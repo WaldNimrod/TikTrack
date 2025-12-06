@@ -451,24 +451,177 @@ BASE (1)
   └── INIT-SYSTEM (22) - תלוי בהכל
 ```
 
-### HTML Structure
+### HTML Structure (Development Mode)
 
 ```html
 <!-- ===== PACKAGE: BASE ===== -->
-<script src="scripts/base-script-1.js?v=1.0.0"></script>
-<script src="scripts/base-script-2.js?v=1.0.0"></script>
+<script src="scripts/base-script-1.js?v=1.0.0" defer></script>
+<script src="scripts/base-script-2.js?v=1.0.0" defer></script>
 
 <!-- ===== PACKAGE: SERVICES ===== -->
-<script src="scripts/services/service-1.js?v=1.0.0"></script>
+<script src="scripts/services/service-1.js?v=1.0.0" defer></script>
 
 <!-- ===== PACKAGE: DASHBOARD-WIDGETS ===== -->
-<script src="scripts/widgets/widget-1.js?v=1.0.0"></script>
+<script src="scripts/widgets/widget-1.js?v=1.0.0" defer></script>
 
 <!-- ===== PACKAGE: INIT-SYSTEM ===== -->
-<script src="scripts/init-system/package-manifest.js?v=1.0.0"></script>
-<script src="scripts/page-initialization-configs.js?v=1.0.0"></script>
-<script src="scripts/unified-app-initializer.js?v=1.0.0"></script>
+<script src="scripts/init-system/package-manifest.js?v=1.0.0" defer></script>
+<script src="scripts/page-initialization-configs.js?v=1.0.0" defer></script>
+<script src="scripts/modules/core-systems.js?v=1.0.0" defer></script>
 ```
+
+**הערה:** כל הסקריפטים משתמשים ב-`defer` attribute כדי לשפר ביצועים תוך שמירה על סדר ביצוע.
+
+### HTML Structure (Production Mode - עם Bundles)
+
+```html
+<!-- ===== PACKAGE: BASE ===== -->
+<script src="scripts/bundles/base.bundle.js?v=1.0.0" defer></script>
+
+<!-- ===== PACKAGE: SERVICES ===== -->
+<script src="scripts/bundles/services.bundle.js?v=1.0.0" defer></script>
+
+<!-- ===== PACKAGE: DASHBOARD-WIDGETS ===== -->
+<script src="scripts/bundles/dashboard-widgets.bundle.js?v=1.0.0" defer></script>
+
+<!-- ===== PACKAGE: INIT-SYSTEM ===== -->
+<script src="scripts/bundles/init-system.bundle.js?v=1.0.0" defer></script>
+```
+
+**הערה:** ב-Production Mode, כל package נטען כ-bundle אחד, מה שמפחית את מספר בקשות הרשת.
+
+### Loading Strategy Attributes
+
+#### defer (מומלץ לסקריפטים קריטיים)
+
+**שימוש:**
+- סקריפטים קריטיים עם תלויות
+- כל ה-packages הקריטיים
+
+**התנהגות:**
+- נטען במקביל ל-parsing
+- רץ אחרי HTML parsing
+- **שומר על סדר ביצוע**
+
+#### async (מומלץ לסקריפטים לא קריטיים)
+
+**שימוש:**
+- סקריפטים לא קריטיים
+- dev-tools, monitoring
+
+**התנהגות:**
+- נטען במקביל ל-parsing
+- רץ מיד כשהוא מוכן
+- **לא שומר על סדר ביצוע**
+
+---
+
+## 📦 Bundling Workflow
+
+### סקירה כללית
+
+Bundling מאפשר איחוד מספר קבצי JavaScript לקבצים גדולים יותר, מה שמפחית את מספר בקשות הרשת ומשפר ביצועים.
+
+### תהליך עבודה
+
+#### 1. בניית Bundles
+
+```bash
+# בניית כל ה-bundles
+npm run build:bundles
+
+# בניית bundle ספציפי
+npm run build:bundles -- --package=base
+```
+
+**תהליך:**
+- קריאת `package-manifest.js`
+- זיהוי כל הסקריפטים בכל package
+- איחוד הסקריפטים ל-bundle אחד עם `esbuild`
+- Minification ו-optimization
+- יצירת source map
+- שמירה ב-`trading-ui/scripts/bundles/`
+
+#### 2. בדיקת Bundles
+
+```bash
+# בדיקת כל ה-bundles
+npm run test:bundles
+
+# בדיקת bundle ספציפי
+npm run test:bundles -- --package=base
+```
+
+**בדיקות:**
+- וידוא שה-bundle קיים
+- בדיקת גודל
+- וידוא שה-source map קיים
+- בדיקת תקינות
+
+#### 3. עדכון HTML ל-Production Mode
+
+```bash
+# 1. גיבוי
+cp trading-ui/my-page.html trading-ui/my-page.html.backup
+
+# 2. יצירת HTML עם bundles
+node trading-ui/scripts/generate-script-loading-code.js my-page --mode=production --use-bundles > temp_my-page.html
+
+# 3. החלפה
+mv temp_my-page.html trading-ui/my-page.html
+```
+
+#### 4. בדיקות
+
+```bash
+# בדיקות ביצועים
+python3 scripts/testing/test_performance_pages.py --page=my-page
+
+# בדיקות console errors
+python3 scripts/test_pages_console_errors.py --page=my-page
+```
+
+### הגדרת Loading Strategy ב-package-manifest.js
+
+כל package יכול להגדיר `loadingStrategy`:
+
+```javascript
+'my-package': {
+  id: 'my-package',
+  name: 'My Package',
+  loadingStrategy: 'defer', // defer, async, או sync
+  scripts: [
+    {
+      file: 'my-script.js',
+      globalCheck: 'window.MyScript',
+      loadingStrategy: 'defer' // אופציונלי - אם לא מוגדר, משתמש ב-package loadingStrategy
+    }
+  ]
+}
+```
+
+**כללי סיווג:**
+- **`defer`** - לסקריפטים קריטיים עם תלויות (מומלץ לרוב הסקריפטים)
+- **`async`** - לסקריפטים לא קריטיים ללא תלויות
+- **`sync`** - רק במקרים מיוחדים מאוד
+
+### יצירת Script Loading Code
+
+המערכת משתמשת ב-`generate-script-loading-code.js` ליצירת קוד טעינה אוטומטי:
+
+```bash
+# Development mode (קבצים מקוריים)
+node trading-ui/scripts/generate-script-loading-code.js my-page
+
+# Production mode (bundles)
+node trading-ui/scripts/generate-script-loading-code.js my-page --mode=production --use-bundles
+```
+
+הכלי:
+1. קורא את `package-manifest.js` ו-`page-initialization-configs.js`
+2. ממיין packages לפי `loadOrder`
+3. יוצר תגי `<script>` עם `loadingStrategy` הנכון
+4. מוסיף הערות ותיעוד
 
 ---
 

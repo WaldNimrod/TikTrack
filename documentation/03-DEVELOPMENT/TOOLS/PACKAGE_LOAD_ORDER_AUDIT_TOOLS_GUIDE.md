@@ -457,6 +457,50 @@ node scripts/audit/validate-package-dependencies.js
 
 ---
 
+## 📦 תמיכה ב-Bundles
+
+### Development Mode (ברירת מחדל)
+
+כלי הבדיקה עובדים עם קבצים מקוריים (development mode):
+
+```bash
+# הכלים בודקים קבצים מקוריים
+node scripts/audit/validate-all-pages-load-order.js
+```
+
+**תכונות:**
+- בדיקת קבצים מקוריים
+- זיהוי כל הסקריפטים בנפרד
+- בדיקת סדר טעינה מדויק
+
+### Production Mode (עם Bundles)
+
+כלי הבדיקה יכולים לעבוד גם עם bundles (production mode):
+
+**הערה:** כלי הבדיקה הנוכחיים בודקים קבצים מקוריים. לבדיקת bundles, השתמש ב:
+
+```bash
+# בדיקת bundles
+npm run test:bundles
+
+# בדיקת bundle ספציפי
+npm run test:bundles -- --package=base
+```
+
+**תכונות:**
+- בדיקת bundles
+- זיהוי bundle → scripts mapping
+- בדיקת גודל ותקינות
+
+### עדכון עתידי
+
+כלי הבדיקה יכולים להיות מעודכנים בעתיד לתמיכה מלאה ב-bundles:
+- זיהוי bundles ב-HTML
+- מיפוי Bundle → Scripts
+- בדיקת סדר טעינה עם bundles
+
+---
+
 ## 📚 תעוד נוסף
 
 ### קבצי תעוד מרכזיים

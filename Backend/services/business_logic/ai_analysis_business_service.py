@@ -182,9 +182,10 @@ class AIAnalysisBusinessService(BaseBusinessService):
     def validate_variables(self, variables: Dict[str, Any]) -> Dict[str, Any]:
         """
         Validate variables dictionary.
+        Supports both v2.0 structure (with prompt_variables, filters, trade_selection) and legacy v1.0 structure.
         
         Args:
-            variables: Variables dictionary
+            variables: Variables dictionary (v2.0 or v1.0)
             
         Returns:
             Dict with 'is_valid' (bool) and 'errors' (List[str])
@@ -199,23 +200,77 @@ class AIAnalysisBusinessService(BaseBusinessService):
             errors.append('Variables dictionary cannot be empty')
             return {'is_valid': False, 'errors': errors}
         
-        # Check total length of all variables (to prevent extremely large requests)
-        total_length = sum(len(str(v)) for v in variables.values())
-        if total_length > self.VARIABLES_MAX_LENGTH:
-            errors.append(f"Total length of all variables must not exceed {self.VARIABLES_MAX_LENGTH} characters")
+        # Check if this is v2.0 structure
+        is_v2 = variables.get('version') == '2.0' or 'prompt_variables' in variables
         
-        # Validate each variable value
-        for key, value in variables.items():
-            if not isinstance(key, str):
-                errors.append(f"Variable key '{key}' must be a string")
-            elif len(key) == 0:
-                errors.append("Variable key cannot be empty")
-            elif len(key) > 100:
-                errors.append(f"Variable key '{key}' must not exceed 100 characters")
+        if is_v2:
+            # v2.0 structure: validate prompt_variables, filters, trade_selection separately
+            prompt_variables = variables.get('prompt_variables', {})
+            filters = variables.get('filters', {})
+            trade_selection = variables.get('trade_selection', {})
+            metadata = variables.get('metadata', {})
             
-            # Value can be string, number, or None
-            if value is not None and not isinstance(value, (str, int, float, bool)):
-                errors.append(f"Variable '{key}' value must be a string, number, or boolean")
+            # Validate prompt_variables (must be flat dict with simple values)
+            if isinstance(prompt_variables, dict):
+                for key, value in prompt_variables.items():
+                    if not isinstance(key, str):
+                        errors.append(f"Prompt variable key '{key}' must be a string")
+                    elif value is not None and not isinstance(value, (str, int, float, bool)):
+                        errors.append(f"Prompt variable '{key}' value must be a string, number, or boolean")
+            else:
+                errors.append("prompt_variables must be a dictionary")
+            
+            # Validate filters (must be flat dict with simple values)
+            if isinstance(filters, dict):
+                for key, value in filters.items():
+                    if not isinstance(key, str):
+                        errors.append(f"Filter key '{key}' must be a string")
+                    elif value is not None and not isinstance(value, (str, int, float, bool)):
+                        errors.append(f"Filter '{key}' value must be a string, number, or boolean")
+            else:
+                errors.append("filters must be a dictionary")
+            
+            # Validate trade_selection (can contain nested structures, but top-level keys must be strings)
+            if isinstance(trade_selection, dict):
+                for key, value in trade_selection.items():
+                    if not isinstance(key, str):
+                        errors.append(f"Trade selection key '{key}' must be a string")
+                    # trade_selection values can be more complex (dicts, lists) - allow them
+            else:
+                errors.append("trade_selection must be a dictionary")
+            
+            # Validate metadata (can contain nested structures)
+            if metadata and not isinstance(metadata, dict):
+                errors.append("metadata must be a dictionary")
+            
+            # Check total length (sum of all nested values)
+            total_length = (
+                sum(len(str(v)) for v in prompt_variables.values() if v is not None) +
+                sum(len(str(v)) for v in filters.values() if v is not None) +
+                len(str(trade_selection)) +
+                len(str(metadata))
+            )
+            if total_length > self.VARIABLES_MAX_LENGTH:
+                errors.append(f"Total length of all variables must not exceed {self.VARIABLES_MAX_LENGTH} characters")
+        else:
+            # Legacy v1.0 structure: validate as flat dictionary
+            # Check total length of all variables (to prevent extremely large requests)
+            total_length = sum(len(str(v)) for v in variables.values())
+            if total_length > self.VARIABLES_MAX_LENGTH:
+                errors.append(f"Total length of all variables must not exceed {self.VARIABLES_MAX_LENGTH} characters")
+            
+            # Validate each variable value
+            for key, value in variables.items():
+                if not isinstance(key, str):
+                    errors.append(f"Variable key '{key}' must be a string")
+                elif len(key) == 0:
+                    errors.append("Variable key cannot be empty")
+                elif len(key) > 100:
+                    errors.append(f"Variable key '{key}' must not exceed 100 characters")
+                
+                # Value can be string, number, or None
+                if value is not None and not isinstance(value, (str, int, float, bool)):
+                    errors.append(f"Variable '{key}' value must be a string, number, or boolean")
         
         return {
             'is_valid': len(errors) == 0,

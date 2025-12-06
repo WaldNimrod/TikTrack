@@ -864,8 +864,8 @@ class HeaderSystem {
                   <div class="type-filter-item" data-value="השקעה" onclick="selectTypeOption('השקעה')">
                     <span class="option-text">השקעה</span>
                   </div>
-                  <div class="type-filter-item" data-value="פסיבי" onclick="selectTypeOption('פסיבי')">
-                    <span class="option-text">פסיבי</span>
+                  <div class="type-filter-item" data-value="פאסיבי" onclick="selectTypeOption('פאסיבי')">
+                    <span class="option-text">פאסיבי</span>
                   </div>
                 </div>
               </div>
@@ -3165,8 +3165,8 @@ function updateFilterSelections(filters) {
     Swing: 'סווינג',
     investment: 'השקעה',
     Investment: 'השקעה',
-    passive: 'פסיבי',
-    Passive: 'פסיבי',
+    passive: 'פאסיבי',
+    Passive: 'פאסיבי',
     // date ranges
     all_time: 'כל הזמן',
     any: 'כל הזמן',

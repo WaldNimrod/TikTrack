@@ -16,7 +16,7 @@
  * - registerWatchListsTables() - רישום טבלאות ב-UnifiedTableSystem
  * 
  * DATA LOADING (3)
- * - loadMockupData() - טעינת נתוני מוקאפ
+ * - loadWatchListsData() - טעינת נתוני רשימות צפייה מ-API
  * - loadWatchLists() - טעינת רשימות צפייה
  * - loadWatchListItems(listId) - טעינת פריטי רשימה
  * 
@@ -74,6 +74,7 @@
 
     // ===== PAGE INITIALIZATION =====
 
+
     /**
      * Initialize Watch Lists Page
      * @async
@@ -115,11 +116,19 @@
                 });
             }
 
-            // Register tables (optional - UnifiedTableSystem may not be available in mockups)
+            // Wait for ModalManagerV2 to be available
+            let retries = 0;
+            while (!window.ModalManagerV2 && retries < 20) {
+                await new Promise(resolve => setTimeout(resolve, 100));
+                retries++;
+            }
+
+            // Register modals with ModalManagerV2
+            // Register tables
             registerWatchListsTables();
 
-            // Load mockup data
-            await loadMockupData();
+            // Load watch lists data from API
+            await loadWatchListsData();
 
             // Restore page state (view mode, active list, sections)
             await restorePageState();
@@ -136,7 +145,7 @@
                 });
             }
 
-            // Initialize drag and drop (mockup)
+            // Initialize drag and drop
             if (window.WatchListsUIService?.initializeDragAndDrop) {
                 window.WatchListsUIService.initializeDragAndDrop();
             }
@@ -176,8 +185,7 @@
      */
     function registerWatchListsTables() {
         if (!window.UnifiedTableSystem) {
-            // UnifiedTableSystem is optional for mockups - no warning needed
-            window.Logger?.debug?.('ℹ️ UnifiedTableSystem not available (optional for mockups)', PAGE_LOG_CONTEXT);
+            window.Logger?.warn?.('⚠️ UnifiedTableSystem not available', PAGE_LOG_CONTEXT);
             return;
         }
 
@@ -221,10 +229,10 @@
     // ===== DATA LOADING =====
 
     /**
-     * Load mockup data
+     * Load watch lists data from API
      * @async
      */
-    async function loadMockupData() {
+    async function loadWatchListsData() {
         // Show loading state
         const container = document.getElementById('watchListsGrid') || document.querySelector('.watch-lists-container');
         if (container && typeof window.showLoadingState === 'function') {
@@ -232,18 +240,18 @@
         }
         
         try {
-            // Load watch lists
+            // Load watch lists from API
             await loadWatchLists();
 
             // Load summary stats
-            calculateSummaryStats();
+            await calculateSummaryStats();
             
             // Hide loading state
             if (container && typeof window.hideLoadingState === 'function') {
                 window.hideLoadingState(container.id || 'watchListsGrid');
             }
 
-            window.Logger?.debug?.('✅ Mockup data loaded', PAGE_LOG_CONTEXT);
+            window.Logger?.debug?.('✅ Watch lists data loaded', PAGE_LOG_CONTEXT);
         } catch (error) {
             // Hide loading state on error
             if (container && typeof window.hideLoadingState === 'function') {
@@ -255,19 +263,10 @@
                 window.NotificationSystem.showError('שגיאה בטעינת נתונים', 
                     `לא ניתן לטעון את הנתונים. ${errorMsg}`);
             } else if (window.Logger) {
-                window.Logger.warn('⚠️ Error loading mockup data (non-critical in mockup mode)', { 
+                window.Logger.error('❌ Error loading watch lists data', { 
                     ...PAGE_LOG_CONTEXT, 
                     error: errorMsg 
                 });
-            }
-            // Try fallback to mockup data directly
-            try {
-                if (window.WatchListsDataService?.getMockupWatchLists) {
-                    watchListsData = window.WatchListsDataService.getMockupWatchLists();
-                    calculateSummaryStats();
-                }
-            } catch (fallbackError) {
-                // Silent fallback - mockup data may not be critical
             }
         }
     }
@@ -278,15 +277,16 @@
      */
     async function loadWatchLists() {
         try {
-            if (window.WatchListsDataService?.loadWatchListsData) {
-                watchListsData = await window.WatchListsDataService.loadWatchListsData({ force: false });
-                renderWatchListsGrid();
-            } else {
-                // Fallback to mockup data
-                if (window.WatchListsDataService?.getMockupWatchLists) {
-                    watchListsData = window.WatchListsDataService.getMockupWatchLists();
-                    renderWatchListsGrid();
-                }
+            if (!window.WatchListsDataService?.loadWatchListsData) {
+                throw new Error('WatchListsDataService not available');
+            }
+            
+            watchListsData = await window.WatchListsDataService.loadWatchListsData({ force: false });
+            renderWatchListsGrid();
+            
+            // Auto-select first list if no active list
+            if (!activeListId && watchListsData && watchListsData.length > 0) {
+                await selectList(watchListsData[0].id);
             }
         } catch (error) {
             const errorMsg = error?.message || (typeof error === 'string' ? error : 'שגיאה לא ידועה');
@@ -306,16 +306,12 @@
      */
     async function loadWatchListItems(listId) {
         try {
-            if (window.WatchListsDataService?.loadWatchListItemsData) {
-                activeListItems = await window.WatchListsDataService.loadWatchListItemsData(listId, { force: false });
-                renderActiveListView(activeListItems);
-            } else {
-                // Fallback to mockup data
-                if (window.WatchListsDataService?.getMockupWatchListItems) {
-                    activeListItems = window.WatchListsDataService.getMockupWatchListItems(listId);
-                    renderActiveListView(activeListItems);
-                }
+            if (!window.WatchListsDataService?.getWatchListItems) {
+                throw new Error('WatchListsDataService not available');
             }
+            
+            activeListItems = await window.WatchListsDataService.getWatchListItems(listId, { force: false });
+            renderActiveListView(activeListItems);
         } catch (error) {
             const errorMsg = error?.message || (typeof error === 'string' ? error : 'שגיאה לא ידועה');
             if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {
@@ -333,10 +329,140 @@
      * Render watch lists grid
      */
     function renderWatchListsGrid() {
-        const gridContainer = document.getElementById('watchListsGrid');
-        if (!gridContainer) return;
+        const tbody = document.getElementById('watchListsTableBody');
+        if (!tbody) {
+            window.Logger?.warn?.('⚠️ watchListsTableBody not found', PAGE_LOG_CONTEXT);
+            return;
+        }
 
-        // Grid is already in HTML (mockup), just update data attributes if needed
+        // Clear existing rows
+        tbody.innerHTML = '';
+
+        // If no data, show empty message
+        if (!watchListsData || watchListsData.length === 0) {
+            const tr = document.createElement('tr');
+            const td = document.createElement('td');
+            td.colSpan = 5;
+            td.className = 'text-center text-muted';
+            td.textContent = 'אין רשימות צפייה. לחץ על "יצירת רשימת צפייה חדשה" כדי להתחיל.';
+            tr.appendChild(td);
+            tbody.appendChild(tr);
+            return;
+        }
+
+        // Render each watch list
+        watchListsData.forEach(list => {
+            const tr = document.createElement('tr');
+            tr.setAttribute('data-watch-list-id', list.id);
+
+            // Icon column
+            const tdIcon = document.createElement('td');
+            tdIcon.className = 'col-icon';
+            if (list.icon) {
+                const iconSpan = document.createElement('span');
+                iconSpan.className = 'icon-placeholder icon';
+                iconSpan.setAttribute('data-icon', list.icon);
+                iconSpan.setAttribute('data-size', '20');
+                iconSpan.setAttribute('data-alt', list.icon);
+                iconSpan.setAttribute('aria-label', list.icon);
+                tdIcon.appendChild(iconSpan);
+            }
+            tr.appendChild(tdIcon);
+
+            // Name column
+            const tdName = document.createElement('td');
+            tdName.className = 'col-name';
+            const strong = document.createElement('strong');
+            strong.textContent = list.name || `רשימה #${list.id}`;
+            tdName.appendChild(strong);
+            tr.appendChild(tdName);
+
+            // View mode column
+            const tdViewMode = document.createElement('td');
+            tdViewMode.className = 'col-view-mode';
+            const viewModeMap = { 'table': 'טבלה', 'cards': 'כרטיסים', 'compact': 'קומפקטי' };
+            const viewModeIconMap = { 'table': 'table', 'cards': 'cards', 'compact': 'list' };
+            const viewMode = list.view_mode || 'table';
+            if (viewModeIconMap[viewMode]) {
+                const iconSpan = document.createElement('span');
+                iconSpan.className = 'icon-placeholder icon';
+                iconSpan.setAttribute('data-icon', viewModeIconMap[viewMode]);
+                iconSpan.setAttribute('data-size', '16');
+                iconSpan.setAttribute('data-alt', viewMode);
+                iconSpan.setAttribute('aria-label', viewMode);
+                tdViewMode.appendChild(iconSpan);
+            }
+            const viewModeText = document.createElement('span');
+            viewModeText.className = 'ms-2';
+            viewModeText.textContent = viewModeMap[viewMode] || viewMode;
+            tdViewMode.appendChild(viewModeText);
+            tr.appendChild(tdViewMode);
+
+            // Tickers count column
+            const tdTickers = document.createElement('td');
+            tdTickers.className = 'col-tickers';
+            const itemsIcon = document.createElement('span');
+            itemsIcon.className = 'icon-placeholder icon';
+            itemsIcon.setAttribute('data-icon', 'items');
+            itemsIcon.setAttribute('data-size', '14');
+            itemsIcon.setAttribute('data-alt', 'items');
+            itemsIcon.setAttribute('aria-label', 'items');
+            tdTickers.appendChild(itemsIcon);
+            const countText = document.createTextNode(` ${list.item_count || 0} טיקרים`);
+            tdTickers.appendChild(countText);
+            tr.appendChild(tdTickers);
+
+            // Actions column
+            const tdActions = document.createElement('td');
+            tdActions.className = 'col-actions actions-cell';
+            const actionsDiv = document.createElement('div');
+            actionsDiv.className = 'd-flex gap-1 justify-content-center align-items-center';
+            actionsDiv.style.flexWrap = 'nowrap';
+
+            // View button
+            const btnView = document.createElement('button');
+            btnView.type = 'button';
+            btnView.setAttribute('data-button-type', 'VIEW');
+            btnView.setAttribute('data-variant', 'small');
+            btnView.setAttribute('data-text', '');
+            btnView.setAttribute('data-onclick', `window.WatchListsPage?.selectList(${list.id})`);
+            btnView.title = 'פתח רשימה';
+            actionsDiv.appendChild(btnView);
+
+            // Edit button
+            const btnEdit = document.createElement('button');
+            btnEdit.type = 'button';
+            btnEdit.setAttribute('data-button-type', 'EDIT');
+            btnEdit.setAttribute('data-variant', 'small');
+            btnEdit.setAttribute('data-text', '');
+            btnEdit.setAttribute('data-onclick', `window.WatchListsPage?.editList(${list.id})`);
+            btnEdit.title = 'ערוך רשימה';
+            actionsDiv.appendChild(btnEdit);
+
+            // Delete button
+            const btnDelete = document.createElement('button');
+            btnDelete.type = 'button';
+            btnDelete.setAttribute('data-button-type', 'DELETE');
+            btnDelete.setAttribute('data-variant', 'small');
+            btnDelete.setAttribute('data-text', '');
+            btnDelete.setAttribute('data-onclick', `window.WatchListsPage?.deleteList(${list.id})`);
+            btnDelete.title = 'מחק רשימה';
+            actionsDiv.appendChild(btnDelete);
+
+            tdActions.appendChild(actionsDiv);
+            tr.appendChild(tdActions);
+
+            tbody.appendChild(tr);
+        });
+
+        // Update select dropdown
+        updateActiveListSelect();
+
+        // Initialize button system for new buttons
+        if (window.ButtonSystemInit?.initializeButtons) {
+            window.ButtonSystemInit.initializeButtons(tbody);
+        }
+
         window.Logger?.debug?.('📊 Watch lists grid rendered', { ...PAGE_LOG_CONTEXT, count: watchListsData.length });
     }
 
@@ -345,32 +471,155 @@
      * @param {Array} items - Items to render
      */
     function renderActiveListView(items) {
-        // Table view is handled by UnifiedTableSystem
-        // Cards and compact views need manual rendering
-        if (currentViewMode === 'cards') {
-            renderCardsView(items);
+        if (!items) items = [];
+
+        // Table view is handled by UnifiedTableSystem or manual rendering
+        if (currentViewMode === 'table') {
+            // Use UI Service if available, otherwise manual rendering
+            if (window.WatchListsUIService?.renderTableView) {
+                window.WatchListsUIService.renderTableView(items);
+            } else {
+                // Manual table rendering will be handled by updateWatchListItemsTable
+                updateWatchListItemsTable(items);
+            }
+        } else if (currentViewMode === 'cards') {
+            if (window.WatchListsUIService?.renderCardsView) {
+                window.WatchListsUIService.renderCardsView(items);
+            } else {
+                renderCardsView(items);
+            }
         } else if (currentViewMode === 'compact') {
-            renderCompactView(items);
+            if (window.WatchListsUIService?.renderCompactView) {
+                window.WatchListsUIService.renderCompactView(items);
+            } else {
+                renderCompactView(items);
+            }
         }
 
         window.Logger?.debug?.('📊 Active list view rendered', { ...PAGE_LOG_CONTEXT, mode: currentViewMode, count: items.length });
     }
 
     /**
+     * Update watch list items table
+     * @param {Array} items - Items to render
+     */
+    function updateWatchListItemsTable(items) {
+        const tbody = document.getElementById('watchListItemsTableBody');
+        if (!tbody) {
+            window.Logger?.warn?.('⚠️ watchListItemsTableBody not found', PAGE_LOG_CONTEXT);
+            return;
+        }
+
+        // Clear existing rows
+        tbody.innerHTML = '';
+
+        // If no data, show empty message
+        if (!items || items.length === 0) {
+            const tr = document.createElement('tr');
+            const td = document.createElement('td');
+            td.colSpan = 11;
+            td.className = 'text-center text-muted';
+            td.textContent = 'אין פריטים ברשימה זו. לחץ על "הוסף טיקר לרשימה" כדי להתחיל.';
+            tr.appendChild(td);
+            tbody.appendChild(tr);
+            return;
+        }
+
+        // Render each item (simplified - full rendering should use FieldRendererService)
+        items.forEach(item => {
+            const tr = document.createElement('tr');
+            tr.setAttribute('data-item-id', item.id);
+            tr.setAttribute('draggable', 'true');
+
+            // Drag handle column
+            const tdDrag = document.createElement('td');
+            tdDrag.className = 'drag-handle-column';
+            const dragHandle = document.createElement('span');
+            dragHandle.className = 'drag-handle';
+            dragHandle.textContent = '≡';
+            tdDrag.appendChild(dragHandle);
+            tr.appendChild(tdDrag);
+
+            // Flag column
+            const tdFlag = document.createElement('td');
+            const flagBtn = document.createElement('button');
+            flagBtn.type = 'button';
+            flagBtn.className = 'btn btn-sm btn-flag';
+            if (item.flag_color) {
+                flagBtn.setAttribute('data-flag-color', item.flag_color);
+            }
+            flagBtn.setAttribute('data-onclick', `window.WatchListsPage?.showFlagPalette(${item.id})`);
+            flagBtn.title = 'שינוי דגל';
+            const flagIcon = document.createElement('span');
+            flagIcon.className = 'icon-placeholder icon';
+            flagIcon.setAttribute('data-icon', item.flag_color ? 'flag-filled' : 'flag');
+            flagIcon.setAttribute('data-size', '16');
+            flagIcon.setAttribute('data-alt', 'flag');
+            flagIcon.setAttribute('aria-label', 'flag');
+            flagBtn.appendChild(flagIcon);
+            tdFlag.appendChild(flagBtn);
+            tr.appendChild(tdFlag);
+
+            // Symbol column
+            const tdSymbol = document.createElement('td');
+            const strong = document.createElement('strong');
+            strong.textContent = item.ticker?.symbol || item.external_symbol || `טיקר #${item.id}`;
+            tdSymbol.appendChild(strong);
+            if (item.external_symbol) {
+                const badge = document.createElement('span');
+                badge.className = 'badge bg-secondary ms-2';
+                badge.textContent = 'חיצוני';
+                tdSymbol.appendChild(badge);
+            }
+            tr.appendChild(tdSymbol);
+
+            // Price column (simplified - should use FieldRendererService)
+            const tdPrice = document.createElement('td');
+            tdPrice.textContent = item.ticker?.current_price || item.price || 'N/A';
+            tr.appendChild(tdPrice);
+
+            // Add more columns as needed (Change, Change %, Daily Change %, ATR, Position, P/L, P/L %, Actions)
+            // For now, add placeholder cells
+            for (let i = 0; i < 8; i++) {
+                const td = document.createElement('td');
+                td.textContent = '-';
+                tr.appendChild(td);
+            }
+
+            tbody.appendChild(tr);
+        });
+
+        // Initialize button system for new buttons
+        if (window.ButtonSystemInit?.initializeButtons) {
+            window.ButtonSystemInit.initializeButtons(tbody);
+        }
+
+        window.Logger?.debug?.('📊 Watch list items table updated', { ...PAGE_LOG_CONTEXT, count: items.length });
+    }
+
+    /**
      * Render summary statistics
      */
-    function renderSummaryStats() {
-        const stats = calculateSummaryStats();
+    function renderSummaryStats(stats = null) {
+        // If stats not provided, calculate them (async)
+        if (!stats) {
+            calculateSummaryStats().then(calculatedStats => {
+                renderSummaryStats(calculatedStats);
+            }).catch(error => {
+                window.Logger?.error?.('❌ Error calculating summary stats', { ...PAGE_LOG_CONTEXT, error: error?.message });
+            });
+            return;
+        }
         
         const totalListsEl = document.getElementById('totalWatchLists');
         const totalTickersEl = document.getElementById('totalTickers');
         const activeFlagsEl = document.getElementById('activeFlags');
         const externalTickersEl = document.getElementById('externalTickers');
 
-        if (totalListsEl) totalListsEl.textContent = stats.totalLists;
-        if (totalTickersEl) totalTickersEl.textContent = stats.totalTickers;
-        if (activeFlagsEl) activeFlagsEl.textContent = stats.activeFlags;
-        if (externalTickersEl) externalTickersEl.textContent = stats.externalTickers;
+        if (totalListsEl) totalListsEl.textContent = stats.totalLists || 0;
+        if (totalTickersEl) totalTickersEl.textContent = stats.totalTickers || 0;
+        if (activeFlagsEl) activeFlagsEl.textContent = stats.activeFlags || 0;
+        if (externalTickersEl) externalTickersEl.textContent = stats.externalTickers || 0;
     }
 
     /**
@@ -380,6 +629,44 @@
     function renderFlaggedTickers(tickers) {
         // Table view is handled by UnifiedTableSystem
         window.Logger?.debug?.('🚩 Flagged tickers rendered', { ...PAGE_LOG_CONTEXT, count: tickers.length });
+    }
+
+    /**
+     * Update active list select dropdown
+     */
+    function updateActiveListSelect() {
+        const selectEl = document.getElementById('activeListSelect');
+        if (!selectEl) {
+            window.Logger?.warn?.('⚠️ activeListSelect not found', PAGE_LOG_CONTEXT);
+            return;
+        }
+
+        // Clear existing options
+        selectEl.innerHTML = '';
+
+        // Add empty option if no lists
+        if (!watchListsData || watchListsData.length === 0) {
+            const option = document.createElement('option');
+            option.value = '';
+            option.textContent = 'אין רשימות זמינות';
+            option.disabled = true;
+            selectEl.appendChild(option);
+            return;
+        }
+
+        // Add options for each list
+        watchListsData.forEach(list => {
+            const option = document.createElement('option');
+            option.value = list.id;
+            option.textContent = list.name || `רשימה #${list.id}`;
+            if (list.id === activeListId) {
+                option.selected = true;
+            }
+            selectEl.appendChild(option);
+        });
+
+        // Ensure dark color is maintained (using CSS variables)
+        selectEl.style.fontWeight = '600';
     }
 
     /**
@@ -394,14 +681,8 @@
         // Also update select if exists
         const selectEl = document.getElementById('activeListSelect');
         if (selectEl) {
-            // Find option by text and select it
-            const options = selectEl.querySelectorAll('option');
-            for (const option of options) {
-                if (option.textContent === listName) {
-                    selectEl.value = option.value;
-                    break;
-                }
-            }
+            // Find option by value (activeListId) and select it
+            selectEl.value = activeListId || '';
             // Ensure dark color is maintained after value change (using CSS variables)
             // CSS already handles this via variables, but we ensure fontWeight is maintained
             selectEl.style.fontWeight = '600';
@@ -554,14 +835,13 @@
     /**
      * Open add list modal
      */
-    function openAddListModal() {
-        if (window.ModalManagerV2?.showModal) {
-            window.ModalManagerV2.showModal('watchListModal', {
-                mode: 'create',
-                title: 'רשימה חדשה'
-            });
+    async function openAddListModal() {
+        if (typeof window.showModalSafe === 'function') {
+            await window.showModalSafe('watchListModal', 'add');
+        } else if (window.ModalManagerV2) {
+            await window.ModalManagerV2.showModal('watchListModal', 'add');
         } else {
-            window.Logger?.warn?.('⚠️ ModalManagerV2 not available', PAGE_LOG_CONTEXT);
+            window.Logger?.warn?.('⚠️ showModalSafe and ModalManagerV2 not available', PAGE_LOG_CONTEXT);
         }
     }
 
@@ -569,29 +849,37 @@
      * Open edit list modal
      * @param {number} listId - List ID
      */
-    function openEditListModal(listId) {
-        if (window.ModalManagerV2?.showModal) {
+    async function openEditListModal(listId) {
+        try {
             const list = watchListsData.find(l => l.id === listId);
-            window.ModalManagerV2.showModal('watchListModal', {
-                mode: 'edit',
-                title: 'עריכת רשימה',
-                data: list
-            });
-        } else {
-            window.Logger?.warn?.('⚠️ ModalManagerV2 not available', PAGE_LOG_CONTEXT);
+            if (list) {
+                if (typeof window.showModalSafe === 'function') {
+                    await window.showModalSafe('watchListModal', 'edit');
+                    // Populate form with data
+                    if (window.ModalManagerV2 && window.ModalManagerV2.populateForm) {
+                        window.ModalManagerV2.populateForm('watchListModal', list);
+                    }
+                } else if (window.ModalManagerV2) {
+                    await window.ModalManagerV2.showModal('watchListModal', 'edit', list);
+                } else {
+                    window.Logger?.warn?.('⚠️ showModalSafe and ModalManagerV2 not available', PAGE_LOG_CONTEXT);
+                }
+            }
+        } catch (error) {
+            window.Logger?.error?.('❌ Error opening edit list modal', { ...PAGE_LOG_CONTEXT, error });
         }
     }
 
     /**
      * Add ticker (open modal)
      */
-    function addTicker() {
-        if (window.ModalManagerV2?.showModal) {
-            window.ModalManagerV2.showModal('addTickerModal', {
-                listId: activeListId
-            });
+    async function addTicker() {
+        if (typeof window.showModalSafe === 'function') {
+            await window.showModalSafe('addTickerModal', 'add');
+        } else if (window.ModalManagerV2) {
+            await window.ModalManagerV2.showModal('addTickerModal', 'add');
         } else {
-            window.Logger?.warn?.('⚠️ ModalManagerV2 not available', PAGE_LOG_CONTEXT);
+            window.Logger?.warn?.('⚠️ showModalSafe and ModalManagerV2 not available', PAGE_LOG_CONTEXT);
         }
     }
 
@@ -599,13 +887,29 @@
      * Edit item (open modal)
      * @param {number} itemId - Item ID
      */
-    function editItem(itemId) {
+    async function editItem(itemId) {
+        // Wait for ModalManagerV2 to be available
+        if (!window.ModalManagerV2) {
+            window.Logger?.warn?.('⚠️ ModalManagerV2 not available, waiting...', PAGE_LOG_CONTEXT);
+            // Wait up to 2 seconds for ModalManagerV2
+            for (let i = 0; i < 20; i++) {
+                await new Promise(resolve => setTimeout(resolve, 100));
+                if (window.ModalManagerV2) {
+                    window.Logger?.info?.('✅ ModalManagerV2 became available', PAGE_LOG_CONTEXT);
+                    break;
+                }
+            }
+        }
+        
         const item = activeListItems.find(i => i.id === itemId);
         if (item && window.ModalManagerV2?.showModal) {
-            window.ModalManagerV2.showModal('editWatchListItemModal', {
-                itemId: itemId,
-                data: item
-            });
+            try {
+                await window.ModalManagerV2.showModal('editWatchListItemModal', 'edit', item, {
+                    itemId: itemId
+                });
+            } catch (error) {
+                window.Logger?.error?.('❌ Error opening edit item modal', { ...PAGE_LOG_CONTEXT, error });
+            }
         } else {
             window.Logger?.warn?.('⚠️ Item not found or ModalManagerV2 not available', PAGE_LOG_CONTEXT);
         }
@@ -908,9 +1212,9 @@
 
     /**
      * Calculate summary statistics
-     * @returns {Object} Statistics object
+     * @returns {Promise<Object>} Statistics object
      */
-    function calculateSummaryStats() {
+    async function calculateSummaryStats() {
         const stats = {
             totalLists: watchListsData.length,
             totalTickers: 0,
@@ -919,16 +1223,20 @@
         };
 
         // Calculate from all lists
-        watchListsData.forEach(list => {
-            if (window.WatchListsDataService?.getMockupWatchListItems) {
-                const items = window.WatchListsDataService.getMockupWatchListItems(list.id);
-                stats.totalTickers += items.length;
-                stats.activeFlags += items.filter(i => i.flag_color).length;
-                stats.externalTickers += items.filter(i => i.external_symbol).length;
+        for (const list of watchListsData) {
+            try {
+                if (window.WatchListsDataService?.getWatchListItems) {
+                    const items = await window.WatchListsDataService.getWatchListItems(list.id, { force: false });
+                    stats.totalTickers += items.length;
+                    stats.activeFlags += items.filter(i => i.flag_color).length;
+                    stats.externalTickers += items.filter(i => i.external_symbol).length;
+                }
+            } catch (error) {
+                window.Logger?.warn?.('⚠️ Error loading items for stats', { ...PAGE_LOG_CONTEXT, listId: list.id, error: error?.message });
             }
-        });
+        }
 
-        renderSummaryStats();
+        renderSummaryStats(stats);
 
         return stats;
     }
@@ -946,7 +1254,7 @@
      * @param {Array} items - Items to render
      */
     function renderCardsView(items) {
-        // Cards view rendering is handled by HTML (mockup)
+        // Cards view rendering
         // This is a placeholder for future dynamic rendering
         window.Logger?.debug?.('🃏 Cards view rendered', { ...PAGE_LOG_CONTEXT, count: items.length });
     }
@@ -956,7 +1264,7 @@
      * @param {Array} items - Items to render
      */
     function renderCompactView(items) {
-        // Compact view rendering is handled by HTML (mockup)
+        // Compact view rendering
         // This is a placeholder for future dynamic rendering
         window.Logger?.debug?.('📋 Compact view rendered', { ...PAGE_LOG_CONTEXT, count: items.length });
     }
@@ -1066,7 +1374,7 @@
         registerTables: registerWatchListsTables,
 
         // Data loading
-        loadMockupData,
+        loadWatchListsData,
         loadWatchLists,
         loadWatchListItems,
 
@@ -1076,6 +1384,8 @@
         renderSummaryStats,
         renderFlaggedTickers,
         updateActiveListTitle,
+        updateActiveListSelect,
+        updateWatchListItemsTable,
         switchList,
 
         // View mode

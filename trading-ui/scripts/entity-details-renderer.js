@@ -341,10 +341,28 @@ class EntityDetailsRenderer {
         if (!tickerColor && typeof window.getEntityColor === 'function') {
             tickerColor = window.getEntityColor('ticker') || '';
         }
+        
+        // 🔍 DEBUG: Log tickerData to see what we're receiving
+        if (window.Logger) {
+            window.Logger.debug('🔍 [renderMarketData] Ticker data received:', {
+                hasVolume: 'volume' in tickerData,
+                volume: tickerData.volume,
+                volumeType: typeof tickerData.volume,
+                hasMarketCap: 'market_cap' in tickerData,
+                marketCap: tickerData.market_cap,
+                marketCapType: typeof tickerData.market_cap,
+                allKeys: Object.keys(tickerData).filter(k => k.includes('volume') || k.includes('market') || k.includes('cap')),
+                page: 'entity-details-renderer'
+            });
+        }
+        
         const price = tickerData.current_price || tickerData.price || 0;
         const change = tickerData.daily_change || tickerData.change_amount || 0;
         const changePercent = tickerData.daily_change_percent || tickerData.change_percent || 0;
-        const volume = tickerData.volume || 0;
+        // Volume: check explicitly for null/undefined, 0 is a valid value
+        const volume = (tickerData.volume !== undefined && tickerData.volume !== null) ? tickerData.volume : null;
+        // Market cap: check explicitly for null/undefined
+        const marketCap = (tickerData.market_cap !== undefined && tickerData.market_cap !== null) ? tickerData.market_cap : null;
         const currencySymbol = tickerData.currency_symbol || (tickerData.currency && tickerData.currency.symbol) || '$';
         const updatedAt = tickerData.yahoo_updated_at || tickerData.updated_at || null;
         const dataSource = tickerData.data_source || null;
@@ -413,8 +431,19 @@ class EntityDetailsRenderer {
         const changeIcon = change >= 0 ? '↗' : '↘';
         const changeSign = change >= 0 ? '+' : '';
         
-        // פורמט נפח
-        const formattedVolume = volume > 0 ? volume.toLocaleString('he-IL') : 'N/A';
+        // פורמט נפח - שימוש ב-renderVolume אם זמין, אחרת פורמט ידני
+        let formattedVolume = 'N/A';
+        if (volume !== null && volume !== undefined && !isNaN(volume) && Number.isFinite(volume)) {
+            if (volume === 0) {
+                formattedVolume = '0';
+            } else if (typeof window.renderVolume === 'function') {
+                formattedVolume = window.renderVolume(volume, true);
+            } else if (window.FieldRendererService && typeof window.FieldRendererService.renderVolume === 'function') {
+                formattedVolume = window.FieldRendererService.renderVolume(volume, true);
+            } else {
+                formattedVolume = volume.toLocaleString('he-IL');
+            }
+        }
         
         // פורמט תאריך עדכון
         let updatedAtDisplay = '';
@@ -444,7 +473,7 @@ class EntityDetailsRenderer {
             }
         }
         
-        return `
+        const html = `
             <div class="market-data-container pb-2 mb-3 border-bottom">
                 <div class="d-flex align-items-center justify-content-center gap-3 flex-wrap">
                     <div class="fw-bold fs-5" style="direction: ltr;">
@@ -458,6 +487,11 @@ class EntityDetailsRenderer {
                     <div class="text-muted small">
                         נפח: ${formattedVolume}
                     </div>
+                    ${marketCap !== null && marketCap !== undefined ? `
+                    <div class="text-muted small" id="market-cap-display">
+                        שווי שוק: ${this._formatMarketCap(marketCap, currencySymbol)}
+                    </div>
+                    ` : ''}
                     ${updatedAtDisplay ? `
                     <div class="text-muted small">
                         עודכן: ${updatedAtDisplay}
@@ -481,6 +515,70 @@ class EntityDetailsRenderer {
                 ` : ''}
             </div>
         `;
+        
+        // Apply warning color if market cap is below threshold
+        if (marketCap !== null && marketCap !== undefined) {
+            // Load preference asynchronously and apply warning
+            this._applyMarketCapWarning(marketCap, currencySymbol);
+        }
+        
+        return html;
+    }
+    
+    /**
+     * Format market cap value with currency symbol
+     * @param {number} marketCap - Market cap value
+     * @param {string} currencySymbol - Currency symbol
+     * @returns {string} Formatted market cap string
+     * @private
+     */
+    _formatMarketCap(marketCap, currencySymbol = '$') {
+        if (marketCap === null || marketCap === undefined || isNaN(marketCap)) {
+            return 'N/A';
+        }
+        
+        // Format: $1.5B, $500M, etc.
+        if (marketCap >= 1000000000) {
+            return `${currencySymbol}${(marketCap / 1000000000).toFixed(2)}B`;
+        } else if (marketCap >= 1000000) {
+            return `${currencySymbol}${(marketCap / 1000000).toFixed(2)}M`;
+        } else if (marketCap >= 1000) {
+            return `${currencySymbol}${(marketCap / 1000).toFixed(2)}K`;
+        } else {
+            return `${currencySymbol}${marketCap.toFixed(2)}`;
+        }
+    }
+    
+    /**
+     * Apply warning color to market cap display if below threshold
+     * @param {number} marketCap - Market cap value
+     * @param {string} currencySymbol - Currency symbol
+     * @private
+     */
+    async _applyMarketCapWarning(marketCap, currencySymbol) {
+        try {
+            // Get threshold from preferences
+            let threshold = 1000000000; // Default: 1 billion
+            if (typeof window.getCurrentPreference === 'function') {
+                threshold = await window.getCurrentPreference('market_cap_warning_threshold') || 1000000000;
+            } else if (window.PreferencesCore && typeof window.PreferencesCore.getPreference === 'function') {
+                threshold = await window.PreferencesCore.getPreference('market_cap_warning_threshold') || 1000000000;
+            } else if (window.currentPreferences && window.currentPreferences.market_cap_warning_threshold) {
+                threshold = parseFloat(window.currentPreferences.market_cap_warning_threshold) || 1000000000;
+            }
+            
+            // Apply warning color if market cap is below threshold
+            const marketCapDisplay = document.getElementById('market-cap-display');
+            if (marketCapDisplay && marketCap < threshold) {
+                marketCapDisplay.classList.add('text-warning', 'fw-bold');
+                marketCapDisplay.setAttribute('title', `שווי שוק נמוך מהסף (${this._formatMarketCap(threshold, currencySymbol)})`);
+            }
+        } catch (e) {
+            // Silently fail if preference loading fails
+            if (window.Logger) {
+                window.Logger.debug('Failed to load market cap warning threshold', { page: 'entity-details-renderer', error: e });
+            }
+        }
     }
 
     // REMOVED: Old renderTradeSpecific() - replaced by enhanced version below (line 1151)
@@ -989,6 +1087,11 @@ class EntityDetailsRenderer {
                 <div class="mb-3 d-flex align-items-center">
                     <label class="form-label fw-bold me-2 mb-0" style="min-width: 120px;">תאריך יצירה:</label>
                     <span class="text-muted">${createdAt}</span>
+                </div>
+                
+                <div class="mb-3 d-flex align-items-center">
+                    <label class="form-label fw-bold me-2 mb-0" style="min-width: 120px;">מזהה:</label>
+                    <span class="text-muted">${tickerData.id || '-'}</span>
                 </div>
                 
                 ${providerSymbolsHtml}

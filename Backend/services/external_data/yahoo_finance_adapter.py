@@ -31,6 +31,7 @@ class QuoteData:
     change_pct_day: Optional[float] = None  # Added missing attribute
     change_amount: Optional[float] = None
     volume: Optional[int] = None
+    market_cap: Optional[float] = None  # Market capitalization in base currency
     currency: str = 'USD'
     asof_utc: Optional[datetime] = None
     source: str = 'yahoo_finance'
@@ -880,9 +881,32 @@ class YahooFinanceAdapter:
             else:
                 logger.warning(f"📊 {symbol}: Cannot calculate percentage change - missing data")
             
+            # Try multiple volume field names (Yahoo Finance may use different fields)
             if 'regularMarketVolume' in meta:
                 quote.volume = int(meta['regularMarketVolume'])
-                logger.info(f"📊 {symbol}: volume = {quote.volume}")
+                logger.info(f"📊 {symbol}: volume = {quote.volume} (from regularMarketVolume)")
+            elif 'volume' in meta:
+                quote.volume = int(meta['volume'])
+                logger.info(f"📊 {symbol}: volume = {quote.volume} (from volume)")
+            elif 'averageVolume' in meta:
+                quote.volume = int(meta['averageVolume'])
+                logger.info(f"📊 {symbol}: volume = {quote.volume} (from averageVolume)")
+            elif 'averageDailyVolume10Day' in meta:
+                quote.volume = int(meta['averageDailyVolume10Day'])
+                logger.info(f"📊 {symbol}: volume = {quote.volume} (from averageDailyVolume10Day)")
+            else:
+                logger.warning(f"📊 {symbol}: No volume data found in meta. Available keys: {list(meta.keys())}")
+            
+            # Extract market capitalization (market cap)
+            # Yahoo Finance provides marketCap in meta
+            if 'marketCap' in meta:
+                try:
+                    quote.market_cap = float(meta['marketCap'])
+                    logger.info(f"📊 {symbol}: market_cap = {quote.market_cap:,.0f} (from marketCap)")
+                except (ValueError, TypeError) as e:
+                    logger.warning(f"📊 {symbol}: Error parsing marketCap: {e}")
+            else:
+                logger.debug(f"📊 {symbol}: No marketCap found in meta. Available keys: {list(meta.keys())}")
             
             # Extract open price and calculate change from open
             if 'regularMarketOpen' in meta:
@@ -1044,7 +1068,8 @@ class YahooFinanceAdapter:
             logger.info(f"🔄 _cache_quote_by_ticker called for ticker: {ticker.symbol} (ID: {ticker.id})")
             
             # Check if quote already exists (within last hour to avoid duplicates)
-            cutoff_time = datetime.now(timezone.utc) - timedelta(hours=1)
+            # Use a shorter window (5 minutes) to allow force refresh to work properly
+            cutoff_time = datetime.now(timezone.utc) - timedelta(minutes=5)
             existing_quote = self.db_session.query(MarketDataQuote).filter(
                 MarketDataQuote.ticker_id == ticker.id,
                 MarketDataQuote.provider_id == self.provider_id,
@@ -1054,11 +1079,14 @@ class YahooFinanceAdapter:
             if existing_quote:
                 # Update existing quote
                 logger.info(f"🔄 Updating existing quote for {ticker.symbol}")
+                logger.info(f"📊 Updating quote: old_volume={existing_quote.volume}, new_volume={quote.volume}")
                 existing_quote.asof_utc = quote.asof_utc or datetime.now(timezone.utc)
                 existing_quote.price = quote.price
                 existing_quote.change_pct_day = quote.change_pct_day or quote.change_pct
                 existing_quote.change_amount_day = quote.change_amount
-                existing_quote.volume = quote.volume
+                existing_quote.volume = quote.volume  # Explicitly update volume
+                existing_quote.market_cap = quote.market_cap  # Update market cap
+                logger.info(f"📊 After update: existing_quote.volume={existing_quote.volume}, market_cap={existing_quote.market_cap}")
                 existing_quote.currency = quote.currency
                 existing_quote.source = quote.source
                 existing_quote.is_stale = False
@@ -1084,6 +1112,7 @@ class YahooFinanceAdapter:
                     change_pct_day=quote.change_pct_day or quote.change_pct,
                     change_amount_day=quote.change_amount,
                     volume=quote.volume,
+                    market_cap=quote.market_cap,
                     currency=quote.currency,
                     source=quote.source,
                     is_stale=False,
@@ -1103,12 +1132,64 @@ class YahooFinanceAdapter:
                 self.db_session.add(db_quote)
             
             # Also update quotes_last table as required by specification Section 3.1
-            self._update_quotes_last(ticker.id, quote)
+            # Do this AFTER we've updated the quote but BEFORE commit to ensure volume is saved
+            # Use a separate transaction to avoid rollback issues
+            try:
+                # Save the quote first, then update quotes_last
+                # This ensures the quote is saved even if quotes_last fails
+                pass  # We'll update quotes_last after commit
+            except Exception as e:
+                logger.warning(f"⚠️ Error preparing quotes_last update for {ticker.symbol}: {e} - continuing anyway")
             
+            # Log before commit to see what we're about to save
             logger.info(f"🔄 Committing transaction for {ticker.symbol}")
+            logger.info(f"📊 Quote data being saved: price={quote.price}, volume={quote.volume}, change_pct={quote.change_pct_day or quote.change_pct}")
+            if existing_quote:
+                logger.info(f"📊 Existing quote before commit: volume={existing_quote.volume}, price={existing_quote.price}")
+            elif db_quote:
+                logger.info(f"📊 New quote before commit: volume={db_quote.volume}, price={db_quote.price}")
+            
+            # Flush to ensure changes are in session before commit
+            self.db_session.flush()
+            
+            # Commit the transaction
             self.db_session.commit()
             
-            logger.info(f"✅ Successfully cached quote for {ticker.symbol}: ${quote.price}")
+            # Now update quotes_last after commit (separate transaction to avoid rollback)
+            try:
+                self._update_quotes_last(ticker.id, quote)
+            except Exception as e:
+                logger.warning(f"⚠️ Error updating quotes_last for {ticker.symbol}: {e} - continuing anyway")
+            
+            # Refresh the object from database to ensure we have the latest data
+            if existing_quote:
+                self.db_session.refresh(existing_quote)
+                logger.info(f"📊 Existing quote after commit and refresh: volume={existing_quote.volume}, price={existing_quote.price}")
+            
+            # Verify the data was saved correctly - query fresh from database
+            saved_quote = self.db_session.query(MarketDataQuote).filter(
+                MarketDataQuote.ticker_id == ticker.id,
+                MarketDataQuote.provider_id == self.provider_id
+            ).order_by(MarketDataQuote.fetched_at.desc()).first()
+            
+            if saved_quote:
+                if quote.volume is not None:
+                    if saved_quote.volume != quote.volume:
+                        logger.warning(f"⚠️ Volume mismatch for {ticker.symbol}: saved={saved_quote.volume}, expected={quote.volume}")
+                        logger.warning(f"⚠️ Quote object volume: {quote.volume}, DB quote volume: {saved_quote.volume}")
+                        # Try to fix it - update directly
+                        saved_quote.volume = quote.volume
+                        self.db_session.commit()
+                        logger.info(f"🔧 Fixed volume mismatch for {ticker.symbol}: set to {quote.volume}")
+                    else:
+                        logger.info(f"✅ Verified volume saved correctly for {ticker.symbol}: {saved_quote.volume}")
+                else:
+                    logger.warning(f"⚠️ Quote volume is None for {ticker.symbol} - volume was not fetched from Yahoo Finance")
+                    logger.info(f"📊 Saved quote volume in DB: {saved_quote.volume}")
+            else:
+                logger.error(f"❌ Could not find saved quote for {ticker.symbol} after commit!")
+            
+            logger.info(f"✅ Successfully cached quote for {ticker.symbol}: ${quote.price}, volume={quote.volume}")
             
         except SQLAlchemyError as e:
             logger.error(f"❌ SQLAlchemy error caching quote for ticker {ticker.id}: {e}", exc_info=True)

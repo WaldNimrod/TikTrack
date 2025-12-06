@@ -1044,9 +1044,13 @@ class EntityDetailsModal {
             }
             
             // טיפול מיוחד עבור account/trading_account - הצגת שם החשבון במקום מספר
+            // טיפול מיוחד עבור ticker - הצגת symbol במקום מזהה
             let titleText = '';
             if (finalEntityType === 'trading_account' && entityData && entityData.name) {
                 titleText = `פרטי חשבון מסחר: ${entityData.name}`;
+            } else if (finalEntityType === 'ticker' && entityData && entityData.symbol) {
+                // עבור ticker - הצגת symbol בכותרת
+                titleText = `פרטי טיקר: ${entityData.symbol}`;
             } else {
                 // יצירת כותרת חדשה: [איקון] פרטי [סוג ישות] מספר [מזהה]
                 titleText = `פרטי ${entityLabel}${finalEntityId ? ` מספר ${finalEntityId}` : ''}`;
@@ -1203,17 +1207,37 @@ class EntityDetailsModal {
         if (entityType === 'ticker') {
             const tickerId = this.currentEntityId || entityData?.id;
             if (tickerId) {
-                // כפתור ישיר עם איקון - לא תפריט
-                const iconPath = window.BUTTON_ICONS?.DASHBOARD || '/trading-ui/images/icons/tabler/gauge.svg';
+                // כפתור ישיר עם איקון בלבד - כמו בתפריט פעולות
+                // Get icon based on button type - use BUTTON_ICONS if available
+                let icon = '';
+                if (window.BUTTON_ICONS && window.BUTTON_ICONS.DASHBOARD) {
+                    const iconPath = window.BUTTON_ICONS.DASHBOARD;
+                    if (iconPath.startsWith('/') || iconPath.startsWith('http')) {
+                        // It's a path, convert to img tag
+                        icon = `<img src="${iconPath}" width="16" height="16" alt="דשבורד" class="icon">`;
+                    } else {
+                        // It's already HTML or emoji
+                        icon = iconPath;
+                    }
+                } else {
+                    // Fallback to emoji if BUTTON_ICONS not available
+                    icon = '📊';
+                }
+                
+                // Escape onclick for HTML attribute
+                const escapedOnclick = `window.location.href='/ticker-dashboard.html?tickerId=${tickerId}'`.replace(/'/g, '&#39;');
+                
                 buttonsHtml = `
                     <button type="button" 
-                            class="btn btn-sm btn-outline-primary" 
-                            onclick="window.location.href='/ticker-dashboard.html?tickerId=${tickerId}'"
-                            title="דשבורד מלא"
+                            class="btn actions-menu-item" 
+                            data-variant="small" 
                             data-button-type="DASHBOARD"
-                            data-variant="normal">
-                        <img src="${iconPath}" width="16" height="16" alt="דשבורד" class="icon me-1">
-                        דשבורד מלא
+                            data-onclick='${escapedOnclick}'
+                            data-tooltip="דשבורד מלא"
+                            data-tooltip-placement="top"
+                            data-tooltip-trigger="hover"
+                            style="margin-right: 4px;">
+                        ${icon}
                     </button>
                 `;
             }

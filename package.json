@@ -50,7 +50,10 @@
     "docs:check": "npm run jsdoc:check",
     "docs:add": "npm run jsdoc:add",
     "docs:update": "npm run docs:add && npm run docs:generate",
-    "ci:prefs-guards": "bash scripts/ci/preferences-guards.sh"
+    "ci:prefs-guards": "bash scripts/ci/preferences-guards.sh",
+    "build:bundles": "node scripts/build/bundle-packages.js",
+    "build:bundles:package": "node scripts/build/bundle-packages.js",
+    "test:bundles": "node scripts/build/test-bundles.js"
   },
   "repository": {
     "type": "git",
@@ -71,6 +74,7 @@
     "@typescript-eslint/eslint-plugin": "^8.41.0",
     "@typescript-eslint/parser": "^8.41.0",
     "axe-core": "^4.10.3",
+    "esbuild": "^0.24.2",
     "eslint": "^9.34.0",
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-jsdoc": "^54.1.1",

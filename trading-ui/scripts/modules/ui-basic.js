@@ -1992,24 +1992,24 @@ function initializeValidation(formId, validationRules = {}) {
       case 'email':
       case 'tel':
       case 'url':
-        isValid = (window.validateTextField || validateTextField)(input, fieldRules);
+        isValid = window.validateTextField ? window.validateTextField(input, fieldRules) : true;
         break;
 
       case 'number':
-        isValid = (window.validateNumberField || validateNumberField)(input, fieldRules);
+        isValid = window.validateNumberField ? window.validateNumberField(input, fieldRules) : true;
         break;
 
       case 'date':
-        isValid = (window.validateDateField || validateDateField)(input, fieldRules);
+        isValid = window.validateDateField ? window.validateDateField(input, fieldRules) : true;
         break;
 
       default:
         if (input.tagName === 'SELECT') {
-          isValid = (window.validateSelectField || validateSelectField)(input, fieldRules);
+          isValid = window.validateSelectField ? window.validateSelectField(input, fieldRules) : true;
         } else if (input.tagName === 'TEXTAREA') {
-          isValid = (window.validateTextField || validateTextField)(input, fieldRules);
+          isValid = window.validateTextField ? window.validateTextField(input, fieldRules) : true;
         } else {
-          isValid = (window.validateField || validateField)(input, fieldRules);
+          isValid = window.validateField ? window.validateField(input, fieldRules) : true;
         }
         break;
       }

@@ -535,6 +535,24 @@ class ModalManagerV2 {
             fieldsHTML = this.generateFieldsHTML(config.fields);
         }
         
+        // Generate default title in Hebrew if not provided
+        let defaultTitle = 'הוספת ישות';
+        if (config.entityType && !config.title?.add) {
+            const ENTITY_LABELS = {
+                ticker: 'טיקר',
+                trade: 'טרייד',
+                trade_plan: 'תכנון',
+                execution: 'ביצוע',
+                trading_account: 'חשבון מסחר',
+                account: 'חשבון מסחר',
+                alert: 'התראה',
+                cash_flow: 'תזרים מזומנים',
+                note: 'הערה'
+            };
+            const entityLabel = ENTITY_LABELS[config.entityType] || config.entityType;
+            defaultTitle = `הוספת ${entityLabel}`;
+        }
+        
         return `
             <div class="modal fade" id="${config.id}" tabindex="-1" 
                  aria-labelledby="${config.id}Label" aria-hidden="true"
@@ -546,7 +564,7 @@ class ModalManagerV2 {
                              style="background-color: var(--current-entity-color-light) !important; border-bottom: 2px solid var(--current-entity-color-dark)">
                             <!-- Breadcrumb navigation -->
                             <div class="modal-navigation-breadcrumb" style="order: 0; width: 100%; margin-bottom: 0.5rem;"></div>
-                            <h5 class="modal-title" id="${config.id}Label" style="color: var(--current-entity-color-dark) !important; order: 1;">${config.title.add || 'הוספת ישות'}</h5>
+                            <h5 class="modal-title" id="${config.id}Label" style="color: var(--current-entity-color-dark) !important; order: 1;">${config.title?.add || defaultTitle}</h5>
                             <!-- Back button - uses the button system -->
                             <button type="button" 
                                     data-button-type="BACK" 
@@ -6539,6 +6557,20 @@ class ModalManagerV2 {
     handleModalHidden(modalElement) {
         const modalId = modalElement.id;
         
+        // Fix ARIA accessibility: Remove aria-hidden from focused elements before closing
+        // This prevents the warning about aria-hidden on elements with focus
+        const activeElement = document.activeElement;
+        if (activeElement && modalElement.contains(activeElement)) {
+            // If the active element is inside the modal, blur it first
+            if (typeof activeElement.blur === 'function') {
+                activeElement.blur();
+            }
+            // Remove aria-hidden from active element if it exists
+            if (activeElement.hasAttribute('aria-hidden')) {
+                activeElement.removeAttribute('aria-hidden');
+            }
+        }
+        
         if (this.modals.has(modalId)) {
             this.modals.get(modalId).isActive = false;
         }
@@ -6675,9 +6707,38 @@ class ModalManagerV2 {
         const titleElement = modalElement.querySelector('.modal-title');
         if (!titleElement) return;
         
-        const title = config.title && config.title[mode] ? 
-            config.title[mode] : 
-            `${mode === 'add' ? 'הוספת' : mode === 'edit' ? 'עריכת' : 'צפייה ב'}${config.entityType}`;
+        // If title is explicitly provided in config, use it
+        if (config.title && config.title[mode]) {
+            titleElement.textContent = config.title[mode];
+            return;
+        }
+        
+        // Otherwise, generate title from entityType (translate to Hebrew)
+        let entityLabel = config.entityType;
+        
+        // Try to get Hebrew label from ENTITY_LABELS (modal-navigation-manager)
+        if (window.ModalNavigationService && typeof window.ModalNavigationService.getEntityLabel === 'function') {
+            entityLabel = window.ModalNavigationService.getEntityLabel(config.entityType) || entityLabel;
+        } else if (window.LinkedItemsService && typeof window.LinkedItemsService.getEntityLabel === 'function') {
+            entityLabel = window.LinkedItemsService.getEntityLabel(config.entityType) || entityLabel;
+        } else {
+            // Fallback: use ENTITY_LABELS from modal-navigation-manager if available
+            const ENTITY_LABELS = {
+                ticker: 'טיקר',
+                trade: 'טרייד',
+                trade_plan: 'תכנון',
+                execution: 'ביצוע',
+                trading_account: 'חשבון מסחר',
+                account: 'חשבון מסחר',
+                alert: 'התראה',
+                cash_flow: 'תזרים מזומנים',
+                note: 'הערה'
+            };
+            entityLabel = ENTITY_LABELS[config.entityType] || entityLabel;
+        }
+        
+        const modePrefix = mode === 'add' ? 'הוספת' : mode === 'edit' ? 'עריכת' : 'צפייה ב';
+        const title = `${modePrefix} ${entityLabel}`;
         
         titleElement.textContent = title;
         

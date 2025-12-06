@@ -258,6 +258,28 @@ When providing coding assistance:
 
 **These optimization rules are fundamental and should be applied in ALL future interactions.**
 
+## Test Credentials Rule - CRITICAL
+**כל הבדיקות (Selenium, API, E2E) חייבות להשתמש תמיד בפרטי התחברות מנהל:**
+- **Username:** `admin`
+- **Password:** `admin123`
+- **Email:** `admin@tiktrack.com`
+
+**חובה:**
+1. **כל סקריפטי בדיקה** - חייבים להשתמש ב-admin/admin123 כברירת מחדל
+2. **כל בדיקות Selenium/E2E** - חייבים להתחבר כמנהל
+3. **כל בדיקות API** - חייבים להשתמש ב-session של admin
+4. **אין להשתמש ב-test/test** או credentials אחרים לבדיקות אוטומטיות
+
+**משתמשים זמינים:**
+- **Admin (מנהל):** `admin` / `admin123` - **לכל הבדיקות**
+- **User (משתמש רגיל):** `user` / `user123` - רק לבדיקות multi-user ספציפיות
+- **Nimrod (מנהל ראשי):** `nimrod` / `nimw` - רק לשימוש ידני
+
+**פרטי התחברות מוצגים בעמוד ההתחברות:**
+- במערכת קיימים פרטי התחברות לדמו המוצגים בדף login.html
+
+This is a fundamental rule that ALL future chats must follow.
+
 ## Selenium Testing Rule - CRITICAL
 **לפני כל סיום תוכנית או בקשת בדיקות ידניות מהמשתמש - חובה להריץ בדיקות Selenium מלאות.**
 

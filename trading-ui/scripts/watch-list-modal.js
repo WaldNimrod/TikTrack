@@ -50,7 +50,7 @@
         while (retries < 10) {
             const iconSelector = document.getElementById('iconSelector');
             const viewModeRadios = document.querySelectorAll('input[name="viewMode"]');
-            
+        
             if (iconSelector && viewModeRadios.length > 0) {
                 break;
             }

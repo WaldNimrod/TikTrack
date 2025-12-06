@@ -440,10 +440,12 @@ class UnifiedLogManager {
             
             // Check if UnifiedCacheManager is available and initialize if needed
             if (!window.UnifiedCacheManager) {
-                console.warn('⚠️ UnifiedCacheManager not available, using fallback');
+                // Fallback is used until cache is ready - this is expected during initialization
+                // No log needed - this is normal during page load
                 this.useFallback = true;
             } else if (!window.cacheSystemReady) {
-                console.warn('⚠️ Cache system not ready yet, using fallback');
+                // Fallback is used until cache is ready - this is expected during initialization
+                // No log needed - this is normal during page load
                 this.useFallback = true;
             } else {
                 // Try to initialize cache system if not already initialized

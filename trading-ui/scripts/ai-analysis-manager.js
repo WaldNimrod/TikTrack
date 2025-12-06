@@ -446,6 +446,101 @@
                   }
                 }
                 
+                // Populate trading accounts after form is rendered (if needed)
+                const accountSelect = document.querySelector('#aiVariablesModal select[data-populate-accounts="true"]');
+                if (accountSelect && window.SelectPopulatorService && typeof window.SelectPopulatorService.populateAccountsSelect === 'function') {
+                  try {
+                    window.Logger?.info('🔄 Populating trading accounts after modal shown', { 
+                      page: 'ai-analysis', 
+                      selectId: accountSelect.id 
+                    });
+                    
+                    await window.SelectPopulatorService.populateAccountsSelect(accountSelect, {
+                      includeEmpty: true,
+                      emptyText: 'בחר חשבון מסחר...',
+                      defaultFromPreferences: true // Use default from preferences
+                    });
+                    
+                    accountSelect.removeAttribute('data-populate-accounts');
+                    
+                    window.Logger?.info('✅ Trading accounts populated after modal shown', { 
+                      page: 'ai-analysis', 
+                      selectId: accountSelect.id,
+                      optionsCount: accountSelect.options.length 
+                    });
+                  } catch (error) {
+                    window.Logger?.warn('Error populating trading accounts after modal shown', error, { page: 'ai-analysis' });
+                  }
+                }
+                
+                // Also handle text field for trading_account (convert to select if needed)
+                const accountTextField = document.querySelector('#aiVariablesModal input[id*="trading_account"], #aiVariablesModal input[id*="account"]');
+                if (accountTextField && accountTextField.type === 'text' && !accountTextField.parentElement.querySelector('select')) {
+                  // Convert text field to select with accounts
+                  try {
+                    window.Logger?.info('🔄 Converting trading_account text field to select', { 
+                      page: 'ai-analysis', 
+                      fieldId: accountTextField.id 
+                    });
+                    
+                    // Create select element
+                    const accountSelect = document.createElement('select');
+                    accountSelect.id = accountTextField.id;
+                    accountSelect.className = accountTextField.className;
+                    accountSelect.name = accountTextField.name || accountTextField.id;
+                    accountSelect.required = accountTextField.required;
+                    
+                    // Replace text input with select
+                    accountTextField.parentElement.replaceChild(accountSelect, accountTextField);
+                    
+                    // Populate with accounts
+                    if (window.SelectPopulatorService && typeof window.SelectPopulatorService.populateAccountsSelect === 'function') {
+                      await window.SelectPopulatorService.populateAccountsSelect(accountSelect, {
+                        includeEmpty: true,
+                        emptyText: 'בחר חשבון מסחר...',
+                        defaultFromPreferences: true
+                      });
+                      
+                      window.Logger?.info('✅ Trading accounts select created and populated', { 
+                        page: 'ai-analysis', 
+                        selectId: accountSelect.id,
+                        optionsCount: accountSelect.options.length 
+                      });
+                    }
+                  } catch (error) {
+                    window.Logger?.warn('Error converting trading_account field to select', error, { page: 'ai-analysis' });
+                  }
+                }
+                
+                // Populate trading methods after form is rendered (if needed)
+                const tradingMethodsSelect = document.querySelector('#aiVariablesModal select[data-populate-trading-methods="true"]');
+                if (tradingMethodsSelect && typeof manager.populateTradingMethodsSelect === 'function') {
+                  try {
+                    window.Logger?.info('🔄 Populating trading methods after modal shown', { 
+                      page: 'ai-analysis', 
+                      selectId: tradingMethodsSelect.id 
+                    });
+                    
+                    await manager.populateTradingMethodsSelect(tradingMethodsSelect);
+                    
+                    // Add "אחר" option after trading methods
+                    const otherOption = document.createElement('option');
+                    otherOption.value = '__other__';
+                    otherOption.textContent = 'אחר';
+                    tradingMethodsSelect.appendChild(otherOption);
+                    
+                    tradingMethodsSelect.removeAttribute('data-populate-trading-methods');
+                    
+                    window.Logger?.info('✅ Trading methods populated after modal shown', { 
+                      page: 'ai-analysis', 
+                      selectId: tradingMethodsSelect.id,
+                      optionsCount: tradingMethodsSelect.options.length 
+                    });
+                  } catch (error) {
+                    window.Logger?.warn('Error populating trading methods after modal shown', error, { page: 'ai-analysis' });
+                  }
+                }
+                
                 // Setup form handler after form is rendered
                 if (typeof manager.setupFormHandler === 'function') {
                   setTimeout(() => {
@@ -711,25 +806,63 @@
           label.textContent = variable.label || variable.key;
           label.setAttribute('for', `var_modal_${variable.key}`);
 
-          // Always create a select dropdown with "אחר" option
-          const select = document.createElement('select');
-          select.className = 'form-select';
-          select.id = `var_modal_${variable.key}`;
-          select.name = variable.key;
+          // Check if variable should be text input (text/number type without options, or date_range)
+          const shouldBeTextInput = (variable.type === 'text' || variable.type === 'number') && 
+                                    (!variable.options || !Array.isArray(variable.options) || variable.options.length === 0) &&
+                                    variable.key !== 'ticker_symbol' && 
+                                    variable.key !== 'stock_ticker' &&
+                                    variable.key !== 'trading_account' &&
+                                    variable.key !== 'account_id' &&
+                                    variable.integration !== 'trading_accounts';
           
-          // Add empty option (only if not using tickers - tickers will add their own)
-          const isTickerField = (variable.key === 'ticker_symbol' || variable.key === 'stock_ticker') &&
-                                window.SelectPopulatorService && 
-                                typeof window.SelectPopulatorService.populateTickersSelect === 'function';
+          let select, textInput;
+          let isTextInput = false;
           
-          if (!isTickerField) {
-          const emptyOption = document.createElement('option');
-          emptyOption.value = '';
-          emptyOption.textContent = 'בחר...';
-          select.appendChild(emptyOption);
+            if (shouldBeTextInput) {
+            // Create text/number input for simple fields (like date_range, single_trade_id)
+            textInput = document.createElement('input');
+            textInput.type = variable.type === 'number' ? 'number' : 'text';
+            textInput.className = 'form-control';
+            textInput.id = `var_modal_${variable.key}`;
+            textInput.name = variable.key;
+            if (variable.placeholder) {
+              textInput.placeholder = variable.placeholder;
+            }
+            if (variable.default_value) {
+              textInput.value = variable.default_value;
+            }
+            if (variable.required) {
+              textInput.required = true;
+            }
+            isTextInput = true;
+          } else {
+            // Always create a select dropdown with "אחר" option
+            select = document.createElement('select');
+            select.className = 'form-select';
+            select.id = `var_modal_${variable.key}`;
+            select.name = variable.key;
+          }
+          
+          // Add empty option (only if not using tickers or accounts - they will add their own)
+          // Skip if this is a text input field
+          if (!isTextInput) {
+            const isTickerField = (variable.key === 'ticker_symbol' || variable.key === 'stock_ticker') &&
+                                  window.SelectPopulatorService && 
+                                  typeof window.SelectPopulatorService.populateTickersSelect === 'function';
+            
+            const isAccountField = (variable.key === 'trading_account' || variable.key === 'account_id' || variable.integration === 'trading_accounts') &&
+                                   window.SelectPopulatorService && 
+                                   typeof window.SelectPopulatorService.populateAccountsSelect === 'function';
+            
+            if (!isTickerField && !isAccountField) {
+              const emptyOption = document.createElement('option');
+              emptyOption.value = '';
+              emptyOption.textContent = 'בחר...';
+              select.appendChild(emptyOption);
+            }
           }
 
-          // Populate options based on variable type and key
+          // Populate options based on variable type and key (only for select fields)
           let options = [];
           
           if (variable.key === 'investment_type' && window.VALID_INVESTMENT_TYPES) {
@@ -738,15 +871,30 @@
               value: type,
               label: window.INVESTMENT_TYPE_LABELS?.[type] || type
             }));
-          } else if (variable.key === 'technical_indicators' || variable.key === 'condition_focus') {
-            // Use Trading Methods from system
-            if (window.SelectPopulatorService && typeof window.SelectPopulatorService.populateTradingMethodsSelect === 'function') {
-              // Get trading methods
-              const tradingMethods = await this.getTradingMethods();
-              options = tradingMethods.map(method => ({
-                value: method.name || method,
-                label: method.name || method
-              }));
+          } else if (variable.integration === 'trading_methods' || variable.key === 'technical_indicators' || variable.key === 'condition_focus') {
+            // Use Trading Methods from system - populate directly using populateTradingMethodsSelect
+            // Mark for later population after select is added to DOM
+            select.setAttribute('data-populate-trading-methods', 'true');
+            // Don't populate options array here - will be populated directly in select element
+          } else if (variable.integration === 'trading_accounts' || variable.key === 'trading_account' || variable.key === 'account_id') {
+            // Use Trading Accounts from system - populate directly using SelectPopulatorService
+            if (window.SelectPopulatorService && typeof window.SelectPopulatorService.populateAccountsSelect === 'function') {
+              // Mark for later population after select is added to DOM
+              select.setAttribute('data-populate-accounts', 'true');
+            } else {
+              // Fallback: get accounts manually
+              try {
+                const response = await fetch('/api/trading-accounts/open');
+                const data = await response.json();
+                const accounts = data.data || data || [];
+                options = accounts.filter(acc => acc.status === 'open').map(account => ({
+                  value: account.id.toString(),
+                  label: account.name || `Account #${account.id}`
+                }));
+              } catch (error) {
+                window.Logger?.warn('Error loading trading accounts', error, { page: 'ai-analysis' });
+                options = [];
+              }
             }
           } else if (variable.key === 'ticker_symbol' || variable.key === 'stock_ticker') {
             // Use Tickers from system - populate directly using SelectPopulatorService
@@ -769,6 +917,26 @@
               value: reason,
               label: reason
             }));
+          } else if (variable.key === 'trading_account' || variable.key === 'account_id') {
+            // Use Trading Accounts from system - populate directly using SelectPopulatorService
+            if (window.SelectPopulatorService && typeof window.SelectPopulatorService.populateAccountsSelect === 'function') {
+              // Mark for later population after select is added to DOM
+              select.setAttribute('data-populate-accounts', 'true');
+            } else {
+              // Fallback: get accounts manually
+              try {
+                const response = await fetch('/api/trading-accounts/open');
+                const data = await response.json();
+                const accounts = data.data || data || [];
+                options = accounts.filter(acc => acc.status === 'open').map(account => ({
+                  value: account.id.toString(),
+                  label: account.name || `Account #${account.id}`
+                }));
+              } catch (error) {
+                window.Logger?.warn('Error loading trading accounts', error, { page: 'ai-analysis' });
+                options = [];
+              }
+            }
           } else if (variable.options && Array.isArray(variable.options)) {
             // Use provided options
             options = variable.options.map(option => ({
@@ -779,68 +947,146 @@
             // Already handled above
           }
 
-          // Add all options to select (only if not using tickers integration)
-          if (select.getAttribute('data-populate-tickers') !== 'true') {
-            options.forEach(option => {
-              const optionEl = document.createElement('option');
-              optionEl.value = option.value;
-              optionEl.textContent = option.label;
-              select.appendChild(optionEl);
-            });
+          // Add all options to select (only if not using tickers, trading methods, or accounts integration)
+          // Skip if this is a text input field
+          if (!isTextInput) {
+            const needsTickerPopulation = select.getAttribute('data-populate-tickers') === 'true';
+            const needsTradingMethodsPopulation = select.getAttribute('data-populate-trading-methods') === 'true';
+            const needsAccountsPopulation = select.getAttribute('data-populate-accounts') === 'true';
+            
+            if (!needsTickerPopulation && !needsTradingMethodsPopulation && !needsAccountsPopulation) {
+              options.forEach(option => {
+                const optionEl = document.createElement('option');
+                optionEl.value = option.value;
+                optionEl.textContent = option.label;
+                select.appendChild(optionEl);
+              });
 
-            // Always add "אחר" option
-            const otherOption = document.createElement('option');
-            otherOption.value = '__other__';
-            otherOption.textContent = 'אחר';
-            select.appendChild(otherOption);
-          }
-
-          // Create hidden text/textarea input for "אחר" value
-          let otherInput;
-          if (variable.type === 'textarea') {
-            otherInput = document.createElement('textarea');
-            otherInput.rows = variable.rows || 3;
-          } else {
-            otherInput = document.createElement('input');
-            otherInput.type = variable.type === 'number' ? 'number' : 'text';
-          }
-          otherInput.className = 'form-control mt-2 other-input';
-          otherInput.id = `var_modal_${variable.key}_other`;
-          otherInput.name = `${variable.key}_other`;
-          if (variable.placeholder) {
-            otherInput.placeholder = variable.placeholder;
-          }
-
-          // Handle "אחר" selection - Use CSS classes instead of inline styles
-          select.addEventListener('change', () => {
-            const otherInputEl = document.getElementById(`var_modal_${variable.key}_other`);
-            if (select.value === '__other__') {
-              otherInputEl.classList.add('show');
-              otherInputEl.required = variable.required || false;
-            } else {
-              otherInputEl.classList.remove('show');
-              otherInputEl.value = '';
-              otherInputEl.required = false;
+              // Always add "אחר" option
+              const otherOption = document.createElement('option');
+              otherOption.value = '__other__';
+              otherOption.textContent = 'אחר';
+              select.appendChild(otherOption);
             }
-          });
-
-          // Set default value if provided
-          if (variable.default_value) {
-            select.value = variable.default_value;
           }
 
-          if (variable.required) {
-            select.required = true;
+          // Create hidden text/textarea input for "אחר" value (only for select fields)
+          let otherInput;
+          if (!isTextInput) {
+            if (variable.type === 'textarea') {
+              otherInput = document.createElement('textarea');
+              otherInput.rows = variable.rows || 3;
+            } else {
+              otherInput = document.createElement('input');
+              otherInput.type = variable.type === 'number' ? 'number' : 'text';
+            }
+            otherInput.className = 'form-control mt-2 other-input';
+            otherInput.id = `var_modal_${variable.key}_other`;
+            otherInput.name = `${variable.key}_other`;
+            if (variable.placeholder) {
+              otherInput.placeholder = variable.placeholder;
+            }
+
+            // Handle "אחר" selection - Use CSS classes instead of inline styles
+            select.addEventListener('change', () => {
+              const otherInputEl = document.getElementById(`var_modal_${variable.key}_other`);
+              if (select.value === '__other__') {
+                otherInputEl.classList.add('show');
+                otherInputEl.required = variable.required || false;
+              } else {
+                otherInputEl.classList.remove('show');
+                otherInputEl.value = '';
+                otherInputEl.required = false;
+              }
+            });
           }
 
-          col.appendChild(label);
-          col.appendChild(select);
-          col.appendChild(otherInput);
-          container.appendChild(col);
+            // Set default value if provided (only for select fields)
+            if (!isTextInput) {
+            if (variable.default_value) {
+              select.value = variable.default_value;
+            }
+
+            if (variable.required) {
+              select.required = true;
+            }
+
+            // Handle conditional display (e.g., single_trade_id depends on trade_selection_type)
+            if (variable.conditional_display) {
+              const dependsOn = variable.conditional_display.depends_on;
+              const showWhen = variable.conditional_display.show_when;
+              
+              // Initially hide if conditional
+              col.style.display = 'none';
+              
+              // Find the dependent field
+              const dependentSelect = document.getElementById(`var_modal_${dependsOn}`) || document.getElementById(`var_${dependsOn}`);
+              if (dependentSelect) {
+                // Handler function to show/hide based on dependency
+                const updateVisibility = () => {
+                  if (dependentSelect.value === showWhen) {
+                    col.style.display = '';
+                  } else {
+                    col.style.display = 'none';
+                    // Clear value when hidden
+                    if (select) select.value = '';
+                    if (textInput) textInput.value = '';
+                  }
+                };
+                
+                // Set initial visibility
+                updateVisibility();
+                
+                // Add listener for changes
+                dependentSelect.addEventListener('change', updateVisibility);
+              }
+            }
+
+            col.appendChild(label);
+            col.appendChild(select);
+            col.appendChild(otherInput);
+            container.appendChild(col);
+          } else {
+            // For text input, just add label and input
+            
+            // Handle conditional display for text inputs too
+            if (variable.conditional_display) {
+              const dependsOn = variable.conditional_display.depends_on;
+              const showWhen = variable.conditional_display.show_when;
+              
+              // Initially hide if conditional
+              col.style.display = 'none';
+              
+              // Find the dependent field
+              const dependentSelect = document.getElementById(`var_modal_${dependsOn}`) || document.getElementById(`var_${dependsOn}`);
+              if (dependentSelect) {
+                // Handler function to show/hide based on dependency
+                const updateVisibility = () => {
+                  if (dependentSelect.value === showWhen) {
+                    col.style.display = '';
+                  } else {
+                    col.style.display = 'none';
+                    textInput.value = '';
+                  }
+                };
+                
+                // Set initial visibility
+                updateVisibility();
+                
+                // Add listener for changes
+                dependentSelect.addEventListener('change', updateVisibility);
+              }
+            }
+            
+            col.appendChild(label);
+            col.appendChild(textInput);
+            container.appendChild(col);
+          }
 
           // Populate tickers select if needed (after element is in DOM)
           // Store reference for later population after modal is shown
-          if (select.getAttribute('data-populate-tickers') === 'true') {
+          // Only check if select exists (not for text inputs)
+          if (!isTextInput && select && select.getAttribute('data-populate-tickers') === 'true') {
             // Mark for population - will be populated after modal is shown
             select.setAttribute('data-needs-ticker-population', 'true');
             
@@ -909,13 +1155,15 @@
               } catch (error) {
                 window.Logger?.warn('Error populating tickers (immediate)', error, { page: 'ai-analysis' });
                 // Add "אחר" even if population failed
-                const selectEl = document.getElementById(select.id);
-                if (selectEl) {
-                const otherOption = document.createElement('option');
-                otherOption.value = '__other__';
-                otherOption.textContent = 'אחר';
-                  selectEl.appendChild(otherOption);
-              }
+                if (select && select.id) {
+                  const selectEl = document.getElementById(select.id);
+                  if (selectEl) {
+                    const otherOption = document.createElement('option');
+                    otherOption.value = '__other__';
+                    otherOption.textContent = 'אחר';
+                    selectEl.appendChild(otherOption);
+                  }
+                }
               }
             }, 200); // Small delay to ensure DOM is ready
           }
@@ -1069,7 +1317,7 @@
                 optionEl.textContent = label;
                 input.appendChild(optionEl);
               });
-            } else if (variable.key === 'technical_indicators' || variable.key === 'condition_focus') {
+            } else if (variable.integration === 'trading_methods' || variable.key === 'technical_indicators' || variable.key === 'condition_focus') {
               // Use Trading Methods from system
               await this.populateTradingMethodsSelect(input);
             } else if (variable.key === 'ticker_symbol' || variable.key === 'stock_ticker') {
@@ -1124,7 +1372,7 @@
             if (window.SelectPopulatorService?.populateSelectWithData) {
               window.SelectPopulatorService.populateSelectWithData(select, methods, {
                 valueField: 'id',
-                textField: (method) => method.name_he || method.name || `Method #${method.id}`,
+                textField: (method) => method.name_he || method.name_en || method.name || `Method #${method.id}`,
                 includeEmpty: true,
                 emptyText: 'בחר שיטת מסחר...'
               });
@@ -1146,29 +1394,61 @@
         }
 
         // Try SelectPopulatorService.populateGenericSelect as second option
-        if (window.SelectPopulatorService?.populateGenericSelect) {
-          await window.SelectPopulatorService.populateGenericSelect(select, '/api/trading-methods/', {
-            valueField: 'id',
-            textField: (method) => method.name_he || method.name || `Method #${method.id}`,
-            includeEmpty: true,
-            emptyText: 'בחר שיטת מסחר...'
-          });
-          window.Logger?.debug('Trading methods loaded via SelectPopulatorService', { page: 'ai-analysis' });
-          return;
+        // Note: populateGenericSelect expects an ID string (without #), not an element
+        // So we need to use it with the element's ID or use direct API call
+        if (window.SelectPopulatorService?.populateGenericSelect && select.id) {
+          try {
+            await window.SelectPopulatorService.populateGenericSelect(select.id, '/api/trading-methods/', {
+              valueField: 'id',
+              textField: (method) => method.name_he || method.name_en || method.name || `Method #${method.id}`,
+              includeEmpty: true,
+              emptyText: 'בחר שיטת מסחר...'
+            });
+            window.Logger?.debug('Trading methods loaded via SelectPopulatorService.populateGenericSelect', { page: 'ai-analysis' });
+            return;
+          } catch (error) {
+            window.Logger?.warn('Error using populateGenericSelect, falling back to direct API', error, { page: 'ai-analysis' });
+          }
         }
 
         // Fallback to direct API call
+        window.Logger?.debug('Loading trading methods via direct API call', { page: 'ai-analysis' });
         const response = await fetch('/api/trading-methods/');
         if (response.ok) {
           const data = await response.json();
-          if (data.status === 'success' && data.data) {
+          if (data.status === 'success' && data.data && data.data.length > 0) {
+            // Clear existing options except empty one
+            while (select.options.length > 0) {
+              select.remove(0);
+            }
+            
+            // Add empty option
+            const emptyOption = document.createElement('option');
+            emptyOption.value = '';
+            emptyOption.textContent = 'בחר שיטת מסחר...';
+            select.appendChild(emptyOption);
+            
+            // Add methods
             data.data.forEach((method) => {
               const optionEl = document.createElement('option');
               optionEl.value = method.id;
-              optionEl.textContent = method.name_he || method.name || `Method #${method.id}`;
+              optionEl.textContent = method.name_he || method.name_en || method.name || `Method #${method.id}`;
               select.appendChild(optionEl);
             });
+            
+            window.Logger?.info('Trading methods loaded via direct API call', {
+              page: 'ai-analysis',
+              count: data.data.length
+            });
+          } else {
+            window.Logger?.warn('API returned no trading methods', { page: 'ai-analysis', responseData: data });
           }
+        } else {
+          window.Logger?.warn('Failed to fetch trading methods from API', {
+            page: 'ai-analysis',
+            status: response.status,
+            statusText: response.statusText
+          });
         }
       } catch (error) {
         window.Logger?.warn('Error loading trading methods', error, { page: 'ai-analysis' });
@@ -1367,6 +1647,68 @@
         page: 'ai-analysis',
         variableCount: Object.keys(variables).length,
         variables: Object.keys(variables)
+      });
+
+      // Build v2.0 structure: Separate prompt_variables from filters
+      // Filters that should NOT be sent to LLM: trading_account, trading_account_id, account_id
+      // These are stored in filters for future analysis but not sent in prompt
+      const prompt_variables = {};
+      const filters = {};
+      const trade_selection = {};
+      
+      // Define which variables are filters (not sent to LLM)
+      const filterKeys = ['trading_account', 'trading_account_id', 'account_id'];
+      
+      // Handle trade_selection_type and related fields
+      const tradeSelectionType = variables['trade_selection_type'] || 'all';
+      
+      // Separate variables into prompt_variables and filters
+      Object.keys(variables).forEach(key => {
+        if (filterKeys.includes(key)) {
+          // Convert to trading_account_id if needed for backend
+          if (key === 'trading_account') {
+            filters['trading_account_id'] = variables[key];
+          } else {
+            filters[key] = variables[key];
+          }
+        } else if (key === 'trade_selection_type') {
+          // Store in trade_selection
+          trade_selection['type'] = variables[key];
+        } else if (key === 'single_trade_id') {
+          // Store in trade_selection if single trade is selected
+          if (tradeSelectionType === 'single' && variables[key]) {
+            trade_selection['trade_id'] = parseInt(variables[key], 10);
+          }
+        } else if (key === 'response_language') {
+          // response_language is kept in prompt_variables but handled separately in backend
+          prompt_variables[key] = variables[key];
+        } else {
+          // All other variables go to prompt_variables
+          prompt_variables[key] = variables[key];
+        }
+      });
+      
+      // Build v2.0 structure
+      const variables_v2 = {
+        version: '2.0',
+        prompt_variables: prompt_variables,
+        filters: filters,
+        trade_selection: trade_selection,
+        metadata: {
+          analysis_scope: this.selectedTemplate.name || 'unknown',
+          filters_applied: Object.keys(filters),
+          trade_selection_type: tradeSelectionType
+        }
+      };
+      
+      // Use v2.0 structure for API call
+      variables = variables_v2;
+      
+      window.Logger?.debug('Built v2.0 variables structure', {
+        page: 'ai-analysis',
+        prompt_variables_count: Object.keys(prompt_variables).length,
+        filters_count: Object.keys(filters).length,
+        filters: Object.keys(filters)
       });
 
       // Set loading state - check both modal and page
@@ -3606,6 +3948,43 @@
       } else {
         window.Logger?.warn('⚠️ Save as Note button not found in results modal', { page: 'ai-analysis' });
       }
+      
+      // Setup export dropdown menu items
+      const exportPDFBtn = document.querySelector('#aiResultsModal #exportPDFBtnModal, #aiResultsModal a[data-onclick*="exportToPDF"]');
+      const exportMarkdownBtn = document.querySelector('#aiResultsModal #exportMarkdownBtnModal, #aiResultsModal a[data-onclick*="exportToMarkdown"]');
+      const exportHTMLBtn = document.querySelector('#aiResultsModal #exportHTMLBtnModal, #aiResultsModal a[data-onclick*="exportToHTML"]');
+      
+      [exportPDFBtn, exportMarkdownBtn, exportHTMLBtn].forEach((btn, index) => {
+        if (btn) {
+          const exportType = index === 0 ? 'PDF' : index === 1 ? 'Markdown' : 'HTML';
+          btn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            window.Logger?.info(`🖱️ Export to ${exportType} button clicked`, { 
+              page: 'ai-analysis',
+              hasCurrentAnalysis: !!this.currentAnalysis,
+              currentAnalysisId: this.currentAnalysis?.id
+            });
+            if (index === 0) {
+              await this.exportToPDF();
+            } else if (index === 1) {
+              await this.exportToMarkdown();
+            } else {
+              await this.exportToHTML();
+            }
+            // Close dropdown
+            const dropdownToggle = document.querySelector('#aiResultsModal #exportBtnModal');
+            if (dropdownToggle && window.bootstrap?.Dropdown) {
+              const dropdownInstance = bootstrap.Dropdown.getInstance(dropdownToggle);
+              if (dropdownInstance) {
+                dropdownInstance.hide();
+              }
+            }
+            return false;
+          });
+          window.Logger?.info(`✅ Export to ${exportType} button connected`, { page: 'ai-analysis' });
+        }
+      });
     },
 
     /**
@@ -4251,55 +4630,35 @@
     },
 
     /**
-     * Setup Page Visibility API listener to close modals when page returns from sleep/hidden
+     * Setup Page Visibility API listener
+     * NOTE: We do NOT close modals when switching tabs - this allows users to keep modals open
+     * while working in other tabs/windows. This improves UX significantly.
      */
     setupPageVisibilityListener() {
       if (typeof document === 'undefined' || !document.addEventListener) {
         return;
       }
 
+      // Page Visibility API listener is intentionally minimal
+      // We do NOT close modals when page visibility changes to preserve user work
+      // Modals should only be closed by explicit user action (close button, ESC, etc.)
+      
       document.addEventListener('visibilitychange', () => {
-        // When page becomes visible again after being hidden
+        // Log visibility changes for debugging but don't interfere with modals
         if (document.visibilityState === 'visible') {
-          // Close any open modals using ModalManagerV2
-          if (window.ModalManagerV2 && window.ModalManagerV2.hideModal) {
-            // Get all currently open modals
-            const openModals = document.querySelectorAll('.modal.show, .modal[style*="display: block"]');
-            
-            openModals.forEach(modal => {
-              const modalId = modal.getAttribute('id');
-              if (modalId) {
-                window.Logger?.info('Closing modal after page visibility change', {
-                  page: 'ai-analysis',
-                  modalId
-                });
-                
-                // Close modal using ModalManagerV2
-                window.ModalManagerV2.hideModal(modalId);
-              }
-            });
-          } else {
-            // Fallback: Use Bootstrap modal API directly
-            const openModals = document.querySelectorAll('.modal.show, .modal[style*="display: block"]');
-            openModals.forEach(modal => {
-              const bsModal = bootstrap?.Modal?.getInstance(modal);
-              if (bsModal) {
-                bsModal.hide();
-              } else {
-                // Direct hide if Bootstrap instance not available
-                modal.style.display = 'none';
-                modal.classList.remove('show');
-                const backdrop = document.querySelector('.modal-backdrop');
-                if (backdrop) {
-                  backdrop.remove();
-                }
-              }
-            });
-          }
+          window.Logger?.debug('Page became visible', {
+            page: 'ai-analysis',
+            openModalsCount: document.querySelectorAll('.modal.show').length
+          });
+        } else {
+          window.Logger?.debug('Page became hidden', {
+            page: 'ai-analysis',
+            openModalsCount: document.querySelectorAll('.modal.show').length
+          });
         }
       });
       
-      window.Logger?.info('Page Visibility API listener setup for modal management', { page: 'ai-analysis' });
+      window.Logger?.info('Page Visibility API listener setup for modal management (modals preserved on tab switch)', { page: 'ai-analysis' });
     },
   };
 

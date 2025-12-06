@@ -85,7 +85,7 @@
 
 ---
 
-## 📋 עמודים ראשיים (29 עמודים) ✅ **סטנדרטיזציה מלאה הושלמה**
+## 📋 עמודים ראשיים (30 עמודים) ✅ **סטנדרטיזציה מלאה הושלמה**
 
 ### עמודים מרכזיים
 | עמוד | תיאור | גישה | API | Business Logic Service | סטטוס |
@@ -103,6 +103,7 @@
 | **notes.html** | מערכת הערות | `http://localhost:5000/notes.html` | `/api/notes/*` | ✅ NoteBusinessService | ✅ מוכן |
 | **research.html** | מחקר וניתוח | `http://localhost:5000/research.html` | `/api/research/*` | ❌ חסר | ⏳ צריך Business Service |
 | **ai-analysis.html** | ניתוח AI - יצירת ניתוחים באמצעות מנועי LLM | `http://localhost:8080/ai-analysis` | `/api/ai-analysis/*` | ✅ AIAnalysisService | ✅ מוכן |
+| **watch-list.html** | ניהול רשימות צפייה | `http://localhost:8080/watch-list` | `/api/watch-lists/*` | ✅ WatchListService | ✅ מוכן |
 | **preferences.html** | הגדרות מערכת v3.0 | `http://localhost:8080/preferences.html` | `/api/preferences/*` | ❌ חסר (מורכב) | ⏳ אופציונלי |
 | **user-profile.html** | ניהול פרופיל משתמש | `http://localhost:8080/user-profile.html` | `/api/auth/me`, `/api/auth/me/password` | ❌ חסר | ✅ מוכן |
 
@@ -163,13 +164,12 @@
 | **init-system-management.html** | ניהול מערכת אתחול | `http://localhost:8080/init-system-management.html` |
 | **conditions-test.html** | בדיקת תנאים | `http://localhost:8080/conditions-test.html` |
 
-### עמודי רשימות מעקב
+### עמודי רשימות מעקב (מוקאפים)
 | עמוד | תיאור | גישה |
 |------|--------|------|
-| **watch-lists-page.html** | ניהול רשימות צפייה (מוקאפ) | `http://localhost:8080/mockups/watch-lists-page.html` |
-| **watch-list-modal.html** | מודל רשימת צפייה | `http://localhost:8080/watch-list-modal.html` |
-| **add-ticker-modal.html** | מודל הוספת טיקר | `http://localhost:8080/add-ticker-modal.html` |
-| **flag-quick-action.html** | פעולה מהירה - דגל | `http://localhost:8080/flag-quick-action.html` |
+| **watch-list-modal.html** | מודל רשימת צפייה (מוקאפ) | `http://localhost:8080/mockups/watch-list-modal.html` |
+| **add-ticker-modal.html** | מודל הוספת טיקר (מוקאפ) | `http://localhost:8080/mockups/add-ticker-modal.html` |
+| **flag-quick-action.html** | פעולה מהירה - דגל (מוקאפ) | `http://localhost:8080/mockups/flag-quick-action.html` |
 
 ### עמודי מוקאפים (Daily Snapshots)
 | עמוד | תיאור | גישה |
@@ -210,16 +210,16 @@
 
 ## 📊 סטטיסטיקות
 
-- **סה"כ עמודים ראשיים:** 24 עמודים
-- **עמודים מרכזיים:** 12 עמודים
+- **סה"כ עמודים ראשיים:** 25 עמודים
+- **עמודים מרכזיים:** 13 עמודים
 - **עמודים טכניים:** 12 עמודים
 - **עמודים משניים:** 5 עמודים
 - **עמודי אימות:** 4 עמודים
 - **עמודי כלים לפיתוח:** 10 עמודים
-- **עמודי רשימות מעקב:** 4 עמודים
+- **עמודי רשימות מעקב (מוקאפים):** 3 עמודים
 - **עמודי מוקאפים:** 11 עמודים
 - **עמודים נוספים:** 2 עמודים
-- **סה"כ עמודים:** 59 עמודים
+- **סה"כ עמודים:** 60 עמודים
 
 ---
 

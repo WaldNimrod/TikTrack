@@ -480,7 +480,8 @@ class EntityDetailsService:
                     # Add market data to ticker object
                     from models.external_data import MarketDataQuote
                     latest_quote = db.query(MarketDataQuote).filter(
-                        MarketDataQuote.ticker_id == entity.ticker.id
+                        MarketDataQuote.ticker_id == entity.ticker.id,
+                        MarketDataQuote.provider_id.isnot(None)  # Only get quotes with provider
                     ).order_by(MarketDataQuote.fetched_at.desc()).first()
                     
                     if latest_quote:
@@ -491,8 +492,15 @@ class EntityDetailsService:
                         entity_dict['ticker']['daily_change'] = latest_quote.change_amount_day  # For frontend compatibility
                         entity_dict['ticker']['daily_change_percent'] = latest_quote.change_pct_day  # For frontend compatibility
                         entity_dict['ticker']['volume'] = latest_quote.volume
+                        entity_dict['ticker']['market_cap'] = latest_quote.market_cap
                         entity_dict['ticker']['yahoo_updated_at'] = latest_quote.fetched_at.isoformat() if latest_quote.fetched_at else None
-                        entity_dict['ticker']['data_source'] = latest_quote.source
+                        # Use provider name if source is not available
+                        if latest_quote.source:
+                            entity_dict['ticker']['data_source'] = latest_quote.source
+                        elif latest_quote.provider:
+                            entity_dict['ticker']['data_source'] = latest_quote.provider.name
+                        else:
+                            entity_dict['ticker']['data_source'] = 'unknown'
                         # Open price data
                         entity_dict['ticker']['open_price'] = latest_quote.open_price
                         entity_dict['ticker']['change_from_open'] = latest_quote.change_amount_from_open
@@ -680,6 +688,18 @@ class EntityDetailsService:
                 logger.info(f"🔍 Processing ticker entity {entity_id}")
                 entity_dict['external_data'] = EntityDetailsService._get_external_data_summary(entity)
                 
+                # Add historical quotes count
+                try:
+                    from models.external_data import MarketDataQuote
+                    historical_count = db.query(MarketDataQuote).filter(
+                        MarketDataQuote.ticker_id == entity_id
+                    ).count()
+                    entity_dict['historical_quotes_count'] = historical_count
+                    logger.debug(f"Added historical_quotes_count for ticker {entity_id}: {historical_count}")
+                except Exception as count_error:
+                    logger.warning(f"Error getting historical quotes count for ticker {entity_id}: {count_error}")
+                    entity_dict['historical_quotes_count'] = 0
+                
                 # Add provider symbol mappings if they exist
                 try:
                     from services.ticker_symbol_mapping_service import TickerSymbolMappingService
@@ -692,33 +712,71 @@ class EntityDetailsService:
                     logger.debug(f"Could not load provider symbol mappings for ticker {entity_id}: {str(mapping_error)}")
                 
                 # Add market data directly to ticker entity (not just in nested ticker object)
-                from models.external_data import MarketDataQuote
-                latest_quote = db.query(MarketDataQuote).filter(
-                    MarketDataQuote.ticker_id == entity_id
-                ).order_by(MarketDataQuote.fetched_at.desc()).first()
-                
-                logger.info(f"🔍 Ticker {entity_id}: latest_quote={latest_quote is not None}, entity_type={entity_type}")
-                
-                if latest_quote:
-                    # Add market data directly to ticker entity_dict
-                    entity_dict['current_price'] = latest_quote.price
-                    entity_dict['price'] = latest_quote.price  # Alias for compatibility
-                    entity_dict['change_percent'] = latest_quote.change_pct_day
-                    entity_dict['change_amount'] = latest_quote.change_amount_day
-                    entity_dict['daily_change'] = latest_quote.change_amount_day
-                    entity_dict['daily_change_percent'] = latest_quote.change_pct_day
-                    entity_dict['volume'] = latest_quote.volume
-                    # Open price data
-                    entity_dict['open_price'] = latest_quote.open_price
-                    entity_dict['change_from_open'] = latest_quote.change_amount_from_open
-                    entity_dict['change_from_open_percent'] = latest_quote.change_pct_from_open
-                    entity_dict['yahoo_updated_at'] = latest_quote.fetched_at.isoformat() if latest_quote.fetched_at else None
-                    entity_dict['updated_at'] = latest_quote.fetched_at.isoformat() if latest_quote.fetched_at else entity_dict.get('updated_at')
-                    entity_dict['data_source'] = latest_quote.source
+                latest_quote = None
+                try:
+                    from models.external_data import MarketDataQuote
+                    # Import joinedload explicitly to avoid scope issues
+                    from sqlalchemy.orm import joinedload as sqlalchemy_joinedload
+                    latest_quote = db.query(MarketDataQuote).options(
+                        sqlalchemy_joinedload(MarketDataQuote.provider)
+                    ).filter(
+                        MarketDataQuote.ticker_id == entity_id
+                    ).order_by(MarketDataQuote.fetched_at.desc()).first()
                     
-                    # ATR data
-                    entity_dict['atr'] = latest_quote.atr
-                    entity_dict['atr_period'] = latest_quote.atr_period or 14
+                    logger.info(f"🔍 Ticker {entity_id}: latest_quote={latest_quote is not None}, entity_type={entity_type}")
+                    
+                    if latest_quote:
+                        logger.debug(f"📊 Ticker {entity_id}: quote details - price={latest_quote.price}, provider_id={getattr(latest_quote, 'provider_id', None)}, has_provider={hasattr(latest_quote, 'provider')}")
+                        try:
+                            # Add market data directly to ticker entity_dict
+                            entity_dict['current_price'] = latest_quote.price
+                            entity_dict['price'] = latest_quote.price  # Alias for compatibility
+                            entity_dict['change_percent'] = latest_quote.change_pct_day
+                            entity_dict['change_amount'] = latest_quote.change_amount_day
+                            entity_dict['daily_change'] = latest_quote.change_amount_day
+                            entity_dict['daily_change_percent'] = latest_quote.change_pct_day
+                            entity_dict['volume'] = latest_quote.volume
+                            entity_dict['market_cap'] = latest_quote.market_cap
+                            # Open price data
+                            entity_dict['open_price'] = latest_quote.open_price
+                            entity_dict['change_from_open'] = latest_quote.change_amount_from_open
+                            entity_dict['change_from_open_percent'] = latest_quote.change_pct_from_open
+                            entity_dict['yahoo_updated_at'] = latest_quote.fetched_at.isoformat() if latest_quote.fetched_at else None
+                            entity_dict['updated_at'] = latest_quote.fetched_at.isoformat() if latest_quote.fetched_at else entity_dict.get('updated_at')
+                            
+                            # Use provider name if source is not available
+                            try:
+                                # Try to get source field first
+                                source_value = getattr(latest_quote, 'source', None)
+                                if source_value:
+                                    entity_dict['data_source'] = source_value
+                                else:
+                                    # Try to get provider name
+                                    provider_obj = getattr(latest_quote, 'provider', None)
+                                    if provider_obj and hasattr(provider_obj, 'name'):
+                                        entity_dict['data_source'] = provider_obj.name
+                                    else:
+                                        # Fallback: try to get provider_id and query provider
+                                        provider_id = getattr(latest_quote, 'provider_id', None)
+                                        if provider_id:
+                                            from models.external_data import ExternalDataProvider
+                                            provider = db.query(ExternalDataProvider).filter(ExternalDataProvider.id == provider_id).first()
+                                            if provider:
+                                                entity_dict['data_source'] = provider.name
+                                            else:
+                                                entity_dict['data_source'] = 'unknown'
+                                        else:
+                                            entity_dict['data_source'] = 'unknown'
+                            except Exception as source_error:
+                                logger.warning(f"Error getting data_source for ticker {entity_id}: {source_error}", exc_info=True)
+                                entity_dict['data_source'] = 'unknown'
+                            
+                            # ATR data
+                            entity_dict['atr'] = latest_quote.atr
+                            entity_dict['atr_period'] = latest_quote.atr_period or 14
+                        except Exception as market_data_error:
+                            logger.error(f"Error adding market data for ticker {entity_id}: {market_data_error}", exc_info=True)
+                            # Don't fail the entire request - just skip market data
                     
                     # Calculate ATR if not available
                     if latest_quote.atr is None:
@@ -752,94 +810,98 @@ class EntityDetailsService:
                                     entity_dict['atr_warnings'] = atr_result.warnings
                         except Exception as atr_error:
                             logger.warning(f"Error calculating ATR for ticker {entity_id}: {atr_error}")
-                    
-                    # Calculate 52W range - with cache
-                    try:
-                        from services.external_data.week52_calculator import Week52Calculator
-                        from services.advanced_cache_service import advanced_cache_service
                         
-                        week52_calculator = Week52Calculator(db)
-                        
-                        # Check cache for 52W range
-                        week52_cache_key = f"ticker_{entity_id}_week52"
-                        week52_result = advanced_cache_service.get(week52_cache_key)
-                        
-                        if week52_result is None:
-                            # Calculate 52W range
-                            week52_result = week52_calculator.calculate_52w_range(
-                                ticker_id=entity_id,
-                                db_session=db
-                            )
+                        # Calculate 52W range - with cache
+                        try:
+                            from services.external_data.week52_calculator import Week52Calculator
+                            from services.advanced_cache_service import advanced_cache_service
+                            
+                            week52_calculator = Week52Calculator(db)
+                            
+                            # Check cache for 52W range
+                            week52_cache_key = f"ticker_{entity_id}_week52"
+                            week52_result = advanced_cache_service.get(week52_cache_key)
+                            
+                            if week52_result is None:
+                                # Calculate 52W range
+                                week52_result = week52_calculator.calculate_52w_range(
+                                    ticker_id=entity_id,
+                                    db_session=db
+                                )
+                                if week52_result:
+                                    # Cache result for 1 hour (3600 seconds)
+                                    week52_dict = {
+                                        'high': week52_result.high,
+                                        'low': week52_result.low,
+                                        'warnings': week52_result.warnings if hasattr(week52_result, 'warnings') else []
+                                    }
+                                    advanced_cache_service.set(week52_cache_key, week52_dict, ttl=3600)
+                                    logger.info(f"✅ 52W range calculated and cached for ticker {entity_id}: high={week52_result.high:.2f}, low={week52_result.low:.2f}")
+                                else:
+                                    logger.warning(f"⚠️ 52W range calculation returned None for ticker {entity_id}")
+                            else:
+                                logger.info(f"✅ 52W range retrieved from cache for ticker {entity_id}: high={week52_result['high']:.2f}, low={week52_result['low']:.2f}")
+                            
                             if week52_result:
-                                # Cache result for 1 hour (3600 seconds)
-                                week52_dict = {
-                                    'high': week52_result.high,
-                                    'low': week52_result.low,
-                                    'warnings': week52_result.warnings if hasattr(week52_result, 'warnings') else []
-                                }
-                                advanced_cache_service.set(week52_cache_key, week52_dict, ttl=3600)
-                                logger.info(f"✅ 52W range calculated and cached for ticker {entity_id}: high={week52_result.high:.2f}, low={week52_result.low:.2f}")
+                                if isinstance(week52_result, dict):
+                                    entity_dict['week52_high'] = week52_result['high']
+                                    entity_dict['week52_low'] = week52_result['low']
+                                    if week52_result.get('warnings'):
+                                        entity_dict['week52_warnings'] = week52_result['warnings']
+                                else:
+                                    entity_dict['week52_high'] = week52_result.high
+                                    entity_dict['week52_low'] = week52_result.low
+                                    if week52_result.warnings:
+                                        entity_dict['week52_warnings'] = week52_result.warnings
+                        except Exception as week52_error:
+                            logger.warning(f"Error calculating 52W range for ticker {entity_id}: {week52_error}", exc_info=True)
+                        
+                        # Calculate volatility - with cache
+                        try:
+                            from services.external_data.technical_indicators_calculator import TechnicalIndicatorsCalculator
+                            from services.advanced_cache_service import advanced_cache_service
+                            
+                            tech_calculator = TechnicalIndicatorsCalculator(db)
+                            
+                            # Check cache for volatility
+                            volatility_cache_key = f"ticker_{entity_id}_volatility_30"
+                            volatility_result = advanced_cache_service.get(volatility_cache_key)
+                            
+                            if volatility_result is None:
+                                # Calculate volatility
+                                volatility_result = tech_calculator.calculate_volatility(
+                                    ticker_id=entity_id,
+                                    period=30,  # 30 days default
+                                    db_session=db
+                                )
+                                if volatility_result is not None:
+                                    # Cache result for 1 hour (3600 seconds)
+                                    advanced_cache_service.set(volatility_cache_key, volatility_result, ttl=3600)
+                                    logger.info(f"✅ Volatility calculated and cached for ticker {entity_id}: {volatility_result:.2f}%")
+                                else:
+                                    # Check if we have enough historical data
+                                    from models.external_data import MarketDataQuote
+                                    from datetime import datetime, timedelta
+                                    cutoff_date = datetime.utcnow() - timedelta(days=35)
+                                    quote_count = db.query(MarketDataQuote).filter(
+                                        MarketDataQuote.ticker_id == entity_id,
+                                        MarketDataQuote.close_price.isnot(None),
+                                        MarketDataQuote.asof_utc >= cutoff_date
+                                    ).count()
+                                    logger.warning(f"⚠️ Volatility calculation returned None for ticker {entity_id} (have {quote_count} quotes, need 31)")
                             else:
-                                logger.warning(f"⚠️ 52W range calculation returned None for ticker {entity_id}")
-                        else:
-                            logger.info(f"✅ 52W range retrieved from cache for ticker {entity_id}: high={week52_result['high']:.2f}, low={week52_result['low']:.2f}")
-                        
-                        if week52_result:
-                            if isinstance(week52_result, dict):
-                                entity_dict['week52_high'] = week52_result['high']
-                                entity_dict['week52_low'] = week52_result['low']
-                                if week52_result.get('warnings'):
-                                    entity_dict['week52_warnings'] = week52_result['warnings']
-                            else:
-                                entity_dict['week52_high'] = week52_result.high
-                                entity_dict['week52_low'] = week52_result.low
-                                if week52_result.warnings:
-                                    entity_dict['week52_warnings'] = week52_result.warnings
-                    except Exception as week52_error:
-                        logger.warning(f"Error calculating 52W range for ticker {entity_id}: {week52_error}", exc_info=True)
-                    
-                    # Calculate volatility - with cache
-                    try:
-                        from services.external_data.technical_indicators_calculator import TechnicalIndicatorsCalculator
-                        from services.advanced_cache_service import advanced_cache_service
-                        
-                        tech_calculator = TechnicalIndicatorsCalculator(db)
-                        
-                        # Check cache for volatility
-                        volatility_cache_key = f"ticker_{entity_id}_volatility_30"
-                        volatility_result = advanced_cache_service.get(volatility_cache_key)
-                        
-                        if volatility_result is None:
-                            # Calculate volatility
-                            volatility_result = tech_calculator.calculate_volatility(
-                                ticker_id=entity_id,
-                                period=30,  # 30 days default
-                                db_session=db
-                            )
+                                logger.info(f"✅ Volatility retrieved from cache for ticker {entity_id}: {volatility_result:.2f}%")
+                            
                             if volatility_result is not None:
-                                # Cache result for 1 hour (3600 seconds)
-                                advanced_cache_service.set(volatility_cache_key, volatility_result, ttl=3600)
-                                logger.info(f"✅ Volatility calculated and cached for ticker {entity_id}: {volatility_result:.2f}%")
-                            else:
-                                # Check if we have enough historical data
-                                from models.external_data import MarketDataQuote
-                                from datetime import datetime, timedelta
-                                cutoff_date = datetime.utcnow() - timedelta(days=35)
-                                quote_count = db.query(MarketDataQuote).filter(
-                                    MarketDataQuote.ticker_id == entity_id,
-                                    MarketDataQuote.close_price.isnot(None),
-                                    MarketDataQuote.asof_utc >= cutoff_date
-                                ).count()
-                                logger.warning(f"⚠️ Volatility calculation returned None for ticker {entity_id} (have {quote_count} quotes, need 31)")
-                        else:
-                            logger.info(f"✅ Volatility retrieved from cache for ticker {entity_id}: {volatility_result:.2f}%")
-                        
-                        if volatility_result is not None:
-                            entity_dict['volatility'] = volatility_result
-                    except Exception as volatility_error:
-                        logger.warning(f"Error calculating volatility for ticker {entity_id}: {volatility_error}", exc_info=True)
+                                entity_dict['volatility'] = volatility_result
+                        except Exception as volatility_error:
+                            logger.warning(f"Error calculating volatility for ticker {entity_id}: {volatility_error}", exc_info=True)
+                except Exception as market_data_outer_error:
+                    logger.error(f"Error loading market data for ticker {entity_id}: {market_data_outer_error}", exc_info=True)
+                    # Don't fail the entire request - just skip market data
                     
-                    # Calculate Moving Averages (MA 20 and MA 150) - with cache
+                # Calculate Moving Averages (MA 20 and MA 150) - with cache (only if latest_quote exists)
+                if latest_quote:
                     try:
                         from services.external_data.technical_indicators_calculator import TechnicalIndicatorsCalculator
                         from services.advanced_cache_service import advanced_cache_service

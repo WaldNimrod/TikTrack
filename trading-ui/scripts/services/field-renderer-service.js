@@ -462,7 +462,7 @@ class FieldRendererService {
         const typeTranslations = {
             'swing': 'סווינג',
             'investment': 'השקעה',
-            'passive': 'פסיבי',
+            'passive': 'פאסיבי',
             'deposit': 'הפקדה',
             'withdrawal': 'משיכה',
             'fee': 'עמלה',

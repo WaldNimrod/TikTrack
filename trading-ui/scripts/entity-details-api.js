@@ -207,19 +207,101 @@ class EntityDetailsAPI {
             }
             
             // טעינת נתוני שוק אם נדרש (לטיקרים)
+            // הערה: EntityDetailsService כבר מחזיר נתוני שוק, אבל נטען גם מ-getMarketData
+            // כדי לוודא שיש לנו את הנתונים העדכניים ביותר
+            // חשוב: אם getMarketData לא מחזיר שדה מסוים, נשמור את הערך הקיים מ-EntityDetailsService
             if (entityType === 'ticker' && options.includeMarketData !== false) {
                 try {
+                    // שמירת הנתונים הקיימים מ-EntityDetailsService לפני עדכון
+                    const existingPrice = entityData.current_price || entityData.price;
+                    const existingChangePercent = entityData.change_percent || entityData.daily_change_percent;
+                    const existingChangeAmount = entityData.change_amount || entityData.daily_change;
+                    const existingVolume = entityData.volume;
+                    const existingMarketCap = entityData.market_cap;
+                    const existingYahooUpdatedAt = entityData.yahoo_updated_at;
+                    const existingDataSource = entityData.data_source;
+                    
                     const marketData = await this.getMarketData(entityId);
                     if (marketData) {
-                        entityData.current_price = marketData.price;
-                        entityData.change_percent = marketData.change_pct_day;
-                        entityData.change_amount = marketData.change_amount_day;
-                        entityData.volume = marketData.volume;
-                        entityData.yahoo_updated_at = marketData.fetched_at;
-                        entityData.data_source = marketData.provider;
+                        // עדכון רק אם הערך קיים (לא null/undefined) - אחרת נשמור את הערך הקיים
+                        if (marketData.price !== undefined && marketData.price !== null) {
+                            entityData.current_price = marketData.price;
+                            entityData.price = marketData.price; // Alias
+                        } else if (existingPrice !== undefined && existingPrice !== null) {
+                            // שמירת הערך הקיים אם אין ערך חדש
+                            entityData.current_price = existingPrice;
+                            entityData.price = existingPrice;
+                        }
+                        
+                        if (marketData.change_pct_day !== undefined && marketData.change_pct_day !== null) {
+                            entityData.change_percent = marketData.change_pct_day;
+                            entityData.daily_change_percent = marketData.change_pct_day;
+                        } else if (existingChangePercent !== undefined && existingChangePercent !== null) {
+                            entityData.change_percent = existingChangePercent;
+                            entityData.daily_change_percent = existingChangePercent;
+                        }
+                        
+                        if (marketData.change_amount_day !== undefined && marketData.change_amount_day !== null) {
+                            entityData.change_amount = marketData.change_amount_day;
+                            entityData.daily_change = marketData.change_amount_day;
+                        } else if (existingChangeAmount !== undefined && existingChangeAmount !== null) {
+                            entityData.change_amount = existingChangeAmount;
+                            entityData.daily_change = existingChangeAmount;
+                        }
+                        
+                        // Volume: עדכן רק אם יש ערך חדש, אחרת נשמור את הקיים
+                        if (marketData.volume !== undefined && marketData.volume !== null) {
+                            entityData.volume = marketData.volume;
+                        } else if (existingVolume !== undefined && existingVolume !== null) {
+                            // שמירת הערך הקיים אם אין ערך חדש
+                            entityData.volume = existingVolume;
+                        }
+                        
+                        // Market cap: עדכן רק אם יש ערך חדש, אחרת נשמור את הקיים
+                        if (marketData.market_cap !== undefined && marketData.market_cap !== null) {
+                            entityData.market_cap = marketData.market_cap;
+                        } else if (existingMarketCap !== undefined && existingMarketCap !== null) {
+                            // שמירת הערך הקיים אם אין ערך חדש
+                            entityData.market_cap = existingMarketCap;
+                        }
+                        
+                        if (marketData.fetched_at) {
+                            entityData.yahoo_updated_at = marketData.fetched_at;
+                        } else if (existingYahooUpdatedAt) {
+                            entityData.yahoo_updated_at = existingYahooUpdatedAt;
+                        }
+                        
+                        if (marketData.provider) {
+                            entityData.data_source = marketData.provider;
+                        } else if (existingDataSource) {
+                            entityData.data_source = existingDataSource;
+                        }
+                        
+                        // לוג לבדיקה
+                        window.Logger.debug(`Market data merged for ticker ${entityId}`, {
+                            price: entityData.current_price,
+                            volume: entityData.volume,
+                            market_cap: entityData.market_cap,
+                            hadExistingPrice: existingPrice !== undefined && existingPrice !== null,
+                            hadExistingVolume: existingVolume !== undefined && existingVolume !== null,
+                            hadExistingMarketCap: existingMarketCap !== undefined && existingMarketCap !== null,
+                            marketDataPrice: marketData.price,
+                            marketDataVolume: marketData.volume,
+                            marketDataMarketCap: marketData.market_cap,
+                            page: "entity-details-api"
+                        });
+                    } else {
+                        // אם getMarketData החזיר null, נשתמש בנתונים מה-service (כבר שמורים)
+                        window.Logger.debug(`getMarketData returned null for ticker ${entityId}, preserving data from EntityDetailsService`, {
+                            price: entityData.current_price || entityData.price,
+                            volume: entityData.volume,
+                            market_cap: entityData.market_cap,
+                            page: "entity-details-api"
+                        });
                     }
                 } catch (error) {
-                    window.Logger.warn(`Failed to load market data for ${entityType} ${entityId}:`, error, { page: "entity-details-api" });
+                    // במקרה של שגיאה, נשמור את הנתונים הקיימים
+                    window.Logger.warn(`Failed to load market data for ${entityType} ${entityId}, preserving existing data:`, error, { page: "entity-details-api" });
                 }
             }
 
@@ -1336,10 +1418,35 @@ class EntityDetailsAPI {
             });
 
             if (!response.ok) {
+                // Try to get error details from response
+                let errorMessage = `שגיאת שרת בקבלת נתוני שוק: ${response.status}`;
+                try {
+                    const errorData = await response.json();
+                    if (errorData.message) {
+                        errorMessage = errorData.message;
+                    }
+                    if (errorData.suggestion) {
+                        errorMessage += ` (${errorData.suggestion})`;
+                    }
+                } catch (e) {
+                    // If response is not JSON, use default message
+                }
+                
+                // For 404/410, return null (no data available) - this is expected
                 if (response.status === 404 || response.status === 410) {
+                    window.Logger.debug(`Market data not available for ticker ${tickerId}: ${errorMessage}`, { 
+                        status: response.status,
+                        page: "entity-details-api" 
+                    });
                     return null;
                 }
-                throw new Error(`שגיאת שרת בקבלת נתוני שוק: ${response.status}`);
+                
+                // For other errors, log and return null (graceful degradation)
+                window.Logger.warn(`Error getting market data for ticker ${tickerId}: ${errorMessage}`, { 
+                    status: response.status,
+                    page: "entity-details-api" 
+                });
+                return null;
             }
 
             const data = await response.json();
@@ -1347,12 +1454,18 @@ class EntityDetailsAPI {
             if (data.status === 'success' && data.data) {
                 return data.data;
             } else {
+                // Log if response format is unexpected
+                window.Logger.debug(`Unexpected response format for ticker ${tickerId}`, { 
+                    status: data.status,
+                    hasData: !!data.data,
+                    page: "entity-details-api" 
+                });
                 return null;
             }
 
         } catch (error) {
             window.Logger.error(`Error getting market data for ticker ${tickerId}:`, error, { page: "entity-details-api" });
-            return null; // החזר null במקום לזרוק שגיאה
+            return null; // החזר null במקום לזרוק שגיאה - graceful degradation
         }
     }
 

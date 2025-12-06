@@ -24,7 +24,7 @@
             }
             if (window._iconInitRetries < 10) {
                 window._iconInitRetries++;
-                setTimeout(initializeIcons, 100);
+            setTimeout(initializeIcons, 100);
             }
             return;
         }
@@ -32,7 +32,7 @@
         // Wait for IconSystem to be initialized
         if (!window.IconSystem.initialized) {
             try {
-                await window.IconSystem.initialize();
+            await window.IconSystem.initialize();
             } catch (error) {
                 if (typeof window.Logger !== 'undefined') {
                     window.Logger.warn('Failed to initialize IconSystem', {

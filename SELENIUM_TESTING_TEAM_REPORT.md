@@ -394,3 +394,4 @@ python3 scripts/test_pages_console_errors.py
 **המלצה:** להתחיל עם תיקון Logger Server Error - זה משפיע על 9 עמודים מרכזיים
 
 
+

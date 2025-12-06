@@ -142,7 +142,8 @@ function notifyMissingExecutionsOnce(key, message) {
     if (typeof window.showWarningNotification === 'function') {
         window.showWarningNotification('אין נתוני Executions', message);
     }
-    window.Logger?.warn?.('⚠️ Missing executions detected', { context: key, message }, { page: 'positions-portfolio' });
+    // User already sees the notification - log as info, not warn
+    window.Logger?.info?.('Missing executions detected', { context: key, message }, { page: 'positions-portfolio' });
 }
 
 function createDiagnosticsMessageFromPortfolio(diagnostics) {
@@ -151,9 +152,37 @@ function createDiagnosticsMessageFromPortfolio(diagnostics) {
     }
     
     // Don't show message if there are executions in any account
-    // Check if execution_pairs_count exists and is > 0
+    // Check multiple indicators:
+    // 1. execution_pairs_count > 0 (positions exist)
+    // 2. accounts_with_executions contains accounts (backend says they have executions)
+    // 3. Check if executions data exists in frontend for these accounts
     if (diagnostics.execution_pairs_count !== undefined && diagnostics.execution_pairs_count > 0) {
         return null;
+    }
+    
+    // Check if backend says these accounts have executions
+    if (Array.isArray(diagnostics.accounts_with_executions) && diagnostics.accounts_with_executions.length > 0) {
+        // Backend found executions - don't show warning
+        return null;
+    }
+    
+    // Verify with frontend executions data if available
+    if (window.executionsData && Array.isArray(window.executionsData) && window.executionsData.length > 0) {
+        // Check if any of the "missing" accounts actually have executions in frontend data
+        const accountsWithExecutionsInFrontend = diagnostics.accounts_without_executions.filter(accountId => {
+            return window.executionsData.some(exec => 
+                exec.trading_account_id === accountId || exec.account_id === accountId
+            );
+        });
+        
+        // If we found executions in frontend for these accounts, don't show warning
+        if (accountsWithExecutionsInFrontend.length > 0) {
+            window.Logger?.debug?.('Accounts marked as missing executions actually have executions in frontend data', {
+                accounts: accountsWithExecutionsInFrontend,
+                page: 'positions-portfolio'
+            });
+            return null;
+        }
     }
     
     const missingCount = diagnostics.accounts_without_executions.length;
@@ -185,6 +214,22 @@ function createDiagnosticsMessageFromAccount(diagnostics) {
     // Don't show message if account_id is missing or undefined
     if (!diagnostics.account_id) {
         return null;
+    }
+    
+    // Verify with frontend executions data if available
+    if (window.executionsData && Array.isArray(window.executionsData) && window.executionsData.length > 0) {
+        const accountId = diagnostics.account_id;
+        const hasExecutions = window.executionsData.some(exec => 
+            exec.trading_account_id === accountId || exec.account_id === accountId
+        );
+        
+        if (hasExecutions) {
+            window.Logger?.debug?.('Account marked as missing executions actually has executions in frontend data', {
+                accountId,
+                page: 'positions-portfolio'
+            });
+            return null;
+        }
     }
     
     // Try to get account name from trading_accountsData
@@ -332,6 +377,24 @@ window.initPositionsPortfolio = async function(autoSelectDefault = false) {
     
     // Setup section open listeners
     setupPositionsSectionOpenListener();
+    
+    // CRITICAL: Load executions data first - portfolio calculations depend on it
+    // Use the general ExecutionsData service (same as other pages)
+    if (window.ExecutionsData && typeof window.ExecutionsData.loadExecutionsData === 'function') {
+        try {
+            window.Logger?.info?.('📥 Loading executions data for portfolio calculations...', { page: 'positions-portfolio' });
+            await window.ExecutionsData.loadExecutionsData({ force: false });
+            window.Logger?.info?.('✅ Executions data loaded for portfolio', { page: 'positions-portfolio' });
+        } catch (error) {
+            window.Logger?.warn?.('⚠️ Error loading executions data for portfolio:', { error: error?.message, page: 'positions-portfolio' });
+            // Continue anyway - portfolio will show diagnostics if executions are missing
+        }
+    } else {
+        window.Logger?.warn?.('⚠️ ExecutionsData service not available - portfolio may not find executions', { 
+            ExecutionsDataAvailable: !!window.ExecutionsData,
+            page: 'positions-portfolio' 
+        });
+    }
     
     // Load portfolio on init (if no trading account selector dependency)
     await loadPortfolio();
@@ -1536,17 +1599,17 @@ function renderPortfolioSummaryFallback(summary, size) {
         div3.appendChild(strong3);
         summaryElement.appendChild(div3);
     } else {
-        // Full view: cards in grid layout
+        // Full view: cards in 2 rows (4 cards per row) using existing CSS classes
         const cardsContainer = document.createElement('div');
         cardsContainer.className = 'summary-cards-container';
         
-        // Helper function to create a stat card
+        // Helper function to create a stat card using existing CSS classes
         const createStatCard = (label, value, valueClass = '', subtitle = '') => {
             const card = document.createElement('div');
-            card.className = 'compact-stat-card';
+            card.className = 'compact-stat-card'; // Use existing class from _cards.css
             
             const numberDiv = document.createElement('div');
-            numberDiv.className = 'compact-stat-number';
+            numberDiv.className = 'compact-stat-number'; // Use existing class
             if (valueClass) {
                 numberDiv.className += ` ${valueClass}`;
             }
@@ -1554,13 +1617,13 @@ function renderPortfolioSummaryFallback(summary, size) {
             card.appendChild(numberDiv);
             
             const labelDiv = document.createElement('div');
-            labelDiv.className = 'compact-stat-label';
+            labelDiv.className = 'compact-stat-label'; // Use existing class
             labelDiv.textContent = label;
             card.appendChild(labelDiv);
             
             if (subtitle) {
                 const subtitleDiv = document.createElement('div');
-                subtitleDiv.className = 'compact-stat-absolute';
+                subtitleDiv.className = 'compact-stat-absolute'; // Use existing class
                 subtitleDiv.textContent = subtitle;
                 card.appendChild(subtitleDiv);
             }
@@ -1568,11 +1631,28 @@ function renderPortfolioSummaryFallback(summary, size) {
             return card;
         };
         
-        // Full view: all cards in grid
+        // Calculate year-to-date profit/loss from executions
+        let yearToDatePl = 0;
+        const currentYear = new Date().getFullYear();
+        const yearStart = new Date(currentYear, 0, 1);
+        
+        if (window.executionsData && Array.isArray(window.executionsData)) {
+            yearToDatePl = window.executionsData
+                .filter(exec => {
+                    if (!exec.date && !exec.execution_date) return false;
+                    const execDate = new Date(exec.date || exec.execution_date);
+                    return execDate >= yearStart && exec.action === 'sell' && exec.realized_pl !== null && exec.realized_pl !== undefined;
+                })
+                .reduce((sum, exec) => sum + (parseFloat(exec.realized_pl) || 0), 0);
+        }
+        
+        // Row 1: 4 cards
         cardsContainer.appendChild(createStatCard('סה"כ פוזיציות', totalPositions.toString()));
         cardsContainer.appendChild(createStatCard('שווי שוק כולל', formatCurrencyHebrew(totalMarketValue, false, true)));
         cardsContainer.appendChild(createStatCard('עלות כוללת', formatCurrencyHebrew(totalCost, false, false)));
+        cardsContainer.appendChild(createStatCard('סה"כ עמלות', formatCurrencyHebrew(totalFees, false, false)));
         
+        // Row 2: 4 cards
         const realizedPlValue = formatCurrencyHebrew(totalRealizedPl, true, true);
         cardsContainer.appendChild(createStatCard(
             'רווח/הפסד מוכר',
@@ -1596,7 +1676,12 @@ function renderPortfolioSummaryFallback(summary, size) {
             plPercent
         ));
         
-        cardsContainer.appendChild(createStatCard('סה"כ עמלות', formatCurrencyHebrew(totalFees, false, false)));
+        const ytdPlValue = formatCurrencyHebrew(yearToDatePl, true, true);
+        cardsContainer.appendChild(createStatCard(
+            'רווח/הפסד מתחילת שנה',
+            ytdPlValue,
+            yearToDatePl >= 0 ? 'positive' : 'negative'
+        ));
         
         summaryElement.appendChild(cardsContainer);
     }

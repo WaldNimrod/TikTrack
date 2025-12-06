@@ -33,6 +33,11 @@ def tracking() -> Any:
     """Tracking page - redirect to trades"""
     return send_from_directory(UI_DIR, "trades.html")
 
+@pages_bp.route('/watch-list')
+def watch_list() -> Any:
+    """Watch list management page"""
+    return send_from_directory(UI_DIR, "watch-list.html")
+
 
 
 @pages_bp.route('/accounts')

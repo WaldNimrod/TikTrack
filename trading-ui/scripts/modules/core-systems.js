@@ -101,53 +101,87 @@
     return;
   }
 
-  const needsModalFallback = !window.bootstrap || !window.bootstrap.Modal;
-  const needsTooltipFallback = !window.bootstrap || !window.bootstrap.Tooltip;
+  // Wait for Bootstrap to load before checking if fallback is needed
+  // This prevents false warnings when Bootstrap is still loading
+  (function waitForBootstrap() {
+    // Check if we've been waiting too long (10 seconds max)
+    const maxWaitTime = 10000; // 10 seconds
+    const startTime = Date.now();
+    
+    const checkBootstrap = () => {
+      const elapsed = Date.now() - startTime;
+      const stillNeedsModal = !window.bootstrap || !window.bootstrap.Modal;
+      const stillNeedsTooltip = !window.bootstrap || !window.bootstrap.Tooltip;
 
-  if (!needsModalFallback && !needsTooltipFallback) {
-    return;
-  }
-
-  console.warn(
-    '⚠️ [Bootstrap Fallback] Bootstrap assets not available - installing lightweight fallback for modals/tooltips'
-  );
-
-  const dispatchEvent = (element, name) => {
-    if (!element) {
-      return;
-    }
-    try {
-      const event = new Event(name, { bubbles: true, cancelable: false });
-      element.dispatchEvent(event);
-    } catch (error) {
-      // Older browsers fallback
-      try {
-        const event = document.createEvent('Event');
-        event.initEvent(name, true, false);
-        element.dispatchEvent(event);
-      } catch (e) {
-        console.error('❌ [Bootstrap Fallback] Failed to dispatch event', name, e);
+      // If Bootstrap loaded, exit without fallback
+      if (!stillNeedsModal && !stillNeedsTooltip) {
+        return;
       }
-    }
-  };
 
-  class BootstrapModalFallback {
-    constructor(element, options = {}) {
-      if (!element) {
-        throw new Error('BootstrapModalFallback requires a DOM element');
+      // If we've waited too long, install fallback
+      if (elapsed >= maxWaitTime) {
+        console.warn(
+          '⚠️ [Bootstrap Fallback] Bootstrap assets not available after 10s - installing lightweight fallback for modals/tooltips'
+        );
+        installFallback();
+      } else {
+        // Check again in 100ms
+        setTimeout(checkBootstrap, 100);
+        return;
       }
-      this._element = element;
-      this._options = {
-        backdrop: options.backdrop !== undefined ? options.backdrop : true,
-        keyboard: options.keyboard !== undefined ? options.keyboard : true,
-        focus: options.focus !== undefined ? options.focus : true,
+    };
+
+    // Install fallback function
+    function installFallback() {
+      // Check what's needed at install time
+      const needsModalFallback = !window.bootstrap || !window.bootstrap.Modal;
+      const needsTooltipFallback = !window.bootstrap || !window.bootstrap.Tooltip;
+
+      // If nothing is needed, return early
+      if (!needsModalFallback && !needsTooltipFallback) {
+        return;
+      }
+
+      const dispatchEvent = (element, name) => {
+        if (!element) {
+          return;
+        }
+        try {
+          const event = new Event(name, { bubbles: true, cancelable: false });
+          element.dispatchEvent(event);
+        } catch (error) {
+          // Older browsers fallback
+          try {
+            const event = document.createEvent('Event');
+            event.initEvent(name, true, false);
+            element.dispatchEvent(event);
+          } catch (e) {
+            console.error('❌ [Bootstrap Fallback] Failed to dispatch event', name, e);
+          }
+        }
       };
-      this._isShown = false;
-      this._backdrop = null;
-      this._handleKeydown = null;
-      this._previouslyFocused = null;
-      BootstrapModalFallback._instances.set(element, this);
-    }
+
+      // Set up instances WeakMaps before classes
+      const modalInstances = new WeakMap();
+      const tooltipInstances = new WeakMap();
+
+      class BootstrapModalFallback {
+        constructor(element, options = {}) {
+          if (!element) {
+            throw new Error('BootstrapModalFallback requires a DOM element');
+          }
+          this._element = element;
+          this._options = {
+            backdrop: options.backdrop !== undefined ? options.backdrop : true,
+            keyboard: options.keyboard !== undefined ? options.keyboard : true,
+            focus: options.focus !== undefined ? options.focus : true,
+      };
+          this._isShown = false;
+          this._backdrop = null;
+          this._handleKeydown = null;
+          this._previouslyFocused = null;
+          modalInstances.set(element, this);
+        }
 
     show() {
       if (this._isShown) {
@@ -241,7 +275,7 @@
 
     dispose() {
       this.hide();
-      BootstrapModalFallback._instances.delete(this._element);
+      modalInstances.delete(this._element);
       this._element = null;
     }
 
@@ -256,7 +290,12 @@
     }
 
     static getInstance(element) {
-      return BootstrapModalFallback._instances.get(element) || null;
+      return modalInstances.get(element) || null;
+    }
+
+    static getOrCreateInstance(element, options = {}) {
+      const existingInstance = BootstrapModalFallback.getInstance(element);
+      return existingInstance || new BootstrapModalFallback(element, options);
     }
 
     static get VERSION() {
@@ -264,21 +303,14 @@
     }
   }
 
-  BootstrapModalFallback._instances = new WeakMap();
-
-  BootstrapModalFallback.getOrCreateInstance = function (element, options = {}) {
-    const existingInstance = BootstrapModalFallback.getInstance(element);
-    return existingInstance || new BootstrapModalFallback(element, options);
-  };
-
-  class BootstrapTooltipFallback {
-    constructor(element, options = {}) {
-      if (!element) {
-        throw new Error('BootstrapTooltipFallback requires a DOM element');
-      }
-      this._element = element;
-      this._options = options;
-      BootstrapTooltipFallback._instances.set(element, this);
+      class BootstrapTooltipFallback {
+        constructor(element, options = {}) {
+          if (!element) {
+            throw new Error('BootstrapTooltipFallback requires a DOM element');
+          }
+          this._element = element;
+          this._options = options;
+          tooltipInstances.set(element, this);
 
       const title =
         options?.title ||
@@ -291,11 +323,11 @@
     }
 
     dispose() {
-      BootstrapTooltipFallback._instances.delete(this._element);
+      tooltipInstances.delete(this._element);
     }
 
     static getInstance(element) {
-      return BootstrapTooltipFallback._instances.get(element) || null;
+      return tooltipInstances.get(element) || null;
     }
 
     static get VERSION() {
@@ -303,19 +335,31 @@
     }
   }
 
-  BootstrapTooltipFallback._instances = new WeakMap();
+      // Install fallbacks to window.bootstrap
+      const bootstrapGlobal = window.bootstrap ? { ...window.bootstrap } : {};
+      if (needsModalFallback) {
+        bootstrapGlobal.Modal = BootstrapModalFallback;
+      }
+      if (needsTooltipFallback) {
+        bootstrapGlobal.Tooltip = BootstrapTooltipFallback;
+      }
+      bootstrapGlobal.__isFallback = true;
 
-  const bootstrapGlobal = window.bootstrap ? { ...window.bootstrap } : {};
-  if (needsModalFallback) {
-    bootstrapGlobal.Modal = BootstrapModalFallback;
-  }
-  if (needsTooltipFallback) {
-    bootstrapGlobal.Tooltip = BootstrapTooltipFallback;
-  }
-  bootstrapGlobal.__isFallback = true;
+      window.bootstrap = bootstrapGlobal;
+    }
 
-  window.bootstrap = bootstrapGlobal;
-})();
+    // Initial check
+    const initialNeedsModal = !window.bootstrap || !window.bootstrap.Modal;
+    const initialNeedsTooltip = !window.bootstrap || !window.bootstrap.Tooltip;
+
+    // If Bootstrap is already available, no fallback needed
+    if (!initialNeedsModal && !initialNeedsTooltip) {
+      return;
+    }
+
+    // Start checking
+    checkBootstrap();
+  })();
 
 // ===== UNIFIED APP INITIALIZER =====
 
@@ -949,6 +993,15 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
           console.warn('⚠️ Will attempt to initialize them or use fallbacks');
         }
 
+        // Wait for base package scripts to load (UnifiedCacheManager, Logger, NotificationSystem)
+        // Poll for up to 5 seconds for the scripts to load
+        let attempts = 0;
+        const maxAttempts = 50; // 50 * 100ms = 5 seconds
+        while ((typeof window.UnifiedCacheManager === 'undefined' || typeof window.Logger === 'undefined') && attempts < maxAttempts) {
+          await new Promise(resolve => setTimeout(resolve, 100));
+          attempts++;
+        }
+
         // Initialize IndexedDB first (blocking) to prevent race conditions
         await this.initializeCacheSystem();
 
@@ -964,7 +1017,7 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
         }
 
         if (!window.UnifiedCacheManager) {
-          throw new Error('UnifiedCacheManager is required but not available');
+          throw new Error('UnifiedCacheManager is required but not available - base package may not be loaded. Make sure base package is in dependencies.');
         }
 
         if (!window.UnifiedCacheManager.initialized) {
@@ -1793,6 +1846,15 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
         window.Logger.debug('Initializing Unified Cache System', {}, { page: 'core-systems' });
       }
 
+      // Wait for UnifiedCacheManager to be loaded (from base package)
+      // Poll for up to 5 seconds for the script to load
+      let attempts = 0;
+      const maxAttempts = 50; // 50 * 100ms = 5 seconds
+      while (typeof window.UnifiedCacheManager === 'undefined' && attempts < maxAttempts) {
+        await new Promise(resolve => setTimeout(resolve, 100));
+        attempts++;
+      }
+
       // Initialize UnifiedCacheManager with timeout
       if (typeof window.UnifiedCacheManager !== 'undefined') {
         try {
@@ -1835,7 +1897,7 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
           throw error;
         }
       } else {
-        throw new Error('UnifiedCacheManager is not available - script may not be loaded');
+        throw new Error('UnifiedCacheManager is not available - base package may not be loaded. Make sure base package is in dependencies.');
       }
     }
 
@@ -2390,8 +2452,13 @@ window.addEventListener('unhandledrejection', event => {
     console.error('❌ Unhandled Promise Rejection:', details);
   }
 
+  // Safe check - only use showNotification if it's available (from notification-system.js in base package)
   if (event.reason && typeof window.showNotification === 'function') {
-    window.showNotification('❌ Promise rejection occurred', 'error');
+    try {
+      window.showNotification('❌ Promise rejection occurred', 'error');
+    } catch (notificationError) {
+      console.error('❌ Failed to show promise rejection notification:', notificationError);
+    }
   }
 });
 
@@ -2850,11 +2917,16 @@ function hideNotification(notification) {
  * @param {string} category - Category of notification (default: 'system')
  */
 async function showSimpleErrorNotification(title, message, duration = 6000, category = null) {
-  // Use the global notification system from notification-system.js
+  // Use the global notification system from notification-system.js (loaded in base package)
   if (typeof window.showNotification === 'function') {
-    await window.showNotification(message, 'error', title, duration, category);
+    try {
+      await window.showNotification(message, 'error', title, duration, category);
+    } catch (error) {
+      console.error('Failed to show notification:', error);
+    }
   } else {
-    console.error('showNotification not available');
+    // Fallback to console if notification system not loaded yet
+    console.error(`❌ ${title}: ${message}`);
   }
 }
 
@@ -4129,8 +4201,15 @@ async function showDetailsModal(title, content, options = {}) {
           navigator.clipboard
             .writeText(codeToCopy)
             .then(() => {
-              if (typeof showNotification === 'function') {
-                showNotification('✅ הקוד הועתק ללוח בהצלחה!', 'success');
+              // Safe check - use window.showNotification from notification-system.js (base package)
+              if (typeof window.showNotification === 'function') {
+                try {
+                  window.showNotification('✅ הקוד הועתק ללוח בהצלחה!', 'success');
+                } catch (error) {
+                  console.log('✅ הקוד הועתק ללוח בהצלחה!');
+                }
+              } else {
+                console.log('✅ הקוד הועתק ללוח בהצלחה!');
               }
             })
             .catch(err => {
@@ -4825,7 +4904,7 @@ window.notificationSystem = {
 
   // NOTIFICATION SYSTEM functions
   // Note: showSuccessNotification, showWarningNotification, showInfoNotification use global functions from notification-system.js
-  showNotification, // Keep local - has complex logic
+  // showNotification removed - use window.showNotification from notification-system.js instead
   showFinalSuccessNotification,
   // showErrorNotification - use global from notification-system.js
   showSimpleErrorNotification,
@@ -4850,17 +4929,19 @@ window.notificationSystem = {
 };
 
 // Global NotificationSystem object for compatibility
+// Note: All notification functions are loaded from notification-system.js (base package)
+// Use safe checks to prevent errors if notification-system.js hasn't loaded yet
 window.NotificationSystem = {
-  show: window.showNotification,
-  showSuccess: window.showSuccessNotification, // From notification-system.js
+  show: typeof window.showNotification === 'function' ? window.showNotification : function() { console.warn('showNotification not available - notification-system.js may not be loaded'); },
+  showSuccess: typeof window.showSuccessNotification === 'function' ? window.showSuccessNotification : function() { console.warn('showSuccessNotification not available'); }, // From notification-system.js
   showFinalSuccess: window.showFinalSuccessNotification,
-  showError: window.showErrorNotification, // From notification-system.js
+  showError: typeof window.showErrorNotification === 'function' ? window.showErrorNotification : function() { console.warn('showErrorNotification not available'); }, // From notification-system.js
   showSimpleError: window.showSimpleErrorNotification,
   showCriticalError: window.showCriticalErrorNotification,
   createCriticalError: window.createCriticalError,
   withCriticalErrorHandling: window.withCriticalErrorHandling,
-  showWarning: window.showWarningNotification, // From notification-system.js
-  showInfo: window.showInfoNotification, // From notification-system.js
+  showWarning: typeof window.showWarningNotification === 'function' ? window.showWarningNotification : function() { console.warn('showWarningNotification not available'); }, // From notification-system.js
+  showInfo: typeof window.showInfoNotification === 'function' ? window.showInfoNotification : function() { console.warn('showInfoNotification not available'); }, // From notification-system.js
   showDetails: window.showDetailsModal,
   shouldShow: window.shouldShowNotification,
   logWithCategory: window.logWithCategory,

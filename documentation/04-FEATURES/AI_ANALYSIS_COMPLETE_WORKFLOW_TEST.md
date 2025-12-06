@@ -240,3 +240,4 @@ npx playwright test trading-ui/scripts/testing/automated/ai-analysis-e2e.spec.js
 **עודכן:** 2 בפברואר 2025  
 **סטטוס:** ✅ מוכן להרצה
 
+

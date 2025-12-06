@@ -1,0 +1,101 @@
+{
+  "timestamp": "2025-12-06T10:16:28.067447",
+  "tests": [
+    {
+      "name": "Page Loads",
+      "status": "passed",
+      "message": "Page loaded successfully: טיקרים - TikTrack",
+      "details": {},
+      "timestamp": "2025-12-06T10:16:35.706575"
+    },
+    {
+      "name": "JavaScript Errors",
+      "status": "warning",
+      "message": "Found 3 JavaScript errors",
+      "details": {
+        "errors": [
+          "http://127.0.0.1:8080/api/auth/me - Failed to load resource: the server responded with a status of 401 (UNAUTHORIZED)",
+          "http://127.0.0.1:8080/api/tickers/my?_ts=1765008992693 - Failed to load resource: the server responded with a status of 401 (UNAUTHORIZED)",
+          "http://127.0.0.1:8080/api/tickers/my?_ts=1765008992696 - Failed to load resource: the server responded with a status of 401 (UNAUTHORIZED)"
+        ]
+      },
+      "timestamp": "2025-12-06T10:16:35.707283"
+    },
+    {
+      "name": "Integration Functions",
+      "status": "passed",
+      "message": "All integration functions exist",
+      "details": {},
+      "timestamp": "2025-12-06T10:16:35.717702"
+    },
+    {
+      "name": "Table Element",
+      "status": "passed",
+      "message": "Tickers table found",
+      "details": {},
+      "timestamp": "2025-12-06T10:16:35.721681"
+    },
+    {
+      "name": "Table Rows",
+      "status": "passed",
+      "message": "Found 58 ticker rows",
+      "details": {},
+      "timestamp": "2025-12-06T10:16:37.741959"
+    },
+    {
+      "name": "Status Badges Display",
+      "status": "warning",
+      "message": "No status badges found (may need data enrichment)",
+      "details": {},
+      "timestamp": "2025-12-06T10:16:50.760772"
+    },
+    {
+      "name": "EntityDetailsAPI",
+      "status": "passed",
+      "message": "EntityDetailsAPI is available",
+      "details": {},
+      "timestamp": "2025-12-06T10:16:50.763500"
+    },
+    {
+      "name": "ExternalDataService",
+      "status": "passed",
+      "message": "ExternalDataService is available",
+      "details": {},
+      "timestamp": "2025-12-06T10:16:50.765766"
+    },
+    {
+      "name": "Data Enrichment",
+      "status": "passed",
+      "message": "Enrichment functions ready",
+      "details": {},
+      "timestamp": "2025-12-06T10:16:50.768066"
+    },
+    {
+      "name": "UnifiedCacheManager",
+      "status": "passed",
+      "message": "UnifiedCacheManager is available",
+      "details": {},
+      "timestamp": "2025-12-06T10:16:50.770300"
+    },
+    {
+      "name": "UnifiedProgressManager",
+      "status": "failed",
+      "message": "UnifiedProgressManager not available",
+      "details": {},
+      "timestamp": "2025-12-06T10:16:50.772450"
+    },
+    {
+      "name": "Console Errors",
+      "status": "passed",
+      "message": "No critical console errors found",
+      "details": {},
+      "timestamp": "2025-12-06T10:16:50.773125"
+    }
+  ],
+  "summary": {
+    "total": 12,
+    "passed": 9,
+    "failed": 1,
+    "warnings": 2
+  }
+}

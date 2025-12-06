@@ -123,3 +123,4 @@ python3 scripts/test_pages_console_errors.py
 **המלצה:** להריץ לפני כל סיום תוכנית או בקשת בדיקות ידניות
 
 
+

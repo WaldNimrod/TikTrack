@@ -1,46 +1,46 @@
 {
-  "timestamp": "2025-12-06T00:20:22.297995",
+  "timestamp": "2025-12-06T20:28:29.734104",
   "base_url": "http://localhost:8080",
   "total_pages": 47,
-  "successful": 42,
-  "failed": 5,
-  "with_errors": 5,
-  "with_warnings": 34,
-  "with_header": 38,
+  "successful": 3,
+  "failed": 44,
+  "with_errors": 44,
+  "with_warnings": 31,
+  "with_header": 40,
   "with_core_systems": 43,
   "rate_limiting_stats": {
-    "rate_limit_hits": 14,
+    "rate_limit_hits": 0,
     "current_requests_in_window": 1,
-    "adaptive_delay": 5.0,
-    "last_rate_limit_time": 1764973217.139536
+    "adaptive_delay": 2.0,
+    "last_rate_limit_time": null
   },
   "summary_by_category": {
-    "watchlists": {
-      "total": 4,
-      "successful": 4
+    "secondary": {
+      "total": 3,
+      "successful": 0
     },
     "auth": {
       "total": 4,
-      "successful": 4
-    },
-    "main": {
-      "total": 15,
-      "successful": 11
+      "successful": 0
     },
     "dev": {
       "total": 9,
-      "successful": 9
-    },
-    "technical": {
-      "total": 10,
-      "successful": 10
+      "successful": 0
     },
     "additional": {
       "total": 2,
-      "successful": 1
+      "successful": 0
     },
-    "secondary": {
-      "total": 3,
+    "technical": {
+      "total": 10,
+      "successful": 0
+    },
+    "main": {
+      "total": 15,
+      "successful": 0
+    },
+    "watchlists": {
+      "total": 4,
       "successful": 3
     }
   },
@@ -51,49 +51,54 @@
       "category": "main",
       "priority": "high",
       "success": false,
-      "load_time": 1.5065479278564453,
+      "load_time": 1.4816060066223145,
       "console_errors": [
         {
           "level": "SEVERE",
-          "message": "Rate limit exceeded after 3 retries: http://localhost:8080/api/tickers/with-initial-data - Failed to load resource: the server responded with a status of 429 (TOO MANY REQUESTS)",
-          "timestamp": 1764972850398
+          "message": "http://localhost:8080/scripts/modules/core-systems.js?v=1.0.0 5982:0 Uncaught SyntaxError: Unexpected end of input",
+          "timestamp": 1765045501757
         },
         {
           "level": "SEVERE",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 906:24 \"[12:14:08 AM] ERROR: ❌ TickerListWidget: Error loading active tickers\" Object",
-          "timestamp": 1764972850398
+          "message": "http://localhost:8080/scripts/bundles/base.bundle.js?v=1.0.0 21614:19 Uncaught TypeError: this.waitForBootstrap is not a function",
+          "timestamp": 1765045501769
         },
         {
           "level": "SEVERE",
-          "message": "Rate limit exceeded after 3 retries: http://localhost:8080/api/tickers/with-initial-data - Failed to load resource: the server responded with a status of 429 (TOO MANY REQUESTS)",
-          "timestamp": 1764972850398
+          "message": "http://localhost:8080/scripts/bundles/base.bundle.js?v=1.0.0 21614:19 Uncaught TypeError: this.waitForBootstrap is not a function",
+          "timestamp": 1765045503790
         },
         {
           "level": "SEVERE",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 906:24 \"[12:14:08 AM] ERROR: ❌ TickerChartWidget: Error loading tickers\" Object",
-          "timestamp": 1764972850398
+          "message": "http://localhost:8080/scripts/bundles/base.bundle.js?v=1.0.0 21614:19 Uncaught TypeError: this.waitForBootstrap is not a function",
+          "timestamp": 1765045503792
         }
       ],
       "console_warnings": [
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:14:07 AM] WARN: [ConditionsModalController] Modal element not found\" Object",
-          "timestamp": 1764972848004
+          "message": "http://localhost:8080/scripts/bundles/base.bundle.js?v=1.0.0 13816:24 \"[8:25:01 PM] WARN: [ConditionsModalController] Modal element not found and could not be created\" Object",
+          "timestamp": 1765045501742
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:14:10 AM] WARN: ⚠️ Missing executions detected\" Object",
-          "timestamp": 1764972850400
+          "message": "http://localhost:8080/scripts/bundles/base.bundle.js?v=1.0.0 13816:24 \"[8:25:01 PM] WARN: ⚠️ No color found for entity import_session - should load from preferences\" Object",
+          "timestamp": 1765045501750
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/tables.js?v=1.0.0 1349:16 \"⚠️ [updateTableWithPagination] Skipping pagination for table portfolioTable - table is inside a modal\"",
-          "timestamp": 1764972850400
+          "message": "http://localhost:8080/scripts/bundles/modules.bundle.js?v=1.0.0 5676:12 \"UnifiedCacheManager לא זמין - משתמש בברירת מחדל (כלל 44 violation prevented) עבור top-section בדף \\\"index\\\"\"",
+          "timestamp": 1765045503789
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/button-system-init.js?v=1.0.0 65:26 \"⚠️🔘 Button System: updateTooltip: Cannot update static tooltip\" Object",
-          "timestamp": 1764972850400
+          "message": "http://localhost:8080/scripts/bundles/modules.bundle.js?v=1.0.0 5714:16 \"UnifiedCacheManager לא זמין - משתמש בברירת מחדל (כלל 44 violation prevented) עבור \\\"main\\\" בדף \\\"index\\\"\"",
+          "timestamp": 1765045503789
+        },
+        {
+          "level": "WARNING",
+          "message": "http://localhost:8080/scripts/bundles/modules.bundle.js?v=1.0.0 5714:16 \"UnifiedCacheManager לא זמין - משתמש בברירת מחדל (כלל 44 violation prevented) עבור \\\"full-portfolio\\\" בדף \\\"index\\\"\"",
+          "timestamp": 1765045503789
         }
       ],
       "page_errors": [],
@@ -104,37 +109,38 @@
         "loadActiveAlertsInProgress": true,
         "showNotificationInProgress": false
       },
-      "rate_limit_retries": 3,
-      "timestamp": "2025-12-06T00:14:06.884119"
+      "rate_limit_retries": 0,
+      "timestamp": "2025-12-06T20:25:00.303361"
     },
     {
       "page": "טריידים",
       "url": "/trades.html",
       "category": "main",
       "priority": "high",
-      "success": true,
-      "load_time": 0.4716498851776123,
-      "console_errors": [],
+      "success": false,
+      "load_time": 0.7415261268615723,
+      "console_errors": [
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/button-system-init.js?v=1.0.0 348:19 Uncaught TypeError: this.waitForBootstrap is not a function",
+          "timestamp": 1765045506306
+        },
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/modules/core-systems.js?v=1.0.0 5982:0 Uncaught SyntaxError: Unexpected end of input",
+          "timestamp": 1765045506545
+        },
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/button-system-init.js?v=1.0.0 348:19 Uncaught TypeError: this.waitForBootstrap is not a function",
+          "timestamp": 1765045508569
+        }
+      ],
       "console_warnings": [
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1286:14 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
-          "timestamp": 1764972855751
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:14:15 AM] WARN: [ConditionsModalController] Modal element not found\" Object",
-          "timestamp": 1764972855837
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/trades.html - [DOM] Found 2 elements with non-unique id #tradeOpenConditionsButton: (More info: https://goo.gl/9p2vKq) %o %o",
-          "timestamp": 1764972857890
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/scripts/pagination-system.js?v=1.0.0 85:28 \"⚠️ [PaginationSystem.create] Skipping pagination creation for table tradesTable - table is inside a modal\"",
-          "timestamp": 1764972857890
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[8:25:06 PM] WARN: [ConditionsModalController] Modal element not found and could not be created\" Object",
+          "timestamp": 1765045506538
         }
       ],
       "page_errors": [],
@@ -146,31 +152,47 @@
         "showNotificationInProgress": false
       },
       "rate_limit_retries": 0,
-      "timestamp": "2025-12-06T00:14:15.411584"
+      "timestamp": "2025-12-06T20:25:05.816050"
     },
     {
       "page": "תכניות מסחר",
       "url": "/trade_plans.html",
       "category": "main",
       "priority": "high",
-      "success": true,
-      "load_time": 0.5380532741546631,
-      "console_errors": [],
+      "success": false,
+      "load_time": 0.44238996505737305,
+      "console_errors": [
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/button-system-init.js?v=1.0.0 348:19 Uncaught TypeError: this.waitForBootstrap is not a function",
+          "timestamp": 1765045510852
+        },
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/modules/core-systems.js?v=1.0.0 5982:0 Uncaught SyntaxError: Unexpected end of input",
+          "timestamp": 1765045511021
+        },
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/button-system-init.js?v=1.0.0 348:19 Uncaught TypeError: this.waitForBootstrap is not a function",
+          "timestamp": 1765045513035
+        },
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/button-system-init.js?v=1.0.0 348:19 Uncaught TypeError: this.waitForBootstrap is not a function",
+          "timestamp": 1765045513035
+        },
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/button-system-init.js?v=1.0.0 348:19 Uncaught TypeError: this.waitForBootstrap is not a function",
+          "timestamp": 1765045513036
+        }
+      ],
       "console_warnings": [
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1286:14 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
-          "timestamp": 1764972863310
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:14:23 AM] WARN: [ConditionsModalController] Modal element not found\" Object",
-          "timestamp": 1764972863406
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/scripts/tables.js?v=1.0.0 1349:16 \"⚠️ [updateTableWithPagination] Skipping pagination for table trade_plansTable - table is inside a modal\"",
-          "timestamp": 1764972865466
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[8:25:10 PM] WARN: [ConditionsModalController] Modal element not found and could not be created\" Object",
+          "timestamp": 1765045510973
         }
       ],
       "page_errors": [],
@@ -182,31 +204,37 @@
         "showNotificationInProgress": false
       },
       "rate_limit_retries": 0,
-      "timestamp": "2025-12-06T00:14:22.921777"
+      "timestamp": "2025-12-06T20:25:10.582976"
     },
     {
       "page": "התראות",
       "url": "/alerts.html",
       "category": "main",
       "priority": "high",
-      "success": true,
-      "load_time": 0.5048511028289795,
-      "console_errors": [],
+      "success": false,
+      "load_time": 0.4526982307434082,
+      "console_errors": [
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/button-system-init.js?v=1.0.0 348:19 Uncaught TypeError: this.waitForBootstrap is not a function",
+          "timestamp": 1765045515335
+        },
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/modules/core-systems.js?v=1.0.0 5982:0 Uncaught SyntaxError: Unexpected end of input",
+          "timestamp": 1765045515492
+        },
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/button-system-init.js?v=1.0.0 348:19 Uncaught TypeError: this.waitForBootstrap is not a function",
+          "timestamp": 1765045517518
+        }
+      ],
       "console_warnings": [
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1286:14 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
-          "timestamp": 1764972870853
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:14:30 AM] WARN: [ConditionsModalController] Modal element not found\" Object",
-          "timestamp": 1764972870947
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/scripts/tables.js?v=1.0.0 1349:16 \"⚠️ [updateTableWithPagination] Skipping pagination for table alertsTable - table is inside a modal\"",
-          "timestamp": 1764972873007
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[8:25:15 PM] WARN: [ConditionsModalController] Modal element not found and could not be created\" Object",
+          "timestamp": 1765045515455
         }
       ],
       "page_errors": [],
@@ -218,36 +246,57 @@
         "showNotificationInProgress": false
       },
       "rate_limit_retries": 0,
-      "timestamp": "2025-12-06T00:14:30.495431"
+      "timestamp": "2025-12-06T20:25:15.050958"
     },
     {
       "page": "טיקרים",
       "url": "/tickers.html",
       "category": "main",
       "priority": "high",
-      "success": true,
-      "load_time": 0.59600830078125,
-      "console_errors": [],
+      "success": false,
+      "load_time": 0.4707458019256592,
+      "console_errors": [
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/button-system-init.js?v=1.0.0 348:19 Uncaught TypeError: this.waitForBootstrap is not a function",
+          "timestamp": 1765045519835
+        },
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/modules/core-systems.js?v=1.0.0 5982:0 Uncaught SyntaxError: Unexpected end of input",
+          "timestamp": 1765045520001
+        },
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/button-system-init.js?v=1.0.0 348:19 Uncaught TypeError: this.waitForBootstrap is not a function",
+          "timestamp": 1765045522022
+        }
+      ],
       "console_warnings": [
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1286:14 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
-          "timestamp": 1764972878468
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[8:25:19 PM] WARN: [ConditionsModalController] Modal element not found and could not be created\" Object",
+          "timestamp": 1765045519955
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:14:38 AM] WARN: [ConditionsModalController] Modal element not found\" Object",
-          "timestamp": 1764972878565
+          "message": "http://localhost:8080/api/tickers/my?_ts=1765045520007 - Failed to load resource: the server responded with a status of 401 (UNAUTHORIZED)",
+          "timestamp": 1765045522021
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/api/tickers/my?_ts=1764972878625 - Failed to load resource: the server responded with a status of 401 (UNAUTHORIZED)",
-          "timestamp": 1764972880632
+          "message": "http://localhost:8080/api/tickers/my?_ts=1765045520008 - Failed to load resource: the server responded with a status of 401 (UNAUTHORIZED)",
+          "timestamp": 1765045522021
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/api/tickers/my?_ts=1764972878626 - Failed to load resource: the server responded with a status of 401 (UNAUTHORIZED)",
-          "timestamp": 1764972880633
+          "message": "http://localhost:8080/api/external-data/quotes/1618 - Failed to load resource: the server responded with a status of 404 (NOT FOUND)",
+          "timestamp": 1765045522022
+        },
+        {
+          "level": "WARNING",
+          "message": "http://localhost:8080/api/external-data/quotes/1618 - Failed to load resource: the server responded with a status of 404 (NOT FOUND)",
+          "timestamp": 1765045522022
         }
       ],
       "page_errors": [],
@@ -259,7 +308,7 @@
         "showNotificationInProgress": false
       },
       "rate_limit_retries": 0,
-      "timestamp": "2025-12-06T00:14:38.031433"
+      "timestamp": "2025-12-06T20:25:19.537305"
     },
     {
       "page": "דשבורד טיקר",
@@ -267,29 +316,44 @@
       "category": "main",
       "priority": "medium",
       "success": false,
-      "load_time": 1.1895790100097656,
+      "load_time": 0.5825281143188477,
       "console_errors": [
         {
           "level": "SEVERE",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 906:24 \"[12:14:46 AM] ERROR: ❌ No ticker ID found in URL\" Object",
-          "timestamp": 1764972886883
+          "message": "http://localhost:8080/scripts/modules/core-systems.js?v=1.0.0 5982:0 Uncaught SyntaxError: Unexpected end of input",
+          "timestamp": 1765045524615
         },
         {
           "level": "SEVERE",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 906:24 \"[12:14:46 AM] ERROR: ❌ Error initializing ticker dashboard\" Object",
-          "timestamp": 1764972886883
+          "message": "http://localhost:8080/scripts/button-system-init.js?v=1.0.0 348:19 Uncaught TypeError: this.waitForBootstrap is not a function",
+          "timestamp": 1765045526635
+        },
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 906:24 \"[8:25:25 PM] ERROR: ❌ No ticker ID found in URL\" Object",
+          "timestamp": 1765045526637
+        },
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 906:24 \"[8:25:25 PM] ERROR: ❌ Error initializing ticker dashboard\" Object",
+          "timestamp": 1765045526637
+        },
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/button-system-init.js?v=1.0.0 348:19 Uncaught TypeError: this.waitForBootstrap is not a function",
+          "timestamp": 1765045526637
         }
       ],
       "console_warnings": [
         {
           "level": "WARNING",
           "message": "http://localhost:8080/scripts/charts/tradingview-adapter.js?v=1.0.0 36:24 \"⚠️ TradingView Lightweight Charts not loaded yet\"",
-          "timestamp": 1764972886330
+          "timestamp": 1765045524580
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:14:46 AM] WARN: ⚠️ No ticker ID or symbol found in URL\" Object",
-          "timestamp": 1764972886883
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[8:25:25 PM] WARN: ⚠️ No ticker ID or symbol found in URL\" Object",
+          "timestamp": 1765045526637
         }
       ],
       "page_errors": [],
@@ -301,31 +365,37 @@
         "showNotificationInProgress": false
       },
       "rate_limit_retries": 0,
-      "timestamp": "2025-12-06T00:14:45.644876"
+      "timestamp": "2025-12-06T20:25:24.037035"
     },
     {
       "page": "חשבונות מסחר",
       "url": "/trading_accounts.html",
       "category": "main",
       "priority": "high",
-      "success": true,
-      "load_time": 0.5334169864654541,
-      "console_errors": [],
+      "success": false,
+      "load_time": 0.4336891174316406,
+      "console_errors": [
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/button-system-init.js?v=1.0.0 348:19 Uncaught TypeError: this.waitForBootstrap is not a function",
+          "timestamp": 1765045528928
+        },
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/modules/core-systems.js?v=1.0.0 5982:0 Uncaught SyntaxError: Unexpected end of input",
+          "timestamp": 1765045529089
+        },
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/button-system-init.js?v=1.0.0 348:19 Uncaught TypeError: this.waitForBootstrap is not a function",
+          "timestamp": 1765045531103
+        }
+      ],
       "console_warnings": [
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1286:14 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
-          "timestamp": 1764972894277
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:14:54 AM] WARN: [ConditionsModalController] Modal element not found\" Object",
-          "timestamp": 1764972894383
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/scripts/page-initialization-configs.js?v=1.0.0 1167:20 \"⚠️ No suitable function found for loading trading accounts data\"",
-          "timestamp": 1764972896438
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[8:25:29 PM] WARN: [ConditionsModalController] Modal element not found and could not be created\" Object",
+          "timestamp": 1765045529048
         }
       ],
       "page_errors": [],
@@ -337,36 +407,42 @@
         "showNotificationInProgress": false
       },
       "rate_limit_retries": 0,
-      "timestamp": "2025-12-06T00:14:53.897997"
+      "timestamp": "2025-12-06T20:25:28.656967"
     },
     {
       "page": "ביצועים",
       "url": "/executions.html",
       "category": "main",
       "priority": "high",
-      "success": true,
-      "load_time": 0.58302903175354,
-      "console_errors": [],
+      "success": false,
+      "load_time": 0.4844200611114502,
+      "console_errors": [
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/button-system-init.js?v=1.0.0 348:19 Uncaught TypeError: this.waitForBootstrap is not a function",
+          "timestamp": 1765045533386
+        },
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/modules/core-systems.js?v=1.0.0 5982:0 Uncaught SyntaxError: Unexpected end of input",
+          "timestamp": 1765045533589
+        },
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/button-system-init.js?v=1.0.0 348:19 Uncaught TypeError: this.waitForBootstrap is not a function",
+          "timestamp": 1765045535606
+        },
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/button-system-init.js?v=1.0.0 348:19 Uncaught TypeError: this.waitForBootstrap is not a function",
+          "timestamp": 1765045535607
+        }
+      ],
       "console_warnings": [
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1286:14 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
-          "timestamp": 1764972901881
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:15:01 AM] WARN: [ConditionsModalController] Modal element not found\" Object",
-          "timestamp": 1764972901979
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/scripts/pagination-system.js?v=1.0.0 85:28 \"⚠️ [PaginationSystem.create] Skipping pagination creation for table executionsTable - table is inside a modal\"",
-          "timestamp": 1764972904036
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/scripts/pagination-system.js?v=1.0.0 85:28 \"⚠️ [PaginationSystem.create] Skipping pagination creation for table executionsTable - table is inside a modal\"",
-          "timestamp": 1764972904095
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[8:25:33 PM] WARN: [ConditionsModalController] Modal element not found and could not be created\" Object",
+          "timestamp": 1765045533546
         }
       ],
       "page_errors": [],
@@ -378,26 +454,42 @@
         "showNotificationInProgress": false
       },
       "rate_limit_retries": 0,
-      "timestamp": "2025-12-06T00:15:01.447768"
+      "timestamp": "2025-12-06T20:25:33.112825"
     },
     {
       "page": "ייבוא נתונים",
       "url": "/data_import.html",
       "category": "main",
       "priority": "medium",
-      "success": true,
-      "load_time": 0.5177609920501709,
-      "console_errors": [],
+      "success": false,
+      "load_time": 0.48734593391418457,
+      "console_errors": [
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/button-system-init.js?v=1.0.0 348:19 Uncaught TypeError: this.waitForBootstrap is not a function",
+          "timestamp": 1765045537899
+        },
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/modules/core-systems.js?v=1.0.0 5982:0 Uncaught SyntaxError: Unexpected end of input",
+          "timestamp": 1765045538101
+        },
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/button-system-init.js?v=1.0.0 348:19 Uncaught TypeError: this.waitForBootstrap is not a function",
+          "timestamp": 1765045540117
+        },
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/button-system-init.js?v=1.0.0 348:19 Uncaught TypeError: this.waitForBootstrap is not a function",
+          "timestamp": 1765045540117
+        }
+      ],
       "console_warnings": [
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1286:14 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
-          "timestamp": 1764972910089
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:15:10 AM] WARN: [ConditionsModalController] Modal element not found\" Object",
-          "timestamp": 1764972910183
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[8:25:38 PM] WARN: [ConditionsModalController] Modal element not found and could not be created\" Object",
+          "timestamp": 1765045538062
         }
       ],
       "page_errors": [],
@@ -409,26 +501,37 @@
         "showNotificationInProgress": false
       },
       "rate_limit_retries": 0,
-      "timestamp": "2025-12-06T00:15:09.719989"
+      "timestamp": "2025-12-06T20:25:37.618217"
     },
     {
       "page": "תזרימי מזומן",
       "url": "/cash_flows.html",
       "category": "main",
       "priority": "high",
-      "success": true,
-      "load_time": 0.5551037788391113,
-      "console_errors": [],
+      "success": false,
+      "load_time": 0.4389970302581787,
+      "console_errors": [
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/button-system-init.js?v=1.0.0 348:19 Uncaught TypeError: this.waitForBootstrap is not a function",
+          "timestamp": 1765045542455
+        },
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/modules/core-systems.js?v=1.0.0 5982:0 Uncaught SyntaxError: Unexpected end of input",
+          "timestamp": 1765045542617
+        },
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/button-system-init.js?v=1.0.0 348:19 Uncaught TypeError: this.waitForBootstrap is not a function",
+          "timestamp": 1765045544626
+        }
+      ],
       "console_warnings": [
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1286:14 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
-          "timestamp": 1764972917607
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:15:17 AM] WARN: [ConditionsModalController] Modal element not found\" Object",
-          "timestamp": 1764972917727
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[8:25:42 PM] WARN: [ConditionsModalController] Modal element not found and could not be created\" Object",
+          "timestamp": 1765045542573
         }
       ],
       "page_errors": [],
@@ -440,7 +543,7 @@
         "showNotificationInProgress": false
       },
       "rate_limit_retries": 0,
-      "timestamp": "2025-12-06T00:15:17.253933"
+      "timestamp": "2025-12-06T20:25:42.182519"
     },
     {
       "page": "הערות",
@@ -448,26 +551,25 @@
       "category": "main",
       "priority": "high",
       "success": false,
-      "load_time": 0.48651695251464844,
+      "load_time": 0.427426815032959,
       "console_errors": [
         {
           "level": "SEVERE",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 906:24 \"[12:15:25 AM] ERROR: ❌ [page-initialization-configs] loadNotesData function not available\" Object",
-          "timestamp": 1764972927316
-        }
-      ],
-      "console_warnings": [
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1286:14 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
-          "timestamp": 1764972925181
+          "message": "http://localhost:8080/scripts/button-system-init.js?v=1.0.0 348:19 Uncaught TypeError: this.waitForBootstrap is not a function",
+          "timestamp": 1765045546923
         },
         {
-          "level": "WARNING",
-          "message": "http://localhost:8080/notes.html - [DOM] Found 2 elements with non-unique id #tradeOpenConditionsButton: (More info: https://goo.gl/9p2vKq) %o %o",
-          "timestamp": 1764972927315
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/modules/core-systems.js?v=1.0.0 5982:0 Uncaught SyntaxError: Unexpected end of input",
+          "timestamp": 1765045547062
+        },
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/button-system-init.js?v=1.0.0 348:19 Uncaught TypeError: this.waitForBootstrap is not a function",
+          "timestamp": 1765045549070
         }
       ],
+      "console_warnings": [],
       "page_errors": [],
       "has_header": true,
       "has_core_systems": true,
@@ -477,31 +579,37 @@
         "showNotificationInProgress": false
       },
       "rate_limit_retries": 0,
-      "timestamp": "2025-12-06T00:15:24.823843"
+      "timestamp": "2025-12-06T20:25:46.636989"
     },
     {
       "page": "מחקר",
       "url": "/research.html",
       "category": "main",
       "priority": "medium",
-      "success": true,
-      "load_time": 0.38199400901794434,
-      "console_errors": [],
+      "success": false,
+      "load_time": 0.3585038185119629,
+      "console_errors": [
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/button-system-init.js?v=1.0.0 348:19 Uncaught TypeError: this.waitForBootstrap is not a function",
+          "timestamp": 1765045551346
+        },
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/modules/core-systems.js?v=1.0.0 5982:0 Uncaught SyntaxError: Unexpected end of input",
+          "timestamp": 1765045551440
+        }
+      ],
       "console_warnings": [
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:15:32 AM] WARN: [ConditionsModalController] Modal element not found\" Object",
-          "timestamp": 1764972932695
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[8:25:51 PM] WARN: [ConditionsModalController] Modal element not found and could not be created\" Object",
+          "timestamp": 1765045551432
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:15:32 AM] WARN: ⚠️ Research initializer not available\" Object",
-          "timestamp": 1764972934714
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:15:33 AM] WARN: ⚠️ accountFilterMenu not found\" Object",
-          "timestamp": 1764972934714
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[8:25:53 PM] WARN: ⚠️ accountFilterMenu not found\" Object",
+          "timestamp": 1765045553457
         }
       ],
       "page_errors": [],
@@ -513,7 +621,7 @@
         "showNotificationInProgress": false
       },
       "rate_limit_retries": 0,
-      "timestamp": "2025-12-06T00:15:32.324969"
+      "timestamp": "2025-12-06T20:25:51.084683"
     },
     {
       "page": "ניתוח AI",
@@ -521,83 +629,27 @@
       "category": "main",
       "priority": "medium",
       "success": false,
-      "load_time": 0.5275769233703613,
+      "load_time": 0.44101810455322266,
       "console_errors": [
         {
           "level": "SEVERE",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 906:24 \"[12:15:40 AM] ERROR: ❌ Failed to get u1:ai-analysis-providers:\" Error: Authentication required\n    at http://localhost:8080/scripts/services/ai-analysis-data.js?v=1.0.0:684:21\n    at async Object.fallback (http://localhost:8080/scripts/cache-ttl-guard.js?v=1.0.0:72:24)\n    at async UnifiedCacheManager.get (http://localhost:8080/scripts/unified-cache-manager.js?v=1.0.0:508:38)\n    at async Object.ensure (http://localhost:8080/scripts/cache-ttl-guard.js?v=1.0.0:84:20)\n    at async Object.getLLMProviderSettings (http://localhost:8080/scripts/services/ai-analysis-data.js?v=1.0.0:669:16)\n    at async Object.init (http://localhost:8080/scripts/ai-analysis-manager.js?v=1.0.0:109:38)\n    at async ADDITIONAL_PAGE_CONFIGS.ai-analysis.customInitializers (http://localhost:8080/scripts/page-initialization-configs.js?v=1.0.0:3482:15)\n    at async UnifiedAppInitializer.finalizeInitialization (http://localhost:8080/scripts/modules/core-systems.js?v=1.0.0:1437:13)\n    at async UnifiedAppInitializer.initialize (http://localhost:8080/scripts/modules/core-systems.js?v=1.0.0:695:9)\n    at async window.initializeUnifiedApp (http://localhost:8080/scripts/modules/core-systems.js?v=1.0.0:2196:10)",
-          "timestamp": 1764972942263
+          "message": "http://localhost:8080/scripts/button-system-init.js?v=1.0.0 348:19 Uncaught TypeError: this.waitForBootstrap is not a function",
+          "timestamp": 1765045555765
         },
         {
           "level": "SEVERE",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 906:24 \"[12:15:40 AM] ERROR: ❌ Error loading LLM provider settings\" Object",
-          "timestamp": 1764972942263
+          "message": "http://localhost:8080/scripts/modules/core-systems.js?v=1.0.0 5982:0 Uncaught SyntaxError: Unexpected end of input",
+          "timestamp": 1765045555915
         },
         {
           "level": "SEVERE",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 906:24 \"[12:15:40 AM] ERROR: ❌ Failed to get u1:ai-analysis-history:\" Error: Authentication required\n    at http://localhost:8080/scripts/services/ai-analysis-data.js?v=1.0.0:604:21\n    at async Object.fallback (http://localhost:8080/scripts/cache-ttl-guard.js?v=1.0.0:72:24)\n    at async UnifiedCacheManager.get (http://localhost:8080/scripts/unified-cache-manager.js?v=1.0.0:508:38)\n    at async Object.ensure (http://localhost:8080/scripts/cache-ttl-guard.js?v=1.0.0:84:20)\n    at async Object.loadHistory (http://localhost:8080/scripts/services/ai-analysis-data.js?v=1.0.0:584:16)\n    at async Object.init (http://localhost:8080/scripts/ai-analysis-manager.js?v=1.0.0:120:26)\n    at async ADDITIONAL_PAGE_CONFIGS.ai-analysis.customInitializers (http://localhost:8080/scripts/page-initialization-configs.js?v=1.0.0:3482:15)\n    at async UnifiedAppInitializer.finalizeInitialization (http://localhost:8080/scripts/modules/core-systems.js?v=1.0.0:1437:13)\n    at async UnifiedAppInitializer.initialize (http://localhost:8080/scripts/modules/core-systems.js?v=1.0.0:695:9)\n    at async window.initializeUnifiedApp (http://localhost:8080/scripts/modules/core-systems.js?v=1.0.0:2196:10)",
-          "timestamp": 1764972942263
-        },
-        {
-          "level": "SEVERE",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 906:24 \"[12:15:40 AM] ERROR: ❌ Error loading history\" Object",
-          "timestamp": 1764972942264
+          "message": "http://localhost:8080/scripts/button-system-init.js?v=1.0.0 348:19 Uncaught TypeError: this.waitForBootstrap is not a function",
+          "timestamp": 1765045557929
         }
       ],
-      "console_warnings": [
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/api/ai-analysis/llm-provider - Failed to load resource: the server responded with a status of 401 (UNAUTHORIZED)",
-          "timestamp": 1764972942263
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:15:40 AM] WARN: ⚠️ Authentication required - redirecting to login\" Object",
-          "timestamp": 1764972942263
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/api/ai-analysis/llm-provider - Failed to load resource: the server responded with a status of 401 (UNAUTHORIZED)",
-          "timestamp": 1764972942263
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:15:40 AM] WARN: ⚠️ Authentication required - redirecting to login\" Object",
-          "timestamp": 1764972942263
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:15:40 AM] WARN: Could not load LLM provider settings\" Object",
-          "timestamp": 1764972942263
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/api/ai-analysis/history?limit=50&offset=0 - Failed to load resource: the server responded with a status of 401 (UNAUTHORIZED)",
-          "timestamp": 1764972942263
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:15:40 AM] WARN: ⚠️ Authentication required - redirecting to login\" Object",
-          "timestamp": 1764972942263
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/api/ai-analysis/history?limit=50&offset=0 - Failed to load resource: the server responded with a status of 401 (UNAUTHORIZED)",
-          "timestamp": 1764972942264
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:15:40 AM] WARN: ⚠️ Authentication required - redirecting to login\" Object",
-          "timestamp": 1764972942264
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:15:40 AM] WARN: Could not load history\" Object",
-          "timestamp": 1764972942264
-        }
-      ],
+      "console_warnings": [],
       "page_errors": [],
-      "has_header": false,
+      "has_header": true,
       "has_core_systems": true,
       "initialization_status": {
         "getPreferenceInProgress": false,
@@ -605,66 +657,67 @@
         "showNotificationInProgress": false
       },
       "rate_limit_retries": 0,
-      "timestamp": "2025-12-06T00:15:39.727537"
+      "timestamp": "2025-12-06T20:25:55.474165"
     },
     {
       "page": "העדפות",
       "url": "/preferences.html",
       "category": "main",
       "priority": "high",
-      "success": true,
-      "load_time": 0.4420490264892578,
-      "console_errors": [],
+      "success": false,
+      "load_time": 0.45595383644104004,
+      "console_errors": [
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/button-system-init.js?v=1.0.0 348:19 Uncaught TypeError: this.waitForBootstrap is not a function",
+          "timestamp": 1765045560222
+        },
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/modules/core-systems.js?v=1.0.0 5982:0 Uncaught SyntaxError: Unexpected end of input",
+          "timestamp": 1765045560393
+        },
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/button-system-init.js?v=1.0.0 348:19 Uncaught TypeError: this.waitForBootstrap is not a function",
+          "timestamp": 1765045562411
+        },
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/button-system-init.js?v=1.0.0 348:19 Uncaught TypeError: this.waitForBootstrap is not a function",
+          "timestamp": 1765045562411
+        }
+      ],
       "console_warnings": [
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1286:14 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
-          "timestamp": 1764972947605
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:15:47 AM] WARN: [ConditionsModalController] Modal element not found\" Object",
-          "timestamp": 1764972947687
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[8:26:00 PM] WARN: [ConditionsModalController] Modal element not found and could not be created\" Object",
+          "timestamp": 1765045560348
         },
         {
           "level": "WARNING",
           "message": "http://localhost:8080/preferences.html - [DOM] Found 2 elements with non-unique id #console_logs_cache_enabled: (More info: https://goo.gl/9p2vKq) %o %o",
-          "timestamp": 1764972947729
+          "timestamp": 1765045560395
         },
         {
           "level": "WARNING",
           "message": "http://localhost:8080/preferences.html - [DOM] Found 2 elements with non-unique id #console_logs_initialization_enabled: (More info: https://goo.gl/9p2vKq) %o %o",
-          "timestamp": 1764972947729
+          "timestamp": 1765045560395
         },
         {
           "level": "WARNING",
           "message": "http://localhost:8080/preferences.html - [DOM] Found 2 elements with non-unique id #console_logs_notifications_enabled: (More info: https://goo.gl/9p2vKq) %o %o",
-          "timestamp": 1764972947729
+          "timestamp": 1765045560395
         },
         {
           "level": "WARNING",
           "message": "http://localhost:8080/preferences.html - [DOM] Found 2 elements with non-unique id #console_logs_ui_components_enabled: (More info: https://goo.gl/9p2vKq) %o %o",
-          "timestamp": 1764972947729
+          "timestamp": 1765045560395
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/preferences.html - [DOM] Found 2 elements with non-unique id #tradeOpenConditionsButton: (More info: https://goo.gl/9p2vKq) %o %o",
-          "timestamp": 1764972949742
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:15:47 AM] WARN: ⚠️ PreferencesDebugMonitor not available\" Object",
-          "timestamp": 1764972949745
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:15:47 AM] WARN: ⚠️ updatePreferencesSummary function not available\" Object",
-          "timestamp": 1764972949745
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:15:48 AM] WARN: ⚠️ Dashboard section not found\" Object",
-          "timestamp": 1764972949746
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[8:26:01 PM] WARN: ⚠️ Dashboard section not found\" Object",
+          "timestamp": 1765045562411
         }
       ],
       "page_errors": [],
@@ -676,46 +729,47 @@
         "showNotificationInProgress": false
       },
       "rate_limit_retries": 0,
-      "timestamp": "2025-12-06T00:15:47.287977"
+      "timestamp": "2025-12-06T20:25:59.942306"
     },
     {
       "page": "פרופיל משתמש",
       "url": "/user-profile.html",
       "category": "main",
       "priority": "medium",
-      "success": true,
-      "load_time": 0.6400279998779297,
-      "console_errors": [],
+      "success": false,
+      "load_time": 0.3389110565185547,
+      "console_errors": [
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/button-system-init.js?v=1.0.0 348:19 Uncaught TypeError: this.waitForBootstrap is not a function",
+          "timestamp": 1765045564617
+        },
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/modules/core-systems.js?v=1.0.0 5982:0 Uncaught SyntaxError: Unexpected end of input",
+          "timestamp": 1765045564775
+        },
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/button-system-init.js?v=1.0.0 348:19 Uncaught TypeError: this.waitForBootstrap is not a function",
+          "timestamp": 1765045566792
+        }
+      ],
       "console_warnings": [
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/button-system-init.js?v=1.0.0 65:26 \"⚠️🔘 Button System: ID conflict detected, using unique ID\" Object",
-          "timestamp": 1764972954973
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[8:26:04 PM] WARN: ⚠️ No mapping found for page class: user-profile-page\" Object",
+          "timestamp": 1765045564620
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/button-system-init.js?v=1.0.0 65:26 \"⚠️🔘 Button System: ID conflict detected, using unique ID\" Object",
-          "timestamp": 1764972954973
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[8:26:04 PM] WARN: [ConditionsModalController] Modal element not found and could not be created\" Object",
+          "timestamp": 1765045564734
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/button-system-init.js?v=1.0.0 65:26 \"⚠️🔘 Button System: ID conflict detected, using unique ID\" Object",
-          "timestamp": 1764972954973
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:15:54 AM] WARN: ⚠️ No mapping found for page class: user-profile-page\" Object",
-          "timestamp": 1764972954975
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:15:55 AM] WARN: [ConditionsModalController] Modal element not found\" Object",
-          "timestamp": 1764972955317
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:15:56 AM] WARN: ⚠️ Dashboard section not found\" Object",
-          "timestamp": 1764972957406
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[8:26:05 PM] WARN: ⚠️ Dashboard section not found\" Object",
+          "timestamp": 1765045566792
         }
       ],
       "page_errors": [],
@@ -727,26 +781,37 @@
         "showNotificationInProgress": false
       },
       "rate_limit_retries": 0,
-      "timestamp": "2025-12-06T00:15:54.758102"
+      "timestamp": "2025-12-06T20:26:04.436944"
     },
     {
       "page": "תצוגת בסיס נתונים",
       "url": "/db_display.html",
       "category": "technical",
       "priority": "low",
-      "success": true,
-      "load_time": 0.39533305168151855,
-      "console_errors": [],
+      "success": false,
+      "load_time": 0.38210511207580566,
+      "console_errors": [
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/button-system-init.js?v=1.0.0 348:19 Uncaught TypeError: this.waitForBootstrap is not a function",
+          "timestamp": 1765045569116
+        },
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/modules/core-systems.js?v=1.0.0 5982:0 Uncaught SyntaxError: Unexpected end of input",
+          "timestamp": 1765045569191
+        }
+      ],
       "console_warnings": [
         {
           "level": "WARNING",
           "message": "http://localhost:8080/trading-ui/images/icons/entities/db_display.svg - Failed to load resource: the server responded with a status of 404 (NOT FOUND)",
-          "timestamp": 1764972962440
+          "timestamp": 1765045568872
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:16:02 AM] WARN: ⚠️ No mapping found for page class: db-display-page\" Object",
-          "timestamp": 1764972962718
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[8:26:09 PM] WARN: ⚠️ No mapping found for page class: db-display-page\" Object",
+          "timestamp": 1765045569116
         }
       ],
       "page_errors": [],
@@ -758,26 +823,42 @@
         "showNotificationInProgress": false
       },
       "rate_limit_retries": 0,
-      "timestamp": "2025-12-06T00:16:02.413072"
+      "timestamp": "2025-12-06T20:26:08.808760"
     },
     {
       "page": "נתונים נוספים",
       "url": "/db_extradata.html",
       "category": "technical",
       "priority": "low",
-      "success": true,
-      "load_time": 0.3777289390563965,
-      "console_errors": [],
+      "success": false,
+      "load_time": 0.363861083984375,
+      "console_errors": [
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/button-system-init.js?v=1.0.0 348:19 Uncaught TypeError: this.waitForBootstrap is not a function",
+          "timestamp": 1765045573490
+        },
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/modules/core-systems.js?v=1.0.0 5982:0 Uncaught SyntaxError: Unexpected end of input",
+          "timestamp": 1765045573580
+        },
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/button-system-init.js?v=1.0.0 348:19 Uncaught TypeError: this.waitForBootstrap is not a function",
+          "timestamp": 1765045575600
+        }
+      ],
       "console_warnings": [
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:16:10 AM] WARN: ⚠️ No mapping found for page class: db-extradata-page\" Object",
-          "timestamp": 1764972970114
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[8:26:13 PM] WARN: ⚠️ No mapping found for page class: db-extradata-page\" Object",
+          "timestamp": 1765045573493
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:16:11 AM] WARN: ⚠️ Dashboard section not found\" Object",
-          "timestamp": 1764972972223
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[8:26:14 PM] WARN: ⚠️ Dashboard section not found\" Object",
+          "timestamp": 1765045575605
         }
       ],
       "page_errors": [],
@@ -789,36 +870,42 @@
         "showNotificationInProgress": false
       },
       "rate_limit_retries": 0,
-      "timestamp": "2025-12-06T00:16:09.831975"
+      "timestamp": "2025-12-06T20:26:13.219412"
     },
     {
       "page": "אילוצי מערכת",
       "url": "/constraints.html",
       "category": "technical",
       "priority": "low",
-      "success": true,
-      "load_time": 0.3101949691772461,
-      "console_errors": [],
+      "success": false,
+      "load_time": 0.31295084953308105,
+      "console_errors": [
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/button-system-init.js?v=1.0.0 348:19 Uncaught TypeError: this.waitForBootstrap is not a function",
+          "timestamp": 1765045577787
+        },
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/modules/core-systems.js?v=1.0.0 5982:0 Uncaught SyntaxError: Unexpected end of input",
+          "timestamp": 1765045577935
+        },
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/button-system-init.js?v=1.0.0 348:19 Uncaught TypeError: this.waitForBootstrap is not a function",
+          "timestamp": 1765045579950
+        }
+      ],
       "console_warnings": [
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1286:14 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
-          "timestamp": 1764972977449
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[8:26:17 PM] WARN: [ConditionsModalController] Modal element not found and could not be created\" Object",
+          "timestamp": 1765045577907
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:16:17 AM] WARN: [ConditionsModalController] Modal element not found\" Object",
-          "timestamp": 1764972977519
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/constraints.html - [DOM] Found 2 elements with non-unique id #tradeOpenConditionsButton: (More info: https://goo.gl/9p2vKq) %o %o",
-          "timestamp": 1764972979557
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:16:18 AM] WARN: ⚠️ Dashboard section not found\" Object",
-          "timestamp": 1764972979558
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[8:26:19 PM] WARN: ⚠️ Dashboard section not found\" Object",
+          "timestamp": 1765045579950
         }
       ],
       "page_errors": [],
@@ -830,36 +917,42 @@
         "showNotificationInProgress": false
       },
       "rate_limit_retries": 0,
-      "timestamp": "2025-12-06T00:16:17.237195"
+      "timestamp": "2025-12-06T20:26:17.623326"
     },
     {
       "page": "משימות רקע",
       "url": "/background-tasks.html",
       "category": "technical",
       "priority": "low",
-      "success": true,
-      "load_time": 0.4095730781555176,
-      "console_errors": [],
+      "success": false,
+      "load_time": 0.4271848201751709,
+      "console_errors": [
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/button-system-init.js?v=1.0.0 348:19 Uncaught TypeError: this.waitForBootstrap is not a function",
+          "timestamp": 1765045582273
+        },
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/modules/core-systems.js?v=1.0.0 5982:0 Uncaught SyntaxError: Unexpected end of input",
+          "timestamp": 1765045582388
+        },
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/button-system-init.js?v=1.0.0 348:19 Uncaught TypeError: this.waitForBootstrap is not a function",
+          "timestamp": 1765045584405
+        }
+      ],
       "console_warnings": [
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1286:14 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
-          "timestamp": 1764972984892
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[8:26:22 PM] WARN: [ConditionsModalController] Modal element not found and could not be created\" Object",
+          "timestamp": 1765045582366
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:16:24 AM] WARN: [ConditionsModalController] Modal element not found\" Object",
-          "timestamp": 1764972984943
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/background-tasks.html - [DOM] Found 2 elements with non-unique id #tradeOpenConditionsButton: (More info: https://goo.gl/9p2vKq) %o %o",
-          "timestamp": 1764972986980
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:16:26 AM] WARN: ⚠️ Dashboard section not found\" Object",
-          "timestamp": 1764972986988
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[8:26:23 PM] WARN: ⚠️ Dashboard section not found\" Object",
+          "timestamp": 1765045584406
         }
       ],
       "page_errors": [],
@@ -871,31 +964,42 @@
         "showNotificationInProgress": false
       },
       "rate_limit_retries": 0,
-      "timestamp": "2025-12-06T00:16:24.562881"
+      "timestamp": "2025-12-06T20:26:21.963904"
     },
     {
       "page": "ניטור שרת",
       "url": "/server-monitor.html",
       "category": "technical",
       "priority": "low",
-      "success": true,
-      "load_time": 0.40615200996398926,
-      "console_errors": [],
+      "success": false,
+      "load_time": 0.42948389053344727,
+      "console_errors": [
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/button-system-init.js?v=1.0.0 348:19 Uncaught TypeError: this.waitForBootstrap is not a function",
+          "timestamp": 1765045586729
+        },
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/modules/core-systems.js?v=1.0.0 5982:0 Uncaught SyntaxError: Unexpected end of input",
+          "timestamp": 1765045586852
+        },
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/button-system-init.js?v=1.0.0 348:19 Uncaught TypeError: this.waitForBootstrap is not a function",
+          "timestamp": 1765045588870
+        }
+      ],
       "console_warnings": [
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:16:32 AM] WARN: [ConditionsModalController] Modal element not found\" Object",
-          "timestamp": 1764972992384
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[8:26:26 PM] WARN: [ConditionsModalController] Modal element not found and could not be created\" Object",
+          "timestamp": 1765045586820
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/server-monitor.html - [DOM] Found 2 elements with non-unique id #tradeOpenConditionsButton: (More info: https://goo.gl/9p2vKq) %o %o",
-          "timestamp": 1764972994418
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:16:33 AM] WARN: ⚠️ Dashboard section not found\" Object",
-          "timestamp": 1764972994426
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[8:26:28 PM] WARN: ⚠️ Dashboard section not found\" Object",
+          "timestamp": 1765045588873
         }
       ],
       "page_errors": [],
@@ -907,31 +1011,47 @@
         "showNotificationInProgress": false
       },
       "rate_limit_retries": 0,
-      "timestamp": "2025-12-06T00:16:32.003782"
+      "timestamp": "2025-12-06T20:26:26.424969"
     },
     {
       "page": "ניהול מערכת",
       "url": "/system-management.html",
       "category": "technical",
       "priority": "low",
-      "success": true,
-      "load_time": 0.4647538661956787,
-      "console_errors": [],
+      "success": false,
+      "load_time": 0.5064818859100342,
+      "console_errors": [
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/button-system-init.js?v=1.0.0 348:19 Uncaught TypeError: this.waitForBootstrap is not a function",
+          "timestamp": 1765045591216
+        },
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/modules/core-systems.js?v=1.0.0 5982:0 Uncaught SyntaxError: Unexpected end of input",
+          "timestamp": 1765045591398
+        },
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/button-system-init.js?v=1.0.0 348:19 Uncaught TypeError: this.waitForBootstrap is not a function",
+          "timestamp": 1765045593404
+        },
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/button-system-init.js?v=1.0.0 348:19 Uncaught TypeError: this.waitForBootstrap is not a function",
+          "timestamp": 1765045593404
+        }
+      ],
       "console_warnings": [
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:16:39 AM] WARN: [ConditionsModalController] Modal element not found\" Object",
-          "timestamp": 1764972999835
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[8:26:31 PM] WARN: [ConditionsModalController] Modal element not found and could not be created\" Object",
+          "timestamp": 1765045591308
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/system-management.html - [DOM] Found 2 elements with non-unique id #tradeOpenConditionsButton: (More info: https://goo.gl/9p2vKq) %o %o",
-          "timestamp": 1764973001912
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:16:41 AM] WARN: ⚠️ Dashboard section not found\" Object",
-          "timestamp": 1764973001914
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[8:26:32 PM] WARN: ⚠️ Dashboard section not found\" Object",
+          "timestamp": 1765045593404
         }
       ],
       "page_errors": [],
@@ -943,31 +1063,42 @@
         "showNotificationInProgress": false
       },
       "rate_limit_retries": 0,
-      "timestamp": "2025-12-06T00:16:39.439934"
+      "timestamp": "2025-12-06T20:26:30.891394"
     },
     {
       "page": "מרכז התראות",
       "url": "/notifications-center.html",
       "category": "technical",
       "priority": "low",
-      "success": true,
-      "load_time": 0.5544948577880859,
-      "console_errors": [],
+      "success": false,
+      "load_time": 0.3910059928894043,
+      "console_errors": [
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/button-system-init.js?v=1.0.0 348:19 Uncaught TypeError: this.waitForBootstrap is not a function",
+          "timestamp": 1765045595681
+        },
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/modules/core-systems.js?v=1.0.0 5982:0 Uncaught SyntaxError: Unexpected end of input",
+          "timestamp": 1765045595807
+        },
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/button-system-init.js?v=1.0.0 348:19 Uncaught TypeError: this.waitForBootstrap is not a function",
+          "timestamp": 1765045597823
+        }
+      ],
       "console_warnings": [
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:16:47 AM] WARN: [ConditionsModalController] Modal element not found\" Object",
-          "timestamp": 1764973007420
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[8:26:35 PM] WARN: [ConditionsModalController] Modal element not found and could not be created\" Object",
+          "timestamp": 1765045595771
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:16:47 AM] WARN: ⚠️ Notifications Center initializer not found\" Object",
-          "timestamp": 1764973009492
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:16:48 AM] WARN: ⚠️ Dashboard section not found\" Object",
-          "timestamp": 1764973009493
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[8:26:37 PM] WARN: ⚠️ Dashboard section not found\" Object",
+          "timestamp": 1765045597823
         }
       ],
       "page_errors": [],
@@ -979,36 +1110,42 @@
         "showNotificationInProgress": false
       },
       "rate_limit_retries": 0,
-      "timestamp": "2025-12-06T00:16:46.922465"
+      "timestamp": "2025-12-06T20:26:35.418193"
     },
     {
       "page": "ניהול CSS",
       "url": "/css-management.html",
       "category": "technical",
       "priority": "low",
-      "success": true,
-      "load_time": 0.3747248649597168,
-      "console_errors": [],
+      "success": false,
+      "load_time": 0.4077589511871338,
+      "console_errors": [
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/button-system-init.js?v=1.0.0 348:19 Uncaught TypeError: this.waitForBootstrap is not a function",
+          "timestamp": 1765045600131
+        },
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/modules/core-systems.js?v=1.0.0 5982:0 Uncaught SyntaxError: Unexpected end of input",
+          "timestamp": 1765045600247
+        },
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/button-system-init.js?v=1.0.0 348:19 Uncaught TypeError: this.waitForBootstrap is not a function",
+          "timestamp": 1765045602253
+        }
+      ],
       "console_warnings": [
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1286:14 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
-          "timestamp": 1764973014800
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[8:26:40 PM] WARN: [ConditionsModalController] Modal element not found and could not be created\" Object",
+          "timestamp": 1765045600223
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:16:54 AM] WARN: [ConditionsModalController] Modal element not found\" Object",
-          "timestamp": 1764973014849
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/css-management.html - [DOM] Found 2 elements with non-unique id #tradeOpenConditionsButton: (More info: https://goo.gl/9p2vKq) %o %o",
-          "timestamp": 1764973016886
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:16:56 AM] WARN: ⚠️ Dashboard section not found\" Object",
-          "timestamp": 1764973016894
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[8:26:41 PM] WARN: ⚠️ Dashboard section not found\" Object",
+          "timestamp": 1765045602255
         }
       ],
       "page_errors": [],
@@ -1020,31 +1157,42 @@
         "showNotificationInProgress": false
       },
       "rate_limit_retries": 0,
-      "timestamp": "2025-12-06T00:16:54.503370"
+      "timestamp": "2025-12-06T20:26:39.838078"
     },
     {
       "page": "תצוגת צבעים",
       "url": "/dynamic-colors-display.html",
       "category": "technical",
       "priority": "low",
-      "success": true,
-      "load_time": 0.3881869316101074,
-      "console_errors": [],
+      "success": false,
+      "load_time": 0.3998908996582031,
+      "console_errors": [
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/button-system-init.js?v=1.0.0 348:19 Uncaught TypeError: this.waitForBootstrap is not a function",
+          "timestamp": 1765045604563
+        },
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/modules/core-systems.js?v=1.0.0 5982:0 Uncaught SyntaxError: Unexpected end of input",
+          "timestamp": 1765045604676
+        },
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/button-system-init.js?v=1.0.0 348:19 Uncaught TypeError: this.waitForBootstrap is not a function",
+          "timestamp": 1765045606691
+        }
+      ],
       "console_warnings": [
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:17:02 AM] WARN: [ConditionsModalController] Modal element not found\" Object",
-          "timestamp": 1764973022276
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[8:26:44 PM] WARN: [ConditionsModalController] Modal element not found and could not be created\" Object",
+          "timestamp": 1765045604649
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/dynamic-colors-display.html - [DOM] Found 2 elements with non-unique id #tradeOpenConditionsButton: (More info: https://goo.gl/9p2vKq) %o %o",
-          "timestamp": 1764973024311
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:17:03 AM] WARN: ⚠️ Dashboard section not found\" Object",
-          "timestamp": 1764973024317
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[8:26:45 PM] WARN: ⚠️ Dashboard section not found\" Object",
+          "timestamp": 1765045606692
         }
       ],
       "page_errors": [],
@@ -1056,36 +1204,42 @@
         "showNotificationInProgress": false
       },
       "rate_limit_retries": 0,
-      "timestamp": "2025-12-06T00:17:01.910960"
+      "timestamp": "2025-12-06T20:26:44.275920"
     },
     {
       "page": "עיצובים",
       "url": "/designs.html",
       "category": "technical",
       "priority": "low",
-      "success": true,
-      "load_time": 0.3999490737915039,
-      "console_errors": [],
+      "success": false,
+      "load_time": 0.4078826904296875,
+      "console_errors": [
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/button-system-init.js?v=1.0.0 348:19 Uncaught TypeError: this.waitForBootstrap is not a function",
+          "timestamp": 1765045609003
+        },
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/modules/core-systems.js?v=1.0.0 5982:0 Uncaught SyntaxError: Unexpected end of input",
+          "timestamp": 1765045609119
+        },
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/button-system-init.js?v=1.0.0 348:19 Uncaught TypeError: this.waitForBootstrap is not a function",
+          "timestamp": 1765045611126
+        }
+      ],
       "console_warnings": [
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1286:14 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
-          "timestamp": 1764973029648
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[8:26:49 PM] WARN: [ConditionsModalController] Modal element not found and could not be created\" Object",
+          "timestamp": 1765045609089
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:17:09 AM] WARN: [ConditionsModalController] Modal element not found\" Object",
-          "timestamp": 1764973029700
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/designs.html - [DOM] Found 2 elements with non-unique id #tradeOpenConditionsButton: (More info: https://goo.gl/9p2vKq) %o %o",
-          "timestamp": 1764973031739
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:17:10 AM] WARN: ⚠️ Dashboard section not found\" Object",
-          "timestamp": 1764973031747
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[8:26:50 PM] WARN: ⚠️ Dashboard section not found\" Object",
+          "timestamp": 1765045611128
         }
       ],
       "page_errors": [],
@@ -1097,46 +1251,52 @@
         "showNotificationInProgress": false
       },
       "rate_limit_retries": 0,
-      "timestamp": "2025-12-06T00:17:09.328104"
+      "timestamp": "2025-12-06T20:26:48.711967"
     },
     {
       "page": "דשבורד נתונים חיצוניים",
       "url": "/external-data-dashboard.html",
       "category": "secondary",
       "priority": "low",
-      "success": true,
-      "load_time": 0.4279818534851074,
-      "console_errors": [],
+      "success": false,
+      "load_time": 0.4481170177459717,
+      "console_errors": [
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/button-system-init.js?v=1.0.0 348:19 Uncaught TypeError: this.waitForBootstrap is not a function",
+          "timestamp": 1765045613442
+        },
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/modules/core-systems.js?v=1.0.0 5982:0 Uncaught SyntaxError: Unexpected end of input",
+          "timestamp": 1765045613582
+        },
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 906:24 \"[8:26:53 PM] ERROR: external-data-dashboard:init: Cannot create property 'textContent' on string ''\" Object",
+          "timestamp": 1765045615611
+        },
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/button-system-init.js?v=1.0.0 348:19 Uncaught TypeError: this.waitForBootstrap is not a function",
+          "timestamp": 1765045615613
+        }
+      ],
       "console_warnings": [
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:17:17 AM] WARN: [ConditionsModalController] Modal element not found\" Object",
-          "timestamp": 1764973037131
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[8:26:53 PM] WARN: [ConditionsModalController] Modal element not found and could not be created\" Object",
+          "timestamp": 1765045613530
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/charts/chart-system.js?v=1.0.0 61:24 \"⚠️ ChartTheme not available\"",
-          "timestamp": 1764973037140
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[8:26:53 PM] WARN: external-data-dashboard:update-current-settings:no-providers\" Object",
+          "timestamp": 1765045615612
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/unified-log-manager.js?v=1.0.0 445:24 \"⚠️ Cache system not ready yet, using fallback\"",
-          "timestamp": 1764973037185
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/external-data-dashboard.html - [DOM] Found 2 elements with non-unique id #tradeOpenConditionsButton: (More info: https://goo.gl/9p2vKq) %o %o",
-          "timestamp": 1764973039202
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:17:17 AM] WARN: external-data-dashboard:update-current-settings:no-providers\" Object",
-          "timestamp": 1764973039202
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:17:18 AM] WARN: ⚠️ Dashboard section not found\" Object",
-          "timestamp": 1764973039209
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[8:26:54 PM] WARN: ⚠️ Dashboard section not found\" Object",
+          "timestamp": 1765045615616
         }
       ],
       "page_errors": [],
@@ -1148,31 +1308,42 @@
         "showNotificationInProgress": false
       },
       "rate_limit_retries": 0,
-      "timestamp": "2025-12-06T00:17:16.761686"
+      "timestamp": "2025-12-06T20:26:53.147091"
     },
     {
       "page": "ניהול גרפים",
       "url": "/chart-management.html",
       "category": "secondary",
       "priority": "low",
-      "success": true,
-      "load_time": 0.4025087356567383,
-      "console_errors": [],
+      "success": false,
+      "load_time": 0.42865490913391113,
+      "console_errors": [
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/button-system-init.js?v=1.0.0 348:19 Uncaught TypeError: this.waitForBootstrap is not a function",
+          "timestamp": 1765045617917
+        },
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/modules/core-systems.js?v=1.0.0 5982:0 Uncaught SyntaxError: Unexpected end of input",
+          "timestamp": 1765045618058
+        },
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/button-system-init.js?v=1.0.0 348:19 Uncaught TypeError: this.waitForBootstrap is not a function",
+          "timestamp": 1765045620074
+        }
+      ],
       "console_warnings": [
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:17:24 AM] WARN: [ConditionsModalController] Modal element not found\" Object",
-          "timestamp": 1764973044599
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[8:26:58 PM] WARN: [ConditionsModalController] Modal element not found and could not be created\" Object",
+          "timestamp": 1765045618007
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/chart-management.html - [DOM] Found 2 elements with non-unique id #tradeOpenConditionsButton: (More info: https://goo.gl/9p2vKq) %o %o",
-          "timestamp": 1764973046634
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:17:25 AM] WARN: ⚠️ Dashboard section not found\" Object",
-          "timestamp": 1764973046642
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[8:26:59 PM] WARN: ⚠️ Dashboard section not found\" Object",
+          "timestamp": 1765045620075
         }
       ],
       "page_errors": [],
@@ -1184,16 +1355,27 @@
         "showNotificationInProgress": false
       },
       "rate_limit_retries": 0,
-      "timestamp": "2025-12-06T00:17:24.220120"
+      "timestamp": "2025-12-06T20:26:57.629871"
     },
     {
       "page": "דשבורד בדיקות CRUD",
       "url": "/crud-testing-dashboard.html",
       "category": "secondary",
       "priority": "low",
-      "success": true,
-      "load_time": 0.33087801933288574,
-      "console_errors": [],
+      "success": false,
+      "load_time": 0.34380006790161133,
+      "console_errors": [
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/button-system-init.js?v=1.0.0 348:19 Uncaught TypeError: this.waitForBootstrap is not a function",
+          "timestamp": 1765045622394
+        },
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/modules/core-systems.js?v=1.0.0 5982:0 Uncaught SyntaxError: Unexpected end of input",
+          "timestamp": 1765045622442
+        }
+      ],
       "console_warnings": [],
       "page_errors": [],
       "has_header": true,
@@ -1204,16 +1386,27 @@
         "showNotificationInProgress": false
       },
       "rate_limit_retries": 0,
-      "timestamp": "2025-12-06T00:17:31.652568"
+      "timestamp": "2025-12-06T20:27:02.098904"
     },
     {
       "page": "כניסה למערכת",
       "url": "/login.html",
       "category": "auth",
       "priority": "high",
-      "success": true,
-      "load_time": 0.39738988876342773,
-      "console_errors": [],
+      "success": false,
+      "load_time": 0.4088420867919922,
+      "console_errors": [
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/modules/core-systems.js?v=1.0.0 5982:0 Uncaught SyntaxError: Unexpected end of input",
+          "timestamp": 1765045626884
+        },
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/button-system-init.js?v=1.0.0 348:19 Uncaught TypeError: this.waitForBootstrap is not a function",
+          "timestamp": 1765045628898
+        }
+      ],
       "console_warnings": [],
       "page_errors": [],
       "has_header": false,
@@ -1224,16 +1417,27 @@
         "showNotificationInProgress": false
       },
       "rate_limit_retries": 0,
-      "timestamp": "2025-12-06T00:17:39.004533"
+      "timestamp": "2025-12-06T20:27:06.473271"
     },
     {
       "page": "הרשמה למערכת",
       "url": "/register.html",
       "category": "auth",
       "priority": "medium",
-      "success": true,
-      "load_time": 0.3740842342376709,
-      "console_errors": [],
+      "success": false,
+      "load_time": 0.40223217010498047,
+      "console_errors": [
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/modules/core-systems.js?v=1.0.0 5982:0 Uncaught SyntaxError: Unexpected end of input",
+          "timestamp": 1765045631321
+        },
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/button-system-init.js?v=1.0.0 348:19 Uncaught TypeError: this.waitForBootstrap is not a function",
+          "timestamp": 1765045633336
+        }
+      ],
       "console_warnings": [],
       "page_errors": [],
       "has_header": false,
@@ -1244,16 +1448,22 @@
         "showNotificationInProgress": false
       },
       "rate_limit_retries": 0,
-      "timestamp": "2025-12-06T00:17:46.432179"
+      "timestamp": "2025-12-06T20:27:10.918034"
     },
     {
       "page": "שחזור סיסמה",
       "url": "/forgot-password.html",
       "category": "auth",
       "priority": "medium",
-      "success": true,
-      "load_time": 0.2910730838775635,
-      "console_errors": [],
+      "success": false,
+      "load_time": 0.3105299472808838,
+      "console_errors": [
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/modules/core-systems.js?v=1.0.0 5982:0 Uncaught SyntaxError: Unexpected end of input",
+          "timestamp": 1765045635666
+        }
+      ],
       "console_warnings": [],
       "page_errors": [],
       "has_header": false,
@@ -1264,16 +1474,22 @@
         "showNotificationInProgress": false
       },
       "rate_limit_retries": 0,
-      "timestamp": "2025-12-06T00:17:53.836542"
+      "timestamp": "2025-12-06T20:27:15.353461"
     },
     {
       "page": "איפוס סיסמה",
       "url": "/reset-password.html",
       "category": "auth",
       "priority": "medium",
-      "success": true,
-      "load_time": 0.31016111373901367,
-      "console_errors": [],
+      "success": false,
+      "load_time": 0.3042910099029541,
+      "console_errors": [
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/modules/core-systems.js?v=1.0.0 5982:0 Uncaught SyntaxError: Unexpected end of input",
+          "timestamp": 1765045640006
+        }
+      ],
       "console_warnings": [],
       "page_errors": [],
       "has_header": false,
@@ -1284,16 +1500,22 @@
         "showNotificationInProgress": false
       },
       "rate_limit_retries": 0,
-      "timestamp": "2025-12-06T00:18:01.163653"
+      "timestamp": "2025-12-06T20:27:19.700717"
     },
     {
       "page": "מיפוי צבעי כפתורים",
       "url": "/button-color-mapping.html",
       "category": "dev",
       "priority": "low",
-      "success": true,
-      "load_time": 0.538567066192627,
-      "console_errors": [],
+      "success": false,
+      "load_time": 0.32077479362487793,
+      "console_errors": [
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/modules/core-systems.js?v=1.0.0 5982:0 Uncaught SyntaxError: Unexpected end of input",
+          "timestamp": 1765045644360
+        }
+      ],
       "console_warnings": [],
       "page_errors": [],
       "has_header": true,
@@ -1304,16 +1526,22 @@
         "showNotificationInProgress": false
       },
       "rate_limit_retries": 0,
-      "timestamp": "2025-12-06T00:18:08.503767"
+      "timestamp": "2025-12-06T20:27:24.039890"
     },
     {
       "page": "מיפוי צבעי כפתורים - פשוט",
       "url": "/button-color-mapping-simple.html",
       "category": "dev",
       "priority": "low",
-      "success": true,
-      "load_time": 0.3724536895751953,
-      "console_errors": [],
+      "success": false,
+      "load_time": 0.35642290115356445,
+      "console_errors": [
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/modules/core-systems.js?v=1.0.0 5982:0 Uncaught SyntaxError: Unexpected end of input",
+          "timestamp": 1765045648750
+        }
+      ],
       "console_warnings": [],
       "page_errors": [],
       "has_header": true,
@@ -1324,31 +1552,42 @@
         "showNotificationInProgress": false
       },
       "rate_limit_retries": 0,
-      "timestamp": "2025-12-06T00:18:16.069295"
+      "timestamp": "2025-12-06T20:27:28.392980"
     },
     {
       "page": "מודלים של תנאים",
       "url": "/conditions-modals.html",
       "category": "dev",
       "priority": "low",
-      "success": true,
-      "load_time": 0.36488914489746094,
-      "console_errors": [],
+      "success": false,
+      "load_time": 0.3553957939147949,
+      "console_errors": [
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/button-system-init.js?v=1.0.0 348:19 Uncaught TypeError: this.waitForBootstrap is not a function",
+          "timestamp": 1765045653071
+        },
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/modules/core-systems.js?v=1.0.0 5982:0 Uncaught SyntaxError: Unexpected end of input",
+          "timestamp": 1765045653123
+        }
+      ],
       "console_warnings": [
         {
           "level": "WARNING",
           "message": "http://localhost:8080/images/icons/entities/conditions.svg - Failed to load resource: the server responded with a status of 404 (NOT FOUND)",
-          "timestamp": 1764973103541
+          "timestamp": 1765045652837
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:18:23 AM] WARN: ⚠️ No mapping found for page class: conditions-modals-page\" Object",
-          "timestamp": 1764973103784
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[8:27:33 PM] WARN: ⚠️ No mapping found for page class: conditions-modals-page\" Object",
+          "timestamp": 1765045653071
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:18:23 AM] WARN: [ConditionsModalController] Modal element not found\" Object",
-          "timestamp": 1764973103830
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[8:27:33 PM] WARN: [ConditionsModalController] Modal element not found and could not be created\" Object",
+          "timestamp": 1765045653114
         }
       ],
       "page_errors": [],
@@ -1360,21 +1599,27 @@
         "showNotificationInProgress": false
       },
       "rate_limit_retries": 0,
-      "timestamp": "2025-12-06T00:18:23.473315"
+      "timestamp": "2025-12-06T20:27:32.768832"
     },
     {
       "page": "ניהול קבוצות העדפות",
       "url": "/preferences-groups-management.html",
       "category": "dev",
       "priority": "low",
-      "success": true,
-      "load_time": 0.404620885848999,
-      "console_errors": [],
+      "success": false,
+      "load_time": 0.36440300941467285,
+      "console_errors": [
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/modules/core-systems.js?v=1.0.0 5982:0 Uncaught SyntaxError: Unexpected end of input",
+          "timestamp": 1765045657522
+        }
+      ],
       "console_warnings": [
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:18:31 AM] WARN: ⚠️ No mapping found for page class: preferences-groups-management-page\" Object",
-          "timestamp": 1764973111208
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[8:27:37 PM] WARN: ⚠️ No mapping found for page class: preferences-groups-management-page\" Object",
+          "timestamp": 1765045657461
         }
       ],
       "page_errors": [],
@@ -1386,31 +1631,37 @@
         "showNotificationInProgress": false
       },
       "rate_limit_retries": 0,
-      "timestamp": "2025-12-06T00:18:30.869795"
+      "timestamp": "2025-12-06T20:27:37.158188"
     },
     {
       "page": "ניהול תגיות",
       "url": "/tag-management.html",
       "category": "dev",
       "priority": "low",
-      "success": true,
-      "load_time": 0.3430781364440918,
-      "console_errors": [],
+      "success": false,
+      "load_time": 0.2924618721008301,
+      "console_errors": [
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/button-system-init.js?v=1.0.0 348:19 Uncaught TypeError: this.waitForBootstrap is not a function",
+          "timestamp": 1765045661732
+        },
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/modules/core-systems.js?v=1.0.0 5982:0 Uncaught SyntaxError: Unexpected end of input",
+          "timestamp": 1765045661845
+        },
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/button-system-init.js?v=1.0.0 348:19 Uncaught TypeError: this.waitForBootstrap is not a function",
+          "timestamp": 1765045663862
+        }
+      ],
       "console_warnings": [
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1286:14 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
-          "timestamp": 1764973118571
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:18:38 AM] WARN: ⚠️ Failed to cache tag data\" Object",
-          "timestamp": 1764973120665
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/tag-management.html - [DOM] Found 2 elements with non-unique id #tradeOpenConditionsButton: (More info: https://goo.gl/9p2vKq) %o %o",
-          "timestamp": 1764973120666
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[8:27:41 PM] WARN: ⚠️ Failed to cache tag data\" Object",
+          "timestamp": 1765045663862
         }
       ],
       "page_errors": [],
@@ -1422,21 +1673,89 @@
         "showNotificationInProgress": false
       },
       "rate_limit_retries": 0,
-      "timestamp": "2025-12-06T00:18:38.308802"
+      "timestamp": "2025-12-06T20:27:41.553412"
     },
     {
       "page": "ניהול מטמון",
       "url": "/cache-management.html",
       "category": "dev",
       "priority": "low",
-      "success": true,
-      "load_time": 0.22911310195922852,
-      "console_errors": [],
+      "success": false,
+      "load_time": 0.19522595405578613,
+      "console_errors": [
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/modules/core-systems.js?v=1.0.0 5982:0 Uncaught SyntaxError: Unexpected end of input",
+          "timestamp": 1765045666079
+        }
+      ],
+      "console_warnings": [],
+      "page_errors": [],
+      "has_header": true,
+      "has_core_systems": true,
+      "initialization_status": {
+        "getPreferenceInProgress": false,
+        "loadActiveAlertsInProgress": false,
+        "showNotificationInProgress": false
+      },
+      "rate_limit_retries": 0,
+      "timestamp": "2025-12-06T20:27:45.884625"
+    },
+    {
+      "page": "דשבורד איכות קוד",
+      "url": "/code-quality-dashboard.html",
+      "category": "dev",
+      "priority": "low",
+      "success": false,
+      "load_time": 0.3544430732727051,
+      "console_errors": [
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/button-system-init.js?v=1.0.0 348:19 Uncaught TypeError: this.waitForBootstrap is not a function",
+          "timestamp": 1765045670388
+        },
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/modules/core-systems.js?v=1.0.0 5982:0 Uncaught SyntaxError: Unexpected end of input",
+          "timestamp": 1765045670459
+        }
+      ],
+      "console_warnings": [],
+      "page_errors": [],
+      "has_header": true,
+      "has_core_systems": true,
+      "initialization_status": {
+        "getPreferenceInProgress": false,
+        "loadActiveAlertsInProgress": false,
+        "showNotificationInProgress": false
+      },
+      "rate_limit_retries": 0,
+      "timestamp": "2025-12-06T20:27:50.103373"
+    },
+    {
+      "page": "ניהול מערכת אתחול",
+      "url": "/init-system-management.html",
+      "category": "dev",
+      "priority": "low",
+      "success": false,
+      "load_time": 0.3110630512237549,
+      "console_errors": [
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/modules/core-systems.js?v=1.0.0 5982:0 Uncaught SyntaxError: Unexpected end of input",
+          "timestamp": 1765045674799
+        },
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/init-system/validators/runtime-validator.js?v=1.0.0 77:14 \"🔴 מערכות חסרות:\" Array(1)",
+          "timestamp": 1765045676804
+        }
+      ],
       "console_warnings": [
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/unified-log-manager.js?v=1.0.0 445:24 \"⚠️ Cache system not ready yet, using fallback\"",
-          "timestamp": 1764973125895
+          "message": "http://localhost:8080/scripts/init-system/validators/runtime-validator.js?v=1.0.0 194:14 \"⚠️ נמצאו 1 בעיות\"",
+          "timestamp": 1765045676804
         }
       ],
       "page_errors": [],
@@ -1448,56 +1767,22 @@
         "showNotificationInProgress": false
       },
       "rate_limit_retries": 0,
-      "timestamp": "2025-12-06T00:18:45.682004"
-    },
-    {
-      "page": "דשבורד איכות קוד",
-      "url": "/code-quality-dashboard.html",
-      "category": "dev",
-      "priority": "low",
-      "success": true,
-      "load_time": 0.39287495613098145,
-      "console_errors": [],
-      "console_warnings": [],
-      "page_errors": [],
-      "has_header": true,
-      "has_core_systems": true,
-      "initialization_status": {
-        "getPreferenceInProgress": false,
-        "loadActiveAlertsInProgress": false,
-        "showNotificationInProgress": false
-      },
-      "rate_limit_retries": 0,
-      "timestamp": "2025-12-06T00:18:52.944560"
-    },
-    {
-      "page": "ניהול מערכת אתחול",
-      "url": "/init-system-management.html",
-      "category": "dev",
-      "priority": "low",
-      "success": true,
-      "load_time": 0.3361179828643799,
-      "console_errors": [],
-      "console_warnings": [],
-      "page_errors": [],
-      "has_header": true,
-      "has_core_systems": true,
-      "initialization_status": {
-        "getPreferenceInProgress": false,
-        "loadActiveAlertsInProgress": false,
-        "showNotificationInProgress": false
-      },
-      "rate_limit_retries": 0,
-      "timestamp": "2025-12-06T00:19:00.367385"
+      "timestamp": "2025-12-06T20:27:54.487672"
     },
     {
       "page": "בדיקת תנאים",
       "url": "/conditions-test.html",
       "category": "dev",
       "priority": "low",
-      "success": true,
-      "load_time": 1.1902079582214355,
-      "console_errors": [],
+      "success": false,
+      "load_time": 0.27510499954223633,
+      "console_errors": [
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/modules/core-systems.js?v=1.0.0 5982:0 Uncaught SyntaxError: Unexpected end of input",
+          "timestamp": 1765045679089
+        }
+      ],
       "console_warnings": [],
       "page_errors": [],
       "has_header": true,
@@ -1508,21 +1793,27 @@
         "showNotificationInProgress": false
       },
       "rate_limit_retries": 0,
-      "timestamp": "2025-12-06T00:19:07.727338"
+      "timestamp": "2025-12-06T20:27:58.816940"
     },
     {
       "page": "ניהול רשימות צפייה",
       "url": "/mockups/watch-lists-page.html",
       "category": "watchlists",
       "priority": "medium",
-      "success": true,
-      "load_time": 0.45224499702453613,
-      "console_errors": [],
+      "success": false,
+      "load_time": 0.6681568622589111,
+      "console_errors": [
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/button-system-init.js?v=1.0.0 348:19 Uncaught TypeError: this.waitForBootstrap is not a function",
+          "timestamp": 1765045683451
+        }
+      ],
       "console_warnings": [
         {
           "level": "WARNING",
           "message": "http://localhost:8080/mockups/images/logo.svg - Failed to load resource: the server responded with a status of 404 (NOT FOUND)",
-          "timestamp": 1764973156394
+          "timestamp": 1765045683514
         }
       ],
       "page_errors": [],
@@ -1534,7 +1825,7 @@
         "showNotificationInProgress": false
       },
       "rate_limit_retries": 0,
-      "timestamp": "2025-12-06T00:19:15.945562"
+      "timestamp": "2025-12-06T20:28:03.126138"
     },
     {
       "page": "מודל רשימת צפייה",
@@ -1542,7 +1833,7 @@
       "category": "watchlists",
       "priority": "medium",
       "success": true,
-      "load_time": 0.7050092220306396,
+      "load_time": 0.27350401878356934,
       "console_errors": [],
       "console_warnings": [],
       "page_errors": [],
@@ -1554,7 +1845,7 @@
         "showNotificationInProgress": false
       },
       "rate_limit_retries": 0,
-      "timestamp": "2025-12-06T00:19:23.415016"
+      "timestamp": "2025-12-06T20:28:07.824161"
     },
     {
       "page": "מודל הוספת טיקר",
@@ -1562,7 +1853,7 @@
       "category": "watchlists",
       "priority": "medium",
       "success": true,
-      "load_time": 0.2879669666290283,
+      "load_time": 0.38324904441833496,
       "console_errors": [],
       "console_warnings": [],
       "page_errors": [],
@@ -1574,7 +1865,7 @@
         "showNotificationInProgress": false
       },
       "rate_limit_retries": 0,
-      "timestamp": "2025-12-06T00:19:31.164451"
+      "timestamp": "2025-12-06T20:28:12.143750"
     },
     {
       "page": "פעולה מהירה דגלים",
@@ -1582,7 +1873,7 @@
       "category": "watchlists",
       "priority": "medium",
       "success": true,
-      "load_time": 0.2564711570739746,
+      "load_time": 0.2420518398284912,
       "console_errors": [],
       "console_warnings": [],
       "page_errors": [],
@@ -1594,83 +1885,32 @@
         "showNotificationInProgress": false
       },
       "rate_limit_retries": 0,
-      "timestamp": "2025-12-06T00:19:38.487682"
+      "timestamp": "2025-12-06T20:28:16.556093"
     },
     {
       "page": "תצוגת ווידג'טים TradingView",
       "url": "/tradingview-widgets-showcase.html",
       "category": "additional",
       "priority": "low",
-      "success": true,
-      "load_time": 0.3242781162261963,
-      "console_errors": [],
-      "console_warnings": [
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:19:46 AM] WARN: ⚠️ No mapping found for page class: tradingview-widgets-showcase-page\" Object",
-          "timestamp": 1764973186061
-        }
-      ],
-      "page_errors": [],
-      "has_header": false,
-      "has_core_systems": true,
-      "initialization_status": {
-        "getPreferenceInProgress": false,
-        "loadActiveAlertsInProgress": false,
-        "showNotificationInProgress": false
-      },
-      "rate_limit_retries": 0,
-      "timestamp": "2025-12-06T00:19:45.775052"
-    },
-    {
-      "page": "טריידים מעוצבים",
-      "url": "/trades_formatted.html",
-      "category": "additional",
-      "priority": "low",
       "success": false,
-      "load_time": 0.4040839672088623,
+      "load_time": 0.3116111755371094,
       "console_errors": [
         {
           "level": "SEVERE",
-          "message": "Rate limit exceeded after 3 retries: http://localhost:8080/api/trade-plans/3107 - Failed to load resource: the server responded with a status of 429 (TOO MANY REQUESTS)",
-          "timestamp": 1764973217136
+          "message": "http://localhost:8080/scripts/button-system-init.js?v=1.0.0 348:19 Uncaught TypeError: this.waitForBootstrap is not a function",
+          "timestamp": 1765045701092
         },
         {
           "level": "SEVERE",
-          "message": "Rate limit exceeded after 3 retries: http://localhost:8080/api/trade-plans/3107 - Failed to load resource: the server responded with a status of 429 (TOO MANY REQUESTS)",
-          "timestamp": 1764973217137
-        },
-        {
-          "level": "SEVERE",
-          "message": "Rate limit exceeded after 3 retries: http://localhost:8080/api/trade-plans/3103 - Failed to load resource: the server responded with a status of 429 (TOO MANY REQUESTS)",
-          "timestamp": 1764973217137
-        },
-        {
-          "level": "SEVERE",
-          "message": "Rate limit exceeded after 3 retries: http://localhost:8080/api/trade-plans/3103 - Failed to load resource: the server responded with a status of 429 (TOO MANY REQUESTS)",
-          "timestamp": 1764973217137
-        },
-        {
-          "level": "SEVERE",
-          "message": "Rate limit exceeded after 3 retries: http://localhost:8080/api/trade-plans/3061 - Failed to load resource: the server responded with a status of 429 (TOO MANY REQUESTS)",
-          "timestamp": 1764973217137
-        },
-        {
-          "level": "SEVERE",
-          "message": "Rate limit exceeded after 3 retries: http://localhost:8080/api/trade-plans/3061 - Failed to load resource: the server responded with a status of 429 (TOO MANY REQUESTS)",
-          "timestamp": 1764973217137
+          "message": "http://localhost:8080/scripts/modules/core-systems.js?v=1.0.0 5982:0 Uncaught SyntaxError: Unexpected end of input",
+          "timestamp": 1765045701133
         }
       ],
       "console_warnings": [
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1286:14 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
-          "timestamp": 1764973214990
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/trades_formatted.html - [DOM] Found 2 elements with non-unique id #tradeOpenConditionsButton: (More info: https://goo.gl/9p2vKq) %o %o",
-          "timestamp": 1764973217091
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[8:28:21 PM] WARN: ⚠️ No mapping found for page class: tradingview-widgets-showcase-page\" Object",
+          "timestamp": 1765045701094
         }
       ],
       "page_errors": [],
@@ -1681,8 +1921,44 @@
         "loadActiveAlertsInProgress": false,
         "showNotificationInProgress": false
       },
-      "rate_limit_retries": 3,
-      "timestamp": "2025-12-06T00:20:14.675883"
+      "rate_limit_retries": 0,
+      "timestamp": "2025-12-06T20:28:20.822799"
+    },
+    {
+      "page": "טריידים מעוצבים",
+      "url": "/trades_formatted.html",
+      "category": "additional",
+      "priority": "low",
+      "success": false,
+      "load_time": 0.4388892650604248,
+      "console_errors": [
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/button-system-init.js?v=1.0.0 348:19 Uncaught TypeError: this.waitForBootstrap is not a function",
+          "timestamp": 1765045705459
+        },
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/modules/core-systems.js?v=1.0.0 5982:0 Uncaught SyntaxError: Unexpected end of input",
+          "timestamp": 1765045705599
+        },
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/button-system-init.js?v=1.0.0 348:19 Uncaught TypeError: this.waitForBootstrap is not a function",
+          "timestamp": 1765045707615
+        }
+      ],
+      "console_warnings": [],
+      "page_errors": [],
+      "has_header": true,
+      "has_core_systems": true,
+      "initialization_status": {
+        "getPreferenceInProgress": false,
+        "loadActiveAlertsInProgress": false,
+        "showNotificationInProgress": false
+      },
+      "rate_limit_retries": 0,
+      "timestamp": "2025-12-06T20:28:25.161925"
     }
   ]
 }

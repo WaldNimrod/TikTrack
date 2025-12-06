@@ -1292,11 +1292,13 @@ function switchTableTab(tabName) {
  * Fetches and updates overview section data
  * @returns {void}
  */
-function refreshOverview() {
+async function refreshOverview() {
     window.Logger.info('Refreshing overview data...', { page: "index" });
-    window.loadDashboardData().catch((error) => {
+    try {
+        await window.loadDashboardData();
+    } catch (error) {
         window.Logger?.error?.('❌ Error refreshing dashboard overview', { message: error?.message }, { page: 'index' });
-    });
+    }
 }
 
 /**
@@ -1427,7 +1429,7 @@ window.initializeIndexPage = async function() {
     }
     
     // Initialize overview data
-    refreshOverview();
+    await refreshOverview();
     
     // Setup action buttons
     const refreshButton = document.querySelector('.btn');

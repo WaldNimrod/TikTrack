@@ -767,6 +767,8 @@ async function runDetailedPageScan(pageName, pageConfig) {
         currentPage = 'tag-management';
     } else if (path.includes('ai-analysis')) {
         currentPage = 'ai-analysis';
+    } else if (path.includes('watch-list')) {
+        currentPage = 'watch-list';
     }
     
     if (currentPage !== pageName) {

@@ -80,6 +80,23 @@
     flex-shrink: 0;
 }
 
+/* Action Separator - מפריד בין קבוצות כפתורים */
+.action-separator {
+    width: 1px;
+    height: 24px;
+    background-color: var(--border-color, #dee2e6);
+    margin: 0 0.5rem;
+    align-self: center;
+}
+
+/* Filter Separator - מפריד בין כפתורי פילטר */
+.filter-separator {
+    color: var(--text-muted, #6c757d);
+    margin: 0 0.5rem;
+    font-size: 0.9rem;
+    align-self: center;
+}
+
 /* Special Button Types - סוגי כפתורים מיוחדים */
 .btn-add,
 button.btn-add {

@@ -352,7 +352,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
             try {
               window.RecentItemsWidget.init('recentItemsWidgetContainer', {
                 defaultTab: 'trades',
-                maxItems: 5 // Maximum number of items to display per tab
+                maxItems: 4 // Maximum number of items to display per tab (limited to 4 for consistent height)
               });
             } catch (error) {
               window.Logger?.warn('⚠️ Error initializing RecentItemsWidget:', error, {
@@ -2285,6 +2285,67 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         },
       ],
     },
+
+    'watch-lists': {
+      name: 'Watch Lists',
+      packages: [
+        'base',
+        'services',
+        'ui-advanced',
+        'crud',
+        'entity-services',
+        'watch-lists',
+        'init-system',
+      ],
+      requiredGlobals: [
+        'window.UnifiedAppInitializer',
+        'window.PAGE_CONFIGS',
+        'window.PACKAGE_MANIFEST',
+        'NotificationSystem',
+        'window.IconSystem',
+        'window.Logger',
+        'window.WatchListsDataService',
+        'window.WatchListsUIService',
+        'window.WatchListsPage',
+        'window.FieldRendererService',
+        'window.CRUDResponseHandler',
+        'window.UnifiedTableSystem',
+        'window.PageStateManager',
+      ],
+      description: 'ניהול רשימות צפייה - יצירה, עריכה, מחיקה וניהול טיקרים',
+      lastModified: '2025-12-06',
+      pageType: 'main',
+      cacheStrategy: 'standard',
+      requiresFilters: true,
+      requiresValidation: false,
+      requiresTables: true,
+      customInitializers: [
+        async pageConfig => {
+          window.Logger?.info?.('📋 Initializing Watch Lists Page...', {
+            page: 'page-initialization-configs',
+          });
+
+          // Initialize page
+          if (typeof window.WatchListsPage?.initializeWatchListsPage === 'function') {
+            try {
+              await window.WatchListsPage.initializeWatchListsPage();
+              window.Logger?.info?.('✅ Watch Lists Page initialized successfully', {
+                page: 'page-initialization-configs',
+              });
+            } catch (error) {
+              window.Logger?.error?.('❌ Error initializing Watch Lists Page', {
+                page: 'page-initialization-configs',
+                error: error?.message || error,
+              });
+            }
+          } else {
+            window.Logger?.warn?.('⚠️ WatchListsPage.initializeWatchListsPage not available', {
+              page: 'page-initialization-configs',
+            });
+          }
+        },
+      ],
+    },
   };
 
   // ===== CONFIGURATION HELPER FUNCTIONS =====
@@ -3276,32 +3337,39 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
     },
 
     // Watch Lists Pages
-    'watch-lists-page': {
-      name: 'Watch Lists Page',
+    'watch-list': {
+      name: 'Watch List Page',
       packages: [
         'base',
         'services',
+        'validation', // Required for form validation - must load before modules/ui-advanced
+        'modules', // Required for ModalManagerV2 and watch-lists-config.js
         'ui-advanced',
         'crud',
         'entity-services',
-        'watch-lists'
+        'watch-lists',
+        'init-system'
       ],
       requiredGlobals: [
+        'UnifiedCacheManager',
+        'Logger',
         'NotificationSystem',
         'window.IconSystem',
         'window.WatchListsDataService',
         'window.WatchListsUIService',
         'window.WatchListsPage',
+        'window.ModalManagerV2',
         'window.HeaderSystem',
-        'window.UnifiedTableSystem'
+        'window.UnifiedTableSystem',
+        'window.validateTextField' // Validation functions
       ],
       pageSpecificScripts: ['scripts/watch-lists-page.js'],
-      description: 'עמוד ניהול רשימות צפייה - מוקאפ',
-      lastModified: '2025-11-26',
-      pageType: 'mockup',
+      description: 'עמוד ניהול רשימות צפייה - production',
+      lastModified: '2025-12-06',
+      pageType: 'main',
       cacheStrategy: 'standard',
       requiresFilters: true,
-      requiresValidation: false,
+      requiresValidation: true, // Changed to true - validation is required for modals
       requiresTables: true,
       sectionsDefaultState: 'open',
       sectionDefaultStates: {
@@ -3312,7 +3380,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       },
       customInitializers: [
         async pageConfig => {
-          window.Logger?.info('📊 Initializing Watch Lists Page...', {
+          window.Logger?.info('📊 Initializing Watch List Page...', {
             page: 'page-initialization-configs',
           });
 

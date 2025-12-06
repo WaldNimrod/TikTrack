@@ -128,9 +128,30 @@
             }
 
             if (!this.modalElement) {
-                // Only warn if not on auth page - modal might be needed later
-                window.Logger?.warn('[ConditionsModalController] Modal element not found', { page: 'conditions-modal-controller' });
-                return;
+                // Try to create the modal if it doesn't exist
+                if (window.ModalManagerV2 && window.conditionsModalConfig) {
+                    try {
+                        window.ModalManagerV2.createCRUDModal(window.conditionsModalConfig);
+                        this.modalElement = document.getElementById(MODAL_ID);
+                        if (this.modalElement) {
+                            window.Logger?.info('[ConditionsModalController] Modal created successfully', { page: 'conditions-modal-controller' });
+                        }
+                    } catch (error) {
+                        window.Logger?.error('[ConditionsModalController] Failed to create modal', { error: error?.message, stack: error?.stack }, { page: 'conditions-modal-controller' });
+                    }
+                }
+                
+                if (!this.modalElement) {
+                    // Only warn if we're not on an auth page and modal creation failed
+                    const isAuthPage = window.location.pathname.includes('login.html') ||
+                                     window.location.pathname.includes('register.html') ||
+                                     window.location.pathname.includes('forgot-password.html') ||
+                                     window.location.pathname.includes('reset-password.html');
+                    if (!isAuthPage) {
+                        window.Logger?.warn('[ConditionsModalController] Modal element not found and could not be created', { page: 'conditions-modal-controller' });
+                    }
+                    return;
+                }
             }
 
             try {

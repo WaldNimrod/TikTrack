@@ -3392,8 +3392,8 @@ function setupTradeConditionsButton(modalElement) {
 
   const summaryContainer = controlsWrapper.querySelector('#tradeConditionsSummary');
   const disabledHint = controlsWrapper.querySelector('[data-conditions-disabled-hint]');
-  const openButton = document.getElementById('tradeOpenConditionsButton');
-  const evaluateButton = document.getElementById('tradeEvaluateConditionsButton');
+  const openButton = controlsWrapper.querySelector('#tradeOpenConditionsButton');
+  const evaluateButton = controlsWrapper.querySelector('#tradeEvaluateConditionsButton');
   const tickerSelect = modalElement.querySelector('#tradeTicker');
 
   const updateButtonState = () => {

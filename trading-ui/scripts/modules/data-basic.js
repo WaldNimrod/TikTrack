@@ -490,7 +490,7 @@ function getColumnValue(item, columnIndex, tableType) {
       // Return the translated investment type value
       const typeDisplay = item[fieldName] === 'swing' ? 'סווינג' :
         item[fieldName] === 'investment' ? 'השקעה' :
-          item[fieldName] === 'passive' ? 'פסיבי' :
+          item[fieldName] === 'passive' ? 'פאסיבי' :
             item[fieldName] === 'day' ? 'יומי' :
               item[fieldName] === 'scalp' ? 'סקלפינג' :
                 item[fieldName] || '';
@@ -1283,8 +1283,21 @@ if (!window.TABLE_COLUMN_MAPPINGS || Object.keys(window.TABLE_COLUMN_MAPPINGS).l
                         window.location.pathname.includes('tickers') ||
                         window.location.pathname.includes('executions') ||
                         window.location.pathname.includes('trade_plans');
+    
+    // Only warn if this is a table page AND table-mappings.js was supposed to load but didn't
+    // Check if table-mappings.js actually loaded by checking for its global
     if (isTablePage) {
-      console.warn('⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!');
+      // Check if table-mappings.js was loaded by looking for the script tag or checking if it's in the page
+      const tableMappingsScript = Array.from(document.querySelectorAll('script')).find(script => 
+        script.src && script.src.includes('table-mappings.js')
+      );
+      
+      // If table-mappings.js script tag exists but TABLE_COLUMN_MAPPINGS wasn't set by it, that's a problem
+      if (tableMappingsScript && (!window.TABLE_COLUMN_MAPPINGS || Object.keys(window.TABLE_COLUMN_MAPPINGS).length === 0)) {
+        // Script was supposed to load but didn't set the mappings - this is a real issue
+        window.Logger?.warn?.('⚠️ [data-basic.js] table-mappings.js script found but TABLE_COLUMN_MAPPINGS not set - using legacy mappings', {}, { page: 'data-basic' });
+      }
+      // If table-mappings.js script tag doesn't exist, it's optional and we use legacy - no warning needed
     }
   }
 } else {

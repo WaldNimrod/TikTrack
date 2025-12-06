@@ -171,7 +171,8 @@ from routes.api import (
     css_management_bp,
     preferences_bp,
     wal_bp,
-    system_settings_bp
+    system_settings_bp,
+    watch_lists_bp
 )
 from routes.api.preferences_v4 import preferences_v4_bp
 from routes.api.server_logs import server_logs_bp
@@ -497,6 +498,7 @@ app.register_blueprint(cash_flows_bp)
 app.register_blueprint(notes_bp)
 app.register_blueprint(executions_bp)
 app.register_blueprint(tags_bp)
+app.register_blueprint(watch_lists_bp)
 app.register_blueprint(preferences_bp)
 app.register_blueprint(preferences_v4_bp)
 app.register_blueprint(users_bp)
@@ -549,13 +551,13 @@ app.register_blueprint(status_bp)
 app.register_blueprint(pages_bp)
 
 # Register Conditions System blueprints
-# Note: trading_methods_bp removed - file deleted
 from routes.api.plan_conditions import plan_conditions_bp
 from routes.api.trade_conditions import trade_conditions_bp
+from routes.api.trading_methods import trading_methods_bp
 
-# Note: trading_methods_bp removed - file deleted
 app.register_blueprint(plan_conditions_bp)
 app.register_blueprint(trade_conditions_bp)
+app.register_blueprint(trading_methods_bp)
 
 # Register Database Display API blueprints
 app.register_blueprint(preference_groups_bp)
@@ -1956,14 +1958,20 @@ def get_yahoo_quote(symbol: str) -> Any:
             return jsonify({
                 "status": "error",
                 "error": f"No data available for symbol {symbol.upper()}",
+                "error_code": "NO_DATA_AVAILABLE",
+                "symbol": symbol.upper(),
+                "suggestion": "Please check the symbol format (e.g., 'AAPL' for US stocks, '500X.TA' for Israeli stocks) or try refreshing the data",
                 "timestamp": datetime.now().isoformat()
             }), 404
             
     except Exception as e:
-        logger.error(f"Error fetching Yahoo Finance data for {symbol}: {e}")
+        logger.error(f"Error fetching Yahoo Finance data for {symbol}: {e}", exc_info=True)
         return jsonify({
             "status": "error",
             "error": str(e),
+            "error_code": "YAHOO_FINANCE_ERROR",
+            "symbol": symbol.upper(),
+            "suggestion": "Please check the symbol format and try again, or use the refresh endpoint to fetch data",
             "timestamp": datetime.now().isoformat()
         }), 500
     finally:

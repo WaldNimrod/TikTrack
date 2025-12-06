@@ -83,6 +83,7 @@ def get_ticker_quote(ticker_id):
                 'change_pct_day': quote.change_pct_day,
                 'change_amount_day': quote.change_amount_day,
                 'volume': quote.volume,
+                'market_cap': quote.market_cap,
                 'currency': quote.currency,
                 'provider': quote.provider.name if quote.provider else 'unknown',
                 'asof_utc': quote.asof_utc.isoformat() if quote.asof_utc else None,
@@ -109,10 +110,13 @@ def get_ticker_quote(ticker_id):
             db_session.close()
         
     except Exception as e:
-        logger.error(f"Failed to get quote for ticker {ticker_id}: {e}")
+        logger.error(f"Failed to get quote for ticker {ticker_id}: {e}", exc_info=True)
         return jsonify({
             'status': 'error',
-            'message': f'Failed to get quote for ticker {ticker_id}'
+            'message': f'Failed to get quote for ticker {ticker_id}',
+            'error_code': 'INTERNAL_SERVER_ERROR',
+            'error': str(e),
+            'suggestion': 'Please try again later or contact support if the issue persists'
         }), 500
 
 
@@ -205,6 +209,7 @@ def get_batch_quotes():
                         'change_pct_day': quote.change_pct_day,
                         'change_amount_day': quote.change_amount_day,
                         'volume': quote.volume,
+                        'market_cap': quote.market_cap,
                         'currency': quote.currency,
                         'provider': quote.provider.name if quote.provider else 'unknown',
                         'asof_utc': quote.asof_utc.isoformat() if quote.asof_utc else None,
@@ -382,14 +387,17 @@ def get_quote_history(ticker_id):
         return jsonify({
             'status': 'error',
             'message': f'Invalid parameter: {str(e)}',
-            'error_code': 'INVALID_PARAMETER'
+            'error_code': 'INVALID_PARAMETER',
+            'suggestion': 'Please check that days is between 1-365 and interval is one of: 1d, 1w, 1m'
         }), 400
     except Exception as e:
         logger.error(f"Failed to get quote history for ticker {ticker_id}: {e}", exc_info=True)
         return jsonify({
             'status': 'error',
             'message': f'Failed to get quote history for ticker {ticker_id}',
-            'error': str(e)
+            'error_code': 'INTERNAL_SERVER_ERROR',
+            'error': str(e),
+            'suggestion': 'Please try again later or contact support if the issue persists'
         }), 500
 
 
@@ -459,23 +467,13 @@ def refresh_ticker_quote(ticker_id):
             adapter = YahooFinanceAdapter(db_session, provider.id)
             
             # Step 2: Clear cache if force_refresh
+            # Note: We don't delete quotes here because the adapter's _cache_quote_by_ticker
+            # will update existing quotes if they exist within the last 5 minutes.
+            # This ensures volume and other data are properly updated.
             if force_refresh:
-                logger.info(f"🔄 Step 2: Clearing cached quotes (force_refresh=True)")
-                try:
-                    # Delete recent quotes to force refresh
-                    cutoff_time = datetime.now(timezone.utc) - timedelta(minutes=5)
-                    deleted_count = db_session.query(MarketDataQuote).filter(
-                        MarketDataQuote.ticker_id == ticker_id,
-                        MarketDataQuote.provider_id == provider.id,
-                        MarketDataQuote.fetched_at >= cutoff_time
-                    ).delete()
-                    db_session.commit()
-                    logger.info(f"✅ Deleted {deleted_count} cached quotes")
-                except Exception as clear_error:
-                    logger.warning(f"⚠️ Could not clear cached quotes before refresh: {clear_error}")
-                    db_session.rollback()
+                logger.info(f"🔄 Step 2: Force refresh enabled - will update existing quotes or create new ones")
             else:
-                logger.info(f"🔄 Step 2: Skipping cache clear (force_refresh=False)")
+                logger.info(f"🔄 Step 2: Skipping force refresh (force_refresh=False)")
             
             # Step 3: Fetch current quote
             logger.info(f"🔄 Step 3: Fetching current quote for {ticker.symbol}")
@@ -483,7 +481,19 @@ def refresh_ticker_quote(ticker_id):
             try:
                 quote_data = adapter.get_quote(ticker.symbol, ticker=ticker)
                 if quote_data:
-                    logger.info(f"✅ Successfully fetched current quote for {ticker.symbol}: ${quote_data.price}")
+                    logger.info(f"✅ Successfully fetched current quote for {ticker.symbol}: ${quote_data.price}, volume={quote_data.volume}")
+                    # If volume is None, try to get it from the database (might have been saved but not returned)
+                    if quote_data.volume is None:
+                        logger.warning(f"⚠️ Quote volume is None for {ticker.symbol}, checking database...")
+                        from models.external_data import MarketDataQuote
+                        latest_quote = db_session.query(MarketDataQuote).filter(
+                            MarketDataQuote.ticker_id == ticker_id
+                        ).order_by(MarketDataQuote.fetched_at.desc()).first()
+                        if latest_quote and latest_quote.volume is not None:
+                            logger.info(f"✅ Found volume in database for {ticker.symbol}: {latest_quote.volume}")
+                            quote_data.volume = latest_quote.volume
+                        else:
+                            logger.warning(f"⚠️ No volume found in database for {ticker.symbol}")
                 else:
                     logger.warning(f"⚠️ No quote data returned for {ticker.symbol}")
             except Exception as quote_error:
@@ -591,6 +601,19 @@ def refresh_ticker_quote(ticker_id):
             # Check if we got quote data or if we have existing data in database
             if quote_data and quote_data.price:
                 # Quote fetched and saved successfully
+                # If volume is still None, try to get it from the database (might have been saved but not returned in quote_data)
+                if quote_data.volume is None:
+                    logger.warning(f"⚠️ Quote volume is None for {ticker.symbol} after get_quote(), checking database...")
+                    from models.external_data import MarketDataQuote
+                    latest_quote = db_session.query(MarketDataQuote).filter(
+                        MarketDataQuote.ticker_id == ticker_id
+                    ).order_by(MarketDataQuote.fetched_at.desc()).first()
+                    if latest_quote and latest_quote.volume is not None:
+                        logger.info(f"✅ Found volume in database for {ticker.symbol}: {latest_quote.volume}")
+                        quote_data.volume = latest_quote.volume
+                    else:
+                        logger.warning(f"⚠️ No volume found in database for {ticker.symbol} either")
+                
                 # Invalidate backend cache for entity details and all technical indicators
                 try:
                     from services.advanced_cache_service import advanced_cache_service
@@ -615,7 +638,7 @@ def refresh_ticker_quote(ticker_id):
                 end_time = datetime.now(timezone.utc)
                 duration_seconds = (end_time - start_time).total_seconds()
                 
-                logger.info(f"✅ refresh_ticker_quote completed for {ticker.symbol}: {historical_count} historical quotes, {len(indicators_calculated)} indicators, duration: {duration_seconds:.2f}s")
+                logger.info(f"✅ refresh_ticker_quote completed for {ticker.symbol}: {historical_count} historical quotes, {len(indicators_calculated)} indicators, duration: {duration_seconds:.2f}s, volume={quote_data.volume}")
                 
                 return jsonify({
                     'status': 'success',
@@ -626,6 +649,7 @@ def refresh_ticker_quote(ticker_id):
                         'price': quote_data.price,
                         'change_percent': quote_data.change_pct_day or quote_data.change_pct,
                         'volume': quote_data.volume,
+                        'market_cap': quote_data.market_cap,
                         'fetched_at': quote_data.asof_utc.isoformat() if quote_data.asof_utc else None,
                         'historical_quotes_count': historical_count,
                         'indicators_calculated': indicators_calculated,
@@ -657,6 +681,7 @@ def refresh_ticker_quote(ticker_id):
                             'price': existing_quote.price,
                             'change_percent': existing_quote.change_pct_day,
                             'volume': existing_quote.volume,
+                            'market_cap': existing_quote.market_cap,
                             'fetched_at': existing_quote.fetched_at.isoformat() if existing_quote.fetched_at else None,
                             'historical_quotes_count': historical_count,
                             'indicators_calculated': indicators_calculated,

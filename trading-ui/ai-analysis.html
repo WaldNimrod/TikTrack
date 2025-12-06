@@ -303,29 +303,42 @@
                 <div class="modal-header modal-header-colored">
                     <div class="modal-navigation-breadcrumb" id="aiResultsModalBreadcrumb"></div>
                     <h5 class="modal-title" id="aiResultsModalLabel">תוצאות ניתוח</h5>
-                    <button type="button" data-button-type="BACK" data-variant="small" data-text="" title="חזור" id="aiResultsBackBtn"></button>
-                    <button type="button" data-button-type="CLOSE" data-bs-dismiss="modal" data-text="" title="סגור"></button>
-                </div>
-                <div class="modal-body">
-                    <!-- כפתורי פעולה -->
-                    <div class="row g-2 mb-3">
-                        <div class="col-12">
-                            <div class="d-flex gap-2 flex-wrap">
-                                <button type="button" data-button-type="PRIMARY" data-variant="full" data-text="שמור כהערה" data-onclick="window.AIAnalysisManager?.saveAsNote()" id="saveAsNoteBtnModal">
-                                    <span>שמור כהערה</span>
-                                </button>
-                                <button data-button-type="SECONDARY" data-variant="full" data-text="ייצא ל-PDF" data-onclick="window.AIAnalysisManager?.exportToPDF()" id="exportPDFBtnModal">
-                                    <span>ייצא ל-PDF</span>
-                                </button>
-                                <button data-button-type="SECONDARY" data-variant="full" data-text="ייצא ל-Markdown" data-onclick="window.AIAnalysisManager?.exportToMarkdown()" id="exportMarkdownBtnModal">
-                                    <span>ייצא ל-Markdown</span>
-                                </button>
-                                <button data-button-type="SECONDARY" data-variant="full" data-text="ייצא ל-HTML" data-onclick="window.AIAnalysisManager?.exportToHTML()" id="exportHTMLBtnModal">
-                                    <span>ייצא ל-HTML</span>
-                                </button>
-                            </div>
+                    <!-- כפתורי פעולה בכותרת -->
+                    <div class="modal-header-actions" style="order: 2; display: flex; gap: 0.5rem; align-items: center;">
+                        <!-- כפתור שמור כהערה -->
+                        <button type="button" 
+                                data-button-type="PRIMARY" 
+                                data-variant="small" 
+                                data-text="שמור כהערה" 
+                                data-onclick="window.AIAnalysisManager?.saveAsNote()" 
+                                id="saveAsNoteBtnModal"
+                                title="שמור כהערה">
+                            <span>שמור כהערה</span>
+                        </button>
+                        <!-- כפתור ייצוא עם dropdown -->
+                        <div class="btn-group">
+                            <button type="button" 
+                                    data-button-type="SECONDARY" 
+                                    data-variant="small" 
+                                    data-icon-type="EXPORT"
+                                    data-text="" 
+                                    id="exportBtnModal"
+                                    class="dropdown-toggle"
+                                    data-bs-toggle="dropdown"
+                                    aria-expanded="false"
+                                    title="ייצא">
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="#" data-onclick="window.AIAnalysisManager?.exportToPDF()" id="exportPDFBtnModal">ייצא ל-PDF</a></li>
+                                <li><a class="dropdown-item" href="#" data-onclick="window.AIAnalysisManager?.exportToMarkdown()" id="exportMarkdownBtnModal">ייצא ל-Markdown</a></li>
+                                <li><a class="dropdown-item" href="#" data-onclick="window.AIAnalysisManager?.exportToHTML()" id="exportHTMLBtnModal">ייצא ל-HTML</a></li>
+                            </ul>
                         </div>
                     </div>
+                    <button type="button" data-button-type="BACK" data-variant="small" data-text="" title="חזור" id="aiResultsBackBtn" style="order: 998;"></button>
+                    <button type="button" data-button-type="CLOSE" data-bs-dismiss="modal" data-text="" title="סגור" style="order: 999;"></button>
+                </div>
+                <div class="modal-body">
 
                     <!-- אזור תוצאות -->
                     <div id="resultsContainerModal" class="markdown-body">
@@ -611,6 +624,9 @@
     <script src="scripts/ai-notes-integration.js?v=1.0.0" defer></script> <!-- AI analysis notes integration -->
     <!-- [95] Load Order: 95 | Strategy: defer -->
     <script src="scripts/ai-export-service.js?v=1.0.0" defer></script> <!-- AI analysis export service -->
+    <!-- [95.5] Load Order: 95.5 | Strategy: defer -->
+    <script src="scripts/debug-trading-methods.js?v=1.0.0" defer></script> <!-- Debug helper for Trading Methods (development only) -->
+    <script src="scripts/debug-ai-analysis-fields.js?v=1.0.0" defer></script> <!-- Debug helper for AI Analysis fields validation -->
 
     <!-- =============================================================== -->
     <!-- ===== PACKAGE 9/9: INITIALIZATION PACKAGE ===== -->

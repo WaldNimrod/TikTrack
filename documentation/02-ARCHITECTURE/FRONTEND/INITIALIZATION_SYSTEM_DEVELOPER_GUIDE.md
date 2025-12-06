@@ -229,6 +229,46 @@ trading-ui/scripts/
 }
 ```
 
+### שלב 4: הוספת Loading Strategy (אופציונלי)
+
+אם הסקריפט צריך loading strategy ספציפי, הוסף אותו ל-`package-manifest.js`:
+
+```javascript
+'my-package': {
+  // ... package config
+  loadingStrategy: 'defer', // defer, async, או sync (נדיר)
+  scripts: [
+    {
+      file: 'my-new-script.js',
+      globalCheck: 'window.MyNewScript',
+      description: 'My new script',
+      required: true,
+      loadOrder: 1,
+      loadingStrategy: 'defer' // אופציונלי - אם לא מוגדר, משתמש ב-package loadingStrategy
+    }
+  ]
+}
+```
+
+**כללי סיווג:**
+- **`defer`** - לסקריפטים קריטיים עם תלויות (מומלץ לרוב הסקריפטים)
+- **`async`** - לסקריפטים לא קריטיים ללא תלויות (dev-tools, monitoring)
+- **`sync`** - רק במקרים מיוחדים מאוד (כמעט לא משתמשים)
+
+### שלב 5: יצירת Script Loading Code
+
+לאחר הוספת הסקריפט, עדכן את ה-HTML באמצעות `generate-script-loading-code.js`:
+
+```bash
+# Development mode (קבצים מקוריים)
+node trading-ui/scripts/generate-script-loading-code.js my-page
+
+# Production mode (bundles)
+node trading-ui/scripts/generate-script-loading-code.js my-page --mode=production --use-bundles
+```
+
+הכלי יוצר אוטומטית את תגי ה-`<script>` עם ה-`loadingStrategy` הנכון.
+
 ---
 
 ## 📚 הוספת package חדש
@@ -275,6 +315,110 @@ trading-ui/scripts/
   // ...
 }
 ```
+
+### שלב 3: הוספת Loading Strategy
+
+הוסף `loadingStrategy` ל-package:
+
+```javascript
+'my-new-package': {
+  // ... package config
+  loadingStrategy: 'defer', // defer (קריטי), async (לא קריטי), או sync (נדיר)
+  // ...
+}
+```
+
+---
+
+## 📦 עבודה עם Bundles
+
+### סקירה כללית
+
+Bundles מאפשרים איחוד מספר קבצי JavaScript לקבצים גדולים יותר, מה שמפחית את מספר בקשות הרשת ומשפר ביצועים.
+
+### Development Mode (ברירת מחדל)
+
+**שימוש:**
+- פיתוח יומיומי
+- דיבוג
+- בדיקות
+
+**תכונות:**
+- כל הסקריפטים נטענים בנפרד
+- קל לדיבוג
+- שינויים בקוד נראים מיד
+
+**עדכון HTML:**
+```bash
+node trading-ui/scripts/generate-script-loading-code.js my-page
+```
+
+### Production Mode (עם Bundles)
+
+**שימוש:**
+- פרודקשן
+- ביצועים מיטביים
+
+**תכונות:**
+- כל הסקריפטים של package מאוחדים ל-bundle אחד
+- הפחתה דרמטית במספר בקשות
+- Minification ו-optimization
+
+**בניית Bundles:**
+```bash
+# בניית כל ה-bundles
+npm run build:bundles
+
+# בניית bundle ספציפי
+npm run build:bundles -- --package=my-package
+```
+
+**בדיקת Bundles:**
+```bash
+# בדיקת כל ה-bundles
+npm run test:bundles
+
+# בדיקת bundle ספציפי
+npm run test:bundles -- --package=my-package
+```
+
+**עדכון HTML ל-Production Mode:**
+```bash
+# 1. גיבוי
+cp trading-ui/my-page.html trading-ui/my-page.html.backup
+
+# 2. יצירת HTML עם bundles
+node trading-ui/scripts/generate-script-loading-code.js my-page --mode=production --use-bundles > temp_my-page.html
+
+# 3. החלפה
+mv temp_my-page.html trading-ui/my-page.html
+```
+
+### Troubleshooting Bundles
+
+#### Bundle לא נטען
+
+**סיבות אפשריות:**
+1. Bundle לא נבנה - הרץ `npm run build:bundles`
+2. Bundle לא קיים - בדוק ב-`trading-ui/scripts/bundles/`
+3. שגיאת build - בדוק את ה-logs
+
+**פתרון:**
+- המערכת נופלת אוטומטית לקבצים המקוריים
+- בדוק את ה-console לשגיאות
+- הרץ `npm run test:bundles` לבדיקה
+
+#### שגיאות JavaScript אחרי Bundling
+
+**סיבות אפשריות:**
+1. בעיית סדר טעינה
+2. בעיית scope
+3. בעיית dependencies
+
+**פתרון:**
+- בדוק את ה-source map
+- בדוק את ה-console לשגיאות
+- נסה development mode לבדיקה
 
 ---
 

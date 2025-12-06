@@ -123,6 +123,7 @@ http://localhost:8080/my-new-page
 - `/executions` → `executions.html`
 - `/preferences` → `preferences.html`
 - `/ai-analysis` → `ai-analysis.html` ✅ **חדש! ינואר 2025**
+- `/watch-list` → `watch-list.html` ✅ **חדש! דצמבר 2025**
 
 ### עמודים טכניים
 

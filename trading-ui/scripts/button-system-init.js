@@ -345,6 +345,9 @@ class AdvancedButtonSystem {
         // Wait for button icons to be loaded
         await this.waitForButtonIcons();
         
+        // Wait for Bootstrap to be available before processing buttons (to avoid tooltip warnings)
+        await this.waitForBootstrap();
+        
         this.processButtonsInBatches(buttonElements);
 
         // NOTE: processButtonElement already initializes tooltips for buttons with data-button-type
@@ -570,8 +573,10 @@ class AdvancedButtonSystem {
         // CRITICAL: If ID already exists, make it unique by appending timestamp
         if (document.getElementById(id)) {
             const timestamp = Date.now().toString(36);
+            const originalId = element.getAttribute('data-id') || id;
             id = `${id}-${timestamp.slice(-6)}`;
-            this.logger.warn('ID conflict detected, using unique ID', { originalId: element.getAttribute('data-id'), newId: id });
+            // Conflict resolved automatically - log as info for tracking
+            this.logger.info('ID conflict detected and resolved', { originalId, newId: id, element: element.tagName });
         }
 
         // CRITICAL: Read tooltip configuration from data attributes BEFORE processing
@@ -965,9 +970,14 @@ class AdvancedButtonSystem {
         const buttonId = button.id || 'unknown';
         
         // Check if Bootstrap is available
-        if (typeof bootstrap === 'undefined' || !bootstrap.Tooltip) {
-            this.logger.debug('Bootstrap Tooltip not available, using native title attribute');
-            this.logger.warn(`Bootstrap Tooltip not available for button ${buttonId}`);
+        // Note: We should have waited for Bootstrap in initializeButtons(), but double-check here
+        if (typeof bootstrap === 'undefined' || !bootstrap || !bootstrap.Tooltip) {
+            // Don't log warning for each button - we already logged it in waitForBootstrap()
+            // Just use native title attribute silently
+            if (config && config.title) {
+                button.setAttribute('title', config.title);
+                button.setAttribute('aria-label', config.title);
+            }
             return;
         }
 
@@ -1082,11 +1092,8 @@ class AdvancedButtonSystem {
         
         // CRITICAL: Check if button has static tooltip - these cannot be changed
         if (buttonElement.hasAttribute('data-tooltip-static')) {
-            this.logger.warn('updateTooltip: Cannot update static tooltip', {
-                buttonId,
-                currentTooltip: buttonElement.getAttribute('data-tooltip'),
-                requestedTooltip: newText
-            });
+            // Expected behavior - static tooltips cannot be updated
+            // No log needed - this is normal behavior
             return false;
         }
         

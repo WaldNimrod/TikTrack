@@ -67,6 +67,7 @@
 | **preferences** | ❌ **חסר בהגדרות** |
 | **user-profile** | base, services, modules, ui-advanced, preferences, init-system |
 | **ai-analysis** | base, services, ui-advanced, modules, preferences, entity-services, info-summary, ai-analysis, init-system |
+| **watch-list** | base, services, ui-advanced, crud, entity-services, watch-lists, init-system |
 
 ### עמודים טכניים (Technical Pages)
 

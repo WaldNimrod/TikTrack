@@ -118,3 +118,4 @@ async refreshTickerData(tickerId, options = {}) {
 4. ✅ בדיקת תאימות ובדיקות
 
 
+

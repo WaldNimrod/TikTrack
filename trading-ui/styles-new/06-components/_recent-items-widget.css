@@ -290,6 +290,8 @@
   /* Enable scrolling on card-body - allows overlay from list items to extend */
   overflow-y: auto;
   overflow-x: visible; /* Allow overlay to extend horizontally beyond container */
+  /* Limit height to 4 items for consistent widget height */
+  max-height: 420px; /* Approximately 4 items (100px each + padding) */
 }
 
 /* ===== Tab Pane Content Wrapper ===== */
@@ -323,5 +325,8 @@
   /* Contain list items within container - but allow overlay to extend */
   max-width: 100%;
   box-sizing: border-box;
+  /* Limit height to 4 items: each item is ~100px (60px min-height + padding + margin) */
+  /* 4 items = ~400px, but we use max-height to allow flexibility */
+  max-height: 420px; /* Approximately 4 items (100px each + padding) */
 }
 

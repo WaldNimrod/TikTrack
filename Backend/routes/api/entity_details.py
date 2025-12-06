@@ -92,22 +92,28 @@ def get_entity_details(entity_type: str, entity_id: int):
         
         db: Session = next(get_db())
         
-        # Get entity details
-        entity_details = EntityDetailsService.get_entity_details(db, entity_type, entity_id)
-        
-        if not entity_details:
+        try:
+            logger.info(f"🔍 Getting entity details: type={entity_type}, id={entity_id}")
+            # Get entity details
+            entity_details = EntityDetailsService.get_entity_details(db, entity_type, entity_id)
+            
+            if not entity_details:
+                logger.warning(f"⚠️ Entity not found: type={entity_type}, id={entity_id}")
+                return jsonify({
+                    "success": False,
+                    "error": {"message": f"{entity_type.title()} with ID {entity_id} not found"},
+                    "version": "1.0"
+                }), 404
+            
+            logger.info(f"✅ Entity details retrieved successfully: type={entity_type}, id={entity_id}")
             return jsonify({
-                "success": False,
-                "error": {"message": f"{entity_type.title()} with ID {entity_id} not found"},
+                "success": True,
+                "data": entity_details,
+                "message": f"Entity details retrieved successfully",
                 "version": "1.0"
-            }), 404
-        
-        return jsonify({
-            "success": True,
-            "data": entity_details,
-            "message": f"Entity details retrieved successfully",
-            "version": "1.0"
-        })
+            })
+        finally:
+            db.close()
         
     except ValueError as ve:
         logger.warning(f"Validation error for {entity_type} {entity_id}: {str(ve)}")
@@ -118,10 +124,13 @@ def get_entity_details(entity_type: str, entity_id: int):
         }), 400
         
     except Exception as e:
+        import traceback
+        error_trace = traceback.format_exc()
         logger.error(f"Error getting entity details for {entity_type} {entity_id}: {str(e)}")
+        logger.error(f"Traceback: {error_trace}")
         return jsonify({
             "success": False,
-            "error": {"message": "Internal server error"},
+            "error": {"message": f"Internal server error: {str(e)}"},
             "version": "1.0"
         }), 500
         

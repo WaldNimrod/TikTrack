@@ -9,12 +9,24 @@
 (function() {
     'use strict';
 
-// Investment types from system constraints (same as database)
-const INVESTMENT_TYPES = [
-    { value: 'swing', label: 'סווינג' },
-    { value: 'investment', label: 'השקעה' },
-    { value: 'passive', label: 'פאסיבי' }
-];
+// Investment types - use system-wide constants if available, otherwise fallback
+// Use window.VALID_INVESTMENT_TYPES for consistency across the system
+const INVESTMENT_TYPES = (() => {
+    if (window.VALID_INVESTMENT_TYPES && Array.isArray(window.VALID_INVESTMENT_TYPES)) {
+        // Use system-wide investment types with labels
+        const labels = window.INVESTMENT_TYPE_LABELS || {};
+        return window.VALID_INVESTMENT_TYPES.map(type => ({
+            value: type,
+            label: labels[type] || type
+        }));
+    }
+    // Fallback to standard values (same as database constraints)
+    return [
+        { value: 'swing', label: 'סווינג' },
+        { value: 'investment', label: 'השקעה' },
+        { value: 'passive', label: 'פאסיבי' }
+    ];
+})();
 
 let allTradingAccounts = [];
 let portfolioPerformanceChart = null;
@@ -110,7 +122,7 @@ async function loadTradingAccounts() {
                     id: acc.id,
                     name: acc.name || acc.account_name || `Account #${acc.id}`
                 })).sort((a, b) => a.name.localeCompare(b.name));
-                populateAccountFilterMenu();
+                await populateAccountFilterMenu();
                 return;
             }
         }
@@ -147,22 +159,42 @@ async function loadTradingAccounts() {
             }
         }
         
-        // Priority 3: Direct API call (only if no other method worked)
+        // Priority 3: Use TradingAccountsData service (same as header-system)
+        if ((!accounts || accounts.length === 0) && window.TradingAccountsData && typeof window.TradingAccountsData.getAll === 'function') {
+            try {
+                accounts = await window.TradingAccountsData.getAll();
+                if (window.Logger) {
+                    window.Logger.info(`📊 Loaded ${accounts.length} accounts via TradingAccountsData`, { page: 'portfolio-state-page' });
+                }
+            } catch (error) {
+                if (window.Logger) {
+                    window.Logger.warn('⚠️ Failed to load accounts via TradingAccountsData, trying fallback', { page: 'portfolio-state-page', error });
+                }
+            }
+        }
+        
+        // Priority 4: Direct API call (only if no other method worked)
         if (!accounts || accounts.length === 0) {
-            const response = await fetch('/api/trading-accounts/');
-            if (response.ok) {
-                const data = await response.json();
-                accounts = Array.isArray(data?.data) ? data.data : (Array.isArray(data) ? data : []);
-                if (window.Logger) {
-                    window.Logger.info(`📊 Loaded ${accounts.length} accounts via direct API call`, { page: 'portfolio-state-page' });
+            try {
+                const response = await fetch('/api/trading-accounts/');
+                if (response.ok) {
+                    const data = await response.json();
+                    accounts = Array.isArray(data?.data) ? data.data : (Array.isArray(data) ? data : []);
+                    if (window.Logger) {
+                        window.Logger.info(`📊 Loaded ${accounts.length} accounts via direct API call`, { page: 'portfolio-state-page' });
+                    }
+                } else {
+                    const errorMsg = `שגיאה בטעינת חשבונות מסחר: ${response.status} ${response.statusText}`;
+                    if (window.NotificationSystem) {
+                        window.NotificationSystem.showError('שגיאה בטעינת נתונים', errorMsg);
+                    }
+                    if (window.Logger) {
+                        window.Logger.error('❌ Failed to load trading accounts', { page: 'portfolio-state-page', status: response.status, statusText: response.statusText });
+                    }
                 }
-            } else {
-                const errorMsg = `שגיאה בטעינת חשבונות מסחר: ${response.status} ${response.statusText}`;
-                if (window.NotificationSystem) {
-                    window.NotificationSystem.showError('שגיאה בטעינת נתונים', errorMsg);
-                }
+            } catch (error) {
                 if (window.Logger) {
-                    window.Logger.error('❌ Failed to load trading accounts', { page: 'portfolio-state-page', status: response.status, statusText: response.statusText });
+                    window.Logger.error('❌ Error in direct API call for trading accounts', { page: 'portfolio-state-page', error });
                 }
             }
         }
@@ -192,7 +224,7 @@ async function loadTradingAccounts() {
         }
         
         // Populate account filter menu
-        populateAccountFilterMenu();
+        await populateAccountFilterMenu();
     } catch (error) {
         if (window.Logger) {
             window.Logger.error('❌ Error loading trading accounts', { page: 'portfolio-state-page', error });
@@ -201,7 +233,7 @@ async function loadTradingAccounts() {
 }
 
 // Populate account filter menu (extracted for reuse)
-function populateAccountFilterMenu() {
+async function populateAccountFilterMenu() {
     try {
         const accountMenu = document.getElementById('accountFilterMenu');
         if (accountMenu) {
@@ -235,10 +267,80 @@ function populateAccountFilterMenu() {
                 window.Logger.info(`📋 Total items in menu: ${allItems.length} (should be ${allTradingAccounts.length + 1} including "הכול")`, { page: 'portfolio-state-page' });
             }
             
-            // Select all accounts by default (select "הכול")
-            const allItem = accountMenu.querySelector('.account-filter-item[data-value="הכול"]');
-            if (allItem) {
-                allItem.classList.add('selected');
+            // Set default account from preferences (same as other pages)
+            try {
+                let defaultAccountId = null;
+                
+                // Get default account from PreferencesCore (single source of truth)
+                if (window.PreferencesCore && typeof window.PreferencesCore.getPreference === 'function') {
+                    try {
+                        const prefValue = await window.PreferencesCore.getPreference('default_trading_account');
+                        if (prefValue) {
+                            // Handle different value types
+                            let accountId = null;
+                            if (typeof prefValue === 'object' && prefValue !== null) {
+                                accountId = prefValue.id || prefValue.value || null;
+                            } else {
+                                const parsed = parseInt(prefValue);
+                                if (!isNaN(parsed)) {
+                                    accountId = parsed;
+                                }
+                            }
+                            
+                            if (accountId) {
+                                defaultAccountId = accountId;
+                                if (window.Logger) {
+                                    window.Logger.info(`✅ Got default account from preferences: ${defaultAccountId}`, { page: 'portfolio-state-page' });
+                                }
+                            }
+                        }
+                    } catch (e) {
+                        if (window.Logger) {
+                            window.Logger.warn('⚠️ Error getting default account from PreferencesCore', { page: 'portfolio-state-page', error: e });
+                        }
+                    }
+                }
+                
+                // Select default account if found and exists in menu
+                if (defaultAccountId) {
+                    const defaultItem = accountMenu.querySelector(`.account-filter-item[data-value="${defaultAccountId}"]`);
+                    if (defaultItem) {
+                        // Remove selected from "הכול"
+                        const allItem = accountMenu.querySelector('.account-filter-item[data-value="הכול"]');
+                        if (allItem) {
+                            allItem.classList.remove('selected');
+                        }
+                        // Select default account
+                        defaultItem.classList.add('selected');
+                        if (window.Logger) {
+                            window.Logger.info(`✅ Selected default account from preferences (ID: ${defaultAccountId})`, { page: 'portfolio-state-page' });
+                        }
+                    } else {
+                        // Default account not in list, select "הכול"
+                        const allItem = accountMenu.querySelector('.account-filter-item[data-value="הכול"]');
+                        if (allItem) {
+                            allItem.classList.add('selected');
+                        }
+                        if (window.Logger) {
+                            window.Logger.warn(`⚠️ Default account ${defaultAccountId} not found in menu, selecting "הכול"`, { page: 'portfolio-state-page' });
+                        }
+                    }
+                } else {
+                    // No default preference, select "הכול" by default
+                    const allItem = accountMenu.querySelector('.account-filter-item[data-value="הכול"]');
+                    if (allItem) {
+                        allItem.classList.add('selected');
+                    }
+                }
+            } catch (error) {
+                if (window.Logger) {
+                    window.Logger.warn('⚠️ Error setting default account', { page: 'portfolio-state-page', error });
+                }
+                // Fallback: select "הכול"
+                const allItem = accountMenu.querySelector('.account-filter-item[data-value="הכול"]');
+                if (allItem) {
+                    allItem.classList.add('selected');
+                }
             }
             
             // Update filter text
@@ -3524,10 +3626,13 @@ async function waitForScripts() {
             updateDateRangeFilterText();
         }
         
+        // Load trading accounts first - this populates the account filter menu
         await loadTradingAccounts();
+        
         // Restore selected accounts after accounts are loaded
         restoreSelectedAccounts();
         
+        // Load investment types (uses system-wide VALID_INVESTMENT_TYPES for consistency)
         loadInvestmentTypes();
         await loadPortfolioState();
         
@@ -3582,26 +3687,8 @@ async function waitForScripts() {
         handleCustomDateToChange,
         applyCustomDateRange,
         toggleAccountFilterMenu,
-        selectAccountOption
-    };
-
-    // Export functions to window for debugging
-    window.portfolioStatePage = {
-        toggleCardDetails,
-        compareDates,
-        removeComparisonDate,
-        getCSSVariableValue,
-        loadTradingAccounts,
-        loadPortfolioState,
-        applyFilters,
-        clearFilters,
-        toggleDateRangeFilterMenu,
-        selectDateRangeOption,
-        handleCustomDateFromChange,
-        handleCustomDateToChange,
-        applyCustomDateRange,
-        toggleAccountFilterMenu,
-        selectAccountOption
+        selectAccountOption,
+        populateAccountFilterMenu
     };
 
 })();

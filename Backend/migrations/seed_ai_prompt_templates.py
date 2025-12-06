@@ -138,13 +138,23 @@ TECHNICAL_ANALYSIS_TEMPLATE = {
     "name": "Technical Analysis Deep Dive",
     "name_he": "ניתוח טכני מעמיק",
     "description": "Comprehensive technical analysis with chart patterns and indicators",
-    "prompt_text": """Act as an elite technical analyst with decades of experience in chart pattern recognition and technical indicator analysis. You specialize in identifying high-probability trading setups using advanced technical analysis. Analyze the stock using comprehensive technical methods and structure your response according to the framework below.
+    "prompt_text": """Act as an elite technical analyst with decades of experience in chart pattern recognition and technical indicator analysis. You specialize in identifying high-probability trading setups using advanced technical analysis. Analyze the stock using comprehensive technical methods, and when historical trading data is provided, use it to validate technical patterns and improve your analysis accuracy. Structure your response according to the framework below.
 
+Analysis Parameters:
 Stock Ticker / Company Name: {stock_ticker}
 Time Frame: {time_frame}
 Technical Indicators: {technical_indicators}
 Chart Pattern Focus: {chart_pattern_focus}
 Investment Type: {investment_type}
+
+=== HISTORICAL TRADING DATA ===
+{trade_data_structured}
+
+IMPORTANT: If trading data is provided above, use it to:
+- Validate technical patterns with actual entry/exit points
+- Compare predicted support/resistance levels with actual price action
+- Assess how technical indicators aligned with actual trade outcomes
+- Identify which technical setups were most successful historically
 
 Use the following structure to deliver a clear, well-reasoned technical analysis:
 
@@ -238,6 +248,24 @@ Build the report this way:
                 "default_value": None
             },
             {
+                "key": "date_range",
+                "label": "Date Range (Optional)",
+                "type": "text",
+                "required": False,
+                "placeholder": "Start date - End date (e.g., 2024-01-01 - 2024-12-31)",
+                "default_value": None
+            },
+            {
+                "key": "trading_account",
+                "label": "Trading Account",
+                "type": "select",
+                "required": False,
+                "placeholder": "בחר חשבון מסחר...",
+                "default_value": None,
+                "options": [],
+                "integration": "trading_accounts"
+            },
+            {
                 "key": "response_language",
                 "label": "Response Language / שפת המשוב",
                 "type": "select",
@@ -260,47 +288,57 @@ TRADE_PERFORMANCE_TEMPLATE = {
     "name": "Trade Performance & Portfolio Analysis",
     "name_he": "ניתוח ביצועים ופורטפוליו",
     "description": "Analysis of trading performance and portfolio optimization",
-    "prompt_text": """Act as a senior portfolio analyst at a top-tier trading firm. You excel at analyzing trading performance, identifying patterns in execution, and providing actionable recommendations for portfolio optimization. Analyze the trading data and structure your response according to the framework below.
+    "prompt_text": """Act as a senior portfolio analyst at a top-tier trading firm. You excel at analyzing trading performance, identifying patterns in execution, and providing actionable recommendations for portfolio optimization. Analyze the trading data provided below and structure your response according to the framework.
 
+Analysis Parameters:
 Ticker Symbol: {ticker_symbol}
 Date Range: {date_range}
 Analysis Focus: {analysis_focus}
 Investment Type Filter: {investment_type_filter}
-Trading Account: {trading_account}
+
+=== TRADING DATA ===
+{trade_data_structured}
+
+IMPORTANT: Use the actual trading data provided above to calculate real metrics and provide specific insights. The data includes actual executions, positions, and performance.
 
 Use the following structure to deliver a clear, well-reasoned performance analysis:
 
 1. Performance Overview
-- Total P&L for the period
-- Win rate and average win/loss ratio
-- Best and worst performing trades
-- ROI and Sharpe ratio if applicable
+- Total P&L for the period (calculate from actual data)
+- Win rate and average win/loss ratio (based on actual trades)
+- Best and worst performing trades (with specific IDs and details)
+- ROI and Sharpe ratio if applicable (calculated from data)
 
 2. Trade Pattern Analysis
-- Most profitable entry strategies
-- Exit timing effectiveness
-- Holding period analysis
+- Most profitable entry strategies (analyze actual execution patterns)
+- Exit timing effectiveness (analyze actual exit points vs targets)
+- Holding period analysis (calculate from actual trade dates)
 - Correlation with market conditions
 
 3. Risk Assessment
-- Maximum drawdown period
-- Risk per trade analysis
-- Position sizing effectiveness
+- Maximum drawdown period (from actual P&L data)
+- Risk per trade analysis (actual position sizes and stops)
+- Position sizing effectiveness (compare planned vs actual)
 - Volatility impact on performance
 
 4. Execution Quality Review
-- Entry price vs intended price analysis
-- Slippage assessment
-- Timing of entries/exits
+- Entry price vs intended price analysis (compare planned vs actual)
+- Slippage assessment (actual vs planned execution prices)
+- Timing of entries/exits (analyze execution timing)
 - Comparison to market benchmarks
 
-5. Portfolio Optimization Recommendations
-- Suggested position sizing adjustments
-- Entry/exit strategy improvements
-- Risk management enhancements
+5. Trade Plan vs Execution Analysis
+- Compare original trade plan targets vs actual results
+- Analyze condition effectiveness (which conditions triggered)
+- Assess reasons and thesis validity
+
+6. Portfolio Optimization Recommendations
+- Suggested position sizing adjustments (based on actual performance)
+- Entry/exit strategy improvements (learned from actual trades)
+- Risk management enhancements (based on actual drawdowns)
 - Diversification suggestions
 
-6. Action Plan
+7. Action Plan
 - 5-bullet summary of key findings
 - Top 3 actionable recommendations
 - Priority level for each recommendation
@@ -309,7 +347,8 @@ Use the following structure to deliver a clear, well-reasoned performance analys
 Build the report this way:
 - Use markdown
 - Use bullet points where appropriate
-- Include specific numbers and percentages
+- Include specific numbers and percentages from actual data
+- Reference specific trade IDs when relevant
 - Be concise, professional, and insight-driven
 - Do not explain your process just deliver the analysis""",
     "variables_json": json.dumps({
@@ -355,10 +394,53 @@ Build the report this way:
             {
                 "key": "trading_account",
                 "label": "Trading Account",
-                "type": "text",
+                "type": "select",
                 "required": False,
-                "placeholder": "Optional - filter by trading account",
-                "default_value": None
+                "placeholder": "בחר חשבון מסחר...",
+                "default_value": None,
+                "options": [],
+                "integration": "trading_accounts"
+            },
+            {
+                "key": "trade_selection_type",
+                "label": "Trade Selection Type / סוג בחירת טריידים",
+                "type": "select",
+                "required": False,
+                "options": [
+                    {"value": "all", "label": "כל הטריידים"},
+                    {"value": "single", "label": "טרייד בודד"},
+                    {"value": "multiple", "label": "קבוצת טריידים"},
+                    {"value": "filtered", "label": "טריידים מסוננים"}
+                ],
+                "default_value": "all"
+            },
+            {
+                "key": "single_trade_id",
+                "label": "Trade ID (for single trade)",
+                "type": "number",
+                "required": False,
+                "placeholder": "הזן ID של טרייד ספציפי",
+                "default_value": None,
+                "conditional_display": {
+                    "depends_on": "trade_selection_type",
+                    "show_when": "single"
+                }
+            },
+            {
+                "key": "analysis_topics",
+                "label": "Analysis Topics / נושאי ניתוח",
+                "type": "select",
+                "required": False,
+                "placeholder": "בחר נושאי ניתוח...",
+                "default_value": None,
+                "options": [
+                    {"value": "performance", "label": "Performance Review"},
+                    {"value": "risk", "label": "Risk Assessment"},
+                    {"value": "execution", "label": "Execution Quality"},
+                    {"value": "optimization", "label": "Optimization Recommendations"},
+                    {"value": "patterns", "label": "Trade Patterns"},
+                    {"value": "correlation", "label": "Market Correlation"}
+                ]
             },
             {
                 "key": "response_language",
@@ -383,13 +465,24 @@ RISK_CONDITIONS_TEMPLATE = {
     "name": "Risk & Conditions Analysis",
     "name_he": "ניתוח סיכונים ותנאים",
     "description": "Analysis of risk profile and condition effectiveness",
-    "prompt_text": """Act as a risk management specialist with expertise in trading conditions and alert systems. Analyze the risk profile and condition effectiveness for a specific trading strategy. Structure your response according to the framework below.
+    "prompt_text": """Act as a risk management specialist with expertise in trading conditions and alert systems. Analyze the risk profile and condition effectiveness for a specific trading strategy. When trading data is provided below, use it to analyze actual condition performance and compare planned conditions with execution results. Structure your response according to the framework below.
 
+Analysis Parameters:
 Ticker Symbol: {ticker_symbol}
 Trade Plan ID: {trade_plan_id}
 Trade ID: {trade_id}
 Condition Focus: {condition_focus}
 Investment Type: {investment_type}
+
+=== TRADING DATA (TRADE PLANS & CONDITIONS) ===
+{trade_data_structured}
+
+IMPORTANT: If trading data is provided above, use it to:
+- Analyze actual condition trigger rates and timing
+- Compare planned conditions (from Trade Plans) with actual trade outcomes
+- Assess condition effectiveness: which conditions led to profitable trades vs losses
+- Identify false positives/negatives in condition triggers
+- Evaluate risk per condition type based on actual performance
 
 Use the following structure to deliver a clear, well-reasoned risk analysis:
 
@@ -468,6 +561,24 @@ Build the report this way:
                     {"value": "Day Trading", "label": "Day Trading"},
                     {"value": "Scalping", "label": "Scalping"}
                 ],
+                "default_value": None
+            },
+            {
+                "key": "trading_account",
+                "label": "Trading Account",
+                "type": "select",
+                "required": False,
+                "placeholder": "בחר חשבון מסחר...",
+                "default_value": None,
+                "options": [],
+                "integration": "trading_accounts"
+            },
+            {
+                "key": "date_range",
+                "label": "Date Range (Optional)",
+                "type": "text",
+                "required": False,
+                "placeholder": "Start date - End date (e.g., 2024-01-01 - 2024-12-31)",
                 "default_value": None
             },
             {

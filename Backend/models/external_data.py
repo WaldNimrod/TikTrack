@@ -66,6 +66,7 @@ class MarketDataQuote(BaseModel):
     change_pct_day = Column(Float, nullable=True)                   # Daily change percentage
     change_amount_day = Column(Float, nullable=True)                # Daily change amount
     volume = Column(Integer, nullable=True)                         # Trading volume
+    market_cap = Column(Float, nullable=True)                      # Market capitalization in base currency
     
     # Open price data (from market open)
     open_price = Column(Float, nullable=True)                      # Daily open price

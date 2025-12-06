@@ -1200,10 +1200,14 @@ class HeaderSystem {
                         <span class="nav-text">תכנון</span>
                       </a>
                     </li>
-                    <li class="tiktrack-nav-item">
-                      <a href="/trades" class="tiktrack-nav-link" data-page="trades">
+                    <li class="tiktrack-nav-item dropdown">
+                      <a href="/trades" class="tiktrack-nav-link tiktrack-dropdown-toggle" data-page="trades">
                         <span class="nav-text">מעקב</span>
+                        <span class="tiktrack-dropdown-arrow">▼</span>
                       </a>
+                      <ul class="tiktrack-dropdown-menu">
+                        <li><a class="tiktrack-dropdown-item" href="/watch-list">רשימות צפייה</a></li>
+                      </ul>
                     </li>
                     <li class="tiktrack-nav-item dropdown">
                       <a href="/research" class="tiktrack-nav-link tiktrack-dropdown-toggle" data-page="research">
@@ -1388,8 +1392,8 @@ class HeaderSystem {
                   <div class="type-filter-item" data-value="השקעה">
                     <span class="option-text">השקעה</span>
                   </div>
-                  <div class="type-filter-item" data-value="פסיבי">
-                    <span class="option-text">פסיבי</span>
+                  <div class="type-filter-item" data-value="פאסיבי">
+                    <span class="option-text">פאסיבי</span>
                   </div>
                   <button class="filter-close-btn" onclick="window.headerSystem?.filterManager?.closeFilter('typeFilterMenu')" title="סגור">×</button>
                 </div>

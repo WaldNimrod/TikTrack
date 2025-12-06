@@ -1347,7 +1347,8 @@ window.updateTableWithPagination = async function({
     if (table) {
       const isInModal = table.closest('.modal, [class*="modal"]');
       if (isInModal) {
-        console.warn(`⚠️ [updateTableWithPagination] Skipping pagination for table ${tableId} - table is inside a modal`);
+        // Expected behavior - pagination is not needed for tables inside modals
+        // No log needed - this is normal behavior
         // Render full dataset without pagination
         await render(data, {
           skipPagination: true,

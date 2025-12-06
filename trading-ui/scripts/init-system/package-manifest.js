@@ -17,12 +17,17 @@
  * - critical: Whether package is critical
  * - loadOrder: Loading order (1 = first, higher = later)
  * - dependencies: Array of package IDs this package depends on
+ * - loadingStrategy: Script loading strategy ('defer', 'async', or 'sync')
+ *   - 'defer': Load in parallel, execute after HTML parsing (maintains order) - RECOMMENDED for critical scripts
+ *   - 'async': Load in parallel, execute immediately when ready (doesn't maintain order) - For non-critical scripts
+ *   - 'sync': Load and execute synchronously (blocks parsing) - RARE, only for special cases
  * - scripts: Array of script objects
  *   - file: Script file path
  *   - globalCheck: Global variable to check for script availability
  *   - description: Script description
  *   - required: Whether script is required
  *   - loadOrder: Script loading order within package
+ *   - loadingStrategy: Optional - Script-specific loading strategy (if not set, uses package loadingStrategy)
  * 
  * TOTAL PACKAGES: 25 (after removing advanced-notifications)
  * 
@@ -80,12 +85,14 @@
  * 'my-package': {
  *     id: 'my-package',
  *     name: 'My Package',
+ *     loadingStrategy: 'defer', // defer (critical), async (non-critical), or sync (rare)
  *     scripts: [
  *         {
  *             file: 'my-new-script.js',
  *             globalCheck: 'window.MyNewScript', // IMPORTANT: Global for identification
  *             description: 'My new script',
- *             required: true
+ *             required: true,
+ *             loadingStrategy: 'defer' // Optional - if not set, uses package loadingStrategy
  *         }
  *     ]
  * }
@@ -465,6 +472,13 @@ const PACKAGE_MANIFEST = {
         loadOrder: 7
       },
       {
+        file: 'services/unified-progress-manager.js',
+        globalCheck: 'window.UnifiedProgressManager',
+        description: 'Unified progress manager for process tracking',
+        required: true,
+        loadOrder: 5.5
+      },
+      {
         file: 'services/tag-service.js',
         globalCheck: 'window.TagService',
         description: 'Central tag service (tag management and retrieval)',
@@ -817,6 +831,13 @@ const PACKAGE_MANIFEST = {
         loadOrder: 18
       },
       {
+        file: 'modal-configs/watch-lists-config.js',
+        globalCheck: 'window.watchListModalConfig',
+        description: 'Watch lists modal configuration',
+        required: true,
+        loadOrder: 19
+      },
+      {
         file: 'modal-configs/cash-flows-config.js',
         globalCheck: 'window.cashFlowModalConfig',
         description: 'Cash flows modal configuration',
@@ -1062,14 +1083,14 @@ const PACKAGE_MANIFEST = {
     initTime: '~95ms'
   },
 
-  // 6. VALIDATION PACKAGE - Validation
+  // 2.4. VALIDATION PACKAGE - Validation (must load before modules/ui-basic.js)
   validation: {
     id: 'validation',
     name: 'Validation Package',
     description: 'Validation systems',
     version: '1.5.0',
     critical: false,
-    loadOrder: 6,
+    loadOrder: 2.4, // Must load before modules (2.5) because ui-basic.js uses validation functions
     dependencies: ['base'],
     loadingStrategy: 'defer', // Critical package - validation system, has dependencies on base
     scripts: [
@@ -1839,17 +1860,17 @@ const PACKAGE_MANIFEST = {
   'watch-lists': {
     id: 'watch-lists',
     name: 'Watch Lists Package',
-    description: 'Watch lists management system (UI layer only - mockup mode)',
+    description: 'Watch lists management system - full production implementation with API integration',
     version: '1.0.0',
     critical: false,
     loadOrder: 20,
     dependencies: ['base', 'services', 'ui-advanced', 'crud', 'entity-services'],
-    loadingStrategy: 'async', // Non-critical - only for watch lists pages (mockup)
+    loadingStrategy: 'async', // Non-critical - only for watch lists pages
     scripts: [
       {
         file: 'services/watch-lists-data.js',
         globalCheck: 'window.WatchListsDataService',
-        description: 'Watch lists data service (mockup mode)',
+        description: 'Watch lists data service (API + Cache + CRUD)',
         required: true,
         loadOrder: 1
       },
@@ -1868,25 +1889,11 @@ const PACKAGE_MANIFEST = {
         loadOrder: 3
       },
       {
-        file: 'watch-list-modal.js',
-        globalCheck: 'window.WatchListModal',
-        description: 'Watch list modal (Add/Edit)',
-        required: false,
-        loadOrder: 4
-      },
-      {
-        file: 'add-ticker-modal.js',
-        globalCheck: 'window.AddTickerModal',
-        description: 'Add ticker modal',
-        required: false,
-        loadOrder: 5
-      },
-      {
         file: 'flag-quick-action.js',
         globalCheck: 'window.FlagQuickAction',
         description: 'Flag quick action palette',
         required: false,
-        loadOrder: 6
+        loadOrder: 4
       }
     ],
     estimatedSize: '~50KB',

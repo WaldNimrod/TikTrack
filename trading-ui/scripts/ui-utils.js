@@ -135,6 +135,77 @@ async function calculatePercentageFromPrice(currentPrice, targetPrice, side = 'L
 }
 
 /**
+ * Calculate profit/loss value (general function for all interfaces)
+ * @param {number} currentPrice - Current price
+ * @param {number} entryPrice - Entry/average price
+ * @param {number} quantity - Position quantity (can be negative for short)
+ * @returns {number} Profit/loss value (positive for profit, negative for loss)
+ * 
+ * @example
+ * calculateProfitLoss(150.25, 148.00, 100) // Returns: 225 (profit)
+ * calculateProfitLoss(150.25, 152.00, 100) // Returns: -175 (loss)
+ */
+function calculateProfitLoss(currentPrice, entryPrice, quantity) {
+  if (!currentPrice || currentPrice <= 0) {
+    return 0;
+  }
+  if (!entryPrice || entryPrice <= 0) {
+    return 0;
+  }
+  if (!quantity || quantity === 0) {
+    return 0;
+  }
+  
+  // P/L = (currentPrice - entryPrice) * quantity
+  // Works for both long (positive quantity) and short (negative quantity)
+  return (currentPrice - entryPrice) * quantity;
+}
+
+/**
+ * Calculate profit/loss percentage (general function for all interfaces)
+ * @param {number} currentPrice - Current price
+ * @param {number} entryPrice - Entry/average price
+ * @returns {number} Profit/loss percentage (positive for profit, negative for loss)
+ * 
+ * @example
+ * calculateProfitLossPercent(150.25, 148.00) // Returns: 1.52 (1.52% profit)
+ * calculateProfitLossPercent(150.25, 152.00) // Returns: -1.15 (-1.15% loss)
+ */
+function calculateProfitLossPercent(currentPrice, entryPrice) {
+  if (!currentPrice || currentPrice <= 0) {
+    return 0;
+  }
+  if (!entryPrice || entryPrice <= 0) {
+    return 0;
+  }
+  
+  // P/L % = ((currentPrice - entryPrice) / entryPrice) * 100
+  return ((currentPrice - entryPrice) / entryPrice) * 100;
+}
+
+/**
+ * Calculate daily change percentage from open price (general function for all interfaces)
+ * @param {number} currentPrice - Current price
+ * @param {number} openPrice - Opening price (price at start of day)
+ * @returns {number} Daily change percentage (positive for gain, negative for loss)
+ * 
+ * @example
+ * calculateDailyChangePercent(150.25, 148.00) // Returns: 1.52 (1.52% gain)
+ * calculateDailyChangePercent(150.25, 152.00) // Returns: -1.15 (-1.15% loss)
+ */
+function calculateDailyChangePercent(currentPrice, openPrice) {
+  if (!currentPrice || currentPrice <= 0) {
+    return 0;
+  }
+  if (!openPrice || openPrice <= 0) {
+    return 0;
+  }
+  
+  // Daily change % = ((currentPrice - openPrice) / openPrice) * 100
+  return ((currentPrice - openPrice) / openPrice) * 100;
+}
+
+/**
  * Update stop and target prices in form based on current price and percentages
  * @param {string} formId - ID of the form
  * @param {number} currentPrice - Current price of the ticker
@@ -362,6 +433,9 @@ window.showModal = showModal;
 window.calculateStopPrice = calculateStopPrice;
 window.calculateTargetPrice = calculateTargetPrice;
 window.calculatePercentageFromPrice = calculatePercentageFromPrice;
+window.calculateProfitLoss = calculateProfitLoss;
+window.calculateProfitLossPercent = calculateProfitLossPercent;
+window.calculateDailyChangePercent = calculateDailyChangePercent;
 window.updatePricesFromPercentages = updatePricesFromPercentages;
 window.updatePercentagesFromPrices = updatePercentagesFromPrices;
 window.formatPercentage = formatPercentage;
@@ -373,6 +447,10 @@ window.uiUtils = {
   calculateStopPrice,
   calculateTargetPrice,
   calculatePercentageFromPrice,
+  // Financial calculation functions (general - for all interfaces)
+  calculateProfitLoss,
+  calculateProfitLossPercent,
+  calculateDailyChangePercent,
   updatePricesFromPercentages,
   updatePercentagesFromPrices,
   formatPercentage,

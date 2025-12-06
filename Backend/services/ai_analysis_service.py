@@ -126,7 +126,7 @@ class PromptTemplateService:
         return translated_text
     
     @staticmethod
-    def build_prompt(template: AIPromptTemplate, variables: Dict[str, Any]) -> str:
+    def build_prompt(template: AIPromptTemplate, variables: Dict[str, Any], trade_data: Optional[str] = None) -> str:
         """
         Build final prompt from template and variables
         
@@ -136,6 +136,7 @@ class PromptTemplateService:
         Args:
             template: Template object
             variables: User-provided variables
+            trade_data: Formatted trade data string (if available)
             
         Returns:
             Final prompt text
@@ -150,6 +151,10 @@ class PromptTemplateService:
             placeholder = f"{{{key}}}"
             if placeholder in prompt:
                 prompt = prompt.replace(placeholder, str(value))
+        
+        # Add trade data if provided and placeholder exists
+        if trade_data and "{trade_data_structured}" in prompt:
+            prompt = prompt.replace("{trade_data_structured}", trade_data)
         
         # Handle response language
         response_language = variables.get('response_language', 'english')
@@ -316,15 +321,117 @@ class AIAnalysisService:
         else:
             raise ValueError(f"Unsupported provider: {provider}")
         
-        # Build prompt
-        prompt = PromptTemplateService.build_prompt(template, variables)
+        # Determine if this template needs trade data
+        # Templates that benefit from trade data: Portfolio Performance (3), Technical Analysis (2), Risk & Conditions (4)
+        template_needs_trade_data = template_id in [2, 3, 4]
         
-        # Create request record
+        # Get trade data if needed
+        trade_data_str = None
+        if template_needs_trade_data:
+            try:
+                from services.trade_aggregation_service import TradeAggregationService
+                
+                # Extract trade selection and filters from variables
+                # Support both v2.0 structure and legacy v1.0 structure
+                prompt_variables = variables
+                filters = {}
+                trade_selection = {}
+                
+                if isinstance(variables, dict) and variables.get('version') == '2.0':
+                    # New v2.0 structure
+                    prompt_variables = variables.get('prompt_variables', variables)
+                    filters = variables.get('filters', {})
+                    trade_selection = variables.get('trade_selection', {})
+                elif isinstance(variables, dict) and 'prompt_variables' in variables:
+                    # Partial v2.0 structure (without version)
+                    prompt_variables = variables.get('prompt_variables', variables)
+                    filters = variables.get('filters', {})
+                    trade_selection = variables.get('trade_selection', {})
+                
+                # Build aggregation parameters
+                agg_params = {'user_id': user_id}
+                
+                # Add filters
+                if filters.get('trading_account_id'):
+                    agg_params['trading_account_id'] = int(filters['trading_account_id'])
+                
+                if filters.get('trading_method_id'):
+                    agg_params['trading_method_id'] = int(filters['trading_method_id'])
+                
+                # Add trade selection criteria
+                # Handle single trade selection
+                if trade_selection.get('trade_id'):
+                    agg_params['trade_id'] = int(trade_selection['trade_id'])
+                elif trade_selection.get('trade_ids'):
+                    # Multiple trade IDs (for future use)
+                    agg_params['trade_ids'] = trade_selection['trade_ids']
+                
+                criteria = trade_selection.get('criteria', {})
+                
+                if criteria.get('ticker_symbol'):
+                    agg_params['ticker_symbol'] = criteria['ticker_symbol']
+                elif prompt_variables.get('ticker_symbol'):
+                    agg_params['ticker_symbol'] = prompt_variables['ticker_symbol']
+                
+                if criteria.get('investment_type'):
+                    agg_params['investment_type'] = criteria['investment_type']
+                elif prompt_variables.get('investment_type_filter'):
+                    agg_params['investment_type'] = prompt_variables['investment_type_filter']
+                
+                # Date range
+                date_range = criteria.get('date_range') or prompt_variables.get('date_range')
+                if date_range:
+                    if isinstance(date_range, dict):
+                        if date_range.get('start'):
+                            try:
+                                agg_params['date_range_start'] = datetime.fromisoformat(date_range['start'].replace('Z', '+00:00'))
+                            except:
+                                pass
+                        if date_range.get('end'):
+                            try:
+                                agg_params['date_range_end'] = datetime.fromisoformat(date_range['end'].replace('Z', '+00:00'))
+                            except:
+                                pass
+                    elif isinstance(date_range, str) and ' - ' in date_range:
+                        # Parse "2024-01-01 - 2024-12-31" format
+                        parts = date_range.split(' - ')
+                        if len(parts) == 2:
+                            try:
+                                agg_params['date_range_start'] = datetime.fromisoformat(parts[0].strip())
+                                agg_params['date_range_end'] = datetime.fromisoformat(parts[1].strip())
+                            except:
+                                pass
+                
+                # Include closed/cancelled based on template
+                agg_params['include_closed'] = True
+                agg_params['include_cancelled'] = template_id == 4  # Risk & Conditions
+                agg_params['enrich_with_position'] = True
+                agg_params['enrich_with_market_data'] = template_id == 2  # Technical Analysis
+                
+                # Aggregate trades
+                enriched_data = TradeAggregationService.aggregate_trades(db, **agg_params)
+                
+                # Format for AI
+                if enriched_data.get('trades'):
+                    trade_data_str = TradeAggregationService.format_trades_for_ai(enriched_data)
+                    logger.info(f"✅ Added trade data to prompt: {len(enriched_data.get('trades', []))} trades")
+                else:
+                    logger.info("⚠️ No trades found for analysis")
+                    trade_data_str = "No trades found matching the specified criteria."
+                    
+            except Exception as e:
+                logger.error(f"Error fetching trade data: {str(e)}", exc_info=True)
+                trade_data_str = f"Error fetching trade data: {str(e)}"
+        
+        # Build prompt with trade data if available
+        prompt = PromptTemplateService.build_prompt(template, prompt_variables if isinstance(variables, dict) and 'prompt_variables' in variables else variables, trade_data_str)
+        
+        # Create request record - save full variables structure
         request = AIAnalysisRequest(
             user_id=user_id,
             template_id=template_id,
             provider=provider,
-            variables_json=json.dumps(variables),
+            variables_json=json.dumps(variables),  # Save full structure (v2.0 or legacy)
             prompt_text=prompt,
             status='pending'
         )

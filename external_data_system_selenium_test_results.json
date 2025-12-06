@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-12-05T20:42:53.329456",
+  "timestamp": "2025-12-06T20:17:21.266692",
   "base_url": "http://localhost:8080",
   "api_tests": [
     {
@@ -9,7 +9,7 @@
       "category": "status",
       "success": true,
       "status_code": 200,
-      "response_time": 0.1311337947845459,
+      "response_time": 0.05127692222595215,
       "error": null,
       "data_keys": [
         "cache",
@@ -22,7 +22,7 @@
         "timestamp",
         "version"
       ],
-      "timestamp": "2025-12-05T20:42:53.329460"
+      "timestamp": "2025-12-06T20:17:21.266695"
     },
     {
       "endpoint": "ניטור Scheduler",
@@ -31,7 +31,7 @@
       "category": "scheduler",
       "success": true,
       "status_code": 200,
-      "response_time": 0.03082585334777832,
+      "response_time": 0.011048078536987305,
       "error": null,
       "data_keys": [
         "data",
@@ -39,7 +39,7 @@
         "timestamp",
         "version"
       ],
-      "timestamp": "2025-12-05T20:42:53.460712"
+      "timestamp": "2025-12-06T20:17:21.318040"
     },
     {
       "endpoint": "טיקרים עם נתונים חסרים",
@@ -48,7 +48,7 @@
       "category": "status",
       "success": true,
       "status_code": 200,
-      "response_time": 0.2671830654144287,
+      "response_time": 0.06671285629272461,
       "error": null,
       "data_keys": [
         "data",
@@ -56,7 +56,7 @@
         "timestamp",
         "version"
       ],
-      "timestamp": "2025-12-05T20:42:53.491643"
+      "timestamp": "2025-12-06T20:17:21.329132"
     },
     {
       "endpoint": "היסטוריית רענונים",
@@ -65,7 +65,7 @@
       "category": "scheduler",
       "success": true,
       "status_code": 200,
-      "response_time": 0.02266073226928711,
+      "response_time": 0.004693031311035156,
       "error": null,
       "data_keys": [
         "group_refresh_history",
@@ -75,7 +75,7 @@
         "total_entries",
         "version"
       ],
-      "timestamp": "2025-12-05T20:42:53.759191"
+      "timestamp": "2025-12-06T20:17:21.395978"
     }
   ],
   "ui_tests": [
@@ -84,69 +84,95 @@
       "url": "/external-data-dashboard.html",
       "category": "external_data",
       "priority": "high",
-      "success": true,
-      "load_time": 2.103508949279785,
-      "console_errors": [],
-      "console_warnings": [
+      "success": false,
+      "load_time": 1.763312816619873,
+      "console_errors": [
         {
-          "level": "WARNING",
-          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1272:10 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\""
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/button-system-init.js?v=1.0.0 348:19 Uncaught TypeError: this.waitForBootstrap is not a function"
         },
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/modules/core-systems.js?v=1.0.0 349:1 Uncaught SyntaxError: Unexpected token ')'"
+        },
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 906:24 \"[8:17:25 PM] ERROR: external-data-dashboard:init: Cannot create property 'textContent' on string ''\" Object"
+        },
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/button-system-init.js?v=1.0.0 348:19 Uncaught TypeError: this.waitForBootstrap is not a function"
+        }
+      ],
+      "console_warnings": [
         {
           "level": "WARNING",
           "message": "http://localhost:8080/scripts/charts/chart-system.js?v=1.0.0 56:24 \"⚠️ ChartLoader not available\""
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 904:24 \"[8:42:58 PM] WARN: [ConditionsModalController] Modal element not found\" Object"
+          "message": "http://localhost:8080/scripts/charts/chart-system.js?v=1.0.0 61:24 \"⚠️ ChartTheme not available\""
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1272:10 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\""
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[8:17:25 PM] WARN: [ConditionsModalController] Modal element not found and could not be created\" Object"
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 904:24 \"[8:42:58 PM] WARN: [ConditionsModalController] Modal element not found\" Object"
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[8:17:25 PM] WARN: external-data-dashboard:update-current-settings:no-providers\" Object"
+        },
+        {
+          "level": "WARNING",
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[8:17:26 PM] WARN: ⚠️ Dashboard section not found\" Object"
         }
       ],
       "ui_elements": {
-        "scheduler_section": false,
-        "scheduler_monitoring_section": false,
-        "missing_data_section": false,
-        "ticker_load_section": false,
+        "scheduler_section": true,
+        "scheduler_monitoring_section": true,
+        "missing_data_section": true,
+        "ticker_load_section": true,
         "refresh_full_button": false,
-        "actions_section": false,
-        "scheduler_status_content": false,
-        "scheduler_monitoring_content": false,
-        "total_buttons": 10,
+        "actions_section": true,
+        "scheduler_status_content": true,
+        "scheduler_monitoring_content": true,
+        "total_buttons": 180,
         "refresh_status_button": false,
         "refresh_providers_button": false
       },
       "buttons_working": [],
       "buttons_broken": [],
       "api_calls": [],
-      "timestamp": "2025-12-05T20:42:56.510912"
+      "timestamp": "2025-12-06T20:17:23.967183"
     },
     {
       "page": "דשבורד טיקר",
       "url": "/ticker-dashboard.html",
       "category": "external_data",
       "priority": "high",
-      "success": true,
-      "load_time": 0.9123108386993408,
-      "console_errors": [],
+      "success": false,
+      "load_time": 0.3646550178527832,
+      "console_errors": [
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/modules/core-systems.js?v=1.0.0 341:1 Uncaught SyntaxError: Unexpected token ')'"
+        },
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/button-system-init.js?v=1.0.0 348:19 Uncaught TypeError: this.waitForBootstrap is not a function"
+        },
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 906:24 \"[8:17:29 PM] ERROR: ❌ No ticker ID found in URL\" Object"
+        },
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 906:24 \"[8:17:29 PM] ERROR: ❌ Error initializing ticker dashboard\" Object"
+        }
+      ],
       "console_warnings": [
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1272:10 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\""
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1272:10 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\""
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 904:24 \"[8:43:02 PM] WARN: [ConditionsModalController] Modal element not found\" Object"
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[8:17:29 PM] WARN: ⚠️ No ticker ID or symbol found in URL\" Object"
         }
       ],
       "ui_elements": {
@@ -157,53 +183,50 @@
       "buttons_working": [],
       "buttons_broken": [],
       "api_calls": [],
-      "timestamp": "2025-12-05T20:43:01.677124"
+      "timestamp": "2025-12-06T20:17:28.778951"
     },
     {
       "page": "ניהול מערכת - נתונים חיצוניים",
       "url": "/system-management.html",
       "category": "external_data",
       "priority": "medium",
-      "success": true,
-      "load_time": 0.5144720077514648,
-      "console_errors": [],
+      "success": false,
+      "load_time": 0.37512898445129395,
+      "console_errors": [
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/button-system-init.js?v=1.0.0 348:19 Uncaught TypeError: this.waitForBootstrap is not a function"
+        },
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/modules/core-systems.js?v=1.0.0 341:1 Uncaught SyntaxError: Unexpected token ')'"
+        },
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/button-system-init.js?v=1.0.0 348:19 Uncaught TypeError: this.waitForBootstrap is not a function"
+        }
+      ],
       "console_warnings": [
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1272:10 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\""
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[8:17:32 PM] WARN: [ConditionsModalController] Modal element not found and could not be created\" Object"
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/auth-guard.js?v=1.0.0 76:12 \"Auth guard: checkAuthentication function not found. Loading auth.js...\""
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 904:24 \"[8:43:06 PM] WARN: [ConditionsModalController] Modal element not found\" Object"
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1272:10 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\""
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 904:24 \"[8:43:06 PM] WARN: [ConditionsModalController] Modal element not found\" Object"
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/login.html - [DOM] Found 2 elements with non-unique id #tradeOpenConditionsButton: (More info: https://goo.gl/9p2vKq) %o %o"
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[8:17:33 PM] WARN: ⚠️ Dashboard section not found\" Object"
         }
       ],
       "ui_elements": {},
       "buttons_working": [],
       "buttons_broken": [],
       "api_calls": [],
-      "timestamp": "2025-12-05T20:43:05.602973"
+      "timestamp": "2025-12-06T20:17:32.181014"
     }
   ],
   "process_tests": [
     {
       "test_name": "תהליך טעינת נתונים מלאה",
-      "success": false,
+      "success": true,
       "steps": [
         {
           "step": "1. טעינת עמוד ניהול",
@@ -211,17 +234,17 @@
         },
         {
           "step": "2. בדיקת תצוגת מצב Scheduler",
-          "success": false,
-          "scheduler_section_found": false,
-          "scheduler_content_found": false,
-          "scheduler_monitoring_found": false,
-          "scheduler_any_found": false,
-          "has_dashboard": false
+          "success": true,
+          "scheduler_section_found": true,
+          "scheduler_content_found": true,
+          "scheduler_monitoring_found": true,
+          "scheduler_any_found": true,
+          "has_dashboard": true
         },
         {
           "step": "3. בדיקת תצוגת טיקרים עם נתונים חסרים",
           "success": true,
-          "elements_found": 0,
+          "elements_found": 3,
           "api_works": true
         },
         {
@@ -231,7 +254,7 @@
         }
       ],
       "errors": [],
-      "timestamp": "2025-12-05T20:43:09.131600"
+      "timestamp": "2025-12-06T20:17:35.559814"
     },
     {
       "test_name": "בדיקת בקרות Scheduler",
@@ -239,30 +262,30 @@
       "steps": [
         {
           "step": "1. בדיקת תצוגת Scheduler וניטור",
-          "success": false,
-          "scheduler_section_found": false,
-          "scheduler_monitoring_found": false,
-          "scheduler_status_content_found": false,
-          "scheduler_monitoring_content_found": false,
-          "scheduler_any_found": false,
-          "action_buttons_found": 0
+          "success": true,
+          "scheduler_section_found": true,
+          "scheduler_monitoring_found": true,
+          "scheduler_status_content_found": true,
+          "scheduler_monitoring_content_found": true,
+          "scheduler_any_found": true,
+          "action_buttons_found": 2
         },
         {
           "step": "2. בדיקת API להפעלת Scheduler",
-          "success": true,
-          "status_code": 200
+          "success": false,
+          "status_code": 401
         }
       ],
       "errors": [],
-      "timestamp": "2025-12-05T20:43:18.587443"
+      "timestamp": "2025-12-06T20:17:44.222128"
     }
   ],
   "summary": {
     "api_successful": 4,
     "api_total": 4,
-    "ui_successful": 3,
+    "ui_successful": 0,
     "ui_total": 3,
-    "process_successful": 0,
+    "process_successful": 1,
     "process_total": 2
   }
 }

@@ -360,37 +360,67 @@ class UnifiedAppInitializer {
 
 ## 🔄 זרימת טעינה מפורטת
 
-### תהליך טעינה מלא
+### תהליך טעינה מלא (עם async/defer)
 
 ```
 1. HTML נטען
    ↓
 2. כל הסקריפטים נטענים סטטית (לפי סדר ב-HTML)
+   - סקריפטים עם defer: נטענים במקביל, רצים אחרי HTML parsing (שומרים על סדר)
+   - סקריפטים עם async: נטענים במקביל, רצים מיד כשהוא מוכן (לא שומרים על סדר)
+   - סקריפטים ללא attributes: נטענים ובוצעים סינכרונית (חוסמים)
    ↓
-3. DOMContentLoaded event
+3. HTML parsing מסתיים
    ↓
-4. UnifiedAppInitializer.initialize() נקרא
+4. DOMContentLoaded event
    ↓
-5. Stage 1: Detect and Analyze
+5. סקריפטים עם defer רצים (לפי סדר ב-HTML)
+   ↓
+6. UnifiedAppInitializer.initialize() נקרא
+   ↓
+7. Stage 1: Detect and Analyze
    - זיהוי עמוד
    - ניתוח מערכות זמינות
    ↓
-6. Stage 2: Prepare Configuration
+8. Stage 2: Prepare Configuration
    - טעינת page config
    - העתקת packages array
    - אימות תלויות
    ↓
-7. Stage 3: Execute Initialization
+9. Stage 3: Execute Initialization
    - Cache System initialization
    - Preferences initialization (אם נדרש)
    - Application initialization
    - Custom initializers
    ↓
-8. Stage 4: Finalize
+10. Stage 4: Finalize
    - State restoration
    - Success notifications
    ↓
-9. עמוד מוכן לשימוש
+11. עמוד מוכן לשימוש
+```
+
+### זרימת טעינה עם Bundles (Production Mode)
+
+```
+1. HTML נטען
+   ↓
+2. Bundles נטענים (לפי סדר ב-HTML)
+   - base.bundle.js (defer) - כל הסקריפטים של base package
+   - services.bundle.js (defer) - כל הסקריפטים של services package
+   - modules.bundle.js (defer) - כל הסקריפטים של modules package
+   - ... (כל package כ-bundle אחד)
+   ↓
+3. HTML parsing מסתיים
+   ↓
+4. DOMContentLoaded event
+   ↓
+5. Bundles רצים (לפי סדר ב-HTML)
+   - כל bundle מכיל את כל הסקריפטים של ה-package בסדר הנכון
+   ↓
+6. UnifiedAppInitializer.initialize() נקרא
+   ↓
+7-11. (אותו תהליך כמו Development Mode)
 ```
 
 ### סדר טעינת Packages
@@ -476,6 +506,315 @@ scripts: [
 1. **חבילה עם loadOrder נמוך יותר נטענת קודם**
 2. **תלויות נטענות לפני החבילה התלויה**
 3. **scripts בתוך חבילה נטענים לפי loadOrder שלהם**
+
+---
+
+## ⚡ Script Loading Strategies (async/defer)
+
+### סקירה כללית
+
+כדי לשפר ביצועים, המערכת משתמשת ב-**loading strategies** (אסטרטגיות טעינה) באמצעות `async` ו-`defer` attributes. זה מאפשר טעינה מקבילית של סקריפטים תוך שמירה על סדר ביצוע נכון.
+
+### Loading Strategy Attributes
+
+#### 1. `defer` - טעינה מושהית (מומלץ לסקריפטים קריטיים)
+
+**שימוש:**
+- סקריפטים קריטיים עם תלויות
+- סקריפטים שצריכים להיטען בסדר מסוים
+- כל ה-packages הקריטיים (base, services, modules, ui-advanced, crud, preferences)
+
+**התנהגות:**
+- הסקריפט נטען במקביל ל-parsing של HTML
+- הסקריפט רץ **אחרי** שה-HTML נטען במלואו
+- **סדר הביצוע נשמר** - סקריפטים עם `defer` רצים לפי הסדר שמופיעים ב-HTML
+
+**דוגמה:**
+```html
+<script src="scripts/auth.js?v=1.0.0" defer></script>
+<script src="scripts/notification-system.js?v=1.0.0" defer></script>
+<!-- notification-system.js יטען במקביל, אבל ירוץ אחרי auth.js -->
+```
+
+#### 2. `async` - טעינה אסינכרונית (מומלץ לסקריפטים לא קריטיים)
+
+**שימוש:**
+- סקריפטים לא קריטיים
+- סקריפטים ללא תלויות
+- dev-tools, monitoring scripts
+
+**התנהגות:**
+- הסקריפט נטען במקביל ל-parsing של HTML
+- הסקריפט רץ **מיד כשהוא מוכן** (לא מחכה ל-HTML)
+- **סדר הביצוע לא מובטח** - הסקריפט הראשון שמוכן ירוץ ראשון
+
+**דוגמה:**
+```html
+<script src="scripts/dev-tools.js?v=1.0.0" async></script>
+<!-- רץ מיד כשהוא מוכן, לא מחכה לסקריפטים אחרים -->
+```
+
+#### 3. `sync` - טעינה סינכרונית (נדיר מאוד)
+
+**שימוש:**
+- רק במקרים מיוחדים מאוד
+- סקריפטים שצריכים לחסום את הטעינה
+
+**התנהגות:**
+- הסקריפט נטען ובוצע **לפני** המשך parsing של HTML
+- חוסם את הטעינה - לא מומלץ
+
+**הערה:** כמעט ולא משתמשים ב-sync במערכת.
+
+### הגדרת Loading Strategy
+
+#### ברמת Package
+
+כל package ב-`package-manifest.js` יכול להגדיר `loadingStrategy`:
+
+```javascript
+'base': {
+  id: 'base',
+  name: 'Base Package',
+  loadingStrategy: 'defer', // defer, async, או sync
+  scripts: [...]
+}
+```
+
+#### ברמת Script
+
+כל script בתוך package יכול להגדיר `loadingStrategy` (אופציונלי):
+
+```javascript
+scripts: [
+  {
+    file: 'auth.js',
+    loadingStrategy: 'defer', // אם לא מוגדר, משתמש ב-package loadingStrategy
+    required: true
+  }
+]
+```
+
+### כללי סיווג
+
+#### Packages עם `defer` (קריטיים):
+- `base` - חובה לכל עמוד
+- `services` - שירותים בסיסיים
+- `modules` - מודולים ומערכות
+- `ui-advanced` - ממשק מתקדם
+- `crud` - פעולות CRUD
+- `preferences` - מערכת העדפות
+- `validation` - אימות
+- `conditions` - תנאים
+- `init-system` - מערכת איתחול
+
+#### Packages עם `async` (לא קריטיים):
+- `dev-tools` - כלי פיתוח
+- `monitoring` - ניטור (חלק מ-init-system)
+
+### יצירת Script Loading Code
+
+המערכת משתמשת ב-`generate-script-loading-code.js` ליצירת קוד טעינה אוטומטי:
+
+```bash
+# Development mode (קבצים מקוריים)
+node trading-ui/scripts/generate-script-loading-code.js index
+
+# Production mode (bundles)
+node trading-ui/scripts/generate-script-loading-code.js index --mode=production --use-bundles
+```
+
+הכלי:
+1. קורא את `package-manifest.js` ו-`page-initialization-configs.js`
+2. ממיין packages לפי `loadOrder`
+3. יוצר תגי `<script>` עם `loadingStrategy` הנכון
+4. מוסיף הערות ותיעוד
+
+---
+
+## 📦 Bundling System
+
+### סקירה כללית
+
+מערכת Bundling מאפשרת איחוד מספר קבצי JavaScript לקבצים גדולים יותר (bundles), מה שמפחית את מספר בקשות הרשת ומשפר ביצועים.
+
+### Development vs Production Modes
+
+#### Development Mode (ברירת מחדל)
+
+**שימוש:**
+- פיתוח יומיומי
+- דיבוג
+- בדיקות
+
+**תכונות:**
+- כל הסקריפטים נטענים בנפרד (קבצים מקוריים)
+- קל לדיבוג - כל קובץ נפרד
+- Source maps זמינים
+- שינויים בקוד נראים מיד
+
+**דוגמה:**
+```html
+<script src="scripts/auth.js?v=1.0.0" defer></script>
+<script src="scripts/notification-system.js?v=1.0.0" defer></script>
+<script src="scripts/logger-service.js?v=1.0.0" defer></script>
+<!-- כל קובץ נטען בנפרד -->
+```
+
+#### Production Mode (עם Bundles)
+
+**שימוש:**
+- פרודקשן
+- ביצועים מיטביים
+
+**תכונות:**
+- כל הסקריפטים של package מאוחדים ל-bundle אחד
+- הפחתה דרמטית במספר בקשות (מ-246 ל-30-50)
+- Minification ו-optimization
+- Source maps זמינים לדיבוג
+
+**דוגמה:**
+```html
+<script src="scripts/bundles/base.bundle.js?v=1.0.0" defer></script>
+<script src="scripts/bundles/services.bundle.js?v=1.0.0" defer></script>
+<!-- כל package נטען כ-bundle אחד -->
+```
+
+### Build Process
+
+#### בניית Bundles
+
+```bash
+# בניית כל ה-bundles
+npm run build:bundles
+
+# בניית bundle ספציפי
+npm run build:bundles -- --package=base
+```
+
+**תהליך:**
+1. קריאת `package-manifest.js`
+2. זיהוי כל הסקריפטים בכל package
+3. איחוד הסקריפטים ל-bundle אחד עם `esbuild`
+4. Minification ו-optimization
+5. יצירת source map
+6. שמירה ב-`trading-ui/scripts/bundles/`
+
+#### בדיקת Bundles
+
+```bash
+# בדיקת כל ה-bundles
+npm run test:bundles
+
+# בדיקת bundle ספציפי
+npm run test:bundles -- --package=base
+```
+
+**בדיקות:**
+- וידוא שה-bundle קיים
+- בדיקת גודל (צריך להיות קטן יותר מהמקורי)
+- וידוא שה-source map קיים
+- בדיקת תקינות
+
+### מבנה Bundle
+
+כל bundle מכיל:
+- **כל הסקריפטים של ה-package** בסדר הנכון (לפי `loadOrder`)
+- **Minification** - קוד מקוצר
+- **Source map** - לדיבוג
+- **IIFE wrapper** - בידוד scope
+
+**דוגמה:**
+```javascript
+// base.bundle.js
+(function() {
+  'use strict';
+  // auth.js content
+  // notification-system.js content
+  // logger-service.js content
+  // ... כל הסקריפטים של base package
+})();
+```
+
+### עדכון עמודים ל-Production Mode
+
+#### תהליך עדכון
+
+1. **גיבוי קובץ HTML המקורי:**
+   ```bash
+   cp trading-ui/index.html trading-ui/index.html.backup
+   ```
+
+2. **יצירת HTML עם bundles:**
+   ```bash
+   node trading-ui/scripts/generate-script-loading-code.js index --mode=production --use-bundles > temp_index.html
+   ```
+
+3. **החלפת הקובץ:**
+   ```bash
+   mv temp_index.html trading-ui/index.html
+   ```
+
+4. **בדיקות:**
+   - טעינת העמוד
+   - בדיקת console errors
+   - בדיקת פונקציונליות
+
+#### Fallback Mechanism
+
+אם bundle לא קיים, המערכת נופלת חזרה לקבצים המקוריים:
+
+```javascript
+// generate-script-loading-code.js
+if (useBundles && fs.existsSync(bundlePath)) {
+  // Use bundle
+} else {
+  // Fallback to individual files
+}
+```
+
+### יתרונות Bundling
+
+1. **הפחתת בקשות רשת:**
+   - לפני: 246 בקשות
+   - אחרי: 30-50 בקשות
+   - שיפור: 80-85% הפחתה
+
+2. **שיפור זמן טעינה:**
+   - לפני: 10.05s
+   - אחרי: 2.0-2.5s
+   - שיפור: 75-80% הפחתה
+
+3. **Minification:**
+   - קוד מקוצר
+   - גודל קטן יותר
+   - טעינה מהירה יותר
+
+### Troubleshooting
+
+#### Bundle לא נטען
+
+**סיבות אפשריות:**
+1. Bundle לא נבנה - הרץ `npm run build:bundles`
+2. Bundle לא קיים - בדוק ב-`trading-ui/scripts/bundles/`
+3. שגיאת build - בדוק את ה-logs
+
+**פתרון:**
+- המערכת נופלת אוטומטית לקבצים המקוריים
+- בדוק את ה-console לשגיאות
+- הרץ `npm run test:bundles` לבדיקה
+
+#### שגיאות JavaScript אחרי Bundling
+
+**סיבות אפשריות:**
+1. בעיית סדר טעינה
+2. בעיית scope
+3. בעיית dependencies
+
+**פתרון:**
+- בדוק את ה-source map
+- בדוק את ה-console לשגיאות
+- נסה development mode לבדיקה
 
 ---
 

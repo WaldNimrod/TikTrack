@@ -124,6 +124,18 @@
             // Restore page state (view mode, active list, sections)
             await restorePageState();
 
+            // Ensure select maintains styling after any change (CSS variables handle color automatically)
+            const selectEl = document.getElementById('activeListSelect');
+            if (selectEl) {
+                // CSS variables handle color automatically - just ensure fontWeight is maintained
+                selectEl.style.fontWeight = '600';
+                
+                // Add event listener to maintain fontWeight after change
+                selectEl.addEventListener('change', function() {
+                    this.style.fontWeight = '600';
+                });
+            }
+
             // Initialize drag and drop (mockup)
             if (window.WatchListsUIService?.initializeDragAndDrop) {
                 window.WatchListsUIService.initializeDragAndDrop();
@@ -140,6 +152,11 @@
             // Trigger icon initialization after page is fully loaded
             if (typeof window.initializeIcons === 'function') {
                 setTimeout(() => window.initializeIcons(), 100);
+            }
+
+            // Buttons are already in HTML, just initialize button system
+            if (typeof window.initializeButtons === 'function') {
+                setTimeout(() => window.initializeButtons(), 200);
             }
 
             window.Logger?.info?.('✅ Watch Lists Page initialized successfully', PAGE_LOG_CONTEXT);
@@ -385,6 +402,9 @@
                     break;
                 }
             }
+            // Ensure dark color is maintained after value change (using CSS variables)
+            // CSS already handles this via variables, but we ensure fontWeight is maintained
+            selectEl.style.fontWeight = '600';
         }
     }
 
@@ -644,6 +664,47 @@
      * @param {number} listId - List ID
      * @async
      */
+    /**
+     * Delete current active list with confirmation
+     * @async
+     */
+    async function deleteCurrentList() {
+        const currentListId = getCurrentListId();
+        if (!currentListId) {
+            if (window.NotificationSystem) {
+                window.NotificationSystem.showWarning('לא נבחרה רשימה למחיקה', 'system');
+            }
+            return;
+        }
+
+        // Get list name for confirmation message
+        const currentList = watchListsData.find(list => list.id === currentListId);
+        const listName = currentList?.name || `רשימה #${currentListId}`;
+
+        // Show confirmation dialog
+        const confirmed = await new Promise((resolve) => {
+            if (typeof window.showConfirmationDialog === 'function') {
+                window.showConfirmationDialog(
+                    'מחיקת רשימת צפייה',
+                    `האם אתה בטוח שברצונך למחוק את הרשימה "${listName}"?\n\nפעולה זו תמחק את הרשימה וכל הפריטים שבה לצמיתות.`,
+                    () => resolve(true),
+                    () => resolve(false),
+                    'danger'
+                );
+            } else {
+                resolve(window.confirm(`האם אתה בטוח שברצונך למחוק את הרשימה "${listName}"?`));
+            }
+        });
+
+        if (!confirmed) {
+            window.Logger?.info?.('🗑️ Delete cancelled by user', { ...PAGE_LOG_CONTEXT, listId: currentListId });
+            return;
+        }
+
+        // Delete the list
+        await deleteList(currentListId);
+    }
+
     async function deleteList(listId) {
         try {
             // Check linked items before deletion
@@ -1036,6 +1097,7 @@
         // CRUD operations
         saveWatchList,
         deleteList,
+        deleteCurrentList,
         selectList,
         addTickerToList,
         removeItem,

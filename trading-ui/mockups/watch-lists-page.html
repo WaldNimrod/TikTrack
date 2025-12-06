@@ -138,11 +138,14 @@
                                     </div>
                                     <div class="table-actions">
                                         <button type="button"
+                                                    class="btn btn"
                                                 data-button-type="ADD"
-                                                data-style="negative"
                                                 data-icon="➕"
                                                 data-text="רשימה חדשה"
-                                                data-onclick="window.WatchListsPage?.openAddListModal()">
+                                                    data-onclick="window.WatchListsPage?.openAddListModal()"
+                                                    data-bs-toggle="tooltip"
+                                                    data-bs-placement="top"
+                                                    title="יצירת רשימת צפייה חדשה">
                                         </button>
                                         <button type="button"
                                                 data-button-type="TOGGLE"
@@ -192,7 +195,9 @@
                                                     <th class="col-tickers">
                                                         <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(3, window.WatchListsPage?.watchListsData || [], 'watch_lists', window.WatchListsPage?.updateWatchListsTable); }" style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">טיקרים <span class="sort-icon">↕</span></button>
                                                     </th>
-                                                    <th class="col-actions actions-cell actions-3-items"></th>
+                                                    <th class="col-actions actions-cell">
+                                                        <span class="actions-header-icon">⋮</span>
+                                                    </th>
                                                 </tr>
                                             </thead>
                                             <tbody id="watchListsTableBody">
@@ -209,29 +214,30 @@
                                                     </td>
                                                     <td class="col-tickers">
                                                             <span class="icon-placeholder icon" data-icon="list" data-size="14" data-alt="items" aria-label="items"></span>
-                                                        15 טיקרים
+                                                            15 טיקרים
                                                     </td>
-                                                    <td class="col-actions">
-                                                        <div class="btn-group" role="group">
+                                                    <td class="col-actions actions-cell">
+                                                        <div class="d-flex gap-1 justify-content-center align-items-center" style="flex-wrap: nowrap;">
                                                             <button type="button"
-                                                                    class="btn btn-sm btn-primary"
+                                                                    data-button-type="VIEW"
+                                                                    data-variant="small"
+                                                                    data-text=""
                                                                     data-onclick="window.WatchListsPage?.selectList(1)"
                                                                     title="פתח רשימה">
-                                                                פתח
                                                             </button>
                                                         <button type="button"
                                                                 data-button-type="EDIT"
                                                                 data-variant="small"
                                                                     data-text=""
                                                                 data-onclick="window.WatchListsPage?.editList(1)"
-                                                                title="עריכה">
+                                                                    title="ערוך רשימה">
                                                         </button>
                                                         <button type="button"
                                                                 data-button-type="DELETE"
                                                                 data-variant="small"
                                                                     data-text=""
                                                                 data-onclick="window.WatchListsPage?.deleteList(1)"
-                                                                title="מחיקה">
+                                                                    title="מחק רשימה">
                                                         </button>
                                                     </div>
                                                     </td>
@@ -249,27 +255,30 @@
                                                     </td>
                                                     <td class="col-tickers">
                                                         <span class="icon-placeholder icon" data-icon="items" data-size="14" data-alt="items" aria-label="items"></span>
-                                                        12 טיקרים
+                                                            12 טיקרים
                                                     </td>
-                                                    <td class="col-actions">
-                                                        <div class="btn-group" role="group">
+                                                    <td class="col-actions actions-cell">
+                                                        <div class="d-flex gap-1 justify-content-center align-items-center" style="flex-wrap: nowrap;">
                                                     <button type="button"
-                                                                    class="btn btn-sm btn-primary"
+                                                                    data-button-type="VIEW"
+                                                                    data-variant="small"
+                                                                    data-text=""
                                                                     data-onclick="window.WatchListsPage?.selectList(2)"
                                                                     title="פתח רשימה">
-                                                                פתח
                                                     </button>
                                                         <button type="button"
                                                                 data-button-type="EDIT"
                                                                 data-variant="small"
+                                                                    data-text=""
                                                                 data-onclick="window.WatchListsPage?.editList(2)"
-                                                                title="עריכה">
+                                                                    title="ערוך רשימה">
                                                         </button>
                                                         <button type="button"
                                                                 data-button-type="DELETE"
                                                                 data-variant="small"
+                                                                    data-text=""
                                                                 data-onclick="window.WatchListsPage?.deleteList(2)"
-                                                                title="מחיקה">
+                                                                    title="מחק רשימה">
                                                         </button>
                                                     </div>
                                                     </td>
@@ -287,27 +296,30 @@
                                                     </td>
                                                     <td class="col-tickers">
                                                             <span class="icon-placeholder icon" data-icon="list" data-size="14" data-alt="items" aria-label="items"></span>
-                                                        15 טיקרים
+                                                            15 טיקרים
                                                     </td>
-                                                    <td class="col-actions">
-                                                        <div class="btn-group" role="group">
+                                                    <td class="col-actions actions-cell">
+                                                        <div class="d-flex gap-1 justify-content-center align-items-center" style="flex-wrap: nowrap;">
                                                     <button type="button"
-                                                                    class="btn btn-sm btn-primary"
+                                                                    data-button-type="VIEW"
+                                                                    data-variant="small"
+                                                                    data-text=""
                                                                     data-onclick="window.WatchListsPage?.selectList(3)"
                                                                     title="פתח רשימה">
-                                                                פתח
                                                     </button>
                                                         <button type="button"
                                                                 data-button-type="EDIT"
                                                                 data-variant="small"
+                                                                    data-text=""
                                                                 data-onclick="window.WatchListsPage?.editList(3)"
-                                                                title="עריכה">
+                                                                    title="ערוך רשימה">
                                                         </button>
                                                         <button type="button"
                                                                 data-button-type="DELETE"
                                                                 data-variant="small"
+                                                                    data-text=""
                                                                 data-onclick="window.WatchListsPage?.deleteList(3)"
-                                                                title="מחיקה">
+                                                                    title="מחק רשימה">
                                                         </button>
                                                     </div>
                                                     </td>
@@ -323,21 +335,42 @@
                                 <div class="section-header">
                                     <div class="table-title">
                                         <span class="icon-placeholder icon" data-icon="table" data-size="16" data-alt="table" aria-label="table"></span>
-                                        <select id="activeListSelect" 
-                                                class="form-select form-select-sm d-inline-block" 
-                                                style="width: auto; min-width: 200px; margin-inline-start: 0.5rem;"
-                                                data-onchange="window.WatchListsPage?.switchList(this.value)"
-                                                title="בחר רשימה">
-                                            <option value="1" selected>מניות טכנולוגיה</option>
-                                            <option value="2">אנרגיה</option>
-                                            <option value="3">קריפטו</option>
-                                        </select>
+                                        <div style="display: inline-flex; align-items: center; gap: 0.5rem; margin-inline-start: 0.5rem;">
+                                            <select id="activeListSelect" 
+                                                    class="form-select form-select-title d-inline-block" 
+                                                    style="width: auto; min-width: 200px;"
+                                                    data-onchange="window.WatchListsPage?.switchList(this.value)"
+                                                    title="בחר רשימה">
+                                                <option value="1" selected>מניות טכנולוגיה</option>
+                                                <option value="2">אנרגיה</option>
+                                                <option value="3">קריפטו</option>
+                                            </select>
+                                            <button type="button"
+                                                        class="btn btn"
+                                                    data-button-type="ADD"
+                                                    data-variant="small"
+                                                    data-text=""
+                                                        data-onclick="window.WatchListsPage?.openAddListModal()"
+                                                        data-bs-toggle="tooltip"
+                                                        data-bs-placement="top"
+                                                        title="יצירת רשימת צפייה חדשה">
+                                            </button>
+                                            <button type="button"
+                                                        class="btn btn"
+                                                    data-button-type="DELETE"
+                                                    data-variant="small"
+                                                    data-text=""
+                                                        data-onclick="window.WatchListsPage?.deleteCurrentList()"
+                                                        data-bs-toggle="tooltip"
+                                                        data-bs-placement="top"
+                                                        title="מחיקת הרשימה הנוכחית">
+                                            </button>
+                                        </div>
                                     </div>
                                     <div class="table-actions">
-                                        <!-- View Mode Toggle -->
-                                        <div class="btn-group" role="group">
+                                        <div class="filter-buttons-container button-row">
                                             <button type="button"
-                                                    class="btn btn-sm btn-outline-primary btn-view-mode active"
+                                                    class="btn btn btn-sm btn-view-mode active filter-icon-btn"
                                                     data-view-mode="table"
                                                     data-onclick="window.WatchListsPage?.setViewMode('table')"
                                                     title="תצוגת טבלה"
@@ -346,7 +379,7 @@
                                                 <i class="bi bi-table"></i>
                                             </button>
                                             <button type="button"
-                                                    class="btn btn-sm btn-outline-primary btn-view-mode"
+                                                    class="btn btn btn-sm btn-view-mode filter-icon-btn"
                                                     data-view-mode="cards"
                                                     data-onclick="window.WatchListsPage?.setViewMode('cards')"
                                                     title="תצוגת כרטיסים"
@@ -355,7 +388,7 @@
                                                 <i class="bi bi-grid-3x3"></i>
                                             </button>
                                             <button type="button"
-                                                    class="btn btn-sm btn-outline-primary btn-view-mode"
+                                                    class="btn btn btn-sm btn-view-mode filter-icon-btn"
                                                     data-view-mode="compact"
                                                     data-onclick="window.WatchListsPage?.setViewMode('compact')"
                                                     title="תצוגה קומפקטית"
@@ -363,25 +396,28 @@
                                                     data-bs-placement="top">
                                                 <i class="bi bi-list-ul"></i>
                                             </button>
-                                        </div>
+                                            <div class="action-separator"></div>
                                         <button type="button"
+                                                    class="btn btn"
                                                 data-button-type="ADD"
-                                                data-icon="➕"
-                                                data-text="הוסף טיקר"
-                                                data-onclick="window.WatchListsPage?.addTicker()"
-                                                data-bs-toggle="tooltip"
-                                                data-bs-placement="top"
-                                                title="הוסף טיקר לרשימה">
+                                                data-variant="small"
+                                                data-text=""
+                                                    data-onclick="window.WatchListsPage?.addTicker()"
+                                                    data-bs-toggle="tooltip"
+                                                    data-bs-placement="top"
+                                                    title="הוסף טיקר לרשימה">
                                         </button>
                                         <button type="button"
+                                                    class="btn btn"
                                                 data-button-type="TOGGLE"
                                                 data-variant="small"
                                                 data-onclick="toggleSection('active-list-section')"
-                                                data-text="הצג/הסתר"
-                                                data-bs-toggle="tooltip"
-                                                data-bs-placement="top"
-                                                title="הצג/הסתר רשימה">
+                                                    data-text="הצג/הסתר"
+                                                    data-bs-toggle="tooltip"
+                                                    data-bs-placement="top"
+                                                    title="הצג/הסתר רשימה">
                                         </button>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="section-body">
@@ -405,8 +441,17 @@
                                                         <th class="col-change-percent">
                                                             <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(5, window.WatchListsPage?.watchListItemsData || [], 'watch_list_items', window.WatchListsPage?.updateWatchListItemsTable); }" style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">Change % <span class="sort-icon">↕</span></button>
                                                         </th>
+                                                        <th class="col-daily-change">
+                                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(6, window.WatchListsPage?.watchListItemsData || [], 'watch_list_items', window.WatchListsPage?.updateWatchListItemsTable); }" style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">שינוי היום % <span class="sort-icon">↕</span></button>
+                                                        </th>
+                                                        <th class="col-atr">
+                                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(7, window.WatchListsPage?.watchListItemsData || [], 'watch_list_items', window.WatchListsPage?.updateWatchListItemsTable); }" style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">ATR <span class="sort-icon">↕</span></button>
+                                                        </th>
                                                         <th class="col-position">Position</th>
                                                         <th class="col-pl">P/L</th>
+                                                        <th class="col-pl-percent">
+                                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(9, window.WatchListsPage?.watchListItemsData || [], 'watch_list_items', window.WatchListsPage?.updateWatchListItemsTable); }" style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">P/L % <span class="sort-icon">↕</span></button>
+                                                        </th>
                                                         <th class="actions-column actions-cell actions-4-items">Actions</th>
                                                     </tr>
                                                 </thead>
@@ -430,8 +475,16 @@
                                                         <td>$150.25</td>
                                                         <td class="text-success">+$2.10</td>
                                                         <td class="text-success">+1.42%</td>
+                                                        <td class="text-success">+1.52%</td>
+                                                        <td>
+                                                            <span class="atr-value atr-yellow" dir="ltr">
+                                                                <span class="atr-number">3.25%</span>
+                                                                <span class="badge bg-warning">בינוני</span>
+                                                            </span>
+                                                        </td>
                                                         <td>100</td>
                                                         <td class="text-success">+$210.00</td>
+                                                        <td class="text-success">+1.40%</td>
                                                         <td>
                                                             <div class="btn-group" role="group" style="display: flex; flex-wrap: nowrap; gap: 2px;">
                                                                 <button type="button"
@@ -478,8 +531,16 @@
                                                         <td>$378.90</td>
                                                         <td class="text-danger">-$1.50</td>
                                                         <td class="text-danger">-0.39%</td>
+                                                        <td class="text-danger">-0.40%</td>
+                                                        <td>
+                                                            <span class="atr-value atr-red" dir="ltr">
+                                                                <span class="atr-number">5.80%</span>
+                                                                <span class="badge bg-danger">גבוה</span>
+                                                            </span>
+                                                        </td>
                                                         <td>50</td>
                                                         <td class="text-danger">-$75.00</td>
+                                                        <td class="text-danger">-0.40%</td>
                                                         <td>
                                                             <div class="btn-group" role="group" style="display: flex; flex-wrap: nowrap; gap: 2px;">
                                                                 <button type="button"
@@ -526,11 +587,19 @@
                                                         <td>$245.80</td>
                                                         <td class="text-danger">-$2.10</td>
                                                         <td class="text-danger">-0.85%</td>
+                                                        <td class="text-danger">-0.85%</td>
+                                                        <td>
+                                                            <span class="atr-value atr-yellow" dir="ltr">
+                                                                <span class="atr-number">4.20%</span>
+                                                                <span class="badge bg-warning">בינוני</span>
+                                                            </span>
+                                                        </td>
                                                         <td>75</td>
                                                         <td class="text-danger">-$157.50</td>
+                                                        <td class="text-danger">-0.85%</td>
                                                         <td>
                                                             <div class="btn-group" role="group" style="display: flex; flex-wrap: nowrap; gap: 2px;">
-                                                            <button type="button"
+                                                                <button type="button"
                                                                         data-button-type="VIEW"
                                                                         data-variant="small"
                                                                         data-text=""
@@ -573,8 +642,16 @@
                                                         <td>$142.30</td>
                                                         <td class="text-success">+$5.20</td>
                                                         <td class="text-success">+3.79%</td>
+                                                        <td class="text-success">+3.80%</td>
+                                                        <td>
+                                                            <span class="atr-value atr-green" dir="ltr">
+                                                                <span class="atr-number">2.90%</span>
+                                                                <span class="badge bg-success">נמוך</span>
+                                                            </span>
+                                                        </td>
                                                         <td>200</td>
                                                         <td class="text-success">+$1,040.00</td>
+                                                        <td class="text-success">+3.65%</td>
                                                         <td>
                                                             <div class="btn-group" role="group" style="display: flex; flex-wrap: nowrap; gap: 2px;">
                                                                 <button type="button"
@@ -645,8 +722,70 @@
                                                         </button>
                                                     </div>
                                                     <div class="mt-2">
-                                                        <div class="fs-5 fw-bold">$378.90</div>
-                                                        <div class="text-danger small">-0.39% (-$1.50)</div>
+                                                        <div class="fs-5 fw-bold">
+                                                            ${(() => {
+                                                                if (typeof window.FieldRendererService?.renderAmount === 'function') {
+                                                                    return window.FieldRendererService.renderAmount(378.90, '$', 2, false);
+                                                                }
+                                                                return '$378.90';
+                                                            })()}
+                                                        </div>
+                                                        <div class="small">
+                                                            ${(() => {
+                                                                if (typeof window.FieldRendererService?.renderNumericValue === 'function') {
+                                                                    const changePercent = window.FieldRendererService.renderNumericValue(-0.39, '%', true);
+                                                                    const changeValue = window.FieldRendererService.renderAmount(-1.50, '$', 2, true);
+                                                                    return `${changePercent} (${changeValue})`;
+                                                                }
+                                                                return '<span class="text-danger">-0.39% (-$1.50)</span>';
+                                                            })()}
+                                                        </div>
+                                                    </div>
+                                                    <div class="mt-3 pt-2 border-top">
+                                                        <div class="d-flex justify-content-between mb-1">
+                                                            <small class="text-muted">Position:</small>
+                                                            <small class="fw-bold">
+                                                                ${(() => {
+                                                                    if (typeof window.FieldRendererService?.renderShares === 'function') {
+                                                                        return window.FieldRendererService.renderShares(50, 'numeric-ltr');
+                                                                    }
+                                                                    return '50';
+                                                                })()}
+                                                            </small>
+                                                        </div>
+                                                        <div class="d-flex justify-content-between mb-1">
+                                                            <small class="text-muted">P/L:</small>
+                                                            <small class="fw-bold">
+                                                                ${(() => {
+                                                                    if (typeof window.FieldRendererService?.renderAmount === 'function') {
+                                                                        return window.FieldRendererService.renderAmount(-75.00, '$', 2, true);
+                                                                    }
+                                                                    return '<span class="text-danger">-$75.00</span>';
+                                                                })()}
+                                                            </small>
+                                                        </div>
+                                                        <div class="d-flex justify-content-between mb-1">
+                                                            <small class="text-muted">P/L %:</small>
+                                                            <small class="fw-bold">
+                                                                ${(() => {
+                                                                    if (typeof window.FieldRendererService?.renderNumericValue === 'function') {
+                                                                        return window.FieldRendererService.renderNumericValue(-0.40, '%', true);
+                                                                    }
+                                                                    return '<span class="text-danger">-0.40%</span>';
+                                                                })()}
+                                                            </small>
+                                                        </div>
+                                                        <div class="d-flex justify-content-between">
+                                                            <small class="text-muted">ATR:</small>
+                                                            <small class="fw-bold">
+                                                                ${(() => {
+                                                                    if (typeof window.FieldRendererService?.renderATR === 'function') {
+                                                                        return window.FieldRendererService.renderATR(5.80, 5.80, { showBadge: false });
+                                                                    }
+                                                                    return '$5.80';
+                                                                })()}
+                                                            </small>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -670,6 +809,24 @@
                                                         <div class="fs-5 fw-bold">$245.80</div>
                                                         <div class="text-danger small">-0.85% (-$2.10)</div>
                                                     </div>
+                                                    <div class="mt-3 pt-2 border-top">
+                                                        <div class="d-flex justify-content-between mb-1">
+                                                            <small class="text-muted">Position:</small>
+                                                            <small class="fw-bold">75</small>
+                                                        </div>
+                                                        <div class="d-flex justify-content-between mb-1">
+                                                            <small class="text-muted">P/L:</small>
+                                                            <small class="text-danger fw-bold">-$157.50</small>
+                                                        </div>
+                                                        <div class="d-flex justify-content-between mb-1">
+                                                            <small class="text-muted">P/L %:</small>
+                                                            <small class="text-danger fw-bold">-0.85%</small>
+                                                        </div>
+                                                        <div class="d-flex justify-content-between">
+                                                            <small class="text-muted">ATR:</small>
+                                                            <small class="fw-bold">$4.20</small>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div class="col-md-3 col-sm-6" data-item-id="4">
@@ -689,6 +846,24 @@
                                                         <div class="fs-5 fw-bold">$142.30</div>
                                                         <div class="text-success small">+3.79% (+$5.20)</div>
                                                     </div>
+                                                    <div class="mt-3 pt-2 border-top">
+                                                        <div class="d-flex justify-content-between mb-1">
+                                                            <small class="text-muted">Position:</small>
+                                                            <small class="fw-bold">200</small>
+                                                </div>
+                                                        <div class="d-flex justify-content-between mb-1">
+                                                            <small class="text-muted">P/L:</small>
+                                                            <small class="text-success fw-bold">+$1,040.00</small>
+                                            </div>
+                                                        <div class="d-flex justify-content-between mb-1">
+                                                            <small class="text-muted">P/L %:</small>
+                                                            <small class="text-success fw-bold">+3.65%</small>
+                                                        </div>
+                                                        <div class="d-flex justify-content-between">
+                                                            <small class="text-muted">ATR:</small>
+                                                            <small class="fw-bold">$2.90</small>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -700,63 +875,107 @@
                                             <div class="compact-list-item" data-item-id="1">
                                                 <div class="d-flex align-items-center gap-3">
                                                     <span class="drag-handle">≡</span>
-                                                    <strong>AAPL</strong>
-                                                    <span class="text-muted">Apple Inc.</span>
-                                                    <span>$150.25</span>
-                                                    <span class="text-success">+1.42%</span>
-                                                </div>
                                                 <button type="button"
                                                         class="btn btn-sm btn-flag"
                                                         data-flag-color="#26baac"
-                                                        data-onclick="window.WatchListsPage?.showFlagPalette(1)">
-                                                    <span class="icon-placeholder icon" data-icon="flag-filled" data-size="14" data-alt="flag" aria-label="flag"></span>
+                                                            data-onclick="window.WatchListsPage?.showFlagPalette(1)"
+                                                            title="שינוי דגל"
+                                                            style="padding: 0.125rem; border: none; background: transparent;">
+                                                        <span class="icon-placeholder icon" data-icon="flag-filled" data-size="16" data-alt="flag" aria-label="flag"></span>
                                                 </button>
+                                                    <strong>AAPL</strong>
+                                                    ${(() => {
+                                                        if (typeof window.FieldRendererService?.renderAmount === 'function') {
+                                                            return window.FieldRendererService.renderAmount(150.25, '$', 2, false);
+                                                        }
+                                                        return '<span>$150.25</span>';
+                                                    })()}
+                                                    ${(() => {
+                                                        if (typeof window.FieldRendererService?.renderNumericValue === 'function') {
+                                                            return window.FieldRendererService.renderNumericValue(1.42, '%', true);
+                                                        }
+                                                        return '<span class="text-success">+1.42%</span>';
+                                                    })()}
+                                                </div>
                                             </div>
                                             <div class="compact-list-item" data-item-id="2">
                                                 <div class="d-flex align-items-center gap-3">
                                                     <span class="drag-handle">≡</span>
-                                                    <strong>MSFT</strong>
-                                                    <span class="text-muted">Microsoft Corporation</span>
-                                                    <span>$378.90</span>
-                                                    <span class="text-danger">-0.39%</span>
-                                                </div>
                                                 <button type="button"
                                                         class="btn btn-sm btn-flag"
                                                         data-flag-color="#fc5a06"
-                                                        data-onclick="window.WatchListsPage?.showFlagPalette(2)">
-                                                    <span class="icon-placeholder icon" data-icon="flag-filled" data-size="14" data-alt="flag" aria-label="flag"></span>
+                                                            data-onclick="window.WatchListsPage?.showFlagPalette(2)"
+                                                            title="שינוי דגל"
+                                                            style="padding: 0.125rem; border: none; background: transparent;">
+                                                        <span class="icon-placeholder icon" data-icon="flag-filled" data-size="16" data-alt="flag" aria-label="flag"></span>
                                                 </button>
+                                                    <strong>MSFT</strong>
+                                                    ${(() => {
+                                                        if (typeof window.FieldRendererService?.renderAmount === 'function') {
+                                                            return window.FieldRendererService.renderAmount(378.90, '$', 2, false);
+                                                        }
+                                                        return '<span>$378.90</span>';
+                                                    })()}
+                                                    ${(() => {
+                                                        if (typeof window.FieldRendererService?.renderNumericValue === 'function') {
+                                                            return window.FieldRendererService.renderNumericValue(-0.39, '%', true);
+                                                        }
+                                                        return '<span class="text-danger">-0.39%</span>';
+                                                    })()}
+                                                </div>
                                             </div>
                                             <div class="compact-list-item" data-item-id="3">
                                                 <div class="d-flex align-items-center gap-3">
                                                     <span class="drag-handle">≡</span>
-                                                    <strong>TSLA</strong>
-                                                    <span class="badge bg-secondary badge-sm">חיצוני</span>
-                                                    <span class="text-muted">Tesla Inc.</span>
-                                                    <span>$245.80</span>
-                                                    <span class="text-danger">-0.85%</span>
-                                                </div>
                                                 <button type="button"
                                                         class="btn btn-sm btn-flag"
-                                                        data-onclick="window.WatchListsPage?.showFlagPalette(3)">
-                                                    <span class="icon-placeholder icon" data-icon="flag" data-size="14" data-alt="flag" aria-label="flag"></span>
+                                                            data-onclick="window.WatchListsPage?.showFlagPalette(3)"
+                                                            title="שינוי דגל"
+                                                            style="padding: 0.125rem; border: none; background: transparent;">
+                                                        <span class="icon-placeholder icon" data-icon="flag" data-size="16" data-alt="flag" aria-label="flag"></span>
                                                 </button>
+                                                    <strong>TSLA</strong>
+                                                    <span class="badge bg-secondary badge-sm">חיצוני</span>
+                                                    ${(() => {
+                                                        if (typeof window.FieldRendererService?.renderAmount === 'function') {
+                                                            return window.FieldRendererService.renderAmount(245.80, '$', 2, false);
+                                                        }
+                                                        return '<span>$245.80</span>';
+                                                    })()}
+                                                    ${(() => {
+                                                        if (typeof window.FieldRendererService?.renderNumericValue === 'function') {
+                                                            return window.FieldRendererService.renderNumericValue(-0.85, '%', true);
+                                                        }
+                                                        return '<span class="text-danger">-0.85%</span>';
+                                                    })()}
+                                                </div>
                                             </div>
                                             <div class="compact-list-item" data-item-id="4">
                                                 <div class="d-flex align-items-center gap-3">
                                                     <span class="drag-handle">≡</span>
-                                                    <strong>GOOGL</strong>
-                                                    <span class="text-muted">Alphabet Inc.</span>
-                                                    <span>$142.30</span>
-                                                    <span class="text-success">+3.79%</span>
-                                                </div>
                                                 <button type="button"
                                                         class="btn btn-sm btn-flag"
-                                                        data-onclick="window.WatchListsPage?.showFlagPalette(4)">
-                                                    <span class="icon-placeholder icon" data-icon="flag" data-size="14" data-alt="flag" aria-label="flag"></span>
-                                                </button>
-                                            </div>
+                                                            data-onclick="window.WatchListsPage?.showFlagPalette(4)"
+                                                            title="שינוי דגל"
+                                                            style="padding: 0.125rem; border: none; background: transparent;">
+                                        <span class="icon-placeholder icon" data-icon="flag" data-size="16" data-alt="flag" aria-label="flag"></span>
+                                            </button>
+                                                    <strong>GOOGL</strong>
+                                                    ${(() => {
+                                                        if (typeof window.FieldRendererService?.renderAmount === 'function') {
+                                                            return window.FieldRendererService.renderAmount(142.30, '$', 2, false);
+                                                        }
+                                                        return '<span>$142.30</span>';
+                                                    })()}
+                                                    ${(() => {
+                                                        if (typeof window.FieldRendererService?.renderNumericValue === 'function') {
+                                                            return window.FieldRendererService.renderNumericValue(3.79, '%', true);
+                                                        }
+                                                        return '<span class="text-success">+3.79%</span>';
+                                                    })()}
                                         </div>
+                                    </div>
+                                </div>
                                     </div>
                                 </div>
                             </section>

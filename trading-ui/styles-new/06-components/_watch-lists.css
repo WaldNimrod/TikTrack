@@ -160,10 +160,16 @@
 }
 
 /* ===== View Mode Buttons ===== */
-.btn-view-mode.active {
-    background-color: var(--primary-color, #26baac);
-    color: white;
-    border-color: var(--primary-color, #26baac);
+/* Note: filter-icon-btn background is defined in _chart-management.css */
+.btn-view-mode {
+    background-color: white !important;
+}
+
+.btn-view-mode.active,
+.btn-view-mode.active.filter-icon-btn {
+    background-color: var(--apple-blue, #007AFF) !important;
+    color: white !important;
+    border-color: var(--apple-blue, #007AFF) !important;
 }
 
 /* ===== Watch List Item Card ===== */
@@ -189,6 +195,104 @@
 
 .compact-list-item:hover {
     background-color: var(--background-light, #f8f9fa);
+}
+
+/* ===== List Management Buttons (Add/Delete) ===== */
+/* כפתורי הוספה ומחיקה אחרי הסלקטור - רקע לבן עם צבעים נכונים */
+.table-title .btn[data-button-type="ADD"],
+.table-title .btn[data-button-type="DELETE"] {
+    background-color: white !important;
+    border: 1px solid #dee2e6 !important;
+    color: var(--text-color, #495057) !important;
+    padding: 0.375rem 0.5rem !important;
+    min-width: 32px !important;
+    height: 32px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 4px !important;
+    transition: all 0.2s ease !important;
+}
+
+.table-title .btn[data-button-type="ADD"] {
+    color: var(--color-action-add, var(--primary-color, #26baac)) !important;
+    border-color: var(--color-action-add, var(--primary-color, #26baac)) !important;
+}
+
+.table-title .btn[data-button-type="ADD"]:hover {
+    background-color: var(--color-action-add, var(--primary-color, #26baac)) !important;
+    color: white !important;
+    border-color: var(--color-action-add, var(--primary-color, #26baac)) !important;
+}
+
+.table-title .btn[data-button-type="DELETE"] {
+    color: var(--color-action-delete, #dc3545) !important;
+    border-color: var(--color-action-delete, #dc3545) !important;
+}
+
+.table-title .btn[data-button-type="DELETE"]:hover {
+    background-color: var(--color-action-delete, #dc3545) !important;
+    color: white !important;
+    border-color: var(--color-action-delete, #dc3545) !important;
+}
+
+/* ===== Select Styled as Title ===== */
+/* עיצוב הסלקטור כך שיראה כמו כותרת - צבע כהה שנשמר גם אחרי שינוי */
+.table-title .form-select-title,
+.table-title #activeListSelect.form-select-title,
+.table-title select.form-select-title {
+    border: none !important;
+    background: transparent !important;
+    font-size: 1.1rem !important;
+    font-weight: 600 !important;
+    color: var(--color-text-primary-dark, var(--text-color, var(--apple-text-primary, #212529))) !important;
+    padding: 0.25rem 0.5rem !important;
+    padding-inline-end: 1.5rem !important;
+    cursor: pointer !important;
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 9L1 4h10z'/%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat !important;
+    background-position: left 0.5rem center !important;
+    background-size: 12px 12px !important;
+    min-width: 200px !important;
+    transition: all 0.2s ease !important;
+}
+
+/* וודא שהצבע נשמר גם אחרי שינוי הערך */
+.table-title .form-select-title option,
+.table-title #activeListSelect.form-select-title option,
+.table-title select.form-select-title option {
+    color: var(--color-text-primary-dark, var(--text-color, var(--apple-text-primary, #212529))) !important;
+    background-color: var(--apple-bg-primary, #FFFFFF) !important;
+}
+
+/* Hover - שומר על צבע כהה עם רקע עדין */
+.table-title .form-select-title:hover,
+.table-title #activeListSelect.form-select-title:hover,
+.table-title select.form-select-title:hover {
+    color: var(--color-text-primary-dark, var(--text-color, var(--apple-text-primary, #212529))) !important;
+    background-color: rgba(0, 0, 0, 0.03) !important;
+    border-radius: 4px !important;
+}
+
+/* Focus - שומר על צבע כהה עם הדגשה */
+.table-title .form-select-title:focus,
+.table-title #activeListSelect.form-select-title:focus,
+.table-title select.form-select-title:focus {
+    outline: none !important;
+    color: var(--color-text-primary-dark, var(--text-color, var(--apple-text-primary, #212529))) !important;
+    background-color: rgba(0, 0, 0, 0.05) !important;
+    border-radius: 4px !important;
+    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Active/Selected - וודא שהצבע נשמר */
+.table-title .form-select-title:active,
+.table-title #activeListSelect.form-select-title:active,
+.table-title select.form-select-title:active {
+    color: var(--color-text-primary-dark, var(--text-color, var(--apple-text-primary, #212529))) !important;
 }
 
 /* ===== Flag Button ===== */

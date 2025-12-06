@@ -1532,11 +1532,15 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
           console.log('📝 [page-initialization-configs] Notes customInitializer started');
 
           // Wait for loadNotesData to be available (for bundle support)
+          // Improved wait logic: faster polling at start, then slower
           let waitCount = 0;
-          const maxWait = 50; // 5 seconds max (50 * 100ms)
+          const maxWait = 100; // 10 seconds max (100 * 100ms) - increased from 5 seconds
+          const fastPollInterval = 50; // 50ms for first 20 checks (1 second)
+          const slowPollInterval = 100; // 100ms for remaining checks
           
           while (typeof window.loadNotesData !== 'function' && waitCount < maxWait) {
-            await new Promise(resolve => setTimeout(resolve, 100));
+            const interval = waitCount < 20 ? fastPollInterval : slowPollInterval;
+            await new Promise(resolve => setTimeout(resolve, interval));
             waitCount++;
           }
 
@@ -1550,11 +1554,23 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
               window.Logger.warn('⚠️ [page-initialization-configs] Error in loadNotesData (will continue without notes)', { error: error?.message, stack: error?.stack, page: 'page-initialization-configs' });
             }
           } else {
-            window.Logger.warn('⚠️ [page-initialization-configs] loadNotesData function not available (may load later or page may work without it)', { 
-              loadNotesDataType: typeof window.loadNotesData,
-              waitTime: waitCount * 100,
-              page: 'page-initialization-configs' 
-            });
+            // Fallback: try to use NotesData service if available
+            if (typeof window.NotesData?.loadNotesData === 'function') {
+              window.Logger.info('📝 [page-initialization-configs] Using NotesData service as fallback...', { page: 'page-initialization-configs' });
+              try {
+                await window.NotesData.loadNotesData();
+                window.Logger.info('✅ [page-initialization-configs] Notes data loaded via service', { page: 'page-initialization-configs' });
+              } catch (error) {
+                window.Logger.warn('⚠️ [page-initialization-configs] Error loading notes via service (will continue without notes)', { error: error?.message, page: 'page-initialization-configs' });
+              }
+            } else {
+              window.Logger.warn('⚠️ [page-initialization-configs] loadNotesData function not available (may load later or page may work without it)', { 
+                loadNotesDataType: typeof window.loadNotesData,
+                notesDataType: typeof window.NotesData,
+                waitTime: waitCount * 100,
+                page: 'page-initialization-configs' 
+              });
+            }
           }
         },
       ],
@@ -3628,47 +3644,40 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         },
       ],
     },    'portfolio-state-page': {
-      name: 'Portfolio State Page',
-      description: 'עמוד מוקאפ - portfolio-state-page',
-      lastModified: '2025-02-02',
-      pageType: 'mockup',
+      name: 'מצב תיק היסטורי',
+      description: 'עמוד מצב תיק היסטורי - ניתוח וצפייה במצב תיק בנקודות זמן שונות',
+      lastModified: '2025-01-12',
+      pageType: 'main',
       packages: [
         "base",
         "services",
         "ui-advanced",
         "modules",
         "crud",
-        "conditions",
-        "dashboard-widgets",
+        "preferences",
+        "entity-services",
+        "charts",
         "init-system"
-],
+      ],
       requiredGlobals: [
         'window.UnifiedAppInitializer', // Unified Init System
         'window.PAGE_CONFIGS', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
-
         "NotificationSystem",
         "window.IconSystem",
+        "window.FieldRendererService",
+        "window.UnifiedTableSystem",
+        "window.ModalManagerV2",
+        "window.LinkedItemsService",
         "window.SelectPopulatorService",
         "window.DataCollectionService",
-        "window.DefaultValueSetter",
-        "window.TableSortValueAdapter",
-        "window.LinkedItemsService",
-        "window.CRUDResponseHandler",
-        "window.createActionsMenu",
-        "window.ModalNavigationManager",
-        "window.ModalManagerV2",
-        "window.conditionsInitializer",
-        "window.ConditionsUIManager",
-        "window.PendingTradePlanWidget",
-        "window.PaginationSystem"
-,
+        "window.CRUDResponseHandler"
       ],
       preloadAssets: ['portfolio-state-page-data'],
       cacheStrategy: 'standard',
-      requiresFilters: false,
+      requiresFilters: true,
       requiresValidation: false,
-      requiresTables: false,
+      requiresTables: true,
       customInitializers: [
         async pageConfig => {
           window.Logger?.info('📄 Initializing portfolio-state-page...', {
@@ -3677,49 +3686,43 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         },
       ],
     },    'trade-history-page': {
-      name: 'Trade History Page',
-      description: 'עמוד מוקאפ - trade-history-page',
-      lastModified: '2025-02-02',
-      pageType: 'mockup',
+      name: 'היסטוריית טרייד',
+      description: 'עמוד היסטוריית טרייד - ניתוח וצפייה בהיסטוריית טריידים',
+      lastModified: '2025-01-12',
+      pageType: 'main',
       packages: [
         "base",
         "services",
         "ui-advanced",
         "modules",
         "crud",
-        "conditions",
-        "dashboard-widgets",
-        "init-system",
-        "info-summary"
-],
+        "preferences",
+        "entity-services",
+        "entity-details",
+        "info-summary",
+        "charts",
+        "init-system"
+      ],
       requiredGlobals: [
         'window.UnifiedAppInitializer', // Unified Init System
         'window.PAGE_CONFIGS', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
-
         "NotificationSystem",
         "window.IconSystem",
+        "window.FieldRendererService",
+        "window.ModalManagerV2",
+        "window.LinkedItemsService",
+        "window.UnifiedTableSystem",
+        "window.InfoSummarySystem",
         "window.SelectPopulatorService",
         "window.DataCollectionService",
-        "window.DefaultValueSetter",
-        "window.TableSortValueAdapter",
-        "window.LinkedItemsService",
-        "window.CRUDResponseHandler",
-        "window.createActionsMenu",
-        "window.ModalNavigationManager",
-        "window.ModalManagerV2",
-        "window.conditionsInitializer",
-        "window.ConditionsUIManager",
-        "window.PendingTradePlanWidget",
-        "window.PaginationSystem",
-        "window.InfoSummarySystem"
-,
+        "window.CRUDResponseHandler"
       ],
       preloadAssets: ['trade-history-page-data'],
       cacheStrategy: 'standard',
-      requiresFilters: false,
+      requiresFilters: true,
       requiresValidation: false,
-      requiresTables: false,
+      requiresTables: true,
       customInitializers: [
         async pageConfig => {
           window.Logger?.info('📄 Initializing trade-history-page...', {
@@ -3830,47 +3833,39 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         },
       ],
     },    'trading-journal-page': {
-      name: 'Trading Journal Page',
-      description: 'עמוד מוקאפ - trading-journal-page',
-      lastModified: '2025-02-02',
-      pageType: 'mockup',
+      name: 'יומן מסחר',
+      description: 'עמוד יומן מסחר - ניהול ותצוגת יומן מסחר עם לוח שנה',
+      lastModified: '2025-01-12',
+      pageType: 'main',
       packages: [
         "base",
         "services",
         "ui-advanced",
         "modules",
         "crud",
-        "conditions",
-        "dashboard-widgets",
-        "init-system",
-        "info-summary"
-],
+        "preferences",
+        "entity-services",
+        "entity-details",
+        "info-summary",
+        "init-system"
+      ],
       requiredGlobals: [
         'window.UnifiedAppInitializer', // Unified Init System
         'window.PAGE_CONFIGS', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
-
         "NotificationSystem",
         "window.IconSystem",
+        "window.FieldRendererService",
+        "window.ModalManagerV2",
+        "window.LinkedItemsService",
+        "window.InfoSummarySystem",
         "window.SelectPopulatorService",
         "window.DataCollectionService",
-        "window.DefaultValueSetter",
-        "window.TableSortValueAdapter",
-        "window.LinkedItemsService",
-        "window.CRUDResponseHandler",
-        "window.createActionsMenu",
-        "window.ModalNavigationManager",
-        "window.ModalManagerV2",
-        "window.conditionsInitializer",
-        "window.ConditionsUIManager",
-        "window.PendingTradePlanWidget",
-        "window.PaginationSystem",
-        "window.InfoSummarySystem"
-,
+        "window.CRUDResponseHandler"
       ],
       preloadAssets: ['trading-journal-page-data'],
       cacheStrategy: 'standard',
-      requiresFilters: false,
+      requiresFilters: true,
       requiresValidation: false,
       requiresTables: false,
       customInitializers: [

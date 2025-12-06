@@ -46,6 +46,14 @@ class EntityDetailsAPI {
         this.retryAttempts = 3;
         this.retryDelay = 1000; // 1 שנייה
         
+        // Rate limiting prevention - batch loading for trade plans
+        this.tradePlansCache = new Map(); // Cache for individual trade plans
+        this.tradePlansPendingRequests = new Map(); // Track pending requests to avoid duplicates
+        this.tradePlansBatchQueue = []; // Queue for batch loading
+        this.tradePlansBatchSize = 10; // Load 10 plans at a time
+        this.tradePlansBatchDelay = 100; // 100ms delay between batches
+        this.tradePlansBatchTimeout = null; // Timeout for batch processing
+        
         this.init();
     }
 
@@ -81,6 +89,105 @@ class EntityDetailsAPI {
                 console.error('Error initializing EntityDetailsAPI:', error);
             }
         }
+    }
+
+    /**
+     * Load trade plan with caching and batch support - טעינת trade plan עם cache ו-batch
+     * 
+     * @param {number} planId - מזהה trade plan
+     * @returns {Promise<Object|null>} - Promise עם נתוני trade plan או null
+     * @private
+     */
+    async loadTradePlan(planId) {
+        // Check cache first
+        const cacheKey = `trade-plan-${planId}`;
+        const cached = this.tradePlansCache.get(cacheKey);
+        if (cached) {
+            const age = Date.now() - cached.timestamp;
+            if (age < this.cacheTimeout) {
+                return cached.data;
+            }
+            // Cache expired
+            this.tradePlansCache.delete(cacheKey);
+        }
+
+        // Check if request is already pending
+        if (this.tradePlansPendingRequests.has(planId)) {
+            return await this.tradePlansPendingRequests.get(planId);
+        }
+
+        // Create promise for this request
+        const promise = this._fetchTradePlanWithRetry(planId);
+        this.tradePlansPendingRequests.set(planId, promise);
+
+        try {
+            const planData = await promise;
+            // Cache the result
+            this.tradePlansCache.set(cacheKey, {
+                data: planData,
+                timestamp: Date.now()
+            });
+            return planData;
+        } catch (error) {
+            // Remove from pending on error
+            this.tradePlansPendingRequests.delete(planId);
+            throw error;
+        } finally {
+            // Remove from pending after completion
+            this.tradePlansPendingRequests.delete(planId);
+        }
+    }
+
+    /**
+     * Fetch trade plan with retry logic - טעינת trade plan עם retry
+     * 
+     * @param {number} planId - מזהה trade plan
+     * @returns {Promise<Object|null>} - Promise עם נתוני trade plan או null
+     * @private
+     */
+    async _fetchTradePlanWithRetry(planId) {
+        for (let attempt = 0; attempt < this.retryAttempts; attempt++) {
+            try {
+                const response = await fetch(`/api/trade-plans/${planId}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    }
+                });
+
+                if (response.status === 429) {
+                    // Rate limited - wait and retry
+                    const waitTime = this.retryDelay * (attempt + 1);
+                    if (window.Logger) {
+                        window.Logger.warn(`⚠️ Rate limited for trade plan ${planId}, waiting ${waitTime}ms before retry ${attempt + 1}/${this.retryAttempts}`, { page: "entity-details-api" });
+                    }
+                    await new Promise(resolve => setTimeout(resolve, waitTime));
+                    continue;
+                }
+
+                if (!response.ok) {
+                    if (response.status === 404) {
+                        return null; // Plan not found
+                    }
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const payload = await response.json();
+                return payload?.data || payload || null;
+            } catch (error) {
+                if (attempt === this.retryAttempts - 1) {
+                    // Last attempt failed
+                    if (window.Logger) {
+                        window.Logger.warn(`⚠️ Failed to load trade plan ${planId} after ${this.retryAttempts} attempts:`, error, { page: "entity-details-api" });
+                    }
+                    return null; // Return null instead of throwing
+                }
+                // Wait before retry
+                await new Promise(resolve => setTimeout(resolve, this.retryDelay * (attempt + 1)));
+            }
+        }
+        return null;
     }
 
     /**
@@ -174,22 +281,16 @@ class EntityDetailsAPI {
                     
                     if ((!hasPlanObject || !hasFlatPlan) && planItem && planItem.id) {
                         // אם אין ערכים קריטיים, נטען את ה-trade_plan המלא מה-API
+                        // שימוש ב-loadTradePlan עם cache ו-retry logic למניעת rate limiting
                         if (window.Logger) {
-                            window.Logger.info('🔗 Enriching trade planning from trade_plan endpoint...', {
+                            window.Logger.debug('🔗 Enriching trade planning from trade_plan endpoint...', {
                                 tradeId: entityId,
                                 planId: planItem.id
                             }, { page: "entity-details-api" });
                         }
-                        const planResp = await fetch(`/api/trade-plans/${planItem.id}`, {
-                            method: 'GET',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Accept': 'application/json'
-                            }
-                        });
-                        if (planResp.ok) {
-                            const planPayload = await planResp.json();
-                            const planData = planPayload?.data || planPayload || null;
+                        
+                        try {
+                            const planData = await this.loadTradePlan(planItem.id);
                             if (planData) {
                                 // שמירת האובייקט המלא
                                 entityData.trade_plan = entityData.trade_plan || planData;
@@ -198,6 +299,11 @@ class EntityDetailsAPI {
                                 // אבל entry_price - רק מה-Trade עצמו, לא מהתוכנית!
                                 // Removed: trade_plan_planned_amount fallback - זה שדה של התוכנית, לא של הטרייד
                                 // Removed: entry_price fallback - רק מה-Trade עצמו
+                            }
+                        } catch (planError) {
+                            // Silent fail - we'll continue without the plan data
+                            if (window.Logger) {
+                                window.Logger.debug('⚠️ Failed to load trade plan (non-critical):', planError?.message, { page: "entity-details-api" });
                             }
                         }
                     }

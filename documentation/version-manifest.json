@@ -10,13 +10,13 @@
     "notes": "Final sm-section-server fix"
   },
   "development": {
-    "version": "1.3.89.0",
+    "version": "1.3.90.0",
     "major": 1,
     "minor": 3,
-    "patch": 89,
+    "patch": 90,
     "build": 0,
-    "commit": "6af27cdbf8524fe546f29d595438ffedd45db174",
-    "updated_at": "2025-12-06T22:16:33+00:00",
-    "notes": "אופטימיזציה מקיפה של טעינת נתונים חיצוניים + תיעוד מלא"
+    "commit": "2ddae0bbb19fc006dede8a7db7cef84ceeddc9b4",
+    "updated_at": "2025-12-06T22:18:37+00:00",
+    "notes": "Fix bundles errors: rate limiting, loadNotesData, and warnings"
   }
 }

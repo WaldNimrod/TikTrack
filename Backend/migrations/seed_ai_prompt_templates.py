@@ -77,7 +77,7 @@ Build the report this way:
         "variables": [
             {
                 "key": "stock_ticker",
-                "label": "Stock Ticker / Company Name",
+                "label": "טיקר",
                 "type": "select",
                 "required": False,
                 "placeholder": "בחר טיקר...",
@@ -87,7 +87,7 @@ Build the report this way:
             },
             {
                 "key": "investment_thesis",
-                "label": "Investment Thesis",
+                "label": "סיבת השקעה",
                 "type": "select",
                 "required": False,
                 "placeholder": "בחר סיבה...",
@@ -97,7 +97,7 @@ Build the report this way:
             },
             {
                 "key": "goal",
-                "label": "Goal",
+                "label": "מטרה",
                 "type": "select",
                 "required": False,
                 "placeholder": "בחר מטרה...",
@@ -117,14 +117,14 @@ Build the report this way:
             },
             {
                 "key": "response_language",
-                "label": "Response Language / שפת המשוב",
+                "label": "שפת המשוב",
                 "type": "select",
                 "required": False,
                 "placeholder": "בחר שפה...",
                 "default_value": "hebrew",
                 "options": [
                     {"value": "hebrew", "label": "עברית"},
-                    {"value": "english", "label": "English"}
+                    {"value": "english", "label": "אנגלית"}
                 ]
             }
         ]
@@ -201,23 +201,29 @@ Build the report this way:
         "variables": [
             {
                 "key": "stock_ticker",
-                "label": "Stock Ticker / Company Name",
+                "label": "טיקר",
                 "type": "text",
                 "required": False,
-                "placeholder": "Add name if you want specific analysis",
+                "placeholder": "הזן טיקר לניתוח ספציפי",
                 "default_value": None
             },
             {
                 "key": "time_frame",
-                "label": "Time Frame",
+                "label": "מסגרת זמן",
                 "type": "select",
                 "required": False,
-                "options": ["1 day", "1 week", "1 month", "3 months", "1 year"],
+                "options": [
+                    {"value": "1 day", "label": "יום אחד"},
+                    {"value": "1 week", "label": "שבוע אחד"},
+                    {"value": "1 month", "label": "חודש אחד"},
+                    {"value": "3 months", "label": "3 חודשים"},
+                    {"value": "1 year", "label": "שנה אחת"}
+                ],
                 "default_value": "1 month"
             },
             {
                 "key": "technical_indicators",
-                "label": "Technical Indicators",
+                "label": "אינדיקטורים טכניים",
                 "type": "select",
                 "required": False,
                 "placeholder": "בחר אינדיקטורים טכניים...",
@@ -227,37 +233,43 @@ Build the report this way:
             },
             {
                 "key": "chart_pattern_focus",
-                "label": "Chart Pattern Focus",
+                "label": "מיקוד תבניות גרף",
                 "type": "select",
                 "required": False,
-                "options": ["Head & Shoulders", "Triangles", "Flags", "Support/Resistance", "Trend Lines"],
+                "options": [
+                    {"value": "Head & Shoulders", "label": "ראש וכתפיים"},
+                    {"value": "Triangles", "label": "משולשים"},
+                    {"value": "Flags", "label": "דגלים"},
+                    {"value": "Support/Resistance", "label": "תמיכה/התנגדות"},
+                    {"value": "Trend Lines", "label": "קווי מגמה"}
+                ],
                 "default_value": None
             },
             {
                 "key": "investment_type",
-                "label": "Investment Type",
+                "label": "סוג השקעה",
                 "type": "select",
                 "required": False,
                 "options": [
-                    {"value": "Swing Trading", "label": "Swing Trading"},
-                    {"value": "Long-term Investment", "label": "Long-term Investment"},
-                    {"value": "Passive Investment", "label": "Passive Investment"},
-                    {"value": "Day Trading", "label": "Day Trading"},
-                    {"value": "Scalping", "label": "Scalping"}
+                    {"value": "swing", "label": "סווינג"},
+                    {"value": "investment", "label": "השקעה"},
+                    {"value": "passive", "label": "פאסיבי"},
+                    {"value": "day_trading", "label": "מסחר יומי"},
+                    {"value": "scalping", "label": "סקלפינג"}
                 ],
                 "default_value": None
             },
             {
                 "key": "date_range",
-                "label": "Date Range (Optional)",
-                "type": "text",
+                "label": "טווח תאריכים",
+                "type": "date-range",
                 "required": False,
-                "placeholder": "Start date - End date (e.g., 2024-01-01 - 2024-12-31)",
+                "placeholder": "",
                 "default_value": None
             },
             {
                 "key": "trading_account",
-                "label": "Trading Account",
+                "label": "חשבון מסחר",
                 "type": "select",
                 "required": False,
                 "placeholder": "בחר חשבון מסחר...",
@@ -267,14 +279,14 @@ Build the report this way:
             },
             {
                 "key": "response_language",
-                "label": "Response Language / שפת המשוב",
+                "label": "שפת המשוב",
                 "type": "select",
                 "required": False,
                 "placeholder": "בחר שפה...",
                 "default_value": "hebrew",
                 "options": [
                     {"value": "hebrew", "label": "עברית"},
-                    {"value": "english", "label": "English"}
+                    {"value": "english", "label": "אנגלית"}
                 ]
             }
         ]
@@ -355,45 +367,49 @@ Build the report this way:
         "variables": [
             {
                 "key": "ticker_symbol",
-                "label": "Ticker Symbol",
+                "label": "טיקר",
                 "type": "text",
                 "required": False,
-                "placeholder": "Stock ticker to analyze",
+                "placeholder": "הזן טיקר לניתוח",
                 "default_value": None
             },
             {
                 "key": "date_range",
-                "label": "Date Range",
-                "type": "text",
+                "label": "טווח תאריכים",
+                "type": "date-range",
                 "required": False,
-                "placeholder": "Start date - End date",
+                "placeholder": "",
                 "default_value": None
             },
             {
                 "key": "analysis_focus",
-                "label": "Analysis Focus",
+                "label": "מיקוד ניתוח",
                 "type": "select",
                 "required": False,
-                "options": ["Performance Review", "Risk Assessment", "Optimization Recommendations"],
+                "options": [
+                    {"value": "Performance Review", "label": "סקירת ביצועים"},
+                    {"value": "Risk Assessment", "label": "הערכת סיכונים"},
+                    {"value": "Optimization Recommendations", "label": "המלצות אופטימיזציה"}
+                ],
                 "default_value": "Performance Review"
             },
             {
                 "key": "investment_type_filter",
-                "label": "Investment Type Filter",
+                "label": "סינון סוג השקעה",
                 "type": "select",
                 "required": False,
                 "options": [
-                    {"value": "Swing Trading", "label": "Swing Trading"},
-                    {"value": "Long-term Investment", "label": "Long-term Investment"},
-                    {"value": "Passive Investment", "label": "Passive Investment"},
-                    {"value": "Day Trading", "label": "Day Trading"},
-                    {"value": "Scalping", "label": "Scalping"}
+                    {"value": "swing", "label": "סווינג"},
+                    {"value": "investment", "label": "השקעה"},
+                    {"value": "passive", "label": "פאסיבי"},
+                    {"value": "day_trading", "label": "מסחר יומי"},
+                    {"value": "scalping", "label": "סקלפינג"}
                 ],
                 "default_value": None
             },
             {
                 "key": "trading_account",
-                "label": "Trading Account",
+                "label": "חשבון מסחר",
                 "type": "select",
                 "required": False,
                 "placeholder": "בחר חשבון מסחר...",
@@ -403,7 +419,7 @@ Build the report this way:
             },
             {
                 "key": "trade_selection_type",
-                "label": "Trade Selection Type / סוג בחירת טריידים",
+                "label": "סוג בחירת טריידים",
                 "type": "select",
                 "required": False,
                 "options": [
@@ -416,7 +432,7 @@ Build the report this way:
             },
             {
                 "key": "single_trade_id",
-                "label": "Trade ID (for single trade)",
+                "label": "מזהה טרייד (לטרייד בודד)",
                 "type": "number",
                 "required": False,
                 "placeholder": "הזן ID של טרייד ספציפי",
@@ -428,30 +444,30 @@ Build the report this way:
             },
             {
                 "key": "analysis_topics",
-                "label": "Analysis Topics / נושאי ניתוח",
+                "label": "נושאי ניתוח",
                 "type": "select",
                 "required": False,
                 "placeholder": "בחר נושאי ניתוח...",
                 "default_value": None,
                 "options": [
-                    {"value": "performance", "label": "Performance Review"},
-                    {"value": "risk", "label": "Risk Assessment"},
-                    {"value": "execution", "label": "Execution Quality"},
-                    {"value": "optimization", "label": "Optimization Recommendations"},
-                    {"value": "patterns", "label": "Trade Patterns"},
-                    {"value": "correlation", "label": "Market Correlation"}
+                    {"value": "performance", "label": "סקירת ביצועים"},
+                    {"value": "risk", "label": "הערכת סיכונים"},
+                    {"value": "execution", "label": "איכות ביצוע"},
+                    {"value": "optimization", "label": "המלצות אופטימיזציה"},
+                    {"value": "patterns", "label": "תבניות מסחר"},
+                    {"value": "correlation", "label": "קורלציה לשוק"}
                 ]
             },
             {
                 "key": "response_language",
-                "label": "Response Language / שפת המשוב",
+                "label": "שפת המשוב",
                 "type": "select",
                 "required": False,
                 "placeholder": "בחר שפה...",
                 "default_value": "hebrew",
                 "options": [
                     {"value": "hebrew", "label": "עברית"},
-                    {"value": "english", "label": "English"}
+                    {"value": "english", "label": "אנגלית"}
                 ]
             }
         ]
@@ -519,53 +535,55 @@ Build the report this way:
         "variables": [
             {
                 "key": "ticker_symbol",
-                "label": "Ticker Symbol",
+                "label": "טיקר",
                 "type": "text",
                 "required": False,
-                "placeholder": "Stock ticker to analyze",
+                "placeholder": "הזן סמל טיקר לניתוח",
                 "default_value": None
             },
             {
                 "key": "trade_plan_id",
-                "label": "Trade Plan ID",
+                "label": "מזהה תוכנית מסחר",
                 "type": "number",
                 "required": False,
-                "placeholder": "Optional - analyze plan conditions",
+                "placeholder": "אופציונלי - ניתוח תנאי תוכנית",
                 "default_value": None
             },
             {
                 "key": "trade_id",
-                "label": "Trade ID",
+                "label": "מזהה טרייד",
                 "type": "number",
                 "required": False,
-                "placeholder": "Optional - analyze trade conditions",
+                "placeholder": "אופציונלי - ניתוח תנאי טרייד",
                 "default_value": None
             },
             {
                 "key": "condition_focus",
-                "label": "Condition Focus",
-                "type": "text",
+                "label": "מיקוד תנאים",
+                "type": "select",
                 "required": False,
-                "placeholder": "Select from Trading Methods",
-                "default_value": None
+                "placeholder": "בחר שיטת מסחר...",
+                "default_value": None,
+                "options": [],
+                "integration": "trading_methods"
             },
             {
                 "key": "investment_type",
-                "label": "Investment Type",
+                "label": "סוג השקעה",
                 "type": "select",
                 "required": False,
                 "options": [
-                    {"value": "Swing Trading", "label": "Swing Trading"},
-                    {"value": "Long-term Investment", "label": "Long-term Investment"},
-                    {"value": "Passive Investment", "label": "Passive Investment"},
-                    {"value": "Day Trading", "label": "Day Trading"},
-                    {"value": "Scalping", "label": "Scalping"}
+                    {"value": "swing", "label": "סווינג"},
+                    {"value": "investment", "label": "השקעה"},
+                    {"value": "passive", "label": "פאסיבי"},
+                    {"value": "day_trading", "label": "מסחר יומי"},
+                    {"value": "scalping", "label": "סקלפינג"}
                 ],
                 "default_value": None
             },
             {
                 "key": "trading_account",
-                "label": "Trading Account",
+                "label": "חשבון מסחר",
                 "type": "select",
                 "required": False,
                 "placeholder": "בחר חשבון מסחר...",
@@ -575,22 +593,22 @@ Build the report this way:
             },
             {
                 "key": "date_range",
-                "label": "Date Range (Optional)",
-                "type": "text",
+                "label": "טווח תאריכים",
+                "type": "date-range",
                 "required": False,
-                "placeholder": "Start date - End date (e.g., 2024-01-01 - 2024-12-31)",
+                "placeholder": "",
                 "default_value": None
             },
             {
                 "key": "response_language",
-                "label": "Response Language / שפת המשוב",
+                "label": "שפת המשוב",
                 "type": "select",
                 "required": False,
                 "placeholder": "בחר שפה...",
                 "default_value": "hebrew",
                 "options": [
                     {"value": "hebrew", "label": "עברית"},
-                    {"value": "english", "label": "English"}
+                    {"value": "english", "label": "אנגלית"}
                 ]
             }
         ]

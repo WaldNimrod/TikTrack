@@ -843,7 +843,8 @@ const PAGE_TO_ENTITY_MAPPING = {
   'constraints-page': 'constraint',
   'tag-management-page': 'preference', // Tag management page - uses preference colors
   'ai-analysis-page': 'research', // AI Analysis page - uses research colors
-  'watch-lists-page': 'ticker', // Watch Lists page - uses ticker colors (similar entity type)
+  'watch-list-page': 'ticker', // Watch List page - uses ticker colors (similar entity type)
+  'watch-lists-page': 'ticker', // Watch Lists page - uses ticker colors (alias for consistency)
   'db-display-page': null, // Uses fixed gray color
   'db-extradata-page': null, // Uses fixed gray color
   'extra-data-page': null, // Alias

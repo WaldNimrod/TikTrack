@@ -1,10 +1,37 @@
 /**
  * Generate Script Loading Code for Pages
  * Uses package-manifest.js and page-initialization-configs.js to generate correct script loading order
+ * 
+ * Environment Detection:
+ * - TikTrackApp-Production → production (with bundles)
+ * - TikTrackApp → development (without bundles)
  */
 
 const fs = require('fs');
 const path = require('path');
+
+/**
+ * Detect environment from workspace directory name
+ * - TikTrackApp-Production → production
+ * - TikTrackApp → development
+ * @returns {string} 'production' or 'development'
+ */
+function detectEnvironment() {
+  const cwd = process.cwd();
+  const workspaceName = path.basename(cwd);
+  
+  // Check for Production in directory name (case-insensitive)
+  if (workspaceName.includes('Production') || workspaceName.includes('production')) {
+    return 'production';
+  } else if (workspaceName === 'TikTrackApp') {
+    return 'development';
+  } else {
+    // Default to development if uncertain (safer default)
+    console.warn(`⚠️ Could not determine environment from directory: ${workspaceName}`);
+    console.warn('Defaulting to development. Use --mode flag to override.');
+    return 'development';
+  }
+}
 
 // Load package manifest
 const manifestPath = path.join(__dirname, 'init-system', 'package-manifest.js');
@@ -53,10 +80,20 @@ try {
 /**
  * Generate script loading code for a page
  * @param {string} pageName - Page name
- * @param {string} mode - 'development' or 'production' (default: 'development')
- * @param {boolean} useBundles - Whether to use bundles if available (default: false)
+ * @param {string} mode - 'development' or 'production' (auto-detected if null)
+ * @param {boolean} useBundles - Whether to use bundles (auto-set based on mode if null)
  */
-function generateScriptLoadingCode(pageName, mode = 'development', useBundles = false) {
+function generateScriptLoadingCode(pageName, mode = null, useBundles = null) {
+  // Auto-detect environment if not provided
+  if (!mode) {
+    mode = detectEnvironment();
+  }
+  
+  // Auto-set useBundles based on environment
+  // Production uses bundles, development doesn't
+  if (useBundles === null) {
+    useBundles = (mode === 'production');
+  }
   const pageConfig = PAGE_CONFIGS[pageName];
   if (!pageConfig) {
     console.error(`❌ No config found for page: ${pageName}`);
@@ -233,9 +270,28 @@ function generateScriptLoadingCode(pageName, mode = 'development', useBundles = 
 const pageName = process.argv[2];
 const modeArg = process.argv.find(arg => arg.startsWith('--mode='));
 const useBundlesArg = process.argv.find(arg => arg === '--use-bundles' || arg === '--bundles');
+const noBundlesArg = process.argv.find(arg => arg === '--no-bundles');
 
-const mode = modeArg ? modeArg.split('=')[1] : 'development';
-const useBundles = useBundlesArg !== undefined || process.env.USE_BUNDLES === 'true';
+// Parse mode - auto-detect if not provided
+let mode = modeArg ? modeArg.split('=')[1] : null;
+if (!mode) {
+  mode = detectEnvironment();
+}
+
+// Parse useBundles - auto-set based on mode if not provided
+let useBundles = null;
+if (noBundlesArg !== undefined) {
+  useBundles = false;
+} else if (useBundlesArg !== undefined) {
+  useBundles = true;
+} else if (process.env.USE_BUNDLES === 'true') {
+  useBundles = true;
+} else if (process.env.USE_BUNDLES === 'false') {
+  useBundles = false;
+} else {
+  // Auto-set based on mode
+  useBundles = (mode === 'production');
+}
 
 if (pageName) {
   // Generate for specific page
@@ -250,7 +306,11 @@ if (pageName) {
     console.log(`  - ${page}`);
   });
   console.log('\nUsage:');
-  console.log('  node generate-script-loading-code.js <pageName> [--mode=development|production] [--use-bundles]');
+  console.log('  node generate-script-loading-code.js <pageName> [--mode=development|production] [--use-bundles|--no-bundles]');
+  console.log('\nEnvironment Detection:');
+  console.log('  - TikTrackApp-Production → production (with bundles)');
+  console.log('  - TikTrackApp → development (without bundles)');
+  console.log('  - Use --mode flag to override auto-detection');
 }
 
 module.exports = { generateScriptLoadingCode };

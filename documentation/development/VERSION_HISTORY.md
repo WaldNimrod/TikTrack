@@ -241,3 +241,4 @@ This log tracks version bumps for the development environment (branch `main`). M
 | 2025-12-06T08:06:53+00:00 | 1.3.88.0 | 1.3.87.0 | a95336ef62051904d92936f58147572a384e656e | 591ff219ec00ca45430562360d8e02bf4488e14f | patch | Fix Selenium test script TypeError and verify all main pages pass tests |
 | 2025-12-06T22:16:33+00:00 | 1.3.89.0 | 1.3.88.0 | 6af27cdbf8524fe546f29d595438ffedd45db174 | a95336ef62051904d92936f58147572a384e656e | patch | אופטימיזציה מקיפה של טעינת נתונים חיצוניים + תיעוד מלא |
 | 2025-12-06T22:18:37+00:00 | 1.3.90.0 | 1.3.89.0 | 2ddae0bbb19fc006dede8a7db7cef84ceeddc9b4 | 6af27cdbf8524fe546f29d595438ffedd45db174 | patch | Fix bundles errors: rate limiting, loadNotesData, and warnings |
+| 2025-12-06T23:23:27+00:00 | 1.3.91.0 | 1.3.90.0 | 815776016857f0342073693c066a92cadeeafd7b | 2ddae0bbb19fc006dede8a7db7cef84ceeddc9b4 | patch | Complete bundles environment-aware setup and development environment fixes |

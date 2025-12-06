@@ -169,7 +169,7 @@ async function loadCurrencies() {
       currenciesData = result.data;
 
       renderCurrenciesTable();
-      updatePageSummaryStats();
+      updateCurrenciesPageSummaryStats();
     } else {
       handleApiError(new Error(result.error), 'טעינת מטבעות');
       // הצגת שגיאה למשתמש
@@ -349,16 +349,21 @@ function renderCurrenciesTable() {
 /**
  * עדכון סטטיסטיקות סיכום
  */
-function updatePageSummaryStats() {
+function updateCurrenciesPageSummaryStats() {
   const totalCurrencies = currenciesData.length;
   const rates = currenciesData.map(c => parseFloat(c.usd_rate));
   const maxRate = rates.length > 0 ? Math.max(...rates) : 1.0;
   const minRate = rates.length > 0 ? Math.min(...rates) : 1.0;
 
-  document.getElementById('totalCurrencies').textContent = totalCurrencies;
-  document.getElementById('baseCurrency').textContent = 'USD';
-  document.getElementById('maxRate').textContent = maxRate.toFixed(6);
-  document.getElementById('minRate').textContent = minRate.toFixed(6);
+  const totalCurrenciesEl = document.getElementById('totalCurrencies');
+  const baseCurrencyEl = document.getElementById('baseCurrency');
+  const maxRateEl = document.getElementById('maxRate');
+  const minRateEl = document.getElementById('minRate');
+  
+  if (totalCurrenciesEl) totalCurrenciesEl.textContent = totalCurrencies;
+  if (baseCurrencyEl) baseCurrencyEl.textContent = 'USD';
+  if (maxRateEl) maxRateEl.textContent = maxRate.toFixed(6);
+  if (minRateEl) minRateEl.textContent = minRate.toFixed(6);
 }
 
 /**
@@ -379,7 +384,12 @@ async function initializeCurrenciesPage() {
   await loadCurrencies();
 
   // שחזור מצב הסגירה
-  restoreCurrenciesSectionState();
+  if (typeof restoreCurrenciesSectionState === 'function') {
+    restoreCurrenciesSectionState();
+  } else if (typeof window.restoreCurrenciesSectionState === 'function') {
+    window.restoreCurrenciesSectionState();
+  }
+  // If function doesn't exist, silently skip - not critical
 
 }
 
@@ -394,15 +404,21 @@ async function initializeCurrenciesPage() {
   // שחזור מצב הסקשנים
   if (typeof window.restoreCurrenciesSectionState === 'function') {
     window.restoreCurrenciesSectionState();
-  } else {
+  } else if (typeof handleFunctionNotFound === 'function') {
     handleFunctionNotFound('restoreCurrenciesSectionState', 'פונקציית שחזור מצב מטבעות לא נמצאה');
+  } else {
+    // Silent fallback if handleFunctionNotFound is not available
+    window.Logger?.warn?.('⚠️ restoreCurrenciesSectionState function not available', { page: 'currencies' });
   }
 
   // טעינת נתונים
   if (typeof window.loadCurrenciesData === 'function') {
     window.loadCurrenciesData();
-  } else {
+  } else if (typeof handleFunctionNotFound === 'function') {
     handleFunctionNotFound('loadCurrenciesData', 'פונקציית טעינת נתוני מטבעות לא נמצאה');
+  } else {
+    // Silent fallback if handleFunctionNotFound is not available
+    window.Logger?.warn?.('⚠️ loadCurrenciesData function not available', { page: 'currencies' });
   }
 
 //   // Currencies page initialization completed
@@ -426,7 +442,15 @@ window.toggleCurrenciesSection = function() {
         }
     }
 };
-window.restoreCurrenciesSectionState = restoreCurrenciesSectionState;
+// restoreCurrenciesSectionState - function is provided by restoreAnyTableSort or similar system
+window.restoreCurrenciesSectionState = function() {
+    // Use general restore function if available
+    if (typeof window.restoreAnyTableSort === 'function') {
+        window.restoreAnyTableSort('currencies');
+    } else if (typeof window.Logger?.debug === 'function') {
+        window.Logger.debug('restoreCurrenciesSectionState: restoreAnyTableSort not available', { page: 'currencies' });
+    }
+};
 window.renderCurrenciesTable = renderCurrenciesTable;
-window.updatePageSummaryStats = updatePageSummaryStats;
+window.updateCurrenciesPageSummaryStats = updateCurrenciesPageSummaryStats;
 window.initializeCurrenciesPage = initializeCurrenciesPage;

@@ -10,13 +10,13 @@
     "notes": "Final sm-section-server fix"
   },
   "development": {
-    "version": "1.3.90.0",
+    "version": "1.3.91.0",
     "major": 1,
     "minor": 3,
-    "patch": 90,
+    "patch": 91,
     "build": 0,
-    "commit": "2ddae0bbb19fc006dede8a7db7cef84ceeddc9b4",
-    "updated_at": "2025-12-06T22:18:37+00:00",
-    "notes": "Fix bundles errors: rate limiting, loadNotesData, and warnings"
+    "commit": "815776016857f0342073693c066a92cadeeafd7b",
+    "updated_at": "2025-12-06T23:23:27+00:00",
+    "notes": "Complete bundles environment-aware setup and development environment fixes"
   }
 }

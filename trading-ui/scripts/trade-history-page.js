@@ -62,12 +62,17 @@
      * @param {string} dateString - Date string
      * @param {boolean} includeTime - Whether to include time
      * @returns {string} Formatted date
+     * @deprecated Use window.FieldRendererService.renderDate() directly
      */
     function formatDate(dateString, includeTime = false) {
         if (!dateString) return '-';
         
         // Use FieldRendererService for consistent date formatting
-        return window.FieldRendererService.renderDate(dateString, includeTime);
+        if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
+            return window.FieldRendererService.renderDate(dateString, includeTime);
+        }
+        // Fallback if FieldRendererService not available
+        return dateString;
     }
 
     // ===== Main Functions =====
@@ -510,7 +515,14 @@
             // Fallback למקרה שהמערכת לא זמינה (מוקאפ)
             const trade = allTrades.find(t => t.id === tradeId);
             if (!trade) return;
-            alert(`פרטי טרייד #${tradeId}\n\nטיקר: ${trade.ticker}\nצד: ${trade.side}\nסוג: ${getInvestmentTypeText(trade.investment_type)}\nתאריך יצירה: ${formatDate(trade.created_at)}\nתאריך סגירה: ${formatDate(trade.closed_at)}\nP/L: $${trade.pl} (${trade.pl >= 0 ? '+' : ''}${trade.pl_percent}%)`);
+            // Use NotificationSystem instead of alert
+            const tradeDetails = `פרטי טרייד #${tradeId}\n\nטיקר: ${trade.ticker}\nצד: ${trade.side}\nסוג: ${getInvestmentTypeText(trade.investment_type)}\nתאריך יצירה: ${formatDate(trade.created_at)}\nתאריך סגירה: ${formatDate(trade.closed_at)}\nP/L: $${trade.pl} (${trade.pl >= 0 ? '+' : ''}${trade.pl_percent}%)`;
+            
+            if (window.NotificationSystem && typeof window.NotificationSystem.showInfo === 'function') {
+                window.NotificationSystem.showInfo('פרטי טרייד', tradeDetails);
+            } else if (window.Logger) {
+                window.Logger.info('Trade details', { page: 'trade-history-page', tradeId, details: tradeDetails });
+            }
         }
     }
 

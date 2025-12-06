@@ -3683,6 +3683,45 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
           window.Logger?.info('📄 Initializing portfolio-state-page...', {
             page: 'page-initialization-configs',
           });
+          
+          // Wait for portfolioStatePage to be available
+          if (!window.portfolioStatePage) {
+            window.Logger?.warn('⚠️ portfolioStatePage not available yet, waiting...', {
+              page: 'page-initialization-configs',
+            });
+            
+            // Wait up to 5 seconds for the script to load
+            let retries = 0;
+            while (!window.portfolioStatePage) {
+              if (retries >= 50) {
+                window.Logger?.error('❌ portfolioStatePage not available after wait', {
+                  page: 'page-initialization-configs',
+                });
+                return;
+              }
+              await new Promise(resolve => setTimeout(resolve, 100));
+              retries++;
+            }
+          }
+
+          // Call initializePage if available, otherwise page will initialize via DOMContentLoaded
+          if (typeof window.portfolioStatePage.initializePage === 'function') {
+            try {
+              await window.portfolioStatePage.initializePage();
+              window.Logger?.info('✅ Portfolio State Page initialized via UnifiedAppInitializer', {
+                page: 'page-initialization-configs',
+              });
+            } catch (error) {
+              window.Logger?.error('❌ Error initializing Portfolio State Page', {
+                page: 'page-initialization-configs',
+                error,
+              });
+            }
+          } else {
+            window.Logger?.info('ℹ️ Portfolio State Page will initialize via DOMContentLoaded', {
+              page: 'page-initialization-configs',
+            });
+          }
         },
       ],
     },    'trade-history-page': {
@@ -3728,6 +3767,40 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
           window.Logger?.info('📄 Initializing trade-history-page...', {
             page: 'page-initialization-configs',
           });
+          
+          // Wait for tradeHistoryPage to be available
+          if (!window.tradeHistoryPage || typeof window.tradeHistoryPage.initializePage !== 'function') {
+            window.Logger?.warn('⚠️ tradeHistoryPage.initializePage not available yet, waiting...', {
+              page: 'page-initialization-configs',
+            });
+            
+            // Wait up to 5 seconds for the script to load
+            let retries = 0;
+            while (!window.tradeHistoryPage || typeof window.tradeHistoryPage.initializePage !== 'function') {
+              if (retries >= 50) {
+                window.Logger?.error('❌ tradeHistoryPage.initializePage not available after wait', {
+                  page: 'page-initialization-configs',
+                });
+                return;
+              }
+              await new Promise(resolve => setTimeout(resolve, 100));
+              retries++;
+            }
+          }
+
+          // Call initializePage from trade-history-page.js
+          try {
+            await window.tradeHistoryPage.initializePage();
+            window.Logger?.info('✅ Trade History Page initialized via UnifiedAppInitializer', {
+              page: 'page-initialization-configs',
+            });
+          } catch (error) {
+            window.Logger?.error('❌ Error initializing Trade History Page', {
+              page: 'page-initialization-configs',
+              error,
+            });
+            throw error;
+          }
         },
       ],
     },    'price-history-page': {
@@ -3871,6 +3944,32 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       customInitializers: [
         async pageConfig => {
           window.Logger?.info('📄 Initializing trading-journal-page...', {
+            page: 'page-initialization-configs',
+          });
+          
+          // Wait for tradingJournalPage to be available
+          if (!window.tradingJournalPage) {
+            window.Logger?.warn('⚠️ tradingJournalPage not available yet, waiting...', {
+              page: 'page-initialization-configs',
+            });
+            
+            // Wait up to 5 seconds for the script to load
+            let retries = 0;
+            while (!window.tradingJournalPage) {
+              if (retries >= 50) {
+                window.Logger?.error('❌ tradingJournalPage not available after wait', {
+                  page: 'page-initialization-configs',
+                });
+                return;
+              }
+              await new Promise(resolve => setTimeout(resolve, 100));
+              retries++;
+            }
+          }
+
+          // Trading Journal Page initializes via DOMContentLoaded listener
+          // Just verify it's loaded
+          window.Logger?.info('✅ Trading Journal Page script loaded', {
             page: 'page-initialization-configs',
           });
         },

@@ -154,6 +154,15 @@ class InitSystemCheck {
             pageName = 'tag-management';
         }
         
+        // Handle mockup pages with specific URL patterns
+        if (path.includes('trade-history-page')) {
+            pageName = 'trade-history-page';
+        } else if (path.includes('portfolio-state-page')) {
+            pageName = 'portfolio-state-page';
+        } else if (path.includes('trading-journal-page')) {
+            pageName = 'trading-journal-page';
+        }
+        
         // For mockup pages, check if there's a class on html element
         if (document.documentElement && document.documentElement.className) {
             const htmlClass = document.documentElement.className;

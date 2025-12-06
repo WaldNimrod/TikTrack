@@ -6,6 +6,7 @@ This script uses Selenium to check JavaScript console errors
 
 import json
 import time
+import argparse
 from datetime import datetime
 from pathlib import Path
 from collections import deque
@@ -95,7 +96,13 @@ ALL_PAGES = [
     {"name": "בדיקת תנאים", "url": "/conditions-test.html", "category": "dev", "priority": "low"},
     
     # עמודי רשימות מעקב (Watch Lists)
-    {"name": "ניהול רשימות צפייה", "url": "/mockups/watch-lists-page.html", "category": "watchlists", "priority": "medium"},
+    {"name": "ניהול רשימות צפייה", "url": "/watch-list.html", "category": "watchlists", "priority": "high"},
+    {"name": "ניהול רשימות צפייה (מוקאפ)", "url": "/mockups/watch-lists-page.html", "category": "watchlists", "priority": "medium"},
+    
+    # עמודי מחקר (Research Pages) - משולבים
+    {"name": "היסטוריית טרייד", "url": "/mockups/daily-snapshots/trade-history-page.html", "category": "main", "priority": "high"},
+    {"name": "מצב תיק היסטורי", "url": "/mockups/daily-snapshots/portfolio-state-page.html", "category": "main", "priority": "high"},
+    {"name": "יומן מסחר", "url": "/mockups/daily-snapshots/trading-journal-page.html", "category": "main", "priority": "high"},
     {"name": "מודל רשימת צפייה", "url": "/mockups/watch-list-modal.html", "category": "watchlists", "priority": "medium"},
     {"name": "מודל הוספת טיקר", "url": "/mockups/add-ticker-modal.html", "category": "watchlists", "priority": "medium"},
     {"name": "פעולה מהירה דגלים", "url": "/mockups/flag-quick-action.html", "category": "watchlists", "priority": "medium"},
@@ -405,11 +412,30 @@ def test_page_console(driver, page_info, retry_count: int = 0):
 
 def main():
     """Main test function"""
+    parser = argparse.ArgumentParser(description='Test console errors on pages')
+    parser.add_argument('--page', type=str, help='Test specific page URL (e.g., /watch-list.html)')
+    args = parser.parse_args()
+    
+    # Filter pages if --page is specified
+    pages_to_test = ALL_PAGES
+    if args.page:
+        page_url = args.page if args.page.startswith('/') else '/' + args.page
+        pages_to_test = [p for p in ALL_PAGES if p['url'] == page_url]
+        if not pages_to_test:
+            print(f"❌ Page not found: {page_url}")
+            print(f"Available pages with 'watch-list' in URL:")
+            for p in [p for p in ALL_PAGES if 'watch-list' in p['url'].lower()]:
+                print(f"  - {p['url']} ({p['name']})")
+            return
+    
     print("=" * 80)
-    print("🔍 בדיקת שגיאות קונסול בכל העמודים")
+    if args.page:
+        print(f"🔍 בדיקת שגיאות קונסול בעמוד: {args.page}")
+    else:
+        print("🔍 בדיקת שגיאות קונסול בכל העמודים")
     print("=" * 80)
     print(f"Base URL: {BASE_URL}")
-    print(f"Total pages to test: {len(ALL_PAGES)}")
+    print(f"Total pages to test: {len(pages_to_test)}")
     print(f"Start time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print("=" * 80)
     print()
@@ -422,8 +448,8 @@ def main():
     results = []
     
     try:
-        for i, page in enumerate(ALL_PAGES, 1):
-            print(f"[{i}/{len(ALL_PAGES)}] Testing: {page['name']} ({page['url']}) [{page['category']}]")
+        for i, page in enumerate(pages_to_test, 1):
+            print(f"[{i}/{len(pages_to_test)}] Testing: {page['name']} ({page['url']}) [{page['category']}]")
             
             # Show rate limit stats if we've hit limits
             if rate_tracker.rate_limit_hits > 0:

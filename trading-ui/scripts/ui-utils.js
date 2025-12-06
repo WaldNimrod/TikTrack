@@ -2477,7 +2477,7 @@ function updatePageSummaryStats(pageName, data, countElementId = null) {
         // עדכון מספר הרשומות בטבלה (אם סופק ID)
         if (countElementId) {
           const countElement = document.getElementById(countElementId);
-          if (countElement) {
+          if (countElement && typeof countElement === 'object' && 'textContent' in countElement) {
             countElement.textContent = `${summaryData.length} רשומות`;
           }
         }
@@ -2487,8 +2487,7 @@ function updatePageSummaryStats(pageName, data, countElementId = null) {
     } else {
       // מערכת סיכום נתונים לא זמינה
       const summaryStatsElement = document.getElementById('summaryStats');
-      if (summaryStatsElement) {
-        summaryStatsElement.textContent = '';
+      if (summaryStatsElement && typeof summaryStatsElement === 'object' && 'textContent' in summaryStatsElement) {
         summaryStatsElement.textContent = '';
         const errorDiv = document.createElement('div');
         errorDiv.style.color = '#dc3545';

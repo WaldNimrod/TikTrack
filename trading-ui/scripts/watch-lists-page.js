@@ -196,9 +196,9 @@
         // Register active list table
         window.UnifiedTableSystem.registry.register('watch_list_items', {
             dataGetter: () => activeListItems || [],
-            updateFunction: (data) => {
+            updateFunction: async (data) => {
                 activeListItems = Array.isArray(data) ? data : [];
-                renderActiveListView(activeListItems);
+                await renderActiveListView(activeListItems);
             },
             tableSelector: '#watchListItemsTable',
             columns: getColumns('watch_list_items'),
@@ -310,15 +310,32 @@
                 throw new Error('WatchListsDataService not available');
             }
             
+            window.Logger?.debug?.('📥 Loading watch list items', { ...PAGE_LOG_CONTEXT, listId });
             activeListItems = await window.WatchListsDataService.getWatchListItems(listId, { force: false });
-            renderActiveListView(activeListItems);
+            window.Logger?.debug?.('✅ Watch list items loaded', { ...PAGE_LOG_CONTEXT, listId, count: activeListItems?.length || 0 });
+            
+            if (!Array.isArray(activeListItems)) {
+                window.Logger?.warn?.('⚠️ Watch list items is not an array', { ...PAGE_LOG_CONTEXT, listId, items: activeListItems });
+                activeListItems = [];
+            }
+            
+            // Ensure we have data before rendering
+            if (activeListItems.length === 0) {
+                window.Logger?.debug?.('No items in list, rendering empty state', { ...PAGE_LOG_CONTEXT, listId });
+            }
+            
+            await renderActiveListView(activeListItems);
         } catch (error) {
             const errorMsg = error?.message || (typeof error === 'string' ? error : 'שגיאה לא ידועה');
+            window.Logger?.error?.('❌ Error loading watch list items', { ...PAGE_LOG_CONTEXT, listId, error: errorMsg });
+            
+            // Clear items on error
+            activeListItems = [];
+            await renderActiveListView([]);
+            
             if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {
                 window.NotificationSystem.showError('שגיאה בטעינת פריטי רשימה', 
                     `לא ניתן לטעון את הפריטים. ${errorMsg}`);
-            } else if (window.Logger) {
-                window.Logger.error('❌ Error loading watch list items', { ...PAGE_LOG_CONTEXT, listId, error: errorMsg });
             }
         }
     }
@@ -354,6 +371,15 @@
         watchListsData.forEach(list => {
             const tr = document.createElement('tr');
             tr.setAttribute('data-watch-list-id', list.id);
+            // Add click handler to row - select list on click
+            tr.style.cursor = 'pointer';
+            tr.addEventListener('click', (e) => {
+                // Don't trigger if clicking on buttons or actions
+                if (e.target.closest('.actions-cell') || e.target.closest('button')) {
+                    return;
+                }
+                window.WatchListsPage?.selectList(list.id);
+            });
 
             // Icon column
             const tdIcon = document.createElement('td');
@@ -469,44 +495,62 @@
     /**
      * Render active list view
      * @param {Array} items - Items to render
+     * @async
      */
-    function renderActiveListView(items) {
+    async function renderActiveListView(items) {
         if (!items) items = [];
+        
+        window.Logger?.debug?.('🎨 Rendering active list view', { ...PAGE_LOG_CONTEXT, mode: currentViewMode, itemsCount: items.length });
 
-        // Table view is handled by UnifiedTableSystem or manual rendering
-        if (currentViewMode === 'table') {
-            // Use UI Service if available, otherwise manual rendering
-            if (window.WatchListsUIService?.renderTableView) {
-                window.WatchListsUIService.renderTableView(items);
-            } else {
-                // Manual table rendering will be handled by updateWatchListItemsTable
-                updateWatchListItemsTable(items);
+        try {
+            // Table view is handled by UnifiedTableSystem or manual rendering
+            if (currentViewMode === 'table') {
+                // Use UI Service if available, otherwise manual rendering
+                if (window.WatchListsUIService?.renderTableView) {
+                    window.Logger?.debug?.('Using WatchListsUIService.renderTableView', { ...PAGE_LOG_CONTEXT });
+                    window.WatchListsUIService.renderTableView(items);
+                } else {
+                    // Manual table rendering will be handled by updateWatchListItemsTable
+                    window.Logger?.debug?.('Using manual updateWatchListItemsTable', { ...PAGE_LOG_CONTEXT });
+                    await updateWatchListItemsTable(items);
+                }
+            } else if (currentViewMode === 'cards') {
+                if (window.WatchListsUIService?.renderCardsView) {
+                    window.WatchListsUIService.renderCardsView(items);
+                } else {
+                    await renderCardsView(items);
+                }
+            } else if (currentViewMode === 'compact') {
+                if (window.WatchListsUIService?.renderCompactView) {
+                    window.WatchListsUIService.renderCompactView(items);
+                } else {
+                    await renderCompactView(items);
+                }
             }
-        } else if (currentViewMode === 'cards') {
-            if (window.WatchListsUIService?.renderCardsView) {
-                window.WatchListsUIService.renderCardsView(items);
-            } else {
-                renderCardsView(items);
-            }
-        } else if (currentViewMode === 'compact') {
-            if (window.WatchListsUIService?.renderCompactView) {
-                window.WatchListsUIService.renderCompactView(items);
-            } else {
-                renderCompactView(items);
-            }
+
+            window.Logger?.debug?.('📊 Active list view rendered', { ...PAGE_LOG_CONTEXT, mode: currentViewMode, count: items.length });
+        } catch (error) {
+            window.Logger?.error?.('❌ Error rendering active list view', { ...PAGE_LOG_CONTEXT, error: error?.message || error });
         }
-
-        window.Logger?.debug?.('📊 Active list view rendered', { ...PAGE_LOG_CONTEXT, mode: currentViewMode, count: items.length });
     }
 
     /**
      * Update watch list items table
      * @param {Array} items - Items to render
+     * @async
      */
-    function updateWatchListItemsTable(items) {
+    async function updateWatchListItemsTable(items) {
+        window.Logger?.debug?.('🔄 updateWatchListItemsTable called', { ...PAGE_LOG_CONTEXT, itemsCount: items?.length || 0 });
+        
         const tbody = document.getElementById('watchListItemsTableBody');
         if (!tbody) {
             window.Logger?.warn?.('⚠️ watchListItemsTableBody not found', PAGE_LOG_CONTEXT);
+            // Try alternative selector
+            const alternativeTbody = document.querySelector('#watchListItemsTable tbody');
+            if (alternativeTbody) {
+                window.Logger?.info?.('Found alternative tbody selector', PAGE_LOG_CONTEXT);
+                return updateWatchListItemsTable(items); // Recursive call with found element
+            }
             return;
         }
 
@@ -515,6 +559,7 @@
 
         // If no data, show empty message
         if (!items || items.length === 0) {
+            window.Logger?.debug?.('No items to render, showing empty message', PAGE_LOG_CONTEXT);
             const tr = document.createElement('tr');
             const td = document.createElement('td');
             td.colSpan = 11;
@@ -524,12 +569,18 @@
             tbody.appendChild(tr);
             return;
         }
+        
+        window.Logger?.debug?.('Rendering items to table', { ...PAGE_LOG_CONTEXT, itemsCount: items.length });
 
-        // Render each item (simplified - full rendering should use FieldRendererService)
-        items.forEach(item => {
+        // Render each item with full data using FieldRendererService
+        // Using for...of loop to avoid async issues with forEach
+        for (const item of items) {
             const tr = document.createElement('tr');
             tr.setAttribute('data-item-id', item.id);
             tr.setAttribute('draggable', 'true');
+
+            const ticker = item.ticker || {};
+            const currencySymbol = ticker.currency_symbol || ticker.currency?.symbol || '$';
 
             // Drag handle column
             const tdDrag = document.createElement('td');
@@ -563,7 +614,7 @@
             // Symbol column
             const tdSymbol = document.createElement('td');
             const strong = document.createElement('strong');
-            strong.textContent = item.ticker?.symbol || item.external_symbol || `טיקר #${item.id}`;
+            strong.textContent = ticker.symbol || item.external_symbol || `טיקר #${item.id}`;
             tdSymbol.appendChild(strong);
             if (item.external_symbol) {
                 const badge = document.createElement('span');
@@ -573,21 +624,141 @@
             }
             tr.appendChild(tdSymbol);
 
-            // Price column (simplified - should use FieldRendererService)
+            // Price column - using FieldRendererService
             const tdPrice = document.createElement('td');
-            tdPrice.textContent = item.ticker?.current_price || item.price || 'N/A';
+            const price = ticker.current_price || ticker.price || null;
+            if (price !== null && window.FieldRendererService?.renderAmount) {
+                tdPrice.innerHTML = window.FieldRendererService.renderAmount(price, currencySymbol, 2, false);
+            } else {
+                tdPrice.textContent = 'לא זמין';
+                tdPrice.className = 'text-muted';
+            }
             tr.appendChild(tdPrice);
 
-            // Add more columns as needed (Change, Change %, Daily Change %, ATR, Position, P/L, P/L %, Actions)
-            // For now, add placeholder cells
-            for (let i = 0; i < 8; i++) {
-                const td = document.createElement('td');
-                td.textContent = '-';
-                tr.appendChild(td);
+            // Change column - using FieldRendererService
+            const tdChange = document.createElement('td');
+            const change = ticker.change || ticker.change_amount || null;
+            if (change !== null && window.FieldRendererService?.renderAmount) {
+                tdChange.innerHTML = window.FieldRendererService.renderAmount(change, currencySymbol, 2, true);
+            } else {
+                tdChange.textContent = '-';
+                tdChange.className = 'text-muted';
             }
+            tr.appendChild(tdChange);
+
+            // Change % column - using FieldRendererService
+            const tdChangePercent = document.createElement('td');
+            const changePercent = ticker.change_percent || ticker.change_percentage || null;
+            if (changePercent !== null && window.FieldRendererService?.renderNumericValue) {
+                tdChangePercent.innerHTML = window.FieldRendererService.renderNumericValue(changePercent, '%', true);
+            } else {
+                tdChangePercent.textContent = '-';
+                tdChangePercent.className = 'text-muted';
+            }
+            tr.appendChild(tdChangePercent);
+
+            // Daily Change % column - using FieldRendererService
+            const tdDailyChange = document.createElement('td');
+            const dailyChangePercent = ticker.daily_change_percent || ticker.daily_change_percentage || null;
+            if (dailyChangePercent !== null && window.FieldRendererService?.renderNumericValue) {
+                tdDailyChange.innerHTML = window.FieldRendererService.renderNumericValue(dailyChangePercent, '%', true);
+            } else {
+                tdDailyChange.textContent = '-';
+                tdDailyChange.className = 'text-muted';
+            }
+            tr.appendChild(tdDailyChange);
+
+            // ATR column - using FieldRendererService (async)
+            const tdATR = document.createElement('td');
+            const atr = ticker.atr || null;
+            const atrPercent = ticker.atr_percent || (atr !== null && price !== null && price > 0 ? (parseFloat(atr) / parseFloat(price) * 100) : null);
+            if (atr !== null && atrPercent !== null && window.FieldRendererService?.renderATR) {
+                // ATR is async - set placeholder first, then update
+                tdATR.textContent = 'טוען...';
+                tdATR.className = 'text-muted';
+                // Render ATR async
+                (async () => {
+                    try {
+                        const atrHtml = await window.FieldRendererService.renderATR(atr, atrPercent);
+                        tdATR.innerHTML = atrHtml;
+                    } catch (e) {
+                        window.Logger?.warn?.('Error rendering ATR', { ...PAGE_LOG_CONTEXT, error: e });
+                        tdATR.textContent = atrPercent ? `${atrPercent.toFixed(2)}%` : '-';
+                        tdATR.className = 'text-muted';
+                    }
+                })();
+            } else {
+                tdATR.textContent = atrPercent ? `${atrPercent.toFixed(2)}%` : '-';
+                tdATR.className = 'text-muted';
+            }
+            tr.appendChild(tdATR);
+
+            // Position column - need to fetch position data (placeholder for now)
+            const tdPosition = document.createElement('td');
+            // TODO: Fetch position data if available
+            tdPosition.textContent = '-';
+            tdPosition.className = 'text-muted';
+            tr.appendChild(tdPosition);
+
+            // P/L column - using FieldRendererService
+            const tdPL = document.createElement('td');
+            const pl = ticker.profit_loss || ticker.pl || null;
+            if (pl !== null && window.FieldRendererService?.renderAmount) {
+                tdPL.innerHTML = window.FieldRendererService.renderAmount(pl, currencySymbol, 2, true);
+            } else {
+                tdPL.textContent = '-';
+                tdPL.className = 'text-muted';
+            }
+            tr.appendChild(tdPL);
+
+            // P/L % column - using FieldRendererService
+            const tdPLPercent = document.createElement('td');
+            const plPercent = ticker.profit_loss_percent || ticker.pl_percent || null;
+            if (plPercent !== null && window.FieldRendererService?.renderNumericValue) {
+                tdPLPercent.innerHTML = window.FieldRendererService.renderNumericValue(plPercent, '%', true);
+            } else {
+                tdPLPercent.textContent = '-';
+                tdPLPercent.className = 'text-muted';
+            }
+            tr.appendChild(tdPLPercent);
+
+            // Actions column
+            const tdActions = document.createElement('td');
+            tdActions.className = 'actions-cell';
+            const actionsContainer = document.createElement('div');
+            actionsContainer.className = 'action-buttons-container';
+
+            // Edit button
+            const editBtn = document.createElement('button');
+            editBtn.type = 'button';
+            editBtn.className = 'btn btn-sm btn-icon-only';
+            editBtn.setAttribute('data-onclick', `window.WatchListsPage?.editItem(${item.id})`);
+            editBtn.title = 'עריכה';
+            const editIcon = document.createElement('span');
+            editIcon.className = 'icon-placeholder icon';
+            editIcon.setAttribute('data-icon', 'edit');
+            editIcon.setAttribute('data-size', '16');
+            editBtn.appendChild(editIcon);
+            actionsContainer.appendChild(editBtn);
+
+            // Delete button
+            const deleteBtn = document.createElement('button');
+            deleteBtn.type = 'button';
+            deleteBtn.className = 'btn btn-sm btn-icon-only';
+            deleteBtn.setAttribute('data-onclick', `window.WatchListsPage?.removeItem(${item.id})`);
+            deleteBtn.title = 'מחיקה';
+            const deleteIcon = document.createElement('span');
+            deleteIcon.className = 'icon-placeholder icon';
+            deleteIcon.setAttribute('data-icon', 'trash');
+            deleteIcon.setAttribute('data-size', '16');
+            deleteBtn.appendChild(deleteIcon);
+            actionsContainer.appendChild(deleteBtn);
+
+            tdActions.appendChild(actionsContainer);
+            tr.appendChild(tdActions);
 
             tbody.appendChild(tr);
-        });
+        }
 
         // Initialize button system for new buttons
         if (window.ButtonSystemInit?.initializeButtons) {
@@ -692,8 +863,9 @@
     /**
      * Switch to different watch list
      * @param {string|number} listId - List ID
+     * @async
      */
-    function switchList(listId) {
+    async function switchList(listId) {
         if (!listId) {
             window.Logger?.warn?.('No list ID provided', PAGE_LOG_CONTEXT);
             return;
@@ -713,8 +885,8 @@
         // Set as active
         activeListId = listIdNum;
         
-        // Load list items
-        loadWatchListItems(listIdNum);
+        // Load list items - MUST await to ensure items are loaded before continuing
+        await loadWatchListItems(listIdNum);
         
         // Update title
         updateActiveListTitle(list.name);
@@ -732,9 +904,19 @@
      * @param {string} mode - View mode ('table', 'cards', 'compact')
      */
     function setViewMode(mode) {
+        if (!['table', 'cards', 'compact'].includes(mode)) {
+            window.Logger?.warn?.('Invalid view mode', { ...PAGE_LOG_CONTEXT, mode });
+            return;
+        }
+
+        window.Logger?.debug?.('🔄 Setting view mode', { ...PAGE_LOG_CONTEXT, mode, previousMode: currentViewMode });
+
+        // Update current view mode
+        currentViewMode = mode;
+
+        // Use UI Service if available
         if (window.WatchListsUIService?.switchViewMode) {
             window.WatchListsUIService.switchViewMode(mode);
-            currentViewMode = mode;
         } else {
             // Fallback implementation
             const tableView = document.getElementById('tableView');
@@ -749,8 +931,6 @@
             if (selectedView) {
                 selectedView.classList.remove('d-none');
             }
-
-            currentViewMode = mode;
         }
         
         // Update active button state
@@ -763,9 +943,20 @@
                 btn.classList.remove('active');
             }
         });
+
+        // CRITICAL: Re-render the active list view with current data after mode change
+        if (activeListItems && activeListItems.length > 0) {
+            window.Logger?.debug?.('Re-rendering active list view after mode change', { ...PAGE_LOG_CONTEXT, mode, itemsCount: activeListItems.length });
+            // Call async function properly
+            Promise.resolve(renderActiveListView(activeListItems)).catch(error => {
+                window.Logger?.error?.('Error re-rendering after view mode change', { ...PAGE_LOG_CONTEXT, error });
+            });
+        }
         
         // Save page state
         savePageState();
+
+        window.Logger?.debug?.('✅ View mode set', { ...PAGE_LOG_CONTEXT, mode });
     }
 
     // ===== FLAG MANAGEMENT =====
@@ -1034,7 +1225,9 @@
                             if (activeListId === listId) {
                                 activeListId = null;
                                 activeListItems = [];
-                                renderActiveListView([]);
+                                Promise.resolve(renderActiveListView([])).catch(error => {
+                                    window.Logger?.error?.('Error clearing active list view', { ...PAGE_LOG_CONTEXT, error });
+                                });
                             }
                         },
                         showNotification: true
@@ -1253,9 +1446,126 @@
      * Render cards view (helper)
      * @param {Array} items - Items to render
      */
-    function renderCardsView(items) {
-        // Cards view rendering
-        // This is a placeholder for future dynamic rendering
+    async function renderCardsView(items) {
+        if (!items) items = [];
+        
+        window.Logger?.debug?.('🃏 Rendering cards view', { ...PAGE_LOG_CONTEXT, count: items.length });
+        
+        const container = document.getElementById('watchListItemsCards');
+        if (!container) {
+            window.Logger?.warn?.('⚠️ watchListItemsCards container not found', PAGE_LOG_CONTEXT);
+            return;
+        }
+
+        // Clear existing cards
+        container.innerHTML = '';
+
+        if (items.length === 0) {
+            const emptyMsg = document.createElement('div');
+            emptyMsg.className = 'col-12 text-center text-muted py-5';
+            emptyMsg.textContent = 'אין פריטים ברשימה זו. לחץ על "הוסף טיקר לרשימה" כדי להתחיל.';
+            container.appendChild(emptyMsg);
+            return;
+        }
+
+        // Render each item as a card
+        for (const item of items) {
+            const ticker = item.ticker || {};
+            const currencySymbol = ticker.currency_symbol || ticker.currency?.symbol || '$';
+            const price = ticker.current_price || ticker.price || null;
+            const change = ticker.change || ticker.change_amount || null;
+            const changePercent = ticker.change_percent || ticker.change_percentage || null;
+            const symbol = ticker.symbol || item.external_symbol || `טיקר #${item.id}`;
+
+            const col = document.createElement('div');
+            col.className = 'col-md-6 col-lg-4';
+
+            const card = document.createElement('div');
+            card.className = 'card h-100';
+            card.setAttribute('data-item-id', item.id);
+
+            const cardBody = document.createElement('div');
+            cardBody.className = 'card-body';
+
+            // Card header with symbol and flag
+            const cardHeader = document.createElement('div');
+            cardHeader.className = 'd-flex justify-content-between align-items-start mb-3';
+            
+            const symbolStrong = document.createElement('strong');
+            symbolStrong.className = 'h5 mb-0';
+            symbolStrong.textContent = symbol;
+            cardHeader.appendChild(symbolStrong);
+
+            if (item.flag_color) {
+                const flagBtn = document.createElement('button');
+                flagBtn.type = 'button';
+                flagBtn.className = 'btn btn-sm btn-flag';
+                flagBtn.setAttribute('data-flag-color', item.flag_color);
+                flagBtn.setAttribute('data-onclick', `window.WatchListsPage?.showFlagPalette(${item.id})`);
+                flagBtn.title = 'שינוי דגל';
+                const flagIcon = document.createElement('span');
+                flagIcon.className = 'icon-placeholder icon';
+                flagIcon.setAttribute('data-icon', 'flag-filled');
+                flagIcon.setAttribute('data-size', '16');
+                flagBtn.appendChild(flagIcon);
+                cardHeader.appendChild(flagBtn);
+            }
+
+            cardBody.appendChild(cardHeader);
+
+            // Price
+            if (price !== null) {
+                const priceDiv = document.createElement('div');
+                priceDiv.className = 'mb-2';
+                if (window.FieldRendererService?.renderAmount) {
+                    priceDiv.innerHTML = window.FieldRendererService.renderAmount(price, currencySymbol, 2, false);
+                } else {
+                    priceDiv.textContent = `${currencySymbol}${price.toFixed(2)}`;
+                }
+                cardBody.appendChild(priceDiv);
+            }
+
+            // Change
+            if (changePercent !== null) {
+                const changeDiv = document.createElement('div');
+                changeDiv.className = 'mb-2';
+                if (window.FieldRendererService?.renderNumericValue) {
+                    changeDiv.innerHTML = window.FieldRendererService.renderNumericValue(changePercent, '%', true);
+                } else {
+                    changeDiv.textContent = changePercent >= 0 ? `+${changePercent.toFixed(2)}%` : `${changePercent.toFixed(2)}%`;
+                }
+                cardBody.appendChild(changeDiv);
+            }
+
+            // Actions
+            const actionsDiv = document.createElement('div');
+            actionsDiv.className = 'd-flex gap-2 mt-3';
+            
+            const editBtn = document.createElement('button');
+            editBtn.type = 'button';
+            editBtn.className = 'btn btn-sm btn-outline-primary';
+            editBtn.setAttribute('data-onclick', `window.WatchListsPage?.editItem(${item.id})`);
+            editBtn.textContent = 'עריכה';
+            actionsDiv.appendChild(editBtn);
+
+            const deleteBtn = document.createElement('button');
+            deleteBtn.type = 'button';
+            deleteBtn.className = 'btn btn-sm btn-outline-danger';
+            deleteBtn.setAttribute('data-onclick', `window.WatchListsPage?.removeItem(${item.id})`);
+            deleteBtn.textContent = 'מחיקה';
+            actionsDiv.appendChild(deleteBtn);
+
+            cardBody.appendChild(actionsDiv);
+            card.appendChild(cardBody);
+            col.appendChild(card);
+            container.appendChild(col);
+        }
+
+        // Initialize button system for new buttons
+        if (window.ButtonSystemInit?.initializeButtons) {
+            window.ButtonSystemInit.initializeButtons(container);
+        }
+
         window.Logger?.debug?.('🃏 Cards view rendered', { ...PAGE_LOG_CONTEXT, count: items.length });
     }
 
@@ -1263,9 +1573,103 @@
      * Render compact view (helper)
      * @param {Array} items - Items to render
      */
-    function renderCompactView(items) {
-        // Compact view rendering
-        // This is a placeholder for future dynamic rendering
+    async function renderCompactView(items) {
+        if (!items) items = [];
+        
+        window.Logger?.debug?.('📋 Rendering compact view', { ...PAGE_LOG_CONTEXT, count: items.length });
+        
+        const container = document.getElementById('watchListItemsCompact');
+        if (!container) {
+            window.Logger?.warn?.('⚠️ watchListItemsCompact container not found', PAGE_LOG_CONTEXT);
+            return;
+        }
+
+        // Clear existing items
+        container.innerHTML = '';
+
+        if (items.length === 0) {
+            const emptyMsg = document.createElement('div');
+            emptyMsg.className = 'list-group-item text-center text-muted py-5';
+            emptyMsg.textContent = 'אין פריטים ברשימה זו. לחץ על "הוסף טיקר לרשימה" כדי להתחיל.';
+            container.appendChild(emptyMsg);
+            return;
+        }
+
+        // Render each item as a compact list item
+        for (const item of items) {
+            const ticker = item.ticker || {};
+            const currencySymbol = ticker.currency_symbol || ticker.currency?.symbol || '$';
+            const price = ticker.current_price || ticker.price || null;
+            const changePercent = ticker.change_percent || ticker.change_percentage || null;
+            const symbol = ticker.symbol || item.external_symbol || `טיקר #${item.id}`;
+
+            const listItem = document.createElement('div');
+            listItem.className = 'list-group-item';
+            listItem.setAttribute('data-item-id', item.id);
+
+            const itemContent = document.createElement('div');
+            itemContent.className = 'd-flex justify-content-between align-items-center';
+
+            const leftContent = document.createElement('div');
+            leftContent.className = 'd-flex align-items-center gap-3';
+
+            // Symbol
+            const symbolStrong = document.createElement('strong');
+            symbolStrong.textContent = symbol;
+            leftContent.appendChild(symbolStrong);
+
+            // Price
+            if (price !== null) {
+                const priceSpan = document.createElement('span');
+                if (window.FieldRendererService?.renderAmount) {
+                    priceSpan.innerHTML = window.FieldRendererService.renderAmount(price, currencySymbol, 2, false);
+                } else {
+                    priceSpan.textContent = `${currencySymbol}${price.toFixed(2)}`;
+                }
+                leftContent.appendChild(priceSpan);
+            }
+
+            // Change %
+            if (changePercent !== null) {
+                const changeSpan = document.createElement('span');
+                if (window.FieldRendererService?.renderNumericValue) {
+                    changeSpan.innerHTML = window.FieldRendererService.renderNumericValue(changePercent, '%', true);
+                } else {
+                    changeSpan.textContent = changePercent >= 0 ? `+${changePercent.toFixed(2)}%` : `${changePercent.toFixed(2)}%`;
+                }
+                leftContent.appendChild(changeSpan);
+            }
+
+            itemContent.appendChild(leftContent);
+
+            // Actions
+            const actionsDiv = document.createElement('div');
+            actionsDiv.className = 'd-flex gap-2';
+
+            const editBtn = document.createElement('button');
+            editBtn.type = 'button';
+            editBtn.className = 'btn btn-sm btn-outline-primary';
+            editBtn.setAttribute('data-onclick', `window.WatchListsPage?.editItem(${item.id})`);
+            editBtn.textContent = 'עריכה';
+            actionsDiv.appendChild(editBtn);
+
+            const deleteBtn = document.createElement('button');
+            deleteBtn.type = 'button';
+            deleteBtn.className = 'btn btn-sm btn-outline-danger';
+            deleteBtn.setAttribute('data-onclick', `window.WatchListsPage?.removeItem(${item.id})`);
+            deleteBtn.textContent = 'מחיקה';
+            actionsDiv.appendChild(deleteBtn);
+
+            itemContent.appendChild(actionsDiv);
+            listItem.appendChild(itemContent);
+            container.appendChild(listItem);
+        }
+
+        // Initialize button system for new buttons
+        if (window.ButtonSystemInit?.initializeButtons) {
+            window.ButtonSystemInit.initializeButtons(container);
+        }
+
         window.Logger?.debug?.('📋 Compact view rendered', { ...PAGE_LOG_CONTEXT, count: items.length });
     }
 
@@ -1387,9 +1791,16 @@
         updateActiveListSelect,
         updateWatchListItemsTable,
         switchList,
+        
+        // Data getters (for external access)
+        get watchListsData() { return watchListsData; },
+        get activeListId() { return activeListId; },
+        get watchListItemsData() { return activeListItems; },
 
         // View mode
         setViewMode,
+        renderCardsView,
+        renderCompactView,
 
         // Flag management
         showFlagPalette,

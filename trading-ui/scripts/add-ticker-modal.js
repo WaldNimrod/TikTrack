@@ -40,6 +40,7 @@
     let currentListId = null;
     let selectedTickerId = null;
     let searchResults = [];
+    let allTickersCache = null; // Cache for all tickers to avoid repeated API calls
 
     // ===== MODAL MANAGEMENT =====
 
@@ -54,7 +55,7 @@
         if (searchInput) {
             searchInput.addEventListener('input', (e) => {
                 const query = e.target.value.trim();
-                if (query.length >= 2) {
+                if (query.length >= 1) {
                     searchTicker(query);
                 } else {
                     clearSearchResults();
@@ -65,7 +66,7 @@
                 if (e.key === 'Enter') {
                     e.preventDefault();
                     const query = e.target.value.trim();
-                    if (query.length >= 2) {
+                    if (query.length >= 1) {
                         searchTicker(query);
                     }
                 }
@@ -75,7 +76,7 @@
         if (searchBtn) {
             searchBtn.addEventListener('click', () => {
                 const query = searchInput?.value.trim() || '';
-                if (query.length >= 2) {
+                if (query.length >= 1) {
                     searchTicker(query);
                 }
             });
@@ -151,28 +152,101 @@
     // ===== TICKER SEARCH =====
 
     /**
-     * Search ticker (mockup)
+     * Load all tickers from the system
+     * @async
+     * @returns {Promise<Array>} Array of all tickers
+     */
+    async function loadAllTickers() {
+        // Return cached tickers if available
+        if (allTickersCache) {
+            return allTickersCache;
+        }
+
+        try {
+            const baseUrl = window.API_BASE_URL || (window.location?.protocol === 'file:' ? 'http://127.0.0.1:8080' : '');
+            const separator = baseUrl.endsWith('/') ? '' : '/';
+            const url = `${baseUrl}${separator}api/tickers/?_ts=${Date.now()}`;
+
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Cache-Control': 'no-cache'
+                },
+                credentials: 'include'
+            });
+
+            if (!response.ok) {
+                if (response.status === 401) {
+                    window.Logger?.warn?.('⚠️ Authentication required for ticker search', PAGE_LOG_CONTEXT);
+                    return [];
+                }
+                throw new Error(`Failed to load tickers: ${response.status}`);
+            }
+
+            const payload = await response.json();
+            const tickers = Array.isArray(payload?.data) ? payload.data : (Array.isArray(payload) ? payload : []);
+
+            // Cache the results
+            allTickersCache = tickers;
+
+            window.Logger?.debug?.('✅ All tickers loaded', { ...PAGE_LOG_CONTEXT, count: tickers.length });
+            return tickers;
+        } catch (error) {
+            window.Logger?.error?.('❌ Error loading all tickers', { ...PAGE_LOG_CONTEXT, error: error?.message || error });
+            return [];
+        }
+    }
+
+    /**
+     * Search ticker - searches all tickers in the system from first character
      * @param {string} query - Search query
      * @async
      */
     async function searchTicker(query) {
+        if (!query || query.trim().length === 0) {
+            clearSearchResults();
+            return;
+        }
+
+        const searchQuery = query.trim();
+        const resultsContainer = document.getElementById('tickerSearchResults');
+        
+        // Show loading indicator
+        if (resultsContainer) {
+            resultsContainer.innerHTML = '<div class="text-center text-muted py-2"><i class="bi bi-hourglass-split me-2"></i>טוען...</div>';
+        }
+
         try {
-            // Mockup search results
-            const mockResults = [
-                { id: 5, symbol: 'AAPL', name: 'Apple Inc.', type: 'Stock', currency: 'USD' },
-                { id: 12, symbol: 'MSFT', name: 'Microsoft Corporation', type: 'Stock', currency: 'USD' },
-                { id: 8, symbol: 'GOOGL', name: 'Alphabet Inc.', type: 'Stock', currency: 'USD' }
-            ].filter(t => 
-                t.symbol.toLowerCase().includes(query.toLowerCase()) ||
-                t.name.toLowerCase().includes(query.toLowerCase())
-            );
+            // Load all tickers (cached after first load)
+            const allTickers = await loadAllTickers();
 
-            searchResults = mockResults;
-            renderSearchResults(mockResults);
+            // Filter from first character (startsWith)
+            const filtered = allTickers.filter(ticker => {
+                const symbol = (ticker.symbol || '').toUpperCase();
+                const name = (ticker.name || '').toUpperCase();
+                const queryUpper = searchQuery.toUpperCase();
 
-            window.Logger?.debug?.('🔍 Ticker search completed (mockup)', { ...PAGE_LOG_CONTEXT, query, count: mockResults.length });
+                return symbol.startsWith(queryUpper) || name.startsWith(queryUpper);
+            });
+
+            // Limit results to 20 for performance
+            const limitedResults = filtered.slice(0, 20);
+
+            searchResults = limitedResults;
+            renderSearchResults(limitedResults);
+
+            window.Logger?.debug?.('🔍 Ticker search completed', { ...PAGE_LOG_CONTEXT, query: searchQuery, count: limitedResults.length, total: filtered.length });
         } catch (error) {
-            window.Logger?.error?.('❌ Error searching ticker', { ...PAGE_LOG_CONTEXT, query, error: error?.message || error });
+            window.Logger?.error?.('❌ Error searching ticker', { ...PAGE_LOG_CONTEXT, query: searchQuery, error: error?.message || error });
+            
+            if (resultsContainer) {
+                resultsContainer.innerHTML = `
+                    <div class="alert alert-warning">
+                        <small>שגיאה בחיפוש טיקרים. אנא נסה שוב.</small>
+                    </div>
+                `;
+            }
         }
     }
 
@@ -215,22 +289,30 @@
         }
 
         // Build results HTML and insert using tempDiv
-        const resultsHTML = results.map(ticker => `
-            <div class="search-result-item" data-ticker-id="${ticker.id}">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <strong>${ticker.symbol}</strong> - ${ticker.name}
-                        <br>
-                        <small class="text-muted">${ticker.type} • ${ticker.currency}</small>
+        const resultsHTML = results.map(ticker => {
+            const symbol = ticker.symbol || ticker.ticker_symbol || 'N/A';
+            const name = ticker.name || '';
+            const type = ticker.type || '';
+            const currency = ticker.currency || ticker.currency_code || '';
+            const typeDisplay = type ? (type.charAt(0).toUpperCase() + type.slice(1)) : '';
+            const currencyDisplay = currency || '';
+            
+            return `
+                <div class="search-result-item" data-ticker-id="${ticker.id}">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>${symbol}</strong>${name ? ` - ${name}` : ''}
+                            ${(typeDisplay || currencyDisplay) ? `<br><small class="text-muted">${typeDisplay}${typeDisplay && currencyDisplay ? ' • ' : ''}${currencyDisplay}</small>` : ''}
+                        </div>
+                        <button type="button" 
+                                class="btn btn-sm btn-primary" 
+                                data-onclick="window.AddTickerModal?.selectTicker(${ticker.id})">
+                            הוסף
+                        </button>
                     </div>
-                    <button type="button" 
-                            class="btn btn-sm btn-primary" 
-                            data-onclick="window.AddTickerModal?.selectTicker(${ticker.id})">
-                        הוסף
-                    </button>
                 </div>
-            </div>
-        `).join('');
+            `;
+        }).join('');
         resultsContainer.textContent = '';
         const parser = new DOMParser();
         const doc = parser.parseFromString(resultsHTML, 'text/html');
@@ -292,6 +374,7 @@
         clearSearchResults();
         selectedTickerId = null;
         currentListId = null;
+        // Don't clear cache - keep it for faster subsequent searches
     }
 
     // ===== DATA HANDLING =====

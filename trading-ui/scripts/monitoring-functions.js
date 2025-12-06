@@ -769,6 +769,12 @@ async function runDetailedPageScan(pageName, pageConfig) {
         currentPage = 'ai-analysis';
     } else if (path.includes('watch-list')) {
         currentPage = 'watch-list';
+    } else if (path.includes('trade-history-page')) {
+        currentPage = 'trade-history-page';
+    } else if (path.includes('portfolio-state-page')) {
+        currentPage = 'portfolio-state-page';
+    } else if (path.includes('trading-journal-page')) {
+        currentPage = 'trading-journal-page';
     }
     
     if (currentPage !== pageName) {

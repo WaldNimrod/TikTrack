@@ -153,6 +153,14 @@ const addTickerModalConfig = {
             html: `
                 <div class="mb-3">
                     <label for="tickerSearch" class="form-label fw-bold">חיפוש טיקר מהמערכת</label>
+                    <div class="alert alert-info d-flex justify-content-between align-items-center mb-2">
+                        <small class="mb-0">אם לא נמצא הטיקר הדרוש, יש להוסיף למערכת</small>
+                        <button type="button" 
+                                class="btn btn-sm btn-outline-primary"
+                                data-onclick="window.ModalManagerV2?.showModal('tickersModal', 'add')">
+                            <i class="bi bi-plus-circle"></i> הוסף טיקר חדש
+                        </button>
+                    </div>
                     <input type="text" 
                            class="form-control" 
                            id="tickerSearch" 

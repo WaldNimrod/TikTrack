@@ -1583,12 +1583,13 @@ function updateSummaryCards(data) {
     // Display P/L percentage using FieldRendererService
     const plPercentEl = document.getElementById('pl-percentage');
     if (plPercentEl) {
-    if (plPercent === '-') {
-            plPercentEl.innerHTML.textContent = '';
-        const div = document.createElement('div');
-        div.className = 'numeric-value-zero';
-        div.textContent = '(-)';
-        plPercentEl.innerHTML.appendChild(div);
+        if (plPercent === '-') {
+            // Clear and set zero value
+            plPercentEl.innerHTML = '';
+            const div = document.createElement('div');
+            div.className = 'numeric-value-zero';
+            div.textContent = '(-)';
+            plPercentEl.appendChild(div);
     } else {
         const plPercentNum = parseFloat(plPercent);
             if (window.FieldRendererService) {
@@ -3061,7 +3062,12 @@ function compareDates() {
     }
     
     if (!date1 || !date2) {
-        alert('נא לבחור שני תאריכים להשוואה');
+        // Use NotificationSystem instead of alert
+        if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {
+            window.NotificationSystem.showError('שגיאה', 'נא לבחור שני תאריכים להשוואה');
+        } else if (window.Logger) {
+            window.Logger.warn('Please select two dates for comparison', { page: 'portfolio-state-page' });
+        }
         return;
     }
     
@@ -3673,6 +3679,7 @@ async function waitForScripts() {
 
     // Export functions to window for debugging
     window.portfolioStatePage = {
+        initializePage, // Export for UnifiedAppInitializer
         toggleCardDetails,
         compareDates,
         removeComparisonDate,

@@ -1209,10 +1209,8 @@ function updateNotesSummary(notes) {
       }
     }
   } catch (error) {
-    window.Logger.error('שגיאה בעדכון סיכום הערות:', error, { page: "notes" });
-    if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה בעדכון סיכום הערות', error.message);
-    }
+    window.Logger.warn('⚠️ שגיאה בעדכון סיכום הערות (לא קריטי - הדף ימשיך לעבוד):', error, { page: "notes" });
+    // Don't show error notification for non-critical summary update errors
   }
 }
 

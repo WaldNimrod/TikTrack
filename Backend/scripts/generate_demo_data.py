@@ -53,6 +53,7 @@ from models.currency import Currency
 from models.user import User
 from models.note_relation_type import NoteRelationType
 from models.user_ticker import UserTicker
+from models.watch_list import WatchList, WatchListItem
 
 # ============================================================================
 # Configuration
@@ -519,7 +520,9 @@ class DemoDataGenerator:
             'cash_flows': 0,
             'alerts': 0,
             'notes': 0,
-            'ai_analysis': 0
+            'ai_analysis': 0,
+            'watch_lists': 0,
+            'watch_list_items': 0
         }
         
         # Cache for lookup
@@ -550,6 +553,7 @@ class DemoDataGenerator:
             self._create_cash_flows()
             self._create_alerts()
             self._create_notes()
+            self._create_watch_lists()  # Create watch lists with items
             
             # Try to create AI analysis - if retry_count column doesn't exist, skip it
             try:
@@ -1920,6 +1924,198 @@ class DemoDataGenerator:
         
         self.created_count['notes'] = created
         print(f"   ✅ נוצרו {created} הערות")
+    
+    def _create_watch_lists(self) -> None:
+        """יוצר רשימות צפייה עם פריטים"""
+        print(f"\n📋 יוצר רשימות צפייה...")
+        
+        if not self.user_cache:
+            raise DataGenerationError('watch_lists', "משתמש לא נמצא")
+        
+        # Get watch lists count from config (default: 0)
+        watch_lists_count = self.config.get('watch_lists', {}).get('count', 0)
+        
+        if watch_lists_count == 0:
+            print("   ⏭️  אין רשימות צפייה ליצירה (count=0)")
+            return
+        
+        # Watch list names templates (define before checking existing lists)
+        watch_list_names = [
+            "מעקב יומי",
+            "תיק השקעות",
+            "מניות טכנולוגיה",
+            "דיבידנדים",
+            "מעקב שבועי",
+            "סקטור אנרגיה",
+            "מניות צמיחה",
+            "ETF מעקב",
+            "מניות ערך",
+            "מעקב אישי"
+        ]
+        
+        # Check if watch lists already exist for this user
+        existing_lists = self.db.query(WatchList).filter_by(user_id=self.user_cache.id).all()
+        existing_count = len(existing_lists)
+        
+        if existing_count >= watch_lists_count:
+            print(f"   ⚠️  נמצאו {existing_count} רשימות קיימות (נדרשות {watch_lists_count}) - מדלג על יצירה")
+            # Count existing items
+            existing_items_count = 0
+            for wl in existing_lists:
+                items = self.db.query(WatchListItem).filter_by(watch_list_id=wl.id).all()
+                existing_items_count += len(items)
+            self.created_count['watch_lists'] = existing_count
+            self.created_count['watch_list_items'] = existing_items_count
+            print(f"   ✅ משתמש רשימות קיימות: {existing_count} רשימות, {existing_items_count} פריטים")
+            return
+        
+        # Need to create additional lists
+        if existing_count > 0:
+            print(f"   ℹ️  נמצאו {existing_count} רשימות קיימות, יוצר עוד {watch_lists_count - existing_count} רשימות")
+            # Get existing list names to avoid duplicates
+            existing_names = {wl.name for wl in existing_lists}
+            # Filter out existing names from available names
+            available_names = [name for name in watch_list_names if name not in existing_names]
+        else:
+            existing_names = set()
+            available_names = watch_list_names
+        
+        # Adjust count to create only missing lists
+        lists_to_create = watch_lists_count - existing_count
+        
+        # Available icons for watch lists
+        available_icons = [
+            'chart-line', 'eye', 'flame', 'coins', 'table', 'cards', 
+            'bookmark', 'tag', 'activity', 'wallet', 'calendar', 'star'
+        ]
+        
+        # Available colors (using logo colors and common colors)
+        available_colors = [
+            '#26baac',  # Primary logo color (Turquoise-Green)
+            '#fc5a06',  # Secondary logo color (Orange-Red)
+            '#3b82f6',  # Blue
+            '#8b5cf6',  # Purple
+            '#ef4444',  # Red
+            '#10b981',  # Green
+            '#f59e0b',  # Amber
+            '#6366f1',  # Indigo
+        ]
+        
+        # Available view modes
+        view_modes = ['table', 'cards', 'compact']
+        
+        # Available sort columns
+        sort_columns = ['symbol', 'name', 'price', 'change_percent', None]
+        sort_directions = ['asc', 'desc']
+        
+        # Available flag colors for items
+        flag_colors = [
+            '#26baac', '#fc5a06', '#3b82f6', '#8b5cf6', 
+            '#ef4444', '#10b981', '#f59e0b', '#6366f1',
+            '#ec4899', '#14b8a6', '#f97316', '#84cc16'
+        ]
+        
+        created_lists = 0
+        created_items = 0
+        lists_with_icons = 0
+        lists_with_colors = 0
+        items_with_flags = 0
+        
+        # Get user's tickers for watch list items
+        user_tickers = self.relationship_manager.tickers
+        if not user_tickers:
+            print("   ⚠️  אין טיקרים למשתמש - לא ניתן ליצור רשימות צפייה")
+            return
+        
+        for i in range(lists_to_create):
+            # Select name from available names (avoiding duplicates)
+            if i < len(available_names):
+                list_name = available_names[i]
+            else:
+                # Generate unique name if we run out of templates
+                counter = len(existing_lists) + i + 1
+                list_name = f"רשימה {counter}"
+            
+            # Select random properties
+            has_icon = random.random() > 0.2  # 80% chance for icon
+            has_color = random.random() > 0.3  # 70% chance for color
+            
+            icon = random.choice(available_icons) if has_icon else None
+            color_hex = random.choice(available_colors) if has_color else None
+            view_mode = random.choice(view_modes)
+            default_sort_column = random.choice(sort_columns)
+            default_sort_direction = random.choice(sort_directions) if default_sort_column else 'asc'
+            
+            watch_list = WatchList(
+                user_id=self.user_cache.id,
+                name=list_name,
+                icon=icon,
+                color_hex=color_hex,
+                display_order=i,
+                view_mode=view_mode,
+                default_sort_column=default_sort_column,
+                default_sort_direction=default_sort_direction
+            )
+            
+            watch_list.created_at = self.date_gen.generate_date('random')
+            
+            self.db.add(watch_list)
+            self.db.flush()  # Flush to get the ID
+            
+            if has_icon:
+                lists_with_icons += 1
+            if has_color:
+                lists_with_colors += 1
+            
+            # Add items to watch list (5-15 items per list)
+            items_count = random.randint(5, 15)
+            selected_tickers = random.sample(user_tickers, min(items_count, len(user_tickers)))
+            
+            for item_idx, ticker in enumerate(selected_tickers):
+                # 60% chance for flag color
+                has_flag = random.random() > 0.4
+                flag_color = random.choice(flag_colors) if has_flag else None
+                
+                if has_flag:
+                    items_with_flags += 1
+                
+                # 30% chance for notes
+                notes = None
+                if random.random() > 0.7:
+                    notes_templates = [
+                        "לעקוב אחרי",
+                        "מעניין לקנייה",
+                        "לבדוק בעתיד",
+                        "מעקב יומי",
+                        "להמתין לירידה"
+                    ]
+                    notes = random.choice(notes_templates)
+                
+                item = WatchListItem(
+                    watch_list_id=watch_list.id,
+                    ticker_id=ticker.id,
+                    flag_color=flag_color,
+                    display_order=item_idx,
+                    notes=notes
+                )
+                
+                item.created_at = self.date_gen.generate_date('random')
+                
+                self.db.add(item)
+                created_items += 1
+            
+            created_lists += 1
+        
+        self.db.flush()
+        
+        self.created_count['watch_lists'] = created_lists
+        self.created_count['watch_list_items'] = created_items
+        
+        print(f"   ✅ נוצרו {created_lists} רשימות צפייה עם {created_items} פריטים")
+        if not self.dry_run:
+            print(f"      - רשימות עם איקונים: {lists_with_icons}")
+            print(f"      - רשימות עם צבעים: {lists_with_colors}")
+            print(f"      - פריטים עם דגלי צבע: {items_with_flags}")
     
     def _create_ai_analysis(self) -> None:
         """יוצר ניתוחי AI לדוגמה"""

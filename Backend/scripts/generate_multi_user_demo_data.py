@@ -74,6 +74,9 @@ USER_FULL_CONFIG = {
         'count': 80,
         'from_plans_percent': 70
     },
+    'watch_lists': {
+        'count': 3
+    },
     'time_distribution': {
         'last_6_months_percent': 40,
         'last_3_months_of_6_percent': 70,
@@ -101,6 +104,9 @@ ADMIN_LIMITED_CONFIG = {
     'trades': {
         'count': 15,
         'from_plans_percent': 70
+    },
+    'watch_lists': {
+        'count': 2
     },
     'time_distribution': {
         'last_6_months_percent': 40,

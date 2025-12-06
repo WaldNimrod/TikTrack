@@ -286,30 +286,94 @@
         
         try {
             if (window.Logger) {
-                window.Logger.info('🔄 Starting data fetch from external provider', { tickerId, tickerSymbol, page: 'ticker-dashboard' });
+                window.Logger.info('🔄 Starting optimized data fetch from external provider', { tickerId, tickerSymbol, page: 'ticker-dashboard' });
+            }
+
+            // Step 0: Check what data is missing before loading
+            if (window.Logger) {
+                window.Logger.info('🔍 Step 0: Checking what data is missing...', { tickerId, page: 'ticker-dashboard' });
+            }
+            
+            let missingDataInfo = null;
+            try {
+                // Check missing data via API endpoint
+                const missingDataResponse = await fetch(`/api/external-data/status/tickers/missing-data`);
+                if (missingDataResponse.ok) {
+                    const missingDataResult = await missingDataResponse.json();
+                    const allMissingTickers = [
+                        ...(missingDataResult?.data?.tickers_missing_current || []),
+                        ...(missingDataResult?.data?.tickers_missing_historical || []),
+                        ...(missingDataResult?.data?.tickers_missing_indicators || [])
+                    ];
+                    missingDataInfo = allMissingTickers.find(t => t.id === tickerId);
+                    
+                    if (window.Logger) {
+                        window.Logger.info('📊 Missing data check completed', { 
+                            tickerId, 
+                            needsRefresh: !!missingDataInfo,
+                            missingDataInfo: missingDataInfo,
+                            page: 'ticker-dashboard' 
+                        });
+                    }
+                }
+            } catch (checkError) {
+                if (window.Logger) {
+                    window.Logger.warn('⚠️ Could not check missing data, will refresh all data', { 
+                        error: checkError.message, 
+                        tickerId,
+                        page: 'ticker-dashboard' 
+                    });
+                }
+                // Continue with full refresh if check fails
+            }
+            
+            // If all data is fresh, skip refresh
+            if (!missingDataInfo) {
+                if (window.Logger) {
+                    window.Logger.info('✅ All data is fresh, skipping refresh', { tickerId, page: 'ticker-dashboard' });
+                }
+                // Still reload data to get latest from cache
+                if (window.TickerDashboardData) {
+                    return await window.TickerDashboardData.loadTickerDashboardData(tickerId, { forceRefresh: false });
+                }
+                return null;
             }
 
             // Initialize progress overlay
             if (window.unifiedProgressManager) {
+                const needsQuote = missingDataInfo.reason === 'missing_current_quote' || missingDataInfo.reason === 'insufficient_historical_data';
+                const needsHistorical = missingDataInfo.reason === 'insufficient_historical_data';
+                const needsIndicators = missingDataInfo.reason === 'missing_technical_indicators';
+                
+                const steps = [];
+                const descriptions = [];
+                
+                if (needsQuote) {
+                    steps.push('טוען מחיר נוכחי');
+                    descriptions.push('מתחבר לספק הנתונים החיצוני, טוען מחיר נוכחי...');
+                }
+                if (needsHistorical) {
+                    steps.push('טוען נתונים היסטוריים');
+                    descriptions.push('טוען 150 ימים של נתונים היסטוריים...');
+                }
+                if (needsIndicators) {
+                    steps.push('מחשב אינדיקטורים טכניים');
+                    descriptions.push('מחשב ATR, Volatility, ממוצעים נעים...');
+                }
+                steps.push('מסיים טעינה');
+                descriptions.push('מסיים את התהליך...');
+                
                 window.unifiedProgressManager.createOverlay(overlayId, {
                     title: `טעינת נתונים עבור ${tickerSymbol}`,
-                    totalSteps: 3,
-                    stepLabels: [
-                        'טוען נתונים מהספק החיצוני',
-                        'מעבד ומאמת נתונים',
-                        'מסיים טעינה'
-                    ],
-                    stepDescriptions: [
-                        'מתחבר לספק הנתונים החיצוני, טוען מחיר נוכחי ונתונים היסטוריים...',
-                        'בודק שכל הנתונים קיימים...',
-                        'מסיים את התהליך...'
-                    ]
+                    totalSteps: steps.length,
+                    stepLabels: steps,
+                    stepDescriptions: descriptions
                 });
             }
 
-            // Step 1-2: Use ExternalDataService to refresh ticker data (quote + historical + indicators)
+            // Step 1: Use ExternalDataService to refresh only missing data
             if (window.Logger) {
-                window.Logger.info('📊 Step 1-2/4: Refreshing ticker data using ExternalDataService...', { tickerId, page: 'ticker-dashboard' });
+                window.Logger.info('📊 Step 1: Refreshing only missing ticker data using ExternalDataService...', { tickerId, page: 'ticker-dashboard' });
             }
             if (window.unifiedProgressManager) {
                 window.unifiedProgressManager.showProgress(
@@ -320,21 +384,31 @@
                 );
             }
 
-            // Use ExternalDataService.refreshTickerData() - unified system
-            // This handles: quote refresh, historical data (150 days), and technical indicators
+            // Determine what to load based on missing data check
+            const needsQuote = missingDataInfo.reason === 'missing_current_quote' || missingDataInfo.reason === 'insufficient_historical_data';
+            const needsHistorical = missingDataInfo.reason === 'insufficient_historical_data';
+            const needsIndicators = missingDataInfo.reason === 'missing_technical_indicators';
+            
+            // Use ExternalDataService.refreshTickerData() - optimized to load only missing data
+            // Backend will check what's missing and load only what's needed
             let refreshResult = null;
             if (window.ExternalDataService && typeof window.ExternalDataService.refreshTickerData === 'function') {
                 try {
+                    // Don't use forceRefresh - let backend decide what to load
+                    // includeHistorical will be determined by backend based on missing data check
                     refreshResult = await window.ExternalDataService.refreshTickerData(tickerId, {
-                        forceRefresh: true,
-                        includeHistorical: true,
-                        daysBack: 150
+                        forceRefresh: false, // Let backend check what's missing
+                        includeHistorical: needsHistorical ? true : undefined, // Only if needed
+                        daysBack: needsHistorical ? 150 : undefined // Only if needed
                     });
+                    
                     if (window.Logger) {
-                        window.Logger.info('✅ Ticker data refreshed successfully via ExternalDataService', { 
+                        window.Logger.info('✅ Ticker data refreshed successfully (optimized)', { 
                             tickerId, 
                             hasPrice: !!refreshResult?.price,
                             hasHistorical: !!refreshResult?.historical_quotes_count,
+                            actionsTaken: refreshResult?.data?.actions_taken || [],
+                            actionsSkipped: refreshResult?.data?.actions_skipped || [],
                             page: 'ticker-dashboard' 
                         });
                     }
@@ -480,7 +554,48 @@
                 }
             }
 
-            // Step 3: Final verification and return
+            // Step 3: Show optimization summary to user
+            if (refreshResult?.data?.optimization) {
+                const opt = refreshResult.data.optimization;
+                const actionsTaken = refreshResult.data.actions_taken || [];
+                const actionsSkipped = refreshResult.data.actions_skipped || [];
+                
+                if (window.Logger) {
+                    window.Logger.info('📊 Optimization summary', {
+                        tickerId,
+                        quoteLoaded: opt.quote_loaded,
+                        historicalLoaded: opt.historical_loaded,
+                        indicatorsCalculated: opt.indicators_calculated_count,
+                        actionsTaken: actionsTaken,
+                        actionsSkipped: actionsSkipped,
+                        reason: opt.reason,
+                        page: 'ticker-dashboard'
+                    });
+                }
+                
+                // Show notification if some data was skipped (optimized)
+                if (actionsSkipped.length > 0 && window.NotificationSystem) {
+                    const skippedMessages = [];
+                    if (actionsSkipped.includes('quote_skipped_fresh')) {
+                        skippedMessages.push('מחיר נוכחי (עדכני)');
+                    }
+                    if (actionsSkipped.includes('historical_skipped_fresh')) {
+                        skippedMessages.push('נתונים היסטוריים (עדכניים)');
+                    }
+                    if (actionsSkipped.includes('indicators_skipped_fresh')) {
+                        skippedMessages.push('אינדיקטורים טכניים (עדכניים)');
+                    }
+                    
+                    if (skippedMessages.length > 0) {
+                        window.NotificationSystem.showSuccess(
+                            `אופטימיזציה: דולגו ${skippedMessages.join(', ')} - הנתונים עדכניים`,
+                            { duration: 5000 }
+                        );
+                    }
+                }
+            }
+
+            // Step 4: Final verification and return
             if (window.Logger) {
                 window.Logger.info('📊 Step 3/3: Final data verification...', { tickerId, page: 'ticker-dashboard' });
             }
@@ -1081,11 +1196,32 @@
             if (typeof window.hideLoadingState === 'function') {
                 window.hideLoadingState('ticker-dashboard-top');
             }
-            if (window.NotificationSystem) {
-                window.NotificationSystem.showError('שגיאה', `שגיאה בטעינת דשבורד טיקר: ${error.message}`);
-            }
-            if (window.Logger) {
-                window.Logger.warn('⚠️ Error initializing ticker dashboard (will continue with available data)', { error: error?.message || error, page: 'ticker-dashboard' });
+            
+            // Check if error is due to missing ticker ID (expected in some cases)
+            const isMissingTickerId = error?.message?.includes('ticker ID') || 
+                                      error?.message?.includes('tickerId') ||
+                                      !tickerId;
+            
+            if (isMissingTickerId) {
+                // This is expected - page can work without ticker ID in some cases
+                if (window.Logger) {
+                    window.Logger.debug('ℹ️ Ticker dashboard initialized without ticker ID (expected in some cases)', { 
+                        error: error?.message, 
+                        page: 'ticker-dashboard' 
+                    });
+                }
+            } else {
+                // Real error - show notification
+                if (window.NotificationSystem) {
+                    window.NotificationSystem.showError('שגיאה', `שגיאה בטעינת דשבורד טיקר: ${error.message}`);
+                }
+                if (window.Logger) {
+                    window.Logger.warn('⚠️ Error initializing ticker dashboard (will continue with available data)', { 
+                        error: error?.message || error, 
+                        tickerId,
+                        page: 'ticker-dashboard' 
+                    });
+                }
             }
         }
     }

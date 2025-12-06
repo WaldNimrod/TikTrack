@@ -401,6 +401,14 @@ async function refreshWatchListTickers(tickers) {
 
 ## Changelog
 
+### Version 2.1.0 (2025-12-07)
+
+- ✅ **אופטימיזציה:** טעינה רק של נתונים חסרים (לא את כל הנתונים)
+- ✅ **אופטימיזציה:** שימוש ב-`MissingDataChecker` לפני טעינה
+- ✅ **אופטימיזציה:** גודל קבוצות אופטימלי (25 טיקרים)
+- ✅ **שיפור:** הודעות הצלחה/שגיאה מפורטות עם פרטי רענון
+- ✅ **תיעוד:** הוספת תיעוד מלא על `DataRefreshPolicy` ו-`MissingDataChecker`
+
 ### Version 2.0.0 (2025-12-05)
 
 - ✅ **הוספה:** `refreshTickerData()` - פונקציה ל-refresh ticker בודד עם historical data
@@ -417,7 +425,11 @@ async function refreshWatchListTickers(tickers) {
 
 ## Related Documentation
 
+- [External Data Optimization Developer Guide](../03-DEVELOPMENT/GUIDES/EXTERNAL_DATA_OPTIMIZATION_DEVELOPER_GUIDE.md) ⭐ **חדש - מדריך מפתח מקיף**
+- [Data Refresh Policy](../04-FEATURES/EXTERNAL_DATA/DATA_REFRESH_POLICY.md) ⭐ **חדש**
+- [Missing Data Checker](../04-FEATURES/EXTERNAL_DATA/MISSING_DATA_CHECKER.md) ⭐ **חדש**
 - [External Data System Analysis Report](../05-REPORTS/EXTERNAL_DATA_SYSTEM_ANALYSIS_REPORT.md)
+- [External Data Optimization Test Results](../05-REPORTS/EXTERNAL_DATA_OPTIMIZATION_TEST_RESULTS.md) ⭐ **חדש**
 - [Ticker Dashboard External Data Analysis](../05-REPORTS/TICKER_DASHBOARD_EXTERNAL_DATA_ANALYSIS.md)
 - [Backend: Data Normalizer](../../../Backend/services/external_data/data_normalizer.py)
 - [Backend: Quotes API](../../../Backend/routes/external_data/quotes.py)

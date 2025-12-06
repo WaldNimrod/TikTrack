@@ -2358,7 +2358,8 @@ async function loadAndRefreshMissingData(tickers, options = {}) {
       total: 0,
       refreshed: 0,
       failed: 0,
-      errors: []
+      errors: [],
+      skipped: 0
     };
   }
 
@@ -2385,12 +2386,16 @@ async function loadAndRefreshMissingData(tickers, options = {}) {
     if (allMissingTickerIds.size === 0) {
       if (!silent) {
         window.Logger?.info?.('No tickers with missing data found', { page: 'tickers' });
+        if (window.NotificationSystem) {
+          window.NotificationSystem.showSuccess('כל הנתונים עדכניים', 'כל הטיקרים בעלי נתונים עדכניים');
+        }
       }
       return {
         total: tickers.length,
         refreshed: 0,
         failed: 0,
-        errors: []
+        errors: [],
+        skipped: tickers.length
       };
     }
 
@@ -2406,6 +2411,7 @@ async function loadAndRefreshMissingData(tickers, options = {}) {
 
     const overlayId = 'tickers-refresh-missing';
     const tickersToRefresh = tickers.filter(t => allMissingTickerIds.has(t.id));
+    const tickersSkipped = tickers.filter(t => !allMissingTickerIds.has(t.id));
     let progressStep = 0;
     const totalSteps = tickersToRefresh.length;
 
@@ -2439,12 +2445,39 @@ async function loadAndRefreshMissingData(tickers, options = {}) {
 
       try {
         if (window.ExternalDataService) {
-          await window.ExternalDataService.refreshTickerData(ticker.id, {
-            forceRefresh: true,
-            includeHistorical: true,
-            daysBack: 150
+          // Don't use forceRefresh - let backend check what's missing and load only that
+          // Backend will determine what to load based on missing data check
+          const refreshResult = await window.ExternalDataService.refreshTickerData(ticker.id, {
+            forceRefresh: false, // Let backend decide
+            includeHistorical: undefined, // Let backend decide based on missing data
+            daysBack: undefined // Let backend decide
           });
-          results.refreshed++;
+          
+          // Check if data was actually loaded or skipped (all fresh)
+          if (refreshResult?.data?.skipped) {
+            // Data was fresh, skipped refresh
+            if (window.Logger) {
+              window.Logger.info('Ticker data is fresh, skipped refresh', {
+                tickerId: ticker.id,
+                symbol: ticker.symbol,
+                reason: refreshResult.data.reason,
+                page: 'tickers'
+              });
+            }
+            results.refreshed++; // Count as success (no refresh needed)
+          } else {
+            // Data was loaded
+            results.refreshed++;
+            if (window.Logger) {
+              window.Logger.info('Ticker data refreshed successfully', {
+                tickerId: ticker.id,
+                symbol: ticker.symbol,
+                actionsTaken: refreshResult?.data?.actions_taken || [],
+                actionsSkipped: refreshResult?.data?.actions_skipped || [],
+                page: 'tickers'
+              });
+            }
+          }
         } else {
           throw new Error('ExternalDataService not available');
         }
@@ -2469,14 +2502,27 @@ async function loadAndRefreshMissingData(tickers, options = {}) {
     }
 
     if (!silent) {
+      const summaryMessage = `עודכנו ${results.refreshed} טיקרים${tickersSkipped.length > 0 ? `, ${tickersSkipped.length} דולגו (עדכניים)` : ''}${results.failed > 0 ? `, ${results.failed} נכשלו` : ''}`;
       window.Logger?.info?.('Completed refreshing missing data', {
         refreshed: results.refreshed,
+        skipped: tickersSkipped.length,
         failed: results.failed,
         page: 'tickers'
       });
+      
+      if (window.NotificationSystem) {
+        if (results.failed === 0) {
+          window.NotificationSystem.showSuccess('רענון נתונים הושלם', summaryMessage);
+        } else {
+          window.NotificationSystem.showWarning('רענון נתונים הושלם (חלקי)', summaryMessage);
+        }
+      }
     }
 
-    return results;
+    return {
+      ...results,
+      skipped: tickersSkipped.length
+    };
   } catch (error) {
     window.Logger?.error?.('Failed to load and refresh missing data', {
       error: error.message,

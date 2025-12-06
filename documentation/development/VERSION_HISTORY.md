@@ -239,3 +239,4 @@ This log tracks version bumps for the development environment (branch `main`). M
 | 2025-12-04T20:48:25+00:00 | 1.3.86.0 | 1.3.85.0 | 176269d6b53ee7925d79b78202fc41f1d6976d3d | 066f23564d91b813945e5e2a0259505aa9b58a01 | patch | Fix investment types and status validation in demo data generation |
 | 2025-12-05T17:37:46+00:00 | 1.3.87.0 | 1.3.86.0 | 591ff219ec00ca45430562360d8e02bf4488e14f | 176269d6b53ee7925d79b78202fc41f1d6976d3d | patch | Fix account activity calculations and add short/cover execution cards |
 | 2025-12-06T08:06:53+00:00 | 1.3.88.0 | 1.3.87.0 | a95336ef62051904d92936f58147572a384e656e | 591ff219ec00ca45430562360d8e02bf4488e14f | patch | Fix Selenium test script TypeError and verify all main pages pass tests |
+| 2025-12-06T22:16:33+00:00 | 1.3.89.0 | 1.3.88.0 | 6af27cdbf8524fe546f29d595438ffedd45db174 | a95336ef62051904d92936f58147572a384e656e | patch | אופטימיזציה מקיפה של טעינת נתונים חיצוניים + תיעוד מלא |

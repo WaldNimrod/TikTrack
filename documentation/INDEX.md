@@ -670,13 +670,22 @@ TikTrackApp/
 
 ### 📚 **תיעוד מעודכן:**
 - **תיעוד מלא**: [EXTERNAL_DATA_SERVICE_SYSTEM.md](02-ARCHITECTURE/FRONTEND/EXTERNAL_DATA_SERVICE_SYSTEM.md) ✅ **חדש!**
+- **מדריך מפתח מקיף**: [EXTERNAL_DATA_OPTIMIZATION_DEVELOPER_GUIDE.md](03-DEVELOPMENT/GUIDES/EXTERNAL_DATA_OPTIMIZATION_DEVELOPER_GUIDE.md) ⭐ **חדש! דצמבר 2025**
+- **מדיניות רענון**: [DATA_REFRESH_POLICY.md](04-FEATURES/EXTERNAL_DATA/DATA_REFRESH_POLICY.md) ⭐ **חדש! דצמבר 2025**
+- **בודק נתונים חסרים**: [MISSING_DATA_CHECKER.md](04-FEATURES/EXTERNAL_DATA/MISSING_DATA_CHECKER.md) ⭐ **חדש! דצמבר 2025**
+- **README**: [EXTERNAL_DATA/README.md](04-FEATURES/EXTERNAL_DATA/README.md) ⭐ **חדש! דצמבר 2025**
 - **API Reference**: כל הפונקציות, דוגמאות שימוש, ו-Best Practices
 - **Integration Examples**: דוגמאות אינטגרציה עם דשבורד טיקרים
 
 ### 🔄 **עדכונים אחרונים (דצמבר 2025):**
+- ✅ **אופטימיזציה**: טעינה רק של נתונים חסרים (לא את כל הנתונים) ⭐ **חדש!**
+- ✅ **אופטימיזציה**: גודל קבוצות אופטימלי (25 טיקרים) ⭐ **חדש!**
+- ✅ **אופטימיזציה**: לוגיקה דינמית להקטנת גודל קבוצה ⭐ **חדש!**
+- ✅ **אופטימיזציה**: טעינת נתונים היסטוריים פעם ביום (אחרי סגירת השוק) ⭐ **חדש!**
+- ✅ **אופטימיזציה**: חישוב אינדיקטורים אוטומטי ⭐ **חדש!**
 - ✅ **פונקציה חדשה**: `refreshTickerData()` - refresh ticker בודד עם historical data
 - ✅ **תיקון ארכיטקטורה**: הסרת קוד מקומי מהדשבורד, שימוש במערכת הכללית בלבד
-- ✅ **תיעוד מלא**: יצירת תיעוד מקיף למערכת
+- ✅ **תיעוד מלא**: יצירת תיעוד מקיף למערכת + מדריכים למפתחים ⭐ **חדש!**
 - ✅ **תיקון Scheduler**: תיקון בעיית אתחול Scheduler עם `set_data_refresh_scheduler()`
 - ✅ **תיקון שגיאות JavaScript**: תיקון 20+ שגיאות Logger ב-`cache-management.js`
 - ✅ **תיקון API Endpoints**: הוספת `/scheduler/history` alias

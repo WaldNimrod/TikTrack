@@ -880,6 +880,76 @@
       const overlayId = 'external-data-refresh-all';
       
       try {
+        // Step 0: Check what data is missing before loading
+        logger.info(`${MODULE_NAME}:refresh-all:checking-missing-data`);
+        
+        let missingDataSummary = null;
+        try {
+          const missingDataResponse = await fetch('/api/external-data/status/tickers/missing-data');
+          if (missingDataResponse.ok) {
+            const missingDataResult = await missingDataResponse.json();
+            missingDataSummary = missingDataResult?.data?.summary || {};
+            
+            // Check if all data is fresh
+            const totalMissing = (missingDataSummary.missing_current_count || 0) + 
+                                (missingDataSummary.missing_historical_count || 0) + 
+                                (missingDataSummary.missing_indicators_count || 0);
+            
+            if (totalMissing === 0) {
+              notification.success('כל הנתונים עדכניים', 'כל הטיקרים בעלי נתונים עדכניים, אין צורך ברענון');
+              return {
+                status: 'success',
+                message: 'All data is fresh, no refresh needed',
+                data: {
+                  skipped: true,
+                  total_tickers: missingDataSummary.total_open_tickers || 0
+                }
+              };
+            }
+            
+            // Show confirmation dialog with detailed information
+            const confirmationMessage = `
+              <div style="text-align: right; direction: rtl;">
+                <p><strong>פרטי רענון:</strong></p>
+                <ul style="text-align: right;">
+                  <li>סה"כ טיקרים: ${missingDataSummary.total_open_tickers || 0}</li>
+                  <li>טיקרים שצריכים quote נוכחי: ${missingDataSummary.missing_current_count || 0}</li>
+                  <li>טיקרים שצריכים נתונים היסטוריים: ${missingDataSummary.missing_historical_count || 0}</li>
+                  <li>טיקרים שצריכים אינדיקטורים: ${missingDataSummary.missing_indicators_count || 0}</li>
+                </ul>
+                <p style="color: #666; font-size: 0.9em; margin-top: 10px;">
+                  <strong>הערה:</strong> רק הנתונים החסרים ייטענו. נתונים עדכניים יידלגו.
+                </p>
+              </div>
+            `;
+            
+            const confirmed = await new Promise((resolve) => {
+              if (window.showConfirmationDialog) {
+                window.showConfirmationDialog(
+                  'רענון כל הנתונים החיצוניים',
+                  confirmationMessage,
+                  () => resolve(true),
+                  () => resolve(false)
+                );
+              } else {
+                // Fallback to simple confirm
+                resolve(confirm('האם להמשיך ברענון כל הנתונים?'));
+              }
+            });
+            
+            if (!confirmed) {
+              logger.info(`${MODULE_NAME}:refresh-all:cancelled-by-user`);
+              return {
+                status: 'cancelled',
+                message: 'User cancelled refresh'
+              };
+            }
+          }
+        } catch (checkError) {
+          logger.warn(`${MODULE_NAME}:refresh-all:check-failed`, { error: checkError.message });
+          // Continue with refresh if check fails
+        }
+        
         // Show progress overlay
         showProgressOverlay(overlayId, 1, 'מתחיל רענון', 'מכין בקשה לרענון כל הנתונים', {
           title: 'רענון כל הנתונים החיצוניים',
@@ -1136,6 +1206,79 @@
       const overlayId = 'external-data-refresh-full';
       
       try {
+        // Step 0: Check what data is missing before loading
+        logger.info(`${MODULE_NAME}:refresh-full:checking-missing-data`);
+        
+        let missingDataSummary = null;
+        try {
+          const missingDataResponse = await fetch('/api/external-data/status/tickers/missing-data');
+          if (missingDataResponse.ok) {
+            const missingDataResult = await missingDataResponse.json();
+            missingDataSummary = missingDataResult?.data?.summary || {};
+            
+            // Check if all data is fresh
+            const totalMissing = (missingDataSummary.missing_current_count || 0) + 
+                                (missingDataSummary.missing_historical_count || 0) + 
+                                (missingDataSummary.missing_indicators_count || 0);
+            
+            if (totalMissing === 0) {
+              notification.success('כל הנתונים עדכניים', 'כל הטיקרים בעלי נתונים עדכניים, אין צורך בטעינה מלאה');
+              return {
+                status: 'success',
+                message: 'All data is fresh, no refresh needed',
+                data: {
+                  skipped: true,
+                  total_tickers: missingDataSummary.total_open_tickers || 0
+                }
+              };
+            }
+            
+            // Show confirmation dialog with detailed information
+            const confirmationMessage = `
+              <div style="text-align: right; direction: rtl;">
+                <p><strong>פרטי טעינה מלאה:</strong></p>
+                <ul style="text-align: right;">
+                  <li>סה"כ טיקרים: ${missingDataSummary.total_open_tickers || 0}</li>
+                  <li>טיקרים שצריכים quote נוכחי: ${missingDataSummary.missing_current_count || 0}</li>
+                  <li>טיקרים שצריכים נתונים היסטוריים: ${missingDataSummary.missing_historical_count || 0}</li>
+                  <li>טיקרים שצריכים אינדיקטורים: ${missingDataSummary.missing_indicators_count || 0}</li>
+                </ul>
+                <p style="color: #666; font-size: 0.9em; margin-top: 10px;">
+                  <strong>הערה:</strong> רק הנתונים החסרים ייטענו. נתונים עדכניים יידלגו.
+                </p>
+                <p style="color: #fc5a06; font-size: 0.9em; margin-top: 10px;">
+                  <strong>שימו לב:</strong> תהליך זה עלול לקחת זמן רב אם יש הרבה נתונים חסרים.
+                </p>
+              </div>
+            `;
+            
+            const confirmed = await new Promise((resolve) => {
+              if (window.showConfirmationDialog) {
+                window.showConfirmationDialog(
+                  'טעינת נתונים מלאה',
+                  confirmationMessage,
+                  () => resolve(true),
+                  () => resolve(false)
+                );
+              } else {
+                // Fallback to simple confirm
+                resolve(confirm('האם להמשיך בטעינת נתונים מלאה?'));
+              }
+            });
+            
+            if (!confirmed) {
+              logger.info(`${MODULE_NAME}:refresh-full:cancelled-by-user`);
+              return {
+                status: 'cancelled',
+                message: 'User cancelled refresh'
+              };
+            }
+          }
+        } catch (checkError) {
+          logger.warn(`${MODULE_NAME}:refresh-full:check-failed`, { error: checkError.message });
+          // Continue with refresh if check fails
+        }
+        
         // Show progress overlay
         showProgressOverlay(overlayId, 1, 'מתחיל טעינה מלאה', 'מכין בקשה לטעינת נתונים מלאה', {
           title: 'טעינת נתונים מלאה',
@@ -1450,6 +1593,96 @@
       if (!tickerId) {
         notification.warning('בחירת טיקר', 'אנא בחר טיקר מהרשימה');
         return;
+      }
+      
+      // Step 0: Check what data is missing for this ticker before loading
+      logger.info(`${MODULE_NAME}:refresh-ticker:checking-missing-data`, { tickerId });
+      
+      let tickerMissingData = null;
+      try {
+        const missingDataResponse = await fetch('/api/external-data/status/tickers/missing-data');
+        if (missingDataResponse.ok) {
+          const missingDataResult = await missingDataResponse.json();
+          const allMissingTickers = [
+            ...(missingDataResult?.data?.tickers_missing_current || []),
+            ...(missingDataResult?.data?.tickers_missing_historical || []),
+            ...(missingDataResult?.data?.tickers_missing_indicators || [])
+          ];
+          tickerMissingData = allMissingTickers.find(t => t.id === tickerId);
+          
+          // If all data is fresh, show confirmation before skipping
+          if (!tickerMissingData) {
+            const confirmed = await new Promise((resolve) => {
+              if (window.showConfirmationDialog) {
+                window.showConfirmationDialog(
+                  'כל הנתונים עדכניים',
+                  'כל הנתונים עבור טיקר זה עדכניים. האם בכל זאת להמשיך ברענון?',
+                  () => resolve(true),
+                  () => resolve(false)
+                );
+              } else {
+                resolve(confirm('כל הנתונים עדכניים. האם להמשיך ברענון?'));
+              }
+            });
+            
+            if (!confirmed) {
+              logger.info(`${MODULE_NAME}:refresh-ticker:cancelled-by-user`, { tickerId });
+              notification.info('רענון בוטל', 'כל הנתונים עדכניים, רענון בוטל');
+              return {
+                status: 'cancelled',
+                message: 'All data is fresh, refresh cancelled by user'
+              };
+            }
+          } else {
+            // Show confirmation dialog with detailed information about what's missing
+            const missingFields = [];
+            if (tickerMissingData.reason === 'missing_current_quote') {
+              missingFields.push('מחיר נוכחי');
+            }
+            if (tickerMissingData.reason === 'insufficient_historical_data') {
+              missingFields.push(`נתונים היסטוריים (${tickerMissingData.current_count || 0}/${tickerMissingData.required_count || 150})`);
+            }
+            if (tickerMissingData.reason === 'missing_technical_indicators') {
+              missingFields.push(`אינדיקטורים טכניים: ${(tickerMissingData.missing_indicators || []).join(', ')}`);
+            }
+            
+            const confirmationMessage = `
+              <div style="text-align: right; direction: rtl;">
+                <p><strong>נתונים חסרים עבור טיקר זה:</strong></p>
+                <ul style="text-align: right;">
+                  ${missingFields.map(field => `<li>${field}</li>`).join('')}
+                </ul>
+                <p style="color: #666; font-size: 0.9em; margin-top: 10px;">
+                  <strong>הערה:</strong> רק הנתונים החסרים ייטענו. נתונים עדכניים יידלגו.
+                </p>
+              </div>
+            `;
+            
+            const confirmed = await new Promise((resolve) => {
+              if (window.showConfirmationDialog) {
+                window.showConfirmationDialog(
+                  'רענון נתונים לטיקר',
+                  confirmationMessage,
+                  () => resolve(true),
+                  () => resolve(false)
+                );
+              } else {
+                resolve(confirm('האם להמשיך ברענון הנתונים?'));
+              }
+            });
+            
+            if (!confirmed) {
+              logger.info(`${MODULE_NAME}:refresh-ticker:cancelled-by-user`, { tickerId });
+              return {
+                status: 'cancelled',
+                message: 'User cancelled refresh'
+              };
+            }
+          }
+        }
+      } catch (checkError) {
+        logger.warn(`${MODULE_NAME}:refresh-ticker:check-failed`, { error: checkError.message, tickerId });
+        // Continue with refresh if check fails
       }
       
       const originalButtonText = button?.textContent || 'טען נתונים מלאים';
@@ -3333,22 +3566,25 @@
           const resetTime = errorData?.details?.reset_time?.epochMs || Date.now() + 60000; // Default 1 minute
           const waitTime = Math.max(1000, resetTime - Date.now() + 1000); // Add 1 second buffer
           
-          if (retryCount < 2) {
+          if (retryCount < 3) { // Increased from 2 to 3 retries
             logger.warn(`${MODULE_NAME}:load-scheduler-status:rate-limited`, { 
               retryCount, 
+              maxRetries: 3,
               waitTime: Math.round(waitTime / 1000) + 's',
               resetTime: new Date(resetTime).toISOString()
             });
             
             this._loadingSchedulerStatus = false;
             
-            // Wait and retry
-            await new Promise(resolve => setTimeout(resolve, waitTime));
+            // Wait and retry with exponential backoff
+            const backoffDelay = waitTime * (retryCount + 1);
+            await new Promise(resolve => setTimeout(resolve, backoffDelay));
             return this.loadSchedulerStatus(showNotification, retryCount + 1);
           } else {
             // Max retries reached, show cached data if available
             logger.warn(`${MODULE_NAME}:load-scheduler-status:max-retries-reached`, { 
-              hasCachedData: !!this.schedulerStatusData 
+              hasCachedData: !!this.schedulerStatusData,
+              retryCount 
             });
             
             if (this.schedulerStatusData) {
@@ -3358,9 +3594,12 @@
                 notification.warning('מצב מתזמן', 'נתונים מהמטמון (rate limit)');
               }
             } else {
+              // No cached data - silently fail (non-critical feature)
               this.schedulerStatusData = null;
               this.renderSchedulerStatus(null);
-              this.handleError('שגיאה בטעינת מצב מתזמן', new Error('Rate limit exceeded - נסה שוב בעוד דקה'), 'load-scheduler-status');
+              logger.debug(`${MODULE_NAME}:load-scheduler-status:no-cached-data`, { 
+                message: 'Scheduler status unavailable (rate limited, no cache)' 
+              });
             }
             return;
           }

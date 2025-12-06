@@ -346,7 +346,7 @@
       bootstrapGlobal.__isFallback = true;
 
       window.bootstrap = bootstrapGlobal;
-    }
+    } // End of installFallback function
 
     // Initial check
     const initialNeedsModal = !window.bootstrap || !window.bootstrap.Modal;
@@ -359,7 +359,7 @@
 
     // Start checking
     checkBootstrap();
-  })();
+  })(); // Close inner IIFE for Bootstrap fallback
 
 // ===== UNIFIED APP INITIALIZER =====
 
@@ -5904,6 +5904,7 @@ if (false && typeof window.PAGE_CONFIGS === 'undefined') {
       ],
     },
   };
+} // Close if (false && ...) block that starts on line 5058
 
   // ===== CONFIGURATION HELPER FUNCTIONS =====
 
@@ -5982,4 +5983,4 @@ if (false && typeof window.PAGE_CONFIGS === 'undefined') {
   // window.PAGE_CONFIGS = PAGE_CONFIGS;
   // window.PAGE_CONFIGS.__SOURCE = 'core-systems';
   // window.pageInitializationConfigs = PAGE_CONFIGS;
-}
+})(); // Close IIFE that starts on line 99

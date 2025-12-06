@@ -1479,7 +1479,11 @@ async function updatePortfolioSummaryToggleButton() {
         toggleBtn.setAttribute('aria-label', nextActionLabel);
         toggleBtn.setAttribute('data-tooltip', nextActionLabel);
         
-        if (window.bootstrap?.Tooltip) {
+        // Use Button System to update tooltip if available
+        if (window.advancedButtonSystem && typeof window.advancedButtonSystem.updateTooltip === 'function') {
+            window.advancedButtonSystem.updateTooltip(toggleBtn, nextActionLabel);
+        } else if (window.bootstrap?.Tooltip) {
+            // Fallback to direct Bootstrap update if Button System not available
             const tooltipInstance = window.bootstrap.Tooltip.getInstance(toggleBtn);
             if (tooltipInstance) {
                 tooltipInstance.setContent({ '.tooltip-inner': nextActionLabel });

@@ -61,10 +61,16 @@ async function initAuthGuard() {
             }
             return;
           }
+        } else if (response.status === 401) {
+          // 401 is expected when not authenticated - silently handle it
+          // Don't log as error to avoid console pollution
         }
       } catch (error) {
-        // If server check fails, stay on login page
-        console.debug('Auth guard: Server check failed, staying on login page', error);
+        // Only log non-401 errors to avoid console pollution
+        // 401 errors are expected and handled silently
+        if (error.message && !error.message.includes('401') && !error.message.includes('UNAUTHORIZED')) {
+          console.debug('Auth guard: Server check failed, staying on login page', error);
+        }
       }
     }
     
@@ -108,6 +114,11 @@ async function checkAuthAndRedirect() {
       });
       
       if (!response.ok) {
+        // 401 is expected when not authenticated - silently handle it
+        // Other errors should be logged
+        if (response.status !== 401) {
+          console.warn('Auth guard: Unexpected error checking authentication:', response.status);
+        }
         // Not authenticated - redirect to login
         redirectToLogin();
         return;

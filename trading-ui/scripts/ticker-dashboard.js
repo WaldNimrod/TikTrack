@@ -1486,20 +1486,30 @@
                             labelDiv.appendChild(node.cloneNode(true));
                         });
                         
-                        // Initialize Bootstrap tooltip for help icon
-                        if (typeof bootstrap !== 'undefined' && bootstrap.Tooltip) {
-                            try {
-                                const helpIconElement = labelDiv.querySelector('.help-icon');
-                                if (helpIconElement) {
+                        // Initialize tooltip for help icon using Button System (unified tooltip system)
+                        const helpIconElement = labelDiv.querySelector('.help-icon');
+                        if (helpIconElement) {
+                            // Add data-tooltip attribute for Button System
+                            const helpText = helpIconElement.getAttribute('title') || helpIconElement.getAttribute('data-bs-original-title') || '';
+                            if (helpText) {
+                                helpIconElement.setAttribute('data-tooltip', helpText);
+                            }
+                            
+                            // Use Button System to initialize tooltip
+                            if (window.advancedButtonSystem && typeof window.advancedButtonSystem.initializeTooltips === 'function') {
+                                window.advancedButtonSystem.initializeTooltips(labelDiv);
+                            } else if (typeof bootstrap !== 'undefined' && bootstrap.Tooltip) {
+                                // Fallback to direct Bootstrap initialization if Button System not available
+                                try {
                                     new bootstrap.Tooltip(helpIconElement, {
                                         placement: 'top',
                                         trigger: 'hover',
                                         html: true
                                     });
-                                }
-                            } catch (tooltipError) {
-                                if (window.Logger) {
-                                    window.Logger.warn('Failed to initialize tooltip for help icon', { error: tooltipError.message, page: 'ticker-dashboard' });
+                                } catch (tooltipError) {
+                                    if (window.Logger) {
+                                        window.Logger.warn('Failed to initialize tooltip for help icon', { error: tooltipError.message, page: 'ticker-dashboard' });
+                                    }
                                 }
                             }
                         }
@@ -1530,14 +1540,26 @@
                                             }
                                         }
                                         helpIconSpan.outerHTML = helpIcon;
-                                        // Initialize new tooltip
+                                        // Initialize new tooltip using Button System (unified tooltip system)
                                         const newHelpIcon = labelDiv.querySelector('.help-icon');
-                                        if (newHelpIcon && typeof bootstrap !== 'undefined' && bootstrap.Tooltip) {
-                                            new bootstrap.Tooltip(newHelpIcon, {
-                                                placement: 'top',
-                                                trigger: 'hover',
-                                                html: true
-                                            });
+                                        if (newHelpIcon) {
+                                            // Add data-tooltip attribute for Button System
+                                            const helpText = newHelpIcon.getAttribute('title') || newHelpIcon.getAttribute('data-bs-original-title') || '';
+                                            if (helpText) {
+                                                newHelpIcon.setAttribute('data-tooltip', helpText);
+                                            }
+                                            
+                                            // Use Button System to initialize tooltip
+                                            if (window.advancedButtonSystem && typeof window.advancedButtonSystem.initializeTooltips === 'function') {
+                                                window.advancedButtonSystem.initializeTooltips(labelDiv);
+                                            } else if (typeof bootstrap !== 'undefined' && bootstrap.Tooltip) {
+                                                // Fallback to direct Bootstrap initialization if Button System not available
+                                                new bootstrap.Tooltip(newHelpIcon, {
+                                                    placement: 'top',
+                                                    trigger: 'hover',
+                                                    html: true
+                                                });
+                                            }
                                         }
                                     }
                                 }

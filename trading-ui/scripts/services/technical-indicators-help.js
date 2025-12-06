@@ -84,12 +84,15 @@
         },
         
         /**
-         * Initialize tooltips for help icons
+         * Initialize tooltips for help icons using Button System (unified tooltip system)
          * Should be called after DOM is ready
          */
         initializeTooltips: function() {
-            if (typeof window.bootstrap !== 'undefined' && window.bootstrap.Tooltip) {
-                // Initialize Bootstrap tooltips
+            // Use Button System to initialize tooltips - this ensures consistent tooltip handling
+            if (window.advancedButtonSystem && typeof window.advancedButtonSystem.initializeTooltips === 'function') {
+                window.advancedButtonSystem.initializeTooltips(document.body);
+            } else if (typeof window.bootstrap !== 'undefined' && window.bootstrap.Tooltip) {
+                // Fallback to direct Bootstrap initialization if Button System not available
                 const tooltipElements = document.querySelectorAll('[data-bs-toggle="tooltip"]');
                 tooltipElements.forEach(element => {
                     new window.bootstrap.Tooltip(element);

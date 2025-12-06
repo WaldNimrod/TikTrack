@@ -35,6 +35,9 @@ class AIAnalysisErrorCodes:
     VALIDATION_MISSING_VARIABLES = "AI_3003"
     VALIDATION_INVALID_PROVIDER = "AI_3004"
     VALIDATION_INVALID_STATUS = "AI_3005"
+    VALIDATION_NO_TRADES_FOUND = "AI_3006"
+    VALIDATION_NO_TRADES_IN_DATE_RANGE = "AI_3007"
+    VALIDATION_TICKER_REQUIRED = "AI_3008"
     
     # Request errors (4xxx)
     REQUEST_NOT_FOUND = "AI_4001"
@@ -149,6 +152,21 @@ ERROR_MESSAGES: Dict[str, Dict[str, str]] = {
         'he': 'סטטוס לא תקין. נא לבדוק את הבקשה.',
         'en': 'Invalid status. Please check the request.',
         'action': 'check_request'
+    },
+    AIAnalysisErrorCodes.VALIDATION_NO_TRADES_FOUND: {
+        'he': 'לא נמצאו טריידים במערכת. נא צור טריידים לפני ביצוע ניתוח.',
+        'en': 'No trades found in the system. Please create trades before running analysis.',
+        'action': 'create_trades'
+    },
+    AIAnalysisErrorCodes.VALIDATION_NO_TRADES_IN_DATE_RANGE: {
+        'he': 'לא נמצאו טריידים בטווח התאריכים שנבחר. אנא בחר טווח אחר או בדוק שיש טריידים בתקופה זו.',
+        'en': 'No trades found in the selected date range. Please choose a different range or check if trades exist in this period.',
+        'action': 'select_different_date_range'
+    },
+    AIAnalysisErrorCodes.VALIDATION_TICKER_REQUIRED: {
+        'he': 'ניתוח טכני דורש בחירת טיקר. אנא בחר טיקר לפני ביצוע הניתוח.',
+        'en': 'Technical analysis requires a ticker selection. Please select a ticker before running the analysis.',
+        'action': 'select_ticker'
     },
     
     # Request errors
@@ -288,6 +306,16 @@ def categorize_error(error: Exception, error_message: str = None) -> str:
     # Validation errors
     if 'validation' in combined or 'validate' in combined:
         return AIAnalysisErrorCodes.VALIDATION_FAILED
+    
+    # Trade data validation errors
+    if 'לא נמצאו טריידים' in error_str or 'no trades found' in combined:
+        if 'טווח התאריכים' in error_str or 'date range' in combined:
+            return AIAnalysisErrorCodes.VALIDATION_NO_TRADES_IN_DATE_RANGE
+        return AIAnalysisErrorCodes.VALIDATION_NO_TRADES_FOUND
+    
+    # Ticker required error
+    if 'טיקר' in error_str and ('דורש' in error_str or 'required' in combined):
+        return AIAnalysisErrorCodes.VALIDATION_TICKER_REQUIRED
     
     # User errors
     if 'user' in combined and ('not found' in combined or 'missing' in combined):

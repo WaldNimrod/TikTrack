@@ -114,28 +114,39 @@
 
         // If still no user, fetch from API
         if (!user) {
-          const response = await fetch('/api/auth/me', {
-            method: 'GET',
-            credentials: 'include'
-          });
+          try {
+            const response = await fetch('/api/auth/me', {
+              method: 'GET',
+              credentials: 'include'
+            });
 
-          if (response.ok) {
-            const data = await response.json();
-            if (data.status === 'success' && data.data?.user) {
-              user = data.data.user;
-              
-              // Save to cache
-              if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
-                try {
-                  await window.UnifiedCacheManager.save(cacheKey, user, {
-                    layer: 'localStorage',
-                    ttl: 300000,
-                    includeUserId: false
-                  });
-                } catch (cacheError) {
-                  window.Logger?.warn('Cache save failed', { error: cacheError, page: 'user-profile' });
+            if (response.ok) {
+              const data = await response.json();
+              if (data.status === 'success' && data.data?.user) {
+                user = data.data.user;
+                
+                // Save to cache
+                if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
+                  try {
+                    await window.UnifiedCacheManager.save(cacheKey, user, {
+                      layer: 'localStorage',
+                      ttl: 300000,
+                      includeUserId: false
+                    });
+                  } catch (cacheError) {
+                    window.Logger?.warn('Cache save failed', { error: cacheError, page: 'user-profile' });
+                  }
                 }
               }
+            } else if (response.status === 401) {
+              // 401 is expected when not authenticated - silently handle it
+              // Don't log as error to avoid console pollution
+            }
+          } catch (error) {
+            // Only log non-401 errors to avoid console pollution
+            // 401 errors are expected and handled silently
+            if (error.message && !error.message.includes('401') && !error.message.includes('UNAUTHORIZED')) {
+              window.Logger?.warn('Error fetching user profile', { error: error.message, page: 'user-profile' });
             }
           }
 

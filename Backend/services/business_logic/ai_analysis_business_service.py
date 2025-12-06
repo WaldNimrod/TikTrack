@@ -133,6 +133,12 @@ class AIAnalysisBusinessService(BaseBusinessService):
         else:
             errors.append('Variables are required')
         
+        # Template-specific validations
+        if template_id and variables:
+            template_specific_errors = self._validate_template_specific_requirements(template_id, variables)
+            if template_specific_errors:
+                errors.extend(template_specific_errors)
+        
         # Validate status (if provided)
         status = data.get('status')
         if status and status not in self.VALID_STATUSES:
@@ -142,6 +148,36 @@ class AIAnalysisBusinessService(BaseBusinessService):
             'is_valid': len(errors) == 0,
             'errors': errors
         }
+    
+    def _validate_template_specific_requirements(
+        self,
+        template_id: int,
+        variables: Dict[str, Any]
+    ) -> List[str]:
+        """
+        Validate template-specific requirements
+        
+        Args:
+            template_id: Template ID (2=Technical Analysis, 3=Portfolio Performance, 4=Risk & Conditions)
+            variables: Variables dictionary (v2.0 or legacy)
+            
+        Returns:
+            List of error messages (empty if valid)
+        """
+        errors = []
+        
+        # Extract prompt_variables from v2.0 structure or use variables directly
+        prompt_variables = variables
+        if isinstance(variables, dict) and ('prompt_variables' in variables or variables.get('version') == '2.0'):
+            prompt_variables = variables.get('prompt_variables', variables)
+        
+        # Technical Analysis (template_id=2) requires ticker symbol
+        if template_id == 2:
+            ticker_symbol = prompt_variables.get('ticker_symbol') or prompt_variables.get('stock_ticker')
+            if not ticker_symbol or (isinstance(ticker_symbol, str) and ticker_symbol.strip() == ''):
+                errors.append("ניתוח טכני דורש בחירת טיקר. אנא בחר טיקר לפני ביצוע הניתוח.")
+        
+        return errors
     
     def validate_template_exists(self, template_id: int) -> Dict[str, Any]:
         """

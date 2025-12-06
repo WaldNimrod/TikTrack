@@ -1617,13 +1617,16 @@ async function renderCashFlowsTable() {
     }
   }
 
-  // Clean up and reinitialize Bootstrap tooltips after table update
+  // Clean up and reinitialize tooltips after table update using Button System
   // This prevents "Cannot convert undefined or null to object" errors
-  if (typeof bootstrap !== 'undefined' && bootstrap.Tooltip) {
-    try {
-      // Destroy all existing tooltips in the table container
-      const tableContainer = document.querySelector('#cashFlowsContainer');
-      if (tableContainer) {
+  const tableContainer = document.querySelector('#cashFlowsContainer');
+  if (tableContainer) {
+    // Use Button System to reinitialize tooltips (it handles cleanup automatically)
+    if (window.advancedButtonSystem && typeof window.advancedButtonSystem.initializeTooltips === 'function') {
+      window.advancedButtonSystem.initializeTooltips(tableContainer);
+    } else if (typeof bootstrap !== 'undefined' && bootstrap.Tooltip) {
+      // Fallback to direct Bootstrap cleanup if Button System not available
+      try {
         const existingTooltips = tableContainer.querySelectorAll('[data-bs-toggle="tooltip"], [data-tooltip]');
         existingTooltips.forEach(element => {
           const tooltipInstance = bootstrap.Tooltip.getInstance(element);

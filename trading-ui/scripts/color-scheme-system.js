@@ -53,7 +53,8 @@ const ENTITY_COLORS = {
   research: '#17a2b8',
   preference: '#adb5bd',
   development: BRAND_SECONDARY,
-  position: '#0d6efd'
+  position: '#0d6efd',
+  import_session: '#fd7e14' // שימוש בצבע של cash_flow (תזרימי מזומן)
 };
 
 const ENTITY_BACKGROUND_COLORS = {
@@ -71,7 +72,8 @@ const ENTITY_BACKGROUND_COLORS = {
   research: 'rgba(23, 162, 184, 0.1)',
   preference: 'rgba(173, 181, 189, 0.1)',
   development: BRAND_SECONDARY_BG,
-  position: 'rgba(13, 110, 253, 0.12)'
+  position: 'rgba(13, 110, 253, 0.12)',
+  import_session: 'rgba(253, 126, 20, 0.1)' // שימוש בצבע רקע של cash_flow (תזרימי מזומן)
 };
 
 const ENTITY_TEXT_COLORS = {

@@ -609,9 +609,16 @@ async function checkAuthentication(onAuthenticated = null, onNotAuthenticated = 
         }
         return;
       }
+    } else if (response.status === 401) {
+      // 401 is expected when not authenticated - silently handle it
+      // Don't log as error to avoid console pollution
     }
   } catch (error) {
-    console.warn('Failed to check authentication:', error);
+    // Only log non-401 errors to avoid console pollution
+    // 401 errors are expected and handled silently
+    if (error.message && !error.message.includes('401')) {
+      console.warn('Failed to check authentication:', error);
+    }
   }
   
   // Not authenticated - try localStorage as fallback

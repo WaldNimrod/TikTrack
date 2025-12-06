@@ -417,8 +417,12 @@
             });
         });
 
-        // Initialize Bootstrap tooltips
-        if (window.bootstrap && window.bootstrap.Tooltip) {
+        // Initialize tooltips using Button System (unified tooltip system)
+        if (window.advancedButtonSystem && typeof window.advancedButtonSystem.initializeTooltips === 'function') {
+            // Use Button System to initialize tooltips - this ensures consistent tooltip handling
+            window.advancedButtonSystem.initializeTooltips(document.body);
+        } else if (window.bootstrap && window.bootstrap.Tooltip) {
+            // Fallback to direct Bootstrap initialization if Button System not available
             const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
             tooltipTriggerList.forEach(tooltipTriggerEl => {
                 new window.bootstrap.Tooltip(tooltipTriggerEl);

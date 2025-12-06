@@ -515,8 +515,39 @@ class TradeAggregationService:
         
         # Add date range if available
         if filters.get('date_range_start') or filters.get('date_range_end'):
-            start = filters.get('date_range_start', 'All time')
-            end = filters.get('date_range_end', 'Present')
+            start = filters.get('date_range_start')
+            end = filters.get('date_range_end')
+            
+            # Convert datetime to string if needed
+            # filters_applied contains isoformat strings, but check for datetime objects too
+            if start:
+                if isinstance(start, datetime):
+                    start = start.strftime('%Y-%m-%d')
+                elif isinstance(start, str):
+                    # Already a string (isoformat), extract date part if needed
+                    try:
+                        # If it's ISO format, extract date part
+                        if 'T' in start:
+                            start = start.split('T')[0]
+                    except:
+                        pass
+            else:
+                start = 'All time'
+            
+            if end:
+                if isinstance(end, datetime):
+                    end = end.strftime('%Y-%m-%d')
+                elif isinstance(end, str):
+                    # Already a string (isoformat), extract date part if needed
+                    try:
+                        # If it's ISO format, extract date part
+                        if 'T' in end:
+                            end = end.split('T')[0]
+                    except:
+                        pass
+            else:
+                end = 'Present'
+            
             lines.append(f"Period: {start} to {end}")
         
         lines.append("")

@@ -182,10 +182,13 @@ class AdvancedButtonSystem {
         this.performance.startTime = performance.now();
         this.logger.info('Starting system initialization...');
 
+        // Bind initializeButtons to ensure correct 'this' context
+        const boundInitializeButtons = this.initializeButtons.bind(this);
+        
         if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', () => this.initializeButtons());
+            document.addEventListener('DOMContentLoaded', () => boundInitializeButtons());
         } else {
-            this.initializeButtons();
+            boundInitializeButtons();
         }
 
         this.setupMutationObserver();
@@ -326,8 +329,10 @@ class AdvancedButtonSystem {
         if (this.debounceTimer) {
             clearTimeout(this.debounceTimer);
         }
+        // Bind initializeButtons to ensure correct 'this' context
+        const boundInitializeButtons = this.initializeButtons.bind(this);
         this.debounceTimer = setTimeout(async () => {
-            await this.initializeButtons();
+            await boundInitializeButtons();
         }, this.config.performance.debounceDelay);
     }
 
@@ -497,6 +502,32 @@ class AdvancedButtonSystem {
         }
         
         this.logger.warn('Button icons not loaded within timeout, using fallback');
+        return false;
+    }
+
+    /**
+     * Wait for Bootstrap to be available before processing buttons
+     * This prevents tooltip initialization errors
+     * @returns {Promise<boolean>} True if Bootstrap is available, false if timeout
+     */
+    async waitForBootstrap() {
+        const maxWaitTime = 5000; // 5 seconds max
+        const checkInterval = 100; // Check every 100ms
+        let elapsed = 0;
+        
+        while (elapsed < maxWaitTime) {
+            // Check if Bootstrap is available (either from CDN or fallback)
+            if (typeof bootstrap !== 'undefined' && bootstrap && bootstrap.Tooltip) {
+                this.logger.debug('Bootstrap loaded successfully');
+                return true;
+            }
+            
+            await new Promise(resolve => setTimeout(resolve, checkInterval));
+            elapsed += checkInterval;
+        }
+        
+        // If Bootstrap not available, log warning but continue (fallback will be used)
+        this.logger.warn('Bootstrap not loaded within timeout, using fallback tooltips');
         return false;
     }
 

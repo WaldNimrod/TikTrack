@@ -231,6 +231,205 @@ class AIAnalysisService:
         self.encryption_service = APIKeyEncryptionService()
         self.business_service = AIAnalysisBusinessService()
     
+    @staticmethod
+    def _get_available_date_range(
+        db: Session,
+        user_id: int,
+        agg_params: Dict[str, Any]
+    ) -> Dict[str, Any]:
+        """
+        Get the available date range for trades in the system
+        
+        Args:
+            db: Database session
+            user_id: User ID
+            agg_params: Aggregation parameters (excluding date_range)
+            
+        Returns:
+            Dict with:
+                - earliest_date: datetime - earliest trade date
+                - latest_date: datetime - latest trade date
+                - trades_count: int - total trades count
+        """
+        try:
+            from services.trade_aggregation_service import TradeAggregationService
+            from models.trade import Trade
+            from sqlalchemy import func
+            
+            # Remove date filters to get all trades
+            check_params = {k: v for k, v in agg_params.items() 
+                          if k not in ['date_range_start', 'date_range_end', 'date_field']}
+            
+            # Get all trades with the given filters (no date filter)
+            result = TradeAggregationService.aggregate_trades(db, **check_params)
+            trades = result.get('trades', [])
+            
+            if not trades:
+                return {
+                    'earliest_date': None,
+                    'latest_date': None,
+                    'trades_count': 0
+                }
+            
+            # Find earliest and latest dates from trades
+            dates = []
+            for trade_data in trades:
+                trade = trade_data.get('trade', {})
+                created_at = trade.get('opened_at')
+                closed_at = trade.get('closed_at')
+                
+                if created_at:
+                    try:
+                        if isinstance(created_at, str):
+                            dates.append(datetime.fromisoformat(created_at.replace('Z', '+00:00')))
+                    except:
+                        pass
+                if closed_at:
+                    try:
+                        if isinstance(closed_at, str):
+                            dates.append(datetime.fromisoformat(closed_at.replace('Z', '+00:00')))
+                    except:
+                        pass
+            
+            if dates:
+                earliest = min(dates)
+                latest = max(dates)
+                return {
+                    'earliest_date': earliest,
+                    'latest_date': latest,
+                    'trades_count': len(trades)
+                }
+            
+            return {
+                'earliest_date': None,
+                'latest_date': None,
+                'trades_count': len(trades)
+            }
+            
+        except Exception as e:
+            logger.error(f"Error getting available date range: {str(e)}", exc_info=True)
+            return {
+                'earliest_date': None,
+                'latest_date': None,
+                'trades_count': 0
+            }
+    
+    @staticmethod
+    def _validate_trade_data_availability(
+        db: Session,
+        user_id: int,
+        agg_params: Dict[str, Any],
+        template_id: int
+    ) -> Dict[str, Any]:
+        """
+        Validate that trade data is available for the given criteria
+        
+        Args:
+            db: Database session
+            user_id: User ID
+            agg_params: Aggregation parameters (same as for aggregate_trades)
+            template_id: Template ID for context-specific error messages
+            
+        Returns:
+            Dict with:
+                - has_data: bool - whether trades exist
+                - trades_count: int - number of matching trades
+                - error_message: str - user-friendly error message if no data
+        """
+        try:
+            from services.trade_aggregation_service import TradeAggregationService
+            
+            # Quick check: aggregate trades with minimal enrichment for performance
+            check_params = agg_params.copy()
+            check_params['enrich_with_position'] = False
+            check_params['enrich_with_market_data'] = False
+            
+            result = TradeAggregationService.aggregate_trades(db, **check_params)
+            trades = result.get('trades', [])
+            trades_count = len(trades)
+            
+            if trades_count == 0:
+                # Generate specific error messages based on filters
+                error_parts = []
+                
+                # Check date range
+                date_range_start = agg_params.get('date_range_start')
+                date_range_end = agg_params.get('date_range_end')
+                if date_range_start or date_range_end:
+                    if isinstance(date_range_start, datetime):
+                        start_str = date_range_start.strftime('%Y-%m-%d')
+                    else:
+                        start_str = str(date_range_start) if date_range_start else 'All time'
+                    if isinstance(date_range_end, datetime):
+                        end_str = date_range_end.strftime('%Y-%m-%d')
+                    else:
+                        end_str = str(date_range_end) if date_range_end else 'Present'
+                    error_parts.append(f"טווח התאריכים {start_str} עד {end_str}")
+                    
+                    # Check if date range is outside available range
+                    available_range = AIAnalysisService._get_available_date_range(db, user_id, agg_params)
+                    if available_range.get('earliest_date') and available_range.get('latest_date'):
+                        earliest = available_range['earliest_date']
+                        latest = available_range['latest_date']
+                        earliest_str = earliest.strftime('%Y-%m-%d')
+                        latest_str = latest.strftime('%Y-%m-%d')
+                        
+                        # Check if requested range is outside available range
+                        range_outside = False
+                        if date_range_start and isinstance(date_range_start, datetime):
+                            if date_range_start < earliest or date_range_start > latest:
+                                range_outside = True
+                        if date_range_end and isinstance(date_range_end, datetime):
+                            if date_range_end < earliest or date_range_end > latest:
+                                range_outside = True
+                        
+                        if range_outside:
+                            return {
+                                'has_data': False,
+                                'trades_count': 0,
+                                'error_message': f"טווח התאריכים שנבחר מחוץ לטווח הזמין במערכת. טווח זמין: {earliest_str} עד {latest_str}. אנא בחר טווח תואם."
+                            }
+                
+                # Check investment type
+                investment_type = agg_params.get('investment_type')
+                if investment_type:
+                    error_parts.append(f"סוג השקעה: {investment_type}")
+                
+                # Check ticker
+                ticker_symbol = agg_params.get('ticker_symbol')
+                if ticker_symbol:
+                    error_parts.append(f"טיקר: {ticker_symbol}")
+                
+                # Check account
+                trading_account_id = agg_params.get('trading_account_id')
+                if trading_account_id:
+                    error_parts.append(f"חשבון מסחר: {trading_account_id}")
+                
+                if error_parts:
+                    error_msg = f"לא נמצאו טריידים תואמים לקריטריונים הבאים: {', '.join(error_parts)}. אנא בחר קריטריונים אחרים או בדוק שיש טריידים תואמים במערכת."
+                else:
+                    error_msg = "לא נמצאו טריידים במערכת. נא צור טריידים לפני ביצוע ניתוח."
+                
+                return {
+                    'has_data': False,
+                    'trades_count': 0,
+                    'error_message': error_msg
+                }
+            
+            return {
+                'has_data': True,
+                'trades_count': trades_count,
+                'error_message': None
+            }
+            
+        except Exception as e:
+            logger.error(f"Error validating trade data availability: {str(e)}", exc_info=True)
+            return {
+                'has_data': False,
+                'trades_count': 0,
+                'error_message': f"שגיאה בבדיקת נתוני טריידים: {str(e)}"
+            }
+    
     def generate_analysis(
         self,
         db: Session,
@@ -407,6 +606,14 @@ class AIAnalysisService:
                 agg_params['include_cancelled'] = template_id == 4  # Risk & Conditions
                 agg_params['enrich_with_position'] = True
                 agg_params['enrich_with_market_data'] = template_id == 2  # Technical Analysis
+                
+                # Validate trade data availability before proceeding
+                validation_result = AIAnalysisService._validate_trade_data_availability(
+                    db, user_id, agg_params, template_id
+                )
+                if not validation_result['has_data']:
+                    error_msg = validation_result.get('error_message', 'No trades found matching the specified criteria.')
+                    raise ValueError(error_msg)
                 
                 # Aggregate trades
                 enriched_data = TradeAggregationService.aggregate_trades(db, **agg_params)

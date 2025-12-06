@@ -2044,22 +2044,39 @@
             });
           } else {
             // Handle error from CRUDResponseHandler
-            const errorMessage = crudResult?.error?.message || crudResult?.message || 'שגיאה לא ידועה ביצירת הניתוח';
+            // Check for specific error codes and extract user-friendly messages
+            let errorMessage = crudResult?.error?.message || crudResult?.message || 'שגיאה לא ידועה ביצירת הניתוח';
+            const errorCode = responseData?.error_code || crudResult?.error?.code;
+            
+            // Use error code mapping if available
+            if (errorCode && responseData?.error_message) {
+              errorMessage = responseData.error_message;
+            } else if (errorCode && crudResult?.error?.user_message) {
+              errorMessage = crudResult.error.user_message;
+            }
             
             // Hide progress overlay on error
             this.hideProgressOverlay();
             
+            // Reset loading state on error
+            if (isModal) {
+              this.setLoadingState(false, 'generateAnalysisBtnModal', 'generateAnalysisBtnTextModal', 'generateAnalysisBtnSpinnerModal');
+            } else {
+              this.setLoadingState(false, 'generateAnalysisBtn', 'generateAnalysisBtnText', 'generateAnalysisBtnSpinner');
+            }
+            
             window.Logger?.error('❌ Analysis generation failed', {
               page: 'ai-analysis',
               error: errorMessage,
+              errorCode: errorCode,
               crudResult
             });
             
             if (window.NotificationSystem) {
               window.NotificationSystem.showError(
-                `❌ הניתוח נכשל: ${errorMessage}`,
+                errorMessage,
                 'system',
-                { duration: 8000 }
+                { duration: 10000 }
               );
             }
           }
@@ -2207,22 +2224,30 @@
         
         // Extract error message and code
         let errorMessage = error?.message || 'שגיאה לא ידועה';
-        const errorCode = error?.errorCode || null;
-        const errorAction = error?.errorAction || null;
+        let errorCode = error?.errorCode || null;
+        let errorAction = error?.errorAction || null;
+        
+        // Reset loading state on error
+        if (isModal) {
+          this.setLoadingState(false, 'generateAnalysisBtnModal', 'generateAnalysisBtnTextModal', 'generateAnalysisBtnSpinnerModal');
+        } else {
+          this.setLoadingState(false, 'generateAnalysisBtn', 'generateAnalysisBtnText', 'generateAnalysisBtnSpinner');
+        }
         
         // If error has errorCode, use the message from error (already user-friendly)
         // Otherwise, try to extract from error response
         if (error?.response) {
           try {
             const errorData = await error.response.json().catch(() => ({}));
-            if (errorData.message) {
-              errorMessage = errorData.message;
+            // Prefer user-friendly error message from server
+            if (errorData.error_message || errorData.message) {
+              errorMessage = errorData.error_message || errorData.message;
             }
             if (errorData.error_code && !errorCode) {
-              error.errorCode = errorData.error_code;
+              errorCode = errorData.error_code;
             }
             if (errorData.action && !errorAction) {
-              error.errorAction = errorData.action;
+              errorAction = errorData.action;
             }
           } catch (e) {
             // Ignore JSON parse errors

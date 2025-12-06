@@ -120,6 +120,7 @@ let ENTITY_COLORS = {
   'design': '#495057',
   'research': '#343a40',
   'preference': '#adb5bd',
+  'import_session': '#d4a574', // שימוש בצבע של cash_flow (תזרימי מזומן)
 };
 
 /**
@@ -140,6 +141,7 @@ let ENTITY_BACKGROUND_COLORS = {
   'design': 'rgba(73, 80, 87, 0.1)',
   'research': 'rgba(52, 58, 64, 0.1)',
   'preference': 'rgba(173, 181, 189, 0.1)',
+  'import_session': 'rgba(32, 201, 151, 0.1)', // שימוש בצבע רקע של cash_flow (תזרימי מזומן)
 };
 
 /**

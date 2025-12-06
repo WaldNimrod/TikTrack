@@ -90,8 +90,9 @@ class YahooFinanceAdapter:
         self.preferred_batch_size = 25
         
         # Error handling
-        self.retry_attempts = 2
+        self.retry_attempts = 3  # Increased from 2 to 3 for better reliability
         self.timeout_seconds = 20
+        self.retry_base_delay = 1  # Base delay in seconds for exponential backoff
         
         # Load provider configuration
         self._load_provider_config()
@@ -422,11 +423,16 @@ class YahooFinanceAdapter:
     def _make_request(self, url: str, params: Dict = None) -> Optional[Dict]:
         """Make HTTP request with retry logic and rate limiting"""
         if not self._check_rate_limit():
+            logger.warning(f"Rate limit reached, cannot make request to {url}")
             return None
+        
+        symbol = url.split('/')[-1].split('?')[0] if '/' in url else 'unknown'
         
         for attempt in range(self.retry_attempts + 1):
             try:
                 self._increment_request_count()
+                
+                logger.debug(f"📡 Request attempt {attempt + 1}/{self.retry_attempts + 1} for {symbol}: {url}")
                 
                 response = self.session.get(
                     url, 
@@ -436,30 +442,57 @@ class YahooFinanceAdapter:
                 response.raise_for_status()
                 
                 data = response.json()
-                logger.debug(f"Request successful: {url}")
+                logger.debug(f"✅ Request successful for {symbol} (attempt {attempt + 1})")
                 return data
                 
             except requests.exceptions.HTTPError as e:
-                if e.response and e.response.status_code == 404:
+                status_code = e.response.status_code if e.response else None
+                
+                if status_code == 404:
                     # Symbol not found in Yahoo Finance - likely European/unsupported ticker
                     # Don't retry 404 errors - symbol simply doesn't exist in Yahoo Finance
-                    logger.warning(f"Symbol not found in Yahoo Finance (404): {url.split('/')[-1].split('?')[0]} - This may be a European or unsupported ticker")
+                    logger.warning(f"⚠️ Symbol not found in Yahoo Finance (404): {symbol} - This may be a European or unsupported ticker")
                     return None  # Don't retry 404 errors
-                logger.warning(f"Request attempt {attempt + 1} failed: {e}")
+                
+                if status_code == 429:
+                    # Rate limit exceeded - wait longer before retry
+                    wait_time = (2 ** attempt) * 5  # Longer wait for rate limits
+                    logger.warning(f"⚠️ Rate limit exceeded (429) for {symbol}, waiting {wait_time}s before retry {attempt + 1}/{self.retry_attempts}")
+                    if attempt < self.retry_attempts:
+                        time.sleep(wait_time)
+                        continue
+                
+                logger.warning(f"⚠️ HTTP error for {symbol} (attempt {attempt + 1}/{self.retry_attempts + 1}): {status_code} - {e}")
                 if attempt < self.retry_attempts:
-                    time.sleep(2 ** attempt)  # Exponential backoff
+                    wait_time = self.retry_base_delay * (2 ** attempt)  # Exponential backoff
+                    logger.debug(f"⏳ Waiting {wait_time}s before retry for {symbol}")
+                    time.sleep(wait_time)
                 else:
-                    logger.error(f"All retry attempts failed for {url}")
+                    logger.error(f"❌ All retry attempts failed for {symbol}: HTTP {status_code}")
                     return None
+                    
+            except requests.exceptions.Timeout as e:
+                logger.warning(f"⚠️ Request timeout for {symbol} (attempt {attempt + 1}/{self.retry_attempts + 1}): {e}")
+                if attempt < self.retry_attempts:
+                    wait_time = self.retry_base_delay * (2 ** attempt)
+                    logger.debug(f"⏳ Waiting {wait_time}s before retry for {symbol}")
+                    time.sleep(wait_time)
+                else:
+                    logger.error(f"❌ All retry attempts failed for {symbol}: Timeout")
+                    return None
+                    
             except requests.exceptions.RequestException as e:
-                logger.warning(f"Request attempt {attempt + 1} failed: {e}")
+                logger.warning(f"⚠️ Request error for {symbol} (attempt {attempt + 1}/{self.retry_attempts + 1}): {e}")
                 if attempt < self.retry_attempts:
-                    time.sleep(2 ** attempt)  # Exponential backoff
+                    wait_time = self.retry_base_delay * (2 ** attempt)
+                    logger.debug(f"⏳ Waiting {wait_time}s before retry for {symbol}")
+                    time.sleep(wait_time)
                 else:
-                    logger.error(f"All retry attempts failed for {url}")
+                    logger.error(f"❌ All retry attempts failed for {symbol}: {e}")
                     return None
+                    
             except Exception as e:
-                logger.error(f"Unexpected error in request: {e}")
+                logger.error(f"❌ Unexpected error in request for {symbol}: {e}", exc_info=True)
                 return None
         
         return None
@@ -597,14 +630,17 @@ class YahooFinanceAdapter:
                 except Exception as e:
                     last_error = e
                     if attempt_symbol != symbols_to_try[-1]:  # Not the last attempt
-                        logger.debug(f"Error fetching {attempt_symbol}: {e}, trying next fallback...")
+                        logger.debug(f"⚠️ Error fetching {symbol} with provider symbol {attempt_symbol}: {e}, trying next fallback...")
                         continue
                     else:
-                        logger.error(f"Error getting quote for {symbol} (tried: {', '.join(symbols_to_try)}): {e}")
+                        logger.error(f"❌ Error getting quote for {symbol} (tried all variations: {', '.join(symbols_to_try)}): {e}")
             
-            # If all attempts failed, log the last error
+            # If all attempts failed, log detailed error information
             if last_error:
-                logger.error(f"All symbol variations failed for {symbol}: {last_error}")
+                logger.error(f"❌ All symbol variations failed for {symbol} (tried: {', '.join(symbols_to_try)}): {last_error}")
+                # Log additional context for debugging
+                if ticker:
+                    logger.error(f"   Ticker ID: {ticker.id}, Internal Symbol: {ticker.symbol}, Provider Symbol: {provider_symbol}")
             return None
             
         except Exception as e:
@@ -751,14 +787,17 @@ class YahooFinanceAdapter:
         for internal_symbol, provider_symbol in zip(internal_symbols, provider_symbols):
             try:
                 ticker = symbol_to_ticker.get(internal_symbol)
+                logger.debug(f"📊 Fetching quote for {internal_symbol} (provider: {provider_symbol}, ticker_id: {ticker.id if ticker else 'N/A'})")
+                
                 quote = self.get_quote(internal_symbol, ticker=ticker)
                 if quote:
                     quotes.append(quote)
+                    logger.debug(f"✅ Successfully fetched quote for {internal_symbol}")
                 else:
-                    logger.warning(f"Failed to get quote for {internal_symbol} (provider: {provider_symbol})")
+                    logger.warning(f"⚠️ Failed to get quote for {internal_symbol} (provider: {provider_symbol}) - symbol may not exist in Yahoo Finance or API error")
                     
             except Exception as e:
-                logger.error(f"Error fetching quote for {internal_symbol}: {e}")
+                logger.error(f"❌ Error fetching quote for {internal_symbol} (provider: {provider_symbol}): {e}", exc_info=True)
                 continue
         
         return quotes
@@ -1532,9 +1571,11 @@ class YahooFinanceAdapter:
             # For 150 trading days, we need ~210 calendar days (150 * 1.4 ratio)
             # But to be safe, we use 1.5 ratio to ensure we get enough trading days
             # For 150 trading days: 150 * 1.5 = 225 calendar days minimum
-            # So buffer should be approximately 75 days for 150 trading days
-            buffer_days = max(75, int(days_back * 0.5))  # 50% buffer for trading days vs calendar days (safer)
+            # Increased buffer to 100 days to ensure we get at least 150 trading days
+            # This accounts for weekends (2/7 = ~28.6% reduction) and holidays (~10-15 days per year)
+            buffer_days = max(100, int(days_back * 0.67))  # 67% buffer for trading days vs calendar days (safer)
             start_date = end_date - timedelta(days=days_back + buffer_days)  # Get more data for reliability
+            logger.debug(f"📅 Historical data request: {symbol} - {days_back} trading days requested, buffer: {buffer_days} days, total: {days_back + buffer_days} calendar days from {start_date} to {end_date}")
             
             url = f"{self.base_url}/v8/finance/chart/{symbol}"
             params = {
@@ -1545,38 +1586,78 @@ class YahooFinanceAdapter:
             
             data = self._make_request(url, params)
             if not data:
+                logger.warning(f"⚠️ No data returned from Yahoo Finance API for {symbol}")
                 return []
             
             if 'chart' not in data or 'result' not in data['chart'] or not data['chart']['result']:
+                logger.warning(f"⚠️ Invalid response structure from Yahoo Finance API for {symbol}: missing chart.result")
                 return []
             
             result = data['chart']['result'][0]
             if 'timestamp' not in result or 'indicators' not in result:
+                logger.warning(f"⚠️ Invalid response structure from Yahoo Finance API for {symbol}: missing timestamp or indicators")
                 return []
             
             timestamps = result['timestamp']
             quotes = result['indicators']['quote'][0]
             
+            logger.debug(f"📊 Raw data from API: {symbol} - {len(timestamps)} timestamps, {len(quotes.get('open', []))} open prices")
+            
             historical_data = []
+            skipped_null_count = 0
+            skipped_invalid_count = 0
+            
             for i in range(len(timestamps)):
                 try:
-                    if (quotes['open'][i] is not None and quotes['high'][i] is not None and 
-                        quotes['low'][i] is not None and quotes['close'][i] is not None):
+                    # Validate all OHLC values are not None before processing
+                    open_val = quotes.get('open', [None])[i] if i < len(quotes.get('open', [])) else None
+                    high_val = quotes.get('high', [None])[i] if i < len(quotes.get('high', [])) else None
+                    low_val = quotes.get('low', [None])[i] if i < len(quotes.get('low', [])) else None
+                    close_val = quotes.get('close', [None])[i] if i < len(quotes.get('close', [])) else None
+                    
+                    if open_val is None or high_val is None or low_val is None or close_val is None:
+                        skipped_null_count += 1
+                        continue
+                    
+                    # Validate numeric values
+                    try:
+                        open_float = float(open_val)
+                        high_float = float(high_val)
+                        low_float = float(low_val)
+                        close_float = float(close_val)
+                        
+                        # Validate price ranges (high >= low, high >= open, high >= close, low <= open, low <= close)
+                        if high_float < low_float or high_float < open_float or high_float < close_float or low_float > open_float or low_float > close_float:
+                            skipped_invalid_count += 1
+                            logger.debug(f"⚠️ Invalid price range for {symbol} at index {i}: O={open_float}, H={high_float}, L={low_float}, C={close_float}")
+                            continue
+                        
                         historical_date = datetime.fromtimestamp(timestamps[i], tz=timezone.utc)
                         historical_data.append({
                             'date': historical_date,
-                            'open': float(quotes['open'][i]),
-                            'high': float(quotes['high'][i]),
-                            'low': float(quotes['low'][i]),
-                            'close': float(quotes['close'][i])
+                            'open': open_float,
+                            'high': high_float,
+                            'low': low_float,
+                            'close': close_float
                         })
+                    except (ValueError, TypeError) as e:
+                        skipped_invalid_count += 1
+                        logger.debug(f"⚠️ Invalid numeric value for {symbol} at index {i}: {e}")
+                        continue
+                        
                 except (ValueError, TypeError, IndexError) as e:
+                    skipped_invalid_count += 1
                     logger.warning(f"Error parsing historical data point {i} for {symbol}: {e}")
                     continue
             
             # Sort by date (oldest first) for ATR calculation
             historical_data.sort(key=lambda x: x['date'])
-            logger.info(f"📊 {symbol}: Fetched {len(historical_data)} historical OHLC data points")
+            
+            logger.info(f"📊 {symbol}: Fetched {len(historical_data)} valid historical OHLC data points (requested {days_back} trading days, skipped {skipped_null_count} null values, {skipped_invalid_count} invalid values)")
+            
+            if skipped_null_count > 0 or skipped_invalid_count > 0:
+                logger.warning(f"⚠️ {symbol}: Skipped {skipped_null_count + skipped_invalid_count} data points due to null/invalid values")
+            
             return historical_data
             
         except Exception as e:
@@ -1610,32 +1691,62 @@ class YahooFinanceAdapter:
             # Check if we have enough data
             if len(historical_data) < days_back:
                 logger.warning(f"⚠️ Only {len(historical_data)} quotes fetched for {ticker.symbol}, expected at least {days_back} trading days")
+                # Log date range for debugging
+                if historical_data:
+                    first_date = min(d['date'] for d in historical_data)
+                    last_date = max(d['date'] for d in historical_data)
+                    logger.debug(f"📅 Date range: {first_date.date()} to {last_date.date()}")
             
             saved_count = 0
             skipped_count = 0
+            error_count = 0
+            
+            # Optimize: Batch query for existing quotes to reduce database queries
+            from sqlalchemy import func
+            quote_dates = []
+            for data_point in historical_data:
+                quote_date = data_point['date']
+                if isinstance(quote_date, datetime):
+                    quote_dates.append(quote_date.date())
+                else:
+                    quote_dates.append(quote_date.date() if hasattr(quote_date, 'date') else None)
+            
+            # Batch query: Get all existing quotes for this ticker/provider in one query
+            existing_quotes_map = {}
+            if quote_dates:
+                existing_quotes = self.db_session.query(
+                    MarketDataQuote.id,
+                    func.date(MarketDataQuote.asof_utc).label('quote_date'),
+                    MarketDataQuote
+                ).filter(
+                    MarketDataQuote.ticker_id == ticker.id,
+                    MarketDataQuote.provider_id == self.provider_id,
+                    func.date(MarketDataQuote.asof_utc).in_([d for d in quote_dates if d])
+                ).all()
+                
+                for quote_id, quote_date, quote_obj in existing_quotes:
+                    date_key = quote_date.isoformat() if quote_date else None
+                    if date_key:
+                        existing_quotes_map[date_key] = quote_obj
+            
+            logger.debug(f"📊 Found {len(existing_quotes_map)} existing quotes for {ticker.symbol} out of {len(historical_data)} data points")
+            
+            # Batch size for commits (commit every 50 quotes to avoid large transactions)
+            BATCH_SIZE = 50
+            current_batch = 0
             
             # Save each historical quote to database
             for data_point in historical_data:
                 try:
-                    # Check if quote already exists for this date
-                    # Use date comparison (ignore time) to avoid duplicates
-                    from sqlalchemy import func
                     quote_date = data_point['date']
                     if isinstance(quote_date, datetime):
-                        # Extract date part only (ignore time)
                         quote_date_only = quote_date.date()
-                        existing_quote = self.db_session.query(MarketDataQuote).filter(
-                            MarketDataQuote.ticker_id == ticker.id,
-                            MarketDataQuote.provider_id == self.provider_id,
-                            func.date(MarketDataQuote.asof_utc) == quote_date_only
-                        ).first()
+                        date_key = quote_date_only.isoformat()
                     else:
-                        # Fallback to exact match
-                        existing_quote = self.db_session.query(MarketDataQuote).filter(
-                            MarketDataQuote.ticker_id == ticker.id,
-                            MarketDataQuote.provider_id == self.provider_id,
-                            MarketDataQuote.asof_utc == data_point['date']
-                        ).first()
+                        quote_date_only = quote_date.date() if hasattr(quote_date, 'date') else None
+                        date_key = quote_date_only.isoformat() if quote_date_only else None
+                    
+                    existing_quote = existing_quotes_map.get(date_key) if date_key else None
                     
                     if existing_quote:
                         # Update existing quote with historical data
@@ -1669,15 +1780,47 @@ class YahooFinanceAdapter:
                         self.db_session.add(historical_quote)
                         saved_count += 1
                     
+                    # Batch commit every BATCH_SIZE quotes
+                    current_batch += 1
+                    if current_batch >= BATCH_SIZE:
+                        try:
+                            self.db_session.commit()
+                            logger.debug(f"📊 Committed batch of {BATCH_SIZE} quotes for {ticker.symbol}")
+                            current_batch = 0
+                        except Exception as batch_error:
+                            logger.warning(f"⚠️ Error committing batch for {ticker.symbol}: {batch_error}")
+                            self.db_session.rollback()
+                    
                 except Exception as e:
-                    logger.warning(f"Error saving historical quote for {ticker.symbol} on {data_point['date']}: {e}")
+                    error_count += 1
+                    logger.warning(f"Error saving historical quote for {ticker.symbol} on {data_point.get('date', 'unknown')}: {e}")
                     continue
             
-            # Commit all changes
-            self.db_session.commit()
-            logger.info(f"✅ Saved {saved_count} new historical quotes and updated {skipped_count} existing quotes for {ticker.symbol}")
-            
-            return saved_count + skipped_count
+            # Commit remaining changes
+            try:
+                if current_batch > 0:
+                    self.db_session.commit()
+                    logger.debug(f"📊 Committed final batch of {current_batch} quotes for {ticker.symbol}")
+                
+                total_quotes = saved_count + skipped_count
+                logger.info(f"✅ Saved {saved_count} new historical quotes and updated {skipped_count} existing quotes for {ticker.symbol} (total: {total_quotes}, errors: {error_count})")
+                
+                # Verify we have enough quotes in database
+                db_quote_count = self.db_session.query(MarketDataQuote).filter(
+                    MarketDataQuote.ticker_id == ticker.id,
+                    MarketDataQuote.provider_id == self.provider_id
+                ).count()
+                
+                if db_quote_count < days_back:
+                    logger.warning(f"⚠️ Only {db_quote_count} quotes in database for {ticker.symbol}, expected at least {days_back}")
+                else:
+                    logger.info(f"✅ Verified: {db_quote_count} quotes in database for {ticker.symbol} (target: {days_back})")
+                
+                return total_quotes
+            except Exception as commit_error:
+                logger.error(f"❌ Error committing historical quotes for {ticker.symbol}: {commit_error}", exc_info=True)
+                self.db_session.rollback()
+                return 0
             
         except Exception as e:
             logger.error(f"Error fetching and saving historical quotes for {ticker.symbol}: {e}", exc_info=True)

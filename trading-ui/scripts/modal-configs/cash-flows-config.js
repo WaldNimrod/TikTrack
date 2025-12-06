@@ -438,16 +438,15 @@ window.cashFlowModalConfig = cashFlowModalConfig;
     
     // אם ModalManagerV2 לא זמין, נסה שוב אחרי זמן קצר (עד 5 שניות)
     let attempts = 0;
-    const maxAttempts = 50; // 50 ניסיונות * 100ms = 5 שניות
+    const maxAttempts = 10; // 10 ניסיונות * 200ms = 2 שניות (הופחת מ-50 ל-10)
     const retryInterval = setInterval(() => {
         attempts++;
         if (window.ModalManagerV2 && typeof window.ModalManagerV2.createCRUDModal === 'function') {
             try {
                 window.ModalManagerV2.createCRUDModal(cashFlowModalConfig);
-                if (window.Logger) {
-                    window.Logger.info('✅ Cash Flow Modal created successfully (retry)', { page: 'cash-flows-config', attempts });
-                } else {
-                    console.log(`✅ Cash Flow Modal created successfully (after ${attempts} attempts)`);
+                if (window.Logger && attempts > 1) {
+                    // Only log if it took more than one attempt
+                    window.Logger.debug('✅ Cash Flow Modal created successfully (retry)', { page: 'cash-flows-config', attempts });
                 }
                 clearInterval(retryInterval);
             } catch (error) {
@@ -458,13 +457,12 @@ window.cashFlowModalConfig = cashFlowModalConfig;
                 }
             }
         } else if (attempts >= maxAttempts) {
-            // הגענו למקסימום ניסיונות
+            // הגענו למקסימום ניסיונות - רק אזהרה אחת בסוף
             clearInterval(retryInterval);
             if (window.Logger) {
-                window.Logger.warn('⚠️ Cash Flow Modal not created - ModalManagerV2 not available after retries', { page: 'cash-flows-config', attempts: maxAttempts });
-            } else {
-                console.warn(`⚠️ Cash Flow Modal not created - ModalManagerV2 not available after ${maxAttempts} attempts`);
+                window.Logger.debug('⚠️ Cash Flow Modal not created - ModalManagerV2 not available after retries', { page: 'cash-flows-config', attempts: maxAttempts });
             }
+            // Silent failure - modal is optional
         }
-    }, 100);
+    }, 200); // Increased interval to 200ms to reduce load
 })();

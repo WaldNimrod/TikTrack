@@ -125,27 +125,8 @@ class EntityDetailsAPI {
                 }
             }
 
-            window.Logger.info(`Fetching entity details for ${entityType} ${entityId}`, { page: "entity-details-api" });
-
             // קריאה לשרת עם retry logic
             const entityData = await this.fetchWithRetry(entityType, entityId, options);
-            window.Logger.info(`📊 Entity data received:`, entityData, { page: "entity-details-api" });
-            
-            // טעינת פריטים מקושרים אם נדרש
-            console.log(`🔍 [ENTITY-DETAILS-API] Checking linked items option for ${entityType} ${entityId}:`, {
-                includeLinkedItems: options.includeLinkedItems,
-                includeLinkedItemsNotFalse: options.includeLinkedItems !== false,
-                willLoad: options.includeLinkedItems !== false
-            });
-            
-            if (window.Logger) {
-                window.Logger.info(`🔍 Checking linked items option for ${entityType} ${entityId}:`, {
-                    includeLinkedItems: options.includeLinkedItems,
-                    includeLinkedItemsNotFalse: options.includeLinkedItems !== false,
-                    willLoad: options.includeLinkedItems !== false,
-                    page: "entity-details-api"
-                });
-            }
             
             const shouldLoadLinkedItems = options.includeLinkedItems !== false;
             const expectedLinkedItemsCount = typeof entityData.linked_items_count === 'number'
@@ -157,39 +138,14 @@ class EntityDetailsAPI {
                 const hasLinkedItemsFromBackend = entityData.linked_items !== undefined && Array.isArray(entityData.linked_items);
                 
                 if (hasLinkedItemsFromBackend) {
-                    console.log(`✅ [ENTITY-DETAILS-API] Using linked_items from backend for ${entityType} ${entityId}:`, {
-                        count: entityData.linked_items.length,
-                        items: entityData.linked_items
-                    });
-                    if (window.Logger) {
-                        window.Logger.info(`✅ Using linked_items from backend for ${entityType} ${entityId}:`, {
-                            count: entityData.linked_items.length,
-                            page: "entity-details-api"
-                        });
-                    }
                     // הבאקאנד כבר החזיר linked_items - לא צריך לטעון שוב
                 } else {
                     // הבאקאנד לא החזיר linked_items - נטען בנפרד
                     try {
-                        console.log(`🔗 [ENTITY-DETAILS-API] Loading linked items separately for ${entityType} ${entityId}...`);
-                        if (window.Logger) {
-                            window.Logger.info(`🔗 Loading linked items separately for ${entityType} ${entityId}...`, { page: "entity-details-api" });
-                        }
                         const linkedItems = await this.getLinkedItems(entityType, entityId, {
                             forceRefresh: options.forceRefresh || (expectedLinkedItemsCount !== null && expectedLinkedItemsCount > 0),
                             expectedCount: expectedLinkedItemsCount
                         });
-                        console.log(`🔗 [ENTITY-DETAILS-API] Linked items received for ${entityType} ${entityId}:`, {
-                            count: linkedItems.length,
-                            items: linkedItems
-                        });
-                        if (window.Logger) {
-                            window.Logger.info(`🔗 Linked items received for ${entityType} ${entityId}:`, {
-                                count: linkedItems.length,
-                                items: linkedItems,
-                                page: "entity-details-api"
-                            });
-                        }
                         entityData.linked_items = linkedItems;
                     } catch (error) {
                         console.error(`❌ [ENTITY-DETAILS-API] Failed to load linked items for ${entityType} ${entityId}:`, error);
@@ -203,10 +159,6 @@ class EntityDetailsAPI {
                     }
                 }
             } else {
-                console.log(`⏭️ [ENTITY-DETAILS-API] Skipping linked items load for ${entityType} ${entityId} (includeLinkedItems=false)`);
-                if (window.Logger) {
-                    window.Logger.info(`⏭️ Skipping linked items load for ${entityType} ${entityId} (includeLinkedItems=false)`, { page: "entity-details-api" });
-                }
                 entityData.linked_items = entityData.linked_items || [];
             }
 
@@ -257,9 +209,7 @@ class EntityDetailsAPI {
             // טעינת נתוני שוק אם נדרש (לטיקרים)
             if (entityType === 'ticker' && options.includeMarketData !== false) {
                 try {
-                    window.Logger.info(`📈 Loading market data for ${entityType} ${entityId}...`, { page: "entity-details-api" });
                     const marketData = await this.getMarketData(entityId);
-                    window.Logger.info(`📈 Market data received:`, marketData, { page: "entity-details-api" });
                     if (marketData) {
                         entityData.current_price = marketData.price;
                         entityData.change_percent = marketData.change_pct_day;
@@ -276,9 +226,7 @@ class EntityDetailsAPI {
             // טעינת שם המטבע אם נדרש (לטיקרים)
             if (entityType === 'ticker' && entityData.currency_id) {
                 try {
-                    window.Logger.info(`💰 Loading currency data for currency_id ${entityData.currency_id}...`, { page: "entity-details-api" });
                     const currencyData = await this.getCurrencyData(entityData.currency_id);
-                    window.Logger.info(`💰 Currency data received:`, currencyData, { page: "entity-details-api" });
                     if (currencyData) {
                         entityData.currency_name = currencyData.name;
                         entityData.currency_symbol = currencyData.symbol;
@@ -291,9 +239,7 @@ class EntityDetailsAPI {
             // טעינת נתונים על טריידים ותכנונים אם נדרש (לטיקרים)
             if (entityType === 'ticker' && options.includeLinkedItems !== false) {
                 try {
-                    window.Logger.info(`📊 Loading trades and plans data for ${entityType} ${entityId}...`, { page: "entity-details-api" });
                     const linkedItems = await this.getLinkedItems(entityType, entityId);
-                    window.Logger.info(`📊 Linked items received:`, linkedItems, { page: "entity-details-api" });
                     
                     if (linkedItems && linkedItems.length > 0) {
                         // סינון טריידים ותכנונים
@@ -302,8 +248,6 @@ class EntityDetailsAPI {
                         
                         entityData.trades_summary = trades;
                         entityData.trade_plans_summary = tradePlans;
-                        
-                        window.Logger.info(`📊 Trades: ${trades.length}, Trade Plans: ${tradePlans.length}`, { page: "entity-details-api" });
                     }
                 } catch (error) {
                     window.Logger.warn(`Failed to load trades and plans data for ${entityType} ${entityId}:`, error, { page: "entity-details-api" });
@@ -1241,10 +1185,6 @@ class EntityDetailsAPI {
         
             // אם לא במטמון - טעינה מה-API
             const url = `/api/linked-items/${entityType}/${entityId}`;
-            console.log(`🔗 [ENTITY-DETAILS-API] Fetching linked items from: ${url}`);
-            if (window.Logger) {
-                window.Logger.info(`🔗 Fetching linked items from: ${url}`, { page: "entity-details-api" });
-            }
             
             const response = await fetch(url, {
                 method: 'GET',
@@ -1253,11 +1193,6 @@ class EntityDetailsAPI {
                     'Accept': 'application/json'
                 }
             });
-            
-            console.log(`🔗 [ENTITY-DETAILS-API] Response status: ${response.status}`);
-            if (window.Logger) {
-                window.Logger.info(`🔗 Response status: ${response.status}`, { page: "entity-details-api" });
-            }
 
             if (!response.ok) {
                 if (response.status === 404) {
@@ -1272,14 +1207,23 @@ class EntityDetailsAPI {
                         }
                     return emptyArray;
                 }
+                // Handle 429 (Too Many Requests) gracefully - return empty array instead of throwing
+                if (response.status === 429) {
+                    window.Logger.warn(`⚠️ Rate limit exceeded for linked items ${entityType} ${entityId} - returning empty array`, { page: "entity-details-api" });
+                    // Save empty array to cache to prevent repeated requests
+                    const emptyArray = [];
+                    if (window.UnifiedCacheManager.initialized) {
+                        await window.UnifiedCacheManager.save(cacheKey, emptyArray, {
+                            layer: 'memory',
+                            ttl: 60000 // 1 minute - shorter TTL for rate limit errors
+                        });
+                    }
+                    return emptyArray;
+                }
                 throw new Error(`שגיאת שרת בקבלת פריטים מקושרים: ${response.status}`);
             }
 
             const data = await response.json();
-            console.log(`🔗 [ENTITY-DETAILS-API] Raw linked items data:`, data);
-            if (window.Logger) {
-                window.Logger.info(`🔗 Raw linked items data:`, data, { page: "entity-details-api" });
-            }
             
             const enrichLinkedItems = (items, direction) => {
                 if (!Array.isArray(items)) {
@@ -1364,18 +1308,6 @@ class EntityDetailsAPI {
                     }
                 }
             
-            console.log(`🔗 [ENTITY-DETAILS-API] Final linked items (${allLinkedItems.length} total):`, {
-                allLinkedItems,
-                childCount: data?.child_entities?.length || 0,
-                parentCount: data?.parent_entities?.length || 0
-            });
-            if (window.Logger) {
-                window.Logger.info(`🔗 Final linked items (${allLinkedItems.length} total):`, allLinkedItems, { 
-                    childCount: data?.child_entities?.length || 0,
-                    parentCount: data?.parent_entities?.length || 0,
-                    page: "entity-details-api" 
-                });
-            }
             return allLinkedItems;
 
         } catch (error) {
@@ -1394,7 +1326,6 @@ class EntityDetailsAPI {
     async getMarketData(tickerId) {
         try {
             const url = `/api/external-data/quotes/${tickerId}`;
-            window.Logger.info(`📈 Fetching market data from: ${url}`, { page: "entity-details-api" });
             
             const response = await fetch(url, {
                 method: 'GET',
@@ -1403,29 +1334,19 @@ class EntityDetailsAPI {
                     'Accept': 'application/json'
                 }
             });
-            
-            window.Logger.info(`📈 Market data response status: ${response.status}`, { page: "entity-details-api" });
 
             if (!response.ok) {
                 if (response.status === 404 || response.status === 410) {
-                    // 404/410 - endpoint not found or resource gone, return null (graceful degradation)
-                    window.Logger.info(`Market data endpoint not available for ticker ${tickerId} (status: ${response.status})`, { 
-                        tickerId,
-                        status: response.status,
-                        page: "entity-details-api" 
-                    });
                     return null;
                 }
                 throw new Error(`שגיאת שרת בקבלת נתוני שוק: ${response.status}`);
             }
 
             const data = await response.json();
-            window.Logger.info(`📈 Raw market data:`, data, { page: "entity-details-api" });
             
             if (data.status === 'success' && data.data) {
                 return data.data;
             } else {
-                window.Logger.info(`📈 No market data found`, { page: "entity-details-api" });
                 return null;
             }
 
@@ -1445,7 +1366,6 @@ class EntityDetailsAPI {
     async getCurrencyData(currencyId) {
         try {
             const url = `/api/currencies/${currencyId}`;
-            window.Logger.info(`💰 Fetching currency data from: ${url}`, { page: "entity-details-api" });
             
             const response = await fetch(url, {
                 method: 'GET',
@@ -1454,24 +1374,19 @@ class EntityDetailsAPI {
                     'Accept': 'application/json'
                 }
             });
-            
-            window.Logger.info(`💰 Currency data response status: ${response.status}`, { page: "entity-details-api" });
 
             if (!response.ok) {
                 if (response.status === 404) {
-                    window.Logger.debug(`No currency data found for currency ${currencyId}`, { page: "entity-details-api" });
                     return null;
                 }
                 throw new Error(`שגיאת שרת בקבלת נתוני מטבע: ${response.status}`);
             }
 
             const data = await response.json();
-            window.Logger.info(`💰 Raw currency data:`, data, { page: "entity-details-api" });
             
             if (data.status === 'success' && data.data) {
                 return data.data;
             } else {
-                window.Logger.info(`💰 No currency data found`, { page: "entity-details-api" });
                 return null;
             }
 

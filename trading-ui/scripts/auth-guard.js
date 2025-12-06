@@ -138,20 +138,35 @@ async function checkAuthAndRedirect() {
 }
 
 /**
- * Redirect to login page
+ * Show login modal instead of redirecting to login page
+ * הצגת modal כניסה במקום redirect לעמוד כניסה
  */
-function redirectToLogin() {
+async function redirectToLogin() {
   const currentPath = window.location.pathname;
-  const loginPath = currentPath.includes('trading-ui') 
-    ? 'trading-ui/login.html' 
-    : 'login.html';
   
   // Store intended destination for redirect after login
   if (currentPath && !currentPath.includes('login.html') && !currentPath.includes('register.html')) {
     sessionStorage.setItem('redirectAfterLogin', currentPath);
   }
   
-  window.location.href = loginPath;
+  // Show login modal instead of redirecting
+  if (typeof window.TikTrackAuth?.showLoginModal === 'function') {
+    await window.TikTrackAuth.showLoginModal(() => {
+      // On successful login, redirect to intended destination or dashboard
+      const redirectPath = getRedirectAfterLogin();
+      if (redirectPath) {
+        window.location.href = redirectPath;
+      } else {
+        window.location.href = 'index.html';
+      }
+    });
+  } else {
+    // Fallback: redirect to login page if modal not available
+    const loginPath = currentPath.includes('trading-ui') 
+      ? 'trading-ui/login.html' 
+      : 'login.html';
+    window.location.href = loginPath;
+  }
 }
 
 /**

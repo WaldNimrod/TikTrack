@@ -1,27 +1,35 @@
 {
-  "timestamp": "2025-12-05T20:57:02.707187",
+  "timestamp": "2025-12-06T00:20:22.297995",
   "base_url": "http://localhost:8080",
   "total_pages": 47,
-  "successful": 47,
-  "failed": 0,
-  "with_errors": 0,
-  "with_warnings": 41,
-  "with_header": 1,
+  "successful": 42,
+  "failed": 5,
+  "with_errors": 5,
+  "with_warnings": 34,
+  "with_header": 38,
   "with_core_systems": 43,
   "rate_limiting_stats": {
-    "rate_limit_hits": 0,
+    "rate_limit_hits": 14,
     "current_requests_in_window": 1,
-    "adaptive_delay": 2.0,
-    "last_rate_limit_time": null
+    "adaptive_delay": 5.0,
+    "last_rate_limit_time": 1764973217.139536
   },
   "summary_by_category": {
+    "watchlists": {
+      "total": 4,
+      "successful": 4
+    },
+    "auth": {
+      "total": 4,
+      "successful": 4
+    },
+    "main": {
+      "total": 15,
+      "successful": 11
+    },
     "dev": {
       "total": 9,
       "successful": 9
-    },
-    "secondary": {
-      "total": 3,
-      "successful": 3
     },
     "technical": {
       "total": 10,
@@ -29,19 +37,11 @@
     },
     "additional": {
       "total": 2,
-      "successful": 2
+      "successful": 1
     },
-    "watchlists": {
-      "total": 4,
-      "successful": 4
-    },
-    "main": {
-      "total": 15,
-      "successful": 15
-    },
-    "auth": {
-      "total": 4,
-      "successful": 4
+    "secondary": {
+      "total": 3,
+      "successful": 3
     }
   },
   "results": [
@@ -50,41 +50,62 @@
       "url": "/",
       "category": "main",
       "priority": "high",
-      "success": true,
-      "load_time": 2.3532679080963135,
-      "console_errors": [],
+      "success": false,
+      "load_time": 1.5065479278564453,
+      "console_errors": [
+        {
+          "level": "SEVERE",
+          "message": "Rate limit exceeded after 3 retries: http://localhost:8080/api/tickers/with-initial-data - Failed to load resource: the server responded with a status of 429 (TOO MANY REQUESTS)",
+          "timestamp": 1764972850398
+        },
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 906:24 \"[12:14:08 AM] ERROR: ❌ TickerListWidget: Error loading active tickers\" Object",
+          "timestamp": 1764972850398
+        },
+        {
+          "level": "SEVERE",
+          "message": "Rate limit exceeded after 3 retries: http://localhost:8080/api/tickers/with-initial-data - Failed to load resource: the server responded with a status of 429 (TOO MANY REQUESTS)",
+          "timestamp": 1764972850398
+        },
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 906:24 \"[12:14:08 AM] ERROR: ❌ TickerChartWidget: Error loading tickers\" Object",
+          "timestamp": 1764972850398
+        }
+      ],
       "console_warnings": [
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1272:10 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
-          "timestamp": 1764960796050
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:14:07 AM] WARN: [ConditionsModalController] Modal element not found\" Object",
+          "timestamp": 1764972848004
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 904:24 \"[8:53:16 PM] WARN: [ConditionsModalController] Modal element not found\" Object",
-          "timestamp": 1764960796091
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:14:10 AM] WARN: ⚠️ Missing executions detected\" Object",
+          "timestamp": 1764972850400
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1272:10 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
-          "timestamp": 1764960796485
+          "message": "http://localhost:8080/scripts/tables.js?v=1.0.0 1349:16 \"⚠️ [updateTableWithPagination] Skipping pagination for table portfolioTable - table is inside a modal\"",
+          "timestamp": 1764972850400
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 904:24 \"[8:53:16 PM] WARN: [ConditionsModalController] Modal element not found\" Object",
-          "timestamp": 1764960796641
+          "message": "http://localhost:8080/scripts/button-system-init.js?v=1.0.0 65:26 \"⚠️🔘 Button System: updateTooltip: Cannot update static tooltip\" Object",
+          "timestamp": 1764972850400
         }
       ],
       "page_errors": [],
-      "has_header": false,
+      "has_header": true,
       "has_core_systems": true,
       "initialization_status": {
         "getPreferenceInProgress": false,
-        "loadActiveAlertsInProgress": false,
+        "loadActiveAlertsInProgress": true,
         "showNotificationInProgress": false
       },
-      "rate_limit_retries": 0,
-      "timestamp": "2025-12-05T20:53:14.290944"
+      "rate_limit_retries": 3,
+      "timestamp": "2025-12-06T00:14:06.884119"
     },
     {
       "page": "טריידים",
@@ -92,37 +113,32 @@
       "category": "main",
       "priority": "high",
       "success": true,
-      "load_time": 1.1732580661773682,
+      "load_time": 0.4716498851776123,
       "console_errors": [],
       "console_warnings": [
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1272:10 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
-          "timestamp": 1764960800965
+          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1286:14 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
+          "timestamp": 1764972855751
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 904:24 \"[8:53:21 PM] WARN: [ConditionsModalController] Modal element not found\" Object",
-          "timestamp": 1764960801087
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:14:15 AM] WARN: [ConditionsModalController] Modal element not found\" Object",
+          "timestamp": 1764972855837
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1272:10 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
-          "timestamp": 1764960801623
+          "message": "http://localhost:8080/trades.html - [DOM] Found 2 elements with non-unique id #tradeOpenConditionsButton: (More info: https://goo.gl/9p2vKq) %o %o",
+          "timestamp": 1764972857890
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 904:24 \"[8:53:21 PM] WARN: [ConditionsModalController] Modal element not found\" Object",
-          "timestamp": 1764960801838
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/login.html - [DOM] Found 2 elements with non-unique id #tradeOpenConditionsButton: (More info: https://goo.gl/9p2vKq) %o %o",
-          "timestamp": 1764960803849
+          "message": "http://localhost:8080/scripts/pagination-system.js?v=1.0.0 85:28 \"⚠️ [PaginationSystem.create] Skipping pagination creation for table tradesTable - table is inside a modal\"",
+          "timestamp": 1764972857890
         }
       ],
       "page_errors": [],
-      "has_header": false,
+      "has_header": true,
       "has_core_systems": true,
       "initialization_status": {
         "getPreferenceInProgress": false,
@@ -130,7 +146,7 @@
         "showNotificationInProgress": false
       },
       "rate_limit_retries": 0,
-      "timestamp": "2025-12-05T20:53:20.666674"
+      "timestamp": "2025-12-06T00:14:15.411584"
     },
     {
       "page": "תכניות מסחר",
@@ -138,37 +154,27 @@
       "category": "main",
       "priority": "high",
       "success": true,
-      "load_time": 0.8980958461761475,
+      "load_time": 0.5380532741546631,
       "console_errors": [],
       "console_warnings": [
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1272:10 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
-          "timestamp": 1764960806467
+          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1286:14 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
+          "timestamp": 1764972863310
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 904:24 \"[8:53:26 PM] WARN: [ConditionsModalController] Modal element not found\" Object",
-          "timestamp": 1764960806756
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:14:23 AM] WARN: [ConditionsModalController] Modal element not found\" Object",
+          "timestamp": 1764972863406
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1272:10 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
-          "timestamp": 1764960808797
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 904:24 \"[8:53:27 PM] WARN: [ConditionsModalController] Modal element not found\" Object",
-          "timestamp": 1764960808805
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/login.html - [DOM] Found 2 elements with non-unique id #tradeOpenConditionsButton: (More info: https://goo.gl/9p2vKq) %o %o",
-          "timestamp": 1764960808806
+          "message": "http://localhost:8080/scripts/tables.js?v=1.0.0 1349:16 \"⚠️ [updateTableWithPagination] Skipping pagination for table trade_plansTable - table is inside a modal\"",
+          "timestamp": 1764972865466
         }
       ],
       "page_errors": [],
-      "has_header": false,
+      "has_header": true,
       "has_core_systems": true,
       "initialization_status": {
         "getPreferenceInProgress": false,
@@ -176,7 +182,7 @@
         "showNotificationInProgress": false
       },
       "rate_limit_retries": 0,
-      "timestamp": "2025-12-05T20:53:25.864669"
+      "timestamp": "2025-12-06T00:14:22.921777"
     },
     {
       "page": "התראות",
@@ -184,37 +190,27 @@
       "category": "main",
       "priority": "high",
       "success": true,
-      "load_time": 1.6644930839538574,
+      "load_time": 0.5048511028289795,
       "console_errors": [],
       "console_warnings": [
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1272:10 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
-          "timestamp": 1764960811153
+          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1286:14 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
+          "timestamp": 1764972870853
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 904:24 \"[8:53:31 PM] WARN: [ConditionsModalController] Modal element not found\" Object",
-          "timestamp": 1764960811282
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:14:30 AM] WARN: [ConditionsModalController] Modal element not found\" Object",
+          "timestamp": 1764972870947
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1272:10 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
-          "timestamp": 1764960812259
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 904:24 \"[8:53:32 PM] WARN: [ConditionsModalController] Modal element not found\" Object",
-          "timestamp": 1764960812482
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/login.html - [DOM] Found 2 elements with non-unique id #tradeOpenConditionsButton: (More info: https://goo.gl/9p2vKq) %o %o",
-          "timestamp": 1764960814493
+          "message": "http://localhost:8080/scripts/tables.js?v=1.0.0 1349:16 \"⚠️ [updateTableWithPagination] Skipping pagination for table alertsTable - table is inside a modal\"",
+          "timestamp": 1764972873007
         }
       ],
       "page_errors": [],
-      "has_header": false,
+      "has_header": true,
       "has_core_systems": true,
       "initialization_status": {
         "getPreferenceInProgress": false,
@@ -222,7 +218,7 @@
         "showNotificationInProgress": false
       },
       "rate_limit_retries": 0,
-      "timestamp": "2025-12-05T20:53:30.820183"
+      "timestamp": "2025-12-06T00:14:30.495431"
     },
     {
       "page": "טיקרים",
@@ -230,37 +226,32 @@
       "category": "main",
       "priority": "high",
       "success": true,
-      "load_time": 1.3696997165679932,
+      "load_time": 0.59600830078125,
       "console_errors": [],
       "console_warnings": [
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1272:10 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
-          "timestamp": 1764960817437
+          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1286:14 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
+          "timestamp": 1764972878468
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 904:24 \"[8:53:37 PM] WARN: [ConditionsModalController] Modal element not found\" Object",
-          "timestamp": 1764960817856
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:14:38 AM] WARN: [ConditionsModalController] Modal element not found\" Object",
+          "timestamp": 1764972878565
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1272:10 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
-          "timestamp": 1764960819906
+          "message": "http://localhost:8080/api/tickers/my?_ts=1764972878625 - Failed to load resource: the server responded with a status of 401 (UNAUTHORIZED)",
+          "timestamp": 1764972880632
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 904:24 \"[8:53:38 PM] WARN: [ConditionsModalController] Modal element not found\" Object",
-          "timestamp": 1764960819912
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/login.html - [DOM] Found 2 elements with non-unique id #tradeOpenConditionsButton: (More info: https://goo.gl/9p2vKq) %o %o",
-          "timestamp": 1764960819913
+          "message": "http://localhost:8080/api/tickers/my?_ts=1764972878626 - Failed to load resource: the server responded with a status of 401 (UNAUTHORIZED)",
+          "timestamp": 1764972880633
         }
       ],
       "page_errors": [],
-      "has_header": false,
+      "has_header": true,
       "has_core_systems": true,
       "initialization_status": {
         "getPreferenceInProgress": false,
@@ -268,40 +259,41 @@
         "showNotificationInProgress": false
       },
       "rate_limit_retries": 0,
-      "timestamp": "2025-12-05T20:53:36.500919"
+      "timestamp": "2025-12-06T00:14:38.031433"
     },
     {
       "page": "דשבורד טיקר",
       "url": "/ticker-dashboard.html",
       "category": "main",
       "priority": "medium",
-      "success": true,
-      "load_time": 0.8246231079101562,
-      "console_errors": [],
+      "success": false,
+      "load_time": 1.1895790100097656,
+      "console_errors": [
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 906:24 \"[12:14:46 AM] ERROR: ❌ No ticker ID found in URL\" Object",
+          "timestamp": 1764972886883
+        },
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 906:24 \"[12:14:46 AM] ERROR: ❌ Error initializing ticker dashboard\" Object",
+          "timestamp": 1764972886883
+        }
+      ],
       "console_warnings": [
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1272:10 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
-          "timestamp": 1764960822479
+          "message": "http://localhost:8080/scripts/charts/tradingview-adapter.js?v=1.0.0 36:24 \"⚠️ TradingView Lightweight Charts not loaded yet\"",
+          "timestamp": 1764972886330
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1272:10 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
-          "timestamp": 1764960824765
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 904:24 \"[8:53:43 PM] WARN: [ConditionsModalController] Modal element not found\" Object",
-          "timestamp": 1764960824771
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/login.html - [DOM] Found 2 elements with non-unique id #tradeOpenConditionsButton: (More info: https://goo.gl/9p2vKq) %o %o",
-          "timestamp": 1764960824772
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:14:46 AM] WARN: ⚠️ No ticker ID or symbol found in URL\" Object",
+          "timestamp": 1764972886883
         }
       ],
       "page_errors": [],
-      "has_header": false,
+      "has_header": true,
       "has_core_systems": true,
       "initialization_status": {
         "getPreferenceInProgress": false,
@@ -309,7 +301,7 @@
         "showNotificationInProgress": false
       },
       "rate_limit_retries": 0,
-      "timestamp": "2025-12-05T20:53:41.919668"
+      "timestamp": "2025-12-06T00:14:45.644876"
     },
     {
       "page": "חשבונות מסחר",
@@ -317,37 +309,27 @@
       "category": "main",
       "priority": "high",
       "success": true,
-      "load_time": 0.8284008502960205,
+      "load_time": 0.5334169864654541,
       "console_errors": [],
       "console_warnings": [
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1272:10 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
-          "timestamp": 1764960827111
+          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1286:14 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
+          "timestamp": 1764972894277
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 904:24 \"[8:53:47 PM] WARN: [ConditionsModalController] Modal element not found\" Object",
-          "timestamp": 1764960827232
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:14:54 AM] WARN: [ConditionsModalController] Modal element not found\" Object",
+          "timestamp": 1764972894383
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1272:10 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
-          "timestamp": 1764960827522
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 904:24 \"[8:53:47 PM] WARN: [ConditionsModalController] Modal element not found\" Object",
-          "timestamp": 1764960827609
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/login.html - [DOM] Found 2 elements with non-unique id #tradeOpenConditionsButton: (More info: https://goo.gl/9p2vKq) %o %o",
-          "timestamp": 1764960829620
+          "message": "http://localhost:8080/scripts/page-initialization-configs.js?v=1.0.0 1167:20 \"⚠️ No suitable function found for loading trading accounts data\"",
+          "timestamp": 1764972896438
         }
       ],
       "page_errors": [],
-      "has_header": false,
+      "has_header": true,
       "has_core_systems": true,
       "initialization_status": {
         "getPreferenceInProgress": false,
@@ -355,7 +337,7 @@
         "showNotificationInProgress": false
       },
       "rate_limit_retries": 0,
-      "timestamp": "2025-12-05T20:53:46.781972"
+      "timestamp": "2025-12-06T00:14:53.897997"
     },
     {
       "page": "ביצועים",
@@ -363,37 +345,32 @@
       "category": "main",
       "priority": "high",
       "success": true,
-      "load_time": 0.9538888931274414,
+      "load_time": 0.58302903175354,
       "console_errors": [],
       "console_warnings": [
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1272:10 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
-          "timestamp": 1764960831948
+          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1286:14 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
+          "timestamp": 1764972901881
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 904:24 \"[8:53:52 PM] WARN: [ConditionsModalController] Modal element not found\" Object",
-          "timestamp": 1764960832114
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:15:01 AM] WARN: [ConditionsModalController] Modal element not found\" Object",
+          "timestamp": 1764972901979
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1272:10 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
-          "timestamp": 1764960832480
+          "message": "http://localhost:8080/scripts/pagination-system.js?v=1.0.0 85:28 \"⚠️ [PaginationSystem.create] Skipping pagination creation for table executionsTable - table is inside a modal\"",
+          "timestamp": 1764972904036
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 904:24 \"[8:53:52 PM] WARN: [ConditionsModalController] Modal element not found\" Object",
-          "timestamp": 1764960832588
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/login.html - [DOM] Found 2 elements with non-unique id #tradeOpenConditionsButton: (More info: https://goo.gl/9p2vKq) %o %o",
-          "timestamp": 1764960834595
+          "message": "http://localhost:8080/scripts/pagination-system.js?v=1.0.0 85:28 \"⚠️ [PaginationSystem.create] Skipping pagination creation for table executionsTable - table is inside a modal\"",
+          "timestamp": 1764972904095
         }
       ],
       "page_errors": [],
-      "has_header": false,
+      "has_header": true,
       "has_core_systems": true,
       "initialization_status": {
         "getPreferenceInProgress": false,
@@ -401,7 +378,7 @@
         "showNotificationInProgress": false
       },
       "rate_limit_retries": 0,
-      "timestamp": "2025-12-05T20:53:51.635419"
+      "timestamp": "2025-12-06T00:15:01.447768"
     },
     {
       "page": "ייבוא נתונים",
@@ -409,37 +386,22 @@
       "category": "main",
       "priority": "medium",
       "success": true,
-      "load_time": 0.8405449390411377,
+      "load_time": 0.5177609920501709,
       "console_errors": [],
       "console_warnings": [
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1272:10 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
-          "timestamp": 1764960837177
+          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1286:14 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
+          "timestamp": 1764972910089
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 904:24 \"[8:53:57 PM] WARN: [ConditionsModalController] Modal element not found\" Object",
-          "timestamp": 1764960837432
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1272:10 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
-          "timestamp": 1764960839475
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 904:24 \"[8:53:58 PM] WARN: [ConditionsModalController] Modal element not found\" Object",
-          "timestamp": 1764960839481
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/login.html - [DOM] Found 2 elements with non-unique id #tradeOpenConditionsButton: (More info: https://goo.gl/9p2vKq) %o %o",
-          "timestamp": 1764960839482
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:15:10 AM] WARN: [ConditionsModalController] Modal element not found\" Object",
+          "timestamp": 1764972910183
         }
       ],
       "page_errors": [],
-      "has_header": false,
+      "has_header": true,
       "has_core_systems": true,
       "initialization_status": {
         "getPreferenceInProgress": false,
@@ -447,7 +409,7 @@
         "showNotificationInProgress": false
       },
       "rate_limit_retries": 0,
-      "timestamp": "2025-12-05T20:53:56.600708"
+      "timestamp": "2025-12-06T00:15:09.719989"
     },
     {
       "page": "תזרימי מזומן",
@@ -455,37 +417,22 @@
       "category": "main",
       "priority": "high",
       "success": true,
-      "load_time": 0.9520301818847656,
+      "load_time": 0.5551037788391113,
       "console_errors": [],
       "console_warnings": [
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1272:10 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
-          "timestamp": 1764960841891
+          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1286:14 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
+          "timestamp": 1764972917607
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 904:24 \"[8:54:02 PM] WARN: [ConditionsModalController] Modal element not found\" Object",
-          "timestamp": 1764960842018
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1272:10 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
-          "timestamp": 1764960842341
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 904:24 \"[8:54:02 PM] WARN: [ConditionsModalController] Modal element not found\" Object",
-          "timestamp": 1764960842438
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/login.html - [DOM] Found 2 elements with non-unique id #tradeOpenConditionsButton: (More info: https://goo.gl/9p2vKq) %o %o",
-          "timestamp": 1764960844447
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:15:17 AM] WARN: [ConditionsModalController] Modal element not found\" Object",
+          "timestamp": 1764972917727
         }
       ],
       "page_errors": [],
-      "has_header": false,
+      "has_header": true,
       "has_core_systems": true,
       "initialization_status": {
         "getPreferenceInProgress": false,
@@ -493,40 +440,36 @@
         "showNotificationInProgress": false
       },
       "rate_limit_retries": 0,
-      "timestamp": "2025-12-05T20:54:01.488085"
+      "timestamp": "2025-12-06T00:15:17.253933"
     },
     {
       "page": "הערות",
       "url": "/notes.html",
       "category": "main",
       "priority": "high",
-      "success": true,
-      "load_time": 0.9303090572357178,
-      "console_errors": [],
+      "success": false,
+      "load_time": 0.48651695251464844,
+      "console_errors": [
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 906:24 \"[12:15:25 AM] ERROR: ❌ [page-initialization-configs] loadNotesData function not available\" Object",
+          "timestamp": 1764972927316
+        }
+      ],
       "console_warnings": [
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1272:10 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
-          "timestamp": 1764960846813
+          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1286:14 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
+          "timestamp": 1764972925181
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1272:10 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
-          "timestamp": 1764960847275
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 904:24 \"[8:54:07 PM] WARN: [ConditionsModalController] Modal element not found\" Object",
-          "timestamp": 1764960847384
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/login.html - [DOM] Found 2 elements with non-unique id #tradeOpenConditionsButton: (More info: https://goo.gl/9p2vKq) %o %o",
-          "timestamp": 1764960849389
+          "message": "http://localhost:8080/notes.html - [DOM] Found 2 elements with non-unique id #tradeOpenConditionsButton: (More info: https://goo.gl/9p2vKq) %o %o",
+          "timestamp": 1764972927315
         }
       ],
       "page_errors": [],
-      "has_header": false,
+      "has_header": true,
       "has_core_systems": true,
       "initialization_status": {
         "getPreferenceInProgress": false,
@@ -534,7 +477,7 @@
         "showNotificationInProgress": false
       },
       "rate_limit_retries": 0,
-      "timestamp": "2025-12-05T20:54:06.455691"
+      "timestamp": "2025-12-06T00:15:24.823843"
     },
     {
       "page": "מחקר",
@@ -542,32 +485,27 @@
       "category": "main",
       "priority": "medium",
       "success": true,
-      "load_time": 0.7631292343139648,
+      "load_time": 0.38199400901794434,
       "console_errors": [],
       "console_warnings": [
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 904:24 \"[8:54:11 PM] WARN: [ConditionsModalController] Modal element not found\" Object",
-          "timestamp": 1764960851789
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:15:32 AM] WARN: [ConditionsModalController] Modal element not found\" Object",
+          "timestamp": 1764972932695
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1272:10 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
-          "timestamp": 1764960852071
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:15:32 AM] WARN: ⚠️ Research initializer not available\" Object",
+          "timestamp": 1764972934714
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 904:24 \"[8:54:12 PM] WARN: [ConditionsModalController] Modal element not found\" Object",
-          "timestamp": 1764960852162
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/login.html - [DOM] Found 2 elements with non-unique id #tradeOpenConditionsButton: (More info: https://goo.gl/9p2vKq) %o %o",
-          "timestamp": 1764960854168
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:15:33 AM] WARN: ⚠️ accountFilterMenu not found\" Object",
+          "timestamp": 1764972934714
         }
       ],
       "page_errors": [],
-      "has_header": false,
+      "has_header": true,
       "has_core_systems": true,
       "initialization_status": {
         "getPreferenceInProgress": false,
@@ -575,36 +513,87 @@
         "showNotificationInProgress": false
       },
       "rate_limit_retries": 0,
-      "timestamp": "2025-12-05T20:54:11.400120"
+      "timestamp": "2025-12-06T00:15:32.324969"
     },
     {
       "page": "ניתוח AI",
       "url": "/ai-analysis.html",
       "category": "main",
       "priority": "medium",
-      "success": true,
-      "load_time": 0.7799549102783203,
-      "console_errors": [],
+      "success": false,
+      "load_time": 0.5275769233703613,
+      "console_errors": [
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 906:24 \"[12:15:40 AM] ERROR: ❌ Failed to get u1:ai-analysis-providers:\" Error: Authentication required\n    at http://localhost:8080/scripts/services/ai-analysis-data.js?v=1.0.0:684:21\n    at async Object.fallback (http://localhost:8080/scripts/cache-ttl-guard.js?v=1.0.0:72:24)\n    at async UnifiedCacheManager.get (http://localhost:8080/scripts/unified-cache-manager.js?v=1.0.0:508:38)\n    at async Object.ensure (http://localhost:8080/scripts/cache-ttl-guard.js?v=1.0.0:84:20)\n    at async Object.getLLMProviderSettings (http://localhost:8080/scripts/services/ai-analysis-data.js?v=1.0.0:669:16)\n    at async Object.init (http://localhost:8080/scripts/ai-analysis-manager.js?v=1.0.0:109:38)\n    at async ADDITIONAL_PAGE_CONFIGS.ai-analysis.customInitializers (http://localhost:8080/scripts/page-initialization-configs.js?v=1.0.0:3482:15)\n    at async UnifiedAppInitializer.finalizeInitialization (http://localhost:8080/scripts/modules/core-systems.js?v=1.0.0:1437:13)\n    at async UnifiedAppInitializer.initialize (http://localhost:8080/scripts/modules/core-systems.js?v=1.0.0:695:9)\n    at async window.initializeUnifiedApp (http://localhost:8080/scripts/modules/core-systems.js?v=1.0.0:2196:10)",
+          "timestamp": 1764972942263
+        },
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 906:24 \"[12:15:40 AM] ERROR: ❌ Error loading LLM provider settings\" Object",
+          "timestamp": 1764972942263
+        },
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 906:24 \"[12:15:40 AM] ERROR: ❌ Failed to get u1:ai-analysis-history:\" Error: Authentication required\n    at http://localhost:8080/scripts/services/ai-analysis-data.js?v=1.0.0:604:21\n    at async Object.fallback (http://localhost:8080/scripts/cache-ttl-guard.js?v=1.0.0:72:24)\n    at async UnifiedCacheManager.get (http://localhost:8080/scripts/unified-cache-manager.js?v=1.0.0:508:38)\n    at async Object.ensure (http://localhost:8080/scripts/cache-ttl-guard.js?v=1.0.0:84:20)\n    at async Object.loadHistory (http://localhost:8080/scripts/services/ai-analysis-data.js?v=1.0.0:584:16)\n    at async Object.init (http://localhost:8080/scripts/ai-analysis-manager.js?v=1.0.0:120:26)\n    at async ADDITIONAL_PAGE_CONFIGS.ai-analysis.customInitializers (http://localhost:8080/scripts/page-initialization-configs.js?v=1.0.0:3482:15)\n    at async UnifiedAppInitializer.finalizeInitialization (http://localhost:8080/scripts/modules/core-systems.js?v=1.0.0:1437:13)\n    at async UnifiedAppInitializer.initialize (http://localhost:8080/scripts/modules/core-systems.js?v=1.0.0:695:9)\n    at async window.initializeUnifiedApp (http://localhost:8080/scripts/modules/core-systems.js?v=1.0.0:2196:10)",
+          "timestamp": 1764972942263
+        },
+        {
+          "level": "SEVERE",
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 906:24 \"[12:15:40 AM] ERROR: ❌ Error loading history\" Object",
+          "timestamp": 1764972942264
+        }
+      ],
       "console_warnings": [
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1272:10 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
-          "timestamp": 1764960856455
+          "message": "http://localhost:8080/api/ai-analysis/llm-provider - Failed to load resource: the server responded with a status of 401 (UNAUTHORIZED)",
+          "timestamp": 1764972942263
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1272:10 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
-          "timestamp": 1764960856844
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:15:40 AM] WARN: ⚠️ Authentication required - redirecting to login\" Object",
+          "timestamp": 1764972942263
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 904:24 \"[8:54:16 PM] WARN: [ConditionsModalController] Modal element not found\" Object",
-          "timestamp": 1764960856954
+          "message": "http://localhost:8080/api/ai-analysis/llm-provider - Failed to load resource: the server responded with a status of 401 (UNAUTHORIZED)",
+          "timestamp": 1764972942263
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/login.html - [DOM] Found 2 elements with non-unique id #tradeOpenConditionsButton: (More info: https://goo.gl/9p2vKq) %o %o",
-          "timestamp": 1764960858965
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:15:40 AM] WARN: ⚠️ Authentication required - redirecting to login\" Object",
+          "timestamp": 1764972942263
+        },
+        {
+          "level": "WARNING",
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:15:40 AM] WARN: Could not load LLM provider settings\" Object",
+          "timestamp": 1764972942263
+        },
+        {
+          "level": "WARNING",
+          "message": "http://localhost:8080/api/ai-analysis/history?limit=50&offset=0 - Failed to load resource: the server responded with a status of 401 (UNAUTHORIZED)",
+          "timestamp": 1764972942263
+        },
+        {
+          "level": "WARNING",
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:15:40 AM] WARN: ⚠️ Authentication required - redirecting to login\" Object",
+          "timestamp": 1764972942263
+        },
+        {
+          "level": "WARNING",
+          "message": "http://localhost:8080/api/ai-analysis/history?limit=50&offset=0 - Failed to load resource: the server responded with a status of 401 (UNAUTHORIZED)",
+          "timestamp": 1764972942264
+        },
+        {
+          "level": "WARNING",
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:15:40 AM] WARN: ⚠️ Authentication required - redirecting to login\" Object",
+          "timestamp": 1764972942264
+        },
+        {
+          "level": "WARNING",
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:15:40 AM] WARN: Could not load history\" Object",
+          "timestamp": 1764972942264
         }
       ],
       "page_errors": [],
@@ -616,7 +605,7 @@
         "showNotificationInProgress": false
       },
       "rate_limit_retries": 0,
-      "timestamp": "2025-12-05T20:54:16.176304"
+      "timestamp": "2025-12-06T00:15:39.727537"
     },
     {
       "page": "העדפות",
@@ -624,37 +613,62 @@
       "category": "main",
       "priority": "high",
       "success": true,
-      "load_time": 0.8033750057220459,
+      "load_time": 0.4420490264892578,
       "console_errors": [],
       "console_warnings": [
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1272:10 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
-          "timestamp": 1764960861269
+          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1286:14 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
+          "timestamp": 1764972947605
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 904:24 \"[8:54:21 PM] WARN: [ConditionsModalController] Modal element not found\" Object",
-          "timestamp": 1764960861383
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:15:47 AM] WARN: [ConditionsModalController] Modal element not found\" Object",
+          "timestamp": 1764972947687
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1272:10 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
-          "timestamp": 1764960861691
+          "message": "http://localhost:8080/preferences.html - [DOM] Found 2 elements with non-unique id #console_logs_cache_enabled: (More info: https://goo.gl/9p2vKq) %o %o",
+          "timestamp": 1764972947729
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 904:24 \"[8:54:21 PM] WARN: [ConditionsModalController] Modal element not found\" Object",
-          "timestamp": 1764960861784
+          "message": "http://localhost:8080/preferences.html - [DOM] Found 2 elements with non-unique id #console_logs_initialization_enabled: (More info: https://goo.gl/9p2vKq) %o %o",
+          "timestamp": 1764972947729
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/login.html - [DOM] Found 2 elements with non-unique id #tradeOpenConditionsButton: (More info: https://goo.gl/9p2vKq) %o %o",
-          "timestamp": 1764960863795
+          "message": "http://localhost:8080/preferences.html - [DOM] Found 2 elements with non-unique id #console_logs_notifications_enabled: (More info: https://goo.gl/9p2vKq) %o %o",
+          "timestamp": 1764972947729
+        },
+        {
+          "level": "WARNING",
+          "message": "http://localhost:8080/preferences.html - [DOM] Found 2 elements with non-unique id #console_logs_ui_components_enabled: (More info: https://goo.gl/9p2vKq) %o %o",
+          "timestamp": 1764972947729
+        },
+        {
+          "level": "WARNING",
+          "message": "http://localhost:8080/preferences.html - [DOM] Found 2 elements with non-unique id #tradeOpenConditionsButton: (More info: https://goo.gl/9p2vKq) %o %o",
+          "timestamp": 1764972949742
+        },
+        {
+          "level": "WARNING",
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:15:47 AM] WARN: ⚠️ PreferencesDebugMonitor not available\" Object",
+          "timestamp": 1764972949745
+        },
+        {
+          "level": "WARNING",
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:15:47 AM] WARN: ⚠️ updatePreferencesSummary function not available\" Object",
+          "timestamp": 1764972949745
+        },
+        {
+          "level": "WARNING",
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:15:48 AM] WARN: ⚠️ Dashboard section not found\" Object",
+          "timestamp": 1764972949746
         }
       ],
       "page_errors": [],
-      "has_header": false,
+      "has_header": true,
       "has_core_systems": true,
       "initialization_status": {
         "getPreferenceInProgress": false,
@@ -662,7 +676,7 @@
         "showNotificationInProgress": false
       },
       "rate_limit_retries": 0,
-      "timestamp": "2025-12-05T20:54:20.983370"
+      "timestamp": "2025-12-06T00:15:47.287977"
     },
     {
       "page": "פרופיל משתמש",
@@ -670,57 +684,42 @@
       "category": "main",
       "priority": "medium",
       "success": true,
-      "load_time": 1.6898407936096191,
+      "load_time": 0.6400279998779297,
       "console_errors": [],
       "console_warnings": [
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1272:10 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
-          "timestamp": 1764960866111
+          "message": "http://localhost:8080/scripts/button-system-init.js?v=1.0.0 65:26 \"⚠️🔘 Button System: ID conflict detected, using unique ID\" Object",
+          "timestamp": 1764972954973
         },
         {
           "level": "WARNING",
           "message": "http://localhost:8080/scripts/button-system-init.js?v=1.0.0 65:26 \"⚠️🔘 Button System: ID conflict detected, using unique ID\" Object",
-          "timestamp": 1764960866231
+          "timestamp": 1764972954973
         },
         {
           "level": "WARNING",
           "message": "http://localhost:8080/scripts/button-system-init.js?v=1.0.0 65:26 \"⚠️🔘 Button System: ID conflict detected, using unique ID\" Object",
-          "timestamp": 1764960866231
+          "timestamp": 1764972954973
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/button-system-init.js?v=1.0.0 65:26 \"⚠️🔘 Button System: ID conflict detected, using unique ID\" Object",
-          "timestamp": 1764960866231
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:15:54 AM] WARN: ⚠️ No mapping found for page class: user-profile-page\" Object",
+          "timestamp": 1764972954975
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 904:24 \"[8:54:26 PM] WARN: ⚠️ No mapping found for page class: user-profile-page\" Object",
-          "timestamp": 1764960866232
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:15:55 AM] WARN: [ConditionsModalController] Modal element not found\" Object",
+          "timestamp": 1764972955317
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 904:24 \"[8:54:26 PM] WARN: [ConditionsModalController] Modal element not found\" Object",
-          "timestamp": 1764960866235
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1272:10 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
-          "timestamp": 1764960866678
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 904:24 \"[8:54:26 PM] WARN: [ConditionsModalController] Modal element not found\" Object",
-          "timestamp": 1764960866994
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/login.html - [DOM] Found 2 elements with non-unique id #tradeOpenConditionsButton: (More info: https://goo.gl/9p2vKq) %o %o",
-          "timestamp": 1764960867498
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:15:56 AM] WARN: ⚠️ Dashboard section not found\" Object",
+          "timestamp": 1764972957406
         }
       ],
       "page_errors": [],
-      "has_header": false,
+      "has_header": true,
       "has_core_systems": true,
       "initialization_status": {
         "getPreferenceInProgress": false,
@@ -728,7 +727,7 @@
         "showNotificationInProgress": false
       },
       "rate_limit_retries": 0,
-      "timestamp": "2025-12-05T20:54:25.808933"
+      "timestamp": "2025-12-06T00:15:54.758102"
     },
     {
       "page": "תצוגת בסיס נתונים",
@@ -736,37 +735,22 @@
       "category": "technical",
       "priority": "low",
       "success": true,
-      "load_time": 0.8199379444122314,
+      "load_time": 0.39533305168151855,
       "console_errors": [],
       "console_warnings": [
         {
           "level": "WARNING",
           "message": "http://localhost:8080/trading-ui/images/icons/entities/db_display.svg - Failed to load resource: the server responded with a status of 404 (NOT FOUND)",
-          "timestamp": 1764960871565
+          "timestamp": 1764972962440
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 904:24 \"[8:54:32 PM] WARN: ⚠️ No mapping found for page class: db-display-page\" Object",
-          "timestamp": 1764960872328
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1272:10 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
-          "timestamp": 1764960874370
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 904:24 \"[8:54:33 PM] WARN: [ConditionsModalController] Modal element not found\" Object",
-          "timestamp": 1764960874376
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/login.html - [DOM] Found 2 elements with non-unique id #tradeOpenConditionsButton: (More info: https://goo.gl/9p2vKq) %o %o",
-          "timestamp": 1764960874376
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:16:02 AM] WARN: ⚠️ No mapping found for page class: db-display-page\" Object",
+          "timestamp": 1764972962718
         }
       ],
       "page_errors": [],
-      "has_header": false,
+      "has_header": true,
       "has_core_systems": true,
       "initialization_status": {
         "getPreferenceInProgress": false,
@@ -774,7 +758,7 @@
         "showNotificationInProgress": false
       },
       "rate_limit_retries": 0,
-      "timestamp": "2025-12-05T20:54:31.518369"
+      "timestamp": "2025-12-06T00:16:02.413072"
     },
     {
       "page": "נתונים נוספים",
@@ -782,40 +766,30 @@
       "category": "technical",
       "priority": "low",
       "success": true,
-      "load_time": 1.3174209594726562,
+      "load_time": 0.3777289390563965,
       "console_errors": [],
       "console_warnings": [
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 904:24 \"[8:54:36 PM] WARN: ⚠️ No mapping found for page class: db-extradata-page\" Object",
-          "timestamp": 1764960876808
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:16:10 AM] WARN: ⚠️ No mapping found for page class: db-extradata-page\" Object",
+          "timestamp": 1764972970114
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1272:10 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
-          "timestamp": 1764960877422
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 904:24 \"[8:54:37 PM] WARN: [ConditionsModalController] Modal element not found\" Object",
-          "timestamp": 1764960877703
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/login.html - [DOM] Found 2 elements with non-unique id #tradeOpenConditionsButton: (More info: https://goo.gl/9p2vKq) %o %o",
-          "timestamp": 1764960879713
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:16:11 AM] WARN: ⚠️ Dashboard section not found\" Object",
+          "timestamp": 1764972972223
         }
       ],
       "page_errors": [],
-      "has_header": false,
+      "has_header": true,
       "has_core_systems": true,
       "initialization_status": {
         "getPreferenceInProgress": false,
-        "loadActiveAlertsInProgress": false,
+        "loadActiveAlertsInProgress": true,
         "showNotificationInProgress": false
       },
       "rate_limit_retries": 0,
-      "timestamp": "2025-12-05T20:54:36.387134"
+      "timestamp": "2025-12-06T00:16:09.831975"
     },
     {
       "page": "אילוצי מערכת",
@@ -823,37 +797,32 @@
       "category": "technical",
       "priority": "low",
       "success": true,
-      "load_time": 0.7879059314727783,
+      "load_time": 0.3101949691772461,
       "console_errors": [],
       "console_warnings": [
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1272:10 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
-          "timestamp": 1764960881969
+          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1286:14 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
+          "timestamp": 1764972977449
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 904:24 \"[8:54:42 PM] WARN: [ConditionsModalController] Modal element not found\" Object",
-          "timestamp": 1764960882103
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:16:17 AM] WARN: [ConditionsModalController] Modal element not found\" Object",
+          "timestamp": 1764972977519
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1272:10 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
-          "timestamp": 1764960882417
+          "message": "http://localhost:8080/constraints.html - [DOM] Found 2 elements with non-unique id #tradeOpenConditionsButton: (More info: https://goo.gl/9p2vKq) %o %o",
+          "timestamp": 1764972979557
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 904:24 \"[8:54:42 PM] WARN: [ConditionsModalController] Modal element not found\" Object",
-          "timestamp": 1764960882514
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/login.html - [DOM] Found 2 elements with non-unique id #tradeOpenConditionsButton: (More info: https://goo.gl/9p2vKq) %o %o",
-          "timestamp": 1764960884523
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:16:18 AM] WARN: ⚠️ Dashboard section not found\" Object",
+          "timestamp": 1764972979558
         }
       ],
       "page_errors": [],
-      "has_header": false,
+      "has_header": true,
       "has_core_systems": true,
       "initialization_status": {
         "getPreferenceInProgress": false,
@@ -861,7 +830,7 @@
         "showNotificationInProgress": false
       },
       "rate_limit_retries": 0,
-      "timestamp": "2025-12-05T20:54:41.728342"
+      "timestamp": "2025-12-06T00:16:17.237195"
     },
     {
       "page": "משימות רקע",
@@ -869,45 +838,40 @@
       "category": "technical",
       "priority": "low",
       "success": true,
-      "load_time": 1.022862195968628,
+      "load_time": 0.4095730781555176,
       "console_errors": [],
       "console_warnings": [
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1272:10 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
-          "timestamp": 1764960886915
+          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1286:14 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
+          "timestamp": 1764972984892
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 904:24 \"[8:54:46 PM] WARN: [ConditionsModalController] Modal element not found\" Object",
-          "timestamp": 1764960886996
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:16:24 AM] WARN: [ConditionsModalController] Modal element not found\" Object",
+          "timestamp": 1764972984943
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1272:10 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
-          "timestamp": 1764960887548
+          "message": "http://localhost:8080/background-tasks.html - [DOM] Found 2 elements with non-unique id #tradeOpenConditionsButton: (More info: https://goo.gl/9p2vKq) %o %o",
+          "timestamp": 1764972986980
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 904:24 \"[8:54:47 PM] WARN: [ConditionsModalController] Modal element not found\" Object",
-          "timestamp": 1764960887557
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/login.html - [DOM] Found 2 elements with non-unique id #tradeOpenConditionsButton: (More info: https://goo.gl/9p2vKq) %o %o",
-          "timestamp": 1764960889561
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:16:26 AM] WARN: ⚠️ Dashboard section not found\" Object",
+          "timestamp": 1764972986988
         }
       ],
       "page_errors": [],
-      "has_header": false,
+      "has_header": true,
       "has_core_systems": true,
       "initialization_status": {
         "getPreferenceInProgress": false,
-        "loadActiveAlertsInProgress": false,
+        "loadActiveAlertsInProgress": true,
         "showNotificationInProgress": false
       },
       "rate_limit_retries": 0,
-      "timestamp": "2025-12-05T20:54:46.534258"
+      "timestamp": "2025-12-06T00:16:24.562881"
     },
     {
       "page": "ניטור שרת",
@@ -915,37 +879,27 @@
       "category": "technical",
       "priority": "low",
       "success": true,
-      "load_time": 1.0392718315124512,
+      "load_time": 0.40615200996398926,
       "console_errors": [],
       "console_warnings": [
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1272:10 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
-          "timestamp": 1764960891973
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:16:32 AM] WARN: [ConditionsModalController] Modal element not found\" Object",
+          "timestamp": 1764972992384
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 904:24 \"[8:54:52 PM] WARN: [ConditionsModalController] Modal element not found\" Object",
-          "timestamp": 1764960892071
+          "message": "http://localhost:8080/server-monitor.html - [DOM] Found 2 elements with non-unique id #tradeOpenConditionsButton: (More info: https://goo.gl/9p2vKq) %o %o",
+          "timestamp": 1764972994418
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1272:10 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
-          "timestamp": 1764960892608
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 904:24 \"[8:54:52 PM] WARN: [ConditionsModalController] Modal element not found\" Object",
-          "timestamp": 1764960892612
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/login.html - [DOM] Found 2 elements with non-unique id #tradeOpenConditionsButton: (More info: https://goo.gl/9p2vKq) %o %o",
-          "timestamp": 1764960894621
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:16:33 AM] WARN: ⚠️ Dashboard section not found\" Object",
+          "timestamp": 1764972994426
         }
       ],
       "page_errors": [],
-      "has_header": false,
+      "has_header": true,
       "has_core_systems": true,
       "initialization_status": {
         "getPreferenceInProgress": false,
@@ -953,7 +907,7 @@
         "showNotificationInProgress": false
       },
       "rate_limit_retries": 0,
-      "timestamp": "2025-12-05T20:54:51.573570"
+      "timestamp": "2025-12-06T00:16:32.003782"
     },
     {
       "page": "ניהול מערכת",
@@ -961,42 +915,27 @@
       "category": "technical",
       "priority": "low",
       "success": true,
-      "load_time": 0.5236470699310303,
+      "load_time": 0.4647538661956787,
       "console_errors": [],
       "console_warnings": [
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1272:10 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
-          "timestamp": 1764960897002
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:16:39 AM] WARN: [ConditionsModalController] Modal element not found\" Object",
+          "timestamp": 1764972999835
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/auth-guard.js?v=1.0.0 76:12 \"Auth guard: checkAuthentication function not found. Loading auth.js...\"",
-          "timestamp": 1764960897142
+          "message": "http://localhost:8080/system-management.html - [DOM] Found 2 elements with non-unique id #tradeOpenConditionsButton: (More info: https://goo.gl/9p2vKq) %o %o",
+          "timestamp": 1764973001912
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 904:24 \"[8:54:57 PM] WARN: [ConditionsModalController] Modal element not found\" Object",
-          "timestamp": 1764960897145
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1272:10 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
-          "timestamp": 1764960899186
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 904:24 \"[8:54:57 PM] WARN: [ConditionsModalController] Modal element not found\" Object",
-          "timestamp": 1764960899191
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/login.html - [DOM] Found 2 elements with non-unique id #tradeOpenConditionsButton: (More info: https://goo.gl/9p2vKq) %o %o",
-          "timestamp": 1764960899191
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:16:41 AM] WARN: ⚠️ Dashboard section not found\" Object",
+          "timestamp": 1764973001914
         }
       ],
       "page_errors": [],
-      "has_header": false,
+      "has_header": true,
       "has_core_systems": true,
       "initialization_status": {
         "getPreferenceInProgress": false,
@@ -1004,7 +943,7 @@
         "showNotificationInProgress": false
       },
       "rate_limit_retries": 0,
-      "timestamp": "2025-12-05T20:54:56.633073"
+      "timestamp": "2025-12-06T00:16:39.439934"
     },
     {
       "page": "מרכז התראות",
@@ -1012,37 +951,27 @@
       "category": "technical",
       "priority": "low",
       "success": true,
-      "load_time": 0.8496332168579102,
+      "load_time": 0.5544948577880859,
       "console_errors": [],
       "console_warnings": [
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1272:10 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
-          "timestamp": 1764960901525
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:16:47 AM] WARN: [ConditionsModalController] Modal element not found\" Object",
+          "timestamp": 1764973007420
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 904:24 \"[8:55:01 PM] WARN: [ConditionsModalController] Modal element not found\" Object",
-          "timestamp": 1764960901648
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:16:47 AM] WARN: ⚠️ Notifications Center initializer not found\" Object",
+          "timestamp": 1764973009492
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1272:10 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
-          "timestamp": 1764960901960
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 904:24 \"[8:55:02 PM] WARN: [ConditionsModalController] Modal element not found\" Object",
-          "timestamp": 1764960902051
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/login.html - [DOM] Found 2 elements with non-unique id #tradeOpenConditionsButton: (More info: https://goo.gl/9p2vKq) %o %o",
-          "timestamp": 1764960904057
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:16:48 AM] WARN: ⚠️ Dashboard section not found\" Object",
+          "timestamp": 1764973009493
         }
       ],
       "page_errors": [],
-      "has_header": false,
+      "has_header": true,
       "has_core_systems": true,
       "initialization_status": {
         "getPreferenceInProgress": false,
@@ -1050,7 +979,7 @@
         "showNotificationInProgress": false
       },
       "rate_limit_retries": 0,
-      "timestamp": "2025-12-05T20:55:01.201024"
+      "timestamp": "2025-12-06T00:16:46.922465"
     },
     {
       "page": "ניהול CSS",
@@ -1058,37 +987,32 @@
       "category": "technical",
       "priority": "low",
       "success": true,
-      "load_time": 0.9335651397705078,
+      "load_time": 0.3747248649597168,
       "console_errors": [],
       "console_warnings": [
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1272:10 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
-          "timestamp": 1764960906375
+          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1286:14 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
+          "timestamp": 1764973014800
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 904:24 \"[8:55:06 PM] WARN: [ConditionsModalController] Modal element not found\" Object",
-          "timestamp": 1764960906494
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:16:54 AM] WARN: [ConditionsModalController] Modal element not found\" Object",
+          "timestamp": 1764973014849
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1272:10 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
-          "timestamp": 1764960906897
+          "message": "http://localhost:8080/css-management.html - [DOM] Found 2 elements with non-unique id #tradeOpenConditionsButton: (More info: https://goo.gl/9p2vKq) %o %o",
+          "timestamp": 1764973016886
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 904:24 \"[8:55:06 PM] WARN: [ConditionsModalController] Modal element not found\" Object",
-          "timestamp": 1764960906998
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/login.html - [DOM] Found 2 elements with non-unique id #tradeOpenConditionsButton: (More info: https://goo.gl/9p2vKq) %o %o",
-          "timestamp": 1764960909007
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:16:56 AM] WARN: ⚠️ Dashboard section not found\" Object",
+          "timestamp": 1764973016894
         }
       ],
       "page_errors": [],
-      "has_header": false,
+      "has_header": true,
       "has_core_systems": true,
       "initialization_status": {
         "getPreferenceInProgress": false,
@@ -1096,7 +1020,7 @@
         "showNotificationInProgress": false
       },
       "rate_limit_retries": 0,
-      "timestamp": "2025-12-05T20:55:06.066949"
+      "timestamp": "2025-12-06T00:16:54.503370"
     },
     {
       "page": "תצוגת צבעים",
@@ -1104,37 +1028,27 @@
       "category": "technical",
       "priority": "low",
       "success": true,
-      "load_time": 0.8392798900604248,
+      "load_time": 0.3881869316101074,
       "console_errors": [],
       "console_warnings": [
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1272:10 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
-          "timestamp": 1764960911302
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:17:02 AM] WARN: [ConditionsModalController] Modal element not found\" Object",
+          "timestamp": 1764973022276
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 904:24 \"[8:55:11 PM] WARN: [ConditionsModalController] Modal element not found\" Object",
-          "timestamp": 1764960911390
+          "message": "http://localhost:8080/dynamic-colors-display.html - [DOM] Found 2 elements with non-unique id #tradeOpenConditionsButton: (More info: https://goo.gl/9p2vKq) %o %o",
+          "timestamp": 1764973024311
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1272:10 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
-          "timestamp": 1764960911744
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 904:24 \"[8:55:11 PM] WARN: [ConditionsModalController] Modal element not found\" Object",
-          "timestamp": 1764960911854
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/login.html - [DOM] Found 2 elements with non-unique id #tradeOpenConditionsButton: (More info: https://goo.gl/9p2vKq) %o %o",
-          "timestamp": 1764960913863
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:17:03 AM] WARN: ⚠️ Dashboard section not found\" Object",
+          "timestamp": 1764973024317
         }
       ],
       "page_errors": [],
-      "has_header": false,
+      "has_header": true,
       "has_core_systems": true,
       "initialization_status": {
         "getPreferenceInProgress": false,
@@ -1142,7 +1056,7 @@
         "showNotificationInProgress": false
       },
       "rate_limit_retries": 0,
-      "timestamp": "2025-12-05T20:55:11.016219"
+      "timestamp": "2025-12-06T00:17:01.910960"
     },
     {
       "page": "עיצובים",
@@ -1150,37 +1064,32 @@
       "category": "technical",
       "priority": "low",
       "success": true,
-      "load_time": 0.7828011512756348,
+      "load_time": 0.3999490737915039,
       "console_errors": [],
       "console_warnings": [
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1272:10 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
-          "timestamp": 1764960916177
+          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1286:14 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
+          "timestamp": 1764973029648
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 904:24 \"[8:55:16 PM] WARN: [ConditionsModalController] Modal element not found\" Object",
-          "timestamp": 1764960916262
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:17:09 AM] WARN: [ConditionsModalController] Modal element not found\" Object",
+          "timestamp": 1764973029700
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1272:10 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
-          "timestamp": 1764960916558
+          "message": "http://localhost:8080/designs.html - [DOM] Found 2 elements with non-unique id #tradeOpenConditionsButton: (More info: https://goo.gl/9p2vKq) %o %o",
+          "timestamp": 1764973031739
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 904:24 \"[8:55:16 PM] WARN: [ConditionsModalController] Modal element not found\" Object",
-          "timestamp": 1764960916655
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/login.html - [DOM] Found 2 elements with non-unique id #tradeOpenConditionsButton: (More info: https://goo.gl/9p2vKq) %o %o",
-          "timestamp": 1764960918664
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:17:10 AM] WARN: ⚠️ Dashboard section not found\" Object",
+          "timestamp": 1764973031747
         }
       ],
       "page_errors": [],
-      "has_header": false,
+      "has_header": true,
       "has_core_systems": true,
       "initialization_status": {
         "getPreferenceInProgress": false,
@@ -1188,7 +1097,7 @@
         "showNotificationInProgress": false
       },
       "rate_limit_retries": 0,
-      "timestamp": "2025-12-05T20:55:15.873730"
+      "timestamp": "2025-12-06T00:17:09.328104"
     },
     {
       "page": "דשבורד נתונים חיצוניים",
@@ -1196,42 +1105,42 @@
       "category": "secondary",
       "priority": "low",
       "success": true,
-      "load_time": 0.9750900268554688,
+      "load_time": 0.4279818534851074,
       "console_errors": [],
       "console_warnings": [
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1272:10 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
-          "timestamp": 1764960920986
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:17:17 AM] WARN: [ConditionsModalController] Modal element not found\" Object",
+          "timestamp": 1764973037131
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/charts/chart-system.js?v=1.0.0 56:24 \"⚠️ ChartLoader not available\"",
-          "timestamp": 1764960921058
+          "message": "http://localhost:8080/scripts/charts/chart-system.js?v=1.0.0 61:24 \"⚠️ ChartTheme not available\"",
+          "timestamp": 1764973037140
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 904:24 \"[8:55:21 PM] WARN: [ConditionsModalController] Modal element not found\" Object",
-          "timestamp": 1764960921101
+          "message": "http://localhost:8080/scripts/unified-log-manager.js?v=1.0.0 445:24 \"⚠️ Cache system not ready yet, using fallback\"",
+          "timestamp": 1764973037185
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1272:10 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
-          "timestamp": 1764960921643
+          "message": "http://localhost:8080/external-data-dashboard.html - [DOM] Found 2 elements with non-unique id #tradeOpenConditionsButton: (More info: https://goo.gl/9p2vKq) %o %o",
+          "timestamp": 1764973039202
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 904:24 \"[8:55:21 PM] WARN: [ConditionsModalController] Modal element not found\" Object",
-          "timestamp": 1764960921649
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:17:17 AM] WARN: external-data-dashboard:update-current-settings:no-providers\" Object",
+          "timestamp": 1764973039202
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/login.html - [DOM] Found 2 elements with non-unique id #tradeOpenConditionsButton: (More info: https://goo.gl/9p2vKq) %o %o",
-          "timestamp": 1764960923660
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:17:18 AM] WARN: ⚠️ Dashboard section not found\" Object",
+          "timestamp": 1764973039209
         }
       ],
       "page_errors": [],
-      "has_header": false,
+      "has_header": true,
       "has_core_systems": true,
       "initialization_status": {
         "getPreferenceInProgress": false,
@@ -1239,7 +1148,7 @@
         "showNotificationInProgress": false
       },
       "rate_limit_retries": 0,
-      "timestamp": "2025-12-05T20:55:20.678045"
+      "timestamp": "2025-12-06T00:17:16.761686"
     },
     {
       "page": "ניהול גרפים",
@@ -1247,37 +1156,27 @@
       "category": "secondary",
       "priority": "low",
       "success": true,
-      "load_time": 0.7930638790130615,
+      "load_time": 0.4025087356567383,
       "console_errors": [],
       "console_warnings": [
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1272:10 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
-          "timestamp": 1764960926016
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:17:24 AM] WARN: [ConditionsModalController] Modal element not found\" Object",
+          "timestamp": 1764973044599
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 904:24 \"[8:55:26 PM] WARN: [ConditionsModalController] Modal element not found\" Object",
-          "timestamp": 1764960926096
+          "message": "http://localhost:8080/chart-management.html - [DOM] Found 2 elements with non-unique id #tradeOpenConditionsButton: (More info: https://goo.gl/9p2vKq) %o %o",
+          "timestamp": 1764973046634
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1272:10 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
-          "timestamp": 1764960926371
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 904:24 \"[8:55:26 PM] WARN: [ConditionsModalController] Modal element not found\" Object",
-          "timestamp": 1764960926466
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/login.html - [DOM] Found 2 elements with non-unique id #tradeOpenConditionsButton: (More info: https://goo.gl/9p2vKq) %o %o",
-          "timestamp": 1764960928475
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:17:25 AM] WARN: ⚠️ Dashboard section not found\" Object",
+          "timestamp": 1764973046642
         }
       ],
       "page_errors": [],
-      "has_header": false,
+      "has_header": true,
       "has_core_systems": true,
       "initialization_status": {
         "getPreferenceInProgress": false,
@@ -1285,7 +1184,7 @@
         "showNotificationInProgress": false
       },
       "rate_limit_retries": 0,
-      "timestamp": "2025-12-05T20:55:25.675026"
+      "timestamp": "2025-12-06T00:17:24.220120"
     },
     {
       "page": "דשבורד בדיקות CRUD",
@@ -1293,27 +1192,11 @@
       "category": "secondary",
       "priority": "low",
       "success": true,
-      "load_time": 0.6788289546966553,
+      "load_time": 0.33087801933288574,
       "console_errors": [],
-      "console_warnings": [
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1272:10 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
-          "timestamp": 1764960933207
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 904:24 \"[8:55:31 PM] WARN: [ConditionsModalController] Modal element not found\" Object",
-          "timestamp": 1764960933214
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/login.html - [DOM] Found 2 elements with non-unique id #tradeOpenConditionsButton: (More info: https://goo.gl/9p2vKq) %o %o",
-          "timestamp": 1764960933215
-        }
-      ],
+      "console_warnings": [],
       "page_errors": [],
-      "has_header": false,
+      "has_header": true,
       "has_core_systems": true,
       "initialization_status": {
         "getPreferenceInProgress": false,
@@ -1321,7 +1204,7 @@
         "showNotificationInProgress": false
       },
       "rate_limit_retries": 0,
-      "timestamp": "2025-12-05T20:55:30.486125"
+      "timestamp": "2025-12-06T00:17:31.652568"
     },
     {
       "page": "כניסה למערכת",
@@ -1329,25 +1212,9 @@
       "category": "auth",
       "priority": "high",
       "success": true,
-      "load_time": 0.391402006149292,
+      "load_time": 0.39738988876342773,
       "console_errors": [],
-      "console_warnings": [
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1272:10 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
-          "timestamp": 1764960935526
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 904:24 \"[8:55:35 PM] WARN: [ConditionsModalController] Modal element not found\" Object",
-          "timestamp": 1764960935615
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/login.html - [DOM] Found 2 elements with non-unique id #tradeOpenConditionsButton: (More info: https://goo.gl/9p2vKq) %o %o",
-          "timestamp": 1764960937625
-        }
-      ],
+      "console_warnings": [],
       "page_errors": [],
       "has_header": false,
       "has_core_systems": true,
@@ -1357,7 +1224,7 @@
         "showNotificationInProgress": false
       },
       "rate_limit_retries": 0,
-      "timestamp": "2025-12-05T20:55:35.224344"
+      "timestamp": "2025-12-06T00:17:39.004533"
     },
     {
       "page": "הרשמה למערכת",
@@ -1365,20 +1232,9 @@
       "category": "auth",
       "priority": "medium",
       "success": true,
-      "load_time": 0.381702184677124,
+      "load_time": 0.3740842342376709,
       "console_errors": [],
-      "console_warnings": [
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1272:10 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
-          "timestamp": 1764960939936
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 904:24 \"[8:55:40 PM] WARN: [ConditionsModalController] Modal element not found\" Object",
-          "timestamp": 1764960940021
-        }
-      ],
+      "console_warnings": [],
       "page_errors": [],
       "has_header": false,
       "has_core_systems": true,
@@ -1388,7 +1244,7 @@
         "showNotificationInProgress": false
       },
       "rate_limit_retries": 0,
-      "timestamp": "2025-12-05T20:55:39.639102"
+      "timestamp": "2025-12-06T00:17:46.432179"
     },
     {
       "page": "שחזור סיסמה",
@@ -1396,7 +1252,7 @@
       "category": "auth",
       "priority": "medium",
       "success": true,
-      "load_time": 0.37839269638061523,
+      "load_time": 0.2910730838775635,
       "console_errors": [],
       "console_warnings": [],
       "page_errors": [],
@@ -1408,7 +1264,7 @@
         "showNotificationInProgress": false
       },
       "rate_limit_retries": 0,
-      "timestamp": "2025-12-05T20:55:44.054537"
+      "timestamp": "2025-12-06T00:17:53.836542"
     },
     {
       "page": "איפוס סיסמה",
@@ -1416,7 +1272,7 @@
       "category": "auth",
       "priority": "medium",
       "success": true,
-      "load_time": 0.2994539737701416,
+      "load_time": 0.31016111373901367,
       "console_errors": [],
       "console_warnings": [],
       "page_errors": [],
@@ -1428,7 +1284,7 @@
         "showNotificationInProgress": false
       },
       "rate_limit_retries": 0,
-      "timestamp": "2025-12-05T20:55:48.448920"
+      "timestamp": "2025-12-06T00:18:01.163653"
     },
     {
       "page": "מיפוי צבעי כפתורים",
@@ -1436,27 +1292,11 @@
       "category": "dev",
       "priority": "low",
       "success": true,
-      "load_time": 0.9791738986968994,
+      "load_time": 0.538567066192627,
       "console_errors": [],
-      "console_warnings": [
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1272:10 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
-          "timestamp": 1764960953740
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 904:24 \"[8:55:53 PM] WARN: [ConditionsModalController] Modal element not found\" Object",
-          "timestamp": 1764960953743
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/login.html - [DOM] Found 2 elements with non-unique id #tradeOpenConditionsButton: (More info: https://goo.gl/9p2vKq) %o %o",
-          "timestamp": 1764960955750
-        }
-      ],
+      "console_warnings": [],
       "page_errors": [],
-      "has_header": false,
+      "has_header": true,
       "has_core_systems": true,
       "initialization_status": {
         "getPreferenceInProgress": false,
@@ -1464,7 +1304,7 @@
         "showNotificationInProgress": false
       },
       "rate_limit_retries": 0,
-      "timestamp": "2025-12-05T20:55:52.765330"
+      "timestamp": "2025-12-06T00:18:08.503767"
     },
     {
       "page": "מיפוי צבעי כפתורים - פשוט",
@@ -1472,27 +1312,11 @@
       "category": "dev",
       "priority": "low",
       "success": true,
-      "load_time": 0.4201388359069824,
+      "load_time": 0.3724536895751953,
       "console_errors": [],
-      "console_warnings": [
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1272:10 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
-          "timestamp": 1764960960208
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 904:24 \"[8:55:58 PM] WARN: [ConditionsModalController] Modal element not found\" Object",
-          "timestamp": 1764960960211
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/login.html - [DOM] Found 2 elements with non-unique id #tradeOpenConditionsButton: (More info: https://goo.gl/9p2vKq) %o %o",
-          "timestamp": 1764960960211
-        }
-      ],
+      "console_warnings": [],
       "page_errors": [],
-      "has_header": false,
+      "has_header": true,
       "has_core_systems": true,
       "initialization_status": {
         "getPreferenceInProgress": false,
@@ -1500,7 +1324,7 @@
         "showNotificationInProgress": false
       },
       "rate_limit_retries": 0,
-      "timestamp": "2025-12-05T20:55:57.756298"
+      "timestamp": "2025-12-06T00:18:16.069295"
     },
     {
       "page": "מודלים של תנאים",
@@ -1508,42 +1332,27 @@
       "category": "dev",
       "priority": "low",
       "success": true,
-      "load_time": 0.8680810928344727,
+      "load_time": 0.36488914489746094,
       "console_errors": [],
       "console_warnings": [
         {
           "level": "WARNING",
           "message": "http://localhost:8080/images/icons/entities/conditions.svg - Failed to load resource: the server responded with a status of 404 (NOT FOUND)",
-          "timestamp": 1764960962260
+          "timestamp": 1764973103541
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 904:24 \"[8:56:02 PM] WARN: ⚠️ No mapping found for page class: conditions-modals-page\" Object",
-          "timestamp": 1764960962540
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:18:23 AM] WARN: ⚠️ No mapping found for page class: conditions-modals-page\" Object",
+          "timestamp": 1764973103784
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 904:24 \"[8:56:02 PM] WARN: [ConditionsModalController] Modal element not found\" Object",
-          "timestamp": 1764960962541
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1272:10 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
-          "timestamp": 1764960963080
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 904:24 \"[8:56:02 PM] WARN: [ConditionsModalController] Modal element not found\" Object",
-          "timestamp": 1764960963084
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/login.html - [DOM] Found 2 elements with non-unique id #tradeOpenConditionsButton: (More info: https://goo.gl/9p2vKq) %o %o",
-          "timestamp": 1764960965091
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:18:23 AM] WARN: [ConditionsModalController] Modal element not found\" Object",
+          "timestamp": 1764973103830
         }
       ],
       "page_errors": [],
-      "has_header": false,
+      "has_header": true,
       "has_core_systems": true,
       "initialization_status": {
         "getPreferenceInProgress": false,
@@ -1551,7 +1360,7 @@
         "showNotificationInProgress": false
       },
       "rate_limit_retries": 0,
-      "timestamp": "2025-12-05T20:56:02.216528"
+      "timestamp": "2025-12-06T00:18:23.473315"
     },
     {
       "page": "ניהול קבוצות העדפות",
@@ -1559,32 +1368,17 @@
       "category": "dev",
       "priority": "low",
       "success": true,
-      "load_time": 0.467008113861084,
+      "load_time": 0.404620885848999,
       "console_errors": [],
       "console_warnings": [
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 904:24 \"[8:56:07 PM] WARN: ⚠️ No mapping found for page class: preferences-groups-management-page\" Object",
-          "timestamp": 1764960967562
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1272:10 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
-          "timestamp": 1764960969582
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 904:24 \"[8:56:07 PM] WARN: [ConditionsModalController] Modal element not found\" Object",
-          "timestamp": 1764960969586
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/login.html - [DOM] Found 2 elements with non-unique id #tradeOpenConditionsButton: (More info: https://goo.gl/9p2vKq) %o %o",
-          "timestamp": 1764960969586
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:18:31 AM] WARN: ⚠️ No mapping found for page class: preferences-groups-management-page\" Object",
+          "timestamp": 1764973111208
         }
       ],
       "page_errors": [],
-      "has_header": false,
+      "has_header": true,
       "has_core_systems": true,
       "initialization_status": {
         "getPreferenceInProgress": false,
@@ -1592,7 +1386,7 @@
         "showNotificationInProgress": false
       },
       "rate_limit_retries": 0,
-      "timestamp": "2025-12-05T20:56:07.099534"
+      "timestamp": "2025-12-06T00:18:30.869795"
     },
     {
       "page": "ניהול תגיות",
@@ -1600,32 +1394,27 @@
       "category": "dev",
       "priority": "low",
       "success": true,
-      "load_time": 0.9397430419921875,
+      "load_time": 0.3430781364440918,
       "console_errors": [],
       "console_warnings": [
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1272:10 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
-          "timestamp": 1764960971972
+          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1286:14 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
+          "timestamp": 1764973118571
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1272:10 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
-          "timestamp": 1764960972408
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:18:38 AM] WARN: ⚠️ Failed to cache tag data\" Object",
+          "timestamp": 1764973120665
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 904:24 \"[8:56:12 PM] WARN: [ConditionsModalController] Modal element not found\" Object",
-          "timestamp": 1764960972531
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/login.html - [DOM] Found 2 elements with non-unique id #tradeOpenConditionsButton: (More info: https://goo.gl/9p2vKq) %o %o",
-          "timestamp": 1764960974537
+          "message": "http://localhost:8080/tag-management.html - [DOM] Found 2 elements with non-unique id #tradeOpenConditionsButton: (More info: https://goo.gl/9p2vKq) %o %o",
+          "timestamp": 1764973120666
         }
       ],
       "page_errors": [],
-      "has_header": false,
+      "has_header": true,
       "has_core_systems": true,
       "initialization_status": {
         "getPreferenceInProgress": false,
@@ -1633,7 +1422,7 @@
         "showNotificationInProgress": false
       },
       "rate_limit_retries": 0,
-      "timestamp": "2025-12-05T20:56:11.594790"
+      "timestamp": "2025-12-06T00:18:38.308802"
     },
     {
       "page": "ניהול מטמון",
@@ -1641,32 +1430,17 @@
       "category": "dev",
       "priority": "low",
       "success": true,
-      "load_time": 0.7299330234527588,
+      "load_time": 0.22911310195922852,
       "console_errors": [],
       "console_warnings": [
         {
           "level": "WARNING",
           "message": "http://localhost:8080/scripts/unified-log-manager.js?v=1.0.0 445:24 \"⚠️ Cache system not ready yet, using fallback\"",
-          "timestamp": 1764960976726
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1272:10 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
-          "timestamp": 1764960977273
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 904:24 \"[8:56:17 PM] WARN: [ConditionsModalController] Modal element not found\" Object",
-          "timestamp": 1764960977277
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/login.html - [DOM] Found 2 elements with non-unique id #tradeOpenConditionsButton: (More info: https://goo.gl/9p2vKq) %o %o",
-          "timestamp": 1764960979281
+          "timestamp": 1764973125895
         }
       ],
       "page_errors": [],
-      "has_header": false,
+      "has_header": true,
       "has_core_systems": true,
       "initialization_status": {
         "getPreferenceInProgress": false,
@@ -1674,7 +1448,7 @@
         "showNotificationInProgress": false
       },
       "rate_limit_retries": 0,
-      "timestamp": "2025-12-05T20:56:16.545647"
+      "timestamp": "2025-12-06T00:18:45.682004"
     },
     {
       "page": "דשבורד איכות קוד",
@@ -1682,27 +1456,11 @@
       "category": "dev",
       "priority": "low",
       "success": true,
-      "load_time": 0.7367191314697266,
+      "load_time": 0.39287495613098145,
       "console_errors": [],
-      "console_warnings": [
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1272:10 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
-          "timestamp": 1764960981944
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 904:24 \"[8:56:22 PM] WARN: [ConditionsModalController] Modal element not found\" Object",
-          "timestamp": 1764960982031
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/login.html - [DOM] Found 2 elements with non-unique id #tradeOpenConditionsButton: (More info: https://goo.gl/9p2vKq) %o %o",
-          "timestamp": 1764960984040
-        }
-      ],
+      "console_warnings": [],
       "page_errors": [],
-      "has_header": false,
+      "has_header": true,
       "has_core_systems": true,
       "initialization_status": {
         "getPreferenceInProgress": false,
@@ -1710,7 +1468,7 @@
         "showNotificationInProgress": false
       },
       "rate_limit_retries": 0,
-      "timestamp": "2025-12-05T20:56:21.293391"
+      "timestamp": "2025-12-06T00:18:52.944560"
     },
     {
       "page": "ניהול מערכת אתחול",
@@ -1718,27 +1476,11 @@
       "category": "dev",
       "priority": "low",
       "success": true,
-      "load_time": 0.26966023445129395,
+      "load_time": 0.3361179828643799,
       "console_errors": [],
-      "console_warnings": [
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1272:10 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
-          "timestamp": 1764960988342
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 904:24 \"[8:56:26 PM] WARN: [ConditionsModalController] Modal element not found\" Object",
-          "timestamp": 1764960988346
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/login.html - [DOM] Found 2 elements with non-unique id #tradeOpenConditionsButton: (More info: https://goo.gl/9p2vKq) %o %o",
-          "timestamp": 1764960988346
-        }
-      ],
+      "console_warnings": [],
       "page_errors": [],
-      "has_header": false,
+      "has_header": true,
       "has_core_systems": true,
       "initialization_status": {
         "getPreferenceInProgress": false,
@@ -1746,7 +1488,7 @@
         "showNotificationInProgress": false
       },
       "rate_limit_retries": 0,
-      "timestamp": "2025-12-05T20:56:26.052945"
+      "timestamp": "2025-12-06T00:19:00.367385"
     },
     {
       "page": "בדיקת תנאים",
@@ -1754,27 +1496,11 @@
       "category": "dev",
       "priority": "low",
       "success": true,
-      "load_time": 0.2959308624267578,
+      "load_time": 1.1902079582214355,
       "console_errors": [],
-      "console_warnings": [
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1272:10 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
-          "timestamp": 1764960992692
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 904:24 \"[8:56:30 PM] WARN: [ConditionsModalController] Modal element not found\" Object",
-          "timestamp": 1764960992700
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/login.html - [DOM] Found 2 elements with non-unique id #tradeOpenConditionsButton: (More info: https://goo.gl/9p2vKq) %o %o",
-          "timestamp": 1764960992700
-        }
-      ],
+      "console_warnings": [],
       "page_errors": [],
-      "has_header": false,
+      "has_header": true,
       "has_core_systems": true,
       "initialization_status": {
         "getPreferenceInProgress": false,
@@ -1782,7 +1508,7 @@
         "showNotificationInProgress": false
       },
       "rate_limit_retries": 0,
-      "timestamp": "2025-12-05T20:56:30.351288"
+      "timestamp": "2025-12-06T00:19:07.727338"
     },
     {
       "page": "ניהול רשימות צפייה",
@@ -1790,9 +1516,15 @@
       "category": "watchlists",
       "priority": "medium",
       "success": true,
-      "load_time": 0.31273818016052246,
+      "load_time": 0.45224499702453613,
       "console_errors": [],
-      "console_warnings": [],
+      "console_warnings": [
+        {
+          "level": "WARNING",
+          "message": "http://localhost:8080/mockups/images/logo.svg - Failed to load resource: the server responded with a status of 404 (NOT FOUND)",
+          "timestamp": 1764973156394
+        }
+      ],
       "page_errors": [],
       "has_header": true,
       "has_core_systems": false,
@@ -1802,7 +1534,7 @@
         "showNotificationInProgress": false
       },
       "rate_limit_retries": 0,
-      "timestamp": "2025-12-05T20:56:34.711512"
+      "timestamp": "2025-12-06T00:19:15.945562"
     },
     {
       "page": "מודל רשימת צפייה",
@@ -1810,7 +1542,7 @@
       "category": "watchlists",
       "priority": "medium",
       "success": true,
-      "load_time": 0.2501809597015381,
+      "load_time": 0.7050092220306396,
       "console_errors": [],
       "console_warnings": [],
       "page_errors": [],
@@ -1822,7 +1554,7 @@
         "showNotificationInProgress": false
       },
       "rate_limit_retries": 0,
-      "timestamp": "2025-12-05T20:56:39.048473"
+      "timestamp": "2025-12-06T00:19:23.415016"
     },
     {
       "page": "מודל הוספת טיקר",
@@ -1830,7 +1562,7 @@
       "category": "watchlists",
       "priority": "medium",
       "success": true,
-      "load_time": 0.2752950191497803,
+      "load_time": 0.2879669666290283,
       "console_errors": [],
       "console_warnings": [],
       "page_errors": [],
@@ -1842,7 +1574,7 @@
         "showNotificationInProgress": false
       },
       "rate_limit_retries": 0,
-      "timestamp": "2025-12-05T20:56:43.323429"
+      "timestamp": "2025-12-06T00:19:31.164451"
     },
     {
       "page": "פעולה מהירה דגלים",
@@ -1850,7 +1582,7 @@
       "category": "watchlists",
       "priority": "medium",
       "success": true,
-      "load_time": 0.26281023025512695,
+      "load_time": 0.2564711570739746,
       "console_errors": [],
       "console_warnings": [],
       "page_errors": [],
@@ -1862,7 +1594,7 @@
         "showNotificationInProgress": false
       },
       "rate_limit_retries": 0,
-      "timestamp": "2025-12-05T20:56:47.612499"
+      "timestamp": "2025-12-06T00:19:38.487682"
     },
     {
       "page": "תצוגת ווידג'טים TradingView",
@@ -1870,28 +1602,13 @@
       "category": "additional",
       "priority": "low",
       "success": true,
-      "load_time": 0.8520519733428955,
+      "load_time": 0.3242781162261963,
       "console_errors": [],
       "console_warnings": [
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 904:24 \"[8:56:52 PM] WARN: ⚠️ No mapping found for page class: tradingview-widgets-showcase-page\" Object",
-          "timestamp": 1764961012192
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1272:10 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
-          "timestamp": 1764961012744
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 904:24 \"[8:56:52 PM] WARN: [ConditionsModalController] Modal element not found\" Object",
-          "timestamp": 1764961012750
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/login.html - [DOM] Found 2 elements with non-unique id #tradeOpenConditionsButton: (More info: https://goo.gl/9p2vKq) %o %o",
-          "timestamp": 1764961014759
+          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 903:24 \"[12:19:46 AM] WARN: ⚠️ No mapping found for page class: tradingview-widgets-showcase-page\" Object",
+          "timestamp": 1764973186061
         }
       ],
       "page_errors": [],
@@ -1903,48 +1620,69 @@
         "showNotificationInProgress": false
       },
       "rate_limit_retries": 0,
-      "timestamp": "2025-12-05T20:56:51.897142"
+      "timestamp": "2025-12-06T00:19:45.775052"
     },
     {
       "page": "טריידים מעוצבים",
       "url": "/trades_formatted.html",
       "category": "additional",
       "priority": "low",
-      "success": true,
-      "load_time": 1.7632207870483398,
-      "console_errors": [],
+      "success": false,
+      "load_time": 0.4040839672088623,
+      "console_errors": [
+        {
+          "level": "SEVERE",
+          "message": "Rate limit exceeded after 3 retries: http://localhost:8080/api/trade-plans/3107 - Failed to load resource: the server responded with a status of 429 (TOO MANY REQUESTS)",
+          "timestamp": 1764973217136
+        },
+        {
+          "level": "SEVERE",
+          "message": "Rate limit exceeded after 3 retries: http://localhost:8080/api/trade-plans/3107 - Failed to load resource: the server responded with a status of 429 (TOO MANY REQUESTS)",
+          "timestamp": 1764973217137
+        },
+        {
+          "level": "SEVERE",
+          "message": "Rate limit exceeded after 3 retries: http://localhost:8080/api/trade-plans/3103 - Failed to load resource: the server responded with a status of 429 (TOO MANY REQUESTS)",
+          "timestamp": 1764973217137
+        },
+        {
+          "level": "SEVERE",
+          "message": "Rate limit exceeded after 3 retries: http://localhost:8080/api/trade-plans/3103 - Failed to load resource: the server responded with a status of 429 (TOO MANY REQUESTS)",
+          "timestamp": 1764973217137
+        },
+        {
+          "level": "SEVERE",
+          "message": "Rate limit exceeded after 3 retries: http://localhost:8080/api/trade-plans/3061 - Failed to load resource: the server responded with a status of 429 (TOO MANY REQUESTS)",
+          "timestamp": 1764973217137
+        },
+        {
+          "level": "SEVERE",
+          "message": "Rate limit exceeded after 3 retries: http://localhost:8080/api/trade-plans/3061 - Failed to load resource: the server responded with a status of 429 (TOO MANY REQUESTS)",
+          "timestamp": 1764973217137
+        }
+      ],
       "console_warnings": [
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1272:10 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
-          "timestamp": 1764961017318
+          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1286:14 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
+          "timestamp": 1764973214990
         },
         {
           "level": "WARNING",
-          "message": "http://localhost:8080/scripts/modules/data-basic.js?v=1.0.0 1272:10 \"⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!\"",
-          "timestamp": 1764961018239
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/scripts/logger-service.js?v=1.0.0 904:24 \"[8:56:58 PM] WARN: [ConditionsModalController] Modal element not found\" Object",
-          "timestamp": 1764961018535
-        },
-        {
-          "level": "WARNING",
-          "message": "http://localhost:8080/login.html - [DOM] Found 2 elements with non-unique id #tradeOpenConditionsButton: (More info: https://goo.gl/9p2vKq) %o %o",
-          "timestamp": 1764961020546
+          "message": "http://localhost:8080/trades_formatted.html - [DOM] Found 2 elements with non-unique id #tradeOpenConditionsButton: (More info: https://goo.gl/9p2vKq) %o %o",
+          "timestamp": 1764973217091
         }
       ],
       "page_errors": [],
-      "has_header": false,
+      "has_header": true,
       "has_core_systems": true,
       "initialization_status": {
         "getPreferenceInProgress": false,
         "loadActiveAlertsInProgress": false,
         "showNotificationInProgress": false
       },
-      "rate_limit_retries": 0,
-      "timestamp": "2025-12-05T20:56:56.772233"
+      "rate_limit_retries": 3,
+      "timestamp": "2025-12-06T00:20:14.675883"
     }
   ]
 }

@@ -4731,48 +4731,48 @@ window.saveTrade = async function saveTrade() {
             }
         } else {
             // Fallback to direct API call with CRUDResponseHandler
-            const url = isEdit ? `/api/trades/${tradeId}` : '/api/trades';
-            const method = isEdit ? 'PUT' : 'POST';
-            
-            // Cache will be invalidated after successful save via CacheSyncManager in CRUDResponseHandler
-            // No need to clear cache before mutation - CacheSyncManager handles dependencies automatically
+        const url = isEdit ? `/api/trades/${tradeId}` : '/api/trades';
+        const method = isEdit ? 'PUT' : 'POST';
+        
+        // Cache will be invalidated after successful save via CacheSyncManager in CRUDResponseHandler
+        // No need to clear cache before mutation - CacheSyncManager handles dependencies automatically
 
-            // Send to API
-            const response = await fetch(url, {
-                method: method,
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(payload)
+        // Send to API
+        const response = await fetch(url, {
+            method: method,
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(payload)
+        });
+        
+        // Use CRUDResponseHandler for consistent response handling
+        if (isEdit) {
+            crudResult = await CRUDResponseHandler.handleUpdateResponse(response, {
+                modalId: 'tradesModal',
+                successMessage: 'טרייד עודכן בהצלחה',
+                entityName: 'טרייד',
+                reloadFn: window.loadTradesData,
+                requiresHardReload: false
             });
-            
-            // Use CRUDResponseHandler for consistent response handling
-            if (isEdit) {
-                crudResult = await CRUDResponseHandler.handleUpdateResponse(response, {
-                    modalId: 'tradesModal',
-                    successMessage: 'טרייד עודכן בהצלחה',
-                    entityName: 'טרייד',
-                    reloadFn: window.loadTradesData,
-                    requiresHardReload: false
-                });
-            } else {
-                crudResult = await CRUDResponseHandler.handleSaveResponse(response, {
-                    modalId: 'tradesModal',
-                    successMessage: 'טרייד נוסף בהצלחה',
-                    entityName: 'טרייד',
-                    reloadFn: window.loadTradesData,
-                    requiresHardReload: false
-                });
+        } else {
+            crudResult = await CRUDResponseHandler.handleSaveResponse(response, {
+                modalId: 'tradesModal',
+                successMessage: 'טרייד נוסף בהצלחה',
+                entityName: 'טרייד',
+                reloadFn: window.loadTradesData,
+                requiresHardReload: false
+            });
 
-                // רק אם הטרייד נוצר מאשקול ביצועים - קישור אוטומטי של ביצועים לטרייד
-                // Note: This is now handled by ExecutionClusterHelpers.handleTradeCreated
-                // which is called from the widget's openTradeModalFromCluster context
-                const isFromExecutionCluster = form.dataset.tradeCreationSource === 'execution-cluster';
-                if (isFromExecutionCluster && crudResult && window.ExecutionClusterHelpers?.handleTradeCreated) {
-                    const clusterId = form.dataset.clusterId;
-                    const selectedExecutionIds = form.dataset.selectedExecutionIds?.split(',').map(id => Number(id)).filter(Number.isFinite) || [];
-                    if (clusterId && selectedExecutionIds.length > 0) {
-                        await window.ExecutionClusterHelpers.handleTradeCreated(crudResult, clusterId, selectedExecutionIds);
+            // רק אם הטרייד נוצר מאשקול ביצועים - קישור אוטומטי של ביצועים לטרייד
+            // Note: This is now handled by ExecutionClusterHelpers.handleTradeCreated
+            // which is called from the widget's openTradeModalFromCluster context
+            const isFromExecutionCluster = form.dataset.tradeCreationSource === 'execution-cluster';
+            if (isFromExecutionCluster && crudResult && window.ExecutionClusterHelpers?.handleTradeCreated) {
+                const clusterId = form.dataset.clusterId;
+                const selectedExecutionIds = form.dataset.selectedExecutionIds?.split(',').map(id => Number(id)).filter(Number.isFinite) || [];
+                if (clusterId && selectedExecutionIds.length > 0) {
+                    await window.ExecutionClusterHelpers.handleTradeCreated(crudResult, clusterId, selectedExecutionIds);
                     }
                 }
             }

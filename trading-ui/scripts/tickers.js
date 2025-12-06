@@ -1030,28 +1030,28 @@ async function saveTicker() {
       });
     } else {
       // Fallback to direct API call with CRUDResponseHandler
-      let response;
-      if (window.TickersData && window.TickersData.createTicker) {
-        response = await window.TickersData.createTicker(tickerPayload);
-      } else {
-        // Fallback ל-direct fetch אם השירות לא זמין
-        response = await fetch('/api/tickers', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(tickerPayload),
-        });
-      }
-
-      // שימוש ב-CRUDResponseHandler עם רענון אוטומטי
-      crudResult = await CRUDResponseHandler.handleSaveResponse(response, {
-        modalId: 'tickersModal',
-        successMessage: `טיקר ${symbol} נוסף בהצלחה!`,
-        entityName: 'טיקר',
-        reloadFn: window.loadTickersData,
-        requiresHardReload: false
+    let response;
+    if (window.TickersData && window.TickersData.createTicker) {
+      response = await window.TickersData.createTicker(tickerPayload);
+    } else {
+      // Fallback ל-direct fetch אם השירות לא זמין
+      response = await fetch('/api/tickers', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(tickerPayload),
       });
+    }
+
+    // שימוש ב-CRUDResponseHandler עם רענון אוטומטי
+      crudResult = await CRUDResponseHandler.handleSaveResponse(response, {
+      modalId: 'tickersModal',
+      successMessage: `טיקר ${symbol} נוסף בהצלחה!`,
+      entityName: 'טיקר',
+      reloadFn: window.loadTickersData,
+      requiresHardReload: false
+    });
     }
     
     const newTickerId = Number(crudResult?.data?.id || crudResult?.id);
@@ -1274,29 +1274,29 @@ async function updateTicker() {
       });
     } else {
       // Fallback to direct API call with CRUDResponseHandler
-      let response;
-      if (window.TickersData && window.TickersData.updateTicker) {
-        response = await window.TickersData.updateTicker(parseInt(id), tickerPayload);
-      } else {
-        // Fallback ל-direct fetch אם השירות לא זמין
-        response = await fetch(`/api/tickers/${parseInt(id)}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(tickerPayload),
-        });
-      }
-
-      // שימוש ב-CRUDResponseHandler עם רענון אוטומטי
-      updateResult = await CRUDResponseHandler.handleUpdateResponse(response, {
-        modalId: 'tickersModal',
-        successMessage: `טיקר ${symbol} עודכן בהצלחה!`,
-        apiUrl: '/api/tickers/',
-        entityName: 'טיקר',
-        reloadFn: window.loadTickersData,
-        requiresHardReload: false
+    let response;
+    if (window.TickersData && window.TickersData.updateTicker) {
+      response = await window.TickersData.updateTicker(parseInt(id), tickerPayload);
+    } else {
+      // Fallback ל-direct fetch אם השירות לא זמין
+      response = await fetch(`/api/tickers/${parseInt(id)}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(tickerPayload),
       });
+    }
+
+    // שימוש ב-CRUDResponseHandler עם רענון אוטומטי
+      updateResult = await CRUDResponseHandler.handleUpdateResponse(response, {
+      modalId: 'tickersModal',
+      successMessage: `טיקר ${symbol} עודכן בהצלחה!`,
+      apiUrl: '/api/tickers/',
+      entityName: 'טיקר',
+      reloadFn: window.loadTickersData,
+      requiresHardReload: false
+    });
     }
     
     if (updateResult !== null && window.TagService) {
@@ -1784,33 +1784,33 @@ async function performTickerDeletion(tickerId) {
       });
     } else {
       // Fallback to direct API call with CRUDResponseHandler
-      let response;
-      if (typeof window.TickersData?.deleteTicker === 'function') {
-        response = await window.TickersData.deleteTicker(tickerId);
-      } else {
-        // Fallback to direct fetch
-        response = await fetch(`/api/tickers/${tickerId}`, {
-          method: 'DELETE',
-        });
-      }
-
-      // Use CRUDResponseHandler for consistent response handling
-      await CRUDResponseHandler.handleDeleteResponse(response, {
-        successMessage: 'טיקר נמחק בהצלחה',
-        entityName: 'טיקר',
-        reloadFn: () => {
-          window.loadTickersData({ force: true });
-          // Update active trades field if function exists
-          if (typeof window.updateActiveTradesField === 'function') {
-            window.updateActiveTradesField();
-          }
-          // Call onTickerDeleted callback if exists
-          if (typeof window.onTickerDeleted === 'function') {
-            window.onTickerDeleted(tickerId);
-          }
-        },
-        requiresHardReload: false
+    let response;
+    if (typeof window.TickersData?.deleteTicker === 'function') {
+      response = await window.TickersData.deleteTicker(tickerId);
+    } else {
+      // Fallback to direct fetch
+      response = await fetch(`/api/tickers/${tickerId}`, {
+        method: 'DELETE',
       });
+    }
+
+    // Use CRUDResponseHandler for consistent response handling
+    await CRUDResponseHandler.handleDeleteResponse(response, {
+      successMessage: 'טיקר נמחק בהצלחה',
+      entityName: 'טיקר',
+      reloadFn: () => {
+        window.loadTickersData({ force: true });
+        // Update active trades field if function exists
+        if (typeof window.updateActiveTradesField === 'function') {
+          window.updateActiveTradesField();
+        }
+        // Call onTickerDeleted callback if exists
+        if (typeof window.onTickerDeleted === 'function') {
+          window.onTickerDeleted(tickerId);
+        }
+      },
+      requiresHardReload: false
+    });
     }
 
   } catch (error) {
@@ -1935,6 +1935,566 @@ async function confirmDeleteTicker(id) {
  * @param {Object} [options={}] - Loading options (force, signal, etc.)
  * @returns {Promise<Array>} Array of tickers
  */
+/**
+ * Check if ticker has complete data (historical data and technical indicators)
+ * @param {Object} ticker - Ticker object
+ * @returns {Object} Object with data completeness status
+ */
+function checkTickerDataCompleteness(ticker) {
+  const result = {
+    hasPrice: false,
+    hasHistorical: false,
+    hasATR: false,
+    hasWeek52: false,
+    hasVolatility: false,
+    hasMA20: false,
+    hasMA150: false,
+    historicalCount: 0,
+    missingFields: [],
+    missingCalculations: [],
+    completeness: 0 // 0-100 percentage
+  };
+
+  // Check for price data
+  const hasPrice = ticker && (
+    ticker.current_price !== undefined && ticker.current_price !== null ||
+    ticker.price !== undefined && ticker.price !== null
+  );
+  result.hasPrice = hasPrice;
+  if (!hasPrice) {
+    result.missingFields.push('נתוני מחיר נוכחי');
+  }
+
+  // Check for historical data count
+  if (ticker.historical_quotes_count !== undefined) {
+    result.historicalCount = ticker.historical_quotes_count;
+    result.hasHistorical = result.historicalCount >= 150;
+    if (!result.hasHistorical) {
+      result.missingFields.push(`נתונים היסטוריים (${result.historicalCount}/150)`);
+    }
+  } else {
+    result.missingFields.push('נתונים היסטוריים (לא נטען)');
+  }
+
+  // Check ATR
+  if (ticker.atr !== undefined && ticker.atr !== null) {
+    result.hasATR = true;
+  } else {
+    result.missingCalculations.push('ATR');
+  }
+
+  // Check 52W
+  if (ticker.week52_high !== undefined && ticker.week52_high !== null &&
+      ticker.week52_low !== undefined && ticker.week52_low !== null) {
+    result.hasWeek52 = true;
+  } else {
+    result.missingCalculations.push('52W High/Low');
+  }
+
+  // Check Volatility
+  if (ticker.volatility !== undefined && ticker.volatility !== null) {
+    result.hasVolatility = true;
+  } else {
+    result.missingCalculations.push('תנודתיות');
+  }
+
+  // Check MA 20
+  if (ticker.ma_20 !== undefined && ticker.ma_20 !== null) {
+    result.hasMA20 = true;
+  } else {
+    result.missingCalculations.push('MA 20');
+  }
+
+  // Check MA 150
+  if (ticker.ma_150 !== undefined && ticker.ma_150 !== null) {
+    result.hasMA150 = true;
+  } else {
+    result.missingCalculations.push('MA 150');
+  }
+
+  // Calculate completeness percentage
+  const totalChecks = 7; // price, historical, ATR, 52W, Volatility, MA20, MA150
+  const passedChecks = [
+    result.hasPrice,
+    result.hasHistorical,
+    result.hasATR,
+    result.hasWeek52,
+    result.hasVolatility,
+    result.hasMA20,
+    result.hasMA150
+  ].filter(Boolean).length;
+  result.completeness = Math.round((passedChecks / totalChecks) * 100);
+
+  return result;
+}
+
+/**
+ * Check completeness of data for all tickers
+ * @param {Array} tickers - Array of tickers
+ * @returns {Object} Summary of data completeness
+ */
+async function checkTickersDataCompleteness(tickers) {
+  if (!Array.isArray(tickers) || tickers.length === 0) {
+    return {
+      total: 0,
+      complete: 0,
+      incomplete: 0,
+      missingHistorical: [],
+      missingIndicators: []
+    };
+  }
+
+  const summary = {
+    total: tickers.length,
+    complete: 0,
+    incomplete: 0,
+    missingHistorical: [],
+    missingIndicators: []
+  };
+
+  tickers.forEach(ticker => {
+    const completeness = checkTickerDataCompleteness(ticker);
+    if (completeness.completeness === 100) {
+      summary.complete++;
+    } else {
+      summary.incomplete++;
+      if (!completeness.hasHistorical) {
+        summary.missingHistorical.push({
+          id: ticker.id,
+          symbol: ticker.symbol,
+          count: completeness.historicalCount
+        });
+      }
+      if (completeness.missingCalculations.length > 0) {
+        summary.missingIndicators.push({
+          id: ticker.id,
+          symbol: ticker.symbol,
+          missing: completeness.missingCalculations
+        });
+      }
+    }
+  });
+
+  return summary;
+}
+
+/**
+ * Ensure historical data is loaded for tickers that need it
+ * @param {Array} tickers - Array of tickers
+ * @param {Object} options - Options (silent, showProgress)
+ * @returns {Promise<Array>} Array of tickers with historical data
+ */
+async function ensureHistoricalDataForTickers(tickers, options = {}) {
+  const { silent = false, showProgress = true } = options;
+  
+  if (!Array.isArray(tickers) || tickers.length === 0) {
+    return tickers;
+  }
+
+  if (!window.ExternalDataService) {
+    window.Logger?.warn?.('ExternalDataService not available, skipping historical data loading', { page: 'tickers' });
+    return tickers;
+  }
+
+  const overlayId = 'tickers-ensure-historical';
+  let progressStep = 0;
+  const totalSteps = tickers.length;
+
+  if (showProgress && window.UnifiedProgressManager) {
+    window.UnifiedProgressManager.showProgress(overlayId, {
+      title: 'טוען נתונים היסטוריים',
+      message: `בודק ${tickers.length} טיקרים...`,
+      totalSteps: totalSteps,
+      currentStep: 0
+    });
+  }
+
+  const tickersWithData = [];
+  const tickersNeedingData = [];
+
+  // First pass: identify tickers needing data
+  for (const ticker of tickers) {
+    const completeness = checkTickerDataCompleteness(ticker);
+    if (!completeness.hasHistorical || completeness.historicalCount < 150) {
+      tickersNeedingData.push(ticker);
+    } else {
+      tickersWithData.push(ticker);
+    }
+  }
+
+  if (tickersNeedingData.length === 0) {
+    if (showProgress && window.UnifiedProgressManager) {
+      window.UnifiedProgressManager.hideProgress(overlayId);
+    }
+    if (!silent) {
+      window.Logger?.info?.('All tickers have sufficient historical data', { 
+        count: tickers.length, 
+        page: 'tickers' 
+      });
+    }
+    return tickers;
+  }
+
+  if (!silent) {
+    window.Logger?.info?.('Loading historical data for tickers', { 
+      total: tickers.length,
+      needingData: tickersNeedingData.length,
+      page: 'tickers' 
+    });
+  }
+
+  // Second pass: load historical data for tickers that need it
+  for (let i = 0; i < tickersNeedingData.length; i++) {
+    const ticker = tickersNeedingData[i];
+    progressStep++;
+
+    if (showProgress && window.UnifiedProgressManager) {
+      window.UnifiedProgressManager.updateProgress(overlayId, {
+        message: `טוען נתונים היסטוריים עבור ${ticker.symbol || ticker.id} (${progressStep}/${totalSteps})`,
+        currentStep: progressStep
+      });
+    }
+
+    try {
+      // Use ExternalDataService to refresh ticker data with historical data
+      const refreshedData = await window.ExternalDataService.refreshTickerData(ticker.id, {
+        forceRefresh: false,
+        includeHistorical: true,
+        daysBack: 150
+      });
+
+      // Merge refreshed data with original ticker
+      const enrichedTicker = {
+        ...ticker,
+        ...refreshedData,
+        historical_quotes_count: refreshedData.historical_quotes_count || 0
+      };
+
+      tickersWithData.push(enrichedTicker);
+
+      // Save to cache
+      if (window.UnifiedCacheManager) {
+        const cacheKey = `ticker-full-${ticker.id}`;
+        await window.UnifiedCacheManager.save(cacheKey, enrichedTicker, 'memory', { ttl: 3600 });
+      }
+
+      if (!silent) {
+        window.Logger?.debug?.('Loaded historical data for ticker', {
+          tickerId: ticker.id,
+          symbol: ticker.symbol,
+          historicalCount: enrichedTicker.historical_quotes_count,
+          page: 'tickers'
+        });
+      }
+    } catch (error) {
+      window.Logger?.warn?.('Failed to load historical data for ticker', {
+        tickerId: ticker.id,
+        symbol: ticker.symbol,
+        error: error.message,
+        page: 'tickers'
+      });
+      // Add ticker without historical data
+      tickersWithData.push(ticker);
+    }
+  }
+
+  if (showProgress && window.UnifiedProgressManager) {
+    window.UnifiedProgressManager.hideProgress(overlayId);
+  }
+
+  return tickersWithData;
+}
+
+/**
+ * Enrich tickers with full data from EntityDetailsAPI
+ * @param {Array} tickers - Array of basic tickers
+ * @param {Object} options - Options (silent, showProgress, forceRefresh)
+ * @returns {Promise<Array>} Array of enriched tickers
+ */
+async function enrichTickersWithFullData(tickers, options = {}) {
+  const { silent = false, showProgress = true, forceRefresh = false } = options;
+
+  if (!Array.isArray(tickers) || tickers.length === 0) {
+    return tickers;
+  }
+
+  if (!window.entityDetailsAPI || typeof window.entityDetailsAPI.getEntityDetails !== 'function') {
+    window.Logger?.warn?.('EntityDetailsAPI not available, skipping data enrichment', { page: 'tickers' });
+    return tickers;
+  }
+
+  const overlayId = 'tickers-enrich-data';
+  let progressStep = 0;
+  const totalSteps = tickers.length;
+
+  if (showProgress && window.UnifiedProgressManager) {
+    window.UnifiedProgressManager.showProgress(overlayId, {
+      title: 'מעשיר נתוני טיקרים',
+      message: `טוען נתונים מלאים עבור ${tickers.length} טיקרים...`,
+      totalSteps: totalSteps,
+      currentStep: 0
+    });
+  }
+
+  const enrichedTickers = [];
+
+  for (let i = 0; i < tickers.length; i++) {
+    const ticker = tickers[i];
+    progressStep++;
+
+    if (showProgress && window.UnifiedProgressManager) {
+      window.UnifiedProgressManager.updateProgress(overlayId, {
+        message: `טוען נתונים מלאים עבור ${ticker.symbol || ticker.id} (${progressStep}/${totalSteps})`,
+        currentStep: progressStep
+      });
+    }
+
+    try {
+      // Check cache first
+      const cacheKey = `ticker-full-${ticker.id}`;
+      let fullData = null;
+
+      if (!forceRefresh && window.UnifiedCacheManager) {
+        fullData = await window.UnifiedCacheManager.get(cacheKey, 'memory');
+        if (fullData) {
+          if (!silent) {
+            window.Logger?.debug?.('Loaded full ticker data from cache', {
+              tickerId: ticker.id,
+              symbol: ticker.symbol,
+              page: 'tickers'
+            });
+          }
+        }
+      }
+
+      // If not in cache, load from API
+      if (!fullData) {
+        fullData = await window.entityDetailsAPI.getEntityDetails('ticker', ticker.id, {
+          includeMarketData: true,
+          includeLinkedItems: false, // Don't load linked items to avoid 429 errors
+          forceRefresh: forceRefresh
+        });
+
+        // Save to cache
+        if (window.UnifiedCacheManager && fullData) {
+          await window.UnifiedCacheManager.save(cacheKey, fullData, 'memory', { ttl: 3600 });
+        }
+      }
+
+      // Merge full data with basic ticker data
+      const enrichedTicker = {
+        ...ticker,
+        ...fullData
+      };
+
+      enrichedTickers.push(enrichedTicker);
+
+      if (!silent) {
+        window.Logger?.debug?.('Enriched ticker with full data', {
+          tickerId: ticker.id,
+          symbol: ticker.symbol,
+          hasATR: !!enrichedTicker.atr,
+          hasWeek52: !!enrichedTicker.week52_high,
+          hasVolatility: !!enrichedTicker.volatility,
+          hasMA20: !!enrichedTicker.ma_20,
+          hasMA150: !!enrichedTicker.ma_150,
+          page: 'tickers'
+        });
+      }
+    } catch (error) {
+      window.Logger?.warn?.('Failed to enrich ticker with full data', {
+        tickerId: ticker.id,
+        symbol: ticker.symbol,
+        error: error.message,
+        page: 'tickers'
+      });
+      // Add ticker without enrichment
+      enrichedTickers.push(ticker);
+    }
+  }
+
+  if (showProgress && window.UnifiedProgressManager) {
+    window.UnifiedProgressManager.hideProgress(overlayId);
+  }
+
+  return enrichedTickers;
+}
+
+/**
+ * Load and refresh missing data for tickers
+ * @param {Array} tickers - Array of tickers
+ * @param {Object} options - Options (silent, showProgress)
+ * @returns {Promise<Object>} Summary of refresh operation
+ */
+async function loadAndRefreshMissingData(tickers, options = {}) {
+  const { silent = false, showProgress = true } = options;
+
+  if (!Array.isArray(tickers) || tickers.length === 0) {
+    return {
+      total: 0,
+      refreshed: 0,
+      failed: 0,
+      errors: []
+    };
+  }
+
+  try {
+    // Check for missing data using API endpoint
+    const response = await fetch('/api/external-data/status/tickers/missing-data');
+    if (!response.ok) {
+      throw new Error(`Failed to fetch missing data status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    const missingDataInfo = data?.data || {};
+
+    const missingHistorical = missingDataInfo.tickers_missing_historical || [];
+    const missingIndicators = missingDataInfo.tickers_missing_indicators || [];
+    const missingCurrent = missingDataInfo.tickers_missing_current || [];
+
+    const allMissingTickerIds = new Set([
+      ...missingHistorical.map(t => t.id),
+      ...missingIndicators.map(t => t.id),
+      ...missingCurrent.map(t => t.id)
+    ]);
+
+    if (allMissingTickerIds.size === 0) {
+      if (!silent) {
+        window.Logger?.info?.('No tickers with missing data found', { page: 'tickers' });
+      }
+      return {
+        total: tickers.length,
+        refreshed: 0,
+        failed: 0,
+        errors: []
+      };
+    }
+
+    if (!silent) {
+      window.Logger?.info?.('Found tickers with missing data', {
+        missingHistorical: missingHistorical.length,
+        missingIndicators: missingIndicators.length,
+        missingCurrent: missingCurrent.length,
+        total: allMissingTickerIds.size,
+        page: 'tickers'
+      });
+    }
+
+    const overlayId = 'tickers-refresh-missing';
+    const tickersToRefresh = tickers.filter(t => allMissingTickerIds.has(t.id));
+    let progressStep = 0;
+    const totalSteps = tickersToRefresh.length;
+
+    if (showProgress && window.UnifiedProgressManager) {
+      window.UnifiedProgressManager.showProgress(overlayId, {
+        title: 'מרענן נתונים חסרים',
+        message: `מרענן ${tickersToRefresh.length} טיקרים...`,
+        totalSteps: totalSteps,
+        currentStep: 0
+      });
+    }
+
+    const results = {
+      total: tickersToRefresh.length,
+      refreshed: 0,
+      failed: 0,
+      errors: []
+    };
+
+    for (let i = 0; i < tickersToRefresh.length; i++) {
+      const ticker = tickersToRefresh[i];
+      progressStep++;
+
+      if (showProgress && window.UnifiedProgressManager) {
+        window.UnifiedProgressManager.updateProgress(overlayId, {
+          message: `מרענן נתונים עבור ${ticker.symbol || ticker.id} (${progressStep}/${totalSteps})`,
+          currentStep: progressStep
+        });
+      }
+
+      try {
+        if (window.ExternalDataService) {
+          await window.ExternalDataService.refreshTickerData(ticker.id, {
+            forceRefresh: true,
+            includeHistorical: true,
+            daysBack: 150
+          });
+          results.refreshed++;
+        } else {
+          throw new Error('ExternalDataService not available');
+        }
+      } catch (error) {
+        results.failed++;
+        results.errors.push({
+          tickerId: ticker.id,
+          symbol: ticker.symbol,
+          error: error.message
+        });
+        window.Logger?.warn?.('Failed to refresh ticker data', {
+          tickerId: ticker.id,
+          symbol: ticker.symbol,
+          error: error.message,
+          page: 'tickers'
+        });
+      }
+    }
+
+    if (showProgress && window.UnifiedProgressManager) {
+      window.UnifiedProgressManager.hideProgress(overlayId);
+    }
+
+    if (!silent) {
+      window.Logger?.info?.('Completed refreshing missing data', {
+        refreshed: results.refreshed,
+        failed: results.failed,
+        page: 'tickers'
+      });
+    }
+
+    return results;
+  } catch (error) {
+    window.Logger?.error?.('Failed to load and refresh missing data', {
+      error: error.message,
+      page: 'tickers'
+    });
+    return {
+      total: tickers.length,
+      refreshed: 0,
+      failed: tickers.length,
+      errors: [{ error: error.message }]
+    };
+  }
+}
+
+/**
+ * Get data status badge HTML for a ticker
+ * @param {Object} ticker - Ticker object
+ * @returns {string} HTML badge element
+ */
+function getDataStatusBadge(ticker) {
+  const completeness = checkTickerDataCompleteness(ticker);
+  
+  let badgeClass = 'badge bg-success';
+  let badgeText = 'מלא';
+  let badgeTitle = 'כל הנתונים זמינים';
+
+  if (completeness.completeness === 0) {
+    badgeClass = 'badge bg-danger';
+    badgeText = 'חסר';
+    badgeTitle = 'נתונים חסרים - נדרש רענון';
+  } else if (completeness.completeness < 50) {
+    badgeClass = 'badge bg-danger';
+    badgeText = 'חלקי';
+    badgeTitle = `נתונים חלקיים (${completeness.completeness}%)`;
+  } else if (completeness.completeness < 100) {
+    badgeClass = 'badge bg-warning';
+    badgeText = 'חלקי';
+    badgeTitle = `נתונים חלקיים (${completeness.completeness}%)`;
+  }
+
+  return `<span class="${badgeClass}" title="${badgeTitle}" data-bs-toggle="tooltip">${badgeText}</span>`;
+}
+
 async function loadTickersDataInternal(options = {}) {
   try {
     window.Logger.info('Loading tickers data', { page: "tickers" });
@@ -2043,7 +2603,48 @@ async function loadTickersDataInternal(options = {}) {
     // עדכון שדה active_trades
     await updateActiveTradesField();
 
-    // עדכון הטבלה (אחרי עדכון active_trades)
+    // Enrich tickers with full data (historical data, technical indicators)
+    // Only if not forcing refresh and we want to load full data
+    if (!options.skipEnrichment && options.enrichWithFullData !== false) {
+      try {
+        window.Logger?.info?.('Enriching tickers with full data', { 
+          count: tickersData.length, 
+          page: 'tickers' 
+        });
+        
+        tickersData = await enrichTickersWithFullData(tickersData, {
+          silent: options.silent || false,
+          showProgress: options.showProgress !== false,
+          forceRefresh: options.force || false
+        });
+      } catch (error) {
+        window.Logger?.warn?.('Failed to enrich tickers with full data, continuing with basic data', {
+          error: error.message,
+          page: 'tickers'
+        });
+      }
+    }
+
+    // Check for missing data and optionally refresh
+    if (options.autoRefreshMissing !== false) {
+      try {
+        const completenessSummary = await checkTickersDataCompleteness(tickersData);
+        if (completenessSummary.incomplete > 0 && !options.silent) {
+          window.Logger?.info?.('Found tickers with incomplete data', {
+            incomplete: completenessSummary.incomplete,
+            total: completenessSummary.total,
+            page: 'tickers'
+          });
+        }
+      } catch (error) {
+        window.Logger?.warn?.('Failed to check data completeness', {
+          error: error.message,
+          page: 'tickers'
+        });
+      }
+    }
+
+    // עדכון הטבלה (אחרי עדכון active_trades והעשרת נתונים)
     await updateTickersTable(tickersData);
 
     // עדכון סטטיסטיקות סיכום
@@ -2376,6 +2977,7 @@ function renderTickersTableRows(tickers) {
         </td>
         <td class="status-cell" data-status="${ticker.user_ticker_status || ticker.status || ''}" title="${statusLabel}">
           ${statusHtml}
+          ${getDataStatusBadge(ticker)}
         </td>
         <td class="type-cell" data-type="${ticker.type_custom || ticker.type || ''}" title="${typeLabel}">
           <span class="badge-type entity-badge-base" style="background-color: ${typeStyle.backgroundColor}; color: ${typeStyle.color};">

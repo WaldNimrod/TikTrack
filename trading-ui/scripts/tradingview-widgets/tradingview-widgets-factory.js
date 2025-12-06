@@ -198,6 +198,13 @@
 
     /**
      * Create Mini Chart widget
+     * 
+     * ⚠️ NOTE: TradingView widgets automatically create WebSocket connections
+     * to widgetdata.tradingview.com for real-time data updates.
+     * These WebSocket connections are managed by TradingView's external library
+     * and are not under our direct control. Connection failures are expected
+     * in development environments and do not affect widget functionality.
+     * 
      * @param {Object} config - Widget configuration
      * @returns {Object} Widget instance (script element)
      */

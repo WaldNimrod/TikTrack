@@ -420,12 +420,10 @@
    * Load active tickers
    */
   async function loadActiveTickers() {
-    window.Logger?.info?.('🔄 TickerListWidget: loadActiveTickers START', { page: 'ticker-list-widget' });
     showLoading('active');
     state.activeTickers = [];
 
     try {
-      window.Logger?.info?.('🔄 TickerListWidget: Fetching /api/tickers/with-initial-data', { page: 'ticker-list-widget' });
       const response = await fetch('/api/tickers/with-initial-data', {
         method: 'GET',
         headers: {
@@ -434,24 +432,22 @@
         }
       });
 
-      window.Logger?.info?.('🔄 TickerListWidget: Response received', { status: response.status, ok: response.ok, page: 'ticker-list-widget' });
-
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
       const data = await response.json();
-      window.Logger?.info?.('🔄 TickerListWidget: Data parsed', { status: data.status, dataCount: Array.isArray(data.data) ? data.data.length : 0, page: 'ticker-list-widget' });
       
       if (data.status === 'success' && Array.isArray(data.data)) {
         // Load full ticker data with technical indicators from EntityDetailsAPI
-        window.Logger?.info?.('🔄 TickerListWidget: Loading full ticker data with technical indicators', { count: data.data.length, page: 'ticker-list-widget' });
+        // Note: includeLinkedItems: false to avoid 429 errors from too many parallel requests
         const enrichedTickers = await Promise.all(
           data.data.map(async (ticker) => {
             try {
               if (window.entityDetailsAPI && typeof window.entityDetailsAPI.getEntityDetails === 'function') {
                 const fullData = await window.entityDetailsAPI.getEntityDetails('ticker', ticker.id, {
                   includeMarketData: true,
+                  includeLinkedItems: false, // Don't load linked items on homepage to avoid 429 errors
                   forceRefresh: false
                 });
                 // Merge full data with basic ticker data
@@ -466,7 +462,6 @@
         );
         
         state.activeTickers = enrichedTickers;
-        window.Logger?.info?.('✅ TickerListWidget: Rendering active tickers', { count: state.activeTickers.length, page: 'ticker-list-widget' });
         await renderTickersList('active', state.activeTickers);
       } else {
         throw new Error(data.error?.message || 'Invalid response format');
@@ -636,8 +631,6 @@
      * @param {object} config - Configuration object (optional)
      */
     init(containerId = CONTAINER_ID, config = {}) {
-      window.Logger?.info?.('🚀 TickerListWidget.init() called', { containerId, config, page: 'ticker-list-widget' });
-      
       if (state.initialized) {
         window.Logger?.warn?.('⚠️ TickerListWidget already initialized', { page: 'ticker-list-widget' });
         return;
@@ -648,20 +641,16 @@
         ...DEFAULT_CONFIG,
         ...config
       };
-      window.Logger?.info?.('⚙️ TickerListWidget: Config merged', { config: state.config, page: 'ticker-list-widget' });
 
       if (!cacheElements()) {
         window.Logger?.error?.('❌ TickerListWidget: Container not found', { containerId, page: 'ticker-list-widget' });
         return;
       }
-      window.Logger?.info?.('✅ TickerListWidget: Elements cached', { page: 'ticker-list-widget' });
 
       bindEvents();
       state.initialized = true;
-      window.Logger?.info?.('✅ TickerListWidget: Events bound, state initialized', { page: 'ticker-list-widget' });
 
       // Load initial tab data
-      window.Logger?.info?.('🔄 TickerListWidget: Loading initial tab data', { defaultTab: state.config.defaultTab, page: 'ticker-list-widget' });
       if (state.config.defaultTab === 'active') {
         loadActiveTickers();
       } else if (state.config.defaultTab === 'watchlist') {
@@ -669,8 +658,6 @@
       } else {
         loadAllTickers();
       }
-
-      window.Logger?.info?.('✅ TickerListWidget initialized successfully', { config: state.config, page: 'ticker-list-widget' });
     },
 
     /**

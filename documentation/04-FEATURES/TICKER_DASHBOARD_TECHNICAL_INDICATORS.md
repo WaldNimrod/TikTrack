@@ -302,9 +302,54 @@ Cache מתנקה אוטומטית:
 
 ---
 
+## 🔄 אינטגרציה עם דשבורד טיקרים
+
+**תאריך עדכון:** דצמבר 2025
+
+**מימוש חדש:**
+דשבורד טיקרים (`tickers.html`) עכשיו כולל אינטגרציה מלאה עם מערכת הנתונים החיצוניים וחישובים טכניים:
+
+### תכונות חדשות:
+
+1. **העשרת נתונים עם חישובים טכניים:**
+   - `enrichTickersWithFullData()` - מעשירה טיקרים עם נתונים מלאים מ-`EntityDetailsAPI`
+   - כוללת כל החישובים הטכניים (ATR, Volatility, MA 20/150, 52W)
+   - משתמשת ב-cache לשיפור ביצועים
+
+2. **שמירת חישובים טכניים:**
+   - חישובים טכניים נשמרים ב-`UnifiedCacheManager` עם TTL של שעה
+   - Cache key: `ticker-full-{tickerId}`
+   - זמינים מיד בטעינת הדף הבאה
+
+3. **בדיקת שלמות חישובים:**
+   - `checkTickerDataCompleteness()` - בודקת את שלמות החישובים הטכניים
+   - מחזירה מידע על חישובים חסרים ואחוז שלמות
+
+### שימוש:
+
+```javascript
+// העשרת טיקרים עם חישובים טכניים
+const enrichedTickers = await enrichTickersWithFullData(tickers, {
+  showProgress: true,
+  forceRefresh: false
+});
+
+// בדיקת שלמות חישובים
+const completeness = checkTickerDataCompleteness(ticker);
+// completeness.hasATR, completeness.hasVolatility, completeness.hasMA20, etc.
+```
+
+### מיקום בקוד:
+
+- `trading-ui/scripts/tickers.js` - `enrichTickersWithFullData()`, `checkTickerDataCompleteness()`
+- `trading-ui/scripts/ticker-dashboard.js` - `checkMissingData()` (גרסה מקורית)
+
+---
+
 ## 🔗 קישורים רלוונטיים
 
 - [דרישות נתונים לדשבורד טיקר](TICKER_DASHBOARD_DATA_REQUIREMENTS.md)
+- [אינטגרציה עם מערכת נתונים חיצוניים](TICKERS_DASHBOARD_EXTERNAL_DATA_INTEGRATION.md)
 - [תוכנית שיפורים לדשבורד טיקר](../03-DEVELOPMENT/PLANS/TICKER_DASHBOARD_IMPROVEMENTS_PLAN.md)
 - [דוח בדיקות דשבורד טיקר](../05-REPORTS/TICKER_DASHBOARD_TEST_REPORT.md)
 

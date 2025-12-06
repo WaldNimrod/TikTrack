@@ -8,6 +8,9 @@
     <!-- Bootstrap CSS (חובה ראשון) -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css?v=0da3519a_20251102_104906">
 
+    <!-- Bootstrap Icons CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
     <!-- TikTrack ITCSS Master Styles -->
     <link rel="stylesheet" href="../styles-new/master.css?v=1.0.0">
 </head>
@@ -30,7 +33,7 @@
     <div class="modal fade show" id="watchListModal" tabindex="-1" style="display: block;" role="dialog">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
-                <div class="modal-header">
+                <div class="modal-header modal-header-colored">
                     <h5 class="modal-title" id="watchListModalTitle">רשימה חדשה</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
@@ -45,48 +48,90 @@
                                    maxlength="100"
                                    placeholder="לדוגמה: מניות טכנולוגיה">
                         </div>
-                        <div class="mb-3">
-                            <label for="watchListIcon" class="form-label">איקון</label>
-                            <select class="form-select" id="watchListIcon">
-                                <option value="">ללא איקון</option>
-                                <option value="chart-line">גרף</option>
-                                <option value="flame">אש</option>
-                                <option value="coins">מטבעות</option>
-                                <option value="eye">עין</option>
-                                <option value="star">כוכב</option>
-                                <option value="heart">לב</option>
-                            </select>
-                            <small class="form-text text-muted">איקון שיוצג בכרטיס הרשימה</small>
-                        </div>
-                        <div class="mb-3">
-                            <label for="watchListColor" class="form-label">צבע</label>
-                            <div class="row g-2">
-                                <div class="col-md-6">
-                                    <input type="color" 
-                                           class="form-control form-control-color" 
-                                           id="watchListColor" 
-                                           value="#26baac"
-                                           title="בחר צבע">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">איקון</label>
+                                <div class="icon-selector-wrapper">
+                                    <button type="button" 
+                                            class="btn btn-outline-secondary icon-selector-trigger" 
+                                            id="iconSelectorTrigger"
+                                            data-bs-toggle="dropdown"
+                                            data-bs-auto-close="outside"
+                                            aria-expanded="false">
+                                        <span id="selectedIconPreview" class="selected-icon-preview">
+                                            <span class="icon-preview-placeholder">ללא איקון</span>
+                                        </span>
+                                        <i class="bi bi-chevron-down ms-2"></i>
+                                    </button>
+                                    <div class="dropdown-menu icon-selector-dropdown" id="iconSelectorDropdown">
+                                        <!-- Tabs for icon libraries -->
+                                        <ul class="nav nav-tabs icon-library-tabs" role="tablist">
+                                            <li class="nav-item" role="presentation">
+                                                <button class="nav-link active" 
+                                                        id="tabler-tab" 
+                                                        data-bs-toggle="tab" 
+                                                        data-bs-target="#tabler-icons" 
+                                                        type="button" 
+                                                        role="tab"
+                                                        onclick="event.stopPropagation();">
+                                                    Tabler
+                                                </button>
+                                            </li>
+                                            <li class="nav-item" role="presentation">
+                                                <button class="nav-link" 
+                                                        id="bootstrap-tab" 
+                                                        data-bs-toggle="tab" 
+                                                        data-bs-target="#bootstrap-icons" 
+                                                        type="button" 
+                                                        role="tab"
+                                                        onclick="event.stopPropagation();">
+                                                    Bootstrap
+                                                </button>
+                                            </li>
+                                        </ul>
+                                        <div class="tab-content icon-library-content">
+                                            <div class="tab-pane fade show active" 
+                                                 id="tabler-icons" 
+                                                 role="tabpanel">
+                                                <div id="iconSelector" class="icon-selector-grid">
+                                                    <!-- Tabler Icons will be populated by JavaScript -->
+                                                </div>
+                                            </div>
+                                            <div class="tab-pane fade" 
+                                                 id="bootstrap-icons" 
+                                                 role="tabpanel">
+                                                <div id="bootstrapIconSelector" class="icon-selector-grid">
+                                                    <!-- Bootstrap Icons will be populated by JavaScript -->
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="col-md-6">
-                                    <input type="text" 
-                                           class="form-control" 
-                                           id="watchListColorHex" 
-                                           value="#26baac"
-                                           placeholder="#26baac"
-                                           pattern="^#[0-9A-Fa-f]{6}$">
-                                    <small class="form-text text-muted">Hex color code</small>
-                                </div>
+                                <input type="hidden" id="watchListIcon" value="">
+                                <input type="hidden" id="watchListIconLibrary" value="tabler">
+                                <small class="form-text text-muted">איקון שיוצג בכרטיס הרשימה</small>
                             </div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="watchListViewMode" class="form-label">תצוגה ברירת מחדל</label>
-                            <select class="form-select" id="watchListViewMode">
-                                <option value="table">טבלה</option>
-                                <option value="cards">כרטיסים</option>
-                                <option value="compact">קומפקטי</option>
-                            </select>
-                            <small class="form-text text-muted">תצוגה שתוצג בעת פתיחת הרשימה</small>
+                            <div class="col-md-6">
+                                <label class="form-label">תצוגה ברירת מחדל</label>
+                                <div class="view-mode-selector">
+                                    <div class="btn-group view-mode-radio" role="group" aria-label="View mode selection">
+                                        <input type="radio" class="btn-check" name="viewMode" id="viewModeTable" value="table" checked>
+                                        <label class="btn btn-outline-primary" for="viewModeTable" data-bs-toggle="tooltip" data-bs-placement="top" title="טבלה">
+                                            <i class="bi bi-table"></i>
+                                        </label>
+                                        <input type="radio" class="btn-check" name="viewMode" id="viewModeCards" value="cards">
+                                        <label class="btn btn-outline-primary" for="viewModeCards" data-bs-toggle="tooltip" data-bs-placement="top" title="כרטיסים">
+                                            <i class="bi bi-grid-3x3"></i>
+                                        </label>
+                                        <input type="radio" class="btn-check" name="viewMode" id="viewModeCompact" value="compact">
+                                        <label class="btn btn-outline-primary" for="viewModeCompact" data-bs-toggle="tooltip" data-bs-placement="top" title="קומפקטי">
+                                            <i class="bi bi-list-ul"></i>
+                                        </label>
+                                    </div>
+                                </div>
+                                <input type="hidden" id="watchListViewMode" value="table">
+                                <small class="form-text text-muted">תצוגה שתוצג בעת פתיחת הרשימה</small>
+                            </div>
                         </div>
                     </form>
                 </div>
@@ -131,7 +176,7 @@
     <script src="../scripts/modal-manager-v2.js?v=1.0.0"></script>
 
     <!-- Page-specific script -->
-    <script src="../scripts/watch-list-modal.js?v=1.0.0" defer></script>
+    <script src="../scripts/watch-list-modal.js?v=1.0.1"></script>
 </body>
 </html>
 

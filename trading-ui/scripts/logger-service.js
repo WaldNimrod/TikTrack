@@ -737,25 +737,25 @@ class Logger {
             return;
         }
 
-        // Monitor long tasks (רק במצב DEBUG)
-        if ('PerformanceObserver' in window) {
-            const observer = new PerformanceObserver(list => {
-                list.getEntries().forEach(entry => {
-                    if (entry.duration > this.longTaskThreshold) {
-                        this.performance('Long task detected', entry.duration, {
-                            name: entry.name,
-                            startTime: entry.startTime
-                        });
-                    }
-                });
-            });
-
-            try {
-                observer.observe({ entryTypes: ['longtask'] });
-            } catch (e) {
-                // Long task API not supported
-            }
-        }
+        // Monitor long tasks (רק במצב DEBUG) - disabled to reduce console noise
+        // if ('PerformanceObserver' in window) {
+        //     const observer = new PerformanceObserver(list => {
+        //         list.getEntries().forEach(entry => {
+        //             if (entry.duration > this.longTaskThreshold) {
+        //                 this.performance('Long task detected', entry.duration, {
+        //                     name: entry.name,
+        //                     startTime: entry.startTime
+        //                 });
+        //             }
+        //         });
+        //     });
+        //
+        //     try {
+        //         observer.observe({ entryTypes: ['longtask'] });
+        //     } catch (e) {
+        //         // Long task API not supported
+        //     }
+        // }
     }
 
     /**
@@ -775,7 +775,6 @@ class Logger {
             if (logsToSave.length > maxLogs) {
                 // שומרים רק את הלוגים החדשים ביותר
                 logsToSave = logsToSave.slice(-maxLogs);
-                console.warn(`⚠️ Logs truncated to ${maxLogs} entries`);
             }
 
             localStorage.setItem('tiktrack_pending_logs', JSON.stringify(logsToSave));

@@ -355,13 +355,29 @@
          * @returns {string} Prepared inline SVG HTML
          */
         _prepareInlineSVG(svgContent, size, alt, className, style) {
+            // Validate input
+            if (!svgContent || typeof svgContent !== 'string') {
+                return `<img src="/trading-ui/images/icons/tabler/alert-circle.svg" width="${size}" height="${size}" alt="${alt}" class="${className}"${style}>`;
+            }
+
             // Parse SVG using DOMParser
             const parser = new DOMParser();
             const doc = parser.parseFromString(svgContent.trim(), 'image/svg+xml');
+            
+            // Check for parser errors
+            const parserError = doc.querySelector('parsererror');
+            if (parserError) {
+                // Parsing failed - fallback to img tag
+                const iconName = alt || 'icon';
+                return `<img src="/trading-ui/images/icons/tabler/${iconName}.svg" width="${size}" height="${size}" alt="${alt}" class="${className}"${style} onerror="this.style.display='none'">`;
+            }
+
             const svgElement = doc.documentElement;
 
-            if (!svgElement) {
-                return svgContent; // Return original if parsing fails
+            if (!svgElement || svgElement.tagName !== 'svg') {
+                // Invalid SVG - fallback to img tag
+                const iconName = alt || 'icon';
+                return `<img src="/trading-ui/images/icons/tabler/${iconName}.svg" width="${size}" height="${size}" alt="${alt}" class="${className}"${style} onerror="this.style.display='none'">`;
             }
 
             // Set attributes

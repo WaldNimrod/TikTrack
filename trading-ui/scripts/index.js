@@ -333,12 +333,6 @@ function updateSummaryStats(data, currencySymbol) {
  */
 function updateRecentItemsWidget(trades = [], tradePlans = [], currencySymbol) {
     if (window.RecentItemsWidget?.render) {
-        window.Logger?.info?.('📊 Updating RecentItemsWidget', { 
-            tradesCount: Array.isArray(trades) ? trades.length : 0,
-            tradePlansCount: Array.isArray(tradePlans) ? tradePlans.length : 0,
-            currencySymbol,
-            page: 'index'
-        });
         // Build render data - only include trades/tradePlans if they have data
         // This matches the test page behavior where we only pass what we have
         const renderData = {
@@ -352,13 +346,6 @@ function updateRecentItemsWidget(trades = [], tradePlans = [], currencySymbol) {
         if (Array.isArray(tradePlans) && tradePlans.length > 0) {
             renderData.tradePlans = tradePlans;
         }
-        
-        window.Logger?.info?.('📊 Calling RecentItemsWidget.render', {
-            renderDataKeys: Object.keys(renderData),
-            tradesIncluded: renderData.hasOwnProperty('trades'),
-            tradePlansIncluded: renderData.hasOwnProperty('tradePlans'),
-            page: 'index'
-        });
         
         window.RecentItemsWidget.render(renderData);
         return;
@@ -950,27 +937,11 @@ function processDashboardData(data, source = 'network') {
     updateDashboardCount({ trades, alerts, accounts });
     updatePortfolioSummary({ accounts, trades, cashFlows }, currencySymbol);
     
-    window.Logger?.info?.('🔍 [index.js] processDashboardData - About to update widget', {
-        tradesCount: trades.length,
-        alertsCount: alerts.length,
-        accountsCount: accounts.length,
-        currencySymbol,
-        page: 'index'
-    });
-    
     // Update unified recent items widget with trades (trade plans will be loaded separately)
     // IMPORTANT: Only pass trades if we have data - don't pass empty array (it clears existing)
     // This matches the test page behavior
     if (trades && trades.length > 0) {
-        window.Logger?.info?.('🔍 [index.js] processDashboardData - Updating widget with trades', {
-            tradesCount: trades.length,
-            page: 'index'
-        });
         updateRecentItemsWidget(trades, [], currencySymbol);
-    } else {
-        window.Logger?.info?.('🔍 [index.js] processDashboardData - No trades, skipping widget update (will update when trades loaded)', {
-            page: 'index'
-        });
     }
     
     // Load and update recent trade plans (will update unified widget with both trades and plans)
@@ -1021,62 +992,24 @@ function processDashboardData(data, source = 'network') {
  * @returns {Promise<void>}
  */
 async function loadRecentTradePlans(currencySymbol, currentTrades = []) {
-    window.Logger?.info?.('🔍 [index.js] loadRecentTradePlans START', {
-        currencySymbol,
-        currentTradesCount: Array.isArray(currentTrades) ? currentTrades.length : 0,
-        TradePlansDataServiceExists: !!window.TradePlansDataService,
-        TradePlansDataServiceLoadExists: !!window.TradePlansDataService?.loadTradePlansData,
-        RecentItemsWidgetExists: !!window.RecentItemsWidget,
-        RecentItemsWidgetRenderExists: !!window.RecentItemsWidget?.render,
-        page: 'index'
-    });
-    
     try {
         let tradePlans = [];
         
         // Try to use trade plans data service if available
         if (window.TradePlansDataService?.loadTradePlansData) {
-            window.Logger?.info?.('🔍 [index.js] Using TradePlansDataService to load trade plans', { page: 'index' });
             tradePlans = await window.TradePlansDataService.loadTradePlansData({ force: false });
-            window.Logger?.info?.('🔍 [index.js] TradePlansDataService returned', {
-                isArray: Array.isArray(tradePlans),
-                count: Array.isArray(tradePlans) ? tradePlans.length : 0,
-                firstPlan: tradePlans?.[0],
-                page: 'index'
-            });
             if (!Array.isArray(tradePlans)) {
                 tradePlans = [];
-                window.Logger?.warn?.('⚠️ [index.js] TradePlansDataService returned non-array, setting to empty', { 
-                    type: typeof tradePlans,
-                    tradePlans,
-                    page: 'index' 
-                });
             }
         } else {
-            window.Logger?.info?.('🔍 [index.js] TradePlansDataService not available, fetching directly from API', { page: 'index' });
             // Fallback: fetch directly from API
             const response = await fetch('/api/trade-plans/', { headers: { Accept: 'application/json' } });
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             const payload = await response.json();
-            window.Logger?.info?.('🔍 [index.js] API response received', {
-                hasData: !!payload?.data,
-                isArrayData: Array.isArray(payload?.data),
-                isArrayRoot: Array.isArray(payload),
-                dataCount: Array.isArray(payload?.data) ? payload.data.length : (Array.isArray(payload) ? payload.length : 0),
-                page: 'index'
-            });
             tradePlans = Array.isArray(payload?.data) ? payload.data : (Array.isArray(payload) ? payload : []);
         }
-        
-        window.Logger?.info?.('🔍 [index.js] About to update RecentItemsWidget', {
-            tradePlansCount: tradePlans.length,
-            currentTradesCount: Array.isArray(currentTrades) ? currentTrades.length : 0,
-            willPassTrades: Array.isArray(currentTrades) && currentTrades.length > 0,
-            currencySymbol,
-            page: 'index'
-        });
         
         // Update unified widget if available
         if (window.RecentItemsWidget?.render) {
@@ -1093,21 +1026,7 @@ async function loadRecentTradePlans(currencySymbol, currentTrades = []) {
             }
             // If currentTrades is empty, don't pass it at all - widget will preserve existing trades from state
             
-            window.Logger?.info?.('🔍 [index.js] Calling RecentItemsWidget.render', {
-                willPassTrades: renderData.hasOwnProperty('trades'),
-                tradesCount: renderData.trades?.length || 0,
-                tradePlansCount: renderData.tradePlans?.length || 0,
-                renderDataKeys: Object.keys(renderData),
-                page: 'index'
-            });
-            
             window.RecentItemsWidget.render(renderData);
-            window.Logger?.info?.('📊 [index.js] Updated RecentItemsWidget with trade plans', {
-                tradesCount: Array.isArray(currentTrades) ? currentTrades.length : 0,
-                tradePlansCount: tradePlans.length,
-                firstTradePlan: tradePlans[0],
-                page: 'index'
-            });
         } else {
             window.Logger?.warn?.('⚠️ [index.js] RecentItemsWidget not available, falling back to separate widget', { page: 'index' });
             // Fallback to separate widget

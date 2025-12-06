@@ -924,7 +924,7 @@ async function loadExecutionsData(options = {}) {
       type: typeof rawExecutions,
       isArray: Array.isArray(rawExecutions),
       firstItem: rawExecutions?.[0] ? Object.keys(rawExecutions[0]) : null,
-      page: "executions" 
+      page: "executions"
     });
 
     executionsData = Array.isArray(rawExecutions)

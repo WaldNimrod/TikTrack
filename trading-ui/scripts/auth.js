@@ -86,11 +86,20 @@ if (typeof window.addEventListener === 'function') {
           window.dispatchEvent(new CustomEvent('logout:success'));
           window.dispatchEvent(new CustomEvent('user:logged-out'));
           
-          // Redirect to login if not already there
-          if (!window.location.pathname.includes('login.html') && 
-              !window.location.pathname.includes('register.html')) {
-            window.location.href = 'login.html';
+        // Show login modal if not already on login/register page
+        if (!window.location.pathname.includes('login.html') && 
+            !window.location.pathname.includes('register.html')) {
+          if (typeof window.TikTrackAuth?.showLoginModal === 'function') {
+            await window.TikTrackAuth.showLoginModal();
+          } else {
+            // Show login modal instead of redirecting
+      if (typeof window.TikTrackAuth?.showLoginModal === 'function') {
+        await window.TikTrackAuth.showLoginModal();
+      } else {
+        window.location.href = 'login.html';
+      }
           }
+        }
         } else if (authEvent.type === 'login') {
           // Login event from another tab - update local state
           console.log('🔔 Login event received from another tab');
@@ -412,9 +421,15 @@ async function logout() {
     window.dashboardDataState.lastLoadedAt = null;
   }
 
-  // Small delay to allow UI updates, then redirect
-  setTimeout(() => {
-    window.location.href = 'login.html';
+  // Small delay to allow UI updates, then show login modal
+  setTimeout(async () => {
+    // Show login modal instead of redirecting
+    if (typeof window.TikTrackAuth?.showLoginModal === 'function') {
+      await window.TikTrackAuth.showLoginModal();
+    } else {
+      // Fallback: redirect to login page if modal not available
+      window.location.href = 'login.html';
+    }
   }, 100);
 }
 
@@ -623,7 +638,12 @@ async function checkAuthentication(onAuthenticated = null, onNotAuthenticated = 
     // Redirect to login if not on login/register page
     if (!window.location.pathname.includes('login.html') && 
         !window.location.pathname.includes('register.html')) {
-      window.location.href = 'login.html';
+      // Show login modal instead of redirecting
+      if (typeof window.TikTrackAuth?.showLoginModal === 'function') {
+        await window.TikTrackAuth.showLoginModal();
+      } else {
+        window.location.href = 'login.html';
+      }
     }
   }
 }
@@ -696,6 +716,100 @@ function createLogoutButton(containerId) {
   button.onclick = logout;
   button.textContent = '🚪 התנתק';
   container.appendChild(button);
+}
+
+/**
+ * Show login modal instead of redirecting to login page
+ * הצגת modal כניסה במקום redirect לעמוד כניסה
+ */
+async function showLoginModal(onSuccess = null) {
+  const modalId = 'loginModal';
+  
+  // Remove existing modal if any
+  const existingModal = document.getElementById(modalId);
+  if (existingModal) {
+    existingModal.remove();
+  }
+  
+  // Remove any orphaned backdrops
+  const backdrops = document.querySelectorAll('.modal-backdrop');
+  backdrops.forEach(backdrop => backdrop.remove());
+  
+  // Create modal HTML
+  const loginModalHTML = `
+    <div class="modal fade" id="${modalId}" tabindex="-1" aria-labelledby="${modalId}Label" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header border-0 pb-0">
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="display: none;"></button>
+          </div>
+          <div class="modal-body pt-0">
+            <div id="loginModalContainer"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  // Add modal to DOM
+  document.body.insertAdjacentHTML('beforeend', loginModalHTML);
+  
+  // Create login interface inside modal
+  const container = document.getElementById('loginModalContainer');
+  if (container) {
+    createLoginInterface('loginModalContainer', async () => {
+      // On successful login, close modal and reload page or redirect
+      const modalElement = document.getElementById(modalId);
+      if (modalElement && window.bootstrap) {
+        const modal = window.bootstrap.Modal.getInstance(modalElement);
+        if (modal) {
+          modal.hide();
+        }
+      }
+      
+      // Wait a bit for modal to close, then reload or redirect
+      setTimeout(() => {
+        if (onSuccess && typeof onSuccess === 'function') {
+          onSuccess();
+        } else {
+          // Reload current page to refresh UI
+          window.location.reload();
+        }
+      }, 300);
+    });
+  }
+  
+  // Show modal using Bootstrap
+  const modalElement = document.getElementById(modalId);
+  if (modalElement) {
+    // Wait a bit for DOM to be ready
+    await new Promise(resolve => setTimeout(resolve, 100));
+    
+    if (window.bootstrap && window.bootstrap.Modal) {
+      const modal = new window.bootstrap.Modal(modalElement, {
+        backdrop: 'static',
+        keyboard: false
+      });
+      modal.show();
+    } else {
+      // Fallback: wait for Bootstrap to load
+      let attempts = 0;
+      const checkBootstrap = setInterval(() => {
+        attempts++;
+        if (window.bootstrap && window.bootstrap.Modal) {
+          clearInterval(checkBootstrap);
+          const modal = new window.bootstrap.Modal(modalElement, {
+            backdrop: 'static',
+            keyboard: false
+          });
+          modal.show();
+        } else if (attempts > 50) {
+          clearInterval(checkBootstrap);
+          console.error('Bootstrap Modal not available after waiting');
+        }
+      }, 100);
+    }
+  }
 }
 
 // פונקציה לבדיקת הרשאות
@@ -788,6 +902,7 @@ window.TikTrackAuth = {
   setLoadingState,
   register,
   loadSavedCredentials,
+  showLoginModal,
 };
 
 // Export register function globally

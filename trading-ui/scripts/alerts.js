@@ -2491,13 +2491,13 @@ async function saveAlert() {
     } else {
       // Fallback to direct API call with CRUDResponseHandler
       crudResult = await CRUDResponseHandler.handleSaveResponse(response, {
-        modalId: modalId,
-        successMessage: isEdit ? 'התראה עודכנה בהצלחה!' : 'התראה נשמרה בהצלחה!',
-        apiUrl: '/api/alerts/',
-        entityName: 'התראה',
-        reloadFn: window.loadAlertsData,
-        requiresHardReload: false
-      });
+      modalId: modalId,
+      successMessage: isEdit ? 'התראה עודכנה בהצלחה!' : 'התראה נשמרה בהצלחה!',
+      apiUrl: '/api/alerts/',
+      entityName: 'התראה',
+      reloadFn: window.loadAlertsData,
+      requiresHardReload: false
+    });
     }
     const alertRecordId = isEdit ? Number(alertId) : Number(crudResult?.data?.id || crudResult?.id);
     if (Number.isFinite(alertRecordId) && window.TagService) {
@@ -2985,7 +2985,7 @@ async function confirmDeleteAlert(alertId) {
         requiresHardReload: false
       });
     } else if (window.performAlertDeletion) {
-      // Use performAlertDeletion which handles cache clearing
+    // Use performAlertDeletion which handles cache clearing
       await window.performAlertDeletion(alertId);
     } else {
       // Fallback to direct API call with CRUDResponseHandler

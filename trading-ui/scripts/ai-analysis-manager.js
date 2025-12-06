@@ -2685,28 +2685,78 @@
           provider
         });
 
+        // Show progress overlay IMMEDIATELY (same as new analysis)
+        this.showProgressOverlay(1, 'מתחיל תהליך הרצה מחדש...', 'מאתחל את המערכת ומכין את הנתונים');
+        
+        // Force a small delay to ensure UI updates are visible
+        await new Promise(resolve => setTimeout(resolve, 50));
+
         // Validate request before generating analysis using Business Logic Layer
         if (window.AIAnalysisData?.validateAnalysisRequest) {
           try {
-            window.Logger?.info?.('🔍 Validating analysis request before rerun...', { page: 'ai-analysis' });
+            window.Logger?.info?.('🔍 Validating analysis request before rerun...', { 
+              page: 'ai-analysis',
+              templateId: templateId,
+              provider: provider,
+              variables: variables,
+              variablesType: typeof variables,
+              variablesKeys: variables ? Object.keys(variables) : []
+            });
             
-            const validationResult = await window.AIAnalysisData.validateAnalysisRequest({
+            // Update progress overlay to step 2
+            this.showProgressOverlay(2, 'מאמת נתונים...', 'בודק תקינות הנתונים והגדרות');
+            
+            const validationData = {
               template_id: templateId,
               variables: variables,
               provider: provider
+            };
+            
+            window.Logger?.debug?.('📤 Sending validation request', {
+              page: 'ai-analysis',
+              validationData: validationData
+            });
+            
+            const validationResult = await window.AIAnalysisData.validateAnalysisRequest(validationData);
+            
+            window.Logger?.debug?.('📥 Received validation result', {
+              page: 'ai-analysis',
+              validationResult: validationResult,
+              isValid: validationResult?.is_valid,
+              errors: validationResult?.errors
             });
 
             if (!validationResult.is_valid) {
-              const errorMessage = validationResult.errors.join(', ');
+              // Extract error messages - handle both array and single message
+              let errorMessages = [];
+              if (validationResult.errors) {
+                if (Array.isArray(validationResult.errors)) {
+                  errorMessages = validationResult.errors;
+                } else if (typeof validationResult.errors === 'string') {
+                  errorMessages = [validationResult.errors];
+                }
+              }
+              
+              const errorMessage = errorMessages.length > 0 
+                ? errorMessages.join('\n')
+                : 'שגיאת ולידציה לא ידועה';
               
               window.Logger?.warn?.('⚠️ Validation failed before rerun', {
                 page: 'ai-analysis',
+                validationResult: validationResult,
                 errors: validationResult.errors,
+                errorMessages: errorMessages,
+                templateId: templateId,
+                provider: provider,
+                variables: variables
               });
+              
+              // Hide progress overlay on error
+              this.hideProgressOverlay();
               
               if (window.NotificationSystem) {
                 window.NotificationSystem.showError(
-                  'שגיאת ולידציה: ' + errorMessage,
+                  'שגיאת ולידציה:\n' + errorMessage,
                   'system'
                 );
               }
@@ -2714,11 +2764,17 @@
             }
             
             window.Logger?.info?.('✅ Validation passed for rerun', { page: 'ai-analysis' });
+            
+            // Update progress overlay to step 3
+            this.showProgressOverlay(3, 'שולח בקשה למנוע AI...', 'מתחבר למנוע ומעביר את הנתונים');
           } catch (validationError) {
             window.Logger?.error?.('❌ Error during validation for rerun', {
               page: 'ai-analysis',
               error: validationError?.message || validationError,
             });
+            
+            // Hide progress overlay on error
+            this.hideProgressOverlay();
             
             if (window.NotificationSystem) {
               window.NotificationSystem.showError(
@@ -2732,8 +2788,11 @@
 
         // Show loading notification
         if (window.NotificationSystem) {
-          window.NotificationSystem.showInfo('מריץ ניתוח מחדש...', 'system');
+          window.NotificationSystem.showInfo('📤 שולח בקשה לשרת... ממתין לתגובת המנוע', 'system', { duration: 8000 });
         }
+
+        // Update progress overlay to step 4
+        this.showProgressOverlay(4, 'ממתין לתגובת המנוע...', 'המנוע מעבד את הבקשה - זה עלול לקחת 30-60 שניות');
 
         // Call generate API
         const apiUrl = window.API_BASE_URL 
@@ -2753,6 +2812,43 @@
           })
         });
 
+        // Check if response is OK
+        if (!response.ok) {
+          let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+          try {
+            const errorData = await response.json();
+            if (errorData.error?.message) {
+              errorMessage = errorData.error.message;
+            } else if (errorData.message) {
+              errorMessage = errorData.message;
+            }
+          } catch (e) {
+            // Ignore JSON parse errors
+          }
+          
+          window.Logger?.error('Rerun API call failed', {
+            page: 'ai-analysis',
+            status: response.status,
+            statusText: response.statusText,
+            errorMessage
+          });
+          
+          if (window.NotificationSystem) {
+            window.NotificationSystem.showError(
+              `שגיאה בהרצה חוזרת: ${errorMessage}`,
+              'system'
+            );
+          }
+          
+          // Hide progress overlay on error
+          this.hideProgressOverlay();
+          
+          return;
+        }
+
+        // Update progress overlay to step 5
+        this.showProgressOverlay(5, 'מעבד תוצאות...', 'מכין את הדוח הסופי ושומר במטמון');
+
         // Read response and save pendingResult BEFORE calling CRUDResponseHandler (same as handleGenerateAnalysis)
         const responseClone = response.clone();
         let responseData = null;
@@ -2761,9 +2857,59 @@
         try {
           responseData = await response.json();
           
+          // Check if response indicates failure
+          if (responseData.status === 'error' || (responseData.status === 'success' && responseData.data && responseData.data.status === 'failed')) {
+            const errorMessage = responseData.data?.error_message || responseData.error?.message || responseData.message || 'הניתוח נכשל';
+            
+            window.Logger?.warn('Rerun analysis failed', {
+              page: 'ai-analysis',
+              status: responseData.status,
+              errorMessage,
+              errorData: responseData.error
+            });
+            
+            if (window.NotificationSystem) {
+              window.NotificationSystem.showError(
+                `שגיאה בהרצה חוזרת: ${errorMessage}`,
+                'system'
+              );
+            }
+            
+            // Hide progress overlay on error
+            this.hideProgressOverlay();
+            
+            return;
+          }
+          
           // Extract result from response
           if (responseData.status === 'success' && responseData.data) {
             result = responseData.data;
+            
+            // Check if result status is failed
+            if (result.status === 'failed') {
+              const errorMessage = result.error_message || 'הניתוח נכשל';
+              
+              window.Logger?.warn('Rerun analysis result is failed', {
+                page: 'ai-analysis',
+                requestId: result.id,
+                errorMessage
+              });
+              
+              if (window.NotificationSystem) {
+                window.NotificationSystem.showError(
+                  `הניתוח נכשל: ${errorMessage}`,
+                  'system'
+                );
+              }
+              
+              // Hide progress overlay on failure
+              this.hideProgressOverlay();
+              
+              // Still show the failed result in modal
+              this.currentAnalysis = result;
+              await this.openResultsModal(result);
+              return;
+            }
             
             // Store result for display after reload - MUST be set BEFORE reloadFn is called
             this.pendingResult = result;
@@ -2852,6 +2998,9 @@
                     updatedResult.response_text = this.pendingResult.response_text;
                   }
                   
+                  // Hide progress overlay before opening results modal
+                  this.hideProgressOverlay();
+                  
                   await this.openResultsModal(updatedResult);
                   this.pendingResult = null; // Clear pending result
                 } else {
@@ -2919,6 +3068,9 @@
             window.updatePageSummaryStats('ai-analysis', this.history);
           }
           
+            // Hide progress overlay before opening results modal
+            this.hideProgressOverlay();
+            
             // Open results modal after history is updated
             if (result.data && result.data.id) {
               // Ensure we have the latest result with cache info
@@ -2930,6 +3082,9 @@
           }
         }
       } catch (error) {
+        // Hide progress overlay on error
+        this.hideProgressOverlay();
+        
         window.Logger?.error('Error re-running analysis', error, { page: 'ai-analysis' });
         if (window.NotificationSystem) {
           window.NotificationSystem.showError(
@@ -3247,22 +3402,34 @@
           }
         }
 
-        // Check cache first
+        // Check if item already has response_text (from history or API load)
         let analysisResult = null;
-        if (window.UnifiedCacheManager && item.id) {
-          const cacheKey = `ai-analysis-response-${item.id}`;
-          const cachedData = await window.UnifiedCacheManager.get(cacheKey);
-          if (cachedData && cachedData.response_text) {
-            window.Logger?.debug('Found analysis response in cache', { page: 'ai-analysis', id: item.id });
-            analysisResult = {
-              ...item,
-              response_text: cachedData.response_text,
-              response_json: cachedData.response_json
-            };
+        if (item.response_text) {
+          window.Logger?.debug('Found analysis response in item', { page: 'ai-analysis', id: item.id });
+          analysisResult = {
+            ...item,
+            response_text: item.response_text,
+            response_json: item.response_json
+          };
+        }
+
+        // Check cache if not in item
+        if (!analysisResult || !analysisResult.response_text) {
+          if (window.UnifiedCacheManager && item.id) {
+            const cacheKey = `ai-analysis-response-${item.id}`;
+            const cachedData = await window.UnifiedCacheManager.get(cacheKey);
+            if (cachedData && cachedData.response_text) {
+              window.Logger?.debug('Found analysis response in cache', { page: 'ai-analysis', id: item.id });
+              analysisResult = {
+                ...item,
+                response_text: cachedData.response_text,
+                response_json: cachedData.response_json
+              };
+            }
           }
         }
 
-        // If not in cache, try to load from API
+        // If not in item or cache, try to load from API
         if (!analysisResult || !analysisResult.response_text) {
           const response = await fetch(`/api/ai-analysis/history/${item.id}`, {
             credentials: 'include',

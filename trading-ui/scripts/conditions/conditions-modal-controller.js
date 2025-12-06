@@ -102,6 +102,19 @@
         }
 
         setupModal() {
+            // Skip modal setup on auth pages (login, register, etc.)
+            const isAuthPage = window.location.pathname.includes('login.html') ||
+                             window.location.pathname.includes('register.html') ||
+                             window.location.pathname.includes('forgot-password.html') ||
+                             window.location.pathname.includes('reset-password.html') ||
+                             document.body.classList.contains('login-page') ||
+                             document.body.classList.contains('auth-page');
+            
+            if (isAuthPage) {
+                // Silently skip - no modal needed on auth pages
+                return;
+            }
+            
             this.modalElement = document.getElementById(MODAL_ID);
             if (!this.modalElement) {
                 if (window.ModalManagerV2 && window.conditionsModalConfig) {
@@ -115,6 +128,7 @@
             }
 
             if (!this.modalElement) {
+                // Only warn if not on auth page - modal might be needed later
                 window.Logger?.warn('[ConditionsModalController] Modal element not found', { page: 'conditions-modal-controller' });
                 return;
             }

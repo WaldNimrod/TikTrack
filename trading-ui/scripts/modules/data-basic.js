@@ -1268,9 +1268,25 @@ function setColumnDefinition(tableName, columnName, definition) {
 // table-mappings.js is the authoritative source for UI table mappings.
 
 // Only export if table-mappings.js hasn't already set these (table-mappings.js should load first)
+// Note: table-mappings.js is optional - not needed for pages without tables (e.g., dashboard/index)
 if (!window.TABLE_COLUMN_MAPPINGS || Object.keys(window.TABLE_COLUMN_MAPPINGS).length === 0) {
   window.TABLE_COLUMN_MAPPINGS = LEGACY_TABLE_COLUMN_MAPPINGS;
-  console.warn('⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!');
+  // Only warn if we're on a page that actually uses tables (exclude index/dashboard page)
+  const isIndexPage = window.location.pathname === '/' ||
+                      window.location.pathname === '/index.html' ||
+                      window.location.pathname.includes('/index') ||
+                      document.body.classList.contains('index-page');
+  
+  if (!isIndexPage) {
+    const isTablePage = document.querySelector('table[data-table-type]') || 
+                        window.location.pathname.includes('trades') ||
+                        window.location.pathname.includes('tickers') ||
+                        window.location.pathname.includes('executions') ||
+                        window.location.pathname.includes('trade_plans');
+    if (isTablePage) {
+      console.warn('⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!');
+    }
+  }
 } else {
   // table-mappings.js already loaded - don't override, but merge any missing mappings
   // This is for database display pages that might need the legacy mappings

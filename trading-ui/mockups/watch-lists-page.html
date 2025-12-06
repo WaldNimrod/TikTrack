@@ -15,6 +15,9 @@
     <!-- Bootstrap CSS (חובה ראשון) -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css?v=0da3519a_20251102_104906">
     
+    <!-- Bootstrap Icons CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
     <!-- TikTrack ITCSS Master Styles -->
     <link rel="stylesheet" href="../styles-new/master.css?v=1.0.0">
 
@@ -78,7 +81,6 @@
     <link rel="stylesheet" href="../styles-new/06-components/_watch-lists.css?v=1.0.0">
     
     <!-- Header System (Must load early) -->
-    <script src="../scripts/header-system.js" defer></script>
     <script>
         // Auto-initialize HeaderSystem when DOM is ready
         (function() {
@@ -118,8 +120,8 @@
     -->
     <!-- LOCK: DO NOT MODIFY - Page Structure -->
     <div class="container-fluid page-container">
-        <!-- ===== TEMPLATE ZONE 1: BACKGROUND WRAPPER (LOCKED) ===== -->
-        <div class="background-wrapper">
+                    <!-- ===== TEMPLATE ZONE 1: BACKGROUND WRAPPER (LOCKED) ===== -->
+<div class="background-wrapper">
         <!-- ===== TEMPLATE ZONE 2: HEADER SYSTEM (LOCKED - DO NOT TOUCH) ===== -->
         <div id="unified-header"></div>
 
@@ -137,16 +139,10 @@
                                     <div class="table-actions">
                                         <button type="button"
                                                 data-button-type="ADD"
-                                                data-variant="primary"
+                                                data-style="negative"
                                                 data-icon="➕"
                                                 data-text="רשימה חדשה"
                                                 data-onclick="window.WatchListsPage?.openAddListModal()">
-                                        </button>
-                                        <button type="button"
-                                                data-button-type="REFRESH"
-                                                data-icon="🔄"
-                                                data-text="רענן"
-                                                data-onclick="window.WatchListsPage?.refreshAll()">
                                         </button>
                                         <button type="button"
                                                 data-button-type="TOGGLE"
@@ -157,35 +153,12 @@
                                     </div>
                                 </div>
                                 <div class="section-body">
-                                    <p class="text-muted mb-3">
-                                        ניהול רשימות צפייה מותאמות אישית לטיקרים. אפשרות להוסיף טיקרים מהמערכת וגם טיקרים חיצוניים עם מעקב אחר מחירים.
-                                    </p>
-                                    <!-- Summary Stats -->
-                                    <div class="row g-3" id="watchListsSummary">
-                                        <div class="col-md-3 col-sm-6">
-                                            <div class="info-card info-card-primary">
-                                                <div class="info-card-label">סה״כ רשימות</div>
-                                                <div class="info-card-value" id="totalWatchLists">3</div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-3 col-sm-6">
-                                            <div class="info-card info-card-secondary">
-                                                <div class="info-card-label">טיקרים כולל</div>
-                                                <div class="info-card-value" id="totalTickers">42</div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-3 col-sm-6">
-                                            <div class="info-card info-card-success">
-                                                <div class="info-card-label">דגלים פעילים</div>
-                                                <div class="info-card-value" id="activeFlags">5</div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-3 col-sm-6">
-                                            <div class="info-card info-card-warning">
-                                                <div class="info-card-label">טיקרים חיצוניים</div>
-                                                <div class="info-card-value" id="externalTickers">8</div>
-                                            </div>
-                                        </div>
+                                    <!-- אלמנט סיכום מידע -->
+                                    <div class="info-summary" id="summaryStats">
+                                        <div>סה״כ רשימות: <strong id="totalWatchLists">3</strong></div>
+                                        <div>טיקרים כולל: <strong id="totalTickers">42</strong></div>
+                                        <div>דגלים פעילים: <strong id="activeFlags">5</strong></div>
+                                        <div>טיקרים חיצוניים: <strong id="externalTickers">8</strong></div>
                                     </div>
                                 </div>
                             </div>
@@ -207,56 +180,85 @@
                                     </div>
                                 </div>
                                 <div class="section-body">
-                                    <div class="row g-3" id="watchListsGrid">
-                                        <!-- Watch List Card 1 -->
-                                        <div class="col-md-4 col-sm-6" data-watch-list-id="1" draggable="true">
-                                            <div class="watch-list-card">
-                                                <div class="watch-list-card-header" data-bg-color="rgba(38, 186, 172, 0.1)">
-                                                    <div class="watch-list-card-icon">
-                                                        <span class="icon-placeholder icon" data-icon="chart-line" data-size="24" data-alt="chart-line" aria-label="chart-line"></span>
-                                                    </div>
-                                                    <div class="watch-list-card-actions">
+                                    <div class="table-responsive" id="watchListsContainer">
+                                        <table class="table table-striped align-middle" id="watchListsTable" data-table-type="watch_lists">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th class="col-icon">איקון</th>
+                                                    <th class="col-name">
+                                                        <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(1, window.WatchListsPage?.watchListsData || [], 'watch_lists', window.WatchListsPage?.updateWatchListsTable); }" style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">שם רשימה <span class="sort-icon">↕</span></button>
+                                                    </th>
+                                                    <th class="col-view-mode">תצוגה</th>
+                                                    <th class="col-tickers">
+                                                        <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(3, window.WatchListsPage?.watchListsData || [], 'watch_lists', window.WatchListsPage?.updateWatchListsTable); }" style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">טיקרים <span class="sort-icon">↕</span></button>
+                                                    </th>
+                                                    <th class="col-actions actions-cell actions-3-items"></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="watchListsTableBody">
+                                                <tr data-watch-list-id="1">
+                                                    <td class="col-icon">
+                                                        <span class="icon-placeholder icon" data-icon="chart-line" data-size="20" data-alt="chart-line" aria-label="chart-line"></span>
+                                                    </td>
+                                                    <td class="col-name">
+                                                        <strong>מניות טכנולוגיה</strong>
+                                                    </td>
+                                                    <td class="col-view-mode">
+                                                        <span class="icon-placeholder icon" data-icon="table" data-size="16" data-alt="table" aria-label="table"></span>
+                                                        <span class="ms-2">טבלה</span>
+                                                    </td>
+                                                    <td class="col-tickers">
+                                                            <span class="icon-placeholder icon" data-icon="list" data-size="14" data-alt="items" aria-label="items"></span>
+                                                        15 טיקרים
+                                                    </td>
+                                                    <td class="col-actions">
+                                                        <div class="btn-group" role="group">
+                                                            <button type="button"
+                                                                    class="btn btn-sm btn-primary"
+                                                                    data-onclick="window.WatchListsPage?.selectList(1)"
+                                                                    title="פתח רשימה">
+                                                                פתח
+                                                            </button>
                                                         <button type="button"
                                                                 data-button-type="EDIT"
                                                                 data-variant="small"
+                                                                    data-text=""
                                                                 data-onclick="window.WatchListsPage?.editList(1)"
                                                                 title="עריכה">
                                                         </button>
                                                         <button type="button"
                                                                 data-button-type="DELETE"
                                                                 data-variant="small"
+                                                                    data-text=""
                                                                 data-onclick="window.WatchListsPage?.deleteList(1)"
                                                                 title="מחיקה">
                                                         </button>
                                                     </div>
-                                                </div>
-                                                <div class="watch-list-card-body">
-                                                    <h5 class="watch-list-card-title">מניות טכנולוגיה</h5>
-                                                    <div class="watch-list-card-stats">
-                                                        <span class="stat-item">
-                                                            <span class="icon-placeholder icon" data-icon="chart-line" data-size="14" data-alt="items" aria-label="items"></span>
-                                                            15 טיקרים
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                                <div class="watch-list-card-footer">
+                                                    </td>
+                                                </tr>
+                                                <tr data-watch-list-id="2">
+                                                    <td class="col-icon">
+                                                        <span class="icon-placeholder icon" data-icon="flame" data-size="20" data-alt="flame" aria-label="flame"></span>
+                                                    </td>
+                                                    <td class="col-name">
+                                                        <strong>אנרגיה</strong>
+                                                    </td>
+                                                    <td class="col-view-mode">
+                                                        <span class="icon-placeholder icon" data-icon="cards" data-size="16" data-alt="cards" aria-label="cards"></span>
+                                                        <span class="ms-2">כרטיסים</span>
+                                                    </td>
+                                                    <td class="col-tickers">
+                                                        <span class="icon-placeholder icon" data-icon="items" data-size="14" data-alt="items" aria-label="items"></span>
+                                                        12 טיקרים
+                                                    </td>
+                                                    <td class="col-actions">
+                                                        <div class="btn-group" role="group">
                                                     <button type="button"
-                                                            class="btn btn-sm btn-primary w-100"
-                                                            data-onclick="window.WatchListsPage?.selectList(1)">
-                                                        פתח רשימה
+                                                                    class="btn btn-sm btn-primary"
+                                                                    data-onclick="window.WatchListsPage?.selectList(2)"
+                                                                    title="פתח רשימה">
+                                                                פתח
                                                     </button>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- Watch List Card 2 -->
-                                        <div class="col-md-4 col-sm-6" data-watch-list-id="2" draggable="true">
-                                            <div class="watch-list-card">
-                                                <div class="watch-list-card-header" data-bg-color="rgba(252, 90, 6, 0.1)">
-                                                    <div class="watch-list-card-icon">
-                                                        <span class="icon-placeholder icon" data-icon="flame" data-size="24" data-alt="flame" aria-label="flame"></span>
-                                                    </div>
-                                                    <div class="watch-list-card-actions">
                                                         <button type="button"
                                                                 data-button-type="EDIT"
                                                                 data-variant="small"
@@ -270,34 +272,31 @@
                                                                 title="מחיקה">
                                                         </button>
                                                     </div>
-                                                </div>
-                                                <div class="watch-list-card-body">
-                                                    <h5 class="watch-list-card-title">אנרגיה</h5>
-                                                    <div class="watch-list-card-stats">
-                                                        <span class="stat-item">
-                                                            <span class="icon-placeholder icon" data-icon="chart-line" data-size="14" data-alt="items" aria-label="items"></span>
-                                                            12 טיקרים
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                                <div class="watch-list-card-footer">
+                                                    </td>
+                                                </tr>
+                                                <tr data-watch-list-id="3">
+                                                    <td class="col-icon">
+                                                        <span class="icon-placeholder icon" data-icon="coins" data-size="20" data-alt="coins" aria-label="coins"></span>
+                                                    </td>
+                                                    <td class="col-name">
+                                                        <strong>קריפטו</strong>
+                                                    </td>
+                                                    <td class="col-view-mode">
+                                                        <span class="icon-placeholder icon" data-icon="list" data-size="16" data-alt="compact" aria-label="compact"></span>
+                                                        <span class="ms-2">קומפקטי</span>
+                                                    </td>
+                                                    <td class="col-tickers">
+                                                            <span class="icon-placeholder icon" data-icon="list" data-size="14" data-alt="items" aria-label="items"></span>
+                                                        15 טיקרים
+                                                    </td>
+                                                    <td class="col-actions">
+                                                        <div class="btn-group" role="group">
                                                     <button type="button"
-                                                            class="btn btn-sm btn-primary w-100"
-                                                            data-onclick="window.WatchListsPage?.selectList(2)">
-                                                        פתח רשימה
+                                                                    class="btn btn-sm btn-primary"
+                                                                    data-onclick="window.WatchListsPage?.selectList(3)"
+                                                                    title="פתח רשימה">
+                                                                פתח
                                                     </button>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- Watch List Card 3 -->
-                                        <div class="col-md-4 col-sm-6" data-watch-list-id="3" draggable="true">
-                                            <div class="watch-list-card">
-                                                <div class="watch-list-card-header" data-bg-color="rgba(40, 167, 69, 0.1)">
-                                                    <div class="watch-list-card-icon">
-                                                        <span class="icon-placeholder icon" data-icon="coins" data-size="24" data-alt="coins" aria-label="coins"></span>
-                                                    </div>
-                                                    <div class="watch-list-card-actions">
                                                         <button type="button"
                                                                 data-button-type="EDIT"
                                                                 data-variant="small"
@@ -311,25 +310,10 @@
                                                                 title="מחיקה">
                                                         </button>
                                                     </div>
-                                                </div>
-                                                <div class="watch-list-card-body">
-                                                    <h5 class="watch-list-card-title">קריפטו</h5>
-                                                    <div class="watch-list-card-stats">
-                                                        <span class="stat-item">
-                                                            <span class="icon-placeholder icon" data-icon="chart-line" data-size="14" data-alt="items" aria-label="items"></span>
-                                                            15 טיקרים
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                                <div class="watch-list-card-footer">
-                                                    <button type="button"
-                                                            class="btn btn-sm btn-primary w-100"
-                                                            data-onclick="window.WatchListsPage?.selectList(3)">
-                                                        פתח רשימה
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
                                     </div>
                                 </div>
                             </section>
@@ -339,7 +323,15 @@
                                 <div class="section-header">
                                     <div class="table-title">
                                         <span class="icon-placeholder icon" data-icon="table" data-size="16" data-alt="table" aria-label="table"></span>
-                                        <span id="activeListTitle">מניות טכנולוגיה</span>
+                                        <select id="activeListSelect" 
+                                                class="form-select form-select-sm d-inline-block" 
+                                                style="width: auto; min-width: 200px; margin-inline-start: 0.5rem;"
+                                                data-onchange="window.WatchListsPage?.switchList(this.value)"
+                                                title="בחר רשימה">
+                                            <option value="1" selected>מניות טכנולוגיה</option>
+                                            <option value="2">אנרגיה</option>
+                                            <option value="3">קריפטו</option>
+                                        </select>
                                     </div>
                                     <div class="table-actions">
                                         <!-- View Mode Toggle -->
@@ -348,35 +340,47 @@
                                                     class="btn btn-sm btn-outline-primary btn-view-mode active"
                                                     data-view-mode="table"
                                                     data-onclick="window.WatchListsPage?.setViewMode('table')"
-                                                    title="תצוגת טבלה">
-                                                <span class="icon-placeholder icon" data-icon="table" data-size="16" data-alt="table" aria-label="table"></span>
+                                                    title="תצוגת טבלה"
+                                                    data-bs-toggle="tooltip"
+                                                    data-bs-placement="top">
+                                                <i class="bi bi-table"></i>
                                             </button>
                                             <button type="button"
                                                     class="btn btn-sm btn-outline-primary btn-view-mode"
                                                     data-view-mode="cards"
                                                     data-onclick="window.WatchListsPage?.setViewMode('cards')"
-                                                    title="תצוגת כרטיסים">
-                                                <span class="icon-placeholder icon" data-icon="cards" data-size="16" data-alt="cards" aria-label="cards"></span>
+                                                    title="תצוגת כרטיסים"
+                                                    data-bs-toggle="tooltip"
+                                                    data-bs-placement="top">
+                                                <i class="bi bi-grid-3x3"></i>
                                             </button>
                                             <button type="button"
                                                     class="btn btn-sm btn-outline-primary btn-view-mode"
                                                     data-view-mode="compact"
                                                     data-onclick="window.WatchListsPage?.setViewMode('compact')"
-                                                    title="תצוגה קומפקטית">
-                                                <span class="icon-placeholder icon" data-icon="list" data-size="16" data-alt="compact" aria-label="compact"></span>
+                                                    title="תצוגה קומפקטית"
+                                                    data-bs-toggle="tooltip"
+                                                    data-bs-placement="top">
+                                                <i class="bi bi-list-ul"></i>
                                             </button>
                                         </div>
                                         <button type="button"
                                                 data-button-type="ADD"
                                                 data-icon="➕"
                                                 data-text="הוסף טיקר"
-                                                data-onclick="window.WatchListsPage?.addTicker()">
+                                                data-onclick="window.WatchListsPage?.addTicker()"
+                                                data-bs-toggle="tooltip"
+                                                data-bs-placement="top"
+                                                title="הוסף טיקר לרשימה">
                                         </button>
                                         <button type="button"
                                                 data-button-type="TOGGLE"
                                                 data-variant="small"
                                                 data-onclick="toggleSection('active-list-section')"
-                                                data-text="הצג/הסתר">
+                                                data-text="הצג/הסתר"
+                                                data-bs-toggle="tooltip"
+                                                data-bs-placement="top"
+                                                title="הצג/הסתר רשימה">
                                         </button>
                                     </div>
                                 </div>
@@ -388,13 +392,22 @@
                                                 <thead class="table-light">
                                                     <tr>
                                                         <th class="drag-handle-column"></th>
-                                                        <th class="sortable-header">Symbol</th>
-                                                        <th class="sortable-header">Name</th>
-                                                        <th class="sortable-header">Price</th>
-                                                        <th class="sortable-header">Change</th>
-                                                        <th class="sortable-header">Change %</th>
                                                         <th class="flag-column">Flag</th>
-                                                        <th class="actions-column">Actions</th>
+                                                        <th class="col-symbol">
+                                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(1, window.WatchListsPage?.watchListItemsData || [], 'watch_list_items', window.WatchListsPage?.updateWatchListItemsTable); }" style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">Symbol <span class="sort-icon">↕</span></button>
+                                                        </th>
+                                                        <th class="col-price">
+                                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(3, window.WatchListsPage?.watchListItemsData || [], 'watch_list_items', window.WatchListsPage?.updateWatchListItemsTable); }" style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">Price <span class="sort-icon">↕</span></button>
+                                                        </th>
+                                                        <th class="col-change">
+                                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(4, window.WatchListsPage?.watchListItemsData || [], 'watch_list_items', window.WatchListsPage?.updateWatchListItemsTable); }" style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">Change <span class="sort-icon">↕</span></button>
+                                                        </th>
+                                                        <th class="col-change-percent">
+                                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(5, window.WatchListsPage?.watchListItemsData || [], 'watch_list_items', window.WatchListsPage?.updateWatchListItemsTable); }" style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">Change % <span class="sort-icon">↕</span></button>
+                                                        </th>
+                                                        <th class="col-position">Position</th>
+                                                        <th class="col-pl">P/L</th>
+                                                        <th class="actions-column actions-cell actions-4-items">Actions</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody id="watchListItemsTableBody">
@@ -402,13 +415,6 @@
                                                         <td class="drag-handle-column">
                                                             <span class="drag-handle">≡</span>
                                                         </td>
-                                                        <td>
-                                                            <strong>AAPL</strong>
-                                                        </td>
-                                                        <td>Apple Inc.</td>
-                                                        <td>$150.25</td>
-                                                        <td class="text-success">+$2.10</td>
-                                                        <td class="text-success">+1.42%</td>
                                                         <td>
                                                             <button type="button"
                                                                     class="btn btn-sm btn-flag"
@@ -419,18 +425,36 @@
                                                             </button>
                                                         </td>
                                                         <td>
-                                                            <div class="btn-group" role="group">
+                                                            <strong>AAPL</strong>
+                                                        </td>
+                                                        <td>$150.25</td>
+                                                        <td class="text-success">+$2.10</td>
+                                                        <td class="text-success">+1.42%</td>
+                                                        <td>100</td>
+                                                        <td class="text-success">+$210.00</td>
+                                                        <td>
+                                                            <div class="btn-group" role="group" style="display: flex; flex-wrap: nowrap; gap: 2px;">
                                                                 <button type="button"
-                                                                        data-button-type="EDIT"
+                                                                        data-button-type="VIEW"
                                                                         data-variant="small"
-                                                                        data-onclick="window.WatchListsPage?.editItem(1)"
-                                                                        title="עריכה">
+                                                                        data-text=""
+                                                                        data-onclick="if (typeof window.showEntityDetails === 'function') { window.showEntityDetails('ticker', 1, { mode: 'view' }); }"
+                                                                        title="פרטי טיקר">
+                                                                </button>
+                                                                <button type="button"
+                                                                        data-button-type="DASHBOARD"
+                                                                        data-variant="small"
+                                                                        data-text=""
+                                                                        data-onclick="window.location.href='/ticker-dashboard.html?tickerId=1'"
+                                                                        title="דשבורד טיקר">
                                                                 </button>
                                                                 <button type="button"
                                                                         data-button-type="DELETE"
                                                                         data-variant="small"
+                                                                        data-text=""
                                                                         data-onclick="window.WatchListsPage?.removeItem(1)"
-                                                                        title="הסרה">
+                                                                        title="הסר מהרשימה"
+                                                                        style="color: #dc3545;">
                                                                 </button>
                                                             </div>
                                                         </td>
@@ -439,13 +463,6 @@
                                                         <td class="drag-handle-column">
                                                             <span class="drag-handle">≡</span>
                                                         </td>
-                                                        <td>
-                                                            <strong>MSFT</strong>
-                                                        </td>
-                                                        <td>Microsoft Corporation</td>
-                                                        <td>$378.90</td>
-                                                        <td class="text-danger">-$1.50</td>
-                                                        <td class="text-danger">-0.39%</td>
                                                         <td>
                                                             <button type="button"
                                                                     class="btn btn-sm btn-flag"
@@ -456,18 +473,36 @@
                                                             </button>
                                                         </td>
                                                         <td>
-                                                            <div class="btn-group" role="group">
+                                                            <strong>MSFT</strong>
+                                                        </td>
+                                                        <td>$378.90</td>
+                                                        <td class="text-danger">-$1.50</td>
+                                                        <td class="text-danger">-0.39%</td>
+                                                        <td>50</td>
+                                                        <td class="text-danger">-$75.00</td>
+                                                        <td>
+                                                            <div class="btn-group" role="group" style="display: flex; flex-wrap: nowrap; gap: 2px;">
                                                                 <button type="button"
-                                                                        data-button-type="EDIT"
+                                                                        data-button-type="VIEW"
                                                                         data-variant="small"
-                                                                        data-onclick="window.WatchListsPage?.editItem(2)"
-                                                                        title="עריכה">
+                                                                        data-text=""
+                                                                        data-onclick="if (typeof window.showEntityDetails === 'function') { window.showEntityDetails('ticker', 2, { mode: 'view' }); }"
+                                                                        title="פרטי טיקר">
+                                                                </button>
+                                                                <button type="button"
+                                                                        data-button-type="DASHBOARD"
+                                                                        data-variant="small"
+                                                                        data-text=""
+                                                                        data-onclick="window.location.href='/ticker-dashboard.html?tickerId=2'"
+                                                                        title="דשבורד טיקר">
                                                                 </button>
                                                                 <button type="button"
                                                                         data-button-type="DELETE"
                                                                         data-variant="small"
+                                                                        data-text=""
                                                                         data-onclick="window.WatchListsPage?.removeItem(2)"
-                                                                        title="הסרה">
+                                                                        title="הסר מהרשימה"
+                                                                        style="color: #dc3545;">
                                                                 </button>
                                                             </div>
                                                         </td>
@@ -477,14 +512,6 @@
                                                             <span class="drag-handle">≡</span>
                                                         </td>
                                                         <td>
-                                                            <strong>TSLA</strong>
-                                                            <span class="badge bg-secondary ms-2">חיצוני</span>
-                                                        </td>
-                                                        <td>Tesla Inc.</td>
-                                                        <td>$245.80</td>
-                                                        <td class="text-danger">-$2.10</td>
-                                                        <td class="text-danger">-0.85%</td>
-                                                        <td>
                                                             <button type="button"
                                                                     class="btn btn-sm btn-flag"
                                                                     data-onclick="window.WatchListsPage?.showFlagPalette(3)"
@@ -493,18 +520,37 @@
                                                             </button>
                                                         </td>
                                                         <td>
-                                                            <div class="btn-group" role="group">
-                                                                <button type="button"
-                                                                        data-button-type="EDIT"
+                                                            <strong>TSLA</strong>
+                                                            <span class="badge bg-secondary ms-2">חיצוני</span>
+                                                        </td>
+                                                        <td>$245.80</td>
+                                                        <td class="text-danger">-$2.10</td>
+                                                        <td class="text-danger">-0.85%</td>
+                                                        <td>75</td>
+                                                        <td class="text-danger">-$157.50</td>
+                                                        <td>
+                                                            <div class="btn-group" role="group" style="display: flex; flex-wrap: nowrap; gap: 2px;">
+                                                            <button type="button"
+                                                                        data-button-type="VIEW"
                                                                         data-variant="small"
-                                                                        data-onclick="window.WatchListsPage?.editItem(3)"
-                                                                        title="עריכה">
+                                                                        data-text=""
+                                                                        data-onclick="if (typeof window.showEntityDetails === 'function') { window.showEntityDetails('ticker', 3, { mode: 'view' }); }"
+                                                                        title="פרטי טיקר">
+                                                            </button>
+                                                                <button type="button"
+                                                                        data-button-type="DASHBOARD"
+                                                                        data-variant="small"
+                                                                        data-text=""
+                                                                        data-onclick="window.location.href='/ticker-dashboard.html?tickerId=3'"
+                                                                        title="דשבורד טיקר">
                                                                 </button>
                                                                 <button type="button"
                                                                         data-button-type="DELETE"
                                                                         data-variant="small"
+                                                                        data-text=""
                                                                         data-onclick="window.WatchListsPage?.removeItem(3)"
-                                                                        title="הסרה">
+                                                                        title="הסר מהרשימה"
+                                                                        style="color: #dc3545;">
                                                                 </button>
                                                             </div>
                                                         </td>
@@ -514,13 +560,6 @@
                                                             <span class="drag-handle">≡</span>
                                                         </td>
                                                         <td>
-                                                            <strong>GOOGL</strong>
-                                                        </td>
-                                                        <td>Alphabet Inc.</td>
-                                                        <td>$142.30</td>
-                                                        <td class="text-success">+$5.20</td>
-                                                        <td class="text-success">+3.79%</td>
-                                                        <td>
                                                             <button type="button"
                                                                     class="btn btn-sm btn-flag"
                                                                     data-onclick="window.WatchListsPage?.showFlagPalette(4)"
@@ -529,18 +568,36 @@
                                                             </button>
                                                         </td>
                                                         <td>
-                                                            <div class="btn-group" role="group">
+                                                            <strong>GOOGL</strong>
+                                                        </td>
+                                                        <td>$142.30</td>
+                                                        <td class="text-success">+$5.20</td>
+                                                        <td class="text-success">+3.79%</td>
+                                                        <td>200</td>
+                                                        <td class="text-success">+$1,040.00</td>
+                                                        <td>
+                                                            <div class="btn-group" role="group" style="display: flex; flex-wrap: nowrap; gap: 2px;">
                                                                 <button type="button"
-                                                                        data-button-type="EDIT"
+                                                                        data-button-type="VIEW"
                                                                         data-variant="small"
-                                                                        data-onclick="window.WatchListsPage?.editItem(4)"
-                                                                        title="עריכה">
+                                                                        data-text=""
+                                                                        data-onclick="if (typeof window.showEntityDetails === 'function') { window.showEntityDetails('ticker', 4, { mode: 'view' }); }"
+                                                                        title="פרטי טיקר">
+                                                                </button>
+                                                                <button type="button"
+                                                                        data-button-type="DASHBOARD"
+                                                                        data-variant="small"
+                                                                        data-text=""
+                                                                        data-onclick="window.location.href='/ticker-dashboard.html?tickerId=4'"
+                                                                        title="דשבורד טיקר">
                                                                 </button>
                                                                 <button type="button"
                                                                         data-button-type="DELETE"
                                                                         data-variant="small"
+                                                                        data-text=""
                                                                         data-onclick="window.WatchListsPage?.removeItem(4)"
-                                                                        title="הסרה">
+                                                                        title="הסר מהרשימה"
+                                                                        style="color: #dc3545;">
                                                                 </button>
                                                             </div>
                                                         </td>
@@ -704,88 +761,6 @@
                                 </div>
                             </section>
 
-                            <!-- Flagged Tickers Section -->
-                            <section class="content-section" id="flagged-tickers-section" data-section="flagged">
-                                <div class="section-header">
-                                    <div class="table-title">
-                                        <span class="icon-placeholder icon" data-icon="flag" data-size="16" data-alt="flag" aria-label="flag"></span>
-                                        <span>טיקרים מסומנים</span>
-                                    </div>
-                                    <div class="table-actions">
-                                        <!-- Flag Color Filter Buttons -->
-                                        <div class="btn-group me-2" role="group">
-                                            <button type="button"
-                                                    class="btn btn-sm"
-                                                    class="btn-flag-filter"
-                                                    data-flag-color="#26baac"
-                                                    data-onclick="window.WatchListsPage?.filterByFlag('#26baac')"
-                                                    title="דגל Trade">
-                                            </button>
-                                            <button type="button"
-                                                    class="btn btn-sm"
-                                                    class="btn-flag-filter"
-                                                    data-flag-color="#fc5a06"
-                                                    data-onclick="window.WatchListsPage?.filterByFlag('#fc5a06')"
-                                                    title="דגל Alert">
-                                            </button>
-                                            <button type="button"
-                                                    class="btn btn-sm"
-                                                    class="btn-flag-filter"
-                                                    data-flag-color="#28a745"
-                                                    data-onclick="window.WatchListsPage?.filterByFlag('#28a745')"
-                                                    title="דגל Account">
-                                            </button>
-                                        </div>
-                                        <button type="button"
-                                                data-button-type="TOGGLE"
-                                                data-variant="small"
-                                                data-onclick="toggleSection('flagged-tickers-section')"
-                                                data-text="הצג/הסתר">
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="section-body">
-                                    <div class="alert alert-info">
-                                        <strong>דגל Trade (#26baac):</strong> 8 טיקרים
-                                    </div>
-                                    <div class="table-responsive">
-                                        <table class="table table-sm table-striped" id="flaggedTickersTable" data-table-type="flagged_tickers">
-                                            <thead class="table-light">
-                                                <tr>
-                                                    <th>רשימה</th>
-                                                    <th>Symbol</th>
-                                                    <th>Name</th>
-                                                    <th>Price</th>
-                                                    <th>Change %</th>
-                                                    <th>Flag</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
-                                                    <td>מניות טכנולוגיה</td>
-                                                    <td><strong>AAPL</strong></td>
-                                                    <td>Apple Inc.</td>
-                                                    <td>$150.25</td>
-                                                    <td class="text-success">+1.42%</td>
-                                                    <td>
-                                                        <span class="icon-placeholder icon" data-icon="flag-filled" data-size="14" data-alt="flag" aria-label="flag"></span>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td>אנרגיה</td>
-                                                    <td><strong>XOM</strong></td>
-                                                    <td>Exxon Mobil</td>
-                                                    <td>$110.50</td>
-                                                    <td class="text-success">+0.75%</td>
-                                                    <td>
-                                                        <span class="icon-placeholder icon" data-icon="flag-filled" data-size="14" data-alt="flag" aria-label="flag"></span>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </section>
                         </div>
                     </div>
                 </div>
@@ -796,40 +771,199 @@
     <!-- Modals will be in separate file -->
     <!-- See watch-list-modal.html and flag-quick-action.html -->
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- =============================================================== -->
+        <!-- =============================================================== -->
+        <!-- =============================================================== -->
+    <!-- ===== START SCRIPT LOADING ORDER ===== -->
+    <!-- =============================================================== -->
+    <!-- ⚠️ DO NOT MODIFY MANUALLY - Generated by generate-script-loading-code.js -->
+    <!-- 📋 Loading Order: BASE → SERVICES → MODULES → UI-ADVANCED → CRUD → PREFERENCES → INIT-SYSTEM -->
+    <!-- 🎯 Page: watch-lists-page | Generated: 2025-12-05T20:51:04.277Z -->
+    <!-- 📦 Packages: base, services, ui-advanced, crud, entity-services, watch-lists -->
 
-    <!-- Core Systems (Must load first) -->
-    <script src="../scripts/logger-service.js?v=1.0.0"></script>
-    <script src="../scripts/button-icons.js?v=1.0.0"></script>
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 1/6: BASE PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 1 | Description: Core systems required for all pages -->
+    <!-- Dependencies:  -->
+    <!-- Critical: YES | Version: 1.5.0 -->
 
-    <!-- Package Manifest & Configs -->
-    <script src="../scripts/init-system/package-manifest.js?v=1.0.0"></script>
-    <script src="../scripts/page-initialization-configs.js?v=1.0.0"></script>
+    <!-- [1] Load Order: 1 | Strategy: defer -->
+    <script src="../scripts/api-config.js?v=1.0.0" defer></script> <!-- Central API configuration -->
+    <!-- [2] Load Order: 2 | Strategy: defer -->
+    <script src="../scripts/global-favicon.js?v=1.0.0" defer></script> <!-- Favicon management -->
+    <!-- [3] Load Order: 3 | Strategy: defer -->
+    <script src="../scripts/notification-system.js?v=1.0.0" defer></script> <!-- Notification system -->
+    <!-- [4] Load Order: 4 | Strategy: defer -->
+    <script src="../scripts/cache-sync-manager.js?v=1.0.0" defer></script> <!-- Cache synchronization manager -->
+    <!-- [5] Load Order: 5 | Strategy: defer -->
+    <script src="../scripts/ui-utils.js?v=1.0.0" defer></script> <!-- UI utilities -->
+    <!-- [6] Load Order: 6 | Strategy: defer -->
+    <script src="../scripts/warning-system.js?v=1.0.0" defer></script> <!-- Warning system -->
+    <!-- [7] Load Order: 7 | Strategy: defer -->
+    <script src="../scripts/error-handlers.js?v=1.0.0" defer></script> <!-- Error handling system -->
+    <!-- [8] Load Order: 8 | Strategy: defer -->
+    <script src="../scripts/unified-cache-manager.js?v=1.0.0" defer></script> <!-- Unified cache manager -->
+    <!-- [9] Load Order: 9 | Strategy: defer -->
+    <script src="../scripts/icon-mappings.js?v=1.0.0" defer></script> <!-- Central icon mappings -->
+    <!-- [10] Load Order: 10 | Strategy: defer -->
+    <script src="../scripts/icon-system.js?v=1.0.0" defer></script> <!-- Central icon system -->
+    <!-- [11] Load Order: 11 | Strategy: defer -->
+    <script src="../scripts/icon-replacement-helper.js?v=1.0.0" defer></script> <!-- Icon replacement helper for standardizing icon usage -->
+    <!-- [12] Load Order: 12 | Strategy: defer -->
+    <script src="../scripts/cache-clear-menu.js?v=1.0.0" defer></script> <!-- Cache clearing control (Stage B-Lite) -->
+    <!-- [13] Load Order: 13 | Strategy: defer -->
+    <script src="../scripts/cache-ttl-guard.js?v=1.0.0" defer></script> <!-- TTL guard for entity loaders -->
+    <!-- [14] Load Order: 14 | Strategy: defer -->
+    <script src="../scripts/auth.js?v=1.0.0" defer></script> <!-- Authentication system -->
+    <!-- [15] Load Order: 15 | Strategy: defer -->
+    <script src="../scripts/auth-guard.js?v=1.0.0" defer></script> <!-- Page protection - authentication guard -->
+    <!-- [16] Load Order: 16 | Strategy: defer -->
+    <script src="../scripts/logger-service.js?v=1.0.0" defer></script> <!-- Advanced logging service -->
+    <!-- [17] Load Order: 17 | Strategy: defer -->
+    <script src="../scripts/header-system.js?v=1.0.0" defer></script> <!-- Header system -->
+    <!-- [18] Load Order: 18 | Strategy: defer -->
+    <script src="../scripts/page-state-manager.js?v=1.0.0" defer></script> <!-- Unified page state manager -->
+    <!-- [19] Load Order: 19 | Strategy: defer -->
+    <script src="../scripts/page-utils.js?v=1.0.0" defer></script> <!-- Page utilities -->
+    <!-- [20] Load Order: 20 | Strategy: defer -->
+    <script src="../scripts/translation-utils.js?v=1.0.0" defer></script> <!-- Translations -->
+    <!-- [21] Load Order: 21 | Strategy: defer -->
+    <script src="../scripts/button-icons.js?v=1.0.0" defer></script> <!-- Icon and button system -->
+    <!-- [22] Load Order: 22 | Strategy: defer -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script> <!-- Bootstrap JS Bundle (Tooltips & Modals) -->
+    <!-- [23] Load Order: 23 | Strategy: defer -->
+    <script src="../scripts/event-handler-manager.js?v=1.0.0" defer></script> <!-- Central event management system -->
+    <!-- [24] Load Order: 24 | Strategy: defer -->
+    <script src="../scripts/button-system-init.js?v=1.0.0" defer></script> <!-- Button system -->
+    <!-- [25] Load Order: 25 | Strategy: defer -->
+    <script src="../scripts/color-scheme-system.js?v=1.0.0" defer></script> <!-- Dynamic color system -->
 
-    <!-- Cache System (MUST load first) -->
-    <script src="../scripts/unified-cache-manager.js?v=1.0.0"></script>
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 2/6: SERVICES PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 2 | Description: General services -->
+    <!-- Dependencies: base -->
+    <!-- Critical: NO | Version: 1.5.0 -->
 
-    <!-- Icon System -->
-    <script src="../scripts/icon-mappings.js?v=1.0.0"></script>
-    <script src="../scripts/icon-system.js?v=1.0.0"></script>
+    <!-- [26] Load Order: 26 | Strategy: defer -->
+    <script src="../scripts/services/data-collection-service.js?v=1.0.0" defer></script> <!-- Data collection service -->
+    <!-- [27] Load Order: 27 | Strategy: defer -->
+    <script src="../scripts/services/field-renderer-service.js?v=1.0.0" defer></script> <!-- Field rendering service -->
+    <!-- [28] Load Order: 28 | Strategy: defer -->
+    <script src="../scripts/services/select-populator-service.js?v=1.0.0" defer></script> <!-- Select box population service -->
+    <!-- [29] Load Order: 29 | Strategy: defer -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script> <!-- jsPDF library (for AI analysis PDF export) -->
+    <!-- [30] Load Order: 30 | Strategy: defer -->
+    <script src="../scripts/services/ai-analysis-data.js?v=1.0.0" defer></script> <!-- AI Analysis data service -->
+    <!-- [31] Load Order: 31 | Strategy: defer -->
+    <script src="../scripts/services/statistics-calculator.js?v=1.0.0" defer></script> <!-- Statistics calculator -->
+    <!-- [32] Load Order: 32 | Strategy: defer -->
+    <script src="../scripts/services/default-value-setter.js?v=1.0.0" defer></script> <!-- Default value service -->
+    <!-- [33] Load Order: 33 | Strategy: defer -->
+    <script src="../scripts/services/preferences-data.js?v=1.0.0" defer></script> <!-- Preferences data service (API + Cache) -->
+    <!-- [34] Load Order: 34 | Strategy: defer -->
+    <script src="../scripts/services/crud-response-handler.js?v=1.0.0" defer></script> <!-- CRUD response handler -->
+    <!-- [35] Load Order: 35 | Strategy: defer -->
+    <script src="../scripts/services/unified-crud-service.js?v=1.0.0" defer></script> <!-- Unified CRUD service for all entities -->
+    <!-- [36] Load Order: 36 | Strategy: defer -->
+    <script src="../scripts/services/investment-calculation-service.js?v=1.0.0" defer></script> <!-- Investment form amount ↔ quantity calculations -->
+    <!-- [37] Load Order: 37 | Strategy: defer -->
+    <script src="../scripts/services/tag-service.js?v=1.0.0" defer></script> <!-- Central tag service (tag management and retrieval) -->
+    <!-- [38] Load Order: 38 | Strategy: defer -->
+    <script src="../scripts/services/table-sort-value-adapter.js?v=1.0.0" defer></script> <!-- Adapter for unified sort values (DateEnvelope, legacy) -->
+    <!-- [39] Load Order: 39 | Strategy: defer -->
+    <script src="../scripts/services/lint-status-service.js?v=1.0.0" defer></script> <!-- Unified linter status service (API reading and data conversion) -->
+    <!-- [40] Load Order: 40 | Strategy: defer -->
+    <script src="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.min.js" defer></script> <!-- Quill.js - Rich Text Editor Library -->
+    <!-- [41] Load Order: 41 | Strategy: defer -->
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js" defer></script> <!-- DOMPurify - HTML Sanitizer -->
+    <!-- [42] Load Order: 42 | Strategy: defer -->
+    <script src="../scripts/services/rich-text-editor-service.js?v=1.0.0" defer></script> <!-- Rich text editor service -->
 
-    <!-- Notification System -->
-    <script src="../scripts/notification-system.js?v=1.0.0"></script>
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 3/6: UI ADVANCED PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 3 | Description: Advanced user interface -->
+    <!-- Dependencies: base, services, modules -->
+    <!-- Critical: NO | Version: 1.5.0 -->
 
-    <!-- Watch Lists Services (MUST load before page script) -->
-    <script src="../scripts/services/watch-lists-data.js?v=1.0.0"></script>
-    <script src="../scripts/services/watch-lists-ui-service.js?v=1.0.0"></script>
+    <!-- [43] Load Order: 43 | Strategy: defer -->
+    <script src="../scripts/tables.js?v=1.0.0" defer></script> <!-- Table system -->
+    <!-- [44] Load Order: 44 | Strategy: defer -->
+    <script src="../scripts/table-data-registry.js?v=1.0.0" defer></script> <!-- Table data registry -->
+    <!-- [45] Load Order: 45 | Strategy: defer -->
+    <script src="../scripts/pagination-system.js?v=1.0.0" defer></script> <!-- Pagination system -->
+    <!-- [46] Load Order: 46 | Strategy: defer -->
+    <script src="../scripts/modules/actions-menu-system.js?v=1.0.0" defer></script> <!-- Actions menu system -->
 
-    <!-- Icon Initializer (MUST load after page content is ready) -->
-    <script src="../scripts/mockups-icon-initializer.js?v=1.0.0"></script>
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 4/6: CRUD OPERATIONS PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 4 | Description: Data and table management systems -->
+    <!-- Dependencies: base, services -->
+    <!-- Critical: NO | Version: 1.5.0 -->
 
-    <!-- Unified Initialization System -->
-    <!-- Note: unified-app-initializer.js is loaded via package-manifest.js in production -->
-    <!-- For mockup, we skip this as it's not critical for the mockup display -->
+    <!-- [47] Load Order: 47 | Strategy: defer -->
+    <script src="../scripts/date-utils.js?v=1.0.0" defer></script> <!-- Date utilities -->
+    <!-- [48] Load Order: 48 | Strategy: defer -->
+    <script src="../scripts/data-utils.js?v=1.0.0" defer></script> <!-- General data utilities -->
+    <!-- [49] Load Order: 49 | Strategy: defer -->
+    <script src="../scripts/unified-table-system.js?v=1.0.0" defer></script> <!-- Unified central table system -->
 
-    <!-- Page-specific script -->
-    <script src="../scripts/watch-lists-page.js?v=1.0.0" defer></script>
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 5/6: ENTITY SERVICES PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 10 | Description: Entity services -->
+    <!-- Dependencies: base, services -->
+    <!-- Critical: NO | Version: 1.5.0 -->
+
+    <!-- [50] Load Order: 50 | Strategy: defer -->
+    <script src="../scripts/account-service.js?v=1.0.0" defer></script> <!-- Account service -->
+    <!-- [51] Load Order: 51 | Strategy: defer -->
+    <script src="../scripts/alert-service.js?v=1.0.0" defer></script> <!-- Alert service -->
+    <!-- [52] Load Order: 52 | Strategy: defer -->
+    <script src="../scripts/ticker-service.js?v=1.0.0" defer></script> <!-- Ticker service -->
+    <!-- [53] Load Order: 53 | Strategy: defer -->
+    <script src="../scripts/services/trade-plans-data.js?v=1.0.0" defer></script> <!-- Trade plans data service -->
+    <!-- [54] Load Order: 54 | Strategy: defer -->
+    <script src="../scripts/trade-plan-service.js?v=1.0.0" defer></script> <!-- Trade plan service -->
+    <!-- [55] Load Order: 55 | Strategy: defer -->
+    <script src="../scripts/condition-translator.js?v=1.0.0" defer></script> <!-- Condition translator -->
+    <!-- [56] Load Order: 56 | Strategy: defer -->
+    <script src="../scripts/constraints.js?v=1.0.0" defer></script> <!-- Constraints system -->
+    <!-- [57] Load Order: 57 | Strategy: defer -->
+    <script src="../scripts/services/linked-items-service.js?v=1.0.0" defer></script> <!-- Shared logic service for linked items -->
+    <!-- [58] Load Order: 58 | Strategy: defer -->
+    <script src="../scripts/linked-items.js?v=1.0.0" defer></script> <!-- Linked items -->
+    <!-- [59] Load Order: 59 | Strategy: defer -->
+    <script src="../scripts/related-object-filters.js?v=1.0.0" defer></script> <!-- Related object filters -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 6/6: WATCH LISTS PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 20 | Description: Watch lists management system (UI layer only - mockup mode) -->
+    <!-- Dependencies: base, services, ui-advanced, crud, entity-services -->
+    <!-- Critical: NO | Version: 1.0.0 -->
+
+    <!-- [60] Load Order: 60 | Strategy: async -->
+    <script src="../scripts/services/watch-lists-data.js?v=1.0.0" async></script> <!-- Watch lists data service (mockup mode) -->
+    <!-- [61] Load Order: 61 | Strategy: async -->
+    <script src="../scripts/services/watch-lists-ui-service.js?v=1.0.0" async></script> <!-- Watch lists UI service -->
+    <!-- [62] Load Order: 62 | Strategy: async -->
+    <script src="../scripts/flag-quick-action.js?v=1.0.0" async></script> <!-- Flag palette quick action -->
+    <!-- [63] Load Order: 63 | Strategy: async -->
+    <script src="../scripts/watch-lists-page.js?v=1.0.0" async></script> <!-- Watch lists main page -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PAGE-SPECIFIC SCRIPTS ===== -->
+    <!-- =============================================================== -->
+
+    <!-- =============================================================== -->
+    <!-- ===== FINAL SUMMARY ===== -->
+    <!-- =============================================================== -->
+    <!-- 📊 Total Scripts Processed: 62 | Unique Scripts Loaded: 62 -->
+    <!-- 🔧 For maintenance: Use generate-script-loading-code.js -->
 
 </body>
 </html>

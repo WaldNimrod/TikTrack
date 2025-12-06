@@ -208,10 +208,12 @@ Build the report this way:
             {
                 "key": "technical_indicators",
                 "label": "Technical Indicators",
-                "type": "text",
+                "type": "select",
                 "required": False,
-                "placeholder": "Select from Trading Methods (RSI, MACD, Moving Averages, etc.)",
-                "default_value": None
+                "placeholder": "בחר אינדיקטורים טכניים...",
+                "default_value": None,
+                "options": [],
+                "integration": "trading_methods"
             },
             {
                 "key": "chart_pattern_focus",
@@ -226,7 +228,13 @@ Build the report this way:
                 "label": "Investment Type",
                 "type": "select",
                 "required": False,
-                "options": ["swing", "investment", "passive", "day_trading", "scalping"],
+                "options": [
+                    {"value": "Swing Trading", "label": "Swing Trading"},
+                    {"value": "Long-term Investment", "label": "Long-term Investment"},
+                    {"value": "Passive Investment", "label": "Passive Investment"},
+                    {"value": "Day Trading", "label": "Day Trading"},
+                    {"value": "Scalping", "label": "Scalping"}
+                ],
                 "default_value": None
             },
             {
@@ -335,7 +343,13 @@ Build the report this way:
                 "label": "Investment Type Filter",
                 "type": "select",
                 "required": False,
-                "options": ["swing", "investment", "passive", "day_trading", "scalping"],
+                "options": [
+                    {"value": "Swing Trading", "label": "Swing Trading"},
+                    {"value": "Long-term Investment", "label": "Long-term Investment"},
+                    {"value": "Passive Investment", "label": "Passive Investment"},
+                    {"value": "Day Trading", "label": "Day Trading"},
+                    {"value": "Scalping", "label": "Scalping"}
+                ],
                 "default_value": None
             },
             {
@@ -447,7 +461,13 @@ Build the report this way:
                 "label": "Investment Type",
                 "type": "select",
                 "required": False,
-                "options": ["swing", "investment", "passive", "day_trading", "scalping"],
+                "options": [
+                    {"value": "Swing Trading", "label": "Swing Trading"},
+                    {"value": "Long-term Investment", "label": "Long-term Investment"},
+                    {"value": "Passive Investment", "label": "Passive Investment"},
+                    {"value": "Day Trading", "label": "Day Trading"},
+                    {"value": "Scalping", "label": "Scalping"}
+                ],
                 "default_value": None
             },
             {

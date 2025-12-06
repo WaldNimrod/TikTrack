@@ -1088,22 +1088,22 @@ async function performCashFlowDeletion(id) {
       });
     } else {
       // Fallback to direct API call with CRUDResponseHandler
-      let response;
-      if (typeof window.CashFlowsData?.deleteCashFlow === 'function') {
-        response = await window.CashFlowsData.deleteCashFlow(id);
-      } else {
-        response = await fetch(`/api/cash-flows/${id}`, {
-          method: 'DELETE',
-        });
-      }
-
-      // שימוש ב-CRUDResponseHandler עם רענון אוטומטי
-      await CRUDResponseHandler.handleDeleteResponse(response, {
-        successMessage: 'תזרים המזומנים נמחק בהצלחה!',
-        entityName: 'תזרים מזומנים',
-        reloadFn: () => window.loadCashFlowsData({ force: true }),
-        requiresHardReload: false
+    let response;
+    if (typeof window.CashFlowsData?.deleteCashFlow === 'function') {
+      response = await window.CashFlowsData.deleteCashFlow(id);
+    } else {
+      response = await fetch(`/api/cash-flows/${id}`, {
+        method: 'DELETE',
       });
+    }
+
+    // שימוש ב-CRUDResponseHandler עם רענון אוטומטי
+    await CRUDResponseHandler.handleDeleteResponse(response, {
+      successMessage: 'תזרים המזומנים נמחק בהצלחה!',
+      entityName: 'תזרים מזומנים',
+      reloadFn: () => window.loadCashFlowsData({ force: true }),
+      requiresHardReload: false
+    });
     }
   } catch (error) {
     window.Logger.error('performCashFlowDeletion: Error occurred', { page: 'cash_flows', error: error?.message || error });
@@ -2972,53 +2972,53 @@ async function saveCashFlow() {
             });
         } else {
             // Fallback to direct API call with CRUDResponseHandler
-            let response;
-            if (isEdit && typeof window.CashFlowsData?.updateCashFlow === 'function') {
-                response = await window.CashFlowsData.updateCashFlow(cashFlowId, dataToSend);
-            } else if (!isEdit && typeof window.CashFlowsData?.createCashFlow === 'function') {
-                response = await window.CashFlowsData.createCashFlow(dataToSend);
-            } else {
-                const url = isEdit ? `/api/cash-flows/${cashFlowId}` : '/api/cash-flows';
-                response = await fetch(url, {
-                    method: isEdit ? 'PUT' : 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(dataToSend)
-                });
-            }
-            
-            let responseToHandle = response;
-            if (!response.ok) {
-                const responseClone = response.clone();
-                const errorText = await responseClone.text();
-                window.Logger.error('saveCashFlow error response', {
-                    page: 'cash_flows',
-                    status: response.status,
-                    body: errorText,
-                });
-            }
-            
-            // CRUDResponseHandler handles ALL response processing including errors
-            // No need to pre-check or call response.json() here
-            if (isEdit) {
-                window.Logger.debug('saveCashFlow - Calling handleUpdateResponse', { page: 'cash_flows', cashFlowId });
-                crudResult = await CRUDResponseHandler.handleUpdateResponse(responseToHandle, {
-                    modalId: 'cashFlowModal',
-                    successMessage: 'תזרים מזומן עודכן בהצלחה',
-                    entityName: 'תזרים מזומן',
-                    reloadFn: () => window.loadCashFlowsData({ force: true }),
-                    requiresHardReload: false  // Prevent reload confirmation dialog
-                });
-            } else {
-                window.Logger.debug('saveCashFlow - Calling handleSaveResponse', { page: 'cash_flows' });
-                crudResult = await CRUDResponseHandler.handleSaveResponse(responseToHandle, {
-                    modalId: 'cashFlowModal',
-                    successMessage: 'תזרים מזומן נוסף בהצלחה',
-                    entityName: 'תזרים מזומן',
-                    reloadFn: () => window.loadCashFlowsData({ force: true }),
-                    requiresHardReload: false  // Prevent reload confirmation dialog
-                });
+        let response;
+        if (isEdit && typeof window.CashFlowsData?.updateCashFlow === 'function') {
+            response = await window.CashFlowsData.updateCashFlow(cashFlowId, dataToSend);
+        } else if (!isEdit && typeof window.CashFlowsData?.createCashFlow === 'function') {
+            response = await window.CashFlowsData.createCashFlow(dataToSend);
+        } else {
+            const url = isEdit ? `/api/cash-flows/${cashFlowId}` : '/api/cash-flows';
+            response = await fetch(url, {
+                method: isEdit ? 'PUT' : 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(dataToSend)
+            });
+        }
+        
+        let responseToHandle = response;
+        if (!response.ok) {
+            const responseClone = response.clone();
+            const errorText = await responseClone.text();
+            window.Logger.error('saveCashFlow error response', {
+                page: 'cash_flows',
+                status: response.status,
+                body: errorText,
+            });
+        }
+        
+        // CRUDResponseHandler handles ALL response processing including errors
+        // No need to pre-check or call response.json() here
+        if (isEdit) {
+            window.Logger.debug('saveCashFlow - Calling handleUpdateResponse', { page: 'cash_flows', cashFlowId });
+            crudResult = await CRUDResponseHandler.handleUpdateResponse(responseToHandle, {
+                modalId: 'cashFlowModal',
+                successMessage: 'תזרים מזומן עודכן בהצלחה',
+                entityName: 'תזרים מזומן',
+                reloadFn: () => window.loadCashFlowsData({ force: true }),
+                requiresHardReload: false  // Prevent reload confirmation dialog
+            });
+        } else {
+            window.Logger.debug('saveCashFlow - Calling handleSaveResponse', { page: 'cash_flows' });
+            crudResult = await CRUDResponseHandler.handleSaveResponse(responseToHandle, {
+                modalId: 'cashFlowModal',
+                successMessage: 'תזרים מזומן נוסף בהצלחה',
+                entityName: 'תזרים מזומן',
+                reloadFn: () => window.loadCashFlowsData({ force: true }),
+                requiresHardReload: false  // Prevent reload confirmation dialog
+            });
             }
         }
         

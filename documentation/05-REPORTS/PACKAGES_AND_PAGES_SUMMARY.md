@@ -52,7 +52,7 @@
 
 | עמוד | חבילות |
 |------|---------|
-| **index** | base, services, ui-advanced, modules, crud, preferences, entity-services, entity-details, info-summary, dashboard-widgets, init-system |
+| **index** | base, services, ui-advanced, modules, crud, preferences, entity-services, entity-details, info-summary, dashboard-widgets, tradingview-widgets, conditions, init-system |
 | **trades** | ❌ **חסר בהגדרות** |
 | **trade_plans** | ❌ **חסר בהגדרות** |
 | **alerts** | ❌ **חסר בהגדרות** |

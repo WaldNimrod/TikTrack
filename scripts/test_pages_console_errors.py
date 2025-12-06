@@ -247,6 +247,7 @@ def test_page_console(driver, page_info, retry_count: int = 0):
         except TimeoutException:
             result["page_errors"].append("Page load timeout")
         
+        # Always update load_time, even if there was an exception
         result["load_time"] = time.time() - start_time
         
         # Wait additional time for JavaScript to execute
@@ -365,6 +366,10 @@ def test_page_console(driver, page_info, retry_count: int = 0):
         error_msg = str(e)
         result["page_errors"].append(f"WebDriver error: {error_msg}")
         
+        # Update load_time even if there was an exception
+        if 'start_time' in locals():
+            result["load_time"] = time.time() - start_time
+        
         # Check if it's a rate limit error
         if '429' in error_msg or 'Too Many Requests' in error_msg:
             rate_tracker.record_rate_limit_hit()
@@ -375,6 +380,10 @@ def test_page_console(driver, page_info, retry_count: int = 0):
                 return test_page_console(driver, page_info, retry_count + 1)
     except Exception as e:
         result["page_errors"].append(f"Exception: {str(e)}")
+        
+        # Update load_time even if there was an exception
+        if 'start_time' in locals():
+            result["load_time"] = time.time() - start_time
     
     # Adaptive delay based on rate limit history
     if RATE_LIMIT_CONFIG['adaptive_delay']:
@@ -430,7 +439,10 @@ def main():
             warnings_count = len(result["console_warnings"])
             
             print(f"  {status_icon} Status: {'SUCCESS' if result['success'] else 'ERRORS FOUND'}")
-            print(f"  ⏱️  Load time: {result['load_time']:.2f}s")
+            if result.get('load_time') is not None:
+                print(f"  ⏱️  Load time: {result['load_time']:.2f}s")
+            else:
+                print(f"  ⏱️  Load time: N/A")
             if result.get("rate_limit_retries", 0) > 0:
                 print(f"  🔄 Retries: {result['rate_limit_retries']}")
             if errors_count > 0:

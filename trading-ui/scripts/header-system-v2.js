@@ -27,7 +27,9 @@ if (window.Logger) {
 }
 
 // ===== FilterManager Class =====
-class FilterManager {
+// Prevent duplicate declaration
+if (typeof window.FilterManager === 'undefined') {
+window.FilterManager = class FilterManager {
   constructor() {
     this.currentFilters = {
       search: '',
@@ -943,7 +945,8 @@ class MenuManager {
       }
     });
   }
-}
+};
+} // End of if (typeof window.FilterManager === 'undefined')
 
 // ===== HeaderSystem Class =====
 class HeaderSystem {

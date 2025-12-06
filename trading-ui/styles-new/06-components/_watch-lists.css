@@ -95,7 +95,21 @@
 }
 
 .actions-column {
-    width: 120px;
+    width: 140px;
+    white-space: nowrap;
+}
+
+/* Ensure button groups in watch lists table display inline */
+#watchListItemsTable .btn-group {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    gap: 2px;
+    align-items: center;
+}
+
+#watchListItemsTable .btn-group button {
+    flex-shrink: 0;
+    margin: 0;
 }
 
 /* ===== Flag Palette Popup ===== */
@@ -282,5 +296,217 @@
 .btn-flag-filter[data-flag-color="#0056b3"] {
     background-color: #0056b3;
     border-color: #0056b3;
+}
+
+/* ===== Icon Selector Wrapper ===== */
+.icon-selector-wrapper {
+    position: relative;
+}
+
+.icon-selector-trigger {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 0.75rem;
+}
+
+.selected-icon-preview {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.icon-preview-placeholder {
+    color: var(--text-muted, #6c757d);
+    font-size: 0.9rem;
+}
+
+/* ===== Icon Selector Dropdown ===== */
+.icon-selector-dropdown {
+    min-width: 400px;
+    max-width: 500px;
+    padding: 0;
+    margin-top: 0.25rem;
+    border: 1px solid var(--border-color, #dee2e6);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* ===== Icon Library Tabs ===== */
+.icon-library-tabs {
+    border-bottom: 1px solid var(--border-color, #dee2e6);
+    margin: 0;
+    padding: 0.5rem 0.5rem 0 0.5rem;
+}
+
+.icon-library-tabs .nav-link {
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: var(--text-muted, #6c757d);
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+}
+
+.icon-library-tabs .nav-link:hover {
+    color: var(--primary-color, #26baac);
+    border-bottom-color: var(--primary-color, #26baac);
+}
+
+.icon-library-tabs .nav-link.active {
+    color: var(--primary-color, #26baac);
+    border-bottom-color: var(--primary-color, #26baac);
+    background-color: transparent;
+}
+
+/* ===== Icon Library Content ===== */
+.icon-library-content {
+    padding: 0.5rem;
+}
+
+.icon-library-content .tab-pane {
+    min-height: 200px;
+}
+
+/* ===== Icon Selector Grid ===== */
+.icon-selector-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
+    gap: 0.5rem;
+    padding: 0.5rem;
+    max-height: 350px;
+    overflow-y: auto;
+}
+
+.icon-selector-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem;
+    border: 2px solid transparent;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    background-color: white;
+    aspect-ratio: 1;
+}
+
+.icon-selector-item:hover {
+    border-color: var(--primary-color, #26baac);
+    background-color: var(--primary-light, #e7f5f3);
+    transform: scale(1.1);
+    box-shadow: 0 2px 8px rgba(38, 186, 172, 0.3);
+    z-index: 1;
+}
+
+.icon-selector-item.active {
+    border-color: var(--primary-color, #26baac);
+    background-color: var(--primary-light, #e7f5f3);
+    box-shadow: 0 0 0 3px rgba(38, 186, 172, 0.2);
+}
+
+.icon-preview {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.icon-preview.no-icon {
+    border: 1px dashed var(--border-color, #dee2e6);
+    border-radius: 4px;
+    color: var(--text-muted, #6c757d);
+    font-size: 0.7rem;
+    width: 100%;
+    height: 100%;
+}
+
+.icon-preview-icon {
+    width: 24px;
+    height: 24px;
+    color: var(--text-color, #212529);
+}
+
+.icon-preview i {
+    color: var(--text-color, #212529);
+}
+
+/* Remove labels - icons only */
+.icon-label {
+    display: none;
+}
+
+/* ===== View Mode Selector ===== */
+.view-mode-selector {
+    display: flex;
+    justify-content: center;
+}
+
+.view-mode-radio {
+    display: flex;
+    gap: 0.25rem;
+}
+
+.view-mode-radio .btn {
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    font-size: 1.2rem;
+}
+
+.view-mode-radio .btn-check:checked + .btn {
+    background-color: var(--primary-color, #26baac);
+    border-color: var(--primary-color, #26baac);
+    color: white;
+}
+
+/* ===== Flag Color Palette ===== */
+.flag-color-palette {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.5rem;
+    padding: 0.5rem;
+    border: 1px solid var(--border-color, #dee2e6);
+    border-radius: 4px;
+    background-color: var(--background-light, #f8f9fa);
+    max-width: 300px;
+}
+
+.flag-color-palette .flag-color-btn {
+    width: 48px;
+    height: 48px;
+    border: 2px solid transparent;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+}
+
+.flag-color-palette .flag-color-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+}
+
+.flag-color-palette .flag-color-btn.active {
+    border-color: var(--text-color, #212529);
+    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1), 0 0 0 2px var(--text-color, #212529);
+    transform: scale(1.05);
+}
+
+.flag-color-palette .flag-color-btn.active::after {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 1.2rem;
+    font-weight: bold;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
 }
 

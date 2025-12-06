@@ -141,6 +141,7 @@ const PACKAGE_MANIFEST = {
     critical: true,
     loadOrder: 1,
     dependencies: [],
+    loadingStrategy: 'defer', // Critical package with dependencies - must maintain load order
     scripts: [
       {
         file: 'api-config.js',
@@ -370,6 +371,7 @@ const PACKAGE_MANIFEST = {
     critical: false,
     loadOrder: 2,
     dependencies: ['base'],
+    loadingStrategy: 'defer', // Critical package - required for most pages, has dependencies on base
     scripts: [
       {
         file: 'services/data-collection-service.js',
@@ -597,12 +599,13 @@ const PACKAGE_MANIFEST = {
     critical: false,
     loadOrder: 3,
     dependencies: ['base', 'services', 'modules'],
+    loadingStrategy: 'defer', // Critical package - tables and advanced UI, has dependencies on modules
     scripts: [
       {
         file: 'table-mappings.js',
         globalCheck: 'window.TABLE_COLUMN_MAPPINGS',
-        description: 'Table mappings',
-        required: true,
+        description: 'Table mappings (optional - only for pages with tables)',
+        required: false, // Optional - not needed for dashboard/index page
         loadOrder: 0
       },
       {
@@ -647,6 +650,7 @@ const PACKAGE_MANIFEST = {
     critical: false,
     loadOrder: 2.5,
     dependencies: ['base', 'services'],
+    loadingStrategy: 'defer', // Critical package - modal system and UI components, has dependencies
     scripts: [
       {
         file: 'modal-navigation-manager.js',
@@ -879,6 +883,7 @@ const PACKAGE_MANIFEST = {
     critical: false,
     loadOrder: 4,
     dependencies: ['base', 'services'],
+    loadingStrategy: 'defer', // Critical package - CRUD operations, has dependencies on base and services
     scripts: [
       {
         file: 'date-utils.js',
@@ -915,6 +920,7 @@ const PACKAGE_MANIFEST = {
     critical: false,
     loadOrder: 5.2,
     dependencies: ['base', 'services', 'modules', 'ui-advanced', 'crud', 'preferences'],
+    loadingStrategy: 'defer', // Critical package - tag management, has dependencies on multiple packages
     scripts: [
       {
         file: 'tag-management-page.js',
@@ -937,6 +943,7 @@ const PACKAGE_MANIFEST = {
     critical: false,
     loadOrder: 5,
     dependencies: ['base', 'services'], // Added 'services' dependency for preferences-data.js
+    loadingStrategy: 'defer', // Critical package - preferences system, has dependencies on base and services
     scripts: [
       {
         file: 'preferences-cache.js',
@@ -1064,6 +1071,7 @@ const PACKAGE_MANIFEST = {
     critical: false,
     loadOrder: 6,
     dependencies: ['base'],
+    loadingStrategy: 'defer', // Critical package - validation system, has dependencies on base
     scripts: [
       {
         file: 'validation-utils.js',
@@ -1085,6 +1093,7 @@ const PACKAGE_MANIFEST = {
     critical: false,
     loadOrder: 6.5,
     dependencies: ['base', 'validation'],
+    loadingStrategy: 'defer', // Critical package - conditions system, has dependencies on base and validation
     scripts: [
       {
         file: 'conditions/conditions-translations.js',
@@ -1151,6 +1160,7 @@ const PACKAGE_MANIFEST = {
     critical: false,
     loadOrder: 7,
     dependencies: ['base', 'services'],
+    loadingStrategy: 'async', // Non-critical - only for external data dashboard page
     scripts: [
       {
         file: 'yahoo-finance-service.js',
@@ -1184,6 +1194,7 @@ const PACKAGE_MANIFEST = {
     critical: false,
     loadOrder: 8,
     dependencies: ['base', 'services'],
+    loadingStrategy: 'async', // Non-critical - only for pages with charts
     scripts: [
       {
         file: 'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js',
@@ -1249,6 +1260,7 @@ const PACKAGE_MANIFEST = {
     critical: false,
     loadOrder: 9,
     dependencies: ['base', 'services'],
+    loadingStrategy: 'async', // Non-critical - only for log pages
     scripts: [
       {
         file: 'unified-log-api.js',
@@ -1285,6 +1297,7 @@ const PACKAGE_MANIFEST = {
     critical: false,
     loadOrder: 9.5, // Changed from 9 to 9.5 to differentiate from logs (9)
     dependencies: ['base', 'services'],
+    loadingStrategy: 'defer', // Critical package - cache system, has dependencies on base and services
     scripts: [
       {
         file: 'cache-policy-manager.js',
@@ -1314,6 +1327,7 @@ const PACKAGE_MANIFEST = {
     critical: false,
     loadOrder: 10,
     dependencies: ['base', 'services'],
+    loadingStrategy: 'defer', // Critical package - entity services, has dependencies on base and services
     scripts: [
       {
         file: 'services/trades-data.js',
@@ -1455,6 +1469,7 @@ const PACKAGE_MANIFEST = {
     critical: false,
     loadOrder: 11,
     dependencies: ['base', 'services'],
+    loadingStrategy: 'defer', // Critical package - helper functions, has dependencies on base and services
     scripts: [
       {
         file: 'utils/cache-key-helper.js',
@@ -1512,6 +1527,7 @@ const PACKAGE_MANIFEST = {
     critical: false,
     loadOrder: 12,
     dependencies: ['base', 'services'],
+    loadingStrategy: 'async', // Non-critical - only for system management pages
     scripts: [
       {
         file: 'system-management/system-management-main.js',
@@ -1623,20 +1639,15 @@ const PACKAGE_MANIFEST = {
     critical: false,
     loadOrder: 13,
     dependencies: ['base', 'services'],
+    loadingStrategy: 'async', // Non-critical - only for management pages
     scripts: [
-      {
-        file: 'auth.js',
-        globalCheck: 'window.login',
-        description: 'Authentication system',
-        required: true,
-        loadOrder: 1
-      },
+      // NOTE: auth.js removed - already in base package to avoid duplicate loading
       {
         file: 'background-tasks.js',
         globalCheck: 'window.startScheduler',
         description: 'Background tasks',
         required: true,
-        loadOrder: 2
+        loadOrder: 1
       }
     ],
     estimatedSize: '~150KB',
@@ -1652,6 +1663,7 @@ const PACKAGE_MANIFEST = {
     critical: false,
     loadOrder: 14,
     dependencies: ['base', 'services'],
+    loadingStrategy: 'async', // Non-critical - only for development tools pages
     scripts: [
       {
         file: 'init-system/dev-tools/page-template-generator.js',
@@ -1692,6 +1704,7 @@ const PACKAGE_MANIFEST = {
     critical: false,
     loadOrder: 15,
     dependencies: ['base', 'ui-advanced'],
+    loadingStrategy: 'defer', // Critical package - filter system, embedded in header-system.js
     scripts: [],
     estimatedSize: '~0KB',
     initTime: '~0ms',
@@ -1727,6 +1740,7 @@ const PACKAGE_MANIFEST = {
     critical: false,
     loadOrder: 17,
     dependencies: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'entity-services'],
+    loadingStrategy: 'defer', // Critical package - entity details, has dependencies on multiple packages
     scripts: [
       {
         file: 'entity-details-api.js',
@@ -1763,6 +1777,7 @@ const PACKAGE_MANIFEST = {
     critical: false,
     loadOrder: 18,
     dependencies: ['base', 'services'],
+    loadingStrategy: 'defer', // Critical package - info summary, has dependencies on base and services
     scripts: [
       {
         file: 'info-summary-system.js',
@@ -1792,6 +1807,7 @@ const PACKAGE_MANIFEST = {
     critical: false,
     loadOrder: 19, // Changed from 20 to 19 to load before init-system (22) and after dashboard-widgets (19.5)
     dependencies: ['base'],
+    loadingStrategy: 'async', // Non-critical - only for TradingView chart pages
     scripts: [
       {
         file: 'charts/vendor/lightweight-charts.standalone.production.js',
@@ -1828,6 +1844,7 @@ const PACKAGE_MANIFEST = {
     critical: false,
     loadOrder: 20,
     dependencies: ['base', 'services', 'ui-advanced', 'crud', 'entity-services'],
+    loadingStrategy: 'async', // Non-critical - only for watch lists pages (mockup)
     scripts: [
       {
         file: 'services/watch-lists-data.js',
@@ -1886,6 +1903,7 @@ const PACKAGE_MANIFEST = {
     critical: false,
     loadOrder: 20.5, // After entity-services, before init-system
     dependencies: ['base', 'services', 'ui-advanced', 'modules', 'preferences', 'entity-services'],
+    loadingStrategy: 'defer', // Critical package - AI analysis, has dependencies on multiple packages
     scripts: [
       {
         file: 'https://cdn.jsdelivr.net/npm/marked@9.1.6/marked.min.js',
@@ -1945,6 +1963,7 @@ const PACKAGE_MANIFEST = {
     critical: false,
     loadOrder: 22, // Changed from 20 to 22 to load after all other packages (dashboard-widgets 19.5, tradingview-charts 19, tradingview-widgets 21, watch-lists 20)
     dependencies: ['base'], // Only base is required for Logger and basic systems
+    loadingStrategy: 'defer', // Critical package - initialization system, must load last, has dependencies on base
     scripts: [
       {
         file: 'init-system/package-manifest.js',
@@ -2024,6 +2043,7 @@ const PACKAGE_MANIFEST = {
     critical: false,
     loadOrder: 19.5,
     dependencies: ['base', 'services', 'ui-advanced', 'entity-services', 'modules', 'entity-details'],
+    loadingStrategy: 'defer', // Critical package - dashboard widgets, has dependencies on multiple packages
     scripts: [
       {
         file: 'services/dashboard-data.js',
@@ -2120,6 +2140,7 @@ const PACKAGE_MANIFEST = {
     critical: false,
     loadOrder: 6.1,
     dependencies: ['modules', 'validation'],
+    loadingStrategy: 'defer', // Critical package - dashboard modules, has dependencies on modules and validation
     scripts: [
       {
         file: 'trade-selector-modal.js',
@@ -2149,6 +2170,7 @@ const PACKAGE_MANIFEST = {
     critical: false,
     loadOrder: 21,
     dependencies: ['base', 'preferences'],
+    loadingStrategy: 'async', // Non-critical - only for TradingView widget pages
     scripts: [
       {
         file: 'tradingview-widgets/tradingview-widgets-config.js',

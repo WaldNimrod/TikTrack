@@ -40,6 +40,59 @@ window.positionsPortfolioState = {
     }
 };
 
+// Define togglePortfolioSummarySize early to ensure it's available when called
+// This function is called via data-onclick attribute, so it must be available immediately
+window.togglePortfolioSummarySize = async function() {
+    // If the full implementation hasn't loaded yet, wait for it
+    if (typeof window.positionsPortfolioState === 'undefined') {
+        window.positionsPortfolioState = { summarySize: 'minimal' };
+    }
+    
+    const currentSize = window.positionsPortfolioState.summarySize || 'minimal';
+    const newSize = currentSize === 'minimal' ? 'full' : 'minimal';
+    window.positionsPortfolioState.summarySize = newSize;
+    
+    // Wait for the full implementation to load (functions defined later in the file)
+    // Try calling the functions, but if they're not available yet, wait a bit
+    let attempts = 0;
+    const maxAttempts = 20; // Increased to 20 attempts (1 second total)
+    while (attempts < maxAttempts) {
+        // Check if the full implementation is available via window functions
+        if (typeof window.updatePortfolioSummaryToggleButton === 'function' && 
+            typeof window.loadPortfolioSummary === 'function') {
+            // Full implementation loaded, use it
+            await window.updatePortfolioSummaryToggleButton();
+            await window.loadPortfolioSummary();
+            return;
+        }
+        
+        // Wait a bit and try again
+        await new Promise(resolve => setTimeout(resolve, 50));
+        attempts++;
+    }
+    
+    // Fallback: just reload the summary element
+    const summaryElement = document.getElementById('portfolioSummaryStats');
+    if (summaryElement) {
+        summaryElement.textContent = 'טוען סיכום...';
+        // Try to load summary manually
+        try {
+            const size = window.positionsPortfolioState.summarySize || 'minimal';
+            const response = await fetch(`/api/portfolio/summary?size=${size}`);
+            if (response.ok) {
+                const result = await response.json();
+                if (result.status === 'success' && result.data) {
+                    // Simple rendering fallback
+                    const summary = result.data.summary || {};
+                    summaryElement.textContent = `סה"כ פוזיציות: ${summary.total_positions || 0}`;
+                }
+            }
+        } catch (error) {
+            window.Logger?.warn?.('Error loading portfolio summary', { error: error.message, page: 'positions-portfolio' });
+        }
+    }
+};
+
 let positionsPaginationInstance = null;
 let portfolioPaginationInstance = null;
 
@@ -119,8 +172,8 @@ function createDiagnosticsMessageFromPortfolio(diagnostics) {
     const accountList = accountNames.join(', ');
     const idsSuffix = missingCount > 5 ? ` ועוד ${missingCount - 5} חשבונות` : '';
     
-    // More gentle message for new systems
-    return `עדיין לא נוספו נתוני ביצוע (Buy/Sell) ב-${missingCount} חשבונות${missingCount > 1 ? '' : ''} (${accountList}${idsSuffix}). לאחר הוספת נתוני ביצוע, הפוזיציות יופיעו כאן אוטומטית.`;
+    // Shortened message - show account names only, no IDs
+    return `אין נתוני ביצוע בחשבון${missingCount > 1 ? 'ות' : ''}: ${accountList}${idsSuffix}`;
 }
 
 function createDiagnosticsMessageFromAccount(diagnostics) {
@@ -146,8 +199,8 @@ function createDiagnosticsMessageFromAccount(diagnostics) {
     // Use account name if available, otherwise use ID
     const accountDisplay = accountName || `#${diagnostics.account_id}`;
     
-    // More gentle message for new systems
-    return `עדיין לא נוספו נתוני ביצוע (Buy/Sell) לחשבון ${accountDisplay}. לאחר הוספת נתוני ביצוע, הפוזיציות יופיעו כאן אוטומטית.`;
+    // Shortened message
+    return `אין נתוני ביצוע בחשבון ${accountDisplay}`;
 }
 
 function setPortfolioDiagnostics(diagnostics) {
@@ -170,7 +223,7 @@ function getNoPositionsMessage(diagnostics, context = 'portfolio') {
     if (context === 'portfolio') {
         const message = createDiagnosticsMessageFromPortfolio(diagnostics);
         if (message) {
-            return `${message} לאחר הוספת הנתונים הטבלה תתעדכן אוטומטית.`;
+            return message;
         }
     } else if (context === 'account') {
         const message = createDiagnosticsMessageFromAccount(diagnostics);
@@ -1453,9 +1506,14 @@ function renderPortfolioSummaryFallback(summary, size) {
     const totalCost = summary.total_cost || 0;
     const totalPl = summary.total_pl || 0;
     const totalPlPercent = summary.total_pl_percent || 0;
+    const totalRealizedPl = summary.total_realized_pl || 0;
+    const totalUnrealizedPl = summary.total_unrealized_pl || 0;
+    const totalFees = summary.total_fees || 0;
     
     summaryElement.textContent = '';
+    
     if (size === 'minimal') {
+        // Minimal view: return to original simple text design
         const div1 = document.createElement('div');
         div1.textContent = 'סה"כ פוזיציות: ';
         const strong1 = document.createElement('strong');
@@ -1478,28 +1536,69 @@ function renderPortfolioSummaryFallback(summary, size) {
         div3.appendChild(strong3);
         summaryElement.appendChild(div3);
     } else {
-        const container = document.createElement('div');
-        container.className = 'info-summary-full';
+        // Full view: cards in grid layout
+        const cardsContainer = document.createElement('div');
+        cardsContainer.className = 'summary-cards-container';
         
-        const createSummaryRow = (label, value, className = '') => {
-            const div = document.createElement('div');
-            div.textContent = `${label}: `;
-            const strong = document.createElement('strong');
-            if (className) strong.className = className;
-            strong.textContent = value;
-            div.appendChild(strong);
-            return div;
+        // Helper function to create a stat card
+        const createStatCard = (label, value, valueClass = '', subtitle = '') => {
+            const card = document.createElement('div');
+            card.className = 'compact-stat-card';
+            
+            const numberDiv = document.createElement('div');
+            numberDiv.className = 'compact-stat-number';
+            if (valueClass) {
+                numberDiv.className += ` ${valueClass}`;
+            }
+            numberDiv.textContent = value;
+            card.appendChild(numberDiv);
+            
+            const labelDiv = document.createElement('div');
+            labelDiv.className = 'compact-stat-label';
+            labelDiv.textContent = label;
+            card.appendChild(labelDiv);
+            
+            if (subtitle) {
+                const subtitleDiv = document.createElement('div');
+                subtitleDiv.className = 'compact-stat-absolute';
+                subtitleDiv.textContent = subtitle;
+                card.appendChild(subtitleDiv);
+            }
+            
+            return card;
         };
         
-        container.appendChild(createSummaryRow('סה"כ פוזיציות', totalPositions));
-        container.appendChild(createSummaryRow('שווי שוק כולל', formatCurrencyHebrew(totalMarketValue, false, true)));
-        container.appendChild(createSummaryRow('עלות כוללת', formatCurrencyHebrew(totalCost, false, false)));
-        container.appendChild(createSummaryRow('רווח/הפסד מוכר', formatCurrencyHebrew(summary.total_realized_pl || 0, true, true)));
-        container.appendChild(createSummaryRow('רווח/הפסד לא מוכר', formatCurrencyHebrew(summary.total_unrealized_pl || 0, true, true)));
-        container.appendChild(createSummaryRow('רווח/הפסד כולל', `${formatCurrencyHebrew(totalPl, true, true)} (${totalPlPercent.toFixed(2)}%${totalPlPercent >= 0 ? '+' : '-'})`, totalPl >= 0 ? 'text-success' : 'text-danger'));
-        container.appendChild(createSummaryRow('סה"כ עמלות', formatCurrencyHebrew(summary.total_fees || 0, false, false)));
+        // Full view: all cards in grid
+        cardsContainer.appendChild(createStatCard('סה"כ פוזיציות', totalPositions.toString()));
+        cardsContainer.appendChild(createStatCard('שווי שוק כולל', formatCurrencyHebrew(totalMarketValue, false, true)));
+        cardsContainer.appendChild(createStatCard('עלות כוללת', formatCurrencyHebrew(totalCost, false, false)));
         
-        summaryElement.appendChild(container);
+        const realizedPlValue = formatCurrencyHebrew(totalRealizedPl, true, true);
+        cardsContainer.appendChild(createStatCard(
+            'רווח/הפסד מוכר',
+            realizedPlValue,
+            totalRealizedPl >= 0 ? 'positive' : 'negative'
+        ));
+        
+        const unrealizedPlValue = formatCurrencyHebrew(totalUnrealizedPl, true, true);
+        cardsContainer.appendChild(createStatCard(
+            'רווח/הפסד לא מוכר',
+            unrealizedPlValue,
+            totalUnrealizedPl >= 0 ? 'positive' : 'negative'
+        ));
+        
+        const plValue = formatCurrencyHebrew(totalPl, true, true);
+        const plPercent = `${totalPlPercent.toFixed(2)}%${totalPlPercent >= 0 ? '+' : ''}`;
+        cardsContainer.appendChild(createStatCard(
+            'רווח/הפסד כולל',
+            plValue,
+            totalPl >= 0 ? 'positive' : 'negative',
+            plPercent
+        ));
+        
+        cardsContainer.appendChild(createStatCard('סה"כ עמלות', formatCurrencyHebrew(totalFees, false, false)));
+        
+        summaryElement.appendChild(cardsContainer);
     }
     
     const diagnosticsSource = window.positionsPortfolioState.portfolioDiagnostics || window.positionsPortfolioState.summaryDiagnostics;
@@ -1594,8 +1693,13 @@ window.PositionsPortfolioSystem = {
     loadAccountPositions,
     loadPortfolio,
     loadPortfolioSummary,
+    updatePortfolioSummaryToggleButton,
     showPositionDetails: window.showPositionDetails
 };
+
+// Export functions to window for early access
+window.updatePortfolioSummaryToggleButton = updatePortfolioSummaryToggleButton;
+window.loadPortfolioSummary = loadPortfolioSummary;
 
 // Export table rendering functions to window scope for sorting
 window.updatePositionsTable = renderPositionsTable;

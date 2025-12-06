@@ -97,16 +97,84 @@
             document.body.appendChild(flagPaletteElement);
         }
 
-        // Position palette
+        // Position palette using fixed positioning for better control
+        const isRTL = document.documentElement.dir === 'rtl' || 
+                     getComputedStyle(document.body).direction === 'rtl';
+        
         if (position && position.element) {
             const rect = position.element.getBoundingClientRect();
-            flagPaletteElement.style.position = 'absolute';
-            flagPaletteElement.style.top = `${rect.bottom + 5}px`;
-            flagPaletteElement.style.left = `${rect.left}px`;
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+            
+            // Temporarily show to get dimensions
+            flagPaletteElement.style.visibility = 'hidden';
+            flagPaletteElement.style.display = 'block';
+            const paletteWidth = flagPaletteElement.offsetWidth || 200;
+            const paletteHeight = flagPaletteElement.offsetHeight || 150;
+            
+            // Calculate position
+            let left, top;
+            
+            // Horizontal positioning (RTL-aware)
+            if (isRTL) {
+                // RTL: try to open to the left (before button)
+                const spaceOnLeft = rect.left;
+                const spaceOnRight = viewportWidth - rect.right;
+                
+                if (spaceOnLeft >= paletteWidth) {
+                    // Enough space on left
+                    left = rect.left - paletteWidth - 5;
+                } else if (spaceOnRight >= paletteWidth) {
+                    // Not enough on left, use right
+                    left = rect.right + 5;
+                } else {
+                    // Default: align with button left edge
+                    left = Math.max(5, rect.left - paletteWidth + 20);
+                }
+            } else {
+                // LTR: try to open to the right
+                const spaceOnRight = viewportWidth - rect.right;
+                const spaceOnLeft = rect.left;
+                
+                if (spaceOnRight >= paletteWidth) {
+                    left = rect.right + 5;
+                } else if (spaceOnLeft >= paletteWidth) {
+                    left = rect.left - paletteWidth - 5;
+                } else {
+                    left = Math.max(5, rect.right - paletteWidth + 20);
+                }
+            }
+            
+            // Vertical positioning
+            if (rect.bottom + paletteHeight + 5 <= viewportHeight) {
+                // Enough space below
+                top = rect.bottom + 5;
+            } else if (rect.top - paletteHeight - 5 >= 0) {
+                // Not enough below, try above
+                top = rect.top - paletteHeight - 5;
+            } else {
+                // Default: below, but adjust if needed
+                top = Math.max(5, Math.min(rect.bottom + 5, viewportHeight - paletteHeight - 5));
+            }
+            
+            flagPaletteElement.style.position = 'fixed';
+            flagPaletteElement.style.left = `${left}px`;
+            flagPaletteElement.style.top = `${top}px`;
+            flagPaletteElement.style.visibility = 'visible';
+            flagPaletteElement.style.zIndex = '1050';
         } else if (position && position.x && position.y) {
-            flagPaletteElement.style.position = 'absolute';
-            flagPaletteElement.style.top = `${position.y}px`;
+            // Use provided coordinates (already in viewport coordinates)
+            flagPaletteElement.style.position = 'fixed';
             flagPaletteElement.style.left = `${position.x}px`;
+            flagPaletteElement.style.top = `${position.y}px`;
+            flagPaletteElement.style.zIndex = '1050';
+        } else {
+            // Fallback: center screen
+            flagPaletteElement.style.position = 'fixed';
+            flagPaletteElement.style.left = '50%';
+            flagPaletteElement.style.top = '50%';
+            flagPaletteElement.style.transform = 'translate(-50%, -50%)';
+            flagPaletteElement.style.zIndex = '1050';
         }
 
         flagPaletteElement.classList.remove('d-none');

@@ -192,7 +192,6 @@
       const chartInstance = window.TradingViewWidgetsFactory.createWidget('mini-chart', chartConfig);
       
       if (window.Logger) {
-        window.Logger.info('Created mini chart for ticker', { tickerId: ticker.id, symbol: tvSymbol, page: 'ticker-chart-widget' });
       }
 
       return chartInstance;
@@ -393,12 +392,10 @@
    * Load tickers with initial data
    */
   async function loadTickers() {
-    window.Logger?.info?.('🔄 TickerChartWidget: loadTickers START', { page: 'ticker-chart-widget' });
     showLoading();
     state.tickers = [];
 
     try {
-      window.Logger?.info?.('🔄 TickerChartWidget: Fetching /api/tickers/with-initial-data', { page: 'ticker-chart-widget' });
       const response = await fetch('/api/tickers/with-initial-data', {
         method: 'GET',
         headers: {
@@ -407,14 +404,11 @@
         }
       });
 
-      window.Logger?.info?.('🔄 TickerChartWidget: Response received', { status: response.status, ok: response.ok, page: 'ticker-chart-widget' });
-
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
       const data = await response.json();
-      window.Logger?.info?.('🔄 TickerChartWidget: Data parsed', { status: data.status, dataCount: Array.isArray(data.data) ? data.data.length : 0, page: 'ticker-chart-widget' });
       
       if (data.status === 'success' && Array.isArray(data.data)) {
         // If defaultTickers specified, filter to those
@@ -424,13 +418,13 @@
         }
         
         // Load full ticker data with technical indicators from EntityDetailsAPI
-        window.Logger?.info?.('🔄 TickerChartWidget: Loading full ticker data with technical indicators', { count: tickersToShow.length, page: 'ticker-chart-widget' });
         const enrichedTickers = await Promise.all(
           tickersToShow.map(async (ticker) => {
             try {
               if (window.entityDetailsAPI && typeof window.entityDetailsAPI.getEntityDetails === 'function') {
                 const fullData = await window.entityDetailsAPI.getEntityDetails('ticker', ticker.id, {
                   includeMarketData: true,
+                  includeLinkedItems: false, // Don't load linked items on homepage to avoid 429 errors
                   forceRefresh: false
                 });
                 // Merge full data with basic ticker data
@@ -445,7 +439,6 @@
         );
         
         state.tickers = enrichedTickers;
-        window.Logger?.info?.('✅ TickerChartWidget: Rendering tickers', { count: state.tickers.length, page: 'ticker-chart-widget' });
         await renderTickers(state.tickers);
       } else {
         throw new Error(data.error?.message || 'Invalid response format');
@@ -468,8 +461,6 @@
      * @param {object} config - Configuration object (optional)
      */
     init(containerId = CONTAINER_ID, config = {}) {
-      window.Logger?.info?.('🚀 TickerChartWidget.init() called', { containerId, config, page: 'ticker-chart-widget' });
-      
       if (state.initialized) {
         window.Logger?.warn?.('⚠️ TickerChartWidget already initialized', { page: 'ticker-chart-widget' });
         return;
@@ -480,22 +471,16 @@
         ...DEFAULT_CONFIG,
         ...config
       };
-      window.Logger?.info?.('⚙️ TickerChartWidget: Config merged', { config: state.config, page: 'ticker-chart-widget' });
 
       if (!cacheElements()) {
         window.Logger?.error?.('❌ TickerChartWidget: Container not found', { containerId, page: 'ticker-chart-widget' });
         return;
       }
-      window.Logger?.info?.('✅ TickerChartWidget: Elements cached', { page: 'ticker-chart-widget' });
 
       state.initialized = true;
-      window.Logger?.info?.('✅ TickerChartWidget: State initialized', { page: 'ticker-chart-widget' });
 
       // Load tickers
-      window.Logger?.info?.('🔄 TickerChartWidget: Loading tickers', { page: 'ticker-chart-widget' });
       loadTickers();
-
-      window.Logger?.info?.('✅ TickerChartWidget initialized successfully', { config: state.config, page: 'ticker-chart-widget' });
     },
 
     /**

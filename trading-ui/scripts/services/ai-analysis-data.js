@@ -247,18 +247,67 @@
           });
 
           if (!response.ok) {
-            const errorData = await response.json().catch(() => ({}));
+            let errorData = {};
+            try {
+              const text = await response.text();
+              if (text) {
+                errorData = JSON.parse(text);
+              }
+            } catch (parseError) {
+              window.Logger?.warn?.('⚠️ Failed to parse validation error response', {
+                ...PAGE_LOG_CONTEXT,
+                parseError: parseError?.message,
+                status: response.status
+              });
+            }
+            
+            // Extract errors - handle both array and string formats
+            let errors = [];
+            if (errorData.error) {
+              if (Array.isArray(errorData.error.errors)) {
+                errors = errorData.error.errors;
+              } else if (errorData.error.message) {
+                errors = [errorData.error.message];
+              } else if (typeof errorData.error === 'string') {
+                errors = [errorData.error];
+              }
+            } else if (errorData.errors) {
+              errors = Array.isArray(errorData.errors) ? errorData.errors : [errorData.errors];
+            } else if (errorData.message) {
+              errors = [errorData.message];
+            }
+            
+            if (errors.length === 0) {
+              errors = [`Validation failed (HTTP ${response.status})`];
+            }
+            
+            window.Logger?.warn?.('⚠️ Validation response not OK', {
+              ...PAGE_LOG_CONTEXT,
+              status: response.status,
+              statusText: response.statusText,
+              errorData: errorData,
+              extractedErrors: errors
+            });
+            
             return {
               is_valid: false,
-              errors: errorData.error?.errors || [errorData.error?.message || 'Validation failed']
+              errors: errors
             };
           }
 
           const result = await response.json();
-          return {
-            is_valid: result.status === 'success',
-            errors: []
-          };
+          if (result.status === 'success') {
+            return {
+              is_valid: true,
+              errors: []
+            };
+          } else {
+            // Handle error response (status: 'error' with 200 OK)
+            return {
+              is_valid: false,
+              errors: result.error?.errors || [result.error?.message || 'Validation failed']
+            };
+          }
         }, { ttl: 60 * 1000 });
       }
       
@@ -273,18 +322,67 @@
       });
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
+        let errorData = {};
+        try {
+          const text = await response.text();
+          if (text) {
+            errorData = JSON.parse(text);
+          }
+        } catch (parseError) {
+          window.Logger?.warn?.('⚠️ Failed to parse validation error response (fallback)', {
+            ...PAGE_LOG_CONTEXT,
+            parseError: parseError?.message,
+            status: response.status
+          });
+        }
+        
+        // Extract errors - handle both array and string formats
+        let errors = [];
+        if (errorData.error) {
+          if (Array.isArray(errorData.error.errors)) {
+            errors = errorData.error.errors;
+          } else if (errorData.error.message) {
+            errors = [errorData.error.message];
+          } else if (typeof errorData.error === 'string') {
+            errors = [errorData.error];
+          }
+        } else if (errorData.errors) {
+          errors = Array.isArray(errorData.errors) ? errorData.errors : [errorData.errors];
+        } else if (errorData.message) {
+          errors = [errorData.message];
+        }
+        
+        if (errors.length === 0) {
+          errors = [`Validation failed (HTTP ${response.status})`];
+        }
+        
+        window.Logger?.warn?.('⚠️ Validation response not OK (fallback)', {
+          ...PAGE_LOG_CONTEXT,
+          status: response.status,
+          statusText: response.statusText,
+          errorData: errorData,
+          extractedErrors: errors
+        });
+        
         return {
           is_valid: false,
-          errors: errorData.error?.errors || [errorData.error?.message || 'Validation failed']
+          errors: errors
         };
       }
 
       const result = await response.json();
-      return {
-        is_valid: result.status === 'success',
-        errors: []
-      };
+      if (result.status === 'success') {
+        return {
+          is_valid: true,
+          errors: []
+        };
+      } else {
+        // Handle error response (status: 'error' with 200 OK)
+        return {
+          is_valid: false,
+          errors: result.error?.errors || [result.error?.message || 'Validation failed']
+        };
+      }
     } catch (error) {
       window.Logger?.error?.('❌ Error validating analysis request', {
         ...PAGE_LOG_CONTEXT,

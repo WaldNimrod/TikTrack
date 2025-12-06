@@ -131,7 +131,7 @@
     try {
       if (combination === 'createTrades') {
         if (!window.ExecutionClusteringService) {
-          window.Logger?.warn?.('ExecutionClusteringService not available', { combination, page: 'unified-pending-actions-widget' });
+          window.Logger?.debug?.('ExecutionClusteringService not available', { combination, page: 'unified-pending-actions-widget' });
           return [];
         }
         // Getting cached clusters for createTrades
@@ -1343,7 +1343,7 @@
       await new Promise(resolve => setTimeout(resolve, 200));
     }
     
-    window.Logger?.warn?.('Some required services not available', {
+    window.Logger?.debug?.('Some required services not available', {
       hasClusteringService: !!window.ExecutionClusteringService,
       hasAssignmentService: !!window.ExecutionAssignmentService,
       hasTradePlanService: !!window.TradePlanAssignmentService,

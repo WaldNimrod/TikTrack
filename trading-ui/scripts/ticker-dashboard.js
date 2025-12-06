@@ -245,18 +245,12 @@
                     'נתונים חסרים',
                     message,
                     () => {
-                        // After user confirms, ensure progress overlay will be above modal
-                        // by closing modal first, then resolving
+                        // After user confirms, close modal and resolve
                         const modal = document.getElementById('confirmationModal');
-                        if (modal && window.ModalManagerV2) {
-                            window.ModalManagerV2.closeModal('confirmationModal').then(() => {
-                                resolve(true);
-                            }).catch(() => {
-                                resolve(true); // Resolve anyway if close fails
-                            });
-                        } else {
-                            resolve(true);
+                        if (modal && window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
+                            window.ModalManagerV2.hideModal('confirmationModal');
                         }
+                        resolve(true);
                     },
                     () => {
                         resolve(false);

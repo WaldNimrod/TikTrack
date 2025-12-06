@@ -1819,18 +1819,18 @@ async function saveNote() {
       });
     } else {
       // Fallback to direct API call with CRUDResponseHandler
-      const crudOptions = {
-        modalId: 'notesModal',
-        successMessage: noteId ? 'הערה עודכנה בהצלחה!' : 'הערה נשמרה בהצלחה!',
-        entityName: 'הערה',
-        reloadFn,
-        requiresHardReload: false
-      };
+    const crudOptions = {
+      modalId: 'notesModal',
+      successMessage: noteId ? 'הערה עודכנה בהצלחה!' : 'הערה נשמרה בהצלחה!',
+      entityName: 'הערה',
+      reloadFn,
+      requiresHardReload: false
+    };
 
-      if (noteId) {
-        crudResult = await CRUDResponseHandler.handleUpdateResponse(response, crudOptions);
-      } else {
-        crudResult = await CRUDResponseHandler.handleSaveResponse(response, crudOptions);
+    if (noteId) {
+      crudResult = await CRUDResponseHandler.handleUpdateResponse(response, crudOptions);
+    } else {
+      crudResult = await CRUDResponseHandler.handleSaveResponse(response, crudOptions);
       }
     }
 
@@ -2058,20 +2058,20 @@ async function deleteNoteFromServer(noteId) {
         return; // יציאה מוצלחת
       } else {
         // Fallback to direct API call with CRUDResponseHandler
-        const useService = typeof window.NotesData?.deleteNote === 'function';
-        const response = useService
-          ? await window.NotesData.deleteNote(noteId)
-          : await fetch(`/api/notes/${noteId}`, { method: 'DELETE' });
+      const useService = typeof window.NotesData?.deleteNote === 'function';
+      const response = useService
+        ? await window.NotesData.deleteNote(noteId)
+        : await fetch(`/api/notes/${noteId}`, { method: 'DELETE' });
 
-        // שימוש ב-CRUDResponseHandler עם רענון אוטומטי
-        await CRUDResponseHandler.handleDeleteResponse(response, {
-          successMessage: 'הערה נמחקה בהצלחה!',
-          apiUrl: '/api/notes/',
-          entityName: 'הערה',
-          reloadFn: () => window.loadNotesData({ force: true }),
-          requiresHardReload: false
-        });
-        return; // יציאה מוצלחת
+      // שימוש ב-CRUDResponseHandler עם רענון אוטומטי
+      await CRUDResponseHandler.handleDeleteResponse(response, {
+        successMessage: 'הערה נמחקה בהצלחה!',
+        apiUrl: '/api/notes/',
+        entityName: 'הערה',
+        reloadFn: () => window.loadNotesData({ force: true }),
+        requiresHardReload: false
+      });
+      return; // יציאה מוצלחת
       }
     } catch (error) {
       retryCount++;

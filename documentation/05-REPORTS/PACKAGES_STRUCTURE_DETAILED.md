@@ -52,7 +52,7 @@
 
 | עמוד | חבילות מוגדרות | סטטוס |
 |------|----------------|-------|
-| **index** | base, services, ui-advanced, modules, crud, preferences, entity-services, entity-details, info-summary, dashboard-widgets, init-system | ✅ מוגדר |
+| **index** | base, services, ui-advanced, modules, crud, preferences, entity-services, entity-details, info-summary, dashboard-widgets, tradingview-widgets, conditions, init-system | ✅ מוגדר |
 | **trades** | ❌ **חסר** | 🔴 צריך להוסיף |
 | **trade_plans** | ❌ **חסר** | 🔴 צריך להוסיף |
 | **alerts** | ❌ **חסר** | 🔴 צריך להוסיף |

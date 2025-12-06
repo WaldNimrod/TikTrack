@@ -963,25 +963,19 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
           }, { page: 'core-systems' });
         }
 
-        if (window.UnifiedCacheManager) {
-        } else if (!dependencyCheck.details.UnifiedCacheManager.optional) {
-          console.error(
-            '❌ UnifiedCacheManager is required but not available - using localStorage fallback'
-          );
+        if (!window.UnifiedCacheManager) {
+          throw new Error('UnifiedCacheManager is required but not available');
+        }
+
+        if (!window.UnifiedCacheManager.initialized) {
+          throw new Error('UnifiedCacheManager failed to initialize - check logs for details');
         }
 
         // Set global flag for other systems
-        window.cacheSystemReady =
-          window.UnifiedCacheManager && window.UnifiedCacheManager.initialized;
-
-        if (window.cacheSystemReady) {
-          if (window.Logger?.debug) {
-            window.Logger.debug('Cache system ready (4-layer architecture)', {}, { page: 'core-systems' });
-          }
-        } else {
-          if (window.Logger?.warn) {
-            window.Logger.warn('Cache system not ready, using localStorage fallback', {}, { page: 'core-systems' });
-          }
+        window.cacheSystemReady = true;
+        
+        if (window.Logger?.info) {
+          window.Logger.info('✅ Cache system ready (4-layer architecture)', {}, { page: 'core-systems' });
         }
 
         // Initialize preferences system (standardized loading for all pages)
@@ -1060,6 +1054,16 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
           }
 
           if (typeof window.initializeHeaderSystem === 'function') {
+            // Check if Header System is already initialized (prevent double initialization)
+            if (window.headerSystem && window.headerSystem.isInitialized) {
+              if (window.Logger?.debug) {
+                window.Logger.debug('Header System already initialized, skipping PLANNED method', {
+                  page: window.location.pathname
+                }, { page: 'core-systems' });
+              }
+              return;
+            }
+            
             // Mark that planned initialization is being used
             window.__headerSystemInitMethod = 'planned';
             
@@ -1797,12 +1801,12 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
               window.Logger.debug('Initializing UnifiedCacheManager', {}, { page: 'core-systems' });
             }
 
-            // Add timeout to prevent hanging
+            // Add timeout to prevent hanging (increased to 30 seconds for slow IndexedDB)
             const initPromise = window.UnifiedCacheManager.initialize();
             const timeoutPromise = new Promise((_, reject) =>
               setTimeout(
                 () => reject(new Error('UnifiedCacheManager initialization timeout')),
-                10000
+                30000
               )
             );
 
@@ -1827,12 +1831,11 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
           } else {
             console.error('❌ UnifiedCacheManager initialization failed:', error);
           }
-          console.warn('⚠️ Using localStorage fallback');
-          // Set a flag to indicate cache system is not available
-          window.UnifiedCacheManager = null;
+          // Don't set to null - throw the error so we can see the real problem
+          throw error;
         }
       } else {
-        console.warn('⚠️ UnifiedCacheManager not available, using localStorage fallback');
+        throw new Error('UnifiedCacheManager is not available - script may not be loaded');
       }
     }
 
@@ -2104,10 +2107,10 @@ async function initializeCacheSystem() {
         window.Logger.debug('Initializing UnifiedCacheManager (legacy)', {}, { page: 'core-systems' });
       }
 
-      // Add timeout to prevent hanging
+      // Add timeout to prevent hanging (increased to 30 seconds for slow IndexedDB)
       const initPromise = window.UnifiedCacheManager.initialize();
       const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error('UnifiedCacheManager initialization timeout')), 10000)
+        setTimeout(() => reject(new Error('UnifiedCacheManager initialization timeout')), 30000)
       );
 
       const initResult = await Promise.race([initPromise, timeoutPromise]);
@@ -3341,7 +3344,7 @@ function showFinalSuccessModal(successInfo) {
             </h4>
             <div class="d-flex gap-2">
               <button data-button-type="COPY" id="finalSuccessModal-copy-btn" data-text="העתק" title="העתק פרטי הצלחה"></button>
-              <button data-button-type="CLOSE" id="finalSuccessModal-close-btn" data-text="סגור" title="סגור"></button>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="סגור" id="finalSuccessModal-close-btn" title="סגור"></button>
             </div>
           </div>
           <div class="modal-body">
@@ -3378,7 +3381,7 @@ function showFinalSuccessModal(successInfo) {
           </div>
           <div class="modal-footer" style="justify-content: flex-end; direction: rtl;">
             <button data-button-type="COPY" id="finalSuccessModal-footer-copy" data-text="העתק" title="העתק פרטי הצלחה"></button>
-            <button data-button-type="CLOSE" id="finalSuccessModal-footer-close" data-text="סגור" title="סגור"></button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="finalSuccessModal-footer-close" data-text="סגור" title="סגור">סגור</button>
           </div>
         </div>
       </div>
@@ -3406,15 +3409,29 @@ function showFinalSuccessModal(successInfo) {
     });
   });
 
+  // Close buttons - use Bootstrap's data-bs-dismiss="modal" for automatic handling
+  // Also add manual event listeners as fallback
   const closeButtons = modalElement
     ? modalElement.querySelectorAll('#finalSuccessModal-close-btn, #finalSuccessModal-footer-close')
     : [];
   closeButtons.forEach(button => {
-    button.addEventListener('click', () => {
+    // Ensure data-bs-dismiss is set
+    if (!button.hasAttribute('data-bs-dismiss')) {
+      button.setAttribute('data-bs-dismiss', 'modal');
+    }
+    // Add manual event listener as fallback
+    button.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
       if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
         window.ModalManagerV2.hideModal('finalSuccessModal');
       } else if (modalInstance) {
         modalInstance.hide();
+      } else if (modalElement) {
+        const bsModal = bootstrap.Modal.getInstance(modalElement);
+        if (bsModal) {
+          bsModal.hide();
+        }
       }
     });
   });
@@ -3497,7 +3514,7 @@ function showFinalSuccessModalWithReload(successInfo) {
             </h4>
             <div class="d-flex gap-2">
               <button data-button-type="COPY" id="finalSuccessModalWithReload-copy-btn" data-text="העתק" title="העתק פרטי הצלחה"></button>
-              <button data-button-type="CLOSE" id="finalSuccessModalWithReload-close-btn" data-text="סגור" title="סגור"></button>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="סגור" id="finalSuccessModalWithReload-close-btn" title="סגור"></button>
             </div>
           </div>
           <div class="modal-body">
@@ -3538,7 +3555,7 @@ function showFinalSuccessModalWithReload(successInfo) {
           <div class="modal-footer" style="justify-content: space-between; direction: rtl;">
             <div class="d-flex gap-2">
               <button data-button-type="COPY" id="finalSuccessModalWithReload-footer-copy" data-text="העתק" title="העתק פרטי הצלחה"></button>
-              <button data-button-type="CLOSE" id="finalSuccessModalWithReload-footer-close" data-text="סגור" title="סגור"></button>
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="finalSuccessModalWithReload-footer-close" data-text="סגור" title="סגור">סגור</button>
             </div>
             <button type="button" class="btn btn-primary" id="finalSuccessModal-reload-btn">
               <i class="fas fa-sync-alt"></i> רענן עכשיו
@@ -3572,17 +3589,31 @@ function showFinalSuccessModalWithReload(successInfo) {
     });
   });
 
+  // Close buttons - use Bootstrap's data-bs-dismiss="modal" for automatic handling
+  // Also add manual event listeners as fallback
   const closeButtons = modalElement
     ? modalElement.querySelectorAll(
         '#finalSuccessModalWithReload-close-btn, #finalSuccessModalWithReload-footer-close'
       )
     : [];
   closeButtons.forEach(button => {
-    button.addEventListener('click', () => {
+    // Ensure data-bs-dismiss is set
+    if (!button.hasAttribute('data-bs-dismiss')) {
+      button.setAttribute('data-bs-dismiss', 'modal');
+    }
+    // Add manual event listener as fallback
+    button.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
       if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
         window.ModalManagerV2.hideModal('finalSuccessModalWithReload');
       } else if (modalInstance) {
         modalInstance.hide();
+      } else if (modalElement) {
+        const bsModal = bootstrap.Modal.getInstance(modalElement);
+        if (bsModal) {
+          bsModal.hide();
+        }
       }
     });
   });
@@ -3659,7 +3690,7 @@ async function showCriticalErrorModal(errorInfo, detailedMessage) {
             </h4>
             <div class="d-flex gap-2">
               <button data-button-type="COPY" id="${modalId}-copy-btn" data-text="העתק" title="העתק פרטי שגיאה"></button>
-              <button data-button-type="CLOSE" id="${modalId}-close-btn" data-text="סגור" title="סגור"></button>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="סגור" id="${modalId}-close-btn" title="סגור"></button>
             </div>
           </div>
           <div class="modal-body">
@@ -3697,7 +3728,7 @@ async function showCriticalErrorModal(errorInfo, detailedMessage) {
           </div>
           <div class="modal-footer" style="justify-content: flex-end; direction: rtl;">
             <button data-button-type="COPY" id="${modalId}-copy-details-btn" data-text="העתק" title="העתק פרטי שגיאה"></button>
-            <button data-button-type="CLOSE" id="${modalId}-footer-close" data-text="סגור" title="סגור"></button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="${modalId}-footer-close" data-text="סגור" title="סגור">סגור</button>
           </div>
         </div>
       </div>
@@ -3784,19 +3815,61 @@ async function showCriticalErrorModal(errorInfo, detailedMessage) {
     }
   });
 
-  // Close button in header
+  // Close button in header - use ModalManagerV2 or Bootstrap
   const headerCloseButton = modal.querySelector(`#${modalId}-close-btn`);
   if (headerCloseButton) {
-    headerCloseButton.addEventListener('click', () => {
-      hideModal(modalId);
+    // Ensure data-bs-dismiss is set for Bootstrap
+    if (!headerCloseButton.hasAttribute('data-bs-dismiss')) {
+      headerCloseButton.setAttribute('data-bs-dismiss', 'modal');
+    }
+    // Add manual event listener as fallback
+    headerCloseButton.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      // Use ModalManagerV2 if available, otherwise Bootstrap
+      if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
+        window.ModalManagerV2.hideModal(modalId);
+      } else if (bootstrap?.Modal) {
+        const bsModal = bootstrap.Modal.getInstance(modal);
+        if (bsModal) {
+          bsModal.hide();
+        } else {
+          modal.style.display = 'none';
+          modal.classList.remove('show');
+        }
+      } else {
+        modal.style.display = 'none';
+        modal.classList.remove('show');
+      }
     });
   }
 
-  // Close button in footer
+  // Close button in footer - use ModalManagerV2 or Bootstrap
   const footerCloseBtn = modal.querySelector(`#${modalId}-footer-close`);
   if (footerCloseBtn) {
-    footerCloseBtn.addEventListener('click', () => {
-      hideModal(modalId);
+    // Ensure data-bs-dismiss is set for Bootstrap
+    if (!footerCloseBtn.hasAttribute('data-bs-dismiss')) {
+      footerCloseBtn.setAttribute('data-bs-dismiss', 'modal');
+    }
+    // Add manual event listener as fallback
+    footerCloseBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      // Use ModalManagerV2 if available, otherwise Bootstrap
+      if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
+        window.ModalManagerV2.hideModal(modalId);
+      } else if (bootstrap?.Modal) {
+        const bsModal = bootstrap.Modal.getInstance(modal);
+        if (bsModal) {
+          bsModal.hide();
+        } else {
+          modal.style.display = 'none';
+          modal.classList.remove('show');
+        }
+      } else {
+        modal.style.display = 'none';
+        modal.classList.remove('show');
+      }
     });
   }
 
@@ -4103,19 +4176,36 @@ async function showDetailsModal(title, content, options = {}) {
 // Helper function to hide modal
 function hideModal(modalId) {
   const modal = document.getElementById(modalId);
-  const backdrop = document.getElementById(`${modalId}-backdrop`);
-
-  if (modal) {
-    modal.style.display = 'none';
-    modal.classList.remove('show');
-    modal.remove();
+  if (!modal) {
+    return;
   }
+
+  // Try Bootstrap Modal instance first
+  const bsModal = bootstrap?.Modal?.getInstance(modal);
+  if (bsModal) {
+    bsModal.hide();
+    // Remove modal after Bootstrap hides it
+    modal.addEventListener('hidden.bs.modal', () => {
+      modal.remove();
+    }, { once: true });
+    return;
+  }
+
+  // Try ModalManagerV2
+  if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
+    window.ModalManagerV2.hideModal(modalId);
+    return;
+  }
+
+  // Fallback: Manual removal
+  const backdrop = document.getElementById(`${modalId}-backdrop`);
+  modal.style.display = 'none';
+  modal.classList.remove('show');
+  modal.remove();
 
   if (backdrop) {
     backdrop.remove();
   }
-
-  // Backdrop handled by Bootstrap
 }
 
 // Helper function to close all details modals
@@ -5325,11 +5415,6 @@ if (false && typeof window.PAGE_CONFIGS === 'undefined') {
           // Define global functions for button onclick handlers
           console.log('🔧 Defining global functions for External Data Dashboard...');
 
-          window.testProvider = function (providerId) {
-            // console.log('🧪 Testing provider:', providerId);
-            // Implementation for testing specific provider
-          };
-
           window.toggleProvider = function (providerId) {
             // console.log('🔄 Toggling provider:', providerId);
             // Implementation for toggling provider status
@@ -5377,14 +5462,7 @@ if (false && typeof window.PAGE_CONFIGS === 'undefined') {
             }
           };
 
-          window.testAllProviders = function () {
-            console.log('🔔 testAllProviders called from global function');
-            if (window.externalDataDashboard) {
-              window.externalDataDashboard.testAllProviders();
-            } else {
-              console.error('❌ externalDataDashboard not available');
-            }
-          };
+          // testAllProviders removed - Test Provider feature deprecated
 
           window.exportData = function () {
             if (window.externalDataDashboard) {

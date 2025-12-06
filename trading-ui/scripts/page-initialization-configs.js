@@ -204,6 +204,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'entity-details',
         'info-summary',
         'dashboard-widgets',
+        'tradingview-widgets', // Required for TickerChartWidget mini charts
         'conditions', // Conditions System
         'init-system',
       ],
@@ -224,6 +225,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.TagWidget',
         'window.TickerListWidget', // Ticker List Widget
         'window.TickerChartWidget', // Ticker Chart Widget
+        'window.TradingViewWidgetsFactory', // TradingView Widgets Factory (required for TickerChartWidget)
         'window.WatchListsWidgetService', // Watch Lists Widget Service
         'window.conditionsInitializer', // Conditions System
         'window.ConditionsUIManager', // Conditions System
@@ -277,10 +279,8 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
           }
 
           // Use the new unified initialization function
-          window.Logger?.info?.('🔵 About to call initializeIndexPage...', { page: 'page-initialization-configs' });
           if (typeof window.initializeIndexPage === 'function') {
             await window.initializeIndexPage();
-            window.Logger?.info?.('🔵 initializeIndexPage completed', { page: 'page-initialization-configs' });
           } else {
             // Fallback to old method
             // Initialize charts if available
@@ -295,34 +295,22 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
           }
 
           // Initialize ticker widgets
-          window.Logger?.info?.('🔵 About to initialize ticker widgets...', { 
-            hasTickerListWidget: typeof window.TickerListWidget !== 'undefined',
-            hasTickerChartWidget: typeof window.TickerChartWidget !== 'undefined',
-            page: 'page-initialization-configs' 
-          });
-          
           if (window.TickerListWidget) {
             try {
-              window.Logger?.info?.('🔵 Initializing TickerListWidget...', { page: 'page-initialization-configs' });
               window.TickerListWidget.init('tickerListWidgetContainer', {
                 maxItems: 5,
                 defaultTab: 'active'
               });
-              window.Logger?.info?.('✅ TickerListWidget initialized successfully', { page: 'page-initialization-configs' });
             } catch (error) {
               window.Logger?.error?.('❌ Error initializing TickerListWidget', { error: error.message, stack: error.stack, page: 'page-initialization-configs' });
             }
-          } else {
-            window.Logger?.warn?.('⚠️ TickerListWidget not available', { page: 'page-initialization-configs' });
           }
           
           if (window.TickerChartWidget) {
             try {
-              window.Logger?.info?.('🔵 Initializing TickerChartWidget...', { page: 'page-initialization-configs' });
               window.TickerChartWidget.init('tickerChartWidgetContainer', {
                 maxItems: 3
               });
-              window.Logger?.info?.('✅ TickerChartWidget initialized successfully', { page: 'page-initialization-configs' });
             } catch (error) {
               window.Logger?.error?.('❌ Error initializing TickerChartWidget', { error: error.message, stack: error.stack, page: 'page-initialization-configs' });
             }
@@ -344,76 +332,42 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
           }
 
           // Initialize unified tag widget
-          window.Logger?.info?.('🔵 About to initialize TagWidget...', { page: 'page-initialization-configs' });
           if (typeof window.TagWidget !== 'undefined' && typeof window.TagWidget.init === 'function') {
             try {
-              window.Logger?.info?.('🏷️ Initializing TagWidget...', { page: 'page-initialization-configs' });
               // Initialize with default configuration: min 1 row, max 3 rows
               window.TagWidget.init('tagWidgetContainer', {
                 minRows: 1,
                 maxRows: 3,
                 rowHeight: 20
               });
-              window.Logger?.info?.('✅ TagWidget initialization called', { page: 'page-initialization-configs' });
             } catch (error) {
               window.Logger?.warn('⚠️ Error initializing TagWidget:', error, {
                 page: 'page-initialization-configs',
               });
             }
-          } else {
-            window.Logger?.warn('⚠️ TagWidget not available', {
-              TagWidgetExists: typeof window.TagWidget !== 'undefined',
-              hasInit: typeof window.TagWidget?.init === 'function',
-              page: 'page-initialization-configs',
-            });
           }
 
           // Initialize unified recent items widget
           if (typeof window.RecentItemsWidget !== 'undefined' && typeof window.RecentItemsWidget.init === 'function') {
             try {
-              window.Logger?.info?.('📊 Initializing RecentItemsWidget...', { page: 'page-initialization-configs' });
               window.RecentItemsWidget.init('recentItemsWidgetContainer', {
                 defaultTab: 'trades',
                 maxItems: 5 // Maximum number of items to display per tab
               });
-              window.Logger?.info?.('✅ RecentItemsWidget initialization called', { page: 'page-initialization-configs' });
             } catch (error) {
               window.Logger?.warn('⚠️ Error initializing RecentItemsWidget:', error, {
                 page: 'page-initialization-configs',
               });
             }
-          } else {
-            window.Logger?.warn('⚠️ RecentItemsWidget not available', {
-              RecentItemsWidgetExists: typeof window.RecentItemsWidget !== 'undefined',
-              hasInit: typeof window.RecentItemsWidget?.init === 'function',
-              page: 'page-initialization-configs',
-            });
           }
 
           // Initialize unified pending actions widget
-          window.Logger?.info?.('🔴🔴🔴 CHECKING UnifiedPendingActionsWidget - START', {
-            WidgetExists: typeof window.UnifiedPendingActionsWidget !== 'undefined',
-            hasInit: typeof window.UnifiedPendingActionsWidget?.init === 'function',
-            page: 'page-initialization-configs',
-          });
-          
           try {
             if (typeof window.UnifiedPendingActionsWidget !== 'undefined' && typeof window.UnifiedPendingActionsWidget.init === 'function') {
-              window.Logger?.info?.('🟢🟢🟢 Initializing UnifiedPendingActionsWidget...', { 
-                containerId: 'unifiedPendingActionsWidgetContainer',
-                config: { defaultItemsLimit: 4, defaultAction: 'assign', defaultEntity: 'plans' },
-                page: 'page-initialization-configs' 
-              });
-              
-              const result = await window.UnifiedPendingActionsWidget.init('unifiedPendingActionsWidgetContainer', {
+              await window.UnifiedPendingActionsWidget.init('unifiedPendingActionsWidgetContainer', {
                 defaultItemsLimit: 4,
                 defaultAction: 'assign',
                 defaultEntity: 'plans'
-              });
-              
-              window.Logger?.info?.('✅✅✅ UnifiedPendingActionsWidget initialization completed', { 
-                result,
-                page: 'page-initialization-configs' 
               });
             } else {
               window.Logger?.error?.('🔴🔴🔴 UnifiedPendingActionsWidget not available!', {
@@ -431,17 +385,10 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
             });
           }
           
-          window.Logger?.info?.('🔴🔴🔴 CHECKING UnifiedPendingActionsWidget - END', {
-            page: 'page-initialization-configs',
-          });
-          
           // Equalize widget heights after all widgets are initialized
           // Wait a bit for widgets to render their content
           setTimeout(() => {
             if (typeof window.equalizeWidgetHeights === 'function') {
-              window.Logger?.info?.('📏 Equalizing widget heights after initialization...', {
-                page: 'page-initialization-configs',
-              });
               window.equalizeWidgetHeights();
             }
           }, 1500);
@@ -1776,12 +1723,10 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.SelectPopulatorService',
         'window.DataCollectionService',
         'window.DefaultValueSetter',
-        'window.LinkedItemsService',
         'window.CRUDResponseHandler',
         'window.ModalManagerV2',
         'window.conditionsInitializer',
         'window.ConditionsUIManager',
-        'window.PendingTradePlanWidget',
         'window.PaginationSystem',
       // ← NEW: מטאדאטה
       ],

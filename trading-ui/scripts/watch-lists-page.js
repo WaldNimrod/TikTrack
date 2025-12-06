@@ -374,6 +374,54 @@
         if (titleEl) {
             titleEl.textContent = listName || 'רשימה פעילה';
         }
+        // Also update select if exists
+        const selectEl = document.getElementById('activeListSelect');
+        if (selectEl) {
+            // Find option by text and select it
+            const options = selectEl.querySelectorAll('option');
+            for (const option of options) {
+                if (option.textContent === listName) {
+                    selectEl.value = option.value;
+                    break;
+                }
+            }
+        }
+    }
+
+    /**
+     * Switch to different watch list
+     * @param {string|number} listId - List ID
+     */
+    function switchList(listId) {
+        if (!listId) {
+            window.Logger?.warn?.('No list ID provided', PAGE_LOG_CONTEXT);
+            return;
+        }
+
+        const listIdNum = typeof listId === 'string' ? parseInt(listId, 10) : listId;
+        
+        window.Logger?.info?.('🔄 Switching to list', { ...PAGE_LOG_CONTEXT, listId: listIdNum });
+
+        // Find list in data
+        const list = watchListsData.find(l => l.id === listIdNum);
+        if (!list) {
+            window.Logger?.warn?.('List not found', { ...PAGE_LOG_CONTEXT, listId: listIdNum });
+            return;
+        }
+
+        // Set as active
+        activeListId = listIdNum;
+        
+        // Load list items
+        loadWatchListItems(listIdNum);
+        
+        // Update title
+        updateActiveListTitle(list.name);
+        
+        // Save page state
+        savePageState();
+        
+        window.Logger?.info?.('✅ Switched to list', { ...PAGE_LOG_CONTEXT, listId: listIdNum, name: list.name });
     }
 
     // ===== VIEW MODE =====
@@ -404,6 +452,17 @@
             currentViewMode = mode;
         }
         
+        // Update active button state
+        const viewModeButtons = document.querySelectorAll('.btn-view-mode');
+        viewModeButtons.forEach(btn => {
+            const btnMode = btn.getAttribute('data-view-mode');
+            if (btnMode === mode) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        });
+        
         // Save page state
         savePageState();
     }
@@ -415,7 +474,16 @@
      * @param {number} itemId - Item ID
      */
     function showFlagPalette(itemId) {
-        if (window.WatchListsUIService?.showFlagPalette) {
+        // Use flag-quick-action.js if available
+        if (window.FlagQuickAction?.show) {
+            const flagBtn = document.querySelector(`[data-item-id="${itemId}"] .btn-flag`);
+            if (flagBtn) {
+                // Pass element for better positioning
+                window.FlagQuickAction.show(itemId, { element: flagBtn });
+            } else {
+                window.FlagQuickAction.show(itemId);
+            }
+        } else if (window.WatchListsUIService?.showFlagPalette) {
             window.WatchListsUIService.showFlagPalette(itemId);
         } else {
             // Fallback - would open flag-quick-action modal
@@ -927,17 +995,9 @@
         }
     }
 
-    // ===== INITIALIZATION =====
-
-    // Initialize when DOM is ready
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initializeWatchListsPage);
-    } else {
-        // DOM already loaded
-        initializeWatchListsPage();
-    }
-
     // ===== GLOBAL EXPORTS =====
+    // Note: Initialization is handled by UnifiedAppInitializer via page-initialization-configs.js
+    // The init function will be called automatically by the unified initialization system
 
     window.WatchListsPage = {
         // Initialization
@@ -955,6 +1015,7 @@
         renderSummaryStats,
         renderFlaggedTickers,
         updateActiveListTitle,
+        switchList,
 
         // View mode
         setViewMode,

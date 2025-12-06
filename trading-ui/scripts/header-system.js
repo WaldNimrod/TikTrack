@@ -27,7 +27,9 @@ if (window.Logger) {
 }
 
 // ===== FilterManager Class =====
-class FilterManager {
+// Prevent duplicate declaration
+if (typeof window.FilterManager === 'undefined') {
+window.FilterManager = class FilterManager {
   constructor() {
     this.currentFilters = {
       search: '',
@@ -683,9 +685,12 @@ class FilterManager {
     window.Logger?.info?.(`✅ Loaded ${openAccounts.length} open trading accounts for filter`, { page: 'header-system' });
   }
 }
+} // End of if (typeof window.FilterManager === 'undefined')
 
 // ===== MenuManager Class =====
-class MenuManager {
+// Prevent duplicate declaration
+if (typeof window.MenuManager === 'undefined') {
+window.MenuManager = class MenuManager {
   constructor() {
     this.openMenuId = null;
     this.hoverTimeouts = new Map();
@@ -1017,14 +1022,21 @@ class MenuManager {
       }
     });
   }
-}
+};
+} // End of if (typeof window.MenuManager === 'undefined')
 
 // ===== HeaderSystem Class =====
 class HeaderSystem {
   constructor() {
     this.isInitialized = false;
-    this.filterManager = new FilterManager();
-    this.menuManager = new MenuManager();
+    if (!window.FilterManager) {
+      throw new Error('FilterManager is not defined. Make sure header-system.js is loaded correctly.');
+    }
+    if (!window.MenuManager) {
+      throw new Error('MenuManager is not defined. Make sure header-system.js is loaded correctly.');
+    }
+    this.filterManager = new window.FilterManager();
+    this.menuManager = new window.MenuManager();
   }
 
   init() {
@@ -1820,7 +1832,7 @@ if (typeof window.addEventListener === 'function') {
 }
 
 // ===== Global Logout Handler =====
-window.handleHeaderLogout = function(event) {
+window.handleHeaderLogout = async function(event) {
   if (event) {
     event.preventDefault();
     event.stopPropagation();
@@ -1830,16 +1842,24 @@ window.handleHeaderLogout = function(event) {
   const isAuth = window.TikTrackAuth?.isAuthenticated?.() || false;
   
   if (isAuth) {
-    // User is authenticated - perform logout
+    // User is authenticated - perform logout (which will show login modal)
     if (window.TikTrackAuth?.logout) {
-      window.TikTrackAuth.logout();
+      await window.TikTrackAuth.logout();
     } else {
-      // Fallback if TikTrackAuth not available
-      window.location.href = '/login.html';
+      // Fallback if TikTrackAuth not available - show login modal
+      if (typeof window.TikTrackAuth?.showLoginModal === 'function') {
+        await window.TikTrackAuth.showLoginModal();
+      } else {
+        window.location.href = '/login.html';
+      }
     }
   } else {
-    // User is not authenticated - redirect to login
-    window.location.href = '/login.html';
+    // User is not authenticated - show login modal
+    if (typeof window.TikTrackAuth?.showLoginModal === 'function') {
+      await window.TikTrackAuth.showLoginModal();
+    } else {
+      window.location.href = '/login.html';
+    }
   }
 };
 

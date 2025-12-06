@@ -2553,39 +2553,39 @@ async function saveTradingAccount() {
             });
         } else {
             // Fallback to direct API call with CRUDResponseHandler
-            let response;
-            if (isEdit && typeof window.TradingAccountsData?.updateTradingAccount === 'function') {
-                response = await window.TradingAccountsData.updateTradingAccount(accountId, payload);
-            } else if (!isEdit && typeof window.TradingAccountsData?.createTradingAccount === 'function') {
-                response = await window.TradingAccountsData.createTradingAccount(payload);
-            } else {
-                const url = isEdit ? `/api/trading-accounts/${accountId}` : '/api/trading-accounts';
-                response = await fetch(url, {
-                    method: isEdit ? 'PUT' : 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(payload)
-                });
-            }
-            
-            // Use CRUDResponseHandler for consistent response handling
-            if (isEdit) {
-                crudResult = await CRUDResponseHandler.handleUpdateResponse(response, {
-                    modalId: 'tradingAccountsModal',
-                    successMessage: 'חשבון מסחר עודכן בהצלחה',
-                    entityName: 'חשבון מסחר',
-                    reloadFn: () => window.loadTradingAccountsDataForTradingAccountsPage({ force: true }),
-                    requiresHardReload: false
-                });
-            } else {
-                crudResult = await CRUDResponseHandler.handleSaveResponse(response, {
-                    modalId: 'tradingAccountsModal',
-                    successMessage: 'חשבון מסחר נוסף בהצלחה',
-                    entityName: 'חשבון מסחר',
-                    reloadFn: () => window.loadTradingAccountsDataForTradingAccountsPage({ force: true }),
-                    requiresHardReload: false
-                });
+        let response;
+        if (isEdit && typeof window.TradingAccountsData?.updateTradingAccount === 'function') {
+            response = await window.TradingAccountsData.updateTradingAccount(accountId, payload);
+        } else if (!isEdit && typeof window.TradingAccountsData?.createTradingAccount === 'function') {
+            response = await window.TradingAccountsData.createTradingAccount(payload);
+        } else {
+            const url = isEdit ? `/api/trading-accounts/${accountId}` : '/api/trading-accounts';
+            response = await fetch(url, {
+                method: isEdit ? 'PUT' : 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload)
+            });
+        }
+        
+        // Use CRUDResponseHandler for consistent response handling
+        if (isEdit) {
+            crudResult = await CRUDResponseHandler.handleUpdateResponse(response, {
+                modalId: 'tradingAccountsModal',
+                successMessage: 'חשבון מסחר עודכן בהצלחה',
+                entityName: 'חשבון מסחר',
+                reloadFn: () => window.loadTradingAccountsDataForTradingAccountsPage({ force: true }),
+                requiresHardReload: false
+            });
+        } else {
+            crudResult = await CRUDResponseHandler.handleSaveResponse(response, {
+                modalId: 'tradingAccountsModal',
+                successMessage: 'חשבון מסחר נוסף בהצלחה',
+                entityName: 'חשבון מסחר',
+                reloadFn: () => window.loadTradingAccountsDataForTradingAccountsPage({ force: true }),
+                requiresHardReload: false
+            });
             }
         }
 
@@ -2705,22 +2705,22 @@ async function performTradingAccountDeletion(accountId) {
             });
         } else {
             // Fallback to direct API call with CRUDResponseHandler
-            let response;
-            if (typeof window.TradingAccountsData?.deleteTradingAccount === 'function') {
-                response = await window.TradingAccountsData.deleteTradingAccount(accountId);
-            } else {
-                response = await fetch(`/api/trading-accounts/${accountId}`, {
-                    method: 'DELETE'
-                });
-            }
-            
-            // Use CRUDResponseHandler for consistent response handling
-            await CRUDResponseHandler.handleDeleteResponse(response, {
-                successMessage: 'חשבון מסחר נמחק בהצלחה',
-                entityName: 'חשבון מסחר',
-                reloadFn: () => window.loadTradingAccountsDataForTradingAccountsPage({ force: true }),
-                requiresHardReload: false
+        let response;
+        if (typeof window.TradingAccountsData?.deleteTradingAccount === 'function') {
+            response = await window.TradingAccountsData.deleteTradingAccount(accountId);
+        } else {
+            response = await fetch(`/api/trading-accounts/${accountId}`, {
+                method: 'DELETE'
             });
+        }
+        
+        // Use CRUDResponseHandler for consistent response handling
+        await CRUDResponseHandler.handleDeleteResponse(response, {
+            successMessage: 'חשבון מסחר נמחק בהצלחה',
+            entityName: 'חשבון מסחר',
+            reloadFn: () => window.loadTradingAccountsDataForTradingAccountsPage({ force: true }),
+            requiresHardReload: false
+        });
         }
         
     } catch (error) {

@@ -93,12 +93,27 @@ function generateScriptLoadingCode(pageName) {
       .sort((a, b) => (a.loadOrder || 0) - (b.loadOrder || 0));
     
     sortedScripts.forEach((script) => {
-      html += `    <!-- [${scriptCounter}] Load Order: ${scriptCounter} -->\n`;
+      // Get loading strategy from package (default: defer for critical packages)
+      const loadingStrategy = pkg.loadingStrategy || 'defer';
+      
+      html += `    <!-- [${scriptCounter}] Load Order: ${scriptCounter} | Strategy: ${loadingStrategy} -->\n`;
+      
       // Handle external URLs (CDN) vs local files
       const scriptSrc = script.file.startsWith('http://') || script.file.startsWith('https://') 
         ? script.file 
         : `scripts/${script.file}?v=1.0.0`;
-      html += `    <script src="${scriptSrc}"></script> <!-- ${script.description} -->\n`;
+      
+      // Generate script tag with loading strategy
+      let scriptTag;
+      if (loadingStrategy === 'sync') {
+        // Synchronous loading (rare - only if explicitly needed)
+        scriptTag = `    <script src="${scriptSrc}"></script> <!-- ${script.description} -->\n`;
+      } else {
+        // Async or defer loading
+        scriptTag = `    <script src="${scriptSrc}" ${loadingStrategy}></script> <!-- ${script.description} -->\n`;
+      }
+      
+      html += scriptTag;
       if (!(script.file.startsWith('http://') || script.file.startsWith('https://'))) {
         loadedScripts.add(script.file);
       }
@@ -124,8 +139,8 @@ function generateScriptLoadingCode(pageName) {
     if (!loadedScripts.has(scriptFile)) {
       const scriptPath = path.join(__dirname, '..', scriptFile);
       if (fs.existsSync(scriptPath)) {
-        html += `    <!-- [${scriptCounter}] Page-specific: ${scriptFile} -->\n`;
-        html += `    <script src="scripts/${scriptFile}?v=1.0.0"></script> <!-- Page-specific script -->\n\n`;
+        html += `    <!-- [${scriptCounter}] Page-specific: ${scriptFile} | Strategy: defer -->\n`;
+        html += `    <script src="scripts/${scriptFile}?v=1.0.0" defer></script> <!-- Page-specific script -->\n\n`;
         scriptCounter++;
       }
     }
@@ -145,8 +160,8 @@ function generateScriptLoadingCode(pageName) {
       if (!loadedScripts.has(scriptFile)) {
         const scriptPath = path.join(__dirname, '..', scriptFile);
         if (fs.existsSync(scriptPath)) {
-          html += `    <!-- [${scriptCounter}] Page-specific: ${scriptFile} -->\n`;
-          html += `    <script src="scripts/${scriptFile}?v=1.0.0"></script> <!-- Page-specific script -->\n\n`;
+          html += `    <!-- [${scriptCounter}] Page-specific: ${scriptFile} | Strategy: defer -->\n`;
+          html += `    <script src="scripts/${scriptFile}?v=1.0.0" defer></script> <!-- Page-specific script -->\n\n`;
           scriptCounter++;
         }
       }

@@ -6,10 +6,16 @@ Tests all interfaces and processes of the external data system
 
 import json
 import time
-import requests
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, Any, List
+
+try:
+    import requests
+except ImportError:
+    print("❌ Error: requests not installed.")
+    print("   Install with: pip install requests")
+    exit(1)
 
 try:
     from selenium import webdriver

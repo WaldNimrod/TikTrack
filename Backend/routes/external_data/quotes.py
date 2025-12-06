@@ -282,11 +282,29 @@ def get_batch_quotes():
 
 @quotes_bp.route('/<int:ticker_id>/history', methods=['GET'])
 def get_quote_history(ticker_id):
-    """Get quote history for a ticker"""
+    """Get quote history for a ticker from market_data_quotes table"""
     try:
+        from datetime import datetime, timedelta, timezone
+        from sqlalchemy import desc
+        
         # Query parameters
         days = int(request.args.get('days', 30))
         interval = request.args.get('interval', '1d')
+        
+        # Validate parameters
+        if days < 1 or days > 365:
+            return jsonify({
+                'status': 'error',
+                'message': 'Days parameter must be between 1 and 365',
+                'error_code': 'INVALID_PARAMETER'
+            }), 400
+        
+        if interval not in ['1d', '1w', '1m']:
+            return jsonify({
+                'status': 'error',
+                'message': 'Interval must be one of: 1d, 1w, 1m',
+                'error_code': 'INVALID_PARAMETER'
+            }), 400
         
         # Get database session
         db_session = next(get_db())
@@ -301,24 +319,77 @@ def get_quote_history(ticker_id):
                     'error_code': 'TICKER_NOT_FOUND'
                 }), 404
             
-            # TODO: Implement historical data retrieval from intraday_slots table
-            # For now, return error indicating feature not implemented
+            # Get provider ID for Yahoo Finance
+            from models.external_data import ExternalDataProvider
+            provider = db_session.query(ExternalDataProvider).filter(
+                ExternalDataProvider.name == 'yahoo_finance'
+            ).first()
+            
+            if not provider:
+                return jsonify({
+                    'status': 'error',
+                    'message': 'Yahoo Finance provider not configured',
+                    'error_code': 'PROVIDER_NOT_CONFIGURED'
+                }), 503
+            
+            # Calculate date range
+            end_date = datetime.now(timezone.utc)
+            start_date = end_date - timedelta(days=days)
+            
+            # Query historical quotes from market_data_quotes table
+            from models.external_data import MarketDataQuote
+            quotes = db_session.query(MarketDataQuote).filter(
+                MarketDataQuote.ticker_id == ticker_id,
+                MarketDataQuote.provider_id == provider.id,
+                MarketDataQuote.asof_utc >= start_date,
+                MarketDataQuote.asof_utc <= end_date
+            ).order_by(desc(MarketDataQuote.asof_utc)).all()
+            
+            # Format response data
+            history_data = []
+            for quote in quotes:
+                history_data.append({
+                    'date': quote.asof_utc.isoformat() if quote.asof_utc else None,
+                    'price': float(quote.price) if quote.price else None,
+                    'open': float(quote.open_price) if quote.open_price else None,
+                    'high': float(quote.high_price) if quote.high_price else None,
+                    'low': float(quote.low_price) if quote.low_price else None,
+                    'close': float(quote.close_price) if quote.close_price else None,
+                    'volume': int(quote.volume) if quote.volume else None
+                })
+            
+            logger.info(f"📊 Retrieved {len(history_data)} historical quotes for {ticker.symbol} (ticker_id: {ticker_id}, days: {days})")
+            
             return jsonify({
-                'status': 'error',
-                'message': 'Historical data retrieval not yet implemented',
-                'error_code': 'FEATURE_NOT_IMPLEMENTED',
+                'status': 'success',
+                'data': history_data,
+                'ticker_id': ticker_id,
                 'ticker_symbol': ticker.symbol,
-                'suggestion': 'This feature will be available in the next update'
-            }), 501  # Not Implemented
+                'count': len(history_data),
+                'days_requested': days,
+                'interval': interval,
+                'date_range': {
+                    'start': start_date.isoformat(),
+                    'end': end_date.isoformat()
+                }
+            }), 200
             
         finally:
             db_session.close()
         
-    except Exception as e:
-        logger.error(f"Failed to get quote history for ticker {ticker_id}: {e}")
+    except ValueError as e:
+        logger.error(f"Invalid parameter for quote history: {e}")
         return jsonify({
             'status': 'error',
-            'message': f'Failed to get quote history for ticker {ticker_id}'
+            'message': f'Invalid parameter: {str(e)}',
+            'error_code': 'INVALID_PARAMETER'
+        }), 400
+    except Exception as e:
+        logger.error(f"Failed to get quote history for ticker {ticker_id}: {e}", exc_info=True)
+        return jsonify({
+            'status': 'error',
+            'message': f'Failed to get quote history for ticker {ticker_id}',
+            'error': str(e)
         }), 500
 
 
@@ -326,11 +397,30 @@ def get_quote_history(ticker_id):
 @require_authentication()
 def refresh_ticker_quote(ticker_id):
     """Manually refresh quote for a ticker"""
+    start_time = datetime.now(timezone.utc)
     try:
+        # Validate ticker_id
+        if not isinstance(ticker_id, int) or ticker_id <= 0:
+            return jsonify({
+                'status': 'error',
+                'message': f'Invalid ticker_id: {ticker_id}',
+                'error_code': 'INVALID_TICKER_ID'
+            }), 400
+        
         data = request.get_json() or {}
         force_refresh = data.get('force_refresh', False)
         include_historical = data.get('include_historical', True)  # Default to True
         days_back = data.get('days_back', 150)  # Default to 150 for MA 150 calculation
+        
+        # Validate days_back
+        if not isinstance(days_back, int) or days_back < 1 or days_back > 365:
+            return jsonify({
+                'status': 'error',
+                'message': f'Invalid days_back: {days_back} (must be between 1 and 365)',
+                'error_code': 'INVALID_DAYS_BACK'
+            }), 400
+        
+        logger.info(f"🔄 Starting refresh_ticker_quote for ticker_id: {ticker_id}, days_back: {days_back}, include_historical: {include_historical}")
         
         # Get database session
         db_session = next(get_db())
@@ -339,11 +429,14 @@ def refresh_ticker_quote(ticker_id):
             # Get ticker information
             ticker = db_session.query(Ticker).filter(Ticker.id == ticker_id).first()
             if not ticker:
+                logger.warning(f"⚠️ Ticker with ID {ticker_id} not found")
                 return jsonify({
                     'status': 'error',
                     'message': f'Ticker with ID {ticker_id} not found',
                     'error_code': 'TICKER_NOT_FOUND'
                 }), 404
+            
+            logger.info(f"✅ Found ticker: {ticker.symbol} (ID: {ticker_id})")
             
             # Implement refresh logic using YahooFinanceAdapter
             from services.external_data.yahoo_finance_adapter import YahooFinanceAdapter
@@ -362,45 +455,63 @@ def refresh_ticker_quote(ticker_id):
                 }), 503
             
             # Initialize adapter
+            logger.info(f"🔄 Step 1: Initializing adapter for provider {provider.id} ({provider.name})")
             adapter = YahooFinanceAdapter(db_session, provider.id)
             
-            # Fetch quote with force refresh (bypass cache)
-            # First, clear any cached quote to force fresh fetch
-            try:
-                # Delete recent quotes to force refresh
-                cutoff_time = datetime.now(timezone.utc) - timedelta(minutes=5)
-                db_session.query(MarketDataQuote).filter(
-                    MarketDataQuote.ticker_id == ticker_id,
-                    MarketDataQuote.provider_id == provider.id,
-                    MarketDataQuote.fetched_at >= cutoff_time
-                ).delete()
-                db_session.commit()
-            except Exception as clear_error:
-                logger.warning(f"Could not clear cached quotes before refresh: {clear_error}")
-                db_session.rollback()
+            # Step 2: Clear cache if force_refresh
+            if force_refresh:
+                logger.info(f"🔄 Step 2: Clearing cached quotes (force_refresh=True)")
+                try:
+                    # Delete recent quotes to force refresh
+                    cutoff_time = datetime.now(timezone.utc) - timedelta(minutes=5)
+                    deleted_count = db_session.query(MarketDataQuote).filter(
+                        MarketDataQuote.ticker_id == ticker_id,
+                        MarketDataQuote.provider_id == provider.id,
+                        MarketDataQuote.fetched_at >= cutoff_time
+                    ).delete()
+                    db_session.commit()
+                    logger.info(f"✅ Deleted {deleted_count} cached quotes")
+                except Exception as clear_error:
+                    logger.warning(f"⚠️ Could not clear cached quotes before refresh: {clear_error}")
+                    db_session.rollback()
+            else:
+                logger.info(f"🔄 Step 2: Skipping cache clear (force_refresh=False)")
             
-            # Fetch current quote (will fetch fresh from API since cache is cleared)
+            # Step 3: Fetch current quote
+            logger.info(f"🔄 Step 3: Fetching current quote for {ticker.symbol}")
             quote_data = None
             try:
                 quote_data = adapter.get_quote(ticker.symbol, ticker=ticker)
+                if quote_data:
+                    logger.info(f"✅ Successfully fetched current quote for {ticker.symbol}: ${quote_data.price}")
+                else:
+                    logger.warning(f"⚠️ No quote data returned for {ticker.symbol}")
             except Exception as quote_error:
-                logger.error(f"Error fetching quote for {ticker.symbol}: {quote_error}", exc_info=True)
+                logger.error(f"❌ Error fetching quote for {ticker.symbol}: {quote_error}", exc_info=True)
                 # Continue - we'll check if we have existing data in database
             
-            # Also fetch historical data (days_back days for MA 150 calculation)
-            # This ensures we have enough data for technical indicators
+            # Step 4: Fetch historical data (days_back days for MA 150 calculation)
             historical_count = 0
             if include_historical:
+                logger.info(f"🔄 Step 4: Fetching historical data for {ticker.symbol} ({days_back} days)")
                 try:
                     historical_count = adapter.fetch_and_save_historical_quotes(ticker, days_back=days_back)
-                    logger.info(f"📊 Fetched {historical_count} historical quotes for {ticker.symbol} (requested {days_back} days)")
+                    if historical_count > 0:
+                        logger.info(f"✅ Fetched {historical_count} historical quotes for {ticker.symbol} (requested {days_back} days)")
+                        if historical_count < 120:
+                            logger.warning(f"⚠️ Only {historical_count} quotes fetched for {ticker.symbol}, expected at least 120 for MA 150")
+                    else:
+                        logger.warning(f"⚠️ No historical quotes fetched for {ticker.symbol}")
                 except Exception as hist_error:
-                    logger.warning(f"Could not fetch historical data for {ticker.symbol}: {hist_error}", exc_info=True)
+                    logger.error(f"❌ Could not fetch historical data for {ticker.symbol}: {hist_error}", exc_info=True)
                     # Continue even if historical fetch fails
+            else:
+                logger.info(f"🔄 Step 4: Skipping historical data fetch (include_historical=False)")
             
-            # Pre-calculate technical indicators after fetching historical data
-            # This ensures calculations are ready when entity_details is called
+            # Step 5: Pre-calculate technical indicators after fetching historical data
+            indicators_calculated = []
             if historical_count > 0:
+                logger.info(f"🔄 Step 5: Pre-calculating technical indicators for {ticker.symbol} (have {historical_count} quotes)")
                 try:
                     from services.external_data.technical_indicators_calculator import TechnicalIndicatorsCalculator
                     from services.external_data.week52_calculator import Week52Calculator
@@ -409,8 +520,6 @@ def refresh_ticker_quote(ticker_id):
                     tech_calculator = TechnicalIndicatorsCalculator(db_session)
                     week52_calculator = Week52Calculator(db_session)
                     
-                    logger.info(f"📊 Pre-calculating technical indicators for {ticker.symbol} after fetching {historical_count} historical quotes")
-                    
                     # Pre-calculate Volatility (needs 30+ days)
                     if historical_count >= 30:
                         try:
@@ -418,11 +527,12 @@ def refresh_ticker_quote(ticker_id):
                             if volatility is not None:
                                 volatility_cache_key = f"ticker_{ticker_id}_volatility_30"
                                 advanced_cache_service.set(volatility_cache_key, volatility, ttl=3600)
+                                indicators_calculated.append('volatility_30')
                                 logger.info(f"✅ Pre-calculated Volatility for {ticker.symbol}: {volatility:.2f}%")
                             else:
                                 logger.warning(f"⚠️ Volatility calculation returned None for {ticker.symbol} (have {historical_count} quotes)")
                         except Exception as vol_error:
-                            logger.warning(f"Error pre-calculating volatility for {ticker.symbol}: {vol_error}", exc_info=True)
+                            logger.warning(f"⚠️ Error pre-calculating volatility for {ticker.symbol}: {vol_error}", exc_info=True)
                     
                     # Pre-calculate MA 20 (needs 20+ days)
                     if historical_count >= 20:
@@ -431,11 +541,12 @@ def refresh_ticker_quote(ticker_id):
                             if sma_20 is not None:
                                 ma20_cache_key = f"ticker_{ticker_id}_ma_20"
                                 advanced_cache_service.set(ma20_cache_key, sma_20, ttl=3600)
+                                indicators_calculated.append('ma_20')
                                 logger.info(f"✅ Pre-calculated MA 20 for {ticker.symbol}: {sma_20:.2f}")
                             else:
                                 logger.warning(f"⚠️ MA 20 calculation returned None for {ticker.symbol} (have {historical_count} quotes)")
                         except Exception as ma20_error:
-                            logger.warning(f"Error pre-calculating MA 20 for {ticker.symbol}: {ma20_error}", exc_info=True)
+                            logger.warning(f"⚠️ Error pre-calculating MA 20 for {ticker.symbol}: {ma20_error}", exc_info=True)
                     
                     # Pre-calculate MA 150 (needs 150 trading days ≈ 120+ quotes due to weekends/holidays)
                     # With weekends and holidays, 150 trading days ≈ 210 calendar days
@@ -446,11 +557,12 @@ def refresh_ticker_quote(ticker_id):
                             if sma_150 is not None:
                                 ma150_cache_key = f"ticker_{ticker_id}_ma_150"
                                 advanced_cache_service.set(ma150_cache_key, sma_150, ttl=3600)
+                                indicators_calculated.append('ma_150')
                                 logger.info(f"✅ Pre-calculated MA 150 for {ticker.symbol}: {sma_150:.2f}")
                             else:
                                 logger.warning(f"⚠️ MA 150 calculation returned None for {ticker.symbol} (have {historical_count} quotes)")
                         except Exception as ma150_error:
-                            logger.warning(f"Error pre-calculating MA 150 for {ticker.symbol}: {ma150_error}", exc_info=True)
+                            logger.warning(f"⚠️ Error pre-calculating MA 150 for {ticker.symbol}: {ma150_error}", exc_info=True)
                     
                     # Pre-calculate 52W range (needs 10+ days, but better with more)
                     if historical_count >= 10:
@@ -464,13 +576,14 @@ def refresh_ticker_quote(ticker_id):
                                     'warnings': week52_result.warnings if hasattr(week52_result, 'warnings') else []
                                 }
                                 advanced_cache_service.set(week52_cache_key, week52_dict, ttl=3600)
+                                indicators_calculated.append('week52')
                                 logger.info(f"✅ Pre-calculated 52W range for {ticker.symbol}: high={week52_result.high:.2f}, low={week52_result.low:.2f}")
                             else:
                                 logger.warning(f"⚠️ 52W range calculation returned None for {ticker.symbol} (have {historical_count} quotes)")
                         except Exception as week52_error:
-                            logger.warning(f"Error pre-calculating 52W range for {ticker.symbol}: {week52_error}", exc_info=True)
+                            logger.warning(f"⚠️ Error pre-calculating 52W range for {ticker.symbol}: {week52_error}", exc_info=True)
                     
-                    logger.info(f"✅ Completed pre-calculation of technical indicators for {ticker.symbol}")
+                    logger.info(f"✅ Step 5 completed: Calculated {len(indicators_calculated)} indicators for {ticker.symbol}: {', '.join(indicators_calculated)}")
                 except Exception as calc_error:
                     logger.warning(f"Error pre-calculating technical indicators for {ticker.symbol}: {calc_error}", exc_info=True)
                     # Continue even if pre-calculation fails - calculations will happen on-demand
@@ -498,6 +611,12 @@ def refresh_ticker_quote(ticker_id):
                 except Exception as cache_error:
                     logger.warning(f"Could not invalidate cache: {cache_error}", exc_info=True)
                 
+                # Calculate duration
+                end_time = datetime.now(timezone.utc)
+                duration_seconds = (end_time - start_time).total_seconds()
+                
+                logger.info(f"✅ refresh_ticker_quote completed for {ticker.symbol}: {historical_count} historical quotes, {len(indicators_calculated)} indicators, duration: {duration_seconds:.2f}s")
+                
                 return jsonify({
                     'status': 'success',
                     'message': f'Quote refreshed successfully for {ticker.symbol}',
@@ -507,7 +626,14 @@ def refresh_ticker_quote(ticker_id):
                         'price': quote_data.price,
                         'change_percent': quote_data.change_pct_day or quote_data.change_pct,
                         'volume': quote_data.volume,
-                        'fetched_at': quote_data.asof_utc.isoformat() if quote_data.asof_utc else None
+                        'fetched_at': quote_data.asof_utc.isoformat() if quote_data.asof_utc else None,
+                        'historical_quotes_count': historical_count,
+                        'indicators_calculated': indicators_calculated,
+                        'performance': {
+                            'duration_seconds': round(duration_seconds, 2),
+                            'start_time': start_time.isoformat(),
+                            'end_time': end_time.isoformat()
+                        }
                     }
                 })
             else:
@@ -518,7 +644,10 @@ def refresh_ticker_quote(ticker_id):
                 
                 if existing_quote:
                     # We have existing data - refresh might have failed but we have data
-                    logger.info(f"⚠️ Quote refresh failed for {ticker.symbol}, but existing data found in database")
+                    end_time = datetime.now(timezone.utc)
+                    duration_seconds = (end_time - start_time).total_seconds()
+                    
+                    logger.info(f"⚠️ Quote refresh failed for {ticker.symbol}, but existing data found in database (age: {(datetime.now(timezone.utc) - existing_quote.fetched_at).total_seconds() / 60:.1f} minutes)")
                     return jsonify({
                         'status': 'success',
                         'message': f'Quote refresh attempted for {ticker.symbol}. Using existing data.',
@@ -529,17 +658,34 @@ def refresh_ticker_quote(ticker_id):
                             'change_percent': existing_quote.change_pct_day,
                             'volume': existing_quote.volume,
                             'fetched_at': existing_quote.fetched_at.isoformat() if existing_quote.fetched_at else None,
-                            'note': 'Using existing data - refresh may have failed'
+                            'historical_quotes_count': historical_count,
+                            'indicators_calculated': indicators_calculated,
+                            'note': 'Using existing data - refresh may have failed',
+                            'performance': {
+                                'duration_seconds': round(duration_seconds, 2),
+                                'start_time': start_time.isoformat(),
+                                'end_time': end_time.isoformat()
+                            }
                         }
                     }), 200
                 else:
                     # No quote data at all - this is a real error
-                    logger.error(f"❌ Failed to fetch quote for {ticker.symbol} and no existing data found")
+                    end_time = datetime.now(timezone.utc)
+                    duration_seconds = (end_time - start_time).total_seconds()
+                    
+                    logger.error(f"❌ Failed to fetch quote for {ticker.symbol} and no existing data found (duration: {duration_seconds:.2f}s)")
                     return jsonify({
                         'status': 'error',
                         'message': f'Failed to fetch quote for {ticker.symbol} and no existing data available',
                         'error_code': 'QUOTE_FETCH_FAILED',
-                        'ticker_symbol': ticker.symbol
+                        'ticker_symbol': ticker.symbol,
+                        'historical_quotes_count': historical_count,
+                        'indicators_calculated': indicators_calculated,
+                        'performance': {
+                            'duration_seconds': round(duration_seconds, 2),
+                            'start_time': start_time.isoformat(),
+                            'end_time': end_time.isoformat()
+                        }
                     }), 500
             
         finally:

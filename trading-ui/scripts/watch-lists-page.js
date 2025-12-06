@@ -1065,12 +1065,27 @@
      * Add ticker (open modal)
      */
     async function addTicker() {
-        if (typeof window.showModalSafe === 'function') {
+        if (!activeListId) {
+            window.Logger?.warn?.('⚠️ No active list selected', PAGE_LOG_CONTEXT);
+            if (typeof window.showNotification === 'function') {
+                window.showNotification('שגיאה', 'error', 'יש לבחור רשימה פעילה לפני הוספת טיקר', 5000);
+            }
+            return;
+        }
+
+        // Use ModalManagerV2 directly to pass listId through options
+        if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
+            await window.ModalManagerV2.showModal('addTickerModal', 'add', null, { listId: activeListId });
+        } else if (window.AddTickerModal && typeof window.AddTickerModal.open === 'function') {
+            window.AddTickerModal.open(activeListId);
+        } else if (typeof window.showModalSafe === 'function') {
             await window.showModalSafe('addTickerModal', 'add');
-        } else if (window.ModalManagerV2) {
-            await window.ModalManagerV2.showModal('addTickerModal', 'add');
+            // Set listId manually if modal opened via showModalSafe
+            if (window.AddTickerModal) {
+                window.AddTickerModal.currentListId = activeListId;
+            }
         } else {
-            window.Logger?.warn?.('⚠️ showModalSafe and ModalManagerV2 not available', PAGE_LOG_CONTEXT);
+            window.Logger?.warn?.('⚠️ Modal system not available', PAGE_LOG_CONTEXT);
         }
     }
 
@@ -1119,35 +1134,72 @@
                 return;
             }
 
+            // Determine mode and listId from ModalManagerV2 or modal element
+            let mode = 'add';
+            let listId = null;
+            
+            if (window.ModalManagerV2 && window.ModalManagerV2.modals) {
+                const modalInfo = window.ModalManagerV2.modals.get('watchListModal');
+                if (modalInfo) {
+                    mode = modalInfo.currentMode || 'add';
+                    if (modalInfo.currentEntityData && modalInfo.currentEntityData.id) {
+                        listId = modalInfo.currentEntityData.id;
+                    }
+                }
+            }
+            
+            // Also check modal element for data attributes
+            const modalElement = document.getElementById('watchListModal');
+            if (modalElement) {
+                if (modalElement.dataset.listId) {
+                    listId = parseInt(modalElement.dataset.listId);
+                    mode = 'edit';
+                }
+            }
+
             // Collect form data
             const formData = window.DataCollectionService.collectFormData({
                 name: { id: 'watchListName', type: 'text' },
                 icon: { id: 'watchListIcon', type: 'text' },
-                color_hex: { id: 'watchListColorHex', type: 'text' },
+                icon_library: { id: 'watchListIconLibrary', type: 'text' },
                 view_mode: { id: 'watchListViewMode', type: 'text' }
             });
 
-            // Save via data service
-            if (window.WatchListsDataService?.createWatchList) {
-                const result = await window.WatchListsDataService.createWatchList(formData);
-                
-                // Handle response via CRUDResponseHandler
-                if (window.CRUDResponseHandler?.handleResponse) {
-                    await window.CRUDResponseHandler.handleResponse(result, {
-                        entityType: 'watch_list',
-                        operation: 'create',
-                        onSuccess: async () => {
-                            await loadWatchLists();
-                            renderSummaryStats();
-                        },
-                        showNotification: true
-                    });
-                }
+            let result;
+            const operation = mode === 'edit' && listId ? 'update' : 'create';
+            
+            if (operation === 'update' && listId && window.WatchListsDataService?.updateWatchList) {
+                // Update existing list
+                result = await window.WatchListsDataService.updateWatchList(listId, formData);
+            } else if (window.WatchListsDataService?.createWatchList) {
+                // Create new list
+                result = await window.WatchListsDataService.createWatchList(formData);
+            } else {
+                window.Logger?.warn?.('⚠️ WatchListsDataService not available', PAGE_LOG_CONTEXT);
+                return;
+            }
+            
+            // Handle response via CRUDResponseHandler
+            if (result && window.CRUDResponseHandler?.handleResponse) {
+                await window.CRUDResponseHandler.handleResponse(result, {
+                    entityType: 'watch_list',
+                    operation: operation,
+                    onSuccess: async () => {
+                        await loadWatchLists();
+                        renderSummaryStats();
+                        
+                        // If we created a new list, select it automatically
+                        if (operation === 'create' && result && result.id) {
+                            await selectList(result.id);
+                        }
+                    },
+                    showNotification: true
+                });
+            }
 
-                // Close modal
-                if (window.ModalManagerV2?.closeModal) {
-                    window.ModalManagerV2.closeModal('watchListModal');
-                }
+            // Close modal
+            if (window.ModalManagerV2?.closeModal) {
+                window.ModalManagerV2.closeModal('watchListModal');
             }
         } catch (error) {
             window.Logger?.error?.('❌ Error saving watch list', { ...PAGE_LOG_CONTEXT, error: error?.message || error });

@@ -3388,7 +3388,8 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.ModalManagerV2',
         'window.HeaderSystem',
         'window.UnifiedTableSystem',
-        'window.validateTextField' // Validation functions
+        'window.validateTextField', // Validation functions
+        'window.tickersModalConfig' // Required for nested ticker addition modal
       ],
       pageSpecificScripts: ['scripts/watch-lists-page.js'],
       description: 'עמוד ניהול רשימות צפייה - production',
@@ -3455,6 +3456,8 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       packages: [
         'base',
         'services',
+        'validation',
+        'modules', // Required for tickersModalConfig and ModalManagerV2
         'ui-advanced',
         'watch-lists'
       ],
@@ -3462,7 +3465,8 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'NotificationSystem',
         'window.ModalManagerV2',
         'window.AddTickerModal',
-        'window.SelectPopulatorService'
+        'window.SelectPopulatorService',
+        'window.tickersModalConfig' // Required for nested ticker addition modal
       ],
       pageSpecificScripts: ['scripts/add-ticker-modal.js'],
       description: 'מודל הוספת טיקר - מוקאפ',

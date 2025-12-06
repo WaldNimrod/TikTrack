@@ -48,8 +48,8 @@
         // Wait for DOM elements to be ready
         let retries = 0;
         while (retries < 10) {
-            const iconSelector = document.getElementById('iconSelector');
-            const viewModeRadios = document.querySelectorAll('input[name="viewMode"]');
+            const iconSelector = document.getElementById('watchListIconSelector');
+            const viewModeRadios = document.querySelectorAll('input[name="watchListViewMode"]');
         
             if (iconSelector && viewModeRadios.length > 0) {
                 break;
@@ -92,10 +92,10 @@
      * @async
      */
     async function populateTablerIcons() {
-        const iconSelector = document.getElementById('iconSelector');
+        const iconSelector = document.getElementById('watchListIconSelector');
         
         if (!iconSelector) {
-            window.Logger?.warn?.('⚠️ iconSelector not found, retrying...', PAGE_LOG_CONTEXT);
+            window.Logger?.warn?.('⚠️ watchListIconSelector not found, retrying...', PAGE_LOG_CONTEXT);
             setTimeout(populateTablerIcons, 200);
             return;
         }
@@ -224,10 +224,10 @@
      * Populate Bootstrap Icons selector
      */
     function populateBootstrapIcons() {
-        const iconSelector = document.getElementById('bootstrapIconSelector');
+        const iconSelector = document.getElementById('watchListBootstrapIconSelector');
         
         if (!iconSelector) {
-            window.Logger?.warn?.('⚠️ bootstrapIconSelector not found', PAGE_LOG_CONTEXT);
+            window.Logger?.warn?.('⚠️ watchListBootstrapIconSelector not found', PAGE_LOG_CONTEXT);
             return;
         }
 
@@ -339,8 +339,8 @@
     async function selectIcon(iconName, library) {
         const iconInput = document.getElementById('watchListIcon');
         const libraryInput = document.getElementById('watchListIconLibrary');
-        const preview = document.getElementById('selectedIconPreview');
-        const trigger = document.getElementById('iconSelectorTrigger');
+        const preview = document.getElementById('watchListSelectedIconPreview');
+        const trigger = document.getElementById('watchListIconSelectorTrigger');
         
         if (!iconInput || !libraryInput || !preview) {
             return;
@@ -402,7 +402,7 @@
      */
     function setupViewModeSelector() {
         const viewModeInput = document.getElementById('watchListViewMode');
-        const radioButtons = document.querySelectorAll('input[name="viewMode"]');
+        const radioButtons = document.querySelectorAll('input[name="watchListViewMode"]');
         
         if (!viewModeInput || !radioButtons.length) {
             return;
@@ -529,7 +529,7 @@
             viewModeInput.value = viewMode;
         }
         // Update radio button
-        const radioButton = document.querySelector(`input[name="viewMode"][value="${viewMode}"]`);
+        const radioButton = document.querySelector(`input[name="watchListViewMode"][value="${viewMode}"]`);
         if (radioButton) {
             radioButton.checked = true;
         }
@@ -656,7 +656,8 @@
         populateForm,
         validateForm,
         resetForm,
-        save: saveWatchList
+        save: saveWatchList,
+        populateIconSelector: populateIconSelector
     };
 
     // Individual function exports

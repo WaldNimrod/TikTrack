@@ -1108,12 +1108,26 @@ class DemoDataGenerator:
                 self.date_gen.now
             )
             
-            # Status
-            status = 'open' if random.random() > 0.6 else 'closed'
-            closed_at = self.date_gen.generate_date_in_range(
-                trade_date,
-                self.date_gen.now
-            ) if status == 'closed' else None
+            # Status - ensure variety: open, closed, cancelled
+            status_rand = random.random()
+            if status_rand > 0.7:
+                status = 'open'
+                closed_at = None
+                cancelled_at = None
+            elif status_rand > 0.15:
+                status = 'closed'
+                closed_at = self.date_gen.generate_date_in_range(
+                    trade_date,
+                    self.date_gen.now
+                )
+                cancelled_at = None
+            else:
+                status = 'cancelled'
+                closed_at = None
+                cancelled_at = self.date_gen.generate_date_in_range(
+                    trade_date,
+                    self.date_gen.now
+                )
             
             # Calculate P/L if closed
             total_pl = None
@@ -1134,6 +1148,7 @@ class DemoDataGenerator:
                 planned_amount=plan.planned_amount,
                 entry_price=plan.entry_price,
                 closed_at=closed_at,
+                cancelled_at=cancelled_at,
                 total_pl=total_pl,
                 notes=f"טרייד מתוכנית {plan.id}"
             )
@@ -1159,7 +1174,27 @@ class DemoDataGenerator:
             
             trade_date = self.date_gen.generate_date('random')
             
-            status = 'open' if random.random() > 0.5 else 'closed'
+            # Status - ensure variety: open, closed, cancelled
+            status_rand = random.random()
+            if status_rand > 0.7:
+                status = 'open'
+                closed_at = None
+                cancelled_at = None
+            elif status_rand > 0.15:
+                status = 'closed'
+                closed_at = self.date_gen.generate_date_in_range(
+                    trade_date,
+                    self.date_gen.now
+                )
+                cancelled_at = None
+            else:
+                status = 'cancelled'
+                closed_at = None
+                cancelled_at = self.date_gen.generate_date_in_range(
+                    trade_date,
+                    self.date_gen.now
+                )
+            
             investment_type = random.choice(INVESTMENT_TYPES)
             # Ensure 90% Long for independent trades using shuffled indices
             side_index = independent_indices[i]
@@ -1169,7 +1204,6 @@ class DemoDataGenerator:
             planned_amount = round(random.uniform(5000, 50000), 2)
             planned_quantity = round(planned_amount / entry_price, 2)
             
-            closed_at = None
             total_pl = None
             if status == 'closed':
                 closed_at = self.date_gen.generate_date_in_range(trade_date, self.date_gen.now)
@@ -1188,6 +1222,7 @@ class DemoDataGenerator:
                 planned_amount=planned_amount,
                 entry_price=entry_price,
                 closed_at=closed_at,
+                cancelled_at=cancelled_at,
                 total_pl=total_pl,
                 notes="טרייד עצמאי"
             )

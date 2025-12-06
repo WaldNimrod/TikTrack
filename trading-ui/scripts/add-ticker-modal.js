@@ -41,6 +41,15 @@
     let selectedTickerId = null;
     let searchResults = [];
     let allTickersCache = null; // Cache for all tickers to avoid repeated API calls
+    
+    // Expose currentListId for external access
+    window.AddTickerModal = window.AddTickerModal || {};
+    Object.defineProperty(window.AddTickerModal, 'currentListId', {
+        get: () => currentListId,
+        set: (value) => {
+            currentListId = value;
+        }
+    });
 
     // ===== MODAL MANAGEMENT =====
 
@@ -100,43 +109,83 @@
      * Setup flag color palette
      */
     function setupFlagColorPalette() {
-        // Wait for modal to be rendered
-        setTimeout(() => {
-            const flagButtons = document.querySelectorAll('.flag-color-btn-add-modal');
-            const clearBtn = document.getElementById('clearFlagColorBtn');
-            const flagInput = document.getElementById('itemFlagColor');
+        const flagButtons = document.querySelectorAll('.flag-color-btn-add-modal');
+        const clearBtn = document.getElementById('clearFlagColorBtn');
+        const flagInput = document.getElementById('itemFlagColor');
 
-            flagButtons.forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const color = btn.getAttribute('data-color');
-                    if (color && flagInput) {
-                        flagInput.value = color;
-                        
-                        // Update active state
-                        flagButtons.forEach(b => b.classList.remove('active'));
-                        btn.classList.add('active');
-                        
-                        // Add checkmark style
-                        btn.style.borderColor = '#212529';
-                        btn.style.boxShadow = '0 0 0 2px #212529';
-                        
-                        window.Logger?.debug?.('✅ Flag color selected', { ...PAGE_LOG_CONTEXT, color });
-                    }
-                });
-            });
+        if (!flagButtons.length || !flagInput) {
+            // Try again after a short delay if elements aren't ready
+            setTimeout(setupFlagColorPalette, 100);
+            return;
+        }
 
-            if (clearBtn && flagInput) {
-                clearBtn.addEventListener('click', () => {
-                    flagInput.value = '';
-                    flagButtons.forEach(b => {
+        // Remove existing listeners by cloning elements
+        flagButtons.forEach(btn => {
+            const newBtn = btn.cloneNode(true);
+            btn.parentNode.replaceChild(newBtn, btn);
+        });
+        const clearBtnNew = clearBtn ? clearBtn.cloneNode(true) : null;
+        if (clearBtn && clearBtnNew) {
+            clearBtn.parentNode.replaceChild(clearBtnNew, clearBtn);
+        }
+
+        // Get fresh references after cloning
+        const freshFlagButtons = document.querySelectorAll('.flag-color-btn-add-modal');
+        const freshClearBtn = document.getElementById('clearFlagColorBtn');
+        const freshFlagInput = document.getElementById('itemFlagColor');
+
+        freshFlagButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const color = btn.getAttribute('data-color');
+                if (color && freshFlagInput) {
+                    freshFlagInput.value = color;
+                    
+                    // Update active state - remove from all
+                    freshFlagButtons.forEach(b => {
                         b.classList.remove('active');
                         b.style.borderColor = 'transparent';
                         b.style.boxShadow = 'none';
+                        b.style.transform = 'scale(1)';
                     });
-                    window.Logger?.debug?.('✅ Flag color cleared', PAGE_LOG_CONTEXT);
+                    
+                    // Add active state to selected
+                    btn.classList.add('active');
+                    btn.style.borderColor = '#212529';
+                    btn.style.boxShadow = '0 0 0 2px #212529';
+                    btn.style.transform = 'scale(1.05)';
+                    
+                    window.Logger?.debug?.('✅ Flag color selected', { ...PAGE_LOG_CONTEXT, color });
+                }
+            });
+
+            // Hover effect
+            btn.addEventListener('mouseenter', () => {
+                if (!btn.classList.contains('active')) {
+                    btn.style.transform = 'scale(1.1)';
+                    btn.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.2)';
+                }
+            });
+
+            btn.addEventListener('mouseleave', () => {
+                if (!btn.classList.contains('active')) {
+                    btn.style.transform = 'scale(1)';
+                    btn.style.boxShadow = 'none';
+                }
+            });
+        });
+
+        if (freshClearBtn && freshFlagInput) {
+            freshClearBtn.addEventListener('click', () => {
+                freshFlagInput.value = '';
+                freshFlagButtons.forEach(b => {
+                    b.classList.remove('active');
+                    b.style.borderColor = 'transparent';
+                    b.style.boxShadow = 'none';
+                    b.style.transform = 'scale(1)';
                 });
-            }
-        }, 100);
+                window.Logger?.debug?.('✅ Flag color cleared', PAGE_LOG_CONTEXT);
+            });
+        }
     }
 
     /**
@@ -157,7 +206,12 @@
 
         // Open via ModalManagerV2
         if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
-            window.ModalManagerV2.showModal('addTickerModal', 'add', { listId: listId }).catch(error => {
+            window.ModalManagerV2.showModal('addTickerModal', 'add', { listId: listId }).then(() => {
+                // Setup flag palette after modal is shown
+                setTimeout(() => {
+                    setupFlagColorPalette();
+                }, 200);
+            }).catch(error => {
                 window.Logger?.error('Error showing add ticker modal via ModalManagerV2', { error, modalId: 'addTickerModal', page: 'add-ticker-modal' });
                 // Fallback to bootstrap if ModalManagerV2 fails
                 if (bootstrap?.Modal) {
@@ -165,6 +219,9 @@
                     if (modal) {
                         const bsModal = new bootstrap.Modal(modal);
                         bsModal.show();
+                        setTimeout(() => {
+                            setupFlagColorPalette();
+                        }, 200);
                     }
                 }
             });
@@ -173,6 +230,9 @@
             if (modal) {
                 const bsModal = new bootstrap.Modal(modal);
                 bsModal.show();
+                setTimeout(() => {
+                    setupFlagColorPalette();
+                }, 200);
             }
         }
     }
@@ -420,6 +480,20 @@
         clearSearchResults();
         selectedTickerId = null;
         currentListId = null;
+        
+        // Clear flag color selection
+        const flagInput = document.getElementById('itemFlagColor');
+        if (flagInput) {
+            flagInput.value = '';
+        }
+        const flagButtons = document.querySelectorAll('.flag-color-btn-add-modal');
+        flagButtons.forEach(btn => {
+            btn.classList.remove('active');
+            btn.style.borderColor = 'transparent';
+            btn.style.boxShadow = 'none';
+            btn.style.transform = 'scale(1)';
+        });
+        
         // Don't clear cache - keep it for faster subsequent searches
     }
 
@@ -480,9 +554,53 @@
 
     // Initialize when DOM is ready
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initializeAddTickerModal);
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeAddTickerModal();
+            setupModalEventListener();
+        });
     } else {
         initializeAddTickerModal();
+        setupModalEventListener();
+    }
+
+    /**
+     * Setup modal event listener to capture listId from options
+     */
+    function setupModalEventListener() {
+        const modalElement = document.getElementById('addTickerModal');
+        if (!modalElement) {
+            // Try again after a delay if modal doesn't exist yet
+            setTimeout(setupModalEventListener, 500);
+            return;
+        }
+
+        modalElement.addEventListener('shown.bs.modal', function(event) {
+            // Check if listId was passed through entityData (third parameter)
+            // ModalManagerV2 passes entityData as third parameter
+            const modalInfo = window.ModalManagerV2?.modals?.get('addTickerModal');
+            if (modalInfo && modalInfo.lastEntityData && modalInfo.lastEntityData.listId) {
+                currentListId = parseInt(modalInfo.lastEntityData.listId);
+                window.Logger?.debug?.('✅ ListId captured from entityData', { ...PAGE_LOG_CONTEXT, listId: currentListId });
+            }
+            
+            // Check if passed through options (fourth parameter)
+            if (modalInfo && modalInfo.lastOptions && modalInfo.lastOptions.listId) {
+                currentListId = parseInt(modalInfo.lastOptions.listId);
+                window.Logger?.debug?.('✅ ListId captured from options', { ...PAGE_LOG_CONTEXT, listId: currentListId });
+            }
+            
+            // Try to get listId from modal dataset
+            const modalData = event.target.dataset;
+            if (modalData && modalData.listId) {
+                currentListId = parseInt(modalData.listId);
+                window.Logger?.debug?.('✅ ListId captured from modal dataset', { ...PAGE_LOG_CONTEXT, listId: currentListId });
+            }
+            
+            // Setup flag palette after modal is shown
+            setTimeout(() => {
+                setupFlagColorPalette();
+            }, 100);
+        });
     }
 
     // ===== GLOBAL EXPORTS =====

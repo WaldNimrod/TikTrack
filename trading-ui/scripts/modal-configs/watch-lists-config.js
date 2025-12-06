@@ -157,7 +157,7 @@ const addTickerModalConfig = {
                         <small class="mb-0">אם לא נמצא הטיקר הדרוש, יש להוסיף למערכת</small>
                         <button type="button" 
                                 class="btn btn-sm btn-outline-primary"
-                                data-onclick="window.ModalManagerV2?.showModal('tickersModal', 'add')">
+                                data-onclick="if(window.ModalManagerV2){window.ModalManagerV2.showModal('tickersModal','add');}">
                             <i class="bi bi-plus-circle"></i> הוסף טיקר חדש
                         </button>
                     </div>

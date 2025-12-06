@@ -90,7 +90,53 @@
             });
         }
 
+        // Setup flag color palette
+        setupFlagColorPalette();
+
         window.Logger?.debug?.('✅ Add Ticker Modal initialized', PAGE_LOG_CONTEXT);
+    }
+
+    /**
+     * Setup flag color palette
+     */
+    function setupFlagColorPalette() {
+        // Wait for modal to be rendered
+        setTimeout(() => {
+            const flagButtons = document.querySelectorAll('.flag-color-btn-add-modal');
+            const clearBtn = document.getElementById('clearFlagColorBtn');
+            const flagInput = document.getElementById('itemFlagColor');
+
+            flagButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const color = btn.getAttribute('data-color');
+                    if (color && flagInput) {
+                        flagInput.value = color;
+                        
+                        // Update active state
+                        flagButtons.forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                        
+                        // Add checkmark style
+                        btn.style.borderColor = '#212529';
+                        btn.style.boxShadow = '0 0 0 2px #212529';
+                        
+                        window.Logger?.debug?.('✅ Flag color selected', { ...PAGE_LOG_CONTEXT, color });
+                    }
+                });
+            });
+
+            if (clearBtn && flagInput) {
+                clearBtn.addEventListener('click', () => {
+                    flagInput.value = '';
+                    flagButtons.forEach(b => {
+                        b.classList.remove('active');
+                        b.style.borderColor = 'transparent';
+                        b.style.boxShadow = 'none';
+                    });
+                    window.Logger?.debug?.('✅ Flag color cleared', PAGE_LOG_CONTEXT);
+                });
+            }
+        }, 100);
     }
 
     /**
@@ -399,8 +445,7 @@
                 ticker_id: { id: 'selectedTickerId', type: 'int', default: selectedTickerId },
                 external_symbol: { id: 'externalSymbol', type: 'text' },
                 external_name: { id: 'externalName', type: 'text' },
-                flag_color: { id: 'itemFlagColor', type: 'text' },
-                notes: { id: 'itemNotes', type: 'text' }
+                flag_color: { id: 'itemFlagColor', type: 'text' }
             });
 
             // Add via data service

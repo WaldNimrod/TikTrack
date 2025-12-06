@@ -243,3 +243,4 @@ This log tracks version bumps for the development environment (branch `main`). M
 | 2025-12-06T22:18:37+00:00 | 1.3.90.0 | 1.3.89.0 | 2ddae0bbb19fc006dede8a7db7cef84ceeddc9b4 | 6af27cdbf8524fe546f29d595438ffedd45db174 | patch | Fix bundles errors: rate limiting, loadNotesData, and warnings |
 | 2025-12-06T23:23:27+00:00 | 1.3.91.0 | 1.3.90.0 | 815776016857f0342073693c066a92cadeeafd7b | 2ddae0bbb19fc006dede8a7db7cef84ceeddc9b4 | patch | Complete bundles environment-aware setup and development environment fixes |
 | 2025-12-06T23:23:45+00:00 | 1.3.92.0 | 1.3.91.0 | b703d5d01f7467fb911a0cfdd6efe0d81d847b50 | 815776016857f0342073693c066a92cadeeafd7b | patch | Add backup file patterns to .gitignore |
+| 2025-12-06T23:26:17+00:00 | 1.3.93.0 | 1.3.92.0 | a793ffce0ac81f18d7d0c647ade506685b0499dd | b703d5d01f7467fb911a0cfdd6efe0d81d847b50 | patch | שילוב 3 עמודי מוקאפים במערכת - היסטוריית טרייד, מצב תיק היסטורי, יומן מסחר |

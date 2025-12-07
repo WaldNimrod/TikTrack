@@ -609,7 +609,8 @@ async function updateNotesTable(notes, options = {}) {
   try {
     const { skipPagination = false } = options;
     window.Logger.info('🟢🟢🟢 updateNotesTable נקראה (פונקציה רגילה) עם', notes ? notes.length : 0, 'הערות', { page: "notes" });
-    window.Logger.info('🔍🔍🔵 Stack trace:', new Error().stack, { page: "notes" });
+    // Removed stack trace logging - it was causing false positive errors in testing
+    // window.Logger.info('🔍🔍🔵 Stack trace:', new Error().stack, { page: "notes" });
     
     const tbody = document.querySelector('#notesTable tbody');
     if (!tbody) {

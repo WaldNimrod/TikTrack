@@ -1198,8 +1198,8 @@
             }
 
             // Close modal
-            if (window.ModalManagerV2?.closeModal) {
-                window.ModalManagerV2.closeModal('watchListModal');
+            if (window.ModalManagerV2?.hideModal) {
+                window.ModalManagerV2.hideModal('watchListModal');
             }
         } catch (error) {
             window.Logger?.error?.('❌ Error saving watch list', { ...PAGE_LOG_CONTEXT, error: error?.message || error });
@@ -1367,8 +1367,8 @@
                 }
 
                 // Close modal
-                if (window.ModalManagerV2?.closeModal) {
-                    window.ModalManagerV2.closeModal('addTickerModal');
+                if (window.ModalManagerV2?.hideModal) {
+                    window.ModalManagerV2.hideModal('addTickerModal');
                 }
             }
         } catch (error) {

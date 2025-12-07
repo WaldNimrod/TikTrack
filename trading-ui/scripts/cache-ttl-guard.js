@@ -50,7 +50,11 @@
     // AI Analysis cache configs
     'ai-analysis-templates': { ttl: 60 * 60 * 1000 }, // 1 hour - stable data
     'ai-analysis-history': { ttl: 5 * 60 * 1000 },   // 5 minutes - frequently updated
-    'ai-analysis-providers': { ttl: 5 * 60 * 1000 } // 5 minutes - user settings
+    'ai-analysis-providers': { ttl: 5 * 60 * 1000 }, // 5 minutes - user settings
+    // Historical Data Services cache configs
+    'trade-history-data': { ttl: 5 * 60 * 1000 }, // 5 minutes
+    'portfolio-state-data': { ttl: 10 * 60 * 1000 }, // 10 minutes
+    'trading-journal-data': { ttl: 3 * 60 * 1000 } // 3 minutes
   };
 
   async function ensure(key, loaderFn, options = {}) {

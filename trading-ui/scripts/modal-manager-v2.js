@@ -6681,11 +6681,11 @@ class ModalManagerV2 {
                         await window.WatchListModal.init();
                     } else {
                         // Use inline function to populate icons
-                        await populateWatchListIcons(modalElement);
+                        await this.populateWatchListIcons(modalElement);
                     }
                     
                     // Setup view mode selector
-                    setupWatchListViewModeSelector(modalElement);
+                    this.setupWatchListViewModeSelector(modalElement);
                 } catch (error) {
                     window.Logger?.error?.('❌ Error populating watch list icons', { error: error?.message || error, page: 'modal-manager-v2' });
                 }
@@ -6698,7 +6698,7 @@ class ModalManagerV2 {
      * @param {HTMLElement} modalElement - The modal element
      * @private
      */
-    async function populateWatchListIcons(modalElement) {
+    async populateWatchListIcons(modalElement) {
         const tablerSelector = modalElement.querySelector('#watchListIconSelector');
         const bootstrapSelector = modalElement.querySelector('#watchListBootstrapIconSelector');
         
@@ -6757,7 +6757,7 @@ class ModalManagerV2 {
                 }
                 
                 iconItem.addEventListener('click', () => {
-                    selectWatchListIcon(iconName, 'tabler', modalElement);
+                    this.selectWatchListIcon(iconName, 'tabler', modalElement);
                 });
                 
                 tablerSelector.appendChild(iconItem);
@@ -6831,7 +6831,7 @@ class ModalManagerV2 {
                 }
                 
                 iconItem.addEventListener('click', () => {
-                    selectWatchListIcon(iconClass, 'bootstrap', modalElement);
+                    this.selectWatchListIcon(iconClass, 'bootstrap', modalElement);
                 });
                 
                 bootstrapSelector.appendChild(iconItem);
@@ -6848,7 +6848,7 @@ class ModalManagerV2 {
      * @param {HTMLElement} modalElement - The modal element
      * @private
      */
-    async function selectWatchListIcon(iconName, library, modalElement) {
+    async selectWatchListIcon(iconName, library, modalElement) {
         const iconInput = modalElement.querySelector('#watchListIcon');
         const libraryInput = modalElement.querySelector('#watchListIconLibrary');
         const preview = modalElement.querySelector('#watchListSelectedIconPreview');
@@ -6899,7 +6899,7 @@ class ModalManagerV2 {
      * @param {HTMLElement} modalElement - The modal element
      * @private
      */
-    function setupWatchListViewModeSelector(modalElement) {
+    setupWatchListViewModeSelector(modalElement) {
         const viewModeInput = modalElement.querySelector('#watchListViewMode');
         const radioButtons = modalElement.querySelectorAll('input[name="watchListViewMode"]');
         

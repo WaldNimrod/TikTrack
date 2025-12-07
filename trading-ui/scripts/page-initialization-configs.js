@@ -3675,7 +3675,8 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         "window.LinkedItemsService",
         "window.SelectPopulatorService",
         "window.DataCollectionService",
-        "window.CRUDResponseHandler"
+        "window.CRUDResponseHandler",
+        "window.PortfolioStateData" // Portfolio State Data Service
       ],
       preloadAssets: ['portfolio-state-page-data'],
       cacheStrategy: 'standard',
@@ -3759,7 +3760,8 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         "window.InfoSummarySystem",
         "window.SelectPopulatorService",
         "window.DataCollectionService",
-        "window.CRUDResponseHandler"
+        "window.CRUDResponseHandler",
+        "window.TradeHistoryData" // Trade History Data Service
       ],
       preloadAssets: ['trade-history-page-data'],
       cacheStrategy: 'standard',
@@ -3938,7 +3940,8 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         "window.InfoSummarySystem",
         "window.SelectPopulatorService",
         "window.DataCollectionService",
-        "window.CRUDResponseHandler"
+        "window.CRUDResponseHandler",
+        "window.TradingJournalData" // Trading Journal Data Service
       ],
       preloadAssets: ['trading-journal-page-data'],
       cacheStrategy: 'standard',

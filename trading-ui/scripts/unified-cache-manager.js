@@ -171,7 +171,13 @@ const CACHE_DEPENDENCIES = {
         'accounts-data',
         'cash-flows-data'
     ],
-    'statistics-data': ['trades-data', 'executions-data']
+    'statistics-data': ['trades-data', 'executions-data'],
+    
+    // Historical Data Level
+    'trade-history-data': ['trades', 'executions', 'trade-plans'],
+    'portfolio-state-snapshot-*': ['executions', 'market_data_quotes', 'trades'],
+    'portfolio-state-series-*': ['executions', 'market_data_quotes', 'trades'],
+    'trading-journal-*': ['notes', 'trades', 'executions']
 };
 
 // TTL Policies Configuration
@@ -264,6 +270,16 @@ class UnifiedCacheManager {
             'market-data': { layer: 'backend', ttl: 30000, compress: false },
             'alerts-data': { layer: 'memory', ttl: 60000, compress: false, dependencies: ['accounts-data'] },
             'alert-{id}': { layer: 'memory', ttl: 60000, compress: false, dependencies: ['alerts-data'] },
+            // Historical Data Services
+            'trade-history-data': { layer: 'backend', ttl: 300000, compress: false, dependencies: ['trades', 'executions', 'trade-plans'] },
+            'trade-history-statistics-*': { layer: 'backend', ttl: 300000, compress: false },
+            'trade-history-aggregated-*': { layer: 'backend', ttl: 300000, compress: false },
+            'trade-history-plan-vs-execution-*': { layer: 'backend', ttl: 300000, compress: false },
+            'portfolio-state-snapshot-*': { layer: 'backend', ttl: 600000, compress: false, dependencies: ['executions', 'market_data_quotes', 'trades'] },
+            'portfolio-state-series-*': { layer: 'backend', ttl: 600000, compress: false },
+            'portfolio-state-performance-*': { layer: 'backend', ttl: 600000, compress: false },
+            'portfolio-state-comparison-*': { layer: 'backend', ttl: 600000, compress: false },
+            'trading-journal-*': { layer: 'backend', ttl: 180000, compress: false, dependencies: ['notes', 'trades', 'executions'] },
             'trading-accounts-data': { layer: 'memory', ttl: 60000, compress: false, dependencies: ['user-preferences'] },
             'trading-account-{id}': { layer: 'memory', ttl: 60000, compress: false, dependencies: ['trading-accounts-data'] },
             'executions-data': { layer: 'memory', ttl: 45000, compress: false, dependencies: ['accounts-data'] },

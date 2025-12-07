@@ -1365,6 +1365,27 @@ const PACKAGE_MANIFEST = {
         loadOrder: 0
       },
       {
+        file: 'services/trade-history-data.js',
+        globalCheck: 'window.TradeHistoryData',
+        description: 'Trade history data service',
+        required: false,  // Required only for trade-history-page
+        loadOrder: 8
+      },
+      {
+        file: 'services/portfolio-state-data.js',
+        globalCheck: 'window.PortfolioStateData',
+        description: 'Portfolio state data service',
+        required: false,  // Required only for portfolio-state-page
+        loadOrder: 8.5
+      },
+      {
+        file: 'services/trading-journal-data.js',
+        globalCheck: 'window.TradingJournalData',
+        description: 'Trading journal data service',
+        required: false,  // Required only for trading-journal-page
+        loadOrder: 9
+      },
+      {
         file: 'account-service.js',
         globalCheck: 'window.getAccounts',
         description: 'Account service',

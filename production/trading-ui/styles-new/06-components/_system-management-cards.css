@@ -1,0 +1,193 @@
+/**
+ * System Management Cards - Standardized Stats and Actions Cards
+ * ==============================================================
+ * 
+ * Standardized CSS for system management statistics and actions cards
+ * Used across all system management sections for consistency
+ * 
+ * @version 1.0.0
+ * @created November 30, 2025
+ */
+
+/* Stats Card - Standardized statistics display */
+.sm-stats-card {
+  margin-bottom: 1rem;
+}
+
+.sm-stats-card .card-header {
+  background-color: var(--bg-secondary, #f8f9fa);
+  border-bottom: 1px solid var(--border-color, #dee2e6);
+  padding: 0.75rem 1rem;
+}
+
+.sm-stats-card .card-header h5 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+}
+
+.sm-stats-card .card-header h5 i {
+  margin-left: 0.5rem;
+  color: var(--primary-color, #26baac);
+}
+
+.sm-stats-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.sm-stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--border-color-light, #e9ecef);
+}
+
+.sm-stat-row:last-child {
+  border-bottom: none;
+}
+
+.sm-stat-row .stat-label {
+  display: flex;
+  align-items: center;
+  font-weight: 500;
+  color: var(--text-secondary, #6c757d);
+  flex: 1;
+}
+
+.sm-stat-row .stat-label i {
+  margin-left: 0.5rem;
+  width: 1.25rem;
+  text-align: center;
+  color: var(--text-muted, #adb5bd);
+}
+
+.sm-stat-row .stat-value {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  color: var(--text-primary, #212529);
+}
+
+.sm-stat-row .stat-value .badge {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+}
+
+/* Actions Card - Standardized actions display */
+.sm-actions-card {
+  margin-bottom: 1rem;
+}
+
+.sm-actions-card .card-header {
+  background-color: var(--bg-secondary, #f8f9fa);
+  border-bottom: 1px solid var(--border-color, #dee2e6);
+  padding: 0.75rem 1rem;
+}
+
+.sm-actions-card .card-header h5 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+}
+
+.sm-actions-card .card-header h5 i {
+  margin-left: 0.5rem;
+  color: var(--primary-color, #26baac);
+}
+
+.sm-action-group {
+  margin-bottom: 1.5rem;
+}
+
+.sm-action-group:last-child {
+  margin-bottom: 0;
+}
+
+.sm-action-group .action-group-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-secondary, #6c757d);
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border-color-light, #e9ecef);
+}
+
+.action-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.action-buttons .btn {
+  white-space: nowrap;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .sm-stat-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .sm-stat-row .stat-value {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+  }
+
+  .action-buttons .btn {
+    width: 100%;
+  }
+}
+
+/* Color utilities for stat values */
+.sm-stat-row .stat-value.text-success {
+  color: var(--color-success, #28a745) !important;
+}
+
+.sm-stat-row .stat-value.text-warning {
+  color: var(--color-warning, #ffc107) !important;
+}
+
+.sm-stat-row .stat-value.text-danger {
+  color: var(--color-danger, #dc3545) !important;
+}
+
+.sm-stat-row .stat-value.text-info {
+  color: var(--color-info, #17a2b8) !important;
+}
+
+.sm-stat-row .stat-value.text-primary {
+  color: var(--primary-color, #26baac) !important;
+}
+
+.sm-stat-row .stat-value.text-secondary {
+  color: var(--text-secondary, #6c757d) !important;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

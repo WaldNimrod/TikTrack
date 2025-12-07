@@ -490,7 +490,7 @@ function getColumnValue(item, columnIndex, tableType) {
       // Return the translated investment type value
       const typeDisplay = item[fieldName] === 'swing' ? 'סווינג' :
         item[fieldName] === 'investment' ? 'השקעה' :
-          item[fieldName] === 'passive' ? 'פסיבי' :
+          item[fieldName] === 'passive' ? 'פאסיבי' :
             item[fieldName] === 'day' ? 'יומי' :
               item[fieldName] === 'scalp' ? 'סקלפינג' :
                 item[fieldName] || '';
@@ -1268,9 +1268,38 @@ function setColumnDefinition(tableName, columnName, definition) {
 // table-mappings.js is the authoritative source for UI table mappings.
 
 // Only export if table-mappings.js hasn't already set these (table-mappings.js should load first)
+// Note: table-mappings.js is optional - not needed for pages without tables (e.g., dashboard/index)
 if (!window.TABLE_COLUMN_MAPPINGS || Object.keys(window.TABLE_COLUMN_MAPPINGS).length === 0) {
   window.TABLE_COLUMN_MAPPINGS = LEGACY_TABLE_COLUMN_MAPPINGS;
-  console.warn('⚠️ [data-basic.js] Using legacy TABLE_COLUMN_MAPPINGS - table-mappings.js should be loaded first!');
+  // Only warn if we're on a page that actually uses tables (exclude index/dashboard page)
+  const isIndexPage = window.location.pathname === '/' ||
+                      window.location.pathname === '/index.html' ||
+                      window.location.pathname.includes('/index') ||
+                      document.body.classList.contains('index-page');
+  
+  if (!isIndexPage) {
+    const isTablePage = document.querySelector('table[data-table-type]') || 
+                        window.location.pathname.includes('trades') ||
+                        window.location.pathname.includes('tickers') ||
+                        window.location.pathname.includes('executions') ||
+                        window.location.pathname.includes('trade_plans');
+    
+    // Only warn if this is a table page AND table-mappings.js was supposed to load but didn't
+    // Check if table-mappings.js actually loaded by checking for its global
+    if (isTablePage) {
+      // Check if table-mappings.js was loaded by looking for the script tag or checking if it's in the page
+      const tableMappingsScript = Array.from(document.querySelectorAll('script')).find(script => 
+        script.src && script.src.includes('table-mappings.js')
+      );
+      
+      // If table-mappings.js script tag exists but TABLE_COLUMN_MAPPINGS wasn't set by it, that's a problem
+      if (tableMappingsScript && (!window.TABLE_COLUMN_MAPPINGS || Object.keys(window.TABLE_COLUMN_MAPPINGS).length === 0)) {
+        // Script was supposed to load but didn't set the mappings - this is a real issue
+        window.Logger?.warn?.('⚠️ [data-basic.js] table-mappings.js script found but TABLE_COLUMN_MAPPINGS not set - using legacy mappings', {}, { page: 'data-basic' });
+      }
+      // If table-mappings.js script tag doesn't exist, it's optional and we use legacy - no warning needed
+    }
+  }
 } else {
   // table-mappings.js already loaded - don't override, but merge any missing mappings
   // This is for database display pages that might need the legacy mappings
@@ -1916,9 +1945,17 @@ window.applyDefaultSort = async function (tableType, data, updateFunction) {
 window.closeModal = function (modalId) {
   const modal = document.getElementById(modalId);
   if (modal) {
-    const bootstrapModal = bootstrap.Modal.getInstance(modal);
-    if (bootstrapModal) {
-      bootstrapModal.hide();
+    if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
+      window.ModalManagerV2.hideModal(modalId);
+    } else if (bootstrap?.Modal) {
+      const bootstrapModal = bootstrap.Modal.getInstance(modal);
+      if (bootstrapModal) {
+        bootstrapModal.hide();
+      } else {
+        // Fallback: hide modal manually
+        modal.classList.remove('show');
+        modal.style.display = 'none';
+      }
     } else {
       // Fallback: hide modal manually
       modal.classList.remove('show');
@@ -2078,17 +2115,29 @@ window.loadTableData = async function(tableType, updateFunction, options = {}) {
       const columns = options.columns || 5;
       
       if (tbody) {
-        tbody.innerHTML = `
-          <tr class="empty-state-row">
-            <td colspan="${columns}" class="text-center py-5">
-              <div class="empty-state-content">
-                <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
-                <h5 class="text-muted">אין ${entityName} להצגה</h5>
-                <p class="text-muted small mb-0">לא נמצאו רשומות במערכת</p>
-              </div>
-            </td>
-          </tr>
-        `;
+        // Build empty state using createElement
+        tbody.textContent = '';
+        const emptyRow = document.createElement('tr');
+        emptyRow.className = 'empty-state-row';
+        const emptyCell = document.createElement('td');
+        emptyCell.colSpan = columns;
+        emptyCell.className = 'text-center py-5';
+        const emptyContent = document.createElement('div');
+        emptyContent.className = 'empty-state-content';
+        const icon = document.createElement('i');
+        icon.className = 'fas fa-inbox fa-3x text-muted mb-3';
+        emptyContent.appendChild(icon);
+        const h5 = document.createElement('h5');
+        h5.className = 'text-muted';
+        h5.textContent = `אין ${entityName} להצגה`;
+        emptyContent.appendChild(h5);
+        const p = document.createElement('p');
+        p.className = 'text-muted small mb-0';
+        p.textContent = 'לא נמצאו רשומות במערכת';
+        emptyContent.appendChild(p);
+        emptyCell.appendChild(emptyContent);
+        emptyRow.appendChild(emptyCell);
+        tbody.appendChild(emptyRow);
         console.log(`ℹ️ Displayed empty state message for ${entityName} (0 records)`);
       }
     }

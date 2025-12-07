@@ -56,7 +56,13 @@ class ConditionsFormGenerator {
 
         this.mode = options.isEdit ? 'edit' : 'create';
 
-        container.innerHTML = this.buildFormHTML(options);
+        container.textContent = '';
+        const formHTML = this.buildFormHTML(options);
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(formHTML, 'text/html');
+        doc.body.childNodes.forEach(node => {
+            container.appendChild(node.cloneNode(true));
+        });
         this.initializeActionNotesEditor(options.conditionData);
         if (window.ButtonSystem?.processButtons) {
             window.ButtonSystem.processButtons(container);
@@ -248,7 +254,11 @@ class ConditionsFormGenerator {
         const methodSelect = document.getElementById('methodSelect');
         if (!methodSelect) return;
 
-        methodSelect.innerHTML = `<option value="">${this.translator.getFormLabel('select_method')}...</option>`;
+        methodSelect.textContent = '';
+        const option = document.createElement('option');
+        option.value = '';
+        option.textContent = `${this.translator.getFormLabel('select_method')}...`;
+        methodSelect.appendChild(option);
 
         this.methods
             .sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0))
@@ -299,7 +309,11 @@ class ConditionsFormGenerator {
         const container = document.getElementById('parametersFields');
         const wrapper = document.getElementById('parametersContainer');
         if (container) {
-            container.innerHTML = '<div class="text-muted">בחר שיטת מסחר כדי להגדיר פרמטרים</div>';
+            container.textContent = '';
+            const div = document.createElement('div');
+            div.className = 'text-muted';
+            div.textContent = 'בחר שיטת מסחר כדי להגדיר פרמטרים';
+            container.appendChild(div);
         }
         if (wrapper) {
             wrapper.style.display = 'none';
@@ -366,7 +380,7 @@ class ConditionsFormGenerator {
         if (existingContent && window.RichTextEditorService?.setContent) {
             window.RichTextEditorService.setContent(editorId, existingContent);
         } else if (editor?.root) {
-            editor.root.innerHTML = '';
+            editor.root.textContent = '';
         }
     }
 
@@ -395,10 +409,14 @@ class ConditionsFormGenerator {
         const container = document.getElementById('parametersFields');
         if (!container || !wrapper) return;
 
-        container.innerHTML = '';
+        container.textContent = '';
 
         if (!Array.isArray(method.parameters) || method.parameters.length === 0) {
-            container.innerHTML = '<div class="text-muted">אין פרמטרים לשיטה זו</div>';
+            container.textContent = '';
+            const div = document.createElement('div');
+            div.className = 'text-muted';
+            div.textContent = 'אין פרמטרים לשיטה זו';
+            container.appendChild(div);
             wrapper.style.display = '';
             return;
         }
@@ -425,7 +443,8 @@ class ConditionsFormGenerator {
         const requiredIndicator = parameter.is_required ? '<span class="text-danger">*</span>' : '';
         const input = this.buildInputForParameter(parameter);
 
-        fieldContainer.innerHTML = `
+        fieldContainer.textContent = '';
+        const fieldHTML = `
             <label class="form-label" for="${parameter.parameter_key}">
                 ${label} ${requiredIndicator}
             </label>
@@ -433,6 +452,11 @@ class ConditionsFormGenerator {
             <small class="form-text text-muted">${parameter.help_text_he || parameter.help_text_en || ''}</small>
             <div class="invalid-feedback" id="${parameter.parameter_key}Error"></div>
         `;
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(fieldHTML, 'text/html');
+        doc.body.childNodes.forEach(node => {
+            fieldContainer.appendChild(node.cloneNode(true));
+        });
 
         return fieldContainer;
     }
@@ -608,9 +632,18 @@ class ConditionsFormGenerator {
         if (!saveBtn) return;
 
         saveBtn.disabled = loading;
-        saveBtn.innerHTML = loading
-            ? '<i class="fas fa-spinner fa-spin"></i> שומר...'
-            : `<i class="fas fa-save"></i> ${this.translator.getFormLabel('save_condition')}`;
+        saveBtn.textContent = '';
+        if (loading) {
+            const spinner = document.createElement('i');
+            spinner.className = 'fas fa-spinner fa-spin';
+            saveBtn.appendChild(spinner);
+            saveBtn.appendChild(document.createTextNode(' שומר...'));
+        } else {
+            const icon = document.createElement('i');
+            icon.className = 'fas fa-save';
+            saveBtn.appendChild(icon);
+            saveBtn.appendChild(document.createTextNode(` ${this.translator.getFormLabel('save_condition')}`));
+        }
     }
 
     handleFormCancel() {

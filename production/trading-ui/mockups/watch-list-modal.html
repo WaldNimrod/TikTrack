@@ -8,6 +8,9 @@
     <!-- Bootstrap CSS (חובה ראשון) -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css?v=0da3519a_20251102_104906">
 
+    <!-- Bootstrap Icons CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
     <!-- TikTrack ITCSS Master Styles -->
     <link rel="stylesheet" href="../styles-new/master.css?v=1.0.0">
 </head>
@@ -15,8 +18,133 @@
     <!-- Notification container -->
     <div class="notification-container" id="notificationContainer"></div>
     
+    <!-- Mockups Navigation -->
+    <div class="mockups-navigation">
+        <div class="mockups-navigation-content">
+            <span class="mockups-navigation-label">📋 ניווט מוקאפים:</span>
+            <a href="watch-lists-page.html" class="mockups-navigation-link">רשימות צפייה</a>
+            <a href="watch-list-modal.html" class="mockups-navigation-link active">מודל רשימה</a>
+            <a href="add-ticker-modal.html" class="mockups-navigation-link">הוספת טיקר</a>
+            <a href="flag-quick-action.html" class="mockups-navigation-link">דגלים</a>
+        </div>
+    </div>
 
-    
+    <!-- Add/Edit Watch List Modal -->
+    <div class="modal fade show" id="watchListModal" tabindex="-1" style="display: block;" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header modal-header-colored">
+                    <h5 class="modal-title" id="watchListModalTitle">רשימה חדשה</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="watchListForm">
+                        <div class="mb-3">
+                            <label for="watchListName" class="form-label">שם הרשימה *</label>
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="watchListName" 
+                                   required 
+                                   maxlength="100"
+                                   placeholder="לדוגמה: מניות טכנולוגיה">
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">איקון</label>
+                                <div class="icon-selector-wrapper">
+                                    <button type="button" 
+                                            class="btn btn-outline-secondary icon-selector-trigger" 
+                                            id="iconSelectorTrigger"
+                                            data-bs-toggle="dropdown"
+                                            data-bs-auto-close="outside"
+                                            aria-expanded="false">
+                                        <span id="selectedIconPreview" class="selected-icon-preview">
+                                            <span class="icon-preview-placeholder">ללא איקון</span>
+                                        </span>
+                                        <i class="bi bi-chevron-down ms-2"></i>
+                                    </button>
+                                    <div class="dropdown-menu icon-selector-dropdown" id="iconSelectorDropdown">
+                                        <!-- Tabs for icon libraries -->
+                                        <ul class="nav nav-tabs icon-library-tabs" role="tablist">
+                                            <li class="nav-item" role="presentation">
+                                                <button class="nav-link active" 
+                                                        id="tabler-tab" 
+                                                        data-bs-toggle="tab" 
+                                                        data-bs-target="#tabler-icons" 
+                                                        type="button" 
+                                                        role="tab"
+                                                        onclick="event.stopPropagation();">
+                                                    Tabler
+                                                </button>
+                                            </li>
+                                            <li class="nav-item" role="presentation">
+                                                <button class="nav-link" 
+                                                        id="bootstrap-tab" 
+                                                        data-bs-toggle="tab" 
+                                                        data-bs-target="#bootstrap-icons" 
+                                                        type="button" 
+                                                        role="tab"
+                                                        onclick="event.stopPropagation();">
+                                                    Bootstrap
+                                                </button>
+                                            </li>
+                                        </ul>
+                                        <div class="tab-content icon-library-content">
+                                            <div class="tab-pane fade show active" 
+                                                 id="tabler-icons" 
+                                                 role="tabpanel">
+                                                <div id="iconSelector" class="icon-selector-grid">
+                                                    <!-- Tabler Icons will be populated by JavaScript -->
+                                                </div>
+                                            </div>
+                                            <div class="tab-pane fade" 
+                                                 id="bootstrap-icons" 
+                                                 role="tabpanel">
+                                                <div id="bootstrapIconSelector" class="icon-selector-grid">
+                                                    <!-- Bootstrap Icons will be populated by JavaScript -->
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <input type="hidden" id="watchListIcon" value="">
+                                <input type="hidden" id="watchListIconLibrary" value="tabler">
+                                <small class="form-text text-muted">איקון שיוצג בכרטיס הרשימה</small>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">תצוגה ברירת מחדל</label>
+                                <div class="view-mode-selector">
+                                    <div class="btn-group view-mode-radio" role="group" aria-label="View mode selection">
+                                        <input type="radio" class="btn-check" name="viewMode" id="viewModeTable" value="table" checked>
+                                        <label class="btn btn-outline-primary" for="viewModeTable" data-bs-toggle="tooltip" data-bs-placement="top" title="טבלה">
+                                            <i class="bi bi-table"></i>
+                                        </label>
+                                        <input type="radio" class="btn-check" name="viewMode" id="viewModeCards" value="cards">
+                                        <label class="btn btn-outline-primary" for="viewModeCards" data-bs-toggle="tooltip" data-bs-placement="top" title="כרטיסים">
+                                            <i class="bi bi-grid-3x3"></i>
+                                        </label>
+                                        <input type="radio" class="btn-check" name="viewMode" id="viewModeCompact" value="compact">
+                                        <label class="btn btn-outline-primary" for="viewModeCompact" data-bs-toggle="tooltip" data-bs-placement="top" title="קומפקטי">
+                                            <i class="bi bi-list-ul"></i>
+                                        </label>
+                                    </div>
+                                </div>
+                                <input type="hidden" id="watchListViewMode" value="table">
+                                <small class="form-text text-muted">תצוגה שתוצג בעת פתיחת הרשימה</small>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
+                    <button type="button" 
+                            class="btn btn-primary" 
+                            data-onclick="window.WatchListModal?.saveWatchList()">
+                        שמור
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Bootstrap JS -->
@@ -30,11 +158,25 @@
     <script src="../scripts/init-system/package-manifest.js?v=1.0.0"></script>
     <script src="../scripts/page-initialization-configs.js?v=1.0.0"></script>
 
-    <!-- Unified Initialization System -->
-    <script src="../scripts/unified-app-initializer.js?v=1.0.0"></script>
+    <!-- Cache System -->
+    <script src="../scripts/unified-cache-manager.js?v=1.0.0"></script>
+
+    <!-- Icon System -->
+    <script src="../scripts/icon-mappings.js?v=1.0.0"></script>
+    <script src="../scripts/icon-system.js?v=1.0.0"></script>
+
+    <!-- Notification System -->
+    <script src="../scripts/notification-system.js?v=1.0.0"></script>
+
+    <!-- Watch Lists Services -->
+    <script src="../scripts/services/watch-lists-data.js?v=1.0.0"></script>
+    <script src="../scripts/services/watch-lists-ui-service.js?v=1.0.0"></script>
+
+    <!-- Modal Manager (required for modals) -->
+    <script src="../scripts/modal-manager-v2.js?v=1.0.0"></script>
 
     <!-- Page-specific script -->
-    <script src="../scripts/watch-list-modal.js?v=1.0.0" defer></script>
+    <script src="../scripts/watch-list-modal.js?v=1.0.1"></script>
 </body>
 </html>
 

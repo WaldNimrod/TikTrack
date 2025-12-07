@@ -1116,7 +1116,11 @@ async function loadAccountsForLinking(targetSelect) {
             accountOptionsCache = [];
         }
     }
-    targetSelect.innerHTML = '<option value="">בחר חשבון מסחר...</option>';
+    targetSelect.textContent = '';
+    const defaultOption = document.createElement('option');
+    defaultOption.value = '';
+    defaultOption.textContent = 'בחר חשבון מסחר...';
+    targetSelect.appendChild(defaultOption);
     accountOptionsCache.forEach((account) => {
         const option = document.createElement('option');
         option.value = account.id;
@@ -1830,7 +1834,10 @@ function showProcessingOverlay(message = 'טוען ומעבד נתונים...') 
         const spinner = document.createElement('div');
         spinner.className = 'spinner-border text-light';
         spinner.setAttribute('role', 'status');
-        spinner.innerHTML = '<span class="visually-hidden">Loading...</span>';
+        const spinnerText = document.createElement('span');
+        spinnerText.className = 'visually-hidden';
+        spinnerText.textContent = 'Loading...';
+        spinner.appendChild(spinnerText);
 
         const messageEl = document.createElement('div');
         messageEl.className = 'processing-overlay-message';
@@ -1990,7 +1997,7 @@ function populateDataTypeSelect(select) {
     }
 
     const previousValue = select.value;
-    select.innerHTML = '';
+    select.textContent = '';
 
     IMPORT_DATA_TYPE_ORDER.forEach((key) => {
         const definition = IMPORT_DATA_TYPE_DEFINITIONS[key];
@@ -2096,7 +2103,10 @@ function updateSelectedDataTypeInfo() {
         if (subtitleEl) {
             subtitleEl.textContent = '';
         }
-        contentEl.innerHTML = '<p>בחר תהליך ייבוא מהרשימה כדי לצפות בתיאור והתרחישים הנתמכים.</p>';
+        contentEl.textContent = '';
+        const p = document.createElement('p');
+        p.textContent = 'בחר תהליך ייבוא מהרשימה כדי לצפות בתיאור והתרחישים הנתמכים.';
+        contentEl.appendChild(p);
         applyEntityTypeToImportButtons('cash_flow');
         if (modalDialog) modalDialog.setAttribute('data-entity-type', 'cash_flow');
         if (stepContainer) stepContainer.setAttribute('data-entity-type', 'cash_flow');
@@ -2125,13 +2135,30 @@ function updateSelectedDataTypeInfo() {
         statsHtml = `<div class="data-type-stats">${recordsLabel}</div>`;
     }
 
-    contentEl.innerHTML = `
-        <p>${definition.description}</p>
-        ${statsHtml}
-        ${definition.documentationAnchor
-            ? `<p class="mt-2"><a href="${definition.documentationAnchor}" target="_blank">למידע נוסף בתיעוד</a></p>`
-            : ''}
-    `;
+    contentEl.textContent = '';
+    const p1 = document.createElement('p');
+    p1.textContent = definition.description;
+    contentEl.appendChild(p1);
+    
+    if (statsHtml) {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(statsHtml, 'text/html');
+        const statsElement = doc.body.firstElementChild;
+        if (statsElement) {
+            contentEl.appendChild(statsElement);
+        }
+    }
+    
+    if (definition.documentationAnchor) {
+        const p2 = document.createElement('p');
+        p2.className = 'mt-2';
+        const a = document.createElement('a');
+        a.href = definition.documentationAnchor;
+        a.target = '_blank';
+        a.textContent = 'למידע נוסף בתיעוד';
+        p2.appendChild(a);
+        contentEl.appendChild(p2);
+    }
 
     if (modalDialog) {
         modalDialog.setAttribute('data-entity-type', entityType);
@@ -2244,7 +2271,7 @@ function clearCashflowAnalysisSections() {
         const sectionElement = document.getElementById(section);
         const contentElement = content ? document.getElementById(content) : null;
         if (contentElement) {
-            contentElement.innerHTML = '';
+            contentElement.textContent = '';
         }
         if (sectionElement) {
             setElementDisplay(sectionElement, 'none');
@@ -2259,7 +2286,7 @@ function renderCashflowTypeCards(typeStats = {}, totalsByType = {}) {
         return;
     }
 
-    container.innerHTML = '';
+    container.textContent = '';
     
     // IMPORTANT: Filter out types that should be skipped (not imported)
     // These types are filtered out in IBKRConnector._build_cashflow_record:
@@ -2330,7 +2357,7 @@ function renderCashflowTypeCards(typeStats = {}, totalsByType = {}) {
             const card = document.createElement('div');
             card.className = 'analysis-card';
             card.setAttribute('data-cashflow-type', typeKey);
-            card.innerHTML = `
+            const cardHTML = `
                 <div class="card-icon"><i class="bi bi-diagram-3"></i></div>
                 <div class="card-content">
                     <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
@@ -2350,6 +2377,11 @@ function renderCashflowTypeCards(typeStats = {}, totalsByType = {}) {
                     ${primaryCurrencyEntry ? `<small>מטבע מוביל: ${primaryCurrencyEntry[0]} ${formatAmount(primaryCurrencyEntry[1])}</small>` : ''}
                 </div>
             `;
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(cardHTML, 'text/html');
+            doc.body.childNodes.forEach(node => {
+                card.appendChild(node.cloneNode(true));
+            });
             container.appendChild(card);
             
             // Add event listener for checkbox
@@ -2437,7 +2469,12 @@ function renderCashflowSummaryComparison(summaryComparison = {}) {
         </table>
     `;
 
-    container.innerHTML = tableHTML;
+    container.textContent = '';
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(tableHTML, 'text/html');
+    doc.body.childNodes.forEach(node => {
+        container.appendChild(node.cloneNode(true));
+    });
     setElementDisplay(section, 'block');
 }
 
@@ -2448,7 +2485,7 @@ function renderCashflowCurrencyCards(totalsByCurrency = {}) {
         return;
     }
 
-    container.innerHTML = '';
+    container.textContent = '';
     const entries = Object.entries(totalsByCurrency)
         .filter(([currency]) => currency && currency !== 'undefined');
 
@@ -2462,13 +2499,18 @@ function renderCashflowCurrencyCards(totalsByCurrency = {}) {
         .forEach(([currency, amount]) => {
             const card = document.createElement('div');
             card.className = 'analysis-card';
-            card.innerHTML = `
+            const cardHTML = `
                 <div class="card-icon"><i class="bi bi-cash-stack"></i></div>
                 <div class="card-content">
                     <div class="card-number">${currency}</div>
                     <div class="card-label">${formatAmount(amount)}</div>
                 </div>
             `;
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(cardHTML, 'text/html');
+            doc.body.childNodes.forEach(node => {
+                card.appendChild(node.cloneNode(true));
+            });
             container.appendChild(card);
         });
 
@@ -2486,7 +2528,7 @@ function renderCashflowIssuesSummary({
         return;
     }
 
-    list.innerHTML = '';
+    list.textContent = '';
     const items = [];
 
     if (Array.isArray(missingAccountDetails) && missingAccountDetails.length > 0) {
@@ -2527,7 +2569,7 @@ function renderCashflowIssuesSummary({
     items.forEach((item) => {
         const card = document.createElement('div');
         card.className = 'summary-card';
-        card.innerHTML = `
+        const cardHTML = `
             <div class="summary-header">
                 <div class="summary-title"><i class="bi ${item.icon}"></i> ${item.title}</div>
                 <div class="summary-subtitle">${formatNumber(item.count)}</div>
@@ -2536,6 +2578,11 @@ function renderCashflowIssuesSummary({
                 <p>${item.description}</p>
             </div>
         `;
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(cardHTML, 'text/html');
+        doc.body.childNodes.forEach(node => {
+            card.appendChild(node.cloneNode(true));
+        });
         list.appendChild(card);
     });
 
@@ -2549,7 +2596,7 @@ function renderKeyValueCards(sectionId, containerId, entries = {}, { labelPrefix
         return;
     }
 
-    container.innerHTML = '';
+    container.textContent = '';
     const pairs = Object.entries(entries || {}).filter(([key]) => typeof key === 'string' && key.trim() !== '');
     if (!pairs.length) {
         setElementDisplay(section, 'none');
@@ -2562,13 +2609,18 @@ function renderKeyValueCards(sectionId, containerId, entries = {}, { labelPrefix
         .forEach(([key, value]) => {
             const card = document.createElement('div');
             card.className = 'analysis-card';
-            card.innerHTML = `
+            const cardHTML = `
                 <div class="card-icon"><i class="bi bi-bar-chart-steps"></i></div>
                 <div class="card-content">
                     <div class="card-number">${labelPrefix ? `${labelPrefix} ${key}` : key}</div>
                     <div class="card-label">${formatAmount(value)}</div>
                 </div>
             `;
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(cardHTML, 'text/html');
+            doc.body.childNodes.forEach(node => {
+                card.appendChild(node.cloneNode(true));
+            });
             container.appendChild(card);
         });
 }
@@ -2580,7 +2632,7 @@ function renderListSummary(sectionId, listId, items = [], formatter) {
         return;
     }
 
-    list.innerHTML = '';
+    list.textContent = '';
     if (!Array.isArray(items) || !items.length) {
         setElementDisplay(section, 'none');
         return;
@@ -4082,9 +4134,34 @@ async function openImportUserDataModal() {
             }
         }
         
-        // Show modal using Bootstrap when available
+        // Show modal using ModalManagerV2 first, fallback to Bootstrap
         let modalShown = false;
-        if (typeof bootstrap !== 'undefined' && typeof bootstrap.Modal === 'function') {
+        if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
+            try {
+                await window.ModalManagerV2.showModal('importUserDataModal', 'view');
+                modalShown = true;
+            } catch (error) {
+                window.Logger?.error('[Import Modal] Error showing modal via ModalManagerV2, trying Bootstrap fallback', { error: error?.message, page: 'import-user-data' });
+                // Fallback to Bootstrap
+                if (typeof bootstrap !== 'undefined' && typeof bootstrap.Modal === 'function') {
+                    try {
+                        importModalBootstrapInstance = bootstrap.Modal.getInstance(modal);
+                        if (!importModalBootstrapInstance) {
+                            importModalBootstrapInstance = new bootstrap.Modal(modal, {
+                                backdrop: true,
+                                keyboard: true,
+                                focus: true
+                            });
+                        }
+                        importModalBootstrapInstance.show();
+                        modalShown = true;
+                    } catch (bootstrapError) {
+                        window.Logger?.error('[Import Modal] Error showing Bootstrap modal, trying manual fallback', { error: bootstrapError?.message, page: 'import-user-data' });
+                    }
+                }
+            }
+        } else if (typeof bootstrap !== 'undefined' && typeof bootstrap.Modal === 'function') {
+            // Fallback to Bootstrap if ModalManagerV2 not available
             try {
                 importModalBootstrapInstance = bootstrap.Modal.getInstance(modal);
                 if (!importModalBootstrapInstance) {
@@ -4097,11 +4174,12 @@ async function openImportUserDataModal() {
                 importModalBootstrapInstance.show();
                 modalShown = true;
             } catch (error) {
-                window.Logger?.error('[Import Modal] Error showing Bootstrap modal, trying fallback', { error: error?.message, page: 'import-user-data' });
+                window.Logger?.error('[Import Modal] Error showing Bootstrap modal, trying manual fallback', { error: error?.message, page: 'import-user-data' });
             }
         }
         
         if (!modalShown) {
+            // Last resort: manual modal display
             try {
                 modal.style.display = 'block';
                 modal.classList.add('show');
@@ -4152,11 +4230,11 @@ async function openImportUserDataModal() {
             stack: error?.stack,
             page: 'import-user-data' 
         });
-        if (typeof window.showDetailedNotification === 'function') {
-            window.showDetailedNotification(
+        // Show error notification in corner (not modal!)
+        if (typeof window.showErrorNotification === 'function') {
+            await window.showErrorNotification(
                 'שגיאה בפתיחת מודול ייבוא',
                 `לא ניתן לפתוח את מודול הייבוא: ${error?.message || 'שגיאה לא ידועה'}`,
-                'error',
                 10000,
                 'import-user-data'
             );
@@ -4185,7 +4263,10 @@ function closeImportUserDataModal() {
     modal.dataset.importClosing = 'true';
     
     const legacyHide = () => {
-        if (typeof bootstrap !== 'undefined' && typeof bootstrap.Modal === 'function') {
+        // Try ModalManagerV2 first
+        if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
+            window.ModalManagerV2.hideModal('importUserDataModal');
+        } else if (typeof bootstrap !== 'undefined' && typeof bootstrap.Modal === 'function') {
             const instance = bootstrap.Modal.getInstance(modal) || importModalBootstrapInstance;
             if (instance) {
                 instance.hide();
@@ -4410,7 +4491,13 @@ function resetPreviewDisplay() {
     tablePlaceholders.forEach(({ elementId, columns }) => {
         const tableBody = document.getElementById(elementId);
         if (tableBody) {
-            tableBody.innerHTML = `<tr><td colspan="${columns}">אין נתונים להצגה. העלה קובץ חדש להפעלת תהליך הייבוא.</td></tr>`;
+            tableBody.textContent = '';
+            const row = document.createElement('tr');
+            const cell = document.createElement('td');
+            cell.colSpan = columns;
+            cell.textContent = 'אין נתונים להצגה. העלה קובץ חדש להפעלת תהליך הייבוא.';
+            row.appendChild(cell);
+            tableBody.appendChild(row);
         }
     });
 }
@@ -4929,7 +5016,7 @@ function clearProblemSections() {
     containers.forEach(containerId => {
         const container = document.getElementById(containerId);
         if (container) {
-            container.innerHTML = '';
+            container.textContent = '';
         }
     });
 }
@@ -5036,7 +5123,15 @@ function releaseProblemTables() {
         const tbody = tableElement.querySelector('tbody');
         if (tbody) {
             const columnCount = tableElement.querySelectorAll('thead th').length || 1;
-            tbody.innerHTML = renderTableEmptyRow(columnCount, 'טוען נתונים...');
+            tbody.textContent = '';
+            const emptyRow = renderTableEmptyRow(columnCount, 'טוען נתונים...');
+            if (emptyRow) {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(emptyRow, 'text/html');
+                doc.body.childNodes.forEach(node => {
+                    tbody.appendChild(node.cloneNode(true));
+                });
+            }
         }
     });
 }
@@ -5061,15 +5156,27 @@ function displayExistingRecords(existingRecords) {
 
     if (unresolvedEntries.length === 0) {
         setElementDisplay(section, 'none');
-        tableBody.innerHTML = renderTableEmptyRow(8, 'אין רשומות קיימות למעקב.');
+        tableBody.textContent = '';
+        const emptyRowHTML = renderTableEmptyRow(8, 'אין רשומות קיימות למעקב.');
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(emptyRowHTML, 'text/html');
+        doc.body.childNodes.forEach(node => {
+            tableBody.appendChild(node.cloneNode(true));
+        });
         markProblemTableReady('existingRecordsTable');
         return;
     }
 
     setElementDisplay(section, 'block');
-    tableBody.innerHTML = unresolvedEntries
+    tableBody.textContent = '';
+    const rowsHTML = unresolvedEntries
         .map((entry) => renderDuplicateRow(entry.item, 'existing_record', entry.index))
         .join('');
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(rowsHTML, 'text/html');
+    doc.body.childNodes.forEach(node => {
+        tableBody.appendChild(node.cloneNode(true));
+    });
     markProblemTableReady('existingRecordsTable');
 }
 
@@ -5104,7 +5211,8 @@ function loadStep5Content() {
     const content = document.getElementById('step5Content');
     if (!content) return;
     
-    content.innerHTML = `
+    content.textContent = '';
+    const step5HTML = `
         <div class="step-content-inner">
             <h4>אישור סופי</h4>
             <div class="final-summary">
@@ -5135,6 +5243,16 @@ function loadStep5Content() {
                 </div>
             </div>
         `;
+    const parser1 = new DOMParser();
+    const doc1 = parser1.parseFromString(containerHTML, 'text/html');
+    doc1.body.childNodes.forEach(node => {
+        container.appendChild(node.cloneNode(true));
+    });
+    const parser2 = new DOMParser();
+    const doc2 = parser2.parseFromString(step5HTML, 'text/html');
+    doc2.body.childNodes.forEach(node => {
+        content.appendChild(node.cloneNode(true));
+    });
     
     // Update summary stats
     updateSummaryStats();
@@ -5502,7 +5620,7 @@ async function loadAccounts() {
                 : [];
             
             // Clear existing options
-            accountSelect.innerHTML = '';
+            accountSelect.textContent = '';
             
             // Add empty option
             const emptyOption = document.createElement('option');
@@ -5566,7 +5684,7 @@ function loadAccountsFallback() {
             const openAccounts = accounts.filter(account => account.status === 'open');
             
             // Clear existing options
-            accountSelect.innerHTML = '';
+            accountSelect.textContent = '';
             
             // Add empty option
             const emptyOption = document.createElement('option');
@@ -6567,36 +6685,29 @@ function displayPreviewData(data) {
 function renderExecutionPreviewTables(recordsToImport, recordsToSkip, taskType = 'executions') {
     const importTableHeadRow = document.querySelector('#importTable thead tr');
     if (importTableHeadRow) {
-        importTableHeadRow.innerHTML = `
-            <th>סמל</th>
-            <th>פעולה</th>
-            <th>כמות</th>
-            <th>מחיר</th>
-            <th>עמלה</th>
-            <th>Realized P/L</th>
-            <th>MTM P/L</th>
-            <th>תאריך</th>
-        `;
+        importTableHeadRow.textContent = '';
+        const headers = ['סמל', 'פעולה', 'כמות', 'מחיר', 'עמלה', 'Realized P/L', 'MTM P/L', 'תאריך'];
+        headers.forEach(headerText => {
+            const th = document.createElement('th');
+            th.textContent = headerText;
+            importTableHeadRow.appendChild(th);
+        });
     }
 
     const skipTableHeadRow = document.querySelector('#skipTable thead tr');
     if (skipTableHeadRow) {
-        skipTableHeadRow.innerHTML = `
-            <th>סמל</th>
-            <th>פעולה</th>
-            <th>כמות</th>
-            <th>מחיר</th>
-            <th>עמלה</th>
-            <th>Realized P/L</th>
-            <th>MTM P/L</th>
-            <th>תאריך</th>
-            <th>סיבה</th>
-        `;
+        skipTableHeadRow.textContent = '';
+        const headers = ['סמל', 'פעולה', 'כמות', 'מחיר', 'עמלה', 'Realized P/L', 'MTM P/L', 'תאריך', 'סיבה'];
+        headers.forEach(headerText => {
+            const th = document.createElement('th');
+            th.textContent = headerText;
+            skipTableHeadRow.appendChild(th);
+        });
     }
 
     const importTableBody = document.getElementById('importTableBody');
     if (importTableBody) {
-        importTableBody.innerHTML = '';
+        importTableBody.textContent = '';
         recordsToImport.forEach(entry => {
             const { record } = extractPreviewRecord(entry);
             if (!record) return;
@@ -6608,23 +6719,28 @@ function renderExecutionPreviewTables(recordsToImport, recordsToSkip, taskType =
                 ? (record.mtm_pl >= 0 ? `$${record.mtm_pl}` : `-$${Math.abs(record.mtm_pl)}`) 
                 : '-';
         const dateDisplay = renderImportDate(record.date, 'N/A');
-            row.innerHTML = `
-                <td>${record.symbol || record.ticker || 'N/A'}</td>
-                <td>${record.action || 'N/A'}</td>
-                <td>${record.quantity || 'N/A'}</td>
-                <td>${record.price || 'N/A'}</td>
-                <td>${record.fee || record.commission || 'N/A'}</td>
-                <td>${realizedPL}</td>
-                <td>${mtmPL}</td>
-            <td>${dateDisplay}</td>
-            `;
+            const cells = [
+                record.symbol || record.ticker || 'N/A',
+                record.action || 'N/A',
+                record.quantity || 'N/A',
+                record.price || 'N/A',
+                record.fee || record.commission || 'N/A',
+                realizedPL,
+                mtmPL,
+                dateDisplay
+            ];
+            cells.forEach(cellText => {
+                const td = document.createElement('td');
+                td.textContent = cellText;
+                row.appendChild(td);
+            });
             importTableBody.appendChild(row);
         });
     }
     
     const skipTableBody = document.getElementById('skipTableBody');
     if (skipTableBody) {
-        skipTableBody.innerHTML = '';
+        skipTableBody.textContent = '';
         recordsToSkip.forEach(entry => {
             const { record, wrapper } = extractPreviewRecord(entry);
             if (!record) return;
@@ -6636,17 +6752,22 @@ function renderExecutionPreviewTables(recordsToImport, recordsToSkip, taskType =
                 ? (record.mtm_pl >= 0 ? `$${record.mtm_pl}` : `-$${Math.abs(record.mtm_pl)}`) 
                 : '-';
         const dateDisplay = renderImportDate(record.date, 'N/A');
-            row.innerHTML = `
-                <td>${record.symbol || record.ticker || 'N/A'}</td>
-                <td>${record.action || 'N/A'}</td>
-                <td>${record.quantity || 'N/A'}</td>
-                <td>${record.price || 'N/A'}</td>
-                <td>${record.fee || record.commission || 'N/A'}</td>
-                <td>${realizedPL}</td>
-                <td>${mtmPL}</td>
-            <td>${dateDisplay}</td>
-                <td>${wrapper.reason || 'N/A'}</td>
-            `;
+            const cells = [
+                record.symbol || record.ticker || 'N/A',
+                record.action || 'N/A',
+                record.quantity || 'N/A',
+                record.price || 'N/A',
+                record.fee || record.commission || 'N/A',
+                realizedPL,
+                mtmPL,
+                dateDisplay,
+                wrapper.reason || 'N/A'
+            ];
+            cells.forEach(cellText => {
+                const td = document.createElement('td');
+                td.textContent = cellText;
+                row.appendChild(td);
+            });
             skipTableBody.appendChild(row);
         });
     }
@@ -6663,78 +6784,78 @@ function renderExecutionPreviewTables(recordsToImport, recordsToSkip, taskType =
 function renderCashflowPreviewTables(recordsToImport, recordsToSkip, summary = {}, importCountFallback = recordsToImport.length, skipCountFallback = recordsToSkip.length) {
     const importTableHeadRow = document.querySelector('#importTable thead tr');
     if (importTableHeadRow) {
-        importTableHeadRow.innerHTML = `
-            <th>סוג תזרים</th>
-            <th>סכום</th>
-            <th>מטבע</th>
-            <th>תאריך אפקטיבי</th>
-            <th>חשבון מקור</th>
-            <th>חשבון יעד</th>
-            <th>נכס</th>
-            <th>תיאור</th>
-        `;
+        importTableHeadRow.textContent = '';
+        const headers = ['סוג תזרים', 'סכום', 'מטבע', 'תאריך אפקטיבי', 'חשבון מקור', 'חשבון יעד', 'נכס', 'תיאור'];
+        headers.forEach(headerText => {
+            const th = document.createElement('th');
+            th.textContent = headerText;
+            importTableHeadRow.appendChild(th);
+        });
     }
 
     const skipTableHeadRow = document.querySelector('#skipTable thead tr');
     if (skipTableHeadRow) {
-        skipTableHeadRow.innerHTML = `
-            <th>סוג תזרים</th>
-            <th>סכום</th>
-            <th>מטבע</th>
-            <th>תאריך אפקטיבי</th>
-            <th>חשבון מקור</th>
-            <th>חשבון יעד</th>
-            <th>נכס</th>
-            <th>סיבה</th>
-        `;
+        skipTableHeadRow.textContent = '';
+        const headers = ['סוג תזרים', 'סכום', 'מטבע', 'תאריך אפקטיבי', 'חשבון מקור', 'חשבון יעד', 'נכס', 'סיבה'];
+        headers.forEach(headerText => {
+            const th = document.createElement('th');
+            th.textContent = headerText;
+            skipTableHeadRow.appendChild(th);
+        });
     }
 
     const importTableBody = document.getElementById('importTableBody');
     if (importTableBody) {
-        importTableBody.innerHTML = '';
+        importTableBody.textContent = '';
         recordsToImport.forEach(entry => {
             const { record } = extractPreviewRecord(entry);
             if (!record) return;
             const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${buildValueOrFallback(resolveCashflowTypeLabel(record.cashflow_type))}</td>
-                <td>${buildValueOrFallback(record.amount)}</td>
-                <td>${buildValueOrFallback(record.currency)}</td>
-                <td>${buildValueOrFallback(record.effective_date)}</td>
-                <td>${
-                    (typeof window.getTradingAccountName === 'function' && record.source_account)
-                        ? escapeHtml(window.getTradingAccountName(record.source_account))
-                        : buildValueOrFallback(record.source_account)
-                }</td>
-                <td>${buildValueOrFallback(record.target_account)}</td>
-                <td>${buildValueOrFallback(record.asset_symbol)}</td>
-                <td>${buildValueOrFallback(record.memo)}</td>
-            `;
+            const cells = [
+                buildValueOrFallback(resolveCashflowTypeLabel(record.cashflow_type)),
+                buildValueOrFallback(record.amount),
+                buildValueOrFallback(record.currency),
+                buildValueOrFallback(record.effective_date),
+                (typeof window.getTradingAccountName === 'function' && record.source_account)
+                    ? escapeHtml(window.getTradingAccountName(record.source_account))
+                    : buildValueOrFallback(record.source_account),
+                buildValueOrFallback(record.target_account),
+                buildValueOrFallback(record.asset_symbol),
+                buildValueOrFallback(record.memo)
+            ];
+            cells.forEach(cellText => {
+                const td = document.createElement('td');
+                td.textContent = cellText;
+                row.appendChild(td);
+            });
             importTableBody.appendChild(row);
         });
     }
 
     const skipTableBody = document.getElementById('skipTableBody');
     if (skipTableBody) {
-        skipTableBody.innerHTML = '';
+        skipTableBody.textContent = '';
         recordsToSkip.forEach(entry => {
             const { record, wrapper } = extractPreviewRecord(entry);
             if (!record) return;
             const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${buildValueOrFallback(resolveCashflowTypeLabel(record.cashflow_type))}</td>
-                <td>${buildValueOrFallback(record.amount)}</td>
-                <td>${buildValueOrFallback(record.currency)}</td>
-                <td>${buildValueOrFallback(record.effective_date)}</td>
-                <td>${
-                    (typeof window.getTradingAccountName === 'function' && record.source_account)
-                        ? escapeHtml(window.getTradingAccountName(record.source_account))
-                        : buildValueOrFallback(record.source_account)
-                }</td>
-                <td>${buildValueOrFallback(record.target_account)}</td>
-                <td>${buildValueOrFallback(record.asset_symbol)}</td>
-                <td>${buildValueOrFallback(wrapper.reason)}</td>
-            `;
+            const cells = [
+                buildValueOrFallback(resolveCashflowTypeLabel(record.cashflow_type)),
+                buildValueOrFallback(record.amount),
+                buildValueOrFallback(record.currency),
+                buildValueOrFallback(record.effective_date),
+                (typeof window.getTradingAccountName === 'function' && record.source_account)
+                    ? escapeHtml(window.getTradingAccountName(record.source_account))
+                    : buildValueOrFallback(record.source_account),
+                buildValueOrFallback(record.target_account),
+                buildValueOrFallback(record.asset_symbol),
+                buildValueOrFallback(wrapper.reason)
+            ];
+            cells.forEach(cellText => {
+                const td = document.createElement('td');
+                td.textContent = cellText;
+                row.appendChild(td);
+            });
             skipTableBody.appendChild(row);
         });
     }
@@ -6753,76 +6874,79 @@ function renderCashflowPreviewTables(recordsToImport, recordsToSkip, summary = {
 function renderPortfolioPreviewTables(recordsToImport, recordsToSkip, summary = {}, importCountFallback = recordsToImport.length, skipCountFallback = recordsToSkip.length) {
     const importTableHeadRow = document.querySelector('#importTable thead tr');
     if (importTableHeadRow) {
-        importTableHeadRow.innerHTML = `
-            <th>סמל</th>
-            <th>קטגוריה</th>
-            <th>מטבע</th>
-            <th>כמות</th>
-            <th>שווי שוק</th>
-            <th>עלות כוללת</th>
-            <th>רווח/הפסד</th>
-            <th>תקופת דוח</th>
-        `;
+        importTableHeadRow.textContent = '';
+        const headers = ['סמל', 'קטגוריה', 'מטבע', 'כמות', 'שווי שוק', 'עלות כוללת', 'רווח/הפסד', 'תקופת דוח'];
+        headers.forEach(headerText => {
+            const th = document.createElement('th');
+            th.textContent = headerText;
+            importTableHeadRow.appendChild(th);
+        });
     }
 
     const skipTableHeadRow = document.querySelector('#skipTable thead tr');
     if (skipTableHeadRow) {
-        skipTableHeadRow.innerHTML = `
-            <th>סמל</th>
-            <th>קטגוריה</th>
-            <th>מטבע</th>
-            <th>כמות</th>
-            <th>שווי שוק</th>
-            <th>עלות כוללת</th>
-            <th>רווח/הפסד</th>
-            <th>תקופת דוח</th>
-            <th>סיבה</th>
-        `;
+        skipTableHeadRow.textContent = '';
+        const headers = ['סמל', 'קטגוריה', 'מטבע', 'כמות', 'שווי שוק', 'עלות כוללת', 'רווח/הפסד', 'תקופת דוח', 'סיבה'];
+        headers.forEach(headerText => {
+            const th = document.createElement('th');
+            th.textContent = headerText;
+            skipTableHeadRow.appendChild(th);
+        });
     }
 
     const importTableBody = document.getElementById('importTableBody');
     if (importTableBody) {
-        importTableBody.innerHTML = '';
+        importTableBody.textContent = '';
         recordsToImport.forEach((entry) => {
             const { record } = extractPreviewRecord(entry);
             if (!record) {
                 return;
             }
             const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${escapeHtml(record.symbol || record.description || 'N/A')}</td>
-                <td>${escapeHtml(record.asset_category || 'N/A')}</td>
-                <td>${escapeHtml(record.currency || '')}</td>
-                <td>${formatNumber(record.quantity ?? 0, 2)}</td>
-                <td>${formatAmount(record.market_value ?? 0)}</td>
-                <td>${formatAmount(record.cost_basis ?? 0)}</td>
-                <td>${formatAmount(record.unrealized_pl ?? 0)}</td>
-                <td>${renderImportDate(record.statement_period_end, record.statement_period || '—')}</td>
-            `;
+            const cells = [
+                escapeHtml(record.symbol || record.description || 'N/A'),
+                escapeHtml(record.asset_category || 'N/A'),
+                escapeHtml(record.currency || ''),
+                formatNumber(record.quantity ?? 0, 2),
+                formatAmount(record.market_value ?? 0),
+                formatAmount(record.cost_basis ?? 0),
+                formatAmount(record.unrealized_pl ?? 0),
+                renderImportDate(record.statement_period_end, record.statement_period || '—')
+            ];
+            cells.forEach(cellText => {
+                const td = document.createElement('td');
+                td.textContent = cellText;
+                row.appendChild(td);
+            });
             importTableBody.appendChild(row);
         });
     }
 
     const skipTableBody = document.getElementById('skipTableBody');
     if (skipTableBody) {
-        skipTableBody.innerHTML = '';
+        skipTableBody.textContent = '';
         recordsToSkip.forEach((entry) => {
             const { record, wrapper } = extractPreviewRecord(entry);
             if (!record) {
                 return;
             }
             const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${escapeHtml(record.symbol || record.description || 'N/A')}</td>
-                <td>${escapeHtml(record.asset_category || 'N/A')}</td>
-                <td>${escapeHtml(record.currency || '')}</td>
-                <td>${formatNumber(record.quantity ?? 0, 2)}</td>
-                <td>${formatAmount(record.market_value ?? 0)}</td>
-                <td>${formatAmount(record.cost_basis ?? 0)}</td>
-                <td>${formatAmount(record.unrealized_pl ?? 0)}</td>
-                <td>${renderImportDate(record.statement_period_end, record.statement_period || '—')}</td>
-                <td>${escapeHtml(wrapper.reason || 'validation_error')}</td>
-            `;
+            const cells = [
+                escapeHtml(record.symbol || record.description || 'N/A'),
+                escapeHtml(record.asset_category || 'N/A'),
+                escapeHtml(record.currency || ''),
+                formatNumber(record.quantity ?? 0, 2),
+                formatAmount(record.market_value ?? 0),
+                formatAmount(record.cost_basis ?? 0),
+                formatAmount(record.unrealized_pl ?? 0),
+                renderImportDate(record.statement_period_end, record.statement_period || '—'),
+                escapeHtml(wrapper.reason || 'validation_error')
+            ];
+            cells.forEach(cellText => {
+                const td = document.createElement('td');
+                td.textContent = cellText;
+                row.appendChild(td);
+            });
             skipTableBody.appendChild(row);
         });
     }
@@ -6831,70 +6955,76 @@ function renderPortfolioPreviewTables(recordsToImport, recordsToSkip, summary = 
 function renderTaxFxPreviewTables(recordsToImport, recordsToSkip, summary = {}, importCountFallback = recordsToImport.length, skipCountFallback = recordsToSkip.length) {
     const importTableHeadRow = document.querySelector('#importTable thead tr');
     if (importTableHeadRow) {
-        importTableHeadRow.innerHTML = `
-            <th>סוג</th>
-            <th>מטבע</th>
-            <th>סכום</th>
-            <th>תיאור</th>
-            <th>תאריך</th>
-            <th>מטבע מקור</th>
-            <th>מטבע יעד</th>
-            <th>כמות</th>
-        `;
+        importTableHeadRow.textContent = '';
+        const headers = ['סוג', 'מטבע', 'סכום', 'תיאור', 'תאריך', 'מטבע מקור', 'מטבע יעד', 'כמות'];
+        headers.forEach(headerText => {
+            const th = document.createElement('th');
+            th.textContent = headerText;
+            importTableHeadRow.appendChild(th);
+        });
     }
 
     const skipTableHeadRow = document.querySelector('#skipTable thead tr');
     if (skipTableHeadRow) {
-        skipTableHeadRow.innerHTML = `
-            <th>סוג</th>
-            <th>מטבע</th>
-            <th>סכום</th>
-            <th>תיאור</th>
-            <th>תאריך</th>
-            <th>סיבה</th>
-        `;
+        skipTableHeadRow.textContent = '';
+        const headers = ['סוג', 'מטבע', 'סכום', 'תיאור', 'תאריך', 'סיבה'];
+        headers.forEach(headerText => {
+            const th = document.createElement('th');
+            th.textContent = headerText;
+            skipTableHeadRow.appendChild(th);
+        });
     }
 
     const importTableBody = document.getElementById('importTableBody');
     if (importTableBody) {
-        importTableBody.innerHTML = '';
+        importTableBody.textContent = '';
         recordsToImport.forEach((entry) => {
             const { record } = extractPreviewRecord(entry);
             if (!record) {
                 return;
             }
             const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${escapeHtml(record.record_type || 'tax_cashflow')}</td>
-                <td>${escapeHtml(record.currency || '')}</td>
-                <td>${formatAmount(record.amount ?? 0)}</td>
-                <td>${escapeHtml(record.description || '')}</td>
-                <td>${renderImportDate(record.effective_date, record.statement_period || '—')}</td>
-                <td>${escapeHtml(record.source_currency || '')}</td>
-                <td>${escapeHtml(record.target_currency || '')}</td>
-                <td>${formatNumber(record.quantity ?? 0, 4)}</td>
-            `;
+            const cells = [
+                escapeHtml(record.record_type || 'tax_cashflow'),
+                escapeHtml(record.currency || ''),
+                formatAmount(record.amount ?? 0),
+                escapeHtml(record.description || ''),
+                renderImportDate(record.effective_date, record.statement_period || '—'),
+                escapeHtml(record.source_currency || ''),
+                escapeHtml(record.target_currency || ''),
+                formatNumber(record.quantity ?? 0, 4)
+            ];
+            cells.forEach(cellText => {
+                const td = document.createElement('td');
+                td.textContent = cellText;
+                row.appendChild(td);
+            });
             importTableBody.appendChild(row);
         });
     }
 
     const skipTableBody = document.getElementById('skipTableBody');
     if (skipTableBody) {
-        skipTableBody.innerHTML = '';
+        skipTableBody.textContent = '';
         recordsToSkip.forEach((entry) => {
             const { record, wrapper } = extractPreviewRecord(entry);
             if (!record) {
                 return;
             }
             const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${escapeHtml(record.record_type || 'tax_cashflow')}</td>
-                <td>${escapeHtml(record.currency || '')}</td>
-                <td>${formatAmount(record.amount ?? 0)}</td>
-                <td>${escapeHtml(record.description || '')}</td>
-                <td>${renderImportDate(record.effective_date, record.statement_period || '—')}</td>
-                <td>${escapeHtml(wrapper.reason || 'validation_error')}</td>
-            `;
+            const cells = [
+                escapeHtml(record.record_type || 'tax_cashflow'),
+                escapeHtml(record.currency || ''),
+                formatAmount(record.amount ?? 0),
+                escapeHtml(record.description || ''),
+                renderImportDate(record.effective_date, record.statement_period || '—'),
+                escapeHtml(wrapper.reason || 'validation_error')
+            ];
+            cells.forEach(cellText => {
+                const td = document.createElement('td');
+                td.textContent = cellText;
+                row.appendChild(td);
+            });
             skipTableBody.appendChild(row);
         });
     }
@@ -6904,23 +7034,29 @@ function renderAccountReconciliationPreview(recordsToImport, recordsToSkip, summ
     const importTableHeadRow = document.querySelector('#importTable thead tr');
     const importTableBody = document.getElementById('importTableBody');
     if (importTableHeadRow) {
-        importTableHeadRow.innerHTML = `
-            <th>חשבון</th>
-            <th>מטבע בסיס</th>
-            <th>מצב הרשאות</th>
-            <th>מסמכים חסרים</th>
-        `;
+        importTableHeadRow.textContent = '';
+        const headers = ['חשבון', 'מטבע בסיס', 'מצב הרשאות', 'מסמכים חסרים'];
+        headers.forEach(headerText => {
+            const th = document.createElement('th');
+            th.textContent = headerText;
+            importTableHeadRow.appendChild(th);
+        });
     }
     if (importTableBody) {
-        importTableBody.innerHTML = '';
+        importTableBody.textContent = '';
         recordsToImport.forEach(record => {
             const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${buildValueOrFallback(record.account_id)}</td>
-                <td>${buildValueOrFallback(record.base_currency)}</td>
-                <td>${buildValueOrFallback((record.entitlements || []).join(', '), '—')}</td>
-                <td>${buildValueOrFallback((record.missing_documents || []).join(', '), '—')}</td>
-            `;
+            const cells = [
+                buildValueOrFallback(record.account_id),
+                buildValueOrFallback(record.base_currency),
+                buildValueOrFallback((record.entitlements || []).join(', '), '—'),
+                buildValueOrFallback((record.missing_documents || []).join(', '), '—')
+            ];
+            cells.forEach(cellText => {
+                const td = document.createElement('td');
+                td.textContent = cellText;
+                row.appendChild(td);
+            });
             importTableBody.appendChild(row);
         });
     }
@@ -6928,25 +7064,35 @@ function renderAccountReconciliationPreview(recordsToImport, recordsToSkip, summ
     const skipTableHeadRow = document.querySelector('#skipTable thead tr');
     const skipTableBody = document.getElementById('skipTableBody');
     if (skipTableHeadRow) {
-        skipTableHeadRow.innerHTML = `
-            <th>סוג</th>
-            <th>פרטים</th>
-        `;
+        skipTableHeadRow.textContent = '';
+        const headers = ['סוג', 'פרטים'];
+        headers.forEach(headerText => {
+            const th = document.createElement('th');
+            th.textContent = headerText;
+            skipTableHeadRow.appendChild(th);
+        });
     }
     if (skipTableBody) {
-        skipTableBody.innerHTML = '';
+        skipTableBody.textContent = '';
 
         recordsToSkip.forEach(entry => {
             const { record, wrapper } = extractPreviewRecord(entry);
             const errors = wrapper?.errors || wrapper?.message || wrapper?.reason || 'שגיאה לא ידועה';
             const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>שגיאת ולידציה</td>
-                <td>
-                    ${record ? `<div><strong>חשבון:</strong> ${escapeHtml(record.account_id || 'לא ידוע')}</div>` : ''}
-                    <div><strong>מידע:</strong> ${escapeHtml(Array.isArray(errors) ? errors.join(', ') : errors)}</div>
-                </td>
+            const typeCell = document.createElement('td');
+            typeCell.textContent = 'שגיאת ולידציה';
+            row.appendChild(typeCell);
+            const detailsCell = document.createElement('td');
+            const detailsHTML = `
+                ${record ? `<div><strong>חשבון:</strong> ${escapeHtml(record.account_id || 'לא ידוע')}</div>` : ''}
+                <div><strong>מידע:</strong> ${escapeHtml(Array.isArray(errors) ? errors.join(', ') : errors)}</div>
             `;
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(detailsHTML, 'text/html');
+            doc.body.childNodes.forEach(node => {
+                detailsCell.appendChild(node.cloneNode(true));
+            });
+            row.appendChild(detailsCell);
             skipTableBody.appendChild(row);
         });
 
@@ -6964,10 +7110,12 @@ function renderAccountReconciliationPreview(recordsToImport, recordsToSkip, summ
             issue.items.forEach(item => {
                 const serialized = typeof item === 'string' ? item : JSON.stringify(item);
                 const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${escapeHtml(issue.label)}</td>
-                    <td>${escapeHtml(serialized)}</td>
-                `;
+                const labelCell = document.createElement('td');
+                labelCell.textContent = issue.label;
+                row.appendChild(labelCell);
+                const detailsCell = document.createElement('td');
+                detailsCell.textContent = serialized;
+                row.appendChild(detailsCell);
                 skipTableBody.appendChild(row);
             });
         });
@@ -7181,7 +7329,8 @@ function displayProblemResolution(data) {
     const container = document.getElementById('problemResolution');
     if (!container) return;
     
-    container.innerHTML = `
+    container.textContent = '';
+    const containerHTML = `
         <div class="problem-resolution">
             <div class="problem-section">
                 <h5>טיקרים חסרים</h5>
@@ -7281,6 +7430,11 @@ function displayProblemResolution(data) {
                     </div>
                 </div>
             `;
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(containerHTML, 'text/html');
+    doc.body.childNodes.forEach(node => {
+        container.appendChild(node.cloneNode(true));
+    });
 }
 
 /**
@@ -7574,10 +7728,15 @@ async function openAddTickerModal(symbol, currency = 'USD') {
                     if (externalDataResult) {
                         const summaryHtml = renderMetadataSummaryBlock(metadata);
                         if (summaryHtml) {
-                            externalDataResult.innerHTML = summaryHtml;
+                            externalDataResult.textContent = '';
+                            const parser = new DOMParser();
+                            const doc = parser.parseFromString(summaryHtml, 'text/html');
+                            doc.body.childNodes.forEach(node => {
+                                externalDataResult.appendChild(node.cloneNode(true));
+                            });
                             setElementDisplay(externalDataResult, 'block');
     } else {
-                            externalDataResult.innerHTML = '';
+                            externalDataResult.textContent = '';
                             setElementDisplay(externalDataResult, 'none');
                         }
                     }
@@ -7585,10 +7744,13 @@ async function openAddTickerModal(symbol, currency = 'USD') {
                     if (externalDataWarning) {
                         if (metadata) {
                             setElementDisplay(externalDataWarning, 'none');
-                            externalDataWarning.innerHTML = '';
+                            externalDataWarning.textContent = '';
                         } else {
                             setElementDisplay(externalDataWarning, 'block');
-                            externalDataWarning.innerHTML = '<small>לא נמצאו נתוני רקע לטיקר זה. ניתן להוסיף ידנית.</small>';
+                            externalDataWarning.textContent = '';
+                            const small = document.createElement('small');
+                            small.textContent = 'לא נמצאו נתוני רקע לטיקר זה. ניתן להוסיף ידנית.';
+                            externalDataWarning.appendChild(small);
                         }
                     }
 
@@ -7656,7 +7818,8 @@ function displayPreview(data) {
     if (!container) return;
     
     updateSymbolMetadataCache(data?.symbol_metadata);
-    container.innerHTML = `
+    container.textContent = '';
+    const containerHTML = `
         <div class="preview-data">
             <h5>תצוגה מקדימה</h5>
             <div class="preview-summary">
@@ -7778,7 +7941,8 @@ function updateSummaryStats() {
 function showConfirmationModal() {
     const modal = document.createElement('div');
     modal.className = 'confirmation-modal-overlay';
-    modal.innerHTML = `
+    modal.textContent = '';
+    const modalHTML = `
                 <div class="confirmation-modal">
             <h3>אישור ייבוא נתונים</h3>
             <p>האם אתה בטוח שברצונך לייבא את הנתונים?</p>
@@ -7789,6 +7953,11 @@ function showConfirmationModal() {
                 </div>
             </div>
         `;
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(containerHTML, 'text/html');
+    doc.body.childNodes.forEach(node => {
+        container.appendChild(node.cloneNode(true));
+    });
         
     document.body.appendChild(modal);
 }
@@ -8058,23 +8227,53 @@ async function handleSessionReset(sessionId, skipGoToStep = false) {
         showImportUserDataNotification(`שגיאה באיפוס הייבוא: ${errorMessage}`, 'error');
 
         const detailedErrors = Array.isArray(data?.errors) ? data.errors : null;
-        if (detailedErrors?.length && typeof window.showDetailedNotification === 'function') {
-            window.showDetailedNotification(
-                'פרטי שגיאה באיפוס ייבוא',
-                detailedErrors.map((item, idx) => `(${idx + 1}) ${item}`).join('\n'),
-                'error',
-                12000,
-                'import-user-data'
-            );
+        if (detailedErrors?.length) {
+            // Show error notification in corner first
+            if (typeof window.showErrorNotification === 'function') {
+                await window.showErrorNotification(
+                    'שגיאה באיפוס ייבוא',
+                    `נמצאו ${detailedErrors.length} שגיאות. לחץ על "הצג פרטים" לפרטים נוספים.`,
+                    12000,
+                    'import-user-data'
+                );
+                
+                // Add "Show Details" button that opens modal
+                setTimeout(() => {
+                    const notifications = document.querySelectorAll('.notification');
+                    const lastNotification = notifications[notifications.length - 1];
+                    
+                    if (lastNotification) {
+                        const detailsBtn = document.createElement('button');
+                        detailsBtn.className = 'btn btn-sm btn-link notification-details-btn';
+                        detailsBtn.style.cssText = 'padding: 2px 8px; margin-top: 4px; font-size: 0.85em; text-decoration: underline; color: inherit;';
+                        detailsBtn.textContent = 'הצג פרטים';
+                        detailsBtn.onclick = () => {
+                            if (typeof window.showDetailsModal === 'function') {
+                                window.showDetailsModal(
+                                    'פרטי שגיאה באיפוס ייבוא',
+                                    `<div style="white-space: pre-line; font-family: monospace; font-size: 0.9em;">${detailedErrors.map((item, idx) => `(${idx + 1}) ${item}`).join('\n')}</div>`,
+                                    { includeCopyButton: true }
+                                );
+                            }
+                            lastNotification.remove();
+                        };
+                        
+                        const contentDiv = lastNotification.querySelector('.notification-content');
+                        if (contentDiv) {
+                            contentDiv.appendChild(detailsBtn);
+                        }
+                    }
+                }, 100);
+            }
         }
     } catch (error) {
         window.Logger?.error('[Import Modal] Failed to reset import session', { error: error?.message });
         showImportUserDataNotification('שגיאה באיפוס הייבוא', 'error');
-        if (typeof window.showDetailedNotification === 'function') {
-            window.showDetailedNotification(
+        // Show error notification in corner (not modal!)
+        if (typeof window.showErrorNotification === 'function') {
+            await window.showErrorNotification(
                 'שגיאה באיפוס הייבוא',
                 error?.message || 'שגיאה לא ידועה',
-                'error',
                 12000,
                 'import-user-data'
             );
@@ -8111,7 +8310,38 @@ function handleSessionCompletion(status, message, details = null) {
     
     showImportUserDataNotification(finalMessage, statusInfo.type);
     
-    if (details && typeof window.showDetailedNotification === 'function') {
+    // If there are details, add "Show Details" button to notification
+    if (details) {
+        setTimeout(() => {
+            const notifications = document.querySelectorAll('.notification');
+            const lastNotification = notifications[notifications.length - 1];
+            
+            if (lastNotification) {
+                const detailsBtn = document.createElement('button');
+                detailsBtn.className = 'btn btn-sm btn-link notification-details-btn';
+                detailsBtn.style.cssText = 'padding: 2px 8px; margin-top: 4px; font-size: 0.85em; text-decoration: underline; color: inherit;';
+                detailsBtn.textContent = 'הצג פרטים';
+                detailsBtn.onclick = () => {
+                    if (typeof window.showDetailsModal === 'function') {
+                        window.showDetailsModal(
+                            'פרטי ייבוא',
+                            `<div style="white-space: pre-line; font-family: monospace; font-size: 0.9em;">${details}</div>`,
+                            { includeCopyButton: true }
+                        );
+                    }
+                    lastNotification.remove();
+                };
+                
+                const contentDiv = lastNotification.querySelector('.notification-content');
+                if (contentDiv) {
+                    contentDiv.appendChild(detailsBtn);
+                }
+            }
+        }, 100);
+    }
+    
+    // REMOVED: showDetailedNotification - now using corner notification with "Show Details" button
+    if (false && details && typeof window.showDetailedNotification === 'function') {
         window.showDetailedNotification(
             'פרטי ייבוא',
             details,
@@ -8254,7 +8484,8 @@ function displayProblemResolutionDetailed(data) {
         try {
             const existingHead = document.querySelector('#existingRecordsTable thead tr');
             if (existingHead) {
-                existingHead.innerHTML = `
+                existingHead.textContent = '';
+                const existingHeadHTML = `
                     <th>סוג</th>
                     <th>סכום</th>
                     <th>מטבע</th>
@@ -8264,10 +8495,16 @@ function displayProblemResolutionDetailed(data) {
                     <th>רמת ביטחון</th>
                     <th class="text-center">פעולות</th>
                 `;
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(existingHeadHTML, 'text/html');
+                doc.body.querySelectorAll('th').forEach(th => {
+                    existingHead.appendChild(th.cloneNode(true));
+                });
             }
             const withinHead = document.querySelector('#withinFileDuplicatesTable thead tr');
             if (withinHead) {
-                withinHead.innerHTML = `
+                withinHead.textContent = '';
+                const withinHeadHTML = `
                     <th>סוג</th>
                     <th>סכום</th>
                     <th>מטבע</th>
@@ -8277,6 +8514,11 @@ function displayProblemResolutionDetailed(data) {
                     <th>רמת ביטחון</th>
                     <th class="text-center">פעולות</th>
                 `;
+                const parser2 = new DOMParser();
+                const doc2 = parser2.parseFromString(withinHeadHTML, 'text/html');
+                doc2.body.querySelectorAll('th').forEach(th => {
+                    withinHead.appendChild(th.cloneNode(true));
+                });
             }
         } catch (e) {
             window.Logger?.warn('[Import Modal] Failed to set cashflow headers for duplicates tables', { error: e?.message });
@@ -8332,7 +8574,7 @@ function clearProblemSectionsForSession() {
     containers.forEach(containerId => {
         const container = document.getElementById(containerId);
         if (container) {
-            container.innerHTML = '';
+            container.textContent = '';
         }
     });
 }
@@ -8365,15 +8607,27 @@ function displayMissingTickers(missingTickers) {
 
     if (unresolvedEntries.length === 0) {
         setElementDisplay(section, 'none');
-        tableBody.innerHTML = renderTableEmptyRow(5, 'אין טיקרים חסרים.');
+        tableBody.textContent = '';
+        const emptyRowHTML = renderTableEmptyRow(5, 'אין טיקרים חסרים.');
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(emptyRowHTML, 'text/html');
+        doc.body.childNodes.forEach(node => {
+            tableBody.appendChild(node.cloneNode(true));
+        });
         markProblemTableReady('missingTickersTable');
         return;
     }
 
     setElementDisplay(section, 'block');
-    tableBody.innerHTML = unresolvedEntries
+    tableBody.textContent = '';
+    const rowsHTML = unresolvedEntries
         .map((entry) => renderMissingTickerRow(entry.item))
         .join('');
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(rowsHTML, 'text/html');
+    doc.body.childNodes.forEach(node => {
+        tableBody.appendChild(node.cloneNode(true));
+    });
     markProblemTableReady('missingTickersTable');
 }
 
@@ -8637,15 +8891,27 @@ function displayWithinFileDuplicates(duplicates, activeMatchIndexSet = new Set()
 
     if (unresolvedEntries.length === 0) {
         setElementDisplay(section, 'none');
-        tableBody.innerHTML = renderTableEmptyRow(8, 'אין כפילויות פעילות בקובץ.');
+        tableBody.textContent = '';
+        const emptyRowHTML = renderTableEmptyRow(8, 'אין כפילויות פעילות בקובץ.');
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(emptyRowHTML, 'text/html');
+        doc.body.childNodes.forEach(node => {
+            tableBody.appendChild(node.cloneNode(true));
+        });
         markProblemTableReady('withinFileDuplicatesTable');
         return;
     }
 
     setElementDisplay(section, 'block');
-    tableBody.innerHTML = unresolvedEntries
+    tableBody.textContent = '';
+    const rowsHTML = unresolvedEntries
         .map((entry) => renderDuplicateRow(entry.item, 'within_file', entry.index, activeMatchIndexSet))
         .join('');
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(rowsHTML, 'text/html');
+    doc.body.childNodes.forEach(node => {
+        tableBody.appendChild(node.cloneNode(true));
+    });
     markProblemTableReady('withinFileDuplicatesTable');
 }
 
@@ -9521,15 +9787,27 @@ function displayCashflowMissingAccounts(accounts) {
 
     if (unresolvedEntries.length === 0) {
         setElementDisplay(section, 'none');
-        tableBody.innerHTML = renderTableEmptyRow(4, 'אין חשבונות חסרים.');
+        tableBody.textContent = '';
+        const emptyRowHTML = renderTableEmptyRow(4, 'אין חשבונות חסרים.');
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(emptyRowHTML, 'text/html');
+        doc.body.childNodes.forEach(node => {
+            tableBody.appendChild(node.cloneNode(true));
+        });
         markProblemTableReady('cashflowMissingAccountsTable');
         return;
     }
 
     setElementDisplay(section, 'block');
-    tableBody.innerHTML = unresolvedEntries
+    tableBody.textContent = '';
+    const rowsHTML = unresolvedEntries
         .map(({ item }) => renderCashflowMissingAccountRow(item))
         .join('');
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(rowsHTML, 'text/html');
+    doc.body.childNodes.forEach(node => {
+        tableBody.appendChild(node.cloneNode(true));
+    });
     markProblemTableReady('cashflowMissingAccountsTable');
 }
 
@@ -9567,15 +9845,27 @@ function displayCashflowCurrencyIssues(issues) {
 
     if (unresolvedEntries.length === 0) {
         setElementDisplay(section, 'none');
-        tableBody.innerHTML = renderTableEmptyRow(4, 'אין בעיות מטבע פעילות.');
+        tableBody.textContent = '';
+        const emptyRowHTML = renderTableEmptyRow(4, 'אין בעיות מטבע פעילות.');
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(emptyRowHTML, 'text/html');
+        doc.body.childNodes.forEach(node => {
+            tableBody.appendChild(node.cloneNode(true));
+        });
         markProblemTableReady('cashflowCurrencyIssuesTable');
         return;
     }
 
     setElementDisplay(section, 'block');
-    tableBody.innerHTML = unresolvedEntries
+    tableBody.textContent = '';
+    const rowsHTML = unresolvedEntries
         .map(({ item }) => renderCashflowCurrencyIssueRow(item))
         .join('');
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(rowsHTML, 'text/html');
+    doc.body.childNodes.forEach(node => {
+        tableBody.appendChild(node.cloneNode(true));
+    });
     markProblemTableReady('cashflowCurrencyIssuesTable');
 }
 
@@ -9606,15 +9896,27 @@ function displayAccountMissingAccounts(accounts) {
 
     if (unresolvedEntries.length === 0) {
         setElementDisplay(section, 'none');
-        tableBody.innerHTML = renderTableEmptyRow(3, 'אין חשבונות חסרים.');
+        tableBody.textContent = '';
+        const emptyRowHTML = renderTableEmptyRow(3, 'אין חשבונות חסרים.');
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(emptyRowHTML, 'text/html');
+        doc.body.childNodes.forEach(node => {
+            tableBody.appendChild(node.cloneNode(true));
+        });
         markProblemTableReady('accountMissingAccountsTable');
         return;
     }
 
     setElementDisplay(section, 'block');
-    tableBody.innerHTML = unresolvedEntries
+    tableBody.textContent = '';
+    const rowsHTML = unresolvedEntries
         .map(({ item }) => renderAccountMissingAccountRow(item))
         .join('');
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(rowsHTML, 'text/html');
+    doc.body.childNodes.forEach(node => {
+        tableBody.appendChild(node.cloneNode(true));
+    });
     markProblemTableReady('accountMissingAccountsTable');
 }
 
@@ -9652,15 +9954,27 @@ function displayAccountCurrencyMismatches(items) {
 
     if (unresolvedEntries.length === 0) {
         setElementDisplay(section, 'none');
-        tableBody.innerHTML = renderTableEmptyRow(3, 'אין אי התאמות במטבעי בסיס.');
+        tableBody.textContent = '';
+        const emptyRowHTML = renderTableEmptyRow(3, 'אין אי התאמות במטבעי בסיס.');
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(emptyRowHTML, 'text/html');
+        doc.body.childNodes.forEach(node => {
+            tableBody.appendChild(node.cloneNode(true));
+        });
         markProblemTableReady('accountCurrencyMismatchesTable');
         return;
     }
 
     setElementDisplay(section, 'block');
-    tableBody.innerHTML = unresolvedEntries
+    tableBody.textContent = '';
+    const rowsHTML = unresolvedEntries
         .map(({ item }) => renderAccountCurrencyMismatchRow(item))
         .join('');
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(rowsHTML, 'text/html');
+    doc.body.childNodes.forEach(node => {
+        tableBody.appendChild(node.cloneNode(true));
+    });
     markProblemTableReady('accountCurrencyMismatchesTable');
 }
 
@@ -9697,15 +10011,27 @@ function displayAccountEntitlementWarnings(items) {
 
     if (unresolvedEntries.length === 0) {
         setElementDisplay(section, 'none');
-        tableBody.innerHTML = renderTableEmptyRow(3, 'אין התראות הרשאות פעילות.');
+        tableBody.textContent = '';
+        const emptyRowHTML = renderTableEmptyRow(3, 'אין התראות הרשאות פעילות.');
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(emptyRowHTML, 'text/html');
+        doc.body.childNodes.forEach(node => {
+            tableBody.appendChild(node.cloneNode(true));
+        });
         markProblemTableReady('accountEntitlementWarningsTable');
         return;
     }
 
     setElementDisplay(section, 'block');
-    tableBody.innerHTML = unresolvedEntries
+    tableBody.textContent = '';
+    const rowsHTML = unresolvedEntries
         .map(({ item }) => renderAccountEntitlementWarningRow(item))
         .join('');
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(rowsHTML, 'text/html');
+    doc.body.childNodes.forEach(node => {
+        tableBody.appendChild(node.cloneNode(true));
+    });
     markProblemTableReady('accountEntitlementWarningsTable');
 }
 
@@ -9746,15 +10072,27 @@ function displayAccountMissingDocuments(items) {
 
     if (unresolvedEntries.length === 0) {
         setElementDisplay(section, 'none');
-        tableBody.innerHTML = renderTableEmptyRow(2, 'אין מסמכים חסרים.');
+        tableBody.textContent = '';
+        const emptyRowHTML = renderTableEmptyRow(2, 'אין מסמכים חסרים.');
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(emptyRowHTML, 'text/html');
+        doc.body.childNodes.forEach(node => {
+            tableBody.appendChild(node.cloneNode(true));
+        });
         markProblemTableReady('accountMissingDocumentsTable');
         return;
     }
 
     setElementDisplay(section, 'block');
-    tableBody.innerHTML = unresolvedEntries
+    tableBody.textContent = '';
+    const rowsHTML = unresolvedEntries
         .map(({ item }) => renderAccountMissingDocumentsRow(item))
         .join('');
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(rowsHTML, 'text/html');
+    doc.body.childNodes.forEach(node => {
+        tableBody.appendChild(node.cloneNode(true));
+    });
     markProblemTableReady('accountMissingDocumentsTable');
 }
 

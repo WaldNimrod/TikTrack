@@ -147,9 +147,13 @@ function showConfirmationDialog(title, message, onConfirm = null, onCancel = nul
 
   // פונקציה לסגירת המודל
   const closeModal = () => {
-    const bootstrapModal = bootstrap.Modal.getInstance(modal);
-    if (bootstrapModal) {
-      bootstrapModal.hide();
+    if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
+      window.ModalManagerV2.hideModal(modalId);
+    } else if (bootstrap?.Modal) {
+      const bootstrapModal = bootstrap.Modal.getInstance(modal);
+      if (bootstrapModal) {
+        bootstrapModal.hide();
+      }
     }
     // הסרת המודל מהדף אחרי סגירה
     setTimeout(() => {
@@ -176,62 +180,137 @@ function showConfirmationDialog(title, message, onConfirm = null, onCancel = nul
     }
   };
 
+  // פונקציה לניקוי הפונקציות הגלובליות
+  const cleanupFunctions = () => {
+    // נקה את הפונקציות רק אחרי שהמודל נסגר לגמרי
+    setTimeout(() => {
+      if (window.confirmationModalConfirm && modal.dataset.confirmed === 'true') {
+        delete window.confirmationModalConfirm;
+      }
+      if (window.confirmationModalCancel && modal.dataset.cancelled === 'true') {
+        delete window.confirmationModalCancel;
+      }
+    }, 500); // המתן 500ms אחרי סגירת המודל
+  };
+
   // יצירת פונקציות גלובליות לכפתורים (עם data-onclick)
+  // תמיד צור מחדש את הפונקציות כדי למנוע בעיות עם מודלים מרובים
   window.confirmationModalConfirm = () => {
-    if (modal.dataset.confirmed === 'true') {
-      return; // Already confirmed, prevent double execution
+    if (!modal || modal.dataset.confirmed === 'true') {
+      return; // Already confirmed or modal removed, prevent double execution
     }
     modal.dataset.confirmed = 'true';
     // Remove aria-hidden before invoking callbacks to prevent accessibility warning
     modal.removeAttribute('aria-hidden');
     invokeCallbacks(true);
     closeModal();
-    // נקה את הפונקציה אחרי שימוש
-    delete window.confirmationModalConfirm;
-    delete window.confirmationModalCancel;
+    cleanupFunctions();
   };
 
   window.confirmationModalCancel = () => {
-    if (modal.dataset.cancelled === 'true') {
-      return; // Already cancelled, prevent double execution
+    if (!modal || modal.dataset.cancelled === 'true') {
+      return; // Already cancelled or modal removed, prevent double execution
     }
     modal.dataset.cancelled = 'true';
     // Remove aria-hidden before invoking callbacks to prevent accessibility warning
     modal.removeAttribute('aria-hidden');
     invokeCallbacks(false);
     closeModal();
-    // נקה את הפונקציה אחרי שימוש
-    delete window.confirmationModalConfirm;
-    delete window.confirmationModalCancel;
+    cleanupFunctions();
   };
 
   // סגירה בלחיצה על הרקע
   modal.addEventListener('click', (e) => {
     if (e.target === modal) {
-      modal.dataset.cancelled = 'true';
-      invokeCallbacks(false);
-      closeModal();
+      if (modal.dataset.cancelled !== 'true') {
+        modal.dataset.cancelled = 'true';
+        invokeCallbacks(false);
+        closeModal();
+        cleanupFunctions();
+      }
     }
   });
 
   // אירוע סגירה על ידי לחיצה מחוץ למודל או ESC
   modal.addEventListener('hidden.bs.modal', () => {
     // רק אם לא זומנו callbacks (כדי למנוע כפילות)
-    invokeCallbacks(false);
+    if (!callbacksInvoked) {
+      invokeCallbacks(false);
+    }
     // הסרת המודל מהדף
     setTimeout(() => {
       if (modal && modal.parentNode) {
         modal.parentNode.removeChild(modal);
       }
     }, 300);
+    cleanupFunctions();
   });
 
-  // הצגת המודל
+  // הצגת המודל דרך ModalManagerV2 או Bootstrap fallback
   try {
-    const bootstrapModal = new bootstrap.Modal(modal);
-    bootstrapModal.show();
+    if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
+      // ניקוי backdrops לפני פתיחה
+      if (window.ModalManagerV2._cleanupBootstrapBackdrops) {
+        window.ModalManagerV2._cleanupBootstrapBackdrops();
+      }
+      
+      window.ModalManagerV2.showModal(modalId, 'view').then(() => {
+        // עדכון z-index דרך ModalZIndexManager
+        if (window.ModalZIndexManager && typeof window.ModalZIndexManager.forceUpdate === 'function') {
+          requestAnimationFrame(() => {
+            window.ModalZIndexManager.forceUpdate(modal);
+          });
+        }
+      }).catch(error => {
+        window.Logger?.error('Error showing confirmation modal via ModalManagerV2', { error, modalId, page: 'warning-system' });
+        // Fallback to Bootstrap
+        if (bootstrap?.Modal) {
+          // ניקוי backdrops לפני פתיחה
+          if (window.ModalManagerV2?._cleanupBootstrapBackdrops) {
+            window.ModalManagerV2._cleanupBootstrapBackdrops();
+          }
+          const bootstrapModal = new bootstrap.Modal(modal, { backdrop: false });
+          bootstrapModal.show();
+          // ניקוי backdrops אחרי פתיחה
+          if (window.ModalManagerV2?._cleanupBootstrapBackdrops) {
+            setTimeout(() => {
+              window.ModalManagerV2._cleanupBootstrapBackdrops();
+            }, 50);
+          }
+          // עדכון z-index
+          if (window.ModalZIndexManager?.forceUpdate) {
+            setTimeout(() => {
+              window.ModalZIndexManager.forceUpdate(modal);
+            }, 50);
+          }
+        } else {
+          throw error;
+        }
+      });
+    } else if (bootstrap?.Modal) {
+      // ניקוי backdrops לפני פתיחה
+      if (window.ModalManagerV2?._cleanupBootstrapBackdrops) {
+        window.ModalManagerV2._cleanupBootstrapBackdrops();
+      }
+      const bootstrapModal = new bootstrap.Modal(modal, { backdrop: false });
+      bootstrapModal.show();
+      // ניקוי backdrops אחרי פתיחה
+      if (window.ModalManagerV2?._cleanupBootstrapBackdrops) {
+        setTimeout(() => {
+          window.ModalManagerV2._cleanupBootstrapBackdrops();
+        }, 50);
+      }
+      // עדכון z-index
+      if (window.ModalZIndexManager?.forceUpdate) {
+        setTimeout(() => {
+          window.ModalZIndexManager.forceUpdate(modal);
+        }, 50);
+      }
+    } else {
+      throw new Error('Bootstrap Modal not available');
+    }
   } catch (error) {
-    console.error('❌ showConfirmationDialog - Bootstrap Modal Error:', error);
+    console.error('❌ showConfirmationDialog - Modal Error:', error);
     // fallback ל-confirm רגיל
     const confirmed = window.confirm(message);
     if (confirmed && onConfirm) {

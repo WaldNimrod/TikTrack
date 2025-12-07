@@ -792,7 +792,16 @@
             const activeSession = state.sessions.find(session => ACTIVE_STATUSES.has(session.status));
             if (activeSession) {
                 const statusHtml = renderStatus(activeSession.status);
-                activeStatusElement.innerHTML = `${statusHtml} <span class="session-meta">(#${activeSession.id})</span>`;
+                activeStatusElement.textContent = '';
+                const parser = new DOMParser();
+                const statusDoc = parser.parseFromString(statusHtml, 'text/html');
+                statusDoc.body.childNodes.forEach(node => {
+                    activeStatusElement.appendChild(node.cloneNode(true));
+                });
+                const span = document.createElement('span');
+                span.className = 'session-meta';
+                span.textContent = `(#${activeSession.id})`;
+                activeStatusElement.appendChild(span);
             } else {
                 activeStatusElement.textContent = 'אין סשנים פעילים';
             }
@@ -810,7 +819,7 @@
             return;
         }
 
-        tableBody.innerHTML = '';
+        tableBody.textContent = '';
 
         const effectiveData = Array.isArray(tableData) ? tableData : state.sessions;
 
@@ -1038,7 +1047,7 @@
                     data-tooltip="מחק סשן ייבוא"></button>
         `;
         
-        row.innerHTML = [
+        const rowHTML = [
             `<td class="col-session-id">#${session.id}</td>`,
             `<td class="col-account">${session.trading_account_name || (session.trading_account_id ? `חשבון #${session.trading_account_id}` : 'לא ידוע')}</td>`,
             `<td class="col-provider">${session.provider || 'לא צויין'}</td>`,
@@ -1053,6 +1062,15 @@
                 ${deleteButton}
             </td>`
         ].join('');
+        row.textContent = '';
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(`<table><tbody><tr>${rowHTML}</tr></tbody></table>`, 'text/html');
+        const tempRow = doc.body.querySelector('tr');
+        if (tempRow) {
+            Array.from(tempRow.children).forEach(cell => {
+                row.appendChild(cell.cloneNode(true));
+            });
+        }
 
         return row;
     }

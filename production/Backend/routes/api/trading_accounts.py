@@ -32,7 +32,9 @@ def get_open_trading_accounts():
     """Get all open trading accounts - custom implementation"""
     try:
         db: Session = g.db
-        trading_accounts = TradingAccountService.get_open_trading_accounts(db)
+        # Get user_id from Flask context (set by auth middleware)
+        user_id = getattr(g, 'user_id', None)
+        trading_accounts = TradingAccountService.get_open_trading_accounts(db, user_id=user_id)
         return jsonify({
             "status": "success",
             "data": [trading_account.to_dict() for trading_account in trading_accounts],
@@ -63,7 +65,9 @@ def get_trading_account_by_name(account_name: str):
     """Get trading account by name"""
     try:
         db: Session = g.db
-        trading_account = TradingAccountService.get_by_name(db, account_name)
+        # Get user_id from Flask context (set by auth middleware)
+        user_id = getattr(g, 'user_id', None)
+        trading_account = TradingAccountService.get_by_name(db, account_name, user_id=user_id)
         
         if not trading_account:
             return jsonify({
@@ -97,7 +101,9 @@ def create_trading_account():
         if 'notes' in data and data['notes']:
             data['notes'] = BaseEntityUtils.sanitize_rich_text(data['notes'])
         db: Session = g.db
-        trading_account = TradingAccountService.create(db, data)
+        # Get user_id from Flask context (set by auth middleware)
+        user_id = getattr(g, 'user_id', None)
+        trading_account = TradingAccountService.create(db, data, user_id=user_id)
         
         return jsonify({
             "status": "success",
@@ -137,7 +143,9 @@ def update_trading_account(trading_account_id: int):
         if 'notes' in data and data['notes']:
             data['notes'] = BaseEntityUtils.sanitize_rich_text(data['notes'])
         db: Session = g.db
-        trading_account = TradingAccountService.update(db, trading_account_id, data)
+        # Get user_id from Flask context (set by auth middleware)
+        user_id = getattr(g, 'user_id', None)
+        trading_account = TradingAccountService.update(db, trading_account_id, data, user_id=user_id)
         if trading_account:
             return jsonify({
                 "status": "success",
@@ -174,11 +182,14 @@ def update_trading_account(trading_account_id: int):
 
 @trading_accounts_bp.route('/<int:trading_account_id>/open-trades', methods=['GET'])
 @cache_for(ttl=30)  # Cache for 30 seconds - open trades change frequently
+@handle_database_session()
 def get_trading_account_open_trades(trading_account_id: int):
     """Get trading account's open trades"""
     try:
-        db: Session = next(get_db())
-        open_trades = TradingAccountService.get_open_trades(db, trading_account_id)
+        db: Session = g.db
+        # Get user_id from Flask context (set by auth middleware)
+        user_id = getattr(g, 'user_id', None)
+        open_trades = TradingAccountService.get_open_trades(db, trading_account_id, user_id=user_id)
         return jsonify({
             "status": "success",
             "data": open_trades,
@@ -192,8 +203,6 @@ def get_trading_account_open_trades(trading_account_id: int):
             "error": {"message": "Failed to retrieve open trades"},
             "version": "1.0"
         }), 500
-    finally:
-        db.close()
 
 @trading_accounts_bp.route('/<int:trading_account_id>', methods=['DELETE'])
 @handle_database_session(auto_commit=True, auto_close=True)
@@ -203,8 +212,11 @@ def delete_trading_account(trading_account_id: int):
     try:
         db: Session = g.db
         
-        # הגנה על החשבון האחרון
-        all_trading_accounts = TradingAccountService.get_all(db)
+        # Get user_id from Flask context (set by auth middleware)
+        user_id = getattr(g, 'user_id', None)
+        
+        # הגנה על החשבון האחרון (filtered by user_id)
+        all_trading_accounts = TradingAccountService.get_all(db, user_id=user_id)
         if len(all_trading_accounts) == 1:
             return jsonify({
                 "status": "error",
@@ -214,8 +226,8 @@ def delete_trading_account(trading_account_id: int):
                 "version": "1.0"
             }), 400
         
-        # Check if there are open trades
-        open_trades = TradingAccountService.get_open_trades(db, trading_account_id)
+        # Check if there are open trades (filtered by user_id)
+        open_trades = TradingAccountService.get_open_trades(db, trading_account_id, user_id=user_id)
         if open_trades:
             return jsonify({
                 "status": "error",
@@ -227,7 +239,7 @@ def delete_trading_account(trading_account_id: int):
             }), 400
         
         # Try to delete (this will check for all linked items)
-        success = TradingAccountService.delete(db, trading_account_id)
+        success = TradingAccountService.delete(db, trading_account_id, user_id=user_id)
         if success:
             return jsonify({
                 "status": "success",
@@ -252,11 +264,14 @@ def delete_trading_account(trading_account_id: int):
 
 @trading_accounts_bp.route('/<int:trading_account_id>/stats', methods=['GET'])
 @cache_for(ttl=60)  # Cache for 1 minute - stats don't change frequently
+@handle_database_session()
 def get_trading_account_stats(trading_account_id: int):
     """Get trading account statistics"""
     try:
-        db: Session = next(get_db())
-        stats = TradingAccountService.get_stats(db, trading_account_id)
+        db: Session = g.db
+        # Get user_id from Flask context (set by auth middleware)
+        user_id = getattr(g, 'user_id', None)
+        stats = TradingAccountService.get_stats(db, trading_account_id, user_id=user_id)
         if stats:
             return jsonify({
                 "status": "success",
@@ -277,5 +292,3 @@ def get_trading_account_stats(trading_account_id: int):
             "error": {"message": "Failed to retrieve trading account stats"},
             "version": "1.0"
         }), 500
-    finally:
-        db.close()

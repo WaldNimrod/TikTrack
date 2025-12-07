@@ -29,12 +29,20 @@
                         status.textContent = '✅ הספרייה נטענה בהצלחה';
                         
                         info.style.display = 'block';
-                        info.innerHTML = `
+                        info.textContent = '';
+                        const infoHTML = `
                             <strong>Global Name:</strong> ${hasLightweightCharts ? 'window.LightweightCharts' : 'window.lightweightCharts'}<br>
                             <strong>Version:</strong> ${version}<br>
                             <strong>createChart:</strong> ${typeof lib?.createChart === 'function' ? '✅' : '❌'}<br>
                             <strong>LineSeries:</strong> ${lib?.LineSeries ? '✅' : '❌'}
                         `;
+                        const tempDiv = document.createElement('div');
+                        tempDiv.textContent = '';
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(infoHTML, 'text/html');
+                        doc.body.childNodes.forEach(node => {
+                            info.appendChild(node.cloneNode(true));
+                        });
                         
                         return true;
                     } else {
@@ -73,10 +81,16 @@
                     status.textContent = '✅ מערכת Theme עובדת';
                     
                     info.style.display = 'block';
-                    info.innerHTML = `
+                    const infoHTML = `
                         <strong>Theme Options:</strong> ${JSON.stringify(themeOptions, null, 2).substring(0, 200)}...<br>
                         <strong>Colors:</strong> ${JSON.stringify(colors, null, 2)}
                     `;
+                    info.textContent = '';
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(infoHTML, 'text/html');
+                    doc.body.childNodes.forEach(node => {
+                        info.appendChild(node.cloneNode(true));
+                    });
                     
                     return true;
                 } catch (error) {
@@ -108,7 +122,7 @@
                     status.textContent = '✅ מערכת Adapter עובדת';
                     
                     info.style.display = 'block';
-                    info.innerHTML = `
+                    const infoHTML = `
                         <strong>Methods:</strong><br>
                         - createChart: ${typeof adapter.createChart === 'function' ? '✅' : '❌'}<br>
                         - addLineSeries: ${typeof adapter.addLineSeries === 'function' ? '✅' : '❌'}<br>
@@ -117,6 +131,12 @@
                         - destroyChart: ${typeof adapter.destroyChart === 'function' ? '✅' : '❌'}<br>
                         - applyTheme: ${typeof adapter.applyTheme === 'function' ? '✅' : '❌'}
                     `;
+                    info.textContent = '';
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(infoHTML, 'text/html');
+                    doc.body.childNodes.forEach(node => {
+                        info.appendChild(node.cloneNode(true));
+                    });
                     
                     return true;
                 } catch (error) {
@@ -140,7 +160,7 @@
                     requestAnimationFrame(() => {
                         try {
                             // Clear container first
-                            container.innerHTML = '';
+                            container.textContent = '';
                             
                             // Quick checks
                             if (typeof window.LightweightCharts === 'undefined' && typeof window.lightweightCharts === 'undefined') {
@@ -245,7 +265,7 @@
                 return new Promise((resolve) => {
                     requestAnimationFrame(() => {
                         try {
-                            container.innerHTML = '';
+                            container.textContent = '';
                             
                             if (container.clientWidth === 0 || container.clientHeight === 0) {
                                 requestAnimationFrame(() => {
@@ -317,7 +337,7 @@
                 return new Promise((resolve) => {
                     requestAnimationFrame(() => {
                         try {
-                            container.innerHTML = '';
+                            container.textContent = '';
                             
                             if (container.clientWidth === 0 || container.clientHeight === 0) {
                                 requestAnimationFrame(() => {
@@ -392,7 +412,7 @@
                 return new Promise((resolve) => {
                     requestAnimationFrame(() => {
                         try {
-                            container.innerHTML = '';
+                            container.textContent = '';
                             
                             if (container.clientWidth === 0 || container.clientHeight === 0) {
                                 requestAnimationFrame(() => {
@@ -494,11 +514,17 @@
                     status.textContent = '✅ אינטגרציה עם צבעים עובדת';
                     
                     info.style.display = 'block';
-                    info.innerHTML = `
+                    const infoHTML = `
                         <strong>Primary Color:</strong> ${primaryColor}<br>
                         <strong>Success Color:</strong> ${successColor}<br>
                         <strong>All Colors:</strong> ${JSON.stringify(colors, null, 2)}
                     `;
+                    info.textContent = '';
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(infoHTML, 'text/html');
+                    doc.body.childNodes.forEach(node => {
+                        info.appendChild(node.cloneNode(true));
+                    });
                     
                     return true;
                 } catch (error) {
@@ -535,11 +561,17 @@
                         : '⚠️ העדפות לא נטענו (אולי PreferencesData לא זמין)';
                     
                     info.style.display = 'block';
-                    info.innerHTML = `
+                    const infoHTML = `
                         <strong>Preferences Loaded:</strong> ${hasPreferences ? '✅' : '❌'}<br>
                         <strong>PreferencesData Available:</strong> ${typeof window.PreferencesData !== 'undefined' ? '✅' : '❌'}<br>
                         <strong>Preferences:</strong> ${JSON.stringify(theme.preferences, null, 2)}
                     `;
+                    info.textContent = '';
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(infoHTML, 'text/html');
+                    doc.body.childNodes.forEach(node => {
+                        info.appendChild(node.cloneNode(true));
+                    });
                     
                     return hasPreferences;
                 } catch (error) {
@@ -583,11 +615,17 @@
                     status.textContent = '✅ תמיכה ב-RTL נבדקה';
                     
                     info.style.display = 'block';
-                    info.innerHTML = `
+                    const infoHTML = `
                         <strong>Document Direction:</strong> ${isRTL ? 'RTL ✅' : 'LTR'}<br>
                         <strong>Chart Creation:</strong> ${chartCreated ? '✅' : '❌'}<br>
                         <strong>Note:</strong> הגרפים תמיד משמאל לימין - זה בסדר. רק טקסט צריך להיות RTL.
                     `;
+                    info.textContent = '';
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(infoHTML, 'text/html');
+                    doc.body.childNodes.forEach(node => {
+                        info.appendChild(node.cloneNode(true));
+                    });
                     
                     return true;
                 } catch (error) {
@@ -641,7 +679,7 @@
         };
         
         try {
-            console.log(`Running test: ${test.name}`);
+            window.Logger?.debug(`Running test: ${test.name}`);
             let result = test.run();
             
             // Wait only for async operations (if test returns Promise)
@@ -868,7 +906,13 @@
                         // Fallback already set
                     }
                 }
-                copyBtn.innerHTML = hourglassIcon + ' מעתיק...';
+                copyBtn.textContent = '';
+                const parser = new DOMParser();
+                const iconDoc = parser.parseFromString(hourglassIcon, 'text/html');
+                iconDoc.body.childNodes.forEach(node => {
+                    copyBtn.appendChild(node.cloneNode(true));
+                });
+                copyBtn.appendChild(document.createTextNode(' מעתיק...'));
             }
             
             testResults.endTime = new Date();
@@ -956,7 +1000,13 @@
                         // Fallback already set
                     }
                 }
-                copyBtn.innerHTML = infoIcon + ' הועתק!';
+                copyBtn.textContent = '';
+                const parser = new DOMParser();
+                const iconDoc = parser.parseFromString(infoIcon, 'text/html');
+                iconDoc.body.childNodes.forEach(node => {
+                    copyBtn.appendChild(node.cloneNode(true));
+                });
+                copyBtn.appendChild(document.createTextNode(' הועתק!'));
                 setTimeout(async () => {
                     let infoIcon2 = '<img src="../../images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">';
                     if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {
@@ -966,14 +1016,20 @@
                             // Fallback already set
                         }
                     }
-                    copyBtn.innerHTML = infoIcon2 + ' העתק לוג מפורט';
+                    copyBtn.textContent = '';
+                    const parser = new DOMParser();
+                    const iconDoc = parser.parseFromString(infoIcon2, 'text/html');
+                    iconDoc.body.childNodes.forEach(node => {
+                        copyBtn.appendChild(node.cloneNode(true));
+                    });
+                    copyBtn.appendChild(document.createTextNode(' העתק לוג מפורט'));
                 }, 2000);
             }
             
             if (window.NotificationSystem) {
                 window.NotificationSystem.showSuccess('לוג מפורט הועתק ללוח', 'בדיקת TradingView');
             } else {
-                alert('לוג מפורט הועתק ללוח');
+                window.showErrorNotification('לוג מפורט הועתק ללוח', "שגיאה");
             }
         } catch (error) {
             if (window.Logger) {
@@ -982,7 +1038,7 @@
             if (window.NotificationSystem) {
                 window.NotificationSystem.showError('שגיאה בהעתקת הלוג: ' + error.message, 'בדיקת TradingView');
             } else {
-                alert('שגיאה בהעתקת הלוג: ' + error.message);
+                window.showErrorNotification('שגיאה בהעתקת הלוג: ' + error.message, "שגיאה");
             }
             
             const copyBtn = document.getElementById('copyLogBtn');
@@ -997,7 +1053,13 @@
                         // Fallback already set
                     }
                 }
-                copyBtn.innerHTML = iconHTML + ' העתק לוג מפורט';
+                copyBtn.textContent = '';
+                const parser = new DOMParser();
+                const iconDoc = parser.parseFromString(iconHTML, 'text/html');
+                iconDoc.body.childNodes.forEach(node => {
+                    copyBtn.appendChild(node.cloneNode(true));
+                });
+                copyBtn.appendChild(document.createTextNode(' העתק לוג מפורט'));
             }
         }
     }

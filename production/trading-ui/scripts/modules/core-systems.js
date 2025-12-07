@@ -1,11 +1,96 @@
+/*
+ * ==========================================
+ * FUNCTION INDEX
+ * ==========================================
+ * 
+ * This index lists all functions in this file, organized by category.
+ * 
+ * Total Functions: ~50+
+ * 
+ * UNIFIED APP INITIALIZER CLASS (Core Class)
+ * - UnifiedAppInitializer - Main initialization class
+ *   - constructor() - Initialize UnifiedAppInitializer instance
+ *   - initialize() - Main initialization entry point (4 stages)
+ *   - detectAndAnalyze() - Stage 1: Detect page and analyze available systems
+ *   - prepareConfiguration() - Stage 2: Prepare optimal configuration
+ *   - executeInitialization(config) - Stage 3: Execute initialization
+ *   - finalizeInitialization(config) - Stage 4: Finalize initialization
+ *   - initializeModuleConfigs() - Initialize module configurations for dynamic loading
+ *   - loadRequiredModules(pageConfig) - Load required modules for page
+ *   - getRequiredModules(pageConfig) - Get required modules for page
+ *   - sortModulesByPriority(moduleNames) - Sort modules by priority
+ *   - getLoadingStatistics() - Get loading statistics
+ *   - validateDependencies() - Validate all dependencies are loaded
+ *   - initializePreferencesForPage(config) - Initialize preferences system for page
+ *   - manualInitialization(config) - Manual initialization (standard flow)
+ *   - detectPageInfo() - Detect current page information
+ *   - analyzeAvailableSystems() - Analyze which systems are available
+ * 
+ * BOOTSTRAP FALLBACKS
+ * - BootstrapModalFallback - Fallback for Bootstrap Modal
+ * - BootstrapTooltipFallback - Fallback for Bootstrap Tooltip
+ * 
+ * GLOBAL FUNCTIONS
+ * - initializeUnifiedApp() - Global initialization function
+ * - initializeUnifiedAppWhenReady() - Initialize when DOM is ready
+ * 
+ * UNIFIED INITIALIZATION SYSTEM
+ * - UnifiedInitializationSystem.addCoreSystem(name, initFunction) - Register core system
+ * - UnifiedInitializationSystem.initializeCoreSystems() - Initialize all registered core systems
+ * 
+ * NOTIFICATION SYSTEM
+ * - showSuccessNotification(title, message, category) - Show success notification
+ * - showErrorNotification(title, message, category) - Show error notification
+ * - showWarningNotification(title, message, category) - Show warning notification
+ * - showInfoNotification(title, message, category) - Show info notification
+ * - showNotification(type, title, message, category) - Generic notification function
+ * 
+ * ALERT SYSTEM
+ * - createAlert(alertData) - Create new alert
+ * - updateAlertHistory(action, data) - Update alert history
+ * - updateAlert(alertId, alertData) - Update existing alert
+ * - markAlertAsTriggered(alertId) - Mark alert as triggered
+ * - markAlertAsRead(alertId) - Mark alert as read
+ * - getNotificationIcon(type) - Get icon for notification type
+ * 
+ * MODAL MANAGEMENT
+ * - showFinalSuccessModal(successInfo) - Show final success modal
+ * - showFinalSuccessModalWithReload(successInfo) - Show success modal with reload
+ * - closeAllDetailsModals() - Close all detail modals
+ * 
+ * UTILITIES
+ * - copyToClipboard(content, resolvedTitle) - Copy content to clipboard
+ * - copyBlockingModalContent(modalElement, title, buttons) - Copy modal content
+ * 
+ * ==========================================
+ */
+
 /**
  * Core Systems Module - TikTrack
  * מערכות ליבה חיוניות
  *
  * @fileoverview מודול מערכות ליבה הכולל את המערכות הבסיסיות ביותר
- * @version 1.0.0
+ * 
+ * **מערכת איתחול מאוחדת:**
+ * - UnifiedAppInitializer - נקודת כניסה מרכזית לכל איתחול עמוד
+ * - 4 שלבי איתחול: Detect → Prepare → Execute → Finalize
+ * - תמיכה ב-Bootstrap fallbacks
+ * - מערכת התראות מאוחדת
+ * 
+ * **Package:** init-system (נטען אחרון, loadOrder: 22)
+ * **תלויות:** רק base package
+ * 
+ * **שינוי חשוב (דצמבר 2025):**
+ * - הועבר מ-base package ל-init-system package
+ * - נטען אחרון כדי שכל המערכות יהיו זמינות לפני איתחול
+ * - תלויות הופחתו מ-25 ל-1 (base בלבד)
+ * 
+ * @version 1.6.0
  * @author TikTrack Development Team
  * @created 2025-01-06
+ * @updated 2025-12-04 - Moved to init-system package, reduced dependencies
+ * 
+ * @see {@link documentation/02-ARCHITECTURE/FRONTEND/UNIFIED_INITIALIZATION_SYSTEM.md|Unified Initialization System Documentation}
  */
 
 // ============================================================================
@@ -16,53 +101,87 @@
     return;
   }
 
-  const needsModalFallback = !window.bootstrap || !window.bootstrap.Modal;
-  const needsTooltipFallback = !window.bootstrap || !window.bootstrap.Tooltip;
+  // Wait for Bootstrap to load before checking if fallback is needed
+  // This prevents false warnings when Bootstrap is still loading
+  (function waitForBootstrap() {
+    // Check if we've been waiting too long (10 seconds max)
+    const maxWaitTime = 10000; // 10 seconds
+    const startTime = Date.now();
+    
+    const checkBootstrap = () => {
+      const elapsed = Date.now() - startTime;
+      const stillNeedsModal = !window.bootstrap || !window.bootstrap.Modal;
+      const stillNeedsTooltip = !window.bootstrap || !window.bootstrap.Tooltip;
 
-  if (!needsModalFallback && !needsTooltipFallback) {
-    return;
-  }
-
-  console.warn(
-    '⚠️ [Bootstrap Fallback] Bootstrap assets not available - installing lightweight fallback for modals/tooltips'
-  );
-
-  const dispatchEvent = (element, name) => {
-    if (!element) {
-      return;
-    }
-    try {
-      const event = new Event(name, { bubbles: true, cancelable: false });
-      element.dispatchEvent(event);
-    } catch (error) {
-      // Older browsers fallback
-      try {
-        const event = document.createEvent('Event');
-        event.initEvent(name, true, false);
-        element.dispatchEvent(event);
-      } catch (e) {
-        console.error('❌ [Bootstrap Fallback] Failed to dispatch event', name, e);
+      // If Bootstrap loaded, exit without fallback
+      if (!stillNeedsModal && !stillNeedsTooltip) {
+        return;
       }
-    }
-  };
 
-  class BootstrapModalFallback {
-    constructor(element, options = {}) {
-      if (!element) {
-        throw new Error('BootstrapModalFallback requires a DOM element');
+      // If we've waited too long, install fallback
+      if (elapsed >= maxWaitTime) {
+        console.warn(
+          '⚠️ [Bootstrap Fallback] Bootstrap assets not available after 10s - installing lightweight fallback for modals/tooltips'
+        );
+        installFallback();
+      } else {
+        // Check again in 100ms
+        setTimeout(checkBootstrap, 100);
+        return;
       }
-      this._element = element;
-      this._options = {
-        backdrop: options.backdrop !== undefined ? options.backdrop : true,
-        keyboard: options.keyboard !== undefined ? options.keyboard : true,
-        focus: options.focus !== undefined ? options.focus : true,
+    };
+
+    // Install fallback function
+    function installFallback() {
+      // Check what's needed at install time
+      const needsModalFallback = !window.bootstrap || !window.bootstrap.Modal;
+      const needsTooltipFallback = !window.bootstrap || !window.bootstrap.Tooltip;
+
+      // If nothing is needed, return early
+      if (!needsModalFallback && !needsTooltipFallback) {
+        return;
+      }
+
+      const dispatchEvent = (element, name) => {
+        if (!element) {
+          return;
+        }
+        try {
+          const event = new Event(name, { bubbles: true, cancelable: false });
+          element.dispatchEvent(event);
+        } catch (error) {
+          // Older browsers fallback
+          try {
+            const event = document.createEvent('Event');
+            event.initEvent(name, true, false);
+            element.dispatchEvent(event);
+          } catch (e) {
+            console.error('❌ [Bootstrap Fallback] Failed to dispatch event', name, e);
+          }
+        }
       };
-      this._isShown = false;
-      this._backdrop = null;
-      this._handleKeydown = null;
-      this._previouslyFocused = null;
-      BootstrapModalFallback._instances.set(element, this);
-    }
+
+      // Set up instances WeakMaps before classes
+      const modalInstances = new WeakMap();
+      const tooltipInstances = new WeakMap();
+
+      class BootstrapModalFallback {
+        constructor(element, options = {}) {
+          if (!element) {
+            throw new Error('BootstrapModalFallback requires a DOM element');
+          }
+          this._element = element;
+          this._options = {
+            backdrop: options.backdrop !== undefined ? options.backdrop : true,
+            keyboard: options.keyboard !== undefined ? options.keyboard : true,
+            focus: options.focus !== undefined ? options.focus : true,
+      };
+          this._isShown = false;
+          this._backdrop = null;
+          this._handleKeydown = null;
+          this._previouslyFocused = null;
+          modalInstances.set(element, this);
+        }
 
     show() {
       if (this._isShown) {
@@ -156,7 +275,7 @@
 
     dispose() {
       this.hide();
-      BootstrapModalFallback._instances.delete(this._element);
+      modalInstances.delete(this._element);
       this._element = null;
     }
 
@@ -171,7 +290,12 @@
     }
 
     static getInstance(element) {
-      return BootstrapModalFallback._instances.get(element) || null;
+      return modalInstances.get(element) || null;
+    }
+
+    static getOrCreateInstance(element, options = {}) {
+      const existingInstance = BootstrapModalFallback.getInstance(element);
+      return existingInstance || new BootstrapModalFallback(element, options);
     }
 
     static get VERSION() {
@@ -179,21 +303,14 @@
     }
   }
 
-  BootstrapModalFallback._instances = new WeakMap();
-
-  BootstrapModalFallback.getOrCreateInstance = function (element, options = {}) {
-    const existingInstance = BootstrapModalFallback.getInstance(element);
-    return existingInstance || new BootstrapModalFallback(element, options);
-  };
-
-  class BootstrapTooltipFallback {
-    constructor(element, options = {}) {
-      if (!element) {
-        throw new Error('BootstrapTooltipFallback requires a DOM element');
-      }
-      this._element = element;
-      this._options = options;
-      BootstrapTooltipFallback._instances.set(element, this);
+      class BootstrapTooltipFallback {
+        constructor(element, options = {}) {
+          if (!element) {
+            throw new Error('BootstrapTooltipFallback requires a DOM element');
+          }
+          this._element = element;
+          this._options = options;
+          tooltipInstances.set(element, this);
 
       const title =
         options?.title ||
@@ -206,11 +323,11 @@
     }
 
     dispose() {
-      BootstrapTooltipFallback._instances.delete(this._element);
+      tooltipInstances.delete(this._element);
     }
 
     static getInstance(element) {
-      return BootstrapTooltipFallback._instances.get(element) || null;
+      return tooltipInstances.get(element) || null;
     }
 
     static get VERSION() {
@@ -218,19 +335,31 @@
     }
   }
 
-  BootstrapTooltipFallback._instances = new WeakMap();
+      // Install fallbacks to window.bootstrap
+      const bootstrapGlobal = window.bootstrap ? { ...window.bootstrap } : {};
+      if (needsModalFallback) {
+        bootstrapGlobal.Modal = BootstrapModalFallback;
+      }
+      if (needsTooltipFallback) {
+        bootstrapGlobal.Tooltip = BootstrapTooltipFallback;
+      }
+      bootstrapGlobal.__isFallback = true;
 
-  const bootstrapGlobal = window.bootstrap ? { ...window.bootstrap } : {};
-  if (needsModalFallback) {
-    bootstrapGlobal.Modal = BootstrapModalFallback;
-  }
-  if (needsTooltipFallback) {
-    bootstrapGlobal.Tooltip = BootstrapTooltipFallback;
-  }
-  bootstrapGlobal.__isFallback = true;
+      window.bootstrap = bootstrapGlobal;
+    } // End of installFallback function
 
-  window.bootstrap = bootstrapGlobal;
-})();
+    // Initial check
+    const initialNeedsModal = !window.bootstrap || !window.bootstrap.Modal;
+    const initialNeedsTooltip = !window.bootstrap || !window.bootstrap.Tooltip;
+
+    // If Bootstrap is already available, no fallback needed
+    if (!initialNeedsModal && !initialNeedsTooltip) {
+      return;
+    }
+
+    // Start checking
+    checkBootstrap();
+  })(); // Close inner IIFE for Bootstrap fallback
 
 // ===== UNIFIED APP INITIALIZER =====
 
@@ -266,6 +395,11 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
     /**
      * Initialize module configurations for dynamic loading
      * אתחול תצורות מודולים לטעינה דינמית
+     * 
+     * @method initializeModuleConfigs
+     * @description מאתחל את תצורות המודולים לטעינה דינמית (כרגע לא בשימוש - static loading only)
+     * @memberof UnifiedAppInitializer
+     * @since 1.0.0
      */
     initializeModuleConfigs() {
       this.moduleConfigs.set('core-systems', {
@@ -649,25 +783,42 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
 
       // Load page-specific configuration from page-initialization-configs.js
       let pageConfig = null;
-      // Debug info only in verbose mode
+      
+      // Debug: Check what's available
+      if (window.Logger?.debug) {
+        window.Logger.debug('Looking for page config', {
+          pageName: this.pageInfo.name,
+          hasPageInitializationConfigs: typeof window.pageInitializationConfigs !== 'undefined',
+          hasPAGE_CONFIGS: typeof window.PAGE_CONFIGS !== 'undefined',
+          pageInitializationConfigsKeys: typeof window.pageInitializationConfigs !== 'undefined' ? Object.keys(window.pageInitializationConfigs) : [],
+          PAGE_CONFIGSKeys: typeof window.PAGE_CONFIGS !== 'undefined' ? Object.keys(window.PAGE_CONFIGS) : [],
+        }, { page: 'core-systems' });
+      }
 
       if (
         typeof window.pageInitializationConfigs !== 'undefined' &&
         window.pageInitializationConfigs[this.pageInfo.name]
       ) {
         pageConfig = window.pageInitializationConfigs[this.pageInfo.name];
-        // Removed debug log - page config loading is tracked internally
+        if (window.Logger?.debug) {
+          window.Logger.debug(`Found page config in pageInitializationConfigs for ${this.pageInfo.name}`, { page: 'core-systems' });
+        }
       } else if (
         typeof window.PAGE_CONFIGS !== 'undefined' &&
         window.PAGE_CONFIGS[this.pageInfo.name]
       ) {
         // Fallback to PAGE_CONFIGS if pageInitializationConfigs not available
         pageConfig = window.PAGE_CONFIGS[this.pageInfo.name];
-        // Removed debug log - page config loading is tracked internally
+        if (window.Logger?.debug) {
+          window.Logger.debug(`Found page config in PAGE_CONFIGS for ${this.pageInfo.name}`, { page: 'core-systems' });
+        }
       } else {
         // Only log warning if page config is critical
         if (window.Logger) {
-          window.Logger.warn(`No page config found for ${this.pageInfo.name}`, { page: 'core-systems' });
+          window.Logger.warn(`No page config found for ${this.pageInfo.name}`, { 
+            page: 'core-systems',
+            availableKeys: typeof window.pageInitializationConfigs !== 'undefined' ? Object.keys(window.pageInitializationConfigs) : (typeof window.PAGE_CONFIGS !== 'undefined' ? Object.keys(window.PAGE_CONFIGS) : [])
+          });
         }
       }
 
@@ -721,7 +872,7 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
           available:
             typeof window.PreferencesCore !== 'undefined' && window.PreferencesCore !== null,
           initialized: window.PreferencesCore?.initialized === true || true, // PreferencesCore doesn't have explicit initialized flag
-          optional: false,
+          optional: true, // Optional - not all pages need preferences (e.g., system-management)
         },
         Logger: {
           available: typeof window.Logger !== 'undefined' && window.Logger !== null,
@@ -738,7 +889,7 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
           available:
             typeof window.ActionsMenuSystem !== 'undefined' && window.ActionsMenuSystem !== null,
           initialized: true, // ActionsMenuSystem doesn't have explicit initialized flag
-          optional: false,
+          optional: true, // Optional - not all pages need actions menu (e.g., system-management)
         },
         HeaderSystem: {
           available: typeof window.HeaderSystem !== 'undefined' && window.HeaderSystem !== null,
@@ -776,6 +927,23 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
 
     /**
      * Stage 3: Execute initialization
+     */
+    /**
+     * Stage 3: Execute Initialization
+     * שלב 3: ביצוע איתחול
+     * 
+     * @method executeInitialization
+     * @description מבצע את האיתחול בפועל:
+     * - Cache System initialization
+     * - Preferences initialization (אם packages כולל 'preferences')
+     * - Application initialization (Header, Notifications, Actions Menu)
+     * - Custom initializers (אם מוגדרים)
+     * 
+     * @memberof UnifiedAppInitializer
+     * @async
+     * @param {Object} config - Configuration object מ-prepareConfiguration()
+     * @returns {Promise<void>}
+     * @since 1.0.0
      */
     async executeInitialization(config) {
       if (window.Logger?.debug) {
@@ -825,6 +993,15 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
           console.warn('⚠️ Will attempt to initialize them or use fallbacks');
         }
 
+        // Wait for base package scripts to load (UnifiedCacheManager, Logger, NotificationSystem)
+        // Poll for up to 5 seconds for the scripts to load
+        let attempts = 0;
+        const maxAttempts = 50; // 50 * 100ms = 5 seconds
+        while ((typeof window.UnifiedCacheManager === 'undefined' || typeof window.Logger === 'undefined') && attempts < maxAttempts) {
+          await new Promise(resolve => setTimeout(resolve, 100));
+          attempts++;
+        }
+
         // Initialize IndexedDB first (blocking) to prevent race conditions
         await this.initializeCacheSystem();
 
@@ -839,40 +1016,27 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
           }, { page: 'core-systems' });
         }
 
-        if (window.UnifiedCacheManager) {
-        } else if (!dependencyCheck.details.UnifiedCacheManager.optional) {
-          console.error(
-            '❌ UnifiedCacheManager is required but not available - using localStorage fallback'
-          );
+        if (!window.UnifiedCacheManager) {
+          throw new Error('UnifiedCacheManager is required but not available - base package may not be loaded. Make sure base package is in dependencies.');
+        }
+
+        if (!window.UnifiedCacheManager.initialized) {
+          throw new Error('UnifiedCacheManager failed to initialize - check logs for details');
         }
 
         // Set global flag for other systems
-        window.cacheSystemReady =
-          window.UnifiedCacheManager && window.UnifiedCacheManager.initialized;
-
-        if (window.cacheSystemReady) {
-          if (window.Logger?.debug) {
-            window.Logger.debug('Cache system ready (4-layer architecture)', {}, { page: 'core-systems' });
-          }
-        } else {
-          if (window.Logger?.warn) {
-            window.Logger.warn('Cache system not ready, using localStorage fallback', {}, { page: 'core-systems' });
-          }
+        window.cacheSystemReady = true;
+        
+        if (window.Logger?.info) {
+          window.Logger.info('✅ Cache system ready (4-layer architecture)', {}, { page: 'core-systems' });
         }
 
         // Initialize preferences system (standardized loading for all pages)
         // This ensures single point of entry, proper cache usage, and no duplicate API calls
         await this.initializePreferencesForPage(config);
 
-        // Use the application initializer if available
-        if (typeof window.initializeApplication === 'function') {
-          // Removed debug log - using application initializer
-          await window.initializeApplication(config);
-        } else {
-          // Removed debug log - manual initialization fallback is normal
-          // Fallback to manual initialization
-          await this.manualInitialization(config);
-        }
+        // Manual initialization (no backward compatibility with initializeApplication)
+        await this.manualInitialization(config);
       } catch (error) {
         if (typeof window.Logger !== 'undefined' && window.Logger.error) {
           window.Logger.error('❌ Error in executeInitialization:', error, {
@@ -920,14 +1084,91 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
       }
       await Promise.all([
         // Header System - has localStorage fallback, doesn't need cache
+        // Skip header for auth pages (login, register, etc.)
         (async () => {
-          if (typeof window.initializeHeaderSystem === 'function') {
+          const isAuthPage = config.pageType === 'auth' || 
+                            config.name === 'Login' || 
+                            config.name === 'Register' ||
+                            window.location.pathname.includes('login.html') ||
+                            window.location.pathname.includes('register.html');
+          
+          if (isAuthPage) {
             if (window.Logger?.debug) {
-              window.Logger.debug('Initializing Header System', {}, { page: 'core-systems' });
+              window.Logger.debug('Skipping Header System for auth page', {}, { page: 'core-systems' });
             }
-            window.initializeHeaderSystem();
+            return;
+          }
+
+          // Wait for HeaderSystem to be available (in case base package loads late)
+          let waitCount = 0;
+          while (typeof window.initializeHeaderSystem !== 'function' && waitCount < 50) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+            waitCount++;
+          }
+
+          if (typeof window.initializeHeaderSystem === 'function') {
+            // Check if Header System is already initialized (prevent double initialization)
+            if (window.headerSystem && window.headerSystem.isInitialized) {
+              if (window.Logger?.debug) {
+                window.Logger.debug('Header System already initialized, skipping PLANNED method', {
+                  page: window.location.pathname
+                }, { page: 'core-systems' });
+              }
+              return;
+            }
+            
+            // Mark that planned initialization is being used
+            window.__headerSystemInitMethod = 'planned';
+            
+            if (window.Logger?.debug) {
+              window.Logger.debug('Initializing Header System (PLANNED METHOD)', {
+                waitCount,
+                HeaderSystemExists: typeof window.HeaderSystem !== 'undefined',
+                initializeHeaderSystemExists: typeof window.initializeHeaderSystem !== 'undefined',
+                page: window.location.pathname
+              }, { page: 'core-systems' });
+            }
+            
+            // Also log to console for easy tracking
+            console.log('✅ [HEADER INIT] Using PLANNED method for:', window.location.pathname);
+            
+            // Store in localStorage for tracking
+            try {
+              const initLog = {
+                page: window.location.pathname,
+                method: 'planned',
+                timestamp: new Date().toISOString()
+              };
+              const existingLogs = JSON.parse(localStorage.getItem('__headerInitLogs') || '[]');
+              existingLogs.push(initLog);
+              localStorage.setItem('__headerInitLogs', JSON.stringify(existingLogs));
+            } catch (e) {
+              // Ignore localStorage errors
+            }
+            
+            try {
+              window.initializeHeaderSystem();
+            } catch (error) {
+              if (window.Logger?.error) {
+                window.Logger.error('Error initializing Header System', {
+                  error: error.message,
+                  stack: error.stack
+                }, { page: 'core-systems' });
+              } else {
+                console.error('❌ Error initializing Header System:', error);
+              }
+            }
           } else {
-            console.warn('⚠️ initializeHeaderSystem not available');
+            const errorMsg = '⚠️ initializeHeaderSystem not available after waiting';
+            if (window.Logger?.warn) {
+              window.Logger.warn(errorMsg, {
+                HeaderSystemExists: typeof window.HeaderSystem !== 'undefined',
+                HeaderSystemClassExists: typeof window.HeaderSystemClass !== 'undefined',
+                waitCount
+              }, { page: 'core-systems' });
+            } else {
+              console.warn(errorMsg);
+            }
           }
         })(),
 
@@ -953,7 +1194,10 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
           } else {
             // Only log warning if ActionsMenuSystem is critical
             if (window.Logger) {
-              window.Logger.warn('ActionsMenuSystem not available', { page: 'core-systems' });
+              // ActionsMenuSystem is optional - silently skip if not available
+              if (window.Logger?.debug) {
+                window.Logger.debug('ActionsMenuSystem not available (optional)', { page: 'core-systems' });
+              }
             }
           }
         })(),
@@ -1362,6 +1606,28 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
     /**
      * Detect page information
      */
+    /**
+     * Detect current page information
+     * זיהוי מידע על העמוד הנוכחי
+     * 
+     * @method detectPageInfo
+     * @description מזהה את העמוד הנוכחי על בסיס URL:
+     * - שם העמוד (pageName)
+     * - נתיב (path)
+     * - שם קובץ (filename)
+     * - סוג עמוד (type)
+     * - דרישות (requirements: filters, validation, tables, charts)
+     * 
+     * @memberof UnifiedAppInitializer
+     * @returns {Object} Page info object עם:
+     * - name: string - שם העמוד
+     * - path: string - נתיב העמוד
+     * - filename: string - שם הקובץ
+     * - type: string - סוג העמוד (trading, development, preferences, dashboard, general)
+     * - requirements: Object - דרישות העמוד
+     * 
+     * @since 1.0.0
+     */
     detectPageInfo() {
       const path = window.location.pathname;
       const filename = path.split('/').pop() || 'index';
@@ -1392,6 +1658,19 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
 
     /**
      * Detect available systems
+     * זיהוי מערכות זמינות
+     * 
+     * @method detectAvailableSystems
+     * @description בודק אילו מערכות זמינות ב-window:
+     * - Core Systems: NotificationSystem, HeaderSystem, FilterSystem
+     * - Page Systems: pageFilters, validation, tables
+     * - Preferences & Storage: preferences, indexeddb
+     * - UI Systems: uiUtils, notifications, actionsMenu
+     * 
+     * @memberof UnifiedAppInitializer
+     * @returns {Set<string>} Set של שמות מערכות זמינות
+     * 
+     * @since 1.0.0
      */
     detectAvailableSystems() {
       const systems = new Set();
@@ -1419,6 +1698,13 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
 
     /**
      * Analyze page requirements
+     * ניתוח דרישות העמוד
+     * 
+     * @method analyzePageRequirements
+     * @description מנתח את דרישות העמוד (כרגע רק לוג, הדרישות נקבעות ב-detectPageInfo)
+     * 
+     * @memberof UnifiedAppInitializer
+     * @since 1.0.0
      */
     analyzePageRequirements() {
       // This is already done in detectPageInfo, but can be extended
@@ -1429,6 +1715,21 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
 
     /**
      * Determine page type
+     * קביעת סוג העמוד
+     * 
+     * @method determinePageType
+     * @description קובע את סוג העמוד על בסיס שם העמוד:
+     * - 'trading' - עמודי מסחר (trades, executions, alerts)
+     * - 'development' - עמודי פיתוח (system-management, crud-testing-dashboard, וכו')
+     * - 'preferences' - עמוד העדפות
+     * - 'dashboard' - דשבורד ראשי
+     * - 'general' - עמוד כללי (ברירת מחדל)
+     * 
+     * @memberof UnifiedAppInitializer
+     * @param {string} pageName - שם העמוד
+     * @returns {string} סוג העמוד
+     * 
+     * @since 1.0.0
      */
     determinePageType(pageName) {
       if (['trades', 'executions', 'alerts'].includes(pageName)) return 'trading';
@@ -1443,6 +1744,16 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
 
     /**
      * Check if page requires filters
+     * בדיקה אם העמוד דורש פילטרים
+     * 
+     * @method requiresFilters
+     * @description בודק אם העמוד דורש מערכת פילטרים
+     * 
+     * @memberof UnifiedAppInitializer
+     * @param {string} pageName - שם העמוד
+     * @returns {boolean} true אם העמוד דורש פילטרים
+     * 
+     * @since 1.0.0
      */
     requiresFilters(pageName) {
       const filterPages = [
@@ -1464,6 +1775,16 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
 
     /**
      * Check if page requires validation
+     * בדיקה אם העמוד דורש ולידציה
+     * 
+     * @method requiresValidation
+     * @description בודק אם העמוד דורש מערכת ולידציה
+     * 
+     * @memberof UnifiedAppInitializer
+     * @param {string} pageName - שם העמוד
+     * @returns {boolean} true אם העמוד דורש ולידציה
+     * 
+     * @since 1.0.0
      */
     requiresValidation(pageName) {
       const validationPages = [
@@ -1480,6 +1801,16 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
 
     /**
      * Check if page requires tables
+     * בדיקה אם העמוד דורש טבלאות
+     * 
+     * @method requiresTables
+     * @description בודק אם העמוד דורש מערכת טבלאות
+     * 
+     * @memberof UnifiedAppInitializer
+     * @param {string} pageName - שם העמוד
+     * @returns {boolean} true אם העמוד דורש טבלאות
+     * 
+     * @since 1.0.0
      */
     requiresTables(pageName) {
       const tablePages = [
@@ -1515,6 +1846,15 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
         window.Logger.debug('Initializing Unified Cache System', {}, { page: 'core-systems' });
       }
 
+      // Wait for UnifiedCacheManager to be loaded (from base package)
+      // Poll for up to 5 seconds for the script to load
+      let attempts = 0;
+      const maxAttempts = 50; // 50 * 100ms = 5 seconds
+      while (typeof window.UnifiedCacheManager === 'undefined' && attempts < maxAttempts) {
+        await new Promise(resolve => setTimeout(resolve, 100));
+        attempts++;
+      }
+
       // Initialize UnifiedCacheManager with timeout
       if (typeof window.UnifiedCacheManager !== 'undefined') {
         try {
@@ -1523,12 +1863,12 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
               window.Logger.debug('Initializing UnifiedCacheManager', {}, { page: 'core-systems' });
             }
 
-            // Add timeout to prevent hanging
+            // Add timeout to prevent hanging (increased to 30 seconds for slow IndexedDB)
             const initPromise = window.UnifiedCacheManager.initialize();
             const timeoutPromise = new Promise((_, reject) =>
               setTimeout(
                 () => reject(new Error('UnifiedCacheManager initialization timeout')),
-                10000
+                30000
               )
             );
 
@@ -1553,17 +1893,30 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
           } else {
             console.error('❌ UnifiedCacheManager initialization failed:', error);
           }
-          console.warn('⚠️ Using localStorage fallback');
-          // Set a flag to indicate cache system is not available
-          window.UnifiedCacheManager = null;
+          // Don't set to null - throw the error so we can see the real problem
+          throw error;
         }
       } else {
-        console.warn('⚠️ UnifiedCacheManager not available, using localStorage fallback');
+        throw new Error('UnifiedCacheManager is not available - base package may not be loaded. Make sure base package is in dependencies.');
       }
     }
 
     /**
      * Handle errors
+     */
+    /**
+     * Handle initialization error
+     * טיפול בשגיאת איתחול
+     * 
+     * @method handleError
+     * @description מטפל בשגיאות איתחול:
+     * - לוגים את השגיאה
+     * - מריץ error handlers רשומים
+     * - מציג הודעת שגיאה למשתמש
+     * 
+     * @memberof UnifiedAppInitializer
+     * @param {Error} error - שגיאת איתחול
+     * @since 1.0.0
      */
     handleError(error) {
       if (typeof window.Logger !== 'undefined' && window.Logger.error) {
@@ -1791,7 +2144,11 @@ function requiresTables(pageName) {
  * Check if page requires charts (Legacy - moved outside class)
  */
 function requiresCharts(pageName) {
-  return pageName === 'index' || document.querySelectorAll('canvas, .chart-container').length > 0;
+  const chartPages = ['index'];
+  return (
+    chartPages.includes(pageName) ||
+    document.querySelectorAll('canvas[id], .chart-container').length > 0
+  );
 }
 
 /**
@@ -1812,10 +2169,10 @@ async function initializeCacheSystem() {
         window.Logger.debug('Initializing UnifiedCacheManager (legacy)', {}, { page: 'core-systems' });
       }
 
-      // Add timeout to prevent hanging
+      // Add timeout to prevent hanging (increased to 30 seconds for slow IndexedDB)
       const initPromise = window.UnifiedCacheManager.initialize();
       const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error('UnifiedCacheManager initialization timeout')), 10000)
+        setTimeout(() => reject(new Error('UnifiedCacheManager initialization timeout')), 30000)
       );
 
       const initResult = await Promise.race([initPromise, timeoutPromise]);
@@ -1876,6 +2233,27 @@ window.unifiedAppInit = new UnifiedAppInitializer();
 
 // ===== GLOBAL EXPORT =====
 
+/**
+ * Initialize Unified App - Global entry point
+ * אתחול אפליקציה מאוחדת - נקודת כניסה גלובלית
+ * 
+ * @function initializeUnifiedApp
+ * @global
+ * @async
+ * @description נקודת הכניסה הגלובלית לאיתחול המערכת.
+ * מבצע את כל תהליך האיתחול ב-4 שלבים דרך UnifiedAppInitializer.
+ * 
+ * @returns {Promise<Object>} Status object עם פרטי האיתחול
+ * @throws {Error} אם האיתחול נכשל
+ * 
+ * @example
+ * // האיתחול מתבצע אוטומטית ב-DOMContentLoaded
+ * // או ניתן לקרוא ישירות:
+ * await window.initializeUnifiedApp();
+ * 
+ * @since 1.0.0
+ * @updated 1.6.0 - Moved to init-system package
+ */
 window.initializeUnifiedApp = async function () {
   return await window.unifiedAppInit.initialize();
 };
@@ -1922,13 +2300,30 @@ window.globalInitializationState = {
   customInitializers: new Map(),
 };
 
-// Single DOMContentLoaded listener - replaces all others
-document.addEventListener('DOMContentLoaded', async () => {
+/**
+ * Initialize Unified App when DOM is ready
+ * אתחול אפליקציה מאוחדת כשהדף מוכן
+ * 
+ * @function initializeUnifiedAppWhenReady
+ * @private
+ * @async
+ * @description בודק את מצב ה-DOM ומריץ איתחול:
+ * - אם DOM עדיין בטעינה - ממתין ל-DOMContentLoaded
+ * - אם DOM כבר נטען - מריץ איתחול ישירות
+ * 
+ * זה תיקון חשוב לבעיה שבה init-system נטען מאוחר (loadOrder: 22)
+ * ואז DOMContentLoaded כבר עבר.
+ * 
+ * @returns {Promise<void>}
+ * @since 1.6.0 (2025-12-04) - Added to handle late loading
+ */
+const initializeUnifiedAppWhenReady = async () => {
   // Use Logger for initialization logs
   if (window.Logger && Logger.DEBUG_MODE) {
-    window.Logger.debug('DOM Content Loaded - Starting Unified App Initialization', {
+    window.Logger.debug('Starting Unified App Initialization', {
       url: window.location.href,
       pathname: window.location.pathname,
+      readyState: document.readyState,
       page: 'core-systems'
     });
   }
@@ -1986,7 +2381,16 @@ document.addEventListener('DOMContentLoaded', async () => {
       window.globalInitializationState.unifiedAppInitializing = false;
     }
   }
-});
+};
+
+// Check if DOM is already loaded (when init-system loads late)
+if (document.readyState === 'loading') {
+  // DOM is still loading, wait for DOMContentLoaded
+  document.addEventListener('DOMContentLoaded', initializeUnifiedAppWhenReady);
+} else {
+  // DOM is already loaded (interactive or complete), initialize immediately
+  initializeUnifiedAppWhenReady();
+}
 
 // ===== ERROR HANDLING =====
 
@@ -2009,8 +2413,27 @@ window.addEventListener('error', event => {
     console.error('❌ Global Error:', details);
   }
 
-  if (event.error && typeof window.showNotification === 'function') {
-    window.showNotification('❌ System error occurred', 'error');
+  // CRITICAL: Prevent infinite recursion - don't call showNotification if error is in notification system
+  // Check if error is related to notification system to prevent recursion
+  const isNotificationError = event.filename && (
+    event.filename.includes('notification-system') ||
+    event.filename.includes('notification') ||
+    event.message?.includes('notification') ||
+    event.message?.includes('showNotification') ||
+    event.message?.includes('shouldShowNotification')
+  );
+
+  // Also check if showNotification is currently being called (prevent recursion)
+  if (!isNotificationError && !window.__SHOW_NOTIFICATION_IN_PROGRESS__ && event.error && typeof window.showNotification === 'function') {
+    try {
+      window.showNotification('❌ System error occurred', 'error', 'מערכת', 5000, 'system', { userInitiated: false });
+    } catch (notificationError) {
+      // If showing notification fails, just log to console to prevent further recursion
+      console.error('❌ Failed to show error notification:', notificationError);
+    }
+  } else if (isNotificationError) {
+    // If error is in notification system, just log to console
+    console.error('❌ Error in notification system (preventing recursion):', details);
   }
 });
 
@@ -2029,8 +2452,13 @@ window.addEventListener('unhandledrejection', event => {
     console.error('❌ Unhandled Promise Rejection:', details);
   }
 
+  // Safe check - only use showNotification if it's available (from notification-system.js in base package)
   if (event.reason && typeof window.showNotification === 'function') {
-    window.showNotification('❌ Promise rejection occurred', 'error');
+    try {
+      window.showNotification('❌ Promise rejection occurred', 'error');
+    } catch (notificationError) {
+      console.error('❌ Failed to show promise rejection notification:', notificationError);
+    }
   }
 });
 
@@ -2038,6 +2466,23 @@ window.addEventListener('unhandledrejection', event => {
 window.UnifiedInitializationSystem = {
   coreSystems: new Map(),
 
+  /**
+   * Register core system for initialization
+   * רישום מערכת ליבה לאיתחול
+   * 
+   * @method addCoreSystem
+   * @description רושם מערכת ליבה לאיתחול אוטומטי
+   * 
+   * @memberof UnifiedInitializationSystem
+   * @param {string} name - שם המערכת
+   * @param {Function} initFunction - פונקציית איתחול
+   * @since 1.0.0
+   * 
+   * @example
+   * window.UnifiedInitializationSystem.addCoreSystem('MySystem', async () => {
+   *   await window.MySystem.initialize();
+   * });
+   */
   addCoreSystem(name, initFunction) {
     if (window.Logger?.debug) {
       window.Logger.debug(`Registering core system: ${name}`, {}, { page: 'core-systems' });
@@ -2045,6 +2490,21 @@ window.UnifiedInitializationSystem = {
     this.coreSystems.set(name, initFunction);
   },
 
+  /**
+   * Initialize all registered core systems
+   * אתחול כל המערכות הליבה הרשומות
+   * 
+   * @method initializeCoreSystems
+   * @description מאתחל את כל המערכות הליבה שנרשמו:
+   * - בודק אם המערכת כבר מאותחלת
+   * - מריץ את פונקציית האיתחול
+   * - מטפל בשגיאות
+   * 
+   * @memberof UnifiedInitializationSystem
+   * @async
+   * @returns {Promise<void>}
+   * @since 1.0.0
+   */
   async initializeCoreSystems() {
     if (window.Logger?.debug) {
       window.Logger.debug('Initializing registered core systems', {}, { page: 'core-systems' });
@@ -2251,6 +2711,11 @@ function getNotificationIcon(type) {
  */
 async function shouldShowNotification(category) {
   try {
+    // CRITICAL: Prevent infinite recursion - if getPreference is currently being called, return default
+    if (window.__GET_PREFERENCE_IN_PROGRESS__) {
+      return true; // Default: show notification during preferences loading
+    }
+    
     const preferenceName = `notifications_${category}_enabled`;
     // Preference check - debug only
 
@@ -2303,6 +2768,11 @@ async function shouldShowNotification(category) {
  */
 async function shouldLogToConsole(category) {
   try {
+    // CRITICAL: Prevent infinite recursion - if getPreference is currently being called, return default
+    if (window.__GET_PREFERENCE_IN_PROGRESS__) {
+      return true; // Default: write to console during preferences loading
+    }
+    
     const preferenceName = `console_logs_${category}_enabled`;
     const isEnabled = await window.getPreference(preferenceName);
     return isEnabled === 'true' || isEnabled === true;
@@ -2447,11 +2917,16 @@ function hideNotification(notification) {
  * @param {string} category - Category of notification (default: 'system')
  */
 async function showSimpleErrorNotification(title, message, duration = 6000, category = null) {
-  // Use the global notification system from notification-system.js
+  // Use the global notification system from notification-system.js (loaded in base package)
   if (typeof window.showNotification === 'function') {
-    await window.showNotification(message, 'error', title, duration, category);
+    try {
+      await window.showNotification(message, 'error', title, duration, category);
+    } catch (error) {
+      console.error('Failed to show notification:', error);
+    }
   } else {
-    console.error('showNotification not available');
+    // Fallback to console if notification system not loaded yet
+    console.error(`❌ ${title}: ${message}`);
   }
 }
 
@@ -2490,10 +2965,23 @@ window.createAndShowModal = async function (modalHtml, modalId, options = {}) {
   }
 
   // Try to use ModalManagerV2 first (supports dynamic modals)
-  // ModalManagerV2 כבר מטפל ב-Modal Navigation System
+  // ModalManagerV2 כבר מטפל ב-Modal Navigation System, z-index, backdrop, וכפתור חזור
   if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
     try {
+      // ניקוי backdrops לפני פתיחה
+      if (window.ModalManagerV2._cleanupBootstrapBackdrops) {
+        window.ModalManagerV2._cleanupBootstrapBackdrops();
+      }
+      
       await window.ModalManagerV2.showModal(modalId, 'view');
+      
+      // עדכון z-index דרך ModalZIndexManager
+      if (window.ModalZIndexManager && typeof window.ModalZIndexManager.forceUpdate === 'function') {
+        requestAnimationFrame(() => {
+          window.ModalZIndexManager.forceUpdate(modalElement);
+        });
+      }
+      
       // Return Bootstrap instance for backwards compatibility (if available)
       if (bootstrap?.Modal) {
         return bootstrap.Modal.getInstance(modalElement) || new bootstrap.Modal(modalElement, { backdrop: false });
@@ -2501,11 +2989,14 @@ window.createAndShowModal = async function (modalHtml, modalId, options = {}) {
       return null;
     } catch (error) {
       // Fallback to Bootstrap if ModalManagerV2 fails
-      window.Logger?.warn(`createAndShowModal: ${modalId} not available in ModalManagerV2, using Bootstrap fallback`, { page: 'core-systems' });
+      window.Logger?.warn(`createAndShowModal: ${modalId} not available in ModalManagerV2, using Bootstrap fallback`, { 
+        error: error?.message || error,
+        page: 'core-systems' 
+      });
     }
   }
 
-  // Fallback to Bootstrap modal (original implementation)
+  // Fallback to Bootstrap modal (original implementation) - עם backdrop: false
   // Modal Navigation System - רק למודלים מקוננים (nested modals)
   // בדיקה אם יש stack - רק אז זה מודל מקונן שצריך רישום
   const hasStack = window.ModalNavigationService?.getStack?.()?.length > 0;
@@ -2925,7 +3416,7 @@ function showFinalSuccessModal(successInfo) {
             </h4>
             <div class="d-flex gap-2">
               <button data-button-type="COPY" id="finalSuccessModal-copy-btn" data-text="העתק" title="העתק פרטי הצלחה"></button>
-              <button data-button-type="CLOSE" id="finalSuccessModal-close-btn" data-text="סגור" title="סגור"></button>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="סגור" id="finalSuccessModal-close-btn" title="סגור"></button>
             </div>
           </div>
           <div class="modal-body">
@@ -2962,7 +3453,7 @@ function showFinalSuccessModal(successInfo) {
           </div>
           <div class="modal-footer" style="justify-content: flex-end; direction: rtl;">
             <button data-button-type="COPY" id="finalSuccessModal-footer-copy" data-text="העתק" title="העתק פרטי הצלחה"></button>
-            <button data-button-type="CLOSE" id="finalSuccessModal-footer-close" data-text="סגור" title="סגור"></button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="finalSuccessModal-footer-close" data-text="סגור" title="סגור">סגור</button>
           </div>
         </div>
       </div>
@@ -2990,13 +3481,29 @@ function showFinalSuccessModal(successInfo) {
     });
   });
 
+  // Close buttons - use Bootstrap's data-bs-dismiss="modal" for automatic handling
+  // Also add manual event listeners as fallback
   const closeButtons = modalElement
     ? modalElement.querySelectorAll('#finalSuccessModal-close-btn, #finalSuccessModal-footer-close')
     : [];
   closeButtons.forEach(button => {
-    button.addEventListener('click', () => {
-      if (modalInstance) {
+    // Ensure data-bs-dismiss is set
+    if (!button.hasAttribute('data-bs-dismiss')) {
+      button.setAttribute('data-bs-dismiss', 'modal');
+    }
+    // Add manual event listener as fallback
+    button.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
+        window.ModalManagerV2.hideModal('finalSuccessModal');
+      } else if (modalInstance) {
         modalInstance.hide();
+      } else if (modalElement) {
+        const bsModal = bootstrap.Modal.getInstance(modalElement);
+        if (bsModal) {
+          bsModal.hide();
+        }
       }
     });
   });
@@ -3079,7 +3586,7 @@ function showFinalSuccessModalWithReload(successInfo) {
             </h4>
             <div class="d-flex gap-2">
               <button data-button-type="COPY" id="finalSuccessModalWithReload-copy-btn" data-text="העתק" title="העתק פרטי הצלחה"></button>
-              <button data-button-type="CLOSE" id="finalSuccessModalWithReload-close-btn" data-text="סגור" title="סגור"></button>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="סגור" id="finalSuccessModalWithReload-close-btn" title="סגור"></button>
             </div>
           </div>
           <div class="modal-body">
@@ -3120,7 +3627,7 @@ function showFinalSuccessModalWithReload(successInfo) {
           <div class="modal-footer" style="justify-content: space-between; direction: rtl;">
             <div class="d-flex gap-2">
               <button data-button-type="COPY" id="finalSuccessModalWithReload-footer-copy" data-text="העתק" title="העתק פרטי הצלחה"></button>
-              <button data-button-type="CLOSE" id="finalSuccessModalWithReload-footer-close" data-text="סגור" title="סגור"></button>
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="finalSuccessModalWithReload-footer-close" data-text="סגור" title="סגור">סגור</button>
             </div>
             <button type="button" class="btn btn-primary" id="finalSuccessModal-reload-btn">
               <i class="fas fa-sync-alt"></i> רענן עכשיו
@@ -3154,15 +3661,31 @@ function showFinalSuccessModalWithReload(successInfo) {
     });
   });
 
+  // Close buttons - use Bootstrap's data-bs-dismiss="modal" for automatic handling
+  // Also add manual event listeners as fallback
   const closeButtons = modalElement
     ? modalElement.querySelectorAll(
         '#finalSuccessModalWithReload-close-btn, #finalSuccessModalWithReload-footer-close'
       )
     : [];
   closeButtons.forEach(button => {
-    button.addEventListener('click', () => {
-      if (modalInstance) {
+    // Ensure data-bs-dismiss is set
+    if (!button.hasAttribute('data-bs-dismiss')) {
+      button.setAttribute('data-bs-dismiss', 'modal');
+    }
+    // Add manual event listener as fallback
+    button.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
+        window.ModalManagerV2.hideModal('finalSuccessModalWithReload');
+      } else if (modalInstance) {
         modalInstance.hide();
+      } else if (modalElement) {
+        const bsModal = bootstrap.Modal.getInstance(modalElement);
+        if (bsModal) {
+          bsModal.hide();
+        }
       }
     });
   });
@@ -3174,9 +3697,13 @@ function showFinalSuccessModalWithReload(successInfo) {
       console.log('🔄 User requested reload after cache clearing');
 
       // Close modal first
-      const modalInstance = bootstrap.Modal.getInstance(modal);
-      if (modalInstance) {
-        modalInstance.hide();
+      if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
+        window.ModalManagerV2.hideModal('finalSuccessModalWithReload');
+      } else {
+        const modalInstance = bootstrap?.Modal?.getInstance(modalElement);
+        if (modalInstance) {
+          modalInstance.hide();
+        }
       }
 
       // Wait a moment for modal to close, then reload
@@ -3235,7 +3762,7 @@ async function showCriticalErrorModal(errorInfo, detailedMessage) {
             </h4>
             <div class="d-flex gap-2">
               <button data-button-type="COPY" id="${modalId}-copy-btn" data-text="העתק" title="העתק פרטי שגיאה"></button>
-              <button data-button-type="CLOSE" id="${modalId}-close-btn" data-text="סגור" title="סגור"></button>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="סגור" id="${modalId}-close-btn" title="סגור"></button>
             </div>
           </div>
           <div class="modal-body">
@@ -3273,7 +3800,7 @@ async function showCriticalErrorModal(errorInfo, detailedMessage) {
           </div>
           <div class="modal-footer" style="justify-content: flex-end; direction: rtl;">
             <button data-button-type="COPY" id="${modalId}-copy-details-btn" data-text="העתק" title="העתק פרטי שגיאה"></button>
-            <button data-button-type="CLOSE" id="${modalId}-footer-close" data-text="סגור" title="סגור"></button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="${modalId}-footer-close" data-text="סגור" title="סגור">סגור</button>
           </div>
         </div>
       </div>
@@ -3286,11 +3813,68 @@ async function showCriticalErrorModal(errorInfo, detailedMessage) {
   // Get modal element
   const modal = document.getElementById(modalId);
 
-  // Show modal using simple system (no Bootstrap dependency)
-  modal.style.display = 'block';
-  modal.classList.add('show');
-
-  // Backdrop handled by Bootstrap
+  // Show modal using ModalManagerV2 (with proper z-index and backdrop management)
+  if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
+    // ניקוי backdrops לפני פתיחה
+    if (window.ModalManagerV2._cleanupBootstrapBackdrops) {
+      window.ModalManagerV2._cleanupBootstrapBackdrops();
+    }
+    
+    window.ModalManagerV2.showModal(modalId, 'view').then(() => {
+      // עדכון z-index דרך ModalZIndexManager
+      if (window.ModalZIndexManager && typeof window.ModalZIndexManager.forceUpdate === 'function') {
+        requestAnimationFrame(() => {
+          window.ModalZIndexManager.forceUpdate(modal);
+        });
+      }
+    }).catch(error => {
+      window.Logger?.error('Error showing critical error modal via ModalManagerV2', { error, modalId, page: 'core-systems' });
+      // Fallback to Bootstrap
+      if (bootstrap?.Modal) {
+        // ניקוי backdrops לפני פתיחה
+        if (window.ModalManagerV2?._cleanupBootstrapBackdrops) {
+          window.ModalManagerV2._cleanupBootstrapBackdrops();
+        }
+        const bootstrapModal = new bootstrap.Modal(modal, { backdrop: false });
+        bootstrapModal.show();
+        // ניקוי backdrops אחרי פתיחה
+        if (window.ModalManagerV2?._cleanupBootstrapBackdrops) {
+          setTimeout(() => {
+            window.ModalManagerV2._cleanupBootstrapBackdrops();
+          }, 50);
+        }
+        // עדכון z-index
+        if (window.ModalZIndexManager?.forceUpdate) {
+          setTimeout(() => {
+            window.ModalZIndexManager.forceUpdate(modal);
+          }, 50);
+        }
+      }
+    });
+  } else if (bootstrap?.Modal) {
+    // ניקוי backdrops לפני פתיחה
+    if (window.ModalManagerV2?._cleanupBootstrapBackdrops) {
+      window.ModalManagerV2._cleanupBootstrapBackdrops();
+    }
+    const bootstrapModal = new bootstrap.Modal(modal, { backdrop: false });
+    bootstrapModal.show();
+    // ניקוי backdrops אחרי פתיחה
+    if (window.ModalManagerV2?._cleanupBootstrapBackdrops) {
+      setTimeout(() => {
+        window.ModalManagerV2._cleanupBootstrapBackdrops();
+      }, 50);
+    }
+    // עדכון z-index
+    if (window.ModalZIndexManager?.forceUpdate) {
+      setTimeout(() => {
+        window.ModalZIndexManager.forceUpdate(modal);
+      }, 50);
+    }
+  } else {
+    // Fallback: Show modal using simple system (no Bootstrap dependency)
+    modal.style.display = 'block';
+    modal.classList.add('show');
+  }
 
   // Copy button in header
   const copyButton = modal.querySelector(`#${modalId}-copy-btn`);
@@ -3303,19 +3887,61 @@ async function showCriticalErrorModal(errorInfo, detailedMessage) {
     }
   });
 
-  // Close button in header
+  // Close button in header - use ModalManagerV2 or Bootstrap
   const headerCloseButton = modal.querySelector(`#${modalId}-close-btn`);
   if (headerCloseButton) {
-    headerCloseButton.addEventListener('click', () => {
-      hideModal(modalId);
+    // Ensure data-bs-dismiss is set for Bootstrap
+    if (!headerCloseButton.hasAttribute('data-bs-dismiss')) {
+      headerCloseButton.setAttribute('data-bs-dismiss', 'modal');
+    }
+    // Add manual event listener as fallback
+    headerCloseButton.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      // Use ModalManagerV2 if available, otherwise Bootstrap
+      if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
+        window.ModalManagerV2.hideModal(modalId);
+      } else if (bootstrap?.Modal) {
+        const bsModal = bootstrap.Modal.getInstance(modal);
+        if (bsModal) {
+          bsModal.hide();
+        } else {
+          modal.style.display = 'none';
+          modal.classList.remove('show');
+        }
+      } else {
+        modal.style.display = 'none';
+        modal.classList.remove('show');
+      }
     });
   }
 
-  // Close button in footer
+  // Close button in footer - use ModalManagerV2 or Bootstrap
   const footerCloseBtn = modal.querySelector(`#${modalId}-footer-close`);
   if (footerCloseBtn) {
-    footerCloseBtn.addEventListener('click', () => {
-      hideModal(modalId);
+    // Ensure data-bs-dismiss is set for Bootstrap
+    if (!footerCloseBtn.hasAttribute('data-bs-dismiss')) {
+      footerCloseBtn.setAttribute('data-bs-dismiss', 'modal');
+    }
+    // Add manual event listener as fallback
+    footerCloseBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      // Use ModalManagerV2 if available, otherwise Bootstrap
+      if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
+        window.ModalManagerV2.hideModal(modalId);
+      } else if (bootstrap?.Modal) {
+        const bsModal = bootstrap.Modal.getInstance(modal);
+        if (bsModal) {
+          bsModal.hide();
+        } else {
+          modal.style.display = 'none';
+          modal.classList.remove('show');
+        }
+      } else {
+        modal.style.display = 'none';
+        modal.classList.remove('show');
+      }
     });
   }
 
@@ -3463,24 +4089,103 @@ async function showDetailsModal(title, content, options = {}) {
   // Ensure content is properly rendered as HTML
   const detailsContent = modal.querySelector('.details-content');
   if (detailsContent) {
-    detailsContent.innerHTML = content;
+    detailsContent.textContent = '';
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(content, 'text/html');
+    doc.body.childNodes.forEach(node => {
+      detailsContent.appendChild(node.cloneNode(true));
+    });
   }
 
-  // Show modal using simple system (no Bootstrap dependency)
-  modal.style.display = 'block';
-  modal.classList.add('show');
-  document.body.classList.add('modal-open');
-
-  // Create backdrop
-  const backdrop = document.createElement('div');
-  backdrop.className = 'modal-backdrop fade show';
-  backdrop.id = `${modalId}-backdrop`;
-  document.body.appendChild(backdrop);
+  // Show modal using ModalManagerV2 (with proper z-index and backdrop management)
+  if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
+    // ניקוי backdrops לפני פתיחה
+    if (window.ModalManagerV2._cleanupBootstrapBackdrops) {
+      window.ModalManagerV2._cleanupBootstrapBackdrops();
+    }
+    
+    window.ModalManagerV2.showModal(modalId, 'view').then(() => {
+      // עדכון z-index דרך ModalZIndexManager
+      if (window.ModalZIndexManager && typeof window.ModalZIndexManager.forceUpdate === 'function') {
+        requestAnimationFrame(() => {
+          window.ModalZIndexManager.forceUpdate(modal);
+        });
+      }
+    }).catch(error => {
+      window.Logger?.error('Error showing details modal via ModalManagerV2', { error, modalId, page: 'core-systems' });
+      // Fallback to Bootstrap
+      if (bootstrap?.Modal) {
+        // ניקוי backdrops לפני פתיחה
+        if (window.ModalManagerV2?._cleanupBootstrapBackdrops) {
+          window.ModalManagerV2._cleanupBootstrapBackdrops();
+        }
+        const bootstrapModal = new bootstrap.Modal(modal, { backdrop: false });
+        bootstrapModal.show();
+        // ניקוי backdrops אחרי פתיחה
+        if (window.ModalManagerV2?._cleanupBootstrapBackdrops) {
+          setTimeout(() => {
+            window.ModalManagerV2._cleanupBootstrapBackdrops();
+          }, 50);
+        }
+        // עדכון z-index
+        if (window.ModalZIndexManager?.forceUpdate) {
+          setTimeout(() => {
+            window.ModalZIndexManager.forceUpdate(modal);
+          }, 50);
+        }
+      } else {
+        // Fallback: Show modal using simple system (no Bootstrap dependency)
+        modal.style.display = 'block';
+        modal.classList.add('show');
+        document.body.classList.add('modal-open');
+        
+        // Create backdrop
+        const backdrop = document.createElement('div');
+        backdrop.className = 'modal-backdrop fade show';
+        backdrop.id = `${modalId}-backdrop`;
+        document.body.appendChild(backdrop);
+      }
+    });
+  } else if (bootstrap?.Modal) {
+    // ניקוי backdrops לפני פתיחה
+    if (window.ModalManagerV2?._cleanupBootstrapBackdrops) {
+      window.ModalManagerV2._cleanupBootstrapBackdrops();
+    }
+    const bootstrapModal = new bootstrap.Modal(modal, { backdrop: false });
+    bootstrapModal.show();
+    // ניקוי backdrops אחרי פתיחה
+    if (window.ModalManagerV2?._cleanupBootstrapBackdrops) {
+      setTimeout(() => {
+        window.ModalManagerV2._cleanupBootstrapBackdrops();
+      }, 50);
+    }
+    // עדכון z-index
+    if (window.ModalZIndexManager?.forceUpdate) {
+      setTimeout(() => {
+        window.ModalZIndexManager.forceUpdate(modal);
+      }, 50);
+    }
+  } else {
+    // Fallback: Show modal using simple system (no Bootstrap dependency)
+    modal.style.display = 'block';
+    modal.classList.add('show');
+    document.body.classList.add('modal-open');
+    
+    // Create backdrop
+    const backdrop = document.createElement('div');
+    backdrop.className = 'modal-backdrop fade show';
+    backdrop.id = `${modalId}-backdrop`;
+    document.body.appendChild(backdrop);
+  }
 
   // סגירה בלחיצה על הרקע
   modal.addEventListener('click', e => {
     if (e.target === modal) {
-      hideModal(modalId);
+      if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
+        window.ModalManagerV2.hideModal(modalId);
+      } else {
+        hideModal(modalId);
+      }
     }
   });
 
@@ -3496,8 +4201,15 @@ async function showDetailsModal(title, content, options = {}) {
           navigator.clipboard
             .writeText(codeToCopy)
             .then(() => {
-              if (typeof showNotification === 'function') {
-                showNotification('✅ הקוד הועתק ללוח בהצלחה!', 'success');
+              // Safe check - use window.showNotification from notification-system.js (base package)
+              if (typeof window.showNotification === 'function') {
+                try {
+                  window.showNotification('✅ הקוד הועתק ללוח בהצלחה!', 'success');
+                } catch (error) {
+                  console.log('✅ הקוד הועתק ללוח בהצלחה!');
+                }
+              } else {
+                console.log('✅ הקוד הועתק ללוח בהצלחה!');
               }
             })
             .catch(err => {
@@ -3517,7 +4229,11 @@ async function showDetailsModal(title, content, options = {}) {
   const headerCloseButton = modal.querySelector(`#${modalId}-close-btn`);
   if (headerCloseButton) {
     headerCloseButton.addEventListener('click', () => {
-      hideModal(modalId);
+      if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
+        window.ModalManagerV2.hideModal(modalId);
+      } else {
+        hideModal(modalId);
+      }
     });
   }
 
@@ -3525,7 +4241,11 @@ async function showDetailsModal(title, content, options = {}) {
   const footerCloseBtn = modal.querySelector(`#${modalId}-footer-close`);
   if (footerCloseBtn) {
     footerCloseBtn.addEventListener('click', () => {
-      hideModal(modalId);
+      if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
+        window.ModalManagerV2.hideModal(modalId);
+      } else {
+        hideModal(modalId);
+      }
     });
   }
 
@@ -3535,19 +4255,36 @@ async function showDetailsModal(title, content, options = {}) {
 // Helper function to hide modal
 function hideModal(modalId) {
   const modal = document.getElementById(modalId);
-  const backdrop = document.getElementById(`${modalId}-backdrop`);
-
-  if (modal) {
-    modal.style.display = 'none';
-    modal.classList.remove('show');
-    modal.remove();
+  if (!modal) {
+    return;
   }
+
+  // Try Bootstrap Modal instance first
+  const bsModal = bootstrap?.Modal?.getInstance(modal);
+  if (bsModal) {
+    bsModal.hide();
+    // Remove modal after Bootstrap hides it
+    modal.addEventListener('hidden.bs.modal', () => {
+      modal.remove();
+    }, { once: true });
+    return;
+  }
+
+  // Try ModalManagerV2
+  if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
+    window.ModalManagerV2.hideModal(modalId);
+    return;
+  }
+
+  // Fallback: Manual removal
+  const backdrop = document.getElementById(`${modalId}-backdrop`);
+  modal.style.display = 'none';
+  modal.classList.remove('show');
+  modal.remove();
 
   if (backdrop) {
     backdrop.remove();
   }
-
-  // Backdrop handled by Bootstrap
 }
 
 // Helper function to close all details modals
@@ -3568,12 +4305,12 @@ function closeAllDetailsModals() {
 
 // Helper function to extract text content from HTML
 function extractTextFromHTML(htmlContent) {
-  // Create temporary div to parse HTML
-  const tempDiv = document.createElement('div');
-  tempDiv.innerHTML = htmlContent;
+  // Parse HTML using DOMParser
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(htmlContent, 'text/html');
 
   // Extract text content
-  let textContent = tempDiv.textContent || tempDiv.innerText || '';
+  let textContent = doc.body.textContent || doc.body.innerText || '';
 
   // Clean up the text
   textContent = textContent
@@ -4167,7 +4904,7 @@ window.notificationSystem = {
 
   // NOTIFICATION SYSTEM functions
   // Note: showSuccessNotification, showWarningNotification, showInfoNotification use global functions from notification-system.js
-  showNotification, // Keep local - has complex logic
+  // showNotification removed - use window.showNotification from notification-system.js instead
   showFinalSuccessNotification,
   // showErrorNotification - use global from notification-system.js
   showSimpleErrorNotification,
@@ -4192,17 +4929,19 @@ window.notificationSystem = {
 };
 
 // Global NotificationSystem object for compatibility
+// Note: All notification functions are loaded from notification-system.js (base package)
+// Use safe checks to prevent errors if notification-system.js hasn't loaded yet
 window.NotificationSystem = {
-  show: window.showNotification,
-  showSuccess: window.showSuccessNotification, // From notification-system.js
+  show: typeof window.showNotification === 'function' ? window.showNotification : function() { console.warn('showNotification not available - notification-system.js may not be loaded'); },
+  showSuccess: typeof window.showSuccessNotification === 'function' ? window.showSuccessNotification : function() { console.warn('showSuccessNotification not available'); }, // From notification-system.js
   showFinalSuccess: window.showFinalSuccessNotification,
-  showError: window.showErrorNotification, // From notification-system.js
+  showError: typeof window.showErrorNotification === 'function' ? window.showErrorNotification : function() { console.warn('showErrorNotification not available'); }, // From notification-system.js
   showSimpleError: window.showSimpleErrorNotification,
   showCriticalError: window.showCriticalErrorNotification,
   createCriticalError: window.createCriticalError,
   withCriticalErrorHandling: window.withCriticalErrorHandling,
-  showWarning: window.showWarningNotification, // From notification-system.js
-  showInfo: window.showInfoNotification, // From notification-system.js
+  showWarning: typeof window.showWarningNotification === 'function' ? window.showWarningNotification : function() { console.warn('showWarningNotification not available'); }, // From notification-system.js
+  showInfo: typeof window.showInfoNotification === 'function' ? window.showInfoNotification : function() { console.warn('showInfoNotification not available'); }, // From notification-system.js
   showDetails: window.showDetailsModal,
   shouldShow: window.shouldShowNotification,
   logWithCategory: window.logWithCategory,
@@ -4222,94 +4961,8 @@ window.NotificationSystem = {
   },
 };
 
-// פונקציה להצגת הודעה מפורטת בחלון
-window.showDetailedNotification = async function (
-  title,
-  message,
-  type = 'info',
-  duration = 8000,
-  category = null
-) {
-  try {
-    // יצירת modal עם התוכן המפורט
-    const modalId = `detailed-notification-${Date.now()}`;
-    const modalHtml = `
-      <div class="modal fade" id="${modalId}" tabindex="-1" aria-labelledby="${modalId}Label">
-        <div class="modal-dialog modal-lg">
-          <div class="modal-content">
-            <div class="modal-header bg-${type === 'error' ? 'danger' : type === 'warning' ? 'warning' : type === 'success' ? 'success' : 'info'} text-white">
-              <h5 class="modal-title" id="${modalId}Label">${title}</h5>
-              ${window.createCloseButton ? window.createCloseButton('', 'Close') : '<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>'}
-            </div>
-            <div class="modal-body">
-              <div style="white-space: pre-line; font-family: monospace; font-size: 0.9em;">${message}</div>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">סגור</button>
-              <button type="button" class="btn btn-primary" data-copy-text="${message.replace(/"/g, '&quot;').replace(/'/g, '&#39;')}" id="${modalId}-copy-btn">העתק</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    `;
-
-    // Use the unified helper function to create and show modal without ARIA warnings
-    const modal = window.createAndShowModal(modalHtml, modalId);
-    const modalElement = document.getElementById(modalId);
-
-    // הוספת event listener לכפתור העתקה (למניעת בעיות escape)
-    const copyBtn = document.getElementById(`${modalId}-copy-btn`);
-    if (copyBtn) {
-      copyBtn.addEventListener('click', () => {
-        const textToCopy = copyBtn.getAttribute('data-copy-text') || message;
-        if (typeof window.copyToClipboard === 'function') {
-          window.copyToClipboard(textToCopy, title);
-        } else if (typeof copyToClipboard === 'function') {
-          copyToClipboard(textToCopy, title);
-        } else {
-          // Fallback: use navigator.clipboard directly
-          navigator.clipboard.writeText(textToCopy).then(() => {
-            if (typeof window.showSuccessNotification === 'function') {
-              window.showSuccessNotification('התוכן הועתק ללוח', 'העתקה');
-            }
-          }).catch(err => {
-            console.error('Failed to copy:', err);
-          });
-        }
-      });
-    }
-
-    // הסרת ה-modal אחרי סגירה
-    modalElement.addEventListener('hidden.bs.modal', () => {
-      modalElement.remove();
-    });
-
-    // סגירה אוטומטית אחרי הזמן שצוין
-    if (duration > 0) {
-      setTimeout(() => {
-        if (modalElement && document.contains(modalElement)) {
-          modal.hide();
-        }
-      }, duration);
-    }
-
-    return true;
-  } catch (error) {
-    console.error('❌ Error showing detailed notification:', error);
-    // fallback להודעה רגילה
-    return await window.showNotification(message, type, title, duration, category);
-  }
-};
-
-// Export new helper functions to global scope
-window.closeAllDetailsModals = closeAllDetailsModals;
-window.extractTextFromHTML = extractTextFromHTML;
-window.copyToClipboard = copyToClipboard;
-
-// בדיקת פונקציות בסוף טעינת notification-system.js
-// notification-system.js נטען
-// WARNING FUNCTIONS moved to warning-system.js
-// showDeleteWarning, showConfirmationDialog, showValidationWarning now in warning-system.js
+// REMOVED: showDetailedNotification - use window.showDetailedNotification from notification-system.js
+// The function is now defined in notification-system.js and shows corner notifications (not modals!)
 
 // ===== DYNAMIC LOADING GLOBAL FUNCTIONS =====
 
@@ -4843,11 +5496,6 @@ if (false && typeof window.PAGE_CONFIGS === 'undefined') {
           // Define global functions for button onclick handlers
           console.log('🔧 Defining global functions for External Data Dashboard...');
 
-          window.testProvider = function (providerId) {
-            // console.log('🧪 Testing provider:', providerId);
-            // Implementation for testing specific provider
-          };
-
           window.toggleProvider = function (providerId) {
             // console.log('🔄 Toggling provider:', providerId);
             // Implementation for toggling provider status
@@ -4895,14 +5543,7 @@ if (false && typeof window.PAGE_CONFIGS === 'undefined') {
             }
           };
 
-          window.testAllProviders = function () {
-            console.log('🔔 testAllProviders called from global function');
-            if (window.externalDataDashboard) {
-              window.externalDataDashboard.testAllProviders();
-            } else {
-              console.error('❌ externalDataDashboard not available');
-            }
-          };
+          // testAllProviders removed - Test Provider feature deprecated
 
           window.exportData = function () {
             if (window.externalDataDashboard) {
@@ -5263,6 +5904,7 @@ if (false && typeof window.PAGE_CONFIGS === 'undefined') {
       ],
     },
   };
+} // Close if (false && ...) block that starts on line 5058
 
   // ===== CONFIGURATION HELPER FUNCTIONS =====
 
@@ -5341,4 +5983,4 @@ if (false && typeof window.PAGE_CONFIGS === 'undefined') {
   // window.PAGE_CONFIGS = PAGE_CONFIGS;
   // window.PAGE_CONFIGS.__SOURCE = 'core-systems';
   // window.pageInitializationConfigs = PAGE_CONFIGS;
-}
+})(); // Close IIFE that starts on line 99

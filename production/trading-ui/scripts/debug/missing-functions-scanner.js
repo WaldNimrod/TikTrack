@@ -163,7 +163,13 @@
         if (typeof document !== 'undefined') {
             const reportDiv = document.createElement('div');
             reportDiv.id = 'missing-functions-report';
-            reportDiv.innerHTML = generateReport(report);
+            const reportHTML = generateReport(report);
+            reportDiv.textContent = '';
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(reportHTML, 'text/html');
+            doc.body.childNodes.forEach(node => {
+              reportDiv.appendChild(node.cloneNode(true));
+            });
             reportDiv.style.cssText = 'position: fixed; top: 10px; right: 10px; background: white; border: 2px solid #333; z-index: 10000; max-height: 80vh; overflow-y: auto; max-width: 600px;';
             document.body.appendChild(reportDiv);
         }

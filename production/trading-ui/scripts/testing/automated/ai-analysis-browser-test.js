@@ -97,7 +97,7 @@
       logTest('AIAnalysisData service loaded', hasService, hasService ? 'Service available' : 'Service not found', duration);
       
       if (hasService) {
-        const methods = ['loadTemplates', 'generateAnalysis', 'loadHistory', 'getLLMProviderSettings', 'saveAsNote', 'exportToPDF'];
+        const methods = ['loadTemplates', 'generateAnalysis', 'loadHistory', 'getLLMProviderSettings', 'saveAsNote', 'exportToPDF', 'validateAnalysisRequest', 'validateVariables'];
         methods.forEach(method => {
           const hasMethod = typeof window.AIAnalysisData[method] === 'function';
           logTest(`AIAnalysisData.${method}()`, hasMethod, hasMethod ? 'Method exists' : 'Method not found');
@@ -234,6 +234,45 @@
       logTest('UnifiedCacheManager integration', hasCache, hasCache ? 'UnifiedCacheManager available' : 'UnifiedCacheManager not found');
     } catch (error) {
       logTest('UnifiedCacheManager integration', false, error.message);
+    }
+
+    // Test 6: Validate analysis request (Business Logic integration)
+    try {
+      const start = Date.now();
+      if (window.AIAnalysisData && window.AIAnalysisData.validateAnalysisRequest) {
+        const validationResult = await window.AIAnalysisData.validateAnalysisRequest({
+          template_id: 1,
+          variables: { stock_ticker: 'TSLA', goal: 'Investment' },
+          provider: 'gemini'
+        });
+        const duration = Date.now() - start;
+        const success = typeof validationResult === 'object' && 'is_valid' in validationResult;
+        logTest('Validate analysis request', success, success ? (validationResult.is_valid ? 'Validation passed' : 'Validation failed (expected)') : 'Validation function error', duration);
+      } else {
+        logTest('Validate analysis request', false, 'AIAnalysisData.validateAnalysisRequest not available');
+      }
+    } catch (error) {
+      logTest('Validate analysis request', false, error.message);
+      testResults.errors.push({ test: 'Validate analysis request', error: error.message });
+    }
+
+    // Test 7: Validate variables (Business Logic integration)
+    try {
+      const start = Date.now();
+      if (window.AIAnalysisData && window.AIAnalysisData.validateVariables) {
+        const validationResult = await window.AIAnalysisData.validateVariables({
+          stock_ticker: 'TSLA',
+          goal: 'Investment'
+        });
+        const duration = Date.now() - start;
+        const success = typeof validationResult === 'object' && 'is_valid' in validationResult;
+        logTest('Validate variables', success, success ? (validationResult.is_valid ? 'Variables valid' : 'Variables invalid (expected)') : 'Validation function error', duration);
+      } else {
+        logTest('Validate variables', false, 'AIAnalysisData.validateVariables not available');
+      }
+    } catch (error) {
+      logTest('Validate variables', false, error.message);
+      testResults.errors.push({ test: 'Validate variables', error: error.message });
     }
   }
 
@@ -447,4 +486,5 @@
   console.log('✅ AI Analysis automated test suite loaded');
   console.log('Run: window.runAllAIAnalysisTests()');
 })();
+
 

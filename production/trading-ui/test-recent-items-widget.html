@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>בדיקת Recent Items Widget</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { padding: 2rem; }
+        .debug-section { margin: 2rem 0; padding: 1rem; background: #f8f9fa; border-radius: 8px; }
+        .log-entry { padding: 0.5rem; margin: 0.25rem 0; background: white; border-left: 3px solid #007bff; }
+        .log-error { border-left-color: #dc3545; }
+        .log-warn { border-left-color: #ffc107; }
+        .log-success { border-left-color: #28a745; }
+        pre { background: #f4f4f4; padding: 1rem; border-radius: 4px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>בדיקת Recent Items Widget</h1>
+    
+    <div class="row">
+        <div class="col-md-8">
+            <div id="recentItemsWidgetContainer" class="card">
+                <div class="card-header">
+                    <ul class="nav nav-tabs" id="recentItemsTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="recentItemsTradesTab" data-bs-toggle="tab" data-bs-target="#recentItemsWidgetTradesPane" type="button" role="tab">טריידים אחרונים</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="recentItemsPlansTab" data-bs-toggle="tab" data-bs-target="#recentItemsWidgetPlansPane" type="button" role="tab">תוכניות אחרונות</button>
+                        </li>
+                    </ul>
+                </div>
+                <div class="card-body">
+                    <div class="tab-content">
+                        <!-- Trades Tab -->
+                        <div class="tab-pane fade show active" id="recentItemsWidgetTradesPane" role="tabpanel">
+                            <div id="recentItemsWidgetTradesLoading" class="d-none text-center py-4">
+                                <div class="spinner-border" role="status"></div>
+                                <p class="mt-2 text-muted">טוען טריידים...</p>
+                            </div>
+                            <div id="recentItemsWidgetTradesError" class="d-none alert alert-danger"></div>
+                            <div id="recentItemsWidgetTradesEmpty" class="d-none text-center py-4 text-muted">אין טריידים זמינים</div>
+                            <div id="recentItemsWidgetTradesList"></div>
+                        </div>
+                        <!-- Plans Tab -->
+                        <div class="tab-pane fade" id="recentItemsWidgetPlansPane" role="tabpanel">
+                            <div id="recentItemsWidgetPlansLoading" class="d-none text-center py-4">
+                                <div class="spinner-border" role="status"></div>
+                                <p class="mt-2 text-muted">טוען תוכניות...</p>
+                            </div>
+                            <div id="recentItemsWidgetPlansError" class="d-none alert alert-danger"></div>
+                            <div id="recentItemsWidgetPlansEmpty" class="d-none text-center py-4 text-muted">אין תוכניות זמינות</div>
+                            <div id="recentItemsWidgetPlansList"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="debug-section">
+                <h3>לוגים</h3>
+                <div id="debugLogs"></div>
+                <button class="btn btn-sm btn-secondary mt-2" onclick="clearLogs()">נקה לוגים</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="debug-section mt-4">
+        <h3>נתוני בדיקה</h3>
+        <button class="btn btn-primary" onclick="loadTestData()">טען נתוני בדיקה</button>
+        <button class="btn btn-secondary" onclick="inspectWidget()">בדוק מצב ווידג'ט</button>
+        <pre id="testDataDisplay"></pre>
+    </div>
+
+    <!-- Load all required scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- BASE PACKAGE - Essential for all pages -->
+    <script src="scripts/logger-service.js?v=1.0.0"></script>
+    <script src="scripts/unified-cache-manager.js?v=1.0.0"></script>
+    <script src="scripts/cache-ttl-guard.js?v=1.0.0"></script>
+    <script src="scripts/services/date-utils.js?v=1.0.0"></script>
+    
+    <!-- SERVICES PACKAGE -->
+    <script src="scripts/services/data-collection-service.js?v=1.0.0"></script>
+    <script src="scripts/services/field-renderer-service.js?v=1.0.0"></script>
+    <script src="scripts/services/table-sort-value-adapter.js?v=1.0.0"></script>
+    
+    <!-- WIDGET -->
+    <script src="scripts/widgets/recent-items-widget.js?v=1.0.0"></script>
+    
+    <!-- Add logging interceptor -->
+    <script>
+        const logs = [];
+        const originalConsoleLog = console.log;
+        const originalConsoleError = console.error;
+        const originalConsoleWarn = console.warn;
+
+        function addLog(type, message, data) {
+            logs.push({ type, message, data, time: new Date().toLocaleTimeString() });
+            updateLogDisplay();
+        }
+
+        console.log = function(...args) {
+            originalConsoleLog.apply(console, args);
+            addLog('info', args[0], args.slice(1));
+        };
+
+        console.error = function(...args) {
+            originalConsoleError.apply(console, args);
+            addLog('error', args[0], args.slice(1));
+        };
+
+        console.warn = function(...args) {
+            originalConsoleWarn.apply(console, args);
+            addLog('warn', args[0], args.slice(1));
+        };
+
+        function updateLogDisplay() {
+            const container = document.getElementById('debugLogs');
+            container.innerHTML = logs.slice(-20).reverse().map(log => 
+                `<div class="log-entry log-${log.type}">
+                    <strong>${log.time}</strong> - ${log.message}
+                    ${log.data && log.data.length > 0 ? `<pre>${JSON.stringify(log.data, null, 2)}</pre>` : ''}
+                </div>`
+            ).join('');
+        }
+
+        function clearLogs() {
+            logs.length = 0;
+            updateLogDisplay();
+        }
+
+        function inspectWidget() {
+            const widget = window.RecentItemsWidget;
+            const state = widget?.state;
+            const data = {
+                widgetExists: !!widget,
+                initialized: state?.initialized,
+                tradesCount: state?.trades?.length || 0,
+                tradePlansCount: state?.tradePlans?.length || 0,
+                activeTab: state?.activeTab,
+                trades: state?.trades,
+                tradePlans: state?.tradePlans
+            };
+            document.getElementById('testDataDisplay').textContent = JSON.stringify(data, null, 2);
+            addLog('info', 'Widget State', data);
+        }
+
+        async function loadTestData() {
+            try {
+                // Load trades
+                const tradesRes = await fetch('/api/trades/', { headers: { Accept: 'application/json' } });
+                const tradesData = await tradesRes.json();
+                const trades = Array.isArray(tradesData.data) ? tradesData.data : (Array.isArray(tradesData) ? tradesData : []);
+                
+                // Load trade plans
+                const plansRes = await fetch('/api/trade-plans/', { headers: { Accept: 'application/json' } });
+                const plansData = await plansRes.json();
+                const plans = Array.isArray(plansData.data) ? plansData.data : (Array.isArray(plansData) ? plansData : []);
+
+                addLog('success', 'נתונים נטענו', { trades: trades.length, plans: plans.length });
+
+                if (window.RecentItemsWidget) {
+                    window.RecentItemsWidget.render({
+                        trades: trades.slice(0, 5),
+                        tradePlans: plans.slice(0, 5),
+                        currencySymbol: '$'
+                    });
+                    addLog('success', 'ווידג\'ט עודכן', { trades: trades.length, plans: plans.length });
+                } else {
+                    addLog('error', 'ווידג\'ט לא זמין');
+                }
+            } catch (error) {
+                addLog('error', 'שגיאה בטעינת נתונים', error);
+            }
+        }
+
+        // Wait for scripts to load
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                if (window.RecentItemsWidget) {
+                    window.RecentItemsWidget.init();
+                    addLog('success', 'ווידג\'ט אותחל');
+                } else {
+                    addLog('error', 'ווידג\'ט לא נמצא - בדוק טעינת סקריפטים');
+                }
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
+

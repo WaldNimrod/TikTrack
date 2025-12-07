@@ -106,14 +106,7 @@
     elements.container.style.setProperty('--tag-widget-min-height', `${minHeight}px`);
     elements.container.style.setProperty('--tag-widget-max-height', `${maxHeight}px`);
     
-    window.Logger?.debug?.('TagWidget: Height configuration applied', {
-      minRows,
-      maxRows,
-      rowHeight,
-      minHeight,
-      maxHeight,
-      page: 'tag-widget'
-    });
+    // Height configuration applied
   }
 
   /**
@@ -126,12 +119,11 @@
     }
 
     // Tab buttons
-    elements.cloudTab = elements.container.querySelector('#tagWidgetCloudTab');
-    elements.searchTab = elements.container.querySelector('#tagWidgetSearchTab');
-
-    // Tab panes
-    elements.cloudPane = elements.container.querySelector('#tagWidgetCloudPane');
-    elements.searchPane = elements.container.querySelector('#tagWidgetSearchPane');
+    // Tabs removed - search is now in header
+    // elements.cloudTab = elements.container.querySelector('#tagWidgetCloudTab');
+    // elements.searchTab = elements.container.querySelector('#tagWidgetSearchTab');
+    // elements.cloudPane = elements.container.querySelector('#tagWidgetCloudPane');
+    // elements.searchPane = elements.container.querySelector('#tagWidgetSearchPane');
 
     // Cloud elements
     elements.cloudLoading = elements.container.querySelector('#tagWidgetCloudLoading');
@@ -152,8 +144,13 @@
    * Initialize autocomplete for search input
    */
   function initAutocomplete() {
-    if (!elements.searchInput || !window.AutocompleteService) {
-      window.Logger?.warn?.('TagWidget: AutocompleteService not available or search input not found', { page: 'tag-widget' });
+    if (!elements.searchInput) {
+      window.Logger?.warn?.('TagWidget: Search input not found', { page: 'tag-widget' });
+      return;
+    }
+    if (!window.AutocompleteService) {
+      // AutocompleteService is optional - widget can work without it
+      // AutocompleteService not available (optional feature)
       return;
     }
 
@@ -249,17 +246,8 @@
    * Bind events
    */
   function bindEvents() {
-    // Tab switching (Bootstrap tabs)
-    if (elements.cloudTab) {
-      elements.cloudTab.addEventListener('shown.bs.tab', () => {
-        state.activeTab = 'cloud';
-      });
-    }
-    if (elements.searchTab) {
-      elements.searchTab.addEventListener('shown.bs.tab', () => {
-        state.activeTab = 'search';
-      });
-    }
+    // Tabs removed - search is now always visible in header
+    // No tab switching needed
 
     // Search form submit
     if (elements.searchForm) {
@@ -306,6 +294,31 @@
           
           window.Logger?.info?.('TagWidget: Tag clicked', { tagId, tagName, page: 'tag-widget' });
           applyTagFromCloud(tag);
+        }
+      });
+    }
+    
+    // Event delegation for approve/reject buttons in search results drawer (same as Unified Pending Actions Widget)
+    if (elements.drawerResultsBody) {
+      elements.drawerResultsBody.addEventListener('click', async (event) => {
+        // Handle APPROVE button
+        const approveBtn = event.target.closest('[data-button-type="APPROVE"]');
+        if (approveBtn) {
+          const item = approveBtn.closest('.list-group-item, [data-entity-type]');
+          if (item) {
+            await handleApproveAction(item, event);
+          }
+          return;
+        }
+
+        // Handle REJECT/DISMISS button
+        const rejectBtn = event.target.closest('[data-button-type="REJECT"], [data-button-type="DISMISS"]');
+        if (rejectBtn) {
+          const item = rejectBtn.closest('.list-group-item, [data-entity-type]');
+          if (item) {
+            await handleRejectAction(item, event);
+          }
+          return;
         }
       });
     }
@@ -417,7 +430,7 @@
     const maxUsage = Math.max(...usageValues, 1);
 
     // Clear container first
-    elements.cloudContainer.innerHTML = '';
+    elements.cloudContainer.textContent = '';
     
     if (!Array.isArray(tags) || tags.length === 0) {
       if (elements.cloudEmpty) {
@@ -476,6 +489,9 @@
         window.Logger?.warn?.('TagWidget: Failed to store tag data map', { error, page: 'tag-widget' });
       }
     }
+
+    // Dispatch event to trigger height equalization
+    window.dispatchEvent(new CustomEvent('widgetContentUpdated'));
   }
 
   /**
@@ -622,82 +638,42 @@
   }
 
   /**
-   * Wait for ModalManagerV2 to be available
-   * @param {number} maxWait - Maximum wait time in milliseconds (default: 2000)
-   * @returns {Promise<boolean>} - True if ModalManagerV2 is available, false otherwise
+   * Wait for required services/elements to be available
+   * @param {Object} options - Options object
+   * @param {number} options.maxWait - Maximum wait time in milliseconds (default: 2000)
+   * @param {string} options.type - Type to wait for: 'modalManager' | 'drawer' | 'both'
+   * @returns {Promise<boolean>} - True if all required items are available, false otherwise
    */
-  async function waitForModalManager(maxWait = 2000) {
-    if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
-      return true;
-    }
-
+  async function waitForRequired({ maxWait = 2000, type = 'both' } = {}) {
     const startTime = Date.now();
     const checkInterval = 100;
 
     return new Promise((resolve) => {
-      const checkModalManager = () => {
-        if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
-          window.Logger?.info?.('ModalManagerV2 available after wait', { 
-            waitTime: Date.now() - startTime,
-            page: 'tag-widget' 
-          });
+      const check = () => {
+        const modalManagerReady = (type === 'drawer' || window.ModalManagerV2?.showModal);
+        const drawerReady = (type === 'modalManager' || document.getElementById('tagSearchDrawer'));
+
+        if (modalManagerReady && drawerReady) {
           resolve(true);
           return;
         }
 
         if (Date.now() - startTime >= maxWait) {
-          window.Logger?.warn?.('ModalManagerV2 not available after waiting', { 
+          window.Logger?.warn?.('Required services/elements not available after waiting', { 
             waitTime: maxWait,
+            type,
+            modalManagerReady,
+            drawerReady,
             page: 'tag-widget' 
           });
           resolve(false);
           return;
         }
 
-        setTimeout(checkModalManager, checkInterval);
+        setTimeout(check, checkInterval);
       };
 
-      checkModalManager();
-    });
-  }
-
-  /**
-   * Wait for drawer to be created in DOM
-   * @param {number} maxWait - Maximum wait time in milliseconds (default: 2000)
-   * @returns {Promise<boolean>} - True if drawer exists, false otherwise
-   */
-  async function waitForDrawer(maxWait = 2000) {
-    if (document.getElementById('tagSearchDrawer')) {
-      return true;
-    }
-
-    const startTime = Date.now();
-    const checkInterval = 100;
-
-    return new Promise((resolve) => {
-      const checkDrawer = () => {
-        if (document.getElementById('tagSearchDrawer')) {
-          window.Logger?.info?.('Tag search drawer found after wait', { 
-            waitTime: Date.now() - startTime,
-            page: 'tag-widget' 
-          });
-          resolve(true);
-          return;
-        }
-
-        if (Date.now() - startTime >= maxWait) {
-          window.Logger?.warn?.('Tag search drawer not found after waiting', { 
-            waitTime: maxWait,
-            page: 'tag-widget' 
-          });
-          resolve(false);
-          return;
-        }
-
-        setTimeout(checkDrawer, checkInterval);
-      };
-
-      checkDrawer();
+      check();
     });
   }
 
@@ -705,21 +681,19 @@
    * Open search results drawer
    */
   async function openDrawer({ query, entityType, results, total }) {
-    // Wait for ModalManagerV2 to be available (with retry)
-    const modalManagerReady = await waitForModalManager(3000);
+    // Wait for required services/elements
+    const ready = await waitForRequired({ maxWait: 3000, type: 'both' });
     
-    if (!modalManagerReady) {
-      window.Logger?.error?.('ModalManagerV2 not available, cannot open tag search drawer', { 
+    if (!ready) {
+      window.Logger?.error?.('Required services/elements not available, cannot open tag search drawer', { 
         page: 'tag-widget',
         ModalManagerV2Exists: typeof window.ModalManagerV2 !== 'undefined',
-        hasShowModal: typeof window.ModalManagerV2?.showModal === 'function'
+        hasShowModal: typeof window.ModalManagerV2?.showModal === 'function',
+        drawerExists: !!document.getElementById('tagSearchDrawer')
       });
       window.NotificationSystem?.showError?.('מערכת החלונות לא זמינה. אנא רענן את הדף.');
       return;
     }
-
-    // Wait for drawer to be created (ModalManagerV2.createCRUDModal needs to run first)
-    const drawerReady = await waitForDrawer(2000);
     
     if (!drawerReady) {
       window.Logger?.warn?.('Tag search drawer not found, attempting to initialize...', { 
@@ -1112,11 +1086,11 @@
     
     if (linkedItemsHtml) {
       // Parse the HTML
-      const tempDiv = document.createElement('div');
-      tempDiv.innerHTML = linkedItemsHtml.trim();
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(linkedItemsHtml.trim(), 'text/html');
       
       // Find the section in the generated HTML
-      const linkedItemsSection = tempDiv.querySelector('section.content-section');
+      const linkedItemsSection = doc.body.querySelector('section.content-section');
       if (linkedItemsSection) {
         // Hide the section header (we already have title/subtitle in drawer header)
         const sectionHeader = linkedItemsSection.querySelector('.section-header-with-extra-info');
@@ -1183,12 +1157,7 @@
                 // Update table to show only paginated items
                 if (window.entityDetailsRenderer && typeof window.entityDetailsRenderer.updateLinkedItemsTableBody === 'function') {
                   window.entityDetailsRenderer.updateLinkedItemsTableBody(tableId, paginatedItems);
-                  window.Logger?.debug?.('TagWidget: Updated table with paginated items', {
-                    page: currentPage,
-                    itemsShown: paginatedItems.length,
-                    totalItems: enrichedItems.length,
-                    page: 'tag-widget'
-                  });
+                  // Updated table with paginated items
                 }
               } else {
                 // Fallback: use original items if enrichment not available
@@ -1239,9 +1208,15 @@
 
     const tagCell = document.createElement('td');
     if (window.FieldRendererService?.renderTagBadges) {
-      tagCell.innerHTML = window.FieldRendererService.renderTagBadges([tag], {
+      tagCell.textContent = '';
+      const badgeHTML = window.FieldRendererService.renderTagBadges([tag], {
         showTitle: false,
         includeCategory: false
+      });
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(badgeHTML, 'text/html');
+      doc.body.childNodes.forEach(node => {
+        tagCell.appendChild(node.cloneNode(true));
       });
     } else {
       tagCell.textContent = tag?.name || '-';
@@ -1249,7 +1224,7 @@
     row.appendChild(tagCell);
 
     const dateCell = document.createElement('td');
-    dateCell.innerHTML = formatDate(linked_at);
+    dateCell.textContent = formatDate(linked_at);
     row.appendChild(dateCell);
 
     const actionsCell = document.createElement('td');
@@ -1491,30 +1466,14 @@
       });
 
       if (!cacheElements()) {
-        window.Logger?.warn?.('TagWidget: Container not found, will retry...', { 
+        window.Logger?.warn?.('TagWidget: Container not found', { 
           containerId, 
           page: 'tag-widget',
           containerExists: !!document.getElementById(containerId)
         });
-        // Retry after a short delay if DOM might not be ready
-        setTimeout(() => {
-          if (!state.initialized && cacheElements()) {
-            window.Logger?.info?.('TagWidget: Container found on retry, initializing...', { page: 'tag-widget' });
-            applyHeightConfiguration();
-            bindEvents();
-            ensureDrawerChrome();
-            initAutocomplete();
-            refreshTagCloud().catch((error) => {
-              window.Logger?.error?.('TagWidget: Error during initial refresh (retry)', { error, page: 'tag-widget' });
-            });
-            state.initialized = true;
-          }
-        }, 500);
         return;
       }
 
-      window.Logger?.info?.('TagWidget: Container found, binding events...', { page: 'tag-widget' });
-      
       // Apply height configuration before binding events
       applyHeightConfiguration();
       
@@ -1525,11 +1484,8 @@
       initAutocomplete();
       
       // Set active tab from config
-      if (config.defaultTab === 'search' && elements.searchTab && window.bootstrap?.Tab) {
-        const searchTabInstance = new window.bootstrap.Tab(elements.searchTab);
-        searchTabInstance.show();
-        state.activeTab = 'search';
-      }
+      // Tabs removed - search is now always visible in header
+      // No tab switching needed
 
       window.Logger?.info?.('TagWidget: Starting tag cloud refresh...', { page: 'tag-widget' });
       refreshTagCloud().catch((error) => {
@@ -1554,6 +1510,39 @@
      * Destroy widget and cleanup
      */
     destroy() {
+      if (!state.initialized) {
+        return;
+      }
+      
+      // Remove event listeners by cloning elements
+      if (elements.searchForm) {
+        const newForm = elements.searchForm.cloneNode(true);
+        elements.searchForm.parentNode?.replaceChild(newForm, elements.searchForm);
+      }
+      
+      if (elements.cloudContainer) {
+        const newContainer = elements.cloudContainer.cloneNode(true);
+        elements.cloudContainer.parentNode?.replaceChild(newContainer, elements.cloudContainer);
+      }
+      
+      if (elements.drawerLoadMoreBtn) {
+        const newBtn = elements.drawerLoadMoreBtn.cloneNode(true);
+        elements.drawerLoadMoreBtn.parentNode?.replaceChild(newBtn, elements.drawerLoadMoreBtn);
+      }
+      
+      // Clear state
+      state.initialized = false;
+      state.tagCloudLoading = false;
+      state.searchLoading = false;
+      state.lastQuery = '';
+      state.lastEntityFilter = '';
+      state.lastResults = [];
+      state.lastResultCount = 0;
+      state.metadataCache.clear();
+      state.lastLinkedItems = [];
+      
+      window.Logger?.info?.('TagWidget: Destroyed and cleaned up', { page: 'tag-widget' });
+      
       state.initialized = false;
       state.metadataCache.clear();
       
@@ -1562,7 +1551,46 @@
         window.AutocompleteService.destroy(elements.searchInput);
       }
       
-      // Clear event listeners if needed
+      // Remove event listeners
+      if (elements.searchFilter) {
+        // Clone and replace to remove all event listeners
+        const newFilter = elements.searchFilter.cloneNode(true);
+        elements.searchFilter.parentNode?.replaceChild(newFilter, elements.searchFilter);
+        elements.searchFilter = newFilter;
+      }
+      
+      // Tabs removed - no need to clone
+      
+      if (elements.searchForm) {
+        const newForm = elements.searchForm.cloneNode(true);
+        elements.searchForm.parentNode?.replaceChild(newForm, elements.searchForm);
+        elements.searchForm = newForm;
+      }
+      
+      if (elements.cloudContainer) {
+        const newContainer = elements.cloudContainer.cloneNode(true);
+        elements.cloudContainer.parentNode?.replaceChild(newContainer, elements.cloudContainer);
+        elements.cloudContainer = newContainer;
+      }
+      
+      if (elements.drawerLoadMoreBtn) {
+        const newBtn = elements.drawerLoadMoreBtn.cloneNode(true);
+        elements.drawerLoadMoreBtn.parentNode?.replaceChild(newBtn, elements.drawerLoadMoreBtn);
+        elements.drawerLoadMoreBtn = newBtn;
+      }
+      
+      // Clear state
+      state.tagCloudLoading = false;
+      state.searchLoading = false;
+      state.lastQuery = '';
+      state.lastEntityFilter = '';
+      state.lastResults = [];
+      state.lastResultCount = 0;
+      state.currentLimit = DEFAULT_LIMIT;
+      state.currentPage = 1;
+      state.lastLinkedItems = [];
+      
+      window.Logger?.info?.('TagWidget: Destroyed and cleaned up', { page: 'tag-widget' });
     },
 
     /**
@@ -1583,6 +1611,118 @@
 
     version: '1.0.0'
   };
+
+  /**
+   * Handle APPROVE action - open modal for creation/assignment (same as Unified Pending Actions Widget)
+   */
+  async function handleApproveAction(item, event) {
+    event.preventDefault();
+    event.stopPropagation();
+    
+    window.Logger?.info?.('Handling APPROVE action', { page: 'tag-widget' });
+    
+    const entityType = item.dataset.entityType;
+    const entityId = item.dataset.entityId;
+    
+    if (!entityType || !entityId) {
+      return;
+    }
+    
+    // Handle based on entity type
+    if (entityType === 'execution') {
+      // Handle execution assignment to trade
+      const executionId = Number(entityId);
+      if (executionId && window.ExecutionAssignmentService) {
+        const highlights = await window.ExecutionAssignmentService.getCachedHighlights() || [];
+        const highlight = highlights.find(h => h.execution?.id === executionId);
+        if (highlight && highlight.suggestions && highlight.suggestions.length > 0) {
+          const firstSuggestion = highlight.suggestions[0];
+          const tradeId = firstSuggestion.trade?.id || firstSuggestion.trade_id;
+          if (tradeId && window.acceptSuggestion) {
+            await window.acceptSuggestion(executionId, Number(tradeId));
+            await TagWidget.refreshTagCloud();
+          } else {
+            if (window.ModalManagerV2?.showModal) {
+              await window.ModalManagerV2.showModal('executionsModal', 'edit', { 
+                execution_id: executionId,
+                trade_id: tradeId ? Number(tradeId) : null
+              });
+              await TagWidget.refreshTagCloud();
+            }
+          }
+        } else {
+          if (window.ModalManagerV2?.showModal) {
+            await window.ModalManagerV2.showModal('executionsModal', 'edit', { 
+              execution_id: executionId
+            });
+            await TagWidget.refreshTagCloud();
+          }
+        }
+      }
+    } else if (entityType === 'trade' || entityType === 'trade_plan') {
+      // Handle plan assignment to trade
+      const tradeId = Number(entityId);
+      if (tradeId && window.TradePlanAssignmentService) {
+        const assignments = await window.TradePlanAssignmentService.getCachedAssignments() || [];
+        const assignment = assignments.find(a => (a.trade?.id || a.trade_id) === tradeId);
+        if (assignment && assignment.suggestions && assignment.suggestions.length > 0) {
+          const firstSuggestion = assignment.suggestions[0];
+          const planId = firstSuggestion.plan?.id || firstSuggestion.trade_plan_id;
+          if (planId && window.ModalManagerV2?.showModal) {
+            await window.ModalManagerV2.showModal('tradesModal', 'edit', { 
+              trade_id: tradeId,
+              trade_plan_id: Number(planId)
+            });
+            await TagWidget.refreshTagCloud();
+          }
+        } else {
+          if (window.ModalManagerV2?.showModal) {
+            await window.ModalManagerV2.showModal('tradesModal', 'edit', { 
+              trade_id: tradeId
+            });
+            await TagWidget.refreshTagCloud();
+          }
+        }
+      }
+    }
+  }
+
+  /**
+   * Handle REJECT/DISMISS action - remove item from list (same as Unified Pending Actions Widget)
+   */
+  async function handleRejectAction(item, event) {
+    event.preventDefault();
+    event.stopPropagation();
+    
+    window.Logger?.info?.('Handling REJECT action', { page: 'tag-widget' });
+    
+    const entityType = item.dataset.entityType;
+    const entityId = item.dataset.entityId;
+    
+    if (!entityType || !entityId) {
+      return;
+    }
+    
+    // Handle based on entity type
+    if (entityType === 'execution') {
+      const executionId = entityId;
+      if (executionId && window.ExecutionAssignmentService) {
+        await window.ExecutionAssignmentService.dismissItem(executionId);
+        await TagWidget.refreshTagCloud();
+      }
+    } else if (entityType === 'trade') {
+      const tradeId = entityId;
+      const planId = item.dataset.planId;
+      if (tradeId && window.TradePlanAssignmentService) {
+        if (planId) {
+          await window.TradePlanAssignmentService.dismissItem('assignment', tradeId, planId);
+        } else {
+          await window.TradePlanAssignmentService.dismissItem('creation', tradeId);
+        }
+        await TagWidget.refreshTagCloud();
+      }
+    }
+  }
 
   // Export to global scope
   window.TagWidget = TagWidget;

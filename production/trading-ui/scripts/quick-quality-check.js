@@ -162,7 +162,12 @@ class QuickQualityCheckManager {
             
             // Create modal element
             const modalElement = document.createElement('div');
-            modalElement.innerHTML = modalHtml;
+            modalElement.textContent = '';
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(modalHtml, 'text/html');
+            doc.body.childNodes.forEach(node => {
+              modalElement.appendChild(node.cloneNode(true));
+            });
             modalElement.className = 'modal fade';
             modalElement.id = 'quickQualityCheckModal';
             modalElement.setAttribute('tabindex', '-1');
@@ -172,12 +177,27 @@ class QuickQualityCheckManager {
             // Add to body
             document.body.appendChild(modalElement);
 
-            // Show modal
-            const modal = new bootstrap.Modal(modalElement);
-            modal.show();
+            // Show modal using ModalManagerV2 first, fallback to Bootstrap
+            if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
+                window.ModalManagerV2.showModal('quickQualityCheckModal', 'view').catch(error => {
+                    window.Logger?.error('Error showing quality check modal via ModalManagerV2', { error, modalId: 'quickQualityCheckModal', page: 'quick-quality-check' });
+                    // Fallback to Bootstrap
+                    if (bootstrap?.Modal) {
+                        const modal = new bootstrap.Modal(modalElement);
+                        modal.show();
+                    }
+                });
+            } else if (bootstrap?.Modal) {
+                const modal = new bootstrap.Modal(modalElement);
+                modal.show();
+            }
 
             // Clean up when modal is hidden
             modalElement.addEventListener('hidden.bs.modal', () => {
+                // Try to hide via ModalManagerV2 first
+                if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
+                    window.ModalManagerV2.hideModal('quickQualityCheckModal');
+                }
                 document.body.removeChild(modalElement);
             });
 

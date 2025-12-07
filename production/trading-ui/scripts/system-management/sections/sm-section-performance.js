@@ -129,7 +129,10 @@ class SMPerformanceSection extends SMBaseSection {
       const result = await response.json();
       return result.status === 'success' ? result.data : null;
     } catch (error) {
-      console.warn('⚠️ Failed to fetch system performance:', error);
+      // Backend endpoint may not be available - this is expected in some environments
+      if (window.Logger?.debug) {
+        window.Logger.debug('System performance endpoint not available', { error: error.message }, { page: 'system-management' });
+      }
       return null;
     }
   }
@@ -157,7 +160,12 @@ class SMPerformanceSection extends SMBaseSection {
 
     try {
       const performanceHtml = this.createPerformanceHTML(renderData);
-      this.container.innerHTML = performanceHtml;
+      this.container.textContent = '';
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(performanceHtml, 'text/html');
+      doc.body.childNodes.forEach(node => {
+        this.container.appendChild(node.cloneNode(true));
+      });
       
       console.log('✅ Performance section rendered successfully');
       
@@ -470,7 +478,7 @@ class SMPerformanceSection extends SMBaseSection {
                 <tbody>
                   <tr>
                     <td><strong>זמן פעילות:</strong></td>
-                    <td>${this.getSystemUptime(overview, metrics, performance)}</td>
+                    <td>${this.formatUptime(this.getSystemUptime(overview, metrics, performance))}</td>
                   </tr>
                   <tr>
                     <td><strong>עומס מערכת:</strong></td>
@@ -920,6 +928,57 @@ class SMPerformanceSection extends SMBaseSection {
     
     if (overview && overview.summary && overview.summary.uptime) {
       return overview.summary.uptime;
+    }
+    
+    return null;
+  }
+
+  /**
+   * Format uptime for display
+   * עיצוב זמן פעילות לתצוגה
+   */
+  formatUptime(uptime) {
+    if (!uptime) return 'לא זמין';
+    
+    // If it's already a string, return it
+    if (typeof uptime === 'string') {
+      return uptime;
+    }
+    
+    // If it's a number (seconds), format it
+    if (typeof uptime === 'number') {
+      const days = Math.floor(uptime / 86400);
+      const hours = Math.floor((uptime % 86400) / 3600);
+      const minutes = Math.floor((uptime % 3600) / 60);
+      const seconds = uptime % 60;
+      
+      if (days > 0) {
+        return `${days} ימים, ${hours} שעות`;
+      } else if (hours > 0) {
+        return `${hours} שעות, ${minutes} דקות`;
+      } else if (minutes > 0) {
+        return `${minutes} דקות, ${seconds} שניות`;
+      } else {
+        return `${seconds} שניות`;
+      }
+    }
+    
+    // If it's an object, try to extract meaningful info
+    if (typeof uptime === 'object' && uptime !== null) {
+      if (uptime.days !== undefined || uptime.hours !== undefined) {
+        const d = uptime.days || 0;
+        const h = uptime.hours || 0;
+        const m = uptime.minutes || 0;
+        if (d > 0) {
+          return `${d} ימים, ${h} שעות`;
+        } else if (h > 0) {
+          return `${h} שעות, ${m} דקות`;
+        } else {
+          return `${m} דקות`;
+        }
+      }
+      // Fallback: stringify
+      return JSON.stringify(uptime);
     }
     
     return 'לא זמין';

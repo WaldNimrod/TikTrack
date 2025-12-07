@@ -161,44 +161,9 @@ class IndexPageEnhancements {
      */
     async loadChart(chartId) {
         try {
-            // Check if chart already exists to prevent duplicate loading
-            if (window.ChartSystem && typeof window.ChartSystem.has === 'function') {
-                if (window.ChartSystem.has(chartId)) {
-                    window.Logger.info(`⏭️ Chart ${chartId} already exists, skipping lazy load`, { page: 'index-enhancements' });
-                    return;
-                }
-            } else if (window.homeCharts && window.homeCharts[chartId]) {
-                // Fallback check using homeCharts object
-                window.Logger.info(`⏭️ Chart ${chartId} already exists in homeCharts, skipping lazy load`, { page: 'index-enhancements' });
-                return;
-            }
-            
-            window.Logger.info(`📊 Loading chart: ${chartId}`, { page: 'index-enhancements' });
-            
-            // Add loading indicator
-            this.addChartLoadingIndicator(chartId);
-            
-            // Load chart based on ID
-            switch (chartId) {
-                case 'tradesStatusChart':
-                    await window.createTradesStatusChart();
-                    break;
-                case 'performanceChart':
-                    await window.createPerformanceChart();
-                    break;
-                case 'accountChart':
-                    await window.createAccountChart();
-                    break;
-                case 'mixedChart':
-                    await window.createMixedChart();
-                    break;
-            }
-            
-            // Remove loading indicator
-            this.removeChartLoadingIndicator(chartId);
-            
-            this.stats.chartCount++;
-            window.Logger.info(`✅ Chart ${chartId} loaded successfully`, { page: 'index-enhancements' });
+            // Charts removed - no longer used on index page
+            window.Logger.warn(`⚠️ Chart loading requested but charts are no longer used: ${chartId}`, { page: 'index-enhancements' });
+            return;
         } catch (error) {
             window.Logger.error(`❌ Error loading chart ${chartId}:`, error, { page: 'index-enhancements' });
             this.showChartError(chartId);
@@ -211,14 +176,22 @@ class IndexPageEnhancements {
     addChartLoadingIndicator(chartId) {
         const chartContainer = document.getElementById(chartId);
         if (chartContainer) {
-            chartContainer.innerHTML = `
-                <div class="chart-loading">
-                    <div class="spinner-border text-primary" role="status">
-                        <span class="visually-hidden">טוען גרף...</span>
-                    </div>
-                    <p class="mt-2">טוען גרף...</p>
-                </div>
-            `;
+            chartContainer.textContent = '';
+            const loadingDiv = document.createElement('div');
+            loadingDiv.className = 'chart-loading';
+            const spinner = document.createElement('div');
+            spinner.className = 'spinner-border text-primary';
+            spinner.setAttribute('role', 'status');
+            const spinnerText = document.createElement('span');
+            spinnerText.className = 'visually-hidden';
+            spinnerText.textContent = 'טוען גרף...';
+            spinner.appendChild(spinnerText);
+            loadingDiv.appendChild(spinner);
+            const p = document.createElement('p');
+            p.className = 'mt-2';
+            p.textContent = 'טוען גרף...';
+            loadingDiv.appendChild(p);
+            chartContainer.appendChild(loadingDiv);
         }
     }
     
@@ -241,15 +214,22 @@ class IndexPageEnhancements {
     showChartError(chartId) {
         const chartContainer = document.getElementById(chartId);
         if (chartContainer) {
-            chartContainer.innerHTML = `
-                <div class="chart-error">
-                    <i class="bi bi-exclamation-triangle text-warning"></i>
-                    <p class="mt-2">שגיאה בטעינת הגרף</p>
-                    <button class="btn btn-sm btn-outline-primary" onclick="window.refreshChart('${chartId}')">
-                        נסה שוב
-                    </button>
-                </div>
-            `;
+            chartContainer.textContent = '';
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'chart-error';
+            const icon = document.createElement('i');
+            icon.className = 'bi bi-exclamation-triangle text-warning';
+            errorDiv.appendChild(icon);
+            const p = document.createElement('p');
+            p.className = 'mt-2';
+            p.textContent = 'שגיאה בטעינת הגרף';
+            errorDiv.appendChild(p);
+            const btn = document.createElement('button');
+            btn.className = 'btn btn-sm btn-outline-primary';
+            btn.textContent = 'נסה שוב';
+            btn.onclick = () => window.refreshChart(chartId);
+            errorDiv.appendChild(btn);
+            chartContainer.appendChild(errorDiv);
         }
     }
     
@@ -382,7 +362,10 @@ class IndexPageEnhancements {
             if (actions && !actions.querySelector('.refresh-indicator')) {
                 const refreshButton = document.createElement('button');
                 refreshButton.className = 'btn btn-sm btn-outline-secondary refresh-indicator';
-                refreshButton.innerHTML = '<i class="bi bi-arrow-clockwise"></i>';
+                refreshButton.textContent = '';
+                const icon = document.createElement('i');
+                icon.className = 'bi bi-arrow-clockwise';
+                refreshButton.appendChild(icon);
                 refreshButton.title = 'רענן סקשן';
                 refreshButton.onclick = () => this.refreshSection(header);
                 actions.appendChild(refreshButton);
@@ -621,9 +604,15 @@ class IndexPageEnhancements {
         if (statsContainer) {
             const progressBar = document.createElement('div');
             progressBar.className = 'progress mt-2';
-            progressBar.innerHTML = `
-                <div class="progress-bar" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
-            `;
+            progressBar.textContent = '';
+            const progressBarInner = document.createElement('div');
+            progressBarInner.className = 'progress-bar';
+            progressBarInner.setAttribute('role', 'progressbar');
+            progressBarInner.style.width = '0%';
+            progressBarInner.setAttribute('aria-valuenow', '0');
+            progressBarInner.setAttribute('aria-valuemin', '0');
+            progressBarInner.setAttribute('aria-valuemax', '100');
+            progressBar.appendChild(progressBarInner);
             statsContainer.appendChild(progressBar);
         }
     }
@@ -637,7 +626,10 @@ class IndexPageEnhancements {
             if (!stat.querySelector('.trend-indicator')) {
                 const indicator = document.createElement('span');
                 indicator.className = 'trend-indicator ms-2';
-                indicator.innerHTML = '<i class="bi bi-arrow-up text-success"></i>';
+                indicator.textContent = '';
+                const icon = document.createElement('i');
+                icon.className = 'bi bi-arrow-up text-success';
+                indicator.appendChild(icon);
                 stat.appendChild(indicator);
             }
         });

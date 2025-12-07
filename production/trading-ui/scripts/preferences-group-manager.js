@@ -104,7 +104,8 @@ class PreferencesGroupManager {
           'סווינג': 'swing',
           'השקעה': 'investment',
           'Investment': 'investment',
-          'פסיבי': 'passive',
+          'פאסיבי': 'passive',
+          'פסיבי': 'passive', // Support legacy value
           'Passive': 'passive',
           'הכל': 'all',
           'הכול': 'all',

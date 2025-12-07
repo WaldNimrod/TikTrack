@@ -164,7 +164,14 @@ function showLoadingState(tableType) {
   if (tableContainer) {
     const tbody = tableContainer.querySelector('tbody');
     if (tbody) {
-      tbody.innerHTML = '<tr><td colspan="100" class="text-center text-muted">Loading data...</td></tr>';
+      tbody.textContent = '';
+      const row = document.createElement('tr');
+      const cell = document.createElement('td');
+      cell.colSpan = 100;
+      cell.className = 'text-center text-muted';
+      cell.textContent = 'Loading data...';
+      row.appendChild(cell);
+      tbody.appendChild(row);
     }
   }
 }
@@ -180,7 +187,15 @@ function showErrorState(tableType, errorMessage) {
   if (tableContainer) {
     const tbody = tableContainer.querySelector('tbody');
     if (tbody) {
-      tbody.innerHTML = `<tr><td colspan="100" class="text-center text-danger">Error: ${errorMessage}</td></tr>`;
+      tbody.textContent = '';
+        // Convert HTML string to DOM elements safely
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(`<tr><td colspan="100" class="text-center text-danger">Error: ${errorMessage}</td></tr>`, 'text/html');
+        const fragment = document.createDocumentFragment();
+        Array.from(doc.body.childNodes).forEach(node => {
+            fragment.appendChild(node.cloneNode(true));
+        });
+        tbody.appendChild(fragment);
     }
   }
 }
@@ -223,12 +238,28 @@ function updateTableDisplay(data, tableType, containerId) {
   const thead = table.querySelector('thead');
   if (thead && data.length > 0) {
     const headers = createTableHeaders(data);
-    thead.innerHTML = headers;
+    thead.textContent = '';
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(`<table><thead>${headers}</thead></table>`, 'text/html');
+    const tempThead = doc.body.querySelector('thead');
+    if (tempThead) {
+        Array.from(tempThead.children).forEach(child => {
+            thead.appendChild(child.cloneNode(true));
+        });
+    }
   }
 
   // Create table rows
   const rows = createTableRows(data);
-  tbody.innerHTML = rows;
+  tbody.textContent = '';
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(`<table><tbody>${rows}</tbody></table>`, 'text/html');
+  const tempTbody = doc.body.querySelector('tbody');
+  if (tempTbody) {
+      Array.from(tempTbody.children).forEach(child => {
+          tbody.appendChild(child.cloneNode(true));
+      });
+  }
 
   // Update table count
   // Count indicator handled by updateTableInfo()

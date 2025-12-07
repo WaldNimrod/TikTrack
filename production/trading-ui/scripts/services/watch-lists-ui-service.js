@@ -131,9 +131,18 @@
          * @param {Array} data - Data to render
          */
         renderTableView(data) {
-            // Table view is handled by UnifiedTableSystem
-            // This function is a placeholder for future customizations
-            window.Logger?.debug?.('📊 Table view rendered', { ...PAGE_LOG_CONTEXT, itemCount: data?.length || 0 });
+            window.Logger?.debug?.('📊 WatchListsUIService.renderTableView called', { ...PAGE_LOG_CONTEXT, itemCount: data?.length || 0 });
+            
+            // Call the actual table update function from WatchListsPage
+            if (window.WatchListsPage?.updateWatchListItemsTable) {
+                window.Logger?.debug?.('Calling WatchListsPage.updateWatchListItemsTable', { ...PAGE_LOG_CONTEXT });
+                // Call async function properly
+                Promise.resolve(window.WatchListsPage.updateWatchListItemsTable(data || [])).catch(error => {
+                    window.Logger?.error?.('Error in updateWatchListItemsTable', { ...PAGE_LOG_CONTEXT, error });
+                });
+            } else {
+                window.Logger?.warn?.('⚠️ WatchListsPage.updateWatchListItemsTable not available', { ...PAGE_LOG_CONTEXT });
+            }
         }
 
         /**
@@ -141,9 +150,15 @@
          * @param {Array} data - Data to render
          */
         renderCardsView(data) {
-            // Cards view rendering logic
-            // This is handled by the page script, this is a placeholder
-            window.Logger?.debug?.('🃏 Cards view rendered', { ...PAGE_LOG_CONTEXT, itemCount: data?.length || 0 });
+            window.Logger?.debug?.('🃏 WatchListsUIService.renderCardsView called', { ...PAGE_LOG_CONTEXT, itemCount: data?.length || 0 });
+            
+            // Call the actual rendering function from WatchListsPage
+            if (window.WatchListsPage?.renderCardsView) {
+                window.Logger?.debug?.('Calling WatchListsPage.renderCardsView', { ...PAGE_LOG_CONTEXT });
+                window.WatchListsPage.renderCardsView(data || []);
+            } else {
+                window.Logger?.warn?.('⚠️ WatchListsPage.renderCardsView not available', { ...PAGE_LOG_CONTEXT });
+            }
         }
 
         /**
@@ -151,9 +166,15 @@
          * @param {Array} data - Data to render
          */
         renderCompactView(data) {
-            // Compact view rendering logic
-            // This is handled by the page script, this is a placeholder
-            window.Logger?.debug?.('📋 Compact view rendered', { ...PAGE_LOG_CONTEXT, itemCount: data?.length || 0 });
+            window.Logger?.debug?.('📋 WatchListsUIService.renderCompactView called', { ...PAGE_LOG_CONTEXT, itemCount: data?.length || 0 });
+            
+            // Call the actual rendering function from WatchListsPage
+            if (window.WatchListsPage?.renderCompactView) {
+                window.Logger?.debug?.('Calling WatchListsPage.renderCompactView', { ...PAGE_LOG_CONTEXT });
+                window.WatchListsPage.renderCompactView(data || []);
+            } else {
+                window.Logger?.warn?.('⚠️ WatchListsPage.renderCompactView not available', { ...PAGE_LOG_CONTEXT });
+            }
         }
 
         /**
@@ -197,7 +218,12 @@
                                 class: 'icon',
                                 style: `color: ${color}`
                             });
-                            flagBtn.innerHTML = iconHTML;
+                            flagBtn.textContent = '';
+                            const parser = new DOMParser();
+                            const doc = parser.parseFromString(iconHTML, 'text/html');
+                            doc.body.childNodes.forEach(node => {
+                                flagBtn.appendChild(node.cloneNode(true));
+                            });
                         }
                     }
                 }
@@ -235,7 +261,12 @@
                                 alt: 'flag',
                                 class: 'icon text-muted'
                             });
-                            flagBtn.innerHTML = iconHTML;
+                            flagBtn.textContent = '';
+                            const parser = new DOMParser();
+                            const doc = parser.parseFromString(iconHTML, 'text/html');
+                            doc.body.childNodes.forEach(node => {
+                                flagBtn.appendChild(node.cloneNode(true));
+                            });
                         }
                     }
                 }
@@ -323,6 +354,9 @@
     window.Logger?.info?.('✅ WatchListsUIService loaded successfully', PAGE_LOG_CONTEXT);
 
 })();
+
+
+
 
 
 

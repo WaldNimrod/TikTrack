@@ -341,10 +341,28 @@ class EntityDetailsRenderer {
         if (!tickerColor && typeof window.getEntityColor === 'function') {
             tickerColor = window.getEntityColor('ticker') || '';
         }
+        
+        // 🔍 DEBUG: Log tickerData to see what we're receiving
+        if (window.Logger) {
+            window.Logger.debug('🔍 [renderMarketData] Ticker data received:', {
+                hasVolume: 'volume' in tickerData,
+                volume: tickerData.volume,
+                volumeType: typeof tickerData.volume,
+                hasMarketCap: 'market_cap' in tickerData,
+                marketCap: tickerData.market_cap,
+                marketCapType: typeof tickerData.market_cap,
+                allKeys: Object.keys(tickerData).filter(k => k.includes('volume') || k.includes('market') || k.includes('cap')),
+                page: 'entity-details-renderer'
+            });
+        }
+        
         const price = tickerData.current_price || tickerData.price || 0;
         const change = tickerData.daily_change || tickerData.change_amount || 0;
         const changePercent = tickerData.daily_change_percent || tickerData.change_percent || 0;
-        const volume = tickerData.volume || 0;
+        // Volume: check explicitly for null/undefined, 0 is a valid value
+        const volume = (tickerData.volume !== undefined && tickerData.volume !== null) ? tickerData.volume : null;
+        // Market cap: check explicitly for null/undefined
+        const marketCap = (tickerData.market_cap !== undefined && tickerData.market_cap !== null) ? tickerData.market_cap : null;
         const currencySymbol = tickerData.currency_symbol || (tickerData.currency && tickerData.currency.symbol) || '$';
         const updatedAt = tickerData.yahoo_updated_at || tickerData.updated_at || null;
         const dataSource = tickerData.data_source || null;
@@ -413,8 +431,19 @@ class EntityDetailsRenderer {
         const changeIcon = change >= 0 ? '↗' : '↘';
         const changeSign = change >= 0 ? '+' : '';
         
-        // פורמט נפח
-        const formattedVolume = volume > 0 ? volume.toLocaleString('he-IL') : 'N/A';
+        // פורמט נפח - שימוש ב-renderVolume אם זמין, אחרת פורמט ידני
+        let formattedVolume = 'N/A';
+        if (volume !== null && volume !== undefined && !isNaN(volume) && Number.isFinite(volume)) {
+            if (volume === 0) {
+                formattedVolume = '0';
+            } else if (typeof window.renderVolume === 'function') {
+                formattedVolume = window.renderVolume(volume, true);
+            } else if (window.FieldRendererService && typeof window.FieldRendererService.renderVolume === 'function') {
+                formattedVolume = window.FieldRendererService.renderVolume(volume, true);
+            } else {
+                formattedVolume = volume.toLocaleString('he-IL');
+            }
+        }
         
         // פורמט תאריך עדכון
         let updatedAtDisplay = '';
@@ -444,7 +473,7 @@ class EntityDetailsRenderer {
             }
         }
         
-        return `
+        const html = `
             <div class="market-data-container pb-2 mb-3 border-bottom">
                 <div class="d-flex align-items-center justify-content-center gap-3 flex-wrap">
                     <div class="fw-bold fs-5" style="direction: ltr;">
@@ -458,6 +487,11 @@ class EntityDetailsRenderer {
                     <div class="text-muted small">
                         נפח: ${formattedVolume}
                     </div>
+                    ${marketCap !== null && marketCap !== undefined ? `
+                    <div class="text-muted small" id="market-cap-display">
+                        שווי שוק: ${this._formatMarketCap(marketCap, currencySymbol)}
+                    </div>
+                    ` : ''}
                     ${updatedAtDisplay ? `
                     <div class="text-muted small">
                         עודכן: ${updatedAtDisplay}
@@ -481,6 +515,70 @@ class EntityDetailsRenderer {
                 ` : ''}
             </div>
         `;
+        
+        // Apply warning color if market cap is below threshold
+        if (marketCap !== null && marketCap !== undefined) {
+            // Load preference asynchronously and apply warning
+            this._applyMarketCapWarning(marketCap, currencySymbol);
+        }
+        
+        return html;
+    }
+    
+    /**
+     * Format market cap value with currency symbol
+     * @param {number} marketCap - Market cap value
+     * @param {string} currencySymbol - Currency symbol
+     * @returns {string} Formatted market cap string
+     * @private
+     */
+    _formatMarketCap(marketCap, currencySymbol = '$') {
+        if (marketCap === null || marketCap === undefined || isNaN(marketCap)) {
+            return 'N/A';
+        }
+        
+        // Format: $1.5B, $500M, etc.
+        if (marketCap >= 1000000000) {
+            return `${currencySymbol}${(marketCap / 1000000000).toFixed(2)}B`;
+        } else if (marketCap >= 1000000) {
+            return `${currencySymbol}${(marketCap / 1000000).toFixed(2)}M`;
+        } else if (marketCap >= 1000) {
+            return `${currencySymbol}${(marketCap / 1000).toFixed(2)}K`;
+        } else {
+            return `${currencySymbol}${marketCap.toFixed(2)}`;
+        }
+    }
+    
+    /**
+     * Apply warning color to market cap display if below threshold
+     * @param {number} marketCap - Market cap value
+     * @param {string} currencySymbol - Currency symbol
+     * @private
+     */
+    async _applyMarketCapWarning(marketCap, currencySymbol) {
+        try {
+            // Get threshold from preferences
+            let threshold = 1000000000; // Default: 1 billion
+            if (typeof window.getCurrentPreference === 'function') {
+                threshold = await window.getCurrentPreference('market_cap_warning_threshold') || 1000000000;
+            } else if (window.PreferencesCore && typeof window.PreferencesCore.getPreference === 'function') {
+                threshold = await window.PreferencesCore.getPreference('market_cap_warning_threshold') || 1000000000;
+            } else if (window.currentPreferences && window.currentPreferences.market_cap_warning_threshold) {
+                threshold = parseFloat(window.currentPreferences.market_cap_warning_threshold) || 1000000000;
+            }
+            
+            // Apply warning color if market cap is below threshold
+            const marketCapDisplay = document.getElementById('market-cap-display');
+            if (marketCapDisplay && marketCap < threshold) {
+                marketCapDisplay.classList.add('text-warning', 'fw-bold');
+                marketCapDisplay.setAttribute('title', `שווי שוק נמוך מהסף (${this._formatMarketCap(threshold, currencySymbol)})`);
+            }
+        } catch (e) {
+            // Silently fail if preference loading fails
+            if (window.Logger) {
+                window.Logger.debug('Failed to load market cap warning threshold', { page: 'entity-details-renderer', error: e });
+            }
+        }
     }
 
     // REMOVED: Old renderTradeSpecific() - replaced by enhanced version below (line 1151)
@@ -989,6 +1087,11 @@ class EntityDetailsRenderer {
                 <div class="mb-3 d-flex align-items-center">
                     <label class="form-label fw-bold me-2 mb-0" style="min-width: 120px;">תאריך יצירה:</label>
                     <span class="text-muted">${createdAt}</span>
+                </div>
+                
+                <div class="mb-3 d-flex align-items-center">
+                    <label class="form-label fw-bold me-2 mb-0" style="min-width: 120px;">מזהה:</label>
+                    <span class="text-muted">${tickerData.id || '-'}</span>
                 </div>
                 
                 ${providerSymbolsHtml}
@@ -1747,8 +1850,9 @@ class EntityDetailsRenderer {
             }
         }
 
-        const statusDisplay = FieldRenderer?.renderStatus
-            ? FieldRenderer.renderStatus(tradePlanData.status, 'trade_plan')
+        // Use FieldRendererService directly (always available via BASE package)
+        const statusDisplay = window.FieldRendererService?.renderStatus
+            ? window.FieldRendererService.renderStatus(tradePlanData.status, 'trade_plan')
             : (tradePlanData.status || 'לא זמין');
 
         return `
@@ -2029,7 +2133,14 @@ class EntityDetailsRenderer {
                 }
 
             if (!Array.isArray(data) || data.length === 0) {
-                    tableBody.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-3">אין ביצועים להצגה</td></tr>';
+                    tableBody.textContent = '';
+                    const emptyRow = document.createElement('tr');
+                    const emptyCell = document.createElement('td');
+                    emptyCell.colSpan = 6;
+                    emptyCell.className = 'text-center text-muted py-3';
+                    emptyCell.textContent = 'אין ביצועים להצגה';
+                    emptyRow.appendChild(emptyCell);
+                    tableBody.appendChild(emptyRow);
                     return;
                 }
 
@@ -2070,7 +2181,16 @@ class EntityDetailsRenderer {
                     `;
                 }).join('');
 
-            tableBody.innerHTML = rows;
+            // Insert rows using DOMParser
+            tableBody.textContent = '';
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(`<table><tbody>${rows}</tbody></table>`, 'text/html');
+            const tempTbody = doc.body.querySelector('tbody');
+            if (tempTbody) {
+              Array.from(tempTbody.children).forEach(row => {
+                tableBody.appendChild(row.cloneNode(true));
+              });
+            }
         };
 
         const executionRowsHtml = normalizedExecutions.length
@@ -2627,7 +2747,16 @@ class EntityDetailsRenderer {
             }
 
             setTimeout(() => {
-                window.ButtonSystem.initializeButtons();
+                // Initialize buttons if ButtonSystem is available
+                if (window.initializeButtons && typeof window.initializeButtons === 'function') {
+                    window.initializeButtons();
+                } else if (window.ButtonSystem && typeof window.ButtonSystem.initializeButtons === 'function') {
+                    window.ButtonSystem.initializeButtons();
+                } else {
+                    if (window.Logger) {
+                        window.Logger.debug('Button system not available for button initialization', { tableId, page: 'entity-details-renderer' });
+                    }
+                }
             }, 100);
         
             console.log('🔍 [renderLinkedItems] Returning HTML', { 
@@ -2806,18 +2935,44 @@ class EntityDetailsRenderer {
             // Create linked badge with ID for alerts and notes
             let linkedBadge;
             if (entityType === 'alert' || entityType === 'note') {
-                // Add ID below entity type
+                // Use renderLinkedEntity to get icon, then add ID below
+                const baseBadge = window.FieldRendererService.renderLinkedEntity(
+                    item.type,
+                    item.id,
+                    cleanName,
+                    {
+                        renderMode: 'linked-items-table',
+                        status: item.status
+                    }
+                );
+                
+                // Extract icon and label from baseBadge, then add ID
                 const escapedLabel = this._escapeHtml(entityLabel);
                 const escapedName = this._escapeHtml(cleanName);
                 const escapedId = this._escapeHtml(`#${itemId}`);
                 
-                linkedBadge = `
-                    <div class="linked-items-table-link d-flex flex-column align-items-start gap-1">
-                        <span class="linked-items-table-label fw-semibold text-body">${escapedLabel}</span>
-                        <span class="linked-items-table-name text-muted small">${escapedId}</span>
-                        <span class="linked-items-table-name text-muted small">${escapedName}</span>
-                    </div>
-                `;
+                // If baseBadge contains icon, use it; otherwise create simple structure
+                if (baseBadge && baseBadge.includes('<img') || baseBadge.includes('<svg')) {
+                    linkedBadge = `
+                        <div class="linked-items-table-link d-flex flex-column align-items-start gap-1">
+                            ${baseBadge}
+                            <span class="linked-items-table-name text-muted small">${escapedId}</span>
+                        </div>
+                    `;
+                } else {
+                    // Fallback: create structure with icon
+                    const iconPath = entityType === 'alert' ? '/trading-ui/images/icons/entities/alerts.svg' : '/trading-ui/images/icons/entities/notes.svg';
+                    linkedBadge = `
+                        <div class="linked-items-table-link d-flex align-items-center gap-2">
+                            <img src="${iconPath}" width="20" height="20" alt="${escapedLabel}" class="linked-items-table-icon">
+                            <div class="d-flex flex-column align-items-start gap-1">
+                                <span class="linked-items-table-label fw-semibold text-body">${escapedLabel}</span>
+                                <span class="linked-items-table-name text-muted small">${escapedId}</span>
+                                <span class="linked-items-table-name text-muted small">${escapedName}</span>
+                            </div>
+                        </div>
+                    `;
+                }
             } else {
                 // Use standard renderLinkedEntity for other types
                 linkedBadge = window.FieldRendererService.renderLinkedEntity(
@@ -4994,7 +5149,7 @@ class EntityDetailsRenderer {
         // אם אין נתונים - ננקה את הטבלה (זה תקין אחרי מחיקה)
         if (sortedData.length === 0) {
             console.log('ℹ️ [updateLinkedItemsTableBody] Empty sorted data - clearing table (this is normal after deletion)');
-            tbody.innerHTML = '';
+            tbody.textContent = '';
             
             // Initialize tooltips and buttons even for empty table
             this._initializeFilterTooltips(tableId);
@@ -5015,7 +5170,7 @@ class EntityDetailsRenderer {
         });
         
         // ניקוי הטבלה
-        tbody.innerHTML = '';
+        tbody.textContent = '';
         
         console.log('🔍 [updateLinkedItemsTableBody] After clearing tbody', {
             tbodyRowsAfter: tbody.querySelectorAll('tr').length,
@@ -5146,24 +5301,39 @@ class EntityDetailsRenderer {
             // Wait for DOM to be ready, then use button system to initialize tooltips
             requestAnimationFrame(() => {
                 setTimeout(() => {
-                    console.log(`🔍 [Tooltip Debug] Calling initializeTooltips on container`);
-                    // Use button system to initialize tooltips for buttons with data-tooltip
-                    // Filter buttons don't have data-button-type, so we only initialize tooltips
-                    window.advancedButtonSystem.initializeTooltips(filterContainer);
-                    
-                    // Verify tooltips were initialized
-                    setTimeout(() => {
-                        const initializedCount = Array.from(buttonsWithTooltip).filter(btn => 
-                            bootstrap?.Tooltip?.getInstance(btn)
-                        ).length;
-                        console.log(`🔍 [Tooltip Debug] Tooltips initialized: ${initializedCount}/${buttonsWithTooltip.length}`);
-                    }, 200);
+                    // Double-check ButtonSystem is still available (might load asynchronously)
+                    if (window.advancedButtonSystem && typeof window.advancedButtonSystem.initializeTooltips === 'function') {
+                        window.advancedButtonSystem.initializeTooltips(filterContainer);
+                        
+                        // Verify tooltips were initialized
+                        setTimeout(() => {
+                            const initializedCount = Array.from(buttonsWithTooltip).filter(btn => 
+                                bootstrap?.Tooltip?.getInstance(btn)
+                            ).length;
+                            if (window.Logger && window.Logger.debug) {
+                                window.Logger.debug('Tooltips initialized', { 
+                                    initializedCount, 
+                                    totalButtons: buttonsWithTooltip.length,
+                                    tableId,
+                                    page: 'entity-details-renderer' 
+                                });
+                            }
+                        }, 200);
+                    } else {
+                        if (window.Logger) {
+                            window.Logger.debug('Button system not available for tooltip initialization (delayed check)', { 
+                                tableId, 
+                                page: 'entity-details-renderer' 
+                            });
+                        }
+                    }
                 }, 100);
             });
         } else {
-            console.warn(`🔍 [Tooltip Debug] Button system not available - tooltips will not be initialized`);
-            if (window.Logger) {
-                window.Logger.warn('Button system not available for tooltip initialization', { 
+            // ButtonSystem not available - this is expected if it hasn't loaded yet
+            // Tooltips will be initialized when ButtonSystem becomes available
+            if (window.Logger && window.Logger.debug) {
+                window.Logger.debug('Button system not available for tooltip initialization', { 
                     tableId, 
                     page: 'entity-details-renderer' 
                 });

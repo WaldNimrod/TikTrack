@@ -27,7 +27,9 @@ if (window.Logger) {
 }
 
 // ===== FilterManager Class =====
-class FilterManager {
+// Prevent duplicate declaration
+if (typeof window.FilterManager === 'undefined') {
+window.FilterManager = class FilterManager {
   constructor() {
     this.currentFilters = {
       search: '',
@@ -599,7 +601,10 @@ class FilterManager {
       const accountItem = document.createElement('div');
       accountItem.className = 'account-filter-item';
       accountItem.setAttribute('data-value', account.id.toString());
-      accountItem.innerHTML = `<span class="option-text">${account.name || account.id}</span>`;
+      const span = document.createElement('span');
+      span.className = 'option-text';
+      span.textContent = account.name || account.id;
+      accountItem.appendChild(span);
       accountMenu.appendChild(accountItem);
     });
 
@@ -940,7 +945,8 @@ class MenuManager {
       }
     });
   }
-}
+};
+} // End of if (typeof window.FilterManager === 'undefined')
 
 // ===== HeaderSystem Class =====
 class HeaderSystem {
@@ -989,7 +995,12 @@ class HeaderSystem {
 
     const existingHeader = document.getElementById('unified-header');
     const headerHTML = HeaderSystem.getHeaderHTML();
-    existingHeader.innerHTML = headerHTML;
+    existingHeader.textContent = '';
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(headerHTML, 'text/html');
+    doc.body.childNodes.forEach(node => {
+        existingHeader.appendChild(node.cloneNode(true));
+    });
   }
 
   static getHeaderHTML() {
@@ -1015,10 +1026,14 @@ class HeaderSystem {
                         <span class="nav-text">תכנון</span>
                       </a>
                     </li>
-                    <li class="tiktrack-nav-item">
-                      <a href="/trades" class="tiktrack-nav-link" data-page="trades">
+                    <li class="tiktrack-nav-item dropdown">
+                      <a href="/trades" class="tiktrack-nav-link tiktrack-dropdown-toggle" data-page="trades">
                         <span class="nav-text">מעקב</span>
+                        <span class="tiktrack-dropdown-arrow">▼</span>
                       </a>
+                      <ul class="tiktrack-dropdown-menu">
+                        <li><a class="tiktrack-dropdown-item" href="/watch-lists">רשימות צפייה</a></li>
+                      </ul>
                     </li>
                     <li class="tiktrack-nav-item">
                       <a href="/research" class="tiktrack-nav-link" data-page="research">
@@ -1200,8 +1215,8 @@ class HeaderSystem {
                   <div class="type-filter-item" data-value="השקעה">
                     <span class="option-text">השקעה</span>
                   </div>
-                  <div class="type-filter-item" data-value="פסיבי">
-                    <span class="option-text">פסיבי</span>
+                  <div class="type-filter-item" data-value="פאסיבי">
+                    <span class="option-text">פאסיבי</span>
                   </div>
                 </div>
               </div>

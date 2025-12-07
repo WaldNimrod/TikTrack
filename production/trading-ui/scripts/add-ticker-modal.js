@@ -40,6 +40,16 @@
     let currentListId = null;
     let selectedTickerId = null;
     let searchResults = [];
+    let allTickersCache = null; // Cache for all tickers to avoid repeated API calls
+    
+    // Expose currentListId for external access
+    window.AddTickerModal = window.AddTickerModal || {};
+    Object.defineProperty(window.AddTickerModal, 'currentListId', {
+        get: () => currentListId,
+        set: (value) => {
+            currentListId = value;
+        }
+    });
 
     // ===== MODAL MANAGEMENT =====
 
@@ -54,7 +64,7 @@
         if (searchInput) {
             searchInput.addEventListener('input', (e) => {
                 const query = e.target.value.trim();
-                if (query.length >= 2) {
+                if (query.length >= 1) {
                     searchTicker(query);
                 } else {
                     clearSearchResults();
@@ -65,7 +75,7 @@
                 if (e.key === 'Enter') {
                     e.preventDefault();
                     const query = e.target.value.trim();
-                    if (query.length >= 2) {
+                    if (query.length >= 1) {
                         searchTicker(query);
                     }
                 }
@@ -75,7 +85,7 @@
         if (searchBtn) {
             searchBtn.addEventListener('click', () => {
                 const query = searchInput?.value.trim() || '';
-                if (query.length >= 2) {
+                if (query.length >= 1) {
                     searchTicker(query);
                 }
             });
@@ -89,7 +99,93 @@
             });
         }
 
+        // Setup flag color palette
+        setupFlagColorPalette();
+
         window.Logger?.debug?.('✅ Add Ticker Modal initialized', PAGE_LOG_CONTEXT);
+    }
+
+    /**
+     * Setup flag color palette
+     */
+    function setupFlagColorPalette() {
+        const flagButtons = document.querySelectorAll('.flag-color-btn-add-modal');
+        const clearBtn = document.getElementById('clearFlagColorBtn');
+        const flagInput = document.getElementById('itemFlagColor');
+
+        if (!flagButtons.length || !flagInput) {
+            // Try again after a short delay if elements aren't ready
+            setTimeout(setupFlagColorPalette, 100);
+            return;
+        }
+
+        // Remove existing listeners by cloning elements
+        flagButtons.forEach(btn => {
+            const newBtn = btn.cloneNode(true);
+            btn.parentNode.replaceChild(newBtn, btn);
+        });
+        const clearBtnNew = clearBtn ? clearBtn.cloneNode(true) : null;
+        if (clearBtn && clearBtnNew) {
+            clearBtn.parentNode.replaceChild(clearBtnNew, clearBtn);
+        }
+
+        // Get fresh references after cloning
+        const freshFlagButtons = document.querySelectorAll('.flag-color-btn-add-modal');
+        const freshClearBtn = document.getElementById('clearFlagColorBtn');
+        const freshFlagInput = document.getElementById('itemFlagColor');
+
+        freshFlagButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const color = btn.getAttribute('data-color');
+                if (color && freshFlagInput) {
+                    freshFlagInput.value = color;
+                    
+                    // Update active state - remove from all
+                    freshFlagButtons.forEach(b => {
+                        b.classList.remove('active');
+                        b.style.borderColor = 'transparent';
+                        b.style.boxShadow = 'none';
+                        b.style.transform = 'scale(1)';
+                    });
+                    
+                    // Add active state to selected
+                    btn.classList.add('active');
+                    btn.style.borderColor = '#212529';
+                    btn.style.boxShadow = '0 0 0 2px #212529';
+                    btn.style.transform = 'scale(1.05)';
+                    
+                    window.Logger?.debug?.('✅ Flag color selected', { ...PAGE_LOG_CONTEXT, color });
+                }
+            });
+
+            // Hover effect
+            btn.addEventListener('mouseenter', () => {
+                if (!btn.classList.contains('active')) {
+                    btn.style.transform = 'scale(1.1)';
+                    btn.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.2)';
+                }
+            });
+
+            btn.addEventListener('mouseleave', () => {
+                if (!btn.classList.contains('active')) {
+                    btn.style.transform = 'scale(1)';
+                    btn.style.boxShadow = 'none';
+                }
+            });
+        });
+
+        if (freshClearBtn && freshFlagInput) {
+            freshClearBtn.addEventListener('click', () => {
+                freshFlagInput.value = '';
+                freshFlagButtons.forEach(b => {
+                    b.classList.remove('active');
+                    b.style.borderColor = 'transparent';
+                    b.style.boxShadow = 'none';
+                    b.style.transform = 'scale(1)';
+                });
+                window.Logger?.debug?.('✅ Flag color cleared', PAGE_LOG_CONTEXT);
+            });
+        }
     }
 
     /**
@@ -109,15 +205,34 @@
         resetForm();
 
         // Open via ModalManagerV2
-        if (window.ModalManagerV2?.showModal) {
-            window.ModalManagerV2.showModal('addTickerModal', {
-                listId: listId
+        if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
+            window.ModalManagerV2.showModal('addTickerModal', 'add', { listId: listId }).then(() => {
+                // Setup flag palette after modal is shown
+                setTimeout(() => {
+                    setupFlagColorPalette();
+                }, 200);
+            }).catch(error => {
+                window.Logger?.error('Error showing add ticker modal via ModalManagerV2', { error, modalId: 'addTickerModal', page: 'add-ticker-modal' });
+                // Fallback to bootstrap if ModalManagerV2 fails
+                if (bootstrap?.Modal) {
+                    const modal = document.getElementById('addTickerModal');
+                    if (modal) {
+                        const bsModal = new bootstrap.Modal(modal);
+                        bsModal.show();
+                        setTimeout(() => {
+                            setupFlagColorPalette();
+                        }, 200);
+                    }
+                }
             });
-        } else {
+        } else if (bootstrap?.Modal) {
             const modal = document.getElementById('addTickerModal');
             if (modal) {
                 const bsModal = new bootstrap.Modal(modal);
                 bsModal.show();
+                setTimeout(() => {
+                    setupFlagColorPalette();
+                }, 200);
             }
         }
     }
@@ -126,9 +241,9 @@
      * Close add ticker modal
      */
     function closeAddTickerModal() {
-        if (window.ModalManagerV2?.closeModal) {
-            window.ModalManagerV2.closeModal('addTickerModal');
-        } else {
+        if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
+            window.ModalManagerV2.hideModal('addTickerModal');
+        } else if (bootstrap?.Modal) {
             const modal = document.getElementById('addTickerModal');
             if (modal) {
                 const bsModal = bootstrap.Modal.getInstance(modal);
@@ -143,28 +258,101 @@
     // ===== TICKER SEARCH =====
 
     /**
-     * Search ticker (mockup)
+     * Load all tickers from the system
+     * @async
+     * @returns {Promise<Array>} Array of all tickers
+     */
+    async function loadAllTickers() {
+        // Return cached tickers if available
+        if (allTickersCache) {
+            return allTickersCache;
+        }
+
+        try {
+            const baseUrl = window.API_BASE_URL || (window.location?.protocol === 'file:' ? 'http://127.0.0.1:8080' : '');
+            const separator = baseUrl.endsWith('/') ? '' : '/';
+            const url = `${baseUrl}${separator}api/tickers/?_ts=${Date.now()}`;
+
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Cache-Control': 'no-cache'
+                },
+                credentials: 'include'
+            });
+
+            if (!response.ok) {
+                if (response.status === 401) {
+                    window.Logger?.warn?.('⚠️ Authentication required for ticker search', PAGE_LOG_CONTEXT);
+                    return [];
+                }
+                throw new Error(`Failed to load tickers: ${response.status}`);
+            }
+
+            const payload = await response.json();
+            const tickers = Array.isArray(payload?.data) ? payload.data : (Array.isArray(payload) ? payload : []);
+
+            // Cache the results
+            allTickersCache = tickers;
+
+            window.Logger?.debug?.('✅ All tickers loaded', { ...PAGE_LOG_CONTEXT, count: tickers.length });
+            return tickers;
+        } catch (error) {
+            window.Logger?.error?.('❌ Error loading all tickers', { ...PAGE_LOG_CONTEXT, error: error?.message || error });
+            return [];
+        }
+    }
+
+    /**
+     * Search ticker - searches all tickers in the system from first character
      * @param {string} query - Search query
      * @async
      */
     async function searchTicker(query) {
+        if (!query || query.trim().length === 0) {
+            clearSearchResults();
+            return;
+        }
+
+        const searchQuery = query.trim();
+        const resultsContainer = document.getElementById('tickerSearchResults');
+        
+        // Show loading indicator
+        if (resultsContainer) {
+            resultsContainer.innerHTML = '<div class="text-center text-muted py-2"><i class="bi bi-hourglass-split me-2"></i>טוען...</div>';
+        }
+
         try {
-            // Mockup search results
-            const mockResults = [
-                { id: 5, symbol: 'AAPL', name: 'Apple Inc.', type: 'Stock', currency: 'USD' },
-                { id: 12, symbol: 'MSFT', name: 'Microsoft Corporation', type: 'Stock', currency: 'USD' },
-                { id: 8, symbol: 'GOOGL', name: 'Alphabet Inc.', type: 'Stock', currency: 'USD' }
-            ].filter(t => 
-                t.symbol.toLowerCase().includes(query.toLowerCase()) ||
-                t.name.toLowerCase().includes(query.toLowerCase())
-            );
+            // Load all tickers (cached after first load)
+            const allTickers = await loadAllTickers();
 
-            searchResults = mockResults;
-            renderSearchResults(mockResults);
+            // Filter from first character (startsWith)
+            const filtered = allTickers.filter(ticker => {
+                const symbol = (ticker.symbol || '').toUpperCase();
+                const name = (ticker.name || '').toUpperCase();
+                const queryUpper = searchQuery.toUpperCase();
 
-            window.Logger?.debug?.('🔍 Ticker search completed (mockup)', { ...PAGE_LOG_CONTEXT, query, count: mockResults.length });
+                return symbol.startsWith(queryUpper) || name.startsWith(queryUpper);
+            });
+
+            // Limit results to 20 for performance
+            const limitedResults = filtered.slice(0, 20);
+
+            searchResults = limitedResults;
+            renderSearchResults(limitedResults);
+
+            window.Logger?.debug?.('🔍 Ticker search completed', { ...PAGE_LOG_CONTEXT, query: searchQuery, count: limitedResults.length, total: filtered.length });
         } catch (error) {
-            window.Logger?.error?.('❌ Error searching ticker', { ...PAGE_LOG_CONTEXT, query, error: error?.message || error });
+            window.Logger?.error?.('❌ Error searching ticker', { ...PAGE_LOG_CONTEXT, query: searchQuery, error: error?.message || error });
+            
+            if (resultsContainer) {
+                resultsContainer.innerHTML = `
+                    <div class="alert alert-warning">
+                        <small>שגיאה בחיפוש טיקרים. אנא נסה שוב.</small>
+                    </div>
+                `;
+            }
         }
     }
 
@@ -198,26 +386,45 @@
         if (!resultsContainer) return;
 
         if (results.length === 0) {
-            resultsContainer.innerHTML = '<div class="alert alert-info">לא נמצאו תוצאות</div>';
+            resultsContainer.textContent = '';
+            const noResultsDiv = document.createElement('div');
+            noResultsDiv.className = 'alert alert-info';
+            noResultsDiv.textContent = 'לא נמצאו תוצאות';
+            resultsContainer.appendChild(noResultsDiv);
             return;
         }
 
-        resultsContainer.innerHTML = results.map(ticker => `
-            <div class="search-result-item" data-ticker-id="${ticker.id}">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <strong>${ticker.symbol}</strong> - ${ticker.name}
-                        <br>
-                        <small class="text-muted">${ticker.type} • ${ticker.currency}</small>
+        // Build results HTML and insert using tempDiv
+        const resultsHTML = results.map(ticker => {
+            const symbol = ticker.symbol || ticker.ticker_symbol || 'N/A';
+            const name = ticker.name || '';
+            const type = ticker.type || '';
+            const currency = ticker.currency || ticker.currency_code || '';
+            const typeDisplay = type ? (type.charAt(0).toUpperCase() + type.slice(1)) : '';
+            const currencyDisplay = currency || '';
+            
+            return `
+                <div class="search-result-item" data-ticker-id="${ticker.id}">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>${symbol}</strong>${name ? ` - ${name}` : ''}
+                            ${(typeDisplay || currencyDisplay) ? `<br><small class="text-muted">${typeDisplay}${typeDisplay && currencyDisplay ? ' • ' : ''}${currencyDisplay}</small>` : ''}
+                        </div>
+                        <button type="button" 
+                                class="btn btn-sm btn-primary" 
+                                data-onclick="window.AddTickerModal?.selectTicker(${ticker.id})">
+                            הוסף
+                        </button>
                     </div>
-                    <button type="button" 
-                            class="btn btn-sm btn-primary" 
-                            data-onclick="window.AddTickerModal?.selectTicker(${ticker.id})">
-                        הוסף
-                    </button>
                 </div>
-            </div>
-        `).join('');
+            `;
+        }).join('');
+        resultsContainer.textContent = '';
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(resultsHTML, 'text/html');
+        doc.body.childNodes.forEach(node => {
+          resultsContainer.appendChild(node.cloneNode(true));
+        });
 
         // Add click handlers
         resultsContainer.querySelectorAll('.search-result-item').forEach(item => {
@@ -236,7 +443,7 @@
     function clearSearchResults() {
         const resultsContainer = document.getElementById('tickerSearchResults');
         if (resultsContainer) {
-            resultsContainer.innerHTML = '';
+            resultsContainer.textContent = '';
         }
         searchResults = [];
     }
@@ -273,6 +480,21 @@
         clearSearchResults();
         selectedTickerId = null;
         currentListId = null;
+        
+        // Clear flag color selection
+        const flagInput = document.getElementById('itemFlagColor');
+        if (flagInput) {
+            flagInput.value = '';
+        }
+        const flagButtons = document.querySelectorAll('.flag-color-btn-add-modal');
+        flagButtons.forEach(btn => {
+            btn.classList.remove('active');
+            btn.style.borderColor = 'transparent';
+            btn.style.boxShadow = 'none';
+            btn.style.transform = 'scale(1)';
+        });
+        
+        // Don't clear cache - keep it for faster subsequent searches
     }
 
     // ===== DATA HANDLING =====
@@ -297,8 +519,7 @@
                 ticker_id: { id: 'selectedTickerId', type: 'int', default: selectedTickerId },
                 external_symbol: { id: 'externalSymbol', type: 'text' },
                 external_name: { id: 'externalName', type: 'text' },
-                flag_color: { id: 'itemFlagColor', type: 'text' },
-                notes: { id: 'itemNotes', type: 'text' }
+                flag_color: { id: 'itemFlagColor', type: 'text' }
             });
 
             // Add via data service
@@ -333,9 +554,53 @@
 
     // Initialize when DOM is ready
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initializeAddTickerModal);
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeAddTickerModal();
+            setupModalEventListener();
+        });
     } else {
         initializeAddTickerModal();
+        setupModalEventListener();
+    }
+
+    /**
+     * Setup modal event listener to capture listId from options
+     */
+    function setupModalEventListener() {
+        const modalElement = document.getElementById('addTickerModal');
+        if (!modalElement) {
+            // Try again after a delay if modal doesn't exist yet
+            setTimeout(setupModalEventListener, 500);
+            return;
+        }
+
+        modalElement.addEventListener('shown.bs.modal', function(event) {
+            // Check if listId was passed through entityData (third parameter)
+            // ModalManagerV2 passes entityData as third parameter
+            const modalInfo = window.ModalManagerV2?.modals?.get('addTickerModal');
+            if (modalInfo && modalInfo.lastEntityData && modalInfo.lastEntityData.listId) {
+                currentListId = parseInt(modalInfo.lastEntityData.listId);
+                window.Logger?.debug?.('✅ ListId captured from entityData', { ...PAGE_LOG_CONTEXT, listId: currentListId });
+            }
+            
+            // Check if passed through options (fourth parameter)
+            if (modalInfo && modalInfo.lastOptions && modalInfo.lastOptions.listId) {
+                currentListId = parseInt(modalInfo.lastOptions.listId);
+                window.Logger?.debug?.('✅ ListId captured from options', { ...PAGE_LOG_CONTEXT, listId: currentListId });
+            }
+            
+            // Try to get listId from modal dataset
+            const modalData = event.target.dataset;
+            if (modalData && modalData.listId) {
+                currentListId = parseInt(modalData.listId);
+                window.Logger?.debug?.('✅ ListId captured from modal dataset', { ...PAGE_LOG_CONTEXT, listId: currentListId });
+            }
+            
+            // Setup flag palette after modal is shown
+            setTimeout(() => {
+                setupFlagColorPalette();
+            }, 100);
+        });
     }
 
     // ===== GLOBAL EXPORTS =====
@@ -361,6 +626,7 @@
     window.Logger?.info?.('✅ AddTickerModal loaded successfully', PAGE_LOG_CONTEXT);
 
 })();
+
 
 
 

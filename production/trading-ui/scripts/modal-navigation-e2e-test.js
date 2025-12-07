@@ -55,7 +55,7 @@
       const testModal = document.createElement('div');
       testModal.id = testModalId;
       testModal.className = 'modal';
-      testModal.innerHTML = `
+      const modalHTML = `
         <div class="modal-dialog">
           <div class="modal-content">
             <div class="modal-header">
@@ -67,6 +67,11 @@
           </div>
         </div>
       `;
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(modalHTML, 'text/html');
+      doc.body.childNodes.forEach(node => {
+          testModal.appendChild(node.cloneNode(true));
+      });
       document.body.appendChild(testModal);
 
       // בדיקה שהמערכת עדיין ריקה (מודל ראשי לא נרשם)
@@ -181,7 +186,7 @@
       const primaryModal = document.createElement('div');
       primaryModal.id = 'testPrimaryModal';
       primaryModal.className = 'modal';
-      primaryModal.innerHTML = `
+      const primaryModalHTML = `
         <div class="modal-dialog">
           <div class="modal-content">
             <div class="modal-header">
@@ -190,12 +195,17 @@
           </div>
         </div>
       `;
+      const parser1 = new DOMParser();
+      const doc1 = parser1.parseFromString(primaryModalHTML, 'text/html');
+      doc1.body.childNodes.forEach(node => {
+          primaryModal.appendChild(node.cloneNode(true));
+      });
       document.body.appendChild(primaryModal);
 
       const nestedModal = document.createElement('div');
       nestedModal.id = 'testNestedModal';
       nestedModal.className = 'modal';
-      nestedModal.innerHTML = `
+      const nestedModalHTML = `
         <div class="modal-dialog">
           <div class="modal-content">
             <div class="modal-header">
@@ -204,6 +214,11 @@
           </div>
         </div>
       `;
+      const parser2 = new DOMParser();
+      const doc2 = parser2.parseFromString(nestedModalHTML, 'text/html');
+      doc2.body.childNodes.forEach(node => {
+          nestedModal.appendChild(node.cloneNode(true));
+      });
       document.body.appendChild(nestedModal);
 
       // רישום מודלים
@@ -269,7 +284,7 @@
       const primaryModal = document.createElement('div');
       primaryModal.id = 'testPrimaryModal';
       primaryModal.className = 'modal';
-      primaryModal.innerHTML = `
+      const primaryModalHTML = `
         <div class="modal-dialog">
           <div class="modal-content">
             <div class="modal-header">
@@ -278,12 +293,17 @@
           </div>
         </div>
       `;
+      const parser1 = new DOMParser();
+      const doc1 = parser1.parseFromString(primaryModalHTML, 'text/html');
+      doc1.body.childNodes.forEach(node => {
+          primaryModal.appendChild(node.cloneNode(true));
+      });
       document.body.appendChild(primaryModal);
 
       const nestedModal = document.createElement('div');
       nestedModal.id = 'testNestedModal';
       nestedModal.className = 'modal';
-      nestedModal.innerHTML = `
+      const nestedModalHTML = `
         <div class="modal-dialog">
           <div class="modal-content">
             <div class="modal-header">
@@ -292,6 +312,11 @@
           </div>
         </div>
       `;
+      const parser2 = new DOMParser();
+      const doc2 = parser2.parseFromString(nestedModalHTML, 'text/html');
+      doc2.body.childNodes.forEach(node => {
+          nestedModal.appendChild(node.cloneNode(true));
+      });
       document.body.appendChild(nestedModal);
 
       // רישום מודלים

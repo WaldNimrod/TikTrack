@@ -27,7 +27,9 @@ if (window.Logger) {
 }
 
 // ===== FilterManager Class =====
-class FilterManager {
+// Prevent duplicate declaration
+if (typeof window.FilterManager === 'undefined') {
+window.FilterManager = class FilterManager {
   constructor() {
     this.currentFilters = {
       search: '',
@@ -673,16 +675,22 @@ class FilterManager {
       const accountItem = document.createElement('div');
       accountItem.className = 'account-filter-item';
       accountItem.setAttribute('data-value', account.id.toString());
-      accountItem.innerHTML = `<span class="option-text">${account.name || account.id}</span>`;
+      const span = document.createElement('span');
+      span.className = 'option-text';
+      span.textContent = account.name || account.id;
+      accountItem.appendChild(span);
       accountMenu.appendChild(accountItem);
     });
 
     window.Logger?.info?.(`✅ Loaded ${openAccounts.length} open trading accounts for filter`, { page: 'header-system' });
   }
 }
+} // End of if (typeof window.FilterManager === 'undefined')
 
 // ===== MenuManager Class =====
-class MenuManager {
+// Prevent duplicate declaration
+if (typeof window.MenuManager === 'undefined') {
+window.MenuManager = class MenuManager {
   constructor() {
     this.openMenuId = null;
     this.hoverTimeouts = new Map();
@@ -1014,14 +1022,21 @@ class MenuManager {
       }
     });
   }
-}
+};
+} // End of if (typeof window.MenuManager === 'undefined')
 
 // ===== HeaderSystem Class =====
 class HeaderSystem {
   constructor() {
     this.isInitialized = false;
-    this.filterManager = new FilterManager();
-    this.menuManager = new MenuManager();
+    if (!window.FilterManager) {
+      throw new Error('FilterManager is not defined. Make sure header-system.js is loaded correctly.');
+    }
+    if (!window.MenuManager) {
+      throw new Error('MenuManager is not defined. Make sure header-system.js is loaded correctly.');
+    }
+    this.filterManager = new window.FilterManager();
+    this.menuManager = new window.MenuManager();
   }
 
   init() {
@@ -1052,6 +1067,19 @@ class HeaderSystem {
   }
 
   static createHeader() {
+    // Skip header creation for auth pages (login, register, etc.)
+    const isAuthPage = window.location.pathname.includes('login.html') ||
+                      window.location.pathname.includes('register.html') ||
+                      window.location.pathname.includes('forgot-password.html') ||
+                      window.location.pathname.includes('reset-password.html') ||
+                      document.documentElement.classList.contains('login-page') ||
+                      document.documentElement.classList.contains('auth-page');
+    
+    if (isAuthPage) {
+      window.Logger?.debug('Skipping header creation for auth page', { page: 'header-system' });
+      return;
+    }
+
     const headerElement = document.getElementById('unified-header');
     if (!headerElement) {
       if (!document.body) {
@@ -1064,7 +1092,12 @@ class HeaderSystem {
 
     const existingHeader = document.getElementById('unified-header');
     const headerHTML = HeaderSystem.getHeaderHTML();
-    existingHeader.innerHTML = headerHTML;
+    existingHeader.textContent = '';
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(headerHTML, 'text/html');
+    doc.body.childNodes.forEach(node => {
+        existingHeader.appendChild(node.cloneNode(true));
+    });
   }
 
   /**
@@ -1167,15 +1200,27 @@ class HeaderSystem {
                         <span class="nav-text">תכנון</span>
                       </a>
                     </li>
-                    <li class="tiktrack-nav-item">
-                      <a href="/trades" class="tiktrack-nav-link" data-page="trades">
+                    <li class="tiktrack-nav-item dropdown">
+                      <a href="/trades" class="tiktrack-nav-link tiktrack-dropdown-toggle" data-page="trades">
                         <span class="nav-text">מעקב</span>
+                        <span class="tiktrack-dropdown-arrow">▼</span>
                       </a>
+                      <ul class="tiktrack-dropdown-menu">
+                        <li><a class="tiktrack-dropdown-item" href="/watch-list">רשימות צפייה</a></li>
+                      </ul>
                     </li>
-                    <li class="tiktrack-nav-item">
-                      <a href="/research" class="tiktrack-nav-link" data-page="research">
+                    <li class="tiktrack-nav-item dropdown">
+                      <a href="/research" class="tiktrack-nav-link tiktrack-dropdown-toggle" data-page="research">
                         <span class="nav-text">מחקר</span>
+                        <span class="tiktrack-dropdown-arrow">▼</span>
                       </a>
+                      <ul class="tiktrack-dropdown-menu">
+                        <li><a class="tiktrack-dropdown-item" href="/ai-analysis">אנליזת AI</a></li>
+                        <li class="separator"></li>
+                        <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/trade-history-page.html">📈 היסטוריית טרייד</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/portfolio-state-page.html">💼 מצב תיק היסטורי</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/trading-journal-page.html">📓 יומן מסחר</a></li>
+                      </ul>
                     </li>
                     <li class="tiktrack-nav-item dropdown">
                       <a href="#" class="tiktrack-nav-link tiktrack-dropdown-toggle" data-page="data">
@@ -1351,8 +1396,8 @@ class HeaderSystem {
                   <div class="type-filter-item" data-value="השקעה">
                     <span class="option-text">השקעה</span>
                   </div>
-                  <div class="type-filter-item" data-value="פסיבי">
-                    <span class="option-text">פסיבי</span>
+                  <div class="type-filter-item" data-value="פאסיבי">
+                    <span class="option-text">פאסיבי</span>
                   </div>
                   <button class="filter-close-btn" onclick="window.headerSystem?.filterManager?.closeFilter('typeFilterMenu')" title="סגור">×</button>
                 </div>
@@ -1795,7 +1840,7 @@ if (typeof window.addEventListener === 'function') {
 }
 
 // ===== Global Logout Handler =====
-window.handleHeaderLogout = function(event) {
+window.handleHeaderLogout = async function(event) {
   if (event) {
     event.preventDefault();
     event.stopPropagation();
@@ -1805,16 +1850,24 @@ window.handleHeaderLogout = function(event) {
   const isAuth = window.TikTrackAuth?.isAuthenticated?.() || false;
   
   if (isAuth) {
-    // User is authenticated - perform logout
+    // User is authenticated - perform logout (which will show login modal)
     if (window.TikTrackAuth?.logout) {
-      window.TikTrackAuth.logout();
+      await window.TikTrackAuth.logout();
     } else {
-      // Fallback if TikTrackAuth not available
-      window.location.href = '/login.html';
+      // Fallback if TikTrackAuth not available - show login modal
+      if (typeof window.TikTrackAuth?.showLoginModal === 'function') {
+        await window.TikTrackAuth.showLoginModal();
+      } else {
+        window.location.href = '/login.html';
+      }
     }
   } else {
-    // User is not authenticated - redirect to login
-    window.location.href = '/login.html';
+    // User is not authenticated - show login modal
+    if (typeof window.TikTrackAuth?.showLoginModal === 'function') {
+      await window.TikTrackAuth.showLoginModal();
+    } else {
+      window.location.href = '/login.html';
+    }
   }
 };
 
@@ -1946,4 +1999,156 @@ if (window.HeaderSystem && !window.HeaderSystem.createFilterSystem) {
 if (window.Logger) {
   window.Logger.info('✅ Header System v7.0.0 loaded successfully!', { page: 'header-system' });
 }
+
+// ===== AUTO-INITIALIZATION FALLBACK =====
+// Ensure header is initialized on all pages (except auth pages) even if UnifiedAppInitializer doesn't run
+// זה מבטיח שה-header יתאחל בכל עמוד (חוץ מ-auth pages) גם אם UnifiedAppInitializer לא רץ
+
+(function() {
+  'use strict';
+  
+  // Skip auto-initialization for auth pages
+  const isAuthPage = window.location.pathname.includes('login.html') ||
+                     window.location.pathname.includes('register.html') ||
+                     window.location.pathname.includes('forgot-password.html') ||
+                     window.location.pathname.includes('reset-password.html');
+  
+  if (isAuthPage) {
+    if (window.Logger?.debug) {
+      window.Logger.debug('Skipping Header System auto-initialization for auth page', { page: 'header-system' });
+    }
+    return;
+  }
+  
+  // Function to initialize header with retry logic
+  const ensureHeaderInitialized = async () => {
+    // Check if header is already initialized
+    if (window.headerSystem && window.headerSystem.isInitialized) {
+      if (window.Logger?.debug) {
+        window.Logger.debug('Header System already initialized, skipping auto-init', { page: 'header-system' });
+      }
+      return;
+    }
+    
+    // Check if UnifiedAppInitializer exists and might initialize the header
+    const hasUnifiedAppInitializer = typeof window.UnifiedAppInitializer !== 'undefined' || 
+                                     typeof window.initializeUnifiedApp !== 'undefined' ||
+                                     (window.globalInitializationState && window.globalInitializationState.unifiedAppInitializing);
+    
+    if (hasUnifiedAppInitializer) {
+      // Wait longer for UnifiedAppInitializer to initialize the header
+      let waitCount = 0;
+      const maxWait = 50; // 5 seconds - give UnifiedAppInitializer enough time
+      
+      while (waitCount < maxWait) {
+        // Check if header was initialized
+        if (window.headerSystem && window.headerSystem.isInitialized) {
+          if (window.Logger?.debug) {
+            window.Logger.debug('Header System initialized by UnifiedAppInitializer', { 
+              waitCount,
+              page: 'header-system' 
+            });
+          }
+          return;
+        }
+        
+        // Check if UnifiedAppInitializer is still initializing
+        if (window.globalInitializationState && window.globalInitializationState.unifiedAppInitializing) {
+          await new Promise(resolve => setTimeout(resolve, 100));
+          waitCount++;
+          continue;
+        }
+        
+        // Check if UnifiedAppInitializer finished initializing
+        if (window.globalInitializationState && window.globalInitializationState.unifiedAppInitialized) {
+          // UnifiedAppInitializer finished, check one more time if header was initialized
+          await new Promise(resolve => setTimeout(resolve, 200));
+          if (window.headerSystem && window.headerSystem.isInitialized) {
+            if (window.Logger?.debug) {
+              window.Logger.debug('Header System initialized by UnifiedAppInitializer (after completion)', { 
+                waitCount,
+                page: 'header-system' 
+              });
+            }
+            return;
+          }
+          // UnifiedAppInitializer finished but didn't initialize header, break and initialize ourselves
+          break;
+        }
+        
+        // Wait a bit more
+        await new Promise(resolve => setTimeout(resolve, 100));
+        waitCount++;
+      }
+    }
+    
+    // Initialize header if not already initialized
+    if (!window.headerSystem || !window.headerSystem.isInitialized) {
+      // Mark that fallback initialization is being used
+      window.__headerSystemInitMethod = 'fallback';
+      
+      if (window.Logger?.info) {
+        window.Logger.info('🔄 Auto-initializing Header System (FALLBACK METHOD)', {
+          hasUnifiedAppInitializer,
+          unifiedAppInitialized: window.globalInitializationState?.unifiedAppInitialized,
+          unifiedAppInitializing: window.globalInitializationState?.unifiedAppInitializing,
+          page: window.location.pathname
+        }, { page: 'header-system' });
+      }
+      
+      // Also log to console for easy tracking
+      console.log('🔄 [HEADER INIT] Using FALLBACK method for:', window.location.pathname);
+      
+      // Store in localStorage for tracking
+      try {
+        const initLog = {
+          page: window.location.pathname,
+          method: 'fallback',
+          timestamp: new Date().toISOString()
+        };
+        const existingLogs = JSON.parse(localStorage.getItem('__headerInitLogs') || '[]');
+        existingLogs.push(initLog);
+        localStorage.setItem('__headerInitLogs', JSON.stringify(existingLogs));
+      } catch (e) {
+        // Ignore localStorage errors
+      }
+      
+      try {
+        if (typeof window.initializeHeaderSystem === 'function') {
+          window.initializeHeaderSystem();
+        } else if (typeof window.HeaderSystem !== 'undefined' && typeof window.HeaderSystem.initialize === 'function') {
+          window.HeaderSystem.initialize();
+        } else {
+          if (window.Logger?.warn) {
+            window.Logger.warn('⚠️ Header System initialization functions not available', {
+              initializeHeaderSystemExists: typeof window.initializeHeaderSystem !== 'undefined',
+              HeaderSystemExists: typeof window.HeaderSystem !== 'undefined'
+            }, { page: 'header-system' });
+          }
+        }
+      } catch (error) {
+        if (window.Logger?.error) {
+          window.Logger.error('❌ Error auto-initializing Header System', {
+            error: error.message,
+            stack: error.stack
+          }, { page: 'header-system' });
+        } else {
+          console.error('❌ Error auto-initializing Header System:', error);
+        }
+      }
+    }
+  };
+  
+  // Initialize when DOM is ready
+  // Use longer delay to ensure UnifiedAppInitializer has time to initialize first
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+      // Wait 1 second after DOMContentLoaded to allow UnifiedAppInitializer to start
+      setTimeout(ensureHeaderInitialized, 1000);
+    });
+  } else {
+    // DOM is already loaded, wait longer to allow other systems to initialize first
+    setTimeout(ensureHeaderInitialized, 1500);
+  }
+})();
 

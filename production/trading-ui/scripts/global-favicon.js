@@ -76,7 +76,6 @@ function autoSetFavicon() {
     // Map filename to page type
     const pageTypeMap = {
         'index': 'home',
-        'linter-realtime-monitor': 'linter',
         'trading_accounts': 'trading_accounts',
         'accounts': 'trading_accounts', // Legacy support for old URLs
         'alerts': 'alerts',

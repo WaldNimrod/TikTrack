@@ -184,10 +184,20 @@ class SystemManagementMain {
     console.log(`🔧 Initializing section: ${sectionId}`);
     
     // Check if section exists in DOM
-    const sectionElement = document.getElementById(sectionId);
+    // Special handling for sm-dashboard which is in the top section
+    let sectionElement = document.getElementById(sectionId);
+    if (!sectionElement && sectionId === 'sm-dashboard') {
+      // Try to find the dashboard container in the top section
+      sectionElement = document.getElementById('sm-dashboard-content') || 
+                      document.querySelector('.top-section[data-section="top"]');
+    }
     if (!sectionElement) {
-      console.warn(`⚠️ Section element ${sectionId} not found in DOM`);
-      return;
+      // For sm-dashboard, this is expected - it's rendered into the top section
+      if (sectionId !== 'sm-dashboard') {
+        console.warn(`⚠️ Section element ${sectionId} not found in DOM`);
+        return;
+      }
+      // Don't return for sm-dashboard - it will be handled by the section class
     }
 
     // Get section class name from data attribute or convention
@@ -393,7 +403,11 @@ class SystemManagementMain {
       const refreshBtn = document.createElement('button');
       refreshBtn.id = 'global-refresh-btn';
       refreshBtn.className = 'btn btn-sm btn-outline-primary';
-      refreshBtn.innerHTML = '<i class="fas fa-sync-alt"></i> רענן הכל';
+      refreshBtn.textContent = '';
+      const icon = document.createElement('i');
+      icon.className = 'fas fa-sync-alt';
+      refreshBtn.appendChild(icon);
+      refreshBtn.appendChild(document.createTextNode(' רענן הכל'));
       refreshBtn.title = 'רענן את כל הסקשנים';
       headerActions.appendChild(refreshBtn);
     }
@@ -411,7 +425,11 @@ class SystemManagementMain {
       const toggleBtn = document.createElement('button');
       toggleBtn.id = 'global-toggle-btn';
       toggleBtn.className = 'btn btn-sm btn-outline-secondary';
-      toggleBtn.innerHTML = '<i class="fas fa-eye"></i> הצג/הסתר הכל';
+      toggleBtn.textContent = '';
+      const icon = document.createElement('i');
+      icon.className = 'fas fa-eye';
+      toggleBtn.appendChild(icon);
+      toggleBtn.appendChild(document.createTextNode(' הצג/הסתר הכל'));
       toggleBtn.title = 'הצג/הסתר את כל הסקשנים';
       headerActions.appendChild(toggleBtn);
     }
@@ -446,27 +464,41 @@ class SystemManagementMain {
    * @returns {void}
    */
   toggleAllSections() {
-    const toggleBtn = document.getElementById('global-toggle-btn');
-    const sections = document.querySelectorAll('.sm-section-body');
+    // Use the standard section toggle system
+    const sections = document.querySelectorAll('.content-section[data-section]');
     
     if (sections.length === 0) return;
     
-    // Check if any section is visible
-    const anyVisible = Array.from(sections).some(section => 
-      section.style.display !== 'none'
-    );
-    
-    // Toggle all sections
-    sections.forEach(section => {
-      section.style.display = anyVisible ? 'none' : 'block';
+    // Check if any section is visible (expanded)
+    const anyExpanded = Array.from(sections).some(section => {
+      const sectionBody = section.querySelector('.section-body');
+      return sectionBody && sectionBody.style.display !== 'none';
     });
     
-    // Update toggle button text
-    if (toggleBtn) {
-      toggleBtn.innerHTML = anyVisible ? 
-        '<i class="fas fa-eye-slash"></i> הצג הכל' : 
-        '<i class="fas fa-eye"></i> הסתר הכל';
-    }
+    // Toggle all sections using the standard toggleSection function
+    sections.forEach(section => {
+      const sectionId = section.getAttribute('data-section');
+      if (sectionId && typeof window.toggleSection === 'function') {
+        // If any are expanded, collapse all; otherwise expand all
+        if (anyExpanded) {
+          // Collapse all
+          const sectionBody = section.querySelector('.section-body');
+          if (sectionBody) {
+            sectionBody.style.display = 'none';
+            section.classList.remove('expanded');
+            section.classList.add('collapsed');
+          }
+        } else {
+          // Expand all
+          const sectionBody = section.querySelector('.section-body');
+          if (sectionBody) {
+            sectionBody.style.display = 'block';
+            section.classList.remove('collapsed');
+            section.classList.add('expanded');
+          }
+        }
+      }
+    });
   }
 
   /**
@@ -616,3 +648,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 // Export for global access
 window.SystemManagementMain = SystemManagementMain;
+
+// Export toggleAllSections as global function for HTML onclick
+window.toggleAllSections = function() {
+  if (window.systemManagementMain) {
+    window.systemManagementMain.toggleAllSections();
+  } else {
+    console.warn('⚠️ SystemManagementMain not initialized yet');
+  }
+};

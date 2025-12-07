@@ -25,10 +25,21 @@
    Statistics Headers
    ============================================================================ */
 
-/* Statistics header with centered text */
+/* Statistics header with centered text - enlarged with divider */
 .statistics-header-full {
     text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: 30px;
+    margin-top: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid var(--border-color, #ddd);
+}
+
+/* Enlarge h4 in statistics headers */
+.statistics-header-full h4 {
+    font-size: 1.5rem; /* 24px - larger than default 18px */
+    font-weight: 700; /* Bold */
+    margin: 0;
+    color: var(--color-text-primary, #333);
 }
 
 /* ============================================================================
@@ -55,5 +66,32 @@
 /* Section with top margin */
 .section-margin-top {
     margin-top: 30px;
+}
+
+/* ============================================================================
+   Account Activity Table Styles
+   ============================================================================ */
+
+/* Clickable ticker link in account activity table */
+.ticker-link-clickable {
+    cursor: pointer;
+    color: var(--primary-color, #26baac);
+    text-decoration: underline;
+    transition: color 0.2s ease;
+}
+
+.ticker-link-clickable:hover {
+    color: var(--primary-color-dark, #1a9a8c);
+    text-decoration: underline;
+}
+
+/* View details button in account activity table */
+.btn-view-details {
+    width: 2.5em;
+    height: 2.5em;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 

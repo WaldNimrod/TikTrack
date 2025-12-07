@@ -1,0 +1,121 @@
+/**
+ * Autocomplete System Styles
+ * מערכת השלמה אוטומטית
+ * 
+ * File: trading-ui/styles-new/06-components/_autocomplete.css
+ * Version: 1.0.0
+ * Created: January 30, 2025
+ * 
+ * Features:
+ * - Overlay positioning (fixed)
+ * - RTL support
+ * - Keyboard navigation styling
+ * - Loading and empty states
+ */
+
+/* Autocomplete Overlay */
+.autocomplete-overlay {
+  position: fixed;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 10000;
+  max-height: 300px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: none;
+  direction: rtl;
+  text-align: right;
+}
+
+/* Autocomplete Item */
+.autocomplete-item {
+  padding: 0.5rem 0.75rem;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  border-bottom: 1px solid #f0f0f0;
+  user-select: none;
+}
+
+.autocomplete-item:last-child {
+  border-bottom: none;
+}
+
+.autocomplete-item:hover,
+.autocomplete-item.autocomplete-item-selected {
+  background-color: #f5f5f5;
+}
+
+.autocomplete-item:active {
+  background-color: #e8e8e8;
+}
+
+/* Empty State */
+.autocomplete-empty {
+  padding: 1rem;
+  text-align: center;
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+/* Loading State */
+.autocomplete-loading {
+  padding: 1rem;
+  text-align: center;
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+/* Error State */
+.autocomplete-error {
+  padding: 1rem;
+  text-align: center;
+  color: #dc3545;
+  font-size: 0.9rem;
+}
+
+/* Scrollbar Styling (for webkit browsers) */
+.autocomplete-overlay::-webkit-scrollbar {
+  width: 8px;
+}
+
+.autocomplete-overlay::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.autocomplete-overlay::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+.autocomplete-overlay::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* RTL Support */
+[dir="rtl"] .autocomplete-overlay {
+  direction: rtl;
+  text-align: right;
+}
+
+[dir="ltr"] .autocomplete-overlay {
+  direction: ltr;
+  text-align: left;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

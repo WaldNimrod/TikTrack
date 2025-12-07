@@ -144,7 +144,11 @@
   }
 
   function renderEmpty(container) {
-    container.innerHTML = '<div class="text-muted small">אין טריידים זמינים</div>';
+    container.textContent = '';
+    const div = document.createElement('div');
+    div.className = 'text-muted small';
+    div.textContent = 'אין טריידים זמינים';
+    container.appendChild(div);
   }
 
   function renderList(trades, container, currencySymbol) {
@@ -170,7 +174,12 @@
       if (sideValue) {
         const sideSpan = document.createElement('span');
         if (typeof sideValue === 'string' && sideValue.includes('<')) {
-          sideSpan.innerHTML = sideValue;
+          sideSpan.textContent = '';
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(sideValue, 'text/html');
+          doc.body.childNodes.forEach(node => {
+            sideSpan.appendChild(node.cloneNode(true));
+          });
         } else {
           sideSpan.textContent = sideValue;
         }
@@ -195,13 +204,19 @@
 
       const amountWrap = document.createElement('div');
       amountWrap.className = 'text-end fw-semibold';
-      amountWrap.innerHTML = formatAmount(trade.amount, currencySymbol);
+      const amountHTML = formatAmount(trade.amount, currencySymbol);
+      amountWrap.textContent = '';
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(amountHTML, 'text/html');
+      doc.body.childNodes.forEach(node => {
+        amountWrap.appendChild(node.cloneNode(true));
+      });
       item.appendChild(amountWrap);
 
       list.appendChild(item);
     });
 
-    container.innerHTML = '';
+    container.textContent = '';
     container.appendChild(list);
   }
 

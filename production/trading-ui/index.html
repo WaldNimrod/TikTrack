@@ -19,11 +19,15 @@
     
     <!-- External Libraries -->
     <!-- Bootstrap Icons and FontAwesome removed - using Tabler Icons via IconSystem -->
+    
+    <!-- Dashboard Widgets - Equal Height Styles -->
+    <!-- Note: Equal height is handled by JavaScript (equalizeWidgetHeights function in index.js) -->
+    <!-- Styles moved to _index.css for ITCSS compliance -->
 </head><body class="index-page"><div id="unified-header"></div><div class="background-wrapper"><div class="page-body"><div class="top-section" data-section="top"><div class="section-header"><div class="table-title"><img src="/trading-ui/images/icons/entities/home.svg" alt="דף הבית" class="section-icon"> דף הבית - TikTrack </div><div class="table-actions"><button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('top')" data-text="הצג/הסתר" title="הצג/הסתר סקשן"></button></div></div><div class="section-body"><active-alerts></active-alerts><div class="info-summary" id="summaryStats"><div>סה"כ טריידים: <strong id="totalTrades">0</strong></div><div>סה"כ התראות: <strong id="totalAlerts">0</strong></div><div>יתרה נוכחית: <strong id="currentBalance">$0</strong></div><div>רווח/הפסד: <strong id="totalPnL">$0</strong></div></div><div class="info-summary portfolio-summary-card d-flex align-items-center justify-content-between gap-3 flex-nowrap" id="portfolioSummaryContent"><div id="portfolioSummaryStats" class="flex-grow-1"><div>טוען סיכום...</div></div><button data-button-type="VIEW" data-variant="small" data-onclick="togglePortfolioSummarySize()" data-id="portfolioSummaryToggleSize" data-tooltip="הצג סיכום מלא" data-tooltip-placement="bottom" aria-label="הצג סיכום מלא" class="flex-shrink-0 ms-2"></button></div></div></div><div class="main-content"><div class="content-section" id="main"><div class="section-header"><div class="table-title"><img src="images/icons/entities/home.svg" alt="לוח בקרה" class="section-icon"> לוח בקרה </div><div class="table-count" id="dashboardCount">טוען...</div><div class="table-actions"><button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('main')" data-text="הצג/הסתר" title="הצג/הסתר סקשן"></button></div></div><div class="section-body">
-        <!-- שורה ראשונה: טריידים אחרונים + תוכניות אחרונות (מאוחד) -->
+        <!-- שורה ראשונה: טריידים אחרונים + פעולות ממתינות (שיוך ויצירה) -->
         <div class="row g-3 mb-3">
             <div class="col-md-6">
-                <div class="card h-100" id="recentItemsWidgetContainer" style="max-height: 400px; display: flex; flex-direction: column;">
+                <div class="card h-100" id="recentItemsWidgetContainer">
                     <div class="card-header">
                         <ul class="nav nav-tabs mb-0" id="recentItemsTabs" role="tablist">
                             <li class="nav-item" role="presentation">
@@ -52,9 +56,9 @@
                             </li>
                         </ul>
                     </div>
-                    <div class="card-body" style="flex: 1; display: flex; flex-direction: column; min-height: 0; padding: 0.5rem;">
+                    <div class="card-body">
                         <!-- Tab Content -->
-                        <div class="tab-content" id="recentItemsWidgetTabContent" style="flex: 1; display: flex; flex-direction: column; min-height: 0; overflow: visible;">
+                        <div class="tab-content" id="recentItemsWidgetTabContent">
                             <!-- Trades Tab Pane -->
                             <div class="tab-pane fade show active" 
                                  id="recentItemsWidgetTradesPane" 
@@ -94,13 +98,8 @@
                     </div>
                 </div>
             </div>
-        </div>
-        
-        <!-- שורה שנייה: 4 עמודות - שיוך לטרייד, יצירת טרייד, שיוך לתוכנית, יצירת תוכנית -->
-        <!-- שורה שלישית: ווידג'ט פעולות ממתינות מאוחד (שיוך ויצירה) -->
-        <div class="row g-3 mb-3">
-            <div class="col-12 col-lg-6">
-                <div class="card h-100" id="unifiedPendingActionsWidgetContainer" style="max-height: 500px; display: flex; flex-direction: column;">
+            <div class="col-md-6">
+                <div class="card h-100" id="unifiedPendingActionsWidgetContainer">
                     <div class="card-header d-flex align-items-center justify-content-between gap-2">
                         <h5 class="mb-0" id="unifiedPendingActionsWidgetTitle">
                             <span class="d-inline-flex align-items-center gap-2">
@@ -108,53 +107,59 @@
                                 <span>פעולות ממתינות</span>
                             </span>
                         </h5>
-                        <span class="badge entity-trade" id="unifiedPendingActionsWidgetBadge">0</span>
+                        <div class="d-flex align-items-center gap-2">
+                            <!-- Count display in header for each combination -->
+                            <span class="badge bg-body-secondary text-body" id="assignPlansCountHeader">0</span>
+                            <span class="badge bg-body-secondary text-body" id="assignTradesCountHeader">0</span>
+                            <span class="badge bg-body-secondary text-body" id="createPlansCountHeader">0</span>
+                            <span class="badge bg-body-secondary text-body" id="createTradesCountHeader">0</span>
+                            <span class="badge entity-trade" id="unifiedPendingActionsWidgetBadge">0</span>
+                        </div>
                     </div>
                     <div class="card-header">
-                        <!-- Action Tabs Row (Top) -->
-                        <ul class="nav nav-tabs" id="unifiedPendingActionsActionTabs" role="tablist">
+                        <!-- All Tabs in Single Row: [טרייד][תוכנית] | [שיוך] [יצירת חדש] -->
+                        <ul class="nav nav-tabs d-flex align-items-center gap-2" id="unifiedPendingActionsAllTabs" role="tablist">
+                            <!-- Entity Tabs (Primary Color) -->
                             <li class="nav-item" role="presentation">
-                                <button class="nav-link active" 
+                                <button class="nav-link active unified-pending-entity-tab" 
+                                        id="entityTabTrades" 
+                                        type="button">
+                                    טריידים
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link unified-pending-entity-tab" 
+                                        id="entityTabPlans" 
+                                        type="button">
+                                    תוכניות
+                                </button>
+                            </li>
+                            <!-- Separator -->
+                            <li class="nav-item-separator">|</li>
+                            <!-- Action Tabs (Secondary Color) -->
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active unified-pending-action-tab" 
                                         id="actionTabAssign" 
                                         type="button">
                                     שיוך
                                 </button>
                             </li>
                             <li class="nav-item" role="presentation">
-                                <button class="nav-link" 
+                                <button class="nav-link unified-pending-action-tab" 
                                         id="actionTabCreate" 
                                         type="button">
                                     יצירת חדש
                                 </button>
                             </li>
                         </ul>
-                        
-                        <!-- Entity Tabs Row (Bottom) -->
-                        <ul class="nav nav-tabs" id="unifiedPendingActionsEntityTabs" role="tablist">
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link active" 
-                                        id="entityTabPlans" 
-                                        type="button">
-                                    תוכניות
-                                </button>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link" 
-                                        id="entityTabTrades" 
-                                        type="button">
-                                    טריידים
-                                </button>
-                            </li>
-                        </ul>
                     </div>
-                    <div class="card-body d-flex flex-column gap-3" style="overflow-y: auto; flex: 1;">
+                    <div class="card-body d-flex flex-column gap-3">
                         <!-- Tab Content Panes -->
-                        <div class="tab-content" id="unifiedPendingActionsTabContent" style="flex: 1; display: flex; flex-direction: column;">
+                        <div class="tab-content" id="unifiedPendingActionsTabContent">
                             <!-- Assign Plans Pane -->
                             <div class="tab-pane fade show active" 
                                  id="paneAssignPlans" 
-                                 role="tabpanel"
-                                 style="flex: 1; display: flex; flex-direction: column;">
+                                 role="tabpanel">
                                 <div id="assignPlansLoading" class="d-flex align-items-center justify-content-center text-muted small unified-pending-loading">
                                     <div class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></div>
                                     <span>טוען הצעות שיוך תוכניות...</span>
@@ -163,15 +168,13 @@
                                 <div id="assignPlansEmpty" class="alert alert-success d-none unified-pending-empty" role="status">
                                     כל הטריידים מלווים בתוכנית מתאימה. עבודה מצוינת!
                                 </div>
-                                <span class="badge bg-body-secondary text-body mb-2" id="assignPlansCount" style="align-self: flex-start;">0</span>
                                 <ul class="unified-pending-list flex-grow-1" id="assignPlansList"></ul>
                             </div>
                             
                             <!-- Assign Trades Pane -->
                             <div class="tab-pane fade" 
                                  id="paneAssignTrades" 
-                                 role="tabpanel"
-                                 style="flex: 1; display: flex; flex-direction: column;">
+                                 role="tabpanel">
                                 <div id="assignTradesLoading" class="d-flex align-items-center justify-content-center text-muted small unified-pending-loading">
                                     <div class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></div>
                                     <span>טוען המלצות שיוך ביצועים...</span>
@@ -180,15 +183,13 @@
                                 <div id="assignTradesEmpty" class="alert alert-success d-none unified-pending-empty" role="status">
                                     אין כרגע ביצועים שממתינים לשיוך. המשך עבודה מצוינת!
                                 </div>
-                                <span class="badge bg-body-secondary text-body mb-2" id="assignTradesCount" style="align-self: flex-start;">0</span>
                                 <ul class="unified-pending-list flex-grow-1" id="assignTradesList"></ul>
                             </div>
                             
                             <!-- Create Plans Pane -->
                             <div class="tab-pane fade" 
                                  id="paneCreatePlans" 
-                                 role="tabpanel"
-                                 style="flex: 1; display: flex; flex-direction: column;">
+                                 role="tabpanel">
                                 <div id="createPlansLoading" class="d-flex align-items-center justify-content-center text-muted small unified-pending-loading">
                                     <div class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></div>
                                     <span>טוען הצעות יצירת תוכניות...</span>
@@ -197,15 +198,13 @@
                                 <div id="createPlansEmpty" class="alert alert-success d-none unified-pending-empty" role="status">
                                     כל הטריידים מלווים בתוכנית מתאימה. עבודה מצוינת!
                                 </div>
-                                <span class="badge bg-body-secondary text-body mb-2" id="createPlansCount" style="align-self: flex-start;">0</span>
                                 <ul class="unified-pending-list flex-grow-1" id="createPlansList"></ul>
                             </div>
                             
                             <!-- Create Trades Pane -->
                             <div class="tab-pane fade" 
                                  id="paneCreateTrades" 
-                                 role="tabpanel"
-                                 style="flex: 1; display: flex; flex-direction: column;">
+                                 role="tabpanel">
                                 <div id="createTradesLoading" class="d-flex align-items-center justify-content-center text-muted small unified-pending-loading">
                                     <div class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></div>
                                     <span>טוען אשכולות ליצירת טרייד...</span>
@@ -214,7 +213,6 @@
                                 <div id="createTradesEmpty" class="alert alert-success d-none unified-pending-empty" role="status">
                                     אין כרגע אשכולות זמינים ליצירת טרייד חדש.
                                 </div>
-                                <span class="badge bg-body-secondary text-body mb-2" id="createTradesCount" style="align-self: flex-start;">0</span>
                                 <ul class="unified-pending-list flex-grow-1" id="createTradesList"></ul>
                             </div>
                         </div>
@@ -223,7 +221,7 @@
             </div>
         </div>
         
-        <!-- שורה רביעית: ווידג'ט תגיות מאוחד (ענן + חיפוש) -->
+        <!-- שורה שנייה: תגיות + כרטיס ריק לוויג'ט עתידי -->
         <div class="row g-3 mb-3">
             <div class="col-md-6">
                 <div class="card h-100" id="tagWidgetContainer">
@@ -232,94 +230,160 @@
                             <img src="images/icons/entities/home.svg" alt="תגיות" class="section-icon">
                             <span>תגיות</span>
                         </h5>
-                        <!-- Bootstrap Tabs - מימין (סוף השורה ב-RTL) -->
-                        <ul class="nav nav-tabs mb-0" id="tagWidgetTabs" role="tablist">
+                        <!-- Search in Header - מימין (סוף השורה ב-RTL) -->
+                        <form id="tagWidgetSearchForm" class="d-flex flex-wrap gap-2 align-items-center">
+                            <label for="tagWidgetSearchInput" class="visually-hidden">חיפוש תגית</label>
+                            <input id="tagWidgetSearchInput"
+                                   type="search"
+                                   class="form-control"
+                                   placeholder="חיפוש תגית..."
+                                   minlength="2"
+                                   autocomplete="off">
+                            <select id="tagWidgetSearchEntityFilter" class="form-select">
+                                <option value="">כל היישויות</option>
+                                <option value="trade">טריידים</option>
+                                <option value="trade_plan">תכניות</option>
+                                <option value="execution">ביצועים</option>
+                                <option value="trading_account">חשבונות</option>
+                                <option value="alert">התראות</option>
+                                <option value="ticker">טיקרים</option>
+                                <option value="cash_flow">תזרימי מזומנים</option>
+                                <option value="note">הערות</option>
+                            </select>
+                            <button type="submit"
+                                    data-button-type="PRIMARY"
+                                    data-variant="small"
+                                    data-icon="search"
+                                    data-text="חפש"
+                                    title="הפעל חיפוש תגיות"></button>
+                        </form>
+                    </div>
+                    <div class="card-body">
+                        <!-- Tag Cloud - Always Visible -->
+                        <div class="d-flex flex-column gap-0 position-relative">
+                            <div id="tagWidgetCloudLoading" class="d-flex align-items-center justify-content-center text-muted small">
+                                <div class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></div>
+                                <span>טוען נתוני תגיות...</span>
+                            </div>
+                            <div id="tagWidgetCloudError" class="alert alert-danger d-none" role="alert"></div>
+                            <div id="tagWidgetCloudEmpty" class="alert alert-info d-none" role="status">
+                                אין עדיין נתונים להצגה. צרף תגיות לטרנזקציות כדי לראות תובנות כאן.
+                            </div>
+                            <div id="tagWidgetCloudContainer" class="d-flex flex-wrap align-items-center"></div>
+                        </div>
+                        <!-- Search Status -->
+                        <div id="tagWidgetSearchStatus" class="small text-muted mt-2"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card h-100" id="tickerListWidgetContainer">
+                    <div class="card-header d-flex align-items-center justify-content-between gap-2">
+                        <h5 class="mb-0 d-flex align-items-center gap-2">
+                            <img src="images/icons/entities/tickers.svg" alt="דשבורד טיקרים" class="section-icon">
+                            <span>דשבורד טיקרים</span>
+                        </h5>
+                        <button data-button-type="REFRESH" 
+                                data-variant="small"
+                                data-onclick="window.TickerListWidget?.refresh()"
+                                title="רענן נתונים">
+                        </button>
+                    </div>
+                    <div class="card-header">
+                        <!-- Bootstrap Tabs -->
+                        <ul class="nav nav-tabs mb-0" id="tickerListWidgetTabs" role="tablist">
                             <li class="nav-item" role="presentation">
                                 <button class="nav-link active" 
-                                        id="tagWidgetCloudTab" 
+                                        id="tickerListWidgetActiveTab" 
                                         data-bs-toggle="tab" 
-                                        data-bs-target="#tagWidgetCloudPane" 
+                                        data-bs-target="#tickerListWidgetActivePane" 
                                         type="button" 
                                         role="tab" 
-                                        aria-controls="tagWidgetCloudPane" 
+                                        aria-controls="tickerListWidgetActivePane" 
                                         aria-selected="true">
-                                    ענן תגיות
+                                    טיקרים פעילים
                                 </button>
                             </li>
                             <li class="nav-item" role="presentation">
                                 <button class="nav-link" 
-                                        id="tagWidgetSearchTab" 
+                                        id="tickerListWidgetWatchlistTab" 
                                         data-bs-toggle="tab" 
-                                        data-bs-target="#tagWidgetSearchPane" 
+                                        data-bs-target="#tickerListWidgetWatchlistPane" 
                                         type="button" 
                                         role="tab" 
-                                        aria-controls="tagWidgetSearchPane" 
+                                        aria-controls="tickerListWidgetWatchlistPane" 
                                         aria-selected="false">
-                                    חיפוש מהיר
+                                    רשימת צפיה
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" 
+                                        id="tickerListWidgetAllTab" 
+                                        data-bs-toggle="tab" 
+                                        data-bs-target="#tickerListWidgetAllPane" 
+                                        type="button" 
+                                        role="tab" 
+                                        aria-controls="tickerListWidgetAllPane" 
+                                        aria-selected="false">
+                                    כל הטיקרים
                                 </button>
                             </li>
                         </ul>
                     </div>
                     <div class="card-body">
-
                         <!-- Tab Content -->
-                        <div class="tab-content" id="tagWidgetTabContent">
-                            <!-- Cloud Tab Pane -->
+                        <div class="tab-content" id="tickerListWidgetTabContent">
+                            <!-- Active Tickers Pane -->
                             <div class="tab-pane fade show active" 
-                                 id="tagWidgetCloudPane" 
+                                 id="tickerListWidgetActivePane" 
                                  role="tabpanel" 
-                                 aria-labelledby="tagWidgetCloudTab">
+                                 aria-labelledby="tickerListWidgetActiveTab">
                                 <div class="d-flex flex-column gap-0 position-relative">
-                                    <div id="tagWidgetCloudLoading" class="d-flex align-items-center justify-content-center text-muted small">
+                                    <div id="tickerListWidgetActiveLoading" class="ticker-list-widget-loading d-flex align-items-center justify-content-center text-muted small">
                                         <div class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></div>
-                                        <span>טוען נתוני תגיות...</span>
+                                        <span>טוען טיקרים פעילים...</span>
                                     </div>
-                                    <div id="tagWidgetCloudError" class="alert alert-danger d-none" role="alert"></div>
-                                    <div id="tagWidgetCloudEmpty" class="alert alert-info d-none" role="status">
-                                        אין עדיין נתונים להצגה. צרף תגיות לטרנזקציות כדי לראות תובנות כאן.
+                                    <div id="tickerListWidgetActiveError" class="ticker-list-widget-error alert alert-danger d-none" role="alert"></div>
+                                    <div id="tickerListWidgetActiveEmpty" class="ticker-list-widget-empty alert alert-info d-none" role="status">
+                                        <div class="text-muted small">אין טיקרים פעילים להצגה</div>
                                     </div>
-                                    <div id="tagWidgetCloudContainer" class="d-flex flex-wrap align-items-center"></div>
+                                    <div id="tickerListWidgetActiveList" class="ticker-list-widget-list"></div>
                                 </div>
                             </div>
-
-                            <!-- Search Tab Pane -->
+                            
+                            <!-- Watchlist Pane -->
                             <div class="tab-pane fade" 
-                                 id="tagWidgetSearchPane" 
+                                 id="tickerListWidgetWatchlistPane" 
                                  role="tabpanel" 
-                                 aria-labelledby="tagWidgetSearchTab">
-                                <div class="d-flex flex-column gap-3 mt-3">
-                                    <form id="tagWidgetSearchForm" class="d-flex flex-column gap-3">
-                                        <div class="d-flex flex-wrap gap-2 align-items-center">
-                                            <label for="tagWidgetSearchInput" class="visually-hidden">חיפוש תגית</label>
-                                            <input id="tagWidgetSearchInput"
-                                                   type="search"
-                                                   class="form-control flex-grow-1"
-                                                   placeholder="לדוגמה: אסטרטגיה, סוג מניה, סטטוס..."
-                                                   minlength="2"
-                                                   autocomplete="off">
-                                            <select id="tagWidgetSearchEntityFilter" class="form-select w-auto">
-                                                <option value="">כל היישויות</option>
-                                                <option value="trade">טריידים</option>
-                                                <option value="trade_plan">תכניות</option>
-                                                <option value="execution">ביצועים</option>
-                                                <option value="trading_account">חשבונות</option>
-                                                <option value="alert">התראות</option>
-                                                <option value="ticker">טיקרים</option>
-                                                <option value="cash_flow">תזרימי מזומנים</option>
-                                                <option value="note">הערות</option>
-                                            </select>
-                                            <button type="submit"
-                                                    data-button-type="PRIMARY"
-                                                    data-variant="full"
-                                                    data-icon="search"
-                                                    data-text="חפש"
-                                                    title="הפעל חיפוש תגיות"></button>
-                                        </div>
-                                        <div class="text-muted small">
-                                            הקלד לפחות שני תווים ולחץ חפש. לחיצה על תגית בענן תמלא את השדה אוטומטית.
-                                        </div>
-                                        <div id="tagWidgetSearchStatus" class="small text-muted"></div>
-                                    </form>
+                                 aria-labelledby="tickerListWidgetWatchlistTab">
+                                <div class="d-flex flex-column gap-0 position-relative">
+                                    <div id="tickerListWidgetWatchlistLoading" class="ticker-list-widget-loading d-flex align-items-center justify-content-center text-muted small">
+                                        <div class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></div>
+                                        <span>טוען רשימת צפיה...</span>
+                                    </div>
+                                    <div id="tickerListWidgetWatchlistError" class="ticker-list-widget-error alert alert-danger d-none" role="alert"></div>
+                                    <div id="tickerListWidgetWatchlistEmpty" class="ticker-list-widget-empty alert alert-info d-none" role="status">
+                                        <div class="text-muted small">אין טיקרים ברשימת צפיה</div>
+                                    </div>
+                                    <div id="tickerListWidgetWatchlistList" class="ticker-list-widget-list"></div>
+                                </div>
+                            </div>
+                            
+                            <!-- All Tickers Pane -->
+                            <div class="tab-pane fade" 
+                                 id="tickerListWidgetAllPane" 
+                                 role="tabpanel" 
+                                 aria-labelledby="tickerListWidgetAllTab">
+                                <div class="d-flex flex-column gap-0 position-relative">
+                                    <div id="tickerListWidgetAllLoading" class="ticker-list-widget-loading d-flex align-items-center justify-content-center text-muted small">
+                                        <div class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></div>
+                                        <span>טוען כל הטיקרים...</span>
+                                    </div>
+                                    <div id="tickerListWidgetAllError" class="ticker-list-widget-error alert alert-danger d-none" role="alert"></div>
+                                    <div id="tickerListWidgetAllEmpty" class="ticker-list-widget-empty alert alert-info d-none" role="status">
+                                        <div class="text-muted small">אין טיקרים להצגה</div>
+                                    </div>
+                                    <div id="tickerListWidgetAllList" class="ticker-list-widget-list"></div>
                                 </div>
                             </div>
                         </div>
@@ -328,30 +392,35 @@
             </div>
         </div>
         
-        <!-- שורה רביעית: גרפים -->
-        <div class="row g-3">
-            <div class="col-md-4">
-            <div class="card h-100">
-                <div class="card-header"><h5>סטטוס טריידים</h5></div>
-                <div class="card-body"><canvas id="tradesStatusChart" width="300" height="200"></canvas></div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card h-100">
-                <div class="card-header"><h5>חשבונות</h5></div>
-                <div class="card-body"><canvas id="accountChart" width="300" height="200"></canvas></div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card h-100">
-                <div class="card-header"><h5>גרף מעורב</h5></div>
-                <div class="card-body"><canvas id="mixedChart" width="300" height="200"></canvas></div>
-            </div>
-        </div>
-        <div class="col-md-12">
-            <div class="card h-100">
-                <div class="card-header"><h5>ביצועים</h5></div>
-                <div class="card-body"><canvas id="performanceChart" width="400" height="200"></canvas></div>
+        <!-- שורה שלישית: וויגיט גרפים -->
+        <div class="row g-3 mb-3">
+            <div class="col-12">
+                <div class="card h-100" id="tickerChartWidgetContainer">
+                    <div class="card-header d-flex align-items-center justify-content-between gap-2">
+                        <h5 class="mb-0 d-flex align-items-center gap-2">
+                            <img src="images/icons/entities/tickers.svg" alt="גרפים מהירים" class="section-icon">
+                            <span>גרפים מהירים</span>
+                        </h5>
+                        <button data-button-type="REFRESH" 
+                                data-variant="small"
+                                data-onclick="window.TickerChartWidget?.refresh()"
+                                title="רענן נתונים">
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div id="tickerChartWidgetLoading" class="ticker-chart-widget-loading d-flex align-items-center justify-content-center text-muted small">
+                            <div class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></div>
+                            <span>טוען טיקרים...</span>
+                        </div>
+                        <div id="tickerChartWidgetError" class="ticker-chart-widget-error alert alert-danger d-none" role="alert"></div>
+                        <div id="tickerChartWidgetEmpty" class="ticker-chart-widget-empty alert alert-info d-none" role="status">
+                            <div class="text-muted small">אין טיקרים להצגה</div>
+                        </div>
+                        <div class="row g-3" id="tickerChartWidgetCharts">
+                            <!-- Mini Charts will be rendered here -->
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -441,304 +510,378 @@
         </div></div><div class="bottom-spacer"></div><div class="notification-container" id="notificationContainer"></div><div id="toastContainer" class="toast-container position-fixed top-0 end-0 p-3"></div></div>
             <!-- =============================================================== -->
         <!-- =============================================================== -->
+        <!-- =============================================================== -->
+        <!-- =============================================================== -->
+        <!-- =============================================================== -->
+        <!-- =============================================================== -->
+        <!-- =============================================================== -->
+        <!-- =============================================================== -->
+        <!-- =============================================================== -->
+        <!-- =============================================================== -->
+        <!-- =============================================================== -->
+        <!-- =============================================================== -->
+        <!-- =============================================================== -->
+        <!-- =============================================================== -->
+        <!-- =============================================================== -->
+        <!-- =============================================================== -->
+        <!-- =============================================================== -->
+    <!-- =============================================================== -->
+    <!-- =============================================================== -->
+    <!-- =============================================================== -->
+    <!-- =============================================================== -->
     <!-- ===== START SCRIPT LOADING ORDER ===== -->
     <!-- =============================================================== -->
     <!-- ⚠️ DO NOT MODIFY MANUALLY - Generated by generate-script-loading-code.js -->
     <!-- 📋 Loading Order: BASE → SERVICES → MODULES → UI-ADVANCED → CRUD → PREFERENCES → INIT-SYSTEM -->
-    <!-- 🎯 Page: index | Generated: 2025-11-29T19:33:03.766Z -->
-    <!-- 📦 Packages: base, services, ui-advanced, crud, preferences, entity-services, entity-details, info-summary, dashboard-widgets, init-system -->
+    <!-- 🎯 Page: index | Generated: 2025-12-06T22:09:41.502Z -->
+    <!-- 📦 Packages: base, services, ui-advanced, modules, crud, preferences, entity-services, entity-details, info-summary, dashboard-widgets, tradingview-widgets, conditions, init-system -->
+    <!-- 🔧 Mode: development | Use Bundles: false -->
 
     <!-- =============================================================== -->
-    <!-- ===== PACKAGE 1/10: BASE PACKAGE ===== -->
+    <!-- ===== PACKAGE 1/13: BASE PACKAGE ===== -->
     <!-- =============================================================== -->
     <!-- Load Order: 1 | Description: Core systems required for all pages -->
     <!-- Dependencies:  -->
-    <!-- Critical: YES | Version: 2.0.0 -->
+    <!-- Critical: YES | Version: 1.5.0 -->
 
-    <!-- [1] Load Order: 1 -->
-    <script src="scripts/api-config.js?v=1.0.0"></script> <!-- Central API configuration -->
-    <!-- [2] Load Order: 2 -->
-    <script src="scripts/global-favicon.js?v=1.0.0"></script> <!-- Favicon management -->
-    <!-- [3] Load Order: 3 -->
-    <script src="scripts/notification-system.js?v=1.0.0"></script> <!-- Notification system -->
-    <!-- [4] Load Order: 4 -->
-    <script src="scripts/cache-sync-manager.js?v=1.0.0"></script> <!-- Cache synchronization manager -->
-    <!-- [5] Load Order: 5 -->
-    <script src="scripts/ui-utils.js?v=1.0.0"></script> <!-- UI utilities -->
-    <!-- [6] Load Order: 6 -->
-    <script src="scripts/warning-system.js?v=1.0.0"></script> <!-- Warning system -->
-    <!-- [7] Load Order: 7 -->
-    <script src="scripts/error-handlers.js?v=1.0.0"></script> <!-- Error handling system -->
-    <!-- [8] Load Order: 8 -->
-    <script src="scripts/unified-cache-manager.js?v=1.0.0"></script> <!-- Unified cache manager -->
-    <!-- [9] Load Order: 9 -->
-    <script src="scripts/icon-mappings.js?v=1.0.0"></script> <!-- Central icon mappings -->
-    <!-- [10] Load Order: 10 -->
-    <script src="scripts/icon-system.js?v=1.0.0"></script> <!-- Central icon system -->
-    <!-- [11] Load Order: 11 -->
-    <script src="scripts/icon-replacement-helper.js?v=1.0.0"></script> <!-- Icon replacement helper for standardizing icon usage -->
-    <!-- [12] Load Order: 12 -->
-    <script src="scripts/cache-clear-menu.js?v=1.0.0"></script> <!-- Cache clearing control (Stage B-Lite) -->
-    <!-- [13] Load Order: 13 -->
-    <script src="scripts/cache-ttl-guard.js?v=1.0.0"></script> <!-- TTL guard for entity loaders -->
-    <!-- [14] Load Order: 14 -->
-    <script src="scripts/logger-service.js?v=1.0.0"></script> <!-- Advanced logging service -->
-    <!-- [15] Load Order: 15 -->
-    <script src="scripts/header-system.js?v=1.0.0"></script> <!-- Header system -->
-    <!-- [16] Load Order: 16 -->
-    <script src="scripts/page-state-manager.js?v=1.0.0"></script> <!-- Unified page state manager -->
-    <!-- [17] Load Order: 17 -->
-    <script src="scripts/page-utils.js?v=1.0.0"></script> <!-- Page utilities -->
-    <!-- [18] Load Order: 18 -->
-    <script src="scripts/translation-utils.js?v=1.0.0"></script> <!-- Translations -->
-    <!-- [19] Load Order: 19 -->
-    <script src="scripts/button-icons.js?v=1.0.0"></script> <!-- Icon and button system -->
-    <!-- [20] Load Order: 20 -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script> <!-- Bootstrap JS Bundle (Tooltips & Modals) -->
-    <!-- [21] Load Order: 21 -->
-    <script src="scripts/event-handler-manager.js?v=1.0.0"></script> <!-- Central event management system -->
-    <!-- [22] Load Order: 22 -->
-    <script src="scripts/button-system-init.js?v=1.0.0"></script> <!-- Button system -->
-    <!-- [23] Load Order: 23 -->
-    <script src="scripts/color-scheme-system.js?v=1.0.0"></script> <!-- Dynamic color system -->
-    <!-- [24] Load Order: 24 -->
-    <script src="scripts/modules/core-systems.js?v=1.0.0"></script> <!-- Unified initialization system - single entry point (required for all pages) -->
+    <!-- [1] Load Order: 1 | Strategy: defer -->
+    <script src="scripts/api-config.js?v=1.0.0" defer></script> <!-- Central API configuration -->
+    <!-- [2] Load Order: 2 | Strategy: defer -->
+    <script src="scripts/global-favicon.js?v=1.0.0" defer></script> <!-- Favicon management -->
+    <!-- [3] Load Order: 3 | Strategy: defer -->
+    <script src="scripts/notification-system.js?v=1.0.0" defer></script> <!-- Notification system -->
+    <!-- [4] Load Order: 4 | Strategy: defer -->
+    <script src="scripts/cache-sync-manager.js?v=1.0.0" defer></script> <!-- Cache synchronization manager -->
+    <!-- [5] Load Order: 5 | Strategy: defer -->
+    <script src="scripts/ui-utils.js?v=1.0.0" defer></script> <!-- UI utilities -->
+    <!-- [6] Load Order: 6 | Strategy: defer -->
+    <script src="scripts/warning-system.js?v=1.0.0" defer></script> <!-- Warning system -->
+    <!-- [7] Load Order: 7 | Strategy: defer -->
+    <script src="scripts/error-handlers.js?v=1.0.0" defer></script> <!-- Error handling system -->
+    <!-- [8] Load Order: 8 | Strategy: defer -->
+    <script src="scripts/unified-cache-manager.js?v=1.0.0" defer></script> <!-- Unified cache manager -->
+    <!-- [9] Load Order: 9 | Strategy: defer -->
+    <script src="scripts/icon-mappings.js?v=1.0.0" defer></script> <!-- Central icon mappings -->
+    <!-- [10] Load Order: 10 | Strategy: defer -->
+    <script src="scripts/icon-system.js?v=1.0.0" defer></script> <!-- Central icon system -->
+    <!-- [11] Load Order: 11 | Strategy: defer -->
+    <script src="scripts/icon-replacement-helper.js?v=1.0.0" defer></script> <!-- Icon replacement helper for standardizing icon usage -->
+    <!-- [12] Load Order: 12 | Strategy: defer -->
+    <script src="scripts/cache-clear-menu.js?v=1.0.0" defer></script> <!-- Cache clearing control (Stage B-Lite) -->
+    <!-- [13] Load Order: 13 | Strategy: defer -->
+    <script src="scripts/cache-ttl-guard.js?v=1.0.0" defer></script> <!-- TTL guard for entity loaders -->
+    <!-- [14] Load Order: 14 | Strategy: defer -->
+    <script src="scripts/auth.js?v=1.0.0" defer></script> <!-- Authentication system -->
+    <!-- [15] Load Order: 15 | Strategy: defer -->
+    <script src="scripts/auth-guard.js?v=1.0.0" defer></script> <!-- Page protection - authentication guard -->
+    <!-- [16] Load Order: 16 | Strategy: defer -->
+    <script src="scripts/logger-service.js?v=1.0.0" defer></script> <!-- Advanced logging service -->
+    <!-- [17] Load Order: 17 | Strategy: defer -->
+    <script src="scripts/header-system.js?v=1.0.0" defer></script> <!-- Header system -->
+    <!-- [18] Load Order: 18 | Strategy: defer -->
+    <script src="scripts/page-state-manager.js?v=1.0.0" defer></script> <!-- Unified page state manager -->
+    <!-- [19] Load Order: 19 | Strategy: defer -->
+    <script src="scripts/page-utils.js?v=1.0.0" defer></script> <!-- Page utilities -->
+    <!-- [20] Load Order: 20 | Strategy: defer -->
+    <script src="scripts/translation-utils.js?v=1.0.0" defer></script> <!-- Translations -->
+    <!-- [21] Load Order: 21 | Strategy: defer -->
+    <script src="scripts/button-icons.js?v=1.0.0" defer></script> <!-- Icon and button system -->
+    <!-- [22] Load Order: 22 | Strategy: defer -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script> <!-- Bootstrap JS Bundle (Tooltips & Modals) -->
+    <!-- [23] Load Order: 23 | Strategy: defer -->
+    <script src="scripts/event-handler-manager.js?v=1.0.0" defer></script> <!-- Central event management system -->
+    <!-- [24] Load Order: 24 | Strategy: defer -->
+    <script src="scripts/button-system-init.js?v=1.0.0" defer></script> <!-- Button system -->
+    <!-- [25] Load Order: 25 | Strategy: defer -->
+    <script src="scripts/color-scheme-system.js?v=1.0.0" defer></script> <!-- Dynamic color system -->
 
     <!-- =============================================================== -->
-    <!-- ===== PACKAGE 2/10: SERVICES PACKAGE ===== -->
+    <!-- ===== PACKAGE 2/13: SERVICES PACKAGE ===== -->
     <!-- =============================================================== -->
     <!-- Load Order: 2 | Description: General services -->
     <!-- Dependencies: base -->
-    <!-- Critical: NO | Version: 2.0.0 -->
+    <!-- Critical: NO | Version: 1.5.0 -->
 
-    <!-- [25] Load Order: 25 -->
-    <script src="scripts/services/data-collection-service.js?v=1.0.0"></script> <!-- Data collection service -->
-    <!-- [26] Load Order: 26 -->
-    <script src="scripts/services/field-renderer-service.js?v=1.0.0"></script> <!-- Field rendering service -->
-    <!-- [27] Load Order: 27 -->
-    <script src="scripts/services/select-populator-service.js?v=1.0.0"></script> <!-- Select box population service -->
-    <!-- [28] Load Order: 28 -->
-    <script src="scripts/services/statistics-calculator.js?v=1.0.0"></script> <!-- Statistics calculator -->
-    <!-- [29] Load Order: 29 -->
-    <script src="scripts/services/default-value-setter.js?v=1.0.0"></script> <!-- Default value service -->
-    <!-- [30] Load Order: 30 -->
-    <script src="scripts/services/preferences-data.js?v=1.0.0"></script> <!-- Preferences data service (API + Cache) -->
-    <!-- [31] Load Order: 31 -->
-    <script src="scripts/services/crud-response-handler.js?v=1.0.0"></script> <!-- CRUD response handler -->
-    <!-- [32] Load Order: 32 -->
-    <script src="scripts/services/unified-crud-service.js?v=1.0.0"></script> <!-- Unified CRUD service for all entities -->
-    <!-- [33] Load Order: 33 -->
-    <script src="scripts/services/investment-calculation-service.js?v=1.0.0"></script> <!-- Investment form amount ↔ quantity calculations -->
-    <!-- [34] Load Order: 34 -->
-    <script src="scripts/services/tag-service.js?v=1.0.0"></script> <!-- Central tag service (tag management and retrieval) -->
-    <!-- [34.1] Load Order: 34.1 -->
-    <script src="scripts/services/autocomplete-service.js?v=1.0.0"></script> <!-- General autocomplete service for reusable suggestions dropdown -->
-    <!-- [35] Load Order: 35 -->
-    <script src="scripts/services/table-sort-value-adapter.js?v=1.0.0"></script> <!-- Adapter for unified sort values (DateEnvelope, legacy) -->
-    <!-- [36] Load Order: 36 -->
-    <script src="scripts/services/lint-status-service.js?v=1.0.0"></script> <!-- Unified linter status service (API reading and data conversion) -->
-    <!-- [37] Load Order: 37 -->
-    <script src="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.min.js"></script> <!-- Quill.js - Rich Text Editor Library -->
-    <!-- [38] Load Order: 38 -->
-    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js"></script> <!-- DOMPurify - HTML Sanitizer -->
-    <!-- [39] Load Order: 39 -->
-    <script src="scripts/services/rich-text-editor-service.js?v=1.0.0"></script> <!-- Rich text editor service -->
+    <!-- [26] Load Order: 26 | Strategy: defer -->
+    <script src="scripts/services/data-collection-service.js?v=1.0.0" defer></script> <!-- Data collection service -->
+    <!-- [27] Load Order: 27 | Strategy: defer -->
+    <script src="scripts/services/field-renderer-service.js?v=1.0.0" defer></script> <!-- Field rendering service -->
+    <!-- [28] Load Order: 28 | Strategy: defer -->
+    <script src="scripts/services/select-populator-service.js?v=1.0.0" defer></script> <!-- Select box population service -->
+    <!-- [29] Load Order: 29 | Strategy: defer -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script> <!-- jsPDF library (for AI analysis PDF export) -->
+    <!-- [30] Load Order: 30 | Strategy: defer -->
+    <script src="scripts/services/ai-analysis-data.js?v=1.0.0" defer></script> <!-- AI Analysis data service -->
+    <!-- [31] Load Order: 31 | Strategy: defer -->
+    <script src="scripts/services/statistics-calculator.js?v=1.0.0" defer></script> <!-- Statistics calculator -->
+    <!-- [32] Load Order: 32 | Strategy: defer -->
+    <script src="scripts/services/default-value-setter.js?v=1.0.0" defer></script> <!-- Default value service -->
+    <!-- [33] Load Order: 33 | Strategy: defer -->
+    <script src="scripts/services/preferences-data.js?v=1.0.0" defer></script> <!-- Preferences data service (API + Cache) -->
+    <!-- [34] Load Order: 34 | Strategy: defer -->
+    <script src="scripts/services/unified-progress-manager.js?v=1.0.0" defer></script> <!-- Unified progress manager for process tracking -->
+    <!-- [35] Load Order: 35 | Strategy: defer -->
+    <script src="scripts/services/crud-response-handler.js?v=1.0.0" defer></script> <!-- CRUD response handler -->
+    <!-- [36] Load Order: 36 | Strategy: defer -->
+    <script src="scripts/services/unified-crud-service.js?v=1.0.0" defer></script> <!-- Unified CRUD service for all entities -->
+    <!-- [37] Load Order: 37 | Strategy: defer -->
+    <script src="scripts/services/investment-calculation-service.js?v=1.0.0" defer></script> <!-- Investment form amount ↔ quantity calculations -->
+    <!-- [38] Load Order: 38 | Strategy: defer -->
+    <script src="scripts/services/tag-service.js?v=1.0.0" defer></script> <!-- Central tag service (tag management and retrieval) -->
+    <!-- [39] Load Order: 39 | Strategy: defer -->
+    <script src="scripts/services/table-sort-value-adapter.js?v=1.0.0" defer></script> <!-- Adapter for unified sort values (DateEnvelope, legacy) -->
+    <!-- [40] Load Order: 40 | Strategy: defer -->
+    <script src="scripts/services/lint-status-service.js?v=1.0.0" defer></script> <!-- Unified linter status service (API reading and data conversion) -->
+    <!-- [41] Load Order: 41 | Strategy: defer -->
+    <script src="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.min.js" defer></script> <!-- Quill.js - Rich Text Editor Library -->
+    <!-- [42] Load Order: 42 | Strategy: defer -->
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js" defer></script> <!-- DOMPurify - HTML Sanitizer -->
+    <!-- [43] Load Order: 43 | Strategy: defer -->
+    <script src="scripts/services/rich-text-editor-service.js?v=1.0.0" defer></script> <!-- Rich text editor service -->
 
     <!-- =============================================================== -->
-    <!-- ===== PACKAGE 3.5/10: MODULES PACKAGE ===== -->
+    <!-- ===== PACKAGE 3/13: MODULES PACKAGE ===== -->
     <!-- =============================================================== -->
-    <!-- Load Order: 3.5 | Description: General modules -->
+    <!-- Load Order: 2.5 | Description: General modules -->
     <!-- Dependencies: base, services -->
-    <!-- Critical: NO | Version: 2.0.0 -->
+    <!-- Critical: NO | Version: 1.5.0 -->
 
-    <!-- [39.5] Load Order: 39.5 -->
-    <script src="scripts/modal-navigation-manager.js?v=1.0.0"></script> <!-- Nested modal navigation system -->
-    <!-- [39.6] Load Order: 39.6 -->
-    <script src="scripts/modal-manager-v2.js?v=1.0.0"></script> <!-- Modal manager V2 -->
-    <!-- [39.7] Load Order: 39.7 -->
-    <script src="scripts/tag-ui-manager.js?v=1.0.0"></script> <!-- Tag selection management in modals -->
-    <!-- [39.8] Load Order: 39.8 -->
-    <script src="scripts/tag-events.js?v=1.0.0"></script> <!-- Global tag events system -->
-    <!-- [39.9] Load Order: 39.9 -->
-    <script src="scripts/modules/data-basic.js?v=1.0.0"></script> <!-- Basic data -->
-    <!-- [40] Load Order: 40 -->
-    <script src="scripts/modules/ui-basic.js?v=1.0.0"></script> <!-- Basic interface -->
-    <!-- [41] Load Order: 41 -->
-    <script src="scripts/modules/data-advanced.js?v=1.0.0"></script> <!-- Advanced data -->
-    <!-- [42] Load Order: 42 -->
-    <script src="scripts/modules/ui-advanced.js?v=1.0.0"></script> <!-- Advanced interface -->
-    <!-- [43] Load Order: 43 -->
-    <script src="scripts/modules/communication-module.js?v=1.0.0"></script> <!-- Communication module -->
-    <!-- [44] Load Order: 44 -->
-    <script src="scripts/modules/business-module.js?v=1.0.0"></script> <!-- Business module -->
-    <!-- [45] Load Order: 45 -->
-    <script src="scripts/modules/localstorage-sync.js?v=1.0.0"></script> <!-- localStorage synchronization -->
-    <!-- [46] Load Order: 46 -->
-    <script src="scripts/modules/dynamic-loader-config.js?v=1.0.0"></script> <!-- Dynamic loader configuration -->
+    <!-- [44] Load Order: 44 | Strategy: defer -->
+    <script src="scripts/modal-navigation-manager.js?v=1.0.0" defer></script> <!-- Nested modal navigation system -->
+    <!-- [45] Load Order: 45 | Strategy: defer -->
+    <script src="scripts/modal-z-index-manager.js?v=1.0.0" defer></script> <!-- Dynamic z-index management for nested modals -->
+    <!-- [46] Load Order: 46 | Strategy: defer -->
+    <script src="scripts/tag-ui-manager.js?v=1.0.0" defer></script> <!-- Tag selection management in modals -->
+    <!-- [47] Load Order: 47 | Strategy: defer -->
+    <script src="scripts/tag-events.js?v=1.0.0" defer></script> <!-- Global tag events system -->
+    <!-- [48] Load Order: 48 | Strategy: defer -->
+    <script src="scripts/modules/data-basic.js?v=1.0.0" defer></script> <!-- Basic data -->
+    <!-- [49] Load Order: 49 | Strategy: defer -->
+    <script src="scripts/modules/ui-basic.js?v=1.0.0" defer></script> <!-- Basic interface -->
+    <!-- [50] Load Order: 50 | Strategy: defer -->
+    <script src="scripts/modules/data-advanced.js?v=1.0.0" defer></script> <!-- Advanced data -->
+    <!-- [51] Load Order: 51 | Strategy: defer -->
+    <script src="scripts/modules/ui-advanced.js?v=1.0.0" defer></script> <!-- Advanced interface -->
+    <!-- [52] Load Order: 52 | Strategy: defer -->
+    <script src="scripts/modules/communication-module.js?v=1.0.0" defer></script> <!-- Communication module -->
+    <!-- [53] Load Order: 53 | Strategy: defer -->
+    <script src="scripts/modules/business-module.js?v=1.0.0" defer></script> <!-- Business module -->
+    <!-- [54] Load Order: 54 | Strategy: defer -->
+    <script src="scripts/modules/localstorage-sync.js?v=1.0.0" defer></script> <!-- localStorage synchronization -->
+    <!-- [55] Load Order: 55 | Strategy: defer -->
+    <script src="scripts/modules/dynamic-loader-config.js?v=1.0.0" defer></script> <!-- Dynamic loader configuration -->
+    <!-- [56] Load Order: 56 | Strategy: defer -->
+    <script src="scripts/import-user-data.js?v=1.0.0" defer></script> <!-- Execution data import modal -->
+    <!-- [57] Load Order: 57 | Strategy: defer -->
+    <script src="scripts/modal-configs/trades-config.js?v=1.0.0" defer></script> <!-- Trades modal configuration -->
+    <!-- [58] Load Order: 58 | Strategy: defer -->
+    <script src="scripts/modal-configs/trade-plans-config.js?v=1.0.0" defer></script> <!-- Trade plans modal configuration -->
+    <!-- [59] Load Order: 59 | Strategy: defer -->
+    <script src="scripts/modal-configs/watch-lists-config.js?v=1.0.0" defer></script> <!-- Watch lists modal configuration -->
+    <!-- [60] Load Order: 60 | Strategy: defer -->
+    <script src="scripts/modal-configs/cash-flows-config.js?v=1.0.0" defer></script> <!-- Cash flows modal configuration -->
+    <!-- [61] Load Order: 61 | Strategy: defer -->
+    <script src="scripts/modal-configs/tag-management-config.js?v=1.0.0" defer></script> <!-- Tag system modal configuration -->
+    <!-- [62] Load Order: 62 | Strategy: defer -->
+    <script src="scripts/modal-manager-v2.js?v=1.0.0" defer></script> <!-- Modal manager V2 - MUST load after all modal configs -->
 
     <!-- =============================================================== -->
-    <!-- ===== PACKAGE 3/10: UI ADVANCED PACKAGE ===== -->
+    <!-- ===== PACKAGE 4/13: UI ADVANCED PACKAGE ===== -->
     <!-- =============================================================== -->
     <!-- Load Order: 3 | Description: Advanced user interface -->
-    <!-- Dependencies: base, services -->
-    <!-- Critical: NO | Version: 2.0.0 -->
+    <!-- Dependencies: base, services, modules -->
+    <!-- Critical: NO | Version: 1.5.0 -->
 
-    <!-- [47] Load Order: 47 -->
-    <script src="scripts/table-mappings.js?v=1.0.0"></script> <!-- Table mappings -->
-    <!-- [48] Load Order: 48 -->
-    <script src="scripts/tables.js?v=1.0.0"></script> <!-- Table system -->
-    <!-- [49] Load Order: 49 -->
-    <script src="scripts/table-data-registry.js?v=1.0.0"></script> <!-- Table data registry -->
-    <!-- [50] Load Order: 50 -->
-    <script src="scripts/pagination-system.js?v=1.0.0"></script> <!-- Pagination system -->
-    <!-- [51] Load Order: 51 -->
-    <script src="scripts/modules/actions-menu-system.js?v=1.0.0"></script> <!-- Actions menu system -->
+    <!-- [63] Load Order: 63 | Strategy: defer -->
+    <script src="scripts/tables.js?v=1.0.0" defer></script> <!-- Table system -->
+    <!-- [64] Load Order: 64 | Strategy: defer -->
+    <script src="scripts/table-data-registry.js?v=1.0.0" defer></script> <!-- Table data registry -->
+    <!-- [65] Load Order: 65 | Strategy: defer -->
+    <script src="scripts/pagination-system.js?v=1.0.0" defer></script> <!-- Pagination system -->
+    <!-- [66] Load Order: 66 | Strategy: defer -->
+    <script src="scripts/modules/actions-menu-system.js?v=1.0.0" defer></script> <!-- Actions menu system -->
 
     <!-- =============================================================== -->
-    <!-- ===== PACKAGE 4/10: CRUD OPERATIONS PACKAGE ===== -->
+    <!-- ===== PACKAGE 5/13: CRUD OPERATIONS PACKAGE ===== -->
     <!-- =============================================================== -->
     <!-- Load Order: 4 | Description: Data and table management systems -->
     <!-- Dependencies: base, services -->
-    <!-- Critical: NO | Version: 2.0.0 -->
+    <!-- Critical: NO | Version: 1.5.0 -->
 
-    <!-- [52] Load Order: 52 -->
-    <script src="scripts/date-utils.js?v=1.0.0"></script> <!-- Date utilities -->
-    <!-- [53] Load Order: 53 -->
-    <script src="scripts/data-utils.js?v=1.0.0"></script> <!-- General data utilities -->
-    <!-- [54] Load Order: 54 -->
-    <script src="scripts/unified-table-system.js?v=1.0.0"></script> <!-- Unified central table system -->
+    <!-- [67] Load Order: 67 | Strategy: defer -->
+    <script src="scripts/date-utils.js?v=1.0.0" defer></script> <!-- Date utilities -->
+    <!-- [68] Load Order: 68 | Strategy: defer -->
+    <script src="scripts/data-utils.js?v=1.0.0" defer></script> <!-- General data utilities -->
+    <!-- [69] Load Order: 69 | Strategy: defer -->
+    <script src="scripts/unified-table-system.js?v=1.0.0" defer></script> <!-- Unified central table system -->
 
     <!-- =============================================================== -->
-    <!-- ===== PACKAGE 5/10: PREFERENCES PACKAGE ===== -->
+    <!-- ===== PACKAGE 6/13: PREFERENCES PACKAGE ===== -->
     <!-- =============================================================== -->
     <!-- Load Order: 5 | Description: User preferences system v2.0 (10 files) -->
     <!-- Dependencies: base, services -->
-    <!-- Critical: NO | Version: 2.1.0 -->
+    <!-- Critical: NO | Version: 1.5.0 -->
 
-    <!-- [55] Load Order: 55 -->
-    <script src="scripts/preferences-cache.js?v=1.0.0"></script> <!-- Preferences cache management layer -->
-    <!-- [56] Load Order: 56 -->
-    <script src="scripts/services/preferences-v4.js?v=1.0.0"></script> <!-- Preferences V4 SDK (group-first) -->
-    <!-- [57] Load Order: 57 -->
-    <script src="scripts/preferences-events.js?v=1.0.0"></script> <!-- Preferences event system -->
-    <!-- [58] Load Order: 58 -->
-    <script src="scripts/preferences-core-new.js?v=1.0.0"></script> <!-- Preferences core (without colors) -->
-    <!-- [59] Load Order: 59 -->
-    <script src="scripts/preferences-ui-layer.js?v=1.0.0"></script> <!-- Preferences UI layer -->
-    <!-- [60] Load Order: 60 -->
-    <script src="scripts/preferences-colors.js?v=1.0.0"></script> <!-- Color system (60+ preferences) -->
-    <!-- [61] Load Order: 61 -->
-    <script src="scripts/preferences-manager.js?v=1.0.0"></script> <!-- Preferences manager (central) -->
-    <!-- [62] Load Order: 62 -->
-    <script src="scripts/preferences-profiles.js?v=1.0.0"></script> <!-- Profile management -->
-    <!-- [63] Load Order: 63 -->
-    <script src="scripts/preferences-lazy-loader.js?v=1.0.0"></script> <!-- lazy loading system -->
-    <!-- [64] Load Order: 64 -->
-    <script src="scripts/preferences-validation.js?v=1.0.0"></script> <!-- validation system -->
-    <!-- [65] Load Order: 65 -->
-    <script src="scripts/preferences-ui-v4.js?v=1.0.0"></script> <!-- User interface V4 (Group-First) -->
-    <!-- [66] Load Order: 66 -->
-    <script src="scripts/preferences-ui.js?v=1.0.0"></script> <!-- User interface -->
-    <!-- [67] Load Order: 67 -->
-    <script src="scripts/preferences-group-manager.js?v=1.0.0"></script> <!-- Preferences group manager -->
+    <!-- [70] Load Order: 70 | Strategy: defer -->
+    <script src="scripts/preferences-cache.js?v=1.0.0" defer></script> <!-- Preferences cache management layer -->
+    <!-- [71] Load Order: 71 | Strategy: defer -->
+    <script src="scripts/services/preferences-v4.js?v=1.0.0" defer></script> <!-- Preferences V4 SDK (group-first) -->
+    <!-- [72] Load Order: 72 | Strategy: defer -->
+    <script src="scripts/preferences-events.js?v=1.0.0" defer></script> <!-- Preferences event system -->
+    <!-- [73] Load Order: 73 | Strategy: defer -->
+    <script src="scripts/preferences-core-new.js?v=1.0.0" defer></script> <!-- Preferences core (without colors) -->
+    <!-- [74] Load Order: 74 | Strategy: defer -->
+    <script src="scripts/preferences-ui-layer.js?v=1.0.0" defer></script> <!-- Preferences UI layer -->
+    <!-- [75] Load Order: 75 | Strategy: defer -->
+    <script src="scripts/preferences-colors.js?v=1.0.0" defer></script> <!-- Color system (60+ preferences) -->
+    <!-- [76] Load Order: 76 | Strategy: defer -->
+    <script src="scripts/preferences-manager.js?v=1.0.0" defer></script> <!-- Preferences manager (central) -->
+    <!-- [77] Load Order: 77 | Strategy: defer -->
+    <script src="scripts/preferences-profiles.js?v=1.0.0" defer></script> <!-- Profile management -->
+    <!-- [78] Load Order: 78 | Strategy: defer -->
+    <script src="scripts/preferences-lazy-loader.js?v=1.0.0" defer></script> <!-- lazy loading system -->
+    <!-- [79] Load Order: 79 | Strategy: defer -->
+    <script src="scripts/preferences-validation.js?v=1.0.0" defer></script> <!-- validation system -->
+    <!-- [80] Load Order: 80 | Strategy: defer -->
+    <script src="scripts/preferences-ui-v4.js?v=1.0.0" defer></script> <!-- User interface V4 (Group-First) -->
+    <!-- [81] Load Order: 81 | Strategy: defer -->
+    <script src="scripts/preferences-ui.js?v=1.0.0" defer></script> <!-- User interface -->
+    <!-- [82] Load Order: 82 | Strategy: defer -->
+    <script src="scripts/preferences-group-manager.js?v=1.0.0" defer></script> <!-- Preferences group manager -->
 
     <!-- =============================================================== -->
-    <!-- ===== PACKAGE 6/10: ENTITY SERVICES PACKAGE ===== -->
+    <!-- ===== PACKAGE 7/13: CONDITIONS PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 6.5 | Description: Condition systems -->
+    <!-- Dependencies: base, validation -->
+    <!-- Critical: NO | Version: 1.5.0 -->
+
+    <!-- [83] Load Order: 83 | Strategy: defer -->
+    <script src="scripts/conditions/conditions-translations.js?v=1.0.0" defer></script> <!-- Condition translations -->
+    <!-- [84] Load Order: 84 | Strategy: defer -->
+    <script src="scripts/conditions/conditions-validator.js?v=1.0.0" defer></script> <!-- Condition validator -->
+    <!-- [85] Load Order: 85 | Strategy: defer -->
+    <script src="scripts/conditions/conditions-form-generator.js?v=1.0.0" defer></script> <!-- Condition form generator -->
+    <!-- [86] Load Order: 86 | Strategy: defer -->
+    <script src="scripts/conditions/conditions-crud-manager.js?v=1.0.0" defer></script> <!-- Condition CRUD manager -->
+    <!-- [87] Load Order: 87 | Strategy: defer -->
+    <script src="scripts/conditions/conditions-initializer.js?v=1.0.0" defer></script> <!-- Condition initializer -->
+    <!-- [88] Load Order: 88 | Strategy: defer -->
+    <script src="scripts/conditions/conditions-ui-manager.js?v=1.0.0" defer></script> <!-- Condition UI manager -->
+    <!-- [89] Load Order: 89 | Strategy: defer -->
+    <script src="scripts/conditions/conditions-modal-controller.js?v=1.0.0" defer></script> <!-- Condition modal controller -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 8/13: ENTITY SERVICES PACKAGE ===== -->
     <!-- =============================================================== -->
     <!-- Load Order: 10 | Description: Entity services -->
     <!-- Dependencies: base, services -->
-    <!-- Critical: NO | Version: 2.0.0 -->
+    <!-- Critical: NO | Version: 1.5.0 -->
 
-    <!-- [68] Load Order: 68 -->
-    <script src="scripts/account-service.js?v=1.0.0"></script> <!-- Account service -->
-    <!-- [69] Load Order: 69 -->
-    <script src="scripts/alert-service.js?v=1.0.0"></script> <!-- Alert service -->
-    <!-- [70] Load Order: 70 -->
-    <script src="scripts/ticker-service.js?v=1.0.0"></script> <!-- Ticker service -->
-    <!-- [70.5] Load Order: 70.5 -->
-    <script src="scripts/services/trade-plans-data.js?v=1.0.0"></script> <!-- Trade plans data service -->
-    <!-- [71] Load Order: 71 -->
-    <script src="scripts/trade-plan-service.js?v=1.0.0"></script> <!-- Trade plan service -->
-    <!-- [72] Load Order: 72 -->
-    <script src="scripts/condition-translator.js?v=1.0.0"></script> <!-- Condition translator -->
-    <!-- [73] Load Order: 73 -->
-    <script src="scripts/constraints.js?v=1.0.0"></script> <!-- Constraints system -->
-    <!-- [74] Load Order: 74 -->
-    <script src="scripts/services/linked-items-service.js?v=1.0.0"></script> <!-- Shared logic service for linked items -->
-    <!-- [75] Load Order: 75 -->
-    <script src="scripts/linked-items.js?v=1.0.0"></script> <!-- Linked items -->
-    <!-- [76] Load Order: 76 -->
-    <script src="scripts/related-object-filters.js?v=1.0.0"></script> <!-- Related object filters -->
+    <!-- [90] Load Order: 90 | Strategy: defer -->
+    <script src="scripts/account-service.js?v=1.0.0" defer></script> <!-- Account service -->
+    <!-- [91] Load Order: 91 | Strategy: defer -->
+    <script src="scripts/alert-service.js?v=1.0.0" defer></script> <!-- Alert service -->
+    <!-- [92] Load Order: 92 | Strategy: defer -->
+    <script src="scripts/ticker-service.js?v=1.0.0" defer></script> <!-- Ticker service -->
+    <!-- [93] Load Order: 93 | Strategy: defer -->
+    <script src="scripts/services/trade-plans-data.js?v=1.0.0" defer></script> <!-- Trade plans data service -->
+    <!-- [94] Load Order: 94 | Strategy: defer -->
+    <script src="scripts/trade-plan-service.js?v=1.0.0" defer></script> <!-- Trade plan service -->
+    <!-- [95] Load Order: 95 | Strategy: defer -->
+    <script src="scripts/condition-translator.js?v=1.0.0" defer></script> <!-- Condition translator -->
+    <!-- [96] Load Order: 96 | Strategy: defer -->
+    <script src="scripts/constraints.js?v=1.0.0" defer></script> <!-- Constraints system -->
+    <!-- [97] Load Order: 97 | Strategy: defer -->
+    <script src="scripts/services/linked-items-service.js?v=1.0.0" defer></script> <!-- Shared logic service for linked items -->
+    <!-- [98] Load Order: 98 | Strategy: defer -->
+    <script src="scripts/linked-items.js?v=1.0.0" defer></script> <!-- Linked items -->
+    <!-- [99] Load Order: 99 | Strategy: defer -->
+    <script src="scripts/related-object-filters.js?v=1.0.0" defer></script> <!-- Related object filters -->
 
     <!-- =============================================================== -->
-    <!-- ===== PACKAGE 7/10: ENTITY DETAILS PACKAGE ===== -->
+    <!-- ===== PACKAGE 9/13: ENTITY DETAILS PACKAGE ===== -->
     <!-- =============================================================== -->
     <!-- Load Order: 17 | Description: Entity details systems -->
     <!-- Dependencies: base, services, ui-advanced, crud, preferences, entity-services -->
-    <!-- Critical: NO | Version: 2.0.0 -->
+    <!-- Critical: NO | Version: 1.5.0 -->
 
-    <!-- [77] Load Order: 77 -->
-    <script src="scripts/entity-details-api.js?v=1.0.0"></script> <!-- Entity details API -->
-    <!-- [78] Load Order: 78 -->
-    <script src="scripts/entity-details-renderer.js?v=1.0.0"></script> <!-- Entity details renderer -->
-    <!-- [79] Load Order: 79 -->
-    <script src="scripts/entity-details-modal.js?v=1.0.0"></script> <!-- Entity details modal -->
+    <!-- [100] Load Order: 100 | Strategy: defer -->
+    <script src="scripts/entity-details-api.js?v=1.0.0" defer></script> <!-- Entity details API -->
+    <!-- [101] Load Order: 101 | Strategy: defer -->
+    <script src="scripts/entity-details-renderer.js?v=1.0.0" defer></script> <!-- Entity details renderer -->
+    <!-- [102] Load Order: 102 | Strategy: defer -->
+    <script src="scripts/entity-details-modal.js?v=1.0.0" defer></script> <!-- Entity details modal -->
 
     <!-- =============================================================== -->
-    <!-- ===== PACKAGE 8/10: INFO SUMMARY PACKAGE ===== -->
+    <!-- ===== PACKAGE 10/13: INFO SUMMARY PACKAGE ===== -->
     <!-- =============================================================== -->
     <!-- Load Order: 18 | Description: Unified data summary system for all pages -->
     <!-- Dependencies: base, services -->
     <!-- Critical: NO | Version: 1.0.0 -->
 
-    <!-- [80] Load Order: 80 -->
-    <script src="scripts/info-summary-system.js?v=1.0.0"></script> <!-- Core data summary system -->
-    <!-- [81] Load Order: 81 -->
-    <script src="scripts/info-summary-configs.js?v=1.0.0"></script> <!-- Page configurations for data summary -->
+    <!-- [103] Load Order: 103 | Strategy: defer -->
+    <script src="scripts/info-summary-system.js?v=1.0.0" defer></script> <!-- Core data summary system -->
+    <!-- [104] Load Order: 104 | Strategy: defer -->
+    <script src="scripts/info-summary-configs.js?v=1.0.0" defer></script> <!-- Page configurations for data summary -->
 
     <!-- =============================================================== -->
-    <!-- ===== PACKAGE 9/10: DASHBOARD WIDGETS ===== -->
+    <!-- ===== PACKAGE 11/13: DASHBOARD WIDGETS ===== -->
     <!-- =============================================================== -->
     <!-- Load Order: 19.5 | Description: Widgets and dashboard interfaces (Pending Executions, Trade Creation) -->
-    <!-- Dependencies: base, services, ui-advanced, entity-services -->
+    <!-- Dependencies: base, services, ui-advanced, entity-services, modules, entity-details -->
     <!-- Critical: NO | Version: 1.0.0 -->
 
-    <!-- [82] Load Order: 82 -->
-    <script src="scripts/services/dashboard-data.js?v=1.0.0"></script> <!-- Unified dashboard data service -->
-    <!-- [83] Load Order: 83 -->
-    <script src="scripts/widgets/recent-items-widget.js?v=1.0.0"></script> <!-- Unified recent trades and trade plans widget -->
-    <!-- [83.5] Load Order: 83.5 -->
-    <script src="scripts/widgets/recent-trades-widget.js?v=1.0.0"></script> <!-- Recent trades widget (deprecated - use RecentItemsWidget) -->
-    <!-- [84] Load Order: 84 -->
-    <script src="scripts/pending-executions-widget.js?v=1.0.0"></script> <!-- Assignment recommendations widget -->
-    <!-- [85] Load Order: 85 -->
-    <script src="scripts/pending-trade-plan-widget.js?v=1.0.0"></script> <!-- Trade plan assignment widget -->
-    <!-- [85.5] Load Order: 85.5 -->
-    <script src="scripts/widgets/unified-pending-actions-widget.js?v=1.0.0"></script> <!-- Unified widget for pending assignments and creations -->
-    <!-- [86] Load Order: 86 -->
-    <script src="scripts/widgets/tag-widget.js?v=1.0.0"></script> <!-- Unified tag widget (cloud + search) -->
-    <!-- [87] Load Order: 87 -->
-    <script src="scripts/active-alerts-component.js?v=1.0.0"></script> <!-- Active alerts component -->
-    <!-- [88] Load Order: 88 -->
-    <script src="scripts/modal-configs/tag-search-config.js?v=1.0.0"></script> <!-- Tag search drawer configuration (for TagWidget) -->
-    <!-- [88] Load Order: 88 -->
-    <script src="scripts/index.js?v=1.0.0"></script> <!-- Dashboard page logic -->
+    <!-- [105] Load Order: 105 | Strategy: defer -->
+    <script src="scripts/services/dashboard-data.js?v=1.0.0" defer></script> <!-- Unified dashboard data service -->
+    <!-- [106] Load Order: 106 | Strategy: defer -->
+    <script src="scripts/widgets/unified-pending-actions-widget.js?v=1.0.0" defer></script> <!-- undefined -->
+    <!-- [107] Load Order: 107 | Strategy: defer -->
+    <script src="scripts/widgets/recent-items-widget.js?v=1.0.0" defer></script> <!-- Unified recent trades and trade plans widget -->
+    <!-- [108] Load Order: 108 | Strategy: defer -->
+    <script src="scripts/widgets/tag-widget.js?v=1.0.0" defer></script> <!-- Unified tag widget (cloud + search) -->
+    <!-- [109] Load Order: 109 | Strategy: defer -->
+    <script src="scripts/active-alerts-component.js?v=1.0.0" defer></script> <!-- Active alerts component -->
+    <!-- [110] Load Order: 110 | Strategy: defer -->
+    <script src="scripts/widgets/ticker-list-widget.js?v=1.0.0" defer></script> <!-- Ticker list widget with KPI cards -->
+    <!-- [111] Load Order: 111 | Strategy: defer -->
+    <script src="scripts/widgets/ticker-chart-widget.js?v=1.0.0" defer></script> <!-- Ticker chart widget with mini charts -->
+    <!-- [112] Load Order: 112 | Strategy: defer -->
+    <script src="scripts/index.js?v=1.0.0" defer></script> <!-- Dashboard page logic -->
 
     <!-- =============================================================== -->
-    <!-- ===== PACKAGE 10/10: INITIALIZATION PACKAGE ===== -->
+    <!-- ===== PACKAGE 12/13: TRADINGVIEW WIDGETS PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 21 | Description: Central system for managing TradingView widgets -->
+    <!-- Dependencies: base, preferences -->
+    <!-- Critical: NO | Version: 1.0.0 -->
+
+    <!-- [113] Load Order: 113 | Strategy: async -->
+    <script src="scripts/tradingview-widgets/tradingview-widgets-config.js?v=1.0.0" async></script> <!-- Widget configuration -->
+    <!-- [114] Load Order: 114 | Strategy: async -->
+    <script src="scripts/tradingview-widgets/tradingview-widgets-colors.js?v=1.0.0" async></script> <!-- Color system integration -->
+    <!-- [115] Load Order: 115 | Strategy: async -->
+    <script src="scripts/tradingview-widgets/tradingview-widgets-factory.js?v=1.0.0" async></script> <!-- Factory for creating widgets -->
+    <!-- [116] Load Order: 116 | Strategy: async -->
+    <script src="scripts/tradingview-widgets/tradingview-widgets-core.js?v=1.0.0" async></script> <!-- Central widget management system -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 13/13: INITIALIZATION PACKAGE ===== -->
     <!-- =============================================================== -->
     <!-- Load Order: 22 | Description: Initialization and monitoring systems -->
-    <!-- Dependencies: base, crud, services, ui-advanced, modules, preferences, validation, conditions, external-data, charts, logs, cache, entity-services, helper, system-management, management, dev-tools, advanced-notifications, entity-details, info-summary, dashboard-widgets, tradingview-widgets, tradingview-charts, watch-lists, ai-analysis -->
-    <!-- Critical: NO | Version: 2.0.0 -->
+    <!-- Dependencies: base -->
+    <!-- Critical: NO | Version: 1.5.0 -->
 
-    <!-- [89] Load Order: 89 -->
-    <script src="scripts/init-system/package-manifest.js?v=1.0.0"></script> <!-- Package manifest -->
-    <!-- [90] Load Order: 90 -->
-    <script src="scripts/page-initialization-configs.js?v=1.0.0"></script> <!-- Page initialization configurations -->
-    <!-- [91] Load Order: 91 -->
-    <script src="scripts/init-system-check.js?v=1.0.0"></script> <!-- Initialization system check -->
-    <!-- [92] Load Order: 92 -->
-    <script src="scripts/monitoring-functions.js?v=1.0.0"></script> <!-- Page monitoring functions -->
+    <!-- [117] Load Order: 117 | Strategy: defer -->
+    <script src="scripts/init-system/package-manifest.js?v=1.0.0" defer></script> <!-- Package manifest -->
+    <!-- [118] Load Order: 118 | Strategy: defer -->
+    <script src="scripts/page-initialization-configs.js?v=1.0.0" defer></script> <!-- Page initialization configurations -->
+    <!-- [119] Load Order: 119 | Strategy: defer -->
+    <script src="scripts/init-system-check.js?v=1.0.0" defer></script> <!-- Initialization system check -->
+    <!-- [120] Load Order: 120 | Strategy: defer -->
+    <script src="scripts/monitoring-functions.js?v=1.0.0" defer></script> <!-- Page monitoring functions -->
+    <!-- [121] Load Order: 121 | Strategy: defer -->
+    <script src="scripts/modules/core-systems.js?v=1.0.0" defer></script> <!-- Unified initialization system - single entry point (required for all pages) -->
 
     <!-- =============================================================== -->
     <!-- ===== PAGE-SPECIFIC SCRIPTS ===== -->
@@ -747,51 +890,9 @@
     <!-- =============================================================== -->
     <!-- ===== FINAL SUMMARY ===== -->
     <!-- =============================================================== -->
-    <!-- 📊 Total Scripts Processed: 86 | Unique Scripts Loaded: 86 -->
+    <!-- 📊 Total Scripts Processed: 121 | Unique Scripts Loaded: 121 -->
     <!-- 🔧 For maintenance: Use generate-script-loading-code.js -->
-    
-    <!-- =============================================================== -->
-    <!-- ===== DIRECT WIDGET INITIALIZATION (FALLBACK) ===== -->
-    <!-- =============================================================== -->
-    <!-- Initialize UnifiedPendingActionsWidget directly as fallback if customInitializers don't run -->
-    <script>
-        // Wait for DOM and all systems to load
-        window.addEventListener('DOMContentLoaded', async () => {
-            // Wait a bit more for all scripts to load
-            setTimeout(async () => {
-                window.Logger?.info?.('🔵🔵🔵 FALLBACK: Attempting direct widget initialization', { 
-                    widgetExists: typeof window.UnifiedPendingActionsWidget !== 'undefined',
-                    containerExists: !!document.getElementById('unifiedPendingActionsWidgetContainer'),
-                    page: 'index' 
-                });
-                
-                if (typeof window.UnifiedPendingActionsWidget !== 'undefined' && 
-                    typeof window.UnifiedPendingActionsWidget.init === 'function' &&
-                    document.getElementById('unifiedPendingActionsWidgetContainer')) {
-                    try {
-                        await window.UnifiedPendingActionsWidget.init('unifiedPendingActionsWidgetContainer', {
-                            defaultItemsLimit: 4,
-                            defaultAction: 'assign',
-                            defaultEntity: 'plans'
-                        });
-                        window.Logger?.info?.('✅✅✅ FALLBACK: Widget initialized successfully', { page: 'index' });
-                    } catch (error) {
-                        window.Logger?.error?.('🔴🔴🔴 FALLBACK: Error initializing widget', { 
-                            error: error.message,
-                            errorStack: error.stack,
-                            page: 'index' 
-                        });
-                    }
-                } else {
-                    window.Logger?.warn?.('⚠️⚠️⚠️ FALLBACK: Widget or container not available', { 
-                        widgetExists: typeof window.UnifiedPendingActionsWidget !== 'undefined',
-                        hasInit: typeof window.UnifiedPendingActionsWidget?.init === 'function',
-                        containerExists: !!document.getElementById('unifiedPendingActionsWidgetContainer'),
-                        page: 'index' 
-                    });
-                }
-            }, 2000); // Wait 2 seconds for all systems to load
-        });
-    </script>
+
+
 </body>
 </html>

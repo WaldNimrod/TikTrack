@@ -1,5 +1,6 @@
-from sqlalchemy import Column, Integer, ForeignKey, DateTime, UniqueConstraint
+from sqlalchemy import Column, Integer, ForeignKey, DateTime, String, UniqueConstraint
 from sqlalchemy.orm import relationship
+from sqlalchemy.sql import func
 from .base import BaseModel
 from typing import Dict, Any
 from datetime import datetime
@@ -39,8 +40,18 @@ class UserTicker(BaseModel):
                     comment="User who has this ticker in their list")
     ticker_id = Column(Integer, ForeignKey('tickers.id', ondelete='CASCADE'), nullable=False, index=True,
                      comment="Ticker in the user's list")
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False,
+    name_custom = Column(String(100), nullable=True,
+                        comment="Custom company name for this user")
+    type_custom = Column(String(20), nullable=True,
+                        comment="Custom asset type for this user")
+    status = Column(String(20), default='open', nullable=False,
+                   comment="User-ticker association status: open, closed, cancelled")
+    # Note: created_at is inherited from BaseModel, but we override it here for timezone support
+    # The server_default should work, but we'll set it explicitly in code to be safe
+    created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False,
                        comment="When the ticker was added to user's list")
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now(), nullable=True,
+                       comment="Last update timestamp")
     
     # Relationships
     user = relationship("User", backref="user_tickers")
@@ -48,7 +59,7 @@ class UserTicker(BaseModel):
     
     def __repr__(self) -> str:
         """String representation of the UserTicker"""
-        return f"<UserTicker(user_id={self.user_id}, ticker_id={self.ticker_id})>"
+        return f"<UserTicker(user_id={self.user_id}, ticker_id={self.ticker_id}, status={self.status})>"
     
     def to_dict(self) -> Dict[str, Any]:
         """
@@ -64,10 +75,25 @@ class UserTicker(BaseModel):
         """
         result = super().to_dict()
         
+        # Add custom fields
+        if hasattr(self, 'name_custom'):
+            result['name_custom'] = self.name_custom
+        if hasattr(self, 'type_custom'):
+            result['type_custom'] = self.type_custom
+        if hasattr(self, 'status'):
+            result['status'] = self.status
+        if hasattr(self, 'updated_at'):
+            result['updated_at'] = self.updated_at
+        
         # Add related data if available
         if hasattr(self, 'ticker') and self.ticker:
             result['ticker_symbol'] = self.ticker.symbol
             result['ticker_name'] = self.ticker.name
+            # Add default name/type if custom not set
+            if not result.get('name_custom') and self.ticker.name:
+                result['name_custom'] = None  # Explicitly show it's not set
+            if not result.get('type_custom') and self.ticker.type:
+                result['type_custom'] = None  # Explicitly show it's not set
         if hasattr(self, 'user') and self.user:
             result['username'] = self.user.username
         

@@ -305,11 +305,152 @@
   console.log('═══════════════════════════════════════════════════════════════');
   console.log('\n');
 
+  // ============================================================================
+  // 10. בדיקת סקשנים 3+4 - ניטור מפורט
+  // ============================================================================
+  console.log('🔍 שלב 10: ניטור מפורט של סקשנים 3+4');
+  console.log('───────────────────────────────────────────────────────────────');
+  
+  // בדיקת סקשן 3 (trade-creation)
+  const tradeCreationSection = document.querySelector('[data-section="trade-creation"]') || document.getElementById('tradeCreationClustersSection');
+  const tradeCreationHeader = tradeCreationSection?.querySelector('.section-header');
+  const tradeCreationBody = tradeCreationSection?.querySelector('.section-body');
+  const tradeCreationTable = document.getElementById('executionTradeCreationClustersTable');
+  
+  console.log('\n📊 סקשן 3 (Trade Creation):');
+  if (tradeCreationSection) {
+    console.log('   ✅ סקשן נמצא ב-DOM');
+    const isVisible = tradeCreationSection.offsetParent !== null;
+    const bodyDisplay = tradeCreationBody ? window.getComputedStyle(tradeCreationBody).display : 'unknown';
+    const isCollapsed = bodyDisplay === 'none';
+    console.log(`   ${isVisible ? '✅' : '❌'} סקשן ${isVisible ? 'גלוי' : 'מוסתר'}`);
+    console.log(`   ${isCollapsed ? '📦' : '📂'} מצב: ${isCollapsed ? 'סגור' : 'פתוח'}`);
+    
+    if (tradeCreationHeader) {
+      const headerVisible = tradeCreationHeader.offsetParent !== null;
+      console.log(`   ${headerVisible ? '✅' : '❌'} כותרת ${headerVisible ? 'גלויה' : 'מוסתרת'}`);
+    } else {
+      console.error('   ❌ כותרת לא נמצאה!');
+    }
+    
+    if (tradeCreationTable) {
+      const tableRows = tradeCreationTable.querySelectorAll('tbody tr').length;
+      console.log(`   ${tableRows > 0 ? '✅' : '⚠️'} טבלה: ${tableRows} שורות`);
+    } else {
+      console.warn('   ⚠️  טבלה לא נמצאה (ייתכן שעדיין לא נטענה)');
+    }
+  } else {
+    console.error('   ❌ סקשן לא נמצא ב-DOM!');
+  }
+  
+  // בדיקת סקשן 4 (suggestions)
+  const suggestionsSection = document.querySelector('[data-section="suggestions"]') || document.getElementById('suggestions');
+  const suggestionsHeader = suggestionsSection?.querySelector('.section-header');
+  const suggestionsBody = suggestionsSection?.querySelector('.section-body');
+  const suggestionsTable = document.getElementById('tradeSuggestionsTable');
+  
+  console.log('\n📊 סקשן 4 (Suggestions):');
+  if (suggestionsSection) {
+    console.log('   ✅ סקשן נמצא ב-DOM');
+    const isVisible = suggestionsSection.offsetParent !== null;
+    const bodyDisplay = suggestionsBody ? window.getComputedStyle(suggestionsBody).display : 'unknown';
+    const isCollapsed = bodyDisplay === 'none';
+    console.log(`   ${isVisible ? '✅' : '❌'} סקשן ${isVisible ? 'גלוי' : 'מוסתר'}`);
+    console.log(`   ${isCollapsed ? '📦' : '📂'} מצב: ${isCollapsed ? 'סגור' : 'פתוח'}`);
+    
+    if (suggestionsHeader) {
+      const headerVisible = suggestionsHeader.offsetParent !== null;
+      console.log(`   ${headerVisible ? '✅' : '❌'} כותרת ${headerVisible ? 'גלויה' : 'מוסתרת'}`);
+    } else {
+      console.error('   ❌ כותרת לא נמצאה!');
+    }
+    
+    if (suggestionsTable) {
+      const tableRows = suggestionsTable.querySelectorAll('tbody tr').length;
+      console.log(`   ${tableRows > 0 ? '✅' : '⚠️'} טבלה: ${tableRows} שורות`);
+    } else {
+      console.warn('   ⚠️  טבלה לא נמצאה (ייתכן שעדיין לא נטענה)');
+    }
+  } else {
+    console.error('   ❌ סקשן לא נמצא ב-DOM!');
+  }
+  
+  // בדיקת הטבלה השנייה (main)
+  const mainSection = document.querySelector('[data-section="main"]') || document.getElementById('main');
+  const mainTable = document.getElementById('executionsTable');
+  const mainTableRows = mainTable?.querySelectorAll('tbody tr').length || 0;
+  
+  console.log('\n📊 סקשן 2 (Main Table):');
+  if (mainSection) {
+    const mainBody = mainSection.querySelector('.section-body');
+    const mainBodyDisplay = mainBody ? window.getComputedStyle(mainBody).display : 'unknown';
+    const mainIsVisible = mainBodyDisplay !== 'none';
+    console.log(`   ${mainIsVisible ? '✅' : '❌'} סקשן ${mainIsVisible ? 'פתוח' : 'סגור'}`);
+    console.log(`   ${mainTableRows > 0 ? '✅' : '⚠️'} טבלה: ${mainTableRows} שורות`);
+    
+    if (mainTableRows > 0) {
+      console.log('   ✅ הטבלה השנייה מוצגת - ניתן להתחיל טעינת סקשנים 3+4');
+    } else {
+      console.warn('   ⚠️  הטבלה השנייה עדיין לא מוצגת');
+    }
+  }
+  
+  // בדיקת זמינות נתונים
+  console.log('\n📊 זמינות נתונים:');
+  const hasExecutionClusteringService = typeof window.ExecutionClusteringService !== 'undefined';
+  const hasExecutionAssignmentService = typeof window.ExecutionAssignmentService !== 'undefined';
+  console.log(`   ${hasExecutionClusteringService ? '✅' : '❌'} ExecutionClusteringService: ${hasExecutionClusteringService ? 'זמין' : 'חסר'}`);
+  console.log(`   ${hasExecutionAssignmentService ? '✅' : '❌'} ExecutionAssignmentService: ${hasExecutionAssignmentService ? 'זמין' : 'חסר'}`);
+  
+  // בדיקת API calls
+  console.log('\n📊 ניטור API Calls:');
+  if (window.performance && window.performance.getEntriesByType) {
+    const apiCalls = window.performance.getEntriesByType('resource')
+      .filter(entry => entry.name.includes('/api/executions'))
+      .map(entry => ({
+        url: entry.name,
+        duration: entry.duration.toFixed(2),
+        type: entry.initiatorType
+      }));
+    
+    if (apiCalls.length > 0) {
+      console.log(`   ✅ נמצאו ${apiCalls.length} קריאות API:`);
+      apiCalls.forEach(call => {
+        console.log(`      - ${call.url.substring(call.url.lastIndexOf('/'))} (${call.duration}ms)`);
+      });
+    } else {
+      console.warn('   ⚠️  לא נמצאו קריאות API (ייתכן שעדיין לא בוצעו)');
+    }
+  }
+  
+  console.log('\n');
+
   // החזרת תוצאות לשימוש נוסף
   return {
     success: results.failed === 0,
     results,
     conditionsLoaded,
+    sections: {
+      tradeCreation: {
+        exists: !!tradeCreationSection,
+        visible: tradeCreationSection?.offsetParent !== null,
+        collapsed: tradeCreationBody ? window.getComputedStyle(tradeCreationBody).display === 'none' : null,
+        headerVisible: tradeCreationHeader?.offsetParent !== null,
+        tableRows: tradeCreationTable?.querySelectorAll('tbody tr').length || 0
+      },
+      suggestions: {
+        exists: !!suggestionsSection,
+        visible: suggestionsSection?.offsetParent !== null,
+        collapsed: suggestionsBody ? window.getComputedStyle(suggestionsBody).display === 'none' : null,
+        headerVisible: suggestionsHeader?.offsetParent !== null,
+        tableRows: suggestionsTable?.querySelectorAll('tbody tr').length || 0
+      },
+      main: {
+        exists: !!mainSection,
+        tableRows: mainTableRows,
+        ready: mainTableRows > 0
+      }
+    },
     summary: {
       passed: results.passed,
       failed: results.failed,

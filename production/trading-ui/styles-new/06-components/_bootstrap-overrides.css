@@ -545,9 +545,8 @@
   overflow: hidden;
 }
 
-/* הוסר: modal-nested משתמש ב-z-index דינמי דרך CSS variables */
-.modal:not(.modal-nested) .modal-content {
-  z-index: 1000000001 !important;
+/* z-index נקבע דינמית דרך ModalZIndexManager */
+.modal .modal-content {
   background: var(--apple-bg-elevated);
   border-radius: 6px;
   box-shadow: var(--apple-shadow-heavy);
@@ -563,7 +562,7 @@
 }
 
 .modal-backdrop {
-  z-index: 999999998 !important;
+  /* z-index נקבע דינמית דרך ModalZIndexManager */
 }
 
 /* הודעות - וידוא שהן מופיעות מעל הכל */
@@ -575,51 +574,7 @@
   z-index: 100000000 !important;
 }
 
-/* וידוא שכל המודלים מופיעים מעל הכל */
-/* הוסר: modal-nested משתמש ב-z-index דינמי דרך CSS variables */
-.modal.show:not(.modal-nested) {
-  z-index: 999999999 !important;
-}
-
-.modal.show:not(.modal-nested) .modal-dialog {
-  z-index: 1000000000 !important;
-}
-
-/* הוסר: modal-content z-index - כבר מוגדר למעלה */
-
-/* וידוא שהרקע לא חוסם את המודלים */
-.modal-backdrop.show {
-  z-index: 999999998 !important;
-}
-
-/* מודלים ספציפיים עם z-index גבוה יותר */
-/* הוסר: #linkedItemsModal - משתמש ב-modal-nested class עם z-index דינמי */
-#addAlertModal,
-#editAlertModal,
-#addExecutionModal,
-#editExecutionModal,
-#deleteExecutionModal,
-#warningModal {
-  z-index: 999999999 !important;
-}
-
-#addAlertModal .modal-dialog,
-#editAlertModal .modal-dialog,
-#addExecutionModal .modal-dialog,
-#editExecutionModal .modal-dialog,
-#deleteExecutionModal .modal-dialog,
-#warningModal .modal-dialog {
-  z-index: 1000000000 !important;
-}
-
-#addAlertModal .modal-content,
-#editAlertModal .modal-content,
-#addExecutionModal .modal-content,
-#editExecutionModal .modal-content,
-#deleteExecutionModal .modal-content,
-#warningModal .modal-content {
-  z-index: 1000000001 !important;
-}
+/* z-index נקבע דינמית דרך ModalZIndexManager - אין צורך ב-override כאן */
 
 /* ===== סגנונות כפתורים ===== */
 

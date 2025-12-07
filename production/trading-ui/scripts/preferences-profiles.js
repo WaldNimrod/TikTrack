@@ -23,7 +23,11 @@
  * - UI synchronization
  */
 
-window.Logger.info('📄 Loading preferences-profiles.js v1.0.0...', { page: 'preferences-profiles' });
+if (window.Logger && typeof window.Logger.info === 'function') {
+    window.Logger.info('📄 Loading preferences-profiles.js v1.0.0...', { page: 'preferences-profiles' });
+} else if (window.DEBUG_MODE) {
+    console.log('📄 Loading preferences-profiles.js v1.0.0...');
+}
 
 // ============================================================================
 // FUNCTION INDEX

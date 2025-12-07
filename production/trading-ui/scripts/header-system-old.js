@@ -559,7 +559,12 @@ class HeaderSystem {
         page: 'header-system',
         htmlLength: headerHTML.length,
       });
-      headerElement.innerHTML = headerHTML;
+      headerElement.textContent = '';
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(headerHTML, 'text/html');
+      doc.body.childNodes.forEach(node => {
+          headerElement.appendChild(node.cloneNode(true));
+      });
 
       // בדיקות אחרי יצירה
       const createdElements = {
@@ -859,8 +864,8 @@ class HeaderSystem {
                   <div class="type-filter-item" data-value="השקעה" onclick="selectTypeOption('השקעה')">
                     <span class="option-text">השקעה</span>
                   </div>
-                  <div class="type-filter-item" data-value="פסיבי" onclick="selectTypeOption('פסיבי')">
-                    <span class="option-text">פסיבי</span>
+                  <div class="type-filter-item" data-value="פאסיבי" onclick="selectTypeOption('פאסיבי')">
+                    <span class="option-text">פאסיבי</span>
                   </div>
                 </div>
               </div>
@@ -1943,7 +1948,10 @@ class HeaderSystem {
           // שימוש ב-ID במקום שם - כפי ששמור בהעדפות (default_trading_account)
           accountItem.setAttribute('data-value', account.id);
           accountItem.onclick = () => selectAccountOption(account.id);
-          accountItem.innerHTML = `<span class="option-text">${account.name}</span>`;
+          const span = document.createElement('span');
+          span.className = 'option-text';
+          span.textContent = account.name;
+          accountItem.appendChild(span);
           accountMenu.appendChild(accountItem);
           // window.Logger.info('🔧 הוספתי חשבון מסחר:', account.name, { page: "header-system" });
         });
@@ -3157,8 +3165,8 @@ function updateFilterSelections(filters) {
     Swing: 'סווינג',
     investment: 'השקעה',
     Investment: 'השקעה',
-    passive: 'פסיבי',
-    Passive: 'פסיבי',
+    passive: 'פאסיבי',
+    Passive: 'פאסיבי',
     // date ranges
     all_time: 'כל הזמן',
     any: 'כל הזמן',

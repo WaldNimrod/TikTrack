@@ -33,6 +33,11 @@ def tracking() -> Any:
     """Tracking page - redirect to trades"""
     return send_from_directory(UI_DIR, "trades.html")
 
+@pages_bp.route('/watch-list')
+def watch_list() -> Any:
+    """Watch list management page"""
+    return send_from_directory(UI_DIR, "watch-list.html")
+
 
 
 @pages_bp.route('/accounts')
@@ -134,11 +139,6 @@ def constraints() -> Any:
 def test_header_only() -> Any:
     """Test header only page"""
     return send_from_directory(UI_DIR, "test-header-only.html")
-
-@pages_bp.route('/linter-realtime-monitor')
-def linter_realtime_monitor() -> Any:
-    """Linter realtime monitor page"""
-    return send_from_directory(UI_DIR, "linter-realtime-monitor.html")
 
 @pages_bp.route('/chart-management')
 def chart_management() -> Any:

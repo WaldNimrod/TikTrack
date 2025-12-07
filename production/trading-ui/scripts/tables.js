@@ -958,9 +958,17 @@ window.applyDefaultSort = async function (tableType, data, updateFunction) {
 window.closeModal = function (modalId) {
   const modal = document.getElementById(modalId);
   if (modal) {
-    const bootstrapModal = bootstrap.Modal.getInstance(modal);
-    if (bootstrapModal) {
-      bootstrapModal.hide();
+    if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
+      window.ModalManagerV2.hideModal(modalId);
+    } else if (bootstrap?.Modal) {
+      const bootstrapModal = bootstrap.Modal.getInstance(modal);
+      if (bootstrapModal) {
+        bootstrapModal.hide();
+      } else {
+        // Fallback: hide modal manually
+        modal.classList.remove('show');
+        modal.style.display = 'none';
+      }
     } else {
       // Fallback: hide modal manually
       modal.classList.remove('show');
@@ -1339,7 +1347,8 @@ window.updateTableWithPagination = async function({
     if (table) {
       const isInModal = table.closest('.modal, [class*="modal"]');
       if (isInModal) {
-        console.warn(`⚠️ [updateTableWithPagination] Skipping pagination for table ${tableId} - table is inside a modal`);
+        // Expected behavior - pagination is not needed for tables inside modals
+        // No log needed - this is normal behavior
         // Render full dataset without pagination
         await render(data, {
           skipPagination: true,

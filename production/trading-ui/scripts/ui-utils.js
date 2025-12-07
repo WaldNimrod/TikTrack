@@ -135,6 +135,77 @@ async function calculatePercentageFromPrice(currentPrice, targetPrice, side = 'L
 }
 
 /**
+ * Calculate profit/loss value (general function for all interfaces)
+ * @param {number} currentPrice - Current price
+ * @param {number} entryPrice - Entry/average price
+ * @param {number} quantity - Position quantity (can be negative for short)
+ * @returns {number} Profit/loss value (positive for profit, negative for loss)
+ * 
+ * @example
+ * calculateProfitLoss(150.25, 148.00, 100) // Returns: 225 (profit)
+ * calculateProfitLoss(150.25, 152.00, 100) // Returns: -175 (loss)
+ */
+function calculateProfitLoss(currentPrice, entryPrice, quantity) {
+  if (!currentPrice || currentPrice <= 0) {
+    return 0;
+  }
+  if (!entryPrice || entryPrice <= 0) {
+    return 0;
+  }
+  if (!quantity || quantity === 0) {
+    return 0;
+  }
+  
+  // P/L = (currentPrice - entryPrice) * quantity
+  // Works for both long (positive quantity) and short (negative quantity)
+  return (currentPrice - entryPrice) * quantity;
+}
+
+/**
+ * Calculate profit/loss percentage (general function for all interfaces)
+ * @param {number} currentPrice - Current price
+ * @param {number} entryPrice - Entry/average price
+ * @returns {number} Profit/loss percentage (positive for profit, negative for loss)
+ * 
+ * @example
+ * calculateProfitLossPercent(150.25, 148.00) // Returns: 1.52 (1.52% profit)
+ * calculateProfitLossPercent(150.25, 152.00) // Returns: -1.15 (-1.15% loss)
+ */
+function calculateProfitLossPercent(currentPrice, entryPrice) {
+  if (!currentPrice || currentPrice <= 0) {
+    return 0;
+  }
+  if (!entryPrice || entryPrice <= 0) {
+    return 0;
+  }
+  
+  // P/L % = ((currentPrice - entryPrice) / entryPrice) * 100
+  return ((currentPrice - entryPrice) / entryPrice) * 100;
+}
+
+/**
+ * Calculate daily change percentage from open price (general function for all interfaces)
+ * @param {number} currentPrice - Current price
+ * @param {number} openPrice - Opening price (price at start of day)
+ * @returns {number} Daily change percentage (positive for gain, negative for loss)
+ * 
+ * @example
+ * calculateDailyChangePercent(150.25, 148.00) // Returns: 1.52 (1.52% gain)
+ * calculateDailyChangePercent(150.25, 152.00) // Returns: -1.15 (-1.15% loss)
+ */
+function calculateDailyChangePercent(currentPrice, openPrice) {
+  if (!currentPrice || currentPrice <= 0) {
+    return 0;
+  }
+  if (!openPrice || openPrice <= 0) {
+    return 0;
+  }
+  
+  // Daily change % = ((currentPrice - openPrice) / openPrice) * 100
+  return ((currentPrice - openPrice) / openPrice) * 100;
+}
+
+/**
  * Update stop and target prices in form based on current price and percentages
  * @param {string} formId - ID of the form
  * @param {number} currentPrice - Current price of the ticker
@@ -362,6 +433,9 @@ window.showModal = showModal;
 window.calculateStopPrice = calculateStopPrice;
 window.calculateTargetPrice = calculateTargetPrice;
 window.calculatePercentageFromPrice = calculatePercentageFromPrice;
+window.calculateProfitLoss = calculateProfitLoss;
+window.calculateProfitLossPercent = calculateProfitLossPercent;
+window.calculateDailyChangePercent = calculateDailyChangePercent;
 window.updatePricesFromPercentages = updatePricesFromPercentages;
 window.updatePercentagesFromPrices = updatePercentagesFromPrices;
 window.formatPercentage = formatPercentage;
@@ -373,6 +447,10 @@ window.uiUtils = {
   calculateStopPrice,
   calculateTargetPrice,
   calculatePercentageFromPrice,
+  // Financial calculation functions (general - for all interfaces)
+  calculateProfitLoss,
+  calculateProfitLossPercent,
+  calculateDailyChangePercent,
   updatePricesFromPercentages,
   updatePercentagesFromPrices,
   formatPercentage,
@@ -524,7 +602,19 @@ async function cancelItem(itemType, itemId, itemName = null, currentStatus = nul
       );
     });
   } else {
-    confirmed = window.confirm(`האם אתה בטוח שברצונך לבטל את ${entityLabel} "${displayName}"?`);
+    if (window.showConfirmationDialog) {
+      confirmed = await new Promise((resolve) => {
+        window.showConfirmationDialog(
+          'ביטול',
+          `האם אתה בטוח שברצונך לבטל את ${entityLabel} "${displayName}"?`,
+          () => resolve(true),
+          () => resolve(false),
+          'warning'
+        );
+      });
+    } else {
+      confirmed = window.confirm(`האם אתה בטוח שברצונך לבטל את ${entityLabel} "${displayName}"?`);
+    }
   }
 
   if (!confirmed) {
@@ -794,9 +884,16 @@ function initializeModalBackdrop() {
     // הוספת event listener לסגירה בלחיצה על הרקע
     modal.addEventListener('click', event => {
       if (event.target === modal) {
-        const modalInstance = bootstrap.Modal.getInstance(modal);
-        if (modalInstance) {
-          modalInstance.hide();
+        if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
+          const modalId = modal.id;
+          if (modalId) {
+            window.ModalManagerV2.hideModal(modalId);
+          }
+        } else if (bootstrap?.Modal) {
+          const modalInstance = bootstrap.Modal.getInstance(modal);
+          if (modalInstance) {
+            modalInstance.hide();
+          }
         }
       }
     });
@@ -817,9 +914,22 @@ function showSecondConfirmationModal(message, onConfirm) {
     window.showConfirmationDialog('אישור', message, onConfirm, () => {});
   } else {
     // Fallback למקרה שמערכת התראות לא זמינה
-    const confirmed = window.confirm(message);
-    if (confirmed) {
-      onConfirm();
+    let confirmed = false;
+    if (window.showConfirmationDialog) {
+      window.showConfirmationDialog(
+        'אישור',
+        message,
+        () => {
+          confirmed = true;
+          onConfirm();
+        },
+        () => {}
+      );
+    } else {
+      confirmed = window.confirm(message);
+      if (confirmed) {
+        onConfirm();
+      }
     }
   }
 }
@@ -956,37 +1066,38 @@ async function handleApiResponseWithRefresh(response, options = {}) {
 function getPageDataFunctions() {
   const currentPage = window.location.pathname.split('/').pop().replace('.html', '') || 'index';
   
+  // Define function mappings - check at call time, not definition time
   const pageFunctions = {
     'tickers': {
-      loadData: window.loadTickersData,
-      updateActive: window.updateActiveTradesField
+      get loadData() { return typeof window.loadTickersData === 'function' ? window.loadTickersData : null; },
+      get updateActive() { return typeof window.updateActiveTradesField === 'function' ? window.updateActiveTradesField : null; }
     },
     'trades': {
-      loadData: window.loadTradesData,
-      updateActive: window.updateActiveTradesField
+      get loadData() { return typeof window.loadTradesData === 'function' ? window.loadTradesData : null; },
+      get updateActive() { return typeof window.updateActiveTradesField === 'function' ? window.updateActiveTradesField : null; }
     },
     'trading_accounts': {
-      loadData: window.loadTradingAccountsDataForTradingAccountsPage,
+      get loadData() { return typeof window.loadTradingAccountsDataForTradingAccountsPage === 'function' ? window.loadTradingAccountsDataForTradingAccountsPage : null; },
       updateActive: null
     },
     'alerts': {
-      loadData: window.loadAlertsData,
+      get loadData() { return typeof window.loadAlertsData === 'function' ? window.loadAlertsData : null; },
       updateActive: null
     },
     'trade_plans': {
-      loadData: window.loadTradePlansData,
+      get loadData() { return typeof window.loadTradePlansData === 'function' ? window.loadTradePlansData : null; },
       updateActive: null
     },
     'executions': {
-      loadData: window.loadExecutionsData,
+      get loadData() { return typeof window.loadExecutionsData === 'function' ? window.loadExecutionsData : null; },
       updateActive: null
     },
     'cash_flows': {
-      loadData: window.loadCashFlowsData,
+      get loadData() { return typeof window.loadCashFlowsData === 'function' ? window.loadCashFlowsData : null; },
       updateActive: null
     },
     'notes': {
-      loadData: window.loadNotesData,
+      get loadData() { return typeof window.loadNotesData === 'function' ? window.loadNotesData : null; },
       updateActive: null
     }
   };
@@ -1360,18 +1471,27 @@ window.restoreAllSectionStates = async function () {
           }
         } else {
           // No saved state - apply default state from page config
-          // Special case: trade-creation section should be closed by default (lazy loading)
-          const shouldBeClosed = sectionId === 'trade-creation';
-          const finalState = shouldBeClosed ? 'closed' : defaultState;
+          // Check sectionDefaultStates first, then fallback to sectionsDefaultState
+          const sectionSpecificDefault = pageConfig?.sectionDefaultStates?.[sectionId];
+          const finalDefaultState = sectionSpecificDefault || defaultState;
+          const finalState = finalDefaultState === 'closed' ? 'closed' : 'open';
           
           if (finalState === 'open') {
             sectionBody.style.display = 'block';
             if (icon) { icon.textContent = '▲'; }
-            if (window.Logger) { window.Logger.debug(`✅ Section "${sectionId}" default state OPEN (no cache)`, { page: "ui-utils" }); }
+            if (window.Logger) { window.Logger.debug(`✅ Section "${sectionId}" default state OPEN (no cache)`, { 
+              page: "ui-utils",
+              sectionSpecificDefault,
+              finalDefaultState
+            }); }
           } else {
             sectionBody.style.display = 'none';
             if (icon) { icon.textContent = '▼'; }
-            if (window.Logger) { window.Logger.debug(`✅ Section "${sectionId}" default state CLOSED (no cache)`, { page: "ui-utils" }); }
+            if (window.Logger) { window.Logger.debug(`✅ Section "${sectionId}" default state CLOSED (no cache)`, { 
+              page: "ui-utils",
+              sectionSpecificDefault,
+              finalDefaultState
+            }); }
           }
         }
       }
@@ -1777,7 +1897,18 @@ function loadTableActionButtons(tableId, entityType, config = {}) {
       return;
     }
     
-    actionsCell.innerHTML = buttonsHtml;
+    // Insert buttons HTML using tempDiv
+    actionsCell.textContent = '';
+    const tempDiv = document.createElement('div');
+    tempDiv.textContent = '';
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(buttonsHtml, 'text/html');
+    doc.body.childNodes.forEach(node => {
+        tempDiv.appendChild(node.cloneNode(true));
+    });
+    while (tempDiv.firstChild) {
+      actionsCell.appendChild(tempDiv.firstChild);
+    }
   });
 
 }
@@ -2346,7 +2477,7 @@ function updatePageSummaryStats(pageName, data, countElementId = null) {
         // עדכון מספר הרשומות בטבלה (אם סופק ID)
         if (countElementId) {
           const countElement = document.getElementById(countElementId);
-          if (countElement) {
+          if (countElement && typeof countElement === 'object' && 'textContent' in countElement) {
             countElement.textContent = `${summaryData.length} רשומות`;
           }
         }
@@ -2356,12 +2487,13 @@ function updatePageSummaryStats(pageName, data, countElementId = null) {
     } else {
       // מערכת סיכום נתונים לא זמינה
       const summaryStatsElement = document.getElementById('summaryStats');
-      if (summaryStatsElement) {
-        summaryStatsElement.innerHTML = `
-          <div style="color: #dc3545; font-weight: bold;">
-            ⚠️ מערכת סיכום נתונים לא זמינה - נא לרענן את הדף
-          </div>
-        `;
+      if (summaryStatsElement && typeof summaryStatsElement === 'object' && 'textContent' in summaryStatsElement) {
+        summaryStatsElement.textContent = '';
+        const errorDiv = document.createElement('div');
+        errorDiv.style.color = '#dc3545';
+        errorDiv.style.fontWeight = 'bold';
+        errorDiv.textContent = '⚠️ מערכת סיכום נתונים לא זמינה - נא לרענן את הדף';
+        summaryStatsElement.appendChild(errorDiv);
       }
     }
     
@@ -2545,7 +2677,14 @@ function showLoadingState(componentId) {
         if (!component.querySelector('.loading-spinner')) {
             const spinner = document.createElement('div');
             spinner.className = 'loading-spinner';
-            spinner.innerHTML = '<div class="spinner-border spinner-border-sm" role="status"><span class="visually-hidden">טוען...</span></div>';
+            const spinnerDiv = document.createElement('div');
+            spinnerDiv.className = 'spinner-border spinner-border-sm';
+            spinnerDiv.setAttribute('role', 'status');
+            const span = document.createElement('span');
+            span.className = 'visually-hidden';
+            span.textContent = 'טוען...';
+            spinnerDiv.appendChild(span);
+            spinner.appendChild(spinnerDiv);
             component.appendChild(spinner);
         }
     }

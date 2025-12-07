@@ -159,7 +159,7 @@
             
             // Fallback to localStorage
             if (!stored) {
-                const localStorageData = localStorage.getItem(FILTERS_STORAGE_KEY);
+                const localStorageData = window.PageStateManager?.getItem(FILTERS_STORAGE_KEY);
                 if (localStorageData) {
                     stored = JSON.parse(localStorageData);
                 }
@@ -198,7 +198,7 @@
                 });
             } else {
                 // Fallback to localStorage
-                localStorage.setItem(FILTERS_STORAGE_KEY, JSON.stringify(data));
+                window.PageStateManager?.setItem(FILTERS_STORAGE_KEY, JSON.stringify(data));
             }
         } catch (error) {
             if (window.Logger) {
@@ -212,7 +212,7 @@
                     eventTypes: state.filters.eventTypes,
                     lastUpdated: Date.now()
                 };
-                localStorage.setItem(FILTERS_STORAGE_KEY, JSON.stringify(data));
+                window.PageStateManager?.setItem(FILTERS_STORAGE_KEY, JSON.stringify(data));
             } catch (e) {
                 // Ignore localStorage errors
             }
@@ -495,7 +495,7 @@
 
         // Save to localStorage (mock - in real system would save to backend)
         try {
-            localStorage.setItem('economic-calendar-saved-events', JSON.stringify(state.savedEvents));
+            window.PageStateManager?.setItem('economic-calendar-saved-events', JSON.stringify(state.savedEvents));
         } catch (error) {
             if (window.Logger) {
                 window.Logger.warn('Failed to save events to localStorage', {
@@ -539,7 +539,7 @@
 
         // Save to localStorage
         try {
-            localStorage.setItem('economic-calendar-saved-events', JSON.stringify(state.savedEvents));
+            window.PageStateManager?.setItem('economic-calendar-saved-events', JSON.stringify(state.savedEvents));
         } catch (error) {
             if (window.Logger) {
                 window.Logger.warn('Failed to save events to localStorage', {
@@ -561,7 +561,7 @@
                 // Clear summary if no events
                 const summaryContainer = document.getElementById('economic-calendar-summary');
                 if (summaryContainer) {
-                    summaryContainer.innerHTML = '';
+                    summaryContainer.textContent = '';
                 }
             }
         }
@@ -810,7 +810,11 @@
         if (!container) return;
 
         if (!state.savedEvents || state.savedEvents.length === 0) {
-            container.innerHTML = '<div class="text-muted text-center py-3">אין אירועים שמורים</div>';
+            container.innerHTML.textContent = '';
+        const div = document.createElement('div');
+        div.className = 'text-muted text-center py-3';
+        div.textContent = 'אין אירועים שמורים';
+        container.innerHTML.appendChild(div);
             return;
         }
 
@@ -874,7 +878,12 @@
             </table>
         `;
 
-        container.innerHTML = tableHTML;
+        container.textContent = '';
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(tableHTML, 'text/html');
+        doc.body.childNodes.forEach(node => {
+          container.appendChild(node.cloneNode(true));
+        });
         
         // Initialize icons in the rendered table (async, don't block)
         initializeIcons().catch(() => {

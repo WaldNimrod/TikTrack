@@ -122,6 +122,17 @@ class ChartLoader {
         Chart.defaults.responsive = true;
         Chart.defaults.maintainAspectRatio = false;
 
+        // Configure font defaults FIRST (before plugins that use it)
+        if (!Chart.defaults.font) {
+            Chart.defaults.font = {
+                family: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+                size: 12,
+                style: 'normal',
+                weight: 'normal',
+                lineHeight: 1.2
+            };
+        }
+
         // Configure animation
         Chart.defaults.animation = {
             duration: 1000,
@@ -154,6 +165,10 @@ class ChartLoader {
                 borderWidth: 1,
                 cornerRadius: 6,
                 displayColors: true
+            },
+            title: {
+                display: false,
+                font: Chart.defaults.font // Ensure title plugin has font configured
             }
         };
 

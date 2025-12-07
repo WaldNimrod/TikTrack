@@ -204,11 +204,15 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'entity-details',
         'info-summary',
         'dashboard-widgets',
+        'tradingview-widgets', // Required for TickerChartWidget mini charts
+        'conditions', // Conditions System
         'init-system',
       ],
-
       // ← NEW: בדיקות תקינות
       requiredGlobals: [
+        'window.UnifiedAppInitializer', // Unified Init System
+        'window.PAGE_CONFIGS', // Unified Init System
+        'window.PACKAGE_MANIFEST', // Unified Init System
         'NotificationSystem',
         'DataUtils',
         'window.Logger',
@@ -219,8 +223,21 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.RecentItemsWidget',
         'window.UnifiedPendingActionsWidget',
         'window.TagWidget',
+        'window.TickerListWidget', // Ticker List Widget
+        'window.TickerChartWidget', // Ticker Chart Widget
+        'window.TradingViewWidgetsFactory', // TradingView Widgets Factory (required for TickerChartWidget)
+        'window.WatchListsWidgetService', // Watch Lists Widget Service
+        'window.conditionsInitializer', // Conditions System
+        'window.ConditionsUIManager', // Conditions System
+        'window.UnifiedAppInitializer', // Unified Init System
+        'window.PAGE_CONFIGS', // Unified Init System
+        'window.PACKAGE_MANIFEST', // Unified Init System
+        'window.CRUDResponseHandler', // CRUD Response Handler
+        'window.LinkedItemsService', // Linked Items System
+        'window.loadLinkedItemsData', // Linked Items System
+        'window.UnifiedTableSystem', // Unified Table System
+        'window.PaginationSystem', // Pagination System
       ],
-
       // ← NEW: מטאדאטה
       description: 'דשבורד ראשי - כולל גרפים, סטטיסטיקות ונתונים כלליים',
       lastModified: '2025-10-19',
@@ -262,10 +279,8 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
           }
 
           // Use the new unified initialization function
-          window.Logger?.info?.('🔵 About to call initializeIndexPage...', { page: 'page-initialization-configs' });
           if (typeof window.initializeIndexPage === 'function') {
             await window.initializeIndexPage();
-            window.Logger?.info?.('🔵 initializeIndexPage completed', { page: 'page-initialization-configs' });
           } else {
             // Fallback to old method
             // Initialize charts if available
@@ -277,6 +292,30 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
           if (typeof window.loadDashboardData === 'function') {
             await window.loadDashboardData();
           }
+          }
+
+          // Initialize ticker widgets
+          if (window.TickerListWidget) {
+            try {
+              window.TickerListWidget.init('tickerListWidgetContainer', {
+                maxItems: 5,
+                defaultTab: 'active'
+              });
+            } catch (error) {
+              window.Logger?.error?.('❌ Error initializing TickerListWidget', { error: error.message, stack: error.stack, page: 'page-initialization-configs' });
+            }
+          }
+          
+          if (window.TickerChartWidget) {
+            try {
+              window.TickerChartWidget.init('tickerChartWidgetContainer', {
+                maxItems: 3
+              });
+            } catch (error) {
+              window.Logger?.error?.('❌ Error initializing TickerChartWidget', { error: error.message, stack: error.stack, page: 'page-initialization-configs' });
+            }
+          } else {
+            window.Logger?.warn?.('⚠️ TickerChartWidget not available', { page: 'page-initialization-configs' });
           }
 
           // Initialize positions & portfolio system
@@ -293,76 +332,42 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
           }
 
           // Initialize unified tag widget
-          window.Logger?.info?.('🔵 About to initialize TagWidget...', { page: 'page-initialization-configs' });
           if (typeof window.TagWidget !== 'undefined' && typeof window.TagWidget.init === 'function') {
             try {
-              window.Logger?.info?.('🏷️ Initializing TagWidget...', { page: 'page-initialization-configs' });
               // Initialize with default configuration: min 1 row, max 3 rows
               window.TagWidget.init('tagWidgetContainer', {
                 minRows: 1,
                 maxRows: 3,
                 rowHeight: 20
               });
-              window.Logger?.info?.('✅ TagWidget initialization called', { page: 'page-initialization-configs' });
             } catch (error) {
               window.Logger?.warn('⚠️ Error initializing TagWidget:', error, {
                 page: 'page-initialization-configs',
               });
             }
-          } else {
-            window.Logger?.warn('⚠️ TagWidget not available', {
-              TagWidgetExists: typeof window.TagWidget !== 'undefined',
-              hasInit: typeof window.TagWidget?.init === 'function',
-              page: 'page-initialization-configs',
-            });
           }
 
           // Initialize unified recent items widget
           if (typeof window.RecentItemsWidget !== 'undefined' && typeof window.RecentItemsWidget.init === 'function') {
             try {
-              window.Logger?.info?.('📊 Initializing RecentItemsWidget...', { page: 'page-initialization-configs' });
               window.RecentItemsWidget.init('recentItemsWidgetContainer', {
                 defaultTab: 'trades',
-                maxItems: 5 // Maximum number of items to display per tab
+                maxItems: 4 // Maximum number of items to display per tab (limited to 4 for consistent height)
               });
-              window.Logger?.info?.('✅ RecentItemsWidget initialization called', { page: 'page-initialization-configs' });
             } catch (error) {
               window.Logger?.warn('⚠️ Error initializing RecentItemsWidget:', error, {
                 page: 'page-initialization-configs',
               });
             }
-          } else {
-            window.Logger?.warn('⚠️ RecentItemsWidget not available', {
-              RecentItemsWidgetExists: typeof window.RecentItemsWidget !== 'undefined',
-              hasInit: typeof window.RecentItemsWidget?.init === 'function',
-              page: 'page-initialization-configs',
-            });
           }
 
           // Initialize unified pending actions widget
-          window.Logger?.info?.('🔴🔴🔴 CHECKING UnifiedPendingActionsWidget - START', {
-            WidgetExists: typeof window.UnifiedPendingActionsWidget !== 'undefined',
-            hasInit: typeof window.UnifiedPendingActionsWidget?.init === 'function',
-            page: 'page-initialization-configs',
-          });
-          
           try {
             if (typeof window.UnifiedPendingActionsWidget !== 'undefined' && typeof window.UnifiedPendingActionsWidget.init === 'function') {
-              window.Logger?.info?.('🟢🟢🟢 Initializing UnifiedPendingActionsWidget...', { 
-                containerId: 'unifiedPendingActionsWidgetContainer',
-                config: { defaultItemsLimit: 4, defaultAction: 'assign', defaultEntity: 'plans' },
-                page: 'page-initialization-configs' 
-              });
-              
-              const result = await window.UnifiedPendingActionsWidget.init('unifiedPendingActionsWidgetContainer', {
+              await window.UnifiedPendingActionsWidget.init('unifiedPendingActionsWidgetContainer', {
                 defaultItemsLimit: 4,
                 defaultAction: 'assign',
                 defaultEntity: 'plans'
-              });
-              
-              window.Logger?.info?.('✅✅✅ UnifiedPendingActionsWidget initialization completed', { 
-                result,
-                page: 'page-initialization-configs' 
               });
             } else {
               window.Logger?.error?.('🔴🔴🔴 UnifiedPendingActionsWidget not available!', {
@@ -380,9 +385,13 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
             });
           }
           
-          window.Logger?.info?.('🔴🔴🔴 CHECKING UnifiedPendingActionsWidget - END', {
-            page: 'page-initialization-configs',
-          });
+          // Equalize widget heights after all widgets are initialized
+          // Wait a bit for widgets to render their content
+          setTimeout(() => {
+            if (typeof window.equalizeWidgetHeights === 'function') {
+              window.equalizeWidgetHeights();
+            }
+          }, 1500);
         },
       ],
     },
@@ -401,6 +410,10 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'init-system',
       ],
       requiredGlobals: [
+        'window.UnifiedAppInitializer', // Unified Init System
+        'window.PAGE_CONFIGS', // Unified Init System
+        'window.PACKAGE_MANIFEST', // Unified Init System
+
         'NotificationSystem',
         'window.IconSystem',
         'DataUtils',
@@ -408,7 +421,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.ModalManagerV2',
         'window.TagService',
         'window.TagUIManager',
-        'window.TagManagementPage',
+        'window.TagManagementPage'
       ],
       description: 'ניהול תגיות וקטגוריות - כולל אנליטיקה, סינון והצעות',
       lastModified: '2025-11-13',
@@ -442,14 +455,16 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'base',
         'services',
         'ui-advanced',
+        'modules', // Required for ModalManagerV2
         'crud',
         'preferences',
         'validation',
         'entity-details',
         'info-summary',
+        'dashboard-widgets', // Pending Trade Plan Widget
+        'conditions', // Conditions System
         'init-system',
       ],
-
       // ← NEW: בדיקות תקינות
       requiredGlobals: [
         'NotificationSystem',
@@ -458,9 +473,22 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.Logger',
         'window.CacheSyncManager',
         'window.PreferencesUIV4',
-      ],
-
+        'window.InfoSummarySystem', // Info Summary System
+        'window.conditionsInitializer', // Conditions System
+        'window.ConditionsUIManager', // Conditions System
+        'window.LinkedItemsService', // Linked Items Service
+        'window.CRUDResponseHandler', // CRUD Response Handler
+        'window.createActionsMenu', // Actions Menu Toolkit
+        'window.PaginationSystem', // Pagination System
+        'window.showEntityDetails', // Entity Details Modal
+        'window.PendingTradePlanWidget', // Pending Trade Plan Widget
+        'window.UnifiedAppInitializer', // Unified Init System
+        'window.PAGE_CONFIGS', // Unified Init System
+        'window.PACKAGE_MANIFEST', // Unified Init System
+        'window.ModalManagerV2', // Modal Manager V2
+        'window.ConditionsSummaryRenderer', // Conditions Summary Renderer
       // ← NEW: מטאדאטה
+      ],
       description: 'עמוד העדפות משתמש - הגדרות מערכת וצבעים',
       lastModified: '2025-10-19',
       pageType: 'settings',
@@ -474,86 +502,60 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
 
       // ← NEW: Default state for sections (when no cache exists)
       sectionsDefaultState: 'closed', // 'closed' | 'open'
-
-      // קיים
-      requiresFilters: false,
-      requiresValidation: true,
-      requiresTables: false,
-      customInitializers: [
-        // Preferences-specific initialization
-        async pageConfig => {
-          window.Logger.info('⚙️ Initializing Preferences...', {
-            page: 'page-initialization-configs',
-          });
-
-          // Load trading accounts for default account preference
-          if (typeof window.loadAccountsForPreferences === 'function') {
-            await window.loadAccountsForPreferences();
-          }
-
-          // Initialize Preferences UI V4 (this loads user/profile data and displays it)
-          // Note: PreferencesCore.initializeWithLazyLoading() is called by core-systems.js
-          // but PreferencesUIV4.initialize() is page-specific and must be called here
-          if (window.PreferencesUIV4 && typeof window.PreferencesUIV4.initialize === 'function') {
-            window.Logger.info('🎨 Initializing Preferences UI V4...', {
-              page: 'page-initialization-configs',
-            });
-            await window.PreferencesUIV4.initialize();
-          } else if (window.PreferencesUI && typeof window.PreferencesUI.initialize === 'function') {
-            // Fallback to PreferencesUI if PreferencesUIV4 is not available
-            window.Logger.info('🎨 Initializing Preferences UI (fallback)...', {
-              page: 'page-initialization-configs',
-            });
-            await window.PreferencesUI.initialize();
-          } else {
-            window.Logger.warn('⚠️ PreferencesUIV4 or PreferencesUI not available', {
-              page: 'page-initialization-configs',
-            });
-          }
-
-          // Load default colors if not set
-          if (typeof window.loadDefaultColors === 'function') {
-            window.loadDefaultColors();
-          }
-
-          // Render preference types audit table
-          if (typeof window.renderPreferenceTypesAuditTable === 'function') {
-            await window.renderPreferenceTypesAuditTable();
-          }
-
-          // Setup preference change handlers (function not implemented yet)
-          // if (typeof window.setupPreferenceHandlers === 'function') {
-          //     window.setupPreferenceHandlers();
-          // }
-        },
-      ],
     },
 
     'user-profile': {
       name: 'User Profile',
+      description: 'ניהול פרופיל משתמש - הגדרות אישיות, SMTP, AI Analysis',
+      lastModified: '2025-02-02',
+      pageType: 'management',
       packages: [
         'base',
         'services',
-        'modules',
         'ui-advanced',
+        'modules',
+        'crud',
         'preferences',
-        'init-system'
+        'entity-details',
+        'info-summary',
+        'dashboard-widgets',
+        'conditions',
+        'init-system',
       ],
       requiredGlobals: [
+        'window.UnifiedAppInitializer', // Unified Init System
+        'window.PAGE_CONFIGS', // Unified Init System
+        'window.PACKAGE_MANIFEST', // Unified Init System
+
         'NotificationSystem',
         'window.IconSystem',
+        'DataUtils',
         'window.Logger',
+        'window.ModalManagerV2',
+        'window.ModalNavigationManager',
+        'window.SelectPopulatorService',
+        'window.DataCollectionService',
+        'window.DefaultValueSetter',
+        'window.TableSortValueAdapter',
+        'window.LinkedItemsService',
+        'window.CRUDResponseHandler',
+        'window.createActionsMenu',
+        'window.InfoSummarySystem',
+        'window.PaginationSystem',
+        'window.showEntityDetails',
+        'window.conditionsInitializer',
+        'window.ConditionsUIManager',
+        'window.PendingTradePlanWidget',
         'window.TikTrackAuth',
         'window.UserProfilePage',
         'window.AIAnalysisManager'
       ],
       pageSpecificScripts: [
         'scripts/user-profile.js',
-        'scripts/user-profile-ai-analysis.js'
+        'scripts/user-profile-ai-analysis.js',
       ],
-      description: 'ניהול פרופיל משתמש - הגדרות אישיות, SMTP, AI Analysis',
-      lastModified: '2025-01-30',
-      pageType: 'management',
+      preloadAssets: ['user-profile-data'],
+      cacheStrategy: 'standard',
       requiresFilters: false,
       requiresValidation: false,
       requiresTables: false,
@@ -577,50 +579,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
     },
     
     // Legacy entry (kept for compatibility)
-    'user_profile': {
-      name: 'User Profile',
-      packages: [
-        'base',
-        'services',
-        'validation',
-        'modules',
-        'ui-advanced',
-        'preferences',
-        'init-system',
-      ],
-      requiredGlobals: [
-        'NotificationSystem',
-        'window.IconSystem',
-        'window.Logger',
-        'window.TikTrackAuth',
-        'window.UserProfilePage',
-        'window.AIAnalysisManager',
-      ],
-      pageSpecificScripts: [
-        'scripts/user-profile.js',
-        'scripts/user-profile-ai-analysis.js'
-      ],
-      description: 'ניהול פרופיל משתמש - עדכון פרטים, שינוי סיסמה, הגדרות SMTP, הגדרות AI Analysis',
-      lastModified: '2025-01-29',
-      pageType: 'settings',
-      requiresFilters: false,
-      requiresValidation: true,
-      requiresTables: false,
-      customInitializers: [
-        async () => {
-          if (window.UserProfilePage && typeof window.UserProfilePage.init === 'function') {
-            await window.UserProfilePage.init();
-          }
-          // Initialize AI Analysis Manager
-          if (window.AIAnalysisManager && typeof window.AIAnalysisManager.init === 'function') {
-            if (!window.AIAnalysisManager.initialized) {
-              await window.AIAnalysisManager.init();
-            }
-          }
-        },
-      ],
-    },
-
     // Trading Pages
     trades: {
       name: 'Trades',
@@ -649,7 +607,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'info-summary',
         'init-system',
       ],
-
       // ← NEW: בדיקות תקינות
       requiredGlobals: [
         'NotificationSystem',
@@ -671,9 +628,16 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.ConditionsUIManager',
         'window.ConditionsModalController',
         'window.conditionsModalConfig',
-      ],
-
+        'window.UnifiedAppInitializer', // Unified Init System
+        'window.PAGE_CONFIGS', // Unified Init System
+        'window.PACKAGE_MANIFEST', // Unified Init System
+        'window.CRUDResponseHandler', // CRUD Response Handler
+        'window.LinkedItemsService', // Linked Items System
+        'window.loadLinkedItemsData', // Linked Items System
+        'window.UnifiedTableSystem', // Unified Table System
+        'window.PaginationSystem', // Pagination System
       // ← NEW: מטאדאטה
+      ],
       description: 'עמוד מעקב טריידים - כולל טבלאות, פילטרים, התראות ותנאים',
       lastModified: '2025-10-19',
       pageType: 'crud',
@@ -743,7 +707,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'info-summary',
         'init-system',
       ],
-
       // ← NEW: בדיקות תקינות
       requiredGlobals: [
         'NotificationSystem',
@@ -751,7 +714,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'DataUtils',
         'window.Logger',
         'window.CacheSyncManager',
-        'window.loadExecutionsData',
+        'window.ExecutionsData',
         'window.executionsModalConfig',
         'window.SelectPopulatorService',
         'window.tickerService',
@@ -759,9 +722,8 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.RichTextEditorService',
         'window.Quill',
         'window.DOMPurify',
-      ],
-
       // ← NEW: מטאדאטה
+      ],
       description: 'מעקב ביצועי עסקאות - היסטוריית ביצועים שבוצעו',
       lastModified: '2025-11-24',
       pageType: 'crud',
@@ -791,33 +753,51 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
           // Preferences are already loaded by core-systems.js via initializePreferencesForPage
           // No need to call loadUserPreferences here - it causes duplicate API calls and 429 errors
 
-          window.Logger.info('🔍 Checking loadExecutionsData...', {
-            exists: typeof window.loadExecutionsData !== 'undefined',
-            type: typeof window.loadExecutionsData,
-            isFunction: typeof window.loadExecutionsData === 'function',
-            page: 'page-initialization-configs',
-          });
-          
+          // Use window.loadExecutionsData wrapper which updates allExecutions and renders table
           if (typeof window.loadExecutionsData === 'function') {
-            window.Logger.info('📥 Calling loadExecutionsData...', {
+            window.Logger.info('📥 Calling window.loadExecutionsData...', {
               page: 'page-initialization-configs',
             });
             try {
               await window.loadExecutionsData();
-              window.Logger.info('✅ loadExecutionsData completed', {
+              window.Logger.info('✅ window.loadExecutionsData completed', {
                 page: 'page-initialization-configs',
               });
             } catch (error) {
-              window.Logger.error('❌ loadExecutionsData failed', {
+              window.Logger.error('❌ window.loadExecutionsData failed', {
                 error: error?.message,
                 stack: error?.stack,
                 page: 'page-initialization-configs',
               });
             }
           } else {
-            window.Logger.warn('⚠️ window.loadExecutionsData is not a function', {
-              type: typeof window.loadExecutionsData,
-              value: window.loadExecutionsData,
+            window.Logger.warn('⚠️ window.loadExecutionsData is not available', {
+              loadExecutionsDataExists: typeof window.loadExecutionsData,
+              ExecutionsDataExists: !!window.ExecutionsData,
+              page: 'page-initialization-configs',
+            });
+          }
+
+          // Initialize executions page (sets up preloading and lazy loading systems)
+          if (typeof window.initializeExecutionsPage === 'function') {
+            window.Logger.info('📥 Calling window.initializeExecutionsPage...', {
+              page: 'page-initialization-configs',
+            });
+            try {
+              await window.initializeExecutionsPage();
+              window.Logger.info('✅ window.initializeExecutionsPage completed', {
+                page: 'page-initialization-configs',
+              });
+            } catch (error) {
+              window.Logger.error('❌ window.initializeExecutionsPage failed', {
+                error: error?.message,
+                stack: error?.stack,
+                page: 'page-initialization-configs',
+              });
+            }
+          } else {
+            window.Logger.warn('⚠️ window.initializeExecutionsPage is not available', {
+              initializeExecutionsPageExists: typeof window.initializeExecutionsPage,
               page: 'page-initialization-configs',
             });
           }
@@ -856,8 +836,11 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'info-summary',
         'init-system',
       ],
-
       requiredGlobals: [
+        'window.UnifiedAppInitializer', // Unified Init System
+        'window.PAGE_CONFIGS', // Unified Init System
+        'window.PACKAGE_MANIFEST', // Unified Init System
+
         'NotificationSystem',
         'window.IconSystem',
         'window.Logger',
@@ -866,7 +849,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.refreshDataImportHistory',
         'window.showImportUserDataNotification',
       ],
-
       description: 'דף מרכזי לניהול תהליכי ייבוא נתונים ושיגור המודול המאוחד',
       lastModified: '2025-11-18',
       pageType: 'crud',
@@ -880,7 +862,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'scripts/monitor-import-execution.js',
         'scripts/debug-active-session.js',
       ],
-
       requiresFilters: false,
       requiresValidation: true,
       requiresTables: true,
@@ -922,7 +903,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'info-summary',
         'init-system',
       ],
-
       // ← NEW: בדיקות תקינות
       requiredGlobals: [
         'NotificationSystem',
@@ -945,7 +925,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.ConditionsModalController',
         'window.conditionsModalConfig',
       ],
-
       requiresFilters: true,
       requiresValidation: true,
       requiresTables: true,
@@ -1022,7 +1001,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'info-summary',
         'init-system',
       ],
-
       // ← NEW: בדיקות תקינות
       requiredGlobals: [
         'NotificationSystem',
@@ -1039,9 +1017,8 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.ConditionsUIManager',
         'window.ConditionsModalController',
         'window.conditionsModalConfig',
-      ],
-
       // ← NEW: מטאדאטה
+      ],
       description: 'מערכת התראות עסקיות - ניהול תנאי שוק והתראות',
       lastModified: '2025-11-13',
       pageType: 'crud',
@@ -1113,9 +1090,9 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'entity-details',
         'entity-services',
         'info-summary',
+        'conditions', // Conditions System
         'init-system',
       ],
-
       // ← NEW: בדיקות תקינות
       requiredGlobals: [
         'NotificationSystem',
@@ -1128,16 +1105,32 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.RichTextEditorService',
         'window.Quill',
         'window.DOMPurify',
-      ],
-
+        'window.conditionsInitializer', // Conditions System
+        'window.ConditionsUIManager', // Conditions System
+        'window.UnifiedAppInitializer', // Unified Init System
+        'window.PAGE_CONFIGS', // Unified Init System
+        'window.PACKAGE_MANIFEST', // Unified Init System
       // ← NEW: מטאדאטה
+      ],
       description: 'ניהול חשבונות מסחר - הוספה, עריכה ומעקב חשבונות',
       lastModified: '2025-10-19',
       pageType: 'crud',
 
       // ← NEW: אופטימיזציה
-      preloadAssets: ['accounts-data'],
+      // Use the correct cache key: 'trading-accounts-data' (primary) with fallback to 'accounts-data' (legacy)
+      preloadAssets: ['trading-accounts-data', 'accounts-data'],
       cacheStrategy: 'aggressive',
+
+      // ← NEW: Section default states
+      // Top section and main table load open, other sections load closed (lazy loading)
+      sectionsDefaultState: 'open', // Default for all sections
+      sectionDefaultStates: {
+        'top': 'open',                          // Always open
+        'main': 'open',                         // Always open
+        'account-activity-summary': 'closed',   // Closed, parallel loading
+        'account-activity-table': 'closed',     // Closed, parallel loading
+        'positions-portfolio': 'closed'         // Closed, parallel loading
+      },
 
       // קיים
       requiresFilters: true,
@@ -1295,9 +1288,11 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'entity-services',
         'entity-details',
         'info-summary',
+        'conditions', // Conditions System
         'init-system',
       ],
       requiredGlobals: [
+
         'NotificationSystem',
         'window.IconSystem', // from base package
         'DataUtils', // from services package
@@ -1307,6 +1302,15 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.RichTextEditorService',
         'window.Quill',
         'window.DOMPurify',
+        'window.SelectPopulatorService', // Data Collection Service
+        'window.DataCollectionService', // Data Collection Service
+        'window.DefaultValueSetter', // Data Collection Service
+        'window.TableSortValueAdapter', // Data Collection Service
+        'window.conditionsInitializer', // Conditions System
+        'window.ConditionsUIManager', // Conditions System
+        'window.UnifiedAppInitializer', // Unified Init System
+        'window.PAGE_CONFIGS', // Unified Init System
+        'window.PACKAGE_MANIFEST', // Unified Init System
       ],
       description: 'ניהול תזרימי מזומנים - הכנסות והוצאות',
       lastModified: '2025-11-13',
@@ -1358,9 +1362,9 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'entity-services',
         'entity-details',
         'info-summary',
+        'conditions', // Conditions System
         'init-system',
       ],
-
       // ← NEW: בדיקות תקינות
       requiredGlobals: [
         'NotificationSystem',
@@ -1370,9 +1374,13 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.loadTickersData',
         'window.ModalManagerV2',
         'window.tickersModalConfig',
-      ],
-
+        'window.conditionsInitializer', // Conditions System
+        'window.ConditionsUIManager', // Conditions System
+        'window.UnifiedAppInitializer', // Unified Init System
+        'window.PAGE_CONFIGS', // Unified Init System
+        'window.PACKAGE_MANIFEST', // Unified Init System
       // ← NEW: מטאדאטה
+      ],
       description: 'ניהול טיקרים - מעקב מחירים ונתונים פיננסיים',
       lastModified: '2025-11-13',
       pageType: 'crud',
@@ -1415,10 +1423,14 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'entity-services',
         'entity-details',
         'info-summary',
+        'tradingview-charts', // Required for price chart
         'init-system',
       ],
-
       requiredGlobals: [
+        'window.UnifiedAppInitializer', // Unified Init System
+        'window.PAGE_CONFIGS', // Unified Init System
+        'window.PACKAGE_MANIFEST', // Unified Init System
+
         'NotificationSystem',
         'window.IconSystem',
         'DataUtils',
@@ -1429,7 +1441,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.FieldRendererService',
         'window.LinkedItemsService',
       ],
-
       description: 'דשבורד טיקר מורחב - גרפים, KPI, מדדים טכניים ופעילות משתמש',
       lastModified: '2025-01-28',
       pageType: 'dashboard',
@@ -1444,8 +1455,19 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         async pageConfig => {
           window.Logger.info('📊 Initializing Ticker Dashboard...', { page: 'page-initialization-configs' });
 
+          // Note: HeaderSystem is already initialized by core-systems.js in manualInitialization
+          // No need to initialize it again here to avoid duplicate initialization warnings
+
+          // Initialize Ticker Dashboard
           if (typeof window.tickerDashboard?.init === 'function') {
+            window.Logger.info('📊 Calling window.tickerDashboard.init()...', { page: 'page-initialization-configs' });
             await window.tickerDashboard.init();
+            window.Logger.info('✅ window.tickerDashboard.init() completed', { page: 'page-initialization-configs' });
+          } else {
+            window.Logger.error('❌ window.tickerDashboard.init is not a function', { 
+              tickerDashboardExists: !!window.tickerDashboard,
+              page: 'page-initialization-configs' 
+            });
           }
         },
       ],
@@ -1477,9 +1499,9 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'entity-services',
         'entity-details',
         'info-summary',
+        'helper', // Required for notes.js (loadNotesData)
         'init-system',
       ],
-
       // ← NEW: בדיקות תקינות
       requiredGlobals: [
         'NotificationSystem',
@@ -1492,8 +1514,16 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.RichTextEditorService',
         'window.Quill',
         'window.DOMPurify',
+        'window.ConditionsSummaryRenderer', // Conditions Summary Renderer
+        'window.UnifiedAppInitializer', // Unified Init System
+        'window.PAGE_CONFIGS', // Unified Init System
+        'window.PACKAGE_MANIFEST', // Unified Init System
+        'window.CRUDResponseHandler', // CRUD Response Handler
+        'window.LinkedItemsService', // Linked Items System
+        'window.loadLinkedItemsData', // Linked Items System
+        'window.UnifiedTableSystem', // Unified Table System
+        'window.PaginationSystem', // Pagination System
       ],
-
       requiresFilters: true,
       requiresValidation: true,
       requiresTables: true,
@@ -1501,74 +1531,45 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         async pageConfig => {
           console.log('📝 [page-initialization-configs] Notes customInitializer started');
 
-          // Use general system getPageDataFunctions() instead of local code
-          if (typeof window.getPageDataFunctions === 'function') {
-            console.log('✅ [page-initialization-configs] getPageDataFunctions found');
-            const { loadData } = window.getPageDataFunctions();
-            console.log('🔍 [page-initialization-configs] loadData type:', typeof loadData);
+          // Wait for loadNotesData to be available (for bundle support)
+          // Improved wait logic: faster polling at start, then slower
+          let waitCount = 0;
+          const maxWait = 100; // 10 seconds max (100 * 100ms) - increased from 5 seconds
+          const fastPollInterval = 50; // 50ms for first 20 checks (1 second)
+          const slowPollInterval = 100; // 100ms for remaining checks
+          
+          while (typeof window.loadNotesData !== 'function' && waitCount < maxWait) {
+            const interval = waitCount < 20 ? fastPollInterval : slowPollInterval;
+            await new Promise(resolve => setTimeout(resolve, interval));
+            waitCount++;
+          }
 
-            if (loadData && typeof loadData === 'function') {
-              console.log(
-                '📝 [page-initialization-configs] Initializing Notes via general system...'
-              );
-              try {
-                await loadData();
-                console.log('✅ [page-initialization-configs] Notes data loaded successfully');
-              } catch (error) {
-                console.error('❌ [page-initialization-configs] Error loading notes data:', error);
-              }
-            } else {
-              console.warn(
-                '⚠️ [page-initialization-configs] loadData is not a function, trying fallback...'
-              );
-              // Fallback to direct function call if general system doesn't have it
-              if (typeof window.loadNotesData === 'function') {
-                console.log(
-                  '📝 [page-initialization-configs] Initializing Notes (fallback to loadNotesData via TTL guard)...'
-                );
-                try {
-                  if (window.CacheTTLGuard?.ensure) {
-                    await window.CacheTTLGuard.ensure('notes-data', window.loadNotesData);
-                  } else {
-                    await window.loadNotesData();
-                  }
-                  console.log(
-                    '✅ [page-initialization-configs] Notes data loaded successfully (fallback)'
-                  );
-                } catch (error) {
-                  console.error('❌ [page-initialization-configs] Error in loadNotesData:', error);
-                }
-              } else {
-                console.error(
-                  '❌ [page-initialization-configs] loadNotesData function not available'
-                );
-              }
+          // Use direct function call for notes page
+          if (typeof window.loadNotesData === 'function') {
+            window.Logger.info('📝 [page-initialization-configs] Initializing Notes via loadNotesData...', { page: 'page-initialization-configs' });
+            try {
+              await window.loadNotesData();
+              window.Logger.info('✅ [page-initialization-configs] Notes data loaded successfully', { page: 'page-initialization-configs' });
+            } catch (error) {
+              window.Logger.warn('⚠️ [page-initialization-configs] Error in loadNotesData (will continue without notes)', { error: error?.message, stack: error?.stack, page: 'page-initialization-configs' });
             }
           } else {
-            console.warn(
-              '⚠️ [page-initialization-configs] getPageDataFunctions not found, trying direct loadNotesData...'
-            );
-            // Fallback if getPageDataFunctions doesn't exist
-            if (typeof window.loadNotesData === 'function') {
-              console.log(
-                '📝 [page-initialization-configs] Initializing Notes (direct loadNotesData via TTL guard)...'
-              );
+            // Fallback: try to use NotesData service if available
+            if (typeof window.NotesData?.loadNotesData === 'function') {
+              window.Logger.info('📝 [page-initialization-configs] Using NotesData service as fallback...', { page: 'page-initialization-configs' });
               try {
-                if (window.CacheTTLGuard?.ensure) {
-                  await window.CacheTTLGuard.ensure('notes-data', window.loadNotesData);
-                } else {
-                  await window.loadNotesData();
-                }
-                console.log(
-                  '✅ [page-initialization-configs] Notes data loaded successfully (direct)'
-                );
+                await window.NotesData.loadNotesData();
+                window.Logger.info('✅ [page-initialization-configs] Notes data loaded via service', { page: 'page-initialization-configs' });
               } catch (error) {
-                console.error('❌ [page-initialization-configs] Error in loadNotesData:', error);
+                window.Logger.warn('⚠️ [page-initialization-configs] Error loading notes via service (will continue without notes)', { error: error?.message, page: 'page-initialization-configs' });
               }
             } else {
-              console.error(
-                '❌ [page-initialization-configs] loadNotesData function not available'
-              );
+              window.Logger.warn('⚠️ [page-initialization-configs] loadNotesData function not available (may load later or page may work without it)', { 
+                loadNotesDataType: typeof window.loadNotesData,
+                notesDataType: typeof window.NotesData,
+                waitTime: waitCount * 100,
+                page: 'page-initialization-configs' 
+              });
             }
           }
         },
@@ -1582,6 +1583,13 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       // החבילות הדרושות למערכת הניהול המשולבת
       packages: [
         'base',
+        'services',
+        'ui-advanced',
+        'modules',
+        'crud',
+        'conditions',
+        'dashboard-widgets',
+        'info-summary',
         'external-data',
         'logs',
         'cache',
@@ -1589,11 +1597,28 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'management',
         'init-system',
       ],
+      requiredGlobals: [
+        'window.UnifiedAppInitializer', // Unified Init System
+        'window.PAGE_CONFIGS', // Unified Init System
+        'window.PACKAGE_MANIFEST', // Unified Init System
 
-      requiredGlobals: ['NotificationSystem',
-        'window.IconSystem', 'window.systemManagement'],
-
+        'NotificationSystem',
+        'window.IconSystem',
+        'window.systemManagement',
+        'window.SelectPopulatorService',
+        'window.DataCollectionService',
+        'window.DefaultValueSetter',
+        'window.LinkedItemsService',
+        'window.CRUDResponseHandler',
+        'window.ModalNavigationManager',
+        'window.ModalManagerV2',
+        'window.conditionsInitializer',
+        'window.ConditionsUIManager',
+        'window.PendingTradePlanWidget',
+        'window.InfoSummarySystem',
+        'window.PaginationSystem',
       // ← NEW: מטאדאטה
+      ],
       description: 'כלי ניהול מערכת - מעקב ביצועים, לוגים וסטטיסטיקות',
       lastModified: '2025-11-13',
       pageType: 'admin',
@@ -1636,11 +1661,38 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
     'server-monitor': {
       name: 'Server Monitor',
 
-      packages: ['base', 'management', 'init-system'],
+      packages: [
+        'base',
+        'services',
+        'ui-advanced',
+        'modules',
+        'crud',
+        'conditions',
+        'dashboard-widgets',
+        'info-summary',
+        'management',
+        'init-system',
+      ],
+      requiredGlobals: [
+        'window.UnifiedAppInitializer', // Unified Init System
+        'window.PAGE_CONFIGS', // Unified Init System
+        'window.PACKAGE_MANIFEST', // Unified Init System
 
-      requiredGlobals: ['NotificationSystem',
-        'window.IconSystem', 'window.serverMonitor'],
-
+        'NotificationSystem',
+        'window.IconSystem',
+        'window.serverMonitor',
+        'window.SelectPopulatorService',
+        'window.DataCollectionService',
+        'window.DefaultValueSetter',
+        'window.LinkedItemsService',
+        'window.CRUDResponseHandler',
+        'window.ModalManagerV2',
+        'window.conditionsInitializer',
+        'window.ConditionsUIManager',
+        'window.PendingTradePlanWidget',
+        'window.InfoSummarySystem',
+        'window.PaginationSystem',
+      ],
       requiresFilters: false,
       requiresValidation: false,
       requiresTables: false,
@@ -1671,17 +1723,40 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
     'external-data-dashboard': {
       name: 'External Data',
 
-      packages: ['base', 'external-data', 'charts', 'logs', 'info-summary', 'init-system'],
-
+      packages: [
+        'base',
+        'services',
+        'ui-advanced',
+        'modules',
+        'crud',
+        'conditions',
+        'dashboard-widgets',
+        'external-data',
+        'charts',
+        'logs',
+        'info-summary',
+        'init-system',
+      ],
       requiredGlobals: [
+        'window.UnifiedAppInitializer', // Unified Init System
+        'window.PAGE_CONFIGS', // Unified Init System
+        'window.PACKAGE_MANIFEST', // Unified Init System
+
         'NotificationSystem',
         'window.IconSystem',
         'window.ExternalDataDashboard',
         'window.ExternalDataDashboardActions',
         'window.YahooFinanceService',
-      ],
-
+        'window.SelectPopulatorService',
+        'window.DataCollectionService',
+        'window.DefaultValueSetter',
+        'window.CRUDResponseHandler',
+        'window.ModalManagerV2',
+        'window.conditionsInitializer',
+        'window.ConditionsUIManager',
+        'window.PaginationSystem',
       // ← NEW: מטאדאטה
+      ],
       description: 'דשבורד נתונים חיצוניים - Yahoo Finance וספקי נתונים אחרים',
       lastModified: '2025-10-19',
       pageType: 'dashboard',
@@ -1732,9 +1807,41 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
 
     'notifications-center': {
       name: 'Notifications Center',
-      packages: ['base', 'crud', 'logs', 'info-summary', 'init-system'],
-      requiredGlobals: ['NotificationSystem',
-        'window.IconSystem', 'window.initializeNotificationsCenter'],
+      packages: [
+        'base',
+        'services',
+        'ui-advanced',
+        'modules',
+        'crud',
+        'conditions',
+        'dashboard-widgets',
+        'logs',
+        'init-system',
+      ],
+      requiredGlobals: [
+        'window.UnifiedAppInitializer', // Unified Init System
+        'window.PAGE_CONFIGS', // Unified Init System
+        'window.PACKAGE_MANIFEST', // Unified Init System
+
+        'NotificationSystem',
+        'window.IconSystem',
+        'window.SelectPopulatorService',
+        'window.DataCollectionService',
+        'window.DefaultValueSetter',
+        'window.LinkedItemsService',
+        'window.CRUDResponseHandler',
+        'window.ModalNavigationManager',
+        'window.ModalManagerV2',
+        'window.conditionsInitializer',
+        'window.ConditionsUIManager',
+        'window.PendingTradePlanWidget',
+        'window.PaginationSystem',
+      ],
+      requiredGlobals: [
+        'NotificationSystem',
+        'window.IconSystem',
+        'window.initializeNotificationsCenter'
+      ],
       requiresFilters: false,
       requiresValidation: false,
       requiresTables: false,
@@ -1759,8 +1866,14 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
     'notifications-center.html': {
       name: 'Notifications Center HTML',
       packages: ['base', 'crud', 'logs', 'init-system'],
-      requiredGlobals: ['NotificationSystem',
-        'window.IconSystem', 'window.initializeNotificationsCenter'],
+      requiredGlobals: [
+        'window.UnifiedAppInitializer', // Unified Init System
+        'window.PAGE_CONFIGS', // Unified Init System
+        'window.PACKAGE_MANIFEST', // Unified Init System
+        'NotificationSystem',
+        'window.IconSystem',
+        'window.initializeNotificationsCenter'
+      ],
       requiresFilters: false,
       requiresValidation: false,
       requiresTables: false,
@@ -1783,31 +1896,33 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       ],
     },
 
-    'unified-logs-demo.html': {
-      name: 'Unified Logs Demo',
-      packages: ['base', 'logs', 'init-system'],
-      requiredGlobals: ['NotificationSystem',
-        'window.IconSystem', 'window.UnifiedLogAPI'],
-      requiresFilters: false,
-      requiresValidation: false,
-      requiresTables: false,
+    trades_formatted: {
+      name: 'Trades Formatted',
+      packages: ['base', 'services', 'ui-advanced', 'modules', 'crud', 'preferences', 'entity-services', 'entity-details', 'info-summary', 'init-system'],
+      requiredGlobals: [
+        'window.UnifiedAppInitializer', // Unified Init System
+        'window.PAGE_CONFIGS', // Unified Init System
+        'window.PACKAGE_MANIFEST', // Unified Init System
+        'NotificationSystem',
+        'window.IconSystem',
+        'window.UnifiedTableSystem',
+        'window.FieldRendererService',
+        'window.TradesData',
+        'window.ModalManagerV2'
+      ],
+      description: 'טריידים בפורמט',
+      pageType: 'main',
+      requiresFilters: true,
+      requiresValidation: true,
+      requiresTables: true,
       customInitializers: [
         async pageConfig => {
-          window.Logger.info('📊 Initializing Unified Logs Demo...', {
-            page: 'page-initialization-configs',
-          });
-
-          // Initialize Unified Log System
-          if (window.UnifiedLogAPI) {
-            try {
-              await window.UnifiedLogAPI.initialize();
-              window.Logger.info('✅ Unified Log System initialized for demo', {
-                page: 'page-initialization-configs',
-              });
-            } catch (error) {
-              window.Logger.warn('⚠️ Failed to initialize Unified Log System for demo:', error, {
-                page: 'page-initialization-configs',
-              });
+          window.Logger.info('📈 Initializing Trades Formatted...', { page: 'page-initialization-configs' });
+          if (typeof window.loadTradesData === 'function') {
+            if (window.CacheTTLGuard?.ensure) {
+              await window.CacheTTLGuard.ensure('trade-data', window.loadTradesData);
+            } else {
+              await window.loadTradesData();
             }
           }
         },
@@ -1846,9 +1961,16 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       description: 'עמוד מחקר שוק - כלים, ניתוחים ונתונים מהירים',
       lastModified: '2025-11-13',
       pageType: 'research',
-      packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'init-system'],
-      requiredGlobals: ['NotificationSystem',
-        'window.IconSystem', 'DataUtils', 'window.initializeResearchPage'],
+      packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'conditions', 'init-system'],
+      requiredGlobals: [
+        'window.UnifiedAppInitializer', // Unified Init System
+        'window.PAGE_CONFIGS', // Unified Init System
+        'window.PACKAGE_MANIFEST', // Unified Init System
+'NotificationSystem',
+        'window.IconSystem', 'DataUtils', 'window.initializeResearchPage',
+        'window.conditionsInitializer', // Conditions System
+        'window.ConditionsUIManager', // Conditions System
+      ],
       preloadAssets: ['research-data'],
       cacheStrategy: 'standard',
       requiresFilters: true,
@@ -1875,12 +1997,34 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
 
     'background-tasks': {
       name: 'Background Tasks',
-      packages: ['base', 'crud', 'logs', 'info-summary', 'init-system'],
+      packages: [
+        'base',
+        'services',
+        'ui-advanced',
+        'modules',
+        'crud',
+        'conditions',
+        'dashboard-widgets',
+        'init-system',
+      ],
       requiredGlobals: [
+        'window.UnifiedAppInitializer', // Unified Init System
+        'window.PAGE_CONFIGS', // Unified Init System
+        'window.PACKAGE_MANIFEST', // Unified Init System
+
         'NotificationSystem',
         'window.IconSystem',
         'window.startScheduler',
         'window.refreshBackgroundTasksLog',
+        'window.SelectPopulatorService',
+        'window.DataCollectionService',
+        'window.DefaultValueSetter',
+        'window.LinkedItemsService',
+        'window.CRUDResponseHandler',
+        'window.ModalManagerV2',
+        'window.conditionsInitializer',
+        'window.ConditionsUIManager',
+        'window.PendingTradePlanWidget',
       ],
       description: 'ניהול משימות רקע',
       lastModified: '2025-10-19',
@@ -1902,31 +2046,14 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       ],
     },
 
-    'test-header-only': {
-      name: 'Header System Test',
-      packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'init-system'],
-      requiredGlobals: ['NotificationSystem'],
-      description: 'עמוד בדיקות לרכיבי ההדר המאוחדים',
-      lastModified: '2025-11-14',
-      pageType: 'development',
-      preloadAssets: ['header-demo'],
-      cacheStrategy: 'standard',
-      requiresFilters: false,
-      requiresValidation: false,
-      requiresTables: true,
-      customInitializers: [
-        () => {
-          window.Logger.info('🧪 Initializing Header-only test page...', {
-            page: 'page-initialization-configs',
-          });
-        },
-      ],
-    },
-
     'init-system-management': {
       name: 'Init System Management',
       packages: ['base', 'dev-tools', 'init-system'],
       requiredGlobals: [
+        'window.UnifiedAppInitializer', // Unified Init System
+        'window.PAGE_CONFIGS', // Unified Init System
+        'window.PACKAGE_MANIFEST', // Unified Init System
+
         'NotificationSystem',
         'window.IconSystem',
         'PackageManifest',
@@ -1957,6 +2084,10 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       name: 'Cache Management',
       packages: ['base', 'logs', 'cache', 'init-system'],
       requiredGlobals: [
+        'window.UnifiedAppInitializer', // Unified Init System
+        'window.PAGE_CONFIGS', // Unified Init System
+        'window.PACKAGE_MANIFEST', // Unified Init System
+
         'NotificationSystem',
         'window.IconSystem',
         'window.cacheManagementPage',
@@ -1988,6 +2119,10 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       name: 'Conditions Test',
       packages: ['base', 'init-system'],
       requiredGlobals: [
+        'window.UnifiedAppInitializer', // Unified Init System
+        'window.PAGE_CONFIGS', // Unified Init System
+        'window.PACKAGE_MANIFEST', // Unified Init System
+
         'NotificationSystem',
         'window.IconSystem',
         'window.loadConditionsTest',
@@ -2018,6 +2153,10 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       name: 'CRUD Testing Dashboard',
       packages: ['base', 'services', 'ui-advanced', 'crud', 'init-system'],
       requiredGlobals: [
+        'window.UnifiedAppInitializer', // Unified Init System
+        'window.PAGE_CONFIGS', // Unified Init System
+        'window.PACKAGE_MANIFEST', // Unified Init System
+
         'NotificationSystem',
         'window.IconSystem',
         'CRUDEnhancedTester',
@@ -2025,7 +2164,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.runAPITests',
         'window.runUITests',
       ],
-      pageSpecificScripts: ['scripts/crud-testing-enhanced.js'],
+      pageSpecificScripts: ['scripts/crud-testing-enhanced.js', 'scripts/crud-automated-test-runner.js'],
       description: 'דשבורד בדיקות CRUD - בדיקות API ו-UI אוטומטיות',
       lastModified: '2025-10-26',
       pageType: 'development',
@@ -2079,15 +2218,38 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       name: 'TradingView Lightweight Charts Test Page',
       packages: [
         'base',
+        'services',
+        'ui-advanced',
+        'modules',
+        'crud',
+        'info-summary',
+        'conditions',
         'system-management',
         'preferences',
         'charts',
         'tradingview-charts',
         'init-system',
       ],
-      requiredGlobals: [        'window.IconSystem',
+      requiredGlobals: [
+        'window.UnifiedAppInitializer', // Unified Init System
+        'window.PAGE_CONFIGS', // Unified Init System
+        'window.PACKAGE_MANIFEST', // Unified Init System
 
+        'NotificationSystem',
+        'window.IconSystem',
         'window.Logger',
+        'window.ModalManagerV2',
+        'window.FieldRendererService',
+        'window.CRUDResponseHandler',
+        'window.InfoSummarySystem',
+        'window.LinkedItemsService',
+        'window.loadLinkedItemsData',
+        'window.PageStateManager',
+        'window.DataCollectionService',
+        'window.SelectPopulatorService',
+        'window.ConditionsSummaryRenderer',
+        'window.UnifiedTableSystem',
+        'window.PaginationSystem',
         'window.TradingViewTheme',
         'window.TradingViewChartAdapter',
         'window.LightweightCharts',
@@ -2146,6 +2308,67 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
                 error: error?.message || error,
               });
             }
+          }
+        },
+      ],
+    },
+
+    'watch-lists': {
+      name: 'Watch Lists',
+      packages: [
+        'base',
+        'services',
+        'ui-advanced',
+        'crud',
+        'entity-services',
+        'watch-lists',
+        'init-system',
+      ],
+      requiredGlobals: [
+        'window.UnifiedAppInitializer',
+        'window.PAGE_CONFIGS',
+        'window.PACKAGE_MANIFEST',
+        'NotificationSystem',
+        'window.IconSystem',
+        'window.Logger',
+        'window.WatchListsDataService',
+        'window.WatchListsUIService',
+        'window.WatchListsPage',
+        'window.FieldRendererService',
+        'window.CRUDResponseHandler',
+        'window.UnifiedTableSystem',
+        'window.PageStateManager',
+      ],
+      description: 'ניהול רשימות צפייה - יצירה, עריכה, מחיקה וניהול טיקרים',
+      lastModified: '2025-12-06',
+      pageType: 'main',
+      cacheStrategy: 'standard',
+      requiresFilters: true,
+      requiresValidation: false,
+      requiresTables: true,
+      customInitializers: [
+        async pageConfig => {
+          window.Logger?.info?.('📋 Initializing Watch Lists Page...', {
+            page: 'page-initialization-configs',
+          });
+
+          // Initialize page
+          if (typeof window.WatchListsPage?.initializeWatchListsPage === 'function') {
+            try {
+              await window.WatchListsPage.initializeWatchListsPage();
+              window.Logger?.info?.('✅ Watch Lists Page initialized successfully', {
+                page: 'page-initialization-configs',
+              });
+            } catch (error) {
+              window.Logger?.error?.('❌ Error initializing Watch Lists Page', {
+                page: 'page-initialization-configs',
+                error: error?.message || error,
+              });
+            }
+          } else {
+            window.Logger?.warn?.('⚠️ WatchListsPage.initializeWatchListsPage not available', {
+              page: 'page-initialization-configs',
+            });
           }
         },
       ],
@@ -2231,12 +2454,15 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       name: 'Code Quality Dashboard',
       packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'init-system'],
       requiredGlobals: [
+        'window.UnifiedAppInitializer', // Unified Init System
+        'window.PAGE_CONFIGS', // Unified Init System
+        'window.PACKAGE_MANIFEST', // Unified Init System
+
         'NotificationSystem',
         'window.IconSystem',
         'window.codeQualityDashboard',
         'window.LintStatusService',
       ],
-      pageSpecificScripts: ['scripts/linter-realtime-monitor.js'],
       requiresFilters: false,
       requiresValidation: false,
       requiresTables: true,
@@ -2257,32 +2483,23 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       ],
     },
     // Test page for monitoring system
-    'test-monitoring': {
-      name: 'Test Monitoring Page',
-      packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'init-system'],
-      requiredGlobals: [
-        'NotificationSystem',
-        'window.IconSystem',
-        'DataCollectionService',
-        'UnifiedCacheManager',
-        'Logger',
-      ],
-      description: 'עמוד בדיקה למערכת הניטור וכלי יצירת קוד טעינה',
-      lastModified: '2025-01-31',
-      pageType: 'test',
-      preloadAssets: [],
-      cacheStrategy: 'none',
-      requiresFilters: false,
-      requiresValidation: false,
-      requiresTables: false,
-      customInitializers: [],
-    },
-
     // Missing pages from documentation
     db_extradata: {
       name: 'Database Extra Data',
-      packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'init-system'],
+      packages: [
+        'base',
+        'services',
+        'ui-advanced',
+        'crud',
+        'preferences',
+        'dashboard-widgets',
+        'init-system',
+      ],
       requiredGlobals: [
+        'window.UnifiedAppInitializer', // Unified Init System
+        'window.PAGE_CONFIGS', // Unified Init System
+        'window.PACKAGE_MANIFEST', // Unified Init System
+
         'NotificationSystem',
         'window.IconSystem',
         'DataUtils',
@@ -2290,6 +2507,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.loadExtraData',
         'window.loadUserPreferences',
         'window.initSystemCheck',
+        'window.PendingTradePlanWidget',
       ],
       description: 'תצוגת נתונים נוספים במסד הנתונים',
       lastModified: '2025-11-13',
@@ -2313,9 +2531,50 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
 
     constraints: {
       name: 'System Constraints',
-      packages: ['base', 'services', 'ui-advanced', 'crud', 'init-system'],
-      requiredGlobals: ['NotificationSystem',
-        'window.IconSystem', 'window.loadConstraints', 'window.ConstraintManager', 'window.createActionsMenu'],
+      packages: [
+        'base',
+        'services',
+        'ui-advanced',
+        'modules',
+        'crud',
+        'preferences', // Required for ColorSchemeSystem
+        'conditions',
+        'dashboard-widgets',
+        'info-summary',
+        'init-system',
+      ],
+      requiredGlobals: [
+        'window.UnifiedAppInitializer', // Unified Init System
+        'window.PAGE_CONFIGS', // Unified Init System
+        'window.PACKAGE_MANIFEST', // Unified Init System
+
+        'NotificationSystem',
+        'window.IconSystem',
+        'window.loadConstraints',
+        'window.ConstraintManager',
+        'window.createActionsMenu',
+        'window.SelectPopulatorService',
+        'window.DataCollectionService',
+        'window.DefaultValueSetter',
+        'window.TableSortValueAdapter',
+        'window.LinkedItemsService',
+        'window.CRUDResponseHandler',
+        'window.ModalNavigationManager',
+        'window.ModalManagerV2',
+        'window.conditionsInitializer',
+        'window.ConditionsUIManager',
+        'window.PendingTradePlanWidget',
+        'window.InfoSummarySystem',
+        'window.PaginationSystem',
+        'window.ColorSchemeSystem', // Color Scheme System
+      ],
+      requiredGlobals: [
+        'NotificationSystem',
+        'window.IconSystem',
+        'window.loadConstraints',
+        'window.ConstraintManager',
+        'window.createActionsMenu'
+      ],
       description: 'ניהול אילוצי מערכת',
       lastModified: '2025-10-19',
       pageType: 'system',
@@ -2338,9 +2597,39 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
 
     'css-management': {
       name: 'CSS Management',
-      packages: ['base', 'init-system'],
-      requiredGlobals: ['NotificationSystem',
-        'window.IconSystem', 'window.loadCSSManagement', 'window.CSSManager'],
+      packages: [
+        'base',
+        'services',
+        'ui-advanced',
+        'modules',
+        'crud',
+        'conditions',
+        'dashboard-widgets',
+        'info-summary',
+        'init-system',
+      ],
+      requiredGlobals: [
+        'window.UnifiedAppInitializer', // Unified Init System
+        'window.PAGE_CONFIGS', // Unified Init System
+        'window.PACKAGE_MANIFEST', // Unified Init System
+
+        'NotificationSystem',
+        'window.IconSystem',
+        'window.loadCSSManagement',
+        'window.CSSManager',
+        'window.SelectPopulatorService',
+        'window.DataCollectionService',
+        'window.DefaultValueSetter',
+        'window.LinkedItemsService',
+        'window.CRUDResponseHandler',
+        'window.ModalNavigationManager',
+        'window.ModalManagerV2',
+        'window.conditionsInitializer',
+        'window.ConditionsUIManager',
+        'window.PendingTradePlanWidget',
+        'window.InfoSummarySystem',
+        'window.PaginationSystem',
+      ],
       description: 'ניהול CSS במערכת',
       lastModified: '2025-10-19',
       pageType: 'development',
@@ -2363,10 +2652,35 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
 
     'dynamic-colors-display': {
       name: 'Dynamic Colors Display',
-      packages: ['base', 'init-system'],
+      packages: [
+        'base',
+        'services',
+        'ui-advanced',
+        'modules',
+        'crud',
+        'conditions',
+        'dashboard-widgets',
+        'info-summary',
+        'init-system',
+      ],
       requiredGlobals: [
+        'window.UnifiedAppInitializer', // Unified Init System
+        'window.PAGE_CONFIGS', // Unified Init System
+        'window.PACKAGE_MANIFEST', // Unified Init System
+
         'NotificationSystem',
         'window.IconSystem',
+        'window.SelectPopulatorService',
+        'window.DataCollectionService',
+        'window.DefaultValueSetter',
+        'window.LinkedItemsService',
+        'window.CRUDResponseHandler',
+        'window.ModalManagerV2',
+        'window.conditionsInitializer',
+        'window.ConditionsUIManager',
+        'window.PendingTradePlanWidget',
+        'window.InfoSummarySystem',
+        'window.PaginationSystem',
         'window.loadColorDisplay',
         'window.ColorSchemeSystem',
       ],
@@ -2392,9 +2706,38 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
 
     designs: {
       name: 'Design Gallery',
-      packages: ['base', 'init-system'],
-      requiredGlobals: ['NotificationSystem',
-        'window.IconSystem', 'window.loadDesigns', 'window.DesignGallery'],
+      packages: [
+        'base',
+        'services',
+        'ui-advanced',
+        'modules',
+        'crud',
+        'conditions',
+        'dashboard-widgets',
+        'info-summary',
+        'init-system',
+      ],
+      requiredGlobals: [
+        'window.UnifiedAppInitializer', // Unified Init System
+        'window.PAGE_CONFIGS', // Unified Init System
+        'window.PACKAGE_MANIFEST', // Unified Init System
+
+        'NotificationSystem',
+        'window.IconSystem',
+        'window.loadDesigns',
+        'window.DesignGallery',
+        'window.SelectPopulatorService',
+        'window.DataCollectionService',
+        'window.DefaultValueSetter',
+        'window.LinkedItemsService',
+        'window.CRUDResponseHandler',
+        'window.ModalManagerV2',
+        'window.conditionsInitializer',
+        'window.ConditionsUIManager',
+        'window.PendingTradePlanWidget',
+        'window.InfoSummarySystem',
+        'window.PaginationSystem',
+      ],
       pageSpecificScripts: ['scripts/button-system-demo-core.js'],
       description: 'גלריית עיצובים',
       lastModified: '2025-10-19',
@@ -2418,12 +2761,37 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
 
     'chart-management': {
       name: 'Chart Management',
-      packages: ['base', 'init-system'],
+      packages: [
+        'base',
+        'services',
+        'ui-advanced',
+        'modules',
+        'crud',
+        'conditions',
+        'dashboard-widgets',
+        'info-summary',
+        'init-system',
+      ],
       requiredGlobals: [
+        'window.UnifiedAppInitializer', // Unified Init System
+        'window.PAGE_CONFIGS', // Unified Init System
+        'window.PACKAGE_MANIFEST', // Unified Init System
+
         'NotificationSystem',
         'window.IconSystem',
         'window.loadChartManagement',
         'window.ChartManagement',
+        'window.SelectPopulatorService',
+        'window.DataCollectionService',
+        'window.DefaultValueSetter',
+        'window.LinkedItemsService',
+        'window.CRUDResponseHandler',
+        'window.ModalManagerV2',
+        'window.conditionsInitializer',
+        'window.ConditionsUIManager',
+        'window.PendingTradePlanWidget',
+        'window.InfoSummarySystem',
+        'window.PaginationSystem',
       ],
       description: 'ניהול גרפים במערכת',
       lastModified: '2025-10-19',
@@ -2450,6 +2818,10 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       name: 'Init System Management',
       packages: ['base', 'dev-tools', 'init-system'],
       requiredGlobals: [
+        'window.UnifiedAppInitializer', // Unified Init System
+        'window.PAGE_CONFIGS', // Unified Init System
+        'window.PACKAGE_MANIFEST', // Unified Init System
+
         'NotificationSystem',
         'window.IconSystem',
         'PackageManifest',
@@ -2480,6 +2852,10 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       name: 'Cache Management',
       packages: ['base', 'logs', 'cache', 'init-system'],
       requiredGlobals: [
+        'window.UnifiedAppInitializer', // Unified Init System
+        'window.PAGE_CONFIGS', // Unified Init System
+        'window.PACKAGE_MANIFEST', // Unified Init System
+
         'NotificationSystem',
         'window.IconSystem',
         'window.cacheManagementPage',
@@ -2511,6 +2887,10 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       name: 'Conditions Test',
       packages: ['base', 'init-system'],
       requiredGlobals: [
+        'window.UnifiedAppInitializer', // Unified Init System
+        'window.PAGE_CONFIGS', // Unified Init System
+        'window.PACKAGE_MANIFEST', // Unified Init System
+
         'NotificationSystem',
         'window.IconSystem',
         'window.loadConditionsTest',
@@ -2541,6 +2921,10 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       name: 'CRUD Testing Dashboard',
       packages: ['base', 'services', 'ui-advanced', 'crud', 'init-system'],
       requiredGlobals: [
+        'window.UnifiedAppInitializer', // Unified Init System
+        'window.PAGE_CONFIGS', // Unified Init System
+        'window.PACKAGE_MANIFEST', // Unified Init System
+
         'NotificationSystem',
         'window.IconSystem',
         'CRUDEnhancedTester',
@@ -2596,85 +2980,14 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       ],
     },
 
-    // Trade History Page (Mockup)
-    'trade-history-page': {
-      name: 'Trade History Page',
-      packages: [
-        'base',
-        'services',
-        'ui-advanced',
-        'crud',
-        'preferences',
-        'entity-services',
-        'tradingview-charts',
-        'init-system',
-      ],
-      requiredGlobals: [
-        'NotificationSystem',
-        'window.IconSystem',
-        'TradingViewChartAdapter',
-        'TradingViewTheme',
-        'window.LightweightCharts',
-        'window.tradeHistoryPage',
-        'window.UnifiedCacheManager',
-        'window.UnifiedAppInitializer',
-      ],
-      pageSpecificScripts: ['scripts/trade-history-page.js'],
-      description: 'עמוד היסטוריית טרייד - מוקאפ עם גרפים TradingView',
-      lastModified: '2025-01-29',
-      pageType: 'mockup',
-      preloadAssets: ['trades-data', 'executions-data'],
-      cacheStrategy: 'standard',
-      requiresFilters: true,
-      requiresValidation: false,
-      requiresTables: true,
-      customInitializers: [
-        async pageConfig => {
-          window.Logger.info('📊 Initializing Trade History Page via UnifiedAppInitializer...', {
-            page: 'page-initialization-configs',
-          });
-
-          // Wait for tradeHistoryPage to be available
-          if (!window.tradeHistoryPage || typeof window.tradeHistoryPage.initializePage !== 'function') {
-            window.Logger.warn('⚠️ tradeHistoryPage.initializePage not available yet, waiting...', {
-              page: 'page-initialization-configs',
-            });
-            
-            // Wait up to 5 seconds for the script to load
-            let retries = 0;
-            while (!window.tradeHistoryPage || typeof window.tradeHistoryPage.initializePage !== 'function') {
-              if (retries >= 50) {
-                window.Logger.error('❌ tradeHistoryPage.initializePage not available after wait', {
-                  page: 'page-initialization-configs',
-                });
-                return;
-              }
-              await new Promise(resolve => setTimeout(resolve, 100));
-              retries++;
-            }
-          }
-
-          // Call initializePage from trade-history-page.js
-          try {
-            await window.tradeHistoryPage.initializePage();
-            window.Logger.info('✅ Trade History Page initialized via UnifiedAppInitializer', {
-              page: 'page-initialization-configs',
-            });
-          } catch (error) {
-            window.Logger.error('❌ Error initializing Trade History Page', {
-              page: 'page-initialization-configs',
-              error,
-            });
-            throw error;
-          }
-        },
-      ],
-    },
-
     'tradingview-widgets-showcase': {
       name: 'TradingView Widgets Showcase',
       packages: ['base', 'preferences', 'tradingview-widgets', 'init-system'],
       requiredGlobals: [
+        'window.UnifiedAppInitializer', // Unified Init System
+        'window.PAGE_CONFIGS', // Unified Init System
+        'window.PACKAGE_MANIFEST', // Unified Init System
+
         'NotificationSystem',
         'window.IconSystem',
         'TradingViewWidgetsManager',
@@ -2697,492 +3010,394 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       ],
     },
 
-    // Price History Page (Mockup)
-    'price-history-page': {
-      name: 'Price History Page',
-      packages: [
-        'base',
-        'services',
-        'ui-advanced',
-        'crud',
-        'preferences',
-        'entity-services',
-        'tradingview-charts',
-        'tradingview-widgets',
-        'init-system',
-      ],
+    // Authentication Pages
+    login: {
+      name: 'Login',
+      packages: ['base', 'services', 'ui-advanced', 'modules', 'crud', 'info-summary', 'conditions', 'preferences', 'validation', 'init-system'],
       requiredGlobals: [
+        'window.UnifiedAppInitializer', // Unified Init System
+        'window.PAGE_CONFIGS', // Unified Init System
+        'window.PACKAGE_MANIFEST', // Unified Init System
+
         'NotificationSystem',
         'window.IconSystem',
-        'TradingViewChartAdapter',
-        'TradingViewTheme',
-        'window.LightweightCharts',
-        'TradingViewWidgetsManager',
-        'TradingViewWidgetsColors',
-        'window.priceHistoryPage',
+        'window.ModalManagerV2',
+        'window.CRUDResponseHandler',
+        'window.ColorSchemeSystem',
+        'window.InfoSummarySystem',
+        'window.LinkedItemsService',
+        'window.loadLinkedItemsData',
+        'window.ConditionsSummaryRenderer',
+        'window.UnifiedTableSystem',
+        'window.PaginationSystem',
       ],
-      pageSpecificScripts: ['scripts/price-history-page.js'],
-      description: 'עמוד היסטוריית מחירים - מוקאפ עם גרפים TradingView Lightweight Charts ו-TradingView Widgets',
-      lastModified: '2025-11-24',
-      pageType: 'mockup',
-      preloadAssets: ['trades-data', 'executions-data'],
-      cacheStrategy: 'standard',
-      requiresFilters: true,
-      requiresValidation: false,
-      requiresTables: true,
-      customInitializers: [
-        async pageConfig => {
-          window.Logger.info('📊 Initializing Price History Page...', {
-            page: 'page-initialization-configs',
-          });
-
-          // Wait for TradingView to be available
-          if (typeof window.lightweightCharts === 'undefined') {
-            window.Logger.warn('⚠️ TradingView Lightweight Charts not loaded yet', {
-              page: 'page-initialization-configs',
-            });
-          }
-
-          // Wait for TradingView Widgets Manager
-          if (window.TradingViewWidgetsManager) {
-            await window.TradingViewWidgetsManager.init();
-          }
-        },
-      ],
-    },
-
-    // Portfolio State Page (Mockup)
-    'portfolio-state-page': {
-      name: 'Portfolio State Page',
-      packages: [
-        'base',
-        'services',
-        'ui-advanced',
-        'crud',
-        'preferences',
-        'entity-services',
-        'tradingview-charts',
-        'init-system',
-      ],
-      requiredGlobals: [
-        'NotificationSystem',
-        'window.IconSystem',
-        'TradingViewChartAdapter',
-        'TradingViewTheme',
-        'window.LightweightCharts',
-        'window.portfolioStatePage',
-      ],
-      pageSpecificScripts: ['scripts/portfolio-state-page.js'],
-      description: 'עמוד מצב תיק - מוקאפ עם גרפים TradingView Lightweight Charts',
-      lastModified: '2025-11-24',
-      pageType: 'mockup',
-      preloadAssets: ['portfolio-data'],
-      cacheStrategy: 'standard',
-      requiresFilters: true,
-      requiresValidation: false,
-      requiresTables: true,
-      customInitializers: [
-        async pageConfig => {
-          window.Logger?.info('📊 Initializing Portfolio State Page...', {
-            page: 'page-initialization-configs',
-          });
-        },
-      ],
-    },
-
-    // Comparative Analysis Page (Mockup)
-    'comparative-analysis-page': {
-      name: 'Comparative Analysis Page',
-      packages: [
-        'base',
-        'services',
-        'ui-advanced',
-        'crud',
-        'preferences',
-        'entity-services',
-        'tradingview-charts',
-        'init-system',
-      ],
-      requiredGlobals: [
-        'NotificationSystem',
-        'window.IconSystem',
-        'TradingViewChartAdapter',
-        'TradingViewTheme',
-        'window.LightweightCharts',
-        'window.comparativeAnalysisPage',
-      ],
-      pageSpecificScripts: ['scripts/comparative-analysis-page.js'],
-      description: 'עמוד ניתוח השוואתי - מוקאפ עם גרפים TradingView Lightweight Charts',
-      lastModified: '2025-11-24',
-      pageType: 'mockup',
-      preloadAssets: ['trades-data'],
-      cacheStrategy: 'standard',
-      requiresFilters: true,
-      requiresValidation: false,
-      requiresTables: true,
-      customInitializers: [
-        async pageConfig => {
-          window.Logger?.info('📊 Initializing Comparative Analysis Page...', {
-            page: 'page-initialization-configs',
-          });
-        },
-      ],
-    },
-
-    // Trading Journal Page (Mockup)
-    'trading-journal-page': {
-      name: 'Trading Journal Page',
-      packages: [
-        'base',
-        'services',
-        'ui-advanced',
-        'crud',
-        'preferences',
-        'entity-services',
-        'init-system',
-      ],
-      requiredGlobals: [
-        'NotificationSystem',
-        'window.IconSystem',
-        'window.tradingJournalPage',
-      ],
-      pageSpecificScripts: ['scripts/trading-journal-page.js'],
-      description: 'עמוד יומן מסחר - מוקאפ',
-      lastModified: '2025-11-24',
-      pageType: 'mockup',
-      preloadAssets: ['journal-data'],
-      cacheStrategy: 'standard',
+      description: 'כניסה למערכת',
+      pageType: 'auth',
       requiresFilters: false,
-      requiresValidation: false,
+      requiresValidation: true,
       requiresTables: false,
       customInitializers: [
-        async pageConfig => {
-          window.Logger?.info('📊 Initializing Trading Journal Page...', {
-            page: 'page-initialization-configs',
-          });
-        },
-      ],
-    },
-
-    // Strategy Analysis Page (Mockup)
-    'strategy-analysis-page': {
-      name: 'Strategy Analysis Page',
-      packages: [
-        'base',
-        'services',
-        'ui-advanced',
-        'crud',
-        'preferences',
-        'entity-services',
-        'init-system',
-      ],
-      requiredGlobals: [
-        'NotificationSystem',
-        'window.IconSystem',
-        'window.strategyAnalysisPage',
-      ],
-      pageSpecificScripts: ['scripts/strategy-analysis-page.js'],
-      description: 'עמוד ניתוח אסטרטגיות - מוקאפ',
-      lastModified: '2025-11-24',
-      pageType: 'mockup',
-      preloadAssets: ['strategies-data'],
-      cacheStrategy: 'standard',
-      requiresFilters: true,
-      requiresValidation: false,
-      requiresTables: true,
-      customInitializers: [
-        async pageConfig => {
-          window.Logger?.info('📊 Initializing Strategy Analysis Page...', {
-            page: 'page-initialization-configs',
-          });
-        },
-      ],
-    },
-
-    // Economic Calendar Page (Mockup)
-    'economic-calendar-page': {
-      name: 'Economic Calendar Page',
-      packages: [
-        'base',
-        'services',
-        'ui-advanced',
-        'crud',
-        'preferences',
-        'entity-services',
-        'tradingview-widgets',
-        'init-system',
-      ],
-      requiredGlobals: [
-        'NotificationSystem',
-        'window.IconSystem',
-        'TradingViewWidgetsManager',
-        'TradingViewWidgetsColors',
-        'window.economicCalendarPage',
-      ],
-      pageSpecificScripts: ['scripts/economic-calendar-page.js'],
-      description: 'עמוד לוח אירועים כלכליים - מוקאפ עם TradingView Widgets',
-      lastModified: '2025-11-24',
-      pageType: 'mockup',
-      preloadAssets: ['calendar-data'],
-      cacheStrategy: 'standard',
-      requiresFilters: false,
-      requiresValidation: false,
-      requiresTables: false,
-      customInitializers: [
-        async pageConfig => {
-          window.Logger?.info('📊 Initializing Economic Calendar Page...', {
-            page: 'page-initialization-configs',
-          });
-          
-          // Wait for TradingViewWidgetsManager
-          if (window.TradingViewWidgetsManager) {
-            if (!window.TradingViewWidgetsManager._initialized) {
-              await window.TradingViewWidgetsManager.init();
+        async (pageConfig) => {
+          // Create login interface
+          if (typeof window.TikTrackAuth !== 'undefined' && typeof window.TikTrackAuth.createLoginInterface === 'function') {
+            window.TikTrackAuth.createLoginInterface('loginContainer');
+            // Load saved credentials if available
+            if (typeof window.TikTrackAuth.loadSavedCredentials === 'function') {
+              window.TikTrackAuth.loadSavedCredentials();
             }
-          }
-          
-          // Wait for cache system
-          if (window.cacheSystemReady !== undefined) {
-            let waitCount = 0;
-            while (!window.cacheSystemReady && waitCount < 50) {
-              await new Promise(resolve => setTimeout(resolve, 100));
-              waitCount++;
+          } else if (typeof window.createLoginInterface === 'function') {
+            window.createLoginInterface('loginContainer');
+            if (typeof window.loadSavedCredentials === 'function') {
+              window.loadSavedCredentials();
             }
-          }
-          
-          // Wait for preferences
-          let prefWaitCount = 0;
-          while (!window.currentPreferences && !window.userPreferences && prefWaitCount < 50) {
-            await new Promise(resolve => setTimeout(resolve, 100));
-            prefWaitCount++;
-          }
-          
-          // Initialize widget if economicCalendarPage is available
-          if (window.economicCalendarPage && typeof window.economicCalendarPage.initializeEconomicCalendarWidget === 'function') {
-            await window.economicCalendarPage.initializeEconomicCalendarWidget();
+          } else {
+            window.Logger?.warn('⚠️ createLoginInterface not available', { page: 'login' });
           }
         },
       ],
     },
 
-    // History Widget (Mockup)
-    'history-widget': {
-      name: 'History Widget',
-      packages: [
-        'base',
-        'services',
-        'ui-advanced',
-        'preferences',
-        'tradingview-charts',
-        'init-system',
-      ],
+    register: {
+      name: 'Register',
+      packages: ['base', 'services', 'ui-advanced', 'modules', 'crud', 'info-summary', 'conditions', 'preferences', 'validation', 'init-system'],
       requiredGlobals: [
+        'window.UnifiedAppInitializer', // Unified Init System
+        'window.PAGE_CONFIGS', // Unified Init System
+        'window.PACKAGE_MANIFEST', // Unified Init System
+
         'NotificationSystem',
         'window.IconSystem',
-        'window.historyWidget',
-        'window.TradingViewChartAdapter',
-        'window.TradingViewTheme',
-        'window.FieldRendererService',
+        'window.ModalManagerV2',
+        'window.CRUDResponseHandler',
+        'window.ColorSchemeSystem',
+        'window.InfoSummarySystem',
+        'window.LinkedItemsService',
+        'window.loadLinkedItemsData',
+        'window.ConditionsSummaryRenderer',
+        'window.UnifiedTableSystem',
+        'window.PaginationSystem',
       ],
-      pageSpecificScripts: ['scripts/history-widget.js'],
-      description: 'ווידג\'ט היסטוריה - מוקאפ',
-      lastModified: '2025-01-27',
-      pageType: 'mockup',
-      preloadAssets: [],
-      cacheStrategy: 'standard',
+      description: 'הרשמה למערכת',
+      pageType: 'auth',
+      requiresFilters: false,
+      requiresValidation: true,
+      requiresTables: false,
+    },
+
+    'forgot-password': {
+      name: 'Forgot Password',
+      packages: ['base', 'services', 'ui-advanced', 'validation', 'init-system'],
+      requiredGlobals: [
+        'window.UnifiedAppInitializer', // Unified Init System
+        'window.PAGE_CONFIGS', // Unified Init System
+        'window.PACKAGE_MANIFEST', // Unified Init System
+        'NotificationSystem',
+        'window.IconSystem'
+      ],
+      description: 'שחזור סיסמה',
+      pageType: 'auth',
+      requiresFilters: false,
+      requiresValidation: true,
+      requiresTables: false,
+    },
+
+    'reset-password': {
+      name: 'Reset Password',
+      packages: ['base', 'services', 'ui-advanced', 'validation', 'init-system'],
+      requiredGlobals: [
+        'window.UnifiedAppInitializer', // Unified Init System
+        'window.PAGE_CONFIGS', // Unified Init System
+        'window.PACKAGE_MANIFEST', // Unified Init System
+        'NotificationSystem',
+        'window.IconSystem'
+      ],
+      description: 'איפוס סיסמה',
+      pageType: 'auth',
+      requiresFilters: false,
+      requiresValidation: true,
+      requiresTables: false,
+    },
+
+    // Development Tools Pages
+    'button-color-mapping': {
+      name: 'Button Color Mapping',
+      packages: ['base', 'services', 'ui-advanced', 'preferences', 'init-system'],
+      requiredGlobals: [
+        'window.UnifiedAppInitializer', // Unified Init System
+        'window.PAGE_CONFIGS', // Unified Init System
+        'window.PACKAGE_MANIFEST', // Unified Init System
+        'NotificationSystem',
+        'window.IconSystem',
+        'window.ColorManager'
+      ],
+      description: 'מיפוי צבעי כפתורים',
+      pageType: 'dev-tools',
       requiresFilters: false,
       requiresValidation: false,
       requiresTables: false,
-      customInitializers: [
-        async pageConfig => {
-          window.Logger?.info('📊 Initializing History Widget...', {
-            page: 'page-initialization-configs',
-          });
-          
-          // Initialize widgets after systems are ready
-          if (typeof window.historyWidget !== 'undefined' && typeof window.historyWidget.initializeWidgets === 'function') {
-            try {
-              await window.historyWidget.initializeWidgets();
-            } catch (error) {
-              window.Logger?.warn('Error initializing history widget widgets', {
-                page: 'page-initialization-configs',
-                error
-              });
-            }
-          }
-        },
-      ],
     },
 
-    // Emotional Tracking Widget (Mockup)
-    'emotional-tracking-widget': {
-      name: 'Emotional Tracking Widget',
-      packages: [
-        'base',
-        'services',
-        'ui-advanced',
-        'preferences',
-        'tradingview-charts',
-        'init-system',
-      ],
+    'button-color-mapping-simple': {
+      name: 'Button Color Mapping Simple',
+      packages: ['base', 'services', 'ui-advanced', 'preferences', 'init-system'],
       requiredGlobals: [
-        'NotificationSystem',
-        'window.IconSystem',
-        'window.emotionalTrackingWidget',
-        'TradingViewChartAdapter',
-        'TradingViewTheme',
-        'window.LightweightCharts',
-        'FieldRendererService',
+        'window.UnifiedAppInitializer', // Unified Init System
+        'window.PAGE_CONFIGS', // Unified Init System
+        'window.PACKAGE_MANIFEST', // Unified Init System
+'NotificationSystem', 'window.IconSystem', 'window.ColorManager',
       ],
-      pageSpecificScripts: ['scripts/emotional-tracking-widget.js'],
-      description: 'ווידג\'ט תיעוד רגשי - מוקאפ',
-      lastModified: '2025-01-29',
-      pageType: 'mockup',
-      preloadAssets: [],
-      cacheStrategy: 'standard',
+      description: 'מיפוי צבעי כפתורים - פשוט',
+      pageType: 'dev-tools',
       requiresFilters: false,
       requiresValidation: false,
       requiresTables: false,
-      customInitializers: [
-        async pageConfig => {
-          window.Logger?.info('📊 Initializing Emotional Tracking Widget...', {
-            page: 'page-initialization-configs',
-          });
-
-          // Wait for TradingView to be available
-          if (typeof window.LightweightCharts === 'undefined' && typeof window.lightweightCharts === 'undefined') {
-            window.Logger?.warn('⚠️ TradingView Lightweight Charts not loaded yet', {
-              page: 'page-initialization-configs',
-            });
-          }
-
-          // Initialize widgets after a short delay to ensure all systems are loaded
-          if (window.emotionalTrackingWidget && typeof window.emotionalTrackingWidget.initializeWidgets === 'function') {
-            setTimeout(() => {
-              window.emotionalTrackingWidget.initializeWidgets();
-            }, 500);
-          }
-        },
-      ],
     },
 
-    // Date Comparison Modal (Mockup)
-    'date-comparison-modal': {
+    'conditions-modals': {
+      name: 'Conditions Modals',
+      packages: ['base', 'services', 'ui-advanced', 'conditions', 'init-system'],
+      requiredGlobals: [
+        'window.UnifiedAppInitializer', // Unified Init System
+        'window.PAGE_CONFIGS', // Unified Init System
+        'window.PACKAGE_MANIFEST', // Unified Init System
+'NotificationSystem', 'window.IconSystem', 'window.AlertConditionRenderer',
+      ],
+      description: 'מודלים של תנאים',
+      pageType: 'dev-tools',
+      requiresFilters: false,
+      requiresValidation: false,
+      requiresTables: false,
+    },
+
+
+    'preferences-groups-management': {
+      name: 'Preferences Groups Management',
+      packages: ['base', 'services', 'ui-advanced', 'preferences', 'init-system'],
+      requiredGlobals: [
+        'window.UnifiedAppInitializer', // Unified Init System
+        'window.PAGE_CONFIGS', // Unified Init System
+        'window.PACKAGE_MANIFEST', // Unified Init System
+'NotificationSystem', 'window.IconSystem', 'window.PreferencesCore',
+      ],
+      description: 'ניהול קבוצות העדפות',
+      pageType: 'dev-tools',
+      requiresFilters: false,
+      requiresValidation: false,
+      requiresTables: false,
+    },
+
+    // Daily Snapshots Mockup Pages
+    'daily-snapshots-comparative-analysis-page': {
+      name: 'Comparative Analysis',
+      packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'entity-services', 'tradingview-charts', 'init-system'],
+      requiredGlobals: [
+        'window.UnifiedAppInitializer', // Unified Init System
+        'window.PAGE_CONFIGS', // Unified Init System
+        'window.PACKAGE_MANIFEST', // Unified Init System
+'NotificationSystem', 'window.IconSystem',
+      ],
+      description: 'ניתוח השוואתי - מוקאפ',
+      pageType: 'mockup',
+      requiresFilters: false,
+      requiresValidation: false,
+      requiresTables: false,
+    },
+
+    'daily-snapshots-date-comparison-modal': {
       name: 'Date Comparison Modal',
-      packages: [
-        'base',
-        'services',
-        'ui-advanced',
-        'preferences',
-        'init-system',
-        'charts',
-      ],
+      packages: ['base', 'services', 'ui-advanced', 'preferences', 'init-system', 'charts'],
       requiredGlobals: [
-        'NotificationSystem',
-        'window.IconSystem',
-        'window.dateComparisonModal',
-        'TradingViewChartAdapter',
-        'UnifiedCacheManager',
-        'FieldRendererService',
-        'InfoSummarySystem',
-        'PreferencesCore',
+        'window.UnifiedAppInitializer', // Unified Init System
+        'window.PAGE_CONFIGS', // Unified Init System
+        'window.PACKAGE_MANIFEST', // Unified Init System
+'NotificationSystem', 'window.IconSystem',
       ],
-      pageSpecificScripts: ['scripts/date-comparison-modal.js'],
-      description: 'מודל השוואת תאריכים - מוקאפ',
-      lastModified: '2025-01-29',
+      description: 'השוואת תאריכים - מוקאפ',
       pageType: 'mockup',
-      preloadAssets: [],
-      cacheStrategy: 'standard',
-      requiresFilters: false,
-      requiresValidation: false,
-      requiresTables: true,
-      customInitializers: [
-        async pageConfig => {
-          window.Logger?.info('📊 Initializing Date Comparison Modal...', {
-            page: 'page-initialization-configs',
-          });
-          
-          // Wait for all required systems
-          await new Promise(resolve => setTimeout(resolve, 500));
-          
-          // Initialize date comparison modal if available
-          if (window.dateComparisonModal && typeof window.dateComparisonModal.initializePage === 'function') {
-            await window.dateComparisonModal.initializePage();
-          }
-        },
-      ],
-    },
-
-    // TradingView Test Page (Mockup)
-    'tradingview-test-page': {
-      name: 'TradingView Test Page',
-      packages: [
-        'base',
-        'services',
-        'ui-advanced',
-        'preferences',
-        'tradingview-charts',
-        'tradingview-widgets',
-        'init-system',
-      ],
-      requiredGlobals: [
-        'NotificationSystem',
-        'window.IconSystem',
-        'TradingViewChartAdapter',
-        'TradingViewTheme',
-        'window.LightweightCharts',
-        'TradingViewWidgetsManager',
-        'TradingViewWidgetsColors',
-        'window.tradingviewTestPage',
-      ],
-      pageSpecificScripts: ['scripts/tradingview-test-page.js'],
-      description: 'עמוד בדיקת TradingView - מוקאפ עם גרפים ו-ווידג\'טים',
-      lastModified: '2025-11-24',
-      pageType: 'mockup',
-      preloadAssets: [],
-      cacheStrategy: 'standard',
       requiresFilters: false,
       requiresValidation: false,
       requiresTables: false,
-      customInitializers: [
-        async pageConfig => {
-          window.Logger?.info('📊 Initializing TradingView Test Page...', {
-            page: 'page-initialization-configs',
-          });
-          if (window.TradingViewWidgetsManager) {
-            await window.TradingViewWidgetsManager.init();
-          }
-        },
+    },
+
+    'daily-snapshots-economic-calendar-page': {
+      name: 'Economic Calendar',
+      packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'entity-services', 'tradingview-widgets', 'init-system'],
+      requiredGlobals: [
+        'window.UnifiedAppInitializer', // Unified Init System
+        'window.PAGE_CONFIGS', // Unified Init System
+        'window.PACKAGE_MANIFEST', // Unified Init System
+'NotificationSystem', 'window.IconSystem',
       ],
+      description: 'לוח שנה כלכלי - מוקאפ',
+      pageType: 'mockup',
+      requiresFilters: false,
+      requiresValidation: false,
+      requiresTables: false,
+    },
+
+    'daily-snapshots-emotional-tracking-widget': {
+      name: 'Emotional Tracking Widget',
+      packages: ['base', 'services', 'ui-advanced', 'preferences', 'tradingview-charts', 'init-system'],
+      requiredGlobals: [
+        'window.UnifiedAppInitializer', // Unified Init System
+        'window.PAGE_CONFIGS', // Unified Init System
+        'window.PACKAGE_MANIFEST', // Unified Init System
+'NotificationSystem', 'window.IconSystem',
+      ],
+      description: 'ווידג\'ט מעקב רגשי - מוקאפ',
+      pageType: 'mockup',
+      requiresFilters: false,
+      requiresValidation: false,
+      requiresTables: false,
+    },
+
+    'daily-snapshots-heatmap-visual-example': {
+      name: 'Heatmap Visual Example',
+      packages: ['base', 'services', 'ui-advanced', 'preferences', 'tradingview-charts', 'init-system'],
+      requiredGlobals: [
+        'window.UnifiedAppInitializer', // Unified Init System
+        'window.PAGE_CONFIGS', // Unified Init System
+        'window.PACKAGE_MANIFEST', // Unified Init System
+'NotificationSystem', 'window.IconSystem',
+      ],
+      description: 'דוגמת מפת חום - מוקאפ',
+      pageType: 'mockup',
+      requiresFilters: false,
+      requiresValidation: false,
+      requiresTables: false,
+    },
+
+    'daily-snapshots-history-widget': {
+      name: 'History Widget',
+      packages: ['base', 'services', 'ui-advanced', 'preferences', 'tradingview-charts', 'init-system'],
+      requiredGlobals: [
+        'window.UnifiedAppInitializer', // Unified Init System
+        'window.PAGE_CONFIGS', // Unified Init System
+        'window.PACKAGE_MANIFEST', // Unified Init System
+'NotificationSystem', 'window.IconSystem',
+      ],
+      description: 'ווידג\'ט היסטוריה - מוקאפ',
+      pageType: 'mockup',
+      requiresFilters: false,
+      requiresValidation: false,
+      requiresTables: false,
+    },
+
+    'daily-snapshots-portfolio-state-page': {
+      name: 'Portfolio State Page',
+      packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'entity-services', 'tradingview-charts', 'init-system'],
+      requiredGlobals: [
+        'window.UnifiedAppInitializer', // Unified Init System
+        'window.PAGE_CONFIGS', // Unified Init System
+        'window.PACKAGE_MANIFEST', // Unified Init System
+'NotificationSystem', 'window.IconSystem',
+      ],
+      description: 'מצב תיק השקעות - מוקאפ',
+      pageType: 'mockup',
+      requiresFilters: false,
+      requiresValidation: false,
+      requiresTables: false,
+    },
+
+    'daily-snapshots-price-history-page': {
+      name: 'Price History Page',
+      packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'entity-services', 'tradingview-charts', 'tradingview-widgets', 'init-system'],
+      requiredGlobals: [
+        'window.UnifiedAppInitializer', // Unified Init System
+        'window.PAGE_CONFIGS', // Unified Init System
+        'window.PACKAGE_MANIFEST', // Unified Init System
+'NotificationSystem', 'window.IconSystem',
+      ],
+      description: 'היסטוריית מחירים - מוקאפ',
+      pageType: 'mockup',
+      requiresFilters: false,
+      requiresValidation: false,
+      requiresTables: false,
+    },
+
+    'daily-snapshots-strategy-analysis-page': {
+      name: 'Strategy Analysis Page',
+      packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'entity-services', 'init-system'],
+      requiredGlobals: [
+        'window.UnifiedAppInitializer', // Unified Init System
+        'window.PAGE_CONFIGS', // Unified Init System
+        'window.PACKAGE_MANIFEST', // Unified Init System
+'NotificationSystem', 'window.IconSystem',
+      ],
+      description: 'ניתוח אסטרטגיה - מוקאפ',
+      pageType: 'mockup',
+      requiresFilters: false,
+      requiresValidation: false,
+      requiresTables: false,
+    },
+
+    'daily-snapshots-trade-history-page': {
+      name: 'Trade History Page',
+      packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'entity-services', 'tradingview-charts', 'init-system'],
+      requiredGlobals: [
+        'window.UnifiedAppInitializer', // Unified Init System
+        'window.PAGE_CONFIGS', // Unified Init System
+        'window.PACKAGE_MANIFEST', // Unified Init System
+'NotificationSystem', 'window.IconSystem',
+      ],
+      description: 'היסטוריית טריידים - מוקאפ',
+      pageType: 'mockup',
+      requiresFilters: false,
+      requiresValidation: false,
+      requiresTables: false,
+    },
+
+    'daily-snapshots-trading-journal-page': {
+      name: 'Trading Journal Page',
+      packages: ['base', 'services', 'ui-advanced', 'crud', 'preferences', 'entity-services', 'init-system'],
+      requiredGlobals: [
+        'window.UnifiedAppInitializer', // Unified Init System
+        'window.PAGE_CONFIGS', // Unified Init System
+        'window.PACKAGE_MANIFEST', // Unified Init System
+'NotificationSystem', 'window.IconSystem',
+      ],
+      description: 'יומן מסחר - מוקאפ',
+      pageType: 'mockup',
+      requiresFilters: false,
+      requiresValidation: false,
+      requiresTables: false,
     },
 
     // Watch Lists Pages
-    'watch-lists-page': {
-      name: 'Watch Lists Page',
+    'watch-list': {
+      name: 'Watch List Page',
       packages: [
         'base',
         'services',
+        'validation', // Required for form validation - must load before modules/ui-advanced
+        'modules', // Required for ModalManagerV2 and watch-lists-config.js
         'ui-advanced',
         'crud',
         'entity-services',
-        'watch-lists'
+        'watch-lists',
+        'init-system'
       ],
       requiredGlobals: [
+        'UnifiedCacheManager',
+        'Logger',
         'NotificationSystem',
         'window.IconSystem',
         'window.WatchListsDataService',
         'window.WatchListsUIService',
         'window.WatchListsPage',
+        'window.ModalManagerV2',
         'window.HeaderSystem',
-        'window.UnifiedTableSystem'
+        'window.UnifiedTableSystem',
+        'window.validateTextField', // Validation functions
+        'window.tickersModalConfig' // Required for nested ticker addition modal
       ],
       pageSpecificScripts: ['scripts/watch-lists-page.js'],
-      description: 'עמוד ניהול רשימות צפייה - מוקאפ',
-      lastModified: '2025-11-26',
-      pageType: 'mockup',
+      description: 'עמוד ניהול רשימות צפייה - production',
+      lastModified: '2025-12-06',
+      pageType: 'main',
       cacheStrategy: 'standard',
       requiresFilters: true,
-      requiresValidation: false,
+      requiresValidation: true, // Changed to true - validation is required for modals
       requiresTables: true,
       sectionsDefaultState: 'open',
       sectionDefaultStates: {
@@ -3193,7 +3408,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       },
       customInitializers: [
         async pageConfig => {
-          window.Logger?.info('📊 Initializing Watch Lists Page...', {
+          window.Logger?.info('📊 Initializing Watch List Page...', {
             page: 'page-initialization-configs',
           });
 
@@ -3241,6 +3456,8 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       packages: [
         'base',
         'services',
+        'validation',
+        'modules', // Required for tickersModalConfig and ModalManagerV2
         'ui-advanced',
         'watch-lists'
       ],
@@ -3248,7 +3465,8 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'NotificationSystem',
         'window.ModalManagerV2',
         'window.AddTickerModal',
-        'window.SelectPopulatorService'
+        'window.SelectPopulatorService',
+        'window.tickersModalConfig' // Required for nested ticker addition modal
       ],
       pageSpecificScripts: ['scripts/add-ticker-modal.js'],
       description: 'מודל הוספת טיקר - מוקאפ',
@@ -3311,6 +3529,10 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'init-system'
       ],
       requiredGlobals: [
+        'window.UnifiedAppInitializer', // Unified Init System
+        'window.PAGE_CONFIGS', // Unified Init System
+        'window.PACKAGE_MANIFEST', // Unified Init System
+
         'NotificationSystem',
         'window.IconSystem',
         'window.Logger',
@@ -3324,7 +3546,8 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.DataCollectionService',
         'window.FieldRendererService',
         'window.ModalManagerV2',
-        'window.CRUDResponseHandler'
+        'window.CRUDResponseHandler',
+        'window.notesModalConfig' // Required for Save as Note feature
         // Note: window.NotesData is optional - ai-notes-integration.js has fallback
       ],
       description: 'ניתוח AI - יצירת ניתוחים באמצעות מנועי LLM',
@@ -3369,6 +3592,656 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         },
       ],
     },
+
+
+    'tradingview-test-page': {
+      name: 'TradingView Test Page',
+      description: 'בדיקת TradingView Lightweight Charts',
+      lastModified: '2025-02-02',
+      pageType: 'development',
+      packages: [
+        'base',
+        'services',
+        'ui-advanced',
+        'modules',
+        'crud',
+        'conditions',
+        'dashboard-widgets',
+        'info-summary',
+        'entity-details',
+        'tradingview-charts',
+        'init-system',
+      ],
+      requiredGlobals: [
+        'window.UnifiedAppInitializer', // Unified Init System
+        'window.PAGE_CONFIGS', // Unified Init System
+        'window.PACKAGE_MANIFEST', // Unified Init System
+
+        'NotificationSystem',
+        'window.IconSystem',
+        'window.SelectPopulatorService',
+        'window.DataCollectionService',
+        'window.DefaultValueSetter',
+        'window.TableSortValueAdapter',
+        'window.LinkedItemsService',
+        'window.CRUDResponseHandler',
+        'window.createActionsMenu',
+        'window.ModalNavigationManager',
+        'window.ModalManagerV2',
+        'window.conditionsInitializer',
+        'window.ConditionsUIManager',
+        'window.PendingTradePlanWidget',
+        'window.InfoSummarySystem',
+        'window.PaginationSystem',
+        'window.showEntityDetails',
+      ],
+      preloadAssets: ['tradingview-test'],
+      cacheStrategy: 'standard',
+      requiresFilters: false,
+      requiresValidation: false,
+      requiresTables: false,
+      customInitializers: [
+        async pageConfig => {
+          window.Logger?.info('📊 Initializing TradingView Test Page...', {
+            page: 'page-initialization-configs',
+          });
+        },
+      ],
+    },    'portfolio-state-page': {
+      name: 'מצב תיק היסטורי',
+      description: 'עמוד מצב תיק היסטורי - ניתוח וצפייה במצב תיק בנקודות זמן שונות',
+      lastModified: '2025-01-12',
+      pageType: 'main',
+      packages: [
+        "base",
+        "services",
+        "ui-advanced",
+        "modules",
+        "crud",
+        "preferences",
+        "entity-services",
+        "charts",
+        "init-system"
+      ],
+      requiredGlobals: [
+        'window.UnifiedAppInitializer', // Unified Init System
+        'window.PAGE_CONFIGS', // Unified Init System
+        'window.PACKAGE_MANIFEST', // Unified Init System
+        "NotificationSystem",
+        "window.IconSystem",
+        "window.FieldRendererService",
+        "window.UnifiedTableSystem",
+        "window.ModalManagerV2",
+        "window.LinkedItemsService",
+        "window.SelectPopulatorService",
+        "window.DataCollectionService",
+        "window.CRUDResponseHandler"
+      ],
+      preloadAssets: ['portfolio-state-page-data'],
+      cacheStrategy: 'standard',
+      requiresFilters: true,
+      requiresValidation: false,
+      requiresTables: true,
+      customInitializers: [
+        async pageConfig => {
+          window.Logger?.info('📄 Initializing portfolio-state-page...', {
+            page: 'page-initialization-configs',
+          });
+          
+          // Wait for portfolioStatePage to be available
+          if (!window.portfolioStatePage) {
+            window.Logger?.warn('⚠️ portfolioStatePage not available yet, waiting...', {
+              page: 'page-initialization-configs',
+            });
+            
+            // Wait up to 5 seconds for the script to load
+            let retries = 0;
+            while (!window.portfolioStatePage) {
+              if (retries >= 50) {
+                window.Logger?.error('❌ portfolioStatePage not available after wait', {
+                  page: 'page-initialization-configs',
+                });
+                return;
+              }
+              await new Promise(resolve => setTimeout(resolve, 100));
+              retries++;
+            }
+          }
+
+          // Call initializePage if available, otherwise page will initialize via DOMContentLoaded
+          if (typeof window.portfolioStatePage.initializePage === 'function') {
+            try {
+              await window.portfolioStatePage.initializePage();
+              window.Logger?.info('✅ Portfolio State Page initialized via UnifiedAppInitializer', {
+                page: 'page-initialization-configs',
+              });
+            } catch (error) {
+              window.Logger?.error('❌ Error initializing Portfolio State Page', {
+                page: 'page-initialization-configs',
+                error,
+              });
+            }
+          } else {
+            window.Logger?.info('ℹ️ Portfolio State Page will initialize via DOMContentLoaded', {
+              page: 'page-initialization-configs',
+            });
+          }
+        },
+      ],
+    },    'trade-history-page': {
+      name: 'היסטוריית טרייד',
+      description: 'עמוד היסטוריית טרייד - ניתוח וצפייה בהיסטוריית טריידים',
+      lastModified: '2025-01-12',
+      pageType: 'main',
+      packages: [
+        "base",
+        "services",
+        "ui-advanced",
+        "modules",
+        "crud",
+        "preferences",
+        "entity-services",
+        "entity-details",
+        "info-summary",
+        "charts",
+        "init-system"
+      ],
+      requiredGlobals: [
+        'window.UnifiedAppInitializer', // Unified Init System
+        'window.PAGE_CONFIGS', // Unified Init System
+        'window.PACKAGE_MANIFEST', // Unified Init System
+        "NotificationSystem",
+        "window.IconSystem",
+        "window.FieldRendererService",
+        "window.ModalManagerV2",
+        "window.LinkedItemsService",
+        "window.UnifiedTableSystem",
+        "window.InfoSummarySystem",
+        "window.SelectPopulatorService",
+        "window.DataCollectionService",
+        "window.CRUDResponseHandler"
+      ],
+      preloadAssets: ['trade-history-page-data'],
+      cacheStrategy: 'standard',
+      requiresFilters: true,
+      requiresValidation: false,
+      requiresTables: true,
+      customInitializers: [
+        async pageConfig => {
+          window.Logger?.info('📄 Initializing trade-history-page...', {
+            page: 'page-initialization-configs',
+          });
+          
+          // Wait for tradeHistoryPage to be available
+          if (!window.tradeHistoryPage || typeof window.tradeHistoryPage.initializePage !== 'function') {
+            window.Logger?.warn('⚠️ tradeHistoryPage.initializePage not available yet, waiting...', {
+              page: 'page-initialization-configs',
+            });
+            
+            // Wait up to 5 seconds for the script to load
+            let retries = 0;
+            while (!window.tradeHistoryPage || typeof window.tradeHistoryPage.initializePage !== 'function') {
+              if (retries >= 50) {
+                window.Logger?.error('❌ tradeHistoryPage.initializePage not available after wait', {
+                  page: 'page-initialization-configs',
+                });
+                return;
+              }
+              await new Promise(resolve => setTimeout(resolve, 100));
+              retries++;
+            }
+          }
+
+          // Call initializePage from trade-history-page.js
+          try {
+            await window.tradeHistoryPage.initializePage();
+            window.Logger?.info('✅ Trade History Page initialized via UnifiedAppInitializer', {
+              page: 'page-initialization-configs',
+            });
+          } catch (error) {
+            window.Logger?.error('❌ Error initializing Trade History Page', {
+              page: 'page-initialization-configs',
+              error,
+            });
+            throw error;
+          }
+        },
+      ],
+    },    'price-history-page': {
+      name: 'Price History Page',
+      description: 'עמוד מוקאפ - price-history-page',
+      lastModified: '2025-02-02',
+      pageType: 'mockup',
+      packages: [
+        "base",
+        "services",
+        "ui-advanced",
+        "modules",
+        "crud",
+        "conditions",
+        "dashboard-widgets",
+        "init-system",
+        "info-summary"
+],
+      requiredGlobals: [
+        'window.UnifiedAppInitializer', // Unified Init System
+        'window.PAGE_CONFIGS', // Unified Init System
+        'window.PACKAGE_MANIFEST', // Unified Init System
+
+        "NotificationSystem",
+        "window.IconSystem",
+        "window.SelectPopulatorService",
+        "window.DataCollectionService",
+        "window.DefaultValueSetter",
+        "window.TableSortValueAdapter",
+        "window.LinkedItemsService",
+        "window.CRUDResponseHandler",
+        "window.createActionsMenu",
+        "window.ModalNavigationManager",
+        "window.ModalManagerV2",
+        "window.conditionsInitializer",
+        "window.ConditionsUIManager",
+        "window.PendingTradePlanWidget",
+        "window.PaginationSystem",
+        "window.InfoSummarySystem"
+,
+      ],
+      preloadAssets: ['price-history-page-data'],
+      cacheStrategy: 'standard',
+      requiresFilters: false,
+      requiresValidation: false,
+      requiresTables: false,
+      customInitializers: [
+        async pageConfig => {
+          window.Logger?.info('📄 Initializing price-history-page...', {
+            page: 'page-initialization-configs',
+          });
+        },
+      ],
+    },    'comparative-analysis-page': {
+      name: 'Comparative Analysis Page',
+      description: 'עמוד מוקאפ - comparative-analysis-page',
+      lastModified: '2025-02-02',
+      pageType: 'mockup',
+      packages: [
+        "base",
+        "services",
+        "ui-advanced",
+        "modules",
+        "crud",
+        "conditions",
+        "dashboard-widgets",
+        "init-system",
+        "info-summary"
+],
+      requiredGlobals: [
+        'window.UnifiedAppInitializer', // Unified Init System
+        'window.PAGE_CONFIGS', // Unified Init System
+        'window.PACKAGE_MANIFEST', // Unified Init System
+
+        "NotificationSystem",
+        "window.IconSystem",
+        "window.SelectPopulatorService",
+        "window.DataCollectionService",
+        "window.DefaultValueSetter",
+        "window.TableSortValueAdapter",
+        "window.LinkedItemsService",
+        "window.CRUDResponseHandler",
+        "window.createActionsMenu",
+        "window.ModalNavigationManager",
+        "window.ModalManagerV2",
+        "window.conditionsInitializer",
+        "window.ConditionsUIManager",
+        "window.PendingTradePlanWidget",
+        "window.PaginationSystem",
+        "window.InfoSummarySystem"
+,
+      ],
+      preloadAssets: ['comparative-analysis-page-data'],
+      cacheStrategy: 'standard',
+      requiresFilters: false,
+      requiresValidation: false,
+      requiresTables: false,
+      customInitializers: [
+        async pageConfig => {
+          window.Logger?.info('📄 Initializing comparative-analysis-page...', {
+            page: 'page-initialization-configs',
+          });
+        },
+      ],
+    },    'trading-journal-page': {
+      name: 'יומן מסחר',
+      description: 'עמוד יומן מסחר - ניהול ותצוגת יומן מסחר עם לוח שנה',
+      lastModified: '2025-01-12',
+      pageType: 'main',
+      packages: [
+        "base",
+        "services",
+        "ui-advanced",
+        "modules",
+        "crud",
+        "preferences",
+        "entity-services",
+        "entity-details",
+        "info-summary",
+        "init-system"
+      ],
+      requiredGlobals: [
+        'window.UnifiedAppInitializer', // Unified Init System
+        'window.PAGE_CONFIGS', // Unified Init System
+        'window.PACKAGE_MANIFEST', // Unified Init System
+        "NotificationSystem",
+        "window.IconSystem",
+        "window.FieldRendererService",
+        "window.ModalManagerV2",
+        "window.LinkedItemsService",
+        "window.InfoSummarySystem",
+        "window.SelectPopulatorService",
+        "window.DataCollectionService",
+        "window.CRUDResponseHandler"
+      ],
+      preloadAssets: ['trading-journal-page-data'],
+      cacheStrategy: 'standard',
+      requiresFilters: true,
+      requiresValidation: false,
+      requiresTables: false,
+      customInitializers: [
+        async pageConfig => {
+          window.Logger?.info('📄 Initializing trading-journal-page...', {
+            page: 'page-initialization-configs',
+          });
+          
+          // Wait for tradingJournalPage to be available
+          if (!window.tradingJournalPage) {
+            window.Logger?.warn('⚠️ tradingJournalPage not available yet, waiting...', {
+              page: 'page-initialization-configs',
+            });
+            
+            // Wait up to 5 seconds for the script to load
+            let retries = 0;
+            while (!window.tradingJournalPage) {
+              if (retries >= 50) {
+                window.Logger?.error('❌ tradingJournalPage not available after wait', {
+                  page: 'page-initialization-configs',
+                });
+                return;
+              }
+              await new Promise(resolve => setTimeout(resolve, 100));
+              retries++;
+            }
+          }
+
+          // Trading Journal Page initializes via DOMContentLoaded listener
+          // Just verify it's loaded
+          window.Logger?.info('✅ Trading Journal Page script loaded', {
+            page: 'page-initialization-configs',
+          });
+        },
+      ],
+    },    'strategy-analysis-page': {
+      name: 'Strategy Analysis Page',
+      description: 'עמוד מוקאפ - strategy-analysis-page',
+      lastModified: '2025-02-02',
+      pageType: 'mockup',
+      packages: [
+        "base",
+        "services",
+        "ui-advanced",
+        "modules",
+        "crud",
+        "conditions",
+        "dashboard-widgets",
+        "init-system",
+        "info-summary"
+],
+      requiredGlobals: [
+        'window.UnifiedAppInitializer', // Unified Init System
+        'window.PAGE_CONFIGS', // Unified Init System
+        'window.PACKAGE_MANIFEST', // Unified Init System
+
+        "NotificationSystem",
+        "window.IconSystem",
+        "window.SelectPopulatorService",
+        "window.DataCollectionService",
+        "window.DefaultValueSetter",
+        "window.TableSortValueAdapter",
+        "window.LinkedItemsService",
+        "window.CRUDResponseHandler",
+        "window.createActionsMenu",
+        "window.ModalNavigationManager",
+        "window.ModalManagerV2",
+        "window.conditionsInitializer",
+        "window.ConditionsUIManager",
+        "window.PendingTradePlanWidget",
+        "window.PaginationSystem",
+        "window.InfoSummarySystem"
+,
+      ],
+      preloadAssets: ['strategy-analysis-page-data'],
+      cacheStrategy: 'standard',
+      requiresFilters: false,
+      requiresValidation: false,
+      requiresTables: false,
+      customInitializers: [
+        async pageConfig => {
+          window.Logger?.info('📄 Initializing strategy-analysis-page...', {
+            page: 'page-initialization-configs',
+          });
+        },
+      ],
+    },    'economic-calendar-page': {
+      name: 'Economic Calendar Page',
+      description: 'עמוד מוקאפ - economic-calendar-page',
+      lastModified: '2025-02-02',
+      pageType: 'mockup',
+      packages: [
+        "base",
+        "services",
+        "ui-advanced",
+        "modules",
+        "crud",
+        "conditions",
+        "dashboard-widgets",
+        "init-system",
+        "info-summary"
+],
+      requiredGlobals: [
+        'window.UnifiedAppInitializer', // Unified Init System
+        'window.PAGE_CONFIGS', // Unified Init System
+        'window.PACKAGE_MANIFEST', // Unified Init System
+
+        "NotificationSystem",
+        "window.IconSystem",
+        "window.SelectPopulatorService",
+        "window.DataCollectionService",
+        "window.DefaultValueSetter",
+        "window.TableSortValueAdapter",
+        "window.LinkedItemsService",
+        "window.CRUDResponseHandler",
+        "window.createActionsMenu",
+        "window.ModalNavigationManager",
+        "window.ModalManagerV2",
+        "window.conditionsInitializer",
+        "window.ConditionsUIManager",
+        "window.PendingTradePlanWidget",
+        "window.PaginationSystem",
+        "window.InfoSummarySystem"
+,
+      ],
+      preloadAssets: ['economic-calendar-page-data'],
+      cacheStrategy: 'standard',
+      requiresFilters: false,
+      requiresValidation: false,
+      requiresTables: false,
+      customInitializers: [
+        async pageConfig => {
+          window.Logger?.info('📄 Initializing economic-calendar-page...', {
+            page: 'page-initialization-configs',
+          });
+        },
+      ],
+    },    'history-widget': {
+      name: 'History Widget',
+      description: 'עמוד מוקאפ - history-widget',
+      lastModified: '2025-02-02',
+      pageType: 'mockup',
+      packages: [
+        "base",
+        "services",
+        "ui-advanced",
+        "modules",
+        "crud",
+        "conditions",
+        "dashboard-widgets",
+        "init-system",
+        "info-summary"
+],
+      requiredGlobals: [
+        'window.UnifiedAppInitializer', // Unified Init System
+        'window.PAGE_CONFIGS', // Unified Init System
+        'window.PACKAGE_MANIFEST', // Unified Init System
+
+        "NotificationSystem",
+        "window.IconSystem",
+        "window.SelectPopulatorService",
+        "window.DataCollectionService",
+        "window.DefaultValueSetter",
+        "window.TableSortValueAdapter",
+        "window.LinkedItemsService",
+        "window.CRUDResponseHandler",
+        "window.createActionsMenu",
+        "window.ModalNavigationManager",
+        "window.ModalManagerV2",
+        "window.conditionsInitializer",
+        "window.ConditionsUIManager",
+        "window.PendingTradePlanWidget",
+        "window.PaginationSystem",
+        "window.InfoSummarySystem"
+,
+      ],
+      preloadAssets: ['history-widget-data'],
+      cacheStrategy: 'standard',
+      requiresFilters: false,
+      requiresValidation: false,
+      requiresTables: false,
+      customInitializers: [
+        async pageConfig => {
+          window.Logger?.info('📄 Initializing history-widget...', {
+            page: 'page-initialization-configs',
+          });
+        },
+      ],
+    },    'emotional-tracking-widget': {
+      name: 'Emotional Tracking Widget',
+      description: 'עמוד מוקאפ - emotional-tracking-widget',
+      lastModified: '2025-02-02',
+      pageType: 'mockup',
+      packages: [
+        "base",
+        "services",
+        "ui-advanced",
+        "modules",
+        "crud",
+        "conditions",
+        "dashboard-widgets",
+        "init-system"
+],
+      requiredGlobals: [
+        'window.UnifiedAppInitializer', // Unified Init System
+        'window.PAGE_CONFIGS', // Unified Init System
+        'window.PACKAGE_MANIFEST', // Unified Init System
+
+        "NotificationSystem",
+        "window.IconSystem",
+        "window.SelectPopulatorService",
+        "window.DataCollectionService",
+        "window.DefaultValueSetter",
+        "window.TableSortValueAdapter",
+        "window.LinkedItemsService",
+        "window.CRUDResponseHandler",
+        "window.createActionsMenu",
+        "window.ModalNavigationManager",
+        "window.ModalManagerV2",
+        "window.conditionsInitializer",
+        "window.ConditionsUIManager",
+        "window.PendingTradePlanWidget",
+        "window.PaginationSystem"
+,
+      ],
+      preloadAssets: ['emotional-tracking-widget-data'],
+      cacheStrategy: 'standard',
+      requiresFilters: false,
+      requiresValidation: false,
+      requiresTables: false,
+      customInitializers: [
+        async pageConfig => {
+          window.Logger?.info('📄 Initializing emotional-tracking-widget...', {
+            page: 'page-initialization-configs',
+          });
+        },
+      ],
+    },    'date-comparison-modal': {
+      name: 'Date Comparison Modal',
+      description: 'עמוד מוקאפ - date-comparison-modal',
+      lastModified: '2025-02-02',
+      pageType: 'mockup',
+      packages: [
+        "base",
+        "services",
+        "ui-advanced",
+        "modules",
+        "crud",
+        "conditions",
+        "dashboard-widgets",
+        "init-system",
+        "info-summary"
+],
+      requiredGlobals: [
+        'window.UnifiedAppInitializer', // Unified Init System
+        'window.PAGE_CONFIGS', // Unified Init System
+        'window.PACKAGE_MANIFEST', // Unified Init System
+
+        "NotificationSystem",
+        "window.IconSystem",
+        "window.SelectPopulatorService",
+        "window.DataCollectionService",
+        "window.DefaultValueSetter",
+        "window.TableSortValueAdapter",
+        "window.LinkedItemsService",
+        "window.CRUDResponseHandler",
+        "window.createActionsMenu",
+        "window.ModalNavigationManager",
+        "window.ModalManagerV2",
+        "window.conditionsInitializer",
+        "window.ConditionsUIManager",
+        "window.PendingTradePlanWidget",
+        "window.PaginationSystem",
+        "window.InfoSummarySystem"
+,
+      ],
+      preloadAssets: ['date-comparison-modal-data'],
+      cacheStrategy: 'standard',
+      requiresFilters: false,
+      requiresValidation: false,
+      requiresTables: false,
+      customInitializers: [
+        async pageConfig => {
+          window.Logger?.info('📄 Initializing date-comparison-modal...', {
+            page: 'page-initialization-configs',
+          });
+        },
+      ],
+    },
+
+
+
+
+
+
+
+
+
+
   };
 
   // ===== GLOBAL EXPORT =====

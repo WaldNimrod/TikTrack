@@ -2775,8 +2775,12 @@
     flex-wrap: wrap;
 }
 
+.filter-buttons-container button {
+    background-color: white !important;
+}
+
 .filter-buttons-container button.active {
-    background-color: var(--apple-blue);
+    background-color: var(--apple-blue) !important;
     color: white;
     border-color: var(--apple-blue);
 }

@@ -44,12 +44,15 @@ def get_trades_pending_plan_assignments():
     normalizer = None
     try:
         db: Session = g.db
+        # Get user_id from Flask context (set by auth middleware)
+        user_id = getattr(g, 'user_id', None)
         normalizer = _get_date_normalizer()
         limit = request.args.get('limit', type=int)
         suggestions_limit = request.args.get('suggestions', default=3, type=int)
 
         suggestions = TradePlanMatchingService.get_assignment_suggestions(
             db,
+            user_id=user_id,
             max_items=limit,
             max_suggestions_per_trade=max(suggestions_limit or 1, 1),
         )
@@ -81,11 +84,14 @@ def get_trades_pending_plan_creations():
     normalizer = None
     try:
         db: Session = g.db
+        # Get user_id from Flask context (set by auth middleware)
+        user_id = getattr(g, 'user_id', None)
         normalizer = _get_date_normalizer()
         limit = request.args.get('limit', type=int)
 
         assignment_preview = TradePlanMatchingService.get_assignment_suggestions(
             db,
+            user_id=user_id,
             max_items=None,
             max_suggestions_per_trade=3,
         )
@@ -96,6 +102,7 @@ def get_trades_pending_plan_creations():
 
         creations = TradePlanMatchingService.get_creation_suggestions(
             db,
+            user_id=user_id,
             max_items=limit,
             assignment_index=assignment_index,
         )
@@ -127,6 +134,9 @@ def get_trades():
     """Get all trades with filtering options - enhanced with market data"""
     db: Session = g.db
     
+    # Get user_id from Flask context (set by auth middleware)
+    user_id = getattr(g, 'user_id', None)
+    
     # Get filtering parameters
     trading_account_id = request.args.get('trading_account_id', type=int)
     status = request.args.get('status')
@@ -146,14 +156,14 @@ def get_trades():
         # If there are filtering parameters, use appropriate function
         if trading_account_id and status:
             logger.info(f"Filtering trades by trading_account_id={trading_account_id} and status={status}")
-            trades = TradeService.get_by_account_and_status(db, trading_account_id, status)
+            trades = TradeService.get_by_account_and_status(db, trading_account_id, status, user_id=user_id)
             logger.info(f"Found {len(trades)} trades for account {trading_account_id} with status {status}")
         elif trading_account_id:
-            trades = TradeService.get_by_account(db, trading_account_id)
+            trades = TradeService.get_by_account(db, trading_account_id, user_id=user_id)
         elif status:
-            trades = TradeService.get_by_status(db, status)
+            trades = TradeService.get_by_status(db, status, user_id=user_id)
         else:
-            trades = TradeService.get_all(db)
+            trades = TradeService.get_all(db, user_id=user_id)
         
         # Convert trades to dict with market data and position data
         trade_dicts = []
@@ -232,11 +242,14 @@ def get_trade(trade_id: int):
     return jsonify(response), status_code
 
 @trades_bp.route('/account/<int:trading_account_id>', methods=['GET'])
+@handle_database_session()
 def get_trades_by_account(trading_account_id: int):
     """Get trades by account"""
     try:
-        db: Session = next(get_db())
-        trades = TradeService.get_by_account(db, trading_account_id)
+        db: Session = g.db
+        # Get user_id from Flask context (set by auth middleware)
+        user_id = getattr(g, 'user_id', None)
+        trades = TradeService.get_by_account(db, trading_account_id, user_id=user_id)
         normalizer = _get_date_normalizer()
         data = normalizer.normalize_output([trade.to_dict() for trade in trades])
         return jsonify({
@@ -264,6 +277,9 @@ def get_trades_by_account(trading_account_id: int):
 def create_trade():
     """Create a new trade"""
     try:
+        # Get user_id from Flask context (set by auth middleware)
+        user_id = getattr(g, 'user_id', None)
+        
         normalizer = _get_date_normalizer()
         data = request.get_json() or {}
         
@@ -280,8 +296,41 @@ def create_trade():
             data['notes'] = BaseEntityUtils.sanitize_rich_text(data['notes'])
         
         db: Session = g.db
+        
+        # Verify trading_account belongs to user if provided
+        if 'trading_account_id' in data and user_id is not None:
+            from models.trading_account import TradingAccount
+            account = db.query(TradingAccount).filter(
+                TradingAccount.id == data['trading_account_id'],
+                TradingAccount.user_id == user_id
+            ).first()
+            if not account:
+                return jsonify({
+                    "status": "error",
+                    "error": {"message": "Trading account not found or does not belong to user"},
+                    "timestamp": normalizer.now_envelope(),
+                    "version": "1.0"
+                }), 404
+        
+        # Verify ticker belongs to user if provided
+        if 'ticker_id' in data and user_id is not None:
+            from models.ticker import Ticker
+            from models.user_ticker import UserTicker
+            # Check if user has access to this ticker
+            user_ticker = db.query(UserTicker).filter(
+                UserTicker.user_id == user_id,
+                UserTicker.ticker_id == data['ticker_id']
+            ).first()
+            if not user_ticker:
+                return jsonify({
+                    "status": "error",
+                    "error": {"message": "Ticker not found or does not belong to user"},
+                    "timestamp": normalizer.now_envelope(),
+                    "version": "1.0"
+                }), 404
+        
         normalized_payload = normalizer.normalize_input_payload(data)
-        trade = TradeService.create(db, normalized_payload)
+        trade = TradeService.create(db, normalized_payload, user_id=user_id)
         trade_dict = normalizer.normalize_output(trade.to_dict() if hasattr(trade, 'to_dict') else {})
         return jsonify({
             "status": "success",

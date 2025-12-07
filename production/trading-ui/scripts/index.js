@@ -7,12 +7,8 @@
  * 
  * Total Functions: 17
  * 
- * DATA MANIPULATION (5)
- * - createTradesStatusChart() - * Export overview data from the index page
- * - createPerformanceChart() - createPerformanceChart function
- * - createAccountChart() - createAccountChart function
- * - createMixedChart() - createMixedChart function
- * - createMixedChartData() - REMOVED: not used
+ * DATA MANIPULATION (0)
+ * - Chart functions - REMOVED: All chart-related functions removed (no longer used on index page)
  * 
  * EVENT HANDLING (1)
  * - quickAction() - * Refresh overview data on the index page
@@ -20,14 +16,11 @@
  * ICON MANAGEMENT (1)
  * - replaceIconsWithIconSystem() - Replace all <img> tags with IconSystem.renderIcon()
  * 
- * OTHER (10)
+ * OTHER (5)
  * - switchTableTab() - switchTableTab function
  * - refreshOverview() - * Switch between table tabs on the index page
  * - exportOverview() - * Switch between table tabs on the index page
- * - refreshAllCharts() - refreshAllCharts function
- * - refreshChart() - refreshChart function
- * - exportChart() - exportChart function
- * - exportAllCharts() - exportAllCharts function
+ * - equalizeWidgetHeights() - Equalize widget heights in each row
  * - generateDetailedLog() - generateDetailedLog function
  * - debugZIndexStatus() - debugZIndexStatus function
  * - copyDetailedLogLocal() - copyDetailedLogLocal function
@@ -72,13 +65,7 @@ window.Logger.info('🏠 Index page JavaScript loaded', { page: "index" });
  */
 
 // ===== GLOBAL VARIABLES =====
-// Export homeCharts to global scope for enhancements system
-window.homeCharts = {
-    tradesStatusChart: null,
-    performanceChart: null,
-    accountChart: null,
-    mixedChart: null
-};
+// Charts removed - no longer used on index page
 
 const DASHBOARD_DATA_KEY = 'dashboard-data';
 const DASHBOARD_DATA_TTL = 60000;
@@ -288,11 +275,24 @@ function updateSummaryStats(data, currencySymbol) {
         // שימוש ישיר ב-FieldRendererService - המערכת תמיד זמינה דרך BASE package
         const numericBalance = toNumber(balance);
         if (Number.isFinite(numericBalance)) {
-            balanceEl.innerHTML = window.FieldRendererService?.renderAmount
+            const htmlContent = window.FieldRendererService?.renderAmount
                 ? window.FieldRendererService.renderAmount(numericBalance, currencySymbol, 2, true)
                 : '<span class="text-muted">לא זמין</span>';
+            balanceEl.textContent = '';
+            // Convert HTML string to DOM elements safely
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(htmlContent, 'text/html');
+            const fragment = document.createDocumentFragment();
+            Array.from(doc.body.childNodes).forEach(node => {
+                fragment.appendChild(node.cloneNode(true));
+            });
+            balanceEl.appendChild(fragment);
         } else {
-            balanceEl.innerHTML = '<span class="text-muted">לא זמין</span>';
+            balanceEl.textContent = '';
+            const span = document.createElement('span');
+            span.className = 'text-muted';
+            span.textContent = 'לא זמין';
+            balanceEl.appendChild(span);
         }
     }
 
@@ -302,11 +302,24 @@ function updateSummaryStats(data, currencySymbol) {
         // שימוש ישיר ב-FieldRendererService - המערכת תמיד זמינה דרך BASE package
         const numericPnL = toNumber(totalPnL);
         if (Number.isFinite(numericPnL)) {
-            totalPnLEl.innerHTML = window.FieldRendererService?.renderAmount
+            const htmlContent = window.FieldRendererService?.renderAmount
                 ? window.FieldRendererService.renderAmount(numericPnL, currencySymbol, 2, true)
                 : '<span class="text-muted">לא זמין</span>';
+            totalPnLEl.textContent = '';
+            // Convert HTML string to DOM elements safely
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(htmlContent, 'text/html');
+            const fragment = document.createDocumentFragment();
+            Array.from(doc.body.childNodes).forEach(node => {
+                fragment.appendChild(node.cloneNode(true));
+            });
+            totalPnLEl.appendChild(fragment);
         } else {
-            totalPnLEl.innerHTML = '<span class="text-muted">לא זמין</span>';
+            totalPnLEl.textContent = '';
+            const span = document.createElement('span');
+            span.className = 'text-muted';
+            span.textContent = 'לא זמין';
+            totalPnLEl.appendChild(span);
         }
     }
 }
@@ -320,12 +333,6 @@ function updateSummaryStats(data, currencySymbol) {
  */
 function updateRecentItemsWidget(trades = [], tradePlans = [], currencySymbol) {
     if (window.RecentItemsWidget?.render) {
-        window.Logger?.info?.('📊 Updating RecentItemsWidget', { 
-            tradesCount: Array.isArray(trades) ? trades.length : 0,
-            tradePlansCount: Array.isArray(tradePlans) ? tradePlans.length : 0,
-            currencySymbol,
-            page: 'index'
-        });
         // Build render data - only include trades/tradePlans if they have data
         // This matches the test page behavior where we only pass what we have
         const renderData = {
@@ -339,13 +346,6 @@ function updateRecentItemsWidget(trades = [], tradePlans = [], currencySymbol) {
         if (Array.isArray(tradePlans) && tradePlans.length > 0) {
             renderData.tradePlans = tradePlans;
         }
-        
-        window.Logger?.info?.('📊 Calling RecentItemsWidget.render', {
-            renderDataKeys: Object.keys(renderData),
-            tradesIncluded: renderData.hasOwnProperty('trades'),
-            tradePlansIncluded: renderData.hasOwnProperty('tradePlans'),
-            page: 'index'
-        });
         
         window.RecentItemsWidget.render(renderData);
         return;
@@ -383,7 +383,11 @@ function updateRecentTradePlans(tradePlans = [], currencySymbol) {
     }
 
     if (!Array.isArray(tradePlans) || tradePlans.length === 0) {
-        container.innerHTML = '<div class="text-muted small">אין תוכניות זמינות</div>';
+        container.textContent = '';
+        const div = document.createElement('div');
+        div.className = 'text-muted small';
+        div.textContent = 'אין תוכניות זמינות';
+        container.appendChild(div);
         return;
     }
 
@@ -445,7 +449,16 @@ function updateRecentTradePlans(tradePlans = [], currencySymbol) {
         if (value !== undefined && value !== null) {
             const numericValue = toNumber(value);
             if (Number.isFinite(numericValue) && window.FieldRendererService?.renderAmount) {
-                amountWrapper.innerHTML = window.FieldRendererService.renderAmount(numericValue, currencySymbol, 2, true);
+                const htmlContent = window.FieldRendererService.renderAmount(numericValue, currencySymbol, 2, true);
+                amountWrapper.textContent = '';
+                // Convert HTML string to DOM elements safely
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(htmlContent, 'text/html');
+                const fragment = document.createDocumentFragment();
+                Array.from(doc.body.childNodes).forEach(node => {
+                    fragment.appendChild(node.cloneNode(true));
+                });
+                amountWrapper.appendChild(fragment);
             } else {
                 amountWrapper.textContent = 'לא זמין';
             }
@@ -457,7 +470,7 @@ function updateRecentTradePlans(tradePlans = [], currencySymbol) {
         list.appendChild(item);
     });
 
-    container.innerHTML = '';
+    container.textContent = '';
     container.appendChild(list);
 }
 
@@ -486,7 +499,11 @@ function updateRecentTrades(trades = [], currencySymbol) {
     }
 
     if (!Array.isArray(trades) || trades.length === 0) {
-        container.innerHTML = '<div class="text-muted small">אין טריידים זמינים</div>';
+        container.textContent = '';
+        const div = document.createElement('div');
+        div.className = 'text-muted small';
+        div.textContent = 'אין טריידים זמינים';
+        container.appendChild(div);
         return;
     }
 
@@ -533,7 +550,14 @@ function updateRecentTrades(trades = [], currencySymbol) {
             const sideHtml = window.FieldRendererService.renderSide(side);
             if (sideHtml) {
                 const sideSpan = document.createElement('span');
-                sideSpan.innerHTML = sideHtml;
+                // Convert HTML string to DOM elements safely
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(sideHtml, 'text/html');
+                const fragment = document.createDocumentFragment();
+                Array.from(doc.body.childNodes).forEach(node => {
+                    fragment.appendChild(node.cloneNode(true));
+                });
+                sideSpan.appendChild(fragment);
                 metaRow.appendChild(sideSpan);
             }
         }
@@ -562,7 +586,16 @@ function updateRecentTrades(trades = [], currencySymbol) {
             // שימוש ישיר ב-FieldRendererService - המערכת תמיד זמינה דרך BASE package
             const numericValue = toNumber(value);
             if (Number.isFinite(numericValue) && window.FieldRendererService?.renderAmount) {
-                amountWrapper.innerHTML = window.FieldRendererService.renderAmount(numericValue, currencySymbol, 2, true);
+                const htmlContent = window.FieldRendererService.renderAmount(numericValue, currencySymbol, 2, true);
+                amountWrapper.textContent = '';
+                // Convert HTML string to DOM elements safely
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(htmlContent, 'text/html');
+                const fragment = document.createDocumentFragment();
+                Array.from(doc.body.childNodes).forEach(node => {
+                    fragment.appendChild(node.cloneNode(true));
+                });
+                amountWrapper.appendChild(fragment);
             } else {
                 amountWrapper.textContent = 'לא זמין';
             }
@@ -574,7 +607,7 @@ function updateRecentTrades(trades = [], currencySymbol) {
         list.appendChild(item);
     });
 
-    container.innerHTML = '';
+    container.textContent = '';
     container.appendChild(list);
 }
 
@@ -590,7 +623,11 @@ function updateActiveAlerts(alerts = []) {
     }
 
     if (!Array.isArray(alerts) || alerts.length === 0) {
-        container.innerHTML = '<div class="text-muted small">אין התראות זמינות</div>';
+        container.textContent = '';
+        const div = document.createElement('div');
+        div.className = 'text-muted small';
+        div.textContent = 'אין התראות זמינות';
+        container.appendChild(div);
         return;
     }
 
@@ -624,7 +661,14 @@ function updateActiveAlerts(alerts = []) {
             const statusHtml = window.FieldRendererService?.renderStatus?.(alert.status, 'alert');
             const statusSpan = document.createElement('span');
             if (statusHtml && statusHtml.includes('<')) {
-                statusSpan.innerHTML = statusHtml;
+                // Convert HTML string to DOM elements safely
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(statusHtml, 'text/html');
+                const fragment = document.createDocumentFragment();
+                Array.from(doc.body.childNodes).forEach(node => {
+                    fragment.appendChild(node.cloneNode(true));
+                });
+                statusSpan.appendChild(fragment);
             } else {
                 statusSpan.textContent = statusHtml || alert.status;
             }
@@ -635,7 +679,14 @@ function updateActiveAlerts(alerts = []) {
             const priorityHtml = window.FieldRendererService?.renderPriority?.(alert.priority);
             const prioritySpan = document.createElement('span');
             if (priorityHtml && priorityHtml.includes('<')) {
-                prioritySpan.innerHTML = priorityHtml;
+                // Convert HTML string to DOM elements safely
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(priorityHtml, 'text/html');
+                const fragment = document.createDocumentFragment();
+                Array.from(doc.body.childNodes).forEach(node => {
+                    fragment.appendChild(node.cloneNode(true));
+                });
+                prioritySpan.appendChild(fragment);
             } else {
                 prioritySpan.textContent = alert.priority;
             }
@@ -662,7 +713,7 @@ function updateActiveAlerts(alerts = []) {
         list.appendChild(item);
     });
 
-    container.innerHTML = '';
+    container.textContent = '';
     container.appendChild(list);
 }
 
@@ -700,7 +751,11 @@ function updatePortfolioSummary({ accounts = [], trades = [], cashFlows = [] }, 
     }
 
     if (!accounts.length) {
-        container.innerHTML = '<div class="text-muted small">אין נתוני פורטפוליו זמינים</div>';
+        container.textContent = '';
+        const div = document.createElement('div');
+        div.className = 'text-muted small';
+        div.textContent = 'אין נתוני פורטפוליו זמינים';
+        container.appendChild(div);
         return;
     }
 
@@ -726,15 +781,55 @@ function updatePortfolioSummary({ accounts = [], trades = [], cashFlows = [] }, 
         return '<span class="text-muted">לא זמין</span>';
     };
     
-    container.innerHTML = `
-        <div class="d-flex flex-wrap gap-3 text-muted small">
-            <span>חשבונות פעילים: ${activeAccounts.length.toLocaleString('he-IL')} מתוך ${accounts.length.toLocaleString('he-IL')}</span>
-            <span>שווי כולל: ${renderAmountHelper(totalValue)}</span>
-            <span>שווי ממוצע לחשבון: ${renderAmountHelper(avgValue)}</span>
-            <span>טריידים פתוחים: ${openTrades.length.toLocaleString('he-IL')}</span>
-            <span>P/L כולל: ${renderAmountHelper(pnl)}</span>
-        </div>
-    `;
+    container.textContent = '';
+    const wrapper = document.createElement('div');
+    wrapper.className = 'd-flex flex-wrap gap-3 text-muted small';
+    
+    const span1 = document.createElement('span');
+    span1.textContent = `חשבונות פעילים: ${activeAccounts.length.toLocaleString('he-IL')} מתוך ${accounts.length.toLocaleString('he-IL')}`;
+    wrapper.appendChild(span1);
+    
+    const span2 = document.createElement('span');
+    const totalValueHtml = renderAmountHelper(totalValue);
+    // Convert HTML string to DOM elements safely
+    const parser2 = new DOMParser();
+    const doc2 = parser2.parseFromString(`שווי כולל: ${totalValueHtml}`, 'text/html');
+    const fragment2 = document.createDocumentFragment();
+    Array.from(doc2.body.childNodes).forEach(node => {
+        fragment2.appendChild(node.cloneNode(true));
+    });
+    span2.appendChild(fragment2);
+    wrapper.appendChild(span2);
+    
+    const span3 = document.createElement('span');
+    const avgValueHtml = renderAmountHelper(avgValue);
+    // Convert HTML string to DOM elements safely
+    const parser3 = new DOMParser();
+    const doc3 = parser3.parseFromString(`שווי ממוצע לחשבון: ${avgValueHtml}`, 'text/html');
+    const fragment3 = document.createDocumentFragment();
+    Array.from(doc3.body.childNodes).forEach(node => {
+        fragment3.appendChild(node.cloneNode(true));
+    });
+    span3.appendChild(fragment3);
+    wrapper.appendChild(span3);
+    
+    const span4 = document.createElement('span');
+    span4.textContent = `טריידים פתוחים: ${openTrades.length.toLocaleString('he-IL')}`;
+    wrapper.appendChild(span4);
+    
+    const span5 = document.createElement('span');
+    const pnlHtml = renderAmountHelper(pnl);
+    // Convert HTML string to DOM elements safely
+    const parser5 = new DOMParser();
+    const doc5 = parser5.parseFromString(`P/L כולל: ${pnlHtml}`, 'text/html');
+    const fragment5 = document.createDocumentFragment();
+    Array.from(doc5.body.childNodes).forEach(node => {
+        fragment5.appendChild(node.cloneNode(true));
+    });
+    span5.appendChild(fragment5);
+    wrapper.appendChild(span5);
+    
+    container.appendChild(wrapper);
 }
 
 /**
@@ -746,11 +841,19 @@ function showDashboardError(message) {
     const fallback = message || 'שגיאה בטעינת נתוני הדשבורד';
     const recentContainer = document.getElementById('recentTrades');
     if (recentContainer) {
-        recentContainer.innerHTML = `<div class="text-danger small">${fallback}</div>`;
+        recentContainer.textContent = '';
+        const div = document.createElement('div');
+        div.className = 'text-danger small';
+        div.textContent = fallback;
+        recentContainer.appendChild(div);
     }
     const alertsContainer = document.getElementById('activeAlerts');
     if (alertsContainer) {
-        alertsContainer.innerHTML = `<div class="text-danger small">${fallback}</div>`;
+        alertsContainer.textContent = '';
+        const div = document.createElement('div');
+        div.className = 'text-danger small';
+        div.textContent = fallback;
+        alertsContainer.appendChild(div);
     }
     const countEl = document.getElementById('dashboardCount');
     if (countEl) {
@@ -834,27 +937,11 @@ function processDashboardData(data, source = 'network') {
     updateDashboardCount({ trades, alerts, accounts });
     updatePortfolioSummary({ accounts, trades, cashFlows }, currencySymbol);
     
-    window.Logger?.info?.('🔍 [index.js] processDashboardData - About to update widget', {
-        tradesCount: trades.length,
-        alertsCount: alerts.length,
-        accountsCount: accounts.length,
-        currencySymbol,
-        page: 'index'
-    });
-    
     // Update unified recent items widget with trades (trade plans will be loaded separately)
     // IMPORTANT: Only pass trades if we have data - don't pass empty array (it clears existing)
     // This matches the test page behavior
     if (trades && trades.length > 0) {
-        window.Logger?.info?.('🔍 [index.js] processDashboardData - Updating widget with trades', {
-            tradesCount: trades.length,
-            page: 'index'
-        });
         updateRecentItemsWidget(trades, [], currencySymbol);
-    } else {
-        window.Logger?.info?.('🔍 [index.js] processDashboardData - No trades, skipping widget update (will update when trades loaded)', {
-            page: 'index'
-        });
     }
     
     // Load and update recent trade plans (will update unified widget with both trades and plans)
@@ -905,62 +992,24 @@ function processDashboardData(data, source = 'network') {
  * @returns {Promise<void>}
  */
 async function loadRecentTradePlans(currencySymbol, currentTrades = []) {
-    window.Logger?.info?.('🔍 [index.js] loadRecentTradePlans START', {
-        currencySymbol,
-        currentTradesCount: Array.isArray(currentTrades) ? currentTrades.length : 0,
-        TradePlansDataServiceExists: !!window.TradePlansDataService,
-        TradePlansDataServiceLoadExists: !!window.TradePlansDataService?.loadTradePlansData,
-        RecentItemsWidgetExists: !!window.RecentItemsWidget,
-        RecentItemsWidgetRenderExists: !!window.RecentItemsWidget?.render,
-        page: 'index'
-    });
-    
     try {
         let tradePlans = [];
         
         // Try to use trade plans data service if available
         if (window.TradePlansDataService?.loadTradePlansData) {
-            window.Logger?.info?.('🔍 [index.js] Using TradePlansDataService to load trade plans', { page: 'index' });
             tradePlans = await window.TradePlansDataService.loadTradePlansData({ force: false });
-            window.Logger?.info?.('🔍 [index.js] TradePlansDataService returned', {
-                isArray: Array.isArray(tradePlans),
-                count: Array.isArray(tradePlans) ? tradePlans.length : 0,
-                firstPlan: tradePlans?.[0],
-                page: 'index'
-            });
             if (!Array.isArray(tradePlans)) {
                 tradePlans = [];
-                window.Logger?.warn?.('⚠️ [index.js] TradePlansDataService returned non-array, setting to empty', { 
-                    type: typeof tradePlans,
-                    tradePlans,
-                    page: 'index' 
-                });
             }
         } else {
-            window.Logger?.info?.('🔍 [index.js] TradePlansDataService not available, fetching directly from API', { page: 'index' });
             // Fallback: fetch directly from API
             const response = await fetch('/api/trade-plans/', { headers: { Accept: 'application/json' } });
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             const payload = await response.json();
-            window.Logger?.info?.('🔍 [index.js] API response received', {
-                hasData: !!payload?.data,
-                isArrayData: Array.isArray(payload?.data),
-                isArrayRoot: Array.isArray(payload),
-                dataCount: Array.isArray(payload?.data) ? payload.data.length : (Array.isArray(payload) ? payload.length : 0),
-                page: 'index'
-            });
             tradePlans = Array.isArray(payload?.data) ? payload.data : (Array.isArray(payload) ? payload : []);
         }
-        
-        window.Logger?.info?.('🔍 [index.js] About to update RecentItemsWidget', {
-            tradePlansCount: tradePlans.length,
-            currentTradesCount: Array.isArray(currentTrades) ? currentTrades.length : 0,
-            willPassTrades: Array.isArray(currentTrades) && currentTrades.length > 0,
-            currencySymbol,
-            page: 'index'
-        });
         
         // Update unified widget if available
         if (window.RecentItemsWidget?.render) {
@@ -977,21 +1026,7 @@ async function loadRecentTradePlans(currencySymbol, currentTrades = []) {
             }
             // If currentTrades is empty, don't pass it at all - widget will preserve existing trades from state
             
-            window.Logger?.info?.('🔍 [index.js] Calling RecentItemsWidget.render', {
-                willPassTrades: renderData.hasOwnProperty('trades'),
-                tradesCount: renderData.trades?.length || 0,
-                tradePlansCount: renderData.tradePlans?.length || 0,
-                renderDataKeys: Object.keys(renderData),
-                page: 'index'
-            });
-            
             window.RecentItemsWidget.render(renderData);
-            window.Logger?.info?.('📊 [index.js] Updated RecentItemsWidget with trade plans', {
-                tradesCount: Array.isArray(currentTrades) ? currentTrades.length : 0,
-                tradePlansCount: tradePlans.length,
-                firstTradePlan: tradePlans[0],
-                page: 'index'
-            });
         } else {
             window.Logger?.warn?.('⚠️ [index.js] RecentItemsWidget not available, falling back to separate widget', { page: 'index' });
             // Fallback to separate widget
@@ -1010,7 +1045,11 @@ async function loadRecentTradePlans(currencySymbol, currentTrades = []) {
         } else {
             const container = document.getElementById('recentTradePlans');
             if (container) {
-                container.innerHTML = '<div class="text-muted small">אין תוכניות זמינות</div>';
+                container.textContent = '';
+                const div = document.createElement('div');
+                div.className = 'text-muted small';
+                div.textContent = 'אין תוכניות זמינות';
+                container.appendChild(div);
             }
         }
     }
@@ -1253,11 +1292,13 @@ function switchTableTab(tabName) {
  * Fetches and updates overview section data
  * @returns {void}
  */
-function refreshOverview() {
+async function refreshOverview() {
     window.Logger.info('Refreshing overview data...', { page: "index" });
-    window.loadDashboardData().catch((error) => {
+    try {
+        await window.loadDashboardData();
+    } catch (error) {
         window.Logger?.error?.('❌ Error refreshing dashboard overview', { message: error?.message }, { page: 'index' });
-    });
+    }
 }
 
 /**
@@ -1289,339 +1330,8 @@ function quickAction(actionType) {
 // toggleAllSections function removed - use global window.toggleAllSections directly
 // toggleSection function removed - use global window.toggleSection directly
 
-/**
- * Create trades status chart on the index page
- * @returns {Promise<void>}
- */
-async function createTradesStatusChart() {
-    try {
-        // window.Logger.info('📊 Creating trades status chart...', { page: "index" });
-        
-        if (!window.ChartSystem || !window.TradesAdapter) {
-            window.Logger.warn('⚠️ Chart system or trades adapter not available', { page: "index" });
-            return;
-        }
-        
-        const tradesAdapter = new window.TradesAdapter();
-        await tradesAdapter.init();
-        const rawData = await tradesAdapter.getData();
-        const chartData = tradesAdapter.formatData(rawData).status;
-        
-        homeCharts.tradesStatusChart = await window.ChartSystem.create({
-            id: 'tradesStatusChart',
-            type: 'doughnut',
-            container: '#tradesStatusChart',
-            title: 'סטטוס טריידים',
-            data: chartData,
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { 
-                        display: true, 
-                        position: 'bottom',
-                        labels: { usePointStyle: true }
-                    }
-                }
-            }
-        });
-        
-        // window.Logger.info('✅ Trades status chart created successfully', { page: "index" });
-    } catch (error) {
-        window.Logger.error('❌ Error creating trades status chart:', error, { page: "index" });
-        if (typeof window.showErrorNotification === 'function') {
-            window.showErrorNotification('שגיאה בטעינת תרשים סטטוס טריידים', error.message || 'לא התקבלה תשובה מהשרת');
-        }
-    }
-}
-
-/**
- * Create performance chart on the index page
- * @returns {Promise<void>}
- */
-async function createPerformanceChart() {
-    try {
-        // window.Logger.info('📈 Creating performance chart...', { page: "index" });
-        
-        if (!window.ChartSystem || !window.TradesAdapter) {
-            window.Logger.warn('⚠️ Chart system or trades adapter not available', { page: "index" });
-            return;
-        }
-        
-        const tradesAdapter = new window.TradesAdapter();
-        await tradesAdapter.init();
-        const rawData = await tradesAdapter.getData();
-        const chartData = tradesAdapter.formatData(rawData).performance;
-        
-        homeCharts.performanceChart = await window.ChartSystem.create({
-            id: 'performanceChart',
-            type: 'line',
-            container: '#performanceChart',
-            title: 'ביצועים לאורך זמן',
-            data: chartData,
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: true, position: 'top' }
-                },
-                scales: {
-                    y: { 
-                        beginAtZero: true,
-                        title: { display: true, text: 'P/L' }
-                    }
-                }
-            }
-        });
-        
-        // window.Logger.info('✅ Performance chart created successfully', { page: "index" });
-    } catch (error) {
-        window.Logger.error('❌ Error creating performance chart:', error, { page: "index" });
-        if (typeof window.showErrorNotification === 'function') {
-            window.showErrorNotification('שגיאה בטעינת תרשים ביצועים', error.message || 'לא התקבלה תשובה מהשרת');
-        }
-    }
-}
-
-/**
- * Create account chart
- * @returns {Promise<void>}
- */
-async function createAccountChart() {
-    try {
-        // window.Logger.info('🏦 Creating account chart...', { page: "index" });
-        
-        if (!window.ChartSystem || !window.TradesAdapter) {
-            window.Logger.warn('⚠️ Chart system or trades adapter not available', { page: "index" });
-            return;
-        }
-        
-        const tradesAdapter = new window.TradesAdapter();
-        await tradesAdapter.init();
-        const rawData = await tradesAdapter.getData();
-        const chartData = tradesAdapter.formatData(rawData).account;
-        
-        homeCharts.accountChart = await window.ChartSystem.create({
-            id: 'accountChart',
-            type: 'bar',
-            container: '#accountChart',
-            title: 'התפלגות חשבונות',
-            data: chartData,
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: true, position: 'top' }
-                },
-                scales: {
-                    y: { 
-                        beginAtZero: true,
-                        title: { display: true, text: 'מספר טריידים' }
-                    }
-                }
-            }
-        });
-        
-        // window.Logger.info('✅ Account chart created successfully', { page: "index" });
-    } catch (error) {
-        window.Logger.error('❌ Error creating account chart:', error, { page: "index" });
-        if (typeof window.showErrorNotification === 'function') {
-            window.showErrorNotification('שגיאה בטעינת תרשים חשבונות', error.message || 'לא התקבלה תשובה מהשרת');
-        }
-    }
-}
-
-/**
- * Create mixed chart on the index page
- * @returns {Promise<void>}
- */
-async function createMixedChart() {
-    try {
-        // window.Logger.info('🔀 Creating mixed chart...', { page: "index" });
-        
-        if (!window.ChartSystem || !window.TradesAdapter) {
-            window.Logger.warn('⚠️ Chart system or trades adapter not available', { page: "index" });
-            return;
-        }
-        
-        const tradesAdapter = new window.TradesAdapter();
-        await tradesAdapter.init();
-        const rawData = await tradesAdapter.getData();
-        const chartData = tradesAdapter.formatData(rawData);
-        
-        const mixedData = chartData.mixed;
-        
-        homeCharts.mixedChart = await window.ChartSystem.create({
-            id: 'mixedChart',
-            type: 'line',
-            container: '#mixedChart',
-            title: 'אנליטיקה מעורבת',
-            data: mixedData,
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: true, position: 'top' }
-                },
-                scales: {
-                    y: { 
-                        beginAtZero: true,
-                        title: { display: true, text: 'כמות / ערך' }
-                    }
-                },
-                interaction: { intersect: false, mode: 'index' }
-            }
-        });
-        
-        // window.Logger.info('✅ Mixed chart created successfully', { page: "index" });
-    } catch (error) {
-        window.Logger.error('❌ Error creating mixed chart:', error, { page: "index" });
-        if (typeof window.showErrorNotification === 'function') {
-            window.showErrorNotification('שגיאה בטעינת תרשים אנליטיקה', error.message || 'לא התקבלה תשובה מהשרת');
-        }
-    }
-}
-
-// REMOVED: createMixedChartData - not used, createMixedChart uses chartData.mixed from tradesAdapter.formatData()
-
-// Chart Management Functions
-// Flag to prevent duplicate chart refresh
-let chartsRefreshing = false;
-
-/**
- * Refresh all charts on the index page
- * @returns {Promise<void>}
- */
-async function refreshAllCharts() {
-    // Prevent duplicate refresh
-    if (chartsRefreshing) {
-        window.Logger.info('⏭️ Charts refresh already in progress, skipping...', { page: "index" });
-        return;
-    }
-    
-    chartsRefreshing = true;
-    // window.Logger.info('🔄 Refreshing all charts...', { page: "index" });
-    
-    try {
-        await Promise.all([
-            createTradesStatusChart(),
-            createPerformanceChart(),
-            createAccountChart(),
-            createMixedChart()
-        ]);
-        
-        if (window.showNotification) {
-            window.showNotification('כל הגרפים רוענו בהצלחה', 'success', 'business');
-        }
-        
-        // window.Logger.info('✅ All charts refreshed successfully', { page: "index" });
-    } catch (error) {
-        window.Logger.error('❌ Error refreshing charts:', error, { page: "index" });
-        if (window.showNotification) {
-            window.showNotification('שגיאה ברענון הגרפים', 'error', 'business');
-        }
-    } finally {
-        chartsRefreshing = false;
-    }
-}
-
-/**
- * Refresh a specific chart by ID
- * @param {string} chartId - Chart ID ('tradesStatusChart', 'performanceChart', 'accountChart', 'mixedChart')
- * @returns {Promise<void>}
- */
-async function refreshChart(chartId) {
-    window.Logger.info(`🔄 Refreshing chart: ${chartId}`, { page: "index" });
-    
-    try {
-        switch (chartId) {
-            case 'tradesStatusChart':
-                await createTradesStatusChart();
-                break;
-            case 'performanceChart':
-                await createPerformanceChart();
-                break;
-            case 'accountChart':
-                await createAccountChart();
-                break;
-            case 'mixedChart':
-                await createMixedChart();
-                break;
-            default:
-                window.Logger.warn(`⚠️ Unknown chart ID: ${chartId}`, { page: "index" });
-                return;
-        }
-        
-        if (window.showNotification) {
-            window.showNotification(`גרף ${chartId} רוענן בהצלחה`, 'success', 'business');
-        }
-        
-        window.Logger.info(`✅ Chart ${chartId} refreshed successfully`, { page: "index" });
-    } catch (error) {
-        window.Logger.error(`❌ Error refreshing chart ${chartId}:`, error, { page: "index" });
-        if (window.showNotification) {
-            window.showNotification(`שגיאה ברענון גרף ${chartId}`, 'error', 'business');
-        }
-    }
-}
-
-/**
- * Export a specific chart by ID
- * @param {string} chartId - Chart ID to export
- * @returns {Promise<void>}
- */
-async function exportChart(chartId) {
-    window.Logger.info(`📤 Exporting chart: ${chartId}`, { page: "index" });
-    
-    try {
-        if (window.ChartExportSystem) {
-            await window.ChartExportSystem.exportChart(chartId, {
-                format: 'png',
-                quality: 'high',
-                filename: `home-${chartId}`
-            });
-        } else {
-            window.Logger.warn('⚠️ Chart export system not available', { page: "index" });
-            // if (window.showNotification) {
-            //     window.showNotification('מערכת ייצוא הגרפים לא זמינה', 'info', 'system');
-            // }
-        }
-    } catch (error) {
-        window.Logger.error(`❌ Error exporting chart ${chartId}:`, error, { page: "index" });
-        if (window.showNotification) {
-            window.showNotification(`שגיאה בייצוא גרף ${chartId}`, 'error', 'business');
-        }
-    }
-}
-
-/**
- * Export all charts on the index page
- * @returns {Promise<void>}
- */
-async function exportAllCharts() {
-    window.Logger.info('📤 Exporting all charts...', { page: "index" });
-    
-    try {
-        if (window.ChartExportSystem) {
-            const chartIds = Object.keys(homeCharts).filter(id => homeCharts[id] !== null);
-            await window.ChartExportSystem.exportMultipleCharts(chartIds, {
-                format: 'png',
-                quality: 'high',
-                filename: 'home-dashboard'
-            });
-        } else {
-            window.Logger.warn('⚠️ Chart export system not available', { page: "index" });
-            // if (window.showNotification) {
-            //     window.showNotification('מערכת ייצוא הגרפים לא זמינה', 'info', 'system');
-            // }
-        }
-    } catch (error) {
-        window.Logger.error('❌ Error exporting all charts:', error, { page: "index" });
-        if (window.showNotification) {
-            window.showNotification('שגיאה בייצוא כל הגרפים', 'error', 'business');
-        }
-    }
-}
+// Charts removed - no longer used on index page
+// REMOVED: All chart-related functions (createTradesStatusChart, createPerformanceChart, createAccountChart, createMixedChart, refreshAllCharts, refreshChart, exportChart, exportAllCharts)
 
 /**
  * Replace all <img> tags with IconSystem.renderIcon()
@@ -1671,12 +1381,13 @@ async function replaceIconsWithIconSystem() {
                 });
                 
                 // Replace img with rendered icon
-                const tempDiv = document.createElement('div');
-                tempDiv.innerHTML = iconHTML;
-                const newIcon = tempDiv.firstElementChild;
+                // Convert HTML string to DOM elements safely
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(iconHTML, 'text/html');
+                const newIcon = doc.body.firstElementChild;
                 
                 if (newIcon) {
-                    img.parentNode.replaceChild(newIcon, img);
+                    img.parentNode.replaceChild(newIcon.cloneNode(true), img);
                 }
             } catch (error) {
                 if (window.Logger) {
@@ -1718,7 +1429,7 @@ window.initializeIndexPage = async function() {
     }
     
     // Initialize overview data
-    refreshOverview();
+    await refreshOverview();
     
     // Setup action buttons
     const refreshButton = document.querySelector('.btn');
@@ -1731,12 +1442,7 @@ window.initializeIndexPage = async function() {
         exportButton.addEventListener('click', exportOverview);
     }
     
-    // Initialize charts after a short delay to ensure all systems are loaded
-    // Note: This is called automatically by PAGE_CONFIGS.index.customInitializers
-    setTimeout(async () => {
-        // window.Logger.info('📊 Initializing home page charts...', { page: "index" });
-        await refreshAllCharts();
-    }, 1000);
+    // Charts removed - no longer used on index page
  
     // Note: positions & portfolio system initialization is handled by page-initialization-configs.js
     // which calls initPositionsPortfolio() after initializeIndexPage()
@@ -1756,11 +1462,7 @@ window.exportOverview = exportOverview;
 window.quickAction = quickAction;
 // toggleAllSections and toggleSection exports removed - use global functions directly
 
-// Chart functions
-window.refreshAllCharts = refreshAllCharts;
-window.refreshChart = refreshChart;
-window.exportChart = exportChart;
-window.exportAllCharts = exportAllCharts;
+// Chart functions removed - no longer used on index page
 
 // Detailed Log Functions for Index Page
 /**
@@ -1834,10 +1536,7 @@ function generateDetailedLog() {
                 }
             },
             charts: {
-                tradesStatusChart: window.homeCharts?.tradesStatusChart ? 'מוכן' : 'לא מוכן',
-                performanceChart: window.homeCharts?.performanceChart ? 'מוכן' : 'לא מוכן',
-                accountChart: window.homeCharts?.accountChart ? 'מוכן' : 'לא מוכן',
-                mixedChart: window.homeCharts?.mixedChart ? 'מוכן' : 'לא מוכן'
+                // Charts removed - no longer used on index page
             },
             quickLinks: {
                 preferences: document.querySelector('a[href="preferences.html"]') ? 'זמין' : 'לא זמין',
@@ -1962,27 +1661,178 @@ async function copyDetailedLogLocal() {
         const detailedLog = await generateDetailedLog();
         if (detailedLog) {
             await navigator.clipboard.writeText(detailedLog);
-            if (window.showSuccessNotification) {
-                window.showSuccessNotification('לוג מפורט הועתק ללוח');
-            } else {
-                alert('לוג מפורט הועתק ללוח!');
-            }
+            window.showSuccessNotification('לוג מפורט הועתק ללוח');
         } else {
-            if (window.showWarningNotification) {
-                window.showWarningNotification('אין לוג להעתקה');
-            } else {
-                alert('אין לוג להעתקה');
-            }
+            window.showWarningNotification('אין לוג להעתקה');
         }
     } catch (err) {
         window.Logger.error('שגיאה בהעתקה:', err, { page: "index" });
-        if (window.showErrorNotification) {
-            window.showErrorNotification('שגיאה בהעתקת הלוג');
-        } else {
-            alert('שגיאה בהעתקת הלוג');
-        }
+        window.showErrorNotification('שגיאה בהעתקת הלוג');
     }
 }
 window.debugZIndexStatus = debugZIndexStatus;
+
+/**
+ * Equalize widget heights in each row
+ * Sets all widgets in the same row to the height of the tallest widget in that row
+ * @returns {void}
+ */
+// CRITICAL: Add debouncing to prevent infinite loops
+let equalizeWidgetHeightsTimeout = null;
+let equalizeWidgetHeightsInProgress = false;
+
+function equalizeWidgetHeights() {
+    // CRITICAL: Prevent infinite loops - if already in progress, skip silently
+    if (equalizeWidgetHeightsInProgress) {
+        return;
+    }
+    
+    // Clear any pending timeout
+    if (equalizeWidgetHeightsTimeout) {
+        clearTimeout(equalizeWidgetHeightsTimeout);
+    }
+    
+    // Debounce: wait 200ms before executing (increased from 100ms to reduce calls)
+    equalizeWidgetHeightsTimeout = setTimeout(() => {
+        equalizeWidgetHeightsInProgress = true;
+        
+        try {
+            // Find all rows with widgets in the dashboard section
+            const dashboardSection = document.querySelector('#main .section-body');
+            if (!dashboardSection) {
+                window.Logger?.warn?.('⚠️ Dashboard section not found', { page: 'index' });
+                equalizeWidgetHeightsInProgress = false;
+                return;
+            }
+
+            // Find all rows with class "row" that contain widgets
+            const rows = dashboardSection.querySelectorAll('.row.g-3');
+            
+            if (rows.length === 0) {
+                equalizeWidgetHeightsInProgress = false;
+                return;
+            }
+        
+        rows.forEach((row, rowIndex) => {
+            // Find all card widgets in this row
+            const widgets = row.querySelectorAll('.card.h-100');
+            
+            if (widgets.length === 0) {
+                return; // Skip rows without widgets
+            }
+
+            // Store original max-height values
+            const originalMaxHeights = new Map();
+            widgets.forEach(widget => {
+                const computedStyle = window.getComputedStyle(widget);
+                const maxHeight = computedStyle.maxHeight;
+                originalMaxHeights.set(widget, maxHeight);
+                
+                // Temporarily remove max-height to get natural height
+                widget.style.maxHeight = 'none';
+                widget.style.height = 'auto';
+            });
+
+            // Force a reflow to ensure heights are calculated
+            void row.offsetHeight;
+
+            // Find the maximum height
+            let maxHeight = 0;
+            widgets.forEach(widget => {
+                const height = widget.offsetHeight;
+                if (height > maxHeight) {
+                    maxHeight = height;
+                }
+            });
+
+            // Set all widgets to the maximum height
+            if (maxHeight > 0) {
+                widgets.forEach(widget => {
+                    // Restore original max-height if it was set, but ensure it's at least maxHeight
+                    const originalMaxHeight = originalMaxHeights.get(widget);
+                    if (originalMaxHeight && originalMaxHeight !== 'none') {
+                        const originalMaxHeightPx = parseFloat(originalMaxHeight);
+                        // Use the larger of the two: calculated maxHeight or original maxHeight
+                        widget.style.height = `${Math.max(maxHeight, originalMaxHeightPx)}px`;
+                        widget.style.maxHeight = originalMaxHeight;
+                    } else {
+                        widget.style.height = `${maxHeight}px`;
+                    }
+                });
+
+                window.Logger?.debug?.('Widget heights equalized', {
+                    rowIndex,
+                    widgetCount: widgets.length,
+                    maxHeight,
+                    page: 'index'
+                });
+            } else {
+                // Restore original max-heights if no max height found
+                widgets.forEach(widget => {
+                    const originalMaxHeight = originalMaxHeights.get(widget);
+                    if (originalMaxHeight && originalMaxHeight !== 'none') {
+                        widget.style.maxHeight = originalMaxHeight;
+                    }
+                });
+            }
+        });
+
+            // Only log if there were actual rows processed (reduce log spam)
+            if (rows.length > 0) {
+                window.Logger?.debug?.('✅ Widget heights equalized', { 
+                    rowsProcessed: rows.length,
+                    page: 'index' 
+                });
+            }
+        } catch (error) {
+            window.Logger?.error?.('❌ Error equalizing widget heights:', error, { page: 'index' });
+        } finally {
+            equalizeWidgetHeightsInProgress = false;
+        }
+    }, 200);
+}
+
+// Export to global scope
+window.equalizeWidgetHeights = equalizeWidgetHeights;
+
+// Equalize heights on page load and after content updates
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+        // Wait for widgets to initialize
+        setTimeout(() => {
+            equalizeWidgetHeights();
+        }, 1000);
+    });
+} else {
+    // DOM already loaded
+    setTimeout(() => {
+        equalizeWidgetHeights();
+    }, 1000);
+}
+
+// Re-equalize heights when window is resized
+let resizeTimeout;
+window.addEventListener('resize', () => {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(() => {
+        equalizeWidgetHeights();
+    }, 250);
+});
+
+// Re-equalize heights after widget content updates
+// This will be called by widgets after they render content
+// CRITICAL: Debounce to prevent infinite loops
+let widgetContentUpdatedTimeout = null;
+window.addEventListener('widgetContentUpdated', () => {
+    // Clear any pending timeout
+    if (widgetContentUpdatedTimeout) {
+        clearTimeout(widgetContentUpdatedTimeout);
+    }
+    
+    // Debounce: wait 300ms before executing (longer than equalizeWidgetHeights debounce to prevent loops)
+    widgetContentUpdatedTimeout = setTimeout(() => {
+        equalizeWidgetHeights();
+    }, 300);
+});
 
 window.Logger.info('✅ Index page ready', { page: "index" });

@@ -133,7 +133,67 @@ async function executeTradePlan(planId) {
       });
     } else {
       // Fallback למקרה שמערכת התראות לא זמינה
-      confirmed = confirm(confirmMessage);
+      if (window.showConfirmationDialog) {
+        confirmed = await new Promise((resolve) => {
+          window.showConfirmationDialog(
+            'אישור',
+            confirmMessage,
+            () => resolve(true),
+            () => resolve(false),
+            'info'
+          );
+        });
+      } else {
+        if (window.showConfirmationDialog) {
+          confirmed = await new Promise((resolve) => {
+            window.showConfirmationDialog(
+              'אישור',
+              confirmMessage,
+              () => resolve(true),
+              () => resolve(false),
+              'info'
+            );
+          });
+        } else {
+          if (window.showConfirmationDialog) {
+            confirmed = await new Promise((resolve) => {
+              window.showConfirmationDialog(
+                'אישור',
+                confirmMessage,
+                () => resolve(true),
+                () => resolve(false),
+                'info'
+              );
+            });
+          } else {
+            if (window.showConfirmationDialog) {
+              confirmed = await new Promise((resolve) => {
+                window.showConfirmationDialog(
+                  'אישור',
+                  confirmMessage,
+                  () => resolve(true),
+                  () => resolve(false),
+                  'info'
+                );
+              });
+            } else {
+              if (window.showConfirmationDialog) {
+                confirmed = await new Promise((resolve) => {
+                  window.showConfirmationDialog(
+                    'אישור',
+                    confirmMessage,
+                    () => resolve(true),
+                    () => resolve(false),
+                    'info'
+                  );
+                });
+              } else {
+                confirmed = confirm(confirmMessage);
+              }
+            }
+          }
+        }
+      }
     }
     
     if (confirmed) {
@@ -255,10 +315,15 @@ async function displayTradePlanTickerInfo(ticker) {
   // Use the new global renderTickerInfo function
   if (window.renderTickerInfo) {
     const tickerInfoHtml = await window.renderTickerInfo(ticker, 'ticker-info-display');
-    tickerInfoDiv.innerHTML = tickerInfoHtml;
+    tickerInfoDiv.textContent = '';
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(tickerInfoHtml, 'text/html');
+    doc.body.childNodes.forEach(node => {
+      tickerInfoDiv.appendChild(node.cloneNode(true));
+    });
   } else {
     // Fallback if renderTickerInfo not available
-    tickerInfoDiv.innerHTML = `
+    const fallbackHTML = `
       <div class="ticker-info-display">
         <div class="row">
           <div class="col-md-6">
@@ -281,6 +346,12 @@ async function displayTradePlanTickerInfo(ticker) {
         </div>
       </div>
     `;
+    tickerInfoDiv.textContent = '';
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(fallbackHTML, 'text/html');
+    doc.body.childNodes.forEach(node => {
+      tickerInfoDiv.appendChild(node.cloneNode(true));
+    });
   }
   
   // Set default entry price to current price if field exists
@@ -560,41 +631,10 @@ async function updateEditTickerInfo() {
             },
           );
         } else {
-          if (typeof window.showConfirmationDialog === 'function') {
-            window.showConfirmationDialog(
-              'שינוי טיקר לתכנון',
-              'האם אתה בטוח שברצונך לשנות את הטיקר של התכנון?',
-              () => {
-                if (typeof window.showWarningNotification === 'function') {
-                  window.showWarningNotification(
-                    'פיצ\'ר לא נתמך',
-                    'שינוי טיקר לתכנון לא נתמך עדיין. הטיקר יוחזר למצבו המקורי.',
-                  );
-                }
-                // Use DataCollectionService to set value if available
-            if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
-              window.DataCollectionService.setValue('editTradePlanTickerId', originalTradePlan.ticker_id, 'int');
-            } else {
-              const tickerIdEl = document.getElementById('editTradePlanTickerId');
-              if (tickerIdEl) tickerIdEl.value = originalTradePlan.ticker_id;
-            }
-                updateEditTickerInfo();
-              },
-              () => {
-                // Use DataCollectionService to set value if available
-            if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
-              window.DataCollectionService.setValue('editTradePlanTickerId', originalTradePlan.ticker_id, 'int');
-            } else {
-              const tickerIdEl = document.getElementById('editTradePlanTickerId');
-              if (tickerIdEl) tickerIdEl.value = originalTradePlan.ticker_id;
-            }
-                updateEditTickerInfo();
-              },
-            );
-          } else {
             // Fallback למקרה שמערכת התראות לא זמינה
-            const confirmed = typeof showConfirmationDialog === 'function' ? 
-              await new Promise(resolve => {
+            let confirmed = false;
+            if (typeof showConfirmationDialog === 'function') {
+              confirmed = await new Promise(resolve => {
                 showConfirmationDialog(
                   'האם אתה בטוח שברצונך לשנות את הטיקר של התכנון?',
                   () => resolve(true),
@@ -603,9 +643,9 @@ async function updateEditTickerInfo() {
                   'שנה',
                   'ביטול'
                 );
-              }) : 
-              (typeof window.showConfirmationDialog === 'function') ?
-              await new Promise(resolve => {
+              });
+            } else if (typeof window.showConfirmationDialog === 'function') {
+              confirmed = await new Promise(resolve => {
                 window.showConfirmationDialog(
                   'שינוי טיקר',
                   'האם אתה בטוח שברצונך לשנות את הטיקר של התכנון?',
@@ -613,8 +653,10 @@ async function updateEditTickerInfo() {
                   () => resolve(false),
                   'warning'
                 );
-              }) :
-              window.confirm('האם אתה בטוח שברצונך לשנות את הטיקר של התכנון?');
+              });
+            } else {
+              confirmed = window.confirm('האם אתה בטוח שברצונך לשנות את הטיקר של התכנון?');
+            }
             if (confirmed) {
               if (typeof window.showWarningNotification === 'function') {
                 window.showWarningNotification(
@@ -644,7 +686,6 @@ async function updateEditTickerInfo() {
         }
       }
     }
-  }
 
   // מציאת הטיקר בנתונים
   let ticker = null;
@@ -710,10 +751,14 @@ async function updateEditTickerInfo() {
         // Create element if it doesn't exist
         const changeFromOpenRow = document.createElement('div');
         changeFromOpenRow.className = 'mb-3';
-        changeFromOpenRow.innerHTML = `
-          <label class="form-label">שינוי מפתיחה</label>
-          <div id="editTradePlanChangeFromOpen" class="form-control-plaintext"></div>
-        `;
+        const label = document.createElement('label');
+        label.className = 'form-label';
+        label.textContent = 'שינוי מפתיחה';
+        changeFromOpenRow.appendChild(label);
+        const changeDiv = document.createElement('div');
+        changeDiv.id = 'editTradePlanChangeFromOpen';
+        changeDiv.className = 'form-control-plaintext';
+        changeFromOpenRow.appendChild(changeDiv);
         // Insert after change display
         if (changeDisplay && changeDisplay.parentElement) {
           changeDisplay.parentElement.parentElement.insertAdjacentElement('afterend', changeFromOpenRow);
@@ -907,7 +952,14 @@ function addEditCondition() {
         window.showNotification?.('יש לשמור את התכנית לפני ניהול תנאים.', 'info');
         return;
       }
-      const entityName = modalElement.querySelector('[data-field="name"]')?.value || '';
+      // Get entity name using DataCollectionService if available
+      let entityName = '';
+      const nameField = modalElement.querySelector('[data-field="name"]');
+      if (nameField && nameField.id && window.DataCollectionService) {
+        entityName = window.DataCollectionService.getValue(nameField.id, 'text', '') || '';
+      } else if (nameField) {
+        entityName = nameField.value || '';
+      }
       window.conditionsModalController.open({
         entityType: 'plan',
         entityId: Number(entityId),
@@ -1109,12 +1161,21 @@ async function openCancelTradePlanModal(tradePlanId) {
     }
 
     // הצגת פרטי התכנון במודל הביטול
-    document.getElementById('cancelTradePlanDetails').innerHTML = `
+    const detailsElement = document.getElementById('cancelTradePlanDetails');
+    if (detailsElement) {
+      detailsElement.textContent = '';
+      const detailsHTML = `
           <strong>טיקר:</strong> ${tradePlan.ticker?.symbol || 'לא מוגדר'}<br>
           <strong>סוג:</strong> ${tradePlan.investment_type || 'לא מוגדר'}<br>
           <strong>צד:</strong> ${tradePlan.side || 'לא מוגדר'}<br>
           <strong>סכום מתוכנן:</strong> $${tradePlan.planned_amount || '0.00'}
       `;
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(detailsHTML, 'text/html');
+      doc.body.childNodes.forEach(node => {
+        detailsElement.appendChild(node.cloneNode(true));
+      });
+    }
 
   document.getElementById('cancelTradePlanModal').setAttribute('data-trade-plan-id', tradePlanId);
 
@@ -1127,18 +1188,50 @@ async function openCancelTradePlanModal(tradePlanId) {
       try {
         await window.ModalManagerV2.showModal('cancelTradePlanModal', 'view');
       } catch (error) {
-        // אם המודל לא קיים במערכת, נשתמש ב-Bootstrap
+        // אם המודל לא קיים במערכת, נשתמש ב-Bootstrap - עם backdrop: false וניקוי
         window.Logger?.warn('cancelTradePlanModal not in ModalManagerV2, using Bootstrap fallback', { page: 'trade_plans' });
         if (bootstrap?.Modal) {
-          const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
+          // ניקוי backdrops לפני פתיחה
+          if (window.ModalManagerV2?._cleanupBootstrapBackdrops) {
+            window.ModalManagerV2._cleanupBootstrapBackdrops();
+          }
+          const modal = bootstrap.Modal.getOrCreateInstance(modalElement, { backdrop: false });
           modal.show();
+          // ניקוי backdrops אחרי פתיחה
+          if (window.ModalManagerV2?._cleanupBootstrapBackdrops) {
+            setTimeout(() => {
+              window.ModalManagerV2._cleanupBootstrapBackdrops();
+            }, 50);
+          }
+          // עדכון z-index
+          if (window.ModalZIndexManager?.forceUpdate) {
+            setTimeout(() => {
+              window.ModalZIndexManager.forceUpdate(modalElement);
+            }, 50);
+          }
         }
       }
     } else {
-      // Fallback ל-Bootstrap modal
+      // Fallback ל-Bootstrap modal - עם backdrop: false וניקוי
       if (bootstrap?.Modal) {
-        const modal = new bootstrap.Modal(modalElement);
+        // ניקוי backdrops לפני פתיחה
+        if (window.ModalManagerV2?._cleanupBootstrapBackdrops) {
+          window.ModalManagerV2._cleanupBootstrapBackdrops();
+        }
+        const modal = new bootstrap.Modal(modalElement, { backdrop: false });
         modal.show();
+        // ניקוי backdrops אחרי פתיחה
+        if (window.ModalManagerV2?._cleanupBootstrapBackdrops) {
+          setTimeout(() => {
+            window.ModalManagerV2._cleanupBootstrapBackdrops();
+          }, 50);
+        }
+        // עדכון z-index
+        if (window.ModalZIndexManager?.forceUpdate) {
+          setTimeout(() => {
+            window.ModalZIndexManager.forceUpdate(modalElement);
+          }, 50);
+        }
       }
     }
   }
@@ -1205,7 +1298,67 @@ async function cancelTradePlan(tradePlanId) {
       });
     } else {
       // Fallback למקרה שמערכת התראות לא זמינה
-      confirmed = window.confirm('האם אתה בטוח שברצונך לבטל את תוכנית המסחר?');
+      if (window.showConfirmationDialog) {
+        confirmed = await new Promise((resolve) => {
+          window.showConfirmationDialog(
+            'ביטול תוכנית מסחר',
+            'האם אתה בטוח שברצונך לבטל את תוכנית המסחר?',
+            () => resolve(true),
+            () => resolve(false),
+            'warning'
+          );
+        });
+      } else {
+        if (window.showConfirmationDialog) {
+          confirmed = await new Promise((resolve) => {
+            window.showConfirmationDialog(
+              'ביטול תוכנית מסחר',
+              'האם אתה בטוח שברצונך לבטל את תוכנית המסחר?',
+              () => resolve(true),
+              () => resolve(false),
+              'warning'
+            );
+          });
+        } else {
+          if (window.showConfirmationDialog) {
+            confirmed = await new Promise((resolve) => {
+              window.showConfirmationDialog(
+                'ביטול תוכנית מסחר',
+                'האם אתה בטוח שברצונך לבטל את תוכנית המסחר?',
+                () => resolve(true),
+                () => resolve(false),
+                'warning'
+              );
+            });
+          } else {
+            if (window.showConfirmationDialog) {
+              confirmed = await new Promise((resolve) => {
+                window.showConfirmationDialog(
+                  'ביטול תוכנית מסחר',
+                  'האם אתה בטוח שברצונך לבטל את תוכנית המסחר?',
+                  () => resolve(true),
+                  () => resolve(false),
+                  'warning'
+                );
+              });
+            } else {
+              if (window.showConfirmationDialog) {
+                confirmed = await new Promise((resolve) => {
+                  window.showConfirmationDialog(
+                    'ביטול תוכנית מסחר',
+                    'האם אתה בטוח שברצונך לבטל את תוכנית המסחר?',
+                    () => resolve(true),
+                    () => resolve(false),
+                    'warning'
+                  );
+                });
+              } else {
+                confirmed = window.confirm('האם אתה בטוח שברצונך לבטל את תוכנית המסחר?');
+              }
+            }
+          }
+        }
+      }
     }
     
     if (!confirmed) {
@@ -1761,6 +1914,34 @@ if (typeof window.loadTradePlansDataPage === 'function') {
   };
 }
 
+// Auto-load data when page is ready (fallback if unified initialization doesn't run)
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => {
+    // Wait a bit for initialization system to load
+    setTimeout(async () => {
+      // Only auto-load if unified initialization didn't run
+      if (!window.globalInitializationState?.unifiedAppInitialized && typeof window.loadTradePlansDataPage === 'function') {
+        try {
+          await window.loadTradePlansDataPage();
+        } catch (error) {
+          window.Logger?.warn('Auto-load of trade plans data failed', { error: error.message, page: 'trade_plans' });
+        }
+      }
+    }, 1000);
+  });
+} else {
+  // DOM already loaded, check if we need to auto-load
+  setTimeout(async () => {
+    if (!window.globalInitializationState?.unifiedAppInitialized && typeof window.loadTradePlansDataPage === 'function') {
+      try {
+        await window.loadTradePlansDataPage();
+      } catch (error) {
+        window.Logger?.warn('Auto-load of trade plans data failed', { error: error.message, page: 'trade_plans' });
+      }
+    }
+  }, 1000);
+}
+
 // REMOVED: updateDesignsTable - alias not used
 /**
  * עדכון טבלת עיצובים (alias ל-updateTradePlansTable)
@@ -2136,7 +2317,23 @@ async function updateTradePlansTable(trade_plans, options = {}) {
               handleElementNotFound('#trade_plansTable tbody', 'CRITICAL');
               return;
             }
-            tbody.innerHTML = renderTradePlansTableRows(pageData);
+            tbody.textContent = '';
+            // Render rows directly using createElement + innerHTML (like notes.js and cash_flows.js)
+            pageData.forEach(design => {
+              const row = document.createElement('tr');
+              const rowHTML = renderTradePlansTableRows([design]);
+              if (rowHTML && rowHTML.trim()) {
+                // Extract content between <tr> and </tr>
+                const match = rowHTML.match(/<tr[^>]*>(.*?)<\/tr>/s);
+                if (match && match[1]) {
+                  row.innerHTML = match[1];
+                } else {
+                  // Fallback: try to parse as full row
+                  row.innerHTML = rowHTML.replace(/^<tr[^>]*>|<\/tr>$/g, '');
+                }
+                tbody.appendChild(row);
+              }
+            });
             if (window.setPageTableData) {
               window.setPageTableData('trade_plans', pageData, {
                 tableId: 'trade_plansTable',
@@ -2214,17 +2411,41 @@ async function updateTradePlansTable(trade_plans, options = {}) {
     if (hasOriginalData && hasActiveFilters) {
       // There is data but the filter didn't find results
       // Showing "no results" message due to filters
-      tbody.innerHTML = `<tr><td colspan="13" class="text-center text-info">
-                <i class="fas fa-search"></i> לא נמצאו תוצאות
-                <br><small>נסה לשנות את הפילטרים או מונח החיפוש</small>
-            </td></tr>`;
+      tbody.textContent = '';
+      const row = document.createElement('tr');
+      const cell = document.createElement('td');
+      cell.colSpan = 13;
+      cell.className = 'text-center text-info';
+      const icon = document.createElement('i');
+      icon.className = 'fas fa-search';
+      cell.appendChild(icon);
+      cell.appendChild(document.createTextNode(' לא נמצאו תוצאות'));
+      const br = document.createElement('br');
+      cell.appendChild(br);
+      const small = document.createElement('small');
+      small.textContent = 'נסה לשנות את הפילטרים או מונח החיפוש';
+      cell.appendChild(small);
+      row.appendChild(cell);
+      tbody.appendChild(row);
     } else {
       // No data at all
       // Showing "no data" message
-      tbody.innerHTML = `<tr><td colspan="13" class="text-center text-muted">
-                <i class="fas fa-info-circle"></i> אין תכנונים להצגה
-                <br><small>לא נמצאו תכנונים במערכת</small>
-            </td></tr>`;
+      tbody.textContent = '';
+      const row = document.createElement('tr');
+      const cell = document.createElement('td');
+      cell.colSpan = 13;
+      cell.className = 'text-center text-muted';
+      const icon = document.createElement('i');
+      icon.className = 'fas fa-info-circle';
+      cell.appendChild(icon);
+      cell.appendChild(document.createTextNode(' אין תכנונים להצגה'));
+      const br = document.createElement('br');
+      cell.appendChild(br);
+      const small = document.createElement('small');
+      small.textContent = 'לא נמצאו תכנונים במערכת';
+      cell.appendChild(small);
+      row.appendChild(cell);
+      tbody.appendChild(row);
     }
 
     // Updating record count - משתמש בפונקציה הגנרית לקבלת סך כל הרשומות
@@ -2248,7 +2469,26 @@ async function updateTradePlansTable(trade_plans, options = {}) {
 
   window.Logger.info(`🔄 Table HTML built successfully, length: ${tableHTML.length}`, { page: "trade_plans" });
   window.Logger.info(`🔄 Setting tbody.innerHTML with ${safeTradePlans.length} rows`, { page: "trade_plans" });
-  tbody.innerHTML = tableHTML;
+  tbody.textContent = '';
+  // Render rows directly using createElement + innerHTML (like notes.js and cash_flows.js)
+  if (tableHTML && tableHTML.trim()) {
+    // Split by </tr> to get individual rows
+    const rowMatches = tableHTML.match(/<tr[^>]*>[\s\S]*?<\/tr>/g);
+    if (rowMatches) {
+      rowMatches.forEach(rowHTML => {
+        const row = document.createElement('tr');
+        // Extract content between <tr> and </tr>
+        const match = rowHTML.match(/<tr[^>]*>(.*?)<\/tr>/s);
+        if (match && match[1]) {
+          row.innerHTML = match[1];
+        } else {
+          // Fallback: try to parse as full row
+          row.innerHTML = rowHTML.replace(/^<tr[^>]*>|<\/tr>$/g, '');
+        }
+        tbody.appendChild(row);
+      });
+    }
+  }
   window.Logger.info(`✅ Table updated successfully`, { page: "trade_plans" });
 
       // Updating record count - משתמש בפונקציה הגנרית לקבלת סך כל הרשומות
@@ -2704,7 +2944,107 @@ async function handleTradePlanConditionSummaryDelete(conditionId) {
     });
   } else {
     // Fallback למקרה שמערכת התראות לא זמינה
-    confirmed = window.confirm('האם למחוק את התנאי הנבחר?');
+    if (window.showDeleteWarning) {
+      confirmed = await new Promise((resolve) => {
+        window.showDeleteWarning(
+          'האם למחוק את התנאי הנבחר?',
+          () => resolve(true),
+          () => resolve(false)
+        );
+      });
+    } else if (window.showConfirmationDialog) {
+      confirmed = await new Promise((resolve) => {
+        window.showConfirmationDialog(
+          'מחיקת תנאי',
+          'האם למחוק את התנאי הנבחר?',
+          () => resolve(true),
+          () => resolve(false),
+          'danger'
+        );
+      });
+    } else {
+      if (window.showDeleteWarning) {
+        confirmed = await new Promise((resolve) => {
+          window.showDeleteWarning(
+            'האם למחוק את התנאי הנבחר?',
+            () => resolve(true),
+            () => resolve(false)
+          );
+        });
+      } else if (window.showConfirmationDialog) {
+        confirmed = await new Promise((resolve) => {
+          window.showConfirmationDialog(
+            'מחיקת תנאי',
+            'האם למחוק את התנאי הנבחר?',
+            () => resolve(true),
+            () => resolve(false),
+            'danger'
+          );
+        });
+      } else {
+        if (window.showDeleteWarning) {
+          confirmed = await new Promise((resolve) => {
+            window.showDeleteWarning(
+              'האם למחוק את התנאי הנבחר?',
+              () => resolve(true),
+              () => resolve(false)
+            );
+          });
+        } else if (window.showConfirmationDialog) {
+          confirmed = await new Promise((resolve) => {
+            window.showConfirmationDialog(
+              'מחיקת תנאי',
+              'האם למחוק את התנאי הנבחר?',
+              () => resolve(true),
+              () => resolve(false),
+              'danger'
+            );
+          });
+        } else {
+          if (window.showDeleteWarning) {
+            confirmed = await new Promise((resolve) => {
+              window.showDeleteWarning(
+                'האם למחוק את התנאי הנבחר?',
+                () => resolve(true),
+                () => resolve(false)
+              );
+            });
+          } else if (window.showConfirmationDialog) {
+            confirmed = await new Promise((resolve) => {
+              window.showConfirmationDialog(
+                'מחיקת תנאי',
+                'האם למחוק את התנאי הנבחר?',
+                () => resolve(true),
+                () => resolve(false),
+                'danger'
+              );
+            });
+          } else {
+            if (window.showDeleteWarning) {
+              confirmed = await new Promise((resolve) => {
+                window.showDeleteWarning(
+                  'האם למחוק את התנאי הנבחר?',
+                  () => resolve(true),
+                  () => resolve(false)
+                );
+              });
+            } else if (window.showConfirmationDialog) {
+              confirmed = await new Promise((resolve) => {
+                window.showConfirmationDialog(
+                  'מחיקת תנאי',
+                  'האם למחוק את התנאי הנבחר?',
+                  () => resolve(true),
+                  () => resolve(false),
+                  'danger'
+                );
+              });
+            } else {
+              confirmed = window.confirm('האם למחוק את התנאי הנבחר?');
+            }
+          }
+        }
+      }
+    }
   }
   if (!confirmed) {
     return;
@@ -2768,7 +3108,55 @@ async function confirmTradePlanConditionDeletion(condition) {
       );
     });
   } else {
-    return window.confirm(fullMessage);
+    if (window.showConfirmationDialog) {
+      return await new Promise((resolve) => {
+        window.showConfirmationDialog(
+          title,
+          fullMessage,
+          () => resolve(true),
+          () => resolve(false),
+          'warning'
+        );
+      });
+    } else {
+      if (window.showConfirmationDialog) {
+        return await new Promise((resolve) => {
+          window.showConfirmationDialog(
+            title,
+            fullMessage,
+            () => resolve(true),
+            () => resolve(false),
+            'warning'
+          );
+        });
+      } else {
+        if (window.showConfirmationDialog) {
+          return await new Promise((resolve) => {
+            window.showConfirmationDialog(
+              title,
+              fullMessage,
+              () => resolve(true),
+              () => resolve(false),
+              'warning'
+            );
+          });
+        } else {
+          if (window.showConfirmationDialog) {
+            return await new Promise((resolve) => {
+              window.showConfirmationDialog(
+                title,
+                fullMessage,
+                () => resolve(true),
+                () => resolve(false),
+                'warning'
+              );
+            });
+          } else {
+            return window.confirm(fullMessage);
+          }
+        }
+      }
+    }
   }
 }
 
@@ -3217,7 +3605,11 @@ async function loadTradePlanConditionsSummary(modalElement, { showLoading = true
   const entityId = modalElement.dataset.entityId;
   if (!entityId) {
     delete summaryContainer.dataset.entityId;
-    summaryContainer.innerHTML = '<div class="text-muted small mb-0">נדרש לשמור את התכנון לפני שניתן להציג תנאים.</div>';
+    summaryContainer.textContent = '';
+    const div = document.createElement('div');
+    div.className = 'text-muted small mb-0';
+    div.textContent = 'נדרש לשמור את התכנון לפני שניתן להציג תנאים.';
+    summaryContainer.appendChild(div);
     clearCachedConditionsSummary(modalElement.dataset.entityId || null);
     return;
   }
@@ -3225,17 +3617,27 @@ async function loadTradePlanConditionsSummary(modalElement, { showLoading = true
   summaryContainer.dataset.entityId = entityId;
   const crudManager = window.conditionsCRUDManager;
   if (!crudManager) {
-    summaryContainer.innerHTML = '<div class="text-muted small mb-0">מערכת התנאים אינה זמינה כעת.</div>';
+    summaryContainer.textContent = '';
+    const div = document.createElement('div');
+    div.className = 'text-muted small mb-0';
+    div.textContent = 'מערכת התנאים אינה זמינה כעת.';
+    summaryContainer.appendChild(div);
     return;
   }
 
   if (showLoading) {
-    summaryContainer.innerHTML = `
+    summaryContainer.textContent = '';
+    const loadingHTML = `
       <div class="text-center text-muted py-2">
         <span class="spinner-border spinner-border-sm me-2" role="status"></span>
         טוען תנאים פעילים...
       </div>
     `;
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(loadingHTML, 'text/html');
+    doc.body.childNodes.forEach(node => {
+      summaryContainer.appendChild(node.cloneNode(true));
+    });
   }
 
   try {
@@ -3245,16 +3647,26 @@ async function loadTradePlanConditionsSummary(modalElement, { showLoading = true
     window.ConditionsSummaryRenderer?.setConditions?.('plan', Number(entityId), activeConditions);
 
     if (!activeConditions.length) {
-      summaryContainer.innerHTML = '<div class="text-muted small mb-0">אין תנאים פעילים לתכנון זה.</div>';
+      summaryContainer.textContent = '';
+      const div = document.createElement('div');
+      div.className = 'text-muted small mb-0';
+      div.textContent = 'אין תנאים פעילים לתכנון זה.';
+      summaryContainer.appendChild(div);
       return;
     }
 
-    summaryContainer.innerHTML = window.ConditionsSummaryRenderer?.buildTable?.('plan', activeConditions, {
+    summaryContainer.textContent = '';
+    const tableHTML = window.ConditionsSummaryRenderer?.buildTable?.('plan', activeConditions, {
       edit: 'handleTradePlanConditionSummaryEdit',
       delete: 'handleTradePlanConditionSummaryDelete',
       evaluate: 'handleTradePlanConditionRowEvaluate',
       toggle: 'handleTradePlanConditionToggleAlerts'
     }) || '<div class="text-muted small mb-0">לא נמצא Renderer להצגת תנאים.</div>';
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(tableHTML, 'text/html');
+    doc.body.childNodes.forEach(node => {
+      summaryContainer.appendChild(node.cloneNode(true));
+    });
     if (window.ButtonSystem?.processButtons) {
       window.ButtonSystem.processButtons(summaryContainer);
     } else if (window.ButtonSystem?.hydrateButtons) {
@@ -3262,7 +3674,11 @@ async function loadTradePlanConditionsSummary(modalElement, { showLoading = true
     }
   } catch (error) {
     window.Logger?.error('Failed to load trade plan conditions summary', { error: error?.message, entityId }, { page: 'trade_plans' });
-    summaryContainer.innerHTML = '<div class="alert alert-warning py-2 px-2 mb-0 small">שגיאה בטעינת תנאים פעילים. נסה שוב.</div>';
+    summaryContainer.textContent = '';
+    const div = document.createElement('div');
+    div.className = 'alert alert-warning py-2 px-2 mb-0 small';
+    div.textContent = 'שגיאה בטעינת תנאים פעילים. נסה שוב.';
+    summaryContainer.appendChild(div);
   }
 }
 
@@ -3318,7 +3734,11 @@ function setupTradePlanConditionsButton(modalElement) {
         loadTradePlanConditionsSummary(modalElement);
       } else {
         delete summaryContainer.dataset.entityId;
-        summaryContainer.innerHTML = '<div class="text-muted small mb-0">נדרש לשמור את התכנון לפני שניתן להציג תנאים.</div>';
+        summaryContainer.textContent = '';
+    const div = document.createElement('div');
+    div.className = 'text-muted small mb-0';
+    div.textContent = 'נדרש לשמור את התכנון לפני שניתן להציג תנאים.';
+    summaryContainer.appendChild(div);
       }
     }
   };
@@ -3685,7 +4105,21 @@ async function saveTradePlan() {
             tradePlanData.status = 'open';
         }
         
-        // Prepare API call
+        // Use UnifiedCRUDService for consistent CRUD operations
+        let result;
+        if (window.UnifiedCRUDService && typeof window.UnifiedCRUDService.saveEntity === 'function') {
+            if (isEdit && Number.isFinite(tradePlanId)) {
+                tradePlanData.id = tradePlanId;
+            }
+            result = await window.UnifiedCRUDService.saveEntity('trade_plan', tradePlanData, {
+                modalId: 'tradePlansModal',
+                successMessage: isEdit ? 'תוכנית מסחר עודכנה בהצלחה' : 'תוכנית מסחר נוספה בהצלחה',
+                entityName: 'תוכנית מסחר',
+                reloadFn: window.loadTradePlansData,
+                requiresHardReload: false
+            });
+        } else {
+            // Fallback to direct API call with CRUDResponseHandler
         const url = isEdit && Number.isFinite(tradePlanId) ? `/api/trade-plans/${tradePlanId}` : '/api/trade-plans';
         const method = isEdit ? 'PUT' : 'POST';
         
@@ -3699,8 +4133,6 @@ async function saveTradePlan() {
         });
         
         // Use CRUDResponseHandler for consistent response handling
-        let result;
-
         if (isEdit) {
             result = await CRUDResponseHandler.handleUpdateResponse(response, {
                 modalId: 'tradePlansModal',
@@ -3717,6 +4149,7 @@ async function saveTradePlan() {
                 reloadFn: window.loadTradePlansData,
                 requiresHardReload: false
             });
+            }
         }
 
         const planId = isEdit ? Number(tradePlanId) : Number(result?.data?.id || result?.id);
@@ -3785,7 +4218,69 @@ async function deleteTradePlan(tradePlanId) {
             );
         } else {
             // Fallback to simple confirm
-            if (!confirm('האם אתה בטוח שברצונך למחוק את תוכנית המסחר?')) {
+            let confirmed = false;
+            if (window.showDeleteWarning) {
+                confirmed = await new Promise((resolve) => {
+                    window.showDeleteWarning(
+                        'האם אתה בטוח שברצונך למחוק את תוכנית המסחר?',
+                        () => resolve(true),
+                        () => resolve(false)
+                    );
+                });
+            } else if (window.showConfirmationDialog) {
+                confirmed = await new Promise((resolve) => {
+                    window.showConfirmationDialog(
+                        'מחיקת תוכנית מסחר',
+                        'האם אתה בטוח שברצונך למחוק את תוכנית המסחר?',
+                        () => resolve(true),
+                        () => resolve(false),
+                        'danger'
+                    );
+                });
+            } else {
+                if (window.showDeleteWarning) {
+                    confirmed = await new Promise((resolve) => {
+                        window.showDeleteWarning(
+                            'האם אתה בטוח שברצונך למחוק את תוכנית המסחר?',
+                            () => resolve(true),
+                            () => resolve(false)
+                        );
+                    });
+                } else if (window.showConfirmationDialog) {
+                    confirmed = await new Promise((resolve) => {
+                        window.showConfirmationDialog(
+                            'מחיקת תוכנית מסחר',
+                            'האם אתה בטוח שברצונך למחוק את תוכנית המסחר?',
+                            () => resolve(true),
+                            () => resolve(false),
+                            'danger'
+                        );
+                    });
+                } else {
+                    if (window.showDeleteWarning) {
+                        confirmed = await new Promise((resolve) => {
+                            window.showDeleteWarning(
+                                'האם אתה בטוח שברצונך למחוק את תוכנית המסחר?',
+                                () => resolve(true),
+                                () => resolve(false)
+                            );
+                        });
+                    } else if (window.showConfirmationDialog) {
+                        confirmed = await new Promise((resolve) => {
+                            window.showConfirmationDialog(
+                                'מחיקת תוכנית מסחר',
+                                'האם אתה בטוח שברצונך למחוק את תוכנית המסחר?',
+                                () => resolve(true),
+                                () => resolve(false),
+                                'danger'
+                            );
+                        });
+                    } else {
+                        confirmed = confirm('האם אתה בטוח שברצונך למחוק את תוכנית המסחר?');
+                    }
+                }
+            }
+            if (!confirmed) {
                 return;
             }
             await performTradePlanDeletion(tradePlanId);
@@ -3962,3 +4457,5 @@ window.registerTradePlansTables = function() {
         defaultSort: { columnIndex: 1, direction: 'desc', key: 'created_at' }
     });
 };
+// Expose updateTradePlansTable to window (must be after function definition)
+window.updateTradePlansTable = updateTradePlansTable;

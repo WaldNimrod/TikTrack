@@ -405,3 +405,75 @@
 
 /* Toggle Button Styles - Removed */
 /* Note: Section toggle buttons are defined in layout.css */
+
+/* ===== Portfolio Summary Full Mode Styles ===== */
+.info-summary-full {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs, 8px);
+}
+
+.summary-header-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-sm, 12px);
+    padding: var(--spacing-xs, 8px) 0;
+    border-bottom: 2px solid var(--color-border-light, var(--border-color, var(--color-border)));
+    margin-bottom: var(--spacing-xs, 8px);
+    font-weight: var(--typography-font-weight-semibold, 600);
+    color: var(--color-text-primary, var(--text-color));
+}
+
+.summary-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-sm, 12px);
+    padding: var(--spacing-xs, 8px) 0;
+    border-bottom: 1px solid var(--color-border-light, var(--border-color, var(--color-border)));
+}
+
+.summary-row:last-child {
+    border-bottom: none;
+}
+
+.summary-label {
+    color: var(--color-text-secondary, var(--text-muted, var(--color-text-secondary)));
+    font-weight: var(--typography-font-weight-medium, 500);
+    font-size: var(--typography-font-size-sm, 14px);
+}
+
+.summary-value {
+    color: var(--color-text-primary, var(--text-color));
+    font-weight: var(--typography-font-weight-semibold, 600);
+    font-size: var(--typography-font-size-sm, 14px);
+    text-align: left;
+}
+
+[dir="rtl"] .summary-value {
+    text-align: right;
+}
+
+/* ===== Portfolio Summary Cards ===== */
+/* Use existing summary-cards-container and compact-stat-card styles from _cards.css and _linter-realtime-monitor.css */
+/* These styles are already defined in the system, so we just ensure they work with portfolio summary */
+#portfolioSummaryStats .summary-cards-container {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* 2 rows, 4 cards per row */
+    gap: 1rem;
+    margin: 1rem 0;
+}
+
+#portfolioSummaryStats .compact-stat-card {
+    min-height: 100px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+@media (max-width: 768px) {
+    #portfolioSummaryStats .summary-cards-container {
+        grid-template-columns: repeat(2, 1fr); /* 2 columns on mobile */
+        gap: 0.75rem;
+    }
+}

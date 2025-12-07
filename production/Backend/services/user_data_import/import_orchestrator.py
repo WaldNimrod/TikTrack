@@ -247,7 +247,8 @@ class ImportOrchestrator:
         file_content: str,
         connector_type: str,
         task_type: str = 'executions',
-        linking_context: Optional[Dict[str, Any]] = None
+        linking_context: Optional[Dict[str, Any]] = None,
+        user_id: Optional[int] = None
     ) -> Dict[str, Any]:
         """
         Create a new import session with specified connector.
@@ -301,6 +302,7 @@ class ImportOrchestrator:
             # Explicitly set created_at to ensure it's not None
             # BaseModel has server_default but it may not work in all cases
             session = ImportSession(
+                user_id=user_id,  # Set user_id from parameter
                 trading_account_id=trading_account_id,
                 provider=connector.get_provider_name(),
                 file_name=file_name,
@@ -332,7 +334,10 @@ class ImportOrchestrator:
             logger.info("✅ File content stored successfully")
             
             # Create live report for this session
-            user_id = 1  # TODO: Get actual user ID from session/auth
+            if not user_id:
+                logger.warning("⚠️ No user_id provided - using default user_id=1 for backward compatibility")
+                user_id = 1
+            
             self.create_live_report(
                 session_id=session.id,
                 user_id=user_id,
@@ -398,7 +403,8 @@ class ImportOrchestrator:
         session: ImportSession,
         connector,
         file_content: str,
-        task_type: str
+        task_type: str,
+        user_id: Optional[int] = None
     ) -> Dict[str, Any]:
         """
         Parse, normalize, validate and detect duplicates for the given session.
@@ -454,6 +460,14 @@ class ImportOrchestrator:
                 file_account_number=file_account_number
             )
 
+        # Get user_id from session if not provided
+        if not user_id and session:
+            user_id = session.user_id
+        
+        # Set user_id on validation_service for _check_missing_tickers
+        if user_id:
+            self.validation_service.user_id = user_id
+        
         logger.info(
             "🔍 [Import Pipeline] Validating records",
             extra={'session_id': session.id, 'normalized_records_count': len(normalization_result.get('normalized_records', []))}
@@ -2312,11 +2326,15 @@ class ImportOrchestrator:
                 )
                 return account_link_error
             
+            # Get user_id from session
+            user_id = session.user_id if session else None
+            
             pipeline_result = self._process_import_pipeline(
                 session=session,
                 connector=connector,
                 file_content=file_content,
-                task_type=normalized_task
+                task_type=normalized_task,
+                user_id=user_id
             )
 
             raw_records = pipeline_result['raw_records']
@@ -2426,11 +2444,15 @@ class ImportOrchestrator:
                 )
                 return account_link_error
             
+            # Get user_id from session
+            user_id = session.user_id if session else None
+            
             pipeline_result = self._process_import_pipeline(
                 session=session,
                 connector=connector,
                 file_content=file_content,
-                task_type=normalized_task
+                task_type=normalized_task,
+                user_id=user_id
             )
 
             preview_data_raw = self._build_preview_payload(normalized_task, pipeline_result, selected_types=selected_types)
@@ -2466,7 +2488,7 @@ class ImportOrchestrator:
                 'error': str(e)
             }
     
-    def execute_import(self, session_id: int, task_type: Optional[str] = None, selected_types: Optional[List[str]] = None) -> Dict[str, Any]:
+    def execute_import(self, session_id: int, task_type: Optional[str] = None, selected_types: Optional[List[str]] = None, user_id: Optional[int] = None) -> Dict[str, Any]:
         """
         Execute the import process and persist records according to the active task type.
         
@@ -2474,6 +2496,7 @@ class ImportOrchestrator:
             session_id: Import session ID
             task_type: Optional override for task type
             selected_types: Optional list of cashflow types to import (for cashflows task)
+            user_id: User ID for user isolation (required for user_ticker associations)
         """
         try:
             logger.info(f"🔍 [IMPORT] ===== STARTING EXECUTE_IMPORT FOR SESSION {session_id} =====")
@@ -2657,20 +2680,31 @@ class ImportOrchestrator:
                     'import_errors': ['No records available for import after preview regeneration.']
                 }
 
+            # Get user_id from session if not provided
+            if not user_id and import_session:
+                user_id = import_session.user_id
+                logger.info(f"👤 [IMPORT] Using user_id from session: {user_id}")
+            
+            if not user_id:
+                logger.warning("⚠️ [IMPORT] No user_id available - using default user_id=1 for backward compatibility")
+                user_id = 1
+            
+            logger.info(f"👤 [IMPORT] User ID: {user_id}")
+            
             logger.info(f"🔍 [IMPORT] Step 5: Executing import task: {requested_task_type}")
             if requested_task_type == 'cashflows':
                 logger.info(f"🔍 [IMPORT] Calling _execute_import_cashflows for session {session_id}")
-                task_result = self._execute_import_cashflows(import_session, preview_data)
+                task_result = self._execute_import_cashflows(import_session, preview_data, user_id=user_id)
                 logger.info(f"✅ [IMPORT] _execute_import_cashflows completed: success={task_result.get('success')}, imported={task_result.get('imported_count', 0)}")
             elif requested_task_type == 'account_reconciliation':
                 logger.info(f"🔍 [IMPORT] Calling _execute_import_account_reconciliation for session {session_id}")
-                task_result = self._execute_import_account_reconciliation(import_session, preview_data)
+                task_result = self._execute_import_account_reconciliation(import_session, preview_data, user_id=user_id)
             elif requested_task_type in {'portfolio_positions', 'taxes_and_fx'}:
                 logger.info(f"🔍 [IMPORT] Calling _execute_report_only for session {session_id}")
-                task_result = self._execute_report_only(import_session, preview_data, requested_task_type)
+                task_result = self._execute_report_only(import_session, preview_data, requested_task_type, user_id=user_id)
             else:
                 logger.info(f"🔍 [IMPORT] Calling _execute_import_executions for session {session_id}")
-                task_result = self._execute_import_executions(import_session, preview_data)
+                task_result = self._execute_import_executions(import_session, preview_data, user_id=user_id)
 
             if not task_result.get('success'):
                 import_session.imported_records = task_result.get('imported_count', 0)
@@ -2699,8 +2733,10 @@ class ImportOrchestrator:
                     )
 
             try:
+                # Get user_id from session if not provided
+                report_user_id = user_id or (import_session.user_id if import_session else 1)
                 saved_file_path = self.report_generator.save_import_file(
-                    user_id=1,
+                    user_id=report_user_id,
                     session_id=session_id,
                     file_content=import_session.get_summary_data('file_content'),
                     file_name=import_session.file_name,
@@ -2749,8 +2785,13 @@ class ImportOrchestrator:
                 if 'import_session' in locals():
                     file_content = import_session.get_summary_data('file_content')
                     file_name = import_session.file_name
+                # Get user_id from session if available
+                session_user_id = user_id or 1
+                if 'import_session' in locals() and import_session and import_session.user_id:
+                    session_user_id = import_session.user_id
+                
                 saved_file_path = self.report_generator.save_import_file(
-                    user_id=1,
+                    user_id=session_user_id,
                     session_id=session_id,
                     file_content=file_content,
                     file_name=file_name,
@@ -2768,7 +2809,8 @@ class ImportOrchestrator:
     def _execute_import_executions(
         self,
         import_session: ImportSession,
-        preview_data: Dict[str, Any]
+        preview_data: Dict[str, Any],
+        user_id: Optional[int] = None
     ) -> Dict[str, Any]:
         raw_entries = preview_data.get('records_to_import', []) or []
         skipped_count = len(preview_data.get('records_to_skip', []) or [])
@@ -2790,7 +2832,17 @@ class ImportOrchestrator:
             else:
                 execution_payloads.append(entry)
 
-        enriched_records = TickerService.enrich_records_with_ticker_ids(self.db_session, execution_payloads)
+        # Get user_id from session if not provided
+        if not user_id and import_session:
+            user_id = import_session.user_id
+        
+        if not user_id:
+            logger.warning("⚠️ [EXECUTIONS] No user_id available - using default user_id=1 for backward compatibility")
+            user_id = 1
+        
+        logger.info(f"👤 [EXECUTIONS] User ID: {user_id}")
+        
+        enriched_records = TickerService.enrich_records_with_ticker_ids(self.db_session, execution_payloads, user_id=user_id)
         if not enriched_records:
             error_message = 'Ticker enrichment failed for all records. Ensure all tickers exist in the system.'
             return {
@@ -2830,6 +2882,7 @@ class ImportOrchestrator:
                 import_timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
                 unique_execution_id = f"{filename}_{import_timestamp}_{record.get('external_id', 'exec')}"
                 execution = Execution(
+                    user_id=user_id,  # Set user_id from parameter
                     ticker_id=record.get('ticker_id'),
                     trading_account_id=import_session.trading_account_id,
                     trade_id=None,
@@ -3018,7 +3071,8 @@ class ImportOrchestrator:
     def _execute_import_cashflows(
         self,
         import_session: ImportSession,
-        preview_data: Dict[str, Any]
+        preview_data: Dict[str, Any],
+        user_id: Optional[int] = None
     ) -> Dict[str, Any]:
         logger.info(f"🔍 [IMPORT] ===== _execute_import_cashflows START =====")
         logger.info(f"🔍 [IMPORT] Session ID: {import_session.id}, Trading Account: {import_session.trading_account_id}")
@@ -3187,8 +3241,13 @@ class ImportOrchestrator:
         from .import_validator import ImportValidator
         
         # Prepare tag management: get/create category and prepare user_id
-        # Use user_id=1 for single-user system (can be extended to get from trading_account in future)
-        user_id = 1
+        # Get user_id from parameter or import_session
+        if not user_id and import_session:
+            user_id = import_session.user_id
+        
+        if not user_id:
+            logger.warning("⚠️ No user_id available - using default user_id=1 for backward compatibility")
+            user_id = 1
         provider_name = import_session.provider or import_session.connector_type or "Unknown"
         # Normalize provider name (e.g., "ibkr" -> "IBKR", "IBKRConnector" -> "IBKR")
         if provider_name.lower() == "ibkr" or "ibkr" in provider_name.lower():
@@ -3740,7 +3799,8 @@ class ImportOrchestrator:
     def _execute_import_account_reconciliation(
         self,
         import_session: ImportSession,
-        preview_data: Dict[str, Any]
+        preview_data: Dict[str, Any],
+        user_id: Optional[int] = None
     ) -> Dict[str, Any]:
         raw_entries = preview_data.get('records_to_import', []) or []
         skipped_count = len(preview_data.get('records_to_skip', []) or [])

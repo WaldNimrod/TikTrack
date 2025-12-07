@@ -612,7 +612,7 @@
             }
         ];
 
-        context.summaryElement.innerHTML = '';
+        context.summaryElement.textContent = '';
 
         const container = document.createElement('div');
         container.classList.add('risk-summary-card', 'summary-card');
@@ -669,17 +669,24 @@
 
             switch (field.valueType) {
                 case 'html':
-                    td.innerHTML = field.value || '-';
+                    td.textContent = field.value || '-';
                     break;
                 case 'amount':
-                    td.innerHTML = renderAmountWithVariant(field.value, { currencySymbol, amountDecimals }, 'neutral');
+                    td.textContent = '';
+                    const amountHTML = renderAmountWithVariant(field.value, { currencySymbol, amountDecimals }, 'neutral');
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(amountHTML, 'text/html');
+                    doc.body.childNodes.forEach(node => {
+                        td.appendChild(node.cloneNode(true));
+                    });
                     break;
                 case 'riskRewardSummary': {
                     const riskHtml = renderAmountWithVariant(summaryData.riskAmount, { currencySymbol, amountDecimals }, 'negative');
                     const rewardHtml = renderAmountWithVariant(summaryData.rewardAmount, { currencySymbol, amountDecimals }, 'positive');
                     const ratioHtml = escapeHtmlText(ratioText);
 
-                    td.innerHTML = `
+                    td.textContent = '';
+                    const riskRewardHTML = `
                         <div class="risk-summary-card__risk-reward" style="display: flex; flex-direction: column; gap: 6px; align-items: center;">
                             <div class="risk-summary-card__risk-reward-row" style="display: flex; gap: 12px; align-items: center; justify-content: center;">
                                 <span>${riskHtml}</span>
@@ -691,6 +698,11 @@
                             </div>
                         </div>
                     `;
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(riskRewardHTML, 'text/html');
+                    doc.body.childNodes.forEach(node => {
+                        td.appendChild(node.cloneNode(true));
+                    });
                     break;
                 }
                 case 'text': {
@@ -698,7 +710,11 @@
                         ? '-'
                         : field.value;
                     if (field.direction === 'ltr') {
-                        td.innerHTML = `<span dir="ltr">${escapeHtmlText(safeValue)}</span>`;
+                        td.textContent = '';
+                        const span = document.createElement('span');
+                        span.setAttribute('dir', 'ltr');
+                        span.textContent = escapeHtmlText(safeValue);
+                        td.appendChild(span);
                     } else {
                         td.textContent = safeValue;
                     }

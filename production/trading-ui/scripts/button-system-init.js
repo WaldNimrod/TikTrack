@@ -182,10 +182,13 @@ class AdvancedButtonSystem {
         this.performance.startTime = performance.now();
         this.logger.info('Starting system initialization...');
 
+        // Bind initializeButtons to ensure correct 'this' context
+        const boundInitializeButtons = this.initializeButtons.bind(this);
+        
         if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', () => this.initializeButtons());
+            document.addEventListener('DOMContentLoaded', () => boundInitializeButtons());
         } else {
-            this.initializeButtons();
+            boundInitializeButtons();
         }
 
         this.setupMutationObserver();
@@ -326,8 +329,10 @@ class AdvancedButtonSystem {
         if (this.debounceTimer) {
             clearTimeout(this.debounceTimer);
         }
+        // Bind initializeButtons to ensure correct 'this' context
+        const boundInitializeButtons = this.initializeButtons.bind(this);
         this.debounceTimer = setTimeout(async () => {
-            await this.initializeButtons();
+            await boundInitializeButtons();
         }, this.config.performance.debounceDelay);
     }
 
@@ -344,6 +349,9 @@ class AdvancedButtonSystem {
 
         // Wait for button icons to be loaded
         await this.waitForButtonIcons();
+        
+        // Wait for Bootstrap to be available before processing buttons (to avoid tooltip warnings)
+        await this.waitForBootstrap();
         
         this.processButtonsInBatches(buttonElements);
 
@@ -497,6 +505,34 @@ class AdvancedButtonSystem {
         return false;
     }
 
+    /**
+     * Wait for Bootstrap to be available before processing buttons
+     * This prevents tooltip initialization errors
+     * @returns {Promise<boolean>} True if Bootstrap is available, false if timeout
+     */
+    async waitForBootstrap() {
+        const maxWaitTime = 10000; // 10 seconds max (increased from 5)
+        const checkInterval = 100; // Check every 100ms
+        let elapsed = 0;
+        
+        while (elapsed < maxWaitTime) {
+            // Check if Bootstrap is available (either from CDN or fallback)
+            // Only check window.bootstrap to avoid TDZ (Temporal Dead Zone) errors
+            const bootstrap = window.bootstrap;
+            if (bootstrap && bootstrap.Tooltip) {
+                this.logger.debug('Bootstrap loaded successfully');
+                return true;
+            }
+            
+            await new Promise(resolve => setTimeout(resolve, checkInterval));
+            elapsed += checkInterval;
+        }
+        
+        // If Bootstrap not available, log warning but continue (fallback will be used)
+        this.logger.warn('Bootstrap not loaded within timeout, using fallback tooltips');
+        return false;
+    }
+
     processButtonsInBatches(buttonElements) {
         const batchSize = this.config.performance.batchSize;
         const totalButtons = buttonElements.length;
@@ -538,11 +574,26 @@ class AdvancedButtonSystem {
             return;
         }
 
+        // Check if element is attached to DOM - if not, schedule retry
         if (!element.parentNode) {
-            this.logger.warn('Skipping button without parent node', {
-                elementId: element.id || `anonymous-${index}`,
-                buttonType
-            });
+            // Element is not yet attached to DOM - schedule retry after a short delay
+            // This handles cases where buttons are created but not yet inserted into DOM
+            setTimeout(() => {
+                // Check again if element is now in DOM and not yet processed
+                if (element.parentNode && !element.hasAttribute('data-button-processed')) {
+                    this.logger.debug('Retrying button processing after DOM attachment', {
+                        elementId: element.id || `anonymous-${index}`,
+                        buttonType
+                    });
+                    this.processButtonElement(element, index);
+                } else if (!element.parentNode) {
+                    // Still not in DOM after retry - log as debug (not warning) since this might be intentional
+                    this.logger.debug('Button not yet attached to DOM, skipping', {
+                        elementId: element.id || `anonymous-${index}`,
+                        buttonType
+                    });
+                }
+            }, 100); // Retry after 100ms
             return;
         }
         
@@ -570,8 +621,10 @@ class AdvancedButtonSystem {
         // CRITICAL: If ID already exists, make it unique by appending timestamp
         if (document.getElementById(id)) {
             const timestamp = Date.now().toString(36);
+            const originalId = element.getAttribute('data-id') || id;
             id = `${id}-${timestamp.slice(-6)}`;
-            this.logger.warn('ID conflict detected, using unique ID', { originalId: element.getAttribute('data-id'), newId: id });
+            // Conflict resolved automatically - log as info for tracking
+            this.logger.info('ID conflict detected and resolved', { originalId, newId: id, element: element.tagName });
         }
 
         // CRITICAL: Read tooltip configuration from data attributes BEFORE processing
@@ -716,9 +769,9 @@ class AdvancedButtonSystem {
                 // Check if we got inline SVG (not img tag)
                 if (inlineSVG && inlineSVG.includes('<svg')) {
                     // Replace img with inline SVG
-                    const tempDiv = document.createElement('div');
-                    tempDiv.innerHTML = inlineSVG;
-                    const svgElement = tempDiv.firstElementChild;
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(inlineSVG, 'image/svg+xml');
+                    const svgElement = doc.documentElement;
                     
                     if (svgElement && svgElement.tagName === 'svg') {
                         img.replaceWith(svgElement);
@@ -965,9 +1018,14 @@ class AdvancedButtonSystem {
         const buttonId = button.id || 'unknown';
         
         // Check if Bootstrap is available
-        if (typeof bootstrap === 'undefined' || !bootstrap.Tooltip) {
-            this.logger.debug('Bootstrap Tooltip not available, using native title attribute');
-            this.logger.warn(`Bootstrap Tooltip not available for button ${buttonId}`);
+        // Note: We should have waited for Bootstrap in initializeButtons(), but double-check here
+        if (typeof bootstrap === 'undefined' || !bootstrap || !bootstrap.Tooltip) {
+            // Don't log warning for each button - we already logged it in waitForBootstrap()
+            // Just use native title attribute silently
+            if (config && config.title) {
+                button.setAttribute('title', config.title);
+                button.setAttribute('aria-label', config.title);
+            }
             return;
         }
 
@@ -1082,11 +1140,8 @@ class AdvancedButtonSystem {
         
         // CRITICAL: Check if button has static tooltip - these cannot be changed
         if (buttonElement.hasAttribute('data-tooltip-static')) {
-            this.logger.warn('updateTooltip: Cannot update static tooltip', {
-                buttonId,
-                currentTooltip: buttonElement.getAttribute('data-tooltip'),
-                requestedTooltip: newText
-            });
+            // Expected behavior - static tooltips cannot be updated
+            // No log needed - this is normal behavior
             return false;
         }
         

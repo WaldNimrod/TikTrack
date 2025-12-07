@@ -1,24 +1,24 @@
 {
-  "snapshot_id": "pre-update_20251130_135514",
+  "snapshot_id": "pre-update_20251207_020250",
   "step_1": {
     "completed": true,
-    "timestamp": "2025-11-30T13:55:16.429548",
+    "timestamp": "2025-12-07T02:02:52.814862",
     "result": {
       "success": true,
       "commits_count": 15,
-      "output_file": "/Users/nimrod/Documents/TikTrack/TikTrackApp-Production/_Tmp/release_notes_main_20251130_135514.log",
+      "output_file": "/Users/nimrod/Documents/TikTrack/TikTrackApp-Production/_Tmp/release_notes_main_20251207_020250.log",
       "commits": [
-        "da66b8fe1 fix: Final sm-section-server fix - Bump version to 1.3.14.5",
-        "f7825f199 fix: Final sm-section-server improvements - Bump version to 1.3.14.4",
-        "0d9d22ce8 fix: Additional fixes - ai-analysis-manager, info-summary-system, pagination-system",
-        "32f799344 fix: Final updates - ai-analysis-manager, info-summary-system, sm-section-server",
-        "f5a67b43b fix: Additional updates - tag service, preferences loader, system management"
+        "1d0ac97a8 \u05d9\u05e6\u05d9\u05e8\u05ea \u05d1\u05e1\u05d9\u05e1 \u05e0\u05ea\u05d5\u05e0\u05d9\u05dd \u05e4\u05e8\u05d5\u05d3\u05e7\u05e9\u05df \u05e2\u05dd \u05de\u05e4\u05ea\u05d7\u05d5\u05ea \u05de\u05e1\u05d5\u05d3\u05e8\u05d9\u05dd \u05d5\u05e0\u05ea\u05d5\u05e0\u05d9 \u05d3\u05d5\u05d2\u05de\u05d4 \u05de\u05dc\u05d0\u05d9\u05dd",
+        "e681f2eca \u05e9\u05d9\u05dc\u05d5\u05d1 3 \u05e2\u05de\u05d5\u05d3\u05d9 \u05de\u05d5\u05e7\u05d0\u05e4\u05d9\u05dd \u05d1\u05de\u05e2\u05e8\u05db\u05ea - \u05d4\u05d9\u05e1\u05d8\u05d5\u05e8\u05d9\u05d9\u05ea \u05d8\u05e8\u05d9\u05d9\u05d3, \u05de\u05e6\u05d1 \u05ea\u05d9\u05e7 \u05d4\u05d9\u05e1\u05d8\u05d5\u05e8\u05d9, \u05d9\u05d5\u05de\u05df \u05de\u05e1\u05d7\u05e8",
+        "a793ffce0 chore: Add backup file patterns to .gitignore",
+        "b703d5d01 feat: Complete bundles environment-aware setup and development environment fixes",
+        "815776016 Update AI Analysis documentation to v2.0"
       ]
     }
   },
   "step_2": {
     "completed": true,
-    "timestamp": "2025-11-30T13:55:16.527406",
+    "timestamp": "2025-12-07T02:02:52.856293",
     "result": {
       "success": true,
       "running": false,
@@ -38,39 +38,39 @@
   },
   "step_4": {
     "completed": true,
-    "timestamp": "2025-11-30T13:55:18.209536",
+    "timestamp": "2025-12-07T02:02:55.054661",
     "result": {
       "success": true,
       "commits_count": 15,
-      "output_file": "/Users/nimrod/Documents/TikTrack/TikTrackApp-Production/_Tmp/release_notes_main_20251130_135516.log",
+      "output_file": "/Users/nimrod/Documents/TikTrack/TikTrackApp-Production/_Tmp/release_notes_main_20251207_020252.log",
       "commits": [
-        "da66b8fe1 fix: Final sm-section-server fix - Bump version to 1.3.14.5",
-        "f7825f199 fix: Final sm-section-server improvements - Bump version to 1.3.14.4",
-        "0d9d22ce8 fix: Additional fixes - ai-analysis-manager, info-summary-system, pagination-system",
-        "32f799344 fix: Final updates - ai-analysis-manager, info-summary-system, sm-section-server",
-        "f5a67b43b fix: Additional updates - tag service, preferences loader, system management"
+        "1d0ac97a8 \u05d9\u05e6\u05d9\u05e8\u05ea \u05d1\u05e1\u05d9\u05e1 \u05e0\u05ea\u05d5\u05e0\u05d9\u05dd \u05e4\u05e8\u05d5\u05d3\u05e7\u05e9\u05df \u05e2\u05dd \u05de\u05e4\u05ea\u05d7\u05d5\u05ea \u05de\u05e1\u05d5\u05d3\u05e8\u05d9\u05dd \u05d5\u05e0\u05ea\u05d5\u05e0\u05d9 \u05d3\u05d5\u05d2\u05de\u05d4 \u05de\u05dc\u05d0\u05d9\u05dd",
+        "e681f2eca \u05e9\u05d9\u05dc\u05d5\u05d1 3 \u05e2\u05de\u05d5\u05d3\u05d9 \u05de\u05d5\u05e7\u05d0\u05e4\u05d9\u05dd \u05d1\u05de\u05e2\u05e8\u05db\u05ea - \u05d4\u05d9\u05e1\u05d8\u05d5\u05e8\u05d9\u05d9\u05ea \u05d8\u05e8\u05d9\u05d9\u05d3, \u05de\u05e6\u05d1 \u05ea\u05d9\u05e7 \u05d4\u05d9\u05e1\u05d8\u05d5\u05e8\u05d9, \u05d9\u05d5\u05de\u05df \u05de\u05e1\u05d7\u05e8",
+        "a793ffce0 chore: Add backup file patterns to .gitignore",
+        "b703d5d01 feat: Complete bundles environment-aware setup and development environment fixes",
+        "815776016 Update AI Analysis documentation to v2.0"
       ]
     }
   },
   "step_5": {
     "completed": true,
-    "timestamp": "2025-11-30T13:55:22.400271",
+    "timestamp": "2025-12-07T02:02:59.331456",
     "result": {
       "success": true,
-      "conflicts_resolved": 2,
+      "conflicts_resolved": 0,
       "conflicts_unresolved": 0
     }
   },
   "step_6": {
     "completed": true,
-    "timestamp": "2025-11-30T13:55:24.383597",
+    "timestamp": "2025-12-07T02:03:00.205286",
     "result": {
       "success": true
     }
   },
   "step_7": {
     "completed": true,
-    "timestamp": "2025-11-30T13:55:24.385730",
+    "timestamp": "2025-12-07T02:03:00.206018",
     "result": {
       "success": true,
       "stopped": false,
@@ -86,10 +86,10 @@
       "migrations": []
     }
   },
-  "last_failed_step": null,
+  "last_failed_step": 5,
   "step_9": {
     "completed": true,
-    "timestamp": "2025-11-30T13:55:24.395761",
+    "timestamp": "2025-12-07T02:03:00.207829",
     "result": {
       "success": true,
       "verified": false,
@@ -98,7 +98,7 @@
   },
   "step_10": {
     "completed": true,
-    "timestamp": "2025-11-30T13:55:33.814705",
+    "timestamp": "2025-12-07T02:03:05.722465",
     "result": {
       "success": true,
       "needs_update": false,
@@ -112,9 +112,6 @@
             "Werkzeug",
             "SQLAlchemy",
             "psycopg2-binary",
-            "Flask-SocketIO",
-            "python-socketio",
-            "python-engineio",
             "gunicorn",
             "waitress",
             "requests",
@@ -156,7 +153,7 @@
   },
   "step_11": {
     "completed": true,
-    "timestamp": "2025-11-30T13:55:33.815312",
+    "timestamp": "2025-12-07T02:03:05.723135",
     "result": {
       "success": true,
       "updated": false,
@@ -165,7 +162,7 @@
   },
   "step_12": {
     "completed": true,
-    "timestamp": "2025-11-30T13:55:35.010901",
+    "timestamp": "2025-12-07T02:03:08.342606",
     "result": {
       "success": true,
       "results": {
@@ -178,19 +175,19 @@
   },
   "step_13": {
     "completed": true,
-    "timestamp": "2025-11-30T13:56:05.200955",
+    "timestamp": "2025-12-07T02:03:38.531674",
     "result": {
       "success": true,
-      "pid": 11864,
+      "pid": 22625,
       "port": 5001,
       "background": true,
       "health_check": "failed",
-      "health_error": "Health check did not pass within 30 seconds (elapsed: 30.1s)"
+      "health_error": "Health check did not pass within 30 seconds (elapsed: 30.2s)"
     }
   },
   "step_14": {
     "completed": true,
-    "timestamp": "2025-11-30T13:57:00.234009",
+    "timestamp": "2025-12-07T02:04:33.564203",
     "result": {
       "success": true,
       "stable": false,
@@ -202,8 +199,8 @@
         ],
         "errors": [
           "Process not alive: Process not found",
-          "\u001b[0;31m[13:55:36] ERROR:\u001b[0m Server process exited immediately. See /Users/nimrod/Documents/TikTrack/TikTrackApp-Production/production/Backend/server_output.log",
-          "\u001b[0;31m[13:55:36] ERROR:\u001b[0m Server process exited immediately. See /Users/nimrod/Documents/TikTrack/TikTrackApp-Production/production/Backend/server_output.log",
+          "\u001b[0;31m[02:03:10] ERROR:\u001b[0m Server process exited immediately. See /Users/nimrod/Documents/TikTrack/TikTrackApp-Production/production/Backend/server_output.log",
+          "\u001b[0;31m[02:03:10] ERROR:\u001b[0m Server process exited immediately. See /Users/nimrod/Documents/TikTrack/TikTrackApp-Production/production/Backend/server_output.log",
           "Traceback (most recent call last):"
         ]
       },
@@ -243,8 +240,8 @@
         "process_alive": false,
         "process_error": "Process not found",
         "log_errors": [
-          "\u001b[0;31m[13:55:36] ERROR:\u001b[0m Server process exited immediately. See /Users/nimrod/Documents/TikTrack/TikTrackApp-Production/production/Backend/server_output.log",
-          "\u001b[0;31m[13:55:36] ERROR:\u001b[0m Server process exited immediately. See /Users/nimrod/Documents/TikTrack/TikTrackApp-Production/production/Backend/server_output.log",
+          "\u001b[0;31m[02:03:10] ERROR:\u001b[0m Server process exited immediately. See /Users/nimrod/Documents/TikTrack/TikTrackApp-Production/production/Backend/server_output.log",
+          "\u001b[0;31m[02:03:10] ERROR:\u001b[0m Server process exited immediately. See /Users/nimrod/Documents/TikTrack/TikTrackApp-Production/production/Backend/server_output.log",
           "Traceback (most recent call last):"
         ],
         "log_errors_count": 3
@@ -253,10 +250,10 @@
   },
   "step_15": {
     "completed": true,
-    "timestamp": "2025-11-30T13:57:00.302151",
+    "timestamp": "2025-12-07T02:04:33.619977",
     "result": {
       "success": true,
-      "new_version": "1.2.10.0"
+      "new_version": "1.2.11.0"
     }
   },
   "step_16": {

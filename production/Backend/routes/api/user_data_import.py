@@ -9,7 +9,7 @@ Version: 1.0
 Last Updated: 2025-01-16
 """
 
-from flask import Blueprint, request, jsonify, current_app
+from flask import Blueprint, request, jsonify, current_app, g
 from werkzeug.utils import secure_filename
 import os
 import logging
@@ -95,6 +95,17 @@ def upload_and_preview():
     Handles file upload, identifies connector, parses, normalizes, validates,
     detects duplicates, and returns a preview of the data.
     """
+    # Get user_id from Flask context (set by auth middleware)
+    user_id = getattr(g, 'user_id', None)
+    if not user_id:
+        logger.warning("❌ [UPLOAD-AND-PREVIEW] User not authenticated - user_id not found in Flask context")
+        return jsonify({
+            'success': False,
+            'error': 'User authentication required'
+        }), 401
+    
+    logger.info(f"👤 [UPLOAD-AND-PREVIEW] User ID: {user_id}")
+    
     if 'file' not in request.files:
         return jsonify({"error": "No file part in the request"}), 400
     
@@ -130,7 +141,8 @@ def upload_and_preview():
             file_name,
             file_content,
             connector_type=connector_type,
-            task_type=task_type
+            task_type=task_type,
+            user_id=user_id
         )
         session_id = session_data['session_id']
         
@@ -303,7 +315,8 @@ def upload_file():
                     file_content=file_content,
                     connector_type=connector_type,
                     task_type=task_type,
-                    linking_context=linking_context
+                    linking_context=linking_context,
+                    user_id=user_id
                 )
                 logger.info(f"📊 [UPLOAD] Session creation result: {result}")
             except Exception as session_error:
@@ -1121,6 +1134,17 @@ def execute_import(session_id: int):
     Returns:
         JSON response with import results
     """
+    # Get user_id from Flask context (set by auth middleware)
+    user_id = getattr(g, 'user_id', None)
+    if not user_id:
+        logger.warning("❌ [EXECUTE-IMPORT] User not authenticated - user_id not found in Flask context")
+        return jsonify({
+            'status': 'error',
+            'message': 'User authentication required'
+        }), 401
+    
+    logger.info(f"👤 [EXECUTE-IMPORT] User ID: {user_id}, Session ID: {session_id}")
+    
     try:
         payload = request.get_json(silent=True) or {}
         task_type = payload.get('task_type')
@@ -1128,7 +1152,7 @@ def execute_import(session_id: int):
         db_session = next(get_db())
         try:
             orchestrator = ImportOrchestrator(db_session)
-            result_raw = orchestrator.execute_import(session_id, task_type, selected_types=selected_types)
+            result_raw = orchestrator.execute_import(session_id, task_type, selected_types=selected_types, user_id=user_id)
             
             if not result_raw.get('success'):
                 status_code = 400 if result_raw.get('error_code') == 'ACCOUNT_LINK_REQUIRED' else 400

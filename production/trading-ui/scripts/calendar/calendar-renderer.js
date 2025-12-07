@@ -50,7 +50,7 @@
             }
 
             // Clear existing content
-            calendarGrid.innerHTML = '';
+            calendarGrid.textContent = '';
 
             // Render headers using Hebrew day names
             this._renderHeaders(calendarGrid);
@@ -194,7 +194,12 @@
                     
                     const iconContainer = document.createElement('span');
                     iconContainer.className = 'calendar-indicator-icon-container';
-                    iconContainer.innerHTML = iconHTML;
+                    iconContainer.textContent = '';
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(iconHTML, 'text/html');
+                    doc.body.childNodes.forEach(node => {
+                        iconContainer.appendChild(node.cloneNode(true));
+                    });
                     indicator.appendChild(iconContainer);
                 } catch (error) {
                     if (window.Logger) {

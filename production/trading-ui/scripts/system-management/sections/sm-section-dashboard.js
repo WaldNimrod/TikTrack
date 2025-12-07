@@ -183,7 +183,12 @@ class SMDashboardSection extends SMBaseSection {
 
     try {
       const dashboardHtml = this.createDashboardHTML(data);
-      this.container.innerHTML = dashboardHtml;
+      this.container.textContent = '';
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(dashboardHtml, 'text/html');
+      doc.body.childNodes.forEach(node => {
+        this.container.appendChild(node.cloneNode(true));
+      });
       
       console.log('✅ Dashboard rendered successfully');
       
@@ -198,8 +203,8 @@ class SMDashboardSection extends SMBaseSection {
   }
 
   /**
-   * Create dashboard HTML with small cards organized by topic
-   * יצירת HTML של dashboard עם כרטיסים קטנים מסודרים לפי נושאים
+   * Create dashboard HTML with standardized stats cards
+   * יצירת HTML של dashboard עם כרטיסי סטטיסטיקות סטנדרטיים
    */
   createDashboardHTML(data) {
     const {
@@ -210,249 +215,170 @@ class SMDashboardSection extends SMBaseSection {
       uptime = 'unknown',
       summary = {},
       health = {},
-      metrics = {}
+      metrics = {},
+      environment = null
     } = data;
 
-    // Calculate health score color
-    const healthScoreColor = this.getHealthScoreColor(system_score);
-    
-    // Format uptime
+    // Format values
     const formattedUptime = this.formatUptime(uptime);
-    
-    // Format response time
     const formattedResponseTime = SMUIComponents.formatDuration(response_time_ms);
+    const healthScoreColor = system_score >= 90 ? 'success' : system_score >= 75 ? 'warning' : system_score >= 50 ? 'info' : 'danger';
 
     return `
       <div class="dashboard-overview">
-        <!-- Dashboard Cards by Topic - Organized in small cards -->
-        <div class="row g-3 mb-3">
+        <div class="row g-3">
           <!-- בריאות מערכת -->
-          <div class="col-md-3 col-sm-6">
-            <div class="card h-100">
-              <div class="card-body text-center">
-                <div class="h5 mb-2">🏥 בריאות</div>
-                <div class="mb-2">
-                  <span class="badge bg-${this.getStatusBadgeColor(overall_status)} fs-6">
-                    ${this.getStatusText(overall_status)}
-                  </span>
-                </div>
-                <div class="small text-muted">${this.getPerformanceText(overall_performance)}</div>
-              </div>
-            </div>
+          <div class="col-md-6 col-lg-4">
+            ${SMUIComponents.createStatsCard(
+              'בריאות מערכת',
+              [
+                {
+                  label: 'סטטוס כללי',
+                  value: this.getStatusText(overall_status),
+                  icon: 'fa-heartbeat',
+                  badge: { text: this.getStatusText(overall_status), variant: this.getStatusBadgeColor(overall_status) }
+                },
+                {
+                  label: 'ביצועים',
+                  value: this.getPerformanceText(overall_performance),
+                  icon: 'fa-tachometer-alt'
+                },
+                {
+                  label: 'ציון בריאות',
+                  value: `${system_score}%`,
+                  icon: 'fa-chart-line',
+                  color: healthScoreColor
+                }
+              ],
+              { icon: 'fa-heartbeat' }
+            )}
           </div>
-          
-          <!-- ציון מערכת -->
-          <div class="col-md-3 col-sm-6">
-            <div class="card h-100">
-              <div class="card-body text-center">
-                <div class="h5 mb-2">📊 ציון</div>
-                <div class="h4 mb-2" style="color: ${healthScoreColor}">${system_score}%</div>
-                <div class="small text-muted">בריאות מערכת</div>
-              </div>
-            </div>
+
+          <!-- ביצועים וזמנים -->
+          <div class="col-md-6 col-lg-4">
+            ${SMUIComponents.createStatsCard(
+              'ביצועים וזמנים',
+              [
+                {
+                  label: 'זמן תגובה ממוצע',
+                  value: formattedResponseTime,
+                  icon: 'fa-clock',
+                  color: 'success'
+                },
+                {
+                  label: 'זמן פעילות שרת',
+                  value: formattedUptime,
+                  icon: 'fa-history',
+                  color: 'primary'
+                },
+                {
+                  label: 'זמן פעילות מערכת',
+                  value: this.formatUptime(metrics.uptime || uptime),
+                  icon: 'fa-calendar-alt'
+                }
+              ],
+              { icon: 'fa-tachometer-alt' }
+            )}
           </div>
-          
-          <!-- זמן תגובה -->
-          <div class="col-md-3 col-sm-6">
-            <div class="card h-100">
-              <div class="card-body text-center">
-                <div class="h5 mb-2">⏱️ תגובה</div>
-                <div class="h4 mb-2 text-success">${formattedResponseTime}</div>
-                <div class="small text-muted">זמן תגובה ממוצע</div>
-              </div>
-            </div>
+
+          <!-- משאבי מערכת -->
+          <div class="col-md-6 col-lg-4">
+            ${SMUIComponents.createStatsCard(
+              'משאבי מערכת',
+              [
+                {
+                  label: 'שימוש בזיכרון',
+                  value: `${this.formatMemoryUsage(summary.memory_usage_percent || 0)}%`,
+                  icon: 'fa-memory',
+                  color: summary.memory_usage_percent > 80 ? 'danger' : summary.memory_usage_percent > 60 ? 'warning' : 'info'
+                },
+                {
+                  label: 'עומס מעבד',
+                  value: `${this.formatCPUUsage(summary.cpu_usage_percent || 0)}%`,
+                  icon: 'fa-microchip',
+                  color: summary.cpu_usage_percent > 80 ? 'danger' : summary.cpu_usage_percent > 60 ? 'warning' : 'info'
+                },
+                {
+                  label: 'שימוש בדיסק',
+                  value: `${summary.disk_usage_percent || 0}%`,
+                  icon: 'fa-hdd',
+                  color: summary.disk_usage_percent > 80 ? 'danger' : summary.disk_usage_percent > 60 ? 'warning' : 'warning'
+                }
+              ],
+              { icon: 'fa-server' }
+            )}
           </div>
-          
-          <!-- זמן פעילות -->
-          <div class="col-md-3 col-sm-6">
-            <div class="card h-100">
-              <div class="card-body text-center">
-                <div class="h5 mb-2">🔄 פעילות</div>
-                <div class="h4 mb-2 text-primary">${formattedUptime}</div>
-                <div class="small text-muted">זמן פעילות שרת</div>
-              </div>
-            </div>
+
+          <!-- סביבה ומידע -->
+          ${environment ? `
+          <div class="col-md-6 col-lg-4">
+            ${SMUIComponents.createStatsCard(
+              'סביבה ומידע',
+              [
+                {
+                  label: 'סביבת עבודה',
+                  value: environment.environment === 'production' ? 'ייצור' : 'פיתוח',
+                  icon: 'fa-globe',
+                  badge: { text: environment.environment === 'production' ? 'ייצור' : 'פיתוח', variant: environment.environment === 'production' ? 'danger' : 'info' }
+                },
+                {
+                  label: 'פורט שרת',
+                  value: environment.port || 'N/A',
+                  icon: 'fa-plug'
+                },
+                {
+                  label: 'בסיס נתונים',
+                  value: environment.database?.name || 'N/A',
+                  icon: 'fa-database'
+                },
+                {
+                  label: 'סוג בסיס נתונים',
+                  value: environment.database?.type || 'PostgreSQL',
+                  icon: 'fa-database'
+                },
+                {
+                  label: 'גרסת מערכת',
+                  value: '2.0.5',
+                  icon: 'fa-code-branch'
+                }
+              ],
+              { icon: 'fa-info-circle' }
+            )}
           </div>
-        </div>
-        
-        <!-- משאבי מערכת -->
-        <div class="row g-3 mb-3">
-          <!-- זיכרון -->
-          <div class="col-md-3 col-sm-6">
-            <div class="card h-100">
-              <div class="card-body text-center">
-                <div class="h5 mb-2">💾 זיכרון</div>
-                <div class="h4 mb-2 text-secondary">${this.formatMemoryUsage(summary.memory_usage_percent || 0)}%</div>
-                <div class="small text-muted">שימוש בזיכרון</div>
-              </div>
-            </div>
-          </div>
-          
-          <!-- CPU -->
-          <div class="col-md-3 col-sm-6">
-            <div class="card h-100">
-              <div class="card-body text-center">
-                <div class="h5 mb-2">⚡ מעבד</div>
-                <div class="h4 mb-2 text-info">${this.formatCPUUsage(summary.cpu_usage_percent || 0)}%</div>
-                <div class="small text-muted">עומס מעבד</div>
-              </div>
-            </div>
-          </div>
-          
-          <!-- מטמון -->
-          <div class="col-md-3 col-sm-6">
-            <div class="card h-100">
-              <div class="card-body text-center">
-                <div class="h5 mb-2">🗄️ מטמון</div>
-                <div class="h4 mb-2 text-primary">${health.cache?.status === 'healthy' ? 'פעיל' : 'בעיה'}</div>
-                <div class="small text-muted">סטטוס מטמון</div>
-              </div>
-            </div>
-          </div>
-          
-          <!-- דיסק -->
-          <div class="col-md-3 col-sm-6">
-            <div class="card h-100">
-              <div class="card-body text-center">
-                <div class="h5 mb-2">💿 דיסק</div>
-                <div class="h4 mb-2 text-warning">${summary.disk_usage_percent || 0}%</div>
-                <div class="small text-muted">שימוש בדיסק</div>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <!-- סביבה ושרת -->
-        ${data.environment ? `
-        <div class="row g-3 mb-3">
-          <!-- סביבה -->
-          <div class="col-md-3 col-sm-6">
-            <div class="card h-100">
-              <div class="card-body text-center">
-                <div class="h5 mb-2">🌐 סביבה</div>
-                <div class="h4 mb-2 text-${data.environment.environment === 'production' ? 'danger' : 'info'}">
-                  ${data.environment.environment === 'production' ? 'ייצור' : 'פיתוח'}
-                </div>
-                <div class="small text-muted">סביבת עבודה</div>
-              </div>
-            </div>
-          </div>
-          
-          <!-- פורט -->
-          <div class="col-md-3 col-sm-6">
-            <div class="card h-100">
-              <div class="card-body text-center">
-                <div class="h5 mb-2">🔌 פורט</div>
-                <div class="h4 mb-2">${data.environment.port || 'N/A'}</div>
-                <div class="small text-muted">פורט שרת</div>
-              </div>
-            </div>
-          </div>
-          
-          <!-- בסיס נתונים -->
-          <div class="col-md-3 col-sm-6">
-            <div class="card h-100">
-              <div class="card-body text-center">
-                <div class="h5 mb-2">🗃️ בסיס נתונים</div>
-                <div class="h6 mb-2">${data.environment.database?.name || 'N/A'}</div>
-                <div class="small text-muted">${data.environment.database?.type || 'PostgreSQL'}</div>
-              </div>
-            </div>
-          </div>
-          
-          <!-- גרסה -->
-          <div class="col-md-3 col-sm-6">
-            <div class="card h-100">
-              <div class="card-body text-center">
-                <div class="h5 mb-2">📋 גרסה</div>
-                <div class="h4 mb-2 text-secondary">2.0.5</div>
-                <div class="small text-muted">גרסת מערכת</div>
-              </div>
-            </div>
-          </div>
-        </div>
-        ` : ''}
-        
-        <!-- סטטוס רכיבי מערכת -->
-        <div class="row g-3 mb-3">
-          <div class="col-md-3 col-sm-6">
-            <div class="card h-100">
-              <div class="card-body text-center">
-                <div class="h5 mb-2">🖥️ שרת</div>
-                <div class="mb-2">
-                  <span class="badge bg-${this.getComponentStatusColor(health.server)}">
-                    ${this.getComponentStatus(health.server)}
-                  </span>
-                </div>
-                <div class="small text-muted">Backend API</div>
-              </div>
-            </div>
-          </div>
-          
-          <div class="col-md-3 col-sm-6">
-            <div class="card h-100">
-              <div class="card-body text-center">
-                <div class="h5 mb-2">🗄️ בסיס נתונים</div>
-                <div class="mb-2">
-                  <span class="badge bg-${this.getComponentStatusColor(health.database)}">
-                    ${this.getComponentStatus(health.database)}
-                  </span>
-                </div>
-                <div class="small text-muted">${data.environment?.database?.type || 'PostgreSQL'}</div>
-              </div>
-            </div>
-          </div>
-          
-          <div class="col-md-3 col-sm-6">
-            <div class="card h-100">
-              <div class="card-body text-center">
-                <div class="h5 mb-2">🗄️ מטמון</div>
-                <div class="mb-2">
-                  <span class="badge bg-${this.getComponentStatusColor(health.cache)}">
-                    ${this.getComponentStatus(health.cache)}
-                  </span>
-                </div>
-                <div class="small text-muted">Multi-layer Cache</div>
-              </div>
-            </div>
-          </div>
-          
-          <div class="col-md-3 col-sm-6">
-            <div class="card h-100">
-              <div class="card-body text-center">
-                <div class="h5 mb-2">🌐 נתונים חיצוניים</div>
-                <div class="mb-2">
-                  <span class="badge bg-${this.getComponentStatusColor(health.external_data)}">
-                    ${this.getComponentStatus(health.external_data)}
-                  </span>
-                </div>
-                <div class="small text-muted">Yahoo Finance API</div>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <!-- קישורים מהירים -->
-        <div class="row">
-          <div class="col-12">
-            <div class="card">
-              <div class="card-header">
-                <h6 class="mb-0">קישורים מהירים</h6>
-              </div>
-              <div class="card-body">
-                <div class="d-flex flex-wrap gap-2">
-                  <a href="/cache-management" class="btn btn-sm btn-outline-primary">
-                    <i class="fas fa-layer-group me-1"></i> ניהול מטמון מלא
-                  </a>
-                  <a href="/server-monitor" class="btn btn-sm btn-outline-primary">
-                    <i class="fas fa-server me-1"></i> ניטור שרת מלא
-                  </a>
-                  <a href="/external-data-dashboard" class="btn btn-sm btn-outline-primary">
-                    <i class="fas fa-globe me-1"></i> דשבורד נתונים חיצוניים
-                  </a>
-                </div>
-              </div>
-            </div>
+          ` : ''}
+
+          <!-- סטטוס רכיבי מערכת -->
+          <div class="col-md-6 col-lg-4">
+            ${SMUIComponents.createStatsCard(
+              'סטטוס רכיבי מערכת',
+              [
+                {
+                  label: 'שרת',
+                  value: this.getComponentStatus(health.server),
+                  icon: 'fa-server',
+                  badge: { text: this.getComponentStatus(health.server), variant: this.getComponentStatusColor(health.server) }
+                },
+                {
+                  label: 'בסיס נתונים',
+                  value: this.getComponentStatus(health.database),
+                  icon: 'fa-database',
+                  badge: { text: this.getComponentStatus(health.database), variant: this.getComponentStatusColor(health.database) }
+                },
+                {
+                  label: 'מטמון',
+                  value: this.getComponentStatus(health.cache),
+                  icon: 'fa-layer-group',
+                  badge: { text: this.getComponentStatus(health.cache), variant: this.getComponentStatusColor(health.cache) }
+                },
+                {
+                  label: 'נתונים חיצוניים',
+                  value: this.getComponentStatus(health.external_data),
+                  icon: 'fa-globe',
+                  badge: { text: this.getComponentStatus(health.external_data), variant: this.getComponentStatusColor(health.external_data) }
+                }
+              ],
+              { icon: 'fa-cogs' }
+            )}
           </div>
         </div>
       </div>

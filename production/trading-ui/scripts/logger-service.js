@@ -311,6 +311,16 @@ class Logger {
             return cached !== undefined ? cached : true;
         }
 
+        // CRITICAL: Prevent infinite recursion - if getPreference is currently being called (during preferences loading),
+        // don't call it again. Instead, return default value (true) to allow logging.
+        // This prevents: getPreference() → Logger.info() → shouldLogToConsole() → fetchConsolePreference() → getPreference() → ...
+        if (window.__GET_PREFERENCE_IN_PROGRESS__) {
+            // During preferences loading, return default (true) to allow logging
+            const defaultValue = true;
+            this.cacheConsolePreference(preferenceKey, defaultValue);
+            return Promise.resolve(defaultValue);
+        }
+
         const promise = window.getPreference(preferenceKey)
             .then(value => {
                 const boolValue = this.normalizeBoolean(value);
@@ -669,9 +679,35 @@ class Logger {
             this.flushAttempts = 0; // איפוס מונה הניסיונות
 
         } catch (error) {
-            console.error('❌ Failed to send logs to server:', error);
+            // Don't throw - handle gracefully
+            if (error.name === 'AbortError') {
+                // Timeout - put logs back and retry later
+                this.pendingLogs.unshift(...logsToSend);
+                this.savePendingLogs();
+                if (window.DEBUG_MODE) {
+                    console.warn('⚠️ Logger flush timeout, will retry later');
+                }
+                this.isFlushing = false;
+                return;
+            }
             
-            // Put logs back in pending queue
+            // Network error or server error - handle gracefully
+            // Don't log to console.error as it creates noise - only in DEBUG mode
+            if (window.DEBUG_MODE) {
+                console.warn('⚠️ Logger server unavailable, using fallback:', error.message);
+            }
+            
+            // Fallback: log to console only (don't throw, don't create errors)
+            // Only log critical errors to console in non-DEBUG mode
+            const criticalLogs = logsToSend.filter(log => log.level >= Logger.LogLevel.ERROR);
+            if (criticalLogs.length > 0 && !window.DEBUG_MODE) {
+                criticalLogs.forEach(log => {
+                    const level = ['debug', 'info', 'warn', 'error', 'critical'][log.level] || 'error';
+                    console[level] || console.error(log.message);
+                });
+            }
+            
+            // Put logs back in pending queue for retry
             this.pendingLogs.unshift(...logsToSend);
             this.savePendingLogs();
         } finally {
@@ -701,25 +737,25 @@ class Logger {
             return;
         }
 
-        // Monitor long tasks (רק במצב DEBUG)
-        if ('PerformanceObserver' in window) {
-            const observer = new PerformanceObserver(list => {
-                list.getEntries().forEach(entry => {
-                    if (entry.duration > this.longTaskThreshold) {
-                        this.performance('Long task detected', entry.duration, {
-                            name: entry.name,
-                            startTime: entry.startTime
-                        });
-                    }
-                });
-            });
-
-            try {
-                observer.observe({ entryTypes: ['longtask'] });
-            } catch (e) {
-                // Long task API not supported
-            }
-        }
+        // Monitor long tasks (רק במצב DEBUG) - disabled to reduce console noise
+        // if ('PerformanceObserver' in window) {
+        //     const observer = new PerformanceObserver(list => {
+        //         list.getEntries().forEach(entry => {
+        //             if (entry.duration > this.longTaskThreshold) {
+        //                 this.performance('Long task detected', entry.duration, {
+        //                     name: entry.name,
+        //                     startTime: entry.startTime
+        //                 });
+        //             }
+        //         });
+        //     });
+        //
+        //     try {
+        //         observer.observe({ entryTypes: ['longtask'] });
+        //     } catch (e) {
+        //         // Long task API not supported
+        //     }
+        // }
     }
 
     /**
@@ -739,7 +775,6 @@ class Logger {
             if (logsToSave.length > maxLogs) {
                 // שומרים רק את הלוגים החדשים ביותר
                 logsToSave = logsToSave.slice(-maxLogs);
-                console.warn(`⚠️ Logs truncated to ${maxLogs} entries`);
             }
 
             localStorage.setItem('tiktrack_pending_logs', JSON.stringify(logsToSave));

@@ -494,11 +494,52 @@ class PreferencesCore {
      * @returns {Promise<any>} Preference value
      */
   async getPreference(preferenceName, userId = null, profileId = null, useLazyLoading = true) {
-    // For default profile, use 0 explicitly
-    const finalUserId = userId || this.currentUserId;
-    const finalProfileId = profileId !== null && profileId !== undefined ? profileId : this.currentProfileId !== null ? this.currentProfileId : 0;
+    // CRITICAL: Set flag to prevent Logger from calling getPreference() during preferences loading
+    // This prevents infinite recursion: getPreference() → Logger.info() → shouldLogToConsole() → getPreference() → ...
+    const wasInProgress = window.__GET_PREFERENCE_IN_PROGRESS__;
+    
+    // CRITICAL: Track call stack to detect recursion
+    if (!window.__GET_PREFERENCE_CALL_STACK__) {
+      window.__GET_PREFERENCE_CALL_STACK__ = [];
+    }
+    
+    const callInfo = {
+      preferenceName,
+      timestamp: Date.now(),
+      stack: new Error().stack
+    };
+    
+    // Check for recursion - if same preference is being called again
+    const recentCall = window.__GET_PREFERENCE_CALL_STACK__.find(c => 
+      c.preferenceName === preferenceName && 
+      Date.now() - c.timestamp < 100
+    );
+    
+    if (recentCall && wasInProgress) {
+      // Recursion detected - this should NOT happen after our fixes
+      // Log as error to help identify remaining issues
+      console.error('🚨 RECURSION DETECTED in getPreference (should be fixed!):', {
+        preferenceName,
+        callStack: window.__GET_PREFERENCE_CALL_STACK__.map(c => c.preferenceName),
+        recentCall: recentCall.stack
+      });
+      return null; // Return null to break recursion
+    }
+    
+    window.__GET_PREFERENCE_CALL_STACK__.push(callInfo);
+    // Keep only last 10 calls
+    if (window.__GET_PREFERENCE_CALL_STACK__.length > 10) {
+      window.__GET_PREFERENCE_CALL_STACK__.shift();
+    }
+    
+    window.__GET_PREFERENCE_IN_PROGRESS__ = true;
+    
+    try {
+      // For default profile, use 0 explicitly
+      const finalUserId = userId || this.currentUserId;
+      const finalProfileId = profileId !== null && profileId !== undefined ? profileId : this.currentProfileId !== null ? this.currentProfileId : 0;
 
-    const cacheKey = `preference_${preferenceName}_${finalUserId}_${finalProfileId}`;
+      const cacheKey = `preference_${preferenceName}_${finalUserId}_${finalProfileId}`;
 
     // Use UnifiedCacheManager with fallback to localStorage if not initialized
     if (window.UnifiedCacheManager) {
@@ -528,18 +569,25 @@ class PreferencesCore {
       }
 
       if (cached !== null) {
-        window.Logger.debug(`🔍 CACHE DEBUG: Cache hit for ${preferenceName} = ${cached} (key: ${cacheKey}, { page: "preferences-core-new" })`);
+        // Remove from call stack before returning
+        const index = window.__GET_PREFERENCE_CALL_STACK__.findIndex(c => 
+          c.preferenceName === preferenceName && 
+          Math.abs(c.timestamp - callInfo.timestamp) < 10
+        );
+        if (index !== -1) {
+          window.__GET_PREFERENCE_CALL_STACK__.splice(index, 1);
+        }
+        if (!wasInProgress) {
+          window.__GET_PREFERENCE_IN_PROGRESS__ = false;
+        }
         return cached;
       }
     }
-
-    window.Logger.debug(`🔍 CACHE DEBUG: Cache miss for ${preferenceName} (key: ${cacheKey}, { page: "preferences-core-new" }) - loading from API`);
 
     // Check lazy loading if enabled
     if (useLazyLoading && window.LazyLoader) {
       const isLoaded = window.LazyLoader.isLoaded(preferenceName);
       if (!isLoaded) {
-        window.Logger.debug(`🎯 Loading ${preferenceName} on demand via lazy loader`, { page: 'preferences-core-new' });
         // Load all preferences at once from API
         // Use force: false to leverage cache - only call API if cache is missing or expired
         // This prevents rate limiting after cache clear or hard refresh
@@ -549,23 +597,21 @@ class PreferencesCore {
         const maxWaitAttempts = 20; // 2 seconds total (20 * 100ms)
         while (!window.PreferencesData?.loadAllPreferencesRaw || typeof window.PreferencesData.loadAllPreferencesRaw !== 'function') {
           if (waitCount >= maxWaitAttempts) {
-            window.Logger?.warn?.('[PreferencesCore] loadAllPreferencesRaw API is not available after waiting - returning null', { 
-              page: 'preferences-core-new',
-              preferenceName,
-              waitTime: `${maxWaitAttempts * 100}ms`,
-            });
+            // Remove from call stack before returning
+            const index = window.__GET_PREFERENCE_CALL_STACK__.findIndex(c => 
+              c.preferenceName === preferenceName && 
+              Math.abs(c.timestamp - callInfo.timestamp) < 10
+            );
+            if (index !== -1) {
+              window.__GET_PREFERENCE_CALL_STACK__.splice(index, 1);
+            }
+            if (!wasInProgress) {
+              window.__GET_PREFERENCE_IN_PROGRESS__ = false;
+            }
             return null;
           }
           await new Promise(resolve => setTimeout(resolve, 100));
           waitCount++;
-        }
-        
-        if (waitCount > 0) {
-          window.Logger?.debug?.('[PreferencesCore] PreferencesData became available after waiting', {
-            page: 'preferences-core-new',
-            preferenceName,
-            waitTime: `${waitCount * 100}ms`,
-          });
         }
         
         const preferencesDataApi = window.PreferencesData;
@@ -586,36 +632,92 @@ class PreferencesCore {
             });
           }
 
+          // Remove from call stack before returning
+          const index = window.__GET_PREFERENCE_CALL_STACK__.findIndex(c => 
+            c.preferenceName === preferenceName && 
+            Math.abs(c.timestamp - callInfo.timestamp) < 10
+          );
+          if (index !== -1) {
+            window.__GET_PREFERENCE_CALL_STACK__.splice(index, 1);
+          }
+          if (!wasInProgress) {
+            window.__GET_PREFERENCE_IN_PROGRESS__ = false;
+          }
           return value;
         } catch (error) {
-          window.Logger.error('❌ Error loading preferences:', error, { page: 'preferences-core-new' });
+          // Remove from call stack before returning
+          const index = window.__GET_PREFERENCE_CALL_STACK__.findIndex(c => 
+            c.preferenceName === preferenceName && 
+            Math.abs(c.timestamp - callInfo.timestamp) < 10
+          );
+          if (index !== -1) {
+            window.__GET_PREFERENCE_CALL_STACK__.splice(index, 1);
+          }
+          if (!wasInProgress) {
+            window.__GET_PREFERENCE_IN_PROGRESS__ = false;
+          }
           return null;
         }
       }
     }
 
-    try {
-      // Load from API
-      const value = await this.apiClient.getPreference(
-        preferenceName,
-        finalUserId,
-        finalProfileId,
-      );
+      try {
+        // Load from API
+        const value = await this.apiClient.getPreference(
+          preferenceName,
+          finalUserId,
+          finalProfileId,
+        );
 
-      // Save to UnifiedCacheManager
-      if (window.UnifiedCacheManager) {
-        await window.UnifiedCacheManager.save(cacheKey, value, {
-          layer: 'localStorage',
-          ttl: 300000,
-        });
+        // Save to UnifiedCacheManager
+        if (window.UnifiedCacheManager) {
+          await window.UnifiedCacheManager.save(cacheKey, value, {
+            layer: 'localStorage',
+            ttl: 300000,
+          });
+        }
+
+        // Remove from call stack before returning
+        const index = window.__GET_PREFERENCE_CALL_STACK__.findIndex(c => 
+          c.preferenceName === preferenceName && 
+          Math.abs(c.timestamp - callInfo.timestamp) < 10
+        );
+        if (index !== -1) {
+          window.__GET_PREFERENCE_CALL_STACK__.splice(index, 1);
+        }
+        if (!wasInProgress) {
+          window.__GET_PREFERENCE_IN_PROGRESS__ = false;
+        }
+        return value;
+
+      } catch (error) {
+        // Remove from call stack before returning
+        const index = window.__GET_PREFERENCE_CALL_STACK__.findIndex(c => 
+          c.preferenceName === preferenceName && 
+          Math.abs(c.timestamp - callInfo.timestamp) < 10
+        );
+        if (index !== -1) {
+          window.__GET_PREFERENCE_CALL_STACK__.splice(index, 1);
+        }
+        if (!wasInProgress) {
+          window.__GET_PREFERENCE_IN_PROGRESS__ = false;
+        }
+        return null;
       }
-
-      window.Logger.info(`✅ Loaded preference ${preferenceName}:`, value, { page: 'preferences-core-new' });
-      return value;
-
-    } catch (error) {
-      window.Logger.error(`❌ Error loading preference ${preferenceName}:`, error, { page: 'preferences-core-new' });
-      return null;
+    } finally {
+      // Remove from call stack
+      const index = window.__GET_PREFERENCE_CALL_STACK__.findIndex(c => 
+        c.preferenceName === preferenceName && 
+        Math.abs(c.timestamp - callInfo.timestamp) < 10
+      );
+      if (index !== -1) {
+        window.__GET_PREFERENCE_CALL_STACK__.splice(index, 1);
+      }
+      
+      // CRITICAL: Clear flag only if we set it (not if it was already set)
+      if (!wasInProgress) {
+        window.__GET_PREFERENCE_IN_PROGRESS__ = false;
+      }
     }
   }
 
@@ -657,13 +759,11 @@ class PreferencesCore {
               ttl: 300000,
             });
             if (cached !== null) {
-              window.Logger.info('✅ Cache hit for all preferences', { page: 'preferences-core-new' });
               return cached;
             }
           }
         } else {
           // Force refresh: clear cache first
-          window.Logger.info('🔄 Force refresh: clearing cache before loading from server', { page: 'preferences-core-new' });
           if (window.UnifiedCacheManager) {
             await window.UnifiedCacheManager.remove(cacheKey, { layer: 'localStorage' });
             const prefixedKey = `tiktrack_${cacheKey}`;
@@ -681,12 +781,6 @@ class PreferencesCore {
           }
 
           // Load all preferences
-          window.Logger?.debug?.('🔍 Calling apiClient.getAllPreferences', {
-            page: 'preferences-core-new',
-            userId: finalUserId,
-            profileId: finalProfileId,
-          });
-          
           const apiResult = await this.apiClient.getAllPreferences(
             finalUserId,
             finalProfileId,
@@ -694,29 +788,10 @@ class PreferencesCore {
           
           // Handle null result - PreferencesAPIClient returns null if PreferencesData is not available
           if (!apiResult) {
-            window.Logger?.warn?.('⚠️ PreferencesAPIClient.getAllPreferences returned null - PreferencesData not available', {
-              page: 'preferences-core-new',
-              userId: finalUserId,
-              profileId: finalProfileId,
-            });
             return {};
           }
           
-          window.Logger?.debug?.('🔍 apiClient.getAllPreferences result', {
-            page: 'preferences-core-new',
-            userId: finalUserId,
-            profileId: finalProfileId,
-            preferencesCount: Array.isArray(apiResult?.preferences) ? apiResult.preferences.length : Object.keys(apiResult?.preferences || {}).length,
-          });
-          
           let allPreferences = apiResult.preferences || {};
-          
-          window.Logger?.debug?.('🔍 Extracted preferences from API result', {
-            page: 'preferences-core-new',
-            userId: finalUserId,
-            profileId: finalProfileId,
-            allPreferencesCount: Object.keys(allPreferences).length,
-          });
           const profileContext = apiResult.profileContext || null;
           const effectiveProfileId = profileContext && profileContext.resolved_profile_id !== null && profileContext.resolved_profile_id !== undefined
             ? profileContext.resolved_profile_id
@@ -740,12 +815,6 @@ class PreferencesCore {
           // If no preferences loaded, load all default values from preference_types table
           // This ensures the system always has default values to work with
           if (Object.keys(allPreferences).length === 0) {
-            window.Logger?.info?.('⚠️ No user preferences found, loading default values from preference_types table', {
-              page: 'preferences-core-new',
-              userId: finalUserId,
-              profileId: effectiveProfileId,
-            });
-            
             try {
               // Try to load preference types metadata to get all preference names
               if (window.PreferencesData && typeof window.PreferencesData.loadPreferenceTypes === 'function') {
@@ -769,25 +838,16 @@ class PreferencesCore {
                       }
                     } catch (defaultError) {
                       // Non-critical - continue loading other defaults
-                      window.Logger?.debug?.(`⚠️ Failed to load default for ${prefName}: ${defaultError?.message}`, {
-                        page: 'preferences-core-new',
-                      });
                     }
                   }
                   
                   if (Object.keys(defaultPreferences).length > 0) {
                     allPreferences = defaultPreferences;
-                    window.Logger?.info?.(`✅ Loaded ${Object.keys(defaultPreferences).length} default preferences`, {
-                      page: 'preferences-core-new',
-                    });
                   }
                 }
               }
             } catch (defaultLoadError) {
-              window.Logger?.warn?.('⚠️ Failed to load default preferences, continuing with empty preferences', {
-                page: 'preferences-core-new',
-                error: defaultLoadError?.message,
-              });
+              // Silent fail - continue with empty preferences
             }
           }
 
@@ -803,14 +863,19 @@ class PreferencesCore {
             });
           }
 
-          window.Logger.info(`✅ Loaded ${Object.keys(result).length} preferences`, { page: 'preferences-core-new' });
           return result;
         } catch (error) {
-          window.Logger.error('❌ Error loading all preferences:', error, { page: 'preferences-core-new' });
+          // Only log critical errors
+          if (window.DEBUG_MODE) {
+            console.error('❌ Error loading all preferences:', error);
+          }
           return {};
         }
       } catch (error) {
-        window.Logger.error('❌ Error in getAllPreferences outer try:', error, { page: 'preferences-core-new' });
+        // Only log critical errors
+        if (window.DEBUG_MODE) {
+          console.error('❌ Error in getAllPreferences:', error);
+        }
         return {};
       } finally {
         this._getAllPreferencesInflight.delete(dedupeKey);
@@ -838,8 +903,6 @@ class PreferencesCore {
     try {
       // Strict validation if available
       if (window.PreferenceValidator) {
-        window.Logger.info(`🔍 Validating preference ${preferenceName} before save...`, { page: 'preferences-core-new' });
-
         const validationResult = await window.PreferenceValidator.validatePreference(
           preferenceName,
           value,
@@ -850,8 +913,6 @@ class PreferencesCore {
           const errorMessages = validationResult.errors.map(e => e.message).join(', ');
           throw new ValidationError(`Validation failed for ${preferenceName}: ${errorMessages}`);
         }
-
-        window.Logger.info(`✅ Validation passed for ${preferenceName}`, { page: 'preferences-core-new' });
       } else {
         // Fallback to basic validation
         const exists = await this.validationManager.checkPreferenceExists(preferenceName);
@@ -869,7 +930,7 @@ class PreferencesCore {
       );
 
       if (success) {
-        window.Logger.info(`✅ Saved preference ${preferenceName}:`, value, { page: 'preferences-core-new' });
+        // Preference saved
 
         // ✅ מוחק cache אחרי שמירה מוצלחת
         await this.invalidatePreference(preferenceName, userId, profileId);
@@ -889,9 +950,12 @@ class PreferencesCore {
     } catch (error) {
       // ValidationError (preference not found in DB) is not a critical error - use warn instead
       if (error instanceof ValidationError || error?.name === 'ValidationError') {
-        window.Logger.warn(`⚠️ Preference ${preferenceName} validation failed (may not exist in DB):`, error.message, { page: 'preferences-core-new' });
+        // Validation failed - non-critical
       } else {
-        window.Logger.error(`❌ Error saving preference ${preferenceName}:`, error, { page: 'preferences-core-new' });
+        // Only log critical errors
+        if (window.DEBUG_MODE) {
+          console.error(`❌ Error saving preference ${preferenceName}:`, error);
+        }
       }
       return {
         success: false,
@@ -936,7 +1000,6 @@ class PreferencesCore {
       await window.UnifiedCacheManager.remove(`all_preferences_${userId || this.currentUserId}_${profileId || this.currentProfileId}`);
     }
 
-    window.Logger.info(`✅ Saved ${results.saved} preferences, ${results.errors} errors`, { page: 'preferences-core-new' });
     return results;
   }
 
@@ -945,7 +1008,7 @@ class PreferencesCore {
      */
   clearCache() {
     // Cache clearing is now handled by UnifiedCacheManager
-    window.Logger.info('🧹 Cache clearing handled by UnifiedCacheManager', { page: 'preferences-core-new' });
+    // Cache clearing handled by UnifiedCacheManager
   }
 
   /**
@@ -977,7 +1040,7 @@ class PreferencesCore {
       await window.UnifiedCacheManager.remove(prefixedAllPrefsKey, { layer: 'localStorage' });
     }
 
-    window.Logger.info(`🧹 Invalidated preference cache: ${preferenceName}`, { page: 'preferences-core-new' });
+    // Cache invalidated
   }
 
   /**
@@ -988,7 +1051,7 @@ class PreferencesCore {
     for (const name of preferenceNames) {
       await this.invalidatePreference(name);
     }
-    window.Logger.info(`🧹 Invalidated ${preferenceNames.length} preferences`, { page: 'preferences-core-new' });
+    // Cache invalidated
   }
 
   /**
@@ -1007,7 +1070,7 @@ class PreferencesCore {
 
     // If forceRefresh is true, clear cache first
     if (forceRefresh) {
-      window.Logger.info(`🔄 Force refresh: clearing cache for group ${groupName} before loading from server`, { page: 'preferences-core-new' });
+      // Force refresh: clearing cache
       if (window.UnifiedCacheManager) {
         await window.UnifiedCacheManager.remove(cacheKey);
         const prefixedKey = `tiktrack_${cacheKey}`;
@@ -1023,13 +1086,11 @@ class PreferencesCore {
       });
 
       if (cached !== null) {
-        window.Logger.debug(`🔍 Cache hit for group ${groupName}`, { page: 'preferences-core-new' });
         return cached;
       }
     }
 
     // Load from server
-    window.Logger.info(`📥 Loading group ${groupName} from server...`, { page: 'preferences-core-new' });
     const groupResponse = await this.apiClient.getGroupPreferences(
       groupName,
       finalUserId,
@@ -1060,7 +1121,6 @@ class PreferencesCore {
       });
     }
 
-    window.Logger.info(`✅ Loaded ${Object.keys(preferences).length} preferences from group ${groupName}`, { page: 'preferences-core-new' });
     return preferences;
   }
 
@@ -1082,7 +1142,6 @@ class PreferencesCore {
     // Clear cache for this group
     await this.clearGroupCache(groupName, finalUserId, finalProfileId);
 
-    window.Logger.info(`✅ Saved ${results.saved} preferences from group ${groupName}`, { page: 'preferences-core-new' });
     return results;
   }
 
@@ -1100,7 +1159,7 @@ class PreferencesCore {
 
     if (window.UnifiedCacheManager) {
       await window.UnifiedCacheManager.remove(cacheKey);
-      window.Logger.debug(`🧹 Cleared cache for group ${groupName}`, { page: 'preferences-core-new' });
+      // Cache cleared
     }
   }
 
@@ -1112,7 +1171,7 @@ class PreferencesCore {
      */
   async setCurrentProfile(userId, profileId) {
     if (window.Logger) {
-      window.Logger.info(`🔄 Setting current profile to user ${userId}, profile ${profileId}`, { page: 'preferences-core-new' });
+      // Setting current profile
     }
     this.currentUserId = userId;
     this.currentProfileId = profileId;
@@ -1126,7 +1185,7 @@ class PreferencesCore {
     // via UnifiedCacheManager.refreshUserPreferences()
 
     if (window.Logger) {
-      window.Logger.info('✅ Profile updated in PreferencesCore', { page: 'preferences-core-new' });
+      // Profile updated
     }
   }
 
@@ -1137,10 +1196,6 @@ class PreferencesCore {
      */
   async initializeWithLazyLoading(userId = null, profileId = null) {
     try {
-      if (window.Logger && typeof window.Logger.info === 'function') {
-        window.Logger.info('🚀 Initializing preferences with lazy loading...', { page: 'preferences-core-new' });
-      }
-
       // Update current profile if provided
       if (userId !== null && profileId !== null) {
         await this.setCurrentProfile(userId, profileId);
@@ -1158,34 +1213,21 @@ class PreferencesCore {
           finalUserId,
           finalProfileId,
         );
-        if (window.Logger && typeof window.Logger.info === 'function') {
-          window.Logger.info('✅ Lazy loading initialized', { page: 'preferences-core-new' });
-        }
       } else {
-        if (window.Logger && typeof window.Logger.warn === 'function') {
-          window.Logger.warn('⚠️ LazyLoader not available, using standard loading', { page: 'preferences-core-new' });
-        }
         // Fallback to standard loading
         await this.getAllPreferences(userId, profileId);
       }
 
     } catch (error) {
-      // Handle error gracefully - Logger may not be available
-      if (window.Logger && typeof window.Logger.error === 'function') {
-        window.Logger.error('❌ Error initializing lazy loading:', error, { page: 'preferences-core-new' });
-      } else {
+      // Only log critical errors
+      if (window.DEBUG_MODE) {
         console.warn('⚠️ Error initializing lazy loading:', error);
       }
       // Fallback to standard loading
       try {
         await this.getAllPreferences(userId, profileId);
       } catch (fallbackError) {
-        // If fallback also fails, just log and continue
-        if (window.Logger && typeof window.Logger.warn === 'function') {
-          window.Logger.warn('⚠️ Fallback loading also failed:', fallbackError, { page: 'preferences-core-new' });
-        } else {
-          console.warn('⚠️ Fallback loading also failed:', fallbackError);
-        }
+        // Silent fail - continue without preferences
       }
     }
   }
@@ -1210,6 +1252,22 @@ window.PreferencesCore = new PreferencesCore();
  * @returns {Promise<any>} Preference value
  */
 window.getPreference = async function(preferenceName, userId = null, profileId = null) {
+  // CRITICAL: Prevent recursion - if getPreference is already in progress, return null
+  // This prevents: window.getPreference() → PreferencesCore.getPreference() → Logger → window.getPreference() → ...
+  if (window.__GET_PREFERENCE_IN_PROGRESS__) {
+    if (window.DEBUG_MODE) {
+      console.debug('🔄 window.getPreference: Recursion prevented, returning null', { preferenceName });
+    }
+    return null;
+  }
+  
+  if (!window.PreferencesCore || typeof window.PreferencesCore.getPreference !== 'function') {
+    if (window.DEBUG_MODE) {
+      console.debug('⚠️ window.getPreference: PreferencesCore not available', { preferenceName });
+    }
+    return null;
+  }
+  
   return await window.PreferencesCore.getPreference(preferenceName, userId, profileId);
 };
 
@@ -1343,20 +1401,4 @@ window.initializePreferences = async function(userId = null, profileId = null) {
 // ============================================================================
 
 // Auto-initialize when DOM is ready
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => {
-    if (window.Logger && window.Logger.info) {
-      window.Logger.info('📄 Preferences core system initialized', { page: 'preferences-core-new' });
-    }
-  });
-} else {
-  if (window.Logger && window.Logger.info) {
-    window.Logger.info('📄 Preferences core system initialized', { page: 'preferences-core-new' });
-  }
-}
-
 // Event listener removed - UnifiedCacheManager handles preferences refresh directly
-
-if (window.Logger && window.Logger.info) {
-  window.Logger.info('✅ preferences-core.js loaded successfully', { page: 'preferences-core-new' });
-}

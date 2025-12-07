@@ -1149,10 +1149,41 @@ async function loadPortfolioState() {
     }
 }
 
-// Load trades from API
+// Load trades from API using PortfolioStateData service
 async function loadTrades(dateRange, selectedAccounts, investmentType) {
     try {
-        // Check cache first
+        // Use PortfolioStateData service if available
+        if (window.PortfolioStateData && typeof window.PortfolioStateData.loadSnapshot === 'function') {
+            // Convert dateRange string to actual date
+            const targetDate = getDateFromRange(dateRange);
+            const accountId = Array.isArray(selectedAccounts) && selectedAccounts.length === 1 ? selectedAccounts[0] : null;
+            
+            // Load snapshot from PortfolioStateData
+            const snapshot = await window.PortfolioStateData.loadSnapshot(accountId, targetDate, {
+                include_closed: false
+            });
+            
+            // Extract trades/positions from snapshot
+            allTrades = snapshot?.positions || snapshot?.trades || [];
+            
+            // Filter by investment type if specified
+            if (investmentType && allTrades.length > 0) {
+                allTrades = allTrades.filter(trade => trade.investment_type === investmentType);
+            }
+            
+            if (window.Logger) {
+                window.Logger.info(`✅ Loaded ${allTrades.length} trades from PortfolioStateData`, { 
+                    page: 'portfolio-state-page',
+                    dateRange,
+                    targetDate,
+                    accountId
+                });
+            }
+            
+            return;
+        }
+        
+        // Fallback to direct API call if PortfolioStateData not available
         const accountsKey = Array.isArray(selectedAccounts) ? selectedAccounts.join(',') : (selectedAccounts || 'all');
         const cacheKey = `portfolio-state-trades-${dateRange}-${accountsKey}-${investmentType || 'all'}`;
         
@@ -1167,14 +1198,14 @@ async function loadTrades(dateRange, selectedAccounts, investmentType) {
             }
         }
         
-        // TODO (Stage 3.3 - Backend): Load from API endpoint /api/daily-snapshots/{date}/trades
-        // For now, using mock data
-        // In production, this should fetch from: /api/daily-snapshots/{date}/trades?account_id={accountId}&investment_type={investmentType}
-        // This requires:
-        // 1. Creating DailySnapshot model in Backend
-        // 2. Creating API endpoint /api/daily-snapshots/{date}/trades
-        // 3. Background job to create daily snapshots automatically
-        // 4. Replacing mock data with API call using safeApiCall()
+        // Final fallback: use mock data if API not available
+        if (window.Logger) {
+            window.Logger.warn('PortfolioStateData not available, using mock data as fallback', { page: 'portfolio-state-page' });
+        }
+        if (window.NotificationSystem) {
+            window.NotificationSystem.showWarning('טעינת נתונים', 'נטענים נתוני דמה במקום נתונים אמיתיים');
+        }
+        
         allTrades = [
             {
                 id: 1,
@@ -1262,6 +1293,38 @@ async function loadTrades(dateRange, selectedAccounts, investmentType) {
             window.Logger.error('Error loading trades', { page: 'portfolio-state-page', error });
         }
         allTrades = [];
+    }
+}
+
+// Helper function to convert dateRange string to actual date
+function getDateFromRange(dateRange) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    switch (dateRange) {
+        case 'היום':
+            return today.toISOString().split('T')[0];
+        case 'אתמול':
+            const yesterday = new Date(today);
+            yesterday.setDate(yesterday.getDate() - 1);
+            return yesterday.toISOString().split('T')[0];
+        case 'השבוע':
+            const weekStart = new Date(today);
+            weekStart.setDate(today.getDate() - today.getDay()); // Start of week (Sunday)
+            return weekStart.toISOString().split('T')[0];
+        case 'החודש':
+            const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+            return monthStart.toISOString().split('T')[0];
+        case 'השנה':
+            const yearStart = new Date(today.getFullYear(), 0, 1);
+            return yearStart.toISOString().split('T')[0];
+        default:
+            // For custom date range, try to parse or default to today
+            if (dateRange && dateRange.includes('-')) {
+                // Assume it's a date string
+                return dateRange;
+            }
+            return today.toISOString().split('T')[0];
     }
 }
 

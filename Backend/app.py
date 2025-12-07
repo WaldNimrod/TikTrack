@@ -172,7 +172,10 @@ from routes.api import (
     preferences_bp,
     wal_bp,
     system_settings_bp,
-    watch_lists_bp
+    watch_lists_bp,
+    trade_history_bp,
+    portfolio_state_bp,
+    trading_journal_bp
 )
 from routes.api.preferences_v4 import preferences_v4_bp
 from routes.api.server_logs import server_logs_bp
@@ -509,6 +512,11 @@ app.register_blueprint(entity_details_bp)
 # Business Logic API
 from routes.api.business_logic import business_logic_bp
 app.register_blueprint(business_logic_bp)
+
+# Historical Data API
+app.register_blueprint(trade_history_bp)
+app.register_blueprint(portfolio_state_bp)
+app.register_blueprint(trading_journal_bp)
 
 # Register Cache Sync blueprint
 from routes.api.cache_sync import cache_sync_bp

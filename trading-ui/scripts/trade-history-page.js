@@ -201,53 +201,61 @@
 
     /**
      * Load trades from API with caching and error handling
+     * Uses TradeHistoryData service for unified data loading
      */
     async function loadTrades() {
         showLoadingState('trades-table-section');
         
         try {
-            // Create cache key
-            const cacheKey = window.createCacheKey ? 
-                window.createCacheKey('trade-history', 'trades', {}) : 
-                'trade-history-trades-default';
-            
-            // Try to load from cache
-            if (window.UnifiedCacheManager) {
-                const cachedData = await window.UnifiedCacheManager.get(cacheKey, 'memory');
-                if (cachedData) {
-                    allTrades = cachedData;
-                    filteredTrades = [...allTrades];
-                    loadTradesTable();
-                    hideLoadingState('trades-table-section');
-                    return;
-                }
+            // Use TradeHistoryData service if available
+            if (window.TradeHistoryData && typeof window.TradeHistoryData.loadTradeHistory === 'function') {
+                // Build filters from current filter state
+                const filters = {
+                    // Add filters from UI if available
+                };
+                
+                const data = await window.TradeHistoryData.loadTradeHistory(filters);
+                const trades = Array.isArray(data?.trades) ? data.trades : (Array.isArray(data) ? data : []);
+                
+                // Transform trades to match our format
+                allTrades = trades.map(trade => ({
+                    id: trade.id,
+                    ticker: trade.ticker_symbol || trade.ticker?.symbol || '',
+                    side: trade.side || '',
+                    investment_type: trade.investment_type || '',
+                    created_at: trade.created_at?.utc || trade.created_at || '',
+                    closed_at: trade.closed_at?.utc || trade.closed_at || '',
+                    pl: trade.realized_pl || trade.pl || 0,
+                    pl_percent: trade.pl_percent || 0
+                })).filter(t => t.ticker); // Only trades with ticker
+                
+                filteredTrades = [...allTrades];
+                loadTradesTable();
+            } else {
+                // Fallback to direct API call if TradeHistoryData not available
+                const data = await window.safeApiCall('/api/trades/');
+                const trades = Array.isArray(data?.data) ? data.data : (Array.isArray(data) ? data : []);
+                
+                // Transform trades to match our format
+                allTrades = trades.map(trade => ({
+                    id: trade.id,
+                    ticker: trade.ticker_symbol || trade.ticker?.symbol || '',
+                    side: trade.side || '',
+                    investment_type: trade.investment_type || '',
+                    created_at: trade.created_at?.utc || trade.created_at || '',
+                    closed_at: trade.closed_at?.utc || trade.closed_at || '',
+                    pl: trade.realized_pl || trade.pl || 0,
+                    pl_percent: trade.pl_percent || 0
+                })).filter(t => t.ticker); // Only trades with ticker
+                
+                filteredTrades = [...allTrades];
+                loadTradesTable();
             }
-            
-            // Load from API using safeApiCall
-            const data = await window.safeApiCall('/api/trades/');
-            const trades = Array.isArray(data?.data) ? data.data : (Array.isArray(data) ? data : []);
-            
-            // Transform trades to match our format
-            allTrades = trades.map(trade => ({
-                id: trade.id,
-                ticker: trade.ticker_symbol || trade.ticker?.symbol || '',
-                side: trade.side || '',
-                investment_type: trade.investment_type || '',
-                created_at: trade.created_at?.utc || trade.created_at || '',
-                closed_at: trade.closed_at?.utc || trade.closed_at || '',
-                pl: trade.realized_pl || trade.pl || 0,
-                pl_percent: trade.pl_percent || 0
-            })).filter(t => t.ticker); // Only trades with ticker
-        
-            // Save to cache
-            if (window.UnifiedCacheManager) {
-                await window.UnifiedCacheManager.save(cacheKey, allTrades, 'memory', { ttl: 300 }); // 5 minutes
-            }
-            
-            filteredTrades = [...allTrades];
-            loadTradesTable();
         } catch (error) {
-            // Error already handled by safeApiCall, but fallback to mock data
+            // Error already handled by TradeHistoryData or safeApiCall, but fallback to mock data
+            if (window.Logger) {
+                window.Logger.warn('Error loading trades, using mock data as fallback', { page: 'trade-history-page', error });
+            }
             if (window.NotificationSystem) {
                 window.NotificationSystem.showWarning('טעינת נתונים', 'נטענים נתוני דמה במקום נתונים אמיתיים');
             }
@@ -662,56 +670,77 @@
     }
 
     /**
-     * Load data from cache or use mock data
+     * Load data from TradeHistoryData service
+     * Replaces old mock data loading with real API integration
      */
     async function loadDataFromCache() {
         try {
-            const cacheAvailable = await waitForCacheManager();
-            
-            if (cacheAvailable && window.UnifiedCacheManager) {
-                // Try to load from cache
-                const cachedData = await window.UnifiedCacheManager.get(CACHE_KEY_MOCK_DATA);
-                if (cachedData) {
-                    tradeHistoryData = cachedData;
-                    if (window.Logger) {
-                        window.Logger.info('Loaded trade history data from cache', { page: 'trade-history-page' });
-                    }
-                    return cachedData;
-                }
-            }
-            
-            // Fallback to mock data
-            if (window.TradeHistoryMockData) {
-                tradeHistoryData = window.TradeHistoryMockData;
-                if (window.Logger) {
-                    window.Logger.info('Using mock data for trade history', { page: 'trade-history-page' });
-                }
+            // Use TradeHistoryData service if available
+            if (window.TradeHistoryData && typeof window.TradeHistoryData.loadTradeHistory === 'function') {
+                // Load trade history data
+                const filters = {
+                    // Add filters from selected trade if available
+                    ...(selectedTradeId ? { trade_id: selectedTradeId } : {})
+                };
                 
-                // Save to cache for next time
-                if (cacheAvailable && window.UnifiedCacheManager) {
-                    await window.UnifiedCacheManager.save(CACHE_KEY_MOCK_DATA, tradeHistoryData, {
-                        layer: 'localStorage',
-                        ttl: null, // persistent
-                        syncToBackend: false
+                const [tradeData, statisticsData, planVsExecutionData] = await Promise.all([
+                    window.TradeHistoryData.loadTradeHistory(filters).catch(err => {
+                        window.Logger?.warn('Error loading trade history', { page: 'trade-history-page', error: err });
+                        return null;
+                    }),
+                    window.TradeHistoryData.loadStatistics(filters).catch(err => {
+                        window.Logger?.warn('Error loading statistics', { page: 'trade-history-page', error: err });
+                        return null;
+                    }),
+                    selectedTradeId ? window.TradeHistoryData.loadPlanVsExecution({
+                        start_date: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+                        end_date: new Date().toISOString().split('T')[0]
+                    }).catch(err => {
+                        window.Logger?.warn('Error loading plan vs execution', { page: 'trade-history-page', error: err });
+                        return null;
+                    }) : Promise.resolve(null)
+                ]);
+                
+                // Build trade history data object
+                tradeHistoryData = {
+                    selectedTrade: tradeData?.trades?.[0] || null,
+                    statistics: statisticsData || {},
+                    planVsExecution: planVsExecutionData || [],
+                    timelineData: tradeData?.timeline || []
+                };
+                
+                if (window.Logger) {
+                    window.Logger.info('Loaded trade history data from TradeHistoryData service', { 
+                        page: 'trade-history-page',
+                        tradesCount: tradeData?.trades?.length || 0
                     });
                 }
                 
                 return tradeHistoryData;
             }
             
-            const errorMsg = 'אין נתוני דמה זמינים';
+            // Fallback to mock data if TradeHistoryData not available
+            if (window.TradeHistoryMockData) {
+                tradeHistoryData = window.TradeHistoryMockData;
+                if (window.Logger) {
+                    window.Logger.warn('TradeHistoryData not available, using mock data', { page: 'trade-history-page' });
+                }
+                return tradeHistoryData;
+            }
+            
+            const errorMsg = 'TradeHistoryData service not available and no mock data available';
             if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {
                 window.NotificationSystem.showError('שגיאה בטעינת נתונים', errorMsg);
             } else if (window.Logger) {
-                window.Logger.error('No mock data available', { page: 'trade-history-page' });
+                window.Logger.error('No data available', { page: 'trade-history-page' });
             }
             return null;
         } catch (error) {
             const errorMsg = error?.message || (typeof error === 'string' ? error : 'שגיאה לא ידועה');
             if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {
-                window.NotificationSystem.showError('שגיאה בטעינת נתונים מהמטמון', errorMsg);
+                window.NotificationSystem.showError('שגיאה בטעינת נתונים', errorMsg);
             } else if (window.Logger) {
-                window.Logger.error('Error loading data from cache', { page: 'trade-history-page', error });
+                window.Logger.error('Error loading data', { page: 'trade-history-page', error });
             }
             // Fallback to mock data
             if (window.TradeHistoryMockData) {

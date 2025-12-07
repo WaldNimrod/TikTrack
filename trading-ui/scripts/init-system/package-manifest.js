@@ -1435,53 +1435,74 @@ const PACKAGE_MANIFEST = {
         loadOrder: 6.9
       },
       {
+        file: 'services/trade-history-data.js',
+        globalCheck: 'window.TradeHistoryData',
+        description: 'Trade history data service',
+        required: false,
+        loadOrder: 7
+      },
+      {
+        file: 'services/portfolio-state-data.js',
+        globalCheck: 'window.PortfolioStateData',
+        description: 'Portfolio state data service',
+        required: false,
+        loadOrder: 7.5
+      },
+      {
+        file: 'services/trading-journal-data.js',
+        globalCheck: 'window.TradingJournalData',
+        description: 'Trading journal data service',
+        required: false,
+        loadOrder: 8
+      },
+      {
         file: 'condition-translator.js',
         globalCheck: 'window.conditionTranslator',
         description: 'Condition translator',
         required: true,
-        loadOrder: 7
+        loadOrder: 9
       },
       {
         file: 'constraints.js',
         globalCheck: 'window.toggleLayer',
         description: 'Constraints system',
         required: true,
-        loadOrder: 8
+        loadOrder: 10
       },
       {
         file: 'services/linked-items-service.js',
         globalCheck: 'window.LinkedItemsService',
         description: 'Shared logic service for linked items',
         required: true,
-        loadOrder: 9
+        loadOrder: 11
       },
       {
         file: 'linked-items.js',
         globalCheck: 'window.viewLinkedItems',
         description: 'Linked items',
         required: true,
-        loadOrder: 10
+        loadOrder: 12
       },
       {
         file: 'related-object-filters.js',
         globalCheck: 'window.filterByRelatedObjectType',
         description: 'Related object filters',
         required: true,
-        loadOrder: 11
+        loadOrder: 13
       },
       {
         file: 'account-activity.js',
         globalCheck: 'window.initAccountActivity',
         description: 'Account activity system',
         required: false,
-        loadOrder: 12
+        loadOrder: 14
       },
       {
         file: 'positions-portfolio.js',
         globalCheck: 'window.initPositionsPortfolio',
         description: 'Positions and portfolio system',
         required: false,
-        loadOrder: 13
+        loadOrder: 15
       }
     ],
     estimatedSize: '~180KB',

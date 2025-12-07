@@ -6680,244 +6680,16 @@ class ModalManagerV2 {
                         // Fallback: call init which should populate icons
                         await window.WatchListModal.init();
                     } else {
-                        // Use inline function to populate icons
-                        await populateWatchListIcons(modalElement);
+                        // Use inline method to populate icons
+                        await this._populateWatchListIcons(modalElement);
                     }
                     
                     // Setup view mode selector
-                    setupWatchListViewModeSelector(modalElement);
+                    this._setupWatchListViewModeSelector(modalElement);
                 } catch (error) {
                     window.Logger?.error?.('❌ Error populating watch list icons', { error: error?.message || error, page: 'modal-manager-v2' });
                 }
             }, 300);
-        }
-    }
-    
-    /**
-     * Populate watch list icon selector
-     * @param {HTMLElement} modalElement - The modal element
-     * @private
-     */
-    async function populateWatchListIcons(modalElement) {
-        const tablerSelector = modalElement.querySelector('#watchListIconSelector');
-        const bootstrapSelector = modalElement.querySelector('#watchListBootstrapIconSelector');
-        
-        if (!tablerSelector && !bootstrapSelector) {
-            window.Logger?.warn?.('⚠️ Watch list icon selectors not found', { page: 'modal-manager-v2' });
-            return;
-        }
-        
-        // Wait for IconSystem
-        if (!window.IconSystem) {
-            window.Logger?.warn?.('⚠️ IconSystem not available for watch list icons', { page: 'modal-manager-v2' });
-            return;
-        }
-        
-        if (!window.IconSystem.initialized) {
-            try {
-                await window.IconSystem.initialize();
-            } catch (error) {
-                window.Logger?.error?.('❌ Error initializing IconSystem', { error: error?.message || error, page: 'modal-manager-v2' });
-                return;
-            }
-        }
-        
-        // Populate Tabler icons
-        if (tablerSelector) {
-            const tablerIcons = [
-                '', 'chart-line', 'eye', 'flame', 'coins', 
-                'table', 'cards', 'bookmark', 'tag', 'activity', 
-                'wallet', 'calendar', 'pencil', 'trash', 
-                'plus', 'check', 'x', 'search', 'filter', 'settings', 'download', 
-                'upload', 'refresh', 'archive', 'copy', 'link', 'info-circle', 
-                'alert-triangle'
-            ];
-            
-            tablerSelector.innerHTML = '';
-            
-            for (const iconName of tablerIcons) {
-                const iconItem = document.createElement('div');
-                iconItem.className = 'icon-selector-item';
-                iconItem.dataset.icon = iconName;
-                iconItem.dataset.library = 'tabler';
-                
-                if (iconName === '') {
-                    iconItem.innerHTML = '<div class="icon-preview no-icon"><span>ללא</span></div>';
-                } else {
-                    try {
-                        const iconHTML = await window.IconSystem.renderIcon('button', iconName, {
-                            size: '24',
-                            alt: iconName,
-                            class: 'icon-preview-icon'
-                        });
-                        iconItem.innerHTML = `<div class="icon-preview">${iconHTML}</div>`;
-                    } catch (error) {
-                        iconItem.innerHTML = `<div class="icon-preview"><span>${iconName}</span></div>`;
-                    }
-                }
-                
-                iconItem.addEventListener('click', () => {
-                    selectWatchListIcon(iconName, 'tabler', modalElement);
-                });
-                
-                tablerSelector.appendChild(iconItem);
-            }
-        }
-        
-        // Populate Bootstrap icons
-        if (bootstrapSelector) {
-            const bootstrapIcons = [
-                '', 
-                { class: 'bi-graph-up', color: '#26baac' },
-                { class: 'bi-eye', color: '#0056b3' },
-                { class: 'bi-star-fill', color: '#ffc107' },
-                { class: 'bi-heart-fill', color: '#dc3545' },
-                { class: 'bi-fire', color: '#fc5a06' },
-                { class: 'bi-coin', color: '#ffc107' },
-                { class: 'bi-list-ul', color: '#6c757d' },
-                { class: 'bi-table', color: '#28a745' },
-                { class: 'bi-grid-3x3', color: '#17a2b8' },
-                { class: 'bi-bookmark-fill', color: '#6f42c1' },
-                { class: 'bi-tag-fill', color: '#20c997' },
-                { class: 'bi-tags-fill', color: '#20c997' },
-                { class: 'bi-pie-chart-fill', color: '#fd7e14' },
-                { class: 'bi-activity', color: '#28a745' },
-                { class: 'bi-wallet2', color: '#0056b3' },
-                { class: 'bi-cash-stack', color: '#28a745' },
-                { class: 'bi-calendar-event', color: '#17a2b8' },
-                { class: 'bi-clock-history', color: '#6c757d' },
-                { class: 'bi-pencil-fill', color: '#0056b3' },
-                { class: 'bi-trash-fill', color: '#dc3545' },
-                { class: 'bi-plus-circle-fill', color: '#28a745' },
-                { class: 'bi-check-circle-fill', color: '#28a745' },
-                { class: 'bi-x-circle-fill', color: '#dc3545' },
-                { class: 'bi-search', color: '#6c757d' },
-                { class: 'bi-funnel-fill', color: '#6f42c1' },
-                { class: 'bi-gear-fill', color: '#6c757d' },
-                { class: 'bi-download', color: '#0056b3' },
-                { class: 'bi-upload', color: '#28a745' },
-                { class: 'bi-arrow-clockwise', color: '#17a2b8' },
-                { class: 'bi-archive-fill', color: '#6c757d' },
-                { class: 'bi-copy', color: '#0056b3' },
-                { class: 'bi-link-45deg', color: '#26baac' },
-                { class: 'bi-info-circle-fill', color: '#17a2b8' },
-                { class: 'bi-exclamation-triangle-fill', color: '#ffc107' }
-            ];
-            
-            bootstrapSelector.innerHTML = '';
-            
-            for (const iconData of bootstrapIcons) {
-                const iconItem = document.createElement('div');
-                iconItem.className = 'icon-selector-item';
-                
-                let iconClass = '';
-                let iconColor = '';
-                
-                if (typeof iconData === 'string') {
-                    iconClass = iconData;
-                } else {
-                    iconClass = iconData.class;
-                    iconColor = iconData.color;
-                }
-                
-                iconItem.dataset.icon = iconClass;
-                iconItem.dataset.library = 'bootstrap';
-                
-                if (iconClass === '') {
-                    iconItem.innerHTML = '<div class="icon-preview no-icon"><span>ללא</span></div>';
-                } else {
-                    const colorStyle = iconColor ? `style="font-size: 24px; color: ${iconColor};"` : 'style="font-size: 24px;"';
-                    iconItem.innerHTML = `<div class="icon-preview"><i class="${iconClass}" ${colorStyle}></i></div>`;
-                }
-                
-                iconItem.addEventListener('click', () => {
-                    selectWatchListIcon(iconClass, 'bootstrap', modalElement);
-                });
-                
-                bootstrapSelector.appendChild(iconItem);
-            }
-        }
-        
-        window.Logger?.info?.('✅ Watch list icons populated', { page: 'modal-manager-v2' });
-    }
-    
-    /**
-     * Select watch list icon
-     * @param {string} iconName - Icon name/class
-     * @param {string} library - Icon library
-     * @param {HTMLElement} modalElement - The modal element
-     * @private
-     */
-    async function selectWatchListIcon(iconName, library, modalElement) {
-        const iconInput = modalElement.querySelector('#watchListIcon');
-        const libraryInput = modalElement.querySelector('#watchListIconLibrary');
-        const preview = modalElement.querySelector('#watchListSelectedIconPreview');
-        
-        if (!iconInput || !libraryInput || !preview) {
-            return;
-        }
-        
-        iconInput.value = iconName;
-        libraryInput.value = library;
-        
-        // Remove active class from all items
-        modalElement.querySelectorAll('.icon-selector-item').forEach(item => {
-            item.classList.remove('active');
-        });
-        
-        // Add active class to selected item
-        const selectedItem = modalElement.querySelector(`[data-icon="${iconName}"][data-library="${library}"]`);
-        if (selectedItem) {
-            selectedItem.classList.add('active');
-        }
-        
-        // Update preview
-        if (iconName === '') {
-            preview.innerHTML = '<span class="icon-preview-placeholder">ללא איקון</span>';
-        } else if (library === 'bootstrap') {
-            preview.innerHTML = `<i class="${iconName}" style="font-size: 20px;"></i>`;
-        } else {
-            try {
-                if (window.IconSystem) {
-                    const iconHTML = await window.IconSystem.renderIcon('button', iconName, {
-                        size: '20',
-                        alt: iconName,
-                        class: 'icon-preview-icon'
-                    });
-                    preview.innerHTML = iconHTML;
-                } else {
-                    preview.innerHTML = `<span>${iconName}</span>`;
-                }
-            } catch (error) {
-                preview.innerHTML = `<span>${iconName}</span>`;
-            }
-        }
-    }
-    
-    /**
-     * Setup watch list view mode selector
-     * @param {HTMLElement} modalElement - The modal element
-     * @private
-     */
-    function setupWatchListViewModeSelector(modalElement) {
-        const viewModeInput = modalElement.querySelector('#watchListViewMode');
-        const radioButtons = modalElement.querySelectorAll('input[name="watchListViewMode"]');
-        
-        if (!viewModeInput || !radioButtons.length) {
-            return;
-        }
-        
-        radioButtons.forEach(radio => {
-            radio.addEventListener('change', (e) => {
-                if (e.target.checked) {
-                    viewModeInput.value = e.target.value;
-                }
-            });
-        });
-        
-        // Initialize tooltips
-        if (window.advancedButtonSystem && typeof window.advancedButtonSystem.initializeTooltips === 'function') {
-            window.advancedButtonSystem.initializeTooltips(modalElement);
         }
     }
 
@@ -8385,6 +8157,249 @@ class ModalManagerV2 {
             if (this.activeModal === modalId) {
                 this.activeModal = null;
             }
+        }
+    }
+    
+    /**
+     * Populate watch list icon selector
+     * @param {HTMLElement} modalElement - The modal element
+     * @private
+     */
+    async _populateWatchListIcons(modalElement) {
+        const tablerSelector = modalElement.querySelector('#watchListIconSelector');
+        const bootstrapSelector = modalElement.querySelector('#watchListBootstrapIconSelector');
+        
+        if (!tablerSelector && !bootstrapSelector) {
+            window.Logger?.warn?.('⚠️ Watch list icon selectors not found', { page: 'modal-manager-v2' });
+            return;
+        }
+        
+        // Wait for IconSystem
+        if (!window.IconSystem) {
+            window.Logger?.warn?.('⚠️ IconSystem not available for watch list icons', { page: 'modal-manager-v2' });
+            return;
+        }
+        
+        if (!window.IconSystem.initialized) {
+            try {
+                await window.IconSystem.initialize();
+            } catch (error) {
+                window.Logger?.error?.('❌ Error initializing IconSystem', { error: error?.message || error, page: 'modal-manager-v2' });
+                return;
+            }
+        }
+        
+        // Populate Tabler icons
+        if (tablerSelector) {
+            const tablerIcons = [
+                '', 'chart-line', 'eye', 'flame', 'coins', 
+                'table', 'cards', 'bookmark', 'tag', 'activity', 
+                'wallet', 'calendar', 'pencil', 'trash', 
+                'plus', 'check', 'x', 'search', 'filter', 'settings', 'download', 
+                'upload', 'refresh', 'archive', 'copy', 'link', 'info-circle', 
+                'alert-triangle'
+            ];
+            
+            tablerSelector.innerHTML = '';
+            
+            for (const iconName of tablerIcons) {
+                const iconItem = document.createElement('div');
+                iconItem.className = 'icon-selector-item';
+                iconItem.dataset.icon = iconName;
+                iconItem.dataset.library = 'tabler';
+                
+                if (iconName === '') {
+                    iconItem.innerHTML = '<div class="icon-preview no-icon"><span>ללא</span></div>';
+                } else {
+                    try {
+                        const iconHTML = await window.IconSystem.renderIcon('button', iconName, {
+                            size: '24',
+                            alt: iconName,
+                            class: 'icon-preview-icon'
+                        });
+                        iconItem.innerHTML = `<div class="icon-preview">${iconHTML}</div>`;
+                    } catch (error) {
+                        iconItem.innerHTML = `<div class="icon-preview"><span>${iconName}</span></div>`;
+                    }
+                }
+                
+                iconItem.addEventListener('click', () => {
+                    this._selectWatchListIcon(iconName, 'tabler', modalElement);
+                });
+                
+                tablerSelector.appendChild(iconItem);
+            }
+        }
+        
+        // Populate Bootstrap icons
+        if (bootstrapSelector) {
+            const bootstrapIcons = [
+                '', 
+                { class: 'bi-graph-up', color: '#26baac' },
+                { class: 'bi-eye', color: '#0056b3' },
+                { class: 'bi-star-fill', color: '#ffc107' },
+                { class: 'bi-heart-fill', color: '#dc3545' },
+                { class: 'bi-fire', color: '#fc5a06' },
+                { class: 'bi-coin', color: '#ffc107' },
+                { class: 'bi-list-ul', color: '#6c757d' },
+                { class: 'bi-table', color: '#28a745' },
+                { class: 'bi-grid-3x3', color: '#17a2b8' },
+                { class: 'bi-bookmark-fill', color: '#6f42c1' },
+                { class: 'bi-tag-fill', color: '#20c997' },
+                { class: 'bi-tags-fill', color: '#20c997' },
+                { class: 'bi-pie-chart-fill', color: '#fd7e14' },
+                { class: 'bi-activity', color: '#28a745' },
+                { class: 'bi-wallet2', color: '#0056b3' },
+                { class: 'bi-cash-stack', color: '#28a745' },
+                { class: 'bi-calendar-event', color: '#17a2b8' },
+                { class: 'bi-clock-history', color: '#6c757d' },
+                { class: 'bi-pencil-fill', color: '#0056b3' },
+                { class: 'bi-trash-fill', color: '#dc3545' },
+                { class: 'bi-plus-circle-fill', color: '#28a745' },
+                { class: 'bi-check-circle-fill', color: '#28a745' },
+                { class: 'bi-x-circle-fill', color: '#dc3545' },
+                { class: 'bi-search', color: '#6c757d' },
+                { class: 'bi-funnel-fill', color: '#6f42c1' },
+                { class: 'bi-gear-fill', color: '#6c757d' },
+                { class: 'bi-download', color: '#0056b3' },
+                { class: 'bi-upload', color: '#28a745' },
+                { class: 'bi-arrow-clockwise', color: '#17a2b8' },
+                { class: 'bi-archive-fill', color: '#6c757d' },
+                { class: 'bi-copy', color: '#0056b3' },
+                { class: 'bi-link-45deg', color: '#26baac' },
+                { class: 'bi-info-circle-fill', color: '#17a2b8' },
+                { class: 'bi-exclamation-triangle-fill', color: '#ffc107' }
+            ];
+            
+            bootstrapSelector.innerHTML = '';
+            
+            for (const iconData of bootstrapIcons) {
+                const iconItem = document.createElement('div');
+                iconItem.className = 'icon-selector-item';
+                
+                let iconClass = '';
+                let iconColor = '';
+                
+                if (typeof iconData === 'string') {
+                    iconClass = iconData;
+                } else {
+                    iconClass = iconData.class;
+                    iconColor = iconData.color;
+                }
+                
+                iconItem.dataset.icon = iconClass;
+                iconItem.dataset.library = 'bootstrap';
+                
+                if (iconClass === '') {
+                    iconItem.innerHTML = '<div class="icon-preview no-icon"><span>ללא</span></div>';
+                } else {
+                    const colorStyle = iconColor ? `style="font-size: 24px; color: ${iconColor};"` : 'style="font-size: 24px;"';
+                    iconItem.innerHTML = `<div class="icon-preview"><i class="${iconClass}" ${colorStyle}></i></div>`;
+                }
+                
+                iconItem.addEventListener('click', () => {
+                    this._selectWatchListIcon(iconClass, 'bootstrap', modalElement);
+                });
+                
+                bootstrapSelector.appendChild(iconItem);
+            }
+        }
+        
+        window.Logger?.info?.('✅ Watch list icons populated', { page: 'modal-manager-v2' });
+    }
+    
+    /**
+     * Select watch list icon
+     * @param {string} iconName - Icon name/class
+     * @param {string} library - Icon library
+     * @param {HTMLElement} modalElement - The modal element
+     * @private
+     */
+    async _selectWatchListIcon(iconName, library, modalElement) {
+        const iconInput = modalElement.querySelector('#watchListIcon');
+        const libraryInput = modalElement.querySelector('#watchListIconLibrary');
+        const preview = modalElement.querySelector('#watchListSelectedIconPreview');
+        
+        if (!iconInput || !libraryInput || !preview) {
+            return;
+        }
+        
+        iconInput.value = iconName;
+        libraryInput.value = library;
+        
+        // Remove active class from all items
+        modalElement.querySelectorAll('.icon-selector-item').forEach(item => {
+            item.classList.remove('active');
+        });
+        
+        // Add active class to selected item
+        const selectedItem = modalElement.querySelector(`[data-icon="${iconName}"][data-library="${library}"]`);
+        if (selectedItem) {
+            selectedItem.classList.add('active');
+        }
+        
+        // Update preview
+        if (iconName === '') {
+            preview.innerHTML = '<span class="icon-preview-placeholder">ללא איקון</span>';
+        } else if (library === 'bootstrap') {
+            preview.innerHTML = `<i class="${iconName}" style="font-size: 20px;"></i>`;
+        } else {
+            try {
+                if (window.IconSystem) {
+                    const iconHTML = await window.IconSystem.renderIcon('button', iconName, {
+                        size: '20',
+                        alt: iconName,
+                        class: 'icon-preview-icon'
+                    });
+                    preview.innerHTML = iconHTML;
+                } else {
+                    preview.innerHTML = `<span>${iconName}</span>`;
+                }
+            } catch (error) {
+                preview.innerHTML = `<span>${iconName}</span>`;
+            }
+        }
+    }
+    
+    /**
+     * Setup watch list view mode selector
+     * @param {HTMLElement} modalElement - The modal element
+     * @private
+     */
+    _setupWatchListViewModeSelector(modalElement) {
+        const viewModeInput = modalElement.querySelector('#watchListViewMode');
+        const radioButtons = modalElement.querySelectorAll('input[name="watchListViewMode"]');
+        
+        if (!viewModeInput || !radioButtons.length) {
+            return;
+        }
+        
+        // Set default value if no radio is checked
+        const checkedRadio = Array.from(radioButtons).find(r => r.checked);
+        if (!checkedRadio && radioButtons.length > 0) {
+            // Check the first radio button (should be 'table' with checked attribute)
+            const firstRadio = Array.from(radioButtons).find(r => r.hasAttribute('checked')) || radioButtons[0];
+            if (firstRadio) {
+                firstRadio.checked = true;
+                viewModeInput.value = firstRadio.value || 'table';
+            }
+        } else if (checkedRadio) {
+            viewModeInput.value = checkedRadio.value || 'table';
+        } else {
+            viewModeInput.value = 'table'; // Default
+        }
+        
+        radioButtons.forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                if (e.target.checked) {
+                    viewModeInput.value = e.target.value;
+                }
+            });
+        });
+        
+        // Initialize tooltips
+        if (window.advancedButtonSystem && typeof window.advancedButtonSystem.initializeTooltips === 'function') {
+            window.advancedButtonSystem.initializeTooltips(modalElement);
         }
     }
 }

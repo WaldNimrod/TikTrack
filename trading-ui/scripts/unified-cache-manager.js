@@ -203,7 +203,23 @@ const TTL_POLICIES = {
     'market-data': 'very-short',     // 1 minute
     'quote-{symbol}': 'very-short',  // 1 minute
     'dashboard-data': 'medium',      // 30 minutes
-    'statistics-data': 'medium'      // 30 minutes
+    'statistics-data': 'medium',     // 30 minutes
+    // Historical Data TTL Policies
+    'trade-history-data': 'short',   // 5 minutes
+    'trade-history-data-*': 'short', // 5 minutes
+    'trade-history-statistics-*': 'short', // 5 minutes
+    'trade-history-aggregated-*': 'short', // 5 minutes
+    'trade-history-plan-vs-execution-*': 'short', // 5 minutes
+    'portfolio-state-data': 'medium', // 10 minutes (historical data changes less)
+    'portfolio-state-snapshot-*': 'medium', // 10 minutes
+    'portfolio-state-series-*': 'medium', // 10 minutes
+    'portfolio-state-performance-*': 'medium', // 10 minutes
+    'portfolio-state-comparison-*': 'medium', // 10 minutes
+    'trading-journal-data': 'short', // 3 minutes (changes more frequently)
+    'trading-journal-data-*': 'short', // 3 minutes
+    'trading-journal-statistics-*': 'short', // 3 minutes
+    'trading-journal-calendar-*': 'short', // 3 minutes
+    'trading-journal-by-entity-*': 'short' // 3 minutes
 };
 
 // TTL Values in milliseconds
@@ -276,7 +292,23 @@ class UnifiedCacheManager {
             'account-balance-*': { layer: 'backend', ttl: 60000, compress: false, dependencies: ['accounts-data', 'cash-flows-data', 'executions-data'] },
             'positions-account-*': { layer: 'backend', ttl: 300000, compress: false, dependencies: ['executions', 'market_data_quotes'] },
             'portfolio-*': { layer: 'backend', ttl: 300000, compress: false, dependencies: ['executions', 'market_data_quotes'] },
-            'portfolio-summary-*': { layer: 'backend', ttl: 300000, compress: false, dependencies: ['executions', 'market_data_quotes'] }
+            'portfolio-summary-*': { layer: 'backend', ttl: 300000, compress: false, dependencies: ['executions', 'market_data_quotes'] },
+            // Historical Data Cache Configuration
+            'trade-history-data': { layer: 'backend', ttl: 300000, compress: false, dependencies: ['trades', 'executions', 'trade-plans'] },
+            'trade-history-data-*': { layer: 'backend', ttl: 300000, compress: false, dependencies: ['trades', 'executions', 'trade-plans'] },
+            'trade-history-statistics-*': { layer: 'backend', ttl: 300000, compress: false },
+            'trade-history-aggregated-*': { layer: 'backend', ttl: 300000, compress: false },
+            'trade-history-plan-vs-execution-*': { layer: 'backend', ttl: 300000, compress: false },
+            'portfolio-state-data': { layer: 'backend', ttl: 600000, compress: false, dependencies: ['executions', 'market_data_quotes', 'trades'] },
+            'portfolio-state-snapshot-*': { layer: 'backend', ttl: 600000, compress: false, dependencies: ['executions', 'market_data_quotes', 'trades'] },
+            'portfolio-state-series-*': { layer: 'backend', ttl: 600000, compress: false, dependencies: ['executions', 'market_data_quotes', 'trades'] },
+            'portfolio-state-performance-*': { layer: 'backend', ttl: 600000, compress: false, dependencies: ['executions', 'market_data_quotes', 'trades'] },
+            'portfolio-state-comparison-*': { layer: 'backend', ttl: 600000, compress: false, dependencies: ['executions', 'market_data_quotes', 'trades'] },
+            'trading-journal-data': { layer: 'backend', ttl: 180000, compress: false, dependencies: ['notes', 'trades', 'executions'] },
+            'trading-journal-data-*': { layer: 'backend', ttl: 180000, compress: false, dependencies: ['notes', 'trades', 'executions'] },
+            'trading-journal-statistics-*': { layer: 'backend', ttl: 180000, compress: false },
+            'trading-journal-calendar-*': { layer: 'backend', ttl: 180000, compress: false },
+            'trading-journal-by-entity-*': { layer: 'backend', ttl: 180000, compress: false }
         };
         
         // ממשקי שכבות מטמון

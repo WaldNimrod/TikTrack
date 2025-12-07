@@ -1164,6 +1164,33 @@
                 icon_library: { id: 'watchListIconLibrary', type: 'text' },
                 view_mode: { id: 'watchListViewMode', type: 'text' }
             });
+            
+            // Ensure view_mode is valid - get from radio button if hidden input is empty
+            if (!formData.view_mode || formData.view_mode.trim() === '') {
+                const modalElement = document.getElementById('watchListModal');
+                if (modalElement) {
+                    const checkedRadio = modalElement.querySelector('input[name="watchListViewMode"]:checked');
+                    if (checkedRadio && checkedRadio.value) {
+                        formData.view_mode = checkedRadio.value;
+                    } else {
+                        // Try to get the first checked radio or default to 'table'
+                        const firstRadio = modalElement.querySelector('input[name="watchListViewMode"][value="table"]');
+                        if (firstRadio) {
+                            firstRadio.checked = true;
+                            formData.view_mode = 'table';
+                        } else {
+                            formData.view_mode = 'table'; // Default
+                        }
+                    }
+                } else {
+                    formData.view_mode = 'table'; // Default fallback
+                }
+            }
+            
+            // Validate view_mode value
+            if (!formData.view_mode || !['table', 'cards', 'compact'].includes(formData.view_mode)) {
+                formData.view_mode = 'table'; // Fallback to default
+            }
 
             let result;
             const operation = mode === 'edit' && listId ? 'update' : 'create';
@@ -1875,6 +1902,10 @@
         addTickerToList,
         removeItem,
         refreshAll,
+        
+        // Export saveWatchList to window for ModalManagerV2
+        // This ensures the save button in the modal can find the function
+        // Note: watch-list-modal.js also exports saveWatchList, but this one is more complete
 
         // Utilities
         getCurrentListId
@@ -1894,6 +1925,12 @@
     window.setFlag = setFlag;
     window.removeFlag = removeFlag;
     window.setViewMode = setViewMode;
+    
+    // Export saveWatchList to window for ModalManagerV2 onclick handler
+    // This ensures the save button in the modal can find the function
+    // Note: watch-list-modal.js also exports saveWatchList, but this one is more complete
+    // and handles mode detection from ModalManagerV2 properly
+    window.saveWatchList = saveWatchList;
 
     window.Logger?.info?.('✅ WatchListsPage loaded successfully', PAGE_LOG_CONTEXT);
 

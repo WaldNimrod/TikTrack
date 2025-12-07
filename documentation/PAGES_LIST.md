@@ -149,10 +149,12 @@
 ### עמודי אימות
 | עמוד | תיאור | גישה |
 |------|--------|------|
-| **login.html** | כניסה למערכת | `http://localhost:8080/login.html` |
+| **~~login.html~~** | ~~כניסה למערכת~~ | **הוסר - כניסה עובדת במודול (auth.js)** |
 | **register.html** | הרשמה למערכת | `http://localhost:8080/register.html` |
 | **forgot-password.html** | שחזור סיסמה | `http://localhost:8080/forgot-password.html` |
 | **reset-password.html** | איפוס סיסמה | `http://localhost:8080/reset-password.html` |
+
+**הערה:** מסך הכניסה עבר לעבוד במודול (`auth.js` - `showLoginModal()`) ולא בעמוד נפרד. המודול מופיע אוטומטית כאשר נדרש authentication.
 
 ### עמודי כלים לפיתוח
 | עמוד | תיאור | גישה |

@@ -49,7 +49,7 @@
  * - saveWatchList() - שמירת רשימה
  * - deleteList(listId) - מחיקת רשימה
  * - selectList(listId) - בחירת רשימה פעילה
- * - addTickerToList() - הוספת טיקר לרשימה
+ * - (addTickerToList is now in add-ticker-modal.js)
  * - removeItem(itemId) - הסרת פריט מהרשימה
  * - refreshAll() - רענון כל הנתונים
  * 
@@ -319,6 +319,12 @@
                 activeListItems = [];
             }
             
+            // Enrich items with full ticker data (current price, position, etc.)
+            if (activeListItems.length > 0 && window.entityDetailsAPI?.getEntityDetails) {
+                window.Logger?.debug?.('🔄 Enriching items with ticker market data', { ...PAGE_LOG_CONTEXT, count: activeListItems.length });
+                activeListItems = await enrichWatchListItemsWithTickerData(activeListItems);
+            }
+            
             // Ensure we have data before rendering
             if (activeListItems.length === 0) {
                 window.Logger?.debug?.('No items in list, rendering empty state', { ...PAGE_LOG_CONTEXT, listId });
@@ -338,6 +344,68 @@
                     `לא ניתן לטעון את הפריטים. ${errorMsg}`);
             }
         }
+    }
+
+    /**
+     * Enrich watch list items with full ticker market data
+     * @param {Array} items - Watch list items to enrich
+     * @returns {Promise<Array>} Enriched items
+     */
+    async function enrichWatchListItemsWithTickerData(items) {
+        if (!window.entityDetailsAPI?.getEntityDetails) {
+            window.Logger?.warn?.('⚠️ entityDetailsAPI not available, skipping enrichment', PAGE_LOG_CONTEXT);
+            return items;
+        }
+
+        const enrichedItems = await Promise.all(
+            items.map(async (item) => {
+                try {
+                    // Get ticker ID (either from item.ticker_id or item.ticker.id)
+                    const tickerId = item.ticker_id || item.ticker?.id;
+                    if (!tickerId) {
+                        window.Logger?.debug?.('⚠️ No ticker ID for item, skipping enrichment', { ...PAGE_LOG_CONTEXT, itemId: item.id });
+                        return item;
+                    }
+
+                    // Load full ticker data with market data
+                    const tickerData = await window.entityDetailsAPI.getEntityDetails('ticker', tickerId, {
+                        includeMarketData: true,
+                        includeLinkedItems: false, // Don't load linked items for performance
+                        forceRefresh: false
+                    });
+
+                    if (tickerData) {
+                        // Merge ticker data into item.ticker
+                        item.ticker = {
+                            ...(item.ticker || {}),
+                            ...tickerData
+                        };
+                        
+                        window.Logger?.debug?.('✅ Enriched item with ticker data', {
+                            ...PAGE_LOG_CONTEXT,
+                            itemId: item.id,
+                            tickerId,
+                            hasPrice: !!tickerData.current_price,
+                            hasChange: !!tickerData.change_percent,
+                            hasPosition: !!tickerData.position
+                        });
+                    }
+
+                    return item;
+                } catch (error) {
+                    // If enrichment fails, return original item
+                    window.Logger?.warn?.('⚠️ Failed to enrich item with ticker data', {
+                        ...PAGE_LOG_CONTEXT,
+                        itemId: item.id,
+                        tickerId: item.ticker_id || item.ticker?.id,
+                        error: error?.message || error
+                    });
+                    return item;
+                }
+            })
+        );
+
+        return enrichedItems;
     }
 
     // ===== RENDERING =====
@@ -484,9 +552,16 @@
         // Update select dropdown
         updateActiveListSelect();
 
-        // Initialize button system for new buttons
-        if (window.ButtonSystemInit?.initializeButtons) {
-            window.ButtonSystemInit.initializeButtons(tbody);
+        // Initialize button system for new buttons - use processButtons instead of initializeButtons for better icon rendering
+        if (window.ButtonSystemInit?.processButtons) {
+            // Use setTimeout to ensure DOM is ready
+            setTimeout(() => {
+                window.ButtonSystemInit.processButtons(tbody);
+            }, 100);
+        } else if (window.ButtonSystemInit?.initializeButtons) {
+            setTimeout(() => {
+                window.ButtonSystemInit.initializeButtons(tbody);
+            }, 100);
         }
 
         window.Logger?.debug?.('📊 Watch lists grid rendered', { ...PAGE_LOG_CONTEXT, count: watchListsData.length });
@@ -693,11 +768,35 @@
             }
             tr.appendChild(tdATR);
 
-            // Position column - need to fetch position data (placeholder for now)
+            // Position column - display position if available
             const tdPosition = document.createElement('td');
-            // TODO: Fetch position data if available
-            tdPosition.textContent = '-';
-            tdPosition.className = 'text-muted';
+            const position = ticker.position || item.position || null;
+            if (position && position.quantity !== undefined && position.quantity !== null) {
+                const quantity = parseFloat(position.quantity) || 0;
+                const side = position.side || (quantity > 0 ? 'long' : quantity < 0 ? 'short' : 'closed');
+                const quantityAbs = Math.abs(quantity);
+                
+                // Render quantity with sign and side badge
+                let positionHtml = '';
+                if (quantity !== 0) {
+                    const sign = quantity > 0 ? '+' : '-';
+                    const sideClass = side === 'long' ? 'text-success' : side === 'short' ? 'text-danger' : '';
+                    const sideLabel = side === 'long' ? 'לונג' : side === 'short' ? 'שורט' : '';
+                    
+                    if (window.FieldRendererService?.renderSide) {
+                        positionHtml = `${window.FieldRendererService.renderSide(side)} #${sign}${quantityAbs.toLocaleString()}`;
+                    } else {
+                        positionHtml = `<span class="badge badge-${side} me-1">${sideLabel}</span>#${sign}${quantityAbs.toLocaleString()}`;
+                    }
+                } else {
+                    positionHtml = '-';
+                }
+                
+                tdPosition.innerHTML = positionHtml;
+            } else {
+                tdPosition.textContent = '-';
+                tdPosition.className = 'text-muted';
+            }
             tr.appendChild(tdPosition);
 
             // P/L column - using FieldRendererService
@@ -728,30 +827,24 @@
             const actionsContainer = document.createElement('div');
             actionsContainer.className = 'action-buttons-container';
 
-            // Edit button
+            // Edit button - using data-button-type for proper icon rendering
             const editBtn = document.createElement('button');
             editBtn.type = 'button';
-            editBtn.className = 'btn btn-sm btn-icon-only';
+            editBtn.setAttribute('data-button-type', 'EDIT');
+            editBtn.setAttribute('data-variant', 'small');
+            editBtn.setAttribute('data-text', '');
             editBtn.setAttribute('data-onclick', `window.WatchListsPage?.editItem(${item.id})`);
             editBtn.title = 'עריכה';
-            const editIcon = document.createElement('span');
-            editIcon.className = 'icon-placeholder icon';
-            editIcon.setAttribute('data-icon', 'edit');
-            editIcon.setAttribute('data-size', '16');
-            editBtn.appendChild(editIcon);
             actionsContainer.appendChild(editBtn);
 
-            // Delete button
+            // Delete button - using data-button-type for proper icon rendering
             const deleteBtn = document.createElement('button');
             deleteBtn.type = 'button';
-            deleteBtn.className = 'btn btn-sm btn-icon-only';
+            deleteBtn.setAttribute('data-button-type', 'DELETE');
+            deleteBtn.setAttribute('data-variant', 'small');
+            deleteBtn.setAttribute('data-text', '');
             deleteBtn.setAttribute('data-onclick', `window.WatchListsPage?.removeItem(${item.id})`);
             deleteBtn.title = 'מחיקה';
-            const deleteIcon = document.createElement('span');
-            deleteIcon.className = 'icon-placeholder icon';
-            deleteIcon.setAttribute('data-icon', 'trash');
-            deleteIcon.setAttribute('data-size', '16');
-            deleteBtn.appendChild(deleteIcon);
             actionsContainer.appendChild(deleteBtn);
 
             tdActions.appendChild(actionsContainer);
@@ -760,9 +853,15 @@
             tbody.appendChild(tr);
         }
 
-        // Initialize button system for new buttons
-        if (window.ButtonSystemInit?.initializeButtons) {
-            window.ButtonSystemInit.initializeButtons(tbody);
+        // Initialize button system for new buttons - use processButtons for better icon rendering
+        if (window.ButtonSystemInit?.processButtons) {
+            setTimeout(() => {
+                window.ButtonSystemInit.processButtons(tbody);
+            }, 100);
+        } else if (window.ButtonSystemInit?.initializeButtons) {
+            setTimeout(() => {
+                window.ButtonSystemInit.initializeButtons(tbody);
+            }, 100);
         }
 
         window.Logger?.debug?.('📊 Watch list items table updated', { ...PAGE_LOG_CONTEXT, count: items.length });
@@ -1150,10 +1249,6 @@
                     reloadFn: async () => {
                         await loadWatchLists();
                         renderSummaryStats();
-                        // If we created a new list, select it automatically
-                        if (!isEdit && result && result.data && result.data.id) {
-                            await selectList(result.data.id);
-                        }
                     },
                     requiresHardReload: false,
                     fieldMap: {
@@ -1233,64 +1328,44 @@
 
     async function deleteList(listId) {
         try {
-            // Get list name for confirmation message
-            const list = watchListsData.find(l => l.id === listId);
-            const listName = list?.name || `רשימה #${listId}`;
-
-            // Show confirmation dialog
-            const confirmed = await new Promise((resolve) => {
-                if (typeof window.showConfirmationDialog === 'function') {
-                    window.showConfirmationDialog(
-                        'מחיקת רשימת צפייה',
-                        `האם אתה בטוח שברצונך למחוק את הרשימה "${listName}"?\n\nפעולה זו תמחק את הרשימה וכל הפריטים שבה לצמיתות.`,
-                        () => resolve(true),
-                        () => resolve(false),
-                        'danger'
-                    );
-                } else {
-                    resolve(window.confirm(`האם אתה בטוח שברצונך למחוק את הרשימה "${listName}"?`));
-                }
-            });
-
-            if (!confirmed) {
-                window.Logger?.info?.('🗑️ Delete cancelled by user', { ...PAGE_LOG_CONTEXT, listId });
-                return;
-            }
-
-            // Check linked items before deletion
-            if (typeof window.checkLinkedItemsBeforeAction === 'function') {
-                const hasLinkedItems = await window.checkLinkedItemsBeforeAction('watch_list', listId, 'delete');
-                if (hasLinkedItems) {
-                    return; // User cancelled
-                }
-            }
-
-            // Delete via data service
-            if (window.WatchListsDataService?.deleteWatchList) {
-                const result = await window.WatchListsDataService.deleteWatchList(listId);
-
-                // Handle response via CRUDResponseHandler
-                if (window.CRUDResponseHandler?.handleResponse) {
-                    await window.CRUDResponseHandler.handleResponse(result, {
-                        entityType: 'watch_list',
-                        operation: 'delete',
-                        onSuccess: async () => {
-                            await loadWatchLists();
-                            renderSummaryStats();
-                            if (activeListId === listId) {
-                                activeListId = null;
-                                activeListItems = [];
-                                Promise.resolve(renderActiveListView([])).catch(error => {
-                                    window.Logger?.error?.('Error clearing active list view', { ...PAGE_LOG_CONTEXT, error });
-                                });
-                            }
-                        },
-                        showNotification: true
-                    });
+            // Use UnifiedCRUDService for consistent CRUD operations
+            // UnifiedCRUDService handles confirmation and linked items checking via entityDetailsAPI
+            if (window.UnifiedCRUDService && typeof window.UnifiedCRUDService.deleteEntity === 'function') {
+                const success = await window.UnifiedCRUDService.deleteEntity('watch_list', listId, {
+                    successMessage: 'רשימה נמחקה בהצלחה',
+                    entityName: 'רשימה',
+                    reloadFn: async () => {
+                        await loadWatchLists();
+                        renderSummaryStats();
+                        // Clear active list if it was deleted
+                        if (activeListId === listId) {
+                            activeListId = null;
+                            activeListItems = [];
+                            await renderActiveListView([]);
+                        }
+                    },
+                    requiresHardReload: false,
+                    checkLinkedItems: async (entityType, entityId) => {
+                        if (typeof window.checkLinkedItemsBeforeAction === 'function') {
+                            return await window.checkLinkedItemsBeforeAction(entityType, entityId, 'delete');
+                        }
+                        return false;
+                    }
+                });
+                
+                return success;
+            } else {
+                // Fallback to direct API call (should not happen in production)
+                window.Logger?.warn?.('⚠️ UnifiedCRUDService.deleteEntity not available', PAGE_LOG_CONTEXT);
+                if (typeof window.showErrorNotification === 'function') {
+                    window.showErrorNotification('שגיאה', 'מערכת מחיקה לא זמינה');
                 }
             }
         } catch (error) {
             window.Logger?.error?.('❌ Error deleting list', { ...PAGE_LOG_CONTEXT, listId, error: error?.message || error });
+            if (typeof window.showErrorNotification === 'function') {
+                window.showErrorNotification('שגיאה', `לא ניתן למחוק את הרשימה: ${error?.message || 'שגיאה לא ידועה'}`);
+            }
         }
     }
 
@@ -1336,48 +1411,7 @@
      * Add ticker to list
      * @async
      */
-    async function addTickerToList() {
-        try {
-            if (!window.DataCollectionService) {
-                window.Logger?.warn?.('⚠️ DataCollectionService not available', PAGE_LOG_CONTEXT);
-                return;
-            }
-
-            // Collect form data
-            const formData = window.DataCollectionService.collectFormData({
-                ticker_id: { id: 'selectedTickerId', type: 'int' },
-                external_symbol: { id: 'externalSymbol', type: 'text' },
-                external_name: { id: 'externalName', type: 'text' },
-                flag_color: { id: 'itemFlagColor', type: 'text' },
-                notes: { id: 'itemNotes', type: 'text' }
-            });
-
-            // Add via data service
-            if (window.WatchListsDataService?.addTickerToList && activeListId) {
-                const result = await window.WatchListsDataService.addTickerToList(activeListId, formData);
-
-                // Handle response via CRUDResponseHandler
-                if (window.CRUDResponseHandler?.handleResponse) {
-                    await window.CRUDResponseHandler.handleResponse(result, {
-                        entityType: 'watch_list_item',
-                        operation: 'create',
-                        onSuccess: async () => {
-                            await loadWatchListItems(activeListId);
-                            renderSummaryStats();
-                        },
-                        showNotification: true
-                    });
-                }
-
-                // Close modal
-                if (window.ModalManagerV2?.hideModal) {
-                    window.ModalManagerV2.hideModal('addTickerModal');
-                }
-            }
-        } catch (error) {
-            window.Logger?.error?.('❌ Error adding ticker to list', { ...PAGE_LOG_CONTEXT, error: error?.message || error });
-        }
-    }
+    // addTickerToList is now in add-ticker-modal.js - removed duplicate implementation
 
     /**
      * Remove item from list
@@ -1875,7 +1909,7 @@
         deleteList,
         deleteCurrentList,
         selectList,
-        addTickerToList,
+        // addTickerToList is now in add-ticker-modal.js
         removeItem,
         refreshAll,
 

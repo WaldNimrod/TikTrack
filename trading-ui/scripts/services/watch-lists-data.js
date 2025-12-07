@@ -264,17 +264,13 @@
         signal,
       });
       
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error?.message || `Failed to create watch list (${response.status})`);
+      if (response.ok) {
+        // Invalidate cache on success
+        await invalidateWatchListsCache();
       }
       
-      const result = await response.json();
-      
-      // Invalidate cache
-      await invalidateWatchListsCache();
-      
-      return result.data || null;
+      // Return Response object (not parsed data) - UnifiedCRUDService/CRUDResponseHandler will handle it
+      return response;
     } catch (error) {
       window.Logger?.error?.('❌ Error creating watch list', {
         ...PAGE_LOG_CONTEXT,
@@ -298,17 +294,13 @@
         signal,
       });
       
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error?.message || `Failed to update watch list (${response.status})`);
+      if (response.ok) {
+        // Invalidate cache on success
+        await invalidateWatchListsCache();
       }
       
-      const result = await response.json();
-      
-      // Invalidate cache
-      await invalidateWatchListsCache();
-      
-      return result.data || null;
+      // Return Response object (not parsed data) - UnifiedCRUDService/CRUDResponseHandler will handle it
+      return response;
     } catch (error) {
       window.Logger?.error?.('❌ Error updating watch list', {
         ...PAGE_LOG_CONTEXT,

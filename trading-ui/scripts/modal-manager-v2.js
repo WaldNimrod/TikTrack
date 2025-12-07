@@ -6577,6 +6577,18 @@ class ModalManagerV2 {
             }
         }
 
+        // For Add Ticker Modal - initialize ticker search handlers
+        if (modalId === 'addTickerModal') {
+            if (window.AddTickerModal && typeof window.AddTickerModal.init === 'function') {
+                // Initialize ticker search handlers when modal is shown
+                setTimeout(() => {
+                    if (typeof window.AddTickerModal.initializeTickerSearchHandlers === 'function') {
+                        window.AddTickerModal.initializeTickerSearchHandlers();
+                    }
+                }, 100);
+            }
+        }
+
         // For Tickers modal - load provider symbol fields
         if (modalId === 'tickersModal') {
             // Load provider symbol fields when modal is shown

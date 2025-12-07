@@ -76,9 +76,14 @@ class HistoricalDataBusinessService(BaseBusinessService):
             data: Request data dictionary with keys:
                 - user_id: int (required, positive)
                 - account_id: int (optional, positive)
-                - start_date: str/datetime (required, ISO format)
-                - end_date: str/datetime (required, ISO format, must be >= start_date)
+                - start_date: str/datetime (optional, ISO format)
+                - end_date: str/datetime (optional, ISO format, must be >= start_date)
                 - date: str/datetime (optional, for single date queries)
+                - ticker_id: int (optional, positive)
+                - status: str (optional, filter by status)
+                - investment_type: str (optional, filter by investment type)
+                
+        Note: If no dates are provided, all trades for the user will be returned.
             
         Returns:
             Dict with:
@@ -99,9 +104,8 @@ class HistoricalDataBusinessService(BaseBusinessService):
         end_date = data.get('end_date')
         date = data.get('date')
         
-        # Either date range or single date must be provided
-        if not (start_date and end_date) and not date:
-            errors.append('Either date range (start_date, end_date) or single date must be provided')
+        # Dates are optional - if not provided, return all trades
+        # Only validate if dates are provided
         
         # Validate date range if provided
         if start_date and end_date:
@@ -149,6 +153,12 @@ class HistoricalDataBusinessService(BaseBusinessService):
         if account_id is not None:
             if not isinstance(account_id, int) or account_id <= 0:
                 errors.append('account_id must be a positive integer if provided')
+        
+        # Step 4: Ticker ID validation (if provided)
+        ticker_id = data.get('ticker_id')
+        if ticker_id is not None:
+            if not isinstance(ticker_id, int) or ticker_id <= 0:
+                errors.append('ticker_id must be a positive integer if provided')
         
         return {
             'is_valid': len(errors) == 0,
@@ -268,13 +278,54 @@ class HistoricalDataBusinessService(BaseBusinessService):
         Returns:
             Dict with aggregated trade history
         """
-        # Placeholder implementation
-        return {
-            'trades': [],
-            'count': 0,
-            'grouped': {} if group_by else None,
-            'is_valid': True
-        }
+        if not self.db_session:
+            return {
+                'trades': [],
+                'count': 0,
+                'grouped': {} if group_by else None,
+                'is_valid': False,
+                'error': 'Database session not available'
+            }
+        
+        try:
+            from services.trade_aggregation_service import TradeAggregationService
+            
+            # Map filters to TradeAggregationService parameters
+            aggregation_result = TradeAggregationService.aggregate_trades(
+                db=self.db_session,
+                user_id=user_id,
+                ticker_id=filters.get('ticker_id'),
+                trading_account_id=filters.get('account_id'),
+                investment_type=filters.get('investment_type'),
+                status=filters.get('status'),
+                date_range_start=filters.get('start_date'),
+                date_range_end=filters.get('end_date'),
+                include_closed=True,
+                enrich_with_position=True
+            )
+            
+            trades = aggregation_result.get('trades', [])
+            
+            # Group trades if group_by is specified
+            grouped = None
+            if group_by:
+                grouped = self._group_trades(trades, group_by)
+            
+            return {
+                'trades': trades,
+                'count': len(trades),
+                'grouped': grouped,
+                'is_valid': True
+            }
+        except Exception as e:
+            self.logger.error(f"Error aggregating trade history: {str(e)}", exc_info=True)
+            return {
+                'trades': [],
+                'count': 0,
+                'grouped': {} if group_by else None,
+                'is_valid': False,
+                'error': str(e)
+            }
     
     def calculate_trade_statistics(
         self,

@@ -447,7 +447,7 @@ const PACKAGE_MANIFEST = {
         file: 'services/executions-data.js',
         globalCheck: 'window.ExecutionsData',
         description: 'Executions data service (API + Cache + CRUD)',
-        required: true, // Required for executions page
+        required: false, // Required only for executions page, not all pages
         loadOrder: 5.2
       },
       {
@@ -1384,6 +1384,13 @@ const PACKAGE_MANIFEST = {
         description: 'Trading journal data service',
         required: false,  // Required only for trading-journal-page
         loadOrder: 9
+      },
+      {
+        file: 'trade-history-page.js',
+        globalCheck: 'window.tradeHistoryPage',
+        description: 'Trade history page script (page-specific)',
+        required: false,  // Required only for trade-history page
+        loadOrder: 10
       },
       {
         file: 'account-service.js',

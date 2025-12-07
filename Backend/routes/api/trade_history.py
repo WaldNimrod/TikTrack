@@ -34,6 +34,22 @@ logger = logging.getLogger(__name__)
 trade_history_bp = Blueprint('trade_history', __name__, url_prefix='/api/trade-history')
 
 
+def _resolve_user_id() -> Optional[int]:
+    """
+    Resolve user_id from Flask context or request parameters.
+    
+    Returns:
+        user_id if found, None otherwise
+    """
+    user_id = getattr(g, 'user_id', None)
+    if not user_id:
+        # Fallback: explicit user_id passed in request (query/body)
+        user_id = request.args.get('user_id', type=int)
+        if not user_id and request.is_json:
+            user_id = request.get_json().get('user_id') if request.get_json() else None
+    return user_id
+
+
 @trade_history_bp.route('/', methods=['GET'])
 @handle_database_session()
 @cache_with_deps(ttl=300, dependencies=['trades', 'executions', 'trade-plans'])
@@ -57,14 +73,8 @@ def get_trade_history():
     try:
         db: Session = g.db
         
-        # Get user_id from Flask context (set by auth middleware)
-        user_id = getattr(g, 'user_id', None)
-        if not user_id:
-            error_payload = BaseEntityUtils.create_error_payload(
-                None,
-                "User authentication required"
-            )
-            return jsonify(error_payload), 401
+        # Resolve user_id with fallback
+        user_id = _resolve_user_id()
         
         normalizer = BaseEntityUtils.get_request_normalizer(request)
         
@@ -171,7 +181,8 @@ def get_trade_statistics():
     try:
         db: Session = g.db
         
-        user_id = getattr(g, 'user_id', None)
+        # Resolve user_id with fallback
+        user_id = _resolve_user_id()
         if not user_id:
             error_payload = BaseEntityUtils.create_error_payload(
                 None,
@@ -276,13 +287,8 @@ def get_plan_vs_execution():
     try:
         db: Session = g.db
         
-        user_id = getattr(g, 'user_id', None)
-        if not user_id:
-            error_payload = BaseEntityUtils.create_error_payload(
-                None,
-                "User authentication required"
-            )
-            return jsonify(error_payload), 401
+        # Resolve user_id with fallback
+        user_id = _resolve_user_id()
         
         normalizer = BaseEntityUtils.get_request_normalizer(request)
         
@@ -373,7 +379,8 @@ def get_aggregated_trade_history():
     try:
         db: Session = g.db
         
-        user_id = getattr(g, 'user_id', None)
+        # Resolve user_id with fallback
+        user_id = _resolve_user_id()
         if not user_id:
             error_payload = BaseEntityUtils.create_error_payload(
                 None,

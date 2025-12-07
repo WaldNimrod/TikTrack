@@ -3389,9 +3389,14 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.HeaderSystem',
         'window.UnifiedTableSystem',
         'window.validateTextField', // Validation functions
-        'window.tickersModalConfig' // Required for nested ticker addition modal
+        'window.tickersModalConfig', // Required for nested ticker addition modal
+        'window.AddTickerModal', // Required for add ticker modal
+        'window.addTickerToList' // Required for add ticker modal save function
       ],
-      pageSpecificScripts: ['scripts/watch-lists-page.js'],
+      pageSpecificScripts: [
+        'scripts/watch-lists-page.js',
+        'scripts/add-ticker-modal.js' // Add ticker modal
+      ],
       description: 'עמוד ניהול רשימות צפייה - production',
       lastModified: '2025-12-06',
       pageType: 'main',
@@ -3647,7 +3652,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
           });
         },
       ],
-    },    'portfolio-state-page': {
+    },    'portfolio-state': {
       name: 'מצב תיק היסטורי',
       description: 'עמוד מצב תיק היסטורי - ניתוח וצפייה במצב תיק בנקודות זמן שונות',
       lastModified: '2025-01-12',
@@ -3729,7 +3734,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
           }
         },
       ],
-    },    'trade-history-page': {
+    },    'trade-history': {
       name: 'היסטוריית טרייד',
       description: 'עמוד היסטוריית טרייד - ניתוח וצפייה בהיסטוריית טריידים',
       lastModified: '2025-01-12',
@@ -3745,6 +3750,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         "entity-details",
         "info-summary",
         "charts",
+        "tradingview-charts", // Required for TradingView charts in trade history
         "init-system"
       ],
       requiredGlobals: [
@@ -3761,7 +3767,8 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         "window.SelectPopulatorService",
         "window.DataCollectionService",
         "window.CRUDResponseHandler",
-        "window.TradeHistoryData" // Trade History Data Service
+        "window.TradeHistoryData", // Trade History Data Service
+        "window.tradeHistoryPage" // Trade History Page Script
       ],
       preloadAssets: ['trade-history-page-data'],
       cacheStrategy: 'standard',
@@ -3770,7 +3777,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       requiresTables: true,
       customInitializers: [
         async pageConfig => {
-          window.Logger?.info('📄 Initializing trade-history-page...', {
+          window.Logger?.info('📄 Initializing trade-history...', {
             page: 'page-initialization-configs',
           });
           
@@ -3911,7 +3918,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
           });
         },
       ],
-    },    'trading-journal-page': {
+    },    'trading-journal': {
       name: 'יומן מסחר',
       description: 'עמוד יומן מסחר - ניהול ותצוגת יומן מסחר עם לוח שנה',
       lastModified: '2025-01-12',

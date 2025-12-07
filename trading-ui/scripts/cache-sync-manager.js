@@ -124,6 +124,9 @@ class CacheSyncManager {
       'alert-created': ['alerts-data', 'dashboard-data'],
       'alert-updated': ['alerts-data', 'dashboard-data', 'business:validate-condition-value*', 'business:validate-alert*'],
       'alert-deleted': ['alerts-data', 'dashboard-data'],
+      'watch-list-updated': ['watch-lists-data', 'watch-list-*'],
+      'watch-list-created': ['watch-lists-data', 'watch-list-*'],
+      'watch-list-deleted': ['watch-lists-data', 'watch-list-*'],
       'import-session-deleted': ['data-import-data', 'data-import-accounts'],
     };
   }

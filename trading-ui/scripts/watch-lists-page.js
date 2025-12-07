@@ -1332,20 +1332,22 @@
      * @param {number} itemId - Item ID
      */
     function showFlagPalette(itemId) {
-        // Use flag-quick-action.js if available
+        // Use flag-quick-action.js if available (preferred)
         if (window.FlagQuickAction?.show) {
-            const flagBtn = document.querySelector(`[data-item-id="${itemId}"] .btn-flag`);
+            // Find flag button in any view mode (table, cards, compact)
+            const itemElement = document.querySelector(`[data-item-id="${itemId}"]`);
+            const flagBtn = itemElement?.querySelector('.btn-flag');
             if (flagBtn) {
                 // Pass element for better positioning
                 window.FlagQuickAction.show(itemId, { element: flagBtn });
             } else {
+                // Fallback: show without element positioning
                 window.FlagQuickAction.show(itemId);
             }
         } else if (window.WatchListsUIService?.showFlagPalette) {
             window.WatchListsUIService.showFlagPalette(itemId);
         } else {
-            // Fallback - would open flag-quick-action modal
-            window.Logger?.debug?.('🚩 Flag palette requested', { ...PAGE_LOG_CONTEXT, itemId });
+            window.Logger?.warn?.('⚠️ Flag palette system not available', { ...PAGE_LOG_CONTEXT, itemId });
         }
     }
 

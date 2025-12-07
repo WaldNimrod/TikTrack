@@ -334,3 +334,4 @@
   window.Logger?.debug?.('✅ TradingJournalData service initialized', PAGE_LOG_CONTEXT);
 })();
 
+

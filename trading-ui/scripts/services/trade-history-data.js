@@ -338,3 +338,4 @@
   window.Logger?.debug?.('✅ TradeHistoryData service initialized', PAGE_LOG_CONTEXT);
 })();
 
+

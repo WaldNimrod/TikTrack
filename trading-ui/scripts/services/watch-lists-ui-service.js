@@ -195,35 +195,46 @@
          */
         async setFlag(itemId, color) {
             try {
-                // Update via data service
-                if (typeof window.WatchListsDataService?.updateWatchListItem === 'function') {
-                    // Get current list ID (would need to be passed or stored)
-                    const listId = this.getCurrentListId();
-                    if (listId) {
-                        await window.WatchListsDataService.updateWatchListItem(listId, itemId, { flag_color: color });
-                    }
+                // Get current list ID
+                const listId = this.getCurrentListId();
+                if (!listId) {
+                    window.Logger?.warn?.('⚠️ No active list ID available', { ...PAGE_LOG_CONTEXT, itemId });
+                    return;
                 }
 
-                // Update UI
+                // Update via data service
+                if (window.WatchListsDataService?.updateWatchListItem) {
+                    await window.WatchListsDataService.updateWatchListItem(listId, itemId, { flag_color: color });
+                } else {
+                    throw new Error('WatchListsDataService.updateWatchListItem not available');
+                }
+
+                // Invalidate cache
+                if (window.CacheSyncManager?.invalidateByAction) {
+                    await window.CacheSyncManager.invalidateByAction('watch-list-updated');
+                }
+
+                // Update UI immediately - support all view modes
                 const itemElement = document.querySelector(`[data-item-id="${itemId}"]`);
                 if (itemElement) {
                     const flagBtn = itemElement.querySelector('.btn-flag');
                     if (flagBtn) {
-                        flagBtn.setAttribute('data-flag-color', color);
-                        // Update icon via IconSystem
-                        if (typeof window.IconSystem?.renderIcon === 'function') {
-                            const iconHTML = await window.IconSystem.renderIcon('button', 'flag-filled', {
-                                size: '16',
-                                alt: 'flag',
-                                class: 'icon',
-                                style: `color: ${color}`
-                            });
-                            flagBtn.textContent = '';
-                            const parser = new DOMParser();
-                            const doc = parser.parseFromString(iconHTML, 'text/html');
-                            doc.body.childNodes.forEach(node => {
-                                flagBtn.appendChild(node.cloneNode(true));
-                            });
+                        if (color) {
+                            flagBtn.setAttribute('data-flag-color', color);
+                            flagBtn.style.color = color;
+                            const flagIcon = flagBtn.querySelector('.icon');
+                            if (flagIcon) {
+                                flagIcon.setAttribute('data-icon', 'flag-filled');
+                                flagIcon.style.color = color;
+                            }
+                        } else {
+                            flagBtn.removeAttribute('data-flag-color');
+                            flagBtn.style.color = '';
+                            const flagIcon = flagBtn.querySelector('.icon');
+                            if (flagIcon) {
+                                flagIcon.setAttribute('data-icon', 'flag');
+                                flagIcon.style.color = '';
+                            }
                         }
                     }
                 }
@@ -231,6 +242,7 @@
                 window.Logger?.info?.('✅ Flag set', { ...PAGE_LOG_CONTEXT, itemId, color });
             } catch (error) {
                 window.Logger?.error?.('❌ Error setting flag', { ...PAGE_LOG_CONTEXT, itemId, color, error: error?.message || error });
+                throw error; // Re-throw to allow caller to handle
             }
         }
 
@@ -240,33 +252,36 @@
          */
         async removeFlag(itemId) {
             try {
-                // Update via data service
-                if (typeof window.WatchListsDataService?.updateWatchListItem === 'function') {
-                    const listId = this.getCurrentListId();
-                    if (listId) {
-                        await window.WatchListsDataService.updateWatchListItem(listId, itemId, { flag_color: null });
-                    }
+                // Get current list ID
+                const listId = this.getCurrentListId();
+                if (!listId) {
+                    window.Logger?.warn?.('⚠️ No active list ID available', { ...PAGE_LOG_CONTEXT, itemId });
+                    return;
                 }
 
-                // Update UI
+                // Update via data service
+                if (window.WatchListsDataService?.updateWatchListItem) {
+                    await window.WatchListsDataService.updateWatchListItem(listId, itemId, { flag_color: null });
+                } else {
+                    throw new Error('WatchListsDataService.updateWatchListItem not available');
+                }
+
+                // Invalidate cache
+                if (window.CacheSyncManager?.invalidateByAction) {
+                    await window.CacheSyncManager.invalidateByAction('watch-list-updated');
+                }
+
+                // Update UI immediately - support all view modes
                 const itemElement = document.querySelector(`[data-item-id="${itemId}"]`);
                 if (itemElement) {
                     const flagBtn = itemElement.querySelector('.btn-flag');
                     if (flagBtn) {
                         flagBtn.removeAttribute('data-flag-color');
-                        // Update icon via IconSystem
-                        if (typeof window.IconSystem?.renderIcon === 'function') {
-                            const iconHTML = await window.IconSystem.renderIcon('button', 'flag', {
-                                size: '16',
-                                alt: 'flag',
-                                class: 'icon text-muted'
-                            });
-                            flagBtn.textContent = '';
-                            const parser = new DOMParser();
-                            const doc = parser.parseFromString(iconHTML, 'text/html');
-                            doc.body.childNodes.forEach(node => {
-                                flagBtn.appendChild(node.cloneNode(true));
-                            });
+                        flagBtn.style.color = '';
+                        const flagIcon = flagBtn.querySelector('.icon');
+                        if (flagIcon) {
+                            flagIcon.setAttribute('data-icon', 'flag');
+                            flagIcon.style.color = '';
                         }
                     }
                 }
@@ -274,6 +289,7 @@
                 window.Logger?.info?.('✅ Flag removed', { ...PAGE_LOG_CONTEXT, itemId });
             } catch (error) {
                 window.Logger?.error?.('❌ Error removing flag', { ...PAGE_LOG_CONTEXT, itemId, error: error?.message || error });
+                throw error; // Re-throw to allow caller to handle
             }
         }
 
@@ -306,43 +322,96 @@
          * @returns {number|null} Current list ID
          */
         getCurrentListId() {
-            // This would be stored in the page state
+            // Try to get from WatchListsPage first (most reliable)
+            if (window.WatchListsPage?.activeListId) {
+                return window.WatchListsPage.activeListId;
+            }
+            
+            // Fallback to PageStateManager
             if (typeof window.PageStateManager?.get === 'function') {
                 return window.PageStateManager.get('watch-lists-active-list-id');
             }
+            
             return null;
         }
 
         /**
-         * Initialize drag and drop (mockup - visual only)
+         * Initialize drag and drop for reordering items
          */
         initializeDragAndDrop() {
-            // Mockup implementation - visual only
-            const draggableItems = document.querySelectorAll('[draggable="true"]');
-            draggableItems.forEach(item => {
-                item.addEventListener('dragstart', this.handleDragStart.bind(this));
-                item.addEventListener('dragend', this.handleDragEnd.bind(this));
+            const tbody = document.querySelector('#watchListItemsTable tbody');
+            if (!tbody) {
+                window.Logger?.warn?.('⚠️ Watch list items table not found for drag & drop', { ...PAGE_LOG_CONTEXT });
+                return;
+            }
+
+            const rows = tbody.querySelectorAll('tr[data-item-id]');
+            let draggedElement = null;
+
+            rows.forEach(row => {
+                // Make row draggable
+                row.setAttribute('draggable', 'true');
+
+                // Drag start
+                row.addEventListener('dragstart', (e) => {
+                    draggedElement = row;
+                    row.classList.add('dragging');
+                    e.dataTransfer.effectAllowed = 'move';
+                    e.dataTransfer.setData('text/html', row.innerHTML);
+                });
+
+                // Drag end
+                row.addEventListener('dragend', () => {
+                    row.classList.remove('dragging');
+                    draggedElement = null;
+                });
+
+                // Drag over
+                row.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    e.dataTransfer.dropEffect = 'move';
+                    
+                    if (draggedElement && draggedElement !== row) {
+                        const rect = row.getBoundingClientRect();
+                        const next = (e.clientY - rect.top) / (rect.bottom - rect.top) > 0.5;
+                        tbody.insertBefore(draggedElement, next ? row.nextSibling : row);
+                    }
+                });
+
+                // Drop
+                row.addEventListener('drop', async (e) => {
+                    e.preventDefault();
+                    
+                    if (draggedElement && draggedElement !== row) {
+                        const rect = row.getBoundingClientRect();
+                        const next = (e.clientY - rect.top) / (rect.bottom - rect.top) > 0.5;
+                        tbody.insertBefore(draggedElement, next ? row.nextSibling : row);
+
+                        // Get new order
+                        const newOrder = Array.from(tbody.querySelectorAll('tr[data-item-id]')).map((r, index) => ({
+                            id: parseInt(r.getAttribute('data-item-id')),
+                            order: index + 1
+                        }));
+
+                        // Get current list ID
+                        const listId = window.WatchListsPage?.activeListId;
+                        if (listId && window.WatchListsDataService?.updateItemOrder) {
+                            try {
+                                await window.WatchListsDataService.updateItemOrder(listId, newOrder);
+                                window.Logger?.info?.('✅ Item order updated', { ...PAGE_LOG_CONTEXT, listId });
+                            } catch (error) {
+                                window.Logger?.error?.('❌ Error updating item order', { ...PAGE_LOG_CONTEXT, error: error?.message || error });
+                                // Reload to restore original order
+                                if (window.WatchListsPage?.loadWatchListItems) {
+                                    await window.WatchListsPage.loadWatchListItems(listId);
+                                }
+                            }
+                        }
+                    }
+                });
             });
 
-            window.Logger?.debug?.('🎯 Drag and drop initialized (mockup)', { ...PAGE_LOG_CONTEXT });
-        }
-
-        /**
-         * Handle drag start
-         * @param {DragEvent} event - Drag event
-         */
-        handleDragStart(event) {
-            event.dataTransfer.effectAllowed = 'move';
-            event.dataTransfer.setData('text/html', event.target.outerHTML);
-            event.target.classList.add('dragging');
-        }
-
-        /**
-         * Handle drag end
-         * @param {DragEvent} event - Drag event
-         */
-        handleDragEnd(event) {
-            event.target.classList.remove('dragging');
+            window.Logger?.debug?.('✅ Drag and drop initialized', { ...PAGE_LOG_CONTEXT });
         }
     }
 

@@ -35,6 +35,7 @@
  * - updateWatchList(listId, payload, options) - Update existing watch list
  * - deleteWatchList(listId, options) - Delete watch list
  * - addTickerToList(listId, tickerData, options) - Add ticker to list
+ * - updateWatchListItem(listId, itemId, payload, options) - Update watch list item
  * - removeTickerFromList(itemId, options) - Remove ticker from list
  * - updateItemOrder(listId, itemsOrder, options) - Update item display order
  *
@@ -378,6 +379,41 @@
     }
   }
 
+  async function updateWatchListItem(listId, itemId, payload, options = {}) {
+    const { signal } = options;
+    const base = resolveBaseUrl();
+    const separator = base.endsWith('/') ? '' : '/';
+    const url = `${base}${separator}api/watch-lists/items/${itemId}`;
+    
+    try {
+      const response = await fetch(url, {
+        method: 'PUT',
+        headers: DEFAULT_HEADERS,
+        body: JSON.stringify(payload),
+        signal,
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error?.message || `Failed to update watch list item (${response.status})`);
+      }
+      
+      // Invalidate cache on success
+      await invalidateWatchListsCache();
+      
+      // Return Response object (not parsed data) - UnifiedCRUDService/CRUDResponseHandler will handle it
+      return response;
+    } catch (error) {
+      window.Logger?.error?.('❌ Error updating watch list item', {
+        ...PAGE_LOG_CONTEXT,
+        listId,
+        itemId,
+        error: error?.message,
+      });
+      throw error;
+    }
+  }
+
   async function removeTickerFromList(itemId, options = {}) {
     const { signal } = options;
     const base = resolveBaseUrl();
@@ -399,7 +435,8 @@
       // Invalidate cache
       await invalidateWatchListsCache();
       
-      return true;
+      // Return response for consistency with other CRUD operations
+      return response;
     } catch (error) {
       window.Logger?.error?.('❌ Error removing ticker from watch list', {
         ...PAGE_LOG_CONTEXT,
@@ -443,6 +480,73 @@
     }
   }
 
+  async function syncFlagLists(options = {}) {
+    const { signal } = options;
+    const base = resolveBaseUrl();
+    const separator = base.endsWith('/') ? '' : '/';
+    const url = `${base}${separator}api/watch-lists/flag-lists/sync`;
+    
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: DEFAULT_HEADERS,
+        signal,
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error?.message || `Failed to sync flag lists (${response.status})`);
+      }
+      
+      const result = await response.json();
+      
+      // Invalidate cache
+      await invalidateWatchListsCache();
+      
+      return result.data || [];
+    } catch (error) {
+      window.Logger?.error?.('❌ Error syncing flag lists', {
+        ...PAGE_LOG_CONTEXT,
+        error: error?.message,
+      });
+      throw error;
+    }
+  }
+
+  async function syncSingleFlagList(flagColor, options = {}) {
+    const { signal } = options;
+    const base = resolveBaseUrl();
+    const separator = base.endsWith('/') ? '' : '/';
+    const url = `${base}${separator}api/watch-lists/flag-lists/${encodeURIComponent(flagColor)}/sync`;
+    
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: DEFAULT_HEADERS,
+        signal,
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error?.message || `Failed to sync flag list (${response.status})`);
+      }
+      
+      const result = await response.json();
+      
+      // Invalidate cache
+      await invalidateWatchListsCache();
+      
+      return result.data || null;
+    } catch (error) {
+      window.Logger?.error?.('❌ Error syncing flag list', {
+        ...PAGE_LOG_CONTEXT,
+        flagColor,
+        error: error?.message,
+      });
+      throw error;
+    }
+  }
+
   // Export to window
   window.WatchListsData = {
     // Cache management
@@ -461,8 +565,13 @@
     updateWatchList,
     deleteWatchList,
     addTickerToList,
+    updateWatchListItem,
     removeTickerFromList,
     updateItemOrder,
+    
+    // Flag list operations
+    syncFlagLists,
+    syncSingleFlagList,
   };
 
   // Also export as WatchListsDataService for consistency

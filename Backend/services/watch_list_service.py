@@ -285,6 +285,7 @@ class WatchListService:
     def get_watch_list_items(db: Session, list_id: int, user_id: int) -> List[WatchListItem]:
         """
         Get all items in a watch list, ordered by display_order.
+        For flag lists (is_flag_list=1), returns all items with the flag color from all user's lists.
 
         Args:
             db: Database session
@@ -302,13 +303,40 @@ class WatchListService:
         if not watch_list:
             raise ValueError(f"Watch list {list_id} not found or doesn't belong to user {user_id}")
 
-        logger.debug("Fetching items for watch list %s", list_id)
-        return (
-            db.query(WatchListItem)
-            .filter(WatchListItem.watch_list_id == list_id)
-            .order_by(WatchListItem.display_order.asc())
-            .all()
-        )
+        # Check if this is a flag list
+        is_flag_list = getattr(watch_list, 'is_flag_list', 0)
+        flag_color = getattr(watch_list, 'flag_color', None)
+        
+        if is_flag_list and flag_color:
+            # Flag list: return all items with this flag color from all user's lists
+            logger.debug("Fetching items for flag list %s (color: %s)", list_id, flag_color)
+            
+            # Get all user's watch lists
+            all_user_lists = WatchListService.get_watch_lists(db, user_id)
+            all_list_ids = [wl.id for wl in all_user_lists]
+            
+            if not all_list_ids:
+                return []
+            
+            # Get all items with this flag color
+            return (
+                db.query(WatchListItem)
+                .filter(
+                    WatchListItem.watch_list_id.in_(all_list_ids),
+                    WatchListItem.flag_color == flag_color
+                )
+                .order_by(WatchListItem.display_order.asc())
+                .all()
+            )
+        else:
+            # Regular list: return items from this list only
+            logger.debug("Fetching items for watch list %s", list_id)
+            return (
+                db.query(WatchListItem)
+                .filter(WatchListItem.watch_list_id == list_id)
+                .order_by(WatchListItem.display_order.asc())
+                .all()
+            )
 
     @staticmethod
     def add_ticker_to_list(
@@ -525,6 +553,99 @@ class WatchListService:
         
         logger.info("Updated display order for watch list %s", list_id)
         return True
+
+    # --------------------------------------------------------------------- #
+    # Flag List Operations (Automatic Dynamic Lists)
+    # --------------------------------------------------------------------- #
+
+    @staticmethod
+    def get_or_create_flag_list(db: Session, user_id: int, flag_color: str) -> WatchList:
+        """
+        Get or create a dynamic flag list for a specific flag color.
+        Flag lists are automatically managed - they show all tickers with the flag.
+        
+        Args:
+            db: Database session
+            user_id: User ID
+            flag_color: Flag color in hex format (e.g., '#26baac')
+        
+        Returns:
+            WatchList object (existing or newly created)
+        """
+        # Map flag colors to Hebrew names
+        flag_names = {
+            '#26baac': 'דגל Trade',
+            '#0056b3': 'דגל Trade Plan',
+            '#28a745': 'דגל Account',
+            '#20c997': 'דגל Cash Flow',
+            '#dc3545': 'דגל Ticker',
+            '#fc5a06': 'דגל Alert',
+            '#6f42c1': 'דגל Note',
+            '#17a2b8': 'דגל Execution'
+        }
+        
+        flag_list_name = flag_names.get(flag_color, f'דגל {flag_color}')
+        
+        # Check if flag list exists
+        existing = db.query(WatchList).filter(
+            WatchList.user_id == user_id,
+            WatchList.is_flag_list == 1,
+            WatchList.flag_color == flag_color
+        ).first()
+        
+        if existing:
+            logger.debug("Found existing flag list %s for color %s", existing.id, flag_color)
+            return existing
+        
+        # Create new flag list
+        # Get next display_order (flag lists should appear after regular lists)
+        max_order = db.query(func.max(WatchList.display_order)).filter(
+            WatchList.user_id == user_id
+        ).scalar() or 0
+        
+        flag_list = WatchList(
+            user_id=user_id,
+            name=flag_list_name,
+            icon='flag-filled',
+            color_hex=flag_color,
+            display_order=max_order + 1,
+            view_mode='table',
+            is_flag_list=1,
+            flag_color=flag_color
+        )
+        
+        db.add(flag_list)
+        db.commit()
+        db.refresh(flag_list)
+        
+        logger.info("Created flag list %s for color %s (user %s)", flag_list.id, flag_color, user_id)
+        return flag_list
+
+    @staticmethod
+    def sync_flag_list_items(db: Session, list_id: int, user_id: int) -> bool:
+        """
+        Sync flag list - this is a no-op for flag lists since they are dynamic views.
+        Flag lists don't store items - they dynamically show all items with the flag color.
+        This method exists for API compatibility but doesn't need to do anything.
+        
+        Args:
+            db: Database session
+            list_id: Flag list ID
+            user_id: User ID (for validation)
+        
+        Returns:
+            True if successful
+        """
+        # Verify it's a flag list
+        flag_list = WatchListService.get_watch_list_by_id(db, list_id, user_id)
+        if not flag_list or not getattr(flag_list, 'is_flag_list', 0):
+            raise ValueError(f"List {list_id} is not a flag list")
+        
+        # Flag lists are dynamic - no sync needed
+        # The get_watch_list_items method already handles dynamic flag lists
+        logger.debug("Flag list %s is dynamic - no sync needed", list_id)
+        return True
+
 
 
 

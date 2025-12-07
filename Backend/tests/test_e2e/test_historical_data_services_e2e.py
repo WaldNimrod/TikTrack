@@ -165,3 +165,4 @@ class TestHistoricalDataServicesIntegrationE2E:
             assert 'portfolio-state-data' in content, "Portfolio state TTL should be configured"
             assert 'trading-journal-data' in content, "Trading journal TTL should be configured"
 
+

@@ -435,3 +435,4 @@ const data = await window.TradeHistoryData.loadTradeHistory(filters);
 
 **תאריך עדכון אחרון:** 7 דצמבר 2025
 
+

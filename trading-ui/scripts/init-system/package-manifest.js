@@ -1907,7 +1907,7 @@ const PACKAGE_MANIFEST = {
     critical: false,
     loadOrder: 20,
     dependencies: ['base', 'services', 'ui-advanced', 'crud', 'entity-services'],
-    loadingStrategy: 'async', // Non-critical - only for watch lists pages
+    loadingStrategy: 'defer', // Changed to defer to ensure WatchListsPage global is available when checked
     scripts: [
       {
         file: 'services/watch-lists-data.js',

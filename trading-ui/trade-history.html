@@ -390,8 +390,7 @@
                                     <span data-icon="download" class="icon"></span> ייצא
                                 </button>
                             </div>
-                            <button class="filter-toggle-btn" data-onclick="toggleSection('trade-history-top-section')" title="הצג/הסתר סקשן" data-button-type="FILTER">
-                                <span class="section-toggle-icon">▼</span>
+                            <button class="filter-toggle-btn" data-onclick="toggleSection('trade-history-top-section')" title="הצג/הסתר סקשן" data-button-type="FILTER" data-icon="chevron-down">
                             </button>
                         </div>
                     </div>
@@ -533,7 +532,7 @@
                     <div class="section-header">
                         <h2><span data-icon="list" class="icon"></span> פירוט צעדים</h2>
                         <div class="header-actions">
-                            <button class="filter-toggle-btn" data-onclick="toggleSection('timeline-absolute-section')" title="הצג/הסתר סקשן" data-button-type="FILTER">
+                            <button class="filter-toggle-btn" data-onclick="toggleSection('timeline-absolute-section')" title="הצג/הסתר סקשן" data-button-type="FILTER" data-icon="chevron-down">
                                 <span class="section-toggle-icon">▼</span>
                             </button>
                                 </div>
@@ -558,7 +557,7 @@
                     <div class="section-header">
                         <h2><span data-icon="chart-line" class="icon"></span> טיימליין</h2>
                         <div class="header-actions">
-                            <button class="filter-toggle-btn" data-onclick="toggleSection('timeline-relative-section')" title="הצג/הסתר סקשן" data-button-type="FILTER">
+                            <button class="filter-toggle-btn" data-onclick="toggleSection('timeline-relative-section')" title="הצג/הסתר סקשן" data-button-type="FILTER" data-icon="chevron-down">
                                 <span class="section-toggle-icon">▼</span>
                             </button>
                         </div>
@@ -617,7 +616,7 @@
                     <div class="section-header">
                         <h2><span data-icon="info-circle" class="icon"></span> תכנון מול ביצוע</h2>
                         <div class="header-actions">
-                            <button class="filter-toggle-btn" data-onclick="toggleSection('plan-vs-execution-section')" title="הצג/הסתר סקשן" data-button-type="FILTER">
+                            <button class="filter-toggle-btn" data-onclick="toggleSection('plan-vs-execution-section')" title="הצג/הסתר סקשן" data-button-type="FILTER" data-icon="chevron-down">
                                 <span class="section-toggle-icon">▼</span>
                             </button>
                         </div>
@@ -658,7 +657,7 @@
                     <div class="section-header">
                         <h2><span data-icon="link" class="icon"></span> פריטים מקושרים</h2>
                         <div class="header-actions">
-                            <button class="filter-toggle-btn" data-onclick="toggleSection('linked-items-section')" title="הצג/הסתר סקשן" data-button-type="FILTER">
+                            <button class="filter-toggle-btn" data-onclick="toggleSection('linked-items-section')" title="הצג/הסתר סקשן" data-button-type="FILTER" data-icon="chevron-down">
                                 <span class="section-toggle-icon">▼</span>
                             </button>
                         </div>
@@ -677,5 +676,444 @@
     
     <!-- Page Bottom Spacing -->
     <div class="page-bottom-spacing"></div>
+    
+    <script>
+        // Timeline Chart
+        let selectedTimelineStep = null;
+        let timelineChart = null;
+        let isInitializingTimelineChart = false; // Flag to prevent multiple initializations
+        
+        // Export initTimelineChart globally
+        window.initTimelineChart = async function initTimelineChart() {
+            const container = document.getElementById('timelineChart');
+            if (!container) {
+                if (window.Logger) {
+                    window.Logger.warn('Timeline chart container not found', { page: 'trade-history-page' });
+                }
+                return;
+            }
+            
+            // Prevent multiple simultaneous initializations
+            if (isInitializingTimelineChart) {
+                if (window.Logger) {
+                    window.Logger.info('Timeline chart initialization already in progress, skipping...', { page: 'trade-history-page' });
+                }
+                return;
+            }
+            
+            isInitializingTimelineChart = true;
+            
+            try {
+                // Quick check for TradingView - if not available, wait briefly and check again
+                if (typeof window.TradingViewChartAdapter === 'undefined' || 
+                    (typeof window.LightweightCharts === 'undefined' && typeof window.lightweightCharts === 'undefined')) {
+                    // Wait max 1 second (10 retries × 100ms) instead of 5 seconds
+                    let retries = 0;
+                    while ((typeof window.TradingViewChartAdapter === 'undefined' || 
+                            (typeof window.LightweightCharts === 'undefined' && typeof window.lightweightCharts === 'undefined')) && 
+                           retries < 10) {
+                        await new Promise(resolve => setTimeout(resolve, 100));
+                        retries++;
+                    }
+                }
+                
+                if (typeof window.TradingViewChartAdapter === 'undefined') {
+                    if (window.Logger) {
+                        window.Logger.error('TradingViewChartAdapter not available', { page: 'trade-history-page' });
+                    }
+                    isInitializingTimelineChart = false;
+                    return;
+                }
+                
+                // Destroy existing chart if it exists
+                if (timelineChart && typeof window.TradingViewChartAdapter.destroyChart === 'function') {
+                    try {
+                        window.TradingViewChartAdapter.destroyChart(timelineChart);
+                    } catch (e) {
+                        if (window.Logger) {
+                            window.Logger.warn('Error destroying timeline chart', { page: 'trade-history-page', error: e });
+                        }
+                    }
+                    timelineChart = null;
+                }
+                
+                // Clear container (but keep loading indicator if exists)
+                const loading = container.querySelector('.chart-loading');
+                container.innerHTML = '';
+                if (loading) {
+                    container.appendChild(loading);
+                }
+            } catch (e) {
+                if (window.Logger) {
+                    window.Logger.warn('Error during chart cleanup', { page: 'trade-history-page', error: e });
+                }
+            } finally {
+                isInitializingTimelineChart = false;
+            }
+            
+            // Get timeline data from tradeHistoryPage or global
+            let timelineData = [];
+            
+            // Try to get data from global tradeHistoryData first (most reliable)
+            if (window.tradeHistoryData && window.tradeHistoryData.timelineData && Array.isArray(window.tradeHistoryData.timelineData)) {
+                const rawTimelineData = window.tradeHistoryData.timelineData;
+                if (rawTimelineData && rawTimelineData.length > 0) {
+                    // Transform to chart format
+                    const startDate = new Date(rawTimelineData[0].date);
+                    
+                    // Calculate cumulative position and P/L
+                    let currentPosition = 0;
+                    let cumulativeRealizedPL = 0;
+                    
+                    timelineData = rawTimelineData.map((point, index) => {
+                        const date = new Date(point.date);
+                        const daysFromStart = Math.floor((date - startDate) / (1000 * 60 * 60 * 24));
+                        
+                        // Update position based on execution
+                        if (point.type === 'Execution') {
+                            if (point.side === 'buy') {
+                                currentPosition += point.quantity || 0;
+                            } else if (point.side === 'sell') {
+                                currentPosition -= point.quantity || 0;
+                            }
+                            cumulativeRealizedPL += point.pl || 0;
+                        }
+                        
+                        // Calculate unrealized PL (placeholder)
+                        const unrealizedPL = 0;
+                        const totalPL = cumulativeRealizedPL + unrealizedPL;
+                        
+                        // Format date as DD/MM/YYYY
+                        const day = String(date.getDate()).padStart(2, '0');
+                        const month = String(date.getMonth() + 1).padStart(2, '0');
+                        const year = date.getFullYear();
+                        const dateStr = `${day}/${month}/${year}`;
+                        
+                        return {
+                            date: dateStr,
+                            type: point.type,
+                            id: point.id,
+                            positionSize: currentPosition,
+                            realizedPL: cumulativeRealizedPL,
+                            unrealizedPL: unrealizedPL,
+                            totalPL: totalPL,
+                            daysFromStart: daysFromStart,
+                            qty: point.quantity || null,
+                            price: point.price || null,
+                            side: point.side ? (point.side === 'buy' ? 'Buy' : 'Sell') : null,
+                            amount: point.amount || null,
+                            realized: point.pl || null
+                        };
+                    });
+                }
+            } else if (window.tradeHistoryPage && typeof window.tradeHistoryPage.getTimelineData === 'function') {
+                // Fallback: try to get from tradeHistoryPage
+                const rawTimelineData = window.tradeHistoryPage.getTimelineData();
+                if (rawTimelineData && Array.isArray(rawTimelineData) && rawTimelineData.length > 0) {
+                    // Transform to chart format (same as above)
+                    const startDate = new Date(rawTimelineData[0].date);
+                    
+                    let currentPosition = 0;
+                    let cumulativeRealizedPL = 0;
+                    
+                    timelineData = rawTimelineData.map((point, index) => {
+                        const date = new Date(point.date);
+                        const daysFromStart = Math.floor((date - startDate) / (1000 * 60 * 60 * 24));
+                        
+                        if (point.type === 'Execution') {
+                            if (point.side === 'buy' || point.action === 'buy') {
+                                currentPosition += point.quantity || 0;
+                            } else if (point.side === 'sell' || point.action === 'sell') {
+                                currentPosition -= point.quantity || 0;
+                            }
+                            cumulativeRealizedPL += point.pl || 0;
+                        }
+                        
+                        const unrealizedPL = 0;
+                        const totalPL = cumulativeRealizedPL + unrealizedPL;
+                        
+                        const day = String(date.getDate()).padStart(2, '0');
+                        const month = String(date.getMonth() + 1).padStart(2, '0');
+                        const year = date.getFullYear();
+                        const dateStr = `${day}/${month}/${year}`;
+                        
+                        return {
+                            date: dateStr,
+                            type: point.type,
+                            id: point.id,
+                            positionSize: currentPosition,
+                            realizedPL: cumulativeRealizedPL,
+                            unrealizedPL: unrealizedPL,
+                            totalPL: totalPL,
+                            daysFromStart: daysFromStart,
+                            qty: point.quantity || null,
+                            price: point.price || null,
+                            side: point.side ? (point.side === 'buy' ? 'Buy' : 'Sell') : null,
+                            amount: point.amount || null,
+                            realized: point.pl || null
+                        };
+                    });
+                }
+            }
+            
+            // If no data available, show empty chart
+            if (!timelineData || timelineData.length === 0) {
+                if (window.Logger) {
+                    window.Logger.warn('No timeline data available for chart, showing empty chart', { 
+                        page: 'trade-history-page',
+                        hasGlobalData: !!window.tradeHistoryData,
+                        hasPageData: !!(window.tradeHistoryPage && typeof window.tradeHistoryPage.getTimelineData === 'function')
+                    });
+                }
+                timelineData = []; // Empty array - chart will show empty
+            } else {
+                if (window.Logger) {
+                    window.Logger.info('Timeline data loaded for chart', { 
+                        page: 'trade-history-page',
+                        dataPoints: timelineData.length,
+                        executions: timelineData.filter(d => d.type === 'Execution').length
+                    });
+                }
+            }
+            
+            // Store timeline data globally for market price chart to use
+            window._timelineData = timelineData;
+            
+            // Get dynamic colors from CSS variables or theme
+            function getCSSVariableValue(varName, defaultValue) {
+                if (typeof window.getComputedStyle === 'function') {
+                    const value = getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
+                    return value || defaultValue;
+                }
+                return defaultValue;
+            }
+            
+            const mutedColor = getCSSVariableValue('--muted-color', '#6c757d') || getCSSVariableValue('--text-muted', '#6c757d');
+            const successColor = getCSSVariableValue('--success-color', '#28a745');
+            const warningColor = getCSSVariableValue('--warning-color', '#ffc107');
+            const dangerColor = getCSSVariableValue('--danger-color', '#dc3545');
+            const primaryColor = getCSSVariableValue('--primary-color', '#26baac') || getCSSVariableValue('--chart-primary-color', '#26baac');
+            
+            // Convert dates to TradingView format
+            // TradingView Lightweight Charts supports:
+            // 1. String format: 'YYYY-MM-DD' (for daily data)
+            // 2. Unix timestamp (number) - for precise time with seconds/milliseconds
+            // For multiple points on same date/time, we add a small offset (seconds) to ensure unique timestamps
+            function convertDateToTradingView(dateStr, index = 0) {
+                if (!dateStr) return dateStr;
+                
+                // Try to parse as Date first (handles various formats)
+                let dateObj = null;
+                if (dateStr.includes('T') || dateStr.includes('Z')) {
+                    // ISO format
+                    dateObj = new Date(dateStr);
+                } else {
+                    // Try different formats: DD/MM/YYYY, DD.MM.YYYY, DD/MM/YYYY HH:MM, DD.MM.YYYY HH:MM
+                    // Parse full date with time if available
+                    const dateTimeParts = dateStr.split(' ');
+                    const dateOnly = dateTimeParts[0];
+                    const timeOnly = dateTimeParts[1] || null;
+                    
+                    const parts = dateOnly.split(/[./-]/);
+                    if (parts.length === 3) {
+                        const day = parts[0].padStart(2, '0');
+                        const month = parts[1].padStart(2, '0');
+                        const year = parts[2];
+                        
+                        // If time is available, use it; otherwise use date only
+                        if (timeOnly) {
+                            const timeParts = timeOnly.split(':');
+                            const hours = timeParts[0] || '00';
+                            const minutes = timeParts[1] || '00';
+                            const seconds = timeParts[2] || '00';
+                            dateObj = new Date(`${year}-${month}-${day}T${hours}:${minutes}:${seconds}`);
+                        } else {
+                            dateObj = new Date(`${year}-${month}-${day}`);
+                        }
+                    } else {
+                        dateObj = new Date(dateStr);
+                    }
+                }
+                
+                // If valid date, return as unix timestamp (for precise time handling)
+                // Add small offset (index * 1 second) to ensure unique timestamps for multiple points on same date/time
+                // This allows the chart to display all points correctly
+                if (dateObj && !isNaN(dateObj.getTime())) {
+                    // Return as unix timestamp (seconds since epoch)
+                    // Add index seconds to ensure uniqueness when multiple points have same date/time
+                    const baseTimestamp = Math.floor(dateObj.getTime() / 1000);
+                    return baseTimestamp + index; // Add index seconds for uniqueness
+                }
+                
+                // Fallback: try to extract from string and return as unix timestamp
+                const parts = dateStr.split(/[./-]/);
+                if (parts.length === 3) {
+                    const day = parts[0].padStart(2, '0');
+                    const month = parts[1].padStart(2, '0');
+                    const year = parts[2].split(' ')[0]; // Remove time if present
+                    const fallbackDate = new Date(`${year}-${month}-${day}`);
+                    if (fallbackDate && !isNaN(fallbackDate.getTime())) {
+                        const baseTimestamp = Math.floor(fallbackDate.getTime() / 1000);
+                        return baseTimestamp + index; // Add index seconds for uniqueness
+                    }
+                    return `${year}-${month}-${day}`;
+                }
+                
+                return dateStr;
+            }
+            
+            // Create chart with TradingView
+            try {
+                // Get wrapper for width calculation (if exists)
+                const wrapper = container.closest('.chart-container-wrapper') || container.parentElement;
+                const containerWidth = wrapper ? wrapper.clientWidth : (container.clientWidth || 800);
+                const containerHeight = container.clientHeight || 400;
+                
+                // Create chart
+                timelineChart = window.TradingViewChartAdapter.createChart(container, {
+                    width: containerWidth,
+                    height: containerHeight,
+                    layout: {
+                        textColor: getCSSVariableValue('--text-color', '#212529'),
+                        background: { type: 'solid', color: getCSSVariableValue('--card-background', '#ffffff') }
+                    },
+                    rightPriceScale: {
+                        visible: true,
+                        scaleMargins: {
+                            top: 0.1,
+                            bottom: 0.1
+                        }
+                    },
+                    leftPriceScale: {
+                        visible: true,
+                        scaleMargins: {
+                            top: 0.1,
+                            bottom: 0.1
+                        }
+                    },
+                    timeScale: {
+                        timeVisible: true,
+                        secondsVisible: false
+                    }
+                });
+                
+                // Convert data to TradingView format
+                // Use index to handle multiple points on same date
+                const positionSizeData = timelineData.map((d, index) => {
+                    const time = convertDateToTradingView(d.date, index);
+                    return {
+                        time: time,
+                        value: d.positionSize !== null && d.positionSize !== undefined ? d.positionSize : 0
+                    };
+                }).filter(d => d.time && !isNaN(d.value)); // Filter out invalid data
+                
+                // Position Size - Left Scale, Stepped Line
+                const positionSizeSeries = window.TradingViewChartAdapter.addLineSeries(timelineChart, {
+                    priceScaleId: 'left',
+                    color: mutedColor,
+                    lineWidth: 3,
+                    lineType: 1, // Stepped
+                    title: 'גודל פוזיציה'
+                });
+                
+                if (positionSizeData.length > 0) {
+                    positionSizeSeries.setData(positionSizeData);
+                }
+                
+                // Realized P/L - Right Scale
+                const realizedPLSeries = window.TradingViewChartAdapter.addLineSeries(timelineChart, {
+                    priceScaleId: 'right',
+                    color: successColor,
+                    lineWidth: 2,
+                    lineType: 0, // Normal
+                    title: 'P/L ממומש'
+                });
+                
+                const realizedPLData = timelineData.map((d, index) => {
+                    const time = convertDateToTradingView(d.date, index);
+                    return {
+                        time: time,
+                        value: d.realizedPL !== null && d.realizedPL !== undefined ? d.realizedPL : 0
+                    };
+                }).filter(d => d.time && !isNaN(d.value));
+                
+                if (realizedPLData.length > 0) {
+                    realizedPLSeries.setData(realizedPLData);
+                }
+                
+                // Unrealized P/L - Right Scale
+                const unrealizedPLSeries = window.TradingViewChartAdapter.addLineSeries(timelineChart, {
+                    priceScaleId: 'right',
+                    color: warningColor,
+                    lineWidth: 2,
+                    lineType: 0, // Normal
+                    title: 'P/L לא ממומש'
+                });
+                
+                const unrealizedPLData = timelineData.map((d, index) => {
+                    const time = convertDateToTradingView(d.date, index);
+                    return {
+                        time: time,
+                        value: d.unrealizedPL !== null && d.unrealizedPL !== undefined ? d.unrealizedPL : 0
+                    };
+                }).filter(d => d.time && !isNaN(d.value));
+                
+                if (unrealizedPLData.length > 0) {
+                    unrealizedPLSeries.setData(unrealizedPLData);
+                }
+                
+                // Total P/L - Right Scale
+                const totalPLSeries = window.TradingViewChartAdapter.addLineSeries(timelineChart, {
+                    priceScaleId: 'right',
+                    color: primaryColor,
+                    lineWidth: 3,
+                    lineType: 0, // Normal
+                    title: 'P/L כולל'
+                });
+                
+                const totalPLData = timelineData.map((d, index) => {
+                    const time = convertDateToTradingView(d.date, index);
+                    return {
+                        time: time,
+                        value: d.totalPL !== null && d.totalPL !== undefined ? d.totalPL : 0
+                    };
+                }).filter(d => d.time && !isNaN(d.value));
+                
+                if (totalPLData.length > 0) {
+                    totalPLSeries.setData(totalPLData);
+                }
+                
+                // Fit content
+                timelineChart.timeScale().fitContent();
+                
+                // Hide loading text
+                const loadingText = container.querySelector('.chart-loading, [class*="loading"]');
+                if (loadingText) {
+                    loadingText.style.display = 'none';
+                }
+                
+                // Remove "טוען גרף" text if exists
+                const loadingTextNodes = Array.from(container.childNodes).filter(node => 
+                    node.nodeType === Node.TEXT_NODE && node.textContent.includes('טוען גרף')
+                );
+                loadingTextNodes.forEach(node => node.remove());
+                
+                if (window.Logger) {
+                    window.Logger.info('Timeline chart initialized successfully', { 
+                        page: 'trade-history-page', 
+                        dataPoints: timelineData.length,
+                        seriesCount: 4
+                    });
+                }
+            } catch (error) {
+                if (window.Logger) {
+                    window.Logger.error('Error creating timeline chart', { page: 'trade-history-page', error });
+                }
+            } finally {
+                isInitializingTimelineChart = false;
+            }
+        };
+    </script>
+    
 </body>
 </html>

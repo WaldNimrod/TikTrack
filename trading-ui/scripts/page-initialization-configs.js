@@ -3374,6 +3374,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'ui-advanced',
         'crud',
         'entity-services',
+        'entity-details', // Required for enriching ticker data with market prices, positions, etc.
         'watch-lists',
         'init-system'
       ],
@@ -3391,7 +3392,8 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.validateTextField', // Validation functions
         'window.tickersModalConfig', // Required for nested ticker addition modal
         'window.AddTickerModal', // Required for add ticker modal
-        'window.addTickerToList' // Required for add ticker modal save function
+        'window.addTickerToList', // Required for add ticker modal save function
+        'window.entityDetailsAPI' // Required for enriching ticker data with market prices, positions, etc.
       ],
       pageSpecificScripts: [
         'scripts/watch-lists-page.js',

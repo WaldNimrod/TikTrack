@@ -24,6 +24,7 @@ from sqlalchemy.orm import Session
 from datetime import datetime, timezone
 from services.business_logic.historical_data_business_service import HistoricalDataBusinessService
 from services.advanced_cache_service import cache_with_deps
+from services.user_service import UserService
 from .base_entity_decorators import handle_database_session
 from .base_entity_utils import BaseEntityUtils
 import logging
@@ -32,22 +33,27 @@ from typing import Optional
 logger = logging.getLogger(__name__)
 
 trade_history_bp = Blueprint('trade_history', __name__, url_prefix='/api/trade-history')
+user_service = UserService()
 
 
-def _resolve_user_id() -> Optional[int]:
+def _resolve_user_id() -> int:
     """
-    Resolve user_id from Flask context or request parameters.
-    
-    Returns:
-        user_id if found, None otherwise
+    Return active user id from Flask context (set by auth middleware).
+    Falls back to default user if not authenticated (for backward compatibility).
     """
+    # Primary: Get from Flask context (set by auth middleware)
     user_id = getattr(g, 'user_id', None)
-    if not user_id:
-        # Fallback: explicit user_id passed in request (query/body)
-        user_id = request.args.get('user_id', type=int)
-        if not user_id and request.is_json:
-            user_id = request.get_json().get('user_id') if request.get_json() else None
-    return user_id
+    if user_id is not None:
+        return user_id
+    
+    # Fallback: Check query parameter
+    user_id = request.args.get('user_id', type=int)
+    if user_id is not None:
+        return user_id
+    
+    # Fallback: Default user (for backward compatibility and tools)
+    default_user = user_service.get_default_user()
+    return default_user["id"] if default_user else 1
 
 
 @trade_history_bp.route('/', methods=['GET'])

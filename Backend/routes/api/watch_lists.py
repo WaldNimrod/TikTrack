@@ -643,3 +643,181 @@ def reorder_items(list_id: int):
             "version": "1.0"
         }), 500
 
+
+@watch_lists_bp.route('/flags/<color>', methods=['GET'], endpoint='get_flagged_tickers')
+@handle_database_session()
+@api_endpoint(cache_ttl=60, rate_limit=60)
+def get_flagged_tickers(color: str):
+    """
+    Get all tickers with a specific flag color across all user's watch lists.
+    
+    Args:
+        color: Flag color in hex format (e.g., '#26baac')
+    
+    Returns:
+        JSON response with list of flagged items
+    """
+    db: Session = g.db
+    user_id = _resolve_user_id()
+    
+    try:
+        normalizer = _get_watch_lists_normalizer()
+        
+        # Get all watch lists for user
+        watch_lists = WatchListService.get_watch_lists(db, user_id)
+        list_ids = [wl.id for wl in watch_lists]
+        
+        if not list_ids:
+            return jsonify({
+                "status": "success",
+                "data": [],
+                "count": 0,
+                "timestamp": normalizer.now_envelope(),
+                "version": "1.0"
+            }), 200
+        
+        # Get all items with the specified flag color from user's lists
+        from models.watch_list import WatchListItem
+        items = (
+            db.query(WatchListItem)
+            .filter(
+                WatchListItem.watch_list_id.in_(list_ids),
+                WatchListItem.flag_color == color
+            )
+            .order_by(WatchListItem.display_order.asc())
+            .all()
+        )
+        
+        # Convert to dict and add watch list name
+        items_data = []
+        for item in items:
+            item_dict = item.to_dict()
+            # Add watch list name
+            watch_list = next((wl for wl in watch_lists if wl.id == item.watch_list_id), None)
+            if watch_list:
+                item_dict['watch_list_name'] = watch_list.name
+            items_data.append(item_dict)
+        
+        items_data = normalizer.normalize_output(items_data)
+        
+        return jsonify({
+            "status": "success",
+            "data": items_data,
+            "count": len(items_data),
+            "timestamp": normalizer.now_envelope(),
+            "version": "1.0"
+        }), 200
+    except Exception as e:
+        import traceback
+        error_trace = traceback.format_exc()
+        logger.error(f"Error getting flagged tickers: {str(e)}\nTraceback:\n{error_trace}")
+        return jsonify({
+            "status": "error",
+            "error": {"message": f"Failed to retrieve flagged tickers: {str(e)}"},
+            "version": "1.0"
+        }), 500
+
+
+@watch_lists_bp.route('/flag-lists/sync', methods=['POST'], endpoint='sync_flag_lists')
+@handle_database_session()
+def sync_flag_lists():
+    """
+    Sync all flag lists for the current user.
+    Creates flag lists if they don't exist and syncs their items.
+    
+    Returns:
+        JSON response with sync status
+    """
+    db: Session = g.db
+    user_id = _resolve_user_id()
+    
+    try:
+        normalizer = _get_watch_lists_normalizer()
+        
+        # Get all 8 flag colors
+        flag_colors = [
+            '#26baac',  # Trade
+            '#0056b3',  # Trade Plan
+            '#28a745',  # Account
+            '#20c997',  # Cash Flow
+            '#dc3545',  # Ticker
+            '#fc5a06',  # Alert
+            '#6f42c1',  # Note
+            '#17a2b8'   # Execution
+        ]
+        
+        synced_lists = []
+        
+        # Get or create flag lists and sync them
+        for flag_color in flag_colors:
+            flag_list = WatchListService.get_or_create_flag_list(db, user_id, flag_color)
+            WatchListService.sync_flag_list_items(db, flag_list.id, user_id)
+            synced_lists.append(flag_list.to_dict())
+        
+        # Normalize dates
+        synced_lists = normalizer.normalize_output(synced_lists)
+        
+        return jsonify({
+            "status": "success",
+            "data": synced_lists,
+            "count": len(synced_lists),
+            "message": "Flag lists synced successfully",
+            "timestamp": normalizer.now_envelope(),
+            "version": "1.0"
+        }), 200
+    except Exception as e:
+        import traceback
+        error_trace = traceback.format_exc()
+        logger.error(f"Error syncing flag lists: {str(e)}\nTraceback:\n{error_trace}")
+        return jsonify({
+            "status": "error",
+            "error": {"message": f"Failed to sync flag lists: {str(e)}"},
+            "version": "1.0"
+        }), 500
+
+
+@watch_lists_bp.route('/flag-lists/<color>/sync', methods=['POST'], endpoint='sync_single_flag_list')
+@handle_database_session()
+def sync_single_flag_list(color: str):
+    """
+    Sync a single flag list for a specific flag color.
+    
+    Args:
+        color: Flag color in hex format (e.g., '#26baac')
+    
+    Returns:
+        JSON response with sync status
+    """
+    db: Session = g.db
+    user_id = _resolve_user_id()
+    
+    try:
+        normalizer = _get_watch_lists_normalizer()
+        
+        # Get or create flag list
+        flag_list = WatchListService.get_or_create_flag_list(db, user_id, color)
+        
+        # Sync items
+        WatchListService.sync_flag_list_items(db, flag_list.id, user_id)
+        
+        # Get updated list data
+        list_data = flag_list.to_dict()
+        list_data = normalizer.normalize_output([list_data])[0]
+        
+        return jsonify({
+            "status": "success",
+            "data": list_data,
+            "message": "Flag list synced successfully",
+            "timestamp": normalizer.now_envelope(),
+            "version": "1.0"
+        }), 200
+    except Exception as e:
+        import traceback
+        error_trace = traceback.format_exc()
+        logger.error(f"Error syncing flag list {color}: {str(e)}\nTraceback:\n{error_trace}")
+        return jsonify({
+            "status": "error",
+            "error": {"message": f"Failed to sync flag list: {str(e)}"},
+            "version": "1.0"
+        }), 500
+

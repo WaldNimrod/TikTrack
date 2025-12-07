@@ -130,6 +130,9 @@
             // Load watch lists data from API
             await loadWatchListsData();
 
+            // Sync flag lists (create/update automatic flag lists)
+            await refreshFlagLists();
+
             // Restore page state (view mode, active list, sections)
             await restorePageState();
 
@@ -284,9 +287,54 @@
             watchListsData = await window.WatchListsDataService.loadWatchListsData({ force: false });
             renderWatchListsGrid();
             
-            // Auto-select first list if no active list
+            // Auto-select first list with items if no active list
             if (!activeListId && watchListsData && watchListsData.length > 0) {
-                await selectList(watchListsData[0].id);
+                // Try to find first list with items (check both item_count and verify via API)
+                let listToSelect = null;
+                
+                // First, try lists that show item_count > 0
+                for (const list of watchListsData) {
+                    if (list.item_count > 0) {
+                        // Verify it actually has items by checking API
+                        try {
+                            const itemsResponse = await fetch(`/api/watch-lists/${list.id}/items?_ts=${Date.now()}`);
+                            if (itemsResponse.ok) {
+                                const itemsData = await itemsResponse.json();
+                                const actualItemCount = itemsData.data?.length || 0;
+                                if (actualItemCount > 0) {
+                                    listToSelect = list;
+                                    window.Logger?.info?.('✅ Found list with items (verified)', {
+                                        ...PAGE_LOG_CONTEXT,
+                                        listId: list.id,
+                                        itemCount: actualItemCount
+                                    });
+                                    break;
+                                }
+                            }
+                        } catch (e) {
+                            window.Logger?.warn?.('⚠️ Error verifying list items', {
+                                ...PAGE_LOG_CONTEXT,
+                                listId: list.id,
+                                error: e?.message
+                            });
+                        }
+                    }
+                }
+                
+                // If no verified list found, try first list anyway
+                if (!listToSelect) {
+                    listToSelect = watchListsData[0];
+                }
+                
+                if (listToSelect) {
+                    window.Logger?.info?.('🔄 Auto-selecting list', {
+                        ...PAGE_LOG_CONTEXT,
+                        listId: listToSelect.id,
+                        listName: listToSelect.name,
+                        itemCount: listToSelect.item_count
+                    });
+                    await selectList(listToSelect.id);
+                }
             }
         } catch (error) {
             const errorMsg = error?.message || (typeof error === 'string' ? error : 'שגיאה לא ידועה');
@@ -310,9 +358,17 @@
                 throw new Error('WatchListsDataService not available');
             }
             
-            window.Logger?.debug?.('📥 Loading watch list items', { ...PAGE_LOG_CONTEXT, listId });
+            window.Logger?.info?.('📥 [MONITOR] Loading watch list items', { ...PAGE_LOG_CONTEXT, listId });
             activeListItems = await window.WatchListsDataService.getWatchListItems(listId, { force: false });
-            window.Logger?.debug?.('✅ Watch list items loaded', { ...PAGE_LOG_CONTEXT, listId, count: activeListItems?.length || 0 });
+            window.Logger?.info?.('✅ [MONITOR] Watch list items loaded from API', {
+                ...PAGE_LOG_CONTEXT,
+                listId,
+                count: activeListItems?.length || 0,
+                isArray: Array.isArray(activeListItems),
+                firstItem: activeListItems?.[0],
+                firstItemTickerId: activeListItems?.[0]?.ticker_id,
+                firstItemHasTicker: !!activeListItems?.[0]?.ticker
+            });
             
             if (!Array.isArray(activeListItems)) {
                 window.Logger?.warn?.('⚠️ Watch list items is not an array', { ...PAGE_LOG_CONTEXT, listId, items: activeListItems });
@@ -320,17 +376,55 @@
             }
             
             // Enrich items with full ticker data (current price, position, etc.)
-            if (activeListItems.length > 0 && window.entityDetailsAPI?.getEntityDetails) {
-                window.Logger?.debug?.('🔄 Enriching items with ticker market data', { ...PAGE_LOG_CONTEXT, count: activeListItems.length });
-                activeListItems = await enrichWatchListItemsWithTickerData(activeListItems);
+            // Wait for entityDetailsAPI if not yet available (package might still be loading)
+            if (activeListItems.length > 0) {
+                let maxWait = 5000; // Wait up to 5 seconds
+                let waited = 0;
+                while (!window.entityDetailsAPI && waited < maxWait) {
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    waited += 100;
+                }
+                
+                if (window.entityDetailsAPI?.getEntityDetails) {
+                    window.Logger?.info?.('🔄 [MONITOR] Enriching items with ticker market data', {
+                        ...PAGE_LOG_CONTEXT,
+                        count: activeListItems.length,
+                        entityDetailsAPIAvailable: !!window.entityDetailsAPI,
+                        getEntityDetailsAvailable: !!window.entityDetailsAPI?.getEntityDetails,
+                        waitedMs: waited
+                    });
+                    activeListItems = await enrichWatchListItemsWithTickerData(activeListItems);
+                window.Logger?.info?.('✅ [MONITOR] Enrichment completed', {
+                    ...PAGE_LOG_CONTEXT,
+                    enrichedCount: activeListItems?.length || 0,
+                    firstItemHasTicker: !!activeListItems?.[0]?.ticker,
+                    firstItemTickerPrice: activeListItems?.[0]?.ticker?.current_price,
+                    firstItemTickerSymbol: activeListItems?.[0]?.ticker?.symbol,
+                    firstItemTickerKeys: activeListItems?.[0]?.ticker ? Object.keys(activeListItems[0].ticker).slice(0, 20) : []
+                });
+            } else {
+                window.Logger?.warn?.('⚠️ [MONITOR] Skipping enrichment', {
+                    ...PAGE_LOG_CONTEXT,
+                    itemsCount: activeListItems.length,
+                    entityDetailsAPIAvailable: !!window.entityDetailsAPI,
+                    getEntityDetailsAvailable: !!window.entityDetailsAPI?.getEntityDetails
+                });
             }
             
             // Ensure we have data before rendering
             if (activeListItems.length === 0) {
                 window.Logger?.debug?.('No items in list, rendering empty state', { ...PAGE_LOG_CONTEXT, listId });
+            } else {
+                window.Logger?.info?.('🔄 [MONITOR] About to render active list view', {
+                    ...PAGE_LOG_CONTEXT,
+                    itemsCount: activeListItems.length,
+                    viewMode: currentViewMode,
+                    firstItemTickerPrice: activeListItems[0]?.ticker?.current_price
+                });
             }
             
             await renderActiveListView(activeListItems);
+            window.Logger?.info?.('✅ [MONITOR] Active list view rendered', { ...PAGE_LOG_CONTEXT });
         } catch (error) {
             const errorMsg = error?.message || (typeof error === 'string' ? error : 'שגיאה לא ידועה');
             window.Logger?.error?.('❌ Error loading watch list items', { ...PAGE_LOG_CONTEXT, listId, error: errorMsg });
@@ -352,20 +446,79 @@
      * @returns {Promise<Array>} Enriched items
      */
     async function enrichWatchListItemsWithTickerData(items) {
+        if (!Array.isArray(items) || items.length === 0) {
+            window.Logger?.debug?.('⚠️ No items to enrich', { ...PAGE_LOG_CONTEXT });
+            return items;
+        }
+
         if (!window.entityDetailsAPI?.getEntityDetails) {
             window.Logger?.warn?.('⚠️ entityDetailsAPI not available, skipping enrichment', PAGE_LOG_CONTEXT);
             return items;
         }
 
+        window.Logger?.info?.('🔄 [MONITOR] Enriching watch list items with ticker data', {
+            ...PAGE_LOG_CONTEXT,
+            itemsCount: items.length,
+            itemIds: items.map(i => i.id),
+            tickerIds: items.map(i => i.ticker_id || i.ticker?.id).filter(Boolean)
+        });
+
+        // Load position data once for all items (optimization)
+        let positionsMap = {};
+        try {
+            window.Logger?.debug?.('🔄 [MONITOR] Fetching positions...', { ...PAGE_LOG_CONTEXT });
+            const portfolioResponse = await fetch('/api/positions/portfolio?unify_accounts=true');
+            if (portfolioResponse && portfolioResponse.ok) {
+                const portfolioData = await portfolioResponse.json();
+                // The API returns: { status: "success", data: { positions: [...], summary: {...} } }
+                const positions = portfolioData?.data?.positions || 
+                                 (Array.isArray(portfolioData?.data) ? portfolioData.data : []) || [];
+                // Create a map: ticker_id -> position
+                positions.forEach(pos => {
+                    if (pos.ticker_id) {
+                        positionsMap[pos.ticker_id] = pos;
+                    }
+                });
+                window.Logger?.info?.('✅ [MONITOR] Loaded position data for enrichment', {
+                    ...PAGE_LOG_CONTEXT,
+                    positionsCount: positions.length,
+                    itemsCount: items.length,
+                    uniqueTickers: Object.keys(positionsMap).length
+                });
+            } else {
+                window.Logger?.warn?.('⚠️ [MONITOR] Positions API failed', {
+                    ...PAGE_LOG_CONTEXT,
+                    status: portfolioResponse?.status
+                });
+            }
+        } catch (positionError) {
+            // Position data is optional - log but don't fail
+            window.Logger?.warn?.('⚠️ [MONITOR] Could not load position data (optional)', {
+                ...PAGE_LOG_CONTEXT,
+                error: positionError?.message || positionError
+            });
+        }
+
         const enrichedItems = await Promise.all(
-            items.map(async (item) => {
+            items.map(async (item, index) => {
                 try {
                     // Get ticker ID (either from item.ticker_id or item.ticker.id)
                     const tickerId = item.ticker_id || item.ticker?.id;
                     if (!tickerId) {
-                        window.Logger?.debug?.('⚠️ No ticker ID for item, skipping enrichment', { ...PAGE_LOG_CONTEXT, itemId: item.id });
+                        window.Logger?.warn?.('⚠️ [MONITOR] No ticker ID for item, skipping enrichment', {
+                            ...PAGE_LOG_CONTEXT,
+                            itemId: item.id,
+                            index: `${index + 1}/${items.length}`
+                        });
                         return item;
                     }
+
+                    window.Logger?.debug?.('🔄 [MONITOR] Fetching entity details', {
+                        ...PAGE_LOG_CONTEXT,
+                        itemId: item.id,
+                        tickerId,
+                        index: `${index + 1}/${items.length}`
+                    });
 
                     // Load full ticker data with market data
                     const tickerData = await window.entityDetailsAPI.getEntityDetails('ticker', tickerId, {
@@ -374,36 +527,100 @@
                         forceRefresh: false
                     });
 
+                    window.Logger?.info?.('📊 [MONITOR] Entity details received', {
+                        ...PAGE_LOG_CONTEXT,
+                        itemId: item.id,
+                        tickerId,
+                        hasData: !!tickerData,
+                        dataKeys: tickerData ? Object.keys(tickerData).slice(0, 20) : [],
+                        current_price: tickerData?.current_price,
+                        change_percent: tickerData?.change_percent,
+                        atr: tickerData?.atr
+                    });
+
                     if (tickerData) {
+                        // Add position data from the map we loaded earlier
+                        const tickerPosition = positionsMap[tickerId];
+                        if (tickerPosition) {
+                            tickerData.position = {
+                                quantity: tickerPosition.quantity || 0,
+                                side: tickerPosition.side || 'closed',
+                                market_value: tickerPosition.market_value,
+                                unrealized_pl: tickerPosition.unrealized_pl,
+                                unrealized_pl_percent: tickerPosition.unrealized_pl_percent
+                            };
+                            
+                            // Add P/L fields for display
+                            tickerData.profit_loss = tickerPosition.unrealized_pl;
+                            tickerData.pl = tickerPosition.unrealized_pl;
+                            tickerData.profit_loss_percent = tickerPosition.unrealized_pl_percent;
+                            tickerData.pl_percent = tickerPosition.unrealized_pl_percent;
+                            
+                            window.Logger?.debug?.('✅ [MONITOR] Added position data', {
+                                ...PAGE_LOG_CONTEXT,
+                                tickerId,
+                                quantity: tickerData.position.quantity,
+                                side: tickerData.position.side
+                            });
+                        } else {
+                            window.Logger?.debug?.('ℹ️ [MONITOR] No position found for ticker', {
+                                ...PAGE_LOG_CONTEXT,
+                                tickerId
+                            });
+                        }
+
                         // Merge ticker data into item.ticker
                         item.ticker = {
                             ...(item.ticker || {}),
                             ...tickerData
                         };
                         
-                        window.Logger?.debug?.('✅ Enriched item with ticker data', {
+                        window.Logger?.info?.('✅ [MONITOR] Enriched item with ticker data', {
                             ...PAGE_LOG_CONTEXT,
                             itemId: item.id,
                             tickerId,
-                            hasPrice: !!tickerData.current_price,
-                            hasChange: !!tickerData.change_percent,
-                            hasPosition: !!tickerData.position
+                            symbol: tickerData.symbol,
+                            hasPrice: tickerData.current_price !== null && tickerData.current_price !== undefined,
+                            price: tickerData.current_price,
+                            hasChange: tickerData.change_percent !== null && tickerData.change_percent !== undefined,
+                            changePercent: tickerData.change_percent,
+                            hasATR: tickerData.atr !== null && tickerData.atr !== undefined,
+                            atr: tickerData.atr,
+                            hasPosition: !!tickerData.position,
+                            positionQuantity: tickerData.position?.quantity,
+                            hasPL: tickerData.profit_loss !== null && tickerData.profit_loss !== undefined,
+                            pl: tickerData.profit_loss,
+                            allKeys: Object.keys(tickerData).slice(0, 30)
+                        });
+                    } else {
+                        window.Logger?.warn?.('⚠️ [MONITOR] No ticker data returned from entityDetailsAPI', {
+                            ...PAGE_LOG_CONTEXT,
+                            itemId: item.id,
+                            tickerId
                         });
                     }
 
                     return item;
                 } catch (error) {
                     // If enrichment fails, return original item
-                    window.Logger?.warn?.('⚠️ Failed to enrich item with ticker data', {
+                    window.Logger?.error?.('❌ [MONITOR] Failed to enrich item with ticker data', {
                         ...PAGE_LOG_CONTEXT,
                         itemId: item.id,
                         tickerId: item.ticker_id || item.ticker?.id,
-                        error: error?.message || error
+                        error: error?.message || error,
+                        stack: error?.stack
                     });
                     return item;
                 }
             })
         );
+
+        window.Logger?.info?.('✅ [MONITOR] Enrichment completed', {
+            ...PAGE_LOG_CONTEXT,
+            enrichedCount: enrichedItems.length,
+            firstItemHasTicker: !!enrichedItems[0]?.ticker,
+            firstItemTickerKeys: enrichedItems[0]?.ticker ? Object.keys(enrichedItems[0].ticker).slice(0, 20) : []
+        });
 
         return enrichedItems;
     }
@@ -449,16 +666,17 @@
                 window.WatchListsPage?.selectList(list.id);
             });
 
-            // Icon column
+            // Icon column - larger icon for list header
             const tdIcon = document.createElement('td');
             tdIcon.className = 'col-icon';
             if (list.icon) {
                 const iconSpan = document.createElement('span');
                 iconSpan.className = 'icon-placeholder icon';
                 iconSpan.setAttribute('data-icon', list.icon);
-                iconSpan.setAttribute('data-size', '20');
+                iconSpan.setAttribute('data-size', '32'); // Larger icon for list header
                 iconSpan.setAttribute('data-alt', list.icon);
                 iconSpan.setAttribute('aria-label', list.icon);
+                iconSpan.style.fontSize = '1.5rem'; // Additional size styling
                 tdIcon.appendChild(iconSpan);
             }
             tr.appendChild(tdIcon);
@@ -560,7 +778,7 @@
             }, 100);
         } else if (window.ButtonSystemInit?.initializeButtons) {
             setTimeout(() => {
-                window.ButtonSystemInit.initializeButtons(tbody);
+            window.ButtonSystemInit.initializeButtons(tbody);
             }, 100);
         }
 
@@ -574,36 +792,36 @@
      */
     async function renderActiveListView(items) {
         if (!items) items = [];
-        
+
         window.Logger?.debug?.('🎨 Rendering active list view', { ...PAGE_LOG_CONTEXT, mode: currentViewMode, itemsCount: items.length });
 
         try {
-            // Table view is handled by UnifiedTableSystem or manual rendering
-            if (currentViewMode === 'table') {
-                // Use UI Service if available, otherwise manual rendering
-                if (window.WatchListsUIService?.renderTableView) {
+        // Table view is handled by UnifiedTableSystem or manual rendering
+        if (currentViewMode === 'table') {
+            // Use UI Service if available, otherwise manual rendering
+            if (window.WatchListsUIService?.renderTableView) {
                     window.Logger?.debug?.('Using WatchListsUIService.renderTableView', { ...PAGE_LOG_CONTEXT });
-                    window.WatchListsUIService.renderTableView(items);
-                } else {
-                    // Manual table rendering will be handled by updateWatchListItemsTable
+                window.WatchListsUIService.renderTableView(items);
+            } else {
+                // Manual table rendering will be handled by updateWatchListItemsTable
                     window.Logger?.debug?.('Using manual updateWatchListItemsTable', { ...PAGE_LOG_CONTEXT });
                     await updateWatchListItemsTable(items);
-                }
-            } else if (currentViewMode === 'cards') {
-                if (window.WatchListsUIService?.renderCardsView) {
-                    window.WatchListsUIService.renderCardsView(items);
-                } else {
-                    await renderCardsView(items);
-                }
-            } else if (currentViewMode === 'compact') {
-                if (window.WatchListsUIService?.renderCompactView) {
-                    window.WatchListsUIService.renderCompactView(items);
-                } else {
-                    await renderCompactView(items);
-                }
             }
+        } else if (currentViewMode === 'cards') {
+            if (window.WatchListsUIService?.renderCardsView) {
+                window.WatchListsUIService.renderCardsView(items);
+            } else {
+                    await renderCardsView(items);
+            }
+        } else if (currentViewMode === 'compact') {
+            if (window.WatchListsUIService?.renderCompactView) {
+                window.WatchListsUIService.renderCompactView(items);
+            } else {
+                    await renderCompactView(items);
+            }
+        }
 
-            window.Logger?.debug?.('📊 Active list view rendered', { ...PAGE_LOG_CONTEXT, mode: currentViewMode, count: items.length });
+        window.Logger?.debug?.('📊 Active list view rendered', { ...PAGE_LOG_CONTEXT, mode: currentViewMode, count: items.length });
         } catch (error) {
             window.Logger?.error?.('❌ Error rendering active list view', { ...PAGE_LOG_CONTEXT, error: error?.message || error });
         }
@@ -644,18 +862,44 @@
             tbody.appendChild(tr);
             return;
         }
-        
-        window.Logger?.debug?.('Rendering items to table', { ...PAGE_LOG_CONTEXT, itemsCount: items.length });
+
+        window.Logger?.info?.('🔄 [MONITOR] Rendering items to table', {
+            ...PAGE_LOG_CONTEXT,
+            itemsCount: items.length,
+            firstItemKeys: items[0] ? Object.keys(items[0]) : [],
+            firstItemTicker: items[0]?.ticker ? Object.keys(items[0].ticker).slice(0, 20) : []
+        });
 
         // Render each item with full data using FieldRendererService
         // Using for...of loop to avoid async issues with forEach
-        for (const item of items) {
+        for (let i = 0; i < items.length; i++) {
+            const item = items[i];
+            window.Logger?.debug?.('🔄 [MONITOR] Rendering item', {
+                ...PAGE_LOG_CONTEXT,
+                index: `${i + 1}/${items.length}`,
+                itemId: item.id,
+                tickerId: item.ticker_id,
+                hasTicker: !!item.ticker,
+                tickerKeys: item.ticker ? Object.keys(item.ticker).slice(0, 20) : []
+            });
+
             const tr = document.createElement('tr');
             tr.setAttribute('data-item-id', item.id);
             tr.setAttribute('draggable', 'true');
 
             const ticker = item.ticker || {};
             const currencySymbol = ticker.currency_symbol || ticker.currency?.symbol || '$';
+            
+            window.Logger?.debug?.('📊 [MONITOR] Item ticker data', {
+                ...PAGE_LOG_CONTEXT,
+                itemId: item.id,
+                symbol: ticker.symbol,
+                current_price: ticker.current_price,
+                price: ticker.price,
+                change: ticker.change,
+                change_percent: ticker.change_percent,
+                currencySymbol
+            });
 
             // Drag handle column
             const tdDrag = document.createElement('td');
@@ -673,6 +917,7 @@
             flagBtn.className = 'btn btn-sm btn-flag';
             if (item.flag_color) {
                 flagBtn.setAttribute('data-flag-color', item.flag_color);
+                flagBtn.style.color = item.flag_color; // Set flag color
             }
             flagBtn.setAttribute('data-onclick', `window.WatchListsPage?.showFlagPalette(${item.id})`);
             flagBtn.title = 'שינוי דגל';
@@ -682,6 +927,9 @@
             flagIcon.setAttribute('data-size', '16');
             flagIcon.setAttribute('data-alt', 'flag');
             flagIcon.setAttribute('aria-label', 'flag');
+            if (item.flag_color) {
+                flagIcon.style.color = item.flag_color; // Set icon color
+            }
             flagBtn.appendChild(flagIcon);
             tdFlag.appendChild(flagBtn);
             tr.appendChild(tdFlag);
@@ -689,7 +937,8 @@
             // Symbol column
             const tdSymbol = document.createElement('td');
             const strong = document.createElement('strong');
-            strong.textContent = ticker.symbol || item.external_symbol || `טיקר #${item.id}`;
+            const symbol = ticker.symbol || item.external_symbol || `טיקר #${item.id}`;
+            strong.textContent = symbol;
             tdSymbol.appendChild(strong);
             if (item.external_symbol) {
                 const badge = document.createElement('span');
@@ -698,23 +947,51 @@
                 tdSymbol.appendChild(badge);
             }
             tr.appendChild(tdSymbol);
+            
+            window.Logger?.debug?.('✅ [MONITOR] Symbol rendered', {
+                ...PAGE_LOG_CONTEXT,
+                itemId: item.id,
+                symbol: symbol
+            });
 
             // Price column - using FieldRendererService
             const tdPrice = document.createElement('td');
-            const price = ticker.current_price || ticker.price || null;
-            if (price !== null && window.FieldRendererService?.renderAmount) {
-                tdPrice.innerHTML = window.FieldRendererService.renderAmount(price, currencySymbol, 2, false);
+            const price = ticker.current_price ?? ticker.price ?? null;
+            window.Logger?.debug?.('💰 [MONITOR] Price rendering', {
+                ...PAGE_LOG_CONTEXT,
+                itemId: item.id,
+                symbol: symbol,
+                priceValue: price,
+                priceType: typeof price,
+                isFinite: price !== null && price !== undefined ? Number.isFinite(parseFloat(price)) : false,
+                hasFieldRendererService: !!window.FieldRendererService,
+                hasRenderAmount: !!window.FieldRendererService?.renderAmount
+            });
+            if (price !== null && price !== undefined && !isNaN(parseFloat(price)) && Number.isFinite(parseFloat(price)) && window.FieldRendererService?.renderAmount) {
+                const renderedPrice = window.FieldRendererService.renderAmount(parseFloat(price), currencySymbol, 2, false);
+                tdPrice.innerHTML = renderedPrice;
+                window.Logger?.debug?.('✅ [MONITOR] Price rendered', {
+                    ...PAGE_LOG_CONTEXT,
+                    itemId: item.id,
+                    rendered: renderedPrice
+                });
             } else {
                 tdPrice.textContent = 'לא זמין';
                 tdPrice.className = 'text-muted';
+                window.Logger?.warn?.('⚠️ [MONITOR] Price not rendered', {
+                    ...PAGE_LOG_CONTEXT,
+                    itemId: item.id,
+                    price,
+                    reason: !price ? 'no price' : isNaN(parseFloat(price)) ? 'not a number' : !Number.isFinite(parseFloat(price)) ? 'not finite' : !window.FieldRendererService ? 'no FieldRendererService' : !window.FieldRendererService.renderAmount ? 'no renderAmount' : 'unknown'
+                });
             }
             tr.appendChild(tdPrice);
 
             // Change column - using FieldRendererService
             const tdChange = document.createElement('td');
-            const change = ticker.change || ticker.change_amount || null;
-            if (change !== null && window.FieldRendererService?.renderAmount) {
-                tdChange.innerHTML = window.FieldRendererService.renderAmount(change, currencySymbol, 2, true);
+            const change = ticker.change ?? ticker.change_amount ?? null;
+            if (change !== null && change !== undefined && !isNaN(parseFloat(change)) && window.FieldRendererService?.renderAmount) {
+                tdChange.innerHTML = window.FieldRendererService.renderAmount(parseFloat(change), currencySymbol, 2, true);
             } else {
                 tdChange.textContent = '-';
                 tdChange.className = 'text-muted';
@@ -723,9 +1000,9 @@
 
             // Change % column - using FieldRendererService
             const tdChangePercent = document.createElement('td');
-            const changePercent = ticker.change_percent || ticker.change_percentage || null;
-            if (changePercent !== null && window.FieldRendererService?.renderNumericValue) {
-                tdChangePercent.innerHTML = window.FieldRendererService.renderNumericValue(changePercent, '%', true);
+            const changePercent = ticker.change_percent ?? ticker.change_percentage ?? null;
+            if (changePercent !== null && changePercent !== undefined && !isNaN(parseFloat(changePercent)) && window.FieldRendererService?.renderNumericValue) {
+                tdChangePercent.innerHTML = window.FieldRendererService.renderNumericValue(parseFloat(changePercent), '%', true);
             } else {
                 tdChangePercent.textContent = '-';
                 tdChangePercent.className = 'text-muted';
@@ -734,9 +1011,9 @@
 
             // Daily Change % column - using FieldRendererService
             const tdDailyChange = document.createElement('td');
-            const dailyChangePercent = ticker.daily_change_percent || ticker.daily_change_percentage || null;
-            if (dailyChangePercent !== null && window.FieldRendererService?.renderNumericValue) {
-                tdDailyChange.innerHTML = window.FieldRendererService.renderNumericValue(dailyChangePercent, '%', true);
+            const dailyChangePercent = ticker.daily_change_percent ?? ticker.daily_change_percentage ?? null;
+            if (dailyChangePercent !== null && dailyChangePercent !== undefined && !isNaN(parseFloat(dailyChangePercent)) && window.FieldRendererService?.renderNumericValue) {
+                tdDailyChange.innerHTML = window.FieldRendererService.renderNumericValue(parseFloat(dailyChangePercent), '%', true);
             } else {
                 tdDailyChange.textContent = '-';
                 tdDailyChange.className = 'text-muted';
@@ -801,9 +1078,9 @@
 
             // P/L column - using FieldRendererService
             const tdPL = document.createElement('td');
-            const pl = ticker.profit_loss || ticker.pl || null;
-            if (pl !== null && window.FieldRendererService?.renderAmount) {
-                tdPL.innerHTML = window.FieldRendererService.renderAmount(pl, currencySymbol, 2, true);
+            const pl = ticker.profit_loss ?? ticker.pl ?? null;
+            if (pl !== null && pl !== undefined && !isNaN(parseFloat(pl)) && window.FieldRendererService?.renderAmount) {
+                tdPL.innerHTML = window.FieldRendererService.renderAmount(parseFloat(pl), currencySymbol, 2, true);
             } else {
                 tdPL.textContent = '-';
                 tdPL.className = 'text-muted';
@@ -812,30 +1089,20 @@
 
             // P/L % column - using FieldRendererService
             const tdPLPercent = document.createElement('td');
-            const plPercent = ticker.profit_loss_percent || ticker.pl_percent || null;
-            if (plPercent !== null && window.FieldRendererService?.renderNumericValue) {
-                tdPLPercent.innerHTML = window.FieldRendererService.renderNumericValue(plPercent, '%', true);
+            const plPercent = ticker.profit_loss_percent ?? ticker.pl_percent ?? null;
+            if (plPercent !== null && plPercent !== undefined && !isNaN(parseFloat(plPercent)) && window.FieldRendererService?.renderNumericValue) {
+                tdPLPercent.innerHTML = window.FieldRendererService.renderNumericValue(parseFloat(plPercent), '%', true);
             } else {
                 tdPLPercent.textContent = '-';
                 tdPLPercent.className = 'text-muted';
             }
             tr.appendChild(tdPLPercent);
 
-            // Actions column
+            // Actions column - only delete button (no edit button for items)
             const tdActions = document.createElement('td');
             tdActions.className = 'actions-cell';
             const actionsContainer = document.createElement('div');
             actionsContainer.className = 'action-buttons-container';
-
-            // Edit button - using data-button-type for proper icon rendering
-            const editBtn = document.createElement('button');
-            editBtn.type = 'button';
-            editBtn.setAttribute('data-button-type', 'EDIT');
-            editBtn.setAttribute('data-variant', 'small');
-            editBtn.setAttribute('data-text', '');
-            editBtn.setAttribute('data-onclick', `window.WatchListsPage?.editItem(${item.id})`);
-            editBtn.title = 'עריכה';
-            actionsContainer.appendChild(editBtn);
 
             // Delete button - using data-button-type for proper icon rendering
             const deleteBtn = document.createElement('button');
@@ -860,7 +1127,7 @@
             }, 100);
         } else if (window.ButtonSystemInit?.initializeButtons) {
             setTimeout(() => {
-                window.ButtonSystemInit.initializeButtons(tbody);
+            window.ButtonSystemInit.initializeButtons(tbody);
             }, 100);
         }
 
@@ -1101,10 +1368,65 @@
      * @param {string} color - Flag color (hex)
      */
     async function setFlag(itemId, color) {
-        if (window.WatchListsUIService?.setFlag) {
-            await window.WatchListsUIService.setFlag(itemId, color);
-        } else {
-            window.Logger?.debug?.('🚩 Flag set', { ...PAGE_LOG_CONTEXT, itemId, color });
+        try {
+            if (!activeListId) {
+                window.Logger?.warn?.('⚠️ No active list selected', PAGE_LOG_CONTEXT);
+                return;
+            }
+
+            // Use UI Service if available (preferred - centralized logic)
+            if (window.WatchListsUIService?.setFlag) {
+                await window.WatchListsUIService.setFlag(itemId, color);
+            } else if (window.WatchListsDataService?.updateWatchListItem) {
+                // Fallback: Use Data Service directly
+                await window.WatchListsDataService.updateWatchListItem(activeListId, itemId, { flag_color: color });
+            } else {
+                // Last resort: Direct API call
+                const response = await fetch(`/api/watch-lists/${activeListId}/items/${itemId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ flag_color: color })
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.error?.message || `Failed to update flag: ${response.status}`);
+                }
+            }
+
+            // Invalidate cache
+            if (window.CacheSyncManager?.invalidateByAction) {
+                await window.CacheSyncManager.invalidateByAction('watch-list-updated');
+            }
+
+            // Reload items to ensure sync
+            await loadWatchListItems(activeListId);
+            
+            // Sync flag list if flag was set/removed
+            if (window.WatchListsDataService?.syncSingleFlagList) {
+                try {
+                    if (color) {
+                        await window.WatchListsDataService.syncSingleFlagList(color);
+                    }
+                    // Also sync if flag was removed (to remove from flag list)
+                    // We need to check the old flag color - for now, sync all flag lists
+                    await window.WatchListsDataService.syncFlagLists();
+                } catch (error) {
+                    window.Logger?.warn?.('⚠️ Error syncing flag list after flag change', {
+                        ...PAGE_LOG_CONTEXT,
+                        error: error?.message
+                    });
+                }
+            }
+            
+            renderSummaryStats();
+
+            window.Logger?.info?.('✅ Flag set', { ...PAGE_LOG_CONTEXT, itemId, color });
+        } catch (error) {
+            window.Logger?.error?.('❌ Error setting flag', { ...PAGE_LOG_CONTEXT, itemId, color, error: error?.message || error });
+            if (window.NotificationSystem?.showError) {
+                window.NotificationSystem.showError('שגיאה', `לא ניתן לעדכן את הדגל: ${error?.message || 'שגיאה לא ידועה'}`);
+            }
         }
     }
 
@@ -1113,10 +1435,29 @@
      * @param {number} itemId - Item ID
      */
     async function removeFlag(itemId) {
-        if (window.WatchListsUIService?.removeFlag) {
-            await window.WatchListsUIService.removeFlag(itemId);
-        } else {
-            window.Logger?.debug?.('🚩 Flag removed', { ...PAGE_LOG_CONTEXT, itemId });
+        try {
+            if (!activeListId) {
+                window.Logger?.warn?.('⚠️ No active list selected', PAGE_LOG_CONTEXT);
+                return;
+            }
+
+            // Use UI Service if available (preferred - centralized logic)
+            if (window.WatchListsUIService?.removeFlag) {
+                await window.WatchListsUIService.removeFlag(itemId);
+            } else if (window.WatchListsDataService?.updateWatchListItem) {
+                // Fallback: Use Data Service directly
+                await window.WatchListsDataService.updateWatchListItem(activeListId, itemId, { flag_color: null });
+            } else {
+                window.Logger?.warn?.('⚠️ No flag removal method available', PAGE_LOG_CONTEXT);
+            }
+
+            // Reload items to ensure sync
+            await loadWatchListItems(activeListId);
+            renderSummaryStats();
+
+            window.Logger?.info?.('✅ Flag removed', { ...PAGE_LOG_CONTEXT, itemId });
+        } catch (error) {
+            window.Logger?.error?.('❌ Error removing flag', { ...PAGE_LOG_CONTEXT, itemId, error: error?.message || error });
         }
     }
 
@@ -1144,7 +1485,7 @@
             // Use ModalManagerV2.showEditModal - loads data from API automatically
             if (window.ModalManagerV2 && typeof window.ModalManagerV2.showEditModal === 'function') {
                 await window.ModalManagerV2.showEditModal('watchListModal', 'watch_list', listId);
-            } else {
+                } else {
                 window.Logger?.warn?.('⚠️ ModalManagerV2.showEditModal not available', PAGE_LOG_CONTEXT);
             }
         } catch (error) {
@@ -1252,10 +1593,10 @@
                     },
                     requiresHardReload: false,
                     fieldMap: {
-                        name: { id: 'watchListName', type: 'text' },
-                        icon: { id: 'watchListIcon', type: 'text' },
+                name: { id: 'watchListName', type: 'text' },
+                icon: { id: 'watchListIcon', type: 'text' },
                         icon_library: { id: 'watchListIconLibrary', type: 'text' },
-                        view_mode: { id: 'watchListViewMode', type: 'text' }
+                view_mode: { id: 'watchListViewMode', type: 'text' }
                     },
                     entityId: listId || null,
                     isEdit: isEdit
@@ -1335,12 +1676,12 @@
                     successMessage: 'רשימה נמחקה בהצלחה',
                     entityName: 'רשימה',
                     reloadFn: async () => {
-                        await loadWatchLists();
-                        renderSummaryStats();
+                            await loadWatchLists();
+                            renderSummaryStats();
                         // Clear active list if it was deleted
-                        if (activeListId === listId) {
-                            activeListId = null;
-                            activeListItems = [];
+                            if (activeListId === listId) {
+                                activeListId = null;
+                                activeListItems = [];
                             await renderActiveListView([]);
                         }
                     },
@@ -1425,25 +1766,85 @@
                 return;
             }
 
-            // Remove via data service
+            // Use UnifiedCRUDService with custom endpoint for watch_list_item
+            // watch_list_item is not a primary entity type, so we use CRUDResponseHandler directly
             if (window.WatchListsDataService?.removeTickerFromList) {
-                const result = await window.WatchListsDataService.removeTickerFromList(itemId);
+                // Show confirmation dialog first
+                const confirmed = await window.showConfirmationDialog?.(
+                    'הסרת טיקר מהרשימה',
+                    'האם אתה בטוח שברצונך להסיר את הטיקר מהרשימה?',
+                    'מחק',
+                    'ביטול'
+                );
 
-                // Handle response via CRUDResponseHandler
-                if (window.CRUDResponseHandler?.handleResponse) {
-                    await window.CRUDResponseHandler.handleResponse(result, {
+                if (!confirmed) {
+                    return;
+                }
+
+                // Get response from data service
+                const response = await window.WatchListsDataService.removeTickerFromList(itemId);
+
+                // Handle response - use CRUDResponseHandler if available
+                if (response && window.CRUDResponseHandler?.handleDeleteResponse) {
+                    await window.CRUDResponseHandler.handleDeleteResponse(response, {
                         entityType: 'watch_list_item',
-                        operation: 'delete',
-                        onSuccess: async () => {
+                        entityName: 'פריט רשימה',
+                        reloadFn: async () => {
+                            // Close confirmation modal if open
+                            const confirmationModal = document.getElementById('confirmationModal');
+                            if (confirmationModal) {
+                                const modalInstance = bootstrap.Modal.getInstance(confirmationModal);
+                                if (modalInstance) {
+                                    modalInstance.hide();
+                                }
+                            }
+
+                            // Reload watch list items after deletion
                             await loadWatchListItems(activeListId);
                             renderSummaryStats();
                         },
-                        showNotification: true
+                        onSuccess: async () => {
+                            window.Logger?.info?.('✅ Item removed successfully', { ...PAGE_LOG_CONTEXT, itemId });
+                        }
                     });
+                } else {
+                    // Fallback: manual handling
+                    if (response && response.ok) {
+                        // Close confirmation modal if open
+                        const confirmationModal = document.getElementById('confirmationModal');
+                        if (confirmationModal) {
+                            const modalInstance = bootstrap.Modal.getInstance(confirmationModal);
+                            if (modalInstance) {
+                                modalInstance.hide();
+                            }
+                        }
+
+                        // Show success notification
+                        if (window.NotificationSystem?.showSuccess) {
+                            window.NotificationSystem.showSuccess('הצלחה', 'הטיקר הוסר מהרשימה בהצלחה');
+                        } else if (window.showNotification) {
+                            window.showNotification('הצלחה', 'success', 'הטיקר הוסר מהרשימה בהצלחה', 3000);
+                        }
+
+                        // Reload items
+                        await loadWatchListItems(activeListId);
+                        renderSummaryStats();
+                    } else {
+                        throw new Error('תגובת השרת לא תקינה');
+                    }
                 }
+            } else {
+                throw new Error('WatchListsDataService.removeTickerFromList לא זמין');
             }
         } catch (error) {
             window.Logger?.error?.('❌ Error removing item', { ...PAGE_LOG_CONTEXT, itemId, error: error?.message || error });
+            
+            // Show error notification
+            if (window.NotificationSystem?.showError) {
+                window.NotificationSystem.showError('שגיאה', `לא ניתן להסיר את הטיקר: ${error?.message || 'שגיאה לא ידועה'}`);
+            } else if (window.showNotification) {
+                window.showNotification('שגיאה', 'error', `לא ניתן להסיר את הטיקר: ${error?.message || 'שגיאה לא ידועה'}`, 5000);
+            }
         }
     }
 
@@ -1532,6 +1933,33 @@
     }
 
     /**
+     * Refresh flag lists - sync all automatic flag lists
+     * @async
+     */
+    async function refreshFlagLists() {
+        try {
+            if (!window.WatchListsDataService?.syncFlagLists) {
+                window.Logger?.warn?.('⚠️ syncFlagLists not available', PAGE_LOG_CONTEXT);
+                return;
+            }
+
+            window.Logger?.info?.('🔄 Syncing flag lists...', PAGE_LOG_CONTEXT);
+            await window.WatchListsDataService.syncFlagLists();
+            
+            // Reload watch lists to include flag lists
+            await loadWatchLists();
+            
+            window.Logger?.info?.('✅ Flag lists synced', PAGE_LOG_CONTEXT);
+        } catch (error) {
+            window.Logger?.error?.('❌ Error syncing flag lists', {
+                ...PAGE_LOG_CONTEXT,
+                error: error?.message || error
+            });
+            // Don't show error to user - flag lists are optional
+        }
+    }
+
+    /**
      * Render cards view (helper)
      * @param {Array} items - Items to render
      */
@@ -1585,20 +2013,25 @@
             symbolStrong.textContent = symbol;
             cardHeader.appendChild(symbolStrong);
 
+            // Flag button - always show (allows adding/removing flag)
+            const flagBtn = document.createElement('button');
+            flagBtn.type = 'button';
+            flagBtn.className = 'btn btn-sm btn-flag';
             if (item.flag_color) {
-                const flagBtn = document.createElement('button');
-                flagBtn.type = 'button';
-                flagBtn.className = 'btn btn-sm btn-flag';
                 flagBtn.setAttribute('data-flag-color', item.flag_color);
-                flagBtn.setAttribute('data-onclick', `window.WatchListsPage?.showFlagPalette(${item.id})`);
-                flagBtn.title = 'שינוי דגל';
-                const flagIcon = document.createElement('span');
-                flagIcon.className = 'icon-placeholder icon';
-                flagIcon.setAttribute('data-icon', 'flag-filled');
-                flagIcon.setAttribute('data-size', '16');
-                flagBtn.appendChild(flagIcon);
-                cardHeader.appendChild(flagBtn);
+                flagBtn.style.color = item.flag_color;
             }
+            flagBtn.setAttribute('data-onclick', `window.WatchListsPage?.showFlagPalette(${item.id})`);
+            flagBtn.title = 'שינוי דגל';
+            const flagIcon = document.createElement('span');
+            flagIcon.className = 'icon-placeholder icon';
+            flagIcon.setAttribute('data-icon', item.flag_color ? 'flag-filled' : 'flag');
+            flagIcon.setAttribute('data-size', '16');
+            if (item.flag_color) {
+                flagIcon.style.color = item.flag_color;
+            }
+            flagBtn.appendChild(flagIcon);
+            cardHeader.appendChild(flagBtn);
 
             cardBody.appendChild(cardHeader);
 
@@ -1701,6 +2134,26 @@
 
             const leftContent = document.createElement('div');
             leftContent.className = 'd-flex align-items-center gap-3';
+
+            // Flag button - always show (allows adding/removing flag)
+            const flagBtn = document.createElement('button');
+            flagBtn.type = 'button';
+            flagBtn.className = 'btn btn-sm btn-flag';
+            if (item.flag_color) {
+                flagBtn.setAttribute('data-flag-color', item.flag_color);
+                flagBtn.style.color = item.flag_color;
+            }
+            flagBtn.setAttribute('data-onclick', `window.WatchListsPage?.showFlagPalette(${item.id})`);
+            flagBtn.title = 'שינוי דגל';
+            const flagIcon = document.createElement('span');
+            flagIcon.className = 'icon-placeholder icon';
+            flagIcon.setAttribute('data-icon', item.flag_color ? 'flag-filled' : 'flag');
+            flagIcon.setAttribute('data-size', '16');
+            if (item.flag_color) {
+                flagIcon.style.color = item.flag_color;
+            }
+            flagBtn.appendChild(flagIcon);
+            leftContent.appendChild(flagBtn);
 
             // Symbol
             const symbolStrong = document.createElement('strong');
@@ -1914,7 +2367,8 @@
         refreshAll,
 
         // Utilities
-        getCurrentListId
+        getCurrentListId,
+        refreshFlagLists
     };
 
     // Individual function exports for HTML onclick handlers

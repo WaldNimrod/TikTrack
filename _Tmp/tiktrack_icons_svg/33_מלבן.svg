@@ -1,7 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
-  <title>33. מלבן</title>
-  <circle cx="100" cy="100" r="90" fill="none" stroke="#284b63" stroke-width="10"/>
-  <g stroke="#26b7a9" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none">
-    <rect x="60" y="70" width="80" height="60" rx="6" />
-  </g>
-</svg>

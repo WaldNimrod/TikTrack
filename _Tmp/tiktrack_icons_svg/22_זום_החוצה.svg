@@ -1,9 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
-  <title>22. זום החוצה</title>
-  <circle cx="100" cy="100" r="90" fill="none" stroke="#284b63" stroke-width="10"/>
-  <g stroke="#26b7a9" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none">
-    <circle cx="95" cy="95" r="40" />
-    <line x1="120" y1="120" x2="150" y2="150" />
-    <line x1="80" y1="95" x2="110" y2="95" />
-  </g>
-</svg>

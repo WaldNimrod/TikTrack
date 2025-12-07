@@ -58,6 +58,33 @@ trading-ui/scripts/bundles/
 archive/
 reports/advanced-duplicates-*.json
 
+# Temporary directories and files
+_Tmp/
+_Tmp/**
+
+# Old reports and test results (keep only recent ones)
+*REPORT*.md
+*TEST*.md
+*STATUS*.md
+*AUDIT*.md
+*FINAL*.md
+*COMPLETE*.md
+*VERIFICATION*.md
+*_results*.json
+*_test*.json
+console_errors*.json
+test_*.json
+*_output.txt
+
+# Test coverage and results
+coverage/
+test-results/
+
+# Old backup directories
+backup/
+logs/
+logs-production/
+
 # Production environment - exclude DB and logs only
 production/Backend/db/*.db
 production/Backend/db/*.db-shm

@@ -1,8 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
-  <title>22</title>
-  <circle cx="100" cy="100" r="90" fill="none" stroke="#284b63" stroke-width="10"/>
-  <g transform="translate(-40,-40) scale(1.4)" stroke="#26b7a9" stroke-width="10" 
-     stroke-linecap="round" stroke-linejoin="round" fill="none">
-<circle cx='95' cy='95' r='40'/><line x1='80' y1='95' x2='110' y2='95'/>
-  </g>
-</svg>

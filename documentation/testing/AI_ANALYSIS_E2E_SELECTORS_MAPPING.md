@@ -169,15 +169,19 @@ expect(count).toBe(1);
     </div>
   </div>
   <!-- Modals -->
-  <div id="aiTemplateSelectionModal">...</div>
-  <div id="aiVariablesModal">...</div>
-  <div id="aiResultsModal">...</div>
+  <!-- Note: Old modals (aiTemplateSelectionModal, aiVariablesModal) removed in December 2025 -->
+  <div id="aiAnalysisWizardModal">...</div> <!-- New Wizard interface with 3 steps -->
+  <div id="aiResultsModal">...</div> <!-- Still used for rerun and direct result viewing -->
 </body>
 ```
 
 ### במודלים:
-- **`#aiTemplateSelectionModal`**: מכיל `#templatesContainerModal`
-- **`#aiVariablesModal`**: מכיל `#aiAnalysisFormModal`, `#variablesContainerModal`, `#llmProviderModal`, `#generateAnalysisBtnModal`
+- **`#aiAnalysisWizardModal`**: ✅ Wizard החדש עם 3 שלבים
+  - שלב 1: `#ai-wizard-step-1` - בחירת מנוע (`#wizardProviderSelect`), שפה (`#wizardLanguageSelect`) ותבנית (`#wizardTemplatesContainer`)
+  - שלב 2: `#ai-wizard-step-2` - פילטרים (`#wizardFiltersContainer`) ומאפיינים (`#wizardVariablesContainer`)
+  - שלב 3: `#ai-wizard-step-3` - תוצאות (`#wizardResultsContainer`)
+- **`#aiResultsModal`**: ✅ עדיין בשימוש להרצה חוזרת וצפייה ישירה בתוצאות
+  - מכיל `#resultsContainerModal`, `#saveAsNoteBtnModal`, `#exportPDFBtnModal`, וכו'
 - **`#aiResultsModal`**: מכיל `#resultsContainerModal`, `#saveAsNoteBtnModal`, `#exportPDFBtnModal`, וכו'
 
 ---

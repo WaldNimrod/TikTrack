@@ -10,13 +10,13 @@
     "notes": "יצירת בסיס נתונים פרודקשן עם מפתחות מסודרים ונתוני דוגמה מלאים"
   },
   "development": {
-    "version": "1.3.94.0",
+    "version": "1.3.95.0",
     "major": 1,
     "minor": 3,
-    "patch": 94,
+    "patch": 95,
     "build": 0,
-    "commit": "6ce1411ca4c4e975da85211d5bf7a5efa282ab42",
-    "updated_at": "2025-12-07T01:37:09+00:00",
-    "notes": "תיקון: סגירת מודול הוספת טיקר לרשימה אחרי שמירה - תיקון CRUDResponseHandler.handleResponse"
+    "commit": "5a67c6e1adeb18ea15065551c3737d77275fd7b9",
+    "updated_at": "2025-12-07T20:12:12+00:00",
+    "notes": "Replace old AI analysis modal interface with 3-step wizard and improve error messages"
   }
 }

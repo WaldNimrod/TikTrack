@@ -7,6 +7,9 @@ Date: 2025-12-04
 """
 
 from typing import Dict, Optional, Tuple
+import logging
+
+logger = logging.getLogger(__name__)
 
 # Error code constants
 class AIAnalysisErrorCodes:
@@ -77,7 +80,9 @@ ERROR_MESSAGES: Dict[str, Dict[str, str]] = {
     AIAnalysisErrorCodes.PROVIDER_RATE_LIMIT: {
         'he': 'חרגת ממגבלת הבקשות. נא לנסות שוב בעוד כמה דקות.',
         'en': 'Rate limit exceeded. Please try again in a few minutes.',
-        'action': 'retry_later'
+        'action': 'retry_later',
+        'detailed_template': 'he',
+        'detailed_message_he': 'חרגת ממגבלת הבקשות עבור מנוע {provider}. נא לנסות שוב בעוד {retry_after} דקות או מאוחר יותר.'
     },
     AIAnalysisErrorCodes.PROVIDER_TIMEOUT: {
         'he': 'הבקשה ארכה יותר מדי זמן. נא לנסות שוב.',
@@ -92,7 +97,9 @@ ERROR_MESSAGES: Dict[str, Dict[str, str]] = {
     AIAnalysisErrorCodes.PROVIDER_QUOTA_EXCEEDED: {
         'he': 'חרגת ממכסת הבקשות החודשית. נא לבדוק את המכסה שלך.',
         'en': 'Monthly quota exceeded. Please check your quota.',
-        'action': 'check_quota'
+        'action': 'check_quota',
+        'detailed_template': 'he',
+        'detailed_message_he': 'חרגת ממכסת הבקשות החודשית עבור מנוע {provider}. המכסה מתאפסת ב-{reset_time}. ניתן לנסות שוב מאוחר יותר או לבדוק את המכסה בהגדרות המשתמש.'
     },
     AIAnalysisErrorCodes.PROVIDER_INVALID_RESPONSE: {
         'he': 'התגובה מהשירות לא תקינה. נא לנסות שוב.',
@@ -332,7 +339,9 @@ def categorize_error(error: Exception, error_message: str = None) -> str:
 
 
 def format_error_response(error_code: str, original_message: str = None, 
-                         language: str = 'he', **kwargs) -> Dict[str, any]:
+                         language: str = 'he', provider: str = None,
+                         reset_time: str = None, retry_after: int = None,
+                         **kwargs) -> Dict[str, any]:
     """
     Format error response with error code and user-friendly message
     
@@ -340,19 +349,72 @@ def format_error_response(error_code: str, original_message: str = None,
         error_code: Error code
         original_message: Original error message (for logging)
         language: Language code ('he' or 'en')
+        provider: AI provider name (e.g., 'gemini', 'perplexity')
+        reset_time: Quota reset time (formatted string)
+        retry_after: Retry after X minutes (for rate limits)
         **kwargs: Additional fields to include
         
     Returns:
-        Dictionary with error response
+        Dictionary with error response including detailed message
     """
     user_message, action = get_error_message(error_code, language)
     
+    # Check if this error has a detailed template
+    error_info = ERROR_MESSAGES.get(error_code, {})
+    detailed_template = error_info.get('detailed_template')
+    detailed_message_key = f"detailed_message_{language}" if detailed_template == language else None
+    
+    # Build detailed message if template exists
+    detailed_message = None
+    if detailed_message_key and detailed_message_key in error_info:
+        template = error_info[detailed_message_key]
+        try:
+            # Format template with available variables
+            template_vars = {}
+            if provider:
+                # Translate provider name to Hebrew
+                provider_names = {
+                    'gemini': 'Gemini',
+                    'perplexity': 'Perplexity'
+                }
+                template_vars['provider'] = provider_names.get(provider.lower(), provider)
+            if reset_time:
+                template_vars['reset_time'] = reset_time
+            if retry_after is not None:
+                template_vars['retry_after'] = retry_after
+            elif reset_time:
+                # Calculate approximate minutes until reset (if reset_time is in future)
+                from datetime import datetime
+                try:
+                    reset_dt = datetime.fromisoformat(reset_time.replace('Z', '+00:00'))
+                    now = datetime.now(reset_dt.tzinfo)
+                    if reset_dt > now:
+                        diff = reset_dt - now
+                        template_vars['retry_after'] = int(diff.total_seconds() / 60)
+                except:
+                    pass
+            
+            if template_vars:
+                detailed_message = template.format(**template_vars)
+        except (KeyError, ValueError) as e:
+            # If template formatting fails, use regular message
+            logger.warning(f"Failed to format detailed error message: {e}")
+            detailed_message = None
+    
     response = {
         'error_code': error_code,
-        'message': user_message,
+        'message': detailed_message or user_message,  # Use detailed if available
         'original_message': original_message,  # For debugging
         'action': action
     }
+    
+    # Add detailed information for frontend
+    if provider:
+        response['provider'] = provider
+    if reset_time:
+        response['reset_time'] = reset_time
+    if retry_after is not None:
+        response['retry_after_minutes'] = retry_after
     
     response.update(kwargs)
     

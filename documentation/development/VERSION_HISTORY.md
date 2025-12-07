@@ -245,3 +245,4 @@ This log tracks version bumps for the development environment (branch `main`). M
 | 2025-12-06T23:23:45+00:00 | 1.3.92.0 | 1.3.91.0 | b703d5d01f7467fb911a0cfdd6efe0d81d847b50 | 815776016857f0342073693c066a92cadeeafd7b | patch | Add backup file patterns to .gitignore |
 | 2025-12-06T23:26:17+00:00 | 1.3.93.0 | 1.3.92.0 | a793ffce0ac81f18d7d0c647ade506685b0499dd | b703d5d01f7467fb911a0cfdd6efe0d81d847b50 | patch | שילוב 3 עמודי מוקאפים במערכת - היסטוריית טרייד, מצב תיק היסטורי, יומן מסחר |
 | 2025-12-07T01:37:09+00:00 | 1.3.94.0 | 1.3.93.0 | 6ce1411ca4c4e975da85211d5bf7a5efa282ab42 | a793ffce0ac81f18d7d0c647ade506685b0499dd | patch | תיקון: סגירת מודול הוספת טיקר לרשימה אחרי שמירה - תיקון CRUDResponseHandler.handleResponse |
+| 2025-12-07T20:12:12+00:00 | 1.3.95.0 | 1.3.94.0 | 5a67c6e1adeb18ea15065551c3737d77275fd7b9 | 6ce1411ca4c4e975da85211d5bf7a5efa282ab42 | patch | Replace old AI analysis modal interface with 3-step wizard and improve error messages |

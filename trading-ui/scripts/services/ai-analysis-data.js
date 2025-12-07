@@ -229,14 +229,72 @@
    * Uses CacheTTLGuard for caching validation results (TTL: 60 seconds)
    */
   async function validateAnalysisRequest(data) {
+    // Log input data for debugging
+    window.Logger?.debug?.('🔍 validateAnalysisRequest called', {
+      ...PAGE_LOG_CONTEXT,
+      dataType: typeof data,
+      dataKeys: data ? Object.keys(data) : [],
+      template_id: data?.template_id,
+      template_id_type: typeof data?.template_id,
+      template_id_value: data?.template_id,
+      provider: data?.provider,
+      has_variables: !!data?.variables
+    });
+    
+    // Validate input structure
+    if (!data || typeof data !== 'object') {
+      window.Logger?.error?.('❌ validateAnalysisRequest: invalid data parameter', {
+        ...PAGE_LOG_CONTEXT,
+        data: data
+      });
+      return {
+        is_valid: false,
+        errors: ['Invalid validation data: must be an object']
+      };
+    }
+    
+    // Ensure template_id is a number, not an object
+    if (data.template_id && typeof data.template_id === 'object') {
+      window.Logger?.error?.('❌ validateAnalysisRequest: template_id is an object!', {
+        ...PAGE_LOG_CONTEXT,
+        template_id: data.template_id,
+        template_id_type: typeof data.template_id,
+        full_data: data
+      });
+      // Try to extract actual template_id
+      if (data.template_id.template_id !== undefined) {
+        data.template_id = data.template_id.template_id;
+        window.Logger?.warn?.('⚠️ Extracted template_id from nested object', {
+          ...PAGE_LOG_CONTEXT,
+          extracted_template_id: data.template_id
+        });
+      } else {
+        return {
+          is_valid: false,
+          errors: ['Invalid template_id: expected number, got object']
+        };
+      }
+    }
+    
     const cacheKey = window.CacheKeyHelper?.generateCacheKeyFromObject 
       ? window.CacheKeyHelper.generateCacheKeyFromObject('business:validate-ai-analysis', data)
       : `business:validate-ai-analysis:${JSON.stringify(data)}`;
+    
+    window.Logger?.debug?.('🔑 Generated cache key', {
+      ...PAGE_LOG_CONTEXT,
+      cacheKey: cacheKey
+    });
     
     try {
       // Use CacheTTLGuard for automatic cache management
       if (window.CacheTTLGuard?.ensure) {
         return await window.CacheTTLGuard.ensure(cacheKey, async () => {
+          // Log before sending request
+          window.Logger?.debug?.('📤 Sending validation request to API', {
+            ...PAGE_LOG_CONTEXT,
+            data: data,
+            data_json: JSON.stringify(data)
+          });
           const response = await fetch(buildUrl('/api/business/ai-analysis/validate'), {
             method: 'POST',
             headers: {

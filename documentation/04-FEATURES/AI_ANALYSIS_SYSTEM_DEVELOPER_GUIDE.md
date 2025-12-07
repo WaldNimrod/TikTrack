@@ -1,9 +1,9 @@
 # AI Analysis System - Developer Guide
 
 **תאריך יצירה:** 28 בינואר 2025  
-**תאריך עדכון אחרון:** 06 בדצמבר 2025  
-**גרסה:** 2.0.0  
-**סטטוס:** ✅ מעודכן - כולל v2.0, DateRangePickerService, TradeAggregationService
+**תאריך עדכון אחרון:** 07 בדצמבר 2025  
+**גרסה:** 2.1.0  
+**סטטוס:** ✅ מעודכן - כולל v2.0, DateRangePickerService, TradeAggregationService, Wizard Interface
 
 ---
 
@@ -61,6 +61,28 @@ def ai_analysis() -> Any:
 
 ## 🏗️ ארכיטקטורה
 
+### ממשק ה-User Interface (דצמבר 2025)
+
+#### Wizard Interface (ממשק החדש) ⭐
+המערכת משתמשת בממשק וויזארד עם 3 שלבים:
+
+1. **שלב 1:** בחירת מנוע AI, שפת משוב ותבנית ניתוח
+2. **שלב 2:** הגדרת פילטרים (אקורדיאון) ומאפיינים לניתוח (אקורדיאון)
+3. **שלב 3:** הצגת תוצאות עם אפשרות לשמירה, ייצוא וסגירה
+
+**קבצים:**
+- `ai-analysis-wizard.js` - הלוגיקה המלאה של ה-Wizard
+- Modal ID: `aiAnalysisWizardModal` (מוגדר ב-HTML)
+
+#### Legacy Functions (לשמירה על תאימות)
+- `openTemplateSelectionModal()` - עכשיו רק פותח את ה-Wizard
+- `handleTemplateSelectionFromModal()` - עכשיו רק פותח את ה-Wizard
+- `renderVariablesFormModal()` - עדיין בשימוש על ידי ה-Wizard (ל-step 2)
+
+---
+
+## 🏗️ ארכיטקטורה (מפורט)
+
 ### Backend Architecture
 
 ```
@@ -82,14 +104,19 @@ Backend/
 
 ```
 trading-ui/
-├── ai-analysis.html                # Main page
+├── ai-analysis.html                # Main page (includes Wizard modal)
 └── scripts/
     ├── services/
     │   └── ai-analysis-data.js     # Data service
-    ├── ai-analysis-manager.js      # UI manager
+    ├── ai-analysis-manager.js      # UI manager (legacy functions for compatibility)
+    ├── ai-analysis-wizard.js       # Wizard interface (3-step process) ⭐ NEW
     ├── ai-result-renderer.js       # Result renderer
-    └── ai-template-selector.js     # Template selector
+    ├── ai-template-selector.js     # Template selector
+    ├── ai-notes-integration.js     # Notes integration
+    └── ai-export-service.js        # Export service (PDF, Markdown, HTML)
 ```
+
+> **הערה:** הממשק הישן (aiTemplateSelectionModal, aiVariablesModal) הוסר בדצמבר 2025. כל יצירת ניתוחים עוברת דרך ה-Wizard החדש.
 
 ### Database Schema
 

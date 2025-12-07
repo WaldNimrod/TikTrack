@@ -1390,7 +1390,7 @@
 
             // Remove via data service
             if (window.WatchListsDataService?.removeTickerFromList) {
-                const result = await window.WatchListsDataService.removeTickerFromList(activeListId, itemId);
+                const result = await window.WatchListsDataService.removeTickerFromList(itemId);
 
                 // Handle response via CRUDResponseHandler
                 if (window.CRUDResponseHandler?.handleResponse) {

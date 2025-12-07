@@ -450,22 +450,9 @@
             titleEl.textContent = currentMode === 'edit' ? 'עריכת רשימה' : 'רשימה חדשה';
         }
 
-        // Ensure selectors are populated (wait a bit for DOM to be ready)
-        setTimeout(async () => {
-            await populateIconSelector();
-            populateColorPalette();
-            setupViewModeSelector();
-        }, 100);
-
-        if (currentMode === 'edit' && data) {
-            await populateForm(data);
-        } else {
-            await resetForm();
-        }
-
-        // Open via ModalManagerV2
+        // Open via ModalManagerV2 first
         if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
-            window.ModalManagerV2.showModal('watchListModal', currentMode, data).catch(error => {
+            await window.ModalManagerV2.showModal('watchListModal', currentMode, data).catch(error => {
                 window.Logger?.error('Error showing watch list modal via ModalManagerV2', { error, modalId: 'watchListModal', page: 'watch-list-modal' });
                 // Fallback to bootstrap if ModalManagerV2 fails
                 if (bootstrap?.Modal && modal) {
@@ -478,6 +465,21 @@
             const bsModal = new bootstrap.Modal(modal);
             bsModal.show();
         }
+
+        // Wait for modal to be fully shown, then populate form and initialize selectors
+        setTimeout(async () => {
+            // Ensure selectors are populated
+            await populateIconSelector();
+            populateColorPalette();
+            setupViewModeSelector();
+            
+            // Populate form AFTER modal is shown and ModalManagerV2.populateForm has run
+            if (currentMode === 'edit' && data) {
+                await populateForm(data);
+            } else {
+                await resetForm();
+            }
+        }, 400);
     }
 
     /**

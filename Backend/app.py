@@ -514,6 +514,9 @@ from routes.api.business_logic import business_logic_bp
 app.register_blueprint(business_logic_bp)
 
 # Historical Data API
+from routes.api.trade_history import trade_history_bp
+from routes.api.portfolio_state import portfolio_state_bp
+from routes.api.trading_journal import trading_journal_bp
 app.register_blueprint(trade_history_bp)
 app.register_blueprint(portfolio_state_bp)
 app.register_blueprint(trading_journal_bp)

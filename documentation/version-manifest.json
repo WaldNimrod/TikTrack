@@ -1,13 +1,13 @@
 {
   "production": {
-    "version": "1.3.17.0",
+    "version": "1.3.18.0",
     "major": 1,
     "minor": 3,
-    "patch": 17,
+    "patch": 18,
     "build": 0,
-    "commit": "c3cea3465bb8d039a6b8f097a952ce5ddf9314b1",
-    "updated_at": "2025-12-07T17:20:22+00:00",
-    "notes": "Add new API files from main merge"
+    "commit": "37522a1ba215cfda56c07ca0ae50c61dd9cb7b43",
+    "updated_at": "2025-12-07T17:31:05+00:00",
+    "notes": "Add Testing Environment Rules to Cursor rules"
   },
   "development": {
     "version": "1.3.94.0",

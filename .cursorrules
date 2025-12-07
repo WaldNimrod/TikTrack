@@ -1,5 +1,100 @@
 # Cursor Rules for TikTrack Project
 
+## Testing Environment Rules - CRITICAL - ABSOLUTE PRIORITY
+**סביבת Testing - הגבלות קריטיות - חובה לקרוא לפני כל פעולה!**
+
+### מהות הסביבה:
+**הסביבה הנוכחית (`TikTrackApp-Production`) היא סביבת Testing - לא סביבת פיתוח!**
+
+### הגדרות סביבה:
+- **תיקייה:** `TikTrackApp-Production/` → מזוהה כ-**Testing** environment
+- **פורט:** 5001
+- **Database:** `TikTrack-db-testing`
+- **מטרה:** בדיקות לפני עליה לאוויר, לא פיתוח פעיל
+
+### הגבלות קריטיות - אסור לעבור עליהן:
+
+#### ❌ אסור לשנות קוד:
+1. **אין לשנות קוד אפליקציה** - רק הגדרות סביבה (config files)
+2. **אין להוסיף פונקציות חדשות** - כל קוד חדש צריך להיות ב-development
+3. **אין לתקן באגים בקוד** - כל תיקון צריך להיות ב-development/main
+4. **אין לשנות לוגיקה עסקית** - רק הגדרות סביבה
+
+#### ✅ מותר לשנות רק:
+1. **הגדרות סביבה** - `production/Backend/config/settings.py`:
+   - `IS_TESTING = True`
+   - `POSTGRES_DB = "TikTrack-db-testing"`
+   - `PORT = 5001`
+   - משתני סביבה אחרים
+2. **הגדרות שרת** - `start_server.sh` (רק זיהוי סביבה)
+3. **הגדרות database** - רק שמות databases ו-connection strings
+
+#### 🔍 תהליך עבודה עם תקלות:
+
+**אם יש תקלה בקוד:**
+1. **חובה ראשונה:** לבדוק אם יש פתרון ב-Git (main branch)
+   ```bash
+   git checkout main
+   git pull origin main
+   # בדוק אם הבעיה נפתרה ב-main
+   ```
+2. **אם יש פתרון ב-main:** למשוך את הקוד המעודכן
+   ```bash
+   git checkout origin/main -- path/to/file.py
+   ```
+3. **אם אין פתרון ב-Git:** **חובה לדווח למשתמש מיד!**
+   - לא לנסות לתקן בעצמך
+   - לא להוסיף קוד חדש
+   - לא לשנות לוגיקה
+   - רק לדווח על הבעיה ולבקש הנחיות
+
+#### 📋 Checklist לפני כל שינוי:
+- [ ] האם זה שינוי בהגדרות סביבה בלבד?
+- [ ] האם בדקתי ב-Git אם יש פתרון?
+- [ ] האם המשתמש אישר את השינוי?
+- [ ] האם זה לא משנה לוגיקה עסקית?
+
+#### ⚠️ דוגמאות למה אסור:
+```python
+# ❌ אסור: תיקון באג בקוד
+def calculate_profit(trade):
+    return trade.price * trade.quantity  # תיקון באג
+
+# ❌ אסור: הוספת פונקציה חדשה
+def new_feature():
+    # קוד חדש
+    pass
+
+# ❌ אסור: שינוי לוגיקה
+if IS_TESTING:
+    # לוגיקה שונה
+    pass
+```
+
+#### ✅ דוגמאות למה מותר:
+```python
+# ✅ מותר: שינוי הגדרות סביבה
+IS_TESTING = True
+POSTGRES_DB = "TikTrack-db-testing"
+PORT = 5001
+
+# ✅ מותר: משיכת קוד מעודכן מ-Git
+git checkout origin/main -- path/to/file.py
+```
+
+### תהליך עדכון קוד:
+1. **תמיד למשוך מ-main** - לא לכתוב קוד חדש
+2. **לפתור conflicts** - אבל רק אם זה הגדרות סביבה
+3. **אם יש בעיה** - לדווח למשתמש, לא לתקן
+
+### זכור:
+- **סביבת Testing = בדיקות בלבד**
+- **לא פיתוח = לא שינוי קוד**
+- **כל תקלה = לבדוק ב-Git תחילה**
+- **אם אין פתרון = לדווח מיד**
+
+**זהו כלל יסוד - חובה לקרוא ולפעול לפיו לפני כל פעולה!**
+
 ## Rule #1 - Use Existing General Systems - CRITICAL
 **לפני כל כתיבת פונקציה או קוד מקומי - חובה לבדוק היטב אם קיים קוד כללי במערכת.**
 
@@ -64,14 +159,14 @@ This is a fundamental rule that ALL future chats must follow. Any documentation 
 
 ### Environment Detection by Directory Name:
 **CRITICAL**: The server automatically detects environment based on workspace directory name:
-- **`TikTrackApp-Production`** → Production environment → Port **5001**
+- **`TikTrackApp-Production`** → **Testing** environment → Port **5001** (NOT production!)
 - **`TikTrackApp`** → Development environment → Port **8080**
 
 **Always verify environment before starting server** by checking the workspace directory name.
 
 ### Server Ports:
 - **Development**: Port **8080** (workspace: `TikTrackApp`)
-- **Production**: Port **5001** (workspace: `TikTrackApp-Production`)
+- **Testing**: Port **5001** (workspace: `TikTrackApp-Production`) - **This is Testing, not Production!**
 
 ### Database Migration Status:
 - **✅ COMPLETED**: Migration from SQLite to PostgreSQL (November 2025)

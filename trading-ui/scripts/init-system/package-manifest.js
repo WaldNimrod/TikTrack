@@ -447,7 +447,7 @@ const PACKAGE_MANIFEST = {
         file: 'services/executions-data.js',
         globalCheck: 'window.ExecutionsData',
         description: 'Executions data service (API + Cache + CRUD)',
-        required: false,
+        required: true, // Required for executions page
         loadOrder: 5.2
       },
       {

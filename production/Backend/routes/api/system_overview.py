@@ -1143,9 +1143,14 @@ def get_environment_info():
     """
     try:
         import os
-        from config.settings import IS_PRODUCTION, PORT, POSTGRES_DB, POSTGRES_HOST, POSTGRES_PORT
+        from config.settings import IS_PRODUCTION, IS_TESTING, PORT, POSTGRES_DB, POSTGRES_HOST, POSTGRES_PORT
         
-        environment = 'production' if IS_PRODUCTION else 'development'
+        if IS_PRODUCTION:
+            environment = 'production'
+        elif IS_TESTING:
+            environment = 'testing'
+        else:
+            environment = 'development'
         
         return jsonify({
             'status': 'success',

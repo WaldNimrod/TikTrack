@@ -1,13 +1,13 @@
 {
   "production": {
-    "version": "1.3.17.0",
+    "version": "1.3.18.0",
     "major": 1,
     "minor": 3,
-    "patch": 17,
+    "patch": 18,
     "build": 0,
-    "commit": "f86b5bf795daa4f71ba67e505719113735c8179e",
-    "updated_at": "2025-12-07T00:23:40+00:00",
-    "notes": "עדכון לאחר משיכת שינויים מצוות פרודקשן - שילוב שינויים מקומיים"
+    "commit": "ad2a13783756ea2e296b8b0d35cc92ad61d181fa",
+    "updated_at": "2025-12-07T17:03:22+00:00",
+    "notes": "Convert production environment to testing environment"
   },
   "development": {
     "version": "1.3.46.0",

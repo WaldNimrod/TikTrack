@@ -10,9 +10,10 @@
 # Location: start_server.sh (project root)
 # Integration: Uses Backend/utils/server_lock_manager.py
 # NOTE: Environment detection by directory name:
-#       - TikTrackApp-Production → Production (port 5001)
+#       - TikTrackApp-Online → Online (port 80/443)
+#       - TikTrackApp-Production → Testing (port 5001)
 #       - TikTrackApp → Development (port 8080)
-#       You can override with --env flag: --env production or --env development
+#       You can override with --env flag: --env testing, --env development, or --env online
 #
 # Database: PostgreSQL (default for development since November 2025)
 # - Automatically sets PostgreSQL environment variables if not already set
@@ -88,13 +89,14 @@ show_help() {
     echo "  -h, --help        Show this help message"
     echo "  --check-only      Only check for conflicts, don't start server"
     echo "  --force           Force start even if conflicts detected (DANGEROUS)"
-    echo "  --env <env>       Environment (development | production)"
-    echo "                    Shorthand: --prod, --production"
+    echo "  --env <env>       Environment (development | testing | online)"
+    echo "                    Shorthand: --prod, --production (deprecated, use --env testing)"
     echo "  --attach          Follow live logs and keep script open (Ctrl+C exits tail)"
     echo ""
     echo "Environment Detection:"
     echo "  The script automatically detects environment from workspace directory name:"
-    echo "  - TikTrackApp-Production → Production (port 5001)"
+    echo "  - TikTrackApp-Online → Online (port 80/443)"
+    echo "  - TikTrackApp-Production → Testing (port 5001)"
     echo "  - TikTrackApp → Development (port 8080)"
     echo "  You can override with --env flag if needed."
     echo ""
@@ -124,14 +126,29 @@ setup_postgresql_env() {
             export POSTGRES_USER=TikTrakDBAdmin
             export POSTGRES_PASSWORD="BigMeZoo1974!?"
             log_success "PostgreSQL environment variables configured for development"
-        elif [ "$ENVIRONMENT" = "production" ]; then
-            log_info "Setting PostgreSQL environment variables (production defaults)..."
+        elif [ "$ENVIRONMENT" = "testing" ]; then
+            log_info "Setting PostgreSQL environment variables (testing defaults)..."
             export POSTGRES_HOST=localhost
-            export POSTGRES_DB=TikTrack-db-development
+            export POSTGRES_DB=TikTrack-db-testing
             export POSTGRES_USER=TikTrakDBAdmin
             export POSTGRES_PASSWORD="BigMeZoo1974!?"
-            log_success "PostgreSQL environment variables configured for production"
-            log_warning "Production is using development database (TikTrack-db-development)"
+            log_success "PostgreSQL environment variables configured for testing"
+        elif [ "$ENVIRONMENT" = "online" ]; then
+            log_info "Setting PostgreSQL environment variables (online defaults)..."
+            export POSTGRES_HOST=localhost
+            export POSTGRES_DB=TikTrack-db-online
+            export POSTGRES_USER=TikTrakDBAdmin
+            export POSTGRES_PASSWORD="BigMeZoo1974!?"
+            log_success "PostgreSQL environment variables configured for online"
+        elif [ "$ENVIRONMENT" = "production" ]; then
+            # Legacy support - map production to testing
+            log_warning "Production environment is deprecated. Mapping to testing."
+            log_info "Setting PostgreSQL environment variables (testing defaults)..."
+            export POSTGRES_HOST=localhost
+            export POSTGRES_DB=TikTrack-db-testing
+            export POSTGRES_USER=TikTrakDBAdmin
+            export POSTGRES_PASSWORD="BigMeZoo1974!?"
+            log_success "PostgreSQL environment variables configured for testing"
         fi
     else
         log_info "PostgreSQL environment variables already set (using existing values)"
@@ -333,15 +350,20 @@ handle_shutdown() {
 
 detect_environment_from_directory() {
     # Detect environment based on workspace directory name
-    # TikTrackApp-Production → production (port 5001)
+    # TikTrackApp-Online → online (port 80/443)
+    # TikTrackApp-Production → testing (port 5001) - changed from production
     # TikTrackApp → development (port 8080)
     
     local workspace_path="$(pwd)"
     local workspace_name="$(basename "$workspace_path")"
     
-    # Check for Production in directory name (case-insensitive)
-    if [[ "$workspace_name" == *"Production"* ]] || [[ "$workspace_name" == *"production"* ]]; then
-        echo "production"
+    # Check for Online in directory name (case-insensitive) - highest priority
+    if [[ "$workspace_name" == *"Online"* ]] || [[ "$workspace_name" == *"online"* ]]; then
+        echo "online"
+        return 0
+    # Check for Production in directory name (case-insensitive) - now maps to testing
+    elif [[ "$workspace_name" == *"Production"* ]] || [[ "$workspace_name" == *"production"* ]]; then
+        echo "testing"
         return 0
     elif [[ "$workspace_name" == "TikTrackApp" ]]; then
         echo "development"
@@ -423,14 +445,34 @@ main() {
     done
 
     case "$ENVIRONMENT" in
-        production|prod|PRODUCTION|Prod)
-            ENVIRONMENT="production"
+        testing|test|TESTING|Test)
+            ENVIRONMENT="testing"
             SERVER_DIR="production/Backend"
             SERVER_FILE="$SERVER_DIR/app.py"
             LOCK_MANAGER="$SERVER_DIR/utils/server_lock_manager.py"
             SERVER_PORT=5001
             DB_PATH="$SERVER_DIR/db/tiktrack.db"
-            log_info "Environment: PRODUCTION → Port: 5001"
+            log_info "Environment: TESTING → Port: 5001"
+            ;;
+        production|prod|PRODUCTION|Prod)
+            # Legacy support - map production to testing
+            log_warning "Production environment is deprecated. Using testing environment."
+            ENVIRONMENT="testing"
+            SERVER_DIR="production/Backend"
+            SERVER_FILE="$SERVER_DIR/app.py"
+            LOCK_MANAGER="$SERVER_DIR/utils/server_lock_manager.py"
+            SERVER_PORT=5001
+            DB_PATH="$SERVER_DIR/db/tiktrack.db"
+            log_info "Environment: TESTING (from production) → Port: 5001"
+            ;;
+        online|ONLINE|Online)
+            ENVIRONMENT="online"
+            SERVER_DIR="online/Backend"
+            SERVER_FILE="$SERVER_DIR/app.py"
+            LOCK_MANAGER="$SERVER_DIR/utils/server_lock_manager.py"
+            SERVER_PORT=80
+            DB_PATH="$SERVER_DIR/db/tiktrack.db"
+            log_info "Environment: ONLINE → Port: 80/443"
             ;;
         development|dev|DEVELOPMENT|Dev|"")
             ENVIRONMENT="development"
@@ -443,7 +485,7 @@ main() {
             ;;
         *)
             log_error "Unknown environment: $ENVIRONMENT"
-            echo "Supported environments: development, production"
+            echo "Supported environments: development, testing, online"
             exit 1
             ;;
     esac

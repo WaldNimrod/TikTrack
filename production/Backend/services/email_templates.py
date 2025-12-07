@@ -61,9 +61,11 @@ def get_base_url() -> str:
         return base_url.rstrip('/')
     
     # Determine from environment
-    is_production = os.getenv('TIKTRACK_ENV', 'development').lower() == 'production'
+    env = os.getenv('TIKTRACK_ENV', 'development').lower()
+    is_production = env == 'production'
+    is_testing = env == 'testing'
     host = os.getenv('TIKTRACK_HOST', '127.0.0.1')
-    port = os.getenv('TIKTRACK_PORT', '5001' if is_production else '8080')
+    port = os.getenv('TIKTRACK_PORT', '5001' if (is_production or is_testing) else '8080')
     
     return f"http://{host}:{port}"
 

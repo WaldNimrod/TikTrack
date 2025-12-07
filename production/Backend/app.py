@@ -69,6 +69,7 @@ from config.settings import (
     HOST,
     PORT,
     IS_PRODUCTION,
+    IS_TESTING,
     ENVIRONMENT,
     UI_DIR
 )
@@ -172,7 +173,10 @@ from routes.api import (
     preferences_bp,
     wal_bp,
     system_settings_bp,
-    watch_lists_bp
+    watch_lists_bp,
+    trade_history_bp,
+    portfolio_state_bp,
+    trading_journal_bp
 )
 from routes.api.preferences_v4 import preferences_v4_bp
 from routes.api.server_logs import server_logs_bp
@@ -509,6 +513,11 @@ app.register_blueprint(entity_details_bp)
 # Business Logic API
 from routes.api.business_logic import business_logic_bp
 app.register_blueprint(business_logic_bp)
+
+# Historical Data API
+app.register_blueprint(trade_history_bp)
+app.register_blueprint(portfolio_state_bp)
+app.register_blueprint(trading_journal_bp)
 
 # Register Cache Sync blueprint
 from routes.api.cache_sync import cache_sync_bp
@@ -2804,7 +2813,12 @@ if __name__ == "__main__":
     # - Notification system works without WebSockets
     
     # Display server startup information
-    env_name = "PRODUCTION" if IS_PRODUCTION else "DEVELOPMENT"
+    if IS_PRODUCTION:
+        env_name = "PRODUCTION"
+    elif IS_TESTING:
+        env_name = "TESTING"
+    else:
+        env_name = "DEVELOPMENT"
     print("🚀 Starting TikTrack Server...")
     print(f"🌍 Environment: {env_name}")
     print(f"📡 Server running on port {PORT}")

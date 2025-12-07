@@ -384,6 +384,15 @@ This is a fundamental rule that ALL future chats must follow.
 3. **Installation**: Requires `pip install selenium webdriver-manager` (one-time setup)
 4. **Automatic ChromeDriver**: Uses `webdriver-manager` for automatic ChromeDriver installation
 5. **Full Coverage**: Tests all pages for JavaScript runtime errors, console messages, and system initialization
+6. **MUST LOGIN AS ADMIN**: Always login as admin (username: `admin`, password: `admin123`) before testing pages
+
+### Authentication Requirement - CRITICAL:
+**חובה להתחבר כמנהל לפני כל בדיקת עמודים:**
+- **Username:** `admin`
+- **Password:** `admin123`
+- **Reason:** Without authentication, many pages won't work correctly and will show false errors
+- **When:** Before testing any page in browser or Selenium
+- **How:** Use browser extension login or Selenium login flow
 
 ### When to Run:
 - ✅ **Before completion of any plan** - Run full Selenium test suite
@@ -409,7 +418,7 @@ This is a fundamental rule that ALL future chats must follow.
 
 ### Example Workflow:
 ```bash
-# 1. Run Selenium tests
+# 1. Run Selenium tests (with admin login)
 python3 scripts/test_pages_console_errors.py
 
 # 2. Review results
@@ -418,6 +427,14 @@ python3 scripts/test_pages_console_errors.py
 # - Re-run if needed
 
 # 3. Only then ask user for manual testing (if needed)
+```
+
+### Browser Testing Workflow:
+```javascript
+// 1. Navigate to login page
+// 2. Login as admin (admin/admin123)
+// 3. Then test all pages
+// 4. Check console for errors
 ```
 
 **This is a fundamental rule that ALL future chats must follow.**

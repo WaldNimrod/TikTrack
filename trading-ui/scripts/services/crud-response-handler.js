@@ -131,9 +131,13 @@ class CRUDResponseHandler {
             // סגירת modal
             if (options.modalId) {
                 console.log('✅ handleSaveResponse - Closing modal:', options.modalId);
-                const modal = bootstrap.Modal.getInstance(document.getElementById(options.modalId));
-                if (modal) {
-                    modal.hide();
+                if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
+                    window.ModalManagerV2.hideModal(options.modalId);
+                } else if (bootstrap?.Modal) {
+                    const modal = bootstrap.Modal.getInstance(document.getElementById(options.modalId));
+                    if (modal) {
+                        modal.hide();
+                    }
                 }
             }
 
@@ -227,9 +231,13 @@ class CRUDResponseHandler {
 
             // סגירת modal
             if (options.modalId) {
-                const modal = bootstrap.Modal.getInstance(document.getElementById(options.modalId));
-                if (modal) {
-                    modal.hide();
+                if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
+                    window.ModalManagerV2.hideModal(options.modalId);
+                } else if (bootstrap?.Modal) {
+                    const modal = bootstrap.Modal.getInstance(document.getElementById(options.modalId));
+                    if (modal) {
+                        modal.hide();
+                    }
                 }
             }
 
@@ -597,27 +605,55 @@ class CRUDResponseHandler {
                     .then(() => {
                         if (typeof window.showNotification === 'function') {
                             window.showNotification('פרטי השגיאה הועתקו ללוח', 'success');
+                        } else if (window.showSuccessNotification) {
+                            window.showSuccessNotification('פרטי השגיאה הועתקו ללוח');
+                        } else if (window.showInfoNotification) {
+                            window.showInfoNotification('פרטי השגיאה הועתקו ללוח', 'success');
                         } else {
                             alert('פרטי השגיאה הועתקו ללוח');
                         }
                     })
                     .catch(() => {
-                        alert('שגיאה בהעתקה ללוח');
+                        if (window.showErrorNotification) {
+                            window.showErrorNotification('שגיאה בהעתקה ללוח');
+                        } else if (window.showInfoNotification) {
+                            window.showInfoNotification('שגיאה בהעתקה ללוח', 'error');
+                        } else {
+                            alert('שגיאה בהעתקה ללוח');
+                        }
                     });
             }
         };
 
-        tbody.innerHTML = `
-            <tr>
-                <td colspan="${columnCount}" class="text-center text-danger" style="padding: 20px;">
-                    <i class="fas ${icon} fa-2x mb-2"></i><br>
-                    <strong style="font-size: 1.1em;">${title}</strong><br>
-                    <small>${message}</small><br>
-                    ${retryBtn}
-                    ${copyBtn}
-                </td>
-            </tr>
-        `;
+        // Build error row using createElement
+        tbody.textContent = '';
+        const errorRow = document.createElement('tr');
+        const errorCell = document.createElement('td');
+        errorCell.colSpan = columnCount;
+        errorCell.className = 'text-center text-danger';
+        errorCell.style.padding = '20px';
+        const errorIcon = document.createElement('i');
+        errorIcon.className = `fas ${icon} fa-2x mb-2`;
+        errorCell.appendChild(errorIcon);
+        errorCell.appendChild(document.createElement('br'));
+        const strong = document.createElement('strong');
+        strong.style.fontSize = '1.1em';
+        strong.textContent = title;
+        errorCell.appendChild(strong);
+        errorCell.appendChild(document.createElement('br'));
+        const small = document.createElement('small');
+        small.textContent = message;
+        errorCell.appendChild(small);
+        errorCell.appendChild(document.createElement('br'));
+        // Insert retry and copy buttons using DOMParser
+        const buttonsHTML = retryBtn + copyBtn;
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(buttonsHTML, 'text/html');
+        doc.body.childNodes.forEach(node => {
+          errorCell.appendChild(node.cloneNode(true));
+        });
+        errorRow.appendChild(errorCell);
+        tbody.appendChild(errorRow);
     }
 
     /**

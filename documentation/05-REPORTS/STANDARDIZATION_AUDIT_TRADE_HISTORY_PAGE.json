@@ -1,0 +1,3633 @@
+{
+  "page": "trade-history-page.html",
+  "js_file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/trade-history-page.js",
+  "html_file": null,
+  "categories": {
+    "unified_init": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": null
+    },
+    "section_toggle": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": null
+    },
+    "notifications": {
+      "status": "issues_found",
+      "issues": [
+        {
+          "line": 495,
+          "content": "alert(`פרטי טרייד #${tradeId}\\n\\nטיקר: ${trade.ticker}\\nצד: ${trade.side}\\nסוג: ${getInvestmentTypeT",
+          "pattern": "alert\\(",
+          "match": "alert(",
+          "file": "js"
+        },
+        {
+          "line": 238,
+          "content": "if (window.NotificationSystem) {",
+          "pattern": "NotificationSystem",
+          "match": "NotificationSystem",
+          "file": "js"
+        },
+        {
+          "line": 239,
+          "content": "window.NotificationSystem.showWarning('טעינת נתונים', 'נטענים נתוני דמה במקום נתונים אמיתיים');",
+          "pattern": "NotificationSystem",
+          "match": "NotificationSystem",
+          "file": "js"
+        },
+        {
+          "line": 673,
+          "content": "if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {",
+          "pattern": "NotificationSystem",
+          "match": "NotificationSystem",
+          "file": "js"
+        },
+        {
+          "line": 673,
+          "content": "if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {",
+          "pattern": "NotificationSystem",
+          "match": "NotificationSystem",
+          "file": "js"
+        },
+        {
+          "line": 674,
+          "content": "window.NotificationSystem.showError('שגיאה בטעינת נתונים', errorMsg);",
+          "pattern": "NotificationSystem",
+          "match": "NotificationSystem",
+          "file": "js"
+        },
+        {
+          "line": 681,
+          "content": "if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {",
+          "pattern": "NotificationSystem",
+          "match": "NotificationSystem",
+          "file": "js"
+        },
+        {
+          "line": 681,
+          "content": "if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {",
+          "pattern": "NotificationSystem",
+          "match": "NotificationSystem",
+          "file": "js"
+        },
+        {
+          "line": 682,
+          "content": "window.NotificationSystem.showError('שגיאה בטעינת נתונים מהמטמון', errorMsg);",
+          "pattern": "NotificationSystem",
+          "match": "NotificationSystem",
+          "file": "js"
+        },
+        {
+          "line": 754,
+          "content": "if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {",
+          "pattern": "NotificationSystem",
+          "match": "NotificationSystem",
+          "file": "js"
+        },
+        {
+          "line": 754,
+          "content": "if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {",
+          "pattern": "NotificationSystem",
+          "match": "NotificationSystem",
+          "file": "js"
+        },
+        {
+          "line": 755,
+          "content": "window.NotificationSystem.showError('שגיאה בטעינת עמוד',",
+          "pattern": "NotificationSystem",
+          "match": "NotificationSystem",
+          "file": "js"
+        },
+        {
+          "line": 791,
+          "content": "if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {",
+          "pattern": "NotificationSystem",
+          "match": "NotificationSystem",
+          "file": "js"
+        },
+        {
+          "line": 791,
+          "content": "if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {",
+          "pattern": "NotificationSystem",
+          "match": "NotificationSystem",
+          "file": "js"
+        },
+        {
+          "line": 792,
+          "content": "window.NotificationSystem.showError('שגיאה באתחול עמוד היסטוריית טריידים',",
+          "pattern": "NotificationSystem",
+          "match": "NotificationSystem",
+          "file": "js"
+        },
+        {
+          "line": 857,
+          "content": "if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {",
+          "pattern": "NotificationSystem",
+          "match": "NotificationSystem",
+          "file": "js"
+        },
+        {
+          "line": 857,
+          "content": "if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {",
+          "pattern": "NotificationSystem",
+          "match": "NotificationSystem",
+          "file": "js"
+        },
+        {
+          "line": 858,
+          "content": "window.NotificationSystem.showError('שגיאה בטעינת גרף',",
+          "pattern": "NotificationSystem",
+          "match": "NotificationSystem",
+          "file": "js"
+        },
+        {
+          "line": 877,
+          "content": "if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {",
+          "pattern": "NotificationSystem",
+          "match": "NotificationSystem",
+          "file": "js"
+        },
+        {
+          "line": 877,
+          "content": "if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {",
+          "pattern": "NotificationSystem",
+          "match": "NotificationSystem",
+          "file": "js"
+        },
+        {
+          "line": 878,
+          "content": "window.NotificationSystem.showError('שגיאה בהצגת עמוד',",
+          "pattern": "NotificationSystem",
+          "match": "NotificationSystem",
+          "file": "js"
+        }
+      ],
+      "issue_count": 21,
+      "js_result": {
+        "status": "issues_found",
+        "issues": [
+          {
+            "line": 495,
+            "content": "alert(`פרטי טרייד #${tradeId}\\n\\nטיקר: ${trade.ticker}\\nצד: ${trade.side}\\nסוג: ${getInvestmentTypeT",
+            "pattern": "alert\\(",
+            "match": "alert("
+          },
+          {
+            "line": 238,
+            "content": "if (window.NotificationSystem) {",
+            "pattern": "NotificationSystem",
+            "match": "NotificationSystem"
+          },
+          {
+            "line": 239,
+            "content": "window.NotificationSystem.showWarning('טעינת נתונים', 'נטענים נתוני דמה במקום נתונים אמיתיים');",
+            "pattern": "NotificationSystem",
+            "match": "NotificationSystem"
+          },
+          {
+            "line": 673,
+            "content": "if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {",
+            "pattern": "NotificationSystem",
+            "match": "NotificationSystem"
+          },
+          {
+            "line": 673,
+            "content": "if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {",
+            "pattern": "NotificationSystem",
+            "match": "NotificationSystem"
+          },
+          {
+            "line": 674,
+            "content": "window.NotificationSystem.showError('שגיאה בטעינת נתונים', errorMsg);",
+            "pattern": "NotificationSystem",
+            "match": "NotificationSystem"
+          },
+          {
+            "line": 681,
+            "content": "if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {",
+            "pattern": "NotificationSystem",
+            "match": "NotificationSystem"
+          },
+          {
+            "line": 681,
+            "content": "if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {",
+            "pattern": "NotificationSystem",
+            "match": "NotificationSystem"
+          },
+          {
+            "line": 682,
+            "content": "window.NotificationSystem.showError('שגיאה בטעינת נתונים מהמטמון', errorMsg);",
+            "pattern": "NotificationSystem",
+            "match": "NotificationSystem"
+          },
+          {
+            "line": 754,
+            "content": "if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {",
+            "pattern": "NotificationSystem",
+            "match": "NotificationSystem"
+          },
+          {
+            "line": 754,
+            "content": "if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {",
+            "pattern": "NotificationSystem",
+            "match": "NotificationSystem"
+          },
+          {
+            "line": 755,
+            "content": "window.NotificationSystem.showError('שגיאה בטעינת עמוד',",
+            "pattern": "NotificationSystem",
+            "match": "NotificationSystem"
+          },
+          {
+            "line": 791,
+            "content": "if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {",
+            "pattern": "NotificationSystem",
+            "match": "NotificationSystem"
+          },
+          {
+            "line": 791,
+            "content": "if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {",
+            "pattern": "NotificationSystem",
+            "match": "NotificationSystem"
+          },
+          {
+            "line": 792,
+            "content": "window.NotificationSystem.showError('שגיאה באתחול עמוד היסטוריית טריידים',",
+            "pattern": "NotificationSystem",
+            "match": "NotificationSystem"
+          },
+          {
+            "line": 857,
+            "content": "if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {",
+            "pattern": "NotificationSystem",
+            "match": "NotificationSystem"
+          },
+          {
+            "line": 857,
+            "content": "if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {",
+            "pattern": "NotificationSystem",
+            "match": "NotificationSystem"
+          },
+          {
+            "line": 858,
+            "content": "window.NotificationSystem.showError('שגיאה בטעינת גרף',",
+            "pattern": "NotificationSystem",
+            "match": "NotificationSystem"
+          },
+          {
+            "line": 877,
+            "content": "if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {",
+            "pattern": "NotificationSystem",
+            "match": "NotificationSystem"
+          },
+          {
+            "line": 877,
+            "content": "if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {",
+            "pattern": "NotificationSystem",
+            "match": "NotificationSystem"
+          },
+          {
+            "line": 878,
+            "content": "window.NotificationSystem.showError('שגיאה בהצגת עמוד',",
+            "pattern": "NotificationSystem",
+            "match": "NotificationSystem"
+          }
+        ],
+        "issue_count": 21
+      },
+      "html_result": null
+    },
+    "modals": {
+      "status": "ok",
+      "issues": [
+        {
+          "line": 303,
+          "content": "// Use ModalManagerV2 if available, fallback to Bootstrap",
+          "pattern": "ModalManagerV2",
+          "match": "ModalManagerV2",
+          "file": "js"
+        },
+        {
+          "line": 304,
+          "content": "if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {",
+          "pattern": "ModalManagerV2",
+          "match": "ModalManagerV2",
+          "file": "js"
+        },
+        {
+          "line": 304,
+          "content": "if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {",
+          "pattern": "ModalManagerV2",
+          "match": "ModalManagerV2",
+          "file": "js"
+        },
+        {
+          "line": 306,
+          "content": "await window.ModalManagerV2.showModal('tradeSelectorModal', 'view');",
+          "pattern": "ModalManagerV2",
+          "match": "ModalManagerV2",
+          "file": "js"
+        },
+        {
+          "line": 308,
+          "content": "// Fallback to Bootstrap if ModalManagerV2 fails",
+          "pattern": "ModalManagerV2",
+          "match": "ModalManagerV2",
+          "file": "js"
+        },
+        {
+          "line": 309,
+          "content": "window.Logger?.warn('tradeSelectorModal not available in ModalManagerV2, using Bootstrap fallback', ",
+          "pattern": "ModalManagerV2",
+          "match": "ModalManagerV2",
+          "file": "js"
+        },
+        {
+          "line": 311,
+          "content": "const modal = window.ModalManagerV2?.openModal(modalElement);",
+          "pattern": "ModalManagerV2",
+          "match": "ModalManagerV2",
+          "file": "js"
+        },
+        {
+          "line": 318,
+          "content": "const modal = window.ModalManagerV2?.openModal(modalElement);",
+          "pattern": "ModalManagerV2",
+          "match": "ModalManagerV2",
+          "file": "js"
+        },
+        {
+          "line": 520,
+          "content": "if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {",
+          "pattern": "ModalManagerV2",
+          "match": "ModalManagerV2",
+          "file": "js"
+        },
+        {
+          "line": 520,
+          "content": "if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {",
+          "pattern": "ModalManagerV2",
+          "match": "ModalManagerV2",
+          "file": "js"
+        },
+        {
+          "line": 521,
+          "content": "window.ModalManagerV2.hideModal('tradeSelectorModal');",
+          "pattern": "ModalManagerV2",
+          "match": "ModalManagerV2",
+          "file": "js"
+        },
+        {
+          "line": 525,
+          "content": "const modal = window.ModalManagerV2?.getInstance(modalElement);",
+          "pattern": "ModalManagerV2",
+          "match": "ModalManagerV2",
+          "file": "js"
+        },
+        {
+          "line": 311,
+          "content": "const modal = window.ModalManagerV2?.openModal(modalElement);",
+          "pattern": "openModal",
+          "match": "openModal",
+          "file": "js"
+        },
+        {
+          "line": 318,
+          "content": "const modal = window.ModalManagerV2?.openModal(modalElement);",
+          "pattern": "openModal",
+          "match": "openModal",
+          "file": "js"
+        }
+      ],
+      "issue_count": 14,
+      "js_result": {
+        "status": "ok",
+        "issues": [
+          {
+            "line": 303,
+            "content": "// Use ModalManagerV2 if available, fallback to Bootstrap",
+            "pattern": "ModalManagerV2",
+            "match": "ModalManagerV2"
+          },
+          {
+            "line": 304,
+            "content": "if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {",
+            "pattern": "ModalManagerV2",
+            "match": "ModalManagerV2"
+          },
+          {
+            "line": 304,
+            "content": "if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {",
+            "pattern": "ModalManagerV2",
+            "match": "ModalManagerV2"
+          },
+          {
+            "line": 306,
+            "content": "await window.ModalManagerV2.showModal('tradeSelectorModal', 'view');",
+            "pattern": "ModalManagerV2",
+            "match": "ModalManagerV2"
+          },
+          {
+            "line": 308,
+            "content": "// Fallback to Bootstrap if ModalManagerV2 fails",
+            "pattern": "ModalManagerV2",
+            "match": "ModalManagerV2"
+          },
+          {
+            "line": 309,
+            "content": "window.Logger?.warn('tradeSelectorModal not available in ModalManagerV2, using Bootstrap fallback', ",
+            "pattern": "ModalManagerV2",
+            "match": "ModalManagerV2"
+          },
+          {
+            "line": 311,
+            "content": "const modal = window.ModalManagerV2?.openModal(modalElement);",
+            "pattern": "ModalManagerV2",
+            "match": "ModalManagerV2"
+          },
+          {
+            "line": 318,
+            "content": "const modal = window.ModalManagerV2?.openModal(modalElement);",
+            "pattern": "ModalManagerV2",
+            "match": "ModalManagerV2"
+          },
+          {
+            "line": 520,
+            "content": "if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {",
+            "pattern": "ModalManagerV2",
+            "match": "ModalManagerV2"
+          },
+          {
+            "line": 520,
+            "content": "if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {",
+            "pattern": "ModalManagerV2",
+            "match": "ModalManagerV2"
+          },
+          {
+            "line": 521,
+            "content": "window.ModalManagerV2.hideModal('tradeSelectorModal');",
+            "pattern": "ModalManagerV2",
+            "match": "ModalManagerV2"
+          },
+          {
+            "line": 525,
+            "content": "const modal = window.ModalManagerV2?.getInstance(modalElement);",
+            "pattern": "ModalManagerV2",
+            "match": "ModalManagerV2"
+          },
+          {
+            "line": 311,
+            "content": "const modal = window.ModalManagerV2?.openModal(modalElement);",
+            "pattern": "openModal",
+            "match": "openModal"
+          },
+          {
+            "line": 318,
+            "content": "const modal = window.ModalManagerV2?.openModal(modalElement);",
+            "pattern": "openModal",
+            "match": "openModal"
+          }
+        ],
+        "issue_count": 14
+      },
+      "html_result": null
+    },
+    "tables": {
+      "status": "missing",
+      "issues": [
+        {
+          "line": 1237,
+          "content": "* Register plan vs execution table with UnifiedTableSystem",
+          "pattern": "UnifiedTableSystem",
+          "match": "UnifiedTableSystem",
+          "file": "js"
+        },
+        {
+          "line": 1240,
+          "content": "if (!window.UnifiedTableSystem || !window.UnifiedTableSystem.registry) {",
+          "pattern": "UnifiedTableSystem",
+          "match": "UnifiedTableSystem",
+          "file": "js"
+        },
+        {
+          "line": 1240,
+          "content": "if (!window.UnifiedTableSystem || !window.UnifiedTableSystem.registry) {",
+          "pattern": "UnifiedTableSystem",
+          "match": "UnifiedTableSystem",
+          "file": "js"
+        },
+        {
+          "line": 1242,
+          "content": "window.Logger.warn('UnifiedTableSystem not available for plan vs execution table registration', { pa",
+          "pattern": "UnifiedTableSystem",
+          "match": "UnifiedTableSystem",
+          "file": "js"
+        },
+        {
+          "line": 1250,
+          "content": "if (window.UnifiedTableSystem.registry.isRegistered && window.UnifiedTableSystem.registry.isRegister",
+          "pattern": "UnifiedTableSystem",
+          "match": "UnifiedTableSystem",
+          "file": "js"
+        },
+        {
+          "line": 1250,
+          "content": "if (window.UnifiedTableSystem.registry.isRegistered && window.UnifiedTableSystem.registry.isRegister",
+          "pattern": "UnifiedTableSystem",
+          "match": "UnifiedTableSystem",
+          "file": "js"
+        },
+        {
+          "line": 1339,
+          "content": "window.UnifiedTableSystem.registry.register(tableType, {",
+          "pattern": "UnifiedTableSystem",
+          "match": "UnifiedTableSystem",
+          "file": "js"
+        },
+        {
+          "line": 1375,
+          "content": "window.Logger.info('✅ Registered plan vs execution table with UnifiedTableSystem', { page: 'trade-hi",
+          "pattern": "UnifiedTableSystem",
+          "match": "UnifiedTableSystem",
+          "file": "js"
+        }
+      ],
+      "issue_count": 8,
+      "js_result": {
+        "status": "missing",
+        "issues": [
+          {
+            "line": 1237,
+            "content": "* Register plan vs execution table with UnifiedTableSystem",
+            "pattern": "UnifiedTableSystem",
+            "match": "UnifiedTableSystem"
+          },
+          {
+            "line": 1240,
+            "content": "if (!window.UnifiedTableSystem || !window.UnifiedTableSystem.registry) {",
+            "pattern": "UnifiedTableSystem",
+            "match": "UnifiedTableSystem"
+          },
+          {
+            "line": 1240,
+            "content": "if (!window.UnifiedTableSystem || !window.UnifiedTableSystem.registry) {",
+            "pattern": "UnifiedTableSystem",
+            "match": "UnifiedTableSystem"
+          },
+          {
+            "line": 1242,
+            "content": "window.Logger.warn('UnifiedTableSystem not available for plan vs execution table registration', { pa",
+            "pattern": "UnifiedTableSystem",
+            "match": "UnifiedTableSystem"
+          },
+          {
+            "line": 1250,
+            "content": "if (window.UnifiedTableSystem.registry.isRegistered && window.UnifiedTableSystem.registry.isRegister",
+            "pattern": "UnifiedTableSystem",
+            "match": "UnifiedTableSystem"
+          },
+          {
+            "line": 1250,
+            "content": "if (window.UnifiedTableSystem.registry.isRegistered && window.UnifiedTableSystem.registry.isRegister",
+            "pattern": "UnifiedTableSystem",
+            "match": "UnifiedTableSystem"
+          },
+          {
+            "line": 1339,
+            "content": "window.UnifiedTableSystem.registry.register(tableType, {",
+            "pattern": "UnifiedTableSystem",
+            "match": "UnifiedTableSystem"
+          },
+          {
+            "line": 1375,
+            "content": "window.Logger.info('✅ Registered plan vs execution table with UnifiedTableSystem', { page: 'trade-hi",
+            "pattern": "UnifiedTableSystem",
+            "match": "UnifiedTableSystem"
+          }
+        ],
+        "issue_count": 8
+      },
+      "html_result": null
+    },
+    "field_renderer": {
+      "status": "ok",
+      "issues": [
+        {
+          "line": 61,
+          "content": "* Format date string using FieldRendererService",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 69,
+          "content": "// Use FieldRendererService for consistent date formatting",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 70,
+          "content": "return window.FieldRendererService.renderDate(dateString, includeTime);",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 350,
+          "content": "// Use FieldRendererService for P/L display",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 352,
+          "content": "if (window.FieldRendererService) {",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 353,
+          "content": "const plAmount = window.FieldRendererService.renderAmount(trade.pl, '$', 0, true);",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 354,
+          "content": "const plPercent = window.FieldRendererService.renderNumericValue(trade.pl_percent || 0, '%', true);",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 902,
+          "content": "if (totalPLEl && window.FieldRendererService) {",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 903,
+          "content": "totalPLEl.innerHTML = window.FieldRendererService.renderAmount(statistics.totalPL, '$', 0, true);",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 907,
+          "content": "const percent = window.FieldRendererService.renderNumericValue(statistics.totalPLPercent, '%', true)",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 918,
+          "content": "if (returnPercentEl && window.FieldRendererService) {",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 919,
+          "content": "returnPercentEl.innerHTML = window.FieldRendererService.renderNumericValue(statistics.totalPLPercent",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 935,
+          "content": "* Render trade details using FieldRendererService",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 950,
+          "content": "if (window.FieldRendererService && typeof window.FieldRendererService.renderSide === 'function') {",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 950,
+          "content": "if (window.FieldRendererService && typeof window.FieldRendererService.renderSide === 'function') {",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 951,
+          "content": "sideEl.innerHTML = window.FieldRendererService.renderSide(trade.side);",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 961,
+          "content": "if (window.FieldRendererService && typeof window.FieldRendererService.renderType === 'function') {",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 961,
+          "content": "if (window.FieldRendererService && typeof window.FieldRendererService.renderType === 'function') {",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 962,
+          "content": "investmentTypeEl.innerHTML = window.FieldRendererService.renderType(trade.investment_type);",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 1038,
+          "content": "if (plel && window.FieldRendererService) {",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 1039,
+          "content": "const realizedPL = window.FieldRendererService.renderAmount(trade.realized_pl || trade.total_pl || 0",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 1041,
+          "content": "? window.FieldRendererService.renderAmount(trade.unrealized_pl, '$', 0, true)",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 1043,
+          "content": "const totalPL = window.FieldRendererService.renderAmount(trade.total_pl || trade.realized_pl || 0, '",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 1058,
+          "content": "* Render timeline steps using FieldRendererService",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 1147,
+          "content": "if (window.FieldRendererService) {",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 1148,
+          "content": "plHTML = window.FieldRendererService.renderAmount(plValue, '$', 2, true);",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 1161,
+          "content": "if (window.FieldRendererService) {",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 1162,
+          "content": "detailsHTML = `<div class=\"timeline-step-details cashflow-amount\">${window.FieldRendererService.rend",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 1313,
+          "content": "if (window.FieldRendererService) {",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 1314,
+          "content": "html += `<div class=\"value\">${window.FieldRendererService.renderAmount(value.amount, '$', 0, true)}<",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 1400,
+          "content": "if (window.FieldRendererService) {",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 1401,
+          "content": "html += `<div class=\"value\">${window.FieldRendererService.renderAmount(value.amount, '$', 0, true)}<",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        }
+      ],
+      "issue_count": 32,
+      "js_result": {
+        "status": "ok",
+        "issues": [
+          {
+            "line": 61,
+            "content": "* Format date string using FieldRendererService",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 69,
+            "content": "// Use FieldRendererService for consistent date formatting",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 70,
+            "content": "return window.FieldRendererService.renderDate(dateString, includeTime);",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 350,
+            "content": "// Use FieldRendererService for P/L display",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 352,
+            "content": "if (window.FieldRendererService) {",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 353,
+            "content": "const plAmount = window.FieldRendererService.renderAmount(trade.pl, '$', 0, true);",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 354,
+            "content": "const plPercent = window.FieldRendererService.renderNumericValue(trade.pl_percent || 0, '%', true);",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 902,
+            "content": "if (totalPLEl && window.FieldRendererService) {",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 903,
+            "content": "totalPLEl.innerHTML = window.FieldRendererService.renderAmount(statistics.totalPL, '$', 0, true);",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 907,
+            "content": "const percent = window.FieldRendererService.renderNumericValue(statistics.totalPLPercent, '%', true)",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 918,
+            "content": "if (returnPercentEl && window.FieldRendererService) {",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 919,
+            "content": "returnPercentEl.innerHTML = window.FieldRendererService.renderNumericValue(statistics.totalPLPercent",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 935,
+            "content": "* Render trade details using FieldRendererService",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 950,
+            "content": "if (window.FieldRendererService && typeof window.FieldRendererService.renderSide === 'function') {",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 950,
+            "content": "if (window.FieldRendererService && typeof window.FieldRendererService.renderSide === 'function') {",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 951,
+            "content": "sideEl.innerHTML = window.FieldRendererService.renderSide(trade.side);",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 961,
+            "content": "if (window.FieldRendererService && typeof window.FieldRendererService.renderType === 'function') {",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 961,
+            "content": "if (window.FieldRendererService && typeof window.FieldRendererService.renderType === 'function') {",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 962,
+            "content": "investmentTypeEl.innerHTML = window.FieldRendererService.renderType(trade.investment_type);",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 1038,
+            "content": "if (plel && window.FieldRendererService) {",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 1039,
+            "content": "const realizedPL = window.FieldRendererService.renderAmount(trade.realized_pl || trade.total_pl || 0",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 1041,
+            "content": "? window.FieldRendererService.renderAmount(trade.unrealized_pl, '$', 0, true)",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 1043,
+            "content": "const totalPL = window.FieldRendererService.renderAmount(trade.total_pl || trade.realized_pl || 0, '",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 1058,
+            "content": "* Render timeline steps using FieldRendererService",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 1147,
+            "content": "if (window.FieldRendererService) {",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 1148,
+            "content": "plHTML = window.FieldRendererService.renderAmount(plValue, '$', 2, true);",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 1161,
+            "content": "if (window.FieldRendererService) {",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 1162,
+            "content": "detailsHTML = `<div class=\"timeline-step-details cashflow-amount\">${window.FieldRendererService.rend",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 1313,
+            "content": "if (window.FieldRendererService) {",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 1314,
+            "content": "html += `<div class=\"value\">${window.FieldRendererService.renderAmount(value.amount, '$', 0, true)}<",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 1400,
+            "content": "if (window.FieldRendererService) {",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 1401,
+            "content": "html += `<div class=\"value\">${window.FieldRendererService.renderAmount(value.amount, '$', 0, true)}<",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          }
+        ],
+        "issue_count": 32
+      },
+      "html_result": null
+    },
+    "crud_handler": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": null
+    },
+    "select_populator": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": null
+    },
+    "data_collection": {
+      "status": "ok",
+      "issues": [
+        {
+          "line": 460,
+          "content": "// Use DataCollectionService to clear fields if available",
+          "pattern": "DataCollectionService",
+          "match": "DataCollectionService",
+          "file": "js"
+        },
+        {
+          "line": 461,
+          "content": "if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {",
+          "pattern": "DataCollectionService",
+          "match": "DataCollectionService",
+          "file": "js"
+        },
+        {
+          "line": 461,
+          "content": "if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {",
+          "pattern": "DataCollectionService",
+          "match": "DataCollectionService",
+          "file": "js"
+        },
+        {
+          "line": 462,
+          "content": "window.DataCollectionService.setValue('filterTicker', '', 'text');",
+          "pattern": "DataCollectionService",
+          "match": "DataCollectionService",
+          "file": "js"
+        },
+        {
+          "line": 463,
+          "content": "window.DataCollectionService.setValue('filterSide', '', 'text');",
+          "pattern": "DataCollectionService",
+          "match": "DataCollectionService",
+          "file": "js"
+        },
+        {
+          "line": 464,
+          "content": "window.DataCollectionService.setValue('filterInvestmentType', '', 'text');",
+          "pattern": "DataCollectionService",
+          "match": "DataCollectionService",
+          "file": "js"
+        },
+        {
+          "line": 465,
+          "content": "window.DataCollectionService.setValue('filterDateFrom', '', 'dateOnly');",
+          "pattern": "DataCollectionService",
+          "match": "DataCollectionService",
+          "file": "js"
+        },
+        {
+          "line": 466,
+          "content": "window.DataCollectionService.setValue('filterDateTo', '', 'dateOnly');",
+          "pattern": "DataCollectionService",
+          "match": "DataCollectionService",
+          "file": "js"
+        },
+        {
+          "line": 1609,
+          "content": "// Use DataCollectionService to set values if available",
+          "pattern": "DataCollectionService",
+          "match": "DataCollectionService",
+          "file": "js"
+        },
+        {
+          "line": 1610,
+          "content": "if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {",
+          "pattern": "DataCollectionService",
+          "match": "DataCollectionService",
+          "file": "js"
+        },
+        {
+          "line": 1610,
+          "content": "if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {",
+          "pattern": "DataCollectionService",
+          "match": "DataCollectionService",
+          "file": "js"
+        },
+        {
+          "line": 1611,
+          "content": "if (ticker) window.DataCollectionService.setValue('filterTicker', ticker, 'text');",
+          "pattern": "DataCollectionService",
+          "match": "DataCollectionService",
+          "file": "js"
+        },
+        {
+          "line": 1612,
+          "content": "if (side) window.DataCollectionService.setValue('filterSide', side, 'text');",
+          "pattern": "DataCollectionService",
+          "match": "DataCollectionService",
+          "file": "js"
+        },
+        {
+          "line": 1613,
+          "content": "if (investmentType) window.DataCollectionService.setValue('filterInvestmentType', investmentType, 't",
+          "pattern": "DataCollectionService",
+          "match": "DataCollectionService",
+          "file": "js"
+        },
+        {
+          "line": 1614,
+          "content": "if (dateFrom) window.DataCollectionService.setValue('filterDateFrom', dateFrom, 'dateOnly');",
+          "pattern": "DataCollectionService",
+          "match": "DataCollectionService",
+          "file": "js"
+        },
+        {
+          "line": 1615,
+          "content": "if (dateTo) window.DataCollectionService.setValue('filterDateTo', dateTo, 'dateOnly');",
+          "pattern": "DataCollectionService",
+          "match": "DataCollectionService",
+          "file": "js"
+        }
+      ],
+      "issue_count": 16,
+      "js_result": {
+        "status": "ok",
+        "issues": [
+          {
+            "line": 460,
+            "content": "// Use DataCollectionService to clear fields if available",
+            "pattern": "DataCollectionService",
+            "match": "DataCollectionService"
+          },
+          {
+            "line": 461,
+            "content": "if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {",
+            "pattern": "DataCollectionService",
+            "match": "DataCollectionService"
+          },
+          {
+            "line": 461,
+            "content": "if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {",
+            "pattern": "DataCollectionService",
+            "match": "DataCollectionService"
+          },
+          {
+            "line": 462,
+            "content": "window.DataCollectionService.setValue('filterTicker', '', 'text');",
+            "pattern": "DataCollectionService",
+            "match": "DataCollectionService"
+          },
+          {
+            "line": 463,
+            "content": "window.DataCollectionService.setValue('filterSide', '', 'text');",
+            "pattern": "DataCollectionService",
+            "match": "DataCollectionService"
+          },
+          {
+            "line": 464,
+            "content": "window.DataCollectionService.setValue('filterInvestmentType', '', 'text');",
+            "pattern": "DataCollectionService",
+            "match": "DataCollectionService"
+          },
+          {
+            "line": 465,
+            "content": "window.DataCollectionService.setValue('filterDateFrom', '', 'dateOnly');",
+            "pattern": "DataCollectionService",
+            "match": "DataCollectionService"
+          },
+          {
+            "line": 466,
+            "content": "window.DataCollectionService.setValue('filterDateTo', '', 'dateOnly');",
+            "pattern": "DataCollectionService",
+            "match": "DataCollectionService"
+          },
+          {
+            "line": 1609,
+            "content": "// Use DataCollectionService to set values if available",
+            "pattern": "DataCollectionService",
+            "match": "DataCollectionService"
+          },
+          {
+            "line": 1610,
+            "content": "if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {",
+            "pattern": "DataCollectionService",
+            "match": "DataCollectionService"
+          },
+          {
+            "line": 1610,
+            "content": "if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {",
+            "pattern": "DataCollectionService",
+            "match": "DataCollectionService"
+          },
+          {
+            "line": 1611,
+            "content": "if (ticker) window.DataCollectionService.setValue('filterTicker', ticker, 'text');",
+            "pattern": "DataCollectionService",
+            "match": "DataCollectionService"
+          },
+          {
+            "line": 1612,
+            "content": "if (side) window.DataCollectionService.setValue('filterSide', side, 'text');",
+            "pattern": "DataCollectionService",
+            "match": "DataCollectionService"
+          },
+          {
+            "line": 1613,
+            "content": "if (investmentType) window.DataCollectionService.setValue('filterInvestmentType', investmentType, 't",
+            "pattern": "DataCollectionService",
+            "match": "DataCollectionService"
+          },
+          {
+            "line": 1614,
+            "content": "if (dateFrom) window.DataCollectionService.setValue('filterDateFrom', dateFrom, 'dateOnly');",
+            "pattern": "DataCollectionService",
+            "match": "DataCollectionService"
+          },
+          {
+            "line": 1615,
+            "content": "if (dateTo) window.DataCollectionService.setValue('filterDateTo', dateTo, 'dateOnly');",
+            "pattern": "DataCollectionService",
+            "match": "DataCollectionService"
+          }
+        ],
+        "issue_count": 16
+      },
+      "html_result": null
+    },
+    "icons": {
+      "status": "ok",
+      "issues": [
+        {
+          "line": 1075,
+          "content": "// Use IconSystem to get entity icons",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 1076,
+          "content": "if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 1076,
+          "content": "if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 1081,
+          "content": "iconPath = await window.IconSystem.getEntityIcon('note');",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 1085,
+          "content": "iconPath = await window.IconSystem.getEntityIcon('cash_flow');",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 1089,
+          "content": "iconPath = await window.IconSystem.getEntityIcon('alert');",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 1091,
+          "content": "iconPath = await window.IconSystem.getEntityIcon('trade_plan');",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 1094,
+          "content": "iconPath = await window.IconSystem.getEntityIcon('execution');",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 1194,
+          "content": "if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 1194,
+          "content": "if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 1197,
+          "content": "return await window.IconSystem.renderIcon('entity', entityType, { size: '16', alt: step.type, class:",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 1258,
+          "content": "if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 1258,
+          "content": "if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 1260,
+          "content": "iconHTML = await window.IconSystem.renderIcon('button', icon, { size: '16', alt: 'icon', class: 'ico",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 1289,
+          "content": "if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 1289,
+          "content": "if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 1291,
+          "content": "iconHTML = await window.IconSystem.renderIcon('button', statusIcon, { size: '16', alt: statusIcon, c",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 1433,
+          "content": "${typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 1433,
+          "content": "${typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 1434,
+          "content": "? await window.IconSystem.renderIcon('button', row.categoryIcon || 'info-circle', { size: '16', alt:",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 1457,
+          "content": "if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 1457,
+          "content": "if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 1459,
+          "content": "return await window.IconSystem.renderIcon('button', statusIcon, { size: '16', alt: statusIcon, class",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 1199,
+          "content": "return `<img src=\"${iconPath}\" alt=\"${step.type}\" class=\"entity-icon-small\">`;",
+          "pattern": "<img.*icon",
+          "match": "<img src=\"${iconPath}\" alt=\"${step.type}\" class=\"e",
+          "file": "js"
+        },
+        {
+          "line": 1202,
+          "content": "return `<img src=\"${iconPath}\" alt=\"${step.type}\" class=\"entity-icon-small\">`;",
+          "pattern": "<img.*icon",
+          "match": "<img src=\"${iconPath}\" alt=\"${step.type}\" class=\"e",
+          "file": "js"
+        },
+        {
+          "line": 1257,
+          "content": "let iconHTML = `<img src=\"../../images/icons/tabler/${icon}.svg\" width=\"16\" height=\"16\" alt=\"icon\" c",
+          "pattern": "<img.*icon",
+          "match": "<img src=\"../../images/icons/tabler/${icon}.svg\" w",
+          "file": "js"
+        },
+        {
+          "line": 1288,
+          "content": "let iconHTML = `<img src=\"../../images/icons/tabler/${statusIcon}.svg\" width=\"16\" height=\"16\" alt=\"$",
+          "pattern": "<img.*icon",
+          "match": "<img src=\"../../images/icons/tabler/${statusIcon}.",
+          "file": "js"
+        },
+        {
+          "line": 1435,
+          "content": ": `<img src=\"../../images/icons/tabler/${row.categoryIcon || 'info-circle'}.svg\" width=\"16\" height=\"",
+          "pattern": "<img.*icon",
+          "match": "<img src=\"../../images/icons/tabler/${row.category",
+          "file": "js"
+        },
+        {
+          "line": 1461,
+          "content": "return `<img src=\"../../images/icons/tabler/${statusIcon}.svg\" width=\"16\" height=\"16\" alt=\"${statusI",
+          "pattern": "<img.*icon",
+          "match": "<img src=\"../../images/icons/tabler/${statusIcon}.",
+          "file": "js"
+        },
+        {
+          "line": 1464,
+          "content": "return `<img src=\"../../images/icons/tabler/${statusIcon}.svg\" width=\"16\" height=\"16\" alt=\"${statusI",
+          "pattern": "<img.*icon",
+          "match": "<img src=\"../../images/icons/tabler/${statusIcon}.",
+          "file": "js"
+        }
+      ],
+      "issue_count": 30,
+      "js_result": {
+        "status": "ok",
+        "issues": [
+          {
+            "line": 1075,
+            "content": "// Use IconSystem to get entity icons",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 1076,
+            "content": "if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 1076,
+            "content": "if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 1081,
+            "content": "iconPath = await window.IconSystem.getEntityIcon('note');",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 1085,
+            "content": "iconPath = await window.IconSystem.getEntityIcon('cash_flow');",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 1089,
+            "content": "iconPath = await window.IconSystem.getEntityIcon('alert');",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 1091,
+            "content": "iconPath = await window.IconSystem.getEntityIcon('trade_plan');",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 1094,
+            "content": "iconPath = await window.IconSystem.getEntityIcon('execution');",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 1194,
+            "content": "if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 1194,
+            "content": "if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 1197,
+            "content": "return await window.IconSystem.renderIcon('entity', entityType, { size: '16', alt: step.type, class:",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 1258,
+            "content": "if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 1258,
+            "content": "if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 1260,
+            "content": "iconHTML = await window.IconSystem.renderIcon('button', icon, { size: '16', alt: 'icon', class: 'ico",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 1289,
+            "content": "if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 1289,
+            "content": "if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 1291,
+            "content": "iconHTML = await window.IconSystem.renderIcon('button', statusIcon, { size: '16', alt: statusIcon, c",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 1433,
+            "content": "${typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 1433,
+            "content": "${typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 1434,
+            "content": "? await window.IconSystem.renderIcon('button', row.categoryIcon || 'info-circle', { size: '16', alt:",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 1457,
+            "content": "if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 1457,
+            "content": "if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 1459,
+            "content": "return await window.IconSystem.renderIcon('button', statusIcon, { size: '16', alt: statusIcon, class",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 1199,
+            "content": "return `<img src=\"${iconPath}\" alt=\"${step.type}\" class=\"entity-icon-small\">`;",
+            "pattern": "<img.*icon",
+            "match": "<img src=\"${iconPath}\" alt=\"${step.type}\" class=\"e"
+          },
+          {
+            "line": 1202,
+            "content": "return `<img src=\"${iconPath}\" alt=\"${step.type}\" class=\"entity-icon-small\">`;",
+            "pattern": "<img.*icon",
+            "match": "<img src=\"${iconPath}\" alt=\"${step.type}\" class=\"e"
+          },
+          {
+            "line": 1257,
+            "content": "let iconHTML = `<img src=\"../../images/icons/tabler/${icon}.svg\" width=\"16\" height=\"16\" alt=\"icon\" c",
+            "pattern": "<img.*icon",
+            "match": "<img src=\"../../images/icons/tabler/${icon}.svg\" w"
+          },
+          {
+            "line": 1288,
+            "content": "let iconHTML = `<img src=\"../../images/icons/tabler/${statusIcon}.svg\" width=\"16\" height=\"16\" alt=\"$",
+            "pattern": "<img.*icon",
+            "match": "<img src=\"../../images/icons/tabler/${statusIcon}."
+          },
+          {
+            "line": 1435,
+            "content": ": `<img src=\"../../images/icons/tabler/${row.categoryIcon || 'info-circle'}.svg\" width=\"16\" height=\"",
+            "pattern": "<img.*icon",
+            "match": "<img src=\"../../images/icons/tabler/${row.category"
+          },
+          {
+            "line": 1461,
+            "content": "return `<img src=\"../../images/icons/tabler/${statusIcon}.svg\" width=\"16\" height=\"16\" alt=\"${statusI",
+            "pattern": "<img.*icon",
+            "match": "<img src=\"../../images/icons/tabler/${statusIcon}."
+          },
+          {
+            "line": 1464,
+            "content": "return `<img src=\"../../images/icons/tabler/${statusIcon}.svg\" width=\"16\" height=\"16\" alt=\"${statusI",
+            "pattern": "<img.*icon",
+            "match": "<img src=\"../../images/icons/tabler/${statusIcon}."
+          }
+        ],
+        "issue_count": 30
+      },
+      "html_result": null
+    },
+    "colors": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": null
+    },
+    "info_summary": {
+      "status": "ok",
+      "issues": [
+        {
+          "line": 1052,
+          "content": "// Consider using InfoSummarySystem if this becomes a summary of multiple trades",
+          "pattern": "InfoSummarySystem",
+          "match": "InfoSummarySystem",
+          "file": "js"
+        }
+      ],
+      "issue_count": 1,
+      "js_result": {
+        "status": "ok",
+        "issues": [
+          {
+            "line": 1052,
+            "content": "// Consider using InfoSummarySystem if this becomes a summary of multiple trades",
+            "pattern": "InfoSummarySystem",
+            "match": "InfoSummarySystem"
+          }
+        ],
+        "issue_count": 1
+      },
+      "html_result": null
+    },
+    "pagination": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": null
+    },
+    "entity_details": {
+      "status": "ok",
+      "issues": [
+        {
+          "line": 489,
+          "content": "if (typeof window.showEntityDetails === 'function') {",
+          "pattern": "showEntityDetails",
+          "match": "showEntityDetails",
+          "file": "js"
+        },
+        {
+          "line": 490,
+          "content": "window.showEntityDetails('trade', tradeId, { mode: 'view' });",
+          "pattern": "showEntityDetails",
+          "match": "showEntityDetails",
+          "file": "js"
+        }
+      ],
+      "issue_count": 2,
+      "js_result": {
+        "status": "ok",
+        "issues": [
+          {
+            "line": 489,
+            "content": "if (typeof window.showEntityDetails === 'function') {",
+            "pattern": "showEntityDetails",
+            "match": "showEntityDetails"
+          },
+          {
+            "line": 490,
+            "content": "window.showEntityDetails('trade', tradeId, { mode: 'view' });",
+            "pattern": "showEntityDetails",
+            "match": "showEntityDetails"
+          }
+        ],
+        "issue_count": 2
+      },
+      "html_result": null
+    },
+    "conditions": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": null
+    },
+    "page_state": {
+      "status": "ok",
+      "issues": [
+        {
+          "line": 396,
+          "content": "if (window.PageStateManager) {",
+          "pattern": "PageStateManager",
+          "match": "PageStateManager",
+          "file": "js"
+        },
+        {
+          "line": 397,
+          "content": "window.PageStateManager.savePageState('trade-history-page', {",
+          "pattern": "PageStateManager",
+          "match": "PageStateManager",
+          "file": "js"
+        },
+        {
+          "line": 1494,
+          "content": "* Save page state using PageStateManager",
+          "pattern": "PageStateManager",
+          "match": "PageStateManager",
+          "file": "js"
+        },
+        {
+          "line": 1498,
+          "content": "if (!window.PageStateManager) {",
+          "pattern": "PageStateManager",
+          "match": "PageStateManager",
+          "file": "js"
+        },
+        {
+          "line": 1500,
+          "content": "window.Logger.warn('PageStateManager not available', { page: 'trade-history-page' });",
+          "pattern": "PageStateManager",
+          "match": "PageStateManager",
+          "file": "js"
+        },
+        {
+          "line": 1505,
+          "content": "// Initialize PageStateManager if needed",
+          "pattern": "PageStateManager",
+          "match": "PageStateManager",
+          "file": "js"
+        },
+        {
+          "line": 1506,
+          "content": "if (!window.PageStateManager.initialized) {",
+          "pattern": "PageStateManager",
+          "match": "PageStateManager",
+          "file": "js"
+        },
+        {
+          "line": 1507,
+          "content": "await window.PageStateManager.initialize();",
+          "pattern": "PageStateManager",
+          "match": "PageStateManager",
+          "file": "js"
+        },
+        {
+          "line": 1539,
+          "content": "const saved = await window.PageStateManager.savePageState(pageName, {",
+          "pattern": "PageStateManager",
+          "match": "PageStateManager",
+          "file": "js"
+        },
+        {
+          "line": 1562,
+          "content": "* Load page state using PageStateManager",
+          "pattern": "PageStateManager",
+          "match": "PageStateManager",
+          "file": "js"
+        },
+        {
+          "line": 1566,
+          "content": "if (!window.PageStateManager) {",
+          "pattern": "PageStateManager",
+          "match": "PageStateManager",
+          "file": "js"
+        },
+        {
+          "line": 1568,
+          "content": "window.Logger.warn('PageStateManager not available', { page: 'trade-history-page' });",
+          "pattern": "PageStateManager",
+          "match": "PageStateManager",
+          "file": "js"
+        },
+        {
+          "line": 1573,
+          "content": "// Initialize PageStateManager if needed",
+          "pattern": "PageStateManager",
+          "match": "PageStateManager",
+          "file": "js"
+        },
+        {
+          "line": 1574,
+          "content": "if (!window.PageStateManager.initialized) {",
+          "pattern": "PageStateManager",
+          "match": "PageStateManager",
+          "file": "js"
+        },
+        {
+          "line": 1575,
+          "content": "await window.PageStateManager.initialize();",
+          "pattern": "PageStateManager",
+          "match": "PageStateManager",
+          "file": "js"
+        },
+        {
+          "line": 1579,
+          "content": "const state = await window.PageStateManager.loadPageState(pageName);",
+          "pattern": "PageStateManager",
+          "match": "PageStateManager",
+          "file": "js"
+        }
+      ],
+      "issue_count": 16,
+      "js_result": {
+        "status": "ok",
+        "issues": [
+          {
+            "line": 396,
+            "content": "if (window.PageStateManager) {",
+            "pattern": "PageStateManager",
+            "match": "PageStateManager"
+          },
+          {
+            "line": 397,
+            "content": "window.PageStateManager.savePageState('trade-history-page', {",
+            "pattern": "PageStateManager",
+            "match": "PageStateManager"
+          },
+          {
+            "line": 1494,
+            "content": "* Save page state using PageStateManager",
+            "pattern": "PageStateManager",
+            "match": "PageStateManager"
+          },
+          {
+            "line": 1498,
+            "content": "if (!window.PageStateManager) {",
+            "pattern": "PageStateManager",
+            "match": "PageStateManager"
+          },
+          {
+            "line": 1500,
+            "content": "window.Logger.warn('PageStateManager not available', { page: 'trade-history-page' });",
+            "pattern": "PageStateManager",
+            "match": "PageStateManager"
+          },
+          {
+            "line": 1505,
+            "content": "// Initialize PageStateManager if needed",
+            "pattern": "PageStateManager",
+            "match": "PageStateManager"
+          },
+          {
+            "line": 1506,
+            "content": "if (!window.PageStateManager.initialized) {",
+            "pattern": "PageStateManager",
+            "match": "PageStateManager"
+          },
+          {
+            "line": 1507,
+            "content": "await window.PageStateManager.initialize();",
+            "pattern": "PageStateManager",
+            "match": "PageStateManager"
+          },
+          {
+            "line": 1539,
+            "content": "const saved = await window.PageStateManager.savePageState(pageName, {",
+            "pattern": "PageStateManager",
+            "match": "PageStateManager"
+          },
+          {
+            "line": 1562,
+            "content": "* Load page state using PageStateManager",
+            "pattern": "PageStateManager",
+            "match": "PageStateManager"
+          },
+          {
+            "line": 1566,
+            "content": "if (!window.PageStateManager) {",
+            "pattern": "PageStateManager",
+            "match": "PageStateManager"
+          },
+          {
+            "line": 1568,
+            "content": "window.Logger.warn('PageStateManager not available', { page: 'trade-history-page' });",
+            "pattern": "PageStateManager",
+            "match": "PageStateManager"
+          },
+          {
+            "line": 1573,
+            "content": "// Initialize PageStateManager if needed",
+            "pattern": "PageStateManager",
+            "match": "PageStateManager"
+          },
+          {
+            "line": 1574,
+            "content": "if (!window.PageStateManager.initialized) {",
+            "pattern": "PageStateManager",
+            "match": "PageStateManager"
+          },
+          {
+            "line": 1575,
+            "content": "await window.PageStateManager.initialize();",
+            "pattern": "PageStateManager",
+            "match": "PageStateManager"
+          },
+          {
+            "line": 1579,
+            "content": "const state = await window.PageStateManager.loadPageState(pageName);",
+            "pattern": "PageStateManager",
+            "match": "PageStateManager"
+          }
+        ],
+        "issue_count": 16
+      },
+      "html_result": null
+    },
+    "logger": {
+      "status": "ok",
+      "issues": [
+        {
+          "line": 83,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 84,
+          "content": "window.Logger.info('✅ Header System initialized', { page: 'trade-history-page' });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 87,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 88,
+          "content": "window.Logger.error('Error initializing Header System', {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 99,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 100,
+          "content": "window.Logger.error('Error initializing Header System (retry)', {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 107,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 108,
+          "content": "window.Logger.warn('HeaderSystem not available after retry', { page: 'trade-history-page' });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 151,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 152,
+          "content": "window.Logger.warn('Error loading tickers, using empty list', { page: 'trade-history-page', error })",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 309,
+          "content": "window.Logger?.warn('tradeSelectorModal not available in ModalManagerV2, using Bootstrap fallback', ",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 400,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 401,
+          "content": "window.Logger.warn('Error saving filter state', { page: 'trade-history-page', error: err });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 564,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 565,
+          "content": "window.Logger.info(`Loading trade ${tradeId} for analysis...`, { page: 'trade-history-page', tradeId",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 601,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 602,
+          "content": "window.Logger.warn('UnifiedCacheManager not available, using fallback', { page: 'trade-history-page'",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 625,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 626,
+          "content": "window.Logger.warn('TradingViewChartAdapter not available after wait', { page: 'trade-history-page' ",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 646,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 647,
+          "content": "window.Logger.info('Loaded trade history data from cache', { page: 'trade-history-page' });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 656,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 657,
+          "content": "window.Logger.info('Using mock data for trade history', { page: 'trade-history-page' });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 675,
+          "content": "} else if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 676,
+          "content": "window.Logger.error('No mock data available', { page: 'trade-history-page' });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 683,
+          "content": "} else if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 684,
+          "content": "window.Logger.error('Error loading data from cache', { page: 'trade-history-page', error });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 709,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 710,
+          "content": "window.Logger.warn('Failed to save to cache', { page: 'trade-history-page', key, error });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 720,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 721,
+          "content": "window.Logger.info('Page already initialized, skipping...', { page: 'trade-history-page' });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 727,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 728,
+          "content": "window.Logger.info('📊 Initializing Trade History Page...', { page: 'trade-history-page' });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 757,
+          "content": "} else if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 758,
+          "content": "window.Logger.error('Failed to load data, cannot initialize page', { page: 'trade-history-page' });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 786,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 787,
+          "content": "window.Logger.info('✅ Trade History Page initialized successfully', { page: 'trade-history-page' });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 794,
+          "content": "} else if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 795,
+          "content": "window.Logger.error('Error initializing Trade History Page', { page: 'trade-history-page', error });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 845,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 846,
+          "content": "window.Logger.warn('initTimelineChart not found in HTML, chart may not initialize', { page: 'trade-h",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 860,
+          "content": "} else if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 861,
+          "content": "window.Logger.error('Error initializing timeline chart', { page: 'trade-history-page', error });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 872,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 873,
+          "content": "window.Logger.info('Page rendered successfully', { page: 'trade-history-page' });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 880,
+          "content": "} else if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 881,
+          "content": "window.Logger.error('Error rendering page', { page: 'trade-history-page', error });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1241,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1242,
+          "content": "window.Logger.warn('UnifiedTableSystem not available for plan vs execution table registration', { pa",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1374,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1375,
+          "content": "window.Logger.info('✅ Registered plan vs execution table with UnifiedTableSystem', { page: 'trade-hi",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1483,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1484,
+          "content": "window.Logger.info('HeaderSystem filter manager available', { page: 'trade-history-page' });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1487,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1488,
+          "content": "window.Logger.warn('HeaderSystem filter manager not available', { page: 'trade-history-page' });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1499,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1500,
+          "content": "window.Logger.warn('PageStateManager not available', { page: 'trade-history-page' });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1532,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1533,
+          "content": "window.Logger.warn('Error getting chart zoom state', { page: 'trade-history-page', error });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1547,
+          "content": "if (saved && window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1548,
+          "content": "window.Logger.debug('Saved page state', { page: 'trade-history-page' });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1554,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1555,
+          "content": "window.Logger.warn('Error saving page state', { page: 'trade-history-page', error });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1567,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1568,
+          "content": "window.Logger.warn('PageStateManager not available', { page: 'trade-history-page' });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1653,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1654,
+          "content": "window.Logger.debug('Loaded page state', { page: 'trade-history-page' });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1660,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1661,
+          "content": "window.Logger.warn('Error loading page state', { page: 'trade-history-page', error });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1683,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1684,
+          "content": "window.Logger.warn('Error restoring chart zoom state', { page: 'trade-history-page', error });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        }
+      ],
+      "issue_count": 71,
+      "js_result": {
+        "status": "ok",
+        "issues": [
+          {
+            "line": 83,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 84,
+            "content": "window.Logger.info('✅ Header System initialized', { page: 'trade-history-page' });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 87,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 88,
+            "content": "window.Logger.error('Error initializing Header System', {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 99,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 100,
+            "content": "window.Logger.error('Error initializing Header System (retry)', {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 107,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 108,
+            "content": "window.Logger.warn('HeaderSystem not available after retry', { page: 'trade-history-page' });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 151,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 152,
+            "content": "window.Logger.warn('Error loading tickers, using empty list', { page: 'trade-history-page', error })",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 309,
+            "content": "window.Logger?.warn('tradeSelectorModal not available in ModalManagerV2, using Bootstrap fallback', ",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 400,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 401,
+            "content": "window.Logger.warn('Error saving filter state', { page: 'trade-history-page', error: err });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 564,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 565,
+            "content": "window.Logger.info(`Loading trade ${tradeId} for analysis...`, { page: 'trade-history-page', tradeId",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 601,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 602,
+            "content": "window.Logger.warn('UnifiedCacheManager not available, using fallback', { page: 'trade-history-page'",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 625,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 626,
+            "content": "window.Logger.warn('TradingViewChartAdapter not available after wait', { page: 'trade-history-page' ",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 646,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 647,
+            "content": "window.Logger.info('Loaded trade history data from cache', { page: 'trade-history-page' });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 656,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 657,
+            "content": "window.Logger.info('Using mock data for trade history', { page: 'trade-history-page' });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 675,
+            "content": "} else if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 676,
+            "content": "window.Logger.error('No mock data available', { page: 'trade-history-page' });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 683,
+            "content": "} else if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 684,
+            "content": "window.Logger.error('Error loading data from cache', { page: 'trade-history-page', error });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 709,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 710,
+            "content": "window.Logger.warn('Failed to save to cache', { page: 'trade-history-page', key, error });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 720,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 721,
+            "content": "window.Logger.info('Page already initialized, skipping...', { page: 'trade-history-page' });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 727,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 728,
+            "content": "window.Logger.info('📊 Initializing Trade History Page...', { page: 'trade-history-page' });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 757,
+            "content": "} else if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 758,
+            "content": "window.Logger.error('Failed to load data, cannot initialize page', { page: 'trade-history-page' });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 786,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 787,
+            "content": "window.Logger.info('✅ Trade History Page initialized successfully', { page: 'trade-history-page' });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 794,
+            "content": "} else if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 795,
+            "content": "window.Logger.error('Error initializing Trade History Page', { page: 'trade-history-page', error });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 845,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 846,
+            "content": "window.Logger.warn('initTimelineChart not found in HTML, chart may not initialize', { page: 'trade-h",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 860,
+            "content": "} else if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 861,
+            "content": "window.Logger.error('Error initializing timeline chart', { page: 'trade-history-page', error });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 872,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 873,
+            "content": "window.Logger.info('Page rendered successfully', { page: 'trade-history-page' });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 880,
+            "content": "} else if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 881,
+            "content": "window.Logger.error('Error rendering page', { page: 'trade-history-page', error });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1241,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1242,
+            "content": "window.Logger.warn('UnifiedTableSystem not available for plan vs execution table registration', { pa",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1374,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1375,
+            "content": "window.Logger.info('✅ Registered plan vs execution table with UnifiedTableSystem', { page: 'trade-hi",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1483,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1484,
+            "content": "window.Logger.info('HeaderSystem filter manager available', { page: 'trade-history-page' });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1487,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1488,
+            "content": "window.Logger.warn('HeaderSystem filter manager not available', { page: 'trade-history-page' });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1499,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1500,
+            "content": "window.Logger.warn('PageStateManager not available', { page: 'trade-history-page' });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1532,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1533,
+            "content": "window.Logger.warn('Error getting chart zoom state', { page: 'trade-history-page', error });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1547,
+            "content": "if (saved && window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1548,
+            "content": "window.Logger.debug('Saved page state', { page: 'trade-history-page' });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1554,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1555,
+            "content": "window.Logger.warn('Error saving page state', { page: 'trade-history-page', error });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1567,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1568,
+            "content": "window.Logger.warn('PageStateManager not available', { page: 'trade-history-page' });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1653,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1654,
+            "content": "window.Logger.debug('Loaded page state', { page: 'trade-history-page' });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1660,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1661,
+            "content": "window.Logger.warn('Error loading page state', { page: 'trade-history-page', error });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1683,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1684,
+            "content": "window.Logger.warn('Error restoring chart zoom state', { page: 'trade-history-page', error });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          }
+        ],
+        "issue_count": 71
+      },
+      "html_result": null
+    },
+    "cache": {
+      "status": "ok",
+      "issues": [
+        {
+          "line": 126,
+          "content": "if (window.UnifiedCacheManager) {",
+          "pattern": "UnifiedCacheManager",
+          "match": "UnifiedCacheManager",
+          "file": "js"
+        },
+        {
+          "line": 127,
+          "content": "const cachedData = await window.UnifiedCacheManager.get(cacheKey, 'memory');",
+          "pattern": "UnifiedCacheManager",
+          "match": "UnifiedCacheManager",
+          "file": "js"
+        },
+        {
+          "line": 144,
+          "content": "if (window.UnifiedCacheManager) {",
+          "pattern": "UnifiedCacheManager",
+          "match": "UnifiedCacheManager",
+          "file": "js"
+        },
+        {
+          "line": 145,
+          "content": "await window.UnifiedCacheManager.save(cacheKey, allTickers, 'memory', { ttl: 600 }); // 10 minutes",
+          "pattern": "UnifiedCacheManager",
+          "match": "UnifiedCacheManager",
+          "file": "js"
+        },
+        {
+          "line": 202,
+          "content": "if (window.UnifiedCacheManager) {",
+          "pattern": "UnifiedCacheManager",
+          "match": "UnifiedCacheManager",
+          "file": "js"
+        },
+        {
+          "line": 203,
+          "content": "const cachedData = await window.UnifiedCacheManager.get(cacheKey, 'memory');",
+          "pattern": "UnifiedCacheManager",
+          "match": "UnifiedCacheManager",
+          "file": "js"
+        },
+        {
+          "line": 230,
+          "content": "if (window.UnifiedCacheManager) {",
+          "pattern": "UnifiedCacheManager",
+          "match": "UnifiedCacheManager",
+          "file": "js"
+        },
+        {
+          "line": 231,
+          "content": "await window.UnifiedCacheManager.save(cacheKey, allTrades, 'memory', { ttl: 300 }); // 5 minutes",
+          "pattern": "UnifiedCacheManager",
+          "match": "UnifiedCacheManager",
+          "file": "js"
+        },
+        {
+          "line": 576,
+          "content": "* Wait for UnifiedCacheManager to be ready",
+          "pattern": "UnifiedCacheManager",
+          "match": "UnifiedCacheManager",
+          "file": "js"
+        },
+        {
+          "line": 581,
+          "content": "if (window.UnifiedCacheManager &&",
+          "pattern": "UnifiedCacheManager",
+          "match": "UnifiedCacheManager",
+          "file": "js"
+        },
+        {
+          "line": 582,
+          "content": "(window.UnifiedCacheManager.initialized || window.UnifiedCacheManager.isInitialized?.())) {",
+          "pattern": "UnifiedCacheManager",
+          "match": "UnifiedCacheManager",
+          "file": "js"
+        },
+        {
+          "line": 582,
+          "content": "(window.UnifiedCacheManager.initialized || window.UnifiedCacheManager.isInitialized?.())) {",
+          "pattern": "UnifiedCacheManager",
+          "match": "UnifiedCacheManager",
+          "file": "js"
+        },
+        {
+          "line": 590,
+          "content": "while ((!window.UnifiedCacheManager ||",
+          "pattern": "UnifiedCacheManager",
+          "match": "UnifiedCacheManager",
+          "file": "js"
+        },
+        {
+          "line": 591,
+          "content": "(!window.UnifiedCacheManager.initialized &&",
+          "pattern": "UnifiedCacheManager",
+          "match": "UnifiedCacheManager",
+          "file": "js"
+        },
+        {
+          "line": 592,
+          "content": "!window.UnifiedCacheManager.isInitialized?.())) &&",
+          "pattern": "UnifiedCacheManager",
+          "match": "UnifiedCacheManager",
+          "file": "js"
+        },
+        {
+          "line": 598,
+          "content": "if (!window.UnifiedCacheManager ||",
+          "pattern": "UnifiedCacheManager",
+          "match": "UnifiedCacheManager",
+          "file": "js"
+        },
+        {
+          "line": 599,
+          "content": "(!window.UnifiedCacheManager.initialized &&",
+          "pattern": "UnifiedCacheManager",
+          "match": "UnifiedCacheManager",
+          "file": "js"
+        },
+        {
+          "line": 600,
+          "content": "!window.UnifiedCacheManager.isInitialized?.())) {",
+          "pattern": "UnifiedCacheManager",
+          "match": "UnifiedCacheManager",
+          "file": "js"
+        },
+        {
+          "line": 602,
+          "content": "window.Logger.warn('UnifiedCacheManager not available, using fallback', { page: 'trade-history-page'",
+          "pattern": "UnifiedCacheManager",
+          "match": "UnifiedCacheManager",
+          "file": "js"
+        },
+        {
+          "line": 641,
+          "content": "if (cacheAvailable && window.UnifiedCacheManager) {",
+          "pattern": "UnifiedCacheManager",
+          "match": "UnifiedCacheManager",
+          "file": "js"
+        },
+        {
+          "line": 643,
+          "content": "const cachedData = await window.UnifiedCacheManager.get(CACHE_KEY_MOCK_DATA);",
+          "pattern": "UnifiedCacheManager",
+          "match": "UnifiedCacheManager",
+          "file": "js"
+        },
+        {
+          "line": 661,
+          "content": "if (cacheAvailable && window.UnifiedCacheManager) {",
+          "pattern": "UnifiedCacheManager",
+          "match": "UnifiedCacheManager",
+          "file": "js"
+        },
+        {
+          "line": 662,
+          "content": "await window.UnifiedCacheManager.save(CACHE_KEY_MOCK_DATA, tradeHistoryData, {",
+          "pattern": "UnifiedCacheManager",
+          "match": "UnifiedCacheManager",
+          "file": "js"
+        },
+        {
+          "line": 701,
+          "content": "if (cacheAvailable && window.UnifiedCacheManager) {",
+          "pattern": "UnifiedCacheManager",
+          "match": "UnifiedCacheManager",
+          "file": "js"
+        },
+        {
+          "line": 702,
+          "content": "await window.UnifiedCacheManager.save(key, data, {",
+          "pattern": "UnifiedCacheManager",
+          "match": "UnifiedCacheManager",
+          "file": "js"
+        },
+        {
+          "line": 764,
+          "content": "const cachedSelectedId = await window.UnifiedCacheManager?.get(CACHE_KEY_SELECTED_TRADE_ID);",
+          "pattern": "UnifiedCacheManager",
+          "match": "UnifiedCacheManager",
+          "file": "js"
+        }
+      ],
+      "issue_count": 26,
+      "js_result": {
+        "status": "ok",
+        "issues": [
+          {
+            "line": 126,
+            "content": "if (window.UnifiedCacheManager) {",
+            "pattern": "UnifiedCacheManager",
+            "match": "UnifiedCacheManager"
+          },
+          {
+            "line": 127,
+            "content": "const cachedData = await window.UnifiedCacheManager.get(cacheKey, 'memory');",
+            "pattern": "UnifiedCacheManager",
+            "match": "UnifiedCacheManager"
+          },
+          {
+            "line": 144,
+            "content": "if (window.UnifiedCacheManager) {",
+            "pattern": "UnifiedCacheManager",
+            "match": "UnifiedCacheManager"
+          },
+          {
+            "line": 145,
+            "content": "await window.UnifiedCacheManager.save(cacheKey, allTickers, 'memory', { ttl: 600 }); // 10 minutes",
+            "pattern": "UnifiedCacheManager",
+            "match": "UnifiedCacheManager"
+          },
+          {
+            "line": 202,
+            "content": "if (window.UnifiedCacheManager) {",
+            "pattern": "UnifiedCacheManager",
+            "match": "UnifiedCacheManager"
+          },
+          {
+            "line": 203,
+            "content": "const cachedData = await window.UnifiedCacheManager.get(cacheKey, 'memory');",
+            "pattern": "UnifiedCacheManager",
+            "match": "UnifiedCacheManager"
+          },
+          {
+            "line": 230,
+            "content": "if (window.UnifiedCacheManager) {",
+            "pattern": "UnifiedCacheManager",
+            "match": "UnifiedCacheManager"
+          },
+          {
+            "line": 231,
+            "content": "await window.UnifiedCacheManager.save(cacheKey, allTrades, 'memory', { ttl: 300 }); // 5 minutes",
+            "pattern": "UnifiedCacheManager",
+            "match": "UnifiedCacheManager"
+          },
+          {
+            "line": 576,
+            "content": "* Wait for UnifiedCacheManager to be ready",
+            "pattern": "UnifiedCacheManager",
+            "match": "UnifiedCacheManager"
+          },
+          {
+            "line": 581,
+            "content": "if (window.UnifiedCacheManager &&",
+            "pattern": "UnifiedCacheManager",
+            "match": "UnifiedCacheManager"
+          },
+          {
+            "line": 582,
+            "content": "(window.UnifiedCacheManager.initialized || window.UnifiedCacheManager.isInitialized?.())) {",
+            "pattern": "UnifiedCacheManager",
+            "match": "UnifiedCacheManager"
+          },
+          {
+            "line": 582,
+            "content": "(window.UnifiedCacheManager.initialized || window.UnifiedCacheManager.isInitialized?.())) {",
+            "pattern": "UnifiedCacheManager",
+            "match": "UnifiedCacheManager"
+          },
+          {
+            "line": 590,
+            "content": "while ((!window.UnifiedCacheManager ||",
+            "pattern": "UnifiedCacheManager",
+            "match": "UnifiedCacheManager"
+          },
+          {
+            "line": 591,
+            "content": "(!window.UnifiedCacheManager.initialized &&",
+            "pattern": "UnifiedCacheManager",
+            "match": "UnifiedCacheManager"
+          },
+          {
+            "line": 592,
+            "content": "!window.UnifiedCacheManager.isInitialized?.())) &&",
+            "pattern": "UnifiedCacheManager",
+            "match": "UnifiedCacheManager"
+          },
+          {
+            "line": 598,
+            "content": "if (!window.UnifiedCacheManager ||",
+            "pattern": "UnifiedCacheManager",
+            "match": "UnifiedCacheManager"
+          },
+          {
+            "line": 599,
+            "content": "(!window.UnifiedCacheManager.initialized &&",
+            "pattern": "UnifiedCacheManager",
+            "match": "UnifiedCacheManager"
+          },
+          {
+            "line": 600,
+            "content": "!window.UnifiedCacheManager.isInitialized?.())) {",
+            "pattern": "UnifiedCacheManager",
+            "match": "UnifiedCacheManager"
+          },
+          {
+            "line": 602,
+            "content": "window.Logger.warn('UnifiedCacheManager not available, using fallback', { page: 'trade-history-page'",
+            "pattern": "UnifiedCacheManager",
+            "match": "UnifiedCacheManager"
+          },
+          {
+            "line": 641,
+            "content": "if (cacheAvailable && window.UnifiedCacheManager) {",
+            "pattern": "UnifiedCacheManager",
+            "match": "UnifiedCacheManager"
+          },
+          {
+            "line": 643,
+            "content": "const cachedData = await window.UnifiedCacheManager.get(CACHE_KEY_MOCK_DATA);",
+            "pattern": "UnifiedCacheManager",
+            "match": "UnifiedCacheManager"
+          },
+          {
+            "line": 661,
+            "content": "if (cacheAvailable && window.UnifiedCacheManager) {",
+            "pattern": "UnifiedCacheManager",
+            "match": "UnifiedCacheManager"
+          },
+          {
+            "line": 662,
+            "content": "await window.UnifiedCacheManager.save(CACHE_KEY_MOCK_DATA, tradeHistoryData, {",
+            "pattern": "UnifiedCacheManager",
+            "match": "UnifiedCacheManager"
+          },
+          {
+            "line": 701,
+            "content": "if (cacheAvailable && window.UnifiedCacheManager) {",
+            "pattern": "UnifiedCacheManager",
+            "match": "UnifiedCacheManager"
+          },
+          {
+            "line": 702,
+            "content": "await window.UnifiedCacheManager.save(key, data, {",
+            "pattern": "UnifiedCacheManager",
+            "match": "UnifiedCacheManager"
+          },
+          {
+            "line": 764,
+            "content": "const cachedSelectedId = await window.UnifiedCacheManager?.get(CACHE_KEY_SELECTED_TRADE_ID);",
+            "pattern": "UnifiedCacheManager",
+            "match": "UnifiedCacheManager"
+          }
+        ],
+        "issue_count": 26
+      },
+      "html_result": null
+    },
+    "dom_manipulation": {
+      "status": "issues_found",
+      "issues": [
+        {
+          "line": 163,
+          "content": "tickerSelect.innerHTML = '<option value=\"\">הכל</option>';",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 179,
+          "content": "investmentSelect.innerHTML = '<option value=\"\">הכל</option>';",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 340,
+          "content": "tbody.innerHTML = '';",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 346,
+          "content": "tbody.innerHTML = filteredTrades.map(trade => {",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 903,
+          "content": "totalPLEl.innerHTML = window.FieldRendererService.renderAmount(statistics.totalPL, '$', 0, true);",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 908,
+          "content": "totalPLPercentEl.innerHTML = `(${percent})`;",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 919,
+          "content": "returnPercentEl.innerHTML = window.FieldRendererService.renderNumericValue(statistics.totalPLPercent",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 951,
+          "content": "sideEl.innerHTML = window.FieldRendererService.renderSide(trade.side);",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 953,
+          "content": "sideEl.innerHTML = `<span class=\"badge bg-success\">${trade.side || '-'}</span>`;",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 962,
+          "content": "investmentTypeEl.innerHTML = window.FieldRendererService.renderType(trade.investment_type);",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 1027,
+          "content": "conditionsEl.innerHTML = conditions.map(cond =>",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 1031,
+          "content": "conditionsEl.innerHTML = '<span class=\"text-muted\">-</span>';",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 1046,
+          "content": "plel.innerHTML = `",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 1216,
+          "content": "timelineEl.innerHTML = stepsHTML.join('');",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 1473,
+          "content": "tbodyEl.innerHTML = rowsHTML.join('');",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 165,
+          "content": "const option = document.createElement('option');",
+          "pattern": "createElement",
+          "match": "createElement",
+          "file": "js"
+        },
+        {
+          "line": 181,
+          "content": "const option = document.createElement('option');",
+          "pattern": "createElement",
+          "match": "createElement",
+          "file": "js"
+        }
+      ],
+      "issue_count": 17,
+      "js_result": {
+        "status": "issues_found",
+        "issues": [
+          {
+            "line": 163,
+            "content": "tickerSelect.innerHTML = '<option value=\"\">הכל</option>';",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 179,
+            "content": "investmentSelect.innerHTML = '<option value=\"\">הכל</option>';",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 340,
+            "content": "tbody.innerHTML = '';",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 346,
+            "content": "tbody.innerHTML = filteredTrades.map(trade => {",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 903,
+            "content": "totalPLEl.innerHTML = window.FieldRendererService.renderAmount(statistics.totalPL, '$', 0, true);",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 908,
+            "content": "totalPLPercentEl.innerHTML = `(${percent})`;",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 919,
+            "content": "returnPercentEl.innerHTML = window.FieldRendererService.renderNumericValue(statistics.totalPLPercent",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 951,
+            "content": "sideEl.innerHTML = window.FieldRendererService.renderSide(trade.side);",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 953,
+            "content": "sideEl.innerHTML = `<span class=\"badge bg-success\">${trade.side || '-'}</span>`;",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 962,
+            "content": "investmentTypeEl.innerHTML = window.FieldRendererService.renderType(trade.investment_type);",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 1027,
+            "content": "conditionsEl.innerHTML = conditions.map(cond =>",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 1031,
+            "content": "conditionsEl.innerHTML = '<span class=\"text-muted\">-</span>';",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 1046,
+            "content": "plel.innerHTML = `",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 1216,
+            "content": "timelineEl.innerHTML = stepsHTML.join('');",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 1473,
+            "content": "tbodyEl.innerHTML = rowsHTML.join('');",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 165,
+            "content": "const option = document.createElement('option');",
+            "pattern": "createElement",
+            "match": "createElement"
+          },
+          {
+            "line": 181,
+            "content": "const option = document.createElement('option');",
+            "pattern": "createElement",
+            "match": "createElement"
+          }
+        ],
+        "issue_count": 17
+      },
+      "html_result": null
+    },
+    "html_structure": {
+      "status": "issues_found",
+      "issues": [
+        {
+          "line": 374,
+          "content": "<button class=\"btn btn-sm\" data-onclick=\"window.tradeHistoryPage.viewTradeDetails(${trade.id})\" titl",
+          "pattern": "data-onclick",
+          "match": "data-onclick",
+          "file": "js"
+        },
+        {
+          "line": 376,
+          "content": "<button class=\"btn btn-sm btn-primary\" data-onclick=\"window.tradeHistoryPage.selectTradeForAnalysis(",
+          "pattern": "data-onclick",
+          "match": "data-onclick",
+          "file": "js"
+        },
+        {
+          "line": 1028,
+          "content": "`<div><a href=\"#\" data-onclick=\"showConditionDetails(${cond.id}); return false;\">${cond.description}",
+          "pattern": "data-onclick",
+          "match": "data-onclick",
+          "file": "js"
+        },
+        {
+          "line": 1189,
+          "content": "<div class=\"${stepClass}\" data-step=\"${index}\" data-onclick=\"selectTimelineStep(${index})\">",
+          "pattern": "data-onclick",
+          "match": "data-onclick",
+          "file": "js"
+        },
+        {
+          "line": 1210,
+          "content": "<a href=\"#\" class=\"timeline-step-link\" data-onclick=\"${onClickFn}; return false;\">פרטים מלאים →</a>",
+          "pattern": "data-onclick",
+          "match": "data-onclick",
+          "file": "js"
+        },
+        {
+          "line": 1190,
+          "content": "<div class=\"timeline-point-absolute\" ${pointColor ? `style=\"background-color: ${pointColor};\"` : ''}",
+          "pattern": "style\\s*=",
+          "match": "style=",
+          "file": "js"
+        }
+      ],
+      "issue_count": 6,
+      "js_result": {
+        "status": "issues_found",
+        "issues": [
+          {
+            "line": 374,
+            "content": "<button class=\"btn btn-sm\" data-onclick=\"window.tradeHistoryPage.viewTradeDetails(${trade.id})\" titl",
+            "pattern": "data-onclick",
+            "match": "data-onclick"
+          },
+          {
+            "line": 376,
+            "content": "<button class=\"btn btn-sm btn-primary\" data-onclick=\"window.tradeHistoryPage.selectTradeForAnalysis(",
+            "pattern": "data-onclick",
+            "match": "data-onclick"
+          },
+          {
+            "line": 1028,
+            "content": "`<div><a href=\"#\" data-onclick=\"showConditionDetails(${cond.id}); return false;\">${cond.description}",
+            "pattern": "data-onclick",
+            "match": "data-onclick"
+          },
+          {
+            "line": 1189,
+            "content": "<div class=\"${stepClass}\" data-step=\"${index}\" data-onclick=\"selectTimelineStep(${index})\">",
+            "pattern": "data-onclick",
+            "match": "data-onclick"
+          },
+          {
+            "line": 1210,
+            "content": "<a href=\"#\" class=\"timeline-step-link\" data-onclick=\"${onClickFn}; return false;\">פרטים מלאים →</a>",
+            "pattern": "data-onclick",
+            "match": "data-onclick"
+          },
+          {
+            "line": 1190,
+            "content": "<div class=\"timeline-point-absolute\" ${pointColor ? `style=\"background-color: ${pointColor};\"` : ''}",
+            "pattern": "style\\s*=",
+            "match": "style="
+          }
+        ],
+        "issue_count": 6
+      },
+      "html_result": null
+    }
+  }
+}

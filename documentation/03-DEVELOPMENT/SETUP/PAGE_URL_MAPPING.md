@@ -123,6 +123,7 @@ http://localhost:8080/my-new-page
 - `/executions` → `executions.html`
 - `/preferences` → `preferences.html`
 - `/ai-analysis` → `ai-analysis.html` ✅ **חדש! ינואר 2025**
+- `/watch-list` → `watch-list.html` ✅ **חדש! דצמבר 2025**
 
 ### עמודים טכניים
 
@@ -131,7 +132,6 @@ http://localhost:8080/my-new-page
 - `/designs` → `designs.html`
 - `/constraints` → `constraints.html`
 - `/external-data-dashboard` → `external-data-dashboard.html`
-- `/linter-realtime-monitor` → `linter-realtime-monitor.html`
 - `/chart-management` → `chart-management.html`
 
 ### עמודים נוספים
@@ -218,4 +218,9 @@ def ai_analysis() -> Any:
 ---
 
 **עודכן:** 28 בינואר 2025
+
+
+
+
+
 

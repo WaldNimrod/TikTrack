@@ -19,7 +19,14 @@ user_service = UserService()
 
 
 def _resolve_user_id() -> int:
-    """Return active user id (defaults to 1 if not configured)."""
+    """Return active user id from Flask context (set by auth middleware).
+    Falls back to default user if not authenticated (for backward compatibility)."""
+    # Primary: Get from Flask context (set by auth middleware)
+    user_id = getattr(g, 'user_id', None)
+    if user_id is not None:
+        return user_id
+    
+    # Fallback: Default user (for backward compatibility and tools)
     default_user = user_service.get_default_user()
     return default_user["id"] if default_user else 1
 

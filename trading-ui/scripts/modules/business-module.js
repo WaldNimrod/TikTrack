@@ -205,7 +205,7 @@ function addInvestmentTypeColorLegend() {
     });
 
     // החלף את התוכן הקיים
-    legendContainer.innerHTML = '';
+    legendContainer.textContent = '';
     legendContainer.appendChild(globalLegend);
   } else {
     // ברירת מחדל אם המערכת הכללית לא זמינה
@@ -324,7 +324,14 @@ async function loadTradesData() {
       // Fallback if ResponseHandler not available
       const tbody = document.querySelector('#tradesTable tbody');
       if (tbody) {
-        tbody.innerHTML = '<tr><td colspan="11" class="text-center text-danger">שגיאה בטעינת נתונים: ' + error.message + '</td></tr>';
+        tbody.textContent = '';
+        const errorRow = document.createElement('tr');
+        const errorCell = document.createElement('td');
+        errorCell.colSpan = 11;
+        errorCell.className = 'text-center text-danger';
+        errorCell.textContent = 'שגיאה בטעינת נתונים: ' + error.message;
+        errorRow.appendChild(errorCell);
+        tbody.appendChild(errorRow);
       }
     }
   }
@@ -461,7 +468,15 @@ function updateTradesTable(trades) {
   `;
   }).join('');
 
-  tbody.innerHTML = tableHTML;
+  tbody.textContent = '';
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(`<table><tbody>${tableHTML}</tbody></table>`, 'text/html');
+  const tempTbody = doc.body.querySelector('tbody');
+  if (tempTbody) {
+    Array.from(tempTbody.children).forEach(row => {
+      tbody.appendChild(row.cloneNode(true));
+    });
+  }
 
   // עדכון ספירת רשומות - רק בדף תכנון
   if (window.location.pathname === '/trade_plans' || window.location.pathname === '/trade_plans.html') {
@@ -821,7 +836,11 @@ async function _REMOVED_loadEditTradeModalData(trade) {
     // מילוי רשימת חשבונות - רק חשבונות פתוחים
     const accountSelect = document.getElementById('editTradeAccountId');
     if (accountSelect) {
-      accountSelect.innerHTML = '<option value="">בחר חשבון מסחר...</option>';
+      accountSelect.textContent = '';
+      const option = document.createElement('option');
+      option.value = '';
+      option.textContent = 'בחר חשבון מסחר...';
+      accountSelect.appendChild(option);
       const openAccounts = accounts.data.filter(account => account.status === 'open');
       openAccounts.forEach(account => {
         const option = document.createElement('option');
@@ -834,7 +853,11 @@ async function _REMOVED_loadEditTradeModalData(trade) {
     // מילוי רשימת טיקרים - רק טיקרים פעילים
     const tickerSelect = document.getElementById('editTradeTickerId');
     if (tickerSelect) {
-      tickerSelect.innerHTML = '<option value="">בחר טיקר</option>';
+      tickerSelect.textContent = '';
+      const option = document.createElement('option');
+      option.value = '';
+      option.textContent = 'בחר טיקר';
+      tickerSelect.appendChild(option);
       const activeTickers = tickers.data.filter(ticker => ticker.status === 'open');
       activeTickers.forEach(ticker => {
         const option = document.createElement('option');
@@ -847,7 +870,11 @@ async function _REMOVED_loadEditTradeModalData(trade) {
     // מילוי רשימת תוכניות טרייד - כולל תוכניות סגורות לעריכה
     const tradePlanSelect = document.getElementById('editTradeTradePlanId');
     if (tradePlanSelect) {
-      tradePlanSelect.innerHTML = '<option value="">בחר תוכנית טרייד</option>';
+      tradePlanSelect.textContent = '';
+      const option = document.createElement('option');
+      option.value = '';
+      option.textContent = 'בחר תוכנית טרייד';
+      tradePlanSelect.appendChild(option);
       // ניקוי סימונים
       tradePlanSelect.removeAttribute('data-restored');
       tradePlanSelect.removeAttribute('data-cleared');
@@ -877,7 +904,13 @@ async function _REMOVED_loadEditTradeModalData(trade) {
         // יצירת טקסט עם הסימבול בבולד וסטטוס
         const statusText = status === 'open' ? 'פתוח' : status === 'closed' ? 'סגור' : status;
         const boldSymbol = `<strong>${tickerSymbol}</strong>`;
-        option.innerHTML = `${boldSymbol} | ${side} | ${investmentType} | ${createdDate} | ${statusText}`;
+        option.textContent = '';
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(boldSymbol, 'text/html');
+        doc.body.childNodes.forEach(node => {
+          option.appendChild(node.cloneNode(true));
+        });
+        option.appendChild(document.createTextNode(` | ${side} | ${investmentType} | ${createdDate} | ${statusText}`));
         option.setAttribute('data-ticker-symbol', tickerSymbol);
         option.setAttribute('data-ticker-id', tickerId);
         tradePlanSelect.appendChild(option);
@@ -1243,7 +1276,14 @@ async function _REMOVED_saveEditTradeData() {
     await loadTradesData();
 
     // סגירת המודל
-    bootstrap.Modal.getInstance(document.getElementById('editTradeModal')).hide();
+    if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
+      window.ModalManagerV2.hideModal('editTradeModal');
+    } else if (bootstrap?.Modal) {
+      const modal = bootstrap.Modal.getInstance(document.getElementById('editTradeModal'));
+      if (modal) {
+        modal.hide();
+      }
+    }
 
   } catch (error) {
     if (typeof handleSaveError === 'function') {
@@ -1475,8 +1515,14 @@ async function saveNewTradeRecord() {
       loadTradesData();
 
       // סגירת המודל
-      const modal = bootstrap.Modal.getInstance(document.getElementById('addTradeModal'));
-      modal.hide();
+      if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
+        window.ModalManagerV2.hideModal('addTradeModal');
+      } else if (bootstrap?.Modal) {
+        const modal = bootstrap.Modal.getInstance(document.getElementById('addTradeModal'));
+        if (modal) {
+          modal.hide();
+        }
+      }
 
     } else {
       const errorData = await response.json();
@@ -1530,7 +1576,11 @@ async function loadModalData() {
     // מילוי רשימת חשבונות - רק חשבונות פתוחים
     const accountSelect = document.getElementById('addTradeAccountId');
     if (accountSelect) {
-      accountSelect.innerHTML = '<option value="">בחר חשבון מסחר...</option>';
+      accountSelect.textContent = '';
+      const option = document.createElement('option');
+      option.value = '';
+      option.textContent = 'בחר חשבון מסחר...';
+      accountSelect.appendChild(option);
       const openAccounts = accounts.data.filter(account => account.status === 'open');
       openAccounts.forEach(account => {
         const option = document.createElement('option');
@@ -1543,7 +1593,11 @@ async function loadModalData() {
     // מילוי רשימת תוכניות טרייד - הצג רק תוכניות פתוחות כברירת מחדל
     const tradePlanSelect = document.getElementById('addTradeTradePlanId');
     if (tradePlanSelect) {
-      tradePlanSelect.innerHTML = '<option value="">בחר תוכנית טרייד</option>';
+      tradePlanSelect.textContent = '';
+      const option = document.createElement('option');
+      option.value = '';
+      option.textContent = 'בחר תוכנית טרייד';
+      tradePlanSelect.appendChild(option);
 
       // בדיקה אם הפילטר "הצג תכנונים סגורים" פעיל
       const showClosedCheckbox = document.getElementById('addTradeShowClosedTrades');
@@ -1583,7 +1637,7 @@ async function loadModalData() {
         const part1 = `${statusIndicator} ${boldSymbol} | ${side} | ${investmentType}`;
         const part2 = ` | ${createdDate} (${statusText})`;
         const optionText = part1 + part2;
-        option.innerHTML = optionText;
+        option.textContent = optionText;
         option.setAttribute('data-ticker-symbol', tickerSymbol);
         option.setAttribute('data-ticker-id', tickerId);
         option.setAttribute('data-plan-status', plan.status);
@@ -2204,7 +2258,8 @@ function updateTableStats() {
   // עדכון סטטיסטיקות סיכום
   const summaryStatsElement = document.getElementById('summaryStats');
   if (summaryStatsElement) {
-    summaryStatsElement.innerHTML = `
+    summaryStatsElement.textContent = '';
+    const statsHTML = `
       <div class="stats-grid">
         <div class="stat-item">
           <span class="stat-label">פתוחים:</span>
@@ -2232,6 +2287,11 @@ function updateTableStats() {
         </div>
       </div>
     `;
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(statsHTML, 'text/html');
+    doc.body.childNodes.forEach(node => {
+      summaryStatsElement.appendChild(node.cloneNode(true));
+    });
   } else {
     if (typeof handleElementNotFound === 'function') {
       handleElementNotFound('summaryStats', 'CRITICAL');

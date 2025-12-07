@@ -1,0 +1,1366 @@
+{
+  "page": "tradingview-test-page.html",
+  "js_file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/tradingview-test-page.js",
+  "html_file": null,
+  "categories": {
+    "unified_init": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": null
+    },
+    "section_toggle": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": null
+    },
+    "notifications": {
+      "status": "ok",
+      "issues": [
+        {
+          "line": 973,
+          "content": "if (window.NotificationSystem) {",
+          "pattern": "NotificationSystem",
+          "match": "NotificationSystem",
+          "file": "js"
+        },
+        {
+          "line": 974,
+          "content": "window.NotificationSystem.showSuccess('לוג מפורט הועתק ללוח', 'בדיקת TradingView');",
+          "pattern": "NotificationSystem",
+          "match": "NotificationSystem",
+          "file": "js"
+        },
+        {
+          "line": 982,
+          "content": "if (window.NotificationSystem) {",
+          "pattern": "NotificationSystem",
+          "match": "NotificationSystem",
+          "file": "js"
+        },
+        {
+          "line": 983,
+          "content": "window.NotificationSystem.showError('שגיאה בהעתקת הלוג: ' + error.message, 'בדיקת TradingView');",
+          "pattern": "NotificationSystem",
+          "match": "NotificationSystem",
+          "file": "js"
+        },
+        {
+          "line": 976,
+          "content": "window.showErrorNotification('לוג מפורט הועתק ללוח', \"שגיאה\");",
+          "pattern": "showErrorNotification",
+          "match": "showErrorNotification",
+          "file": "js"
+        },
+        {
+          "line": 985,
+          "content": "window.showErrorNotification('שגיאה בהעתקת הלוג: ' + error.message, \"שגיאה\");",
+          "pattern": "showErrorNotification",
+          "match": "showErrorNotification",
+          "file": "js"
+        }
+      ],
+      "issue_count": 6,
+      "js_result": {
+        "status": "ok",
+        "issues": [
+          {
+            "line": 973,
+            "content": "if (window.NotificationSystem) {",
+            "pattern": "NotificationSystem",
+            "match": "NotificationSystem"
+          },
+          {
+            "line": 974,
+            "content": "window.NotificationSystem.showSuccess('לוג מפורט הועתק ללוח', 'בדיקת TradingView');",
+            "pattern": "NotificationSystem",
+            "match": "NotificationSystem"
+          },
+          {
+            "line": 982,
+            "content": "if (window.NotificationSystem) {",
+            "pattern": "NotificationSystem",
+            "match": "NotificationSystem"
+          },
+          {
+            "line": 983,
+            "content": "window.NotificationSystem.showError('שגיאה בהעתקת הלוג: ' + error.message, 'בדיקת TradingView');",
+            "pattern": "NotificationSystem",
+            "match": "NotificationSystem"
+          },
+          {
+            "line": 976,
+            "content": "window.showErrorNotification('לוג מפורט הועתק ללוח', \"שגיאה\");",
+            "pattern": "showErrorNotification",
+            "match": "showErrorNotification"
+          },
+          {
+            "line": 985,
+            "content": "window.showErrorNotification('שגיאה בהעתקת הלוג: ' + error.message, \"שגיאה\");",
+            "pattern": "showErrorNotification",
+            "match": "showErrorNotification"
+          }
+        ],
+        "issue_count": 6
+      },
+      "html_result": null
+    },
+    "modals": {
+      "status": "ok",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "ok",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": null
+    },
+    "tables": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": null
+    },
+    "field_renderer": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": null
+    },
+    "crud_handler": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": null
+    },
+    "select_populator": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": null
+    },
+    "data_collection": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": null
+    },
+    "icons": {
+      "status": "ok",
+      "issues": [
+        {
+          "line": 864,
+          "content": "if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 864,
+          "content": "if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 866,
+          "content": "hourglassIcon = await window.IconSystem.renderIcon('button', 'hourglass', { size: '16', alt: 'hourgl",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 952,
+          "content": "if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 952,
+          "content": "if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 954,
+          "content": "infoIcon = await window.IconSystem.renderIcon('button', 'info-circle', { size: '16', alt: 'icon', cl",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 962,
+          "content": "if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 962,
+          "content": "if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 964,
+          "content": "infoIcon2 = await window.IconSystem.renderIcon('button', 'info-circle', { size: '16', alt: 'icon', c",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 991,
+          "content": "// Render icon using IconSystem",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 993,
+          "content": "if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 993,
+          "content": "if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 995,
+          "content": "iconHTML = await window.IconSystem.renderIcon('button', 'info-circle', { size: '16', alt: 'icon', cl",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 863,
+          "content": "let hourglassIcon = '<img src=\"../../images/icons/tabler/hourglass.svg\" width=\"16\" height=\"16\" alt=\"",
+          "pattern": "<img.*icon",
+          "match": "<img src=\"../../images/icons/tabler/hourglass.svg\"",
+          "file": "js"
+        },
+        {
+          "line": 951,
+          "content": "let infoIcon = '<img src=\"../../images/icons/tabler/info-circle.svg\" width=\"16\" height=\"16\" alt=\"ico",
+          "pattern": "<img.*icon",
+          "match": "<img src=\"../../images/icons/tabler/info-circle.sv",
+          "file": "js"
+        },
+        {
+          "line": 961,
+          "content": "let infoIcon2 = '<img src=\"../../images/icons/tabler/info-circle.svg\" width=\"16\" height=\"16\" alt=\"ic",
+          "pattern": "<img.*icon",
+          "match": "<img src=\"../../images/icons/tabler/info-circle.sv",
+          "file": "js"
+        },
+        {
+          "line": 992,
+          "content": "let iconHTML = '<img src=\"../../images/icons/tabler/info-circle.svg\" width=\"16\" height=\"16\" alt=\"ico",
+          "pattern": "<img.*icon",
+          "match": "<img src=\"../../images/icons/tabler/info-circle.sv",
+          "file": "js"
+        }
+      ],
+      "issue_count": 17,
+      "js_result": {
+        "status": "ok",
+        "issues": [
+          {
+            "line": 864,
+            "content": "if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 864,
+            "content": "if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 866,
+            "content": "hourglassIcon = await window.IconSystem.renderIcon('button', 'hourglass', { size: '16', alt: 'hourgl",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 952,
+            "content": "if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 952,
+            "content": "if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 954,
+            "content": "infoIcon = await window.IconSystem.renderIcon('button', 'info-circle', { size: '16', alt: 'icon', cl",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 962,
+            "content": "if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 962,
+            "content": "if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 964,
+            "content": "infoIcon2 = await window.IconSystem.renderIcon('button', 'info-circle', { size: '16', alt: 'icon', c",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 991,
+            "content": "// Render icon using IconSystem",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 993,
+            "content": "if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 993,
+            "content": "if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 995,
+            "content": "iconHTML = await window.IconSystem.renderIcon('button', 'info-circle', { size: '16', alt: 'icon', cl",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 863,
+            "content": "let hourglassIcon = '<img src=\"../../images/icons/tabler/hourglass.svg\" width=\"16\" height=\"16\" alt=\"",
+            "pattern": "<img.*icon",
+            "match": "<img src=\"../../images/icons/tabler/hourglass.svg\""
+          },
+          {
+            "line": 951,
+            "content": "let infoIcon = '<img src=\"../../images/icons/tabler/info-circle.svg\" width=\"16\" height=\"16\" alt=\"ico",
+            "pattern": "<img.*icon",
+            "match": "<img src=\"../../images/icons/tabler/info-circle.sv"
+          },
+          {
+            "line": 961,
+            "content": "let infoIcon2 = '<img src=\"../../images/icons/tabler/info-circle.svg\" width=\"16\" height=\"16\" alt=\"ic",
+            "pattern": "<img.*icon",
+            "match": "<img src=\"../../images/icons/tabler/info-circle.sv"
+          },
+          {
+            "line": 992,
+            "content": "let iconHTML = '<img src=\"../../images/icons/tabler/info-circle.svg\" width=\"16\" height=\"16\" alt=\"ico",
+            "pattern": "<img.*icon",
+            "match": "<img src=\"../../images/icons/tabler/info-circle.sv"
+          }
+        ],
+        "issue_count": 17
+      },
+      "html_result": null
+    },
+    "colors": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": null
+    },
+    "info_summary": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": null
+    },
+    "pagination": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": null
+    },
+    "entity_details": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": null
+    },
+    "conditions": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": null
+    },
+    "page_state": {
+      "status": "ok",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "ok",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": null
+    },
+    "logger": {
+      "status": "issues_found",
+      "issues": [
+        {
+          "line": 808,
+          "content": "const originalConsoleLog = console.log;",
+          "pattern": "console\\.(log|error|warn)",
+          "match": "console.log",
+          "file": "js"
+        },
+        {
+          "line": 809,
+          "content": "const originalConsoleError = console.error;",
+          "pattern": "console\\.(log|error|warn)",
+          "match": "console.error",
+          "file": "js"
+        },
+        {
+          "line": 810,
+          "content": "const originalConsoleWarn = console.warn;",
+          "pattern": "console\\.(log|error|warn)",
+          "match": "console.warn",
+          "file": "js"
+        },
+        {
+          "line": 833,
+          "content": "console.log = function(...args) {",
+          "pattern": "console\\.(log|error|warn)",
+          "match": "console.log",
+          "file": "js"
+        },
+        {
+          "line": 838,
+          "content": "console.error = function(...args) {",
+          "pattern": "console\\.(log|error|warn)",
+          "match": "console.error",
+          "file": "js"
+        },
+        {
+          "line": 847,
+          "content": "console.warn = function(...args) {",
+          "pattern": "console\\.(log|error|warn)",
+          "match": "console.warn",
+          "file": "js"
+        },
+        {
+          "line": 189,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 190,
+          "content": "window.Logger.error('Chart object', { page: 'tradingview-test-page', chart, methods: chart ? Object.",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 220,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 221,
+          "content": "window.Logger.error('Basic Chart Error', { page: 'tradingview-test-page', error });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 229,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 230,
+          "content": "window.Logger.error('Basic Chart Error', { page: 'tradingview-test-page', error });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 292,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 293,
+          "content": "window.Logger.error('Line Series Error', { page: 'tradingview-test-page', error });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 301,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 302,
+          "content": "window.Logger.error('Line Series Error', { page: 'tradingview-test-page', error });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 367,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 368,
+          "content": "window.Logger.error('Stepped Line Error', { page: 'tradingview-test-page', error });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 376,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 377,
+          "content": "window.Logger.error('Stepped Line Error', { page: 'tradingview-test-page', error });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 454,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 455,
+          "content": "window.Logger.error('Dual Y-Axes Error', { page: 'tradingview-test-page', error });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 463,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 464,
+          "content": "window.Logger.error('Dual Y-Axes Error', { page: 'tradingview-test-page', error });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 644,
+          "content": "window.Logger?.debug(`Running test: ${test.name}`);",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 680,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 681,
+          "content": "window.Logger.error(`Test ${test.name} failed`, { page: 'tradingview-test-page', error });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 694,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 695,
+          "content": "window.Logger.info(`\\n📊 Test Summary:`, { page: 'tradingview-test-page', passed: testResults.passed,",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 710,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 711,
+          "content": "window.Logger.info('🧪 Starting TradingView Lightweight Charts tests...', { page: 'tradingview-test-p",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 753,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 754,
+          "content": "window.Logger.info('📄 Initializing preferences with lazy loading...', { page: 'tradingview-test-page",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 757,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 758,
+          "content": "window.Logger.info('✅ Preferences initialized successfully', { page: 'tradingview-test-page' });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 764,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 765,
+          "content": "window.Logger.info('✅ TradingView theme preferences reloaded', { page: 'tradingview-test-page' });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 771,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 772,
+          "content": "window.Logger.warn('⚠️ Preferences initialization failed', { page: 'tradingview-test-page', error })",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 979,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 980,
+          "content": "window.Logger.error('Error copying log', { page: 'tradingview-test-page', error });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1031,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1032,
+          "content": "window.Logger.info('✅ Header System initialized', { page: 'tradingview-test-page' });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1035,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1036,
+          "content": "window.Logger.error('Error initializing Header System', {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1047,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1048,
+          "content": "window.Logger.error('Error initializing Header System (retry)', {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1055,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1056,
+          "content": "window.Logger.warn('HeaderSystem not available after retry', { page: 'tradingview-test-page' });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        }
+      ],
+      "issue_count": 49,
+      "js_result": {
+        "status": "issues_found",
+        "issues": [
+          {
+            "line": 808,
+            "content": "const originalConsoleLog = console.log;",
+            "pattern": "console\\.(log|error|warn)",
+            "match": "console.log"
+          },
+          {
+            "line": 809,
+            "content": "const originalConsoleError = console.error;",
+            "pattern": "console\\.(log|error|warn)",
+            "match": "console.error"
+          },
+          {
+            "line": 810,
+            "content": "const originalConsoleWarn = console.warn;",
+            "pattern": "console\\.(log|error|warn)",
+            "match": "console.warn"
+          },
+          {
+            "line": 833,
+            "content": "console.log = function(...args) {",
+            "pattern": "console\\.(log|error|warn)",
+            "match": "console.log"
+          },
+          {
+            "line": 838,
+            "content": "console.error = function(...args) {",
+            "pattern": "console\\.(log|error|warn)",
+            "match": "console.error"
+          },
+          {
+            "line": 847,
+            "content": "console.warn = function(...args) {",
+            "pattern": "console\\.(log|error|warn)",
+            "match": "console.warn"
+          },
+          {
+            "line": 189,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 190,
+            "content": "window.Logger.error('Chart object', { page: 'tradingview-test-page', chart, methods: chart ? Object.",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 220,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 221,
+            "content": "window.Logger.error('Basic Chart Error', { page: 'tradingview-test-page', error });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 229,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 230,
+            "content": "window.Logger.error('Basic Chart Error', { page: 'tradingview-test-page', error });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 292,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 293,
+            "content": "window.Logger.error('Line Series Error', { page: 'tradingview-test-page', error });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 301,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 302,
+            "content": "window.Logger.error('Line Series Error', { page: 'tradingview-test-page', error });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 367,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 368,
+            "content": "window.Logger.error('Stepped Line Error', { page: 'tradingview-test-page', error });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 376,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 377,
+            "content": "window.Logger.error('Stepped Line Error', { page: 'tradingview-test-page', error });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 454,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 455,
+            "content": "window.Logger.error('Dual Y-Axes Error', { page: 'tradingview-test-page', error });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 463,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 464,
+            "content": "window.Logger.error('Dual Y-Axes Error', { page: 'tradingview-test-page', error });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 644,
+            "content": "window.Logger?.debug(`Running test: ${test.name}`);",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 680,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 681,
+            "content": "window.Logger.error(`Test ${test.name} failed`, { page: 'tradingview-test-page', error });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 694,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 695,
+            "content": "window.Logger.info(`\\n📊 Test Summary:`, { page: 'tradingview-test-page', passed: testResults.passed,",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 710,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 711,
+            "content": "window.Logger.info('🧪 Starting TradingView Lightweight Charts tests...', { page: 'tradingview-test-p",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 753,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 754,
+            "content": "window.Logger.info('📄 Initializing preferences with lazy loading...', { page: 'tradingview-test-page",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 757,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 758,
+            "content": "window.Logger.info('✅ Preferences initialized successfully', { page: 'tradingview-test-page' });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 764,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 765,
+            "content": "window.Logger.info('✅ TradingView theme preferences reloaded', { page: 'tradingview-test-page' });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 771,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 772,
+            "content": "window.Logger.warn('⚠️ Preferences initialization failed', { page: 'tradingview-test-page', error })",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 979,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 980,
+            "content": "window.Logger.error('Error copying log', { page: 'tradingview-test-page', error });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1031,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1032,
+            "content": "window.Logger.info('✅ Header System initialized', { page: 'tradingview-test-page' });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1035,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1036,
+            "content": "window.Logger.error('Error initializing Header System', {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1047,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1048,
+            "content": "window.Logger.error('Error initializing Header System (retry)', {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1055,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1056,
+            "content": "window.Logger.warn('HeaderSystem not available after retry', { page: 'tradingview-test-page' });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          }
+        ],
+        "issue_count": 49
+      },
+      "html_result": null
+    },
+    "cache": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": null
+    },
+    "dom_manipulation": {
+      "status": "issues_found",
+      "issues": [
+        {
+          "line": 32,
+          "content": "info.innerHTML = `",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 76,
+          "content": "info.innerHTML = `",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 111,
+          "content": "info.innerHTML = `",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 143,
+          "content": "container.innerHTML = '';",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 248,
+          "content": "container.innerHTML = '';",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 320,
+          "content": "container.innerHTML = '';",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 395,
+          "content": "container.innerHTML = '';",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 497,
+          "content": "info.innerHTML = `",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 538,
+          "content": "info.innerHTML = `",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 586,
+          "content": "info.innerHTML = `",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 871,
+          "content": "copyBtn.innerHTML = hourglassIcon + ' מעתיק...';",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 959,
+          "content": "copyBtn.innerHTML = infoIcon + ' הועתק!';",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 969,
+          "content": "copyBtn.innerHTML = infoIcon2 + ' העתק לוג מפורט';",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 1000,
+          "content": "copyBtn.innerHTML = iconHTML + ' העתק לוג מפורט';",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 566,
+          "content": "const testContainer = document.createElement('div');",
+          "pattern": "createElement",
+          "match": "createElement",
+          "file": "js"
+        }
+      ],
+      "issue_count": 15,
+      "js_result": {
+        "status": "issues_found",
+        "issues": [
+          {
+            "line": 32,
+            "content": "info.innerHTML = `",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 76,
+            "content": "info.innerHTML = `",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 111,
+            "content": "info.innerHTML = `",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 143,
+            "content": "container.innerHTML = '';",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 248,
+            "content": "container.innerHTML = '';",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 320,
+            "content": "container.innerHTML = '';",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 395,
+            "content": "container.innerHTML = '';",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 497,
+            "content": "info.innerHTML = `",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 538,
+            "content": "info.innerHTML = `",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 586,
+            "content": "info.innerHTML = `",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 871,
+            "content": "copyBtn.innerHTML = hourglassIcon + ' מעתיק...';",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 959,
+            "content": "copyBtn.innerHTML = infoIcon + ' הועתק!';",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 969,
+            "content": "copyBtn.innerHTML = infoIcon2 + ' העתק לוג מפורט';",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 1000,
+            "content": "copyBtn.innerHTML = iconHTML + ' העתק לוג מפורט';",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 566,
+            "content": "const testContainer = document.createElement('div');",
+            "pattern": "createElement",
+            "match": "createElement"
+          }
+        ],
+        "issue_count": 15
+      },
+      "html_result": null
+    },
+    "html_structure": {
+      "status": "ok",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "ok",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": null
+    }
+  }
+}

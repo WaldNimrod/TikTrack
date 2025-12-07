@@ -138,7 +138,12 @@
                     
                     // Replace img with rendered icon
                     const tempDiv = document.createElement('div');
-                    tempDiv.innerHTML = iconHTML;
+                    tempDiv.textContent = '';
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(iconHTML, 'text/html');
+                    doc.body.childNodes.forEach(node => {
+                        tempDiv.appendChild(node.cloneNode(true));
+                    });
                     const newIcon = tempDiv.firstElementChild;
                     
                     if (newIcon) {
@@ -352,7 +357,12 @@
                     class: 'icon'
                 });
                 
-                span.innerHTML = iconHTML;
+                span.textContent = '';
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(iconHTML, 'text/html');
+                doc.body.childNodes.forEach(node => {
+                    span.appendChild(node.cloneNode(true));
+                });
             } catch (error) {
                 if (window.Logger) {
                     window.Logger.warn('Failed to render menu icon', { 

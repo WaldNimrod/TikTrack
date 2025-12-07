@@ -83,7 +83,8 @@ window.PaginationSystem = {
             if (table) {
                 const isInModal = table.closest('.modal, [class*="modal"]');
                 if (isInModal) {
-                    console.warn(`⚠️ [PaginationSystem.create] Skipping pagination creation for table ${tableId} - table is inside a modal`);
+                    // Expected behavior - pagination is not needed for tables inside modals
+                    // No log needed - this is normal behavior
                     return null;
                 }
             }
@@ -348,7 +349,8 @@ class PaginationInstance {
         // Check if table is in a modal - skip pagination if so
         const isInModal = table.closest('.modal, [class*="modal"]');
         if (isInModal) {
-            console.warn(`⚠️ [PaginationSystem] Skipping pagination for table ${this.config.tableId} - table is inside a modal`);
+            // Expected behavior - pagination is not needed for tables inside modals
+            // No log needed - this is normal behavior
             return;
         }
         
@@ -441,7 +443,13 @@ class PaginationInstance {
             </div>
         `;
         
-        container.innerHTML = html;
+        // Insert using DOMParser
+        container.textContent = '';
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        doc.body.childNodes.forEach(node => {
+          container.appendChild(node.cloneNode(true));
+        });
         return container;
     }
     
@@ -474,7 +482,13 @@ class PaginationInstance {
             </div>
         `;
         
-        container.innerHTML = html;
+        // Insert using DOMParser
+        container.textContent = '';
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        doc.body.childNodes.forEach(node => {
+          container.appendChild(node.cloneNode(true));
+        });
         return container;
     }
     

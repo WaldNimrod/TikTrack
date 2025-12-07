@@ -33,22 +33,7 @@ const tradesModalConfig = {
             type: 'display',
             id: 'tradeTickerInfoDisplay',
             label: 'נתוני שוק',
-            colClass: 'col-md-4 col-sm-12'
-        },
-        {
-            type: 'custom',
-            id: 'tradeConditionsControls',
-            colClass: 'col-md-4 col-sm-12',
-            html: `
-                <div class="conditions-control-wrapper d-flex flex-column align-items-end gap-2" data-conditions-controls="trade">
-                    <button type="button" class="btn btn-outline-primary w-100" id="tradeOpenConditionsButton">
-                        ניהול תנאים
-                    </button>
-                    <div class="text-muted small text-start w-100" data-conditions-disabled-hint>
-                        ניהול תנאים יהיה זמין לאחר שמירת העסקה.
-                    </div>
-                </div>
-            `
+            colClass: 'col-md-8 col-sm-12'
         },
         // שורה שנייה: צד + חשבון מסחר
         {

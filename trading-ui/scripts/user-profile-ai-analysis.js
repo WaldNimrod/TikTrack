@@ -140,10 +140,18 @@
       if (!statusEl) return;
 
       if (configured) {
-        statusEl.innerHTML = '<span class="badge bg-success">מפתח מוגדר</span>';
+        statusEl.textContent = '';
+        const span = document.createElement('span');
+        span.className = 'badge bg-success';
+        span.textContent = 'מפתח מוגדר';
+        statusEl.appendChild(span);
         statusEl.style.display = 'block';
       } else {
-        statusEl.innerHTML = '<span class="badge bg-warning">מפתח לא מוגדר</span>';
+        statusEl.textContent = '';
+        const span = document.createElement('span');
+        span.className = 'badge bg-warning';
+        span.textContent = 'מפתח לא מוגדר';
+        statusEl.appendChild(span);
         statusEl.style.display = 'block';
       }
     },
@@ -461,7 +469,11 @@
       if (window.NotificationSystem) {
         window.NotificationSystem.showInfo(helpText, 'system', 10000);
       } else {
-        alert(helpText);
+        if (window.showInfoNotification) {
+          window.showInfoNotification(helpText, 'info');
+        } else {
+          alert(helpText);
+        }
       }
     },
 
@@ -501,10 +513,28 @@
           
           if (!currentText || currentText.length === 0) {
             // Button is empty - restore text and spans
-            saveBtn.innerHTML = `<span id="saveAiAnalysisBtnText">${dataText}</span><span id="saveAiAnalysisBtnSpinner" class="btn-spinner d-none">⏳ שומר...</span>`;
+            saveBtn.textContent = '';
+            const textSpan = document.createElement('span');
+            textSpan.id = 'saveAiAnalysisBtnText';
+            textSpan.textContent = dataText;
+            saveBtn.appendChild(textSpan);
+            const spinnerSpan = document.createElement('span');
+            spinnerSpan.id = 'saveAiAnalysisBtnSpinner';
+            spinnerSpan.className = 'btn-spinner d-none';
+            spinnerSpan.textContent = '⏳ שומר...';
+            saveBtn.appendChild(spinnerSpan);
           } else if (!saveBtn.querySelector('#saveAiAnalysisBtnText')) {
             // Button has text but no spans - wrap existing text
-            saveBtn.innerHTML = `<span id="saveAiAnalysisBtnText">${currentText}</span><span id="saveAiAnalysisBtnSpinner" class="btn-spinner d-none">⏳ שומר...</span>`;
+            saveBtn.textContent = '';
+            const textSpan = document.createElement('span');
+            textSpan.id = 'saveAiAnalysisBtnText';
+            textSpan.textContent = currentText;
+            saveBtn.appendChild(textSpan);
+            const spinnerSpan = document.createElement('span');
+            spinnerSpan.id = 'saveAiAnalysisBtnSpinner';
+            spinnerSpan.className = 'btn-spinner d-none';
+            spinnerSpan.textContent = '⏳ שומר...';
+            saveBtn.appendChild(spinnerSpan);
           }
         }
 
@@ -515,9 +545,27 @@
           const dataText = geminiBtn.getAttribute('data-text') || 'בדוק Gemini Key';
           
           if (!currentText || currentText.length === 0) {
-            geminiBtn.innerHTML = `<span id="validateGeminiBtnText">${dataText}</span><span id="validateGeminiBtnSpinner" class="btn-spinner d-none">⏳ בודק...</span>`;
+            geminiBtn.textContent = '';
+            const textSpan = document.createElement('span');
+            textSpan.id = 'validateGeminiBtnText';
+            textSpan.textContent = dataText;
+            geminiBtn.appendChild(textSpan);
+            const spinnerSpan = document.createElement('span');
+            spinnerSpan.id = 'validateGeminiBtnSpinner';
+            spinnerSpan.className = 'btn-spinner d-none';
+            spinnerSpan.textContent = '⏳ בודק...';
+            geminiBtn.appendChild(spinnerSpan);
           } else if (!geminiBtn.querySelector('#validateGeminiBtnText')) {
-            geminiBtn.innerHTML = `<span id="validateGeminiBtnText">${currentText}</span><span id="validateGeminiBtnSpinner" class="btn-spinner d-none">⏳ בודק...</span>`;
+            geminiBtn.textContent = '';
+            const textSpan = document.createElement('span');
+            textSpan.id = 'validateGeminiBtnText';
+            textSpan.textContent = currentText;
+            geminiBtn.appendChild(textSpan);
+            const spinnerSpan = document.createElement('span');
+            spinnerSpan.id = 'validateGeminiBtnSpinner';
+            spinnerSpan.className = 'btn-spinner d-none';
+            spinnerSpan.textContent = '⏳ בודק...';
+            geminiBtn.appendChild(spinnerSpan);
           }
         }
 
@@ -528,9 +576,27 @@
           const dataText = perplexityBtn.getAttribute('data-text') || 'בדוק Perplexity Key';
           
           if (!currentText || currentText.length === 0) {
-            perplexityBtn.innerHTML = `<span id="validatePerplexityBtnText">${dataText}</span><span id="validatePerplexityBtnSpinner" class="btn-spinner d-none">⏳ בודק...</span>`;
+            perplexityBtn.textContent = '';
+            const textSpan = document.createElement('span');
+            textSpan.id = 'validatePerplexityBtnText';
+            textSpan.textContent = dataText;
+            perplexityBtn.appendChild(textSpan);
+            const spinnerSpan = document.createElement('span');
+            spinnerSpan.id = 'validatePerplexityBtnSpinner';
+            spinnerSpan.className = 'btn-spinner d-none';
+            spinnerSpan.textContent = '⏳ בודק...';
+            perplexityBtn.appendChild(spinnerSpan);
           } else if (!perplexityBtn.querySelector('#validatePerplexityBtnText')) {
-            perplexityBtn.innerHTML = `<span id="validatePerplexityBtnText">${currentText}</span><span id="validatePerplexityBtnSpinner" class="btn-spinner d-none">⏳ בודק...</span>`;
+            perplexityBtn.textContent = '';
+            const textSpan = document.createElement('span');
+            textSpan.id = 'validatePerplexityBtnText';
+            textSpan.textContent = currentText;
+            perplexityBtn.appendChild(textSpan);
+            const spinnerSpan = document.createElement('span');
+            spinnerSpan.id = 'validatePerplexityBtnSpinner';
+            spinnerSpan.className = 'btn-spinner d-none';
+            spinnerSpan.textContent = '⏳ בודק...';
+            perplexityBtn.appendChild(spinnerSpan);
           }
         }
       }, 500);

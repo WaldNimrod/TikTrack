@@ -1,0 +1,2199 @@
+{
+  "page": "system-management.html",
+  "js_file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/system-management.js",
+  "html_file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/system-management.html",
+  "categories": {
+    "unified_init": {
+      "status": "missing",
+      "issues": [
+        {
+          "line": 383,
+          "content": "<script src=\"scripts/init-system/package-manifest.js?v=1.0.0\"></script> <!-- Package manifest -->",
+          "pattern": "package-manifest\\.js",
+          "match": "package-manifest.js",
+          "file": "html"
+        },
+        {
+          "line": 385,
+          "content": "<script src=\"scripts/page-initialization-configs.js?v=1.0.0\"></script> <!-- Page initialization conf",
+          "pattern": "page-initialization-configs\\.js",
+          "match": "page-initialization-configs.js",
+          "file": "html"
+        }
+      ],
+      "issue_count": 2,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": {
+        "status": "missing",
+        "issues": [
+          {
+            "line": 383,
+            "content": "<script src=\"scripts/init-system/package-manifest.js?v=1.0.0\"></script> <!-- Package manifest -->",
+            "pattern": "package-manifest\\.js",
+            "match": "package-manifest.js"
+          },
+          {
+            "line": 385,
+            "content": "<script src=\"scripts/page-initialization-configs.js?v=1.0.0\"></script> <!-- Page initialization conf",
+            "pattern": "page-initialization-configs\\.js",
+            "match": "page-initialization-configs.js"
+          }
+        ],
+        "issue_count": 2
+      }
+    },
+    "section_toggle": {
+      "status": "missing",
+      "issues": [
+        {
+          "line": 34,
+          "content": "<div class=\"top-section\" id=\"system-management-top\" data-section=\"top\">",
+          "pattern": "data-section",
+          "match": "data-section",
+          "file": "html"
+        },
+        {
+          "line": 70,
+          "content": "<div class=\"content-section\" id=\"sm-server\" data-section=\"section1\">",
+          "pattern": "data-section",
+          "match": "data-section",
+          "file": "html"
+        },
+        {
+          "line": 73,
+          "content": "<div class=\"content-section\" id=\"sm-cache\" data-section=\"section2\">",
+          "pattern": "data-section",
+          "match": "data-section",
+          "file": "html"
+        },
+        {
+          "line": 90,
+          "content": "<div class=\"content-section\" id=\"sm-performance\" data-section=\"section3\">",
+          "pattern": "data-section",
+          "match": "data-section",
+          "file": "html"
+        },
+        {
+          "line": 107,
+          "content": "<div class=\"content-section\" id=\"sm-external-data\" data-section=\"section4\">",
+          "pattern": "data-section",
+          "match": "data-section",
+          "file": "html"
+        },
+        {
+          "line": 124,
+          "content": "<div class=\"content-section\" id=\"sm-alerts\" data-section=\"section5\">",
+          "pattern": "data-section",
+          "match": "data-section",
+          "file": "html"
+        },
+        {
+          "line": 141,
+          "content": "<div class=\"content-section\" id=\"sm-database\" data-section=\"section6\">",
+          "pattern": "data-section",
+          "match": "data-section",
+          "file": "html"
+        },
+        {
+          "line": 158,
+          "content": "<div class=\"content-section\" id=\"sm-background-tasks\" data-section=\"section7\">",
+          "pattern": "data-section",
+          "match": "data-section",
+          "file": "html"
+        },
+        {
+          "line": 175,
+          "content": "<div class=\"content-section\" id=\"sm-operations\" data-section=\"section8\">",
+          "pattern": "data-section",
+          "match": "data-section",
+          "file": "html"
+        },
+        {
+          "line": 192,
+          "content": "<div class=\"content-section\" id=\"sm-system-settings\" data-section=\"section9\">",
+          "pattern": "data-section",
+          "match": "data-section",
+          "file": "html"
+        },
+        {
+          "line": 80,
+          "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('section2')\" data",
+          "pattern": "toggleSection",
+          "match": "toggleSection",
+          "file": "html"
+        },
+        {
+          "line": 97,
+          "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('section3')\" data",
+          "pattern": "toggleSection",
+          "match": "toggleSection",
+          "file": "html"
+        },
+        {
+          "line": 114,
+          "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('section4')\" data",
+          "pattern": "toggleSection",
+          "match": "toggleSection",
+          "file": "html"
+        },
+        {
+          "line": 131,
+          "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('section5')\" data",
+          "pattern": "toggleSection",
+          "match": "toggleSection",
+          "file": "html"
+        },
+        {
+          "line": 148,
+          "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('section6')\" data",
+          "pattern": "toggleSection",
+          "match": "toggleSection",
+          "file": "html"
+        },
+        {
+          "line": 165,
+          "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('section7')\" data",
+          "pattern": "toggleSection",
+          "match": "toggleSection",
+          "file": "html"
+        },
+        {
+          "line": 182,
+          "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('section8')\" data",
+          "pattern": "toggleSection",
+          "match": "toggleSection",
+          "file": "html"
+        },
+        {
+          "line": 199,
+          "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('section9')\" data",
+          "pattern": "toggleSection",
+          "match": "toggleSection",
+          "file": "html"
+        }
+      ],
+      "issue_count": 18,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": {
+        "status": "ok",
+        "issues": [
+          {
+            "line": 34,
+            "content": "<div class=\"top-section\" id=\"system-management-top\" data-section=\"top\">",
+            "pattern": "data-section",
+            "match": "data-section"
+          },
+          {
+            "line": 70,
+            "content": "<div class=\"content-section\" id=\"sm-server\" data-section=\"section1\">",
+            "pattern": "data-section",
+            "match": "data-section"
+          },
+          {
+            "line": 73,
+            "content": "<div class=\"content-section\" id=\"sm-cache\" data-section=\"section2\">",
+            "pattern": "data-section",
+            "match": "data-section"
+          },
+          {
+            "line": 90,
+            "content": "<div class=\"content-section\" id=\"sm-performance\" data-section=\"section3\">",
+            "pattern": "data-section",
+            "match": "data-section"
+          },
+          {
+            "line": 107,
+            "content": "<div class=\"content-section\" id=\"sm-external-data\" data-section=\"section4\">",
+            "pattern": "data-section",
+            "match": "data-section"
+          },
+          {
+            "line": 124,
+            "content": "<div class=\"content-section\" id=\"sm-alerts\" data-section=\"section5\">",
+            "pattern": "data-section",
+            "match": "data-section"
+          },
+          {
+            "line": 141,
+            "content": "<div class=\"content-section\" id=\"sm-database\" data-section=\"section6\">",
+            "pattern": "data-section",
+            "match": "data-section"
+          },
+          {
+            "line": 158,
+            "content": "<div class=\"content-section\" id=\"sm-background-tasks\" data-section=\"section7\">",
+            "pattern": "data-section",
+            "match": "data-section"
+          },
+          {
+            "line": 175,
+            "content": "<div class=\"content-section\" id=\"sm-operations\" data-section=\"section8\">",
+            "pattern": "data-section",
+            "match": "data-section"
+          },
+          {
+            "line": 192,
+            "content": "<div class=\"content-section\" id=\"sm-system-settings\" data-section=\"section9\">",
+            "pattern": "data-section",
+            "match": "data-section"
+          },
+          {
+            "line": 80,
+            "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('section2')\" data",
+            "pattern": "toggleSection",
+            "match": "toggleSection"
+          },
+          {
+            "line": 97,
+            "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('section3')\" data",
+            "pattern": "toggleSection",
+            "match": "toggleSection"
+          },
+          {
+            "line": 114,
+            "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('section4')\" data",
+            "pattern": "toggleSection",
+            "match": "toggleSection"
+          },
+          {
+            "line": 131,
+            "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('section5')\" data",
+            "pattern": "toggleSection",
+            "match": "toggleSection"
+          },
+          {
+            "line": 148,
+            "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('section6')\" data",
+            "pattern": "toggleSection",
+            "match": "toggleSection"
+          },
+          {
+            "line": 165,
+            "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('section7')\" data",
+            "pattern": "toggleSection",
+            "match": "toggleSection"
+          },
+          {
+            "line": 182,
+            "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('section8')\" data",
+            "pattern": "toggleSection",
+            "match": "toggleSection"
+          },
+          {
+            "line": 199,
+            "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('section9')\" data",
+            "pattern": "toggleSection",
+            "match": "toggleSection"
+          }
+        ],
+        "issue_count": 18
+      }
+    },
+    "notifications": {
+      "status": "ok",
+      "issues": [
+        {
+          "line": 1795,
+          "content": "if (typeof window.showSuccessNotification === 'function') {",
+          "pattern": "showSuccessNotification",
+          "match": "showSuccessNotification",
+          "file": "js"
+        },
+        {
+          "line": 1796,
+          "content": "window.showSuccessNotification('הצלחה', `ספק נתונים ראשי נשמר: ${provider}`);",
+          "pattern": "showSuccessNotification",
+          "match": "showSuccessNotification",
+          "file": "js"
+        },
+        {
+          "line": 1873,
+          "content": "if (typeof window.showSuccessNotification === 'function') {",
+          "pattern": "showSuccessNotification",
+          "match": "showSuccessNotification",
+          "file": "js"
+        },
+        {
+          "line": 1874,
+          "content": "window.showSuccessNotification('הצלחה', logInfo);",
+          "pattern": "showSuccessNotification",
+          "match": "showSuccessNotification",
+          "file": "js"
+        },
+        {
+          "line": 1806,
+          "content": "if (typeof window.showErrorNotification === 'function') {",
+          "pattern": "showErrorNotification",
+          "match": "showErrorNotification",
+          "file": "js"
+        },
+        {
+          "line": 1807,
+          "content": "window.showErrorNotification('שגיאה', 'שגיאה בשמירת ספק נתונים ראשי: ' + error.message);",
+          "pattern": "showErrorNotification",
+          "match": "showErrorNotification",
+          "file": "js"
+        },
+        {
+          "line": 1879,
+          "content": "window.showErrorNotification(logInfo, \"שגיאה\");",
+          "pattern": "showErrorNotification",
+          "match": "showErrorNotification",
+          "file": "js"
+        },
+        {
+          "line": 1893,
+          "content": "if (typeof window.showErrorNotification === 'function') {",
+          "pattern": "showErrorNotification",
+          "match": "showErrorNotification",
+          "file": "js"
+        },
+        {
+          "line": 1894,
+          "content": "window.showErrorNotification('שגיאה', errorMsg);",
+          "pattern": "showErrorNotification",
+          "match": "showErrorNotification",
+          "file": "js"
+        },
+        {
+          "line": 1898,
+          "content": "window.showErrorNotification(errorMsg, \"שגיאה\");",
+          "pattern": "showErrorNotification",
+          "match": "showErrorNotification",
+          "file": "js"
+        }
+      ],
+      "issue_count": 10,
+      "js_result": {
+        "status": "ok",
+        "issues": [
+          {
+            "line": 1795,
+            "content": "if (typeof window.showSuccessNotification === 'function') {",
+            "pattern": "showSuccessNotification",
+            "match": "showSuccessNotification"
+          },
+          {
+            "line": 1796,
+            "content": "window.showSuccessNotification('הצלחה', `ספק נתונים ראשי נשמר: ${provider}`);",
+            "pattern": "showSuccessNotification",
+            "match": "showSuccessNotification"
+          },
+          {
+            "line": 1873,
+            "content": "if (typeof window.showSuccessNotification === 'function') {",
+            "pattern": "showSuccessNotification",
+            "match": "showSuccessNotification"
+          },
+          {
+            "line": 1874,
+            "content": "window.showSuccessNotification('הצלחה', logInfo);",
+            "pattern": "showSuccessNotification",
+            "match": "showSuccessNotification"
+          },
+          {
+            "line": 1806,
+            "content": "if (typeof window.showErrorNotification === 'function') {",
+            "pattern": "showErrorNotification",
+            "match": "showErrorNotification"
+          },
+          {
+            "line": 1807,
+            "content": "window.showErrorNotification('שגיאה', 'שגיאה בשמירת ספק נתונים ראשי: ' + error.message);",
+            "pattern": "showErrorNotification",
+            "match": "showErrorNotification"
+          },
+          {
+            "line": 1879,
+            "content": "window.showErrorNotification(logInfo, \"שגיאה\");",
+            "pattern": "showErrorNotification",
+            "match": "showErrorNotification"
+          },
+          {
+            "line": 1893,
+            "content": "if (typeof window.showErrorNotification === 'function') {",
+            "pattern": "showErrorNotification",
+            "match": "showErrorNotification"
+          },
+          {
+            "line": 1894,
+            "content": "window.showErrorNotification('שגיאה', errorMsg);",
+            "pattern": "showErrorNotification",
+            "match": "showErrorNotification"
+          },
+          {
+            "line": 1898,
+            "content": "window.showErrorNotification(errorMsg, \"שגיאה\");",
+            "pattern": "showErrorNotification",
+            "match": "showErrorNotification"
+          }
+        ],
+        "issue_count": 10
+      },
+      "html_result": {
+        "status": "ok",
+        "issues": [],
+        "issue_count": 0
+      }
+    },
+    "modals": {
+      "status": "ok",
+      "issues": [
+        {
+          "line": 922,
+          "content": "// Show modal via ModalManagerV2 (supports dynamic modals)",
+          "pattern": "ModalManagerV2",
+          "match": "ModalManagerV2",
+          "file": "js"
+        },
+        {
+          "line": 923,
+          "content": "if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {",
+          "pattern": "ModalManagerV2",
+          "match": "ModalManagerV2",
+          "file": "js"
+        },
+        {
+          "line": 923,
+          "content": "if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {",
+          "pattern": "ModalManagerV2",
+          "match": "ModalManagerV2",
+          "file": "js"
+        },
+        {
+          "line": 925,
+          "content": "await window.ModalManagerV2.showModal(modalId, 'view');",
+          "pattern": "ModalManagerV2",
+          "match": "ModalManagerV2",
+          "file": "js"
+        },
+        {
+          "line": 927,
+          "content": "// Fallback to Bootstrap if ModalManagerV2 fails - עם backdrop: false וניקוי",
+          "pattern": "ModalManagerV2",
+          "match": "ModalManagerV2",
+          "file": "js"
+        },
+        {
+          "line": 928,
+          "content": "window.Logger?.warn('checkResultsModal not available in ModalManagerV2, using Bootstrap fallback', {",
+          "pattern": "ModalManagerV2",
+          "match": "ModalManagerV2",
+          "file": "js"
+        },
+        {
+          "line": 931,
+          "content": "if (window.ModalManagerV2?._cleanupBootstrapBackdrops) {",
+          "pattern": "ModalManagerV2",
+          "match": "ModalManagerV2",
+          "file": "js"
+        },
+        {
+          "line": 932,
+          "content": "window.ModalManagerV2._cleanupBootstrapBackdrops();",
+          "pattern": "ModalManagerV2",
+          "match": "ModalManagerV2",
+          "file": "js"
+        },
+        {
+          "line": 934,
+          "content": "const bsModal = window.ModalManagerV2?.openModal(modal, { backdrop: false });",
+          "pattern": "ModalManagerV2",
+          "match": "ModalManagerV2",
+          "file": "js"
+        },
+        {
+          "line": 937,
+          "content": "if (window.ModalManagerV2?._cleanupBootstrapBackdrops) {",
+          "pattern": "ModalManagerV2",
+          "match": "ModalManagerV2",
+          "file": "js"
+        },
+        {
+          "line": 939,
+          "content": "window.ModalManagerV2._cleanupBootstrapBackdrops();",
+          "pattern": "ModalManagerV2",
+          "match": "ModalManagerV2",
+          "file": "js"
+        },
+        {
+          "line": 954,
+          "content": "if (window.ModalManagerV2?._cleanupBootstrapBackdrops) {",
+          "pattern": "ModalManagerV2",
+          "match": "ModalManagerV2",
+          "file": "js"
+        },
+        {
+          "line": 955,
+          "content": "window.ModalManagerV2._cleanupBootstrapBackdrops();",
+          "pattern": "ModalManagerV2",
+          "match": "ModalManagerV2",
+          "file": "js"
+        },
+        {
+          "line": 957,
+          "content": "const bsModal = window.ModalManagerV2?.openModal(modal, { backdrop: false });",
+          "pattern": "ModalManagerV2",
+          "match": "ModalManagerV2",
+          "file": "js"
+        },
+        {
+          "line": 960,
+          "content": "if (window.ModalManagerV2?._cleanupBootstrapBackdrops) {",
+          "pattern": "ModalManagerV2",
+          "match": "ModalManagerV2",
+          "file": "js"
+        },
+        {
+          "line": 962,
+          "content": "window.ModalManagerV2._cleanupBootstrapBackdrops();",
+          "pattern": "ModalManagerV2",
+          "match": "ModalManagerV2",
+          "file": "js"
+        },
+        {
+          "line": 934,
+          "content": "const bsModal = window.ModalManagerV2?.openModal(modal, { backdrop: false });",
+          "pattern": "openModal",
+          "match": "openModal",
+          "file": "js"
+        },
+        {
+          "line": 957,
+          "content": "const bsModal = window.ModalManagerV2?.openModal(modal, { backdrop: false });",
+          "pattern": "openModal",
+          "match": "openModal",
+          "file": "js"
+        }
+      ],
+      "issue_count": 18,
+      "js_result": {
+        "status": "ok",
+        "issues": [
+          {
+            "line": 922,
+            "content": "// Show modal via ModalManagerV2 (supports dynamic modals)",
+            "pattern": "ModalManagerV2",
+            "match": "ModalManagerV2"
+          },
+          {
+            "line": 923,
+            "content": "if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {",
+            "pattern": "ModalManagerV2",
+            "match": "ModalManagerV2"
+          },
+          {
+            "line": 923,
+            "content": "if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {",
+            "pattern": "ModalManagerV2",
+            "match": "ModalManagerV2"
+          },
+          {
+            "line": 925,
+            "content": "await window.ModalManagerV2.showModal(modalId, 'view');",
+            "pattern": "ModalManagerV2",
+            "match": "ModalManagerV2"
+          },
+          {
+            "line": 927,
+            "content": "// Fallback to Bootstrap if ModalManagerV2 fails - עם backdrop: false וניקוי",
+            "pattern": "ModalManagerV2",
+            "match": "ModalManagerV2"
+          },
+          {
+            "line": 928,
+            "content": "window.Logger?.warn('checkResultsModal not available in ModalManagerV2, using Bootstrap fallback', {",
+            "pattern": "ModalManagerV2",
+            "match": "ModalManagerV2"
+          },
+          {
+            "line": 931,
+            "content": "if (window.ModalManagerV2?._cleanupBootstrapBackdrops) {",
+            "pattern": "ModalManagerV2",
+            "match": "ModalManagerV2"
+          },
+          {
+            "line": 932,
+            "content": "window.ModalManagerV2._cleanupBootstrapBackdrops();",
+            "pattern": "ModalManagerV2",
+            "match": "ModalManagerV2"
+          },
+          {
+            "line": 934,
+            "content": "const bsModal = window.ModalManagerV2?.openModal(modal, { backdrop: false });",
+            "pattern": "ModalManagerV2",
+            "match": "ModalManagerV2"
+          },
+          {
+            "line": 937,
+            "content": "if (window.ModalManagerV2?._cleanupBootstrapBackdrops) {",
+            "pattern": "ModalManagerV2",
+            "match": "ModalManagerV2"
+          },
+          {
+            "line": 939,
+            "content": "window.ModalManagerV2._cleanupBootstrapBackdrops();",
+            "pattern": "ModalManagerV2",
+            "match": "ModalManagerV2"
+          },
+          {
+            "line": 954,
+            "content": "if (window.ModalManagerV2?._cleanupBootstrapBackdrops) {",
+            "pattern": "ModalManagerV2",
+            "match": "ModalManagerV2"
+          },
+          {
+            "line": 955,
+            "content": "window.ModalManagerV2._cleanupBootstrapBackdrops();",
+            "pattern": "ModalManagerV2",
+            "match": "ModalManagerV2"
+          },
+          {
+            "line": 957,
+            "content": "const bsModal = window.ModalManagerV2?.openModal(modal, { backdrop: false });",
+            "pattern": "ModalManagerV2",
+            "match": "ModalManagerV2"
+          },
+          {
+            "line": 960,
+            "content": "if (window.ModalManagerV2?._cleanupBootstrapBackdrops) {",
+            "pattern": "ModalManagerV2",
+            "match": "ModalManagerV2"
+          },
+          {
+            "line": 962,
+            "content": "window.ModalManagerV2._cleanupBootstrapBackdrops();",
+            "pattern": "ModalManagerV2",
+            "match": "ModalManagerV2"
+          },
+          {
+            "line": 934,
+            "content": "const bsModal = window.ModalManagerV2?.openModal(modal, { backdrop: false });",
+            "pattern": "openModal",
+            "match": "openModal"
+          },
+          {
+            "line": 957,
+            "content": "const bsModal = window.ModalManagerV2?.openModal(modal, { backdrop: false });",
+            "pattern": "openModal",
+            "match": "openModal"
+          }
+        ],
+        "issue_count": 18
+      },
+      "html_result": {
+        "status": "ok",
+        "issues": [],
+        "issue_count": 0
+      }
+    },
+    "tables": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      }
+    },
+    "field_renderer": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      }
+    },
+    "crud_handler": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      }
+    },
+    "select_populator": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      }
+    },
+    "data_collection": {
+      "status": "missing",
+      "issues": [
+        {
+          "line": 1824,
+          "content": "// Use DataCollectionService to set value if available",
+          "pattern": "DataCollectionService",
+          "match": "DataCollectionService",
+          "file": "js"
+        },
+        {
+          "line": 1825,
+          "content": "if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {",
+          "pattern": "DataCollectionService",
+          "match": "DataCollectionService",
+          "file": "js"
+        },
+        {
+          "line": 1825,
+          "content": "if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {",
+          "pattern": "DataCollectionService",
+          "match": "DataCollectionService",
+          "file": "js"
+        },
+        {
+          "line": 1826,
+          "content": "window.DataCollectionService.setValue(select.id, provider, 'text');",
+          "pattern": "DataCollectionService",
+          "match": "DataCollectionService",
+          "file": "js"
+        }
+      ],
+      "issue_count": 4,
+      "js_result": {
+        "status": "ok",
+        "issues": [
+          {
+            "line": 1824,
+            "content": "// Use DataCollectionService to set value if available",
+            "pattern": "DataCollectionService",
+            "match": "DataCollectionService"
+          },
+          {
+            "line": 1825,
+            "content": "if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {",
+            "pattern": "DataCollectionService",
+            "match": "DataCollectionService"
+          },
+          {
+            "line": 1825,
+            "content": "if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {",
+            "pattern": "DataCollectionService",
+            "match": "DataCollectionService"
+          },
+          {
+            "line": 1826,
+            "content": "window.DataCollectionService.setValue(select.id, provider, 'text');",
+            "pattern": "DataCollectionService",
+            "match": "DataCollectionService"
+          }
+        ],
+        "issue_count": 4
+      },
+      "html_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      }
+    },
+    "icons": {
+      "status": "missing",
+      "issues": [
+        {
+          "line": 18,
+          "content": "<!-- Bootstrap Icons and FontAwesome removed - using Tabler Icons via IconSystem -->",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "html"
+        },
+        {
+          "line": 37,
+          "content": "<img src=\"/trading-ui/images/icons/tabler/settings.svg\" alt=\"מנהל מערכת\" class=\"section-icon\">",
+          "pattern": "<img.*icon",
+          "match": "<img src=\"/trading-ui/images/icons/tabler/settings",
+          "file": "html"
+        },
+        {
+          "line": 76,
+          "content": "<img src=\"/trading-ui/images/icons/tabler/server.svg\" alt=\"שרת\" class=\"section-icon\">",
+          "pattern": "<img.*icon",
+          "match": "<img src=\"/trading-ui/images/icons/tabler/server.s",
+          "file": "html"
+        },
+        {
+          "line": 93,
+          "content": "<img src=\"/trading-ui/images/icons/tabler/database.svg\" alt=\"מטמון\" class=\"section-icon\">",
+          "pattern": "<img.*icon",
+          "match": "<img src=\"/trading-ui/images/icons/tabler/database",
+          "file": "html"
+        },
+        {
+          "line": 110,
+          "content": "<img src=\"/trading-ui/images/icons/tabler/chart-line.svg\" alt=\"ביצועים\" class=\"section-icon\">",
+          "pattern": "<img.*icon",
+          "match": "<img src=\"/trading-ui/images/icons/tabler/chart-li",
+          "file": "html"
+        },
+        {
+          "line": 127,
+          "content": "<img src=\"/trading-ui/images/icons/tabler/world.svg\" alt=\"נתונים חיצוניים\" class=\"section-icon\">",
+          "pattern": "<img.*icon",
+          "match": "<img src=\"/trading-ui/images/icons/tabler/world.sv",
+          "file": "html"
+        },
+        {
+          "line": 144,
+          "content": "<img src=\"/trading-ui/images/icons/tabler/bell.svg\" alt=\"התראות\" class=\"section-icon\">",
+          "pattern": "<img.*icon",
+          "match": "<img src=\"/trading-ui/images/icons/tabler/bell.svg",
+          "file": "html"
+        },
+        {
+          "line": 161,
+          "content": "<img src=\"/trading-ui/images/icons/tabler/database.svg\" alt=\"בסיס נתונים\" class=\"section-icon\">",
+          "pattern": "<img.*icon",
+          "match": "<img src=\"/trading-ui/images/icons/tabler/database",
+          "file": "html"
+        },
+        {
+          "line": 178,
+          "content": "<img src=\"/trading-ui/images/icons/tabler/clock.svg\" alt=\"משימות רקע\" class=\"section-icon\">",
+          "pattern": "<img.*icon",
+          "match": "<img src=\"/trading-ui/images/icons/tabler/clock.sv",
+          "file": "html"
+        },
+        {
+          "line": 195,
+          "content": "<img src=\"/trading-ui/images/icons/tabler/tools.svg\" alt=\"פעולות\" class=\"section-icon\">",
+          "pattern": "<img.*icon",
+          "match": "<img src=\"/trading-ui/images/icons/tabler/tools.sv",
+          "file": "html"
+        }
+      ],
+      "issue_count": 10,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": {
+        "status": "ok",
+        "issues": [
+          {
+            "line": 18,
+            "content": "<!-- Bootstrap Icons and FontAwesome removed - using Tabler Icons via IconSystem -->",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 37,
+            "content": "<img src=\"/trading-ui/images/icons/tabler/settings.svg\" alt=\"מנהל מערכת\" class=\"section-icon\">",
+            "pattern": "<img.*icon",
+            "match": "<img src=\"/trading-ui/images/icons/tabler/settings"
+          },
+          {
+            "line": 76,
+            "content": "<img src=\"/trading-ui/images/icons/tabler/server.svg\" alt=\"שרת\" class=\"section-icon\">",
+            "pattern": "<img.*icon",
+            "match": "<img src=\"/trading-ui/images/icons/tabler/server.s"
+          },
+          {
+            "line": 93,
+            "content": "<img src=\"/trading-ui/images/icons/tabler/database.svg\" alt=\"מטמון\" class=\"section-icon\">",
+            "pattern": "<img.*icon",
+            "match": "<img src=\"/trading-ui/images/icons/tabler/database"
+          },
+          {
+            "line": 110,
+            "content": "<img src=\"/trading-ui/images/icons/tabler/chart-line.svg\" alt=\"ביצועים\" class=\"section-icon\">",
+            "pattern": "<img.*icon",
+            "match": "<img src=\"/trading-ui/images/icons/tabler/chart-li"
+          },
+          {
+            "line": 127,
+            "content": "<img src=\"/trading-ui/images/icons/tabler/world.svg\" alt=\"נתונים חיצוניים\" class=\"section-icon\">",
+            "pattern": "<img.*icon",
+            "match": "<img src=\"/trading-ui/images/icons/tabler/world.sv"
+          },
+          {
+            "line": 144,
+            "content": "<img src=\"/trading-ui/images/icons/tabler/bell.svg\" alt=\"התראות\" class=\"section-icon\">",
+            "pattern": "<img.*icon",
+            "match": "<img src=\"/trading-ui/images/icons/tabler/bell.svg"
+          },
+          {
+            "line": 161,
+            "content": "<img src=\"/trading-ui/images/icons/tabler/database.svg\" alt=\"בסיס נתונים\" class=\"section-icon\">",
+            "pattern": "<img.*icon",
+            "match": "<img src=\"/trading-ui/images/icons/tabler/database"
+          },
+          {
+            "line": 178,
+            "content": "<img src=\"/trading-ui/images/icons/tabler/clock.svg\" alt=\"משימות רקע\" class=\"section-icon\">",
+            "pattern": "<img.*icon",
+            "match": "<img src=\"/trading-ui/images/icons/tabler/clock.sv"
+          },
+          {
+            "line": 195,
+            "content": "<img src=\"/trading-ui/images/icons/tabler/tools.svg\" alt=\"פעולות\" class=\"section-icon\">",
+            "pattern": "<img.*icon",
+            "match": "<img src=\"/trading-ui/images/icons/tabler/tools.sv"
+          }
+        ],
+        "issue_count": 10
+      }
+    },
+    "colors": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      }
+    },
+    "info_summary": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      }
+    },
+    "pagination": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      }
+    },
+    "entity_details": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      }
+    },
+    "conditions": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      }
+    },
+    "page_state": {
+      "status": "ok",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "ok",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": {
+        "status": "ok",
+        "issues": [],
+        "issue_count": 0
+      }
+    },
+    "logger": {
+      "status": "ok",
+      "issues": [
+        {
+          "line": 39,
+          "content": "window.Logger?.debug('✅ System Management - Initialized successfully');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 47,
+          "content": "window.Logger?.debug('🔄 Refreshing system data...');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 57,
+          "content": "window.Logger?.debug('🔍 Running comprehensive system check...');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 409,
+          "content": "window.Logger?.debug('📊 System Check Results:', checkResults);",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 415,
+          "content": "window.Logger?.error('❌ System check failed:', error);",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 425,
+          "content": "window.Logger?.debug('🗑️ Clearing cache...');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 440,
+          "content": "window.Logger?.debug('💾 Starting system backup...');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 462,
+          "content": "window.Logger?.debug('✅ System backup completed successfully:', backupData);",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 473,
+          "content": "window.Logger?.error('❌ Backup failed:', error);",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 483,
+          "content": "window.Logger?.debug('🔄 Starting restore from backup...');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 550,
+          "content": "window.Logger?.debug('✅ System restore completed successfully:', result.data);",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 561,
+          "content": "window.Logger?.debug('❌ System restore cancelled by user');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 565,
+          "content": "window.Logger?.error('❌ Restore failed:', error);",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 578,
+          "content": "window.Logger?.debug(`📢 ${type.toUpperCase()}: ${message}`);",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 928,
+          "content": "window.Logger?.warn('checkResultsModal not available in ModalManagerV2, using Bootstrap fallback', {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1022,
+          "content": "window.Logger?.error('Failed to copy to clipboard:', error);",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1044,
+          "content": "window.Logger?.debug('📊 Loading system data...');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1056,
+          "content": "window.Logger?.debug('✅ System data loaded successfully');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1062,
+          "content": "window.Logger?.error('❌ Error loading system data:', error);",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1521,
+          "content": "window.Logger?.debug('✅ Backup status updated successfully');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1534,
+          "content": "window.Logger?.debug('⚠️ No backups found');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1537,
+          "content": "window.Logger?.error('❌ Error updating backup status:', error);",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1627,
+          "content": "window.Logger?.error('Error updating external data:', error);",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1681,
+          "content": "window.Logger?.error('Error updating alerts:', error);",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1789,
+          "content": "window.Logger?.debug(`💾 Saving primary data provider: ${provider}`);",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1794,
+          "content": "window.Logger?.debug('✅ Primary data provider saved successfully via PreferencesCore');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1805,
+          "content": "window.Logger?.error('❌ Error saving primary data provider:', error);",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1818,
+          "content": "window.Logger?.debug('📡 Loading primary data provider...');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1830,
+          "content": "window.Logger?.debug(`✅ Primary data provider loaded: ${provider}`);",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1834,
+          "content": "window.Logger?.error('❌ Error loading primary data provider:', error);",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1851,
+          "content": "window.Logger?.debug('📋 Generating detailed log...');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1883,
+          "content": "window.Logger?.debug('✅ Detailed log copied to clipboard');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1889,
+          "content": "window.Logger?.error('❌ Error copying detailed log:', error);",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 263,
+          "content": "<script src=\"scripts/logger-service.js?v=1.0.0\"></script> <!-- Advanced logging service -->",
+          "pattern": "logger-service\\.js",
+          "match": "logger-service.js",
+          "file": "html"
+        }
+      ],
+      "issue_count": 34,
+      "js_result": {
+        "status": "ok",
+        "issues": [
+          {
+            "line": 39,
+            "content": "window.Logger?.debug('✅ System Management - Initialized successfully');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 47,
+            "content": "window.Logger?.debug('🔄 Refreshing system data...');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 57,
+            "content": "window.Logger?.debug('🔍 Running comprehensive system check...');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 409,
+            "content": "window.Logger?.debug('📊 System Check Results:', checkResults);",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 415,
+            "content": "window.Logger?.error('❌ System check failed:', error);",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 425,
+            "content": "window.Logger?.debug('🗑️ Clearing cache...');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 440,
+            "content": "window.Logger?.debug('💾 Starting system backup...');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 462,
+            "content": "window.Logger?.debug('✅ System backup completed successfully:', backupData);",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 473,
+            "content": "window.Logger?.error('❌ Backup failed:', error);",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 483,
+            "content": "window.Logger?.debug('🔄 Starting restore from backup...');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 550,
+            "content": "window.Logger?.debug('✅ System restore completed successfully:', result.data);",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 561,
+            "content": "window.Logger?.debug('❌ System restore cancelled by user');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 565,
+            "content": "window.Logger?.error('❌ Restore failed:', error);",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 578,
+            "content": "window.Logger?.debug(`📢 ${type.toUpperCase()}: ${message}`);",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 928,
+            "content": "window.Logger?.warn('checkResultsModal not available in ModalManagerV2, using Bootstrap fallback', {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1022,
+            "content": "window.Logger?.error('Failed to copy to clipboard:', error);",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1044,
+            "content": "window.Logger?.debug('📊 Loading system data...');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1056,
+            "content": "window.Logger?.debug('✅ System data loaded successfully');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1062,
+            "content": "window.Logger?.error('❌ Error loading system data:', error);",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1521,
+            "content": "window.Logger?.debug('✅ Backup status updated successfully');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1534,
+            "content": "window.Logger?.debug('⚠️ No backups found');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1537,
+            "content": "window.Logger?.error('❌ Error updating backup status:', error);",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1627,
+            "content": "window.Logger?.error('Error updating external data:', error);",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1681,
+            "content": "window.Logger?.error('Error updating alerts:', error);",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1789,
+            "content": "window.Logger?.debug(`💾 Saving primary data provider: ${provider}`);",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1794,
+            "content": "window.Logger?.debug('✅ Primary data provider saved successfully via PreferencesCore');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1805,
+            "content": "window.Logger?.error('❌ Error saving primary data provider:', error);",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1818,
+            "content": "window.Logger?.debug('📡 Loading primary data provider...');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1830,
+            "content": "window.Logger?.debug(`✅ Primary data provider loaded: ${provider}`);",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1834,
+            "content": "window.Logger?.error('❌ Error loading primary data provider:', error);",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1851,
+            "content": "window.Logger?.debug('📋 Generating detailed log...');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1883,
+            "content": "window.Logger?.debug('✅ Detailed log copied to clipboard');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1889,
+            "content": "window.Logger?.error('❌ Error copying detailed log:', error);",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          }
+        ],
+        "issue_count": 33
+      },
+      "html_result": {
+        "status": "ok",
+        "issues": [
+          {
+            "line": 263,
+            "content": "<script src=\"scripts/logger-service.js?v=1.0.0\"></script> <!-- Advanced logging service -->",
+            "pattern": "logger-service\\.js",
+            "match": "logger-service.js"
+          }
+        ],
+        "issue_count": 1
+      }
+    },
+    "cache": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      }
+    },
+    "dom_manipulation": {
+      "status": "issues_found",
+      "issues": [
+        {
+          "line": 597,
+          "content": "container.innerHTML = `",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 685,
+          "content": "resultsContent.innerHTML = `",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 822,
+          "content": "modal.innerHTML = `",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 1248,
+          "content": "detailsElement.innerHTML = scoreDetails;",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 1391,
+          "content": "providerListElement.innerHTML = providers.map(provider => `",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 1413,
+          "content": "logContent.innerHTML = '';",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 1418,
+          "content": "statusLog.innerHTML = `",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 1433,
+          "content": "logEntry.innerHTML = `",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 1515,
+          "content": "backupStatusElement.innerHTML = '<span class=\"text-success\">✅ גיבוי עדכני</span>';",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 1517,
+          "content": "backupStatusElement.innerHTML = '<span class=\"text-warning\">⚠️ גיבוי ישן</span>';",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 1526,
+          "content": "backupStatusElement.innerHTML = '<span class=\"text-danger\">❌ אין גיבויים</span>';",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 1540,
+          "content": "backupStatusElement.innerHTML = '<span class=\"text-danger\">❌ שגיאה בבדיקה</span>';",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 1557,
+          "content": "warningBanner.innerHTML = `",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 1651,
+          "content": "alertsListElement.innerHTML = '';",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 1660,
+          "content": "alertItem.innerHTML = `",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 1671,
+          "content": "noAlertsItem.innerHTML = `",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 1697,
+          "content": "alertsListElement.innerHTML = `",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 594,
+          "content": "const container = document.createElement('div');",
+          "pattern": "createElement",
+          "match": "createElement",
+          "file": "js"
+        },
+        {
+          "line": 684,
+          "content": "// Consider refactoring to use createElement for better security if this becomes a security concern",
+          "pattern": "createElement",
+          "match": "createElement",
+          "file": "js"
+        },
+        {
+          "line": 784,
+          "content": "modal = document.createElement('div');",
+          "pattern": "createElement",
+          "match": "createElement",
+          "file": "js"
+        },
+        {
+          "line": 821,
+          "content": "// Consider refactoring to use createElement for better security if this becomes a security concern",
+          "pattern": "createElement",
+          "match": "createElement",
+          "file": "js"
+        },
+        {
+          "line": 1416,
+          "content": "const statusLog = document.createElement('div');",
+          "pattern": "createElement",
+          "match": "createElement",
+          "file": "js"
+        },
+        {
+          "line": 1428,
+          "content": "const logEntry = document.createElement('div');",
+          "pattern": "createElement",
+          "match": "createElement",
+          "file": "js"
+        },
+        {
+          "line": 1552,
+          "content": "warningBanner = document.createElement('div');",
+          "pattern": "createElement",
+          "match": "createElement",
+          "file": "js"
+        },
+        {
+          "line": 1655,
+          "content": "const alertItem = document.createElement('div');",
+          "pattern": "createElement",
+          "match": "createElement",
+          "file": "js"
+        },
+        {
+          "line": 1669,
+          "content": "const noAlertsItem = document.createElement('div');",
+          "pattern": "createElement",
+          "match": "createElement",
+          "file": "js"
+        }
+      ],
+      "issue_count": 26,
+      "js_result": {
+        "status": "issues_found",
+        "issues": [
+          {
+            "line": 597,
+            "content": "container.innerHTML = `",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 685,
+            "content": "resultsContent.innerHTML = `",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 822,
+            "content": "modal.innerHTML = `",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 1248,
+            "content": "detailsElement.innerHTML = scoreDetails;",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 1391,
+            "content": "providerListElement.innerHTML = providers.map(provider => `",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 1413,
+            "content": "logContent.innerHTML = '';",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 1418,
+            "content": "statusLog.innerHTML = `",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 1433,
+            "content": "logEntry.innerHTML = `",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 1515,
+            "content": "backupStatusElement.innerHTML = '<span class=\"text-success\">✅ גיבוי עדכני</span>';",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 1517,
+            "content": "backupStatusElement.innerHTML = '<span class=\"text-warning\">⚠️ גיבוי ישן</span>';",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 1526,
+            "content": "backupStatusElement.innerHTML = '<span class=\"text-danger\">❌ אין גיבויים</span>';",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 1540,
+            "content": "backupStatusElement.innerHTML = '<span class=\"text-danger\">❌ שגיאה בבדיקה</span>';",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 1557,
+            "content": "warningBanner.innerHTML = `",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 1651,
+            "content": "alertsListElement.innerHTML = '';",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 1660,
+            "content": "alertItem.innerHTML = `",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 1671,
+            "content": "noAlertsItem.innerHTML = `",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 1697,
+            "content": "alertsListElement.innerHTML = `",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 594,
+            "content": "const container = document.createElement('div');",
+            "pattern": "createElement",
+            "match": "createElement"
+          },
+          {
+            "line": 684,
+            "content": "// Consider refactoring to use createElement for better security if this becomes a security concern",
+            "pattern": "createElement",
+            "match": "createElement"
+          },
+          {
+            "line": 784,
+            "content": "modal = document.createElement('div');",
+            "pattern": "createElement",
+            "match": "createElement"
+          },
+          {
+            "line": 821,
+            "content": "// Consider refactoring to use createElement for better security if this becomes a security concern",
+            "pattern": "createElement",
+            "match": "createElement"
+          },
+          {
+            "line": 1416,
+            "content": "const statusLog = document.createElement('div');",
+            "pattern": "createElement",
+            "match": "createElement"
+          },
+          {
+            "line": 1428,
+            "content": "const logEntry = document.createElement('div');",
+            "pattern": "createElement",
+            "match": "createElement"
+          },
+          {
+            "line": 1552,
+            "content": "warningBanner = document.createElement('div');",
+            "pattern": "createElement",
+            "match": "createElement"
+          },
+          {
+            "line": 1655,
+            "content": "const alertItem = document.createElement('div');",
+            "pattern": "createElement",
+            "match": "createElement"
+          },
+          {
+            "line": 1669,
+            "content": "const noAlertsItem = document.createElement('div');",
+            "pattern": "createElement",
+            "match": "createElement"
+          }
+        ],
+        "issue_count": 26
+      },
+      "html_result": {
+        "status": "ok",
+        "issues": [],
+        "issue_count": 0
+      }
+    },
+    "html_structure": {
+      "status": "issues_found",
+      "issues": [
+        {
+          "line": 620,
+          "content": "<div class=\"results-content\" style=\"display: none;\">",
+          "pattern": "style\\s*=",
+          "match": "style=",
+          "file": "js"
+        },
+        {
+          "line": 751,
+          "content": "<pre class=\"bg-light p-2 rounded\" style=\"font-size: 0.8em; max-height: 200px; overflow-y: auto;\">${J",
+          "pattern": "style\\s*=",
+          "match": "style=",
+          "file": "js"
+        },
+        {
+          "line": 897,
+          "content": "<pre class=\"bg-light p-2 rounded\" style=\"font-size: 0.8em; max-height: 200px; overflow-y: auto;\">${J",
+          "pattern": "style\\s*=",
+          "match": "style=",
+          "file": "js"
+        },
+        {
+          "line": 59,
+          "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleAllSections()\" data-text=",
+          "pattern": "data-onclick",
+          "match": "data-onclick",
+          "file": "html"
+        },
+        {
+          "line": 80,
+          "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('section2')\" data",
+          "pattern": "data-onclick",
+          "match": "data-onclick",
+          "file": "html"
+        },
+        {
+          "line": 97,
+          "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('section3')\" data",
+          "pattern": "data-onclick",
+          "match": "data-onclick",
+          "file": "html"
+        },
+        {
+          "line": 114,
+          "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('section4')\" data",
+          "pattern": "data-onclick",
+          "match": "data-onclick",
+          "file": "html"
+        },
+        {
+          "line": 131,
+          "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('section5')\" data",
+          "pattern": "data-onclick",
+          "match": "data-onclick",
+          "file": "html"
+        },
+        {
+          "line": 148,
+          "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('section6')\" data",
+          "pattern": "data-onclick",
+          "match": "data-onclick",
+          "file": "html"
+        },
+        {
+          "line": 165,
+          "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('section7')\" data",
+          "pattern": "data-onclick",
+          "match": "data-onclick",
+          "file": "html"
+        },
+        {
+          "line": 182,
+          "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('section8')\" data",
+          "pattern": "data-onclick",
+          "match": "data-onclick",
+          "file": "html"
+        },
+        {
+          "line": 199,
+          "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('section9')\" data",
+          "pattern": "data-onclick",
+          "match": "data-onclick",
+          "file": "html"
+        },
+        {
+          "line": 59,
+          "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleAllSections()\" data-text=",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "html"
+        },
+        {
+          "line": 80,
+          "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('section2')\" data",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "html"
+        },
+        {
+          "line": 97,
+          "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('section3')\" data",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "html"
+        },
+        {
+          "line": 114,
+          "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('section4')\" data",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "html"
+        },
+        {
+          "line": 131,
+          "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('section5')\" data",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "html"
+        },
+        {
+          "line": 148,
+          "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('section6')\" data",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "html"
+        },
+        {
+          "line": 165,
+          "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('section7')\" data",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "html"
+        },
+        {
+          "line": 182,
+          "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('section8')\" data",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "html"
+        },
+        {
+          "line": 199,
+          "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('section9')\" data",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "html"
+        },
+        {
+          "line": 25,
+          "content": "<div id=\"unified-header\"></div>",
+          "pattern": "unified-header",
+          "match": "unified-header",
+          "file": "html"
+        }
+      ],
+      "issue_count": 22,
+      "js_result": {
+        "status": "issues_found",
+        "issues": [
+          {
+            "line": 620,
+            "content": "<div class=\"results-content\" style=\"display: none;\">",
+            "pattern": "style\\s*=",
+            "match": "style="
+          },
+          {
+            "line": 751,
+            "content": "<pre class=\"bg-light p-2 rounded\" style=\"font-size: 0.8em; max-height: 200px; overflow-y: auto;\">${J",
+            "pattern": "style\\s*=",
+            "match": "style="
+          },
+          {
+            "line": 897,
+            "content": "<pre class=\"bg-light p-2 rounded\" style=\"font-size: 0.8em; max-height: 200px; overflow-y: auto;\">${J",
+            "pattern": "style\\s*=",
+            "match": "style="
+          }
+        ],
+        "issue_count": 3
+      },
+      "html_result": {
+        "status": "issues_found",
+        "issues": [
+          {
+            "line": 59,
+            "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleAllSections()\" data-text=",
+            "pattern": "data-onclick",
+            "match": "data-onclick"
+          },
+          {
+            "line": 80,
+            "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('section2')\" data",
+            "pattern": "data-onclick",
+            "match": "data-onclick"
+          },
+          {
+            "line": 97,
+            "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('section3')\" data",
+            "pattern": "data-onclick",
+            "match": "data-onclick"
+          },
+          {
+            "line": 114,
+            "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('section4')\" data",
+            "pattern": "data-onclick",
+            "match": "data-onclick"
+          },
+          {
+            "line": 131,
+            "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('section5')\" data",
+            "pattern": "data-onclick",
+            "match": "data-onclick"
+          },
+          {
+            "line": 148,
+            "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('section6')\" data",
+            "pattern": "data-onclick",
+            "match": "data-onclick"
+          },
+          {
+            "line": 165,
+            "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('section7')\" data",
+            "pattern": "data-onclick",
+            "match": "data-onclick"
+          },
+          {
+            "line": 182,
+            "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('section8')\" data",
+            "pattern": "data-onclick",
+            "match": "data-onclick"
+          },
+          {
+            "line": 199,
+            "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('section9')\" data",
+            "pattern": "data-onclick",
+            "match": "data-onclick"
+          },
+          {
+            "line": 59,
+            "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleAllSections()\" data-text=",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 80,
+            "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('section2')\" data",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 97,
+            "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('section3')\" data",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 114,
+            "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('section4')\" data",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 131,
+            "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('section5')\" data",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 148,
+            "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('section6')\" data",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 165,
+            "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('section7')\" data",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 182,
+            "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('section8')\" data",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 199,
+            "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('section9')\" data",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 25,
+            "content": "<div id=\"unified-header\"></div>",
+            "pattern": "unified-header",
+            "match": "unified-header"
+          }
+        ],
+        "issue_count": 19
+      }
+    }
+  }
+}

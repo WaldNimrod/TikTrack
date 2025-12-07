@@ -311,7 +311,14 @@ class PagesStandardizationPlan {
             filteredPages = this.getPagesByStatus(filter);
         }
 
-        document.getElementById('pagesListContainer').innerHTML = this.renderPagesList(filteredPages);
+        const pagesListContainer = document.getElementById('pagesListContainer');
+        const pagesListHTML = this.renderPagesList(filteredPages);
+        pagesListContainer.textContent = '';
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(pagesListHTML, 'text/html');
+        doc.body.childNodes.forEach(node => {
+          pagesListContainer.appendChild(node.cloneNode(true));
+        });
     }
 
     /**

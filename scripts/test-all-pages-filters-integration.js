@@ -23,7 +23,7 @@ const BASE_DIR = '.';
 
 // Filter out non-existent files or files in wrong locations
 function shouldTestPage(pagePath) {
-  const nonExistent = ["trading-ui/cache-test.html","trading-ui/linter-realtime-monitor.html","trading-ui/tradingview-test-page.html","trading-ui/test_external_data.html","trading-ui/test_models.html"];
+  const nonExistent = ["trading-ui/tradingview-test-page.html","trading-ui/test_external_data.html","trading-ui/test_models.html"];
   // Also check if file actually exists
   if (!fs.existsSync(pagePath)) {
     return false;

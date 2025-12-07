@@ -13,13 +13,13 @@
   background: rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  z-index: 999999999 ;
+  /* z-index נקבע דינמית דרך ModalZIndexManager */
   direction: rtl;
 }
 
-/* הגדרות z-index גבוהות לכל המודלים באתר */
+/* הגדרות z-index - נקבע דינמית דרך CSS variables */
 .modal-dialog {
-  z-index: 1000000000 ;
+  /* z-index נקבע דינמית דרך ModalZIndexManager */
 }
 
 /* מודל מקונן ברמה שנייה (מודל מקונן מעל מודל מקונן) - z-index גבוה יותר */
@@ -27,17 +27,18 @@
   --modal-nested-offset: 40 !important;
 }
 
-/* מודל tickersModal - וידוא שהוא מופיע מעל כל המודלים האחרים */
+/* מודל tickersModal - z-index נקבע דינמית דרך ModalZIndexManager */
+/* ה-hardcoded z-index הוסר - המערכת תטפל ב-z-index אוטומטית */
 #tickersModal {
-  z-index: 1000000010 !important;
+  /* z-index נקבע דינמית דרך ModalZIndexManager */
 }
 
 #tickersModal .modal-dialog {
-  z-index: 1000000011 !important;
+  /* z-index נקבע דינמית דרך ModalZIndexManager */
 }
 
 #tickersModal .modal-content {
-  z-index: 1000000012 !important;
+  /* z-index נקבע דינמית דרך ModalZIndexManager */
 }
 
 /* הגדרות מיוחדות למודלים גדולים */
@@ -49,7 +50,7 @@
 }
 
 .modal-content {
-  z-index: 1000000001 ;
+  /* z-index נקבע דינמית דרך ModalZIndexManager */
   background: var(--apple-bg-elevated);
   border-radius: 6px;
   box-shadow: var(--apple-shadow-heavy);
@@ -59,7 +60,7 @@
 }
 
 .modal-backdrop {
-  z-index: 999999998 ;
+  /* z-index נקבע דינמית דרך ModalZIndexManager */
 }
 
 /* ===== Modal Navigation System ===== */
@@ -72,7 +73,8 @@
   width: 100%;
   height: 100%;
   background-color: rgba(0, 0, 0, 0.5);
-  z-index: 1040; /* Base z-index, יוגדל דינמית */
+  /* z-index נקבע דינמית דרך ModalZIndexManager */
+  z-index: var(--backdrop-z-index, 1039);
 }
 
 /* Breadcrumb navigation בכותרת מודול */
@@ -198,93 +200,56 @@ button[data-button-type="BACK"][data-navigation-listener="true"] {
   z-index: 1000000002 ;
 }
 
-/* וידוא שכל המודלים מופיעים מעל הכל */
+/* וידוא שכל המודלים מופיעים מעל הכל - z-index דינמי */
 .modal.show {
-  z-index: 999999999 ;
+  z-index: var(--modal-z-index, 1040);
+  transition: opacity 0.3s ease, z-index 0s;
 }
 
 .modal.show .modal-dialog {
-  z-index: 1000000000 ;
+  z-index: var(--modal-dialog-z-index, 1041);
 }
 
 .modal.show .modal-content {
-  z-index: 1000000001 ;
+  z-index: var(--modal-content-z-index, 1042);
+}
+
+/* מודולים קודמים - dimmed effect (נקבע דרך JavaScript classes) */
+.modal.show.modal-stacked {
+  opacity: 0.5;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+/* המודול הפעיל - full visibility (נקבע דרך JavaScript classes) */
+.modal.show.modal-active {
+  opacity: 1;
+  pointer-events: auto;
+  transition: opacity 0.3s ease;
 }
 
 /* וידוא שהרקע לא חוסם את המודלים */
 .modal-backdrop.show {
-  z-index: 999999998 ;
+  /* z-index נקבע דינמית דרך ModalZIndexManager */
 }
 
-/* מודלים ספציפיים עם z-index גבוה יותר */
-/* הוסר: #linkedItemsModal - משתמש ב-modal-nested class עם z-index דינמי */
-#addAlertModal,
-#editAlertModal,
-#addExecutionModal,
-#editExecutionModal,
-#deleteExecutionModal,
-#warningModal,
-#addAccountModal,
-#editAccountModal,
-#addTradeModal,
-#editTradeModal,
-#addTradePlanModal,
-#editTradePlanModal,
-#addCashFlowModal,
-#editCashFlowModal,
-#addNoteModal,
-#editNoteModal,
-#addTickerModal,
-#editTickerModal,
-#loadingModal,
-#log-test-modal {
-  z-index: 999999999 ;
+/* מודלים מקוננים - z-index נקבע דינמית דרך ModalZIndexManager */
+.modal.modal-nested {
+  /* z-index נקבע דינמית דרך ModalZIndexManager */
 }
 
-#addAlertModal .modal-dialog,
-#editAlertModal .modal-dialog,
-#addExecutionModal .modal-dialog,
-#editExecutionModal .modal-dialog,
-#deleteExecutionModal .modal-dialog,
-#warningModal .modal-dialog,
-#addAccountModal .modal-dialog,
-#editAccountModal .modal-dialog,
-#addTradeModal .modal-dialog,
-#editTradeModal .modal-dialog,
-#addTradePlanModal .modal-dialog,
-#editTradePlanModal .modal-dialog,
-#addCashFlowModal .modal-dialog,
-#editCashFlowModal .modal-dialog,
-#addNoteModal .modal-dialog,
-#editNoteModal .modal-dialog,
-#addTickerModal .modal-dialog,
-#editTickerModal .modal-dialog,
-#loadingModal .modal-dialog,
-#log-test-modal .modal-dialog {
-  z-index: 1000000000 ;
+/* מודל tickersModal - z-index נקבע דינמית דרך ModalZIndexManager */
+/* ה-hardcoded z-index הוסר - המערכת תטפל ב-z-index אוטומטית */
+#tickersModal {
+  /* z-index נקבע דינמית דרך ModalZIndexManager */
 }
 
-#addAlertModal .modal-content,
-#editAlertModal .modal-content,
-#addExecutionModal .modal-content,
-#editExecutionModal .modal-content,
-#deleteExecutionModal .modal-content,
-#warningModal .modal-content,
-#addAccountModal .modal-content,
-#editAccountModal .modal-content,
-#addTradeModal .modal-content,
-#editTradeModal .modal-content,
-#addTradePlanModal .modal-content,
-#editTradePlanModal .modal-content,
-#addCashFlowModal .modal-content,
-#editCashFlowModal .modal-content,
-#addNoteModal .modal-content,
-#editNoteModal .modal-content,
-#addTickerModal .modal-content,
-#editTickerModal .modal-content,
-#loadingModal .modal-content,
-#log-test-modal .modal-content {
-  z-index: 1000000001 ;
+#tickersModal .modal-dialog {
+  /* z-index נקבע דינמית דרך ModalZIndexManager */
+}
+
+#tickersModal .modal-content {
+  /* z-index נקבע דינמית דרך ModalZIndexManager */
 }
 
 /* מניעת סגירת מודלים בלחיצה על הרקע */

@@ -1,0 +1,2640 @@
+{
+  "page": "server-monitor.html",
+  "js_file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/server-monitor.js",
+  "html_file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/server-monitor.html",
+  "categories": {
+    "unified_init": {
+      "status": "missing",
+      "issues": [
+        {
+          "line": 590,
+          "content": "<script src=\"scripts/init-system/package-manifest.js?v=1.0.0\"></script> <!-- Package manifest -->",
+          "pattern": "package-manifest\\.js",
+          "match": "package-manifest.js",
+          "file": "html"
+        },
+        {
+          "line": 592,
+          "content": "<script src=\"scripts/page-initialization-configs.js?v=1.0.0\"></script> <!-- Page initialization conf",
+          "pattern": "page-initialization-configs\\.js",
+          "match": "page-initialization-configs.js",
+          "file": "html"
+        }
+      ],
+      "issue_count": 2,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": {
+        "status": "missing",
+        "issues": [
+          {
+            "line": 590,
+            "content": "<script src=\"scripts/init-system/package-manifest.js?v=1.0.0\"></script> <!-- Package manifest -->",
+            "pattern": "package-manifest\\.js",
+            "match": "package-manifest.js"
+          },
+          {
+            "line": 592,
+            "content": "<script src=\"scripts/page-initialization-configs.js?v=1.0.0\"></script> <!-- Page initialization conf",
+            "pattern": "page-initialization-configs\\.js",
+            "match": "page-initialization-configs.js"
+          }
+        ],
+        "issue_count": 2
+      }
+    },
+    "section_toggle": {
+      "status": "missing",
+      "issues": [
+        {
+          "line": 76,
+          "content": "<div class=\"top-section\" data-section=\"top\">",
+          "pattern": "data-section",
+          "match": "data-section",
+          "file": "html"
+        },
+        {
+          "line": 167,
+          "content": "<div class=\"content-section\" id=\"cursorTasksSection\" data-section=\"cursorTasksSection\">",
+          "pattern": "data-section",
+          "match": "data-section",
+          "file": "html"
+        },
+        {
+          "line": 274,
+          "content": "<div class=\"content-section\" id=\"section1\" data-section=\"section1\">",
+          "pattern": "data-section",
+          "match": "data-section",
+          "file": "html"
+        },
+        {
+          "line": 328,
+          "content": "<div class=\"content-section\" id=\"section2\" data-section=\"section2\">",
+          "pattern": "data-section",
+          "match": "data-section",
+          "file": "html"
+        },
+        {
+          "line": 395,
+          "content": "<div class=\"content-section\" id=\"section3\" data-section=\"section3\">",
+          "pattern": "data-section",
+          "match": "data-section",
+          "file": "html"
+        },
+        {
+          "line": 481,
+          "content": "<div class=\"content-section\" id=\"section4\" data-section=\"section4\">",
+          "pattern": "data-section",
+          "match": "data-section",
+          "file": "html"
+        },
+        {
+          "line": 95,
+          "content": "${createToggleButton(\"toggleSection('section1')\", \"הצג/הסתר סקשן\")}",
+          "pattern": "toggleSection",
+          "match": "toggleSection",
+          "file": "html"
+        },
+        {
+          "line": 178,
+          "content": "<button class=\"filter-toggle-btn\" data-onclick=\"toggleSection('cursorTasksSection')\" title=\"הצג/הסתר",
+          "pattern": "toggleSection",
+          "match": "toggleSection",
+          "file": "html"
+        },
+        {
+          "line": 179,
+          "content": "${createToggleButton(\"toggleSection('section1')\", \"הצג/הסתר סקשן\")}",
+          "pattern": "toggleSection",
+          "match": "toggleSection",
+          "file": "html"
+        },
+        {
+          "line": 277,
+          "content": "<button class=\"filter-toggle-btn\" data-onclick=\"toggleSection('section1')\" title=\"הצג/הסתר סקשן\" dat",
+          "pattern": "toggleSection",
+          "match": "toggleSection",
+          "file": "html"
+        },
+        {
+          "line": 278,
+          "content": "${createToggleButton(\"toggleSection('section1')\", \"הצג/הסתר סקשן\")}",
+          "pattern": "toggleSection",
+          "match": "toggleSection",
+          "file": "html"
+        },
+        {
+          "line": 331,
+          "content": "<button class=\"filter-toggle-btn\" data-onclick=\"toggleSection('section2')\" title=\"הצג/הסתר סקשן\" dat",
+          "pattern": "toggleSection",
+          "match": "toggleSection",
+          "file": "html"
+        },
+        {
+          "line": 332,
+          "content": "${createToggleButton(\"toggleSection('section1')\", \"הצג/הסתר סקשן\")}",
+          "pattern": "toggleSection",
+          "match": "toggleSection",
+          "file": "html"
+        },
+        {
+          "line": 398,
+          "content": "<button class=\"filter-toggle-btn\" data-onclick=\"toggleSection('section3')\" title=\"הצג/הסתר סקשן\" dat",
+          "pattern": "toggleSection",
+          "match": "toggleSection",
+          "file": "html"
+        },
+        {
+          "line": 399,
+          "content": "${createToggleButton(\"toggleSection('section1')\", \"הצג/הסתר סקשן\")}",
+          "pattern": "toggleSection",
+          "match": "toggleSection",
+          "file": "html"
+        },
+        {
+          "line": 484,
+          "content": "<button class=\"filter-toggle-btn\" data-onclick=\"toggleSection('section4')\" title=\"הצג/הסתר סקשן\" dat",
+          "pattern": "toggleSection",
+          "match": "toggleSection",
+          "file": "html"
+        },
+        {
+          "line": 485,
+          "content": "${createToggleButton(\"toggleSection('section1')\", \"הצג/הסתר סקשן\")}",
+          "pattern": "toggleSection",
+          "match": "toggleSection",
+          "file": "html"
+        }
+      ],
+      "issue_count": 17,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": {
+        "status": "ok",
+        "issues": [
+          {
+            "line": 76,
+            "content": "<div class=\"top-section\" data-section=\"top\">",
+            "pattern": "data-section",
+            "match": "data-section"
+          },
+          {
+            "line": 167,
+            "content": "<div class=\"content-section\" id=\"cursorTasksSection\" data-section=\"cursorTasksSection\">",
+            "pattern": "data-section",
+            "match": "data-section"
+          },
+          {
+            "line": 274,
+            "content": "<div class=\"content-section\" id=\"section1\" data-section=\"section1\">",
+            "pattern": "data-section",
+            "match": "data-section"
+          },
+          {
+            "line": 328,
+            "content": "<div class=\"content-section\" id=\"section2\" data-section=\"section2\">",
+            "pattern": "data-section",
+            "match": "data-section"
+          },
+          {
+            "line": 395,
+            "content": "<div class=\"content-section\" id=\"section3\" data-section=\"section3\">",
+            "pattern": "data-section",
+            "match": "data-section"
+          },
+          {
+            "line": 481,
+            "content": "<div class=\"content-section\" id=\"section4\" data-section=\"section4\">",
+            "pattern": "data-section",
+            "match": "data-section"
+          },
+          {
+            "line": 95,
+            "content": "${createToggleButton(\"toggleSection('section1')\", \"הצג/הסתר סקשן\")}",
+            "pattern": "toggleSection",
+            "match": "toggleSection"
+          },
+          {
+            "line": 178,
+            "content": "<button class=\"filter-toggle-btn\" data-onclick=\"toggleSection('cursorTasksSection')\" title=\"הצג/הסתר",
+            "pattern": "toggleSection",
+            "match": "toggleSection"
+          },
+          {
+            "line": 179,
+            "content": "${createToggleButton(\"toggleSection('section1')\", \"הצג/הסתר סקשן\")}",
+            "pattern": "toggleSection",
+            "match": "toggleSection"
+          },
+          {
+            "line": 277,
+            "content": "<button class=\"filter-toggle-btn\" data-onclick=\"toggleSection('section1')\" title=\"הצג/הסתר סקשן\" dat",
+            "pattern": "toggleSection",
+            "match": "toggleSection"
+          },
+          {
+            "line": 278,
+            "content": "${createToggleButton(\"toggleSection('section1')\", \"הצג/הסתר סקשן\")}",
+            "pattern": "toggleSection",
+            "match": "toggleSection"
+          },
+          {
+            "line": 331,
+            "content": "<button class=\"filter-toggle-btn\" data-onclick=\"toggleSection('section2')\" title=\"הצג/הסתר סקשן\" dat",
+            "pattern": "toggleSection",
+            "match": "toggleSection"
+          },
+          {
+            "line": 332,
+            "content": "${createToggleButton(\"toggleSection('section1')\", \"הצג/הסתר סקשן\")}",
+            "pattern": "toggleSection",
+            "match": "toggleSection"
+          },
+          {
+            "line": 398,
+            "content": "<button class=\"filter-toggle-btn\" data-onclick=\"toggleSection('section3')\" title=\"הצג/הסתר סקשן\" dat",
+            "pattern": "toggleSection",
+            "match": "toggleSection"
+          },
+          {
+            "line": 399,
+            "content": "${createToggleButton(\"toggleSection('section1')\", \"הצג/הסתר סקשן\")}",
+            "pattern": "toggleSection",
+            "match": "toggleSection"
+          },
+          {
+            "line": 484,
+            "content": "<button class=\"filter-toggle-btn\" data-onclick=\"toggleSection('section4')\" title=\"הצג/הסתר סקשן\" dat",
+            "pattern": "toggleSection",
+            "match": "toggleSection"
+          },
+          {
+            "line": 485,
+            "content": "${createToggleButton(\"toggleSection('section1')\", \"הצג/הסתר סקשן\")}",
+            "pattern": "toggleSection",
+            "match": "toggleSection"
+          }
+        ],
+        "issue_count": 17
+      }
+    },
+    "notifications": {
+      "status": "ok",
+      "issues": [
+        {
+          "line": 364,
+          "content": "if (window.showSuccessNotification) {",
+          "pattern": "showSuccessNotification",
+          "match": "showSuccessNotification",
+          "file": "js"
+        },
+        {
+          "line": 365,
+          "content": "window.showSuccessNotification('ניטור שרת', 'לוג מפורט הועתק ללוח');",
+          "pattern": "showSuccessNotification",
+          "match": "showSuccessNotification",
+          "file": "js"
+        },
+        {
+          "line": 406,
+          "content": "if (window.showSuccessNotification) {",
+          "pattern": "showSuccessNotification",
+          "match": "showSuccessNotification",
+          "file": "js"
+        },
+        {
+          "line": 407,
+          "content": "window.showSuccessNotification('ניטור שרת', 'לוגים נוקו');",
+          "pattern": "showSuccessNotification",
+          "match": "showSuccessNotification",
+          "file": "js"
+        },
+        {
+          "line": 440,
+          "content": "if (window.showSuccessNotification) {",
+          "pattern": "showSuccessNotification",
+          "match": "showSuccessNotification",
+          "file": "js"
+        },
+        {
+          "line": 441,
+          "content": "window.showSuccessNotification('ניטור שרת', 'אופטימיזציה הושלמה');",
+          "pattern": "showSuccessNotification",
+          "match": "showSuccessNotification",
+          "file": "js"
+        },
+        {
+          "line": 480,
+          "content": "if (window.showSuccessNotification) {",
+          "pattern": "showSuccessNotification",
+          "match": "showSuccessNotification",
+          "file": "js"
+        },
+        {
+          "line": 481,
+          "content": "window.showSuccessNotification('ניטור שרת', 'לוגים יוצאו');",
+          "pattern": "showSuccessNotification",
+          "match": "showSuccessNotification",
+          "file": "js"
+        },
+        {
+          "line": 617,
+          "content": "if (window.showSuccessNotification) {",
+          "pattern": "showSuccessNotification",
+          "match": "showSuccessNotification",
+          "file": "js"
+        },
+        {
+          "line": 618,
+          "content": "window.showSuccessNotification('ניטור שרת', 'בדיקת בריאות הושלמה בהצלחה');",
+          "pattern": "showSuccessNotification",
+          "match": "showSuccessNotification",
+          "file": "js"
+        },
+        {
+          "line": 652,
+          "content": "if (window.showSuccessNotification) {",
+          "pattern": "showSuccessNotification",
+          "match": "showSuccessNotification",
+          "file": "js"
+        },
+        {
+          "line": 653,
+          "content": "window.showSuccessNotification('ניטור שרת', 'השרת הופעל מחדש בהצלחה');",
+          "pattern": "showSuccessNotification",
+          "match": "showSuccessNotification",
+          "file": "js"
+        },
+        {
+          "line": 687,
+          "content": "if (window.showSuccessNotification) {",
+          "pattern": "showSuccessNotification",
+          "match": "showSuccessNotification",
+          "file": "js"
+        },
+        {
+          "line": 688,
+          "content": "window.showSuccessNotification('ניטור שרת', 'המטמון נוקה בהצלחה');",
+          "pattern": "showSuccessNotification",
+          "match": "showSuccessNotification",
+          "file": "js"
+        },
+        {
+          "line": 369,
+          "content": "if (window.showErrorNotification) {",
+          "pattern": "showErrorNotification",
+          "match": "showErrorNotification",
+          "file": "js"
+        },
+        {
+          "line": 370,
+          "content": "window.showErrorNotification('שגיאה', 'לא ניתן להעתיק ללוח');",
+          "pattern": "showErrorNotification",
+          "match": "showErrorNotification",
+          "file": "js"
+        },
+        {
+          "line": 376,
+          "content": "if (window.showErrorNotification) {",
+          "pattern": "showErrorNotification",
+          "match": "showErrorNotification",
+          "file": "js"
+        },
+        {
+          "line": 377,
+          "content": "window.showErrorNotification('שגיאה', 'שגיאה בהעתקת לוג');",
+          "pattern": "showErrorNotification",
+          "match": "showErrorNotification",
+          "file": "js"
+        },
+        {
+          "line": 415,
+          "content": "if (window.showErrorNotification) {",
+          "pattern": "showErrorNotification",
+          "match": "showErrorNotification",
+          "file": "js"
+        },
+        {
+          "line": 416,
+          "content": "window.showErrorNotification('שגיאה', 'שגיאה בניקוי לוגים');",
+          "pattern": "showErrorNotification",
+          "match": "showErrorNotification",
+          "file": "js"
+        },
+        {
+          "line": 449,
+          "content": "if (window.showErrorNotification) {",
+          "pattern": "showErrorNotification",
+          "match": "showErrorNotification",
+          "file": "js"
+        },
+        {
+          "line": 450,
+          "content": "window.showErrorNotification('שגיאה', 'שגיאה באופטימיזציה');",
+          "pattern": "showErrorNotification",
+          "match": "showErrorNotification",
+          "file": "js"
+        },
+        {
+          "line": 486,
+          "content": "if (window.showErrorNotification) {",
+          "pattern": "showErrorNotification",
+          "match": "showErrorNotification",
+          "file": "js"
+        },
+        {
+          "line": 487,
+          "content": "window.showErrorNotification('שגיאה', 'שגיאה בייצוא לוגים');",
+          "pattern": "showErrorNotification",
+          "match": "showErrorNotification",
+          "file": "js"
+        },
+        {
+          "line": 626,
+          "content": "if (window.showErrorNotification) {",
+          "pattern": "showErrorNotification",
+          "match": "showErrorNotification",
+          "file": "js"
+        },
+        {
+          "line": 627,
+          "content": "window.showErrorNotification('שגיאה', 'שגיאה בבדיקת בריאות שרת');",
+          "pattern": "showErrorNotification",
+          "match": "showErrorNotification",
+          "file": "js"
+        },
+        {
+          "line": 661,
+          "content": "if (window.showErrorNotification) {",
+          "pattern": "showErrorNotification",
+          "match": "showErrorNotification",
+          "file": "js"
+        },
+        {
+          "line": 662,
+          "content": "window.showErrorNotification('שגיאה', 'שגיאה בהפעלה מחדש של השרת');",
+          "pattern": "showErrorNotification",
+          "match": "showErrorNotification",
+          "file": "js"
+        },
+        {
+          "line": 696,
+          "content": "if (window.showErrorNotification) {",
+          "pattern": "showErrorNotification",
+          "match": "showErrorNotification",
+          "file": "js"
+        },
+        {
+          "line": 697,
+          "content": "window.showErrorNotification('שגיאה', 'שגיאה בניקוי מטמון');",
+          "pattern": "showErrorNotification",
+          "match": "showErrorNotification",
+          "file": "js"
+        },
+        {
+          "line": 751,
+          "content": "if (window.showErrorNotification) {",
+          "pattern": "showErrorNotification",
+          "match": "showErrorNotification",
+          "file": "js"
+        },
+        {
+          "line": 752,
+          "content": "window.showErrorNotification('שגיאה', 'שגיאה בעצירת חירום');",
+          "pattern": "showErrorNotification",
+          "match": "showErrorNotification",
+          "file": "js"
+        },
+        {
+          "line": 798,
+          "content": "if (window.showErrorNotification) {",
+          "pattern": "showErrorNotification",
+          "match": "showErrorNotification",
+          "file": "js"
+        },
+        {
+          "line": 799,
+          "content": "window.showErrorNotification('שגיאה', 'serverMonitor לא אותחל');",
+          "pattern": "showErrorNotification",
+          "match": "showErrorNotification",
+          "file": "js"
+        }
+      ],
+      "issue_count": 34,
+      "js_result": {
+        "status": "ok",
+        "issues": [
+          {
+            "line": 364,
+            "content": "if (window.showSuccessNotification) {",
+            "pattern": "showSuccessNotification",
+            "match": "showSuccessNotification"
+          },
+          {
+            "line": 365,
+            "content": "window.showSuccessNotification('ניטור שרת', 'לוג מפורט הועתק ללוח');",
+            "pattern": "showSuccessNotification",
+            "match": "showSuccessNotification"
+          },
+          {
+            "line": 406,
+            "content": "if (window.showSuccessNotification) {",
+            "pattern": "showSuccessNotification",
+            "match": "showSuccessNotification"
+          },
+          {
+            "line": 407,
+            "content": "window.showSuccessNotification('ניטור שרת', 'לוגים נוקו');",
+            "pattern": "showSuccessNotification",
+            "match": "showSuccessNotification"
+          },
+          {
+            "line": 440,
+            "content": "if (window.showSuccessNotification) {",
+            "pattern": "showSuccessNotification",
+            "match": "showSuccessNotification"
+          },
+          {
+            "line": 441,
+            "content": "window.showSuccessNotification('ניטור שרת', 'אופטימיזציה הושלמה');",
+            "pattern": "showSuccessNotification",
+            "match": "showSuccessNotification"
+          },
+          {
+            "line": 480,
+            "content": "if (window.showSuccessNotification) {",
+            "pattern": "showSuccessNotification",
+            "match": "showSuccessNotification"
+          },
+          {
+            "line": 481,
+            "content": "window.showSuccessNotification('ניטור שרת', 'לוגים יוצאו');",
+            "pattern": "showSuccessNotification",
+            "match": "showSuccessNotification"
+          },
+          {
+            "line": 617,
+            "content": "if (window.showSuccessNotification) {",
+            "pattern": "showSuccessNotification",
+            "match": "showSuccessNotification"
+          },
+          {
+            "line": 618,
+            "content": "window.showSuccessNotification('ניטור שרת', 'בדיקת בריאות הושלמה בהצלחה');",
+            "pattern": "showSuccessNotification",
+            "match": "showSuccessNotification"
+          },
+          {
+            "line": 652,
+            "content": "if (window.showSuccessNotification) {",
+            "pattern": "showSuccessNotification",
+            "match": "showSuccessNotification"
+          },
+          {
+            "line": 653,
+            "content": "window.showSuccessNotification('ניטור שרת', 'השרת הופעל מחדש בהצלחה');",
+            "pattern": "showSuccessNotification",
+            "match": "showSuccessNotification"
+          },
+          {
+            "line": 687,
+            "content": "if (window.showSuccessNotification) {",
+            "pattern": "showSuccessNotification",
+            "match": "showSuccessNotification"
+          },
+          {
+            "line": 688,
+            "content": "window.showSuccessNotification('ניטור שרת', 'המטמון נוקה בהצלחה');",
+            "pattern": "showSuccessNotification",
+            "match": "showSuccessNotification"
+          },
+          {
+            "line": 369,
+            "content": "if (window.showErrorNotification) {",
+            "pattern": "showErrorNotification",
+            "match": "showErrorNotification"
+          },
+          {
+            "line": 370,
+            "content": "window.showErrorNotification('שגיאה', 'לא ניתן להעתיק ללוח');",
+            "pattern": "showErrorNotification",
+            "match": "showErrorNotification"
+          },
+          {
+            "line": 376,
+            "content": "if (window.showErrorNotification) {",
+            "pattern": "showErrorNotification",
+            "match": "showErrorNotification"
+          },
+          {
+            "line": 377,
+            "content": "window.showErrorNotification('שגיאה', 'שגיאה בהעתקת לוג');",
+            "pattern": "showErrorNotification",
+            "match": "showErrorNotification"
+          },
+          {
+            "line": 415,
+            "content": "if (window.showErrorNotification) {",
+            "pattern": "showErrorNotification",
+            "match": "showErrorNotification"
+          },
+          {
+            "line": 416,
+            "content": "window.showErrorNotification('שגיאה', 'שגיאה בניקוי לוגים');",
+            "pattern": "showErrorNotification",
+            "match": "showErrorNotification"
+          },
+          {
+            "line": 449,
+            "content": "if (window.showErrorNotification) {",
+            "pattern": "showErrorNotification",
+            "match": "showErrorNotification"
+          },
+          {
+            "line": 450,
+            "content": "window.showErrorNotification('שגיאה', 'שגיאה באופטימיזציה');",
+            "pattern": "showErrorNotification",
+            "match": "showErrorNotification"
+          },
+          {
+            "line": 486,
+            "content": "if (window.showErrorNotification) {",
+            "pattern": "showErrorNotification",
+            "match": "showErrorNotification"
+          },
+          {
+            "line": 487,
+            "content": "window.showErrorNotification('שגיאה', 'שגיאה בייצוא לוגים');",
+            "pattern": "showErrorNotification",
+            "match": "showErrorNotification"
+          },
+          {
+            "line": 626,
+            "content": "if (window.showErrorNotification) {",
+            "pattern": "showErrorNotification",
+            "match": "showErrorNotification"
+          },
+          {
+            "line": 627,
+            "content": "window.showErrorNotification('שגיאה', 'שגיאה בבדיקת בריאות שרת');",
+            "pattern": "showErrorNotification",
+            "match": "showErrorNotification"
+          },
+          {
+            "line": 661,
+            "content": "if (window.showErrorNotification) {",
+            "pattern": "showErrorNotification",
+            "match": "showErrorNotification"
+          },
+          {
+            "line": 662,
+            "content": "window.showErrorNotification('שגיאה', 'שגיאה בהפעלה מחדש של השרת');",
+            "pattern": "showErrorNotification",
+            "match": "showErrorNotification"
+          },
+          {
+            "line": 696,
+            "content": "if (window.showErrorNotification) {",
+            "pattern": "showErrorNotification",
+            "match": "showErrorNotification"
+          },
+          {
+            "line": 697,
+            "content": "window.showErrorNotification('שגיאה', 'שגיאה בניקוי מטמון');",
+            "pattern": "showErrorNotification",
+            "match": "showErrorNotification"
+          },
+          {
+            "line": 751,
+            "content": "if (window.showErrorNotification) {",
+            "pattern": "showErrorNotification",
+            "match": "showErrorNotification"
+          },
+          {
+            "line": 752,
+            "content": "window.showErrorNotification('שגיאה', 'שגיאה בעצירת חירום');",
+            "pattern": "showErrorNotification",
+            "match": "showErrorNotification"
+          },
+          {
+            "line": 798,
+            "content": "if (window.showErrorNotification) {",
+            "pattern": "showErrorNotification",
+            "match": "showErrorNotification"
+          },
+          {
+            "line": 799,
+            "content": "window.showErrorNotification('שגיאה', 'serverMonitor לא אותחל');",
+            "pattern": "showErrorNotification",
+            "match": "showErrorNotification"
+          }
+        ],
+        "issue_count": 34
+      },
+      "html_result": {
+        "status": "ok",
+        "issues": [],
+        "issue_count": 0
+      }
+    },
+    "modals": {
+      "status": "ok",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "ok",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": {
+        "status": "ok",
+        "issues": [],
+        "issue_count": 0
+      }
+    },
+    "tables": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      }
+    },
+    "field_renderer": {
+      "status": "missing",
+      "issues": [
+        {
+          "line": 181,
+          "content": "// Use FieldRendererService or dateUtils for consistent date formatting",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 183,
+          "content": "if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 183,
+          "content": "if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 184,
+          "content": "lastCheck.textContent = window.FieldRendererService.renderDate(now, true);",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 315,
+          "content": "// Use FieldRendererService or dateUtils for date formatting",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 316,
+          "content": "if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 316,
+          "content": "if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 317,
+          "content": "return window.FieldRendererService.renderDate(timestampDate, false);",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 332,
+          "content": "if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 332,
+          "content": "if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 333,
+          "content": "nowDisplay = window.FieldRendererService.renderDate(now, true);",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 348,
+          "content": "if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 348,
+          "content": "if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 349,
+          "content": "timestampDisplay = window.FieldRendererService.renderDate(log.timestamp, true);",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        }
+      ],
+      "issue_count": 14,
+      "js_result": {
+        "status": "ok",
+        "issues": [
+          {
+            "line": 181,
+            "content": "// Use FieldRendererService or dateUtils for consistent date formatting",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 183,
+            "content": "if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 183,
+            "content": "if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 184,
+            "content": "lastCheck.textContent = window.FieldRendererService.renderDate(now, true);",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 315,
+            "content": "// Use FieldRendererService or dateUtils for date formatting",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 316,
+            "content": "if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 316,
+            "content": "if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 317,
+            "content": "return window.FieldRendererService.renderDate(timestampDate, false);",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 332,
+            "content": "if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 332,
+            "content": "if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 333,
+            "content": "nowDisplay = window.FieldRendererService.renderDate(now, true);",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 348,
+            "content": "if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 348,
+            "content": "if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 349,
+            "content": "timestampDisplay = window.FieldRendererService.renderDate(log.timestamp, true);",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          }
+        ],
+        "issue_count": 14
+      },
+      "html_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      }
+    },
+    "crud_handler": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      }
+    },
+    "select_populator": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      }
+    },
+    "data_collection": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      }
+    },
+    "icons": {
+      "status": "missing",
+      "issues": [
+        {
+          "line": 105,
+          "content": "<img src=\"/trading-ui/images/icons/tabler/circle.svg\" width=\"16\" height=\"16\" alt=\"circle\" class=\"ico",
+          "pattern": "<img.*icon",
+          "match": "<img src=\"/trading-ui/images/icons/tabler/circle.s",
+          "file": "html"
+        },
+        {
+          "line": 189,
+          "content": "<img src=\"/trading-ui/images/icons/tabler/info-circle.svg\" width=\"16\" height=\"16\" alt=\"icon\" class=\"",
+          "pattern": "<img.*icon",
+          "match": "<img src=\"/trading-ui/images/icons/tabler/info-cir",
+          "file": "html"
+        },
+        {
+          "line": 195,
+          "content": "<img src=\"/trading-ui/images/icons/tabler/player-play.svg\" width=\"16\" height=\"16\" alt=\"player-play\" ",
+          "pattern": "<img.*icon",
+          "match": "<img src=\"/trading-ui/images/icons/tabler/player-p",
+          "file": "html"
+        },
+        {
+          "line": 198,
+          "content": "<img src=\"/trading-ui/images/icons/tabler/refresh.svg\" width=\"16\" height=\"16\" alt=\"refresh\" class=\"i",
+          "pattern": "<img.*icon",
+          "match": "<img src=\"/trading-ui/images/icons/tabler/refresh.",
+          "file": "html"
+        },
+        {
+          "line": 201,
+          "content": "<img src=\"/trading-ui/images/icons/tabler/info-circle.svg\" width=\"16\" height=\"16\" alt=\"icon\" class=\"",
+          "pattern": "<img.*icon",
+          "match": "<img src=\"/trading-ui/images/icons/tabler/info-cir",
+          "file": "html"
+        },
+        {
+          "line": 204,
+          "content": "<img src=\"/trading-ui/images/icons/tabler/info-circle.svg\" width=\"16\" height=\"16\" alt=\"info-circle\" ",
+          "pattern": "<img.*icon",
+          "match": "<img src=\"/trading-ui/images/icons/tabler/info-cir",
+          "file": "html"
+        },
+        {
+          "line": 214,
+          "content": "<img src=\"/trading-ui/images/icons/tabler/info-circle.svg\" width=\"16\" height=\"16\" alt=\"icon\" class=\"",
+          "pattern": "<img.*icon",
+          "match": "<img src=\"/trading-ui/images/icons/tabler/info-cir",
+          "file": "html"
+        },
+        {
+          "line": 220,
+          "content": "<img src=\"/trading-ui/images/icons/tabler/info-circle.svg\" width=\"16\" height=\"16\" alt=\"icon\" class=\"",
+          "pattern": "<img.*icon",
+          "match": "<img src=\"/trading-ui/images/icons/tabler/info-cir",
+          "file": "html"
+        },
+        {
+          "line": 223,
+          "content": "<img src=\"/trading-ui/images/icons/tabler/info-circle.svg\" width=\"16\" height=\"16\" alt=\"icon\" class=\"",
+          "pattern": "<img.*icon",
+          "match": "<img src=\"/trading-ui/images/icons/tabler/info-cir",
+          "file": "html"
+        },
+        {
+          "line": 226,
+          "content": "<img src=\"/trading-ui/images/icons/tabler/info-circle.svg\" width=\"16\" height=\"16\" alt=\"icon\" class=\"",
+          "pattern": "<img.*icon",
+          "match": "<img src=\"/trading-ui/images/icons/tabler/info-cir",
+          "file": "html"
+        },
+        {
+          "line": 229,
+          "content": "<img src=\"/trading-ui/images/icons/tabler/info-circle.svg\" width=\"16\" height=\"16\" alt=\"icon\" class=\"",
+          "pattern": "<img.*icon",
+          "match": "<img src=\"/trading-ui/images/icons/tabler/info-cir",
+          "file": "html"
+        },
+        {
+          "line": 243,
+          "content": "<img src=\"/trading-ui/images/icons/tabler/info-circle.svg\" width=\"16\" height=\"16\" alt=\"icon\" class=\"",
+          "pattern": "<img.*icon",
+          "match": "<img src=\"/trading-ui/images/icons/tabler/info-cir",
+          "file": "html"
+        }
+      ],
+      "issue_count": 12,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": {
+        "status": "missing",
+        "issues": [
+          {
+            "line": 105,
+            "content": "<img src=\"/trading-ui/images/icons/tabler/circle.svg\" width=\"16\" height=\"16\" alt=\"circle\" class=\"ico",
+            "pattern": "<img.*icon",
+            "match": "<img src=\"/trading-ui/images/icons/tabler/circle.s"
+          },
+          {
+            "line": 189,
+            "content": "<img src=\"/trading-ui/images/icons/tabler/info-circle.svg\" width=\"16\" height=\"16\" alt=\"icon\" class=\"",
+            "pattern": "<img.*icon",
+            "match": "<img src=\"/trading-ui/images/icons/tabler/info-cir"
+          },
+          {
+            "line": 195,
+            "content": "<img src=\"/trading-ui/images/icons/tabler/player-play.svg\" width=\"16\" height=\"16\" alt=\"player-play\" ",
+            "pattern": "<img.*icon",
+            "match": "<img src=\"/trading-ui/images/icons/tabler/player-p"
+          },
+          {
+            "line": 198,
+            "content": "<img src=\"/trading-ui/images/icons/tabler/refresh.svg\" width=\"16\" height=\"16\" alt=\"refresh\" class=\"i",
+            "pattern": "<img.*icon",
+            "match": "<img src=\"/trading-ui/images/icons/tabler/refresh."
+          },
+          {
+            "line": 201,
+            "content": "<img src=\"/trading-ui/images/icons/tabler/info-circle.svg\" width=\"16\" height=\"16\" alt=\"icon\" class=\"",
+            "pattern": "<img.*icon",
+            "match": "<img src=\"/trading-ui/images/icons/tabler/info-cir"
+          },
+          {
+            "line": 204,
+            "content": "<img src=\"/trading-ui/images/icons/tabler/info-circle.svg\" width=\"16\" height=\"16\" alt=\"info-circle\" ",
+            "pattern": "<img.*icon",
+            "match": "<img src=\"/trading-ui/images/icons/tabler/info-cir"
+          },
+          {
+            "line": 214,
+            "content": "<img src=\"/trading-ui/images/icons/tabler/info-circle.svg\" width=\"16\" height=\"16\" alt=\"icon\" class=\"",
+            "pattern": "<img.*icon",
+            "match": "<img src=\"/trading-ui/images/icons/tabler/info-cir"
+          },
+          {
+            "line": 220,
+            "content": "<img src=\"/trading-ui/images/icons/tabler/info-circle.svg\" width=\"16\" height=\"16\" alt=\"icon\" class=\"",
+            "pattern": "<img.*icon",
+            "match": "<img src=\"/trading-ui/images/icons/tabler/info-cir"
+          },
+          {
+            "line": 223,
+            "content": "<img src=\"/trading-ui/images/icons/tabler/info-circle.svg\" width=\"16\" height=\"16\" alt=\"icon\" class=\"",
+            "pattern": "<img.*icon",
+            "match": "<img src=\"/trading-ui/images/icons/tabler/info-cir"
+          },
+          {
+            "line": 226,
+            "content": "<img src=\"/trading-ui/images/icons/tabler/info-circle.svg\" width=\"16\" height=\"16\" alt=\"icon\" class=\"",
+            "pattern": "<img.*icon",
+            "match": "<img src=\"/trading-ui/images/icons/tabler/info-cir"
+          },
+          {
+            "line": 229,
+            "content": "<img src=\"/trading-ui/images/icons/tabler/info-circle.svg\" width=\"16\" height=\"16\" alt=\"icon\" class=\"",
+            "pattern": "<img.*icon",
+            "match": "<img src=\"/trading-ui/images/icons/tabler/info-cir"
+          },
+          {
+            "line": 243,
+            "content": "<img src=\"/trading-ui/images/icons/tabler/info-circle.svg\" width=\"16\" height=\"16\" alt=\"icon\" class=\"",
+            "pattern": "<img.*icon",
+            "match": "<img src=\"/trading-ui/images/icons/tabler/info-cir"
+          }
+        ],
+        "issue_count": 12
+      }
+    },
+    "colors": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      }
+    },
+    "info_summary": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      }
+    },
+    "pagination": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      }
+    },
+    "entity_details": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      }
+    },
+    "conditions": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      }
+    },
+    "page_state": {
+      "status": "ok",
+      "issues": [
+        {
+          "line": 59,
+          "content": "const saved = window.PageStateManager?.getItem('serverMonitorSettings');",
+          "pattern": "PageStateManager",
+          "match": "PageStateManager",
+          "file": "js"
+        },
+        {
+          "line": 71,
+          "content": "window.PageStateManager?.setItem('serverMonitorSettings', JSON.stringify(this.settings));",
+          "pattern": "PageStateManager",
+          "match": "PageStateManager",
+          "file": "js"
+        }
+      ],
+      "issue_count": 2,
+      "js_result": {
+        "status": "ok",
+        "issues": [
+          {
+            "line": 59,
+            "content": "const saved = window.PageStateManager?.getItem('serverMonitorSettings');",
+            "pattern": "PageStateManager",
+            "match": "PageStateManager"
+          },
+          {
+            "line": 71,
+            "content": "window.PageStateManager?.setItem('serverMonitorSettings', JSON.stringify(this.settings));",
+            "pattern": "PageStateManager",
+            "match": "PageStateManager"
+          }
+        ],
+        "issue_count": 2
+      },
+      "html_result": {
+        "status": "ok",
+        "issues": [],
+        "issue_count": 0
+      }
+    },
+    "logger": {
+      "status": "ok",
+      "issues": [
+        {
+          "line": 38,
+          "content": "window.Logger?.warn(`⏳ ${actionName} ב-cooldown. נסה שוב בעוד ${remainingTime} שניות`);",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 48,
+          "content": "window.Logger?.debug('🔧 ServerMonitor init - מתחיל אתחול');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 64,
+          "content": "window.Logger?.error('❌ שגיאה בטעינת הגדרות:', error);",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 73,
+          "content": "window.Logger?.error('❌ שגיאה בשמירת הגדרות:', error);",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 111,
+          "content": "window.Logger?.debug('🔄 ServerMonitor - מתחיל ניטור');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 132,
+          "content": "window.Logger?.debug('⏹️ ServerMonitor - עוצר ניטור');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 145,
+          "content": "window.Logger?.debug('🔍 ServerMonitor - בודק סטטוס שרת');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 159,
+          "content": "window.Logger?.error('❌ שגיאה בבדיקת סטטוס שרת:', error);",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 252,
+          "content": "window.Logger?.debug(`📝 ServerMonitor - לוג נוסף: ${type} - ${title}`);",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 327,
+          "content": "window.Logger?.debug('📋 ServerMonitor - מעתיק לוג מפורט');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 363,
+          "content": "window.Logger?.debug('✅ לוג הועתק בהצלחה');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 368,
+          "content": "window.Logger?.error('❌ שגיאה בהעתקה:', error);",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 375,
+          "content": "window.Logger?.error('❌ שגיאה בהעתקת לוג:', error);",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 385,
+          "content": "window.Logger?.debug('🧹 ServerMonitor - מנקה לוגים');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 405,
+          "content": "window.Logger?.debug('✅ לוגים נוקו');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 410,
+          "content": "window.Logger?.debug('❌ ניקוי לוגים בוטל');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 414,
+          "content": "window.Logger?.error('❌ שגיאה בניקוי לוגים:', error);",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 428,
+          "content": "window.Logger?.debug('🔧 ServerMonitor - מבצע אופטימיזציה של בסיס הנתונים');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 439,
+          "content": "window.Logger?.debug('✅ אופטימיזציה הושלמה:', result);",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 448,
+          "content": "window.Logger?.error('❌ שגיאה באופטימיזציה:', error);",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 458,
+          "content": "window.Logger?.debug('📤 ServerMonitor - מייצא לוגים');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 479,
+          "content": "window.Logger?.debug('✅ לוגים יוצאו');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 485,
+          "content": "window.Logger?.error('❌ שגיאה בייצוא לוגים:', error);",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 495,
+          "content": "window.Logger?.debug('🔧 ServerMonitor - טוען מידע מערכת');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 503,
+          "content": "window.Logger?.error('❌ שגיאה בטעינת מידע מערכת:', error);",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 510,
+          "content": "window.Logger?.debug('🔍 ServerMonitor - טוען נתוני בריאות');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 518,
+          "content": "window.Logger?.error('❌ שגיאה בטעינת נתוני בריאות:', error);",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 600,
+          "content": "window.Logger?.debug('✅ נתוני בריאות עודכנו בהצלחה');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 610,
+          "content": "window.Logger?.debug('🔍 ServerMonitor - בודק בריאות שרת');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 615,
+          "content": "window.Logger?.debug('✅ בריאות שרת:', data);",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 624,
+          "content": "window.Logger?.error('❌ שגיאה בבדיקת בריאות שרת:', error);",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 639,
+          "content": "window.Logger?.debug('🔄 ServerMonitor - מפעיל שרת מחדש');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 650,
+          "content": "window.Logger?.debug('✅ שרת הופעל מחדש:', result);",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 659,
+          "content": "window.Logger?.error('❌ שגיאה בהפעלה מחדש:', error);",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 674,
+          "content": "window.Logger?.debug('🧹 ServerMonitor - מנקה מטמון');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 685,
+          "content": "window.Logger?.debug('✅ מטמון נוקה:', result);",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 694,
+          "content": "window.Logger?.error('❌ שגיאה בניקוי מטמון:', error);",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 709,
+          "content": "window.Logger?.debug('🛑 ServerMonitor - מבצע עצירת חירום');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 740,
+          "content": "window.Logger?.debug('✅ עצירת חירום הושלמה:', result);",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 749,
+          "content": "window.Logger?.error('❌ שגיאה בעצירת חירום:', error);",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 781,
+          "content": "window.Logger?.debug('🎯 DOM loaded, initializing ServerMonitor...');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 786,
+          "content": "window.Logger?.debug('✅ ServerMonitor initialized successfully');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 797,
+          "content": "window.Logger?.error('❌ serverMonitor instance לא קיים');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 809,
+          "content": "window.Logger?.error('❌ serverMonitor instance לא קיים');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 817,
+          "content": "window.Logger?.error('❌ serverMonitor instance לא קיים');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 821,
+          "content": "window.Logger?.debug('✅ ServerMonitor instance נוצר:', window.serverMonitor);",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 548,
+          "content": "<script src=\"scripts/logger-service.js?v=1.0.0\"></script> <!-- Advanced logging service -->",
+          "pattern": "logger-service\\.js",
+          "match": "logger-service.js",
+          "file": "html"
+        }
+      ],
+      "issue_count": 47,
+      "js_result": {
+        "status": "ok",
+        "issues": [
+          {
+            "line": 38,
+            "content": "window.Logger?.warn(`⏳ ${actionName} ב-cooldown. נסה שוב בעוד ${remainingTime} שניות`);",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 48,
+            "content": "window.Logger?.debug('🔧 ServerMonitor init - מתחיל אתחול');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 64,
+            "content": "window.Logger?.error('❌ שגיאה בטעינת הגדרות:', error);",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 73,
+            "content": "window.Logger?.error('❌ שגיאה בשמירת הגדרות:', error);",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 111,
+            "content": "window.Logger?.debug('🔄 ServerMonitor - מתחיל ניטור');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 132,
+            "content": "window.Logger?.debug('⏹️ ServerMonitor - עוצר ניטור');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 145,
+            "content": "window.Logger?.debug('🔍 ServerMonitor - בודק סטטוס שרת');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 159,
+            "content": "window.Logger?.error('❌ שגיאה בבדיקת סטטוס שרת:', error);",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 252,
+            "content": "window.Logger?.debug(`📝 ServerMonitor - לוג נוסף: ${type} - ${title}`);",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 327,
+            "content": "window.Logger?.debug('📋 ServerMonitor - מעתיק לוג מפורט');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 363,
+            "content": "window.Logger?.debug('✅ לוג הועתק בהצלחה');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 368,
+            "content": "window.Logger?.error('❌ שגיאה בהעתקה:', error);",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 375,
+            "content": "window.Logger?.error('❌ שגיאה בהעתקת לוג:', error);",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 385,
+            "content": "window.Logger?.debug('🧹 ServerMonitor - מנקה לוגים');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 405,
+            "content": "window.Logger?.debug('✅ לוגים נוקו');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 410,
+            "content": "window.Logger?.debug('❌ ניקוי לוגים בוטל');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 414,
+            "content": "window.Logger?.error('❌ שגיאה בניקוי לוגים:', error);",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 428,
+            "content": "window.Logger?.debug('🔧 ServerMonitor - מבצע אופטימיזציה של בסיס הנתונים');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 439,
+            "content": "window.Logger?.debug('✅ אופטימיזציה הושלמה:', result);",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 448,
+            "content": "window.Logger?.error('❌ שגיאה באופטימיזציה:', error);",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 458,
+            "content": "window.Logger?.debug('📤 ServerMonitor - מייצא לוגים');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 479,
+            "content": "window.Logger?.debug('✅ לוגים יוצאו');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 485,
+            "content": "window.Logger?.error('❌ שגיאה בייצוא לוגים:', error);",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 495,
+            "content": "window.Logger?.debug('🔧 ServerMonitor - טוען מידע מערכת');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 503,
+            "content": "window.Logger?.error('❌ שגיאה בטעינת מידע מערכת:', error);",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 510,
+            "content": "window.Logger?.debug('🔍 ServerMonitor - טוען נתוני בריאות');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 518,
+            "content": "window.Logger?.error('❌ שגיאה בטעינת נתוני בריאות:', error);",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 600,
+            "content": "window.Logger?.debug('✅ נתוני בריאות עודכנו בהצלחה');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 610,
+            "content": "window.Logger?.debug('🔍 ServerMonitor - בודק בריאות שרת');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 615,
+            "content": "window.Logger?.debug('✅ בריאות שרת:', data);",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 624,
+            "content": "window.Logger?.error('❌ שגיאה בבדיקת בריאות שרת:', error);",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 639,
+            "content": "window.Logger?.debug('🔄 ServerMonitor - מפעיל שרת מחדש');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 650,
+            "content": "window.Logger?.debug('✅ שרת הופעל מחדש:', result);",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 659,
+            "content": "window.Logger?.error('❌ שגיאה בהפעלה מחדש:', error);",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 674,
+            "content": "window.Logger?.debug('🧹 ServerMonitor - מנקה מטמון');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 685,
+            "content": "window.Logger?.debug('✅ מטמון נוקה:', result);",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 694,
+            "content": "window.Logger?.error('❌ שגיאה בניקוי מטמון:', error);",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 709,
+            "content": "window.Logger?.debug('🛑 ServerMonitor - מבצע עצירת חירום');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 740,
+            "content": "window.Logger?.debug('✅ עצירת חירום הושלמה:', result);",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 749,
+            "content": "window.Logger?.error('❌ שגיאה בעצירת חירום:', error);",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 781,
+            "content": "window.Logger?.debug('🎯 DOM loaded, initializing ServerMonitor...');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 786,
+            "content": "window.Logger?.debug('✅ ServerMonitor initialized successfully');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 797,
+            "content": "window.Logger?.error('❌ serverMonitor instance לא קיים');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 809,
+            "content": "window.Logger?.error('❌ serverMonitor instance לא קיים');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 817,
+            "content": "window.Logger?.error('❌ serverMonitor instance לא קיים');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 821,
+            "content": "window.Logger?.debug('✅ ServerMonitor instance נוצר:', window.serverMonitor);",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          }
+        ],
+        "issue_count": 46
+      },
+      "html_result": {
+        "status": "ok",
+        "issues": [
+          {
+            "line": 548,
+            "content": "<script src=\"scripts/logger-service.js?v=1.0.0\"></script> <!-- Advanced logging service -->",
+            "pattern": "logger-service\\.js",
+            "match": "logger-service.js"
+          }
+        ],
+        "issue_count": 1
+      }
+    },
+    "cache": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      }
+    },
+    "dom_manipulation": {
+      "status": "issues_found",
+      "issues": [
+        {
+          "line": 260,
+          "content": "logsContainer.innerHTML = '';",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 276,
+          "content": "logElement.innerHTML = `",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 761,
+          "content": "systemInfo.innerHTML = `",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 270,
+          "content": "const logElement = document.createElement('div');",
+          "pattern": "createElement",
+          "match": "createElement",
+          "file": "js"
+        },
+        {
+          "line": 471,
+          "content": "const a = document.createElement('a');",
+          "pattern": "createElement",
+          "match": "createElement",
+          "file": "js"
+        }
+      ],
+      "issue_count": 5,
+      "js_result": {
+        "status": "issues_found",
+        "issues": [
+          {
+            "line": 260,
+            "content": "logsContainer.innerHTML = '';",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 276,
+            "content": "logElement.innerHTML = `",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 761,
+            "content": "systemInfo.innerHTML = `",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 270,
+            "content": "const logElement = document.createElement('div');",
+            "pattern": "createElement",
+            "match": "createElement"
+          },
+          {
+            "line": 471,
+            "content": "const a = document.createElement('a');",
+            "pattern": "createElement",
+            "match": "createElement"
+          }
+        ],
+        "issue_count": 5
+      },
+      "html_result": {
+        "status": "ok",
+        "issues": [],
+        "issue_count": 0
+      }
+    },
+    "html_structure": {
+      "status": "issues_found",
+      "issues": [
+        {
+          "line": 94,
+          "content": "<button class=\"filter-toggle-btn\" data-onclick=\"toggleAllSections()\" title=\"הצג/הסתר כל הסקשנים\" dat",
+          "pattern": "data-onclick",
+          "match": "data-onclick",
+          "file": "html"
+        },
+        {
+          "line": 178,
+          "content": "<button class=\"filter-toggle-btn\" data-onclick=\"toggleSection('cursorTasksSection')\" title=\"הצג/הסתר",
+          "pattern": "data-onclick",
+          "match": "data-onclick",
+          "file": "html"
+        },
+        {
+          "line": 277,
+          "content": "<button class=\"filter-toggle-btn\" data-onclick=\"toggleSection('section1')\" title=\"הצג/הסתר סקשן\" dat",
+          "pattern": "data-onclick",
+          "match": "data-onclick",
+          "file": "html"
+        },
+        {
+          "line": 305,
+          "content": "<button class=\"btn btn-success w-100 mb-3\" data-onclick=\"restartServerAdvanced()\" data-button-type=\"",
+          "pattern": "data-onclick",
+          "match": "data-onclick",
+          "file": "html"
+        },
+        {
+          "line": 310,
+          "content": "<button class=\"btn btn-warning w-100 mb-3\" data-onclick=\"stopServer()\" data-button-type=\"STOP\">",
+          "pattern": "data-onclick",
+          "match": "data-onclick",
+          "file": "html"
+        },
+        {
+          "line": 315,
+          "content": "<button data-button-type=\"REFRESH\" data-onclick=\"refreshData()\" data-classes=\"refresh-btn\" data-text",
+          "pattern": "data-onclick",
+          "match": "data-onclick",
+          "file": "html"
+        },
+        {
+          "line": 318,
+          "content": "<button class=\"btn btn-secondary w-100 mb-3\" data-onclick=\"clearLogs()\" data-button-type=\"PRIMARY\">",
+          "pattern": "data-onclick",
+          "match": "data-onclick",
+          "file": "html"
+        },
+        {
+          "line": 331,
+          "content": "<button class=\"filter-toggle-btn\" data-onclick=\"toggleSection('section2')\" title=\"הצג/הסתר סקשן\" dat",
+          "pattern": "data-onclick",
+          "match": "data-onclick",
+          "file": "html"
+        },
+        {
+          "line": 398,
+          "content": "<button class=\"filter-toggle-btn\" data-onclick=\"toggleSection('section3')\" title=\"הצג/הסתר סקשן\" dat",
+          "pattern": "data-onclick",
+          "match": "data-onclick",
+          "file": "html"
+        },
+        {
+          "line": 437,
+          "content": "<button class=\"btn btn-primary\" data-onclick=\"checkApiHealth()\" data-button-type=\"PRIMARY\">",
+          "pattern": "data-onclick",
+          "match": "data-onclick",
+          "file": "html"
+        },
+        {
+          "line": 455,
+          "content": "<button class=\"btn btn-sm btn-success\" data-onclick=\"scanNewEndpoints()\" data-button-type=\"PRIMARY\">",
+          "pattern": "data-onclick",
+          "match": "data-onclick",
+          "file": "html"
+        },
+        {
+          "line": 458,
+          "content": "<button class=\"btn btn-sm btn-primary\" data-onclick=\"testAllEndpoints()\" data-button-type=\"PRIMARY\">",
+          "pattern": "data-onclick",
+          "match": "data-onclick",
+          "file": "html"
+        },
+        {
+          "line": 461,
+          "content": "<button data-button-type=\"REFRESH\" data-onclick=\"refreshData()\" data-classes=\"refresh-btn\" data-text",
+          "pattern": "data-onclick",
+          "match": "data-onclick",
+          "file": "html"
+        },
+        {
+          "line": 484,
+          "content": "<button class=\"filter-toggle-btn\" data-onclick=\"toggleSection('section4')\" title=\"הצג/הסתר סקשן\" dat",
+          "pattern": "data-onclick",
+          "match": "data-onclick",
+          "file": "html"
+        },
+        {
+          "line": 83,
+          "content": "<button class=\"btn btn-sm btn-outline-success\" id=\"quickRestartBtn\" title=\"איתחול מהיר של השרת\" data",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "html"
+        },
+        {
+          "line": 86,
+          "content": "<button class=\"btn btn-sm btn-outline-warning\" id=\"changeModeBtn\" title=\"שינוי מצב מטמון\" data-butto",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "html"
+        },
+        {
+          "line": 89,
+          "content": "<button class=\"btn btn-sm btn-outline-primary\" id=\"monitoringAnalysisBtn\" title=\"הצג ניתוח מפורט של ",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "html"
+        },
+        {
+          "line": 94,
+          "content": "<button class=\"filter-toggle-btn\" data-onclick=\"toggleAllSections()\" title=\"הצג/הסתר כל הסקשנים\" dat",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "html"
+        },
+        {
+          "line": 115,
+          "content": "<button class=\"btn btn-success btn-sm\" id=\"startMonitoringBtn\" data-button-type=\"PLAY\">",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "html"
+        },
+        {
+          "line": 118,
+          "content": "<button class=\"btn btn-warning btn-sm\" id=\"pauseMonitoringBtn\" data-button-type=\"PAUSE\">",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "html"
+        },
+        {
+          "line": 121,
+          "content": "<button class=\"btn btn-danger btn-sm\" id=\"stopMonitoringBtn\" data-button-type=\"STOP\">",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "html"
+        },
+        {
+          "line": 171,
+          "content": "<button class=\"btn btn-sm btn-outline-info\" id=\"openSystemManagementBtn\" title=\"פתח דשבורד ניהול מער",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "html"
+        },
+        {
+          "line": 174,
+          "content": "<button class=\"btn btn-sm btn-outline-primary\" id=\"openAllDashboardsBtn\" title=\"פתח כל הדשבורדים\" da",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "html"
+        },
+        {
+          "line": 178,
+          "content": "<button class=\"filter-toggle-btn\" data-onclick=\"toggleSection('cursorTasksSection')\" title=\"הצג/הסתר",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "html"
+        },
+        {
+          "line": 194,
+          "content": "<button class=\"btn btn-success\" id=\"quickStartBtn\" data-button-type=\"PLAY\">",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "html"
+        },
+        {
+          "line": 197,
+          "content": "<button class=\"btn btn-warning\" id=\"quickRestartBtn2\" data-button-type=\"PLAY\">",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "html"
+        },
+        {
+          "line": 200,
+          "content": "<button class=\"btn btn-info\" id=\"quickStopBtn\" data-button-type=\"STOP\">",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "html"
+        },
+        {
+          "line": 203,
+          "content": "<button class=\"btn btn-secondary\" id=\"quickStatusBtn\" data-button-type=\"VIEW\">",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "html"
+        },
+        {
+          "line": 219,
+          "content": "<button class=\"btn btn-outline-primary\" id=\"devModeBtn\" data-button-type=\"MENU\">",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "html"
+        },
+        {
+          "line": 222,
+          "content": "<button class=\"btn btn-outline-danger\" id=\"noCacheBtn\" data-button-type=\"MENU\">",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "html"
+        },
+        {
+          "line": 225,
+          "content": "<button class=\"btn btn-outline-success\" id=\"productionModeBtn\" data-button-type=\"MENU\">",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "html"
+        },
+        {
+          "line": 228,
+          "content": "<button class=\"btn btn-outline-secondary\" id=\"preserveModeBtn\" data-button-type=\"MENU\">",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "html"
+        },
+        {
+          "line": 277,
+          "content": "<button class=\"filter-toggle-btn\" data-onclick=\"toggleSection('section1')\" title=\"הצג/הסתר סקשן\" dat",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "html"
+        },
+        {
+          "line": 305,
+          "content": "<button class=\"btn btn-success w-100 mb-3\" data-onclick=\"restartServerAdvanced()\" data-button-type=\"",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "html"
+        },
+        {
+          "line": 310,
+          "content": "<button class=\"btn btn-warning w-100 mb-3\" data-onclick=\"stopServer()\" data-button-type=\"STOP\">",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "html"
+        },
+        {
+          "line": 315,
+          "content": "<button data-button-type=\"REFRESH\" data-onclick=\"refreshData()\" data-classes=\"refresh-btn\" data-text",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "html"
+        },
+        {
+          "line": 318,
+          "content": "<button class=\"btn btn-secondary w-100 mb-3\" data-onclick=\"clearLogs()\" data-button-type=\"PRIMARY\">",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "html"
+        },
+        {
+          "line": 331,
+          "content": "<button class=\"filter-toggle-btn\" data-onclick=\"toggleSection('section2')\" title=\"הצג/הסתר סקשן\" dat",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "html"
+        },
+        {
+          "line": 398,
+          "content": "<button class=\"filter-toggle-btn\" data-onclick=\"toggleSection('section3')\" title=\"הצג/הסתר סקשן\" dat",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "html"
+        },
+        {
+          "line": 437,
+          "content": "<button class=\"btn btn-primary\" data-onclick=\"checkApiHealth()\" data-button-type=\"PRIMARY\">",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "html"
+        },
+        {
+          "line": 455,
+          "content": "<button class=\"btn btn-sm btn-success\" data-onclick=\"scanNewEndpoints()\" data-button-type=\"PRIMARY\">",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "html"
+        },
+        {
+          "line": 458,
+          "content": "<button class=\"btn btn-sm btn-primary\" data-onclick=\"testAllEndpoints()\" data-button-type=\"PRIMARY\">",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "html"
+        },
+        {
+          "line": 461,
+          "content": "<button data-button-type=\"REFRESH\" data-onclick=\"refreshData()\" data-classes=\"refresh-btn\" data-text",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "html"
+        },
+        {
+          "line": 484,
+          "content": "<button class=\"filter-toggle-btn\" data-onclick=\"toggleSection('section4')\" title=\"הצג/הסתר סקשן\" dat",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "html"
+        },
+        {
+          "line": 66,
+          "content": "<div id=\"unified-header\"></div>",
+          "pattern": "unified-header",
+          "match": "unified-header",
+          "file": "html"
+        }
+      ],
+      "issue_count": 45,
+      "js_result": {
+        "status": "ok",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": {
+        "status": "issues_found",
+        "issues": [
+          {
+            "line": 94,
+            "content": "<button class=\"filter-toggle-btn\" data-onclick=\"toggleAllSections()\" title=\"הצג/הסתר כל הסקשנים\" dat",
+            "pattern": "data-onclick",
+            "match": "data-onclick"
+          },
+          {
+            "line": 178,
+            "content": "<button class=\"filter-toggle-btn\" data-onclick=\"toggleSection('cursorTasksSection')\" title=\"הצג/הסתר",
+            "pattern": "data-onclick",
+            "match": "data-onclick"
+          },
+          {
+            "line": 277,
+            "content": "<button class=\"filter-toggle-btn\" data-onclick=\"toggleSection('section1')\" title=\"הצג/הסתר סקשן\" dat",
+            "pattern": "data-onclick",
+            "match": "data-onclick"
+          },
+          {
+            "line": 305,
+            "content": "<button class=\"btn btn-success w-100 mb-3\" data-onclick=\"restartServerAdvanced()\" data-button-type=\"",
+            "pattern": "data-onclick",
+            "match": "data-onclick"
+          },
+          {
+            "line": 310,
+            "content": "<button class=\"btn btn-warning w-100 mb-3\" data-onclick=\"stopServer()\" data-button-type=\"STOP\">",
+            "pattern": "data-onclick",
+            "match": "data-onclick"
+          },
+          {
+            "line": 315,
+            "content": "<button data-button-type=\"REFRESH\" data-onclick=\"refreshData()\" data-classes=\"refresh-btn\" data-text",
+            "pattern": "data-onclick",
+            "match": "data-onclick"
+          },
+          {
+            "line": 318,
+            "content": "<button class=\"btn btn-secondary w-100 mb-3\" data-onclick=\"clearLogs()\" data-button-type=\"PRIMARY\">",
+            "pattern": "data-onclick",
+            "match": "data-onclick"
+          },
+          {
+            "line": 331,
+            "content": "<button class=\"filter-toggle-btn\" data-onclick=\"toggleSection('section2')\" title=\"הצג/הסתר סקשן\" dat",
+            "pattern": "data-onclick",
+            "match": "data-onclick"
+          },
+          {
+            "line": 398,
+            "content": "<button class=\"filter-toggle-btn\" data-onclick=\"toggleSection('section3')\" title=\"הצג/הסתר סקשן\" dat",
+            "pattern": "data-onclick",
+            "match": "data-onclick"
+          },
+          {
+            "line": 437,
+            "content": "<button class=\"btn btn-primary\" data-onclick=\"checkApiHealth()\" data-button-type=\"PRIMARY\">",
+            "pattern": "data-onclick",
+            "match": "data-onclick"
+          },
+          {
+            "line": 455,
+            "content": "<button class=\"btn btn-sm btn-success\" data-onclick=\"scanNewEndpoints()\" data-button-type=\"PRIMARY\">",
+            "pattern": "data-onclick",
+            "match": "data-onclick"
+          },
+          {
+            "line": 458,
+            "content": "<button class=\"btn btn-sm btn-primary\" data-onclick=\"testAllEndpoints()\" data-button-type=\"PRIMARY\">",
+            "pattern": "data-onclick",
+            "match": "data-onclick"
+          },
+          {
+            "line": 461,
+            "content": "<button data-button-type=\"REFRESH\" data-onclick=\"refreshData()\" data-classes=\"refresh-btn\" data-text",
+            "pattern": "data-onclick",
+            "match": "data-onclick"
+          },
+          {
+            "line": 484,
+            "content": "<button class=\"filter-toggle-btn\" data-onclick=\"toggleSection('section4')\" title=\"הצג/הסתר סקשן\" dat",
+            "pattern": "data-onclick",
+            "match": "data-onclick"
+          },
+          {
+            "line": 83,
+            "content": "<button class=\"btn btn-sm btn-outline-success\" id=\"quickRestartBtn\" title=\"איתחול מהיר של השרת\" data",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 86,
+            "content": "<button class=\"btn btn-sm btn-outline-warning\" id=\"changeModeBtn\" title=\"שינוי מצב מטמון\" data-butto",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 89,
+            "content": "<button class=\"btn btn-sm btn-outline-primary\" id=\"monitoringAnalysisBtn\" title=\"הצג ניתוח מפורט של ",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 94,
+            "content": "<button class=\"filter-toggle-btn\" data-onclick=\"toggleAllSections()\" title=\"הצג/הסתר כל הסקשנים\" dat",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 115,
+            "content": "<button class=\"btn btn-success btn-sm\" id=\"startMonitoringBtn\" data-button-type=\"PLAY\">",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 118,
+            "content": "<button class=\"btn btn-warning btn-sm\" id=\"pauseMonitoringBtn\" data-button-type=\"PAUSE\">",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 121,
+            "content": "<button class=\"btn btn-danger btn-sm\" id=\"stopMonitoringBtn\" data-button-type=\"STOP\">",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 171,
+            "content": "<button class=\"btn btn-sm btn-outline-info\" id=\"openSystemManagementBtn\" title=\"פתח דשבורד ניהול מער",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 174,
+            "content": "<button class=\"btn btn-sm btn-outline-primary\" id=\"openAllDashboardsBtn\" title=\"פתח כל הדשבורדים\" da",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 178,
+            "content": "<button class=\"filter-toggle-btn\" data-onclick=\"toggleSection('cursorTasksSection')\" title=\"הצג/הסתר",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 194,
+            "content": "<button class=\"btn btn-success\" id=\"quickStartBtn\" data-button-type=\"PLAY\">",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 197,
+            "content": "<button class=\"btn btn-warning\" id=\"quickRestartBtn2\" data-button-type=\"PLAY\">",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 200,
+            "content": "<button class=\"btn btn-info\" id=\"quickStopBtn\" data-button-type=\"STOP\">",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 203,
+            "content": "<button class=\"btn btn-secondary\" id=\"quickStatusBtn\" data-button-type=\"VIEW\">",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 219,
+            "content": "<button class=\"btn btn-outline-primary\" id=\"devModeBtn\" data-button-type=\"MENU\">",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 222,
+            "content": "<button class=\"btn btn-outline-danger\" id=\"noCacheBtn\" data-button-type=\"MENU\">",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 225,
+            "content": "<button class=\"btn btn-outline-success\" id=\"productionModeBtn\" data-button-type=\"MENU\">",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 228,
+            "content": "<button class=\"btn btn-outline-secondary\" id=\"preserveModeBtn\" data-button-type=\"MENU\">",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 277,
+            "content": "<button class=\"filter-toggle-btn\" data-onclick=\"toggleSection('section1')\" title=\"הצג/הסתר סקשן\" dat",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 305,
+            "content": "<button class=\"btn btn-success w-100 mb-3\" data-onclick=\"restartServerAdvanced()\" data-button-type=\"",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 310,
+            "content": "<button class=\"btn btn-warning w-100 mb-3\" data-onclick=\"stopServer()\" data-button-type=\"STOP\">",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 315,
+            "content": "<button data-button-type=\"REFRESH\" data-onclick=\"refreshData()\" data-classes=\"refresh-btn\" data-text",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 318,
+            "content": "<button class=\"btn btn-secondary w-100 mb-3\" data-onclick=\"clearLogs()\" data-button-type=\"PRIMARY\">",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 331,
+            "content": "<button class=\"filter-toggle-btn\" data-onclick=\"toggleSection('section2')\" title=\"הצג/הסתר סקשן\" dat",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 398,
+            "content": "<button class=\"filter-toggle-btn\" data-onclick=\"toggleSection('section3')\" title=\"הצג/הסתר סקשן\" dat",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 437,
+            "content": "<button class=\"btn btn-primary\" data-onclick=\"checkApiHealth()\" data-button-type=\"PRIMARY\">",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 455,
+            "content": "<button class=\"btn btn-sm btn-success\" data-onclick=\"scanNewEndpoints()\" data-button-type=\"PRIMARY\">",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 458,
+            "content": "<button class=\"btn btn-sm btn-primary\" data-onclick=\"testAllEndpoints()\" data-button-type=\"PRIMARY\">",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 461,
+            "content": "<button data-button-type=\"REFRESH\" data-onclick=\"refreshData()\" data-classes=\"refresh-btn\" data-text",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 484,
+            "content": "<button class=\"filter-toggle-btn\" data-onclick=\"toggleSection('section4')\" title=\"הצג/הסתר סקשן\" dat",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 66,
+            "content": "<div id=\"unified-header\"></div>",
+            "pattern": "unified-header",
+            "match": "unified-header"
+          }
+        ],
+        "issue_count": 45
+      }
+    }
+  }
+}

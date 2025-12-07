@@ -25,6 +25,7 @@ from .quotes_last import QuotesLast
 from .password_reset_token import PasswordResetToken
 from .email_log import EmailLog
 from .ai_analysis import AIPromptTemplate, AIAnalysisRequest, UserLLMProvider
+from .watch_list import WatchList, WatchListItem
 
 __all__ = [
     'BaseModel',
@@ -65,5 +66,7 @@ __all__ = [
     'EmailLog',
     'AIPromptTemplate',
     'AIAnalysisRequest',
-    'UserLLMProvider'
+    'UserLLMProvider',
+    'WatchList',
+    'WatchListItem'
 ]

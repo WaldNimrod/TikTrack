@@ -50,7 +50,10 @@
     "docs:check": "npm run jsdoc:check",
     "docs:add": "npm run jsdoc:add",
     "docs:update": "npm run docs:add && npm run docs:generate",
-    "ci:prefs-guards": "bash scripts/ci/preferences-guards.sh"
+    "ci:prefs-guards": "bash scripts/ci/preferences-guards.sh",
+    "build:bundles": "node scripts/build/bundle-packages.js",
+    "build:bundles:package": "node scripts/build/bundle-packages.js",
+    "test:bundles": "node scripts/build/test-bundles.js"
   },
   "repository": {
     "type": "git",
@@ -65,11 +68,13 @@
   },
   "homepage": "https://github.com/WaldNimrod/TikTrack#readme",
   "devDependencies": {
+    "@playwright/test": "^1.57.0",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/user-event": "^14.6.1",
     "@typescript-eslint/eslint-plugin": "^8.41.0",
     "@typescript-eslint/parser": "^8.41.0",
     "axe-core": "^4.10.3",
+    "esbuild": "^0.24.2",
     "eslint": "^9.34.0",
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-jsdoc": "^54.1.1",
@@ -81,9 +86,9 @@
     "jest": "^30.2.0",
     "jest-environment-jsdom": "^30.2.0",
     "lighthouse": "^12.8.2",
+    "postcss-scss": "^4.0.9",
     "prettier": "^3.6.2",
     "puppeteer": "^24.18.0",
-    "postcss-scss": "^4.0.9",
     "stylelint": "^16.23.1",
     "stylelint-config-standard": "^39.0.0",
     "stylelint-order": "^7.0.0",

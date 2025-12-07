@@ -156,7 +156,7 @@
             if (!elements.tagCloudContainer) {
                 return;
             }
-            elements.tagCloudContainer.innerHTML = '';
+            elements.tagCloudContainer.textContent = '';
             if (!Array.isArray(tags) || tags.length === 0) {
                 if (elements.tagCloudEmpty) {
                     elements.tagCloudEmpty.classList.remove('d-none');
@@ -384,7 +384,7 @@
             if (!elements.drawerResultsBody) {
                 return;
             }
-            elements.drawerResultsBody.innerHTML = '';
+            elements.drawerResultsBody.textContent = '';
             if (!Array.isArray(results) || results.length === 0) {
                 if (elements.drawerEmpty) {
                     elements.drawerEmpty.classList.remove('d-none');
@@ -440,9 +440,15 @@
 
             const tagCell = document.createElement('td');
             if (window.FieldRendererService?.renderTagBadges) {
-                tagCell.innerHTML = window.FieldRendererService.renderTagBadges([tag], {
+                tagCell.textContent = '';
+                const badgeHTML = window.FieldRendererService.renderTagBadges([tag], {
                     showTitle: false,
                     includeCategory: false
+                });
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(badgeHTML, 'text/html');
+                doc.body.childNodes.forEach(node => {
+                    tagCell.appendChild(node.cloneNode(true));
                 });
             } else {
                 tagCell.textContent = tag?.name || '-';
@@ -450,7 +456,7 @@
             row.appendChild(tagCell);
 
             const dateCell = document.createElement('td');
-            dateCell.innerHTML = this.formatDate(linked_at);
+            dateCell.textContent = this.formatDate(linked_at);
             row.appendChild(dateCell);
 
         const actionsCell = document.createElement('td');

@@ -1,0 +1,626 @@
+[
+  {
+    "file": "trading-ui/scripts/notifications-center.js",
+    "total": 10,
+    "fixed": 0,
+    "remaining": 10
+  },
+  {
+    "file": "trading-ui/scripts/tradingview-test-page.js",
+    "total": 10,
+    "fixed": 0,
+    "remaining": 10
+  },
+  {
+    "file": "trading-ui/scripts/system-management.js",
+    "total": 10,
+    "fixed": 0,
+    "remaining": 10
+  },
+  {
+    "file": "trading-ui/scripts/ticker-dashboard.js",
+    "total": 9,
+    "fixed": 0,
+    "remaining": 9
+  },
+  {
+    "file": "trading-ui/scripts/modal-manager-v2.js",
+    "total": 9,
+    "fixed": 0,
+    "remaining": 9
+  },
+  {
+    "file": "trading-ui/scripts/external-data-dashboard.js",
+    "total": 9,
+    "fixed": 0,
+    "remaining": 9
+  },
+  {
+    "file": "trading-ui/scripts/modules/business-module.js",
+    "total": 9,
+    "fixed": 0,
+    "remaining": 9
+  },
+  {
+    "file": "trading-ui/scripts/tag-management-page.js",
+    "total": 8,
+    "fixed": 0,
+    "remaining": 8
+  },
+  {
+    "file": "trading-ui/scripts/user-profile-ai-analysis.js",
+    "total": 8,
+    "fixed": 0,
+    "remaining": 8
+  },
+  {
+    "file": "trading-ui/scripts/background-tasks.js",
+    "total": 8,
+    "fixed": 0,
+    "remaining": 8
+  },
+  {
+    "file": "trading-ui/scripts/constraint-manager.js",
+    "total": 7,
+    "fixed": 0,
+    "remaining": 7
+  },
+  {
+    "file": "trading-ui/scripts/active-alerts-component.js",
+    "total": 7,
+    "fixed": 0,
+    "remaining": 7
+  },
+  {
+    "file": "trading-ui/scripts/constraints.js",
+    "total": 7,
+    "fixed": 0,
+    "remaining": 7
+  },
+  {
+    "file": "trading-ui/scripts/date-comparison-modal.js",
+    "total": 7,
+    "fixed": 0,
+    "remaining": 7
+  },
+  {
+    "file": "trading-ui/scripts/services/select-populator-service.js",
+    "total": 7,
+    "fixed": 0,
+    "remaining": 7
+  },
+  {
+    "file": "trading-ui/scripts/trade-selector-modal.js",
+    "total": 6,
+    "fixed": 0,
+    "remaining": 6
+  },
+  {
+    "file": "trading-ui/scripts/css-management.js",
+    "total": 6,
+    "fixed": 0,
+    "remaining": 6
+  },
+  {
+    "file": "trading-ui/scripts/button-system-demo-core.js",
+    "total": 6,
+    "fixed": 0,
+    "remaining": 6
+  },
+  {
+    "file": "trading-ui/scripts/crud-testing-enhanced.js",
+    "total": 6,
+    "fixed": 0,
+    "remaining": 6
+  },
+  {
+    "file": "trading-ui/scripts/system-management/sections/sm-section-external-data.js",
+    "total": 6,
+    "fixed": 0,
+    "remaining": 6
+  },
+  {
+    "file": "trading-ui/scripts/conditions/conditions-form-generator.js",
+    "total": 6,
+    "fixed": 0,
+    "remaining": 6
+  },
+  {
+    "file": "trading-ui/scripts/modal-navigation-e2e-test.js",
+    "total": 5,
+    "fixed": 0,
+    "remaining": 5
+  },
+  {
+    "file": "trading-ui/scripts/unified-log-display.js",
+    "total": 5,
+    "fixed": 0,
+    "remaining": 5
+  },
+  {
+    "file": "trading-ui/scripts/services/autocomplete-service.js",
+    "total": 5,
+    "fixed": 0,
+    "remaining": 5
+  },
+  {
+    "file": "trading-ui/scripts/entity-details-modal.js",
+    "total": 4,
+    "fixed": 0,
+    "remaining": 4
+  },
+  {
+    "file": "trading-ui/scripts/preferences-ui.js",
+    "total": 4,
+    "fixed": 0,
+    "remaining": 4
+  },
+  {
+    "file": "trading-ui/scripts/emotional-tracking-widget.js",
+    "total": 4,
+    "fixed": 0,
+    "remaining": 4
+  },
+  {
+    "file": "trading-ui/scripts/ai-template-selector.js",
+    "total": 4,
+    "fixed": 0,
+    "remaining": 4
+  },
+  {
+    "file": "trading-ui/scripts/dynamic-colors-display.js",
+    "total": 4,
+    "fixed": 0,
+    "remaining": 4
+  },
+  {
+    "file": "trading-ui/scripts/test-header-only.js",
+    "total": 4,
+    "fixed": 0,
+    "remaining": 4
+  },
+  {
+    "file": "trading-ui/scripts/test-monitoring.js",
+    "total": 4,
+    "fixed": 0,
+    "remaining": 4
+  },
+  {
+    "file": "trading-ui/scripts/conditions/conditions-ui-manager.js",
+    "total": 4,
+    "fixed": 0,
+    "remaining": 4
+  },
+  {
+    "file": "trading-ui/scripts/enhancements/index-enhancements.js",
+    "total": 4,
+    "fixed": 0,
+    "remaining": 4
+  },
+  {
+    "file": "trading-ui/scripts/modules/ui-basic.js",
+    "total": 4,
+    "fixed": 0,
+    "remaining": 4
+  },
+  {
+    "file": "trading-ui/scripts/services/investment-calculation-service.js",
+    "total": 4,
+    "fixed": 0,
+    "remaining": 4
+  },
+  {
+    "file": "trading-ui/scripts/preferences-page.js",
+    "total": 3,
+    "fixed": 0,
+    "remaining": 3
+  },
+  {
+    "file": "trading-ui/scripts/db_extradata.js",
+    "total": 3,
+    "fixed": 0,
+    "remaining": 3
+  },
+  {
+    "file": "trading-ui/scripts/ai-result-renderer.js",
+    "total": 3,
+    "fixed": 0,
+    "remaining": 3
+  },
+  {
+    "file": "trading-ui/scripts/cache-management.js",
+    "total": 3,
+    "fixed": 0,
+    "remaining": 3
+  },
+  {
+    "file": "trading-ui/scripts/ui-utils.js",
+    "total": 3,
+    "fixed": 0,
+    "remaining": 3
+  },
+  {
+    "file": "trading-ui/scripts/db_display.js",
+    "total": 3,
+    "fixed": 0,
+    "remaining": 3
+  },
+  {
+    "file": "trading-ui/scripts/cash_flows.js",
+    "total": 3,
+    "fixed": 0,
+    "remaining": 3
+  },
+  {
+    "file": "trading-ui/scripts/widgets/tag-widget.js",
+    "total": 3,
+    "fixed": 0,
+    "remaining": 3
+  },
+  {
+    "file": "trading-ui/scripts/widgets/recent-trades-widget.js",
+    "total": 3,
+    "fixed": 0,
+    "remaining": 3
+  },
+  {
+    "file": "trading-ui/scripts/external-data-service.js",
+    "total": 2,
+    "fixed": 0,
+    "remaining": 2
+  },
+  {
+    "file": "trading-ui/scripts/header-system.js",
+    "total": 2,
+    "fixed": 0,
+    "remaining": 2
+  },
+  {
+    "file": "trading-ui/scripts/trading-journal-page.js",
+    "total": 2,
+    "fixed": 0,
+    "remaining": 2
+  },
+  {
+    "file": "trading-ui/scripts/notification-system.js",
+    "total": 2,
+    "fixed": 0,
+    "remaining": 2
+  },
+  {
+    "file": "trading-ui/scripts/auth.js",
+    "total": 2,
+    "fixed": 0,
+    "remaining": 2
+  },
+  {
+    "file": "trading-ui/scripts/debug-actions-menu-comprehensive.js",
+    "total": 2,
+    "fixed": 0,
+    "remaining": 2
+  },
+  {
+    "file": "trading-ui/scripts/ai-notes-integration.js",
+    "total": 2,
+    "fixed": 0,
+    "remaining": 2
+  },
+  {
+    "file": "trading-ui/scripts/tag-search-controller.js",
+    "total": 2,
+    "fixed": 0,
+    "remaining": 2
+  },
+  {
+    "file": "trading-ui/scripts/header-system-v2.js",
+    "total": 2,
+    "fixed": 0,
+    "remaining": 2
+  },
+  {
+    "file": "trading-ui/scripts/data_import.js",
+    "total": 2,
+    "fixed": 0,
+    "remaining": 2
+  },
+  {
+    "file": "trading-ui/scripts/yahoo-finance-service.js",
+    "total": 2,
+    "fixed": 0,
+    "remaining": 2
+  },
+  {
+    "file": "trading-ui/scripts/ticker-service.js",
+    "total": 2,
+    "fixed": 0,
+    "remaining": 2
+  },
+  {
+    "file": "trading-ui/scripts/icon-replacement-helper.js",
+    "total": 2,
+    "fixed": 0,
+    "remaining": 2
+  },
+  {
+    "file": "trading-ui/scripts/pagination-system.js",
+    "total": 2,
+    "fixed": 0,
+    "remaining": 2
+  },
+  {
+    "file": "trading-ui/scripts/currencies.js",
+    "total": 2,
+    "fixed": 0,
+    "remaining": 2
+  },
+  {
+    "file": "trading-ui/scripts/system-management/system-management-main.js",
+    "total": 2,
+    "fixed": 0,
+    "remaining": 2
+  },
+  {
+    "file": "trading-ui/scripts/system-management/sm-detailed-log.js",
+    "total": 2,
+    "fixed": 0,
+    "remaining": 2
+  },
+  {
+    "file": "trading-ui/scripts/system-management/core/sm-base.js",
+    "total": 2,
+    "fixed": 0,
+    "remaining": 2
+  },
+  {
+    "file": "trading-ui/scripts/modules/core-systems.js",
+    "total": 2,
+    "fixed": 0,
+    "remaining": 2
+  },
+  {
+    "file": "trading-ui/scripts/services/alert-condition-renderer.js",
+    "total": 2,
+    "fixed": 0,
+    "remaining": 2
+  },
+  {
+    "file": "trading-ui/scripts/services/watch-lists-ui-service.js",
+    "total": 2,
+    "fixed": 0,
+    "remaining": 2
+  },
+  {
+    "file": "trading-ui/scripts/widgets/recent-trade-plans-widget.js",
+    "total": 2,
+    "fixed": 0,
+    "remaining": 2
+  },
+  {
+    "file": "trading-ui/scripts/widgets/recent-items-widget.js",
+    "total": 2,
+    "fixed": 0,
+    "remaining": 2
+  },
+  {
+    "file": "trading-ui/scripts/server-monitor.js",
+    "total": 1,
+    "fixed": 0,
+    "remaining": 1
+  },
+  {
+    "file": "trading-ui/scripts/entity-details-renderer.js",
+    "total": 1,
+    "fixed": 0,
+    "remaining": 1
+  },
+  {
+    "file": "trading-ui/scripts/alerts.js",
+    "total": 1,
+    "fixed": 0,
+    "remaining": 1
+  },
+  {
+    "file": "trading-ui/scripts/icon-system.js",
+    "total": 1,
+    "fixed": 0,
+    "remaining": 1
+  },
+  {
+    "file": "trading-ui/scripts/flag-quick-action.js",
+    "total": 1,
+    "fixed": 0,
+    "remaining": 1
+  },
+  {
+    "file": "trading-ui/scripts/economic-calendar-page.js",
+    "total": 1,
+    "fixed": 0,
+    "remaining": 1
+  },
+  {
+    "file": "trading-ui/scripts/preferences-ui-v4.js",
+    "total": 1,
+    "fixed": 0,
+    "remaining": 1
+  },
+  {
+    "file": "trading-ui/scripts/button-color-checker.js",
+    "total": 1,
+    "fixed": 0,
+    "remaining": 1
+  },
+  {
+    "file": "trading-ui/scripts/log-recovery.js",
+    "total": 1,
+    "fixed": 0,
+    "remaining": 1
+  },
+  {
+    "file": "trading-ui/scripts/chart-management.js",
+    "total": 1,
+    "fixed": 0,
+    "remaining": 1
+  },
+  {
+    "file": "trading-ui/scripts/unified-log-api.js",
+    "total": 1,
+    "fixed": 0,
+    "remaining": 1
+  },
+  {
+    "file": "trading-ui/scripts/button-system-init.js",
+    "total": 1,
+    "fixed": 0,
+    "remaining": 1
+  },
+  {
+    "file": "trading-ui/scripts/modal-navigation-manager.js",
+    "total": 1,
+    "fixed": 0,
+    "remaining": 1
+  },
+  {
+    "file": "trading-ui/scripts/info-summary-system.js",
+    "total": 1,
+    "fixed": 0,
+    "remaining": 1
+  },
+  {
+    "file": "trading-ui/scripts/init-system-check.js",
+    "total": 1,
+    "fixed": 0,
+    "remaining": 1
+  },
+  {
+    "file": "trading-ui/scripts/add-ticker-modal.js",
+    "total": 1,
+    "fixed": 0,
+    "remaining": 1
+  },
+  {
+    "file": "trading-ui/scripts/quick-quality-check.js",
+    "total": 1,
+    "fixed": 0,
+    "remaining": 1
+  },
+  {
+    "file": "trading-ui/scripts/tag-ui-manager.js",
+    "total": 1,
+    "fixed": 0,
+    "remaining": 1
+  },
+  {
+    "file": "trading-ui/scripts/system-management/sections/sm-section-system-settings.js",
+    "total": 1,
+    "fixed": 0,
+    "remaining": 1
+  },
+  {
+    "file": "trading-ui/scripts/system-management/sections/sm-section-server.js",
+    "total": 1,
+    "fixed": 0,
+    "remaining": 1
+  },
+  {
+    "file": "trading-ui/scripts/system-management/sections/sm-section-alerts.js",
+    "total": 1,
+    "fixed": 0,
+    "remaining": 1
+  },
+  {
+    "file": "trading-ui/scripts/system-management/sections/sm-section-operations.js",
+    "total": 1,
+    "fixed": 0,
+    "remaining": 1
+  },
+  {
+    "file": "trading-ui/scripts/system-management/sections/sm-section-dashboard.js",
+    "total": 1,
+    "fixed": 0,
+    "remaining": 1
+  },
+  {
+    "file": "trading-ui/scripts/system-management/sections/sm-section-performance.js",
+    "total": 1,
+    "fixed": 0,
+    "remaining": 1
+  },
+  {
+    "file": "trading-ui/scripts/system-management/sections/sm-section-cache.js",
+    "total": 1,
+    "fixed": 0,
+    "remaining": 1
+  },
+  {
+    "file": "trading-ui/scripts/system-management/sections/sm-section-background-tasks.js",
+    "total": 1,
+    "fixed": 0,
+    "remaining": 1
+  },
+  {
+    "file": "trading-ui/scripts/system-management/core/sm-error-handler.js",
+    "total": 1,
+    "fixed": 0,
+    "remaining": 1
+  },
+  {
+    "file": "trading-ui/scripts/charts/vendor/lightweight-charts.standalone.production.js",
+    "total": 1,
+    "fixed": 0,
+    "remaining": 1
+  },
+  {
+    "file": "trading-ui/scripts/testing/automated/atr-traffic-light-test.js",
+    "total": 1,
+    "fixed": 0,
+    "remaining": 1
+  },
+  {
+    "file": "trading-ui/scripts/services/rich-text-editor-service.js",
+    "total": 1,
+    "fixed": 0,
+    "remaining": 1
+  },
+  {
+    "file": "trading-ui/scripts/services/crud-response-handler.js",
+    "total": 1,
+    "fixed": 0,
+    "remaining": 1
+  },
+  {
+    "file": "trading-ui/scripts/services/ai-analysis-data.js",
+    "total": 1,
+    "fixed": 0,
+    "remaining": 1
+  },
+  {
+    "file": "trading-ui/scripts/services/execution-cluster-helpers.js",
+    "total": 1,
+    "fixed": 0,
+    "remaining": 1
+  },
+  {
+    "file": "trading-ui/scripts/widgets/unified-pending-actions-widget-old.js",
+    "total": 1,
+    "fixed": 0,
+    "remaining": 1
+  },
+  {
+    "file": "trading-ui/scripts/widgets/unified-pending-actions-widget-refactored.js",
+    "total": 1,
+    "fixed": 0,
+    "remaining": 1
+  },
+  {
+    "file": "trading-ui/scripts/widgets/unified-pending-actions-widget.js",
+    "total": 1,
+    "fixed": 0,
+    "remaining": 1
+  },
+  {
+    "file": "trading-ui/scripts/debug/missing-functions-scanner.js",
+    "total": 1,
+    "fixed": 0,
+    "remaining": 1
+  }
+]

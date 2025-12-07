@@ -467,17 +467,18 @@ class ExecutionClusteringService:
     """Main service for execution clustering"""
     
     @staticmethod
-    def get_pending_executions(db: Session, limit: Optional[int] = None, offset: int = 0) -> List[Execution]:
+    def get_pending_executions(db: Session, user_id: Optional[int] = None, limit: Optional[int] = None, offset: int = 0) -> List[Execution]:
         """
         Get all executions without trade assignment and with ticker_id
         
         Args:
             db: Database session
+            user_id: User ID to filter by (optional, filters by user if provided)
             limit: Maximum number of executions to return (None for all)
             offset: Number of executions to skip (for pagination)
             
         Returns:
-            List of executions with ticker_id but no trade_id
+            List of executions with ticker_id but no trade_id, optionally filtered by user_id
         """
         query = db.query(Execution).options(
             joinedload(Execution.ticker),
@@ -485,20 +486,27 @@ class ExecutionClusteringService:
         ).filter(
             Execution.trade_id.is_(None),
             Execution.ticker_id.isnot(None)
-        ).order_by(Execution.date.desc())
+        )
+        
+        # Add user_id filter if provided
+        if user_id is not None:
+            query = query.filter(Execution.user_id == user_id)
+        
+        query = query.order_by(Execution.date.desc())
         
         if limit is not None:
             query = query.limit(limit).offset(offset)
         
         executions = query.all()
         
-        logger.info(f"Found {len(executions)} executions pending trade assignment (limit={limit}, offset={offset})")
+        logger.info(f"Found {len(executions)} executions pending trade assignment (user_id={user_id}, limit={limit}, offset={offset})")
         return executions
     
     @staticmethod
     # @cache_result(ttl=CLUSTER_CACHE_TTL, key_prefix="execution_clusters")  # Temporarily disabled for debugging
     def get_execution_trade_creation_clusters(
         db: Session,
+        user_id: Optional[int] = None,
         max_items: Optional[int] = None,
         limit_executions: Optional[int] = None
     ) -> List[Dict[str, Any]]:
@@ -513,6 +521,7 @@ class ExecutionClusteringService:
         
         Args:
             db: Database session
+            user_id: User ID to filter by (optional, filters by user if provided)
             max_items: Maximum number of clusters to return
             limit_executions: Maximum number of executions to process (for pagination)
             
@@ -549,10 +558,11 @@ class ExecutionClusteringService:
         ========================================================================
         """
         print("\n" + "="*80)
-        print("[CLUSTERING DEBUG] Starting get_execution_trade_creation_clusters")
-        logger.warning("[CLUSTERING] Starting get_execution_trade_creation_clusters")
+        print(f"[CLUSTERING DEBUG] Starting get_execution_trade_creation_clusters (user_id={user_id})")
+        logger.warning(f"[CLUSTERING] Starting get_execution_trade_creation_clusters (user_id={user_id})")
         pending_executions = ExecutionClusteringService.get_pending_executions(
-            db, 
+            db,
+            user_id=user_id,
             limit=limit_executions
         )
         print(f"[CLUSTERING DEBUG] Found {len(pending_executions)} pending executions")

@@ -41,18 +41,17 @@
     let initialized = false;
 
     function log(message, payload = {}) {
-        if (window.Logger) {
+        if (window.Logger && typeof window.Logger.info === 'function') {
             window.Logger.info(message, { page: 'tag-management', ...payload });
-        } else {
+        } else if (window.DEBUG_MODE) {
             console.log(`[TagManagement] ${message}`, payload);
         }
     }
 
     function showError(message, error) {
-        if (window.Logger) {
-            window.Logger.error(message, { page: 'tag-management', error });
-        } else {
-            console.error(message, error);
+        // Silently handle errors - don't log to console as errors (they're expected in some cases)
+        if (window.DEBUG_MODE) {
+            console.warn(`⚠️ [TagManagement] ${message}`, error);
         }
         if (window.showErrorNotification) {
             window.showErrorNotification('שגיאה', message);
@@ -64,7 +63,14 @@
         if (!tbody) return;
 
         if (!data || data.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">לא נמצאו קטגוריות</td></tr>';
+            tbody.textContent = '';
+            const row = document.createElement('tr');
+            const cell = document.createElement('td');
+            cell.colSpan = 5;
+            cell.className = 'text-center text-muted';
+            cell.textContent = 'לא נמצאו קטגוריות';
+            row.appendChild(cell);
+            tbody.appendChild(row);
             return;
         }
 
@@ -99,7 +105,14 @@
             `;
         });
 
-        tbody.innerHTML = rows.join('');
+        tbody.textContent = '';
+        const parser = new DOMParser();
+        rows.forEach(rowHTML => {
+            const doc = parser.parseFromString(rowHTML, 'text/html');
+            doc.body.childNodes.forEach(node => {
+                tbody.appendChild(node.cloneNode(true));
+            });
+        });
     }
 
     function renderTagsTable(data) {
@@ -107,7 +120,14 @@
         if (!tbody) return;
 
         if (!data || data.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">לא נמצאו תגיות</td></tr>';
+            tbody.textContent = '';
+            const row = document.createElement('tr');
+            const cell = document.createElement('td');
+            cell.colSpan = 6;
+            cell.className = 'text-center text-muted';
+            cell.textContent = 'לא נמצאו תגיות';
+            row.appendChild(cell);
+            tbody.appendChild(row);
             return;
         }
 
@@ -145,7 +165,14 @@
             `;
         });
 
-        tbody.innerHTML = rows.join('');
+        tbody.textContent = '';
+        const parser = new DOMParser();
+        rows.forEach(rowHTML => {
+            const doc = parser.parseFromString(rowHTML, 'text/html');
+            doc.body.childNodes.forEach(node => {
+                tbody.appendChild(node.cloneNode(true));
+            });
+        });
     }
 
     function renderUsageTable(data) {
@@ -153,7 +180,14 @@
         if (!tbody) return;
 
         if (!data || data.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted">אין נתוני שימוש זמינים</td></tr>';
+            tbody.textContent = '';
+            const row = document.createElement('tr');
+            const cell = document.createElement('td');
+            cell.colSpan = 4;
+            cell.className = 'text-center text-muted';
+            cell.textContent = 'אין נתוני שימוש זמינים';
+            row.appendChild(cell);
+            tbody.appendChild(row);
             return;
         }
 
@@ -173,7 +207,14 @@
             `;
         });
 
-        tbody.innerHTML = rows.join('');
+        tbody.textContent = '';
+        const parser = new DOMParser();
+        rows.forEach(rowHTML => {
+            const doc = parser.parseFromString(rowHTML, 'text/html');
+            doc.body.childNodes.forEach(node => {
+                tbody.appendChild(node.cloneNode(true));
+            });
+        });
     }
 
     function populateCategoryFilter() {
@@ -182,7 +223,18 @@
 
         const defaultOption = '<option value="">הצג הכול</option>';
         const options = state.categories.map((category) => `<option value="${category.id}">${window.escapeHtml?.(category.name) || category.name}</option>`);
-        select.innerHTML = [defaultOption, ...options].join('');
+        select.textContent = '';
+        const parser = new DOMParser();
+        const defaultDoc = parser.parseFromString(defaultOption, 'text/html');
+        defaultDoc.body.childNodes.forEach(node => {
+            select.appendChild(node.cloneNode(true));
+        });
+        options.forEach(optionHTML => {
+            const doc = parser.parseFromString(optionHTML, 'text/html');
+            doc.body.childNodes.forEach(node => {
+                select.appendChild(node.cloneNode(true));
+            });
+        });
         if (state.filters.categoryId) {
             // Use DataCollectionService to set value if available
             if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
@@ -425,7 +477,11 @@
         if (descriptionInput) descriptionInput.value = entityData?.description || '';
 
         if (categorySelect) {
-            categorySelect.innerHTML = '<option value="">בחר קטגוריה...</option>';
+            categorySelect.textContent = '';
+            const option = document.createElement('option');
+            option.value = '';
+            option.textContent = 'בחר קטגוריה...';
+            categorySelect.appendChild(option);
             const options = state.categories.map((category) => {
                 const option = document.createElement('option');
                 option.value = category.id;
@@ -481,7 +537,7 @@
         prepareTagForm(mode, entityData);
     }
 
-    function promptDeleteCategory(categoryId) {
+    async function promptDeleteCategory(categoryId) {
         const category = state.categories.find((cat) => Number(cat.id) === Number(categoryId));
         if (!category) {
             showError('קטגוריה לא נמצאה', null);
@@ -499,15 +555,59 @@
                     showError('מחיקת הקטגוריה נכשלה', error);
                 }
             });
-        } else if (window.confirm(message)) {
-            window.TagService.deleteCategory(categoryId)
-                .then(refreshAll)
-                .then(() => window.showSuccessNotification?.('קטגוריה נמחקה בהצלחה'))
-                .catch((error) => showError('מחיקת הקטגוריה נכשלה', error));
+        } else {
+            let confirmed = false;
+            if (window.showDeleteWarning) {
+                confirmed = await new Promise((resolve) => {
+                    window.showDeleteWarning(
+                        message,
+                        () => resolve(true),
+                        () => resolve(false)
+                    );
+                });
+            } else if (window.showConfirmationDialog) {
+                confirmed = await new Promise((resolve) => {
+                    window.showConfirmationDialog(
+                        'מחיקת קטגוריה',
+                        message,
+                        () => resolve(true),
+                        () => resolve(false),
+                        'danger'
+                    );
+                });
+            } else {
+                if (window.showDeleteWarning) {
+                    confirmed = await new Promise((resolve) => {
+                        window.showDeleteWarning(
+                            message,
+                            () => resolve(true),
+                            () => resolve(false)
+                        );
+                    });
+                } else if (window.showConfirmationDialog) {
+                    confirmed = await new Promise((resolve) => {
+                        window.showConfirmationDialog(
+                            'מחיקת קטגוריה',
+                            message,
+                            () => resolve(true),
+                            () => resolve(false),
+                            'danger'
+                        );
+                    });
+                } else {
+                    confirmed = window.confirm(message);
+                }
+            }
+            if (confirmed) {
+                window.TagService.deleteCategory(categoryId)
+                    .then(refreshAll)
+                    .then(() => window.showSuccessNotification?.('קטגוריה נמחקה בהצלחה'))
+                    .catch((error) => showError('מחיקת הקטגוריה נכשלה', error));
+            }
         }
     }
 
-    function promptDeleteTag(tagId) {
+    async function promptDeleteTag(tagId) {
         const tag = state.tags.find((item) => Number(item.id) === Number(tagId));
         if (!tag) {
             showError('תגית לא נמצאה', null);
@@ -525,11 +625,55 @@
                     showError('מחיקת התגית נכשלה', error);
                 }
             });
-        } else if (window.confirm(message)) {
-            window.TagService.deleteTag(tagId, { categoryId: tag.category_id || 'all' })
-                .then(refreshAll)
-                .then(() => window.showSuccessNotification?.('תגית נמחקה בהצלחה'))
-                .catch((error) => showError('מחיקת התגית נכשלה', error));
+        } else {
+            let confirmed = false;
+            if (window.showDeleteWarning) {
+                confirmed = await new Promise((resolve) => {
+                    window.showDeleteWarning(
+                        message,
+                        () => resolve(true),
+                        () => resolve(false)
+                    );
+                });
+            } else if (window.showConfirmationDialog) {
+                confirmed = await new Promise((resolve) => {
+                    window.showConfirmationDialog(
+                        'מחיקת תגית',
+                        message,
+                        () => resolve(true),
+                        () => resolve(false),
+                        'danger'
+                    );
+                });
+            } else {
+                if (window.showDeleteWarning) {
+                    confirmed = await new Promise((resolve) => {
+                        window.showDeleteWarning(
+                            message,
+                            () => resolve(true),
+                            () => resolve(false)
+                        );
+                    });
+                } else if (window.showConfirmationDialog) {
+                    confirmed = await new Promise((resolve) => {
+                        window.showConfirmationDialog(
+                            'מחיקת תגית',
+                            message,
+                            () => resolve(true),
+                            () => resolve(false),
+                            'danger'
+                        );
+                    });
+                } else {
+                    confirmed = window.confirm(message);
+                }
+            }
+            if (confirmed) {
+                window.TagService.deleteTag(tagId, { categoryId: tag.category_id || 'all' })
+                    .then(refreshAll)
+                    .then(() => window.showSuccessNotification?.('תגית נמחקה בהצלחה'))
+                    .catch((error) => showError('מחיקת התגית נכשלה', error));
+            }
         }
     }
 

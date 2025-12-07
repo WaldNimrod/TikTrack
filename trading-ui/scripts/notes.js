@@ -512,7 +512,49 @@ async function deleteNote(id) {
       );
     } else {
       // Fallback to simple confirm
-      if (!confirm('האם אתה בטוח שברצונך למחוק את ההערה?')) {
+      let confirmed = false;
+      if (window.showDeleteWarning) {
+        confirmed = await new Promise((resolve) => {
+          window.showDeleteWarning(
+            'האם אתה בטוח שברצונך למחוק את ההערה?',
+            () => resolve(true),
+            () => resolve(false)
+          );
+        });
+      } else if (window.showConfirmationDialog) {
+        confirmed = await new Promise((resolve) => {
+          window.showConfirmationDialog(
+            'מחיקת הערה',
+            'האם אתה בטוח שברצונך למחוק את ההערה?',
+            () => resolve(true),
+            () => resolve(false),
+            'danger'
+          );
+        });
+      } else {
+        if (window.showDeleteWarning) {
+          confirmed = await new Promise((resolve) => {
+            window.showDeleteWarning(
+              'האם אתה בטוח שברצונך למחוק את ההערה?',
+              () => resolve(true),
+              () => resolve(false)
+            );
+          });
+        } else if (window.showConfirmationDialog) {
+          confirmed = await new Promise((resolve) => {
+            window.showConfirmationDialog(
+              'מחיקת הערה',
+              'האם אתה בטוח שברצונך למחוק את ההערה?',
+              () => resolve(true),
+              () => resolve(false),
+              'danger'
+            );
+          });
+        } else {
+          confirmed = confirm('האם אתה בטוח שברצונך למחוק את ההערה?');
+        }
+      }
+      if (!confirmed) {
         return;
       }
       confirmDeleteNote(id);
@@ -589,9 +631,232 @@ async function updateNotesTable(notes, options = {}) {
           tableType: 'notes',
           data: safeNotes,
           render: async (pageData, context) => {
-            // Render with additional data
-            const rows = renderNotesTableRows(pageData, additionalData);
-            tbody.innerHTML = rows;
+            // Render with additional data - כמו ב-cash_flows: יוצרים row וממלאים עם innerHTML
+            tbody.textContent = '';
+            pageData.forEach(note => {
+              const row = document.createElement('tr');
+              row.className = 'table-cell-clickable';
+              
+              // קביעת האובייקט המקושר - שימוש בפונקציה הכללית
+              let relatedCellHtml = '-';
+              if (note.related_type_id && note.related_id && window.FieldRendererService && typeof window.FieldRendererService.buildRelatedEntityMeta === 'function' && typeof window.FieldRendererService.renderLinkedEntity === 'function') {
+                try {
+                  const { displayName, metaForEntity } = window.FieldRendererService.buildRelatedEntityMeta(
+                    note.related_type_id,
+                    note.related_id,
+                    additionalData
+                  );
+                  
+                  relatedCellHtml = window.FieldRendererService.renderLinkedEntity(
+                    note.related_type_id,
+                    note.related_id,
+                    displayName,
+                    metaForEntity
+                  );
+                } catch (error) {
+                  window.Logger?.warn('⚠️ renderLinkedEntity failed for note row, falling back to dash', { error, noteId: note?.id }, { page: "notes" });
+                  relatedCellHtml = '-';
+                }
+              }
+              
+              // תוכן
+              const noteContent = note.content || '';
+              const contentDisplay = (() => {
+                if (!noteContent || (typeof noteContent === 'string' && !noteContent.trim())) {
+                  return 'ללא תוכן';
+                }
+                if (window.FieldRendererService && typeof window.FieldRendererService.renderTextPreview === 'function') {
+                  try {
+                    return window.FieldRendererService.renderTextPreview(noteContent, { maxLength: 20, emptyPlaceholder: 'ללא תוכן' });
+                  } catch (error) {
+                    window.Logger?.warn('⚠️ Error rendering text preview', { error, noteId: note?.id, page: 'notes' });
+                  }
+                }
+                const fallbackPlain = String(noteContent).replace(/<[^>]*>/g, '').trim();
+                if (!fallbackPlain) {
+                  return 'ללא תוכן';
+                }
+                const truncated = fallbackPlain.length > 20 ? `${fallbackPlain.substring(0, 20).trimEnd()}…` : fallbackPlain;
+                const escape = (text) => String(text)
+                  .replace(/&/g, '&amp;')
+                  .replace(/</g, '&lt;')
+                  .replace(/>/g, '&gt;')
+                  .replace(/"/g, '&quot;')
+                  .replace(/'/g, '&#39;');
+                return `<span class="text-truncate-preview" title="${escape(fallbackPlain)}">${escape(truncated)}</span>`;
+              })();
+              
+              // קובץ מצורף
+              let attachmentDisplay = '-';
+              const noteAttachment = note.attachment || null;
+              if (noteAttachment && noteAttachment !== null && noteAttachment !== '' && typeof noteAttachment === 'string' && noteAttachment.trim() && noteAttachment !== 'null' && noteAttachment !== 'undefined') {
+                try {
+                  const fileExtension = noteAttachment.split('.').pop()?.toLowerCase();
+                  let fileIcon = '📄';
+                  if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg'].includes(fileExtension)) {
+                    fileIcon = '🖼️';
+                  } else if (['pdf'].includes(fileExtension)) {
+                    fileIcon = '📕';
+                  } else if (['doc', 'docx'].includes(fileExtension)) {
+                    fileIcon = '📘';
+                  } else if (['txt'].includes(fileExtension)) {
+                    fileIcon = '📄';
+                  } else if (['xls', 'xlsx'].includes(fileExtension)) {
+                    fileIcon = '📊';
+                  }
+                  const shortName = noteAttachment.length > 10 ? noteAttachment.substring(0, 10) + '...' : noteAttachment;
+                  attachmentDisplay = `${fileIcon} ${shortName}`;
+                } catch (error) {
+                  attachmentDisplay = '-';
+                }
+              }
+              
+              // תאריך יצירה
+              const createdEnvelope = window.dateUtils?.ensureDateEnvelope
+                ? window.dateUtils.ensureDateEnvelope(note.created_at)
+                : note.created_at;
+              const dateDisplay = window.FieldRendererService?.renderDate
+                ? window.FieldRendererService.renderDate(createdEnvelope || note.created_at)
+                : window.dateUtils?.formatDate
+                  ? window.dateUtils.formatDate(createdEnvelope || note.created_at, { includeTime: false })
+                  : (() => {
+                      try {
+                        const dateValue = createdEnvelope?.utc || createdEnvelope?.local || note.created_at;
+                        if (window.dateUtils && typeof window.dateUtils.ensureDateEnvelope === 'function') {
+                          const envelope = window.dateUtils.ensureDateEnvelope(dateValue);
+                          if (envelope && envelope.epochMs) {
+                            const parsed = new Date(envelope.epochMs);
+                            if (!Number.isNaN(parsed.getTime())) {
+                              if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
+                                return window.FieldRendererService.renderDate(parsed, false);
+                              }
+                              if (window.dateUtils?.formatDate) {
+                                return window.dateUtils.formatDate(parsed, { includeTime: false });
+                              }
+                              return parsed.toLocaleDateString('he-IL');
+                            }
+                          }
+                        }
+                      } catch (error) {
+                        window.Logger?.warn('⚠️ notes table date fallback failed', { error, noteId: note?.id }, { page: 'notes' });
+                      }
+                      return 'לא מוגדר';
+                    })();
+              const dateSortValue = window.dateUtils?.getEpochMilliseconds
+                ? window.dateUtils.getEpochMilliseconds(createdEnvelope || note.created_at)
+                : (createdEnvelope?.epochMs || createdEnvelope?.utc || createdEnvelope?.local || note.created_at || '');
+              
+              // תאריך עדכון
+              const updatedDateCell = (() => {
+                const rawDate = note.updated_at || note.created_at || null;
+                if (!rawDate) {
+                  return `<td class="col-updated"><span class="updated-value-empty">לא זמין</span></td>`;
+                }
+                let dateDisplay = '';
+                let epoch = null;
+                if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
+                  dateDisplay = window.FieldRendererService.renderDate(rawDate, true);
+                  if (window.dateUtils && typeof window.dateUtils.getEpochMilliseconds === 'function') {
+                    const envelope = window.dateUtils.ensureDateEnvelope ? window.dateUtils.ensureDateEnvelope(rawDate) : rawDate;
+                    epoch = window.dateUtils.getEpochMilliseconds(envelope || rawDate);
+                  } else if (rawDate instanceof Date) {
+                    epoch = rawDate.getTime();
+                  } else if (typeof rawDate === 'string') {
+                    const parsed = Date.parse(rawDate);
+                    epoch = Number.isNaN(parsed) ? null : parsed;
+                  } else if (rawDate && typeof rawDate === 'object' && rawDate.epochMs) {
+                    epoch = rawDate.epochMs;
+                  }
+                } else {
+                  const envelope = window.dateUtils && typeof window.dateUtils.ensureDateEnvelope === 'function'
+                    ? window.dateUtils.ensureDateEnvelope(rawDate)
+                    : rawDate && typeof rawDate === 'object' && (rawDate.epochMs || rawDate.utc || rawDate.local)
+                      ? rawDate
+                      : null;
+                  epoch = (() => {
+                    if (window.dateUtils && typeof window.dateUtils.getEpochMilliseconds === 'function') {
+                      return window.dateUtils.getEpochMilliseconds(envelope || rawDate);
+                    }
+                    if (typeof window.getEpochMilliseconds === 'function') {
+                      return window.getEpochMilliseconds(envelope || rawDate);
+                    }
+                    if (envelope && typeof envelope.epochMs === 'number') {
+                      return envelope.epochMs;
+                    }
+                    if (rawDate instanceof Date) {
+                      return rawDate.getTime();
+                    }
+                    if (typeof rawDate === 'string') {
+                      const parsed = Date.parse(rawDate);
+                      return Number.isNaN(parsed) ? null : parsed;
+                    }
+                    return null;
+                  })();
+                  if (epoch === null || Number.isNaN(epoch)) {
+                    return `<td class="col-updated"><span class="updated-value-empty">לא זמין</span></td>`;
+                  }
+                  if (window.dateUtils && typeof window.dateUtils.formatDateTime === 'function') {
+                    dateDisplay = window.dateUtils.formatDateTime(envelope || rawDate);
+                  } else if (window.dateUtils && typeof window.dateUtils.formatDate === 'function') {
+                    dateDisplay = window.dateUtils.formatDate(envelope || rawDate, { includeTime: true });
+                  } else {
+                    try {
+                      const dateObj = new Date(epoch);
+                      dateDisplay = window.formatDate ? window.formatDate(dateObj, true) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(dateObj, { includeTime: true }) : dateObj.toLocaleString('he-IL', {
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      }));
+                    } catch (err) {
+                      window.Logger?.warn('⚠️ notes updated-cell date formatting failed', { err, noteId: note?.id }, { page: 'notes' });
+                      return `<td class="col-updated"><span class="updated-value-empty">לא זמין</span></td>`;
+                    }
+                  }
+                }
+                if (!dateDisplay || dateDisplay === '-') {
+                  return `<td class="col-updated"><span class="updated-value-empty">לא זמין</span></td>`;
+                }
+                return `<td class="col-updated"${epoch ? ` data-epoch="${epoch}"` : ''} title="${dateDisplay}"><span class="updated-value" dir="ltr">${dateDisplay}</span></td>`;
+              })();
+              
+              // Actions menu
+              const actionsMenu = (() => {
+                if (!window.createActionsMenu) return '<!-- Actions menu not available -->';
+                const noteId = note?.id ? parseInt(note.id) : null;
+                if (!noteId) {
+                  return '<!-- Invalid note ID -->';
+                }
+                const result = window.createActionsMenu([
+                  { type: 'VIEW', onclick: `window.showEntityDetails('note', ${noteId}, { mode: 'view' })`, title: 'צפה בפרטי הערה' },
+                  { type: 'EDIT', onclick: `editNote(${noteId})`, title: 'ערוך הערה' },
+                  { type: 'DELETE', onclick: `deleteNote(${noteId})`, title: 'מחק הערה' }
+                ]);
+                return result || '';
+              })();
+              
+              // בניית השורה - כמו ב-cash_flows: createElement + DOMParser
+              const rowHTML = `
+                <td class="col-linked-object related-cell">${relatedCellHtml}</td>
+                <td class="col-content">${contentDisplay}</td>
+                <td class="col-attachment">${attachmentDisplay}</td>
+                <td class="col-created" data-date='${dateSortValue}'>${dateDisplay}</td>
+                ${updatedDateCell}
+                <td class="col-actions actions-cell">${actionsMenu}</td>
+              `;
+              row.textContent = '';
+              const parser = new DOMParser();
+              const doc = parser.parseFromString(`<table><tbody><tr>${rowHTML}</tr></tbody></table>`, 'text/html');
+              const tempRow = doc.body.querySelector('tr');
+              if (tempRow) {
+                Array.from(tempRow.children).forEach(cell => {
+                  row.appendChild(cell.cloneNode(true));
+                });
+              }
+              
+              tbody.appendChild(row);
+            });
             
             // Update buttons
             if (window.advancedButtonSystem && typeof window.advancedButtonSystem.processButtons === 'function') {
@@ -624,18 +889,27 @@ async function updateNotesTable(notes, options = {}) {
     
     // בדיקה שהנתונים קיימים
     if (!safeNotes || safeNotes.length === 0) {
-      const emptyMessage = `
-        <tr>
-          <td colspan="6" class="text-center text-muted">
+      tbody.textContent = '';
+      const emptyRow = document.createElement('tr');
+      const emptyRowHTML = `
+        <td colspan="6" class="text-center text-muted">
           <div style="padding: 20px;">
             <h5>📝 אין הערות</h5>
             <p>לא נמצאו הערות במערכת</p>
             <button data-button-type="ADD" data-variant="full" data-icon="➕" data-text="הוסף הערה ראשונה" data-classes="btn-sm" data-onclick="openNoteDetails()" data-tooltip="הוסף הערה ראשונה למערכת" data-tooltip-placement="top" data-tooltip-trigger="hover"></button>
           </div>
         </td>
-      </tr>
-    `;
-      tbody.innerHTML = emptyMessage;
+      `;
+      emptyRow.textContent = '';
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(`<table><tbody><tr>${emptyRowHTML}</tr></tbody></table>`, 'text/html');
+      const tempRow = doc.body.querySelector('tr');
+      if (tempRow) {
+        Array.from(tempRow.children).forEach(cell => {
+          emptyRow.appendChild(cell.cloneNode(true));
+        });
+      }
+      tbody.appendChild(emptyRow);
       
       // 🔘 עדכון כפתורים דינמיים
       if (window.ButtonSystem && typeof window.ButtonSystem.initializeButtons === 'function') {
@@ -648,9 +922,231 @@ async function updateNotesTable(notes, options = {}) {
       return;
     }
 
-    // בניית שורות הטבלה
-    const rows = renderNotesTableRows(safeNotes, additionalData);
-    tbody.innerHTML = rows;
+    // בניית שורות הטבלה - כמו ב-cash_flows: יוצרים row וממלאים עם innerHTML
+    safeNotes.forEach(note => {
+      const row = document.createElement('tr');
+      row.className = 'table-cell-clickable';
+      
+      // קביעת האובייקט המקושר - שימוש בפונקציה הכללית
+      let relatedCellHtml = '-';
+      if (note.related_type_id && note.related_id && window.FieldRendererService && typeof window.FieldRendererService.buildRelatedEntityMeta === 'function' && typeof window.FieldRendererService.renderLinkedEntity === 'function') {
+        try {
+          const { displayName, metaForEntity } = window.FieldRendererService.buildRelatedEntityMeta(
+            note.related_type_id,
+            note.related_id,
+            additionalData
+          );
+          
+          relatedCellHtml = window.FieldRendererService.renderLinkedEntity(
+            note.related_type_id,
+            note.related_id,
+            displayName,
+            metaForEntity
+          );
+        } catch (error) {
+          window.Logger?.warn('⚠️ renderLinkedEntity failed for note row, falling back to dash', { error, noteId: note?.id }, { page: "notes" });
+          relatedCellHtml = '-';
+        }
+      }
+      
+      // הצגת תוכן HTML עם הגבלה ל-20 תווים
+      const noteContent = note.content || '';
+      const contentDisplay = (() => {
+        if (!noteContent || (typeof noteContent === 'string' && !noteContent.trim())) {
+          return 'ללא תוכן';
+        }
+        if (window.FieldRendererService && typeof window.FieldRendererService.renderTextPreview === 'function') {
+          try {
+            return window.FieldRendererService.renderTextPreview(noteContent, { maxLength: 20, emptyPlaceholder: 'ללא תוכן' });
+          } catch (error) {
+            window.Logger?.warn('⚠️ Error rendering text preview', { error, noteId: note?.id, page: 'notes' });
+          }
+        }
+        const fallbackPlain = String(noteContent).replace(/<[^>]*>/g, '').trim();
+        if (!fallbackPlain) {
+          return 'ללא תוכן';
+        }
+        const truncated = fallbackPlain.length > 20 ? `${fallbackPlain.substring(0, 20).trimEnd()}…` : fallbackPlain;
+        const escape = (text) => String(text)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;');
+        return `<span class="text-truncate-preview" title="${escape(fallbackPlain)}">${escape(truncated)}</span>`;
+      })();
+      
+      // הצגת קובץ עם אייקון
+      let attachmentDisplay = '-';
+      const noteAttachment = note.attachment || null;
+      if (noteAttachment && noteAttachment !== null && noteAttachment !== '' && typeof noteAttachment === 'string' && noteAttachment.trim() && noteAttachment !== 'null' && noteAttachment !== 'undefined') {
+        try {
+          const fileExtension = noteAttachment.split('.').pop()?.toLowerCase();
+          let fileIcon = '📄';
+          if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg'].includes(fileExtension)) {
+            fileIcon = '🖼️';
+          } else if (['pdf'].includes(fileExtension)) {
+            fileIcon = '📕';
+          } else if (['doc', 'docx'].includes(fileExtension)) {
+            fileIcon = '📘';
+          } else if (['txt'].includes(fileExtension)) {
+            fileIcon = '📄';
+          } else if (['xls', 'xlsx'].includes(fileExtension)) {
+            fileIcon = '📊';
+          }
+          const shortName = noteAttachment.length > 10 ? noteAttachment.substring(0, 10) + '...' : noteAttachment;
+          attachmentDisplay = `${fileIcon} ${shortName}`;
+        } catch (error) {
+          attachmentDisplay = '-';
+        }
+      }
+      
+      // תאריך יצירה
+      const createdEnvelope = window.dateUtils?.ensureDateEnvelope
+        ? window.dateUtils.ensureDateEnvelope(note.created_at)
+        : note.created_at;
+      const dateDisplay = window.FieldRendererService?.renderDate
+        ? window.FieldRendererService.renderDate(createdEnvelope || note.created_at)
+        : window.dateUtils?.formatDate
+          ? window.dateUtils.formatDate(createdEnvelope || note.created_at, { includeTime: false })
+          : (() => {
+              try {
+                const dateValue = createdEnvelope?.utc || createdEnvelope?.local || note.created_at;
+                if (window.dateUtils && typeof window.dateUtils.ensureDateEnvelope === 'function') {
+                  const envelope = window.dateUtils.ensureDateEnvelope(dateValue);
+                  if (envelope && envelope.epochMs) {
+                    const parsed = new Date(envelope.epochMs);
+                    if (!Number.isNaN(parsed.getTime())) {
+                      if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
+                        return window.FieldRendererService.renderDate(parsed, false);
+                      }
+                      if (window.dateUtils?.formatDate) {
+                        return window.dateUtils.formatDate(parsed, { includeTime: false });
+                      }
+                      return parsed.toLocaleDateString('he-IL');
+                    }
+                  }
+                }
+              } catch (error) {
+                window.Logger?.warn('⚠️ notes table date fallback failed', { error, noteId: note?.id }, { page: 'notes' });
+              }
+              return 'לא מוגדר';
+            })();
+      const dateSortValue = window.dateUtils?.getEpochMilliseconds
+        ? window.dateUtils.getEpochMilliseconds(createdEnvelope || note.created_at)
+        : (createdEnvelope?.epochMs || createdEnvelope?.utc || createdEnvelope?.local || note.created_at || '');
+      
+      // תאריך עדכון
+      const updatedDateCell = (() => {
+        const rawDate = note.updated_at || note.created_at || null;
+        if (!rawDate) {
+          return `<td class="col-updated"><span class="updated-value-empty">לא זמין</span></td>`;
+        }
+        let dateDisplay = '';
+        let epoch = null;
+        if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
+          dateDisplay = window.FieldRendererService.renderDate(rawDate, true);
+          if (window.dateUtils && typeof window.dateUtils.getEpochMilliseconds === 'function') {
+            const envelope = window.dateUtils.ensureDateEnvelope ? window.dateUtils.ensureDateEnvelope(rawDate) : rawDate;
+            epoch = window.dateUtils.getEpochMilliseconds(envelope || rawDate);
+          } else if (rawDate instanceof Date) {
+            epoch = rawDate.getTime();
+          } else if (typeof rawDate === 'string') {
+            const parsed = Date.parse(rawDate);
+            epoch = Number.isNaN(parsed) ? null : parsed;
+          } else if (rawDate && typeof rawDate === 'object' && rawDate.epochMs) {
+            epoch = rawDate.epochMs;
+          }
+        } else {
+          const envelope = window.dateUtils && typeof window.dateUtils.ensureDateEnvelope === 'function'
+            ? window.dateUtils.ensureDateEnvelope(rawDate)
+            : rawDate && typeof rawDate === 'object' && (rawDate.epochMs || rawDate.utc || rawDate.local)
+              ? rawDate
+              : null;
+          epoch = (() => {
+            if (window.dateUtils && typeof window.dateUtils.getEpochMilliseconds === 'function') {
+              return window.dateUtils.getEpochMilliseconds(envelope || rawDate);
+            }
+            if (typeof window.getEpochMilliseconds === 'function') {
+              return window.getEpochMilliseconds(envelope || rawDate);
+            }
+            if (envelope && typeof envelope.epochMs === 'number') {
+              return envelope.epochMs;
+            }
+            if (rawDate instanceof Date) {
+              return rawDate.getTime();
+            }
+            if (typeof rawDate === 'string') {
+              const parsed = Date.parse(rawDate);
+              return Number.isNaN(parsed) ? null : parsed;
+            }
+            return null;
+          })();
+          if (epoch === null || Number.isNaN(epoch)) {
+            return `<td class="col-updated"><span class="updated-value-empty">לא זמין</span></td>`;
+          }
+          if (window.dateUtils && typeof window.dateUtils.formatDateTime === 'function') {
+            dateDisplay = window.dateUtils.formatDateTime(envelope || rawDate);
+          } else if (window.dateUtils && typeof window.dateUtils.formatDate === 'function') {
+            dateDisplay = window.dateUtils.formatDate(envelope || rawDate, { includeTime: true });
+          } else {
+            try {
+              const dateObj = new Date(epoch);
+              dateDisplay = window.formatDate ? window.formatDate(dateObj, true) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(dateObj, { includeTime: true }) : dateObj.toLocaleString('he-IL', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+              }));
+            } catch (err) {
+              window.Logger?.warn('⚠️ notes updated-cell date formatting failed', { err, noteId: note?.id }, { page: 'notes' });
+              return `<td class="col-updated"><span class="updated-value-empty">לא זמין</span></td>`;
+            }
+          }
+        }
+        if (!dateDisplay || dateDisplay === '-') {
+          return `<td class="col-updated"><span class="updated-value-empty">לא זמין</span></td>`;
+        }
+        return `<td class="col-updated"${epoch ? ` data-epoch="${epoch}"` : ''} title="${dateDisplay}"><span class="updated-value" dir="ltr">${dateDisplay}</span></td>`;
+      })();
+      
+      // Actions menu
+      const actionsMenu = (() => {
+        if (!window.createActionsMenu) return '<!-- Actions menu not available -->';
+        const noteId = note?.id ? parseInt(note.id) : null;
+        if (!noteId) {
+          return '<!-- Invalid note ID -->';
+        }
+        const result = window.createActionsMenu([
+          { type: 'VIEW', onclick: `window.showEntityDetails('note', ${noteId}, { mode: 'view' })`, title: 'צפה בפרטי הערה' },
+          { type: 'EDIT', onclick: `editNote(${noteId})`, title: 'ערוך הערה' },
+          { type: 'DELETE', onclick: `deleteNote(${noteId})`, title: 'מחק הערה' }
+        ]);
+        return result || '';
+      })();
+      
+      // בניית השורה - כמו ב-cash_flows: row.innerHTML → DOMParser
+      const rowHTML = `
+        <td class="col-linked-object related-cell">${relatedCellHtml}</td>
+        <td class="col-content">${contentDisplay}</td>
+        <td class="col-attachment">${attachmentDisplay}</td>
+        <td class="col-created" data-date='${dateSortValue}'>${dateDisplay}</td>
+        ${updatedDateCell}
+        <td class="col-actions actions-cell">${actionsMenu}</td>
+      `;
+      row.textContent = '';
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(`<table><tbody><tr>${rowHTML}</tr></tbody></table>`, 'text/html');
+      const tempRow = doc.body.querySelector('tr');
+      if (tempRow) {
+        Array.from(tempRow.children).forEach(cell => {
+          row.appendChild(cell.cloneNode(true));
+        });
+      }
+      
+      tbody.appendChild(row);
+    });
     
     window.Logger.info('✅ טבלת הערות עודכנה בהצלחה עם', safeNotes.length, 'הערות', { page: "notes", keepInfo: true });
     
@@ -674,406 +1170,8 @@ async function updateNotesTable(notes, options = {}) {
   }
 }
 
-/**
- * Render notes table rows
- * @param {Array} notes - Array of notes to render
- * @param {Object} additionalData - Object with accounts, trades, tradePlans, tickers arrays
- * @returns {string} HTML string of table rows
- */
-function renderNotesTableRows(notes, additionalData = {}) {
-    if (!notes || notes.length === 0) {
-        return '';
-    }
-    
-    const accounts = additionalData.accounts || [];
-    const trades = additionalData.trades || [];
-    const tradePlans = additionalData.tradePlans || [];
-    const tickers = additionalData.tickers || [];
-    
-    return notes.map(note => {
-        try {
-        const createdEnvelope = window.dateUtils?.ensureDateEnvelope
-          ? window.dateUtils.ensureDateEnvelope(note.created_at)
-          : note.created_at;
-        const dateDisplay = window.FieldRendererService?.renderDate
-          ? window.FieldRendererService.renderDate(createdEnvelope || note.created_at)
-          : window.dateUtils?.formatDate
-            ? window.dateUtils.formatDate(createdEnvelope || note.created_at, { includeTime: false })
-            : (() => {
-                try {
-                  // Use dateUtils for consistent date parsing
-                  let parsed;
-                  const dateValue = createdEnvelope?.utc || createdEnvelope?.local || note.created_at;
-                  if (window.dateUtils && typeof window.dateUtils.ensureDateEnvelope === 'function') {
-                    const envelope = window.dateUtils.ensureDateEnvelope(dateValue);
-                    if (envelope && envelope.epochMs) {
-                      parsed = new Date(envelope.epochMs);
-                    } else {
-                      parsed = new Date(dateValue);
-                    }
-                  } else if (dateValue && typeof dateValue === 'object' && typeof dateValue.epochMs === 'number') {
-                    parsed = new Date(dateValue.epochMs);
-                  } else {
-                    parsed = new Date(dateValue);
-                  }
-                  
-                  if (!Number.isNaN(parsed.getTime())) {
-                    // Use FieldRendererService or dateUtils for formatting
-                    if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
-                      return window.FieldRendererService.renderDate(parsed, false);
-                    }
-                    if (window.dateUtils?.formatDate) {
-                      return window.dateUtils.formatDate(parsed, { includeTime: false });
-                    }
-                    // Last resort: use toLocaleDateString
-                    return parsed.toLocaleDateString('he-IL');
-                  }
-                } catch (error) {
-                  window.Logger?.warn('⚠️ notes table date fallback failed', { error, noteId: note?.id }, { page: 'notes' });
-                }
-                return 'לא מוגדר';
-              })();
-        const dateSortValue = window.dateUtils?.getEpochMilliseconds
-          ? window.dateUtils.getEpochMilliseconds(createdEnvelope || note.created_at)
-          : (createdEnvelope?.epochMs || createdEnvelope?.utc || createdEnvelope?.local || note.created_at || '');
-
-        // הצגת תוכן HTML עם הגבלה ל-20 תווים
-        // Debug: Check note content
-        const noteContent = note.content || '';
-        const noteAttachment = note.attachment || null;
-        
-        // Ensure content is processed correctly
-        const contentDisplay = (() => {
-          // Check if content exists and is not empty
-          if (!noteContent || (typeof noteContent === 'string' && !noteContent.trim())) {
-            window.Logger?.warn('⚠️ Note content is empty', { noteId: note?.id, content: noteContent, page: 'notes' });
-            return 'ללא תוכן';
-          }
-          
-          // Use FieldRendererService if available
-          if (window.FieldRendererService && typeof window.FieldRendererService.renderTextPreview === 'function') {
-            try {
-              return window.FieldRendererService.renderTextPreview(noteContent, { maxLength: 20, emptyPlaceholder: 'ללא תוכן' });
-            } catch (error) {
-              window.Logger?.warn('⚠️ Error rendering text preview', { error, noteId: note?.id, page: 'notes' });
-            }
-          }
-          
-          // Fallback: strip HTML and truncate
-          const fallbackPlain = String(noteContent).replace(/<[^>]*>/g, '').trim();
-          if (!fallbackPlain) {
-            return 'ללא תוכן';
-          }
-          const truncated = fallbackPlain.length > 20 ? `${fallbackPlain.substring(0, 20).trimEnd()}…` : fallbackPlain;
-          const escape = (text) => String(text)
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;')
-            .replace(/'/g, '&#39;');
-          return `<span class="text-truncate-preview" title="${escape(fallbackPlain)}">${escape(truncated)}</span>`;
-        })();
-
-        // הצגת קובץ עם אייקון ו-10 תווים ראשונים
-        let attachmentDisplay = '-';
-        // Only show attachment if it exists and is not empty/null
-        if (noteAttachment && noteAttachment !== null && noteAttachment !== '') {
-          // Ensure attachment is a string before processing
-          const fileName = typeof noteAttachment === 'string' ? noteAttachment : String(noteAttachment || '');
-          
-          // Only process if fileName is a valid non-empty string (not just whitespace)
-          if (fileName && fileName.trim() && fileName !== 'null' && fileName !== 'undefined') {
-            try {
-              const fileExtension = fileName.split('.').pop()?.toLowerCase();
-              let fileIcon = '📄'; // ברירת מחדל
-
-              // קביעת אייקון לפי סוג הקובץ
-              if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg'].includes(fileExtension)) {
-                fileIcon = '🖼️';
-              } else if (['pdf'].includes(fileExtension)) {
-                fileIcon = '📕';
-              } else if (['doc', 'docx'].includes(fileExtension)) {
-                fileIcon = '📘';
-              } else if (['txt'].includes(fileExtension)) {
-                fileIcon = '📄';
-              } else if (['xls', 'xlsx'].includes(fileExtension)) {
-                fileIcon = '📊';
-              }
-
-              // הצגת אייקון + 10 תווים ראשונים
-              const shortName = fileName.length > 10 ? fileName.substring(0, 10) + '...' : fileName;
-              attachmentDisplay = `${fileIcon} ${shortName}`;
-            } catch (error) {
-              window.Logger?.warn('⚠️ Error processing attachment', { error, noteId: note?.id, attachment: noteAttachment, page: 'notes' });
-              attachmentDisplay = '-';
-            }
-          } else {
-            // Invalid attachment value - show dash
-            attachmentDisplay = '-';
-          }
-        }
-
-      // קביעת האובייקט המקושר באמצעות המערכת הכללית
-      const dataSources = {
-        accounts: accounts,
-        trades: trades,
-        tradePlans: tradePlans,
-        tickers: tickers
-      };
-
-      let relatedCellHtml = '';
-      if (window.FieldRendererService && typeof window.FieldRendererService.renderLinkedEntity === 'function') {
-        try {
-          let displayName = '';
-          let metaForEntity = {
-            renderMode: 'notes-table'
-          };
-
-          switch (note.related_type_id) {
-            case 1: { // Trading Account
-              const account = accounts.find(a => a && a.id === note.related_id);
-              const accountName = account?.name || account?.account_name || `חשבון מסחר ${note.related_id}`;
-              displayName = accountName;
-              metaForEntity = {
-                renderMode: 'notes-table',
-                name: accountName,
-                status: account?.status || '',
-                currency: account?.currency_symbol || account?.currency || ''
-              };
-              break;
-            }
-            case 2: { // Trade
-              const trade = trades.find(t => t && t.id === note.related_id);
-              const tradeTicker = trade?.ticker_symbol || trade?.ticker?.symbol || (() => {
-                if (trade?.ticker_id) {
-                  const ticker = tickers.find(tk => tk && tk.id === trade.ticker_id);
-                  return ticker?.symbol;
-                }
-                return null;
-              })();
-              const tickerSymbol = tradeTicker || `טרייד ${note.related_id}`;
-              const tradeDate = trade?.created_at || trade?.opened_at || trade?.date || '';
-              displayName = tickerSymbol;
-              metaForEntity = {
-                renderMode: 'notes-table',
-                ticker: tickerSymbol,
-                date: tradeDate,
-                status: trade?.status || '',
-                side: trade?.side || '',
-                investment_type: trade?.investment_type || ''
-              };
-              break;
-            }
-            case 3: { // Trade Plan
-              const plan = tradePlans.find(p => p && p.id === note.related_id);
-              const planTicker = plan?.ticker?.symbol || plan?.ticker_symbol || (() => {
-                if (plan?.ticker_id) {
-                  const ticker = tickers.find(tk => tk && tk.id === plan.ticker_id);
-                  return ticker?.symbol;
-                }
-                return null;
-              })();
-              const tickerSymbol = planTicker || `תוכנית ${note.related_id}`;
-              const planDate = plan?.created_at || plan?.date || '';
-              displayName = tickerSymbol;
-              metaForEntity = {
-                renderMode: 'notes-table',
-                ticker: tickerSymbol,
-                date: planDate,
-                status: plan?.status || '',
-                side: plan?.side || '',
-                investment_type: plan?.investment_type || ''
-              };
-              break;
-            }
-            case 4: { // Ticker
-              const ticker = tickers.find(tk => tk && tk.id === note.related_id);
-              const tickerSymbol = ticker?.symbol || `טיקר ${note.related_id}`;
-              displayName = tickerSymbol;
-              metaForEntity = {
-                renderMode: 'notes-table',
-                ticker: tickerSymbol,
-                status: ticker?.status || ''
-              };
-              break;
-            }
-            default: {
-              displayName = `אובייקט ${note.related_id}`;
-              metaForEntity = {
-                renderMode: 'notes-table'
-              };
-            }
-          }
-
-          relatedCellHtml = window.FieldRendererService.renderLinkedEntity(
-            note.related_type_id,
-            note.related_id,
-            displayName,
-            metaForEntity
-          );
-        } catch (error) {
-          window.Logger?.warn('⚠️ renderLinkedEntity failed, falling back to basic renderer', { error, noteId: note.id }, { page: "notes" });
-          relatedCellHtml = '';
-        }
-      }
-
-      if (!relatedCellHtml) {
-        // שימוש בלוגיקה הישנה כ-Fallback
-        const relatedObjectInfo = window.getRelatedObjectDisplay ? 
-          window.getRelatedObjectDisplay(note, dataSources, { showLink: true, format: 'full' }) :
-          { display: 'כללי', icon: '🌐', class: 'related-general', color: '', bgColor: '', type: 'general', id: null };
-
-        window.Logger.info('🔍 Related object info result:', {
-          display: relatedObjectInfo.display,
-          class: relatedObjectInfo.class,
-          type: relatedObjectInfo.type,
-          id: relatedObjectInfo.id
-        }, { page: "notes" });
-
-        relatedCellHtml = `
-          <div class="related-object-cell ${relatedObjectInfo.class}" 
-           style="${relatedObjectInfo.color ? `color: ${relatedObjectInfo.color};` : ''} ${relatedObjectInfo.bgColor ? `background-color: ${relatedObjectInfo.bgColor};` : ''}"
-           title="${relatedObjectInfo.type || 'כללי'}">
-            ${relatedObjectInfo.display}
-          </div>
-        `;
-      }
-
-        // Debug: Log note data to verify content and attachment are correct
-        window.Logger?.debug('🔍 Building note table row', {
-          noteId: note?.id,
-          hasContent: !!noteContent,
-          contentLength: noteContent?.length || 0,
-          contentPreview: noteContent ? String(noteContent).substring(0, 50) : 'null',
-          hasAttachment: !!noteAttachment,
-          attachmentValue: noteAttachment,
-          contentDisplay: contentDisplay.substring(0, 50),
-          attachmentDisplay,
-          page: 'notes'
-        });
-
-        return `
-          <tr class="table-cell-clickable">
-            <td class="related-cell">${relatedCellHtml}</td>
-            <td class="col-content">${contentDisplay}</td>
-            <td class="col-attachment">${attachmentDisplay}</td>
-            <td class="col-created" data-date='${dateSortValue}'>${dateDisplay}</td>
-            ${(() => {
-              // Prefer FieldRendererService.renderDate for consistent date formatting
-              const rawDate = note.updated_at || note.created_at || null;
-              
-              if (!rawDate) {
-                return `<td class="col-updated"><span class="updated-value-empty">לא זמין</span></td>`;
-              }
-
-              // Use FieldRendererService.renderDate for proper date formatting
-              let dateDisplay = '';
-              let epoch = null;
-
-              if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
-                // Use FieldRendererService to render date with time
-                dateDisplay = window.FieldRendererService.renderDate(rawDate, true);
-                
-                // Get epoch for sorting
-                if (window.dateUtils && typeof window.dateUtils.getEpochMilliseconds === 'function') {
-                  const envelope = window.dateUtils.ensureDateEnvelope ? window.dateUtils.ensureDateEnvelope(rawDate) : rawDate;
-                  epoch = window.dateUtils.getEpochMilliseconds(envelope || rawDate);
-                } else if (rawDate instanceof Date) {
-                  epoch = rawDate.getTime();
-                } else if (typeof rawDate === 'string') {
-                  const parsed = Date.parse(rawDate);
-                  epoch = Number.isNaN(parsed) ? null : parsed;
-                } else if (rawDate && typeof rawDate === 'object' && rawDate.epochMs) {
-                  epoch = rawDate.epochMs;
-                }
-              } else {
-                // Fallback: work directly with date envelope objects or raw values
-                const envelope = window.dateUtils && typeof window.dateUtils.ensureDateEnvelope === 'function'
-                  ? window.dateUtils.ensureDateEnvelope(rawDate)
-                  : rawDate && typeof rawDate === 'object' && (rawDate.epochMs || rawDate.utc || rawDate.local)
-                    ? rawDate
-                    : null;
-
-                // Derive epoch milliseconds in a canonical way
-                epoch = (() => {
-                  if (window.dateUtils && typeof window.dateUtils.getEpochMilliseconds === 'function') {
-                    return window.dateUtils.getEpochMilliseconds(envelope || rawDate);
-                  }
-                  if (typeof window.getEpochMilliseconds === 'function') {
-                    return window.getEpochMilliseconds(envelope || rawDate);
-                  }
-                  if (envelope && typeof envelope.epochMs === 'number') {
-                    return envelope.epochMs;
-                  }
-                  if (rawDate instanceof Date) {
-                    return rawDate.getTime();
-                  }
-                  if (typeof rawDate === 'string') {
-                    const parsed = Date.parse(rawDate);
-                    return Number.isNaN(parsed) ? null : parsed;
-                  }
-                  return null;
-                })();
-
-                if (epoch === null || Number.isNaN(epoch)) {
-                  return `<td class="col-updated"><span class="updated-value-empty">לא זמין</span></td>`;
-                }
-
-                // Build date display using unified date utilities
-                dateDisplay = (() => {
-                  if (window.dateUtils && typeof window.dateUtils.formatDateTime === 'function') {
-                    return window.dateUtils.formatDateTime(envelope || rawDate);
-                  }
-                  if (window.dateUtils && typeof window.dateUtils.formatDate === 'function') {
-                    return window.dateUtils.formatDate(envelope || rawDate, { includeTime: true });
-                  }
-                  try {
-                    const dateObj = new Date(epoch);
-                    return window.formatDate ? window.formatDate(dateObj, true) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(dateObj, { includeTime: true }) : dateObj.toLocaleString('he-IL', {
-                      day: '2-digit',
-                      month: '2-digit',
-                      year: 'numeric',
-                      hour: '2-digit',
-                      minute: '2-digit'
-                    }));
-                  } catch (err) {
-                    window.Logger?.warn('⚠️ notes updated-cell date formatting failed', { err, noteId: note?.id }, { page: 'notes' });
-                    return 'לא מוגדר';
-                  }
-                })();
-              }
-
-              if (!dateDisplay || dateDisplay === '-') {
-                return `<td class="col-updated"><span class="updated-value-empty">לא זמין</span></td>`;
-              }
-
-              return `<td class="col-updated"${epoch ? ` data-epoch="${epoch}"` : ''} title="${dateDisplay}"><span class="updated-value" dir="ltr">${dateDisplay}</span></td>`;
-            })()}
-            <td class='actions-cell'>
-              ${(() => {
-                if (!window.createActionsMenu) return '<!-- Actions menu not available -->';
-                // Ensure note.id is properly escaped and is a number
-                const noteId = note?.id ? parseInt(note.id) : null;
-                if (!noteId) {
-                  window.Logger?.warn('⚠️ Note ID is missing or invalid', { note, page: 'notes' });
-                  return '<!-- Invalid note ID -->';
-                }
-                const result = window.createActionsMenu([
-                  { type: 'VIEW', onclick: `window.showEntityDetails('note', ${noteId}, { mode: 'view' })`, title: 'צפה בפרטי הערה' },
-                  { type: 'EDIT', onclick: `editNote(${noteId})`, title: 'ערוך הערה' },
-                  { type: 'DELETE', onclick: `deleteNote(${noteId})`, title: 'מחק הערה' }
-                ]);
-                return result || '';
-              })()}
-            </td>
-          </tr>
-        `;
-        } catch (error) {
-          window.Logger.error(`❌ Error processing note ${note?.id}:`, error, { page: "notes" });
-          return `<tr><td colspan="6" class="text-center text-danger">שגיאה בעיבוד הערה ${note?.id}</td></tr>`;
-        }
-    }).join('');
-}
+// REMOVED: renderNotesTableRows() - All rendering is now done directly in updateNotesTable()
+// using the general FieldRendererService.buildRelatedEntityMeta() function
 
 // פונקציה לעדכון סיכום הערות
 /**
@@ -1102,18 +1200,17 @@ function updateNotesSummary(notes) {
       // Fallback - מערכת סיכום נתונים לא זמינה
       const summaryStatsElement = document.getElementById('summaryStats');
       if (summaryStatsElement) {
-        summaryStatsElement.innerHTML = `
-          <div style="color: #dc3545; font-weight: bold;">
-            ⚠️ מערכת סיכום נתונים לא זמינה - נא לרענן את הדף
-          </div>
-        `;
+        summaryStatsElement.textContent = '';
+        const div = document.createElement('div');
+        div.style.color = '#dc3545';
+        div.style.fontWeight = 'bold';
+        div.textContent = '⚠️ מערכת סיכום נתונים לא זמינה - נא לרענן את הדף';
+        summaryStatsElement.appendChild(div);
       }
     }
   } catch (error) {
-    window.Logger.error('שגיאה בעדכון סיכום הערות:', error, { page: "notes" });
-    if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה בעדכון סיכום הערות', error.message);
-    }
+    window.Logger.warn('⚠️ שגיאה בעדכון סיכום הערות (לא קריטי - הדף ימשיך לעבוד):', error, { page: "notes" });
+    // Don't show error notification for non-critical summary update errors
   }
 }
 
@@ -1173,7 +1270,11 @@ function populateSelect(selectId, data, field, prefix = '') {
     // Data available for population
   }
 
-  select.innerHTML = '<option value="">בחר אובייקט לשיוך...</option>';
+  select.textContent = '';
+  const option = document.createElement('option');
+  option.value = '';
+  option.textContent = 'בחר אובייקט לשיוך...';
+  select.appendChild(option);
 
   data.forEach(item => {
     const option = document.createElement('option');
@@ -1541,7 +1642,27 @@ async function saveNote() {
     tag_ids: { id: 'noteTags', type: 'tags', default: [] }
   });
 
-  const content = noteData.content || ''; // HTML content from rich text editor
+  // Try to get content from rich text editor if not collected
+  let content = noteData.content || '';
+  if (!content || content.trim() === '') {
+    // Fallback: try to get content directly from RichTextEditorService
+    if (window.RichTextEditorService && typeof window.RichTextEditorService.getContent === 'function') {
+      content = window.RichTextEditorService.getContent('noteContent') || '';
+      window.Logger?.debug('📝 Retrieved content from RichTextEditorService fallback', {
+        contentLength: content?.length || 0,
+        page: 'notes'
+      });
+    }
+  }
+
+  window.Logger?.info('📋 Note data collected', {
+    contentLength: content?.length || 0,
+    hasContent: !!content,
+    related_type_id: noteData.related_type_id,
+    related_id: noteData.related_id,
+    page: 'notes'
+  });
+
   const related_type_id = noteData.related_type_id;
   const related_id = noteData.related_id;
   const tagIds = Array.isArray(noteData.tag_ids) ? noteData.tag_ids : [];
@@ -1549,6 +1670,11 @@ async function saveNote() {
 
   const textContent = content.replace(/<[^>]*>/g, '').trim();
   if (!textContent || textContent.length === 0) {
+    window.Logger?.warn('⚠️ Empty note content detected', {
+      contentLength: content?.length || 0,
+      textContentLength: textContent?.length || 0,
+      page: 'notes'
+    });
     window.showErrorNotification?.('שגיאה', 'תוכן ההערה חובה');
     return;
   }
@@ -1609,7 +1735,16 @@ async function saveNote() {
   }
 
   const isEditMode = form.dataset.mode === 'edit';
-  const formEntityId = form.dataset.entityId || form.dataset.noteId || form.querySelector('input[name="id"]')?.value || null;
+  // Get entity ID - try dataset first, then DataCollectionService, then querySelector
+  let formEntityId = form.dataset.entityId || form.dataset.noteId || null;
+  if (!formEntityId) {
+    const idInput = form.querySelector('input[name="id"]');
+    if (idInput && idInput.id && window.DataCollectionService) {
+      formEntityId = window.DataCollectionService.getValue(idInput.id, 'int', null);
+    } else if (idInput) {
+      formEntityId = idInput.value || null;
+    }
+  }
   const noteId = isEditMode && formEntityId ? parseInt(formEntityId, 10) : null;
   const method = noteId ? 'PUT' : 'POST';
   const url = noteId ? `/api/notes/${noteId}` : '/api/notes/';
@@ -1628,10 +1763,19 @@ async function saveNote() {
       payload = formData;
     } else {
       const requestData = {
-        content,
+        content: content || '',
         related_type_id: parseInt(related_type_id),
         related_id: parseInt(related_id)
       };
+      
+      window.Logger?.info('📤 Sending note creation request', {
+        contentLength: requestData.content?.length || 0,
+        hasContent: !!requestData.content,
+        related_type_id: requestData.related_type_id,
+        related_id: requestData.related_id,
+        page: 'notes'
+      });
+      
       payload = requestData;
     }
 
@@ -1658,6 +1802,21 @@ async function saveNote() {
       });
     }
 
+    // Use UnifiedCRUDService for consistent CRUD operations
+    let crudResult = null;
+    if (window.UnifiedCRUDService && typeof window.UnifiedCRUDService.saveEntity === 'function') {
+      if (noteId) {
+        payload.id = noteId;
+      }
+      crudResult = await window.UnifiedCRUDService.saveEntity('note', payload, {
+        modalId: 'notesModal',
+        successMessage: noteId ? 'הערה עודכנה בהצלחה!' : 'הערה נשמרה בהצלחה!',
+        entityName: 'הערה',
+        reloadFn,
+        requiresHardReload: false
+      });
+    } else {
+      // Fallback to direct API call with CRUDResponseHandler
     const crudOptions = {
       modalId: 'notesModal',
       successMessage: noteId ? 'הערה עודכנה בהצלחה!' : 'הערה נשמרה בהצלחה!',
@@ -1666,11 +1825,11 @@ async function saveNote() {
       requiresHardReload: false
     };
 
-    let crudResult = null;
     if (noteId) {
       crudResult = await CRUDResponseHandler.handleUpdateResponse(response, crudOptions);
     } else {
       crudResult = await CRUDResponseHandler.handleSaveResponse(response, crudOptions);
+      }
     }
 
     // Cache invalidation after CRUDResponseHandler processes the response
@@ -1855,10 +2014,19 @@ async function confirmDeleteNote(noteId) {
   if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
     window.ModalManagerV2.hideModal('deleteNoteModal');
   } else {
-    // Fallback ל-Bootstrap modal
-    const modal = bootstrap.Modal.getInstance(document.getElementById('deleteNoteModal'));
-    if (modal) {
-      modal.hide();
+    // Fallback ל-Bootstrap modal - עם ניקוי backdrop
+    const modalElement = document.getElementById('deleteNoteModal');
+    if (modalElement) {
+      const modal = bootstrap.Modal.getInstance(modalElement);
+      if (modal) {
+        modal.hide();
+        // ניקוי backdrops אחרי סגירה
+        if (window.ModalManagerV2?._cleanupBootstrapBackdrops) {
+          setTimeout(() => {
+            window.ModalManagerV2._cleanupBootstrapBackdrops();
+          }, 100);
+        }
+      }
     }
   }
 
@@ -1877,6 +2045,17 @@ async function deleteNoteFromServer(noteId) {
 
   while (retryCount < maxRetries) {
     try {
+      // Use UnifiedCRUDService for consistent CRUD operations
+      if (window.UnifiedCRUDService && typeof window.UnifiedCRUDService.deleteEntity === 'function') {
+        await window.UnifiedCRUDService.deleteEntity('note', noteId, {
+          successMessage: 'הערה נמחקה בהצלחה!',
+          entityName: 'הערה',
+          reloadFn: () => window.loadNotesData({ force: true }),
+          requiresHardReload: false
+        });
+        return; // יציאה מוצלחת
+      } else {
+        // Fallback to direct API call with CRUDResponseHandler
       const useService = typeof window.NotesData?.deleteNote === 'function';
       const response = useService
         ? await window.NotesData.deleteNote(noteId)
@@ -1891,6 +2070,7 @@ async function deleteNoteFromServer(noteId) {
         requiresHardReload: false
       });
       return; // יציאה מוצלחת
+      }
     } catch (error) {
       retryCount++;
 
@@ -2082,22 +2262,38 @@ function setupNoteValidationEvents() {
 
         const displayElement = document.getElementById('currentAttachmentDisplay');
         if (displayElement) {
-          displayElement.innerHTML = `
-            <div style="display: flex; align-items: center; gap: 8px;">
-              <span>${fileIcon}</span>
-              <span>${fileName} (חדש)</span>
-              <span style="color: ${window.getTableColors ? window.getTableColors().positive : '#28a745'}; font-weight: bold;">✓ נבחר</span>
-            </div>
-          `;
+          displayElement.textContent = '';
+          const container = document.createElement('div');
+          container.style.display = 'flex';
+          container.style.alignItems = 'center';
+          container.style.gap = '8px';
+          const iconSpan = document.createElement('span');
+          iconSpan.textContent = fileIcon;
+          container.appendChild(iconSpan);
+          const nameSpan = document.createElement('span');
+          nameSpan.textContent = `${fileName} (חדש)`;
+          container.appendChild(nameSpan);
+          const checkSpan = document.createElement('span');
+          checkSpan.style.color = window.getTableColors ? window.getTableColors().positive : '#28a745';
+          checkSpan.style.fontWeight = 'bold';
+          checkSpan.textContent = '✓ נבחר';
+          container.appendChild(checkSpan);
+          displayElement.appendChild(container);
         }
 
         // עדכון כפתורי הפעולה
         const actionsElement = document.getElementById('attachmentActions');
         if (actionsElement) {
-          actionsElement.innerHTML = `
+          actionsElement.textContent = '';
+          const actionsHTML = `
             <button data-button-type="SECONDARY" data-variant="full" data-text="✅ קובץ נבחר" data-classes="btn-sm" type="button" disabled></button>
             <button data-button-type="CANCEL" data-variant="full" data-icon="❌" data-text="בטל בחירה" data-classes="btn-sm" data-onclick="clearSelectedFile()" type="button"></button>
           `;
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(actionsHTML, 'text/html');
+          doc.body.childNodes.forEach(node => {
+            actionsElement.appendChild(node.cloneNode(true));
+          });
           actionsElement.style.display = 'block';
         }
       }
@@ -2389,7 +2585,14 @@ function setEditorContent(content, mode = 'add') {
       return;
     }
 
-    editor.innerHTML = content || '';
+    editor.textContent = '';
+    if (content) {
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(content, 'text/html');
+      doc.body.childNodes.forEach(node => {
+        editor.appendChild(node.cloneNode(true));
+      });
+    }
   
   } catch (error) {
     window.Logger.error('שגיאה בהגדרת תוכן עורך:', error, { page: "notes" });
@@ -2580,10 +2783,26 @@ async function viewNote(noteId) {
             }
           }
         } else {
-          // Fallback ל-Bootstrap modal
+          // Fallback ל-Bootstrap modal - עם backdrop: false וניקוי
           if (bootstrap?.Modal) {
-            const modal = new bootstrap.Modal(modalElement);
+            // ניקוי backdrops לפני פתיחה
+            if (window.ModalManagerV2?._cleanupBootstrapBackdrops) {
+              window.ModalManagerV2._cleanupBootstrapBackdrops();
+            }
+            const modal = new bootstrap.Modal(modalElement, { backdrop: false });
             modal.show();
+            // ניקוי backdrops אחרי פתיחה
+            if (window.ModalManagerV2?._cleanupBootstrapBackdrops) {
+              setTimeout(() => {
+                window.ModalManagerV2._cleanupBootstrapBackdrops();
+              }, 50);
+            }
+            // עדכון z-index
+            if (window.ModalZIndexManager?.forceUpdate) {
+              setTimeout(() => {
+                window.ModalZIndexManager.forceUpdate(modalElement);
+              }, 50);
+            }
           }
         }
       }
@@ -2619,7 +2838,16 @@ async function loadNoteForViewing(noteId) {
 
     // מילוי המודל
     document.getElementById('viewNoteRelated').textContent = getNoteRelatedDisplay(note);
-    document.getElementById('viewNoteContent').innerHTML = note.content || 'ללא תוכן';
+    const viewNoteContent = document.getElementById('viewNoteContent');
+    if (viewNoteContent) {
+      viewNoteContent.textContent = '';
+      const content = note.content || 'ללא תוכן';
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(content, 'text/html');
+      doc.body.childNodes.forEach(node => {
+        viewNoteContent.appendChild(node.cloneNode(true));
+      });
+    }
     const createdEnvelope = window.dateUtils?.ensureDateEnvelope
       ? window.dateUtils.ensureDateEnvelope(note.created_at)
       : note.created_at;
@@ -2665,16 +2893,26 @@ async function loadNoteForViewing(noteId) {
           fileIcon = '📊';
         }
 
-        attachmentElement.innerHTML = `
-          <a href="/api/notes/files/${fileName}" target="_blank" class="btn btn-sm">
-            ${fileIcon} ${fileName}
-          </a>
-        `;
+        attachmentElement.textContent = '';
+        const link = document.createElement('a');
+        link.href = `/api/notes/files/${fileName}`;
+        link.target = '_blank';
+        link.className = 'btn btn-sm';
+        link.textContent = `${fileIcon} ${fileName}`;
+        attachmentElement.appendChild(link);
       } else {
-        attachmentElement.innerHTML = '<span class="text-muted">אין קובץ מצורף</span>';
+        attachmentElement.textContent = '';
+        const span = document.createElement('span');
+        span.className = 'text-muted';
+        span.textContent = 'אין קובץ מצורף';
+        attachmentElement.appendChild(span);
       }
     } else {
-      attachmentElement.innerHTML = '<span class="text-muted">אין קובץ מצורף</span>';
+      attachmentElement.textContent = '';
+      const span = document.createElement('span');
+      span.className = 'text-muted';
+      span.textContent = 'אין קובץ מצורף';
+      attachmentElement.appendChild(span);
     }
 
   } catch {
@@ -2748,10 +2986,19 @@ function editCurrentNote() {
       if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
         window.ModalManagerV2.hideModal('viewNoteModal');
       } else {
-        // Fallback ל-Bootstrap modal
-        const viewModal = bootstrap.Modal.getInstance(document.getElementById('viewNoteModal'));
-        if (viewModal) {
-          viewModal.hide();
+        // Fallback ל-Bootstrap modal - עם ניקוי backdrop
+        const modalElement = document.getElementById('viewNoteModal');
+        if (modalElement) {
+          const viewModal = bootstrap.Modal.getInstance(modalElement);
+          if (viewModal) {
+            viewModal.hide();
+            // ניקוי backdrops אחרי סגירה
+            if (window.ModalManagerV2?._cleanupBootstrapBackdrops) {
+              setTimeout(() => {
+                window.ModalManagerV2._cleanupBootstrapBackdrops();
+              }, 100);
+            }
+          }
         }
       }
 
@@ -2807,18 +3054,25 @@ function displayCurrentAttachment(attachment) {
         fileIcon = '📊';
       }
 
-      displayElement.innerHTML = `
-        <div style="display: flex; align-items: center; gap: 8px;">
-          <span>${fileIcon}</span>
-          <span>${fileName}</span>
-          <a href="/api/notes/files/${fileName}" 
-             target="_blank" 
-             class="btn btn-sm" 
-             style="margin-right: auto;">
-            👁️ צפה
-          </a>
-        </div>
-      `;
+      displayElement.textContent = '';
+      const container = document.createElement('div');
+      container.style.display = 'flex';
+      container.style.alignItems = 'center';
+      container.style.gap = '8px';
+      const iconSpan = document.createElement('span');
+      iconSpan.textContent = fileIcon;
+      container.appendChild(iconSpan);
+      const nameSpan = document.createElement('span');
+      nameSpan.textContent = fileName;
+      container.appendChild(nameSpan);
+      const link = document.createElement('a');
+      link.href = `/api/notes/files/${fileName}`;
+      link.target = "_blank";
+      link.className = "btn btn-sm";
+      link.style.marginRight = "auto";
+      link.textContent = "👁️ צפה";
+      container.appendChild(link);
+      displayElement.appendChild(container);
       actionsElement.style.display = 'block';
     } else {
       displayElement.textContent = 'אין קובץ מצורף';

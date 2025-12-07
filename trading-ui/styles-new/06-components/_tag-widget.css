@@ -10,6 +10,37 @@
 /* ===== Widget Container ===== */
 #tagWidgetContainer {
   /* Inherits from card styles */
+  position: relative;
+  /* Ensure tag cloud doesn't get clipped by parent containers */
+  overflow: visible;
+  z-index: 1;
+  /* Maintain stable height - prevent jumps when overlay opens/closes */
+  min-height: 200px; /* Minimum stable height */
+  height: auto; /* Allow growth but prevent shrinking below min */
+}
+
+/* Ensure parent containers don't clip tag cloud or overlays */
+.content-section#main .section-body .row > [class*="col-"] > .card#tagWidgetContainer {
+  overflow: visible;
+}
+
+/* Ensure section body doesn't clip overlays */
+.content-section#main .section-body {
+  overflow: visible;
+}
+
+/* Ensure row doesn't clip overlays */
+.content-section#main .section-body .row {
+  overflow: visible;
+}
+
+/* Position tag cloud container to prevent clipping */
+#tagWidgetCloudContainer {
+  position: relative;
+  /* If content is clipped, adjust positioning */
+  max-height: 400px;
+  overflow-y: auto;
+  overflow-x: visible;
 }
 
 #tagWidgetContainer .card-header {

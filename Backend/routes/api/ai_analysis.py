@@ -9,7 +9,11 @@ from config.database import get_db
 from services.ai_analysis_service import AIAnalysisService, PromptTemplateService
 from services.llm_providers.llm_provider_manager import LLMProviderManager
 from routes.api.base_entity_utils import BaseEntityUtils
+from routes.api.base_entity_decorators import require_authentication
 from services.date_normalization_service import DateNormalizationService
+from services.ai_analysis_error_codes import (
+    AIAnalysisErrorCodes, categorize_error, format_error_response, get_error_message
+)
 import logging
 from typing import Dict, Any
 
@@ -22,34 +26,21 @@ ai_analysis_service = AIAnalysisService()
 provider_manager = LLMProviderManager()
 
 
-def get_current_user_id() -> int:
-    """Get current user ID from session"""
-    # Try session first
-    user_id = session.get('user_id')
-    if user_id:
-        logger.debug(f"get_current_user_id: Found user_id={user_id} in session")
-        return user_id
-    
-    # Try g.user_id
-    user_id = getattr(g, 'user_id', None)
-    if user_id:
-        logger.debug(f"get_current_user_id: Found user_id={user_id} in g")
-        return user_id
-    
-    # Fallback to default user (development mode)
-    user_id = 1
-    logger.debug(f"get_current_user_id: No user_id in session or g, using default user_id={user_id}")
-    return user_id
-
-
 @ai_analysis_bp.route('/generate', methods=['POST'])
+@require_authentication()
 def generate_analysis():
     """Create new AI analysis"""
     db: Session = next(get_db())
     normalizer = None
     
     try:
-        user_id = get_current_user_id()
+        user_id = getattr(g, 'user_id', None)
+        if not user_id:
+            logger.error("❌ User ID not found in Flask context - user not authenticated")
+            return jsonify({
+                'status': 'error',
+                'message': 'User authentication required'
+            }), 401
         data = request.get_json() or {}
         
         template_id = data.get('template_id')
@@ -58,15 +49,23 @@ def generate_analysis():
         
         # Validation
         if not template_id:
+            error_response = format_error_response(
+                AIAnalysisErrorCodes.VALIDATION_MISSING_TEMPLATE_ID,
+                'template_id is required'
+            )
             return jsonify({
                 'status': 'error',
-                'message': 'template_id is required'
+                **error_response
             }), 400
         
         if not isinstance(variables, dict):
+            error_response = format_error_response(
+                AIAnalysisErrorCodes.VALIDATION_MISSING_VARIABLES,
+                'variables must be a dictionary'
+            )
             return jsonify({
                 'status': 'error',
-                'message': 'variables must be a dictionary'
+                **error_response
             }), 400
         
         # Generate analysis
@@ -85,27 +84,26 @@ def generate_analysis():
         
     except ValueError as e:
         logger.warning(f"Invalid request: {e}")
+        error_code = categorize_error(e, str(e))
+        error_response = format_error_response(error_code, str(e))
         return jsonify({
             'status': 'error',
-            'message': str(e),
-            'error_type': 'validation_error'
+            **error_response
         }), 400
     except Exception as e:
         logger.error(f"Error generating analysis: {e}", exc_info=True)
-        # In development, include error details
-        error_message = 'Internal server error'
-        error_type = 'internal_error'
-        if hasattr(e, '__class__'):
-            error_type = e.__class__.__name__
-        # In development mode, include more details
+        error_code = categorize_error(e, str(e))
+        error_response = format_error_response(error_code, str(e))
+        
+        # In development mode, include original error details
         import os
         if os.getenv('FLASK_ENV') == 'development':
-            error_message = str(e)
+            error_response['original_error'] = str(e)
+            error_response['error_type'] = type(e).__name__
         
         return jsonify({
             'status': 'error',
-            'message': error_message,
-            'error_type': error_type
+            **error_response
         }), 500
     finally:
         db.close()
@@ -136,13 +134,20 @@ def get_templates():
 
 
 @ai_analysis_bp.route('/history', methods=['GET'])
+@require_authentication()
 def get_history():
     """Get analysis history"""
     db: Session = next(get_db())
     normalizer = None
     
     try:
-        user_id = get_current_user_id()
+        user_id = getattr(g, 'user_id', None)
+        if not user_id:
+            logger.error("❌ User ID not found in Flask context - user not authenticated")
+            return jsonify({
+                'status': 'error',
+                'message': 'User authentication required'
+            }), 401
         normalizer = BaseEntityUtils.get_request_normalizer(request, fallback_user_id=user_id)
         
         limit = request.args.get('limit', type=int, default=50)
@@ -185,13 +190,20 @@ def get_history():
 
 
 @ai_analysis_bp.route('/history/<int:request_id>', methods=['GET'])
+@require_authentication()
 def get_analysis_by_id(request_id: int):
     """Get specific analysis by ID"""
     db: Session = next(get_db())
     normalizer = None
     
     try:
-        user_id = get_current_user_id()
+        user_id = getattr(g, 'user_id', None)
+        if not user_id:
+            logger.error("❌ User ID not found in Flask context - user not authenticated")
+            return jsonify({
+                'status': 'error',
+                'message': 'User authentication required'
+            }), 401
         normalizer = BaseEntityUtils.get_request_normalizer(request, fallback_user_id=user_id)
         
         request_obj = ai_analysis_service.get_analysis_by_id(
@@ -225,14 +237,70 @@ def get_analysis_by_id(request_id: int):
         db.close()
 
 
+@ai_analysis_bp.route('/history/<int:request_id>', methods=['DELETE'])
+@require_authentication()
+def delete_analysis(request_id: int):
+    """Delete specific analysis by ID"""
+    db: Session = next(get_db())
+    normalizer = None
+    
+    try:
+        user_id = getattr(g, 'user_id', None)
+        if not user_id:
+            logger.error("❌ User ID not found in Flask context - user not authenticated")
+            return jsonify({
+                'status': 'error',
+                'message': 'User authentication required'
+            }), 401
+        normalizer = BaseEntityUtils.get_request_normalizer(request, fallback_user_id=user_id)
+        
+        # Delete the analysis
+        deleted = ai_analysis_service.delete_analysis(
+            db=db,
+            request_id=request_id,
+            user_id=user_id
+        )
+        
+        if not deleted:
+            return jsonify({
+                'status': 'error',
+                'message': 'Analysis not found or not authorized'
+            }), 404
+        
+        # Return success response
+        return jsonify({
+            'status': 'success',
+            'message': 'Analysis deleted successfully',
+            'data': {
+                'deleted_id': request_id
+            }
+        }), 200
+        
+    except Exception as e:
+        logger.error(f"Error deleting analysis: {e}", exc_info=True)
+        return jsonify({
+            'status': 'error',
+            'message': 'Internal server error'
+        }), 500
+    finally:
+        db.close()
+
+
 @ai_analysis_bp.route('/history/<int:request_id>/availability', methods=['GET'])
+@require_authentication()
 def check_analysis_availability(request_id: int):
     """Check availability of analysis response (cache and notes)"""
     db: Session = next(get_db())
     normalizer = None
     
     try:
-        user_id = get_current_user_id()
+        user_id = getattr(g, 'user_id', None)
+        if not user_id:
+            logger.error("❌ User ID not found in Flask context - user not authenticated")
+            return jsonify({
+                'status': 'error',
+                'message': 'User authentication required'
+            }), 401
         normalizer = BaseEntityUtils.get_request_normalizer(request, fallback_user_id=user_id)
         
         # Get analysis
@@ -281,9 +349,13 @@ def check_analysis_availability(request_id: int):
                 note_exists = False
                 note_id = None
         
+        # Check if response_text exists in DB
+        has_db = bool(request_obj.response_text and request_obj.status == 'completed')
+        
         result = {
             'analysis_id': request_id,
             'has_cache': False,  # Frontend will check cache
+            'has_db': has_db,  # Check if response_text exists in DB
             'has_note': note_exists,
             'note_id': note_id if note_exists else None
         }
@@ -304,28 +376,53 @@ def check_analysis_availability(request_id: int):
 
 
 @ai_analysis_bp.route('/history/availability/batch', methods=['POST'])
+@require_authentication()
 def check_analysis_availability_batch():
     """Check availability for multiple analyses (cache and notes)"""
     db: Session = next(get_db())
-    normalizer = None
     
     try:
-        user_id = get_current_user_id()
-        normalizer = BaseEntityUtils.get_request_normalizer(request, fallback_user_id=user_id)
+        user_id = getattr(g, 'user_id', None)
+        if not user_id:
+            logger.error("❌ User ID not found in Flask context - user not authenticated")
+            return jsonify({
+                'status': 'error',
+                'message': 'User authentication required'
+            }), 401
+        logger.debug(f"Checking availability batch for user_id={user_id}")
         
         data = request.get_json() or {}
         analysis_ids = data.get('analysis_ids', [])
+        logger.debug(f"Received analysis_ids: {analysis_ids}")
         
         if not analysis_ids or not isinstance(analysis_ids, list):
+            logger.warning(f"Invalid analysis_ids in batch request: {analysis_ids}")
             return jsonify({
                 'status': 'error',
                 'message': 'analysis_ids array is required'
             }), 400
         
+        # Convert to integers if needed
+        try:
+            analysis_ids = [int(id) for id in analysis_ids if id is not None]
+        except (ValueError, TypeError) as e:
+            logger.warning(f"Error converting analysis_ids to integers: {e}")
+            return jsonify({
+                'status': 'error',
+                'message': 'Invalid analysis_ids format'
+            }), 400
+        
+        if not analysis_ids:
+            # Return empty result map if no valid IDs
+            return jsonify({
+                'status': 'success',
+                'data': {}
+            }), 200
+        
         # Get all analyses
         from models.ai_analysis import AIAnalysisRequest
         from models.note import Note
-        from sqlalchemy import or_, func, and_
+        from datetime import timedelta
         
         analyses = db.query(AIAnalysisRequest).filter(
             AIAnalysisRequest.id.in_(analysis_ids),
@@ -333,23 +430,26 @@ def check_analysis_availability_batch():
         ).all()
         
         # Get all notes created around the same time as analyses
+        notes = []
         if analyses:
-            analysis_times = [a.created_at for a in analyses]
-            min_time = min(analysis_times)
-            max_time = max(analysis_times)
-            
-            # Expand time window by 5 minutes on each side
-            from datetime import timedelta
-            min_time = min_time - timedelta(minutes=5)
-            max_time = max_time + timedelta(minutes=5)
-            
-            notes = db.query(Note).filter(
-                Note.user_id == user_id,
-                Note.created_at >= min_time,
-                Note.created_at <= max_time
-            ).all()
-        else:
-            notes = []
+            try:
+                analysis_times = [a.created_at for a in analyses if a.created_at]
+                if analysis_times:
+                    min_time = min(analysis_times)
+                    max_time = max(analysis_times)
+                    
+                    # Expand time window by 30 minutes on each side (to catch notes saved later)
+                    min_time = min_time - timedelta(minutes=30)
+                    max_time = max_time + timedelta(minutes=30)
+                    
+                    notes = db.query(Note).filter(
+                        Note.user_id == user_id,
+                        Note.created_at >= min_time,
+                        Note.created_at <= max_time
+                    ).all()
+            except Exception as e:
+                logger.warning(f"Error querying notes: {e}")
+                notes = []
         
         # Build result map
         result_map = {}
@@ -358,28 +458,87 @@ def check_analysis_availability_batch():
             note_id = None
             note_exists = False
             
-            # Find matching note (heuristic: created within 5 minutes and contains markdown)
-            for note in notes:
-                time_diff = abs((note.created_at - analysis.created_at).total_seconds())
-                if time_diff < 300 and note.content and ('##' in note.content or '**' in note.content or '###' in note.content):
-                    note_id = note.id
-                    note_exists = True
-                    break
+            # Find matching note using improved heuristics:
+            # 1. Created within 30 minutes of analysis
+            # 2. Contains markdown (typical for AI analysis notes)
+            # 3. Contains analysis ID in content (e.g., "AI Analysis #123" or "ניתוח AI #123")
+            if analysis.created_at:
+                analysis_id_str = str(analysis.id)
+                logger.debug(f"Checking notes for analysis_id={analysis.id}, created_at={analysis.created_at}")
+                
+                for note in notes:
+                    try:
+                        time_diff = abs((note.created_at - analysis.created_at).total_seconds())
+                        
+                        # Check if note was created within 30 minutes (1800 seconds)
+                        if time_diff < 1800 and note.content:
+                            # Check if note contains markdown (typical for AI analysis notes)
+                            has_markdown = ('##' in note.content or '**' in note.content or '###' in note.content)
+                            
+                            # Check if note content contains analysis ID
+                            # Look for patterns like "AI Analysis #123", "ניתוח AI #123", or just "#123"
+                            contains_id = (
+                                f"#{analysis_id_str}" in note.content or
+                                f"AI Analysis #{analysis_id_str}" in note.content or
+                                f"ניתוח AI #{analysis_id_str}" in note.content or
+                                f"analysis #{analysis_id_str}" in note.content.lower() or
+                                f"ניתוח #{analysis_id_str}" in note.content
+                            )
+                            
+                            # Match if: (has markdown) OR (contains ID) OR (both)
+                            if has_markdown or contains_id:
+                                logger.debug(f"Found matching note: note_id={note.id}, time_diff={time_diff:.0f}s, "
+                                           f"has_markdown={has_markdown}, contains_id={contains_id}")
+                                note_id = note.id
+                                note_exists = True
+                                break
+                    except Exception as e:
+                        logger.warning(f"Error comparing note time for analysis_id={analysis.id}, note_id={note.id}: {e}")
+                        continue
+                
+                if not note_exists:
+                    logger.debug(f"No matching note found for analysis_id={analysis.id}")
             
             # Verify note still exists
             if note_id:
-                verified_note = db.query(Note).filter(Note.id == note_id).first()
-                if not verified_note:
+                try:
+                    verified_note = db.query(Note).filter(Note.id == note_id).first()
+                    if not verified_note:
+                        logger.warning(f"Note {note_id} was found but no longer exists")
+                        note_exists = False
+                        note_id = None
+                    else:
+                        logger.debug(f"Verified note {note_id} exists for analysis_id={analysis.id}")
+                except Exception as e:
+                    logger.warning(f"Error verifying note {note_id}: {e}")
                     note_exists = False
                     note_id = None
+            
+            # Check if response_text exists in DB
+            has_db = bool(analysis.response_text and analysis.status == 'completed')
             
             result_map[analysis.id] = {
                 'analysis_id': analysis.id,
                 'has_cache': False,  # Frontend will check cache
+                'has_db': has_db,  # Check if response_text exists in DB
                 'has_note': note_exists,
                 'note_id': note_id if note_exists else None
             }
         
+        # Also add entries for IDs that weren't found (to avoid frontend errors)
+        for analysis_id in analysis_ids:
+            if analysis_id not in result_map:
+                result_map[analysis_id] = {
+                    'analysis_id': analysis_id,
+                    'has_cache': False,
+                    'has_db': False,
+                    'has_note': False,
+                    'note_id': None
+                }
+        
+        # Log summary statistics
+        notes_found = sum(1 for r in result_map.values() if r.get('has_note', False))
+        logger.debug(f"Returning availability batch result: {len(result_map)} items, {notes_found} with notes")
         return jsonify({
             'status': 'success',
             'data': result_map
@@ -387,21 +546,99 @@ def check_analysis_availability_batch():
         
     except Exception as e:
         logger.error(f"Error checking analysis availability batch: {e}", exc_info=True)
+        import traceback
+        logger.error(f"Traceback: {traceback.format_exc()}")
         return jsonify({
             'status': 'error',
-            'message': 'Internal server error'
+            'message': f'Internal server error: {str(e)}',
+            'error_type': type(e).__name__
+        }), 500
+    finally:
+        db.close()
+
+
+@ai_analysis_bp.route('/delete-all', methods=['DELETE'])
+@require_authentication()
+def delete_all_analyses():
+    """Delete all AI analysis records - Admin/dev utility"""
+    db: Session = next(get_db())
+    
+    try:
+        from models.ai_analysis import AIAnalysisRequest
+        user_id = getattr(g, 'user_id', None)
+        if not user_id:
+            logger.error("❌ User ID not found in Flask context - user not authenticated")
+            return jsonify({
+                "status": "error",
+                "error": {"message": "User authentication required"},
+                "version": "1.0"
+            }), 401
+        
+        logger.info("=== DELETE ALL AI ANALYSES START ===")
+        logger.info(f"Deleting all analyses for user_id={user_id}")
+        
+        # Count existing records
+        count = db.query(AIAnalysisRequest).filter(
+            AIAnalysisRequest.user_id == user_id
+        ).count()
+        logger.info(f"Found {count} analyses to delete")
+        
+        if count == 0:
+            logger.info("No analyses to delete")
+            db.close()
+            return jsonify({
+                "status": "success",
+                "message": "No analyses to delete - table is already empty",
+                "deleted_count": 0,
+                "version": "1.0"
+            }), 200
+        
+        # Delete all records for this user
+        # Use synchronize_session=False for bulk delete
+        deleted_count = db.query(AIAnalysisRequest).filter(
+            AIAnalysisRequest.user_id == user_id
+        ).delete(synchronize_session=False)
+        
+        # Commit the deletion
+        db.commit()
+        
+        logger.info(f"Committed deletion of {deleted_count} analyses")
+        
+        logger.info(f"Successfully deleted {deleted_count} analyses")
+        
+        return jsonify({
+            "status": "success",
+            "message": f"Successfully deleted {deleted_count} analyses",
+            "deleted_count": deleted_count,
+            "version": "1.0"
+        }), 200
+        
+    except Exception as e:
+        logger.error(f"Error deleting all analyses: {str(e)}", exc_info=True)
+        db.rollback()
+        return jsonify({
+            "status": "error",
+            "error": {"message": f"Failed to delete all analyses: {str(e)}"},
+            "version": "1.0"
         }), 500
     finally:
         db.close()
 
 
 @ai_analysis_bp.route('/llm-provider', methods=['GET', 'POST'])
+@require_authentication()
 def manage_llm_provider():
     """Get or update LLM provider settings"""
     db: Session = next(get_db())
     
     try:
-        user_id = get_current_user_id()
+        user_id = getattr(g, 'user_id', None)
+        if not user_id:
+            logger.error("❌ User ID not found in Flask context - user not authenticated")
+            return jsonify({
+                'status': 'error',
+                'message': 'User authentication required'
+            }), 401
         
         if request.method == 'GET':
             # Get settings
@@ -477,6 +714,75 @@ def manage_llm_provider():
         return jsonify({
             'status': 'error',
             'message': 'Internal server error'
+        }), 500
+    finally:
+        db.close()
+
+
+@ai_analysis_bp.route('/history/<int:request_id>/retry', methods=['POST'])
+@require_authentication()
+def retry_failed_analysis(request_id: int):
+    """Retry a failed analysis with exponential backoff"""
+    db: Session = next(get_db())
+    normalizer = None
+    
+    try:
+        user_id = getattr(g, 'user_id', None)
+        if not user_id:
+            logger.error("❌ User ID not found in Flask context - user not authenticated")
+            return jsonify({
+                'status': 'error',
+                'message': 'User authentication required'
+            }), 401
+        
+        normalizer = BaseEntityUtils.get_request_normalizer(request, fallback_user_id=user_id)
+        data = request.get_json() or {}
+        
+        # Get optional parameters
+        max_retries = data.get('max_retries', 3)
+        use_fallback_provider = data.get('use_fallback_provider', True)
+        
+        # Retry the failed analysis
+        request_obj = ai_analysis_service.retry_failed_analysis(
+            db=db,
+            request_id=request_id,
+            user_id=user_id,
+            max_retries=max_retries,
+            use_fallback_provider=use_fallback_provider
+        )
+        
+        # Normalize dates in response
+        result_data = request_obj.to_dict(include_response=True)
+        normalized_data = BaseEntityUtils.normalize_output(normalizer, result_data) if normalizer else result_data
+        
+        return jsonify({
+            'status': 'success',
+            'data': normalized_data,
+            'message': f"Analysis retry completed. Status: {request_obj.status}"
+        }), 200
+        
+    except ValueError as e:
+        logger.warning(f"Invalid retry request: {e}")
+        error_code = categorize_error(e, str(e))
+        error_response = format_error_response(error_code, str(e))
+        return jsonify({
+            'status': 'error',
+            **error_response
+        }), 400
+    except Exception as e:
+        logger.error(f"Error retrying analysis: {e}", exc_info=True)
+        error_code = categorize_error(e, str(e))
+        error_response = format_error_response(error_code, str(e))
+        
+        # In development mode, include original error details
+        import os
+        if os.getenv('FLASK_ENV') == 'development':
+            error_response['original_error'] = str(e)
+            error_response['error_type'] = type(e).__name__
+        
+        return jsonify({
+            'status': 'error',
+            **error_response
         }), 500
     finally:
         db.close()

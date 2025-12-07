@@ -67,6 +67,7 @@ class User(BaseModel):
     # notes = relationship("Note", back_populates="user")
     # user_preferences = relationship("UserPreferences", back_populates="user", uselist=False)  # Removed - using new preferences system
     # preference_profiles = relationship("PreferenceProfile", foreign_keys="[PreferenceProfile.user_id]", back_populates="user", uselist=True)  # Disabled - causing mapper issues
+    watch_lists = relationship("WatchList", back_populates="user", cascade="all, delete-orphan")
     
     def __repr__(self) -> str:
         """String representation of the user"""

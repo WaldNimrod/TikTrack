@@ -136,6 +136,9 @@ class UserDataCleanup:
             # Step 6: Import Sessions and Tags
             self._step6_import_sessions_and_tags()
             
+            # Step 6.5: AI Analysis and User Tickers
+            self._step6_5_ai_analysis_and_user_tickers()
+            
             # Step 7: Trading Accounts
             self._step7_trading_accounts()
             
@@ -426,6 +429,69 @@ class UserDataCleanup:
             print(f"   🔍 DRY RUN: היה נמחק {import_sessions_count} סשנים, {tags_count} תגים")
     
     # ========================================================================
+    # Step 6.5: AI Analysis and User Tickers
+    # ========================================================================
+    
+    def _step6_5_ai_analysis_and_user_tickers(self) -> None:
+        """שלב 6.5: מחיקת ניתוחי AI ושיוכי טיקרים"""
+        print("\n🤖 שלב 6.5: ניתוחי AI ושיוכי טיקרים")
+        print("-" * 70)
+        
+        # Count before
+        ai_analysis_count = self._count_table('ai_analysis_requests', table_exists=True)
+        user_tickers_count = self._count_table('user_tickers', table_exists=True)
+        user_llm_providers_count = self._count_table('user_llm_providers', table_exists=True)
+        
+        print(f"   לפני: {ai_analysis_count} ניתוחי AI, {user_tickers_count} שיוכי טיקרים")
+        print(f"   ✅ מפתחות API: {user_llm_providers_count} רשומות (נשמרים)")
+        
+        if not self.dry_run:
+            # Delete AI analysis requests
+            deleted_ai_analysis = 0
+            try:
+                result = self.db.execute(text("DELETE FROM ai_analysis_requests"))
+                deleted_ai_analysis = result.rowcount  # type: ignore[attr-defined]
+            except Exception as e:
+                # Table might not exist
+                if self.verbose:
+                    print(f"   ⚠️  טבלת ai_analysis_requests לא קיימת או שגיאה: {e}")
+            
+            # Delete user_tickers
+            deleted_user_tickers = 0
+            try:
+                result = self.db.execute(text("DELETE FROM user_tickers"))
+                deleted_user_tickers = result.rowcount  # type: ignore[attr-defined]
+            except Exception as e:
+                # Table might not exist
+                if self.verbose:
+                    print(f"   ⚠️  טבלת user_tickers לא קיימת או שגיאה: {e}")
+            
+            # Verify user_llm_providers is NOT deleted (should be preserved)
+            final_llm_providers = self._count_table('user_llm_providers', table_exists=True)
+            if final_llm_providers != user_llm_providers_count:
+                raise CleanupError(
+                    'step6.5',
+                    f"מפתחות API נמחקו! (היו {user_llm_providers_count}, עכשיו {final_llm_providers})",
+                    "user_llm_providers לא אמור להימחק"
+                )
+            
+            self.stats['deleted']['ai_analysis_requests'] = deleted_ai_analysis
+            self.stats['deleted']['user_tickers'] = deleted_user_tickers
+            self.stats['preserved']['user_llm_providers'] = final_llm_providers
+            
+            print(f"   ✅ נמחקו: {deleted_ai_analysis} ניתוחי AI, {deleted_user_tickers} שיוכי טיקרים")
+            print(f"   ✅ נשמרו: {final_llm_providers} מפתחות API")
+            
+            # Verify
+            if deleted_ai_analysis > 0:
+                self._verify_count('ai_analysis_requests', 0)
+            if deleted_user_tickers > 0:
+                self._verify_count('user_tickers', 0)
+        else:
+            print(f"   🔍 DRY RUN: היה נמחק {ai_analysis_count} ניתוחי AI, {user_tickers_count} שיוכי טיקרים")
+            print(f"   🔍 DRY RUN: {user_llm_providers_count} מפתחות API היו נשמרים")
+    
+    # ========================================================================
     # Step 7: Trading Accounts
     # ========================================================================
     
@@ -577,20 +643,20 @@ class UserDataCleanup:
     # ========================================================================
     
     def _step9_preferences_and_profiles(self) -> None:
-        """שלב 9: ניקוי העדפות ופרופילים (שמירת פרופיל פעיל בלבד)"""
+        """שלב 9: ניקוי העדפות ופרופילים (שמירת פרופיל פעיל של כל משתמש)"""
         print("\n⚙️  שלב 9: העדפות ופרופילים")
         print("-" * 70)
         
-        # Check active profile
-        active_profile = self.db.query(PreferenceProfile).filter(
+        # Get all active profiles (one per user)
+        active_profiles = self.db.query(PreferenceProfile).filter(
             PreferenceProfile.is_active == True
-        ).first()
+        ).all()
         
-        if not active_profile:
+        if not active_profiles:
             raise CleanupError(
                 'step9',
                 "פרופיל פעיל לא נמצא",
-                "חייב להיות פרופיל פעיל אחד לפני הניקוי"
+                "חייב להיות לפחות פרופיל פעיל אחד לפני הניקוי"
             )
         
         # Count before
@@ -600,38 +666,51 @@ class UserDataCleanup:
         preference_types_count = self._count_table('preference_types', table_exists=True)
         
         print(f"   לפני: {profiles_count} פרופילים, {preferences_count} העדפות")
-        print(f"   ✅ פרופיל פעיל קיים (ID: {active_profile.id}, User: {active_profile.user_id})")
+        print(f"   ✅ נמצאו {len(active_profiles)} פרופילים פעילים")
         
         if not self.dry_run:
-            # Delete all user preferences (values only, profile stays)
+            # Delete all user preferences (values only, profiles stay)
             result = self.db.execute(text("DELETE FROM user_preferences"))
             deleted_preferences = result.rowcount  # type: ignore[attr-defined]
             
-            # Delete all profiles except active one
-            result = self.db.execute(
-                text(f"DELETE FROM preference_profiles WHERE is_active != TRUE OR user_id != {active_profile.user_id}")
-            )
+            # Delete all profiles except active ones (one per user)
+            active_user_ids = [p.user_id for p in active_profiles]
+            if active_user_ids:
+                # Build query to keep only active profiles
+                placeholders = ','.join([str(uid) for uid in active_user_ids])
+                result = self.db.execute(
+                    text(f"DELETE FROM preference_profiles WHERE is_active != TRUE OR user_id NOT IN ({placeholders})")
+                )
+            else:
+                # Fallback: delete all non-active profiles
+                result = self.db.execute(
+                    text("DELETE FROM preference_profiles WHERE is_active != TRUE")
+                )
             deleted_profiles = result.rowcount  # type: ignore[attr-defined]
             
             self.stats['deleted']['user_preferences'] = deleted_preferences
             self.stats['deleted']['preference_profiles'] = deleted_profiles
-            self.stats['preserved']['preference_profiles'] = 1
+            self.stats['preserved']['preference_profiles'] = len(active_profiles)
             self.stats['preserved']['preference_groups'] = preference_groups_count
             self.stats['preserved']['preference_types'] = preference_types_count
             
             print(f"   ✅ נמחקו: {deleted_preferences} העדפות, {deleted_profiles} פרופילים")
-            print(f"   ✅ נשמר: פרופיל פעיל אחד, {preference_groups_count} קבוצות, {preference_types_count} סוגים")
+            print(f"   ✅ נשמרו: {len(active_profiles)} פרופילים פעילים, {preference_groups_count} קבוצות, {preference_types_count} סוגים")
             
             # Verify
             final_profiles = self._count_table('preference_profiles')
-            if final_profiles != 1:
-                raise VerificationError('step9', "1 פרופיל", f"{final_profiles} פרופילים")
+            final_active_profiles = self.db.execute(
+                text("SELECT COUNT(*) FROM preference_profiles WHERE is_active = TRUE")
+            ).scalar()
+            
+            if final_profiles != len(active_profiles) or final_active_profiles != len(active_profiles):
+                raise VerificationError('step9', f"{len(active_profiles)} פרופילים פעילים", f"{final_profiles} פרופילים, {final_active_profiles} פעילים")
             
             self._verify_count('user_preferences', 0)
             
-            print(f"   ✅ אימות: נשאר פרופיל פעיל אחד")
+            print(f"   ✅ אימות: נשארו {final_active_profiles} פרופילים פעילים")
         else:
-            print(f"   🔍 DRY RUN: היה נמחק {preferences_count} העדפות, {profiles_count - 1} פרופילים")
+            print(f"   🔍 DRY RUN: היה נמחק {preferences_count} העדפות, {profiles_count - len(active_profiles)} פרופילים")
     
     # ========================================================================
     # Step 10: Final Verification
@@ -655,16 +734,19 @@ class UserDataCleanup:
         else:
             verifications.append(("טיקרים", f"❌ {tickers_count} טיקרים במקום 1"))
         
-        # Verify profiles - only one active
+        # Verify profiles - at least one active per user
         profiles_count = self._count_table('preference_profiles')
         active_profiles = self.db.execute(
             text("SELECT COUNT(*) FROM preference_profiles WHERE is_active = TRUE")
         ).scalar()
+        users_count = self.db.execute(
+            text("SELECT COUNT(*) FROM users")
+        ).scalar()
         
-        if profiles_count == 1 and active_profiles == 1:
-            verifications.append(("פרופילים", "✅ פרופיל פעיל אחד"))
+        if active_profiles >= users_count and active_profiles > 0:
+            verifications.append(("פרופילים", f"✅ {active_profiles} פרופילים פעילים (לפחות אחד לכל משתמש)"))
         else:
-            verifications.append(("פרופילים", f"❌ {profiles_count} פרופילים, {active_profiles} פעילים"))
+            verifications.append(("פרופילים", f"❌ {profiles_count} פרופילים, {active_profiles} פעילים (צפוי לפחות {users_count})"))
         
         # Verify preferences - all deleted
         preferences_count = self._count_table('user_preferences')
@@ -689,6 +771,27 @@ class UserDataCleanup:
             verifications.append(("שיטות מסחר", f"✅ {trading_methods_count} שיטות נשמרו"))
         else:
             verifications.append(("שיטות מסחר", "⚠️  לא נמצאו שיטות מסחר"))
+        
+        # Verify AI Analysis deleted
+        ai_analysis_count = self._count_table('ai_analysis_requests', table_exists=True)
+        if ai_analysis_count == 0:
+            verifications.append(("ניתוחי AI", "✅ כל ניתוחי ה-AI נמחקו"))
+        else:
+            verifications.append(("ניתוחי AI", f"❌ {ai_analysis_count} ניתוחי AI נותרו"))
+        
+        # Verify user_tickers deleted
+        user_tickers_count = self._count_table('user_tickers', table_exists=True)
+        if user_tickers_count == 0:
+            verifications.append(("שיוכי טיקרים", "✅ כל שיוכי הטיקרים נמחקו"))
+        else:
+            verifications.append(("שיוכי טיקרים", f"❌ {user_tickers_count} שיוכי טיקרים נותרו"))
+        
+        # Verify user_llm_providers preserved
+        user_llm_providers_count = self._count_table('user_llm_providers', table_exists=True)
+        if user_llm_providers_count > 0:
+            verifications.append(("מפתחות API", f"✅ {user_llm_providers_count} מפתחות API נשמרו"))
+        else:
+            verifications.append(("מפתחות API", "⚠️  לא נמצאו מפתחות API (אופציונלי)"))
         
         # Print all verifications
         print("   📊 תוצאות אימות:")

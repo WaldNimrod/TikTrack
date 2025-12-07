@@ -249,3 +249,17 @@ window.MyWidget.init('container2', { maxItems: 20 });
 **מקור:** `documentation/02-ARCHITECTURE/FRONTEND/WIDGET_SYSTEM_ARCHITECTURE.md`  
 **עודכן:** 21 ינואר 2025
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+

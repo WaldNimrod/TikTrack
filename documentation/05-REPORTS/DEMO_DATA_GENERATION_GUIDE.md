@@ -64,27 +64,40 @@
 
 ## 🚀 הוראות הרצה
 
-### שיטה 1: הרצה ישירה (מומלץ)
+### שיטה 1: יצירת נתונים למשתמש יחיד
 
 ```bash
-cd Backend
-python3 scripts/generate_demo_data.py
+# יצירת נתונים למשתמש ספציפי
+python3 Backend/scripts/generate_demo_data.py --username user
+
+# יצירת נתונים למשתמש admin
+python3 Backend/scripts/generate_demo_data.py --username admin
+
+# ללא username - משתמש ראשון שנמצא (תאימות לאחור)
+python3 Backend/scripts/generate_demo_data.py
 ```
 
-### שיטה 2: עם פרמטרים
+### שיטה 2: יצירת נתונים לכל המשתמשים (מומלץ)
+
+```bash
+# יצירת נתונים לכל המשתמשים לפי MULTI_USER_DATA_DISTRIBUTION.md
+python3 Backend/scripts/generate_multi_user_demo_data.py
+
+# Dry run - רק אימות ללא יצירת נתונים
+python3 Backend/scripts/generate_multi_user_demo_data.py --dry-run
+
+# עם הודעות מפורטות
+python3 Backend/scripts/generate_multi_user_demo_data.py --verbose
+```
+
+### שיטה 3: עם פרמטרים נוספים
 
 ```bash
 # Dry run - רק אימות ללא יצירת נתונים
-python3 Backend/scripts/generate_demo_data.py --dry-run
+python3 Backend/scripts/generate_demo_data.py --dry-run --username user
 
 # עם הודעות מפורטות
-python3 Backend/scripts/generate_demo_data.py --verbose
-```
-
-### שיטה 3: מהתיקייה הראשית
-
-```bash
-python3 Backend/scripts/generate_demo_data.py
+python3 Backend/scripts/generate_demo_data.py --verbose --username admin
 ```
 
 ---
@@ -97,7 +110,17 @@ python3 Backend/scripts/generate_demo_data.py
 - **90% מטבע USD** - טיקרים אמריקאיים (AAPL, MSFT, GOOGL, וכו')
 - **10% מטבעות אחרים** - ILS או EUR
 - **מגוון סוגים:** stocks, ETFs, crypto
-- **שמות ריאליסטיים** מתוך רשימת דוגמאות
+- **רק טיקרים תקינים** - כל הטיקרים נלקחים מ-`SAMPLE_TICKERS` שיש להם נתונים חיצוניים זמינים
+- **לא יווצרו טיקרים "DEMO"** - רק טיקרים אמיתיים עם נתוני שוק זמינים
+- **אם אין מספיק טיקרים תקינים** - הסקריפט יצור פחות טיקרים ויציג אזהרה
+- **Symbol Mappings אוטומטיים** - הסקריפט יוצר אוטומטית symbol mappings לטיקרים אירופאיים:
+  - `SAN` -> `SAN.PA` (Paris Exchange)
+  - `SIE` -> `SIE.F` (Frankfurt Exchange)
+  - `SAP` -> `SAP.F` (Frankfurt Exchange)
+  - `BMW` -> `BMW.F` (Frankfurt Exchange)
+  - `ASML` -> `ASML.AS` (Amsterdam Exchange)
+  - `UL` -> `ULVR.L` (London Stock Exchange)
+  - `NOVN` -> `NOVN.SW` (Swiss Exchange)
 
 ### חשבונות מסחר (2)
 
@@ -119,11 +142,14 @@ python3 Backend/scripts/generate_demo_data.py
 - **90% לונג, 10% שורט**
 - **40% בחצי שנה האחרונה** (מתוכם 70% בשלושת החודשים האחרונים)
 - **60% בשנה וחצי הקודמת**
+- **סוגי השקעה תקינים:** `swing`, `investment`, `passive` בלבד (לפי אילוצי המערכת)
+- **סטטוסים תקינים:** `open`, `closed`, `cancelled` בלבד (לפי אילוצי המערכת)
 
 ### טריידים (80)
 - **70% מתוכניות קיימות** - טריידים שנוצרו מתוכניות
 - **30% עצמאיים** - טריידים ללא תוכנית
-- **סטטוסים מגוונים:** open, closed, cancelled
+- **סטטוסים מגוונים:** `open`, `closed`, `cancelled` בלבד (לפי אילוצי המערכת)
+- **סוגי השקעה תקינים:** `swing`, `investment`, `passive` בלבד (לפי אילוצי המערכת)
 - **קישור נכון** לחשבונות, טיקרים ותוכניות
 
 ### ביצועים (Executions)
@@ -142,6 +168,9 @@ python3 Backend/scripts/generate_demo_data.py
 - **הפקדות ומשיכות** מפוזרות על פני התקופה
 - **דיבידנדים** מטריידים סגורים
 - **עמלות** מפוזרות על פני התקופה
+- **ריבית** על יתרות חיוביות
+- **העברות** בין חשבונות (transfer_in, transfer_out)
+- **המרות מטבע** (currency_exchange_from, currency_exchange_to) - נוצרות מצמדים כאשר יש מספר מטבעות במערכת
 
 ### התראות (Alerts)
 - **התראות על טיקרים** (10)
@@ -156,6 +185,17 @@ python3 Backend/scripts/generate_demo_data.py
 - **הערות על טריידים** (12)
 - **הערות על תוכניות** (10)
 - **הערות על חשבונות** (3)
+
+### ניתוחי AI (AI Analysis)
+- **ניתוחי AI לדוגמה** (5-10) - ניתוחים עם תבניות קיימות
+- **שיוך למשתמש:** כל ניתוחי ה-AI משויכים למשתמש דרך `user_id`
+- **שימוש בתבניות:** ניתוחים נוצרים עם תבניות AI קיימות במערכת
+- **מגוון ניתוחים:** ניתוחים על טיקרים, טריידים, ותוכניות טרייד
+
+### שיוך טיקרים (User Tickers)
+- **שיוך כל הטיקרים:** כל הטיקרים שנוצרו (כולל SPY) משויכים למשתמש דרך `user_tickers`
+- **מבנה נכון:** כל השיוכים נוצרים עם מבנה תקין וקשרים נכונים
+- **שיוך SPY:** גם טיקר SPY משויך למשתמש
 
 ---
 
@@ -289,13 +329,19 @@ python3 Backend/scripts/generate_demo_data.py
 הסקריפט יוצר את הנתונים בסדר מסוים כדי לשמור על קשרים נכונים:
 
 1. **טיקרים** - ללא תלויות
-2. **חשבונות מסחר** - תלויים במטבעות
-3. **תוכניות טרייד** - תלויים בחשבונות וטיקרים
-4. **טריידים** - תלויים בחשבונות, טיקרים ותוכניות
-5. **ביצועים** - תלויים בטריידים
-6. **תזרימי מזומן** - תלויים בחשבונות וטריידים
-7. **התראות** - תלויים בטיקרים, טריידים ותוכניות
-8. **הערות** - תלויות בכל הישויות
+2. **שיוך טיקרים** (`user_tickers`) - תלוי בטיקרים ומשתמשים
+3. **חשבונות מסחר** - תלויים במטבעות
+4. **תוכניות טרייד** - תלויים בחשבונות וטיקרים
+5. **טריידים** - תלויים בחשבונות, טיקרים ותוכניות
+6. **ביצועים** - תלויים בטריידים
+7. **תזרימי מזומן** - תלויים בחשבונות וטריידים
+8. **התראות** - תלויים בטיקרים, טריידים ותוכניות
+9. **הערות** - תלויות בכל הישויות
+10. **ניתוחי AI** (`ai_analysis_requests`) - תלויים בתבניות AI, טיקרים, טריידים ותוכניות
+11. **יצירת Symbol Mappings** - יצירת mappings לטיקרים אירופאיים (SAN.PA, SIE.F, וכו')
+12. **טעינת נתונים חיצוניים ראשוניים** - טעינת נתוני שוק (Yahoo Finance) לכל הטיקרים שנוצרו:
+    - **Quote נוכחי** - מחיר, שינוי, נפח, וכו'
+    - **נתונים היסטוריים** - 150 quotes היסטוריים (לחישוב MA 150, ATR, וכו')
 
 ### פיזור תאריכים
 
@@ -367,6 +413,29 @@ DEMO_CONFIG = {
 
 ---
 
+## ✅ ערכי Enum תקינים במערכת
+
+### סוגי השקעה (Investment Types)
+המערכת תומכת רק ב-3 סוגי השקעה:
+- **`swing`** - סווינג טריידינג
+- **`investment`** - השקעה ארוכת טווח
+- **`passive`** - השקעה פאסיבית
+
+⚠️ **חשוב:** הסקריפט יוצר רק ערכים תקינים אלה. ערכים אחרים (`day_trading`, `scalping`, וכו') לא נתמכים ולא יווצרו.
+
+### סטטוסים (Status)
+המערכת תומכת ב-3 סטטוסים:
+- **`open`** - פתוח/פעיל
+- **`closed`** - סגור/הושלם
+- **`cancelled`** - בוטל
+
+### אילוצי בסיס הנתונים
+- ✅ CHECK constraints ברמת DB מונעים הוספת ערכים לא תקינים
+- ✅ אילוצים קיימים גם בטבלת `constraints` (metadata)
+- ✅ הולידציה גם ברמת Business Logic Service
+
+---
+
 ## 📝 הערות חשובות
 
 ### לפני הרצה
@@ -392,10 +461,48 @@ DEMO_CONFIG = {
 
 ---
 
+## 🔧 עדכון נתוני דוגמה קיימים
+
+אם יש לך נתוני דוגמה קיימים שצריכים עדכון:
+
+### עדכון Symbol Mappings
+
+```bash
+# Dry run - רק הצגת מה היה מתעדכן
+python3 Backend/scripts/update_existing_ticker_mappings.py --dry-run
+
+# עדכון אמיתי
+python3 Backend/scripts/update_existing_ticker_mappings.py --verbose
+```
+
+סקריפט זה:
+- ✅ יוצר mappings חסרים לטיקרים אירופאיים (NOVN.SW, ULVR.L, וכו')
+- ✅ מתקן mappings לא נכונים (DIA.AS -> DIA, COST.L -> COST, וכו')
+- ✅ מעדכן mappings קיימים אם צריך
+
+### טעינת נתונים היסטוריים
+
+```bash
+# טעינת נתונים היסטוריים לכל הטיקרים
+python3 Backend/scripts/load_market_data_for_tickers.py
+
+# טעינה לטיקרים ספציפיים
+python3 Backend/scripts/load_market_data_for_tickers.py --tickers-only "NOVN,UL,SAN"
+```
+
+סקריפט זה:
+- ✅ טוען quote נוכחי לכל טיקר
+- ✅ טוען 150 quotes היסטוריים (לחישוב MA 150, ATR, וכו')
+- ✅ משתמש ב-symbol mappings אוטומטית
+
+---
+
 ## 🔗 קישורים
 
 - **מסמך תהליך הניקוי:** [USER_DATA_CLEANUP_PROCESS.md](USER_DATA_CLEANUP_PROCESS.md)
 - **מיקום הסקריפט:** `Backend/scripts/generate_demo_data.py`
+- **סקריפט לעדכון mappings:** `Backend/scripts/update_existing_ticker_mappings.py`
+- **סקריפט לטעינת נתוני שוק:** `Backend/scripts/load_market_data_for_tickers.py`
 - **מודלים:** `Backend/models/`
 
 ---

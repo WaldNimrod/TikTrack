@@ -1,0 +1,1126 @@
+{
+  "page": "chart-management.html",
+  "js_file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/chart-management.js",
+  "html_file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/chart-management.html",
+  "categories": {
+    "unified_init": {
+      "status": "missing",
+      "issues": [
+        {
+          "line": 349,
+          "content": "<script src=\"scripts/init-system/package-manifest.js?v=1.0.0\"></script> <!-- Package manifest -->",
+          "pattern": "package-manifest\\.js",
+          "match": "package-manifest.js",
+          "file": "html"
+        },
+        {
+          "line": 351,
+          "content": "<script src=\"scripts/page-initialization-configs.js?v=1.0.0\"></script> <!-- Page initialization conf",
+          "pattern": "page-initialization-configs\\.js",
+          "match": "page-initialization-configs.js",
+          "file": "html"
+        }
+      ],
+      "issue_count": 2,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": {
+        "status": "missing",
+        "issues": [
+          {
+            "line": 349,
+            "content": "<script src=\"scripts/init-system/package-manifest.js?v=1.0.0\"></script> <!-- Package manifest -->",
+            "pattern": "package-manifest\\.js",
+            "match": "package-manifest.js"
+          },
+          {
+            "line": 351,
+            "content": "<script src=\"scripts/page-initialization-configs.js?v=1.0.0\"></script> <!-- Page initialization conf",
+            "pattern": "page-initialization-configs\\.js",
+            "match": "page-initialization-configs.js"
+          }
+        ],
+        "issue_count": 2
+      }
+    },
+    "section_toggle": {
+      "status": "missing",
+      "issues": [
+        {
+          "line": 62,
+          "content": "<div class=\"top-section\" data-section=\"top\">",
+          "pattern": "data-section",
+          "match": "data-section",
+          "file": "html"
+        },
+        {
+          "line": 77,
+          "content": "<div class=\"content-section\" id=\"overviewSection\" data-section=\"overviewSection\">",
+          "pattern": "data-section",
+          "match": "data-section",
+          "file": "html"
+        },
+        {
+          "line": 128,
+          "content": "<div class=\"content-section\" id=\"managementSection\" data-section=\"managementSection\">",
+          "pattern": "data-section",
+          "match": "data-section",
+          "file": "html"
+        },
+        {
+          "line": 204,
+          "content": "<div class=\"content-section\" id=\"settingsSection\" data-section=\"settingsSection\">",
+          "pattern": "data-section",
+          "match": "data-section",
+          "file": "html"
+        },
+        {
+          "line": 80,
+          "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('overviewSection'",
+          "pattern": "toggleSection",
+          "match": "toggleSection",
+          "file": "html"
+        },
+        {
+          "line": 131,
+          "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('managementSectio",
+          "pattern": "toggleSection",
+          "match": "toggleSection",
+          "file": "html"
+        },
+        {
+          "line": 207,
+          "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('settingsSection'",
+          "pattern": "toggleSection",
+          "match": "toggleSection",
+          "file": "html"
+        }
+      ],
+      "issue_count": 7,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": {
+        "status": "ok",
+        "issues": [
+          {
+            "line": 62,
+            "content": "<div class=\"top-section\" data-section=\"top\">",
+            "pattern": "data-section",
+            "match": "data-section"
+          },
+          {
+            "line": 77,
+            "content": "<div class=\"content-section\" id=\"overviewSection\" data-section=\"overviewSection\">",
+            "pattern": "data-section",
+            "match": "data-section"
+          },
+          {
+            "line": 128,
+            "content": "<div class=\"content-section\" id=\"managementSection\" data-section=\"managementSection\">",
+            "pattern": "data-section",
+            "match": "data-section"
+          },
+          {
+            "line": 204,
+            "content": "<div class=\"content-section\" id=\"settingsSection\" data-section=\"settingsSection\">",
+            "pattern": "data-section",
+            "match": "data-section"
+          },
+          {
+            "line": 80,
+            "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('overviewSection'",
+            "pattern": "toggleSection",
+            "match": "toggleSection"
+          },
+          {
+            "line": 131,
+            "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('managementSectio",
+            "pattern": "toggleSection",
+            "match": "toggleSection"
+          },
+          {
+            "line": 207,
+            "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('settingsSection'",
+            "pattern": "toggleSection",
+            "match": "toggleSection"
+          }
+        ],
+        "issue_count": 7
+      }
+    },
+    "notifications": {
+      "status": "ok",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "ok",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": {
+        "status": "ok",
+        "issues": [],
+        "issue_count": 0
+      }
+    },
+    "modals": {
+      "status": "ok",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "ok",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": {
+        "status": "ok",
+        "issues": [],
+        "issue_count": 0
+      }
+    },
+    "tables": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      }
+    },
+    "field_renderer": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      }
+    },
+    "crud_handler": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      }
+    },
+    "select_populator": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      }
+    },
+    "data_collection": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      }
+    },
+    "icons": {
+      "status": "missing",
+      "issues": [
+        {
+          "line": 55,
+          "content": "<!-- Bootstrap Icons and FontAwesome removed - using Tabler Icons via IconSystem -->",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "html"
+        },
+        {
+          "line": 67,
+          "content": "<img src=\"/trading-ui/images/icons/tabler/info-circle.svg\" width=\"16\" height=\"16\" alt=\"icon\" class=\"",
+          "pattern": "<img.*icon",
+          "match": "<img src=\"/trading-ui/images/icons/tabler/info-cir",
+          "file": "html"
+        },
+        {
+          "line": 70,
+          "content": "<img src=\"/trading-ui/images/icons/tabler/download.svg\" width=\"16\" height=\"16\" alt=\"download\" class=",
+          "pattern": "<img.*icon",
+          "match": "<img src=\"/trading-ui/images/icons/tabler/download",
+          "file": "html"
+        },
+        {
+          "line": 87,
+          "content": "<img src=\"/trading-ui/images/icons/tabler/info-circle.svg\" width=\"16\" height=\"16\" alt=\"icon\" class=\"",
+          "pattern": "<img.*icon",
+          "match": "<img src=\"/trading-ui/images/icons/tabler/info-cir",
+          "file": "html"
+        },
+        {
+          "line": 97,
+          "content": "<img src=\"/trading-ui/images/icons/tabler/info-circle.svg\" width=\"16\" height=\"16\" alt=\"icon\" class=\"",
+          "pattern": "<img.*icon",
+          "match": "<img src=\"/trading-ui/images/icons/tabler/info-cir",
+          "file": "html"
+        },
+        {
+          "line": 107,
+          "content": "<img src=\"/trading-ui/images/icons/tabler/info-circle.svg\" width=\"16\" height=\"16\" alt=\"icon\" class=\"",
+          "pattern": "<img.*icon",
+          "match": "<img src=\"/trading-ui/images/icons/tabler/info-cir",
+          "file": "html"
+        },
+        {
+          "line": 117,
+          "content": "<img src=\"/trading-ui/images/icons/tabler/info-circle.svg\" width=\"16\" height=\"16\" alt=\"icon\" class=\"",
+          "pattern": "<img.*icon",
+          "match": "<img src=\"/trading-ui/images/icons/tabler/info-cir",
+          "file": "html"
+        },
+        {
+          "line": 138,
+          "content": "<img src=\"/trading-ui/images/icons/tabler/info-circle.svg\" width=\"16\" height=\"16\" alt=\"icon\" class=\"",
+          "pattern": "<img.*icon",
+          "match": "<img src=\"/trading-ui/images/icons/tabler/info-cir",
+          "file": "html"
+        },
+        {
+          "line": 155,
+          "content": "<img src=\"/trading-ui/images/icons/tabler/info-circle.svg\" width=\"16\" height=\"16\" alt=\"icon\" class=\"",
+          "pattern": "<img.*icon",
+          "match": "<img src=\"/trading-ui/images/icons/tabler/info-cir",
+          "file": "html"
+        },
+        {
+          "line": 158,
+          "content": "<img src=\"/trading-ui/images/icons/tabler/chart-line.svg\" width=\"16\" height=\"16\" alt=\"chart-line\" cl",
+          "pattern": "<img.*icon",
+          "match": "<img src=\"/trading-ui/images/icons/tabler/chart-li",
+          "file": "html"
+        },
+        {
+          "line": 161,
+          "content": "<img src=\"/trading-ui/images/icons/tabler/info-circle.svg\" width=\"16\" height=\"16\" alt=\"icon\" class=\"",
+          "pattern": "<img.*icon",
+          "match": "<img src=\"/trading-ui/images/icons/tabler/info-cir",
+          "file": "html"
+        },
+        {
+          "line": 164,
+          "content": "<img src=\"/trading-ui/images/icons/tabler/info-circle.svg\" width=\"16\" height=\"16\" alt=\"icon\" class=\"",
+          "pattern": "<img.*icon",
+          "match": "<img src=\"/trading-ui/images/icons/tabler/info-cir",
+          "file": "html"
+        },
+        {
+          "line": 167,
+          "content": "<img src=\"/trading-ui/images/icons/tabler/info-circle.svg\" width=\"16\" height=\"16\" alt=\"icon\" class=\"",
+          "pattern": "<img.*icon",
+          "match": "<img src=\"/trading-ui/images/icons/tabler/info-cir",
+          "file": "html"
+        },
+        {
+          "line": 170,
+          "content": "<img src=\"/trading-ui/images/icons/tabler/download.svg\" width=\"16\" height=\"16\" alt=\"download\" class=",
+          "pattern": "<img.*icon",
+          "match": "<img src=\"/trading-ui/images/icons/tabler/download",
+          "file": "html"
+        },
+        {
+          "line": 173,
+          "content": "<img src=\"/trading-ui/images/icons/tabler/trash.svg\" width=\"16\" height=\"16\" alt=\"trash\" class=\"icon\"",
+          "pattern": "<img.*icon",
+          "match": "<img src=\"/trading-ui/images/icons/tabler/trash.sv",
+          "file": "html"
+        }
+      ],
+      "issue_count": 15,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": {
+        "status": "ok",
+        "issues": [
+          {
+            "line": 55,
+            "content": "<!-- Bootstrap Icons and FontAwesome removed - using Tabler Icons via IconSystem -->",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 67,
+            "content": "<img src=\"/trading-ui/images/icons/tabler/info-circle.svg\" width=\"16\" height=\"16\" alt=\"icon\" class=\"",
+            "pattern": "<img.*icon",
+            "match": "<img src=\"/trading-ui/images/icons/tabler/info-cir"
+          },
+          {
+            "line": 70,
+            "content": "<img src=\"/trading-ui/images/icons/tabler/download.svg\" width=\"16\" height=\"16\" alt=\"download\" class=",
+            "pattern": "<img.*icon",
+            "match": "<img src=\"/trading-ui/images/icons/tabler/download"
+          },
+          {
+            "line": 87,
+            "content": "<img src=\"/trading-ui/images/icons/tabler/info-circle.svg\" width=\"16\" height=\"16\" alt=\"icon\" class=\"",
+            "pattern": "<img.*icon",
+            "match": "<img src=\"/trading-ui/images/icons/tabler/info-cir"
+          },
+          {
+            "line": 97,
+            "content": "<img src=\"/trading-ui/images/icons/tabler/info-circle.svg\" width=\"16\" height=\"16\" alt=\"icon\" class=\"",
+            "pattern": "<img.*icon",
+            "match": "<img src=\"/trading-ui/images/icons/tabler/info-cir"
+          },
+          {
+            "line": 107,
+            "content": "<img src=\"/trading-ui/images/icons/tabler/info-circle.svg\" width=\"16\" height=\"16\" alt=\"icon\" class=\"",
+            "pattern": "<img.*icon",
+            "match": "<img src=\"/trading-ui/images/icons/tabler/info-cir"
+          },
+          {
+            "line": 117,
+            "content": "<img src=\"/trading-ui/images/icons/tabler/info-circle.svg\" width=\"16\" height=\"16\" alt=\"icon\" class=\"",
+            "pattern": "<img.*icon",
+            "match": "<img src=\"/trading-ui/images/icons/tabler/info-cir"
+          },
+          {
+            "line": 138,
+            "content": "<img src=\"/trading-ui/images/icons/tabler/info-circle.svg\" width=\"16\" height=\"16\" alt=\"icon\" class=\"",
+            "pattern": "<img.*icon",
+            "match": "<img src=\"/trading-ui/images/icons/tabler/info-cir"
+          },
+          {
+            "line": 155,
+            "content": "<img src=\"/trading-ui/images/icons/tabler/info-circle.svg\" width=\"16\" height=\"16\" alt=\"icon\" class=\"",
+            "pattern": "<img.*icon",
+            "match": "<img src=\"/trading-ui/images/icons/tabler/info-cir"
+          },
+          {
+            "line": 158,
+            "content": "<img src=\"/trading-ui/images/icons/tabler/chart-line.svg\" width=\"16\" height=\"16\" alt=\"chart-line\" cl",
+            "pattern": "<img.*icon",
+            "match": "<img src=\"/trading-ui/images/icons/tabler/chart-li"
+          },
+          {
+            "line": 161,
+            "content": "<img src=\"/trading-ui/images/icons/tabler/info-circle.svg\" width=\"16\" height=\"16\" alt=\"icon\" class=\"",
+            "pattern": "<img.*icon",
+            "match": "<img src=\"/trading-ui/images/icons/tabler/info-cir"
+          },
+          {
+            "line": 164,
+            "content": "<img src=\"/trading-ui/images/icons/tabler/info-circle.svg\" width=\"16\" height=\"16\" alt=\"icon\" class=\"",
+            "pattern": "<img.*icon",
+            "match": "<img src=\"/trading-ui/images/icons/tabler/info-cir"
+          },
+          {
+            "line": 167,
+            "content": "<img src=\"/trading-ui/images/icons/tabler/info-circle.svg\" width=\"16\" height=\"16\" alt=\"icon\" class=\"",
+            "pattern": "<img.*icon",
+            "match": "<img src=\"/trading-ui/images/icons/tabler/info-cir"
+          },
+          {
+            "line": 170,
+            "content": "<img src=\"/trading-ui/images/icons/tabler/download.svg\" width=\"16\" height=\"16\" alt=\"download\" class=",
+            "pattern": "<img.*icon",
+            "match": "<img src=\"/trading-ui/images/icons/tabler/download"
+          },
+          {
+            "line": 173,
+            "content": "<img src=\"/trading-ui/images/icons/tabler/trash.svg\" width=\"16\" height=\"16\" alt=\"trash\" class=\"icon\"",
+            "pattern": "<img.*icon",
+            "match": "<img src=\"/trading-ui/images/icons/tabler/trash.sv"
+          }
+        ],
+        "issue_count": 15
+      }
+    },
+    "colors": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      }
+    },
+    "info_summary": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      }
+    },
+    "pagination": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      }
+    },
+    "entity_details": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      }
+    },
+    "conditions": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      }
+    },
+    "page_state": {
+      "status": "ok",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "ok",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": {
+        "status": "ok",
+        "issues": [],
+        "issue_count": 0
+      }
+    },
+    "logger": {
+      "status": "ok",
+      "issues": [
+        {
+          "line": 195,
+          "content": "window.Logger?.warn('ChartManagement: missing data payload', { id, title });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 230,
+          "content": "window.Logger?.warn('ChartManagement: TradesAdapter not available');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 254,
+          "content": "window.Logger?.warn('ChartManagement: PerformanceAdapter not available');",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 319,
+          "content": "<script src=\"scripts/logger-service.js?v=1.0.0\"></script> <!-- Advanced logging service -->",
+          "pattern": "logger-service\\.js",
+          "match": "logger-service.js",
+          "file": "html"
+        }
+      ],
+      "issue_count": 4,
+      "js_result": {
+        "status": "ok",
+        "issues": [
+          {
+            "line": 195,
+            "content": "window.Logger?.warn('ChartManagement: missing data payload', { id, title });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 230,
+            "content": "window.Logger?.warn('ChartManagement: TradesAdapter not available');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 254,
+            "content": "window.Logger?.warn('ChartManagement: PerformanceAdapter not available');",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          }
+        ],
+        "issue_count": 3
+      },
+      "html_result": {
+        "status": "ok",
+        "issues": [
+          {
+            "line": 319,
+            "content": "<script src=\"scripts/logger-service.js?v=1.0.0\"></script> <!-- Advanced logging service -->",
+            "pattern": "logger-service\\.js",
+            "match": "logger-service.js"
+          }
+        ],
+        "issue_count": 1
+      }
+    },
+    "cache": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      }
+    },
+    "dom_manipulation": {
+      "status": "issues_found",
+      "issues": [
+        {
+          "line": 170,
+          "content": "card.innerHTML = `",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 410,
+          "content": "this.elements.chartsList.innerHTML =",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 167,
+          "content": "const card = document.createElement('div');",
+          "pattern": "createElement",
+          "match": "createElement",
+          "file": "js"
+        }
+      ],
+      "issue_count": 3,
+      "js_result": {
+        "status": "issues_found",
+        "issues": [
+          {
+            "line": 170,
+            "content": "card.innerHTML = `",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 410,
+            "content": "this.elements.chartsList.innerHTML =",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 167,
+            "content": "const card = document.createElement('div');",
+            "pattern": "createElement",
+            "match": "createElement"
+          }
+        ],
+        "issue_count": 3
+      },
+      "html_result": {
+        "status": "ok",
+        "issues": [],
+        "issue_count": 0
+      }
+    },
+    "html_structure": {
+      "status": "issues_found",
+      "issues": [
+        {
+          "line": 66,
+          "content": "<button data-button-type=\"TOGGLE\" data-onclick=\"refreshChartsStatus()\" data-classes=\"btn btn-outline",
+          "pattern": "data-onclick",
+          "match": "data-onclick",
+          "file": "html"
+        },
+        {
+          "line": 69,
+          "content": "<button data-button-type=\"EXPORT\" data-onclick=\"exportAllCharts()\" data-classes=\"btn btn-outline-suc",
+          "pattern": "data-onclick",
+          "match": "data-onclick",
+          "file": "html"
+        },
+        {
+          "line": 80,
+          "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('overviewSection'",
+          "pattern": "data-onclick",
+          "match": "data-onclick",
+          "file": "html"
+        },
+        {
+          "line": 131,
+          "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('managementSectio",
+          "pattern": "data-onclick",
+          "match": "data-onclick",
+          "file": "html"
+        },
+        {
+          "line": 136,
+          "content": "<button data-button-type=\"ADD\" data-entity-type=\"chart\" data-variant=\"full\" data-onclick=\"createNewC",
+          "pattern": "data-onclick",
+          "match": "data-onclick",
+          "file": "html"
+        },
+        {
+          "line": 137,
+          "content": "<button data-button-type=\"REFRESH\" data-onclick=\"refreshAllCharts()\" data-text=\"רענן\">",
+          "pattern": "data-onclick",
+          "match": "data-onclick",
+          "file": "html"
+        },
+        {
+          "line": 140,
+          "content": "<button data-button-type=\"DELETE\" data-onclick=\"destroyAllCharts()\" data-text=\"מחק הכל\" title=\"מחק כ",
+          "pattern": "data-onclick",
+          "match": "data-onclick",
+          "file": "html"
+        },
+        {
+          "line": 154,
+          "content": "<button class=\"btn btn-primary btn-sm me-2 mb-2\" data-onclick=\"createTestChart()\" data-button-type=\"",
+          "pattern": "data-onclick",
+          "match": "data-onclick",
+          "file": "html"
+        },
+        {
+          "line": 157,
+          "content": "<button class=\"btn btn-info btn-sm me-2 mb-2\" data-onclick=\"createPerformanceChart()\" data-button-ty",
+          "pattern": "data-onclick",
+          "match": "data-onclick",
+          "file": "html"
+        },
+        {
+          "line": 160,
+          "content": "<button class=\"btn btn-success btn-sm me-2 mb-2\" data-onclick=\"createAccountChart()\" data-button-typ",
+          "pattern": "data-onclick",
+          "match": "data-onclick",
+          "file": "html"
+        },
+        {
+          "line": 163,
+          "content": "<button class=\"btn btn-warning btn-sm me-2 mb-2\" data-onclick=\"createMixedChart()\" data-button-type=",
+          "pattern": "data-onclick",
+          "match": "data-onclick",
+          "file": "html"
+        },
+        {
+          "line": 166,
+          "content": "<button class=\"btn btn-secondary btn-sm me-2 mb-2\" data-onclick=\"updateTestChart()\" data-button-type",
+          "pattern": "data-onclick",
+          "match": "data-onclick",
+          "file": "html"
+        },
+        {
+          "line": 169,
+          "content": "<button data-button-type=\"VIEW\" data-onclick=\"exportTestChart()\" data-classes=\"btn btn-outline-prima",
+          "pattern": "data-onclick",
+          "match": "data-onclick",
+          "file": "html"
+        },
+        {
+          "line": 172,
+          "content": "<button data-button-type=\"DELETE\" data-onclick=\"destroyTestChart()\" data-classes=\"btn btn-outline-da",
+          "pattern": "data-onclick",
+          "match": "data-onclick",
+          "file": "html"
+        },
+        {
+          "line": 207,
+          "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('settingsSection'",
+          "pattern": "data-onclick",
+          "match": "data-onclick",
+          "file": "html"
+        },
+        {
+          "line": 66,
+          "content": "<button data-button-type=\"TOGGLE\" data-onclick=\"refreshChartsStatus()\" data-classes=\"btn btn-outline",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "html"
+        },
+        {
+          "line": 69,
+          "content": "<button data-button-type=\"EXPORT\" data-onclick=\"exportAllCharts()\" data-classes=\"btn btn-outline-suc",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "html"
+        },
+        {
+          "line": 80,
+          "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('overviewSection'",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "html"
+        },
+        {
+          "line": 131,
+          "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('managementSectio",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "html"
+        },
+        {
+          "line": 136,
+          "content": "<button data-button-type=\"ADD\" data-entity-type=\"chart\" data-variant=\"full\" data-onclick=\"createNewC",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "html"
+        },
+        {
+          "line": 137,
+          "content": "<button data-button-type=\"REFRESH\" data-onclick=\"refreshAllCharts()\" data-text=\"רענן\">",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "html"
+        },
+        {
+          "line": 140,
+          "content": "<button data-button-type=\"DELETE\" data-onclick=\"destroyAllCharts()\" data-text=\"מחק הכל\" title=\"מחק כ",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "html"
+        },
+        {
+          "line": 154,
+          "content": "<button class=\"btn btn-primary btn-sm me-2 mb-2\" data-onclick=\"createTestChart()\" data-button-type=\"",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "html"
+        },
+        {
+          "line": 157,
+          "content": "<button class=\"btn btn-info btn-sm me-2 mb-2\" data-onclick=\"createPerformanceChart()\" data-button-ty",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "html"
+        },
+        {
+          "line": 160,
+          "content": "<button class=\"btn btn-success btn-sm me-2 mb-2\" data-onclick=\"createAccountChart()\" data-button-typ",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "html"
+        },
+        {
+          "line": 163,
+          "content": "<button class=\"btn btn-warning btn-sm me-2 mb-2\" data-onclick=\"createMixedChart()\" data-button-type=",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "html"
+        },
+        {
+          "line": 166,
+          "content": "<button class=\"btn btn-secondary btn-sm me-2 mb-2\" data-onclick=\"updateTestChart()\" data-button-type",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "html"
+        },
+        {
+          "line": 169,
+          "content": "<button data-button-type=\"VIEW\" data-onclick=\"exportTestChart()\" data-classes=\"btn btn-outline-prima",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "html"
+        },
+        {
+          "line": 172,
+          "content": "<button data-button-type=\"DELETE\" data-onclick=\"destroyTestChart()\" data-classes=\"btn btn-outline-da",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "html"
+        },
+        {
+          "line": 207,
+          "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('settingsSection'",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "html"
+        },
+        {
+          "line": 59,
+          "content": "<div id=\"unified-header\"></div>",
+          "pattern": "unified-header",
+          "match": "unified-header",
+          "file": "html"
+        }
+      ],
+      "issue_count": 31,
+      "js_result": {
+        "status": "ok",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": {
+        "status": "issues_found",
+        "issues": [
+          {
+            "line": 66,
+            "content": "<button data-button-type=\"TOGGLE\" data-onclick=\"refreshChartsStatus()\" data-classes=\"btn btn-outline",
+            "pattern": "data-onclick",
+            "match": "data-onclick"
+          },
+          {
+            "line": 69,
+            "content": "<button data-button-type=\"EXPORT\" data-onclick=\"exportAllCharts()\" data-classes=\"btn btn-outline-suc",
+            "pattern": "data-onclick",
+            "match": "data-onclick"
+          },
+          {
+            "line": 80,
+            "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('overviewSection'",
+            "pattern": "data-onclick",
+            "match": "data-onclick"
+          },
+          {
+            "line": 131,
+            "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('managementSectio",
+            "pattern": "data-onclick",
+            "match": "data-onclick"
+          },
+          {
+            "line": 136,
+            "content": "<button data-button-type=\"ADD\" data-entity-type=\"chart\" data-variant=\"full\" data-onclick=\"createNewC",
+            "pattern": "data-onclick",
+            "match": "data-onclick"
+          },
+          {
+            "line": 137,
+            "content": "<button data-button-type=\"REFRESH\" data-onclick=\"refreshAllCharts()\" data-text=\"רענן\">",
+            "pattern": "data-onclick",
+            "match": "data-onclick"
+          },
+          {
+            "line": 140,
+            "content": "<button data-button-type=\"DELETE\" data-onclick=\"destroyAllCharts()\" data-text=\"מחק הכל\" title=\"מחק כ",
+            "pattern": "data-onclick",
+            "match": "data-onclick"
+          },
+          {
+            "line": 154,
+            "content": "<button class=\"btn btn-primary btn-sm me-2 mb-2\" data-onclick=\"createTestChart()\" data-button-type=\"",
+            "pattern": "data-onclick",
+            "match": "data-onclick"
+          },
+          {
+            "line": 157,
+            "content": "<button class=\"btn btn-info btn-sm me-2 mb-2\" data-onclick=\"createPerformanceChart()\" data-button-ty",
+            "pattern": "data-onclick",
+            "match": "data-onclick"
+          },
+          {
+            "line": 160,
+            "content": "<button class=\"btn btn-success btn-sm me-2 mb-2\" data-onclick=\"createAccountChart()\" data-button-typ",
+            "pattern": "data-onclick",
+            "match": "data-onclick"
+          },
+          {
+            "line": 163,
+            "content": "<button class=\"btn btn-warning btn-sm me-2 mb-2\" data-onclick=\"createMixedChart()\" data-button-type=",
+            "pattern": "data-onclick",
+            "match": "data-onclick"
+          },
+          {
+            "line": 166,
+            "content": "<button class=\"btn btn-secondary btn-sm me-2 mb-2\" data-onclick=\"updateTestChart()\" data-button-type",
+            "pattern": "data-onclick",
+            "match": "data-onclick"
+          },
+          {
+            "line": 169,
+            "content": "<button data-button-type=\"VIEW\" data-onclick=\"exportTestChart()\" data-classes=\"btn btn-outline-prima",
+            "pattern": "data-onclick",
+            "match": "data-onclick"
+          },
+          {
+            "line": 172,
+            "content": "<button data-button-type=\"DELETE\" data-onclick=\"destroyTestChart()\" data-classes=\"btn btn-outline-da",
+            "pattern": "data-onclick",
+            "match": "data-onclick"
+          },
+          {
+            "line": 207,
+            "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('settingsSection'",
+            "pattern": "data-onclick",
+            "match": "data-onclick"
+          },
+          {
+            "line": 66,
+            "content": "<button data-button-type=\"TOGGLE\" data-onclick=\"refreshChartsStatus()\" data-classes=\"btn btn-outline",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 69,
+            "content": "<button data-button-type=\"EXPORT\" data-onclick=\"exportAllCharts()\" data-classes=\"btn btn-outline-suc",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 80,
+            "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('overviewSection'",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 131,
+            "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('managementSectio",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 136,
+            "content": "<button data-button-type=\"ADD\" data-entity-type=\"chart\" data-variant=\"full\" data-onclick=\"createNewC",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 137,
+            "content": "<button data-button-type=\"REFRESH\" data-onclick=\"refreshAllCharts()\" data-text=\"רענן\">",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 140,
+            "content": "<button data-button-type=\"DELETE\" data-onclick=\"destroyAllCharts()\" data-text=\"מחק הכל\" title=\"מחק כ",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 154,
+            "content": "<button class=\"btn btn-primary btn-sm me-2 mb-2\" data-onclick=\"createTestChart()\" data-button-type=\"",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 157,
+            "content": "<button class=\"btn btn-info btn-sm me-2 mb-2\" data-onclick=\"createPerformanceChart()\" data-button-ty",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 160,
+            "content": "<button class=\"btn btn-success btn-sm me-2 mb-2\" data-onclick=\"createAccountChart()\" data-button-typ",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 163,
+            "content": "<button class=\"btn btn-warning btn-sm me-2 mb-2\" data-onclick=\"createMixedChart()\" data-button-type=",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 166,
+            "content": "<button class=\"btn btn-secondary btn-sm me-2 mb-2\" data-onclick=\"updateTestChart()\" data-button-type",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 169,
+            "content": "<button data-button-type=\"VIEW\" data-onclick=\"exportTestChart()\" data-classes=\"btn btn-outline-prima",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 172,
+            "content": "<button data-button-type=\"DELETE\" data-onclick=\"destroyTestChart()\" data-classes=\"btn btn-outline-da",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 207,
+            "content": "<button data-button-type=\"TOGGLE\" data-variant=\"small\" data-onclick=\"toggleSection('settingsSection'",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 59,
+            "content": "<div id=\"unified-header\"></div>",
+            "pattern": "unified-header",
+            "match": "unified-header"
+          }
+        ],
+        "issue_count": 31
+      }
+    }
+  }
+}

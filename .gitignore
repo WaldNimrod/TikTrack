@@ -49,6 +49,11 @@ Thumbs.db
 *.log.*
 logs/*.log.*
 
+# Bundles (build artifacts - not in git)
+trading-ui/scripts/bundles/
+*.bundle.js
+*.bundle.js.map
+
 # Archive directories (keep local but don't backup)
 archive/
 reports/advanced-duplicates-*.json
@@ -85,3 +90,8 @@ __pycache__/
 
 # Temporary test files
 /tmp/test_*_results.txt
+
+# HTML backup files
+*.html.backup*
+*.html.backup-*
+*.backup-*

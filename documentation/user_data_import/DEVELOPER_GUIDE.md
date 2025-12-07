@@ -198,6 +198,81 @@ trading-ui/
 - `CRUDResponseHandler` - טיפול בפעולות CRUD
 - `TagService` - ניהול תגיות (יצירה, שיוך, מחיקה)
 - `CacheSyncManager` / `UnifiedCacheManager` - ניהול מטמון
+
+### User Isolation ו-User_Ticker Integration
+
+**עדכון חשוב (דצמבר 2025):** מערכת הייבוא עברה עדכון מקיף לתמיכה ב-user isolation ו-user_ticker associations.
+
+#### User ID Passing
+
+**כל ה-API routes חייבים:**
+1. לקבל `user_id` מ-`g.user_id` (Flask context)
+2. לבדוק authentication לפני ביצוע פעולות
+3. להעביר `user_id` לכל הפונקציות הפנימיות
+
+**דוגמה:**
+```python
+@user_data_import_bp.route('/upload', methods=['POST'])
+def upload_file():
+    # Get user_id from Flask context
+    user_id = getattr(g, 'user_id', None)
+    if not user_id:
+        return jsonify({'error': 'User authentication required'}), 401
+    
+    # Pass user_id to orchestrator
+    result = orchestrator.create_import_session(
+        trading_account_id=trading_account_id,
+        file_name=file.filename,
+        file_content=file_content,
+        connector_type=connector_type,
+        task_type=task_type,
+        user_id=user_id  # Pass user_id
+    )
+```
+
+#### User_Ticker Association
+
+**תהליך יצירת טיקרים:**
+1. `TickerService.enrich_records_with_ticker_ids()` מקבל `user_id`
+2. אם טיקר קיים - בודק אם `user_ticker` association קיים
+3. אם `user_ticker` לא קיים - יוצר association
+4. אם טיקר לא קיים - יוצר `ticker` + `user_ticker` association
+
+**דוגמה:**
+```python
+enriched_records = TickerService.enrich_records_with_ticker_ids(
+    db_session, 
+    execution_payloads, 
+    user_id=user_id  # Required for user_ticker creation
+)
+```
+
+#### בדיקת טיקרים חסרים - User-Specific
+
+**`ValidationService._check_missing_tickers()` עכשיו:**
+1. בודק `user_tickers` table עם `user_id` (אם `user_id` מסופק)
+2. טיקר נחשב חסר אם:
+   - הטיקר לא קיים ב-`tickers` table, או
+   - הטיקר קיים אבל אין `user_ticker` association למשתמש
+
+**דוגמה:**
+```python
+# Set user_id on validation_service
+validation_service.user_id = user_id
+
+# Check missing tickers (user-specific)
+missing_tickers = validation_service._check_missing_tickers(records, user_id=user_id)
+```
+
+#### ImportSession User ID
+
+**`ImportSession` שומר `user_id`:**
+- כל import session משויך למשתמש ספציפי
+- `user_id` נשמר ב-session ונעשה בו שימוש בכל התהליך
+
+**קישור לתיעוד:**
+- [USER_TICKER_INTEGRATION.md](../../02-ARCHITECTURE/BACKEND/USER_TICKER_INTEGRATION.md) - ארכיטקטורה מלאה
+- [USER_TICKER_IMPORT.md](./USER_TICKER_IMPORT.md) - תיעוד ייעודי לייבוא
 - `EventHandlerManager` - טיפול באירועים
 
 **דוגמה שגויה (❌):**

@@ -198,6 +198,13 @@
 
     /**
      * Create Mini Chart widget
+     * 
+     * ⚠️ NOTE: TradingView widgets automatically create WebSocket connections
+     * to widgetdata.tradingview.com for real-time data updates.
+     * These WebSocket connections are managed by TradingView's external library
+     * and are not under our direct control. Connection failures are expected
+     * in development environments and do not affect widget functionality.
+     * 
      * @param {Object} config - Widget configuration
      * @returns {Object} Widget instance (script element)
      */
@@ -317,8 +324,13 @@
       script.src = widgetConfig.script;
       script.async = true;
 
+      // Remove container_id from config before passing to TradingView
+      // container_id is only used by our factory, not by TradingView widgets
+      const tradingViewConfig = { ...config };
+      delete tradingViewConfig.container_id;
+
       // Set script content (configuration)
-      const scriptContent = JSON.stringify(config, null, 2);
+      const scriptContent = JSON.stringify(tradingViewConfig, null, 2);
       script.textContent = scriptContent;
 
       // Append script to wrapper

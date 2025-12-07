@@ -31,6 +31,7 @@ class QuoteData:
     change_pct_day: Optional[float] = None  # Added missing attribute
     change_amount: Optional[float] = None
     volume: Optional[int] = None
+    market_cap: Optional[float] = None  # Market capitalization in base currency
     currency: str = 'USD'
     asof_utc: Optional[datetime] = None
     source: str = 'yahoo_finance'
@@ -90,8 +91,9 @@ class YahooFinanceAdapter:
         self.preferred_batch_size = 25
         
         # Error handling
-        self.retry_attempts = 2
+        self.retry_attempts = 3  # Increased from 2 to 3 for better reliability
         self.timeout_seconds = 20
+        self.retry_base_delay = 1  # Base delay in seconds for exponential backoff
         
         # Load provider configuration
         self._load_provider_config()
@@ -422,11 +424,16 @@ class YahooFinanceAdapter:
     def _make_request(self, url: str, params: Dict = None) -> Optional[Dict]:
         """Make HTTP request with retry logic and rate limiting"""
         if not self._check_rate_limit():
+            logger.warning(f"Rate limit reached, cannot make request to {url}")
             return None
+        
+        symbol = url.split('/')[-1].split('?')[0] if '/' in url else 'unknown'
         
         for attempt in range(self.retry_attempts + 1):
             try:
                 self._increment_request_count()
+                
+                logger.debug(f"📡 Request attempt {attempt + 1}/{self.retry_attempts + 1} for {symbol}: {url}")
                 
                 response = self.session.get(
                     url, 
@@ -436,37 +443,94 @@ class YahooFinanceAdapter:
                 response.raise_for_status()
                 
                 data = response.json()
-                logger.debug(f"Request successful: {url}")
+                logger.debug(f"✅ Request successful for {symbol} (attempt {attempt + 1})")
                 return data
                 
             except requests.exceptions.HTTPError as e:
-                if e.response and e.response.status_code == 404:
+                status_code = e.response.status_code if e.response else None
+                
+                if status_code == 404:
                     # Symbol not found in Yahoo Finance - likely European/unsupported ticker
                     # Don't retry 404 errors - symbol simply doesn't exist in Yahoo Finance
-                    logger.warning(f"Symbol not found in Yahoo Finance (404): {url.split('/')[-1].split('?')[0]} - This may be a European or unsupported ticker")
+                    logger.warning(f"⚠️ Symbol not found in Yahoo Finance (404): {symbol} - This may be a European or unsupported ticker")
                     return None  # Don't retry 404 errors
-                logger.warning(f"Request attempt {attempt + 1} failed: {e}")
+                
+                if status_code == 429:
+                    # Rate limit exceeded - wait longer before retry
+                    wait_time = (2 ** attempt) * 5  # Longer wait for rate limits
+                    logger.warning(f"⚠️ Rate limit exceeded (429) for {symbol}, waiting {wait_time}s before retry {attempt + 1}/{self.retry_attempts}")
+                    if attempt < self.retry_attempts:
+                        time.sleep(wait_time)
+                        continue
+                
+                logger.warning(f"⚠️ HTTP error for {symbol} (attempt {attempt + 1}/{self.retry_attempts + 1}): {status_code} - {e}")
                 if attempt < self.retry_attempts:
-                    time.sleep(2 ** attempt)  # Exponential backoff
+                    wait_time = self.retry_base_delay * (2 ** attempt)  # Exponential backoff
+                    logger.debug(f"⏳ Waiting {wait_time}s before retry for {symbol}")
+                    time.sleep(wait_time)
                 else:
-                    logger.error(f"All retry attempts failed for {url}")
+                    logger.error(f"❌ All retry attempts failed for {symbol}: HTTP {status_code}")
                     return None
+                    
+            except requests.exceptions.Timeout as e:
+                logger.warning(f"⚠️ Request timeout for {symbol} (attempt {attempt + 1}/{self.retry_attempts + 1}): {e}")
+                if attempt < self.retry_attempts:
+                    wait_time = self.retry_base_delay * (2 ** attempt)
+                    logger.debug(f"⏳ Waiting {wait_time}s before retry for {symbol}")
+                    time.sleep(wait_time)
+                else:
+                    logger.error(f"❌ All retry attempts failed for {symbol}: Timeout")
+                    return None
+                    
             except requests.exceptions.RequestException as e:
-                logger.warning(f"Request attempt {attempt + 1} failed: {e}")
+                logger.warning(f"⚠️ Request error for {symbol} (attempt {attempt + 1}/{self.retry_attempts + 1}): {e}")
                 if attempt < self.retry_attempts:
-                    time.sleep(2 ** attempt)  # Exponential backoff
+                    wait_time = self.retry_base_delay * (2 ** attempt)
+                    logger.debug(f"⏳ Waiting {wait_time}s before retry for {symbol}")
+                    time.sleep(wait_time)
                 else:
-                    logger.error(f"All retry attempts failed for {url}")
+                    logger.error(f"❌ All retry attempts failed for {symbol}: {e}")
                     return None
+                    
             except Exception as e:
-                logger.error(f"Unexpected error in request: {e}")
+                logger.error(f"❌ Unexpected error in request for {symbol}: {e}", exc_info=True)
                 return None
         
         return None
     
+    def _get_fallback_symbols(self, symbol: str) -> List[str]:
+        """
+        Get fallback symbol variations for European/unsupported tickers
+        
+        Args:
+            symbol: Original symbol
+            
+        Returns:
+            List of fallback symbols to try
+        """
+        fallbacks = []
+        symbol_upper = symbol.upper()
+        
+        # Common European exchanges
+        if not '.' in symbol_upper:
+            # Try German exchange (.DE)
+            fallbacks.append(f"{symbol_upper}.DE")
+            # Try Frankfurt exchange (.F)
+            fallbacks.append(f"{symbol_upper}.F")
+            # Try XETR exchange (.XETR)
+            fallbacks.append(f"{symbol_upper}.XETR")
+            # Try London exchange (.L)
+            fallbacks.append(f"{symbol_upper}.L")
+            # Try Paris exchange (.PA)
+            fallbacks.append(f"{symbol_upper}.PA")
+            # Try Amsterdam exchange (.AS)
+            fallbacks.append(f"{symbol_upper}.AS")
+        
+        return fallbacks
+    
     def get_quote(self, symbol: str, ticker: Optional[Ticker] = None) -> Optional[QuoteData]:
         """
-        Get single quote for a symbol
+        Get single quote for a symbol with retry and fallback symbols
         
         Args:
             symbol: Ticker symbol (internal symbol)
@@ -500,32 +564,88 @@ class YahooFinanceAdapter:
                 logger.debug(f"Cache hit for {provider_symbol}")
                 return cached_quote
             
-            # Fetch from API using provider symbol
-            url = f"{self.base_url}/v8/finance/chart/{provider_symbol}"
-            params = {
-                'interval': '1d',
-                'range': '1d',
-                'includePrePost': 'false'
-            }
+            # Try primary symbol first
+            symbols_to_try = [provider_symbol]
             
-            data = self._make_request(url, params)
-            if not data:
-                return None
+            # Add fallback symbols if primary symbol fails (only for symbols without exchange suffix)
+            if not '.' in provider_symbol:
+                fallback_symbols = self._get_fallback_symbols(provider_symbol)
+                symbols_to_try.extend(fallback_symbols)
             
-            # Parse response - use internal symbol for the quote object
-            internal_symbol = ticker.symbol if ticker else provider_symbol
-            quote = self._parse_quote_response(internal_symbol, data)
-            if quote:
-                # Cache the result
+            # Try each symbol until one works
+            last_error = None
+            for attempt_symbol in symbols_to_try:
+                try:
+                    # Fetch from API using provider symbol
+                    url = f"{self.base_url}/v8/finance/chart/{attempt_symbol}"
+                    params = {
+                        'interval': '1d',
+                        'range': '1d',
+                        'includePrePost': 'false'
+                    }
+                    
+                    data = self._make_request(url, params)
+                    if not data:
+                        if attempt_symbol != symbols_to_try[-1]:  # Not the last attempt
+                            logger.debug(f"Symbol {attempt_symbol} not found, trying next fallback...")
+                            continue
+                        else:
+                            logger.warning(f"All symbol variations failed for {symbol} (tried: {', '.join(symbols_to_try)})")
+                            return None
+                    
+                    # Parse response - use internal symbol for the quote object
+                    internal_symbol = ticker.symbol if ticker else symbol
+                    quote = self._parse_quote_response(internal_symbol, data)
+                    if quote:
+                        # If we used a fallback symbol, log it and optionally save the mapping
+                        if attempt_symbol != provider_symbol:
+                            logger.info(f"✅ Successfully fetched quote for {symbol} using fallback symbol '{attempt_symbol}'")
+                            # Optionally save the mapping for future use
+                            if ticker:
+                                try:
+                                    from services.ticker_symbol_mapping_service import TickerSymbolMappingService
+                                    TickerSymbolMappingService.set_provider_symbol(
+                                        self.db_session,
+                                        ticker.id,
+                                        self.provider_id,
+                                        attempt_symbol,
+                                        is_primary=True
+                                    )
+                                    self.db_session.commit()
+                                    logger.info(f"💾 Saved provider symbol mapping: {ticker.symbol} -> {attempt_symbol}")
+                                except Exception as mapping_error:
+                                    logger.warning(f"Could not save provider symbol mapping: {mapping_error}")
+                        
+                        # Cache the result
+                        if ticker:
+                            self._cache_quote_by_ticker(quote, ticker)
+                        else:
+                            self._cache_quote(quote)
+                        
+                        return quote
+                    else:
+                        if attempt_symbol != symbols_to_try[-1]:  # Not the last attempt
+                            logger.debug(f"Could not parse response for {attempt_symbol}, trying next fallback...")
+                            continue
+                        
+                except Exception as e:
+                    last_error = e
+                    if attempt_symbol != symbols_to_try[-1]:  # Not the last attempt
+                        logger.debug(f"⚠️ Error fetching {symbol} with provider symbol {attempt_symbol}: {e}, trying next fallback...")
+                        continue
+                    else:
+                        logger.error(f"❌ Error getting quote for {symbol} (tried all variations: {', '.join(symbols_to_try)}): {e}")
+            
+            # If all attempts failed, log detailed error information
+            if last_error:
+                logger.error(f"❌ All symbol variations failed for {symbol} (tried: {', '.join(symbols_to_try)}): {last_error}")
+                # Log additional context for debugging
                 if ticker:
-                    self._cache_quote_by_ticker(quote, ticker)
-                else:
-                    self._cache_quote(quote)
-                
-            return quote
+                    logger.error(f"   Ticker ID: {ticker.id}, Internal Symbol: {ticker.symbol}, Provider Symbol: {provider_symbol}")
+            return None
             
         except Exception as e:
-            logger.error(f"Error getting quote for {symbol}: {e}")
+            logger.error(f"Error getting quote for {symbol}: {e}", exc_info=True)
             return None
     
     def get_quotes_batch(self, symbols: List[str]) -> List[QuoteData]:
@@ -668,14 +788,17 @@ class YahooFinanceAdapter:
         for internal_symbol, provider_symbol in zip(internal_symbols, provider_symbols):
             try:
                 ticker = symbol_to_ticker.get(internal_symbol)
+                logger.debug(f"📊 Fetching quote for {internal_symbol} (provider: {provider_symbol}, ticker_id: {ticker.id if ticker else 'N/A'})")
+                
                 quote = self.get_quote(internal_symbol, ticker=ticker)
                 if quote:
                     quotes.append(quote)
+                    logger.debug(f"✅ Successfully fetched quote for {internal_symbol}")
                 else:
-                    logger.warning(f"Failed to get quote for {internal_symbol} (provider: {provider_symbol})")
+                    logger.warning(f"⚠️ Failed to get quote for {internal_symbol} (provider: {provider_symbol}) - symbol may not exist in Yahoo Finance or API error")
                     
             except Exception as e:
-                logger.error(f"Error fetching quote for {internal_symbol}: {e}")
+                logger.error(f"❌ Error fetching quote for {internal_symbol} (provider: {provider_symbol}): {e}", exc_info=True)
                 continue
         
         return quotes
@@ -758,9 +881,32 @@ class YahooFinanceAdapter:
             else:
                 logger.warning(f"📊 {symbol}: Cannot calculate percentage change - missing data")
             
+            # Try multiple volume field names (Yahoo Finance may use different fields)
             if 'regularMarketVolume' in meta:
                 quote.volume = int(meta['regularMarketVolume'])
-                logger.info(f"📊 {symbol}: volume = {quote.volume}")
+                logger.info(f"📊 {symbol}: volume = {quote.volume} (from regularMarketVolume)")
+            elif 'volume' in meta:
+                quote.volume = int(meta['volume'])
+                logger.info(f"📊 {symbol}: volume = {quote.volume} (from volume)")
+            elif 'averageVolume' in meta:
+                quote.volume = int(meta['averageVolume'])
+                logger.info(f"📊 {symbol}: volume = {quote.volume} (from averageVolume)")
+            elif 'averageDailyVolume10Day' in meta:
+                quote.volume = int(meta['averageDailyVolume10Day'])
+                logger.info(f"📊 {symbol}: volume = {quote.volume} (from averageDailyVolume10Day)")
+            else:
+                logger.warning(f"📊 {symbol}: No volume data found in meta. Available keys: {list(meta.keys())}")
+            
+            # Extract market capitalization (market cap)
+            # Yahoo Finance provides marketCap in meta
+            if 'marketCap' in meta:
+                try:
+                    quote.market_cap = float(meta['marketCap'])
+                    logger.info(f"📊 {symbol}: market_cap = {quote.market_cap:,.0f} (from marketCap)")
+                except (ValueError, TypeError) as e:
+                    logger.warning(f"📊 {symbol}: Error parsing marketCap: {e}")
+            else:
+                logger.debug(f"📊 {symbol}: No marketCap found in meta. Available keys: {list(meta.keys())}")
             
             # Extract open price and calculate change from open
             if 'regularMarketOpen' in meta:
@@ -919,21 +1065,58 @@ class YahooFinanceAdapter:
     def _cache_quote_by_ticker(self, quote: QuoteData, ticker: Ticker):
         """Cache quote in database by ticker object"""
         try:
-            logger.info(f"🔄 _cache_quote called for ticker: {ticker.symbol} (ID: {ticker.id})")
+            logger.info(f"🔄 _cache_quote_by_ticker called for ticker: {ticker.symbol} (ID: {ticker.id})")
             
-            # Create or update quote
-            db_quote = MarketDataQuote(
-                ticker_id=ticker.id,
-                provider_id=self.provider_id,
-                asof_utc=quote.asof_utc or datetime.now(timezone.utc),
-                price=quote.price,
-                change_pct_day=quote.change_pct_day or quote.change_pct,
-                change_amount_day=quote.change_amount,
-                volume=quote.volume,
-                currency=quote.currency,
-                source=quote.source,
-                is_stale=False,
-                quality_score=1.0,
+            # Check if quote already exists (within last hour to avoid duplicates)
+            # Use a shorter window (5 minutes) to allow force refresh to work properly
+            cutoff_time = datetime.now(timezone.utc) - timedelta(minutes=5)
+            existing_quote = self.db_session.query(MarketDataQuote).filter(
+                MarketDataQuote.ticker_id == ticker.id,
+                MarketDataQuote.provider_id == self.provider_id,
+                MarketDataQuote.fetched_at >= cutoff_time
+            ).order_by(MarketDataQuote.fetched_at.desc()).first()
+            
+            if existing_quote:
+                # Update existing quote
+                logger.info(f"🔄 Updating existing quote for {ticker.symbol}")
+                logger.info(f"📊 Updating quote: old_volume={existing_quote.volume}, new_volume={quote.volume}")
+                existing_quote.asof_utc = quote.asof_utc or datetime.now(timezone.utc)
+                existing_quote.price = quote.price
+                existing_quote.change_pct_day = quote.change_pct_day or quote.change_pct
+                existing_quote.change_amount_day = quote.change_amount
+                existing_quote.volume = quote.volume  # Explicitly update volume
+                existing_quote.market_cap = quote.market_cap  # Update market cap
+                logger.info(f"📊 After update: existing_quote.volume={existing_quote.volume}, market_cap={existing_quote.market_cap}")
+                existing_quote.currency = quote.currency
+                existing_quote.source = quote.source
+                existing_quote.is_stale = False
+                existing_quote.quality_score = 1.0
+                existing_quote.open_price = quote.open_price
+                existing_quote.change_pct_from_open = quote.change_pct_from_open
+                existing_quote.change_amount_from_open = quote.change_amount_from_open
+                existing_quote.high_price = quote.high_price
+                existing_quote.low_price = quote.low_price
+                existing_quote.close_price = quote.close_price
+                existing_quote.atr = quote.atr
+                existing_quote.atr_period = quote.atr_period or 14
+                existing_quote.fetched_at = datetime.now(timezone.utc)
+                db_quote = existing_quote
+            else:
+                # Create new quote
+                logger.info(f"💾 Creating new quote for {ticker.symbol}")
+                db_quote = MarketDataQuote(
+                    ticker_id=ticker.id,
+                    provider_id=self.provider_id,
+                    asof_utc=quote.asof_utc or datetime.now(timezone.utc),
+                    price=quote.price,
+                    change_pct_day=quote.change_pct_day or quote.change_pct,
+                    change_amount_day=quote.change_amount,
+                    volume=quote.volume,
+                    market_cap=quote.market_cap,
+                    currency=quote.currency,
+                    source=quote.source,
+                    is_stale=False,
+                    quality_score=1.0,
                     # Open price data
                     open_price=quote.open_price,
                     change_pct_from_open=quote.change_pct_from_open,
@@ -946,26 +1129,78 @@ class YahooFinanceAdapter:
                     atr=quote.atr,
                     atr_period=quote.atr_period or 14
                 )
-            
-            logger.info(f"💾 Adding quote to database: {ticker.symbol} = ${quote.price} ({quote.currency})")
-            self.db_session.add(db_quote)
+                self.db_session.add(db_quote)
             
             # Also update quotes_last table as required by specification Section 3.1
-            self._update_quotes_last(ticker.id, quote)
+            # Do this AFTER we've updated the quote but BEFORE commit to ensure volume is saved
+            # Use a separate transaction to avoid rollback issues
+            try:
+                # Save the quote first, then update quotes_last
+                # This ensures the quote is saved even if quotes_last fails
+                pass  # We'll update quotes_last after commit
+            except Exception as e:
+                logger.warning(f"⚠️ Error preparing quotes_last update for {ticker.symbol}: {e} - continuing anyway")
             
+            # Log before commit to see what we're about to save
             logger.info(f"🔄 Committing transaction for {ticker.symbol}")
+            logger.info(f"📊 Quote data being saved: price={quote.price}, volume={quote.volume}, change_pct={quote.change_pct_day or quote.change_pct}")
+            if existing_quote:
+                logger.info(f"📊 Existing quote before commit: volume={existing_quote.volume}, price={existing_quote.price}")
+            elif db_quote:
+                logger.info(f"📊 New quote before commit: volume={db_quote.volume}, price={db_quote.price}")
+            
+            # Flush to ensure changes are in session before commit
+            self.db_session.flush()
+            
+            # Commit the transaction
             self.db_session.commit()
             
-            logger.info(f"✅ Successfully cached quote for {ticker.symbol}: ${quote.price}")
+            # Now update quotes_last after commit (separate transaction to avoid rollback)
+            try:
+                self._update_quotes_last(ticker.id, quote)
+            except Exception as e:
+                logger.warning(f"⚠️ Error updating quotes_last for {ticker.symbol}: {e} - continuing anyway")
+            
+            # Refresh the object from database to ensure we have the latest data
+            if existing_quote:
+                self.db_session.refresh(existing_quote)
+                logger.info(f"📊 Existing quote after commit and refresh: volume={existing_quote.volume}, price={existing_quote.price}")
+            
+            # Verify the data was saved correctly - query fresh from database
+            saved_quote = self.db_session.query(MarketDataQuote).filter(
+                MarketDataQuote.ticker_id == ticker.id,
+                MarketDataQuote.provider_id == self.provider_id
+            ).order_by(MarketDataQuote.fetched_at.desc()).first()
+            
+            if saved_quote:
+                if quote.volume is not None:
+                    if saved_quote.volume != quote.volume:
+                        logger.warning(f"⚠️ Volume mismatch for {ticker.symbol}: saved={saved_quote.volume}, expected={quote.volume}")
+                        logger.warning(f"⚠️ Quote object volume: {quote.volume}, DB quote volume: {saved_quote.volume}")
+                        # Try to fix it - update directly
+                        saved_quote.volume = quote.volume
+                        self.db_session.commit()
+                        logger.info(f"🔧 Fixed volume mismatch for {ticker.symbol}: set to {quote.volume}")
+                    else:
+                        logger.info(f"✅ Verified volume saved correctly for {ticker.symbol}: {saved_quote.volume}")
+                else:
+                    logger.warning(f"⚠️ Quote volume is None for {ticker.symbol} - volume was not fetched from Yahoo Finance")
+                    logger.info(f"📊 Saved quote volume in DB: {saved_quote.volume}")
+            else:
+                logger.error(f"❌ Could not find saved quote for {ticker.symbol} after commit!")
+            
+            logger.info(f"✅ Successfully cached quote for {ticker.symbol}: ${quote.price}, volume={quote.volume}")
             
         except SQLAlchemyError as e:
-            logger.error(f"❌ SQLAlchemy error caching quote for ticker {ticker.id}: {e}")
+            logger.error(f"❌ SQLAlchemy error caching quote for ticker {ticker.id}: {e}", exc_info=True)
             logger.error(f"🔄 Rolling back transaction for {ticker.symbol}")
             self.db_session.rollback()
+            raise  # Re-raise to be caught by caller
         except Exception as e:
-            logger.error(f"❌ Unexpected error caching quote for ticker {ticker.id}: {e}")
+            logger.error(f"❌ Unexpected error caching quote for ticker {ticker.id}: {e}", exc_info=True)
             logger.error(f"🔄 Rolling back transaction for {ticker.symbol}")
             self.db_session.rollback()
+            raise  # Re-raise to be caught by caller
     
     def _log_refresh_operation(self, **kwargs):
         """Log refresh operation details"""
@@ -1413,7 +1648,15 @@ class YahooFinanceAdapter:
             from datetime import date, timedelta
             
             end_date = date.today()
-            start_date = end_date - timedelta(days=days_back + 5)  # Get more data for reliability
+            # Calculate buffer: need to account for weekends and holidays
+            # For 150 trading days, we need ~210 calendar days (150 * 1.4 ratio)
+            # But to be safe, we use 1.5 ratio to ensure we get enough trading days
+            # For 150 trading days: 150 * 1.5 = 225 calendar days minimum
+            # Increased buffer to 100 days to ensure we get at least 150 trading days
+            # This accounts for weekends (2/7 = ~28.6% reduction) and holidays (~10-15 days per year)
+            buffer_days = max(100, int(days_back * 0.67))  # 67% buffer for trading days vs calendar days (safer)
+            start_date = end_date - timedelta(days=days_back + buffer_days)  # Get more data for reliability
+            logger.debug(f"📅 Historical data request: {symbol} - {days_back} trading days requested, buffer: {buffer_days} days, total: {days_back + buffer_days} calendar days from {start_date} to {end_date}")
             
             url = f"{self.base_url}/v8/finance/chart/{symbol}"
             params = {
@@ -1424,43 +1667,246 @@ class YahooFinanceAdapter:
             
             data = self._make_request(url, params)
             if not data:
+                logger.warning(f"⚠️ No data returned from Yahoo Finance API for {symbol}")
                 return []
             
             if 'chart' not in data or 'result' not in data['chart'] or not data['chart']['result']:
+                logger.warning(f"⚠️ Invalid response structure from Yahoo Finance API for {symbol}: missing chart.result")
                 return []
             
             result = data['chart']['result'][0]
             if 'timestamp' not in result or 'indicators' not in result:
+                logger.warning(f"⚠️ Invalid response structure from Yahoo Finance API for {symbol}: missing timestamp or indicators")
                 return []
             
             timestamps = result['timestamp']
             quotes = result['indicators']['quote'][0]
             
+            logger.debug(f"📊 Raw data from API: {symbol} - {len(timestamps)} timestamps, {len(quotes.get('open', []))} open prices")
+            
             historical_data = []
+            skipped_null_count = 0
+            skipped_invalid_count = 0
+            
             for i in range(len(timestamps)):
                 try:
-                    if (quotes['open'][i] is not None and quotes['high'][i] is not None and 
-                        quotes['low'][i] is not None and quotes['close'][i] is not None):
+                    # Validate all OHLC values are not None before processing
+                    open_val = quotes.get('open', [None])[i] if i < len(quotes.get('open', [])) else None
+                    high_val = quotes.get('high', [None])[i] if i < len(quotes.get('high', [])) else None
+                    low_val = quotes.get('low', [None])[i] if i < len(quotes.get('low', [])) else None
+                    close_val = quotes.get('close', [None])[i] if i < len(quotes.get('close', [])) else None
+                    
+                    if open_val is None or high_val is None or low_val is None or close_val is None:
+                        skipped_null_count += 1
+                        continue
+                    
+                    # Validate numeric values
+                    try:
+                        open_float = float(open_val)
+                        high_float = float(high_val)
+                        low_float = float(low_val)
+                        close_float = float(close_val)
+                        
+                        # Validate price ranges (high >= low, high >= open, high >= close, low <= open, low <= close)
+                        if high_float < low_float or high_float < open_float or high_float < close_float or low_float > open_float or low_float > close_float:
+                            skipped_invalid_count += 1
+                            logger.debug(f"⚠️ Invalid price range for {symbol} at index {i}: O={open_float}, H={high_float}, L={low_float}, C={close_float}")
+                            continue
+                        
                         historical_date = datetime.fromtimestamp(timestamps[i], tz=timezone.utc)
                         historical_data.append({
                             'date': historical_date,
-                            'open': float(quotes['open'][i]),
-                            'high': float(quotes['high'][i]),
-                            'low': float(quotes['low'][i]),
-                            'close': float(quotes['close'][i])
+                            'open': open_float,
+                            'high': high_float,
+                            'low': low_float,
+                            'close': close_float
                         })
+                    except (ValueError, TypeError) as e:
+                        skipped_invalid_count += 1
+                        logger.debug(f"⚠️ Invalid numeric value for {symbol} at index {i}: {e}")
+                        continue
+                        
                 except (ValueError, TypeError, IndexError) as e:
+                    skipped_invalid_count += 1
                     logger.warning(f"Error parsing historical data point {i} for {symbol}: {e}")
                     continue
             
             # Sort by date (oldest first) for ATR calculation
             historical_data.sort(key=lambda x: x['date'])
-            logger.info(f"📊 {symbol}: Fetched {len(historical_data)} historical OHLC data points")
+            
+            logger.info(f"📊 {symbol}: Fetched {len(historical_data)} valid historical OHLC data points (requested {days_back} trading days, skipped {skipped_null_count} null values, {skipped_invalid_count} invalid values)")
+            
+            if skipped_null_count > 0 or skipped_invalid_count > 0:
+                logger.warning(f"⚠️ {symbol}: Skipped {skipped_null_count + skipped_invalid_count} data points due to null/invalid values")
+            
             return historical_data
             
         except Exception as e:
             logger.error(f"Error getting historical OHLC data for {symbol}: {e}")
             return []
+    
+    def fetch_and_save_historical_quotes(self, ticker: Ticker, days_back: int = 150) -> int:
+        """
+        Fetch historical quotes and save them to database
+        
+        Args:
+            ticker: Ticker object
+            days_back: Number of days to fetch (default 150 for MA 150 calculation)
+            
+        Returns:
+            Number of quotes saved
+        """
+        try:
+            provider_symbol = self._get_provider_symbol(ticker)
+            logger.info(f"📊 Fetching {days_back} days of historical data for {ticker.symbol} (provider: {provider_symbol})")
+            
+            # Get historical OHLC data
+            historical_data = self._get_historical_ohlc_data(provider_symbol, days_back=days_back)
+            
+            if not historical_data:
+                logger.warning(f"⚠️ No historical data fetched for {ticker.symbol}")
+                return 0
+            
+            logger.info(f"📊 Fetched {len(historical_data)} historical data points for {ticker.symbol} (requested {days_back} trading days)")
+            
+            # Check if we have enough data
+            if len(historical_data) < days_back:
+                logger.warning(f"⚠️ Only {len(historical_data)} quotes fetched for {ticker.symbol}, expected at least {days_back} trading days")
+                # Log date range for debugging
+                if historical_data:
+                    first_date = min(d['date'] for d in historical_data)
+                    last_date = max(d['date'] for d in historical_data)
+                    logger.debug(f"📅 Date range: {first_date.date()} to {last_date.date()}")
+            
+            saved_count = 0
+            skipped_count = 0
+            error_count = 0
+            
+            # Optimize: Batch query for existing quotes to reduce database queries
+            from sqlalchemy import func
+            quote_dates = []
+            for data_point in historical_data:
+                quote_date = data_point['date']
+                if isinstance(quote_date, datetime):
+                    quote_dates.append(quote_date.date())
+                else:
+                    quote_dates.append(quote_date.date() if hasattr(quote_date, 'date') else None)
+            
+            # Batch query: Get all existing quotes for this ticker/provider in one query
+            existing_quotes_map = {}
+            if quote_dates:
+                existing_quotes = self.db_session.query(
+                    MarketDataQuote.id,
+                    func.date(MarketDataQuote.asof_utc).label('quote_date'),
+                    MarketDataQuote
+                ).filter(
+                    MarketDataQuote.ticker_id == ticker.id,
+                    MarketDataQuote.provider_id == self.provider_id,
+                    func.date(MarketDataQuote.asof_utc).in_([d for d in quote_dates if d])
+                ).all()
+                
+                for quote_id, quote_date, quote_obj in existing_quotes:
+                    date_key = quote_date.isoformat() if quote_date else None
+                    if date_key:
+                        existing_quotes_map[date_key] = quote_obj
+            
+            logger.debug(f"📊 Found {len(existing_quotes_map)} existing quotes for {ticker.symbol} out of {len(historical_data)} data points")
+            
+            # Batch size for commits (commit every 50 quotes to avoid large transactions)
+            BATCH_SIZE = 50
+            current_batch = 0
+            
+            # Save each historical quote to database
+            for data_point in historical_data:
+                try:
+                    quote_date = data_point['date']
+                    if isinstance(quote_date, datetime):
+                        quote_date_only = quote_date.date()
+                        date_key = quote_date_only.isoformat()
+                    else:
+                        quote_date_only = quote_date.date() if hasattr(quote_date, 'date') else None
+                        date_key = quote_date_only.isoformat() if quote_date_only else None
+                    
+                    existing_quote = existing_quotes_map.get(date_key) if date_key else None
+                    
+                    if existing_quote:
+                        # Update existing quote with historical data
+                        existing_quote.price = data_point['close']  # Use close as price
+                        existing_quote.close_price = data_point['close']
+                        existing_quote.open_price = data_point['open']
+                        existing_quote.high_price = data_point['high']
+                        existing_quote.low_price = data_point['low']
+                        existing_quote.volume = None  # Historical data may not have volume
+                        existing_quote.fetched_at = datetime.now(timezone.utc)
+                        existing_quote.updated_at = datetime.now(timezone.utc)
+                        skipped_count += 1
+                    else:
+                        # Create new historical quote
+                        historical_quote = MarketDataQuote(
+                            ticker_id=ticker.id,
+                            provider_id=self.provider_id,
+                            asof_utc=data_point['date'],
+                            price=data_point['close'],  # Use close as price
+                            close_price=data_point['close'],
+                            open_price=data_point['open'],
+                            high_price=data_point['high'],
+                            low_price=data_point['low'],
+                            volume=None,  # Historical data may not have volume
+                            currency='USD',  # Default, can be updated
+                            source='yahoo_finance',
+                            is_stale=False,
+                            quality_score=1.0,
+                            fetched_at=datetime.now(timezone.utc)
+                        )
+                        self.db_session.add(historical_quote)
+                        saved_count += 1
+                    
+                    # Batch commit every BATCH_SIZE quotes
+                    current_batch += 1
+                    if current_batch >= BATCH_SIZE:
+                        try:
+                            self.db_session.commit()
+                            logger.debug(f"📊 Committed batch of {BATCH_SIZE} quotes for {ticker.symbol}")
+                            current_batch = 0
+                        except Exception as batch_error:
+                            logger.warning(f"⚠️ Error committing batch for {ticker.symbol}: {batch_error}")
+                            self.db_session.rollback()
+                    
+                except Exception as e:
+                    error_count += 1
+                    logger.warning(f"Error saving historical quote for {ticker.symbol} on {data_point.get('date', 'unknown')}: {e}")
+                    continue
+            
+            # Commit remaining changes
+            try:
+                if current_batch > 0:
+                    self.db_session.commit()
+                    logger.debug(f"📊 Committed final batch of {current_batch} quotes for {ticker.symbol}")
+                
+                total_quotes = saved_count + skipped_count
+                logger.info(f"✅ Saved {saved_count} new historical quotes and updated {skipped_count} existing quotes for {ticker.symbol} (total: {total_quotes}, errors: {error_count})")
+                
+                # Verify we have enough quotes in database
+                db_quote_count = self.db_session.query(MarketDataQuote).filter(
+                    MarketDataQuote.ticker_id == ticker.id,
+                    MarketDataQuote.provider_id == self.provider_id
+                ).count()
+                
+                if db_quote_count < days_back:
+                    logger.warning(f"⚠️ Only {db_quote_count} quotes in database for {ticker.symbol}, expected at least {days_back}")
+                else:
+                    logger.info(f"✅ Verified: {db_quote_count} quotes in database for {ticker.symbol} (target: {days_back})")
+                
+                return total_quotes
+            except Exception as commit_error:
+                logger.error(f"❌ Error committing historical quotes for {ticker.symbol}: {commit_error}", exc_info=True)
+                self.db_session.rollback()
+                return 0
+            
+        except Exception as e:
+            logger.error(f"Error fetching and saving historical quotes for {ticker.symbol}: {e}", exc_info=True)
+            self.db_session.rollback()
+            return 0
     
     def _calculate_atr(self, historical_data: List[Dict[str, Any]], period: int = 14) -> Optional[float]:
         """

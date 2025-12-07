@@ -42,6 +42,7 @@ def api_endpoint(cache_ttl: int = 60, dependencies: List[str] = None,
         validate_request: Whether to validate request data
     """
     def decorator(func: Callable) -> Callable:
+        # Use wraps to preserve original function name and metadata
         @wraps(func)
         def wrapper(*args, **kwargs):
             # Apply rate limiting

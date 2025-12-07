@@ -74,6 +74,35 @@
     }));
   }
 
+  /**
+   * Sort tickers alphabetically by symbol, then by name
+   * This is the standard business logic for ticker ordering across the system
+   * @param {Array} tickers - Array of ticker objects
+   * @returns {Array} Sorted array of tickers
+   */
+  function sortTickersAlphabetically(tickers) {
+    if (!Array.isArray(tickers)) {
+      return [];
+    }
+    
+    return [...tickers].sort((a, b) => {
+      // Get symbol (fallback to empty string)
+      const symbolA = (a.symbol || a.ticker_symbol || '').toUpperCase();
+      const symbolB = (b.symbol || b.ticker_symbol || '').toUpperCase();
+      
+      // First compare by symbol
+      const symbolCompare = symbolA.localeCompare(symbolB, 'he', { numeric: true, sensitivity: 'base' });
+      if (symbolCompare !== 0) {
+        return symbolCompare;
+      }
+      
+      // If symbols are equal, compare by name
+      const nameA = (a.name || '').toUpperCase();
+      const nameB = (b.name || '').toUpperCase();
+      return nameA.localeCompare(nameB, 'he', { numeric: true, sensitivity: 'base' });
+    });
+  }
+
   async function saveTickersCache(data, options = {}) {
     if (!window.UnifiedCacheManager?.save) {
       return;
@@ -149,9 +178,24 @@
   async function fetchTickersFromApi({ signal } = {}) {
     const base = resolveBaseUrl();
     const separator = base.endsWith('/') ? '' : '/';
-    const url = `${base}${separator}api/tickers/?_ts=${Date.now()}`;
+    // Use /api/tickers/my to get only user's tickers
+    const url = `${base}${separator}api/tickers/my?_ts=${Date.now()}`;
     const response = await fetch(url, { method: 'GET', headers: DEFAULT_HEADERS, signal });
     if (!response.ok) {
+      // Fallback to /api/tickers/ if /my fails
+      if (response.status === 401 || response.status === 404) {
+        const fallbackUrl = `${base}${separator}api/tickers/?_ts=${Date.now()}`;
+        const fallbackResponse = await fetch(fallbackUrl, { method: 'GET', headers: DEFAULT_HEADERS, signal });
+        if (!fallbackResponse.ok) {
+          const error = new Error(`Ticker load failed (${fallbackResponse.status})`);
+          notifyLoadError(error.message, error);
+          throw error;
+        }
+        const fallbackPayload = await fallbackResponse.json();
+        const normalized = normalizeTickersPayload(fallbackPayload);
+        await saveTickersCache(normalized);
+        return normalized;
+      }
       const error = new Error(`Ticker load failed (${response.status})`);
       notifyLoadError(error.message, error);
       throw error;
@@ -439,6 +483,8 @@
    * All tickers are shared across users
    */
   async function getAllTickers(options = {}) {
+    // Note: This now returns user's tickers only (via /api/tickers/my)
+    // For backward compatibility, it uses the same endpoint as getUserTickers
     const { force = false, signal } = options;
     return await loadTickersData({ force, signal });
   }
@@ -596,6 +642,8 @@
     getUserTickers,
     addTickerToUser,
     removeTickerFromUser,
+    // Utility functions
+    sortTickersAlphabetically,
   };
 
   window.Logger?.info?.('✅ Tickers Data Service initialized', PAGE_LOG_CONTEXT);

@@ -120,6 +120,7 @@ let ENTITY_COLORS = {
   'design': '#495057',
   'research': '#343a40',
   'preference': '#adb5bd',
+  'import_session': '#d4a574', // שימוש בצבע של cash_flow (תזרימי מזומן)
 };
 
 /**
@@ -140,6 +141,7 @@ let ENTITY_BACKGROUND_COLORS = {
   'design': 'rgba(73, 80, 87, 0.1)',
   'research': 'rgba(52, 58, 64, 0.1)',
   'preference': 'rgba(173, 181, 189, 0.1)',
+  'import_session': 'rgba(32, 201, 151, 0.1)', // שימוש בצבע רקע של cash_flow (תזרימי מזומן)
 };
 
 /**
@@ -520,14 +522,28 @@ function getStatusBorderColor(status) {
  * @returns {string} קוד הצבע
  */
 // Save reference to centralized function before defining local function
-const _originalGetEntityBackgroundColor = typeof window.getEntityBackgroundColor === 'function' 
-  ? window.getEntityBackgroundColor 
-  : null;
+// IMPORTANT: Save the reference immediately to avoid circular dependency
+// If window.getEntityBackgroundColor is not yet defined, we'll check it at call time
+let _originalGetEntityBackgroundColor = null;
+
+// Initialize the reference - use a getter function to check at call time, not definition time
+function _getOriginalGetEntityBackgroundColor() {
+  if (!_originalGetEntityBackgroundColor && typeof window.getEntityBackgroundColor === 'function') {
+    // Store the reference only once to avoid recursion
+    const original = window.getEntityBackgroundColor;
+    // Verify it's not pointing to this function to prevent infinite recursion
+    if (original !== getEntityBackgroundColor) {
+      _originalGetEntityBackgroundColor = original;
+    }
+  }
+  return _originalGetEntityBackgroundColor;
+}
 
 function getEntityBackgroundColor(entityType) {
   // Use centralized Color Scheme System if available (use saved reference to avoid recursion)
-  if (_originalGetEntityBackgroundColor) {
-    return _originalGetEntityBackgroundColor(entityType);
+  const originalFn = _getOriginalGetEntityBackgroundColor();
+  if (originalFn) {
+    return originalFn(entityType);
   }
   // Fallback to local implementation (should not happen in production)
   if (!entityType) {
@@ -2123,113 +2139,75 @@ function updateCSSVariablesFromPreferences(preferences) {
  */
 async function loadColorPreferences() {
   try {
-    // מניעת כפילויות בוטלה כדי לאפשר טעינה מחודשת לפי צורך (ובבדיקות)
-    
-
-    // נסה ראשית מערכת העדפות
-    try {
-      if (window.PreferencesData && typeof window.PreferencesData.loadAllPreferencesRaw === 'function') {
-        const prefPayload = await window.PreferencesData.loadAllPreferencesRaw({ force: false });
-        if (prefPayload && prefPayload.preferences) {
-          const prefs = prefPayload.preferences;
-          
-          // עדכון מערכת הצבעים מהעדפות
-          if (prefs.colorScheme) {
-            if (prefs.colorScheme.numericValues) {
-              Object.assign(NUMERIC_VALUE_COLORS, prefs.colorScheme.numericValues);
-            }
-            if (prefs.colorScheme.entities) {
-              Object.assign(ENTITY_COLORS, prefs.colorScheme.entities);
-            }
-            if (prefs.colorScheme.status) {
-              Object.assign(STATUS_COLORS, prefs.colorScheme.status);
-            }
-          }
-          
-    // עדכון CSS Variables (only if prefs not empty)
-    if (Object.keys(prefs).length > 0) {
-      updateCSSVariablesFromPreferences(prefs);
-    }
-          
-          // עדכון כותרות עם הצבעים החדשים
-          const bodyClass = document.body.className;
-          if (bodyClass) {
-            const entityType = bodyClass.split(' ').find(cls => 
-              ['tickers-page', 'trades-page', 'accounts-page', 'trading-accounts-page', 'alerts-page', 'cash-flows-page', 'notes-page', 'executions-page', 'trade-plans-page', 'preferences-page'].includes(cls)
-            );
-            
-            if (entityType) {
-              let entity = entityType.replace('-page', '').replace('tickers', 'ticker');
-              // תיקון שמות ישויות לפורמט יחיד
-              if (entity === 'preferences') entity = 'preference';
-              else if (entity === 'cash-flows') entity = 'cash_flow';
-              else if (entity === 'trade-plans') entity = 'trade_plan';
-              else if (entity === 'trading-accounts' || entity === 'accounts') entity = 'trading_account';
-              if (ENTITY_COLORS[entity]) {
-                applyEntityColorsToHeaders(entity);
-              }
-            }
-          }
-          
-          window.colorPreferencesLoaded = true;
-          return true;
-        }
+    // CRITICAL: Prevent infinite recursion - if preferences are already being loaded, use currentPreferences
+    if (window.__loadUserPreferencesInflight && window.__loadUserPreferencesInflight.size > 0) {
+      // Preferences are being loaded - use currentPreferences if available
+      if (window.currentPreferences && Object.keys(window.currentPreferences).length > 0) {
+        updateCSSVariablesFromPreferences(window.currentPreferences);
+        return window.currentPreferences;
       }
-    } catch (newError) {
-      // preferences not available (likely database tables not created yet)
+      return {};
+    }
+    
+    // CRITICAL: Prevent infinite recursion - if getPreference is in progress, use currentPreferences
+    if (window.__GET_PREFERENCE_IN_PROGRESS__) {
+      if (window.currentPreferences && Object.keys(window.currentPreferences).length > 0) {
+        updateCSSVariablesFromPreferences(window.currentPreferences);
+        return window.currentPreferences;
+      }
+      return {};
     }
 
-    // Fallback ל-legacy
+    // Use currentPreferences if available to avoid unnecessary API calls
+    if (window.currentPreferences && Object.keys(window.currentPreferences).length > 0) {
+      updateCSSVariablesFromPreferences(window.currentPreferences);
+      return window.currentPreferences;
+    }
+
+    // Load from API only if not already loaded
     if (window.PreferencesData && typeof window.PreferencesData.loadAllPreferencesRaw === 'function') {
       const prefPayload = await window.PreferencesData.loadAllPreferencesRaw({ force: false });
-      const preferences = prefPayload?.preferences || {};
-
-      // עדכון מערכת הצבעים
-      // הסרנו את preferences.numericValueColors כי הוא לא קיים במערכת ההעדפות
-      // במקום זה משתמשים במשתנים ספציפיים: valuePositiveColor, valueNegativeColor וכו'
-
-      // הסרנו את preferences.entityColors כי הוא לא קיים במערכת ההעדפות
-      // במקום זה משתמשים במשתנים ספציפיים: entityTradeColor, entityTradingAccountColor וכו'
-
-      // עדכון CSS Variables (only if prefs not empty)
-      if (Object.keys(preferences).length > 0) {
-        updateCSSVariablesFromPreferences(preferences);
-      }
-
-      // עדכון כותרות עם הצבעים החדשים
-      const bodyClass = document.body.className;
-      if (bodyClass) {
-        const entityType = bodyClass.split(' ').find(cls => 
-          ['tickers-page', 'trades-page', 'accounts-page', 'trading-accounts-page', 'alerts-page', 'cash-flows-page', 'notes-page', 'executions-page', 'trade-plans-page', 'preferences-page'].includes(cls)
-        );
+      if (prefPayload && prefPayload.preferences) {
+        const prefs = prefPayload.preferences;
         
-        if (entityType) {
-          let type = entityType.replace('-page', '');
-          // תיקון שמות ישויות לפורמט יחיד
-          if (type === 'tickers') type = 'ticker';
-          else if (type === 'trades') type = 'trade';
-          else if (type === 'accounts' || type === 'trading-accounts') type = 'trading_account';
-          else if (type === 'alerts') type = 'alert';
-          else if (type === 'cash-flows') type = 'cash_flow';
-          else if (type === 'notes') type = 'note';
-          else if (type === 'trade-plans') type = 'trade_plan';
-          else if (type === 'executions') type = 'execution';
-          else if (type === 'preferences') type = 'preference';
+        // עדכון CSS Variables (only if prefs not empty)
+        if (Object.keys(prefs).length > 0) {
+          updateCSSVariablesFromPreferences(prefs);
+        }
+        
+        // עדכון כותרות עם הצבעים החדשים
+        const bodyClass = document.body.className;
+        if (bodyClass) {
+          const entityType = bodyClass.split(' ').find(cls => 
+            ['tickers-page', 'trades-page', 'accounts-page', 'trading-accounts-page', 'alerts-page', 'cash-flows-page', 'notes-page', 'executions-page', 'trade-plans-page', 'preferences-page'].includes(cls)
+          );
           
-          if (window.applyEntityColorsToHeaders) {
-            setTimeout(() => {
-              window.applyEntityColorsToHeaders(type);
-            }, 100);
+          if (entityType) {
+            let entity = entityType.replace('-page', '').replace('tickers', 'ticker');
+            // תיקון שמות ישויות לפורמט יחיד
+            if (entity === 'preferences') entity = 'preference';
+            else if (entity === 'cash-flows') entity = 'cash_flow';
+            else if (entity === 'trade-plans') entity = 'trade_plan';
+            else if (entity === 'trading-accounts' || entity === 'accounts') entity = 'trading_account';
+            if (ENTITY_COLORS[entity] && typeof window.applyEntityColorsToHeaders === 'function') {
+              window.applyEntityColorsToHeaders(entity);
+            }
           }
         }
+        
+        window.colorPreferencesLoaded = true;
+        return prefs;
       }
-
-      window.colorPreferencesLoaded = true;
-    } else {
-      console.log('❌ Response not ok:', response.status);
     }
+    
+    // Return empty object if no preferences loaded
+    return {};
   } catch (error) {
-    console.error('❌ שגיאה בטעינת הגדרות צבע:', error);
+    // CRITICAL: Do NOT use Logger here to prevent infinite recursion
+    if (window.DEBUG_MODE) {
+      console.error('❌ שגיאה בטעינת הגדרות צבע:', error);
+    }
+    return {};
   }
 }
 
@@ -2417,11 +2395,15 @@ window.loadUserPreferences = async function loadUserPreferences(options = {}) {
       try { if (typeof window.onPreferencesReload === 'function') window.onPreferencesReload(prefs); } catch {}
 
       // event for components to re-apply non-CSS prefs (toggles/flags)
-      try {
-        window.dispatchEvent(new CustomEvent('preferences:updated', {
-          detail: { source, prefs }
-        }));
-      } catch {}
+      // CRITICAL: Only dispatch event if not already in progress to prevent infinite loops
+      // This prevents: loadUserPreferences() → preferences:updated → loadColorPreferences() → loadUserPreferences() → ...
+      if (!window.__loadUserPreferencesInflight || window.__loadUserPreferencesInflight.size === 0) {
+        try {
+          window.dispatchEvent(new CustomEvent('preferences:updated', {
+            detail: { source, prefs }
+          }));
+        } catch {}
+      }
 
       // Debug: log applied primary/secondary
       console.log('✅ loadUserPreferences complete:', {

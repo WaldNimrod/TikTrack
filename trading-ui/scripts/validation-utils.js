@@ -743,7 +743,27 @@ async function validateWithConfirmation(title, message, validationFn) {
         () => resolve(false)
       );
     } else {
-      resolve(window.confirm(`${title}\n\n${message}`));
+      if (window.showConfirmationDialog) {
+        window.showConfirmationDialog(
+          title,
+          message,
+          () => resolve(true),
+          () => resolve(false),
+          'info'
+        );
+      } else {
+        if (window.showConfirmationDialog) {
+          window.showConfirmationDialog(
+            title,
+            message,
+            () => resolve(true),
+            () => resolve(false),
+            'info'
+          );
+        } else {
+          resolve(window.confirm(`${title}\n\n${message}`));
+        }
+      }
     }
   });
 }

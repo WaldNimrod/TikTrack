@@ -1,0 +1,2324 @@
+{
+  "summary": {
+    "totalPages": 76,
+    "pagesInDocs": 64,
+    "pagesInConfigs": 54,
+    "pagesInHTML": 59,
+    "totalPackages": 29,
+    "totalScripts": 216,
+    "issues": {
+      "critical": 19,
+      "high": 0,
+      "medium": 14,
+      "low": 4
+    }
+  },
+  "pages": {
+    "allPages": [
+      "index",
+      "trades",
+      "trade_plans",
+      "alerts",
+      "tickers",
+      "ticker-dashboard",
+      "trading_accounts",
+      "executions",
+      "data_import",
+      "cash_flows",
+      "notes",
+      "research",
+      "ai-analysis",
+      "preferences",
+      "user-profile",
+      "db_display",
+      "db_extradata",
+      "constraints",
+      "background-tasks",
+      "server-monitor",
+      "system-management",
+      "cache-test",
+      "linter-realtime-monitor",
+      "notifications-center",
+      "css-management",
+      "tradingview-test-page",
+      "dynamic-colors-display",
+      "designs",
+      "external-data-dashboard",
+      "chart-management",
+      "crud-testing-dashboard",
+      "test_external_data",
+      "test_models",
+      "login",
+      "register",
+      "forgot-password",
+      "reset-password",
+      "button-color-mapping",
+      "button-color-mapping-simple",
+      "conditions-modals",
+      "tooltip-editor",
+      "preferences-groups-management",
+      "tag-management",
+      "cache-management",
+      "code-quality-dashboard",
+      "init-system-management",
+      "conditions-test",
+      "watch-lists-page",
+      "watch-list-modal",
+      "add-ticker-modal",
+      "flag-quick-action",
+      "daily-snapshots-comparative-analysis-page",
+      "daily-snapshots-date-comparison-modal",
+      "daily-snapshots-economic-calendar-page",
+      "daily-snapshots-emotional-tracking-widget",
+      "daily-snapshots-heatmap-visual-example",
+      "daily-snapshots-history-widget",
+      "daily-snapshots-portfolio-state-page",
+      "daily-snapshots-price-history-page",
+      "daily-snapshots-strategy-analysis-page",
+      "daily-snapshots-trade-history-page",
+      "daily-snapshots-trading-journal-page",
+      "tradingview-widgets-showcase",
+      "trades_formatted",
+      "my-package",
+      "my-page",
+      "portfolio-state-page",
+      "trade-history-page",
+      "price-history-page",
+      "comparative-analysis-page",
+      "trading-journal-page",
+      "strategy-analysis-page",
+      "economic-calendar-page",
+      "history-widget",
+      "emotional-tracking-widget",
+      "date-comparison-modal"
+    ],
+    "documentedPages": [
+      "index",
+      "trades",
+      "trade_plans",
+      "alerts",
+      "tickers",
+      "ticker-dashboard",
+      "trading_accounts",
+      "executions",
+      "data_import",
+      "cash_flows",
+      "notes",
+      "research",
+      "ai-analysis",
+      "preferences",
+      "user-profile",
+      "db_display",
+      "db_extradata",
+      "constraints",
+      "background-tasks",
+      "server-monitor",
+      "system-management",
+      "cache-test",
+      "linter-realtime-monitor",
+      "notifications-center",
+      "css-management",
+      "tradingview-test-page",
+      "dynamic-colors-display",
+      "designs",
+      "external-data-dashboard",
+      "chart-management",
+      "crud-testing-dashboard",
+      "test_external_data",
+      "test_models",
+      "login",
+      "register",
+      "forgot-password",
+      "reset-password",
+      "button-color-mapping",
+      "button-color-mapping-simple",
+      "conditions-modals",
+      "tooltip-editor",
+      "preferences-groups-management",
+      "tag-management",
+      "cache-management",
+      "code-quality-dashboard",
+      "init-system-management",
+      "conditions-test",
+      "watch-lists-page",
+      "watch-list-modal",
+      "add-ticker-modal",
+      "flag-quick-action",
+      "daily-snapshots-comparative-analysis-page",
+      "daily-snapshots-date-comparison-modal",
+      "daily-snapshots-economic-calendar-page",
+      "daily-snapshots-emotional-tracking-widget",
+      "daily-snapshots-heatmap-visual-example",
+      "daily-snapshots-history-widget",
+      "daily-snapshots-portfolio-state-page",
+      "daily-snapshots-price-history-page",
+      "daily-snapshots-strategy-analysis-page",
+      "daily-snapshots-trade-history-page",
+      "daily-snapshots-trading-journal-page",
+      "tradingview-widgets-showcase",
+      "trades_formatted"
+    ],
+    "configPages": [
+      "my-package",
+      "my-page",
+      "tag-management",
+      "user-profile",
+      "ticker-dashboard",
+      "system-management",
+      "server-monitor",
+      "external-data-dashboard",
+      "notifications-center",
+      "background-tasks",
+      "init-system-management",
+      "cache-management",
+      "conditions-test",
+      "crud-testing-dashboard",
+      "code-quality-dashboard",
+      "css-management",
+      "dynamic-colors-display",
+      "chart-management",
+      "tradingview-widgets-showcase",
+      "forgot-password",
+      "reset-password",
+      "button-color-mapping",
+      "button-color-mapping-simple",
+      "conditions-modals",
+      "tooltip-editor",
+      "preferences-groups-management",
+      "daily-snapshots-comparative-analysis-page",
+      "daily-snapshots-date-comparison-modal",
+      "daily-snapshots-economic-calendar-page",
+      "daily-snapshots-emotional-tracking-widget",
+      "daily-snapshots-heatmap-visual-example",
+      "daily-snapshots-history-widget",
+      "daily-snapshots-portfolio-state-page",
+      "daily-snapshots-price-history-page",
+      "daily-snapshots-strategy-analysis-page",
+      "daily-snapshots-trade-history-page",
+      "daily-snapshots-trading-journal-page",
+      "watch-lists-page",
+      "watch-list-modal",
+      "add-ticker-modal",
+      "flag-quick-action",
+      "ai-analysis",
+      "cache-test",
+      "tradingview-test-page",
+      "portfolio-state-page",
+      "trade-history-page",
+      "price-history-page",
+      "comparative-analysis-page",
+      "trading-journal-page",
+      "strategy-analysis-page",
+      "economic-calendar-page",
+      "history-widget",
+      "emotional-tracking-widget",
+      "date-comparison-modal"
+    ],
+    "htmlPages": [
+      "ai-analysis",
+      "alerts",
+      "background-tasks",
+      "button-color-mapping-simple",
+      "button-color-mapping",
+      "cache-management",
+      "cash_flows",
+      "chart-management",
+      "code-quality-dashboard",
+      "conditions-modals",
+      "conditions-test",
+      "constraints",
+      "crud-testing-dashboard",
+      "css-management",
+      "data_import",
+      "db_display",
+      "db_extradata",
+      "designs",
+      "dynamic-colors-display",
+      "executions",
+      "external-data-dashboard",
+      "forgot-password",
+      "index",
+      "init-system-management",
+      "login",
+      "add-ticker-modal",
+      "daily-snapshots-comparative-analysis-page",
+      "daily-snapshots-date-comparison-modal",
+      "daily-snapshots-economic-calendar-page",
+      "daily-snapshots-emotional-tracking-widget",
+      "daily-snapshots-heatmap-visual-example",
+      "daily-snapshots-history-widget",
+      "daily-snapshots-portfolio-state-page",
+      "daily-snapshots-price-history-page",
+      "daily-snapshots-strategy-analysis-page",
+      "daily-snapshots-trade-history-page",
+      "daily-snapshots-trading-journal-page",
+      "flag-quick-action",
+      "watch-list-modal",
+      "watch-lists-page",
+      "notes",
+      "notifications-center",
+      "preferences-groups-management",
+      "preferences",
+      "register",
+      "research",
+      "reset-password",
+      "server-monitor",
+      "system-management",
+      "tag-management",
+      "ticker-dashboard",
+      "tickers",
+      "tooltip-editor",
+      "trade_plans",
+      "trades",
+      "trades_formatted",
+      "trading_accounts",
+      "tradingview-widgets-showcase",
+      "user-profile"
+    ],
+    "missingInDocs": [],
+    "missingInConfigs": [
+      "alerts",
+      "cash_flows",
+      "constraints",
+      "data_import",
+      "db_display",
+      "db_extradata",
+      "designs",
+      "executions",
+      "index",
+      "login",
+      "notes",
+      "preferences",
+      "register",
+      "research",
+      "tickers",
+      "trade_plans",
+      "trades",
+      "trades_formatted",
+      "trading_accounts"
+    ],
+    "extraInConfigs": [
+      "my-package",
+      "my-page",
+      "cache-test",
+      "tradingview-test-page",
+      "portfolio-state-page",
+      "trade-history-page",
+      "price-history-page",
+      "comparative-analysis-page",
+      "trading-journal-page",
+      "strategy-analysis-page",
+      "economic-calendar-page",
+      "history-widget",
+      "emotional-tracking-widget",
+      "date-comparison-modal"
+    ],
+    "duplicates": []
+  },
+  "packages": {
+    "totalPackages": 29,
+    "totalScripts": 216,
+    "structure": {
+      "base": {
+        "scriptsCount": 25,
+        "loadOrder": 1,
+        "dependenciesCount": 0,
+        "hasCircular": false
+      },
+      "services": {
+        "scriptsCount": 26,
+        "loadOrder": 2,
+        "dependenciesCount": 1,
+        "hasCircular": false
+      },
+      "ui-advanced": {
+        "scriptsCount": 5,
+        "loadOrder": 3,
+        "dependenciesCount": 3,
+        "hasCircular": false
+      },
+      "modules": {
+        "scriptsCount": 28,
+        "loadOrder": 2.5,
+        "dependenciesCount": 2,
+        "hasCircular": false
+      },
+      "crud": {
+        "scriptsCount": 3,
+        "loadOrder": 4,
+        "dependenciesCount": 2,
+        "hasCircular": false
+      },
+      "tag-management": {
+        "scriptsCount": 1,
+        "loadOrder": 5.2,
+        "dependenciesCount": 6,
+        "hasCircular": false
+      },
+      "preferences": {
+        "scriptsCount": 16,
+        "loadOrder": 5,
+        "dependenciesCount": 2,
+        "hasCircular": false
+      },
+      "validation": {
+        "scriptsCount": 1,
+        "loadOrder": 6,
+        "dependenciesCount": 1,
+        "hasCircular": false
+      },
+      "conditions": {
+        "scriptsCount": 8,
+        "loadOrder": 6.5,
+        "dependenciesCount": 2,
+        "hasCircular": false
+      },
+      "external-data": {
+        "scriptsCount": 3,
+        "loadOrder": 7,
+        "dependenciesCount": 2,
+        "hasCircular": false
+      },
+      "charts": {
+        "scriptsCount": 7,
+        "loadOrder": 8,
+        "dependenciesCount": 2,
+        "hasCircular": false
+      },
+      "logs": {
+        "scriptsCount": 3,
+        "loadOrder": 9,
+        "dependenciesCount": 2,
+        "hasCircular": false
+      },
+      "cache": {
+        "scriptsCount": 2,
+        "loadOrder": 9.5,
+        "dependenciesCount": 2,
+        "hasCircular": false
+      },
+      "entity-services": {
+        "scriptsCount": 18,
+        "loadOrder": 10,
+        "dependenciesCount": 2,
+        "hasCircular": false
+      },
+      "helper": {
+        "scriptsCount": 6,
+        "loadOrder": 11,
+        "dependenciesCount": 2,
+        "hasCircular": false
+      },
+      "system-management": {
+        "scriptsCount": 16,
+        "loadOrder": 12,
+        "dependenciesCount": 2,
+        "hasCircular": false
+      },
+      "management": {
+        "scriptsCount": 2,
+        "loadOrder": 13,
+        "dependenciesCount": 2,
+        "hasCircular": false
+      },
+      "dev-tools": {
+        "scriptsCount": 4,
+        "loadOrder": 14,
+        "dependenciesCount": 2,
+        "hasCircular": false
+      },
+      "filters": {
+        "scriptsCount": 0,
+        "loadOrder": 15,
+        "dependenciesCount": 2,
+        "hasCircular": false
+      },
+      "advanced-notifications": {
+        "scriptsCount": 0,
+        "loadOrder": 16,
+        "dependenciesCount": 1,
+        "hasCircular": false
+      },
+      "entity-details": {
+        "scriptsCount": 3,
+        "loadOrder": 17,
+        "dependenciesCount": 6,
+        "hasCircular": false
+      },
+      "info-summary": {
+        "scriptsCount": 2,
+        "loadOrder": 18,
+        "dependenciesCount": 2,
+        "hasCircular": false
+      },
+      "tradingview-charts": {
+        "scriptsCount": 3,
+        "loadOrder": 19,
+        "dependenciesCount": 1,
+        "hasCircular": false
+      },
+      "watch-lists": {
+        "scriptsCount": 6,
+        "loadOrder": 20,
+        "dependenciesCount": 5,
+        "hasCircular": false
+      },
+      "ai-analysis": {
+        "scriptsCount": 6,
+        "loadOrder": 20.5,
+        "dependenciesCount": 6,
+        "hasCircular": false
+      },
+      "init-system": {
+        "scriptsCount": 8,
+        "loadOrder": 22,
+        "dependenciesCount": 25,
+        "hasCircular": false
+      },
+      "dashboard-widgets": {
+        "scriptsCount": 8,
+        "loadOrder": 19.5,
+        "dependenciesCount": 6,
+        "hasCircular": false
+      },
+      "dashboard": {
+        "scriptsCount": 2,
+        "loadOrder": 6.1,
+        "dependenciesCount": 2,
+        "hasCircular": false
+      },
+      "tradingview-widgets": {
+        "scriptsCount": 4,
+        "loadOrder": 21,
+        "dependenciesCount": 2,
+        "hasCircular": false
+      }
+    },
+    "dependencyGraph": {
+      "base": {
+        "dependencies": [],
+        "loadOrder": 1,
+        "scripts": [
+          {
+            "file": "api-config.js",
+            "globalCheck": "window.API_BASE_URL",
+            "description": "Central API configuration",
+            "required": true,
+            "loadOrder": 0
+          },
+          {
+            "file": "global-favicon.js",
+            "globalCheck": "window.setFavicon",
+            "description": "Favicon management",
+            "required": true,
+            "loadOrder": 1
+          },
+          {
+            "file": "notification-system.js",
+            "globalCheck": "window.NotificationSystem",
+            "description": "Notification system",
+            "required": true,
+            "loadOrder": 2
+          },
+          {
+            "file": "cache-sync-manager.js",
+            "globalCheck": "window.CacheSyncManager",
+            "description": "Cache synchronization manager",
+            "required": true,
+            "loadOrder": 3
+          },
+          {
+            "file": "ui-utils.js",
+            "globalCheck": "window.toggleSection",
+            "description": "UI utilities",
+            "required": true,
+            "loadOrder": 4
+          },
+          {
+            "file": "warning-system.js",
+            "globalCheck": "window.WarningSystem",
+            "description": "Warning system",
+            "required": true,
+            "loadOrder": 5
+          },
+          {
+            "file": "error-handlers.js",
+            "globalCheck": "window.handleApiError",
+            "description": "Error handling system",
+            "required": true,
+            "loadOrder": 6
+          },
+          {
+            "file": "unified-cache-manager.js",
+            "globalCheck": "window.UnifiedCacheManager",
+            "description": "Unified cache manager",
+            "required": true,
+            "loadOrder": 7
+          },
+          {
+            "file": "icon-mappings.js",
+            "globalCheck": "window.IconMappings",
+            "description": "Central icon mappings",
+            "required": true,
+            "loadOrder": 7.5
+          },
+          {
+            "file": "icon-system.js",
+            "globalCheck": "window.IconSystem",
+            "description": "Central icon system",
+            "required": true,
+            "loadOrder": 7.6
+          },
+          {
+            "file": "icon-replacement-helper.js",
+            "globalCheck": "window.replaceIconsInContext",
+            "description": "Icon replacement helper for standardizing icon usage",
+            "required": true,
+            "loadOrder": 7.7
+          },
+          {
+            "file": "cache-clear-menu.js",
+            "globalCheck": "window.CacheControlMenu",
+            "description": "Cache clearing control (Stage B-Lite)",
+            "required": true,
+            "loadOrder": 8
+          },
+          {
+            "file": "cache-ttl-guard.js",
+            "globalCheck": "window.CacheTTLGuard",
+            "description": "TTL guard for entity loaders",
+            "required": true,
+            "loadOrder": 9
+          },
+          {
+            "file": "logger-service.js",
+            "globalCheck": "window.Logger",
+            "description": "Advanced logging service",
+            "required": true,
+            "loadOrder": 10
+          },
+          {
+            "file": "header-system.js",
+            "globalCheck": "window.HeaderSystem",
+            "description": "Header system",
+            "required": true,
+            "loadOrder": 11
+          },
+          {
+            "file": "page-state-manager.js",
+            "globalCheck": "window.PageStateManager",
+            "description": "Unified page state manager",
+            "required": true,
+            "loadOrder": 12
+          },
+          {
+            "file": "page-utils.js",
+            "globalCheck": "window.loadPageState",
+            "description": "Page utilities",
+            "required": true,
+            "loadOrder": 13
+          },
+          {
+            "file": "translation-utils.js",
+            "globalCheck": "window.translateStatus",
+            "description": "Translations",
+            "required": true,
+            "loadOrder": 14
+          },
+          {
+            "file": "button-icons.js",
+            "globalCheck": "window.BUTTON_ICONS",
+            "description": "Icon and button system",
+            "required": true,
+            "loadOrder": 15
+          },
+          {
+            "file": "https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js",
+            "globalCheck": "window.bootstrap",
+            "description": "Bootstrap JS Bundle (Tooltips & Modals)",
+            "required": true,
+            "loadOrder": 16,
+            "external": true
+          },
+          {
+            "file": "event-handler-manager.js",
+            "globalCheck": "window.EventHandlerManager",
+            "description": "Central event management system",
+            "required": true,
+            "loadOrder": 17
+          },
+          {
+            "file": "button-system-init.js",
+            "globalCheck": "window.ButtonSystem",
+            "description": "Button system",
+            "required": true,
+            "loadOrder": 18
+          },
+          {
+            "file": "color-scheme-system.js",
+            "globalCheck": "window.loadDynamicColors",
+            "description": "Dynamic color system",
+            "required": true,
+            "loadOrder": 19
+          },
+          {
+            "file": "debug-modal-z-index.js",
+            "globalCheck": "window.debugModalZIndex",
+            "description": "Debug tool for checking modal z-index layers",
+            "required": false,
+            "loadOrder": 20
+          },
+          {
+            "file": "modules/core-systems.js",
+            "globalCheck": "window.UnifiedAppInitializer",
+            "description": "Unified initialization system - single entry point (required for all pages)",
+            "required": true,
+            "loadOrder": 21
+          }
+        ]
+      },
+      "services": {
+        "dependencies": [
+          "base"
+        ],
+        "loadOrder": 2,
+        "scripts": [
+          {
+            "file": "services/data-collection-service.js",
+            "globalCheck": "window.DataCollectionService",
+            "description": "Data collection service",
+            "required": true,
+            "loadOrder": 1
+          },
+          {
+            "file": "services/field-renderer-service.js",
+            "globalCheck": "window.FieldRendererService",
+            "description": "Field rendering service",
+            "required": true,
+            "loadOrder": 2
+          },
+          {
+            "file": "services/select-populator-service.js",
+            "globalCheck": "window.SelectPopulatorService",
+            "description": "Select box population service",
+            "required": true,
+            "loadOrder": 3
+          },
+          {
+            "file": "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js",
+            "globalCheck": "window.jspdf",
+            "description": "jsPDF library (for AI analysis PDF export)",
+            "required": true,
+            "loadOrder": 3.5
+          },
+          {
+            "file": "services/ai-analysis-data.js",
+            "globalCheck": "window.AIAnalysisData",
+            "description": "AI Analysis data service",
+            "required": true,
+            "loadOrder": 4
+          },
+          {
+            "file": "services/statistics-calculator.js",
+            "globalCheck": "window.StatisticsCalculator",
+            "description": "Statistics calculator",
+            "required": true,
+            "loadOrder": 4
+          },
+          {
+            "file": "services/default-value-setter.js",
+            "globalCheck": "window.DefaultValueSetter",
+            "description": "Default value service",
+            "required": true,
+            "loadOrder": 5
+          },
+          {
+            "file": "services/preferences-data.js",
+            "globalCheck": "window.PreferencesData",
+            "description": "Preferences data service (API + Cache)",
+            "required": true,
+            "loadOrder": 5.1
+          },
+          {
+            "file": "services/executions-data.js",
+            "globalCheck": "window.loadExecutionsData",
+            "description": "Executions data service",
+            "required": false,
+            "loadOrder": 5.2
+          },
+          {
+            "file": "services/crud-response-handler.js",
+            "globalCheck": "window.CrudResponseHandler",
+            "description": "CRUD response handler",
+            "required": true,
+            "loadOrder": 6
+          },
+          {
+            "file": "services/unified-crud-service.js",
+            "globalCheck": "window.UnifiedCRUDService",
+            "description": "Unified CRUD service for all entities",
+            "required": true,
+            "loadOrder": 6.5
+          },
+          {
+            "file": "services/research-data.js",
+            "globalCheck": "window.ResearchData",
+            "description": "Research data service",
+            "required": false,
+            "loadOrder": 6.6
+          },
+          {
+            "file": "services/investment-calculation-service.js",
+            "globalCheck": "window.InvestmentCalculationService",
+            "description": "Investment form amount ↔ quantity calculations",
+            "required": true,
+            "loadOrder": 7
+          },
+          {
+            "file": "services/tag-service.js",
+            "globalCheck": "window.TagService",
+            "description": "Central tag service (tag management and retrieval)",
+            "required": true,
+            "loadOrder": 8
+          },
+          {
+            "file": "services/autocomplete-service.js",
+            "globalCheck": "window.AutocompleteService",
+            "description": "General autocomplete service for reusable suggestions dropdown",
+            "required": false,
+            "loadOrder": 8.1
+          },
+          {
+            "file": "services/table-sort-value-adapter.js",
+            "globalCheck": "window.TableSortValueAdapter",
+            "description": "Adapter for unified sort values (DateEnvelope, legacy)",
+            "required": true,
+            "loadOrder": 9
+          },
+          {
+            "file": "services/lint-status-service.js",
+            "globalCheck": "window.LintStatusService",
+            "description": "Unified linter status service (API reading and data conversion)",
+            "required": true,
+            "loadOrder": 10
+          },
+          {
+            "file": "services/alert-condition-renderer.js",
+            "globalCheck": "window.AlertConditionRenderer",
+            "description": "Alert condition renderer",
+            "required": false,
+            "loadOrder": 11
+          },
+          {
+            "file": "https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.min.js",
+            "globalCheck": "window.Quill",
+            "description": "Quill.js - Rich Text Editor Library",
+            "required": true,
+            "loadOrder": 12,
+            "external": true
+          },
+          {
+            "file": "https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js",
+            "globalCheck": "window.DOMPurify",
+            "description": "DOMPurify - HTML Sanitizer",
+            "required": true,
+            "loadOrder": 13,
+            "external": true
+          },
+          {
+            "file": "services/rich-text-editor-service.js",
+            "globalCheck": "window.RichTextEditorService",
+            "description": "Rich text editor service",
+            "required": true,
+            "loadOrder": 14
+          },
+          {
+            "file": "services/pending-actions-cache-service.js",
+            "globalCheck": "window.PendingActionsCacheService",
+            "description": "Pending actions cache service (dismissed items management)",
+            "required": false,
+            "loadOrder": 15
+          },
+          {
+            "file": "services/execution-clustering-service.js",
+            "globalCheck": "window.ExecutionClusteringService",
+            "description": "Execution clustering service (trade creation clusters)",
+            "required": false,
+            "loadOrder": 16
+          },
+          {
+            "file": "services/execution-assignment-service.js",
+            "globalCheck": "window.ExecutionAssignmentService",
+            "description": "Execution assignment service (highlights/suggestions)",
+            "required": false,
+            "loadOrder": 17
+          },
+          {
+            "file": "services/trade-plan-assignment-service.js",
+            "globalCheck": "window.TradePlanAssignmentService",
+            "description": "Trade plan assignment service (assignments and creations)",
+            "required": false,
+            "loadOrder": 18
+          },
+          {
+            "file": "services/execution-cluster-helpers.js",
+            "globalCheck": "window.ExecutionClusterHelpers",
+            "description": "Execution cluster helper functions (rendering, actions, calculations)",
+            "required": false,
+            "loadOrder": 19
+          }
+        ]
+      },
+      "ui-advanced": {
+        "dependencies": [
+          "base",
+          "services",
+          "modules"
+        ],
+        "loadOrder": 3,
+        "scripts": [
+          {
+            "file": "table-mappings.js",
+            "globalCheck": "window.TABLE_COLUMN_MAPPINGS",
+            "description": "Table mappings",
+            "required": true,
+            "loadOrder": 0
+          },
+          {
+            "file": "tables.js",
+            "globalCheck": "window.sortTableData",
+            "description": "Table system",
+            "required": true,
+            "loadOrder": 1
+          },
+          {
+            "file": "table-data-registry.js",
+            "globalCheck": "window.TableDataRegistry",
+            "description": "Table data registry",
+            "required": true,
+            "loadOrder": 2
+          },
+          {
+            "file": "pagination-system.js",
+            "globalCheck": "window.PaginationSystem",
+            "description": "Pagination system",
+            "required": true,
+            "loadOrder": 3
+          },
+          {
+            "file": "modules/actions-menu-system.js",
+            "globalCheck": "window.ActionsMenuSystem",
+            "description": "Actions menu system",
+            "required": true,
+            "loadOrder": 4
+          }
+        ]
+      },
+      "modules": {
+        "dependencies": [
+          "base",
+          "services"
+        ],
+        "loadOrder": 2.5,
+        "scripts": [
+          {
+            "file": "modal-navigation-manager.js",
+            "globalCheck": "window.modalNavigationManager",
+            "description": "Nested modal navigation system",
+            "required": true,
+            "loadOrder": 1
+          },
+          {
+            "file": "modal-z-index-manager.js",
+            "globalCheck": "window.ModalZIndexManager",
+            "description": "Dynamic z-index management for nested modals",
+            "required": true,
+            "loadOrder": 1.5
+          },
+          {
+            "file": "modal-z-index-monitor.js",
+            "globalCheck": "window.modalZIndexMonitor",
+            "description": "Z-index monitoring tool for nested modals",
+            "required": false,
+            "loadOrder": 1.6
+          },
+          {
+            "file": "modal-backdrop-monitor.js",
+            "globalCheck": "window.modalBackdropMonitor",
+            "description": "Backdrop monitoring tool for nested modals",
+            "required": false,
+            "loadOrder": 1.7
+          },
+          {
+            "file": "modal-stack-monitor.js",
+            "globalCheck": "window.modalStackMonitor",
+            "description": "Stack monitoring tool for nested modals",
+            "required": false,
+            "loadOrder": 1.8
+          },
+          {
+            "file": "modal-quantum-system-tests.js",
+            "globalCheck": "window.modalQuantumSystemTests",
+            "description": "Automated tests for modal quantum system",
+            "required": false,
+            "loadOrder": 1.9
+          },
+          {
+            "file": "modal-manager-v2.js",
+            "globalCheck": "window.ModalManagerV2",
+            "description": "Modal manager V2",
+            "required": true,
+            "loadOrder": 2
+          },
+          {
+            "file": "tag-ui-manager.js",
+            "globalCheck": "window.TagUIManager",
+            "description": "Tag selection management in modals",
+            "required": true,
+            "loadOrder": 3
+          },
+          {
+            "file": "tag-events.js",
+            "globalCheck": "window.TagEvents",
+            "description": "Global tag events system",
+            "required": true,
+            "loadOrder": 4
+          },
+          {
+            "file": "modules/data-basic.js",
+            "globalCheck": "window.DataBasic",
+            "description": "Basic data",
+            "required": true,
+            "loadOrder": 6
+          },
+          {
+            "file": "modules/ui-basic.js",
+            "globalCheck": "window.UIBasic",
+            "description": "Basic interface",
+            "required": true,
+            "loadOrder": 7
+          },
+          {
+            "file": "modules/data-advanced.js",
+            "globalCheck": "window.DataAdvanced",
+            "description": "Advanced data",
+            "required": true,
+            "loadOrder": 8
+          },
+          {
+            "file": "modules/ui-advanced.js",
+            "globalCheck": "window.UIAdvanced",
+            "description": "Advanced interface",
+            "required": true,
+            "loadOrder": 9,
+            "exports": [
+              "window.loadUserPreferences"
+            ]
+          },
+          {
+            "file": "modules/communication-module.js",
+            "globalCheck": "window.CommunicationModule",
+            "description": "Communication module",
+            "required": true,
+            "loadOrder": 10
+          },
+          {
+            "file": "modules/business-module.js",
+            "globalCheck": "window.BusinessModule",
+            "description": "Business module",
+            "required": true,
+            "loadOrder": 11
+          },
+          {
+            "file": "modules/localstorage-sync.js",
+            "globalCheck": "window.LocalStorageSync",
+            "description": "localStorage synchronization",
+            "required": true,
+            "loadOrder": 12
+          },
+          {
+            "file": "modules/dynamic-loader-config.js",
+            "globalCheck": "window.DynamicLoaderConfig",
+            "description": "Dynamic loader configuration",
+            "required": true,
+            "loadOrder": 13
+          },
+          {
+            "file": "import-user-data.js",
+            "globalCheck": "window.openImportUserDataModal",
+            "description": "Execution data import modal",
+            "required": true,
+            "loadOrder": 14
+          },
+          {
+            "file": "modal-configs/trading-accounts-config.js",
+            "globalCheck": "window.tradingAccountsModalConfig",
+            "description": "Trading accounts modal configuration",
+            "required": false,
+            "loadOrder": 15
+          },
+          {
+            "file": "modal-configs/alerts-config.js",
+            "globalCheck": "window.alertsModalConfig",
+            "description": "Alerts modal configuration",
+            "required": false,
+            "loadOrder": 16
+          },
+          {
+            "file": "modal-configs/trades-config.js",
+            "globalCheck": "window.tradesModalConfig",
+            "description": "Trades modal configuration",
+            "required": true,
+            "loadOrder": 17
+          },
+          {
+            "file": "modal-configs/executions-config.js",
+            "globalCheck": "window.executionsModalConfig",
+            "description": "Executions modal configuration (specific to executions page)",
+            "required": false,
+            "loadOrder": 18
+          },
+          {
+            "file": "modal-configs/trade-plans-config.js",
+            "globalCheck": "window.tradePlansModalConfig",
+            "description": "Trade plans modal configuration",
+            "required": true,
+            "loadOrder": 19
+          },
+          {
+            "file": "modal-configs/tickers-config.js",
+            "globalCheck": "window.tickersModalConfig",
+            "description": "Tickers modal configuration",
+            "required": false,
+            "loadOrder": 20
+          },
+          {
+            "file": "modal-configs/cash-flows-config.js",
+            "globalCheck": "window.cashFlowModalConfig",
+            "description": "Cash flows modal configuration",
+            "required": false,
+            "loadOrder": 21
+          },
+          {
+            "file": "modal-configs/notes-config.js",
+            "globalCheck": "window.notesModalConfig",
+            "description": "Notes modal configuration",
+            "required": false,
+            "loadOrder": 22
+          },
+          {
+            "file": "modal-configs/tag-management-config.js",
+            "globalCheck": "window.tagModalConfig",
+            "description": "Tag system modal configuration",
+            "required": true,
+            "loadOrder": 23
+          },
+          {
+            "file": "trade-selector-modal.js",
+            "globalCheck": "window.tradeSelectorModal",
+            "description": "Trade selector modal",
+            "required": false,
+            "loadOrder": 24
+          }
+        ]
+      },
+      "crud": {
+        "dependencies": [
+          "base",
+          "services"
+        ],
+        "loadOrder": 4,
+        "scripts": [
+          {
+            "file": "date-utils.js",
+            "globalCheck": "window.formatDate",
+            "description": "Date utilities",
+            "required": true,
+            "loadOrder": 1
+          },
+          {
+            "file": "data-utils.js",
+            "globalCheck": "window.isNumeric",
+            "description": "General data utilities",
+            "required": true,
+            "loadOrder": 2
+          },
+          {
+            "file": "unified-table-system.js",
+            "globalCheck": "window.UnifiedTableSystem",
+            "description": "Unified central table system",
+            "required": true,
+            "loadOrder": 3
+          }
+        ]
+      },
+      "tag-management": {
+        "dependencies": [
+          "base",
+          "services",
+          "modules",
+          "ui-advanced",
+          "crud",
+          "preferences"
+        ],
+        "loadOrder": 5.2,
+        "scripts": [
+          {
+            "file": "tag-management-page.js",
+            "globalCheck": "window.TagManagementPage",
+            "description": "Tag management page display management",
+            "required": true,
+            "loadOrder": 1
+          }
+        ]
+      },
+      "preferences": {
+        "dependencies": [
+          "base",
+          "services"
+        ],
+        "loadOrder": 5,
+        "scripts": [
+          {
+            "file": "preferences-cache.js",
+            "globalCheck": "window.PreferencesCache",
+            "description": "Preferences cache management layer",
+            "required": true,
+            "loadOrder": 0
+          },
+          {
+            "file": "preferences-events.js",
+            "globalCheck": "window.PreferencesEvents",
+            "description": "Preferences event system",
+            "required": true,
+            "loadOrder": 1
+          },
+          {
+            "file": "preferences-ui-layer.js",
+            "globalCheck": "window.PreferencesUILayer",
+            "description": "Preferences UI layer",
+            "required": true,
+            "loadOrder": 2
+          },
+          {
+            "file": "preferences-manager.js",
+            "globalCheck": "window.PreferencesManager",
+            "description": "Preferences manager (central)",
+            "required": true,
+            "loadOrder": 3
+          },
+          {
+            "file": "services/preferences-v4.js",
+            "globalCheck": "window.PreferencesV4",
+            "description": "Preferences V4 SDK (group-first)",
+            "required": true,
+            "loadOrder": 0.5
+          },
+          {
+            "file": "preferences-core-new.js",
+            "globalCheck": "window.PreferencesCore",
+            "description": "Preferences core (without colors)",
+            "required": true,
+            "loadOrder": 1
+          },
+          {
+            "file": "preferences-colors.js",
+            "globalCheck": "window.ColorManager",
+            "description": "Color system (60+ preferences)",
+            "required": true,
+            "loadOrder": 2
+          },
+          {
+            "file": "preferences-profiles.js",
+            "globalCheck": "window.ProfileManager",
+            "description": "Profile management",
+            "required": true,
+            "loadOrder": 3
+          },
+          {
+            "file": "preferences-lazy-loader.js",
+            "globalCheck": "window.LazyLoader",
+            "description": "lazy loading system",
+            "required": true,
+            "loadOrder": 4
+          },
+          {
+            "file": "preferences-validation.js",
+            "globalCheck": "window.PreferenceValidator",
+            "description": "validation system",
+            "required": true,
+            "loadOrder": 5
+          },
+          {
+            "file": "preferences-ui-v4.js",
+            "globalCheck": "window.PreferencesUIV4",
+            "description": "User interface V4 (Group-First)",
+            "required": true,
+            "loadOrder": 5.5
+          },
+          {
+            "file": "preferences-ui.js",
+            "globalCheck": "window.PreferencesUI",
+            "description": "User interface",
+            "required": true,
+            "loadOrder": 6
+          },
+          {
+            "file": "preferences-page.js",
+            "globalCheck": "window.loadAccountsForPreferences",
+            "description": "Preferences page specific functions",
+            "required": false,
+            "loadOrder": 7
+          },
+          {
+            "file": "preferences-debug-monitor.js",
+            "globalCheck": "window.PreferencesDebugMonitor",
+            "description": "Monitoring and debugging code for preferences issues",
+            "required": false,
+            "loadOrder": 7.1
+          },
+          {
+            "file": "preferences-group-manager.js",
+            "globalCheck": "window.PreferencesGroupManager",
+            "description": "Preferences group manager",
+            "required": true,
+            "loadOrder": 8
+          },
+          {
+            "file": "testing/automated/preferences-browser-test.js",
+            "globalCheck": "window.runAllPreferenceTests",
+            "description": "Automated browser test suite for preferences",
+            "required": false,
+            "loadOrder": 9
+          }
+        ]
+      },
+      "validation": {
+        "dependencies": [
+          "base"
+        ],
+        "loadOrder": 6,
+        "scripts": [
+          {
+            "file": "validation-utils.js",
+            "globalCheck": "window.validateSelectField",
+            "description": "Validation utilities",
+            "required": true
+          }
+        ]
+      },
+      "conditions": {
+        "dependencies": [
+          "base",
+          "validation"
+        ],
+        "loadOrder": 6.5,
+        "scripts": [
+          {
+            "file": "conditions/conditions-translations.js",
+            "globalCheck": "window.conditionsTranslations",
+            "description": "Condition translations",
+            "required": true,
+            "loadOrder": 1
+          },
+          {
+            "file": "conditions/conditions-validator.js",
+            "globalCheck": "window.conditionsValidator",
+            "description": "Condition validator",
+            "required": true,
+            "loadOrder": 2
+          },
+          {
+            "file": "conditions/conditions-form-generator.js",
+            "globalCheck": "window.conditionsFormGenerator",
+            "description": "Condition form generator",
+            "required": true,
+            "loadOrder": 3
+          },
+          {
+            "file": "conditions/conditions-crud-manager.js",
+            "globalCheck": "window.conditionsCRUDManager",
+            "description": "Condition CRUD manager",
+            "required": true,
+            "loadOrder": 4
+          },
+          {
+            "file": "conditions/conditions-initializer.js",
+            "globalCheck": "window.conditionsInitializer",
+            "description": "Condition initializer",
+            "required": true,
+            "loadOrder": 5
+          },
+          {
+            "file": "modal-configs/conditions-config.js",
+            "globalCheck": "window.conditionsModalConfig",
+            "description": "Condition modal configuration",
+            "required": true,
+            "loadOrder": 6
+          },
+          {
+            "file": "conditions/conditions-ui-manager.js",
+            "globalCheck": "window.ConditionsUIManager",
+            "description": "Condition UI manager",
+            "required": true,
+            "loadOrder": 7
+          },
+          {
+            "file": "conditions/conditions-modal-controller.js",
+            "globalCheck": "window.ConditionsModalController",
+            "description": "Condition modal controller",
+            "required": true,
+            "loadOrder": 8
+          }
+        ]
+      },
+      "external-data": {
+        "dependencies": [
+          "base",
+          "services"
+        ],
+        "loadOrder": 7,
+        "scripts": [
+          {
+            "file": "yahoo-finance-service.js",
+            "globalCheck": "window.YahooFinanceService",
+            "description": "Yahoo Finance service",
+            "required": true
+          },
+          {
+            "file": "external-data-service.js",
+            "globalCheck": "window.ExternalDataService",
+            "description": "External data service",
+            "required": true
+          },
+          {
+            "file": "external-data-settings-service.js",
+            "globalCheck": "window.ExternalDataSettingsService",
+            "description": "External data settings",
+            "required": true
+          }
+        ]
+      },
+      "charts": {
+        "dependencies": [
+          "base",
+          "services"
+        ],
+        "loadOrder": 8,
+        "scripts": [
+          {
+            "file": "https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js",
+            "globalCheck": "window.Chart",
+            "description": "Chart.js library (CDN)",
+            "required": true,
+            "loadOrder": 0,
+            "external": true
+          },
+          {
+            "file": "charts/chart-theme.js",
+            "globalCheck": "window.ChartTheme",
+            "description": "Chart theme",
+            "required": true,
+            "loadOrder": 1
+          },
+          {
+            "file": "charts/chart-system.js",
+            "globalCheck": "window.ChartSystem",
+            "description": "Chart system",
+            "required": true,
+            "loadOrder": 2
+          },
+          {
+            "file": "charts/chart-loader.js",
+            "globalCheck": "window.ChartLoader",
+            "description": "Chart loader",
+            "required": true,
+            "loadOrder": 3
+          },
+          {
+            "file": "charts/chart-export.js",
+            "globalCheck": "window.ChartExport",
+            "description": "Chart export",
+            "required": true,
+            "loadOrder": 4
+          },
+          {
+            "file": "charts/adapters/performance-adapter.js",
+            "globalCheck": "window.PerformanceAdapter",
+            "description": "Performance adapter",
+            "required": true,
+            "loadOrder": 5
+          },
+          {
+            "file": "charts/adapters/trades-adapter.js",
+            "globalCheck": "window.TradesAdapter",
+            "description": "Trades adapter",
+            "required": true,
+            "loadOrder": 6
+          }
+        ]
+      },
+      "logs": {
+        "dependencies": [
+          "base",
+          "services"
+        ],
+        "loadOrder": 9,
+        "scripts": [
+          {
+            "file": "unified-log-api.js",
+            "globalCheck": "window.UnifiedLogAPI",
+            "description": "Unified log API",
+            "required": true,
+            "loadOrder": 1
+          },
+          {
+            "file": "unified-log-manager.js",
+            "globalCheck": "window.UnifiedLogManager",
+            "description": "Unified log manager",
+            "required": true,
+            "loadOrder": 2
+          },
+          {
+            "file": "unified-log-display.js",
+            "globalCheck": "window.UnifiedLogDisplay",
+            "description": "Unified log display",
+            "required": true,
+            "loadOrder": 3
+          }
+        ]
+      },
+      "cache": {
+        "dependencies": [
+          "base",
+          "services"
+        ],
+        "loadOrder": 9.5,
+        "scripts": [
+          {
+            "file": "cache-policy-manager.js",
+            "globalCheck": "window.CachePolicyManager",
+            "description": "Cache policy manager",
+            "required": true,
+            "loadOrder": 1
+          },
+          {
+            "file": "cache-management.js",
+            "globalCheck": "window.cacheManagementPage",
+            "description": "Cache management",
+            "required": true,
+            "loadOrder": 2
+          }
+        ]
+      },
+      "entity-services": {
+        "dependencies": [
+          "base",
+          "services"
+        ],
+        "loadOrder": 10,
+        "scripts": [
+          {
+            "file": "services/trades-data.js",
+            "globalCheck": "window.TradesData",
+            "description": "Trades data service (CRUD + Cache)",
+            "required": false,
+            "loadOrder": 0
+          },
+          {
+            "file": "account-service.js",
+            "globalCheck": "window.getAccounts",
+            "description": "Account service",
+            "required": true,
+            "loadOrder": 1
+          },
+          {
+            "file": "alert-service.js",
+            "globalCheck": "window.getAlertState",
+            "description": "Alert service",
+            "required": true,
+            "loadOrder": 3
+          },
+          {
+            "file": "ticker-service.js",
+            "globalCheck": "window.tickerService",
+            "description": "Ticker service",
+            "required": true,
+            "loadOrder": 4
+          },
+          {
+            "file": "services/trade-plans-data.js",
+            "globalCheck": "window.TradePlansData",
+            "description": "Trade plans data service",
+            "required": true,
+            "loadOrder": 4.5
+          },
+          {
+            "file": "trade-plan-service.js",
+            "globalCheck": "window.getTradePlans",
+            "description": "Trade plan service",
+            "required": true,
+            "loadOrder": 5
+          },
+          {
+            "file": "services/notes-data.js",
+            "globalCheck": "window.NotesData",
+            "description": "Notes data service",
+            "required": false,
+            "loadOrder": 6.5
+          },
+          {
+            "file": "services/alerts-data.js",
+            "globalCheck": "window.AlertsData",
+            "description": "Alerts data service",
+            "required": false,
+            "loadOrder": 6.6
+          },
+          {
+            "file": "services/tickers-data.js",
+            "globalCheck": "window.TickersData",
+            "description": "Tickers data service",
+            "required": false,
+            "loadOrder": 6.7
+          },
+          {
+            "file": "services/trading-accounts-data.js",
+            "globalCheck": "window.TradingAccountsData",
+            "description": "Trading accounts data service",
+            "required": false,
+            "loadOrder": 6.8
+          },
+          {
+            "file": "services/cash-flows-data.js",
+            "globalCheck": "window.CashFlowsData",
+            "description": "Cash flows data service",
+            "required": false,
+            "loadOrder": 6.9
+          },
+          {
+            "file": "condition-translator.js",
+            "globalCheck": "window.conditionTranslator",
+            "description": "Condition translator",
+            "required": true,
+            "loadOrder": 7
+          },
+          {
+            "file": "constraints.js",
+            "globalCheck": "window.toggleLayer",
+            "description": "Constraints system",
+            "required": true,
+            "loadOrder": 8
+          },
+          {
+            "file": "services/linked-items-service.js",
+            "globalCheck": "window.LinkedItemsService",
+            "description": "Shared logic service for linked items",
+            "required": true,
+            "loadOrder": 9
+          },
+          {
+            "file": "linked-items.js",
+            "globalCheck": "window.viewLinkedItems",
+            "description": "Linked items",
+            "required": true,
+            "loadOrder": 10
+          },
+          {
+            "file": "related-object-filters.js",
+            "globalCheck": "window.filterByRelatedObjectType",
+            "description": "Related object filters",
+            "required": true,
+            "loadOrder": 11
+          },
+          {
+            "file": "account-activity.js",
+            "globalCheck": "window.initAccountActivity",
+            "description": "Account activity system",
+            "required": false,
+            "loadOrder": 12
+          },
+          {
+            "file": "positions-portfolio.js",
+            "globalCheck": "window.initPositionsPortfolio",
+            "description": "Positions and portfolio system",
+            "required": false,
+            "loadOrder": 13
+          }
+        ]
+      },
+      "helper": {
+        "dependencies": [
+          "base",
+          "services"
+        ],
+        "loadOrder": 11,
+        "scripts": [
+          {
+            "file": "utils/cache-key-helper.js",
+            "globalCheck": "window.CacheKeyHelper",
+            "description": "Helper for creating optimal cache keys",
+            "required": false,
+            "loadOrder": 0
+          },
+          {
+            "file": "utils/business-logic-batch-helper.js",
+            "globalCheck": "window.BusinessLogicBatchHelper",
+            "description": "Helper for Batch Operations with Business Logic API",
+            "required": false,
+            "loadOrder": 1
+          },
+          {
+            "file": "utils/request-deduplication-helper.js",
+            "globalCheck": "window.RequestDeduplicationHelper",
+            "description": "Helper for Request Deduplication",
+            "required": false,
+            "loadOrder": 2
+          },
+          {
+            "file": "currencies.js",
+            "globalCheck": "window.openCurrencyDetails",
+            "description": "Currency system",
+            "required": true,
+            "loadOrder": 1
+          },
+          {
+            "file": "designs.js",
+            "globalCheck": "window.generateDetailedLog",
+            "description": "Design system",
+            "required": true,
+            "loadOrder": 2
+          },
+          {
+            "file": "research.js",
+            "globalCheck": "window.initializeResearchPage",
+            "description": "Research system",
+            "required": true,
+            "loadOrder": 3
+          }
+        ]
+      },
+      "system-management": {
+        "dependencies": [
+          "base",
+          "services"
+        ],
+        "loadOrder": 12,
+        "scripts": [
+          {
+            "file": "system-management/system-management-main.js",
+            "globalCheck": "window.SystemManagementMain",
+            "description": "Main system management",
+            "required": true
+          },
+          {
+            "file": "system-management/core/sm-base.js",
+            "globalCheck": "window.SMBaseSection",
+            "description": "System management base",
+            "required": true
+          },
+          {
+            "file": "system-management/core/sm-error-handler.js",
+            "globalCheck": "window.SMErrorHandler",
+            "description": "System management error handler",
+            "required": true
+          },
+          {
+            "file": "system-management/core/sm-data-validators.js",
+            "globalCheck": "window.SMDataValidators",
+            "description": "System management data validators",
+            "required": true
+          },
+          {
+            "file": "system-management/core/sm-ui-components.js",
+            "globalCheck": "window.SMUIComponents",
+            "description": "System management UI components",
+            "required": true
+          },
+          {
+            "file": "system-management/sections/sm-section-alerts.js",
+            "globalCheck": "window.SMSectionAlerts",
+            "description": "Alerts section",
+            "required": true
+          },
+          {
+            "file": "system-management/sections/sm-section-background-tasks.js",
+            "globalCheck": "window.SMSectionBackgroundTasks",
+            "description": "Background tasks section",
+            "required": true
+          },
+          {
+            "file": "system-management/sections/sm-section-cache.js",
+            "globalCheck": "window.SMSectionCache",
+            "description": "Cache section",
+            "required": true
+          },
+          {
+            "file": "system-management/sections/sm-section-dashboard.js",
+            "globalCheck": "window.SMSectionDashboard",
+            "description": "Dashboard section",
+            "required": true
+          },
+          {
+            "file": "system-management/sections/sm-section-database.js",
+            "globalCheck": "window.SMSectionDatabase",
+            "description": "Database section",
+            "required": true
+          },
+          {
+            "file": "system-management/sections/sm-section-external-data.js",
+            "globalCheck": "window.SMSectionExternalData",
+            "description": "External data section",
+            "required": true
+          },
+          {
+            "file": "system-management/sections/sm-section-operations.js",
+            "globalCheck": "window.SMSectionOperations",
+            "description": "Operations section",
+            "required": true
+          },
+          {
+            "file": "system-management/sections/sm-section-performance.js",
+            "globalCheck": "window.SMSectionPerformance",
+            "description": "Performance section",
+            "required": true
+          },
+          {
+            "file": "system-management/sections/sm-section-server.js",
+            "globalCheck": "window.SMSectionServer",
+            "description": "Server section",
+            "required": true
+          },
+          {
+            "file": "system-management/sections/sm-section-system-settings.js",
+            "globalCheck": "window.SMSystemSettingsSection",
+            "description": "System settings section",
+            "required": true
+          },
+          {
+            "file": "system-management/sm-detailed-log.js",
+            "globalCheck": "window.generateSystemManagementDetailedLog",
+            "description": "System management detailed log generator",
+            "required": false
+          }
+        ]
+      },
+      "management": {
+        "dependencies": [
+          "base",
+          "services"
+        ],
+        "loadOrder": 13,
+        "scripts": [
+          {
+            "file": "auth.js",
+            "globalCheck": "window.login",
+            "description": "Authentication system",
+            "required": true,
+            "loadOrder": 1
+          },
+          {
+            "file": "background-tasks.js",
+            "globalCheck": "window.startScheduler",
+            "description": "Background tasks",
+            "required": true,
+            "loadOrder": 2
+          }
+        ]
+      },
+      "dev-tools": {
+        "dependencies": [
+          "base",
+          "services"
+        ],
+        "loadOrder": 14,
+        "scripts": [
+          {
+            "file": "init-system/dev-tools/page-template-generator.js",
+            "globalCheck": "window.PageTemplateGenerator",
+            "description": "Page template generator",
+            "required": true
+          },
+          {
+            "file": "init-system/dev-tools/script-analyzer.js",
+            "globalCheck": "window.ScriptAnalyzer",
+            "description": "Script analyzer",
+            "required": true
+          },
+          {
+            "file": "init-system/validators/runtime-validator.js",
+            "globalCheck": "window.RuntimeValidator",
+            "description": "Runtime validator",
+            "required": true
+          },
+          {
+            "file": "debug-filter-tooltips-comprehensive.js",
+            "globalCheck": "window.debugFilterTooltips",
+            "description": "Debug tool for filter tooltips",
+            "required": false,
+            "loadOrder": 4
+          }
+        ]
+      },
+      "filters": {
+        "dependencies": [
+          "base",
+          "ui-advanced"
+        ],
+        "loadOrder": 15,
+        "scripts": []
+      },
+      "advanced-notifications": {
+        "dependencies": [
+          "base"
+        ],
+        "loadOrder": 16,
+        "scripts": []
+      },
+      "entity-details": {
+        "dependencies": [
+          "base",
+          "services",
+          "ui-advanced",
+          "crud",
+          "preferences",
+          "entity-services"
+        ],
+        "loadOrder": 17,
+        "scripts": [
+          {
+            "file": "entity-details-api.js",
+            "globalCheck": "window.EntityDetailsAPI",
+            "description": "Entity details API",
+            "required": true,
+            "loadOrder": 1
+          },
+          {
+            "file": "entity-details-renderer.js",
+            "globalCheck": "window.EntityDetailsRenderer",
+            "description": "Entity details renderer",
+            "required": true,
+            "loadOrder": 2
+          },
+          {
+            "file": "entity-details-modal.js",
+            "globalCheck": "window.showEntityDetails",
+            "description": "Entity details modal",
+            "required": true,
+            "loadOrder": 3
+          }
+        ]
+      },
+      "info-summary": {
+        "dependencies": [
+          "base",
+          "services"
+        ],
+        "loadOrder": 18,
+        "scripts": [
+          {
+            "file": "info-summary-system.js",
+            "globalCheck": "window.InfoSummarySystem",
+            "description": "Core data summary system",
+            "required": true,
+            "loadOrder": 1
+          },
+          {
+            "file": "info-summary-configs.js",
+            "globalCheck": "window.INFO_SUMMARY_CONFIGS",
+            "description": "Page configurations for data summary",
+            "required": true,
+            "loadOrder": 2
+          }
+        ]
+      },
+      "tradingview-charts": {
+        "dependencies": [
+          "base"
+        ],
+        "loadOrder": 19,
+        "scripts": [
+          {
+            "file": "charts/vendor/lightweight-charts.standalone.production.js",
+            "globalCheck": "window.LightweightCharts",
+            "description": "TradingView Lightweight Charts",
+            "required": true,
+            "loadOrder": 0
+          },
+          {
+            "file": "charts/tradingview-theme.js",
+            "globalCheck": "window.TradingViewTheme",
+            "description": "TradingView theme",
+            "required": true,
+            "loadOrder": 1
+          },
+          {
+            "file": "charts/tradingview-adapter.js",
+            "globalCheck": "window.TradingViewChartAdapter",
+            "description": "TradingView system adapter",
+            "required": true,
+            "loadOrder": 2
+          }
+        ]
+      },
+      "watch-lists": {
+        "dependencies": [
+          "base",
+          "services",
+          "ui-advanced",
+          "crud",
+          "entity-services"
+        ],
+        "loadOrder": 20,
+        "scripts": [
+          {
+            "file": "services/watch-lists-data.js",
+            "globalCheck": "window.WatchListsDataService",
+            "description": "Watch lists data service (mockup mode)",
+            "required": true,
+            "loadOrder": 1
+          },
+          {
+            "file": "services/watch-lists-ui-service.js",
+            "globalCheck": "window.WatchListsUIService",
+            "description": "Watch lists UI service",
+            "required": true,
+            "loadOrder": 2
+          },
+          {
+            "file": "watch-lists-page.js",
+            "globalCheck": "window.WatchListsPage",
+            "description": "Watch lists main page",
+            "required": true,
+            "loadOrder": 3
+          },
+          {
+            "file": "watch-list-modal.js",
+            "globalCheck": "window.WatchListModal",
+            "description": "Watch list modal (Add/Edit)",
+            "required": false,
+            "loadOrder": 4
+          },
+          {
+            "file": "add-ticker-modal.js",
+            "globalCheck": "window.AddTickerModal",
+            "description": "Add ticker modal",
+            "required": false,
+            "loadOrder": 5
+          },
+          {
+            "file": "flag-quick-action.js",
+            "globalCheck": "window.FlagQuickAction",
+            "description": "Flag quick action palette",
+            "required": false,
+            "loadOrder": 6
+          }
+        ]
+      },
+      "ai-analysis": {
+        "dependencies": [
+          "base",
+          "services",
+          "ui-advanced",
+          "modules",
+          "preferences",
+          "entity-services"
+        ],
+        "loadOrder": 20.5,
+        "scripts": [
+          {
+            "file": "https://cdn.jsdelivr.net/npm/marked@9.1.6/marked.min.js",
+            "globalCheck": "marked",
+            "description": "Markdown parser library (for AI result rendering)",
+            "required": true,
+            "loadOrder": 0.5
+          },
+          {
+            "file": "ai-analysis-manager.js",
+            "globalCheck": "window.AIAnalysisManager",
+            "description": "AI Analysis UI manager",
+            "required": true,
+            "loadOrder": 1
+          },
+          {
+            "file": "ai-template-selector.js",
+            "globalCheck": "window.AITemplateSelector",
+            "description": "Template selector component",
+            "required": true,
+            "loadOrder": 2
+          },
+          {
+            "file": "ai-result-renderer.js",
+            "globalCheck": "window.AIResultRenderer",
+            "description": "AI result renderer with markdown and infographics",
+            "required": true,
+            "loadOrder": 3
+          },
+          {
+            "file": "ai-notes-integration.js",
+            "globalCheck": "window.AINotesIntegration",
+            "description": "AI analysis notes integration",
+            "required": true,
+            "loadOrder": 4
+          },
+          {
+            "file": "ai-export-service.js",
+            "globalCheck": "window.AIExportService",
+            "description": "AI analysis export service",
+            "required": true,
+            "loadOrder": 5
+          }
+        ]
+      },
+      "init-system": {
+        "dependencies": [
+          "base",
+          "crud",
+          "services",
+          "ui-advanced",
+          "modules",
+          "preferences",
+          "validation",
+          "conditions",
+          "external-data",
+          "charts",
+          "logs",
+          "cache",
+          "entity-services",
+          "helper",
+          "system-management",
+          "management",
+          "dev-tools",
+          "advanced-notifications",
+          "entity-details",
+          "info-summary",
+          "dashboard-widgets",
+          "tradingview-widgets",
+          "tradingview-charts",
+          "watch-lists",
+          "ai-analysis"
+        ],
+        "loadOrder": 22,
+        "scripts": [
+          {
+            "file": "init-system/package-manifest.js",
+            "globalCheck": "window.PACKAGE_MANIFEST",
+            "description": "Package manifest",
+            "required": true,
+            "loadOrder": 1
+          },
+          {
+            "file": "page-initialization-configs.js",
+            "globalCheck": "window.PAGE_INITIALIZATION_CONFIGS",
+            "description": "Page initialization configurations",
+            "required": true,
+            "loadOrder": 2
+          },
+          {
+            "file": "init-system-check.js",
+            "globalCheck": "window.initSystemCheck",
+            "description": "Initialization system check",
+            "required": true,
+            "loadOrder": 3
+          },
+          {
+            "file": "monitoring-functions.js",
+            "globalCheck": "window.runDetailedPageScan",
+            "description": "Page monitoring functions",
+            "required": true,
+            "loadOrder": 4
+          },
+          {
+            "file": "init-system/all-pages-monitoring-test.js",
+            "globalCheck": "window.allPagesMonitoringTest",
+            "description": "Automatic check of all pages",
+            "required": false,
+            "loadOrder": 5
+          },
+          {
+            "file": "init-system/pages-standardization-plan.js",
+            "globalCheck": "window.pagesStandardizationPlan",
+            "description": "Standardization plan for all pages",
+            "required": false,
+            "loadOrder": 6
+          },
+          {
+            "file": "init-system/dependency-analyzer.js",
+            "globalCheck": "window.dependencyAnalyzer",
+            "description": "Dependencies analysis in package manifest",
+            "required": false,
+            "loadOrder": 7
+          },
+          {
+            "file": "init-system/load-order-validator.js",
+            "globalCheck": "window.loadOrderValidator",
+            "description": "Actual loading order check in pages",
+            "required": false,
+            "loadOrder": 8
+          }
+        ]
+      },
+      "dashboard-widgets": {
+        "dependencies": [
+          "base",
+          "services",
+          "ui-advanced",
+          "entity-services",
+          "modules",
+          "entity-details"
+        ],
+        "loadOrder": 19.5,
+        "scripts": [
+          {
+            "file": "services/dashboard-data.js",
+            "globalCheck": "window.DashboardData",
+            "description": "Unified dashboard data service",
+            "required": true,
+            "loadOrder": 0
+          },
+          {
+            "file": "widgets/recent-items-widget.js",
+            "globalCheck": "window.RecentItemsWidget",
+            "description": "Unified recent trades and trade plans widget",
+            "required": true,
+            "loadOrder": 1
+          },
+          {
+            "file": "widgets/recent-trades-widget.js",
+            "globalCheck": "window.RecentTradesWidget",
+            "description": "Recent trades widget (deprecated - use RecentItemsWidget)",
+            "required": false,
+            "loadOrder": 1.5
+          },
+          {
+            "file": "widgets/unified-pending-actions-widget.js",
+            "globalCheck": "window.UnifiedPendingActionsWidget",
+            "description": "Unified widget for pending assignments and creations",
+            "required": true,
+            "loadOrder": 4.5
+          },
+          {
+            "file": "widgets/tag-widget.js",
+            "globalCheck": "window.TagWidget",
+            "description": "Unified tag widget (cloud + search)",
+            "required": true,
+            "loadOrder": 5
+          },
+          {
+            "file": "active-alerts-component.js",
+            "globalCheck": "window.updateActiveAlertsComponent",
+            "description": "Active alerts component",
+            "required": true,
+            "loadOrder": 5
+          },
+          {
+            "file": "modal-configs/tag-search-config.js",
+            "globalCheck": "window.tagSearchDrawerConfig",
+            "description": "Tag search drawer configuration (for TagWidget)",
+            "required": true,
+            "loadOrder": 6
+          },
+          {
+            "file": "index.js",
+            "globalCheck": "window.initializeIndexPage",
+            "description": "Dashboard page logic",
+            "required": true,
+            "loadOrder": 8
+          }
+        ]
+      },
+      "dashboard": {
+        "dependencies": [
+          "modules",
+          "validation"
+        ],
+        "loadOrder": 6.1,
+        "scripts": [
+          {
+            "file": "trade-selector-modal.js",
+            "globalCheck": "window.openTradeSelectorModal",
+            "description": "Trade selector module",
+            "required": false,
+            "loadOrder": 0
+          },
+          {
+            "file": "modal-configs/trades-config.js",
+            "globalCheck": "window.tradesModalConfig",
+            "description": "Trades modal configuration",
+            "required": false,
+            "loadOrder": 1
+          }
+        ]
+      },
+      "tradingview-widgets": {
+        "dependencies": [
+          "base",
+          "preferences"
+        ],
+        "loadOrder": 21,
+        "scripts": [
+          {
+            "file": "tradingview-widgets/tradingview-widgets-config.js",
+            "globalCheck": "window.TradingViewWidgetsConfig",
+            "description": "Widget configuration",
+            "required": true,
+            "loadOrder": 1
+          },
+          {
+            "file": "tradingview-widgets/tradingview-widgets-colors.js",
+            "globalCheck": "window.TradingViewWidgetsColors",
+            "description": "Color system integration",
+            "required": true,
+            "loadOrder": 2
+          },
+          {
+            "file": "tradingview-widgets/tradingview-widgets-factory.js",
+            "globalCheck": "window.TradingViewWidgetsFactory",
+            "description": "Factory for creating widgets",
+            "required": true,
+            "loadOrder": 3
+          },
+          {
+            "file": "tradingview-widgets/tradingview-widgets-core.js",
+            "globalCheck": "window.TradingViewWidgetsManager",
+            "description": "Central widget management system",
+            "required": true,
+            "loadOrder": 4
+          }
+        ]
+      }
+    },
+    "circularDependencies": [],
+    "missingDependencies": [],
+    "loadOrderIssues": [],
+    "unusedDependencies": [
+      {
+        "package": "tag-management",
+        "issue": "Package 'tag-management' is never used as a dependency"
+      },
+      {
+        "package": "filters",
+        "issue": "Package 'filters' is never used as a dependency"
+      },
+      {
+        "package": "init-system",
+        "issue": "Package 'init-system' is never used as a dependency"
+      },
+      {
+        "package": "dashboard",
+        "issue": "Package 'dashboard' is never used as a dependency"
+      }
+    ]
+  },
+  "pagesConfig": {
+    "missingPackages": [],
+    "invalidPackages": [],
+    "missingGlobals": [],
+    "loadOrderIssues": []
+  },
+  "loading": {
+    "scriptsNotInPackages": [],
+    "scriptsMissing": [],
+    "loadOrderMismatches": [],
+    "globalsMissing": []
+  }
+}

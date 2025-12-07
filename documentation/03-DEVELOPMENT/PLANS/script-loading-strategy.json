@@ -1,0 +1,169 @@
+{
+  "version": "1.0.0",
+  "created": "2025-12-05",
+  "description": "Script loading strategy matrix for async/defer optimization",
+  "strategy": {
+    "defer": {
+      "description": "Scripts with dependencies that must load in order",
+      "packages": [
+        "base",
+        "services",
+        "modules",
+        "ui-advanced",
+        "crud",
+        "preferences",
+        "validation",
+        "conditions",
+        "entity-services",
+        "entity-details",
+        "info-summary",
+        "dashboard-widgets",
+        "dashboard",
+        "tag-management",
+        "cache",
+        "helper",
+        "filters",
+        "init-system"
+      ],
+      "reason": "Critical packages with dependencies that must maintain load order"
+    },
+    "async": {
+      "description": "Non-critical scripts that can load independently",
+      "packages": [
+        "external-data",
+        "charts",
+        "logs",
+        "system-management",
+        "management",
+        "dev-tools",
+        "tradingview-charts",
+        "tradingview-widgets",
+        "watch-lists"
+      ],
+      "reason": "Optional packages that are only needed for specific pages"
+    },
+    "sync": {
+      "description": "Scripts that must load synchronously (rare)",
+      "packages": [],
+      "reason": "No packages require synchronous loading - all can use defer/async"
+    }
+  },
+  "packageDetails": {
+    "base": {
+      "loadingStrategy": "defer",
+      "reason": "Critical - required for all pages, has dependencies"
+    },
+    "services": {
+      "loadingStrategy": "defer",
+      "reason": "Critical - required for most pages, has dependencies on base"
+    },
+    "modules": {
+      "loadingStrategy": "defer",
+      "reason": "Critical - modal system and UI components, has dependencies"
+    },
+    "ui-advanced": {
+      "loadingStrategy": "defer",
+      "reason": "Critical - tables and advanced UI, has dependencies on modules"
+    },
+    "crud": {
+      "loadingStrategy": "defer",
+      "reason": "Critical - CRUD operations, has dependencies on base and services"
+    },
+    "preferences": {
+      "loadingStrategy": "defer",
+      "reason": "Critical - preferences system, has dependencies on base and services"
+    },
+    "validation": {
+      "loadingStrategy": "defer",
+      "reason": "Critical - validation system, has dependencies on base"
+    },
+    "conditions": {
+      "loadingStrategy": "defer",
+      "reason": "Critical - conditions system, has dependencies on base and validation"
+    },
+    "entity-services": {
+      "loadingStrategy": "defer",
+      "reason": "Critical - entity services, has dependencies on base and services"
+    },
+    "entity-details": {
+      "loadingStrategy": "defer",
+      "reason": "Critical - entity details, has dependencies on multiple packages"
+    },
+    "info-summary": {
+      "loadingStrategy": "defer",
+      "reason": "Critical - info summary, has dependencies on base and services"
+    },
+    "dashboard-widgets": {
+      "loadingStrategy": "defer",
+      "reason": "Critical - dashboard widgets, has dependencies on multiple packages"
+    },
+    "dashboard": {
+      "loadingStrategy": "defer",
+      "reason": "Critical - dashboard modules, has dependencies on modules and validation"
+    },
+    "tag-management": {
+      "loadingStrategy": "defer",
+      "reason": "Critical - tag management, has dependencies on multiple packages"
+    },
+    "cache": {
+      "loadingStrategy": "defer",
+      "reason": "Critical - cache system, has dependencies on base and services"
+    },
+    "helper": {
+      "loadingStrategy": "defer",
+      "reason": "Critical - helper functions, has dependencies on base and services"
+    },
+    "filters": {
+      "loadingStrategy": "defer",
+      "reason": "Critical - filter system, embedded in header-system.js"
+    },
+    "init-system": {
+      "loadingStrategy": "defer",
+      "reason": "Critical - initialization system, must load last, has dependencies on base"
+    },
+    "external-data": {
+      "loadingStrategy": "async",
+      "reason": "Non-critical - only for external data dashboard page"
+    },
+    "charts": {
+      "loadingStrategy": "async",
+      "reason": "Non-critical - only for pages with charts"
+    },
+    "logs": {
+      "loadingStrategy": "async",
+      "reason": "Non-critical - only for log pages"
+    },
+    "system-management": {
+      "loadingStrategy": "async",
+      "reason": "Non-critical - only for system management pages"
+    },
+    "management": {
+      "loadingStrategy": "async",
+      "reason": "Non-critical - only for management pages"
+    },
+    "dev-tools": {
+      "loadingStrategy": "async",
+      "reason": "Non-critical - only for development tools pages"
+    },
+    "tradingview-charts": {
+      "loadingStrategy": "async",
+      "reason": "Non-critical - only for TradingView chart pages"
+    },
+    "tradingview-widgets": {
+      "loadingStrategy": "async",
+      "reason": "Non-critical - only for TradingView widget pages"
+    },
+    "watch-lists": {
+      "loadingStrategy": "async",
+      "reason": "Non-critical - only for watch lists pages (mockup)"
+    }
+  },
+  "notes": [
+    "All defer scripts maintain load order - they execute in the order they appear in HTML",
+    "All async scripts can load in parallel but execute as soon as they're ready",
+    "No sync scripts needed - all can use defer/async",
+    "External CDN scripts (Bootstrap, Chart.js, etc.) should use defer to maintain order",
+    "Optional scripts (required: false) within packages still follow package strategy"
+  ]
+}
+

@@ -36,7 +36,7 @@ class SystemManagement {
     SystemManagement.setupEventListeners();
 
     this.isInitialized = true;
-    console.log('✅ System Management - Initialized successfully');
+    window.Logger?.debug('✅ System Management - Initialized successfully');
   }
 
   /**
@@ -44,7 +44,7 @@ class SystemManagement {
    * רענון נתוני מערכת
    */
   static refreshSystemData() {
-    console.log('🔄 Refreshing system data...');
+    window.Logger?.debug('🔄 Refreshing system data...');
     const systemManagement = new SystemManagement();
     systemManagement.loadSystemData();
   }
@@ -54,7 +54,7 @@ class SystemManagement {
    * הרצת בדיקת מערכת
    */
   static async runSystemCheck() {
-    console.log('🔍 Running comprehensive system check...');
+    window.Logger?.debug('🔍 Running comprehensive system check...');
 
     try {
       // Show loading notification only for long process start
@@ -406,13 +406,13 @@ class SystemManagement {
       SystemManagement.showNotification(overallMessage, overallStatus);
 
       // Log detailed results
-      console.log('📊 System Check Results:', checkResults);
+      window.Logger?.debug('📊 System Check Results:', checkResults);
 
       // Update results display in the page
       SystemManagement.updateCheckResultsDisplay(resultsContainer, checkResults);
 
     } catch (error) {
-      console.error('❌ System check failed:', error);
+      window.Logger?.error('❌ System check failed:', error);
       SystemManagement.showNotification(`שגיאה בבדיקת מערכת: ${error.message}`, 'error');
     }
   }
@@ -422,7 +422,7 @@ class SystemManagement {
    * ניקוי מטמון
    */
   static clearCache() {
-    console.log('🗑️ Clearing cache...');
+    window.Logger?.debug('🗑️ Clearing cache...');
     // Use global cache clearing function
     if (typeof window.clearAllCache === 'function') {
       window.clearAllCache();
@@ -437,7 +437,7 @@ class SystemManagement {
    * הפעלת גיבוי מערכת
    */
   static async runBackup() {
-    console.log('💾 Starting system backup...');
+    window.Logger?.debug('💾 Starting system backup...');
 
     try {
     // Show loading notification
@@ -459,7 +459,7 @@ class SystemManagement {
           `גיבוי הושלם בהצלחה! קובץ: ${backupData.backup_filename} (${backupData.backup_size_mb} MB)`,
           'success',
         );
-        console.log('✅ System backup completed successfully:', backupData);
+        window.Logger?.debug('✅ System backup completed successfully:', backupData);
 
         // Refresh system data to show updated backup info
         if (window.systemManagement) {
@@ -470,7 +470,7 @@ class SystemManagement {
       }
 
     } catch (error) {
-      console.error('❌ Backup failed:', error);
+      window.Logger?.error('❌ Backup failed:', error);
       SystemManagement.showNotification(`שגיאה בגיבוי: ${error.message}`, 'error');
     }
   }
@@ -480,7 +480,7 @@ class SystemManagement {
    * שחזור מגיבוי
    */
   static async restoreFromBackup() {
-    console.log('🔄 Starting restore from backup...');
+    window.Logger?.debug('🔄 Starting restore from backup...');
 
     try {
       // Get list of available backups
@@ -525,7 +525,7 @@ class SystemManagement {
         });
       } else {
         // Fallback למקרה שמערכת התראות לא זמינה
-        confirmed = confirm(confirmMessage);
+        confirmed = window.showConfirmationDialog(confirmMessage);
       }
 
       if (confirmed) {
@@ -547,7 +547,7 @@ class SystemManagement {
 
         if (result.status === 'success') {
           SystemManagement.showNotification('שחזור הושלם בהצלחה! המערכת תפעיל מחדש...', 'success');
-          console.log('✅ System restore completed successfully:', result.data);
+          window.Logger?.debug('✅ System restore completed successfully:', result.data);
 
           // Refresh page after successful restore
           setTimeout(() => {
@@ -558,11 +558,11 @@ class SystemManagement {
         }
       } else {
         SystemManagement.showNotification('שחזור בוטל על ידי המשתמש', 'info');
-        console.log('❌ System restore cancelled by user');
+        window.Logger?.debug('❌ System restore cancelled by user');
       }
 
     } catch (error) {
-      console.error('❌ Restore failed:', error);
+      window.Logger?.error('❌ Restore failed:', error);
       SystemManagement.showNotification(`שגיאה בשחזור: ${error.message}`, 'error');
     }
   }
@@ -575,7 +575,7 @@ class SystemManagement {
     if (typeof window.showNotification === 'function') {
       window.showNotification(message, type);
     } else {
-      console.log(`📢 ${type.toUpperCase()}: ${message}`);
+      window.Logger?.debug(`📢 ${type.toUpperCase()}: ${message}`);
     }
   }
 
@@ -594,7 +594,8 @@ class SystemManagement {
     const container = document.createElement('div');
     container.id = 'system-check-results';
     container.className = 'system-check-results-container';
-    container.innerHTML = `
+    // Build container HTML and insert using tempDiv
+    const containerHTML = `
       <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
           <h5 class="mb-0">
@@ -623,6 +624,11 @@ class SystemManagement {
         </div>
       </div>
     `;
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(containerHTML, 'text/html');
+    doc.body.childNodes.forEach(node => {
+      container.appendChild(node.cloneNode(true));
+    });
 
     // Insert after the Quick Actions section (in the top section)
     const quickActions = document.querySelector('.quick-actions');
@@ -681,8 +687,8 @@ class SystemManagement {
 
     // Build results content
     // Note: This innerHTML is for system check results display (cards + accordion), not a standard summary element
-    // Consider refactoring to use createElement for better security if this becomes a security concern
-    resultsContent.innerHTML = `
+    // Using tempDiv for complex HTML structure
+    const resultsHTML = `
       <!-- Summary Cards -->
       <div class="row mb-4">
         <div class="col-md-3">
@@ -763,6 +769,13 @@ class SystemManagement {
         <small>זמן בדיקה: ${new Date(checkResults.timestamp).toLocaleString('he-IL')}</small>
       </div>
     `;
+    // Insert using tempDiv
+    resultsContent.textContent = '';
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(resultsHTML, 'text/html');
+    doc.body.childNodes.forEach(node => {
+      resultsContent.appendChild(node.cloneNode(true));
+    });
 
     // Store results globally for copying
     window.lastCheckResults = checkResults;
@@ -819,7 +832,8 @@ class SystemManagement {
     // Build modal content
     // Note: This innerHTML is for system check results modal display, not a standard summary element
     // Consider refactoring to use createElement for better security if this becomes a security concern
-    modal.innerHTML = `
+    modal.textContent = '';
+    const modalHTML = `
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
           <div class="modal-header">
@@ -924,18 +938,50 @@ class SystemManagement {
         try {
             await window.ModalManagerV2.showModal(modalId, 'view');
         } catch (error) {
-            // Fallback to Bootstrap if ModalManagerV2 fails
+            // Fallback to Bootstrap if ModalManagerV2 fails - עם backdrop: false וניקוי
             window.Logger?.warn('checkResultsModal not available in ModalManagerV2, using Bootstrap fallback', { page: 'system-management' });
             if (bootstrap?.Modal) {
-                const bsModal = new bootstrap.Modal(modal);
+                // ניקוי backdrops לפני פתיחה
+                if (window.ModalManagerV2?._cleanupBootstrapBackdrops) {
+                    window.ModalManagerV2._cleanupBootstrapBackdrops();
+                }
+                const bsModal = new bootstrap.Modal(modal, { backdrop: false });
                 bsModal.show();
+                // ניקוי backdrops אחרי פתיחה
+                if (window.ModalManagerV2?._cleanupBootstrapBackdrops) {
+                    setTimeout(() => {
+                        window.ModalManagerV2._cleanupBootstrapBackdrops();
+                    }, 50);
+                }
+                // עדכון z-index
+                if (window.ModalZIndexManager?.forceUpdate) {
+                    setTimeout(() => {
+                        window.ModalZIndexManager.forceUpdate(modal);
+                    }, 50);
+                }
             }
         }
     } else {
-        // Fallback to Bootstrap modal
+        // Fallback to Bootstrap modal - עם backdrop: false וניקוי
         if (bootstrap?.Modal) {
-            const bsModal = new bootstrap.Modal(modal);
+            // ניקוי backdrops לפני פתיחה
+            if (window.ModalManagerV2?._cleanupBootstrapBackdrops) {
+                window.ModalManagerV2._cleanupBootstrapBackdrops();
+            }
+            const bsModal = new bootstrap.Modal(modal, { backdrop: false });
             bsModal.show();
+            // ניקוי backdrops אחרי פתיחה
+            if (window.ModalManagerV2?._cleanupBootstrapBackdrops) {
+                setTimeout(() => {
+                    window.ModalManagerV2._cleanupBootstrapBackdrops();
+                }, 50);
+            }
+            // עדכון z-index
+            if (window.ModalZIndexManager?.forceUpdate) {
+                setTimeout(() => {
+                    window.ModalZIndexManager.forceUpdate(modal);
+                }, 50);
+            }
         }
     }
     
@@ -987,7 +1033,7 @@ class SystemManagement {
     navigator.clipboard.writeText(report).then(() => {
       SystemManagement.showNotification('תוצאות בדיקה הועתקו ללוח בהצלחה', 'success');
     }).catch(error => {
-      console.error('Failed to copy to clipboard:', error);
+      window.Logger?.error('Failed to copy to clipboard:', error);
       SystemManagement.showNotification('שגיאה בהעתקת התוצאות ללוח', 'error');
     });
   }
@@ -1009,7 +1055,7 @@ class SystemManagement {
     this.showLoadingState();
 
     try {
-      console.log('📊 Loading system data...');
+      window.Logger?.debug('📊 Loading system data...');
 
       // Load primary data provider
       await SystemManagement.loadPrimaryDataProvider();
@@ -1021,13 +1067,13 @@ class SystemManagement {
       if (overviewData.status === 'success') {
         this.currentData = overviewData.data;
         this.updateDashboard(overviewData.data);
-        console.log('✅ System data loaded successfully');
+        window.Logger?.debug('✅ System data loaded successfully');
       } else {
         throw new Error(overviewData.message || 'Failed to load system data');
       }
 
     } catch (error) {
-      console.error('❌ Error loading system data:', error);
+      window.Logger?.error('❌ Error loading system data:', error);
       this.handleLoadError(error);
     } finally {
       this.isLoading = false;
@@ -1213,7 +1259,12 @@ class SystemManagement {
         const scoreDetails = this.getScoreDetails(data);
         const detailsElement = document.querySelector('.score-details');
         if (detailsElement) {
-          detailsElement.innerHTML = scoreDetails;
+          detailsElement.textContent = '';
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(scoreDetails, 'text/html');
+          doc.body.childNodes.forEach(node => {
+            detailsElement.appendChild(node.cloneNode(true));
+          });
         }
       }
     }
@@ -1356,7 +1407,8 @@ class SystemManagement {
     const providerListElement = document.getElementById('providerList');
     if (!providerListElement || !providers.length) {return;}
 
-    providerListElement.innerHTML = providers.map(provider => `
+    providerListElement.textContent = '';
+    const providersHTML = providers.map(provider => `
       <div class="provider-item ${provider.status === 'active' ? 'active' : 'inactive'}">
         <div class="provider-info">
           <span class="provider-name">${provider.name || 'Unknown Provider'}</span>
@@ -1371,6 +1423,11 @@ class SystemManagement {
         </div>
       </div>
     `).join('');
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(providersHTML, 'text/html');
+    doc.body.childNodes.forEach(node => {
+      providerListElement.appendChild(node.cloneNode(true));
+    });
   }
 
   updateLogs(data) {
@@ -1378,16 +1435,24 @@ class SystemManagement {
     if (!logContent) {return;}
 
     // Clear existing logs
-    logContent.innerHTML = '';
+    logContent.textContent = '';
 
     // Add system status log
     const statusLog = document.createElement('div');
     statusLog.className = 'log-entry log-info';
-    statusLog.innerHTML = `
+    statusLog.textContent = '';
+        // Convert HTML string to DOM elements safely
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(`
       <div class="log-timestamp">${window.formatTimeOnly ? window.formatTimeOnly(new Date()) : (window.dateUtils?.formatTimeOnly ? window.dateUtils.formatTimeOnly(new Date()) : new Date().toLocaleTimeString('he-IL'))}</div>
       <div class="log-level">INFO</div>
       <div class="log-message">מערכת ניהול מערכת נטענה בהצלחה - ציון מערכת: ${data.system_score || 0}/100</div>
-    `;
+    `, 'text/html');
+        const fragment = document.createDocumentFragment();
+        Array.from(doc.body.childNodes).forEach(node => {
+            fragment.appendChild(node.cloneNode(true));
+        });
+        statusLog.appendChild(fragment);
     logContent.appendChild(statusLog);
 
     // Add health status logs
@@ -1398,11 +1463,19 @@ class SystemManagement {
       const levelText = status.status === 'healthy' ? 'INFO' : status.status === 'warning' ? 'WARNING' : 'ERROR';
 
       logEntry.className = `log-entry ${logLevel}`;
-      logEntry.innerHTML = `
-        <div class="log-timestamp">${window.formatTimeOnly ? window.formatTimeOnly(new Date()) : (window.dateUtils?.formatTimeOnly ? window.dateUtils.formatTimeOnly(new Date()) : new Date().toLocaleTimeString('he-IL'))}</div>
-        <div class="log-level">${levelText}</div>
-        <div class="log-message">${component}: ${status.status} - ביצועים: ${status.performance || 'unknown'}</div>
-      `;
+      logEntry.textContent = '';
+      const timestampDiv = document.createElement('div');
+      timestampDiv.className = 'log-timestamp';
+      timestampDiv.textContent = window.formatTimeOnly ? window.formatTimeOnly(new Date()) : (window.dateUtils?.formatTimeOnly ? window.dateUtils.formatTimeOnly(new Date()) : new Date().toLocaleTimeString('he-IL'));
+      logEntry.appendChild(timestampDiv);
+      const levelDiv = document.createElement('div');
+      levelDiv.className = 'log-level';
+      levelDiv.textContent = levelText;
+      logEntry.appendChild(levelDiv);
+      const messageDiv = document.createElement('div');
+      messageDiv.className = 'log-message';
+      messageDiv.textContent = `${component}: ${status.status} - ביצועים: ${status.performance || 'unknown'}`;
+      logEntry.appendChild(messageDiv);
       logContent.appendChild(logEntry);
     });
   }
@@ -1480,18 +1553,30 @@ class SystemManagement {
 
         if (backupStatusElement) {
           if (isRecentBackup) {
-            backupStatusElement.innerHTML = '<span class="text-success">✅ גיבוי עדכני</span>';
+            backupStatusElement.innerHTML.textContent = '';
+        const div = document.createElement('div');
+        div.className = 'text-success';
+        div.textContent = '✅ גיבוי עדכני';
+        backupStatusElement.innerHTML.appendChild(div);
           } else {
-            backupStatusElement.innerHTML = '<span class="text-warning">⚠️ גיבוי ישן</span>';
+            backupStatusElement.innerHTML.textContent = '';
+        const div = document.createElement('div');
+        div.className = 'text-warning';
+        div.textContent = '⚠️ גיבוי ישן';
+        backupStatusElement.innerHTML.appendChild(div);
           }
         }
 
-        console.log('✅ Backup status updated successfully');
+        window.Logger?.debug('✅ Backup status updated successfully');
       } else {
         // No backups found
         const backupStatusElement = document.getElementById('backupStatus');
         if (backupStatusElement) {
-          backupStatusElement.innerHTML = '<span class="text-danger">❌ אין גיבויים</span>';
+          backupStatusElement.innerHTML.textContent = '';
+        const div = document.createElement('div');
+        div.className = 'text-danger';
+        div.textContent = '❌ אין גיבויים';
+        backupStatusElement.innerHTML.appendChild(div);
         }
 
         const lastBackupDateElement = document.getElementById('lastBackupDate');
@@ -1499,13 +1584,17 @@ class SystemManagement {
           lastBackupDateElement.textContent = 'לא נמצא';
         }
 
-        console.log('⚠️ No backups found');
+        window.Logger?.debug('⚠️ No backups found');
       }
     } catch (error) {
-      console.error('❌ Error updating backup status:', error);
+      window.Logger?.error('❌ Error updating backup status:', error);
       const backupStatusElement = document.getElementById('backupStatus');
       if (backupStatusElement) {
-        backupStatusElement.innerHTML = '<span class="text-danger">❌ שגיאה בבדיקה</span>';
+        backupStatusElement.innerHTML.textContent = '';
+        const div = document.createElement('div');
+        div.className = 'text-danger';
+        div.textContent = '❌ שגיאה בבדיקה';
+        backupStatusElement.innerHTML.appendChild(div);
       }
     }
   }
@@ -1522,17 +1611,28 @@ class SystemManagement {
       warningBanner.className = 'alert alert-danger fallback-warning';
     }
 
-    warningBanner.innerHTML = `
-      <div class="d-flex align-items-center">
-        <i class="fas fa-times-circle me-2"></i>
-        <div>
-          <strong>נתוני מערכת לא זמינים</strong>
-          <br>
-          <small>${errorMessage}</small>
-        </div>
-        <button type="button" class="btn-close ms-auto" onclick="this.parentElement.parentElement.remove()"></button>
-      </div>
-    `;
+    warningBanner.textContent = '';
+    const flexDiv = document.createElement('div');
+    flexDiv.className = 'd-flex align-items-center';
+    const icon = document.createElement('i');
+    icon.className = 'fas fa-times-circle me-2';
+    flexDiv.appendChild(icon);
+    const contentDiv = document.createElement('div');
+    const strong = document.createElement('strong');
+    strong.textContent = 'נתוני מערכת לא זמינים';
+    contentDiv.appendChild(strong);
+    const br = document.createElement('br');
+    contentDiv.appendChild(br);
+    const small = document.createElement('small');
+    small.textContent = errorMessage;
+    contentDiv.appendChild(small);
+    flexDiv.appendChild(contentDiv);
+    const closeBtn = document.createElement('button');
+    closeBtn.type = 'button';
+    closeBtn.className = 'btn-close ms-auto';
+    closeBtn.onclick = function() { this.parentElement.parentElement.remove(); };
+    flexDiv.appendChild(closeBtn);
+    warningBanner.appendChild(flexDiv);
 
     const mainContent = document.querySelector('.main-content');
     if (mainContent) {
@@ -1592,7 +1692,7 @@ class SystemManagement {
         }
       }
     } catch (error) {
-      console.error('Error updating external data:', error);
+      window.Logger?.error('Error updating external data:', error);
     }
   }
 
@@ -1616,7 +1716,7 @@ class SystemManagement {
         // Update alerts list
         const alertsListElement = document.getElementById('alerts-list');
         if (alertsListElement) {
-          alertsListElement.innerHTML = '';
+          alertsListElement.textContent = '';
 
           if (alerts.alerts && alerts.alerts.length > 0) {
             alerts.alerts.forEach(alert => {
@@ -1625,28 +1725,44 @@ class SystemManagement {
 
               const timestamp = window.formatTimeOnly ? window.formatTimeOnly(new Date(alert.timestamp)) : (window.dateUtils?.formatTimeOnly ? window.dateUtils.formatTimeOnly(new Date(alert.timestamp)) : new Date(alert.timestamp).toLocaleTimeString('he-IL'));
 
-              alertItem.innerHTML = `
-                <div class="alert-timestamp">${timestamp}</div>
-                <div class="alert-level">${alert.level.toUpperCase()}</div>
-                <div class="alert-message">${alert.message}</div>
-              `;
+              alertItem.textContent = '';
+              const timestampDiv = document.createElement('div');
+              timestampDiv.className = 'alert-timestamp';
+              timestampDiv.textContent = timestamp;
+              alertItem.appendChild(timestampDiv);
+              const levelDiv = document.createElement('div');
+              levelDiv.className = 'alert-level';
+              levelDiv.textContent = alert.level.toUpperCase();
+              alertItem.appendChild(levelDiv);
+              const messageDiv = document.createElement('div');
+              messageDiv.className = 'alert-message';
+              messageDiv.textContent = alert.message;
+              alertItem.appendChild(messageDiv);
 
               alertsListElement.appendChild(alertItem);
             });
           } else {
             const noAlertsItem = document.createElement('div');
             noAlertsItem.className = 'alert-item info';
-            noAlertsItem.innerHTML = `
-              <div class="alert-timestamp">${window.formatTimeOnly ? window.formatTimeOnly(new Date()) : (window.dateUtils?.formatTimeOnly ? window.dateUtils.formatTimeOnly(new Date()) : new Date().toLocaleTimeString('he-IL'))}</div>
-              <div class="alert-level">INFO</div>
-              <div class="alert-message">אין התראות פעילות</div>
-            `;
+            noAlertsItem.textContent = '';
+            const timestampDiv = document.createElement('div');
+            timestampDiv.className = 'alert-timestamp';
+            timestampDiv.textContent = window.formatTimeOnly ? window.formatTimeOnly(new Date()) : (window.dateUtils?.formatTimeOnly ? window.dateUtils.formatTimeOnly(new Date()) : new Date().toLocaleTimeString('he-IL'));
+            noAlertsItem.appendChild(timestampDiv);
+            const levelDiv = document.createElement('div');
+            levelDiv.className = 'alert-level';
+            levelDiv.textContent = 'INFO';
+            noAlertsItem.appendChild(levelDiv);
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'alert-message';
+            messageDiv.textContent = 'אין התראות פעילות';
+            noAlertsItem.appendChild(messageDiv);
             alertsListElement.appendChild(noAlertsItem);
           }
         }
       }
     } catch (error) {
-      console.error('Error updating alerts:', error);
+      window.Logger?.error('Error updating alerts:', error);
       SystemManagement.showNotification(
         `❌ שגיאה בטעינת התראות: ${error?.message || 'השרת לא החזיר נתונים'}`,
         'error',
@@ -1662,11 +1778,14 @@ class SystemManagement {
 
       const alertsListElement = document.getElementById('alerts-list');
       if (alertsListElement) {
-        alertsListElement.innerHTML = `
-          <div class="alert-item error">
-            <div class="alert-message">לא ניתן לטעון התראות כרגע. בדוק את החיבור לשרת ונסה שוב.</div>
-          </div>
-        `;
+        alertsListElement.textContent = '';
+        const alertItem = document.createElement('div');
+        alertItem.className = 'alert-item error';
+        const messageDiv = document.createElement('div');
+        messageDiv.className = 'alert-message';
+        messageDiv.textContent = 'לא ניתן לטעון התראות כרגע. בדוק את החיבור לשרת ונסה שוב.';
+        alertItem.appendChild(messageDiv);
+        alertsListElement.appendChild(alertItem);
       }
     }
   }
@@ -1754,12 +1873,12 @@ class SystemManagement {
    */
   static async savePrimaryDataProvider(provider) {
     try {
-      console.log(`💾 Saving primary data provider: ${provider}`);
+      window.Logger?.debug(`💾 Saving primary data provider: ${provider}`);
 
       if (window.PreferencesCore && typeof window.PreferencesCore.savePreference === 'function') {
         const success = await window.PreferencesCore.savePreference('primaryDataProvider', provider);
         if (success) {
-          console.log('✅ Primary data provider saved successfully via PreferencesCore');
+          window.Logger?.debug('✅ Primary data provider saved successfully via PreferencesCore');
           if (typeof window.showSuccessNotification === 'function') {
             window.showSuccessNotification('הצלחה', `ספק נתונים ראשי נשמר: ${provider}`);
           }
@@ -1770,7 +1889,7 @@ class SystemManagement {
         throw new Error('PreferencesCore.savePreference not available');
       }
     } catch (error) {
-      console.error('❌ Error saving primary data provider:', error);
+      window.Logger?.error('❌ Error saving primary data provider:', error);
       if (typeof window.showErrorNotification === 'function') {
         window.showErrorNotification('שגיאה', 'שגיאה בשמירת ספק נתונים ראשי: ' + error.message);
       }
@@ -1783,7 +1902,7 @@ class SystemManagement {
    */
   static async loadPrimaryDataProvider() {
     try {
-      console.log('📡 Loading primary data provider...');
+      window.Logger?.debug('📡 Loading primary data provider...');
 
       if (window.PreferencesCore && typeof window.PreferencesCore.getPreference === 'function') {
         const provider = await window.PreferencesCore.getPreference('primaryDataProvider');
@@ -1795,11 +1914,11 @@ class SystemManagement {
           } else {
             select.value = provider;
           }
-          console.log(`✅ Primary data provider loaded: ${provider}`);
+          window.Logger?.debug(`✅ Primary data provider loaded: ${provider}`);
         }
       }
     } catch (error) {
-      console.error('❌ Error loading primary data provider:', error);
+      window.Logger?.error('❌ Error loading primary data provider:', error);
     }
   }
 
@@ -1816,7 +1935,7 @@ class SystemManagement {
    */
   static async copyDetailedLog() {
     try {
-      console.log('📋 Generating detailed log...');
+      window.Logger?.debug('📋 Generating detailed log...');
 
       // Show loading state
       const copyBtn = document.querySelector('.copy-log-btn');
@@ -1844,17 +1963,17 @@ class SystemManagement {
           if (typeof window.showNotification === 'function') {
             window.showNotification(logInfo, 'success');
           } else {
-            alert(logInfo);
+            window.showErrorNotification(logInfo, "שגיאה");
           }
         }
 
-        console.log('✅ Detailed log copied to clipboard');
+        window.Logger?.debug('✅ Detailed log copied to clipboard');
       } else {
         throw new Error(data.message || 'Failed to generate detailed log');
       }
 
     } catch (error) {
-      console.error('❌ Error copying detailed log:', error);
+      window.Logger?.error('❌ Error copying detailed log:', error);
 
       const errorMsg = `שגיאה בהעתקת לוג: ${error.message}\n\n🔧 פתרונות אפשריים:\n• בדוק את החיבור לשרת\n• נסה לרענן את הדף\n• פנה לתמיכה טכנית`;
 
@@ -1863,7 +1982,7 @@ class SystemManagement {
       } else if (typeof window.showNotification === 'function') {
         window.showNotification(errorMsg, 'error');
       } else {
-        alert(errorMsg);
+        window.showErrorNotification(errorMsg, "שגיאה");
       }
     } finally {
     // Reset button

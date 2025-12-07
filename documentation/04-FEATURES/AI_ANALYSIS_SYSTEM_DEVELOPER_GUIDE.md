@@ -1,8 +1,9 @@
 # AI Analysis System - Developer Guide
 
 **תאריך יצירה:** 28 בינואר 2025  
-**גרסה:** 1.0.0  
-**סטטוס:** 📋 תיעוד ראשוני
+**תאריך עדכון אחרון:** 06 בדצמבר 2025  
+**גרסה:** 2.0.0  
+**סטטוס:** ✅ מעודכן - כולל v2.0, DateRangePickerService, TradeAggregationService
 
 ---
 
@@ -109,10 +110,12 @@ trading-ui/
 - `provider` - LLM provider ('gemini' | 'perplexity')
 - `variables_json` - User-provided variables
 - `prompt_text` - Final prompt sent to LLM
-- `response_text` - LLM response
-- `response_json` - Parsed JSON (if applicable)
+- `response_text` - LLM response (**נשמר במסד הנתונים**)
+- `response_json` - Parsed JSON (if applicable) (**נשמר במסד הנתונים**)
 - `status` - Request status ('pending' | 'completed' | 'failed')
 - `error_message` - Error message if failed
+
+**הערה חשובה:** `response_text` ו-`response_json` נשמרים במסד הנתונים ולא רק במטמון של הפרונטאנד. זה מאפשר גישה לתוצאות גם בניתוחים חוזרים וגם בעת צפייה מאוחרת.
 
 #### user_llm_providers
 - `id` - Primary key
@@ -127,21 +130,37 @@ trading-ui/
 
 ## 🔄 זרימת נתונים
 
-### 1. יצירת ניתוח
+### 1. יצירת ניתוח (v2.0)
 
 ```
 User → Frontend (ai-analysis.html)
-  → AIAnalysisManager.generateAnalysis()
+  → AIAnalysisManager.handleGenerateAnalysis()
+  → בניית מבנה v2.0:
+     - prompt_variables (נשלח ל-LLM)
+     - filters (שימוש פנימי בלבד, למשל trading_account_id)
+     - trade_selection (הגדרת בחירת טריידים)
   → AIAnalysisData.generateAnalysis()
   → POST /api/ai-analysis/generate
   → AIAnalysisService.generate_analysis()
+  → אם template_id ב-[2,3,4]: TradeAggregationService.aggregate_trades()
+     - איסוף נתוני טריידים לפי filters ו-trade_selection
+     - עיצוב נתונים: format_trades_for_ai()
+  → PromptTemplateService.build_prompt()
+     - החלפת משתנים מ-prompt_variables
+     - הוספת trade_data_structured (אם קיים)
   → LLMProviderManager.send_prompt()
   → Gemini/Perplexity Provider
   → Response parsing
-  → Save to DB (ai_analysis_requests)
-  → Return to Frontend
+  → Save to DB (ai_analysis_requests) - כולל response_text, response_json, ו-variables_json (v2.0)
+  → Return to Frontend (עם response_text ב-API response)
   → AIResultRenderer.render()
+  → Frontend cache (אופציונלי - למהירות)
 ```
+
+**הערות חשובות:**
+- `response_text` ו-`response_json` נשמרים במסד הנתונים, כך שהתוצאות זמינות גם בניתוחים חוזרים וגם בעת צפייה מאוחרת
+- `variables_json` נשמר בגרסה 2.0 המלאה (כולל prompt_variables, filters, trade_selection)
+- `trading_account_id` נשמר ב-`filters` ולא נשלח למנוע AI (רק לפילטור פנימי)
 
 ### 2. טעינת תבניות
 
@@ -150,9 +169,14 @@ Frontend
   → AIAnalysisData.getTemplates()
   → GET /api/ai-analysis/templates
   → PromptTemplateService.get_all_templates()
-  → Return templates list
+  → Return templates list (כולל תרגום עברית מלא)
   → AITemplateSelector.render()
 ```
+
+**הערות:**
+- כל התבניות כוללות תרגום עברית מלא בשדות `label`
+- שדות `date_range` מוגדרים כ-`type: "date-range"` (DateRangePickerService)
+- שדות `condition_focus` מוגדרים כ-`type: "select"` עם `integration: "trading_methods"`
 
 ### 3. ניהול API Keys
 
@@ -174,18 +198,33 @@ User Profile
 
 יצירת ניתוח חדש.
 
-**Request Body:**
+**Request Body (v2.0):**
 ```json
 {
-  "template_id": 1,
+  "template_id": 3,
   "variables": {
-    "stock_ticker": "AAPL",
-    "investment_thesis": "Strong fundamentals",
-    "goal": "Long-term investment"
+    "version": "2.0",
+    "prompt_variables": {
+      "ticker_symbol": "TSLA",
+      "date_range": "השנה",
+      "analysis_focus": "Performance Review",
+      "response_language": "hebrew"
+    },
+    "filters": {
+      "trading_account_id": 1
+    },
+    "trade_selection": {
+      "type": "all"
+    }
   },
   "provider": "gemini"
 }
 ```
+
+**הערות:**
+- גרסה 2.0 מפרידה בין `prompt_variables` (נשלח ל-LLM) ו-`filters` (לשימוש פנימי)
+- `trading_account_id` נשמר ב-`filters` ולא נשלח למנוע AI
+- `date_range` משתמש ב-`type: "date-range"` עם DateRangePickerService
 
 **Response:**
 ```json
@@ -216,12 +255,31 @@ User Profile
       "name_he": "ניתוח מחקר הון",
       "description": "Comprehensive equity analysis",
       "variables_json": {
-        "variables": [...]
+        "variables": [
+          {
+            "key": "stock_ticker",
+            "label": "טיקר",
+            "type": "select",
+            "integration": "tickers",
+            "placeholder": "בחר טיקר..."
+          },
+          {
+            "key": "date_range",
+            "label": "טווח תאריכים",
+            "type": "date-range",
+            "required": false
+          }
+        ]
       }
     }
   ]
 }
 ```
+
+**הערות:**
+- כל התבניות תורגמו לעברית
+- שדות עם `integration` נטענים אוטומטית (tickers, reasons, trading_accounts, trading_methods)
+- שדות `date_range` משתמשים ב-`type: "date-range"` (DateRangePickerService)
 
 ### GET /api/ai-analysis/history
 
@@ -341,18 +399,62 @@ async function loadTemplates() {
 }
 ```
 
-### Backend: יצירת ניתוח
+### Backend: יצירת ניתוח (v2.0)
 
 ```python
 from services.ai_analysis_service import AIAnalysisService
+from services.trade_aggregation_service import TradeAggregationService
 from services.llm_providers.llm_provider_manager import LLMProviderManager
 
-def generate_analysis(template_id, variables, user_id):
+def generate_analysis(template_id, variables, user_id, provider='gemini'):
+    # Extract v2.0 structure
+    if isinstance(variables, dict) and variables.get('version') == '2.0':
+        prompt_variables = variables.get('prompt_variables', {})
+        filters = variables.get('filters', {})
+        trade_selection = variables.get('trade_selection', {})
+    else:
+        # Legacy v1.0 - backward compatibility
+        prompt_variables = variables
+        filters = {}
+        trade_selection = {}
+    
+    # Get trade data if needed (templates 2, 3, 4)
+    trade_data_str = None
+    if template_id in [2, 3, 4]:
+        agg_params = {'user_id': user_id}
+        
+        # Add filters
+        if filters.get('trading_account_id'):
+            agg_params['trading_account_id'] = filters['trading_account_id']
+        
+        # Add trade selection
+        if trade_selection.get('type') == 'single' and trade_selection.get('trade_id'):
+            agg_params['trade_id'] = trade_selection['trade_id']
+        elif trade_selection.get('type') == 'multiple' and trade_selection.get('trade_ids'):
+            agg_params['trade_ids'] = trade_selection['trade_ids']
+        else:
+            # Filtered or all - use criteria
+            criteria = trade_selection.get('criteria', {})
+            if criteria.get('ticker_symbol'):
+                agg_params['ticker_symbol'] = criteria['ticker_symbol']
+            if criteria.get('date_range_start'):
+                agg_params['date_range_start'] = criteria['date_range_start']
+            if criteria.get('date_range_end'):
+                agg_params['date_range_end'] = criteria['date_range_end']
+        
+        # Aggregate and format
+        result = TradeAggregationService.aggregate_trades(db=db, **agg_params)
+        trade_data_str = TradeAggregationService.format_trades_for_ai(result)
+    
     # Get template
     template = PromptTemplateService.get_template(template_id)
     
-    # Build prompt
-    prompt = build_prompt(template.prompt_text, variables)
+    # Build prompt with trade data
+    prompt = PromptTemplateService.build_prompt(
+        template=template,
+        variables=prompt_variables,
+        trade_data_structured=trade_data_str
+    )
     
     # Get user's API key
     user_provider = UserLLMProvider.query.filter_by(user_id=user_id).first()
@@ -360,14 +462,14 @@ def generate_analysis(template_id, variables, user_id):
     
     # Send to LLM
     provider_manager = LLMProviderManager()
-    response = provider_manager.send_prompt('gemini', prompt, api_key)
+    response = provider_manager.send_prompt(provider, prompt, api_key)
     
-    # Save request
+    # Save request with full v2.0 structure
     request = AIAnalysisRequest(
         user_id=user_id,
         template_id=template_id,
-        provider='gemini',
-        variables_json=json.dumps(variables),
+        provider=provider,
+        variables_json=json.dumps(variables),  # Full v2.0 structure
         prompt_text=prompt,
         response_text=response['text'],
         status='completed'
@@ -628,6 +730,7 @@ await window.CRUDResponseHandler.handleSaveResponse(response, {
 - פתיחת מודלים לבחירת Related Type/Object
 - פתיחת Notes Modal עם prefill
 - ניהול מודלים דינמיים
+- תמיכה בשדות `date-range` - רינדור ואתחול אוטומטי של DateRangePickerService
 
 **דוגמה:**
 ```javascript
@@ -640,6 +743,77 @@ await window.ModalManagerV2.showModal('notesModal', 'add', {
   }
 });
 ```
+
+**תמיכה ב-date-range:**
+ModalManagerV2 מזהה שדות עם `type: "date-range"` ומאתחל אוטומטית את DateRangePickerService:
+```javascript
+// Field config in modal
+{
+  "key": "date_range",
+  "label": "טווח תאריכים",
+  "type": "date-range",
+  "required": false,
+  "defaultValue": "השנה"
+}
+```
+
+### 6.1 DateRangePickerService
+**קובץ:** `trading-ui/scripts/services/date-range-picker-service.js`
+
+**תכונות:**
+- Preset options (היום, השבוע, החודש, השנה, כל זמן)
+- Custom date selection עם HTML5 native date picker
+- אינטגרציה עם `translateDateRangeToDates` להמרת preset strings
+
+**שימוש:**
+```javascript
+// Render date range picker
+const html = window.DateRangePickerService.render({
+  id: 'myDateRange',
+  label: 'טווח תאריכים',
+  defaultValue: 'השנה',
+  required: false
+});
+
+// Initialize
+window.DateRangePickerService.initialize('myDateRange');
+
+// Get selected range
+const range = window.DateRangePickerService.getRangeString('myDateRange');
+// Returns: "2024-01-01 - 2024-12-31" or "השנה"
+```
+
+**תיעוד מלא:** [GENERAL_SYSTEMS_LIST.md](../../frontend/GENERAL_SYSTEMS_LIST.md)
+
+### 6.2 TradeAggregationService
+**קובץ:** `Backend/services/trade_aggregation_service.py`
+
+**תכונות:**
+- מערכת כללית לאגרגציית נתוני טריידים
+- תמיכה בפילטרים מתקדמים (ticker, account, date range, investment type, trading method)
+- העשרת נתונים עם Executions, Trade Plans, Conditions, Positions
+- פורמט נתונים מובנה ל-AI (`format_trades_for_ai()`)
+
+**שימוש:**
+```python
+from services.trade_aggregation_service import TradeAggregationService
+
+# Aggregate trades
+result = TradeAggregationService.aggregate_trades(
+    db=db,
+    user_id=user_id,
+    ticker_symbol="TSLA",
+    trading_account_id=1,
+    date_range_start=datetime(2024, 1, 1),
+    date_range_end=datetime(2024, 12, 31),
+    include_closed=True
+)
+
+# Format for AI
+formatted = TradeAggregationService.format_trades_for_ai(result)
+```
+
+**תיעוד מלא:** [TRADE_AGGREGATION_SYSTEM.md](../../backend/TRADE_AGGREGATION_SYSTEM.md)
 
 ### 7. EventHandlerManager
 **קובץ:** `trading-ui/scripts/event-handler-manager.js`

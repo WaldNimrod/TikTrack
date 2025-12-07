@@ -80,7 +80,7 @@
                 page: 'tag-ui-manager' 
             });
             
-            select.innerHTML = '';
+            select.textContent = '';
 
             const fragment = document.createDocumentFragment();
             tags.forEach(tag => fragment.appendChild(buildOption(tag)));
@@ -132,10 +132,13 @@
             select.insertAdjacentElement('afterend', badgeContainer);
         }
 
-        badgeContainer.innerHTML = '';
+        badgeContainer.textContent = '';
         const selectedOptions = Array.from(select.selectedOptions);
         if (!selectedOptions.length) {
-            badgeContainer.innerHTML = '<span class="text-muted small">לא נבחרו תגיות</span>';
+            const span = document.createElement('span');
+            span.className = 'text-muted small';
+            span.textContent = 'לא נבחרו תגיות';
+            badgeContainer.appendChild(span);
             return;
         }
 

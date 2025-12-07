@@ -32,6 +32,13 @@ class ConditionsInitializer {
             'conditions-crud-manager.js',
             'conditions-form-generator.js'
         ];
+        // Map script names to their global objects (for bundle support)
+        this.dependencyMap = {
+            'conditions-translations.js': 'conditionsTranslations',
+            'conditions-validator.js': 'conditionsValidator',
+            'conditions-crud-manager.js': 'conditionsCRUDManager',
+            'conditions-form-generator.js': 'conditionsFormGenerator'
+        };
     }
     
     /**
@@ -67,7 +74,7 @@ class ConditionsInitializer {
             return true;
             
         } catch (error) {
-            window.Logger?.error('❌ Failed to initialize Conditions System', { error: error?.message, stack: error?.stack }, { page: 'conditions-initializer' });
+            window.Logger?.warn('⚠️ Failed to initialize Conditions System (will retry or use fallback)', { error: error?.message, stack: error?.stack }, { page: 'conditions-initializer' });
             return false;
         }
     }
@@ -103,6 +110,13 @@ class ConditionsInitializer {
      * @returns {boolean} Whether script is loaded
      */
     isScriptLoaded(scriptName) {
+        // First check if global object exists (works with bundles)
+        const globalObjectName = this.dependencyMap[scriptName];
+        if (globalObjectName && window[globalObjectName]) {
+            return true;
+        }
+        
+        // Fallback: check script tags (for development mode)
         const scripts = document.querySelectorAll('script[src]');
         for (const script of scripts) {
             if (script.src.includes(scriptName)) {

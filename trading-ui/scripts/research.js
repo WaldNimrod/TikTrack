@@ -61,11 +61,14 @@
       error?.message ||
       'הדשבורד מחכה לחיבור שירותי המחקר. לאחר חיבור הנתונים נראה כאן כרטיסיות וגרפים.';
 
-    container.innerHTML = `
-      <div class="dashboard-placeholder" data-state="${error ? 'error' : 'idle'}">
-        <p>${message}</p>
-      </div>
-    `;
+    container.textContent = '';
+    const placeholder = document.createElement('div');
+    placeholder.className = 'dashboard-placeholder';
+    placeholder.setAttribute('data-state', error ? 'error' : 'idle');
+    const p = document.createElement('p');
+    p.textContent = message;
+    placeholder.appendChild(p);
+    container.appendChild(placeholder);
   }
 
   /**
@@ -84,11 +87,19 @@
     }
 
     const timestamp = new Date(state.lastUpdated).toLocaleString('he-IL');
-    container.innerHTML = `
+    container.textContent = '';
+        // Convert HTML string to DOM elements safely
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(`
       <div class="info-summary" data-component="research-dashboard">
         <p>נתוני מחקר זמינים (עודכנו ב-${timestamp}).</p>
       </div>
-    `;
+    `, 'text/html');
+        const fragment = document.createDocumentFragment();
+        Array.from(doc.body.childNodes).forEach(node => {
+            fragment.appendChild(node.cloneNode(true));
+        });
+        container.appendChild(fragment);
   }
 
   /**

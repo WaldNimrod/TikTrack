@@ -35,10 +35,19 @@ function addDebugResult(title, data, type = 'info') {
             </div>
         `;
         
-        if (resultsContainer.innerHTML.includes('בחר בדיקה')) {
-            resultsContainer.innerHTML = html;
+        if (resultsContainer.textContent.includes('בחר בדיקה')) {
+            resultsContainer.textContent = '';
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            doc.body.childNodes.forEach(node => {
+                resultsContainer.appendChild(node.cloneNode(true));
+            });
         } else {
-            resultsContainer.insertAdjacentHTML('beforeend', html);
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            doc.body.childNodes.forEach(node => {
+                resultsContainer.appendChild(node.cloneNode(true));
+            });
         }
     }
 }
@@ -209,7 +218,11 @@ function clearResults() {
     debugResults = [];
     const resultsContainer = document.getElementById('debug-results');
     if (resultsContainer) {
-        resultsContainer.innerHTML = '<p class="text-muted">בחר בדיקה מהכפתורים למעלה כדי להתחיל</p>';
+        resultsContainer.textContent = '';
+        const p = document.createElement('p');
+        p.className = 'text-muted';
+        p.textContent = 'בחר בדיקה מהכפתורים למעלה כדי להתחיל';
+        resultsContainer.appendChild(p);
     }
 }
 

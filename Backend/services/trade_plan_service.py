@@ -218,6 +218,16 @@ class TradePlanService:
             db.commit()
             db.refresh(plan)
             logger.info(f"Created trade plan: {plan.id} for ticker {plan.ticker_id}")
+            
+            # Update user-ticker and ticker status
+            try:
+                from services.ticker_service import TickerService
+                if plan.user_id and plan.ticker_id:
+                    TickerService.update_user_ticker_status(db, plan.user_id, plan.ticker_id)
+                    TickerService.update_ticker_status_auto(db, plan.ticker_id)
+            except Exception as e:
+                logger.warning(f"Could not update ticker status after creating trade plan: {e}")
+            
             return plan
         except Exception as e:
             db.rollback()
@@ -284,12 +294,25 @@ class TradePlanService:
                 logger.error(f"Trade plan validation failed: {error_message}")
                 raise ValueError(f"Trade plan validation failed: {error_message}")
             
+            # Track if status changed
+            old_status = plan.status
+            
             for key, value in data.items():
                 if hasattr(plan, key):
                     setattr(plan, key, value)
             db.commit()
             db.refresh(plan)
             logger.info(f"Updated trade plan: {plan.id}")
+            
+            # Update user-ticker and ticker status if status changed
+            try:
+                from services.ticker_service import TickerService
+                if plan.user_id and plan.ticker_id and old_status != plan.status:
+                    TickerService.update_user_ticker_status(db, plan.user_id, plan.ticker_id)
+                    TickerService.update_ticker_status_auto(db, plan.ticker_id)
+            except Exception as e:
+                logger.warning(f"Could not update ticker status after updating trade plan: {e}")
+            
             return plan
         except Exception as e:
             db.rollback()
@@ -351,13 +374,15 @@ class TradePlanService:
             plan.cancelled_at,
         )
         
-        # Update ticker active_trades status (triggers will handle this automatically)
+        # Update user-ticker and ticker status
         try:
-            from app import update_ticker_open_status
-            update_ticker_open_status(plan.ticker_id)
-            logger.info(f"Updated ticker {plan.ticker_id} active_trades status after cancelling plan")
+            from services.ticker_service import TickerService
+            if plan.user_id and plan.ticker_id:
+                TickerService.update_user_ticker_status(db, plan.user_id, plan.ticker_id)
+                TickerService.update_ticker_status_auto(db, plan.ticker_id)
+                logger.info(f"Updated ticker {plan.ticker_id} status after cancelling plan")
         except Exception as e:
-            logger.warning(f"Could not update ticker active_trades status: {e}")
+            logger.warning(f"Could not update ticker status after cancelling plan: {e}")
         
         return plan
     
@@ -368,8 +393,18 @@ class TradePlanService:
         if plan and plan.cancelled_at is not None:
             plan.cancelled_at = None
             plan.cancel_reason = None
+            plan.status = 'open'  # Ensure status is open when activating
             db.commit()
             db.refresh(plan)
+            
+            # Update user-ticker and ticker status
+            try:
+                from services.ticker_service import TickerService
+                if plan.user_id and plan.ticker_id:
+                    TickerService.update_user_ticker_status(db, plan.user_id, plan.ticker_id)
+                    TickerService.update_ticker_status_auto(db, plan.ticker_id)
+            except Exception as e:
+                logger.warning(f"Could not update ticker status after activating plan: {e}")
             logger.info(f"Activated trade plan: {plan_id}")
             return plan
         return None

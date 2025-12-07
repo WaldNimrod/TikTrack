@@ -54,6 +54,8 @@ class AIAnalysisRequest(BaseModel):
     status = Column(String(20), default='pending', nullable=False,
                    comment="Request status: 'pending', 'completed', 'failed'")
     error_message = Column(Text, nullable=True, comment="Error message if status is 'failed'")
+    retry_count = Column(Integer, default=0, nullable=False,
+                        comment="Number of retry attempts for failed analyses")
     
     # Timestamps
     updated_at = Column(DateTime, default=func.now(), onupdate=func.now(), nullable=False)
@@ -67,7 +69,7 @@ class AIAnalysisRequest(BaseModel):
         Convert to dictionary
         
         Args:
-            include_response: If True, include response_text (for initial response only, not saved to DB)
+            include_response: If True, include response_text (saved to DB and available from cache)
         """
         result = super().to_dict()
         try:
@@ -81,10 +83,21 @@ class AIAnalysisRequest(BaseModel):
         else:
             result['template_name'] = 'ניתוח'
         
-        # Include response_text only if explicitly requested (for initial API response)
-        # This allows frontend to save to cache, but response_text is NOT saved to DB
+        # Extract error_code from error_message if present (format: "ERROR_CODE: message")
+        if self.error_message:
+            error_parts = self.error_message.split(':', 1)
+            if len(error_parts) == 2 and error_parts[0].startswith('AI_'):
+                result['error_code'] = error_parts[0].strip()
+                result['error_message'] = error_parts[1].strip()  # User-friendly message only
+            else:
+                result['error_message'] = self.error_message
+                result['error_code'] = None
+        
+        # Include response_text only if explicitly requested
+        # response_text is saved to DB and can also be saved to frontend cache
         if include_response:
             # Check for temporary response (from generate_analysis) or DB response
+            # Priority: temporary response (for immediate API response) > DB response
             if hasattr(self, '_temp_response_text') and self._temp_response_text:
                 result['response_text'] = self._temp_response_text
             elif self.response_text:
@@ -101,7 +114,7 @@ class AIAnalysisRequest(BaseModel):
                     result['response_json'] = None
         else:
             # Do NOT include response_text or response_json in history/listing responses
-            # These are saved to frontend cache only, not in database
+            # These are available in database and can be loaded when viewing specific analysis
             result.pop('response_text', None)
             result.pop('response_json', None)
         return result

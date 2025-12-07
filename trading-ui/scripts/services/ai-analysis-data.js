@@ -5,7 +5,7 @@
  * 
  * This index lists all functions in this file, organized by category.
  * 
- * Total Functions: 9
+ * Total Functions: 12
  * 
  * DATA LOADING (3)
  * - loadTemplates() - Load AI analysis templates from API with cache support
@@ -13,12 +13,16 @@
  * - getLLMProviderSettings() - Get LLM provider settings (Gemini/Perplexity)
  * 
  * DATA MANIPULATION (5)
- * - generateAnalysis() - Generate AI analysis request via API
+ * - generateAnalysis() - Generate AI analysis request via API (with validation)
  * - updateLLMProviderSettings() - Update LLM provider settings (API key, validation)
  * - saveAsNote() - Save analysis result as note
  * - exportToPDF() - Export analysis result to PDF format
  * - exportToMarkdown() - Export analysis result to Markdown format
  * - exportToHTML() - Export analysis result to HTML format
+ * 
+ * VALIDATION (2)
+ * - validateAnalysisRequest() - Validate AI analysis request using Business Logic Layer
+ * - validateVariables() - Validate AI analysis variables using Business Logic Layer
  * 
  * UTILITIES (1)
  * - convertMarkdownToHTML() - Convert markdown text to HTML using marked.js or fallback
@@ -159,6 +163,17 @@
           const response = await fetch(buildUrl('/api/ai-analysis/templates'));
 
           if (!response.ok) {
+            // Handle 401 authentication errors
+            if (response.status === 401) {
+              window.Logger?.warn?.('⚠️ Authentication required - redirecting to login', PAGE_LOG_CONTEXT);
+              if (window.NotificationSystem) {
+                window.NotificationSystem.showError('נדרשת התחברות', 'system');
+              }
+              setTimeout(() => {
+                window.location.href = 'login.html';
+              }, 1000);
+              throw new Error('Authentication required');
+            }
             throw new Error(`HTTP error! status: ${response.status}`);
           }
 
@@ -210,6 +225,250 @@
   }
 
   /**
+   * Validate AI analysis request using Business Logic Layer
+   * Uses CacheTTLGuard for caching validation results (TTL: 60 seconds)
+   */
+  async function validateAnalysisRequest(data) {
+    const cacheKey = window.CacheKeyHelper?.generateCacheKeyFromObject 
+      ? window.CacheKeyHelper.generateCacheKeyFromObject('business:validate-ai-analysis', data)
+      : `business:validate-ai-analysis:${JSON.stringify(data)}`;
+    
+    try {
+      // Use CacheTTLGuard for automatic cache management
+      if (window.CacheTTLGuard?.ensure) {
+        return await window.CacheTTLGuard.ensure(cacheKey, async () => {
+          const response = await fetch(buildUrl('/api/business/ai-analysis/validate'), {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify(data)
+          });
+
+          if (!response.ok) {
+            let errorData = {};
+            try {
+              const text = await response.text();
+              if (text) {
+                errorData = JSON.parse(text);
+              }
+            } catch (parseError) {
+              window.Logger?.warn?.('⚠️ Failed to parse validation error response', {
+                ...PAGE_LOG_CONTEXT,
+                parseError: parseError?.message,
+                status: response.status
+              });
+            }
+            
+            // Extract errors - handle both array and string formats
+            let errors = [];
+            if (errorData.error) {
+              if (Array.isArray(errorData.error.errors)) {
+                errors = errorData.error.errors;
+              } else if (errorData.error.message) {
+                errors = [errorData.error.message];
+              } else if (typeof errorData.error === 'string') {
+                errors = [errorData.error];
+              }
+            } else if (errorData.errors) {
+              errors = Array.isArray(errorData.errors) ? errorData.errors : [errorData.errors];
+            } else if (errorData.message) {
+              errors = [errorData.message];
+            }
+            
+            if (errors.length === 0) {
+              errors = [`Validation failed (HTTP ${response.status})`];
+            }
+            
+            window.Logger?.warn?.('⚠️ Validation response not OK', {
+              ...PAGE_LOG_CONTEXT,
+              status: response.status,
+              statusText: response.statusText,
+              errorData: errorData,
+              extractedErrors: errors
+            });
+            
+            return {
+              is_valid: false,
+              errors: errors
+            };
+          }
+
+          const result = await response.json();
+          if (result.status === 'success') {
+            return {
+              is_valid: true,
+              errors: []
+            };
+          } else {
+            // Handle error response (status: 'error' with 200 OK)
+            return {
+              is_valid: false,
+              errors: result.error?.errors || [result.error?.message || 'Validation failed']
+            };
+          }
+        }, { ttl: 60 * 1000 });
+      }
+      
+      // Fallback if CacheTTLGuard not available
+      const response = await fetch(buildUrl('/api/business/ai-analysis/validate'), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify(data)
+      });
+
+      if (!response.ok) {
+        let errorData = {};
+        try {
+          const text = await response.text();
+          if (text) {
+            errorData = JSON.parse(text);
+          }
+        } catch (parseError) {
+          window.Logger?.warn?.('⚠️ Failed to parse validation error response (fallback)', {
+            ...PAGE_LOG_CONTEXT,
+            parseError: parseError?.message,
+            status: response.status
+          });
+        }
+        
+        // Extract errors - handle both array and string formats
+        let errors = [];
+        if (errorData.error) {
+          if (Array.isArray(errorData.error.errors)) {
+            errors = errorData.error.errors;
+          } else if (errorData.error.message) {
+            errors = [errorData.error.message];
+          } else if (typeof errorData.error === 'string') {
+            errors = [errorData.error];
+          }
+        } else if (errorData.errors) {
+          errors = Array.isArray(errorData.errors) ? errorData.errors : [errorData.errors];
+        } else if (errorData.message) {
+          errors = [errorData.message];
+        }
+        
+        if (errors.length === 0) {
+          errors = [`Validation failed (HTTP ${response.status})`];
+        }
+        
+        window.Logger?.warn?.('⚠️ Validation response not OK (fallback)', {
+          ...PAGE_LOG_CONTEXT,
+          status: response.status,
+          statusText: response.statusText,
+          errorData: errorData,
+          extractedErrors: errors
+        });
+        
+        return {
+          is_valid: false,
+          errors: errors
+        };
+      }
+
+      const result = await response.json();
+      if (result.status === 'success') {
+        return {
+          is_valid: true,
+          errors: []
+        };
+      } else {
+        // Handle error response (status: 'error' with 200 OK)
+        return {
+          is_valid: false,
+          errors: result.error?.errors || [result.error?.message || 'Validation failed']
+        };
+      }
+    } catch (error) {
+      window.Logger?.error?.('❌ Error validating analysis request', {
+        ...PAGE_LOG_CONTEXT,
+        error: error?.message || error,
+      });
+      return {
+        is_valid: false,
+        errors: [error.message || 'Validation error']
+      };
+    }
+  }
+
+  /**
+   * Validate AI analysis variables using Business Logic Layer
+   * Uses CacheTTLGuard for caching validation results (TTL: 60 seconds)
+   */
+  async function validateVariables(variables) {
+    const cacheKey = window.CacheKeyHelper?.generateCacheKeyFromObject 
+      ? window.CacheKeyHelper.generateCacheKeyFromObject('business:validate-ai-analysis-variables', variables)
+      : `business:validate-ai-analysis-variables:${JSON.stringify(variables)}`;
+    
+    try {
+      // Use CacheTTLGuard for automatic cache management
+      if (window.CacheTTLGuard?.ensure) {
+        return await window.CacheTTLGuard.ensure(cacheKey, async () => {
+          const response = await fetch(buildUrl('/api/business/ai-analysis/validate-variables'), {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify({ variables })
+          });
+
+          if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            return {
+              is_valid: false,
+              errors: errorData.error?.errors || [errorData.error?.message || 'Variables validation failed']
+            };
+          }
+
+          const result = await response.json();
+          return {
+            is_valid: result.status === 'success',
+            errors: []
+          };
+        }, { ttl: 60 * 1000 });
+      }
+      
+      // Fallback if CacheTTLGuard not available
+      const response = await fetch(buildUrl('/api/business/ai-analysis/validate-variables'), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({ variables })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        return {
+          is_valid: false,
+          errors: errorData.error?.errors || [errorData.error?.message || 'Variables validation failed']
+        };
+      }
+
+      const result = await response.json();
+      return {
+        is_valid: result.status === 'success',
+        errors: []
+      };
+    } catch (error) {
+      window.Logger?.error?.('❌ Error validating variables', {
+        ...PAGE_LOG_CONTEXT,
+        error: error?.message || error,
+      });
+      return {
+        is_valid: false,
+        errors: [error.message || 'Variables validation error']
+      };
+    }
+  }
+
+  /**
    * Generate analysis
    */
   async function generateAnalysis(templateId, variables, provider) {
@@ -219,6 +478,30 @@
         templateId,
         provider,
       });
+
+      // Validate request using Business Logic Layer before sending
+      const validationResult = await validateAnalysisRequest({
+        template_id: templateId,
+        variables: variables,
+        provider: provider
+      });
+
+      if (!validationResult.is_valid) {
+        const errorMessage = validationResult.errors.join(', ');
+        window.Logger?.warn?.('⚠️ Validation failed before generating analysis', {
+          ...PAGE_LOG_CONTEXT,
+          errors: validationResult.errors,
+        });
+        
+        if (window.NotificationSystem) {
+          window.NotificationSystem.showError(
+            'שגיאת ולידציה: ' + errorMessage,
+            'system'
+          );
+        }
+        
+        throw new Error('Validation failed: ' + errorMessage);
+      }
 
       const response = await fetch(buildUrl('/api/ai-analysis/generate'), {
         method: 'POST',
@@ -234,6 +517,18 @@
       });
 
       if (!response.ok) {
+        // Handle 401 authentication errors
+        if (response.status === 401) {
+          window.Logger?.warn?.('⚠️ Authentication required - redirecting to login', PAGE_LOG_CONTEXT);
+          if (window.NotificationSystem) {
+            window.NotificationSystem.showError('נדרשת התחברות', 'system');
+          }
+          // Redirect to login
+          setTimeout(() => {
+            window.location.href = 'login.html';
+          }, 1000);
+          throw new Error('Authentication required');
+        }
         const errorData = await response.json().catch(() => ({}));
         throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
       }
@@ -257,8 +552,22 @@
       window.Logger?.error?.('❌ Error generating analysis', {
         ...PAGE_LOG_CONTEXT,
         error: error?.message || error,
+        errorCode: error?.errorCode,
+        errorAction: error?.errorAction,
       });
-      window.showErrorNotification?.('שגיאה', error.message || 'שגיאה ביצירת ניתוח');
+      
+      // Show user-friendly error message
+      const errorMessage = error?.message || 'שגיאה ביצירת ניתוח';
+      if (window.NotificationSystem) {
+        window.NotificationSystem.showError(
+          `❌ הניתוח נכשל: ${errorMessage}`,
+          'system',
+          { duration: 8000 }
+        );
+      } else {
+        window.showErrorNotification?.('שגיאה', errorMessage);
+      }
+      
       throw error;
     }
   }
@@ -283,6 +592,11 @@
           });
 
           if (!response.ok) {
+            // Handle 401 authentication errors - return empty array instead of throwing
+            if (response.status === 401) {
+              window.Logger?.debug?.('ℹ️ Authentication required (expected for unauthenticated users)', PAGE_LOG_CONTEXT);
+              return []; // Return empty array instead of throwing error
+            }
             throw new Error(`HTTP error! status: ${response.status}`);
           }
 
@@ -316,6 +630,11 @@
       });
 
       if (!response.ok) {
+        // Handle 401 authentication errors - return empty array instead of throwing
+        if (response.status === 401) {
+          window.Logger?.debug?.('ℹ️ Authentication required (expected for unauthenticated users)', PAGE_LOG_CONTEXT);
+          return []; // Return empty array instead of throwing error
+        }
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
@@ -330,12 +649,16 @@
       });
       return history;
     } catch (error) {
-      window.Logger?.error?.('❌ Error loading history', {
+      // Only log non-authentication errors as warnings
+      if (error?.message?.includes('Authentication required')) {
+        window.Logger?.debug?.('ℹ️ History not available (authentication required)', PAGE_LOG_CONTEXT);
+        return []; // Return empty array instead of throwing
+      }
+      window.Logger?.warn?.('⚠️ Error loading history (will continue without history)', {
         ...PAGE_LOG_CONTEXT,
         error: error?.message || error,
       });
-      window.showErrorNotification?.('שגיאה', 'שגיאה בטעינת היסטוריה');
-      throw error;
+      return []; // Return empty array instead of throwing to allow page to continue
     }
   }
 
@@ -352,6 +675,11 @@
           });
 
           if (!response.ok) {
+            // Handle 401 authentication errors - return null instead of throwing
+            if (response.status === 401) {
+              window.Logger?.debug?.('ℹ️ Authentication required (expected for unauthenticated users)', PAGE_LOG_CONTEXT);
+              return null; // Return null instead of throwing error
+            }
             throw new Error(`HTTP error! status: ${response.status}`);
           }
 
@@ -366,17 +694,27 @@
       });
 
       if (!response.ok) {
+        // Handle 401 authentication errors - return null instead of throwing
+        if (response.status === 401) {
+          window.Logger?.debug?.('ℹ️ Authentication required (expected for unauthenticated users)', PAGE_LOG_CONTEXT);
+          return null; // Return null instead of throwing error
+        }
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
       const data = await response.json();
       return data.status === 'success' ? data.data : null;
     } catch (error) {
-      window.Logger?.error?.('❌ Error loading LLM provider settings', {
+      // Only log non-authentication errors as warnings
+      if (error?.message?.includes('Authentication required')) {
+        window.Logger?.debug?.('ℹ️ LLM provider settings not available (authentication required)', PAGE_LOG_CONTEXT);
+        return null; // Return null instead of throwing
+      }
+      window.Logger?.warn?.('⚠️ Error loading LLM provider settings (will use defaults)', {
         ...PAGE_LOG_CONTEXT,
         error: error?.message || error,
       });
-      throw error;
+      return null; // Return null instead of throwing to allow page to continue
     }
   }
 
@@ -399,6 +737,18 @@
       });
 
       if (!response.ok) {
+        // Handle 401 authentication errors
+        if (response.status === 401) {
+          window.Logger?.warn?.('⚠️ Authentication required - redirecting to login', PAGE_LOG_CONTEXT);
+          if (window.NotificationSystem) {
+            window.NotificationSystem.showError('נדרשת התחברות', 'system');
+          }
+          // Redirect to login
+          setTimeout(() => {
+            window.location.href = 'login.html';
+          }, 1000);
+          throw new Error('Authentication required');
+        }
         const errorData = await response.json().catch(() => ({}));
         throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
       }
@@ -484,9 +834,10 @@
       // Convert markdown to HTML first
       const htmlContent = await convertMarkdownToHTML(analysisResult.response_text);
 
-      // Create a temporary div to render HTML
-      const tempDiv = document.createElement('div');
-      tempDiv.innerHTML = htmlContent;
+      // Parse HTML using DOMParser
+      const parser = new DOMParser();
+      const htmlDoc = parser.parseFromString(htmlContent, 'text/html');
+      const tempDiv = htmlDoc.body;
       tempDiv.style.position = 'absolute';
       tempDiv.style.left = '-9999px';
       document.body.appendChild(tempDiv);
@@ -600,6 +951,157 @@
     }
   }
 
+  /**
+   * Delete specific AI analysis by ID
+   * @param {number} analysisId - Analysis ID to delete
+   * @returns {Promise<boolean>} - True if deleted successfully, false otherwise
+   */
+  async function deleteAnalysis(analysisId) {
+    if (!analysisId) {
+      throw new Error('Analysis ID is required');
+    }
+
+    try {
+      const url = buildUrl(`/api/ai-analysis/history/${analysisId}`);
+      const response = await fetch(url, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        const errorMessage = errorData.message || errorData.error?.message || `Failed to delete analysis: ${response.status} ${response.statusText}`;
+        throw new Error(errorMessage);
+      }
+
+      const result = await response.json();
+      
+      if (result.status === 'success') {
+        // Clear cache for this specific analysis
+        if (window.UnifiedCacheManager) {
+          try {
+            const cacheKey = `ai-analysis-response-${analysisId}`;
+            await window.UnifiedCacheManager.delete(cacheKey);
+            window.Logger?.debug?.('✅ Cleared cache for deleted analysis', {
+              ...PAGE_LOG_CONTEXT,
+              analysisId,
+              cacheKey
+            });
+          } catch (cacheError) {
+            window.Logger?.warn?.('⚠️ Error clearing cache for deleted analysis', {
+              ...PAGE_LOG_CONTEXT,
+              analysisId,
+              error: cacheError?.message || cacheError
+            });
+          }
+        }
+
+        // Invalidate history cache to refresh the list
+        if (window.UnifiedCacheManager) {
+          try {
+            await window.UnifiedCacheManager.delete(HISTORY_CACHE_KEY);
+            window.Logger?.debug?.('✅ Cleared history cache after deletion', PAGE_LOG_CONTEXT);
+          } catch (cacheError) {
+            window.Logger?.warn?.('⚠️ Error clearing history cache', {
+              ...PAGE_LOG_CONTEXT,
+              error: cacheError?.message || cacheError
+            });
+          }
+        }
+
+        window.Logger?.info?.('✅ Analysis deleted successfully', {
+          ...PAGE_LOG_CONTEXT,
+          analysisId
+        });
+
+        return true;
+      } else {
+        throw new Error(result.message || 'Failed to delete analysis');
+      }
+    } catch (error) {
+      window.Logger?.error?.('❌ Error deleting analysis', {
+        ...PAGE_LOG_CONTEXT,
+        analysisId,
+        error: error?.message || error,
+      });
+      throw error;
+    }
+  }
+
+  /**
+   * Delete all AI analysis records
+   * @returns {Promise<Object>} - Result with deleted_count
+   */
+  async function deleteAllAnalyses() {
+    try {
+      const apiUrl = buildUrl('/api/ai-analysis/delete-all');
+      
+      window.Logger?.info?.('🗑️ Deleting all analyses...', PAGE_LOG_CONTEXT);
+      
+      const response = await fetch(apiUrl, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || errorData.error?.message || `HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      
+      if (result.status === 'success') {
+        window.Logger?.info?.('✅ All analyses deleted successfully', {
+          ...PAGE_LOG_CONTEXT,
+          deletedCount: result.deleted_count || 0
+        });
+        
+        // Clear all AI analysis cache entries
+        if (window.UnifiedCacheManager) {
+          try {
+            // Clear all response cache entries (ai-analysis-response-*)
+            if (typeof window.UnifiedCacheManager.clearByPattern === 'function') {
+              await window.UnifiedCacheManager.clearByPattern('ai-analysis-response-');
+              window.Logger?.info?.('🧹 Cleared AI analysis response cache', PAGE_LOG_CONTEXT);
+            } else if (typeof window.UnifiedCacheManager.invalidate === 'function') {
+              await window.UnifiedCacheManager.invalidate('ai-analysis-response-*');
+              window.Logger?.info?.('🧹 Invalidated AI analysis response cache', PAGE_LOG_CONTEXT);
+            }
+            
+            // Clear history cache
+            await invalidateCache('ai-analysis-history');
+            
+            // Also clear any other AI analysis related cache
+            if (typeof window.UnifiedCacheManager.clearByPattern === 'function') {
+              await window.UnifiedCacheManager.clearByPattern('ai-analysis-');
+            }
+          } catch (cacheError) {
+            window.Logger?.warn?.('⚠️ Error clearing cache', {
+              ...PAGE_LOG_CONTEXT,
+              error: cacheError?.message || cacheError
+            });
+          }
+        }
+        
+        return result;
+      } else {
+        throw new Error(result.message || 'Failed to delete analyses');
+      }
+    } catch (error) {
+      window.Logger?.error?.('❌ Error deleting all analyses', {
+        ...PAGE_LOG_CONTEXT,
+        error: error?.message || error,
+      });
+      throw error;
+    }
+  }
+
   // Expose to global scope
   window.AIAnalysisData = {
     loadTemplates,
@@ -611,6 +1113,10 @@
     exportToPDF,
     exportToMarkdown,
     exportToHTML,
+    validateAnalysisRequest,
+    validateVariables,
+    deleteAnalysis,
+    deleteAllAnalyses,
   };
 
   window.Logger?.info?.('✅ AI Analysis Data Service loaded', PAGE_LOG_CONTEXT);

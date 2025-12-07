@@ -29,7 +29,8 @@ function initializeSeriesControls() {
     const container = document.getElementById('series-checkboxes-container');
     if (!container) return;
     
-    container.innerHTML = AVAILABLE_SERIES.map(series => {
+    // Build checkboxes HTML and insert using tempDiv
+    const checkboxesHTML = AVAILABLE_SERIES.map(series => {
         // Use centralized Color Scheme System directly - no local function
         const color = (typeof window.getEntityColor === 'function') 
             ? window.getEntityColor(series.entityType) 
@@ -46,9 +47,19 @@ function initializeSeriesControls() {
                     <div class="series-color-indicator" style="background-color: ${color};"></div>
                     <span class="form-label-small">${series.label}</span>
                 </label>
-            </div>
-        `;
+                </div>
+            `;
     }).join('');
+    
+    // Insert using DOMParser
+    container.textContent = '';
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(checkboxesHTML, 'text/html');
+    const fragment = document.createDocumentFragment();
+    doc.body.querySelectorAll('.series-checkbox-container').forEach(checkbox => {
+        fragment.appendChild(checkbox);
+    });
+    container.appendChild(fragment);
 }
 
 // Toggle series visibility
@@ -664,11 +675,9 @@ async function resetRecordFiltersToDefaults() {
                 }
             } else if (window.currentPreferences?.default_trading_account) {
                 defaultAccountId = parseInt(window.currentPreferences.default_trading_account);
-            } else if (typeof window.getPreference === 'function') {
-                const prefValue = await window.getPreference('default_trading_account');
-                if (prefValue) {
-                    defaultAccountId = parseInt(prefValue);
-                }
+            }
+            // NOTE: Removed fallback to window.getPreference to prevent recursion
+            // window.getPreference just calls PreferencesCore.getPreference again, causing recursion
             }
         } catch (error) {
             if (window.Logger) {
@@ -1514,7 +1523,14 @@ function updateStrategyComparisonTable(filters) {
         '<th class="text-end">מקס בנקודה</th>' +
         '<th class="text-end">סה"כ קניות</th>';
     
-    thead.innerHTML = headerHTML;
+    // Insert header using DOMParser
+    thead.textContent = '';
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(headerHTML, 'text/html');
+    const row = doc.body.querySelector('tr');
+    if (row) {
+        thead.appendChild(row);
+    }
     
     // Calculate colspan for summary and info rows
     const summaryColspan = paramHeaders.length + 6; // param columns + 6 data columns
@@ -1624,7 +1640,13 @@ function updateStrategyComparisonTable(filters) {
             </tr>
         `;
         
-        tbody.innerHTML = dataRows + summaryRow;
+        // Insert rows using DOMParser
+        tbody.textContent = '';
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(dataRows + summaryRow, 'text/html');
+        doc.body.querySelectorAll('tr').forEach(row => {
+            tbody.appendChild(row);
+        });
         
         // Fade in
         tbody.style.opacity = '1';
@@ -1641,12 +1663,20 @@ function updateStrategyComparisonTable(filters) {
         setTimeout(() => {
             // Note: This is a mockup page summary display, not a standard summary element
             // Consider using InfoSummarySystem if this page becomes production-ready
-            summary.innerHTML = `
+            summary.textContent = '';
+        // Convert HTML string to DOM elements safely
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(`
                 <strong>סיכום:</strong>
                 סה"כ קטגוריות: ${totalCategories} |
                 סה"כ טריידים: ${totalTrades} |
                 P/L כולל: ${formatCurrency(totalPL)}
-            `;
+            `, 'text/html');
+        const fragment = document.createDocumentFragment();
+        Array.from(doc.body.childNodes).forEach(node => {
+            fragment.appendChild(node.cloneNode(true));
+        });
+        summary.appendChild(fragment);
             summary.style.opacity = '1';
         }, 150);
     }
@@ -1657,7 +1687,11 @@ function updateStrategyComparisonTable(filters) {
         filterInfo.style.opacity = '0';
         setTimeout(() => {
             const filterText = formatFilterInfo(filters.recordFilters);
-            filterInfo.innerHTML = `<strong>פרמטרי סינון:</strong> ${filterText}`;
+            filterInfo.textContent = '';
+            const strong = document.createElement('strong');
+            strong.textContent = 'פרמטרי סינון: ';
+            filterInfo.appendChild(strong);
+            filterInfo.appendChild(document.createTextNode(filterText));
             filterInfo.style.opacity = '1';
         }, 150);
     }
@@ -1668,7 +1702,11 @@ function updateStrategyComparisonTable(filters) {
         comparisonInfo.style.opacity = '0';
         setTimeout(() => {
             const comparisonText = formatComparisonInfo(filters.comparisonParameters);
-            comparisonInfo.innerHTML = `<strong>פרמטרי השוואה:</strong> ${comparisonText}`;
+            comparisonInfo.textContent = '';
+            const strong = document.createElement('strong');
+            strong.textContent = 'פרמטרי השוואה: ';
+            comparisonInfo.appendChild(strong);
+            comparisonInfo.appendChild(document.createTextNode(comparisonText));
             comparisonInfo.style.opacity = '1';
         }, 150);
     }
@@ -1681,7 +1719,9 @@ function updateHeatmap(filters) {
     
     if (!tbody) return;
     
-    tbody.innerHTML = data.map((item, index) => {
+    tbody.textContent = '';
+    const parser = new DOMParser();
+    data.forEach((item, index) => {
         // Calculate percentages for investment values
         const totalMaxInvestment = data.reduce((sum, it) => sum + (it.maxInvestmentAtPoint || 0), 0);
         const totalTotalPurchases = data.reduce((sum, it) => sum + (it.totalPurchases || 0), 0);
@@ -1697,7 +1737,7 @@ function updateHeatmap(filters) {
             ? ((item.totalPL / item.totalInvestment) * 100) 
             : null;
         
-        return `
+        const rowHTML = `
         <tr class="heatmap-row" data-category="${item.category}" data-index="${index}">
             <td><strong>${item.category}</strong></td>
             <td style="${getColorStyle(item.tradesPercentile, item.trades)}" data-value="${item.trades}">${item.trades}</td>
@@ -1708,7 +1748,12 @@ function updateHeatmap(filters) {
             <td class="text-end" style="${getColorStyle(item.totalPurchasesPercentile, item.totalPurchases || 0)}" data-value="${item.totalPurchases || 0}">${formatInvestmentWithPercent(item.totalPurchases || 0, totalPurchasesPercent)}</td>
         </tr>
     `;
-    }).join('');
+        const doc = parser.parseFromString(rowHTML, 'text/html');
+        const row = doc.body.querySelector('tr');
+        if (row) {
+            tbody.appendChild(row);
+        }
+    });
     
     // Add hover effects
     tbody.querySelectorAll('.heatmap-row').forEach(row => {
@@ -1777,7 +1822,7 @@ function updateVisualHeatmap(filters) {
     }
     
     // Clear grid
-    grid.innerHTML = '';
+    grid.textContent = '';
     
     // Create cells
     sortedData.forEach((item, index) => {
@@ -1818,11 +1863,22 @@ function updateVisualHeatmap(filters) {
             formattedValue = value.toString();
         }
         
-        cell.innerHTML = `
-            <div class="heatmap-cell-label">${item.category}</div>
-            <div class="heatmap-cell-value">${formattedValue}</div>
-            ${currentSortBy === 'totalPL' ? `<div class="heatmap-cell-percent">${item.successRate}% הצלחה</div>` : ''}
-        `;
+        const labelDiv = document.createElement('div');
+        labelDiv.className = 'heatmap-cell-label';
+        labelDiv.textContent = item.category;
+        cell.appendChild(labelDiv);
+        
+        const valueDiv = document.createElement('div');
+        valueDiv.className = 'heatmap-cell-value';
+        valueDiv.textContent = formattedValue;
+        cell.appendChild(valueDiv);
+        
+        if (currentSortBy === 'totalPL') {
+            const percentDiv = document.createElement('div');
+            percentDiv.className = 'heatmap-cell-percent';
+            percentDiv.textContent = `${item.successRate}% הצלחה`;
+            cell.appendChild(percentDiv);
+        }
         
         grid.appendChild(cell);
     });
@@ -2074,7 +2130,14 @@ async function initStrategyPerformanceChart() {
                         // Fallback already set
                     }
                 }
-                loading.innerHTML = alertIcon + ' שגיאה בטעינת גרף';
+                loading.textContent = '';
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(alertIcon, 'text/html');
+                const iconElement = doc.body.firstElementChild;
+                if (iconElement) {
+                    loading.appendChild(iconElement);
+                }
+                loading.appendChild(document.createTextNode(' שגיאה בטעינת גרף'));
                 loading.style.color = '#dc3545';
             }
         }
@@ -2104,7 +2167,15 @@ function updateChartLegend() {
         }
     });
     
-    legend.innerHTML = legendItems.join('');
+    legend.textContent = '';
+    const parser = new DOMParser();
+    legendItems.forEach(itemHTML => {
+        const doc = parser.parseFromString(itemHTML, 'text/html');
+        const item = doc.body.firstElementChild;
+        if (item) {
+            legend.appendChild(item);
+        }
+    });
 }
 
 // Update Strategy Performance Chart
@@ -2294,9 +2365,39 @@ async function updateStrategyInsights(filters) {
                 // Fallback already set
             }
         }
-        if (bestStrategy) bestStrategy.innerHTML = noteIcon + '<strong>אסטרטגיה הטובה ביותר:</strong> אין נתונים';
-        if (bestSuccessRate) bestSuccessRate.innerHTML = noteIcon + '<strong>אחוז הצלחה הגבוה ביותר:</strong> אין נתונים';
-        if (recommendation) recommendation.innerHTML = alertIcon + '<strong>המלצה:</strong> אין נתונים להצגה';
+        if (bestStrategy) {
+            bestStrategy.textContent = '';
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(noteIcon, 'text/html');
+            const iconElement = doc.body.firstElementChild;
+            if (iconElement) bestStrategy.appendChild(iconElement);
+            const strong = document.createElement('strong');
+            strong.textContent = 'אסטרטגיה הטובה ביותר: ';
+            bestStrategy.appendChild(strong);
+            bestStrategy.appendChild(document.createTextNode('אין נתונים'));
+        }
+        if (bestSuccessRate) {
+            bestSuccessRate.textContent = '';
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(noteIcon, 'text/html');
+            const iconElement = doc.body.firstElementChild;
+            if (iconElement) bestSuccessRate.appendChild(iconElement);
+            const strong = document.createElement('strong');
+            strong.textContent = 'אחוז הצלחה הגבוה ביותר: ';
+            bestSuccessRate.appendChild(strong);
+            bestSuccessRate.appendChild(document.createTextNode('אין נתונים'));
+        }
+        if (recommendation) {
+            recommendation.textContent = '';
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(alertIcon, 'text/html');
+            const iconElement = doc.body.firstElementChild;
+            if (iconElement) recommendation.appendChild(iconElement);
+            const strong = document.createElement('strong');
+            strong.textContent = 'המלצה: ';
+            recommendation.appendChild(strong);
+            recommendation.appendChild(document.createTextNode('אין נתונים להצגה'));
+        }
         return;
     }
     
@@ -2320,33 +2421,66 @@ async function updateStrategyInsights(filters) {
     const recommendationEl = document.getElementById('recommendation-insight');
     
     if (bestStrategyEl) {
-        bestStrategyEl.innerHTML = `
-            ${window.IconSystem && typeof window.IconSystem.renderIcon === 'function' 
-              ? await window.IconSystem.renderIcon('tabler', 'note', { size: '16', alt: 'icon', class: 'icon' })
-              : '<img src="../../images/icons/tabler/note.svg" width="16" height="16" alt="icon" class="icon">'}
-            <strong>אסטרטגיה הטובה ביותר:</strong> ${bestStrategy.name || 'לא זמין'} עם P/L כולל של ${formatCurrency(bestStrategy.totalPL)}
-        `;
+        bestStrategyEl.textContent = '';
+        let iconHTML = '';
+        if (window.IconSystem && typeof window.IconSystem.renderIcon === 'function') {
+            iconHTML = await window.IconSystem.renderIcon('tabler', 'note', { size: '16', alt: 'icon', class: 'icon' });
+        } else {
+            iconHTML = '<img src="../../images/icons/tabler/note.svg" width="16" height="16" alt="icon" class="icon">';
+        }
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(iconHTML, 'text/html');
+        const iconElement = doc.body.firstElementChild;
+        if (iconElement) {
+            bestStrategyEl.appendChild(iconElement);
+        }
+        const strong = document.createElement('strong');
+        strong.textContent = 'אסטרטגיה הטובה ביותר: ';
+        bestStrategyEl.appendChild(strong);
+        bestStrategyEl.appendChild(document.createTextNode(`${bestStrategy.name || 'לא זמין'} עם P/L כולל של ${formatCurrency(bestStrategy.totalPL)}`));
     }
     
     if (bestSuccessRateEl) {
-        bestSuccessRateEl.innerHTML = `
-            ${window.IconSystem && typeof window.IconSystem.renderIcon === 'function' 
-              ? await window.IconSystem.renderIcon('tabler', 'info-circle', { size: '16', alt: 'info-circle', class: 'icon' })
-              : '<img src="../../images/icons/tabler/info-circle.svg" width="16" height="16" alt="info-circle" class="icon">'}
-            <strong>אחוז הצלחה הגבוה ביותר:</strong> ${bestSuccessRateStrategy.name || 'לא זמין'} עם ${bestSuccessRateStrategy.successRate}%
-        `;
+        bestSuccessRateEl.textContent = '';
+        let iconHTML = '';
+        if (window.IconSystem && typeof window.IconSystem.renderIcon === 'function') {
+            iconHTML = await window.IconSystem.renderIcon('tabler', 'info-circle', { size: '16', alt: 'info-circle', class: 'icon' });
+        } else {
+            iconHTML = '<img src="../../images/icons/tabler/info-circle.svg" width="16" height="16" alt="info-circle" class="icon">';
+        }
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(iconHTML, 'text/html');
+        const iconElement = doc.body.firstElementChild;
+        if (iconElement) {
+            bestSuccessRateEl.appendChild(iconElement);
+        }
+        const strong = document.createElement('strong');
+        strong.textContent = 'אחוז הצלחה הגבוה ביותר: ';
+        bestSuccessRateEl.appendChild(strong);
+        bestSuccessRateEl.appendChild(document.createTextNode(`${bestSuccessRateStrategy.name || 'לא זמין'} עם ${bestSuccessRateStrategy.successRate}%`));
     }
     
     if (recommendationEl) {
         const recommendationText = bestStrategy.totalPL > 0
             ? `שקול להגדיל את השימוש ב-${bestStrategy.name || 'אסטרטגיה זו'} בגלל ה-P/L הגבוה (${formatCurrency(bestStrategy.totalPL)})`
             : 'אין המלצות זמינות כרגע';
-        recommendationEl.innerHTML = `
-            ${window.IconSystem && typeof window.IconSystem.renderIcon === 'function' 
-              ? await window.IconSystem.renderIcon('tabler', 'alert-triangle', { size: '16', alt: 'alert-triangle', class: 'icon' })
-              : '<img src="../../images/icons/tabler/alert-triangle.svg" width="16" height="16" alt="alert-triangle" class="icon">'}
-            <strong>המלצה:</strong> ${recommendationText}
-        `;
+        recommendationEl.textContent = '';
+        let iconHTML = '';
+        if (window.IconSystem && typeof window.IconSystem.renderIcon === 'function') {
+            iconHTML = await window.IconSystem.renderIcon('tabler', 'alert-triangle', { size: '16', alt: 'alert-triangle', class: 'icon' });
+        } else {
+            iconHTML = '<img src="../../images/icons/tabler/alert-triangle.svg" width="16" height="16" alt="alert-triangle" class="icon">';
+        }
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(iconHTML, 'text/html');
+        const iconElement = doc.body.firstElementChild;
+        if (iconElement) {
+            recommendationEl.appendChild(iconElement);
+        }
+        const strong = document.createElement('strong');
+        strong.textContent = 'המלצה: ';
+        recommendationEl.appendChild(strong);
+        recommendationEl.appendChild(document.createTextNode(recommendationText));
     }
 }
 
@@ -2680,7 +2814,7 @@ async function loadTradingAccounts() {
     if (select) {
         // Clear existing options (except first empty option if exists)
         const firstOption = select.options[0];
-        select.innerHTML = '';
+        select.textContent = '';
         if (firstOption && firstOption.value === '') {
             select.appendChild(firstOption);
         }
@@ -2703,11 +2837,9 @@ async function loadTradingAccounts() {
                 }
             } else if (window.currentPreferences?.default_trading_account) {
                 defaultAccountId = parseInt(window.currentPreferences.default_trading_account);
-            } else if (typeof window.getPreference === 'function') {
-                const prefValue = await window.getPreference('default_trading_account');
-                if (prefValue) {
-                    defaultAccountId = parseInt(prefValue);
-                }
+            }
+            // NOTE: Removed fallback to window.getPreference to prevent recursion
+            // window.getPreference just calls PreferencesCore.getPreference again, causing recursion
             }
             
             // Select default account if found
@@ -2747,7 +2879,7 @@ async function loadTradingMethods() {
     
     const select = document.getElementById('comparisonTradingMethods');
     if (select) {
-        select.innerHTML = '';
+        select.textContent = '';
         mockMethods.forEach(method => {
             const option = document.createElement('option');
             option.value = method.id;
@@ -2770,7 +2902,7 @@ async function loadTickers() {
     
     const select = document.getElementById('comparisonTickers');
     if (select) {
-        select.innerHTML = '';
+        select.textContent = '';
         mockTickers.forEach(ticker => {
             const option = document.createElement('option');
             option.value = ticker.id;
@@ -2799,7 +2931,7 @@ async function initializeRecordFilterTags() {
         await window.TagUIManager.initialize(tagsSelect, mockTags);
     } else {
         // Fallback: create options manually
-        tagsSelect.innerHTML = '';
+        tagsSelect.textContent = '';
         mockTags.forEach(tag => {
             const option = document.createElement('option');
             option.value = tag.id;
@@ -2828,7 +2960,7 @@ async function initializeComparisonTags() {
         await window.TagUIManager.initialize(tagsSelect, mockTags);
     } else {
         // Fallback: create options manually
-        tagsSelect.innerHTML = '';
+        tagsSelect.textContent = '';
         mockTags.forEach(tag => {
             const option = document.createElement('option');
             option.value = tag.id;
@@ -2870,7 +3002,13 @@ function replaceStrategyActionButtons() {
         ]);
 
         if (actionsMenuHtml) {
-            cell.innerHTML = actionsMenuHtml;
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(actionsMenuHtml, 'text/html');
+            const menuElement = doc.body.firstElementChild;
+            if (menuElement) {
+                cell.textContent = '';
+                cell.appendChild(menuElement);
+            }
         }
     });
 }

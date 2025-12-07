@@ -155,7 +155,7 @@ function translateTradeType(type) {
   const typeMap = {
     'swing': 'ספין',
     'investment': 'השקעה',
-    'passive': 'פסיבי',
+    'passive': 'פאסיבי',
     'crypto': 'קריפטו',
     'other': 'אחר',
   };

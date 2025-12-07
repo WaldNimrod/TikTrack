@@ -59,7 +59,7 @@ class SMDatabaseSection extends SMBaseSection {
    */
   async fetchSystemOverview() {
     try {
-      const response = await fetch(this.apiEndpoints.overview, {
+      const response = await this.fetchWithTimeout(this.apiEndpoints.overview, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -79,15 +79,13 @@ class SMDatabaseSection extends SMBaseSection {
     }
   }
 
-  // Removed fetchDatabaseStatus - endpoint doesn't exist, using database endpoint instead
-
   /**
    * Fetch database info
    * קבלת מידע בסיס נתונים
    */
   async fetchDatabaseInfo() {
     try {
-      const response = await fetch(this.apiEndpoints.database, {
+      const response = await this.fetchWithTimeout(this.apiEndpoints.database, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -119,7 +117,12 @@ class SMDatabaseSection extends SMBaseSection {
 
     try {
       const databaseHtml = this.createDatabaseHTML(data);
-      this.container.innerHTML = databaseHtml;
+      this.container.textContent = '';
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(databaseHtml, 'text/html');
+      doc.body.childNodes.forEach(node => {
+        this.container.appendChild(node.cloneNode(true));
+      });
       
       console.log('✅ Database section rendered successfully');
       
@@ -138,7 +141,10 @@ class SMDatabaseSection extends SMBaseSection {
    * יצירת HTML של בסיס נתונים
    */
   createDatabaseHTML(data) {
-    const { overview, status, info } = data;
+    const { overview, database } = data;
+    // Use database data from API response
+    const status = database || {};
+    const info = database || {};
 
     return `
       <div class="database-overview">
@@ -514,16 +520,34 @@ class SMDatabaseSection extends SMBaseSection {
    * קבלת גודל בסיס נתונים
    */
   getDatabaseSize(overview, status, info) {
-    if (info && info.size) {
-      return info.size;
+    // Try info first (from /api/system/database)
+    if (info) {
+      if (info.size_mb !== undefined) {
+        return info.size_mb * 1024 * 1024; // Convert MB to bytes
+      }
+      if (info.size !== undefined) {
+        return typeof info.size === 'number' ? info.size : null;
+      }
     }
     
-    if (status && status.size) {
-      return status.size;
+    // Try status
+    if (status) {
+      if (status.size_mb !== undefined) {
+        return status.size_mb * 1024 * 1024;
+      }
+      if (status.size !== undefined) {
+        return typeof status.size === 'number' ? status.size : null;
+      }
     }
     
-    if (overview && overview.database && overview.database.size) {
-      return overview.database.size;
+    // Try overview
+    if (overview && overview.database) {
+      if (overview.database.size_mb !== undefined) {
+        return overview.database.size_mb * 1024 * 1024;
+      }
+      if (overview.database.size !== undefined) {
+        return typeof overview.database.size === 'number' ? overview.database.size : null;
+      }
     }
     
     return null;
@@ -534,16 +558,43 @@ class SMDatabaseSection extends SMBaseSection {
    * קבלת מספר טבלאות
    */
   getTablesCount(overview, status, info) {
-    if (info && info.tables_count) {
-      return info.tables_count;
+    // Try info first (from /api/system/database)
+    if (info) {
+      if (info.table_count !== undefined) {
+        return info.table_count;
+      }
+      if (info.tables_count !== undefined) {
+        return info.tables_count;
+      }
+      if (info.tables && Array.isArray(info.tables)) {
+        return info.tables.length;
+      }
     }
     
-    if (status && status.tables_count) {
-      return status.tables_count;
+    // Try status
+    if (status) {
+      if (status.table_count !== undefined) {
+        return status.table_count;
+      }
+      if (status.tables_count !== undefined) {
+        return status.tables_count;
+      }
+      if (status.tables && Array.isArray(status.tables)) {
+        return status.tables.length;
+      }
     }
     
-    if (overview && overview.database && overview.database.tables_count) {
-      return overview.database.tables_count;
+    // Try overview
+    if (overview && overview.database) {
+      if (overview.database.table_count !== undefined) {
+        return overview.database.table_count;
+      }
+      if (overview.database.tables_count !== undefined) {
+        return overview.database.tables_count;
+      }
+      if (overview.database.tables && Array.isArray(overview.database.tables)) {
+        return overview.database.tables.length;
+      }
     }
     
     return 0;
@@ -574,16 +625,28 @@ class SMDatabaseSection extends SMBaseSection {
    * קבלת רשימת טבלאות
    */
   getTablesList(overview, status, info) {
-    if (info && info.tables) {
-      return info.tables;
+    // Try info first (from /api/system/database)
+    if (info && info.tables && Array.isArray(info.tables)) {
+      return info.tables.map(table => ({
+        name: table.name || table,
+        records: info.record_counts?.[table.name || table] || table.records || 0
+      }));
     }
     
-    if (status && status.tables) {
-      return status.tables;
+    // Try status
+    if (status && status.tables && Array.isArray(status.tables)) {
+      return status.tables.map(table => ({
+        name: table.name || table,
+        records: status.record_counts?.[table.name || table] || table.records || 0
+      }));
     }
     
-    if (overview && overview.database && overview.database.tables) {
-      return overview.database.tables;
+    // Try overview
+    if (overview && overview.database && overview.database.tables && Array.isArray(overview.database.tables)) {
+      return overview.database.tables.map(table => ({
+        name: table.name || table,
+        records: overview.database.record_counts?.[table.name || table] || table.records || 0
+      }));
     }
     
     return [];
@@ -752,7 +815,11 @@ class SMDatabaseSection extends SMBaseSection {
           `${backup.name} - ${backup.created_at} (${SMUIComponents.formatBytes(backup.size)})`
         ).join('\n');
         
-        alert(`רשימת גיבויים:\n${backupsList}`);
+        if (window.showInfoNotification) {
+          window.showInfoNotification(`רשימת גיבויים:\n${backupsList}`, 'info');
+        } else {
+          alert(`רשימת גיבויים:\n${backupsList}`);
+        }
       } else {
         throw new Error(result.message || 'Failed to list backups');
       }

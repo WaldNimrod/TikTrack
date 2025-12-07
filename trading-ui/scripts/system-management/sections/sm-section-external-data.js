@@ -36,7 +36,8 @@ class SMExternalDataSection extends SMBaseSection {
     }
     
     // If dashboard is not available, return null and handle gracefully
-    console.warn('⚠️ ExternalDataDashboard is not available - section will show limited data');
+    // Note: ExternalDataDashboard is optional for system-management page
+    // It's only loaded on the external-data-dashboard page itself
     return null;
   }
 
@@ -83,7 +84,8 @@ class SMExternalDataSection extends SMBaseSection {
     }
 
     this.container.classList.add('sm-external-data-container');
-    this.container.innerHTML = `
+    this.container.textContent = '';
+    const sectionHTML = `
       <div class="card">
         <div class="card-body">
           <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 mb-3">
@@ -200,7 +202,11 @@ class SMExternalDataSection extends SMBaseSection {
     }
 
     if (!providers || !providers.length) {
-      container.innerHTML = '<div class="list-group-item text-muted">אין נתונים זמינים</div>';
+      container.textContent = '';
+      const div = document.createElement('div');
+      div.className = 'list-group-item text-muted';
+      div.textContent = 'אין נתונים זמינים';
+      container.appendChild(div);
       return;
     }
 
@@ -237,9 +243,23 @@ class SMExternalDataSection extends SMBaseSection {
 
     if (providers.length > 5) {
       const additional = providers.length - 5;
-      container.innerHTML = `${items}<div class="list-group-item text-muted small">+${formatNumberValue(additional)} ספקים נוספים</div>`;
+      container.textContent = '';
+      const parser = new DOMParser();
+      const itemsDoc = parser.parseFromString(items, 'text/html');
+      itemsDoc.body.childNodes.forEach(node => {
+          container.appendChild(node.cloneNode(true));
+      });
+      const additionalDiv = document.createElement('div');
+      additionalDiv.className = 'list-group-item text-muted small';
+      additionalDiv.textContent = `+${formatNumberValue(additional)} ספקים נוספים`;
+      container.appendChild(additionalDiv);
     } else {
-      container.innerHTML = items;
+      container.textContent = '';
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(items, 'text/html');
+      doc.body.childNodes.forEach(node => {
+          container.appendChild(node.cloneNode(true));
+      });
     }
   }
 
@@ -250,7 +270,11 @@ class SMExternalDataSection extends SMBaseSection {
     }
 
     if (!logs || !logs.length) {
-      container.innerHTML = '<div class="list-group-item text-muted">אין אירועים אחרונים</div>';
+      container.textContent = '';
+      const div = document.createElement('div');
+      div.className = 'list-group-item text-muted';
+      div.textContent = 'אין אירועים אחרונים';
+      container.appendChild(div);
       return;
     }
 
@@ -269,7 +293,12 @@ class SMExternalDataSection extends SMBaseSection {
       `;
     }).join('');
 
-    container.innerHTML = items;
+    container.textContent = '';
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(items, 'text/html');
+    doc.body.childNodes.forEach(node => {
+        container.appendChild(node.cloneNode(true));
+    });
   }
 
   getLogLevelBadge(level) {

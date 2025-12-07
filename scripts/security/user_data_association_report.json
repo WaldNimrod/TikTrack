@@ -1,0 +1,217 @@
+{
+  "generated_at": "2025-12-04T15:32:10.486940",
+  "users": [
+    {
+      "id": 10,
+      "username": "admin",
+      "email": "admin@mezoo.co"
+    },
+    {
+      "id": 12,
+      "username": "test_user_1764402991",
+      "email": "test_user_1764402991@test.com"
+    },
+    {
+      "id": 13,
+      "username": "test_user_1764402992",
+      "email": "test_user_1764402992@test.com"
+    },
+    {
+      "id": 14,
+      "username": "test_user_1764403023",
+      "email": "test_user_1764403023@test.com"
+    },
+    {
+      "id": 15,
+      "username": "test_user_1764403024",
+      "email": "test_user_1764403024@test.com"
+    },
+    {
+      "id": 11,
+      "username": "user",
+      "email": "nimrod@mezoo.co"
+    },
+    {
+      "id": 16,
+      "username": "test_user_1764403353",
+      "email": "test_user_1764403353@test.com"
+    },
+    {
+      "id": 17,
+      "username": "test_user_1764403354",
+      "email": "test_user_1764403354@test.com"
+    },
+    {
+      "id": 18,
+      "username": "test_user_1764403373",
+      "email": "test_user_1764403373@test.com"
+    },
+    {
+      "id": 19,
+      "username": "test_user_1764403374",
+      "email": "test_user_1764403374@test.com"
+    },
+    {
+      "id": 1,
+      "username": "nimrod",
+      "email": "waldnimrod@gmail.com"
+    }
+  ],
+  "tables": [
+    {
+      "table_name": "trading_accounts",
+      "total_records": 3,
+      "records_by_user": {
+        "10": 3
+      },
+      "records_without_user_id": [],
+      "records_with_invalid_user_id": [],
+      "needs_fixing": false
+    },
+    {
+      "table_name": "trades",
+      "total_records": 80,
+      "records_by_user": {
+        "10": 80
+      },
+      "records_without_user_id": [],
+      "records_with_invalid_user_id": [],
+      "needs_fixing": false
+    },
+    {
+      "table_name": "trade_plans",
+      "total_records": 120,
+      "records_by_user": {
+        "10": 120
+      },
+      "records_without_user_id": [],
+      "records_with_invalid_user_id": [],
+      "needs_fixing": false
+    },
+    {
+      "table_name": "executions",
+      "total_records": 161,
+      "records_by_user": {
+        "10": 161
+      },
+      "records_without_user_id": [],
+      "records_with_invalid_user_id": [],
+      "needs_fixing": false
+    },
+    {
+      "table_name": "cash_flows",
+      "total_records": 22,
+      "records_by_user": {
+        "10": 22
+      },
+      "records_without_user_id": [],
+      "records_with_invalid_user_id": [],
+      "needs_fixing": false
+    },
+    {
+      "table_name": "alerts",
+      "total_records": 60,
+      "records_by_user": {
+        "10": 60
+      },
+      "records_without_user_id": [],
+      "records_with_invalid_user_id": [],
+      "needs_fixing": false
+    },
+    {
+      "table_name": "notes",
+      "total_records": 85,
+      "records_by_user": {
+        "10": 85
+      },
+      "records_without_user_id": [],
+      "records_with_invalid_user_id": [],
+      "needs_fixing": false
+    },
+    {
+      "table_name": "user_tickers",
+      "total_records": 52,
+      "records_by_user": {
+        "10": 52
+      },
+      "records_without_user_id": [],
+      "records_with_invalid_user_id": [],
+      "needs_fixing": false
+    },
+    {
+      "table_name": "preference_profiles",
+      "total_records": 1,
+      "records_by_user": {
+        "1": 1
+      },
+      "records_without_user_id": [],
+      "records_with_invalid_user_id": [],
+      "needs_fixing": false
+    },
+    {
+      "table_name": "user_preferences",
+      "total_records": 0,
+      "records_by_user": {},
+      "records_without_user_id": [],
+      "records_with_invalid_user_id": [],
+      "needs_fixing": false
+    },
+    {
+      "table_name": "ai_analysis_requests",
+      "total_records": 10,
+      "records_by_user": {
+        "10": 10
+      },
+      "records_without_user_id": [],
+      "records_with_invalid_user_id": [],
+      "needs_fixing": false
+    },
+    {
+      "table_name": "email_logs",
+      "total_records": 4,
+      "records_by_user": {},
+      "records_without_user_id": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "records_with_invalid_user_id": [],
+      "needs_fixing": false
+    },
+    {
+      "table_name": "import_sessions",
+      "total_records": 0,
+      "records_by_user": {},
+      "records_without_user_id": [],
+      "records_with_invalid_user_id": [],
+      "needs_fixing": false
+    },
+    {
+      "table_name": "tags",
+      "total_records": 7,
+      "records_by_user": {
+        "1": 7
+      },
+      "records_without_user_id": [],
+      "records_with_invalid_user_id": [],
+      "needs_fixing": false
+    },
+    {
+      "table_name": "tag_categories",
+      "total_records": 2,
+      "records_by_user": {
+        "1": 2
+      },
+      "records_without_user_id": [],
+      "records_with_invalid_user_id": [],
+      "needs_fixing": false
+    }
+  ],
+  "summary": {
+    "total_tables_checked": 15,
+    "tables_with_issues": 0,
+    "total_records": 607,
+    "records_needing_fix": 4
+  }
+}

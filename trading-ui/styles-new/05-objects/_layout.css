@@ -448,6 +448,7 @@
 .section-header .action-btn,
 .section-header .export-btn,
 .section-header .refresh-btn {
+  background-color: white;
   margin-inline-end: 0.5rem;
   align-self: center;
   color: var(--current-entity-color-dark, var(--text-color, var(--color-text-primary))); /* טקסט כהה של הישות */

@@ -1,7 +1,8 @@
 # AI Analysis System - Backend Architecture
 
 **תאריך יצירה:** 28 בינואר 2025  
-**גרסה:** 1.0.0
+**תאריך עדכון אחרון:** 06 בדצמבר 2025  
+**גרסה:** 2.0.0
 
 ---
 
@@ -19,14 +20,22 @@
 
 ## 🎯 סקירה כללית
 
-### ארכיטקטורה כללית
+### ארכיטקטורה כללית (v2.0)
 
 ```
 Client Request
     ↓
 API Routes (ai_analysis.py)
     ↓
-AIAnalysisService
+AIAnalysisService.generate_analysis()
+    ↓
+[אם template_id ב-2,3,4:]
+    TradeAggregationService.aggregate_trades()
+    ↓
+    TradeAggregationService.format_trades_for_ai()
+    ↓
+PromptTemplateService.build_prompt()
+    (משלב prompt_variables + trade_data_structured)
     ↓
 LLMProviderManager
     ↓
@@ -36,10 +45,15 @@ External LLM API
     ↓
 Response Processing
     ↓
-Database (ai_analysis_requests)
+Database (ai_analysis_requests) - עם variables_json v2.0
     ↓
 Response to Client
 ```
+
+**הערות:**
+- גרסה 2.0 מפרידה בין `prompt_variables` (נשלח ל-LLM) ו-`filters` (שימוש פנימי)
+- `TradeAggregationService` משמש לאיסוף נתוני טריידים לתבניות Portfolio, Technical, Risk
+- `trading_account_id` נשמר ב-`filters` ולא נשלח למנוע AI
 
 ---
 
@@ -112,7 +126,17 @@ CREATE TABLE user_llm_providers (
 ```python
 class AIAnalysisService:
     def generate_analysis(self, template_id, variables, user_id, provider=None):
-        """יצירת ניתוח חדש"""
+        """
+        יצירת ניתוח חדש
+        
+        תומך ב-v2.0 structure:
+        - variables עם version: "2.0"
+        - prompt_variables (נשלח ל-LLM)
+        - filters (שימוש פנימי בלבד)
+        - trade_selection (בחירת טריידים)
+        
+        תמיכה ב-TradeAggregationService לתבניות 2,3,4
+        """
         
     def get_analysis_history(self, user_id, filters=None):
         """קבלת היסטוריית ניתוחים"""
@@ -164,6 +188,38 @@ class PromptTemplateService:
     def delete_template(self, template_id):
         """מחיקת תבנית"""
 ```
+
+### TradeAggregationService
+
+**קובץ:** `Backend/services/trade_aggregation_service.py`
+
+**תפקידים:**
+- מערכת כללית לאגרגציית נתוני טריידים
+- משמש ל-AI Analysis (תבניות 2, 3, 4), דוחות, וסטטיסטיקות
+- העשרת נתונים עם Executions, Trade Plans, Conditions, Positions
+- פורמט נתונים מובנה ל-AI
+
+**Methods:**
+```python
+class TradeAggregationService:
+    @staticmethod
+    def aggregate_trades(
+        db: Session,
+        user_id: int,
+        ticker_symbol: Optional[str] = None,
+        trading_account_id: Optional[int] = None,
+        date_range_start: Optional[datetime] = None,
+        date_range_end: Optional[datetime] = None,
+        # ... additional filters
+    ) -> Dict[str, Any]:
+        """אגרגציית טריידים עם כל הנתונים"""
+        
+    @staticmethod
+    def format_trades_for_ai(aggregated_data: Dict[str, Any]) -> str:
+        """פורמט נתוני טריידים למנוע AI"""
+```
+
+**תיעוד מלא:** [TRADE_AGGREGATION_SYSTEM.md](../../backend/TRADE_AGGREGATION_SYSTEM.md)
 
 ### LLMProviderManager
 

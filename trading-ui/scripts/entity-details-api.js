@@ -46,6 +46,14 @@ class EntityDetailsAPI {
         this.retryAttempts = 3;
         this.retryDelay = 1000; // 1 שנייה
         
+        // Rate limiting prevention - batch loading for trade plans
+        this.tradePlansCache = new Map(); // Cache for individual trade plans
+        this.tradePlansPendingRequests = new Map(); // Track pending requests to avoid duplicates
+        this.tradePlansBatchQueue = []; // Queue for batch loading
+        this.tradePlansBatchSize = 10; // Load 10 plans at a time
+        this.tradePlansBatchDelay = 100; // 100ms delay between batches
+        this.tradePlansBatchTimeout = null; // Timeout for batch processing
+        
         this.init();
     }
 
@@ -69,10 +77,117 @@ class EntityDetailsAPI {
             // הוספה לאובייקט הגלובלי
             window.entityDetailsAPI = this;
             
-            window.Logger.info('EntityDetailsAPI initialized successfully', { page: "entity-details-api" });
+            if (window.Logger && typeof window.Logger.info === 'function') {
+                window.Logger.info('EntityDetailsAPI initialized successfully', { page: "entity-details-api" });
+            } else if (window.DEBUG_MODE) {
+                console.log('EntityDetailsAPI initialized successfully');
+            }
         } catch (error) {
-            window.Logger.error('Error initializing EntityDetailsAPI:', error, { page: "entity-details-api" });
+            if (window.Logger && typeof window.Logger.error === 'function') {
+                window.Logger.error('Error initializing EntityDetailsAPI:', error, { page: "entity-details-api" });
+            } else if (window.DEBUG_MODE) {
+                console.error('Error initializing EntityDetailsAPI:', error);
+            }
         }
+    }
+
+    /**
+     * Load trade plan with caching and batch support - טעינת trade plan עם cache ו-batch
+     * 
+     * @param {number} planId - מזהה trade plan
+     * @returns {Promise<Object|null>} - Promise עם נתוני trade plan או null
+     * @private
+     */
+    async loadTradePlan(planId) {
+        // Check cache first
+        const cacheKey = `trade-plan-${planId}`;
+        const cached = this.tradePlansCache.get(cacheKey);
+        if (cached) {
+            const age = Date.now() - cached.timestamp;
+            if (age < this.cacheTimeout) {
+                return cached.data;
+            }
+            // Cache expired
+            this.tradePlansCache.delete(cacheKey);
+        }
+
+        // Check if request is already pending
+        if (this.tradePlansPendingRequests.has(planId)) {
+            return await this.tradePlansPendingRequests.get(planId);
+        }
+
+        // Create promise for this request
+        const promise = this._fetchTradePlanWithRetry(planId);
+        this.tradePlansPendingRequests.set(planId, promise);
+
+        try {
+            const planData = await promise;
+            // Cache the result
+            this.tradePlansCache.set(cacheKey, {
+                data: planData,
+                timestamp: Date.now()
+            });
+            return planData;
+        } catch (error) {
+            // Remove from pending on error
+            this.tradePlansPendingRequests.delete(planId);
+            throw error;
+        } finally {
+            // Remove from pending after completion
+            this.tradePlansPendingRequests.delete(planId);
+        }
+    }
+
+    /**
+     * Fetch trade plan with retry logic - טעינת trade plan עם retry
+     * 
+     * @param {number} planId - מזהה trade plan
+     * @returns {Promise<Object|null>} - Promise עם נתוני trade plan או null
+     * @private
+     */
+    async _fetchTradePlanWithRetry(planId) {
+        for (let attempt = 0; attempt < this.retryAttempts; attempt++) {
+            try {
+                const response = await fetch(`/api/trade-plans/${planId}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    }
+                });
+
+                if (response.status === 429) {
+                    // Rate limited - wait and retry
+                    const waitTime = this.retryDelay * (attempt + 1);
+                    if (window.Logger) {
+                        window.Logger.warn(`⚠️ Rate limited for trade plan ${planId}, waiting ${waitTime}ms before retry ${attempt + 1}/${this.retryAttempts}`, { page: "entity-details-api" });
+                    }
+                    await new Promise(resolve => setTimeout(resolve, waitTime));
+                    continue;
+                }
+
+                if (!response.ok) {
+                    if (response.status === 404) {
+                        return null; // Plan not found
+                    }
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const payload = await response.json();
+                return payload?.data || payload || null;
+            } catch (error) {
+                if (attempt === this.retryAttempts - 1) {
+                    // Last attempt failed
+                    if (window.Logger) {
+                        window.Logger.warn(`⚠️ Failed to load trade plan ${planId} after ${this.retryAttempts} attempts:`, error, { page: "entity-details-api" });
+                    }
+                    return null; // Return null instead of throwing
+                }
+                // Wait before retry
+                await new Promise(resolve => setTimeout(resolve, this.retryDelay * (attempt + 1)));
+            }
+        }
+        return null;
     }
 
     /**
@@ -117,27 +232,8 @@ class EntityDetailsAPI {
                 }
             }
 
-            window.Logger.info(`Fetching entity details for ${entityType} ${entityId}`, { page: "entity-details-api" });
-
             // קריאה לשרת עם retry logic
             const entityData = await this.fetchWithRetry(entityType, entityId, options);
-            window.Logger.info(`📊 Entity data received:`, entityData, { page: "entity-details-api" });
-            
-            // טעינת פריטים מקושרים אם נדרש
-            console.log(`🔍 [ENTITY-DETAILS-API] Checking linked items option for ${entityType} ${entityId}:`, {
-                includeLinkedItems: options.includeLinkedItems,
-                includeLinkedItemsNotFalse: options.includeLinkedItems !== false,
-                willLoad: options.includeLinkedItems !== false
-            });
-            
-            if (window.Logger) {
-                window.Logger.info(`🔍 Checking linked items option for ${entityType} ${entityId}:`, {
-                    includeLinkedItems: options.includeLinkedItems,
-                    includeLinkedItemsNotFalse: options.includeLinkedItems !== false,
-                    willLoad: options.includeLinkedItems !== false,
-                    page: "entity-details-api"
-                });
-            }
             
             const shouldLoadLinkedItems = options.includeLinkedItems !== false;
             const expectedLinkedItemsCount = typeof entityData.linked_items_count === 'number'
@@ -149,39 +245,14 @@ class EntityDetailsAPI {
                 const hasLinkedItemsFromBackend = entityData.linked_items !== undefined && Array.isArray(entityData.linked_items);
                 
                 if (hasLinkedItemsFromBackend) {
-                    console.log(`✅ [ENTITY-DETAILS-API] Using linked_items from backend for ${entityType} ${entityId}:`, {
-                        count: entityData.linked_items.length,
-                        items: entityData.linked_items
-                    });
-                    if (window.Logger) {
-                        window.Logger.info(`✅ Using linked_items from backend for ${entityType} ${entityId}:`, {
-                            count: entityData.linked_items.length,
-                            page: "entity-details-api"
-                        });
-                    }
                     // הבאקאנד כבר החזיר linked_items - לא צריך לטעון שוב
                 } else {
                     // הבאקאנד לא החזיר linked_items - נטען בנפרד
                     try {
-                        console.log(`🔗 [ENTITY-DETAILS-API] Loading linked items separately for ${entityType} ${entityId}...`);
-                        if (window.Logger) {
-                            window.Logger.info(`🔗 Loading linked items separately for ${entityType} ${entityId}...`, { page: "entity-details-api" });
-                        }
                         const linkedItems = await this.getLinkedItems(entityType, entityId, {
                             forceRefresh: options.forceRefresh || (expectedLinkedItemsCount !== null && expectedLinkedItemsCount > 0),
                             expectedCount: expectedLinkedItemsCount
                         });
-                        console.log(`🔗 [ENTITY-DETAILS-API] Linked items received for ${entityType} ${entityId}:`, {
-                            count: linkedItems.length,
-                            items: linkedItems
-                        });
-                        if (window.Logger) {
-                            window.Logger.info(`🔗 Linked items received for ${entityType} ${entityId}:`, {
-                                count: linkedItems.length,
-                                items: linkedItems,
-                                page: "entity-details-api"
-                            });
-                        }
                         entityData.linked_items = linkedItems;
                     } catch (error) {
                         console.error(`❌ [ENTITY-DETAILS-API] Failed to load linked items for ${entityType} ${entityId}:`, error);
@@ -195,10 +266,6 @@ class EntityDetailsAPI {
                     }
                 }
             } else {
-                console.log(`⏭️ [ENTITY-DETAILS-API] Skipping linked items load for ${entityType} ${entityId} (includeLinkedItems=false)`);
-                if (window.Logger) {
-                    window.Logger.info(`⏭️ Skipping linked items load for ${entityType} ${entityId} (includeLinkedItems=false)`, { page: "entity-details-api" });
-                }
                 entityData.linked_items = entityData.linked_items || [];
             }
 
@@ -214,22 +281,16 @@ class EntityDetailsAPI {
                     
                     if ((!hasPlanObject || !hasFlatPlan) && planItem && planItem.id) {
                         // אם אין ערכים קריטיים, נטען את ה-trade_plan המלא מה-API
+                        // שימוש ב-loadTradePlan עם cache ו-retry logic למניעת rate limiting
                         if (window.Logger) {
-                            window.Logger.info('🔗 Enriching trade planning from trade_plan endpoint...', {
+                            window.Logger.debug('🔗 Enriching trade planning from trade_plan endpoint...', {
                                 tradeId: entityId,
                                 planId: planItem.id
                             }, { page: "entity-details-api" });
                         }
-                        const planResp = await fetch(`/api/trade-plans/${planItem.id}`, {
-                            method: 'GET',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'Accept': 'application/json'
-                            }
-                        });
-                        if (planResp.ok) {
-                            const planPayload = await planResp.json();
-                            const planData = planPayload?.data || planPayload || null;
+                        
+                        try {
+                            const planData = await this.loadTradePlan(planItem.id);
                             if (planData) {
                                 // שמירת האובייקט המלא
                                 entityData.trade_plan = entityData.trade_plan || planData;
@@ -239,6 +300,11 @@ class EntityDetailsAPI {
                                 // Removed: trade_plan_planned_amount fallback - זה שדה של התוכנית, לא של הטרייד
                                 // Removed: entry_price fallback - רק מה-Trade עצמו
                             }
+                        } catch (planError) {
+                            // Silent fail - we'll continue without the plan data
+                            if (window.Logger) {
+                                window.Logger.debug('⚠️ Failed to load trade plan (non-critical):', planError?.message, { page: "entity-details-api" });
+                            }
                         }
                     }
                 } catch (enrichError) {
@@ -247,30 +313,108 @@ class EntityDetailsAPI {
             }
             
             // טעינת נתוני שוק אם נדרש (לטיקרים)
+            // הערה: EntityDetailsService כבר מחזיר נתוני שוק, אבל נטען גם מ-getMarketData
+            // כדי לוודא שיש לנו את הנתונים העדכניים ביותר
+            // חשוב: אם getMarketData לא מחזיר שדה מסוים, נשמור את הערך הקיים מ-EntityDetailsService
             if (entityType === 'ticker' && options.includeMarketData !== false) {
                 try {
-                    window.Logger.info(`📈 Loading market data for ${entityType} ${entityId}...`, { page: "entity-details-api" });
+                    // שמירת הנתונים הקיימים מ-EntityDetailsService לפני עדכון
+                    const existingPrice = entityData.current_price || entityData.price;
+                    const existingChangePercent = entityData.change_percent || entityData.daily_change_percent;
+                    const existingChangeAmount = entityData.change_amount || entityData.daily_change;
+                    const existingVolume = entityData.volume;
+                    const existingMarketCap = entityData.market_cap;
+                    const existingYahooUpdatedAt = entityData.yahoo_updated_at;
+                    const existingDataSource = entityData.data_source;
+                    
                     const marketData = await this.getMarketData(entityId);
-                    window.Logger.info(`📈 Market data received:`, marketData, { page: "entity-details-api" });
                     if (marketData) {
-                        entityData.current_price = marketData.price;
-                        entityData.change_percent = marketData.change_pct_day;
-                        entityData.change_amount = marketData.change_amount_day;
-                        entityData.volume = marketData.volume;
-                        entityData.yahoo_updated_at = marketData.fetched_at;
-                        entityData.data_source = marketData.provider;
+                        // עדכון רק אם הערך קיים (לא null/undefined) - אחרת נשמור את הערך הקיים
+                        if (marketData.price !== undefined && marketData.price !== null) {
+                            entityData.current_price = marketData.price;
+                            entityData.price = marketData.price; // Alias
+                        } else if (existingPrice !== undefined && existingPrice !== null) {
+                            // שמירת הערך הקיים אם אין ערך חדש
+                            entityData.current_price = existingPrice;
+                            entityData.price = existingPrice;
+                        }
+                        
+                        if (marketData.change_pct_day !== undefined && marketData.change_pct_day !== null) {
+                            entityData.change_percent = marketData.change_pct_day;
+                            entityData.daily_change_percent = marketData.change_pct_day;
+                        } else if (existingChangePercent !== undefined && existingChangePercent !== null) {
+                            entityData.change_percent = existingChangePercent;
+                            entityData.daily_change_percent = existingChangePercent;
+                        }
+                        
+                        if (marketData.change_amount_day !== undefined && marketData.change_amount_day !== null) {
+                            entityData.change_amount = marketData.change_amount_day;
+                            entityData.daily_change = marketData.change_amount_day;
+                        } else if (existingChangeAmount !== undefined && existingChangeAmount !== null) {
+                            entityData.change_amount = existingChangeAmount;
+                            entityData.daily_change = existingChangeAmount;
+                        }
+                        
+                        // Volume: עדכן רק אם יש ערך חדש, אחרת נשמור את הקיים
+                        if (marketData.volume !== undefined && marketData.volume !== null) {
+                            entityData.volume = marketData.volume;
+                        } else if (existingVolume !== undefined && existingVolume !== null) {
+                            // שמירת הערך הקיים אם אין ערך חדש
+                            entityData.volume = existingVolume;
+                        }
+                        
+                        // Market cap: עדכן רק אם יש ערך חדש, אחרת נשמור את הקיים
+                        if (marketData.market_cap !== undefined && marketData.market_cap !== null) {
+                            entityData.market_cap = marketData.market_cap;
+                        } else if (existingMarketCap !== undefined && existingMarketCap !== null) {
+                            // שמירת הערך הקיים אם אין ערך חדש
+                            entityData.market_cap = existingMarketCap;
+                        }
+                        
+                        if (marketData.fetched_at) {
+                            entityData.yahoo_updated_at = marketData.fetched_at;
+                        } else if (existingYahooUpdatedAt) {
+                            entityData.yahoo_updated_at = existingYahooUpdatedAt;
+                        }
+                        
+                        if (marketData.provider) {
+                            entityData.data_source = marketData.provider;
+                        } else if (existingDataSource) {
+                            entityData.data_source = existingDataSource;
+                        }
+                        
+                        // לוג לבדיקה
+                        window.Logger.debug(`Market data merged for ticker ${entityId}`, {
+                            price: entityData.current_price,
+                            volume: entityData.volume,
+                            market_cap: entityData.market_cap,
+                            hadExistingPrice: existingPrice !== undefined && existingPrice !== null,
+                            hadExistingVolume: existingVolume !== undefined && existingVolume !== null,
+                            hadExistingMarketCap: existingMarketCap !== undefined && existingMarketCap !== null,
+                            marketDataPrice: marketData.price,
+                            marketDataVolume: marketData.volume,
+                            marketDataMarketCap: marketData.market_cap,
+                            page: "entity-details-api"
+                        });
+                    } else {
+                        // אם getMarketData החזיר null, נשתמש בנתונים מה-service (כבר שמורים)
+                        window.Logger.debug(`getMarketData returned null for ticker ${entityId}, preserving data from EntityDetailsService`, {
+                            price: entityData.current_price || entityData.price,
+                            volume: entityData.volume,
+                            market_cap: entityData.market_cap,
+                            page: "entity-details-api"
+                        });
                     }
                 } catch (error) {
-                    window.Logger.warn(`Failed to load market data for ${entityType} ${entityId}:`, error, { page: "entity-details-api" });
+                    // במקרה של שגיאה, נשמור את הנתונים הקיימים
+                    window.Logger.warn(`Failed to load market data for ${entityType} ${entityId}, preserving existing data:`, error, { page: "entity-details-api" });
                 }
             }
 
             // טעינת שם המטבע אם נדרש (לטיקרים)
             if (entityType === 'ticker' && entityData.currency_id) {
                 try {
-                    window.Logger.info(`💰 Loading currency data for currency_id ${entityData.currency_id}...`, { page: "entity-details-api" });
                     const currencyData = await this.getCurrencyData(entityData.currency_id);
-                    window.Logger.info(`💰 Currency data received:`, currencyData, { page: "entity-details-api" });
                     if (currencyData) {
                         entityData.currency_name = currencyData.name;
                         entityData.currency_symbol = currencyData.symbol;
@@ -283,9 +427,7 @@ class EntityDetailsAPI {
             // טעינת נתונים על טריידים ותכנונים אם נדרש (לטיקרים)
             if (entityType === 'ticker' && options.includeLinkedItems !== false) {
                 try {
-                    window.Logger.info(`📊 Loading trades and plans data for ${entityType} ${entityId}...`, { page: "entity-details-api" });
                     const linkedItems = await this.getLinkedItems(entityType, entityId);
-                    window.Logger.info(`📊 Linked items received:`, linkedItems, { page: "entity-details-api" });
                     
                     if (linkedItems && linkedItems.length > 0) {
                         // סינון טריידים ותכנונים
@@ -294,8 +436,6 @@ class EntityDetailsAPI {
                         
                         entityData.trades_summary = trades;
                         entityData.trade_plans_summary = tradePlans;
-                        
-                        window.Logger.info(`📊 Trades: ${trades.length}, Trade Plans: ${tradePlans.length}`, { page: "entity-details-api" });
                     }
                 } catch (error) {
                     window.Logger.warn(`Failed to load trades and plans data for ${entityType} ${entityId}:`, error, { page: "entity-details-api" });
@@ -1233,10 +1373,6 @@ class EntityDetailsAPI {
         
             // אם לא במטמון - טעינה מה-API
             const url = `/api/linked-items/${entityType}/${entityId}`;
-            console.log(`🔗 [ENTITY-DETAILS-API] Fetching linked items from: ${url}`);
-            if (window.Logger) {
-                window.Logger.info(`🔗 Fetching linked items from: ${url}`, { page: "entity-details-api" });
-            }
             
             const response = await fetch(url, {
                 method: 'GET',
@@ -1245,11 +1381,6 @@ class EntityDetailsAPI {
                     'Accept': 'application/json'
                 }
             });
-            
-            console.log(`🔗 [ENTITY-DETAILS-API] Response status: ${response.status}`);
-            if (window.Logger) {
-                window.Logger.info(`🔗 Response status: ${response.status}`, { page: "entity-details-api" });
-            }
 
             if (!response.ok) {
                 if (response.status === 404) {
@@ -1264,14 +1395,23 @@ class EntityDetailsAPI {
                         }
                     return emptyArray;
                 }
+                // Handle 429 (Too Many Requests) gracefully - return empty array instead of throwing
+                if (response.status === 429) {
+                    window.Logger.warn(`⚠️ Rate limit exceeded for linked items ${entityType} ${entityId} - returning empty array`, { page: "entity-details-api" });
+                    // Save empty array to cache to prevent repeated requests
+                    const emptyArray = [];
+                    if (window.UnifiedCacheManager.initialized) {
+                        await window.UnifiedCacheManager.save(cacheKey, emptyArray, {
+                            layer: 'memory',
+                            ttl: 60000 // 1 minute - shorter TTL for rate limit errors
+                        });
+                    }
+                    return emptyArray;
+                }
                 throw new Error(`שגיאת שרת בקבלת פריטים מקושרים: ${response.status}`);
             }
 
             const data = await response.json();
-            console.log(`🔗 [ENTITY-DETAILS-API] Raw linked items data:`, data);
-            if (window.Logger) {
-                window.Logger.info(`🔗 Raw linked items data:`, data, { page: "entity-details-api" });
-            }
             
             const enrichLinkedItems = (items, direction) => {
                 if (!Array.isArray(items)) {
@@ -1356,18 +1496,6 @@ class EntityDetailsAPI {
                     }
                 }
             
-            console.log(`🔗 [ENTITY-DETAILS-API] Final linked items (${allLinkedItems.length} total):`, {
-                allLinkedItems,
-                childCount: data?.child_entities?.length || 0,
-                parentCount: data?.parent_entities?.length || 0
-            });
-            if (window.Logger) {
-                window.Logger.info(`🔗 Final linked items (${allLinkedItems.length} total):`, allLinkedItems, { 
-                    childCount: data?.child_entities?.length || 0,
-                    parentCount: data?.parent_entities?.length || 0,
-                    page: "entity-details-api" 
-                });
-            }
             return allLinkedItems;
 
         } catch (error) {
@@ -1386,7 +1514,6 @@ class EntityDetailsAPI {
     async getMarketData(tickerId) {
         try {
             const url = `/api/external-data/quotes/${tickerId}`;
-            window.Logger.info(`📈 Fetching market data from: ${url}`, { page: "entity-details-api" });
             
             const response = await fetch(url, {
                 method: 'GET',
@@ -1395,30 +1522,56 @@ class EntityDetailsAPI {
                     'Accept': 'application/json'
                 }
             });
-            
-            window.Logger.info(`📈 Market data response status: ${response.status}`, { page: "entity-details-api" });
 
             if (!response.ok) {
+                // Try to get error details from response
+                let errorMessage = `שגיאת שרת בקבלת נתוני שוק: ${response.status}`;
+                try {
+                    const errorData = await response.json();
+                    if (errorData.message) {
+                        errorMessage = errorData.message;
+                    }
+                    if (errorData.suggestion) {
+                        errorMessage += ` (${errorData.suggestion})`;
+                    }
+                } catch (e) {
+                    // If response is not JSON, use default message
+                }
+                
+                // For 404/410, return null (no data available) - this is expected
                 if (response.status === 404 || response.status === 410) {
-                    window.Logger.debug(`No market data found for ticker ${tickerId} (status: ${response.status}, { page: "entity-details-api" })`);
+                    window.Logger.debug(`Market data not available for ticker ${tickerId}: ${errorMessage}`, { 
+                        status: response.status,
+                        page: "entity-details-api" 
+                    });
                     return null;
                 }
-                throw new Error(`שגיאת שרת בקבלת נתוני שוק: ${response.status}`);
+                
+                // For other errors, log and return null (graceful degradation)
+                window.Logger.warn(`Error getting market data for ticker ${tickerId}: ${errorMessage}`, { 
+                    status: response.status,
+                    page: "entity-details-api" 
+                });
+                return null;
             }
 
             const data = await response.json();
-            window.Logger.info(`📈 Raw market data:`, data, { page: "entity-details-api" });
             
             if (data.status === 'success' && data.data) {
                 return data.data;
             } else {
-                window.Logger.info(`📈 No market data found`, { page: "entity-details-api" });
+                // Log if response format is unexpected
+                window.Logger.debug(`Unexpected response format for ticker ${tickerId}`, { 
+                    status: data.status,
+                    hasData: !!data.data,
+                    page: "entity-details-api" 
+                });
                 return null;
             }
 
         } catch (error) {
             window.Logger.error(`Error getting market data for ticker ${tickerId}:`, error, { page: "entity-details-api" });
-            return null; // החזר null במקום לזרוק שגיאה
+            return null; // החזר null במקום לזרוק שגיאה - graceful degradation
         }
     }
 
@@ -1432,7 +1585,6 @@ class EntityDetailsAPI {
     async getCurrencyData(currencyId) {
         try {
             const url = `/api/currencies/${currencyId}`;
-            window.Logger.info(`💰 Fetching currency data from: ${url}`, { page: "entity-details-api" });
             
             const response = await fetch(url, {
                 method: 'GET',
@@ -1441,24 +1593,19 @@ class EntityDetailsAPI {
                     'Accept': 'application/json'
                 }
             });
-            
-            window.Logger.info(`💰 Currency data response status: ${response.status}`, { page: "entity-details-api" });
 
             if (!response.ok) {
                 if (response.status === 404) {
-                    window.Logger.debug(`No currency data found for currency ${currencyId}`, { page: "entity-details-api" });
                     return null;
                 }
                 throw new Error(`שגיאת שרת בקבלת נתוני מטבע: ${response.status}`);
             }
 
             const data = await response.json();
-            window.Logger.info(`💰 Raw currency data:`, data, { page: "entity-details-api" });
             
             if (data.status === 'success' && data.data) {
                 return data.data;
             } else {
-                window.Logger.info(`💰 No currency data found`, { page: "entity-details-api" });
                 return null;
             }
 

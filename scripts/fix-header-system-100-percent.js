@@ -34,8 +34,6 @@ const KNOWN_ISSUES = {
 
 // Files that don't exist - should be excluded from tests
 const NON_EXISTENT_FILES = [
-  'trading-ui/cache-test.html',
-  'trading-ui/linter-realtime-monitor.html',
   'trading-ui/tradingview-test-page.html',
   'trading-ui/test_external_data.html',
   'trading-ui/test_models.html'

@@ -96,7 +96,11 @@
   }
 
   function renderEmpty(container) {
-    container.innerHTML = '<div class="text-muted small">אין תוכניות זמינות</div>';
+    container.textContent = '';
+    const div = document.createElement('div');
+    div.className = 'text-muted small';
+    div.textContent = 'אין תוכניות זמינות';
+    container.appendChild(div);
   }
 
   function renderList(plans, container, currencySymbol) {
@@ -144,12 +148,18 @@
         const amountWrap = document.createElement('div');
         amountWrap.className = 'text-end fw-semibold';
         if (window.FieldRendererService?.renderAmount) {
-          amountWrap.innerHTML = window.FieldRendererService.renderAmount(
+          const amountHTML = window.FieldRendererService.renderAmount(
             Number(plan.amount),
             currencySymbol,
             2,
             true
           );
+          amountWrap.textContent = '';
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(amountHTML, 'text/html');
+          doc.body.childNodes.forEach(node => {
+            amountWrap.appendChild(node.cloneNode(true));
+          });
         } else {
           amountWrap.textContent = `${currencySymbol}${Number(plan.amount).toLocaleString('he-IL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
         }
@@ -159,7 +169,7 @@
       list.appendChild(item);
     });
 
-    container.innerHTML = '';
+    container.textContent = '';
     container.appendChild(list);
   }
 
@@ -182,4 +192,7 @@
 
   window.RecentTradePlansWidget = RecentTradePlansWidget;
 })();
+
+
+
 

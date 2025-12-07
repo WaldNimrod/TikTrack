@@ -620,9 +620,16 @@ function initializeModalBackdrop() {
     // הוספת event listener לסגירה בלחיצה על הרקע
     modal.addEventListener('click', event => {
       if (event.target === modal) {
-        const modalInstance = bootstrap.Modal.getInstance(modal);
-        if (modalInstance) {
-          modalInstance.hide();
+        if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
+          const modalId = modal.id;
+          if (modalId) {
+            window.ModalManagerV2.hideModal(modalId);
+          }
+        } else if (bootstrap?.Modal) {
+          const modalInstance = bootstrap.Modal.getInstance(modal);
+          if (modalInstance) {
+            modalInstance.hide();
+          }
         }
       }
     });
@@ -661,37 +668,38 @@ function initializeModalBackdrop() {
 function getPageDataFunctions() {
   const currentPage = window.location.pathname.split('/').pop().replace('.html', '') || 'index';
   
+  // Define function mappings - check at call time, not definition time
   const pageFunctions = {
     'tickers': {
-      loadData: window.loadTickersData,
-      updateActive: window.updateActiveTradesField
+      get loadData() { return typeof window.loadTickersData === 'function' ? window.loadTickersData : null; },
+      get updateActive() { return typeof window.updateActiveTradesField === 'function' ? window.updateActiveTradesField : null; }
     },
     'trades': {
-      loadData: window.loadTradesData,
-      updateActive: window.updateActiveTradesField
+      get loadData() { return typeof window.loadTradesData === 'function' ? window.loadTradesData : null; },
+      get updateActive() { return typeof window.updateActiveTradesField === 'function' ? window.updateActiveTradesField : null; }
     },
     'trading_accounts': {
-      loadData: window.loadTradingAccountsDataForTradingAccountsPage,
+      get loadData() { return typeof window.loadTradingAccountsDataForTradingAccountsPage === 'function' ? window.loadTradingAccountsDataForTradingAccountsPage : null; },
       updateActive: null
     },
     'alerts': {
-      loadData: window.loadAlertsData,
+      get loadData() { return typeof window.loadAlertsData === 'function' ? window.loadAlertsData : null; },
       updateActive: null
     },
     'trade_plans': {
-      loadData: window.loadTradePlansData,
+      get loadData() { return typeof window.loadTradePlansData === 'function' ? window.loadTradePlansData : null; },
       updateActive: null
     },
     'executions': {
-      loadData: window.loadExecutionsData,
+      get loadData() { return typeof window.loadExecutionsData === 'function' ? window.loadExecutionsData : null; },
       updateActive: null
     },
     'cash_flows': {
-      loadData: window.loadCashFlowsData,
+      get loadData() { return typeof window.loadCashFlowsData === 'function' ? window.loadCashFlowsData : null; },
       updateActive: null
     },
     'notes': {
-      loadData: window.loadNotesData,
+      get loadData() { return typeof window.loadNotesData === 'function' ? window.loadNotesData : null; },
       updateActive: null
     }
   };
@@ -829,8 +837,18 @@ window.toggleSection = async function (sectionId) {
           existingImg.style.transform = isCollapsed ? '' : 'rotate(180deg)';
         }
       } else {
-        // Replace text content with img tag
-        icon.innerHTML = newIconHTML;
+        // Replace text content with img tag using tempDiv
+        icon.textContent = '';
+        const tempDiv = document.createElement('div');
+        tempDiv.textContent = '';
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(newIconHTML, 'text/html');
+        doc.body.childNodes.forEach(node => {
+            tempDiv.appendChild(node.cloneNode(true));
+        });
+        while (tempDiv.firstChild) {
+          icon.appendChild(tempDiv.firstChild);
+        }
       }
     }
     
@@ -893,26 +911,43 @@ window.toggleSection = async function (sectionId) {
     async function updateChevronIcon(iconElement, isCollapsed) {
         if (!iconElement) return;
         
-        // Use IconSystem if available
+        // Use IconSystem if available - use 'toggle' which maps to 'chevron-down'
         if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized && iconElement.tagName === 'IMG') {
             try {
-                const iconHTML = await window.IconSystem.renderIcon('button', 'toggle', {
-                    size: iconElement.getAttribute('width') || '16',
-                    alt: iconElement.getAttribute('alt') || 'toggle',
-                    class: iconElement.getAttribute('class') || 'icon'
-                });
+                // Use 'toggle' which maps to 'chevron-down' in icon-mappings.js
+                // Add timeout to prevent hanging
+                const iconHTML = await Promise.race([
+                    window.IconSystem.renderIcon('button', 'toggle', {
+                        size: iconElement.getAttribute('width') || '16',
+                        alt: iconElement.getAttribute('alt') || (isCollapsed ? 'הצג' : 'הסתר'),
+                        class: iconElement.getAttribute('class') || 'icon'
+                    }),
+                    new Promise((_, reject) => setTimeout(() => reject(new Error('IconSystem.renderIcon timeout')), 1000))
+                ]);
                 const tempDiv = document.createElement('div');
-                tempDiv.innerHTML = iconHTML;
+                tempDiv.textContent = '';
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(iconHTML, 'text/html');
+                doc.body.childNodes.forEach(node => {
+                    tempDiv.appendChild(node.cloneNode(true));
+                });
                 const newIcon = tempDiv.firstElementChild;
                 if (newIcon) {
+                    // Apply rotation transform for expanded state
+                    if (!isCollapsed && newIcon.tagName === 'svg') {
+                        newIcon.style.transform = 'rotate(180deg)';
+                    } else if (!isCollapsed && newIcon.tagName === 'IMG') {
+                        newIcon.style.transform = 'rotate(180deg)';
+                    }
                     iconElement.parentNode.replaceChild(newIcon, iconElement);
                 }
             } catch (error) {
-                // Fallback to direct path
+                // Fallback to direct path - use chevron-down
                 const toggleIconPath = window.BUTTON_ICONS && window.BUTTON_ICONS.TOGGLE 
                     ? window.BUTTON_ICONS.TOGGLE 
                     : '/trading-ui/images/icons/tabler/chevron-down.svg';
                 iconElement.src = toggleIconPath;
+                iconElement.style.transform = isCollapsed ? '' : 'rotate(180deg)';
             }
         } else if (iconElement.tagName === 'IMG') {
             const toggleIconPath = window.BUTTON_ICONS && window.BUTTON_ICONS.TOGGLE 
@@ -922,12 +957,28 @@ window.toggleSection = async function (sectionId) {
             iconElement.style.transform = isCollapsed ? '' : 'rotate(180deg)';
         } else if (iconElement.querySelector('img')) {
             const img = iconElement.querySelector('img');
+            const toggleIconPath = window.BUTTON_ICONS && window.BUTTON_ICONS.TOGGLE 
+                ? window.BUTTON_ICONS.TOGGLE 
+                : '/trading-ui/images/icons/tabler/chevron-down.svg';
             img.src = toggleIconPath;
             img.style.transform = isCollapsed ? '' : 'rotate(180deg)';
         } else {
             // Replace text content with img tag
+            const toggleIconPath = window.BUTTON_ICONS && window.BUTTON_ICONS.TOGGLE 
+                ? window.BUTTON_ICONS.TOGGLE 
+                : '/trading-ui/images/icons/tabler/chevron-down.svg';
             const transformStyle = isCollapsed ? '' : ' style="transform: rotate(180deg);"';
-            iconElement.innerHTML = `<img src="${toggleIconPath}" width="16" height="16" alt="${isCollapsed ? 'הצג' : 'הסתר'}" class="icon"${transformStyle}>`;
+            iconElement.textContent = '';
+            const img = document.createElement('img');
+            img.src = toggleIconPath;
+            img.width = 16;
+            img.height = 16;
+            img.alt = isCollapsed ? 'הצג' : 'הסתר';
+            img.className = 'icon';
+            if (transformStyle) {
+                img.setAttribute('style', transformStyle);
+            }
+            iconElement.appendChild(img);
         }
     }
 
@@ -937,8 +988,29 @@ window.restoreAllSectionStates = async function () {
   
   // מניעת כפילויות
   if (window.sectionStatesRestored && window.sectionStatesRestored[pageName]) {
-    return;
+    if (window.sectionStatesRestored[pageName] === 'in-progress') {
+      console.warn(`⚠️ restoreAllSectionStates already in progress for "${pageName}", waiting...`);
+      // Wait for completion (max 5 seconds)
+      let waitCount = 0;
+      while (window.sectionStatesRestored[pageName] === 'in-progress' && waitCount < 50) {
+        await new Promise(resolve => setTimeout(resolve, 100));
+        waitCount++;
+      }
+      if (window.sectionStatesRestored[pageName] === 'completed') {
+        console.log(`✅ restoreAllSectionStates completed (waited for previous call)`);
+        return;
+      }
+    } else if (window.sectionStatesRestored[pageName] === 'completed') {
+      console.log(`✅ restoreAllSectionStates already completed for "${pageName}", skipping`);
+      return;
+    }
   }
+  
+  // Mark as in progress to prevent duplicate calls
+  if (!window.sectionStatesRestored) {
+    window.sectionStatesRestored = {};
+  }
+  window.sectionStatesRestored[pageName] = 'in-progress';
   
   // Check for accordion mode (only one section open at a time)
   const pageConfig = typeof window.pageInitializationConfigs !== 'undefined' && 
@@ -1017,25 +1089,65 @@ window.restoreAllSectionStates = async function () {
             if (openSectionId) {
               // Already have an open section, close this one
               sectionBody.style.display = 'none';
-              if (icon) { await updateChevronIcon(icon, true); }
+              if (icon) { 
+                try {
+                  await Promise.race([
+                    updateChevronIcon(icon, true),
+                    new Promise((_, reject) => setTimeout(() => reject(new Error('updateChevronIcon timeout')), 1000))
+                  ]);
+                } catch (e) {
+                  // Fallback: just set display, icon will update later
+                  console.warn(`⚠️ updateChevronIcon timeout for "${sectionId}", continuing...`);
+                }
+              }
               console.log(`✅ Section "${sectionId}" closed (accordion mode - another section is open)`);
             } else {
               // This is the first open section
               openSectionId = sectionId;
               sectionBody.style.display = 'block';
-              if (icon) { await updateChevronIcon(icon, false); }
+              if (icon) { 
+                try {
+                  await Promise.race([
+                    updateChevronIcon(icon, false),
+                    new Promise((_, reject) => setTimeout(() => reject(new Error('updateChevronIcon timeout')), 1000))
+                  ]);
+                } catch (e) {
+                  // Fallback: just set display, icon will update later
+                  console.warn(`⚠️ updateChevronIcon timeout for "${sectionId}", continuing...`);
+                }
+              }
               console.log(`✅ Section "${sectionId}" opened (accordion mode)`);
             }
           } else {
             // This section should be closed
             sectionBody.style.display = 'none';
-            if (icon) { await updateChevronIcon(icon, true); }
+            if (icon) { 
+              try {
+                await Promise.race([
+                  updateChevronIcon(icon, true),
+                  new Promise((_, reject) => setTimeout(() => reject(new Error('updateChevronIcon timeout')), 1000))
+                ]);
+              } catch (e) {
+                // Fallback: just set display, icon will update later
+                console.warn(`⚠️ updateChevronIcon timeout for "${sectionId}", continuing...`);
+              }
+            }
             console.log(`✅ Section "${sectionId}" closed (accordion mode)`);
           }
         } else {
           // No saved state - in accordion mode, always closed
           sectionBody.style.display = 'none';
-          if (icon) { await updateChevronIcon(icon, true); }
+          if (icon) { 
+            try {
+              await Promise.race([
+                updateChevronIcon(icon, true),
+                new Promise((_, reject) => setTimeout(() => reject(new Error('updateChevronIcon timeout')), 1000))
+              ]);
+            } catch (e) {
+              // Fallback: just set display, icon will update later
+              console.warn(`⚠️ updateChevronIcon timeout for "${sectionId}", continuing...`);
+            }
+          }
           console.log(`⏭️ Section "${sectionId}" has no saved state - accordion mode default (closed)`);
         }
       } else {
@@ -1047,28 +1159,69 @@ window.restoreAllSectionStates = async function () {
           if (isHidden) {
             // Restore collapsed state
             sectionBody.style.display = 'none';
-            if (icon) { await updateChevronIcon(icon, true); }
+            if (icon) { 
+              try {
+                await Promise.race([
+                  updateChevronIcon(icon, true),
+                  new Promise((_, reject) => setTimeout(() => reject(new Error('updateChevronIcon timeout')), 1000))
+                ]);
+              } catch (e) {
+                // Fallback: just set display, icon will update later
+                console.warn(`⚠️ updateChevronIcon timeout for "${sectionId}", continuing...`);
+              }
+            }
             console.log(`✅ Section "${sectionId}" RESTORED to COLLAPSED`);
           } else {
             // Restore expanded state
             sectionBody.style.display = 'block';
-            if (icon) { await updateChevronIcon(icon, false); }
+            if (icon) { 
+              try {
+                await Promise.race([
+                  updateChevronIcon(icon, false),
+                  new Promise((_, reject) => setTimeout(() => reject(new Error('updateChevronIcon timeout')), 1000))
+                ]);
+              } catch (e) {
+                // Fallback: just set display, icon will update later
+                console.warn(`⚠️ updateChevronIcon timeout for "${sectionId}", continuing...`);
+              }
+            }
             console.log(`✅ Section "${sectionId}" RESTORED to EXPANDED`);
           }
         } else {
           // No saved state - apply default state from page config
-          // Special case: trade-creation section should be closed by default (lazy loading)
-          const shouldBeClosed = sectionId === 'trade-creation';
-          const finalState = shouldBeClosed ? 'closed' : defaultState;
+          // Check sectionDefaultStates first, then fallback to sectionsDefaultState
+          const sectionSpecificDefault = pageConfig?.sectionDefaultStates?.[sectionId];
+          const finalDefaultState = sectionSpecificDefault || defaultState;
+          const finalState = finalDefaultState === 'closed' ? 'closed' : 'open';
           
           if (finalState === 'open') {
             sectionBody.style.display = 'block';
-            if (icon) { await updateChevronIcon(icon, false); }
-            console.log(`✅ Section "${sectionId}" default state OPEN (no cache)`);
+            if (icon) { 
+              try {
+                await Promise.race([
+                  updateChevronIcon(icon, false),
+                  new Promise((_, reject) => setTimeout(() => reject(new Error('updateChevronIcon timeout')), 1000))
+                ]);
+              } catch (e) {
+                // Fallback: just set display, icon will update later
+                console.warn(`⚠️ updateChevronIcon timeout for "${sectionId}", continuing...`);
+              }
+            }
+            console.log(`✅ Section "${sectionId}" default state OPEN (no cache)`, { sectionSpecificDefault, finalDefaultState });
           } else {
             sectionBody.style.display = 'none';
-            if (icon) { await updateChevronIcon(icon, true); }
-            console.log(`✅ Section "${sectionId}" default state CLOSED (no cache)`);
+            if (icon) { 
+              try {
+                await Promise.race([
+                  updateChevronIcon(icon, true),
+                  new Promise((_, reject) => setTimeout(() => reject(new Error('updateChevronIcon timeout')), 1000))
+                ]);
+              } catch (e) {
+                // Fallback: just set display, icon will update later
+                console.warn(`⚠️ updateChevronIcon timeout for "${sectionId}", continuing...`);
+              }
+            }
+            console.log(`✅ Section "${sectionId}" default state CLOSED (no cache)`, { sectionSpecificDefault, finalDefaultState });
           }
         }
       }
@@ -1088,7 +1241,7 @@ window.restoreAllSectionStates = async function () {
   if (!window.sectionStatesRestored) {
     window.sectionStatesRestored = {};
   }
-  window.sectionStatesRestored[pageName] = true;
+  window.sectionStatesRestored[pageName] = 'completed';
   
   return restoredCount;
 };
@@ -1424,7 +1577,12 @@ function loadTableActionButtons(tableId, entityType, config = {}) {
       return;
     }
     
-    actionsCell.innerHTML = buttonsHtml;
+    actionsCell.textContent = '';
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(buttonsHtml, 'text/html');
+    doc.body.childNodes.forEach(node => {
+        actionsCell.appendChild(node.cloneNode(true));
+    });
   });
 
 }
@@ -1834,24 +1992,24 @@ function initializeValidation(formId, validationRules = {}) {
       case 'email':
       case 'tel':
       case 'url':
-        isValid = (window.validateTextField || validateTextField)(input, fieldRules);
+        isValid = window.validateTextField ? window.validateTextField(input, fieldRules) : true;
         break;
 
       case 'number':
-        isValid = (window.validateNumberField || validateNumberField)(input, fieldRules);
+        isValid = window.validateNumberField ? window.validateNumberField(input, fieldRules) : true;
         break;
 
       case 'date':
-        isValid = (window.validateDateField || validateDateField)(input, fieldRules);
+        isValid = window.validateDateField ? window.validateDateField(input, fieldRules) : true;
         break;
 
       default:
         if (input.tagName === 'SELECT') {
-          isValid = (window.validateSelectField || validateSelectField)(input, fieldRules);
+          isValid = window.validateSelectField ? window.validateSelectField(input, fieldRules) : true;
         } else if (input.tagName === 'TEXTAREA') {
-          isValid = (window.validateTextField || validateTextField)(input, fieldRules);
+          isValid = window.validateTextField ? window.validateTextField(input, fieldRules) : true;
         } else {
-          isValid = (window.validateField || validateField)(input, fieldRules);
+          isValid = window.validateField ? window.validateField(input, fieldRules) : true;
         }
         break;
       }

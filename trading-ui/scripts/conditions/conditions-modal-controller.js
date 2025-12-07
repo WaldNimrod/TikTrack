@@ -28,23 +28,16 @@
             lastEnabledAt: null
         };
 
-        window.location.reload = function patchedReload(forceReload) {
-            if (state.enabled) {
-                const attempt = {
-                    forceReload: Boolean(forceReload),
-                    timestamp: Date.now(),
-                    reason: state.reason,
-                    stack: new Error().stack
-                };
-                state.blockCount += 1;
-                state.lastAttempt = attempt;
-                window.Logger?.warn('[ConditionsReloadBypass] Prevented reload attempt', attempt, { page: 'conditions-modal-controller' });
-                if (typeof window.showNotification === 'function') {
-                    window.showNotification('חוסם ריענון אוטומטי לזמן דיבוג תנאים', 'info');
-                }
-                return;
-            }
-            return originalReload(forceReload);
+        // Note: window.location.reload is read-only and cannot be overridden in modern browsers
+        // This is a security feature. We'll skip the patching and just return a no-op state.
+        // The reload bypass functionality is not critical - it's only for debugging.
+        window.Logger?.debug('[ConditionsModalController] Skipping location.reload override (read-only property)', { page: 'conditions-modal-controller' });
+        
+        // Return state with enabled always false (no bypass functionality)
+        return {
+            ...state,
+            enabled: false,
+            bypassDisabled: true
         };
 
         window.ConditionsReloadBypass = {
@@ -102,6 +95,19 @@
         }
 
         setupModal() {
+            // Skip modal setup on auth pages (login, register, etc.)
+            const isAuthPage = window.location.pathname.includes('login.html') ||
+                             window.location.pathname.includes('register.html') ||
+                             window.location.pathname.includes('forgot-password.html') ||
+                             window.location.pathname.includes('reset-password.html') ||
+                             document.body.classList.contains('login-page') ||
+                             document.body.classList.contains('auth-page');
+            
+            if (isAuthPage) {
+                // Silently skip - no modal needed on auth pages
+                return;
+            }
+            
             this.modalElement = document.getElementById(MODAL_ID);
             if (!this.modalElement) {
                 if (window.ModalManagerV2 && window.conditionsModalConfig) {
@@ -115,8 +121,30 @@
             }
 
             if (!this.modalElement) {
-                window.Logger?.warn('[ConditionsModalController] Modal element not found', { page: 'conditions-modal-controller' });
-                return;
+                // Try to create the modal if it doesn't exist
+                if (window.ModalManagerV2 && window.conditionsModalConfig) {
+                    try {
+                        window.ModalManagerV2.createCRUDModal(window.conditionsModalConfig);
+                        this.modalElement = document.getElementById(MODAL_ID);
+                        if (this.modalElement) {
+                            window.Logger?.info('[ConditionsModalController] Modal created successfully', { page: 'conditions-modal-controller' });
+                        }
+                    } catch (error) {
+                        window.Logger?.error('[ConditionsModalController] Failed to create modal', { error: error?.message, stack: error?.stack }, { page: 'conditions-modal-controller' });
+                    }
+                }
+                
+                if (!this.modalElement) {
+                    // Only warn if we're not on an auth page and modal creation failed
+                    const isAuthPage = window.location.pathname.includes('login.html') ||
+                                     window.location.pathname.includes('register.html') ||
+                                     window.location.pathname.includes('forgot-password.html') ||
+                                     window.location.pathname.includes('reset-password.html');
+                    if (!isAuthPage) {
+                        window.Logger?.warn('[ConditionsModalController] Modal element not found and could not be created', { page: 'conditions-modal-controller' });
+                    }
+                    return;
+                }
             }
 
             try {
@@ -128,10 +156,19 @@
 
             this.modalElement.classList.add('modal-nested');
 
-            this.bootstrapModal = bootstrap.Modal.getOrCreateInstance(this.modalElement, {
-                backdrop: false,
-                keyboard: true
-            });
+            // Use ModalManagerV2 if available, fallback to Bootstrap
+            if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
+                // ModalManagerV2 will handle the modal, but we still need Bootstrap instance for events
+                this.bootstrapModal = bootstrap.Modal.getOrCreateInstance(this.modalElement, {
+                    backdrop: false,
+                    keyboard: true
+                });
+            } else if (bootstrap?.Modal) {
+                this.bootstrapModal = bootstrap.Modal.getOrCreateInstance(this.modalElement, {
+                    backdrop: false,
+                    keyboard: true
+                });
+            }
             this.modalElement.addEventListener('shown.bs.modal', () => this.onModalShown());
             this.modalElement.addEventListener('hidden.bs.modal', () => this.onModalHidden());
 

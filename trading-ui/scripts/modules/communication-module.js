@@ -3,7 +3,7 @@
  * ===============================
  *
  * This module handles all communication-related functionality including
- * external API calls, WebSocket connections, and data synchronization.
+ * external API calls and data synchronization.
  *
  * @version 1.0.0
  * @lastUpdated January 2025
@@ -37,16 +37,6 @@ const CommunicationModule = {
         }
     },
 
-    // WebSocket communication
-    initializeWebSocket(url) {
-        try {
-            const ws = new WebSocket(url);
-            return ws;
-        } catch (error) {
-            console.error('❌ WebSocket initialization failed:', error);
-            throw error;
-        }
-    },
 
     // Data synchronization
     async syncData(source, target) {

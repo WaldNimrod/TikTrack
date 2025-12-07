@@ -31,7 +31,12 @@ class SMErrorHandler {
     const errorCard = this.createErrorCard(error, context, severity, errorId);
     
     // Insert error card into container
-    container.innerHTML = errorCard;
+    container.textContent = '';
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(errorCard, 'text/html');
+    doc.body.childNodes.forEach(node => {
+      container.appendChild(node.cloneNode(true));
+    });
     
     // Setup error card event listeners
     this.setupErrorCardListeners(errorId);

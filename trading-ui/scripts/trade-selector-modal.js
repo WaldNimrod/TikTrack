@@ -257,7 +257,14 @@ class TradeSelectorModal {
         if (!contentDiv) return;
 
         // Show loading
-        contentDiv.innerHTML = '<div class="text-center py-4"><div class="spinner-border" role="status"></div></div>';
+        contentDiv.textContent = '';
+        const loadingDiv = document.createElement('div');
+        loadingDiv.className = 'text-center py-4';
+        const spinner = document.createElement('div');
+        spinner.className = 'spinner-border';
+        spinner.setAttribute('role', 'status');
+        loadingDiv.appendChild(spinner);
+        contentDiv.appendChild(loadingDiv);
 
         try {
             // Get filtering parameters from parent modal if available
@@ -327,17 +334,26 @@ class TradeSelectorModal {
             }
 
             // Render content
-            contentDiv.innerHTML = this.renderContent(trades);
+            contentDiv.textContent = '';
+            const contentHTML = this.renderContent(trades);
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(contentHTML, 'text/html');
+            doc.body.childNodes.forEach(node => {
+                contentDiv.appendChild(node.cloneNode(true));
+            });
             
             // Setup sortable headers after rendering
             this.setupSortableHeaders();
         } catch (error) {
             console.error('Error loading trade selector:', error);
-            contentDiv.innerHTML = `
-                <div class="alert alert-danger">
-                    <strong>שגיאה בטעינת נתונים:</strong> ${error.message}
-                </div>
-            `;
+            contentDiv.textContent = '';
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'alert alert-danger';
+            const strong = document.createElement('strong');
+            strong.textContent = 'שגיאה בטעינת נתונים: ';
+            alertDiv.appendChild(strong);
+            alertDiv.appendChild(document.createTextNode(error.message));
+            contentDiv.appendChild(alertDiv);
         }
     }
 
@@ -678,7 +694,13 @@ class TradeSelectorModal {
         // Re-render table
         const contentDiv = document.getElementById('tradeSelectorContent');
         if (contentDiv) {
-            contentDiv.innerHTML = this.renderTradesTable(sortedTrades);
+            contentDiv.textContent = '';
+            const tableHTML = this.renderTradesTable(sortedTrades);
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(tableHTML, 'text/html');
+            doc.body.childNodes.forEach(node => {
+                contentDiv.appendChild(node.cloneNode(true));
+            });
             this.setupSortableHeaders(); // Re-setup headers after re-render
         }
 
@@ -780,7 +802,8 @@ class TradeSelectorModal {
             const accountDisplay = trade.account_name || trade.trading_account_id || 'לא מוגדר';
             const dateDisplay = trade.created_at ? this.formatTableDate(trade.created_at) : 'לא מוגדר';
 
-            buttonContainer.innerHTML = `
+            buttonContainer.textContent = '';
+            const tableHTML = `
                 <div class="table-responsive" style="margin-top: 0.5rem;">
                     <table class="table table-sm mb-0" style="margin-bottom: 0;">
                         <thead>
@@ -813,6 +836,11 @@ class TradeSelectorModal {
                     </table>
                 </div>
             `;
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(tableHTML, 'text/html');
+            doc.body.childNodes.forEach(node => {
+                buttonContainer.appendChild(node.cloneNode(true));
+            });
         }
     }
 
@@ -860,11 +888,13 @@ class TradeSelectorModal {
         const buttonId = fieldId + 'Button';
         const buttonContainer = document.getElementById(buttonId);
         if (buttonContainer) {
-            buttonContainer.innerHTML = `
-                <button type="button" class="btn btn-primary" data-onclick="openTradeSelector('${fieldId}')">
-                    קשר לטרייד
-                </button>
-            `;
+            buttonContainer.textContent = '';
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'btn btn-primary';
+            button.setAttribute('data-onclick', `openTradeSelector('${fieldId}')`);
+            button.textContent = 'קשר לטרייד';
+            buttonContainer.appendChild(button);
         }
 
         // Reset selection

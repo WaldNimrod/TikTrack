@@ -1,0 +1,3800 @@
+{
+  "page": "comparative-analysis-page.html",
+  "js_file": "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/scripts/comparative-analysis-page.js",
+  "html_file": null,
+  "categories": {
+    "unified_init": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": null
+    },
+    "section_toggle": {
+      "status": "ok",
+      "issues": [
+        {
+          "line": 3512,
+          "content": "// Note: toggleSection is now provided by ui-utils.js",
+          "pattern": "toggleSection",
+          "match": "toggleSection",
+          "file": "js"
+        }
+      ],
+      "issue_count": 1,
+      "js_result": {
+        "status": "ok",
+        "issues": [
+          {
+            "line": 3512,
+            "content": "// Note: toggleSection is now provided by ui-utils.js",
+            "pattern": "toggleSection",
+            "match": "toggleSection"
+          }
+        ],
+        "issue_count": 1
+      },
+      "html_result": null
+    },
+    "notifications": {
+      "status": "ok",
+      "issues": [
+        {
+          "line": 146,
+          "content": "if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {",
+          "pattern": "NotificationSystem",
+          "match": "NotificationSystem",
+          "file": "js"
+        },
+        {
+          "line": 146,
+          "content": "if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {",
+          "pattern": "NotificationSystem",
+          "match": "NotificationSystem",
+          "file": "js"
+        },
+        {
+          "line": 147,
+          "content": "window.NotificationSystem.showError('שגיאה בטעינת גרפים',",
+          "pattern": "NotificationSystem",
+          "match": "NotificationSystem",
+          "file": "js"
+        },
+        {
+          "line": 157,
+          "content": "if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {",
+          "pattern": "NotificationSystem",
+          "match": "NotificationSystem",
+          "file": "js"
+        },
+        {
+          "line": 157,
+          "content": "if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {",
+          "pattern": "NotificationSystem",
+          "match": "NotificationSystem",
+          "file": "js"
+        },
+        {
+          "line": 158,
+          "content": "window.NotificationSystem.showError('שגיאה בטעינת גרפים',",
+          "pattern": "NotificationSystem",
+          "match": "NotificationSystem",
+          "file": "js"
+        },
+        {
+          "line": 2131,
+          "content": "if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {",
+          "pattern": "NotificationSystem",
+          "match": "NotificationSystem",
+          "file": "js"
+        },
+        {
+          "line": 2131,
+          "content": "if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {",
+          "pattern": "NotificationSystem",
+          "match": "NotificationSystem",
+          "file": "js"
+        },
+        {
+          "line": 2132,
+          "content": "window.NotificationSystem.showError('שגיאה בטעינת גרף השוואה',",
+          "pattern": "NotificationSystem",
+          "match": "NotificationSystem",
+          "file": "js"
+        },
+        {
+          "line": 2320,
+          "content": "if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {",
+          "pattern": "NotificationSystem",
+          "match": "NotificationSystem",
+          "file": "js"
+        },
+        {
+          "line": 2320,
+          "content": "if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {",
+          "pattern": "NotificationSystem",
+          "match": "NotificationSystem",
+          "file": "js"
+        },
+        {
+          "line": 2321,
+          "content": "window.NotificationSystem.showError('שגיאה בעדכון גרף השוואה',",
+          "pattern": "NotificationSystem",
+          "match": "NotificationSystem",
+          "file": "js"
+        },
+        {
+          "line": 2969,
+          "content": "if (window.NotificationSystem) {",
+          "pattern": "NotificationSystem",
+          "match": "NotificationSystem",
+          "file": "js"
+        },
+        {
+          "line": 2970,
+          "content": "window.NotificationSystem.showError('שגיאה בטעינת נתונים', 'שגיאה בטעינת חשבונות מסחר');",
+          "pattern": "NotificationSystem",
+          "match": "NotificationSystem",
+          "file": "js"
+        },
+        {
+          "line": 2972,
+          "content": "// Error already handled by NotificationSystem above",
+          "pattern": "NotificationSystem",
+          "match": "NotificationSystem",
+          "file": "js"
+        },
+        {
+          "line": 3115,
+          "content": "if (window.NotificationSystem) {",
+          "pattern": "NotificationSystem",
+          "match": "NotificationSystem",
+          "file": "js"
+        },
+        {
+          "line": 3116,
+          "content": "window.NotificationSystem.showError('שגיאה בטעינת נתונים', 'שגיאה בטעינת טיקרים');",
+          "pattern": "NotificationSystem",
+          "match": "NotificationSystem",
+          "file": "js"
+        },
+        {
+          "line": 3118,
+          "content": "// Error already handled by NotificationSystem above",
+          "pattern": "NotificationSystem",
+          "match": "NotificationSystem",
+          "file": "js"
+        },
+        {
+          "line": 3910,
+          "content": "if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {",
+          "pattern": "NotificationSystem",
+          "match": "NotificationSystem",
+          "file": "js"
+        },
+        {
+          "line": 3910,
+          "content": "if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {",
+          "pattern": "NotificationSystem",
+          "match": "NotificationSystem",
+          "file": "js"
+        },
+        {
+          "line": 3911,
+          "content": "window.NotificationSystem.showError('שגיאה באתחול עמוד ניתוח השוואתי',",
+          "pattern": "NotificationSystem",
+          "match": "NotificationSystem",
+          "file": "js"
+        }
+      ],
+      "issue_count": 21,
+      "js_result": {
+        "status": "ok",
+        "issues": [
+          {
+            "line": 146,
+            "content": "if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {",
+            "pattern": "NotificationSystem",
+            "match": "NotificationSystem"
+          },
+          {
+            "line": 146,
+            "content": "if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {",
+            "pattern": "NotificationSystem",
+            "match": "NotificationSystem"
+          },
+          {
+            "line": 147,
+            "content": "window.NotificationSystem.showError('שגיאה בטעינת גרפים',",
+            "pattern": "NotificationSystem",
+            "match": "NotificationSystem"
+          },
+          {
+            "line": 157,
+            "content": "if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {",
+            "pattern": "NotificationSystem",
+            "match": "NotificationSystem"
+          },
+          {
+            "line": 157,
+            "content": "if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {",
+            "pattern": "NotificationSystem",
+            "match": "NotificationSystem"
+          },
+          {
+            "line": 158,
+            "content": "window.NotificationSystem.showError('שגיאה בטעינת גרפים',",
+            "pattern": "NotificationSystem",
+            "match": "NotificationSystem"
+          },
+          {
+            "line": 2131,
+            "content": "if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {",
+            "pattern": "NotificationSystem",
+            "match": "NotificationSystem"
+          },
+          {
+            "line": 2131,
+            "content": "if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {",
+            "pattern": "NotificationSystem",
+            "match": "NotificationSystem"
+          },
+          {
+            "line": 2132,
+            "content": "window.NotificationSystem.showError('שגיאה בטעינת גרף השוואה',",
+            "pattern": "NotificationSystem",
+            "match": "NotificationSystem"
+          },
+          {
+            "line": 2320,
+            "content": "if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {",
+            "pattern": "NotificationSystem",
+            "match": "NotificationSystem"
+          },
+          {
+            "line": 2320,
+            "content": "if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {",
+            "pattern": "NotificationSystem",
+            "match": "NotificationSystem"
+          },
+          {
+            "line": 2321,
+            "content": "window.NotificationSystem.showError('שגיאה בעדכון גרף השוואה',",
+            "pattern": "NotificationSystem",
+            "match": "NotificationSystem"
+          },
+          {
+            "line": 2969,
+            "content": "if (window.NotificationSystem) {",
+            "pattern": "NotificationSystem",
+            "match": "NotificationSystem"
+          },
+          {
+            "line": 2970,
+            "content": "window.NotificationSystem.showError('שגיאה בטעינת נתונים', 'שגיאה בטעינת חשבונות מסחר');",
+            "pattern": "NotificationSystem",
+            "match": "NotificationSystem"
+          },
+          {
+            "line": 2972,
+            "content": "// Error already handled by NotificationSystem above",
+            "pattern": "NotificationSystem",
+            "match": "NotificationSystem"
+          },
+          {
+            "line": 3115,
+            "content": "if (window.NotificationSystem) {",
+            "pattern": "NotificationSystem",
+            "match": "NotificationSystem"
+          },
+          {
+            "line": 3116,
+            "content": "window.NotificationSystem.showError('שגיאה בטעינת נתונים', 'שגיאה בטעינת טיקרים');",
+            "pattern": "NotificationSystem",
+            "match": "NotificationSystem"
+          },
+          {
+            "line": 3118,
+            "content": "// Error already handled by NotificationSystem above",
+            "pattern": "NotificationSystem",
+            "match": "NotificationSystem"
+          },
+          {
+            "line": 3910,
+            "content": "if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {",
+            "pattern": "NotificationSystem",
+            "match": "NotificationSystem"
+          },
+          {
+            "line": 3910,
+            "content": "if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {",
+            "pattern": "NotificationSystem",
+            "match": "NotificationSystem"
+          },
+          {
+            "line": 3911,
+            "content": "window.NotificationSystem.showError('שגיאה באתחול עמוד ניתוח השוואתי',",
+            "pattern": "NotificationSystem",
+            "match": "NotificationSystem"
+          }
+        ],
+        "issue_count": 21
+      },
+      "html_result": null
+    },
+    "modals": {
+      "status": "ok",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "ok",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": null
+    },
+    "tables": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": null
+    },
+    "field_renderer": {
+      "status": "ok",
+      "issues": [
+        {
+          "line": 1214,
+          "content": "// Use FieldRendererService if available",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 1216,
+          "content": "if (window.FieldRendererService && typeof window.FieldRendererService.renderAmount === 'function') {",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 1216,
+          "content": "if (window.FieldRendererService && typeof window.FieldRendererService.renderAmount === 'function') {",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 1217,
+          "content": "plFormatted = window.FieldRendererService.renderAmount(plValue, '$', 2, true);",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 1229,
+          "content": "// Add percentage if available - using FieldRendererService",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 1232,
+          "content": "if (window.FieldRendererService && typeof window.FieldRendererService.renderNumericValue === 'functi",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 1232,
+          "content": "if (window.FieldRendererService && typeof window.FieldRendererService.renderNumericValue === 'functi",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 1233,
+          "content": "percentHtml = window.FieldRendererService.renderNumericValue(plPercent, '%', true);",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 1251,
+          "content": "// Use FieldRendererService if available",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 1253,
+          "content": "if (window.FieldRendererService && typeof window.FieldRendererService.renderAmount === 'function') {",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 1253,
+          "content": "if (window.FieldRendererService && typeof window.FieldRendererService.renderAmount === 'function') {",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 1254,
+          "content": "valueFormatted = window.FieldRendererService.renderAmount(value, '$', 0, false);",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 1264,
+          "content": "// Add percentage if available - using FieldRendererService",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 1267,
+          "content": "if (window.FieldRendererService && typeof window.FieldRendererService.renderNumericValue === 'functi",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 1267,
+          "content": "if (window.FieldRendererService && typeof window.FieldRendererService.renderNumericValue === 'functi",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 1268,
+          "content": "percentHtml = window.FieldRendererService.renderNumericValue(percent, '%', true);",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 1567,
+          "content": "// Note: formatPLWithPercent already returns HTML with colors via FieldRendererService",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        },
+        {
+          "line": 1587,
+          "content": "// Note: formatPLWithPercent already returns HTML with colors via FieldRendererService",
+          "pattern": "FieldRendererService",
+          "match": "FieldRendererService",
+          "file": "js"
+        }
+      ],
+      "issue_count": 18,
+      "js_result": {
+        "status": "ok",
+        "issues": [
+          {
+            "line": 1214,
+            "content": "// Use FieldRendererService if available",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 1216,
+            "content": "if (window.FieldRendererService && typeof window.FieldRendererService.renderAmount === 'function') {",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 1216,
+            "content": "if (window.FieldRendererService && typeof window.FieldRendererService.renderAmount === 'function') {",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 1217,
+            "content": "plFormatted = window.FieldRendererService.renderAmount(plValue, '$', 2, true);",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 1229,
+            "content": "// Add percentage if available - using FieldRendererService",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 1232,
+            "content": "if (window.FieldRendererService && typeof window.FieldRendererService.renderNumericValue === 'functi",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 1232,
+            "content": "if (window.FieldRendererService && typeof window.FieldRendererService.renderNumericValue === 'functi",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 1233,
+            "content": "percentHtml = window.FieldRendererService.renderNumericValue(plPercent, '%', true);",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 1251,
+            "content": "// Use FieldRendererService if available",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 1253,
+            "content": "if (window.FieldRendererService && typeof window.FieldRendererService.renderAmount === 'function') {",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 1253,
+            "content": "if (window.FieldRendererService && typeof window.FieldRendererService.renderAmount === 'function') {",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 1254,
+            "content": "valueFormatted = window.FieldRendererService.renderAmount(value, '$', 0, false);",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 1264,
+            "content": "// Add percentage if available - using FieldRendererService",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 1267,
+            "content": "if (window.FieldRendererService && typeof window.FieldRendererService.renderNumericValue === 'functi",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 1267,
+            "content": "if (window.FieldRendererService && typeof window.FieldRendererService.renderNumericValue === 'functi",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 1268,
+            "content": "percentHtml = window.FieldRendererService.renderNumericValue(percent, '%', true);",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 1567,
+            "content": "// Note: formatPLWithPercent already returns HTML with colors via FieldRendererService",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          },
+          {
+            "line": 1587,
+            "content": "// Note: formatPLWithPercent already returns HTML with colors via FieldRendererService",
+            "pattern": "FieldRendererService",
+            "match": "FieldRendererService"
+          }
+        ],
+        "issue_count": 18
+      },
+      "html_result": null
+    },
+    "crud_handler": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": null
+    },
+    "select_populator": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": null
+    },
+    "data_collection": {
+      "status": "ok",
+      "issues": [
+        {
+          "line": 729,
+          "content": "// Use DataCollectionService to set values if available",
+          "pattern": "DataCollectionService",
+          "match": "DataCollectionService",
+          "file": "js"
+        },
+        {
+          "line": 730,
+          "content": "if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {",
+          "pattern": "DataCollectionService",
+          "match": "DataCollectionService",
+          "file": "js"
+        },
+        {
+          "line": 730,
+          "content": "if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {",
+          "pattern": "DataCollectionService",
+          "match": "DataCollectionService",
+          "file": "js"
+        },
+        {
+          "line": 732,
+          "content": "window.DataCollectionService.setValue('customDateFrom', filters.dateRangeStart, 'dateOnly');",
+          "pattern": "DataCollectionService",
+          "match": "DataCollectionService",
+          "file": "js"
+        },
+        {
+          "line": 735,
+          "content": "window.DataCollectionService.setValue('customDateTo', filters.dateRangeEnd, 'dateOnly');",
+          "pattern": "DataCollectionService",
+          "match": "DataCollectionService",
+          "file": "js"
+        },
+        {
+          "line": 2542,
+          "content": "// Use DataCollectionService to clear fields if available",
+          "pattern": "DataCollectionService",
+          "match": "DataCollectionService",
+          "file": "js"
+        },
+        {
+          "line": 2543,
+          "content": "if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {",
+          "pattern": "DataCollectionService",
+          "match": "DataCollectionService",
+          "file": "js"
+        },
+        {
+          "line": 2543,
+          "content": "if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {",
+          "pattern": "DataCollectionService",
+          "match": "DataCollectionService",
+          "file": "js"
+        },
+        {
+          "line": 2544,
+          "content": "window.DataCollectionService.setValue('customDateFrom', '', 'dateOnly');",
+          "pattern": "DataCollectionService",
+          "match": "DataCollectionService",
+          "file": "js"
+        },
+        {
+          "line": 2545,
+          "content": "window.DataCollectionService.setValue('customDateTo', '', 'dateOnly');",
+          "pattern": "DataCollectionService",
+          "match": "DataCollectionService",
+          "file": "js"
+        },
+        {
+          "line": 2604,
+          "content": "// Use DataCollectionService to clear fields if available",
+          "pattern": "DataCollectionService",
+          "match": "DataCollectionService",
+          "file": "js"
+        },
+        {
+          "line": 2605,
+          "content": "if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {",
+          "pattern": "DataCollectionService",
+          "match": "DataCollectionService",
+          "file": "js"
+        },
+        {
+          "line": 2605,
+          "content": "if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {",
+          "pattern": "DataCollectionService",
+          "match": "DataCollectionService",
+          "file": "js"
+        },
+        {
+          "line": 2606,
+          "content": "window.DataCollectionService.setValue('customDateFrom', '', 'dateOnly');",
+          "pattern": "DataCollectionService",
+          "match": "DataCollectionService",
+          "file": "js"
+        },
+        {
+          "line": 2607,
+          "content": "window.DataCollectionService.setValue('customDateTo', '', 'dateOnly');",
+          "pattern": "DataCollectionService",
+          "match": "DataCollectionService",
+          "file": "js"
+        }
+      ],
+      "issue_count": 15,
+      "js_result": {
+        "status": "ok",
+        "issues": [
+          {
+            "line": 729,
+            "content": "// Use DataCollectionService to set values if available",
+            "pattern": "DataCollectionService",
+            "match": "DataCollectionService"
+          },
+          {
+            "line": 730,
+            "content": "if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {",
+            "pattern": "DataCollectionService",
+            "match": "DataCollectionService"
+          },
+          {
+            "line": 730,
+            "content": "if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {",
+            "pattern": "DataCollectionService",
+            "match": "DataCollectionService"
+          },
+          {
+            "line": 732,
+            "content": "window.DataCollectionService.setValue('customDateFrom', filters.dateRangeStart, 'dateOnly');",
+            "pattern": "DataCollectionService",
+            "match": "DataCollectionService"
+          },
+          {
+            "line": 735,
+            "content": "window.DataCollectionService.setValue('customDateTo', filters.dateRangeEnd, 'dateOnly');",
+            "pattern": "DataCollectionService",
+            "match": "DataCollectionService"
+          },
+          {
+            "line": 2542,
+            "content": "// Use DataCollectionService to clear fields if available",
+            "pattern": "DataCollectionService",
+            "match": "DataCollectionService"
+          },
+          {
+            "line": 2543,
+            "content": "if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {",
+            "pattern": "DataCollectionService",
+            "match": "DataCollectionService"
+          },
+          {
+            "line": 2543,
+            "content": "if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {",
+            "pattern": "DataCollectionService",
+            "match": "DataCollectionService"
+          },
+          {
+            "line": 2544,
+            "content": "window.DataCollectionService.setValue('customDateFrom', '', 'dateOnly');",
+            "pattern": "DataCollectionService",
+            "match": "DataCollectionService"
+          },
+          {
+            "line": 2545,
+            "content": "window.DataCollectionService.setValue('customDateTo', '', 'dateOnly');",
+            "pattern": "DataCollectionService",
+            "match": "DataCollectionService"
+          },
+          {
+            "line": 2604,
+            "content": "// Use DataCollectionService to clear fields if available",
+            "pattern": "DataCollectionService",
+            "match": "DataCollectionService"
+          },
+          {
+            "line": 2605,
+            "content": "if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {",
+            "pattern": "DataCollectionService",
+            "match": "DataCollectionService"
+          },
+          {
+            "line": 2605,
+            "content": "if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {",
+            "pattern": "DataCollectionService",
+            "match": "DataCollectionService"
+          },
+          {
+            "line": 2606,
+            "content": "window.DataCollectionService.setValue('customDateFrom', '', 'dateOnly');",
+            "pattern": "DataCollectionService",
+            "match": "DataCollectionService"
+          },
+          {
+            "line": 2607,
+            "content": "window.DataCollectionService.setValue('customDateTo', '', 'dateOnly');",
+            "pattern": "DataCollectionService",
+            "match": "DataCollectionService"
+          }
+        ],
+        "issue_count": 15
+      },
+      "html_result": null
+    },
+    "icons": {
+      "status": "ok",
+      "issues": [
+        {
+          "line": 2142,
+          "content": "if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 2142,
+          "content": "if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 2144,
+          "content": "alertIcon = await window.IconSystem.renderIcon('button', 'alert-triangle', { size: '16', alt: 'alert",
+          "pattern": "IconSystem",
+          "match": "IconSystem",
+          "file": "js"
+        },
+        {
+          "line": 2141,
+          "content": "let alertIcon = '<img src=\"../../images/icons/tabler/alert-triangle.svg\" width=\"16\" height=\"16\" alt=",
+          "pattern": "<img.*icon",
+          "match": "<img src=\"../../images/icons/tabler/alert-triangle",
+          "file": "js"
+        }
+      ],
+      "issue_count": 4,
+      "js_result": {
+        "status": "ok",
+        "issues": [
+          {
+            "line": 2142,
+            "content": "if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 2142,
+            "content": "if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 2144,
+            "content": "alertIcon = await window.IconSystem.renderIcon('button', 'alert-triangle', { size: '16', alt: 'alert",
+            "pattern": "IconSystem",
+            "match": "IconSystem"
+          },
+          {
+            "line": 2141,
+            "content": "let alertIcon = '<img src=\"../../images/icons/tabler/alert-triangle.svg\" width=\"16\" height=\"16\" alt=",
+            "pattern": "<img.*icon",
+            "match": "<img src=\"../../images/icons/tabler/alert-triangle"
+          }
+        ],
+        "issue_count": 4
+      },
+      "html_result": null
+    },
+    "colors": {
+      "status": "missing",
+      "issues": [
+        {
+          "line": 23,
+          "content": "// ⚠️ REMOVED: Local getEntityColor() function - use centralized Color Scheme System",
+          "pattern": "getEntityColor",
+          "match": "getEntityColor",
+          "file": "js"
+        },
+        {
+          "line": 24,
+          "content": "// Use window.getEntityColor() directly instead",
+          "pattern": "getEntityColor",
+          "match": "getEntityColor",
+          "file": "js"
+        },
+        {
+          "line": 34,
+          "content": "const color = (typeof window.getEntityColor === 'function')",
+          "pattern": "getEntityColor",
+          "match": "getEntityColor",
+          "file": "js"
+        },
+        {
+          "line": 35,
+          "content": "? window.getEntityColor(series.entityType)",
+          "pattern": "getEntityColor",
+          "match": "getEntityColor",
+          "file": "js"
+        },
+        {
+          "line": 2037,
+          "content": "const color = (typeof window.getEntityColor === 'function')",
+          "pattern": "getEntityColor",
+          "match": "getEntityColor",
+          "file": "js"
+        },
+        {
+          "line": 2038,
+          "content": "? window.getEntityColor(seriesConfig.entityType)",
+          "pattern": "getEntityColor",
+          "match": "getEntityColor",
+          "file": "js"
+        },
+        {
+          "line": 2065,
+          "content": "const color = (typeof window.getEntityColor === 'function')",
+          "pattern": "getEntityColor",
+          "match": "getEntityColor",
+          "file": "js"
+        },
+        {
+          "line": 2066,
+          "content": "? window.getEntityColor(seriesConfig.entityType)",
+          "pattern": "getEntityColor",
+          "match": "getEntityColor",
+          "file": "js"
+        },
+        {
+          "line": 2167,
+          "content": "const color = (typeof window.getEntityColor === 'function')",
+          "pattern": "getEntityColor",
+          "match": "getEntityColor",
+          "file": "js"
+        },
+        {
+          "line": 2168,
+          "content": "? window.getEntityColor(seriesConfig.entityType)",
+          "pattern": "getEntityColor",
+          "match": "getEntityColor",
+          "file": "js"
+        },
+        {
+          "line": 2255,
+          "content": "const color = (typeof window.getEntityColor === 'function')",
+          "pattern": "getEntityColor",
+          "match": "getEntityColor",
+          "file": "js"
+        },
+        {
+          "line": 2256,
+          "content": "? window.getEntityColor(seriesConfig.entityType)",
+          "pattern": "getEntityColor",
+          "match": "getEntityColor",
+          "file": "js"
+        },
+        {
+          "line": 3931,
+          "content": "getEntityColor,",
+          "pattern": "getEntityColor",
+          "match": "getEntityColor",
+          "file": "js"
+        }
+      ],
+      "issue_count": 13,
+      "js_result": {
+        "status": "missing",
+        "issues": [
+          {
+            "line": 23,
+            "content": "// ⚠️ REMOVED: Local getEntityColor() function - use centralized Color Scheme System",
+            "pattern": "getEntityColor",
+            "match": "getEntityColor"
+          },
+          {
+            "line": 24,
+            "content": "// Use window.getEntityColor() directly instead",
+            "pattern": "getEntityColor",
+            "match": "getEntityColor"
+          },
+          {
+            "line": 34,
+            "content": "const color = (typeof window.getEntityColor === 'function')",
+            "pattern": "getEntityColor",
+            "match": "getEntityColor"
+          },
+          {
+            "line": 35,
+            "content": "? window.getEntityColor(series.entityType)",
+            "pattern": "getEntityColor",
+            "match": "getEntityColor"
+          },
+          {
+            "line": 2037,
+            "content": "const color = (typeof window.getEntityColor === 'function')",
+            "pattern": "getEntityColor",
+            "match": "getEntityColor"
+          },
+          {
+            "line": 2038,
+            "content": "? window.getEntityColor(seriesConfig.entityType)",
+            "pattern": "getEntityColor",
+            "match": "getEntityColor"
+          },
+          {
+            "line": 2065,
+            "content": "const color = (typeof window.getEntityColor === 'function')",
+            "pattern": "getEntityColor",
+            "match": "getEntityColor"
+          },
+          {
+            "line": 2066,
+            "content": "? window.getEntityColor(seriesConfig.entityType)",
+            "pattern": "getEntityColor",
+            "match": "getEntityColor"
+          },
+          {
+            "line": 2167,
+            "content": "const color = (typeof window.getEntityColor === 'function')",
+            "pattern": "getEntityColor",
+            "match": "getEntityColor"
+          },
+          {
+            "line": 2168,
+            "content": "? window.getEntityColor(seriesConfig.entityType)",
+            "pattern": "getEntityColor",
+            "match": "getEntityColor"
+          },
+          {
+            "line": 2255,
+            "content": "const color = (typeof window.getEntityColor === 'function')",
+            "pattern": "getEntityColor",
+            "match": "getEntityColor"
+          },
+          {
+            "line": 2256,
+            "content": "? window.getEntityColor(seriesConfig.entityType)",
+            "pattern": "getEntityColor",
+            "match": "getEntityColor"
+          },
+          {
+            "line": 3931,
+            "content": "getEntityColor,",
+            "pattern": "getEntityColor",
+            "match": "getEntityColor"
+          }
+        ],
+        "issue_count": 13
+      },
+      "html_result": null
+    },
+    "info_summary": {
+      "status": "ok",
+      "issues": [
+        {
+          "line": 1616,
+          "content": "// Consider using InfoSummarySystem if this page becomes production-ready",
+          "pattern": "InfoSummarySystem",
+          "match": "InfoSummarySystem",
+          "file": "js"
+        }
+      ],
+      "issue_count": 1,
+      "js_result": {
+        "status": "ok",
+        "issues": [
+          {
+            "line": 1616,
+            "content": "// Consider using InfoSummarySystem if this page becomes production-ready",
+            "pattern": "InfoSummarySystem",
+            "match": "InfoSummarySystem"
+          }
+        ],
+        "issue_count": 1
+      },
+      "html_result": null
+    },
+    "pagination": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": null
+    },
+    "entity_details": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": null
+    },
+    "conditions": {
+      "status": "missing",
+      "issues": [],
+      "issue_count": 0,
+      "js_result": {
+        "status": "missing",
+        "issues": [],
+        "issue_count": 0
+      },
+      "html_result": null
+    },
+    "page_state": {
+      "status": "ok",
+      "issues": [
+        {
+          "line": 68,
+          "content": "window.PageStateManager?.setItem(PREF_SERIES_VISIBILITY, JSON.stringify(seriesVisibility));",
+          "pattern": "PageStateManager",
+          "match": "PageStateManager",
+          "file": "js"
+        },
+        {
+          "line": 85,
+          "content": "const saved = window.PageStateManager?.getItem(PREF_SERIES_VISIBILITY);",
+          "pattern": "PageStateManager",
+          "match": "PageStateManager",
+          "file": "js"
+        },
+        {
+          "line": 531,
+          "content": "// Use PageStateManager if available",
+          "pattern": "PageStateManager",
+          "match": "PageStateManager",
+          "file": "js"
+        },
+        {
+          "line": 532,
+          "content": "if (window.PageStateManager) {",
+          "pattern": "PageStateManager",
+          "match": "PageStateManager",
+          "file": "js"
+        },
+        {
+          "line": 534,
+          "content": "await window.PageStateManager.savePageState('comparative-analysis-page', {",
+          "pattern": "PageStateManager",
+          "match": "PageStateManager",
+          "file": "js"
+        },
+        {
+          "line": 538,
+          "content": "// Fallback to PreferencesCore if PageStateManager fails",
+          "pattern": "PageStateManager",
+          "match": "PageStateManager",
+          "file": "js"
+        },
+        {
+          "line": 544,
+          "content": "window.PageStateManager?.setItem(PREF_FILTERS, JSON.stringify(filters));",
+          "pattern": "PageStateManager",
+          "match": "PageStateManager",
+          "file": "js"
+        },
+        {
+          "line": 548,
+          "content": "window.PageStateManager?.setItem(PREF_FILTERS, JSON.stringify(filters));",
+          "pattern": "PageStateManager",
+          "match": "PageStateManager",
+          "file": "js"
+        },
+        {
+          "line": 552,
+          "content": "window.PageStateManager?.setItem(PREF_FILTERS, JSON.stringify(filters));",
+          "pattern": "PageStateManager",
+          "match": "PageStateManager",
+          "file": "js"
+        },
+        {
+          "line": 567,
+          "content": "window.PageStateManager?.setItem(PREF_FILTERS, JSON.stringify(filters));",
+          "pattern": "PageStateManager",
+          "match": "PageStateManager",
+          "file": "js"
+        },
+        {
+          "line": 578,
+          "content": "window.PageStateManager?.setItem(PREF_FILTERS, JSON.stringify(filters));",
+          "pattern": "PageStateManager",
+          "match": "PageStateManager",
+          "file": "js"
+        },
+        {
+          "line": 582,
+          "content": "window.PageStateManager?.setItem(PREF_FILTERS, JSON.stringify(filters));",
+          "pattern": "PageStateManager",
+          "match": "PageStateManager",
+          "file": "js"
+        },
+        {
+          "line": 591,
+          "content": "window.PageStateManager?.setItem(PREF_FILTERS, JSON.stringify(filters));",
+          "pattern": "PageStateManager",
+          "match": "PageStateManager",
+          "file": "js"
+        },
+        {
+          "line": 607,
+          "content": "if (!window.PageStateManager) {",
+          "pattern": "PageStateManager",
+          "match": "PageStateManager",
+          "file": "js"
+        },
+        {
+          "line": 616,
+          "content": "const state = await window.PageStateManager.loadPageState('comparative-analysis-page');",
+          "pattern": "PageStateManager",
+          "match": "PageStateManager",
+          "file": "js"
+        },
+        {
+          "line": 681,
+          "content": "const saved = window.PageStateManager?.getItem(PREF_FILTERS);",
+          "pattern": "PageStateManager",
+          "match": "PageStateManager",
+          "file": "js"
+        },
+        {
+          "line": 3144,
+          "content": "window.PageStateManager?.setItem(PREF_RECORD_FILTERS, JSON.stringify(filters));",
+          "pattern": "PageStateManager",
+          "match": "PageStateManager",
+          "file": "js"
+        },
+        {
+          "line": 3160,
+          "content": "const saved = window.PageStateManager?.getItem(PREF_RECORD_FILTERS);",
+          "pattern": "PageStateManager",
+          "match": "PageStateManager",
+          "file": "js"
+        },
+        {
+          "line": 3191,
+          "content": "window.PageStateManager?.setItem(PREF_COMPARISON_PARAMS, JSON.stringify(params));",
+          "pattern": "PageStateManager",
+          "match": "PageStateManager",
+          "file": "js"
+        },
+        {
+          "line": 3202,
+          "content": "window.PageStateManager?.setItem(PREF_COMPARISON_PARAMS, JSON.stringify(params));",
+          "pattern": "PageStateManager",
+          "match": "PageStateManager",
+          "file": "js"
+        },
+        {
+          "line": 3206,
+          "content": "window.PageStateManager?.setItem(PREF_COMPARISON_PARAMS, JSON.stringify(params));",
+          "pattern": "PageStateManager",
+          "match": "PageStateManager",
+          "file": "js"
+        },
+        {
+          "line": 3215,
+          "content": "window.PageStateManager?.setItem(PREF_COMPARISON_PARAMS, JSON.stringify(params));",
+          "pattern": "PageStateManager",
+          "match": "PageStateManager",
+          "file": "js"
+        },
+        {
+          "line": 3236,
+          "content": "const saved = window.PageStateManager?.getItem(PREF_COMPARISON_PARAMS);",
+          "pattern": "PageStateManager",
+          "match": "PageStateManager",
+          "file": "js"
+        },
+        {
+          "line": 3769,
+          "content": "const savedRecordFiltersStr = window.PageStateManager?.getItem(PREF_RECORD_FILTERS);",
+          "pattern": "PageStateManager",
+          "match": "PageStateManager",
+          "file": "js"
+        },
+        {
+          "line": 3770,
+          "content": "const savedComparisonParamsStr = window.PageStateManager?.getItem(PREF_COMPARISON_PARAMS);",
+          "pattern": "PageStateManager",
+          "match": "PageStateManager",
+          "file": "js"
+        }
+      ],
+      "issue_count": 25,
+      "js_result": {
+        "status": "ok",
+        "issues": [
+          {
+            "line": 68,
+            "content": "window.PageStateManager?.setItem(PREF_SERIES_VISIBILITY, JSON.stringify(seriesVisibility));",
+            "pattern": "PageStateManager",
+            "match": "PageStateManager"
+          },
+          {
+            "line": 85,
+            "content": "const saved = window.PageStateManager?.getItem(PREF_SERIES_VISIBILITY);",
+            "pattern": "PageStateManager",
+            "match": "PageStateManager"
+          },
+          {
+            "line": 531,
+            "content": "// Use PageStateManager if available",
+            "pattern": "PageStateManager",
+            "match": "PageStateManager"
+          },
+          {
+            "line": 532,
+            "content": "if (window.PageStateManager) {",
+            "pattern": "PageStateManager",
+            "match": "PageStateManager"
+          },
+          {
+            "line": 534,
+            "content": "await window.PageStateManager.savePageState('comparative-analysis-page', {",
+            "pattern": "PageStateManager",
+            "match": "PageStateManager"
+          },
+          {
+            "line": 538,
+            "content": "// Fallback to PreferencesCore if PageStateManager fails",
+            "pattern": "PageStateManager",
+            "match": "PageStateManager"
+          },
+          {
+            "line": 544,
+            "content": "window.PageStateManager?.setItem(PREF_FILTERS, JSON.stringify(filters));",
+            "pattern": "PageStateManager",
+            "match": "PageStateManager"
+          },
+          {
+            "line": 548,
+            "content": "window.PageStateManager?.setItem(PREF_FILTERS, JSON.stringify(filters));",
+            "pattern": "PageStateManager",
+            "match": "PageStateManager"
+          },
+          {
+            "line": 552,
+            "content": "window.PageStateManager?.setItem(PREF_FILTERS, JSON.stringify(filters));",
+            "pattern": "PageStateManager",
+            "match": "PageStateManager"
+          },
+          {
+            "line": 567,
+            "content": "window.PageStateManager?.setItem(PREF_FILTERS, JSON.stringify(filters));",
+            "pattern": "PageStateManager",
+            "match": "PageStateManager"
+          },
+          {
+            "line": 578,
+            "content": "window.PageStateManager?.setItem(PREF_FILTERS, JSON.stringify(filters));",
+            "pattern": "PageStateManager",
+            "match": "PageStateManager"
+          },
+          {
+            "line": 582,
+            "content": "window.PageStateManager?.setItem(PREF_FILTERS, JSON.stringify(filters));",
+            "pattern": "PageStateManager",
+            "match": "PageStateManager"
+          },
+          {
+            "line": 591,
+            "content": "window.PageStateManager?.setItem(PREF_FILTERS, JSON.stringify(filters));",
+            "pattern": "PageStateManager",
+            "match": "PageStateManager"
+          },
+          {
+            "line": 607,
+            "content": "if (!window.PageStateManager) {",
+            "pattern": "PageStateManager",
+            "match": "PageStateManager"
+          },
+          {
+            "line": 616,
+            "content": "const state = await window.PageStateManager.loadPageState('comparative-analysis-page');",
+            "pattern": "PageStateManager",
+            "match": "PageStateManager"
+          },
+          {
+            "line": 681,
+            "content": "const saved = window.PageStateManager?.getItem(PREF_FILTERS);",
+            "pattern": "PageStateManager",
+            "match": "PageStateManager"
+          },
+          {
+            "line": 3144,
+            "content": "window.PageStateManager?.setItem(PREF_RECORD_FILTERS, JSON.stringify(filters));",
+            "pattern": "PageStateManager",
+            "match": "PageStateManager"
+          },
+          {
+            "line": 3160,
+            "content": "const saved = window.PageStateManager?.getItem(PREF_RECORD_FILTERS);",
+            "pattern": "PageStateManager",
+            "match": "PageStateManager"
+          },
+          {
+            "line": 3191,
+            "content": "window.PageStateManager?.setItem(PREF_COMPARISON_PARAMS, JSON.stringify(params));",
+            "pattern": "PageStateManager",
+            "match": "PageStateManager"
+          },
+          {
+            "line": 3202,
+            "content": "window.PageStateManager?.setItem(PREF_COMPARISON_PARAMS, JSON.stringify(params));",
+            "pattern": "PageStateManager",
+            "match": "PageStateManager"
+          },
+          {
+            "line": 3206,
+            "content": "window.PageStateManager?.setItem(PREF_COMPARISON_PARAMS, JSON.stringify(params));",
+            "pattern": "PageStateManager",
+            "match": "PageStateManager"
+          },
+          {
+            "line": 3215,
+            "content": "window.PageStateManager?.setItem(PREF_COMPARISON_PARAMS, JSON.stringify(params));",
+            "pattern": "PageStateManager",
+            "match": "PageStateManager"
+          },
+          {
+            "line": 3236,
+            "content": "const saved = window.PageStateManager?.getItem(PREF_COMPARISON_PARAMS);",
+            "pattern": "PageStateManager",
+            "match": "PageStateManager"
+          },
+          {
+            "line": 3769,
+            "content": "const savedRecordFiltersStr = window.PageStateManager?.getItem(PREF_RECORD_FILTERS);",
+            "pattern": "PageStateManager",
+            "match": "PageStateManager"
+          },
+          {
+            "line": 3770,
+            "content": "const savedComparisonParamsStr = window.PageStateManager?.getItem(PREF_COMPARISON_PARAMS);",
+            "pattern": "PageStateManager",
+            "match": "PageStateManager"
+          }
+        ],
+        "issue_count": 25
+      },
+      "html_result": null
+    },
+    "logger": {
+      "status": "ok",
+      "issues": [
+        {
+          "line": 71,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 72,
+          "content": "window.Logger.warn('Failed to save series visibility state', { page: 'comparative-analysis-page', er",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 99,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 100,
+          "content": "window.Logger.warn('Failed to load series visibility state', { page: 'comparative-analysis-page', er",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 149,
+          "content": "} else if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 150,
+          "content": "window.Logger.error('❌ TradingViewChartAdapter not available', { page: 'comparative-analysis-page', ",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 160,
+          "content": "} else if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 161,
+          "content": "window.Logger.error('❌ LightweightCharts not available', { page: 'comparative-analysis-page', timeou",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 166,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 167,
+          "content": "window.Logger.info('✅ TradingView libraries loaded', { page: 'comparative-analysis-page' });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 561,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 562,
+          "content": "window.Logger.warn('Preference save failed, using localStorage fallback', {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 571,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 572,
+          "content": "window.Logger.warn('Preference save error, using localStorage fallback', {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 585,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 586,
+          "content": "window.Logger.warn('Failed to save filter state', { page: 'comparative-analysis-page', error });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 594,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 595,
+          "content": "window.Logger.warn('Failed to save preference to localStorage (final fallback failed)', {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 659,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 660,
+          "content": "window.Logger.debug('✅ Restored page state', { page: 'comparative-analysis-page' });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 663,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 664,
+          "content": "window.Logger.warn('Failed to restore page state, using fallback', { error, page: 'comparative-analy",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 773,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 774,
+          "content": "window.Logger.warn('Failed to load filter state', { page: 'comparative-analysis-page', error });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 815,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 816,
+          "content": "window.Logger.info('🔍 Creating comparison categories', {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 911,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 912,
+          "content": "window.Logger.warn('⚠️ No comparison parameters enabled - returning empty categories', {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 920,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 921,
+          "content": "window.Logger.info('✅ Creating categories from enabled parameters', {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 943,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 944,
+          "content": "window.Logger.info('📊 Generated category combinations', {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1748,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1749,
+          "content": "window.Logger.info('Filtering by category', { page: 'comparative-analysis-page', category });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1933,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1934,
+          "content": "window.Logger.warn('Comparison chart container not found', { page: 'comparative-analysis-page' });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1945,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1946,
+          "content": "window.Logger.warn('Comparison chart container has zero dimensions, waiting...', { page: 'comparativ",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1965,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 1966,
+          "content": "window.Logger.warn('Error removing existing comparison chart', { page: 'comparative-analysis-page', ",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 2015,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 2016,
+          "content": "window.Logger.warn('Error removing series', { page: 'comparative-analysis-page', error: e });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 2125,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 2126,
+          "content": "window.Logger.info('✅ Comparison chart initialized', { page: 'comparative-analysis-page' });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 2134,
+          "content": "} else if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 2135,
+          "content": "window.Logger.error('Error initializing comparison chart', { page: 'comparative-analysis-page', erro",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 2219,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 2220,
+          "content": "window.Logger.warn('Chart initialization failed, skipping update', { page: 'comparative-analysis-pag",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 2233,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 2234,
+          "content": "window.Logger.warn('Error removing series', { page: 'comparative-analysis-page', error: e });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 2323,
+          "content": "} else if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 2324,
+          "content": "window.Logger.error('Error updating comparison chart', { page: 'comparative-analysis-page', error })",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 2961,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 2962,
+          "content": "window.Logger.info('✅ Trading accounts loaded', { page: 'comparative-analysis-page' });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 2973,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 2974,
+          "content": "window.Logger.warn('❌ Error loading trading accounts', { page: 'comparative-analysis-page', error })",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 3009,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 3010,
+          "content": "window.Logger.info('✅ Trading methods loaded via ConditionsCRUDManager', { page: 'comparative-analys",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 3031,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 3032,
+          "content": "window.Logger.info('✅ Trading methods loaded (mock data)', { page: 'comparative-analysis-page' });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 3111,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 3112,
+          "content": "window.Logger.info('✅ Tickers loaded', { page: 'comparative-analysis-page' });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 3119,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 3120,
+          "content": "window.Logger.warn('❌ Error loading tickers', { page: 'comparative-analysis-page', error });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 3147,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 3148,
+          "content": "window.Logger.warn('Failed to save record filter state', { page: 'comparative-analysis-page', error ",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 3170,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 3171,
+          "content": "window.Logger.warn('Failed to load record filter state', { page: 'comparative-analysis-page', error ",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 3185,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 3186,
+          "content": "window.Logger.warn('Preference save failed, using localStorage fallback', {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 3195,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 3196,
+          "content": "window.Logger.warn('Preference save error, using localStorage fallback', {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 3209,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 3210,
+          "content": "window.Logger.warn('Failed to save comparison parameter state', { page: 'comparative-analysis-page',",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 3218,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 3219,
+          "content": "window.Logger.warn('Failed to save preference to localStorage (final fallback failed)', {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 3340,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 3341,
+          "content": "window.Logger.warn('Failed to load comparison parameter state', { page: 'comparative-analysis-page',",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 3569,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 3570,
+          "content": "window.Logger.warn('⚠️ Tags filter select not found', { page: 'comparative-analysis-page' });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 3584,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 3585,
+          "content": "window.Logger.warn('⚠️ TagUIManager not available after waiting', { page: 'comparative-analysis-page",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 3594,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 3595,
+          "content": "window.Logger.info('✅ Tags filter initialized', { page: 'comparative-analysis-page' });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 3598,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 3599,
+          "content": "window.Logger.warn('⚠️ TagUIManager.refreshSelectOptions not available', { page: 'comparative-analys",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 3603,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 3604,
+          "content": "window.Logger.error('❌ Error initializing tags filter', { page: 'comparative-analysis-page', error }",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 3613,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 3614,
+          "content": "window.Logger.warn('⚠️ Record filter tags select not found', { page: 'comparative-analysis-page' });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 3628,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 3629,
+          "content": "window.Logger.warn('⚠️ TagUIManager not available after waiting', { page: 'comparative-analysis-page",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 3638,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 3639,
+          "content": "window.Logger.info('✅ Record filter tags initialized', { page: 'comparative-analysis-page' });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 3642,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 3643,
+          "content": "window.Logger.warn('⚠️ TagUIManager.refreshSelectOptions not available', { page: 'comparative-analys",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 3647,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 3648,
+          "content": "window.Logger.error('❌ Error initializing record filter tags', { page: 'comparative-analysis-page', ",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 3657,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 3658,
+          "content": "window.Logger.warn('⚠️ Comparison tags select not found', { page: 'comparative-analysis-page' });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 3672,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 3673,
+          "content": "window.Logger.warn('⚠️ TagUIManager not available after waiting', { page: 'comparative-analysis-page",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 3682,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 3683,
+          "content": "window.Logger.info('✅ Comparison tags initialized', { page: 'comparative-analysis-page' });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 3686,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 3687,
+          "content": "window.Logger.warn('⚠️ TagUIManager.refreshSelectOptions not available', { page: 'comparative-analys",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 3691,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 3692,
+          "content": "window.Logger.error('❌ Error initializing comparison tags', { page: 'comparative-analysis-page', err",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 3705,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 3706,
+          "content": "window.Logger.info('✅ Header System initialized', { page: 'comparative-analysis-page' });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 3709,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 3710,
+          "content": "window.Logger.error('Error initializing Header System', {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 3721,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 3722,
+          "content": "window.Logger.error('Error initializing Header System (retry)', {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 3729,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 3730,
+          "content": "window.Logger.warn('HeaderSystem not available after retry', { page: 'comparative-analysis-page' });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 3843,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 3844,
+          "content": "window.Logger.info('✅ Default comparison parameters set (Investment Types - all)', {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 3851,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 3852,
+          "content": "window.Logger.warn('⚠️ Could not set default comparison parameters - elements not ready', {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 3867,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 3868,
+          "content": "window.Logger.info('📊 Current comparison parameters after initialization', {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 3904,
+          "content": "if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 3905,
+          "content": "window.Logger.info('✅ Comparative analysis page initialized', { page: 'comparative-analysis-page' })",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 3913,
+          "content": "} else if (window.Logger) {",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        },
+        {
+          "line": 3914,
+          "content": "window.Logger.error('Error initializing page', { page: 'comparative-analysis-page', error });",
+          "pattern": "window\\.Logger",
+          "match": "window.Logger",
+          "file": "js"
+        }
+      ],
+      "issue_count": 126,
+      "js_result": {
+        "status": "ok",
+        "issues": [
+          {
+            "line": 71,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 72,
+            "content": "window.Logger.warn('Failed to save series visibility state', { page: 'comparative-analysis-page', er",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 99,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 100,
+            "content": "window.Logger.warn('Failed to load series visibility state', { page: 'comparative-analysis-page', er",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 149,
+            "content": "} else if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 150,
+            "content": "window.Logger.error('❌ TradingViewChartAdapter not available', { page: 'comparative-analysis-page', ",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 160,
+            "content": "} else if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 161,
+            "content": "window.Logger.error('❌ LightweightCharts not available', { page: 'comparative-analysis-page', timeou",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 166,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 167,
+            "content": "window.Logger.info('✅ TradingView libraries loaded', { page: 'comparative-analysis-page' });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 561,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 562,
+            "content": "window.Logger.warn('Preference save failed, using localStorage fallback', {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 571,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 572,
+            "content": "window.Logger.warn('Preference save error, using localStorage fallback', {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 585,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 586,
+            "content": "window.Logger.warn('Failed to save filter state', { page: 'comparative-analysis-page', error });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 594,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 595,
+            "content": "window.Logger.warn('Failed to save preference to localStorage (final fallback failed)', {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 659,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 660,
+            "content": "window.Logger.debug('✅ Restored page state', { page: 'comparative-analysis-page' });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 663,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 664,
+            "content": "window.Logger.warn('Failed to restore page state, using fallback', { error, page: 'comparative-analy",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 773,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 774,
+            "content": "window.Logger.warn('Failed to load filter state', { page: 'comparative-analysis-page', error });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 815,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 816,
+            "content": "window.Logger.info('🔍 Creating comparison categories', {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 911,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 912,
+            "content": "window.Logger.warn('⚠️ No comparison parameters enabled - returning empty categories', {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 920,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 921,
+            "content": "window.Logger.info('✅ Creating categories from enabled parameters', {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 943,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 944,
+            "content": "window.Logger.info('📊 Generated category combinations', {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1748,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1749,
+            "content": "window.Logger.info('Filtering by category', { page: 'comparative-analysis-page', category });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1933,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1934,
+            "content": "window.Logger.warn('Comparison chart container not found', { page: 'comparative-analysis-page' });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1945,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1946,
+            "content": "window.Logger.warn('Comparison chart container has zero dimensions, waiting...', { page: 'comparativ",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1965,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 1966,
+            "content": "window.Logger.warn('Error removing existing comparison chart', { page: 'comparative-analysis-page', ",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 2015,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 2016,
+            "content": "window.Logger.warn('Error removing series', { page: 'comparative-analysis-page', error: e });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 2125,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 2126,
+            "content": "window.Logger.info('✅ Comparison chart initialized', { page: 'comparative-analysis-page' });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 2134,
+            "content": "} else if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 2135,
+            "content": "window.Logger.error('Error initializing comparison chart', { page: 'comparative-analysis-page', erro",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 2219,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 2220,
+            "content": "window.Logger.warn('Chart initialization failed, skipping update', { page: 'comparative-analysis-pag",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 2233,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 2234,
+            "content": "window.Logger.warn('Error removing series', { page: 'comparative-analysis-page', error: e });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 2323,
+            "content": "} else if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 2324,
+            "content": "window.Logger.error('Error updating comparison chart', { page: 'comparative-analysis-page', error })",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 2961,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 2962,
+            "content": "window.Logger.info('✅ Trading accounts loaded', { page: 'comparative-analysis-page' });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 2973,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 2974,
+            "content": "window.Logger.warn('❌ Error loading trading accounts', { page: 'comparative-analysis-page', error })",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 3009,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 3010,
+            "content": "window.Logger.info('✅ Trading methods loaded via ConditionsCRUDManager', { page: 'comparative-analys",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 3031,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 3032,
+            "content": "window.Logger.info('✅ Trading methods loaded (mock data)', { page: 'comparative-analysis-page' });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 3111,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 3112,
+            "content": "window.Logger.info('✅ Tickers loaded', { page: 'comparative-analysis-page' });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 3119,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 3120,
+            "content": "window.Logger.warn('❌ Error loading tickers', { page: 'comparative-analysis-page', error });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 3147,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 3148,
+            "content": "window.Logger.warn('Failed to save record filter state', { page: 'comparative-analysis-page', error ",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 3170,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 3171,
+            "content": "window.Logger.warn('Failed to load record filter state', { page: 'comparative-analysis-page', error ",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 3185,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 3186,
+            "content": "window.Logger.warn('Preference save failed, using localStorage fallback', {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 3195,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 3196,
+            "content": "window.Logger.warn('Preference save error, using localStorage fallback', {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 3209,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 3210,
+            "content": "window.Logger.warn('Failed to save comparison parameter state', { page: 'comparative-analysis-page',",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 3218,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 3219,
+            "content": "window.Logger.warn('Failed to save preference to localStorage (final fallback failed)', {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 3340,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 3341,
+            "content": "window.Logger.warn('Failed to load comparison parameter state', { page: 'comparative-analysis-page',",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 3569,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 3570,
+            "content": "window.Logger.warn('⚠️ Tags filter select not found', { page: 'comparative-analysis-page' });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 3584,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 3585,
+            "content": "window.Logger.warn('⚠️ TagUIManager not available after waiting', { page: 'comparative-analysis-page",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 3594,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 3595,
+            "content": "window.Logger.info('✅ Tags filter initialized', { page: 'comparative-analysis-page' });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 3598,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 3599,
+            "content": "window.Logger.warn('⚠️ TagUIManager.refreshSelectOptions not available', { page: 'comparative-analys",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 3603,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 3604,
+            "content": "window.Logger.error('❌ Error initializing tags filter', { page: 'comparative-analysis-page', error }",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 3613,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 3614,
+            "content": "window.Logger.warn('⚠️ Record filter tags select not found', { page: 'comparative-analysis-page' });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 3628,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 3629,
+            "content": "window.Logger.warn('⚠️ TagUIManager not available after waiting', { page: 'comparative-analysis-page",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 3638,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 3639,
+            "content": "window.Logger.info('✅ Record filter tags initialized', { page: 'comparative-analysis-page' });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 3642,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 3643,
+            "content": "window.Logger.warn('⚠️ TagUIManager.refreshSelectOptions not available', { page: 'comparative-analys",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 3647,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 3648,
+            "content": "window.Logger.error('❌ Error initializing record filter tags', { page: 'comparative-analysis-page', ",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 3657,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 3658,
+            "content": "window.Logger.warn('⚠️ Comparison tags select not found', { page: 'comparative-analysis-page' });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 3672,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 3673,
+            "content": "window.Logger.warn('⚠️ TagUIManager not available after waiting', { page: 'comparative-analysis-page",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 3682,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 3683,
+            "content": "window.Logger.info('✅ Comparison tags initialized', { page: 'comparative-analysis-page' });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 3686,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 3687,
+            "content": "window.Logger.warn('⚠️ TagUIManager.refreshSelectOptions not available', { page: 'comparative-analys",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 3691,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 3692,
+            "content": "window.Logger.error('❌ Error initializing comparison tags', { page: 'comparative-analysis-page', err",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 3705,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 3706,
+            "content": "window.Logger.info('✅ Header System initialized', { page: 'comparative-analysis-page' });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 3709,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 3710,
+            "content": "window.Logger.error('Error initializing Header System', {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 3721,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 3722,
+            "content": "window.Logger.error('Error initializing Header System (retry)', {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 3729,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 3730,
+            "content": "window.Logger.warn('HeaderSystem not available after retry', { page: 'comparative-analysis-page' });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 3843,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 3844,
+            "content": "window.Logger.info('✅ Default comparison parameters set (Investment Types - all)', {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 3851,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 3852,
+            "content": "window.Logger.warn('⚠️ Could not set default comparison parameters - elements not ready', {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 3867,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 3868,
+            "content": "window.Logger.info('📊 Current comparison parameters after initialization', {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 3904,
+            "content": "if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 3905,
+            "content": "window.Logger.info('✅ Comparative analysis page initialized', { page: 'comparative-analysis-page' })",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 3913,
+            "content": "} else if (window.Logger) {",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          },
+          {
+            "line": 3914,
+            "content": "window.Logger.error('Error initializing page', { page: 'comparative-analysis-page', error });",
+            "pattern": "window\\.Logger",
+            "match": "window.Logger"
+          }
+        ],
+        "issue_count": 126
+      },
+      "html_result": null
+    },
+    "cache": {
+      "status": "ok",
+      "issues": [
+        {
+          "line": 2925,
+          "content": "if (window.UnifiedCacheManager) {",
+          "pattern": "UnifiedCacheManager",
+          "match": "UnifiedCacheManager",
+          "file": "js"
+        },
+        {
+          "line": 2926,
+          "content": "const cachedData = await window.UnifiedCacheManager.get(cacheKey, 'memory');",
+          "pattern": "UnifiedCacheManager",
+          "match": "UnifiedCacheManager",
+          "file": "js"
+        },
+        {
+          "line": 2943,
+          "content": "if (window.UnifiedCacheManager) {",
+          "pattern": "UnifiedCacheManager",
+          "match": "UnifiedCacheManager",
+          "file": "js"
+        },
+        {
+          "line": 2944,
+          "content": "await window.UnifiedCacheManager.save(cacheKey, accounts, 'memory', { ttl: 600 }); // 10 minutes",
+          "pattern": "UnifiedCacheManager",
+          "match": "UnifiedCacheManager",
+          "file": "js"
+        },
+        {
+          "line": 3073,
+          "content": "if (window.UnifiedCacheManager) {",
+          "pattern": "UnifiedCacheManager",
+          "match": "UnifiedCacheManager",
+          "file": "js"
+        },
+        {
+          "line": 3074,
+          "content": "const cachedData = await window.UnifiedCacheManager.get(cacheKey, 'memory');",
+          "pattern": "UnifiedCacheManager",
+          "match": "UnifiedCacheManager",
+          "file": "js"
+        },
+        {
+          "line": 3091,
+          "content": "if (window.UnifiedCacheManager) {",
+          "pattern": "UnifiedCacheManager",
+          "match": "UnifiedCacheManager",
+          "file": "js"
+        },
+        {
+          "line": 3092,
+          "content": "await window.UnifiedCacheManager.save(cacheKey, tickers, 'memory', { ttl: 600 }); // 10 minutes",
+          "pattern": "UnifiedCacheManager",
+          "match": "UnifiedCacheManager",
+          "file": "js"
+        }
+      ],
+      "issue_count": 8,
+      "js_result": {
+        "status": "ok",
+        "issues": [
+          {
+            "line": 2925,
+            "content": "if (window.UnifiedCacheManager) {",
+            "pattern": "UnifiedCacheManager",
+            "match": "UnifiedCacheManager"
+          },
+          {
+            "line": 2926,
+            "content": "const cachedData = await window.UnifiedCacheManager.get(cacheKey, 'memory');",
+            "pattern": "UnifiedCacheManager",
+            "match": "UnifiedCacheManager"
+          },
+          {
+            "line": 2943,
+            "content": "if (window.UnifiedCacheManager) {",
+            "pattern": "UnifiedCacheManager",
+            "match": "UnifiedCacheManager"
+          },
+          {
+            "line": 2944,
+            "content": "await window.UnifiedCacheManager.save(cacheKey, accounts, 'memory', { ttl: 600 }); // 10 minutes",
+            "pattern": "UnifiedCacheManager",
+            "match": "UnifiedCacheManager"
+          },
+          {
+            "line": 3073,
+            "content": "if (window.UnifiedCacheManager) {",
+            "pattern": "UnifiedCacheManager",
+            "match": "UnifiedCacheManager"
+          },
+          {
+            "line": 3074,
+            "content": "const cachedData = await window.UnifiedCacheManager.get(cacheKey, 'memory');",
+            "pattern": "UnifiedCacheManager",
+            "match": "UnifiedCacheManager"
+          },
+          {
+            "line": 3091,
+            "content": "if (window.UnifiedCacheManager) {",
+            "pattern": "UnifiedCacheManager",
+            "match": "UnifiedCacheManager"
+          },
+          {
+            "line": 3092,
+            "content": "await window.UnifiedCacheManager.save(cacheKey, tickers, 'memory', { ttl: 600 }); // 10 minutes",
+            "pattern": "UnifiedCacheManager",
+            "match": "UnifiedCacheManager"
+          }
+        ],
+        "issue_count": 8
+      },
+      "html_result": null
+    },
+    "dom_manipulation": {
+      "status": "issues_found",
+      "issues": [
+        {
+          "line": 32,
+          "content": "container.innerHTML = AVAILABLE_SERIES.map(series => {",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 1488,
+          "content": "thead.innerHTML = headerHTML;",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 1600,
+          "content": "tbody.innerHTML = dataRows + summaryRow;",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 1617,
+          "content": "summary.innerHTML = `",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 1633,
+          "content": "filterInfo.innerHTML = `<strong>פרמטרי סינון:</strong> ${filterText}`;",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 1644,
+          "content": "comparisonInfo.innerHTML = `<strong>פרמטרי השוואה:</strong> ${comparisonText}`;",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 1657,
+          "content": "tbody.innerHTML = data.map((item, index) => {",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 1721,
+          "content": "tooltip.innerHTML = `",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 1813,
+          "content": "grid.innerHTML = '';",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 1856,
+          "content": "cell.innerHTML = `",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 1900,
+          "content": "tooltipEl.innerHTML = `",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 2149,
+          "content": "loading.innerHTML = alertIcon + ' שגיאה בטעינת גרף';",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 2179,
+          "content": "legend.innerHTML = legendItems.join('');",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 2915,
+          "content": "select.innerHTML = accounts.map(acc =>",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 2928,
+          "content": "select.innerHTML = cachedData.map(acc =>",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 2938,
+          "content": "select.innerHTML = accounts.map(acc =>",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 2948,
+          "content": "select.innerHTML = `",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 2979,
+          "content": "select.innerHTML = `",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 3006,
+          "content": "select.innerHTML = methods.map(method =>",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 3023,
+          "content": "select.innerHTML = `",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 3038,
+          "content": "select.innerHTML = `",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 3063,
+          "content": "select.innerHTML = tickers.map(ticker =>",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 3076,
+          "content": "select.innerHTML = cachedData.map(ticker =>",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 3086,
+          "content": "select.innerHTML = tickers.map(ticker =>",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 3096,
+          "content": "select.innerHTML = `",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 3125,
+          "content": "select.innerHTML = `",
+          "pattern": "\\.innerHTML\\s*=",
+          "match": ".innerHTML =",
+          "file": "js"
+        },
+        {
+          "line": 1707,
+          "content": "const tooltip = document.createElement('div');",
+          "pattern": "createElement",
+          "match": "createElement",
+          "file": "js"
+        },
+        {
+          "line": 1838,
+          "content": "const cell = document.createElement('div');",
+          "pattern": "createElement",
+          "match": "createElement",
+          "file": "js"
+        },
+        {
+          "line": 1892,
+          "content": "const tooltipEl = document.createElement('div');",
+          "pattern": "createElement",
+          "match": "createElement",
+          "file": "js"
+        },
+        {
+          "line": 3542,
+          "content": "const link = document.createElement('a');",
+          "pattern": "createElement",
+          "match": "createElement",
+          "file": "js"
+        }
+      ],
+      "issue_count": 30,
+      "js_result": {
+        "status": "issues_found",
+        "issues": [
+          {
+            "line": 32,
+            "content": "container.innerHTML = AVAILABLE_SERIES.map(series => {",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 1488,
+            "content": "thead.innerHTML = headerHTML;",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 1600,
+            "content": "tbody.innerHTML = dataRows + summaryRow;",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 1617,
+            "content": "summary.innerHTML = `",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 1633,
+            "content": "filterInfo.innerHTML = `<strong>פרמטרי סינון:</strong> ${filterText}`;",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 1644,
+            "content": "comparisonInfo.innerHTML = `<strong>פרמטרי השוואה:</strong> ${comparisonText}`;",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 1657,
+            "content": "tbody.innerHTML = data.map((item, index) => {",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 1721,
+            "content": "tooltip.innerHTML = `",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 1813,
+            "content": "grid.innerHTML = '';",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 1856,
+            "content": "cell.innerHTML = `",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 1900,
+            "content": "tooltipEl.innerHTML = `",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 2149,
+            "content": "loading.innerHTML = alertIcon + ' שגיאה בטעינת גרף';",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 2179,
+            "content": "legend.innerHTML = legendItems.join('');",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 2915,
+            "content": "select.innerHTML = accounts.map(acc =>",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 2928,
+            "content": "select.innerHTML = cachedData.map(acc =>",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 2938,
+            "content": "select.innerHTML = accounts.map(acc =>",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 2948,
+            "content": "select.innerHTML = `",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 2979,
+            "content": "select.innerHTML = `",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 3006,
+            "content": "select.innerHTML = methods.map(method =>",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 3023,
+            "content": "select.innerHTML = `",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 3038,
+            "content": "select.innerHTML = `",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 3063,
+            "content": "select.innerHTML = tickers.map(ticker =>",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 3076,
+            "content": "select.innerHTML = cachedData.map(ticker =>",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 3086,
+            "content": "select.innerHTML = tickers.map(ticker =>",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 3096,
+            "content": "select.innerHTML = `",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 3125,
+            "content": "select.innerHTML = `",
+            "pattern": "\\.innerHTML\\s*=",
+            "match": ".innerHTML ="
+          },
+          {
+            "line": 1707,
+            "content": "const tooltip = document.createElement('div');",
+            "pattern": "createElement",
+            "match": "createElement"
+          },
+          {
+            "line": 1838,
+            "content": "const cell = document.createElement('div');",
+            "pattern": "createElement",
+            "match": "createElement"
+          },
+          {
+            "line": 1892,
+            "content": "const tooltipEl = document.createElement('div');",
+            "pattern": "createElement",
+            "match": "createElement"
+          },
+          {
+            "line": 3542,
+            "content": "const link = document.createElement('a');",
+            "pattern": "createElement",
+            "match": "createElement"
+          }
+        ],
+        "issue_count": 30
+      },
+      "html_result": null
+    },
+    "html_structure": {
+      "status": "issues_found",
+      "issues": [
+        {
+          "line": 1677,
+          "content": "data-onclick=\"filterByCategory('${item.category}')\">",
+          "pattern": "data-onclick",
+          "match": "data-onclick",
+          "file": "js"
+        },
+        {
+          "line": 3899,
+          "content": "const exportBtn = document.querySelector('button[data-button-type=\"EXPORT\"]');",
+          "pattern": "data-button-type",
+          "match": "data-button-type",
+          "file": "js"
+        },
+        {
+          "line": 46,
+          "content": "<div class=\"series-color-indicator\" ${color ? `style=\"--series-color: ${color};\"` : ''}></div>",
+          "pattern": "style\\s*=",
+          "match": "style=",
+          "file": "js"
+        },
+        {
+          "line": 807,
+          "content": "return `<span class=\"badge rounded-pill bg-light text-dark border me-1 mb-1 compact-stat-label-small",
+          "pattern": "style\\s*=",
+          "match": "style=",
+          "file": "js"
+        },
+        {
+          "line": 1679,
+          "content": "<td style=\"${getColorStyle(item.tradesPercentile, item.trades)}\" data-value=\"${item.trades}\">${item.",
+          "pattern": "style\\s*=",
+          "match": "style=",
+          "file": "js"
+        },
+        {
+          "line": 1680,
+          "content": "<td style=\"${getColorStyle(item.avgPLPercentile, item.avgPL)}\" data-value=\"${item.avgPL}\">${formatPL",
+          "pattern": "style\\s*=",
+          "match": "style=",
+          "file": "js"
+        },
+        {
+          "line": 1681,
+          "content": "<td style=\"${getColorStyle(item.plPercentile, item.totalPL)}\" data-value=\"${item.totalPL}\">${formatP",
+          "pattern": "style\\s*=",
+          "match": "style=",
+          "file": "js"
+        },
+        {
+          "line": 1682,
+          "content": "<td style=\"${getColorStyle(item.successPercentile, item.successRate)}\" data-value=\"${item.successRat",
+          "pattern": "style\\s*=",
+          "match": "style=",
+          "file": "js"
+        },
+        {
+          "line": 1683,
+          "content": "<td class=\"text-end\" style=\"${getColorStyle(item.maxInvestmentPercentile, item.maxInvestmentAtPoint ",
+          "pattern": "style\\s*=",
+          "match": "style=",
+          "file": "js"
+        },
+        {
+          "line": 1684,
+          "content": "<td class=\"text-end\" style=\"${getColorStyle(item.totalPurchasesPercentile, item.totalPurchases || 0)",
+          "pattern": "style\\s*=",
+          "match": "style=",
+          "file": "js"
+        },
+        {
+          "line": 2172,
+          "content": "<div class=\"series-legend-color\" ${color ? `style=\"--series-color: ${color};\"` : ''}></div>",
+          "pattern": "style\\s*=",
+          "match": "style=",
+          "file": "js"
+        }
+      ],
+      "issue_count": 11,
+      "js_result": {
+        "status": "issues_found",
+        "issues": [
+          {
+            "line": 1677,
+            "content": "data-onclick=\"filterByCategory('${item.category}')\">",
+            "pattern": "data-onclick",
+            "match": "data-onclick"
+          },
+          {
+            "line": 3899,
+            "content": "const exportBtn = document.querySelector('button[data-button-type=\"EXPORT\"]');",
+            "pattern": "data-button-type",
+            "match": "data-button-type"
+          },
+          {
+            "line": 46,
+            "content": "<div class=\"series-color-indicator\" ${color ? `style=\"--series-color: ${color};\"` : ''}></div>",
+            "pattern": "style\\s*=",
+            "match": "style="
+          },
+          {
+            "line": 807,
+            "content": "return `<span class=\"badge rounded-pill bg-light text-dark border me-1 mb-1 compact-stat-label-small",
+            "pattern": "style\\s*=",
+            "match": "style="
+          },
+          {
+            "line": 1679,
+            "content": "<td style=\"${getColorStyle(item.tradesPercentile, item.trades)}\" data-value=\"${item.trades}\">${item.",
+            "pattern": "style\\s*=",
+            "match": "style="
+          },
+          {
+            "line": 1680,
+            "content": "<td style=\"${getColorStyle(item.avgPLPercentile, item.avgPL)}\" data-value=\"${item.avgPL}\">${formatPL",
+            "pattern": "style\\s*=",
+            "match": "style="
+          },
+          {
+            "line": 1681,
+            "content": "<td style=\"${getColorStyle(item.plPercentile, item.totalPL)}\" data-value=\"${item.totalPL}\">${formatP",
+            "pattern": "style\\s*=",
+            "match": "style="
+          },
+          {
+            "line": 1682,
+            "content": "<td style=\"${getColorStyle(item.successPercentile, item.successRate)}\" data-value=\"${item.successRat",
+            "pattern": "style\\s*=",
+            "match": "style="
+          },
+          {
+            "line": 1683,
+            "content": "<td class=\"text-end\" style=\"${getColorStyle(item.maxInvestmentPercentile, item.maxInvestmentAtPoint ",
+            "pattern": "style\\s*=",
+            "match": "style="
+          },
+          {
+            "line": 1684,
+            "content": "<td class=\"text-end\" style=\"${getColorStyle(item.totalPurchasesPercentile, item.totalPurchases || 0)",
+            "pattern": "style\\s*=",
+            "match": "style="
+          },
+          {
+            "line": 2172,
+            "content": "<div class=\"series-legend-color\" ${color ? `style=\"--series-color: ${color};\"` : ''}></div>",
+            "pattern": "style\\s*=",
+            "match": "style="
+          }
+        ],
+        "issue_count": 11
+      },
+      "html_result": null
+    }
+  }
+}

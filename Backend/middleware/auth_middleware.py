@@ -28,6 +28,7 @@ def setup_auth_middleware(app):
         '/api/auth/login',
         '/api/auth/register',
         '/api/health',
+        '/api/ai-analysis/templates',  # Templates are shared and public
     ]
     
     @app.before_request

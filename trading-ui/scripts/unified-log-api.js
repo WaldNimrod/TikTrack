@@ -367,12 +367,18 @@ class UnifiedLogAPI {
     showError(containerId, message) {
         const container = document.getElementById(containerId);
         if (container) {
-            container.innerHTML = `
-                <div class="alert alert-danger" role="alert">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    <strong>שגיאה:</strong> ${message}
-                </div>
-            `;
+            container.textContent = '';
+            const alert = document.createElement('div');
+            alert.className = 'alert alert-danger';
+            alert.setAttribute('role', 'alert');
+            const icon = document.createElement('i');
+            icon.className = 'fas fa-exclamation-triangle';
+            alert.appendChild(icon);
+            const strong = document.createElement('strong');
+            strong.textContent = 'שגיאה:';
+            alert.appendChild(strong);
+            alert.appendChild(document.createTextNode(' ' + message));
+            container.appendChild(alert);
         }
     }
 

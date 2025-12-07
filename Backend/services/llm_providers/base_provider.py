@@ -72,13 +72,24 @@ class BaseLLMProvider(ABC):
             error: Exception raised by provider
             
         Returns:
-            Dictionary with error information
+            Dictionary with error information including error_code
         """
         logger.error(f"LLM provider error: {error}", exc_info=True)
+        
+        # Import here to avoid circular dependency
+        from services.ai_analysis_error_codes import categorize_error
+        
+        error_code = categorize_error(error, str(error))
+        
         return {
             'text': None,
             'json': None,
             'error': str(error),
+            'error_code': error_code,
             'error_type': type(error).__name__
         }
+
+
+
+
 

@@ -416,16 +416,40 @@ async function updateCurrencyOptions(ticker = null) {
 
     if (addSelect) {
       const addOptions = generateTickerCurrencyOptions();
-      addSelect.innerHTML = currenciesAvailable
-        ? '<option value="">בחר מטבע...</option>' + addOptions
-        : addOptions;
+      addSelect.textContent = '';
+      if (currenciesAvailable) {
+        const defaultOption = document.createElement('option');
+        defaultOption.value = '';
+        defaultOption.textContent = 'בחר מטבע...';
+        addSelect.appendChild(defaultOption);
+      }
+      // Convert HTML string to DOM elements safely
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(addOptions, 'text/html');
+      const fragment = document.createDocumentFragment();
+      Array.from(doc.body.childNodes).forEach(node => {
+        fragment.appendChild(node.cloneNode(true));
+      });
+      addSelect.appendChild(fragment);
     }
 
     if (editSelect) {
       const editOptions = generateTickerCurrencyOptions(ticker);
-      editSelect.innerHTML = currenciesAvailable
-        ? '<option value="">בחר מטבע...</option>' + editOptions
-        : editOptions;
+      editSelect.textContent = '';
+      if (currenciesAvailable) {
+        const defaultOption = document.createElement('option');
+        defaultOption.value = '';
+        defaultOption.textContent = 'בחר מטבע...';
+        editSelect.appendChild(defaultOption);
+      }
+      // Convert HTML string to DOM elements safely
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(editOptions, 'text/html');
+      const fragment = document.createDocumentFragment();
+      Array.from(doc.body.childNodes).forEach(node => {
+        fragment.appendChild(node.cloneNode(true));
+      });
+      editSelect.appendChild(fragment);
     }
   } catch (error) {
     window.Logger.error('updateCurrencyOptions failed', { page: 'tickers', error: error?.message || error });
@@ -644,7 +668,7 @@ async function loadTickerProviderSymbols(tickerId) {
       populateProviderSymbolFields(mappings);
     }
   } catch (error) {
-    console.error('Error loading provider symbols:', error);
+    window.Logger?.error('Error loading provider symbols:', error);
     // Don't show error to user - mappings are optional
   }
 }
@@ -658,7 +682,7 @@ async function loadTickerProviderSymbols(tickerId) {
 function initializeProviderSymbolFields() {
   // This function is deprecated - ModalManagerV2 now handles this
   // Kept for backward compatibility
-  console.warn('⚠️ initializeProviderSymbolFields is deprecated - ModalManagerV2 now handles this');
+  window.Logger?.warn('⚠️ initializeProviderSymbolFields is deprecated - ModalManagerV2 now handles this');
 }
 
 // ===== SAVE AND UPDATE FUNCTIONS =====
@@ -674,16 +698,19 @@ function initializeProviderSymbolFields() {
 async function loadProviderSymbolFields() {
   const fieldsContainer = document.getElementById('providerSymbolsFields');
   if (!fieldsContainer) {
-    console.warn('⚠️ Provider symbols fields container not found');
+    window.Logger?.warn('⚠️ Provider symbols fields container not found');
     return;
   }
 
   // Show loading state
-  fieldsContainer.innerHTML = `
-    <div class="text-center text-muted py-3">
-      <i class="fas fa-spinner fa-spin me-2"></i>טוען רשימת ספקים...
-    </div>
-  `;
+  fieldsContainer.textContent = '';
+  const loadingDiv = document.createElement('div');
+  loadingDiv.className = 'text-center text-muted py-3';
+  const spinner = document.createElement('i');
+  spinner.className = 'fas fa-spinner fa-spin me-2';
+  loadingDiv.appendChild(spinner);
+  loadingDiv.appendChild(document.createTextNode('טוען רשימת ספקים...'));
+  fieldsContainer.appendChild(loadingDiv);
 
   try {
     // Load providers from API
@@ -696,12 +723,16 @@ async function loadProviderSymbolFields() {
     const providers = (result.data || []).filter(p => p.is_active);
 
     if (providers.length === 0) {
-      fieldsContainer.innerHTML = `
-        <div class="alert alert-info mb-0">
-          <i class="fas fa-info-circle me-2"></i>
-          <small>אין ספקי נתונים פעילים במערכת</small>
-        </div>
-      `;
+      fieldsContainer.textContent = '';
+      const alertDiv = document.createElement('div');
+      alertDiv.className = 'alert alert-info mb-0';
+      const icon = document.createElement('i');
+      icon.className = 'fas fa-info-circle me-2';
+      alertDiv.appendChild(icon);
+      const small = document.createElement('small');
+      small.textContent = 'אין ספקי נתונים פעילים במערכת';
+      alertDiv.appendChild(small);
+      fieldsContainer.appendChild(alertDiv);
       return;
     }
 
@@ -727,7 +758,15 @@ async function loadProviderSymbolFields() {
       </div>
     `).join('');
 
-    fieldsContainer.innerHTML = fieldsHTML;
+    fieldsContainer.textContent = '';
+    // Convert HTML string to DOM elements safely
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(fieldsHTML, 'text/html');
+    const fragment = document.createDocumentFragment();
+    Array.from(doc.body.childNodes).forEach(node => {
+      fragment.appendChild(node.cloneNode(true));
+    });
+    fieldsContainer.appendChild(fragment);
     
     if (window.Logger) {
       window.Logger.debug('Provider symbol fields loaded', { 
@@ -736,13 +775,17 @@ async function loadProviderSymbolFields() {
       });
     }
   } catch (error) {
-    console.error('Error loading providers:', error);
-    fieldsContainer.innerHTML = `
-      <div class="alert alert-danger mb-0">
-        <i class="fas fa-exclamation-triangle me-2"></i>
-        <small>שגיאה בטעינת ספקי נתונים. נסה לרענן את הדף.</small>
-      </div>
-    `;
+    window.Logger?.error('Error loading providers:', error);
+    fieldsContainer.textContent = '';
+    const alertDiv = document.createElement('div');
+    alertDiv.className = 'alert alert-danger mb-0';
+    const icon = document.createElement('i');
+    icon.className = 'fas fa-exclamation-triangle me-2';
+    alertDiv.appendChild(icon);
+    const small = document.createElement('small');
+    small.textContent = 'שגיאה בטעינת ספקי נתונים. נסה לרענן את הדף.';
+    alertDiv.appendChild(small);
+    fieldsContainer.appendChild(alertDiv);
     
     if (window.Logger) {
       window.Logger.error('Failed to load provider symbol fields', { 
@@ -790,7 +833,7 @@ function populateProviderSymbolFields(mappings) {
     // Support both provider_name and provider_display_name
     const providerName = mapping.provider_name || mapping.provider_display_name;
     if (!providerName) {
-      console.warn('⚠️ Mapping missing provider name:', mapping);
+      window.Logger?.warn('⚠️ Mapping missing provider name:', mapping);
       return;
     }
     
@@ -810,7 +853,7 @@ function populateProviderSymbolFields(mappings) {
         });
       }
     } else {
-      console.warn(`⚠️ Provider symbol input field not found: providerSymbol_${providerName}`);
+      window.Logger?.warn(`⚠️ Provider symbol input field not found: providerSymbol_${providerName}`);
       if (window.Logger) {
         window.Logger.warn('Provider symbol input field not found', {
           providerName,
@@ -975,7 +1018,18 @@ async function saveTicker() {
       tickerPayload.provider_symbols = providerSymbols;
     }
 
-    // שימוש בשירות הנתונים החדש
+    // Use UnifiedCRUDService for consistent CRUD operations
+    let crudResult;
+    if (window.UnifiedCRUDService && typeof window.UnifiedCRUDService.saveEntity === 'function') {
+      crudResult = await window.UnifiedCRUDService.saveEntity('ticker', tickerPayload, {
+        modalId: 'tickersModal',
+        successMessage: `טיקר ${symbol} נוסף בהצלחה!`,
+        entityName: 'טיקר',
+        reloadFn: window.loadTickersData,
+        requiresHardReload: false
+      });
+    } else {
+      // Fallback to direct API call with CRUDResponseHandler
     let response;
     if (window.TickersData && window.TickersData.createTicker) {
       response = await window.TickersData.createTicker(tickerPayload);
@@ -991,13 +1045,15 @@ async function saveTicker() {
     }
 
     // שימוש ב-CRUDResponseHandler עם רענון אוטומטי
-    const crudResult = await CRUDResponseHandler.handleSaveResponse(response, {
+      crudResult = await CRUDResponseHandler.handleSaveResponse(response, {
       modalId: 'tickersModal',
       successMessage: `טיקר ${symbol} נוסף בהצלחה!`,
       entityName: 'טיקר',
       reloadFn: window.loadTickersData,
       requiresHardReload: false
     });
+    }
+    
     const newTickerId = Number(crudResult?.data?.id || crudResult?.id);
     if (Number.isFinite(newTickerId) && window.TagService) {
       try {
@@ -1192,6 +1248,7 @@ async function updateTicker() {
 
   try {
     const tickerPayload = {
+      id: parseInt(id),
       symbol,
       name,
       type,
@@ -1205,7 +1262,18 @@ async function updateTicker() {
       tickerPayload.provider_symbols = providerSymbols;
     }
 
-    // שימוש בשירות הנתונים החדש
+    // Use UnifiedCRUDService for consistent CRUD operations
+    let updateResult;
+    if (window.UnifiedCRUDService && typeof window.UnifiedCRUDService.saveEntity === 'function') {
+      updateResult = await window.UnifiedCRUDService.saveEntity('ticker', tickerPayload, {
+        modalId: 'tickersModal',
+        successMessage: `טיקר ${symbol} עודכן בהצלחה!`,
+        entityName: 'טיקר',
+        reloadFn: window.loadTickersData,
+        requiresHardReload: false
+      });
+    } else {
+      // Fallback to direct API call with CRUDResponseHandler
     let response;
     if (window.TickersData && window.TickersData.updateTicker) {
       response = await window.TickersData.updateTicker(parseInt(id), tickerPayload);
@@ -1221,7 +1289,7 @@ async function updateTicker() {
     }
 
     // שימוש ב-CRUDResponseHandler עם רענון אוטומטי
-    const updateResult = await CRUDResponseHandler.handleUpdateResponse(response, {
+      updateResult = await CRUDResponseHandler.handleUpdateResponse(response, {
       modalId: 'tickersModal',
       successMessage: `טיקר ${symbol} עודכן בהצלחה!`,
       apiUrl: '/api/tickers/',
@@ -1229,6 +1297,8 @@ async function updateTicker() {
       reloadFn: window.loadTickersData,
       requiresHardReload: false
     });
+    }
+    
     if (updateResult !== null && window.TagService) {
       try {
         await window.TagService.replaceEntityTags('ticker', Number.parseInt(id, 10), tagIds);
@@ -1694,82 +1764,57 @@ async function checkLinkedItemsAndDeleteTicker(tickerId) {
  */
 async function performTickerDeletion(tickerId) {
   try {
-    // Clear cache before deletion to ensure fresh data after reload
-    if (window.unifiedCacheManager) {
-      await window.unifiedCacheManager.clearByPattern('tickers-data');
-      await window.unifiedCacheManager.clearByPattern('market-data');
+    // Use UnifiedCRUDService for consistent CRUD operations
+    if (window.UnifiedCRUDService && typeof window.UnifiedCRUDService.deleteEntity === 'function') {
+      await window.UnifiedCRUDService.deleteEntity('ticker', tickerId, {
+        successMessage: 'טיקר נמחק בהצלחה',
+        entityName: 'טיקר',
+        reloadFn: () => {
+          window.loadTickersData({ force: true });
+          // Update active trades field if function exists
+          if (typeof window.updateActiveTradesField === 'function') {
+            window.updateActiveTradesField();
+          }
+          // Call onTickerDeleted callback if exists
+          if (typeof window.onTickerDeleted === 'function') {
+            window.onTickerDeleted(tickerId);
+          }
+        },
+        requiresHardReload: false
+      });
+    } else {
+      // Fallback to direct API call with CRUDResponseHandler
+    let response;
+    if (typeof window.TickersData?.deleteTicker === 'function') {
+      response = await window.TickersData.deleteTicker(tickerId);
+    } else {
+      // Fallback to direct fetch
+      response = await fetch(`/api/tickers/${tickerId}`, {
+        method: 'DELETE',
+      });
     }
 
-    // שליחה לשרת
-    const response = await fetch(`/api/tickers/${tickerId}`, {
-      method: 'DELETE',
-    });
-
-    // השתמש במערכת הגלובלית החדשה
-    const handled = await window.handleApiResponseWithRefresh(response, {
-      loadDataFunction: window.loadTickersData,
-      updateActiveFieldsFunction: window.updateActiveTradesField,
-      operationName: 'מחיקה',
-      itemName: 'הטיקר',
-      successMessage: 'הטיקר נמחק בהצלחה',
-      onSuccess: () => {
+    // Use CRUDResponseHandler for consistent response handling
+    await CRUDResponseHandler.handleDeleteResponse(response, {
+      successMessage: 'טיקר נמחק בהצלחה',
+      entityName: 'טיקר',
+      reloadFn: () => {
+        window.loadTickersData({ force: true });
+        // Update active trades field if function exists
+        if (typeof window.updateActiveTradesField === 'function') {
+          window.updateActiveTradesField();
+        }
+        // Call onTickerDeleted callback if exists
         if (typeof window.onTickerDeleted === 'function') {
           window.onTickerDeleted(tickerId);
         }
-      }
+      },
+      requiresHardReload: false
     });
-
-    if (!handled) {
-      const errorResponse = await response.text();
-
-      try {
-        const errorData = JSON.parse(errorResponse);
-
-        // בדיקה אם השגיאה קשורה לפריטים מקושרים
-        if (errorData.error && errorData.error.message &&
-                    (errorData.error.message.includes('linked items') ||
-                        errorData.error.message.includes('Cannot delete ticker with linked items'))) {
-
-          // הצגת אזהרת פריטים מקושרים
-          if (window.showLinkedItemsModal) {
-            try {
-              const response = await fetch(`/api/linked-items/ticker/${tickerId}`);
-              if (response.ok) {
-                const data = await response.json();
-                window.showLinkedItemsModal(data, 'ticker', tickerId);
-              } else {
-                throw new Error('Failed to load linked items data');
-              }
-            } catch (error) {
-              handleApiError(error, 'פריטים מקושרים');
-            }
-          } else {
-            if (window.showErrorNotification) {
-              window.showErrorNotification('שגיאה במחיקה', 'לא ניתן למחוק טיקר זה - יש פריטים מקושרים אליו');
-            }
-          }
-          return;
-        }
-
-        // שגיאה אחרת
-        handleApiError('שגיאה במחיקת טיקר', errorResponse);
-        if (window.showErrorNotification) {
-          window.showErrorNotification('שגיאה במחיקה', 'שגיאה במחיקת הטיקר: ' + errorData.error.message);
-        }
-
-      } catch {
-        handleApiError('שגיאה במחיקת טיקר', errorResponse);
-        if (window.showErrorNotification) {
-          window.showErrorNotification('שגיאה במחיקה', 'שגיאה במחיקת הטיקר');
-        }
-      }
     }
 
   } catch (error) {
-    handleSystemError(error, 'ביצוע מחיקת טיקר');
-    if (window.showErrorNotification) {
-      window.showErrorNotification('שגיאה במחיקה', 'שגיאה במחיקת הטיקר');
-    }
+    CRUDResponseHandler.handleError(error, 'מחיקת טיקר');
   }
 }
 
@@ -1818,7 +1863,7 @@ async function deleteTicker(tickerId) {
             );
         } else {
             // Fallback to simple confirm
-            if (!confirm('האם אתה בטוח שברצונך למחוק את הטיקר?')) {
+            if (!window.showConfirmationDialog('האם אתה בטוח שברצונך למחוק את הטיקר?')) {
                 return;
             }
             await performTickerDeletion(tickerId);
@@ -1890,6 +1935,637 @@ async function confirmDeleteTicker(id) {
  * @param {Object} [options={}] - Loading options (force, signal, etc.)
  * @returns {Promise<Array>} Array of tickers
  */
+/**
+ * Check if ticker has complete data (historical data and technical indicators)
+ * @param {Object} ticker - Ticker object
+ * @returns {Object} Object with data completeness status
+ */
+function checkTickerDataCompleteness(ticker) {
+  const result = {
+    hasPrice: false,
+    hasHistorical: false,
+    hasATR: false,
+    hasWeek52: false,
+    hasVolatility: false,
+    hasMA20: false,
+    hasMA150: false,
+    historicalCount: 0,
+    missingFields: [],
+    missingCalculations: [],
+    completeness: 0 // 0-100 percentage
+  };
+
+  // Check for price data
+  const hasPrice = ticker && (
+    ticker.current_price !== undefined && ticker.current_price !== null ||
+    ticker.price !== undefined && ticker.price !== null
+  );
+  result.hasPrice = hasPrice;
+  if (!hasPrice) {
+    result.missingFields.push('נתוני מחיר נוכחי');
+  }
+
+  // Check for historical data count
+  if (ticker.historical_quotes_count !== undefined) {
+    result.historicalCount = ticker.historical_quotes_count;
+    result.hasHistorical = result.historicalCount >= 150;
+    if (!result.hasHistorical) {
+      result.missingFields.push(`נתונים היסטוריים (${result.historicalCount}/150)`);
+    }
+  } else {
+    result.missingFields.push('נתונים היסטוריים (לא נטען)');
+  }
+
+  // Check ATR
+  if (ticker.atr !== undefined && ticker.atr !== null) {
+    result.hasATR = true;
+  } else {
+    result.missingCalculations.push('ATR');
+  }
+
+  // Check 52W
+  if (ticker.week52_high !== undefined && ticker.week52_high !== null &&
+      ticker.week52_low !== undefined && ticker.week52_low !== null) {
+    result.hasWeek52 = true;
+  } else {
+    result.missingCalculations.push('52W High/Low');
+  }
+
+  // Check Volatility
+  if (ticker.volatility !== undefined && ticker.volatility !== null) {
+    result.hasVolatility = true;
+  } else {
+    result.missingCalculations.push('תנודתיות');
+  }
+
+  // Check MA 20
+  if (ticker.ma_20 !== undefined && ticker.ma_20 !== null) {
+    result.hasMA20 = true;
+  } else {
+    result.missingCalculations.push('MA 20');
+  }
+
+  // Check MA 150
+  if (ticker.ma_150 !== undefined && ticker.ma_150 !== null) {
+    result.hasMA150 = true;
+  } else {
+    result.missingCalculations.push('MA 150');
+  }
+
+  // Calculate completeness percentage
+  const totalChecks = 7; // price, historical, ATR, 52W, Volatility, MA20, MA150
+  const passedChecks = [
+    result.hasPrice,
+    result.hasHistorical,
+    result.hasATR,
+    result.hasWeek52,
+    result.hasVolatility,
+    result.hasMA20,
+    result.hasMA150
+  ].filter(Boolean).length;
+  result.completeness = Math.round((passedChecks / totalChecks) * 100);
+
+  return result;
+}
+
+/**
+ * Check completeness of data for all tickers
+ * @param {Array} tickers - Array of tickers
+ * @returns {Object} Summary of data completeness
+ */
+async function checkTickersDataCompleteness(tickers) {
+  if (!Array.isArray(tickers) || tickers.length === 0) {
+    return {
+      total: 0,
+      complete: 0,
+      incomplete: 0,
+      missingHistorical: [],
+      missingIndicators: []
+    };
+  }
+
+  const summary = {
+    total: tickers.length,
+    complete: 0,
+    incomplete: 0,
+    missingHistorical: [],
+    missingIndicators: []
+  };
+
+  tickers.forEach(ticker => {
+    const completeness = checkTickerDataCompleteness(ticker);
+    if (completeness.completeness === 100) {
+      summary.complete++;
+    } else {
+      summary.incomplete++;
+      if (!completeness.hasHistorical) {
+        summary.missingHistorical.push({
+          id: ticker.id,
+          symbol: ticker.symbol,
+          count: completeness.historicalCount
+        });
+      }
+      if (completeness.missingCalculations.length > 0) {
+        summary.missingIndicators.push({
+          id: ticker.id,
+          symbol: ticker.symbol,
+          missing: completeness.missingCalculations
+        });
+      }
+    }
+  });
+
+  return summary;
+}
+
+/**
+ * Ensure historical data is loaded for tickers that need it
+ * @param {Array} tickers - Array of tickers
+ * @param {Object} options - Options (silent, showProgress)
+ * @returns {Promise<Array>} Array of tickers with historical data
+ */
+async function ensureHistoricalDataForTickers(tickers, options = {}) {
+  const { silent = false, showProgress = true } = options;
+  
+  if (!Array.isArray(tickers) || tickers.length === 0) {
+    return tickers;
+  }
+
+  if (!window.ExternalDataService) {
+    window.Logger?.warn?.('ExternalDataService not available, skipping historical data loading', { page: 'tickers' });
+    return tickers;
+  }
+
+  const overlayId = 'tickers-ensure-historical';
+  let progressStep = 0;
+  const totalSteps = tickers.length;
+
+  if (showProgress && window.UnifiedProgressManager) {
+    // Create overlay first with config
+    window.UnifiedProgressManager.createOverlay(overlayId, {
+      title: 'טוען נתונים היסטוריים',
+      totalSteps: totalSteps,
+      stepLabels: Array(totalSteps).fill(''),
+      stepDescriptions: Array(totalSteps).fill('')
+    });
+    // Show initial progress
+    window.UnifiedProgressManager.showProgress(overlayId, 1, 'בודק טיקרים', `בודק ${tickers.length} טיקרים...`);
+  }
+
+  const tickersWithData = [];
+  const tickersNeedingData = [];
+
+  // First pass: identify tickers needing data
+  for (const ticker of tickers) {
+    const completeness = checkTickerDataCompleteness(ticker);
+    if (!completeness.hasHistorical || completeness.historicalCount < 150) {
+      tickersNeedingData.push(ticker);
+    } else {
+      tickersWithData.push(ticker);
+    }
+  }
+
+  if (tickersNeedingData.length === 0) {
+    if (showProgress && window.UnifiedProgressManager) {
+      window.UnifiedProgressManager.hideProgress(overlayId);
+    }
+    if (!silent) {
+      window.Logger?.info?.('All tickers have sufficient historical data', { 
+        count: tickers.length, 
+        page: 'tickers' 
+      });
+    }
+    return tickers;
+  }
+
+  if (!silent) {
+    window.Logger?.info?.('Loading historical data for tickers', { 
+      total: tickers.length,
+      needingData: tickersNeedingData.length,
+      page: 'tickers' 
+    });
+  }
+
+  // Second pass: load historical data for tickers that need it
+  for (let i = 0; i < tickersNeedingData.length; i++) {
+    const ticker = tickersNeedingData[i];
+    progressStep++;
+
+    if (showProgress && window.UnifiedProgressManager) {
+      const percentage = Math.round((progressStep / totalSteps) * 100);
+      window.UnifiedProgressManager.updateProgress(overlayId, percentage, `טוען נתונים היסטוריים עבור ${ticker.symbol || ticker.id} (${progressStep}/${totalSteps})`);
+    }
+
+    try {
+      // Use ExternalDataService to refresh ticker data with historical data
+      const refreshedData = await window.ExternalDataService.refreshTickerData(ticker.id, {
+        forceRefresh: false,
+        includeHistorical: true,
+        daysBack: 150
+      });
+
+      // Merge refreshed data with original ticker
+      const enrichedTicker = {
+        ...ticker,
+        ...refreshedData,
+        historical_quotes_count: refreshedData.historical_quotes_count || 0
+      };
+
+      tickersWithData.push(enrichedTicker);
+
+      // Save to cache
+      if (window.UnifiedCacheManager) {
+        const cacheKey = `ticker-full-${ticker.id}`;
+        await window.UnifiedCacheManager.save(cacheKey, enrichedTicker, 'memory', { ttl: 3600 });
+      }
+
+      if (!silent) {
+        window.Logger?.debug?.('Loaded historical data for ticker', {
+          tickerId: ticker.id,
+          symbol: ticker.symbol,
+          historicalCount: enrichedTicker.historical_quotes_count,
+          page: 'tickers'
+        });
+      }
+    } catch (error) {
+      window.Logger?.warn?.('Failed to load historical data for ticker', {
+        tickerId: ticker.id,
+        symbol: ticker.symbol,
+        error: error.message,
+        page: 'tickers'
+      });
+      // Add ticker without historical data
+      tickersWithData.push(ticker);
+    }
+  }
+
+  if (showProgress && window.UnifiedProgressManager) {
+    window.UnifiedProgressManager.hideProgress(overlayId);
+  }
+
+  return tickersWithData;
+}
+
+/**
+ * Enrich tickers with full data from EntityDetailsAPI
+ * @param {Array} tickers - Array of basic tickers
+ * @param {Object} options - Options (silent, showProgress, forceRefresh)
+ * @returns {Promise<Array>} Array of enriched tickers
+ */
+async function enrichTickersWithFullData(tickers, options = {}) {
+  const { silent = false, showProgress = true, forceRefresh = false } = options;
+
+  if (!Array.isArray(tickers) || tickers.length === 0) {
+    return tickers;
+  }
+
+  if (!window.entityDetailsAPI || typeof window.entityDetailsAPI.getEntityDetails !== 'function') {
+    window.Logger?.warn?.('EntityDetailsAPI not available, skipping data enrichment', { page: 'tickers' });
+    return tickers;
+  }
+
+  const overlayId = 'tickers-enrich-data';
+  const totalSteps = tickers.length;
+  let completedCount = 0;
+  const batchSize = options.batchSize || 5;
+  const maxConcurrent = options.maxConcurrent || 3;
+
+  if (showProgress && window.UnifiedProgressManager) {
+    // Create overlay first with config
+    window.UnifiedProgressManager.createOverlay(overlayId, {
+      title: 'מעשיר נתוני טיקרים',
+      totalSteps: totalSteps,
+      stepLabels: Array(totalSteps).fill(''),
+      stepDescriptions: Array(totalSteps).fill('')
+    });
+    // Show initial progress
+    window.UnifiedProgressManager.showProgress(overlayId, 1, 'מתחיל תהליך', `טוען נתונים מלאים עבור ${tickers.length} טיקרים...`);
+  }
+
+  // Helper function to enrich a single ticker
+  const enrichSingleTicker = async (ticker, index) => {
+    try {
+      // Check cache first
+      const cacheKey = `ticker-full-${ticker.id}`;
+      let fullData = null;
+
+      if (!forceRefresh && window.UnifiedCacheManager) {
+        fullData = await window.UnifiedCacheManager.get(cacheKey, 'memory');
+        if (fullData) {
+          if (!silent) {
+            window.Logger?.debug?.('Loaded full ticker data from cache', {
+              tickerId: ticker.id,
+              symbol: ticker.symbol,
+              page: 'tickers'
+            });
+          }
+        }
+      }
+
+      // If not in cache, load from API
+      if (!fullData) {
+        fullData = await window.entityDetailsAPI.getEntityDetails('ticker', ticker.id, {
+          includeMarketData: true,
+          includeLinkedItems: false, // Don't load linked items to avoid 429 errors
+          forceRefresh: forceRefresh
+        });
+
+        // Save to cache
+        if (window.UnifiedCacheManager && fullData) {
+          await window.UnifiedCacheManager.save(cacheKey, fullData, 'memory', { ttl: 3600 });
+        }
+      }
+
+      // Merge full data with basic ticker data
+      const enrichedTicker = {
+        ...ticker,
+        ...fullData
+      };
+
+      completedCount++;
+      if (showProgress && window.UnifiedProgressManager) {
+        const percentage = Math.round((completedCount / totalSteps) * 100);
+        window.UnifiedProgressManager.updateProgress(overlayId, percentage, `טוען נתונים מלאים (${completedCount}/${totalSteps})`);
+      }
+
+      if (!silent) {
+        window.Logger?.debug?.('Enriched ticker with full data', {
+          tickerId: ticker.id,
+          symbol: ticker.symbol,
+          hasATR: !!enrichedTicker.atr,
+          hasWeek52: !!enrichedTicker.week52_high,
+          hasVolatility: !!enrichedTicker.volatility,
+          hasMA20: !!enrichedTicker.ma_20,
+          hasMA150: !!enrichedTicker.ma_150,
+          page: 'tickers'
+        });
+      }
+
+      return { index, ticker: enrichedTicker, error: null };
+    } catch (error) {
+      completedCount++;
+      window.Logger?.warn?.('Failed to enrich ticker with full data', {
+        tickerId: ticker.id,
+        symbol: ticker.symbol,
+        error: error.message,
+        page: 'tickers'
+      });
+      return { index, ticker: ticker, error: error.message };
+    }
+  };
+
+  // Process tickers in batches with concurrency limit
+  const enrichedResults = [];
+  for (let i = 0; i < tickers.length; i += batchSize) {
+    const batch = tickers.slice(i, i + batchSize);
+    
+    // Process batch with concurrency limit
+    const batchPromises = [];
+    for (let j = 0; j < batch.length; j += maxConcurrent) {
+      const concurrentBatch = batch.slice(j, j + maxConcurrent);
+      const concurrentPromises = concurrentBatch.map((ticker, batchIndex) => 
+        enrichSingleTicker(ticker, i + j + batchIndex)
+      );
+      batchPromises.push(Promise.all(concurrentPromises));
+    }
+    
+    const batchResults = await Promise.all(batchPromises);
+    enrichedResults.push(...batchResults.flat());
+  }
+
+  // Sort results by original index to maintain order
+  enrichedResults.sort((a, b) => a.index - b.index);
+  const enrichedTickers = enrichedResults.map(r => r.ticker);
+
+  if (showProgress && window.UnifiedProgressManager) {
+    window.UnifiedProgressManager.hideProgress(overlayId);
+  }
+
+  return enrichedTickers;
+}
+
+/**
+ * Load and refresh missing data for tickers
+ * @param {Array} tickers - Array of tickers
+ * @param {Object} options - Options (silent, showProgress)
+ * @returns {Promise<Object>} Summary of refresh operation
+ */
+async function loadAndRefreshMissingData(tickers, options = {}) {
+  const { silent = false, showProgress = true } = options;
+
+  if (!Array.isArray(tickers) || tickers.length === 0) {
+    return {
+      total: 0,
+      refreshed: 0,
+      failed: 0,
+      errors: [],
+      skipped: 0
+    };
+  }
+
+  try {
+    // Check for missing data using API endpoint
+    const response = await fetch('/api/external-data/status/tickers/missing-data');
+    if (!response.ok) {
+      throw new Error(`Failed to fetch missing data status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    const missingDataInfo = data?.data || {};
+
+    const missingHistorical = missingDataInfo.tickers_missing_historical || [];
+    const missingIndicators = missingDataInfo.tickers_missing_indicators || [];
+    const missingCurrent = missingDataInfo.tickers_missing_current || [];
+
+    const allMissingTickerIds = new Set([
+      ...missingHistorical.map(t => t.id),
+      ...missingIndicators.map(t => t.id),
+      ...missingCurrent.map(t => t.id)
+    ]);
+
+    if (allMissingTickerIds.size === 0) {
+      if (!silent) {
+        window.Logger?.info?.('No tickers with missing data found', { page: 'tickers' });
+        if (window.NotificationSystem) {
+          window.NotificationSystem.showSuccess('כל הנתונים עדכניים', 'כל הטיקרים בעלי נתונים עדכניים');
+        }
+      }
+      return {
+        total: tickers.length,
+        refreshed: 0,
+        failed: 0,
+        errors: [],
+        skipped: tickers.length
+      };
+    }
+
+    if (!silent) {
+      window.Logger?.info?.('Found tickers with missing data', {
+        missingHistorical: missingHistorical.length,
+        missingIndicators: missingIndicators.length,
+        missingCurrent: missingCurrent.length,
+        total: allMissingTickerIds.size,
+        page: 'tickers'
+      });
+    }
+
+    const overlayId = 'tickers-refresh-missing';
+    const tickersToRefresh = tickers.filter(t => allMissingTickerIds.has(t.id));
+    const tickersSkipped = tickers.filter(t => !allMissingTickerIds.has(t.id));
+    let progressStep = 0;
+    const totalSteps = tickersToRefresh.length;
+
+    if (showProgress && window.UnifiedProgressManager) {
+      // Create overlay first with config
+      window.UnifiedProgressManager.createOverlay(overlayId, {
+        title: 'מרענן נתונים חסרים',
+        totalSteps: totalSteps,
+        stepLabels: Array(totalSteps).fill(''),
+        stepDescriptions: Array(totalSteps).fill('')
+      });
+      // Show initial progress
+      window.UnifiedProgressManager.showProgress(overlayId, 1, 'מתחיל תהליך', `מרענן ${tickersToRefresh.length} טיקרים...`);
+    }
+
+    const results = {
+      total: tickersToRefresh.length,
+      refreshed: 0,
+      failed: 0,
+      errors: []
+    };
+
+    for (let i = 0; i < tickersToRefresh.length; i++) {
+      const ticker = tickersToRefresh[i];
+      progressStep++;
+
+      if (showProgress && window.UnifiedProgressManager) {
+        const percentage = Math.round((progressStep / totalSteps) * 100);
+        window.UnifiedProgressManager.updateProgress(overlayId, percentage, `מרענן נתונים עבור ${ticker.symbol || ticker.id} (${progressStep}/${totalSteps})`);
+      }
+
+      try {
+        if (window.ExternalDataService) {
+          // Don't use forceRefresh - let backend check what's missing and load only that
+          // Backend will determine what to load based on missing data check
+          const refreshResult = await window.ExternalDataService.refreshTickerData(ticker.id, {
+            forceRefresh: false, // Let backend decide
+            includeHistorical: undefined, // Let backend decide based on missing data
+            daysBack: undefined // Let backend decide
+          });
+          
+          // Check if data was actually loaded or skipped (all fresh)
+          if (refreshResult?.data?.skipped) {
+            // Data was fresh, skipped refresh
+            if (window.Logger) {
+              window.Logger.info('Ticker data is fresh, skipped refresh', {
+                tickerId: ticker.id,
+                symbol: ticker.symbol,
+                reason: refreshResult.data.reason,
+                page: 'tickers'
+              });
+            }
+            results.refreshed++; // Count as success (no refresh needed)
+          } else {
+            // Data was loaded
+            results.refreshed++;
+            if (window.Logger) {
+              window.Logger.info('Ticker data refreshed successfully', {
+                tickerId: ticker.id,
+                symbol: ticker.symbol,
+                actionsTaken: refreshResult?.data?.actions_taken || [],
+                actionsSkipped: refreshResult?.data?.actions_skipped || [],
+                page: 'tickers'
+              });
+            }
+          }
+        } else {
+          throw new Error('ExternalDataService not available');
+        }
+      } catch (error) {
+        results.failed++;
+        results.errors.push({
+          tickerId: ticker.id,
+          symbol: ticker.symbol,
+          error: error.message
+        });
+        window.Logger?.warn?.('Failed to refresh ticker data', {
+          tickerId: ticker.id,
+          symbol: ticker.symbol,
+          error: error.message,
+          page: 'tickers'
+        });
+      }
+    }
+
+    if (showProgress && window.UnifiedProgressManager) {
+      window.UnifiedProgressManager.hideProgress(overlayId);
+    }
+
+    if (!silent) {
+      const summaryMessage = `עודכנו ${results.refreshed} טיקרים${tickersSkipped.length > 0 ? `, ${tickersSkipped.length} דולגו (עדכניים)` : ''}${results.failed > 0 ? `, ${results.failed} נכשלו` : ''}`;
+      window.Logger?.info?.('Completed refreshing missing data', {
+        refreshed: results.refreshed,
+        skipped: tickersSkipped.length,
+        failed: results.failed,
+        page: 'tickers'
+      });
+      
+      if (window.NotificationSystem) {
+        if (results.failed === 0) {
+          window.NotificationSystem.showSuccess('רענון נתונים הושלם', summaryMessage);
+        } else {
+          window.NotificationSystem.showWarning('רענון נתונים הושלם (חלקי)', summaryMessage);
+        }
+      }
+    }
+
+    return {
+      ...results,
+      skipped: tickersSkipped.length
+    };
+  } catch (error) {
+    window.Logger?.error?.('Failed to load and refresh missing data', {
+      error: error.message,
+      page: 'tickers'
+    });
+    return {
+      total: tickers.length,
+      refreshed: 0,
+      failed: tickers.length,
+      errors: [{ error: error.message }]
+    };
+  }
+}
+
+/**
+ * Get data status badge HTML for a ticker
+ * @param {Object} ticker - Ticker object
+ * @returns {string} HTML badge element
+ */
+function getDataStatusBadge(ticker) {
+  const completeness = checkTickerDataCompleteness(ticker);
+  
+  let badgeClass = 'badge bg-success';
+  let badgeText = 'מלא';
+  let badgeTitle = 'כל הנתונים זמינים';
+
+  if (completeness.completeness === 0) {
+    badgeClass = 'badge bg-danger';
+    badgeText = 'חסר';
+    badgeTitle = 'נתונים חסרים - נדרש רענון';
+  } else if (completeness.completeness < 50) {
+    badgeClass = 'badge bg-danger';
+    badgeText = 'חלקי';
+    badgeTitle = `נתונים חלקיים (${completeness.completeness}%)`;
+  } else if (completeness.completeness < 100) {
+    badgeClass = 'badge bg-warning';
+    badgeText = 'חלקי';
+    badgeTitle = `נתונים חלקיים (${completeness.completeness}%)`;
+  }
+
+  return `<span class="${badgeClass}" title="${badgeTitle}" data-bs-toggle="tooltip">${badgeText}</span>`;
+}
+
 async function loadTickersDataInternal(options = {}) {
   try {
     window.Logger.info('Loading tickers data', { page: "tickers" });
@@ -1930,25 +2606,116 @@ async function loadTickersDataInternal(options = {}) {
 
       const data = await response.json();
       rawTickers = data?.data || data;
+      
+      // Log volume data for debugging
+      if (window.Logger && rawTickers && rawTickers.length > 0) {
+        const firstTicker = rawTickers[0];
+        window.Logger.info('📊 First ticker from API:', {
+          symbol: firstTicker.symbol,
+          volume: firstTicker.volume,
+          volumeType: typeof firstTicker.volume,
+          hasVolume: 'volume' in firstTicker,
+          change_percent: firstTicker.change_percent,
+          change_percentType: typeof firstTicker.change_percent,
+          hasChangePercent: 'change_percent' in firstTicker,
+          current_price: firstTicker.current_price,
+          change_amount: firstTicker.change_amount,
+          allKeys: Object.keys(firstTicker).filter(k => k.toLowerCase().includes('volume') || k.toLowerCase().includes('change'))
+        }, { page: 'tickers' });
+      }
     }
 
     // שמירת הנתונים
+    // IMPORTANT: yahoo_updated_at is the timestamp when external market data (price) was last updated
     tickersData = Array.isArray(rawTickers)
-      ? rawTickers.map(ticker => ({
-          ...ticker,
-          updated_at: ticker.updated_at
-            || ticker.yahoo_updated_at
-            || ticker.fetched_at
-            || ticker.last_updated_at
-            || null
-        }))
+      ? rawTickers.map(ticker => {
+          // Log volume for each ticker
+          if (window.Logger && ticker.volume !== undefined && ticker.volume !== null) {
+            window.Logger.debug('📊 Ticker volume data:', {
+              symbol: ticker.symbol,
+              volume: ticker.volume,
+              volumeType: typeof ticker.volume
+            }, { page: 'tickers' });
+          }
+          
+          return {
+            ...ticker,
+            // Preserve volume explicitly to ensure it's not lost
+            volume: ticker.volume !== undefined ? ticker.volume : null,
+            // Preserve yahoo_updated_at as primary source for "last price update" display
+            yahoo_updated_at: ticker.yahoo_updated_at || null,
+            updated_at: ticker.updated_at
+              || ticker.yahoo_updated_at
+              || ticker.fetched_at
+              || ticker.last_updated_at
+              || ticker.created_at
+              || null
+          };
+        })
       : [];
     window.tickersData = tickersData;
+    
+    // Log final tickersData volume
+    if (window.Logger && tickersData.length > 0) {
+      const firstTicker = tickersData[0];
+      window.Logger.info('📊 First ticker in tickersData after processing:', {
+        symbol: firstTicker.symbol,
+        volume: firstTicker.volume,
+        volumeType: typeof firstTicker.volume,
+        hasVolume: 'volume' in firstTicker,
+        change_percent: firstTicker.change_percent,
+        change_percentType: typeof firstTicker.change_percent,
+        hasChangePercent: 'change_percent' in firstTicker,
+        current_price: firstTicker.current_price,
+        change_amount: firstTicker.change_amount
+      }, { page: 'tickers' });
+    }
 
     // עדכון שדה active_trades
     await updateActiveTradesField();
 
-    // עדכון הטבלה (אחרי עדכון active_trades)
+    // Enrich tickers with full data (historical data, technical indicators)
+    // Only if not forcing refresh and we want to load full data
+    if (!options.skipEnrichment && options.enrichWithFullData !== false) {
+      try {
+        window.Logger?.info?.('Enriching tickers with full data', { 
+          count: tickersData.length, 
+          page: 'tickers' 
+        });
+        
+        tickersData = await enrichTickersWithFullData(tickersData, {
+          silent: options.silent || false,
+          showProgress: options.showProgress !== false,
+          forceRefresh: options.force || false
+        });
+      } catch (error) {
+        window.Logger?.warn?.('Failed to enrich tickers with full data, continuing with basic data', {
+          error: error.message,
+          page: 'tickers'
+        });
+      }
+    }
+
+    // Check for missing data and optionally refresh
+    if (options.autoRefreshMissing !== false) {
+      try {
+        const completenessSummary = await checkTickersDataCompleteness(tickersData);
+        if (completenessSummary.incomplete > 0 && !options.silent) {
+          window.Logger?.info?.('Found tickers with incomplete data', {
+            incomplete: completenessSummary.incomplete,
+            total: completenessSummary.total,
+            page: 'tickers'
+          });
+        }
+      } catch (error) {
+        window.Logger?.warn?.('Failed to check data completeness', {
+          error: error.message,
+          page: 'tickers'
+        });
+      }
+    }
+
+    // עדכון הטבלה (אחרי עדכון active_trades והעשרת נתונים)
     await updateTickersTable(tickersData);
 
     // עדכון סטטיסטיקות סיכום
@@ -1976,7 +2743,14 @@ async function loadTickersDataInternal(options = {}) {
 window.loadTickersData = async function(options = {}) {
   // When called from CRUDResponseHandler, always force reload to get fresh data
   // This matches the standard pattern used in executions.js and other pages
-  return await loadTickersDataInternal({ ...options, force: true });
+  // Note: enrichWithFullData is still enabled by default even with force: true
+  // because we want to enrich data after loading fresh basic data
+  return await loadTickersDataInternal({ 
+    ...options, 
+    force: true,
+    enrichWithFullData: options.enrichWithFullData !== false, // Default to true even with force
+    autoRefreshMissing: options.autoRefreshMissing !== false // Default to true
+  });
 };
 
 /**
@@ -1998,11 +2772,12 @@ function updateTickersSummaryStats(tickers) {
       // מערכת סיכום נתונים לא זמינה
       const summaryStatsElement = document.getElementById('summaryStats');
       if (summaryStatsElement) {
-        summaryStatsElement.innerHTML = `
-          <div style="color: #dc3545; font-weight: bold;">
-            ⚠️ מערכת סיכום נתונים לא זמינה - נא לרענן את הדף
-          </div>
-        `;
+        summaryStatsElement.textContent = '';
+        const div = document.createElement('div');
+        div.style.color = '#dc3545';
+        div.style.fontWeight = 'bold';
+        div.textContent = '⚠️ מערכת סיכום נתונים לא זמינה - נא לרענן את הדף';
+        summaryStatsElement.appendChild(div);
       }
     }
   } catch (error) {
@@ -2019,6 +2794,10 @@ function updateTickersSummaryStats(tickers) {
 function renderTickersTableRows(tickers) {
   try {
     const toFiniteNumber = (value) => {
+      // 0 הוא ערך תקין - לא להחזיר null עבורו
+      if (value === 0 || value === '0') {
+        return 0;
+      }
       if (value === null || value === undefined || value === '' || value === 'N/A') {
         return null;
       }
@@ -2058,32 +2837,184 @@ function renderTickersTableRows(tickers) {
 
     // בדיקה אם יש נתונים
     if (!tickers || tickers.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="10" class="text-center">לא נמצאו טיקרים</td></tr>';
+      tbody.textContent = '';
+      const tr = document.createElement('tr');
+      const td = document.createElement('td');
+      td.colSpan = 10;
+      td.className = 'text-center';
+      td.textContent = 'לא נמצאו טיקרים';
+      tr.appendChild(td);
+      tbody.appendChild(tr);
       return;
     }
 
-    // יצירת שורות עם עיצוב משופר
-    const tableRows = tickers.map(ticker => {
+    // ניקוי הטבלה
+    tbody.textContent = '';
+    
+    // יצירת שורות עם עיצוב משופר - שימוש ב-createElement במקום DOMParser
+    tickers.forEach(ticker => {
+      // קבלת סמל מטבע - שימוש ב-FieldRendererService._normalizeCurrencySymbol
+      // Priority: ticker.currency_symbol (from enriched data) > getCurrencySymbol(currency_id) > fallback
+      let rawCurrencySymbol = ticker.currency_symbol || ticker.currency?.symbol || getCurrencySymbol(ticker.currency_id);
+      let currencySymbol = rawCurrencySymbol || '$';
+      
+      // נירמול מטבע באמצעות FieldRendererService
+      if (window.FieldRendererService && typeof window.FieldRendererService._normalizeCurrencySymbol === 'function') {
+        currencySymbol = window.FieldRendererService._normalizeCurrencySymbol(currencySymbol) || currencySymbol;
+      } else {
+        // Fallback - אותו לוגיקה כמו FieldRendererService._normalizeCurrencySymbol
+        if (currencySymbol && currencySymbol.length > 1 && /^[A-Za-z]+$/.test(currencySymbol)) {
+          const symbolMap = {
+            'USD': '$', 'ILS': '₪', 'EUR': '€', 'GBP': '£', 'JPY': '¥',
+            'AUD': 'A$', 'CAD': 'C$', 'CHF': 'CHF', 'CNY': '¥', 'HKD': 'HK$', 'INR': '₹'
+          };
+          currencySymbol = symbolMap[currencySymbol.toUpperCase()] || currencySymbol;
+        }
+      }
+      
+      // מחיר - Priority: current_price > price > last_price
+      const priceValue = toFiniteNumber(ticker.current_price || ticker.price || ticker.last_price);
+      
+      // שינוי יומי - Priority: change_percent > daily_change_percent > change_pct_day > change_percent_day
+      // חשוב: בדיקה מפורטת - לא להשתמש ב-|| כי 0 הוא ערך תקין (סוף שבוע/חג)
+      // null/undefined = אין נתונים, 0 = יש נתונים אבל אין שינוי
+      let changePercentValue = null;
+      if (ticker.change_percent !== undefined && ticker.change_percent !== null) {
+        changePercentValue = toFiniteNumber(ticker.change_percent);
+        // אם הערך המקורי הוא 0, שמור אותו (גם אם toFiniteNumber החזיר null)
+        if (changePercentValue === null && ticker.change_percent === 0) {
+          changePercentValue = 0;
+        }
+      } else if (ticker.daily_change_percent !== undefined && ticker.daily_change_percent !== null) {
+        changePercentValue = toFiniteNumber(ticker.daily_change_percent);
+        if (changePercentValue === null && ticker.daily_change_percent === 0) {
+          changePercentValue = 0;
+        }
+      } else if (ticker.change_pct_day !== undefined && ticker.change_pct_day !== null) {
+        changePercentValue = toFiniteNumber(ticker.change_pct_day);
+        if (changePercentValue === null && ticker.change_pct_day === 0) {
+          changePercentValue = 0;
+        }
+      } else if (ticker.change_percent_day !== undefined && ticker.change_percent_day !== null) {
+        changePercentValue = toFiniteNumber(ticker.change_percent_day);
+        if (changePercentValue === null && ticker.change_percent_day === 0) {
+          changePercentValue = 0;
+        }
+      } else if (ticker.change_pct !== undefined && ticker.change_pct !== null) {
+        changePercentValue = toFiniteNumber(ticker.change_pct);
+        if (changePercentValue === null && ticker.change_pct === 0) {
+          changePercentValue = 0;
+        }
+      }
+      
+      // נפח - Priority: volume > trading_volume > daily_volume
+      // חשוב: בדיקה מפורטת - לא להשתמש ב-|| כי 0 הוא ערך תקין (סוף שבוע/חג)
+      // null/undefined = אין נתונים, 0 = יש נתונים אבל אין נפח
+      let volumeValue = null;
+      if (ticker.volume !== undefined && ticker.volume !== null) {
+        volumeValue = toFiniteNumber(ticker.volume);
+        // אם הערך המקורי הוא 0, שמור אותו (גם אם toFiniteNumber החזיר null)
+        if (volumeValue === null && ticker.volume === 0) {
+          volumeValue = 0;
+        }
+      } else if (ticker.trading_volume !== undefined && ticker.trading_volume !== null) {
+        volumeValue = toFiniteNumber(ticker.trading_volume);
+        if (volumeValue === null && ticker.trading_volume === 0) {
+          volumeValue = 0;
+        }
+      } else if (ticker.daily_volume !== undefined && ticker.daily_volume !== null) {
+        volumeValue = toFiniteNumber(ticker.daily_volume);
+        if (volumeValue === null && ticker.daily_volume === 0) {
+          volumeValue = 0;
+        }
+      }
 
-      // קבלת סמל מטבע
-      const currencySymbol = getCurrencySymbol(ticker.currency_id);
-      const priceValue = toFiniteNumber(ticker.current_price);
-      const changePercentValue = toFiniteNumber(ticker.change_percent);
-      const volumeValue = toFiniteNumber(ticker.volume);
-
-      const priceHtml = (typeof window.renderAmount === 'function' && priceValue !== null)
-        ? window.renderAmount(priceValue, currencySymbol, 2, false)
-        : (priceValue !== null ? `${currencySymbol || ''}${priceValue.toFixed(2)}` : 'N/A');
+      // מחיר - שימוש ב-FieldRendererService.renderAmount (תמיד עם סמל מטבע)
+      let priceHtml = 'N/A';
+      if (priceValue !== null && priceValue !== undefined && Number.isFinite(priceValue)) {
+        if (typeof window.renderAmount === 'function') {
+          priceHtml = window.renderAmount(priceValue, currencySymbol, 2, false);
+        } else {
+          // Fallback - תמיד עם סמל מטבע
+          priceHtml = `${currencySymbol || '$'}${priceValue.toFixed(2)}`;
+        }
+      }
 
       // Get change from open values
       const changeFromOpenValue = toFiniteNumber(ticker.change_from_open);
       const changeFromOpenPercentValue = toFiniteNumber(ticker.change_from_open_percent);
       
-      const changePercentHtml = (typeof window.renderNumericValue === 'function' && changePercentValue !== null)
-        ? window.renderNumericValue(changePercentValue, '%', true)
-        : (changePercentValue !== null
-            ? `${changePercentValue >= 0 ? '+' : ''}${changePercentValue.toFixed(2)}%`
-            : 'N/A');
+      // Calculate change amount from percentage if not provided directly
+      // תמיכה בשדות שונים מהשרת - חשוב: בדיקה מפורטת כי 0 הוא ערך תקין
+      let changeAmountValue = null;
+      if (ticker.change_amount !== undefined && ticker.change_amount !== null) {
+        changeAmountValue = toFiniteNumber(ticker.change_amount);
+      } else if (ticker.daily_change !== undefined && ticker.daily_change !== null) {
+        changeAmountValue = toFiniteNumber(ticker.daily_change);
+      } else if (ticker.change_amount_day !== undefined && ticker.change_amount_day !== null) {
+        changeAmountValue = toFiniteNumber(ticker.change_amount_day);
+      }
+      
+      // אם אין change amount אבל יש change percent ומחיר, חשב אותו
+      if ((changeAmountValue === null || changeAmountValue === undefined || isNaN(changeAmountValue)) && priceValue !== null && changePercentValue !== null && Number.isFinite(priceValue) && Number.isFinite(changePercentValue)) {
+        // Calculate: changeAmount = price * (changePercent / 100)
+        changeAmountValue = priceValue * (changePercentValue / 100);
+      }
+      
+      // Render change - שימוש בפורמט אחיד (תמיד להציג אם יש נתונים, כולל 0)
+      // בדיקה: האם יש נתונים בכלל (גם 0 זה נתון תקין - סוף שבוע/חג)
+      let changeHtml = 'N/A';
+      const hasChangePercent = changePercentValue !== null && changePercentValue !== undefined && !isNaN(changePercentValue) && Number.isFinite(changePercentValue);
+      const hasChangeAmount = changeAmountValue !== null && changeAmountValue !== undefined && !isNaN(changeAmountValue) && Number.isFinite(changeAmountValue);
+      
+      if (hasChangePercent) {
+        // 0 הוא ערך תקין - הצג אותו (סוף שבוע/חג)
+        const changeColor = changePercentValue > 0 ? 'text-success' : (changePercentValue < 0 ? 'text-danger' : 'text-secondary');
+        
+        // Format percentage: sign left of number, % symbol after number, no + for positive
+        const percentSign = changePercentValue < 0 ? '-' : '';
+        const percentValue = Math.abs(changePercentValue).toFixed(2);
+        const percentText = `${percentSign}${percentValue}%`;
+        
+        // Format amount: sign left of currency symbol, no + for positive
+        let amountText = '';
+        if (hasChangeAmount) {
+          const amountSign = changeAmountValue < 0 ? '-' : '';
+          const amountValue = Math.abs(changeAmountValue).toFixed(2);
+          amountText = `${amountSign}${currencySymbol}${amountValue}`;
+        }
+        
+        // Combine: amount in parentheses not bold first, then percentage bold (appears on right in RTL)
+        // In RTL: what's written last appears first (on the right), so we write percentage last to appear first
+        if (amountText) {
+          changeHtml = `<span class="${changeColor}" dir="ltr" style="white-space: nowrap;"><span class="fw-normal">(${amountText})</span><span class="fw-bold">${percentText}</span></span>`;
+        } else {
+          changeHtml = `<span class="${changeColor} fw-bold" dir="ltr">${percentText}</span>`;
+        }
+      } else if (hasChangeAmount) {
+        // אם יש רק change amount ללא percentage, הצג אותו (גם אם 0)
+        const changeColor = changeAmountValue > 0 ? 'text-success' : (changeAmountValue < 0 ? 'text-danger' : 'text-secondary');
+        const amountSign = changeAmountValue < 0 ? '-' : '';
+        const amountValue = Math.abs(changeAmountValue).toFixed(2);
+        changeHtml = `<span class="${changeColor} fw-bold" dir="ltr">${amountSign}${currencySymbol}${amountValue}</span>`;
+      }
+      
+      // Debug log for missing data
+      if (!hasChangePercent && !hasChangeAmount && window.Logger) {
+        window.Logger.debug('⚠️ No change data for ticker', {
+          symbol: ticker.symbol,
+          tickerId: ticker.id,
+          change_percent: ticker.change_percent,
+          daily_change_percent: ticker.daily_change_percent,
+          change_pct_day: ticker.change_pct_day,
+          change_amount: ticker.change_amount,
+          daily_change: ticker.daily_change,
+          change_amount_day: ticker.change_amount_day,
+          changePercentValue,
+          changeAmountValue,
+          page: 'tickers'
+        });
+      }
       
       // Build change from open HTML if available
       let changeFromOpenHtml = '';
@@ -2093,36 +3024,31 @@ function renderTickersTableRows(tickers) {
         changeFromOpenHtml = `<br><small class="${changeFromOpenColor}">${changeFromOpenIcon} מפתיחה: ${changeFromOpenValue >= 0 ? '+' : ''}${changeFromOpenValue.toFixed(2)} (${changeFromOpenPercentValue >= 0 ? '+' : ''}${changeFromOpenPercentValue.toFixed(2)}%)</small>`;
       }
 
-      // קבלת עיצוב סוג טיקר
-      const typeStyle = getTickerTypeStyle(ticker.type);
-      const typeLabel = tickerTypeColors[ticker.type]?.label || ticker.type || 'N/A';
+      // קבלת עיצוב סוג טיקר - שימוש ב-type_custom אם קיים
+      const tickerType = ticker.type_custom || ticker.type;
+      const typeStyle = getTickerTypeStyle(tickerType);
+      const typeLabel = tickerTypeColors[tickerType]?.label || tickerType || 'N/A';
 
-      // קבלת עיצוב סטטוס
-      const statusStyle = getTickerStatusStyle(ticker.status);
-      const statusLabel = getTickerStatusLabel(ticker.status);
+      // קבלת עיצוב סטטוס - שימוש ב-user_ticker_status אם קיים (סטטוס ברמת שיוך)
+      const tickerStatus = ticker.user_ticker_status || ticker.status;
+      const statusStyle = getTickerStatusStyle(tickerStatus);
+      const statusLabel = getTickerStatusLabel(tickerStatus);
       const statusHtml = (typeof window.renderStatus === 'function')
-        ? window.renderStatus(ticker.status, 'ticker')
+        ? window.renderStatus(tickerStatus, 'ticker')
         : `<span class="status-badge entity-badge-base" style="background-color: ${statusStyle.backgroundColor}; color: ${statusStyle.color};">
               ${statusLabel}
            </span>`;
 
-      const updatedCellHtml = (() => {
-        // Prefer FieldRendererService.renderDate for consistent date formatting
-        const rawDate = ticker.updated_at || ticker.yahoo_updated_at || ticker.fetched_at || ticker.last_updated_at || null;
-        
-        if (!rawDate) {
-          return `<td class="col-updated"><span class="updated-value-empty">N/A</span></td>`;
-        }
-
-        // Use FieldRendererService.renderDate for proper date formatting
-        let dateDisplay = '';
-        let epoch = null;
-
+      // Build updated cell HTML
+      // Priority: yahoo_updated_at (market data - last price update) > updated_at > fetched_at > created_at (fallback)
+      // IMPORTANT: yahoo_updated_at is the timestamp when external market data (price) was last updated
+      const rawDate = ticker.yahoo_updated_at || ticker.updated_at || ticker.fetched_at || ticker.last_updated_at || ticker.created_at || null;
+      let dateDisplay = '';
+      let epoch = null;
+      
+      if (rawDate) {
         if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
-          // Use FieldRendererService to render date with time
           dateDisplay = window.FieldRendererService.renderDate(rawDate, true);
-          
-          // Get epoch for sorting
           if (window.dateUtils && typeof window.dateUtils.getEpochMilliseconds === 'function') {
             const envelope = window.dateUtils.ensureDateEnvelope ? window.dateUtils.ensureDateEnvelope(rawDate) : rawDate;
             epoch = window.dateUtils.getEpochMilliseconds(envelope || rawDate);
@@ -2135,115 +3061,137 @@ function renderTickersTableRows(tickers) {
             epoch = rawDate.epochMs;
           }
         } else {
-          // Fallback: use parseValidDate if available, otherwise work with date envelope objects
-          const fallbackDate = typeof parseValidDate === 'function' 
-            ? parseValidDate(rawDate)
-            : (rawDate instanceof Date ? rawDate : (typeof rawDate === 'string' ? new Date(rawDate) : null));
-          
-          if (!fallbackDate || !(fallbackDate instanceof Date) || Number.isNaN(fallbackDate.getTime())) {
-            return `<td class="col-updated"><span class="updated-value-empty">N/A</span></td>`;
+          const fallbackDate = parseValidDate(rawDate);
+          if (fallbackDate && fallbackDate instanceof Date && !Number.isNaN(fallbackDate.getTime())) {
+            const envelope = window.dateUtils && typeof window.dateUtils.ensureDateEnvelope === 'function'
+              ? window.dateUtils.ensureDateEnvelope(fallbackDate)
+              : null;
+            epoch = (() => {
+              if (window.dateUtils && typeof window.dateUtils.getEpochMilliseconds === 'function') {
+                return window.dateUtils.getEpochMilliseconds(envelope || fallbackDate);
+              }
+              if (typeof window.getEpochMilliseconds === 'function') {
+                return window.getEpochMilliseconds(envelope || fallbackDate);
+              }
+              if (envelope && typeof envelope.epochMs === 'number') {
+                return envelope.epochMs;
+              }
+              return fallbackDate.getTime();
+            })();
+            dateDisplay = (() => {
+              if (window.dateUtils && typeof window.dateUtils.formatDateTime === 'function') {
+                return window.dateUtils.formatDateTime(envelope || fallbackDate);
+              }
+              if (window.dateUtils && typeof window.dateUtils.formatDate === 'function') {
+                return window.dateUtils.formatDate(envelope || fallbackDate, { includeTime: true });
+              }
+              try {
+                return window.formatDate ? window.formatDate(fallbackDate, true) : fallbackDate.toLocaleString('he-IL', {
+                  day: '2-digit',
+                  month: '2-digit',
+                  year: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit'
+                });
+              } catch (err) {
+                window.Logger?.warn('⚠️ tickers updated-cell date formatting failed', { err, tickerId: ticker?.id }, { page: 'tickers' });
+                return 'לא מוגדר';
+              }
+            })();
           }
-
-          const envelope = window.dateUtils && typeof window.dateUtils.ensureDateEnvelope === 'function'
-            ? window.dateUtils.ensureDateEnvelope(fallbackDate)
-            : null;
-
-          // Derive epoch milliseconds in a canonical way
-          epoch = (() => {
-            if (window.dateUtils && typeof window.dateUtils.getEpochMilliseconds === 'function') {
-              return window.dateUtils.getEpochMilliseconds(envelope || fallbackDate);
-            }
-            if (typeof window.getEpochMilliseconds === 'function') {
-              return window.getEpochMilliseconds(envelope || fallbackDate);
-            }
-            if (envelope && typeof envelope.epochMs === 'number') {
-              return envelope.epochMs;
-            }
-            return fallbackDate.getTime();
-          })();
-
-          // Build date display using unified date utilities
-          dateDisplay = (() => {
-            if (window.dateUtils && typeof window.dateUtils.formatDateTime === 'function') {
-              return window.dateUtils.formatDateTime(envelope || fallbackDate);
-            }
-            if (window.dateUtils && typeof window.dateUtils.formatDate === 'function') {
-              return window.dateUtils.formatDate(envelope || fallbackDate, { includeTime: true });
-            }
-            try {
-              return window.formatDate ? window.formatDate(fallbackDate, true) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(fallbackDate, { includeTime: true }) : fallbackDate.toLocaleString('he-IL', {
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-              }));
-            } catch (err) {
-              window.Logger?.warn('⚠️ tickers updated-cell date formatting failed', { err, tickerId: ticker?.id }, { page: 'tickers' });
-              return 'לא מוגדר';
-            }
-          })();
         }
+      }
+      
+      // Build updated cell HTML with data status badge
+      const dataStatusBadge = getDataStatusBadge(ticker);
+      const updatedCellHtml = dateDisplay && dateDisplay !== '-'
+        ? `<td class="col-updated"${epoch ? ` data-epoch="${epoch}"` : ''} title="${dateDisplay}"><span class="updated-value" dir="ltr">${dateDisplay}</span>${dataStatusBadge}</td>`
+        : `<td class="col-updated"><span class="updated-value-empty">N/A</span>${dataStatusBadge}</td>`;
 
-        if (!dateDisplay || dateDisplay === '-') {
-          return `<td class="col-updated"><span class="updated-value-empty">N/A</span></td>`;
-        }
-
-        return `<td class="col-updated"${epoch ? ` data-epoch="${epoch}"` : ''} title="${dateDisplay}"><span class="updated-value" dir="ltr">${dateDisplay}</span></td>`;
+      // Build actions menu HTML
+      const actionsHtml = (() => {
+        if (!window.createActionsMenu) return '<!-- Actions menu not available -->';
+        const actions = [
+          { type: 'VIEW', onclick: `window.showEntityDetails('ticker', ${ticker.id}, { mode: 'view' })`, title: 'צפה בפרטי טיקר' },
+          { type: 'DASHBOARD', onclick: `window.location.href='/ticker-dashboard.html?tickerId=${ticker.id}'`, title: 'דשבורד מלא' },
+          { type: 'REFRESH', onclick: `refreshTickerExternalData(${ticker.id}, ${ticker.symbol ? `'${String(ticker.symbol).replace(/'/g, "\\'")}'` : '""'})`, title: 'רענון נתונים חיצוניים' },
+          { type: 'EDIT', onclick: `window.ModalManagerV2 && window.ModalManagerV2.showEditModal('tickersModal', 'ticker', ${ticker.id})`, title: 'ערוך' },
+          { type: ticker.status === 'cancelled' ? 'REACTIVATE' : 'CANCEL', onclick: `${ticker.status === 'cancelled' ? 'reactivateTicker' : 'performTickerCancellation'}(${ticker.id})`, title: ticker.status === 'cancelled' ? 'הפעל מחדש טיקר' : 'בטל טיקר' },
+          { type: 'DELETE', onclick: `deleteTicker(${ticker.id})`, title: 'מחק' }
+        ];
+        const result = window.createActionsMenu(actions);
+        return result || '';
       })();
 
-      return `
-                <tr>
-                    <td title="${ticker.symbol || 'N/A'}">
-                        <span class="ticker-symbol-link" 
-                              data-onclick="if (window.showEntityDetails) { window.showEntityDetails('ticker', ${ticker.id}); } else { window.Logger.error('פונקציה showEntityDetails לא קיימת', { page: "tickers" }); }" 
-                              title="לחץ לצפייה בפרטי הטיקר">
-                            <strong>${ticker.symbol || 'N/A'}</strong>
-                        </span>
-                    </td>
-                    <td class="table-cell-center numeric-ltr" title="${priceValue !== null ? `מחיר נוכחי: ${currencySymbol || ''}${priceValue.toFixed(2)}` : 'אין נתוני מחיר'}" dir="ltr">
-                        ${priceHtml}
-                    </td>
-                    <td class="table-cell-center numeric-ltr" title="${changePercentValue !== null ? `שינוי יומי: ${changePercentValue.toFixed(2)}%` : 'אין נתוני שינוי'}${changeFromOpenValue !== null ? ` | שינוי מפתיחה: ${changeFromOpenValue.toFixed(2)} (${changeFromOpenPercentValue.toFixed(2)}%)` : ''}" dir="ltr">
-                        ${changePercentHtml}${changeFromOpenHtml}
-                    </td>
-                    <td class="table-cell-center numeric-ltr" title="${volumeValue !== null ? `נפח: ${volumeValue.toLocaleString('he-IL')}` : 'אין נתוני נפח'}" dir="ltr">
-                        ${window.renderVolume ? window.renderVolume(volumeValue, true) : (volumeValue !== null ? volumeValue.toLocaleString('he-IL') : 'N/A')}
-                    </td>
-                    <td class="status-cell" data-status="${ticker.status || ''}" title="${statusLabel}">
-                        ${statusHtml}
-                    </td>
-                    <td class="type-cell" data-type="${ticker.type || ''}" title="${typeLabel}">
-                        <span class="badge-type entity-badge-base" style="background-color: ${typeStyle.backgroundColor}; color: ${typeStyle.color};">
-                            ${typeLabel}
-                        </span>
-                    </td>
-                    <td title="${ticker.name || 'N/A'}">${ticker.name || 'N/A'}</td>
-                    <td class="table-cell-center" title="${ticker.currency_id ? `מטבע: ${getCurrencySymbol(ticker.currency_id)}` : 'אין נתוני מטבע'}">
-                        ${window.renderCurrency ? window.renderCurrency(ticker.currency_id, ticker.currency_name, getCurrencySymbol(ticker.currency_id)) : getCurrencySymbol(ticker.currency_id)}
-                    </td>
-                    ${updatedCellHtml}
-                    <td class="actions-cell">
-                        ${(() => {
-                          if (!window.createActionsMenu) return '<!-- Actions menu not available -->';
-                          const result = window.createActionsMenu([
-                            { type: 'VIEW', onclick: `window.showEntityDetails('ticker', ${ticker.id}, { mode: 'view' })`, title: 'צפה בפרטי טיקר' },
-                            { type: 'DASHBOARD', onclick: `window.location.href='/ticker-dashboard.html?tickerId=${ticker.id}'`, title: 'דשבורד מורחב' },
-                            { type: 'EDIT', onclick: `window.ModalManagerV2 && window.ModalManagerV2.showEditModal('tickersModal', 'ticker', ${ticker.id})`, title: 'ערוך' },
-                            { type: ticker.status === 'cancelled' ? 'REACTIVATE' : 'CANCEL', onclick: `${ticker.status === 'cancelled' ? 'reactivateTicker' : 'performTickerCancellation'}(${ticker.id})`, title: ticker.status === 'cancelled' ? 'הפעל מחדש טיקר' : 'בטל טיקר' },
-                            { type: 'DELETE', onclick: `deleteTicker(${ticker.id})`, title: 'מחק' }
-                          ]);
-                          return result || '';
-                        })()}
-                    </td>
-                </tr>
-            `;
+      // Create row element
+      const row = document.createElement('tr');
+      const rowHTML = `
+        <td title="${ticker.symbol || 'N/A'}">
+          <span class="ticker-symbol-link" 
+                data-onclick="if (window.showEntityDetails) { window.showEntityDetails('ticker', ${ticker.id}); } else { window.Logger.error('פונקציה showEntityDetails לא קיימת', { page: "tickers" }); }" 
+                title="לחץ לצפייה בפרטי הטיקר">
+            <strong>${ticker.symbol || 'N/A'}</strong>
+          </span>
+        </td>
+        <td class="table-cell-center numeric-ltr" title="${priceValue !== null && Number.isFinite(priceValue) ? `מחיר נוכחי: ${currencySymbol || ''}${priceValue.toFixed(2)}` : 'אין נתוני מחיר'}" dir="ltr">
+          ${priceHtml}
+        </td>
+        <td class="table-cell-center numeric-ltr" title="${changePercentValue !== null ? `שינוי יומי: ${changePercentValue.toFixed(2)}%${changeAmountValue !== null && !isNaN(changeAmountValue) ? ` (${changeAmountValue >= 0 ? '+' : ''}${currencySymbol}${Math.abs(changeAmountValue).toFixed(2)})` : ''}` : 'אין נתוני שינוי'}${changeFromOpenValue !== null ? ` | שינוי מפתיחה: ${changeFromOpenValue.toFixed(2)} (${changeFromOpenPercentValue.toFixed(2)}%)` : ''}" dir="ltr">
+          ${changeHtml}${changeFromOpenHtml}
+        </td>
+        <td class="table-cell-center numeric-ltr" title="${volumeValue !== null && volumeValue !== undefined && !isNaN(volumeValue) && Number.isFinite(volumeValue) && volumeValue >= 0 ? `נפח: ${volumeValue.toLocaleString('he-IL')}` : 'אין נתוני נפח'}" dir="ltr">
+          ${(() => {
+            // הצג נפח גם אם הוא 0 (זה נתון תקין)
+            if (volumeValue !== null && volumeValue !== undefined && !isNaN(volumeValue) && Number.isFinite(volumeValue) && volumeValue >= 0) {
+              if (typeof window.renderVolume === 'function') {
+                return window.renderVolume(volumeValue, true);
+              }
+              return volumeValue.toLocaleString('he-IL');
+            }
+            // Debug log for missing volume
+            if (window.Logger) {
+              window.Logger.debug('⚠️ No volume data for ticker', {
+                symbol: ticker.symbol,
+                tickerId: ticker.id,
+                volume: ticker.volume,
+                trading_volume: ticker.trading_volume,
+                daily_volume: ticker.daily_volume,
+                volumeValue,
+                page: 'tickers'
+              });
+            }
+            return 'N/A';
+          })()}
+        </td>
+        <td class="status-cell" data-status="${ticker.user_ticker_status || ticker.status || ''}" title="${statusLabel}">
+          ${statusHtml}
+        </td>
+        <td class="type-cell" data-type="${ticker.type_custom || ticker.type || ''}" title="${typeLabel}">
+          <span class="badge-type entity-badge-base" style="background-color: ${typeStyle.backgroundColor}; color: ${typeStyle.color};">
+            ${typeLabel}
+          </span>
+        </td>
+        <td title="${ticker.name_custom || ticker.name || 'N/A'}">${ticker.name_custom || ticker.name || 'N/A'}</td>
+        <td class="table-cell-center" title="${ticker.currency_id ? `מטבע: ${currencySymbol}` : 'אין נתוני מטבע'}">
+          ${window.renderCurrency ? window.renderCurrency(ticker.currency_id, ticker.currency_name, currencySymbol) : currencySymbol}
+        </td>
+        ${updatedCellHtml}
+        <td class="actions-cell">
+          ${actionsHtml}
+        </td>
+      `;
+      row.textContent = '';
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(`<table><tbody><tr>${rowHTML}</tr></tbody></table>`, 'text/html');
+      const tempRow = doc.body.querySelector('tr');
+      if (tempRow) {
+          Array.from(tempRow.children).forEach(cell => {
+              row.appendChild(cell.cloneNode(true));
+          });
+      }
+      
+      tbody.appendChild(row);
     });
-
-    // עדכון הטבלה עם כפיית רענון DOM
-    const finalHTML = tableRows.join('');
-    tbody.innerHTML = '';  // ניקוי מלא
-    tbody.innerHTML = finalHTML;  // הוספת התוכן החדש
     
     // כפיית reflow של הדפדפן
     tbody.offsetHeight;
@@ -2414,16 +3362,31 @@ async function checkTickerExternalData() {
         // Disable button and show loading
         checkBtn.disabled = true;
         // Use IconSystem to render loader icon
+        checkBtn.textContent = '';
         if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {
             const loaderIcon = await window.IconSystem.renderIcon('button', 'refresh', {
                 size: '16',
                 alt: 'loading',
                 class: 'icon fa-spin'
             });
-            checkBtn.innerHTML = loaderIcon + ' בודק...';
+            // Convert HTML string to DOM elements safely
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(loaderIcon, 'text/html');
+            const iconElement = doc.body.firstElementChild;
+            if (iconElement) {
+                checkBtn.appendChild(iconElement.cloneNode(true));
+            }
+            checkBtn.appendChild(document.createTextNode(' בודק...'));
         } else {
             // Fallback if IconSystem not available
-            checkBtn.innerHTML = '<img src="/trading-ui/images/icons/tabler/loader.svg" width="16" height="16" alt="loading" class="icon fa-spin"> בודק...';
+            const img = document.createElement('img');
+            img.src = '/trading-ui/images/icons/tabler/loader.svg';
+            img.width = 16;
+            img.height = 16;
+            img.alt = 'loading';
+            img.className = 'icon fa-spin';
+            checkBtn.appendChild(img);
+            checkBtn.appendChild(document.createTextNode(' בודק...'));
         }
         resultDiv.style.display = 'none';
         warningDiv.style.display = 'none';
@@ -2495,21 +3458,51 @@ async function checkTickerExternalData() {
                 `;
             }
             
-            const currencyNotice = currencyResolution.hasCurrency
-                ? ''
-                : `<div class="text-warning small mt-2">לא התקבל מטבע מהספק, המחיר מוצג ללא סמל מטבע.</div>`;
-
-            resultDiv.innerHTML = `
-                <div class="alert alert-success mb-0">
-                    <div class="d-flex align-items-center gap-2 mb-2">
-                        <i class="fas fa-check-circle"></i>
-                        <strong>נתונים נמצאו עבור ${internalSymbol}</strong>
-                    </div>
-                    ${tickerInfoHTML}
-                    ${currencyNotice}
-                    ${providerSymbolNote}
-                </div>
-            `;
+            // Clear and build result div using createElement
+            resultDiv.textContent = '';
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'alert alert-success mb-0';
+            
+            const headerDiv = document.createElement('div');
+            headerDiv.className = 'd-flex align-items-center gap-2 mb-2';
+            const icon = document.createElement('i');
+            icon.className = 'fas fa-check-circle';
+            headerDiv.appendChild(icon);
+            const strong = document.createElement('strong');
+            strong.textContent = `נתונים נמצאו עבור ${internalSymbol}`;
+            headerDiv.appendChild(strong);
+            alertDiv.appendChild(headerDiv);
+            
+            // Add ticker info HTML - Convert HTML string to DOM elements safely
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(tickerInfoHTML, 'text/html');
+            const fragment = document.createDocumentFragment();
+            Array.from(doc.body.childNodes).forEach(node => {
+                fragment.appendChild(node.cloneNode(true));
+            });
+            alertDiv.appendChild(fragment);
+            
+            // Add currency notice if needed
+            if (!currencyResolution.hasCurrency) {
+                const noticeDiv = document.createElement('div');
+                noticeDiv.className = 'text-warning small mt-2';
+                noticeDiv.textContent = 'לא התקבל מטבע מהספק, המחיר מוצג ללא סמל מטבע.';
+                alertDiv.appendChild(noticeDiv);
+            }
+            
+            // Add provider symbol note if needed
+            if (providerSymbolNote) {
+                // Convert HTML string to DOM elements safely
+                const parser2 = new DOMParser();
+                const doc2 = parser2.parseFromString(providerSymbolNote, 'text/html');
+                const fragment2 = document.createDocumentFragment();
+                Array.from(doc2.body.childNodes).forEach(node => {
+                    fragment2.appendChild(node.cloneNode(true));
+                });
+                alertDiv.appendChild(fragment2);
+            }
+            
+            resultDiv.appendChild(alertDiv);
             resultDiv.style.display = 'block';
             warningDiv.style.display = 'none';
             
@@ -2521,17 +3514,32 @@ async function checkTickerExternalData() {
     } catch (error) {
         window.Logger?.error('Error checking external data', { page: 'tickers', symbol, error: error?.message || error });
         
-        // Show warning
-        warningDiv.innerHTML = `
-            <div class="d-flex align-items-start">
-                <i class="fas fa-exclamation-triangle me-2 mt-1"></i>
-                <div>
-                    <strong>לא ניתן לטעון נתונים חיצוניים</strong>
-                    <p class="mb-0 small">${error.message || 'שגיאה בטעינת נתונים מהשרת'}</p>
-                    <p class="mb-0 small mt-1">ניתן להמשיך בהוספת הטיקר ללא נתונים חיצוניים.</p>
-                </div>
-            </div>
-        `;
+        // Show warning using createElement
+        warningDiv.textContent = '';
+        const warningContainer = document.createElement('div');
+        warningContainer.className = 'd-flex align-items-start';
+        
+        const warningIcon = document.createElement('i');
+        warningIcon.className = 'fas fa-exclamation-triangle me-2 mt-1';
+        warningContainer.appendChild(warningIcon);
+        
+        const warningContent = document.createElement('div');
+        const strong = document.createElement('strong');
+        strong.textContent = 'לא ניתן לטעון נתונים חיצוניים';
+        warningContent.appendChild(strong);
+        
+        const errorP = document.createElement('p');
+        errorP.className = 'mb-0 small';
+        errorP.textContent = error.message || 'שגיאה בטעינת נתונים מהשרת';
+        warningContent.appendChild(errorP);
+        
+        const noticeP = document.createElement('p');
+        noticeP.className = 'mb-0 small mt-1';
+        noticeP.textContent = 'ניתן להמשיך בהוספת הטיקר ללא נתונים חיצוניים.';
+        warningContent.appendChild(noticeP);
+        
+        warningContainer.appendChild(warningContent);
+        warningDiv.appendChild(warningContainer);
         warningDiv.style.display = 'block';
         resultDiv.style.display = 'none';
         
@@ -2545,16 +3553,31 @@ async function checkTickerExternalData() {
         // Re-enable button
         checkBtn.disabled = false;
         // Use IconSystem to render refresh icon
+        checkBtn.textContent = '';
         if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {
             const refreshIcon = await window.IconSystem.renderIcon('button', 'refresh', {
                 size: '16',
                 alt: 'refresh',
                 class: 'icon me-1'
             });
-            checkBtn.innerHTML = refreshIcon + ' בדוק נתונים חיצוניים';
+            // Convert HTML string to DOM elements safely
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(refreshIcon, 'text/html');
+            const iconElement = doc.body.firstElementChild;
+            if (iconElement) {
+                checkBtn.appendChild(iconElement.cloneNode(true));
+            }
+            checkBtn.appendChild(document.createTextNode(' בדוק נתונים חיצוניים'));
         } else {
             // Fallback if IconSystem not available
-            checkBtn.innerHTML = '<img src="/trading-ui/images/icons/tabler/refresh.svg" width="16" height="16" alt="refresh" class="icon me-1"> בדוק נתונים חיצוניים';
+            const img = document.createElement('img');
+            img.src = '/trading-ui/images/icons/tabler/refresh.svg';
+            img.width = 16;
+            img.height = 16;
+            img.alt = 'refresh';
+            img.className = 'icon me-1';
+            checkBtn.appendChild(img);
+            checkBtn.appendChild(document.createTextNode(' בדוק נתונים חיצוניים'));
         }
     }
 }
@@ -2877,6 +3900,258 @@ window.addEventListener('load', function () {
 
 // ===== EXTERNAL DATA FUNCTIONS =====
 // External data integration and refresh
+
+/**
+ * Refresh external data for a specific ticker
+ * Updates external price data, historical data, and technical indicators for a single ticker
+ * 
+ * @function refreshTickerExternalData
+ * @async
+ * @param {number} tickerId - Ticker ID
+ * @param {string} tickerSymbol - Ticker symbol (for display)
+ * @returns {Promise<void>}
+ */
+async function refreshTickerExternalData(tickerId, tickerSymbol = '') {
+  try {
+    if (!window.ExternalDataService) {
+      window.NotificationSystem?.showError('שגיאה', 'שירות נתונים חיצוניים לא זמין');
+      return;
+    }
+
+    const overlayId = `refresh-ticker-${tickerId}`;
+    
+    // Show progress overlay
+    if (window.UnifiedProgressManager) {
+      window.UnifiedProgressManager.showProgress(overlayId, {
+        title: `מרענן נתונים עבור ${tickerSymbol || `טיקר #${tickerId}`}`,
+        message: 'מתחבר לספק נתונים...',
+        showCancel: false
+      });
+    }
+
+    // Refresh ticker data with historical data and technical indicators
+    const refreshedData = await window.ExternalDataService.refreshTickerData(tickerId, {
+      forceRefresh: true,
+      includeHistorical: true,
+      daysBack: 150
+    });
+
+    // Invalidate cache to force reload of fresh data
+    if (window.UnifiedCacheManager) {
+      await window.UnifiedCacheManager.invalidate(`ticker-full-${tickerId}`, 'memory');
+      await window.UnifiedCacheManager.invalidate(`entity-details-ticker-${tickerId}`, 'memory');
+    }
+
+    // Wait a bit for backend to save the data
+    await new Promise(resolve => setTimeout(resolve, 500));
+
+    // Reload ticker details from EntityDetailsAPI to get all updated data (including volume)
+    if (window.entityDetailsAPI) {
+      const fullData = await window.entityDetailsAPI.getEntityDetails('ticker', tickerId, {
+        includeMarketData: true,
+        includeLinkedItems: false,
+        forceRefresh: true
+      });
+
+      // Update ticker data with full details from EntityDetailsAPI
+      // Priority: refreshedData (latest from API) > fullData (from EntityDetailsAPI) > existing data
+      if (window.tickersData && Array.isArray(window.tickersData)) {
+        const tickerIndex = window.tickersData.findIndex(t => t.id === tickerId);
+        if (tickerIndex !== -1) {
+          // Merge: refreshedData has the latest data from the refresh endpoint
+          // fullData has all fields from EntityDetailsAPI (may be cached)
+          // Use refreshedData.volume if available, otherwise use fullData.volume
+          const finalVolume = refreshedData.volume !== null && refreshedData.volume !== undefined 
+            ? refreshedData.volume 
+            : (fullData.volume !== null && fullData.volume !== undefined ? fullData.volume : null);
+          
+          // Log detailed information for debugging
+          window.Logger?.info?.('Updating ticker data after refresh', {
+            tickerId,
+            symbol: tickerSymbol,
+            refreshedData: {
+              price: refreshedData.price,
+              volume: refreshedData.volume,
+              change_percent: refreshedData.change_percent
+            },
+            fullData: {
+              price: fullData.price,
+              volume: fullData.volume,
+              change_percent: fullData.change_percent
+            },
+            finalVolume: finalVolume,
+            hasVolume: finalVolume !== null && finalVolume !== undefined,
+            page: 'tickers'
+          });
+          
+          // Update ticker data - prioritize refreshedData for latest values
+          const updatedTicker = {
+            ...window.tickersData[tickerIndex],
+            // Merge all fields from fullData first (includes all entity details)
+            ...fullData,
+            // Override with refreshed data to ensure latest values (these are the most recent)
+            current_price: refreshedData.price || fullData.current_price || window.tickersData[tickerIndex].current_price,
+            change_percent: refreshedData.change_percent || fullData.change_percent || window.tickersData[tickerIndex].change_percent,
+            change_amount: refreshedData.change_amount || fullData.change_amount || window.tickersData[tickerIndex].change_amount,
+            volume: finalVolume, // Use volume from refreshedData if available, otherwise from fullData
+            price: refreshedData.price || fullData.price,
+            fetched_at: refreshedData.fetched_at || fullData.fetched_at
+          };
+          
+          window.tickersData[tickerIndex] = updatedTicker;
+          
+          // Log after update to verify
+          window.Logger?.info?.('Ticker data updated in window.tickersData', {
+            tickerId,
+            symbol: tickerSymbol,
+            updatedVolume: window.tickersData[tickerIndex].volume,
+            updatedPrice: window.tickersData[tickerIndex].current_price,
+            page: 'tickers'
+          });
+        }
+      }
+    } else {
+      // Fallback: Update with refreshed data directly if EntityDetailsAPI is not available
+      if (window.tickersData && Array.isArray(window.tickersData)) {
+        const tickerIndex = window.tickersData.findIndex(t => t.id === tickerId);
+        if (tickerIndex !== -1) {
+          window.tickersData[tickerIndex] = {
+            ...window.tickersData[tickerIndex],
+            current_price: refreshedData.price,
+            change_percent: refreshedData.change_percent,
+            change_amount: refreshedData.change_amount,
+            volume: refreshedData.volume
+          };
+        }
+      }
+    }
+
+    // Hide progress overlay
+    if (window.UnifiedProgressManager) {
+      window.UnifiedProgressManager.hideProgress(overlayId);
+    }
+
+    // Re-render the tickers table to show updated data (including volume)
+    if (window.tickersData && Array.isArray(window.tickersData)) {
+      renderTickersTableRows(window.tickersData);
+    }
+
+    // Show success notification
+    window.NotificationSystem?.showSuccess(
+      'רענון הושלם',
+      `נתוני ${tickerSymbol || `טיקר #${tickerId}`} עודכנו בהצלחה`
+    );
+
+    // Re-render table to show updated data
+    if (typeof renderTickersTableRows === 'function') {
+      await renderTickersTableRows(window.tickersData);
+    } else if (typeof updateTickersTable === 'function') {
+      await updateTickersTable(window.tickersData);
+    }
+
+  } catch (error) {
+    // Hide progress overlay on error
+    if (window.UnifiedProgressManager) {
+      window.UnifiedProgressManager.hideProgress(`refresh-ticker-${tickerId}`);
+    }
+
+    window.Logger?.error('Error refreshing ticker external data:', error, { page: 'tickers' });
+    window.NotificationSystem?.showError(
+      'שגיאה ברענון נתונים',
+      `לא הצלחנו לרענן את נתוני ${tickerSymbol || `טיקר #${tickerId}`}: ${error.message}`
+    );
+  }
+}
+
+// Make function globally available
+window.refreshTickerExternalData = refreshTickerExternalData;
+
+/**
+ * Refresh external data for all tickers on the page
+ * Updates external price data, historical data, and technical indicators for all visible tickers
+ * 
+ * @function refreshAllTickersData
+ * @async
+ * @returns {Promise<void>}
+ */
+async function refreshAllTickersData() {
+  try {
+    if (!window.tickersData || window.tickersData.length === 0) {
+      window.NotificationSystem?.showError('שגיאה', 'אין טיקרים לרענון');
+      return;
+    }
+
+    const overlayId = 'refresh-all-tickers';
+    
+    // Show progress overlay
+    if (window.UnifiedProgressManager) {
+      window.UnifiedProgressManager.showProgress(overlayId, {
+        title: `מרענן נתונים עבור ${window.tickersData.length} טיקרים`,
+        message: 'מתחבר לספק נתונים...',
+        showCancel: false
+      });
+    }
+
+    let successCount = 0;
+    let errorCount = 0;
+
+    // Refresh each ticker one by one
+    for (let i = 0; i < window.tickersData.length; i++) {
+      const ticker = window.tickersData[i];
+      
+      if (window.UnifiedProgressManager) {
+        window.UnifiedProgressManager.updateProgress(overlayId, {
+          message: `מרענן ${ticker.symbol || `טיקר #${ticker.id}`} (${i + 1}/${window.tickersData.length})`
+        });
+      }
+
+      try {
+        await window.refreshTickerExternalData(ticker.id, ticker.symbol || '');
+        successCount++;
+      } catch (error) {
+        errorCount++;
+        window.Logger?.warn(`Failed to refresh ticker ${ticker.symbol || ticker.id}:`, error);
+      }
+    }
+
+    // Hide progress overlay
+    if (window.UnifiedProgressManager) {
+      window.UnifiedProgressManager.hideProgress(overlayId);
+    }
+
+    // Show summary notification
+    if (errorCount === 0) {
+      window.NotificationSystem?.showSuccess(
+        'רענון הושלם',
+        `עודכנו נתונים עבור ${successCount} טיקרים בהצלחה`
+      );
+    } else {
+      window.NotificationSystem?.showWarning(
+        'רענון הושלם חלקית',
+        `עודכנו נתונים עבור ${successCount} טיקרים, ${errorCount} נכשלו`
+      );
+    }
+
+    // Reload table to show updated data
+    if (typeof updateTickersTable === 'function') {
+      await updateTickersTable(window.tickersData);
+    }
+
+  } catch (error) {
+    if (window.UnifiedProgressManager) {
+      window.UnifiedProgressManager.hideProgress('refresh-all-tickers');
+    }
+
+    window.Logger?.error('Error refreshing all tickers data:', error, { page: 'tickers' });
+    window.NotificationSystem?.showError(
+      'שגיאה ברענון נתונים',
+      `לא הצלחנו לרענן את הנתונים: ${error.message}`
+    );
+  }
+}
+
+// Make function globally available
+window.refreshAllTickersData = refreshAllTickersData;
 
 /**
  * Refresh Yahoo Finance data for all tickers

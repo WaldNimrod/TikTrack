@@ -62,7 +62,7 @@ class SMCacheSection extends SMBaseSection {
    */
   async fetchCacheStats() {
     try {
-      const response = await fetch(this.apiEndpoints.stats, {
+      const response = await this.fetchWithTimeout(this.apiEndpoints.stats, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -88,7 +88,7 @@ class SMCacheSection extends SMBaseSection {
    */
   async fetchCacheHealth() {
     try {
-      const response = await fetch(this.apiEndpoints.health, {
+      const response = await this.fetchWithTimeout(this.apiEndpoints.health, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -114,7 +114,7 @@ class SMCacheSection extends SMBaseSection {
    */
   async fetchCacheInfo() {
     try {
-      const response = await fetch(this.apiEndpoints.info, {
+      const response = await this.fetchWithTimeout(this.apiEndpoints.info, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -138,15 +138,20 @@ class SMCacheSection extends SMBaseSection {
    * Render cache data
    * הצגת נתוני מטמון
    */
-  render(data) {
+  async render(data) {
     if (!data || (!data.stats && !data.health && !data.info)) {
       this.showEmptyState('אין נתוני מטמון זמינים');
       return;
     }
 
     try {
-      const cacheHtml = this.createCacheHTML(data);
-      this.container.innerHTML = cacheHtml;
+      const cacheHtml = await this.createCacheHTML(data);
+      this.container.textContent = '';
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(cacheHtml, 'text/html');
+      doc.body.childNodes.forEach(node => {
+        this.container.appendChild(node.cloneNode(true));
+      });
       
       console.log('✅ Cache section rendered successfully');
       
@@ -164,8 +169,11 @@ class SMCacheSection extends SMBaseSection {
    * Create cache HTML
    * יצירת HTML של מטמון
    */
-  createCacheHTML(data) {
+  async createCacheHTML(data) {
     const { stats, health, info } = data;
+
+    // Get cache layers card (async operation)
+    const layersCard = await this.createCacheLayersCard(stats, health, info);
 
     return `
       <div class="cache-overview">
@@ -199,7 +207,7 @@ class SMCacheSection extends SMBaseSection {
         <!-- Cache Layers Status -->
         <div class="row mb-4">
           <div class="col-12">
-            ${this.createCacheLayersCard(stats, health, info)}
+            ${layersCard}
           </div>
         </div>
 
@@ -219,12 +227,12 @@ class SMCacheSection extends SMBaseSection {
    */
   createCacheStatsCard(stats) {
     if (!stats) {
-      return SMUIComponents.createStatusCard(
+      return SMUIComponents.createStatsCard(
         'סטטיסטיקות מטמון',
-        'לא זמין',
-        'warning',
-        'fa-chart-bar',
-        'נתונים לא זמינים'
+        [
+          { label: 'נתונים', value: 'לא זמין', icon: 'fa-exclamation-triangle', color: 'warning' }
+        ],
+        { icon: 'fa-chart-bar' }
       );
     }
 
@@ -232,34 +240,29 @@ class SMCacheSection extends SMBaseSection {
     const missRate = stats.miss_rate || 0;
     const totalRequests = stats.total_requests || 0;
 
-    return `
-      <div class="card cache-stats-card">
-        <div class="card-body text-center">
-          <h5><i class="fas fa-chart-bar"></i> סטטיסטיקות</h5>
-          
-          <div class="cache-metric">
-            <div class="metric-value" style="color: ${this.getHitRateColor(hitRate)}">
-              ${hitRate.toFixed(1)}%
-            </div>
-            <div class="metric-label">Hit Rate</div>
-          </div>
-          
-          <div class="cache-metric">
-            <div class="metric-value text-warning">
-              ${missRate.toFixed(1)}%
-            </div>
-            <div class="metric-label">Miss Rate</div>
-          </div>
-          
-          <div class="cache-metric">
-            <div class="metric-value text-info">
-              ${SMUIComponents.formatNumber(totalRequests)}
-            </div>
-            <div class="metric-label">בקשות כולל</div>
-          </div>
-        </div>
-      </div>
-    `;
+    return SMUIComponents.createStatsCard(
+      'סטטיסטיקות מטמון',
+      [
+        {
+          label: 'Hit Rate',
+          value: `${hitRate.toFixed(1)}%`,
+          icon: 'fa-check-circle',
+          color: this.getHitRateColor(hitRate) === '#28a745' ? 'success' : this.getHitRateColor(hitRate) === '#ffc107' ? 'warning' : 'danger'
+        },
+        {
+          label: 'Miss Rate',
+          value: `${missRate.toFixed(1)}%`,
+          icon: 'fa-times-circle',
+          color: 'warning'
+        },
+        {
+          label: 'בקשות כולל',
+          value: SMUIComponents.formatNumber(totalRequests),
+          icon: 'fa-list'
+        }
+      ],
+      { icon: 'fa-chart-bar' }
+    );
   }
 
   /**
@@ -296,39 +299,36 @@ class SMCacheSection extends SMBaseSection {
    */
   createCachePerformanceCard(stats) {
     if (!stats) {
-      return SMUIComponents.createStatusCard(
+      return SMUIComponents.createStatsCard(
         'ביצועים',
-        'לא זמין',
-        'warning',
-        'fa-tachometer-alt',
-        'נתונים לא זמינים'
+        [
+          { label: 'נתונים', value: 'לא זמין', icon: 'fa-exclamation-triangle', color: 'warning' }
+        ],
+        { icon: 'fa-tachometer-alt' }
       );
     }
 
     const avgResponseTime = stats.average_response_time || 0;
     const totalSize = stats.total_size || 0;
 
-    return `
-      <div class="card cache-performance-card">
-        <div class="card-body text-center">
-          <h5><i class="fas fa-tachometer-alt"></i> ביצועים</h5>
-          
-          <div class="performance-metric">
-            <div class="metric-value text-primary">
-              ${avgResponseTime.toFixed(2)}ms
-            </div>
-            <div class="metric-label">זמן תגובה ממוצע</div>
-          </div>
-          
-          <div class="performance-metric">
-            <div class="metric-value text-info">
-              ${SMUIComponents.formatBytes(totalSize)}
-            </div>
-            <div class="metric-label">גודל כולל</div>
-          </div>
-        </div>
-      </div>
-    `;
+    return SMUIComponents.createStatsCard(
+      'ביצועים',
+      [
+        {
+          label: 'זמן תגובה ממוצע',
+          value: `${avgResponseTime.toFixed(2)}ms`,
+          icon: 'fa-clock',
+          color: 'primary'
+        },
+        {
+          label: 'גודל כולל',
+          value: SMUIComponents.formatBytes(totalSize),
+          icon: 'fa-hdd',
+          color: 'info'
+        }
+      ],
+      { icon: 'fa-tachometer-alt' }
+    );
   }
 
   /**
@@ -336,39 +336,53 @@ class SMCacheSection extends SMBaseSection {
    * יצירת כרטיס פעולות מטמון
    */
   createCacheActionsCard() {
-    return `
-      <div class="card cache-actions-card">
-        <div class="card-body text-center">
-          <h5><i class="fas fa-cogs"></i> פעולות</h5>
-          
-          <div class="cache-actions">
-            <button class="btn btn-warning btn-sm mb-2 w-100" onclick="SMCacheSection.clearCache('light')">
-              <i class="fas fa-broom"></i> נקה קל
-            </button>
-            
-            <button class="btn btn-warning btn-sm mb-2 w-100" onclick="SMCacheSection.clearCache('medium')">
-              <i class="fas fa-trash-alt"></i> נקה בינוני
-            </button>
-            
-            <button class="btn btn-danger btn-sm mb-2 w-100" onclick="SMCacheSection.clearCache('full')">
-              <i class="fas fa-fire"></i> נקה מלא
-            </button>
-            
-            <button class="btn btn-dark btn-sm w-100" onclick="SMCacheSection.clearCache('nuclear')">
-              <i class="fas fa-bomb"></i> נקה גרעיני
-            </button>
-          </div>
-        </div>
-      </div>
-    `;
+    return SMUIComponents.createActionsCard(
+      'פעולות מטמון',
+      [
+        {
+          title: 'פעולות ניקוי',
+          actions: [
+            {
+              text: 'נקה קל',
+              icon: 'fa-broom',
+              variant: 'warning',
+              onclick: 'SMCacheSection.clearCache("light")',
+              title: 'נקה localStorage בלבד'
+            },
+            {
+              text: 'נקה בינוני',
+              icon: 'fa-trash-alt',
+              variant: 'warning',
+              onclick: 'SMCacheSection.clearCache("medium")',
+              title: 'נקה localStorage + IndexedDB'
+            },
+            {
+              text: 'נקה מלא',
+              icon: 'fa-fire',
+              variant: 'danger',
+              onclick: 'SMCacheSection.clearCache("full")',
+              title: 'נקה כל המטמון כולל Backend'
+            },
+            {
+              text: 'נקה גרעיני',
+              icon: 'fa-bomb',
+              variant: 'dark',
+              onclick: 'SMCacheSection.clearCache("nuclear")',
+              title: 'נקה הכל + רענון דף'
+            }
+          ]
+        }
+      ],
+      { icon: 'fa-cogs', direction: 'vertical' }
+    );
   }
 
   /**
    * Create cache layers card
    * יצירת כרטיס שכבות מטמון
    */
-  createCacheLayersCard(stats, health, info) {
-    const layers = this.getCacheLayers(stats, health, info);
+  async createCacheLayersCard(stats, health, info) {
+    const layers = await this.getCacheLayers(stats, health, info);
 
     return `
       <div class="card">
@@ -430,64 +444,107 @@ class SMCacheSection extends SMBaseSection {
    * יצירת כרטיס פעולות מטמון
    */
   createCacheOperationsCard(stats) {
-    return `
-      <div class="card">
-        <div class="card-header">
-          <h5><i class="fas fa-tools"></i> פעולות מטמון</h5>
-        </div>
-        <div class="card-body">
-          <div class="row">
-            <div class="col-md-6">
-              <h6>פעולות ניקוי</h6>
-              <div class="operation-buttons">
-                <button class="btn btn-outline-warning btn-sm me-2 mb-2" onclick="SMCacheSection.clearCache('light')">
-                  <i class="fas fa-broom"></i> נקה קל (localStorage)
-                </button>
-                <button class="btn btn-outline-warning btn-sm me-2 mb-2" onclick="SMCacheSection.clearCache('medium')">
-                  <i class="fas fa-trash-alt"></i> נקה בינוני (+ IndexedDB)
-                </button>
-                <button class="btn btn-outline-danger btn-sm me-2 mb-2" onclick="SMCacheSection.clearCache('full')">
-                  <i class="fas fa-fire"></i> נקה מלא (+ Backend)
-                </button>
-                <button class="btn btn-outline-dark btn-sm mb-2" onclick="SMCacheSection.clearCache('nuclear')">
-                  <i class="fas fa-bomb"></i> נקה גרעיני (כל + reload)
-                </button>
-              </div>
-            </div>
-            <div class="col-md-6">
-              <h6>פעולות מידע</h6>
-              <div class="operation-buttons">
-                <button class="btn btn-outline-info btn-sm me-2 mb-2" onclick="SMCacheSection.refreshStats()">
-                  <i class="fas fa-sync-alt"></i> רענן סטטיסטיקות
-                </button>
-                <button class="btn btn-outline-secondary btn-sm me-2 mb-2" onclick="SMCacheSection.exportStats()">
-                  <i class="fas fa-download"></i> ייצא נתונים
-                </button>
-                <button class="btn btn-outline-primary btn-sm mb-2" onclick="SMCacheSection.showCacheDetails()">
-                  <i class="fas fa-info-circle"></i> פרטים נוספים
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    `;
+    return SMUIComponents.createActionsCard(
+      'פעולות מטמון',
+      [
+        {
+          title: 'פעולות ניקוי',
+          actions: [
+            {
+              text: 'נקה קל (localStorage)',
+              icon: 'fa-broom',
+              variant: 'outline-warning',
+              onclick: 'SMCacheSection.clearCache("light")',
+              title: 'נקה localStorage בלבד'
+            },
+            {
+              text: 'נקה בינוני (+ IndexedDB)',
+              icon: 'fa-trash-alt',
+              variant: 'outline-warning',
+              onclick: 'SMCacheSection.clearCache("medium")',
+              title: 'נקה localStorage + IndexedDB'
+            },
+            {
+              text: 'נקה מלא (+ Backend)',
+              icon: 'fa-fire',
+              variant: 'outline-danger',
+              onclick: 'SMCacheSection.clearCache("full")',
+              title: 'נקה כל המטמון כולל Backend'
+            },
+            {
+              text: 'נקה גרעיני (כל + reload)',
+              icon: 'fa-bomb',
+              variant: 'outline-dark',
+              onclick: 'SMCacheSection.clearCache("nuclear")',
+              title: 'נקה הכל + רענון דף'
+            }
+          ]
+        },
+        {
+          title: 'פעולות מידע',
+          actions: [
+            {
+              text: 'רענן סטטיסטיקות',
+              icon: 'fa-sync-alt',
+              variant: 'outline-info',
+              onclick: 'SMCacheSection.refreshStats()',
+              title: 'רענן את נתוני המטמון'
+            },
+            {
+              text: 'ייצא נתונים',
+              icon: 'fa-download',
+              variant: 'outline-secondary',
+              onclick: 'SMCacheSection.exportStats()',
+              title: 'ייצא נתוני מטמון'
+            },
+            {
+              text: 'פרטים נוספים',
+              icon: 'fa-info-circle',
+              variant: 'outline-primary',
+              onclick: 'SMCacheSection.showCacheDetails()',
+              title: 'הצג פרטים נוספים על המטמון'
+            }
+          ]
+        }
+      ],
+      { icon: 'fa-tools' }
+    );
   }
 
   /**
    * Get cache layers information
    * קבלת מידע שכבות מטמון
    */
-  getCacheLayers(stats, health, info) {
+  async getCacheLayers(stats, health, info) {
+    // Get frontend cache data from UnifiedCacheManager if available
+    let frontendCacheData = null;
+    if (window.UnifiedCacheManager) {
+      try {
+        const unifiedStats = window.UnifiedCacheManager.getStats();
+        const indexedDBStats = await this.getIndexedDBStats();
+        
+        frontendCacheData = {
+          localStorage: this.getLocalStorageStats(),
+          indexedDB: indexedDBStats,
+          memory: this.getMemoryCacheStats(unifiedStats || stats)
+        };
+      } catch (error) {
+        console.warn('⚠️ Failed to get frontend cache stats:', error);
+      }
+    }
+
+    // Backend cache data from API
+    const backendCacheData = stats || {};
+
     const layers = [
       {
         name: 'Memory',
         icon: 'fa-memory',
         status: 'פעיל',
         statusColor: 'success',
-        size: 'לא זמין',
-        items: 'לא זמין',
-        hitRate: 0,
+        size: frontendCacheData?.memory?.size || (backendCacheData.estimated_memory_mb ? `${backendCacheData.estimated_memory_mb.toFixed(2)} MB` : 'לא זמין'),
+        items: frontendCacheData?.memory?.items || backendCacheData.total_entries || 0,
+        hitRate: backendCacheData.hit_rate_percent || 0,
         usage: 0,
         progressBar: false
       },
@@ -496,10 +553,10 @@ class SMCacheSection extends SMBaseSection {
         icon: 'fa-hdd',
         status: 'פעיל',
         statusColor: 'success',
-        size: 'לא זמין',
-        items: 'לא זמין',
+        size: frontendCacheData?.localStorage?.size || 'לא זמין',
+        items: frontendCacheData?.localStorage?.items || 0,
         hitRate: 0,
-        usage: 0,
+        usage: frontendCacheData?.localStorage?.usage || 0,
         progressBar: true
       },
       {
@@ -507,40 +564,89 @@ class SMCacheSection extends SMBaseSection {
         icon: 'fa-database',
         status: 'פעיל',
         statusColor: 'success',
-        size: 'לא זמין',
-        items: 'לא זמין',
+        size: frontendCacheData?.indexedDB?.size || 'לא זמין',
+        items: frontendCacheData?.indexedDB?.items || 0,
         hitRate: 0,
-        usage: 0,
+        usage: frontendCacheData?.indexedDB?.usage || 0,
         progressBar: true
       },
       {
         name: 'Backend',
         icon: 'fa-server',
-        status: 'פעיל',
-        statusColor: 'success',
-        size: 'לא זמין',
-        items: 'לא זמין',
-        hitRate: 0,
+        status: health?.status === 'healthy' ? 'פעיל' : 'בעיה',
+        statusColor: health?.status === 'healthy' ? 'success' : 'warning',
+        size: backendCacheData.estimated_memory_mb ? `${backendCacheData.estimated_memory_mb.toFixed(2)} MB` : 'לא זמין',
+        items: backendCacheData.total_entries || 0,
+        hitRate: backendCacheData.hit_rate_percent || 0,
         usage: 0,
         progressBar: false
       }
     ];
 
-    // Update with actual data if available
-    if (stats && stats.layers) {
-      stats.layers.forEach((layerData, index) => {
-        if (layers[index]) {
-          layers[index].size = layerData.size ? SMUIComponents.formatBytes(layerData.size) : 'לא זמין';
-          layers[index].items = layerData.items || 0;
-          layers[index].hitRate = layerData.hit_rate || 0;
-          layers[index].usage = layerData.usage_percent || 0;
-          layers[index].status = layerData.status === 'healthy' ? 'פעיל' : 'בעיה';
-          layers[index].statusColor = layerData.status === 'healthy' ? 'success' : 'warning';
-        }
-      });
-    }
-
     return layers;
+  }
+
+  /**
+   * Get localStorage statistics
+   * קבלת סטטיסטיקות localStorage
+   */
+  getLocalStorageStats() {
+    try {
+      let totalSize = 0;
+      let itemCount = 0;
+      
+      for (let key in localStorage) {
+        if (localStorage.hasOwnProperty(key)) {
+          const item = localStorage.getItem(key);
+          totalSize += item ? item.length : 0;
+          itemCount++;
+        }
+      }
+      
+      // Calculate usage percentage (assuming 5MB limit)
+      const maxSize = 5 * 1024 * 1024; // 5MB
+      const usage = Math.min(100, Math.round((totalSize / maxSize) * 100));
+      
+      return {
+        size: SMUIComponents.formatBytes(totalSize),
+        items: itemCount,
+        usage: usage
+      };
+    } catch (error) {
+      console.warn('⚠️ Failed to get localStorage stats:', error);
+      return { size: 'לא זמין', items: 0, usage: 0 };
+    }
+  }
+
+  /**
+   * Get IndexedDB statistics
+   * קבלת סטטיסטיקות IndexedDB
+   */
+  async getIndexedDBStats() {
+    try {
+      // Try to get IndexedDB size (this is approximate)
+      if ('indexedDB' in window) {
+        // For now, return placeholder - full implementation would require database inspection
+        return { size: 'לא זמין', items: 0, usage: 0 };
+      }
+      return { size: 'לא זמין', items: 0, usage: 0 };
+    } catch (error) {
+      console.warn('⚠️ Failed to get IndexedDB stats:', error);
+      return { size: 'לא זמין', items: 0, usage: 0 };
+    }
+  }
+
+  /**
+   * Get memory cache statistics
+   * קבלת סטטיסטיקות מטמון זיכרון
+   */
+  getMemoryCacheStats(stats) {
+    if (!stats) return { size: 'לא זמין', items: 0 };
+    
+    return {
+      size: stats.estimated_memory_mb ? `${stats.estimated_memory_mb.toFixed(2)} MB` : 'לא זמין',
+      items: stats.total_entries || 0
+    };
   }
 
   /**
@@ -691,7 +797,11 @@ class SMCacheSection extends SMBaseSection {
     if (cacheSection) {
       const sectionInstance = window.systemManagementMain?.sections?.get('sm-cache');
       if (sectionInstance && sectionInstance.lastData) {
-        alert(`פרטי מטמון:\n${JSON.stringify(sectionInstance.lastData, null, 2)}`);
+        if (window.showInfoNotification) {
+          window.showInfoNotification(`פרטי מטמון:\n${JSON.stringify(sectionInstance.lastData, null, 2)}`, 'info');
+        } else {
+          alert(`פרטי מטמון:\n${JSON.stringify(sectionInstance.lastData, null, 2)}`);
+        }
       }
     }
   }

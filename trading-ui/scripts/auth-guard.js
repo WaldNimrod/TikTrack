@@ -16,7 +16,9 @@
 // Pages that don't require authentication
 const PUBLIC_PAGES = [
   'login.html',
-  'register.html'
+  'register.html',
+  'reset-password.html',
+  'forgot-password.html'
 ];
 
 /**
@@ -33,8 +35,46 @@ function isPublicPage() {
  * Checks authentication and redirects to login if needed
  */
 async function initAuthGuard() {
-  // Skip check for public pages
+  // For public pages (login, register, etc.), check if user is already authenticated
+  // If authenticated, redirect to dashboard
   if (isPublicPage()) {
+    // Check if user is already authenticated (both local and server)
+    const isAuth = typeof isAuthenticated === 'function' ? isAuthenticated() : false;
+    
+    if (isAuth) {
+      // Double-check with server to ensure authentication is valid
+      try {
+        const response = await fetch('/api/auth/me', {
+          method: 'GET',
+          credentials: 'include'
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          if (data.status === 'success' && data.data?.user) {
+            // User is authenticated - redirect to dashboard
+            const redirectPath = getRedirectAfterLogin();
+            if (redirectPath) {
+              window.location.href = redirectPath;
+            } else {
+              window.location.href = 'index.html';
+            }
+            return;
+          }
+        } else if (response.status === 401) {
+          // 401 is expected when not authenticated - silently handle it
+          // Don't log as error to avoid console pollution
+        }
+      } catch (error) {
+        // Only log non-401 errors to avoid console pollution
+        // 401 errors are expected and handled silently
+        if (error.message && !error.message.includes('401') && !error.message.includes('UNAUTHORIZED')) {
+          console.debug('Auth guard: Server check failed, staying on login page', error);
+        }
+      }
+    }
+    
+    // Not authenticated - stay on public page
     return;
   }
   
@@ -74,6 +114,11 @@ async function checkAuthAndRedirect() {
       });
       
       if (!response.ok) {
+        // 401 is expected when not authenticated - silently handle it
+        // Other errors should be logged
+        if (response.status !== 401) {
+          console.warn('Auth guard: Unexpected error checking authentication:', response.status);
+        }
         // Not authenticated - redirect to login
         redirectToLogin();
         return;
@@ -104,20 +149,35 @@ async function checkAuthAndRedirect() {
 }
 
 /**
- * Redirect to login page
+ * Show login modal instead of redirecting to login page
+ * הצגת modal כניסה במקום redirect לעמוד כניסה
  */
-function redirectToLogin() {
+async function redirectToLogin() {
   const currentPath = window.location.pathname;
-  const loginPath = currentPath.includes('trading-ui') 
-    ? 'trading-ui/login.html' 
-    : 'login.html';
   
   // Store intended destination for redirect after login
   if (currentPath && !currentPath.includes('login.html') && !currentPath.includes('register.html')) {
     sessionStorage.setItem('redirectAfterLogin', currentPath);
   }
   
-  window.location.href = loginPath;
+  // Show login modal instead of redirecting
+  if (typeof window.TikTrackAuth?.showLoginModal === 'function') {
+    await window.TikTrackAuth.showLoginModal(() => {
+      // On successful login, redirect to intended destination or dashboard
+      const redirectPath = getRedirectAfterLogin();
+      if (redirectPath) {
+        window.location.href = redirectPath;
+      } else {
+        window.location.href = 'index.html';
+      }
+    });
+  } else {
+    // Fallback: redirect to login page if modal not available
+    const loginPath = currentPath.includes('trading-ui') 
+      ? 'trading-ui/login.html' 
+      : 'login.html';
+    window.location.href = loginPath;
+  }
 }
 
 /**

@@ -1,0 +1,605 @@
+{
+  "timestamp": "2025-12-03T01:50:31.616789",
+  "total_files": 35,
+  "total_alerts": 39,
+  "total_confirms": 38,
+  "results": {
+    "tag-management-page.js": {
+      "alerts": [],
+      "confirms": [
+        {
+          "line": 599,
+          "content": "confirmed = window.confirm(message);",
+          "context": "                        );\n                    });\n                } else {\n                    confirmed = window.confirm(message);\n                }\n            }\n            if (confirmed) {"
+        },
+        {
+          "line": 669,
+          "content": "confirmed = window.confirm(message);",
+          "context": "                        );\n                    });\n                } else {\n                    confirmed = window.confirm(message);\n                }\n            }\n            if (confirmed) {"
+        }
+      ],
+      "total": 2
+    },
+    "notes.js": {
+      "alerts": [],
+      "confirms": [
+        {
+          "line": 554,
+          "content": "confirmed = confirm('האם אתה בטוח שברצונך למחוק את ההערה?');",
+          "context": "            );\n          });\n        } else {\n          confirmed = confirm('האם אתה בטוח שברצונך למחוק את ההערה?');\n        }\n      }\n      if (!confirmed) {"
+        }
+      ],
+      "total": 1
+    },
+    "user-profile-ai-analysis.js": {
+      "alerts": [
+        {
+          "line": 475,
+          "content": "alert(helpText);",
+          "context": "        if (window.showInfoNotification) {\n          window.showInfoNotification(helpText, 'info');\n        } else {\n          alert(helpText);\n        }\n      }\n    },"
+        }
+      ],
+      "confirms": [],
+      "total": 1
+    },
+    "ai-analysis-manager.js": {
+      "alerts": [],
+      "confirms": [
+        {
+          "line": 3707,
+          "content": "resolve(confirm('האם אתה בטוח שברצונך למחוק את כל רשומות הניתוח? פעולה זו אינה ניתנת לביטול.'));",
+          "context": "                  'danger'\n                );\n              } else {\n                resolve(confirm('האם אתה בטוח שברצונך למחוק את כל רשומות הניתוח? פעולה זו אינה ניתנת לביטול.'));\n              }\n            }\n          });"
+        }
+      ],
+      "total": 1
+    },
+    "validation-utils.js": {
+      "alerts": [],
+      "confirms": [
+        {
+          "line": 755,
+          "content": "resolve(window.confirm(`${title}\\n\\n${message}`));",
+          "context": "          'info'\n        );\n      } else {\n        resolve(window.confirm(`${title}\\n\\n${message}`));\n      }\n    }\n  });"
+        }
+      ],
+      "total": 1
+    },
+    "cache-management.js": {
+      "alerts": [
+        {
+          "line": 1521,
+          "content": "alert('לוג מפורט הועתק ללוח!');",
+          "context": "            } else if (window.showInfoNotification) {\n                window.showInfoNotification('לוג מפורט הועתק ללוח!', 'success');\n            } else {\n                alert('לוג מפורט הועתק ללוח!');\n            }\n        }\n    } catch (error) {"
+        },
+        {
+          "line": 1531,
+          "content": "alert('שגיאה בהעתקת הלוג: ' + error.message);",
+          "context": "        } else if (window.showInfoNotification) {\n            window.showInfoNotification('שגיאה בהעתקת הלוג: ' + error.message, 'error');\n        } else {\n            alert('שגיאה בהעתקת הלוג: ' + error.message);\n        }\n    }\n}"
+        }
+      ],
+      "confirms": [],
+      "total": 2
+    },
+    "trade_plans.js": {
+      "alerts": [],
+      "confirms": [
+        {
+          "line": 191,
+          "content": "confirmed = confirm(confirmMessage);",
+          "context": "                  );\n                });\n              } else {\n                confirmed = confirm(confirmMessage);\n              }\n            }\n          }"
+        },
+        {
+          "line": 738,
+          "content": "window.confirm('האם אתה בטוח שברצונך לשנות את הטיקר של התכנון?')));",
+          "context": "                            'warning'\n                          );\n                        }) :\n                        window.confirm('האם אתה בטוח שברצונך לשנות את הטיקר של התכנון?')));\n            if (confirmed) {\n              if (typeof window.showWarningNotification === 'function') {\n                window.showWarningNotification("
+        },
+        {
+          "line": 1436,
+          "content": "confirmed = window.confirm('האם אתה בטוח שברצונך לבטל את תוכנית המסחר?');",
+          "context": "                  );\n                });\n              } else {\n                confirmed = window.confirm('האם אתה בטוח שברצונך לבטל את תוכנית המסחר?');\n              }\n            }\n          }"
+        },
+        {
+          "line": 3094,
+          "content": "confirmed = window.confirm('האם למחוק את התנאי הנבחר?');",
+          "context": "                );\n              });\n            } else {\n              confirmed = window.confirm('האם למחוק את התנאי הנבחר?');\n            }\n          }\n        }"
+        },
+        {
+          "line": 3207,
+          "content": "return window.confirm(fullMessage);",
+          "context": "              );\n            });\n          } else {\n            return window.confirm(fullMessage);\n          }\n        }\n      }"
+        },
+        {
+          "line": 4318,
+          "content": "confirmed = confirm('האם אתה בטוח שברצונך למחוק את תוכנית המסחר?');",
+          "context": "                            );\n                        });\n                    } else {\n                        confirmed = confirm('האם אתה בטוח שברצונך למחוק את תוכנית המסחר?');\n                    }\n                }\n            }"
+        }
+      ],
+      "total": 6
+    },
+    "executions.js": {
+      "alerts": [],
+      "confirms": [
+        {
+          "line": 4892,
+          "content": "if (!confirm('האם אתה בטוח שברצונך למחוק את הביצוע?')) {",
+          "context": "            );\n        } else {\n            // Fallback to simple confirm\n            if (!confirm('האם אתה בטוח שברצונך למחוק את הביצוע?')) {\n                return;\n            }\n            await performExecutionDeletion(executionId);"
+        }
+      ],
+      "total": 1
+    },
+    "alerts.js": {
+      "alerts": [
+        {
+          "line": 205,
+          "content": "alert('שגיאה בטעינת נתוני ההתראות: ' + error.message);",
+          "context": "        if (window.showErrorNotification) {\n          window.showErrorNotification('שגיאה בטעינת נתוני ההתראות', error.message);\n        } else {\n          alert('שגיאה בטעינת נתוני ההתראות: ' + error.message);\n        }\n      }\n      throw error;"
+        },
+        {
+          "line": 821,
+          "content": "{ type: alert.status === 'cancelled' ? 'REACTIVATE' : 'CANCEL', onclick: `window.${alert.status === 'cancelled' ? 'reactivate' : 'cancel'}Alert && window.${alert.status === 'cancelled' ? 'reactivate' : 'cancel'}Alert(${alert.id})`, title: alert.status === 'cancelled' ? 'הפעל מחדש' : 'בטל' },",
+          "context": "        const result = window.createActionsMenu([\n          { type: 'VIEW', onclick: `window.showEntityDetails('alert', ${alert.id}, { mode: 'view' })`, title: 'צפה בפרטי התראה' },\n          { type: 'EDIT', onclick: `editAlert(${alert.id})`, title: 'ערוך התראה' },\n          { type: alert.status === 'cancelled' ? 'REACTIVATE' : 'CANCEL', onclick: `window.${alert.status === 'cancelled' ? 'reactivate' : 'cancel'}Alert && window.${alert.status === 'cancelled' ? 'reactivate' : 'cancel'}Alert(${alert.id})`, title: alert.status === 'cancelled' ? 'הפעל מחדש' : 'בטל' },\n          { type: 'DELETE', onclick: `deleteAlert(${alert.id})`, title: 'מחק התראה' }\n        ]);\n        return result || '';"
+        },
+        {
+          "line": 3674,
+          "content": "alert('לוג מפורט הועתק ללוח!');",
+          "context": "            } else if (window.showInfoNotification) {\n                window.showInfoNotification('לוג מפורט הועתק ללוח!', 'info');\n            } else {\n                alert('לוג מפורט הועתק ללוח!');\n            }\n        } else {\n            if (window.showWarningNotification) {"
+        },
+        {
+          "line": 3682,
+          "content": "alert('אין לוג להעתקה');",
+          "context": "            } else if (window.showInfoNotification) {\n                window.showInfoNotification('אין לוג להעתקה', 'warning');\n            } else {\n                alert('אין לוג להעתקה');\n            }\n        }\n    } catch (err) {"
+        },
+        {
+          "line": 3692,
+          "content": "alert('שגיאה בהעתקת הלוג');",
+          "context": "        } else if (window.showInfoNotification) {\n            window.showInfoNotification('שגיאה בהעתקת הלוג', 'error');\n        } else {\n            alert('שגיאה בהעתקת הלוג');\n        }\n    }\n}"
+        }
+      ],
+      "confirms": [
+        {
+          "line": 2917,
+          "content": "confirmed = window.confirm('האם אתה בטוח שברצונך למחוק התראה זו?');",
+          "context": "            );\n          });\n        } else {\n          confirmed = window.confirm('האם אתה בטוח שברצונך למחוק התראה זו?');\n        }\n      }\n      if (confirmed) {"
+        },
+        {
+          "line": 3271,
+          "content": "confirmed = window.confirm('האם אתה בטוח שברצונך להפעיל מחדש את ההתראה?');",
+          "context": "          );\n        });\n      } else {\n        confirmed = window.confirm('האם אתה בטוח שברצונך להפעיל מחדש את ההתראה?');\n      }\n    }\n    if (!confirmed) {"
+        }
+      ],
+      "total": 7
+    },
+    "ticker-dashboard.js": {
+      "alerts": [],
+      "confirms": [
+        {
+          "line": 220,
+          "content": "const confirmed = confirm(message);",
+          "context": "                );\n            } else {\n                // Fallback to browser confirm\n                const confirmed = confirm(message);\n                resolve(confirmed);\n            }\n        });"
+        }
+      ],
+      "total": 1
+    },
+    "constraints.js": {
+      "alerts": [],
+      "confirms": [
+        {
+          "line": 854,
+          "content": "confirmed = confirm(confirmMessage);",
+          "context": "      });\n    } else {\n      // Fallback למקרה שמערכת התראות לא זמינה\n      confirmed = confirm(confirmMessage);\n    }\n    \n    if (confirmed) {"
+        }
+      ],
+      "total": 1
+    },
+    "warning-system.js": {
+      "alerts": [],
+      "confirms": [
+        {
+          "line": 299,
+          "content": "const confirmed = window.confirm(message);",
+          "context": "  } catch (error) {\n    console.error('❌ showConfirmationDialog - Modal Error:', error);\n    // fallback ל-confirm רגיל\n    const confirmed = window.confirm(message);\n    if (confirmed && onConfirm) {\n      onConfirm();\n    } else if (!confirmed && onCancel) {"
+        },
+        {
+          "line": 331,
+          "content": "* Global confirm replacement - replaces all confirm() calls with custom dialog",
+          "context": "// ===== GLOBAL CONFIRM REPLACEMENT =====\n\n/**\n * Global confirm replacement - replaces all confirm() calls with custom dialog\n * This function should be used instead of the native confirm() function\n * \n * @param {string} message - The confirmation message"
+        },
+        {
+          "line": 332,
+          "content": "* This function should be used instead of the native confirm() function",
+          "context": "\n/**\n * Global confirm replacement - replaces all confirm() calls with custom dialog\n * This function should be used instead of the native confirm() function\n * \n * @param {string} message - The confirmation message\n * @param {function} onConfirm - Callback function when user confirms"
+        },
+        {
+          "line": 352,
+          "content": "* This replaces the browser's native confirm() with our custom dialog",
+          "context": "\n/**\n * Override native confirm function globally\n * This replaces the browser's native confirm() with our custom dialog\n * \n * IMPORTANT: This maintains backward compatibility by handling both sync and async patterns\n */"
+        }
+      ],
+      "total": 4
+    },
+    "init-system-management.js": {
+      "alerts": [
+        {
+          "line": 1490,
+          "content": "alert('קוד שנוצר:\\n\\n' + code.substring(0, 500) + '\\n\\n... (נראה בקונסולה)');",
+          "context": "        window.lastGeneratedCode = code;\n    } else {\n        // Fallback - show in alert\n        alert('קוד שנוצר:\\n\\n' + code.substring(0, 500) + '\\n\\n... (נראה בקונסולה)');\n        Logger.info('📝 Generated script loading code:', code);\n    }\n}"
+        }
+      ],
+      "confirms": [],
+      "total": 1
+    },
+    "ui-utils.js": {
+      "alerts": [],
+      "confirms": [
+        {
+          "line": 538,
+          "content": "confirmed = window.confirm(`האם אתה בטוח שברצונך לבטל את ${entityLabel} \"${displayName}\"?`);",
+          "context": "        );\n      });\n    } else {\n      confirmed = window.confirm(`האם אתה בטוח שברצונך לבטל את ${entityLabel} \"${displayName}\"?`);\n    }\n  }\n"
+        },
+        {
+          "line": 851,
+          "content": "confirmed = window.confirm(message);",
+          "context": "        () => {}\n      );\n    } else {\n      confirmed = window.confirm(message);\n      if (confirmed) {\n        onConfirm();\n      }"
+        }
+      ],
+      "total": 2
+    },
+    "data_import.js": {
+      "alerts": [],
+      "confirms": [
+        {
+          "line": 1448,
+          "content": "if (window.confirm(confirmationMessage)) {",
+          "context": "            \n            const confirmationMessage = `האם אתה בטוח שברצונך למחוק את סשן הייבוא #${sessionId}?\\n\\nפעולה זו תמחק את הסשן לצמיתות.`;\n            \n            if (window.confirm(confirmationMessage)) {\n                try {\n                    const response = await fetch(`/api/user-data-import/session/${sessionId}`, {\n                        method: 'DELETE',"
+        }
+      ],
+      "total": 1
+    },
+    "linter-realtime-monitor.js": {
+      "alerts": [
+        {
+          "line": 2951,
+          "content": "alert(details);",
+          "context": "        if (typeof showModalNotification === 'function') {\n            showModalNotification('פרטי תיקון', details, 'info');\n        } else {\n            alert(details);\n        }\n    }\n};"
+        },
+        {
+          "line": 3127,
+          "content": "alert(details);",
+          "context": "        if (typeof showModalNotification === 'function') {\n            showModalNotification('פרטי פעולה', details, 'info');\n    } else {\n            alert(details);\n        }\n    }\n};"
+        }
+      ],
+      "confirms": [],
+      "total": 2
+    },
+    "import-user-data.js": {
+      "alerts": [],
+      "confirms": [
+        {
+          "line": 8382,
+          "content": "} else if (window.confirm(confirmationMessage)) {",
+          "context": "            null,\n            'warning'\n        );\n    } else if (window.confirm(confirmationMessage)) {\n        handleSessionReset(currentSessionId);\n    }\n}"
+        }
+      ],
+      "total": 1
+    },
+    "trade-history-page.js": {
+      "alerts": [
+        {
+          "line": 513,
+          "content": "alert(`פרטי טרייד #${tradeId}\\n\\nטיקר: ${trade.ticker}\\nצד: ${trade.side}\\nסוג: ${getInvestmentTypeText(trade.investment_type)}\\nתאריך יצירה: ${formatDate(trade.created_at)}\\nתאריך סגירה: ${formatDate(trade.closed_at)}\\nP/L: $${trade.pl} (${trade.pl >= 0 ? '+' : ''}${trade.pl_percent}%)`);",
+          "context": "            // Fallback למקרה שהמערכת לא זמינה (מוקאפ)\n            const trade = allTrades.find(t => t.id === tradeId);\n            if (!trade) return;\n            alert(`פרטי טרייד #${tradeId}\\n\\nטיקר: ${trade.ticker}\\nצד: ${trade.side}\\nסוג: ${getInvestmentTypeText(trade.investment_type)}\\nתאריך יצירה: ${formatDate(trade.created_at)}\\nתאריך סגירה: ${formatDate(trade.closed_at)}\\nP/L: $${trade.pl} (${trade.pl >= 0 ? '+' : ''}${trade.pl_percent}%)`);\n        }\n    }\n"
+        }
+      ],
+      "confirms": [],
+      "total": 1
+    },
+    "portfolio-state-page.js": {
+      "alerts": [
+        {
+          "line": 2962,
+          "content": "alert('נא לבחור שני תאריכים להשוואה');",
+          "context": "    }\n    \n    if (!date1 || !date2) {\n        alert('נא לבחור שני תאריכים להשוואה');\n        return;\n    }\n    "
+        }
+      ],
+      "confirms": [],
+      "total": 1
+    },
+    "unified-cache-manager.js": {
+      "alerts": [],
+      "confirms": [
+        {
+          "line": 2423,
+          "content": "if (confirm('המטמון נוקה בהצלחה. האם להמשיך לטעינה מחדש של העמוד?')) {",
+          "context": "                        );\n                    } else {\n                        // Fallback to simple confirm\n                        if (confirm('המטמון נוקה בהצלחה. האם להמשיך לטעינה מחדש של העמוד?')) {\n                            console.log('✅ User confirmed page reload - executing now...');\n                            if (typeof window.hardReload === 'function') {\n                                window.hardReload();"
+        }
+      ],
+      "total": 1
+    },
+    "alert-service.js": {
+      "alerts": [],
+      "confirms": [
+        {
+          "line": 448,
+          "content": "if (!confirm('האם אתה בטוח שברצונך למחוק את ההתראה?')) {",
+          "context": "      );\n    } else {\n      // Fallback to simple confirm\n      if (!confirm('האם אתה בטוח שברצונך למחוק את ההתראה?')) {\n        return;\n      }\n      await performAlertDeletion(alertId);"
+        }
+      ],
+      "total": 1
+    },
+    "init-system-check.js": {
+      "alerts": [
+        {
+          "line": 197,
+          "content": "alert(errorMsg);",
+          "context": "            if (typeof showNotification === 'function') {\n                showNotification(errorMsg, 'error');\n            } else {\n                alert(errorMsg);\n            }\n            return;\n        }"
+        },
+        {
+          "line": 221,
+          "content": "alert(errorMsg);",
+          "context": "            if (typeof showNotification === 'function') {\n                showNotification(errorMsg, 'error');\n            } else {\n                alert(errorMsg);\n            }\n        }\n    }"
+        },
+        {
+          "line": 274,
+          "content": "alert('קוד שנוצר:\\n\\n' + generatedCode.substring(0, 500) + '\\n\\n... (נראה בקונסולה)');",
+          "context": "            );\n        } else {\n            // Fallback - הצגה ב-alert (לא מומלץ)\n            alert('קוד שנוצר:\\n\\n' + generatedCode.substring(0, 500) + '\\n\\n... (נראה בקונסולה)');\n            console.log('📝 Generated script loading code:', generatedCode);\n        }\n    }"
+        },
+        {
+          "line": 297,
+          "content": "alert('✅ הקוד הועתק ללוח בהצלחה!');",
+          "context": "                    if (typeof showNotification === 'function') {\n                        showNotification('✅ הקוד הועתק ללוח בהצלחה!', 'success');\n                    } else {\n                        alert('✅ הקוד הועתק ללוח בהצלחה!');\n                    }\n                }).catch(err => {\n                    console.error('Clipboard API failed:', err);"
+        },
+        {
+          "line": 328,
+          "content": "alert('✅ הקוד הועתק ללוח בהצלחה!');",
+          "context": "            if (typeof showNotification === 'function') {\n                showNotification('✅ הקוד הועתק ללוח בהצלחה!', 'success');\n            } else {\n                alert('✅ הקוד הועתק ללוח בהצלחה!');\n            }\n        } catch (err) {\n            console.error('Fallback copy failed:', err);"
+        },
+        {
+          "line": 335,
+          "content": "alert('❌ שגיאה בהעתקה - נא להעתיק ידנית מהקונסולה');",
+          "context": "            if (typeof showNotification === 'function') {\n                showNotification('❌ שגיאה בהעתקה - נא להעתיק ידנית', 'error');\n            } else {\n                alert('❌ שגיאה בהעתקה - נא להעתיק ידנית מהקונסולה');\n            }\n            console.log('📝 Code to copy:', text);\n        } finally {"
+        }
+      ],
+      "confirms": [],
+      "total": 6
+    },
+    "trades.js": {
+      "alerts": [],
+      "confirms": [
+        {
+          "line": 1488,
+          "content": "confirmed = window.confirm(`האם אתה בטוח שברצונך לבטל טרייד זה?${tradeDetails}`);",
+          "context": "            );\n          });\n        } else {\n          confirmed = window.confirm(`האם אתה בטוח שברצונך לבטל טרייד זה?${tradeDetails}`);\n        }\n        if (!confirmed) {\n          return;"
+        },
+        {
+          "line": 3001,
+          "content": "confirmed = window.confirm('האם למחוק את התנאי הנבחר?');",
+          "context": "          );\n        });\n      } else {\n        confirmed = window.confirm('האם למחוק את התנאי הנבחר?');\n      }\n    }\n  }"
+        },
+        {
+          "line": 3751,
+          "content": "const confirmed = window.confirm(message);",
+          "context": "              'warning'\n            );\n          } else {\n            const confirmed = window.confirm(message);\n            resolve(confirmed);\n          }\n        }"
+        },
+        {
+          "line": 4234,
+          "content": "confirmed = confirm(confirmMessage);",
+          "context": "            );\n          });\n        } else {\n          confirmed = confirm(confirmMessage);\n        }\n      }\n      if (confirmed) {"
+        }
+      ],
+      "total": 4
+    },
+    "db-extradata.js": {
+      "alerts": [
+        {
+          "line": 141,
+          "content": "alert('לוג מפורט הועתק ללוח!');",
+          "context": "            } else if (typeof window.showNotification === 'function') {\n                window.showNotification('לוג מפורט הועתק ללוח', 'success');\n            } else {\n                alert('לוג מפורט הועתק ללוח!');\n            }\n        }\n    } catch (error) {"
+        },
+        {
+          "line": 149,
+          "content": "alert('שגיאה בהעתקת הלוג: ' + error.message);",
+          "context": "        if (typeof window.showErrorNotification === 'function') {\n            window.showErrorNotification('שגיאה בהעתקת הלוג', error.message);\n        } else {\n            alert('שגיאה בהעתקת הלוג: ' + error.message);\n        }\n    }\n}"
+        }
+      ],
+      "confirms": [],
+      "total": 2
+    },
+    "system-management/sm-detailed-log.js": {
+      "alerts": [
+        {
+          "line": 479,
+          "content": "alert('לוג מפורט הועתק ללוח!');",
+          "context": "                    } else if (typeof window.showNotification === 'function') {\n                        window.showNotification('לוג מפורט הועתק ללוח', 'success');\n                    } else {\n                        alert('לוג מפורט הועתק ללוח!');\n                    }\n                    \n                    console.log('✅ Detailed log copied to clipboard');"
+        },
+        {
+          "line": 498,
+          "content": "alert('לוג מפורט הועתק ללוח!');",
+          "context": "            const detailedLog = await generateSystemManagementDetailedLog();\n            if (detailedLog) {\n                await navigator.clipboard.writeText(detailedLog);\n                alert('לוג מפורט הועתק ללוח!');\n            }\n        }\n    } catch (error) {"
+        },
+        {
+          "line": 506,
+          "content": "alert('שגיאה בהעתקת הלוג: ' + error.message);",
+          "context": "        if (typeof window.showErrorNotification === 'function') {\n            window.showErrorNotification('שגיאה בהעתקת הלוג', error.message);\n        } else {\n            alert('שגיאה בהעתקת הלוג: ' + error.message);\n        }\n    }\n}"
+        }
+      ],
+      "confirms": [],
+      "total": 3
+    },
+    "system-management/sections/sm-section-alerts.js": {
+      "alerts": [
+        {
+          "line": 841,
+          "content": "* Dismiss alert (static method for global access)",
+          "context": "  }\n\n  /**\n   * Dismiss alert (static method for global access)\n   * דחיית התראה (מתודה סטטית לגישה גלובלית)\n   */\n  static async dismissAlert(alertId) {"
+        },
+        {
+          "line": 896,
+          "content": "alert('פתיחת כל ההתראות');",
+          "context": "    if (window.showInfoNotification) {\n      window.showInfoNotification('פתיחת כל ההתראות', 'info');\n    } else {\n      alert('פתיחת כל ההתראות');\n    }\n  }\n"
+        },
+        {
+          "line": 909,
+          "content": "alert('פתיחת כל היסטוריית ההתראות');",
+          "context": "    if (window.showInfoNotification) {\n      window.showInfoNotification('פתיחת כל היסטוריית ההתראות', 'info');\n    } else {\n      alert('פתיחת כל היסטוריית ההתראות');\n    }\n  }\n}"
+        }
+      ],
+      "confirms": [],
+      "total": 3
+    },
+    "system-management/sections/sm-section-database.js": {
+      "alerts": [
+        {
+          "line": 821,
+          "content": "alert(`רשימת גיבויים:\\n${backupsList}`);",
+          "context": "        if (window.showInfoNotification) {\n          window.showInfoNotification(`רשימת גיבויים:\\n${backupsList}`, 'info');\n        } else {\n          alert(`רשימת גיבויים:\\n${backupsList}`);\n        }\n      } else {\n        throw new Error(result.message || 'Failed to list backups');"
+        }
+      ],
+      "confirms": [],
+      "total": 1
+    },
+    "system-management/sections/sm-section-operations.js": {
+      "alerts": [
+        {
+          "line": 560,
+          "content": "alert('ייצוא הגדרות שרת');",
+          "context": "    if (window.showInfoNotification) {\n      window.showInfoNotification('ייצוא הגדרות שרת', 'info');\n    } else {\n      alert('ייצוא הגדרות שרת');\n    }\n  }\n"
+        },
+        {
+          "line": 689,
+          "content": "alert('ייצוא נתוני מטמון');",
+          "context": "    if (window.showInfoNotification) {\n      window.showInfoNotification('ייצוא נתוני מטמון', 'info');\n    } else {\n      alert('ייצוא נתוני מטמון');\n    }\n  }\n"
+        }
+      ],
+      "confirms": [],
+      "total": 2
+    },
+    "system-management/sections/sm-section-cache.js": {
+      "alerts": [
+        {
+          "line": 803,
+          "content": "alert(`פרטי מטמון:\\n${JSON.stringify(sectionInstance.lastData, null, 2)}`);",
+          "context": "        if (window.showInfoNotification) {\n          window.showInfoNotification(`פרטי מטמון:\\n${JSON.stringify(sectionInstance.lastData, null, 2)}`, 'info');\n        } else {\n          alert(`פרטי מטמון:\\n${JSON.stringify(sectionInstance.lastData, null, 2)}`);\n        }\n      }\n    }"
+        }
+      ],
+      "confirms": [],
+      "total": 1
+    },
+    "system-management/sections/sm-section-background-tasks.js": {
+      "alerts": [
+        {
+          "line": 847,
+          "content": "alert('פתיחת לוגי משימות רקע');",
+          "context": "    if (window.showInfoNotification) {\n      window.showInfoNotification('פתיחת לוגי משימות רקע', 'info');\n    } else {\n      alert('פתיחת לוגי משימות רקע');\n    }\n  }\n"
+        },
+        {
+          "line": 954,
+          "content": "alert(`פתיחת פרטי משימה: ${taskId}`);",
+          "context": "    if (window.showInfoNotification) {\n      window.showInfoNotification(`פתיחת פרטי משימה: ${taskId}`, 'info');\n    } else {\n      alert(`פתיחת פרטי משימה: ${taskId}`);\n    }\n  }\n"
+        },
+        {
+          "line": 967,
+          "content": "alert('פתיחת כל היסטוריית המשימות');",
+          "context": "    if (window.showInfoNotification) {\n      window.showInfoNotification('פתיחת כל היסטוריית המשימות', 'info');\n    } else {\n      alert('פתיחת כל היסטוריית המשימות');\n    }\n  }\n}"
+        }
+      ],
+      "confirms": [],
+      "total": 3
+    },
+    "conditions/conditions-ui-manager.js": {
+      "alerts": [],
+      "confirms": [
+        {
+          "line": 234,
+          "content": "return window.confirm(fullMessage);",
+          "context": "            window.showNotification(`${title}: ${message}`, 'warning');\n        }\n\n        return window.confirm(fullMessage);\n    }\n\n    async openConditionForm(condition = null) {"
+        },
+        {
+          "line": 1113,
+          "content": "return window.confirm(fullMessage);",
+          "context": "        }\n\n        if (window.confirm) {\n            return window.confirm(fullMessage);\n        }\n\n        return true;"
+        }
+      ],
+      "total": 2
+    },
+    "conditions/conditions-crud-manager.js": {
+      "alerts": [],
+      "confirms": [
+        {
+          "line": 455,
+          "content": "return window.confirm(this.translator.getMessage('confirm_delete'));",
+          "context": "            return window.showConfirmDialog(this.translator.getMessage('confirm_delete'));\n        }\n        if (window.confirm && typeof window.confirm === 'function') {\n            return window.confirm(this.translator.getMessage('confirm_delete'));\n        }\n        return true;\n    }"
+        }
+      ],
+      "total": 1
+    },
+    "modules/business-module.js": {
+      "alerts": [
+        {
+          "line": 3115,
+          "content": "alert('לוג מפורט הועתק ללוח!');",
+          "context": "            if (window.showSuccessNotification) {\n                window.showSuccessNotification('לוג מפורט הועתק ללוח');\n            } else {\n                alert('לוג מפורט הועתק ללוח!');\n            }\n        } else {\n            if (window.showWarningNotification) {"
+        },
+        {
+          "line": 3121,
+          "content": "alert('אין לוג להעתקה');",
+          "context": "            if (window.showWarningNotification) {\n                window.showWarningNotification('אין לוג להעתקה');\n            } else {\n                alert('אין לוג להעתקה');\n            }\n        }\n    } catch (err) {"
+        },
+        {
+          "line": 3129,
+          "content": "alert('שגיאה בהעתקת הלוג');",
+          "context": "        if (window.showErrorNotification) {\n            window.showErrorNotification('שגיאה בהעתקת הלוג');\n        } else {\n            alert('שגיאה בהעתקת הלוג');\n        }\n    }\n}"
+        }
+      ],
+      "confirms": [
+        {
+          "line": 1896,
+          "content": "firstWarning = window.confirm(",
+          "context": "            );\n          } else {\n            // Fallback למקרה שמערכת התראות לא זמינה\n            firstWarning = window.confirm(\n              '⚠️ אזהרה: במערכת מופיע שיש פוזיציה פתוחה.\\n' +\n                    'האם אתה בטוח שברצונך לסגור את הטרייד?\\n\\n' +\n                    'פוזיציה נוכחית: ' + currentPosition.quantity + ' מניות',"
+        },
+        {
+          "line": 1938,
+          "content": "secondWarning = window.confirm(",
+          "context": "              );\n            } else {\n              // Fallback למקרה שמערכת התראות לא זמינה\n              secondWarning = window.confirm(\n                '🔒 ממשק הסגירה המלא כולל סגירת פוזיציה נמצא בפיתוח.\\n\\n' +\n                          'כרגע ניתן לסגור את הטרייד אך יש לזכור לעדכן עסקה לסגירת פוזיציה.\\n\\n' +\n                          'האם אתה בטוח שברצונך להמשיך?',"
+        },
+        {
+          "line": 2645,
+          "content": "const confirmed = window.confirm(message);",
+          "context": "          );\n        } else {\n          // Fallback למקרה שמערכת התראות לא זמינה\n          const confirmed = window.confirm(message);\n          resolve(confirmed);\n        }\n        resolve(confirmed);"
+        },
+        {
+          "line": 2984,
+          "content": "if (confirm(confirmMessage)) {",
+          "context": "      `סכום: ${trade.amount || 'לא ידוע'}`;\n    \n    // הצגת חלון אישור\n    if (confirm(confirmMessage)) {\n      // ביצוע המחיקה\n      deleteTradeRecord(tradeId);\n    }"
+        }
+      ],
+      "total": 7
+    },
+    "services/crud-response-handler.js": {
+      "alerts": [
+        {
+          "line": 613,
+          "content": "alert('פרטי השגיאה הועתקו ללוח');",
+          "context": "                        } else if (window.showInfoNotification) {\n                            window.showInfoNotification('פרטי השגיאה הועתקו ללוח', 'success');\n                        } else {\n                            alert('פרטי השגיאה הועתקו ללוח');\n                        }\n                    })\n                    .catch(() => {"
+        },
+        {
+          "line": 622,
+          "content": "alert('שגיאה בהעתקה ללוח');",
+          "context": "                        } else if (window.showInfoNotification) {\n                            window.showInfoNotification('שגיאה בהעתקה ללוח', 'error');\n                        } else {\n                            alert('שגיאה בהעתקה ללוח');\n                        }\n                    });\n            }"
+        }
+      ],
+      "confirms": [],
+      "total": 2
+    },
+    "services/unified-crud-service.js": {
+      "alerts": [],
+      "confirms": [
+        {
+          "line": 695,
+          "content": "confirmed = window.confirm(`האם אתה בטוח שברצונך למחוק את ${entityName} #${entityId}?`);",
+          "context": "                } else {\n                    // Fallback to simple confirm\n                    const entityName = options.entityName || entityType;\n                    confirmed = window.confirm(`האם אתה בטוח שברצונך למחוק את ${entityName} #${entityId}?`);\n                }\n                \n                if (!confirmed) {"
+        }
+      ],
+      "total": 1
+    }
+  }
+}

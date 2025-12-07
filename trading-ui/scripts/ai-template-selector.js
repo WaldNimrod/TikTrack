@@ -53,7 +53,14 @@
       this.templates = templates || [];
 
       if (this.templates.length === 0) {
-        container.innerHTML = '<div class="col-12"><div class="alert alert-warning">אין תבניות זמינות</div></div>';
+        container.textContent = '';
+        const col = document.createElement('div');
+        col.className = 'col-12';
+        const alert = document.createElement('div');
+        alert.className = 'alert alert-warning';
+        alert.textContent = 'אין תבניות זמינות';
+        col.appendChild(alert);
+        container.appendChild(col);
         return;
       }
 
@@ -61,9 +68,9 @@
       const sectionBody = container.closest('.section-body');
       if (sectionBody) {
         // Only clear the container, not the entire section
-        container.innerHTML = '';
+        container.textContent = '';
       } else {
-        container.innerHTML = '';
+        container.textContent = '';
       }
 
       // Use for...of loop instead of forEach to support async/await
@@ -100,7 +107,12 @@
           // Fallback if IconSystem not available
           iconHTML = '<img src="images/icons/entities/research.svg" alt="תבנית" class="section-icon template-icon">';
         }
-        icon.innerHTML = iconHTML;
+        icon.textContent = '';
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(iconHTML, 'text/html');
+        doc.body.childNodes.forEach(node => {
+            icon.appendChild(node.cloneNode(true));
+        });
 
         const title = document.createElement('h5');
         title.className = 'card-title text-center';
@@ -139,11 +151,18 @@
       this.templates = templates || [];
 
       if (this.templates.length === 0) {
-        container.innerHTML = '<div class="col-12"><div class="alert alert-warning">אין תבניות זמינות</div></div>';
+        container.textContent = '';
+        const col = document.createElement('div');
+        col.className = 'col-12';
+        const alert = document.createElement('div');
+        alert.className = 'alert alert-warning';
+        alert.textContent = 'אין תבניות זמינות';
+        col.appendChild(alert);
+        container.appendChild(col);
         return;
       }
 
-      container.innerHTML = '';
+      container.textContent = '';
 
       // Use for...of loop instead of forEach to support async/await
       for (const template of this.templates) {
@@ -178,7 +197,12 @@
           // Fallback if IconSystem not available
           iconHTML = '<img src="images/icons/entities/research.svg" alt="תבנית" class="section-icon template-icon">';
         }
-        icon.innerHTML = iconHTML;
+        icon.textContent = '';
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(iconHTML, 'text/html');
+        doc.body.childNodes.forEach(node => {
+            icon.appendChild(node.cloneNode(true));
+        });
 
         const title = document.createElement('h5');
         title.className = 'card-title text-center';

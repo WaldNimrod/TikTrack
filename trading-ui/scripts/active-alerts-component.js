@@ -112,7 +112,8 @@ class ActiveAlertsComponent extends HTMLElement {
   }
 
   render() {
-    this.innerHTML = `
+    this.textContent = '';
+    const componentHTML = `
       <div class="active-alerts" data-role="container">
         <div class="active-alerts__header">
           <div class="active-alerts__title-group">
@@ -142,6 +143,11 @@ class ActiveAlertsComponent extends HTMLElement {
         </div>
       </div>
     `;
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(componentHTML, 'text/html');
+    doc.body.childNodes.forEach(node => {
+        this.appendChild(node.cloneNode(true));
+    });
 
     this.cacheElements();
     this.initializeFilters();
@@ -200,12 +206,18 @@ class ActiveAlertsComponent extends HTMLElement {
       iconClassName: 'active-alerts__filter-icon',
     });
 
-    container.innerHTML = `
+    container.textContent = '';
+    const filtersHTML = `
       <div class="active-alerts__filters-inner">
         ${allButtonHtml}
         ${entityButtonsHtml}
       </div>
     `;
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(filtersHTML, 'text/html');
+    doc.body.childNodes.forEach(node => {
+        container.appendChild(node.cloneNode(true));
+    });
 
     const buttons = container.querySelectorAll('button[data-type]');
     buttons.forEach(button => {
@@ -428,7 +440,48 @@ class ActiveAlertsComponent extends HTMLElement {
 
   async loadActiveAlerts(options = {}) {
     const { force = false } = options;
+    
+    // CRITICAL: Track call stack to detect recursion
+    if (!window.__LOAD_ACTIVE_ALERTS_CALL_STACK__) {
+      window.__LOAD_ACTIVE_ALERTS_CALL_STACK__ = [];
+    }
+    
+    const callInfo = {
+      timestamp: Date.now(),
+      stack: new Error().stack,
+      force
+    };
+    
+    // Check for recursion - if called again within 100ms
+    const recentCall = window.__LOAD_ACTIVE_ALERTS_CALL_STACK__.find(c => 
+      Date.now() - c.timestamp < 100
+    );
+    
+    if (recentCall && this.isLoading) {
+      console.error('🚨 RECURSION DETECTED in loadActiveAlerts:', {
+        callStack: window.__LOAD_ACTIVE_ALERTS_CALL_STACK__.map(c => ({
+          timestamp: c.timestamp,
+          force: c.force
+        })),
+        recentCall: recentCall.stack
+      });
+      return; // Break recursion
+    }
+    
+    window.__LOAD_ACTIVE_ALERTS_CALL_STACK__.push(callInfo);
+    // Keep only last 10 calls
+    if (window.__LOAD_ACTIVE_ALERTS_CALL_STACK__.length > 10) {
+      window.__LOAD_ACTIVE_ALERTS_CALL_STACK__.shift();
+    }
+    
     if (this.isLoading) {
+      // Remove from call stack if already loading
+      const index = window.__LOAD_ACTIVE_ALERTS_CALL_STACK__.findIndex(c => 
+        Math.abs(c.timestamp - callInfo.timestamp) < 10
+      );
+      if (index !== -1) {
+        window.__LOAD_ACTIVE_ALERTS_CALL_STACK__.splice(index, 1);
+      }
       return;
     }
 
@@ -439,10 +492,20 @@ class ActiveAlertsComponent extends HTMLElement {
     const cacheEnabled = !force && this.shouldUseCache();
 
     const finalize = async (alerts, source) => {
-      const normalizedAlerts = Array.isArray(alerts) ? alerts : [];
-      await this.ensureRelatedData();
-      await this.applyAlertsState(normalizedAlerts);
-      this.log('info', 'Active alerts loaded', { source, count: this.alerts.length });
+      try {
+        const normalizedAlerts = Array.isArray(alerts) ? alerts : [];
+        await this.ensureRelatedData();
+        await this.applyAlertsState(normalizedAlerts);
+        this.log('info', 'Active alerts loaded', { source, count: this.alerts.length });
+      } finally {
+        // Remove from call stack
+        const index = window.__LOAD_ACTIVE_ALERTS_CALL_STACK__.findIndex(c => 
+          Math.abs(c.timestamp - callInfo.timestamp) < 10
+        );
+        if (index !== -1) {
+          window.__LOAD_ACTIVE_ALERTS_CALL_STACK__.splice(index, 1);
+        }
+      }
     };
 
     try {
@@ -499,6 +562,14 @@ class ActiveAlertsComponent extends HTMLElement {
       this.isLoading = false;
       this.setLoadingState(false);
       this.updateHeaderState();
+      
+      // Remove from call stack
+      const index = window.__LOAD_ACTIVE_ALERTS_CALL_STACK__.findIndex(c => 
+        Math.abs(c.timestamp - callInfo.timestamp) < 10
+      );
+      if (index !== -1) {
+        window.__LOAD_ACTIVE_ALERTS_CALL_STACK__.splice(index, 1);
+      }
     }
   }
 
@@ -556,7 +627,7 @@ class ActiveAlertsComponent extends HTMLElement {
       return;
     }
 
-    listContainer.innerHTML = '';
+    listContainer.textContent = '';
 
     const filteredAlerts = this.getFilteredAlerts(true);
     if (!filteredAlerts.length) {
@@ -802,7 +873,12 @@ class ActiveAlertsComponent extends HTMLElement {
           relatedMeta,
         );
         if (html) {
-          container.innerHTML = html;
+          container.textContent = '';
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(html, 'text/html');
+          doc.body.childNodes.forEach(node => {
+              container.appendChild(node.cloneNode(true));
+          });
           const linkedElement = container.firstElementChild;
           if (linkedElement) {
             linkedElement.classList.add('active-alerts__linked-entity');
@@ -859,7 +935,12 @@ class ActiveAlertsComponent extends HTMLElement {
         });
         
         const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = iconHTML;
+        tempDiv.textContent = '';
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(iconHTML, 'text/html');
+        doc.body.childNodes.forEach(node => {
+            tempDiv.appendChild(node.cloneNode(true));
+        });
         const icon = tempDiv.firstElementChild;
         if (icon) {
           headerLine.appendChild(icon);
@@ -992,7 +1073,9 @@ class ActiveAlertsComponent extends HTMLElement {
         window.showSuccessNotification('התראה עודכנה', 'התראה סומנה כנקראה');
       }
 
-      await this.loadActiveAlerts({ force: true });
+      // CRITICAL: Prevent infinite recursion - don't reload if already loading
+      // The state is already updated above, so we don't need to reload
+      // await this.loadActiveAlerts({ force: true });
       this.log('info', 'Alert marked as read', { alertId });
     } catch (error) {
       this.log('error', 'Failed to mark alert as read', { alertId, error: error?.message });
@@ -1256,7 +1339,13 @@ class ActiveAlertsComponent extends HTMLElement {
     // שימוש ישיר ב-FieldRendererService - המערכת תמיד זמינה דרך BASE package
     if (window.FieldRendererService?.renderStatus) {
       const wrapper = document.createElement('span');
-      wrapper.innerHTML = window.FieldRendererService.renderStatus(status, relatedType);
+      wrapper.textContent = '';
+      const statusHTML = window.FieldRendererService.renderStatus(status, relatedType);
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(statusHTML, 'text/html');
+      doc.body.childNodes.forEach(node => {
+          wrapper.appendChild(node.cloneNode(true));
+      });
       return wrapper.firstElementChild;
     }
 
@@ -1281,7 +1370,13 @@ class ActiveAlertsComponent extends HTMLElement {
     // שימוש ישיר ב-FieldRendererService - המערכת תמיד זמינה דרך BASE package
     if (window.FieldRendererService?.renderSide) {
       const wrapper = document.createElement('span');
-      wrapper.innerHTML = window.FieldRendererService.renderSide(side);
+      wrapper.textContent = '';
+      const sideHTML = window.FieldRendererService.renderSide(side);
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(sideHTML, 'text/html');
+      doc.body.childNodes.forEach(node => {
+          wrapper.appendChild(node.cloneNode(true));
+      });
       return wrapper.firstElementChild;
     }
 
@@ -1299,7 +1394,13 @@ class ActiveAlertsComponent extends HTMLElement {
 
     if (window.FieldRendererService && typeof window.FieldRendererService.renderType === 'function') {
       const wrapper = document.createElement('span');
-      wrapper.innerHTML = window.FieldRendererService.renderType(investmentType);
+      wrapper.textContent = '';
+      const typeHTML = window.FieldRendererService.renderType(investmentType);
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(typeHTML, 'text/html');
+      doc.body.childNodes.forEach(node => {
+          wrapper.appendChild(node.cloneNode(true));
+      });
       return wrapper.firstElementChild;
     }
 
@@ -1439,15 +1540,53 @@ class ActiveAlertsComponent extends HTMLElement {
   }
 
   handleLoadError(error) {
+    // CRITICAL: Prevent recursion - don't use Logger or showNotification if loadActiveAlerts is in progress
+    // or if getPreference is in progress (to avoid Logger -> getPreference -> Logger loop)
+    if (this.isLoading || window.__GET_PREFERENCE_IN_PROGRESS__) {
+      // Use console directly during loading to avoid recursion
+      if (window.DEBUG_MODE) {
+        console.error('[ActiveAlertsComponent] Failed to load active alerts', { error: error?.message });
+      }
+      return;
+    }
+    
     this.log('error', 'Failed to load active alerts', { error: error?.message });
-    if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה בטעינת התראות פעילות', error?.message || 'אירעה שגיאה בעת טעינת ההתראות');
+    
+    // CRITICAL: Only show notification if not currently loading preferences to avoid recursion
+    if (!window.__GET_PREFERENCE_IN_PROGRESS__ && typeof window.showErrorNotification === 'function') {
+      try {
+        window.showErrorNotification('שגיאה בטעינת התראות פעילות', error?.message || 'אירעה שגיאה בעת טעינת ההתראות');
+      } catch (notifError) {
+        // Fallback to console if notification fails
+        if (window.DEBUG_MODE) {
+          console.error('[ActiveAlertsComponent] Failed to show error notification', notifError);
+        }
+      }
     }
   }
 
   log(level, message, extra = {}) {
+    // CRITICAL: Prevent recursion - don't use Logger if loadActiveAlerts is in progress
+    // or if getPreference is in progress (to avoid Logger -> getPreference -> Logger loop)
+    if (this.isLoading || window.__GET_PREFERENCE_IN_PROGRESS__) {
+      // Use console directly during loading to avoid recursion
+      if (window.DEBUG_MODE) {
+        const consoleMethod = level === 'error' ? console.error : level === 'warn' ? console.warn : console.log;
+        consoleMethod(`[ActiveAlertsComponent] ${message}`, extra);
+      }
+      return;
+    }
+    
     if (window.Logger && typeof window.Logger[level] === 'function') {
-      window.Logger[level](message, { component: 'ActiveAlertsComponent', ...extra });
+      try {
+        window.Logger[level](message, { component: 'ActiveAlertsComponent', ...extra });
+      } catch (error) {
+        // Fallback to console if Logger fails
+        if (window.DEBUG_MODE) {
+          const consoleMethod = level === 'error' ? console.error : level === 'warn' ? console.warn : console.log;
+          consoleMethod(`[ActiveAlertsComponent] ${message}`, extra);
+        }
+      }
     }
   }
 

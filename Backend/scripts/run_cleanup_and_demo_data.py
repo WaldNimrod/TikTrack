@@ -164,7 +164,7 @@ class ProcessRunner:
     def run_phase2_demo_data(self) -> bool:
         """מריץ שלב 2: יצירת נתוני דוגמה"""
         print("\n" + "=" * 70)
-        print("🎨 שלב 2: יצירת נתוני דוגמה")
+        print("🎨 שלב 2: יצירת נתוני דוגמה לכל המשתמשים")
         print("=" * 70)
         
         if self.skip_phase2:
@@ -173,7 +173,7 @@ class ProcessRunner:
         
         script_path = os.path.join(
             os.path.dirname(__file__),
-            'generate_demo_data.py'
+            'generate_multi_user_demo_data.py'
         )
         
         args = []
@@ -251,24 +251,60 @@ class ProcessRunner:
             db = Session()
             
             try:
-                # Check demo data counts
-                tickers_count = db.execute(text('SELECT COUNT(*) FROM tickers')).scalar()
-                accounts_count = db.execute(text('SELECT COUNT(*) FROM trading_accounts')).scalar()
-                plans_count = db.execute(text('SELECT COUNT(*) FROM trade_plans')).scalar()
-                trades_count = db.execute(text('SELECT COUNT(*) FROM trades')).scalar()
+                # Check demo data counts per user
+                from models.user import User
                 
-                print(f"   📊 מספר טיקרים: {tickers_count}")
-                print(f"   📊 מספר חשבונות: {accounts_count}")
-                print(f"   📊 מספר תוכניות: {plans_count}")
-                print(f"   📊 מספר טריידים: {trades_count}")
+                users = db.query(User).filter(User.username.in_(['user', 'admin', 'nimrod'])).all()
                 
-                # Basic verification
-                if tickers_count > 1 and accounts_count >= 3 and plans_count > 0 and trades_count > 0:
-                    print("\n   ✅ נתוני הדוגמה נוצרו בהצלחה")
-                    success = True
-                else:
-                    print("\n   ⚠️  מספר הנתונים נראה נמוך מהצפוי")
-                    success = True  # Don't fail on counts, just warn
+                print("\n   📊 בדיקת נתונים לפי משתמש:")
+                
+                for user in users:
+                    tickers_count = db.execute(
+                        text('SELECT COUNT(*) FROM user_tickers WHERE user_id = :user_id'),
+                        {'user_id': user.id}
+                    ).scalar()
+                    accounts_count = db.execute(
+                        text('SELECT COUNT(*) FROM trading_accounts WHERE user_id = :user_id'),
+                        {'user_id': user.id}
+                    ).scalar()
+                    plans_count = db.execute(
+                        text('SELECT COUNT(*) FROM trade_plans WHERE user_id = :user_id'),
+                        {'user_id': user.id}
+                    ).scalar()
+                    trades_count = db.execute(
+                        text('SELECT COUNT(*) FROM trades WHERE user_id = :user_id'),
+                        {'user_id': user.id}
+                    ).scalar()
+                    
+                    print(f"\n      👤 משתמש: {user.username}")
+                    print(f"         - טיקרים: {tickers_count}")
+                    print(f"         - חשבונות: {accounts_count}")
+                    print(f"         - תוכניות: {plans_count}")
+                    print(f"         - טריידים: {trades_count}")
+                    
+                    # Verify expected counts
+                    if user.username == 'user':
+                        expected_plans = 120
+                        expected_trades = 80
+                        expected_tickers = 50
+                    elif user.username == 'admin':
+                        expected_plans = 20
+                        expected_trades = 15
+                        expected_tickers = 10
+                    elif user.username == 'nimrod':
+                        expected_plans = 0
+                        expected_trades = 0
+                        expected_tickers = 0
+                    else:
+                        continue
+                    
+                    if plans_count == expected_plans and trades_count == expected_trades:
+                        print(f"         ✅ תואם לצפוי")
+                    else:
+                        print(f"         ⚠️  לא תואם לצפוי (תוכניות: {expected_plans}, טריידים: {expected_trades})")
+                
+                print("\n   ✅ בדיקת נתוני הדוגמה הושלמה")
+                success = True
                     
             finally:
                 db.close()

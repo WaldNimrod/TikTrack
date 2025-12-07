@@ -522,6 +522,32 @@ async function checkForMismatches(pageName, pageConfig, htmlScripts = null) {
         }
     }
     
+    // Check modal config loading order - modal configs MUST load before ModalManagerV2
+    const allScripts = Array.from(document.querySelectorAll('script[src]'));
+    const modalManagerIndex = allScripts.findIndex(s => s.src.includes('modal-manager-v2.js'));
+    
+    if (modalManagerIndex !== -1 && window.PACKAGE_MANIFEST) {
+        // Check all modal configs
+        Object.values(window.PACKAGE_MANIFEST).forEach(pkg => {
+            if (pkg.scripts) {
+                pkg.scripts.forEach(script => {
+                    if (script.file.includes('modal-configs/') && script.required !== false) {
+                        const configScriptIndex = allScripts.findIndex(s => s.src.includes(script.file));
+                        if (configScriptIndex !== -1 && configScriptIndex > modalManagerIndex) {
+                            loadOrderIssues.push({
+                                type: 'modal_config_order',
+                                message: `⚠️ סדר טעינה שגוי: ${script.file} נטען אחרי modal-manager-v2.js - צריך להיות לפני! ModalManagerV2 צריך את הקונפיגורציה כדי ליצור את המודל.`,
+                                severity: 'error',
+                                script: script.file,
+                                shouldLoadBefore: 'modal-manager-v2.js'
+                            });
+                        }
+                    }
+                });
+            }
+        });
+    }
+    
     // Check package loading order - IMPROVED: Check relative order within packages and between packages
     if (pageConfig.packages && window.PACKAGE_MANIFEST) {
         // Get all packages for this page
@@ -645,6 +671,8 @@ async function checkForMismatches(pageName, pageConfig, htmlScripts = null) {
         if (!exists) {
             // Check if this global should come from a package
             let suggestedPackage = null;
+            let loadOrderIssue = null;
+            
             if (window.PACKAGE_MANIFEST) {
                 // Check modules package for loadUserPreferences
                 if (globalName === 'loadUserPreferences' || globalVar.includes('loadUserPreferences')) {
@@ -660,16 +688,41 @@ async function checkForMismatches(pageName, pageConfig, htmlScripts = null) {
                         suggestedPackage = 'entity-services';
                     }
                 }
+                
+                // Check for modal configs - they must load BEFORE ModalManagerV2
+                if (globalName.includes('ModalConfig') || globalVar.includes('ModalConfig')) {
+                    // Find the script that should provide this global
+                    Object.values(window.PACKAGE_MANIFEST).forEach(pkg => {
+                        if (pkg.scripts) {
+                            pkg.scripts.forEach(script => {
+                                if (script.globalCheck === globalVar || script.globalCheck === `window.${globalName}`) {
+                                    // Check if modal-manager-v2.js loads before this config
+                                    const allScripts = Array.from(document.querySelectorAll('script[src]'));
+                                    const configScriptIndex = allScripts.findIndex(s => s.src.includes(script.file));
+                                    const modalManagerIndex = allScripts.findIndex(s => s.src.includes('modal-manager-v2.js'));
+                                    
+                                    if (configScriptIndex !== -1 && modalManagerIndex !== -1 && configScriptIndex > modalManagerIndex) {
+                                        loadOrderIssue = `⚠️ ${script.file} נטען אחרי modal-manager-v2.js - צריך להיות לפני!`;
+                                    }
+                                }
+                            });
+                        }
+                    });
+                }
             }
             
             const suggestion = suggestedPackage 
                 ? ` - ייתכן שחסרה חבילת "${suggestedPackage}" ב-PAGE_CONFIGS`
                 : '';
             
+            const loadOrderWarning = loadOrderIssue 
+                ? ` ${loadOrderIssue}`
+                : '';
+            
             mismatches.push({
                 type: 'missing_global',
-                message: `גלובל חסר: ${globalVar} - נדרש לפי התיעוד אבל לא זמין${suggestion}`,
-                severity: 'error'
+                message: `גלובל חסר: ${globalVar} - נדרש לפי התיעוד אבל לא זמין${suggestion}${loadOrderWarning}`,
+                severity: loadOrderIssue ? 'warning' : 'error'
             });
         }
     });
@@ -714,6 +767,14 @@ async function runDetailedPageScan(pageName, pageConfig) {
         currentPage = 'tag-management';
     } else if (path.includes('ai-analysis')) {
         currentPage = 'ai-analysis';
+    } else if (path.includes('watch-list')) {
+        currentPage = 'watch-list';
+    } else if (path.includes('trade-history-page')) {
+        currentPage = 'trade-history-page';
+    } else if (path.includes('portfolio-state-page')) {
+        currentPage = 'portfolio-state-page';
+    } else if (path.includes('trading-journal-page')) {
+        currentPage = 'trading-journal-page';
     }
     
     if (currentPage !== pageName) {

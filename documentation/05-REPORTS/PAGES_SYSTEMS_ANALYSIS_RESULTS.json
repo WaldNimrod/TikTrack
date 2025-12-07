@@ -1,0 +1,873 @@
+{
+  "timestamp": "2025-12-03T02:45:16.802952",
+  "total_pages": 20,
+  "results": {
+    "index": {
+      "packages": [
+        "base",
+        "services",
+        "ui-advanced",
+        "modules",
+        "preferences",
+        "entity-services",
+        "entity-details",
+        "info-summary",
+        "dashboard-widgets",
+        "conditions"
+      ],
+      "requiredGlobals": [
+        "NotificationSystem",
+        "DataUtils",
+        "window.Logger",
+        "window.CacheSyncManager",
+        "window.IconSystem",
+        "window.DashboardData",
+        "window.loadDashboardData",
+        "window.RecentItemsWidget",
+        "window.UnifiedPendingActionsWidget",
+        "window.TagWidget",
+        "window.conditionsInitializer"
+      ],
+      "missing_systems": [
+        "Unified Init System",
+        "CRUDResponseHandler",
+        "LinkedItemsSystem",
+        "UnifiedTableSystem",
+        "PaginationSystem"
+      ],
+      "missing_packages": [
+        "init-system",
+        "crud"
+      ],
+      "missing_globals": [
+        {
+          "system": "Unified Init System",
+          "global": "window.unifiedAppInitializer",
+          "package": "init-system"
+        },
+        {
+          "system": "Unified Init System",
+          "global": "window.PAGE_CONFIGS",
+          "package": "init-system"
+        },
+        {
+          "system": "Unified Init System",
+          "global": "window.PACKAGE_MANIFEST",
+          "package": "init-system"
+        },
+        {
+          "system": "CRUDResponseHandler",
+          "global": "window.CRUDResponseHandler",
+          "package": "crud"
+        },
+        {
+          "system": "LinkedItemsSystem",
+          "global": "window.LinkedItemsService",
+          "package": "crud"
+        },
+        {
+          "system": "LinkedItemsSystem",
+          "global": "window.loadLinkedItemsData",
+          "package": "crud"
+        },
+        {
+          "system": "UnifiedTableSystem",
+          "global": "window.UnifiedTableSystem",
+          "package": "crud"
+        },
+        {
+          "system": "PaginationSystem",
+          "global": "window.PaginationSystem",
+          "package": "crud"
+        }
+      ]
+    },
+    "preferences": {
+      "packages": [
+        "base",
+        "services",
+        "ui-advanced",
+        "modules",
+        "preferences",
+        "validation",
+        "entity-details",
+        "info-summary",
+        "dashboard-widgets"
+      ],
+      "requiredGlobals": [
+        "NotificationSystem",
+        "window.IconSystem",
+        "DataUtils",
+        "window.Logger",
+        "window.CacheSyncManager",
+        "window.PreferencesUIV4",
+        "window.InfoSummarySystem"
+      ],
+      "missing_systems": [
+        "Unified Init System",
+        "CRUDResponseHandler",
+        "LinkedItemsSystem",
+        "ConditionsSummaryRenderer",
+        "UnifiedTableSystem",
+        "PaginationSystem"
+      ],
+      "missing_packages": [
+        "init-system",
+        "conditions",
+        "crud"
+      ],
+      "missing_globals": [
+        {
+          "system": "Unified Init System",
+          "global": "window.unifiedAppInitializer",
+          "package": "init-system"
+        },
+        {
+          "system": "Unified Init System",
+          "global": "window.PAGE_CONFIGS",
+          "package": "init-system"
+        },
+        {
+          "system": "Unified Init System",
+          "global": "window.PACKAGE_MANIFEST",
+          "package": "init-system"
+        },
+        {
+          "system": "CRUDResponseHandler",
+          "global": "window.CRUDResponseHandler",
+          "package": "crud"
+        },
+        {
+          "system": "LinkedItemsSystem",
+          "global": "window.LinkedItemsService",
+          "package": "crud"
+        },
+        {
+          "system": "LinkedItemsSystem",
+          "global": "window.loadLinkedItemsData",
+          "package": "crud"
+        },
+        {
+          "system": "ConditionsSummaryRenderer",
+          "global": "window.ConditionsSummaryRenderer",
+          "package": "conditions"
+        },
+        {
+          "system": "UnifiedTableSystem",
+          "global": "window.UnifiedTableSystem",
+          "package": "crud"
+        },
+        {
+          "system": "PaginationSystem",
+          "global": "window.PaginationSystem",
+          "package": "crud"
+        }
+      ]
+    },
+    "trades": {
+      "packages": [
+        "base",
+        "services",
+        "modules",
+        "ui-advanced",
+        "crud",
+        "preferences",
+        "validation",
+        "conditions",
+        "entity-details",
+        "entity-services",
+        "info-summary",
+        "init-system"
+      ],
+      "requiredGlobals": [
+        "NotificationSystem",
+        "window.IconSystem",
+        "DataUtils",
+        "window.Logger",
+        "window.CacheSyncManager",
+        "window.TradesData",
+        "window.ModalManagerV2",
+        "window.tradesModalConfig",
+        "window.InvestmentCalculationService",
+        "window.loadTradesData",
+        "window.checkLinkedItemsBeforeAction",
+        "window.RichTextEditorService",
+        "window.Quill",
+        "window.DOMPurify",
+        "window.conditionsCRUDManager",
+        "window.conditionsFormGenerator",
+        "window.ConditionsUIManager",
+        "window.ConditionsModalController",
+        "window.conditionsModalConfig",
+        "window.unifiedAppInitializer"
+      ],
+      "missing_systems": [],
+      "missing_packages": [],
+      "missing_globals": []
+    },
+    "executions": {
+      "packages": [
+        "base",
+        "services",
+        "ui-advanced",
+        "modules",
+        "crud",
+        "preferences",
+        "validation",
+        "conditions",
+        "entity-services",
+        "entity-details",
+        "info-summary",
+        "init-system"
+      ],
+      "requiredGlobals": [
+        "NotificationSystem",
+        "window.IconSystem",
+        "DataUtils",
+        "window.Logger",
+        "window.CacheSyncManager",
+        "window.ExecutionsData",
+        "window.executionsModalConfig",
+        "window.SelectPopulatorService",
+        "window.tickerService",
+        "window.loadUserPreferences",
+        "window.RichTextEditorService",
+        "window.Quill",
+        "window.DOMPurify"
+      ],
+      "missing_systems": [],
+      "missing_packages": [],
+      "missing_globals": []
+    },
+    "data_import": {
+      "packages": [
+        "base",
+        "services",
+        "ui-advanced",
+        "modules",
+        "crud",
+        "preferences",
+        "validation",
+        "conditions",
+        "entity-services",
+        "entity-details",
+        "info-summary",
+        "init-system"
+      ],
+      "requiredGlobals": [
+        "NotificationSystem",
+        "window.IconSystem",
+        "window.Logger",
+        "window.ModalManagerV2",
+        "window.initializeDataImportPage",
+        "window.refreshDataImportHistory",
+        "window.showImportUserDataNotification"
+      ],
+      "missing_systems": [],
+      "missing_packages": [],
+      "missing_globals": []
+    },
+    "trade_plans": {
+      "packages": [
+        "base",
+        "services",
+        "modules",
+        "ui-advanced",
+        "crud",
+        "preferences",
+        "validation",
+        "conditions",
+        "entity-services",
+        "entity-details",
+        "info-summary",
+        "init-system"
+      ],
+      "requiredGlobals": [
+        "NotificationSystem",
+        "window.IconSystem",
+        "DataUtils",
+        "window.TradePlansData",
+        "window.ModalManagerV2",
+        "window.tradePlansModalConfig",
+        "window.alertsModalConfig",
+        "window.UnifiedCRUDService",
+        "window.RichTextEditorService",
+        "window.Quill",
+        "window.DOMPurify",
+        "window.conditionsCRUDManager",
+        "window.conditionsFormGenerator",
+        "window.ConditionsUIManager",
+        "window.ConditionsModalController",
+        "window.conditionsModalConfig"
+      ],
+      "missing_systems": [],
+      "missing_packages": [],
+      "missing_globals": []
+    },
+    "alerts": {
+      "packages": [
+        "base",
+        "services",
+        "ui-advanced",
+        "modules",
+        "crud",
+        "preferences",
+        "validation",
+        "conditions",
+        "entity-services",
+        "entity-details",
+        "info-summary",
+        "init-system"
+      ],
+      "requiredGlobals": [
+        "NotificationSystem",
+        "window.IconSystem",
+        "DataUtils",
+        "window.loadAlertsData",
+        "window.ModalManagerV2",
+        "window.alertsModalConfig",
+        "window.RichTextEditorService",
+        "window.Quill",
+        "window.DOMPurify",
+        "window.conditionsCRUDManager",
+        "window.conditionsFormGenerator",
+        "window.ConditionsUIManager",
+        "window.ConditionsModalController",
+        "window.conditionsModalConfig"
+      ],
+      "missing_systems": [],
+      "missing_packages": [],
+      "missing_globals": []
+    },
+    "trading_accounts": {
+      "packages": [
+        "base",
+        "services",
+        "ui-advanced",
+        "modules",
+        "crud",
+        "preferences",
+        "validation",
+        "entity-details",
+        "entity-services",
+        "info-summary",
+        "conditions"
+      ],
+      "requiredGlobals": [
+        "NotificationSystem",
+        "window.IconSystem",
+        "DataUtils",
+        "window.loadTradingAccountsDataForTradingAccountsPage",
+        "window.ModalManagerV2",
+        "window.tradingAccountsModalConfig",
+        "window.TagUIManager",
+        "window.RichTextEditorService",
+        "window.Quill",
+        "window.DOMPurify",
+        "window.conditionsInitializer"
+      ],
+      "missing_systems": [
+        "Unified Init System"
+      ],
+      "missing_packages": [
+        "init-system"
+      ],
+      "missing_globals": [
+        {
+          "system": "Unified Init System",
+          "global": "window.unifiedAppInitializer",
+          "package": "init-system"
+        },
+        {
+          "system": "Unified Init System",
+          "global": "window.PAGE_CONFIGS",
+          "package": "init-system"
+        },
+        {
+          "system": "Unified Init System",
+          "global": "window.PACKAGE_MANIFEST",
+          "package": "init-system"
+        }
+      ]
+    },
+    "cash_flows": {
+      "packages": [
+        "base",
+        "services",
+        "ui-advanced",
+        "modules",
+        "crud",
+        "preferences",
+        "validation",
+        "entity-services",
+        "entity-details",
+        "info-summary",
+        "conditions"
+      ],
+      "requiredGlobals": [
+        "NotificationSystem",
+        "window.IconSystem",
+        "window.ModalManagerV2",
+        "window.cashFlowModalConfig",
+        "window.RichTextEditorService",
+        "window.Quill",
+        "window.DOMPurify",
+        "window.SelectPopulatorService"
+      ],
+      "missing_systems": [
+        "Unified Init System"
+      ],
+      "missing_packages": [
+        "init-system"
+      ],
+      "missing_globals": [
+        {
+          "system": "Unified Init System",
+          "global": "window.unifiedAppInitializer",
+          "package": "init-system"
+        },
+        {
+          "system": "Unified Init System",
+          "global": "window.PAGE_CONFIGS",
+          "package": "init-system"
+        },
+        {
+          "system": "Unified Init System",
+          "global": "window.PACKAGE_MANIFEST",
+          "package": "init-system"
+        }
+      ]
+    },
+    "tickers": {
+      "packages": [
+        "base",
+        "services",
+        "ui-advanced",
+        "modules",
+        "crud",
+        "preferences",
+        "validation",
+        "external-data",
+        "entity-services",
+        "entity-details",
+        "info-summary",
+        "conditions"
+      ],
+      "requiredGlobals": [
+        "NotificationSystem",
+        "window.IconSystem",
+        "DataUtils",
+        "ExternalDataService",
+        "window.loadTickersData",
+        "window.ModalManagerV2",
+        "window.tickersModalConfig",
+        "window.conditionsInitializer"
+      ],
+      "missing_systems": [
+        "Unified Init System"
+      ],
+      "missing_packages": [
+        "init-system"
+      ],
+      "missing_globals": [
+        {
+          "system": "Unified Init System",
+          "global": "window.unifiedAppInitializer",
+          "package": "init-system"
+        },
+        {
+          "system": "Unified Init System",
+          "global": "window.PAGE_CONFIGS",
+          "package": "init-system"
+        },
+        {
+          "system": "Unified Init System",
+          "global": "window.PACKAGE_MANIFEST",
+          "package": "init-system"
+        }
+      ]
+    },
+    "notes": {
+      "packages": [
+        "base",
+        "services",
+        "ui-advanced",
+        "modules",
+        "crud",
+        "preferences",
+        "validation",
+        "entity-services",
+        "entity-details",
+        "info-summary",
+        "init-system"
+      ],
+      "requiredGlobals": [
+        "NotificationSystem",
+        "window.IconSystem",
+        "DataUtils",
+        "window.NotesData",
+        "window.loadNotesData",
+        "window.ModalManagerV2",
+        "window.notesModalConfig",
+        "window.RichTextEditorService",
+        "window.Quill",
+        "window.DOMPurify",
+        "window.ConditionsSummaryRenderer"
+      ],
+      "missing_systems": [],
+      "missing_packages": [],
+      "missing_globals": []
+    },
+    "trades_formatted": {
+      "packages": [
+        "base",
+        "services",
+        "ui-advanced",
+        "modules",
+        "crud",
+        "preferences",
+        "entity-services",
+        "entity-details",
+        "info-summary",
+        "init-system"
+      ],
+      "requiredGlobals": [
+        "NotificationSystem",
+        "window.IconSystem",
+        "window.UnifiedTableSystem",
+        "window.FieldRendererService",
+        "window.TradesData",
+        "window.ModalManagerV2"
+      ],
+      "missing_systems": [
+        "ConditionsSummaryRenderer"
+      ],
+      "missing_packages": [
+        "conditions"
+      ],
+      "missing_globals": [
+        {
+          "system": "ConditionsSummaryRenderer",
+          "global": "window.ConditionsSummaryRenderer",
+          "package": "conditions"
+        }
+      ]
+    },
+    "db_display": {
+      "packages": [
+        "base",
+        "services",
+        "ui-advanced",
+        "crud",
+        "preferences",
+        "info-summary",
+        "init-system"
+      ],
+      "requiredGlobals": [
+        "NotificationSystem",
+        "window.IconSystem",
+        "DataUtils",
+        "window.loadDatabaseInfo",
+        "window.loadUserPreferences",
+        "window.initSystemCheck"
+      ],
+      "missing_systems": [
+        "ModalManagerV2",
+        "ConditionsSummaryRenderer"
+      ],
+      "missing_packages": [
+        "modules",
+        "conditions"
+      ],
+      "missing_globals": [
+        {
+          "system": "ModalManagerV2",
+          "global": "window.ModalManagerV2",
+          "package": "modules"
+        },
+        {
+          "system": "ConditionsSummaryRenderer",
+          "global": "window.ConditionsSummaryRenderer",
+          "package": "conditions"
+        }
+      ]
+    },
+    "research": {
+      "packages": [
+        "base",
+        "services",
+        "ui-advanced",
+        "crud",
+        "preferences",
+        "conditions",
+        "init-system"
+      ],
+      "requiredGlobals": [
+        "NotificationSystem",
+        "window.IconSystem",
+        "DataUtils",
+        "window.initializeResearchPage",
+        "window.conditionsInitializer"
+      ],
+      "missing_systems": [
+        "ModalManagerV2",
+        "InfoSummarySystem"
+      ],
+      "missing_packages": [
+        "info-summary",
+        "modules"
+      ],
+      "missing_globals": [
+        {
+          "system": "ModalManagerV2",
+          "global": "window.ModalManagerV2",
+          "package": "modules"
+        },
+        {
+          "system": "InfoSummarySystem",
+          "global": "window.InfoSummarySystem",
+          "package": "info-summary"
+        }
+      ]
+    },
+    "tradingview_test_page": {
+      "packages": [
+        "base",
+        "services",
+        "ui-advanced",
+        "modules",
+        "crud",
+        "info-summary",
+        "conditions",
+        "system-management",
+        "preferences",
+        "charts",
+        "tradingview-charts",
+        "init-system"
+      ],
+      "requiredGlobals": [
+        "NotificationSystem",
+        "window.IconSystem",
+        "window.Logger",
+        "window.ModalManagerV2",
+        "window.FieldRendererService",
+        "window.CRUDResponseHandler",
+        "window.InfoSummarySystem",
+        "window.LinkedItemsService",
+        "window.loadLinkedItemsData",
+        "window.PageStateManager",
+        "window.DataCollectionService",
+        "window.SelectPopulatorService",
+        "window.ConditionsSummaryRenderer",
+        "window.UnifiedTableSystem",
+        "window.PaginationSystem",
+        "window.TradingViewTheme",
+        "window.TradingViewChartAdapter",
+        "window.LightweightCharts",
+        "window.PreferencesData",
+        "window.PreferencesCore"
+      ],
+      "missing_systems": [],
+      "missing_packages": [],
+      "missing_globals": []
+    },
+    "db_extradata": {
+      "packages": [
+        "base",
+        "services",
+        "ui-advanced",
+        "crud",
+        "preferences",
+        "dashboard-widgets",
+        "init-system"
+      ],
+      "requiredGlobals": [
+        "NotificationSystem",
+        "window.IconSystem",
+        "DataUtils",
+        "window.initDatabaseExtraData",
+        "window.loadExtraData",
+        "window.loadUserPreferences",
+        "window.initSystemCheck",
+        "window.PendingTradePlanWidget"
+      ],
+      "missing_systems": [
+        "ModalManagerV2",
+        "InfoSummarySystem",
+        "ConditionsSummaryRenderer"
+      ],
+      "missing_packages": [
+        "info-summary",
+        "modules",
+        "conditions"
+      ],
+      "missing_globals": [
+        {
+          "system": "ModalManagerV2",
+          "global": "window.ModalManagerV2",
+          "package": "modules"
+        },
+        {
+          "system": "InfoSummarySystem",
+          "global": "window.InfoSummarySystem",
+          "package": "info-summary"
+        },
+        {
+          "system": "ConditionsSummaryRenderer",
+          "global": "window.ConditionsSummaryRenderer",
+          "package": "conditions"
+        }
+      ]
+    },
+    "constraints": {
+      "packages": [
+        "base",
+        "services",
+        "ui-advanced",
+        "modules",
+        "crud",
+        "preferences",
+        "dashboard-widgets",
+        "info-summary",
+        "init-system"
+      ],
+      "requiredGlobals": [
+        "NotificationSystem",
+        "window.IconSystem",
+        "window.loadConstraints",
+        "window.ConstraintManager",
+        "window.createActionsMenu",
+        "window.SelectPopulatorService",
+        "window.DataCollectionService",
+        "window.DefaultValueSetter",
+        "window.TableSortValueAdapter",
+        "window.LinkedItemsService",
+        "window.CRUDResponseHandler",
+        "window.ModalNavigationManager",
+        "window.ModalManagerV2",
+        "window.conditionsInitializer",
+        "window.ConditionsUIManager",
+        "window.PendingTradePlanWidget",
+        "window.InfoSummarySystem",
+        "window.PaginationSystem",
+        "window.ColorSchemeSystem"
+      ],
+      "missing_systems": [
+        "ConditionsSummaryRenderer"
+      ],
+      "missing_packages": [
+        "conditions"
+      ],
+      "missing_globals": [
+        {
+          "system": "ConditionsSummaryRenderer",
+          "global": "window.ConditionsSummaryRenderer",
+          "package": "conditions"
+        }
+      ]
+    },
+    "designs": {
+      "packages": [
+        "base",
+        "services",
+        "ui-advanced",
+        "modules",
+        "crud",
+        "conditions",
+        "dashboard-widgets",
+        "info-summary",
+        "init-system"
+      ],
+      "requiredGlobals": [
+        "NotificationSystem",
+        "window.IconSystem",
+        "window.loadDesigns",
+        "window.DesignGallery",
+        "window.SelectPopulatorService",
+        "window.DataCollectionService",
+        "window.DefaultValueSetter",
+        "window.LinkedItemsService",
+        "window.CRUDResponseHandler",
+        "window.ModalManagerV2",
+        "window.conditionsInitializer",
+        "window.ConditionsUIManager",
+        "window.PendingTradePlanWidget",
+        "window.InfoSummarySystem",
+        "window.PaginationSystem"
+      ],
+      "missing_systems": [
+        "ColorSchemeSystem"
+      ],
+      "missing_packages": [
+        "preferences"
+      ],
+      "missing_globals": [
+        {
+          "system": "ColorSchemeSystem",
+          "global": "window.ColorSchemeSystem",
+          "package": "preferences"
+        }
+      ]
+    },
+    "login": {
+      "packages": [
+        "base",
+        "services",
+        "ui-advanced",
+        "modules",
+        "crud",
+        "info-summary",
+        "conditions",
+        "preferences",
+        "validation",
+        "init-system"
+      ],
+      "requiredGlobals": [
+        "NotificationSystem",
+        "window.IconSystem",
+        "window.ModalManagerV2",
+        "window.CRUDResponseHandler",
+        "window.ColorSchemeSystem",
+        "window.InfoSummarySystem",
+        "window.LinkedItemsService",
+        "window.loadLinkedItemsData",
+        "window.ConditionsSummaryRenderer",
+        "window.UnifiedTableSystem",
+        "window.PaginationSystem"
+      ],
+      "missing_systems": [],
+      "missing_packages": [],
+      "missing_globals": []
+    },
+    "register": {
+      "packages": [
+        "base",
+        "services",
+        "ui-advanced",
+        "modules",
+        "crud",
+        "info-summary",
+        "conditions",
+        "preferences",
+        "validation",
+        "init-system"
+      ],
+      "requiredGlobals": [
+        "NotificationSystem",
+        "window.IconSystem",
+        "window.ModalManagerV2",
+        "window.CRUDResponseHandler",
+        "window.ColorSchemeSystem",
+        "window.InfoSummarySystem",
+        "window.LinkedItemsService",
+        "window.loadLinkedItemsData",
+        "window.ConditionsSummaryRenderer",
+        "window.UnifiedTableSystem",
+        "window.PaginationSystem"
+      ],
+      "missing_systems": [],
+      "missing_packages": [],
+      "missing_globals": []
+    }
+  }
+}

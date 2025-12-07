@@ -636,7 +636,7 @@ window.resetToDefaults = async function() {
         if (typeof showNotification === 'function') {
             showNotification('שגיאה באיפוס ההעדפות: ' + error.message, 'error');
         } else {
-            alert('שגיאה באיפוס ההעדפות: ' + error.message);
+            window.showErrorNotification('שגיאה באיפוס ההעדפות: ' + error.message, "שגיאה");
         }
         
         return false;
@@ -661,7 +661,7 @@ window.loadProfilesToDropdown = async function() {
         }
         
         // נקה את הרשימה
-        profileSelect.innerHTML = '';
+        profileSelect.textContent = '';
         
         if (profiles && profiles.length > 0) {
             profiles.forEach(profile => {

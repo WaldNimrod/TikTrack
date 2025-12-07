@@ -130,10 +130,12 @@
                                                                 <input type="text" id="profileLastName" class="form-control" placeholder="הכנס שם משפחה">
                                                             </div>
                                                             <div class="col-12">
-                                                                <button type="submit" class="btn btn-primary" id="updateInfoBtn">
-                                                                    <span id="updateInfoBtnText">עדכן פרטים</span>
-                                                                    <span id="updateInfoBtnSpinner" class="btn-spinner">⏳ מעדכן...</span>
-                                                                </button>
+                                                                <div class="d-flex justify-content-end">
+                                                                    <button type="submit" class="btn btn-primary" id="updateInfoBtn">
+                                                                        <span id="updateInfoBtnText">עדכן פרטים</span>
+                                                                        <span id="updateInfoBtnSpinner" class="btn-spinner">⏳ מעדכן...</span>
+                                                                    </button>
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </form>
@@ -163,10 +165,12 @@
                                                                 <input type="password" id="confirmNewPassword" class="form-control" placeholder="אמת סיסמה חדשה" required minlength="6">
                                                             </div>
                                                             <div class="col-12">
-                                                                <button type="submit" class="btn btn-warning" id="updatePasswordBtn">
-                                                                    <span id="updatePasswordBtnText">עדכן סיסמה</span>
-                                                                    <span id="updatePasswordBtnSpinner" class="btn-spinner">⏳ מעדכן...</span>
-                                                                </button>
+                                                                <div class="d-flex justify-content-end">
+                                                                    <button type="submit" class="btn btn-warning" id="updatePasswordBtn">
+                                                                        <span id="updatePasswordBtnText">עדכן סיסמה</span>
+                                                                        <span id="updatePasswordBtnSpinner" class="btn-spinner">⏳ מעדכן...</span>
+                                                                    </button>
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </form>
@@ -198,7 +202,7 @@
                                                 <div class="card-body">
                                                     <form id="aiAnalysisSettingsForm">
                                                         <div class="row g-3">
-                                                            <!-- Row 1: Default Provider + Help Panel -->
+                                                            <!-- Column 1: All Controls (Default Provider + Gemini API Key + Perplexity API Key) -->
                                                             <div class="col-md-6">
                                                                 <label class="form-label" for="aiDefaultProvider">מנוע AI ברירת מחדל</label>
                                                                 <select id="aiDefaultProvider" class="form-select" required>
@@ -206,7 +210,51 @@
                                                                     <option value="perplexity">Perplexity</option>
                                                                 </select>
                                                                 <small class="form-text text-muted">בחר מנוע AI שישמש כברירת מחדל לניתוחים</small>
+                                                                
+                                                                <!-- Gemini API Key -->
+                                                                <div class="mt-3">
+                                                                    <label class="form-label" for="geminiApiKey">Gemini API Key</label>
+                                                                    <div class="input-group">
+                                                                        <input type="password" id="geminiApiKey" class="form-control" placeholder="הכנס Gemini API Key">
+                                                                        <button class="btn btn-outline-secondary" type="button" id="toggleGeminiKeyBtn" title="הצג/הסתר מפתח">
+                                                                            <span id="toggleGeminiKeyIcon">👁️</span>
+                                                                        </button>
+                                                                    </div>
+                                                                    <small class="form-text text-muted">המפתח יישמר מוצפן במסד הנתונים</small>
+                                                                    
+                                                                    <!-- Status and Validate Button for Gemini -->
+                                                                    <div class="d-flex align-items-center gap-2 mt-2">
+                                                                        <div id="geminiKeyStatus" class="status-display flex-grow-1"></div>
+                                                                        <button type="button" data-button-type="SECONDARY" data-variant="small" data-onclick="window.AIAnalysisManager?.validateGeminiKey()" data-text="בדוק" data-id="validateGeminiBtn" id="validateGeminiBtn">
+                                                                            <span id="validateGeminiBtnText">בדוק</span>
+                                                                            <span id="validateGeminiBtnSpinner" class="btn-spinner d-none">⏳</span>
+                                                                        </button>
+                                                                    </div>
+                                                                </div>
+                                                                
+                                                                <!-- Perplexity API Key -->
+                                                                <div class="mt-3">
+                                                                    <label class="form-label" for="perplexityApiKey">Perplexity API Key</label>
+                                                                    <div class="input-group">
+                                                                        <input type="password" id="perplexityApiKey" class="form-control" placeholder="הכנס Perplexity API Key">
+                                                                        <button class="btn btn-outline-secondary" type="button" id="togglePerplexityKeyBtn" title="הצג/הסתר מפתח">
+                                                                            <span id="togglePerplexityKeyIcon">👁️</span>
+                                                                        </button>
+                                                                    </div>
+                                                                    <small class="form-text text-muted">המפתח יישמר מוצפן במסד הנתונים</small>
+                                                                    
+                                                                    <!-- Status and Validate Button for Perplexity -->
+                                                                    <div class="d-flex align-items-center gap-2 mt-2">
+                                                                        <div id="perplexityKeyStatus" class="status-display flex-grow-1"></div>
+                                                                        <button type="button" data-button-type="SECONDARY" data-variant="small" data-onclick="window.AIAnalysisManager?.validatePerplexityKey()" data-text="בדוק" data-id="validatePerplexityBtn" id="validatePerplexityBtn">
+                                                                            <span id="validatePerplexityBtnText">בדוק</span>
+                                                                            <span id="validatePerplexityBtnSpinner" class="btn-spinner d-none">⏳</span>
+                                                                        </button>
+                                                                    </div>
+                                                                </div>
                                                             </div>
+
+                                                            <!-- Column 2: All Explanations (Help Panel) -->
                                                             <div class="col-md-6">
                                                                 <label class="form-label">איפה להשיג מפתח API?</label>
                                                                 <div class="alert alert-info mb-0">
@@ -229,51 +277,9 @@
                                                                 </div>
                                                             </div>
 
-                                                            <!-- Row 2: Gemini API Key -->
-                                                            <div class="col-md-6">
-                                                                <label class="form-label" for="geminiApiKey">Gemini API Key</label>
-                                                                <div class="input-group">
-                                                                    <input type="password" id="geminiApiKey" class="form-control" placeholder="הכנס Gemini API Key">
-                                                                    <button class="btn btn-outline-secondary" type="button" id="toggleGeminiKeyBtn" title="הצג/הסתר מפתח">
-                                                                        <span id="toggleGeminiKeyIcon">👁️</span>
-                                                                    </button>
-                                                                </div>
-                                                                <small class="form-text text-muted">המפתח יישמר מוצפן במסד הנתונים</small>
-                                                                
-                                                                <!-- Status and Validate Button for Gemini -->
-                                                                <div class="d-flex align-items-center gap-2 mt-2">
-                                                                    <div id="geminiKeyStatus" class="status-display flex-grow-1"></div>
-                                                                    <button type="button" data-button-type="SECONDARY" data-variant="small" data-onclick="window.AIAnalysisManager?.validateGeminiKey()" data-text="בדוק" data-id="validateGeminiBtn" id="validateGeminiBtn">
-                                                                        <span id="validateGeminiBtnText">בדוק</span>
-                                                                        <span id="validateGeminiBtnSpinner" class="btn-spinner d-none">⏳</span>
-                                                                    </button>
-                                                                </div>
-                                                            </div>
-
-                                                            <!-- Row 2: Perplexity API Key -->
-                                                            <div class="col-md-6">
-                                                                <label class="form-label" for="perplexityApiKey">Perplexity API Key</label>
-                                                                <div class="input-group">
-                                                                    <input type="password" id="perplexityApiKey" class="form-control" placeholder="הכנס Perplexity API Key">
-                                                                    <button class="btn btn-outline-secondary" type="button" id="togglePerplexityKeyBtn" title="הצג/הסתר מפתח">
-                                                                        <span id="togglePerplexityKeyIcon">👁️</span>
-                                                                    </button>
-                                                                </div>
-                                                                <small class="form-text text-muted">המפתח יישמר מוצפן במסד הנתונים</small>
-                                                                
-                                                                <!-- Status and Validate Button for Perplexity -->
-                                                                <div class="d-flex align-items-center gap-2 mt-2">
-                                                                    <div id="perplexityKeyStatus" class="status-display flex-grow-1"></div>
-                                                                    <button type="button" data-button-type="SECONDARY" data-variant="small" data-onclick="window.AIAnalysisManager?.validatePerplexityKey()" data-text="בדוק" data-id="validatePerplexityBtn" id="validatePerplexityBtn">
-                                                                        <span id="validatePerplexityBtnText">בדוק</span>
-                                                                        <span id="validatePerplexityBtnSpinner" class="btn-spinner d-none">⏳</span>
-                                                                    </button>
-                                                                </div>
-                                                            </div>
-
-                                                            <!-- Row 3: Save Button (aligned to left/end) -->
+                                                            <!-- Save Button (aligned to left/end in RTL) -->
                                                             <div class="col-12">
-                                                                <div class="d-flex justify-content-start">
+                                                                <div class="d-flex justify-content-end">
                                                                     <button type="button" data-button-type="PRIMARY" data-variant="full" data-onclick="window.AIAnalysisManager?.saveSettings()" data-text="שמור הגדרות" data-id="saveAiAnalysisBtn" id="saveAiAnalysisBtn">
                                                                         <span id="saveAiAnalysisBtnText">שמור הגדרות</span>
                                                                         <span id="saveAiAnalysisBtnSpinner" class="btn-spinner d-none">⏳ שומר...</span>

@@ -302,15 +302,21 @@
      * טיפול בפעולות לאחר עדכון פרופיל
      */
     async handlePostProfileUpdate(updatedUser) {
-      // Update TikTrackAuth current user
+      // Update localStorage with updated user (same as auth.js does)
+      try {
+        localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+        window.Logger?.debug('✅ Updated currentUser in localStorage', { page: 'user-profile' });
+      } catch (storageError) {
+        window.Logger?.warn('Failed to update currentUser in localStorage', { error: storageError, page: 'user-profile' });
+      }
+
+      // Update TikTrackAuth current user if available
       if (window.TikTrackAuth) {
-        window.PageStateManager?.setItem('currentUser', JSON.stringify(updatedUser));
         const currentUser = window.TikTrackAuth.getCurrentUser();
         if (currentUser) {
           Object.assign(currentUser, updatedUser);
+          window.Logger?.debug('✅ Updated TikTrackAuth currentUser', { page: 'user-profile' });
         }
-      } else {
-        window.PageStateManager?.setItem('currentUser', JSON.stringify(updatedUser));
       }
 
       // Update UnifiedCacheManager cache

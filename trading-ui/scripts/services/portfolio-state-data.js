@@ -15,7 +15,20 @@
  *
  * Related Documentation:
  * - documentation/frontend/GENERAL_SYSTEMS_LIST.md
+ * - documentation/02-ARCHITECTURE/FRONTEND/HISTORICAL_DATA_SERVICES.md
  * - documentation/03-DEVELOPMENT/PLANS/HISTORICAL_PAGES_FULL_IMPLEMENTATION_PLAN.md
+ *
+ * Function Index:
+ * ==============
+ * 
+ * DATA LOADING (4):
+ * - loadSnapshot(accountId, date, options) - Load portfolio snapshot at specific date
+ * - loadSeries(accountId, startDate, endDate, options) - Load portfolio series for charts
+ * - loadPerformance(accountId, dateRange, options) - Load portfolio performance over date range
+ * - loadComparison(accountId, date1, date2, options) - Load portfolio comparison between dates
+ * 
+ * CACHE MANAGEMENT (1):
+ * - invalidateCache() - Invalidate all portfolio state cache
  *
  * @version 1.0.0
  * @created January 2025
@@ -313,4 +326,5 @@
 
   window.Logger?.debug?.('✅ PortfolioStateData service initialized', PAGE_LOG_CONTEXT);
 })();
+
 

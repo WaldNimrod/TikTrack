@@ -447,7 +447,7 @@ const PACKAGE_MANIFEST = {
         file: 'services/executions-data.js',
         globalCheck: 'window.ExecutionsData',
         description: 'Executions data service (API + Cache + CRUD)',
-        required: false,
+        required: false, // Required only for executions page, not all pages
         loadOrder: 5.2
       },
       {
@@ -1365,6 +1365,34 @@ const PACKAGE_MANIFEST = {
         loadOrder: 0
       },
       {
+        file: 'services/trade-history-data.js',
+        globalCheck: 'window.TradeHistoryData',
+        description: 'Trade history data service',
+        required: false,  // Required only for trade-history-page
+        loadOrder: 8
+      },
+      {
+        file: 'services/portfolio-state-data.js',
+        globalCheck: 'window.PortfolioStateData',
+        description: 'Portfolio state data service',
+        required: false,  // Required only for portfolio-state-page
+        loadOrder: 8.5
+      },
+      {
+        file: 'services/trading-journal-data.js',
+        globalCheck: 'window.TradingJournalData',
+        description: 'Trading journal data service',
+        required: false,  // Required only for trading-journal-page
+        loadOrder: 9
+      },
+      {
+        file: 'trade-history-page.js',
+        globalCheck: 'window.tradeHistoryPage',
+        description: 'Trade history page script (page-specific)',
+        required: false,  // Required only for trade-history page
+        loadOrder: 10
+      },
+      {
         file: 'account-service.js',
         globalCheck: 'window.getAccounts',
         description: 'Account service',
@@ -1900,7 +1928,7 @@ const PACKAGE_MANIFEST = {
     critical: false,
     loadOrder: 20,
     dependencies: ['base', 'services', 'ui-advanced', 'crud', 'entity-services'],
-    loadingStrategy: 'async', // Non-critical - only for watch lists pages
+    loadingStrategy: 'defer', // Changed to defer to ensure WatchListsPage global is available when checked
     scripts: [
       {
         file: 'services/watch-lists-data.js',

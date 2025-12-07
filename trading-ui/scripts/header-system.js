@@ -1217,9 +1217,9 @@ class HeaderSystem {
                       <ul class="tiktrack-dropdown-menu">
                         <li><a class="tiktrack-dropdown-item" href="/ai-analysis">אנליזת AI</a></li>
                         <li class="separator"></li>
-                        <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/trade-history-page.html">📈 היסטוריית טרייד</a></li>
-                        <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/portfolio-state-page.html">💼 מצב תיק היסטורי</a></li>
-                        <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/trading-journal-page.html">📓 יומן מסחר</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/trade-history">📈 היסטוריית טרייד</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/portfolio-state">💼 מצב תיק היסטורי</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/trading-journal">📓 יומן מסחר</a></li>
                       </ul>
                     </li>
                     <li class="tiktrack-nav-item dropdown">

@@ -1,8 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
-  <title>12</title>
-  <circle cx="100" cy="100" r="90" fill="none" stroke="#284b63" stroke-width="10"/>
-  <g transform="translate(-40,-40) scale(1.4)" stroke="#26b7a9" stroke-width="10" 
-     stroke-linecap="round" stroke-linejoin="round" fill="none">
-<polyline points='30,140 60,110 90,120 120,90 150,100'/><line x1='30' y1='150' x2='30' y2='60'/><line x1='30' y1='150' x2='160' y2='150'/>
-  </g>
-</svg>

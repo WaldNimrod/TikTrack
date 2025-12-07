@@ -69,6 +69,7 @@ from config.settings import (
     HOST,
     PORT,
     IS_PRODUCTION,
+    IS_TESTING,
     ENVIRONMENT,
     UI_DIR
 )
@@ -514,6 +515,9 @@ from routes.api.business_logic import business_logic_bp
 app.register_blueprint(business_logic_bp)
 
 # Historical Data API
+from routes.api.trade_history import trade_history_bp
+from routes.api.portfolio_state import portfolio_state_bp
+from routes.api.trading_journal import trading_journal_bp
 app.register_blueprint(trade_history_bp)
 app.register_blueprint(portfolio_state_bp)
 app.register_blueprint(trading_journal_bp)
@@ -2812,7 +2816,12 @@ if __name__ == "__main__":
     # - Notification system works without WebSockets
     
     # Display server startup information
-    env_name = "PRODUCTION" if IS_PRODUCTION else "DEVELOPMENT"
+    if IS_PRODUCTION:
+        env_name = "PRODUCTION"
+    elif IS_TESTING:
+        env_name = "TESTING"
+    else:
+        env_name = "DEVELOPMENT"
     print("🚀 Starting TikTrack Server...")
     print(f"🌍 Environment: {env_name}")
     print(f"📡 Server running on port {PORT}")

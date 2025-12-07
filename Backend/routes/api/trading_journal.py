@@ -1,27 +1,27 @@
 """
 Trading Journal API Routes - TikTrack
-=======================================
+======================================
 
 This module provides API endpoints for retrieving trading journal data.
 
 Endpoints:
-    GET /api/trading-journal/entries - Get journal entries
+    GET /api/trading-journal/entries - Get journal entries for date range
     GET /api/trading-journal/statistics - Get journal statistics
-    GET /api/trading-journal/calendar - Get calendar data
-    GET /api/trading-journal/by-entity - Get entries by entity
+    GET /api/trading-journal/calendar - Get calendar data for specific month
+    GET /api/trading-journal/by-entity - Get entries by entity type and ID
 
 Author: TikTrack Development Team
 Version: 1.0.0
 Date: January 2025
 
 Documentation:
-- documentation/02-ARCHITECTURE/BACKEND/BUSINESS_LOGIC_LAYER.md
+- documentation/02-ARCHITECTURE/BACKEND/HISTORICAL_DATA_SERVICE.md
 - documentation/03-DEVELOPMENT/PLANS/HISTORICAL_PAGES_FULL_IMPLEMENTATION_PLAN.md
 """
 
 from flask import Blueprint, jsonify, request, g
 from sqlalchemy.orm import Session
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from services.business_logic.historical_data_business_service import HistoricalDataBusinessService
 from services.advanced_cache_service import cache_with_deps
 from .base_entity_decorators import handle_database_session
@@ -39,22 +39,21 @@ trading_journal_bp = Blueprint('trading_journal', __name__, url_prefix='/api/tra
 @cache_with_deps(ttl=180, dependencies=['notes', 'trades', 'executions'])
 def get_journal_entries():
     """
-    Get journal entries (notes, trades, executions) for a date range.
+    Get journal entries for a date range.
     
     Query Parameters:
         start_date (required): Start date (ISO format)
         end_date (required): End date (ISO format)
-        entity_type (optional): Filter by entity type ('trade', 'execution', 'note', 'all') - default: 'all'
-        entity_id (optional): Filter by specific entity ID
+        entity_type (optional): Entity type ('trade', 'execution', 'note', 'all', default: 'all')
+        entity_id (optional): Entity ID
     
     Returns:
-        JSON response with journal entries
+        JSON response with journal entries data
     """
     normalizer = None
     try:
         db: Session = g.db
         
-        # Get user_id from Flask context
         user_id = getattr(g, 'user_id', None)
         if not user_id:
             error_payload = BaseEntityUtils.create_error_payload(
@@ -91,16 +90,29 @@ def get_journal_entries():
         if end_date.tzinfo is None:
             end_date = end_date.replace(tzinfo=timezone.utc)
         
-        # Parse entity types
-        if entity_type == 'all':
-            entity_types = ['trade', 'execution', 'note']
-        else:
+        # Validate request
+        validation_data = {
+            'user_id': user_id,
+            'start_date': start_date,
+            'end_date': end_date
+        }
+        
+        service = HistoricalDataBusinessService(db_session=db)
+        validation_result = service.validate(validation_data)
+        
+        if not validation_result['is_valid']:
+            error_payload = BaseEntityUtils.create_error_payload(
+                normalizer,
+                f"Validation failed: {', '.join(validation_result['errors'])}"
+            )
+            return jsonify(error_payload), 400
+        
+        # Build entity types list
+        entity_types = None
+        if entity_type and entity_type != 'all':
             entity_types = [entity_type]
         
-        # Initialize service
-        service = HistoricalDataBusinessService(db_session=db)
-        
-        # Aggregate journal entries
+        # Get journal entries
         result = service.aggregate_journal_entries(
             user_id=user_id,
             date_range={
@@ -110,36 +122,27 @@ def get_journal_entries():
             entity_types=entity_types
         )
         
-        if not result.get('is_valid'):
-            error_payload = BaseEntityUtils.create_error_payload(
-                normalizer,
-                result.get('error', 'Failed to aggregate journal entries')
-            )
-            return jsonify(error_payload), 500
-        
         # Filter by entity_id if provided
-        entries = result.get('entries', [])
-        if entity_id:
-            entries = [e for e in entries if e.get('id') == entity_id]
-        
-        result['entries'] = entries
-        result['count'] = len(entries)
-        
-        # Normalize output
-        normalized_data = normalizer.normalize_output(result)
+        if entity_id and result.get('entries'):
+            result['entries'] = [
+                entry for entry in result['entries']
+                if entry.get('entity_id') == entity_id
+            ]
+            result['count'] = len(result['entries'])
         
         payload = BaseEntityUtils.create_success_payload(
             normalizer,
-            data=normalized_data,
-            message="Journal entries retrieved successfully"
+            data=result,
+            extra={'count': result.get('count', 0)}
         )
+        
         return jsonify(payload), 200
         
     except Exception as e:
         logger.error(f"Error getting journal entries: {str(e)}", exc_info=True)
         error_payload = BaseEntityUtils.create_error_payload(
             normalizer,
-            f"Failed to retrieve journal entries: {str(e)}"
+            f"Error retrieving journal entries: {str(e)}"
         )
         return jsonify(error_payload), 500
 
@@ -154,8 +157,8 @@ def get_journal_statistics():
     Query Parameters:
         start_date (required): Start date (ISO format)
         end_date (required): End date (ISO format)
-        entity_type (optional): Filter by entity type
-        period (optional): Period filter ('day', 'week', 'month', 'year')
+        entity_type (optional): Entity type filter
+        period (optional): Period filter
     
     Returns:
         JSON response with journal statistics
@@ -164,7 +167,6 @@ def get_journal_statistics():
     try:
         db: Session = g.db
         
-        # Get user_id from Flask context
         user_id = getattr(g, 'user_id', None)
         if not user_id:
             error_payload = BaseEntityUtils.create_error_payload(
@@ -178,7 +180,7 @@ def get_journal_statistics():
         # Parse query parameters
         start_date_str = request.args.get('start_date')
         end_date_str = request.args.get('end_date')
-        entity_type = request.args.get('entity_type', 'all')
+        entity_type = request.args.get('entity_type')
         period = request.args.get('period')
         
         if not start_date_str or not end_date_str:
@@ -201,62 +203,45 @@ def get_journal_statistics():
         if end_date.tzinfo is None:
             end_date = end_date.replace(tzinfo=timezone.utc)
         
-        # Parse entity types
-        if entity_type == 'all':
-            entity_types = ['trade', 'execution', 'note']
-        else:
-            entity_types = [entity_type]
+        # Validate request
+        validation_data = {
+            'user_id': user_id,
+            'start_date': start_date,
+            'end_date': end_date
+        }
         
-        # Initialize service
         service = HistoricalDataBusinessService(db_session=db)
+        validation_result = service.validate(validation_data)
         
-        # Get entries
-        entries_result = service.aggregate_journal_entries(
+        if not validation_result['is_valid']:
+            error_payload = BaseEntityUtils.create_error_payload(
+                normalizer,
+                f"Validation failed: {', '.join(validation_result['errors'])}"
+            )
+            return jsonify(error_payload), 400
+        
+        # Get journal statistics
+        result = service.calculate_journal_statistics(
             user_id=user_id,
             date_range={
                 'start_date': start_date,
                 'end_date': end_date
             },
-            entity_types=entity_types
+            entity_type=entity_type
         )
-        
-        if not entries_result.get('is_valid'):
-            error_payload = BaseEntityUtils.create_error_payload(
-                normalizer,
-                entries_result.get('error', 'Failed to get journal entries')
-            )
-            return jsonify(error_payload), 500
-        
-        entries = entries_result.get('entries', [])
-        
-        # Calculate statistics
-        stats_result = service.calculate_journal_statistics(
-            entries=entries,
-            period=period
-        )
-        
-        if not stats_result.get('is_valid'):
-            error_payload = BaseEntityUtils.create_error_payload(
-                normalizer,
-                stats_result.get('error', 'Failed to calculate statistics')
-            )
-            return jsonify(error_payload), 500
-        
-        # Normalize output
-        normalized_data = normalizer.normalize_output(stats_result)
         
         payload = BaseEntityUtils.create_success_payload(
             normalizer,
-            data=normalized_data,
-            message="Journal statistics retrieved successfully"
+            data=result
         )
+        
         return jsonify(payload), 200
         
     except Exception as e:
         logger.error(f"Error getting journal statistics: {str(e)}", exc_info=True)
         error_payload = BaseEntityUtils.create_error_payload(
             normalizer,
-            f"Failed to retrieve journal statistics: {str(e)}"
+            f"Error retrieving journal statistics: {str(e)}"
         )
         return jsonify(error_payload), 500
 
@@ -266,12 +251,12 @@ def get_journal_statistics():
 @cache_with_deps(ttl=180, dependencies=['notes', 'trades', 'executions'])
 def get_journal_calendar():
     """
-    Get journal calendar data for a specific month.
+    Get calendar data for a specific month.
     
     Query Parameters:
         month (required): Month (1-12)
         year (required): Year (e.g., 2025)
-        entity_type (optional): Filter by entity type
+        entity_type (optional): Entity type filter
     
     Returns:
         JSON response with calendar data
@@ -280,7 +265,6 @@ def get_journal_calendar():
     try:
         db: Session = g.db
         
-        # Get user_id from Flask context
         user_id = getattr(g, 'user_id', None)
         if not user_id:
             error_payload = BaseEntityUtils.create_error_payload(
@@ -294,7 +278,7 @@ def get_journal_calendar():
         # Parse query parameters
         month = request.args.get('month', type=int)
         year = request.args.get('year', type=int)
-        entity_type = request.args.get('entity_type', 'all')
+        entity_type = request.args.get('entity_type')
         
         if not month or not year:
             error_payload = BaseEntityUtils.create_error_payload(
@@ -311,29 +295,35 @@ def get_journal_calendar():
             return jsonify(error_payload), 400
         
         # Calculate date range for the month
-        from datetime import date as date_class
         start_date = datetime(year, month, 1, tzinfo=timezone.utc)
-        
-        # Get last day of month
         if month == 12:
-            end_date = datetime(year + 1, 1, 1, tzinfo=timezone.utc)
+            end_date = datetime(year + 1, 1, 1, tzinfo=timezone.utc) - timedelta(days=1)
         else:
-            end_date = datetime(year, month + 1, 1, tzinfo=timezone.utc)
+            end_date = datetime(year, month + 1, 1, tzinfo=timezone.utc) - timedelta(days=1)
         
-        # Subtract 1 second to get last moment of the month
-        from datetime import timedelta
-        end_date = end_date - timedelta(seconds=1)
+        # Validate request
+        validation_data = {
+            'user_id': user_id,
+            'start_date': start_date,
+            'end_date': end_date
+        }
         
-        # Parse entity types
-        if entity_type == 'all':
-            entity_types = ['trade', 'execution', 'note']
-        else:
+        service = HistoricalDataBusinessService(db_session=db)
+        validation_result = service.validate(validation_data)
+        
+        if not validation_result['is_valid']:
+            error_payload = BaseEntityUtils.create_error_payload(
+                normalizer,
+                f"Validation failed: {', '.join(validation_result['errors'])}"
+            )
+            return jsonify(error_payload), 400
+        
+        # Build entity types list
+        entity_types = None
+        if entity_type and entity_type != 'all':
             entity_types = [entity_type]
         
-        # Initialize service
-        service = HistoricalDataBusinessService(db_session=db)
-        
-        # Get entries for the month
+        # Get journal entries for the month
         result = service.aggregate_journal_entries(
             user_id=user_id,
             date_range={
@@ -343,47 +333,38 @@ def get_journal_calendar():
             entity_types=entity_types
         )
         
-        if not result.get('is_valid'):
-            error_payload = BaseEntityUtils.create_error_payload(
-                normalizer,
-                result.get('error', 'Failed to get journal entries')
-            )
-            return jsonify(error_payload), 500
-        
-        # Group entries by day
+        # Group entries by day for calendar display
         entries_by_day = {}
         for entry in result.get('entries', []):
-            entry_date = entry.get('date')
-            if isinstance(entry_date, str):
-                entry_date = datetime.fromisoformat(entry_date.replace('Z', '+00:00'))
-            if isinstance(entry_date, datetime):
+            entry_date = entry.get('date') or entry.get('created_at')
+            if entry_date:
+                if isinstance(entry_date, str):
+                    entry_date = datetime.fromisoformat(entry_date.replace('Z', '+00:00'))
                 day_key = entry_date.strftime('%Y-%m-%d')
                 if day_key not in entries_by_day:
                     entries_by_day[day_key] = []
                 entries_by_day[day_key].append(entry)
         
-        calendar_data = {
+        calendar_result = {
             'month': month,
             'year': year,
             'entries_by_day': entries_by_day,
-            'total_entries': len(result.get('entries', []))
+            'total_entries': result.get('count', 0),
+            'is_valid': True
         }
-        
-        # Normalize output
-        normalized_data = normalizer.normalize_output(calendar_data)
         
         payload = BaseEntityUtils.create_success_payload(
             normalizer,
-            data=normalized_data,
-            message="Journal calendar data retrieved successfully"
+            data=calendar_result
         )
+        
         return jsonify(payload), 200
         
     except Exception as e:
         logger.error(f"Error getting journal calendar: {str(e)}", exc_info=True)
         error_payload = BaseEntityUtils.create_error_payload(
             normalizer,
-            f"Failed to retrieve journal calendar: {str(e)}"
+            f"Error retrieving journal calendar: {str(e)}"
         )
         return jsonify(error_payload), 500
 
@@ -408,7 +389,6 @@ def get_journal_by_entity():
     try:
         db: Session = g.db
         
-        # Get user_id from Flask context
         user_id = getattr(g, 'user_id', None)
         if not user_id:
             error_payload = BaseEntityUtils.create_error_payload(
@@ -432,13 +412,6 @@ def get_journal_by_entity():
             )
             return jsonify(error_payload), 400
         
-        if entity_type not in ['trade', 'execution', 'note']:
-            error_payload = BaseEntityUtils.create_error_payload(
-                normalizer,
-                "entity_type must be one of: trade, execution, note"
-            )
-            return jsonify(error_payload), 400
-        
         # Normalize dates if provided
         start_date = None
         end_date = None
@@ -458,14 +431,27 @@ def get_journal_by_entity():
         
         # If no date range provided, use a wide range (last year)
         if not start_date or not end_date:
-            from datetime import timedelta
             end_date = datetime.now(timezone.utc)
             start_date = end_date - timedelta(days=365)
         
-        # Initialize service
-        service = HistoricalDataBusinessService(db_session=db)
+        # Validate request
+        validation_data = {
+            'user_id': user_id,
+            'start_date': start_date,
+            'end_date': end_date
+        }
         
-        # Get entries
+        service = HistoricalDataBusinessService(db_session=db)
+        validation_result = service.validate(validation_data)
+        
+        if not validation_result['is_valid']:
+            error_payload = BaseEntityUtils.create_error_payload(
+                normalizer,
+                f"Validation failed: {', '.join(validation_result['errors'])}"
+            )
+            return jsonify(error_payload), 400
+        
+        # Get journal entries filtered by entity
         result = service.aggregate_journal_entries(
             user_id=user_id,
             date_range={
@@ -475,34 +461,27 @@ def get_journal_by_entity():
             entity_types=[entity_type]
         )
         
-        if not result.get('is_valid'):
-            error_payload = BaseEntityUtils.create_error_payload(
-                normalizer,
-                result.get('error', 'Failed to get journal entries')
-            )
-            return jsonify(error_payload), 500
-        
         # Filter by entity_id
-        entries = [e for e in result.get('entries', []) if e.get('id') == entity_id]
-        
-        result['entries'] = entries
-        result['count'] = len(entries)
-        
-        # Normalize output
-        normalized_data = normalizer.normalize_output(result)
+        if result.get('entries'):
+            result['entries'] = [
+                entry for entry in result['entries']
+                if entry.get('entity_id') == entity_id
+            ]
+            result['count'] = len(result['entries'])
         
         payload = BaseEntityUtils.create_success_payload(
             normalizer,
-            data=normalized_data,
-            message="Journal entries by entity retrieved successfully"
+            data=result,
+            extra={'count': result.get('count', 0)}
         )
+        
         return jsonify(payload), 200
         
     except Exception as e:
-        logger.error(f"Error getting journal entries by entity: {str(e)}", exc_info=True)
+        logger.error(f"Error getting journal by entity: {str(e)}", exc_info=True)
         error_payload = BaseEntityUtils.create_error_payload(
             normalizer,
-            f"Failed to retrieve journal entries by entity: {str(e)}"
+            f"Error retrieving journal by entity: {str(e)}"
         )
         return jsonify(error_payload), 500
 

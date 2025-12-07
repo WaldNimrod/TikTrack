@@ -39,6 +39,12 @@
      * @returns {Array} Array of flag color objects
      */
     function getFlagColors() {
+        // Use UI Service if available (preferred - centralized logic)
+        if (window.WatchListsUIService?.getFlagColors) {
+            return window.WatchListsUIService.getFlagColors();
+        }
+        
+        // Fallback: Return default colors
         return [
             { value: '#26baac', label: 'Trade', entityType: 'trade' },
             { value: '#0056b3', label: 'Trade Plan', entityType: 'trade_plan' },

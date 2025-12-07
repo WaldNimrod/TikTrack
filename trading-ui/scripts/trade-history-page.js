@@ -26,7 +26,6 @@
     let planVsExecutionData = [];
     
     // Cache keys
-    const CACHE_KEY_MOCK_DATA = 'trade-history-page_mockData';
     const CACHE_KEY_SELECTED_TRADE_ID = 'trade-history-page_selectedTradeId';
     const CACHE_KEY_SECTION_STATES = 'trade-history-page_sectionStates';
 
@@ -69,7 +68,7 @@
         
         // Use FieldRendererService for consistent date formatting
         if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
-            return window.FieldRendererService.renderDate(dateString, includeTime);
+        return window.FieldRendererService.renderDate(dateString, includeTime);
         }
         // Fallback if FieldRendererService not available
         return dateString;
@@ -200,119 +199,63 @@
     }
 
     /**
-     * Load trades from API with caching and error handling
-     * Uses TradeHistoryData service for unified data loading
+     * Load trades from TradeHistoryData service
      */
     async function loadTrades() {
         showLoadingState('trades-table-section');
         
         try {
-            // Use TradeHistoryData service if available
-            if (window.TradeHistoryData && typeof window.TradeHistoryData.loadTradeHistory === 'function') {
-                // Build filters from current filter state
-                const filters = {
-                    // Add filters from UI if available
-                };
-                
-                const data = await window.TradeHistoryData.loadTradeHistory(filters);
-                const trades = Array.isArray(data?.trades) ? data.trades : (Array.isArray(data) ? data : []);
-                
-                // Transform trades to match our format
-                allTrades = trades.map(trade => ({
-                    id: trade.id,
-                    ticker: trade.ticker_symbol || trade.ticker?.symbol || '',
-                    side: trade.side || '',
-                    investment_type: trade.investment_type || '',
-                    created_at: trade.created_at?.utc || trade.created_at || '',
-                    closed_at: trade.closed_at?.utc || trade.closed_at || '',
-                    pl: trade.realized_pl || trade.pl || 0,
-                    pl_percent: trade.pl_percent || 0
-                })).filter(t => t.ticker); // Only trades with ticker
-                
-                filteredTrades = [...allTrades];
-                loadTradesTable();
-            } else {
-                // Fallback to direct API call if TradeHistoryData not available
-                const data = await window.safeApiCall('/api/trades/');
-                const trades = Array.isArray(data?.data) ? data.data : (Array.isArray(data) ? data : []);
-                
-                // Transform trades to match our format
-                allTrades = trades.map(trade => ({
-                    id: trade.id,
-                    ticker: trade.ticker_symbol || trade.ticker?.symbol || '',
-                    side: trade.side || '',
-                    investment_type: trade.investment_type || '',
-                    created_at: trade.created_at?.utc || trade.created_at || '',
-                    closed_at: trade.closed_at?.utc || trade.closed_at || '',
-                    pl: trade.realized_pl || trade.pl || 0,
-                    pl_percent: trade.pl_percent || 0
-                })).filter(t => t.ticker); // Only trades with ticker
-                
-                filteredTrades = [...allTrades];
-                loadTradesTable();
+            // Wait for TradeHistoryData service to be available
+            if (!window.TradeHistoryData) {
+                await new Promise((resolve) => {
+                    const checkInterval = setInterval(() => {
+                        if (window.TradeHistoryData) {
+                            clearInterval(checkInterval);
+                            resolve();
+                        }
+                    }, 100);
+                    setTimeout(() => {
+                        clearInterval(checkInterval);
+                        resolve();
+                    }, 5000); // Timeout after 5 seconds
+                });
             }
+
+            if (!window.TradeHistoryData || typeof window.TradeHistoryData.loadTradeHistory !== 'function') {
+                throw new Error('TradeHistoryData service not available');
+            }
+
+            // Load trade history using TradeHistoryData service
+            const data = await window.TradeHistoryData.loadTradeHistory({});
+            const trades = Array.isArray(data?.trades) ? data.trades : [];
+            
+            // Transform trades to match our format
+            allTrades = trades.map(trade => ({
+                id: trade.id,
+                ticker: trade.ticker_symbol || trade.ticker?.symbol || '',
+                side: trade.side || '',
+                investment_type: trade.investment_type || '',
+                created_at: trade.created_at?.utc || trade.created_at || '',
+                closed_at: trade.closed_at?.utc || trade.closed_at || '',
+                pl: trade.realized_pl || trade.pl || 0,
+                pl_percent: trade.pl_percent || 0
+            })).filter(t => t.ticker); // Only trades with ticker
+            
+            filteredTrades = [...allTrades];
+            loadTradesTable();
         } catch (error) {
-            // Error already handled by TradeHistoryData or safeApiCall, but fallback to mock data
-            if (window.Logger) {
-                window.Logger.warn('Error loading trades, using mock data as fallback', { page: 'trade-history-page', error });
+            const errorMsg = error?.message || 'שגיאה בטעינת נתונים';
+            if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {
+                window.NotificationSystem.showError('שגיאה בטעינת טריידים', errorMsg);
+            } else if (window.Logger) {
+                window.Logger.error('Error loading trades', { page: 'trade-history-page', error });
             }
-            if (window.NotificationSystem) {
-                window.NotificationSystem.showWarning('טעינת נתונים', 'נטענים נתוני דמה במקום נתונים אמיתיים');
-            }
-            loadMockTrades();
+            allTrades = [];
+            filteredTrades = [];
+            loadTradesTable();
         } finally {
             hideLoadingState('trades-table-section');
         }
-    }
-
-    /**
-     * Mock data fallback
-     */
-    function loadMockTrades() {
-        allTrades = [
-            {
-                id: 123,
-                ticker: 'AAPL',
-                side: 'Long',
-                investment_type: 'swing',
-                created_at: '2025-01-01',
-                closed_at: '2025-01-20',
-                pl: 1110,
-                pl_percent: 7.4
-            },
-            {
-                id: 124,
-                ticker: 'TSLA',
-                side: 'Short',
-                investment_type: 'swing',
-                created_at: '2025-01-15',
-                closed_at: '2025-01-18',
-                pl: -250,
-                pl_percent: -2.1
-            },
-            {
-                id: 125,
-                ticker: 'MSFT',
-                side: 'Long',
-                investment_type: 'investment',
-                created_at: '2024-12-20',
-                closed_at: '2025-01-25',
-                pl: 850,
-                pl_percent: 5.2
-            },
-            {
-                id: 126,
-                ticker: 'GOOGL',
-                side: 'Long',
-                investment_type: 'swing',
-                created_at: '2025-01-10',
-                closed_at: '2025-01-22',
-                pl: 420,
-                pl_percent: 3.1
-            }
-        ];
-        filteredTrades = [...allTrades];
-        loadTradesTable();
     }
 
     /**
@@ -572,6 +515,9 @@
         saveToCache(CACHE_KEY_SELECTED_TRADE_ID, tradeId);
         savePageState();
         
+        // Update URL with trade_id parameter
+        updateURLWithTradeId(tradeId);
+        
         // Load trade data for analysis
         loadTradeForAnalysis(tradeId);
     }
@@ -590,24 +536,1112 @@
         await saveToCache(CACHE_KEY_SELECTED_TRADE_ID, null);
         await savePageState();
         
+        // Remove trade_id from URL
+        updateURLWithTradeId(null);
+        
+        // Show ticker search modal
+        showTickerSearchModal();
+        
         // Clear all trade analysis data
         // This would reset all charts, statistics, etc.
     }
 
     /**
-     * Load trade for analysis (placeholder - in production would load real data)
+     * Load trade for analysis
      * @param {number} tradeId - Trade ID
      */
-    function loadTradeForAnalysis(tradeId) {
+    async function loadTradeForAnalysis(tradeId) {
         if (window.Logger) {
             window.Logger.info(`Loading trade ${tradeId} for analysis...`, { page: 'trade-history-page', tradeId });
         }
-        // In production, this would:
-        // 1. Fetch trade data from API
-        // 2. Update all charts
-        // 3. Update statistics
-        // 4. Update timeline
-        // 5. Update executions table
+        
+        try {
+            // 1. Fetch trade data from API using EntityDetailsAPI if available
+            let tradeData = null;
+            if (window.entityDetailsAPI && typeof window.entityDetailsAPI.getEntityDetails === 'function') {
+                tradeData = await window.entityDetailsAPI.getEntityDetails('trade', tradeId, {
+                    includeLinkedItems: true
+                });
+            } else {
+                // Fallback: fetch directly from API
+                const response = await fetch(`/api/trades/${tradeId}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    tradeData = data?.data || data;
+                } else if (response.status === 404) {
+                    throw new Error('Trade not found');
+                } else {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+            }
+            
+            if (!tradeData) {
+                throw new Error('Trade not found');
+            }
+            
+            // 2. Create timeline data from linked items (executions, notes, alerts, cash flows, trade plans, trades, alert activations)
+            let timelineData = [];
+            
+            // Helper function to extract date
+            const extractDateValue = (dateValue) => {
+                if (!dateValue) return null;
+                if (typeof dateValue === 'string') {
+                    return dateValue;
+                } else if (dateValue.utc) {
+                    return dateValue.utc;
+                } else if (dateValue instanceof Date) {
+                    return dateValue.toISOString();
+                }
+                return null;
+            };
+            
+            // Add trade creation event
+            if (tradeData.created_at) {
+                timelineData.push({
+                    id: `trade-${tradeData.id}`,
+                    type: 'Trade',
+                    date: extractDateValue(tradeData.created_at),
+                    title: 'יצירת טרייד',
+                    displayText: `טרייד #${tradeData.id} נוצר`,
+                    created_at: tradeData.created_at,
+                    trade_created_at: tradeData.created_at,
+                    plan_created_at: tradeData.trade_plan?.created_at || null
+                });
+            }
+            
+            // Add trade plan creation event (if exists and different from trade creation)
+            if (tradeData.trade_plan && tradeData.trade_plan.created_at) {
+                const planDate = extractDateValue(tradeData.trade_plan.created_at);
+                const tradeDate = extractDateValue(tradeData.created_at);
+                // Only add if different from trade creation date
+                if (planDate && planDate !== tradeDate) {
+                    timelineData.push({
+                        id: `plan-${tradeData.trade_plan.id || 'unknown'}`,
+                        type: 'Trade Plan',
+                        date: planDate,
+                        title: 'יצירת תכנון',
+                        displayText: `תכנון #${tradeData.trade_plan.id || 'unknown'} נוצר`,
+                        created_at: tradeData.trade_plan.created_at,
+                        trade_created_at: tradeData.created_at,
+                        plan_created_at: tradeData.trade_plan.created_at
+                    });
+                }
+            }
+            
+            // Add linked items (executions, notes, alerts, cash flows, alert activations)
+            if (tradeData.linked_items && Array.isArray(tradeData.linked_items)) {
+                const linkedItemsTimeline = tradeData.linked_items
+                    .filter(item => {
+                        // Include all relevant types
+                        return item.type === 'execution' || 
+                               item.type === 'note' || 
+                               item.type === 'alert' || 
+                               item.type === 'cash_flow' ||
+                               item.type === 'trade_plan' ||
+                               item.type === 'trade';
+                    })
+                    .map(item => {
+                        // Extract date properly - prioritize triggered_at for alerts, then execution_date, then created_at, then date
+                        let date = null;
+                        if (item.type === 'alert' && item.triggered_at) {
+                            // Alert activation - use triggered_at
+                            date = extractDateValue(item.triggered_at);
+                        } else if (item.execution_date) {
+                            date = extractDateValue(item.execution_date);
+                        } else if (item.created_at) {
+                            date = extractDateValue(item.created_at);
+                        } else if (item.date) {
+                            date = extractDateValue(item.date);
+                        }
+                        
+                        // Determine type display name
+                        let typeDisplay = item.type === 'execution' ? 'Execution' : 
+                                         item.type === 'note' ? 'Note' :
+                                         item.type === 'alert' ? (item.triggered_at ? 'Alert Activation' : 'Alert') :
+                                         item.type === 'cash_flow' ? 'Cash Flow' :
+                                         item.type === 'trade_plan' ? 'Trade Plan' :
+                                         item.type === 'trade' ? 'Trade' : item.type;
+                        
+                        // Determine title/display text
+                        let title = item.title || item.name || '';
+                        if (item.type === 'alert' && item.triggered_at) {
+                            title = title || 'הפעלת התראה';
+                        } else if (item.type === 'alert') {
+                            title = title || 'התראה';
+                        } else if (item.type === 'note') {
+                            title = title || 'הערה';
+                        } else if (item.type === 'trade_plan') {
+                            title = title || 'תכנון';
+                        } else if (item.type === 'trade') {
+                            title = title || 'טרייד';
+                        }
+                        
+                        return {
+                            id: item.id,
+                            type: typeDisplay,
+                            date: date,
+                            side: item.side || item.action || null,
+                            quantity: item.quantity || null,
+                            price: item.price || null,
+                            amount: item.amount || null,
+                            pl: item.pl || item.realized_pl || null,
+                            displayText: item.title || item.name || item.text || title,
+                            title: title,
+                            // Additional fields for executions
+                            execution_date: item.execution_date || date,
+                            action: item.action || item.side || null,
+                            // Alert specific
+                            triggered_at: item.triggered_at || null,
+                            is_triggered: item.is_triggered || false,
+                            // Creation dates for display
+                            created_at: item.created_at || null,
+                            trade_created_at: tradeData.created_at || null,
+                            plan_created_at: tradeData.trade_plan?.created_at || null
+                        };
+                    });
+                
+                timelineData = timelineData.concat(linkedItemsTimeline);
+            }
+            
+            // Sort all timeline data by date
+            timelineData = timelineData
+                .sort((a, b) => {
+                    // Sort by date (oldest first)
+                    const dateA = new Date(a.date || 0);
+                    const dateB = new Date(b.date || 0);
+                    return dateA - dateB;
+                });
+                
+                // Calculate cumulative position and P/L for chart
+                if (timelineData.length > 0) {
+                    let currentPosition = 0;
+                    let cumulativeRealizedPL = 0;
+                    
+                    timelineData = timelineData.map((point, index) => {
+                        // Update position based on execution
+                        if (point.type === 'Execution') {
+                            if (point.side === 'buy' || point.action === 'buy') {
+                                currentPosition += (point.quantity || 0);
+                            } else if (point.side === 'sell' || point.action === 'sell') {
+                                currentPosition -= (point.quantity || 0);
+                            }
+                            cumulativeRealizedPL += (point.pl || 0);
+                        }
+                        
+                        // Calculate unrealized PL (placeholder - would need current price)
+                        const unrealizedPL = 0;
+                        const totalPL = cumulativeRealizedPL + unrealizedPL;
+                        
+                        return {
+                            ...point,
+                            positionSize: currentPosition,
+                            realizedPL: cumulativeRealizedPL,
+                            unrealizedPL: unrealizedPL,
+                            totalPL: totalPL
+                        };
+                    });
+                }
+                
+                if (window.Logger) {
+                    window.Logger.debug('Created timeline data from linked items', { 
+                        page: 'trade-history-page', 
+                        totalItems: tradeData.linked_items.length,
+                        timelineItems: timelineData.length,
+                        executions: timelineData.filter(t => t.type === 'Execution').length
+                    });
+                }
+            }
+            
+            // 3. Load trade history data for this specific trade (using ticker_id from trade data)
+            // Note: We don't need to load all trades, just use the trade data we already have
+            const tradeHistoryData = {
+                trades: [tradeData],
+                count: 1,
+                timelineData: timelineData
+            };
+            
+            // Store globally for chart access
+            window.tradeHistoryData = tradeHistoryData;
+            if (window.tradeHistoryPage) {
+                window.tradeHistoryPage.tradeHistoryData = tradeHistoryData;
+            }
+            
+            // 4. Calculate statistics from trade data and timeline data
+            let statistics = {};
+            
+            // Calculate duration in days
+            // Main duration: from entry (opened_at) to close (closed_at)
+            // Planning/waiting duration: from creation (created_at or trade_plan.created_at) to opening (opened_at)
+            let durationDays = 0;
+            let planningWaitDays = 0;
+            
+            try {
+                // Helper function to extract date
+                const extractDate = (dateValue) => {
+                    if (!dateValue) return null;
+                    if (typeof dateValue === 'string') {
+                        return new Date(dateValue);
+                    } else if (dateValue.utc) {
+                        return new Date(dateValue.utc);
+                    } else if (dateValue instanceof Date) {
+                        return dateValue;
+                    }
+                    return null;
+                };
+                
+                // Main duration: from entry to close
+                let entryDate = null;
+                let closeDate = null;
+                
+                // Entry date: opened_at, entry_date, or first execution date (buy action)
+                if (tradeData.opened_at) {
+                    entryDate = extractDate(tradeData.opened_at);
+                } else if (tradeData.entry_date) {
+                    entryDate = extractDate(tradeData.entry_date);
+                } else if (timelineData && timelineData.length > 0) {
+                    // Try to find first execution date (buy action)
+                    const firstBuyExecution = timelineData.find(item => 
+                        item.type === 'Execution' && 
+                        (item.side === 'buy' || item.action === 'buy')
+                    );
+                    if (firstBuyExecution && firstBuyExecution.date) {
+                        entryDate = extractDate(firstBuyExecution.date);
+                    } else {
+                        // Fallback: any first execution
+                        const anyExecution = timelineData.find(item => item.type === 'Execution');
+                        if (anyExecution && anyExecution.date) {
+                            entryDate = extractDate(anyExecution.date);
+                        } else {
+                            // Last fallback: use created_at if no executions found
+                            if (tradeData.created_at) {
+                                entryDate = extractDate(tradeData.created_at);
+                            }
+                        }
+                    }
+                } else {
+                    // No timeline data - use created_at as entry date
+                    if (tradeData.created_at) {
+                        entryDate = extractDate(tradeData.created_at);
+                    }
+                }
+                
+                // Close date: closed_at or last execution date (sell action) or current date
+                if (tradeData.closed_at) {
+                    closeDate = extractDate(tradeData.closed_at);
+                } else if (timelineData && timelineData.length > 0) {
+                    // Try to find last execution date (sell action)
+                    const sellExecutions = timelineData.filter(item => 
+                        item.type === 'Execution' && 
+                        (item.side === 'sell' || item.action === 'sell')
+                    );
+                    if (sellExecutions.length > 0) {
+                        // Get the last sell execution
+                        const lastSellExecution = sellExecutions[sellExecutions.length - 1];
+                        if (lastSellExecution && lastSellExecution.date) {
+                            closeDate = extractDate(lastSellExecution.date);
+                        }
+                    }
+                    
+                    // If still no close date, use current date
+                    if (!closeDate && entryDate) {
+                        closeDate = new Date();
+                    }
+                } else if (entryDate) {
+                    // If no closed_at and no timeline data, use current date
+                    closeDate = new Date();
+                }
+                
+                if (entryDate && closeDate && !isNaN(entryDate.getTime()) && !isNaN(closeDate.getTime())) {
+                    durationDays = Math.ceil((closeDate - entryDate) / (1000 * 60 * 60 * 24));
+                    if (durationDays < 0) durationDays = 0;
+                    
+                    if (window.Logger) {
+                        window.Logger.debug('Duration calculated', { 
+                            page: 'trade-history-page', 
+                            entryDate: entryDate.toISOString(),
+                            closeDate: closeDate.toISOString(),
+                            durationDays 
+                        });
+                    }
+                } else {
+                    if (window.Logger) {
+                        window.Logger.warn('Duration calculation failed - missing dates', { 
+                            page: 'trade-history-page', 
+                            hasEntryDate: !!entryDate,
+                            hasCloseDate: !!closeDate,
+                            entryDateValid: entryDate ? !isNaN(entryDate.getTime()) : false,
+                            closeDateValid: closeDate ? !isNaN(closeDate.getTime()) : false,
+                            tradeData: {
+                                opened_at: tradeData.opened_at,
+                                entry_date: tradeData.entry_date,
+                                closed_at: tradeData.closed_at,
+                                created_at: tradeData.created_at
+                            }
+                        });
+                    }
+                }
+                
+                // Planning/waiting duration: from creation to opening
+                let creationDate = null;
+                let openingDate = entryDate; // Use entry date as opening date
+                
+                // Creation date: trade created_at or trade_plan created_at (whichever is earlier)
+                const tradeCreatedAt = tradeData.created_at ? extractDate(tradeData.created_at) : null;
+                const planCreatedAt = tradeData.trade_plan?.created_at ? extractDate(tradeData.trade_plan.created_at) : null;
+                
+                if (tradeCreatedAt && planCreatedAt) {
+                    // Use the earlier date
+                    creationDate = tradeCreatedAt < planCreatedAt ? tradeCreatedAt : planCreatedAt;
+                } else if (tradeCreatedAt) {
+                    creationDate = tradeCreatedAt;
+                } else if (planCreatedAt) {
+                    creationDate = planCreatedAt;
+                }
+                
+                if (creationDate && openingDate && !isNaN(creationDate.getTime()) && !isNaN(openingDate.getTime())) {
+                    planningWaitDays = Math.ceil((openingDate - creationDate) / (1000 * 60 * 60 * 24));
+                    if (planningWaitDays < 0) planningWaitDays = 0;
+                }
+            } catch (error) {
+                if (window.Logger) {
+                    window.Logger.warn('Error calculating duration', { page: 'trade-history-page', error });
+                }
+                durationDays = 0;
+                planningWaitDays = 0;
+            }
+            
+            // Get P/L from trade data
+            const totalPL = tradeData.realized_pl || tradeData.pl || tradeData.total_pl || 0;
+            
+            // Calculate P/L percent if not provided
+            let totalPLPercent = tradeData.pl_percent || tradeData.total_pl_percent || 0;
+            if (totalPLPercent === 0 && totalPL !== 0 && tradeData.entry_price) {
+                // Calculate percent: (P/L / entry_price) * 100
+                const entryPrice = tradeData.entry_price || 0;
+                if (entryPrice > 0) {
+                    totalPLPercent = (totalPL / (entryPrice * (tradeData.planned_quantity || tradeData.quantity || 1))) * 100;
+                }
+            }
+            
+            // Count executions from timeline data
+            const executionCount = timelineData.filter(item => item.type === 'Execution').length;
+            
+            // Build statistics object
+            statistics = {
+                durationDays: durationDays,
+                planningWaitDays: planningWaitDays,
+                totalPL: totalPL,
+                totalPLPercent: totalPLPercent,
+                executionCount: executionCount
+            };
+            
+            // Try to load additional statistics from API (non-critical)
+            if (tradeData.ticker_id) {
+                try {
+                    if (window.Logger) {
+                        window.Logger.debug('Loading additional statistics for ticker', { 
+                            page: 'trade-history-page', 
+                            tickerId: tradeData.ticker_id 
+                        });
+                    }
+                    const apiStatistics = await window.TradeHistoryData?.loadStatistics({
+                        ticker_id: tradeData.ticker_id
+                    }) || {};
+                    
+                    // Merge API statistics (prefer calculated values if API doesn't provide them)
+                    if (apiStatistics.total_trades) {
+                        statistics.totalTrades = apiStatistics.total_trades;
+                    }
+                    if (apiStatistics.win_rate !== undefined) {
+                        statistics.winRate = apiStatistics.win_rate;
+                    }
+                    if (apiStatistics.average_pl !== undefined) {
+                        statistics.averagePL = apiStatistics.average_pl;
+                    }
+                    
+                    if (window.Logger) {
+                        window.Logger.debug('Additional statistics loaded successfully', { 
+                            page: 'trade-history-page', 
+                            hasStatistics: !!apiStatistics 
+                        });
+                    }
+                } catch (error) {
+                    if (window.Logger) {
+                        window.Logger.warn('Failed to load additional statistics (non-critical)', { 
+                            page: 'trade-history', 
+                            error: error?.message,
+                            tickerId: tradeData.ticker_id
+                        });
+                    }
+                }
+            }
+            
+            if (window.Logger) {
+                window.Logger.debug('Statistics calculated', { 
+                    page: 'trade-history-page', 
+                    statistics 
+                });
+            }
+            
+            // 5. Load plan vs execution analysis (if dates are available)
+            let planVsExecution = {};
+            if (tradeData.created_at) {
+                try {
+                    // Convert dates to ISO format using dateUtils if available
+                    let startDate = null;
+                    let endDate = null;
+                    
+                    if (window.dateUtils && typeof window.dateUtils.toISOString === 'function') {
+                        startDate = window.dateUtils.toISOString(tradeData.created_at);
+                        endDate = window.dateUtils.toISOString(tradeData.closed_at) || new Date().toISOString();
+                    } else {
+                        // Fallback: try to extract ISO string from date envelope or convert Date
+                        if (tradeData.created_at) {
+                            if (typeof tradeData.created_at === 'string') {
+                                startDate = tradeData.created_at;
+                            } else if (tradeData.created_at.utc) {
+                                startDate = tradeData.created_at.utc;
+                            } else if (tradeData.created_at instanceof Date) {
+                                startDate = tradeData.created_at.toISOString();
+                            } else {
+                                startDate = new Date(tradeData.created_at).toISOString();
+                            }
+                        }
+                        
+                        if (tradeData.closed_at) {
+                            if (typeof tradeData.closed_at === 'string') {
+                                endDate = tradeData.closed_at;
+                            } else if (tradeData.closed_at.utc) {
+                                endDate = tradeData.closed_at.utc;
+                            } else if (tradeData.closed_at instanceof Date) {
+                                endDate = tradeData.closed_at.toISOString();
+                            } else {
+                                endDate = new Date(tradeData.closed_at).toISOString();
+                            }
+                        } else {
+                            endDate = new Date().toISOString();
+                        }
+                    }
+                    
+                    if (!startDate) {
+                        throw new Error('Invalid start date');
+                    }
+                    
+                    if (window.Logger) {
+                        window.Logger.debug('Loading plan vs execution analysis', { 
+                            page: 'trade-history-page', 
+                            startDate, 
+                            endDate 
+                        });
+                    }
+                    
+                    planVsExecution = await window.TradeHistoryData?.loadPlanVsExecution({
+                        start_date: startDate,
+                        end_date: endDate
+                    }) || {};
+                    
+                    if (window.Logger) {
+                        window.Logger.debug('Plan vs execution loaded successfully', { 
+                            page: 'trade-history-page', 
+                            hasAnalysis: !!planVsExecution?.analysis 
+                        });
+                    }
+                } catch (error) {
+                    if (window.Logger) {
+                        window.Logger.warn('Failed to load plan vs execution (non-critical)', { 
+                            page: 'trade-history', 
+                            error: error?.message 
+                        });
+                    }
+                }
+            } else {
+                if (window.Logger) {
+                    window.Logger.debug('Skipping plan vs execution - no created_at in trade data', { 
+                        page: 'trade-history-page' 
+                    });
+                }
+            }
+            
+            // 6. Update UI with trade data
+            if (window.Logger) {
+                window.Logger.debug('Rendering trade details', { 
+                    page: 'trade-history-page', 
+                    tradeId,
+                    hasConditions: !!(tradeData.conditions && tradeData.conditions.length > 0)
+                });
+            }
+            renderTradeDetails(tradeData, tradeData.conditions || []);
+            
+            if (statistics && Object.keys(statistics).length > 0) {
+                if (window.Logger) {
+                    window.Logger.debug('Rendering statistics', { page: 'trade-history-page' });
+                }
+                renderStatistics(statistics);
+            } else {
+                if (window.Logger) {
+                    window.Logger.debug('Skipping statistics render - no statistics data', { page: 'trade-history-page' });
+                }
+            }
+            
+            // 7. Update timeline and charts
+            if (tradeHistoryData.timelineData && tradeHistoryData.timelineData.length > 0) {
+                if (window.Logger) {
+                    window.Logger.debug('Rendering timeline', { 
+                        page: 'trade-history-page', 
+                        timelineSteps: tradeHistoryData.timelineData.length 
+                    });
+                }
+                await renderTimelineSteps(tradeHistoryData.timelineData);
+                
+                // Initialize timeline chart after rendering steps and ensuring data is available
+                // Wait for both DOM and data to be ready
+                setTimeout(async () => {
+                    try {
+                        // Double-check that timelineData is available globally
+                        if (!window.tradeHistoryData || !window.tradeHistoryData.timelineData || window.tradeHistoryData.timelineData.length === 0) {
+                            if (window.Logger) {
+                                window.Logger.warn('Timeline data not available globally, waiting...', { 
+                                    page: 'trade-history-page',
+                                    hasGlobalData: !!window.tradeHistoryData,
+                                    dataLength: window.tradeHistoryData?.timelineData?.length || 0
+                                });
+                            }
+                            // Wait a bit more and check again
+                            await new Promise(resolve => setTimeout(resolve, 500));
+                        }
+                        
+                        const chartContainer = document.getElementById('timelineChart');
+                        if (chartContainer && typeof window.initTimelineChart === 'function') {
+                            if (window.Logger) {
+                                window.Logger.debug('Initializing timeline chart with data', { 
+                                    page: 'trade-history-page',
+                                    dataPoints: window.tradeHistoryData?.timelineData?.length || 0
+                                });
+                            }
+                            await window.initTimelineChart();
+                        } else {
+                            if (window.Logger) {
+                                window.Logger.warn('Timeline chart container or initTimelineChart not available', { 
+                                    page: 'trade-history-page',
+                                    hasContainer: !!chartContainer,
+                                    hasInitFunction: typeof window.initTimelineChart === 'function'
+                                });
+                            }
+                        }
+                    } catch (error) {
+                        if (window.Logger) {
+                            window.Logger.error('Error initializing timeline chart', { page: 'trade-history-page', error });
+                        }
+                    }
+                }, 1000); // Longer delay to ensure data is loaded
+            } else {
+                if (window.Logger) {
+                    window.Logger.debug('Skipping timeline render - no timeline data', { 
+                        page: 'trade-history-page',
+                        hasTimelineData: !!tradeHistoryData.timelineData,
+                        timelineDataLength: tradeHistoryData.timelineData?.length || 0
+                    });
+                }
+            }
+            
+            // 8. Update plan vs execution table
+            if (planVsExecution && planVsExecution.analysis) {
+                if (window.Logger) {
+                    window.Logger.debug('Rendering plan vs execution', { 
+                        page: 'trade-history-page', 
+                        analysisItems: planVsExecution.analysis.length 
+                    });
+                }
+                planVsExecutionData = planVsExecution.analysis;
+                // Update table if exists
+                const tableBody = document.getElementById('planVsExecutionTableBody');
+                if (tableBody && planVsExecutionData.length > 0) {
+                    // Render plan vs execution data
+                    // This would be implemented based on the table structure
+                }
+            } else {
+                if (window.Logger) {
+                    window.Logger.debug('Skipping plan vs execution render - no analysis data', { page: 'trade-history-page' });
+                }
+            }
+            
+            // 9. Load linked items for this trade (already loaded in tradeData.linked_items, but render them)
+            try {
+                if (window.Logger) {
+                    window.Logger.debug('Loading linked items', { page: 'trade-history-page', tradeId });
+                }
+                if (window.LinkedItemsService && typeof window.LinkedItemsService.loadLinkedItems === 'function') {
+                    await window.LinkedItemsService.loadLinkedItems('trade', tradeId, 'linkedItemsContainer');
+                } else if (typeof loadLinkedItemsData === 'function') {
+                    const linkedItemsData = await loadLinkedItemsData('trade', tradeId);
+                    if (linkedItemsData && window.LinkedItemsService && typeof window.LinkedItemsService.renderLinkedItems === 'function') {
+                        window.LinkedItemsService.renderLinkedItems('linkedItemsContainer', linkedItemsData, 'trade', tradeId);
+                    }
+                }
+                if (window.Logger) {
+                    window.Logger.debug('Linked items loaded', { page: 'trade-history-page' });
+                }
+            } catch (error) {
+                if (window.Logger) {
+                    window.Logger.warn('Failed to load linked items (non-critical)', { 
+                        page: 'trade-history-page', 
+                        error: error?.message 
+                    });
+                }
+            }
+            
+            if (window.Logger) {
+                window.Logger.info(`✅ Trade ${tradeId} loaded for analysis`, { 
+                    page: 'trade-history-page', 
+                    tradeId,
+                    hasStatistics: Object.keys(statistics).length > 0,
+                    hasPlanVsExecution: !!(planVsExecution && planVsExecution.analysis)
+                });
+            }
+        } catch (error) {
+            const errorMsg = error?.message || 'שגיאה בטעינת פרטי טרייד';
+            if (window.Logger) {
+                window.Logger.error('Error loading trade for analysis', { page: 'trade-history-page', tradeId, error });
+            }
+            
+            // If trade not found, show ticker search modal
+            if (errorMsg.includes('not found') || errorMsg.includes('404')) {
+                if (window.NotificationSystem && typeof window.NotificationSystem.showWarning === 'function') {
+                    window.NotificationSystem.showWarning('טרייד לא נמצא', 'הטרייד המבוקש לא נמצא במערכת. נא לבחור טיקר כדי למצוא טריידים.');
+                }
+                showTickerSearchModal();
+            } else {
+                if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {
+                    window.NotificationSystem.showError('שגיאה בטעינת טרייד', errorMsg);
+                }
+            }
+            throw error; // Re-throw to allow caller to handle
+        }
+    }
+    
+    /**
+     * Show ticker search modal for finding trades
+     * Uses ModalManagerV2 to create and show modal
+     */
+    async function showTickerSearchModal() {
+        // Check if modal already exists
+        let modal = document.getElementById('tradeHistoryTickerSearchModal');
+        
+        if (!modal) {
+            // Create modal HTML
+            modal = document.createElement('div');
+            modal.id = 'tradeHistoryTickerSearchModal';
+            modal.className = 'modal fade';
+            modal.setAttribute('tabindex', '-1');
+            modal.setAttribute('aria-labelledby', 'tradeHistoryTickerSearchModalLabel');
+            modal.setAttribute('aria-hidden', 'true');
+            modal.innerHTML = `
+                <div class="modal-dialog modal-lg modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="tradeHistoryTickerSearchModalLabel">חיפוש טרייד - בחירת טיקר</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <!-- Step 1: Ticker Search -->
+                            <div id="tradeHistoryStep1" class="mb-3">
+                                <label for="tradeHistoryTickerSearch" class="form-label fw-bold">שלב 1: חיפוש טיקר מהמערכת</label>
+                                <div class="alert alert-info d-flex justify-content-between align-items-center mb-2">
+                                    <small class="mb-0">בחר טיקר כדי למצוא את הטריידים שלו</small>
+                                    <button type="button" 
+                                            class="btn btn-sm btn-outline-primary"
+                                            data-onclick="if(window.ModalManagerV2){window.ModalManagerV2.showModal('tickersModal','add');}">
+                                        <i class="bi bi-plus-circle"></i> הוסף טיקר חדש
+                                    </button>
+                                </div>
+                                <div class="row g-2 align-items-end">
+                                    <div class="col-md-12">
+                                        <input type="text" 
+                                               class="form-control" 
+                                               id="tradeHistoryTickerSearch" 
+                                               placeholder="הקלד symbol או שם...">
+                                    </div>
+                                </div>
+                                <div id="tradeHistoryTickerSearchResults" class="mt-2">
+                                    <!-- Ticker search results will appear here -->
+                                </div>
+                            </div>
+                            
+                            <!-- Step 2: Trades Selection (hidden initially) -->
+                            <div id="tradeHistoryStep2" class="mb-3" style="display: none;">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <label class="form-label fw-bold mb-0">שלב 2: בחר טרייד</label>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" id="tradeHistoryBackToTickerSearch">
+                                        <i class="bi bi-arrow-right"></i> חזור לחיפוש טיקר
+                                    </button>
+                                </div>
+                                <div class="alert alert-info mb-2">
+                                    <small class="mb-0" id="tradeHistorySelectedTickerInfo">טיקר נבחר: <strong id="tradeHistorySelectedTickerName"></strong></small>
+                                </div>
+                                <div id="tradeHistoryTradesResults" class="mt-2">
+                                    <!-- Trades will appear here -->
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ביטול</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            
+            // Initialize search functionality
+            const searchInput = modal.querySelector('#tradeHistoryTickerSearch');
+            const resultsContainer = modal.querySelector('#tradeHistoryTickerSearchResults');
+            
+            if (searchInput) {
+                let searchTimeout;
+                searchInput.addEventListener('input', (e) => {
+                    const query = e.target.value.trim();
+                    clearTimeout(searchTimeout);
+                    if (query.length >= 1) {
+                        searchTimeout = setTimeout(() => {
+                            searchTickerForTradeHistory(query, resultsContainer);
+                        }, 300);
+                    } else {
+                        clearTickerSearchResults(resultsContainer);
+                    }
+                });
+                
+                searchInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        const query = e.target.value.trim();
+                        if (query.length >= 1) {
+                            searchTickerForTradeHistory(query, resultsContainer);
+                        }
+                    }
+                });
+            }
+        }
+        
+        // Show modal using ModalManagerV2 or Bootstrap
+        if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
+            try {
+                await window.ModalManagerV2.showModal('tradeHistoryTickerSearchModal', 'view');
+            } catch (error) {
+                if (window.Logger) {
+                    window.Logger.error('Error showing ticker search modal via ModalManagerV2', { page: 'trade-history', error });
+                }
+                // Fallback to Bootstrap
+                if (bootstrap?.Modal) {
+                    const bsModal = new bootstrap.Modal(modal);
+                    bsModal.show();
+                }
+            }
+        } else if (bootstrap?.Modal) {
+            const bsModal = new bootstrap.Modal(modal);
+            bsModal.show();
+        } else {
+            if (window.Logger) {
+                window.Logger.warn('Neither ModalManagerV2 nor Bootstrap Modal available', { page: 'trade-history' });
+            }
+        }
+    }
+    
+    /**
+     * Search ticker for trade history
+     * @param {string} query - Search query
+     * @param {HTMLElement} resultsContainer - Container for results
+     */
+    async function searchTickerForTradeHistory(query, resultsContainer) {
+        if (!query || query.trim().length === 0) {
+            clearTickerSearchResults(resultsContainer);
+            return;
+        }
+        
+        const searchQuery = query.trim();
+        
+        // Show loading indicator
+        if (resultsContainer) {
+            resultsContainer.innerHTML = '<div class="text-center text-muted py-2"><i class="bi bi-hourglass-split me-2"></i>טוען...</div>';
+        }
+        
+        try {
+            // Load all tickers (reuse AddTickerModal function if available)
+            let allTickers = [];
+            if (window.AddTickerModal && typeof window.AddTickerModal.loadAllTickers === 'function') {
+                allTickers = await window.AddTickerModal.loadAllTickers();
+            } else {
+                // Fallback: direct API call
+                const baseUrl = window.API_BASE_URL || (window.location?.protocol === 'file:' ? 'http://127.0.0.1:8080' : '');
+                const separator = baseUrl.endsWith('/') ? '' : '/';
+                const url = `${baseUrl}${separator}api/tickers/?_ts=${Date.now()}`;
+                
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Cache-Control': 'no-cache'
+                    },
+                    credentials: 'include'
+                });
+                
+                if (response.ok) {
+                    const payload = await response.json();
+                    allTickers = Array.isArray(payload?.data) ? payload.data : (Array.isArray(payload) ? payload : []);
+                } else {
+                    if (window.Logger) {
+                        window.Logger.warn('Failed to load tickers', { page: 'trade-history-page', status: response.status });
+                    }
+                }
+            }
+            
+            // Filter tickers
+            const queryUpper = searchQuery.toUpperCase();
+            const filtered = allTickers.filter(ticker => {
+                const symbol = (ticker.symbol || '').toUpperCase();
+                const name = (ticker.name || '').toUpperCase();
+                return symbol.startsWith(queryUpper) || name.startsWith(queryUpper);
+            }).slice(0, 20); // Limit to 20 results
+            
+            // Render results
+            renderTickerSearchResults(filtered, resultsContainer);
+        } catch (error) {
+            if (window.Logger) {
+                window.Logger.error('Error searching tickers', { page: 'trade-history-page', error });
+            }
+            if (resultsContainer) {
+                resultsContainer.innerHTML = '<div class="alert alert-danger">שגיאה בחיפוש טיקרים</div>';
+            }
+        }
+    }
+    
+    /**
+     * Render ticker search results
+     * @param {Array} tickers - Array of ticker objects
+     * @param {HTMLElement} resultsContainer - Container for results
+     */
+    function renderTickerSearchResults(tickers, resultsContainer) {
+        if (!resultsContainer) return;
+        
+        if (tickers.length === 0) {
+            resultsContainer.innerHTML = '<div class="alert alert-info">לא נמצאו תוצאות</div>';
+            return;
+        }
+        
+        const resultsHTML = tickers.map(ticker => {
+            const symbol = ticker.symbol || ticker.ticker_symbol || 'N/A';
+            const name = ticker.name || '';
+            const type = ticker.type || '';
+            const currency = ticker.currency || ticker.currency_code || '';
+            const typeDisplay = type ? (type.charAt(0).toUpperCase() + type.slice(1)) : '';
+            const currencyDisplay = currency || '';
+            
+            return `
+                <div class="search-result-item border rounded p-2 mb-2" style="cursor: pointer;" data-ticker-id="${ticker.id}">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>${symbol}</strong>${name ? ` - ${name}` : ''}
+                            ${(typeDisplay || currencyDisplay) ? `<br><small class="text-muted">${typeDisplay}${typeDisplay && currencyDisplay ? ' • ' : ''}${currencyDisplay}</small>` : ''}
+                        </div>
+                        <button type="button" 
+                                class="btn btn-sm btn-primary"
+                                data-ticker-id="${ticker.id}"
+                                data-ticker-symbol="${symbol}">
+                            בחר
+                        </button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+        
+        resultsContainer.innerHTML = resultsHTML;
+        
+        // Add click handlers
+        resultsContainer.querySelectorAll('.search-result-item, .btn').forEach(item => {
+            item.addEventListener('click', (e) => {
+                const tickerId = item.getAttribute('data-ticker-id') || item.closest('[data-ticker-id]')?.getAttribute('data-ticker-id');
+                const tickerSymbol = item.getAttribute('data-ticker-symbol') || item.closest('[data-ticker-symbol]')?.getAttribute('data-ticker-symbol');
+                if (tickerId) {
+                    selectTickerForTradeHistory(parseInt(tickerId), tickerSymbol);
+                }
+            });
+        });
+    }
+    
+    /**
+     * Clear ticker search results
+     * @param {HTMLElement} resultsContainer - Container for results
+     */
+    function clearTickerSearchResults(resultsContainer) {
+        if (resultsContainer) {
+            resultsContainer.innerHTML = '';
+        }
+    }
+    
+    /**
+     * Select ticker and find trades
+     * @param {number} tickerId - Ticker ID
+     * @param {string} tickerSymbol - Ticker symbol
+     */
+    async function selectTickerForTradeHistory(tickerId, tickerSymbol) {
+        if (window.Logger) {
+            window.Logger.info(`Selecting ticker ${tickerId} (${tickerSymbol}) for trade history`, { page: 'trade-history-page' });
+        }
+        
+        try {
+            // Load trades for this ticker
+            const tradesData = await window.TradeHistoryData?.loadTradeHistory({
+                ticker_id: tickerId
+            }) || {};
+            
+            const trades = tradesData.trades || [];
+            
+            if (trades.length === 0) {
+                if (window.NotificationSystem && typeof window.NotificationSystem.showWarning === 'function') {
+                    window.NotificationSystem.showWarning('לא נמצאו טריידים', `לא נמצאו טריידים לטיקר ${tickerSymbol || tickerId}`);
+                }
+                return;
+            }
+            
+            // Show loading indicator
+            const step2 = document.getElementById('tradeHistoryStep2');
+            const tradesResults = document.getElementById('tradeHistoryTradesResults');
+            if (tradesResults) {
+                tradesResults.innerHTML = '<div class="text-center text-muted py-2"><i class="bi bi-hourglass-split me-2"></i>טוען טריידים...</div>';
+            }
+            
+            // Hide step 1, show step 2
+            const step1 = document.getElementById('tradeHistoryStep1');
+            if (step1) {
+                step1.style.display = 'none';
+            }
+            if (step2) {
+                step2.style.display = 'block';
+            }
+            
+            // Update selected ticker info
+            const selectedTickerName = document.getElementById('tradeHistorySelectedTickerName');
+            if (selectedTickerName) {
+                selectedTickerName.textContent = `${tickerSymbol}${trades.length > 1 ? ` (${trades.length} טריידים)` : ''}`;
+            }
+            
+            // Render trades
+            renderTradesForSelection(trades, tradesResults);
+            
+            // Setup back button
+            const backButton = document.getElementById('tradeHistoryBackToTickerSearch');
+            if (backButton) {
+                backButton.onclick = () => {
+                    if (step1) step1.style.display = 'block';
+                    if (step2) step2.style.display = 'none';
+                    if (tradesResults) tradesResults.innerHTML = '';
+                };
+            }
+        } catch (error) {
+            if (window.Logger) {
+                window.Logger.error('Error selecting ticker for trade history', { page: 'trade-history-page', tickerId, error });
+            }
+            if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {
+                window.NotificationSystem.showError('שגיאה', 'שגיאה בטעינת טריידים לטיקר');
+            }
+        }
+    }
+    
+    /**
+     * Render trades for selection
+     * @param {Array} trades - Array of trade objects
+     * @param {HTMLElement} resultsContainer - Container for results
+     */
+    function renderTradesForSelection(trades, resultsContainer) {
+        if (!resultsContainer) return;
+        
+        if (trades.length === 0) {
+            resultsContainer.innerHTML = '<div class="alert alert-info">לא נמצאו טריידים</div>';
+            return;
+        }
+        
+        const resultsHTML = trades.map(trade => {
+            const tradeId = trade.id;
+            const status = trade.status || 'unknown';
+            const side = trade.side || '';
+            const openedAt = trade.opened_at?.display || trade.opened_at || 'לא זמין';
+            const closedAt = trade.closed_at?.display || trade.closed_at || '';
+            const accountName = trade.account_name || '';
+            const totalPL = trade.total_pl || 0;
+            const plDisplay = totalPL >= 0 ? `+${totalPL.toFixed(2)}` : totalPL.toFixed(2);
+            const plClass = totalPL >= 0 ? 'text-success' : 'text-danger';
+            
+            return `
+                <div class="search-result-item border rounded p-2 mb-2" style="cursor: pointer;" data-trade-id="${tradeId}">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>טרייד #${tradeId}</strong>
+                            ${side ? ` - ${side}` : ''}
+                            ${status ? ` <span class="badge bg-secondary">${status}</span>` : ''}
+                            <br>
+                            <small class="text-muted">
+                                נפתח: ${openedAt}
+                                ${closedAt ? ` • נסגר: ${closedAt}` : ''}
+                                ${accountName ? ` • חשבון: ${accountName}` : ''}
+                            </small>
+                            ${totalPL !== 0 ? `<br><small class="${plClass}">P/L: ${plDisplay}</small>` : ''}
+                        </div>
+                        <button type="button" 
+                                class="btn btn-sm btn-primary"
+                                data-trade-id="${tradeId}">
+                            בחר
+                        </button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+        
+        resultsContainer.innerHTML = resultsHTML;
+        
+        // Add click handlers
+        resultsContainer.querySelectorAll('.search-result-item, .btn').forEach(item => {
+            item.addEventListener('click', (e) => {
+                const tradeId = item.getAttribute('data-trade-id') || item.closest('[data-trade-id]')?.getAttribute('data-trade-id');
+                if (tradeId) {
+                    selectTradeForHistory(parseInt(tradeId));
+                }
+            });
+        });
+    }
+    
+    /**
+     * Select trade and load it
+     * @param {number} tradeId - Trade ID
+     */
+    async function selectTradeForHistory(tradeId) {
+        if (window.Logger) {
+            window.Logger.info(`Selecting trade ${tradeId} for history`, { page: 'trade-history-page' });
+        }
+        
+        try {
+            selectedTradeId = tradeId;
+            updateURLWithTradeId(tradeId);
+            await saveToCache(CACHE_KEY_SELECTED_TRADE_ID, tradeId);
+            await loadTradeForAnalysis(tradeId);
+            
+            // Close modal
+            const modal = document.getElementById('tradeHistoryTickerSearchModal');
+            if (modal) {
+                if (window.ModalManagerV2 && typeof window.ModalManagerV2.closeModal === 'function') {
+                    window.ModalManagerV2.closeModal('tradeHistoryTickerSearchModal');
+                } else if (bootstrap?.Modal) {
+                    const bsModal = bootstrap.Modal.getInstance(modal);
+                    if (bsModal) {
+                        bsModal.hide();
+                    }
+                }
+            }
+        } catch (error) {
+            if (window.Logger) {
+                window.Logger.error('Error selecting trade for history', { page: 'trade-history-page', error });
+            }
+            if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {
+                window.NotificationSystem.showError('שגיאה', 'לא ניתן לטעון את הטרייד');
+            }
+        }
     }
 
     /**
@@ -670,83 +1704,72 @@
     }
 
     /**
-     * Load data from TradeHistoryData service
-     * Replaces old mock data loading with real API integration
+     * Load trade history data using TradeHistoryData service
+     * Note: This is only used when we need to load all trades (not when we have a specific trade_id)
      */
     async function loadDataFromCache() {
         try {
-            // Use TradeHistoryData service if available
-            if (window.TradeHistoryData && typeof window.TradeHistoryData.loadTradeHistory === 'function') {
-                // Load trade history data
-                const filters = {
-                    // Add filters from selected trade if available
-                    ...(selectedTradeId ? { trade_id: selectedTradeId } : {})
-                };
-                
-                const [tradeData, statisticsData, planVsExecutionData] = await Promise.all([
-                    window.TradeHistoryData.loadTradeHistory(filters).catch(err => {
-                        window.Logger?.warn('Error loading trade history', { page: 'trade-history-page', error: err });
-                        return null;
-                    }),
-                    window.TradeHistoryData.loadStatistics(filters).catch(err => {
-                        window.Logger?.warn('Error loading statistics', { page: 'trade-history-page', error: err });
-                        return null;
-                    }),
-                    selectedTradeId ? window.TradeHistoryData.loadPlanVsExecution({
-                        start_date: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-                        end_date: new Date().toISOString().split('T')[0]
-                    }).catch(err => {
-                        window.Logger?.warn('Error loading plan vs execution', { page: 'trade-history-page', error: err });
-                        return null;
-                    }) : Promise.resolve(null)
-                ]);
-                
-                // Build trade history data object
-                tradeHistoryData = {
-                    selectedTrade: tradeData?.trades?.[0] || null,
-                    statistics: statisticsData || {},
-                    planVsExecution: planVsExecutionData || [],
-                    timelineData: tradeData?.timeline || []
-                };
-                
-                if (window.Logger) {
-                    window.Logger.info('Loaded trade history data from TradeHistoryData service', { 
-                        page: 'trade-history-page',
-                        tradesCount: tradeData?.trades?.length || 0
+            // If we have a trade_id in URL, we don't need to load all trades
+            const urlTradeId = getTradeIdFromURL();
+            if (urlTradeId) {
+                    if (window.Logger) {
+                    window.Logger.debug('Skipping trade history load - trade_id in URL, will load specific trade', { 
+                        page: 'trade-history-page', 
+                        tradeId: urlTradeId 
                     });
                 }
-                
-                return tradeHistoryData;
+                return null; // Return null - we'll load the specific trade instead
             }
-            
-            // Fallback to mock data if TradeHistoryData not available
-            if (window.TradeHistoryMockData) {
-                tradeHistoryData = window.TradeHistoryMockData;
+
+            // Wait for TradeHistoryData service to be available
+            if (!window.TradeHistoryData) {
+                await new Promise((resolve) => {
+                    const checkInterval = setInterval(() => {
+                        if (window.TradeHistoryData) {
+                            clearInterval(checkInterval);
+                            resolve();
+                        }
+                    }, 100);
+                    setTimeout(() => {
+                        clearInterval(checkInterval);
+                        resolve();
+                    }, 5000); // Timeout after 5 seconds
+                });
+            }
+
+            if (!window.TradeHistoryData || typeof window.TradeHistoryData.loadTradeHistory !== 'function') {
                 if (window.Logger) {
-                    window.Logger.warn('TradeHistoryData not available, using mock data', { page: 'trade-history-page' });
+                    window.Logger.warn('TradeHistoryData service not available', { page: 'trade-history-page' });
                 }
-                return tradeHistoryData;
+                return null;
+            }
+
+            // Load trade history data (only if we don't have a specific trade_id)
+            if (window.Logger) {
+                window.Logger.debug('Loading trade history data (no specific trade_id)', { page: 'trade-history-page' });
             }
             
-            const errorMsg = 'TradeHistoryData service not available and no mock data available';
-            if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {
-                window.NotificationSystem.showError('שגיאה בטעינת נתונים', errorMsg);
-            } else if (window.Logger) {
-                window.Logger.error('No data available', { page: 'trade-history-page' });
+            const data = await window.TradeHistoryData.loadTradeHistory({});
+            tradeHistoryData = data;
+            
+            if (window.Logger) {
+                window.Logger.info('Loaded trade history data', { 
+                    page: 'trade-history-page', 
+                    count: data?.trades?.length || 0 
+                });
             }
-            return null;
+            
+            return tradeHistoryData;
         } catch (error) {
             const errorMsg = error?.message || (typeof error === 'string' ? error : 'שגיאה לא ידועה');
-            if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {
-                window.NotificationSystem.showError('שגיאה בטעינת נתונים', errorMsg);
-            } else if (window.Logger) {
-                window.Logger.error('Error loading data', { page: 'trade-history-page', error });
+            if (window.Logger) {
+                window.Logger.warn('Error loading trade history data (non-critical)', { 
+                    page: 'trade-history-page', 
+                    error: errorMsg,
+                    note: 'This is expected if we have a specific trade_id in URL'
+                });
             }
-            // Fallback to mock data
-            if (window.TradeHistoryMockData) {
-                tradeHistoryData = window.TradeHistoryMockData;
-                return tradeHistoryData;
-            }
+            // Don't show error notification - this is expected when we have a trade_id
             return null;
         }
     }
@@ -772,6 +1795,59 @@
     }
 
     /**
+     * Get trade ID from URL parameters
+     * @returns {number|null} Trade ID from URL or null
+     */
+    function getTradeIdFromURL() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const tradeId = urlParams.get('trade_id') || urlParams.get('tradeId');
+        
+        if (window.Logger) {
+            window.Logger.debug('🔍 Parsing trade ID from URL', { 
+                fullUrl: window.location.href,
+                searchParams: window.location.search,
+                tradeId: tradeId,
+                allParams: Object.fromEntries(urlParams.entries()),
+                page: 'trade-history-page' 
+            });
+        }
+        
+        if (tradeId) {
+            const parsedId = parseInt(tradeId, 10);
+            if (isNaN(parsedId) || parsedId <= 0) {
+                if (window.Logger) {
+                    window.Logger.error('❌ Invalid trade ID in URL', { tradeId, parsedId, page: 'trade-history-page' });
+                }
+                return null;
+            }
+            if (window.Logger) {
+                window.Logger.debug('✅ Parsed trade ID from URL', { tradeId, parsedId, page: 'trade-history-page' });
+            }
+            return parsedId;
+        }
+        
+        return null;
+    }
+
+    /**
+     * Update URL with trade_id parameter without page reload
+     * @param {number|null} tradeId - Trade ID to set in URL
+     */
+    function updateURLWithTradeId(tradeId) {
+        const url = new URL(window.location.href);
+        if (tradeId) {
+            url.searchParams.set('trade_id', tradeId);
+        } else {
+            url.searchParams.delete('trade_id');
+        }
+        // Update URL without reload
+        window.history.replaceState({}, '', url.toString());
+        if (window.Logger) {
+            window.Logger.debug('✅ Updated URL with trade_id', { tradeId, newUrl: url.toString(), page: 'trade-history-page' });
+        }
+    }
+
+    /**
      * Initialize page - called from UnifiedAppInitializer
      */
     async function initializePage() {
@@ -792,8 +1868,53 @@
                 window.showLoadingState('tradesTableContainer');
             }
 
-            // 1. Load mock data (from cache or fresh) - don't wait for cache, use fallback
-            const data = await loadDataFromCache();
+            // 1. Get trade ID from URL (highest priority)
+            const urlTradeId = getTradeIdFromURL();
+            if (urlTradeId) {
+                selectedTradeId = urlTradeId;
+                // Save to cache for future reference
+                await saveToCache(CACHE_KEY_SELECTED_TRADE_ID, urlTradeId);
+                if (window.Logger) {
+                    window.Logger.info('✅ Trade ID loaded from URL', { tradeId: urlTradeId, page: 'trade-history-page' });
+                }
+            }
+
+            // 2. Load trade history data using TradeHistoryData service (with error handling)
+            // Note: If we have a trade_id in URL, we skip this and load the specific trade instead
+            let data = null;
+            if (!selectedTradeId) {
+                // Only load all trades if we don't have a specific trade_id
+                try {
+                    if (window.Logger) {
+                        window.Logger.debug('Loading trade history data (no specific trade_id)', { page: 'trade-history' });
+                    }
+                    data = await loadDataFromCache();
+                    if (window.Logger) {
+                        window.Logger.debug('Trade history data loaded', { 
+                            page: 'trade-history', 
+                            hasData: !!data,
+                            tradesCount: data?.trades?.length || 0
+                        });
+                    }
+                } catch (error) {
+                    if (window.Logger) {
+                        window.Logger.warn('Failed to load trade history data (non-critical)', { 
+                            page: 'trade-history', 
+                            error: error?.message,
+                            note: 'Will continue without data - user can select trade via modal'
+                        });
+                    }
+                    // Don't exit - continue to show ticker search modal
+                    data = null;
+                }
+            } else {
+                if (window.Logger) {
+                    window.Logger.debug('Skipping trade history data load - have specific trade_id', { 
+                        page: 'trade-history', 
+                        tradeId: selectedTradeId 
+                    });
+                }
+            }
             
             // Hide loading state
             if (typeof window.hideLoadingState === 'function') {
@@ -809,23 +1930,21 @@
             waitForTradingView().catch(() => {
                 // TradingView is optional for initial render
             });
-            if (!data) {
-                if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {
-                    window.NotificationSystem.showError('שגיאה בטעינת עמוד', 
-                        'לא ניתן לטעון את הנתונים. נא לרענן את העמוד.');
-                } else if (window.Logger) {
-                    window.Logger.error('Failed to load data, cannot initialize page', { page: 'trade-history-page' });
-                }
-                return;
-            }
 
-            // 5. Load selected trade ID from cache if exists
+            // 3. Load selected trade ID from cache if not already set from URL
+            if (!selectedTradeId) {
             const cachedSelectedId = await window.UnifiedCacheManager?.get(CACHE_KEY_SELECTED_TRADE_ID);
             if (cachedSelectedId) {
                 selectedTradeId = cachedSelectedId;
-    } else {
-                // Default to first trade in mock data
-                selectedTradeId = data.selectedTrade?.id || null;
+                } else if (data?.trades && Array.isArray(data.trades) && data.trades.length > 0) {
+                    // Default to first trade if available
+                    selectedTradeId = data.trades[0].id || null;
+                }
+            }
+            
+            // Update URL if we have a selected trade ID but it's not in the URL
+            if (selectedTradeId && !urlTradeId) {
+                updateURLWithTradeId(selectedTradeId);
             }
 
             // 6. Register tables
@@ -837,8 +1956,61 @@
             // 8. Load page state (sections, chart zoom, etc.)
             await loadPageState();
 
-            // 9. Render page
-            await renderPage(data);
+            // 9. Render page first (so UI is ready)
+            await renderPage(data || { trades: [], count: 0 });
+            
+            // 10. Load selected trade data if available (after render)
+            if (selectedTradeId) {
+                if (window.Logger) {
+                    window.Logger.info('Loading trade for analysis', { 
+                        page: 'trade-history', 
+                        tradeId: selectedTradeId,
+                        step: 'after-render'
+                    });
+                }
+                // Load trade asynchronously without blocking
+                loadTradeForAnalysis(selectedTradeId).then(() => {
+                    if (window.Logger) {
+                        window.Logger.info('✅ Trade loaded successfully', { 
+                            page: 'trade-history', 
+                            tradeId: selectedTradeId 
+                        });
+                    }
+                }).catch(error => {
+                    const errorMsg = error?.message || 'Unknown error';
+                    if (window.Logger) {
+                        window.Logger.error('❌ Error loading trade for analysis', { 
+                            page: 'trade-history', 
+                            tradeId: selectedTradeId, 
+                            error: errorMsg,
+                            willShowModal: errorMsg.includes('not found') || errorMsg.includes('404')
+                        });
+                    }
+                    // If trade not found, show ticker search modal
+                    if (errorMsg.includes('not found') || errorMsg.includes('404')) {
+                        if (window.Logger) {
+                            window.Logger.info('Trade not found - showing ticker search modal', { 
+                                page: 'trade-history', 
+                                tradeId: selectedTradeId 
+                            });
+                        }
+                        setTimeout(() => {
+                            showTickerSearchModal();
+                        }, 1000); // Wait a bit for UI to be ready
+                    }
+                });
+            } else {
+                // No trade ID - show ticker search modal
+                if (window.Logger) {
+                    window.Logger.info('No trade ID - showing ticker search modal', { 
+                        page: 'trade-history' 
+                    });
+                }
+                // Always show if no trade_id is selected (even if we have data)
+                setTimeout(() => {
+                    showTickerSearchModal();
+                }, 1000); // Wait a bit for UI to be ready
+            }
 
             isPageInitialized = true;
 
@@ -864,14 +2036,33 @@
         if (!data) return;
 
         try {
-            // Render statistics
-            renderStatistics(data.statistics);
+            // Find selected trade from data if available
+            let selectedTrade = null;
+            if (selectedTradeId && data?.trades && Array.isArray(data.trades)) {
+                selectedTrade = data.trades.find(t => t.id === selectedTradeId);
+            }
+            
+            // If no selected trade but we have trades, use first one
+            if (!selectedTrade && data?.trades && Array.isArray(data.trades) && data.trades.length > 0) {
+                selectedTrade = data.trades[0];
+                selectedTradeId = selectedTrade.id;
+            }
+            
+            // Render statistics (use data.statistics or calculate from selected trade)
+            const statistics = data.statistics || (selectedTrade ? {
+                durationDays: selectedTrade.duration_days || 0,
+                totalPL: selectedTrade.pl || 0,
+                totalPLPercent: selectedTrade.pl_percent || 0,
+                executionCount: selectedTrade.execution_count || 0
+            } : null);
+            renderStatistics(statistics);
 
             // Render trade details
-            renderTradeDetails(data.selectedTrade, data.conditions);
+            renderTradeDetails(selectedTrade, selectedTrade?.conditions || []);
 
-            // Render timeline steps
-            await renderTimelineSteps(data.timelineData);
+            // Render timeline steps (use data.timelineData or empty array)
+            const timelineData = data.timelineData || (selectedTrade ? [] : []);
+            await renderTimelineSteps(timelineData);
 
             // Initialize timeline chart with data (after a short delay to ensure DOM is ready)
             setTimeout(async () => {
@@ -925,8 +2116,32 @@
             // Render plan vs execution comparison
             renderPlanVsExecution(data.planVsExecution);
 
-            // Load linked items (already handled by existing function)
-            loadLinkedItemsForTrade();
+            // Load linked items for selected trade (if not already loaded in loadTradeForAnalysis)
+            if (selectedTradeId) {
+                try {
+                    if (window.Logger) {
+                        window.Logger.debug('Loading linked items in renderPage', { 
+                            page: 'trade-history-page', 
+                            tradeId: selectedTradeId 
+                        });
+                    }
+                    if (window.LinkedItemsService && typeof window.LinkedItemsService.loadLinkedItems === 'function') {
+                        await window.LinkedItemsService.loadLinkedItems('trade', selectedTradeId, 'linkedItemsContainer');
+                    } else if (typeof loadLinkedItemsData === 'function') {
+                        const linkedItemsData = await loadLinkedItemsData('trade', selectedTradeId);
+                        if (linkedItemsData && window.LinkedItemsService && typeof window.LinkedItemsService.renderLinkedItems === 'function') {
+                            window.LinkedItemsService.renderLinkedItems('linkedItemsContainer', linkedItemsData, 'trade', selectedTradeId);
+                        }
+                    }
+                } catch (error) {
+                    if (window.Logger) {
+                        window.Logger.warn('Failed to load linked items in renderPage (non-critical)', { 
+                            page: 'trade-history-page', 
+                            error: error?.message 
+                        });
+                    }
+                }
+            }
 
             if (window.Logger) {
                 window.Logger.info('Page rendered successfully', { page: 'trade-history-page' });
@@ -948,10 +2163,14 @@
     function renderStatistics(statistics) {
         if (!statistics) return;
 
-        // Duration
+        // Duration - show active duration and planning/waiting duration
         const durationEl = document.getElementById('statDuration');
         if (durationEl) {
-            durationEl.textContent = `${statistics.durationDays} ימים`;
+            let durationText = `${statistics.durationDays || 0} ימים`;
+            if (statistics.planningWaitDays && statistics.planningWaitDays > 0) {
+                durationText += ` <small class="text-muted">(תכנון והמתנה: ${statistics.planningWaitDays} ימים)</small>`;
+            }
+            durationEl.innerHTML = durationText;
             durationEl.classList.remove('loading');
         }
 
@@ -1060,8 +2279,36 @@
             investmentTypeEl.classList.remove('loading');
         }
 
-        // Status
-        updateTradeStatusBadge(trade.status);
+        // Status - update both tradeStatus and tradeStatusBadge if they exist
+        const statusEl = document.getElementById('tradeStatus');
+        const statusBadgeEl = document.getElementById('tradeStatusBadge');
+        
+        const statusHTML = trade.status && window.FieldRendererService && typeof window.FieldRendererService.renderStatus === 'function'
+            ? window.FieldRendererService.renderStatus(trade.status, 'trade')
+            : `<span class="status-badge">${trade.status || '-'}</span>`;
+        
+        // Update tradeStatus if exists
+        if (statusEl) {
+            statusEl.innerHTML = statusHTML;
+            statusEl.classList.remove('loading');
+        }
+        
+        // Update tradeStatusBadge if exists (this is the one in HTML)
+        if (statusBadgeEl) {
+            statusBadgeEl.innerHTML = statusHTML;
+            statusBadgeEl.classList.remove('loading');
+            // Remove loading class from child elements
+            const loadingChild = statusBadgeEl.querySelector('.loading');
+            if (loadingChild) {
+                loadingChild.remove();
+            }
+        }
+        
+        if (!statusEl && !statusBadgeEl) {
+            if (window.Logger) {
+                window.Logger.warn('Status element not found (tradeStatus or tradeStatusBadge)', { page: 'trade-history-page' });
+            }
+        }
 
         // Account
         const accountEl = document.getElementById('tradeAccount');
@@ -1210,12 +2457,18 @@
                         stepClass += ' timeline-cashflow';
                         pointColor = 'var(--secondary-color, #fc5a06)';
                         iconPath = await window.IconSystem.getEntityIcon('cash_flow');
-                    } else if (step.type === 'Alert') {
+                    } else if (step.type === 'Alert' || step.type === 'Alert Activation') {
                         stepClass += ' timeline-alert';
                         pointColor = 'var(--warning-color, #ffc107)';
                         iconPath = await window.IconSystem.getEntityIcon('alert');
                     } else if (step.type === 'Trade Plan') {
+                        stepClass += ' timeline-plan';
+                        pointColor = 'var(--primary-color, #007bff)';
                         iconPath = await window.IconSystem.getEntityIcon('trade_plan');
+                    } else if (step.type === 'Trade') {
+                        stepClass += ' timeline-trade';
+                        pointColor = 'var(--primary-color, #007bff)';
+                        iconPath = await window.IconSystem.getEntityIcon('trade');
                     } else if (step.type === 'Execution') {
                         stepClass += ' execution-title';
                         iconPath = await window.IconSystem.getEntityIcon('execution');
@@ -1230,12 +2483,18 @@
                         stepClass += ' timeline-cashflow';
                         pointColor = 'var(--secondary-color, #fc5a06)';
                         iconPath = '/trading-ui/images/icons/entities/cash_flows.svg';
-                    } else if (step.type === 'Alert') {
+                    } else if (step.type === 'Alert' || step.type === 'Alert Activation') {
                         stepClass += ' timeline-alert';
                         pointColor = 'var(--warning-color, #ffc107)';
                         iconPath = '/trading-ui/images/icons/entities/alerts.svg';
                     } else if (step.type === 'Trade Plan') {
+                        stepClass += ' timeline-plan';
+                        pointColor = 'var(--primary-color, #007bff)';
                         iconPath = '/trading-ui/images/icons/entities/trade_plans.svg';
+                    } else if (step.type === 'Trade') {
+                        stepClass += ' timeline-trade';
+                        pointColor = 'var(--primary-color, #007bff)';
+                        iconPath = '/trading-ui/images/icons/entities/trades.svg';
                     } else if (step.type === 'Execution') {
                         stepClass += ' execution-title';
                         iconPath = '/trading-ui/images/icons/entities/executions.svg';
@@ -1251,12 +2510,18 @@
                     stepClass += ' timeline-cashflow';
                     pointColor = 'var(--secondary-color, #fc5a06)';
                     iconPath = '/trading-ui/images/icons/entities/cash_flows.svg';
-                } else if (step.type === 'Alert') {
+                } else if (step.type === 'Alert' || step.type === 'Alert Activation') {
                     stepClass += ' timeline-alert';
                     pointColor = 'var(--warning-color, #ffc107)';
                     iconPath = '/trading-ui/images/icons/entities/alerts.svg';
                 } else if (step.type === 'Trade Plan') {
+                    stepClass += ' timeline-plan';
+                    pointColor = 'var(--primary-color, #007bff)';
                     iconPath = '/trading-ui/images/icons/entities/trade_plans.svg';
+                } else if (step.type === 'Trade') {
+                    stepClass += ' timeline-trade';
+                    pointColor = 'var(--primary-color, #007bff)';
+                    iconPath = '/trading-ui/images/icons/entities/trades.svg';
                 } else if (step.type === 'Execution') {
                     stepClass += ' execution-title';
                     iconPath = '/trading-ui/images/icons/entities/executions.svg';
@@ -1296,18 +2561,23 @@
 
             const stepId = step.id || index;
             const onClickType = step.type === 'Trade Plan' ? 'plan' : 
+                               (step.type === 'Trade' ? 'trade' :
                                (step.type === 'Execution' ? 'execution' : 
                                (step.type === 'Cash Flow' ? 'cashflow' : 
                                (step.type === 'Note' ? 'note' : 
-                               (step.type === 'Alert' ? 'alert' : 'default'))));
+                               (step.type === 'Alert' || step.type === 'Alert Activation' ? 'alert' : 'default')))));
 
             let onClickFn = '';
             if (step.type === 'Cash Flow') {
                 onClickFn = `showCashFlowDetails(${stepId})`;
             } else if (step.type === 'Note') {
                 onClickFn = `showNoteDetails(${stepId})`;
-            } else if (step.type === 'Alert') {
+            } else if (step.type === 'Alert' || step.type === 'Alert Activation') {
                 onClickFn = `showAlertDetails(${stepId})`;
+            } else if (step.type === 'Trade Plan') {
+                onClickFn = `showTradePlanDetails(${stepId})`;
+            } else if (step.type === 'Trade') {
+                onClickFn = `showTradeDetails(${stepId})`;
             } else {
                 onClickFn = `showExecutionDetails(${stepId}, '${onClickType}')`;
             }
@@ -1320,7 +2590,12 @@
                             ${await (async () => {
                                 if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {
                                     try {
-                                        const entityType = step.type === 'Note' ? 'note' : step.type === 'Cash Flow' ? 'cash_flow' : step.type === 'Alert' ? 'alert' : step.type === 'Trade Plan' ? 'trade_plan' : 'execution';
+                                        const entityType = step.type === 'Note' ? 'note' : 
+                                                          step.type === 'Cash Flow' ? 'cash_flow' : 
+                                                          step.type === 'Alert' || step.type === 'Alert Activation' ? 'alert' : 
+                                                          step.type === 'Trade Plan' ? 'trade_plan' : 
+                                                          step.type === 'Trade' ? 'trade' : 
+                                                          'execution';
                                         return await window.IconSystem.renderIcon('entity', entityType, { size: '16', alt: step.type, class: 'entity-icon-small' });
                                     } catch (error) {
                                         return `<img src="${iconPath}" alt="${step.type}" class="entity-icon-small">`;
@@ -1334,6 +2609,9 @@
                         ${detailsHTML}
                         ${actionHTML}
                         <div class="timeline-step-details"><strong>מזהה:</strong> #${stepId}</div>
+                        ${step.created_at ? `<div class="timeline-step-details text-muted"><small>תאריך יצירה: ${formatDate(step.created_at)}</small></div>` : ''}
+                        ${step.trade_created_at ? `<div class="timeline-step-details text-muted"><small>תאריך יצירת טרייד: ${formatDate(step.trade_created_at)}</small></div>` : ''}
+                        ${step.plan_created_at ? `<div class="timeline-step-details text-muted"><small>תאריך יצירת תוכנית: ${formatDate(step.plan_created_at)}</small></div>` : ''}
                         <a href="#" class="timeline-step-link" data-onclick="${onClickFn}; return false;">פרטים מלאים →</a>
                     </div>
                 </div>
@@ -1828,6 +3106,7 @@
     }
 
     // ===== Export =====
+    // Export immediately to ensure availability for UnifiedAppInitializer
     window.tradeHistoryPage = {
         openTradeSelectorModal,
         applyTradeFilters,
@@ -1835,17 +3114,39 @@
         viewTradeDetails,
         selectTradeForAnalysis,
         clearSelectedTrade,
+        getTradeIdFromURL,
+        updateURLWithTradeId,
+        showTickerSearchModal,
+        selectTickerForTradeHistory,
+        selectTradeForHistory,
+        renderTradesForSelection,
         getCSSVariableValue,
         getInvestmentTypeText,
         formatDate,
         initializePage, // Export for UnifiedAppInitializer
         loadDataFromCache,
+        loadTrades,
         saveToCache,
         savePageState,
         loadPageState,
         restoreChartZoomState,
-        getTimelineData: () => tradeHistoryData?.timelineData || []
+        getTimelineData: () => {
+            // Try to get from current tradeHistoryData first
+            if (window.tradeHistoryData && window.tradeHistoryData.timelineData) {
+                return window.tradeHistoryData.timelineData;
+            }
+            // Fallback to stored tradeHistoryData
+            if (tradeHistoryData && tradeHistoryData.timelineData) {
+                return tradeHistoryData.timelineData;
+            }
+            return [];
+        }
     };
+
+    // Log export for debugging
+    if (window.Logger) {
+        window.Logger.debug('✅ tradeHistoryPage exported', { page: 'trade-history-page' });
+    }
 
 })();
 

@@ -152,7 +152,18 @@
     const base = resolveBaseUrl();
     const separator = base.endsWith('/') ? '' : '/';
     const url = `${base}${separator}api/alerts/?_ts=${Date.now()}`;
-    const response = await fetch(url, { method: 'GET', headers: DEFAULT_HEADERS, signal });
+    const response = await fetch(url, { 
+      method: 'GET', 
+      headers: DEFAULT_HEADERS, 
+      signal,
+      credentials: 'include' // Include cookies for session-based auth
+    });
+    
+    // Handle 401/308 authentication errors
+    if (window.checkAndHandleAuthError && window.checkAndHandleAuthError(response, url)) {
+      throw new Error('Authentication required');
+    }
+    
     if (!response.ok) {
       const error = new Error(`Alert load failed (${response.status})`);
       notifyLoadError(error.message, error);

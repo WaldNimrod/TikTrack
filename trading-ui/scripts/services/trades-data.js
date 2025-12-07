@@ -40,10 +40,26 @@
       }
 
       window.Logger?.debug?.('🔄 Loading trades data from API...', PAGE_LOG_CONTEXT);
-    let response = await fetch('/api/trades/');
+    let response = await fetch('/api/trades/', {
+      credentials: 'include' // Include cookies for session-based auth
+    });
+    
+    // Handle 401/308 authentication errors
+    if (window.checkAndHandleAuthError && window.checkAndHandleAuthError(response, '/api/trades/')) {
+      throw new Error('Authentication required');
+    }
+    
     if (!response.ok) {
       // Retry without trailing slash once
-      const retry = await fetch('/api/trades');
+      const retry = await fetch('/api/trades', {
+        credentials: 'include' // Include cookies for session-based auth
+      });
+      
+      // Handle 401/308 authentication errors on retry
+      if (window.checkAndHandleAuthError && window.checkAndHandleAuthError(retry, '/api/trades')) {
+        throw new Error('Authentication required');
+      }
+      
       if (!retry.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }

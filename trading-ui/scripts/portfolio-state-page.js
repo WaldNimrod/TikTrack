@@ -1149,41 +1149,10 @@ async function loadPortfolioState() {
     }
 }
 
-// Load trades from API using PortfolioStateData service
+// Load trades from API
 async function loadTrades(dateRange, selectedAccounts, investmentType) {
     try {
-        // Use PortfolioStateData service if available
-        if (window.PortfolioStateData && typeof window.PortfolioStateData.loadSnapshot === 'function') {
-            // Convert dateRange string to actual date
-            const targetDate = getDateFromRange(dateRange);
-            const accountId = Array.isArray(selectedAccounts) && selectedAccounts.length === 1 ? selectedAccounts[0] : null;
-            
-            // Load snapshot from PortfolioStateData
-            const snapshot = await window.PortfolioStateData.loadSnapshot(accountId, targetDate, {
-                include_closed: false
-            });
-            
-            // Extract trades/positions from snapshot
-            allTrades = snapshot?.positions || snapshot?.trades || [];
-            
-            // Filter by investment type if specified
-            if (investmentType && allTrades.length > 0) {
-                allTrades = allTrades.filter(trade => trade.investment_type === investmentType);
-            }
-            
-            if (window.Logger) {
-                window.Logger.info(`✅ Loaded ${allTrades.length} trades from PortfolioStateData`, { 
-                    page: 'portfolio-state-page',
-                    dateRange,
-                    targetDate,
-                    accountId
-                });
-            }
-            
-            return;
-        }
-        
-        // Fallback to direct API call if PortfolioStateData not available
+        // Check cache first
         const accountsKey = Array.isArray(selectedAccounts) ? selectedAccounts.join(',') : (selectedAccounts || 'all');
         const cacheKey = `portfolio-state-trades-${dateRange}-${accountsKey}-${investmentType || 'all'}`;
         
@@ -1198,84 +1167,53 @@ async function loadTrades(dateRange, selectedAccounts, investmentType) {
             }
         }
         
-        // Final fallback: use mock data if API not available
-        if (window.Logger) {
-            window.Logger.warn('PortfolioStateData not available, using mock data as fallback', { page: 'portfolio-state-page' });
+        // Load portfolio state using PortfolioStateData service
+        if (!window.PortfolioStateData) {
+            await new Promise((resolve) => {
+                const checkInterval = setInterval(() => {
+                    if (window.PortfolioStateData) {
+                        clearInterval(checkInterval);
+                        resolve();
+                    }
+                }, 100);
+                setTimeout(() => {
+                    clearInterval(checkInterval);
+                    resolve();
+                }, 5000); // Timeout after 5 seconds
+            });
         }
-        if (window.NotificationSystem) {
-            window.NotificationSystem.showWarning('טעינת נתונים', 'נטענים נתוני דמה במקום נתונים אמיתיים');
+
+        if (!window.PortfolioStateData || typeof window.PortfolioStateData.loadSnapshot !== 'function') {
+            throw new Error('PortfolioStateData service not available');
         }
+
+        // Get current date for snapshot
+        const today = new Date().toISOString().split('T')[0];
+        const accountId = Array.isArray(selectedAccounts) && selectedAccounts.length === 1 ? selectedAccounts[0] : null;
         
-        allTrades = [
-            {
-                id: 1,
-                ticker_symbol: 'AAPL',
-                ticker_id: 1,
-                trading_account_id: 1,
-                account_name: 'Account #1',
-                current_price: 150.50,
-                daily_change: 2.5,
-                position_quantity: 100,
-                position_pl_percent: 6.67,
-                position_pl_value: 1000,
-                status: 'open',
-                investment_type: 'swing',
-                side: 'Long',
-                created_at: '2025-01-10',
-                closed_at: null
-            },
-            {
-                id: 2,
-                ticker_symbol: 'TSLA',
-                ticker_id: 2,
-                trading_account_id: 1,
-                account_name: 'Account #1',
-                current_price: 250.00,
-                daily_change: -1.2,
-                position_quantity: 50,
-                position_pl_percent: 4.00,
-                position_pl_value: 500,
-                status: 'open',
-                investment_type: 'day',
-                side: 'Long',
-                created_at: '2025-01-12',
-                closed_at: null
-            },
-            {
-                id: 3,
-                ticker_symbol: 'MSFT',
-                ticker_id: 3,
-                trading_account_id: 2,
-                account_name: 'Account #2',
-                current_price: 300.00,
-                daily_change: 0.5,
-                position_quantity: 200,
-                position_pl_percent: -3.33,
-                position_pl_value: -2000,
-                status: 'open',
-                investment_type: 'investment',
-                side: 'Short',
-                created_at: '2025-01-08',
-                closed_at: null
-            },
-            {
-                id: 4,
-                ticker_symbol: 'GOOGL',
-                ticker_id: 4,
-                trading_account_id: 2,
-                account_name: 'Account #2',
-                current_price: 140.00,
-                daily_change: 1.5,
-                position_quantity: 75,
-                position_pl_percent: 5.00,
-                position_pl_value: 525,
-                status: 'open',
-                investment_type: 'swing',
-                side: 'Long',
-                created_at: '2025-01-05',
-                closed_at: null
-            }
-        ];
+        // Load portfolio snapshot
+        const snapshot = await window.PortfolioStateData.loadSnapshot(accountId, today, {
+            include_closed: false
+        });
+
+        // Extract trades from snapshot positions
+        allTrades = Array.isArray(snapshot?.positions) ? snapshot.positions.map(position => ({
+            id: position.trade_id || position.id,
+            ticker_symbol: position.ticker_symbol || position.ticker?.symbol || '',
+            ticker_id: position.ticker_id || position.ticker?.id,
+            trading_account_id: position.account_id || position.trading_account_id,
+            account_name: position.account_name || `Account #${position.account_id || position.trading_account_id}`,
+            current_price: position.current_price || position.price || 0,
+            daily_change: position.daily_change || 0,
+            position_quantity: position.quantity || 0,
+            position_pl_percent: position.pl_percent || 0,
+            position_pl_value: position.pl_value || 0,
+            status: position.status || 'open',
+            investment_type: position.investment_type || '',
+            side: position.side || '',
+            created_at: position.created_at || '',
+            closed_at: position.closed_at || null
+        })) : [];
         
         // Save to cache
         if (allTrades && allTrades.length >= 0 && window.UnifiedCacheManager) {
@@ -1296,38 +1234,6 @@ async function loadTrades(dateRange, selectedAccounts, investmentType) {
     }
 }
 
-// Helper function to convert dateRange string to actual date
-function getDateFromRange(dateRange) {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    
-    switch (dateRange) {
-        case 'היום':
-            return today.toISOString().split('T')[0];
-        case 'אתמול':
-            const yesterday = new Date(today);
-            yesterday.setDate(yesterday.getDate() - 1);
-            return yesterday.toISOString().split('T')[0];
-        case 'השבוע':
-            const weekStart = new Date(today);
-            weekStart.setDate(today.getDate() - today.getDay()); // Start of week (Sunday)
-            return weekStart.toISOString().split('T')[0];
-        case 'החודש':
-            const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
-            return monthStart.toISOString().split('T')[0];
-        case 'השנה':
-            const yearStart = new Date(today.getFullYear(), 0, 1);
-            return yearStart.toISOString().split('T')[0];
-        default:
-            // For custom date range, try to parse or default to today
-            if (dateRange && dateRange.includes('-')) {
-                // Assume it's a date string
-                return dateRange;
-            }
-            return today.toISOString().split('T')[0];
-    }
-}
-
 // Calculate summary from trades (using InfoSummarySystem if available)
 async function calculateSummaryFromTrades(trades) {
     // Use InfoSummarySystem if available
@@ -1345,14 +1251,13 @@ async function calculateSummaryFromTrades(trades) {
                 const accountId = trade.trading_account_id;
                 const accountName = trade.account_name || `Account #${accountId}`;
                 
-                // Cash balance (mock - should come from snapshot)
+                // Cash balance (from snapshot if available)
                 if (!cashBalanceByAccount[accountId]) {
                     cashBalanceByAccount[accountId] = {
                         account_id: accountId,
                         account_name: accountName,
-                        balance: 20000 // Mock
+                        balance: 0 // Will be populated from snapshot if available
                     };
-                    totalCashBalance += 20000;
                 }
                 
                 // Positions count
@@ -1395,14 +1300,13 @@ async function calculateSummaryFromTrades(trades) {
         const accountId = trade.trading_account_id;
         const accountName = trade.account_name || `Account #${accountId}`;
         
-        // Cash balance (mock - should come from snapshot)
+        // Cash balance (from snapshot if available)
         if (!cashBalanceByAccount[accountId]) {
             cashBalanceByAccount[accountId] = {
                 account_id: accountId,
                 account_name: accountName,
-                balance: 20000 // Mock
+                balance: 0 // Will be populated from snapshot if available
             };
-            totalCashBalance += 20000;
         }
         
         // Portfolio value (from position)
@@ -1901,42 +1805,73 @@ async function initPortfolioPerformanceChart() {
             }
         });
         
-        // Generate performance data (percentage change from start)
-        const mockData = generateMockPortfolioPerformanceData(currentPeriod['both'] || 'month');
-        portfolioPerformanceSeries.setData(mockData.performance);
+        // Load performance data using PortfolioStateData service
+        let performanceData = [];
+        try {
+            if (window.PortfolioStateData && typeof window.PortfolioStateData.loadSeries === 'function') {
+                const period = currentPeriod['both'] || 'month';
+                const endDate = new Date().toISOString().split('T')[0];
+                const startDate = new Date();
+                const days = period === 'week' ? 7 : period === 'month' ? 30 : period === '3months' ? 90 : period === 'year' ? 365 : 30;
+                startDate.setDate(startDate.getDate() - days);
+                const startDateStr = startDate.toISOString().split('T')[0];
+                
+                const accountId = getSelectedAccounts().length === 1 ? getSelectedAccounts()[0] : null;
+                const series = await window.PortfolioStateData.loadSeries(accountId, startDateStr, endDate, {
+                    interval: 'day'
+                });
+                
+                // Transform series data to chart format
+                performanceData = Array.isArray(series?.snapshots) ? series.snapshots.map((snapshot, index) => {
+                    const baseValue = index === 0 ? snapshot.total_value : series.snapshots[0].total_value;
+                    const percent = baseValue > 0 ? ((snapshot.total_value - baseValue) / baseValue) * 100 : 0;
+                    return {
+                        time: snapshot.snapshot_date || snapshot.date,
+                        value: percent
+                    };
+                }) : [];
+            }
+        } catch (error) {
+            if (window.Logger) {
+                window.Logger.warn('Error loading performance data, using empty data', { page: 'portfolio-state-page', error });
+            }
+        }
         
-        // Add markers for multiple min/max points
+        portfolioPerformanceSeries.setData(performanceData);
+        
+        // Add markers for min/max points if data available
         const lightweightCharts = window.LightweightCharts || window.lightweightCharts;
-        if (mockData.minIndices && mockData.maxIndices && lightweightCharts) {
+        if (performanceData.length > 0 && lightweightCharts) {
             const markers = [];
+            const values = performanceData.map(d => d.value);
+            const minValue = Math.min(...values);
+            const maxValue = Math.max(...values);
+            const minIndex = values.indexOf(minValue);
+            const maxIndex = values.indexOf(maxValue);
             
-            // Add markers for all min points
-            mockData.minIndices.forEach((minIdx, idx) => {
-                if (minIdx >= 0 && minIdx < mockData.performance.length) {
-                    markers.push({
-                        time: mockData.performance[minIdx].time,
-                        position: 'belowBar',
-                        color: (typeof window.getNumericValueColor === 'function' ? window.getNumericValueColor(-1, 'medium') : '') || '',
-                        shape: 'arrowUp',
-                        text: `${mockData.performance[minIdx].value.toFixed(2)}%`,
-                        size: 1
-                    });
-                }
-            });
+            // Add marker for min point
+            if (minIndex >= 0 && minIndex < performanceData.length) {
+                markers.push({
+                    time: performanceData[minIndex].time,
+                    position: 'belowBar',
+                    color: (typeof window.getNumericValueColor === 'function' ? window.getNumericValueColor(-1, 'medium') : '') || '',
+                    shape: 'arrowUp',
+                    text: `${performanceData[minIndex].value.toFixed(2)}%`,
+                    size: 1
+                });
+            }
             
-            // Add markers for all max points
-            mockData.maxIndices.forEach((maxIdx, idx) => {
-                if (maxIdx >= 0 && maxIdx < mockData.performance.length) {
-                    markers.push({
-                        time: mockData.performance[maxIdx].time,
-                        position: 'aboveBar',
-                        color: (typeof window.getNumericValueColor === 'function' ? window.getNumericValueColor(1, 'medium') : '') || '',
-                        shape: 'arrowDown',
-                        text: `${mockData.performance[maxIdx].value.toFixed(2)}%`,
-                        size: 1
-                    });
-                }
-            });
+            // Add marker for max point
+            if (maxIndex >= 0 && maxIndex < performanceData.length && maxIndex !== minIndex) {
+                markers.push({
+                    time: performanceData[maxIndex].time,
+                    position: 'aboveBar',
+                    color: (typeof window.getNumericValueColor === 'function' ? window.getNumericValueColor(1, 'medium') : '') || '',
+                    shape: 'arrowDown',
+                    text: `${performanceData[maxIndex].value.toFixed(2)}%`,
+                    size: 1
+                });
+            }
             
             // Try to use createSeriesMarkers if available
             if (typeof lightweightCharts.createSeriesMarkers === 'function') {
@@ -2143,38 +2078,39 @@ async function initPortfolioValueChart() {
         portfolioValueSeries.setData(mockData.values);
         portfolioValuePercentSeries.setData(mockData.percentages);
         
-        // Add markers for multiple min/max points
+        // Add markers for min/max points if data available
         const lightweightCharts = window.LightweightCharts || window.lightweightCharts;
-        if (mockData.minIndices && mockData.maxIndices && lightweightCharts) {
+        if (valueData.length > 0 && lightweightCharts) {
             const markers = [];
+            const values = valueData.map(d => d.value);
+            const minValue = Math.min(...values);
+            const maxValue = Math.max(...values);
+            const minIndex = values.indexOf(minValue);
+            const maxIndex = values.indexOf(maxValue);
             
-            // Add markers for all min points
-            mockData.minIndices.forEach((minIdx, idx) => {
-                if (minIdx >= 0 && minIdx < mockData.values.length) {
-                    markers.push({
-                        time: mockData.values[minIdx].time,
-                        position: 'belowBar',
-                        color: (typeof window.getNumericValueColor === 'function' ? window.getNumericValueColor(-1, 'medium') : '') || '',
-                        shape: 'arrowUp',
-                        text: `$${mockData.values[minIdx].value.toLocaleString()}`,
-                        size: 1
-                    });
-                }
-            });
+            // Add marker for min point
+            if (minIndex >= 0 && minIndex < valueData.length) {
+                markers.push({
+                    time: valueData[minIndex].time,
+                    position: 'belowBar',
+                    color: (typeof window.getNumericValueColor === 'function' ? window.getNumericValueColor(-1, 'medium') : '') || '',
+                    shape: 'arrowUp',
+                    text: `$${valueData[minIndex].value.toLocaleString()}`,
+                    size: 1
+                });
+            }
             
-            // Add markers for all max points
-            mockData.maxIndices.forEach((maxIdx, idx) => {
-                if (maxIdx >= 0 && maxIdx < mockData.values.length) {
-                    markers.push({
-                        time: mockData.values[maxIdx].time,
-                        position: 'aboveBar',
-                        color: (typeof window.getNumericValueColor === 'function' ? window.getNumericValueColor(1, 'medium') : '') || '',
-                        shape: 'arrowDown',
-                        text: `$${mockData.values[maxIdx].value.toLocaleString()}`,
-                        size: 1
-                    });
-                }
-            });
+            // Add marker for max point
+            if (maxIndex >= 0 && maxIndex < valueData.length && maxIndex !== minIndex) {
+                markers.push({
+                    time: valueData[maxIndex].time,
+                    position: 'aboveBar',
+                    color: (typeof window.getNumericValueColor === 'function' ? window.getNumericValueColor(1, 'medium') : '') || '',
+                    shape: 'arrowDown',
+                    text: `$${valueData[maxIndex].value.toLocaleString()}`,
+                    size: 1
+                });
+            }
             
             // Try to use createSeriesMarkers if available
             if (typeof lightweightCharts.createSeriesMarkers === 'function') {
@@ -2437,46 +2373,96 @@ async function initPLTrendChart() {
         });
         
         // Generate data based on filtered trades - TODO: Load from API
-        const mockData = generateMockPLData(currentPeriod['both'] || 'month');
-        realizedPLSeries.setData(mockData.realized);
-        unrealizedPLSeries.setData(mockData.unrealized);
-        totalPLSeries.setData(mockData.total);
-        realizedPLPercentSeries.setData(mockData.realizedPercent);
-        unrealizedPLPercentSeries.setData(mockData.unrealizedPercent);
-        totalPLPercentSeries.setData(mockData.totalPercent);
+        // Load P/L data using PortfolioStateData service
+        let plData = {
+            realized: [],
+            unrealized: [],
+            total: [],
+            realizedPercent: [],
+            unrealizedPercent: [],
+            totalPercent: []
+        };
+        try {
+            if (window.PortfolioStateData && typeof window.PortfolioStateData.loadSeries === 'function') {
+                const period = currentPeriod['both'] || 'month';
+                const endDate = new Date().toISOString().split('T')[0];
+                const startDate = new Date();
+                const days = period === 'week' ? 7 : period === 'month' ? 30 : period === '3months' ? 90 : period === 'year' ? 365 : 30;
+                startDate.setDate(startDate.getDate() - days);
+                const startDateStr = startDate.toISOString().split('T')[0];
+                
+                const accountId = getSelectedAccounts().length === 1 ? getSelectedAccounts()[0] : null;
+                const series = await window.PortfolioStateData.loadSeries(accountId, startDateStr, endDate, {
+                    interval: 'day'
+                });
+                
+                // Transform series data to chart format
+                if (Array.isArray(series?.snapshots)) {
+                    series.snapshots.forEach(snapshot => {
+                        const time = snapshot.snapshot_date || snapshot.date;
+                        const realized = snapshot.total_realized_pl || 0;
+                        const unrealized = snapshot.total_unrealized_pl || 0;
+                        const total = realized + unrealized;
+                        const baseValue = series.snapshots[0]?.total_value || 1;
+                        const realizedPercent = baseValue > 0 ? (realized / baseValue) * 100 : 0;
+                        const unrealizedPercent = baseValue > 0 ? (unrealized / baseValue) * 100 : 0;
+                        const totalPercent = baseValue > 0 ? (total / baseValue) * 100 : 0;
+                        
+                        plData.realized.push({ time, value: realized });
+                        plData.unrealized.push({ time, value: unrealized });
+                        plData.total.push({ time, value: total });
+                        plData.realizedPercent.push({ time, value: realizedPercent });
+                        plData.unrealizedPercent.push({ time, value: unrealizedPercent });
+                        plData.totalPercent.push({ time, value: totalPercent });
+                    });
+                }
+            }
+        } catch (error) {
+            if (window.Logger) {
+                window.Logger.warn('Error loading P/L data, using empty data', { page: 'portfolio-state-page', error });
+            }
+        }
         
-        // Add markers for multiple min/max points on total PL
+        realizedPLSeries.setData(plData.realized);
+        unrealizedPLSeries.setData(plData.unrealized);
+        totalPLSeries.setData(plData.total);
+        realizedPLPercentSeries.setData(plData.realizedPercent);
+        unrealizedPLPercentSeries.setData(plData.unrealizedPercent);
+        totalPLPercentSeries.setData(plData.totalPercent);
+        
+        // Add markers for min/max points on total PL if data available
         const lightweightChartsPL = window.LightweightCharts || window.lightweightCharts;
-        if (mockData.minIndices && mockData.maxIndices && lightweightChartsPL) {
+        if (plData.total.length > 0 && lightweightChartsPL) {
             const markers = [];
+            const values = plData.total.map(d => d.value);
+            const minValue = Math.min(...values);
+            const maxValue = Math.max(...values);
+            const minIndex = values.indexOf(minValue);
+            const maxIndex = values.indexOf(maxValue);
             
-            // Add markers for all min points
-            mockData.minIndices.forEach((minIdx, idx) => {
-                if (minIdx >= 0 && minIdx < mockData.total.length) {
-                    markers.push({
-                        time: mockData.total[minIdx].time,
-                        position: 'belowBar',
-                        color: (typeof window.getNumericValueColor === 'function' ? window.getNumericValueColor(-1, 'medium') : '') || '',
-                        shape: 'arrowUp',
-                        text: `$${mockData.total[minIdx].value.toLocaleString()}`,
-                        size: 1
-                    });
-                }
-            });
+            // Add marker for min point
+            if (minIndex >= 0 && minIndex < plData.total.length) {
+                markers.push({
+                    time: plData.total[minIndex].time,
+                    position: 'belowBar',
+                    color: (typeof window.getNumericValueColor === 'function' ? window.getNumericValueColor(-1, 'medium') : '') || '',
+                    shape: 'arrowUp',
+                    text: `$${plData.total[minIndex].value.toLocaleString()}`,
+                    size: 1
+                });
+            }
             
-            // Add markers for all max points
-            mockData.maxIndices.forEach((maxIdx, idx) => {
-                if (maxIdx >= 0 && maxIdx < mockData.total.length) {
-                    markers.push({
-                        time: mockData.total[maxIdx].time,
-                        position: 'aboveBar',
-                        color: (typeof window.getNumericValueColor === 'function' ? window.getNumericValueColor(1, 'medium') : '') || '',
-                        shape: 'arrowDown',
-                        text: `$${mockData.total[maxIdx].value.toLocaleString()}`,
-                        size: 1
-                    });
-                }
-            });
+            // Add marker for max point
+            if (maxIndex >= 0 && maxIndex < plData.total.length && maxIndex !== minIndex) {
+                markers.push({
+                    time: plData.total[maxIndex].time,
+                    position: 'aboveBar',
+                    color: (typeof window.getNumericValueColor === 'function' ? window.getNumericValueColor(1, 'medium') : '') || '',
+                    shape: 'arrowDown',
+                    text: `$${plData.total[maxIndex].value.toLocaleString()}`,
+                    size: 1
+                });
+            }
             
             // Try to use createSeriesMarkers if available
             if (typeof lightweightChartsPL.createSeriesMarkers === 'function') {
@@ -2834,9 +2820,9 @@ function generateMockPortfolioValueData(period) {
     };
 }
 
-// Generate mock portfolio performance data (percentage return from start, excluding deposits/withdrawals)
-// Performance = (Current Value - Deposits/Withdrawals - Start Value) / Start Value * 100
-function generateMockPortfolioPerformanceData(period) {
+// DEPRECATED: This function is no longer used - replaced by PortfolioStateData.loadSeries()
+// Kept for reference only - will be removed in future cleanup
+function generateMockPortfolioPerformanceData_DEPRECATED(period) {
     const data = [];
     const days = period === 'week' ? 7 : period === 'month' ? 30 : period === '3months' ? 90 : period === 'year' ? 365 : 365;
     
@@ -2972,7 +2958,9 @@ function generateMockPortfolioPerformanceData(period) {
 }
 
 // Generate mock P/L data (filtered by date/account/investment type)
-function generateMockPLData(period) {
+// DEPRECATED: This function is no longer used - replaced by PortfolioStateData.loadSeries()
+// Kept for reference only - will be removed in future cleanup
+function generateMockPLData_DEPRECATED(period) {
     const days = period === 'week' ? 7 : period === 'month' ? 30 : period === '3months' ? 90 : period === 'year' ? 365 : 365;
     const realized = [];
     const unrealized = [];

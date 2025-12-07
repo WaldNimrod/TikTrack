@@ -15,7 +15,7 @@ Version: 1.0.0
 Date: January 2025
 
 Documentation:
-- documentation/02-ARCHITECTURE/BACKEND/BUSINESS_LOGIC_LAYER.md
+- documentation/02-ARCHITECTURE/BACKEND/HISTORICAL_DATA_SERVICE.md
 - documentation/03-DEVELOPMENT/PLANS/HISTORICAL_PAGES_FULL_IMPLEMENTATION_PLAN.md
 """
 
@@ -24,6 +24,7 @@ from sqlalchemy.orm import Session
 from datetime import datetime, timezone
 from services.business_logic.historical_data_business_service import HistoricalDataBusinessService
 from services.advanced_cache_service import cache_with_deps
+from services.user_service import UserService
 from .base_entity_decorators import handle_database_session
 from .base_entity_utils import BaseEntityUtils
 import logging
@@ -32,6 +33,27 @@ from typing import Optional
 logger = logging.getLogger(__name__)
 
 trade_history_bp = Blueprint('trade_history', __name__, url_prefix='/api/trade-history')
+user_service = UserService()
+
+
+def _resolve_user_id() -> int:
+    """
+    Return active user id from Flask context (set by auth middleware).
+    Falls back to default user if not authenticated (for backward compatibility).
+    """
+    # Primary: Get from Flask context (set by auth middleware)
+    user_id = getattr(g, 'user_id', None)
+    if user_id is not None:
+        return user_id
+    
+    # Fallback: Check query parameter
+    user_id = request.args.get('user_id', type=int)
+    if user_id is not None:
+        return user_id
+    
+    # Fallback: Default user (for backward compatibility and tools)
+    default_user = user_service.get_default_user()
+    return default_user["id"] if default_user else 1
 
 
 @trade_history_bp.route('/', methods=['GET'])
@@ -57,14 +79,8 @@ def get_trade_history():
     try:
         db: Session = g.db
         
-        # Get user_id from Flask context (set by auth middleware)
-        user_id = getattr(g, 'user_id', None)
-        if not user_id:
-            error_payload = BaseEntityUtils.create_error_payload(
-                None,
-                "User authentication required"
-            )
-            return jsonify(error_payload), 401
+        # Resolve user_id with fallback
+        user_id = _resolve_user_id()
         
         normalizer = BaseEntityUtils.get_request_normalizer(request)
         
@@ -104,43 +120,47 @@ def get_trade_history():
             filters['start_date'] = start_date
         if end_date:
             filters['end_date'] = end_date
-        if status:
+        if status and status != 'all':
             filters['status'] = status
         if investment_type:
             filters['investment_type'] = investment_type
         
-        # Initialize service
-        service = HistoricalDataBusinessService(db_session=db)
+        # Validate request
+        validation_data = {
+            'user_id': user_id,
+            **filters
+        }
         
-        # Aggregate trade history
+        service = HistoricalDataBusinessService(db_session=db)
+        validation_result = service.validate(validation_data)
+        
+        if not validation_result['is_valid']:
+            error_payload = BaseEntityUtils.create_error_payload(
+                normalizer,
+                f"Validation failed: {', '.join(validation_result['errors'])}"
+            )
+            return jsonify(error_payload), 400
+        
+        # Get trade history
         result = service.aggregate_trade_history(
             user_id=user_id,
             filters=filters,
             group_by=group_by
         )
         
-        if not result.get('is_valid'):
-            error_payload = BaseEntityUtils.create_error_payload(
-                normalizer,
-                result.get('error', 'Failed to aggregate trade history')
-            )
-            return jsonify(error_payload), 500
-        
-        # Normalize output
-        normalized_data = normalizer.normalize_output(result)
-        
         payload = BaseEntityUtils.create_success_payload(
             normalizer,
-            data=normalized_data,
-            message="Trade history retrieved successfully"
+            data=result,
+            extra={'count': result.get('count', 0)}
         )
+        
         return jsonify(payload), 200
         
     except Exception as e:
         logger.error(f"Error getting trade history: {str(e)}", exc_info=True)
         error_payload = BaseEntityUtils.create_error_payload(
             normalizer,
-            f"Failed to retrieve trade history: {str(e)}"
+            f"Error retrieving trade history: {str(e)}"
         )
         return jsonify(error_payload), 500
 
@@ -158,7 +178,7 @@ def get_trade_statistics():
         start_date (optional): Start date (ISO format)
         end_date (optional): End date (ISO format)
         status (optional): Filter by status
-        period (optional): Period filter ('day', 'week', 'month', 'year')
+        period (optional): Period for statistics ('day', 'week', 'month', 'year')
     
     Returns:
         JSON response with trade statistics
@@ -167,8 +187,8 @@ def get_trade_statistics():
     try:
         db: Session = g.db
         
-        # Get user_id from Flask context
-        user_id = getattr(g, 'user_id', None)
+        # Resolve user_id with fallback
+        user_id = _resolve_user_id()
         if not user_id:
             error_payload = BaseEntityUtils.create_error_payload(
                 None,
@@ -183,7 +203,7 @@ def get_trade_statistics():
         ticker_id = request.args.get('ticker_id', type=int)
         start_date_str = request.args.get('start_date')
         end_date_str = request.args.get('end_date')
-        status = request.args.get('status', 'all')
+        status = request.args.get('status')
         period = request.args.get('period')
         
         # Normalize dates
@@ -216,60 +236,48 @@ def get_trade_statistics():
         if status:
             filters['status'] = status
         
-        # Initialize service
+        # Validate request
+        validation_data = {
+            'user_id': user_id,
+            **filters
+        }
+        
         service = HistoricalDataBusinessService(db_session=db)
+        validation_result = service.validate(validation_data)
         
-        # Get trades
-        trades_result = service.aggregate_trade_history(
-            user_id=user_id,
-            filters=filters,
-            group_by=None
-        )
-        
-        if not trades_result.get('is_valid'):
+        if not validation_result['is_valid']:
             error_payload = BaseEntityUtils.create_error_payload(
                 normalizer,
-                trades_result.get('error', 'Failed to get trades')
+                f"Validation failed: {', '.join(validation_result['errors'])}"
             )
-            return jsonify(error_payload), 500
+            return jsonify(error_payload), 400
         
-        trades = trades_result.get('trades', [])
-        
-        # Calculate statistics
-        stats_result = service.calculate_trade_statistics(
-            trades=trades,
+        # Get statistics
+        result = service.calculate_trade_statistics(
+            user_id=user_id,
+            filters=filters,
             period=period
         )
         
-        if not stats_result.get('is_valid'):
-            error_payload = BaseEntityUtils.create_error_payload(
-                normalizer,
-                stats_result.get('error', 'Failed to calculate statistics')
-            )
-            return jsonify(error_payload), 500
-        
-        # Normalize output
-        normalized_data = normalizer.normalize_output(stats_result)
-        
         payload = BaseEntityUtils.create_success_payload(
             normalizer,
-            data=normalized_data,
-            message="Trade statistics retrieved successfully"
+            data=result
         )
+        
         return jsonify(payload), 200
         
     except Exception as e:
         logger.error(f"Error getting trade statistics: {str(e)}", exc_info=True)
         error_payload = BaseEntityUtils.create_error_payload(
             normalizer,
-            f"Failed to retrieve trade statistics: {str(e)}"
+            f"Error retrieving trade statistics: {str(e)}"
         )
         return jsonify(error_payload), 500
 
 
 @trade_history_bp.route('/plan-vs-execution', methods=['GET'])
 @handle_database_session()
-@cache_with_deps(ttl=300, dependencies=['trades', 'trade-plans', 'executions'])
+@cache_with_deps(ttl=300, dependencies=['trades', 'trade-plans'])
 def get_plan_vs_execution():
     """
     Get plan vs execution analysis.
@@ -285,14 +293,8 @@ def get_plan_vs_execution():
     try:
         db: Session = g.db
         
-        # Get user_id from Flask context
-        user_id = getattr(g, 'user_id', None)
-        if not user_id:
-            error_payload = BaseEntityUtils.create_error_payload(
-                None,
-                "User authentication required"
-            )
-            return jsonify(error_payload), 401
+        # Resolve user_id with fallback
+        user_id = _resolve_user_id()
         
         normalizer = BaseEntityUtils.get_request_normalizer(request)
         
@@ -320,10 +322,24 @@ def get_plan_vs_execution():
         if end_date.tzinfo is None:
             end_date = end_date.replace(tzinfo=timezone.utc)
         
-        # Initialize service
-        service = HistoricalDataBusinessService(db_session=db)
+        # Validate request
+        validation_data = {
+            'user_id': user_id,
+            'start_date': start_date,
+            'end_date': end_date
+        }
         
-        # Get analysis
+        service = HistoricalDataBusinessService(db_session=db)
+        validation_result = service.validate(validation_data)
+        
+        if not validation_result['is_valid']:
+            error_payload = BaseEntityUtils.create_error_payload(
+                normalizer,
+                f"Validation failed: {', '.join(validation_result['errors'])}"
+            )
+            return jsonify(error_payload), 400
+        
+        # Get plan vs execution analysis
         result = service.calculate_plan_vs_execution_analysis(
             user_id=user_id,
             date_range={
@@ -332,28 +348,18 @@ def get_plan_vs_execution():
             }
         )
         
-        if not result.get('is_valid'):
-            error_payload = BaseEntityUtils.create_error_payload(
-                normalizer,
-                result.get('error', 'Failed to calculate plan vs execution analysis')
-            )
-            return jsonify(error_payload), 500
-        
-        # Normalize output
-        normalized_data = normalizer.normalize_output(result)
-        
         payload = BaseEntityUtils.create_success_payload(
             normalizer,
-            data=normalized_data,
-            message="Plan vs execution analysis retrieved successfully"
+            data=result
         )
+        
         return jsonify(payload), 200
         
     except Exception as e:
         logger.error(f"Error getting plan vs execution analysis: {str(e)}", exc_info=True)
         error_payload = BaseEntityUtils.create_error_payload(
             normalizer,
-            f"Failed to retrieve plan vs execution analysis: {str(e)}"
+            f"Error retrieving plan vs execution analysis: {str(e)}"
         )
         return jsonify(error_payload), 500
 
@@ -366,11 +372,11 @@ def get_aggregated_trade_history():
     Get aggregated trade history.
     
     Query Parameters:
+        group_by (required): Group by ('period', 'ticker', 'account')
         account_id (optional): Filter by account ID
         ticker_id (optional): Filter by ticker ID
         start_date (optional): Start date (ISO format)
         end_date (optional): End date (ISO format)
-        group_by (required): Group by ('period', 'ticker', 'account')
     
     Returns:
         JSON response with aggregated trade history
@@ -379,8 +385,8 @@ def get_aggregated_trade_history():
     try:
         db: Session = g.db
         
-        # Get user_id from Flask context
-        user_id = getattr(g, 'user_id', None)
+        # Resolve user_id with fallback
+        user_id = _resolve_user_id()
         if not user_id:
             error_payload = BaseEntityUtils.create_error_payload(
                 None,
@@ -391,12 +397,7 @@ def get_aggregated_trade_history():
         normalizer = BaseEntityUtils.get_request_normalizer(request)
         
         # Parse query parameters
-        account_id = request.args.get('account_id', type=int)
-        ticker_id = request.args.get('ticker_id', type=int)
-        start_date_str = request.args.get('start_date')
-        end_date_str = request.args.get('end_date')
         group_by = request.args.get('group_by')
-        
         if not group_by:
             error_payload = BaseEntityUtils.create_error_payload(
                 normalizer,
@@ -404,12 +405,10 @@ def get_aggregated_trade_history():
             )
             return jsonify(error_payload), 400
         
-        if group_by not in ['period', 'ticker', 'account']:
-            error_payload = BaseEntityUtils.create_error_payload(
-                normalizer,
-                "group_by must be one of: period, ticker, account"
-            )
-            return jsonify(error_payload), 400
+        account_id = request.args.get('account_id', type=int)
+        ticker_id = request.args.get('ticker_id', type=int)
+        start_date_str = request.args.get('start_date')
+        end_date_str = request.args.get('end_date')
         
         # Normalize dates
         start_date = None
@@ -439,38 +438,42 @@ def get_aggregated_trade_history():
         if end_date:
             filters['end_date'] = end_date
         
-        # Initialize service
-        service = HistoricalDataBusinessService(db_session=db)
+        # Validate request
+        validation_data = {
+            'user_id': user_id,
+            **filters
+        }
         
-        # Aggregate trade history
+        service = HistoricalDataBusinessService(db_session=db)
+        validation_result = service.validate(validation_data)
+        
+        if not validation_result['is_valid']:
+            error_payload = BaseEntityUtils.create_error_payload(
+                normalizer,
+                f"Validation failed: {', '.join(validation_result['errors'])}"
+            )
+            return jsonify(error_payload), 400
+        
+        # Get aggregated trade history
         result = service.aggregate_trade_history(
             user_id=user_id,
             filters=filters,
             group_by=group_by
         )
         
-        if not result.get('is_valid'):
-            error_payload = BaseEntityUtils.create_error_payload(
-                normalizer,
-                result.get('error', 'Failed to aggregate trade history')
-            )
-            return jsonify(error_payload), 500
-        
-        # Normalize output
-        normalized_data = normalizer.normalize_output(result)
-        
         payload = BaseEntityUtils.create_success_payload(
             normalizer,
-            data=normalized_data,
-            message="Aggregated trade history retrieved successfully"
+            data=result,
+            extra={'count': result.get('count', 0)}
         )
+        
         return jsonify(payload), 200
         
     except Exception as e:
         logger.error(f"Error getting aggregated trade history: {str(e)}", exc_info=True)
         error_payload = BaseEntityUtils.create_error_payload(
             normalizer,
-            f"Failed to retrieve aggregated trade history: {str(e)}"
+            f"Error retrieving aggregated trade history: {str(e)}"
         )
         return jsonify(error_payload), 500
 

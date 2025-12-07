@@ -1,9 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
-  <title>8. טווח זמן שבוע</title>
-  <circle cx="100" cy="100" r="90" fill="none" stroke="#284b63" stroke-width="10"/>
-  <g stroke="#26b7a9" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none">
-    <line x1="40" y1="120" x2="160" y2="120"/>
-
-    <rect x="80.0" y="100" width="40.0" height="40" rx="10" />
-  </g>
-</svg>

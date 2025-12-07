@@ -145,6 +145,21 @@ def chart_management() -> Any:
     """Chart management page"""
     return send_from_directory(UI_DIR, "chart-management.html")
 
+@pages_bp.route('/trade-history')
+def trade_history() -> Any:
+    """Trade history page"""
+    return send_from_directory(UI_DIR, "trade-history.html")
+
+@pages_bp.route('/portfolio-state')
+def portfolio_state() -> Any:
+    """Portfolio state page"""
+    return send_from_directory(UI_DIR, "portfolio-state.html")
+
+@pages_bp.route('/trading-journal')
+def trading_journal() -> Any:
+    """Trading journal page"""
+    return send_from_directory(UI_DIR, "trading-journal.html")
+
 
 
 # Old external data test routes removed - now using /system-test-center

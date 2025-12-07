@@ -15,7 +15,20 @@
  *
  * Related Documentation:
  * - documentation/frontend/GENERAL_SYSTEMS_LIST.md
+ * - documentation/02-ARCHITECTURE/FRONTEND/HISTORICAL_DATA_SERVICES.md
  * - documentation/03-DEVELOPMENT/PLANS/HISTORICAL_PAGES_FULL_IMPLEMENTATION_PLAN.md
+ *
+ * Function Index:
+ * ==============
+ * 
+ * DATA LOADING (4):
+ * - loadEntries(dateRange, filters, options) - Load journal entries for date range
+ * - loadStatistics(dateRange, options) - Load journal statistics
+ * - loadCalendarData(month, year, options) - Load calendar data for specific month
+ * - loadByEntity(entityType, entityId, options) - Load entries by entity type and ID
+ * 
+ * CACHE MANAGEMENT (1):
+ * - invalidateCache() - Invalidate all trading journal cache
  *
  * @version 1.0.0
  * @created January 2025
@@ -320,4 +333,5 @@
 
   window.Logger?.debug?.('✅ TradingJournalData service initialized', PAGE_LOG_CONTEXT);
 })();
+
 

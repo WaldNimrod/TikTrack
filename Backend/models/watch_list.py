@@ -86,6 +86,10 @@ class WatchList(BaseModel):
                                 comment="Default sort column - max 50 chars, optional")
     default_sort_direction = Column(String(4), nullable=False, default='asc',
                                    comment="Default sort direction - 'asc' or 'desc', default 'asc'")
+    is_flag_list = Column(Integer, nullable=False, default=0,
+                         comment="Whether this is an automatic flag list (0=no, 1=yes)")
+    flag_color = Column(String(7), nullable=True,
+                       comment="Flag color for flag lists - only set if is_flag_list=1")
     updated_at = Column(DateTime(timezone=True), nullable=True,
                        comment="Last update timestamp")
     
@@ -132,6 +136,8 @@ class WatchList(BaseModel):
             'view_mode': self.view_mode,
             'default_sort_column': self.default_sort_column,
             'default_sort_direction': self.default_sort_direction,
+            'is_flag_list': bool(getattr(self, 'is_flag_list', 0)),
+            'flag_color': getattr(self, 'flag_color', None),
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'updated_at': getattr(self, 'updated_at', None)
         }

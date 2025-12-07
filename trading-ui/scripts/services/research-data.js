@@ -45,7 +45,13 @@
           'Cache-Control': 'no-cache',
         },
         signal: options.signal,
+        credentials: 'include' // Include cookies for session-based auth
       });
+      
+      // Handle 401/308 authentication errors
+      if (window.checkAndHandleAuthError && window.checkAndHandleAuthError(response, endpoint)) {
+        throw new Error('Authentication required');
+      }
 
       if (!response.ok) {
         throw new Error(`Research API unavailable (${response.status})`);

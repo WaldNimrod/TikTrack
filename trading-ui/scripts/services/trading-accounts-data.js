@@ -149,11 +149,18 @@
   }
 
   async function fetchTradingAccountsFromApi({ signal } = {}) {
-    const response = await fetch(buildUrl('/api/trading-accounts/'), {
+    const url = buildUrl('/api/trading-accounts/');
+    const response = await fetch(url, {
       method: 'GET',
       headers: DEFAULT_HEADERS,
       signal,
+      credentials: 'include' // Include cookies for session-based auth
     });
+    
+    // Handle 401/308 authentication errors
+    if (window.checkAndHandleAuthError && window.checkAndHandleAuthError(response, url)) {
+      throw new Error('Authentication required');
+    }
 
     if (!response.ok) {
       const error = new Error(`טעינת חשבונות נכשלה (${response.status})`);
@@ -215,12 +222,19 @@
   async function sendAccountMutation({ accountId, method, body, signal }) {
     const endpoint = accountId ? `/api/trading-accounts/${accountId}` : '/api/trading-accounts';
     try {
-      const response = await fetch(buildUrl(endpoint), {
+      const url = buildUrl(endpoint);
+      const response = await fetch(url, {
         method,
         headers: DEFAULT_HEADERS,
         body: body ? JSON.stringify(body) : undefined,
         signal,
+        credentials: 'include' // Include cookies for session-based auth
       });
+      
+      // Handle 401/308 authentication errors
+      if (window.checkAndHandleAuthError && window.checkAndHandleAuthError(response, url)) {
+        throw new Error('Authentication required');
+      }
 
       // CRITICAL: Do NOT read response.json() here - let CRUDResponseHandler handle it
       // Reading the response body here would consume it, causing CRUDResponseHandler to fail
@@ -251,11 +265,18 @@
   }
 
   async function fetchTradingAccount(accountId, options = {}) {
-    const response = await fetch(buildUrl(`/api/trading-accounts/${accountId}`), {
+    const url = buildUrl(`/api/trading-accounts/${accountId}`);
+    const response = await fetch(url, {
       method: 'GET',
       headers: DEFAULT_HEADERS,
       signal: options.signal,
+      credentials: 'include' // Include cookies for session-based auth
     });
+    
+    // Handle 401/308 authentication errors
+    if (window.checkAndHandleAuthError && window.checkAndHandleAuthError(response, url)) {
+      throw new Error('Authentication required');
+    }
     if (!response.ok) {
       const error = new Error(`טעינת פרטי חשבון מסחר ${accountId} נכשלה (${response.status})`);
       window.Logger?.error?.('❌ Failed to fetch trading account details', {
@@ -293,11 +314,18 @@
       // Use CacheTTLGuard for automatic cache management
       if (window.CacheTTLGuard?.ensure) {
         return await window.CacheTTLGuard.ensure(cacheKey, async () => {
-          const response = await fetch('/api/business/trading-account/validate', {
+          const url = '/api/business/trading-account/validate';
+          const response = await fetch(url, {
             method: 'POST',
             headers: DEFAULT_HEADERS,
-            body: JSON.stringify(accountData)
+            body: JSON.stringify(accountData),
+            credentials: 'include' // Include cookies for session-based auth
           });
+          
+          // Handle 401/308 authentication errors
+          if (window.checkAndHandleAuthError && window.checkAndHandleAuthError(response, url)) {
+            throw new Error('Authentication required');
+          }
 
           if (!response.ok) {
             const errorData = await response.json();
@@ -316,11 +344,18 @@
       }
       
       // Fallback if CacheTTLGuard not available
-      const response = await fetch('/api/business/trading-account/validate', {
+      const url = '/api/business/trading-account/validate';
+      const response = await fetch(url, {
         method: 'POST',
         headers: DEFAULT_HEADERS,
-        body: JSON.stringify(accountData)
+        body: JSON.stringify(accountData),
+        credentials: 'include' // Include cookies for session-based auth
       });
+      
+      // Handle 401/308 authentication errors
+      if (window.checkAndHandleAuthError && window.checkAndHandleAuthError(response, url)) {
+        throw new Error('Authentication required');
+      }
 
       if (!response.ok) {
         const errorData = await response.json();

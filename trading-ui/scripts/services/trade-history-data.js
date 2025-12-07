@@ -15,7 +15,21 @@
  *
  * Related Documentation:
  * - documentation/frontend/GENERAL_SYSTEMS_LIST.md
+ * - documentation/02-ARCHITECTURE/FRONTEND/HISTORICAL_DATA_SERVICES.md
  * - documentation/03-DEVELOPMENT/PLANS/HISTORICAL_PAGES_FULL_IMPLEMENTATION_PLAN.md
+ *
+ * Function Index:
+ * ==============
+ * 
+ * DATA LOADING (4):
+ * - loadTradeHistory(filters, options) - Load trade history with filters
+ * - fetchFreshTradeHistory(filters, options) - Force reload trade history (skip cache)
+ * - loadStatistics(filters, options) - Load trade statistics
+ * - loadAggregated(groupBy, filters, options) - Load aggregated trade history
+ * - loadPlanVsExecution(dateRange, options) - Load plan vs execution analysis
+ * 
+ * CACHE MANAGEMENT (1):
+ * - invalidateCache() - Invalidate all trade history cache
  *
  * @version 1.0.0
  * @created January 2025
@@ -323,4 +337,5 @@
 
   window.Logger?.debug?.('✅ TradeHistoryData service initialized', PAGE_LOG_CONTEXT);
 })();
+
 

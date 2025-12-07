@@ -1044,16 +1044,13 @@
         try {
             const list = watchListsData.find(l => l.id === listId);
             if (list) {
-                if (typeof window.showModalSafe === 'function') {
-                    await window.showModalSafe('watchListModal', 'edit');
-                    // Populate form with data
-                    if (window.ModalManagerV2 && window.ModalManagerV2.populateForm) {
-                        window.ModalManagerV2.populateForm('watchListModal', list);
-                    }
-                } else if (window.ModalManagerV2) {
-                    await window.ModalManagerV2.showModal('watchListModal', 'edit', list);
+                // Use the watch list modal's own open function which properly handles form population
+                if (window.WatchListModal && typeof window.WatchListModal.open === 'function') {
+                    await window.WatchListModal.open('edit', list);
+                } else if (window.openWatchListModal && typeof window.openWatchListModal === 'function') {
+                    await window.openWatchListModal('edit', list);
                 } else {
-                    window.Logger?.warn?.('⚠️ showModalSafe and ModalManagerV2 not available', PAGE_LOG_CONTEXT);
+                    window.Logger?.warn?.('⚠️ WatchListModal.open not available', PAGE_LOG_CONTEXT);
                 }
             }
         } catch (error) {
@@ -1254,6 +1251,30 @@
 
     async function deleteList(listId) {
         try {
+            // Get list name for confirmation message
+            const list = watchListsData.find(l => l.id === listId);
+            const listName = list?.name || `רשימה #${listId}`;
+
+            // Show confirmation dialog
+            const confirmed = await new Promise((resolve) => {
+                if (typeof window.showConfirmationDialog === 'function') {
+                    window.showConfirmationDialog(
+                        'מחיקת רשימת צפייה',
+                        `האם אתה בטוח שברצונך למחוק את הרשימה "${listName}"?\n\nפעולה זו תמחק את הרשימה וכל הפריטים שבה לצמיתות.`,
+                        () => resolve(true),
+                        () => resolve(false),
+                        'danger'
+                    );
+                } else {
+                    resolve(window.confirm(`האם אתה בטוח שברצונך למחוק את הרשימה "${listName}"?`));
+                }
+            });
+
+            if (!confirmed) {
+                window.Logger?.info?.('🗑️ Delete cancelled by user', { ...PAGE_LOG_CONTEXT, listId });
+                return;
+            }
+
             // Check linked items before deletion
             if (typeof window.checkLinkedItemsBeforeAction === 'function') {
                 const hasLinkedItems = await window.checkLinkedItemsBeforeAction('watch_list', listId, 'delete');

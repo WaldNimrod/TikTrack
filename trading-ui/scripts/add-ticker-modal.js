@@ -526,27 +526,41 @@
             if (window.WatchListsDataService?.addTickerToList && currentListId) {
                 const result = await window.WatchListsDataService.addTickerToList(currentListId, formData);
 
-                // Handle response via CRUDResponseHandler
-                if (window.CRUDResponseHandler?.handleResponse) {
-                    await window.CRUDResponseHandler.handleResponse(result, {
-                        entityType: 'watch_list_item',
-                        operation: 'create',
-                        onSuccess: () => {
-                            closeAddTickerModal();
-                            // Refresh parent page
-                            if (window.WatchListsPage?.loadWatchListItems) {
-                                window.WatchListsPage.loadWatchListItems(currentListId);
-                            }
-                            if (window.WatchListsPage?.renderSummaryStats) {
-                                window.WatchListsPage.renderSummaryStats();
-                            }
-                        },
-                        showNotification: true
-                    });
+                // Handle response manually
+                if (result) {
+                    // Show success notification
+                    if (typeof window.showSuccessNotification === 'function') {
+                        window.showSuccessNotification('הצלחה', 'טיקר נוסף לרשימה בהצלחה');
+                    }
+                    
+                    // Close modal first
+                    closeAddTickerModal();
+                    
+                    // Small delay to ensure modal is closed
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    
+                    // Refresh parent page
+                    if (window.WatchListsPage?.loadWatchListItems) {
+                        await window.WatchListsPage.loadWatchListItems(currentListId);
+                    }
+                    if (window.WatchListsPage?.renderSummaryStats) {
+                        window.WatchListsPage.renderSummaryStats();
+                    }
+                } else {
+                    // Error already handled by data service
+                    window.Logger?.warn?.('⚠️ Failed to add ticker to list - result is null', PAGE_LOG_CONTEXT);
                 }
             }
         } catch (error) {
-            window.Logger?.error?.('❌ Error adding ticker to list', { ...PAGE_LOG_CONTEXT, error: error?.message || error });
+            const errorMsg = error?.message || (typeof error === 'string' ? error : 'שגיאה לא ידועה');
+            window.Logger?.error?.('❌ Error adding ticker to list', { ...PAGE_LOG_CONTEXT, error: errorMsg });
+            
+            // Show error notification to user
+            if (typeof window.showErrorNotification === 'function') {
+                window.showErrorNotification('שגיאה', `לא ניתן להוסיף טיקר לרשימה. ${errorMsg}`);
+            } else if (typeof window.showNotification === 'function') {
+                window.showNotification(`לא ניתן להוסיף טיקר לרשימה. ${errorMsg}`, 'error', 'שגיאה', 5000);
+            }
         }
     }
 

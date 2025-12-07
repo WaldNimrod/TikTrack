@@ -486,17 +486,28 @@
      * Close watch list modal
      */
     function closeWatchListModal() {
+        const modal = document.getElementById('watchListModal');
+        if (!modal) {
+            return;
+        }
+
+        // Try ModalManagerV2 first
         if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
             window.ModalManagerV2.hideModal('watchListModal');
         } else if (bootstrap?.Modal) {
-            const modal = document.getElementById('watchListModal');
-            if (modal) {
-                const bsModal = bootstrap.Modal.getInstance(modal);
-                if (bsModal) {
-                    bsModal.hide();
+            // Fallback to Bootstrap modal
+            const bsModal = bootstrap.Modal.getInstance(modal);
+            if (bsModal) {
+                bsModal.hide();
+            } else {
+                // If no instance exists, create one and hide
+                const newModal = bootstrap.Modal.getOrCreateInstance(modal, { backdrop: false });
+                if (newModal) {
+                    newModal.hide();
                 }
             }
         }
+        
         resetForm();
     }
 
@@ -621,11 +632,17 @@
                 await window.CRUDResponseHandler.handleResponse(result, {
                     entityType: 'watch_list',
                     operation: currentMode === 'edit' ? 'update' : 'create',
-                    onSuccess: () => {
+                    modalId: 'watchListModal',
+                    onSuccess: async () => {
+                        // Close modal first
                         closeWatchListModal();
+                        
+                        // Small delay to ensure modal is closed
+                        await new Promise(resolve => setTimeout(resolve, 100));
+                        
                         // Refresh parent page
                         if (window.WatchListsPage?.loadWatchLists) {
-                            window.WatchListsPage.loadWatchLists();
+                            await window.WatchListsPage.loadWatchLists();
                         }
                         if (window.WatchListsPage?.renderSummaryStats) {
                             window.WatchListsPage.renderSummaryStats();
@@ -633,6 +650,15 @@
                     },
                     showNotification: true
                 });
+            } else if (result && result.success) {
+                // Fallback if CRUDResponseHandler is not available
+                closeWatchListModal();
+                if (window.WatchListsPage?.loadWatchLists) {
+                    await window.WatchListsPage.loadWatchLists();
+                }
+                if (window.WatchListsPage?.renderSummaryStats) {
+                    window.WatchListsPage.renderSummaryStats();
+                }
             }
         } catch (error) {
             window.Logger?.error?.('❌ Error saving watch list', { ...PAGE_LOG_CONTEXT, error: error?.message || error });

@@ -2992,7 +2992,8 @@ class ModalManagerV2 {
             'execution': 'executions',
             'ticker': 'tickers',
             'trade_plan': 'trade-plans',
-            'note': 'notes'
+            'note': 'notes',
+            'watch_list': 'watch-lists'
         };
         return pluralMap[entityType] || `${entityType}s`;
     }
@@ -4555,6 +4556,12 @@ class ModalManagerV2 {
                 'related_type_id': 'noteRelatedType',
                 'related_id': 'noteRelatedObject',
                 'attachment': 'noteAttachment' // Map attachment to noteAttachment field
+            },
+            'watch_list': {
+                'name': 'watchListName',
+                'icon': 'watchListIcon',
+                'icon_library': 'watchListIconLibrary',
+                'view_mode': 'watchListViewMode'
             }
         };
         
@@ -6905,6 +6912,30 @@ class ModalManagerV2 {
         
         if (!viewModeInput || !radioButtons.length) {
             return;
+        }
+        
+        // Initialize: if hidden input has a value, update radio buttons to match
+        // Otherwise, use checked radio value or default to 'table'
+        const hiddenInputValue = viewModeInput.value?.trim();
+        if (hiddenInputValue) {
+            // Update radio buttons to match hidden input value
+            radioButtons.forEach(radio => {
+                radio.checked = (radio.value === hiddenInputValue);
+            });
+        } else {
+            // Initialize with checked radio value (if any)
+            const checkedRadio = Array.from(radioButtons).find(radio => radio.checked);
+            if (checkedRadio && checkedRadio.value) {
+                viewModeInput.value = checkedRadio.value;
+            } else {
+                // Default to 'table' if nothing is checked
+                viewModeInput.value = 'table';
+                // Also check the first radio (table) if nothing is checked
+                const firstRadio = radioButtons[0];
+                if (firstRadio && firstRadio.value === 'table') {
+                    firstRadio.checked = true;
+                }
+            }
         }
         
         radioButtons.forEach(radio => {

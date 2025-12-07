@@ -158,7 +158,17 @@
     });
     
     try {
-      const response = await fetch(url, { method: 'GET', headers: DEFAULT_HEADERS, signal });
+      const response = await fetch(url, { 
+        method: 'GET', 
+        headers: DEFAULT_HEADERS, 
+        signal,
+        credentials: 'include' // Include cookies for session-based auth
+      });
+      
+      // Handle 401/308 authentication errors
+      if (window.checkAndHandleAuthError && window.checkAndHandleAuthError(response, url)) {
+        throw new Error('Authentication required');
+      }
       
       window.Logger?.debug?.('📡 API response received', {
         ...PAGE_LOG_CONTEXT,

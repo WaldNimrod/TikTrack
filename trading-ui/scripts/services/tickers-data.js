@@ -180,12 +180,34 @@
     const separator = base.endsWith('/') ? '' : '/';
     // Use /api/tickers/my to get only user's tickers
     const url = `${base}${separator}api/tickers/my?_ts=${Date.now()}`;
-    const response = await fetch(url, { method: 'GET', headers: DEFAULT_HEADERS, signal });
+    const response = await fetch(url, { 
+      method: 'GET', 
+      headers: DEFAULT_HEADERS, 
+      signal,
+      credentials: 'include' // Include cookies for session-based auth
+    });
+    
+    // Handle 401/308 authentication errors
+    if (window.checkAndHandleAuthError && window.checkAndHandleAuthError(response, url)) {
+      throw new Error('Authentication required');
+    }
+    
     if (!response.ok) {
       // Fallback to /api/tickers/ if /my fails
       if (response.status === 401 || response.status === 404) {
         const fallbackUrl = `${base}${separator}api/tickers/?_ts=${Date.now()}`;
-        const fallbackResponse = await fetch(fallbackUrl, { method: 'GET', headers: DEFAULT_HEADERS, signal });
+        const fallbackResponse = await fetch(fallbackUrl, { 
+          method: 'GET', 
+          headers: DEFAULT_HEADERS, 
+          signal,
+          credentials: 'include' // Include cookies for session-based auth
+        });
+        
+        // Handle 401/308 authentication errors on fallback
+        if (window.checkAndHandleAuthError && window.checkAndHandleAuthError(fallbackResponse, fallbackUrl)) {
+          throw new Error('Authentication required');
+        }
+        
         if (!fallbackResponse.ok) {
           const error = new Error(`Ticker load failed (${fallbackResponse.status})`);
           notifyLoadError(error.message, error);

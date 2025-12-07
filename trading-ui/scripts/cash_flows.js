@@ -79,6 +79,13 @@
 
 // ===== קובץ JavaScript לדף תזרימי מזומנים =====
 
+// Export placeholder immediately (required by page-initialization-configs)
+// This ensures the function is available when requiredGlobals are checked
+window.loadCashFlowsData = window.loadCashFlowsData || function() {
+  console.warn('⚠️ loadCashFlowsData called before implementation loaded');
+  return Promise.resolve([]);
+};
+
 /**
  * Load cash flows data from server (via CashFlowsData service)
  * @function loadCashFlowsData
@@ -106,7 +113,42 @@ async function loadCashFlowsData(options = {}) {
         'Cache-Control': 'no-cache',
       },
       signal: loadOptions.signal,
+      credentials: 'include' // Include cookies for session-based auth
     });
+    
+    // Handle 401/308 authentication errors
+    if (response.status === 401 || response.status === 308) {
+      // Clear any stale auth data
+      localStorage.removeItem('currentUser');
+      localStorage.removeItem('authToken');
+      
+      // Show error notification
+      if (window.NotificationSystem) {
+        window.NotificationSystem.showError(
+          'נדרשת התחברות',
+          'עליך להתחבר למערכת כדי לצפות בנתונים. אנא התחבר כדי להמשיך.',
+          'system'
+        );
+      }
+      
+      // Try to show login modal
+      if (typeof window.TikTrackAuth?.showLoginModal === 'function') {
+        window.TikTrackAuth.showLoginModal(() => {
+          window.location.reload();
+        });
+      } else if (typeof window.AuthGuard?.redirectToLogin === 'function') {
+        window.AuthGuard.redirectToLogin();
+      } else {
+        const currentPath = window.location.pathname;
+        const loginPath = currentPath.includes('trading-ui') 
+          ? 'trading-ui/login.html' 
+          : 'login.html';
+        window.location.href = loginPath;
+      }
+      
+      throw new Error('Authentication required');
+    }
+    
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -188,6 +230,9 @@ async function loadCashFlowsData(options = {}) {
     throw error;
   }
 }
+
+// Update window.loadCashFlowsData with actual implementation (placeholder was set at top of file)
+window.loadCashFlowsData = loadCashFlowsData;
 
 /**
  * Fallback sorting by date (newest first) in case the general system is unavailable
@@ -1577,6 +1622,12 @@ async function renderCashFlowsTable() {
     tbody.appendChild(row);
   });
 
+  window.Logger?.info('✅ [renderCashFlowsTable] Rendered rows', {
+    rowsRendered: dataToRender.length,
+    tbodyChildren: tbody.children.length,
+    page: 'cash_flows'
+  });
+
   setupExchangeRowInteractions();
 
   // Render unified forex exchanges table
@@ -1638,6 +1689,8 @@ async function renderCashFlowsTable() {
             }
           }
         });
+      } catch (e) {
+        // Ignore tooltip disposal errors
       }
       
       // Reinitialize tooltips via button system if available
@@ -1653,8 +1706,6 @@ async function renderCashFlowsTable() {
           }
         }, 100);
       }
-    } catch (tooltipError) {
-      window.Logger?.warn('Tooltip cleanup/reinit failed', { error: tooltipError?.message, page: 'cash_flows' });
     }
   }
 
@@ -1739,14 +1790,42 @@ function updatePageSummaryStats() {
  */
 async function syncCashFlowsPagination(cashFlows) {
   const safeCashFlows = Array.isArray(cashFlows) ? cashFlows : [];
+  
+  window.Logger?.info('🔄 [syncCashFlowsPagination] Starting pagination sync', {
+    dataLength: safeCashFlows.length,
+    page: 'cash_flows'
+  });
+
+  // Check if table exists in DOM
+  const tableElement = document.getElementById('cashFlowsTable');
+  if (!tableElement) {
+    window.Logger?.warn('⚠️ [syncCashFlowsPagination] Table element not found in DOM', {
+      tableId: 'cashFlowsTable',
+      page: 'cash_flows'
+    });
+    // Fallback: render directly without pagination
+    await updateCashFlowsTable(safeCashFlows);
+    return;
+  }
 
   if (typeof window.updateTableWithPagination === 'function') {
     try {
+      window.Logger?.debug('🔄 [syncCashFlowsPagination] Calling updateTableWithPagination', {
+        tableId: 'cashFlowsTable',
+        dataLength: safeCashFlows.length,
+        tableExists: !!tableElement,
+        page: 'cash_flows'
+      });
+      
       cashFlowsPaginationInstance = await window.updateTableWithPagination({
         tableId: 'cashFlowsTable',
         tableType: 'cash_flows',
         data: safeCashFlows,
         render: async (pageData, context = {}) => {
+          window.Logger?.info('🎨 [syncCashFlowsPagination] Render callback called', {
+            pageDataLength: Array.isArray(pageData) ? pageData.length : 0,
+            page: 'cash_flows'
+          });
           // Handle both signature formats:
           // 1. Old: ({ pageData, pagination: paginationInfo }) - direct from pagination
           // 2. New: (pageData, { pageInfo, ... }) - from updateTableWithPagination
@@ -1799,10 +1878,21 @@ async function syncCashFlowsPagination(cashFlows) {
           }
         },
       });
+      window.Logger?.info('✅ [syncCashFlowsPagination] Pagination setup completed', {
+        page: 'cash_flows'
+      });
       return;
     } catch (error) {
-      window.Logger?.warn('syncCashFlowsPagination: falling back to direct render', { error, page: 'cash_flows' });
+      window.Logger?.warn('⚠️ [syncCashFlowsPagination] Pagination failed, falling back to direct render', { 
+        error: error?.message || error,
+        stack: error?.stack,
+        page: 'cash_flows' 
+      });
     }
+  } else {
+    window.Logger?.warn('⚠️ [syncCashFlowsPagination] updateTableWithPagination not available', {
+      page: 'cash_flows'
+    });
   }
 
   if (window.setTableData) {
@@ -1810,6 +1900,10 @@ async function syncCashFlowsPagination(cashFlows) {
     window.setFilteredTableData?.('cash_flows', safeCashFlows, { tableId: CASH_FLOWS_TABLE_ID, skipPageReset: true });
   }
 
+  window.Logger?.info('🔄 [syncCashFlowsPagination] Calling updateCashFlowsTable directly', {
+    dataLength: safeCashFlows.length,
+    page: 'cash_flows'
+  });
   await updateCashFlowsTable(safeCashFlows);
 }
 
@@ -2496,6 +2590,14 @@ async function updateCashFlowsTable(cashFlows, options = {}) {
   const { skipDataUpdate = false, skipSummary = false } = options;
   const prepared = ensureExchangePairsAdjacency(Array.isArray(cashFlows) ? [...cashFlows] : []);
 
+  window.Logger?.info('🔄 [updateCashFlowsTable] Called', {
+    cashFlowsLength: Array.isArray(cashFlows) ? cashFlows.length : 0,
+    preparedLength: prepared.length,
+    skipDataUpdate,
+    skipSummary,
+    page: 'cash_flows'
+  });
+
   // עדכון הנתונים הגלובליים רק אם לא מדלגים
   if (!skipDataUpdate) {
     window.cashFlowsData = prepared;
@@ -2507,12 +2609,19 @@ async function updateCashFlowsTable(cashFlows, options = {}) {
   }
 
   // רינדור הטבלה
+  window.Logger?.info('🎨 [updateCashFlowsTable] Calling renderCashFlowsTable', {
+    page: 'cash_flows'
+  });
   await renderCashFlowsTable();
 
   // עדכון סטטיסטיקות רק אם לא מדלגים
   if (!skipSummary) {
     updatePageSummaryStats();
   }
+  
+  window.Logger?.info('✅ [updateCashFlowsTable] Completed', {
+    page: 'cash_flows'
+  });
 }
 
 // הגדרת הפונקציות כגלובליות
@@ -3898,7 +4007,7 @@ window.testDirectChange = function() {
 // Use window.ModalManagerV2.showEditModal('cashFlowModal', 'cash_flow', cashFlowId) directly
 // window.toggleSection removed - using global version from ui-utils.js
 window.editCashFlow = editCashFlow;
-window.loadCashFlowsData = loadCashFlowsData;
+// window.loadCashFlowsData removed - already exported at line 228
 window.updateCashFlowsTable = updateCashFlowsTable;
 window.updateCashFlow = updateCashFlow;
 window.setCurrencyExchangeSummary = setCurrencyExchangeSummary;
@@ -4136,7 +4245,7 @@ function generateDetailedLog() {
 // השתמש במערכת הכללית error-handlers.js
 
 // ===== GLOBAL EXPORTS =====
-window.loadCashFlowsData = loadCashFlowsData;
+// window.loadCashFlowsData removed - already exported at line 228
 window.calculateBalance = calculateBalance;
 window.getAccountNameById = getAccountNameById;
 // REMOVED: window.toggleCashFlowsSection - use window.toggleSection('main') instead

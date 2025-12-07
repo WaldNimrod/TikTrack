@@ -1042,19 +1042,19 @@
      */
     async function openEditListModal(listId) {
         try {
-            const list = watchListsData.find(l => l.id === listId);
-            if (list) {
-                // Use the watch list modal's own open function which properly handles form population
-                if (window.WatchListModal && typeof window.WatchListModal.open === 'function') {
-                    await window.WatchListModal.open('edit', list);
-                } else if (window.openWatchListModal && typeof window.openWatchListModal === 'function') {
-                    await window.openWatchListModal('edit', list);
-                } else {
-                    window.Logger?.warn?.('⚠️ WatchListModal.open not available', PAGE_LOG_CONTEXT);
-                }
+            // Use ModalManagerV2.showEditModal - loads data from API automatically
+            if (window.ModalManagerV2 && typeof window.ModalManagerV2.showEditModal === 'function') {
+                await window.ModalManagerV2.showEditModal('watchListModal', 'watch_list', listId);
+            } else {
+                window.Logger?.warn?.('⚠️ ModalManagerV2.showEditModal not available', PAGE_LOG_CONTEXT);
             }
         } catch (error) {
-            window.Logger?.error?.('❌ Error opening edit list modal', { ...PAGE_LOG_CONTEXT, error });
+            window.Logger?.error?.('❌ Error opening edit list modal', { ...PAGE_LOG_CONTEXT, error: error?.message || error });
+            
+            // Show error notification to user
+            if (typeof window.showErrorNotification === 'function') {
+                window.showErrorNotification('שגיאה', `לא ניתן לפתוח את מודל העריכה. ${error?.message || 'שגיאה לא ידועה'}`);
+            }
         }
     }
 
@@ -1122,84 +1122,66 @@
 
     /**
      * Save watch list
+     * Uses UnifiedCRUDService for consistent CRUD operations
      * @async
      */
     async function saveWatchList() {
         try {
-            if (!window.DataCollectionService) {
-                window.Logger?.warn?.('⚠️ DataCollectionService not available', PAGE_LOG_CONTEXT);
-                return;
-            }
-
-            // Determine mode and listId from ModalManagerV2 or modal element
-            let mode = 'add';
+            // Determine mode and listId from ModalManagerV2
             let listId = null;
-            
+            let isEdit = false;
             if (window.ModalManagerV2 && window.ModalManagerV2.modals) {
                 const modalInfo = window.ModalManagerV2.modals.get('watchListModal');
                 if (modalInfo) {
-                    mode = modalInfo.currentMode || 'add';
-                    if (modalInfo.currentEntityData && modalInfo.currentEntityData.id) {
+                    const mode = modalInfo.currentMode || 'add';
+                    isEdit = mode === 'edit';
+                    if (isEdit && modalInfo.currentEntityData && modalInfo.currentEntityData.id) {
                         listId = modalInfo.currentEntityData.id;
                     }
                 }
             }
-            
-            // Also check modal element for data attributes
-            const modalElement = document.getElementById('watchListModal');
-            if (modalElement) {
-                if (modalElement.dataset.listId) {
-                    listId = parseInt(modalElement.dataset.listId);
-                    mode = 'edit';
-                }
-            }
 
-            // Collect form data
-            const formData = window.DataCollectionService.collectFormData({
-                name: { id: 'watchListName', type: 'text' },
-                icon: { id: 'watchListIcon', type: 'text' },
-                icon_library: { id: 'watchListIconLibrary', type: 'text' },
-                view_mode: { id: 'watchListViewMode', type: 'text' }
-            });
-
-            let result;
-            const operation = mode === 'edit' && listId ? 'update' : 'create';
-            
-            if (operation === 'update' && listId && window.WatchListsDataService?.updateWatchList) {
-                // Update existing list
-                result = await window.WatchListsDataService.updateWatchList(listId, formData);
-            } else if (window.WatchListsDataService?.createWatchList) {
-                // Create new list
-                result = await window.WatchListsDataService.createWatchList(formData);
-            } else {
-                window.Logger?.warn?.('⚠️ WatchListsDataService not available', PAGE_LOG_CONTEXT);
-                return;
-            }
-            
-            // Handle response via CRUDResponseHandler
-            if (result && window.CRUDResponseHandler?.handleResponse) {
-                await window.CRUDResponseHandler.handleResponse(result, {
-                    entityType: 'watch_list',
-                    operation: operation,
-                    onSuccess: async () => {
+            // Use UnifiedCRUDService for consistent CRUD operations
+            if (window.UnifiedCRUDService && typeof window.UnifiedCRUDService.saveEntity === 'function') {
+                const result = await window.UnifiedCRUDService.saveEntity('watch_list', null, {
+                    modalId: 'watchListModal',
+                    successMessage: isEdit ? 'רשימה עודכנה בהצלחה' : 'רשימה נוספה בהצלחה',
+                    entityName: 'רשימה',
+                    reloadFn: async () => {
                         await loadWatchLists();
                         renderSummaryStats();
-                        
                         // If we created a new list, select it automatically
-                        if (operation === 'create' && result && result.id) {
-                            await selectList(result.id);
+                        if (!isEdit && result && result.data && result.data.id) {
+                            await selectList(result.data.id);
                         }
                     },
-                    showNotification: true
+                    requiresHardReload: false,
+                    fieldMap: {
+                        name: { id: 'watchListName', type: 'text' },
+                        icon: { id: 'watchListIcon', type: 'text' },
+                        icon_library: { id: 'watchListIconLibrary', type: 'text' },
+                        view_mode: { id: 'watchListViewMode', type: 'text' }
+                    },
+                    entityId: listId || null,
+                    isEdit: isEdit
                 });
-            }
-
-            // Close modal
-            if (window.ModalManagerV2?.hideModal) {
-                window.ModalManagerV2.hideModal('watchListModal');
+                
+                return result;
+            } else {
+                // Fallback to direct API call (should not happen in production)
+                window.Logger?.warn?.('⚠️ UnifiedCRUDService not available', PAGE_LOG_CONTEXT);
+                if (typeof window.showErrorNotification === 'function') {
+                    window.showErrorNotification('שגיאה', 'מערכת שמירה לא זמינה');
+                }
             }
         } catch (error) {
-            window.Logger?.error?.('❌ Error saving watch list', { ...PAGE_LOG_CONTEXT, error: error?.message || error });
+            const errorMsg = error?.message || (typeof error === 'string' ? error : 'שגיאה לא ידועה');
+            window.Logger?.error?.('❌ Error saving watch list', { ...PAGE_LOG_CONTEXT, error: errorMsg });
+            
+            // Show error notification to user
+            if (typeof window.showErrorNotification === 'function') {
+                window.showErrorNotification('שגיאה', `לא ניתן לשמור את הרשימה. ${errorMsg}`);
+            }
         }
     }
 
@@ -1915,6 +1897,12 @@
     window.setFlag = setFlag;
     window.removeFlag = removeFlag;
     window.setViewMode = setViewMode;
+    
+    // Export saveWatchList for modal save button (if watch-list-modal.js is not loaded)
+    // This ensures the function is available even if watch-list-modal.js hasn't loaded yet
+    if (!window.saveWatchList) {
+        window.saveWatchList = saveWatchList;
+    }
 
     window.Logger?.info?.('✅ WatchListsPage loaded successfully', PAGE_LOG_CONTEXT);
 

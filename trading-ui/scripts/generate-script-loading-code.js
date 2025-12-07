@@ -215,7 +215,19 @@ function generateScriptLoadingCode(pageName, mode = null, useBundles = null) {
   html += '    <!-- ===== PAGE-SPECIFIC SCRIPTS ===== -->\n';
   html += '    <!-- =============================================================== -->\n\n';
   
-  // Add page-specific scripts that are not in packages
+  // First, add the main page-specific script (e.g., cash_flows.js, alerts.js, trades.js)
+  // This is the primary script file for each page
+  const mainPageScript = `${pageName}.js`;
+  // __dirname is trading-ui/scripts, so the script is in the same directory
+  const mainPageScriptPath = path.join(__dirname, mainPageScript);
+  if (fs.existsSync(mainPageScriptPath) && !loadedScripts.has(mainPageScript)) {
+    html += `    <!-- [${scriptCounter}] Page-specific: ${mainPageScript} | Strategy: defer -->\n`;
+    html += `    <script src="scripts/${mainPageScript}?v=1.0.0" defer></script> <!-- Main page script -->\n\n`;
+    loadedScripts.add(mainPageScript);
+    scriptCounter++;
+  }
+  
+  // Add other page-specific scripts that are not in packages
   const pageSpecificScripts = [
     `${pageName}-manager.js`,
     `${pageName}-selector.js`,

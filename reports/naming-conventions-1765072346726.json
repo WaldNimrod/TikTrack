@@ -1,0 +1,162 @@
+{
+  "timestamp": "2025-12-07T01:52:26.711Z",
+  "pages": [
+    {
+      "file": "index.js",
+      "total": 6,
+      "compliant": 4,
+      "violations": [
+        {
+          "type": "class",
+          "name": "from",
+          "rule": "PascalCase",
+          "message": "Class \"from\" should be PascalCase (e.g., MyClass)"
+        },
+        {
+          "type": "class",
+          "name": "to",
+          "rule": "PascalCase",
+          "message": "Class \"to\" should be PascalCase (e.g., MyClass)"
+        }
+      ]
+    },
+    {
+      "file": "trades.js",
+      "total": 4,
+      "compliant": 4,
+      "violations": []
+    },
+    {
+      "file": "executions.js",
+      "total": 5,
+      "compliant": 4,
+      "violations": [
+        {
+          "type": "variable",
+          "name": "FieldRenderer",
+          "rule": "camelCase",
+          "message": "Variable \"FieldRenderer\" should be camelCase (e.g., myVariable)"
+        }
+      ]
+    },
+    {
+      "file": "alerts.js",
+      "total": 4,
+      "compliant": 4,
+      "violations": []
+    },
+    {
+      "file": "trade_plans.js",
+      "total": 4,
+      "compliant": 4,
+      "violations": []
+    },
+    {
+      "file": "cash_flows.js",
+      "total": 4,
+      "compliant": 4,
+      "violations": []
+    },
+    {
+      "file": "notes.js",
+      "total": 6,
+      "compliant": 4,
+      "violations": [
+        {
+          "type": "variable",
+          "name": "related_type_id",
+          "rule": "camelCase",
+          "message": "Variable \"related_type_id\" should be camelCase (e.g., myVariable)"
+        },
+        {
+          "type": "variable",
+          "name": "related_id",
+          "rule": "camelCase",
+          "message": "Variable \"related_id\" should be camelCase (e.g., myVariable)"
+        }
+      ]
+    },
+    {
+      "file": "research.js",
+      "total": 4,
+      "compliant": 4,
+      "violations": []
+    },
+    {
+      "file": "tickers.js",
+      "total": 5,
+      "compliant": 4,
+      "violations": [
+        {
+          "type": "variable",
+          "name": "currency_id",
+          "rule": "camelCase",
+          "message": "Variable \"currency_id\" should be camelCase (e.g., myVariable)"
+        }
+      ]
+    },
+    {
+      "file": "trading_accounts.js",
+      "total": 9,
+      "compliant": 4,
+      "violations": [
+        {
+          "type": "variable",
+          "name": "trading_accounts",
+          "rule": "camelCase",
+          "message": "Variable \"trading_accounts\" should be camelCase (e.g., myVariable)"
+        },
+        {
+          "type": "variable",
+          "name": "trading_accounts",
+          "rule": "camelCase",
+          "message": "Variable \"trading_accounts\" should be camelCase (e.g., myVariable)"
+        },
+        {
+          "type": "variable",
+          "name": "trading_accounts",
+          "rule": "camelCase",
+          "message": "Variable \"trading_accounts\" should be camelCase (e.g., myVariable)"
+        },
+        {
+          "type": "variable",
+          "name": "trading_accounts",
+          "rule": "camelCase",
+          "message": "Variable \"trading_accounts\" should be camelCase (e.g., myVariable)"
+        },
+        {
+          "type": "variable",
+          "name": "trading_accounts",
+          "rule": "camelCase",
+          "message": "Variable \"trading_accounts\" should be camelCase (e.g., myVariable)"
+        }
+      ]
+    },
+    {
+      "file": "database.js",
+      "total": 4,
+      "compliant": 4,
+      "violations": []
+    },
+    {
+      "file": "preferences-page.js",
+      "total": 5,
+      "compliant": 4,
+      "violations": [
+        {
+          "type": "variable",
+          "name": "PreferenceTypesAudit",
+          "rule": "camelCase",
+          "message": "Variable \"PreferenceTypesAudit\" should be camelCase (e.g., myVariable)"
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "total": 60,
+    "compliant": 48,
+    "violations": 12
+  },
+  "generatedAt": "2025-12-07T01:52:26.726Z",
+  "version": "1.0.0"
+}

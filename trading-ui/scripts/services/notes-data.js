@@ -159,7 +159,13 @@
       method: 'GET',
       headers: DEFAULT_HEADERS,
       signal,
+      credentials: 'include' // Include cookies for session-based auth
     });
+    
+    // Handle 401/308 authentication errors
+    if (window.checkAndHandleAuthError && window.checkAndHandleAuthError(response, url.toString())) {
+      throw new Error('Authentication required');
+    }
 
     if (!response.ok) {
       const error = new Error(`טעינת הערות נכשלה (${response.status})`);

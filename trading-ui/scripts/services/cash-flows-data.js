@@ -163,7 +163,41 @@
       method: 'GET',
       headers: DEFAULT_HEADERS,
       signal,
+      credentials: 'include' // Include cookies for session-based auth
     });
+
+    // Handle 401/308 authentication errors
+    if (response.status === 401 || response.status === 308) {
+      // Clear any stale auth data
+      localStorage.removeItem('currentUser');
+      localStorage.removeItem('authToken');
+      
+      // Show error notification
+      if (window.NotificationSystem) {
+        window.NotificationSystem.showError(
+          'נדרשת התחברות',
+          'עליך להתחבר למערכת כדי לצפות בנתונים. אנא התחבר כדי להמשיך.',
+          'system'
+        );
+      }
+      
+      // Try to show login modal
+      if (typeof window.TikTrackAuth?.showLoginModal === 'function') {
+        window.TikTrackAuth.showLoginModal(() => {
+          window.location.reload();
+        });
+      } else if (typeof window.AuthGuard?.redirectToLogin === 'function') {
+        window.AuthGuard.redirectToLogin();
+      } else {
+        const currentPath = window.location.pathname;
+        const loginPath = currentPath.includes('trading-ui') 
+          ? 'trading-ui/login.html' 
+          : 'login.html';
+        window.location.href = loginPath;
+      }
+      
+      throw new Error('Authentication required');
+    }
 
     if (!response.ok) {
       const error = new Error(`טעינת תזרימים נכשלה (${response.status})`);

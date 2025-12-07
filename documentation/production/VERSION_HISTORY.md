@@ -58,3 +58,4 @@ This log records every production version update, including manual major/minor a
 | 2025-11-30T11:41:55+00:00 | 1.3.14.4 | 1.3.14.3 | 0d9d22ce8ecd73c37e9cbe203c044c0820ef6cea | 32f799344a83e17d01be48d4cbb32eb643d91e7d | build | Final fix: sm-section-server improvements |
 | 2025-11-30T11:42:07+00:00 | 1.3.14.5 | 1.3.14.4 | f7825f199ba48d4215a9ed4235d38ea11a13dc08 | 0d9d22ce8ecd73c37e9cbe203c044c0820ef6cea | build | Final sm-section-server fix |
 | 2025-12-01T11:22:31+00:00 | 1.3.15.0 | 1.3.14.5 | 2035548a024bcd7abd1e565ff671d5b0d6e8466e | f7825f199ba48d4215a9ed4235d38ea11a13dc08 | patch | Add security audit reports for user data isolation and page protection |
+| 2025-12-07T00:15:34+00:00 | 1.3.16.0 | 1.3.15.0 | 467a64e97d608953959fb2a60892f2f35feae662 | 2035548a024bcd7abd1e565ff671d5b0d6e8466e | patch | Production update: Fix AIAnalysisBusinessService and middleware, server running on port 5001 |

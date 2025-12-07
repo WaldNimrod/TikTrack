@@ -1,13 +1,13 @@
 {
   "production": {
-    "version": "1.3.15.0",
+    "version": "1.3.16.0",
     "major": 1,
     "minor": 3,
-    "patch": 15,
+    "patch": 16,
     "build": 0,
-    "commit": "2035548a024bcd7abd1e565ff671d5b0d6e8466e",
-    "updated_at": "2025-12-01T11:22:31+00:00",
-    "notes": "Add security audit reports for user data isolation and page protection"
+    "commit": "467a64e97d608953959fb2a60892f2f35feae662",
+    "updated_at": "2025-12-07T00:15:34+00:00",
+    "notes": "Production update: Fix AIAnalysisBusinessService and middleware, server running on port 5001"
   },
   "development": {
     "version": "1.3.46.0",

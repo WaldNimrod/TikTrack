@@ -63,17 +63,7 @@ def get_ticker_quote(ticker_id):
                 fetched_at_utc = quote.fetched_at
             
             quote_age = (now - fetched_at_utc).total_seconds() / 60  # minutes
-            
-            if quote_age > 1440:  # 24 hours = 1440 minutes
-                return jsonify({
-                    'status': 'error',
-                    'message': f'Quote data for {ticker.symbol} is too old ({quote_age:.1f} minutes old)',
-                    'error_code': 'STALE_QUOTE_DATA',
-                    'ticker_symbol': ticker.symbol,
-                    'quote_age_minutes': round(quote_age, 1),
-                    'last_fetched': quote.fetched_at.isoformat(),
-                    'suggestion': 'Data needs to be refreshed from external provider'
-                }), 410  # Gone (stale data)
+            is_stale_data = quote_age > 1440  # 24 hours = 1440 minutes
             
             # Build response with real data
             quote_data = {
@@ -88,12 +78,20 @@ def get_ticker_quote(ticker_id):
                 'provider': quote.provider.name if quote.provider else 'unknown',
                 'asof_utc': quote.asof_utc.isoformat() if quote.asof_utc else None,
                 'fetched_at': quote.fetched_at.isoformat(),
-                'is_stale': quote.is_stale,
+                'is_stale': is_stale_data or quote.is_stale,  # Mark as stale if older than 24 hours
                 'quality_score': quote.quality_score,
                 # Technical indicators
                 'atr': quote.atr,
                 'atr_period': quote.atr_period or 14
             }
+            
+            # Add warning if data is stale
+            if is_stale_data:
+                quote_data['stale_warning'] = {
+                    'message': f'Quote data for {ticker.symbol} is older than 24 hours ({quote_age:.1f} minutes old)',
+                    'quote_age_minutes': round(quote_age, 1),
+                    'suggestion': 'Data should be refreshed from external provider'
+                }
             
             # Add timezone info if user_id provided
             if user_id:
@@ -188,18 +186,7 @@ def get_batch_quotes():
                         fetched_at_utc = quote.fetched_at
                     
                     quote_age = (now - fetched_at_utc).total_seconds() / 60  # minutes
-                    
-                    if quote_age > 1440:  # 24 hours = 1440 minutes
-                        errors.append({
-                            'ticker_id': ticker_id,
-                            'symbol': ticker.symbol,
-                            'error': f'Quote data is too old ({quote_age:.1f} minutes old)',
-                            'error_code': 'STALE_QUOTE_DATA',
-                            'quote_age_minutes': round(quote_age, 1),
-                            'last_fetched': quote.fetched_at.isoformat(),
-                            'suggestion': 'Data needs to be refreshed from external provider'
-                        })
-                        continue
+                    is_stale_data = quote_age > 1440  # 24 hours = 1440 minutes
                     
                     # Build response with real data
                     quote_data = {
@@ -214,12 +201,20 @@ def get_batch_quotes():
                         'provider': quote.provider.name if quote.provider else 'unknown',
                         'asof_utc': quote.asof_utc.isoformat() if quote.asof_utc else None,
                         'fetched_at': quote.fetched_at.isoformat(),
-                        'is_stale': quote.is_stale,
+                        'is_stale': is_stale_data or quote.is_stale,  # Mark as stale if older than 24 hours
                         'quality_score': quote.quality_score,
                         # Technical indicators
                         'atr': quote.atr,
                         'atr_period': quote.atr_period or 14
                     }
+                    
+                    # Add warning if data is stale
+                    if is_stale_data:
+                        quote_data['stale_warning'] = {
+                            'message': f'Quote data for {ticker.symbol} is older than 24 hours ({quote_age:.1f} minutes old)',
+                            'quote_age_minutes': round(quote_age, 1),
+                            'suggestion': 'Data should be refreshed from external provider'
+                        }
                     
                     # Add timezone info if user_id provided
                     if user_id:

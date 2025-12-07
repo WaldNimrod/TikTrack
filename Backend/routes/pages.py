@@ -70,6 +70,11 @@ def research() -> Any:
     """Research page"""
     return send_from_directory(UI_DIR, "research.html")
 
+@pages_bp.route('/strategy-analysis')
+def strategy_analysis() -> Any:
+    """Strategy Analysis page"""
+    return send_from_directory(UI_DIR, "strategy-analysis.html")
+
 
 
 @pages_bp.route('/cash_flows')

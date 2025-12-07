@@ -21,6 +21,7 @@ from flask import Blueprint, jsonify, request, g
 from sqlalchemy.orm import Session
 from config.database import get_db
 from services.ticker_service import TickerService
+from services.trade_service import TradeService
 from services.advanced_cache_service import cache_for, invalidate_cache
 from services.tag_service import TagService
 from services.date_normalization_service import DateNormalizationService
@@ -343,6 +344,37 @@ def get_tickers_with_initial_data():
             "error": {"message": f"Failed to retrieve tickers with initial data: {str(e)}"},
             "version": "1.0"
         }), 500
+
+@tickers_bp.route('/with-trade-counts', methods=['GET'])
+@handle_database_session()
+def get_tickers_with_trade_counts():
+    """
+    Get all tickers with the count of associated trades.
+    
+    Returns:
+        JSON response with a list of tickers, each including a 'trade_count' field.
+    """
+    db: Session = g.db
+    user_id = _resolve_user_id()
+    normalizer = _get_tickers_normalizer()
+
+    try:
+        # Get all tickers (TickerService.get_all doesn't take user_id)
+        tickers = TickerService.get_all(db)
+        tickers_with_counts = []
+        for ticker in tickers:
+            ticker_dict = ticker.to_dict()
+            # Filter by user_id if ticker has user_id field, or get trade count for user
+            trade_count = TradeService.get_trade_count_for_ticker(db, ticker.id, user_id)
+            ticker_dict['trade_count'] = trade_count
+            tickers_with_counts.append(ticker_dict)
+        
+        payload = BaseEntityUtils.create_success_payload(normalizer, data=tickers_with_counts)
+        return jsonify(payload), 200
+    except Exception as e:
+        logger.error(f"Error getting tickers with trade counts: {str(e)}", exc_info=True)
+        error_payload = BaseEntityUtils.create_error_payload(normalizer, f"Error retrieving tickers with trade counts: {str(e)}")
+        return jsonify(error_payload), 500
 
 @tickers_bp.route('/<int:ticker_id>', methods=['GET'])
 @handle_database_session()

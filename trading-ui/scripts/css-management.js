@@ -1916,7 +1916,7 @@ async function createNewCssFileFromModal() {
 /**
  * יצירת קובץ CSS חדש
  */
-function createNewCssFile() {
+async function createNewCssFile() {
     await showAddCssFileModal();
 }
 

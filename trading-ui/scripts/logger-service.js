@@ -124,7 +124,9 @@ class Logger {
         'tickers': 'business',
         'trade-plans': 'business',
         'cash-flows': 'business',
-        'notes': 'business'
+        'notes': 'business',
+        'trade-history': 'business',
+        'trade-history-page': 'business'
     };
 
     registerPreferenceListeners() {

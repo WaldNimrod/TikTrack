@@ -114,13 +114,14 @@
 
 /* ===== Flag Palette Popup ===== */
 .flag-palette-popup {
-    position: absolute;
+    position: fixed; /* Changed from absolute to fixed for better positioning */
     background: white;
     border: 1px solid var(--border-color, #dee2e6);
     border-radius: 8px;
     padding: 1rem;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     z-index: 1050;
+    display: none; /* Hidden by default, shown via JavaScript */
 }
 
 .flag-palette-header {

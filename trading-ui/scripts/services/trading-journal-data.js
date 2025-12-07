@@ -82,11 +82,20 @@
       params.append('end_date', dateRange.end_date);
       if (filters.entity_type) params.append('entity_type', filters.entity_type);
       if (filters.entity_id) params.append('entity_id', filters.entity_id);
+      if (filters.ticker_symbol) params.append('ticker_symbol', filters.ticker_symbol);
       
       const base = location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
       const url = `${base}/api/trading-journal/entries?${params.toString()}`;
       
-      const response = await fetch(url);
+      const response = await fetch(url, {
+        credentials: 'include' // Include cookies for session-based auth
+      });
+      
+      // Handle 401/308 authentication errors
+      if (window.checkAndHandleAuthError && window.checkAndHandleAuthError(response, url)) {
+        throw new Error('Authentication required');
+      }
+      
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -150,7 +159,15 @@
       const base = location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
       const url = `${base}/api/trading-journal/statistics?${params.toString()}`;
       
-      const response = await fetch(url);
+      const response = await fetch(url, {
+        credentials: 'include' // Include cookies for session-based auth
+      });
+      
+      // Handle 401/308 authentication errors
+      if (window.checkAndHandleAuthError && window.checkAndHandleAuthError(response, url)) {
+        throw new Error('Authentication required');
+      }
+      
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -210,7 +227,15 @@
       const base = location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
       const url = `${base}/api/trading-journal/calendar?${params.toString()}`;
       
-      const response = await fetch(url);
+      const response = await fetch(url, {
+        credentials: 'include' // Include cookies for session-based auth
+      });
+      
+      // Handle 401/308 authentication errors
+      if (window.checkAndHandleAuthError && window.checkAndHandleAuthError(response, url)) {
+        throw new Error('Authentication required');
+      }
+      
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -272,7 +297,15 @@
       const base = location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
       const url = `${base}/api/trading-journal/by-entity?${params.toString()}`;
       
-      const response = await fetch(url);
+      const response = await fetch(url, {
+        credentials: 'include' // Include cookies for session-based auth
+      });
+      
+      // Handle 401/308 authentication errors
+      if (window.checkAndHandleAuthError && window.checkAndHandleAuthError(response, url)) {
+        throw new Error('Authentication required');
+      }
+      
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }

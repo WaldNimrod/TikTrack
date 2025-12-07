@@ -197,6 +197,20 @@
         };
 
         // Register active list table
+        // Register watch_lists table for sorting
+        window.UnifiedTableSystem.registry.register('watch_lists', {
+            dataGetter: () => watchListsData || [],
+            updateFunction: async (data) => {
+                watchListsData = Array.isArray(data) ? data : [];
+                renderWatchListsGrid();
+            },
+            tableSelector: '#watchListsTable',
+            columns: getColumns('watch_lists'),
+            sortable: true,
+            filterable: true,
+            defaultSort: { columnIndex: 0, direction: 'asc', key: 'display_order' }
+        });
+
         window.UnifiedTableSystem.registry.register('watch_list_items', {
             dataGetter: () => activeListItems || [],
             updateFunction: async (data) => {
@@ -394,21 +408,22 @@
                         waitedMs: waited
                     });
                     activeListItems = await enrichWatchListItemsWithTickerData(activeListItems);
-                window.Logger?.info?.('✅ [MONITOR] Enrichment completed', {
-                    ...PAGE_LOG_CONTEXT,
-                    enrichedCount: activeListItems?.length || 0,
-                    firstItemHasTicker: !!activeListItems?.[0]?.ticker,
-                    firstItemTickerPrice: activeListItems?.[0]?.ticker?.current_price,
-                    firstItemTickerSymbol: activeListItems?.[0]?.ticker?.symbol,
-                    firstItemTickerKeys: activeListItems?.[0]?.ticker ? Object.keys(activeListItems[0].ticker).slice(0, 20) : []
-                });
-            } else {
-                window.Logger?.warn?.('⚠️ [MONITOR] Skipping enrichment', {
-                    ...PAGE_LOG_CONTEXT,
-                    itemsCount: activeListItems.length,
-                    entityDetailsAPIAvailable: !!window.entityDetailsAPI,
-                    getEntityDetailsAvailable: !!window.entityDetailsAPI?.getEntityDetails
-                });
+                    window.Logger?.info?.('✅ [MONITOR] Enrichment completed', {
+                        ...PAGE_LOG_CONTEXT,
+                        enrichedCount: activeListItems?.length || 0,
+                        firstItemHasTicker: !!activeListItems?.[0]?.ticker,
+                        firstItemTickerPrice: activeListItems?.[0]?.ticker?.current_price,
+                        firstItemTickerSymbol: activeListItems?.[0]?.ticker?.symbol,
+                        firstItemTickerKeys: activeListItems?.[0]?.ticker ? Object.keys(activeListItems[0].ticker).slice(0, 20) : []
+                    });
+                } else {
+                    window.Logger?.warn?.('⚠️ [MONITOR] Skipping enrichment', {
+                        ...PAGE_LOG_CONTEXT,
+                        itemsCount: activeListItems.length,
+                        entityDetailsAPIAvailable: !!window.entityDetailsAPI,
+                        getEntityDetailsAvailable: !!window.entityDetailsAPI?.getEntityDetails
+                    });
+                }
             }
             
             // Ensure we have data before rendering
@@ -502,6 +517,10 @@
         const enrichedItems = await Promise.all(
             items.map(async (item, index) => {
                 try {
+                    // Preserve flag data before enrichment
+                    const flagColor = item.flag_color;
+                    const flagEntityType = item.flag_entity_type;
+                    
                     // Get ticker ID (either from item.ticker_id or item.ticker.id)
                     const tickerId = item.ticker_id || item.ticker?.id;
                     if (!tickerId) {
@@ -510,6 +529,9 @@
                             itemId: item.id,
                             index: `${index + 1}/${items.length}`
                         });
+                        // Ensure flag data is preserved
+                        item.flag_color = flagColor;
+                        item.flag_entity_type = flagEntityType;
                         return item;
                     }
 
@@ -575,6 +597,10 @@
                             ...tickerData
                         };
                         
+                        // CRITICAL: Preserve flag data after enrichment
+                        item.flag_color = flagColor;
+                        item.flag_entity_type = flagEntityType;
+                        
                         window.Logger?.info?.('✅ [MONITOR] Enriched item with ticker data', {
                             ...PAGE_LOG_CONTEXT,
                             itemId: item.id,
@@ -590,7 +616,9 @@
                             positionQuantity: tickerData.position?.quantity,
                             hasPL: tickerData.profit_loss !== null && tickerData.profit_loss !== undefined,
                             pl: tickerData.profit_loss,
-                            allKeys: Object.keys(tickerData).slice(0, 30)
+                            allKeys: Object.keys(tickerData).slice(0, 30),
+                            flag_color: item.flag_color,
+                            flag_entity_type: item.flag_entity_type
                         });
                     } else {
                         window.Logger?.warn?.('⚠️ [MONITOR] No ticker data returned from entityDetailsAPI', {
@@ -598,11 +626,15 @@
                             itemId: item.id,
                             tickerId
                         });
+                        // Ensure flag data is preserved even if no ticker data
+                        item.flag_color = flagColor;
+                        item.flag_entity_type = flagEntityType;
                     }
 
                     return item;
                 } catch (error) {
-                    // If enrichment fails, return original item
+                    // If enrichment fails, return original item but preserve flag data
+                    // Note: flagColor and flagEntityType are captured at the start of the try block
                     window.Logger?.error?.('❌ [MONITOR] Failed to enrich item with ticker data', {
                         ...PAGE_LOG_CONTEXT,
                         itemId: item.id,
@@ -610,6 +642,9 @@
                         error: error?.message || error,
                         stack: error?.stack
                     });
+                    // Ensure flag data is preserved (already captured at start of try block)
+                    item.flag_color = flagColor;
+                    item.flag_entity_type = flagEntityType;
                     return item;
                 }
             })
@@ -681,11 +716,27 @@
             }
             tr.appendChild(tdIcon);
 
-            // Name column
+            // Name column - for flag lists, show only color, not entity name
             const tdName = document.createElement('td');
             tdName.className = 'col-name';
             const strong = document.createElement('strong');
-            strong.textContent = list.name || `רשימה #${list.id}`;
+            if (list.is_flag_list && list.flag_color) {
+                // Flag list - show only color indicator, not entity name
+                const colorIndicator = document.createElement('span');
+                colorIndicator.className = 'flag-color-indicator';
+                colorIndicator.style.width = '20px';
+                colorIndicator.style.height = '20px';
+                colorIndicator.style.backgroundColor = list.flag_color;
+                colorIndicator.style.borderRadius = '3px';
+                colorIndicator.style.display = 'inline-block';
+                colorIndicator.style.marginInlineEnd = '0.5rem';
+                colorIndicator.style.verticalAlign = 'middle';
+                colorIndicator.title = `דגל ${list.flag_color}`;
+                strong.appendChild(colorIndicator);
+                // Don't show entity name for flag lists
+            } else {
+                strong.textContent = list.name || `רשימה #${list.id}`;
+            }
             tdName.appendChild(strong);
             tr.appendChild(tdName);
 
@@ -751,15 +802,17 @@
             btnEdit.title = 'ערוך רשימה';
             actionsDiv.appendChild(btnEdit);
 
-            // Delete button
-            const btnDelete = document.createElement('button');
-            btnDelete.type = 'button';
-            btnDelete.setAttribute('data-button-type', 'DELETE');
-            btnDelete.setAttribute('data-variant', 'small');
-            btnDelete.setAttribute('data-text', '');
-            btnDelete.setAttribute('data-onclick', `window.WatchListsPage?.deleteList(${list.id})`);
-            btnDelete.title = 'מחק רשימה';
-            actionsDiv.appendChild(btnDelete);
+            // Delete button - hide for flag lists
+            if (!list.is_flag_list) {
+                const btnDelete = document.createElement('button');
+                btnDelete.type = 'button';
+                btnDelete.setAttribute('data-button-type', 'DELETE');
+                btnDelete.setAttribute('data-variant', 'small');
+                btnDelete.setAttribute('data-text', '');
+                btnDelete.setAttribute('data-onclick', `window.WatchListsPage?.deleteList(${list.id})`);
+                btnDelete.title = 'מחק רשימה';
+                actionsDiv.appendChild(btnDelete);
+            }
 
             tdActions.appendChild(actionsDiv);
             tr.appendChild(tdActions);
@@ -880,7 +933,9 @@
                 itemId: item.id,
                 tickerId: item.ticker_id,
                 hasTicker: !!item.ticker,
-                tickerKeys: item.ticker ? Object.keys(item.ticker).slice(0, 20) : []
+                tickerKeys: item.ticker ? Object.keys(item.ticker).slice(0, 20) : [],
+                flag_color: item.flag_color,
+                flag_entity_type: item.flag_entity_type
             });
 
             const tr = document.createElement('tr');
@@ -915,22 +970,155 @@
             const flagBtn = document.createElement('button');
             flagBtn.type = 'button';
             flagBtn.className = 'btn btn-sm btn-flag';
-            if (item.flag_color) {
-                flagBtn.setAttribute('data-flag-color', item.flag_color);
-                flagBtn.style.color = item.flag_color; // Set flag color
+            
+            // CRITICAL: Flag color comes from API (determined by which flag list ticker is in)
+            const flagColor = item.flag_color;
+            if (flagColor) {
+                flagBtn.setAttribute('data-flag-color', flagColor);
+                // Set color on button and icon - use !important to override any CSS
+                flagBtn.style.setProperty('color', flagColor, 'important');
+                flagBtn.style.setProperty('border-color', flagColor, 'important');
+                flagBtn.style.setProperty('border-width', '2px', 'important');
+                flagBtn.style.setProperty('border-style', 'solid', 'important');
+                flagBtn.style.setProperty('background-color', 'transparent', 'important');
+                flagBtn.style.setProperty('opacity', '1', 'important'); // Full opacity for items with flag
+            } else {
+                // No flag - show thin gray border with 0.5 opacity
+                flagBtn.style.setProperty('border-color', '#6c757d', 'important'); // Gray
+                flagBtn.style.setProperty('border-width', '1px', 'important');
+                flagBtn.style.setProperty('border-style', 'solid', 'important');
+                flagBtn.style.setProperty('background-color', 'transparent', 'important');
+                flagBtn.style.setProperty('color', '#6c757d', 'important'); // Gray icon
+                flagBtn.style.setProperty('opacity', '0.5', 'important'); // 0.5 opacity for items without flag
             }
             flagBtn.setAttribute('data-onclick', `window.WatchListsPage?.showFlagPalette(${item.id})`);
             flagBtn.title = 'שינוי דגל';
+            // Add direct event listener as backup
+            flagBtn.addEventListener('click', (e) => {
+                e.stopPropagation(); // Prevent row click
+                if (window.WatchListsPage?.showFlagPalette) {
+                    window.WatchListsPage.showFlagPalette(item.id);
+                } else if (window.showFlagPalette) {
+                    window.showFlagPalette(item.id);
+                } else {
+                    window.Logger?.warn?.('⚠️ showFlagPalette not available', { ...PAGE_LOG_CONTEXT, itemId: item.id });
+                }
+            });
             const flagIcon = document.createElement('span');
             flagIcon.className = 'icon-placeholder icon';
-            flagIcon.setAttribute('data-icon', item.flag_color ? 'flag-filled' : 'flag');
+            flagIcon.setAttribute('data-icon', flagColor ? 'flag-filled' : 'flag');
             flagIcon.setAttribute('data-size', '16');
             flagIcon.setAttribute('data-alt', 'flag');
             flagIcon.setAttribute('aria-label', 'flag');
-            if (item.flag_color) {
-                flagIcon.style.color = item.flag_color; // Set icon color
+            if (flagColor) {
+                // Set color on icon - use !important to override any CSS
+                flagIcon.style.setProperty('color', flagColor, 'important');
+                flagIcon.style.setProperty('fill', flagColor, 'important');
+                flagIcon.style.setProperty('stroke', flagColor, 'important');
+                // Also set as data attribute for icon system
+                flagIcon.setAttribute('data-color', flagColor);
+                // Set CSS variable for SVG icons
+                flagIcon.style.setProperty('--icon-color', flagColor, 'important');
+            } else {
+                // No flag - gray icon
+                flagIcon.style.setProperty('color', '#6c757d', 'important'); // Gray
+                flagIcon.style.setProperty('fill', '#6c757d', 'important');
+                flagIcon.style.setProperty('stroke', '#6c757d', 'important');
             }
             flagBtn.appendChild(flagIcon);
+            
+            // CRITICAL: Replace icon placeholder with actual SVG icon immediately
+            const iconColor = flagColor || '#6c757d'; // Use flag color or gray for no flag
+            const iconName = flagColor ? 'flag-filled' : 'flag';
+            
+            // Try to render icon immediately if IconSystem is available
+            if (window.IconSystem && window.IconSystem.initialized && window.IconSystem.renderIcon) {
+                window.IconSystem.renderIcon('button', iconName, {
+                    size: '16',
+                    alt: 'flag',
+                    class: 'icon',
+                    style: `color: ${iconColor} !important; fill: ${iconColor} !important; stroke: ${iconColor} !important;`
+                }).then(iconHTML => {
+                    if (iconHTML && flagIcon.parentNode) {
+                        // Create temporary container to parse HTML
+                        const temp = document.createElement('div');
+                        temp.innerHTML = iconHTML;
+                        const newIcon = temp.firstElementChild;
+                        if (newIcon) {
+                            // Apply color to SVG
+                            if (newIcon.tagName === 'svg') {
+                                // Set SVG attributes for currentColor support
+                                newIcon.setAttribute('fill', 'none');
+                                newIcon.setAttribute('stroke', 'currentColor');
+                                newIcon.style.setProperty('color', iconColor, 'important');
+                                newIcon.style.setProperty('fill', 'none', 'important');
+                                newIcon.style.setProperty('stroke', iconColor, 'important');
+                                // Also set on all paths and other elements inside SVG
+                                const paths = newIcon.querySelectorAll('path, circle, rect, line, polyline, polygon');
+                                paths.forEach(path => {
+                                    // Remove any existing fill/stroke attributes that might override
+                                    path.removeAttribute('fill');
+                                    path.removeAttribute('stroke');
+                                    // Set style properties
+                                    path.style.setProperty('fill', 'none', 'important');
+                                    path.style.setProperty('stroke', iconColor, 'important');
+                                    path.style.setProperty('color', iconColor, 'important');
+                                });
+                            } else if (newIcon.tagName === 'IMG') {
+                                // For img tags, use CSS filter to change color
+                                newIcon.style.setProperty('filter', `brightness(0) saturate(100%) invert(${iconColor === '#6c757d' ? '50%' : '0%'}) sepia(100%) saturate(10000%) hue-rotate(${iconColor === '#26baac' ? '160deg' : '0deg'})`, 'important');
+                            }
+                            // Replace placeholder with rendered icon
+                            flagIcon.replaceWith(newIcon);
+                        }
+                    }
+                }).catch(error => {
+                    window.Logger?.warn?.('⚠️ Failed to render flag icon', { ...PAGE_LOG_CONTEXT, error: error?.message || error });
+                });
+            }
+            
+            // Also use MutationObserver as backup to catch when icon is replaced by IconSystem
+            if (window.MutationObserver) {
+                const observer = new MutationObserver((mutations) => {
+                    mutations.forEach((mutation) => {
+                        mutation.addedNodes.forEach((node) => {
+                            if (node.nodeType === 1) { // Element node
+                                // Check if it's an SVG or contains SVG
+                                const svg = node.tagName === 'svg' ? node : node.querySelector('svg');
+                                if (svg) {
+                                    // Set SVG attributes for currentColor support
+                                    svg.setAttribute('fill', 'none');
+                                    svg.setAttribute('stroke', 'currentColor');
+                                    svg.style.setProperty('color', iconColor, 'important');
+                                    svg.style.setProperty('fill', 'none', 'important');
+                                    svg.style.setProperty('stroke', iconColor, 'important');
+                                    // Also set on all paths and other elements inside SVG
+                                    const paths = svg.querySelectorAll('path, circle, rect, line, polyline, polygon');
+                                    paths.forEach(path => {
+                                        // Remove any existing fill/stroke attributes that might override
+                                        path.removeAttribute('fill');
+                                        path.removeAttribute('stroke');
+                                        // Set style properties
+                                        path.style.setProperty('fill', 'none', 'important');
+                                        path.style.setProperty('stroke', iconColor, 'important');
+                                        path.style.setProperty('color', iconColor, 'important');
+                                    });
+                                }
+                            }
+                        });
+                    });
+                });
+                observer.observe(flagIcon.parentNode, { childList: true, subtree: true });
+                // Stop observing after 3 seconds
+                setTimeout(() => observer.disconnect(), 3000);
+            }
+            
+            // Log for debugging
+            if (flagColor) {
+                window.Logger?.debug?.('✅ Flag color set', { ...PAGE_LOG_CONTEXT, itemId: item.id, flagColor });
+            } else {
+                window.Logger?.debug?.('⚠️ No flag color', { ...PAGE_LOG_CONTEXT, itemId: item.id, hasFlagColor: !!item.flag_color });
+            }
             tdFlag.appendChild(flagBtn);
             tr.appendChild(tdFlag);
 
@@ -987,10 +1175,23 @@
             }
             tr.appendChild(tdPrice);
 
+            // Get change percent first (needed for fallback calculation)
+            const changePercent = ticker.change_percent ?? ticker.change_percentage ?? null;
+
             // Change column - using FieldRendererService
+            // Try multiple field names: daily_change, change_amount, change_amount_day, change
             const tdChange = document.createElement('td');
-            const change = ticker.change ?? ticker.change_amount ?? null;
-            if (change !== null && change !== undefined && !isNaN(parseFloat(change)) && window.FieldRendererService?.renderAmount) {
+            let change = ticker.daily_change ?? ticker.change_amount ?? ticker.change_amount_day ?? ticker.change ?? null;
+            
+            // If change is null but we have change_percent and price, calculate it
+            if ((change === null || change === undefined || isNaN(parseFloat(change))) && 
+                price !== null && price !== undefined && !isNaN(parseFloat(price)) &&
+                changePercent !== null && changePercent !== undefined && !isNaN(parseFloat(changePercent))) {
+                // Calculate: change = price * (changePercent / 100)
+                change = parseFloat(price) * (parseFloat(changePercent) / 100);
+            }
+            
+            if (change !== null && change !== undefined && !isNaN(parseFloat(change)) && Number.isFinite(parseFloat(change)) && window.FieldRendererService?.renderAmount) {
                 tdChange.innerHTML = window.FieldRendererService.renderAmount(parseFloat(change), currencySymbol, 2, true);
             } else {
                 tdChange.textContent = '-';
@@ -1000,7 +1201,6 @@
 
             // Change % column - using FieldRendererService
             const tdChangePercent = document.createElement('td');
-            const changePercent = ticker.change_percent ?? ticker.change_percentage ?? null;
             if (changePercent !== null && changePercent !== undefined && !isNaN(parseFloat(changePercent)) && window.FieldRendererService?.renderNumericValue) {
                 tdChangePercent.innerHTML = window.FieldRendererService.renderNumericValue(parseFloat(changePercent), '%', true);
             } else {
@@ -1076,6 +1276,29 @@
             }
             tr.appendChild(tdPosition);
 
+            // Value Change column - calculate change in value (change * quantity or price * quantity * change_percent / 100)
+            const tdValueChange = document.createElement('td');
+            tdValueChange.className = 'col-value-change';
+            let valueChange = null;
+            const positionQty = position && position.quantity !== undefined && position.quantity !== null ? parseFloat(position.quantity) : null;
+            if (positionQty !== null && positionQty !== 0) {
+                const qtyAbs = Math.abs(positionQty);
+                // Try to calculate from change amount first
+                if (change !== null && change !== undefined && !isNaN(parseFloat(change))) {
+                    valueChange = parseFloat(change) * qtyAbs;
+                } else if (changePercent !== null && changePercent !== undefined && !isNaN(parseFloat(changePercent)) && price !== null && price !== undefined && !isNaN(parseFloat(price))) {
+                    // Calculate from change percent: valueChange = price * quantity * (changePercent / 100)
+                    valueChange = parseFloat(price) * qtyAbs * (parseFloat(changePercent) / 100);
+                }
+            }
+            if (valueChange !== null && valueChange !== undefined && !isNaN(valueChange) && window.FieldRendererService?.renderAmount) {
+                tdValueChange.innerHTML = window.FieldRendererService.renderAmount(valueChange, currencySymbol, 2, true);
+            } else {
+                tdValueChange.textContent = '-';
+                tdValueChange.className = 'text-muted';
+            }
+            tr.appendChild(tdValueChange);
+
             // P/L column - using FieldRendererService
             const tdPL = document.createElement('td');
             const pl = ticker.profit_loss ?? ticker.pl ?? null;
@@ -1124,10 +1347,152 @@
         if (window.ButtonSystemInit?.processButtons) {
             setTimeout(() => {
                 window.ButtonSystemInit.processButtons(tbody);
+                // Also process icons with flag colors after they're rendered
+                setTimeout(async () => {
+                    // First, replace all icon placeholders with actual icons
+                    const placeholders = tbody.querySelectorAll('.btn-flag .icon-placeholder');
+                    for (const placeholder of placeholders) {
+                        const btn = placeholder.closest('.btn-flag');
+                        const color = placeholder.getAttribute('data-color') || btn?.getAttribute('data-flag-color') || '#6c757d';
+                        const iconName = btn?.getAttribute('data-flag-color') ? 'flag-filled' : 'flag';
+                        
+                        if (window.IconSystem && window.IconSystem.initialized && window.IconSystem.renderIcon) {
+                            try {
+                                const iconHTML = await window.IconSystem.renderIcon('button', iconName, {
+                                    size: '16',
+                                    alt: 'flag',
+                                    class: 'icon',
+                                    style: `color: ${color} !important; fill: none !important; stroke: ${color} !important;`
+                                });
+                                if (iconHTML && placeholder.parentNode) {
+                                    const temp = document.createElement('div');
+                                    temp.innerHTML = iconHTML;
+                                    const newIcon = temp.firstElementChild;
+                                    if (newIcon) {
+                                        // Apply color to SVG
+                                        if (newIcon.tagName === 'svg') {
+                                            newIcon.setAttribute('fill', 'none');
+                                            newIcon.setAttribute('stroke', 'currentColor');
+                                            newIcon.style.setProperty('color', color, 'important');
+                                            newIcon.style.setProperty('fill', 'none', 'important');
+                                            newIcon.style.setProperty('stroke', color, 'important');
+                                            const paths = newIcon.querySelectorAll('path, circle, rect, line, polyline, polygon');
+                                            paths.forEach(path => {
+                                                path.removeAttribute('fill');
+                                                path.removeAttribute('stroke');
+                                                path.style.setProperty('fill', 'none', 'important');
+                                                path.style.setProperty('stroke', color, 'important');
+                                                path.style.setProperty('color', color, 'important');
+                                            });
+                                        }
+                                        placeholder.replaceWith(newIcon);
+                                    }
+                                }
+                            } catch (error) {
+                                window.Logger?.warn?.('⚠️ Failed to render flag icon', { ...PAGE_LOG_CONTEXT, error: error?.message || error });
+                            }
+                        }
+                    }
+                    
+                    // Then apply color to all existing SVG icons
+                    const flagIcons = tbody.querySelectorAll('.btn-flag svg');
+                    flagIcons.forEach(icon => {
+                        const btn = icon.closest('.btn-flag');
+                        const color = btn?.getAttribute('data-flag-color') || '#6c757d';
+                        // Set SVG attributes for currentColor support
+                        icon.setAttribute('fill', 'none');
+                        icon.setAttribute('stroke', 'currentColor');
+                        icon.style.setProperty('color', color, 'important');
+                        icon.style.setProperty('fill', 'none', 'important');
+                        icon.style.setProperty('stroke', color, 'important');
+                        // Also set on all paths and other elements inside SVG
+                        const paths = icon.querySelectorAll('path, circle, rect, line, polyline, polygon');
+                        paths.forEach(path => {
+                            // Remove any existing fill/stroke attributes that might override
+                            path.removeAttribute('fill');
+                            path.removeAttribute('stroke');
+                            // Set style properties
+                            path.style.setProperty('fill', 'none', 'important');
+                            path.style.setProperty('stroke', color, 'important');
+                            path.style.setProperty('color', color, 'important');
+                        });
+                    });
+                }, 200);
             }, 100);
         } else if (window.ButtonSystemInit?.initializeButtons) {
             setTimeout(() => {
-            window.ButtonSystemInit.initializeButtons(tbody);
+                window.ButtonSystemInit.initializeButtons(tbody);
+                // Also process icons with flag colors after they're rendered
+                setTimeout(async () => {
+                    // First, replace all icon placeholders with actual icons
+                    const placeholders = tbody.querySelectorAll('.btn-flag .icon-placeholder');
+                    for (const placeholder of placeholders) {
+                        const btn = placeholder.closest('.btn-flag');
+                        const color = placeholder.getAttribute('data-color') || btn?.getAttribute('data-flag-color') || '#6c757d';
+                        const iconName = btn?.getAttribute('data-flag-color') ? 'flag-filled' : 'flag';
+                        
+                        if (window.IconSystem && window.IconSystem.initialized && window.IconSystem.renderIcon) {
+                            try {
+                                const iconHTML = await window.IconSystem.renderIcon('button', iconName, {
+                                    size: '16',
+                                    alt: 'flag',
+                                    class: 'icon',
+                                    style: `color: ${color} !important; fill: none !important; stroke: ${color} !important;`
+                                });
+                                if (iconHTML && placeholder.parentNode) {
+                                    const temp = document.createElement('div');
+                                    temp.innerHTML = iconHTML;
+                                    const newIcon = temp.firstElementChild;
+                                    if (newIcon) {
+                                        // Apply color to SVG
+                                        if (newIcon.tagName === 'svg') {
+                                            newIcon.setAttribute('fill', 'none');
+                                            newIcon.setAttribute('stroke', 'currentColor');
+                                            newIcon.style.setProperty('color', color, 'important');
+                                            newIcon.style.setProperty('fill', 'none', 'important');
+                                            newIcon.style.setProperty('stroke', color, 'important');
+                                            const paths = newIcon.querySelectorAll('path, circle, rect, line, polyline, polygon');
+                                            paths.forEach(path => {
+                                                path.removeAttribute('fill');
+                                                path.removeAttribute('stroke');
+                                                path.style.setProperty('fill', 'none', 'important');
+                                                path.style.setProperty('stroke', color, 'important');
+                                                path.style.setProperty('color', color, 'important');
+                                            });
+                                        }
+                                        placeholder.replaceWith(newIcon);
+                                    }
+                                }
+                            } catch (error) {
+                                window.Logger?.warn?.('⚠️ Failed to render flag icon', { ...PAGE_LOG_CONTEXT, error: error?.message || error });
+                            }
+                        }
+                    }
+                    
+                    // Then apply color to all existing SVG icons
+                    const flagIcons = tbody.querySelectorAll('.btn-flag svg');
+                    flagIcons.forEach(icon => {
+                        const btn = icon.closest('.btn-flag');
+                        const color = btn?.getAttribute('data-flag-color') || '#6c757d';
+                        // Set SVG attributes for currentColor support
+                        icon.setAttribute('fill', 'none');
+                        icon.setAttribute('stroke', 'currentColor');
+                        icon.style.setProperty('color', color, 'important');
+                        icon.style.setProperty('fill', 'none', 'important');
+                        icon.style.setProperty('stroke', color, 'important');
+                        // Also set on all paths and other elements inside SVG
+                        const paths = icon.querySelectorAll('path, circle, rect, line, polyline, polygon');
+                        paths.forEach(path => {
+                            // Remove any existing fill/stroke attributes that might override
+                            path.removeAttribute('fill');
+                            path.removeAttribute('stroke');
+                            // Set style properties
+                            path.style.setProperty('fill', 'none', 'important');
+                            path.style.setProperty('stroke', color, 'important');
+                            path.style.setProperty('color', color, 'important');
+                        });
+                    });
+                }, 200);
             }, 100);
         }
 
@@ -1331,7 +1696,19 @@
      * Show flag palette
      * @param {number} itemId - Item ID
      */
-    function showFlagPalette(itemId) {
+    async function showFlagPalette(itemId) {
+        // Wait a bit for FlagQuickAction to load if not immediately available
+        // This handles the case where flag-quick-action.js is still loading (defer)
+        if (typeof window.FlagQuickAction === 'undefined') {
+            // Wait up to 1 second for FlagQuickAction to load
+            for (let i = 0; i < 10; i++) {
+                await new Promise(resolve => setTimeout(resolve, 100));
+                if (window.FlagQuickAction?.show) {
+                    break;
+                }
+            }
+        }
+        
         // Use flag-quick-action.js if available (preferred)
         if (window.FlagQuickAction?.show) {
             // Find flag button in any view mode (table, cards, compact)
@@ -1344,10 +1721,18 @@
                 // Fallback: show without element positioning
                 window.FlagQuickAction.show(itemId);
             }
-        } else if (window.WatchListsUIService?.showFlagPalette) {
+            return;
+        }
+        
+        // Fallback to UI Service implementation
+        if (window.WatchListsUIService?.showFlagPalette) {
             window.WatchListsUIService.showFlagPalette(itemId);
         } else {
             window.Logger?.warn?.('⚠️ Flag palette system not available', { ...PAGE_LOG_CONTEXT, itemId });
+            // Last resort: show error notification
+            if (window.NotificationSystem?.showError) {
+                window.NotificationSystem.showError('שגיאה', 'מערכת בחירת דגלים לא זמינה. אנא רענן את הדף.');
+            }
         }
     }
 
@@ -1377,10 +1762,16 @@
             }
 
             // Use UI Service if available (preferred - centralized logic)
+            // UI Service will handle the update, cache invalidation, and reload
             if (window.WatchListsUIService?.setFlag) {
                 await window.WatchListsUIService.setFlag(itemId, color);
-            } else if (window.WatchListsDataService?.updateWatchListItem) {
-                // Fallback: Use Data Service directly
+                // UI Service already reloads items, but we ensure summary stats are updated
+                renderSummaryStats();
+                return;
+            }
+            
+            // Fallback: Use Data Service directly
+            if (window.WatchListsDataService?.updateWatchListItem) {
                 await window.WatchListsDataService.updateWatchListItem(activeListId, itemId, { flag_color: color });
             } else {
                 // Last resort: Direct API call
@@ -1401,7 +1792,7 @@
                 await window.CacheSyncManager.invalidateByAction('watch-list-updated');
             }
 
-            // Reload items to ensure sync
+            // CRITICAL: Reload items to ensure UI shows saved data from backend
             await loadWatchListItems(activeListId);
             
             // Sync flag list if flag was set/removed
@@ -1444,22 +1835,59 @@
             }
 
             // Use UI Service if available (preferred - centralized logic)
+            // UI Service will handle the update, cache invalidation, and reload
             if (window.WatchListsUIService?.removeFlag) {
                 await window.WatchListsUIService.removeFlag(itemId);
-            } else if (window.WatchListsDataService?.updateWatchListItem) {
-                // Fallback: Use Data Service directly
+                // UI Service already reloads items, but we ensure summary stats are updated
+                renderSummaryStats();
+                return;
+            }
+            
+            // Fallback: Use Data Service directly
+            if (window.WatchListsDataService?.updateWatchListItem) {
                 await window.WatchListsDataService.updateWatchListItem(activeListId, itemId, { flag_color: null });
             } else {
-                window.Logger?.warn?.('⚠️ No flag removal method available', PAGE_LOG_CONTEXT);
+                // Last resort: Direct API call
+                const response = await fetch(`/api/watch-lists/${activeListId}/items/${itemId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ flag_color: null })
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.error?.message || `Failed to remove flag: ${response.status}`);
+                }
             }
 
-            // Reload items to ensure sync
+            // Invalidate cache
+            if (window.CacheSyncManager?.invalidateByAction) {
+                await window.CacheSyncManager.invalidateByAction('watch-list-updated');
+            }
+
+            // CRITICAL: Reload items to ensure UI shows saved data from backend
             await loadWatchListItems(activeListId);
+            
+            // Sync flag lists
+            if (window.WatchListsDataService?.syncFlagLists) {
+                try {
+                    await window.WatchListsDataService.syncFlagLists();
+                } catch (error) {
+                    window.Logger?.warn?.('⚠️ Error syncing flag lists after flag removal', {
+                        ...PAGE_LOG_CONTEXT,
+                        error: error?.message
+                    });
+                }
+            }
+            
             renderSummaryStats();
 
             window.Logger?.info?.('✅ Flag removed', { ...PAGE_LOG_CONTEXT, itemId });
         } catch (error) {
             window.Logger?.error?.('❌ Error removing flag', { ...PAGE_LOG_CONTEXT, itemId, error: error?.message || error });
+            if (window.NotificationSystem?.showError) {
+                window.NotificationSystem.showError('שגיאה', `לא ניתן להסיר את הדגל: ${error?.message || 'שגיאה לא ידועה'}`);
+            }
         }
     }
 
@@ -1671,6 +2099,16 @@
 
     async function deleteList(listId) {
         try {
+            // Prevent deletion of flag lists
+            const list = watchListsData?.find(l => l.id === listId);
+            if (list && list.is_flag_list) {
+                window.Logger?.warn?.('⚠️ Cannot delete flag list', { ...PAGE_LOG_CONTEXT, listId });
+                if (window.NotificationSystem?.showError) {
+                    window.NotificationSystem.showError('שגיאה', 'לא ניתן למחוק רשימת דגל. רשימות דגל נוצרות ומנוהלות אוטומטית על ידי המערכת.');
+                }
+                return false;
+            }
+
             // Use UnifiedCRUDService for consistent CRUD operations
             // UnifiedCRUDService handles confirmation and linked items checking via entityDetailsAPI
             if (window.UnifiedCRUDService && typeof window.UnifiedCRUDService.deleteEntity === 'function') {
@@ -2025,6 +2463,17 @@
             }
             flagBtn.setAttribute('data-onclick', `window.WatchListsPage?.showFlagPalette(${item.id})`);
             flagBtn.title = 'שינוי דגל';
+            // Add direct event listener as backup
+            flagBtn.addEventListener('click', (e) => {
+                e.stopPropagation(); // Prevent card click
+                if (window.WatchListsPage?.showFlagPalette) {
+                    window.WatchListsPage.showFlagPalette(item.id);
+                } else if (window.showFlagPalette) {
+                    window.showFlagPalette(item.id);
+                } else {
+                    window.Logger?.warn?.('⚠️ showFlagPalette not available', { ...PAGE_LOG_CONTEXT, itemId: item.id });
+                }
+            });
             const flagIcon = document.createElement('span');
             flagIcon.className = 'icon-placeholder icon';
             flagIcon.setAttribute('data-icon', item.flag_color ? 'flag-filled' : 'flag');
@@ -2147,6 +2596,17 @@
             }
             flagBtn.setAttribute('data-onclick', `window.WatchListsPage?.showFlagPalette(${item.id})`);
             flagBtn.title = 'שינוי דגל';
+            // Add direct event listener as backup
+            flagBtn.addEventListener('click', (e) => {
+                e.stopPropagation(); // Prevent row click
+                if (window.WatchListsPage?.showFlagPalette) {
+                    window.WatchListsPage.showFlagPalette(item.id);
+                } else if (window.showFlagPalette) {
+                    window.showFlagPalette(item.id);
+                } else {
+                    window.Logger?.warn?.('⚠️ showFlagPalette not available', { ...PAGE_LOG_CONTEXT, itemId: item.id });
+                }
+            });
             const flagIcon = document.createElement('span');
             flagIcon.className = 'icon-placeholder icon';
             flagIcon.setAttribute('data-icon', item.flag_color ? 'flag-filled' : 'flag');

@@ -83,7 +83,8 @@ async function loadCategoriesOverview() {
     ];
 
     let html = '<div class="row">';
-    categories.forEach(category => {
+    // Use for...of loop to support async/await
+    for (const category of categories) {
       // Calculate category statistics from actual notification history
       let categoryCount = 0;
       if (window.notificationsCenter && window.notificationsCenter.history) {
@@ -158,7 +159,7 @@ async function loadCategoriesOverview() {
           </div>
         </div>
       `;
-    });
+    }
     html += '</div>';
 
     // Insert using DOMParser
@@ -380,7 +381,7 @@ class NotificationsCenter {
   }
 
 
-  addNotification(type, title, message, time = 'now') {
+  async addNotification(type, title, message, time = 'now') {
     // Auto-detect category if not provided
     let category = 'general';
     if (typeof window.detectNotificationCategory === 'function') {

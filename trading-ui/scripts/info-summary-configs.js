@@ -369,36 +369,13 @@ const INFO_SUMMARY_CONFIGS = {
   'portfolio-state-page': {
     containerId: 'portfolio-state-summary',
     tableType: 'portfolio-trades',
+    // Note: Summary cards are rendered separately via updateSummaryCards()
+    // This config is for trades-summary element only
     stats: [
       {
-        id: 'total_cash_balance',
-        label: 'יתרות מזומן',
-        calculator: 'custom',
-        customCalculator: (data) => {
-          // Calculate from trades (mock data - should come from snapshot)
-          const accounts = {};
-          let total = 0;
-          data.forEach(trade => {
-            const accountId = trade.trading_account_id;
-            if (!accounts[accountId]) {
-              accounts[accountId] = true;
-              total += 20000; // Mock balance per account
-            }
-          });
-          return total;
-        },
-        formatter: 'currencyWithColor'
-      },
-      {
-        id: 'total_portfolio_value',
-        label: 'שווי תיק',
-        calculator: 'custom',
-        customCalculator: (data) => {
-          const cashBalance = 20000 * (new Set(data.map(t => t.trading_account_id)).size);
-          const unrealizedPL = data.reduce((sum, t) => sum + (t.position_pl_value || 0), 0);
-          return cashBalance + unrealizedPL;
-        },
-        formatter: 'currencyWithColor'
+        id: 'total_trades',
+        label: 'סה"כ טריידים',
+        calculator: 'count'
       },
       {
         id: 'total_pl',
@@ -406,18 +383,6 @@ const INFO_SUMMARY_CONFIGS = {
         calculator: 'sumField',
         params: { field: 'position_pl_value' },
         formatter: 'currencyWithColor'
-      },
-      {
-        id: 'total_unrealized_pl',
-        label: 'P/L לא ממומש',
-        calculator: 'sumField',
-        params: { field: 'position_pl_value' },
-        formatter: 'currencyWithColor'
-      },
-      {
-        id: 'open_positions_count',
-        label: 'פוזיציות פתוחות',
-        calculator: 'count'
       }
     ]
   },
@@ -667,6 +632,39 @@ const INFO_SUMMARY_CONFIGS = {
         label: 'עם הערה',
         calculator: 'countByAvailability',
         params: { type: 'note' }
+      }
+    ]
+  },
+
+  // Strategy Analysis page configuration
+  'strategy-analysis': {
+    containerId: 'summaryStats',
+    tableType: 'strategy-list',
+    stats: [
+      {
+        id: 'totalStrategies',
+        label: 'סה"כ אסטרטגיות',
+        calculator: 'count'
+      },
+      {
+        id: 'totalTrades',
+        label: 'סה"כ טריידים',
+        calculator: 'sumField',
+        params: { field: 'trades' }
+      },
+      {
+        id: 'totalPL',
+        label: 'P/L כולל',
+        calculator: 'sumField',
+        params: { field: 'totalPL' },
+        formatter: 'currencyWithColor'
+      },
+      {
+        id: 'avgSuccessRate',
+        label: 'אחוז הצלחה ממוצע',
+        calculator: 'averageField',
+        params: { field: 'successRate' },
+        formatter: 'percentage'
       }
     ]
   }

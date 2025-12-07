@@ -113,10 +113,22 @@ class AIAnalysisBusinessService(BaseBusinessService):
         
         # Validate template_id exists and is active
         template_id = data.get('template_id')
+        # Ensure template_id is an integer (not a dict)
+        # Handle case where entire data dict was passed as template_id (bug in cache or API)
+        if isinstance(template_id, dict):
+            # If template_id is a dict, extract the actual template_id from it
+            original_template_id = template_id
+            template_id = template_id.get('template_id')
+            self.logger.warning(f"template_id was a dict: {original_template_id}, extracted: {template_id}")
+        
         if template_id:
-            template_validation = self.validate_template_exists(template_id)
-            if not template_validation['is_valid']:
-                errors.extend(template_validation['errors'])
+            try:
+                template_id = int(template_id)
+                template_validation = self.validate_template_exists(template_id)
+                if not template_validation['is_valid']:
+                    errors.extend(template_validation['errors'])
+            except (ValueError, TypeError) as e:
+                errors.append(f"Invalid template_id: must be an integer, got {type(template_id).__name__}: {str(e)}")
         
         # Validate provider
         provider = data.get('provider')

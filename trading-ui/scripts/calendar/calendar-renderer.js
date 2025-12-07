@@ -31,7 +31,9 @@
          */
         static async render(year, month, dayData = {}, calendarGrid = null) {
             if (!calendarGrid) {
-                calendarGrid = document.querySelector('.calendar-grid');
+                calendarGrid = document.querySelector('.calendar-grid') || 
+                           document.getElementById('calendar') || 
+                           document.querySelector('.calendar');
             }
 
             if (!calendarGrid) {
@@ -108,6 +110,20 @@
         static async _renderDayCell(year, month, day, dayData, isCurrentMonth) {
             const dayCell = document.createElement('div');
             dayCell.className = 'calendar-day-cell';
+            
+            // Add data attributes for day identification
+            dayCell.setAttribute('data-year', year);
+            dayCell.setAttribute('data-month', month);
+            dayCell.setAttribute('data-day', day);
+            
+            // Add click handler for zoom to day
+            dayCell.style.cursor = 'pointer';
+            dayCell.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (window.tradingJournalPage && typeof window.tradingJournalPage.zoomToDay === 'function') {
+                    window.tradingJournalPage.zoomToDay(day, month, year);
+                }
+            });
 
             // Check if this is today
             const isToday = window.CalendarDateUtils?.isToday(year, month, day) || false;

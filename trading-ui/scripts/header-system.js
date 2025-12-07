@@ -1216,6 +1216,7 @@ class HeaderSystem {
                       </a>
                       <ul class="tiktrack-dropdown-menu">
                         <li><a class="tiktrack-dropdown-item" href="/ai-analysis">אנליזת AI</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/strategy-analysis">📊 ניתוח אסטרטגיות</a></li>
                         <li class="separator"></li>
                         <li><a class="tiktrack-dropdown-item" href="/trade-history">📈 היסטוריית טרייד</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/portfolio-state">💼 מצב תיק היסטורי</a></li>

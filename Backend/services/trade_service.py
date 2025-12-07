@@ -79,6 +79,14 @@ class TradeService:
         return query.all()
     
     @staticmethod
+    def get_trade_count_for_ticker(db: Session, ticker_id: int, user_id: Optional[int] = None) -> int:
+        """Get the count of trades for a specific ticker and user."""
+        query = db.query(Trade).filter(Trade.ticker_id == ticker_id)
+        if user_id is not None:
+            query = query.filter(Trade.user_id == user_id)
+        return query.count()
+    
+    @staticmethod
     def get_open_trades(db: Session, user_id: Optional[int] = None) -> List[Trade]:
         """Get open trades (filtered by user_id if provided)"""
         query = db.query(Trade).filter(Trade.status == 'open')

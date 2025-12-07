@@ -28,6 +28,10 @@ except ImportError:
 
 BASE_URL = "http://localhost:8080"
 
+# Test credentials (admin) - CRITICAL: Always use admin/admin123 for tests
+TEST_USERNAME = "admin"
+TEST_PASSWORD = "admin123"
+
 # Rate limiting configuration
 # Server limits: 5000 requests/minute = ~83 requests/second
 # Additional limit in app.py: 10 requests/second
@@ -101,8 +105,10 @@ ALL_PAGES = [
     
     # עמודי מחקר (Research Pages) - משולבים
     {"name": "היסטוריית טרייד", "url": "/mockups/daily-snapshots/trade-history-page.html", "category": "main", "priority": "high"},
-    {"name": "מצב תיק היסטורי", "url": "/mockups/daily-snapshots/portfolio-state-page.html", "category": "main", "priority": "high"},
-    {"name": "יומן מסחר", "url": "/mockups/daily-snapshots/trading-journal-page.html", "category": "main", "priority": "high"},
+    {"name": "מצב תיק היסטורי", "url": "/portfolio-state.html", "category": "main", "priority": "high"},
+    {"name": "יומן מסחר", "url": "/trading-journal.html", "category": "main", "priority": "high"},
+    {"name": "ניתוח אסטרטגיות", "url": "/strategy-analysis", "category": "main", "priority": "high"},
+    {"name": "יומן מסחר (מוקאפ)", "url": "/mockups/daily-snapshots/trading-journal-page.html", "category": "main", "priority": "low"},
     {"name": "מודל רשימת צפייה", "url": "/mockups/watch-list-modal.html", "category": "watchlists", "priority": "medium"},
     {"name": "מודל הוספת טיקר", "url": "/mockups/add-ticker-modal.html", "category": "watchlists", "priority": "medium"},
     {"name": "פעולה מהירה דגלים", "url": "/mockups/flag-quick-action.html", "category": "watchlists", "priority": "medium"},
@@ -208,6 +214,84 @@ def setup_driver():
         print("💡 Make sure Chrome browser is installed")
         return None
 
+def login(driver):
+    """Login to the system as admin (CRITICAL: Always use admin/admin123 for tests)"""
+    try:
+        print("🔐 Logging in as admin...")
+        driver.get(f"{BASE_URL}/login.html")
+        time.sleep(3)
+        
+        # Wait for login form to be available
+        try:
+            WebDriverWait(driver, 10).until(
+                EC.presence_of_element_located((By.ID, "loginContainer"))
+            )
+            WebDriverWait(driver, 10).until(
+                EC.presence_of_element_located((By.ID, "loginForm"))
+            )
+            time.sleep(1)
+        except TimeoutException:
+            # Try alternative selectors
+            try:
+                WebDriverWait(driver, 5).until(
+                    EC.presence_of_element_located((By.ID, "username"))
+                )
+            except TimeoutException:
+                print("⚠️  Login form not found, assuming already logged in")
+                return True
+        
+        # Find and fill login form
+        username_field = WebDriverWait(driver, 10).until(
+            EC.element_to_be_clickable((By.ID, "username"))
+        )
+        password_field = driver.find_element(By.ID, "password")
+        
+        # Scroll to element if needed
+        driver.execute_script("arguments[0].scrollIntoView(true);", username_field)
+        time.sleep(0.5)
+        
+        username_field.clear()
+        username_field.send_keys(TEST_USERNAME)
+        time.sleep(0.5)
+        
+        password_field.clear()
+        password_field.send_keys(TEST_PASSWORD)
+        time.sleep(0.5)
+        
+        # Try to find and click login button
+        try:
+            login_button = WebDriverWait(driver, 10).until(
+                EC.element_to_be_clickable((By.CSS_SELECTOR, "button[type='submit'], button.btn-primary, #loginBtn, #loginButton"))
+            )
+            driver.execute_script("arguments[0].scrollIntoView(true);", login_button)
+            time.sleep(0.5)
+            driver.execute_script("arguments[0].click();", login_button)
+        except TimeoutException:
+            # Try alternative: submit form directly
+            password_field.send_keys(Keys.RETURN)
+        
+        # Wait for redirect or check if we're logged in
+        time.sleep(5)
+        
+        # Check if we're on a different page (logged in)
+        current_url = driver.current_url
+        if "login" not in current_url.lower():
+            print("✅ Login successful")
+            return True
+        
+        # Check localStorage for session
+        session_check = driver.execute_script("return localStorage.getItem('session_token') || sessionStorage.getItem('session_token');")
+        if session_check:
+            print("✅ Login successful (session found)")
+            return True
+        
+        print("⚠️  Login status unclear, continuing anyway")
+        return True
+    except Exception as e:
+        print(f"⚠️  Login warning: {e}")
+        # Continue anyway - might already be logged in
+        return True
+
 def test_page_console(driver, page_info, retry_count: int = 0):
     """Test a single page for console errors with rate limiting and retry logic"""
     url = BASE_URL + page_info["url"]
@@ -270,9 +354,11 @@ def test_page_console(driver, page_info, retry_count: int = 0):
             if 'favicon' in message.lower() or 'chrome-extension' in message.lower():
                 continue
             
-            # Filter out expected auth errors (401) - these are normal when not logged in
+            # Filter out expected auth errors (401) - but we should be logged in as admin
+            # Only filter /api/auth/me errors as they might be transient
             if '401 (UNAUTHORIZED)' in message and '/api/auth/me' in message:
                 continue
+            # Other 401 errors should be reported as we're logged in
             
             # Filter out network errors for missing optional resources
             if 'Failed to load resource' in message:
@@ -444,6 +530,10 @@ def main():
     if not driver:
         print("❌ Failed to setup WebDriver. Exiting.")
         return
+    
+    # Login as admin before testing pages (CRITICAL: Always use admin/admin123)
+    login(driver)
+    time.sleep(2)  # Wait for login to complete
     
     results = []
     

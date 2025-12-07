@@ -69,6 +69,7 @@ def get_journal_entries():
         end_date_str = request.args.get('end_date')
         entity_type = request.args.get('entity_type', 'all')
         entity_id = request.args.get('entity_id', type=int)
+        ticker_symbol = request.args.get('ticker_symbol')
         
         if not start_date_str or not end_date_str:
             error_payload = BaseEntityUtils.create_error_payload(
@@ -128,6 +129,14 @@ def get_journal_entries():
                 entry for entry in result['entries']
                 if entry.get('entity_id') == entity_id
             ]
+        
+        # Filter by ticker_symbol if provided
+        if ticker_symbol and result.get('entries'):
+            result['entries'] = [
+                entry for entry in result['entries']
+                if entry.get('ticker_symbol') == ticker_symbol
+            ]
+            result['count'] = len(result['entries'])
             result['count'] = len(result['entries'])
         
         payload = BaseEntityUtils.create_success_payload(
@@ -482,6 +491,98 @@ def get_journal_by_entity():
         error_payload = BaseEntityUtils.create_error_payload(
             normalizer,
             f"Error retrieving journal by entity: {str(e)}"
+        )
+        return jsonify(error_payload), 500
+
+
+@trading_journal_bp.route('/activity-stats', methods=['GET'])
+@handle_database_session()
+@cache_with_deps(ttl=180, dependencies=['notes', 'trades', 'executions'])
+def get_activity_stats():
+    """
+    Get activity statistics for a date range.
+    
+    Query Parameters:
+        start_date (required): Start date (ISO format)
+        end_date (required): End date (ISO format)
+        view_mode (optional): 'daily' or 'weekly' (default: 'daily')
+        entity_type (optional): Entity type filter ('trade', 'execution', 'note', 'all', default: 'all')
+        ticker_symbol (optional): Ticker symbol filter
+    
+    Returns:
+        JSON response with activity statistics
+    """
+    normalizer = None
+    try:
+        db: Session = g.db
+        
+        user_id = getattr(g, 'user_id', None)
+        if not user_id:
+            error_payload = BaseEntityUtils.create_error_payload(
+                None,
+                "User authentication required"
+            )
+            return jsonify(error_payload), 401
+        
+        normalizer = BaseEntityUtils.get_request_normalizer(request)
+        
+        # Parse query parameters
+        start_date_str = request.args.get('start_date')
+        end_date_str = request.args.get('end_date')
+        view_mode = request.args.get('view_mode', 'daily')
+        entity_type = request.args.get('entity_type', 'all')
+        ticker_symbol = request.args.get('ticker_symbol')
+        
+        if not start_date_str or not end_date_str:
+            error_payload = BaseEntityUtils.create_error_payload(
+                normalizer,
+                "start_date and end_date are required"
+            )
+            return jsonify(error_payload), 400
+        
+        # Normalize dates
+        start_date = normalizer.normalize_input_payload(start_date_str)
+        if isinstance(start_date, str):
+            start_date = datetime.fromisoformat(start_date.replace('Z', '+00:00'))
+        if start_date.tzinfo is None:
+            start_date = start_date.replace(tzinfo=timezone.utc)
+        
+        end_date = normalizer.normalize_input_payload(end_date_str)
+        if isinstance(end_date, str):
+            end_date = datetime.fromisoformat(end_date.replace('Z', '+00:00'))
+        if end_date.tzinfo is None:
+            end_date = end_date.replace(tzinfo=timezone.utc)
+        
+        # Validate view_mode
+        if view_mode not in ['daily', 'weekly']:
+            view_mode = 'daily'
+        
+        service = HistoricalDataBusinessService(db_session=db)
+        
+        # Get activity statistics
+        result = service.calculate_activity_stats(
+            user_id=user_id,
+            date_range={
+                'start_date': start_date,
+                'end_date': end_date
+            },
+            view_mode=view_mode,
+            entity_type=entity_type if entity_type != 'all' else None,
+            ticker_symbol=ticker_symbol
+        )
+        
+        payload = BaseEntityUtils.create_success_payload(
+            normalizer,
+            data=result
+        )
+        
+        return jsonify(payload), 200
+        
+    except Exception as e:
+        logger.error(f"Error in get_activity_stats: {str(e)}", exc_info=True)
+        error_payload = BaseEntityUtils.create_error_payload(
+            normalizer,
+            f"Error retrieving activity stats: {str(e)}"
         )
         return jsonify(error_payload), 500
 

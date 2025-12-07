@@ -140,6 +140,7 @@ def get_trades():
     
     # Get filtering parameters
     trading_account_id = request.args.get('trading_account_id', type=int)
+    ticker_id = request.args.get('ticker_id', type=int)
     status = request.args.get('status')
     
     # Pagination parameters
@@ -151,7 +152,11 @@ def get_trades():
         normalizer = _get_date_normalizer()
         
         # If there are filtering parameters, use appropriate function
-        if trading_account_id and status:
+        if ticker_id:
+            logger.info(f"Filtering trades by ticker_id={ticker_id}")
+            trades = TradeService.get_by_ticker(db, ticker_id, user_id=user_id)
+            logger.info(f"Found {len(trades)} trades for ticker {ticker_id}")
+        elif trading_account_id and status:
             logger.info(f"Filtering trades by trading_account_id={trading_account_id} and status={status}")
             trades = TradeService.get_by_account_and_status(db, trading_account_id, status, user_id=user_id)
             logger.info(f"Found {len(trades)} trades for account {trading_account_id} with status {status}")

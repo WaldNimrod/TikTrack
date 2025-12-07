@@ -14,13 +14,23 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
+# Set PostgreSQL environment variables if not already set (for development)
+if not os.environ.get('POSTGRES_HOST'):
+    os.environ['POSTGRES_HOST'] = 'localhost'
+if not os.environ.get('POSTGRES_DB'):
+    os.environ['POSTGRES_DB'] = 'TikTrack-db-development'
+if not os.environ.get('POSTGRES_USER'):
+    os.environ['POSTGRES_USER'] = 'TikTrakDBAdmin'
+if not os.environ.get('POSTGRES_PASSWORD'):
+    os.environ['POSTGRES_PASSWORD'] = 'BigMeZoo1974!?'
+
 # Add Backend directory to path
 backend_path = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(backend_path))
 
-from sqlalchemy import text, inspect
+from sqlalchemy import text
 from sqlalchemy.orm import Session
-from config.database import SessionLocal, engine
+from config.database import SessionLocal
 import logging
 
 logging.basicConfig(
@@ -33,9 +43,14 @@ logger = logging.getLogger(__name__)
 def column_exists(db: Session, table_name: str, column_name: str) -> bool:
     """Check if a column exists in a table"""
     try:
-        inspector = inspect(engine)
-        columns = [col['name'] for col in inspector.get_columns(table_name)]
-        return column_name in columns
+        # Use direct SQL query instead of inspector to avoid hanging
+        result = db.execute(text("""
+            SELECT column_name 
+            FROM information_schema.columns 
+            WHERE table_name = :table_name 
+            AND column_name = :column_name
+        """), {"table_name": table_name, "column_name": column_name})
+        return result.fetchone() is not None
     except Exception as e:
         logger.warning(f"Error checking column {table_name}.{column_name}: {e}")
         return False
@@ -46,11 +61,21 @@ def add_flag_list_fields(db: Session):
     
     logger.info("🚀 Starting flag list fields migration...")
     
-    # Check if table exists
-    inspector = inspect(engine)
-    if 'watch_lists' not in inspector.get_table_names():
-        logger.warning("⚠️  watch_lists table does not exist. Run create_watch_lists_tables.py first.")
-        return
+    # Check if table exists using direct SQL query
+    try:
+        result = db.execute(text("""
+            SELECT EXISTS (
+                SELECT FROM information_schema.tables 
+                WHERE table_name = 'watch_lists'
+            )
+        """))
+        table_exists = result.scalar()
+        if not table_exists:
+            logger.warning("⚠️  watch_lists table does not exist. Run create_watch_lists_tables.py first.")
+            return
+    except Exception as e:
+        logger.error(f"❌ Error checking if watch_lists table exists: {e}")
+        raise
     
     # 1. Add is_flag_list column
     if not column_exists(db, 'watch_lists', 'is_flag_list'):
@@ -89,17 +114,29 @@ def add_flag_list_fields(db: Session):
 
 def main():
     """Run migration"""
-    db: Session = SessionLocal()
-    
+    db: Session = None
     try:
+        logger.info("📡 Connecting to database...")
+        db = SessionLocal()
+        logger.info("✅ Database connection established")
+        
         add_flag_list_fields(db)
         logger.info("🎉 Migration completed successfully!")
+    except KeyboardInterrupt:
+        logger.warning("⚠️  Migration interrupted by user")
+        if db:
+            db.rollback()
+        sys.exit(1)
     except Exception as e:
         logger.error(f"❌ Migration failed: {e}", exc_info=True)
-        db.rollback()
+        if db:
+            db.rollback()
         sys.exit(1)
     finally:
-        db.close()
+        if db:
+            logger.info("🔌 Closing database connection...")
+            db.close()
+            logger.info("✅ Database connection closed")
 
 
 if __name__ == "__main__":

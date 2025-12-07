@@ -92,12 +92,39 @@ Historical Data Services הם 3 שירותי נתונים ב-Frontend המספק
    - Cache key: `trade-history-data:{filtersHash}`
    - TTL: 5 minutes
 
-2. **`loadStatistics(filters, options)`**
-   - טעינת סטטיסטיקות טריידים
+2. **`loadTradeTimeline(tradeId, options)`**
+   - טעינת ציר זמן של טרייד ספציפי
+   - כולל: כל האובייקטים המקושרים, חישובי פוזיציה, P/L
+   - Cache key: `trade-history-timeline-{trade_id}`
+   - TTL: IndexedDB, 2 ימים (prod) / 1 יום (dev)
+   - Dependencies: `trades`, `executions`, `trade-plans`, `notes`, `alerts`, `cash-flows`
+
+3. **`loadTradeChartData(tradeId, options)`**
+   - טעינת נתוני גרף לטרייד
+   - כולל: מחירי שוק היסטוריים, נתוני פוזיציה, נתוני P/L
+   - Cache key: `trade-history-chart-data-{trade_id}`
+   - TTL: IndexedDB, 2 ימים (prod) / 1 יום (dev)
+   - Dependencies: `trades`, `executions`, `market_data_quotes`
+
+4. **`loadTradeStatistics(tradeId, options)`**
+   - טעינת סטטיסטיקות מפורטות לטרייד
+   - Cache key: `trade-history-statistics-{trade_id}`
+   - TTL: Backend, 5 דקות (dev) / 10 דקות (prod)
+   - Dependencies: `trades`, `executions`
+
+5. **`loadTradeFullAnalysis(tradeId, options)`**
+   - טעינת ניתוח מלא לטרייד (timeline + chart + statistics)
+   - מיועד לעמוד trade-history בלבד
+   - Cache key: `trade-history-full-analysis-{trade_id}`
+   - TTL: IndexedDB, 2 ימים
+   - Dependencies: כל ה-dependencies של ה-endpoints הנפרדים
+
+6. **`loadStatistics(filters, options)`**
+   - טעינת סטטיסטיקות טריידים (כללי)
    - Cache key: `trade-history-statistics:{filtersHash}`
    - TTL: 5 minutes
 
-3. **`loadAggregated(groupBy, filters, options)`**
+7. **`loadAggregated(groupBy, filters, options)`**
    - טעינת אגרגציה של טריידים
    - Cache key: `trade-history-aggregated:{filtersHash}`
    - TTL: 5 minutes
@@ -427,6 +454,11 @@ const data = await window.TradeHistoryData.loadTradeHistory(filters);
 - ✅ TradeHistoryData - מוכן
 - ✅ PortfolioStateData - מוכן
 - ✅ TradingJournalData - מוכן
+- ✅ trading-journal-page.js - מימוש מלא (07.12.2025)
+  - טעינת נתונים אמיתיים מהבקאנד
+  - רינדור דינמי של רשומות
+  - פילטרים לפי entity type
+  - אינטגרציה עם מערכות כלליות
 - ✅ Cache Integration - מוכן
 - ✅ Page Integration - מוכן
 - ⏳ Full Implementation - pending (placeholder functions need implementation)

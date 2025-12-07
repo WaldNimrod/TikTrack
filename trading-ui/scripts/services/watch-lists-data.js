@@ -206,7 +206,7 @@
     const url = `${base}${separator}api/watch-lists/${listId}?_ts=${Date.now()}`;
     
     try {
-      const response = await fetch(url, { method: 'GET', headers: DEFAULT_HEADERS, signal });
+      const response = await fetch(url, { method: 'GET', headers: DEFAULT_HEADERS, signal, credentials: 'include' });
       if (!response.ok) {
         if (response.status === 404) {
           throw new Error(`Watch list ${listId} not found`);
@@ -232,7 +232,7 @@
     const url = `${base}${separator}api/watch-lists/${listId}/items?_ts=${Date.now()}`;
     
     try {
-      const response = await fetch(url, { method: 'GET', headers: DEFAULT_HEADERS, signal });
+      const response = await fetch(url, { method: 'GET', headers: DEFAULT_HEADERS, signal, credentials: 'include' });
       if (!response.ok) {
         if (response.status === 404) {
           throw new Error(`Watch list ${listId} not found`);
@@ -263,6 +263,7 @@
         headers: DEFAULT_HEADERS,
         body: JSON.stringify(payload),
         signal,
+        credentials: 'include'
       });
       
       if (response.ok) {
@@ -293,6 +294,7 @@
         headers: DEFAULT_HEADERS,
         body: JSON.stringify(payload),
         signal,
+        credentials: 'include'
       });
       
       if (response.ok) {
@@ -323,6 +325,7 @@
         method: 'DELETE',
         headers: DEFAULT_HEADERS,
         signal,
+        credentials: 'include'
       });
       
       if (!response.ok) {
@@ -386,29 +389,58 @@
     const url = `${base}${separator}api/watch-lists/items/${itemId}`;
     
     try {
+      window.Logger?.debug?.('🔄 Updating watch list item', {
+        ...PAGE_LOG_CONTEXT,
+        listId,
+        itemId,
+        payload,
+        url
+      });
+      
       const response = await fetch(url, {
         method: 'PUT',
         headers: DEFAULT_HEADERS,
         body: JSON.stringify(payload),
         signal,
+        credentials: 'include'
       });
       
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error?.message || `Failed to update watch list item (${response.status})`);
+        const errorMsg = errorData.error?.message || `Failed to update watch list item (${response.status})`;
+        window.Logger?.error?.('❌ Error updating watch list item', {
+          ...PAGE_LOG_CONTEXT,
+          listId,
+          itemId,
+          payload,
+          status: response.status,
+          error: errorMsg,
+          errorData
+        });
+        throw new Error(errorMsg);
       }
+      
+      // Parse response to verify data was saved
+      const responseData = await response.json().catch(() => ({}));
+      window.Logger?.debug?.('✅ Watch list item updated successfully', {
+        ...PAGE_LOG_CONTEXT,
+        listId,
+        itemId,
+        responseData: responseData?.data || responseData
+      });
       
       // Invalidate cache on success
       await invalidateWatchListsCache();
       
-      // Return Response object (not parsed data) - UnifiedCRUDService/CRUDResponseHandler will handle it
-      return response;
+      // Return parsed data for immediate UI update
+      return responseData?.data || responseData;
     } catch (error) {
       window.Logger?.error?.('❌ Error updating watch list item', {
         ...PAGE_LOG_CONTEXT,
         listId,
         itemId,
-        error: error?.message,
+        payload,
+        error: error?.message || error,
       });
       throw error;
     }
@@ -425,6 +457,7 @@
         method: 'DELETE',
         headers: DEFAULT_HEADERS,
         signal,
+        credentials: 'include'
       });
       
       if (!response.ok) {
@@ -513,17 +546,32 @@
     }
   }
 
-  async function syncSingleFlagList(flagColor, options = {}) {
+  async function syncSingleFlagList(flagColor, entityType = null, options = {}) {
     const { signal } = options;
     const base = resolveBaseUrl();
     const separator = base.endsWith('/') ? '' : '/';
-    const url = `${base}${separator}api/watch-lists/flag-lists/${encodeURIComponent(flagColor)}/sync`;
+    
+    // Use entityType if provided, otherwise try to find it from color
+    if (!entityType && flagColor) {
+      const flagColors = window.WatchListsUIService?.getFlagColors?.() || [];
+      const flagColorObj = flagColors.find(fc => fc.value === flagColor);
+      if (flagColorObj) {
+        entityType = flagColorObj.entityType;
+      }
+    }
+    
+    // Use entityType for identification (constant), not color (varies by user)
+    const identifier = entityType || flagColor;
+    const url = `${base}${separator}api/watch-lists/flag-lists/${encodeURIComponent(identifier)}/sync`;
     
     try {
+      // Send color in body for display purposes (from user preferences)
       const response = await fetch(url, {
         method: 'POST',
         headers: DEFAULT_HEADERS,
+        body: JSON.stringify({ flag_color: flagColor }),
         signal,
+        credentials: 'include'
       });
       
       if (!response.ok) {

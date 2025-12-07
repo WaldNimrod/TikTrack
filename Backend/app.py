@@ -293,7 +293,8 @@ from routes.pages import pages_bp
 app = Flask(__name__)
 # Set secret key for session management
 app.config['SECRET_KEY'] = os.getenv('FLASK_SECRET_KEY', 'dev-secret-key-change-in-production')
-CORS(app)
+# Configure CORS to support session cookies
+CORS(app, supports_credentials=True, origins=['http://localhost:8080', 'http://127.0.0.1:8080', 'http://localhost:5001', 'http://127.0.0.1:5001'])
 
 # Legacy SQLAlchemy compatibility layer for tests
 db = LegacyDBProxy(app)

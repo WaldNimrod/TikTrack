@@ -45,21 +45,38 @@ user_service = UserService()
 def _resolve_user_id() -> int:
     """
     Return active user id from Flask context (set by auth middleware).
-    Falls back to default user if not authenticated (for backward compatibility).
+    Requires authentication - no fallback to default user.
     """
     # Primary: Get from Flask context (set by auth middleware)
     user_id = getattr(g, 'user_id', None)
     if user_id is not None:
         return user_id
     
-    # Fallback: Check query parameter
+    # Fallback: Check query parameter (for testing/development tools only)
     user_id = request.args.get('user_id', type=int)
     if user_id is not None:
         return user_id
     
-    # Fallback: Default user (for backward compatibility and tools)
-    default_user = user_service.get_default_user()
-    return default_user["id"] if default_user else 1
+    # No authentication - raise error
+    # User must be logged in via session
+    raise ValueError("User not authenticated. Please log in first.")
+
+
+def _handle_auth_error(e: ValueError) -> tuple:
+    """
+    Handle authentication errors consistently across all endpoints.
+    
+    Args:
+        e: ValueError raised by _resolve_user_id()
+    
+    Returns:
+        Tuple of (jsonify response, status_code)
+    """
+    return jsonify({
+        "status": "error",
+        "error": {"message": str(e)},
+        "version": "1.0"
+    }), 401
 
 
 def _get_watch_lists_normalizer() -> DateNormalizationService:
@@ -86,7 +103,10 @@ def get_watch_lists():
         JSON response with list of watch lists
     """
     db: Session = g.db
-    user_id = _resolve_user_id()
+    try:
+        user_id = _resolve_user_id()
+    except ValueError as e:
+        return _handle_auth_error(e)
     
     try:
         normalizer = _get_watch_lists_normalizer()
@@ -134,7 +154,11 @@ def create_watch_list():
         JSON response with created watch list
     """
     db: Session = g.db
-    user_id = _resolve_user_id()
+    try:
+        user_id = _resolve_user_id()
+    except ValueError as e:
+        return _handle_auth_error(e)
+    
     data = request.get_json() or {}
     
     try:
@@ -258,7 +282,11 @@ def update_watch_list(list_id: int):
         JSON response with updated watch list
     """
     db: Session = g.db
-    user_id = _resolve_user_id()
+    try:
+        user_id = _resolve_user_id()
+    except ValueError as e:
+        return _handle_auth_error(e)
+    
     data = request.get_json() or {}
     
     try:
@@ -376,7 +404,8 @@ def get_watch_list_items(list_id: int):
         items = WatchListService.get_watch_list_items(db, list_id, user_id)
         
         # Convert to dict and normalize dates
-        items_data = [item.to_dict() for item in items]
+        # Pass db and user_id to to_dict() so it can check flag lists
+        items_data = [item.to_dict(db=db, user_id=user_id) for item in items]
         items_data = normalizer.normalize_output(items_data)
         
         return jsonify({
@@ -425,7 +454,11 @@ def add_ticker_to_list(list_id: int):
         JSON response with created item
     """
     db: Session = g.db
-    user_id = _resolve_user_id()
+    try:
+        user_id = _resolve_user_id()
+    except ValueError as e:
+        return _handle_auth_error(e)
+    
     data = request.get_json() or {}
     
     try:
@@ -439,11 +472,13 @@ def add_ticker_to_list(list_id: int):
             external_symbol=data.get('external_symbol'),
             external_name=data.get('external_name'),
             flag_color=data.get('flag_color'),
+            flag_entity_type=data.get('flag_entity_type'),
             notes=data.get('notes')
         )
         
         # Convert to dict and normalize dates
-        item_data = item.to_dict()
+        # Pass db and user_id to to_dict() so it can check flag lists
+        item_data = item.to_dict(db=db, user_id=user_id)
         item_data = normalizer.normalize_output([item_data])[0]
         
         return jsonify({
@@ -490,7 +525,11 @@ def update_watch_list_item(item_id: int):
         JSON response with updated item
     """
     db: Session = g.db
-    user_id = _resolve_user_id()
+    try:
+        user_id = _resolve_user_id()
+    except ValueError as e:
+        return _handle_auth_error(e)
+    
     data = request.get_json() or {}
     
     try:
@@ -501,6 +540,7 @@ def update_watch_list_item(item_id: int):
             item_id=item_id,
             user_id=user_id,
             flag_color=data.get('flag_color'),
+            flag_entity_type=data.get('flag_entity_type'),
             display_order=data.get('display_order'),
             notes=data.get('notes')
         )
@@ -513,7 +553,8 @@ def update_watch_list_item(item_id: int):
             }), 404
         
         # Convert to dict and normalize dates
-        item_data = item.to_dict()
+        # Pass db and user_id to to_dict() so it can check flag lists
+        item_data = item.to_dict(db=db, user_id=user_id)
         item_data = normalizer.normalize_output([item_data])[0]
         
         return jsonify({
@@ -605,7 +646,11 @@ def reorder_items(list_id: int):
         JSON response with success status
     """
     db: Session = g.db
-    user_id = _resolve_user_id()
+    try:
+        user_id = _resolve_user_id()
+    except ValueError as e:
+        return _handle_auth_error(e)
+    
     data = request.get_json() or {}
     
     try:
@@ -676,27 +721,29 @@ def get_flagged_tickers(color: str):
                 "version": "1.0"
             }), 200
         
-        # Get all items with the specified flag color from user's lists
+        # Get all items from user's lists
+        # Flag color is determined by which flag list the ticker is in, not stored in item
         from models.watch_list import WatchListItem
-        items = (
+        all_items = (
             db.query(WatchListItem)
-            .filter(
-                WatchListItem.watch_list_id.in_(list_ids),
-                WatchListItem.flag_color == color
-            )
+            .filter(WatchListItem.watch_list_id.in_(list_ids))
             .order_by(WatchListItem.display_order.asc())
             .all()
         )
         
-        # Convert to dict and add watch list name
+        # Filter items by flag color (check which flag list ticker is in)
         items_data = []
-        for item in items:
-            item_dict = item.to_dict()
-            # Add watch list name
-            watch_list = next((wl for wl in watch_lists if wl.id == item.watch_list_id), None)
-            if watch_list:
-                item_dict['watch_list_name'] = watch_list.name
-            items_data.append(item_dict)
+        for item in all_items:
+            # Pass db and user_id to to_dict() so it can check flag lists
+            item_dict = item.to_dict(db=db, user_id=user_id)
+            
+            # Only include items with the specified flag color
+            if item_dict.get('flag_color') == color:
+                # Add watch list name
+                watch_list = next((wl for wl in watch_lists if wl.id == item.watch_list_id), None)
+                if watch_list:
+                    item_dict['watch_list_name'] = watch_list.name
+                items_data.append(item_dict)
         
         items_data = normalizer.normalize_output(items_data)
         
@@ -734,23 +781,24 @@ def sync_flag_lists():
     try:
         normalizer = _get_watch_lists_normalizer()
         
-        # Get all 8 flag colors
-        flag_colors = [
-            '#26baac',  # Trade
-            '#0056b3',  # Trade Plan
-            '#28a745',  # Account
-            '#20c997',  # Cash Flow
-            '#dc3545',  # Ticker
-            '#fc5a06',  # Alert
-            '#6f42c1',  # Note
-            '#17a2b8'   # Execution
+        # Get all 8 flag entity types (constant identifiers, not colors)
+        flag_entity_types = [
+            'trade',
+            'trade_plan',
+            'account',
+            'cash_flow',
+            'ticker',
+            'alert',
+            'note',
+            'execution'
         ]
         
         synced_lists = []
         
         # Get or create flag lists and sync them
-        for flag_color in flag_colors:
-            flag_list = WatchListService.get_or_create_flag_list(db, user_id, flag_color)
+        # Note: We don't pass colors here - they will be set by frontend based on user preferences
+        for entity_type in flag_entity_types:
+            flag_list = WatchListService.get_or_create_flag_list(db, user_id, entity_type, flag_color=None)
             WatchListService.sync_flag_list_items(db, flag_list.id, user_id)
             synced_lists.append(flag_list.to_dict())
         
@@ -776,26 +824,38 @@ def sync_flag_lists():
         }), 500
 
 
-@watch_lists_bp.route('/flag-lists/<color>/sync', methods=['POST'], endpoint='sync_single_flag_list')
+@watch_lists_bp.route('/flag-lists/<entity_type>/sync', methods=['POST'], endpoint='sync_single_flag_list')
 @handle_database_session()
-def sync_single_flag_list(color: str):
+def sync_single_flag_list(entity_type: str):
     """
-    Sync a single flag list for a specific flag color.
+    Sync a single flag list for a specific entity type.
     
     Args:
-        color: Flag color in hex format (e.g., '#26baac')
+        entity_type: Entity type (trade, trade_plan, account, etc.) - constant identifier
+    
+    Request Body (optional):
+        {
+            "flag_color": "#26baac"  # For display only, from user preferences
+        }
     
     Returns:
         JSON response with sync status
     """
     db: Session = g.db
-    user_id = _resolve_user_id()
+    try:
+        user_id = _resolve_user_id()
+    except ValueError as e:
+        return _handle_auth_error(e)
     
     try:
         normalizer = _get_watch_lists_normalizer()
         
-        # Get or create flag list
-        flag_list = WatchListService.get_or_create_flag_list(db, user_id, color)
+        # Get color from request body if provided (from user preferences)
+        data = request.get_json() or {}
+        flag_color = data.get('flag_color')
+        
+        # Get or create flag list by entityType (not color)
+        flag_list = WatchListService.get_or_create_flag_list(db, user_id, entity_type, flag_color=flag_color)
         
         # Sync items
         WatchListService.sync_flag_list_items(db, flag_list.id, user_id)

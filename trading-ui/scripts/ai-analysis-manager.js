@@ -1236,7 +1236,8 @@
               }
             }, 200); // Small delay to ensure DOM is ready
           }
-        }
+        } // End of for loop
+      } // End of try block
       } catch (error) {
         window.Logger?.error('Error rendering variables form in modal', error, { page: 'ai-analysis' });
         const errorDiv = document.createElement('div');

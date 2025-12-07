@@ -796,6 +796,17 @@ class AdvancedButtonSystem {
                 ? iconOverride 
                 : (typeUpper && window.BUTTON_ICONS[typeUpper] ? window.BUTTON_ICONS[typeUpper] : '');
             
+            // If iconPath is just a name (not a path), construct Tabler icon path
+            // BUT: Skip if it's an emoji (contains Unicode characters)
+            if (iconPath && !iconPath.includes('/') && !iconPath.startsWith('http') && !iconPath.startsWith('<') && !iconPath.includes('.')) {
+                // Check if it's an emoji (contains Unicode characters that are not ASCII)
+                const isEmoji = /[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]|[\u{1F600}-\u{1F64F}]|[\u{1F680}-\u{1F6FF}]|[\u{1F900}-\u{1F9FF}]|[\u{1FA00}-\u{1FA6F}]|[\u{1FA70}-\u{1FAFF}]|[\u{2190}-\u{21FF}]|[\u{2300}-\u{23FF}]|[\u{2B00}-\u{2BFF}]|[\u{FE00}-\u{FE0F}]/u.test(iconPath);
+                if (!isEmoji) {
+                    // It's likely an icon name - construct Tabler icon path
+                    iconPath = `/trading-ui/images/icons/tabler/${iconPath}.svg`;
+                }
+            }
+            
             // Convert icon path to HTML - use img tag initially, enhance to inline SVG later for Tabler icons
             let icon = '';
             if (iconPath) {

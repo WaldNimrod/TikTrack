@@ -104,7 +104,7 @@
 | **research.html** | מחקר וניתוח | `http://localhost:5000/research.html` | `/api/research/*` | ❌ חסר | ⏳ צריך Business Service |
 | **portfolio-state-page.html** | מצב תיק היסטורי - ניתוח וצפייה במצב תיק בנקודות זמן שונות | `http://localhost:8080/mockups/daily-snapshots/portfolio-state-page.html` | `/api/portfolio-state/*` | ❌ חסר | ✅ **מוכן** |
 | **trade-history-page.html** | היסטוריית טרייד - ניתוח וצפייה בהיסטוריית טריידים | `http://localhost:8080/mockups/daily-snapshots/trade-history-page.html` | `/api/trade-history/*` | ❌ חסר | ✅ **מוכן** |
-| **trading-journal-page.html** | יומן מסחר - ניהול ותצוגת יומן מסחר עם לוח שנה | `http://localhost:8080/mockups/daily-snapshots/trading-journal-page.html` | `/api/trading-journal/*` | ❌ חסר | ✅ **מוכן** |
+| **trading-journal.html** | יומן מסחר - ניהול ותצוגת יומן מסחר עם לוח שנה | `http://localhost:8080/trading-journal.html` | `/api/trading-journal/*` | ✅ HistoricalDataBusinessService | ✅ **מוכן** - מימוש מלא הושלם 07.12.2025<br>✅ **שיפורים נוספים הושלמו 08.12.2025**: טבלה חכמה, זום ליום, פילטר טיקר, גרף פעילות |
 | **ai-analysis.html** | ניתוח AI - יצירת ניתוחים באמצעות מנועי LLM | `http://localhost:8080/ai-analysis` | `/api/ai-analysis/*` | ✅ AIAnalysisService | ✅ מוכן |
 | **watch-list.html** | ניהול רשימות צפייה | `http://localhost:8080/watch-list` | `/api/watch-lists/*` | ✅ WatchListService | ✅ מוכן |
 | **preferences.html** | הגדרות מערכת v3.0 | `http://localhost:8080/preferences.html` | `/api/preferences/*` | ❌ חסר (מורכב) | ⏳ אופציונלי |
@@ -187,7 +187,7 @@
 | **daily-snapshots-history-widget.html** | ווידג'ט היסטוריה - מוקאפ | `http://localhost:8080/daily-snapshots-history-widget.html` |
 | **portfolio-state-page.html** | מצב תיק היסטורי - ניתוח וצפייה במצב תיק בנקודות זמן שונות | `http://localhost:8080/mockups/daily-snapshots/portfolio-state-page.html` | ✅ **משולב** | `/api/portfolio-state/*` | ❌ חסר | ✅ **מוכן** |
 | **trade-history-page.html** | היסטוריית טרייד - ניתוח וצפייה בהיסטוריית טריידים | `http://localhost:8080/mockups/daily-snapshots/trade-history-page.html` | ✅ **משולב** | `/api/trade-history/*` | ❌ חסר | ✅ **מוכן** |
-| **trading-journal-page.html** | יומן מסחר - ניהול ותצוגת יומן מסחר עם לוח שנה | `http://localhost:8080/mockups/daily-snapshots/trading-journal-page.html` | ✅ **משולב** | `/api/trading-journal/*` | ❌ חסר | ✅ **מוכן** |
+| **trading-journal.html** | יומן מסחר - ניהול ותצוגת יומן מסחר עם לוח שנה | `http://localhost:8080/trading-journal.html` | ✅ **משולב** | `/api/trading-journal/*` | ✅ HistoricalDataBusinessService | ✅ **מוכן** - מימוש מלא הושלם 07.12.2025 |
 | **daily-snapshots-price-history-page.html** | היסטוריית מחירים - מוקאפ | `http://localhost:8080/daily-snapshots-price-history-page.html` |
 | **daily-snapshots-strategy-analysis-page.html** | ניתוח אסטרטגיה - מוקאפ | `http://localhost:8080/daily-snapshots-strategy-analysis-page.html` |
 

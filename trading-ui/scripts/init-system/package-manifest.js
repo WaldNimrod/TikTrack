@@ -1393,6 +1393,34 @@ const PACKAGE_MANIFEST = {
         loadOrder: 10
       },
       {
+        file: 'calendar/calendar-date-utils.js',
+        globalCheck: 'window.CalendarDateUtils',
+        description: 'Calendar date utilities for trading journal',
+        required: false,  // Required only for trading-journal-page
+        loadOrder: 10.5
+      },
+      {
+        file: 'calendar/calendar-data-loader.js',
+        globalCheck: 'window.CalendarDataLoader',
+        description: 'Calendar data loader for trading journal',
+        required: false,  // Required only for trading-journal-page
+        loadOrder: 10.6
+      },
+      {
+        file: 'calendar/calendar-renderer.js',
+        globalCheck: 'window.CalendarRenderer',
+        description: 'Calendar renderer for trading journal',
+        required: false,  // Required only for trading-journal-page
+        loadOrder: 10.7
+      },
+      {
+        file: 'trading-journal-page.js',
+        globalCheck: 'window.tradingJournalPage',
+        description: 'Trading journal page script (page-specific)',
+        required: false,  // Required only for trading-journal-page
+        loadOrder: 10.8
+      },
+      {
         file: 'account-service.js',
         globalCheck: 'window.getAccounts',
         description: 'Account service',
@@ -1838,7 +1866,7 @@ const PACKAGE_MANIFEST = {
     description: 'Unified data summary system for all pages',
     version: '1.0.0',
     critical: false,
-    loadOrder: 18,
+    loadOrder: 17.5, // Changed from 18 to 17.5 to load before TradingView Charts (19)
     dependencies: ['base', 'services'],
     loadingStrategy: 'defer', // Critical package - info summary, has dependencies on base and services
     scripts: [

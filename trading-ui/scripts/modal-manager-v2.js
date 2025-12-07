@@ -1213,7 +1213,9 @@ class ModalManagerV2 {
                         modalId === 'tickersModal' ? 'tickersModalConfig' : null,
                         modalId === 'executionsModal' ? 'executionsModalConfig' : null,
                         modalId === 'cashFlowModal' ? 'cashFlowModalConfig' : null,
-                        modalId === 'notesModal' ? 'notesModalConfig' : null
+                        modalId === 'notesModal' ? 'notesModalConfig' : null,
+                        modalId === 'watchListModal' ? 'watchListModalConfig' : null,
+                        modalId === 'addTickerModal' ? 'addTickerModalConfig' : null
                     ].filter(Boolean); // הסרת null values
                     
                     for (const name of possibleNames) {
@@ -1282,10 +1284,14 @@ class ModalManagerV2 {
                 if (!bootstrap || !bootstrap.Modal) {
                     throw new Error('Bootstrap Modal not available for dynamic modal');
                 }
-                const modal = new bootstrap.Modal(modalElement, {
-                    backdrop: false,
-                    keyboard: true
-                });
+                // Use getOrCreateInstance instead of new - prevents duplicate instances
+                let modal = bootstrap.Modal.getInstance(modalElement);
+                if (!modal) {
+                    modal = bootstrap.Modal.getOrCreateInstance(modalElement, {
+                        backdrop: false,
+                        keyboard: true
+                    });
+                }
                 modal.show();
                 modalInfo.isActive = true;
                 this.activeModal = modalId;
@@ -1701,15 +1707,29 @@ class ModalManagerV2 {
                 throw new Error(`Modal element ${modalId} not in DOM`);
             }
             
-            const modal = new bootstrap.Modal(modalElement, {
-                backdrop: false, // ננהל backdrop מרכזית
-                keyboard: true
-            });
-            
-            // בדיקה שהמודל נוצר בהצלחה
+            // Use getOrCreateInstance instead of new - prevents duplicate instances
+            // This fixes the issue where modals don't open because of conflicting instances
+            let modal = bootstrap.Modal.getInstance(modalElement);
             if (!modal) {
-                console.error('❌ Failed to create Bootstrap modal instance');
-                throw new Error('Failed to create Bootstrap modal instance');
+                // Create new instance only if one doesn't exist
+                modal = bootstrap.Modal.getOrCreateInstance(modalElement, {
+                    backdrop: false, // ננהל backdrop מרכזית
+                    keyboard: true
+                });
+            } else {
+                // If instance exists, ensure it has correct options
+                // Note: Bootstrap doesn't allow changing options on existing instances,
+                // but we can ensure backdrop is handled correctly
+                window.Logger?.debug?.('Using existing Bootstrap Modal instance', {
+                    modalId,
+                    page: 'modal-manager-v2'
+                });
+            }
+            
+            // בדיקה שהמודל נוצר/נמצא בהצלחה
+            if (!modal) {
+                console.error('❌ Failed to get or create Bootstrap modal instance');
+                throw new Error('Failed to get or create Bootstrap modal instance');
             }
             
             modalElement.dataset.modalMode = mode;
@@ -1794,6 +1814,44 @@ class ModalManagerV2 {
             this._cleanupBootstrapBackdrops();
             
             modal.show();
+            
+            // CRITICAL FIX: Ensure modal has position fixed (Bootstrap should add this, but we ensure it)
+            // This fixes the issue where modal has display:block but offsetParent is null
+            const computedStyle = window.getComputedStyle(modalElement);
+            if (computedStyle.position !== 'fixed') {
+                modalElement.style.position = 'fixed';
+                modalElement.style.top = '0';
+                modalElement.style.left = '0';
+                modalElement.style.width = '100%';
+                modalElement.style.height = '100%';
+                window.Logger?.debug?.('🔧 [ModalManagerV2] Fixed modal position to fixed', {
+                    modalId,
+                    previousPosition: computedStyle.position,
+                    page: 'modal-manager-v2'
+                });
+            }
+            
+            // Wait for Bootstrap's show event before continuing
+            // This ensures the modal is fully visible before we manipulate it
+            await new Promise((resolve) => {
+                const checkModal = () => {
+                    const style = window.getComputedStyle(modalElement);
+                    if (modalElement.classList.contains('show') && 
+                        style.display !== 'none' &&
+                        style.position === 'fixed' &&
+                        modalElement.offsetParent !== null) {
+                        resolve();
+                    } else {
+                        // Wait a bit more if modal not fully shown
+                        setTimeout(checkModal, 50);
+                    }
+                };
+                // Start checking after a short delay to allow Bootstrap to apply classes
+                setTimeout(checkModal, 100);
+                // Fallback timeout - resolve after 1 second even if modal not fully shown
+                setTimeout(resolve, 1000);
+            });
+            
             this.bindDismissButtons(modalElement);
             
             // ניקוי נוסף אחרי modal.show() למקרה ש-Bootstrap יצר backdrop חדש

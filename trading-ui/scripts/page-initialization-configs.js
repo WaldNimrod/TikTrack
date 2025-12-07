@@ -3668,6 +3668,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         "preferences",
         "entity-services",
         "charts",
+        "tradingview-charts",
         "init-system"
       ],
       requiredGlobals: [
@@ -3932,6 +3933,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         "modules",
         "crud",
         "preferences",
+        "charts",
         "entity-services",
         "entity-details",
         "info-summary",
@@ -3950,7 +3952,9 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         "window.SelectPopulatorService",
         "window.DataCollectionService",
         "window.CRUDResponseHandler",
-        "window.TradingJournalData" // Trading Journal Data Service
+        "window.TradingJournalData", // Trading Journal Data Service
+        "window.Chart", // Chart.js for activity chart
+        "window.ChartLoader" // Chart loader
       ],
       preloadAssets: ['trading-journal-page-data'],
       cacheStrategy: 'standard',
@@ -4039,6 +4043,79 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
           window.Logger?.info('📄 Initializing strategy-analysis-page...', {
             page: 'page-initialization-configs',
           });
+        },
+      ],
+    },    'strategy-analysis': {
+      name: 'ניתוח אסטרטגיות',
+      description: 'עמוד ניתוח אסטרטגיות - ניתוח ביצועי אסטרטגיות מסחר',
+      lastModified: '2025-01-27',
+      pageType: 'main',
+      packages: [
+        "base",
+        "services",
+        "ui-advanced",
+        "modules",
+        "crud",
+        "preferences",
+        "entity-services",
+        "entity-details",
+        "info-summary",
+        "conditions",
+        "tradingview-charts",
+        "init-system"
+      ],
+      requiredGlobals: [
+        'window.UnifiedAppInitializer',
+        'window.PAGE_CONFIGS',
+        'window.PACKAGE_MANIFEST',
+        "NotificationSystem",
+        "window.IconSystem",
+        "window.FieldRendererService",
+        "window.SelectPopulatorService",
+        "window.DataCollectionService",
+        "window.DefaultValueSetter",
+        "window.TableSortValueAdapter",
+        "window.LinkedItemsService",
+        "window.CRUDResponseHandler",
+        "window.createActionsMenu",
+        "window.ModalNavigationManager",
+        "window.ModalManagerV2",
+        "window.conditionsInitializer",
+        "window.ConditionsUIManager",
+        "window.PaginationSystem",
+        "window.InfoSummarySystem",
+        "window.TradingViewChartAdapter"
+      ],
+      preloadAssets: ['strategy-analysis-data'],
+      cacheStrategy: 'standard',
+      requiresFilters: true,
+      requiresValidation: false,
+      requiresTables: true,
+      customInitializers: [
+        async pageConfig => {
+          window.Logger?.info('📊 Initializing strategy-analysis page...', {
+            page: 'page-initialization-configs',
+          });
+          
+          // Wait for strategy-analysis-page.js to be available
+          if (window.strategyAnalysisPage && typeof window.strategyAnalysisPage.initializePage === 'function') {
+            await window.strategyAnalysisPage.initializePage();
+          } else {
+            // Wait up to 5 seconds for the script to load
+            let retries = 0;
+            while ((!window.strategyAnalysisPage || typeof window.strategyAnalysisPage?.initializePage !== 'function') && retries < 50) {
+              await new Promise(resolve => setTimeout(resolve, 100));
+              retries++;
+            }
+            
+            if (window.strategyAnalysisPage && typeof window.strategyAnalysisPage.initializePage === 'function') {
+              await window.strategyAnalysisPage.initializePage();
+            } else {
+              window.Logger?.warn('⚠️ strategyAnalysisPage.initializePage not available', {
+                page: 'page-initialization-configs',
+              });
+            }
+          }
         },
       ],
     },    'economic-calendar-page': {

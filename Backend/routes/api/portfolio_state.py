@@ -407,33 +407,13 @@ def get_portfolio_comparison():
             )
             return jsonify(error_payload), 400
         
-        # Get portfolio snapshots for both dates
-        snapshot1 = service.calculate_portfolio_state_at_date(
+        # Get portfolio comparison using the dedicated method
+        result = service.calculate_portfolio_comparison(
             user_id=user_id,
             account_id=account_id,
-            target_date=date1,
-            include_closed=False
+            date1=date1,
+            date2=date2
         )
-        
-        snapshot2 = service.calculate_portfolio_state_at_date(
-            user_id=user_id,
-            account_id=account_id,
-            target_date=date2,
-            include_closed=False
-        )
-        
-        # Build comparison result
-        result = {
-            'date1': date1.isoformat(),
-            'date2': date2.isoformat(),
-            'snapshot1': snapshot1,
-            'snapshot2': snapshot2,
-            'comparison': {
-                'value_change': snapshot2.get('total_value', 0.0) - snapshot1.get('total_value', 0.0),
-                'pl_change': snapshot2.get('total_pl', 0.0) - snapshot1.get('total_pl', 0.0)
-            },
-            'is_valid': True
-        }
         
         payload = BaseEntityUtils.create_success_payload(
             normalizer,

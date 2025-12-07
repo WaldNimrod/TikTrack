@@ -132,8 +132,9 @@ function generateScriptLoadingCode(pageName, mode = null, useBundles = null) {
     html += `    <!-- Critical: ${pkg.critical ? 'YES' : 'NO'} | Version: ${pkg.version} -->\n\n`;
     
     // Sort scripts within package by loadOrder
+    // Include all scripts - required and optional (required: false) are both needed
+    // The package is included in pageConfig.packages, so all its scripts should be loaded
     const sortedScripts = (pkg.scripts || [])
-      .filter(script => script.required !== false)
       .sort((a, b) => (a.loadOrder || 0) - (b.loadOrder || 0));
     
     // Check if bundle exists for this package
@@ -181,8 +182,9 @@ function generateScriptLoadingCode(pageName, mode = null, useBundles = null) {
     } else {
       // Use individual scripts (development mode or bundle doesn't exist)
       sortedScripts.forEach((script) => {
-        // Get loading strategy from package (default: defer for critical packages)
-        const loadingStrategy = pkg.loadingStrategy || 'defer';
+        // Include all scripts (required and optional) - they're in the package for a reason
+        // Get loading strategy from script or package (default: defer for critical packages)
+        const loadingStrategy = script.loadingStrategy || pkg.loadingStrategy || 'defer';
         
         html += `    <!-- [${scriptCounter}] Load Order: ${scriptCounter} | Strategy: ${loadingStrategy} -->\n`;
         

@@ -86,8 +86,18 @@
       }
 
       if (!this.chartSystem || typeof this.chartSystem.create !== 'function') {
-        this.chartSystem = window.ChartSystem instanceof ChartSystem ? window.ChartSystem : new ChartSystem();
-        window.ChartSystem = this.chartSystem;
+        // window.ChartSystem is already an instance (from chart-system.js), not a class
+        if (window.ChartSystem && typeof window.ChartSystem.create === 'function') {
+          this.chartSystem = window.ChartSystem;
+        } else {
+          // Fallback: create new instance if ChartSystem class is available
+          if (typeof ChartSystem !== 'undefined') {
+            this.chartSystem = new ChartSystem();
+            window.ChartSystem = this.chartSystem;
+          } else {
+            window.Logger?.error?.('ChartSystem not available', { page: 'chart-management' });
+          }
+        }
       }
     }
 

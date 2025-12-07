@@ -372,9 +372,12 @@
                                                             <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(7, window.WatchListsPage?.watchListItemsData || [], 'watch_list_items', window.WatchListsPage?.updateWatchListItemsTable); }" style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">ATR <span class="sort-icon">↕</span></button>
                                                         </th>
                                                         <th class="col-position">Position</th>
+                                                        <th class="col-value-change">
+                                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(9, window.WatchListsPage?.watchListItemsData || [], 'watch_list_items', window.WatchListsPage?.updateWatchListItemsTable); }" style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">שינוי בערך <span class="sort-icon">↕</span></button>
+                                                        </th>
                                                         <th class="col-pl">P/L</th>
                                                         <th class="col-pl-percent">
-                                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(9, window.WatchListsPage?.watchListItemsData || [], 'watch_list_items', window.WatchListsPage?.updateWatchListItemsTable); }" style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">P/L % <span class="sort-icon">↕</span></button>
+                                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(10, window.WatchListsPage?.watchListItemsData || [], 'watch_list_items', window.WatchListsPage?.updateWatchListItemsTable); }" style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">P/L % <span class="sort-icon">↕</span></button>
                                                         </th>
                                                         <th class="actions-column actions-cell actions-4-items">Actions</th>
                                                     </tr>
@@ -676,6 +679,8 @@
     <script src="scripts/services/watch-lists-data.js?v=1.0.0" defer></script> <!-- Watch lists data service (API + Cache + CRUD) -->
     <!-- [85] Load Order: 85 | Strategy: defer -->
     <script src="scripts/services/watch-lists-ui-service.js?v=1.0.0" defer></script> <!-- Watch lists UI service -->
+    <!-- [85.5] Load Order: 85.5 | Strategy: defer -->
+    <script src="scripts/flag-quick-action.js?v=1.0.0" defer></script> <!-- Flag quick action palette - MUST load before watch-lists-page.js -->
     <!-- [86] Load Order: 86 | Strategy: defer -->
     <script src="scripts/watch-lists-page.js?v=1.0.0" defer></script> <!-- Watch lists main page -->
     <!-- [86.5] Load Order: 86.5 | Strategy: defer -->

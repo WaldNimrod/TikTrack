@@ -559,6 +559,7 @@ app.register_blueprint(user_data_import_reports_bp, url_prefix='/api/user-data-i
 app.register_blueprint(external_quotes_bp, name='external_quotes')
 app.register_blueprint(status_bp)
 # API quotes endpoints (specification compliant)
+app.register_blueprint(quotes_bp)
 
 app.register_blueprint(pages_bp)
 

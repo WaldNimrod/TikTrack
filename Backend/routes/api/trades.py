@@ -322,6 +322,16 @@ def create_trade():
         # Get user_id from Flask context (set by auth middleware)
         user_id = getattr(g, 'user_id', None)
         
+        # CRITICAL: user_id is required for trade creation
+        if user_id is None:
+            normalizer = _get_date_normalizer()
+            return jsonify({
+                "status": "error",
+                "error": {"message": "User authentication required. Please log in to create trades."},
+                "timestamp": normalizer.now_envelope(),
+                "version": "1.0"
+            }), 401
+        
         normalizer = _get_date_normalizer()
         data = request.get_json() or {}
         

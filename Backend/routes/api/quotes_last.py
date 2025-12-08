@@ -15,6 +15,7 @@ from config.database import get_db
 from models.quotes_last import QuotesLast
 from services.date_normalization_service import DateNormalizationService
 from services.preferences_service import PreferencesService
+from routes.api.base_entity_decorators import handle_database_session
 
 logger = logging.getLogger(__name__)
 
@@ -25,9 +26,9 @@ quotes_last_bp = Blueprint('quotes_last', __name__, url_prefix='/api/quotes-last
 def _get_date_normalizer() -> DateNormalizationService:
     """Get date normalization service with user preferences"""
     try:
-        db: Session = next(get_db())
+        # Get user_id from Flask context (set by auth middleware)
+        user_id = getattr(g, 'user_id', None) or 1  # Fallback to default user
         preferences_service = PreferencesService()
-        user_id = 1  # Default user - adjust if needed
         profile_context = preferences_service.build_profile_context(user_id)
         timezone_name = profile_context.get('versions', {}).get('timezone', {}).get('saved_value', 'UTC')
         return DateNormalizationService(timezone_name)
@@ -37,12 +38,23 @@ def _get_date_normalizer() -> DateNormalizationService:
 
 
 @quotes_last_bp.route('/', methods=['GET'])
+@handle_database_session()
 def get_quotes_last():
-    """Get all last quotes"""
+    """Get all last quotes (requires authentication)"""
+    db: Session = g.db
+    
+    # Get user_id from Flask context (set by auth middleware)
+    user_id = getattr(g, 'user_id', None)
+    
+    if user_id is None:
+        return jsonify({
+            'status': 'error',
+            'message': 'User authentication required',
+            'version': '1.0'
+        }), 401
+    
     try:
-        db: Session = next(get_db())
-        
-        # Query using SQLAlchemy model
+        # Quotes are system-wide (shared), but require authentication
         quotes = db.query(QuotesLast).order_by(QuotesLast.id).all()
         
         # Convert to list of dictionaries
@@ -67,17 +79,26 @@ def get_quotes_last():
             'message': f'Error retrieving quotes last: {str(e)}',
             'version': '1.0'
         }), 500
-    finally:
-        db.close()
 
 
 @quotes_last_bp.route('/<int:quote_id>', methods=['GET'])
+@handle_database_session()
 def get_quote_last(quote_id):
-    """Get a specific last quote by ID"""
+    """Get a specific last quote by ID (requires authentication)"""
+    db: Session = g.db
+    
+    # Get user_id from Flask context (set by auth middleware)
+    user_id = getattr(g, 'user_id', None)
+    
+    if user_id is None:
+        return jsonify({
+            'status': 'error',
+            'message': 'User authentication required',
+            'version': '1.0'
+        }), 401
+    
     try:
-        db: Session = next(get_db())
-        
-        # Query using SQLAlchemy model
+        # Quotes are system-wide (shared), but require authentication
         quote = db.query(QuotesLast).filter(QuotesLast.id == quote_id).first()
         
         if not quote:
@@ -106,6 +127,4 @@ def get_quote_last(quote_id):
             'message': f'Error retrieving last quote: {str(e)}',
             'version': '1.0'
         }), 500
-    finally:
-        db.close()
 

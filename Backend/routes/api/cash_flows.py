@@ -265,14 +265,27 @@ def get_cash_flows():
 @handle_database_session(auto_commit=True, auto_close=True)
 @invalidate_cache(['cash_flows', 'account-activity-*'])
 def delete_imported_cash_flows():
-    """Delete all cash flows with source='file_import' - Dev utility for testing"""
+    """Delete all cash flows with source='file_import' for current user - Dev utility for testing"""
     try:
         logger.info("=== DELETE IMPORTED CASH FLOWS START ===")
+        # Get user_id from Flask context (set by auth middleware)
+        user_id = getattr(g, 'user_id', None)
+        
+        if user_id is None:
+            return jsonify({
+                "status": "error",
+                "error": {"message": "User authentication required"},
+                "version": "1.0"
+            }), 401
+        
         # Use the session from the decorator (in g.db)
         db: Session = g.db
         
-        # Count imported records
-        count = db.query(CashFlow).filter(CashFlow.source == 'file_import').count()
+        # Count imported records for current user only
+        count = db.query(CashFlow).filter(
+            CashFlow.source == 'file_import',
+            CashFlow.user_id == user_id
+        ).count()
         logger.info(f"Found {count} imported cash flows to delete")
         
         if count == 0:
@@ -285,7 +298,10 @@ def delete_imported_cash_flows():
             }), 200
         
         # Get details for logging (before deletion)
-        cash_flows = db.query(CashFlow).filter(CashFlow.source == 'file_import').all()
+        cash_flows = db.query(CashFlow).filter(
+            CashFlow.source == 'file_import',
+            CashFlow.user_id == user_id
+        ).all()
         cash_flow_ids = [cf.id for cf in cash_flows]
         logger.info(f"Found {len(cash_flow_ids)} imported cash flows with IDs: {cash_flow_ids[:10] if len(cash_flow_ids) > 10 else cash_flow_ids}...")  # Log first 10 IDs
         
@@ -308,9 +324,12 @@ def delete_imported_cash_flows():
         except Exception as tag_error:
             logger.warning("Failed to remove tags for imported cash flows before bulk deletion: %s", tag_error)
 
-        # Delete all imported records
+        # Delete all imported records for current user only
         # Note: commit will be done by handle_database_session decorator
-        deleted_count = db.query(CashFlow).filter(CashFlow.source == 'file_import').delete()
+        deleted_count = db.query(CashFlow).filter(
+            CashFlow.source == 'file_import',
+            CashFlow.user_id == user_id
+        ).delete()
         logger.info(f"Delete query executed, deleted_count={deleted_count}")
         
         return jsonify({
@@ -751,13 +770,23 @@ def delete_all_cash_flows():
                 "version": "1.0"
             }), 200
         
+        # Get cash flow IDs for current user before deletion (for tag removal)
+        cash_flow_ids = [cf.id for cf in db.query(CashFlow.id).filter(CashFlow.user_id == user_id).all()]
+        
+        # Remove tags for user's cash flows (non-blocking)
+        tags_removed = 0
         try:
-            TagService.remove_all_tags_for_type(db, 'cash_flow')
-        except ValueError as tag_error:
-            logger.warning("Failed to remove tags for all cash_flows before bulk deletion: %s", tag_error)
+            for cash_flow_id in cash_flow_ids:
+                try:
+                    removed = TagService.remove_all_tags_for_entity(db, 'cash_flow', cash_flow_id)
+                    tags_removed += removed
+                except Exception as tag_error:
+                    logger.warning(f"Failed to remove tags for cash_flow {cash_flow_id} before deletion: {tag_error}")
+        except Exception as tag_error:
+            logger.warning("Failed to remove tags for cash_flows before bulk deletion: %s", tag_error)
 
-        # Delete all records
-        deleted_count = db.query(CashFlow).delete()
+        # Delete all records for current user only
+        deleted_count = db.query(CashFlow).filter(CashFlow.user_id == user_id).delete()
         # CRITICAL: Must commit here to make deletion visible to subsequent queries
         db.commit()
         
@@ -860,12 +889,25 @@ def create_currency_exchange():
                 "version": "1.0"
             }), 400
         
+        # Get user_id from Flask context (set by auth middleware)
+        user_id = getattr(g, 'user_id', None)
+        
+        if user_id is None:
+            return jsonify({
+                "status": "error",
+                "error": {"message": "User authentication required"},
+                "version": "1.0"
+            }), 401
+        
         # Validate trading account and fee currency alignment
-        account = db.query(TradingAccount).filter(TradingAccount.id == trading_account_id).first()
+        account = db.query(TradingAccount).filter(
+            TradingAccount.id == trading_account_id,
+            TradingAccount.user_id == user_id
+        ).first()
         if not account:
             return jsonify({
                 "status": "error",
-                "error": {"message": "Trading account not found"},
+                "error": {"message": "Trading account not found or access denied"},
                 "version": "1.0"
             }), 404
 
@@ -1061,16 +1103,29 @@ def update_currency_exchange(exchange_uuid: str):
         data = request.get_json()
         logger.info(f"Received update data: {data}")
         
+        # Get user_id from Flask context (set by auth middleware)
+        user_id = getattr(g, 'user_id', None)
+        
+        if user_id is None:
+            return jsonify({
+                "status": "error",
+                "error": {"message": "User authentication required"},
+                "version": "1.0"
+            }), 401
+        
         db: Session = g.db
         exchange_id = CashFlowHelperService.create_exchange_id(exchange_uuid)
         
-        # Get existing flows
+        # Get existing flows (filtered by user_id)
         flows = CashFlowHelperService.get_exchange_flows(db, exchange_id)
+        
+        # Filter flows by user_id
+        flows = [f for f in flows if f.user_id == user_id]
         
         if not flows:
             return jsonify({
                 "status": "error",
-                "error": {"message": "Currency exchange not found"},
+                "error": {"message": "Currency exchange not found or access denied"},
                 "version": "1.0"
             }), 404
         
@@ -1099,6 +1154,18 @@ def update_currency_exchange(exchange_uuid: str):
         
         # Extract data
         trading_account_id = int(data['trading_account_id'])
+        
+        # Verify account belongs to user
+        account = db.query(TradingAccount).filter(
+            TradingAccount.id == trading_account_id,
+            TradingAccount.user_id == user_id
+        ).first()
+        if not account:
+            return jsonify({
+                "status": "error",
+                "error": {"message": "Trading account not found or access denied"},
+                "version": "1.0"
+            }), 404
         from_currency_id = int(data['from_currency_id'])
         to_currency_id = int(data['to_currency_id'])
         from_amount = float(data['from_amount'])
@@ -1303,11 +1370,24 @@ def delete_currency_exchange(exchange_uuid: str):
     try:
         logger.info(f"=== DELETE CURRENCY EXCHANGE START: {exchange_uuid} ===")
         
+        # Get user_id from Flask context (set by auth middleware)
+        user_id = getattr(g, 'user_id', None)
+        
+        if user_id is None:
+            return jsonify({
+                "status": "error",
+                "error": {"message": "User authentication required"},
+                "version": "1.0"
+            }), 401
+        
         db: Session = g.db
         exchange_id = CashFlowHelperService.create_exchange_id(exchange_uuid)
         
-        # Get existing flows
+        # Get existing flows (filtered by user_id)
         flows = CashFlowHelperService.get_exchange_flows(db, exchange_id)
+        
+        # Filter flows by user_id
+        flows = [f for f in flows if f.user_id == user_id]
         
         if not flows:
             return jsonify({

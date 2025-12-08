@@ -100,7 +100,11 @@ class BaseEntityAPI:
                     data = [record.to_dict() if hasattr(record, 'to_dict') else record for record in records]
             else:
                 # Fallback to direct query if service doesn't have get_all
-                records = db.query(self.service_class.model).all()
+                query = db.query(self.service_class.model)
+                # Add user_id filter if model has user_id and user_id is available
+                if user_id is not None and hasattr(self.service_class.model, 'user_id'):
+                    query = query.filter(self.service_class.model.user_id == user_id)
+                records = query.all()
                 data = [record.to_dict() if hasattr(record, 'to_dict') else record for record in records]
             
             data = normalizer.normalize_output(data)

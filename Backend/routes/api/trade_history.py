@@ -36,24 +36,21 @@ trade_history_bp = Blueprint('trade_history', __name__, url_prefix='/api/trade-h
 user_service = UserService()
 
 
-def _resolve_user_id() -> int:
+def _resolve_user_id() -> Optional[int]:
     """
     Return active user id from Flask context (set by auth middleware).
-    Falls back to default user if not authenticated (for backward compatibility).
+    
+    Returns None if user is not authenticated (for proper authorization checks).
+    No fallback to default user - this ensures proper access control.
     """
     # Primary: Get from Flask context (set by auth middleware)
     user_id = getattr(g, 'user_id', None)
     if user_id is not None:
         return user_id
     
-    # Fallback: Check query parameter
-    user_id = request.args.get('user_id', type=int)
-    if user_id is not None:
-        return user_id
-    
-    # Fallback: Default user (for backward compatibility and tools)
-    default_user = user_service.get_default_user()
-    return default_user["id"] if default_user else 1
+    # No fallback - return None to trigger proper authorization checks
+    # This ensures users can only access their own data
+    return None
 
 
 @trade_history_bp.route('/', methods=['GET'])
@@ -79,8 +76,15 @@ def get_trade_history():
     try:
         db: Session = g.db
         
-        # Resolve user_id with fallback
+        # Resolve user_id - CRITICAL: user_id is required for authorization
         user_id = _resolve_user_id()
+        if user_id is None:
+            normalizer = BaseEntityUtils.get_request_normalizer(request)
+            error_payload = BaseEntityUtils.create_error_payload(
+                normalizer,
+                "User authentication required. Please log in to access trade history."
+            )
+            return jsonify(error_payload), 401
         
         normalizer = BaseEntityUtils.get_request_normalizer(request)
         
@@ -495,8 +499,15 @@ def get_trade_timeline(trade_id):
     try:
         db: Session = g.db
         
-        # Resolve user_id with fallback
+        # Resolve user_id - CRITICAL: user_id is required for authorization
         user_id = _resolve_user_id()
+        if user_id is None:
+            normalizer = BaseEntityUtils.get_request_normalizer(request)
+            error_payload = BaseEntityUtils.create_error_payload(
+                normalizer,
+                "User authentication required. Please log in to access trade timeline."
+            )
+            return jsonify(error_payload), 401
         
         normalizer = BaseEntityUtils.get_request_normalizer(request)
         
@@ -553,8 +564,15 @@ def get_trade_chart_data(trade_id):
     try:
         db: Session = g.db
         
-        # Resolve user_id with fallback
+        # Resolve user_id - CRITICAL: user_id is required for authorization
         user_id = _resolve_user_id()
+        if user_id is None:
+            normalizer = BaseEntityUtils.get_request_normalizer(request)
+            error_payload = BaseEntityUtils.create_error_payload(
+                normalizer,
+                "User authentication required. Please log in to access trade chart data."
+            )
+            return jsonify(error_payload), 401
         
         normalizer = BaseEntityUtils.get_request_normalizer(request)
         
@@ -624,8 +642,15 @@ def get_trade_statistics_detailed(trade_id):
     try:
         db: Session = g.db
         
-        # Resolve user_id with fallback
+        # Resolve user_id - CRITICAL: user_id is required for authorization
         user_id = _resolve_user_id()
+        if user_id is None:
+            normalizer = BaseEntityUtils.get_request_normalizer(request)
+            error_payload = BaseEntityUtils.create_error_payload(
+                normalizer,
+                "User authentication required. Please log in to access trade statistics."
+            )
+            return jsonify(error_payload), 401
         
         normalizer = BaseEntityUtils.get_request_normalizer(request)
         
@@ -680,8 +705,15 @@ def get_trade_full_analysis(trade_id):
     try:
         db: Session = g.db
         
-        # Resolve user_id with fallback
+        # Resolve user_id - CRITICAL: user_id is required for authorization
         user_id = _resolve_user_id()
+        if user_id is None:
+            normalizer = BaseEntityUtils.get_request_normalizer(request)
+            error_payload = BaseEntityUtils.create_error_payload(
+                normalizer,
+                "User authentication required. Please log in to access trade analysis."
+            )
+            return jsonify(error_payload), 401
         
         normalizer = BaseEntityUtils.get_request_normalizer(request)
         
@@ -726,6 +758,23 @@ def get_trade_full_analysis(trade_id):
             user_id=user_id
         )
         
+        # Get trade data for metadata
+        from services.trade_service import TradeService
+        trade = TradeService.get_by_id(db, trade_id, user_id=user_id)
+        trade_data = None
+        if trade:
+            trade_dict = trade.to_dict()
+            # Add ticker info if available
+            if trade.ticker:
+                trade_dict['ticker'] = {
+                    'id': trade.ticker.id,
+                    'symbol': trade.ticker.symbol,
+                    'name': trade.ticker.name
+                }
+                trade_dict['ticker_id'] = trade.ticker.id
+                trade_dict['ticker_symbol'] = trade.ticker.symbol
+            trade_data = trade_dict
+        
         # Combine results
         result = {
             'timeline': timeline_result.get('timeline', []),
@@ -737,6 +786,7 @@ def get_trade_full_analysis(trade_id):
             'statistics': statistics_result.get('statistics', {}),
             'metadata': {
                 'trade_id': trade_id,
+                'trade_data': trade_data,  # Include full trade data in metadata
                 **timeline_result.get('metadata', {}),
                 'chart_metadata': chart_result.get('metadata', {}),
                 'statistics_metadata': statistics_result.get('metadata', {})

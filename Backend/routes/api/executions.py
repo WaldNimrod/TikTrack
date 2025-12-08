@@ -472,6 +472,17 @@ def suggest_trades_for_execution(execution_id: int):
 def batch_assign_executions():
     """Batch assign executions to trades with validation and rollback support"""
     db: Session = g.db
+    
+    # Get user_id from Flask context (set by auth middleware)
+    user_id = getattr(g, 'user_id', None)
+    
+    if user_id is None:
+        return jsonify({
+            "status": "error",
+            "error": {"message": "User authentication required"},
+            "version": "1.0"
+        }), 401
+    
     try:
         # Get JSON data - handle None case when content-type is not application/json
         data = request.get_json() or {}
@@ -502,18 +513,24 @@ def batch_assign_executions():
                 })
                 continue
             
-            execution = db.query(Execution).filter(Execution.id == execution_id).first()
+            execution = db.query(Execution).filter(
+                Execution.id == execution_id,
+                Execution.user_id == user_id
+            ).first()
             if not execution:
                 validation_errors.append({
                     "execution_id": execution_id,
                     "trade_id": trade_id,
-                    "error": "Execution not found"
+                    "error": "Execution not found or access denied"
                 })
                 continue
             
-            # Verify trade exists
+            # Verify trade exists and belongs to user
             from models.trade import Trade
-            trade = db.query(Trade).filter(Trade.id == trade_id).first()
+            trade = db.query(Trade).filter(
+                Trade.id == trade_id,
+                Trade.user_id == user_id
+            ).first()
             if not trade:
                 validation_errors.append({
                     "execution_id": execution_id,

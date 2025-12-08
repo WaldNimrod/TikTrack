@@ -524,7 +524,7 @@ def analyze_session(session_id: int):
 @user_data_import_bp.route('/session/<int:session_id>', methods=['GET'])
 def get_session(session_id: int):
     """
-    Get session details.
+    Get session details (for authenticated user).
     
     Args:
         session_id: Import session ID
@@ -532,17 +532,28 @@ def get_session(session_id: int):
     Returns:
         JSON response with session data
     """
+    # Get user_id from Flask context (set by auth middleware)
+    user_id = getattr(g, 'user_id', None)
+    
+    if user_id is None:
+        return jsonify({
+            'status': 'error',
+            'message': 'User authentication required'
+        }), 401
+    
     try:
         db_session = next(get_db())
         try:
+            # Filter by user_id - import sessions are user-specific
             session = db_session.query(ImportSession).filter(
-                ImportSession.id == session_id
+                ImportSession.id == session_id,
+                ImportSession.user_id == user_id
             ).first()
             
             if not session:
                 return jsonify({
                     'status': 'error',
-                    'message': 'Session not found'
+                    'message': 'Session not found or access denied'
                 }), 404
             
             # Try to get summary_data from cache first
@@ -567,11 +578,12 @@ def get_session(session_id: int):
             if summary_data:
                 session_dict['summary_data'] = _project_storage_payload(summary_data)
             
-            # Include linked trading account information
+            # Include linked trading account information (verify it belongs to user)
             if session.trading_account_id:
                 try:
                     trading_account = db_session.query(TradingAccount).filter(
-                        TradingAccount.id == session.trading_account_id
+                        TradingAccount.id == session.trading_account_id,
+                        TradingAccount.user_id == user_id
                     ).first()
                     if trading_account:
                         from services.user_data_import.import_orchestrator import ImportOrchestrator
@@ -1055,16 +1067,25 @@ def refresh_preview(session_id):
 
 @user_data_import_bp.route('/session/<int:session_id>/allow-existing', methods=['POST'])
 def allow_existing_record(session_id):
-    """Allow importing a record that exists in the system"""
+    """Allow importing a record that exists in the system (for authenticated user)"""
+    # Get user_id from Flask context (set by auth middleware)
+    user_id = getattr(g, 'user_id', None)
+    
+    if user_id is None:
+        return jsonify({'status': 'error', 'message': 'User authentication required'}), 401
+    
     try:
         data = request.get_json()
         record_index = data.get('record_index')
         
-        # Get session
+        # Get session (filtered by user_id)
         db_session = next(get_db())
-        session = db_session.query(ImportSession).filter_by(id=session_id).first()
+        session = db_session.query(ImportSession).filter(
+            ImportSession.id == session_id,
+            ImportSession.user_id == user_id
+        ).first()
         if not session:
-            return jsonify({'status': 'error', 'message': 'Session not found'}), 404
+            return jsonify({'status': 'error', 'message': 'Session not found or access denied'}), 404
         
         # Load preview data
         preview_data = session.preview_data
@@ -1391,15 +1412,27 @@ def get_supported_formats():
 @user_data_import_bp.route('/accounts', methods=['GET'])
 def get_trading_accounts():
     """
-    Get list of trading accounts for import.
+    Get list of trading accounts for import (for authenticated user).
     
     Returns:
         JSON response with trading accounts
     """
+    # Get user_id from Flask context (set by auth middleware)
+    user_id = getattr(g, 'user_id', None)
+    
+    if user_id is None:
+        return jsonify({
+            'status': 'error',
+            'message': 'User authentication required'
+        }), 401
+    
     try:
         db_session = next(get_db())
         try:
-            accounts = db_session.query(TradingAccount).all()
+            # Filter by user_id - trading accounts are user-specific
+            accounts = db_session.query(TradingAccount).filter(
+                TradingAccount.user_id == user_id
+            ).all()
             
             return jsonify({
                 'status': 'success',

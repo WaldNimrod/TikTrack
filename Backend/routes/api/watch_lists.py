@@ -776,7 +776,10 @@ def sync_flag_lists():
         JSON response with sync status
     """
     db: Session = g.db
-    user_id = _resolve_user_id()
+    try:
+        user_id = _resolve_user_id()
+    except ValueError as e:
+        return _handle_auth_error(e)
     
     try:
         normalizer = _get_watch_lists_normalizer()

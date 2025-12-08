@@ -31,6 +31,7 @@ user_service = UserService()
 # Initialize base API (quotes is complex, so we'll use it selectively)
 
 @quotes_bp.route('/quotes/batch', methods=['GET'])
+@handle_database_session()
 def get_quotes_batch():
     """
     GET /api/quotes/batch?ticker_ids=... 
@@ -66,14 +67,33 @@ def get_quotes_batch():
                 "error": "No valid ticker IDs provided"
             }), 400
         
+        # Get user_id from Flask context (set by auth middleware)
+        user_id = getattr(g, 'user_id', None)
+        
+        if user_id is None:
+            return jsonify({
+                "status": "error",
+                "error": "User authentication required"
+            }), 401
+        
         # Get database session
-        db: Session = next(get_db())
+        db: Session = g.db
         
         try:
             quotes = []
             
             for ticker_id in ticker_ids:
                 try:
+                    # Verify user has access to this ticker
+                    from models.user_ticker import UserTicker
+                    user_ticker = db.query(UserTicker).filter(
+                        UserTicker.ticker_id == ticker_id,
+                        UserTicker.user_id == user_id
+                    ).first()
+                    
+                    if not user_ticker:
+                        continue  # Skip tickers user doesn't have access to
+                    
                     # Get ticker
                     ticker = db.query(Ticker).filter(Ticker.id == ticker_id).first()
                     if not ticker:
@@ -124,65 +144,84 @@ def get_quotes_batch():
         }), 500
 
 
-@quotes_bp.route('/quotes/<int:ticker_id>', methods=['GET'])  
+@quotes_bp.route('/quotes/<int:ticker_id>', methods=['GET'])
+@handle_database_session()
 def get_quote(ticker_id: int):
     """
     GET /api/quotes/{ticker_id}
     
     As specified in Section 5.1 of External Data Integration Specification:
-    - Returns single quote for ticker
+    - Returns single quote for ticker (for authenticated user)
     - Responds with UTC timestamps (asof_utc, fetched_at)
     - No local fields in Stage-1
     """
+    # Get user_id from Flask context (set by auth middleware)
+    user_id = getattr(g, 'user_id', None)
+    
+    if user_id is None:
+        return jsonify({
+            "status": "error",
+            "error": "User authentication required"
+        }), 401
+    
     try:
         # Get database session
-        db: Session = next(get_db())
+        db: Session = g.db
         
-        try:
-            # Get ticker
-            ticker = db.query(Ticker).filter(Ticker.id == ticker_id).first()
-            if not ticker:
-                return jsonify({
-                    "status": "error",
-                    "error": f"Ticker with ID {ticker_id} not found"
-                }), 404
-            
-            # Get latest quote
-            quote = db.query(MarketDataQuote).filter(
-                MarketDataQuote.ticker_id == ticker_id
-            ).order_by(MarketDataQuote.fetched_at.desc()).first()
-            
-            if not quote:
-                return jsonify({
-                    "status": "error", 
-                    "error": f"No quote data available for ticker {ticker.symbol}"
-                }), 404
-            
-            # Build response according to specification (UTC fields only)
-            quote_data = {
-                "ticker_id": ticker_id,
-                "symbol": ticker.symbol,
-                "price": quote.price,
-                "change_pct_day": quote.change_pct_day,
-                "change_amount_day": quote.change_amount_day,
-                "volume": quote.volume,
-                "currency": quote.currency,
-                "asof_utc": quote.asof_utc.isoformat() if quote.asof_utc else None,
-                "fetched_at": quote.fetched_at.isoformat(),
-                "source": quote.source,
-                # Technical indicators
-                "atr": quote.atr,
-                "atr_period": quote.atr_period or 14
-            }
-            
+        # Verify user has access to this ticker
+        from models.user_ticker import UserTicker
+        user_ticker = db.query(UserTicker).filter(
+            UserTicker.ticker_id == ticker_id,
+            UserTicker.user_id == user_id
+        ).first()
+        
+        if not user_ticker:
             return jsonify({
-                "status": "success",
-                "data": quote_data,
-                "timestamp": datetime.now(timezone.utc).isoformat()
-            }), 200
-            
-        finally:
-            db.close()
+                "status": "error",
+                "error": f"Ticker with ID {ticker_id} not found or access denied"
+            }), 404
+        
+        # Get ticker
+        ticker = db.query(Ticker).filter(Ticker.id == ticker_id).first()
+        if not ticker:
+            return jsonify({
+                "status": "error",
+                "error": f"Ticker with ID {ticker_id} not found"
+            }), 404
+        
+        # Get latest quote
+        quote = db.query(MarketDataQuote).filter(
+            MarketDataQuote.ticker_id == ticker_id
+        ).order_by(MarketDataQuote.fetched_at.desc()).first()
+        
+        if not quote:
+            return jsonify({
+                "status": "error", 
+                "error": f"No quote data available for ticker {ticker.symbol}"
+            }), 404
+        
+        # Build response according to specification (UTC fields only)
+        quote_data = {
+            "ticker_id": ticker_id,
+            "symbol": ticker.symbol,
+            "price": quote.price,
+            "change_pct_day": quote.change_pct_day,
+            "change_amount_day": quote.change_amount_day,
+            "volume": quote.volume,
+            "currency": quote.currency,
+            "asof_utc": quote.asof_utc.isoformat() if quote.asof_utc else None,
+            "fetched_at": quote.fetched_at.isoformat(),
+            "source": quote.source,
+            # Technical indicators
+            "atr": quote.atr,
+            "atr_period": quote.atr_period or 14
+        }
+        
+        return jsonify({
+            "status": "success",
+            "data": quote_data,
+            "timestamp": datetime.now(timezone.utc).isoformat()
+        }), 200
             
     except Exception as e:
         logger.error(f"Error getting quote for ticker {ticker_id}: {e}")

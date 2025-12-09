@@ -46,11 +46,13 @@
 
 ### עמודים Production
 
-- **[watch-list.html](../../trading-ui/watch-list.html)** - עמוד ראשי מלא (Production) ✅
-  - **גישה:** `http://localhost:8080/watch-list`
+- **[watch-lists.html](../../trading-ui/watch-lists.html)** - עמוד ראשי מלא (Production) ✅
+  - **גישה:** `http://localhost:8080/watch-lists`
   - **API:** `/api/watch-lists/*`
   - **Business Service:** `WatchListService`
   - **סטטוס:** ✅ מוכן - מימוש מלא הושלם דצמבר 2025
+  - **מבנה:** Top Section (Summary Stats) + Active List View + Flagged Tickers (Optional)
+  - **הערה:** Watch Lists Grid Section הוסר - רשימות נבחרות דרך Select Dropdown
 
 ### מוקאפים (להתייחסות)
 

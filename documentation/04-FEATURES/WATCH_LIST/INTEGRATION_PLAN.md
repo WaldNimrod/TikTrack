@@ -470,7 +470,7 @@ if (state) {
   <button type="button"
           data-button-type="TOGGLE"
           data-variant="small"
-          data-onclick="toggleSection('watch-lists-section')"
+          data-onclick="toggleSection('active-list-section')"
           data-text="הצג/הסתר">
   </button>
 </div>

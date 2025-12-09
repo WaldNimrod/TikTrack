@@ -95,12 +95,12 @@ Backend/
     └── watch_list_service.py   # Business logic
 
 trading-ui/
-├── watch-lists.html            # Main page
+├── watch-lists.html            # Main page (Production)
 ├── scripts/
 │   ├── services/
 │   │   ├── watch-lists-data.js      # Data service
 │   │   └── watch-lists-ui-service.js # UI service
-│   └── watch-lists.js          # Page-specific logic
+│   └── watch-lists-page.js    # Page-specific logic
 
 documentation/04-FEATURES/WATCH_LIST/
 ├── WATCHLIST_SPEC.md           # Main specification

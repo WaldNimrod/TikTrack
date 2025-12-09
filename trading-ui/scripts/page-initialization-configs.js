@@ -3413,7 +3413,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       sectionsDefaultState: 'open',
       sectionDefaultStates: {
         'top': 'open',
-        'watch-lists': 'open',
         'active-list': 'open',
         'flagged': 'closed'
       },

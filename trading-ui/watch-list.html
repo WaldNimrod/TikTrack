@@ -214,48 +214,6 @@
                                 </div>
                             </div>
 
-                            <!-- Watch Lists Grid Section -->
-                            <section class="content-section" id="watch-lists-section" data-section="watch-lists">
-                                <div class="section-header">
-                                    <div class="table-title">
-                                        <span class="icon-placeholder icon" data-icon="list" data-size="16" data-alt="list" aria-label="list"></span>
-                                        <span>רשימות צפייה</span>
-                                    </div>
-                                    <div class="table-actions">
-                                        <button type="button"
-                                                data-button-type="TOGGLE"
-                                                data-variant="small"
-                                                data-onclick="toggleSection('watch-lists-section')"
-                                                data-text="הצג/הסתר">
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="section-body">
-                                    <div class="table-responsive" id="watchListsContainer">
-                                        <table class="table table-striped align-middle" id="watchListsTable" data-table-type="watch_lists">
-                                            <thead class="table-light">
-                                                <tr>
-                                                    <th class="col-icon">איקון</th>
-                                                    <th class="col-name">
-                                                        <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(1, window.WatchListsPage?.watchListsData || [], 'watch_lists', window.WatchListsPage?.updateWatchListsTable); }" style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">שם רשימה <span class="sort-icon">↕</span></button>
-                                                    </th>
-                                                    <th class="col-view-mode">תצוגה</th>
-                                                    <th class="col-tickers">
-                                                        <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(3, window.WatchListsPage?.watchListsData || [], 'watch_lists', window.WatchListsPage?.updateWatchListsTable); }" style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">טיקרים <span class="sort-icon">↕</span></button>
-                                                    </th>
-                                                    <th class="col-actions actions-cell">
-                                                        <span class="actions-header-icon">⋮</span>
-                                                    </th>
-                                                </tr>
-                                            </thead>
-                                            <tbody id="watchListsTableBody">
-                                                <!-- Data will be loaded dynamically from API -->
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </section>
-
                             <!-- Active List View Section -->
                             <section class="content-section" id="active-list-section" data-section="active-list">
                                 <div class="section-header">

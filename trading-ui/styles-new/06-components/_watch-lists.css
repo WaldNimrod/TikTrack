@@ -8,6 +8,14 @@
  * @created 26 בנובמבר 2025
  */
 
+/* ===== Hide watch-lists-section (removed from HTML) ===== */
+#watch-lists-section {
+    display: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    overflow: hidden !important;
+}
+
 /* ===== Watch List Card ===== */
 .watch-list-card {
     border: 1px solid var(--border-color, #dee2e6);

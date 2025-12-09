@@ -1501,6 +1501,7 @@
             let fullAnalysis = null;
             let tradeData = null;
             let timelineData = [];
+            let planVsExecution = null;
             
             // Use new API endpoint for full analysis if available
             if (window.TradeHistoryData && typeof window.TradeHistoryData.loadTradeFullAnalysis === 'function') {
@@ -2260,7 +2261,6 @@
             }
             
             // 5. Load plan vs execution analysis (if dates are available and not already loaded from fullAnalysis)
-            let planVsExecution = null;
             
             // First, try to get from fullAnalysis
             if (fullAnalysis && fullAnalysis.plan_vs_execution) {

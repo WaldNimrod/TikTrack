@@ -20,8 +20,7 @@
  * - loadWatchLists() - טעינת רשימות צפייה
  * - loadWatchListItems(listId) - טעינת פריטי רשימה
  * 
- * RENDERING (5)
- * - renderWatchListsGrid() - רינדור רשת רשימות
+ * RENDERING (4)
  * - renderActiveListView() - רינדור תצוגת רשימה פעילה
  * - renderSummaryStats() - רינדור סטטיסטיקות סיכום
  * - renderFlaggedTickers() - רינדור טיקרים מסומנים
@@ -203,20 +202,6 @@
         };
 
         // Register active list table
-        // Register watch_lists table for sorting
-        window.UnifiedTableSystem.registry.register('watch_lists', {
-            dataGetter: () => watchListsData || [],
-            updateFunction: async (data) => {
-                watchListsData = Array.isArray(data) ? data : [];
-                renderWatchListsGrid();
-            },
-            tableSelector: '#watchListsTable',
-            columns: getColumns('watch_lists'),
-            sortable: true,
-            filterable: true,
-            defaultSort: { columnIndex: 0, direction: 'asc', key: 'display_order' }
-        });
-
         window.UnifiedTableSystem.registry.register('watch_list_items', {
             dataGetter: () => activeListItems || [],
             updateFunction: async (data) => {
@@ -305,7 +290,6 @@
             }
             
             watchListsData = await window.WatchListsDataService.loadWatchListsData({ force: false });
-            renderWatchListsGrid();
             
             // Update actions menu after data is loaded
             updateActionsMenu();
@@ -670,177 +654,6 @@
     }
 
     // ===== RENDERING =====
-
-    /**
-     * Render watch lists grid
-     */
-    function renderWatchListsGrid() {
-        const tbody = document.getElementById('watchListsTableBody');
-        if (!tbody) {
-            window.Logger?.warn?.('⚠️ watchListsTableBody not found', PAGE_LOG_CONTEXT);
-            return;
-        }
-
-        // Clear existing rows
-        tbody.innerHTML = '';
-        
-        // Update actions menu after grid is rendered (container should be available now)
-        setTimeout(() => {
-            updateActionsMenu();
-        }, 100);
-
-        // If no data, show empty message
-        if (!watchListsData || watchListsData.length === 0) {
-            const tr = document.createElement('tr');
-            const td = document.createElement('td');
-            td.colSpan = 5;
-            td.className = 'text-center text-muted';
-            td.textContent = 'אין רשימות צפייה. לחץ על "יצירת רשימת צפייה חדשה" כדי להתחיל.';
-            tr.appendChild(td);
-            tbody.appendChild(tr);
-            return;
-        }
-
-        // Render each watch list
-        watchListsData.forEach(list => {
-            const tr = document.createElement('tr');
-            tr.setAttribute('data-watch-list-id', list.id);
-            // Add click handler to row - select list on click
-            tr.style.cursor = 'pointer';
-            tr.addEventListener('click', (e) => {
-                // Don't trigger if clicking on buttons or actions
-                if (e.target.closest('.actions-cell') || e.target.closest('button')) {
-                    return;
-                }
-                window.WatchListsPage?.selectList(list.id);
-            });
-
-            // Icon column - larger icon for list header
-            const tdIcon = document.createElement('td');
-            tdIcon.className = 'col-icon';
-            if (list.icon) {
-                const iconSpan = document.createElement('span');
-                iconSpan.className = 'icon-placeholder icon';
-                iconSpan.setAttribute('data-icon', list.icon);
-                iconSpan.setAttribute('data-size', '32'); // Larger icon for list header
-                iconSpan.setAttribute('data-alt', list.icon);
-                iconSpan.setAttribute('aria-label', list.icon);
-                iconSpan.style.fontSize = '1.5rem'; // Additional size styling
-                tdIcon.appendChild(iconSpan);
-            }
-            tr.appendChild(tdIcon);
-
-            // Name column - for flag lists, show only color, not entity name
-            const tdName = document.createElement('td');
-            tdName.className = 'col-name';
-            const strong = document.createElement('strong');
-            if (list.is_flag_list && list.flag_color) {
-                // Flag list - show only color indicator, not entity name
-                const colorIndicator = document.createElement('span');
-                colorIndicator.className = 'flag-color-indicator';
-                colorIndicator.style.width = '20px';
-                colorIndicator.style.height = '20px';
-                colorIndicator.style.backgroundColor = list.flag_color;
-                colorIndicator.style.borderRadius = '3px';
-                colorIndicator.style.display = 'inline-block';
-                colorIndicator.style.marginInlineEnd = '0.5rem';
-                colorIndicator.style.verticalAlign = 'middle';
-                colorIndicator.title = `דגל ${list.flag_color}`;
-                strong.appendChild(colorIndicator);
-                // Don't show entity name for flag lists
-            } else {
-            strong.textContent = list.name || `רשימה #${list.id}`;
-            }
-            tdName.appendChild(strong);
-            tr.appendChild(tdName);
-
-            // View mode column
-            const tdViewMode = document.createElement('td');
-            tdViewMode.className = 'col-view-mode';
-            const viewModeMap = { 'table': 'טבלה', 'cards': 'כרטיסים', 'compact': 'קומפקטי' };
-            const viewModeIconMap = { 'table': 'table', 'cards': 'cards', 'compact': 'list' };
-            const viewMode = list.view_mode || 'table';
-            if (viewModeIconMap[viewMode]) {
-                const iconSpan = document.createElement('span');
-                iconSpan.className = 'icon-placeholder icon';
-                iconSpan.setAttribute('data-icon', viewModeIconMap[viewMode]);
-                iconSpan.setAttribute('data-size', '16');
-                iconSpan.setAttribute('data-alt', viewMode);
-                iconSpan.setAttribute('aria-label', viewMode);
-                tdViewMode.appendChild(iconSpan);
-            }
-            const viewModeText = document.createElement('span');
-            viewModeText.className = 'ms-2';
-            viewModeText.textContent = viewModeMap[viewMode] || viewMode;
-            tdViewMode.appendChild(viewModeText);
-            tr.appendChild(tdViewMode);
-
-            // Tickers count column
-            const tdTickers = document.createElement('td');
-            tdTickers.className = 'col-tickers';
-            const itemsIcon = document.createElement('span');
-            itemsIcon.className = 'icon-placeholder icon';
-            itemsIcon.setAttribute('data-icon', 'items');
-            itemsIcon.setAttribute('data-size', '14');
-            itemsIcon.setAttribute('data-alt', 'items');
-            itemsIcon.setAttribute('aria-label', 'items');
-            tdTickers.appendChild(itemsIcon);
-            const countText = document.createTextNode(` ${list.item_count || 0} טיקרים`);
-            tdTickers.appendChild(countText);
-            tr.appendChild(tdTickers);
-
-            // Actions column
-            const tdActions = document.createElement('td');
-            tdActions.className = 'col-actions actions-cell';
-            const actionsDiv = document.createElement('div');
-            actionsDiv.className = 'd-flex gap-1 justify-content-center align-items-center';
-            actionsDiv.style.flexWrap = 'nowrap';
-
-            // Edit button
-            const btnEdit = document.createElement('button');
-            btnEdit.type = 'button';
-            btnEdit.setAttribute('data-button-type', 'EDIT');
-            btnEdit.setAttribute('data-variant', 'small');
-            btnEdit.setAttribute('data-text', '');
-            btnEdit.setAttribute('data-onclick', `window.WatchListsPage?.editList(${list.id})`);
-            btnEdit.title = 'ערוך רשימה';
-            actionsDiv.appendChild(btnEdit);
-
-            // Delete button - hide for flag lists
-            if (!list.is_flag_list) {
-            const btnDelete = document.createElement('button');
-            btnDelete.type = 'button';
-            btnDelete.setAttribute('data-button-type', 'DELETE');
-            btnDelete.setAttribute('data-variant', 'small');
-            btnDelete.setAttribute('data-text', '');
-            btnDelete.setAttribute('data-onclick', `window.WatchListsPage?.deleteList(${list.id})`);
-            btnDelete.title = 'מחק רשימה';
-            actionsDiv.appendChild(btnDelete);
-            }
-
-            tdActions.appendChild(actionsDiv);
-            tr.appendChild(tdActions);
-
-            tbody.appendChild(tr);
-        });
-
-        // Update select dropdown
-        updateActiveListSelect();
-
-        // Initialize button system for new buttons - use processButtons instead of initializeButtons for better icon rendering
-        if (window.ButtonSystemInit?.processButtons) {
-            // Use setTimeout to ensure DOM is ready
-            setTimeout(() => {
-                window.ButtonSystemInit.processButtons(tbody);
-            }, 100);
-        } else if (window.ButtonSystemInit?.initializeButtons) {
-            setTimeout(() => {
-            window.ButtonSystemInit.initializeButtons(tbody);
-            }, 100);
-        }
-
-        window.Logger?.debug?.('📊 Watch lists grid rendered', { ...PAGE_LOG_CONTEXT, count: watchListsData.length });
-    }
 
     /**
      * Render active list view
@@ -1982,109 +1795,6 @@
     }
 
     /**
-     * Open edit lists modal - shows table with all watch lists for editing
-     * Uses ModalManagerV2 for proper z-index management with nested modals
-     */
-    async function openEditListsModal() {
-        try {
-            // Create modal HTML with the watch lists table
-            const modalId = 'editWatchListsModal';
-            const modalTitle = 'עריכת רשימות צפייה';
-            
-            // Get the table HTML from the first container
-            const tableContainer = document.getElementById('watchListsContainer');
-            if (!tableContainer) {
-                window.Logger?.warn?.('⚠️ watchListsContainer not found', PAGE_LOG_CONTEXT);
-                if (window.showErrorNotification) {
-                    window.showErrorNotification('שגיאה', 'לא ניתן למצוא את טבלת רשימות הצפייה');
-                }
-                return;
-            }
-            
-            // Clone the table container
-            const tableHTML = tableContainer.innerHTML;
-            
-            // Create modal HTML
-            const modalHTML = `
-                <div class="modal fade" id="${modalId}" tabindex="-1" aria-labelledby="${modalId}Label" aria-hidden="true">
-                    <div class="modal-dialog modal-xl">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="${modalId}Label">${modalTitle}</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="סגור"></button>
-                            </div>
-                            <div class="modal-body">
-                                ${tableHTML}
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">סגור</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-            
-            // Remove existing modal if exists
-            const existingModal = document.getElementById(modalId);
-            if (existingModal) {
-                existingModal.remove();
-            }
-            
-            // Add modal to body
-            document.body.insertAdjacentHTML('beforeend', modalHTML);
-            
-            // Use ModalManagerV2 for proper z-index management with nested modals
-            const modalElement = document.getElementById(modalId);
-            if (modalElement) {
-                // Ensure editWatchListsModal is NOT the last modal (watchListModal should be last)
-                // This ensures proper z-index stacking when opening watchListModal from editWatchListsModal
-                window.Logger?.info?.('✅ [Z-INDEX] editWatchListsModal created', {
-                    ...PAGE_LOG_CONTEXT,
-                    modalId,
-                    isLastChild: modalElement === document.body.lastElementChild
-                });
-                
-                if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
-                    // Use ModalManagerV2 for proper z-index management
-                    await window.ModalManagerV2.showModal(modalId, 'view');
-                    
-                    // Initialize button system for buttons in modal
-                    if (window.ButtonSystemInit?.processButtons) {
-                        setTimeout(() => {
-                            window.ButtonSystemInit.processButtons(modalElement);
-                        }, 100);
-                    }
-                    
-                    // Re-render table in modal (to ensure all buttons work)
-                    renderWatchListsGrid();
-                } else if (window.bootstrap) {
-                    // Fallback to Bootstrap Modal if ModalManagerV2 not available
-                    const modal = new window.bootstrap.Modal(modalElement);
-                    modal.show();
-                    
-                    // Initialize button system for buttons in modal
-                    if (window.ButtonSystemInit?.processButtons) {
-                        setTimeout(() => {
-                            window.ButtonSystemInit.processButtons(modalElement);
-                        }, 100);
-                    }
-                    
-                    // Re-render table in modal (to ensure all buttons work)
-                    renderWatchListsGrid();
-                } else {
-                    window.Logger?.warn?.('⚠️ ModalManagerV2 and Bootstrap Modal not available', PAGE_LOG_CONTEXT);
-                }
-            }
-        } catch (error) {
-            window.Logger?.error?.('❌ Error opening edit lists modal', { ...PAGE_LOG_CONTEXT, error: error?.message || error });
-            
-            if (typeof window.showErrorNotification === 'function') {
-                window.showErrorNotification('שגיאה', `לא ניתן לפתוח את מודל העריכה. ${error?.message || 'שגיאה לא ידועה'}`);
-            }
-        }
-    }
-
-    /**
      * Update actions menu for watch lists
      */
     function updateActionsMenu() {
@@ -2391,13 +2101,6 @@
                 onclick: 'window.WatchListsPage?.openAddListModal()',
                 text: '',
                 title: 'הוסף רשימה'
-            },
-            {
-                type: 'EDIT',
-                variant: 'small',
-                onclick: 'window.WatchListsPage?.openEditListsModal()',
-                text: '',
-                title: 'ערוך רשימות'
             },
             {
                 type: 'DELETE',
@@ -3935,7 +3638,6 @@
         loadWatchListItems,
 
         // Rendering
-        renderWatchListsGrid,
         renderActiveListView,
         renderSummaryStats,
         renderFlaggedTickers,
@@ -3963,7 +3665,6 @@
         // Modal management
         openAddListModal,
         openEditListModal: openEditListModal,
-        openEditListsModal, // New: Edit all lists modal
         editList: openEditListModal, // Alias
         addTicker,
         editItem,

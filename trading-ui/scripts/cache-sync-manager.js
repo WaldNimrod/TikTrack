@@ -149,8 +149,13 @@ class CacheSyncManager {
       this.startQueueProcessing();
       this.initialized = true;
 
-      if (window.notificationSystem) {
-        window.notificationSystem.showNotification('מערכת סינכרון מטמון אותחלה בהצלחה', 'success');
+      const notifySuccess =
+        window.NotificationSystem?.showSuccess
+        || window.NotificationSystem?.showNotification
+        || window.showNotification
+        || window.notificationSystem?.showNotification;
+      if (typeof notifySuccess === 'function') {
+        notifySuccess('מערכת סינכרון מטמון אותחלה בהצלחה', 'success');
       }
 
       return true;
@@ -159,8 +164,13 @@ class CacheSyncManager {
         window.Logger.error('❌ Failed to initialize Cache Sync Manager:', error, { page: 'cache' });
       }
 
-      if (window.notificationSystem) {
-        window.notificationSystem.showNotification('שגיאה באתחול מערכת סינכרון מטמון', 'error');
+      const notifyError =
+        window.NotificationSystem?.showError
+        || window.NotificationSystem?.showNotification
+        || window.showErrorNotification
+        || window.notificationSystem?.showNotification;
+      if (typeof notifyError === 'function') {
+        notifyError('שגיאה באתחול מערכת סינכרון מטמון', 'error');
       }
 
       return false;

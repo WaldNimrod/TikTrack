@@ -1065,7 +1065,9 @@ window.loadTableData = async function(tableType, updateFunction) {
     // Fetch data from server
     const response = await fetch(`/api/data/${tableType}`);
     if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      // החזר אזהרה ודאטה ריק במקום לזרוק חריגות שמפיל עמודי ניטור
+      console.warn(`⚠️ Table ${tableType} returned HTTP ${response.status}: ${response.statusText}`);
+      return [];
     }
     
     const data = await response.json();

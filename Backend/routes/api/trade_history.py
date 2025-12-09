@@ -757,7 +757,6 @@ def get_trade_full_analysis(trade_id):
             trade_id=trade_id,
             user_id=user_id
         )
-        
         # Get trade data for metadata
         from services.trade_service import TradeService
         from services.entity_details_service import EntityDetailsService
@@ -822,7 +821,8 @@ def get_trade_full_analysis(trade_id):
             'is_valid': (
                 timeline_result.get('is_valid', False) and
                 chart_result.get('is_valid', False) and
-                statistics_result.get('is_valid', False)
+                statistics_result.get('is_valid', False) and
+                (plan_vs_execution_result.get('is_valid', True) if plan_vs_execution_result else True)
             )
         }
         
@@ -834,6 +834,8 @@ def get_trade_full_analysis(trade_id):
                 errors.append(chart_result.get('error', 'Chart data calculation failed'))
             if not statistics_result.get('is_valid'):
                 errors.append(statistics_result.get('error', 'Statistics calculation failed'))
+            if plan_vs_execution_result and not plan_vs_execution_result.get('is_valid', True):
+                errors.append(plan_vs_execution_result.get('error', 'Plan vs execution calculation failed'))
             
             error_payload = BaseEntityUtils.create_error_payload(
                 normalizer,

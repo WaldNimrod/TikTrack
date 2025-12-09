@@ -69,9 +69,40 @@ function toggleSeries(seriesKey, visible) {
     updateStrategyPerformanceChart(getFilterValues());
 }
 
+// Helper: ensure UnifiedCacheManager זמין ו מאותחל
+async function ensureUnifiedCacheManagerReady() {
+    // אם כבר מאותחל - לצאת מהר
+    if (window.UnifiedCacheManager?.initialized || window.UnifiedCacheManager?.isInitialized?.()) {
+        return true;
+    }
+    // נסיון לאתחל אם יש initialize
+    if (typeof window.UnifiedCacheManager?.initialize === 'function') {
+        try {
+            await window.UnifiedCacheManager.initialize();
+            return window.UnifiedCacheManager.initialized === true;
+        } catch (e) {
+            if (window.Logger) {
+                window.Logger.warn('UnifiedCacheManager initialize failed (strategy-analysis), continuing without cache', { error: e });
+            }
+        }
+    }
+    // נסיון טעינת סקריפט אם לא נטען
+    if (!window.UnifiedCacheManager && typeof window.loadScriptOnce === 'function') {
+        try {
+            await window.loadScriptOnce('/scripts/unified-cache-manager.js');
+        } catch (e) {
+            if (window.Logger) {
+                window.Logger.warn('UnifiedCacheManager script load failed (strategy-analysis)', { error: e });
+            }
+        }
+    }
+    return !!window.UnifiedCacheManager;
+}
+
 // Save series visibility state using UnifiedCacheManager
 async function saveSeriesVisibilityState() {
     try {
+        await ensureUnifiedCacheManagerReady();
         if (window.UnifiedCacheManager && (window.UnifiedCacheManager.initialized || window.UnifiedCacheManager.isInitialized?.())) {
             await window.UnifiedCacheManager.save(CACHE_KEY_SERIES_VISIBILITY, seriesVisibility, {
                 layer: 'localStorage',
@@ -93,6 +124,7 @@ async function saveSeriesVisibilityState() {
 // Load series visibility state using UnifiedCacheManager
 async function loadSeriesVisibilityState() {
     try {
+        await ensureUnifiedCacheManagerReady();
         if (window.UnifiedCacheManager && (window.UnifiedCacheManager.initialized || window.UnifiedCacheManager.isInitialized?.())) {
             const savedState = await window.UnifiedCacheManager.get(CACHE_KEY_SERIES_VISIBILITY);
             if (savedState && typeof savedState === 'object') {

@@ -159,7 +159,7 @@ async function forceLogoutAndPrompt(reason = 'unauthorized') {
     if (typeof window.TikTrackAuth?.showLoginModal === 'function') {
       await window.TikTrackAuth.showLoginModal();
     } else {
-      window.location.href = 'login.html';
+      window.location.href = '/';
     }
   }
 }
@@ -238,11 +238,11 @@ if (typeof window.addEventListener === 'function') {
           // Show login modal if not already on login/register page
           if (!window.location.pathname.includes('login.html') && 
               !window.location.pathname.includes('register.html')) {
-            if (typeof window.TikTrackAuth?.showLoginModal === 'function') {
-              await window.TikTrackAuth.showLoginModal();
-            } else {
-              window.location.href = 'login.html';
-            }
+              if (typeof window.TikTrackAuth?.showLoginModal === 'function') {
+                await window.TikTrackAuth.showLoginModal();
+              } else {
+                window.location.href = '/';
+              }
           }
         } else if (authEvent.type === 'login') {
           // Login event from another tab - update local state
@@ -674,8 +674,8 @@ async function logout() {
     if (typeof window.TikTrackAuth?.showLoginModal === 'function') {
       await window.TikTrackAuth.showLoginModal();
     } else {
-      // Fallback: redirect to login page if modal not available
-      window.location.href = 'login.html';
+      // Fallback: redirect to home if modal not available
+      window.location.href = '/';
     }
   }, 100);
 }
@@ -1113,7 +1113,7 @@ async function checkAuthentication(onAuthenticated = null, onNotAuthenticated = 
       if (typeof window.TikTrackAuth?.showLoginModal === 'function') {
         await window.TikTrackAuth.showLoginModal();
       } else {
-        window.location.href = 'login.html';
+        window.location.href = '/';
       }
     }
   }
@@ -1684,7 +1684,7 @@ function setupVisibilityCheck() {
             if (typeof window.TikTrackAuth?.showLoginModal === 'function') {
               await window.TikTrackAuth.showLoginModal();
             } else {
-              window.location.href = 'login.html';
+              window.location.href = '/';
             }
           }
         } else {

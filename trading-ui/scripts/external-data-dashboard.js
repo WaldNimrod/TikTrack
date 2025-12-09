@@ -596,6 +596,12 @@
      * @returns {Object|null} ChartSystem instance or null if unavailable
      */
     getChartSystem() {
+      // Lazy-load Chart System if חסר
+      if (!window.ChartSystem && typeof window.loadScriptOnce === 'function') {
+        window.loadScriptOnce('/scripts/charts/chart-system.js').catch((e) => {
+          logger.warn(`${MODULE_NAME}:chart-system-script-load-failed`, { error: e?.message });
+        });
+      }
       if (window.ChartSystem) {
         this.chartSystemUnavailable = false;
         return window.ChartSystem;

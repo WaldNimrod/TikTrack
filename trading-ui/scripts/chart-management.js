@@ -85,6 +85,15 @@
         await window.chartLoader.load();
       }
 
+      // אם המערכת לא זמינה עדיין, לנסות לטעון סקריפט Chart System באופן דינמי
+      if (!window.ChartSystem && typeof window.loadScriptOnce === 'function') {
+        try {
+          await window.loadScriptOnce('/scripts/charts/chart-system.js');
+        } catch (e) {
+          window.Logger?.warn?.('ChartSystem script load failed', { page: 'chart-management', error: e?.message });
+        }
+      }
+
       if (!this.chartSystem || typeof this.chartSystem.create !== 'function') {
         // window.ChartSystem is already an instance (from chart-system.js), not a class
         if (window.ChartSystem && typeof window.ChartSystem.create === 'function') {

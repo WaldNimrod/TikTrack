@@ -1869,6 +1869,11 @@ class EventHandlerManager {
             return {};
         }
         
+        // Guard: ensure element is a valid DOM Element to avoid TypeError on window/document
+        if (!element || element.nodeType !== Node.ELEMENT_NODE) {
+            return {};
+        }
+
         const relevant = {};
         const relevantAttrs = [
             'data-onclick', 'data-onchange', 'data-action', 'data-modal-trigger',

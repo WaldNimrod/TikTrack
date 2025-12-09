@@ -153,7 +153,7 @@
       body = null,
       headers = {},
       signal,
-      credentials = 'same-origin',
+      credentials = 'include',
       // advanced options
       timeoutMs = 15000,
       dedupe = true,
@@ -294,14 +294,8 @@
         payload?.error ||
         payload?.message ||
         `HTTP ${response.status}: ${response.statusText}`;
-      const error = new Error(errorMessage);
-      error.payload = payload;
-      // Authentication handling: mark error for callers, but avoid using the
-      // notification system here (it itself relies on preferences and can
-      // create recursive errors if preferences endpoints return 401).
+      // Authentication handling: להחזיר אובייקט שגיאה רך במקום להפיל את העמוד
       if (response.status === 401 || response.status === 403) {
-        error.isAuthError = true;
-        error.status = response.status;
         try {
           window.Logger?.warn?.('⚠️ Preferences request failed with authentication error', {
             ...PAGE_LOG_CONTEXT,
@@ -310,25 +304,31 @@
             message: errorMessage,
           });
         } catch (_) { /* noop */ }
+        return { status: 'error', error_code: 'AUTH_REQUIRED', message: errorMessage };
       } else if (response.status === 429) {
         // Respect Retry-After header if present, then retry transparently
         const retryAfter = Number(response.headers?.get?.('Retry-After')) || 1;
-        // Jitter to avoid herd effects
         const jitter = Math.floor(Math.random() * 250);
-        // Trip short-lived circuit breaker
         rateLimitedUntil = Date.now() + Math.min(retryAfter * 1000 + jitter, 5000);
         if ((options.maxRetries ?? 2) > 0) {
           await new Promise(r => setTimeout(r, Math.min(retryAfter * 1000 + jitter, 5000)));
-          // Retry once with reduced maxRetries to avoid infinite loop
           return await fetchJson(path, {
             ...options,
             maxRetries: (options.maxRetries ?? 2) - 1,
           });
         }
-        error.status = 429;
-        error.isRateLimited = true;
+        return { status: 'error', error_code: 'RATE_LIMIT_EXCEEDED', message: errorMessage };
       }
-      throw error;
+      try {
+        window.Logger?.error?.('❌ Preferences request failed', {
+          ...PAGE_LOG_CONTEXT,
+          url,
+          status: response.status,
+          message: errorMessage,
+          payload,
+        });
+      } catch (_) { /* noop */ }
+      return { status: 'error', error_code: 'REQUEST_FAILED', message: errorMessage };
     }
 
     // Store latest ETag if present

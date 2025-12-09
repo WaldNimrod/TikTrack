@@ -1207,6 +1207,7 @@ class HeaderSystem {
                       </a>
                       <ul class="tiktrack-dropdown-menu">
                         <li><a class="tiktrack-dropdown-item" href="/watch-list">רשימות צפייה</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/trading-journal">📓 יומן מסחר</a></li>
                       </ul>
                     </li>
                     <li class="tiktrack-nav-item dropdown">
@@ -1220,7 +1221,6 @@ class HeaderSystem {
                         <li class="separator"></li>
                         <li><a class="tiktrack-dropdown-item" href="/trade-history">📈 היסטוריית טרייד</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/portfolio-state">💼 מצב תיק היסטורי</a></li>
-                        <li><a class="tiktrack-dropdown-item" href="/trading-journal">📓 יומן מסחר</a></li>
                       </ul>
                     </li>
                     <li class="tiktrack-nav-item dropdown">
@@ -1243,7 +1243,7 @@ class HeaderSystem {
                         <span class="tiktrack-dropdown-arrow">▼</span>
                       </a>
                       <ul class="tiktrack-dropdown-menu">
-                        <li><a class="tiktrack-dropdown-item" href="/user-profile">👤 פרופיל משתמש</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/user-profile.html">👤 פרופיל משתמש</a></li>
                         <li class="separator"></li>
                         <li><a class="tiktrack-dropdown-item" href="/data_import">ייבוא נתונים</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/tag-management">ניהול תגיות</a></li>
@@ -1486,7 +1486,7 @@ class HeaderSystem {
             </div>
 
             <div class="filter-user-section" id="filterUserSection" style="margin-right: auto; display: flex; align-items: center; gap: 8px;">
-              <a href="/user-profile" class="user-profile-link" id="filterUserProfileLink" title="פרופיל משתמש" style="text-decoration: none; display: none;">
+              <a href="/user-profile.html" class="user-profile-link" id="filterUserProfileLink" title="פרופיל משתמש" style="text-decoration: none; display: none;">
                 <div class="user-avatar-badge" id="filterUserAvatar" style="width: 36px; height: 36px; border-radius: 50%; background: #26baac; color: white; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 14px; cursor: pointer;">
                   <span id="filterUserInitials">?</span>
                 </div>
@@ -1859,7 +1859,7 @@ window.handleHeaderLogout = async function(event) {
       if (typeof window.TikTrackAuth?.showLoginModal === 'function') {
         await window.TikTrackAuth.showLoginModal();
       } else {
-        window.location.href = '/login.html';
+        window.location.href = '/';
       }
     }
   } else {
@@ -1867,7 +1867,7 @@ window.handleHeaderLogout = async function(event) {
     if (typeof window.TikTrackAuth?.showLoginModal === 'function') {
       await window.TikTrackAuth.showLoginModal();
     } else {
-      window.location.href = '/login.html';
+      window.location.href = '/';
     }
   }
 };

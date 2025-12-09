@@ -441,12 +441,14 @@ class UnifiedCacheManager {
                 errorStack: error.stack
             });
             
-            // הודעת שגיאה
-            if (window.notificationSystem) {
-                window.notificationSystem.showNotification(
-                    'שגיאה באתחול מערכת מטמון מאוחדת',
-                    'error'
-                );
+            // הודעת שגיאה (Fallback למערכת ההתראות הכללית)
+            const notifyError =
+                window.NotificationSystem?.showError
+                || window.NotificationSystem?.showNotification
+                || window.showErrorNotification
+                || window.notificationSystem?.showNotification;
+            if (typeof notifyError === 'function') {
+                notifyError('שגיאה באתחול מערכת מטמון מאוחדת', 'error');
             }
             
             // Don't throw - let the system continue with localStorage fallback
@@ -914,12 +916,14 @@ class UnifiedCacheManager {
             if (cleared) {
                 window.Logger.info(`✅ Cleared ${type} cache`, { page: "unified-cache-manager" });
                 
-                // הודעת הצלחה
-                if (window.notificationSystem) {
-                    window.notificationSystem.showNotification(
-                        `מטמון ${type} נוקה בהצלחה`,
-                        'success'
-                    );
+                // הודעת הצלחה (Fallback למערכת ההתראות הכללית)
+                const notifySuccess =
+                    window.NotificationSystem?.showSuccess
+                    || window.NotificationSystem?.showNotification
+                    || window.showNotification
+                    || window.notificationSystem?.showNotification;
+                if (typeof notifySuccess === 'function') {
+                    notifySuccess(`מטמון ${type} נוקה בהצלחה`, 'success');
                 }
             }
             

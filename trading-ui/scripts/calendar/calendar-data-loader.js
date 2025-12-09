@@ -47,18 +47,29 @@
             const { start, end } = window.CalendarDateUtils?.getMonthDateRange(year, month) || 
                                   this._getMonthDateRange(year, month);
 
-            // Load data from all services
-            const [executions, trades, notes, alerts, cashFlows, tradePlans] = await Promise.all([
-                this._loadExecutions(start, end, entityFilter, force),
-                this._loadTrades(start, end, entityFilter, force),
-                this._loadNotes(start, end, entityFilter, force),
-                this._loadAlerts(start, end, entityFilter, force),
-                this._loadCashFlows(start, end, entityFilter, force),
-                this._loadTradePlans(start, end, entityFilter, force)
-            ]);
-
-            // Aggregate by day
-            const aggregated = this._aggregateByDay(executions, trades, notes, alerts, cashFlows, tradePlans, year, month);
+            // Prefer unified data from TradingJournalData (ensures parity with list/cards)
+            let aggregated = null;
+            const unifiedEntries = await this._loadEntriesFromTradingJournal(start, end, {
+                entityFilter,
+                tickerFilter,
+                force
+            });
+            
+            if (Array.isArray(unifiedEntries) && unifiedEntries.length > 0) {
+                aggregated = this._aggregateEntriesByDay(unifiedEntries, year, month);
+            } else {
+                // Fallback to legacy per-entity loaders
+                const [executions, trades, notes, alerts, cashFlows, tradePlans] = await Promise.all([
+                    this._loadExecutions(start, end, entityFilter, tickerFilter, force),
+                    this._loadTrades(start, end, entityFilter, tickerFilter, force),
+                    this._loadNotes(start, end, entityFilter, tickerFilter, force),
+                    this._loadAlerts(start, end, entityFilter, tickerFilter, force),
+                    this._loadCashFlows(start, end, entityFilter, tickerFilter, force),
+                    this._loadTradePlans(start, end, entityFilter, tickerFilter, force)
+                ]);
+    
+                aggregated = this._aggregateByDay(executions, trades, notes, alerts, cashFlows, tradePlans, year, month);
+            }
 
             if (window.Logger) {
                 window.Logger.info('Calendar month data loaded', {
@@ -395,8 +406,8 @@
          * @returns {Promise<Object>} Aggregated data
          */
         static async loadMonthDataWithCache(year, month, options = {}) {
-            const { force = false, entityFilter = 'all' } = options;
-            const cacheKey = `${CALENDAR_DATA_KEY}-${year}-${month}-${entityFilter}`;
+            const { force = false, entityFilter = 'all', tickerFilter = null } = options;
+            const cacheKey = `${CALENDAR_DATA_KEY}-${year}-${month}-${entityFilter}-${tickerFilter || 'all'}`;
 
             // Use CacheTTLGuard if available
             if (window.CacheTTLGuard?.ensure && !force) {
@@ -427,6 +438,95 @@
 
             // Fallback to direct load
             return await this.loadMonthData(year, month, options);
+        }
+
+        /**
+         * Load unified journal entries from TradingJournalData for the month
+         * @private
+         */
+        static async _loadEntriesFromTradingJournal(start, end, { entityFilter = 'all', tickerFilter = null, force = false } = {}) {
+            if (!window.TradingJournalData || typeof window.TradingJournalData.loadEntries !== 'function') {
+                return [];
+            }
+            
+            try {
+                // Use full ISO with end-of-day to avoid excluding last-day items
+                const startISO = new Date(start);
+                startISO.setHours(0, 0, 0, 0);
+                const endISO = new Date(end);
+                endISO.setHours(23, 59, 59, 999);
+
+                const result = await window.TradingJournalData.loadEntries({
+                    start_date: startISO.toISOString(),
+                    end_date: endISO.toISOString()
+                }, {
+                    entity_type: entityFilter === 'all' ? 'all' : entityFilter,
+                    ticker_symbol: tickerFilter || null
+                }, {
+                    force
+                });
+                
+                return result?.entries || [];
+            } catch (error) {
+                if (window.Logger) {
+                    window.Logger.warn('Failed unified journal load for calendar, falling back to legacy loaders', {
+                        ...PAGE_LOG_CONTEXT,
+                        error: error?.message || error
+                    });
+                }
+                return [];
+            }
+        }
+
+        /**
+         * Aggregate unified entries by day (from TradingJournalData)
+         * @private
+         */
+        static _aggregateEntriesByDay(entries, year, month) {
+            const aggregated = {};
+
+            const getDayKey = (date) => {
+                const d = window.CalendarDateUtils?.parseDate(date) || new Date(date);
+                if (isNaN(d.getTime())) return null;
+                if (d.getFullYear() !== year || d.getMonth() !== month) return null;
+                return d.getDate();
+            };
+
+            entries.forEach(entry => {
+                const day = getDayKey(entry.date || entry.created_at);
+                if (!day) return;
+
+                if (!aggregated[day]) {
+                    aggregated[day] = { executions: [], trades: [], notes: [], alerts: [], cashFlows: [], tradePlans: [], others: [] };
+                }
+
+                const bucket = aggregated[day];
+                switch (entry.entity_type) {
+                    case 'execution':
+                        bucket.executions.push(entry);
+                        break;
+                    case 'trade':
+                        bucket.trades.push(entry);
+                        break;
+                    case 'note':
+                        bucket.notes.push(entry);
+                        break;
+                    case 'alert':
+                        bucket.alerts.push(entry);
+                        break;
+                    case 'cash_flow':
+                        bucket.cashFlows.push(entry);
+                        break;
+                    case 'trade_plan':
+                        bucket.tradePlans.push(entry);
+                        break;
+                    default:
+                        bucket.others.push(entry);
+                        break;
+                }
+            });
+
+            return aggregated;
         }
     }
 

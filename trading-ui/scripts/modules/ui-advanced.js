@@ -31,6 +31,12 @@ let _originalGetStatusBorderColor = null;
 // This must run immediately when this script loads (color-scheme-system.js loads before this)
 // CRITICAL: Save the original functions BEFORE they get overwritten by this script's local functions
 (function() {
+  // Guard: prevent double initialization recursion
+  if (window.__UI_ADVANCED_INITIALIZED__) {
+    return;
+  }
+  window.__UI_ADVANCED_INITIALIZED__ = true;
+
   if (typeof window.getStatusColor === 'function') {
     const fnStr = window.getStatusColor.toString();
     // Only save if it's from color-scheme-system.js

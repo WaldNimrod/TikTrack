@@ -510,6 +510,11 @@
 
         // Load saved page state
         await loadPageState();
+        if (!window.currentEntityFilter) {
+            window.currentEntityFilter = 'all';
+        }
+        updateMonthDisplay();
+        initializeMonthYearSelectors();
 
         // Wait for IconSystem and DOM to be ready
         const initAfterLoad = async () => {
@@ -649,29 +654,48 @@
     }
 
     /**
+     * Update month display labels and selectors
+     */
+    function updateMonthDisplay() {
+        const label = window.CalendarDateUtils?.formatMonthDisplay(currentYear, currentMonth) ||
+                      new Date(currentYear, currentMonth, 1).toLocaleDateString('he-IL', { month: 'long', year: 'numeric' });
+        const monthTitle = document.getElementById('currentMonthYear');
+        if (monthTitle) {
+            monthTitle.textContent = label;
+        }
+        const altDisplay = document.getElementById('current-month-display');
+        if (altDisplay) {
+            altDisplay.textContent = label;
+        }
+        const monthSelect = document.getElementById('monthSelect');
+        if (monthSelect) {
+            monthSelect.value = String(currentMonth);
+        }
+        const yearSelect = document.getElementById('yearSelect');
+        if (yearSelect) {
+            yearSelect.value = String(currentYear);
+        }
+    }
+
+    /**
+     * Set month and year, then reload calendar and entries
+     */
+    async function setMonthYear(year, month) {
+        currentYear = year;
+        currentMonth = month;
+        updateMonthDisplay();
+        await loadAndRenderCalendar();
+        await loadAndRenderJournalEntries();
+        await savePageState();
+    }
+
+    /**
      * Navigate to previous or next month
      * @param {string} direction - 'prev' or 'next'
      */
     async function navigateMonth(direction) {
-        // Use CalendarDateUtils for navigation
         const result = window.CalendarDateUtils.navigateMonth(currentYear, currentMonth, direction);
-        currentYear = result.year;
-        currentMonth = result.month;
-        
-        // Update display
-        const monthDisplay = document.getElementById('current-month-display');
-        if (monthDisplay) {
-            monthDisplay.textContent = window.CalendarDateUtils.formatMonthDisplay(currentYear, currentMonth);
-        }
-        
-        // Load and render calendar for new month
-        await loadAndRenderCalendar();
-        
-        // Reload journal entries for new month
-        await loadAndRenderJournalEntries();
-        
-        // Save page state
-        await savePageState();
+        await setMonthYear(result.year, result.month);
         
         if (window.Logger) {
             window.Logger.info(`${direction === 'prev' ? 'Previous' : 'Next'} month navigated`, { 
@@ -1170,13 +1194,15 @@
                 alert: 'התראות'
             };
             
+            const currentFilter = window.currentEntityFilter || 'all';
+            
             // Generate buttons HTML using ButtonSystem
             let buttonsHTML = '';
             
             entityTypes.forEach(({ type, label }) => {
                 const iconPath = iconMappings[type] || '/trading-ui/images/icons/entities/home.svg';
                 const entityLabel = entityLabels[type] || label;
-                const isActive = type === 'all';
+                const isActive = type === currentFilter;
                 
                 buttonsHTML += `
                     <button
@@ -1229,9 +1255,16 @@
             }
             
             const entityFilter = window.currentEntityFilter || 'all';
+
+            // Use full ISO with end-of-day to avoid excluding last-day entries
+            const startISO = new Date(start);
+            startISO.setHours(0, 0, 0, 0);
+            const endISO = new Date(end);
+            endISO.setHours(23, 59, 59, 999);
+
             const result = await window.TradingJournalData.loadEntries({
-                start_date: start.toISOString().split('T')[0],
-                end_date: end.toISOString().split('T')[0]
+                start_date: startISO.toISOString(),
+                end_date: endISO.toISOString()
             }, {
                 entity_type: entityFilter === 'all' ? 'all' : entityFilter,
                 ticker_symbol: window.currentTickerFilter || null

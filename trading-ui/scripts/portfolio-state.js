@@ -1217,9 +1217,16 @@ function showLoadingState(componentId) {
     const overlayId = overlayIdMap[componentId] || `portfolio-state-${componentId}`;
     const component = document.getElementById(componentId);
     
-    if (window.UnifiedProgressManager && component) {
-        // Use UnifiedProgressManager (general system)
-        window.UnifiedProgressManager.showProgress(overlayId, 1, 'טוען...', '');
+    // Use UnifiedProgressManager instance (general system)
+    const progressManager = window.unifiedProgressManager || (window.UnifiedProgressManager ? new window.UnifiedProgressManager() : null);
+    if (progressManager && typeof progressManager.showProgress === 'function' && component) {
+        try {
+            progressManager.showProgress(overlayId, 1, 'טוען...', '');
+        } catch (e) {
+            if (window.Logger) {
+                window.Logger.warn('Failed to show progress via UnifiedProgressManager', { error: e, overlayId, page: 'portfolio-state-page' });
+            }
+        }
     } else if (component) {
         // Fallback: add loading class if UnifiedProgressManager not available
         component.classList.add('loading');
@@ -1254,9 +1261,16 @@ function hideLoadingState(componentId) {
     const overlayId = overlayIdMap[componentId] || `portfolio-state-${componentId}`;
     const component = document.getElementById(componentId);
     
-    if (window.UnifiedProgressManager) {
-        // Use UnifiedProgressManager (general system)
-        window.UnifiedProgressManager.hideProgress(overlayId);
+    // Use UnifiedProgressManager instance (general system)
+    const progressManager = window.unifiedProgressManager || (window.UnifiedProgressManager ? new window.UnifiedProgressManager() : null);
+    if (progressManager && typeof progressManager.hideProgress === 'function') {
+        try {
+            progressManager.hideProgress(overlayId);
+        } catch (e) {
+            if (window.Logger) {
+                window.Logger.warn('Failed to hide progress via UnifiedProgressManager', { error: e, overlayId, page: 'portfolio-state-page' });
+            }
+        }
     } else if (component) {
         // Fallback: remove loading class if UnifiedProgressManager not available
         component.classList.remove('loading');
@@ -1419,13 +1433,22 @@ async function ensurePortfolioHistoricalData(positions, options = {}) {
         steps.push('מסיים טעינה');
         descriptions.push('מסיים את התהליך...');
         
-        window.UnifiedProgressManager.createOverlay(overlayId, {
-            title: 'טוען נתוני שוק עבור תיק',
-            totalSteps: steps.length,
-            stepLabels: steps,
-            stepDescriptions: descriptions
-        });
-        window.UnifiedProgressManager.showProgress(overlayId, 1, 'בודק נתונים', `בודק ${totalSteps} טיקרים...`);
+        const progressManager = window.unifiedProgressManager || (window.UnifiedProgressManager ? new window.UnifiedProgressManager() : null);
+        if (progressManager && typeof progressManager.createOverlay === 'function') {
+            try {
+                progressManager.createOverlay(overlayId, {
+                    title: 'טוען נתוני שוק עבור תיק',
+                    totalSteps: steps.length,
+                    stepLabels: steps,
+                    stepDescriptions: descriptions
+                });
+                progressManager.showProgress(overlayId, 1, 'בודק נתונים', `בודק ${totalSteps} טיקרים...`);
+            } catch (e) {
+                if (window.Logger) {
+                    window.Logger.warn('Failed to create/show progress via UnifiedProgressManager', { error: e, overlayId, page: 'portfolio-state-page' });
+                }
+            }
+        }
     }
 
     // Step 1: Load market data for tickers that need it (optimized - only missing data)
@@ -1436,13 +1459,20 @@ async function ensurePortfolioHistoricalData(positions, options = {}) {
         });
     }
     
-    if (showProgress && window.UnifiedProgressManager) {
-        window.UnifiedProgressManager.showProgress(
-            overlayId,
-            1,
-            `טוען נתונים עבור ${uniqueTickerIds.length} טיקרים...`,
-            'מתחבר לספק הנתונים החיצוני...'
-        );
+    const progressManager = window.unifiedProgressManager || (window.UnifiedProgressManager ? new window.UnifiedProgressManager() : null);
+    if (showProgress && progressManager && typeof progressManager.showProgress === 'function') {
+        try {
+            progressManager.showProgress(
+                overlayId,
+                1,
+                `טוען נתונים עבור ${uniqueTickerIds.length} טיקרים...`,
+                'מתחבר לספק הנתונים החיצוני...'
+            );
+        } catch (e) {
+            if (window.Logger) {
+                window.Logger.warn('⚠️ Failed to show progress overlay (portfolio-state)', { error: e?.message });
+            }
+        }
     }
 
     const positionsWithData = [...positions];
@@ -1456,9 +1486,16 @@ async function ensurePortfolioHistoricalData(positions, options = {}) {
         const needsQuote = tickerInfo?.reason === 'missing_current_quote' || tickerInfo?.reason === 'insufficient_historical_data' || !tickerInfo;
         const needsHistorical = tickerInfo?.reason === 'insufficient_historical_data' || false;
 
-        if (showProgress && window.UnifiedProgressManager) {
-            const percentage = Math.round((progressStep / totalSteps) * 100);
-            window.UnifiedProgressManager.updateProgress(overlayId, percentage, `טוען נתוני שוק עבור טיקר ${progressStep}/${totalSteps}`);
+        const progressManager = window.unifiedProgressManager || (window.UnifiedProgressManager ? new window.UnifiedProgressManager() : null);
+        if (showProgress && progressManager && typeof progressManager.updateProgress === 'function') {
+            try {
+                const percentage = Math.round((progressStep / totalSteps) * 100);
+                progressManager.updateProgress(overlayId, percentage, `טוען נתוני שוק עבור טיקר ${progressStep}/${totalSteps}`);
+            } catch (e) {
+                if (window.Logger) {
+                    window.Logger.warn('Failed to update progress via UnifiedProgressManager', { error: e, overlayId, page: 'portfolio-state-page' });
+                }
+            }
         }
 
         try {
@@ -1487,8 +1524,15 @@ async function ensurePortfolioHistoricalData(positions, options = {}) {
         }
     }
 
-    if (showProgress && window.UnifiedProgressManager) {
-        window.UnifiedProgressManager.hideProgress(overlayId);
+    const progressManager = window.unifiedProgressManager || (window.UnifiedProgressManager ? new window.UnifiedProgressManager() : null);
+    if (showProgress && progressManager && typeof progressManager.hideProgress === 'function') {
+        try {
+            progressManager.hideProgress(overlayId);
+        } catch (e) {
+            if (window.Logger) {
+                window.Logger.warn('Failed to hide progress via UnifiedProgressManager', { error: e, overlayId, page: 'portfolio-state-page' });
+            }
+        }
     }
 
     // Step 2: Data is saved to DB and cache by ExternalDataService
@@ -1531,6 +1575,7 @@ async function loadPortfolioState() {
         
         // Load trades (which also loads snapshot and stores it in currentSnapshot)
         // CRITICAL: currentSnapshot must be loaded before calculateSummaryFromTrades
+        // The loadTrades function already loads snapshot internally via loadTradesData
         const loadResult = await loadTrades(dateRange, selectedAccounts, investmentType);
         
         // Ensure currentSnapshot is set (from loadResult or already set by loadTradesData)
@@ -1548,6 +1593,7 @@ async function loadPortfolioState() {
         
         // Calculate summary from filtered trades (if not cached)
         // CRITICAL: currentSnapshot must be available here for calculateSummaryFromTrades
+        // Order: snapshot loaded → trades loaded → filtered → summary calculated
         if (!summary) {
             summary = await calculateSummaryFromTrades(filteredTrades);
             // Save summary to cache
@@ -2199,7 +2245,10 @@ function renderTradeRow(trade) {
     `;
 }
 
-// Update trades table (using UnifiedTableSystem if available, fallback to manual rendering)
+/**
+ * Update trades table using UnifiedTableSystem (general system)
+ * REQUIRED: UnifiedTableSystem must be available, no fallback
+ */
 function updateTradesTable() {
     if (window.Logger) {
         window.Logger.info('🔄 updateTradesTable called', { 
@@ -2210,249 +2259,159 @@ function updateTradesTable() {
         });
     }
     
-    // Use UnifiedTableSystem if available and registered
-    if (window.UnifiedTableSystem && window.UnifiedTableSystem.registry) {
-        const tableConfig = window.UnifiedTableSystem.registry.getConfig('portfolio-trades');
+    // Use UnifiedTableSystem (general system) - REQUIRED, no fallback
+    if (!window.UnifiedTableSystem || !window.UnifiedTableSystem.registry) {
         if (window.Logger) {
-            window.Logger.info('📋 Table config check', { 
-                hasTableConfig: !!tableConfig,
-                hasUpdateFunction: !!(tableConfig && tableConfig.updateFunction),
+            window.Logger.error('UnifiedTableSystem not available for updateTradesTable', { 
+                hasUnifiedTableSystem: !!window.UnifiedTableSystem,
+                hasRegistry: !!(window.UnifiedTableSystem && window.UnifiedTableSystem.registry),
                 page: 'portfolio-state-page' 
             });
         }
-        
-        if (tableConfig && tableConfig.updateFunction) {
-            // Call the registered updateFunction directly
-            try {
-                if (window.Logger) {
-                    window.Logger.info('✅ Calling registered updateFunction', { 
-                        tradesCount: filteredTrades?.length || 0,
-                        page: 'portfolio-state-page' 
-                    });
-                }
+        if (window.NotificationSystem) {
+            window.NotificationSystem.showError(
+                'שגיאה בעדכון טבלה',
+                'מערכת טבלאות מאוחדת לא זמינה. נא לרענן את הדף.'
+            );
+        }
+        return;
+    }
+    
+    // Get table config from registry
+    const tableConfig = window.UnifiedTableSystem.registry.getConfig('portfolio-trades');
+    if (!tableConfig) {
+        if (window.Logger) {
+            window.Logger.error('Table config not found for portfolio-trades', { page: 'portfolio-state-page' });
+        }
+        if (window.NotificationSystem) {
+            window.NotificationSystem.showError(
+                'שגיאה בעדכון טבלה',
+                'תצורת טבלה לא נמצאה. נא לרענן את הדף.'
+            );
+        }
+        return;
+    }
+    
+    // Use registered updateFunction if available
+    if (tableConfig.updateFunction) {
+        try {
+            if (window.Logger) {
+                window.Logger.info('✅ Calling registered updateFunction', { 
+                    tradesCount: filteredTrades?.length || 0,
+                    page: 'portfolio-state-page' 
+                });
+            }
             tableConfig.updateFunction(filteredTrades);
-                // Update summary after rendering (async, but don't block)
-                updateTradesSummary(filteredTrades).catch(err => {
-                    if (window.Logger) {
-                        window.Logger.warn('Failed to update trades summary', { error: err, page: 'portfolio-state-page' });
-                    }
-                });
+            // Update summary after rendering (async, but don't block)
+            updateTradesSummary(filteredTrades).catch(err => {
                 if (window.Logger) {
-                    window.Logger.info('✅ Trades table updated via registered updateFunction', { tradesCount: filteredTrades.length, page: 'portfolio-state-page' });
+                    window.Logger.warn('Failed to update trades summary', { error: err, page: 'portfolio-state-page' });
                 }
+            });
+            if (window.Logger) {
+                window.Logger.info('✅ Trades table updated via registered updateFunction', { tradesCount: filteredTrades.length, page: 'portfolio-state-page' });
+            }
             return;
-            } catch (error) {
-                if (window.Logger) {
-                    window.Logger.error('❌ Error calling registered updateFunction', { error: error.message, stack: error.stack, page: 'portfolio-state-page' });
-                }
-                // Fall through to manual rendering
-            }
-        } else {
-            if (window.Logger) {
-                window.Logger.warn('⚠️ Table config or updateFunction not found', { 
-                    hasTableConfig: !!tableConfig,
-                    hasUpdateFunction: !!(tableConfig && tableConfig.updateFunction),
-                    page: 'portfolio-state-page' 
-                });
-            }
-        }
-    }
-    
-    // Use UnifiedTableSystem.renderer if available (preferred method)
-    if (window.UnifiedTableSystem && window.UnifiedTableSystem.renderer) {
-        try {
-            // Check if table is registered
-            const tableConfig = window.UnifiedTableSystem.registry?.getConfig('portfolio-trades');
-            if (tableConfig && tableConfig.updateFunction) {
-                // Use registered updateFunction
-                tableConfig.updateFunction(filteredTrades);
-                // Update summary after rendering (async, but don't block)
-                updateTradesSummary(filteredTrades).catch(err => {
-                    if (window.Logger) {
-                        window.Logger.warn('Failed to update trades summary', { error: err, page: 'portfolio-state-page' });
-                    }
-                });
-                return;
-            } else {
-                // Try renderer.render as fallback
-        window.UnifiedTableSystem.renderer.render('portfolio-trades', filteredTrades);
-                // Update summary after rendering (async, but don't block)
-                updateTradesSummary(filteredTrades).catch(err => {
-                    if (window.Logger) {
-                        window.Logger.warn('Failed to update trades summary', { error: err, page: 'portfolio-state-page' });
-                    }
-                });
-        return;
-            }
         } catch (error) {
             if (window.Logger) {
-                window.Logger.warn('Error rendering table via UnifiedTableSystem, falling back to manual rendering', { error: error.message, page: 'portfolio-state-page' });
+                window.Logger.error('❌ Error calling registered updateFunction', { error: error.message, stack: error.stack, page: 'portfolio-state-page' });
             }
-            // Fall through to manual rendering
+            if (window.NotificationSystem) {
+                window.NotificationSystem.showError(
+                    'שגיאה בעדכון טבלה',
+                    'שגיאה בעדכון טבלת טריידים. נא לנסות שוב.'
+                );
+            }
+            return;
         }
     }
     
-    // Fallback to manual rendering
-    const tbody = document.getElementById('trades-table-body');
-    if (!tbody) {
-        if (window.Logger) {
-            window.Logger.error('❌ Trades table body not found - element #trades-table-body missing', { page: 'portfolio-state-page' });
-        }
-        return;
-    }
-    
-    if (window.Logger) {
-        window.Logger.info('📝 Manual rendering fallback', { 
-            tradesCount: filteredTrades?.length || 0,
-            tbodyFound: !!tbody,
-            page: 'portfolio-state-page' 
-        });
-    }
-    
-    if (!filteredTrades || filteredTrades.length === 0) {
-        if (window.Logger) {
-            window.Logger.info('📭 No trades to display - showing empty message', { page: 'portfolio-state-page' });
-        }
-        tbody.textContent = '';
-        const emptyRow = document.createElement('tr');
-        const emptyCell = document.createElement('td');
-        emptyCell.colSpan = 13;
-        emptyCell.className = 'text-center text-muted';
-        emptyCell.textContent = 'אין טריידים להצגה';
-        emptyRow.appendChild(emptyCell);
-        tbody.appendChild(emptyRow);
-        const summaryElement = document.getElementById('trades-summary');
-        if (summaryElement) {
-            summaryElement.textContent = 'אין טריידים';
-        }
-        return;
-    }
-    
-    if (window.Logger) {
-        window.Logger.info('🔄 Rendering trade rows manually', { 
-            tradesCount: filteredTrades.length,
-            page: 'portfolio-state-page' 
-        });
-    }
-    
-    tbody.textContent = '';
-    const parser = new DOMParser();
-    let renderedCount = 0;
-    filteredTrades.forEach((trade, index) => {
+    // Try renderer.render as alternative
+    if (window.UnifiedTableSystem.renderer) {
         try {
-            if (window.Logger && index < 3) {
-                window.Logger.debug('🎨 Rendering trade row', { 
-                    tradeId: trade.id,
-                    ticker: trade.ticker,
-                    index: index,
+            if (window.Logger) {
+                window.Logger.info('✅ Using UnifiedTableSystem.renderer.render', { 
+                    tradesCount: filteredTrades?.length || 0,
                     page: 'portfolio-state-page' 
                 });
             }
-        const rowHTML = renderTradeRow(trade);
-            if (!rowHTML || rowHTML.trim() === '') {
+            window.UnifiedTableSystem.renderer.render('portfolio-trades', filteredTrades);
+            // Update summary after rendering (async, but don't block)
+            updateTradesSummary(filteredTrades).catch(err => {
                 if (window.Logger) {
-                    window.Logger.warn('⚠️ renderTradeRow returned empty HTML', { tradeId: trade.id, page: 'portfolio-state-page' });
+                    window.Logger.warn('Failed to update trades summary', { error: err, page: 'portfolio-state-page' });
                 }
-                return;
-            }
-        const doc = parser.parseFromString(rowHTML, 'text/html');
-        const row = doc.body.querySelector('tr');
-        if (row) {
-            tbody.appendChild(row);
-                renderedCount++;
-            } else {
-                if (window.Logger) {
-                    window.Logger.warn('⚠️ No <tr> element found in parsed HTML', { tradeId: trade.id, rowHTML: rowHTML.substring(0, 100), page: 'portfolio-state-page' });
-                }
-            }
+            });
+            return;
         } catch (error) {
             if (window.Logger) {
-                window.Logger.error('❌ Error rendering trade row', { 
-                    tradeId: trade?.id, 
-                    error: error.message, 
-                    stack: error.stack,
-                    page: 'portfolio-state-page' 
-                });
+                window.Logger.error('❌ Error rendering table via UnifiedTableSystem.renderer', { error: error.message, stack: error.stack, page: 'portfolio-state-page' });
             }
+            if (window.NotificationSystem) {
+                window.NotificationSystem.showError(
+                    'שגיאה בעדכון טבלה',
+                    'שגיאה בעדכון טבלת טריידים. נא לנסות שוב.'
+                );
+            }
+            return;
         }
-    });
-    
-    if (window.Logger) {
-        window.Logger.info('✅ Manual rendering completed', { 
-            totalTrades: filteredTrades.length,
-            renderedRows: renderedCount,
-            tbodyChildren: tbody.children.length,
-            page: 'portfolio-state-page' 
-        });
     }
     
-    // Update trades summary using InfoSummarySystem (general system) - async, but don't block
-    updateTradesSummary(filteredTrades).catch(err => {
-        if (window.Logger) {
-            window.Logger.warn('Failed to update trades summary', { error: err, page: 'portfolio-state-page' });
-        }
-    });
-    
-    // Note: Action buttons are now created directly in renderTradeRow() using createActionsMenu()
-    // No need for loadTableActionButtons() anymore
-    
+    // If we reach here, neither updateFunction nor renderer is available
     if (window.Logger) {
-        window.Logger.debug('Trades table updated manually', { tradesCount: filteredTrades.length, page: 'portfolio-state-page' });
+        window.Logger.error('❌ Neither updateFunction nor renderer available for portfolio-trades table', { page: 'portfolio-state-page' });
+    }
+    if (window.NotificationSystem) {
+        window.NotificationSystem.showError(
+            'שגיאה בעדכון טבלה',
+            'לא ניתן לעדכן את טבלת טריידים. נא לרענן את הדף.'
+        );
     }
 }
 
-// Update trades summary using InfoSummarySystem (general system)
+/**
+ * Update trades summary using InfoSummarySystem (general system)
+ * REQUIRED: InfoSummarySystem must be available, no fallback
+ * 
+ * @param {Array} trades - Array of trades
+ */
 async function updateTradesSummary(trades) {
-    // Use InfoSummarySystem if available (general system)
-    if (window.InfoSummarySystem && window.INFO_SUMMARY_CONFIGS?.['portfolio-state-page']) {
-        try {
-                    const config = window.INFO_SUMMARY_CONFIGS['portfolio-state-page'];
-                    const container = document.getElementById(config.containerId);
-                    if (container) {
-                await window.InfoSummarySystem.calculateAndRender(trades, config);
-                return;
-            }
-        } catch (error) {
-            if (window.Logger) {
-                window.Logger.warn('Failed to update trades summary via InfoSummarySystem', { error, page: 'portfolio-state-page' });
-            }
-            // Fall through to manual rendering
+    // Use InfoSummarySystem (general system) - REQUIRED, no fallback
+    if (!window.InfoSummarySystem || !window.INFO_SUMMARY_CONFIGS?.['portfolio-state-page']) {
+        if (window.Logger) {
+            window.Logger.error('InfoSummarySystem not available for updateTradesSummary', { page: 'portfolio-state-page' });
         }
-    }
-    
-    // Fallback to manual rendering only if InfoSummarySystem not available
-                const summaryElement = document.getElementById('trades-summary');
-    if (!summaryElement) return;
-    
-    if (!trades || trades.length === 0) {
-            summaryElement.textContent = 'אין טריידים';
+        if (window.NotificationSystem) {
+            window.NotificationSystem.showError(
+                'שגיאה בעדכון סיכום',
+                'מערכת חישוב סיכום לא זמינה. נא לרענן את הדף.'
+            );
+        }
         return;
     }
     
-    // Manual calculation as fallback
-    const totalPL = trades.reduce((sum, t) => {
-        const plValue = t.position_pl_value !== null && t.position_pl_value !== undefined ? t.position_pl_value : 0;
-        return sum + plValue;
-    }, 0);
-    
-        summaryElement.innerHTML = '';
-        const strong1 = document.createElement('strong');
-        strong1.textContent = `סה"כ טריידים: ${trades.length}`;
-        summaryElement.appendChild(strong1);
-        
-            const separator = document.createTextNode(' | ');
-            summaryElement.appendChild(separator);
-            const strong2 = document.createElement('strong');
-            strong2.textContent = 'סה"כ P/L: ';
-            summaryElement.appendChild(strong2);
-            const plSpan = document.createElement('span');
-            if (window.FieldRendererService?.renderAmount) {
-                plSpan.innerHTML = window.FieldRendererService.renderAmount(totalPL, '$', 0, true);
-            } else {
-                plSpan.className = totalPL >= 0 ? 'text-success' : totalPL < 0 ? 'text-danger' : 'text-muted';
-                plSpan.textContent = `${totalPL >= 0 ? '+' : ''}${totalPL.toFixed(2)}$`;
+    try {
+        const config = window.INFO_SUMMARY_CONFIGS['portfolio-state-page'];
+        const container = document.getElementById(config.containerId);
+        if (!container) {
+            if (window.Logger) {
+                window.Logger.warn('Summary container not found', { containerId: config.containerId, page: 'portfolio-state-page' });
             }
-            strong2.appendChild(plSpan);
+            return;
+        }
+        
+        await window.InfoSummarySystem.calculateAndRender(trades, config);
+    } catch (error) {
+        if (window.Logger) {
+            window.Logger.error('Failed to update trades summary via InfoSummarySystem', { error, page: 'portfolio-state-page' });
+        }
+        if (window.NotificationSystem) {
+            window.NotificationSystem.showError(
+                'שגיאה בעדכון סיכום',
+                'שגיאה בעדכון סיכום טריידים. נא לנסות שוב.'
+            );
+        }
+    }
 }
 
 // Update summary cards
@@ -2768,7 +2727,9 @@ async function updateSummaryCards(data) {
         if (accountIds.length > 0) {
             const balancePromises = accountIds.map(async (accountId) => {
                 try {
-                    const response = await fetch(`/api/account-activity/${accountId}/balances`);
+                    const response = await fetch(`/api/account-activity/${accountId}/balances`, {
+                        credentials: 'include' // Include cookies for session-based auth
+                    });
                     if (response.ok) {
                         const result = await response.json();
                         if (result.status === 'success' && result.data?.base_currency_total !== null && result.data?.base_currency_total !== undefined) {
@@ -3085,6 +3046,11 @@ async function initUnifiedPortfolioChart() {
             lineWidth: 2,
             title: 'ביצועי תיק',
             priceScaleId: 'left', // Use left scale for percentages
+            priceFormat: {
+                type: 'percent',
+                precision: 2,
+                minMove: 0.01
+            }
         });
         
         // 3. שווי תיק ($) - info color, right scale
@@ -5598,97 +5564,56 @@ async function waitForScripts() {
                 filteredTrades = Array.isArray(data) ? data : [];
                 
                 if (window.Logger) {
-                    window.Logger.info('📊 Filtered trades updated', { 
+                    window.Logger.info('📊 Filtered trades updated, using UnifiedTableSystem.renderer.render', { 
                         filteredTradesCount: filteredTrades.length,
                         page: 'portfolio-state-page' 
                     });
                 }
                 
-                // Render table manually (UnifiedTableSystem will call this)
-                const tbody = document.getElementById('trades-table-body');
-                if (!tbody) {
-                    if (window.Logger) {
-                        window.Logger.error('❌ trades-table-body not found in registered updateFunction', { page: 'portfolio-state-page' });
-                    }
-                    return;
-                }
-                
-                if (filteredTrades.length === 0) {
-                    tbody.textContent = '';
-                    const emptyRow = document.createElement('tr');
-                    const emptyCell = document.createElement('td');
-                    emptyCell.colSpan = 13;
-                    emptyCell.className = 'text-center text-muted';
-                    emptyCell.textContent = 'אין טריידים להצגה';
-                    emptyRow.appendChild(emptyCell);
-                    tbody.appendChild(emptyRow);
-                    const summaryElement = document.getElementById('trades-summary');
-                    if (summaryElement) {
-                        summaryElement.textContent = 'אין טריידים';
-                    }
-                    return;
-                }
-                
-                tbody.textContent = '';
-                const parser = new DOMParser();
-                let renderedCount = 0;
-                filteredTrades.forEach((trade, index) => {
+                // Use UnifiedTableSystem.renderer.render (general system) - REQUIRED, no manual rendering
+                if (window.UnifiedTableSystem && window.UnifiedTableSystem.renderer && typeof window.UnifiedTableSystem.renderer.render === 'function') {
                     try {
-                        if (window.Logger && index < 3) {
-                            window.Logger.debug('🎨 Rendering trade row in updateFunction', { 
-                                tradeId: trade.id,
-                                ticker: trade.ticker_symbol,
-                                index: index,
+                        window.UnifiedTableSystem.renderer.render('portfolio-trades', filteredTrades);
+                        
+                        // Update trades summary using InfoSummarySystem (general system) - async, but don't block
+                        updateTradesSummary(filteredTrades).catch(err => {
+                            if (window.Logger) {
+                                window.Logger.warn('Failed to update trades summary', { error: err, page: 'portfolio-state-page' });
+                            }
+                        });
+                        
+                        if (window.Logger) {
+                            window.Logger.info('✅ Table rendered via UnifiedTableSystem.renderer.render', { 
+                                tradesCount: filteredTrades.length,
                                 page: 'portfolio-state-page' 
                             });
                         }
-                    const rowHTML = renderTradeRow(trade);
-                        if (!rowHTML || rowHTML.trim() === '') {
-                            if (window.Logger) {
-                                window.Logger.warn('⚠️ renderTradeRow returned empty HTML in updateFunction', { tradeId: trade.id, page: 'portfolio-state-page' });
-                            }
-                            return;
-                        }
-                    const doc = parser.parseFromString(rowHTML, 'text/html');
-                    const row = doc.body.querySelector('tr');
-                    if (row) {
-                        tbody.appendChild(row);
-                            renderedCount++;
-                        } else {
-                            if (window.Logger) {
-                                window.Logger.warn('⚠️ No <tr> element found in parsed HTML in updateFunction', { tradeId: trade.id, rowHTML: rowHTML.substring(0, 100), page: 'portfolio-state-page' });
-                            }
-                        }
                     } catch (error) {
                         if (window.Logger) {
-                            window.Logger.error('❌ Error rendering trade row in updateFunction', { 
-                                tradeId: trade?.id, 
+                            window.Logger.error('❌ Error rendering table via UnifiedTableSystem.renderer.render', { 
                                 error: error.message, 
                                 stack: error.stack,
                                 page: 'portfolio-state-page' 
                             });
                         }
+                        if (window.NotificationSystem) {
+                            window.NotificationSystem.showError(
+                                'שגיאה בעדכון טבלה',
+                                'שגיאה בעדכון טבלת טריידים. נא לנסות שוב.'
+                            );
+                        }
                     }
-                });
-                
-                if (window.Logger) {
-                    window.Logger.info('✅ Registered updateFunction completed', { 
-                        totalTrades: filteredTrades.length,
-                        renderedRows: renderedCount,
-                        tbodyChildren: tbody.children.length,
-                        page: 'portfolio-state-page' 
-                    });
-                }
-                
-                // Update trades summary using InfoSummarySystem (general system) - async, but don't block
-                updateTradesSummary(filteredTrades).catch(err => {
+                } else {
                     if (window.Logger) {
-                        window.Logger.warn('Failed to update trades summary', { error: err, page: 'portfolio-state-page' });
+                        window.Logger.error('❌ UnifiedTableSystem.renderer.render not available', { page: 'portfolio-state-page' });
                     }
-                });
-                
-                // Note: Action buttons are now created directly in renderTradeRow() using createActionsMenu()
-                // No need for loadTableActionButtons() anymore
+                    if (window.NotificationSystem) {
+                        window.NotificationSystem.showError(
+                            'שגיאה בעדכון טבלה',
+                            'מערכת רינדור טבלאות לא זמינה. נא לרענן את הדף.'
+                        );
+                    }
+                }
             },
             tableSelector: '#tradesTable',
             columns: getColumns(),

@@ -869,11 +869,105 @@ class HistoricalDataBusinessService(BaseBusinessService):
         Returns:
             Dict with plan vs execution analysis
         """
-        # Placeholder implementation
-        return {
-            'analysis': {},
-            'is_valid': True
-        }
+        try:
+            if not self.db_session:
+                return {
+                    'analysis': {},
+                    'is_valid': False,
+                    'error': 'Database session is required'
+                }
+
+            start_date = date_range.get('start_date')
+            end_date = date_range.get('end_date')
+
+            query = (
+                self.db_session.query(Trade)
+                .options(
+                    joinedload(Trade.trade_plan),
+                    joinedload(Trade.executions),
+                    joinedload(Trade.ticker)
+                )
+                .filter(Trade.user_id == user_id)
+            )
+
+            if start_date:
+                query = query.filter(Trade.created_at >= start_date)
+            if end_date:
+                query = query.filter(Trade.created_at <= end_date)
+
+            trades = query.all()
+
+            analysis_items = []
+            total_planned_qty = 0.0
+            total_executed_qty = 0.0
+            total_planned_amount = 0.0
+            total_executed_amount = 0.0
+
+            for trade in trades:
+                plan = trade.trade_plan
+
+                planned_qty = trade.planned_quantity or (plan.planned_quantity if plan else None) or 0.0
+                planned_amount = trade.planned_amount or (plan.planned_amount if plan else None) or 0.0
+
+                executed_qty = 0.0
+                executed_amount = 0.0
+                for exe in trade.executions or []:
+                    qty = float(exe.quantity or 0)
+                    price = float(exe.price or 0)
+                    action = (exe.action or '').lower()
+                    if action == 'sell':
+                        executed_qty -= qty
+                        executed_amount -= qty * price
+                    else:
+                        executed_qty += qty
+                        executed_amount += qty * price
+
+                completion_rate = 0.0
+                if planned_qty:
+                    completion_rate = (executed_qty / planned_qty) * 100
+
+                total_planned_qty += planned_qty
+                total_executed_qty += executed_qty
+                total_planned_amount += planned_amount
+                total_executed_amount += executed_amount
+
+                analysis_items.append({
+                    'trade_id': trade.id,
+                    'ticker_id': trade.ticker_id,
+                    'ticker_symbol': trade.ticker.symbol if trade.ticker else None,
+                    'status': trade.status,
+                    'planned_quantity': planned_qty,
+                    'planned_amount': planned_amount,
+                    'executed_quantity': executed_qty,
+                    'executed_amount': executed_amount,
+                    'completion_rate_percent': completion_rate,
+                    'created_at': trade.created_at,
+                    'closed_at': trade.closed_at
+                })
+
+            summary = {
+                'trades_count': len(trades),
+                'planned_quantity_total': total_planned_qty,
+                'executed_quantity_total': total_executed_qty,
+                'planned_amount_total': total_planned_amount,
+                'executed_amount_total': total_executed_amount,
+                'completion_rate_percent': (total_executed_qty / total_planned_qty * 100) if total_planned_qty else 0.0
+            }
+
+            return {
+                'analysis': {
+                    'summary': summary,
+                    'items': analysis_items
+                },
+                'is_valid': True
+            }
+        except Exception as e:
+            logger.error(f"Error calculating plan vs execution analysis: {str(e)}", exc_info=True)
+            return {
+                'analysis': {},
+                'is_valid': False,
+                'error': str(e)
+            }
     
     # ========================================================================
     # Trading Journal Calculations

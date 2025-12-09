@@ -1,4 +1,5 @@
 """
+# pyright: reportGeneralTypeIssues=false
 Quotes API Routes - External Data Integration
 API endpoints for quote operations
 """

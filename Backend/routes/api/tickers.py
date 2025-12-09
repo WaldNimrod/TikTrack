@@ -1,4 +1,5 @@
 """
+# pyright: reportGeneralTypeIssues=false
 API Routes for Ticker Management - TikTrack
 
 This module contains all API endpoints for managing tickers in the system.

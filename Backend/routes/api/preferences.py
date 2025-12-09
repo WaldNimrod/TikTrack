@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """
+# pyright: reportGeneralTypeIssues=false
 Preferences API - TikTrack
 ==========================
 

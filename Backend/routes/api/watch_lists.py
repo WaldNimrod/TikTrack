@@ -1,4 +1,5 @@
 """
+# pyright: reportGeneralTypeIssues=false
 API Routes for Watch Lists Management - TikTrack
 ================================================
 

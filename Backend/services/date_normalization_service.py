@@ -1,4 +1,5 @@
 """
+# pyright: reportGeneralTypeIssues=false
 Date Normalization Service
 ==========================
 

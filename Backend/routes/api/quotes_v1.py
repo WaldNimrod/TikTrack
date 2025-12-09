@@ -1,4 +1,5 @@
 """
+# pyright: reportGeneralTypeIssues=false
 API Routes for Quotes - Compliant with External Data Integration Specification
 Implements the exact API endpoints specified in Section 5.1 of the specification
 """

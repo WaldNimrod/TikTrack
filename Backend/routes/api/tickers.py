@@ -363,6 +363,14 @@ def get_tickers_with_trade_counts():
     user_id = _resolve_user_id()
     normalizer = _get_tickers_normalizer()
 
+    # Check authentication - user_id must not be None
+    if user_id is None:
+        return jsonify({
+            "status": "error",
+            "error": {"message": "User authentication required. Please log in to access tickers."},
+            "version": "1.0"
+        }), 401
+
     try:
         # Get all tickers (TickerService.get_all doesn't take user_id)
         tickers = TickerService.get_all(db)
@@ -399,16 +407,16 @@ def get_tickers_with_trade_counts():
 def get_ticker(ticker_id: int):
     """Get ticker by ID with market data (only if user has access)"""
     db: Session = g.db
-    user_id = _resolve_user_id()
-    
-    if user_id is None:
-        return jsonify({
-            "status": "error",
-            "error": {"message": "User authentication required. Please log in to access tickers."},
-            "version": "1.0"
-        }), 401
     
     try:
+        user_id = _resolve_user_id()
+        
+        if user_id is None:
+            return jsonify({
+                "status": "error",
+                "error": {"message": "User authentication required. Please log in to access tickers."},
+                "version": "1.0"
+            }), 401
         # Check if user has access to this ticker
         from models.user_ticker import UserTicker
         user_ticker = db.query(UserTicker).filter(

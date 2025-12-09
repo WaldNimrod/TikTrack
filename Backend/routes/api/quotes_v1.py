@@ -133,9 +133,6 @@ def get_quotes_batch():
                 "timestamp": datetime.now(timezone.utc).isoformat()
             }), 200
             
-        finally:
-            db.close()
-            
     except Exception as e:
         logger.error(f"Error in batch quotes: {e}")
         return jsonify({

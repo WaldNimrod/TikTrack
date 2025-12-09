@@ -137,7 +137,6 @@ def get_journal_entries():
                 if entry.get('ticker_symbol') == ticker_symbol
             ]
             result['count'] = len(result['entries'])
-            result['count'] = len(result['entries'])
         
         payload = BaseEntityUtils.create_success_payload(
             normalizer,

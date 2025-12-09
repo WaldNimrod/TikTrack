@@ -1,5 +1,7 @@
 # Production PostgreSQL Migration - Master Guide
+
 # ===============================================
+
 # מדריך ראשי מרוכז למיגרציה של סביבת הפרודקשן
 
 **תאריך:** נובמבר 2025  
@@ -20,18 +22,21 @@
 ## 🎯 **מה זה כולל?**
 
 ### **מה משתנה:**
+
 - ✅ בסיס הנתונים: SQLite → PostgreSQL
 - ✅ Database name: `TikTrack-db-production`
 - ✅ אותו Docker container: `tiktrack-postgres-dev`
 - ✅ סקריפטי הפעלה: עדכון לתמיכה ב-PostgreSQL
 
 ### **מה נשמר:**
+
 - ✅ כל טבלאות המערכת (constraints, system_settings, currencies, וכו')
 - ✅ מבנה העדפות (preference_groups, preference_types)
 - ✅ שיטות מסחר (trading_methods, method_parameters)
 - ✅ הגדרות מערכת
 
 ### **מה לא נשמר:**
+
 - ❌ נתוני משתמשים (tickers, trades, executions, cash_flows, וכו')
 - ❌ טבלאות משתמשים נשארות ריקות (clean start)
 
@@ -238,12 +243,14 @@ curl http://localhost:5001/api/system/health
 ## 🔧 **תשתית טכנית**
 
 ### **Docker Container:**
+
 - **Container:** `tiktrack-postgres-dev` (אותו container של פיתוח)
 - **Database:** `TikTrack-db-production` (נפרד מ-development)
 - **User:** `TikTrakDBAdmin`
 - **Port:** `5432`
 
 ### **משתני סביבה:**
+
 ```bash
 POSTGRES_HOST=localhost
 POSTGRES_DB=TikTrack-db-production
@@ -256,11 +263,13 @@ POSTGRES_PASSWORD="BigMeZoo1974!?"
 ## 📝 **רשימת בדיקות מהירה**
 
 ### **לפני המיגרציה:**
+
 - [ ] SQLite מגובה
 - [ ] Docker container רץ
 - [ ] סקריפטים הועתקו לפרודקשן
 
 ### **אחרי המיגרציה:**
+
 - [ ] Database נוצר: `docker exec tiktrack-postgres-dev psql -U TikTrakDBAdmin -l | grep TikTrack-db-production`
 - [ ] Schema נוצר: `docker exec tiktrack-postgres-dev psql -U TikTrakDBAdmin -d TikTrack-db-production -c "\dt"`
 - [ ] טבלאות מערכת מכילות נתונים
@@ -275,11 +284,13 @@ POSTGRES_PASSWORD="BigMeZoo1974!?"
 ## 🔄 **גיבוי ושחזור**
 
 ### **יצירת גיבוי:**
+
 ```bash
 ./scripts/db/backup_postgresql_production.sh
 ```
 
 ### **שחזור מגיבוי:**
+
 ```bash
 docker exec -i tiktrack-postgres-dev psql \
   -U TikTrakDBAdmin \
@@ -304,18 +315,22 @@ docker exec -i tiktrack-postgres-dev psql \
 ## 🆘 **פתרון בעיות**
 
 ### **בעיה: "Container not running"**
+
 ```bash
 docker-compose -f docker/docker-compose.dev.yml up -d postgres-dev
 ```
 
 ### **בעיה: "Database already exists"**
+
 הסקריפט ישאל אם למחוק וליצור מחדש.
 
 ### **בעיה: "SQLite not found"**
+
 - הסקריפט ייצור database ריק
 - הרץ מיגרציה ידנית עם `migrate_production_to_pg.py`
 
 ### **בעיה: "Foreign key violations"**
+
 - הסקריפט מסנן אוטומטית רשומות לא תקינות
 - בדוק את הלוגים
 
@@ -326,6 +341,7 @@ docker-compose -f docker/docker-compose.dev.yml up -d postgres-dev
 ## 📞 **תמיכה**
 
 ### **במקרה של בעיות:**
+
 1. בדוק את [PRODUCTION_MIGRATION_CHECKLIST.md](PRODUCTION_MIGRATION_CHECKLIST.md)
 2. ראה [PRODUCTION_POSTGRESQL_MIGRATION.md](PRODUCTION_POSTGRESQL_MIGRATION.md) לפתרון בעיות
 3. בדוק את הלוגים: `Backend/logs/errors.log`
@@ -336,12 +352,14 @@ docker-compose -f docker/docker-compose.dev.yml up -d postgres-dev
 ## 🔗 **קישורים מהירים**
 
 ### **מדריכים:**
+
 - [מדריך ביצוע מלא](PRODUCTION_MIGRATION_EXECUTION_GUIDE.md) ⭐ **התחל כאן**
 - [מדריך מיגרציה מפורט](PRODUCTION_POSTGRESQL_MIGRATION.md)
 - [מדריך עדכון סקריפט הפעלה](PRODUCTION_STARTUP_SCRIPT_UPDATE.md)
 - [רשימת בדיקות](PRODUCTION_MIGRATION_CHECKLIST.md)
 
 ### **סקריפטים:**
+
 - `scripts/db/setup_production_postgresql.sh` ⭐ **התחל כאן**
 - `scripts/db/migrate_production_to_pg.py`
 - `scripts/db/backup_postgresql_production.sh`
@@ -349,6 +367,7 @@ docker-compose -f docker/docker-compose.dev.yml up -d postgres-dev
 - `scripts/db/production_start_server_template.sh`
 
 ### **דוקומנטציה כללית:**
+
 - [PostgreSQL Startup Guide](../server/POSTGRESQL_STARTUP_GUIDE.md) - הפעלת PostgreSQL
 - [PostgreSQL Backup Guide](../server/POSTGRESQL_BACKUP_GUIDE.md) - גיבוי PostgreSQL
 - [Server Management Guide](../server/SERVER_MANAGEMENT_GUIDE.md) - ניהול שרת
@@ -370,6 +389,7 @@ docker-compose -f docker/docker-compose.dev.yml up -d postgres-dev
 ## ✅ **סיכום**
 
 ### **מה צריך לעשות:**
+
 1. ✅ העתק סקריפטים לפרודקשן
 2. ✅ גבה SQLite
 3. ✅ הרץ `setup_production_postgresql.sh`
@@ -377,6 +397,7 @@ docker-compose -f docker/docker-compose.dev.yml up -d postgres-dev
 5. ✅ בדוק שהכל עובד
 
 ### **מה קיבלת:**
+
 - ✅ 5 סקריפטים מוכנים לשימוש
 - ✅ 4 מדריכים מפורטים
 - ✅ תבנית לעדכון סקריפט הפעלה

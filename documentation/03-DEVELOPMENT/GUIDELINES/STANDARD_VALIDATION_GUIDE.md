@@ -8,6 +8,7 @@
 - Page-level custom validators should return messages to be rendered via `showFieldError`, not call system errors directly.
 
 ### Example
+
 ```
 const { isValid, errors } = validateForm('addExecutionForm', rules);
 if (!isValid) {
@@ -16,12 +17,15 @@ if (!isValid) {
   return;
 }
 ```
+
 # מדריך ולידציה סטנדרטית - TikTrack
 
 ## 📅 תאריך יצירה
+
 8 באוקטובר 2025
 
 ## 🎯 מטרת המדריך
+
 הגדרה ברורה של תהליך ולידציה סטנדרטי לכל טפסי ההוספה והעריכה במערכת.
 
 ---
@@ -29,6 +33,7 @@ if (!isValid) {
 ## 🎨 התנהגות נדרשת
 
 ### **✅ הודעות שגיאה:**
+
 - **הודעה פשוטה** - התראה רגילה (toast) ללא מודל מפורט
 - **שימוש ב-`showSimpleErrorNotification`** - ⚠️ חובה! לא `showErrorNotification`
 - **רשימת שדות חסרים** - "שדה חובה חסר: X" או "שדות חובה חסרים: X, Y, Z"
@@ -38,6 +43,7 @@ if (!isValid) {
 ### **⚠️ הבדל חשוב בין סוגי שגיאות:**
 
 #### **📝 שגיאות ולידציה (שימוש ב-`showSimpleErrorNotification`):**
+
 - משתמש לא מילא שדה חובה
 - משתמש הזין ערך לא תקין (סכום 0, תאריך שגוי, פורמט שגוי)
 - משתמש לא בחר אופציה נדרשת
@@ -46,6 +52,7 @@ if (!isValid) {
 - **תצוגה:** התראה פשוטה (toast) אדומה ✅
 
 #### **🚨 שגיאות מערכת (שימוש ב-`showErrorNotification`):**
+
 - **HTTP 500** (Internal Server Error)
 - **HTTP 404** (Not Found)
 - **HTTP 403** (Forbidden)
@@ -55,6 +62,7 @@ if (!isValid) {
 - **תצוגה:** מודל מפורט עם stack trace ✅
 
 #### **🔍 איך לזהות:**
+
 ```javascript
 // בדיקה אם זו שגיאת ולידציה
 let isValidationError = false;
@@ -78,6 +86,7 @@ if (isValidationError) {
 ```
 
 ### **✅ סימון שדות:**
+
 - **שדה בעייתי:** `is-invalid` class + border אדום + הודעה מתחת לשדה
 - **שדה תקין:** `is-valid` class + border ירוק
 - **ניקוי סימון:** בפתיחת מודל או ב-reset
@@ -89,6 +98,7 @@ if (isValidationError) {
 ### **⚡ עקרונות כלליים:**
 
 #### **1. תאריכי פעולות - תמיד היום**
+
 ```javascript
 // הגדרת תאריך נוכחי
 const today = new Date();
@@ -103,6 +113,7 @@ document.getElementById('cashFlowDate').value = todayStr;
 ```
 
 #### **2. שימוש בהעדפות משתמש**
+
 ```javascript
 // קבלת העדפת מטבע ברירת מחדל
 const defaultCurrency = await window.getPreference('default_currency');
@@ -118,6 +129,7 @@ if (defaultAccount) {
 ```
 
 #### **3. ברירות מחדל לוגיות לפי סוג השדה**
+
 ```javascript
 // סוג פעולה - ברירת מחדל הגיונית
 document.getElementById('cashFlowType').value = 'deposit'; // הפקדה
@@ -152,7 +164,8 @@ document.getElementById('cashFlowUsdRate').value = '1.000000';
 | **Notes** | תאריך יצירה | היום | קוד |
 
 ### **⚠️ חשוב:**
-- **תאריכים:** 
+
+- **תאריכים:**
   - ✅ ברירת מחדל: תמיד היום (לא מהעדפות)
   - ✅ **פורמט לשרת:** `YYYY-MM-DD` (רק תאריך, ללא שעה!)
   - ✅ **פורמט ב-HTML:** `<input type="datetime-local">` מאפשר בחירת שעה
@@ -170,11 +183,13 @@ document.getElementById('cashFlowUsdRate').value = '1.000000';
 **מיקום:** `trading-ui/scripts/modules/ui-basic.js`
 
 **טעינה:**
+
 - ✅ נטענת אוטומטית עם המודול `ui-basic`
 - ✅ זמינה בכל עמוד שטוען את המודולים המאוחדים
 - ✅ אין צורך בטעינה נפרדת
 
 **במערכת המאוחדת:**
+
 ```html
 <!-- המודולים נטענים אוטומטית -->
 <script src="scripts/modules/core-systems.js?v=20251006"></script>
@@ -183,12 +198,14 @@ document.getElementById('cashFlowUsdRate').value = '1.000000';
 ```
 
 ### **⚠️ אין צורך להוסיף:**
+
 ```html
 <!-- ❌ לא נדרש יותר - הקובץ הוסר מהמערכת (אוקטובר 2025) -->
 <script src="scripts/validation-utils.js"></script>
 ```
 
 ### **📌 הערה חשובה:**
+
 קובץ `validation-utils.js` **הוסר לחלוטין מהמערכת** (אוקטובר 2025).  
 כל פונקציות הולידציה נמצאות כעת ב-`ui-basic.js` (Core Module) ונטענות אוטומטית בכל דף.  
 אם אתה רואה את הקובץ נטען בקובץ HTML כלשהו - זו שגיאה שצריך לתקן!
@@ -231,6 +248,7 @@ window.validateEntityForm(formId, requiredFields)
 ### **🎯 תהליך מלא מתחילת הטופס ועד השמירה:**
 
 #### **שלב 1: HTML - מבנה הטופס**
+
 ```html
 <form id="addCashFlowForm">
     <!-- שדות חובה מסומנים ב-required -->
@@ -245,6 +263,7 @@ window.validateEntityForm(formId, requiredFields)
 ```
 
 #### **שלב 2: JavaScript - פונקציית ולידציה**
+
 ```javascript
 /**
  * ולידציה של טופס תזרים מזומנים
@@ -269,6 +288,7 @@ function validateCashFlowForm() {
 ```
 
 #### **שלב 3: JavaScript - פונקציית שמירה**
+
 ```javascript
 async function saveCashFlow() {
   try {
@@ -391,6 +411,7 @@ async function handleServerValidationErrors(result) {
 ```
 
 #### **שלב 4: JavaScript - פונקציית פתיחת מודל עם ברירות מחדל**
+
 ```javascript
 function showAddCashFlowModal() {
   // 1. ניקוי הטופס
@@ -438,6 +459,7 @@ function showAddCashFlowModal() {
 ```
 
 #### **שלב 5: JavaScript - טעינת נתונים עם ברירות מחדל מהעדפות**
+
 ```javascript
 async function loadAccountsForCashFlow() {
   try {
@@ -666,6 +688,7 @@ function validateTradePlanForm() {
 ## 🔄 תהליך עבודה סטנדרטי
 
 ### **שלב 1: הגדרת פונקציית ולידציה**
+
 ```javascript
 // בקובץ [entity].js
 function validate[Entity]Form() {
@@ -676,6 +699,7 @@ function validate[Entity]Form() {
 ```
 
 ### **שלב 2: שימוש בולידציה בפונקציית שמירה**
+
 ```javascript
 async function save[Entity]() {
   try {
@@ -698,6 +722,7 @@ async function save[Entity]() {
 ```
 
 ### **שלב 3: ניקוי ולידציה בפתיחת מודל**
+
 ```javascript
 function showAdd[Entity]Modal() {
   // ניקוי הטופס
@@ -726,12 +751,14 @@ function showAdd[Entity]Modal() {
 **עדכון אחרון:** 8 באוקטובר 2025, 18:20
 
 ### ✅ **תוקן במלואו:**
+
 1. **cash_flows.js** ✅ - משתמש בפונקציה הכללית `validateEntityForm` (תוקן קודם)
 2. **trading_accounts.js** ✅ - ולידציה סטנדרטית מלאה, תרגום לעברית, צבעים דינמיים, תצוגת מטבע מלאה
 3. **trades.js** ✅ - ולידציה סטנדרטית, תאריכים בפורמט נכון, הפרדה בין שגיאות
 4. **tickers.js** ✅ - ולידציה סטנדרטית + לוגיקה עסקית (בדיקת כפילות, פריטים מקושרים)
 
 ### 🔄 **נדרש תיקון (קבצים מורכבים):**
+
 5. **alerts.js** 🔴 - קובץ מורכב מאוד (2764 שורות) - יש ולידציה ידנית מסורבלת
 6. **trade_plans.js** 🟡 - משתמש ב-`window.validateForm` ישן, צריך להחליף ל-`validateEntityForm`
 7. **executions.js** ⏭️ - לא נבדק (3854 שורות)
@@ -742,16 +769,19 @@ function showAdd[Entity]Modal() {
 ## 🎯 יתרונות הגישה הסטנדרטית
 
 ### **1. עקביות**
+
 - כל הטפסים מתנהגים אותו דבר
 - הודעות שגיאה אחידות
 - סימון שדות אחיד
 
 ### **2. תחזוקה**
+
 - תיקון באג אחד מתקן את כל הטפסים
 - הוספת תכונה חדשה זמינה מיד לכולם
 - קוד פשוט יותר לתחזוקה
 
 ### **3. חווית משתמש**
+
 - הודעות ברורות ועקביות
 - סימון ויזואלי אחיד
 - תגובה מהירה לשגיאות
@@ -761,12 +791,14 @@ function showAdd[Entity]Modal() {
 ## 📝 הערות חשובות
 
 ### **⚠️ חובה להשתמש:**
+
 - `window.validateEntityForm()` - לולידציה
 - `window.showFieldError()` - לסימון שדה בעייתי
 - **`window.showSimpleErrorNotification()`** - להודעת שגיאה פשוטה ✅
 - `window.clearValidation()` - לניקוי ולידציה
 
 ### **❌ אסור להשתמש:**
+
 - `window.showErrorNotification()` - מציג מודל קריטי מפורט ❌
 - ולידציה מותאמת אישית שלא דרך המערכת הכללית
 - `alert()` להודעות שגיאה
@@ -780,11 +812,13 @@ function showAdd[Entity]Modal() {
 ### **כל טופס במערכת צריך:**
 
 #### **📁 בקובץ HTML:**
+
 1. ✅ טעינת `validation-utils.js` לפני סקריפט העמוד
 2. ✅ שדות חובה מסומנים ב-`required`
 3. ✅ ID אלמנטים ברורים ועקביים
 
 #### **📝 בקובץ JavaScript:**
+
 1. ✅ פונקציית `validate[Entity]Form()` שמשתמשת ב-`validateEntityForm()`
 2. ✅ קריאה לולידציה לפני שליחה לשרת
 3. ✅ ניקוי ולידציה בפתיחת מודל (`clearValidation`)
@@ -796,6 +830,7 @@ function showAdd[Entity]Modal() {
 ### **🎯 תוצאה צפויה:**
 
 #### **כאשר ולידציה נכשלת:**
+
 - ✅ התראה אדומה פשוטה (toast) בפינה השמאלית העליונה
 - ✅ הודעה קצרה: "שדות חובה חסרים: X, Y, Z"
 - ✅ שדות בעייתיים מסומנים באדום
@@ -803,11 +838,13 @@ function showAdd[Entity]Modal() {
 - ✅ משך הצגה: 6 שניות
 
 #### **כאשר שגיאת מערכת:**
+
 - ✅ מודל מפורט עם כל הפרטים (stack trace, browser info, וכו')
 - ✅ אפשרות להעתיק דוח מפורט
 - ✅ מיועד למפתחים ולמשתמשים טכניים
 
 ### **📊 יתרונות:**
+
 - ✅ חווית משתמש עקבית בכל המערכת
 - ✅ קוד נקי וקל לתחזוקה
 - ✅ תמיכה מלאה במערכות כלליות
@@ -818,6 +855,7 @@ function showAdd[Entity]Modal() {
 ## ✅ Checklist לבדיקת תקינות ולידציה
 
 ### **📋 בדיקות HTML:**
+
 - [ ] המודולים המאוחדים נטענים (core-systems, ui-basic, data-basic)
 - [ ] ✅ **אין** טעינה של `validation-utils.js` כקובץ נפרד (הקובץ הוסר מהמערכת - הולידציה ב-ui-basic)
 - [ ] כל השדות החובה מסומנים ב-`required`
@@ -825,6 +863,7 @@ function showAdd[Entity]Modal() {
 - [ ] הכפתור קורא לפונקציית השמירה הנכונה
 
 ### **📋 בדיקות JavaScript:**
+
 - [ ] קיימת פונקציית `validate[Entity]Form()`
 - [ ] הפונקציה משתמשת ב-`window.validateEntityForm()`
 - [ ] כל השדות החובה מוגדרים ברשימת requiredFields
@@ -840,6 +879,7 @@ function showAdd[Entity]Modal() {
   - [ ] מטבע - מהעדפות או USD
 
 ### **📋 בדיקות פונקציונליות:**
+
 - [ ] ניסיון לשמור טופס ריק מציג התראה פשוטה (לא מודל)
 - [ ] שדות ריקים מסומנים באדום
 - [ ] הודעה מציינת בדיוק אילו שדות חסרים
@@ -847,6 +887,7 @@ function showAdd[Entity]Modal() {
 - [ ] אחרי תיקון ושמירה מוצלחת - שדות מנוקים והמודל נסגר
 
 ### **📋 בדיקות חווית משתמש:**
+
 - [ ] הודעת השגיאה קצרה וברורה
 - [ ] אין מודל מפורט לשגיאות ולידציה רגילות
 - [ ] שדות מסומנים מיד בעת הולידציה

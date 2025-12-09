@@ -1,4 +1,5 @@
 # מדריך Email Templates - TikTrack
+
 ## Email Templates Guide
 
 **תאריך יצירה**: 28 בינואר 2025  
@@ -166,6 +167,7 @@
 **מטרה**: מייל איפוס סיסמה
 
 **Placeholders:**
+
 - `{username}` - שם המשתמש
 - `{reset_url}` - קישור לאיפוס סיסמה
 
@@ -183,6 +185,7 @@ render_template('password_reset', {
 **מטרה**: התראות מערכת
 
 **Placeholders:**
+
 - `{title}` - כותרת ההתראה
 - `{message}` - תוכן ההתראה
 - `{action_url}` - קישור לפעולה (אופציונלי)
@@ -202,6 +205,7 @@ render_template('system_notification', {
 **מטרה**: התראות עסקיות
 
 **Placeholders:**
+
 - `{title}` - כותרת ההתראה
 - `{message}` - תוכן ההתראה
 - `{action_url}` - קישור לפעולה (אופציונלי)
@@ -221,6 +225,7 @@ render_template('business_notification', {
 **מטרה**: template כללי
 
 **Placeholders:**
+
 - `{title}` - כותרת המייל
 - `{content}` - תוכן המייל (HTML)
 

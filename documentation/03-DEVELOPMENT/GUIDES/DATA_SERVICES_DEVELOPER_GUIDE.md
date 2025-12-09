@@ -449,6 +449,7 @@ async function deleteTrade(tradeId) {
 ### Overview
 
 Every Data Service can include Business Logic API wrappers that provide:
+
 - **Validation** - Business rule validation via backend
 - **Calculations** - Complex business calculations (prices, percentages, P/L, etc.)
 - **Cache Integration** - Automatic caching via CacheTTLGuard
@@ -642,11 +643,13 @@ async function saveTrade(tradeData) {
 ### Cache Integration with Business Logic API
 
 Business Logic API wrappers automatically use:
+
 - **CacheTTLGuard** - For automatic TTL management
 - **CacheKeyHelper** - For optimized cache key generation
 - **UnifiedCacheManager** - For multi-layer caching
 
 **TTL Guidelines:**
+
 - **Calculations:** 30 seconds (e.g., calculateStopPrice, calculateTargetPrice)
 - **Validations:** 60 seconds (e.g., validateTrade, validateExecution)
 
@@ -709,6 +712,7 @@ if (result.status === 'success' && window.CacheSyncManager?.invalidateByAction) 
 **Problem:** `window.{EntityName}Data` is undefined
 
 **Solutions:**
+
 1. Check that service file is loaded in HTML before page script
 2. Verify service file syntax is correct
 3. Check browser console for JavaScript errors
@@ -719,6 +723,7 @@ if (result.status === 'success' && window.CacheSyncManager?.invalidateByAction) 
 **Problem:** Data always loads from API, never from cache
 
 **Solutions:**
+
 1. Verify UnifiedCacheManager is initialized
 2. Check CacheTTLGuard is available
 3. Ensure TTL is set correctly
@@ -729,6 +734,7 @@ if (result.status === 'success' && window.CacheSyncManager?.invalidateByAction) 
 **Problem:** Changes don't appear until manual refresh
 
 **Solutions:**
+
 1. Verify CacheSyncManager.invalidateByAction is called after mutations
 2. Check action names match CACHE_SYNC_INTEGRATION_MAP.md
 3. Ensure dependencies are configured correctly
@@ -739,6 +745,7 @@ if (result.status === 'success' && window.CacheSyncManager?.invalidateByAction) 
 **Problem:** Create/Update/Delete operations don't work
 
 **Solutions:**
+
 1. Verify service methods return Response objects (not JSON)
 2. Check CRUDResponseHandler is used correctly
 3. Ensure error handling catches and displays errors
@@ -752,7 +759,7 @@ if (result.status === 'success' && window.CacheSyncManager?.invalidateByAction) 
 
 כל Data Service יכול לכלול wrappers ל-Business Logic API עבור ולידציה. ה-wrappers משתמשים ב-ValidationService (Database Constraints) ו-BusinessRulesRegistry (Business Rules) כדי לספק ולידציה מקיפה.
 
-### ארכיטקטורת ולידציה:
+### ארכיטקטורת ולידציה
 
 **3 שכבות ולידציה:**
 
@@ -836,7 +843,7 @@ window.{Entity}Data = {
 };
 ```
 
-### שימוש ב-Validation Wrapper:
+### שימוש ב-Validation Wrapper
 
 ```javascript
 // In page script
@@ -855,7 +862,7 @@ if (!validationResult.is_valid) {
 // Continue with save/update operation
 ```
 
-### Validation Order (Backend):
+### Validation Order (Backend)
 
 בביצוע, ה-Business Service בודק לפי הסדר הבא:
 

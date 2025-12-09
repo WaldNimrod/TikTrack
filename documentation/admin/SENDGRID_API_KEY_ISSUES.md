@@ -1,4 +1,5 @@
 # בעיות עם API Key של SendGrid
+
 ## SendGrid API Key Issues
 
 **תאריך יצירה**: 28 בינואר 2025  
@@ -9,7 +10,7 @@
 
 ## ❌ שגיאה: "535 Authentication failed: The provided authorization grant is invalid, expired, or revoked"
 
-### מה זה אומר?
+### מה זה אומר
 
 השגיאה הזו אומרת שה-API Key לא תקין, פג תוקפו, או בוטל.
 
@@ -17,13 +18,15 @@
 
 ## 🔍 בדיקות
 
-### 1. האם זה באמת SendGrid?
+### 1. האם זה באמת SendGrid
 
 **API Keys של SendGrid** בדרך כלל:
+
 - מתחילים ב-`SG.` (לדוגמה: `SG.xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx`)
 - ארוכים יותר (כ-70 תווים)
 
 **אם המפתח שלך לא מתחיל ב-`SG.`**:
+
 - יכול להיות שזה לא SendGrid
 - יכול להיות שזה API Key בפורמט ישן
 - יכול להיות שזה שירות אחר

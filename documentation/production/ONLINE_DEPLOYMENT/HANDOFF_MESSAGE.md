@@ -126,34 +126,42 @@ https://github.com/WaldNimrod/TikTrack/tree/main/documentation/production/ONLINE
 
 ## 📋 קישורים ישירים לכל הקבצים
 
-### מסמכים ראשיים (חובה):
+### מסמכים ראשיים (חובה)
+
 1. **TESTING_ENVIRONMENT_WORK_INSTRUCTIONS.md**
+
    ```
    https://github.com/WaldNimrod/TikTrack/blob/main/documentation/production/ONLINE_DEPLOYMENT/TESTING_ENVIRONMENT_WORK_INSTRUCTIONS.md
    ```
 
 2. **TESTING_ENVIRONMENT_QUICK_REFERENCE.md**
+
    ```
    https://github.com/WaldNimrod/TikTrack/blob/main/documentation/production/ONLINE_DEPLOYMENT/TESTING_ENVIRONMENT_QUICK_REFERENCE.md
    ```
 
 3. **HANDOFF_README.md**
+
    ```
    https://github.com/WaldNimrod/TikTrack/blob/main/documentation/production/ONLINE_DEPLOYMENT/HANDOFF_README.md
    ```
 
-### מסמכי תמיכה (אופציונלי):
+### מסמכי תמיכה (אופציונלי)
+
 4. **TESTING_ENVIRONMENT_UPDATE_PLAN.md**
+
    ```
    https://github.com/WaldNimrod/TikTrack/blob/main/documentation/production/ONLINE_DEPLOYMENT/TESTING_ENVIRONMENT_UPDATE_PLAN.md
    ```
 
 5. **TESTING_ENVIRONMENT_CHECKLIST.md**
+
    ```
    https://github.com/WaldNimrod/TikTrack/blob/main/documentation/production/ONLINE_DEPLOYMENT/TESTING_ENVIRONMENT_CHECKLIST.md
    ```
 
-### קישור לתיקייה:
+### קישור לתיקייה
+
 ```
 https://github.com/WaldNimrod/TikTrack/tree/main/documentation/production/ONLINE_DEPLOYMENT
 ```

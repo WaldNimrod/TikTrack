@@ -9,6 +9,7 @@
 ## 🎯 מטרת ההעברה
 
 להעביר לצוות הפרודקשן:
+
 1. ✅ כל הסקריפטים והכלים החדשים
 2. ✅ כל מסמכי התעוד
 3. ✅ הוראות שימוש מפורטות
@@ -17,23 +18,26 @@
 
 ---
 
-## 📦 מה צריך להעביר?
+## 📦 מה צריך להעביר
 
 ### 1. סקריפטים וכלים (Scripts & Tools)
 
-#### סקריפטים מרכזיים:
+#### סקריפטים מרכזיים
+
 - ✅ `scripts/production-update/master.py` - Master Script (11 שלבים)
 - ✅ `scripts/production-update/preserve_production_changes.py` - שמירת שינויים
 - ✅ `scripts/production-update/prepare_changelog.py` - יצירת changelog
 - ✅ `scripts/production-update/document_server_changes.py` - תיעוד שינויים
 
-#### סקריפטי sync ו-verification:
+#### סקריפטי sync ו-verification
+
 - ✅ `scripts/sync_to_production.py` - סינכרון Backend (עם DB protection)
 - ✅ `scripts/sync_ui_to_production.py` - סינכרון UI (עם verification)
 - ✅ `scripts/sync_verifier.py` - בדיקת sync עם checksums
 - ✅ `scripts/pre_sync_validation.py` - בדיקת מוכנות לפני sync
 
-#### Master Script - שלבים (Steps):
+#### Master Script - שלבים (Steps)
+
 - ✅ `scripts/production-update/steps/01_collect_changes.py`
 - ✅ `scripts/production-update/steps/02_merge_main.py`
 - ✅ `scripts/production-update/steps/03_cleanup_documentation.py`
@@ -45,17 +49,20 @@
 - ✅ `scripts/production-update/steps/10_commit_push.py`
 - ✅ `scripts/production-update/steps/11_start_server.py`
 
-#### Master Script - כלי עזר (Utils):
+#### Master Script - כלי עזר (Utils)
+
 - ✅ `scripts/production-update/utils/conflict_resolver.py` - פתרון קונפליקטים
 - ✅ `scripts/production-update/utils/logger.py` - מערכת לוגים
 - ✅ `scripts/production-update/utils/reporter.py` - מערכת דיווח
 - ✅ `scripts/production-update/utils/rollback.py` - מערכת rollback
 
-#### Master Script - קבצי config:
+#### Master Script - קבצי config
+
 - ✅ `scripts/production-update/config/steps_config.json`
 - ✅ `scripts/production-update/config/allowed_files.json`
 
-#### Master Script - קבצי lib (אם קיימים):
+#### Master Script - קבצי lib (אם קיימים)
+
 - ✅ `scripts/production-update/lib/sync_to_production.py`
 - ✅ `scripts/production-update/lib/sync_ui_to_production.py`
 - ✅ `scripts/production-update/lib/verify_schema.py`
@@ -63,7 +70,8 @@
 
 ### 2. מסמכי תעוד (Documentation)
 
-#### מסמכים עיקריים:
+#### מסמכים עיקריים
+
 - ✅ `documentation/production/UPDATE_PROCESS.md` - תהליך עדכון מלא
 - ✅ `documentation/production/PROCESS_STEPS_TABLE.md` - טבלת שלבים לפי סביבה
 - ✅ `documentation/production/PROCESS_STEPS_SUMMARY.md` - סיכום שלבים
@@ -75,22 +83,25 @@
 - ✅ `documentation/production/SERVER_CHANGES.md` - תיעוד שינויים בשרת
 - ✅ `documentation/production/INITIAL_HANDOFF.md` - מסמך זה
 
-#### מסמכי Master Script (אם קיימים):
+#### מסמכי Master Script (אם קיימים)
+
 - ✅ `scripts/production-update/README.md`
 - ✅ `scripts/production-update/PROTECTION_GUIDE.md`
 - ✅ `scripts/production-update/COMMIT_INSTRUCTIONS.md`
 
-### 3. קבצי verification (אם קיימים):
+### 3. קבצי verification (אם קיימים)
+
 - ✅ `scripts/verify_production.sh` - בדיקת מבנה
 - ✅ `scripts/verify_production_isolation.sh` - בדיקת הפרדה
 
 ---
 
-## 🚀 איך להעביר?
+## 🚀 איך להעביר
 
 ### אופציה 1: דרך Git (מומלץ) ⭐
 
 **יתרונות:**
+
 - ✅ כל הקבצים נשמרים ב-Git
 - ✅ גרסה מבוקרת
 - ✅ קל לעדכן בעתיד
@@ -147,6 +158,7 @@ git merge origin/main
 ### אופציה 2: דרך Zip File
 
 **יתרונות:**
+
 - ✅ מהיר
 - ✅ לא תלוי ב-Git
 
@@ -191,6 +203,7 @@ ls -la documentation/production/
 ### אופציה 3: דרך Git Patch
 
 **יתרונות:**
+
 - ✅ שומר על היסטוריית Git
 - ✅ קל ליישם
 
@@ -213,7 +226,7 @@ git am *.patch
 
 ## ✅ Checklist העברה
 
-### לפני העברה:
+### לפני העברה
 
 - [ ] כל הקבצים נשמרו ב-Git
 - [ ] כל הקבצים נבדקו (ללא שגיאות)
@@ -221,7 +234,7 @@ git am *.patch
 - [ ] כל הסקריפטים ניתנים להרצה (executable)
 - [ ] בדיקת paths בסקריפטים (relative paths)
 
-### אחרי העברה:
+### אחרי העברה
 
 - [ ] צוות הפרודקשן קיבל את כל הקבצים
 - [ ] הקבצים במקום הנכון
@@ -233,7 +246,7 @@ git am *.patch
 
 ## 📋 רשימת קבצים מלאה להעברה
 
-### סקריפטים:
+### סקריפטים
 
 ```
 scripts/
@@ -270,7 +283,7 @@ scripts/
 └── verify_production_isolation.sh
 ```
 
-### מסמכי תעוד:
+### מסמכי תעוד
 
 ```
 documentation/production/
@@ -325,14 +338,14 @@ python3 scripts/pre_sync_validation.py
 
 ## 📞 תקשורת עם צוות הפרודקשן
 
-### מה להעביר להם:
+### מה להעביר להם
 
 1. **מסמך זה** (`INITIAL_HANDOFF.md`) - הוראות העברה
 2. **`HANDOFF_TO_PRODUCTION_TEAM.md`** - מידע כללי
 3. **`PRODUCTION_SYNC_INSTRUCTIONS.md`** - הוראות עדכון
 4. **`PROCESS_STEPS_TABLE.md`** - טבלת שלבים
 
-### שאלות לשאול:
+### שאלות לשאול
 
 1. איך הם מעדיפים לקבל את הקבצים? (Git, Zip, אחר)
 2. האם יש להם גישה ל-Git repository?
@@ -343,19 +356,19 @@ python3 scripts/pre_sync_validation.py
 
 ## 🎯 סיכום
 
-### מה צריך להעביר:
+### מה צריך להעביר
 
 1. ✅ **כל הסקריפטים** ב-`scripts/production-update/` ו-`scripts/`
 2. ✅ **כל המסמכים** ב-`documentation/production/`
 3. ✅ **הוראות שימוש** מפורטות
 
-### איך להעביר:
+### איך להעביר
 
 1. **מומלץ:** דרך Git (commit & push ל-main, merge ל-production)
 2. **אלטרנטיבה:** Zip file
 3. **אלטרנטיבה:** Git patch
 
-### אחרי העברה:
+### אחרי העברה
 
 1. ✅ בדיקת מבנה קבצים
 2. ✅ בדיקת הרשאות

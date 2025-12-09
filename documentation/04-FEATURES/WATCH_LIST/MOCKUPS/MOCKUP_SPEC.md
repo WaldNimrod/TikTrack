@@ -1,4 +1,5 @@
 # מפרט מוקאפים: Watch List
+
 ## Mockup Specification: Watch List System
 
 **תאריך:** 28 בינואר 2025  
@@ -9,9 +10,11 @@
 ## מוקאפים שנוצרו
 
 ### 1. עמוד ראשי
+
 **קובץ:** `trading-ui/mockups/watch-lists-page.html`
 
 **תכונות:**
+
 - ✅ מבנה סטנדרטי לפי תבנית העמוד
 - ✅ ITCSS מלא
 - ✅ Header System (unified-header)
@@ -24,6 +27,7 @@
 - ✅ Summary stats cards
 
 **Sections:**
+
 1. **Top Section**: Header + Summary Stats (4 cards)
 2. **Watch Lists Grid**: 3 cards לדוגמה
 3. **Active List View**: Table view עם 4 טיקרים
@@ -32,9 +36,11 @@
 ---
 
 ### 2. Modal - Add/Edit Watch List
+
 **קובץ:** `trading-ui/mockups/watch-list-modal.html`
 
 **תכונות:**
+
 - ✅ Form עם כל השדות
 - ✅ Name (required)
 - ✅ Icon selector
@@ -45,9 +51,11 @@
 ---
 
 ### 3. Modal - Add Ticker
+
 **קובץ:** `trading-ui/mockups/add-ticker-modal.html`
 
 **תכונות:**
+
 - ✅ Search ticker מהמערכת
 - ✅ Search results עם typeahead
 - ✅ External ticker input
@@ -57,9 +65,11 @@
 ---
 
 ### 4. Quick Action - Flag Palette
+
 **קובץ:** `trading-ui/mockups/flag-quick-action.html`
 
 **תכונות:**
+
 - ✅ 8 צבעי דגלים (grid 4x2)
 - ✅ Hover effects
 - ✅ Active state
@@ -71,18 +81,22 @@
 ## אינטגרציות במוקאפ
 
 ### Button System
+
 - כל הכפתורים משתמשים ב-`data-button-type`
 - `data-onclick` לפעולות
 
 ### Icon System
+
 - כל האיקונים דרך `<img>` עם paths מ-`images/icons/tabler/`
 - Prepared ל-IconSystem integration
 
 ### Section Toggle
+
 - כל Sections עם `data-section`
 - Toggle buttons עם `toggleSection()`
 
 ### View Modes
+
 - 3 תצוגות מוכנות
 - JavaScript needed ל-switching
 
@@ -91,11 +105,13 @@
 ## דוגמאות נתונים
 
 ### Watch Lists
+
 1. **מניות טכנולוגיה** - 15 טיקרים, איקון chart-line, צבע #26baac
 2. **אנרגיה** - 12 טיקרים, איקון flame, צבע #fc5a06
 3. **קריפטו** - 15 טיקרים, איקון coins, צבע #28a745
 
 ### Watch List Items
+
 1. **AAPL** - במערכת, דגל #26baac, מחיר $150.25, +1.42%
 2. **MSFT** - במערכת, דגל #fc5a06, מחיר $378.90, -0.39%
 3. **TSLA** - חיצוני, ללא דגל, מחיר $245.80, -0.85%
@@ -106,6 +122,7 @@
 ## נקודות לבדיקה
 
 ### UI/UX
+
 - [ ] Cards grid responsive
 - [ ] Table scrollable על mobile
 - [ ] Flag palette positioning
@@ -113,6 +130,7 @@
 - [ ] Empty states
 
 ### אינטגרציות
+
 - [ ] Button System עובד
 - [ ] Icon paths נכונים
 - [ ] Section toggles עובדים
@@ -123,11 +141,13 @@
 ## הערות מימוש
 
 ### JavaScript Needed
+
 - Page logic: `watch-lists.js`
 - Data service: `watch-lists-data.js`
 - UI service: `watch-lists-ui-service.js`
 
 ### Styling
+
 - Watch list card styles (inline במוקאפ)
 - Flag palette styles (inline)
 - View mode styles (inline)
@@ -136,6 +156,10 @@
 ---
 
 **סיכום:** כל המוקאפים מוכנים לבדיקה עם דוגמאות נתונים ואינטגרציות בסיסיות.
+
+
+
+
 
 
 

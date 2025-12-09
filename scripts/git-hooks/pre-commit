@@ -86,5 +86,35 @@ if [[ "${#error_messages[@]}" -gt 0 ]]; then
     exit 1
 fi
 
+# Check for duplicates (optional - can be slow)
+if [[ "${SKIP_DUPLICATE_CHECK:-}" != "1" ]]; then
+    if command -v jscpd &> /dev/null || npx jscpd --version &> /dev/null 2>&1; then
+        echo "🔍 Checking for code duplicates..."
+        if npx jscpd trading-ui/scripts/ Backend/ --min-lines 5 --min-tokens 50 --ignore '**/node_modules/**' --ignore '**/archive/**' --ignore '**/backup/**' --ignore '**/production/**' --format console --threshold 1 2>&1 | grep -q "duplicated"; then
+            echo "⚠️  Code duplicates detected. Review the output above."
+            echo "To bypass: SKIP_DUPLICATE_CHECK=1 git commit"
+            exit 1
+        fi
+    fi
+fi
+
+# Check general systems usage (optional)
+if [[ "${SKIP_GENERAL_SYSTEMS_CHECK:-}" != "1" ]]; then
+    if [[ -f "scripts/qa/check-general-systems-usage.js" ]]; then
+        echo "🔍 Checking general systems usage..."
+        if node scripts/qa/check-general-systems-usage.js 2>&1 | grep -q "potential issues"; then
+            echo "⚠️  Potential issues with general systems usage. Review the output above."
+            echo "To bypass: SKIP_GENERAL_SYSTEMS_CHECK=1 git commit"
+            exit 1
+        fi
+    fi
+fi
+
+# Check parallel processes (warning only)
+if [[ -f "scripts/qa/check-parallel-processes.sh" ]]; then
+    echo "🔍 Checking for parallel processes..."
+    ./scripts/qa/check-parallel-processes.sh || true
+fi
+
 exit 0
 

@@ -1,4 +1,5 @@
 # תוכנית קביעת Bundles לפי סביבה
+
 ## Environment-Aware Bundles Setup Plan
 
 **תאריך:** 6 בדצמבר 2025  
@@ -10,6 +11,7 @@
 ## 🎯 מטרה
 
 לקבע את מערכת ה-bundles כך שהיא:
+
 - ✅ **Development** (`TikTrackApp`) - **ללא bundles** (scripts בודדים)
 - ✅ **Production** (`TikTrackApp-Production`) - **עם bundles** (ברירת מחדל)
 - ✅ זיהוי אוטומטי של סביבה לפי שם תיקייה
@@ -26,6 +28,7 @@
 **קובץ:** `trading-ui/scripts/generate-script-loading-code.js`
 
 **קוד נדרש:**
+
 ```javascript
 /**
  * Detect environment from workspace directory name
@@ -53,6 +56,7 @@ function detectEnvironment() {
 #### 1.2 עדכון ברירת מחדל
 
 **שינוי נדרש:**
+
 ```javascript
 // לפני:
 function generateScriptLoadingCode(pageName, mode = 'development', useBundles = false)
@@ -76,6 +80,7 @@ function generateScriptLoadingCode(pageName, mode = null, useBundles = null) {
 #### 1.3 עדכון Command Line Arguments
 
 **שינוי נדרש:**
+
 ```javascript
 // לפני:
 const mode = modeArg ? modeArg.split('=')[1] : 'development';
@@ -96,6 +101,7 @@ if (useBundles === null) {
 ```
 
 **פעולות:**
+
 - [ ] הוספת `detectEnvironment()` function
 - [ ] עדכון `generateScriptLoadingCode()` ל-auto-detect
 - [ ] עדכון command line arguments parsing
@@ -110,6 +116,7 @@ if (useBundles === null) {
 **קובץ:** `documentation/03-DEVELOPMENT/GUIDES/BUNDLING_SYSTEM_GUIDE.md`
 
 **עדכונים נדרשים:**
+
 - [ ] הוספת סעיף "Environment Detection"
 - [ ] הסבר על Development vs Production
 - [ ] דוגמאות לשימוש
@@ -119,6 +126,7 @@ if (useBundles === null) {
 **קובץ:** `documentation/02-ARCHITECTURE/FRONTEND/UNIFIED_INITIALIZATION_SYSTEM.md`
 
 **עדכונים נדרשים:**
+
 - [ ] עדכון סעיף "Bundling System" - environment-aware
 - [ ] הסבר על זיהוי אוטומטי
 
@@ -131,11 +139,13 @@ if (useBundles === null) {
 **יצירת סקריפט:** `scripts/build/validate-environment-bundles.js`
 
 **תפקיד:**
+
 - בדיקה שכל העמודים ב-production משתמשים ב-bundles
 - בדיקה שכל העמודים ב-development לא משתמשים ב-bundles
 - דוח על חוסר התאמה
 
 **פעולות:**
+
 - [ ] יצירת `scripts/build/validate-environment-bundles.js`
 - [ ] הוספת checks לכל עמודים
 - [ ] הוספת error reporting
@@ -159,6 +169,7 @@ if (useBundles === null) {
 ```
 
 **פעולות:**
+
 - [ ] הוספת `build:validate` script
 - [ ] הוספת `build:production` script
 
@@ -167,18 +178,21 @@ if (useBundles === null) {
 ## 📊 לוגיקה
 
 ### Development Environment (`TikTrackApp`)
+
 - **Mode:** `development`
 - **Use Bundles:** `false` (ברירת מחדל)
 - **Scripts:** בודדים (ללא bundles)
 - **סיבה:** קל יותר ל-debug, hot reload, ופיתוח
 
 ### Production Environment (`TikTrackApp-Production`)
+
 - **Mode:** `production`
 - **Use Bundles:** `true` (ברירת מחדל)
 - **Scripts:** bundles (מיניפיקציה ואופטימיזציה)
 - **סיבה:** ביצועים טובים יותר, פחות בקשות רשת
 
 ### Override Options
+
 - `--mode=development` - Force development mode
 - `--mode=production` - Force production mode
 - `--use-bundles` - Force use bundles
@@ -200,6 +214,7 @@ if (useBundles === null) {
 ## 📝 דוגמאות שימוש
 
 ### Development (אוטומטי)
+
 ```bash
 # בתיקייה: TikTrackApp
 node trading-ui/scripts/generate-script-loading-code.js index
@@ -207,6 +222,7 @@ node trading-ui/scripts/generate-script-loading-code.js index
 ```
 
 ### Production (אוטומטי)
+
 ```bash
 # בתיקייה: TikTrackApp-Production
 node trading-ui/scripts/generate-script-loading-code.js index
@@ -214,6 +230,7 @@ node trading-ui/scripts/generate-script-loading-code.js index
 ```
 
 ### Override
+
 ```bash
 # Force production mode
 node trading-ui/scripts/generate-script-loading-code.js index --mode=production

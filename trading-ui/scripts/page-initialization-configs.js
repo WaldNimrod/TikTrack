@@ -2322,6 +2322,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'crud',
         'entity-services',
         'watch-lists',
+        'tradingview-widgets', // Required for mini charts in cards view
         'init-system',
       ],
       requiredGlobals: [
@@ -2338,6 +2339,8 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.CRUDResponseHandler',
         'window.UnifiedTableSystem',
         'window.PageStateManager',
+        'window.TradingViewWidgetsFactory', // Required for mini charts
+        'window.TradingViewWidgetsColors', // Required for theme support
       ],
       description: 'ניהול רשימות צפייה - יצירה, עריכה, מחיקה וניהול טיקרים',
       lastModified: '2025-12-06',
@@ -3389,6 +3392,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.ModalManagerV2',
         'window.HeaderSystem',
         'window.UnifiedTableSystem',
+        'window.createActionsMenu', // Actions Menu System - required for actions menu
         'window.validateTextField', // Validation functions
         'window.tickersModalConfig', // Required for nested ticker addition modal
         'window.AddTickerModal', // Required for add ticker modal
@@ -3693,7 +3697,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       requiresTables: true,
       customInitializers: [
         async pageConfig => {
-          window.Logger?.info('📄 Initializing portfolio-state-page...', {
+          window.Logger?.info('📄 Initializing portfolio-state...', {
             page: 'page-initialization-configs',
           });
           
@@ -3721,17 +3725,17 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
           if (typeof window.portfolioStatePage.initializePage === 'function') {
             try {
               await window.portfolioStatePage.initializePage();
-              window.Logger?.info('✅ Portfolio State Page initialized via UnifiedAppInitializer', {
+              window.Logger?.info('✅ Portfolio State initialized via UnifiedAppInitializer', {
                 page: 'page-initialization-configs',
               });
             } catch (error) {
-              window.Logger?.error('❌ Error initializing Portfolio State Page', {
+              window.Logger?.error('❌ Error initializing Portfolio State', {
                 page: 'page-initialization-configs',
                 error,
               });
             }
           } else {
-            window.Logger?.info('ℹ️ Portfolio State Page will initialize via DOMContentLoaded', {
+            window.Logger?.info('ℹ️ Portfolio State will initialize via DOMContentLoaded', {
               page: 'page-initialization-configs',
             });
           }
@@ -3754,6 +3758,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         "info-summary",
         "charts",
         "tradingview-charts", // Required for TradingView charts in trade history
+        "external-data", // Required for loading external historical data
         "init-system"
       ],
       requiredGlobals: [
@@ -3770,6 +3775,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         "window.SelectPopulatorService",
         "window.DataCollectionService",
         "window.CRUDResponseHandler",
+        "window.ExternalDataService", // Required for loading external historical data
         "window.TradeHistoryData", // Trade History Data Service
         "window.tradeHistoryPage" // Trade History Page Script
       ],
@@ -3933,7 +3939,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         "modules",
         "crud",
         "preferences",
-        "charts",
+        "tradingview-charts", // Required for TradingView activity chart
         "entity-services",
         "entity-details",
         "info-summary",
@@ -3953,8 +3959,8 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         "window.DataCollectionService",
         "window.CRUDResponseHandler",
         "window.TradingJournalData", // Trading Journal Data Service
-        "window.Chart", // Chart.js for activity chart
-        "window.ChartLoader" // Chart loader
+        "window.TradingViewChartAdapter", // TradingView chart adapter for activity chart
+        "window.LightweightCharts" // TradingView Lightweight Charts library
       ],
       preloadAssets: ['trading-journal-page-data'],
       cacheStrategy: 'standard',
@@ -3966,6 +3972,29 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
           window.Logger?.info('📄 Initializing trading-journal-page...', {
             page: 'page-initialization-configs',
           });
+          
+          // Wait for TradingViewChartAdapter to be available
+          if (!window.TradingViewChartAdapter) {
+            window.Logger?.warn('⚠️ TradingViewChartAdapter not available yet, waiting...', {
+              page: 'page-initialization-configs',
+            });
+            
+            let retries = 0;
+            while (!window.TradingViewChartAdapter && retries < 50) {
+              await new Promise(resolve => setTimeout(resolve, 100));
+              retries++;
+            }
+            
+            if (!window.TradingViewChartAdapter) {
+              window.Logger?.error('❌ TradingViewChartAdapter not available after wait', {
+                page: 'page-initialization-configs',
+              });
+            } else {
+              window.Logger?.info('✅ TradingViewChartAdapter loaded', {
+                page: 'page-initialization-configs',
+              });
+            }
+          }
           
           // Wait for tradingJournalPage to be available
           if (!window.tradingJournalPage) {

@@ -32,6 +32,7 @@
 #### א. Class-Based (TradingView Style)
 
 **יתרונות:**
+
 - ✅ מבנה מובנה וברור - כל הלוגיקה במקום אחד
 - ✅ Lifecycle management מובנה - init, render, destroy
 - ✅ תמיכה ב-multiple instances אוטומטית
@@ -39,11 +40,13 @@
 - ✅ דומה ל-TradingView Widgets System הקיים
 
 **חסרונות:**
+
 - ❌ מורכב יותר - צריך להבין Class syntax
 - ❌ יותר קוד - overhead של Class structure
 - ❌ לא תואם 100% לווידג'טים הקיימים (שהם IIFE)
 
 **דוגמת קוד:**
+
 ```javascript
 class TagWidget {
   constructor(config) {
@@ -67,17 +70,20 @@ widget.init();
 #### ב. Factory Pattern
 
 **יתרונות:**
+
 - ✅ גמיש - Factory יכול ליצור variations שונות
 - ✅ קל לבדיקה - Functions נפרדות
 - ✅ הפרדה ברורה - Factory, Render, Events
 - ✅ קל להרחיב - הוספת factory functions
 
 **חסרונות:**
+
 - ❌ לא קיים במערכת - צריך ליצור תבנית חדשה
 - ❌ State management יותר מסובך - צריך closures/objects
 - ❌ יותר קבצים - Factory, Render, Events נפרדים
 
 **דוגמת קוד:**
+
 ```javascript
 function createTagWidget(config) {
   const state = { activeTab: 'cloud' };
@@ -100,6 +106,7 @@ widget.init();
 #### ג. Module Pattern (IIFE) - המלצה ראשית
 
 **יתרונות:**
+
 - ✅ תואם לווידג'טים הקיימים - RecentTradesWidget, RecentTradePlansWidget
 - ✅ פשוט וישיר - קל להבין ולתחזק
 - ✅ Performance מעולה - ללא Class overhead
@@ -107,11 +114,13 @@ widget.init();
 - ✅ אינטגרציה טובה - ישירות עם window
 
 **חסרונות:**
+
 - ❌ קשה יותר לתמוך ב-multiple instances - צריך IDs ייחודיים
 - ❌ State management פחות מובנה - global/closure
 - ❌ קשה יותר לבדיקה - תלוי ב-global state
 
 **דוגמת קוד:**
+
 ```javascript
 (function() {
   const CONTAINER_ID = 'tagWidget';
@@ -136,17 +145,20 @@ window.TagWidget.init();
 #### ד. Component-Based
 
 **יתרונות:**
+
 - ✅ הפרדה מושלמת - TagCloudComponent, QuickSearchComponent
 - ✅ Components נבדקים בנפרד
 - ✅ קל לשימוש חוזר - Components במערכות אחרות
 - ✅ תמיכה מעולה ב-multiple instances
 
 **חסרונות:**
+
 - ❌ חדש במערכת - צריך ליצור מערכת Components
 - ❌ יותר קבצים - כל Component בקובץ נפרד
 - ❌ יותר מורכב - צריך להבין Component architecture
 
 **דוגמת קוד:**
+
 ```javascript
 class TagCloudComponent {
   constructor(containerId) { /* ... */ }
@@ -194,6 +206,7 @@ class TagWidget {
 #### א. Bootstrap Tabs - המלצה ראשית
 
 **יתרונות:**
+
 - ✅ Bootstrap 5 כבר קיים במערכת
 - ✅ יישום פשוט - רק HTML classes
 - ✅ Accessibility מובנית - Bootstrap מטפל
@@ -202,10 +215,12 @@ class TagWidget {
 - ✅ תחזוקה - Bootstrap מתחזק את עצמו
 
 **חסרונות:**
+
 - ❌ תלות ב-Bootstrap - אם נסיר Bootstrap, יישבר
 - ❌ Customization מוגבל - צריך לדרוס Bootstrap styles
 
 **דוגמת קוד:**
+
 ```html
 <ul class="nav nav-tabs mb-3" role="tablist">
   <li class="nav-item" role="presentation">
@@ -230,16 +245,19 @@ class TagWidget {
 #### ב. Custom Tabs (Simple)
 
 **יתרונות:**
+
 - ✅ ללא תלויות - קוד עצמאי
 - ✅ שליטה מלאה - Custom styling והתנהגות
 - ✅ קל להתאמה - כל מה שרוצים
 
 **חסרונות:**
+
 - ❌ צריך לכתוב הכל - accessibility, responsive, animations
 - ❌ חזרה על קוד - כל ווידג'ט צריך לעתק
 - ❌ לא קיים במערכת - צריך ליצור מאפס
 
 **דוגמת קוד:**
+
 ```javascript
 function initTabs(containerId) {
   const tabs = document.querySelectorAll(`#${containerId} .tab-button`);
@@ -266,17 +284,20 @@ function initTabs(containerId) {
 #### ג. Unified Tab System
 
 **יתרונות:**
+
 - ✅ מערכת מרכזית - כל הווידג'טים משתמשים
 - ✅ תכונות מתקדמות - animations, history, lazy loading
 - ✅ תחזוקה אחת - כל השינויים במקום אחד
 - ✅ API אחיד - `TabSystem.init(containerId, config)`
 
 **חסרונות:**
+
 - ❌ מורכב יותר - צריך לבנות מערכת מלאה
 - ❌ Overhead - מערכת שלמה רק לטאבים
 - ❌ לא קיים במערכת - צריך ליצור מאפס
 
 **דוגמת קוד:**
+
 ```javascript
 // Unified Tab System
 class TabSystem {
@@ -306,16 +327,19 @@ TabSystem.init('tagWidget', {
 #### ד. Web Components (Tabs)
 
 **יתרונות:**
+
 - ✅ Native - לא צריך ספרייה חיצונית
 - ✅ Encapsulation - Styles ו-logic מבודדים
 - ✅ שימוש חוזר - Web Component אחד לכל מקום
 
 **חסרונות:**
+
 - ❌ לא בשימוש במערכת - צריך ליצור מאפס
 - ❌ Browser support - לא כל הדפדפנים הישנים
 - ❌ Learning curve - צריך להבין Web Components
 
 **דוגמת קוד:**
+
 ```html
 <tag-tabs>
   <tag-tab name="cloud" label="ענן תגיות">...</tag-tab>
@@ -334,6 +358,7 @@ TabSystem.init('tagWidget', {
 **המלצה ראשית: Module Pattern (IIFE)** ✅
 
 **סיבות:**
+
 1. ✅ תואם לווידג'טים הקיימים - RecentTradesWidget, RecentTradePlansWidget
 2. ✅ פשוט וישיר - קל להבין ולתחזק
 3. ✅ Performance מעולה
@@ -341,6 +366,7 @@ TabSystem.init('tagWidget', {
 5. ✅ תבנית מוכרת במערכת
 
 **פשרה - Class-Based (אם צריך multiple instances):**
+
 - אם יש צורך ב-multiple instances של הווידג'ט באותו עמוד
 - אם הווידג'ט צפוי להיות מורכב מאוד בעתיד
 
@@ -351,6 +377,7 @@ TabSystem.init('tagWidget', {
 **המלצה ראשית: Bootstrap Tabs** ✅
 
 **סיבות:**
+
 1. ✅ Bootstrap 5 כבר קיים במערכת
 2. ✅ יישום פשוט - רק HTML classes
 3. ✅ Accessibility מובנית
@@ -358,6 +385,7 @@ TabSystem.init('tagWidget', {
 5. ✅ תחזוקה - Bootstrap מתחזק את עצמו
 
 **פשרה - Custom Tabs (אם רוצים שליטה מלאה):**
+
 - רק אם יש צורך ב-customization מאוד ספציפי
 - לא מומלץ - Bootstrap מספיק
 
@@ -366,21 +394,25 @@ TabSystem.init('tagWidget', {
 ## 4. תכנית יישום מומלצת
 
 ### שלב 1: מבנה בסיסי
+
 - יצירת `tag-widget.js` ב-`trading-ui/scripts/widgets/`
 - Module Pattern (IIFE) כמו RecentTradesWidget
 - Bootstrap Tabs ל-2 טאבים: ענן + חיפוש
 
 ### שלב 2: איחוד פונקציונליות
+
 - העברת לוגיקת ענן מ-`tag-search-controller.js`
 - העברת לוגיקת חיפוש מ-`tag-search-controller.js`
 - שמירת state משותף בווידג'ט
 
 ### שלב 3: שילוב בעמודים נוספים
+
 - הוספת API פשוט - `TagWidget.init(containerId, config)`
 - דוגמה לשימוש בעמוד אחר
 - תיעוד במדריך למפתח
 
 ### שלב 4: תיעוד
+
 - מדריך מפתח - `WIDGET_DEVELOPER_GUIDE.md`
 - ארכיטקטורה - `WIDGET_ARCHITECTURE.md`
 - דוגמאות שימוש
@@ -411,24 +443,30 @@ trading-ui/
 **תאריך יישום:** 21 ינואר 2025
 
 ### ארכיטקטורת ווידג'ט
+
 **נבחר: Module Pattern (IIFE)**
+
 - ✅ תואם לווידג'טים הקיימים (RecentTradesWidget, RecentTradePlansWidget)
 - ✅ פשוט וישיר
 - ✅ קל לתחזוקה
 
 ### מערכת טאבים
+
 **נבחר: Bootstrap Tabs (Bootstrap 5)**
+
 - ✅ כבר קיים במערכת
 - ✅ נגישות מובנית
 - ✅ תמיכה RTL
 - ✅ דוגמאות במערכת (ModalManagerV2)
 
 ### יישום
+
 - **קובץ:** `trading-ui/scripts/widgets/tag-widget.js`
 - **CSS:** `trading-ui/styles-new/06-components/_tag-widget.css`
 - **HTML:** `trading-ui/index.html` (מאוחד מ-2 כרטיסים ל-1 עם טאבים)
 
 ### תיעוד
+
 - **מדריך למפתח:** [WIDGET_DEVELOPER_GUIDE.md](WIDGET_DEVELOPER_GUIDE.md)
 - **מדריך Tag Widget:** [TAG_WIDGET_DEVELOPER_GUIDE.md](TAG_WIDGET_DEVELOPER_GUIDE.md)
 - **מדריך טאבים:** [TAB_SYSTEM_GUIDE.md](../../02-ARCHITECTURE/FRONTEND/TAB_SYSTEM_GUIDE.md)

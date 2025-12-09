@@ -4,19 +4,15 @@
  * Unified loader for trading journal data with cache + TTL guard integration.
  *
  * Responsibilities:
- * - Load journal entries (notes, trades, executions) for date range
- * - Load journal statistics
- * - Load calendar data for specific month
- * - Load entries by entity type and ID
- * - Save results inside UnifiedCacheManager with TTL
- * - Provide forced reload + cache invalidation helpers
- * - Surface consistent errors through the global notification + log systems
- * - CacheSyncManager integration for automatic cache invalidation
+ * - Load journal entries from backend (TradingJournalData)
+ * - Dynamic rendering of journal entries
+ * - Filters by entity type and ticker
+ * - Calendar view with indicators
+ * - Integration with FieldRendererService, EntityDetailsModal, IconSystem
  *
  * Related Documentation:
- * - documentation/frontend/GENERAL_SYSTEMS_LIST.md
  * - documentation/02-ARCHITECTURE/FRONTEND/HISTORICAL_DATA_SERVICES.md
- * - documentation/03-DEVELOPMENT/PLANS/HISTORICAL_PAGES_FULL_IMPLEMENTATION_PLAN.md
+ * - documentation/03-DEVELOPMENT/PLANS/TRADING_JOURNAL_PAGE_GAPS_ANALYSIS.md
  *
  * Function Index:
  * ==============
@@ -47,16 +43,10 @@
    * @param {string} dateRange.end_date - End date (ISO format)
    * @param {Object} [filters] - Filter object
    * @param {string} [filters.entity_type] - Entity type ('trade', 'execution', 'note', 'all')
-   * @param {number} [filters.entity_id] - Entity ID
+   * @param {string} [filters.ticker_symbol] - Ticker symbol filter
    * @param {Object} [options] - Options
    * @param {boolean} [options.force=false] - Force fresh data (skip cache)
    * @returns {Promise<Object>} Journal entries data
-   * 
-   * @example
-   * const entries = await TradingJournalData.loadEntries({
-   *   start_date: '2025-01-01',
-   *   end_date: '2025-01-31'
-   * }, { entity_type: 'all' });
    */
   async function loadEntries(dateRange, filters = {}, options = {}) {
     try {
@@ -81,7 +71,6 @@
       params.append('start_date', dateRange.start_date);
       params.append('end_date', dateRange.end_date);
       if (filters.entity_type) params.append('entity_type', filters.entity_type);
-      if (filters.entity_id) params.append('entity_id', filters.entity_id);
       if (filters.ticker_symbol) params.append('ticker_symbol', filters.ticker_symbol);
       
       const base = location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
@@ -117,47 +106,41 @@
   }
 
   /**
-   * Load journal statistics
+   * Load journal activity statistics (for chart)
    * 
    * @param {Object} dateRange - Date range object
    * @param {Object} [options] - Options
-   * @param {string} [options.entity_type] - Entity type filter
-   * @param {string} [options.period] - Period filter
+   * @param {string} [options.ticker_symbol] - Ticker symbol filter
    * @param {boolean} [options.force=false] - Force fresh data (skip cache)
-   * @returns {Promise<Object>} Journal statistics
-   * 
-   * @example
-   * const stats = await TradingJournalData.loadStatistics({
-   *   start_date: '2025-01-01',
-   *   end_date: '2025-01-31'
-   * });
+   * @returns {Promise<Object>} Activity statistics
    */
   async function loadStatistics(dateRange, options = {}) {
     try {
-      const { entity_type, period, force = false } = options || {};
+      const { ticker_symbol, force = false } = options || {};
       
       // Build cache key
-      const cacheKey = `trading-journal-statistics:${dateRange.start_date}:${dateRange.end_date}:${entity_type || 'all'}:${period || 'all'}`;
+      const cacheKey = `trading-journal-activity-stats:${dateRange.start_date}:${dateRange.end_date}:${ticker_symbol || 'all'}`;
       
       if (!force && typeof window.UnifiedCacheManager?.get === 'function') {
         const cached = await window.UnifiedCacheManager.get(cacheKey, { ttl: TRADING_JOURNAL_TTL });
         if (cached) {
-          window.Logger?.debug?.('📦 Journal statistics loaded from cache', PAGE_LOG_CONTEXT);
+          window.Logger?.debug?.('📦 Journal activity stats loaded from cache', PAGE_LOG_CONTEXT);
           return cached;
         }
       }
 
-      window.Logger?.debug?.('🔄 Loading journal statistics from API...', PAGE_LOG_CONTEXT);
+      window.Logger?.debug?.('🔄 Loading journal activity stats from API...', PAGE_LOG_CONTEXT);
       
       // Build query string
       const params = new URLSearchParams();
       params.append('start_date', dateRange.start_date);
       params.append('end_date', dateRange.end_date);
-      if (entity_type) params.append('entity_type', entity_type);
-      if (period) params.append('period', period);
+      params.append('view_mode', 'daily'); // Always use daily view mode
+      if (ticker_symbol) params.append('ticker_symbol', ticker_symbol);
+      // Note: entity_type is not passed to activity-stats (graph shows all entity types)
       
       const base = location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
-      const url = `${base}/api/trading-journal/statistics?${params.toString()}`;
+      const url = `${base}/api/trading-journal/activity-stats?${params.toString()}`;
       
       const response = await fetch(url, {
         credentials: 'include' // Include cookies for session-based auth
@@ -179,7 +162,7 @@
         await window.UnifiedCacheManager.save(cacheKey, payload, { ttl: TRADING_JOURNAL_TTL });
       }
 
-      window.Logger?.debug?.('✅ Journal statistics loaded from API', PAGE_LOG_CONTEXT);
+      window.Logger?.debug?.('✅ Journal activity stats loaded from API', PAGE_LOG_CONTEXT);
       return payload;
     } catch (error) {
       window.Logger?.error?.('❌ Error loading journal statistics', { ...PAGE_LOG_CONTEXT, error: error?.message || error });
@@ -195,18 +178,16 @@
    * @param {number} year - Year (e.g., 2025)
    * @param {Object} [options] - Options
    * @param {string} [options.entity_type] - Entity type filter
+   * @param {string} [options.ticker_symbol] - Ticker symbol filter
    * @param {boolean} [options.force=false] - Force fresh data (skip cache)
    * @returns {Promise<Object>} Calendar data
-   * 
-   * @example
-   * const calendar = await TradingJournalData.loadCalendarData(1, 2025);
    */
   async function loadCalendarData(month, year, options = {}) {
     try {
-      const { entity_type, force = false } = options || {};
+      const { entity_type, ticker_symbol, force = false } = options || {};
       
-      // Build cache key
-      const cacheKey = `trading-journal-calendar:${year}:${month}:${entity_type || 'all'}`;
+      // Build cache key (include ticker_symbol in cache key)
+      const cacheKey = `trading-journal-calendar:${year}:${month}:${entity_type || 'all'}:${ticker_symbol || 'all'}`;
       
       if (!force && typeof window.UnifiedCacheManager?.get === 'function') {
         const cached = await window.UnifiedCacheManager.get(cacheKey, { ttl: TRADING_JOURNAL_TTL });
@@ -222,7 +203,12 @@
       const params = new URLSearchParams();
       params.append('month', month);
       params.append('year', year);
-      if (entity_type) params.append('entity_type', entity_type);
+      // CRITICAL: Always pass entity_type (even if 'all') to ensure backend filters correctly
+      params.append('entity_type', entity_type || 'all');
+      // CRITICAL: Pass ticker_symbol if provided
+      if (ticker_symbol) {
+        params.append('ticker_symbol', ticker_symbol);
+      }
       
       const base = location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
       const url = `${base}/api/trading-journal/calendar?${params.toString()}`;
@@ -266,9 +252,6 @@
    * @param {string} [options.end_date] - End date filter (ISO format)
    * @param {boolean} [options.force=false] - Force fresh data (skip cache)
    * @returns {Promise<Object>} Journal entries for the entity
-   * 
-   * @example
-   * const entries = await TradingJournalData.loadByEntity('trade', 123);
    */
   async function loadByEntity(entityType, entityId, options = {}) {
     try {
@@ -366,5 +349,3 @@
 
   window.Logger?.debug?.('✅ TradingJournalData service initialized', PAGE_LOG_CONTEXT);
 })();
-
-

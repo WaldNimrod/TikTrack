@@ -250,6 +250,7 @@ window.PendingActionsCacheService = {
 **מימוש**: overlay עם hover - כותרת ברשימה, פרטים ב-overlay.
 
 **שימוש ב-`WidgetOverlayService`** שכבר נוצר:
+
 - `WidgetOverlayService.positionOverlay(item, details)`
 - `WidgetOverlayService.setupOverlayHover(item, detailsSelector, itemHoverClass, loggerPage)`
 
@@ -257,13 +258,13 @@ window.PendingActionsCacheService = {
 
 **מטרה**: הסרת כל המודולים הישנים מהמערכת.
 
-#### קבצים למחיקה:
+#### קבצים למחיקה
 
 1. `trading-ui/scripts/pending-execution-trade-creation.js` - מחיקה מלאה
 2. `trading-ui/scripts/pending-executions-widget.js` - מחיקה מלאה
 3. `trading-ui/scripts/pending-trade-plan-widget.js` - מחיקה מלאה
 
-#### עדכונים נדרשים:
+#### עדכונים נדרשים
 
 1. **`package-manifest.js`**:
    - הסרת כל הסקריפטים הישנים מה-manifest
@@ -297,6 +298,7 @@ window.PendingActionsCacheService = {
 **קובץ**: `trading-ui/test-unified-widget-refactored.html`
 
 **תוכן**:
+
 - בדיקת טעינת services
 - בדיקת טעינת נתונים מה-services
 - בדיקת rendering של רשימות
@@ -345,7 +347,7 @@ window.PendingActionsCacheService = {
 
 ## קבצים שייווצרו/יעודכנו
 
-### קבצים חדשים:
+### קבצים חדשים
 
 1. `trading-ui/scripts/services/execution-clustering-service.js`
 2. `trading-ui/scripts/services/execution-assignment-service.js`
@@ -353,13 +355,13 @@ window.PendingActionsCacheService = {
 4. `trading-ui/scripts/services/pending-actions-cache-service.js`
 5. `trading-ui/test-unified-widget-refactored.html`
 
-### קבצים שיעודכנו:
+### קבצים שיעודכנו
 
 1. `trading-ui/scripts/executions.js` - ריפקטורינג מלא
 2. `trading-ui/scripts/widgets/unified-pending-actions-widget.js` - ריפקטורינג מלא
 3. `trading-ui/scripts/init-system/package-manifest.js` - הוספת services, הסרת מודולים ישנים
 
-### קבצים שיימחקו:
+### קבצים שיימחקו
 
 1. `trading-ui/scripts/pending-execution-trade-creation.js`
 2. `trading-ui/scripts/pending-executions-widget.js`
@@ -380,6 +382,10 @@ window.PendingActionsCacheService = {
 - ✅ אין כפילות קוד - services משותפים
 - ✅ המודולים הישנים נמחקו לגמרה
 - ✅ כל הבדיקות עוברות
+
+
+
+
 
 
 

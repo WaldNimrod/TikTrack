@@ -1,4 +1,5 @@
 # אינטגרציה נתונים חיצוניים: Watch List
+
 ## External Data Integration: Watch List System
 
 **תאריך:** 28 בינואר 2025  
@@ -15,16 +16,19 @@
 ## אסטרטגיה
 
 ### 1. משיכה מרוכזת
+
 - **Backend Level**: כל הטיקרים החיצוניים נאספים פעם אחת
 - **Batch Processing**: עיבוד לפי batches
 - **Cache Shared**: מטמון משותף לכל המשתמשים
 
 ### 2. תדירות נמוכה
+
 - לפי הגדרות External Data Service
 - Default: 5-15 דקות
 - Configurable per provider
 
 ### 3. Caching Strategy
+
 - **Backend Cache**: משותף לכל המשתמשים
 - **Frontend Cache**: דרך ExternalDataService
 - **TTL**: לפי provider settings
@@ -117,11 +121,13 @@ async function loadExternalDataForItems(items) {
 ## Cache Management
 
 ### Backend Cache
+
 - **Key Format**: `external_quote:{symbol}`
 - **TTL**: לפי provider (Yahoo Finance: 5-15 דקות)
 - **Shared**: כל המשתמשים משתמשים באותו cache
 
 ### Frontend Cache
+
 - **Service**: ExternalDataService
 - **Strategy**: Memory → Backend API
 - **TTL**: 60 שניות (configurable)
@@ -131,6 +137,7 @@ async function loadExternalDataForItems(items) {
 ## Error Handling
 
 ### No Data Available
+
 ```javascript
 // Display in UI
 if (!item.external_data) {
@@ -139,6 +146,7 @@ if (!item.external_data) {
 ```
 
 ### API Failure
+
 ```javascript
 // Log and continue
 window.Logger?.warn('External data fetch failed', {
@@ -153,14 +161,17 @@ window.Logger?.warn('External data fetch failed', {
 ## Performance Optimization
 
 ### Lazy Loading
+
 - External data נטען רק כש-`includeExternalData=true`
 - Default: false (חוסך requests)
 
 ### Batch Requests
+
 - כל הטיקרים החיצוניים ברשימה ב-request אחד
 - Backend מטפל ב-batching
 
 ### Debouncing
+
 - Refresh external data: debounce 5 דקות
 - Prevent excessive API calls
 
@@ -169,6 +180,7 @@ window.Logger?.warn('External data fetch failed', {
 ## User Experience
 
 ### Loading State
+
 ```html
 <td>
     <span class="spinner-border spinner-border-sm" role="status">
@@ -178,6 +190,7 @@ window.Logger?.warn('External data fetch failed', {
 ```
 
 ### No Data State
+
 ```html
 <td>
     <span class="text-muted">נתונים לא זמינים</span>
@@ -185,6 +198,7 @@ window.Logger?.warn('External data fetch failed', {
 ```
 
 ### Stale Data Indicator
+
 ```html
 <td>
     $150.25
@@ -195,6 +209,10 @@ window.Logger?.warn('External data fetch failed', {
 ---
 
 **סיכום:** אינטגרציה מלאה עם External Data Service עם caching מרוכז וביצועים מיטביים.
+
+
+
+
 
 
 

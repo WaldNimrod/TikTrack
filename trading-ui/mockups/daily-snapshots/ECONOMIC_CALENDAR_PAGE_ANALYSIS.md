@@ -1,4 +1,5 @@
 # ניתוח עמוד לוח שנה כלכלי - Economic Calendar Page
+
 ## Economic Calendar Page - Comprehensive Analysis
 
 **תאריך:** 29 בינואר 2025  
@@ -11,6 +12,7 @@
 ## 📋 סיכום מנהלים
 
 עמוד לוח השנה הכלכלי הוא מוקאפ בסיסי מאוד שחסרים בו:
+
 1. **אינטגרציה עם TradingView Widget** - למרות שהמערכת תומכת בו
 2. **מערכת שמירת מצב היסטורי** - אין אפשרות לשמור סנפשוטים יומיים
 3. **פילטרים דינמיים** - הפילטרים סטטיים ולא פועלים
@@ -48,16 +50,19 @@
 #### 1. **אין שימוש ב-TradingView Economic Calendar Widget**
 
 **הבעיה:**
+
 - המערכת תומכת ב-TradingView Economic Calendar Widget (`tradingview-widgets-factory.js`)
 - העמוד לא משתמש בו כלל
 - יש רק רשימה סטטית של אירועים
 
 **השפעה:**
+
 - אין גישה לנתונים אמיתיים
 - אין אינטראקטיביות
 - אין אפשרות לסנן ולחפש
 
 **פתרון מוצע:**
+
 ```javascript
 // הוספת TradingView Widget
 window.TradingViewWidgetsManager.createWidget({
@@ -79,11 +84,13 @@ window.TradingViewWidgetsManager.createWidget({
 #### 2. **פילטרים סטטיים ולא פועלים**
 
 **הבעיה:**
+
 - הפילטרים (מדינה, חשיבות, סוג אירוע) הם `<select multiple>` סטטיים
 - אין JavaScript שמטפל בפילטרים
 - אין עדכון דינמי של הרשימה
 
 **מה צריך:**
+
 - פילטרים דינמיים שמעדכנים את הרשימה
 - שמירת מצב פילטרים ב-localStorage
 - אינטגרציה עם TradingView Widget filters
@@ -93,16 +100,19 @@ window.TradingViewWidgetsManager.createWidget({
 #### 3. **אין מערכת שמירת מצב היסטורי (Daily Snapshots)**
 
 **הבעיה:**
+
 - אין אפשרות לשמור סנפשוט יומי של אירועים כלכליים
 - אין אפשרות להשוות בין תאריכים
 - אין אינטגרציה עם `date-comparison-modal.html`
 
 **מה צריך:**
+
 - מערכת שמירת סנפשוט יומי של אירועים
 - אפשרות לבחור תאריך ולהציג את האירועים מאותו יום
 - אינטגרציה עם מערכת ההשוואה הקיימת
 
 **דוגמה מהעמודים האחרים:**
+
 - `portfolio-state-page.html` - יש כפתור "השווה" עם `compareDates()`
 - `date-comparison-modal.html` - יש מודל השוואה בין תאריכים
 
@@ -111,11 +121,13 @@ window.TradingViewWidgetsManager.createWidget({
 #### 4. **אין אינטגרציה עם טריידים**
 
 **הבעיה:**
+
 - יש הצגה סטטית של "קשור לטריידים: #123, #124"
 - אין קישור אמיתי או אפשרות ליצור קישור
 - אין אפשרות למשוך אירוע לתוך המערכת
 
 **מה צריך:**
+
 - אפשרות ליצור קישור בין אירוע כלכלי לטרייד
 - אינטגרציה עם `linked-items-service.js`
 - אפשרות לשמור אירועים מעניינים במערכת
@@ -125,11 +137,13 @@ window.TradingViewWidgetsManager.createWidget({
 #### 5. **אין גרפים או ויזואליזציות**
 
 **הבעיה:**
+
 - אין גרפים של אירועים לפי זמן
 - אין ויזואליזציה של השפעת אירועים על השוק
 - אין אינטגרציה עם TradingView Charts
 
 **מה צריך:**
+
 - גרף של אירועים לפי תאריך/שעה
 - אינטגרציה עם מחירי שוק (אם יש)
 - ויזואליזציה של חשיבות אירועים
@@ -139,11 +153,13 @@ window.TradingViewWidgetsManager.createWidget({
 #### 6. **נתונים סטטיים לחלוטין**
 
 **הבעיה:**
+
 - כל האירועים הם hardcoded ב-HTML
 - אין API calls
 - אין טעינת נתונים דינמית
 
 **מה צריך:**
+
 - טעינת נתונים מ-API או TradingView Widget
 - עדכון אוטומטי של אירועים
 - שמירת אירועים מעניינים במערכת
@@ -165,9 +181,10 @@ window.TradingViewWidgetsManager.createWidget({
 
 ## 🔌 אופציות לפיד חדשות כלכליות
 
-### שאלה מקדימה: איך לקבל פיד איכותי?
+### שאלה מקדימה: איך לקבל פיד איכותי
 
 **דרישות:**
+
 - ✅ לא לאסוף ולשמור בעצמנו
 - ✅ פיד רלוונטי ואיכותי
 - ✅ קל ופשוט למימוש
@@ -178,6 +195,7 @@ window.TradingViewWidgetsManager.createWidget({
 ### אופציה 1: TradingView Economic Calendar Widget ⭐ **מומלץ ביותר**
 
 **יתרונות:**
+
 - ✅ **כבר משולב במערכת** - `TradingViewWidgetsManager` תומך בו
 - ✅ **חינמי** - אין צורך ב-API key
 - ✅ **נתונים איכותיים** - TradingView מספקים נתונים מקצועיים
@@ -186,14 +204,17 @@ window.TradingViewWidgetsManager.createWidget({
 - ✅ **תמיכה בעברית** - `locale: 'he'`
 
 **חסרונות:**
+
 - ⚠️ **לא ניתן למשוך רשומות ספציפיות** - ה-Widget הוא embed בלבד
 - ⚠️ **לא ניתן לשמור במערכת** - אין גישה לנתונים הגולמיים
 
 **פתרון לחסרונות:**
+
 - ניתן להוסיף כפתור "שמור אירוע" שמאפשר למשתמש להזין ידנית פרטי אירוע מעניין
 - או להשתמש ב-API של TradingView (אם קיים) למשיכת נתונים
 
 **מימוש:**
+
 ```javascript
 // כבר קיים במערכת!
 window.TradingViewWidgetsManager.createWidget({
@@ -217,20 +238,24 @@ window.TradingViewWidgetsManager.createWidget({
 #### 2.1 **Alpha Vantage Economic Calendar API**
 
 **יתרונות:**
+
 - ✅ API מקצועי
 - ✅ נתונים איכותיים
 - ✅ אפשרות למשוך נתונים ספציפיים
 
 **חסרונות:**
+
 - ❌ **דורש API key** (חינמי מוגבל)
 - ❌ **לא חינמי לחלוטין** - יש מגבלות
 - ❌ **דורש backend integration** - לא ניתן ישירות מ-frontend
 
 **עלות:**
+
 - Free tier: 5 API calls per minute, 500 calls per day
 - Premium: $49.99/month
 
 **מימוש:**
+
 ```python
 # Backend API endpoint
 GET /api/external-data/economic-calendar?date=2025-01-15
@@ -241,16 +266,19 @@ GET /api/external-data/economic-calendar?date=2025-01-15
 #### 2.2 **NewsAPI - Economic News**
 
 **יתרונות:**
+
 - ✅ API חינמי (מוגבל)
 - ✅ מגוון מקורות חדשות
 - ✅ אפשרות לסנן לפי קטגוריות
 
 **חסרונות:**
+
 - ⚠️ **לא Economic Calendar ספציפי** - זה חדשות כלליות
 - ⚠️ **דורש backend integration**
 - ⚠️ **Free tier מוגבל** - 100 requests/day
 
 **מימוש:**
+
 ```python
 # Backend API endpoint
 GET /api/external-data/news?category=business&country=us
@@ -261,15 +289,18 @@ GET /api/external-data/news?category=business&country=us
 #### 2.3 **IEX Cloud Economic Data**
 
 **יתרונות:**
+
 - ✅ API מקצועי
 - ✅ נתונים איכותיים
 - ✅ תמיכה טובה
 
 **חסרונות:**
+
 - ❌ **לא חינמי** - דורש תשלום
 - ❌ **דורש backend integration**
 
 **עלות:**
+
 - Starter: $9/month
 - Launch: $49/month
 
@@ -278,20 +309,24 @@ GET /api/external-data/news?category=business&country=us
 ### אופציה 3: RSS Feeds
 
 **יתרונות:**
+
 - ✅ **חינמי לחלוטין**
 - ✅ **קל למימוש** - RSS הוא סטנדרט פשוט
 - ✅ **מגוון מקורות** - CNBC, Bloomberg, Reuters
 
 **חסרונות:**
+
 - ⚠️ **לא Economic Calendar ספציפי** - זה חדשות כלליות
 - ⚠️ **דורש parsing** - צריך לפרסר את ה-RSS
 - ⚠️ **לא מובנה** - צריך לבנות את הממשק בעצמנו
 
 **דוגמאות מקורות:**
+
 - CNBC Economic News: `https://www.cnbc.com/id/100003114/device/rss/rss.html`
 - Reuters Business: `https://www.reuters.com/rssFeed/businessNews`
 
 **מימוש:**
+
 ```python
 # Backend API endpoint
 GET /api/external-data/rss-feed?source=cnbc&category=economic
@@ -308,12 +343,14 @@ GET /api/external-data/rss-feed?source=cnbc&category=economic
 3. **טבלה של אירועים שמורים** - אירועים שהמשתמש בחר לשמור
 
 **יתרונות:**
+
 - ✅ **חינמי** - TradingView Widget חינמי
 - ✅ **איכותי** - נתונים מקצועיים מ-TradingView
 - ✅ **גמיש** - המשתמש בוחר מה לשמור
 - ✅ **אינטגרציה** - אפשר לקשר לטריידים
 
 **מימוש:**
+
 ```javascript
 // 1. TradingView Widget להצגת כל האירועים
 window.TradingViewWidgetsManager.createWidget({
@@ -334,11 +371,13 @@ window.TradingViewWidgetsManager.createWidget({
 ### שלב 1: הוספת TradingView Widget (דחוף)
 
 **למה:**
+
 - כבר קיים במערכת
 - חינמי ואיכותי
 - נותן ערך מיידי
 
 **מה לעשות:**
+
 1. הוספת container ל-Widget ב-HTML
 2. אתחול ה-Widget ב-`economic-calendar-page.js`
 3. הסרת הרשימה הסטטית (או שמירתה כ-backup)
@@ -348,6 +387,7 @@ window.TradingViewWidgetsManager.createWidget({
 ### שלב 2: פילטרים דינמיים
 
 **מה לעשות:**
+
 1. הוספת event listeners לפילטרים
 2. עדכון ה-Widget לפי הפילטרים
 3. שמירת מצב פילטרים ב-localStorage
@@ -357,12 +397,14 @@ window.TradingViewWidgetsManager.createWidget({
 ### שלב 3: מערכת שמירת אירועים
 
 **מה לעשות:**
+
 1. יצירת entity חדש `EconomicEvent` ב-backend
 2. הוספת כפתור "שמור אירוע" ל-Widget
 3. מודל להזנת פרטי אירוע
 4. טבלה של אירועים שמורים
 
 **מודל נתונים מוצע:**
+
 ```python
 class EconomicEvent(BaseModel):
     id: int
@@ -383,6 +425,7 @@ class EconomicEvent(BaseModel):
 ### שלב 4: אינטגרציה עם מערכת הסנפשוט היומית
 
 **מה לעשות:**
+
 1. הוספת אפשרות לשמור סנפשוט יומי של אירועים
 2. אינטגרציה עם `date-comparison-modal.html`
 3. השוואת אירועים בין תאריכים
@@ -392,6 +435,7 @@ class EconomicEvent(BaseModel):
 ### שלב 5: גרפים וויזואליזציות
 
 **מה לעשות:**
+
 1. גרף של אירועים לפי תאריך
 2. אינטגרציה עם מחירי שוק (אם יש)
 3. ויזואליזציה של חשיבות אירועים
@@ -400,27 +444,29 @@ class EconomicEvent(BaseModel):
 
 ## 📝 סיכום והמלצות סופיות
 
-### מה דחוף לעשות עכשיו:
+### מה דחוף לעשות עכשיו
 
 1. **הוספת TradingView Widget** ⭐ - הכי חשוב, כבר קיים במערכת
 2. **פילטרים דינמיים** - כדי שהעמוד יהיה שימושי
 3. **מערכת שמירת אירועים** - כדי שהמשתמש יוכל למשוך אירועים מעניינים
 
-### מה לא דחוף:
+### מה לא דחוף
 
 1. **Economic Calendar API חיצוני** - TradingView Widget מספיק
 2. **RSS Feeds** - לא Economic Calendar ספציפי
 3. **גרפים** - אפשר להוסיף אחר כך
 
-### הגישה המומלצת:
+### הגישה המומלצת
 
 **שילוב TradingView Widget + Manual Save:**
+
 - TradingView Widget להצגת כל האירועים (חינמי, איכותי)
 - כפתור "שמור אירוע" למשיכת אירועים ספציפיים
 - טבלה של אירועים שמורים עם קישור לטריידים
 - אינטגרציה עם מערכת הסנפשוט היומית
 
 **יתרונות:**
+
 - ✅ חינמי לחלוטין
 - ✅ איכותי ומקצועי
 - ✅ גמיש - המשתמש בוחר מה לשמור
@@ -439,7 +485,7 @@ class EconomicEvent(BaseModel):
 
 ## 🎉 מימוש - 29 בינואר 2025
 
-### מה בוצע:
+### מה בוצע
 
 1. **✅ TradingView Economic Calendar Widget**
    - אינטגרציה מלאה עם TradingViewWidgetsManager
@@ -475,7 +521,7 @@ class EconomicEvent(BaseModel):
    - סקשן אירועים שמורים
    - סקשן סטטיסטיקות
 
-### קבצים שנוצרו/עודכנו:
+### קבצים שנוצרו/עודכנו
 
 1. `trading-ui/mockups/daily-snapshots/economic-calendar-page.html` - עדכון HTML
 2. `trading-ui/scripts/economic-calendar-page.js` - מימוש מלא (כ-600 שורות)
@@ -483,7 +529,7 @@ class EconomicEvent(BaseModel):
 4. `trading-ui/scripts/info-summary-configs.js` - הוספת קונפיגורציה
 5. `trading-ui/scripts/mock-data/economic-events-mock-data.js` - נתוני דמה
 
-### API של economicCalendarPage:
+### API של economicCalendarPage
 
 ```javascript
 window.economicCalendarPage = {
@@ -496,7 +542,7 @@ window.economicCalendarPage = {
 }
 ```
 
-### הערות מימוש:
+### הערות מימוש
 
 - הווידג'ט נטען אוטומטית בעת טעינת העמוד
 - פילטרים נשמרים ב-localStorage ונשמרים בין טעינות

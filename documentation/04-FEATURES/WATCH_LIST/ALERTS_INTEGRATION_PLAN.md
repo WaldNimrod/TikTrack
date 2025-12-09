@@ -1,4 +1,5 @@
 # תוכנית אינטגרציה: Watch List + Alerts
+
 ## Integration Plan: Watch List + Alerts System
 
 **תאריך:** 28 בינואר 2025  
@@ -16,15 +17,18 @@
 ## Use Cases
 
 ### 1. Price Alert
+
 - התראה כש-m price עובר threshold
 - Above/Below price
 - Percentage change
 
 ### 2. Breakout/Breakdown Alert
+
 - התראה על breakout/breakdown מ-support/resistance
 - Volume spike alert
 
 ### 3. Quick Alert Creation
+
 - לחיצה על כפתור "Create Alert" ב-item row
 - Pre-fill alert form עם ticker info
 
@@ -33,6 +37,7 @@
 ## Integration Points
 
 ### 1. Button in Watch List Item
+
 ```html
 <button type="button"
         data-button-type="SECONDARY"
@@ -43,6 +48,7 @@
 ```
 
 ### 2. Alert Form Pre-fill
+
 ```javascript
 function createAlertFromItem(itemId) {
     const item = getWatchListItem(itemId);
@@ -58,6 +64,7 @@ function createAlertFromItem(itemId) {
 ```
 
 ### 3. Link Back from Alert
+
 - Alert details → Link to Watch List
 - "View in Watch List" button
 
@@ -66,14 +73,17 @@ function createAlertFromItem(itemId) {
 ## Technical Implementation
 
 ### Database
+
 - No schema changes needed
 - Alerts כבר תומכים ב-ticker_id
 
 ### API
+
 - No new endpoints needed
 - Use existing `/api/alerts` endpoints
 
 ### Frontend
+
 - Integration ב-watch-lists-ui-service.js
 - Button rendering ב-item rows
 - Modal pre-fill logic
@@ -94,6 +104,10 @@ function createAlertFromItem(itemId) {
 ---
 
 **סטטוס:** תכנון עתידי - לא בשלב ראשון של המימוש.
+
+
+
+
 
 
 

@@ -147,6 +147,12 @@
                     this.style.fontWeight = '600';
                 });
             }
+            
+            // Update actions menu after page is fully initialized
+            // Use setTimeout to ensure DOM is ready
+            setTimeout(() => {
+                updateActionsMenu();
+            }, 200);
 
             // Initialize drag and drop
             if (window.WatchListsUIService?.initializeDragAndDrop) {
@@ -301,6 +307,9 @@
             watchListsData = await window.WatchListsDataService.loadWatchListsData({ force: false });
             renderWatchListsGrid();
             
+            // Update actions menu after data is loaded
+            updateActionsMenu();
+            
             // Auto-select first list with items if no active list
             if (!activeListId && watchListsData && watchListsData.length > 0) {
                 // Try to find first list with items (check both item_count and verify via API)
@@ -408,21 +417,21 @@
                         waitedMs: waited
                     });
                     activeListItems = await enrichWatchListItemsWithTickerData(activeListItems);
-                    window.Logger?.info?.('✅ [MONITOR] Enrichment completed', {
-                        ...PAGE_LOG_CONTEXT,
-                        enrichedCount: activeListItems?.length || 0,
-                        firstItemHasTicker: !!activeListItems?.[0]?.ticker,
-                        firstItemTickerPrice: activeListItems?.[0]?.ticker?.current_price,
-                        firstItemTickerSymbol: activeListItems?.[0]?.ticker?.symbol,
-                        firstItemTickerKeys: activeListItems?.[0]?.ticker ? Object.keys(activeListItems[0].ticker).slice(0, 20) : []
-                    });
-                } else {
-                    window.Logger?.warn?.('⚠️ [MONITOR] Skipping enrichment', {
-                        ...PAGE_LOG_CONTEXT,
-                        itemsCount: activeListItems.length,
-                        entityDetailsAPIAvailable: !!window.entityDetailsAPI,
-                        getEntityDetailsAvailable: !!window.entityDetailsAPI?.getEntityDetails
-                    });
+                window.Logger?.info?.('✅ [MONITOR] Enrichment completed', {
+                    ...PAGE_LOG_CONTEXT,
+                    enrichedCount: activeListItems?.length || 0,
+                    firstItemHasTicker: !!activeListItems?.[0]?.ticker,
+                    firstItemTickerPrice: activeListItems?.[0]?.ticker?.current_price,
+                    firstItemTickerSymbol: activeListItems?.[0]?.ticker?.symbol,
+                    firstItemTickerKeys: activeListItems?.[0]?.ticker ? Object.keys(activeListItems[0].ticker).slice(0, 20) : []
+                });
+            } else {
+                window.Logger?.warn?.('⚠️ [MONITOR] Skipping enrichment', {
+                    ...PAGE_LOG_CONTEXT,
+                    itemsCount: activeListItems.length,
+                    entityDetailsAPIAvailable: !!window.entityDetailsAPI,
+                    getEntityDetailsAvailable: !!window.entityDetailsAPI?.getEntityDetails
+                });
                 }
             }
             
@@ -674,6 +683,11 @@
 
         // Clear existing rows
         tbody.innerHTML = '';
+        
+        // Update actions menu after grid is rendered (container should be available now)
+        setTimeout(() => {
+            updateActionsMenu();
+        }, 100);
 
         // If no data, show empty message
         if (!watchListsData || watchListsData.length === 0) {
@@ -735,7 +749,7 @@
                 strong.appendChild(colorIndicator);
                 // Don't show entity name for flag lists
             } else {
-                strong.textContent = list.name || `רשימה #${list.id}`;
+            strong.textContent = list.name || `רשימה #${list.id}`;
             }
             tdName.appendChild(strong);
             tr.appendChild(tdName);
@@ -782,16 +796,6 @@
             actionsDiv.className = 'd-flex gap-1 justify-content-center align-items-center';
             actionsDiv.style.flexWrap = 'nowrap';
 
-            // View button
-            const btnView = document.createElement('button');
-            btnView.type = 'button';
-            btnView.setAttribute('data-button-type', 'VIEW');
-            btnView.setAttribute('data-variant', 'small');
-            btnView.setAttribute('data-text', '');
-            btnView.setAttribute('data-onclick', `window.WatchListsPage?.selectList(${list.id})`);
-            btnView.title = 'פתח רשימה';
-            actionsDiv.appendChild(btnView);
-
             // Edit button
             const btnEdit = document.createElement('button');
             btnEdit.type = 'button';
@@ -804,14 +808,14 @@
 
             // Delete button - hide for flag lists
             if (!list.is_flag_list) {
-                const btnDelete = document.createElement('button');
-                btnDelete.type = 'button';
-                btnDelete.setAttribute('data-button-type', 'DELETE');
-                btnDelete.setAttribute('data-variant', 'small');
-                btnDelete.setAttribute('data-text', '');
-                btnDelete.setAttribute('data-onclick', `window.WatchListsPage?.deleteList(${list.id})`);
-                btnDelete.title = 'מחק רשימה';
-                actionsDiv.appendChild(btnDelete);
+            const btnDelete = document.createElement('button');
+            btnDelete.type = 'button';
+            btnDelete.setAttribute('data-button-type', 'DELETE');
+            btnDelete.setAttribute('data-variant', 'small');
+            btnDelete.setAttribute('data-text', '');
+            btnDelete.setAttribute('data-onclick', `window.WatchListsPage?.deleteList(${list.id})`);
+            btnDelete.title = 'מחק רשימה';
+            actionsDiv.appendChild(btnDelete);
             }
 
             tdActions.appendChild(actionsDiv);
@@ -1007,7 +1011,7 @@
             const flagIcon = document.createElement('span');
             flagIcon.className = 'icon-placeholder icon';
             flagIcon.setAttribute('data-icon', flagColor ? 'flag-filled' : 'flag');
-            flagIcon.setAttribute('data-size', '16');
+            flagIcon.setAttribute('data-size', '11'); // Reduced by 30% (from 16 to 11)
             flagIcon.setAttribute('data-alt', 'flag');
             flagIcon.setAttribute('aria-label', 'flag');
             if (flagColor) {
@@ -1034,7 +1038,7 @@
             // Try to render icon immediately if IconSystem is available
             if (window.IconSystem && window.IconSystem.initialized && window.IconSystem.renderIcon) {
                 window.IconSystem.renderIcon('button', iconName, {
-                    size: '16',
+                    size: '11', // Reduced by 30% (from 16 to 11)
                     alt: 'flag',
                     class: 'icon',
                     style: `color: ${iconColor} !important; fill: ${iconColor} !important; stroke: ${iconColor} !important;`
@@ -1245,7 +1249,7 @@
             }
             tr.appendChild(tdATR);
 
-            // Position column - display position if available
+            // Position column - display position in two lines: badge on first line, quantity on second line
             const tdPosition = document.createElement('td');
             const position = ticker.position || item.position || null;
             if (position && position.quantity !== undefined && position.quantity !== null) {
@@ -1253,18 +1257,25 @@
                 const side = position.side || (quantity > 0 ? 'long' : quantity < 0 ? 'short' : 'closed');
                 const quantityAbs = Math.abs(quantity);
                 
-                // Render quantity with sign and side badge
+                // Render position in two lines: badge on first line, quantity on second line
                 let positionHtml = '';
                 if (quantity !== 0) {
                     const sign = quantity > 0 ? '+' : '-';
-                    const sideClass = side === 'long' ? 'text-success' : side === 'short' ? 'text-danger' : '';
                     const sideLabel = side === 'long' ? 'לונג' : side === 'short' ? 'שורט' : '';
                     
+                    // First line: Side badge
+                    let badgeHtml = '';
                     if (window.FieldRendererService?.renderSide) {
-                        positionHtml = `${window.FieldRendererService.renderSide(side)} #${sign}${quantityAbs.toLocaleString()}`;
+                        badgeHtml = window.FieldRendererService.renderSide(side);
                     } else {
-                        positionHtml = `<span class="badge badge-${side} me-1">${sideLabel}</span>#${sign}${quantityAbs.toLocaleString()}`;
+                        badgeHtml = `<span class="badge badge-${side}">${sideLabel}</span>`;
                     }
+                    
+                    // Second line: Quantity (without + sign, only - if negative)
+                    const quantityHtml = quantity < 0 ? `-${quantityAbs.toLocaleString()}` : quantityAbs.toLocaleString();
+                    
+                    // Combine in two lines with line break
+                    positionHtml = `<div style="display: flex; flex-direction: column; align-items: center; gap: 2px;">${badgeHtml}<span>${quantityHtml}</span></div>`;
                 } else {
                     positionHtml = '-';
                 }
@@ -1359,7 +1370,7 @@
                         if (window.IconSystem && window.IconSystem.initialized && window.IconSystem.renderIcon) {
                             try {
                                 const iconHTML = await window.IconSystem.renderIcon('button', iconName, {
-                                    size: '16',
+                                    size: '11', // Reduced by 30% (from 16 to 11)
                                     alt: 'flag',
                                     class: 'icon',
                                     style: `color: ${color} !important; fill: none !important; stroke: ${color} !important;`
@@ -1421,7 +1432,7 @@
             }, 100);
         } else if (window.ButtonSystemInit?.initializeButtons) {
             setTimeout(() => {
-                window.ButtonSystemInit.initializeButtons(tbody);
+            window.ButtonSystemInit.initializeButtons(tbody);
                 // Also process icons with flag colors after they're rendered
                 setTimeout(async () => {
                     // First, replace all icon placeholders with actual icons
@@ -1434,7 +1445,7 @@
                         if (window.IconSystem && window.IconSystem.initialized && window.IconSystem.renderIcon) {
                             try {
                                 const iconHTML = await window.IconSystem.renderIcon('button', iconName, {
-                                    size: '16',
+                                    size: '11', // Reduced by 30% (from 16 to 11)
                                     alt: 'flag',
                                     class: 'icon',
                                     style: `color: ${color} !important; fill: none !important; stroke: ${color} !important;`
@@ -1556,16 +1567,31 @@
             return;
         }
 
-        // Add options for each list
+        // Add options for each list with ticker count
         watchListsData.forEach(list => {
             const option = document.createElement('option');
             option.value = list.id;
-            option.textContent = list.name || `רשימה #${list.id}`;
+            const tickerCount = list.item_count || list.ticker_count || 0;
+            
+            // For flag lists, add color indicator
+            if (list.is_flag_list && list.flag_color) {
+                // Create option text with color indicator
+                const colorIndicator = '●'; // Solid circle
+                option.textContent = `${colorIndicator} ${list.name || `רשימה #${list.id}`} (${tickerCount})`;
+                // Set color style for the option
+                option.style.color = list.flag_color;
+            } else {
+                option.textContent = `${list.name || `רשימה #${list.id}`} (${tickerCount})`;
+            }
+            
             if (list.id === activeListId) {
                 option.selected = true;
             }
             selectEl.appendChild(option);
         });
+        
+        // Update actions menu after select is updated
+        updateActionsMenu();
 
         // Ensure dark color is maintained (using CSS variables)
         selectEl.style.fontWeight = '600';
@@ -1621,6 +1647,9 @@
         
         // Update title
         updateActiveListTitle(list.name);
+        
+        // Update actions menu
+        updateActionsMenu();
         
         // Save page state
         savePageState();
@@ -1703,7 +1732,7 @@
             // Wait up to 1 second for FlagQuickAction to load
             for (let i = 0; i < 10; i++) {
                 await new Promise(resolve => setTimeout(resolve, 100));
-                if (window.FlagQuickAction?.show) {
+        if (window.FlagQuickAction?.show) {
                     break;
                 }
             }
@@ -1775,15 +1804,15 @@
                 await window.WatchListsDataService.updateWatchListItem(activeListId, itemId, { flag_color: color });
             } else {
                 // Last resort: Direct API call
-                const response = await fetch(`/api/watch-lists/${activeListId}/items/${itemId}`, {
+            const response = await fetch(`/api/watch-lists/${activeListId}/items/${itemId}`, {
                     method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ flag_color: color })
-                });
-                
-                if (!response.ok) {
-                    const errorData = await response.json().catch(() => ({}));
-                    throw new Error(errorData.error?.message || `Failed to update flag: ${response.status}`);
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ flag_color: color })
+            });
+            
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.error?.message || `Failed to update flag: ${response.status}`);
                 }
             }
 
@@ -1836,8 +1865,8 @@
 
             // Use UI Service if available (preferred - centralized logic)
             // UI Service will handle the update, cache invalidation, and reload
-            if (window.WatchListsUIService?.removeFlag) {
-                await window.WatchListsUIService.removeFlag(itemId);
+        if (window.WatchListsUIService?.removeFlag) {
+            await window.WatchListsUIService.removeFlag(itemId);
                 // UI Service already reloads items, but we ensure summary stats are updated
                 renderSummaryStats();
                 return;
@@ -1846,7 +1875,7 @@
             // Fallback: Use Data Service directly
             if (window.WatchListsDataService?.updateWatchListItem) {
                 await window.WatchListsDataService.updateWatchListItem(activeListId, itemId, { flag_color: null });
-            } else {
+        } else {
                 // Last resort: Direct API call
                 const response = await fetch(`/api/watch-lists/${activeListId}/items/${itemId}`, {
                     method: 'PUT',
@@ -1915,7 +1944,31 @@
             // Use ModalManagerV2.showEditModal - loads data from API automatically
             if (window.ModalManagerV2 && typeof window.ModalManagerV2.showEditModal === 'function') {
                 await window.ModalManagerV2.showEditModal('watchListModal', 'watch_list', listId);
-                } else {
+                
+                // CRITICAL: After modal is shown, ensure it's the last modal in DOM for proper z-index stacking
+                const watchListModalElement = document.getElementById('watchListModal');
+                if (watchListModalElement && watchListModalElement.parentElement === document.body) {
+                    // Move to end of body to ensure it's on top
+                    document.body.appendChild(watchListModalElement);
+                    window.Logger?.info?.('✅ [Z-INDEX] Moved watchListModal to end of body after show', {
+                        ...PAGE_LOG_CONTEXT,
+                        listId
+                    });
+                }
+                
+                // Force z-index update after modal is shown and moved
+                if (window.ModalZIndexManager && typeof window.ModalZIndexManager.forceUpdate === 'function') {
+                    requestAnimationFrame(() => {
+                        if (watchListModalElement) {
+                            window.ModalZIndexManager.forceUpdate(watchListModalElement);
+                            window.Logger?.info?.('✅ [Z-INDEX] Forced z-index update for watchListModal', {
+                                ...PAGE_LOG_CONTEXT,
+                                listId
+                            });
+                        }
+                    });
+                }
+            } else {
                 window.Logger?.warn?.('⚠️ ModalManagerV2.showEditModal not available', PAGE_LOG_CONTEXT);
             }
         } catch (error) {
@@ -1925,6 +1978,554 @@
             if (typeof window.showErrorNotification === 'function') {
                 window.showErrorNotification('שגיאה', `לא ניתן לפתוח את מודל העריכה. ${error?.message || 'שגיאה לא ידועה'}`);
             }
+        }
+    }
+
+    /**
+     * Open edit lists modal - shows table with all watch lists for editing
+     * Uses ModalManagerV2 for proper z-index management with nested modals
+     */
+    async function openEditListsModal() {
+        try {
+            // Create modal HTML with the watch lists table
+            const modalId = 'editWatchListsModal';
+            const modalTitle = 'עריכת רשימות צפייה';
+            
+            // Get the table HTML from the first container
+            const tableContainer = document.getElementById('watchListsContainer');
+            if (!tableContainer) {
+                window.Logger?.warn?.('⚠️ watchListsContainer not found', PAGE_LOG_CONTEXT);
+                if (window.showErrorNotification) {
+                    window.showErrorNotification('שגיאה', 'לא ניתן למצוא את טבלת רשימות הצפייה');
+                }
+                return;
+            }
+            
+            // Clone the table container
+            const tableHTML = tableContainer.innerHTML;
+            
+            // Create modal HTML
+            const modalHTML = `
+                <div class="modal fade" id="${modalId}" tabindex="-1" aria-labelledby="${modalId}Label" aria-hidden="true">
+                    <div class="modal-dialog modal-xl">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="${modalId}Label">${modalTitle}</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="סגור"></button>
+                            </div>
+                            <div class="modal-body">
+                                ${tableHTML}
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">סגור</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Remove existing modal if exists
+            const existingModal = document.getElementById(modalId);
+            if (existingModal) {
+                existingModal.remove();
+            }
+            
+            // Add modal to body
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+            
+            // Use ModalManagerV2 for proper z-index management with nested modals
+            const modalElement = document.getElementById(modalId);
+            if (modalElement) {
+                // Ensure editWatchListsModal is NOT the last modal (watchListModal should be last)
+                // This ensures proper z-index stacking when opening watchListModal from editWatchListsModal
+                window.Logger?.info?.('✅ [Z-INDEX] editWatchListsModal created', {
+                    ...PAGE_LOG_CONTEXT,
+                    modalId,
+                    isLastChild: modalElement === document.body.lastElementChild
+                });
+                
+                if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
+                    // Use ModalManagerV2 for proper z-index management
+                    await window.ModalManagerV2.showModal(modalId, 'view');
+                    
+                    // Initialize button system for buttons in modal
+                    if (window.ButtonSystemInit?.processButtons) {
+                        setTimeout(() => {
+                            window.ButtonSystemInit.processButtons(modalElement);
+                        }, 100);
+                    }
+                    
+                    // Re-render table in modal (to ensure all buttons work)
+                    renderWatchListsGrid();
+                } else if (window.bootstrap) {
+                    // Fallback to Bootstrap Modal if ModalManagerV2 not available
+                    const modal = new window.bootstrap.Modal(modalElement);
+                    modal.show();
+                    
+                    // Initialize button system for buttons in modal
+                    if (window.ButtonSystemInit?.processButtons) {
+                        setTimeout(() => {
+                            window.ButtonSystemInit.processButtons(modalElement);
+                        }, 100);
+                    }
+                    
+                    // Re-render table in modal (to ensure all buttons work)
+                    renderWatchListsGrid();
+                } else {
+                    window.Logger?.warn?.('⚠️ ModalManagerV2 and Bootstrap Modal not available', PAGE_LOG_CONTEXT);
+                }
+            }
+        } catch (error) {
+            window.Logger?.error?.('❌ Error opening edit lists modal', { ...PAGE_LOG_CONTEXT, error: error?.message || error });
+            
+            if (typeof window.showErrorNotification === 'function') {
+                window.showErrorNotification('שגיאה', `לא ניתן לפתוח את מודל העריכה. ${error?.message || 'שגיאה לא ידועה'}`);
+            }
+        }
+    }
+
+    /**
+     * Update actions menu for watch lists
+     */
+    function updateActionsMenu() {
+        window.Logger?.info?.('🔍 [ACTIONS MENU] updateActionsMenu called', {
+            ...PAGE_LOG_CONTEXT,
+            readyState: document.readyState,
+            createActionsMenuAvailable: typeof window.createActionsMenu === 'function',
+            actionsMenuSystemAvailable: !!window.actionsMenuSystem
+        });
+        
+        // Check if DOM is ready
+        if (document.readyState === 'loading') {
+            window.Logger?.debug?.('⏳ [ACTIONS MENU] DOM not ready, waiting...', PAGE_LOG_CONTEXT);
+            // Wait for DOM to be ready
+            document.addEventListener('DOMContentLoaded', () => {
+                updateActionsMenu();
+            });
+            return;
+        }
+        
+        // Wait for actions-menu-system to be loaded
+        if (!window.createActionsMenu) {
+            window.Logger?.warn?.('⏳ [ACTIONS MENU] createActionsMenu not available, waiting...', {
+                ...PAGE_LOG_CONTEXT,
+                actionsMenuSystemAvailable: !!window.actionsMenuSystem,
+                ActionsMenuSystemClassAvailable: typeof ActionsMenuSystem !== 'undefined'
+            });
+            // Wait for actions-menu-system to load (max 5 seconds)
+            let waitCount = 0;
+            const maxWaits = 50; // 50 * 100ms = 5 seconds
+            const waitForSystem = setInterval(() => {
+                waitCount++;
+                if (window.createActionsMenu) {
+                    clearInterval(waitForSystem);
+                    window.Logger?.info?.('✅ [ACTIONS MENU] createActionsMenu now available, retrying...', PAGE_LOG_CONTEXT);
+                    updateActionsMenu(); // Retry after system is loaded
+                } else if (waitCount >= maxWaits) {
+                    clearInterval(waitForSystem);
+                    window.Logger?.error?.('❌ [ACTIONS MENU] createActionsMenu not available after waiting 5 seconds', PAGE_LOG_CONTEXT);
+                }
+            }, 100);
+            return;
+        }
+        
+        // First, let's do a comprehensive search for the container
+        const menuContainer = document.getElementById('watchListsActionsMenu');
+        
+        // Also check by querySelector in different locations
+        const containerInTableTitle = document.querySelector('#active-list-section .table-title #watchListsActionsMenu');
+        const containerInTableActions = document.querySelector('#active-list-section .table-actions #watchListsActionsMenu');
+        const containerAnywhere = document.querySelector('#watchListsActionsMenu');
+        const containerInActiveListSelectParent = document.querySelector('#activeListSelect')?.parentElement?.querySelector('#watchListsActionsMenu');
+        
+        // Get section info
+        const activeListSection = document.getElementById('active-list-section');
+        const tableTitle = activeListSection?.querySelector('.table-title');
+        const tableActions = activeListSection?.querySelector('.table-actions');
+        const activeListSelect = document.getElementById('activeListSelect');
+        const activeListSelectParent = activeListSelect?.parentElement;
+        
+        // Expand the log object to see all details
+        const logData = {
+            ...PAGE_LOG_CONTEXT,
+            // Direct getElementById
+            getElementById: !!menuContainer,
+            // QuerySelector searches
+            querySelectorInTableTitle: !!containerInTableTitle,
+            querySelectorInTableActions: !!containerInTableActions,
+            querySelectorAnywhere: !!containerAnywhere,
+            querySelectorInSelectParent: !!containerInActiveListSelectParent,
+            // Section info
+            activeListSectionExists: !!activeListSection,
+            tableTitleExists: !!tableTitle,
+            tableActionsExists: !!tableActions,
+            activeListSelectExists: !!activeListSelect,
+            activeListSelectParentExists: !!activeListSelectParent,
+            // HTML previews - FULL HTML
+            tableTitleHTML: tableTitle ? tableTitle.outerHTML : 'NOT FOUND',
+            activeListSelectParentHTML: activeListSelectParent ? activeListSelectParent.outerHTML : 'NOT FOUND',
+            activeListSectionHTML: activeListSection ? activeListSection.outerHTML.substring(0, 1000) : 'NOT FOUND',
+            // All containers with id watchListsActionsMenu
+            allContainersWithId: Array.from(document.querySelectorAll('#watchListsActionsMenu')).map(el => ({
+                id: el.id,
+                parentId: el.parentElement?.id || 'N/A',
+                parentClass: el.parentElement?.className || 'N/A',
+                location: el.closest('.table-title') ? 'table-title' : (el.closest('.table-actions') ? 'table-actions' : 'other'),
+                fullHTML: el.outerHTML
+            })),
+            // Check if container exists in HTML source
+            containerInHTMLSource: activeListSection ? activeListSection.innerHTML.includes('watchListsActionsMenu') : false,
+            // All elements with class actions-menu-wrapper
+            allActionsMenuWrappers: Array.from(document.querySelectorAll('.actions-menu-wrapper')).map(el => ({
+                id: el.id || 'NO ID',
+                parentId: el.parentElement?.id || 'N/A',
+                parentClass: el.parentElement?.className || 'N/A',
+                location: el.closest('.table-title') ? 'table-title' : (el.closest('.table-actions') ? 'table-actions' : 'other'),
+                fullHTML: el.outerHTML
+            }))
+        };
+        
+        window.Logger?.info?.('🔍 [ACTIONS MENU] Comprehensive container search', logData);
+        
+        // Also log separately for better visibility - use console.log for full HTML
+        if (tableTitle) {
+            console.log('📋 [ACTIONS MENU] table-title HTML (FULL):', tableTitle.outerHTML);
+            window.Logger?.info?.('📋 [ACTIONS MENU] table-title HTML:', {
+                ...PAGE_LOG_CONTEXT,
+                html: tableTitle.outerHTML,
+                hasWatchListsActionsMenu: tableTitle.outerHTML.includes('watchListsActionsMenu'),
+                hasActionsMenuWrapper: tableTitle.outerHTML.includes('actions-menu-wrapper')
+            });
+        }
+        
+        if (activeListSelectParent) {
+            console.log('📋 [ACTIONS MENU] activeListSelect parent HTML (FULL):', activeListSelectParent.outerHTML);
+            window.Logger?.info?.('📋 [ACTIONS MENU] activeListSelect parent HTML:', {
+                ...PAGE_LOG_CONTEXT,
+                html: activeListSelectParent.outerHTML,
+                hasWatchListsActionsMenu: activeListSelectParent.outerHTML.includes('watchListsActionsMenu'),
+                hasActionsMenuWrapper: activeListSelectParent.outerHTML.includes('actions-menu-wrapper')
+            });
+        }
+        
+        // Check if container exists in HTML string but not in DOM
+        if (tableTitle && tableTitle.outerHTML.includes('watchListsActionsMenu')) {
+            console.warn('⚠️ [ACTIONS MENU] Container exists in HTML but not found in DOM!', {
+                htmlContainsId: tableTitle.outerHTML.includes('id="watchListsActionsMenu"'),
+                htmlContainsClass: tableTitle.outerHTML.includes('class="actions-menu-wrapper"'),
+                querySelectorResult: tableTitle.querySelector('#watchListsActionsMenu'),
+                querySelectorByClass: tableTitle.querySelector('.actions-menu-wrapper')
+            });
+        }
+        
+        // Use the first found container
+        const foundContainer = menuContainer || containerInTableTitle || containerInTableActions || containerAnywhere || containerInActiveListSelectParent;
+        
+        if (foundContainer) {
+            // Container found - create menu immediately
+            window.Logger?.info?.('✅ [ACTIONS MENU] Container found, creating menu...', {
+                ...PAGE_LOG_CONTEXT,
+                containerId: foundContainer.id,
+                containerParent: foundContainer.parentElement?.id || 'N/A',
+                containerParentClass: foundContainer.parentElement?.className || 'N/A',
+                foundVia: menuContainer ? 'getElementById' : 
+                         (containerInTableTitle ? 'querySelectorInTableTitle' :
+                         (containerInTableActions ? 'querySelectorInTableActions' :
+                         (containerAnywhere ? 'querySelectorAnywhere' : 'querySelectorInSelectParent')))
+            });
+            
+            // Remove duplicate ADD and DELETE buttons before creating menu
+            if (activeListSelectParent) {
+                const existingButtons = activeListSelectParent.querySelectorAll('button[data-button-type="ADD"], button[data-button-type="DELETE"]');
+                const addButtons = Array.from(existingButtons).filter(btn => btn.getAttribute('data-onclick')?.includes('openAddListModal'));
+                const deleteButtons = Array.from(existingButtons).filter(btn => btn.getAttribute('data-onclick')?.includes('deleteCurrentList'));
+                
+                // Remove all ADD and DELETE buttons that are duplicates of the actions menu
+                [...addButtons, ...deleteButtons].forEach(btn => {
+                    window.Logger?.info?.('🗑️ [ACTIONS MENU] Removing duplicate button', {
+                        ...PAGE_LOG_CONTEXT,
+                        buttonType: btn.getAttribute('data-button-type'),
+                        onclick: btn.getAttribute('data-onclick')
+                    });
+                    btn.remove();
+                });
+            }
+            
+            createActionsMenuContent(foundContainer);
+            return;
+        }
+        
+        // Container not found - check if section exists
+        if (!activeListSection) {
+            window.Logger?.warn?.('⚠️ active-list-section not found, cannot create actions menu', PAGE_LOG_CONTEXT);
+            return;
+        }
+        
+        // Container not found - CREATE IT!
+        // The container exists in HTML but was removed from DOM - create it dynamically
+        if (activeListSelectParent) {
+            // REMOVE existing ADD and DELETE buttons that shouldn't be there
+            const existingButtons = activeListSelectParent.querySelectorAll('button[data-button-type="ADD"], button[data-button-type="DELETE"]');
+            const addButtons = Array.from(existingButtons).filter(btn => btn.getAttribute('data-onclick')?.includes('openAddListModal'));
+            const deleteButtons = Array.from(existingButtons).filter(btn => btn.getAttribute('data-onclick')?.includes('deleteCurrentList'));
+            
+            // Remove all ADD and DELETE buttons that are duplicates of the actions menu
+            [...addButtons, ...deleteButtons].forEach(btn => {
+                window.Logger?.info?.('🗑️ [ACTIONS MENU] Removing duplicate button', {
+                    ...PAGE_LOG_CONTEXT,
+                    buttonType: btn.getAttribute('data-button-type'),
+                    onclick: btn.getAttribute('data-onclick')
+                });
+                btn.remove();
+            });
+            
+            window.Logger?.warn?.('⚠️ [ACTIONS MENU] Container not found, creating it dynamically', {
+                ...PAGE_LOG_CONTEXT,
+                activeListSelectParentExists: !!activeListSelectParent,
+                existingButtonsCount: existingButtons.length,
+                removedButtonsCount: addButtons.length + deleteButtons.length,
+                willCreateContainer: true
+            });
+            
+            // Create the container dynamically
+            const newContainer = document.createElement('div');
+            newContainer.id = 'watchListsActionsMenu';
+            newContainer.className = 'actions-menu-wrapper';
+            
+            // Insert it after the select, before any existing buttons
+            if (activeListSelect && activeListSelect.nextSibling) {
+                activeListSelectParent.insertBefore(newContainer, activeListSelect.nextSibling);
+            } else {
+                activeListSelectParent.appendChild(newContainer);
+            }
+            
+            window.Logger?.info?.('✅ [ACTIONS MENU] Container created dynamically', {
+                ...PAGE_LOG_CONTEXT,
+                containerId: newContainer.id,
+                containerParent: newContainer.parentElement?.id || 'N/A',
+                containerLocation: 'after activeListSelect'
+            });
+            
+            // Now create the menu
+            createActionsMenuContent(newContainer);
+            return;
+        }
+        
+        // Use MutationObserver to watch for container to be added to DOM
+        const observer = new MutationObserver((mutations, obs) => {
+            const container = document.getElementById('watchListsActionsMenu');
+            if (container) {
+                obs.disconnect();
+                window.Logger?.debug?.('✅ watchListsActionsMenu found via MutationObserver', PAGE_LOG_CONTEXT);
+                createActionsMenuContent(container);
+            }
+        });
+        
+        // Start observing the section for changes
+        observer.observe(activeListSection, {
+            childList: true,
+            subtree: true
+        });
+        
+        // Also try direct lookup with retries as fallback
+        let retryCount = 0;
+        const maxRetries = 10;
+        const retryDelays = [200, 300, 500, 750, 1000, 1500, 2000, 2500, 3000, 4000];
+        
+        const retry = () => {
+            if (retryCount >= maxRetries) {
+                observer.disconnect();
+                window.Logger?.warn?.('⚠️ watchListsActionsMenu not found after all retries', {
+                    ...PAGE_LOG_CONTEXT,
+                    retries: retryCount,
+                    sectionExists: !!activeListSection,
+                    sectionVisible: activeListSection ? activeListSection.offsetParent !== null : false,
+                    sectionDisplay: activeListSection ? window.getComputedStyle(activeListSection).display : 'N/A',
+                    sectionHTML: activeListSection ? activeListSection.innerHTML.substring(0, 200) : 'N/A'
+                });
+                return;
+            }
+            
+            setTimeout(() => {
+                const retryContainer = document.getElementById('watchListsActionsMenu');
+                if (retryContainer) {
+                    observer.disconnect();
+                    window.Logger?.debug?.('✅ watchListsActionsMenu found after retry', {
+                        ...PAGE_LOG_CONTEXT,
+                        retries: retryCount
+                    });
+                    createActionsMenuContent(retryContainer);
+                } else {
+                    retryCount++;
+                    retry();
+                }
+            }, retryDelays[retryCount] || 4000);
+        };
+        
+        retry();
+    }
+    
+    /**
+     * Create actions menu content
+     * @param {HTMLElement} menuContainer - Container element
+     */
+    function createActionsMenuContent(menuContainer) {
+        window.Logger?.info?.('🎯 [ACTIONS MENU] createActionsMenuContent called', {
+            ...PAGE_LOG_CONTEXT,
+            containerId: menuContainer?.id,
+            containerExists: !!menuContainer,
+            createActionsMenuAvailable: typeof window.createActionsMenu === 'function',
+            actionsMenuSystemAvailable: !!window.actionsMenuSystem
+        });
+        
+        if (!menuContainer) {
+            window.Logger?.error?.('❌ [ACTIONS MENU] menuContainer is null!', PAGE_LOG_CONTEXT);
+            return;
+        }
+        
+        // Create action buttons
+        const buttons = [
+            {
+                type: 'ADD',
+                variant: 'small',
+                onclick: 'window.WatchListsPage?.openAddListModal()',
+                text: '',
+                title: 'הוסף רשימה'
+            },
+            {
+                type: 'EDIT',
+                variant: 'small',
+                onclick: 'window.WatchListsPage?.openEditListsModal()',
+                text: '',
+                title: 'ערוך רשימות'
+            },
+            {
+                type: 'DELETE',
+                variant: 'small',
+                onclick: 'window.WatchListsPage?.deleteCurrentList()',
+                text: '',
+                title: 'מחק רשימה פעילה'
+            }
+        ];
+        
+        window.Logger?.info?.('📋 [ACTIONS MENU] Buttons configuration', {
+            ...PAGE_LOG_CONTEXT,
+            buttonCount: buttons.length,
+            buttons: buttons.map(b => ({ type: b.type, title: b.title, onclick: b.onclick }))
+        });
+        
+        // Create actions menu using ActionsMenuSystem
+        if (window.createActionsMenu) {
+            try {
+                window.Logger?.debug?.('🔄 [ACTIONS MENU] Calling window.createActionsMenu...', {
+                    ...PAGE_LOG_CONTEXT,
+                    buttonCount: buttons.length
+                });
+                
+                const menuHTML = window.createActionsMenu(buttons);
+                
+                window.Logger?.info?.('📝 [ACTIONS MENU] createActionsMenu returned', {
+                    ...PAGE_LOG_CONTEXT,
+                    hasHTML: !!menuHTML,
+                    htmlLength: menuHTML?.length || 0,
+                    htmlPreview: menuHTML ? menuHTML.substring(0, 300) : 'EMPTY'
+                });
+                
+                if (menuHTML) {
+                    const beforeHTML = menuContainer.innerHTML;
+                    menuContainer.innerHTML = menuHTML;
+                    const afterHTML = menuContainer.innerHTML;
+                    
+                    window.Logger?.info?.('✅ [ACTIONS MENU] HTML inserted into container', {
+                        ...PAGE_LOG_CONTEXT,
+                        beforeLength: beforeHTML.length,
+                        afterLength: afterHTML.length,
+                        containerChildren: menuContainer.children.length,
+                        hasActionsWrapper: !!menuContainer.querySelector('.actions-menu-wrapper'),
+                        hasActionsTrigger: !!menuContainer.querySelector('.actions-trigger'),
+                        hasActionsPopup: !!menuContainer.querySelector('.actions-menu-popup'),
+                        buttonCount: menuContainer.querySelectorAll('.actions-menu-item').length
+                    });
+                    
+                    // Initialize button system for new buttons
+                    if (window.ButtonSystemInit?.processButtons) {
+                        setTimeout(() => {
+                            window.Logger?.debug?.('🔘 [ACTIONS MENU] Initializing button system...', PAGE_LOG_CONTEXT);
+                            window.ButtonSystemInit.processButtons(menuContainer);
+                            window.Logger?.info?.('✅ [ACTIONS MENU] Button system initialized', {
+                                ...PAGE_LOG_CONTEXT,
+                                processedButtons: menuContainer.querySelectorAll('[data-button-type]').length
+                            });
+                        }, 100);
+                    } else {
+                        window.Logger?.warn?.('⚠️ [ACTIONS MENU] ButtonSystemInit.processButtons not available', PAGE_LOG_CONTEXT);
+                    }
+                    
+                    // Initialize actions menu system if available
+                    if (window.actionsMenuSystem && typeof window.actionsMenuSystem.attachHoverDelay === 'function') {
+                        setTimeout(() => {
+                            window.Logger?.debug?.('🎨 [ACTIONS MENU] Attaching hover delay...', PAGE_LOG_CONTEXT);
+                            window.actionsMenuSystem.attachHoverDelay();
+                            window.Logger?.info?.('✅ [ACTIONS MENU] Hover delay attached', PAGE_LOG_CONTEXT);
+                        }, 200);
+                    } else {
+                        window.Logger?.warn?.('⚠️ [ACTIONS MENU] actionsMenuSystem.attachHoverDelay not available', {
+                            ...PAGE_LOG_CONTEXT,
+                            actionsMenuSystemExists: !!window.actionsMenuSystem,
+                            hasAttachHoverDelay: window.actionsMenuSystem && typeof window.actionsMenuSystem.attachHoverDelay === 'function'
+                        });
+                    }
+                    
+                    window.Logger?.info?.('✅ [ACTIONS MENU] Actions menu created successfully', {
+                        ...PAGE_LOG_CONTEXT,
+                        buttonCount: buttons.length,
+                        finalButtonCount: menuContainer.querySelectorAll('.actions-menu-item').length
+                    });
+                } else {
+                    window.Logger?.error?.('❌ [ACTIONS MENU] createActionsMenu returned empty HTML', PAGE_LOG_CONTEXT);
+                    createFallbackButtons(menuContainer, buttons);
+                }
+            } catch (error) {
+                window.Logger?.error?.('❌ [ACTIONS MENU] Error creating actions menu', {
+                    ...PAGE_LOG_CONTEXT,
+                    error: error?.message || error,
+                    stack: error?.stack
+                });
+                createFallbackButtons(menuContainer, buttons);
+            }
+        } else {
+            window.Logger?.error?.('❌ [ACTIONS MENU] createActionsMenu not available, using fallback', {
+                ...PAGE_LOG_CONTEXT,
+                actionsMenuSystemAvailable: !!window.actionsMenuSystem,
+                ActionsMenuSystemClassAvailable: typeof ActionsMenuSystem !== 'undefined'
+            });
+            createFallbackButtons(menuContainer, buttons);
+        }
+    }
+    
+    /**
+     * Create fallback buttons if ActionsMenuSystem is not available
+     * @param {HTMLElement} menuContainer - Container element
+     * @param {Array} buttons - Array of button configurations
+     */
+    function createFallbackButtons(menuContainer, buttons) {
+        // Fallback: create simple buttons
+        menuContainer.innerHTML = buttons.map(btn => `
+            <button type="button"
+                    class="btn btn"
+                    data-button-type="${btn.type}"
+                    data-variant="${btn.variant}"
+                    data-text="${btn.text}"
+                    data-onclick="${btn.onclick}"
+                    title="${btn.title}">
+            </button>
+        `).join('');
+        
+        // Initialize button system for fallback buttons
+        if (window.ButtonSystemInit?.processButtons) {
+            setTimeout(() => {
+                window.ButtonSystemInit.processButtons(menuContainer);
+            }, 100);
         }
     }
 
@@ -2170,6 +2771,9 @@
                 updateActiveListTitle(list.name);
             }
 
+            // Update actions menu
+            updateActionsMenu();
+
             // Load items
             await loadWatchListItems(listId);
             
@@ -2400,9 +3004,105 @@
     }
 
     /**
-     * Render cards view (helper)
-     * @param {Array} items - Items to render
+     * Helper function to create and render flag button (used in all view modes)
+     * @param {Object} item - Item object
+     * @param {Function} onClickHandler - Click handler function
+     * @returns {HTMLElement} Flag button element
      */
+    function createFlagButton(item, onClickHandler) {
+        const flagBtn = document.createElement('button');
+        flagBtn.type = 'button';
+        flagBtn.className = 'btn btn-sm btn-flag';
+        
+        // CRITICAL: Flag color comes from API (determined by which flag list ticker is in)
+        const flagColor = item.flag_color;
+        if (flagColor) {
+            flagBtn.setAttribute('data-flag-color', flagColor);
+            flagBtn.style.setProperty('color', flagColor, 'important');
+            flagBtn.style.setProperty('border-color', flagColor, 'important');
+            flagBtn.style.setProperty('border-width', '2px', 'important');
+            flagBtn.style.setProperty('border-style', 'solid', 'important');
+            flagBtn.style.setProperty('background-color', 'transparent', 'important');
+            flagBtn.style.setProperty('opacity', '1', 'important');
+        } else {
+            flagBtn.style.setProperty('border-color', '#6c757d', 'important');
+            flagBtn.style.setProperty('border-width', '1px', 'important');
+            flagBtn.style.setProperty('border-style', 'solid', 'important');
+            flagBtn.style.setProperty('background-color', 'transparent', 'important');
+            flagBtn.style.setProperty('color', '#6c757d', 'important');
+            flagBtn.style.setProperty('opacity', '0.5', 'important');
+        }
+        
+        flagBtn.setAttribute('data-onclick', `window.WatchListsPage?.showFlagPalette(${item.id})`);
+        flagBtn.title = 'שינוי דגל';
+        flagBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (onClickHandler) {
+                onClickHandler(item.id, e);
+            } else if (window.WatchListsPage?.showFlagPalette) {
+                window.WatchListsPage.showFlagPalette(item.id);
+            }
+        });
+        
+        const flagIcon = document.createElement('span');
+        flagIcon.className = 'icon-placeholder icon';
+        flagIcon.setAttribute('data-icon', flagColor ? 'flag-filled' : 'flag');
+        flagIcon.setAttribute('data-size', '11'); // Reduced by 30% (from 16 to 11)
+        flagIcon.setAttribute('data-alt', 'flag');
+        flagIcon.setAttribute('aria-label', 'flag');
+        
+        const iconColor = flagColor || '#6c757d';
+        if (flagColor) {
+            flagIcon.style.setProperty('color', flagColor, 'important');
+            flagIcon.style.setProperty('fill', flagColor, 'important');
+            flagIcon.style.setProperty('stroke', flagColor, 'important');
+            flagIcon.setAttribute('data-color', flagColor);
+            flagIcon.style.setProperty('--icon-color', flagColor, 'important');
+        } else {
+            flagIcon.style.setProperty('color', '#6c757d', 'important');
+            flagIcon.style.setProperty('fill', '#6c757d', 'important');
+            flagIcon.style.setProperty('stroke', '#6c757d', 'important');
+        }
+        flagBtn.appendChild(flagIcon);
+        
+        // Render icon immediately if IconSystem is available
+        if (window.IconSystem && window.IconSystem.initialized && window.IconSystem.renderIcon) {
+            const iconName = flagColor ? 'flag-filled' : 'flag';
+            window.IconSystem.renderIcon('button', iconName, {
+                size: '11', // Reduced by 30% (from 16 to 11)
+                alt: 'flag',
+                class: 'icon',
+                style: `color: ${iconColor} !important; fill: ${iconColor} !important; stroke: ${iconColor} !important;`
+            }).then(iconHTML => {
+                if (iconHTML && flagIcon.parentNode) {
+                    const temp = document.createElement('div');
+                    temp.innerHTML = iconHTML;
+                    const newIcon = temp.firstElementChild;
+                    if (newIcon && newIcon.tagName === 'svg') {
+                        newIcon.setAttribute('fill', 'none');
+                        newIcon.setAttribute('stroke', 'currentColor');
+                        newIcon.style.setProperty('color', iconColor, 'important');
+                        newIcon.style.setProperty('fill', 'none', 'important');
+                        newIcon.style.setProperty('stroke', iconColor, 'important');
+                        const paths = newIcon.querySelectorAll('path, circle, rect, line, polyline, polygon');
+                        paths.forEach(path => {
+                            path.removeAttribute('fill');
+                            path.removeAttribute('stroke');
+                            path.style.setProperty('fill', 'none', 'important');
+                            path.style.setProperty('stroke', iconColor, 'important');
+                            path.style.setProperty('color', iconColor, 'important');
+                        });
+                        flagIcon.replaceWith(newIcon);
+                    }
+                }
+            }).catch(error => {
+                window.Logger?.warn?.('⚠️ Failed to render flag icon', { ...PAGE_LOG_CONTEXT, error: error?.message || error });
+            });
+        }
+        
+        return flagBtn;
+    }
+
     async function renderCardsView(items) {
         if (!items) items = [];
         
@@ -2425,118 +3125,374 @@
             return;
         }
 
-        // Render each item as a card
+        // First, render all cards without charts
+        const chartItems = [];
         for (const item of items) {
             const ticker = item.ticker || {};
             const currencySymbol = ticker.currency_symbol || ticker.currency?.symbol || '$';
-            const price = ticker.current_price || ticker.price || null;
-            const change = ticker.change || ticker.change_amount || null;
-            const changePercent = ticker.change_percent || ticker.change_percentage || null;
+            const price = ticker.current_price ?? ticker.price ?? null;
+            const changePercent = ticker.change_percent ?? ticker.change_percentage ?? null;
+            const dailyChangePercent = ticker.daily_change_percent ?? ticker.daily_change_percentage ?? null;
             const symbol = ticker.symbol || item.external_symbol || `טיקר #${item.id}`;
+            
+            // Calculate change amount (same logic as table view)
+            let change = ticker.daily_change ?? ticker.change_amount ?? ticker.change_amount_day ?? ticker.change ?? null;
+            if ((change === null || change === undefined || isNaN(parseFloat(change))) && 
+                price !== null && price !== undefined && !isNaN(parseFloat(price)) &&
+                changePercent !== null && changePercent !== undefined && !isNaN(parseFloat(changePercent))) {
+                change = parseFloat(price) * (parseFloat(changePercent) / 100);
+            }
+            
+            // Position data
+            const position = ticker.position || item.position || null;
+            const positionQty = position && position.quantity !== undefined && position.quantity !== null ? parseFloat(position.quantity) : null;
+            
+            // Calculate value change
+            let valueChange = null;
+            if (positionQty !== null && positionQty !== 0) {
+                const qtyAbs = Math.abs(positionQty);
+                if (change !== null && change !== undefined && !isNaN(parseFloat(change))) {
+                    valueChange = parseFloat(change) * qtyAbs;
+                } else if (changePercent !== null && changePercent !== undefined && !isNaN(parseFloat(changePercent)) && price !== null && price !== undefined && !isNaN(parseFloat(price))) {
+                    valueChange = parseFloat(price) * qtyAbs * (parseFloat(changePercent) / 100);
+                }
+            }
+            
+            // P/L data
+            const pl = ticker.profit_loss ?? ticker.pl ?? null;
+            const plPercent = ticker.profit_loss_percent ?? ticker.pl_percent ?? null;
+            
+            // ATR data
+            const atr = ticker.atr || null;
+            const atrPercent = ticker.atr_percent || (atr !== null && price !== null && price > 0 ? (parseFloat(atr) / parseFloat(price) * 100) : null);
 
             const col = document.createElement('div');
-            col.className = 'col-md-6 col-lg-4';
+            col.className = 'col-md-6 col-lg-4 mb-1';
 
             const card = document.createElement('div');
             card.className = 'card h-100';
             card.setAttribute('data-item-id', item.id);
 
             const cardBody = document.createElement('div');
-            cardBody.className = 'card-body';
+            cardBody.className = 'card-body p-1'; // Reduced padding (from p-2 to p-1)
 
-            // Card header with symbol and flag
-            const cardHeader = document.createElement('div');
-            cardHeader.className = 'd-flex justify-content-between align-items-start mb-3';
+            // ===== HEADER ROW: Empty (chart shows symbol, price, change, flag) =====
+            // No header row needed - chart shows everything
+
+            // ===== MINI CHART PLACEHOLDER =====
+            // TradingViewWidgetsFactory will create the container itself
+            // We just need a placeholder div to mark where the chart should go
+            const chartPlaceholder = document.createElement('div');
+            chartPlaceholder.className = 'mb-1'; // Reduced margin (from mb-2 to mb-1)
+            chartPlaceholder.id = `watch-list-chart-${item.id}`;
+            // Empty - TradingViewWidgetsFactory will create content here
+            cardBody.appendChild(chartPlaceholder);
             
-            const symbolStrong = document.createElement('strong');
-            symbolStrong.className = 'h5 mb-0';
-            symbolStrong.textContent = symbol;
-            cardHeader.appendChild(symbolStrong);
-
-            // Flag button - always show (allows adding/removing flag)
-            const flagBtn = document.createElement('button');
-            flagBtn.type = 'button';
-            flagBtn.className = 'btn btn-sm btn-flag';
-            if (item.flag_color) {
-                flagBtn.setAttribute('data-flag-color', item.flag_color);
-                flagBtn.style.color = item.flag_color;
+            // Store chart data for lazy loading
+            if (symbol) {
+                chartItems.push({
+                    item,
+                    ticker,
+                    symbol,
+                    chartContainer: chartPlaceholder, // Will be used by TradingViewWidgetsFactory
+                    currencySymbol,
+                    price,
+                    changePercent,
+                    dailyChangePercent,
+                    change,
+                    position,
+                    positionQty,
+                    valueChange,
+                    pl,
+                    plPercent,
+                    atr,
+                    atrPercent
+                });
             }
-            flagBtn.setAttribute('data-onclick', `window.WatchListsPage?.showFlagPalette(${item.id})`);
-            flagBtn.title = 'שינוי דגל';
-            // Add direct event listener as backup
-            flagBtn.addEventListener('click', (e) => {
-                e.stopPropagation(); // Prevent card click
+
+            // ===== BOTTOM ROW: Flag + All other info + Delete button =====
+            const infoRow = document.createElement('div');
+            infoRow.className = 'd-flex flex-wrap gap-1 align-items-center justify-content-between small text-muted'; // Reduced gap (from gap-2 to gap-1)
+            
+            // Left side: Flag + Info items
+            const infoItemsContainer = document.createElement('div');
+            infoItemsContainer.className = 'd-flex flex-wrap gap-1 align-items-center'; // Reduced gap (from gap-2 to gap-1)
+            
+            // Flag button (first in row, before ATR)
+            const flagBtn = createFlagButton(item, (itemId, e) => {
                 if (window.WatchListsPage?.showFlagPalette) {
-                    window.WatchListsPage.showFlagPalette(item.id);
-                } else if (window.showFlagPalette) {
-                    window.showFlagPalette(item.id);
-                } else {
-                    window.Logger?.warn?.('⚠️ showFlagPalette not available', { ...PAGE_LOG_CONTEXT, itemId: item.id });
+                    window.WatchListsPage.showFlagPalette(itemId);
                 }
             });
-            const flagIcon = document.createElement('span');
-            flagIcon.className = 'icon-placeholder icon';
-            flagIcon.setAttribute('data-icon', item.flag_color ? 'flag-filled' : 'flag');
-            flagIcon.setAttribute('data-size', '16');
-            if (item.flag_color) {
-                flagIcon.style.color = item.flag_color;
-            }
-            flagBtn.appendChild(flagIcon);
-            cardHeader.appendChild(flagBtn);
-
-            cardBody.appendChild(cardHeader);
-
-            // Price
-            if (price !== null) {
-                const priceDiv = document.createElement('div');
-                priceDiv.className = 'mb-2';
-                if (window.FieldRendererService?.renderAmount) {
-                    priceDiv.innerHTML = window.FieldRendererService.renderAmount(price, currencySymbol, 2, false);
-                } else {
-                    priceDiv.textContent = `${currencySymbol}${price.toFixed(2)}`;
-                }
-                cardBody.appendChild(priceDiv);
-            }
-
-            // Change
-            if (changePercent !== null) {
-                const changeDiv = document.createElement('div');
-                changeDiv.className = 'mb-2';
-                if (window.FieldRendererService?.renderNumericValue) {
-                    changeDiv.innerHTML = window.FieldRendererService.renderNumericValue(changePercent, '%', true);
-                } else {
-                    changeDiv.textContent = changePercent >= 0 ? `+${changePercent.toFixed(2)}%` : `${changePercent.toFixed(2)}%`;
-                }
-                cardBody.appendChild(changeDiv);
-            }
-
-            // Actions
-            const actionsDiv = document.createElement('div');
-            actionsDiv.className = 'd-flex gap-2 mt-3';
+            infoItemsContainer.appendChild(flagBtn);
             
-            const editBtn = document.createElement('button');
-            editBtn.type = 'button';
-            editBtn.className = 'btn btn-sm btn-outline-primary';
-            editBtn.setAttribute('data-onclick', `window.WatchListsPage?.editItem(${item.id})`);
-            editBtn.textContent = 'עריכה';
-            actionsDiv.appendChild(editBtn);
-
+            // Helper function to add info item
+            const addInfoItem = (label, value, renderFn) => {
+                if (value !== null && value !== undefined && !isNaN(parseFloat(value))) {
+                    const infoItem = document.createElement('span');
+                    infoItem.className = 'd-inline-flex align-items-center gap-1';
+                    const labelSpan = document.createElement('span');
+                    labelSpan.textContent = `${label}:`;
+                    infoItem.appendChild(labelSpan);
+                    const valueSpan = document.createElement('span');
+                    if (renderFn) {
+                        valueSpan.innerHTML = renderFn(value);
+                } else {
+                        valueSpan.textContent = value;
+                    }
+                    infoItem.appendChild(valueSpan);
+                    infoItemsContainer.appendChild(infoItem);
+                }
+            };
+            
+            // ATR (shown after flag, in same row as delete button)
+            if (atrPercent !== null && atrPercent !== undefined && !isNaN(parseFloat(atrPercent))) {
+                const atrItem = document.createElement('span');
+                atrItem.className = 'd-inline-flex align-items-center gap-1';
+                const atrLabel = document.createElement('span');
+                atrLabel.textContent = 'ATR:';
+                atrItem.appendChild(atrLabel);
+                const atrValue = document.createElement('span');
+                if (window.FieldRendererService?.renderATR && atr !== null) {
+                    (async () => {
+                        try {
+                            const atrHtml = await window.FieldRendererService.renderATR(atr, atrPercent);
+                            atrValue.innerHTML = atrHtml;
+                        } catch (e) {
+                            atrValue.textContent = `${atrPercent.toFixed(2)}%`;
+                        }
+                    })();
+                } else {
+                    atrValue.textContent = `${atrPercent.toFixed(2)}%`;
+                }
+                atrItem.appendChild(atrValue);
+                infoItemsContainer.appendChild(atrItem);
+            }
+            
+            // Position (only number and side, no label)
+            if (position && positionQty !== null && positionQty !== 0) {
+                const quantity = parseFloat(positionQty) || 0;
+                const side = position.side || (quantity > 0 ? 'long' : quantity < 0 ? 'short' : 'closed');
+                const quantityAbs = Math.abs(quantity);
+                const sign = quantity > 0 ? '+' : '-';
+                const positionItem = document.createElement('span');
+                positionItem.className = 'd-inline-flex align-items-center gap-1';
+                // Only number and side, no "פוזיציה:" label
+                if (window.FieldRendererService?.renderSide) {
+                    positionItem.innerHTML = `${window.FieldRendererService.renderSide(side)} #${sign}${quantityAbs.toLocaleString()}`;
+                } else {
+                    const sideLabel = side === 'long' ? 'לונג' : side === 'short' ? 'שורט' : '';
+                    positionItem.innerHTML = `<span class="badge badge-${side} me-1">${sideLabel}</span>#${sign}${quantityAbs.toLocaleString()}`;
+                }
+                infoItemsContainer.appendChild(positionItem);
+            }
+            
+            // Removed: Value Change, P/L, P/L % - not shown in cards view
+            
+            infoRow.appendChild(infoItemsContainer);
+            
+            // Right side: View details button + Delete button
+            const buttonsContainer = document.createElement('div');
+            buttonsContainer.className = 'd-flex gap-1 align-items-center';
+            
+            // View details button
+            const tickerId = ticker.id || item.ticker_id;
+            if (tickerId) {
+                const viewBtn = document.createElement('button');
+                viewBtn.type = 'button';
+                viewBtn.setAttribute('data-button-type', 'VIEW');
+                viewBtn.setAttribute('data-variant', 'small');
+                viewBtn.setAttribute('data-text', '');
+                viewBtn.setAttribute('data-onclick', `if (window.showEntityDetails) { window.showEntityDetails('ticker', ${tickerId}, { mode: 'view' }); }`);
+                viewBtn.title = 'פרטי טיקר';
+                buttonsContainer.appendChild(viewBtn);
+            }
+            
+            // Delete button
             const deleteBtn = document.createElement('button');
             deleteBtn.type = 'button';
-            deleteBtn.className = 'btn btn-sm btn-outline-danger';
+            deleteBtn.setAttribute('data-button-type', 'DELETE');
+            deleteBtn.setAttribute('data-variant', 'small');
+            deleteBtn.setAttribute('data-text', '');
             deleteBtn.setAttribute('data-onclick', `window.WatchListsPage?.removeItem(${item.id})`);
-            deleteBtn.textContent = 'מחיקה';
-            actionsDiv.appendChild(deleteBtn);
+            deleteBtn.title = 'מחיקה';
+            buttonsContainer.appendChild(deleteBtn);
 
-            cardBody.appendChild(actionsDiv);
+            infoRow.appendChild(buttonsContainer);
+
+            cardBody.appendChild(infoRow);
             card.appendChild(cardBody);
             col.appendChild(card);
             container.appendChild(col);
         }
 
         // Initialize button system for new buttons
-        if (window.ButtonSystemInit?.initializeButtons) {
-            window.ButtonSystemInit.initializeButtons(container);
+        if (window.ButtonSystemInit?.processButtons) {
+            setTimeout(() => {
+                window.ButtonSystemInit.processButtons(container);
+            }, 100);
+        }
+
+        // Load charts lazily, one after another
+        if (chartItems.length > 0) {
+            (async () => {
+                // Load TradingView widgets if not available (only once)
+                if (!window.TradingViewWidgetsFactory) {
+                    window.Logger?.info?.('📦 Loading TradingView widgets dynamically', { 
+                        ...PAGE_LOG_CONTEXT, 
+                        chartCount: chartItems.length
+                    });
+                    
+                    try {
+                        // Load scripts in order using loadScriptOnce if available
+                        if (window.loadScriptOnce) {
+                            await window.loadScriptOnce('scripts/tradingview-widgets/tradingview-widgets-config.js');
+                            await window.loadScriptOnce('scripts/tradingview-widgets/tradingview-widgets-colors.js');
+                            await window.loadScriptOnce('scripts/tradingview-widgets/tradingview-widgets-factory.js');
+                            await window.loadScriptOnce('scripts/tradingview-widgets/tradingview-widgets-core.js');
+                            
+                            // Wait a bit for scripts to initialize
+                            let retries = 0;
+                            const maxRetries = 20; // 20 * 100ms = 2 seconds
+                            while (!window.TradingViewWidgetsFactory && retries < maxRetries) {
+                                await new Promise(resolve => setTimeout(resolve, 100));
+                                retries++;
+                            }
+                        } else {
+                            // Fallback: wait for scripts to load (they should be in HTML)
+                            let retries = 0;
+                            const maxRetries = 30; // 30 * 100ms = 3 seconds
+                            while (!window.TradingViewWidgetsFactory && retries < maxRetries) {
+                                await new Promise(resolve => setTimeout(resolve, 100));
+                                retries++;
+                            }
+                        }
+                    } catch (error) {
+                        window.Logger?.error?.('❌ Failed to load TradingView widgets', { 
+                            ...PAGE_LOG_CONTEXT, 
+                            error: error?.message || error
+                        });
+                    }
+                }
+                
+                if (!window.TradingViewWidgetsFactory) {
+                    window.Logger?.warn?.('⚠️ TradingViewWidgetsFactory not available after loading attempt', { 
+                        ...PAGE_LOG_CONTEXT, 
+                        chartCount: chartItems.length,
+                        hasLoadScriptOnce: !!window.loadScriptOnce
+                    });
+                    // Show error message in all chart containers
+                    chartItems.forEach(({ chartContainer }) => {
+                        chartContainer.innerHTML = '<div class="text-center text-muted small py-3">גרף לא זמין</div>';
+                    });
+                    return;
+                }
+                
+                // Load charts sequentially (one after another)
+                for (let i = 0; i < chartItems.length; i++) {
+                    const { item, ticker, symbol, chartContainer, currencySymbol } = chartItems[i];
+                    
+                    try {
+                        // Get symbol for TradingView (format: EXCHANGE:SYMBOL or just SYMBOL)
+                        const exchange = ticker.exchange || 'NASDAQ';
+                        const tvSymbol = ticker.exchange ? `${exchange}:${symbol}` : symbol;
+                        
+                        // Get theme
+                        let theme = 'light';
+                        if (window.TradingViewWidgetsColors) {
+                            theme = window.TradingViewWidgetsColors.getTheme() || 'light';
+                        }
+                        
+                        // TradingViewWidgetsFactory will create the container and wrapper itself
+                        // Just pass the container_id - factory will handle everything
+                        const chartConfig = {
+                            symbol: tvSymbol,
+                            width: '100%',
+                            height: 150,
+                            dateRange: '1M',
+                            colorTheme: theme,
+                            isTransparent: false,
+                            locale: 'he',
+                            largeChartUrl: '',
+                            container_id: chartContainer.id
+                        };
+                        
+                        window.TradingViewWidgetsFactory.createWidget('mini-chart', chartConfig);
+                        
+                        // Wait for chart to load - check for wrapper or iframe
+                        // TradingViewWidgetsFactory creates a wrapper div around the container
+                        const observer = new MutationObserver((mutations, obs) => {
+                            // Check if wrapper was created (TradingView widget structure)
+                            const hasWrapper = chartContainer.parentElement?.classList?.contains('tradingview-widget-container');
+                            const hasIframe = chartContainer.querySelector('iframe') || 
+                                             chartContainer.parentElement?.querySelector('iframe');
+                            const hasScript = chartContainer.parentElement?.querySelector('script[src*="tradingview"]');
+                            
+                            if (hasWrapper || hasIframe || hasScript) {
+                                // Chart is loading/loaded
+                                obs.disconnect();
+                                
+                                window.Logger?.debug?.('✅ Chart wrapper/iframe detected', { 
+                                    ...PAGE_LOG_CONTEXT, 
+                                    itemId: item.id, 
+                                    symbol: tvSymbol,
+                                    hasWrapper,
+                                    hasIframe: !!hasIframe,
+                                    hasScript: !!hasScript
+                                });
+                            }
+                        });
+                        
+                        // Start observing - watch the container and its parent (for wrapper)
+                        observer.observe(chartContainer, {
+                            childList: true,
+                            subtree: true,
+                            attributes: false
+                        });
+                        
+                        // Also observe parent in case wrapper is created
+                        if (chartContainer.parentElement) {
+                            observer.observe(chartContainer.parentElement, {
+                                childList: true,
+                                subtree: true,
+                                attributes: false
+                            });
+                        }
+                        
+                        // Disconnect observer after 3 seconds (chart should be loading by then)
+                        setTimeout(() => {
+                            observer.disconnect();
+                        }, 3000);
+                        
+                        window.Logger?.debug?.('✅ Mini chart created', { 
+                            ...PAGE_LOG_CONTEXT, 
+                            itemId: item.id, 
+                            symbol: tvSymbol,
+                            containerId: chartContainer.id,
+                            progress: `${i + 1}/${chartItems.length}`
+                        });
+                        
+                        // Wait a bit before loading next chart (to avoid overwhelming the browser)
+                        if (i < chartItems.length - 1) {
+                            await new Promise(resolve => setTimeout(resolve, 200)); // 200ms delay between charts
+                        }
+                    } catch (error) {
+                        window.Logger?.warn?.('⚠️ Failed to create mini chart', { 
+                            ...PAGE_LOG_CONTEXT, 
+                            itemId: item.id, 
+                            symbol, 
+                            error: error?.message || error 
+                        });
+                        // Show placeholder if chart fails
+                        chartContainer.innerHTML = '<div class="text-center text-muted small py-3">גרף לא זמין</div>';
+                    }
+                }
+                
+                window.Logger?.info?.('✅ All charts loaded', { 
+                    ...PAGE_LOG_CONTEXT, 
+                    totalCharts: chartItems.length
+                });
+            })();
         }
 
         window.Logger?.debug?.('🃏 Cards view rendered', { ...PAGE_LOG_CONTEXT, count: items.length });
@@ -2572,106 +3528,298 @@
         for (const item of items) {
             const ticker = item.ticker || {};
             const currencySymbol = ticker.currency_symbol || ticker.currency?.symbol || '$';
-            const price = ticker.current_price || ticker.price || null;
-            const changePercent = ticker.change_percent || ticker.change_percentage || null;
+            const price = ticker.current_price ?? ticker.price ?? null;
+            const changePercent = ticker.change_percent ?? ticker.change_percentage ?? null;
+            const dailyChangePercent = ticker.daily_change_percent ?? ticker.daily_change_percentage ?? null;
             const symbol = ticker.symbol || item.external_symbol || `טיקר #${item.id}`;
+            
+            // Calculate change amount (same logic as table view)
+            let change = ticker.daily_change ?? ticker.change_amount ?? ticker.change_amount_day ?? ticker.change ?? null;
+            if ((change === null || change === undefined || isNaN(parseFloat(change))) && 
+                price !== null && price !== undefined && !isNaN(parseFloat(price)) &&
+                changePercent !== null && changePercent !== undefined && !isNaN(parseFloat(changePercent))) {
+                change = parseFloat(price) * (parseFloat(changePercent) / 100);
+            }
+            
+            // Position data
+            const position = ticker.position || item.position || null;
+            const positionQty = position && position.quantity !== undefined && position.quantity !== null ? parseFloat(position.quantity) : null;
+            
+            // Calculate value change
+            let valueChange = null;
+            if (positionQty !== null && positionQty !== 0) {
+                const qtyAbs = Math.abs(positionQty);
+                if (change !== null && change !== undefined && !isNaN(parseFloat(change))) {
+                    valueChange = parseFloat(change) * qtyAbs;
+                } else if (changePercent !== null && changePercent !== undefined && !isNaN(parseFloat(changePercent)) && price !== null && price !== undefined && !isNaN(parseFloat(price))) {
+                    valueChange = parseFloat(price) * qtyAbs * (parseFloat(changePercent) / 100);
+                }
+            }
+            
+            // P/L data
+            const pl = ticker.profit_loss ?? ticker.pl ?? null;
+            const plPercent = ticker.profit_loss_percent ?? ticker.pl_percent ?? null;
+            
+            // ATR data
+            const atr = ticker.atr || null;
+            const atrPercent = ticker.atr_percent || (atr !== null && price !== null && price > 0 ? (parseFloat(atr) / parseFloat(price) * 100) : null);
 
             const listItem = document.createElement('div');
-            listItem.className = 'list-group-item';
+            listItem.className = 'list-group-item watch-list-compact-item';
             listItem.setAttribute('data-item-id', item.id);
+            listItem.setAttribute('data-widget-overlay', 'true');
+            listItem.setAttribute('role', 'button');
+            listItem.setAttribute('tabindex', '0');
 
             const itemContent = document.createElement('div');
             itemContent.className = 'd-flex justify-content-between align-items-center';
 
             const leftContent = document.createElement('div');
-            leftContent.className = 'd-flex align-items-center gap-3';
+            leftContent.className = 'd-flex align-items-center gap-2';
 
-            // Flag button - always show (allows adding/removing flag)
-            const flagBtn = document.createElement('button');
-            flagBtn.type = 'button';
-            flagBtn.className = 'btn btn-sm btn-flag';
-            if (item.flag_color) {
-                flagBtn.setAttribute('data-flag-color', item.flag_color);
-                flagBtn.style.color = item.flag_color;
-            }
-            flagBtn.setAttribute('data-onclick', `window.WatchListsPage?.showFlagPalette(${item.id})`);
-            flagBtn.title = 'שינוי דגל';
-            // Add direct event listener as backup
-            flagBtn.addEventListener('click', (e) => {
-                e.stopPropagation(); // Prevent row click
+            // Flag button using helper function
+            const flagBtn = createFlagButton(item, (itemId, e) => {
                 if (window.WatchListsPage?.showFlagPalette) {
-                    window.WatchListsPage.showFlagPalette(item.id);
-                } else if (window.showFlagPalette) {
-                    window.showFlagPalette(item.id);
-                } else {
-                    window.Logger?.warn?.('⚠️ showFlagPalette not available', { ...PAGE_LOG_CONTEXT, itemId: item.id });
+                    window.WatchListsPage.showFlagPalette(itemId);
                 }
             });
-            const flagIcon = document.createElement('span');
-            flagIcon.className = 'icon-placeholder icon';
-            flagIcon.setAttribute('data-icon', item.flag_color ? 'flag-filled' : 'flag');
-            flagIcon.setAttribute('data-size', '16');
-            if (item.flag_color) {
-                flagIcon.style.color = item.flag_color;
-            }
-            flagBtn.appendChild(flagIcon);
             leftContent.appendChild(flagBtn);
 
             // Symbol
             const symbolStrong = document.createElement('strong');
             symbolStrong.textContent = symbol;
+            if (item.external_symbol) {
+                const badge = document.createElement('span');
+                badge.className = 'badge bg-secondary ms-2';
+                badge.textContent = 'חיצוני';
+                symbolStrong.appendChild(badge);
+            }
             leftContent.appendChild(symbolStrong);
 
-            // Price
-            if (price !== null) {
+            // Price - only 4 fields visible: flag, symbol, price, change %
                 const priceSpan = document.createElement('span');
-                if (window.FieldRendererService?.renderAmount) {
-                    priceSpan.innerHTML = window.FieldRendererService.renderAmount(price, currencySymbol, 2, false);
+            if (price !== null && price !== undefined && !isNaN(parseFloat(price)) && Number.isFinite(parseFloat(price)) && window.FieldRendererService?.renderAmount) {
+                priceSpan.innerHTML = window.FieldRendererService.renderAmount(parseFloat(price), currencySymbol, 2, false);
                 } else {
-                    priceSpan.textContent = `${currencySymbol}${price.toFixed(2)}`;
+                priceSpan.textContent = 'לא זמין';
+                priceSpan.className = 'text-muted';
                 }
                 leftContent.appendChild(priceSpan);
-            }
 
-            // Change %
-            if (changePercent !== null) {
-                const changeSpan = document.createElement('span');
-                if (window.FieldRendererService?.renderNumericValue) {
-                    changeSpan.innerHTML = window.FieldRendererService.renderNumericValue(changePercent, '%', true);
+            // Change % - only 4 fields visible: flag, symbol, price, change %
+            const changePercentSpan = document.createElement('span');
+            if (changePercent !== null && changePercent !== undefined && !isNaN(parseFloat(changePercent)) && window.FieldRendererService?.renderNumericValue) {
+                changePercentSpan.innerHTML = window.FieldRendererService.renderNumericValue(parseFloat(changePercent), '%', true);
                 } else {
-                    changeSpan.textContent = changePercent >= 0 ? `+${changePercent.toFixed(2)}%` : `${changePercent.toFixed(2)}%`;
+                changePercentSpan.textContent = '-';
+                changePercentSpan.className = 'text-muted';
                 }
-                leftContent.appendChild(changeSpan);
-            }
+            leftContent.appendChild(changePercentSpan);
 
             itemContent.appendChild(leftContent);
 
             // Actions
             const actionsDiv = document.createElement('div');
-            actionsDiv.className = 'd-flex gap-2';
-
-            const editBtn = document.createElement('button');
-            editBtn.type = 'button';
-            editBtn.className = 'btn btn-sm btn-outline-primary';
-            editBtn.setAttribute('data-onclick', `window.WatchListsPage?.editItem(${item.id})`);
-            editBtn.textContent = 'עריכה';
-            actionsDiv.appendChild(editBtn);
+            actionsDiv.className = 'd-flex gap-1';
 
             const deleteBtn = document.createElement('button');
             deleteBtn.type = 'button';
-            deleteBtn.className = 'btn btn-sm btn-outline-danger';
+            deleteBtn.setAttribute('data-button-type', 'DELETE');
+            deleteBtn.setAttribute('data-variant', 'small');
+            deleteBtn.setAttribute('data-text', '');
             deleteBtn.setAttribute('data-onclick', `window.WatchListsPage?.removeItem(${item.id})`);
-            deleteBtn.textContent = 'מחיקה';
+            deleteBtn.title = 'מחיקה';
             actionsDiv.appendChild(deleteBtn);
 
             itemContent.appendChild(actionsDiv);
             listItem.appendChild(itemContent);
+
+            // Overlay with all additional details (hidden by default, shown on hover)
+            const overlayDiv = document.createElement('div');
+            overlayDiv.className = 'watch-list-compact-overlay';
+            overlayDiv.setAttribute('data-overlay', 'true');
+            overlayDiv.setAttribute('data-role', 'widget-detail');
+            overlayDiv.style.display = 'none';
+            
+            const overlayContent = document.createElement('div');
+            overlayContent.className = 'watch-list-compact-overlay-content';
+            
+            // Change amount
+            if (change !== null && change !== undefined && !isNaN(parseFloat(change)) && Number.isFinite(parseFloat(change))) {
+                const row = document.createElement('div');
+                row.className = 'watch-list-compact-overlay-row';
+                const label = document.createElement('span');
+                label.className = 'watch-list-compact-overlay-label';
+                label.textContent = 'שינוי בערך:';
+                const value = document.createElement('span');
+                value.className = 'watch-list-compact-overlay-value';
+                if (window.FieldRendererService?.renderAmount) {
+                    value.innerHTML = window.FieldRendererService.renderAmount(parseFloat(change), currencySymbol, 2, true);
+                } else {
+                    value.textContent = `${currencySymbol}${parseFloat(change).toFixed(2)}`;
+                }
+                row.appendChild(label);
+                row.appendChild(value);
+                overlayContent.appendChild(row);
+            }
+            
+            // Daily Change %
+            if (dailyChangePercent !== null && dailyChangePercent !== undefined && !isNaN(parseFloat(dailyChangePercent))) {
+                const row = document.createElement('div');
+                row.className = 'watch-list-compact-overlay-row';
+                const label = document.createElement('span');
+                label.className = 'watch-list-compact-overlay-label';
+                label.textContent = 'שינוי היום %:';
+                const value = document.createElement('span');
+                value.className = 'watch-list-compact-overlay-value';
+                if (window.FieldRendererService?.renderNumericValue) {
+                    value.innerHTML = window.FieldRendererService.renderNumericValue(parseFloat(dailyChangePercent), '%', true);
+                } else {
+                    value.textContent = `${dailyChangePercent >= 0 ? '+' : ''}${parseFloat(dailyChangePercent).toFixed(2)}%`;
+                }
+                row.appendChild(label);
+                row.appendChild(value);
+                overlayContent.appendChild(row);
+            }
+            
+            // ATR
+            if (atr !== null && atrPercent !== null) {
+                const row = document.createElement('div');
+                row.className = 'watch-list-compact-overlay-row';
+                const label = document.createElement('span');
+                label.className = 'watch-list-compact-overlay-label';
+                label.textContent = 'ATR:';
+                const value = document.createElement('span');
+                value.className = 'watch-list-compact-overlay-value';
+                if (window.FieldRendererService?.renderATR) {
+                    value.textContent = 'טוען...';
+                    (async () => {
+                        try {
+                            const atrHtml = await window.FieldRendererService.renderATR(atr, atrPercent);
+                            value.innerHTML = atrHtml;
+                        } catch (e) {
+                            window.Logger?.warn?.('Error rendering ATR', { ...PAGE_LOG_CONTEXT, error: e });
+                            value.textContent = atrPercent ? `${atrPercent.toFixed(2)}%` : '-';
+                        }
+                    })();
+                } else {
+                    value.textContent = atrPercent ? `${atrPercent.toFixed(2)}%` : '-';
+                }
+                row.appendChild(label);
+                row.appendChild(value);
+                overlayContent.appendChild(row);
+            }
+            
+            // Position
+            if (position && positionQty !== null && positionQty !== 0) {
+                const row = document.createElement('div');
+                row.className = 'watch-list-compact-overlay-row';
+                const label = document.createElement('span');
+                label.className = 'watch-list-compact-overlay-label';
+                label.textContent = 'פוזיציה:';
+                const value = document.createElement('span');
+                value.className = 'watch-list-compact-overlay-value';
+                const quantity = parseFloat(positionQty) || 0;
+                const side = position.side || (quantity > 0 ? 'long' : quantity < 0 ? 'short' : 'closed');
+                const quantityAbs = Math.abs(quantity);
+                const sign = quantity > 0 ? '+' : '-';
+                if (window.FieldRendererService?.renderSide) {
+                    value.innerHTML = `${window.FieldRendererService.renderSide(side)} #${sign}${quantityAbs.toLocaleString()}`;
+                } else {
+                    const sideLabel = side === 'long' ? 'לונג' : side === 'short' ? 'שורט' : '';
+                    value.innerHTML = `<span class="badge badge-${side} me-1">${sideLabel}</span>#${sign}${quantityAbs.toLocaleString()}`;
+                }
+                row.appendChild(label);
+                row.appendChild(value);
+                overlayContent.appendChild(row);
+            }
+            
+            // Value Change
+            if (valueChange !== null && valueChange !== undefined && !isNaN(valueChange)) {
+                const row = document.createElement('div');
+                row.className = 'watch-list-compact-overlay-row';
+                const label = document.createElement('span');
+                label.className = 'watch-list-compact-overlay-label';
+                label.textContent = 'שינוי בערך פוזיציה:';
+                const value = document.createElement('span');
+                value.className = 'watch-list-compact-overlay-value';
+                if (window.FieldRendererService?.renderAmount) {
+                    value.innerHTML = window.FieldRendererService.renderAmount(valueChange, currencySymbol, 2, true);
+                } else {
+                    value.textContent = `${currencySymbol}${valueChange.toFixed(2)}`;
+                }
+                row.appendChild(label);
+                row.appendChild(value);
+                overlayContent.appendChild(row);
+            }
+            
+            // P/L
+            if (pl !== null && pl !== undefined && !isNaN(parseFloat(pl))) {
+                const row = document.createElement('div');
+                row.className = 'watch-list-compact-overlay-row';
+                const label = document.createElement('span');
+                label.className = 'watch-list-compact-overlay-label';
+                label.textContent = 'P/L:';
+                const value = document.createElement('span');
+                value.className = 'watch-list-compact-overlay-value';
+                if (window.FieldRendererService?.renderAmount) {
+                    value.innerHTML = window.FieldRendererService.renderAmount(parseFloat(pl), currencySymbol, 2, true);
+                } else {
+                    value.textContent = `${currencySymbol}${parseFloat(pl).toFixed(2)}`;
+                }
+                row.appendChild(label);
+                row.appendChild(value);
+                overlayContent.appendChild(row);
+            }
+            
+            // P/L %
+            if (plPercent !== null && plPercent !== undefined && !isNaN(parseFloat(plPercent))) {
+                const row = document.createElement('div');
+                row.className = 'watch-list-compact-overlay-row';
+                const label = document.createElement('span');
+                label.className = 'watch-list-compact-overlay-label';
+                label.textContent = 'P/L %:';
+                const value = document.createElement('span');
+                value.className = 'watch-list-compact-overlay-value';
+                if (window.FieldRendererService?.renderNumericValue) {
+                    value.innerHTML = window.FieldRendererService.renderNumericValue(parseFloat(plPercent), '%', true);
+                } else {
+                    value.textContent = `${plPercent >= 0 ? '+' : ''}${parseFloat(plPercent).toFixed(2)}%`;
+                }
+                row.appendChild(label);
+                row.appendChild(value);
+                overlayContent.appendChild(row);
+            }
+            
+            overlayDiv.appendChild(overlayContent);
+            listItem.appendChild(overlayDiv);
             container.appendChild(listItem);
         }
 
         // Initialize button system for new buttons
-        if (window.ButtonSystemInit?.initializeButtons) {
-            window.ButtonSystemInit.initializeButtons(container);
+        if (window.ButtonSystemInit?.processButtons) {
+            setTimeout(() => {
+                window.ButtonSystemInit.processButtons(container);
+            }, 100);
+        }
+
+        // Setup overlay hover for compact view (like widgets)
+        if (window.WidgetOverlayService && container) {
+            window.WidgetOverlayService.destroy(container);
+            window.WidgetOverlayService.setupOverlayHover(
+                container,
+                '.watch-list-compact-item',
+                '[data-overlay="true"]',
+                {
+                    hoverClass: 'is-hovered',
+                    gap: 8,
+                    minWidth: 280,
+                    maxWidth: 400,
+                    zIndex: 1050,
+                    useAnimations: true,
+                    transitionDuration: 100
+                }
+            );
         }
 
         window.Logger?.debug?.('📋 Compact view rendered', { ...PAGE_LOG_CONTEXT, count: items.length });
@@ -2815,9 +3963,13 @@
         // Modal management
         openAddListModal,
         openEditListModal: openEditListModal,
+        openEditListsModal, // New: Edit all lists modal
         editList: openEditListModal, // Alias
         addTicker,
         editItem,
+        
+        // Actions menu
+        updateActionsMenu,
 
         // CRUD operations
         saveWatchList,

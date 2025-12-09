@@ -1276,6 +1276,26 @@ class ModalManagerV2 {
                 throw new Error(`Modal ${modalId} element not found`);
             }
             
+            // CRITICAL: Ensure modal is the last child in body for proper z-index stacking
+            // This ensures that when opening a nested modal, it appears above the parent modal
+            // Always move to end, even if already in body (to ensure correct order)
+            if (modalElement.parentElement === document.body) {
+                // Move to end of body to ensure it's on top
+                document.body.appendChild(modalElement);
+                window.Logger?.info('🔍 [Z-INDEX] Modal moved to end of body', {
+                    modalId,
+                    page: 'modal-manager-v2'
+                });
+            } else if (modalElement.parentElement) {
+                // Modal is in a different parent - move to body
+                document.body.appendChild(modalElement);
+                window.Logger?.info('🔍 [Z-INDEX] Modal moved from parent to end of body', {
+                    modalId,
+                    previousParent: modalElement.parentElement?.id || 'unknown',
+                    page: 'modal-manager-v2'
+                });
+            }
+            
             console.log(`✅ [ModalManagerV2] Modal found, proceeding to show:`, { modalId, mode, isDynamic: modalInfo.isDynamic });
             
             // אם זה מודל דינמי (ללא config), נשתמש בטיפול מינימלי
@@ -1851,6 +1871,17 @@ class ModalManagerV2 {
                 // Fallback timeout - resolve after 1 second even if modal not fully shown
                 setTimeout(resolve, 1000);
             });
+            
+            // CRITICAL: After modal is shown, ensure it's the last modal in DOM for proper z-index stacking
+            // This is especially important for nested modals
+            if (modalElement.parentElement === document.body) {
+                // Move to end of body to ensure it's on top
+                document.body.appendChild(modalElement);
+                window.Logger?.info('🔍 [Z-INDEX] Modal moved to end of body after show', {
+                    modalId,
+                    page: 'modal-manager-v2'
+                });
+            }
             
             this.bindDismissButtons(modalElement);
             
@@ -7163,7 +7194,13 @@ class ModalManagerV2 {
         
         const modalElement = tempDiv.firstElementChild;
         
-        // הוספה לדף
+        // הוספה לדף - תמיד בסוף body כדי להבטיח z-index נכון
+        // אם המודל כבר קיים, נזיז אותו לסוף
+        const existingModal = document.getElementById(modalElement.id);
+        if (existingModal && existingModal !== modalElement) {
+            existingModal.remove();
+        }
+        
         document.body.appendChild(modalElement);
         
         return modalElement;

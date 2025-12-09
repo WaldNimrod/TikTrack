@@ -1,4 +1,5 @@
 # דוח סטנדרטיזציה - עמודי מוקאפ
+
 # Mockups Standardization Report
 
 **תאריך:** 2025-11-25T02:01:06.751038  
@@ -11,13 +12,15 @@
 
 ## סיכום כללי
 
-### חלוקה לפי חומרה:
+### חלוקה לפי חומרה
+
 - **קריטי:** 11
 - **גבוה:** 187
 - **בינוני:** 14
 - **נמוך:** 0
 
-### חלוקה לפי מערכת:
+### חלוקה לפי מערכת
+
 - **unknown:** 212
 
 ---
@@ -81,7 +84,7 @@
   - קוד: `<div class="date-range-filter-item" data-value="שנה" data-onclick="selectDateRangeOption('שנה')">`
 - 🟠 **ERROR:** Using onclick instead of data-onclick
   - שורה: 396
-  - קוד: `<div class="date-range-filter-item" data-value="שנה קודמת" data-onclick="selectDateRangeOption('שנה `
+  - קוד: `<div class="date-range-filter-item" data-value="שנה קודמת" data-onclick="selectDateRangeOption('שנה`
 - 🟠 **ERROR:** Using onclick instead of data-onclick
   - שורה: 429
   - קוד: `<button class="btn btn-link btn-link-small p-0 text-decoration-none" data-onclick="selectAllOptions(`
@@ -108,7 +111,7 @@
   - קוד: `<div class="side-filter-item" data-value="Short" data-onclick="selectSideOption('Short')">`
 - 🟠 **ERROR:** Using onclick instead of data-onclick
   - שורה: 486
-  - קוד: `<button class="filter-toggle filter-toggle-full-width status-filter-toggle" id="statusFilterToggle" `
+  - קוד: `<button class="filter-toggle filter-toggle-full-width status-filter-toggle" id="statusFilterToggle"`
 - 🟠 **ERROR:** Using onclick instead of data-onclick
   - שורה: 491
   - קוד: `<div class="status-filter-item" data-value="הכול" data-onclick="selectStatusOption('הכול')">`
@@ -126,7 +129,7 @@
   - קוד: `<button class="btn btn-outline-secondary btn-sm" data-onclick="resetComparisonParameters()" title="נ`
 - 🟠 **ERROR:** Using onclick instead of data-onclick
   - שורה: 537
-  - קוד: `<button class="btn btn-outline-primary btn-sm" data-onclick="resetComparisonParametersToDefaults()" `
+  - קוד: `<button class="btn btn-outline-primary btn-sm" data-onclick="resetComparisonParametersToDefaults()"`
 - 🟠 **ERROR:** Using onclick instead of data-onclick
   - שורה: 540
   - קוד: `<button class="filter-toggle-btn" data-onclick="toggleSection('comparison-parameters-panel')" title=`
@@ -260,7 +263,7 @@
   - קוד: `<button class="filter-toggle-btn" data-onclick="toggleSection('economic_calendar_page-אירועים-שמורים`
 - 🟠 **ERROR:** Using onclick instead of data-onclick
   - שורה: 209
-  - קוד: `<button class="filter-toggle-btn" data-onclick="toggleSection('economic_calendar_page-סטטיסטיקות')" `
+  - קוד: `<button class="filter-toggle-btn" data-onclick="toggleSection('economic_calendar_page-סטטיסטיקות')"`
 
 #### Initialization System
 
@@ -567,7 +570,7 @@
   - קוד: `<div class="date-range-filter-item" data-value="שנה" data-onclick="selectDateRangeOption('שנה')">`
 - 🟠 **ERROR:** Using onclick instead of data-onclick
   - שורה: 395
-  - קוד: `<div class="date-range-filter-item" data-value="שנה קודמת" data-onclick="selectDateRangeOption('שנה `
+  - קוד: `<div class="date-range-filter-item" data-value="שנה קודמת" data-onclick="selectDateRangeOption('שנה`
 - 🟠 **ERROR:** Using onclick instead of data-onclick
   - שורה: 427
   - קוד: `<button class="btn btn-link btn-link-small p-0 text-decoration-none" data-onclick="selectAllOptions(`
@@ -582,7 +585,7 @@
   - קוד: `<button class="btn btn-link btn-link-small p-0 text-decoration-none" data-onclick="clearAllOptions('`
 - 🟠 **ERROR:** Using onclick instead of data-onclick
   - שורה: 460
-  - קוד: `<button class="filter-toggle filter-toggle-full-width status-filter-toggle" id="statusFilterToggle" `
+  - קוד: `<button class="filter-toggle filter-toggle-full-width status-filter-toggle" id="statusFilterToggle"`
 - 🟠 **ERROR:** Using onclick instead of data-onclick
   - שורה: 465
   - קוד: `<div class="status-filter-item" data-value="הכול" data-onclick="selectStatusOption('הכול')">`
@@ -597,7 +600,7 @@
   - קוד: `<button class="btn btn-outline-secondary btn-sm" data-onclick="resetComparisonParameters()" title="נ`
 - 🟠 **ERROR:** Using onclick instead of data-onclick
   - שורה: 495
-  - קוד: `<button class="btn btn-outline-primary btn-sm" data-onclick="resetComparisonParametersToDefaults()" `
+  - קוד: `<button class="btn btn-outline-primary btn-sm" data-onclick="resetComparisonParametersToDefaults()"`
 - 🟠 **ERROR:** Using onclick instead of data-onclick
   - שורה: 498
   - קוד: `<button class="filter-toggle-btn" data-onclick="toggleSection('comparison-parameters-panel')" title=`
@@ -722,7 +725,7 @@
   - קוד: `</div><button class="filter-toggle-btn" data-onclick="toggleSection('trading_journal_page_top_sectio`
 - 🟠 **ERROR:** Using onclick instead of data-onclick
   - שורה: 293
-  - קוד: `<button class="filter-toggle-btn" data-onclick="toggleSection('trading_journal_page-תצוגה-חודשית')" `
+  - קוד: `<button class="filter-toggle-btn" data-onclick="toggleSection('trading_journal_page-תצוגה-חודשית')"`
 - 🟠 **ERROR:** Using onclick instead of data-onclick
   - שורה: 462
   - קוד: `data-onclick="filterJournalByEntityType('all')"`

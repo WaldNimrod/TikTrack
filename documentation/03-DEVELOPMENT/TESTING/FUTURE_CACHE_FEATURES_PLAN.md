@@ -1,4 +1,5 @@
 # תוכנית תכונות מטמון עתידיות - Future Cache Features Plan
+
 # =====================================================================
 
 **תאריך:** 11 אוקטובר 2025  
@@ -11,12 +12,14 @@
 ## 🎯 **מטרות שלב 2**
 
 ### **בעיות שנותרו אחרי שלב 1:**
+
 1. **ניקוי ידני** - המשתמש צריך לבחור רמה כל פעם
 2. **אין אוטומציה** - צריך לזכור לנקות לפני CRUD
 3. **Service Registration** - שירותים חדשים דורשים עדכון קוד
 4. **ניקוי ממוקד** - לפעמים צריך רק קטגוריה אחת
 
 ### **פתרונות מוצעים:**
+
 1. **CacheRegistry** - רישום אוטומטי של services
 2. **clearCacheBeforeCRUD** - ניקוי אוטומטי לפני פעולות
 3. **clearCacheByCategory** - ניקוי ממוקד לפי סוג
@@ -27,9 +30,11 @@
 ## 🔧 **תכונה 1: CacheRegistry**
 
 ### **מטרה:**
+
 רישום מרכזי של כל Service Caches למניעת hard-coded lists.
 
 ### **ארכיטקטורה:**
+
 ```javascript
 // cache-module.js
 window.CacheRegistry = {
@@ -83,6 +88,7 @@ window.CacheRegistry = {
 ```
 
 ### **שימוש:**
+
 ```javascript
 // בכל service (entity-details-api.js):
 class EntityDetailsAPI {
@@ -102,12 +108,14 @@ class EntityDetailsAPI {
 ```
 
 ### **יתרונות:**
+
 - ✅ שירותים חדשים נרשמים אוטומטית
 - ✅ אין צורך לעדכן clearServiceCaches()
 - ✅ Dashboard אוטומטי של כל ה-caches
 - ✅ סטטיסטיקות לכל service
 
 ### **UI ב-cache-test.html (מושבת):**
+
 ```html
 <div class="future-feature disabled">
     <h5>📊 CacheRegistry Dashboard</h5>
@@ -129,9 +137,11 @@ class EntityDetailsAPI {
 ## 🔧 **תכונה 2: clearCacheBeforeCRUD**
 
 ### **מטרה:**
+
 אוטומציה של ניקוי מטמון לפני פעולות CRUD.
 
 ### **ארכיטקטורה:**
+
 ```javascript
 // cache-module.js
 window.clearCacheBeforeCRUD = async function(entity, action, options = {}) {
@@ -156,6 +166,7 @@ window.clearCacheBeforeCRUD = async function(entity, action, options = {}) {
 ```
 
 ### **שימוש:**
+
 ```javascript
 // alerts.js
 async function saveNewAlert() {
@@ -177,12 +188,14 @@ async function deleteAlert() {
 ```
 
 ### **יתרונות:**
+
 - ✅ אוטומציה מלאה - המפתח לא צריך לזכור
 - ✅ אופטימיזציה - add רק memory, delete מלא
 - ✅ עקביות - כל CRUD עובד אותו דבר
 - ✅ פחות קוד - קריאה אחת במקום הרבה
 
 ### **UI ב-cache-test.html (מושבת):**
+
 ```html
 <div class="future-feature disabled">
     <h5>🤖 clearCacheBeforeCRUD - אוטומציה</h5>
@@ -205,9 +218,11 @@ async function deleteAlert() {
 ## 🔧 **תכונה 3: clearCacheByCategory (משופר)**
 
 ### **מטרה:**
+
 ניקוי ממוקד לפי קטגוריה, כולל orphan keys.
 
 ### **ארכיטקטורה:**
+
 ```javascript
 // cache-module.js
 window.clearCacheByCategory = async function(category, options = {}) {
@@ -255,12 +270,14 @@ window.clearCacheByCategory = async function(category, options = {}) {
 ```
 
 ### **יתרונות:**
+
 - ✅ ממוקד - רק מה שצריך
 - ✅ בטוח יותר - לא נוגע בכל השאר
 - ✅ מהיר יותר - פחות לנקות
 - ✅ כולל orphans - בניגוד לגרסה הנוכחית
 
 ### **UI ב-cache-test.html (מושבת):**
+
 ```html
 <div class="future-feature disabled">
     <h5>📂 clearCacheByCategory - ניקוי ממוקד</h5>
@@ -282,9 +299,11 @@ window.clearCacheByCategory = async function(category, options = {}) {
 ## 🔧 **תכונה 4: Service-by-Service Management**
 
 ### **מטרה:**
+
 ניקוי ידני של service בודד (לdebug ממוקד).
 
 ### **UI ב-cache-test.html (מושבת):**
+
 ```html
 <div class="future-feature disabled">
     <h5>🎛️ Service-by-Service Management</h5>
@@ -345,6 +364,7 @@ window.clearCacheByCategory = async function(category, options = {}) {
 ## 🎨 **ממשק בשלב 1 (מושבת)**
 
 ### **סקציה בcache-test.html:**
+
 ```html
 <div class="content-section future-features-section">
     <div class="section-header">
@@ -467,11 +487,13 @@ window.clearCacheByCategory = async function(category, options = {}) {
 ## 🎯 **ROI - החזר השקעה**
 
 ### **שלב 1: רמות ניקוי (מיידי)**
+
 - **זמן פיתוח:** 4-6 שעות
 - **תועלת:** כיסוי 100%, מניעת באגים
 - **ROI:** מיידי - חיסכון של שעות debug
 
 ### **שלב 2: תכונות מתקדמות (עתידי)**
+
 - **זמן פיתוח:** 6-10 שעות
 - **תועלת:** אוטומציה, פחות טעויות
 - **ROI:** תוך חודש - חיסכון בזמן פיתוח
@@ -481,6 +503,7 @@ window.clearCacheByCategory = async function(category, options = {}) {
 ## 📋 **החלטה: מתי ליישם שלב 2?**
 
 **תנאים:**
+
 1. ✅ שלב 1 פועל 2+ שבועות ללא בעיות
 2. ✅ הצוות מכיר את המערכת
 3. ⏳ זוהו 3+ מקרים שבהם clearCacheBeforeCRUD היה עוזר

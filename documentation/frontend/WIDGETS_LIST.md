@@ -11,6 +11,7 @@
 מסמך זה מרכז את כל הווידג'טים במערכת TikTrack, החל מווידג'טי דשבורד ועד ווידג'טים מיוחדים ומערכות ווידג'טים מתקדמות.
 
 **סטטוס כללי:**
+
 - **Dashboard Widgets:** 7 ווידג'טים
 - **Special Widgets:** 2 ווידג'טים
 - **TradingView Widgets System:** 11 ווידג'טים
@@ -42,6 +43,7 @@
 **Package:** `trading-ui/scripts/init-system/package-manifest.js` → `dashboard-widgets`
 
 **Dependencies:**
+
 - `base` - מערכות בסיסיות
 - `services` - שירותי נתונים
 - `ui-advanced` - ממשק משתמש מתקדם
@@ -65,6 +67,7 @@
 מערכת מרכזית לניהול כל הווידג'טים הרשמיים של TradingView.
 
 **מערכת מרכזית:**
+
 - **Factory & Manager:** `trading-ui/scripts/tradingview-widgets/`
 - **תיעוד:** [TRADINGVIEW_WIDGETS_SYSTEM.md](../02-ARCHITECTURE/FRONTEND/TRADINGVIEW_WIDGETS_SYSTEM.md)
 - **מדריך מפתח:** [TRADINGVIEW_WIDGETS_DEVELOPER_GUIDE.md](../02-ARCHITECTURE/FRONTEND/TRADINGVIEW_WIDGETS_DEVELOPER_GUIDE.md)
@@ -114,11 +117,13 @@
 ### Module Pattern (IIFE) - מומלץ
 
 **דוגמאות במערכת:**
+
 - Recent Trades Widget
 - Recent Trade Plans Widget
 - Tag Widget
 
 **תבנית:**
+
 ```javascript
 ;(function () {
   'use strict';
@@ -136,6 +141,7 @@
 ### Bootstrap Tabs
 
 **דוגמאות במערכת:**
+
 - Tag Widget (ענן + חיפוש)
 - History Widget (טאבים פנימיים)
 - ModalManagerV2 (generateTabsHTML)
@@ -173,6 +179,7 @@
 ## 🔄 עדכונים אחרונים
 
 **29 ינואר 2025:**
+
 - ✅ סטנדרטיזציה מלאה של 3 ווידג'טים לדף הבית
 - ✅ יצירת תעוד מפתח ל-Recent Items Widget
 - ✅ יצירת תעוד מפתח ל-Unified Pending Actions Widget
@@ -180,6 +187,7 @@
 - ✅ יצירת דוח פערים ובעיות
 
 **21 ינואר 2025:**
+
 - ✅ נוסף Tag Widget מאוחד (ענן + חיפוש)
 - ✅ הועבר מ-tag-search-controller לווידג'ט מאוחד
 - ✅ יצירת רשימת ווידג'טים מרכזית

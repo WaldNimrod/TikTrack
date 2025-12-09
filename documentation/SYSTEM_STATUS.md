@@ -1,4 +1,5 @@
 # עמוד אמת - מצב המערכת
+
 ## System Status - Single Source of Truth
 
 **תאריך עדכון:** 28 בינואר 2025  
@@ -179,14 +180,17 @@
 ## קישורים לתיעוד
 
 ### תיעוד כללי
+
 - [PAGES_LIST.md](PAGES_LIST.md) - רשימת כל העמודים
 - [INDEX.md](INDEX.md) - אינדקס תיעוד מלא
 
 ### תיעוד Mockups
+
 - [MOCKUPS_INTEGRATION_STATUS.md](../trading-ui/mockups/daily-snapshots/MOCKUPS_INTEGRATION_STATUS.md) - מטריצת אינטגרציה
 - [COMPREHENSIVE_TEST_REPORT_2025-01-28.md](../trading-ui/mockups/daily-snapshots/COMPREHENSIVE_TEST_REPORT_2025-01-28.md) - דוח בדיקות מקיף
 
 ### תיעוד דוח פערים
+
 - [GAP_REPORT_ANALYSIS_AND_MOCKUP_IMPLEMENTATION_PLAN.md](03-DEVELOPMENT/PLANS/GAP_REPORT_ANALYSIS_AND_MOCKUP_IMPLEMENTATION_PLAN.md) - תוכנית מימוש
 - [GAP_REPORT_DECISIONS.md](05-REPORTS/GAP_REPORT_DECISIONS.md) - החלטות על המלצות
 
@@ -205,6 +209,7 @@
 ## עדכונים אחרונים
 
 **28 בינואר 2025:**
+
 - ✅ יצירת מסמך זה - "עמוד אמת"
 - ✅ עדכון סטטוס כל המסכים
 - ✅ סיווג Mockups לקטגוריות

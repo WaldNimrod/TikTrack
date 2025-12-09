@@ -7,7 +7,7 @@
 
 ## ✅ Checklist לפני העברה
 
-### קבצים לבדיקה:
+### קבצים לבדיקה
 
 - [ ] `scripts/production-update/master.py` - קיים וניתן להרצה
 - [ ] `scripts/production-update/preserve_production_changes.py` - קיים וניתן להרצה
@@ -19,7 +19,7 @@
 - [ ] `scripts/pre_sync_validation.py` - קיים וניתן להרצה
 - [ ] `scripts/verify_production.sh` - קיים וניתן להרצה
 
-### Master Script - Steps:
+### Master Script - Steps
 
 - [ ] `scripts/production-update/steps/01_collect_changes.py`
 - [ ] `scripts/production-update/steps/02_merge_main.py`
@@ -32,19 +32,19 @@
 - [ ] `scripts/production-update/steps/10_commit_push.py`
 - [ ] `scripts/production-update/steps/11_start_server.py`
 
-### Master Script - Utils:
+### Master Script - Utils
 
 - [ ] `scripts/production-update/utils/conflict_resolver.py`
 - [ ] `scripts/production-update/utils/logger.py`
 - [ ] `scripts/production-update/utils/reporter.py`
 - [ ] `scripts/production-update/utils/rollback.py`
 
-### Master Script - Config:
+### Master Script - Config
 
 - [ ] `scripts/production-update/config/steps_config.json`
 - [ ] `scripts/production-update/config/allowed_files.json`
 
-### מסמכי תעוד:
+### מסמכי תעוד
 
 - [ ] `documentation/production/UPDATE_PROCESS.md`
 - [ ] `documentation/production/PROCESS_STEPS_TABLE.md`
@@ -58,7 +58,7 @@
 - [ ] `documentation/production/INITIAL_HANDOFF.md`
 - [ ] `documentation/production/HANDOFF_CHECKLIST.md` (מסמך זה)
 
-### בדיקות טכניות:
+### בדיקות טכניות
 
 - [ ] כל הסקריפטים ניתנים להרצה (`chmod +x`)
 - [ ] כל הסקריפטים משתמשים ב-relative paths
@@ -66,7 +66,7 @@
 - [ ] כל ה-imports תקינים
 - [ ] אין שגיאות syntax
 
-### בדיקות Git:
+### בדיקות Git
 
 - [ ] כל הקבצים ב-Git (לא untracked)
 - [ ] כל הקבצים committed
@@ -76,20 +76,20 @@
 
 ## ✅ Checklist אחרי העברה
 
-### התקנה בסביבת הפרודקשן:
+### התקנה בסביבת הפרודקשן
 
 - [ ] כל הקבצים במקום הנכון
 - [ ] כל הסקריפטים ניתנים להרצה
 - [ ] כל המסמכים נגישים
 
-### בדיקות פונקציונליות:
+### בדיקות פונקציונליות
 
 - [ ] `python3 scripts/production-update/master.py --dry-run` עובד
 - [ ] `python3 scripts/pre_sync_validation.py` עובד
 - [ ] `python3 scripts/sync_verifier.py` עובד
 - [ ] `./scripts/verify_production.sh` עובד
 
-### תקשורת:
+### תקשורת
 
 - [ ] צוות הפרודקשן קיבל את כל הקבצים
 - [ ] צוות הפרודקשן קרא את המסמכים
@@ -100,7 +100,7 @@
 
 ## 📋 רשימת קבצים מלאה
 
-### סקריפטים (Scripts):
+### סקריפטים (Scripts)
 
 ```
 scripts/
@@ -121,7 +121,7 @@ scripts/
 └── verify_production_isolation.sh ✅
 ```
 
-### מסמכי תעוד (Documentation):
+### מסמכי תעוד (Documentation)
 
 ```
 documentation/production/
@@ -143,6 +143,7 @@ documentation/production/
 ## 🎯 סיכום
 
 **סה"כ קבצים להעברה:**
+
 - סקריפטים: ~30+ קבצים
 - מסמכי תעוד: 11 מסמכים
 

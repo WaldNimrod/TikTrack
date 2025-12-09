@@ -52,11 +52,13 @@ User actions (Save as Note / Export)
 **קובץ:** `trading-ui/scripts/ai-analysis-manager.js`
 
 **תפקידים:**
+
 - ניהול UI של עמוד AI Analysis
 - קואורדינציה בין components
 - טיפול באירועי משתמש
 
 **Methods:**
+
 ```javascript
 class AIAnalysisManager {
   async initialize()
@@ -72,11 +74,13 @@ class AIAnalysisManager {
 **קובץ:** `trading-ui/scripts/ai-template-selector.js`
 
 **תפקידים:**
+
 - הצגת תבניות ככרטיסים
 - בחירת תבנית
 - טעינת משתנים
 
 **Methods:**
+
 ```javascript
 class AITemplateSelector {
   async render(templates)
@@ -90,11 +94,13 @@ class AITemplateSelector {
 **קובץ:** `trading-ui/scripts/ai-result-renderer.js`
 
 **תפקידים:**
+
 - רינדור תוצאות markdown
 - הצגת אינפוגרפיקות
 - כפתורי פעולה
 
 **Methods:**
+
 ```javascript
 class AIResultRenderer {
   async render(analysisResult)
@@ -109,11 +115,13 @@ class AIResultRenderer {
 **קובץ:** `trading-ui/scripts/ai-notes-integration.js`
 
 **תפקידים:**
+
 - שמירת תוצאות כהערה
 - המרת markdown → HTML
 - פתיחת מודל הערה
 
 **Methods:**
+
 ```javascript
 class AINotesIntegration {
   async saveAsNote(analysisResult, relatedType, relatedId)
@@ -127,11 +135,13 @@ class AINotesIntegration {
 **קובץ:** `trading-ui/scripts/ai-export-service.js`
 
 **תפקידים:**
+
 - ייצוא ל-PDF
 - ייצוא ל-Markdown
 - ייצוא ל-HTML
 
 **Methods:**
+
 ```javascript
 class AIExportService {
   async exportToPDF(analysisResult)
@@ -200,11 +210,13 @@ User clicks "Export to PDF"
 ### 1. Notes System
 
 **שימוש:**
+
 - `NotesData.createNote()` - יצירת הערה
 - `ModalManagerV2.showModal('notesModal', 'add')` - פתיחת מודל
 - `notesModalConfig` - קונפיגורציה
 
 **דוגמה:**
+
 ```javascript
 async function saveAsNote(analysisResult) {
   // Show selection modal
@@ -228,10 +240,12 @@ async function saveAsNote(analysisResult) {
 ### 2. Button System
 
 **שימוש:**
+
 - כל הכפתורים דרך `data-onclick`
 - `ButtonSystem` ליצירת כפתורים דינמיים
 
 **דוגמה:**
+
 ```html
 <button 
   data-button-type="PRIMARY" 
@@ -245,12 +259,14 @@ async function saveAsNote(analysisResult) {
 ### 3. Color Scheme
 
 **שימוש:**
+
 - `ColorManager.loadAllColors()` - טעינת צבעים
 - `updateCSSVariablesFromPreferences()` - עדכון CSS Variables
 
 ### 4. Field Renderer
 
 **שימוש:**
+
 - `FieldRendererService.renderStatus()` - רינדור סטטוס
 - `FieldRendererService.renderAmount()` - רינדור סכומים
 
@@ -290,6 +306,10 @@ AIAnalysisState.history.unshift(result);
 
 **תאריך עדכון אחרון:** 28 בינואר 2025  
 **גרסה:** 1.0.0
+
+
+
+
 
 
 

@@ -1,4 +1,5 @@
 # סטנדרטיזציה מוקאפים: Watch List
+
 ## Mockup Standardization: Watch List System
 
 **תאריך:** 28 בינואר 2025  
@@ -15,6 +16,7 @@
 ## תבנית עמוד סטנדרטית
 
 ### Structure
+
 ```html
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
@@ -47,6 +49,7 @@
 ## Section Structure
 
 ### Top Section
+
 ```html
 <div class="top-section" id="watch-lists-top" data-section="top">
     <div class="section-header">
@@ -65,6 +68,7 @@
 ```
 
 ### Content Section
+
 ```html
 <section class="content-section" id="section-id" data-section="section-name">
     <div class="section-header">
@@ -81,6 +85,7 @@
 ## Button Standards
 
 ### Button Attributes
+
 - `data-button-type`: ADD, EDIT, DELETE, REFRESH, TOGGLE
 - `data-variant`: primary, secondary, small, outline
 - `data-icon`: Emoji או דרך IconSystem
@@ -88,6 +93,7 @@
 - `data-onclick`: פונקציה לקריאה
 
 ### Examples
+
 ```html
 <!-- Add Button -->
 <button type="button"
@@ -112,6 +118,7 @@
 ## Icon Standards
 
 ### Format
+
 ```html
 <img src="/trading-ui/images/icons/tabler/{icon-name}.svg" 
      width="16" height="16" 
@@ -120,6 +127,7 @@
 ```
 
 ### Icon Names Used
+
 - `eye` - Watch Lists main
 - `chart-line` - Tech stocks
 - `flame` - Energy
@@ -135,6 +143,7 @@
 ## Table Standards
 
 ### Structure
+
 ```html
 <table class="table table-striped align-middle" 
        id="tableId" 
@@ -151,6 +160,7 @@
 ```
 
 ### Drag Handle Column
+
 ```html
 <th class="drag-handle-column" style="width: 40px;"></th>
 <td class="drag-handle-column">
@@ -163,12 +173,14 @@
 ## Card Standards
 
 ### Watch List Card
+
 - Bootstrap card structure
 - Header with icon and actions
 - Body with title and stats
 - Footer with action button
 
 ### Watch List Item Card
+
 - Compact card design
 - Symbol, Name, Price, Change
 - Flag icon
@@ -179,6 +191,7 @@
 ## Modal Standards
 
 ### Structure
+
 ```html
 <div class="modal fade" id="modalId" tabindex="-1">
     <div class="modal-dialog">
@@ -204,6 +217,7 @@
 ## Info Summary Cards
 
 ### Structure
+
 ```html
 <div class="info-card info-card-primary">
     <div class="info-card-label">Label</div>
@@ -212,6 +226,7 @@
 ```
 
 ### Variants
+
 - `info-card-primary`
 - `info-card-secondary`
 - `info-card-success`
@@ -222,12 +237,14 @@
 ## RTL Support
 
 ### Layout
+
 - כל ה-HTML עם `dir="rtl"`
 - Sections מימין לשמאל
 - Buttons align right
 - Tables RTL-ready
 
 ### Icons
+
 - מיקום איקונים מותאם ל-RTL
 - Flags מימין לשורה
 
@@ -236,11 +253,13 @@
 ## Responsive Design
 
 ### Breakpoints
+
 - **Mobile** (< 768px): 1 column cards, horizontal scroll tables
 - **Tablet** (768px - 1024px): 2 column cards
 - **Desktop** (> 1024px): 3 column cards
 
 ### Classes Used
+
 - `col-md-4 col-sm-6` - Cards grid
 - `table-responsive` - Table wrapper
 - `d-flex`, `gap-*` - Flexbox layouts
@@ -250,7 +269,9 @@
 ## Color Standards
 
 ### Flag Colors
+
 8 צבעים מתוך entity colors:
+
 1. #26baac - Trade
 2. #0056b3 - Trade Plan
 3. #28a745 - Account
@@ -261,12 +282,17 @@
 8. #17a2b8 - Execution
 
 ### Usage
+
 - Flag icons: `style="color: {flag_color}"`
 - Card headers: `style="background-color: {color}20"` (20% opacity)
 
 ---
 
 **סיכום:** המוקאפים עוקבים אחר כל הסטנדרטים של המערכת ומוכנים לאינטגרציה מלאה.
+
+
+
+
 
 
 

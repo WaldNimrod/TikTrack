@@ -52,11 +52,6 @@ def _resolve_user_id() -> int:
     if user_id is not None:
         return user_id
     
-    # Fallback: Check query parameter (for testing/development tools only)
-    user_id = request.args.get('user_id', type=int)
-    if user_id is not None:
-        return user_id
-    
     # No authentication - raise error
     # User must be logged in via session
     raise ValueError("User not authenticated. Please log in first.")
@@ -353,7 +348,10 @@ def delete_watch_list(list_id: int):
         JSON response with success status
     """
     db: Session = g.db
-    user_id = _resolve_user_id()
+    try:
+        user_id = _resolve_user_id()
+    except ValueError as e:
+        return _handle_auth_error(e)
     
     try:
         normalizer = _get_watch_lists_normalizer()

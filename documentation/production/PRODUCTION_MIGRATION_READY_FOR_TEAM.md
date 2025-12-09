@@ -1,5 +1,7 @@
 # Production Migration - Ready for Production Team
+
 # =================================================
+
 # אישור מוכנות להעברה לצוות הפרודקשן
 
 **תאריך:** נובמבר 2025  
@@ -10,6 +12,7 @@
 ## ✅ **אישור בדיקות**
 
 ### **בדיקת דרישות מוקדמות:**
+
 ```
 ✅ Docker container is running and healthy
 ✅ Development database exists and works
@@ -30,6 +33,7 @@
 ## 📦 **קבצים מוכנים**
 
 ### **סקריפטים (7 קבצים):**
+
 - ✅ `scripts/db/migrate_production_to_pg.py`
 - ✅ `scripts/db/setup_production_postgresql.sh`
 - ✅ `scripts/db/backup_postgresql_production.sh`
@@ -39,6 +43,7 @@
 - ✅ `scripts/db/check_production_prerequisites.sh`
 
 ### **תיעוד (6 קבצים):**
+
 - ✅ `PRODUCTION_MIGRATION_MASTER_GUIDE.md` - מדריך ראשי
 - ✅ `PRODUCTION_MIGRATION_EXECUTION_GUIDE.md` - מדריך ביצוע
 - ✅ `PRODUCTION_POSTGRESQL_MIGRATION.md` - מדריך מיגרציה מפורט
@@ -56,6 +61,7 @@
 **לפני שהפרודקשן יוכל להשתמש בסקריפטים:**
 
 1. **מזג את `new-db-uopgrde` ל-`main`:**
+
    ```bash
    git checkout main
    git pull origin main
@@ -64,6 +70,7 @@
    ```
 
 2. **אימות שהקבצים ב-main:**
+
    ```bash
    git checkout main
    ls -la scripts/db/migrate_production_to_pg.py

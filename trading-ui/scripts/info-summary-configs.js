@@ -367,7 +367,7 @@ const INFO_SUMMARY_CONFIGS = {
 
   // Portfolio State page configuration
   'portfolio-state-page': {
-    containerId: 'portfolio-state-summary',
+    containerId: 'trades-summary',
     tableType: 'portfolio-trades',
     // Note: Summary cards are rendered separately via updateSummaryCards()
     // This config is for trades-summary element only

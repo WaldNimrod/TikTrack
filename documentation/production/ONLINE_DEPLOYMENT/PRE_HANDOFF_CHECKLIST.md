@@ -11,17 +11,20 @@
 ### 1. וידוא מסמכים מוכנים
 
 #### מסמכים עיקריים
+
 - [ ] `TESTING_ENVIRONMENT_WORK_INSTRUCTIONS.md` - הוראות עבודה מפורטות ✅
 - [ ] `TESTING_ENVIRONMENT_QUICK_REFERENCE.md` - Quick reference ✅
 - [ ] `TESTING_ENVIRONMENT_UPDATE_PLAN.md` - תוכנית מפורטת ✅
 - [ ] `TESTING_ENVIRONMENT_CHECKLIST.md` - Checklist ✅
 
 #### מסמכי תמיכה
+
 - [ ] `ENVIRONMENT_SETUP.md` - הגדרת 3 סביבות ✅
 - [ ] `ENVIRONMENT_NAMING.md` - שמות וזיהוי ✅
 - [ ] `CODE_CHANGES_PLAN.md` - תוכנית שינויים בקוד ✅
 
 **בדיקה:**
+
 ```bash
 # בדיקת שכל הקבצים קיימים
 ls -la documentation/production/ONLINE_DEPLOYMENT/TESTING_ENVIRONMENT*.md
@@ -34,18 +37,21 @@ ls -la documentation/production/ONLINE_DEPLOYMENT/CODE_CHANGES_PLAN.md
 ### 2. בדיקת תקינות מסמכים
 
 #### בדיקת תוכן
+
 - [ ] כל המסמכים מכילים הוראות ברורות
 - [ ] כל הפקודות נכונות וניתנות להעתקה
 - [ ] כל הנתיבים נכונים
 - [ ] כל הדוגמאות עובדות
 
 #### בדיקת עקביות
+
 - [ ] שמות databases עקביים בכל המסמכים
 - [ ] שמות סביבות עקביים
 - [ ] פורטים עקביים (5001)
 - [ ] שמות משתמשים עקביים
 
 **בדיקה ידנית:**
+
 - [ ] קריאת `TESTING_ENVIRONMENT_WORK_INSTRUCTIONS.md` מהתחלה עד הסוף
 - [ ] וידוא שכל השלבים ברורים
 - [ ] וידוא שכל הפקודות נכונות
@@ -55,6 +61,7 @@ ls -la documentation/production/ONLINE_DEPLOYMENT/CODE_CHANGES_PLAN.md
 ### 3. בדיקת Git Status
 
 #### בדיקת שינויים
+
 ```bash
 # בדיקת שינויים לא שמורים
 git status
@@ -66,6 +73,7 @@ git status
 ```
 
 #### בדיקת שינויים ספציפיים
+
 ```bash
 # בדיקת מה השתנה
 git diff documentation/production/ONLINE_DEPLOYMENT/
@@ -79,6 +87,7 @@ git status --short documentation/production/ONLINE_DEPLOYMENT/
 ### 4. Commit & Push
 
 #### שלב 1: Add שינויים
+
 ```bash
 # הוספת כל המסמכים החדשים
 git add documentation/production/ONLINE_DEPLOYMENT/TESTING_ENVIRONMENT*.md
@@ -95,6 +104,7 @@ git add documentation/production/ONLINE_DEPLOYMENT/
 ```
 
 #### שלב 2: Commit
+
 ```bash
 # Commit עם הודעה ברורה
 git commit -m "docs: Add testing environment update documentation
@@ -116,6 +126,7 @@ All documents ready for handoff to testing team."
 ```
 
 #### שלב 3: Push
+
 ```bash
 # Push ל-remote
 git push origin main
@@ -129,6 +140,7 @@ git push origin feature/testing-environment-update
 ### 5. יצירת Summary להעברה
 
 #### יצירת README להעברה
+
 ```bash
 # יצירת README קצר להעברה
 cat > documentation/production/ONLINE_DEPLOYMENT/HANDOFF_README.md << 'EOF'
@@ -176,6 +188,7 @@ EOF
 ### 6. בדיקת נגישות מסמכים
 
 #### בדיקת נתיבים
+
 ```bash
 # בדיקת שכל הקבצים נגישים
 ls -la documentation/production/ONLINE_DEPLOYMENT/TESTING_ENVIRONMENT*.md
@@ -196,6 +209,7 @@ done
 ### 7. יצירת Branch נפרד (אופציונלי)
 
 #### אם רוצים branch נפרד
+
 ```bash
 # יצירת branch חדש
 git checkout -b feature/testing-environment-update
@@ -215,6 +229,7 @@ git push origin feature/testing-environment-update
 ### 8. תיעוד העברה
 
 #### יצירת רשומת העברה
+
 ```bash
 # יצירת רשומת העברה
 cat > documentation/production/ONLINE_DEPLOYMENT/HANDOFF_LOG.md << 'EOF'
@@ -250,23 +265,27 @@ EOF
 ## ✅ Checklist סופי לפני העברה
 
 ### מסמכים
+
 - [ ] כל המסמכים נוצרו
 - [ ] כל המסמכים נבדקו
 - [ ] כל המסמכים נשמרו ב-Git
 - [ ] כל המסמכים נדחפו ל-remote
 
 ### Git
+
 - [ ] כל השינויים נשמרו
 - [ ] Commit עם הודעה ברורה
 - [ ] Push ל-remote הושלם
 - [ ] Branch (אם נוצר) נדחף
 
 ### תיעוד
+
 - [ ] README להעברה נוצר
 - [ ] רשומת העברה נוצרה
 - [ ] כל הנתיבים נכונים
 
 ### תקשורת
+
 - [ ] הודעה לצוות הטסטים מוכנה
 - [ ] רשימת מסמכים להעברה מוכנה
 - [ ] הוראות התחלה מוכנות
@@ -276,6 +295,7 @@ EOF
 ## 🚀 תהליך העברה
 
 ### שלב 1: הכנות
+
 ```bash
 # 1. בדיקת מסמכים
 ls -la documentation/production/ONLINE_DEPLOYMENT/TESTING_ENVIRONMENT*.md
@@ -290,6 +310,7 @@ git push origin main
 ```
 
 ### שלב 2: העברה
+
 1. העבר את המסמכים לצוות הטסטים:
    - `TESTING_ENVIRONMENT_WORK_INSTRUCTIONS.md` ⭐ **ראשי**
    - `TESTING_ENVIRONMENT_QUICK_REFERENCE.md` ⭐ **Quick reference**
@@ -299,6 +320,7 @@ git push origin main
 2. או העבר קישור ל-Git repository
 
 ### שלב 3: מעקב
+
 - [ ] וידוא שהצוות קיבל
 - [ ] מעקב אחר התקדמות
 - [ ] תמיכה בבעיות

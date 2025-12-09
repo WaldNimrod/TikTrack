@@ -52,17 +52,7 @@ def _resolve_user_id() -> Optional[int]:
     No fallback to default user - this ensures proper access control."""
     # Primary: Get from Flask context (set by auth middleware)
     user_id = getattr(g, 'user_id', None)
-    if user_id is not None:
-        return user_id
-    
-    # Fallback: Check query parameter (for testing/development tools only)
-    user_id = request.args.get('user_id', type=int)
-    if user_id is not None:
-        return user_id
-    
-    # No fallback - return None to trigger proper authorization checks
-    # This ensures users can only access their own data
-    return None
+    return user_id
 
 def _get_tickers_normalizer() -> DateNormalizationService:
     """Resolve timezone and create a DateNormalizationService for tickers endpoints."""

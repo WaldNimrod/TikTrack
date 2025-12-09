@@ -1,4 +1,5 @@
 # תוכנית אינטגרציה - עמוד היסטוריית מחירים
+
 ## Price History Page Integration Plan
 
 **תאריך יצירה:** 27 בינואר 2025  
@@ -10,6 +11,7 @@
 ## ✅ תיקונים שבוצעו
 
 ### 1. תיקון כפילות Indicators Toolbar
+
 - **בעיה:** היו שני אלמנטים עם `id="indicators-toolbar"` (שורות 328 ו-356)
 - **תיקון:** הוסר האלמנט הראשון, נשאר רק השני (המפורט יותר)
 - **סטטוס:** ✅ תוקן
@@ -21,6 +23,7 @@
 ### 🔴 קריטי - חובה לאינטגרציה
 
 #### 1. **NotificationSystem** - מערכת התראות
+
 - **קובץ:** `trading-ui/scripts/notification-system.js`
 - **דוקומנטציה:** `documentation/02-ARCHITECTURE/FRONTEND/NOTIFICATION_SYSTEM.md`
 - **שימוש נוכחי:** ❌ משתמש ב-`window.showErrorNotification?.()` ו-`window.showSuccessNotification?.()`
@@ -34,6 +37,7 @@
   - שורה 2021: שגיאה בשמירת תמונה
 
 #### 2. **UI Utils - toggleSection** - מערכת הצגה/הסתרה
+
 - **קובץ:** `trading-ui/scripts/ui-utils.js`
 - **דוקומנטציה:** `documentation/02-ARCHITECTURE/FRONTEND/SECTION_TOGGLE_SYSTEM.md`
 - **שימוש נוכחי:** ✅ יש פונקציה מקומית `toggleSection()` (שורה 1493)
@@ -46,6 +50,7 @@
   - שורה 418: `toggleSection('comparison-chart-section')`
 
 #### 3. **Button System** - מערכת כפתורים
+
 - **קובץ:** `trading-ui/scripts/button-system-init.js`
 - **דוקומנטציה:** `documentation/02-ARCHITECTURE/FRONTEND/button-system.md`
 - **שימוש נוכחי:** ⚠️ חלקי - יש כפתורים עם `data-button-type` (שורות 88-89)
@@ -59,6 +64,7 @@
 ### 🟡 חשוב - מומלץ לאינטגרציה
 
 #### 4. **FieldRendererService** - רינדור שדות אחיד
+
 - **קובץ:** `trading-ui/scripts/services/field-renderer-service.js`
 - **דוקומנטציה:** `documentation/03-API_REFERENCE/field-renderer-service.md`
 - **שימוש נוכחי:** ❌ אין שימוש
@@ -68,6 +74,7 @@
   - שורות 144-171: כרטיסי סטטיסטיקה (`stat-daily-change`, `stat-weekly-change`, וכו')
 
 #### 5. **InfoSummarySystem** - מערכת סיכום נתונים
+
 - **קובץ:** `trading-ui/scripts/info-summary-system.js`
 - **דוקומנטציה:** `documentation/02-ARCHITECTURE/FRONTEND/INFO_SUMMARY_SYSTEM.md`
 - **שימוש נוכחי:** ❌ אין שימוש
@@ -77,6 +84,7 @@
   - שורות 142-172: סקשן סטטיסטיקות שינוי
 
 #### 6. **Logger Service** - מערכת לוגים
+
 - **קובץ:** `trading-ui/scripts/logger-service.js`
 - **דוקומנטציה:** `documentation/02-ARCHITECTURE/FRONTEND/UNIFIED_LOG_SYSTEM_GUIDE.md`
 - **שימוש נוכחי:** ❌ משתמש ב-`console.log`, `console.warn`, `console.error`
@@ -86,6 +94,7 @@
   - שורות 502, 538, 565, 736, 738, 1133, 1141, 1187, 1242, 1307, 1331, 1408, 1433, 1463, 1476, 1518, 1558, 1578, 1610, 1707, 1778, 1792, 1833, 1853, 1918, 1920, 1943, 2048, 2107, 2125
 
 #### 7. **PreferencesCore** - מערכת העדפות
+
 - **קובץ:** `trading-ui/scripts/preferences-core-new.js`
 - **דוקומנטציה:** `documentation/features/preferences/`
 - **שימוש נוכחי:** ✅ יש שימוש חלקי (`loadChartPreferences`, `saveChartPreferences` - שורות 2089-2153)
@@ -97,6 +106,7 @@
 ### 🟢 אופציונלי - לשיפור
 
 #### 8. **UnifiedCacheManager** - מערכת מטמון
+
 - **קובץ:** `trading-ui/scripts/unified-cache-manager.js`
 - **דוקומנטציה:** `documentation/02-ARCHITECTURE/FRONTEND/CACHE_IMPLEMENTATION_GUIDE.md`
 - **שימוש נוכחי:** ❌ אין שימוש (מוקאפ - נתונים מדומים)
@@ -104,6 +114,7 @@
 - **יתרונות:** ביצועים, חוויית משתמש, TTL אוטומטי
 
 #### 9. **ColorSchemeSystem** - מערכת צבעים
+
 - **קובץ:** `trading-ui/scripts/color-scheme-system.js`
 - **דוקומנטציה:** `documentation/02-ARCHITECTURE/FRONTEND/COLOR_SCHEME_SYSTEM.md`
 - **שימוש נוכחי:** ⚠️ חלקי - משתמש ב-`getCSSVariableValue()` (שורות 571, 666, וכו')
@@ -111,6 +122,7 @@
 - **יתרונות:** עקביות, תמיכה במצבי צבע (light/dark)
 
 #### 10. **Icon System** - מערכת איקונים
+
 - **קובץ:** `trading-ui/scripts/icon-system.js`
 - **דוקומנטציה:** `documentation/frontend/ICON_SYSTEM_GUIDE.md`
 - **שימוש נוכחי:** ⚠️ חלקי - יש שימוש ב-`<img src="../../images/icons/...">`
@@ -120,6 +132,7 @@
   - שורות 84, 134, 179, 211, 214, 217, 237, 240, 249, 259, 268, 271, 274, 282, 293, 302, 305, 314, 392, 396, 399, 402, 405, 408, 411, 414, 417, 420, 423, 426, 444
 
 #### 11. **Page State Management** - שמירת מצב עמוד
+
 - **קובץ:** `trading-ui/scripts/page-utils.js`
 - **דוקומנטציה:** `documentation/02-ARCHITECTURE/FRONTEND/PAGE_STATE_MANAGEMENT_SYSTEM.md`
 - **שימוש נוכחי:** ❌ אין שימוש
@@ -127,6 +140,7 @@
 - **יתרונות:** שחזור מצב, חוויית משתמש משופרת
 
 #### 12. **Header System** - מערכת כותרת
+
 - **קובץ:** `trading-ui/scripts/header-system.js`
 - **דוקומנטציה:** `documentation/02-ARCHITECTURE/FRONTEND/HEADER_SYSTEM_README.md`
 - **שימוש נוכחי:** ✅ יש שימוש (שורה 28, 49)
@@ -137,27 +151,31 @@
 
 ## 📊 סיכום אינטגרציה
 
-### סטטוס כללי:
+### סטטוס כללי
+
 - **מערכות משולבות:** 2/12 (Header System, PreferencesCore חלקי)
 - **מערכות שצריך לשלב:** 10/12
 - **קריטי:** 3 מערכות
 - **חשוב:** 4 מערכות
 - **אופציונלי:** 5 מערכות
 
-### סדר עדיפויות:
+### סדר עדיפויות
 
-#### שלב 1 - קריטי (חובה):
+#### שלב 1 - קריטי (חובה)
+
 1. ✅ NotificationSystem - החלפת כל ההודעות
 2. ✅ UI Utils - toggleSection - החלפת פונקציה מקומית
 3. ✅ Button System - וידוא שכל הכפתורים משתמשים במערכת
 
-#### שלב 2 - חשוב (מומלץ):
+#### שלב 2 - חשוב (מומלץ)
+
 4. FieldRendererService - רינדור סטטיסטיקות
 5. InfoSummarySystem - חישובי KPI
 6. Logger Service - החלפת console.*
 7. PreferencesCore - וידוא שמירת העדפות מלאה
 
-#### שלב 3 - אופציונלי (שיפור):
+#### שלב 3 - אופציונלי (שיפור)
+
 8. UnifiedCacheManager - בעת חיבור ל-API
 9. ColorSchemeSystem - וידוא צבעים
 10. Icon System - החלפת איקונים
@@ -171,6 +189,7 @@
 ### שלב 1: תיקון קריטי
 
 #### 1.1 החלפת NotificationSystem
+
 ```javascript
 // לפני:
 window.showErrorNotification?.('שגיאה', 'הודעת שגיאה');
@@ -182,6 +201,7 @@ if (window.NotificationSystem) {
 ```
 
 #### 1.2 החלפת toggleSection
+
 ```javascript
 // לפני:
 function toggleSection(sectionId) {
@@ -193,6 +213,7 @@ function toggleSection(sectionId) {
 ```
 
 #### 1.3 וידוא Button System
+
 ```javascript
 // וידוא שכל הכפתורים עם data-button-type נטענים דרך Button System
 // בדיקה: האם button-system-init.js נטען?

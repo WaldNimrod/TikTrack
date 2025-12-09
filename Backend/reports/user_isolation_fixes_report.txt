@@ -1,0 +1,41 @@
+================================================================================
+User Isolation Fixes Report
+================================================================================
+
+Total Fixes Generated: 3
+
+Fixes by Type:
+  - add_user_id_check: 3
+
+Fixes by Confidence:
+  - High (>=0.7): 3
+  - Medium (0.5-0.7): 0
+  - Low (<0.5): 0
+
+================================================================================
+Detailed Fixes
+================================================================================
+
+[add_user_id_check] /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/api/cash_flows.py:759
+  Function: delete_all_cash_flows
+  Description: Add user_id authentication check to delete_all_cash_flows
+  Confidence: 0.80
+  Old code:         ...
+  New code:         # Get user_id from Flask context (set by auth middleware)
+        user_id = getattr(g, 'user...
+
+[add_user_id_check] /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/api/trading_methods.py:35
+  Function: get_trading_methods
+  Description: Add user_id authentication check to get_trading_methods
+  Confidence: 0.80
+  Old code:         ...
+  New code:         # Get user_id from Flask context (set by auth middleware)
+        user_id = getattr(g, 'user...
+
+[add_user_id_check] /Users/nimrod/Documents/TikTrack/TikTrackApp/Backend/routes/api/trading_methods.py:80
+  Function: get_trading_method
+  Description: Add user_id authentication check to get_trading_method
+  Confidence: 0.80
+  Old code:         ...
+  New code:         # Get user_id from Flask context (set by auth middleware)
+        user_id = getattr(g, 'user...

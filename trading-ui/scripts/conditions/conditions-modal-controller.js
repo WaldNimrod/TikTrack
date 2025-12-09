@@ -82,6 +82,7 @@
             this.navigationInstanceId = null;
             this.parentNavigationInstanceId = null;
             this.reloadBypassActive = false;
+            this.loggedMissingModal = false; // prevent repeated warnings
 
             this.initialize();
         }
@@ -141,7 +142,10 @@
                                      window.location.pathname.includes('forgot-password.html') ||
                                      window.location.pathname.includes('reset-password.html');
                     if (!isAuthPage) {
-                        window.Logger?.warn('[ConditionsModalController] Modal element not found and could not be created', { page: 'conditions-modal-controller' });
+                        if (!this.loggedMissingModal) {
+                            window.Logger?.info?.('[ConditionsModalController] Modal element not found and could not be created (once)', { page: 'conditions-modal-controller' });
+                            this.loggedMissingModal = true;
+                        }
                     }
                     return;
                 }

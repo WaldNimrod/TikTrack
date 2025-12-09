@@ -268,8 +268,10 @@ class TradeService:
                 except ValueError:
                     raise ValueError(f"Invalid date format for closed_at: {data['closed_at']}")
         
-        # Set user_id if provided and not in data
-        if user_id is not None and 'user_id' not in data:
+        # Ensure user_id is set before validation - CRITICAL: user_id is required
+        if 'user_id' not in data or data['user_id'] is None:
+            if user_id is None:
+                raise ValueError("user_id is required for trade creation. Either provide it in data or pass it as parameter.")
             data['user_id'] = user_id
         
         # Validate data against dynamic constraints

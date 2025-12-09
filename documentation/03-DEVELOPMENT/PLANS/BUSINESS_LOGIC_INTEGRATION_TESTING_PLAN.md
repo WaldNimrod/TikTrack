@@ -1,4 +1,5 @@
 # תוכנית בדיקות אינטגרציה - Business Logic Layer
+
 # Integration Testing Plan - Business Logic Layer
 
 **תאריך יצירה:** 22 נובמבר 2025  
@@ -30,6 +31,7 @@
 **פעולות:**
 
 1. **הרצת השרת:**
+
    ```bash
    ./start_server.sh
    ```
@@ -45,6 +47,7 @@
    - [ ] אין שגיאות ב-logs
 
 **קריטריוני השלמה:**
+
 - [ ] השרת רץ בהצלחה
 - [ ] כל ה-blueprints נרשמו
 - [ ] Business Logic API זמין
@@ -98,6 +101,7 @@
    - [ ] בדיקת response time < 200ms
 
 **קריטריוני השלמה:**
+
 - [ ] כל ה-7 endpoints עובדים
 - [ ] כל ה-tests עוברים
 - [ ] Response time < 200ms לכל endpoint
@@ -130,6 +134,7 @@
    - [ ] בדיקת response time < 200ms
 
 **קריטריוני השלמה:**
+
 - [ ] כל ה-3 endpoints עובדים
 - [ ] כל ה-tests עוברים
 - [ ] Response time < 200ms לכל endpoint
@@ -158,6 +163,7 @@
    - [ ] בדיקת response time < 200ms
 
 **קריטריוני השלמה:**
+
 - [ ] כל ה-2 endpoints עובדים
 - [ ] כל ה-tests עוברים
 - [ ] Response time < 200ms לכל endpoint
@@ -185,6 +191,7 @@
    - [ ] `POST /api/business/cash-flow/validate`
 
 **קריטריוני השלמה:**
+
 - [ ] כל ה-7 endpoints עובדים
 - [ ] כל ה-tests עוברים
 - [ ] Response time < 200ms לכל endpoint
@@ -199,6 +206,7 @@
 **מטרה:** לבדוק שה-Frontend wrappers של TradesData עובדים נכון.
 
 **קבצים לבדיקה:**
+
 - `trading-ui/scripts/services/trades-data.js`
 
 **Wrappers לבדיקה:**
@@ -227,6 +235,7 @@
    - [ ] Response time < 200ms
 
 **קריטריוני השלמה:**
+
 - [ ] כל ה-4 wrappers עובדים
 - [ ] Fallback עובד נכון
 - [ ] Error handling עובד נכון
@@ -241,6 +250,7 @@
 **מטרה:** לבדוק שה-Frontend wrappers של ExecutionsData עובדים נכון.
 
 **קבצים לבדיקה:**
+
 - `trading-ui/scripts/services/executions-data.js`
 
 **Wrappers לבדיקה:**
@@ -261,6 +271,7 @@
    - [ ] Response time < 200ms
 
 **קריטריוני השלמה:**
+
 - [ ] כל ה-3 wrappers עובדים
 - [ ] Error handling עובד נכון
 - [ ] Response time < 200ms
@@ -274,6 +285,7 @@
 **מטרה:** לבדוק שה-Frontend wrappers של AlertsData עובדים נכון.
 
 **קבצים לבדיקה:**
+
 - `trading-ui/scripts/services/alerts-data.js`
 
 **Wrappers לבדיקה:**
@@ -289,6 +301,7 @@
    - [ ] Response time < 200ms
 
 **קריטריוני השלמה:**
+
 - [ ] כל ה-2 wrappers עובדים
 - [ ] Error handling עובד נכון
 - [ ] Response time < 200ms
@@ -302,6 +315,7 @@
 **מטרה:** לבדוק שה-price calculation functions ב-ui-utils.js עובדות נכון.
 
 **קבצים לבדיקה:**
+
 - `trading-ui/scripts/ui-utils.js`
 
 **Functions לבדיקה:**
@@ -335,6 +349,7 @@
    - [ ] Response time < 200ms
 
 **קריטריוני השלמה:**
+
 - [ ] כל ה-5 functions עובדות
 - [ ] Fallback עובד נכון
 - [ ] Error handling עובד נכון
@@ -349,6 +364,7 @@
 **מטרה:** לבדוק שהעמוד Trades עובד נכון עם Business Logic API.
 
 **עמוד לבדיקה:**
+
 - `trading-ui/trades.html` + `trading-ui/scripts/trades.js`
 
 **בדיקות:**
@@ -374,6 +390,7 @@
    - [ ] הודעות שגיאה מוצגות נכון
 
 **קריטריוני השלמה:**
+
 - [ ] כל הפונקציונליות עובדת
 - [ ] אין regressions
 - [ ] Error handling עובד נכון
@@ -387,6 +404,7 @@
 **מטרה:** לבדוק שהעמוד Executions עובד נכון עם Business Logic API.
 
 **עמוד לבדיקה:**
+
 - `trading-ui/executions.html` + `trading-ui/scripts/executions.js`
 
 **בדיקות:**
@@ -410,6 +428,7 @@
    - [ ] הודעות שגיאה מוצגות נכון
 
 **קריטריוני השלמה:**
+
 - [ ] כל הפונקציונליות עובדת
 - [ ] אין regressions
 - [ ] Error handling עובד נכון
@@ -423,6 +442,7 @@
 **מטרה:** לבדוק שהעמוד Alerts עובד נכון עם Business Logic API.
 
 **עמוד לבדיקה:**
+
 - `trading-ui/alerts.html` + `trading-ui/scripts/alerts.js`
 
 **בדיקות:**
@@ -442,6 +462,7 @@
    - [ ] הודעות שגיאה מוצגות נכון
 
 **קריטריוני השלמה:**
+
 - [ ] כל הפונקציונליות עובדת
 - [ ] אין regressions
 - [ ] Error handling עובד נכון
@@ -471,6 +492,7 @@
    - [ ] Timeout rate < 0.1%
 
 **קריטריוני השלמה:**
+
 - [ ] Response time < 200ms
 - [ ] Throughput מספק
 - [ ] Error rate נמוך
@@ -502,6 +524,7 @@
    - המלצות לשלב הבא
 
 **קריטריוני השלמה:**
+
 - [ ] דוח סיכום נוצר
 - [ ] כל הבעיות מתועדות
 - [ ] כל התיקונים מתועדים
@@ -521,6 +544,7 @@
 **מטרה:** לוודא שה-Business Logic API calls משתמשים ב-UnifiedCacheManager.
 
 **קבצים לעדכון:**
+
 - `trading-ui/scripts/services/trades-data.js`
 - `trading-ui/scripts/services/executions-data.js`
 - `trading-ui/scripts/services/alerts-data.js`
@@ -529,6 +553,7 @@
 **פעולות:**
 
 1. **עדכון Wrappers להשתמש ב-UnifiedCacheManager:**
+
    ```javascript
    // דוגמה:
    async function calculateStopPrice(currentPrice, stopPercentage, side) {
@@ -567,6 +592,7 @@
    - [ ] Cache refresh עובד
 
 **קריטריוני השלמה:**
+
 - [ ] כל ה-Wrappers משתמשים ב-UnifiedCacheManager
 - [ ] בחירת שכבת מטמון נכונה
 - [ ] TTL נכון לכל סוג חישוב
@@ -581,6 +607,7 @@
 **מטרה:** לוודא שה-Business Logic API calls משתמשים ב-CacheTTLGuard.
 
 **קבצים לעדכון:**
+
 - `trading-ui/scripts/services/trades-data.js`
 - `trading-ui/scripts/services/executions-data.js`
 - `trading-ui/scripts/services/alerts-data.js`
@@ -588,6 +615,7 @@
 **פעולות:**
 
 1. **עדכון Wrappers להשתמש ב-CacheTTLGuard:**
+
    ```javascript
    // דוגמה:
    async function calculateStopPrice(currentPrice, stopPercentage, side) {
@@ -615,6 +643,7 @@
    - [ ] Cache invalidation עובד
 
 **קריטריוני השלמה:**
+
 - [ ] כל ה-Wrappers משתמשים ב-CacheTTLGuard
 - [ ] TTL Guard עובד נכון
 - [ ] Cache refresh עובד
@@ -628,6 +657,7 @@
 **מטרה:** לוודא שה-mutations מפעילים invalidation נכון.
 
 **קבצים לעדכון:**
+
 - `trading-ui/scripts/services/trades-data.js`
 - `trading-ui/scripts/services/executions-data.js`
 - `trading-ui/scripts/services/alerts-data.js`
@@ -635,6 +665,7 @@
 **פעולות:**
 
 1. **עדכון Mutations להפעיל Invalidation:**
+
    ```javascript
    // דוגמה:
    async function createTrade(tradeData) {
@@ -666,6 +697,7 @@
    - [ ] Data נטען מחדש נכון
 
 **קריטריוני השלמה:**
+
 - [ ] כל ה-Mutations מפעילים invalidation
 - [ ] Invalidation patterns נכונים
 - [ ] Reload עובד נכון
@@ -694,6 +726,7 @@
    - [ ] IndexedDB cache < 10MB
 
 **קריטריוני השלמה:**
+
 - [ ] Cache hit rate > 80%
 - [ ] Response time < 200ms
 - [ ] Memory usage תקין
@@ -724,6 +757,7 @@
    - המלצות לשלב הבא
 
 **קריטריוני השלמה:**
+
 - [ ] דוח סיכום נוצר
 - [ ] כל הבעיות מתועדות
 - [ ] כל התיקונים מתועדים
@@ -758,7 +792,7 @@
 
 ## 📊 דוחות וסיכומים
 
-### דוחות ליצירה:
+### דוחות ליצירה
 
 1. **`BUSINESS_LOGIC_PHASE1_TESTING_REPORT.md`**
    - תוצאות כל הבדיקות של Phase 1
@@ -779,6 +813,7 @@
 ## ⏱️ לוח זמנים משוער
 
 ### Phase 1: בדיקת אינטגרציה מעשית
+
 - **שלבים 1.1-1.5**: 2 שעות (API Endpoints)
 - **שלבים 1.6-1.9**: 1.5 שעות (Frontend Wrappers)
 - **שלבים 1.10-1.12**: 1.5 שעות (עמודים)
@@ -786,11 +821,13 @@
 - **סה"כ Phase 1**: ~6 שעות
 
 ### Phase 2: אינטגרציה עם מערכות מטמון
+
 - **שלבים 2.1-2.3**: 5.5 שעות (אינטגרציה)
 - **שלבים 2.4-2.5**: 1 שעה (Performance + סיכום)
 - **סה"כ Phase 2**: ~6.5 שעות
 
 ### סה"כ כולל
+
 - **Phase 1 + Phase 2**: ~12.5 שעות
 - **עם buffer**: ~15 שעות (2 ימי עבודה)
 
@@ -798,14 +835,16 @@
 
 ## 🚀 התחלת עבודה
 
-### לפני התחלה:
+### לפני התחלה
 
 1. **וידוא שהשרת רץ:**
+
    ```bash
    ./start_server.sh
    ```
 
 2. **וידוא ש-PostgreSQL רץ:**
+
    ```bash
    docker ps | grep postgres
    ```
@@ -814,7 +853,7 @@
    - בדיקת logs
    - בדיקת console
 
-### סדר עבודה מומלץ:
+### סדר עבודה מומלץ
 
 1. **Phase 1.1**: הכנת סביבת בדיקה
 2. **Phase 1.2-1.5**: בדיקת API Endpoints

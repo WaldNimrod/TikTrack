@@ -49,16 +49,20 @@ _Last reviewed: 2025-11-15 — Owners: Release Engineering_
 ## 3. עדכון קוד ו-Git – שיטה מומלצת
 
 1. **Merge בטרמינל חיצוני** (iTerm/Terminal) כדי להימנע מתקיעת Cursor:  
+
    ```bash
    git checkout main && git pull origin main
    git checkout production && git pull origin production
    git merge main
    ```
+
 2. **פתרון קונפליקטים:** `git checkout --theirs production/Backend/config/settings.py` וכד' לפי סעיף 3.5 בתהליך.  
 3. **סקריפט אבטחת קבצים קבועים:** לאחר merge וסנכרון, להריץ:  
+
    ```bash
    python scripts/release/reset_production_configs.py --restore-configs --copy-db
    ```  
+
    כך מונעים מצב שבו `config/logging.py` נותר עם `logs-production` או `ENVIRONMENT` לא קבוע.
 4. **Staging ממוכן:** `python scripts/release/git_stage_release.py --extra production/Backend/services/trading_methods_seed_data.py`.  
 5. **Commit Hooks:** להשתמש ב־`pre-push` (או בפקודת `SKIP_VERSION_CHECK=1` רק בעת חרום) כדי להבטיח שה-Manifest והיסטוריית הגרסאות עודכנו דרך `bump-version.py`.
@@ -87,6 +91,7 @@ _Last reviewed: 2025-11-15 — Owners: Release Engineering_
 | DB Drift | `python scripts/release/verify_schema.py --report artifacts/schema_<ts>.json` | שומר דוח לצורך ביקורת. |
 
 **Sequence מומלץ:**
+
 ```bash
 python scripts/release/post_update_validation.py --health-url http://localhost:5001/api/health
 npm run test:api-smoke

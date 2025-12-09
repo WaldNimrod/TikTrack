@@ -1,4 +1,5 @@
 # דוח סטטוס יישום איקונים - TikTrack
+
 # Icon Implementation Status Report
 
 **תאריך:** 23 נובמבר 2025  
@@ -30,6 +31,7 @@
 ### 1. CDN Links שעדיין פעילים
 
 **קבצים:**
+
 - `trading-ui/research.html` - 2 CDN links (Bootstrap Icons + FontAwesome)
 - `trading-ui/mockups/daily-snapshots/tradingview-test-page.html` - 1 CDN link
 
@@ -38,12 +40,14 @@
 ### 2. עמודים שלא משתמשים ב-IconSystem
 
 **עמודים ראשיים:**
+
 - ❌ `trading-ui/research.html` - משתמש ב-CDN, ללא IconSystem
 - ❌ `trading-ui/notifications-center.html` - משתמש ב-FontAwesome (21 occurrences)
 - ❌ `trading-ui/server-monitor.html` - ללא IconSystem
 - ❌ `trading-ui/code-quality-dashboard.html` - ללא IconSystem
 
 **עמודים טכניים:**
+
 - ❌ `trading-ui/mockups/daily-snapshots/tradingview-test-page.html` - CDN link
 
 **פעולה:** הוסף IconSystem לכל העמודים
@@ -54,11 +58,13 @@
 
 **קבצים עם Bootstrap Icons:**
 
-#### עמודים:
+#### עמודים
+
 - `trading-ui/tag-management.html` - 12 occurrences (`bi-tags-fill`, etc.)
 - `trading-ui/preferences-ui.js` - 9 occurrences
 
-#### מוקאפים:
+#### מוקאפים
+
 - `trading-ui/mockups/daily-snapshots/portfolio-state-page.html` - 7 occurrences (`bi-chevron-down`)
 
 **פעולה:** החלף ב-Tabler Icons דרך IconSystem
@@ -67,13 +73,15 @@
 
 **קבצים עם FontAwesome:**
 
-#### עמודים:
+#### עמודים
+
 - `trading-ui/notifications-center.html` - 21 occurrences (`fas fa-chart-bar`)
 - `trading-ui/constraints.html` - 18 occurrences (`fas fa-sort`)
 - `trading-ui/server-monitor.html` - 36 occurrences
 - `trading-ui/background-tasks.html` - 2 occurrences
 
-#### סקריפטים:
+#### סקריפטים
+
 - `trading-ui/scripts/notifications-center.js` - 40 occurrences
 - `trading-ui/scripts/preferences-ui.js` - FontAwesome בשימוש
 - `trading-ui/scripts/conditions-test.js` - 15 occurrences
@@ -83,6 +91,7 @@
 ### 3. נתיבי איקונים ישנים
 
 **קבצים:**
+
 - `trading-ui/db_display.html` - `images/icons/db_display.svg` (ללא entities/)
 - `trading-ui/mockups/daily-snapshots/comparative-analysis-page.html` - 27 occurrences
 - `trading-ui/mockups/daily-snapshots/trading-journal-page.html` - 8 occurrences
@@ -97,7 +106,8 @@
 
 **אבל יש מקרים שכן דורשים תיקון:**
 
-#### איקונים ב-HTML (לא בתגובות):
+#### איקונים ב-HTML (לא בתגובות)
+
 - `trading-ui/index.html` - `data-icon="🔍"` (line 174)
 - `trading-ui/preferences.html` - `⚙️` בכותרת (line 13)
 - `trading-ui/tag-management.html` - `data-icon="➕"`, `🔄` (lines 123, 136, 154)
@@ -107,12 +117,14 @@
 
 **פעולה:** החלף Emojis באיקוני Tabler דרך IconSystem
 
-#### איקונים ב-console.log:
+#### איקונים ב-console.log
+
 רוב ה-Emojis נמצאים ב-console.log statements - **אופציונלי לתקן**, לא קריטי.
 
 ### 2. Hardcoded Icon Paths
 
 **קבצים:**
+
 - מספר קבצי JS עם `iconPath = ...` hardcoded
 - בעיקר ב-modal configs ו-services
 
@@ -241,10 +253,13 @@
 ## 📝 הערות חשובות
 
 ### 1. Emojis בתגובות
+
 רוב ה-Emojis (5,500+) נמצאים בתגובות HTML (`<!-- ... -->`) או ב-console.log statements. אלה **לא דורש תיקון** - הם לא משפיעים על הממשק.
 
 ### 2. יישום חלקי
+
 מספר עמודים משתמשים ב-IconSystem **אבל עדיין יש בהם** Bootstrap Icons או FontAwesome:
+
 - `trading-ui/tag-management.html` - משתמש ב-IconSystem, אבל 12 Bootstrap Icons
 - `trading-ui/constraints.html` - משתמש ב-IconSystem, אבל 18 FontAwesome
 - `trading-ui/mockups/daily-snapshots/portfolio-state-page.html` - משתמש ב-IconSystem, אבל 7 Bootstrap Icons
@@ -252,7 +267,9 @@
 **פעולה:** החלף את הנותרים ב-Tabler Icons
 
 ### 3. נתיבי איקונים ישנים
+
 מספר קבצים עדיין משתמשים בנתיבים ישנים:
+
 - `images/icons/db_display.svg` → צריך להיות `/trading-ui/images/icons/entities/db_display.svg`
 - נתיבים ללא `tabler/` או `entities/` → צריך לעדכן
 

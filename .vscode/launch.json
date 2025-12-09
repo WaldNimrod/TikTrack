@@ -1,0 +1,79 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "firefox",
+      "request": "launch",
+      "name": "🚀 Launch Firefox - Development (RECOMMENDED)",
+      "url": "http://localhost:8080",
+      "webRoot": "${workspaceFolder}/trading-ui",
+      "pathMappings": [
+        {
+          "url": "http://localhost:8080",
+          "path": "${workspaceFolder}/trading-ui"
+        }
+      ],
+      "sourceMaps": true,
+      "reAttach": true,
+      "timeout": 30000,
+      "preLaunchTask": "check-firefox-installed"
+    },
+    {
+      "type": "firefox",
+      "request": "attach",
+      "name": "Attach to Firefox",
+      "url": "http://localhost:8080",
+      "webRoot": "${workspaceFolder}/trading-ui",
+      "pathMappings": [
+        {
+          "url": "http://localhost:8080",
+          "path": "${workspaceFolder}/trading-ui"
+        }
+      ],
+      "sourceMaps": true
+    },
+    {
+      "type": "python",
+      "request": "launch",
+      "name": "Python: Flask App",
+      "module": "flask",
+      "env": {
+        "FLASK_APP": "Backend/app.py",
+        "FLASK_ENV": "development",
+        "FLASK_DEBUG": "1"
+      },
+      "args": [
+        "run",
+        "--no-debugger",
+        "--no-reload"
+      ],
+      "jinja": true,
+      "justMyCode": false,
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "python",
+      "request": "attach",
+      "name": "Python: Attach to Process",
+      "processId": "${command:pickProcess}",
+      "justMyCode": false
+    },
+    {
+      "type": "chrome",
+      "request": "launch",
+      "name": "⚠️ Launch Chrome (NOT RECOMMENDED)",
+      "url": "http://localhost:8080",
+      "webRoot": "${workspaceFolder}/trading-ui",
+      "sourceMaps": true,
+      "runtimeExecutable": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+      "runtimeArgs": [
+        "--remote-debugging-port=9222"
+      ],
+      "presentation": {
+        "hidden": true
+      }
+    }
+  ]
+}
+

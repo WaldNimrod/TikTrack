@@ -12,12 +12,14 @@
 
 במהלך בדיקות אוטומטיות של 44 עמודים, הסקריפט היה עושה בקשות מהירות מדי לשרת, מה שגרם ל-rate limiter של השרת לחסום בקשות עם שגיאת 429.
 
-### מגבלות השרת:
+### מגבלות השרת
+
 - **Rate Limiter כללי:** 5000 requests per minute (~83 requests/second)
 - **מגבלה נוספת ב-app.py:** 10 requests per second
 - **כל עמוד טוען:** ~50-100 קבצים (scripts, CSS, images) במקביל
 
-### הבעיה:
+### הבעיה
+
 - Delay קבוע של 2 שניות לא הספיק
 - לא היה מעקב אחר מספר הבקשות
 - לא היה retry logic עבור 429 errors
@@ -38,6 +40,7 @@ class RateLimitTracker:
 ```
 
 **תכונות:**
+
 - מעקב אחר מספר הבקשות בחלון זמן של 1 שנייה
 - חישוב אוטומטי של זמן המתנה נדרש
 - מעקב אחר rate limit hits
@@ -46,12 +49,14 @@ class RateLimitTracker:
 ### 2. Retry Logic עם Exponential Backoff
 
 כאשר מזוהה שגיאת 429, הסקריפט:
+
 1. מנסה שוב עם delay הולך וגדל
 2. Base delay: 2 שניות
 3. Exponential backoff: `delay = base_delay * (2 ^ retry_count)`
 4. מקסימום 3 ניסיונות
 
 **דוגמה:**
+
 - ניסיון 1: delay 2 שניות
 - ניסיון 2: delay 4 שניות
 - ניסיון 3: delay 8 שניות
@@ -82,17 +87,20 @@ RATE_LIMIT_CONFIG = {
 
 ## שימוש
 
-### הרצה רגילה:
+### הרצה רגילה
+
 ```bash
 python3 scripts/test_pages_console_errors.py
 ```
 
 הסקריפט יפעיל אוטומטית:
+
 - Rate limiting tracking
 - Adaptive delay
 - Retry logic עבור 429 errors
 
-### פלט דוגמה:
+### פלט דוגמה
+
 ```
 [1/44] Testing: דף הבית (/) [main]
   ⏳ Rate limit: waiting 0.5s...
@@ -106,7 +114,8 @@ python3 scripts/test_pages_console_errors.py
   🔄 Retries: 1
 ```
 
-### סיכום בסיום:
+### סיכום בסיום
+
 ```
 📊 Rate Limiting: 2 rate limit hits detected
    Final adaptive delay: 3.50s
@@ -114,19 +123,22 @@ python3 scripts/test_pages_console_errors.py
 
 ## תוצאות
 
-### לפני האופטימיזציה:
+### לפני האופטימיזציה
+
 - ❌ שגיאות 429 רבות
 - ⚠️ אזהרות על rate limiting
 - ⏱️ זמן בדיקה: ~2-3 דקות
 
-### אחרי האופטימיזציה:
+### אחרי האופטימיזציה
+
 - ✅ אין שגיאות 429
 - ✅ Adaptive delay מונע rate limiting
 - ⏱️ זמן בדיקה: ~3-4 דקות (עם delay מותאם)
 
 ## התאמה אישית
 
-### הגדלת קצב הבדיקות:
+### הגדלת קצב הבדיקות
+
 ```python
 RATE_LIMIT_CONFIG = {
     'max_requests_per_second': 8,  # יותר בקשות
@@ -135,7 +147,8 @@ RATE_LIMIT_CONFIG = {
 }
 ```
 
-### הקטנת קצב הבדיקות (יותר שמרני):
+### הקטנת קצב הבדיקות (יותר שמרני)
+
 ```python
 RATE_LIMIT_CONFIG = {
     'max_requests_per_second': 3,  # פחות בקשות
@@ -144,7 +157,8 @@ RATE_LIMIT_CONFIG = {
 }
 ```
 
-### ביטול Adaptive Delay:
+### ביטול Adaptive Delay
+
 ```python
 RATE_LIMIT_CONFIG = {
     'adaptive_delay': False,  # delay קבוע
@@ -155,6 +169,7 @@ RATE_LIMIT_CONFIG = {
 ## מוניטורינג
 
 הסקריפט מדווח על:
+
 - מספר rate limit hits
 - Delay נוכחי (adaptive)
 - מספר retries לכל עמוד

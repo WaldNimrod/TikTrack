@@ -1,9 +1,11 @@
 # בדיקות אינטגרציה - Integration Tests
+
 ## TikTrack Integration Testing Suite
 
 ### 🎯 **מטרת הבדיקות**
 
 בדיקות אינטגרציה בודקות את האינטראקציה בין מערכות שונות במערכת TikTrack, כולל:
+
 - **Cache + Logger** - אינטגרציה בין מערכת המטמון למערכת הלוגים
 - **UI Systems** - אינטגרציה בין מערכות UI (Field Renderer, Button, Table)
 - **Data Systems** - אינטגרציה בין מערכות נתונים (Cache, Table, Chart)
@@ -23,6 +25,7 @@ tests/integration/
 ### 🧪 **סוגי הבדיקות**
 
 #### **1. Cache + Logger Integration**
+
 - **Cache Operations with Logging** - בדיקת לוגים בפעולות מטמון
 - **Error Handling Integration** - טיפול בשגיאות עם לוגים
 - **Cache Statistics Logging** - לוגים של סטטיסטיקות מטמון
@@ -33,6 +36,7 @@ tests/integration/
 - **Cache Health Monitoring** - ניטור בריאות מטמון
 
 #### **2. UI Systems Integration**
+
 - **Field Renderer + Button Integration** - אינטגרציה בין Field Renderer לכפתורים
 - **Table + Field Renderer Integration** - אינטגרציה בין טבלאות ל-Field Renderer
 - **Button + Table Integration** - אינטגרציה בין כפתורים לטבלאות
@@ -41,6 +45,7 @@ tests/integration/
 - **Data Flow Integration** - זרימת נתונים בין מערכות UI
 
 #### **3. Data Systems Integration**
+
 - **Cache + Table Integration** - אינטגרציה בין מטמון לטבלאות
 - **Cache + Chart Integration** - אינטגרציה בין מטמון לגרפים
 - **Table + Chart Integration** - אינטגרציה בין טבלאות לגרפים
@@ -49,6 +54,7 @@ tests/integration/
 - **Error Handling Integration** - טיפול בשגיאות במערכות נתונים
 
 #### **4. API Systems Integration**
+
 - **API Request Caching** - מטמון בקשות API
 - **API Request Logging** - לוגים של בקשות API
 - **API Response Processing** - עיבוד תגובות API
@@ -60,11 +66,13 @@ tests/integration/
 ### 🚀 **הרצת הבדיקות**
 
 #### **הרצת כל בדיקות האינטגרציה:**
+
 ```bash
 npm run test:integration
 ```
 
 #### **הרצת בדיקות ספציפיות:**
+
 ```bash
 # בדיקות Cache + Logger
 npm test tests/integration/cache-logger-integration.test.js
@@ -80,6 +88,7 @@ npm test tests/integration/api-systems-integration.test.js
 ```
 
 #### **הרצת בדיקות עם כיסוי:**
+
 ```bash
 npm run test:integration -- --coverage
 ```
@@ -87,21 +96,25 @@ npm run test:integration -- --coverage
 ### 📊 **סטטיסטיקות הבדיקות**
 
 #### **Cache + Logger Integration:**
+
 - **8 בדיקות** - כיסוי מלא של אינטגרציה
 - **זמן הרצה**: ~2-3 שניות
 - **כיסוי**: 95%+
 
 #### **UI Systems Integration:**
+
 - **6 בדיקות** - כיסוי מלא של מערכות UI
 - **זמן הרצה**: ~3-4 שניות
 - **כיסוי**: 90%+
 
 #### **Data Systems Integration:**
+
 - **6 בדיקות** - כיסוי מלא של מערכות נתונים
 - **זמן הרצה**: ~4-5 שניות
 - **כיסוי**: 85%+
 
 #### **API Systems Integration:**
+
 - **7 בדיקות** - כיסוי מלא של מערכות API
 - **זמן הרצה**: ~5-6 שניות
 - **כיסוי**: 80%+
@@ -109,21 +122,25 @@ npm run test:integration -- --coverage
 ### 🎯 **יתרונות הבדיקות**
 
 #### **1. אמינות גבוהה (95%+)**
+
 - בדיקות עם **קוד אמיתי** במקום Mock פשוט
 - תרחישים אמיתיים של אינטגרציה
 - זיהוי בעיות אמיתיות
 
 #### **2. כיסוי מקיף**
+
 - **27 בדיקות** בסך הכל
 - כיסוי של כל המערכות המרכזיות
 - בדיקת כל תרחישי האינטגרציה
 
 #### **3. ביצועים מעולים**
+
 - זמן הרצה כולל: **15-20 שניות**
 - בדיקות מקבילות
 - ניטור ביצועים
 
 #### **4. תחזוקה קלה**
+
 - מבנה מסודר וברור
 - תיעוד מפורט
 - קלות הוספת בדיקות חדשות
@@ -131,6 +148,7 @@ npm run test:integration -- --coverage
 ### 🔧 **הוספת בדיקות חדשות**
 
 #### **1. יצירת קובץ בדיקה חדש:**
+
 ```javascript
 // tests/integration/new-system-integration.test.js
 describe('New System Integration', () => {
@@ -139,6 +157,7 @@ describe('New System Integration', () => {
 ```
 
 #### **2. הוספת בדיקה לקובץ קיים:**
+
 ```javascript
 describe('Existing System Integration', () => {
     test('should test new integration scenario', () => {
@@ -148,6 +167,7 @@ describe('Existing System Integration', () => {
 ```
 
 #### **3. עדכון האינדקס:**
+
 ```markdown
 # הוספה ל-README.md
 - **New System Integration** - בדיקות אינטגרציה למערכת חדשה
@@ -156,17 +176,20 @@ describe('Existing System Integration', () => {
 ### 📋 **רשימת בדיקות**
 
 #### **✅ הושלמו:**
+
 - [x] Cache + Logger Integration (8 בדיקות)
 - [x] UI Systems Integration (6 בדיקות)
 - [x] Data Systems Integration (6 בדיקות)
 - [x] API Systems Integration (7 בדיקות)
 
 #### **🔄 בתהליך:**
+
 - [ ] Performance Integration Tests
 - [ ] Security Integration Tests
 - [ ] Error Recovery Integration Tests
 
 #### **📅 מתוכנן:**
+
 - [ ] Mobile Integration Tests
 - [ ] Offline Integration Tests
 - [ ] Real-time Integration Tests
@@ -174,6 +197,7 @@ describe('Existing System Integration', () => {
 ### 🎉 **סיכום**
 
 בדיקות האינטגרציה שלנו מספקות:
+
 - **כיסוי מקיף** של כל המערכות
 - **אמינות גבוהה** עם קוד אמיתי
 - **ביצועים מעולים** עם זמן הרצה קצר

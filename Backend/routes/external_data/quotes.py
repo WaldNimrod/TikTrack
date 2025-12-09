@@ -3,14 +3,14 @@ Quotes API Routes - External Data Integration
 API endpoints for quote operations
 """
 
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, g
 from datetime import datetime, timezone, timedelta
 import logging
 
 from models.ticker import Ticker
 from models.external_data import MarketDataQuote, ExternalDataProvider
 from config.database import get_db
-from routes.api.base_entity_decorators import require_authentication
+from routes.api.base_entity_decorators import require_authentication, handle_database_session
 
 logger = logging.getLogger(__name__)
 
@@ -19,14 +19,20 @@ quotes_bp = Blueprint('external_data_quotes', __name__, url_prefix='/api/externa
 
 
 @quotes_bp.route('/<int:ticker_id>', methods=['GET'])
+@handle_database_session()
 def get_ticker_quote(ticker_id):
     """Get quote for a specific ticker"""
     try:
-        # Query parameters
-        user_id = request.args.get('user_id', type=int)
+        # Enforce authenticated user
+        user_id = getattr(g, 'user_id', None)
+        if user_id is None:
+            return jsonify({
+                'status': 'error',
+                'message': 'User authentication required'
+            }), 401
         
         # Get database session
-        db_session = next(get_db())
+        db_session = g.db
         
         try:
             # Get ticker information
@@ -93,12 +99,6 @@ def get_ticker_quote(ticker_id):
                     'suggestion': 'Data should be refreshed from external provider'
                 }
             
-            # Add timezone info if user_id provided
-            if user_id:
-                # TODO: Implement timezone conversion based on user preferences
-                quote_data['asof_local'] = quote_data['asof_utc']
-                quote_data['fetched_at_local'] = quote_data['fetched_at']
-            
             return jsonify({
                 'status': 'success',
                 'data': quote_data
@@ -119,12 +119,20 @@ def get_ticker_quote(ticker_id):
 
 
 @quotes_bp.route('/batch', methods=['GET'])
+@handle_database_session()
 def get_batch_quotes():
     """Get quotes for multiple tickers"""
     try:
         # Query parameters
         ticker_ids_str = request.args.get('ticker_ids', '')
-        user_id = request.args.get('user_id', type=int)
+        
+        # Enforce authenticated user
+        user_id = getattr(g, 'user_id', None)
+        if user_id is None:
+            return jsonify({
+                'status': 'error',
+                'message': 'User authentication required'
+            }), 401
         
         if not ticker_ids_str:
             return jsonify({
@@ -142,7 +150,7 @@ def get_batch_quotes():
             }), 400
         
         # Get database session
-        db_session = next(get_db())
+        db_session = g.db
         
         try:
             quotes_data = []

@@ -1,4 +1,5 @@
 # Business Logic Layer - Complete System Reference
+
 # Business Logic Layer - הפניה מלאה למערכת
 
 **תאריך יצירה:** 22 נובמבר 2025  
@@ -312,24 +313,29 @@
 ## 📊 סיכום סטטוס
 
 ### ישויות
+
 - ✅ **5 ישויות מוכנות** (Trade, Execution, Alert, CashFlow, Statistics)
 - ⏳ **7 ישויות צריכות Business Service** (Note, TradingAccount, TradePlan, Ticker, Currency, Tag, Preferences)
 - ⏳ **12 ישויות אופציונליות** (ישויות משניות)
 
 ### Data Services
+
 - ✅ **8 Data Services מוכנים** (TradesData, ExecutionsData, AlertsData, CashFlowsData, NotesData, TradingAccountsData, TradePlansData, TickersData)
 - ⏳ **4 Data Services צריכים Wrappers** (PreferencesData, ResearchData, DataImportData, DashboardData)
 
 ### עמודים
+
 - ✅ **9 עמודים מוכנים** (Trades, Executions, Alerts, Cash Flows, Trade Plans, Trading Accounts, Tickers, Notes)
 - ⏳ **3 עמודים צריכים Business Service** (Dashboard, Data Import, Research)
 - ✅ **17 עמודים טכניים** (מוכנים)
 
 ### מערכות כלליות
+
 - ✅ **28 מערכות מוכנות** (Core, UI, CRUD חלקי)
 - ⏳ **12 מערכות צריכות אינטגרציה** (מטמון, איתחול, Business Logic)
 
 ### Business Logic Services
+
 - ✅ **11 Business Services קיימים** (Trade, Execution, Alert, Statistics, CashFlow, Note, TradingAccount, TradePlan, Ticker, Currency, Tag)
 - ⏳ **1 Business Service חסר** (Preferences - מורכב)
 
@@ -341,30 +347,35 @@
 
 `StatisticsBusinessService` מספק חישובי סטטיסטיקה, KPI, וביצועי פורטפוליו.
 
-### תכונות עיקריות:
+### תכונות עיקריות
+
 - ✅ חישובי סטטיסטיקה בסיסיים: sum, average, count, min/max
 - ✅ חישובי KPI מורכבים
 - ✅ **חישוב Time-Weighted Return (TWR)** לביצועי פורטפוליו
 
-### פונקציות מרכזיות:
+### פונקציות מרכזיות
 
-#### 1. פונקציות בסיסיות:
+#### 1. פונקציות בסיסיות
+
 - `calculate_sum(data, field)` - חישוב סכום
 - `calculate_average(data, field)` - חישוב ממוצע
 - `count_records(data, filter_fn)` - ספירה עם פילטר
 - `calculate_min_max(data, field)` - מינימום ומקסימום
 
-#### 2. חישובי KPI:
+#### 2. חישובי KPI
+
 - `calculate_kpi(calculation_type, data, params)` - חישוב KPI על פי סוג
   - סוגים: 'kpi', 'summary', 'average', 'position', 'portfolio'
 
-#### 3. חישוב Time-Weighted Return:
+#### 3. חישוב Time-Weighted Return
+
 - `calculate_time_weighted_return(db, account_id, start_date, end_date, include_cash_flows)`
   - **מטרה**: חישוב ביצועי פורטפוליו ללא השפעה של הפקדות/משיכות
   - **איך זה עובד**: מחלק את התקופה לתת-תקופות בין cash flows, מחשב תשואה לכל תת-תקופה, ומכפיל את כל התשואות
   - **למה חשוב**: מתחשב בזמן הכניסה של הכסף - הפקדה בחודש הראשון "עובדת" יותר זמן מהפקדה בחודש האחרון
 
-### תיעוד מפורט:
+### תיעוד מפורט
+
 📚 **ראה:** [`STATISTICS_BUSINESS_SERVICE_GUIDE.md`](../GUIDES/STATISTICS_BUSINESS_SERVICE_GUIDE.md) למדריך מפורט עם דוגמאות שימוש
 
 ---

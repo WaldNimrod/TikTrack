@@ -43,14 +43,16 @@
 
 ## קבצים שעודכנו
 
-### קבצים שעודכנו:
+### קבצים שעודכנו
+
 1. `trading-ui/scripts/modules/core-systems.js` - הוספת `initializePreferencesForPage()`
 2. `trading-ui/scripts/init-system/package-manifest.js` - תיקון תלויות, הוספת core-systems.js ל-base
 3. `trading-ui/scripts/page-initialization-configs.js` - עדכון הערות
 4. **35 קבצי HTML** - הסרת `unified-app-initializer.js`
 5. **9 קבצי HTML** - הסרת טעינות ידניות של `core-systems.js`
 
-### קבצים חדשים:
+### קבצים חדשים
+
 1. `trading-ui/scripts/init-system/dependency-analyzer.js`
 2. `trading-ui/scripts/init-system/load-order-validator.js`
 3. `trading-ui/scripts/init-system/initialization-checker.js`
@@ -60,11 +62,13 @@
 ## ארכיטקטורה סופית
 
 ### נקודת כניסה אחת
+
 - **`core-systems.js`** בלבד אחראי על initialization ✅
 - נטען אוטומטית דרך `base` package בכל העמודים ✅
 - `unified-app-initializer.js` הוסר מכל העמודים ✅
 
 ### זרימת אתחול
+
 1. **BASE Package** נטען (כולל `core-systems.js`)
 2. **Stage 1:** Detect and Analyze - זיהוי עמוד וניתוח מערכות זמינות
 3. **Stage 2:** Prepare Configuration
@@ -80,6 +84,7 @@
 5. **Stage 4:** Finalize
 
 ### אתחול העדפות
+
 - **מקור הקונפיגורציה:** `page-initialization-configs.js` - PAGE_CONFIGS עם `packages` array
 - **זרימת אתחול:**
   1. `prepareConfiguration()` קורא ל-`window.pageInitializationConfigs[pageName]`
@@ -91,6 +96,7 @@
 - **Deduplication:** `_preferencesInitialized` flag מונע כפילויות
 
 ### ⚠️ שינויים קריטיים (2025-01-27)
+
 - **PAGE_CONFIGS:** מוגדר רק ב-`page-initialization-configs.js` (לא ב-`core-systems.js`)
 - **packages array:** חובה לכל עמוד שצריך העדפות - מוגדר ב-`page-initialization-configs.js`
 - **prepareConfiguration():** מעתיק `packages` מה-pageConfig ל-config
@@ -99,26 +105,32 @@
 ## בדיקות נדרשות
 
 ### בדיקה 1: טעינת העדפות פעם אחת
+
 ```javascript
 // בקונסולה:
 window.runComprehensiveInitializationTest()
 ```
+
 - לבדוק בקונסולה Network שטעינה אחת בלבד ל-`/api/preferences/user`
 - לבדוק ללא cache (hard refresh: Cmd+Shift+R)
 - לבדוק עם cache
 
 ### בדיקה 2: אין 429 errors
+
 - לבדוק שכל העמודים עובדים ללא 429
 - לבדוק עם cache ובלי cache
 - לבדוק טעינה מהירה של עמודים
 
 ### בדיקה 3: נתונים זמינים
+
 - לבדוק שהעדפות זמינות לפני שצריך (לפני טעינת נתונים)
 - לבדוק שצבעים זמינים מיד
 - לבדוק שאין שגיאות "undefined" בגישה להעדפות
 
 ### בדיקה 4: בדיקת כל העמודים
+
 עמודים לבדיקה:
+
 - index.html
 - preferences.html
 - trades.html
@@ -134,11 +146,14 @@ window.runComprehensiveInitializationTest()
 ## כלי בדיקה
 
 ### 1. Comprehensive Initialization Test
+
 ```javascript
 // בקונסולה:
 window.runComprehensiveInitializationTest()
 ```
+
 בודק:
+
 - core-systems.js נטען
 - העדפות מאותחלות פעם אחת
 - אין כפילויות
@@ -146,44 +161,55 @@ window.runComprehensiveInitializationTest()
 - אין 429 errors
 
 ### 2. Dependency Analyzer
+
 ```javascript
 // בקונסולה:
 window.dependencyAnalyzer.printReport()
 ```
+
 בודק:
+
 - מעגלי תלויות
 - תלויות חסרות
 - שרשרת תלויות
 
 ### 3. Initialization Checker
+
 ```javascript
 // בקונסולה:
 window.initializationChecker.printReport()
 ```
+
 בודק:
+
 - כפילויות אתחול
 - התנגשויות
 - אתחול העדפות
 
 ### 4. Page Health Checker
+
 ```javascript
 // בקונסולה:
 window.pageHealthChecker.printReport()
 ```
+
 בודק:
+
 - זמינות מערכות
 - בריאות עמוד
 - ביצועים
 
 ## סיכום שינויים
 
-### לפני:
+### לפני
+
 - ❌ שתי מערכות initialization במקביל
 - ❌ העדפות לא נטענות בזמן
 - ❌ 429 errors
 - ❌ נתונים לא זמינים
 
-### אחרי:
+### אחרי
+
 - ✅ נקודת כניסה אחת: `core-systems.js`
 - ✅ העדפות נטענות פעם אחת ב-Stage 3
 - ✅ אין 429 errors
@@ -193,6 +219,7 @@ window.pageHealthChecker.printReport()
 ## המלצות לבדיקה
 
 1. **להריץ את הבדיקה המקיפה:**
+
    ```javascript
    window.runComprehensiveInitializationTest()
    ```

@@ -144,7 +144,7 @@ async function checkForMismatches(pageName, pageConfig, htmlScripts = null) {
         'trading-journal-page.js',
         'date-comparison-modal.js',
         'trade-history-page.js',
-        'portfolio-state-page.js',
+        'portfolio-state.js',
         'price-history-page.js',
         'comparative-analysis-page.js',
         'strategy-analysis-page.js',
@@ -771,8 +771,8 @@ async function runDetailedPageScan(pageName, pageConfig) {
         currentPage = 'watch-list';
     } else if (path.includes('trade-history-page')) {
         currentPage = 'trade-history-page';
-    } else if (path.includes('portfolio-state-page')) {
-        currentPage = 'portfolio-state-page';
+    } else if (path.includes('portfolio-state')) {
+        currentPage = 'portfolio-state';
     } else if (path.includes('trading-journal-page')) {
         currentPage = 'trading-journal-page';
     }

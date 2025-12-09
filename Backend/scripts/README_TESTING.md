@@ -1,4 +1,5 @@
 # מדריך בדיקות - מערכת Multi-User
+
 ## TikTrack - November 29, 2025
 
 ---
@@ -6,11 +7,13 @@
 ## 🚀 התחלה מהירה
 
 ### בדיקות מהירות (10 שניות)
+
 ```bash
 ./Backend/scripts/quick_test.sh
 ```
 
 ### בדיקות מקיפות (30-60 שניות)
+
 ```bash
 ./Backend/scripts/run_final_tests.sh
 ```
@@ -29,19 +32,24 @@
 ## 🧪 סקריפטי בדיקות
 
 ### 1. Quick Test (`quick_test.sh`)
+
 בדיקות מהירות בסיסיות:
+
 - שרת רץ
 - התחברות
 - Endpoints מוגנים
 - טיקרים
 
 **הרצה:**
+
 ```bash
 ./Backend/scripts/quick_test.sh
 ```
 
 ### 2. Comprehensive Tests (`comprehensive_multi_user_tests.py`)
+
 בדיקות מקיפות:
+
 - כל בדיקות Quick Test
 - הרשמה
 - Data isolation
@@ -49,17 +57,21 @@
 - Security
 
 **הרצה:**
+
 ```bash
 python3 Backend/scripts/comprehensive_multi_user_tests.py
 ```
 
 ### 3. Multi-User Migration Test (`test_multi_user_system.py`)
+
 בדיקות ספציפיות למיגרציה:
+
 - Schema changes
 - Data migration
 - User creation
 
 **הרצה:**
+
 ```bash
 python3 Backend/scripts/test_multi_user_system.py
 ```
@@ -102,6 +114,7 @@ python3 Backend/scripts/test_multi_user_system.py
 ## 🔌 בדיקות API
 
 ### Authentication
+
 ```bash
 # התחברות
 curl -X POST http://localhost:8080/api/auth/login \
@@ -119,6 +132,7 @@ curl -X POST http://localhost:8080/api/auth/logout \
 ```
 
 ### Data Endpoints
+
 ```bash
 # Trades
 curl -X GET http://localhost:8080/api/trades/ \
@@ -134,6 +148,7 @@ curl -X GET http://localhost:8080/api/tickers/ \
 ```
 
 ### Security
+
 ```bash
 # ללא authentication (צריך להיכשל)
 curl -X GET http://localhost:8080/api/trades/
@@ -145,6 +160,7 @@ curl -X GET http://localhost:8080/api/trades/
 ## ✅ קריטריונים להצלחה
 
 המערכת מוכנה אם:
+
 - ✅ כל בדיקות Authentication עוברות
 - ✅ כל בדיקות Data Isolation עוברות
 - ✅ כל בדיקות Security עוברות
@@ -157,6 +173,7 @@ curl -X GET http://localhost:8080/api/trades/
 ## 📞 תמיכה
 
 אם נתקלת בבעיה:
+
 1. ראה `FINAL_TESTING_GUIDE.md` לפתרונות נפוצים
 2. בדוק את ה-logs ב-`Backend/logs/`
 3. ודא שהשרת רץ: `curl http://localhost:8080/api/health`

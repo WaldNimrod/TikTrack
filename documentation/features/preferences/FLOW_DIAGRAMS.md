@@ -254,29 +254,36 @@ loadGroupData() - טעינה מחדש! ⚠️
 ## רשימת בעיות מזוהות
 
 ### בעיה 1: טעינה מחדש מיותרת אחרי שמירה
+
 **מיקום:** `refreshGroupState()` → `loadGroupPreferences(forceRefresh=true)`
 **השפעה:** קריאת API מיותרת, איטיות
 **פתרון מוצע:** עדכון אופטימי של UI עם הערכים שנשמרו
 
 ### בעיה 2: populateGroupFields() פעמיים
-**מיקום:** 
+
+**מיקום:**
+
 - `refreshGroupState()` → `populateGroupFields()`
 - Event `preferences:updated` → `_populateAllFormFields()` → `populateGroupFields()`
 **השפעה:** עדכון כפול של שדות
 **פתרון מוצע:** הסרת אחד מהקריאות
 
 ### בעיה 3: refreshUserPreferences() טוען מחדש
+
 **מיקום:** `unified-cache-manager.js:3280-3302`
 **השפעה:** טעינה מחדש מהשרת אחרי ניקוי מטמון
 **פתרון מוצע:** הסרת הטעינה מחדש, רק ניקוי מטמון
 
 ### בעיה 4: מספר נקודות כניסה למטמון
+
 **מיקום:** UnifiedCacheManager, PreferencesCore, PreferencesData, CacheSyncManager
 **השפעה:** קשה לעקוב אחרי ניהול מטמון
 **פתרון מוצע:** נקודת כניסה אחת - PreferencesCache
 
 ### בעיה 5: פורמטי cache keys לא עקביים
-**מיקום:** 
+
+**מיקום:**
+
 - `preference_{name}_{userId}_{profileId}`
 - `preference_group_{groupName}_{userId}_{profileId}`
 - `preferences_all_u{userId}_p{profileId}`
@@ -285,11 +292,13 @@ loadGroupData() - טעינה מחדש! ⚠️
 **פתרון מוצע:** פורמט אחיד `preference_{type}_{identifier}_{userId}_{profileId}`
 
 ### בעיה 6: Race Conditions
+
 **מיקום:** Concurrent loads, Save + Load, Cache Invalidation + Read
 **השפעה:** תוצאות לא עקביות
 **פתרון מוצע:** Deduplication + Locking mechanism
 
 ### בעיה 7: מספר מערכות מקבילות
+
 **מיקום:** PreferencesUI, PreferencesUIV4, PreferencesCore, PreferencesGroupManager
 **השפעה:** סיבוכיות יתר
 **פתרון מוצע:** איחוד ל-PreferencesManager מרכזי
@@ -302,6 +311,7 @@ loadGroupData() - טעינה מחדש! ⚠️
 **מספר race conditions:** 3
 
 **עדיפויות:**
+
 1. **גבוהה:** הסרת טעינות מיותרות אחרי שמירה
 2. **גבוהה:** איחוד population - נקודת כניסה אחת
 3. **בינונית:** איחוד ניהול מטמון

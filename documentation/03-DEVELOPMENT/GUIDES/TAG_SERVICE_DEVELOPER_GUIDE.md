@@ -1,11 +1,13 @@
 # Tag Service Developer Guide
 
 ## 1. Introduction
+
 The Tag Service provides a unified API and UI toolkit for managing categories, tags, and assignments across all TikTrack entities. This guide explains the development workflow, coding standards, integration points, and troubleshooting tips for future maintainers.
 
 ---
 
 ## 2. File Inventory
+
 | Layer | Path | Notes |
 | --- | --- | --- |
 | Backend Models | `Backend/models/tag_category.py`, `tag.py`, `tag_link.py` | SQLAlchemy models with docstrings & indexes |
@@ -19,6 +21,7 @@ The Tag Service provides a unified API and UI toolkit for managing categories, t
 ---
 
 ## 3. Development Workflow
+
 1. **Create/Update Models:** add fields, maintain indexes; run `alembic revision --autogenerate`.
 2. **Service Logic:** extend `TagService` (keep public API documented via docstrings).
 3. **API Changes:** update endpoint schema & ensure compatibility with `CRUDResponseHandler`.
@@ -29,6 +32,7 @@ The Tag Service provides a unified API and UI toolkit for managing categories, t
 ---
 
 ## 4. Coding Standards
+
 - Respect project conventions: function index at file top, JSDoc for every exported function/class, docstrings for Python public methods.
 - Avoid inline styles; rely on ITCSS layers for visual updates.
 - Use existing systems (ModalManagerV2, SelectPopulatorService, UnifiedCacheManager) instead of ad-hoc routines.
@@ -38,6 +42,7 @@ The Tag Service provides a unified API and UI toolkit for managing categories, t
 ---
 
 ## 5. Integration Points
+
 - **Cache Invalidation:** call `TagService.invalidate_entity(entityType, entityId)` after assignment changes.
 - **PageStateManager:** persist tag filters per page via `saveFilters` / `loadFilters`.
 - **Analytics:** update `StatisticsCalculator` consumers to include tag metrics when introducing new dashboards.
@@ -46,6 +51,7 @@ The Tag Service provides a unified API and UI toolkit for managing categories, t
 ---
 
 ## 6. Testing Guidelines
+
 - **Backend:** `pytest tests/backend/test_tag_service.py -q` plus entity-specific tests.
 - **Frontend:** `npm run test -- tag-service` (unit) and `npm run test:integration -- tagging`.
 - **Accessibility:** execute `npm run test:a11y -- tag-management` to verify ARIA, focus handling, contrast.
@@ -54,6 +60,7 @@ The Tag Service provides a unified API and UI toolkit for managing categories, t
 ---
 
 ## 7. Troubleshooting
+
 | Symptom | Likely Cause | Resolution |
 | --- | --- | --- |
 | Tags don’t persist after save | Cache not invalidated | Ensure CRUD handler calls TagService.invalidate and `load*Data` bypass cache |
@@ -64,6 +71,7 @@ The Tag Service provides a unified API and UI toolkit for managing categories, t
 ---
 
 ## 8. Future Enhancements
+
 - Real-time tag collaboration via WebSocket channel.
 - Tag recommendation engine leveraging usage analytics.
 - Export/import tags per user profile.

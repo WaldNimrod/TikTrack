@@ -1,4 +1,5 @@
 # תוכנית עבודה מקיפה - Business Logic Layer Refactoring
+
 # Comprehensive Business Logic Refactoring Plan
 
 **תאריך יצירה:** 22 נובמבר 2025  
@@ -21,16 +22,19 @@
 ## 📊 היקף התוכנית - סטטיסטיקות מעודכנות
 
 ### מערכות כלליות
+
 - **28 מערכות מתועדות** (לפי GENERAL_SYSTEMS_LIST.md)
 - **+12 מערכות נוספות** (investment-calculation, statistics-calculator, וכו')
 - **סה"כ: ~40 מערכות כלליות**
 
 ### עמודים
+
 - **28 עמודים ראשיים** (לפי PAGES_LIST.md)
 - **11 עמודים מרכזיים** (trades, executions, alerts, וכו')
 - **12 עמודים טכניים** (db_display, constraints, וכו')
 
 ### Data Services
+
 - **12 Data Services קיימים**:
   1. ✅ trades-data.js (עודכן)
   2. ✅ executions-data.js (עודכן)
@@ -48,6 +52,7 @@
 ### ישויות במערכת (לפי Backend/models)
 
 **ישויות ראשיות (12 ישויות):**
+
 - ✅ **Trade** - Business Service נוצר
 - ✅ **Execution** - Business Service נוצר
 - ✅ **Alert** - Business Service נוצר
@@ -63,6 +68,7 @@
 - ✅ **Preferences** - Business Service נוצר (שלב ראשון - בסיס יציב)
 
 **ישויות משניות (12 ישויות):**
+
 - ❌ **NoteRelationType** - אופציונלי
 - ❌ **ExternalDataProvider** - אופציונלי
 - ❌ **MarketDataQuote** - אופציונלי
@@ -88,6 +94,7 @@
 ### שלב 1.1: יצירת מבנה Business Logic Layer ✅ **הושלם**
 
 **קבצים שנוצרו:**
+
 - ✅ `Backend/services/business_logic/__init__.py`
 - ✅ `Backend/services/business_logic/base_business_service.py`
 - ✅ `Backend/services/business_logic/business_rules_registry.py`
@@ -95,6 +102,7 @@
 ### שלב 1.2-1.6: Business Services בסיסיים ✅ **הושלם במלואו**
 
 **Services שנוצרו (12 services):**
+
 - ✅ `TradeBusinessService`
 - ✅ `ExecutionBusinessService`
 - ✅ `AlertBusinessService`
@@ -111,15 +119,18 @@
 ### שלב 1.7: Note Business Logic Service ❌ **חסר**
 
 **קבצים ליצירה:**
+
 - `Backend/services/business_logic/note_business_service.py`
 - `Backend/tests/services/business_logic/test_note_business_service.py`
 
 **לוגיקה עסקית להעברה:**
+
 - ולידציות של הערות
 - חישובי קישורים בין הערות לישויות
 - ולידציות של note_relation_types
 
 **קריטריוני השלמה:**
+
 - [ ] Service נוצר
 - [ ] API endpoints נוצרו
 - [ ] טסטים נכתבו
@@ -130,15 +141,18 @@
 ### שלב 1.8: TradingAccount Business Logic Service ❌ **חסר**
 
 **קבצים ליצירה:**
+
 - `Backend/services/business_logic/trading_account_business_service.py`
 - `Backend/tests/services/business_logic/test_trading_account_business_service.py`
 
 **לוגיקה עסקית להעברה:**
+
 - חישובי יתרות חשבון
 - ולידציות של חשבונות
 - חישובי פוזיציות לפי חשבון
 
 **קריטריוני השלמה:**
+
 - [ ] Service נוצר
 - [ ] API endpoints נוצרו
 - [ ] טסטים נכתבו
@@ -149,15 +163,18 @@
 ### שלב 1.9: TradePlan Business Logic Service ❌ **חסר**
 
 **קבצים ליצירה:**
+
 - `Backend/services/business_logic/trade_plan_business_service.py`
 - `Backend/tests/services/business_logic/test_trade_plan_business_service.py`
 
 **לוגיקה עסקית להעברה:**
+
 - חישובי מחירים (מ-trade_plans.js)
 - ולידציות של תוכניות
 - חישובי התאמה בין תוכניות לטריידים
 
 **קריטריוני השלמה:**
+
 - [ ] Service נוצר
 - [ ] API endpoints נוצרו
 - [ ] טסטים נכתבו
@@ -168,15 +185,18 @@
 ### שלב 1.10: Ticker Business Logic Service ❌ **חסר**
 
 **קבצים ליצירה:**
+
 - `Backend/services/business_logic/ticker_business_service.py`
 - `Backend/tests/services/business_logic/test_ticker_business_service.py`
 
 **לוגיקה עסקית להעברה:**
+
 - ולידציות של טיקרים
 - חישובי מחירים נוכחיים
 - ולידציות של סימבולים
 
 **קריטריוני השלמה:**
+
 - [ ] Service נוצר
 - [ ] API endpoints נוצרו
 - [ ] טסטים נכתבו
@@ -187,15 +207,18 @@
 ### שלב 1.11: Currency Business Logic Service ❌ **חסר**
 
 **קבצים ליצירה:**
+
 - `Backend/services/business_logic/currency_business_service.py`
 - `Backend/tests/services/business_logic/test_currency_business_service.py`
 
 **לוגיקה עסקית להעברה:**
+
 - חישובי המרות מטבע
 - ולידציות של שערי חליפין
 - חישובי ערכים במטבעות שונים
 
 **קריטריוני השלמה:**
+
 - [ ] Service נוצר
 - [ ] API endpoints נוצרו
 - [ ] טסטים נכתבו
@@ -206,15 +229,18 @@
 ### שלב 1.12: Tag Business Logic Service ❌ **חסר**
 
 **קבצים ליצירה:**
+
 - `Backend/services/business_logic/tag_business_service.py`
 - `Backend/tests/services/business_logic/test_tag_business_service.py`
 
 **לוגיקה עסקית להעברה:**
+
 - ולידציות של תגיות
 - חישובי קישורים בין תגיות לישויות
 - ולידציות של קטגוריות תגיות
 
 **קריטריוני השלמה:**
+
 - [ ] Service נוצר
 - [ ] API endpoints נוצרו
 - [ ] טסטים נכתבו
@@ -228,7 +254,8 @@
 
 **Data Services שצריך לעדכן:**
 
-#### ✅ עודכנו במלואם:
+#### ✅ עודכנו במלואם
+
 1. ✅ `trades-data.js` - הוספת wrappers ל-API + מטמון
 2. ✅ `executions-data.js` - הוספת wrappers ל-API + מטמון
 3. ✅ `alerts-data.js` - הוספת wrappers ל-API + מטמון
@@ -238,13 +265,15 @@
 7. ✅ `trade-plans-data.js` - הוספת wrappers ל-API + מטמון
 8. ✅ `tickers-data.js` - הוספת wrappers ל-API + מטמון
 
-#### ⏳ לא נדרש (אין Business Logic):
+#### ⏳ לא נדרש (אין Business Logic)
+
 9. ⏳ `preferences-data.js` - אין Business Logic API נדרש
 10. ⏳ `research-data.js` - אין Business Logic API נדרש
 11. ⏳ `data-import-data.js` - אין Business Logic API נדרש
 12. ⏳ `dashboard-data.js` - אין Business Logic API נדרש
 
 **תהליך עבודה לכל Service:**
+
 1. זיהוי כל החישובים בכל Data Service
 2. החלפה ב-API calls ל-Backend
 3. עדכון error handling
@@ -262,7 +291,8 @@
 
 **עמודים לעדכון (28 עמודים):**
 
-#### עמודים מרכזיים (8 עמודים עם Business Logic):
+#### עמודים מרכזיים (8 עמודים עם Business Logic)
+
 1. ✅ `trades.html` + `trades.js` - עודכן + תיקון ולידציה
 2. ✅ `executions.html` + `executions.js` - עודכן
 3. ✅ `alerts.html` + `alerts.js` - עודכן
@@ -272,16 +302,19 @@
 7. ✅ `tickers.html` + `tickers.js` - עודכן
 8. ✅ `notes.html` + `notes.js` - עודכן
 
-#### עמודים ללא Business Logic (לא נדרש עדכון):
+#### עמודים ללא Business Logic (לא נדרש עדכון)
+
 9. ⏳ `index.html` + `index.js` (dashboard) - אין Business Logic API נדרש
 10. ⏳ `data_import.html` + `data_import.js` - אין Business Logic API נדרש
 11. ⏳ `research.html` + `research.js` - אין Business Logic API נדרש
 12. ⏳ `preferences.html` + `preferences-core-new.js` - אין Business Logic API נדרש
 
-#### עמודים טכניים (12 עמודים):
+#### עמודים טכניים (12 עמודים)
+
 13-24. כל העמודים הטכניים (db_display, constraints, etc.)
 
 **תהליך עבודה לכל עמוד:**
+
 1. **סריקה:**
    - זיהוי כל החישובים המקומיים
    - זיהוי כל הולידציות העסקיות
@@ -318,14 +351,15 @@
 
 **מערכות כלליות לעדכון (~40 מערכות):**
 
-#### ✅ עודכנו:
+#### ✅ עודכנו
+
 1. ✅ `ui-utils.js` - עדכון פונקציות מחירים (עם fallback)
 2. ✅ **מערכות מטמון** - אינטגרציה מלאה:
    - ✅ `unified-cache-manager.js` - אינטגרציה מלאה עם Business Logic API
    - ✅ `cache-ttl-guard.js` - אינטגרציה מלאה עם Business Logic API
    - ✅ `cache-sync-manager.js` - אינטגרציה מלאה עם Business Logic API
 
-#### ❌ צריכים עדכון:
+#### ❌ צריכים עדכון
 
 **מערכות Core (8 מערכות):**
 2. ❌ `unified-app-initializer.js` - **קריטי**: וידוא אינטגרציה עם Business Logic API
@@ -366,6 +400,7 @@
 40. ❌ `default-value-setter.js` - בדיקת אינטגרציה
 
 **תהליך עבודה לכל מערכת:**
+
 1. **סריקה:**
    - זיהוי לוגיקה עסקית
    - זיהוי חישובים
@@ -403,6 +438,7 @@
 ### שלב 2.5.1: הבנת ארכיטקטורת האיתחול ✅ **הושלם**
 
 **קבצים לקריאה:**
+
 - ✅ `documentation/02-ARCHITECTURE/FRONTEND/UNIFIED_INITIALIZATION_SYSTEM.md`
 - ✅ `documentation/02-ARCHITECTURE/FRONTEND/MONITORING_SYSTEM_V2.md`
 - ✅ `trading-ui/scripts/modules/core-systems.js`
@@ -410,6 +446,7 @@
 - ✅ `trading-ui/scripts/init-system/package-manifest.js`
 
 **תובנות מרכזיות:**
+
 1. **מערכת מוניטורינג ותיעוד (לא טעינה דינמית)**:
    - `page-initialization-configs.js` - מגדיר אילו packages נדרשים לכל עמוד
    - `package-manifest.js` - מגדיר אילו scripts בכל package
@@ -447,6 +484,7 @@
    - מתחיל ב-Stage 1 (Core Systems)
 
 **קריטריוני השלמה:**
+
 - [ ] כל התיעוד נקרא
 - [ ] כל הקבצים נבדקו
 - [ ] כל התובנות הובנו
@@ -454,6 +492,7 @@
 - [ ] רשימת בדיקות נוצרה (`BUSINESS_LOGIC_INTEGRATION_CHECKLIST.md`)
 
 **📋 רשימת בדיקות:**
+
 - ראה: `documentation/03-DEVELOPMENT/PLANS/BUSINESS_LOGIC_INTEGRATION_CHECKLIST.md`
 
 ---
@@ -466,6 +505,7 @@
 וידוא שכל ה-Business Logic API calls עובדים נכון עם מערכות הטעינה והאיתחול.
 
 **⚠️ חשוב להבין:**
+
 - **מערכת מוניטורינג ותיעוד** - לא טוענת דינמית, רק בודקת ומתעדת
 - **8 מודולים מאוחדים** - נטענים סטטית ב-HTML (לא דינמית)
 - **5 שלבי איתחול** - Core → UI → Page → Validation → Finalization
@@ -525,6 +565,7 @@
    - [ ] **בדיקת התאמה בין packages ל-scripts בפועל**
 
 **קריטריוני השלמה:**
+
 - [ ] כל ה-Data Services עובדים עם UnifiedAppInitializer
 - [ ] כל ה-Business Logic API calls עובדים עם CacheTTLGuard
 - [ ] כל ה-mutations עובדים עם CacheSyncManager
@@ -538,6 +579,7 @@
 ### שלב 3.2: API Integration Testing ✅ **הושלם - סקריפטי בדיקות מוכנים**
 
 **קבצים:**
+
 - ✅ `Backend/tests/services/business_logic/test_trade_business_service.py` - נוצר
 - ✅ `Backend/tests/services/business_logic/test_execution_business_service.py` - נוצר
 - ✅ `Backend/tests/services/business_logic/test_alert_business_service.py` - נוצר
@@ -547,6 +589,7 @@
 - ❌ `trading-ui/tests/integration/test_business_logic_integration.js` - חסר
 
 **בדיקות:**
+
 1. בדיקת כל ה-API endpoints החדשים
 2. בדיקת אינטגרציה Frontend-Backend
 3. בדיקת error handling
@@ -554,6 +597,7 @@
 5. **בדיקת אינטגרציה עם מערכות מטמון**
 
 **קריטריוני השלמה:**
+
 - [ ] כל ה-API endpoints נבדקו
 - [ ] אינטגרציה Frontend-Backend עובדת
 - [ ] Error handling נבדק
@@ -565,9 +609,11 @@
 ### שלב 3.3: End-to-End Testing ✅ **רשימת בדיקות מוכנה**
 
 **עמודים לבדיקה:**
+
 - כל 28 העמודים
 
 **תהליך:**
+
 1. בדיקת כל הפונקציונליות בכל עמוד
 2. בדיקת חישובים
 3. בדיקת ולידציות
@@ -589,6 +635,7 @@
    - בדיקת timeout fallback
 
 **קריטריוני השלמה:**
+
 - [ ] כל העמודים נבדקו
 - [ ] כל הפונקציונליות עובדת
 - [ ] אין regressions
@@ -600,6 +647,7 @@
 ### שלב 3.4: Performance Optimization ✅ **הושלם במלואו**
 
 **אופטימיזציות:**
+
 1. Caching של חישובים
 2. Batch requests
 3. Lazy loading
@@ -607,6 +655,7 @@
 5. **אופטימיזציה של Business Logic API calls**
 
 **קריטריוני השלמה:**
+
 - [ ] Response time < 200ms
 - [ ] Cache hit rate > 80%
 - [ ] Bundle size קטן ב-20%
@@ -619,11 +668,13 @@
 ### שלב 4.1: תיעוד Business Logic Layer ✅ **הושלם במלואו**
 
 **קבצים ליצירה:**
+
 - ❌ `documentation/02-ARCHITECTURE/BACKEND/BUSINESS_LOGIC_LAYER.md` - חסר
 - ❌ `documentation/02-ARCHITECTURE/BACKEND/BUSINESS_RULES_REGISTRY.md` - חסר
 - ❌ `documentation/03-DEVELOPMENT/GUIDES/BUSINESS_LOGIC_DEVELOPER_GUIDE.md` - חסר
 
 **תוכן:**
+
 - ארכיטקטורה של Business Logic Layer
 - רשימת כל ה-Services
 - רשימת כל חוקי העסק
@@ -646,6 +697,7 @@
 ### שלב 4.2: עדכון תיעוד קיים ❌ **לא התחיל**
 
 **קבצים לעדכון:**
+
 - ❌ `documentation/02-ARCHITECTURE/DATA_LAYERS_ARCHITECTURE_SUMMARY.md` - עדכון עם Business Logic Layer
 - ❌ `documentation/frontend/GENERAL_SYSTEMS_LIST.md` - עדכון מערכות
 - ❌ `documentation/PAGES_LIST.md` - עדכון עמודים
@@ -653,6 +705,7 @@
 - ❌ כל תיעוד של Page Scripts
 
 **תוכן:**
+
 - תיעוד השינויים
 - תיעוד API endpoints חדשים
 - תיעוד migration path
@@ -674,9 +727,11 @@
 ### שלב 4.3: Migration Guide ❌ **חסר**
 
 **קובץ ליצירה:**
+
 - ❌ `documentation/03-DEVELOPMENT/GUIDES/BUSINESS_LOGIC_MIGRATION_GUIDE.md`
 
 **תוכן:**
+
 - מדריך שלב אחר שלב למיגרציה
 - דוגמאות קוד
 - Best practices
@@ -697,7 +752,7 @@
 
 ## 📊 סיכום התוכנית - סטטיסטיקות מעודכנות
 
-### סטטיסטיקות:
+### סטטיסטיקות
 
 - **~40 מערכות כלליות** - כולן יעברו refactoring
 - **28 עמודים** - כולם יעברו refactoring
@@ -706,7 +761,7 @@
 - **100+ API endpoints** - יווצרו
 - **200+ טסטים** - ייכתבו
 
-### לוח זמנים משוער:
+### לוח זמנים משוער
 
 - **Phase 1**: 6-8 שבועות (2 Services נוספים)
 - **Phase 2**: 8-10 שבועות (9 Data Services נוספים + 28 עמודים)
@@ -714,7 +769,7 @@
 - **Phase 4**: 2-3 שבועות
 - **סה"כ**: 19-25 שבועות (4.5-6 חודשים)
 
-### קריטריוני הצלחה:
+### קריטריוני הצלחה
 
 - [ ] כל הלוגיקה העסקית ב-Backend
 - [ ] Frontend מכיל רק UI logic
@@ -784,6 +839,7 @@
 **תאריך:** 23 נובמבר 2025  
 **גרסה:** 2.2.0  
 **שינויים:**
+
 - ✅ **Phase 2 הושלם במלואן**:
   - כל ה-8 Data Services עודכנו עם Business Logic API wrappers
   - כל ה-8 עמודים עודכנו להשתמש ב-Business Logic API
@@ -818,6 +874,7 @@
   - יצירת כל הדוחות והסיכומים
 
 **📋 מסמכים קשורים:**
+
 - `documentation/03-DEVELOPMENT/PLANS/BUSINESS_LOGIC_COMPLETE_SYSTEM_REFERENCE.md` - **הפניה מלאה למערכת** (כולל כל הישויות, המערכות, העמודים והאינטגרציות)
 - `documentation/03-DEVELOPMENT/PLANS/BUSINESS_LOGIC_INTEGRATION_TESTING_PLAN.md` - **תוכנית בדיקות אינטגרציה מקיפה** (Phase 1: בדיקות מעשיות, Phase 2: אינטגרציה עם מטמון)
 - `documentation/05-REPORTS/BUSINESS_LOGIC_INITIALIZATION_INTEGRATION_ANALYSIS.md` - ניתוח אינטגרציה

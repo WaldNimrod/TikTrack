@@ -85,6 +85,8 @@ def register():
         )
         
         if result['success']:
+            # Mark session as permanent so it respects PERMANENT_SESSION_LIFETIME
+            session.permanent = True
             # Set session
             session['user_id'] = result['user']['id']
             session['username'] = result['user']['username']
@@ -159,6 +161,8 @@ def login():
         result = auth_service.authenticate_user(username, password)
         
         if result['success']:
+            # Mark session as permanent so it respects PERMANENT_SESSION_LIFETIME
+            session.permanent = True
             # Set session
             session['user_id'] = result['user']['id']
             session['username'] = result['user']['username']

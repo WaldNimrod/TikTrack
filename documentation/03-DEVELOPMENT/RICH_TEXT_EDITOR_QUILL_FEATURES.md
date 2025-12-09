@@ -1,4 +1,5 @@
 # Quill.js - תכונות ספציפיות - TikTrack
+
 ## Quill.js Specific Features for Notes Field
 
 **תאריך:** 6 בנובמבר 2025  
@@ -13,10 +14,12 @@
 **✅ Quill.js תומך במלואו!**
 
 Quill.js כולל ממשק בחירת צבע מובנה (color picker) עבור:
+
 - **צבע טקסט** - `color`
 - **צבע רקע** - `background`
 
 **דוגמה:**
+
 ```javascript
 const quill = new Quill('#editor', {
   modules: {
@@ -28,6 +31,7 @@ const quill = new Quill('#editor', {
 ```
 
 **תצוגה:**
+
 - לחיצה על כפתור הצבע פותחת color picker עם לוח צבעים
 - אפשרות לבחור צבעים מוגדרים מראש
 - אפשרות להזין קוד צבע (#hex או rgb)
@@ -39,12 +43,14 @@ const quill = new Quill('#editor', {
 **✅ Quill.js תומך במלואו!**
 
 Quill.js תומך בכל סוגי היישור:
+
 - **יישור שמאל** - `align: 'left'`
 - **יישור מרכז** - `align: 'center'`
 - **יישור ימין** - `align: 'right'`
 - **יישור מלא** - `align: 'justify'`
 
 **דוגמה:**
+
 ```javascript
 const quill = new Quill('#editor', {
   modules: {
@@ -64,10 +70,12 @@ const quill = new Quill('#editor', {
 **✅ Quill.js תומך במלואו!**
 
 Quill.js תומך בהגדרת כיוון טקסט:
+
 - **RTL** - Right-to-Left (עברית, ערבית)
 - **LTR** - Left-to-Right (אנגלית)
 
 **דוגמה - הגדרה גלובלית:**
+
 ```javascript
 const quill = new Quill('#editor', {
   direction: 'rtl', // כיוון ברירת מחדל - RTL
@@ -80,6 +88,7 @@ const quill = new Quill('#editor', {
 ```
 
 **דוגמה - החלפת כיוון דינמית:**
+
 ```javascript
 // החלפת כיוון לכל העורך
 quill.format('direction', 'rtl');
@@ -177,10 +186,12 @@ quill.formatText(0, 10, 'direction', 'ltr');
 ## 🧪 דוגמה אינטראקטיבית - בדיקה
 
 **קישור לדוגמה חיה:**
+
 - **Quill Playground:** https://quilljs.com/playground/
 - **דוגמה עם RTL:** פתח את ה-Playground והוסף `direction: 'rtl'` לתצורה
 
 **קוד לבדיקה מהירה:**
+
 ```javascript
 // בדיקה 1: ממשק בחירת צבע
 // הוסף לתצורה: [{ 'color': [] }, { 'background': [] }]
@@ -197,7 +208,7 @@ quill.formatText(0, 10, 'direction', 'ltr');
 
 ---
 
-## 📊 השוואה - האם Quill.js מספיק?
+## 📊 השוואה - האם Quill.js מספיק
 
 | דרישה | Quill.js | תמיכה |
 |-------|----------|-------|
@@ -317,6 +328,7 @@ document.head.appendChild(style);
 ## ✅ מסקנה
 
 **Quill.js מספק את כל הדרישות:**
+
 1. ✅ **ממשק בחירת צבע** - Color picker מובנה
 2. ✅ **יישור לימין ולשמאל** - תמיכה מלאה
 3. ✅ **הגדרת RTL/LTR** - תמיכה מלאה

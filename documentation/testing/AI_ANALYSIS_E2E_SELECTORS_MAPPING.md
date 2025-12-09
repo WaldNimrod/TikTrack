@@ -43,16 +43,20 @@
 ## Elements בדף הראשי (לא במודלים)
 
 ### Header Section
+
 - `#ai-analysis-header` ✅ - קיים
 
 ### Templates Section
+
 - `#templatesContainer` ✅ - קיים (בתוך `#ai-analysis-header`)
 
 ### History Section
+
 - `#ai-analysis-history` ✅ - קיים
 - `#historyContainer` ✅ - קיים (בתוך `#ai-analysis-history`)
 
 ### Other
+
 - `#summaryStats` ✅ - קיים (בתוך `#ai-analysis-header`)
 - `#aiAnalysisProgressOverlay` ✅ - קיים
 - `#unified-header` ✅ - קיים
@@ -62,9 +66,11 @@
 ## Elements במודלים
 
 ### Modal 1: Template Selection (`#aiTemplateSelectionModal`)
+
 - `#templatesContainerModal` ✅ - קיים
 
 ### Modal 2: Variables Form (`#aiVariablesModal`)
+
 - `#aiAnalysisFormModal` ✅ - קיים (form element)
 - `#variablesContainerModal` ✅ - קיים
 - `#llmProviderModal` ✅ - קיים
@@ -76,6 +82,7 @@
 - `#aiVariablesModalBreadcrumb` ✅ - קיים
 
 ### Modal 3: Results (`#aiResultsModal`)
+
 - `#resultsContainerModal` ✅ - קיים
 - `#saveAsNoteBtnModal` ✅ - קיים
 - `#exportPDFBtnModal` ✅ - קיים
@@ -91,6 +98,7 @@
 ### 1. Selectors שלא קיימים בדף הראשי
 
 **Problematic selectors:**
+
 - `#ai-analysis-templates` - לא קיים (צריך להסיר או לשנות ל-`#templatesContainer`)
 - `#ai-analysis-form` - לא קיים (קיים רק במודל)
 - `#ai-analysis-results` - לא קיים (קיים רק במודל)
@@ -105,6 +113,7 @@
 ### 2. Elements שצריכים להיות במודלים
 
 כל ה-form elements וה-result elements נמצאים במודלים ולא בדף הראשי. לכן:
+
 - צריך לפתוח מודל לפני בדיקת elements אלה
 - או לבדוק שהם קיימים ב-DOM גם אם hidden
 
@@ -115,11 +124,13 @@
 ### 1. עדכון Selectors
 
 **להסיר מה-tests:**
+
 - `#ai-analysis-templates` - לא קיים
 - `#ai-analysis-form` - לא קיים (רק במודל)
 - `#ai-analysis-results` - לא קיים (רק במודל)
 
 **לעדכן:**
+
 - `#variablesContainer` → `#variablesContainerModal` (במודל)
 - `#llmProvider` → `#llmProviderModal` (במודל)
 - `#generateAnalysisBtn` → `#generateAnalysisBtnModal` (במודל)
@@ -131,6 +142,7 @@
 ### 2. הוספת Waits למודלים
 
 לפני בדיקת elements במודלים:
+
 1. לחכות שהמודל ייפתח
 2. לחכות שה-DOM ייטען במודל
 3. לבדוק שה-element קיים ונראה
@@ -138,6 +150,7 @@
 ### 3. בדיקת קיום ב-DOM
 
 אפשר לבדוק שה-element קיים ב-DOM גם אם הוא hidden:
+
 ```javascript
 const element = page.locator('#exportPDFBtnModal');
 await expect(element).toHaveCount(1); // קיים ב-DOM
@@ -150,7 +163,8 @@ expect(count).toBe(1);
 
 ## Structure מלא של הדף
 
-### בדף הראשי:
+### בדף הראשי
+
 ```
 <body>
   <div id="unified-header"></div>
@@ -175,7 +189,8 @@ expect(count).toBe(1);
 </body>
 ```
 
-### במודלים:
+### במודלים
+
 - **`#aiAnalysisWizardModal`**: ✅ Wizard החדש עם 3 שלבים
   - שלב 1: `#ai-wizard-step-1` - בחירת מנוע (`#wizardProviderSelect`), שפה (`#wizardLanguageSelect`) ותבנית (`#wizardTemplatesContainer`)
   - שלב 2: `#ai-wizard-step-2` - פילטרים (`#wizardFiltersContainer`) ומאפיינים (`#wizardVariablesContainer`)

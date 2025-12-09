@@ -7,7 +7,7 @@
 
 ## 📋 שלבים עיקריים - סקירה מהירה
 
-### תהליך מלא (7 שלבים):
+### תהליך מלא (7 שלבים)
 
 ```
 0. הכנה בסביבת הפיתוח
@@ -34,8 +34,10 @@
 **מי מבצע:** צוות הפיתוח  
 **מיקום:** סביבת הפיתוח (main branch)
 
-#### פעולות:
+#### פעולות
+
 1. **שמירת שינויים**
+
    ```bash
    git add .
    git commit -m "feat: [תיאור השינויים]"
@@ -43,22 +45,27 @@
    ```
 
 2. **יצירת Changelog**
+
    ```bash
    python3 scripts/production-update/prepare_changelog.py
    ```
+
    - בודק שינויים לא שמורים
    - מזהה שינויים קריטיים (config, DB schema, server)
    - יוצר changelog ב-`_Tmp/production_sync_changelog_[timestamp].md`
 
 3. **Pre-Sync Validation**
+
    ```bash
    python3 scripts/pre_sync_validation.py
    ```
+
    - בודק שינויים לא שמורים
    - מזהה קבצי backup/debug
    - בודק קבצים קריטיים
 
-#### תוצאה:
+#### תוצאה
+
 ✅ כל השינויים נשמרו ב-git  
 ✅ Changelog נוצר  
 ✅ Validation עבר בהצלחה
@@ -70,7 +77,8 @@
 **מי מבצע:** צוות הפרודקשן  
 **מיקום:** סביבת הפרודקשן (production branch)
 
-#### פעולות:
+#### פעולות
+
 ```bash
 # בדיקת שינויים
 git status
@@ -80,12 +88,14 @@ python3 scripts/production-update/preserve_production_changes.py
 ```
 
 **קבצים שצריך לשמור:**
+
 - `production/Backend/config/settings.py`
 - `production/Backend/config/logging.py`
 - `production/Backend/config/database.py`
 - כל שינוי אחר שנעשה ישירות בפרודקשן
 
-#### תוצאה:
+#### תוצאה
+
 ✅ כל השינויים בפרודקשן נשמרו ב-git
 
 ---
@@ -95,7 +105,8 @@ python3 scripts/production-update/preserve_production_changes.py
 **מי מבצע:** צוות הפרודקשן  
 **מיקום:** סביבת הפרודקשן
 
-#### פעולות:
+#### פעולות
+
 ```bash
 # מעבר ל-production branch
 git checkout production
@@ -107,7 +118,8 @@ git pull origin production
 git fetch origin main
 ```
 
-#### תוצאה:
+#### תוצאה
+
 ✅ production branch מעודכן  
 ✅ main branch מעודכן
 
@@ -126,6 +138,7 @@ python3 scripts/production-update/master.py
 ```
 
 **מה Master Script עושה:**
+
 - Step 1: Collect Changes
 - Step 2: Merge Main (עם conflict resolver אוטומטי)
 - Step 3-11: המשך התהליך
@@ -140,7 +153,8 @@ git merge main
 # Conflict resolver שומר אוטומטית על קבצי config של production
 ```
 
-#### תוצאה:
+#### תוצאה
+
 ✅ main מוזג ל-production  
 ✅ קונפליקטים נפתרו (אוטומטית או ידנית)
 
@@ -151,10 +165,11 @@ git merge main
 **מי מבצע:** Master Script (אוטומטי) או ידני  
 **מיקום:** סביבת הפרודקשן
 
-#### אם השתמשת ב-Master Script:
+#### אם השתמשת ב-Master Script
+
 ✅ שלב זה כבר בוצע אוטומטית (Step 5)
 
-#### אם לא, הרץ ידנית:
+#### אם לא, הרץ ידנית
 
 ```bash
 # סינכרון Backend + UI
@@ -162,13 +177,15 @@ git merge main
 ```
 
 **מה הסקריפט עושה:**
+
 1. **גיבוי DB** - מגבה את ה-DB לפני מחיקת production directory
 2. **מעתיק Backend** - מ-`Backend/` ל-`production/Backend/`
 3. **מעתיק UI** - מ-`trading-ui/` ל-`production/trading-ui/`
 4. **משחזר DB** - משחזר את ה-DB אחרי sync
 5. **בודק קבצים קריטיים** - verifies critical files
 
-#### תוצאה:
+#### תוצאה
+
 ✅ Backend synced (~157 files)  
 ✅ UI synced (~490 files)  
 ✅ DB protected and restored
@@ -180,10 +197,11 @@ git merge main
 **מי מבצע:** Master Script (אוטומטי) או ידני  
 **מיקום:** סביבת הפרודקשן
 
-#### אם השתמשת ב-Master Script:
+#### אם השתמשת ב-Master Script
+
 ✅ שלב זה כבר בוצע אוטומטית (Step 7 - Fix Config)
 
-#### אם לא, תקן ידנית:
+#### אם לא, תקן ידנית
 
 ```bash
 # בדיקת הגדרות
@@ -196,6 +214,7 @@ python3 -c "from config.settings import UI_DIR, DB_PATH, PORT, IS_PRODUCTION; \
 ```
 
 **תוצאה צפויה:**
+
 ```
 UI: /path/to/production/trading-ui
 DB: PostgreSQL (TikTrack-db-production)
@@ -204,12 +223,14 @@ Production: True
 ```
 
 **אם לא נכון, תקן:**
+
 - `IS_PRODUCTION = True` (hardcoded)
 - `PORT = 5001` (hardcoded)
 - `DATABASE_URL` מצביע על PostgreSQL
 - `UI_DIR` מצביע על `production/trading-ui`
 
-#### תוצאה:
+#### תוצאה
+
 ✅ הגדרות production נכונות
 
 ---
@@ -219,34 +240,42 @@ Production: True
 **מי מבצע:** Master Script (אוטומטי) או ידני  
 **מיקום:** סביבת הפרודקשן
 
-#### אם השתמשת ב-Master Script:
+#### אם השתמשת ב-Master Script
+
 ✅ חלק מהבדיקות כבר בוצעו (Step 8 - Validate)
 
-#### בדיקות נוספות:
+#### בדיקות נוספות
 
 1. **Sync Verification**
+
    ```bash
    python3 scripts/sync_verifier.py
    ```
+
    - בודק checksums של קבצים קריטיים
    - תוצאה: ✅ All critical files verified
 
 2. **אימות מבנה**
+
    ```bash
    ./scripts/verify_production.sh
    ```
+
    - בודק מבנה כללי
    - רשימת קבצים שונים
    - תוצאה: ✅ Verification passed
 
 3. **אימות הפרדה**
+
    ```bash
    ./scripts/verify_production_isolation.sh
    ```
+
    - בודק הפרדה מלאה
    - תוצאה: ✅ Isolation verification passed
 
 4. **בדיקת הגדרות**
+
    ```bash
    cd production/Backend
    python3 -c "from config.settings import PORT, IS_PRODUCTION; \
@@ -255,7 +284,8 @@ Production: True
        print('✅ Production settings verified')"
    ```
 
-#### תוצאה:
+#### תוצאה
+
 ✅ כל הבדיקות עברו בהצלחה
 
 ---
@@ -265,10 +295,11 @@ Production: True
 **מי מבצע:** Master Script (אוטומטי) או ידני  
 **מיקום:** סביבת הפרודקשן
 
-#### אם השתמשת ב-Master Script:
+#### אם השתמשת ב-Master Script
+
 ✅ שלב זה כבר בוצע אוטומטית (Step 9 - Bump Version)
 
-#### אם לא, עדכן ידנית:
+#### אם לא, עדכן ידנית
 
 ```bash
 # קידום גרסת הפרודקשן
@@ -278,7 +309,8 @@ python3 scripts/versioning/bump-version.py \
   --note "Sync main into production - $(date +%Y-%m-%d)"
 ```
 
-#### תוצאה:
+#### תוצאה
+
 ✅ גרסה עודכנה ב-`documentation/version-manifest.json`  
 ✅ היסטוריה עודכנה ב-`documentation/production/VERSION_HISTORY.md`
 
@@ -289,10 +321,11 @@ python3 scripts/versioning/bump-version.py \
 **מי מבצע:** Master Script (אוטומטי) או ידני  
 **מיקום:** סביבת הפרודקשן
 
-#### אם השתמשת ב-Master Script:
+#### אם השתמשת ב-Master Script
+
 ✅ שלב זה כבר בוצע אוטומטית (Step 10 - Commit & Push)
 
-#### אם לא, Commit ידנית:
+#### אם לא, Commit ידנית
 
 ```bash
 # בדיקת שינויים
@@ -313,7 +346,8 @@ git commit -m "feat: Update production from main - [תאריך/גרסה]
 git push origin production
 ```
 
-#### תוצאה:
+#### תוצאה
+
 ✅ כל השינויים נשמרו ב-Git  
 ✅ נדחפו ל-remote
 
@@ -324,7 +358,7 @@ git push origin production
 **מי מבצע:** צוות הפרודקשן  
 **מיקום:** סביבת הפרודקשן
 
-#### אם יש שינויים ב-config:
+#### אם יש שינויים ב-config
 
 ```bash
 # תיעוד אוטומטי
@@ -332,11 +366,13 @@ python3 scripts/production-update/document_server_changes.py
 ```
 
 **מה הסקריפט עושה:**
+
 - מזהה שינויים ב-config files
 - מנתח שינויים בהגדרות מפתח
 - מעדכן את `SERVER_CHANGES.md`
 
-#### תוצאה:
+#### תוצאה
+
 ✅ שינויים בשרת מתועדים
 
 ---

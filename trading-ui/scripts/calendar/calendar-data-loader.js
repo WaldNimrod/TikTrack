@@ -25,158 +25,29 @@
     class CalendarDataLoader {
         /**
          * Load all journal data for a specific month
-         * Uses TradingJournalData.loadCalendarData() for unified data loading
          * @param {number} year - Year
          * @param {number} month - Month (0-11)
          * @param {Object} options - Options (force, entityFilter)
-         * @returns {Promise<Object>} Aggregated data by day (day number as key)
+         * @returns {Promise<Object>} Aggregated data by day
          */
         static async loadMonthData(year, month, options = {}) {
-            const { force = false, entityFilter = 'all' } = options;
+            const { force = false, entityFilter = 'all', tickerFilter = null } = options;
             
             if (window.Logger) {
                 window.Logger.info('Loading calendar month data', {
                     ...PAGE_LOG_CONTEXT,
                     year,
                     month,
-                    entityFilter
+                    entityFilter,
+                    tickerFilter
                 });
             }
 
-            // Wait for TradingJournalData to be available
-            let retries = 0;
-            while (!window.TradingJournalData && retries < 50) {
-                await new Promise(resolve => setTimeout(resolve, 100));
-                retries++;
-            }
-
-            if (!window.TradingJournalData) {
-                if (window.Logger) {
-                    window.Logger.warn('TradingJournalData not available, falling back to individual services', PAGE_LOG_CONTEXT);
-                }
-                return await this._loadMonthDataFallback(year, month, options);
-            }
-
-            try {
-                // Use TradingJournalData.loadCalendarData() - note: month is 1-based in API (1-12)
-                const calendarData = await window.TradingJournalData.loadCalendarData(
-                    month + 1, // Convert 0-based to 1-based
-                    year,
-                    {
-                        entity_type: entityFilter === 'all' ? undefined : entityFilter,
-                        force
-                    }
-                );
-
-                // Convert API format (entries_by_day with YYYY-MM-DD keys) to CalendarRenderer format (day number keys)
-                const aggregated = this._convertCalendarDataFormat(calendarData, year, month);
-
-                if (window.Logger) {
-                    const totalEntries = Object.values(aggregated).reduce((sum, dayData) => {
-                        return sum + (dayData.executions?.length || 0) +
-                               (dayData.trades?.length || 0) +
-                               (dayData.notes?.length || 0) +
-                               (dayData.alerts?.length || 0) +
-                               (dayData.cashFlows?.length || 0) +
-                               (dayData.tradePlans?.length || 0);
-                    }, 0);
-                    
-                    window.Logger.info('Calendar month data loaded from API', {
-                        ...PAGE_LOG_CONTEXT,
-                        year,
-                        month,
-                        totalDays: Object.keys(aggregated).length,
-                        totalEntries
-                    });
-                }
-
-                return aggregated;
-            } catch (error) {
-                if (window.Logger) {
-                    window.Logger.warn('Failed to load calendar data from TradingJournalData, falling back', {
-                        ...PAGE_LOG_CONTEXT,
-                        error: error?.message
-                    });
-                }
-                // Fallback to individual services if API fails
-                return await this._loadMonthDataFallback(year, month, options);
-            }
-        }
-
-        /**
-         * Convert calendar data from API format to CalendarRenderer format
-         * API format: { entries_by_day: { 'YYYY-MM-DD': [entries...] } }
-         * Renderer format: { dayNumber: { executions: [], trades: [], notes: [], alerts: [], cashFlows: [], tradePlans: [] } }
-         * @private
-         */
-        static _convertCalendarDataFormat(calendarData, year, month) {
-            const aggregated = {};
-            const entriesByDay = calendarData?.entries_by_day || {};
-
-            // Iterate through each day in entries_by_day
-            Object.entries(entriesByDay).forEach(([dateKey, entries]) => {
-                // Parse date from YYYY-MM-DD format
-                const date = new Date(dateKey);
-                if (isNaN(date.getTime())) return;
-
-                // Check if date is in the target month
-                if (date.getFullYear() !== year || date.getMonth() !== month) return;
-
-                const day = date.getDate();
-
-                // Initialize day data structure
-                if (!aggregated[day]) {
-                    aggregated[day] = {
-                        executions: [],
-                        trades: [],
-                        notes: [],
-                        alerts: [],
-                        cashFlows: [],
-                        tradePlans: []
-                    };
-                }
-
-                // Group entries by entity type
-                entries.forEach(entry => {
-                    const entityType = entry.entity_type;
-                    switch (entityType) {
-                        case 'execution':
-                            aggregated[day].executions.push(entry);
-                            break;
-                        case 'trade':
-                            aggregated[day].trades.push(entry);
-                            break;
-                        case 'note':
-                            aggregated[day].notes.push(entry);
-                            break;
-                        case 'alert':
-                            aggregated[day].alerts.push(entry);
-                            break;
-                        case 'cash_flow':
-                            aggregated[day].cashFlows.push(entry);
-                            break;
-                        case 'trade_plan':
-                            aggregated[day].tradePlans.push(entry);
-                            break;
-                    }
-                });
-            });
-
-            return aggregated;
-        }
-
-        /**
-         * Fallback method: Load data from individual services (used if TradingJournalData is not available)
-         * @private
-         */
-        static async _loadMonthDataFallback(year, month, options = {}) {
-            const { force = false, entityFilter = 'all' } = options;
-            
             // Get date range for month
             const { start, end } = window.CalendarDateUtils?.getMonthDateRange(year, month) || 
                                   this._getMonthDateRange(year, month);
 
-            // Load data from all services directly
+            // Load data from all services
             const [executions, trades, notes, alerts, cashFlows, tradePlans] = await Promise.all([
                 this._loadExecutions(start, end, entityFilter, force),
                 this._loadTrades(start, end, entityFilter, force),
@@ -190,17 +61,11 @@
             const aggregated = this._aggregateByDay(executions, trades, notes, alerts, cashFlows, tradePlans, year, month);
 
             if (window.Logger) {
-                window.Logger.info('Calendar month data loaded from individual services', {
+                window.Logger.info('Calendar month data loaded', {
                     ...PAGE_LOG_CONTEXT,
                     year,
                     month,
-                    totalDays: Object.keys(aggregated).length,
-                    executions: executions.length,
-                    trades: trades.length,
-                    notes: notes.length,
-                    alerts: alerts.length,
-                    cashFlows: cashFlows.length,
-                    tradePlans: tradePlans.length
+                    totalDays: Object.keys(aggregated).length
                 });
             }
 
@@ -211,7 +76,7 @@
          * Load executions for date range
          * @private
          */
-        static async _loadExecutions(start, end, entityFilter, force) {
+        static async _loadExecutions(start, end, entityFilter, tickerFilter, force) {
             if (entityFilter !== 'all' && entityFilter !== 'execution') {
                 return [];
             }
@@ -219,9 +84,15 @@
             try {
                 if (window.ExecutionsData?.loadExecutionsData) {
                     const allExecutions = await window.ExecutionsData.loadExecutionsData({ force });
-                    // Normalize data - ExecutionsData returns array directly
-                    const executionsArray = Array.isArray(allExecutions) ? allExecutions : (Array.isArray(allExecutions?.data) ? allExecutions.data : []);
-                    return this._filterByDateRange(executionsArray, start, end, 'execution_date', 'date');
+                    let filtered = this._filterByDateRange(allExecutions, start, end, 'execution_date', 'date');
+                    // Filter by ticker if provided
+                    if (tickerFilter) {
+                        filtered = filtered.filter(e => {
+                            const ticker = e.ticker_symbol || e.ticker?.symbol || e.ticker_id;
+                            return ticker === tickerFilter;
+                        });
+                    }
+                    return filtered;
                 }
             } catch (error) {
                 if (window.Logger) {
@@ -238,7 +109,7 @@
          * Load trades for date range
          * @private
          */
-        static async _loadTrades(start, end, entityFilter, force) {
+        static async _loadTrades(start, end, entityFilter, tickerFilter, force) {
             if (entityFilter !== 'all' && entityFilter !== 'trade') {
                 return [];
             }
@@ -246,9 +117,15 @@
             try {
                 if (window.TradesData?.loadTradesData) {
                     const allTrades = await window.TradesData.loadTradesData({ force });
-                    // Normalize data - TradesData returns array directly
-                    const tradesArray = Array.isArray(allTrades) ? allTrades : (Array.isArray(allTrades?.data) ? allTrades.data : []);
-                    return this._filterByDateRange(tradesArray, start, end, 'opened_at', 'created_at');
+                    let filtered = this._filterByDateRange(allTrades, start, end, 'opened_at', 'created_at');
+                    // Filter by ticker if provided
+                    if (tickerFilter) {
+                        filtered = filtered.filter(t => {
+                            const ticker = t.ticker_symbol || t.ticker?.symbol || t.ticker_id;
+                            return ticker === tickerFilter;
+                        });
+                    }
+                    return filtered;
                 }
             } catch (error) {
                 if (window.Logger) {
@@ -265,7 +142,7 @@
          * Load notes for date range
          * @private
          */
-        static async _loadNotes(start, end, entityFilter, force) {
+        static async _loadNotes(start, end, entityFilter, tickerFilter, force) {
             if (entityFilter !== 'all' && entityFilter !== 'note') {
                 return [];
             }
@@ -273,9 +150,15 @@
             try {
                 if (window.NotesData?.loadNotesData) {
                     const allNotes = await window.NotesData.loadNotesData({ force });
-                    // Normalize data - NotesData returns array directly
-                    const notesArray = Array.isArray(allNotes) ? allNotes : (Array.isArray(allNotes?.data) ? allNotes.data : []);
-                    return this._filterByDateRange(notesArray, start, end, 'created_at', 'date');
+                    let filtered = this._filterByDateRange(allNotes, start, end, 'created_at', 'date');
+                    // Filter by ticker if provided (notes may have related_object with ticker)
+                    if (tickerFilter) {
+                        filtered = filtered.filter(n => {
+                            const ticker = n.ticker_symbol || n.related_object?.ticker_symbol || n.ticker_id;
+                            return ticker === tickerFilter;
+                        });
+                    }
+                    return filtered;
                 }
             } catch (error) {
                 if (window.Logger) {
@@ -292,7 +175,7 @@
          * Load alerts for date range
          * @private
          */
-        static async _loadAlerts(start, end, entityFilter, force) {
+        static async _loadAlerts(start, end, entityFilter, tickerFilter, force) {
             if (entityFilter !== 'all' && entityFilter !== 'alert') {
                 return [];
             }
@@ -300,9 +183,15 @@
             try {
                 if (window.AlertsData?.loadAlertsData) {
                     const allAlerts = await window.AlertsData.loadAlertsData({ force });
-                    // Normalize data - AlertsData returns array directly
-                    const alertsArray = Array.isArray(allAlerts) ? allAlerts : (Array.isArray(allAlerts?.data) ? allAlerts.data : []);
-                    return this._filterByDateRange(alertsArray, start, end, 'triggered_at', 'created_at', 'expiry_date');
+                    let filtered = this._filterByDateRange(allAlerts, start, end, 'triggered_at', 'created_at', 'expiry_date');
+                    // Filter by ticker if provided
+                    if (tickerFilter) {
+                        filtered = filtered.filter(a => {
+                            const ticker = a.ticker_symbol || a.ticker?.symbol || a.ticker_id;
+                            return ticker === tickerFilter;
+                        });
+                    }
+                    return filtered;
                 }
             } catch (error) {
                 if (window.Logger) {
@@ -319,7 +208,7 @@
          * Load cash flows for date range
          * @private
          */
-        static async _loadCashFlows(start, end, entityFilter, force) {
+        static async _loadCashFlows(start, end, entityFilter, tickerFilter, force) {
             if (entityFilter !== 'all' && entityFilter !== 'cash_flow') {
                 return [];
             }
@@ -327,9 +216,15 @@
             try {
                 if (window.CashFlowsData?.loadCashFlowsData) {
                     const allCashFlows = await window.CashFlowsData.loadCashFlowsData({ force });
-                    // Normalize data - CashFlowsData returns array directly
-                    const cashFlowsArray = Array.isArray(allCashFlows) ? allCashFlows : (Array.isArray(allCashFlows?.data) ? allCashFlows.data : []);
-                    return this._filterByDateRange(cashFlowsArray, start, end, 'date');
+                    let filtered = this._filterByDateRange(allCashFlows, start, end, 'date');
+                    // Filter by ticker if provided (cash flows usually don't have ticker, but check anyway)
+                    if (tickerFilter) {
+                        filtered = filtered.filter(cf => {
+                            const ticker = cf.ticker_symbol || cf.ticker?.symbol || cf.ticker_id;
+                            return ticker === tickerFilter;
+                        });
+                    }
+                    return filtered;
                 }
             } catch (error) {
                 if (window.Logger) {
@@ -346,7 +241,7 @@
          * Load trade plans for date range
          * @private
          */
-        static async _loadTradePlans(start, end, entityFilter, force) {
+        static async _loadTradePlans(start, end, entityFilter, tickerFilter, force) {
             if (entityFilter !== 'all' && entityFilter !== 'trade_plan') {
                 return [];
             }
@@ -354,9 +249,15 @@
             try {
                 if (window.TradePlansData?.loadTradePlansData) {
                     const allTradePlans = await window.TradePlansData.loadTradePlansData({ force });
-                    // Normalize data - TradePlansData returns array directly
-                    const tradePlansArray = Array.isArray(allTradePlans) ? allTradePlans : (Array.isArray(allTradePlans?.data) ? allTradePlans.data : []);
-                    return this._filterByDateRange(tradePlansArray, start, end, 'entry_date', 'created_at');
+                    let filtered = this._filterByDateRange(allTradePlans, start, end, 'entry_date', 'created_at');
+                    // Filter by ticker if provided
+                    if (tickerFilter) {
+                        filtered = filtered.filter(tp => {
+                            const ticker = tp.ticker_symbol || tp.ticker?.symbol || tp.ticker_id;
+                            return ticker === tickerFilter;
+                        });
+                    }
+                    return filtered;
                 }
             } catch (error) {
                 if (window.Logger) {

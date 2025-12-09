@@ -22,7 +22,7 @@
 
 ## 🎯 סקירה כללית
 
-### מהי מערכת הניטור והטעינה?
+### מהי מערכת הניטור והטעינה
 
 מערכת הניטור והטעינה של TikTrack היא מערכת מרכזית לניהול סקריפטים, חבילות (packages), ותלויות. המערכת מאפשרת:
 
@@ -91,6 +91,7 @@
 - המערכת **רק בודקת** שסקריפטים נטענו כראוי
 
 **למה?**
+
 - ביצועים טובים יותר (לא חסימת אתחול)
 - ניטור מדויק (ידע מראש מה אמור להיטען)
 - פחות מורכבות (לא צורך בניהול promises)
@@ -105,6 +106,7 @@
 - כל package יש לו `scripts` array - רשימת הסקריפטים
 
 **דוגמה:**
+
 ```javascript
 'dashboard-widgets': {
   id: 'dashboard-widgets',
@@ -132,6 +134,7 @@
 - `customInitializers` - פונקציות אתחול מותאמות אישית
 
 **דוגמה:**
+
 ```javascript
 index: {
   name: 'Dashboard',
@@ -160,6 +163,7 @@ index: {
 - ה-Global צריך להיות זהה ל-`globalCheck` ב-Package Manifest
 
 **דוגמה:**
+
 ```javascript
 // recent-items-widget.js
 (function() {
@@ -190,11 +194,13 @@ index: {
 ### שלב 1: יצירת הסקריפט
 
 1. **צור את הקובץ:**
+
    ```
    trading-ui/scripts/widgets/my-new-widget.js
    ```
 
 2. **השתמש ב-Module Pattern (IIFE):**
+
    ```javascript
    ;(function() {
      'use strict';
@@ -237,6 +243,7 @@ index: {
 1. **מצא את החבילה המתאימה** (או צור חדשה)
 
 2. **הוסף את הסקריפט לחבילה:**
+
    ```javascript
    'my-package': {
      id: 'my-package',
@@ -256,6 +263,7 @@ index: {
    ```
 
 **חשוב:**
+
 - `file` - נתיב יחסי מ-`scripts/`
 - `globalCheck` - חייב להתאים ל-`window.MyNewWidget`
 - `required: true` - אם הסקריפט חובה לחבילה
@@ -268,6 +276,7 @@ index: {
 1. **מצא את הגדרת העמוד**
 
 2. **הוסף את החבילה ל-`packages`:**
+
    ```javascript
    'my-page': {
      name: 'My Page',
@@ -288,6 +297,7 @@ index: {
    ```
 
 **חשוב:**
+
 - `packages` - רשימת כל החבילות הנדרשות
 - `requiredGlobals` - רשימת כל ה-globals הנדרשים
 - `customInitializers` - פונקציות אתחול מותאמות אישית
@@ -297,6 +307,7 @@ index: {
 **קובץ:** `trading-ui/my-page.html`
 
 1. **הוסף את תג ה-`<script>`:**
+
    ```html
    <!-- במיקום המתאים לפי loadOrder -->
    <script src="scripts/widgets/my-new-widget.js?v=1.0.0"></script>
@@ -308,6 +319,7 @@ index: {
    - אחרי כל ה-dependencies
 
 **דוגמה:**
+
 ```html
 <!-- ===== PACKAGE: MY PACKAGE ===== -->
 <!-- Load Order: 20 -->
@@ -315,6 +327,7 @@ index: {
 ```
 
 **חשוב:**
+
 - **חובה** להוסיף את הקובץ ל-HTML!
 - המערכת **לא טוענת** אוטומטית
 - הוסף `?v=1.0.0` לגרסה
@@ -324,6 +337,7 @@ index: {
 1. **טען את העמוד בדפדפן**
 
 2. **בדוק ב-Console:**
+
    ```javascript
    // בדוק שה-Global קיים
    console.log(window.MyNewWidget); // צריך להחזיר object
@@ -495,10 +509,12 @@ BASE (1)
 #### defer (מומלץ לסקריפטים קריטיים)
 
 **שימוש:**
+
 - סקריפטים קריטיים עם תלויות
 - כל ה-packages הקריטיים
 
 **התנהגות:**
+
 - נטען במקביל ל-parsing
 - רץ אחרי HTML parsing
 - **שומר על סדר ביצוע**
@@ -506,10 +522,12 @@ BASE (1)
 #### async (מומלץ לסקריפטים לא קריטיים)
 
 **שימוש:**
+
 - סקריפטים לא קריטיים
 - dev-tools, monitoring
 
 **התנהגות:**
+
 - נטען במקביל ל-parsing
 - רץ מיד כשהוא מוכן
 - **לא שומר על סדר ביצוע**
@@ -535,6 +553,7 @@ npm run build:bundles -- --package=base
 ```
 
 **תהליך:**
+
 - קריאת `package-manifest.js`
 - זיהוי כל הסקריפטים בכל package
 - איחוד הסקריפטים ל-bundle אחד עם `esbuild`
@@ -553,6 +572,7 @@ npm run test:bundles -- --package=base
 ```
 
 **בדיקות:**
+
 - וידוא שה-bundle קיים
 - בדיקת גודל
 - וידוא שה-source map קיים
@@ -601,6 +621,7 @@ python3 scripts/test_pages_console_errors.py --page=my-page
 ```
 
 **כללי סיווג:**
+
 - **`defer`** - לסקריפטים קריטיים עם תלויות (מומלץ לרוב הסקריפטים)
 - **`async`** - לסקריפטים לא קריטיים ללא תלויות
 - **`sync`** - רק במקרים מיוחדים מאוד
@@ -618,6 +639,7 @@ node trading-ui/scripts/generate-script-loading-code.js my-page --mode=productio
 ```
 
 הכלי:
+
 1. קורא את `package-manifest.js` ו-`page-initialization-configs.js`
 2. ממיין packages לפי `loadOrder`
 3. יוצר תגי `<script>` עם `loadingStrategy` הנכון
@@ -627,7 +649,7 @@ node trading-ui/scripts/generate-script-loading-code.js my-page --mode=productio
 
 ## 🔍 מערכת ניטור
 
-### מה המערכת בודקת?
+### מה המערכת בודקת
 
 1. **נטענים vs צפויים:**
    - מה אמור להיטען (לפי Package Manifest)
@@ -641,7 +663,7 @@ node trading-ui/scripts/generate-script-loading-code.js my-page --mode=productio
    - האם הסקריפטים נטענו בסדר הנכון?
    - האם תלויות נטענו לפני התלויים?
 
-### איך להשתמש?
+### איך להשתמש
 
 1. **דפדפן:**
    - פתח `/init-system-management`
@@ -649,6 +671,7 @@ node trading-ui/scripts/generate-script-loading-code.js my-page --mode=productio
    - הרץ בדיקה
 
 2. **Console:**
+
    ```javascript
    // בדיקת Global
    window.MyWidget // צריך להחזיר object
@@ -658,6 +681,7 @@ node trading-ui/scripts/generate-script-loading-code.js my-page --mode=productio
    ```
 
 3. **Monitoring Functions:**
+
    ```javascript
    // בדיקה מקיפה
    window.runDetailedPageScan('index');
@@ -673,6 +697,7 @@ node trading-ui/scripts/generate-script-loading-code.js my-page --mode=productio
 ### דוגמה 1: הוספת ווידג'ט חדש
 
 **1. יצירת הסקריפט:**
+
 ```javascript
 // trading-ui/scripts/widgets/new-widget.js
 ;(function() {
@@ -692,6 +717,7 @@ node trading-ui/scripts/generate-script-loading-code.js my-page --mode=productio
 ```
 
 **2. עדכון Package Manifest:**
+
 ```javascript
 'dashboard-widgets': {
   scripts: [
@@ -707,6 +733,7 @@ node trading-ui/scripts/generate-script-loading-code.js my-page --mode=productio
 ```
 
 **3. עדכון Page Config:**
+
 ```javascript
 index: {
   packages: ['base', 'dashboard-widgets'],
@@ -722,6 +749,7 @@ index: {
 ```
 
 **4. עדכון HTML:**
+
 ```html
 <script src="scripts/widgets/new-widget.js?v=1.0.0"></script>
 ```
@@ -733,10 +761,12 @@ index: {
 ### בעיה: "Widget not available"
 
 **תסמינים:**
+
 - `⚠️ Widget not available`
 - `window.MyWidget is undefined`
 
 **פתרונות:**
+
 1. ✅ ודא שהקובץ ב-HTML
 2. ✅ בדוק שהנתיב נכון
 3. ✅ ודא שה-Global נוצר
@@ -745,10 +775,12 @@ index: {
 ### בעיה: "Script not loaded"
 
 **תסמינים:**
+
 - הסקריפט לא נטען
 - אין log "✅ Script loaded"
 
 **פתרונות:**
+
 1. ✅ הוסף את הקובץ ל-HTML
 2. ✅ בדוק שהנתיב נכון
 3. ✅ בדוק שגיאות network ב-Console
@@ -757,10 +789,12 @@ index: {
 ### בעיה: "Load order mismatch"
 
 **תסמינים:**
+
 - `⚠️ Load order mismatch`
 - סקריפטים נטענים בסדר שגוי
 
 **פתרונות:**
+
 1. ✅ בדוק `loadOrder` ב-Package Manifest
 2. ✅ בדוק `dependencies` נכונים
 3. ✅ מיין מחדש את ה-HTML לפי loadOrder
@@ -768,10 +802,12 @@ index: {
 ### בעיה: "Missing dependency"
 
 **תסמינים:**
+
 - `⚠️ Missing dependency`
 - סקריפט לא זמין כשצריך
 
 **פתרונות:**
+
 1. ✅ הוסף dependency ל-`dependencies` array
 2. ✅ ודא שה-dependency נטען לפני
 3. ✅ בדוק שה-dependency ב-Package Manifest
@@ -780,19 +816,19 @@ index: {
 
 ## 📚 קבצים מרכזיים
 
-### קבצי קוד:
+### קבצי קוד
 
 - `trading-ui/scripts/init-system/package-manifest.js` - מניפסט חבילות
 - `trading-ui/scripts/page-initialization-configs.js` - הגדרות עמודים
 - `trading-ui/scripts/modules/core-systems.js` - Unified App Initializer
 - `trading-ui/scripts/monitoring-functions.js` - פונקציות ניטור
 
-### קבצי דוקומנטציה:
+### קבצי דוקומנטציה
 
 - `documentation/02-ARCHITECTURE/FRONTEND/UNIFIED_INITIALIZATION_SYSTEM.md`
 - `documentation/03-DEVELOPMENT/GUIDES/WIDGET_DEVELOPER_GUIDE.md`
 
-### כלי בדיקה:
+### כלי בדיקה
 
 - `/init-system-management` - ממשק ניטור
 - `window.runDetailedPageScan()` - בדיקה מקיפה

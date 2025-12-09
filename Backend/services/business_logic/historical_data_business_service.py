@@ -1405,15 +1405,13 @@ class HistoricalDataBusinessService(BaseBusinessService):
                     'error': 'start_date and end_date are required'
                 }
             
-            # Get all journal entries for the date range
-            entity_types = None
-            if entity_type and entity_type != 'all':
-                entity_types = [entity_type]
-            
+            # CRITICAL: Always load ALL entity types for activity stats calculation
+            # The entity_type filter is only for frontend display, not for graph data
+            # This ensures accurate planning_count calculation across all entity types
             journal_result = self.aggregate_journal_entries(
                 user_id=user_id,
                 date_range=date_range,
-                entity_types=entity_types
+                entity_types=None  # Always load all entity types for accurate graph
             )
             
             entries = journal_result.get('entries', [])

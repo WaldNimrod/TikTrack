@@ -9,7 +9,9 @@
 ## בעיות שזוהו
 
 ### 1. שגיאת 404 - init-system.js לא קיים
+
 **מיקום:**
+
 - `trading-ui/mockups/daily-snapshots/price-history-page.html:4140`
 - `trading-ui/tradingview-widgets-showcase.html:1716`
 
@@ -18,27 +20,34 @@
 **פתרון:** הסרת תגי `<script>` שמנסים לטעון את הקובץ הלא קיים.
 
 ### 2. שגיאת Syntax - "Unexpected identifier 'טים'"
+
 **מיקום:** לא זוהה במדויק, אך יכול להיות:
+
 - בעיית encoding בקבצי JavaScript
 - גרש לא נכון בטקסט עברי
 - בעיה ב-`package-manifest.js` שורה 1625 (`ווידג׳טים` עם גרש ימני)
 
-**פתרון:** 
+**פתרון:**
+
 - בדיקה ותיקון של כל הגרשים בקבצי JavaScript
 - תיקון encoding אם נדרש
 - איחוד גרשים (שימוש בגרש שמאלי בלבד)
 
 ### 3. חסרים 2 ווידג'טים - יש 13 ולא 11
+
 **בעיה:** בקובץ `tradingview-widgets-config.js` יש רק 11 ווידג'טים, אבל בעמוד showcase יש 13:
+
 - חסר: `symbol-search`
 - חסר: `technical-analysis`
 
 **פתרון:** הוספת 2 הווידג'טים החסרים לקובץ config.
 
 ### 4. טעינה לא מדויקת בעמודי מוקאפים
+
 **בעיה:** עמודי המוקאפים לא רשומים במניפסט החבילות ולא מוגדרים ב-page-initialization-configs.js.
 
-**פתרון:** 
+**פתרון:**
+
 - רישום כל עמודי המוקאפים ב-page-initialization-configs.js
 - יצירת קוד טעינה מדויק לכל עמוד באמצעות PageTemplateGenerator
 - בדיקת טעינה באמצעות monitoring-functions.js
@@ -48,15 +57,18 @@
 ## הבהרות חשובות
 
 ### מערכת המטמון/ניטור
+
 **חשוב:** מערכת המטמון היא מערכת ניטור ותיעוד בלבד - היא לא טוענת קבצים בפועל!
 
 **איך זה עובד:**
+
 1. `package-manifest.js` - מגדיר אילו scripts בכל package (תיעוד בלבד)
 2. `page-initialization-configs.js` - מגדיר אילו packages נדרשים לכל עמוד (תיעוד בלבד)
 3. `monitoring-functions.js` - בודק מה נטען בפועל ומה צריך להיות נטען (ניטור בלבד)
 4. **הטעינה בפועל:** נעשית ב-HTML עם תגי `<script>` - לא דינמית!
 
 **כלים זמינים:**
+
 - `PageTemplateGenerator.generateScriptTagsForPage()` - כלי ליצירת קוד טעינה אוטומטי
 - `runDetailedPageScan()` - כלי לבדיקת וניטור בדפדפן
 - `checkForMismatches()` - בדיקת אי-התאמות בין תיעוד למציאות
@@ -72,6 +84,7 @@
 **שורה:** 4140
 
 **פעולה:** הסרת השורה:
+
 ```html
 <script src="../../scripts/init-system/init-system.js"></script> <!-- מערכת אתחול -->
 ```
@@ -85,6 +98,7 @@
 **שורה:** 1716
 
 **פעולה:** הסרת השורה:
+
 ```html
 <script src="scripts/init-system/init-system.js"></script> <!-- מערכת אתחול -->
 ```
@@ -96,11 +110,13 @@
 ### 2.1 בדיקת encoding בקבצי JavaScript
 
 **קבצים לבדיקה:**
+
 - `trading-ui/scripts/init-system/package-manifest.js` (שורה 1625)
 - `trading-ui/scripts/page-initialization-configs.js` (שורה 2378)
 - כל קבצי `tradingview-widgets/*.js`
 
 **פעולה:**
+
 1. בדיקת encoding של כל הקבצים (חייב להיות UTF-8)
 2. חיפוש גרשים לא נכונים (`'` vs `'` vs `'`)
 3. תיקון כל הגרשים לשימוש בגרש שמאלי (`'`) בלבד
@@ -116,6 +132,7 @@
 **תיקון:** החלפה ל-`ווידג'טים` (עם גרש שמאלי `'`)
 
 **שורות נוספות לבדיקה:**
+
 - 1732: `ווידג'טים` (תקין)
 - 1741: `הגדרות ווידג'טים` (תקין)
 - 1755: `Factory ליצירת ווידג'טים` (תקין)
@@ -124,6 +141,7 @@
 ### 2.3 בדיקת שגיאות syntax נוספות
 
 **פעולה:**
+
 1. הרצת syntax check על כל קבצי `tradingview-widgets/*.js`
 2. בדיקת שגיאות linting
 3. תיקון כל שגיאות syntax שזוהו
@@ -139,6 +157,7 @@
 **מיקום:** אחרי `symbol-profile` (שורה 250)
 
 **קונפיגורציה:**
+
 ```javascript
 'symbol-search': {
   script: 'https://s3.tradingview.com/external-embedding/embed-widget-symbol-search.js',
@@ -167,6 +186,7 @@
 **מיקום:** אחרי `symbol-search`
 
 **קונפיגורציה:**
+
 ```javascript
 'technical-analysis': {
   script: 'https://s3.tradingview.com/external-embedding/embed-widget-technical-analysis.js',
@@ -187,6 +207,7 @@
 ### 3.3 עדכון תיעוד
 
 **קבצים לעדכון:**
+
 - `tradingview-widgets-config.js` - עדכון הערה מ-"11" ל-"13"
 - `tradingview-widgets-core.js` - עדכון הערות
 - `tradingview-widgets-factory.js` - הוספת factory methods ל-2 הווידג'טים החדשים
@@ -198,6 +219,7 @@
 ### 4.1 רישום עמודי מוקאפים ב-page-initialization-configs.js
 
 **עמודי מוקאפים:**
+
 1. `price-history-page` - כבר רשום
 2. `trade-history-page`
 3. `portfolio-state-page`
@@ -212,6 +234,7 @@
 12. `tradingview-test-page`
 
 **פעולה:** הוספת config לכל עמוד מוקאפ ב-`page-initialization-configs.js`:
+
 - רישום packages נדרשים
 - רישום requiredGlobals
 - הגדרת customInitializers אם נדרש
@@ -221,12 +244,14 @@
 **כלי:** `trading-ui/scripts/init-system/dev-tools/page-template-generator.js`
 
 **שימוש:**
+
 ```javascript
 const generator = new PageTemplateGenerator();
 const scriptTags = generator.generateScriptTagsForPage('price-history-page', ['base', 'preferences', 'tradingview-widgets', 'init-system']);
 ```
 
 **פעולה:**
+
 1. יצירת קוד טעינה לכל עמוד מוקאפ
 2. החלפת קוד טעינה ידני בקוד שנוצר אוטומטית
 3. וידוא שכל הסקריפטים נטענים בסדר הנכון
@@ -236,11 +261,13 @@ const scriptTags = generator.generateScriptTagsForPage('price-history-page', ['b
 **כלי:** `trading-ui/scripts/monitoring-functions.js`
 
 **פונקציות:**
+
 - `runDetailedPageScan(pageName, pageConfig)` - סריקה מפורטת
 - `checkForMismatches(pageName, pageConfig, htmlScripts)` - בדיקת אי-התאמות
 - `compareHTMLvsDOM(htmlScripts, domScripts, pageConfig, packageManifest)` - השוואה HTML vs DOM
 
 **פעולה:**
+
 1. הרצת `runDetailedPageScan()` על כל עמוד מוקאפ
 2. בדיקת אי-התאמות בין תיעוד למציאות
 3. תיקון כל הבעיות שזוהו
@@ -252,6 +279,7 @@ const scriptTags = generator.generateScriptTagsForPage('price-history-page', ['b
 ### 5.1 בדיקת טעינת קבצים
 
 **בדיקות:**
+
 1. בדיקה שכל 4 קבצי Core System נטענים (200 OK):
    - `tradingview-widgets-config.js`
    - `tradingview-widgets-colors.js`
@@ -269,6 +297,7 @@ const scriptTags = generator.generateScriptTagsForPage('price-history-page', ['b
 ### 5.2 בדיקת עמוד tradingview-widgets-showcase.html
 
 **בדיקות:**
+
 1. העמוד נטען ללא שגיאות
 2. ממשק הבדיקה מופיע ופועל
 3. יצירת ווידג'ט דרך Core System עובדת (כל 13 הווידג'טים)
@@ -280,6 +309,7 @@ const scriptTags = generator.generateScriptTagsForPage('price-history-page', ['b
 ### 5.3 בדיקת עמוד price-history-page.html
 
 **בדיקות:**
+
 1. העמוד נטען ללא שגיאות
 2. סקשן Core System מופיע
 3. ווידג'ט Core System נוצר בהצלחה
@@ -290,6 +320,7 @@ const scriptTags = generator.generateScriptTagsForPage('price-history-page', ['b
 ### 5.4 בדיקת אינטגרציה עם מערכת האיתחול
 
 **בדיקות:**
+
 1. Package `tradingview-widgets` נטען דרך package-manifest
 2. Page configs מכילים את ה-package
 3. Required globals זמינים אחרי טעינה
@@ -299,6 +330,7 @@ const scriptTags = generator.generateScriptTagsForPage('price-history-page', ['b
 ### 5.5 בדיקת אינטגרציה עם מערכת הצבעים
 
 **בדיקות:**
+
 1. `chartSecondaryColor` קיים בהעדפות
 2. צבעים מתעדכנים דינמית
 3. Fallback chain עובד (העדפות → CSS variables → defaults)
@@ -312,6 +344,7 @@ const scriptTags = generator.generateScriptTagsForPage('price-history-page', ['b
 **פקודה:** `./start_server.sh`
 
 **בדיקות:**
+
 1. השרת מתחיל בהצלחה
 2. אין שגיאות באתחול
 3. השרת מאזין על פורט 8080
@@ -319,6 +352,7 @@ const scriptTags = generator.generateScriptTagsForPage('price-history-page', ['b
 ### 6.2 בדיקת נגישות
 
 **בדיקות:**
+
 1. `curl http://localhost:8080/` מחזיר 200 OK
 2. `curl http://localhost:8080/tradingview-widgets-showcase.html` מחזיר 200 OK
 3. `curl http://localhost:8080/mockups/daily-snapshots/price-history-page.html` מחזיר 200 OK
@@ -326,6 +360,7 @@ const scriptTags = generator.generateScriptTagsForPage('price-history-page', ['b
 ### 6.3 בדיקת טעינת קבצים
 
 **בדיקות:**
+
 1. כל 4 קבצי Core System נגישים (200 OK)
 2. אין שגיאות 404
 3. Content-Type נכון (text/javascript)
@@ -333,6 +368,7 @@ const scriptTags = generator.generateScriptTagsForPage('price-history-page', ['b
 ### 6.4 בדיקת דפדפן
 
 **בדיקות:**
+
 1. פתיחת העמודים בדפדפן
 2. בדיקת קונסול - אין שגיאות JavaScript
 3. בדיקת Network tab - כל הקבצים נטענים
@@ -346,6 +382,7 @@ const scriptTags = generator.generateScriptTagsForPage('price-history-page', ['b
 ### 7.1 בדיקת יצירת ווידג'טים
 
 **בדיקות:**
+
 1. יצירת Advanced Chart עובדת
 2. יצירת Symbol Overview עובדת
 3. יצירת Mini Chart עובדת
@@ -354,6 +391,7 @@ const scriptTags = generator.generateScriptTagsForPage('price-history-page', ['b
 ### 7.2 בדיקת עדכון ווידג'טים
 
 **בדיקות:**
+
 1. עדכון symbol עובד
 2. עדכון theme עובד
 3. עדכון locale עובד
@@ -362,6 +400,7 @@ const scriptTags = generator.generateScriptTagsForPage('price-history-page', ['b
 ### 7.3 בדיקת מחיקת ווידג'טים
 
 **בדיקות:**
+
 1. מחיקת ווידג'ט יחיד עובדת
 2. מחיקת כל הווידג'טים עובדת
 3. אין שגיאות אחרי מחיקה
@@ -369,6 +408,7 @@ const scriptTags = generator.generateScriptTagsForPage('price-history-page', ['b
 ### 7.4 בדיקת Responsive Design
 
 **בדיקות:**
+
 1. ווידג'טים מתאימים את עצמם לגודל המסך
 2. Resize events מטופלים נכון
 3. אין overflow או בעיות תצוגה
@@ -380,6 +420,7 @@ const scriptTags = generator.generateScriptTagsForPage('price-history-page', ['b
 ### 8.1 אינטגרציה עם מערכת האיתחול
 
 **בדיקות:**
+
 1. Package נטען דרך package-manifest
 2. Page configs מכילים את ה-package
 3. Required globals זמינים
@@ -389,6 +430,7 @@ const scriptTags = generator.generateScriptTagsForPage('price-history-page', ['b
 ### 8.2 אינטגרציה עם מערכת הצבעים
 
 **בדיקות:**
+
 1. צבעים נטענים מהעדפות
 2. Fallback chain עובד
 3. עדכון צבעים דינמי עובד
@@ -396,6 +438,7 @@ const scriptTags = generator.generateScriptTagsForPage('price-history-page', ['b
 ### 8.3 אינטגרציה עם מערכת העדפות
 
 **בדיקות:**
+
 1. `chartSecondaryColor` קיים בהעדפות
 2. העדפה נשמרת בבסיס הנתונים
 3. העדפה מופיעה בממשק העדפות
@@ -436,7 +479,8 @@ const scriptTags = generator.generateScriptTagsForPage('price-history-page', ['b
 
 ## קבצים לעדכון
 
-### קבצים לעדכון:
+### קבצים לעדכון
+
 1. `trading-ui/mockups/daily-snapshots/price-history-page.html` - הסרת init-system.js
 2. `trading-ui/tradingview-widgets-showcase.html` - הסרת init-system.js
 3. `trading-ui/scripts/init-system/package-manifest.js` - תיקון גרש בשורה 1625
@@ -444,7 +488,8 @@ const scriptTags = generator.generateScriptTagsForPage('price-history-page', ['b
 5. `trading-ui/scripts/page-initialization-configs.js` - רישום כל עמודי המוקאפים
 6. כל עמודי המוקאפים - יצירת קוד טעינה מדויק
 
-### קבצים לבדיקה:
+### קבצים לבדיקה
+
 1. כל קבצי `tradingview-widgets/*.js` - בדיקת syntax
 2. `trading-ui/scripts/page-initialization-configs.js` - בדיקת encoding
 

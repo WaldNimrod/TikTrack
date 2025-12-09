@@ -9,6 +9,7 @@
 ## סקירה כללית
 
 Ticker List Widget הוא וויגיט לדשבורד הבית המציג טיקרים עם KPI Cards מיניאטוריים. הוויגיט כולל 3 טאבים:
+
 - **טיקרים פעילים** - טיקרים של המשתמש עם נתונים ראשוניים
 - **רשימת צפיה** - טיקרים מרשימת צפיה (mockup עכשיו)
 - **כל הטיקרים** - כל הטיקרים של המשתמש עם נתונים ראשוניים
@@ -18,12 +19,15 @@ Ticker List Widget הוא וויגיט לדשבורד הבית המציג טיק
 ## קבצים
 
 ### JavaScript
+
 - `trading-ui/scripts/widgets/ticker-list-widget.js`
 
 ### CSS
+
 - `trading-ui/styles-new/06-components/_ticker-list-widget.css`
 
 ### HTML
+
 - `trading-ui/index.html` - מיקום: שורה שנייה, עמודה ימנית
 
 ---
@@ -35,6 +39,7 @@ Ticker List Widget הוא וויגיט לדשבורד הבית המציג טיק
 מאתחל את הוויגיט.
 
 **Parameters:**
+
 - `containerId` (string, optional) - ID של הקונטיינר (ברירת מחדל: `tickerListWidgetContainer`)
 - `config` (object, optional) - קונפיגורציה:
   - `maxItems` (number) - מספר מקסימלי של טיקרים להצגה (ברירת מחדל: 5)
@@ -42,6 +47,7 @@ Ticker List Widget הוא וויגיט לדשבורד הבית המציג טיק
   - `watchListId` (number | null) - ID של רשימת צפיה (null עבור mockup)
 
 **Example:**
+
 ```javascript
 window.TickerListWidget.init('tickerListWidgetContainer', {
   maxItems: 5,
@@ -55,12 +61,14 @@ window.TickerListWidget.init('tickerListWidgetContainer', {
 מעדכן את הוויגיט עם נתונים חדשים.
 
 **Parameters:**
+
 - `data` (object, optional) - נתונים לעדכון:
   - `activeTickers` (Array) - טיקרים פעילים
   - `watchListTickers` (Array) - טיקרים מרשימת צפיה
   - `allTickers` (Array) - כל הטיקרים
 
 **Example:**
+
 ```javascript
 window.TickerListWidget.render({
   activeTickers: [...],
@@ -74,6 +82,7 @@ window.TickerListWidget.render({
 מרענן את הנתונים מה-API.
 
 **Example:**
+
 ```javascript
 window.TickerListWidget.refresh();
 ```
@@ -83,6 +92,7 @@ window.TickerListWidget.refresh();
 מנקה את הוויגיט ומסיר event listeners.
 
 **Example:**
+
 ```javascript
 window.TickerListWidget.destroy();
 ```
@@ -112,15 +122,18 @@ window.TickerListWidget.destroy();
 ## תלויות
 
 ### מערכות כלליות
+
 - `FieldRendererService` - עיצוב נתונים
 - `ButtonSystem` - כפתורים
 - `NotificationSystem` - התראות שגיאה
 - `UnifiedCacheManager` - ניהול מטמון
 
 ### API Endpoints
+
 - `GET /api/tickers/with-initial-data` - טיקרים עם נתונים ראשוניים
 
 ### Services
+
 - `WatchListsWidgetService` - ניהול רשימות צפיה (mockup)
 
 ---
@@ -128,11 +141,15 @@ window.TickerListWidget.destroy();
 ## קונפיגורציה
 
 ### Package Manifest
+
 הוויגיט נטען דרך החבילה `dashboard-widgets`:
+
 - `trading-ui/scripts/init-system/package-manifest.js`
 
 ### Page Config
+
 הוויגיט מאותחל ב-`page-initialization-configs.js`:
+
 - `index` page → `customInitializers`
 
 ---
@@ -148,6 +165,7 @@ window.TickerListWidget.destroy();
 ## Responsive Design
 
 הוויגיט תומך ב-responsive design:
+
 - Desktop: 3 עמודות
 - Tablet: 2 עמודות
 - Mobile: עמודה אחת

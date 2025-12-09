@@ -62,6 +62,7 @@ def update_user_ticker_status(db, user_id, ticker_id):
 ```
 
 **טריגרים:**
+
 - יצירת טרייד/תוכנית
 - סגירת טרייד/תוכנית
 - ביטול טרייד/תוכנית
@@ -81,6 +82,7 @@ def update_ticker_status_auto(db, ticker_id):
 ```
 
 **שימוש:**
+
 - קובע את העבודה מול מערכת הנתונים החיצוניים
 - קובע את תדירות הטעינה של נתונים חיצוניים
 
@@ -103,6 +105,7 @@ tickers = TickerService.get_user_tickers(db, user_id=10)
 ```
 
 **אופטימיזציה:**
+
 - משתמש ב-`joinedload` למניעת N+1 queries
 - ביצועים: ~0.002s למשתמש עם 52 טיקרים
 
@@ -111,6 +114,7 @@ tickers = TickerService.get_user_tickers(db, user_id=10)
 מעדכן סטטוס ברמת שיוך.
 
 **קריאה אוטומטית:**
+
 - `TradeService.create/update/close/cancel`
 - `TradePlanService.create/update/cancel/activate`
 
@@ -119,6 +123,7 @@ tickers = TickerService.get_user_tickers(db, user_id=10)
 מעדכן סטטוס כללי של טיקר.
 
 **קריאה אוטומטית:**
+
 - אחרי `update_user_ticker_status`
 - אחרי יצירה/עדכון/ביטול שיוך
 
@@ -145,6 +150,7 @@ def get_tickers():
 **שינוי:** משתמש ב-`get_user_tickers` (זהה ל-`/api/tickers/`)
 
 **תגובה:**
+
 ```json
 {
   "status": "success",
@@ -164,23 +170,27 @@ def get_tickers():
 ### POST /api/tickers/
 
 **לוגיקה:**
+
 1. בודק אם הטיקר כבר קיים (לפי `symbol`)
 2. אם קיים → יוצר שיוך ב-`user_tickers`
 3. אם לא קיים → יוצר טיקר חדש ואז שיוך
 
 **שדות מותאמים:**
+
 - `name_custom` - שם חברה מותאם אישית
 - `type_custom` - סוג נכס מותאם אישית
 
 ### PUT /api/tickers/<id>
 
 **לוגיקה:**
+
 - עדכון שדות מותאמים (`name_custom`, `type_custom`) ב-`user_tickers`
 - עדכון שדות כלליים (`symbol`, `name`, `type`) רק למנהל (עתידי)
 
 ### DELETE /api/tickers/<id>
 
 **לוגיקה:**
+
 - מבטל שיוך משתמש (`status = 'cancelled'`)
 - לא מוחק את הטיקר מהטבלה הראשית
 - מעדכן סטטוס כללי
@@ -188,6 +198,7 @@ def get_tickers():
 ### DELETE /api/tickers/<id>/admin-delete
 
 **לוגיקה:**
+
 - רק למנהל
 - בודק שאין שיוכים פעילים
 - מוחק את הטיקר מהטבלה הראשית (cascade)
@@ -220,6 +231,7 @@ const tickers = await window.tickersData.getUserTickers({ force: true });
 #### `populateTickersSelect(selectIdOrElement, options)`
 
 **שינוי:**
+
 - משתמש ב-`/api/tickers/my` במקום `/api/tickers/`
 - מציג `name_custom` אם קיים, אחרת `name`
 - מציג `type_custom` אם קיים, אחרת `type`
@@ -232,6 +244,7 @@ const tickers = await window.tickersData.getUserTickers({ force: true });
 #### `loadTickersForTradePlan(selectId)`
 
 **שינוי:**
+
 - משתמש ב-`/api/tickers/my`
 - ממיין אלפביתית
 - מציג שדות מותאמים
@@ -241,6 +254,7 @@ const tickers = await window.tickersData.getUserTickers({ force: true });
 **קובץ:** `trading-ui/scripts/tickers.js`
 
 **שינויים:**
+
 - מציג `name_custom` במקום `name` (אם קיים)
 - מציג `type_custom` במקום `type` (אם קיים)
 - מציג סטטוס ברמת שיוך (`user_ticker_status`)
@@ -254,6 +268,7 @@ const tickers = await window.tickersData.getUserTickers({ force: true });
 **קובץ:** `Backend/migrations/add_user_ticker_custom_fields.py`
 
 **שדות שנוספו:**
+
 - `name_custom` (VARCHAR(100) NULL)
 - `type_custom` (VARCHAR(20) NULL)
 - `status` (VARCHAR(20) DEFAULT 'open' NOT NULL)
@@ -265,12 +280,14 @@ const tickers = await window.tickersData.getUserTickers({ force: true });
 **קובץ:** `Backend/scripts/migrate_user_ticker_associations.py`
 
 **לוגיקה:**
+
 1. עבור כל משתמש:
    - איתור טיקרים מטריידים, תוכניות וביצועים
    - יצירת שיוך ב-`user_tickers`
    - חישוב סטטוס ראשוני (open/closed)
 
 **תוצאות:**
+
 - User 10 (admin): 52 טיקרים
 - User 11 (user): 19 טיקרים
 - סה"כ: 83 שיוכים
@@ -284,6 +301,7 @@ const tickers = await window.tickersData.getUserTickers({ force: true });
 **קובץ:** `Backend/scripts/optimize_user_ticker_indexes.py`
 
 **אינדקסים שנוצרו:**
+
 - `idx_user_tickers_user_status` (user_id, status)
 - `idx_user_tickers_ticker_status` (ticker_id, status)
 - `idx_user_tickers_status` (status)
@@ -291,11 +309,13 @@ const tickers = await window.tickersData.getUserTickers({ force: true });
 ### ביצועים
 
 **תוצאות בדיקות:**
+
 - `get_user_tickers`: 0.002s (1 query, ללא N+1)
 - `update_ticker_status_auto`: 0.001s
 - `update_user_ticker_status`: 0.002s
 
 **אופטימיזציות:**
+
 - שימוש ב-`joinedload` למניעת N+1 queries
 - אינדקסים מותאמים ל-queries הנפוצים
 

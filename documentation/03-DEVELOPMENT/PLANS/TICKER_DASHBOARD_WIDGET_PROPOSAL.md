@@ -87,10 +87,12 @@
 ### טאב 1: טיקרים פעילים
 
 **מקור נתונים:**
+
 - טיקרים עם סטטוס `open` ברמת `UserTicker`
 - מיון לפי: תאריך עדכון אחרון / נפח / שינוי יומי
 
 **תצוגה:**
+
 - עד 3-5 טיקרים פעילים (configurable)
 - KPI Card מיניאטורי לכל טיקר:
   - **שורה 1:** סמל טיקר + מחיר נוכחי + שינוי יומי (%)
@@ -98,26 +100,31 @@
   - **שורה 3:** כפתור "דשבורד מלא" (קישור ל-`/ticker-dashboard.html?tickerId={id}`)
 
 **אופציונלי:**
+
 - גרף מיני (TradingView Mini Chart) - אם יש מקום
 - Badge עם מספר טיקרים פעילים
 
 ### טאב 2: מועדפים
 
 **מקור נתונים:**
+
 - טיקרים מסומנים כמועדפים (אם יש מערכת מועדפים)
 - או טיקרים עם `name_custom` (טיקרים מותאמים אישית)
 
 **תצוגה:**
+
 - אותו מבנה כמו טאב "טיקרים פעילים"
 - עד 3-5 טיקרים מועדפים
 
 ### טאב 3: כל הטיקרים
 
 **מקור נתונים:**
+
 - כל הטיקרים של המשתמש (מ-`/api/tickers/my`)
 - מיון לפי: שם / סמל / נפח / שינוי
 
 **תצוגה:**
+
 - רשימה מקוצרת (עד 5-10 טיקרים)
 - כפתור "הצג הכל" → קישור לעמוד `tickers.html`
 
@@ -266,16 +273,19 @@
 ### 1. טעינת נתונים
 
 **מקורות:**
+
 - `/api/tickers/my` - רשימת טיקרים של המשתמש
 - `EntityDetailsService.get_entity_details('ticker', id)` - נתונים מפורטים לכל טיקר
 
 **Cache:**
+
 - שימוש ב-`UnifiedCacheManager` עם TTL של 5 דקות
 - Invalidation אוטומטי לאחר עדכון טיקרים
 
 ### 2. רינדור KPI Cards
 
 **שימוש במערכות כלליות:**
+
 - `FieldRendererService.renderAmount()` - מחירים
 - `FieldRendererService.renderNumericValue()` - אחוזים
 - `FieldRendererService.renderATR()` - ATR עם traffic light
@@ -284,6 +294,7 @@
 ### 3. גרף מיני (אופציונלי)
 
 **אם נכלל:**
+
 - TradingView Mini Chart
 - גובה: 60-80px
 - רוחב: 100% של הקונטיינר
@@ -292,6 +303,7 @@
 ### 4. אינטראקטיביות
 
 **אירועים:**
+
 - לחיצה על KPI Card → פתיחת דשבורד מלא
 - לחיצה על כפתור "דשבורד מלא" → ניווט לדשבורד
 - רענון → טעינה מחדש של נתונים
@@ -453,6 +465,7 @@ index: {
 **מיקום:** `trading-ui/styles-new/06-components/_ticker-dashboard-widget.css`
 
 **סגנונות:**
+
 - `.ticker-dashboard-widget-item` - קונטיינר לכל טיקר
 - `.ticker-dashboard-widget-item-header` - כותרת (סמל + מחיר)
 - `.ticker-dashboard-widget-item-metrics` - מדדים טכניים
@@ -460,6 +473,7 @@ index: {
 - `.ticker-dashboard-widget-item-chart` - גרף מיני (אם יש)
 
 **צבעים:**
+
 - שימוש ב-CSS variables של המערכת
 - `var(--brand-primary-color)` - צבע ראשי
 - `var(--brand-secondary-color)` - צבע משני
@@ -469,21 +483,25 @@ index: {
 ## 🔄 Workflow מימוש
 
 ### שלב 1: תכנון ואישור
+
 - [ ] סקירת הצעה זו
 - [ ] אישור ממשק משתמש
 - [ ] החלטה על גרף מיני (כן/לא)
 
 ### שלב 2: יצירת קבצים
+
 - [ ] `trading-ui/scripts/widgets/ticker-dashboard-widget.js`
 - [ ] `trading-ui/styles-new/06-components/_ticker-dashboard-widget.css`
 - [ ] עדכון `trading-ui/index.html`
 
 ### שלב 3: אינטגרציה
+
 - [ ] עדכון Package Manifest
 - [ ] עדכון Page Config
 - [ ] בדיקת טעינה
 
 ### שלב 4: תיעוד
+
 - [ ] עדכון WIDGETS_LIST.md
 - [ ] יצירת מדריך מפתח (אם נדרש)
 
@@ -492,16 +510,19 @@ index: {
 ## 📝 הערות
 
 ### גרף מיני
+
 - **יתרון:** ויזואליזציה מהירה של תנועת מחיר
 - **חסרון:** דורש יותר מקום, עלול להאט טעינה
 - **המלצה:** להתחיל בלי, להוסיף אחר כך אם נדרש
 
 ### מספר טיקרים
+
 - **טיקרים פעילים:** 3-5 (configurable)
 - **מועדפים:** 3-5 (configurable)
 - **כל הטיקרים:** 5-10 (configurable)
 
 ### ביצועים
+
 - Cache עם TTL של 5 דקות
 - Lazy loading של נתונים מפורטים
 - Debounce על רענון

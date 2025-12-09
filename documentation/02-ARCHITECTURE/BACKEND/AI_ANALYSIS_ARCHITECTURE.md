@@ -51,6 +51,7 @@ Response to Client
 ```
 
 **הערות:**
+
 - גרסה 2.0 מפרידה בין `prompt_variables` (נשלח ל-LLM) ו-`filters` (שימוש פנימי)
 - `TradeAggregationService` משמש לאיסוף נתוני טריידים לתבניות Portfolio, Technical, Risk
 - `trading_account_id` נשמר ב-`filters` ולא נשלח למנוע AI
@@ -118,11 +119,13 @@ CREATE TABLE user_llm_providers (
 **קובץ:** `Backend/services/ai_analysis_service.py`
 
 **תפקידים:**
+
 - יצירת ניתוחים
 - ניהול היסטוריה
 - שמירת בקשות
 
 **Methods:**
+
 ```python
 class AIAnalysisService:
     def generate_analysis(self, template_id, variables, user_id, provider=None):
@@ -151,12 +154,14 @@ class AIAnalysisService:
 ### PromptTemplateService
 
 **Option 10 Implementation (November 2025):**
+
 - Full Hebrew translation support with explicit English prohibition
 - Achieves 74%+ Hebrew content for professional financial analysis
 - Supports both Hebrew and English responses
 - Works with all LLM providers (Gemini, Perplexity)
 
 **Key Methods:**
+
 - `build_prompt()` - Builds final prompt with Option 10 for Hebrew
 - `_translate_structure_to_hebrew()` - Translates structure section to Hebrew
 
@@ -167,10 +172,12 @@ class AIAnalysisService:
 **קובץ:** `Backend/services/ai_analysis_service.py`
 
 **תפקידים:**
+
 - ניהול תבניות פרומפטים
 - CRUD operations
 
 **Methods:**
+
 ```python
 class PromptTemplateService:
     def get_all_templates(self, active_only=True):
@@ -194,12 +201,14 @@ class PromptTemplateService:
 **קובץ:** `Backend/services/trade_aggregation_service.py`
 
 **תפקידים:**
+
 - מערכת כללית לאגרגציית נתוני טריידים
 - משמש ל-AI Analysis (תבניות 2, 3, 4), דוחות, וסטטיסטיקות
 - העשרת נתונים עם Executions, Trade Plans, Conditions, Positions
 - פורמט נתונים מובנה ל-AI
 
 **Methods:**
+
 ```python
 class TradeAggregationService:
     @staticmethod
@@ -226,11 +235,13 @@ class TradeAggregationService:
 **קובץ:** `Backend/services/llm_providers/llm_provider_manager.py`
 
 **תפקידים:**
+
 - ניהול מנועי LLM
 - בחירת provider adapter
 - Validation של API keys
 
 **Methods:**
+
 ```python
 class LLMProviderManager:
     def send_prompt(self, provider, prompt, api_key):

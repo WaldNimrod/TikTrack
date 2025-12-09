@@ -67,10 +67,12 @@ Autocomplete Service הוא מערכת כללית לשימוש חוזר המאפ
 אתחול autocomplete על input element.
 
 **Parameters:**
+
 - `inputElement` (HTMLElement): Input element לאתחול autocomplete
 - `config` (Object): אובייקט קונפיגורציה (ראה [Config Options](#config-options))
 
 **Example:**
+
 ```javascript
 const input = document.getElementById('myInput');
 window.AutocompleteService.init(input, {
@@ -92,9 +94,11 @@ window.AutocompleteService.init(input, {
 הרס autocomplete instance והסרת event listeners.
 
 **Parameters:**
+
 - `inputElement` (HTMLElement): Input element להרס autocomplete
 
 **Example:**
+
 ```javascript
 const input = document.getElementById('myInput');
 window.AutocompleteService.destroy(input);
@@ -105,10 +109,12 @@ window.AutocompleteService.destroy(input);
 הצגת suggestions ידנית.
 
 **Parameters:**
+
 - `inputElement` (HTMLElement): Input element
 - `suggestions` (Array): מערך של suggestions להצגה
 
 **Example:**
+
 ```javascript
 const input = document.getElementById('myInput');
 window.AutocompleteService.show(input, [
@@ -122,9 +128,11 @@ window.AutocompleteService.show(input, [
 הסתרת autocomplete overlay.
 
 **Parameters:**
+
 - `inputElement` (HTMLElement): Input element
 
 **Example:**
+
 ```javascript
 const input = document.getElementById('myInput');
 window.AutocompleteService.hide(input);
@@ -141,11 +149,13 @@ window.AutocompleteService.hide(input);
 **Type:** `Function(query: string) => Promise<Array>`
 
 **Parameters:**
+
 - `query` (string): הערך הנוכחי של ה-input
 
 **Returns:** Promise שמחזיר מערך של suggestions
 
 **Example:**
+
 ```javascript
 fetchFunction: async (query) => {
   const result = await window.TagService.getSuggestions({ 
@@ -164,6 +174,7 @@ fetchFunction: async (query) => {
 **Default:** `0`
 
 **Example:**
+
 ```javascript
 minChars: 2 // Show suggestions only after 2 characters
 ```
@@ -176,6 +187,7 @@ minChars: 2 // Show suggestions only after 2 characters
 **Default:** `10`
 
 **Example:**
+
 ```javascript
 maxSuggestions: 20 // Show up to 20 suggestions
 ```
@@ -187,12 +199,14 @@ maxSuggestions: 20 // Show up to 20 suggestions
 **Type:** `Function(item: Object, index: number) => string`
 
 **Parameters:**
+
 - `item` (Object): ה-item לרינדור
 - `index` (number): האינדקס של ה-item
 
 **Returns:** HTML string (חייב להיות HTML בטוח - המערכת לא עושה escape)
 
 **Example:**
+
 ```javascript
 itemRenderer: (tag, index) => {
   const usageText = tag.usage_count ? `${tag.usage_count} שיוכים` : '';
@@ -208,10 +222,12 @@ Callback שנקרא כאשר נבחר item.
 **Type:** `Function(item: Object, index: number) => void`
 
 **Parameters:**
+
 - `item` (Object): ה-item שנבחר
 - `index` (number): האינדקס של ה-item
 
 **Example:**
+
 ```javascript
 onSelect: (tag) => {
   inputElement.value = tag.name;
@@ -226,12 +242,14 @@ onSelect: (tag) => {
 **Type:** `Function(suggestions: Array, query: string) => Array`
 
 **Parameters:**
+
 - `suggestions` (Array): מערך ה-suggestions המקורי
 - `query` (string): הערך הנוכחי של ה-input
 
 **Returns:** מערך מסונן של suggestions
 
 **Example:**
+
 ```javascript
 filterFunction: (suggestions, query) => {
   if (!query || !query.trim()) {
@@ -252,6 +270,7 @@ filterFunction: (suggestions, query) => {
 **Default:** `300`
 
 **Example:**
+
 ```javascript
 debounceDelay: 500 // Wait 500ms before fetching
 ```
@@ -264,6 +283,7 @@ z-index של ה-overlay.
 **Default:** `10000`
 
 **Example:**
+
 ```javascript
 zIndex: 10500 // Higher z-index if needed
 ```
@@ -275,24 +295,29 @@ zIndex: 10500 // Higher z-index if needed
 המערכת מטפלת באירועים הבאים אוטומטית:
 
 ### Input Event
+
 - **Trigger:** כאשר המשתמש מקליד ב-input
 - **Action:** Debounced fetch של suggestions (אם יש מספיק תווים)
 
 ### Focus Event
+
 - **Trigger:** כאשר ה-input מקבל focus
 - **Action:** הצגת suggestions אם יש query (או אם minChars = 0)
 
 ### Blur Event
+
 - **Trigger:** כאשר ה-input מאבד focus
 - **Action:** הסתרת overlay (עם delay של 200ms כדי לאפשר click על suggestions)
 
 ### Keydown Event
+
 - **ArrowDown**: בחירת suggestion הבא
 - **ArrowUp**: בחירת suggestion הקודם
 - **Enter**: בחירת ה-selected suggestion
 - **Escape**: סגירת ה-overlay
 
 ### Click Outside
+
 - **Trigger:** לחיצה מחוץ ל-input וה-overlay
 - **Action:** סגירת ה-overlay
 
@@ -307,6 +332,7 @@ zIndex: 10500 // Higher z-index if needed
 **⚠️ חשוב:** ה-HTML שחוזר מה-`itemRenderer` לא עובר escape אוטומטי. עליך לוודא שהתוכן בטוח (או להשתמש ב-escapeHtml).
 
 **Example:**
+
 ```javascript
 itemRenderer: (tag) => {
   // Escape HTML to prevent XSS
@@ -396,31 +422,37 @@ window.AutocompleteService.init(tickerInput, {
 ## ✅ Best Practices
 
 ### Debouncing
+
 - השתמש ב-debouncing כדי להפחית קריאות API
 - Default: 300ms - מתאים לרוב המקרים
 - הגדל ל-500ms אם ה-API איטי
 
 ### Error Handling
+
 - המערכת מטפלת בשגיאות אוטומטית
 - הצג הודעת שגיאה למשתמש דרך `NotificationSystem`
 - חזור מערך ריק במקרה של שגיאה
 
 ### Performance
+
 - הגבל את מספר ה-suggestions (default: 10)
 - השתמש ב-caching דרך Service layers
 - אל תבצע fetch אם אין מספיק תווים
 
 ### Accessibility
+
 - המערכת תומכת במקלדת אוטומטית
 - ה-overlay כולל `role="listbox"` ו-`aria-selected`
 - וודא שה-`itemRenderer` מחזיר תוכן נגיש
 
 ### Security
+
 - אם אתה משתמש ב-`itemRenderer`, וודא HTML escaping
 - אל תכניס user input ישירות ל-HTML ללא escaping
 - השתמש ב-`escapeHtml` helper אם צריך
 
 ### RTL Support
+
 - המערכת תומכת ב-RTL אוטומטית
 - המיקום מתואם ל-RTL
 - הטקסט מיושר נכון אוטומטית
@@ -432,6 +464,10 @@ window.AutocompleteService.init(tickerInput, {
 - [ארכיטקטורה](AUTOCOMPLETE_SYSTEM_ARCHITECTURE.md)
 - [רשימת מערכות כלליות](../../frontend/GENERAL_SYSTEMS_LIST.md)
 - [Tag Widget Developer Guide](TAG_WIDGET_DEVELOPER_GUIDE.md)
+
+
+
+
 
 
 

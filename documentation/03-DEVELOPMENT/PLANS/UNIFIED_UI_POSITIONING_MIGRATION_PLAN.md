@@ -17,6 +17,7 @@
 ### 1. Widget Overlays ✅ **הושלם**
 
 **קבצים:**
+
 - `trading-ui/scripts/widgets/recent-items-widget.js`
 - `trading-ui/scripts/widgets/unified-pending-actions-widget.js`
 - `trading-ui/scripts/widgets/tag-widget.js`
@@ -38,6 +39,7 @@
 **רלוונטיות לעדכון:** 🔶 **בינונית**
 
 **סיבות:**
+
 - Autocomplete עובד טוב כרגע
 - יכול להרוויח מ-Floating UI למיקום חכם יותר
 - יכול להרוויח מ-handling של transform/overflow על parents
@@ -45,6 +47,7 @@
 **הערכה:** 2-3 שעות
 
 **שלבים:**
+
 1. בדיקת הקוד הקיים
 2. החלפת positioning logic ל-`UnifiedUIPositioning.positionElement`
 3. בדיקת תקינות
@@ -63,6 +66,7 @@
 **רלוונטיות לעדכון:** 🔶 **בינונית**
 
 **סיבות:**
+
 - Menu עובד טוב כרגע
 - יכול להרוויח מ-Floating UI למיקום חכם יותר
 - יכול להרוויח מ-handling של viewport boundaries
@@ -70,6 +74,7 @@
 **הערכה:** 2-3 שעות
 
 **שלבים:**
+
 1. בדיקת הקוד הקיים
 2. החלפת positioning logic ל-`UnifiedUIPositioning.positionElement`
 3. בדיקת תקינות
@@ -88,6 +93,7 @@
 **רלוונטיות לעדכון:** 🔶 **בינונית**
 
 **סיבות:**
+
 - Help system עובד טוב כרגע
 - יכול להרוויח מ-Floating UI למיקום חכם יותר
 - יכול להרוויח מ-handling של transform/overflow
@@ -95,6 +101,7 @@
 **הערכה:** 1-2 שעות
 
 **שלבים:**
+
 1. בדיקת הקוד הקיים
 2. החלפת positioning logic ל-`UnifiedUIPositioning.positionElement`
 3. בדיקת תקינות
@@ -113,6 +120,7 @@
 **רלוונטיות לעדכון:** 🟦 **לא רלוונטי (עתידי, אופציונלי)**
 
 **סיבות:**
+
 - Bootstrap Tooltips עובדים מעולה כרגע
 - אין סיבה להחליף אותם
 - רק משימה עתידית אופציונלית
@@ -120,6 +128,7 @@
 **הערכה:** 4-6 שעות (אם יחליטו לעדכן בעתיד)
 
 **שלבים (עתידי):**
+
 1. החלפת Bootstrap Tooltips ב-Floating UI
 2. עדכון כל הכפתורים
 3. בדיקת תקינות
@@ -140,6 +149,7 @@
 **רלוונטיות לעדכון:** ❌ **לא רלוונטי**
 
 **סיבות:**
+
 - Modal לא צריך overlay positioning
 - Modal ממוקם באמצעות Bootstrap Modal system
 
@@ -173,6 +183,7 @@
 **זמן משוער:** 2-3 שעות
 
 **שלבים:**
+
 1. קריאת `autocomplete-service.js` וזיהוי positioning logic
 2. החלפת positioning logic ל-`UnifiedUIPositioning.positionElement`
 3. בדיקת תקינות:
@@ -183,6 +194,7 @@
 4. עדכון תיעוד
 
 **קריטריונים להצלחה:**
+
 - [ ] Autocomplete ממוקם נכון
 - [ ] לא נחתך על ידי containers
 - [ ] RTL positioning עובד
@@ -198,6 +210,7 @@
 **זמן משוער:** 2-3 שעות
 
 **שלבים:**
+
 1. קריאת `actions-menu-system.js` וזיהוי positioning logic
 2. החלפת positioning logic ל-`UnifiedUIPositioning.positionElement`
 3. בדיקת תקינות:
@@ -208,6 +221,7 @@
 4. עדכון תיעוד
 
 **קריטריונים להצלחה:**
+
 - [ ] Menu ממוקם נכון
 - [ ] לא נחתך על ידי containers
 - [ ] RTL positioning עובד
@@ -223,6 +237,7 @@
 **זמן משוער:** 1-2 שעות
 
 **שלבים:**
+
 1. קריאת `technical-indicators-help.js` וזיהוי positioning logic
 2. החלפת positioning logic ל-`UnifiedUIPositioning.positionElement`
 3. בדיקת תקינות:
@@ -233,6 +248,7 @@
 4. עדכון תיעוד
 
 **קריטריונים להצלחה:**
+
 - [ ] Help overlay ממוקם נכון
 - [ ] לא נחתך על ידי containers
 - [ ] RTL positioning עובד
@@ -243,7 +259,7 @@
 
 ## הערכות זמן
 
-### סה"כ זמן משוער לעדכון כלל הממשקים:
+### סה"כ זמן משוער לעדכון כלל הממשקים
 
 - **Autocomplete Service:** 2-3 שעות
 - **Actions Menu System:** 2-3 שעות
@@ -255,7 +271,7 @@
 
 ## קריטריונים להצלחה כללית
 
-### כל ממשק חייב:
+### כל ממשק חייב
 
 1. ✅ מיקום נכון (לא מוזז)
 2. ✅ לא נחתך על ידי containers

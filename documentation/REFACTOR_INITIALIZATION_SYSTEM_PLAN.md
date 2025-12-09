@@ -12,15 +12,17 @@
 ### בעיה מרכזית: שתי מערכות initialization במקביל
 
 **המצב הנוכחי:**
+
 - `modules/core-systems.js` - המערכת הנכונה לפי התיעוד ✅
 - `unified-app-initializer.js` - צריך להיות ב-archive אך עדיין נטען ב-35 עמודים ❌
 
 **הבעיה העיקרית:**
+
 - `initializePreferencesForPage()` הוסר בטעות מ-`core-systems.js`
 - `unified-app-initializer.js` קורא ל-`initializePreferencesForPage()` אבל לא רץ תמיד או רץ מאוחר מדי
 - התוצאה: העדפות לא נטענות בתחילת הטעינה, קריאות מאוחרות גורמות ל-429 errors, נתונים לא זמינים כשצריך
 
-### בעיות נוספות:
+### בעיות נוספות
 
 1. **כפילות במערכות איתחול:**
    - שני DOMContentLoaded listeners פעילים
@@ -40,6 +42,7 @@
 ## פתרון ארכיטקטורי - עקרון: נקודת כניסה אחת
 
 **עקרון יסוד:**
+
 - `core-systems.js` בלבד אחראי על initialization ✅
 - `unified-app-initializer.js` לא צריך להיות נטען (לפי התיעוד הוא ב-archive) ❌
 
@@ -67,9 +70,11 @@
    - להציב את ה-flag לאחר טעינה מוצלחת
 
 **קבצים:**
+
 - `trading-ui/scripts/modules/core-systems.js` - הוספת הפונקציה והקריאה
 
 **הגדרות טעינת העדפות:**
+
 - **עמוד preferences:** `PreferencesUIV4.initialize()` עם `force: true` (רוצה נתונים טריים)
 - **שאר העמודים:** `PreferencesCore.initializeWithLazyLoading()` עם `force: false` (שימוש ב-cache)
 
@@ -78,6 +83,7 @@
 **מטרה:** להסיר את הקריאה ל-`unified-app-initializer.js` מכל העמודים
 
 **רשימת עמודים (35 עמודים):**
+
 1. `trading-ui/executions.html`
 2. `trading-ui/trade_plans.html`
 3. `trading-ui/notes.html`
@@ -115,6 +121,7 @@
 35. `trading-ui/tag-management.html`
 
 **פעולות:**
+
 1. **חיפוש והסרה:**
    - לחפש `unified-app-initializer.js` בכל קבצי HTML
    - להסיר את השורה: `<script src="scripts/unified-app-initializer.js?v=1.0.0"></script>`
@@ -143,6 +150,7 @@
    - לוודא שסדר הטעינה נכון בכל החבילות
 
 **קבצים:**
+
 - `trading-ui/scripts/init-system/package-manifest.js`
 
 ### שלב 4: עדכון page-initialization-configs.js
@@ -161,6 +169,7 @@
    - להסיר הערות מיושנות
 
 **קבצים:**
+
 - `trading-ui/scripts/page-initialization-configs.js`
 
 ### שלב 5: יצירת כלי אבחון
@@ -190,6 +199,7 @@
    - בדיקת שגיאות
 
 **קבצים חדשים:**
+
 - `trading-ui/scripts/init-system/dependency-analyzer.js`
 - `trading-ui/scripts/init-system/load-order-validator.js`
 - `trading-ui/scripts/init-system/initialization-checker.js`
@@ -211,6 +221,7 @@
    - לעדכן הערות מיושנות
 
 **קבצים:**
+
 - `documentation/02-ARCHITECTURE/FRONTEND/UNIFIED_INITIALIZATION_SYSTEM.md`
 - הערות בקוד
 
@@ -247,6 +258,7 @@
    - tag-management.html
 
 **סדר ביצוע בדיקות:**
+
 1. לבדוק על עמוד אחד (trade_plans) - בדיקה ראשונית
 2. ליישום לרוחב כל העמודים
 3. לבדיקה מלאה של כל העמודים
@@ -254,44 +266,56 @@
 ## לוח זמנים מפורט
 
 ### יום 1: תיקון הליבה
+
 **בוקר (4 שעות):**
+
 - שלב 1: החזרת `initializePreferencesForPage()` ל-`core-systems.js`
 - בדיקה ראשונית על עמוד אחד (trade_plans)
 
 **אחר הצהריים (4 שעות):**
+
 - שלב 2: הסרת `unified-app-initializer.js` מכל העמודים (35 עמודים)
 - בדיקה על כל העמודים
 
 ### יום 2: תיקון תלויות ומניפסט
+
 **בוקר (4 שעות):**
+
 - שלב 3: תיקון תלויות במניפסט
 - שלב 4: עדכון `page-initialization-configs.js`
 
 **אחר הצהריים (4 שעות):**
+
 - בדיקות מקיפות
 - תיקון באגים
 
 ### יום 3: כלי אבחון ותיעוד
+
 **בוקר (4 שעות):**
+
 - שלב 5: יצירת כלי אבחון (2 כלים ראשונים)
 
 **אחר הצהריים (4 שעות):**
+
 - שלב 5: יצירת כלי אבחון (2 כלים נוספים)
 - שלב 6: עדכון תיעוד
 
 ### יום 4-5: בדיקות סופיות ואופטימיזציה
+
 **יום 4:**
+
 - שלב 7: בדיקות מקיפות על כל העמודים
 - תיקון באגים שזוהו
 
 **יום 5:**
+
 - בדיקות ביצועים
 - אופטימיזציה
 - תיעוד סופי
 
 ## קבצים לשינוי - רשימה מפורטת
 
-### קבצים קריטיים לשינוי:
+### קבצים קריטיים לשינוי
 
 1. **`trading-ui/scripts/modules/core-systems.js`** - קובץ מרכזי
    - הוספת `initializePreferencesForPage()` (העתקה מ-unified-app-initializer.js)
@@ -308,9 +332,10 @@
    - הסרת קריאות ל-`PreferencesCore.initializeWithLazyLoading()` מעמודים אחרים
    - הוספת הערות שמסבירות שהעדפות נטענות ב-core-systems.js
 
-### קבצי HTML להסרת unified-app-initializer.js (35 עמודים):
+### קבצי HTML להסרת unified-app-initializer.js (35 עמודים)
 
 **רשימה מלאה:**
+
 1. executions.html
 2. trade_plans.html
 3. notes.html
@@ -348,18 +373,19 @@
 35. tag-management.html
 
 **פעולה:** חיפוש והסרה של:
+
 ```html
 <script src="scripts/unified-app-initializer.js?v=1.0.0"></script>
 ```
 
-### קבצים חדשים ליצירה:
+### קבצים חדשים ליצירה
 
 1. `trading-ui/scripts/init-system/dependency-analyzer.js`
 2. `trading-ui/scripts/init-system/load-order-validator.js`
 3. `trading-ui/scripts/init-system/initialization-checker.js`
 4. `trading-ui/scripts/init-system/page-health-checker.js`
 
-### קבצי תיעוד לעדכון:
+### קבצי תיעוד לעדכון
 
 1. `documentation/02-ARCHITECTURE/FRONTEND/UNIFIED_INITIALIZATION_SYSTEM.md`
 2. הערות בקוד
@@ -369,6 +395,7 @@
 ### בדיקה 1: טעינת העדפות פעם אחת
 
 **שלבים:**
+
 1. לפתוח DevTools → Network tab
 2. לסנן לפי `/api/preferences/user`
 3. לטעון עמוד (hard refresh: Cmd+Shift+R)
@@ -376,12 +403,14 @@
 5. לחזור על הבדיקה עם cache (טעינה רגילה)
 
 **עמודים לבדוק:**
+
 - preferences.html (צריך `PreferencesUIV4.initialize()`)
 - trades.html (צריך `PreferencesCore.initializeWithLazyLoading()`)
 - index.html
 - trade_plans.html
 
 **תוצאה צפויה:**
+
 - ✅ קריאה אחת בלבד ל-`/api/preferences/user` בכל עמוד
 - ✅ אין 429 errors
 - ✅ זמן תגובה סביר (< 500ms)
@@ -389,6 +418,7 @@
 ### בדיקה 2: אין 429 errors
 
 **שלבים:**
+
 1. לפתוח DevTools → Network tab
 2. לטעון עמוד (hard refresh)
 3. לבדוק שאין שגיאות 429
@@ -396,9 +426,11 @@
 5. לבדוק טעינה מהירה של עמודים
 
 **עמודים לבדוק:**
+
 - כל העמודים ברשימה
 
 **תוצאה צפויה:**
+
 - ✅ אין שגיאות 429 בכל העמודים
 - ✅ טעינה מהירה (< 2 שניות)
 - ✅ אין שגיאות קונסול
@@ -406,20 +438,24 @@
 ### בדיקה 3: נתונים זמינים
 
 **שלבים:**
+
 1. לבדוק שהעדפות זמינות לפני שצריך (לפני טעינת נתונים)
 2. לבדוק שצבעים זמינים מיד
 3. לבדוק שאין שגיאות "undefined" בגישה להעדפות
 
 **בדיקות ספציפיות:**
+
 - לבדוק ש-`window.currentPreferences` מוגדר
 - לבדוק ש-`window.PreferencesCore` זמין
 - לבדוק ש-`window.ColorManager` זמין
 - לבדוק שאין שגיאות "Cannot read property of undefined"
 
 **עמודים לבדוק:**
+
 - כל העמודים שמשתמשים בהעדפות
 
 **תוצאה צפויה:**
+
 - ✅ העדפות זמינות לפני טעינת נתונים
 - ✅ צבעים זמינים מיד
 - ✅ אין שגיאות "undefined"
@@ -427,6 +463,7 @@
 ### בדיקה 4: בדיקת כל העמודים
 
 **רשימת עמודים לבדיקה:**
+
 1. index.html
 2. preferences.html
 3. trades.html
@@ -440,6 +477,7 @@
 11. tag-management.html
 
 **בדיקות לכל עמוד:**
+
 - ✅ אין שגיאות קונסול
 - ✅ סדר טעינה נכון
 - ✅ אתחול העדפות פעם אחת בלבד
@@ -450,6 +488,7 @@
 ### בדיקה 5: בדיקת סדר טעינה
 
 **שלבים:**
+
 1. לפתוח DevTools → Network tab
 2. לסנן לפי JavaScript
 3. לטעון עמוד (hard refresh)
@@ -457,6 +496,7 @@
    - BASE → SERVICES → MODULES → UI-ADVANCED → CRUD → PREFERENCES → INIT-SYSTEM
 
 **תוצאה צפויה:**
+
 - ✅ סדר טעינה נכון לפי המניפסט
 - ✅ אין טעינות כפולות
 - ✅ כל הסקריפטים נטענים
@@ -464,12 +504,14 @@
 ### בדיקה 6: בדיקת ביצועים
 
 **שלבים:**
+
 1. לפתוח DevTools → Performance tab
 2. להקליט טעינת עמוד
 3. לבדוק זמן אתחול
 4. לבדוק זמן טעינת העדפות
 
 **תוצאה צפויה:**
+
 - ✅ זמן אתחול כולל < 2 שניות
 - ✅ זמן טעינת העדפות < 500ms
 - ✅ אין blocking operations
@@ -477,22 +519,26 @@
 ## סיכום והמלצות
 
 ### עקרון מרכזי
+
 **נקודת כניסה אחת:** `core-systems.js` בלבד אחראי על initialization
 
 ### סדר ביצוע מומלץ
+
 1. להעתיק `initializePreferencesForPage()` ל-`core-systems.js`
-2. לקרוא לה ב-`executeInitialization()` 
+2. לקרוא לה ב-`executeInitialization()`
 3. להסיר `unified-app-initializer.js` מכל העמודים
 4. לבדוק על עמוד אחד (trade_plans)
 5. ליישום לרוחב כל העמודים
 6. לבדיקה מלאה
 
 ### סיכונים וצמצום סיכונים
+
 - **סיכון:** שינוי במערכת קריטית
 - **צמצום:** בדיקה על עמוד אחד לפני יישום לרוחב
 - **גיבוי:** שמירת גיבוי של הקבצים לפני שינוי
 
 ### הצלחה
+
 - ✅ העדפות נטענות פעם אחת בלבד
 - ✅ אין 429 errors
 - ✅ נתונים זמינים מיד

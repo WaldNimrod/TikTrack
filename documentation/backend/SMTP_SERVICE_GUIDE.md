@@ -1,4 +1,5 @@
 # מדריך שירות SMTP - TikTrack
+
 ## SMTP Service Guide
 
 **תאריך יצירה**: 28 בינואר 2025  

@@ -133,8 +133,15 @@ def get_quotes_batch():
                 "timestamp": datetime.now(timezone.utc).isoformat()
             }), 200
             
+        except Exception as e:
+            logger.error(f"Error in batch quotes: {e}")
+            return jsonify({
+                "status": "error",
+                "error": str(e)
+            }), 500
+            
     except Exception as e:
-        logger.error(f"Error in batch quotes: {e}")
+        logger.error(f"Error in get_quotes_batch: {e}")
         return jsonify({
             "status": "error",
             "error": str(e)
@@ -229,6 +236,7 @@ def get_quote(ticker_id: int):
 
 
 @quotes_bp.route('/user/preferences', methods=['GET'])
+@handle_database_session()
 def get_user_preferences():
     """
     GET /api/user/preferences
@@ -238,11 +246,16 @@ def get_user_preferences():
     - Uses fallback to default user (nimrod, ID: 1)
     """
     try:
-        # Get user_id from query params or use default
-        user_id = request.args.get('user_id', 1, type=int)
+        # Enforce authenticated user
+        user_id = getattr(g, 'user_id', None)
+        if user_id is None:
+            return jsonify({
+                "status": "error",
+                "error": "User authentication required"
+            }), 401
         
         # Get database session
-        db: Session = next(get_db())
+        db: Session = g.db
         
         try:
             # Get user preferences using UserService (with fallback)
@@ -277,6 +290,7 @@ def get_user_preferences():
 
 
 @quotes_bp.route('/user/preferences', methods=['PUT'])
+@handle_database_session()
 def update_user_preferences():
     """
     PUT /api/user/preferences
@@ -293,11 +307,16 @@ def update_user_preferences():
                 "error": "JSON data required"
             }), 400
         
-        # Get user_id from data or use default
-        user_id = data.get('user_id', 1)
+        # Enforce authenticated user
+        user_id = getattr(g, 'user_id', None)
+        if user_id is None:
+            return jsonify({
+                "status": "error",
+                "error": "User authentication required"
+            }), 401
         
         # Get database session  
-        db: Session = next(get_db())
+        db: Session = g.db
         
         try:
             # Validate timezone if provided

@@ -1,4 +1,5 @@
 # מפרט מערכת: Watch List
+
 ## Watch List System Specification
 
 **תאריך:** 28 בינואר 2025  
@@ -42,21 +43,25 @@
 ### 1. ניהול רשימות
 
 **יצירת רשימה:**
+
 - שם רשימה (חובה, max 100 chars)
 - איקון (אופציונלי, מ-IconSystem)
 - צבע (אופציונלי, hex format)
 - תצוגה ברירת מחדל (table/cards/compact)
 
 **עריכת רשימה:**
+
 - שינוי שם, איקון, צבע
 - שינוי תצוגה ברירת מחדל
 - שינוי מיון ברירת מחדל
 
 **מחיקת רשימה:**
+
 - מחיקה כולל כל הפריטים (CASCADE)
 - אישור מחיקה (אופציונלי)
 
 **סידור רשימות:**
+
 - Drag & Drop לסידור ידני
 - שמירת סדר ב-DB
 
@@ -65,19 +70,23 @@
 ### 2. ניהול טיקרים ברשימה
 
 **הוספת טיקר:**
+
 - טיקר במערכת (חיפוש + בחירה)
 - טיקר חיצוני (הזנת symbol)
 - אופציונלי: דגל, הערות, מיקום
 
 **הסרת טיקר:**
+
 - הסרה מרשימה (לא מהמערכת)
 
 **עריכת פריט:**
+
 - שינוי דגל
 - שינוי הערות
 - שינוי מיקום
 
 **סידור טיקרים:**
+
 - Drag & Drop לסידור ידני
 - שמירת סדר ב-DB
 
@@ -86,15 +95,18 @@
 ### 3. מערכת דגלים
 
 **8 צבעי דגלים:**
+
 - מ-8 צבעי ישויות קיימים
 - הצעה: trade, tradePlan, account, cashFlow, ticker, alert, note, execution
 
 **שינוי דגל:**
+
 - Quick action - לחיצה על איקון דגל
 - Palette עם 8 צבעים
 - אפשרות להסרת דגל
 
 **תצוגת דגלים:**
+
 - כל דגל → תצוגה של כל הטיקרים עם הדגל הזה
 - מכל הרשימות של המשתמש
 
@@ -103,17 +115,20 @@
 ### 4. תצוגות
 
 **Table View (ברירת מחדל):**
+
 - טבלה מלאה עם כל העמודות
 - Sortable columns
 - Drag & Drop לסידור
 - Quick actions
 
 **Cards View:**
+
 - Grid של cards
 - מידע בסיסי: Symbol, Name, Price, Change%
 - Flag visible
 
 **Compact View:**
+
 - רשימה קומפקטית
 - מינימלי: Symbol, Price, Change%, Flag
 
@@ -122,12 +137,14 @@
 ### 5. נתונים חיצוניים
 
 **טיקרים חיצוניים:**
+
 - Symbol + Name (optional)
 - משיכת נתוני מחיר מ-External Data Service
 - Caching משותף לכל המשתמשים
 - תדירות נמוכה (לפי הגדרות)
 
 **Integration:**
+
 - YahooFinanceAdapter
 - Batch requests
 - Cache management
@@ -137,10 +154,12 @@
 ### 6. העתקה והעברה
 
 **העתקת טיקר:**
+
 - העתקה לרשימה אחרת
 - שמירת דגל והערות
 
 **ייבוא/ייצוא (עתידי):**
+
 - ייצוא ל-CSV/JSON
 - רשימת symbols עם פסיקים (copy to clipboard)
 
@@ -188,6 +207,7 @@
 ### 1. Database Layer
 
 **טבלאות:**
+
 - `watch_lists` - רשימות
 - `watch_list_items` - פריטים
 
@@ -198,6 +218,7 @@
 ### 2. Backend API Layer
 
 **Routes:**
+
 - `/api/watch-lists` - CRUD רשימות
 - `/api/watch-lists/:id/items` - CRUD פריטים
 - `/api/watch-lists/flags/:color` - טיקרים לפי דגל
@@ -210,11 +231,13 @@
 ### 3. Frontend Services Layer
 
 **Data Service:**
+
 - CRUD wrappers
 - Cache management
 - Error handling
 
 **UI Service:**
+
 - View management
 - Flag management
 - Quick actions
@@ -227,6 +250,7 @@
 ### 4. UI Layer
 
 **עמוד ראשי:**
+
 - Sections: Top, Lists Grid, Active List, Flagged Tickers
 - Modals: Add/Edit List, Add Ticker, Flag Palette
 
@@ -280,6 +304,7 @@ MAX_TICKERS_PER_LIST = 50      # TODO: Move to admin settings
 **מקור:** 8 מתוך 12 צבעי ישויות קיימים
 
 **רשימה מוצעת:**
+
 1. Trade: #26baac
 2. Trade Plan: #0056b3
 3. Account: #28a745
@@ -293,7 +318,8 @@ MAX_TICKERS_PER_LIST = 50      # TODO: Move to admin settings
 
 ## תכונות עתידיות (לא בשלב ראשון)
 
-### Phase 2:
+### Phase 2
+
 - התראות על שינויי מחיר
 - ייצוא/ייבוא רשימות
 - שיתוף רשימות בין משתמשים
@@ -315,6 +341,10 @@ MAX_TICKERS_PER_LIST = 50      # TODO: Move to admin settings
 ---
 
 **סיכום:** מערכת Watch List מתוכננת במלואה עם אינטגרציה מלאה לכל המערכות הקיימות ומוכנה למימוש מלא.
+
+
+
+
 
 
 

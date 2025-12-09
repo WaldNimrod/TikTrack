@@ -9,6 +9,7 @@
 ## סקירה כללית
 
 `MissingDataChecker` היא מערכת שמזהה בדיוק מה חסר לכל טיקר לפני טעינה. המערכת בודקת:
+
 - Quotes נוכחיים (current quotes)
 - נתונים היסטוריים (historical data)
 - אינדיקטורים טכניים (technical indicators)
@@ -43,6 +44,7 @@ checker = MissingDataChecker(db_session)
 בודקת מה חסר לטיקר בודד.
 
 **Parameters:**
+
 - `ticker_id` (int) - מזהה הטיקר
 
 **Returns:** `Dict[str, Any]` - מילון עם פרטים על מה חסר:
@@ -80,6 +82,7 @@ checker = MissingDataChecker(db_session)
 ```
 
 **Example:**
+
 ```python
 missing_data = checker.check_missing_data(ticker_id)
 
@@ -93,11 +96,13 @@ if missing_data['has_any_missing']:
 בודקת מה חסר למספר טיקרים בבת אחת.
 
 **Parameters:**
+
 - `ticker_ids` (List[int]) - רשימת מזההי טיקרים
 
 **Returns:** `Dict[int, Dict[str, Any]]` - מילון של תוצאות (ticker_id -> result)
 
 **Example:**
+
 ```python
 ticker_ids = [1424, 1425, 1426]
 results = checker.check_missing_data_batch(ticker_ids)
@@ -112,6 +117,7 @@ for ticker_id, result in results.items():
 מחזירה סיכום של עדכניות הנתונים לטיקר.
 
 **Parameters:**
+
 - `ticker_id` (int) - מזהה הטיקר
 
 **Returns:** `Dict[str, Any]` - מילון עם פרטי עדכניות:
@@ -129,6 +135,7 @@ for ticker_id, result in results.items():
 ```
 
 **Example:**
+
 ```python
 freshness = checker.get_data_freshness(ticker_id)
 print(f"Last quote: {freshness['last_quote_fetch']}")
@@ -140,11 +147,13 @@ print(f"Historical quotes: {freshness['historical_count']}")
 בודקת אם צריך לרענן quote נוכחי (convenience method).
 
 **Parameters:**
+
 - `ticker_id` (int) - מזהה הטיקר
 
 **Returns:** `bool` - `True` אם צריך לרענן
 
 **Example:**
+
 ```python
 if checker.should_refresh_quote_for_ticker(ticker_id):
     # Refresh quote
@@ -156,11 +165,13 @@ if checker.should_refresh_quote_for_ticker(ticker_id):
 בודקת אם צריך לרענן נתונים היסטוריים (convenience method).
 
 **Parameters:**
+
 - `ticker_id` (int) - מזהה הטיקר
 
 **Returns:** `bool` - `True` אם צריך לרענן
 
 **Example:**
+
 ```python
 if checker.should_refresh_historical_for_ticker(ticker_id):
     # Refresh historical data
@@ -172,11 +183,13 @@ if checker.should_refresh_historical_for_ticker(ticker_id):
 בודקת אילו אינדיקטורים צריך לרענן (convenience method).
 
 **Parameters:**
+
 - `ticker_id` (int) - מזהה הטיקר
 
 **Returns:** `List[str]` - רשימת אינדיקטורים שצריך לרענן
 
 **Example:**
+
 ```python
 indicators_to_refresh = checker.should_refresh_indicators_for_ticker(ticker_id)
 if 'ma_20' in indicators_to_refresh:
@@ -193,6 +206,7 @@ if 'ma_20' in indicators_to_refresh:
 Endpoint שמשתמש ב-`MissingDataChecker` כדי לזהות טיקרים עם נתונים חסרים.
 
 **Response:**
+
 ```json
 {
   "status": "success",
@@ -270,6 +284,7 @@ for ticker in open_tickers:
 ### 1. בדיקה לפני טעינה
 
 ✅ **נכון:**
+
 ```python
 # Check what's missing before loading
 missing_data = checker.check_missing_data(ticker_id)
@@ -284,6 +299,7 @@ if missing_data['should_refresh_historical']:
 ```
 
 ❌ **לא נכון:**
+
 ```python
 # Always load everything - לא יעיל!
 # Load quote, historical, indicators - always
@@ -292,6 +308,7 @@ if missing_data['should_refresh_historical']:
 ### 2. שימוש ב-Recommendations
 
 ✅ **נכון:**
+
 ```python
 # Use recommendations to prioritize
 missing_data = checker.check_missing_data(ticker_id)
@@ -305,6 +322,7 @@ for rec in missing_data['recommendations']:
 ### 3. Batch Checking
 
 ✅ **נכון:**
+
 ```python
 # Check multiple tickers at once
 ticker_ids = [1424, 1425, 1426]

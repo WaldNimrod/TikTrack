@@ -18,22 +18,26 @@
 **תפקיד:** HTTP client מודרני עבור Perplexity AI API
 
 **למה נדרש:**
+
 - Perplexity AI דורש HTTP client מתקדם עם תמיכה ב-async
 - httpx מספק API נקי ונוח יותר מ-requests
 - תמיכה מלאה ב-HTTP/2 ו-async/await
 
 **התקנה:**
+
 ```bash
 pip install httpx==0.28.1
 ```
 
 **תלויות אוטומטיות:**
+
 - `anyio` - Async I/O library
 - `httpcore` - Low-level HTTP client
 - `certifi` - SSL certificates
 - `idna` - Internationalized Domain Names
 
 **שימוש במערכת:**
+
 - `Backend/services/llm_providers/perplexity_provider.py`
 
 ---
@@ -43,16 +47,19 @@ pip install httpx==0.28.1
 **תפקיד:** Google Gemini API client
 
 **למה נדרש:**
+
 - אינטגרציה עם Google Gemini API
 - תמיכה ב-Gemini 1.5 Flash (חינמי)
 - תמיכה ב-multimodal content
 
 **התקנה:**
+
 ```bash
 pip install google-generativeai==0.8.5
 ```
 
 **תלויות אוטומטיות:**
+
 - `google-ai-generativelanguage==0.6.15` - Gemini API client core
 - `google-api-core==2.28.1` - Google API core library
 - `google-api-python-client==2.187.0` - Google API Python client
@@ -64,6 +71,7 @@ pip install google-generativeai==0.8.5
 - ועוד תלויות נוספות
 
 **שימוש במערכת:**
+
 - `Backend/services/llm_providers/gemini_provider.py`
 
 ---
@@ -116,11 +124,13 @@ print('✅ All AI Analysis packages and providers imported successfully')
 ### בעיה: ModuleNotFoundError: No module named 'httpx'
 
 **פתרון:**
+
 ```bash
 pip install httpx==0.28.1
 ```
 
 **אם עדיין לא עובד:**
+
 - ודא שאתה משתמש ב-Python הנכון: `python3 --version`
 - ודא שהחבילה מותקנת ב-Python הנכון: `python3 -m pip install httpx`
 - בדוק את PYTHONPATH
@@ -128,17 +138,20 @@ pip install httpx==0.28.1
 ### בעיה: ModuleNotFoundError: No module named 'google.generativeai'
 
 **פתרון:**
+
 ```bash
 pip install google-generativeai==0.8.5
 ```
 
 **אם עדיין לא עובד:**
+
 - התקן מחדש: `pip uninstall google-generativeai && pip install google-generativeai==0.8.5`
 - ודא שאין קונפליקטים עם protobuf: `pip install --upgrade protobuf`
 
 ### בעיה: Import errors עם google-generativeai
 
 **פתרון:**
+
 ```bash
 # התקן מחדש את כל התלויות
 pip install --upgrade google-generativeai
@@ -192,18 +205,21 @@ python3 -c "import httpx; import google.generativeai; print('✅ Updated package
 ### Development
 
 ✅ **חובה** - כל סביבת פיתוח חייבת לכלול:
+
 - `httpx==0.28.1`
 - `google-generativeai==0.8.5`
 
 ### Production
 
 ✅ **חובה** - כל סביבת production חייבת לכלול:
+
 - `httpx==0.28.1`
 - `google-generativeai==0.8.5`
 
 ### CI/CD
 
 ✅ **חובה** - כל סביבת CI/CD חייבת לכלול:
+
 - `httpx==0.28.1`
 - `google-generativeai==0.8.5`
 
@@ -229,6 +245,10 @@ python3 -c "import httpx; import google.generativeai; print('✅ Updated package
 ---
 
 **עודכן:** 28 בינואר 2025
+
+
+
+
 
 
 

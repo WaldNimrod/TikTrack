@@ -20,11 +20,13 @@
 **קובץ:** `trading-ui/scripts/auth-guard.js`
 
 **תפקיד:**
+
 - בודק authentication לפני טעינת עמודים
 - מפנה לדף התחברות אם לא authenticated
 - רץ אוטומטית בעת טעינת הדף
 
 **לוגיקה:**
+
 1. בודק אם הדף הוא public page (`login.html`, `register.html`, וכו')
 2. אם לא public - בודק authentication דרך `checkAuthentication()` מ-`auth.js`
 3. אם לא authenticated - קורא ל-`redirectToLogin()`
@@ -33,6 +35,7 @@
 **Endpoint לבדיקה:** `/api/auth/me` (GET) עם `credentials: 'include'`
 
 **Session Storage:**
+
 - `redirectAfterLogin` - שומר את ה-URL המקורי לפני redirect
 
 ### 2. Authentication System (`auth.js`)
@@ -42,6 +45,7 @@
 **פונקציות מרכזיות:**
 
 #### `login(username, password)`
+
 - **Endpoint:** `POST /api/auth/login`
 - **Headers:** `Content-Type: application/json`
 - **Body:** `{ username, password }`
@@ -52,12 +56,14 @@
   - `authToken` - 'session_based' או access_token
 
 #### `checkAuthentication()`
+
 - **Endpoint:** `GET /api/auth/me`
 - **Credentials:** `include`
 - **Response:** `{ status: 'success', data: { user } }`
 - **Fallback:** בודק `localStorage.getItem('currentUser')`
 
 **Login Form Structure:**
+
 - Form ID: `#loginForm`
 - Username field: `#username`
 - Password field: `#password`
@@ -67,11 +73,13 @@
 ### 3. Session-Based Authentication
 
 **Backend:**
+
 - משתמש ב-Flask session cookies
 - Session נשמר ב-cookies (HttpOnly, Secure בפרודקשן)
 - Middleware: `auth_middleware.py` טוען `user_id` מ-session ל-`g.user_id`
 
 **Frontend:**
+
 - localStorage כמטמון נוסף
 - Session cookies נשלחים אוטומטית עם `credentials: 'include'`
 
@@ -105,11 +113,13 @@
 ### `preferences-e2e.spec.js`
 
 **תובנות:**
+
 - **לא כולל authentication ב-beforeEach!**
 - פשוט הולך לדף `preferences.html`
 - מניח שהדף נטען ללא בעיות
 
 **הסבר אפשרי:**
+
 - ייתכן שה-test רץ בסביבה שבה authentication כבר פעיל
 - או שהדף preferences לא מוגן (לא סביר)
 - או שהדף לא נטען בפועל ופשוט נכשל בצורה אחרת
@@ -151,6 +161,7 @@
 **קובץ חדש:** `trading-ui/scripts/testing/automated/playwright-auth-helper.js`
 
 **פונקציות:**
+
 - `authenticateUser(page, username, password)` - מבצע login מלא
 - `waitForAuthentication(page)` - מחכה ש-authentication יושלם
 - `verifyAuthentication(page)` - בודק ש-authentication פעיל

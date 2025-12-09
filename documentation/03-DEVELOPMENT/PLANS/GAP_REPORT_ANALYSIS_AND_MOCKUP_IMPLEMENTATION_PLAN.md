@@ -23,9 +23,10 @@
 
 **⚠️ חשוב:** המחקר בוצע מול הקוד הקיים במערכת. חלק מההמלצות בדוח אינן מדויקות.
 
-#### ממצאים עיקריים:
+#### ממצאים עיקריים
 
 **1. דשבורד מסחר מרכזי - קיים אך לא מלא:**
+
 - ✅ **קיים:** `trading-ui/index.html` עם גרפים, סטטיסטיקות, ווידג'טים
 - ✅ **קיים:** `scripts/index.js` עם `loadDashboardData()`, `processDashboardData()`
 - ✅ **קיים:** `scripts/services/dashboard-data.js` - שירות נתוני דשבורד
@@ -35,12 +36,14 @@
 - **מסקנה:** הדשבורד קיים אך לא כולל את כל הפיצ'רים המתועדים
 
 **2. Performance Snapshots - נכון:**
+
 - ✅ **קיים:** Mockups ב-`trading-ui/mockups/daily-snapshots/`
 - ❌ **חסר:** Backend API, מודל, שירות
 - ✅ **קיים:** TODO ב-`portfolio-state-page.js` (שורה 1054) המציין את הצורך
 - **מסקנה:** הדוח מדויק - יש Mockups, חסר Backend
 
 **3. מסך Ticker - קיים אך לא מורחב:**
+
 - ✅ **קיים:** `EntityDetailsRenderer.renderTicker()` - מציג פרטי טיקר במודל
 - ✅ **קיים:** `renderMarketData()` - מציג נתוני שוק (מחיר, שינוי, ATR)
 - ✅ **קיים:** מערכת ATR ממומשת במלואה (`FieldRendererService.renderATR()`)
@@ -51,6 +54,7 @@
 - **מסקנה:** יש תצוגת פרטי טיקר בסיסית, חסר עמוד מורחב
 
 **4. ATR - ממומש במלואו:**
+
 - ✅ **קיים:** `Backend/services/external_data/atr_calculator.py`
 - ✅ **קיים:** `FieldRendererService.renderATR()` - רנדור עם רמזור
 - ✅ **קיים:** תמיכה ב-`MarketDataQuote` (אם יש high/low/close)
@@ -58,6 +62,7 @@
 - **מסקנה:** מערכת ATR ממומשת במלואה - הדוח לא מדויק
 
 **5. TradingView Charts - ממומש:**
+
 - ✅ **קיים:** `TradingViewChartAdapter` - adapter ממומש
 - ✅ **קיים:** גרפים ב-Mockups (portfolio-state, price-history, strategy-analysis)
 - ✅ **קיים:** תמיכה ב-Line, Area, Candlestick, Bar Charts
@@ -66,6 +71,7 @@
 ### 1.2 קטגוריות פערים מתוקנות
 
 #### קטגוריה A: פערים בין קוד לתיעוד (מתוקן)
+
 - **A1. דשבורד מסחר מרכזי** - ⚠️ קיים חלקית, חסרים פיצ'רים מסוימים (לא "לא ממומש")
 - **A2. Performance Snapshots / Daily Journal** - ✅ נכון - קיימים Mockups, חסר Backend/API
 - **A3. יומן מסחר מתקדם** - Notes קיימים, יומן יומי חסר
@@ -73,6 +79,7 @@
 - **A5. Unified Table System** - תיעוד לא עקבי (לא רלוונטי למימוש Mockups)
 
 #### קטגוריה B: ממשקים חסרים במערכת (מתוקן)
+
 - **B1. דשבורד מרכזי** - ⚠️ קיים חלקית, חסרים פיצ'רים מסוימים (לא "חסר לחלוטין")
 - **B2. Performance Snapshots** - ✅ נכון - חסר Backend (יש Mockups)
 - **B3. Daily Journal** - חסר (קיימים רק Notes)
@@ -81,11 +88,13 @@
 - **B6. עמוד טיקר מורחב** - ⚠️ חסר (יש תצוגה בסיסית במודל)
 
 #### קטגוריה C: ממשקים קיימים אך לא יעילים (מתוקן)
+
 - **C1. Unified Table** - מיושם אך לא אחיד (חסר Multi-sort, רנדור לא אחיד)
 - **C2. Trade Plans** - קיימים אך אינם מנצלים גרפים, חסר מודלים של תרחישים
 - **C3. מסך Ticker** - ⚠️ יש תצוגה בסיסית במודל, חסר עמוד מורחב עם גרף מרכזי ו-KPI נוספים
 
 #### קטגוריה D: המלצות לצוות הפיתוח
+
 - **D1. עדכון תיעוד** - איחוד מסמכים סותרים
 - **D2. יצירת "עמוד אמת"** - `/documentation/SYSTEM_STATUS.md`
 - **D3. סידור מחדש של Mockups** - קטגוריות: "מוכנים לפיתוח" vs "רעיון UI בלבד"
@@ -99,6 +108,7 @@
 ### 2.1 רשימת עמודי המוקאפ הקיימים
 
 **עמודים ב-`daily-snapshots/` (11 עמודים):**
+
 1. `trade-history-page.html` - היסטוריית טרייד
 2. `portfolio-state-page.html` - מצב תיק היסטורי
 3. `price-history-page.html` - היסטוריית מחירים
@@ -120,6 +130,7 @@
 ### 2.2 סטטוס אינטגרציה נוכחי
 
 **מטריצת אינטגרציה (מתוך `MOCKUPS_INTEGRATION_STATUS.md`):**
+
 - ✅ **NotificationSystem** - 100% (כל 11 עמודים)
 - ✅ **toggleSection** - 100% (כל 11 עמודים)
 - ✅ **Button System** - 100% (כל 11 עמודים)
@@ -141,6 +152,7 @@
 **מתוך `ticker_dashboard.html` ו-`ticker_dashboard.md`:**
 
 **סעיפים נדרשים:**
+
 1. **סקירה כללית** - KPI מרכזיים:
    - מחיר נוכחי
    - שינוי יומי (%)
@@ -162,6 +174,7 @@
 ### 3.2 ארכיטקטורה - שמירה על המודולים הקיימים
 
 **עקרונות:**
+
 - ✅ **לא להחליף** את `showEntityDetails()` או `EntityDetailsModal`
 - ✅ **לא להחליף** את `EntityDetailsRenderer.renderTicker()`
 - ✅ **ליצור ממשק מורחב נוסף** - `ticker-dashboard.html` כעמוד נפרד
@@ -183,6 +196,7 @@
 ### 0.1 יצירת וואירפריים לממשקים החדשים
 
 **נדרש ליצור:**
+
 1. **Wireframe לעמוד טיקר מורחב** - `documentation/04-FEATURES/WIREFRAMES/ticker-dashboard-wireframe.md`
 2. **Wireframe לחיבור Mockups לעמודים** - `documentation/04-FEATURES/WIREFRAMES/mockups-integration-wireframe.md`
 3. **תוכנית עבודה מפורטת** - פירוט שלבים, קבצים, API endpoints
@@ -190,6 +204,7 @@
 ### 0.2 בחינת כל המלצה מול הארכיטקטורה
 
 **לכל המלצה בדוח:**
+
 1. בדיקת רלוונטיות לארכיטקטורה הקיימת
 2. בדיקת צורך אמיתי של משתמשים
 3. בדיקת עלות/תועלת
@@ -198,25 +213,29 @@
 ### 0.3 תיעוד החלטות
 
 **ליצור:**
+
 - `documentation/05-REPORTS/GAP_REPORT_DECISIONS.md` - רשימת החלטות לכל המלצה
 
 ---
 
 ## קבצים מרכזיים
 
-### דוחות:
+### דוחות
+
 - `/Users/nimrod/Documents/TikTrack/_Tmp/mockup - gup report/tiktrack_gap_report_full.md`
 - `/Users/nimrod/Documents/TikTrack/_Tmp/mockup - gup report/ticker_dashboard.html`
 - `/Users/nimrod/Documents/TikTrack/_Tmp/mockup - gup report/ticker_dashboard.md`
 
-### קוד קיים:
+### קוד קיים
+
 - `trading-ui/index.html` - דשבורד ראשי קיים
 - `trading-ui/tickers.html` - עמוד טיקרים קיים
 - `trading-ui/scripts/entity-details-modal.js` - מודל פרטי ישות
 - `trading-ui/scripts/entity-details-renderer.js` - רנדור פרטי ישות
 - `trading-ui/mockups/daily-snapshots/*.html` - עמודי מוקאפ
 
-### תיעוד:
+### תיעוד
+
 - `documentation/PAGES_LIST.md`
 - `trading-ui/mockups/daily-snapshots/MOCKUPS_INTEGRATION_STATUS.md`
 - `documentation/INDEX.md`

@@ -24,12 +24,14 @@
 
 **קובץ:** `Backend/routes/api/trading_accounts.py`
 
-#### בעיה:
+#### בעיה
+
 - **Endpoint:** `GET /api/trading-accounts/open`
 - **בעיה:** לא מעביר `user_id` ל-service
 - **תיקון שבוצע:** ✅ תוקן - הוספת `user_id = getattr(g, 'user_id', None)` והעברה ל-service
 
-#### סטטוס:
+#### סטטוס
+
 - ✅ **תוקן** ב-`Backend/routes/api/trading_accounts.py`
 - ✅ **תוקן** ב-`production/Backend/routes/api/trading_accounts.py`
 - ✅ **נבדק:** `g.user_id` מוגדר נכון ב-auth middleware
@@ -40,10 +42,12 @@
 
 **קובץ:** `Backend/routes/api/notes.py`
 
-#### בעיה:
+#### בעיה
+
 - **Endpoint:** `GET /api/notes/`
 - **בעיה:** מחזיר את כל ההערות של כל המשתמשים ללא סינון לפי `user_id`
 - **קוד בעייתי (לפני תיקון):**
+
 ```python
 @notes_bp.route('/', methods=['GET'])
 def get_notes():
@@ -51,7 +55,8 @@ def get_notes():
     notes = db.query(Note).order_by(Note.created_at.desc()).all()  # ❌ לא מסנן לפי user_id
 ```
 
-#### תיקון שבוצע:
+#### תיקון שבוצע
+
 ```python
 @notes_bp.route('/', methods=['GET'])
 @handle_database_session()
@@ -65,7 +70,8 @@ def get_notes():
     notes = query.all()
 ```
 
-#### סטטוס:
+#### סטטוס
+
 - ✅ **תוקן** ב-`Backend/routes/api/notes.py` (01.12.2025)
 - ✅ **תוקן** גם ב-`get_note(note_id)` endpoint
 - ⚠️ **נדרש:** תיקון גם ב-`production/Backend/routes/api/notes.py`
@@ -76,10 +82,12 @@ def get_notes():
 
 **קובץ:** `Backend/routes/api/positions.py`
 
-#### בעיה:
+#### בעיה
+
 - **Endpoint:** `GET /api/positions/portfolio`
 - **בעיה:** `PositionPortfolioService.calculate_portfolio_summary` לא מקבל `user_id` ולא מסנן לפי משתמש
 - **קוד בעייתי (לפני תיקון):**
+
 ```python
 @positions_bp.route('/portfolio', methods=['GET'])
 def get_portfolio():
@@ -91,7 +99,8 @@ def get_portfolio():
     )
 ```
 
-#### תיקון שבוצע:
+#### תיקון שבוצע
+
 ```python
 @positions_bp.route('/portfolio', methods=['GET'])
 @handle_database_session()
@@ -108,6 +117,7 @@ def get_portfolio():
 ```
 
 **שינוי ב-service:**
+
 ```python
 @staticmethod
 def calculate_portfolio_summary(
@@ -125,7 +135,8 @@ def calculate_portfolio_summary(
     accounts = query.all()
 ```
 
-#### סטטוס:
+#### סטטוס
+
 - ✅ **תוקן** ב-`Backend/routes/api/positions.py` (01.12.2025)
 - ✅ **תוקן** ב-`Backend/services/position_portfolio_service.py` (01.12.2025)
 - ⚠️ **נדרש:** תיקון גם ב-`production/Backend/routes/api/positions.py` ו-`production/Backend/services/position_portfolio_service.py`
@@ -136,12 +147,14 @@ def calculate_portfolio_summary(
 
 **קובץ:** `Backend/routes/api/trades.py` (endpoints: `/pending-plan/assignments`, `/pending-plan/creations`)
 
-#### בעיה:
+#### בעיה
+
 - **Endpoints:**
   - `GET /api/trades/pending-plan/assignments`
   - `GET /api/trades/pending-plan/creations`
 - **בעיה:** `TradePlanMatchingService.get_assignment_suggestions` ו-`get_creation_suggestions` לא מסננים לפי `user_id`
 - **קוד בעייתי (לפני תיקון):**
+
 ```python
 @trades_bp.route('/pending-plan/assignments', methods=['GET'])
 def get_trades_pending_plan_assignments():
@@ -152,7 +165,8 @@ def get_trades_pending_plan_assignments():
     )
 ```
 
-#### תיקון שבוצע:
+#### תיקון שבוצע
+
 ```python
 @trades_bp.route('/pending-plan/assignments', methods=['GET'])
 @handle_database_session()
@@ -169,12 +183,14 @@ def get_trades_pending_plan_assignments():
 ```
 
 **שינויים ב-service:**
+
 - ✅ הוספת `user_id` parameter ל-`get_assignment_suggestions()`
 - ✅ הוספת `user_id` parameter ל-`get_creation_suggestions()`
 - ✅ הוספת `user_id` parameter ל-`_load_open_plans_for_tickers()`
 - ✅ העברת `user_id` ל-`TradeService.get_trades_without_plan()`
 
-#### סטטוס:
+#### סטטוס
+
 - ✅ **תוקן** ב-`Backend/routes/api/trades.py` (01.12.2025)
 - ✅ **תוקן** ב-`Backend/services/trade_plan_matching_service.py` (01.12.2025)
 - ⚠️ **נדרש:** תיקון גם ב-`production/Backend/routes/api/trades.py` ו-`production/Backend/services/trade_plan_matching_service.py`
@@ -185,18 +201,21 @@ def get_trades_pending_plan_assignments():
 
 **קובץ:** `Backend/routes/api/base_entity.py`
 
-#### בדיקה:
+#### בדיקה
+
 - ✅ **תומך ב-user_id** - BaseEntityAPI מעביר `user_id` ל-services אוטומטית
 - ✅ **כל ה-services תומכים** - TradingAccountService, ExecutionService, CashFlowService, TradeService, TradePlanService, AlertService
 
-#### סטטוס:
+#### סטטוס
+
 - ✅ **אין בעיה** - BaseEntityAPI תומך ב-user_id filtering
 
 ---
 
 ## רשימת Services לבדיקה
 
-### Services שתומכים ב-user_id (✅):
+### Services שתומכים ב-user_id (✅)
+
 1. ✅ `TradingAccountService.get_all(db, user_id=...)`
 2. ✅ `TradingAccountService.get_open_trading_accounts(db, user_id=...)`
 3. ✅ `ExecutionService.get_all(db, user_id=...)`
@@ -205,7 +224,8 @@ def get_trades_pending_plan_assignments():
 6. ✅ `TradePlanService.get_all(db, user_id=...)`
 7. ✅ `AlertService.get_all(db, user_id=...)`
 
-### Services שתוקנו (✅):
+### Services שתוקנו (✅)
+
 1. ✅ `NoteService` - תוקן ב-Notes API
 2. ✅ `PositionPortfolioService.calculate_portfolio_summary()` - תוקן
 3. ✅ `TradePlanMatchingService.get_assignment_suggestions()` - תוקן
@@ -215,12 +235,14 @@ def get_trades_pending_plan_assignments():
 
 ## תוכנית תיקון - סטטוס
 
-### עדיפות גבוהה (קריטי) - ✅ הושלם:
+### עדיפות גבוהה (קריטי) - ✅ הושלם
+
 1. ✅ **Trading Accounts** - תוקן
 2. ✅ **Notes API** - תוקן
 3. ✅ **Portfolio API** - תוקן
 
-### עדיפות בינונית - ✅ הושלם:
+### עדיפות בינונית - ✅ הושלם
+
 4. ✅ **Trade Plan Matching** - תוקן
 5. ✅ **Base Entity API** - נבדק - תומך ב-user_id
 
@@ -229,15 +251,18 @@ def get_trades_pending_plan_assignments():
 ## בדיקות נדרשות
 
 ### 1. בדיקת Auth Middleware
+
 - ✅ **נבדק** - `g.user_id` מוגדר נכון אחרי התחברות
 - ✅ **נבדק** - `g.user_id` הוא `None` כשלא מחוברים
 - ✅ **נבדק** - ה-middleware רץ לפני כל ה-API endpoints
 
 ### 2. בדיקת Base Entity API
+
 - ✅ **נבדק** - כל ה-services שמשתמשים ב-`BaseEntityAPI` תומכים ב-`user_id` parameter
 - ✅ **נבדק** - הסיגנטורות של כל ה-services
 
 ### 3. בדיקת Endpoints מותאמים אישית
+
 - ✅ **תוקן** - `GET /api/notes/` - תוקן
 - ✅ **תוקן** - `GET /api/positions/portfolio` - תוקן
 - ✅ **תוקן** - `GET /api/trades/pending-plan/*` - תוקן
@@ -246,11 +271,13 @@ def get_trades_pending_plan_assignments():
 
 ## בדיקות שבוצעו
 
-### בדיקות אוטומטיות:
+### בדיקות אוטומטיות
+
 - ✅ **סקריפט בדיקה נוצר:** `scripts/security/user_data_isolation_test.py`
 - ⚠️ **נדרש:** הרצת הבדיקות בסביבת Production
 
-### בדיקות ידניות:
+### בדיקות ידניות
+
 - ✅ **Notes API** - נבדק - מחזיר רק הערות של המשתמש המחובר
 - ✅ **Portfolio API** - נבדק - מחזיר רק פורטפוליו של המשתמש המחובר
 - ✅ **Trade Plan Matching** - נבדק - מחזיר רק הצעות של המשתמש המחובר
@@ -278,13 +305,16 @@ def get_trades_pending_plan_assignments():
 ## עדכונים
 
 ### 01.12.2025 - 13:00
+
 - ✅ תוקן Trading Accounts API
 - ❌ זוהו 3 בעיות נוספות שצריכות תיקון
 
 ### 01.12.2025 - 13:30
+
 - 📄 נוצר דוח נוסף: `SECURITY_AUDIT_PAGE_PROTECTION.md` - בדיקת הגנת עמודים
 
 ### 01.12.2025 - 18:00 (תיקון מלא)
+
 - ✅ תוקן Notes API - סינון לפי user_id
 - ✅ תוקן Portfolio API - סינון לפי user_id
 - ✅ תוקן Trade Plan Matching - סינון לפי user_id
@@ -301,11 +331,13 @@ def get_trades_pending_plan_assignments():
 
 **קובץ:** `Backend/services/trade_service.py`
 
-#### בדיקה:
+#### בדיקה
+
 - ✅ `TradeService.get_all()` - תומך ב-user_id
 - ✅ `TradeService.get_trades_without_plan()` - תומך ב-user_id
 
-#### סטטוס:
+#### סטטוס
+
 - ✅ **תומך ב-user_id** - כל המתודות תומכות
 
 ---
@@ -314,10 +346,12 @@ def get_trades_pending_plan_assignments():
 
 **קובץ:** `Backend/services/trade_plan_service.py`
 
-#### בדיקה:
+#### בדיקה
+
 - ✅ `TradePlanService.get_all()` - תומך ב-user_id
 
-#### סטטוס:
+#### סטטוס
+
 - ✅ **תומך ב-user_id** - כל המתודות תומכות
 
 ---
@@ -326,17 +360,19 @@ def get_trades_pending_plan_assignments():
 
 **קובץ:** `Backend/services/alert_service.py`
 
-#### בדיקה:
+#### בדיקה
+
 - ✅ `AlertService.get_all()` - תומך ב-user_id
 
-#### סטטוס:
+#### סטטוס
+
 - ✅ **תומך ב-user_id** - כל המתודות תומכות
 
 ---
 
 ## רשימת בדיקות מפורטת
 
-### Endpoints שצריכים user_id filtering:
+### Endpoints שצריכים user_id filtering
 
 1. ✅ `GET /api/trading-accounts/` - משתמש ב-BaseEntityAPI (תומך)
 2. ✅ `GET /api/trading-accounts/open` - תוקן
@@ -355,17 +391,20 @@ def get_trades_pending_plan_assignments():
 ## סיכום
 
 ✅ **כל הבעיות הקריטיות תוקנו:**
+
 - Notes API - תוקן
 - Portfolio API - תוקן
 - Trade Plan Matching - תוקן
 - Base Entity API - תומך ב-user_id
 
 ⚠️ **נדרש:**
+
 - עדכון קבצים ב-Production
 - הרצת בדיקות מקיפות ב-Production
 - בדיקת ביצועים - וידוא שאין השפעה על מהירות
 
 ✅ **מערכת מוגנת:**
+
 - כל ה-endpoints מסננים לפי user_id
 - Auth Middleware עובד נכון
 - Base Entity API תומך ב-user_id filtering

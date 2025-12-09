@@ -1,5 +1,7 @@
 # TikTrack Docker Database Sync Guide
+
 # ===================================
+
 # מדריך סנכרון בסיס הנתונים בין סביבת הפיתוח המקומית ל-Docker
 
 **גרסה:** 1.0  
@@ -27,6 +29,7 @@ python3 scripts/db/verify_schema_match.py
 ```
 
 הסקריפט בודק:
+
 - ✅ מספר טבלאות
 - ✅ מבנה טבלאות (עמודות, טיפוסים)
 - ✅ מספר רשומות בטבלאות עיקריות
@@ -39,6 +42,7 @@ python3 scripts/db/verify_schema_match.py
 ```
 
 הסקריפט בודק:
+
 - ✅ רשימת טבלאות
 - ✅ מבנה עמודות (שם, טיפוס, NULL, default)
 - ✅ אינדקסים
@@ -55,6 +59,7 @@ python3 scripts/db/verify_schema_match.py
 ```
 
 **מה הסקריפט עושה:**
+
 1. ✅ בודק שה-Docker container רץ
 2. ✅ בודק חיבור לבסיס הנתונים המקומי
 3. ✅ יוצר גיבוי של בסיס הנתונים ב-Docker (לפני סנכרון)
@@ -64,6 +69,7 @@ python3 scripts/db/verify_schema_match.py
 7. ✅ מנקה קבצים זמניים
 
 **תוצאה:**
+
 - בסיס הנתונים ב-Docker זהה ב-100% למקומי
 - גיבוי נשמר ב-`archive/database_backups/docker_pre_sync_YYYYMMDD_HHMMSS.sql`
 

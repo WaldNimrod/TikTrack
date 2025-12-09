@@ -300,16 +300,22 @@ class AlertService:
 
     
     @staticmethod
-    def get_alerts_by_entity(db: Session, entity_type: str, entity_id: int) -> List[Alert]:
-        """Get alerts by entity type and ID"""
+    def get_alerts_by_entity(db: Session, entity_type: str, entity_id: int, user_id: Optional[int] = None) -> List[Alert]:
+        """Get alerts by entity type and ID (filtered by user_id if provided)"""
         try:
             related_type_id = AlertService._get_relation_type_id(db, entity_type)
-            alerts = db.query(Alert).filter(
+            query = db.query(Alert).filter(
                 Alert.related_type_id == related_type_id,
                 Alert.related_id == entity_id
-            ).all()
+            )
             
-            logger.info(f"Found {len(alerts)} alerts for entity {entity_type} {entity_id}")
+            # Filter by user_id if provided
+            if user_id is not None:
+                query = query.filter(Alert.user_id == user_id)
+            
+            alerts = query.all()
+            
+            logger.info(f"Found {len(alerts)} alerts for entity {entity_type} {entity_id} (user_id={user_id})")
             return alerts
         except Exception as e:
             logger.error(f"Error loading alerts for entity {entity_type} {entity_id}: {e}")

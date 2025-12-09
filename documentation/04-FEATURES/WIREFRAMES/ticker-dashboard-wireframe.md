@@ -75,6 +75,7 @@
 **טכנולוגיה:** InfoSummarySystem או KPI Cards מותאמים אישית
 
 **KPI נדרשים:**
+
 - **מחיר נוכחי** - `current_price` מ-`MarketDataQuote`
 - **שינוי יומי** - `daily_change` ו-`daily_change_percent`
 - **ATR** - עם רמזור (FieldRendererService.renderATR)
@@ -82,6 +83,7 @@
 - **טווח 52 שבועות** - `52w_high` ו-`52w_low` (אם זמין)
 
 **עיצוב:**
+
 - Grid layout: 5 עמודות (responsive: 2-3-5)
 - Cards עם רקע בהיר
 - עיצוב עקבי עם InfoSummarySystem
@@ -95,16 +97,19 @@
 **טכנולוגיה:** TradingViewChartAdapter
 
 **סוג גרף:**
+
 - **ברירת מחדל:** Candlestick Chart
 - **אופציות:** Line Chart, Area Chart (toggle)
 
 **תכונות:**
+
 - Time scale בתחתית
 - Price scale בצד ימין
 - Volume overlay (HistogramSeries) - אופציונלי
 - Responsive - מתאים את עצמו לרוחב המסך
 
 **נתונים:**
+
 - IntradayDataSlot (15 דקות) או Daily data
 - טווח זמן: 30 יום אחרונים (ברירת מחדל)
 - אפשרות לשנות טווח: 1D, 1W, 1M, 3M, 1Y
@@ -118,11 +123,13 @@
 **טכנולוגיה:** Cards עם FieldRendererService
 
 **מדדים:**
+
 1. **ATR** - עם רמזור (FieldRendererService.renderATR)
 2. **Volatility** - חישוב מ-ATR או נתונים חיצוניים
 3. **Volume Profile** - ויזואליזציה של נפח (אם זמין)
 
 **עיצוב:**
+
 - 3 Cards בשורה (responsive: 1-2-3)
 - כל Card עם כותרת וערך
 - ATR עם רמזור צבעוני
@@ -136,6 +143,7 @@
 **טכנולוגיה:** LinkedItemsService
 
 **תת-סעיפים:**
+
 1. **תוכניות טרייד (Trade Plans)**
    - רשימה של תוכניות המשויכות לטיקר
    - הצגת R/R, STOP, TARGET
@@ -157,6 +165,7 @@
    - קישור ל-EntityDetailsModal
 
 **עיצוב:**
+
 - Accordion או Tabs לכל סוג פעילות
 - רשימה עם FieldRendererService
 - כפתורי "צפה בפרטים" לכל פריט
@@ -170,11 +179,13 @@
 **טכנולוגיה:** Conditions System
 
 **תוכן:**
+
 - רשימת תנאים המשויכים לטיקר
 - הצגת תנאי ההתראה/תוכנית
 - קישור ל-EntityDetailsModal
 
 **עיצוב:**
+
 - רשימה עם FieldRendererService
 - כל תנאי עם כותרת ותיאור
 
@@ -182,7 +193,8 @@
 
 ## אינטגרציות נדרשות
 
-### מערכות לשימוש:
+### מערכות לשימוש
+
 - ✅ **TradingViewChartAdapter** - לגרף מחיר מרכזי
 - ✅ **FieldRendererService** - לרנדור KPI וערכים
 - ✅ **InfoSummarySystem** - לסטטיסטיקות מהירות
@@ -194,7 +206,8 @@
 - ✅ **Icon System** - לאייקונים
 - ✅ **Header System** - לתפריט ופילטרים
 
-### API Endpoints נדרשים:
+### API Endpoints נדרשים
+
 - `/api/tickers/{id}/dashboard` - נתוני דשבורד מלא
 - `/api/tickers/{id}/technical-indicators` - מדדים טכניים
 - `/api/tickers/{id}/user-activity` - פעילות המשתמש
@@ -205,16 +218,19 @@
 ## Responsive Design
 
 **Desktop (> 768px):**
+
 - 5 KPI Cards בשורה
 - גרף בגובה 50vh
 - 3 Cards למדדים טכניים
 
 **Tablet (768px - 1024px):**
+
 - 3 KPI Cards בשורה
 - גרף בגובה 40vh
 - 2 Cards למדדים טכניים
 
 **Mobile (< 768px):**
+
 - 2 KPI Cards בשורה
 - גרף בגובה 30vh
 - 1 Card למדדים טכניים
@@ -224,15 +240,18 @@
 ## States & Loading
 
 **Loading State:**
+
 - Skeleton loaders לכל סעיף
 - Spinner במרכז הגרף
 - showLoadingState/hideLoadingState
 
 **Empty State:**
+
 - הודעת "אין נתונים זמינים" לכל סעיף
 - כפתור "רענן" או "טען נתונים"
 
 **Error State:**
+
 - NotificationSystem.showError
 - הודעת שגיאה ברורה
 - כפתור "נסה שוב"
@@ -242,11 +261,13 @@
 ## Navigation & Links
 
 **קישורים נדרשים:**
+
 - מעמוד `tickers.html` → `ticker-dashboard.html?tickerId={id}`
 - מ-`EntityDetailsModal` → כפתור "צפה בדשבורד מורחב"
 - חזרה ל-`tickers.html` או `EntityDetailsModal`
 
 **URL Structure:**
+
 - `/ticker-dashboard.html?tickerId=123`
 - `/ticker-dashboard.html?tickerSymbol=TSLA`
 

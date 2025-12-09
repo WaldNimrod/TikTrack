@@ -1,4 +1,5 @@
 # תהליכי אימות מטמון - Cache Verification Procedures
+
 # ====================================================
 
 **תאריך:** 11 אוקטובר 2025  
@@ -9,6 +10,7 @@
 ## 🎯 **חשיבות התהליך**
 
 בדיקת מטמון לפני ואחרי **קריטית** לתהליכי פיתוח:
+
 - ✅ מבטיחה שניקוי עובד
 - ✅ מזהה בעיות מוקדם
 - ✅ מונעת data stale
@@ -19,6 +21,7 @@
 ## 📍 **כלים זמינים**
 
 ### **1. עמוד ניהול מערכת** (`system-management.html`)
+
 - **מיקום:** http://localhost:8080/system-management
 - **כפתורים:**
   - 🔄 רענן נתוני מערכת
@@ -30,6 +33,7 @@
   - 📊 סטטוס מטמון בזמן אמת
 
 ### **2. עמוד בדיקת מטמון** (`cache-test.html`)
+
 - **מיקום:** http://localhost:8080/cache-test
 - **בדיקות:**
   - 🧪 בדיקת אינטגרציה (4 שכבות)
@@ -43,11 +47,13 @@
   - 🔮 תכונות עתידיות (מושבתות)
 
 ### **3. כפתור 🧹 בתפריט הראשי**
+
 - **קורא ל:** `clearAllCache({ level: 'medium' })`
 - **כיסוי:** 60% - UnifiedCacheManager + Service Caches
 - **בטיחות:** בינונית - לא נוגע ב-Orphan Keys
 
 ### **4. Console בדפדפן**
+
 - **Chrome DevTools:** `F12` או `Cmd+Option+I`
 - **Console Tab** - לוגים בזמן אמת
 - **Application Tab** → **Storage** - ראה localStorage/IndexedDB
@@ -59,15 +65,19 @@
 ### **4 רמות עוצמה מדורגות:**
 
 #### **רמה 1: Light 🟢**
+
 ```javascript
 await clearAllCache({ level: 'light' });
 ```
+
 **מנקה:**
+
 - Memory Layer
 - Service Caches (7-9)
 - CSS Management Sets
 
 **לא מנקה:**
+
 - localStorage (tiktrack_*)
 - Orphan Keys
 
@@ -77,16 +87,20 @@ await clearAllCache({ level: 'light' });
 ---
 
 #### **רמה 2: Medium 🔵 (ברירת מחדל)**
+
 ```javascript
 await clearAllCache({ level: 'medium' });
 // או:
 await clearAllCache();  // ברירת מחדל
 ```
+
 **מנקה:**
+
 - כל Light
 - UnifiedCacheManager (4 שכבות)
 
 **לא מנקה:**
+
 - Orphan Keys (15-20)
 
 **מתי להשתמש:** פיתוח יומיומי, כפתור 🧹 בתפריט  
@@ -95,10 +109,13 @@ await clearAllCache();  // ברירת מחדל
 ---
 
 #### **רמה 3: Full 🟠**
+
 ```javascript
 await clearAllCache({ level: 'full' });
 ```
+
 **מנקה:**
+
 - כל Medium
 - Orphan Keys (15-20)
 - authToken, currentUser
@@ -110,10 +127,13 @@ await clearAllCache({ level: 'full' });
 ---
 
 #### **רמה 4: Nuclear ☢️**
+
 ```javascript
 await clearAllCache({ level: 'nuclear' });
 ```
+
 **מנקה:**
+
 - כל Full
 - ALL localStorage (ללא סינון!)
 - DELETE IndexedDB database
@@ -143,6 +163,7 @@ console.log('📊 BEFORE:', before);
 ```
 
 **צפוי לראות:**
+
 ```json
 {
   "timestamp": "2025-10-11T...",
@@ -163,17 +184,20 @@ console.log('📊 BEFORE:', before);
 ### **שלב 2: Action - ביצוע פעולה**
 
 #### **אופציה A: ניקוי מלא**
+
 ```javascript
 await window.clearAllCacheSystems();
 ```
 
 #### **אופציה B: ניקוי שכבה ספציפית**
+
 ```javascript
 await window.clearUnifiedCacheLayer('memory');
 // או: 'localStorage', 'indexedDB', 'backend'
 ```
 
 #### **אופציה C: ניקוי לפי קטגוריה**
+
 ```javascript
 await window.clearCacheByCategory('preferences');
 // או: 'notifications', 'ui-state', 'temp-data'
@@ -196,6 +220,7 @@ console.log('📊 AFTER:', after);
 ```
 
 **צפוי לראות (אחרי ניקוי מלא):**
+
 ```json
 {
   "layers": {
@@ -259,6 +284,7 @@ console.log('🧪 Integration Test Result:', result);
 ```
 
 **צפוי לראות:**
+
 ```json
 {
   "memoryLayer": true,
@@ -269,6 +295,7 @@ console.log('🧪 Integration Test Result:', result);
 ```
 
 **אם יש כשל:**
+
 ```json
 {
   "memoryLayer": true,
@@ -290,6 +317,7 @@ console.log('🏥 Health Check:', healthCheck);
 ```
 
 **צפוי לראות:**
+
 ```json
 {
   "memory": {
@@ -331,6 +359,7 @@ console.log('⚡ Performance Test:', perfTest);
 ```
 
 **צפוי לראות:**
+
 ```json
 {
   "memory": {
@@ -357,6 +386,7 @@ console.log('⚡ Performance Test:', perfTest);
 ```
 
 **מה לחפש:**
+
 - ✅ Memory: < 0.5ms
 - ✅ localStorage: < 0.5ms
 - ✅ IndexedDB: < 2ms
@@ -367,18 +397,21 @@ console.log('⚡ Performance Test:', perfTest);
 ## 📋 **Checklist לפני שינוי גדול**
 
 ### **לפני:**
+
 - [ ] הרץ בדיקת בריאות מלאה
 - [ ] שמור snapshot של מצב המטמון
 - [ ] תעד מספר entries בכל שכבה
 - [ ] תעד גודל כל שכבה (bytes)
 
 ### **אחרי השינוי:**
+
 - [ ] נקה מטמון מלא
 - [ ] הרץ בדיקת אינטגרציה
 - [ ] וודא 4/4 שכבות עובדות
 - [ ] וודא ביצועים תקינים
 
 ### **בעיות נפוצות:**
+
 - ❌ **"0/4 layers"** - UnifiedCacheManager לא אותחל
 - ❌ **"3/4 layers"** - Backend layer לא עובד (בדוק בקונסול)
 - ❌ **"Entries לא מתאפסים"** - בעיה ב-clear()
@@ -459,50 +492,60 @@ NOTES: [כל דבר חריג]
 ## 🎯 **תרחישי שימוש מומלצים (חדש!)**
 
 ### **תרחיש 1: מבחן מהיר**
+
 ```javascript
 // Light - לא נוגע ב-persistent data
 await clearAllCache({ level: 'light' });
 ```
+
 **למה:** איפוס Memory + Services בלבד, בטוח לחלוטין
 
 ---
 
 ### **תרחיש 2: פיתוח יומיומי**
+
 ```javascript
 // Medium - ברירת מחדל, כפתור בתפריט
 await clearAllCache({ level: 'medium' });
 ```
+
 **למה:** מנקה UnifiedCacheManager + Services, לא נוגע ב-orphans (בטוח יחסית)
 
 ---
 
 ### **תרחיש 3: לפני commit/push**
+
 ```javascript
 // Full - כיסוי 100%
 await clearAllCache({ level: 'full' });
 ```
+
 **למה:** ודא שאין נתונים ישנים, כולל orphans  
 **⚠️ שים לב:** דורש login מחדש (authToken נמחק)
 
 ---
 
 ### **תרחיש 4: באג מסתורי**
+
 ```javascript
 // Full - reset מלא
 await clearAllCache({ level: 'full' });
 // רענן דף
 location.reload();
 ```
+
 **למה:** לפעמים orphan keys גורמים לבאגים מוזרים
 
 ---
 
 ### **תרחיש 5: לפני demo/presentation**
+
 ```javascript
 // Nuclear - מצב "כמו חדש"
 await clearAllCache({ level: 'nuclear' });
 location.reload();
 ```
+
 **למה:** reset מוחלט, מערכת נקייה לחלוטין  
 **⚠️⚠️⚠️ רק בחירום!**
 
@@ -532,6 +575,7 @@ console.log('Test Results:', results);
 ```
 
 **מה נבדק:**
+
 - ✅ Light: Memory=0, localStorage>0, orphans>0
 - ✅ Medium: All UnifiedCM=0, orphans>0
 - ✅ Full: הכל=0

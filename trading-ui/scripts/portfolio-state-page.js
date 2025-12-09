@@ -1223,7 +1223,8 @@ async function checkPortfolioDataCompleteness(positions) {
 
 /**
  * Ensure historical data is available for portfolio state calculations
- * Similar to ensureHistoricalDataForTickers in tickers.js
+ * Similar to ensureHistoricalDataForTickers in tickers.js and fetchDataFromProvider in ticker-dashboard
+ * Follows the same pattern: check missing data → show UI → load only missing → save to DB/cache → re-check → render
  * @param {Array} positions - Array of positions from portfolio state
  * @param {Object} options - Options (silent, showProgress)
  * @returns {Promise<Array>} Array of positions with data
@@ -1240,12 +1241,53 @@ async function ensurePortfolioHistoricalData(positions, options = {}) {
         return positions;
     }
 
-    // Check completeness first
+    // Step 0: Check what data is missing before loading (like ticker-dashboard)
+    if (window.Logger) {
+        window.Logger.info('🔍 Step 0: Checking what data is missing...', { page: 'portfolio-state-page' });
+    }
+    
+    let missingDataInfo = null;
+    try {
+        // Check missing data via API endpoint (same as ticker-dashboard)
+        const missingDataResponse = await fetch(`/api/external-data/status/tickers/missing-data`);
+        if (missingDataResponse.ok) {
+            const missingDataResult = await missingDataResponse.json();
+            const allMissingTickers = [
+                ...(missingDataResult?.data?.tickers_missing_current || []),
+                ...(missingDataResult?.data?.tickers_missing_historical || []),
+                ...(missingDataResult?.data?.tickers_missing_indicators || [])
+            ];
+            
+            // Get unique ticker IDs from positions
+            const positionTickerIds = [...new Set(positions.map(p => p.ticker_id).filter(id => id))];
+            missingDataInfo = allMissingTickers.filter(t => positionTickerIds.includes(t.id));
+            
+            if (window.Logger) {
+                window.Logger.info('📊 Missing data check completed', { 
+                    totalPositions: positions.length,
+                    needsRefresh: missingDataInfo.length > 0,
+                    missingTickersCount: missingDataInfo.length,
+                    page: 'portfolio-state-page' 
+                });
+            }
+        }
+    } catch (checkError) {
+        if (window.Logger) {
+            window.Logger.warn('⚠️ Could not check missing data, will refresh all data', { 
+                error: checkError.message, 
+                page: 'portfolio-state-page' 
+            });
+        }
+        // Continue with full refresh if check fails
+    }
+    
+    // Also check completeness locally
     const completeness = await checkPortfolioDataCompleteness(positions);
     
-    if (completeness.complete) {
+    // If all data is fresh, skip refresh
+    if (completeness.complete && (!missingDataInfo || missingDataInfo.length === 0)) {
         if (!silent) {
-            window.Logger?.info?.('All portfolio positions have market data', { 
+            window.Logger?.info?.('✅ All portfolio positions have market data', { 
                 count: positions.length, 
                 page: 'portfolio-state-page' 
             });
@@ -1254,45 +1296,87 @@ async function ensurePortfolioHistoricalData(positions, options = {}) {
     }
 
     const overlayId = 'portfolio-state-ensure-historical';
-    const totalSteps = completeness.positionsNeedingData.length;
+    const uniqueTickerIds = [...new Set(completeness.missingTickers)];
+    const totalSteps = uniqueTickerIds.length;
     let progressStep = 0;
 
     if (showProgress && window.UnifiedProgressManager) {
+        // Create overlay with proper steps (like ticker-dashboard)
+        const steps = [];
+        const descriptions = [];
+        
+        // Determine what needs to be loaded based on missing data check
+        const needsQuote = missingDataInfo?.some(t => t.reason === 'missing_current_quote' || t.reason === 'insufficient_historical_data') || completeness.positionsNeedingData.length > 0;
+        const needsHistorical = missingDataInfo?.some(t => t.reason === 'insufficient_historical_data') || false;
+        
+        if (needsQuote) {
+            steps.push('טוען מחיר נוכחי');
+            descriptions.push('מתחבר לספק הנתונים החיצוני, טוען מחיר נוכחי...');
+        }
+        if (needsHistorical) {
+            steps.push('טוען נתונים היסטוריים');
+            descriptions.push('טוען 150 ימים של נתונים היסטוריים...');
+        }
+        steps.push('מסיים טעינה');
+        descriptions.push('מסיים את התהליך...');
+        
         window.UnifiedProgressManager.createOverlay(overlayId, {
             title: 'טוען נתוני שוק עבור תיק',
-            totalSteps: totalSteps,
-            stepLabels: Array(totalSteps).fill(''),
-            stepDescriptions: Array(totalSteps).fill('')
+            totalSteps: steps.length,
+            stepLabels: steps,
+            stepDescriptions: descriptions
         });
         window.UnifiedProgressManager.showProgress(overlayId, 1, 'בודק נתונים', `בודק ${totalSteps} טיקרים...`);
     }
 
-    // Load market data for tickers that need it
+    // Step 1: Load market data for tickers that need it (optimized - only missing data)
+    if (window.Logger) {
+        window.Logger.info('📊 Step 1: Refreshing only missing ticker data using ExternalDataService...', { 
+            totalTickers: uniqueTickerIds.length,
+            page: 'portfolio-state-page' 
+        });
+    }
+    
+    if (showProgress && window.UnifiedProgressManager) {
+        window.UnifiedProgressManager.showProgress(
+            overlayId,
+            1,
+            `טוען נתונים עבור ${uniqueTickerIds.length} טיקרים...`,
+            'מתחבר לספק הנתונים החיצוני...'
+        );
+    }
+
     const positionsWithData = [...positions];
-    const uniqueTickerIds = [...new Set(completeness.missingTickers)];
 
     for (let i = 0; i < uniqueTickerIds.length; i++) {
         const tickerId = uniqueTickerIds[i];
         progressStep++;
 
+        // Find ticker info from missing data check
+        const tickerInfo = missingDataInfo?.find(t => t.id === tickerId);
+        const needsQuote = tickerInfo?.reason === 'missing_current_quote' || tickerInfo?.reason === 'insufficient_historical_data' || !tickerInfo;
+        const needsHistorical = tickerInfo?.reason === 'insufficient_historical_data' || false;
+
         if (showProgress && window.UnifiedProgressManager) {
             const percentage = Math.round((progressStep / totalSteps) * 100);
-            window.UnifiedProgressManager.updateProgress(overlayId, percentage, `טוען נתוני שוק (${progressStep}/${totalSteps})`);
+            window.UnifiedProgressManager.updateProgress(overlayId, percentage, `טוען נתוני שוק עבור טיקר ${progressStep}/${totalSteps}`);
         }
 
         try {
-            // Use ExternalDataService to refresh ticker data
+            // Use ExternalDataService.refreshTickerData() - optimized to load only missing data
+            // Backend will check what's missing and load only what's needed (like ticker-dashboard)
             const refreshedData = await window.ExternalDataService.refreshTickerData(tickerId, {
-                forceRefresh: false,
-                includeHistorical: false, // Only need current price for portfolio state
-                daysBack: undefined
+                forceRefresh: false, // Let backend decide what to load
+                includeHistorical: needsHistorical ? true : undefined, // Only if needed
+                daysBack: needsHistorical ? 150 : undefined // Only if needed
             });
 
-            if (!silent) {
-                window.Logger?.debug?.('Loaded market data for ticker', {
-                    tickerId,
+            if (window.Logger) {
+                window.Logger.info('✅ Ticker data refreshed successfully (optimized)', { 
+                    tickerId, 
                     hasPrice: !!refreshedData?.price,
-                    page: 'portfolio-state-page'
+                    hasHistorical: !!refreshedData?.historical_quotes_count,
+                    page: 'portfolio-state-page' 
                 });
             }
         } catch (error) {
@@ -1308,7 +1392,8 @@ async function ensurePortfolioHistoricalData(positions, options = {}) {
         window.UnifiedProgressManager.hideProgress(overlayId);
     }
 
-    // Reload portfolio state to get updated market prices
+    // Step 2: Data is saved to DB and cache by ExternalDataService
+    // Step 3: Re-check and render will be done by caller (loadTrades)
     return positionsWithData;
 }
 
@@ -1557,6 +1642,112 @@ async function loadTrades(dateRange, selectedAccounts, investmentType) {
             window.Logger.error('Error loading trades', { page: 'portfolio-state-page', error });
         }
         allTrades = [];
+    }
+}
+
+// Load trades for specific month and year
+async function loadTradesForMonthYear() {
+    const monthSelect = document.getElementById('tradesMonthSelect');
+    const yearSelect = document.getElementById('tradesYearSelect');
+    
+    if (!monthSelect || !yearSelect) {
+        if (window.NotificationSystem) {
+            window.NotificationSystem.showError('שגיאה', 'לא ניתן לטעון טריידים - שדות חודש ושנה לא נמצאו');
+        }
+        return;
+    }
+    
+    const month = parseInt(monthSelect.value);
+    const year = parseInt(yearSelect.value);
+    
+    if (!month || !year) {
+        if (window.NotificationSystem) {
+            window.NotificationSystem.showError('שגיאה', 'נא לבחור חודש ושנה');
+        }
+        return;
+    }
+    
+    // Calculate date range for the month
+    const startDate = new Date(year, month - 1, 1);
+    const endDate = new Date(year, month, 0); // Last day of the month
+    
+    const startDateStr = startDate.toISOString().split('T')[0];
+    const endDateStr = endDate.toISOString().split('T')[0];
+    
+    if (window.Logger) {
+        window.Logger.info('Loading trades for month/year', { month, year, startDate: startDateStr, endDate: endDateStr, page: 'portfolio-state-page' });
+    }
+    
+    try {
+        // Show loading state
+        showLoadingState('trades-table-section');
+        
+        // Load trades from API using date range
+        const selectedAccounts = getSelectedAccounts();
+        const accountId = Array.isArray(selectedAccounts) && selectedAccounts.length === 1 ? selectedAccounts[0] : null;
+        
+        // Use TradeHistoryData or direct API call
+        if (window.TradeHistoryData && typeof window.TradeHistoryData.loadTradeHistory === 'function') {
+            const filters = {
+                account_id: accountId,
+                start_date: startDateStr,
+                end_date: endDateStr
+            };
+            
+            const data = await window.TradeHistoryData.loadTradeHistory(filters);
+            allTrades = data.trades || [];
+        } else {
+            // Fallback to direct API call
+            const response = await fetch(`/api/trade-history/?account_id=${accountId || ''}&start_date=${startDateStr}&end_date=${endDateStr}`);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const result = await response.json();
+            allTrades = result.data?.trades || [];
+        }
+        
+        // Filter and render
+        filteredTrades = allTrades;
+        updateTradesTable();
+        updateTradesSummary(filteredTrades);
+        
+        if (window.NotificationSystem) {
+            window.NotificationSystem.showSuccess('טעינה הושלמה', `נטענו ${filteredTrades.length} טריידים לחודש ${month}/${year}`);
+        }
+    } catch (error) {
+        const errorMsg = `שגיאה בטעינת טריידים: ${error.message || 'שגיאה לא ידועה'}`;
+        if (window.NotificationSystem) {
+            window.NotificationSystem.showError('שגיאה בטעינת נתונים', errorMsg);
+        }
+        if (window.Logger) {
+            window.Logger.error('Error loading trades for month/year', { month, year, error, page: 'portfolio-state-page' });
+        }
+        allTrades = [];
+        filteredTrades = [];
+        updateTradesTable();
+    } finally {
+        hideLoadingState('trades-table-section');
+    }
+}
+
+// Populate year select with years (current year and previous 5 years)
+function populateYearSelect() {
+    const yearSelect = document.getElementById('tradesYearSelect');
+    if (!yearSelect) return;
+    
+    const currentYear = new Date().getFullYear();
+    yearSelect.innerHTML = '';
+    
+    // Add current year and previous 5 years
+    for (let i = 0; i < 6; i++) {
+        const year = currentYear - i;
+        const option = document.createElement('option');
+        option.value = year;
+        option.textContent = year;
+        if (i === 1) { // Default to previous year
+            option.selected = true;
+        }
+        yearSelect.appendChild(option);
     }
 }
 
@@ -1855,12 +2046,20 @@ function renderTradeRow(trade) {
 function updateTradesTable() {
     // Use UnifiedTableSystem if available and registered
     if (window.UnifiedTableSystem && window.UnifiedTableSystem.registry) {
-        const tableConfig = window.UnifiedTableSystem.registry.get('portfolio-trades');
+        const tableConfig = window.UnifiedTableSystem.registry.getConfig('portfolio-trades');
         if (tableConfig && tableConfig.updateFunction) {
             // Call the registered updateFunction directly
             tableConfig.updateFunction(filteredTrades);
             return;
         }
+    }
+    
+    // Use UnifiedTableSystem.renderer if available (preferred method)
+    if (window.UnifiedTableSystem && window.UnifiedTableSystem.renderer) {
+        window.UnifiedTableSystem.renderer.render('portfolio-trades', filteredTrades);
+        // Update summary after rendering
+        updateTradesSummary(filteredTrades);
+        return;
     }
     
     // Fallback to manual rendering
@@ -1894,19 +2093,36 @@ function updateTradesTable() {
         }
     });
     
-    // Update summary using InfoSummarySystem (only if container exists)
-    if (window.InfoSummarySystem && window.INFO_SUMMARY_CONFIGS && window.INFO_SUMMARY_CONFIGS['portfolio-state-page']) {
-        const config = window.INFO_SUMMARY_CONFIGS['portfolio-state-page'];
-        const container = document.getElementById(config.containerId);
-        if (container) {
-            window.InfoSummarySystem.calculateAndRender(filteredTrades, config).catch(err => {
-                window.Logger?.warn('Failed to update portfolio state summary via InfoSummarySystem', { error: err, page: 'portfolio-state-page' });
-            });
+                // Update summary using InfoSummarySystem (only if container exists)
+                if (window.InfoSummarySystem && window.INFO_SUMMARY_CONFIGS && window.INFO_SUMMARY_CONFIGS['portfolio-state-page']) {
+                    const config = window.INFO_SUMMARY_CONFIGS['portfolio-state-page'];
+                    const container = document.getElementById(config.containerId);
+                    if (container) {
+                        window.InfoSummarySystem.calculateAndRender(filteredTrades, config).catch(err => {
+                            window.Logger?.warn('Failed to update portfolio state summary via InfoSummarySystem', { error: err, page: 'portfolio-state-page' });
+                        });
+                    }
+                }
+                
+                // Update trades summary using extracted function
+                updateTradesSummary(filteredTrades);
+    
+    // Note: Action buttons are now created directly in renderTradeRow() using createActionsMenu()
+    // No need for loadTableActionButtons() anymore
+}
+
+// Update trades summary (extracted for reuse)
+function updateTradesSummary(trades) {
+    if (!trades || trades.length === 0) {
+                const summaryElement = document.getElementById('trades-summary');
+                if (summaryElement) {
+            summaryElement.textContent = 'אין טריידים';
         }
+        return;
     }
     
     // Always update trades-summary element - no fallback values
-    const totalPL = filteredTrades.reduce((sum, t) => {
+    const totalPL = trades.reduce((sum, t) => {
         const plValue = t.position_pl_value !== null && t.position_pl_value !== undefined ? t.position_pl_value : 0;
         return sum + plValue;
     }, 0);
@@ -1914,7 +2130,7 @@ function updateTradesTable() {
     if (summaryElement) {
         summaryElement.innerHTML = '';
         const strong1 = document.createElement('strong');
-        strong1.textContent = `סה"כ טריידים: ${filteredTrades.length}`;
+        strong1.textContent = `סה"כ טריידים: ${trades.length}`;
         summaryElement.appendChild(strong1);
         
         if (totalPL !== 0) {
@@ -1927,14 +2143,12 @@ function updateTradesTable() {
             if (window.FieldRendererService?.renderAmount) {
                 plSpan.innerHTML = window.FieldRendererService.renderAmount(totalPL, '$', 0, true);
             } else {
-                plSpan.textContent = `$${totalPL.toFixed(2)}`;
+                plSpan.className = totalPL >= 0 ? 'text-success' : totalPL < 0 ? 'text-danger' : 'text-muted';
+                plSpan.textContent = `${totalPL >= 0 ? '+' : ''}${totalPL.toFixed(2)}$`;
             }
-            summaryElement.appendChild(plSpan);
+            strong2.appendChild(plSpan);
         }
     }
-    
-    // Note: Action buttons are now created directly in renderTradeRow() using createActionsMenu()
-    // No need for loadTableActionButtons() anymore
 }
 
 // Update summary cards
@@ -2191,12 +2405,32 @@ async function updateSummaryCards(data) {
         accountsTableBody.textContent = '';
         
         // Group positions by account and calculate totals
+        // CRITICAL: Use trading_account_id as primary key to ensure unique accounts
+        // account_id might be null/undefined, but trading_account_id should always exist
         const accountsData = {};
+        
         currentSnapshot.positions.forEach(position => {
-            const accountId = position.account_id || position.trading_account_id;
-            const accountName = position.account_name || allTradingAccounts.find(a => a.id === accountId)?.name || `Account #${accountId}`;
+            // Use trading_account_id as primary key (always exists from Backend)
+            const accountId = position.trading_account_id || position.account_id;
             
+            // Skip if accountId is invalid
+            if (!accountId || accountId === null || accountId === undefined) {
+                if (window.Logger) {
+                    window.Logger.warn('Position missing account_id and trading_account_id', { 
+                        position, 
+                        page: 'portfolio-state-page' 
+                    });
+                }
+                return;
+            }
+            
+            // Initialize account data if not exists
             if (!accountsData[accountId]) {
+                // Get account name from position or lookup
+                const accountName = position.account_name || 
+                                  allTradingAccounts.find(a => a.id === accountId)?.name || 
+                                  `Account #${accountId}`;
+                
                 accountsData[accountId] = {
                     account_id: accountId,
                     account_name: accountName,
@@ -2207,7 +2441,7 @@ async function updateSummaryCards(data) {
                 };
             }
             
-            // Sum P/L values
+            // Sum P/L values for this position
             if (position.realized_pl !== null && position.realized_pl !== undefined) {
                 accountsData[accountId].realized_pl += position.realized_pl;
             }
@@ -3754,10 +3988,21 @@ async function compareDates() {
         date2Header.textContent = formatDate(date2);
     }
     
-    // Show comparison table and hide placeholder
-    document.getElementById('comparison-table-wrapper').style.display = 'block';
-    document.getElementById('comparison-placeholder').style.display = 'none';
-    document.getElementById('removeComparisonDate').style.display = 'inline-block';
+    // Show comparison table and hide placeholder (with null checks to prevent errors)
+    const comparisonTableWrapper = document.getElementById('comparison-table-wrapper');
+    const comparisonPlaceholder = document.getElementById('comparison-placeholder');
+    const removeComparisonDateBtn = document.getElementById('removeComparisonDate');
+    
+    if (comparisonTableWrapper) {
+        comparisonTableWrapper.style.display = 'block';
+    }
+    if (comparisonPlaceholder) {
+        comparisonPlaceholder.style.display = 'none';
+    }
+    if (removeComparisonDateBtn) {
+        removeComparisonDateBtn.style.display = 'inline-block';
+        removeComparisonDateBtn.classList.remove('hidden');
+    }
     
     // Load comparison data from API
     let comparisonData = [];
@@ -3940,11 +4185,29 @@ function removeComparisonDate() {
       const datePicker2El = document.getElementById('datePicker2');
       if (datePicker2El) datePicker2El.value = '';
     }
-    document.getElementById('comparison-table-wrapper').style.display = 'none';
-    document.getElementById('comparison-placeholder').style.display = 'block';
-    document.getElementById('removeComparisonDate').style.display = 'none';
-    document.getElementById('comparison-date1-header').textContent = '-';
-    document.getElementById('comparison-date2-header').textContent = '-';
+    // Hide comparison table (with null checks to prevent errors)
+    const comparisonTableWrapper = document.getElementById('comparison-table-wrapper');
+    const comparisonPlaceholder = document.getElementById('comparison-placeholder');
+    const removeComparisonDateBtn = document.getElementById('removeComparisonDate');
+    const date1Header = document.getElementById('comparison-date1-header');
+    const date2Header = document.getElementById('comparison-date2-header');
+    
+    if (comparisonTableWrapper) {
+        comparisonTableWrapper.style.display = 'none';
+    }
+    if (comparisonPlaceholder) {
+        comparisonPlaceholder.style.display = 'block';
+    }
+    if (removeComparisonDateBtn) {
+        removeComparisonDateBtn.style.display = 'none';
+        removeComparisonDateBtn.classList.add('hidden');
+    }
+    if (date1Header) {
+        date1Header.textContent = '-';
+    }
+    if (date2Header) {
+        date2Header.textContent = '-';
+    }
 }
 
 // Toggle section
@@ -4423,6 +4686,16 @@ async function waitForScripts() {
         
         // Load investment types (uses system-wide VALID_INVESTMENT_TYPES for consistency)
         loadInvestmentTypes();
+        
+        // Populate year select and set default to previous month
+        populateYearSelect();
+        const monthSelect = document.getElementById('tradesMonthSelect');
+        if (monthSelect) {
+            const previousMonth = new Date();
+            previousMonth.setMonth(previousMonth.getMonth() - 1);
+            monthSelect.value = previousMonth.getMonth() + 1; // Months are 1-12
+        }
+        
         await loadPortfolioState();
         
         // Load chart default period from preferences (only if not restored from state)
@@ -4559,6 +4832,8 @@ async function waitForScripts() {
         getCSSVariableValue,
         loadTradingAccounts,
         loadPortfolioState,
+        loadTradesForMonthYear, // Export for month/year selection
+        populateYearSelect, // Export for year select population
         applyFilters,
         clearFilters,
         toggleDateRangeFilterMenu,

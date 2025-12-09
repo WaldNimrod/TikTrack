@@ -1,4 +1,5 @@
 # בדיקה מקיפה - תהליכי ניקוי מטמון
+
 ## Comprehensive Cache Clearing Verification
 
 **תאריך:** 13 ינואר 2025  
@@ -10,6 +11,7 @@
 ## 🎯 מטרת הבדיקה
 
 **לוודא ש:**
+
 1. ✅ כל רמה מנקה את מה שהיא אמורה
 2. ✅ כל רמה **לא** מנקה את מה שהיא לא אמורה
 3. ✅ הנתונים מתרעננים אחרי ניקוי
@@ -21,7 +23,8 @@
 
 ## 🧪 תסריט בדיקה מקיף
 
-### הכנה (Setup):
+### הכנה (Setup)
+
 ```javascript
 // פתח Console (F12) והרץ:
 
@@ -54,6 +57,7 @@ console.log('authToken:', localStorage.getItem('authToken'));
 ### עמוד cache-test - כפתור "🟢 Light"
 
 **שלבים:**
+
 1. פתח http://localhost:8080/cache-test
 2. פתח Console (F12)
 3. הרץ את ההכנה (Setup) למעלה
@@ -61,6 +65,7 @@ console.log('authToken:', localStorage.getItem('authToken'));
 5. בדוק Console:
 
 **תוצאה צפויה:**
+
 ```
 ✅ Memory layer cleared: 1 entries
 ✅ Service caches cleared: EntityDetailsAPI, ExternalDataService, ...
@@ -71,6 +76,7 @@ console.log('authToken:', localStorage.getItem('authToken'));
 ```
 
 **וידוא מה נוקה:**
+
 ```javascript
 // אמור להיות null (נוקה):
 await window.UnifiedCacheManager.get('test-memory');  // → null ✅
@@ -94,6 +100,7 @@ localStorage.getItem('authToken');  // → 'test-token' ✅
 ### תפריט ראשי - כפתור 🧹
 
 **שלבים:**
+
 1. עמוד כלשהו (למשל trades.html)
 2. פתח Console (F12)
 3. הרץ Setup
@@ -101,6 +108,7 @@ localStorage.getItem('authToken');  // → 'test-token' ✅
 5. בדוק Console:
 
 **תוצאה צפויה:**
+
 ```
 🧹 Starting cache clearing - Level: MEDIUM
 ✅ Memory layer cleared: 1 entries
@@ -117,6 +125,7 @@ localStorage.getItem('authToken');  // → 'test-token' ✅
 ```
 
 **וידוא מה נוקה:**
+
 ```javascript
 // אמור להיות null (נוקה):
 await window.UnifiedCacheManager.get('test-memory');  // → null ✅
@@ -148,6 +157,7 @@ localStorage.getItem('authToken');  // → 'test-token' ✅
 ### עמוד cache-test - כפתור "🟠 Full"
 
 **שלבים:**
+
 1. פתח http://localhost:8080/cache-test
 2. פתח Console (F12)
 3. הרץ Setup (יצירת נתוני test)
@@ -156,6 +166,7 @@ localStorage.getItem('authToken');  // → 'test-token' ✅
 6. בדוק Console:
 
 **תוצאה צפויה:**
+
 ```
 🧹 Starting cache clearing - Level: FULL
 ✅ Memory layer cleared: 1 entries
@@ -176,6 +187,7 @@ localStorage.getItem('authToken');  // → 'test-token' ✅
 ```
 
 **וידוא מה נוקה:**
+
 ```javascript
 // הכל אמור להיות null:
 await window.UnifiedCacheManager.get('test-memory');  // → null ✅
@@ -200,6 +212,7 @@ localStorage.getItem('authToken');  // → null ✅
 **⚠️ אזהרה:** זה **באמת** מוחק הכל!
 
 **שלבים:**
+
 1. פתח http://localhost:8080/cache-test
 2. פתח Console (F12)
 3. הרץ Setup
@@ -209,6 +222,7 @@ localStorage.getItem('authToken');  // → null ✅
 7. בדוק Console:
 
 **תוצאה צפויה:**
+
 ```
 🧹 Starting cache clearing - Level: NUCLEAR
 ... (כל מה שב-Full)
@@ -222,12 +236,14 @@ localStorage.getItem('authToken');  // → null ✅
 ```
 
 **מה קורה:**
+
 1. מנקה הכל (כולל orphans)
 2. מוחק **כל** localStorage (לא רק tiktrack_*)
 3. מוחק את **כל** ה-IndexedDB database
 4. **מרענן את הדף** (hard reload)
 
 **וידוא:**
+
 ```javascript
 // לא יעבוד - הדף רענן!
 // אבל אחרי reload:
@@ -244,6 +260,7 @@ localStorage.length;  // → 0 (או קטן מאוד) ✅
 ### מטרה: לוודא שהנתונים **באמת** מתרעננים מהשרת
 
 **תרחיש:**
+
 ```
 1. פתח עמוד Trades
 2. רואה 10 trades בטבלה
@@ -253,6 +270,7 @@ localStorage.length;  // → 0 (או קטן מאוד) ✅
 ```
 
 **תוצאה צפויה:**
+
 ```
 Console:
 🧹 Starting cache clearing - Level: MEDIUM
@@ -273,6 +291,7 @@ Trades table: 11 trades ✅ (היה 10, עכשיו 11!)
 ### בדיקת הסטטיסטיקות
 
 **אחרי ניקוי Medium:**
+
 ```javascript
 // בדוק ש-statistics עודכנו:
 const summaryCards = document.querySelectorAll('.summary-card .card-value');
@@ -290,6 +309,7 @@ const summaryCards = document.querySelectorAll('.summary-card .card-value');
 ### מטרה: לוודא שLocalStorage Sync עובד
 
 **תרחיש:**
+
 ```
 1. פתח 2 tabs של http://localhost:8080/trades
 2. Tab 1: פתח Console
@@ -300,6 +320,7 @@ const summaryCards = document.querySelectorAll('.summary-card .card-value');
 **תוצאה צפויה:**
 
 **Tab 1 Console:**
+
 ```
 🧹 Starting cache clearing - Level: MEDIUM
 ...
@@ -308,6 +329,7 @@ const summaryCards = document.querySelectorAll('.summary-card .card-value');
 ```
 
 **Tab 2 Console (תוך <100ms!):**
+
 ```
 📡 LocalStorage: Received cache invalidation from another tab
    Keys: trades, tickers, alerts, notes, executions, cash_flows, trade_plans, trading_accounts, dashboard, research
@@ -330,6 +352,7 @@ const summaryCards = document.querySelectorAll('.summary-card .card-value');
 ### מטרה: לוודא שPolling מזהה שינויים
 
 **תרחיש:**
+
 ```
 1. פתח עמוד Trades (Tab 1)
 2. פתח Console
@@ -362,9 +385,10 @@ const summaryCards = document.querySelectorAll('.summary-card .card-value');
 
 ## 📊 בדיקה 8: וידוא נתונים מדויקים
 
-### Checklist לכל עמוד:
+### Checklist לכל עמוד
 
-#### Trades Page:
+#### Trades Page
+
 - [ ] אחרי create: trade חדש מופיע בטבלה ✅
 - [ ] אחרי update: שינויים מוצגים ✅
 - [ ] אחרי delete: trade נעלם מהטבלה ✅
@@ -372,13 +396,15 @@ const summaryCards = document.querySelectorAll('.summary-card .card-value');
 - [ ] סטטיסטיקות נכונות (Total, Open, Closed) ✅
 - [ ] לא היה reload (Light/Medium/Full) ✅
 
-#### Index (Dashboard):
+#### Index (Dashboard)
+
 - [ ] אחרי clear cache: כל 6 הסטטיסטיקות נכונות ✅
 - [ ] גרפים נטענים מחדש ✅
 - [ ] Last 10 Trades מעודכנים ✅
 - [ ] Active Alerts מעודכנות ✅
 
-#### Tickers:
+#### Tickers
+
 - [ ] אחרי clear cache: כל טיקרים נטענים ✅
 - [ ] active_trades נכון לכל טיקר ✅
 - [ ] סטטוסים נכונים ✅
@@ -387,13 +413,15 @@ const summaryCards = document.querySelectorAll('.summary-card .card-value');
 
 ## 🎯 Acceptance Criteria - קריטריונים לאישור
 
-### ✅ Light Level:
+### ✅ Light Level
+
 - [x] מנקה Memory + Services
 - [x] לא מנקה localStorage/IndexedDB/Orphans
 - [x] לא עושה reload
 - [x] מרענן נתונים (אם יש load function)
 
-### ✅ Medium Level:
+### ✅ Medium Level
+
 - [x] מנקה Memory + Services + UnifiedCM (4 layers)
 - [x] לא מנקה Orphans
 - [x] לא עושה reload
@@ -401,14 +429,16 @@ const summaryCards = document.querySelectorAll('.summary-card .card-value');
 - [x] broadcast לtabs אחרים (LocalStorage)
 - [x] נתונים מדויקים אחרי refresh
 
-### ✅ Full Level:
+### ✅ Full Level
+
 - [x] מנקה הכל כולל Orphans
 - [x] לא עושה reload
 - [x] מרענן נתונים מהשרת
 - [x] broadcast לtabs אחרים
 - [x] נתונים מדויקים אחרי refresh
 
-### ✅ Nuclear Level:
+### ✅ Nuclear Level
+
 - [x] מנקה הכל כולל non-TikTrack items
 - [x] מוחק IndexedDB database
 - [x] **עושה reload מלא** (נדרש!)
@@ -419,6 +449,7 @@ const summaryCards = document.querySelectorAll('.summary-card .card-value');
 ## 🧹 בדיקת נקודות הניקוי
 
 ### נקודה 1: תפריט ראשי - כפתור 🧹
+
 **מיקום:** `header-system.js` שורה 200
 
 ```javascript
@@ -426,6 +457,7 @@ onclick="window.clearAllCache({ level: 'medium' })"
 ```
 
 **בדיקה:**
+
 - [x] Onclick מפעיל clearAllCache ✅
 - [x] Level: 'medium' (נכון!) ✅
 - [x] לא עושה reload ✅
@@ -434,6 +466,7 @@ onclick="window.clearAllCache({ level: 'medium' })"
 ---
 
 ### נקודה 2: cache-test.html - 4 כפתורים
+
 **מיקום:** `cache-test.html` שורות 563, 598, 629, 660
 
 ```html
@@ -444,6 +477,7 @@ onclick="window.clearAllCache({ level: 'medium' })"
 ```
 
 **בדיקה לכל כפתור:**
+
 - [x] Light → מנקה נכון ✅
 - [x] Medium → מנקה נכון + מרענן ✅
 - [x] Full → מנקה הכל + מרענן ✅
@@ -452,6 +486,7 @@ onclick="window.clearAllCache({ level: 'medium' })"
 ---
 
 ### נקודה 3: system-management.html - 4 כפתורים
+
 **מיקום:** `system-management.html` שורות 180, 185, 190, 195
 
 **אותם כפתורים** כמו cache-test, **אותה בדיקה**.
@@ -460,7 +495,7 @@ onclick="window.clearAllCache({ level: 'medium' })"
 
 ## 🎓 Test Script - קופי/פייסט
 
-### Run This in Console:
+### Run This in Console
 
 ```javascript
 // ========================================
@@ -559,6 +594,7 @@ runComprehensiveCacheClearingTest();
 ```
 
 **תוצאה צפויה:**
+
 ```
 🎉 ALL TESTS PASSED!
   Light: ✅ PASS
@@ -570,7 +606,8 @@ runComprehensiveCacheClearingTest();
 
 ## ✅ Final Checklist
 
-### תפריט ראשי:
+### תפריט ראשי
+
 - [x] כפתור 🧹 קיים ונראה
 - [x] onclick → clearAllCache({ level: 'medium' })
 - [x] לוחצים → מנקה Medium
@@ -578,7 +615,8 @@ runComprehensiveCacheClearingTest();
 - [x] נתונים מתרעננים
 - [x] הודעה: "המטמון נוקה והנתונים עודכנו"
 
-### עמוד cache-test:
+### עמוד cache-test
+
 - [x] 4 כפתורים (Light/Medium/Full/Nuclear)
 - [x] כל כפתור מנקה את מה שצריך
 - [x] Light/Medium/Full → לא reload
@@ -586,11 +624,13 @@ runComprehensiveCacheClearingTest();
 - [x] נתונים מתרעננים נכון
 - [x] statistics מעודכנות
 
-### עמוד system-management:
+### עמוד system-management
+
 - [x] 4 כפתורים זהים ל-cache-test
 - [x] פועלים זהה
 
-### Integration:
+### Integration
+
 - [x] Polling מתחיל אוטומטית
 - [x] LocalStorage sync פעיל
 - [x] Backend logging עובד
@@ -603,6 +643,7 @@ runComprehensiveCacheClearingTest();
 ### בעיה: "הטבלה לא מתרעננת אחרי clear"
 
 **גורם אפשרי 1:** אין load function לעמוד
+
 ```javascript
 // בדוק:
 const page = window.location.pathname.split('/').pop().replace('.html', '');
@@ -615,6 +656,7 @@ console.log('Load function:', loadFn);  // אמור להיות function, לא un
 ---
 
 **גורם אפשרי 2:** Load function נכשלת
+
 ```javascript
 // בדוק errors:
 try {
@@ -631,6 +673,7 @@ try {
 ### בעיה: "עדיין רואה נתונים ישנים"
 
 **וידוא שהניקוי עבד:**
+
 ```javascript
 // לפני clear:
 const before = await window.UnifiedCacheManager.get('trades');
@@ -648,17 +691,20 @@ console.log('After:', after);  // אמור להיות null!
 ### בעיה: "Polling לא מזהה שינויים"
 
 **וידוא שPolling רץ:**
+
 ```javascript
 window.PollingManager.getStats();
 // {isPolling: true, changeCount: 0, lastCheck: "2025-01-13T..."}
 ```
 
 **אם isPolling: false:**
+
 ```javascript
 window.PollingManager.start();  // התחל ידנית
 ```
 
 **בדוק endpoint:**
+
 ```bash
 curl "http://localhost:8080/api/cache/changes?since=2025-01-13T00:00:00"
 # אמור להחזיר JSON עם changes
@@ -669,6 +715,7 @@ curl "http://localhost:8080/api/cache/changes?since=2025-01-13T00:00:00"
 ## 🔚 סיכום
 
 **המערכת עברה בדיקה מקיפה:**
+
 - ✅ 4 רמות ניקוי - כולן עובדות
 - ✅ תפריט ראשי - Medium level פעיל
 - ✅ cache-test - כל 4 הרמות פעילות

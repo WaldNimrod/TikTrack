@@ -1,4 +1,5 @@
 # דוח בדיקת דפדפן - עמודי מוקאפ
+
 # Browser Test Report - Mockup Pages
 
 **תאריך:** 25 בנובמבר 2025  
@@ -12,14 +13,16 @@
 ### ✅ תיקונים שבוצעו
 
 #### 1. תיקון שגיאת MutationObserver ✅
+
 - **בעיה:** `Failed to execute 'observe' on 'MutationObserver': parameter 1 is not of type 'Node'`
-- **מיקום:** 
+- **מיקום:**
   - `button-system-init.js` שורה 285 (`setupEntityObserver`)
   - `actions-menu-system.js` שורה 506 (`attachHoverPositioning`)
 - **תיקון:** הוספת בדיקה ש-`document.body` קיים לפני `observe()`, עם retry mechanism
 - **סטטוס:** ✅ תוקן
 
 #### 2. תיקון איקון notebook חסר ✅
+
 - **בעיה:** `GET http://localhost:8080/trading-ui/images/icons/entities/notebook.svg 404 (NOT FOUND)`
 - **תיקון:**
   - הורדת `book.svg` מ-Tabler Icons
@@ -31,12 +34,14 @@
 
 ## בעיות שזוהו בקונסול
 
-### שגיאות שתוקנו:
+### שגיאות שתוקנו
+
 1. ✅ **MutationObserver error** - `button-system-init.js:285`
 2. ✅ **MutationObserver error** - `actions-menu-system.js:506`
 3. ✅ **404 notebook.svg** - איקון חסר
 
-### אזהרות (לא קריטיות):
+### אזהרות (לא קריטיות)
+
 - ⚠️ `No mapping found for page class: trading-journal-page` - לא קריטי, המערכת עובדת
 - ⚠️ `Month navigation elements not found` - פונקציונליות עתידית
 
@@ -54,9 +59,11 @@
 ## המלצות
 
 ### רענון דפדפן נדרש
+
 כל התיקונים בוצעו בקוד, אבל דורשים **רענון דפדפן** (Ctrl+Shift+R / Cmd+Shift+R) כדי לראות את השינויים.
 
 ### בדיקות נוספות
+
 1. **רענון דפדפן** - וידוא שהשגיאות נעלמו
 2. **בדיקת איקונים** - וידוא שכל האיקונים מוצגים
 3. **בדיקת כפתורים** - וידוא שכל הכפתורים עובדים
@@ -66,12 +73,14 @@
 
 ## סיכום
 
-### ✅ הושלמו:
+### ✅ הושלמו
+
 - תיקון 2 שגיאות MutationObserver
 - הורדת איקון `book.svg` מ-Tabler Icons
 - הוספת מיפוי `notebook` ב-`icon-mappings.js`
 
-### ⚠️ נדרש:
+### ⚠️ נדרש
+
 - רענון דפדפן כדי לראות את התיקונים
 - בדיקה נוספת אחרי רענון
 

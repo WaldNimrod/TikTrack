@@ -17,13 +17,15 @@
 
 ### 1. Rate Limiting
 
-#### תכונות:
+#### תכונות
+
 - **IP-based Limiting**: הגבלה לפי כתובת IP
 - **Endpoint-specific Limits**: מגבלות שונות לכל endpoint
 - **Configurable Windows**: חלונות זמן מותאמים
 - **Automatic Cleanup**: ניקוי אוטומטי של נתונים ישנים
 
-#### רמות Rate Limiting:
+#### רמות Rate Limiting
+
 - **Admin**: 200 requests/minute
 - **API**: 30 requests/minute
 - **Auth**: 10 requests/minute
@@ -31,6 +33,7 @@
 - **Default**: 60 requests/minute
 
 #### קובץ: `Backend/utils/rate_limiter.py`
+
 ```python
 class RateLimiter:
     def __init__(self):
@@ -48,7 +51,8 @@ class RateLimiter:
 
 ### 2. Response Headers Optimization
 
-#### Security Headers:
+#### Security Headers
+
 - **X-Content-Type-Options**: nosniff
 - **X-Frame-Options**: DENY
 - **X-XSS-Protection**: 1; mode=block
@@ -56,20 +60,23 @@ class RateLimiter:
 - **Referrer-Policy**: strict-origin-when-cross-origin
 - **Permissions-Policy**: geolocation=(), microphone=(), camera=()
 
-#### Performance Headers:
+#### Performance Headers
+
 - **Cache-Control**: no-cache, no-store, must-revalidate
 - **Pragma**: no-cache
 - **Expires**: 0
 - **X-Response-Time**: זמן תגובה בפועל
 - **Server-Timing**: זמני ביצוע מפורטים
 
-#### CORS Headers:
+#### CORS Headers
+
 - **Access-Control-Allow-Origin**: *
 - **Access-Control-Allow-Methods**: GET, POST, PUT, DELETE, OPTIONS
 - **Access-Control-Allow-Headers**: Content-Type, Authorization, X-Requested-With
 - **Access-Control-Allow-Credentials**: true
 
 #### קובץ: `Backend/utils/response_optimizer.py`
+
 ```python
 class ResponseOptimizer:
     def add_security_headers(self, response):
@@ -88,13 +95,15 @@ class ResponseOptimizer:
 
 ### 3. Advanced Error Handling
 
-#### תכונות:
+#### תכונות
+
 - **Custom Error Classes**: מחלקות שגיאה מותאמות
 - **Centralized Error Handling**: טיפול מרכזי בשגיאות
 - **Detailed Error Logging**: לוגי שגיאות מפורטים
 - **User-friendly Messages**: הודעות שגיאה ידידותיות למשתמש
 
 #### קובץ: `Backend/utils/error_handlers.py`
+
 ```python
 class ErrorHandler:
     @staticmethod
@@ -120,17 +129,20 @@ class ErrorHandler:
 
 ## API Endpoints
 
-### Rate Limiting Management:
+### Rate Limiting Management
+
 - `GET /api/rate-limits/stats` - סטטיסטיקות rate limiting
 - `POST /api/rate-limits/reset` - איפוס rate limits
 
-### Error Handling:
+### Error Handling
+
 - כל ה-endpoints מוגנים עם error handling מתקדם
 - הודעות שגיאה מפורטות וידידותיות
 
 ## דוגמאות שימוש
 
-### בדיקת Rate Limiting:
+### בדיקת Rate Limiting
+
 ```bash
 # בדיקת סטטיסטיקות
 curl http://localhost:8080/api/rate-limits/stats
@@ -139,7 +151,8 @@ curl http://localhost:8080/api/rate-limits/stats
 curl -X POST http://localhost:8080/api/rate-limits/reset
 ```
 
-### בדיקת Response Headers:
+### בדיקת Response Headers
+
 ```bash
 # בדיקת headers
 curl -I http://localhost:8080/api/health
@@ -153,7 +166,8 @@ curl -I http://localhost:8080/api/health
 # X-Response-Time: 1010.62ms
 ```
 
-### בדיקת Error Handling:
+### בדיקת Error Handling
+
 ```bash
 # בדיקת 404 error
 curl http://localhost:8080/api/nonexistent-endpoint
@@ -169,7 +183,8 @@ curl http://localhost:8080/api/nonexistent-endpoint
 
 ## הגדרת Rate Limiting
 
-### הגדרת מגבלות:
+### הגדרת מגבלות
+
 ```python
 # הגדרת מגבלות לכל endpoint
 RATE_LIMITS = {
@@ -181,7 +196,8 @@ RATE_LIMITS = {
 }
 ```
 
-### שימוש ב-Decorator:
+### שימוש ב-Decorator
+
 ```python
 from utils.rate_limiter import rate_limit_api
 
@@ -194,7 +210,8 @@ def sensitive_endpoint():
 
 ## ניטור אבטחה
 
-### Rate Limiting Stats:
+### Rate Limiting Stats
+
 ```json
 {
   "data": {
@@ -210,7 +227,8 @@ def sensitive_endpoint():
 }
 ```
 
-### Error Statistics:
+### Error Statistics
+
 ```json
 {
   "error_stats": {
@@ -227,13 +245,15 @@ def sensitive_endpoint():
 
 ## פתרון בעיות
 
-### בעיות נפוצות:
+### בעיות נפוצות
+
 1. **Rate Limit Exceeded**: בדוק מגבלות ו-windows
 2. **CORS Errors**: בדוק CORS headers
 3. **Security Headers Missing**: בדוק response optimizer
 4. **Error Messages Unclear**: בדוק error handlers
 
-### לוגים לבדיקה:
+### לוגים לבדיקה
+
 ```bash
 # בדיקת לוגי שגיאות
 tail -f logs/errors.log
@@ -244,13 +264,15 @@ grep "security" logs/app.log
 
 ## תחזוקה
 
-### ניקוי Rate Limits:
+### ניקוי Rate Limits
+
 ```bash
 # איפוס ידני
 curl -X POST http://localhost:8080/api/rate-limits/reset
 ```
 
-### עדכון מגבלות:
+### עדכון מגבלות
+
 ```python
 # עדכון מגבלות בזמן ריצה
 rate_limiter.update_limits('api', {'requests': 50, 'window': 60})
@@ -258,12 +280,14 @@ rate_limiter.update_limits('api', {'requests': 50, 'window': 60})
 
 ## התראות אבטחה
 
-### סטטוסי אבטחה:
+### סטטוסי אבטחה
+
 - **Secure**: כל אמצעי האבטחה פעילים
 - **Warning**: בעיה קלה באבטחה
 - **Critical**: בעיה חמורה באבטחה
 
-### מדדי אבטחה:
+### מדדי אבטחה
+
 - **Rate Limiting**: פעיל ומוגן
 - **Headers**: מוגדרים כראוי
 - **Error Handling**: מתקדם וידידותי

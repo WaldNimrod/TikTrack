@@ -31,6 +31,7 @@ git log --oneline -5
 ```
 
 **תוצאה צפויה:**
+
 ```
 * production
   main
@@ -72,6 +73,7 @@ git merge main
 ```
 
 **תוצאה צפויה:**
+
 ```
 Updating abc123..def456
 Fast-forward
@@ -147,6 +149,7 @@ python3 -c "from config.settings import IS_TESTING, POSTGRES_DB, ENVIRONMENT; \
 ```
 
 **תוצאה צפויה:**
+
 ```
 ENVIRONMENT: testing
 IS_TESTING: True
@@ -187,6 +190,7 @@ curl -s "$BASE_URL/api/watch-lists" | jq 'length'
 ```
 
 **תוצאה צפויה:**
+
 ```
 # כל ה-responses צריכים להיות תקינים (200 OK)
 # לא שגיאות 500 או 404
@@ -204,6 +208,7 @@ curl -I http://localhost:5001/watch-lists
 ```
 
 **תוצאה צפויה:**
+
 ```
 HTTP/1.1 200 OK
 Content-Type: text/html
@@ -229,6 +234,7 @@ done
 ```
 
 **תוצאה צפויה:**
+
 ```
 Health check 1:
 healthy
@@ -254,6 +260,7 @@ python3 scripts/production-update/master.py --dry-run
 ```
 
 **תוצאה צפויה:**
+
 ```
 ✅ All checks passed
 ✅ Config verified
@@ -345,6 +352,7 @@ time curl -s http://localhost:5001/api/executions > /dev/null
 ```
 
 **תוצאה צפויה:**
+
 ```
 # כל ה-responses צריכים להיות < 500ms
 ```
@@ -361,6 +369,7 @@ ps aux | grep "python.*app.py" | grep -v grep
 ## ✅ Checklist סופי - מה צריך לבדוק
 
 ### לפני סיום
+
 - [ ] **קוד מעודכן מ-Git** (git pull origin main)
 - [ ] **Config נשמר נכון** (IS_TESTING = True, database name)
 - [ ] **Dependencies מעודכנים** (pip install -r requirements.txt)
@@ -374,6 +383,7 @@ ps aux | grep "python.*app.py" | grep -v grep
 - [ ] **Performance תקין** (response times < 500ms)
 
 ### אחרי סיום
+
 - [ ] **Commit & Push** כל השינויים
 - [ ] **תיעוד** של כל הבדיקות
 - [ ] **הודעה לצוות** על השלמת העבודה
@@ -385,6 +395,7 @@ ps aux | grep "python.*app.py" | grep -v grep
 ### בעיה: Git Merge Conflicts
 
 **פתרון:**
+
 ```bash
 # פתח את הקבצים עם conflicts
 code production/Backend/config/settings.py
@@ -402,6 +413,7 @@ git commit -m "Resolve merge conflicts - preserve testing settings"
 ### בעיה: Dependencies חסרים
 
 **פתרון:**
+
 ```bash
 # התקנת dependencies
 cd production/Backend
@@ -414,6 +426,7 @@ cat requirements.txt
 ### בעיה: Migrations נכשלו
 
 **פתרון:**
+
 ```bash
 # בדיקת מצב migrations
 cd production/Backend
@@ -426,6 +439,7 @@ tail -50 production/Backend/server_output.log
 ### בעיה: API Endpoints לא עובדים
 
 **פתרון:**
+
 ```bash
 # בדיקת שהשרת רץ
 curl http://localhost:5001/api/health
@@ -442,6 +456,7 @@ psql -U TikTrakDBAdmin -d "TikTrack-db-testing" -c "SELECT 1;"
 ## 📞 תמיכה
 
 **אם יש בעיות:**
+
 1. בדוק את הלוגים: `production/Backend/server_output.log`
 2. בדוק את ה-config: `production/Backend/config/settings.py`
 3. בדוק את ה-database: `psql -U TikTrakDBAdmin -d "TikTrack-db-testing" -c "\dt"`

@@ -219,6 +219,7 @@ const successColor = getCSSVariableValue('--success-color', '#28a745');
 ### 1. בחירת תאריכים
 
 **HTML:**
+
 ```html
 <div class="content-section" id="date-selection-section">
   <div class="section-header">
@@ -244,6 +245,7 @@ const successColor = getCSSVariableValue('--success-color', '#28a745');
 ```
 
 **JavaScript:**
+
 ```javascript
 function handleDate1Change() {
   const date1Input = document.getElementById('date1');
@@ -272,6 +274,7 @@ function validateDates() {
 ### 2. טבלת השוואה
 
 **HTML:**
+
 ```html
 <table class="table" id="comparison-table">
   <thead>
@@ -289,6 +292,7 @@ function validateDates() {
 ```
 
 **JavaScript:**
+
 ```javascript
 function updateComparisonTable(data) {
   const tbody = document.getElementById('comparison-table-body');
@@ -321,6 +325,7 @@ function updateComparisonTable(data) {
 ### 3. Bar Chart
 
 **HTML:**
+
 ```html
 <div class="chart-container-wrapper">
   <div class="tradingview-chart-wrapper date-comparison-bar-chart-wrapper">
@@ -334,6 +339,7 @@ function updateComparisonTable(data) {
 ```
 
 **JavaScript:**
+
 ```javascript
 async function initBarChart() {
   await waitForTradingViewAdapter();
@@ -374,6 +380,7 @@ function updateBarChart(data) {
 ### 4. Line Chart
 
 **HTML:**
+
 ```html
 <div class="chart-container-wrapper">
   <div class="tradingview-chart-wrapper date-comparison-line-chart-wrapper">
@@ -387,6 +394,7 @@ function updateBarChart(data) {
 ```
 
 **JavaScript:**
+
 ```javascript
 async function initLineChart() {
   await waitForTradingViewAdapter();
@@ -422,6 +430,7 @@ function updateLineChart(data) {
 ### 5. התראות
 
 **HTML:**
+
 ```html
 <div id="alerts-container">
   <!-- התראות יוטענו דינמית -->
@@ -429,6 +438,7 @@ function updateLineChart(data) {
 ```
 
 **JavaScript:**
+
 ```javascript
 function calculateAlerts(data) {
   const alerts = [];
@@ -525,9 +535,11 @@ function generateDateData(date, baseData = null) {
 קבלת סיכום תיק לתאריך מסוים.
 
 **Parameters:**
+
 - `date` (string, required) - תאריך בפורמט YYYY-MM-DD
 
 **Response:**
+
 ```json
 {
   "date": "2024-01-15",
@@ -545,10 +557,12 @@ function generateDateData(date, baseData = null) {
 השוואה בין שני תאריכים.
 
 **Parameters:**
+
 - `date1` (string, required) - תאריך ראשון בפורמט YYYY-MM-DD
 - `date2` (string, required) - תאריך שני בפורמט YYYY-MM-DD
 
 **Response:**
+
 ```json
 {
   "date1": "2024-01-15",
@@ -609,6 +623,7 @@ updateLineChart(comparisonData);
 **תסמינים:** הגרפים מציגים "טוען גרף..." ולא נטענים.
 
 **פתרון:**
+
 1. בדוק ש-TradingView Lightweight Charts נטען: `typeof window.LightweightCharts !== 'undefined'`
 2. בדוק ש-TradingViewChartAdapter זמין: `typeof window.TradingViewChartAdapter !== 'undefined'`
 3. בדוק את הקונסול לשגיאות JavaScript
@@ -618,6 +633,7 @@ updateLineChart(comparisonData);
 **תסמינים:** תאריכים נבחרים לא נשמרים בין טעינות דף.
 
 **פתרון:**
+
 1. בדוק ש-UnifiedCacheManager מאותחל: `window.UnifiedCacheManager && window.UnifiedCacheManager.initialized`
 2. בדוק ש-PreferencesCore זמין: `typeof window.PreferencesCore !== 'undefined'`
 3. בדוק את הקונסול לשגיאות שמירה
@@ -627,6 +643,7 @@ updateLineChart(comparisonData);
 **תסמינים:** הטבלה נשארת ריקה או מציגה "בחר תאריכים להשוואה".
 
 **פתרון:**
+
 1. ודא שבוצעה השוואה: `compareDates()` נקרא
 2. בדוק ש-`comparisonData` לא null
 3. בדוק את הקונסול לשגיאות JavaScript
@@ -636,6 +653,7 @@ updateLineChart(comparisonData);
 **תסמינים:** הגרפים משתמשים בצבעים קבועים ולא מתאימים ל-dark mode.
 
 **פתרון:**
+
 1. ודא ש-`getCSSVariableValue` משתמש ב-CSS variables
 2. בדוק ש-ColorSchemeSystem נטען
 3. בדוק את ערכי ה-CSS variables ב-devtools

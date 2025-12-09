@@ -8,13 +8,15 @@
 
 ### 1. Background Tasks
 
-#### תכונות:
+#### תכונות
+
 - **Task Scheduling**: תזמון משימות אוטומטי
 - **Task Monitoring**: ניטור ביצועי משימות
 - **Error Handling**: טיפול בשגיאות משימות
 - **History Tracking**: מעקב אחר היסטוריית משימות
 
-#### משימות מוגדרות:
+#### משימות מוגדרות
+
 - **cleanup_expired_data** (יומי) - ניקוי נתונים ישנים
 - **cleanup_cache** (שעתי) - ניקוי cache
 - **rotate_logs** (שבועי) - סיבוב קבצי לוג
@@ -24,6 +26,7 @@
 - **system_health_check** (שעתי) - בדיקת בריאות מערכת
 
 #### קובץ: `Backend/services/background_tasks.py`
+
 ```python
 class BackgroundTaskManager:
     def __init__(self):
@@ -46,13 +49,15 @@ class BackgroundTaskManager:
 
 ### 2. Cache Management
 
-#### תכונות:
+#### תכונות
+
 - **TTL (Time To Live)**: פקיעת תוקף אוטומטית
 - **Memory Management**: ניהול זיכרון יעיל
 - **Statistics**: סטטיסטיקות מפורטות
 - **Cleanup**: ניקוי אוטומטי
 
 #### קובץ: `Backend/services/cache_service.py`
+
 ```python
 class CacheService:
     def __init__(self):
@@ -78,13 +83,15 @@ class CacheService:
 
 ### 3. Database Optimization
 
-#### תכונות:
+#### תכונות
+
 - **Schema Analysis**: ניתוח מבנה בסיס נתונים
 - **Index Optimization**: אופטימיזציה של אינדקסים
 - **Constraint Validation**: בדיקת תקינות constraints
 - **Performance Recommendations**: המלצות לשיפור ביצועים
 
 #### קובץ: `Backend/services/database_optimizer.py`
+
 ```python
 class DatabaseOptimizer:
     def analyze_schema(self) -> Dict[str, Any]:
@@ -106,21 +113,25 @@ class DatabaseOptimizer:
 
 ## API Endpoints
 
-### Background Tasks Management:
+### Background Tasks Management
+
 - `GET /api/tasks/status` - סטטוס משימות רקע
 - `POST /api/tasks/run/<task_name>` - הפעלת משימה ספציפית
 - `POST /api/tasks/start` - הפעלת מנהל משימות
 - `POST /api/tasks/stop` - עצירת מנהל משימות
 
-### Cache Management:
+### Cache Management
+
 - `GET /api/cache/stats` - סטטיסטיקות cache
 - `POST /api/cache/clear` - ניקוי cache
 
-### Database Optimization:
+### Database Optimization
+
 - `GET /api/database/analyze` - ניתוח מבנה בסיס נתונים
 - `POST /api/database/optimize` - דוח אופטימיזציה
 
-### IndexedDB Management:
+### IndexedDB Management
+
 - `GET /api/indexeddb/stats` - סטטיסטיקות IndexedDB
 - `POST /api/indexeddb/cleanup` - ניקוי אוטומטי של IndexedDB
 - `POST /api/indexeddb/cleanup/<max_size>` - ניקוי עם גודל מקסימאלי מותאם
@@ -129,7 +140,8 @@ class DatabaseOptimizer:
 
 ## דוגמאות שימוש
 
-### ניהול Background Tasks:
+### ניהול Background Tasks
+
 ```bash
 # בדיקת סטטוס משימות
 curl http://localhost:8080/api/tasks/status
@@ -144,7 +156,8 @@ curl -X POST http://localhost:8080/api/tasks/start
 curl -X POST http://localhost:8080/api/tasks/stop
 ```
 
-### ניהול Cache:
+### ניהול Cache
+
 ```bash
 # בדיקת סטטיסטיקות
 curl http://localhost:8080/api/cache/stats
@@ -153,7 +166,8 @@ curl http://localhost:8080/api/cache/stats
 curl -X POST http://localhost:8080/api/cache/clear
 ```
 
-### Database Optimization:
+### Database Optimization
+
 ```bash
 # ניתוח מבנה בסיס נתונים
 curl http://localhost:8080/api/database/analyze
@@ -162,7 +176,8 @@ curl http://localhost:8080/api/database/analyze
 curl -X POST http://localhost:8080/api/database/optimize
 ```
 
-### ניהול IndexedDB:
+### ניהול IndexedDB
+
 ```bash
 # בדיקת סטטיסטיקות IndexedDB
 curl http://localhost:8080/api/indexeddb/stats
@@ -185,6 +200,7 @@ curl -X POST http://localhost:8080/api/indexeddb/restore \
 ## משימות רקע מפורטות
 
 ### 1. Data Cleanup
+
 ```python
 def cleanup_expired_data() -> Dict[str, Any]:
     # ניקוי alerts ישנים (30+ ימים)
@@ -194,6 +210,7 @@ def cleanup_expired_data() -> Dict[str, Any]:
 ```
 
 ### 2. Cache Cleanup
+
 ```python
 def cleanup_cache() -> Dict[str, Any]:
     # ניקוי ערכים פגי תוקף
@@ -203,6 +220,7 @@ def cleanup_cache() -> Dict[str, Any]:
 ```
 
 ### 3. Log Rotation
+
 ```python
 def rotate_logs() -> Dict[str, Any]:
     # סיבוב קבצי לוג גדולים מ-10MB
@@ -212,6 +230,7 @@ def rotate_logs() -> Dict[str, Any]:
 ```
 
 ### 4. Database Maintenance
+
 ```python
 def database_maintenance() -> Dict[str, Any]:
     # VACUUM database
@@ -221,6 +240,7 @@ def database_maintenance() -> Dict[str, Any]:
 ```
 
 ### 5. IndexedDB Cleanup
+
 ```python
 def indexeddb_cleanup() -> Dict[str, Any]:
     # ניקוי אוטומטי של IndexedDB
@@ -232,6 +252,7 @@ def indexeddb_cleanup() -> Dict[str, Any]:
 ```
 
 ### 6. System Health Check
+
 ```python
 def system_health_check() -> Dict[str, Any]:
     # בדיקת CPU, זיכרון, דיסק
@@ -242,7 +263,8 @@ def system_health_check() -> Dict[str, Any]:
 
 ## ניטור תחזוקה
 
-### Task Status:
+### Task Status
+
 ```json
 {
   "scheduler_running": true,
@@ -260,7 +282,8 @@ def system_health_check() -> Dict[str, Any]:
 }
 ```
 
-### Cache Statistics:
+### Cache Statistics
+
 ```json
 {
   "active_entries": 15,
@@ -271,7 +294,8 @@ def system_health_check() -> Dict[str, Any]:
 }
 ```
 
-### Database Optimization:
+### Database Optimization
+
 ```json
 {
   "overall_health": "healthy",
@@ -282,7 +306,8 @@ def system_health_check() -> Dict[str, Any]:
 }
 ```
 
-### IndexedDB Statistics:
+### IndexedDB Statistics
+
 ```json
 {
   "total_size_mb": 85.6,
@@ -318,7 +343,8 @@ def system_health_check() -> Dict[str, Any]:
 
 ## הגדרת משימות חדשות
 
-### רישום משימה חדשה:
+### רישום משימה חדשה
+
 ```python
 from services.background_tasks import background_task_manager
 
@@ -379,7 +405,8 @@ background_task_manager.register_task(
 )
 ```
 
-### הגדרת תזמון:
+### הגדרת תזמון
+
 ```python
 # תזמון כל 30 דקות
 schedule_interval="30m"
@@ -393,13 +420,15 @@ schedule_interval="1w"
 
 ## פתרון בעיות
 
-### בעיות נפוצות:
+### בעיות נפוצות
+
 1. **משימות לא רצות**: בדוק scheduler status
 2. **Cache מלא**: בדוק memory usage ו-cleanup
 3. **בסיס נתונים איטי**: הפעל database maintenance
 4. **לוגים גדולים**: הפעל log rotation
 
-### לוגים לבדיקה:
+### לוגים לבדיקה
+
 ```bash
 # בדיקת לוגי משימות
 grep "background_task" logs/app.log
@@ -413,7 +442,8 @@ tail -f logs/database.log
 
 ## תחזוקה ידנית
 
-### הפעלת ניקוי ידני:
+### הפעלת ניקוי ידני
+
 ```bash
 # ניקוי נתונים ישנים
 curl -X POST http://localhost:8080/api/tasks/run/cleanup_expired_data
@@ -425,7 +455,8 @@ curl -X POST http://localhost:8080/api/tasks/run/cleanup_cache
 curl -X POST http://localhost:8080/api/tasks/run/database_maintenance
 ```
 
-### בדיקת בריאות מערכת:
+### בדיקת בריאות מערכת
+
 ```bash
 # בדיקה ידנית
 curl -X POST http://localhost:8080/api/tasks/run/system_health_check
@@ -433,12 +464,14 @@ curl -X POST http://localhost:8080/api/tasks/run/system_health_check
 
 ## התראות תחזוקה
 
-### סטטוסי תחזוקה:
+### סטטוסי תחזוקה
+
 - **Optimal**: כל המשימות רצות בהצלחה
 - **Warning**: חלק מהמשימות נכשלו
 - **Critical**: רוב המשימות נכשלו
 
-### מדדי תחזוקה:
+### מדדי תחזוקה
+
 - **Task Success Rate**: אחוז הצלחת משימות
 - **Cache Efficiency**: יעילות cache
 - **Database Health**: בריאות בסיס נתונים

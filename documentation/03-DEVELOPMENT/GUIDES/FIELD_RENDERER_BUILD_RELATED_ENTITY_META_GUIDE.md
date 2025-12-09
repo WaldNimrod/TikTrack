@@ -1,4 +1,5 @@
 # מדריך לפונקציה buildRelatedEntityMeta
+
 ## Field Renderer Service - buildRelatedEntityMeta Guide
 
 **תאריך יצירה:** 21 בינואר 2025  
@@ -13,6 +14,7 @@
 הפונקציה `buildRelatedEntityMeta` היא פונקציה כללית מרכזית לבניית metadata עבור רינדור ישויות מקושרות בטבלאות. הפונקציה מחליפה קוד כפול ומקומי שהיה קיים ב-`notes.js` ו-`alerts.js`, ומאפשרת רינדור אחיד של עמודת "אובייקט מקושר" בכל העמודים.
 
 ### מטרה
+
 - **אחידות:** רינדור אחיד של ישויות מקושרות בכל העמודים
 - **תחזוקה:** קוד מרכזי במקום אחד במקום כפילות
 - **גמישות:** תמיכה בכל סוגי הישויות (Account, Trade, Trade Plan, Ticker)
@@ -50,10 +52,12 @@ static buildRelatedEntityMeta(relatedTypeId, relatedId, additionalData = {}, opt
 ### 1. Trading Account (relatedTypeId = 1)
 
 **displayName:**
+
 - שם החשבון (`account.name` או `account.account_name`)
 - Fallback: `חשבון מסחר {id}`
 
 **metaForEntity:**
+
 ```javascript
 {
   renderMode: 'notes-table',
@@ -66,10 +70,12 @@ static buildRelatedEntityMeta(relatedTypeId, relatedId, additionalData = {}, opt
 ### 2. Trade (relatedTypeId = 2)
 
 **displayName:**
+
 - סימבול הטיקר (`trade.ticker_symbol` או `trade.ticker.symbol`)
 - Fallback: `null` (לא מזהה!)
 
 **metaForEntity:**
+
 ```javascript
 {
   renderMode: 'notes-table',
@@ -85,10 +91,12 @@ static buildRelatedEntityMeta(relatedTypeId, relatedId, additionalData = {}, opt
 ### 3. Trade Plan (relatedTypeId = 3)
 
 **displayName:**
+
 - סימבול הטיקר (`plan.ticker.symbol` או `plan.ticker_symbol`)
 - Fallback: `null` (לא מזהה!)
 
 **metaForEntity:**
+
 ```javascript
 {
   renderMode: 'notes-table',
@@ -105,10 +113,12 @@ static buildRelatedEntityMeta(relatedTypeId, relatedId, additionalData = {}, opt
 ### 4. Ticker (relatedTypeId = 4)
 
 **displayName:**
+
 - סימבול הטיקר (`ticker.symbol`)
 - Fallback: `null` (לא מזהה!)
 
 **metaForEntity:**
+
 ```javascript
 {
   renderMode: 'notes-table',
@@ -187,12 +197,15 @@ const { displayName, metaForEntity } = window.buildRelatedEntityMeta(
 ## ⚠️ הערות חשובות
 
 ### 1. סימבולים בלבד, לא מזההים
+
 - **חשוב:** עבור Trade, Trade Plan ו-Ticker, `displayName` תמיד מכיל **רק סימבול** (או `null`), **לא מזהה**!
 - **לא נכון:** `displayName = "טרייד 123"` ❌
 - **נכון:** `displayName = "AAPL"` או `null` ✅
 
 ### 2. מבנה additionalData
+
 הפונקציה מצפה לאובייקט עם המבנה הבא:
+
 ```javascript
 {
   accounts: Array,      // מערך של חשבונות מסחר
@@ -203,11 +216,13 @@ const { displayName, metaForEntity } = window.buildRelatedEntityMeta(
 ```
 
 ### 3. תאריכים
+
 - הפונקציה משתמשת ב-`window.dateUtils.ensureDateEnvelope` אם זמין
 - Fallback לערכים גולמיים אם `dateUtils` לא זמין
 - תאריכים מוחזרים כ-`DateEnvelope` objects
 
 ### 4. renderMode
+
 - ברירת המחדל היא `'notes-table'` - מתאים לרינדור בטבלאות
 - ניתן לשנות ב-`metaForEntity` אם נדרש
 
@@ -239,6 +254,7 @@ const html = FieldRendererService.renderLinkedEntity(
 ## 📝 היסטוריית שינויים
 
 ### גרסה 1.0.0 (21 בינואר 2025)
+
 - יצירת הפונקציה הכללית
 - החלפת קוד כפול ב-`notes.js` ו-`alerts.js`
 - תמיכה ב-4 סוגי ישויות: Account, Trade, Trade Plan, Ticker

@@ -118,9 +118,22 @@ async function loadCashFlowsData(options = {}) {
     
     // Handle 401/308 authentication errors
     if (response.status === 401 || response.status === 308) {
-      // Clear any stale auth data
-      localStorage.removeItem('currentUser');
-      localStorage.removeItem('authToken');
+      // Clear any stale auth data using UnifiedCacheManager
+      if (window.UnifiedCacheManager) {
+        try {
+          await window.UnifiedCacheManager.remove('currentUser');
+          await window.UnifiedCacheManager.remove('authToken');
+        } catch (e) {
+          console.warn('Error clearing auth cache:', e);
+          // Fallback to localStorage
+          localStorage.removeItem('currentUser');
+          localStorage.removeItem('authToken');
+        }
+      } else {
+        // Fallback to localStorage if UnifiedCacheManager not available
+        localStorage.removeItem('currentUser');
+        localStorage.removeItem('authToken');
+      }
       
       // Show error notification
       if (window.NotificationSystem) {

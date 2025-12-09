@@ -50,6 +50,7 @@
 4. **תיקון בעיות בממשק המשתמש** - כל התיקונים בממשק המשתמש
 
 **שימו לב:**
+
 - **ייצוא (Export)** לא נדרש לממש כרגע - ימומש כחלק ממערכת כללית עתידית
 - כל התיקונים בממשק המשתמש יבוצעו רק לאחר השלמת השלבים המקדימים
 
@@ -62,6 +63,7 @@
 **מטרה:** להבין מה באמת נדרש בעמוד ai-analysis לפי מערכת הניטור
 
 **פעולות:**
+
 1. קריאת דוח `AI_ANALYSIS_INITIAL_STATE.md`
 2. הרצת `runDetailedPageScan('ai-analysis')` בדפדפן
 3. ניתוח התוצאות:
@@ -73,6 +75,7 @@
 5. השוואה ל-`page-initialization-configs.js`
 
 **תוצאות צפויות:**
+
 - רשימת סקריפטים שצריכים להיכלל במניפסט
 - רשימת סקריפטים שצריכים להוסיף לעמוד
 - רשימת סקריפטים שצריכים להסיר מהעמוד
@@ -85,11 +88,13 @@
 **מטרה:** להבין את הארכיטקטורה הנוכחית של AI Analysis Service
 
 **קבצים לבדיקה:**
+
 - `Backend/services/ai_analysis_service.py` - Service הנוכחי
 - `Backend/routes/api/ai_analysis.py` - API Routes
 - `Backend/models/ai_analysis.py` - Models
 
 **שאלות מחקר:**
+
 1. האם `AIAnalysisService` יורש מ-`BaseBusinessService`? **לא**
 2. האם יש Business Logic Layer נפרד? **לא**
 3. האם יש ולידציה עסקית? **חלקית - רק ולידציה בסיסית**
@@ -97,6 +102,7 @@
 5. האם יש Business Rules Registry? **לא**
 
 **תוצאות צפויות:**
+
 - רשימת בעיות ארכיטקטוריות
 - רשימת שיפורים נדרשים
 - תוכנית מימוש Business Logic Layer
@@ -108,12 +114,14 @@
 **מטרה:** להבין את הארכיטקטורה הנכונה של Business Logic Layer
 
 **קבצים לבדיקה:**
+
 - `documentation/02-ARCHITECTURE/BACKEND/BUSINESS_LOGIC_LAYER.md`
 - `Backend/services/business_logic/base_business_service.py`
 - `Backend/services/business_logic/trade_business_service.py` (דוגמה)
 - `Backend/routes/api/business_logic.py` (דוגמה)
 
 **עקרונות ארכיטקטוריים:**
+
 1. כל Service יורש מ-`BaseBusinessService`
 2. כל Service מממש `validate()` ו-`calculate()`
 3. כל Service משתמש ב-`BusinessRulesRegistry`
@@ -121,6 +129,7 @@
 5. כל Service נגיש דרך `/api/business/*` endpoints
 
 **תוצאות צפויות:**
+
 - הבנה מלאה של הארכיטקטורה הנכונה
 - תוכנית מימוש מפורטת
 
@@ -133,12 +142,14 @@
 **קובץ:** `trading-ui/scripts/init-system/package-manifest.js`
 
 **פעולות:**
+
 1. בדיקת חבילת `ai-analysis` במניפסט
 2. וידוא שכל הסקריפטים הנדרשים מוגדרים
 3. עדכון `dependencies` אם נדרש
 4. עדכון `loadOrder` אם נדרש
 
 **בדיקות:**
+
 - הרצת `checkForMismatches('ai-analysis', pageConfig)` בדפדפן
 - וידוא שאין סקריפטים חסרים
 - וידוא שאין סקריפטים מיותרים
@@ -150,12 +161,14 @@
 **קובץ:** `trading-ui/scripts/page-initialization-configs.js`
 
 **פעולות:**
+
 1. בדיקת הגדרת `ai-analysis` ב-`PAGE_CONFIGS`
 2. וידוא שכל ה-`requiredGlobals` מוגדרים
 3. וידוא שכל ה-`packages` מוגדרים
 4. עדכון `customInitializers` אם נדרש
 
 **בדיקות:**
+
 - הרצת `runDetailedPageScan('ai-analysis')` בדפדפן
 - וידוא שאין בעיות initialization
 
@@ -166,11 +179,13 @@
 **קובץ:** `trading-ui/ai-analysis.html`
 
 **פעולות:**
+
 1. הרצת `generate-script-loading-code.js` ליצירת קוד טעינה מעודכן
 2. החלפת קוד הטעינה הישן בקוד החדש
 3. וידוא שכל הסקריפטים נטענים בסדר הנכון
 
 **בדיקות:**
+
 - הרצת `runDetailedPageScan('ai-analysis')` בדפדפן
 - וידוא שאין בעיות טעינה
 - וידוא שכל הסקריפטים נטענים בהצלחה
@@ -180,6 +195,7 @@
 ### 1.4 בדיקה חוזרת עם כלי הניטור
 
 **פעולות:**
+
 1. הרצת `runDetailedPageScan('ai-analysis')` בדפדפן
 2. ניתוח התוצאות:
    - סקריפטים חסרים → תיקון במניפסט/עמוד
@@ -189,6 +205,7 @@
 3. חזרה על השלבים עד לקבלת קוד טעינה מדויק
 
 **קריטריון הצלחה:**
+
 - `runDetailedPageScan` מחזיר `criticalErrors: 0`
 - `runDetailedPageScan` מחזיר `mismatches: 0`
 - כל הסקריפטים נטענים בהצלחה
@@ -202,11 +219,13 @@
 **מטרה:** לזהות את כל הבעיות הארכיטקטוריות
 
 **קבצים לבדיקה:**
+
 - `Backend/services/ai_analysis_service.py`
 - `Backend/routes/api/ai_analysis.py`
 - `Backend/models/ai_analysis.py`
 
 **שאלות לבדיקה:**
+
 1. האם `AIAnalysisService` יורש מ-`BaseBusinessService`? **לא - בעיה**
 2. האם יש Business Logic Layer נפרד? **לא - בעיה**
 3. האם יש ולידציה עסקית? **חלקית - בעיה**
@@ -215,6 +234,7 @@
 6. האם יש API endpoints ב-`/api/business/ai-analysis/*`? **לא - בעיה**
 
 **תוצאות:**
+
 - רשימת בעיות ארכיטקטוריות מפורטת
 - תוכנית תיקון מפורטת
 
@@ -225,12 +245,15 @@
 **מטרה:** להבין מה צריך להיות
 
 **השוואה ל-Services אחרים:**
+
 - `TradeBusinessService` - דוגמה מושלמת
 - `ExecutionBusinessService` - דוגמה מושלמת
 - `AlertBusinessService` - דוגמה מושלמת
 
 **עקרונות נדרשים:**
+
 1. **יורש מ-BaseBusinessService:**
+
    ```python
    class AIAnalysisBusinessService(BaseBusinessService):
        @property
@@ -247,6 +270,7 @@
    ```
 
 2. **משתמש ב-BusinessRulesRegistry:**
+
    ```python
    from .business_rules_registry import business_rules_registry
    
@@ -265,6 +289,7 @@
    ```
 
 3. **נגיש דרך `/api/business/ai-analysis/*`:**
+
    ```python
    @business_logic_bp.route('/ai-analysis/validate', methods=['POST'])
    def validate_ai_analysis():
@@ -272,6 +297,7 @@
    ```
 
 **תוצאות:**
+
 - תוכנית מימוש מפורטת
 - רשימת שינויים נדרשים
 
@@ -282,12 +308,14 @@
 **קובץ:** `documentation/04-FEATURES/AI_ANALYSIS_SYSTEM_DEVELOPER_GUIDE.md`
 
 **פעולות:**
+
 1. עדכון סעיף "ארכיטקטורה" עם Business Logic Layer
 2. הוספת סעיף "Business Logic Service"
 3. עדכון סעיף "API Reference" עם `/api/business/ai-analysis/*`
 4. הוספת דוגמאות קוד
 
 **תוצאות:**
+
 - אפיון מעודכן ומפורט
 - תיעוד מלא של הארכיטקטורה החדשה
 
@@ -300,6 +328,7 @@
 **קובץ חדש:** `Backend/services/business_logic/ai_analysis_business_service.py`
 
 **פעולות:**
+
 1. יצירת class `AIAnalysisBusinessService` שיורש מ-`BaseBusinessService`
 2. מימוש `table_name` property
 3. מימוש `validate()` method:
@@ -310,6 +339,7 @@
 5. הוספת Business Rules ל-`BusinessRulesRegistry`
 
 **דוגמה:**
+
 ```python
 class AIAnalysisBusinessService(BaseBusinessService):
     @property
@@ -371,6 +401,7 @@ class AIAnalysisBusinessService(BaseBusinessService):
 **קובץ:** `Backend/services/business_logic/business_rules_registry.py`
 
 **פעולות:**
+
 1. הוספת rules ל-`ai_analysis` entity
 2. הגדרת validation rules:
    - `template_id`: required, integer, min=1
@@ -379,6 +410,7 @@ class AIAnalysisBusinessService(BaseBusinessService):
    - `user_id`: required, integer, min=1
 
 **דוגמה:**
+
 ```python
 'ai_analysis': {
     'template_id': {
@@ -410,6 +442,7 @@ class AIAnalysisBusinessService(BaseBusinessService):
 **קובץ:** `Backend/routes/api/business_logic.py`
 
 **פעולות:**
+
 1. הוספת import של `AIAnalysisBusinessService`
 2. יצירת instance של service
 3. הוספת endpoints:
@@ -417,6 +450,7 @@ class AIAnalysisBusinessService(BaseBusinessService):
    - `POST /api/business/ai-analysis/validate-variables` - ולידציה של variables לפי template
 
 **דוגמה:**
+
 ```python
 from services.business_logic.ai_analysis_business_service import AIAnalysisBusinessService
 
@@ -465,11 +499,13 @@ def validate_ai_analysis():
 **קובץ:** `Backend/services/ai_analysis_service.py`
 
 **פעולות:**
+
 1. הוספת שימוש ב-`AIAnalysisBusinessService` ב-`generate_analysis()`
 2. קריאה ל-`validate()` לפני יצירת analysis
 3. שימוש ב-Business Logic Layer לכל הולידציות
 
 **דוגמה:**
+
 ```python
 from services.business_logic.ai_analysis_business_service import AIAnalysisBusinessService
 
@@ -500,11 +536,12 @@ class AIAnalysisService:
 
 ---
 
-### 3.5 עדכון __init__.py
+### 3.5 עדכון **init**.py
 
 **קובץ:** `Backend/services/business_logic/__init__.py`
 
 **פעולות:**
+
 1. הוספת import של `AIAnalysisBusinessService`
 2. הוספת ל-`__all__`
 
@@ -517,11 +554,13 @@ class AIAnalysisService:
 **קובץ:** `Backend/routes/api/ai_analysis.py`
 
 **פעולות:**
+
 1. בדיקת `get_current_user_id()` - האם בודק `session.get('user_id')`?
 2. הוספת בדיקת `session.get('user_id')` לפני fallback ל-1
 3. הוספת logging מפורט
 
 **דוגמה:**
+
 ```python
 def get_current_user_id() -> int:
     """Get current user ID from session"""
@@ -548,6 +587,7 @@ def get_current_user_id() -> int:
 **קובץ:** `Backend/middleware/auth_middleware.py`
 
 **פעולות:**
+
 1. בדיקה שה-blueprint של `ai_analysis` רשום ב-`app.py`
 2. בדיקה שה-middleware רץ על ה-routes
 3. הוספת logging אם נדרש
@@ -561,10 +601,12 @@ def get_current_user_id() -> int:
 **קובץ:** `Backend/services/ai_analysis_service.py`
 
 **פעולות:**
+
 1. תיקון `generate_analysis()` - הוספת fallback ל-'gemini' אם `default_provider` לא מוגדר
 2. הוספת שגיאה ברורה אם גם זה לא עובד
 
 **דוגמה:**
+
 ```python
 # Determine provider
 if not provider:
@@ -580,6 +622,7 @@ if not provider:
 **קובץ:** `trading-ui/scripts/ai-analysis-manager.js`
 
 **פעולות:**
+
 1. וידוא ש-`getLLMProviderSettings()` נקרא עם `credentials: 'include'`
 2. וידוא שה-response מפורש נכון
 3. וידוא ש-`updateProviderSelectModal()` נקרא אחרי טעינת settings
@@ -592,6 +635,7 @@ if not provider:
 **קובץ:** `trading-ui/scripts/ai-analysis-manager.js`
 
 **פעולות:**
+
 1. שימוש ב-`DataCollectionService.collectFormData()` במקום לוגיקה מורכבת
 2. פישוט הלוגיקה של "אחר" option
 3. הוספת validation למשתנים חובה
@@ -603,6 +647,7 @@ if not provider:
 **קובץ:** `Backend/routes/api/ai_analysis.py`
 
 **פעולות:**
+
 1. הוספת error messages מפורטים בסביבת פיתוח
 2. הוספת `error_type` ל-response
 3. שיפור logging של שגיאות
@@ -614,6 +659,7 @@ if not provider:
 **קובץ:** `trading-ui/scripts/ai-analysis-manager.js`
 
 **פעולות:**
+
 1. בדיקה אם ModalManagerV2 רשום נכון
 2. וידוא שה-modal element קיים
 3. הוספת error handling טוב יותר
@@ -626,6 +672,7 @@ if not provider:
 **קובץ:** `trading-ui/scripts/ai-analysis-manager.js`
 
 **פעולות:**
+
 1. הסרת הלוגיקה המורכבת של wait-for-init
 2. שימוש ב-`page-initialization-configs.js` כמו שצריך
 3. הסרת ה-auto-initialization מה-bottom של הקובץ
@@ -637,6 +684,7 @@ if not provider:
 **קובץ:** `trading-ui/scripts/services/ai-analysis-data.js`
 
 **פעולות:**
+
 1. בדיקה אם CacheSyncManager עובד נכון
 2. וידוא שה-action 'ai-analysis-updated' רשום נכון
 3. הוספת error handling טוב יותר
@@ -648,6 +696,7 @@ if not provider:
 **קובץ:** `Backend/services/llm_providers/llm_provider_manager.py`
 
 **פעולות:**
+
 1. בדיקת ה-implementation של `validate_api_key`
 2. וידוא שהיא מחזירה `True/False` נכון
 3. הוספת error handling טוב יותר
@@ -660,6 +709,7 @@ if not provider:
 ### 6.1 בדיקת הגדרת מפתחות API
 
 **תרחיש:**
+
 1. התחבר כמשתמש admin
 2. עבור ל-`/user-profile#ai-analysis`
 3. הגדר מפתח Gemini
@@ -670,6 +720,7 @@ if not provider:
 8. בדוק שהמפתח מתעדכן
 
 **תוצאות צפויות:**
+
 - המפתחות נשמרים מוצפנים
 - ה-API מחזיר `gemini_configured: True` ו-`perplexity_configured: True`
 - המנועים מופיעים כ-enabled במודל
@@ -679,6 +730,7 @@ if not provider:
 ### 6.2 בדיקת יצירת ניתוח עם Gemini
 
 **תרחיש:**
+
 1. עבור ל-`/ai-analysis`
 2. בחר תבנית "ניתוח מחקר הון"
 3. מלא משתנים:
@@ -691,6 +743,7 @@ if not provider:
 7. בדוק שהתוצאות מוצגות
 
 **תוצאות צפויות:**
+
 - הניתוח נוצר בהצלחה
 - התוצאות מוצגות במודל
 - הניתוח נשמר להיסטוריה (metadata בלבד, לא response_text)
@@ -706,6 +759,7 @@ if not provider:
 ### 6.4 בדיקת היסטוריה
 
 **תרחיש:**
+
 1. צור 3 ניתוחים שונים
 2. עבור לסקשן "היסטוריית ניתוחים"
 3. בדוק שהניתוחים מופיעים
@@ -718,6 +772,7 @@ if not provider:
 ### 6.5 בדיקת Error Handling
 
 **תרחישים:**
+
 1. נסה ליצור ניתוח בלי מפתח API - צריך להציג warning
 2. נסה ליצור ניתוח עם template_id לא קיים - צריך שגיאה מפורטת
 3. נסה ליצור ניתוח עם משתנים חסרים - צריך validation error
@@ -728,6 +783,7 @@ if not provider:
 ### 6.6 בדיקת Edge Cases
 
 **תרחישים:**
+
 1. צור ניתוח עם "אחר" option - בדוק שהטקסט החופשי נשמר
 2. צור ניתוח עם מנוע שלא מוגדר - צריך להציג warning
 3. צור ניתוח עם provider לא מוגדר - צריך להשתמש ב-default
@@ -751,7 +807,8 @@ if not provider:
 
 ## 📁 קבצים שיעודכנו
 
-### Backend:
+### Backend
+
 - `Backend/services/business_logic/ai_analysis_business_service.py` - **קובץ חדש**
 - `Backend/services/business_logic/business_rules_registry.py` - הוספת rules
 - `Backend/services/business_logic/__init__.py` - הוספת import
@@ -761,7 +818,8 @@ if not provider:
 - `Backend/services/llm_providers/llm_provider_manager.py` - תיקון validation
 - `Backend/middleware/auth_middleware.py` - בדיקה/תיקון registration
 
-### Frontend:
+### Frontend
+
 - `trading-ui/scripts/init-system/package-manifest.js` - עדכון מניפסט
 - `trading-ui/scripts/page-initialization-configs.js` - עדכון page config
 - `trading-ui/ai-analysis.html` - תיקון קוד טעינה
@@ -769,7 +827,8 @@ if not provider:
 - `trading-ui/scripts/services/ai-analysis-data.js` - תיקון cache, settings loading
 - `trading-ui/scripts/user-profile-ai-analysis.js` - תיקון settings display
 
-### תיעוד:
+### תיעוד
+
 - `documentation/04-FEATURES/AI_ANALYSIS_SYSTEM_DEVELOPER_GUIDE.md` - עדכון ארכיטקטורה
 - `documentation/04-FEATURES/AI_ANALYSIS_SYSTEM_ISSUES_AND_FIXES.md` - עדכון סטטוס
 

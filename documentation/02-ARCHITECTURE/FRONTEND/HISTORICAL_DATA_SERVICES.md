@@ -1,4 +1,5 @@
 # Historical Data Services - Frontend Architecture Documentation
+
 # Historical Data Services - תיעוד ארכיטקטורה Frontend
 
 **תאריך יצירה:** 7 דצמבר 2025  
@@ -28,7 +29,7 @@ Historical Data Services הם 3 שירותי נתונים ב-Frontend המספק
 - **PortfolioStateData** - מצב תיק היסטורי
 - **TradingJournalData** - יומן מסחר
 
-### עקרונות מרכזיים:
+### עקרונות מרכזיים
 
 1. **Cache-first strategy** - שימוש ב-UnifiedCacheManager (4 שכבות)
 2. **Error handling אחיד** - שימוש ב-NotificationSystem ו-Logger Service
@@ -39,7 +40,7 @@ Historical Data Services הם 3 שירותי נתונים ב-Frontend המספק
 
 ## 🏗️ ארכיטקטורה
 
-### מבנה כללי:
+### מבנה כללי
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -206,6 +207,7 @@ Historical Data Services הם 3 שירותי נתונים ב-Frontend המספק
 ### UnifiedCacheManager Configuration
 
 **Trade History:**
+
 ```javascript
 'trade-history-data': { 
   layer: 'backend', 
@@ -221,6 +223,7 @@ Historical Data Services הם 3 שירותי נתונים ב-Frontend המספק
 ```
 
 **Portfolio State:**
+
 ```javascript
 'portfolio-state-snapshot-*': { 
   layer: 'backend', 
@@ -236,6 +239,7 @@ Historical Data Services הם 3 שירותי נתונים ב-Frontend המספק
 ```
 
 **Trading Journal:**
+
 ```javascript
 'trading-journal-*': { 
   layer: 'backend', 
@@ -256,14 +260,17 @@ Historical Data Services הם 3 שירותי נתונים ב-Frontend המספק
 ### Cache Dependencies
 
 **Trade History:**
+
 - תלוי ב: `trades`, `executions`, `trade-plans`
 - Invalidation: כאשר נוצרים/מתעדכנים/נמחקים טריידים, ביצועים או תוכניות
 
 **Portfolio State:**
+
 - תלוי ב: `executions`, `market_data_quotes`, `trades`
 - Invalidation: כאשר נוצרים/מתעדכנים/נמחקים ביצועים, מחירי שוק או טריידים
 
 **Trading Journal:**
+
 - תלוי ב: `notes`, `trades`, `executions`
 - Invalidation: כאשר נוצרים/מתעדכנים/נמחקים הערות, טריידים או ביצועים
 
@@ -271,7 +278,7 @@ Historical Data Services הם 3 שירותי נתונים ב-Frontend המספק
 
 ## ⚠️ Error Handling
 
-### תבנית אחידה:
+### תבנית אחידה
 
 ```javascript
 try {
@@ -285,7 +292,7 @@ try {
 }
 ```
 
-### Error Handling ב-Data Services:
+### Error Handling ב-Data Services
 
 1. **Logger Service** - כל שגיאה נרשמת ב-Logger
 2. **NotificationSystem** - הודעת שגיאה למשתמש
@@ -298,6 +305,7 @@ try {
 ### trade-history-page.js
 
 **שימוש:**
+
 ```javascript
 // Load trade history
 const data = await window.TradeHistoryData.loadTradeHistory(filters);
@@ -312,6 +320,7 @@ const analysis = await window.TradeHistoryData.loadPlanVsExecution(dateRange);
 ### portfolio-state-page.js
 
 **שימוש:**
+
 ```javascript
 // Load snapshot
 const snapshot = await window.PortfolioStateData.loadSnapshot(accountId, date);
@@ -323,6 +332,7 @@ const series = await window.PortfolioStateData.loadSeries(accountId, startDate, 
 ### trading-journal-page.js
 
 **שימוש:**
+
 ```javascript
 // Load entries
 const entries = await window.TradingJournalData.loadEntries(dateRange, filters);
@@ -405,12 +415,14 @@ const calendar = await window.TradingJournalData.loadCalendarData(
 ### 1. תמיד להשתמש ב-Data Services
 
 ❌ **לא נכון:**
+
 ```javascript
 // Direct API call
 const response = await fetch('/api/trade-history/');
 ```
 
 ✅ **נכון:**
+
 ```javascript
 // Use Data Service
 const data = await window.TradeHistoryData.loadTradeHistory(filters);
@@ -437,6 +449,7 @@ const data = await window.TradeHistoryData.loadTradeHistory(filters);
 ## 📚 קבצים רלוונטיים
 
 ### Frontend
+
 - `trading-ui/scripts/services/trade-history-data.js` - Trade History Data Service
 - `trading-ui/scripts/services/portfolio-state-data.js` - Portfolio State Data Service
 - `trading-ui/scripts/services/trading-journal-data.js` - Trading Journal Data Service
@@ -444,6 +457,7 @@ const data = await window.TradeHistoryData.loadTradeHistory(filters);
 - `trading-ui/scripts/cache-ttl-guard.js` - Cache TTL Guard
 
 ### Documentation
+
 - `documentation/02-ARCHITECTURE/BACKEND/HISTORICAL_DATA_SERVICE.md` - Backend Documentation
 - `documentation/03-DEVELOPMENT/PLANS/HISTORICAL_PAGES_FULL_IMPLEMENTATION_PLAN.md` - Implementation Plan
 

@@ -1,18 +1,22 @@
 # System Management API Endpoints
 
 ## מטרת המסמך
+
 מסמך זה מכיל רשימה מפורטת של כל ה-API endpoints המשמשים את עמוד מנהל מערכת.
 
 ## Base URLs
+
 - **Development:** `http://127.0.0.1:8080`
 - **Production:** `http://127.0.0.1:5001`
 
 ## System Overview APIs
 
 ### GET /api/system/overview
+
 **תיאור:** מחזיר סקירה מקיפה של המערכת
 
 **Response Structure:**
+
 ```json
 {
   "status": "success",
@@ -49,15 +53,18 @@
 ```
 
 **Error Codes:**
+
 - `500` - Internal server error
 - `503` - Service unavailable
 
 ---
 
 ### GET /api/system/health
+
 **תיאור:** מחזיר סטטוס בריאות המערכת
 
 **Response Structure:**
+
 ```json
 {
   "status": "success",
@@ -75,9 +82,11 @@
 ---
 
 ### GET /api/system/metrics
+
 **תיאור:** מחזיר מדדי מערכת
 
 **Response Structure:**
+
 ```json
 {
   "status": "success",
@@ -96,9 +105,11 @@
 ---
 
 ### GET /api/system/info
+
 **תיאור:** מחזיר מידע על המערכת
 
 **Response Structure:**
+
 ```json
 {
   "status": "success",
@@ -117,9 +128,11 @@
 ---
 
 ### GET /api/system/database
+
 **תיאור:** מחזיר מידע על בסיס הנתונים
 
 **Response Structure:**
+
 ```json
 {
   "status": "success",
@@ -134,9 +147,11 @@
 ---
 
 ### GET /api/system/cache
+
 **תיאור:** מחזיר מידע על המטמון
 
 **Response Structure:**
+
 ```json
 {
   "status": "success",
@@ -154,9 +169,11 @@
 ---
 
 ### GET /api/system/performance
+
 **תיאור:** מחזיר נתוני ביצועים
 
 **Response Structure:**
+
 ```json
 {
   "status": "success",
@@ -174,9 +191,11 @@
 ---
 
 ### GET /api/system/environment
+
 **תיאור:** מחזיר מידע על הסביבה
 
 **Response Structure:**
+
 ```json
 {
   "status": "success",
@@ -199,9 +218,11 @@
 ## Server Management APIs
 
 ### GET /api/server/status
+
 **תיאור:** מחזיר סטטוס שרת
 
 **Response Structure:**
+
 ```json
 {
   "status": "success",
@@ -220,9 +241,11 @@
 ---
 
 ### GET /api/server/system/info
+
 **תיאור:** מחזיר מידע מפורט על השרת
 
 **Response Structure:**
+
 ```json
 {
   "status": "success",
@@ -249,9 +272,11 @@
 ## Cache Management APIs
 
 ### GET /api/cache/stats
+
 **תיאור:** מחזיר סטטיסטיקות מטמון
 
 **Response Structure:**
+
 ```json
 {
   "status": "success",
@@ -267,9 +292,11 @@
 ---
 
 ### GET /api/cache/health
+
 **תיאור:** מחזיר בריאות מטמון
 
 **Response Structure:**
+
 ```json
 {
   "status": "success",
@@ -290,9 +317,11 @@
 ## System Settings APIs
 
 ### GET /api/system-settings/smtp
+
 **תיאור:** מחזיר הגדרות SMTP
 
 **Response Structure:**
+
 ```json
 {
   "success": true,
@@ -312,9 +341,11 @@
 ---
 
 ### POST /api/system-settings/smtp
+
 **תיאור:** מעדכן הגדרות SMTP
 
 **Request Body:**
+
 ```json
 {
   "smtp_host": "smtp.gmail.com",
@@ -330,6 +361,7 @@
 ```
 
 **Response Structure:**
+
 ```json
 {
   "success": true,
@@ -340,9 +372,11 @@
 ---
 
 ### POST /api/system-settings/smtp/test
+
 **תיאור:** בודק חיבור SMTP
 
 **Response Structure:**
+
 ```json
 {
   "success": true,
@@ -353,9 +387,11 @@
 ---
 
 ### POST /api/system-settings/smtp/test-email
+
 **תיאור:** שולח מייל בדיקה
 
 **Request Body:**
+
 ```json
 {
   "email": "test@example.com"
@@ -363,6 +399,7 @@
 ```
 
 **Response Structure:**
+
 ```json
 {
   "success": true,
@@ -373,9 +410,11 @@
 ---
 
 ### GET /api/system-settings/external-data
+
 **תיאור:** מחזיר הגדרות נתונים חיצוניים
 
 **Response Structure:**
+
 ```json
 {
   "success": true,
@@ -393,9 +432,11 @@
 ---
 
 ### POST /api/system-settings/external-data
+
 **תיאור:** מעדכן הגדרות נתונים חיצוניים
 
 **Request Body:**
+
 ```json
 {
   "ttlActiveSeconds": 300,
@@ -408,6 +449,7 @@
 ```
 
 **Response Structure:**
+
 ```json
 {
   "success": true,
@@ -420,6 +462,7 @@
 ## Error Codes
 
 ### HTTP Status Codes
+
 - `200` - Success
 - `400` - Bad Request
 - `401` - Unauthorized
@@ -429,6 +472,7 @@
 - `503` - Service Unavailable
 
 ### Error Response Structure
+
 ```json
 {
   "status": "error",
@@ -443,12 +487,14 @@
 ---
 
 ## Rate Limiting
+
 - **Default:** 60 requests per minute
 - **Cache TTL:** 30-300 seconds (תלוי ב-endpoint)
 
 ---
 
 ## Authentication
+
 - כל ה-endpoints דורשים authentication
 - משתמשים ב-session cookies
 - אין צורך ב-API key
@@ -456,8 +502,13 @@
 ---
 
 ## הערות
+
 - תאריך עדכון: ___________
 - גרסה: ___________
+
+
+
+
 
 
 

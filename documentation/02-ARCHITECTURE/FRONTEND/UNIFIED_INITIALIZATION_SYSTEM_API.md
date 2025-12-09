@@ -1,4 +1,5 @@
 # תיעוד API - UnifiedAppInitializer
+
 ## UnifiedAppInitializer API Documentation
 
 **תאריך יצירה:** 2025-12-04  
@@ -42,6 +43,7 @@ new UnifiedAppInitializer()
 **Returns:** `UnifiedAppInitializer` - Instance חדש
 
 **Example:**
+
 ```javascript
 const initializer = new UnifiedAppInitializer();
 await initializer.initialize();
@@ -52,19 +54,23 @@ await initializer.initialize();
 ## 🔧 Properties
 
 ### `initialized`
+
 - **Type:** `boolean`
 - **Description:** האם האיתחול הושלם
 - **Default:** `false`
 
 ### `initializationInProgress`
+
 - **Type:** `boolean`
 - **Description:** האם האיתחול בתהליך
 - **Default:** `false`
 
 ### `pageInfo`
+
 - **Type:** `Object | null`
 - **Description:** מידע על העמוד הנוכחי
 - **Structure:**
+
   ```javascript
   {
     name: string,        // שם העמוד
@@ -81,13 +87,16 @@ await initializer.initialize();
   ```
 
 ### `availableSystems`
+
 - **Type:** `Set<string>`
 - **Description:** Set של מערכות זמינות (notification, header, filter, וכו')
 
 ### `performanceMetrics`
+
 - **Type:** `Object`
 - **Description:** מדדי ביצועים
 - **Structure:**
+
   ```javascript
   {
     startTime: number | null,
@@ -103,19 +112,23 @@ await initializer.initialize();
   ```
 
 ### `errorHandlers`
+
 - **Type:** `Array<Function>`
 - **Description:** רשימת error handlers
 
 ### `customInitializers`
+
 - **Type:** `Array<Function>`
 - **Description:** רשימת custom initializers
 
 ### `legacySupport`
+
 - **Type:** `boolean`
 - **Description:** תמיכה ב-legacy code
 - **Default:** `true`
 
 ### `_preferencesInitialized`
+
 - **Type:** `boolean`
 - **Description:** האם העדפות מאותחלות (private)
 - **Default:** `false`
@@ -129,6 +142,7 @@ await initializer.initialize();
 נקודת הכניסה המרכזית לאיתחול. מבצע את כל תהליך האיתחול ב-4 שלבים.
 
 **Signature:**
+
 ```javascript
 async initialize(): Promise<Object>
 ```
@@ -138,6 +152,7 @@ async initialize(): Promise<Object>
 **Throws:** `Error` - אם האיתחול נכשל
 
 **Example:**
+
 ```javascript
 const initializer = new UnifiedAppInitializer();
 const status = await initializer.initialize();
@@ -145,6 +160,7 @@ console.log('Initialization status:', status);
 ```
 
 **Process:**
+
 1. Stage 1: Detect and Analyze
 2. Stage 2: Prepare Configuration
 3. Stage 3: Execute Initialization
@@ -157,6 +173,7 @@ console.log('Initialization status:', status);
 **Stage 1:** זיהוי עמוד וניתוח מערכות זמינות.
 
 **Signature:**
+
 ```javascript
 async detectAndAnalyze(): Promise<void>
 ```
@@ -164,11 +181,13 @@ async detectAndAnalyze(): Promise<void>
 **Returns:** `Promise<void>`
 
 **Process:**
+
 - מזהה את העמוד הנוכחי (`detectPageInfo()`)
 - מנתח מערכות זמינות (`detectAvailableSystems()`)
 - מנתח דרישות העמוד (`analyzePageRequirements()`)
 
 **Example:**
+
 ```javascript
 await initializer.detectAndAnalyze();
 console.log('Page info:', initializer.pageInfo);
@@ -182,11 +201,13 @@ console.log('Available systems:', initializer.availableSystems);
 **Stage 2:** הכנת קונפיגורציה מיטבית.
 
 **Signature:**
+
 ```javascript
 prepareConfiguration(): Object
 ```
 
 **Returns:** `Object` - Configuration object עם:
+
 ```javascript
 {
   pageConfig: Object,           // Page config מ-page-initialization-configs.js
@@ -203,6 +224,7 @@ prepareConfiguration(): Object
 **Throws:** `Error` - אם page config לא נמצא או לא תקין
 
 **Example:**
+
 ```javascript
 const config = initializer.prepareConfiguration();
 console.log('Required packages:', config.packages);
@@ -216,16 +238,19 @@ console.log('Required globals:', config.requiredGlobals);
 **Stage 3:** ביצוע איתחול בפועל.
 
 **Signature:**
+
 ```javascript
 async executeInitialization(config: Object): Promise<void>
 ```
 
 **Parameters:**
+
 - `config` (Object, required) - Configuration object מ-`prepareConfiguration()`
 
 **Returns:** `Promise<void>`
 
 **Process:**
+
 1. Cache System initialization
 2. Preferences initialization (אם `config.packages` כולל 'preferences')
 3. Application initialization:
@@ -235,6 +260,7 @@ async executeInitialization(config: Object): Promise<void>
 4. Custom initializers (אם מוגדרים)
 
 **Example:**
+
 ```javascript
 const config = initializer.prepareConfiguration();
 await initializer.executeInitialization(config);
@@ -247,22 +273,26 @@ await initializer.executeInitialization(config);
 **Stage 4:** סיום איתחול.
 
 **Signature:**
+
 ```javascript
 async finalizeInitialization(config: Object): Promise<void>
 ```
 
 **Parameters:**
+
 - `config` (Object, required) - Configuration object מ-`prepareConfiguration()`
 
 **Returns:** `Promise<void>`
 
 **Process:**
+
 1. State restoration (שחזור מצב סקשנים, וכו')
 2. Success notifications (אם נדרש)
 3. Performance metrics logging
 4. Mark as initialized
 
 **Example:**
+
 ```javascript
 const config = initializer.prepareConfiguration();
 await initializer.executeInitialization(config);
@@ -276,6 +306,7 @@ await initializer.finalizeInitialization(config);
 מאתחל את תצורות המודולים לטעינה דינמית (כרגע לא בשימוש - static loading only).
 
 **Signature:**
+
 ```javascript
 initializeModuleConfigs(): void
 ```
@@ -291,21 +322,25 @@ initializeModuleConfigs(): void
 מאתחל את מערכת העדפות לעמוד.
 
 **Signature:**
+
 ```javascript
 async initializePreferencesForPage(config: Object): Promise<void>
 ```
 
 **Parameters:**
+
 - `config` (Object, required) - Configuration object עם `packages` array
 
 **Returns:** `Promise<void>`
 
 **Process:**
+
 - בודק אם `config.packages` כולל 'preferences'
 - טוען העדפות רק אם נדרש
 - מונע טעינות כפולות
 
 **Example:**
+
 ```javascript
 const config = { packages: ['base', 'preferences'] };
 await initializer.initializePreferencesForPage(config);
@@ -318,22 +353,26 @@ await initializer.initializePreferencesForPage(config);
 איתחול ידני - זרימת איתחול סטנדרטית.
 
 **Signature:**
+
 ```javascript
 async manualInitialization(config: Object): Promise<void>
 ```
 
 **Parameters:**
+
 - `config` (Object, required) - Configuration object מ-`prepareConfiguration()`
 
 **Returns:** `Promise<void>`
 
 **Process:**
+
 - Header System (אם לא auth page)
 - Notification System
 - Actions Menu System
 - Custom initializers
 
 **Example:**
+
 ```javascript
 const config = initializer.prepareConfiguration();
 await initializer.manualInitialization(config);
@@ -346,11 +385,13 @@ await initializer.manualInitialization(config);
 מזהה את העמוד הנוכחי.
 
 **Signature:**
+
 ```javascript
 detectPageInfo(): Object
 ```
 
 **Returns:** `Object` - Page info object:
+
 ```javascript
 {
   name: string,        // שם העמוד
@@ -367,6 +408,7 @@ detectPageInfo(): Object
 ```
 
 **Example:**
+
 ```javascript
 const pageInfo = initializer.detectPageInfo();
 console.log('Page name:', pageInfo.name);
@@ -380,11 +422,13 @@ console.log('Page type:', pageInfo.type);
 מזהה מערכות זמינות.
 
 **Signature:**
+
 ```javascript
 detectAvailableSystems(): Set<string>
 ```
 
 **Returns:** `Set<string>` - Set של שמות מערכות זמינות:
+
 - `'notification'` - NotificationSystem
 - `'header'` - HeaderSystem
 - `'filter'` - FilterSystem
@@ -398,6 +442,7 @@ detectAvailableSystems(): Set<string>
 - `'actionsMenu'` - ActionsMenuSystem
 
 **Example:**
+
 ```javascript
 const systems = initializer.detectAvailableSystems();
 console.log('Available systems:', Array.from(systems));
@@ -410,6 +455,7 @@ console.log('Available systems:', Array.from(systems));
 מנתח את דרישות העמוד.
 
 **Signature:**
+
 ```javascript
 analyzePageRequirements(): void
 ```
@@ -425,14 +471,17 @@ analyzePageRequirements(): void
 קובע את סוג העמוד.
 
 **Signature:**
+
 ```javascript
 determinePageType(pageName: string): string
 ```
 
 **Parameters:**
+
 - `pageName` (string, required) - שם העמוד
 
 **Returns:** `string` - סוג העמוד:
+
 - `'trading'` - עמודי מסחר (trades, executions, alerts)
 - `'development'` - עמודי פיתוח (system-management, crud-testing-dashboard, וכו')
 - `'preferences'` - עמוד העדפות
@@ -440,6 +489,7 @@ determinePageType(pageName: string): string
 - `'general'` - עמוד כללי (ברירת מחדל)
 
 **Example:**
+
 ```javascript
 const pageType = initializer.determinePageType('trades');
 console.log('Page type:', pageType); // 'trading'
@@ -452,16 +502,19 @@ console.log('Page type:', pageType); // 'trading'
 בודק אם העמוד דורש פילטרים.
 
 **Signature:**
+
 ```javascript
 requiresFilters(pageName: string): boolean
 ```
 
 **Parameters:**
+
 - `pageName` (string, required) - שם העמוד
 
 **Returns:** `boolean` - `true` אם העמוד דורש פילטרים
 
 **Example:**
+
 ```javascript
 const needsFilters = initializer.requiresFilters('trades');
 if (needsFilters) {
@@ -476,16 +529,19 @@ if (needsFilters) {
 בודק אם העמוד דורש ולידציה.
 
 **Signature:**
+
 ```javascript
 requiresValidation(pageName: string): boolean
 ```
 
 **Parameters:**
+
 - `pageName` (string, required) - שם העמוד
 
 **Returns:** `boolean` - `true` אם העמוד דורש ולידציה
 
 **Example:**
+
 ```javascript
 const needsValidation = initializer.requiresValidation('trades');
 if (needsValidation) {
@@ -500,16 +556,19 @@ if (needsValidation) {
 בודק אם העמוד דורש טבלאות.
 
 **Signature:**
+
 ```javascript
 requiresTables(pageName: string): boolean
 ```
 
 **Parameters:**
+
 - `pageName` (string, required) - שם העמוד
 
 **Returns:** `boolean` - `true` אם העמוד דורש טבלאות
 
 **Example:**
+
 ```javascript
 const needsTables = initializer.requiresTables('trades');
 if (needsTables) {
@@ -524,16 +583,19 @@ if (needsTables) {
 בודק אם העמוד דורש גרפים.
 
 **Signature:**
+
 ```javascript
 requiresCharts(pageName: string): boolean
 ```
 
 **Parameters:**
+
 - `pageName` (string, required) - שם העמוד
 
 **Returns:** `boolean` - `true` אם העמוד דורש גרפים
 
 **Example:**
+
 ```javascript
 const needsCharts = initializer.requiresCharts('index');
 if (needsCharts) {
@@ -548,21 +610,25 @@ if (needsCharts) {
 מטפל בשגיאות איתחול.
 
 **Signature:**
+
 ```javascript
 handleError(error: Error): void
 ```
 
 **Parameters:**
+
 - `error` (Error, required) - שגיאת איתחול
 
 **Returns:** `void`
 
 **Process:**
+
 - לוגים את השגיאה
 - מריץ error handlers רשומים
 - מציג הודעת שגיאה למשתמש
 
 **Example:**
+
 ```javascript
 try {
   await initializer.initialize();
@@ -578,11 +644,13 @@ try {
 מחזיר את סטטוס האיתחול הנוכחי.
 
 **Signature:**
+
 ```javascript
 getStatus(): Object
 ```
 
 **Returns:** `Object` - Status object:
+
 ```javascript
 {
   initialized: boolean,
@@ -594,6 +662,7 @@ getStatus(): Object
 ```
 
 **Example:**
+
 ```javascript
 const status = initializer.getStatus();
 console.log('Initialized:', status.initialized);
@@ -607,6 +676,7 @@ console.log('Page info:', status.pageInfo);
 מאפס את מצב האיתחול.
 
 **Signature:**
+
 ```javascript
 reset(): void
 ```
@@ -616,6 +686,7 @@ reset(): void
 **Note:** שימושי לבדיקות ודיבוג בלבד.
 
 **Example:**
+
 ```javascript
 initializer.reset();
 await initializer.initialize();
@@ -630,6 +701,7 @@ await initializer.initialize();
 נקודת הכניסה הגלובלית לאיתחול המערכת.
 
 **Signature:**
+
 ```javascript
 async function initializeUnifiedApp(): Promise<Object>
 ```
@@ -639,6 +711,7 @@ async function initializeUnifiedApp(): Promise<Object>
 **Throws:** `Error` - אם האיתחול נכשל
 
 **Example:**
+
 ```javascript
 // האיתחול מתבצע אוטומטית ב-DOMContentLoaded
 // או ניתן לקרוא ישירות:
@@ -654,6 +727,7 @@ await window.initializeUnifiedApp();
 מחזיר את סטטוס האיתחול הגלובלי.
 
 **Signature:**
+
 ```javascript
 function getUnifiedAppStatus(): Object
 ```
@@ -661,6 +735,7 @@ function getUnifiedAppStatus(): Object
 **Returns:** `Object` - Status object (זהה ל-`getStatus()`)
 
 **Example:**
+
 ```javascript
 const status = window.getUnifiedAppStatus();
 console.log('Initialized:', status.initialized);
@@ -673,6 +748,7 @@ console.log('Initialized:', status.initialized);
 מנקה את מצב האיתחול הגלובלי.
 
 **Signature:**
+
 ```javascript
 function clearUnifiedAppState(): void
 ```
@@ -682,6 +758,7 @@ function clearUnifiedAppState(): void
 **Note:** שימושי לבדיקות ודיבוג בלבד.
 
 **Example:**
+
 ```javascript
 window.clearUnifiedAppState();
 await window.initializeUnifiedApp();

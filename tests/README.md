@@ -1,4 +1,5 @@
 # TikTrack Testing Suite
+
 ## מערכת בדיקות מקיפה לפרויקט TikTrack
 
 ### 📁 מבנה התקיות
@@ -36,18 +37,21 @@ tests/
 ### 🧪 סוגי בדיקות
 
 #### 1. **Unit Tests** (`tests/unit/`)
+
 - בדיקות יחידה למערכות בודדות
 - בדיקת פונקציות ספציפיות
 - Mock של תלויות חיצוניות
 - כיסוי של 100% מהקוד הקריטי
 
 #### 2. **Integration Tests** (`tests/integration/`)
+
 - בדיקת אינטגרציה בין מערכות
 - בדיקת זרימות נתונים
 - בדיקת API calls
 - בדיקת תקשורת בין רכיבים
 
 #### 3. **End-to-End Tests** (`tests/e2e/`)
+
 - בדיקות משתמש מלאות
 - בדיקת זרימות עסקיות
 - בדיקת ביצועים
@@ -96,6 +100,7 @@ const Logger = global.window.Logger;
 ```
 
 **יתרונות:**
+
 - ✅ אמינות גבוהה (95% במקום 70%)
 - ✅ בדיקות עם קוד אמיתי
 - ✅ תרחישים אמיתיים
@@ -110,6 +115,7 @@ const Logger = global.window.Logger;
 ### 🔧 הגדרות
 
 #### Jest Configuration
+
 ```javascript
 // jest.config.js
 module.exports = {
@@ -126,6 +132,7 @@ module.exports = {
 ```
 
 #### Test Setup
+
 ```javascript
 // tests/setup.js
 // הגדרות גלובליות, mocks, ו-utilities
@@ -134,6 +141,7 @@ module.exports = {
 ### 📝 כללי כתיבת בדיקות
 
 #### 1. **Naming Convention**
+
 ```javascript
 describe('System Name', () => {
   describe('Feature Group', () => {
@@ -145,6 +153,7 @@ describe('System Name', () => {
 ```
 
 #### 2. **Test Structure (AAA Pattern)**
+
 ```javascript
 test('should process data correctly', () => {
   // Arrange - הכנת נתונים
@@ -160,6 +169,7 @@ test('should process data correctly', () => {
 ```
 
 #### 3. **Mocking Guidelines**
+
 ```javascript
 // Mock global objects
 global.Logger = {
@@ -174,6 +184,7 @@ global.document.getElementById = jest.fn();
 ### 🎯 מערכות נבדקות
 
 #### ✅ **מערכות קריטיות (100% כיסוי)**
+
 - Logger Service
 - Unified Cache Manager
 - Field Renderer Service
@@ -182,6 +193,7 @@ global.document.getElementById = jest.fn();
 - Chart System
 
 #### 🔄 **מערכות נוספות (90% כיסוי)**
+
 - Notification System
 - Color Scheme System
 - Preferences System
@@ -198,6 +210,7 @@ global.document.getElementById = jest.fn();
 ### 🐛 דיווח על באגים
 
 בדיקות נכשלות יוצרות דוחות מפורטים ב:
+
 - `coverage/lcov-report/index.html`
 - `test-results/junit.xml`
 - `test-results/coverage.json`
@@ -205,6 +218,7 @@ global.document.getElementById = jest.fn();
 ### 🔄 CI/CD Integration
 
 הבדיקות רצות אוטומטית ב:
+
 - Pre-commit hooks
 - Pull request validation
 - Deployment pipeline

@@ -1,4 +1,5 @@
 # מדריך כלי בדיקת סדר טעינה ותלויות - למפתח העתידי
+
 **תאריך יצירה:** 1 בדצמבר 2025  
 **גרסה:** 1.0.0  
 **סטטוס:** ✅ פעיל ומתועד  
@@ -36,46 +37,55 @@
 ## 📦 רשימת כלי הבדיקה
 
 ### 1. validate-package-dependencies.js
+
 **תפקיד:** בדיקת תלויות וסדר טעינה של חבילות  
 **מתי להשתמש:** לפני עדכון מניפסט, לאחר שינוי תלויות  
 **פלט:** דוח מפורט + קובץ Markdown
 
 ### 2. validate-all-pages-load-order.js
+
 **תפקיד:** בדיקת סדר טעינה בכל עמודי המערכת  
 **מתי להשתמש:** לפני release, לאחר שינוי מניפסט  
 **פלט:** דוח מפורט + קובץ Markdown
 
 ### 3. fix-all-pages-load-order-v2.js
+
 **תפקיד:** תיקון אוטומטי של סדר טעינה בכל העמודים  
 **מתי להשתמש:** לאחר עדכון מניפסט, כשצריך לעדכן כל העמודים  
 **פלט:** עדכון קבצי HTML
 
 ### 4. load-order-validator.js
+
 **תפקיד:** ספרייה לבדיקת סדר טעינה (משמש כלים אחרים)  
 **מתי להשתמש:** כבסיס לכלים אחרים  
 **פלט:** אין (ספרייה)
 
 ### 5. package-manifest-audit.js
+
 **תפקיד:** בדיקה מקיפה של המניפסט  
 **מתי להשתמש:** בדיקה כללית של המניפסט  
 **פלט:** דוח מפורט
 
 ### 6. dependency-analyzer.js
+
 **תפקיד:** ניתוח מעמיק של תלויות  
 **מתי להשתמש:** לניתוח תלויות מורכב  
 **פלט:** דוח JSON + Markdown
 
 ### 7. browser-page-validator.js
+
 **תפקיד:** יצירת סקריפט לבדיקה בדפדפן  
 **מתי להשתמש:** לבדיקה runtime בדפדפן  
 **פלט:** סקריפט לדפדפן
 
 ### 8. browser-automated-validation.js
+
 **תפקיד:** בדיקה אוטומטית בדפדפן לכל העמודים  
 **מתי להשתמש:** לבדיקה מקיפה בדפדפן  
 **פלט:** דוח JSON
 
 ### 9. page-mapper.js
+
 **תפקיד:** מיפוי עמודים מול הגדרות  
 **מתי להשתמש:** לזיהוי עמודים חסרים  
 **פלט:** דוח Markdown
@@ -89,11 +99,13 @@
 **תפקיד:** בודק את כל התלויות בין החבילות במניפסט
 
 **שימוש:**
+
 ```bash
 node scripts/audit/validate-package-dependencies.js
 ```
 
 **מה הוא בודק:**
+
 - ✅ מבנה חבילות (id, name, loadOrder)
 - ✅ קיום תלויות במניפסט
 - ✅ סדר טעינה תואם לתלויות
@@ -101,10 +113,12 @@ node scripts/audit/validate-package-dependencies.js
 - ✅ כפילויות בסדר טעינה
 
 **פלט:**
+
 - קונסולה: סיכום עם סטטוס
 - קובץ: `documentation/05-REPORTS/PACKAGE_DEPENDENCIES_VALIDATION.md`
 
 **דוגמת פלט:**
+
 ```
 ✅ חבילות נבדקו: 29
 ❌ שגיאות: 0
@@ -113,6 +127,7 @@ node scripts/audit/validate-package-dependencies.js
 ```
 
 **מתי להשתמש:**
+
 - לפני עדכון `package-manifest.js`
 - לאחר הוספת חבילה חדשה
 - לאחר שינוי תלויות
@@ -125,27 +140,32 @@ node scripts/audit/validate-package-dependencies.js
 **תפקיד:** בודק שכל עמודי המערכת נטענים בסדר הנכון
 
 **שימוש:**
+
 ```bash
 node scripts/audit/validate-all-pages-load-order.js
 ```
 
 **מה הוא בודק:**
+
 - ✅ סדר טעינה בכל עמוד
 - ✅ סקריפטים חסרים
 - ✅ סקריפטים מיותרים
 - ✅ התאמה למניפסט
 
 **פלט:**
+
 - קונסולה: סיכום כללי
 - קובץ: `documentation/05-REPORTS/ALL_PAGES_LOAD_ORDER_VALIDATION.md`
 
 **דוגמת פלט:**
+
 ```
 ✅ עמודים תקינים: 59
 ❌ עמודים עם בעיות: 0
 ```
 
 **מתי להשתמש:**
+
 - לפני release
 - לאחר עדכון מניפסט
 - כשמופיעות שגיאות טעינה
@@ -158,20 +178,24 @@ node scripts/audit/validate-all-pages-load-order.js
 **תפקיד:** מתקן אוטומטית את סדר הטעינה בכל העמודים
 
 **שימוש:**
+
 ```bash
 node scripts/audit/fix-all-pages-load-order-v2.js
 ```
 
 **מה הוא עושה:**
+
 - 🔧 קורא את המניפסט והגדרות העמודים
 - 🔧 מייצר קוד טעינה נכון לכל עמוד
 - 🔧 מעדכן את קבצי ה-HTML
 
 **פלט:**
+
 - קונסולה: רשימת עמודים שעודכנו
 - קבצי HTML: מעודכנים עם סדר טעינה נכון
 
 **דוגמת פלט:**
+
 ```
 ✅ עודכנו: 35
 ⏭️  דולגו: 24
@@ -179,6 +203,7 @@ node scripts/audit/fix-all-pages-load-order-v2.js
 ```
 
 **מתי להשתמש:**
+
 - לאחר עדכון `package-manifest.js`
 - לאחר שינוי `loadOrder` של חבילות
 - כשצריך לעדכן כל העמודים בבת אחת
@@ -192,21 +217,25 @@ node scripts/audit/fix-all-pages-load-order-v2.js
 **תפקיד:** בדיקה מקיפה של המניפסט
 
 **שימוש:**
+
 ```bash
 node scripts/audit/package-manifest-audit.js
 ```
 
 **מה הוא בודק:**
+
 - ✅ מבנה המניפסט
 - ✅ חבילות חסרות
 - ✅ עמודים חסרים בהגדרות
 - ✅ סטטיסטיקות כללית
 
 **פלט:**
+
 - קונסולה: סיכום מפורט
 - קובץ: `documentation/05-REPORTS/PACKAGE_MANIFEST_AUDIT_REPORT.md`
 
 **מתי להשתמש:**
+
 - לבדיקה כללית של המניפסט
 - לזיהוי בעיות מבנה
 - לפני שינויים גדולים
@@ -218,22 +247,26 @@ node scripts/audit/package-manifest-audit.js
 **תפקיד:** ניתוח מעמיק של תלויות
 
 **שימוש:**
+
 ```bash
 node scripts/audit/dependency-analyzer.js
 ```
 
 **מה הוא בודק:**
+
 - ✅ גרף תלויות
 - ✅ מעגלי תלויות
 - ✅ תלויות חסרות
 - ✅ בעיות סדר טעינה
 
 **פלט:**
+
 - קונסולה: סיכום
 - קובץ JSON: נתונים מפורטים
 - קובץ Markdown: דוח קריא
 
 **מתי להשתמש:**
+
 - לניתוח תלויות מורכב
 - לזיהוי בעיות תלויות
 - לפני שינוי ארכיטקטורה
@@ -245,19 +278,23 @@ node scripts/audit/dependency-analyzer.js
 **תפקיד:** יוצר סקריפט לבדיקה בדפדפן
 
 **שימוש:**
+
 ```bash
 node scripts/audit/browser-page-validator.js
 ```
 
 **מה הוא עושה:**
+
 - 📝 יוצר `browser-page-validator-browser.js`
 - 📝 יוצר מדריך שימוש
 
 **פלט:**
+
 - `trading-ui/scripts/audit/browser-page-validator-browser.js`
 - `documentation/05-REPORTS/BROWSER_VALIDATOR_USAGE.md`
 
 **מתי להשתמש:**
+
 - כשצריך לבדוק בדפדפן
 - לזיהוי שגיאות runtime
 - לבדיקת console errors
@@ -269,25 +306,30 @@ node scripts/audit/browser-page-validator.js
 **תפקיד:** בדיקה אוטומטית בדפדפן לכל העמודים
 
 **שימוש:**
+
 ```bash
 node scripts/audit/browser-automated-validation.js
 ```
 
 **מה הוא עושה:**
+
 - 🌐 פותח כל עמוד בדפדפן
 - 🌐 מריץ בדיקות
 - 🌐 אוסף תוצאות
 
 **פלט:**
+
 - קונסולה: סיכום
 - קובץ JSON: תוצאות מפורטות
 
 **מתי להשתמש:**
+
 - לבדיקה מקיפה בדפדפן
 - לפני release
 - לזיהוי בעיות runtime
 
 **דרישות:**
+
 - MCP Browser Extension
 - שרת רץ (port 8080)
 
@@ -298,20 +340,24 @@ node scripts/audit/browser-automated-validation.js
 **תפקיד:** מיפוי עמודים מול הגדרות
 
 **שימוש:**
+
 ```bash
 node scripts/audit/page-mapper.js
 ```
 
 **מה הוא בודק:**
+
 - ✅ עמודים עם הגדרות
 - ✅ עמודים ללא הגדרות
 - ✅ עמודים חסרים
 
 **פלט:**
+
 - קונסולה: סיכום
 - קובץ Markdown: דוח מפורט
 
 **מתי להשתמש:**
+
 - לזיהוי עמודים חסרים
 - לבדיקת כיסוי הגדרות
 - לפני הוספת עמודים חדשים
@@ -323,6 +369,7 @@ node scripts/audit/page-mapper.js
 ### תרחיש 1: הוספת חבילה חדשה
 
 **צעדים:**
+
 1. עדכן `package-manifest.js` עם החבילה החדשה
 2. הרץ `validate-package-dependencies.js` - וודא שאין שגיאות
 3. עדכן `page-initialization-configs.js` אם צריך
@@ -330,6 +377,7 @@ node scripts/audit/page-mapper.js
 5. הרץ `validate-all-pages-load-order.js` - וודא שהכל תקין
 
 **פקודות:**
+
 ```bash
 # 1. בדיקת תלויות
 node scripts/audit/validate-package-dependencies.js
@@ -346,12 +394,14 @@ node scripts/audit/validate-all-pages-load-order.js
 ### תרחיש 2: שינוי loadOrder של חבילה
 
 **צעדים:**
+
 1. עדכן `loadOrder` ב-`package-manifest.js`
 2. הרץ `validate-package-dependencies.js` - וודא שהתלויות נכונות
 3. הרץ `fix-all-pages-load-order-v2.js` - עדכן את העמודים
 4. הרץ `validate-all-pages-load-order.js` - וודא שהכל תקין
 
 **פקודות:**
+
 ```bash
 # 1. בדיקת תלויות
 node scripts/audit/validate-package-dependencies.js
@@ -368,11 +418,13 @@ node scripts/audit/validate-all-pages-load-order.js
 ### תרחיש 3: בדיקה לפני release
 
 **צעדים:**
+
 1. הרץ `validate-package-dependencies.js` - וודא שהתלויות תקינות
 2. הרץ `validate-all-pages-load-order.js` - וודא שכל העמודים תקינים
 3. הרץ `browser-automated-validation.js` - בדיקה בדפדפן (אופציונלי)
 
 **פקודות:**
+
 ```bash
 # 1. בדיקת תלויות
 node scripts/audit/validate-package-dependencies.js
@@ -389,12 +441,14 @@ node scripts/audit/browser-automated-validation.js
 ### תרחיש 4: זיהוי בעיות סדר טעינה
 
 **צעדים:**
+
 1. הרץ `validate-all-pages-load-order.js` - זהה עמודים עם בעיות
 2. קרא את הדוח ב-`documentation/05-REPORTS/ALL_PAGES_LOAD_ORDER_VALIDATION.md`
 3. הרץ `fix-all-pages-load-order-v2.js` - תיקון אוטומטי
 4. הרץ `validate-all-pages-load-order.js` שוב - וודא שתוקן
 
 **פקודות:**
+
 ```bash
 # 1. זיהוי בעיות
 node scripts/audit/validate-all-pages-load-order.js
@@ -413,6 +467,7 @@ node scripts/audit/validate-all-pages-load-order.js
 ### בעיה: "Cannot find module 'load-order-validator'"
 
 **פתרון:**
+
 ```bash
 # וודא שאתה בתיקיית הפרויקט
 cd /Users/nimrod/Documents/TikTrack/TikTrackApp
@@ -426,6 +481,7 @@ node scripts/audit/validate-package-dependencies.js
 ### בעיה: "PACKAGE_MANIFEST not found"
 
 **פתרון:**
+
 - וודא ש-`trading-ui/scripts/init-system/package-manifest.js` קיים
 - וודא שהקובץ מכיל `const PACKAGE_MANIFEST = {...}`
 
@@ -434,6 +490,7 @@ node scripts/audit/validate-package-dependencies.js
 ### בעיה: "PAGE_CONFIGS not found"
 
 **פתרון:**
+
 - וודא ש-`trading-ui/scripts/page-initialization-configs.js` קיים
 - וודא שהקובץ מכיל הגדרות לעמודים
 
@@ -442,6 +499,7 @@ node scripts/audit/validate-package-dependencies.js
 ### בעיה: הכלי לא מעדכן עמודים
 
 **פתרון:**
+
 - וודא שיש לך הרשאות כתיבה לקבצי HTML
 - בדוק שהעמודים מכילים את הסימון `<!-- ===== START SCRIPT LOADING ORDER ===== -->`
 - נסה להריץ עם `--force` (אם הכלי תומך)
@@ -451,6 +509,7 @@ node scripts/audit/validate-package-dependencies.js
 ### בעיה: שגיאות parsing
 
 **פתרון:**
+
 - וודא שהמניפסט תקין מבחינת syntax
 - בדוק שאין שגיאות JavaScript
 - נסה להריץ `package-manifest-audit.js` לזיהוי בעיות
@@ -469,6 +528,7 @@ node scripts/audit/validate-all-pages-load-order.js
 ```
 
 **תכונות:**
+
 - בדיקת קבצים מקוריים
 - זיהוי כל הסקריפטים בנפרד
 - בדיקת סדר טעינה מדויק
@@ -488,6 +548,7 @@ npm run test:bundles -- --package=base
 ```
 
 **תכונות:**
+
 - בדיקת bundles
 - זיהוי bundle → scripts mapping
 - בדיקת גודל ותקינות
@@ -495,6 +556,7 @@ npm run test:bundles -- --package=base
 ### עדכון עתידי
 
 כלי הבדיקה יכולים להיות מעודכנים בעתיד לתמיכה מלאה ב-bundles:
+
 - זיהוי bundles ב-HTML
 - מיפוי Bundle → Scripts
 - בדיקת סדר טעינה עם bundles
@@ -536,6 +598,7 @@ npm run test:bundles -- --package=base
 ### 1. תמיד בדוק לפני שינוי
 
 לפני כל שינוי במניפסט או בהגדרות עמודים:
+
 ```bash
 # הרץ בדיקות
 node scripts/audit/validate-package-dependencies.js
@@ -545,6 +608,7 @@ node scripts/audit/validate-all-pages-load-order.js
 ### 2. עדכן את העמודים אחרי שינוי
 
 לאחר שינוי במניפסט:
+
 ```bash
 # עדכן את כל העמודים
 node scripts/audit/fix-all-pages-load-order-v2.js
@@ -556,6 +620,7 @@ node scripts/audit/validate-all-pages-load-order.js
 ### 3. בדוק לפני commit
 
 לפני כל commit:
+
 ```bash
 # בדוק שהכל תקין
 node scripts/audit/validate-package-dependencies.js
@@ -577,6 +642,7 @@ node scripts/audit/validate-all-pages-load-order.js
 ### בעיות נפוצות
 
 אם נתקלת בבעיה:
+
 1. קרא את הסעיף "פתרון בעיות" למעלה
 2. בדוק את הדוחות ב-`documentation/05-REPORTS/`
 3. קרא את התעוד ב-`UNIFIED_INITIALIZATION_SYSTEM.md`
@@ -584,6 +650,7 @@ node scripts/audit/validate-all-pages-load-order.js
 ### שאלות
 
 לשאלות או בעיות:
+
 - בדוק את התעוד במערכת
 - קרא את קוד המקור של הכלים
 - פנה לצוות הפיתוח

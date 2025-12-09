@@ -160,6 +160,7 @@ This log tracks version bumps for the development environment (branch `main`). M
 | 2025-11-29T08:00:43+00:00 | 1.3.41.0 | 1.3.40.0 | 48a408ff686e8f80802b174f321872e1f334263c | 50d675f0e020d2ffdd30cac1bc6689fc4161d52a | patch | קונסולה נקייה 100% - השלמת בדיקות ותיקונים לכל 36 העמודים
 
 תיקונים עיקריים:
+
 - הוחלפו כל console.* calls ב-Logger Service (0 console calls)
 - נוסף Bootstrap CSS ישירות לכל העמודים החסרים
 - הושלם IconSystem בכל העמודים
@@ -168,6 +169,7 @@ This log tracks version bumps for the development environment (branch `main`). M
 - תוקנו 36/36 עמודים (100% מושלמים)
 
 שיפורים:
+
 - 24 → 36 עמודים מושלמים (67% → 100%)
 - 0 console calls (לפני: 9+ בעמוד)
 - 0 שגיאות קריטיות
@@ -175,12 +177,14 @@ This log tracks version bumps for the development environment (branch `main`). M
 | 2025-11-29T15:53:58+00:00 | 1.3.42.0 | 1.3.41.0 | f8c7fd01a0225ea70aedb8797b309e1b5c7c15cd | 48a408ff686e8f80802b174f321872e1f334263c | patch | תיקון: תיקון תצוגת ראש הדף בכל המערכת
 
 תיקונים עיקריים:
+
 - תיקון template literal ב-header-system.js שגרם לשגיאת תחביר
 - הוספת filter-toggle-main שחסר (כפתור טוגל ראשי)
 - הוספת header-styles.css ל-research.html
 - הסתרת פילטרים בעמוד research (דשבורד עתידי)
 
 שיפורים:
+
 - Header נטען כראוי בכל העמודים
 - research.html: header ללא פילטרים (כמבוקש)
 - trades.html: header עם פילטרים (כמבוקש)
@@ -188,6 +192,7 @@ This log tracks version bumps for the development environment (branch `main`). M
 | 2025-11-29T16:31:38+00:00 | 1.3.43.0 | 1.3.42.0 | ef44ce88126eda61f160956ec90c1dbf3ad80de8 | f8c7fd01a0225ea70aedb8797b309e1b5c7c15cd | patch | תיקון: שיפורים נוספים במערכת
 
 תיקונים עיקריים:
+
 - שיפורים במערכת אימות (auth.js, auth.py)
 - עדכוני icon mappings
 - שיפורי עיצוב (layout.css)

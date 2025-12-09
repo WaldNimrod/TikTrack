@@ -352,34 +352,42 @@
                                                 <thead class="table-light">
                                                     <tr>
                                                         <th class="drag-handle-column"></th>
-                                                        <th class="flag-column">Flag</th>
+                                                        <th class="flag-column">
+                                                            <button class="btn btn-link sortable-header">דגל</button>
+                                                        </th>
                                                         <th class="col-symbol">
-                                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(1, window.WatchListsPage?.watchListItemsData || [], 'watch_list_items', window.WatchListsPage?.updateWatchListItemsTable); }" style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">Symbol <span class="sort-icon">↕</span></button>
+                                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(1, window.WatchListsPage?.watchListItemsData || [], 'watch_list_items', window.WatchListsPage?.updateWatchListItemsTable); }">סמל <span class="sort-icon">↕</span></button>
                                                         </th>
                                                         <th class="col-price">
-                                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(3, window.WatchListsPage?.watchListItemsData || [], 'watch_list_items', window.WatchListsPage?.updateWatchListItemsTable); }" style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">Price <span class="sort-icon">↕</span></button>
+                                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(3, window.WatchListsPage?.watchListItemsData || [], 'watch_list_items', window.WatchListsPage?.updateWatchListItemsTable); }">מחיר <span class="sort-icon">↕</span></button>
                                                         </th>
                                                         <th class="col-change">
-                                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(4, window.WatchListsPage?.watchListItemsData || [], 'watch_list_items', window.WatchListsPage?.updateWatchListItemsTable); }" style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">Change <span class="sort-icon">↕</span></button>
+                                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(4, window.WatchListsPage?.watchListItemsData || [], 'watch_list_items', window.WatchListsPage?.updateWatchListItemsTable); }">שינוי <span class="sort-icon">↕</span></button>
                                                         </th>
                                                         <th class="col-change-percent">
-                                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(5, window.WatchListsPage?.watchListItemsData || [], 'watch_list_items', window.WatchListsPage?.updateWatchListItemsTable); }" style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">Change % <span class="sort-icon">↕</span></button>
+                                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(5, window.WatchListsPage?.watchListItemsData || [], 'watch_list_items', window.WatchListsPage?.updateWatchListItemsTable); }">שינוי % <span class="sort-icon">↕</span></button>
                                                         </th>
                                                         <th class="col-daily-change">
-                                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(6, window.WatchListsPage?.watchListItemsData || [], 'watch_list_items', window.WatchListsPage?.updateWatchListItemsTable); }" style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">שינוי היום % <span class="sort-icon">↕</span></button>
+                                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(6, window.WatchListsPage?.watchListItemsData || [], 'watch_list_items', window.WatchListsPage?.updateWatchListItemsTable); }">שינוי היום % <span class="sort-icon">↕</span></button>
                                                         </th>
                                                         <th class="col-atr">
-                                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(7, window.WatchListsPage?.watchListItemsData || [], 'watch_list_items', window.WatchListsPage?.updateWatchListItemsTable); }" style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">ATR <span class="sort-icon">↕</span></button>
+                                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(7, window.WatchListsPage?.watchListItemsData || [], 'watch_list_items', window.WatchListsPage?.updateWatchListItemsTable); }">ATR <span class="sort-icon">↕</span></button>
                                                         </th>
-                                                        <th class="col-position">Position</th>
+                                                        <th class="col-position">
+                                                            <button class="btn btn-link sortable-header">פוזיציה</button>
+                                                        </th>
                                                         <th class="col-value-change">
-                                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(9, window.WatchListsPage?.watchListItemsData || [], 'watch_list_items', window.WatchListsPage?.updateWatchListItemsTable); }" style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">שינוי בערך <span class="sort-icon">↕</span></button>
+                                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(9, window.WatchListsPage?.watchListItemsData || [], 'watch_list_items', window.WatchListsPage?.updateWatchListItemsTable); }">שינוי בערך <span class="sort-icon">↕</span></button>
                                                         </th>
-                                                        <th class="col-pl">P/L</th>
+                                                        <th class="col-pl">
+                                                            <button class="btn btn-link sortable-header">רווח/הפסד</button>
+                                                        </th>
                                                         <th class="col-pl-percent">
-                                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(10, window.WatchListsPage?.watchListItemsData || [], 'watch_list_items', window.WatchListsPage?.updateWatchListItemsTable); }" style="border: none; background: none; padding: 0; margin: 0; width: 100%; text-align: center; color: inherit; text-decoration: none;">P/L % <span class="sort-icon">↕</span></button>
+                                                            <button class="btn btn-link sortable-header" onclick="if (typeof window.sortTableData === 'function') { window.sortTableData(10, window.WatchListsPage?.watchListItemsData || [], 'watch_list_items', window.WatchListsPage?.updateWatchListItemsTable); }">רווח/הפסד % <span class="sort-icon">↕</span></button>
                                                         </th>
-                                                        <th class="actions-column actions-cell actions-4-items">Actions</th>
+                                                        <th class="actions-column actions-cell actions-4-items">
+                                                            <button class="btn btn-link sortable-header">פעולות</button>
+                                                        </th>
                                                     </tr>
                                                 </thead>
                                                 <tbody id="watchListItemsTableBody">

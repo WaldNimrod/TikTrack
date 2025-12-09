@@ -1,6 +1,7 @@
 # מיפוי מערכות פעילות - TikTrack Testing Scope
 
 ## מטרת המסמך
+
 מסמך זה מגדיר את כל המערכות הפעילות בגרסה הנוכחית ואת סטטוס הבדיקות שלהן.
 
 **תאריך עדכון:** 2025-01-27  
@@ -106,6 +107,7 @@
 ## תוכנית בדיקות לפי עדיפות
 
 ### שלב 1 - Core Systems (עדיפות גבוהה)
+
 1. Unified Initialization System
 2. Notification System
 3. Modal Manager V2
@@ -113,23 +115,27 @@
 5. UI Utilities
 
 ### שלב 2 - CRUD & Data Services (עדיפות בינונית)
+
 6. Data Collection Service
 7. CRUD Response Handler
 8. Select Populator Service
 9. Linked Items Service
 
 ### שלב 3 - UI & Display Systems (עדיפות בינונית)
+
 10. Header & Filters System
 11. Color Scheme System
 12. Pagination System
 13. Entity Details Modal
 
 ### שלב 4 - Cache & Performance (עדיפות נמוכה)
+
 14. Cache Sync Manager
 15. Cache Policy Manager
 16. LocalStorage Events Sync
 
 ### שלב 5 - Dev Tools (עדיפות נמוכה)
+
 17. Linter File Analysis
 18. Linter Testing System
 19. Linter Export System

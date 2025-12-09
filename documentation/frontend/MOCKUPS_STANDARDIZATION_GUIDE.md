@@ -1,4 +1,5 @@
 # מדריך סטנדרטיזציה - עמודי מוקאפ
+
 # Mockups Standardization Guide
 
 **תאריך יצירה:** 27 בנובמבר 2025  
@@ -19,7 +20,7 @@
 
 ## תבנית נכונה - מבנה HTML
 
-### מבנה חובה לכל עמוד:
+### מבנה חובה לכל עמוד
 
 ```html
 <body class="[page-name]-page">
@@ -68,7 +69,7 @@
 </body>
 ```
 
-### קבצים התייחסות:
+### קבצים התייחסות
 
 - `trading-ui/test-header-only.html` - תבנית מושלמת
 - `trading-ui/background-tasks.html` - תבנית טובה
@@ -78,7 +79,7 @@
 
 ## ITCSS - דרישות
 
-### 1. ייבוא נכון של CSS:
+### 1. ייבוא נכון של CSS
 
 ```html
 <!-- TikTrack ITCSS Master Styles -->
@@ -87,20 +88,20 @@
 <link rel="stylesheet" href="../../styles-new/header-styles.css">
 ```
 
-### 2. איסורים חמורים:
+### 2. איסורים חמורים
 
 - ❌ אין `<style>` tags בתוך HTML
 - ❌ אין `style=""` attributes (inline styles)
 - ❌ אין `!important` ב-CSS (אלא במקרים נדירים ומתועדים)
 - ❌ אין ייבוא של Bootstrap Icons/FontAwesome ישירות (משתמשים ב-IconSystem)
 
-### 3. מיקום סגנונות:
+### 3. מיקום סגנונות
 
 - כל הסגנונות ב-`trading-ui/styles-new/` לפי ITCSS
 - סגנונות ספציפיים למוקאפ: `06-components/_mockups-common.css`
 - אין צורך ב-`@import` - הקבצים נטענים דרך `master.css`
 
-### קבצים התייחסות:
+### קבצים התייחסות
 
 - `trading-ui/styles-new/main.css` - מבנה ITCSS מלא
 - `trading-ui/mockups/daily-snapshots/MOCKUPS_UNIFIED_STYLES_GUIDE.md` - מדריך סגנונות
@@ -109,7 +110,7 @@
 
 ## Header System - דרישות
 
-### 1. מיקום ב-HTML:
+### 1. מיקום ב-HTML
 
 ```html
 <div class="background-wrapper">
@@ -120,7 +121,7 @@
 </div>
 ```
 
-### 2. טעינת סקריפטים:
+### 2. טעינת סקריפטים
 
 ```html
 <!-- Header System (Must load early) -->
@@ -151,7 +152,7 @@
 </script>
 ```
 
-### קבצים התייחסות:
+### קבצים התייחסות
 
 - `trading-ui/mockups/daily-snapshots/trade-history-page.html` - דוגמה טובה
 - `trading-ui/scripts/header-system.js` - מערכת Header
@@ -160,13 +161,14 @@
 
 ## כלי בדיקה
 
-### סקריפט בדיקה אוטומטי:
+### סקריפט בדיקה אוטומטי
 
 ```bash
 node scripts/mockups-standardization-checker.js
 ```
 
 הסקריפט בודק:
+
 - מבנה HTML נכון
 - נוכחות inline styles
 - ייבוא CSS נכון
@@ -178,7 +180,7 @@ node scripts/mockups-standardization-checker.js
 
 ## רשימת עמודי מוקאפ
 
-### עמודי daily-snapshots (11 עמודים):
+### עמודי daily-snapshots (11 עמודים)
 
 1. `comparative-analysis-page.html`
 2. `date-comparison-modal.html`
@@ -192,7 +194,7 @@ node scripts/mockups-standardization-checker.js
 10. `trading-journal-page.html`
 11. `tradingview-test-page.html`
 
-### עמודי מוקאפ נוספים:
+### עמודי מוקאפ נוספים
 
 12. `../add-ticker-modal.html` - Modal קטן
 13. `../flag-quick-action.html` - Modal קטן

@@ -1,4 +1,5 @@
 # ארכיטקטורת SMTP - TikTrack
+
 ## SMTP Architecture
 
 **תאריך יצירה**: 28 בינואר 2025  
@@ -10,11 +11,13 @@
 ## 🎯 עקרונות ארכיטקטורה
 
 ### 1. **הפרדה מלאה בין קוד להגדרות**
+
 - ✅ כל הגדרות SMTP נשמרות במסד הנתונים (SystemSettings)
 - ✅ אין hardcoded values בקוד (חוץ מ-defaults לפיתוח)
 - ✅ תמיכה ב-fallback למשתני סביבה (לפיתוח בלבד)
 
 ### 2. **תמיכה בכל שירותי SMTP**
+
 - ✅ Gmail / Google Workspace
 - ✅ SendGrid
 - ✅ Mailgun
@@ -23,6 +26,7 @@
 - ✅ כל שירות SMTP סטנדרטי אחר
 
 ### 3. **החלפה קלה ללא שינויי קוד**
+
 - ✅ החלפת שרת SMTP = עדכון הגדרות במסד הנתונים בלבד
 - ✅ אין צורך בשינויי קוד
 - ✅ אין צורך ב-restart (הגדרות נטענות בכל קריאה)
@@ -97,6 +101,7 @@
 **תפקיד**: שירות מרכזי לשליחת מיילים
 
 **תכונות**:
+
 - טעינת הגדרות מ-DB או משתני סביבה
 - שליחת מיילים דרך SMTP
 - תמיכה ב-HTML ו-plain text
@@ -104,6 +109,7 @@
 - בדיקת חיבור SMTP
 
 **שימוש**:
+
 ```python
 from services.email_service import EmailService
 from config.database import SessionLocal
@@ -125,12 +131,14 @@ result = email_service.send_email(
 **תפקיד**: ניהול הגדרות SMTP במסד הנתונים
 
 **תכונות**:
+
 - קריאת הגדרות מ-DB
 - עדכון הגדרות ב-DB
 - הצפנת/פענוח סיסמאות
 - ולידציה של הגדרות
 
 **שימוש**:
+
 ```python
 from services.smtp_settings_service import SMTPSettingsService
 from config.database import SessionLocal
@@ -162,6 +170,7 @@ result = smtp_service.update_smtp_settings(
 **תפקיד**: אחסון הגדרות SMTP במסד הנתונים
 
 **טבלאות**:
+
 - `system_setting_groups` - קבוצות הגדרות
 - `system_setting_types` - סוגי הגדרות
 - `system_settings` - ערכי הגדרות
@@ -169,6 +178,7 @@ result = smtp_service.update_smtp_settings(
 **קבוצה**: `smtp_settings`
 
 **הגדרות**:
+
 - `smtp_host` - שרת SMTP
 - `smtp_port` - פורט SMTP
 - `smtp_user` - שם משתמש
@@ -183,6 +193,7 @@ result = smtp_service.update_smtp_settings(
 **תפקיד**: ממשק ניהול הגדרות SMTP
 
 **תכונות**:
+
 - טעינת הגדרות מה-API
 - עדכון הגדרות דרך ה-API
 - בדיקת חיבור SMTP
@@ -195,6 +206,7 @@ result = smtp_service.update_smtp_settings(
 ### שלב 1: עדכון הגדרות במסד הנתונים
 
 **דרך הממשק** (מומלץ):
+
 1. פתח `http://localhost:8080/user-profile.html`
 2. גלול לסקשן "הגדרות SMTP"
 3. עדכן את הפרטים:
@@ -208,6 +220,7 @@ result = smtp_service.update_smtp_settings(
 4. לחץ "עדכן הגדרות SMTP"
 
 **דרך API**:
+
 ```python
 POST /api/system-settings/smtp
 {
@@ -245,16 +258,19 @@ email_service.send_email(...)  # משתמש בהגדרות החדשות
 ### הצפנת סיסמאות
 
 **איך זה עובד**:
+
 1. סיסמה נשמרת מוצפנת במסד הנתונים (Fernet encryption)
 2. מפתח הצפנה: `TIKTRACK_SMTP_ENCRYPTION_KEY` (משתנה סביבה)
 3. פענוח מתבצע רק בעת שימוש (ב-EmailService)
 
 **הגדרת מפתח הצפנה**:
+
 ```bash
 export TIKTRACK_SMTP_ENCRYPTION_KEY="your_base64_encoded_key_here"
 ```
 
 **יצירת מפתח**:
+
 ```python
 from cryptography.fernet import Fernet
 key = Fernet.generate_key()
@@ -359,7 +375,7 @@ print(key.decode())  # העתק את זה למשתנה סביבה
 
 ## ✅ סיכום
 
-### יתרונות הארכיטקטורה:
+### יתרונות הארכיטקטורה
 
 1. ✅ **החלפה קלה** - רק עדכון הגדרות במסד הנתונים
 2. ✅ **ללא שינויי קוד** - הקוד נשאר זהה
@@ -368,7 +384,7 @@ print(key.decode())  # העתק את זה למשתנה סביבה
 5. ✅ **גמישות** - תמיכה ב-fallback למשתני סביבה
 6. ✅ **לוגינג** - כל ניסיונות השליחה נרשמים
 
-### עקרונות מפתח:
+### עקרונות מפתח
 
 - **Configuration over Code** - הגדרות במסד הנתונים, לא בקוד
 - **Separation of Concerns** - הפרדה בין שירותי הגדרות לשליחת מיילים

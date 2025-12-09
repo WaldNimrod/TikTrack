@@ -11,6 +11,7 @@
 ## מה כבר הושלם ✅
 
 ### שלב 0: לוגיקה עסקית ב-Backend
+
 - ✅ `calculate_trade_timeline()` - חישוב timeline מלא
 - ✅ `calculate_trade_chart_data()` - נתוני גרף עם מחירי שוק
 - ✅ `calculate_trade_statistics_detailed()` - סטטיסטיקות מפורטות
@@ -18,25 +19,30 @@
 - ✅ חישוב Unrealized P/L ב-Backend (שימוש ב-`_get_market_price_at_date`)
 
 ### שלבים 1-3: תיקוני קוד
+
 - ✅ DOM Manipulation - החלפת `innerHTML` ב-`DOMParser`
 - ✅ Notifications - שימוש ב-`NotificationSystem`
 - ✅ Tables - שימוש ב-`UnifiedTableSystem`
 
 ### שלבים 4-5: נתונים חיצוניים
+
 - ✅ בדיקת נתונים חסרים (`checkAndFetchMissingHistoricalPrices`)
 - ✅ הודעת אישור מפורטת (`showMissingHistoricalDataConfirmation`)
 - ✅ שילוב `ExternalDataService` לטעינת נתונים היסטוריים
 
 ### שלב 6: טבלת פירוט צעדים
+
 - ✅ טבלה עם איקונים, סוג, פרטים, כפתור פרטים
 - ✅ חישוב משך זמן בין רשומות
 - ✅ תמיכה בכל סוגי האובייקטים
 
 ### שלב 7: חישוב Unrealized P/L
+
 - ✅ חישוב מדויק ב-Backend
 - ✅ שימוש ב-`_get_market_price_at_date` לכל נקודת זמן
 
 ### תיקונים נוספים
+
 - ✅ תיקון סדר טעינה (Info Summary Package)
 - ✅ הוספת mapping ל-logger-service.js
 - ✅ הוספת mapping ל-color-scheme-system.js
@@ -47,6 +53,7 @@
 ### שלב 8: מימוש גרף טיימליין מלא (קריטי)
 
 **מצב נוכחי:**
+
 - ✅ הגרף נוצר עם TradingView Lightweight Charts
 - ✅ סדרה של `positionSize` (גודל פוזיציה) - קיים (Left Scale, Stepped Line)
 - ✅ סדרה של `realizedPL` (P/L ממומש) - קיים (Right Scale)
@@ -57,6 +64,7 @@
 **מה חסר:**
 
 #### 8.1 הוספת סדרת מחיר נכס (Candlestick)
+
 - **מיקום:** `trading-ui/trade-history.html` - פונקציה `initTimelineChart()`
 - **נתונים:** `chartData.market_prices` (כבר נטען)
 - **סוג:** Candlestick Chart (OHLC) או Line Chart (אם אין OHLC)
@@ -64,6 +72,7 @@
 - **צבע:** Primary color (#26baac)
 
 **קוד לדוגמה:**
+
 ```javascript
 // Add candlestick series for market prices
 if (marketPriceData && marketPriceData.length > 0) {
@@ -83,12 +92,14 @@ if (marketPriceData && marketPriceData.length > 0) {
 ```
 
 #### 8.2 הוספת סדרת שווי פוזיציה (Area)
+
 - **נתונים:** `positionValue = positionSize × marketPrice` (לכל נקודת זמן)
 - **סוג:** Area Chart
 - **מיקום:** Price Scale נפרד (Left)
 - **צבע:** Secondary color (#fc5a06) עם שקיפות
 
 **חישוב:**
+
 ```javascript
 // Calculate position value for each timeline point
 const positionValueData = timelineData.map((d, index) => {
@@ -101,6 +112,7 @@ const positionValueData = timelineData.map((d, index) => {
 ```
 
 #### 8.3 הוספת סדרת מחיר ממוצע (Line)
+
 - **נתונים:** `averagePrice` (כבר מחושב ב-timeline)
 - **סוג:** Line Chart
 - **מיקום:** Price Scale (Right) - יחד עם מחיר נכס
@@ -108,6 +120,7 @@ const positionValueData = timelineData.map((d, index) => {
 - **קו מקווקו:** כן (להבדיל ממחיר נכס)
 
 **קוד:**
+
 ```javascript
 const avgPriceSeries = window.TradingViewChartAdapter.addLineSeries(timelineChart, {
     priceScaleId: 'right',
@@ -119,14 +132,17 @@ const avgPriceSeries = window.TradingViewChartAdapter.addLineSeries(timelineChar
 ```
 
 #### 8.4 עדכון סדרת רווח/הפסד מוכר (כבר קיים - לבדוק)
+
 - **סטטוס:** ✅ כבר קיים (שורה 1082-1102)
 - **פעולה:** לבדוק שהנתונים נכונים ושימוש ב-`realizedPL` מ-timeline
 
 #### 8.5 עדכון סדרת רווח/הפסד לא מוכר (כבר קיים - לבדוק)
+
 - **סטטוס:** ✅ כבר קיים (שורה 1104-1125)
 - **פעולה:** לבדוק שהנתונים נכונים ושימוש ב-`unrealizedPL` מ-timeline (כבר מחושב ב-Backend)
 
 #### 8.6 עדכון Tooltips
+
 - **מיקום:** `trading-ui/trade-history.html` - פונקציה `initTimelineChart()`
 - **תוכן:** כל הנתונים לכל נקודת זמן:
   - תאריך ושעה
@@ -139,6 +155,7 @@ const avgPriceSeries = window.TradingViewChartAdapter.addLineSeries(timelineChar
   - P/L כולל
 
 **קוד:**
+
 ```javascript
 timelineChart.subscribeCrosshairMove(param => {
     if (param.point === undefined || !param.time || param.point.x < 0 || param.point.x > container.clientWidth || param.point.y < 0 || param.point.y > container.clientHeight) {
@@ -155,12 +172,14 @@ timelineChart.subscribeCrosshairMove(param => {
 ```
 
 #### 8.7 שימוש בנתונים מ-Backend
+
 - **מיקום:** `trading-ui/trade-history.html` - פונקציה `initTimelineChart()`
 - **שינוי:** להשתמש ב-`unrealizedPL` מ-timeline data (כבר מחושב ב-Backend)
 - **שינוי:** להשתמש ב-`averagePrice` מ-timeline data
 - **שינוי:** להשתמש ב-`positionValue` מ-timeline data (אם קיים) או לחשב
 
 **קוד:**
+
 ```javascript
 // Use unrealizedPL from timeline data (already calculated in backend)
 const unrealizedPL = point.unrealizedPL !== undefined ? point.unrealizedPL : 0;
@@ -176,6 +195,7 @@ const positionValue = point.positionValue !== undefined ? point.positionValue :
 ### שלב 9: עדכון תעוד
 
 #### 9.1 עדכון תעוד Frontend
+
 - **קבצים:**
   - `documentation/02-ARCHITECTURE/FRONTEND/HISTORICAL_DATA_SERVICES.md`
   - `documentation/04-FEATURES/TRADE_HISTORY_PAGE.md` (יצירה אם לא קיים)
@@ -186,6 +206,7 @@ const positionValue = point.positionValue !== undefined ? point.positionValue :
   - תיעוד בדיקת נתונים חסרים
 
 #### 9.2 עדכון תעוד Backend
+
 - **קבצים:**
   - `documentation/02-ARCHITECTURE/BACKEND/HISTORICAL_DATA_BUSINESS_SERVICE.md` (יצירה אם לא קיים)
 - **תוכן:**
@@ -194,6 +215,7 @@ const positionValue = point.positionValue !== undefined ? point.positionValue :
   - תיעוד `_get_market_price_at_date`
 
 #### 9.3 יצירת מדריך משתמש (אופציונלי)
+
 - **קובץ:** `documentation/04-FEATURES/TRADE_HISTORY_PAGE_USER_GUIDE.md`
 - **תוכן:**
   - הסבר על כל הפיצ'רים
@@ -203,10 +225,12 @@ const positionValue = point.positionValue !== undefined ? point.positionValue :
 ### שלב 10: בדיקות מקיפות
 
 #### 10.1 בדיקות Selenium
+
 - ✅ כבר בוצע - הצלחה (100%)
 - **פעולה:** להריץ שוב לאחר השלמת שלב 8
 
 #### 10.2 בדיקות ידניות
+
 - **רשימת בדיקות:**
   1. טעינת עמוד עם `tradeId=2512`
   2. בדיקת טבלת צעדים - וידוא שכל הרשומות מוצגות
@@ -218,6 +242,7 @@ const positionValue = point.positionValue !== undefined ? point.positionValue :
   8. בדיקת cache - וידוא שהנתונים נשמרים במטמון
 
 #### 10.3 בדיקת ביצועים
+
 - **מדדים:**
   - זמן טעינה ראשונית
   - זמן טעינת גרף
@@ -227,6 +252,7 @@ const positionValue = point.positionValue !== undefined ? point.positionValue :
 ## סדר ביצוע מומלץ
 
 ### שלב 8: מימוש גרף טיימליין מלא (קריטי - ראשון)
+
 1. **8.7** - שימוש בנתונים מ-Backend (קל ביותר, בסיס לכל השאר)
 2. **8.1** - הוספת סדרת מחיר נכס (Candlestick) - **קריטי**
 3. **8.3** - הוספת סדרת מחיר ממוצע (Line)
@@ -236,16 +262,18 @@ const positionValue = point.positionValue !== undefined ? point.positionValue :
 7. **8.6** - עדכון Tooltips (לבסוף, אחרי שכל הסדרות עובדות)
 
 ### שלב 9: עדכון תעוד
+
 - לבצע במקביל או אחרי שלב 8
 
 ### שלב 10: בדיקות מקיפות
+
 - לבצע אחרי השלמת שלבים 8-9
 
 ## הערות חשובות
 
 1. **שימוש בנתונים מ-Backend:** כל הנתונים כבר מחושבים ב-Backend - רק צריך להשתמש בהם
 2. **TradingView Lightweight Charts:** יש להשתמש ב-`TradingViewChartAdapter` (כבר קיים)
-3. **Price Scales:** 
+3. **Price Scales:**
    - Right Scale: מחיר נכס, מחיר ממוצע, P/L כולל
    - Left Scale: גודל פוזיציה, שווי פוזיציה, רווח/הפסד מוכר, רווח/הפסד לא מוכר
 4. **צבעים:** להשתמש ב-CSS variables או צבעי הלוגו (#26baac, #fc5a06)
@@ -253,11 +281,13 @@ const positionValue = point.positionValue !== undefined ? point.positionValue :
 
 ## קבצים לעדכון
 
-### קבצים עיקריים:
+### קבצים עיקריים
+
 - `trading-ui/trade-history.html` - פונקציה `initTimelineChart()` (שורות ~705-1200)
 - `trading-ui/scripts/trade-history-page.js` - טעינת נתונים לגרף (אם נדרש)
 
-### קבצי תעוד:
+### קבצי תעוד
+
 - `documentation/02-ARCHITECTURE/FRONTEND/HISTORICAL_DATA_SERVICES.md`
 - `documentation/04-FEATURES/TRADE_HISTORY_PAGE.md` (יצירה)
 - `documentation/02-ARCHITECTURE/BACKEND/HISTORICAL_DATA_BUSINESS_SERVICE.md` (יצירה)

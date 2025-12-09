@@ -1,4 +1,5 @@
 # מטריצת סטטוס אינטגרציה - עמודי מוקאפ
+
 ## Mockups Integration Status Matrix
 
 7. **Emotional Tracking Widget - מימוש מלא (29 בינואר 2025):**
@@ -34,6 +35,7 @@
 | **tradingview-test** | ✅ | ✅ | ⏳ | ⚠️ | ⚠️ | ✅ | ✅ | ❌ | ✅ | ✅ | ⚠️ | ✅ |
 
 **סימון:**
+
 - ✅ = משולב כראוי
 - ⚠️ = שימוש חלקי/לא מלא
 - ⏳ = בתהליך
@@ -43,18 +45,21 @@
 
 ## סיכום התקדמות
 
-### שלב 1 - אינטגרציות קריטיות (3 מערכות):
+### שלב 1 - אינטגרציות קריטיות (3 מערכות)
+
 - **NotificationSystem:** ✅ הושלם - כל 11 עמודים
 - **toggleSection (UI Utils):** ✅ הושלם - כל 11 עמודים (הוסרו פונקציות מקומיות)
 - **Button System:** ✅ הושלם - כל 11 עמודים (נוסף button-system-init.js לכל העמודים)
 
-### שלב 2 - אינטגרציות חשובות (4 מערכות):
+### שלב 2 - אינטגרציות חשובות (4 מערכות)
+
 - **FieldRendererService:** ✅ הושלם - 11/11 עמודים (כל העמודים טוענים את המערכת, 4 עמודים משתמשים בה בפועל: price-history, portfolio-state, comparative-analysis, trade-history)
 - **InfoSummarySystem:** ✅ הושלם - 11/11 עמודים (כל העמודים טוענים את המערכת, מוכן לאינטגרציה עתידית)
 - **Logger Service:** ✅ הושלם - 11/11 עמודים
 - **PreferencesCore:** ✅ הושלם - 11/11 עמודים (כל העמודים טוענים את המערכת, comparative-analysis-page משתמש במערכת במקום localStorage)
 
-### שלב 3 - אינטגרציות אופציונליות (5 מערכות):
+### שלב 3 - אינטגרציות אופציונליות (5 מערכות)
+
 - **UnifiedCacheManager:** ❌ לא רלוונטי למוקאפ (רק בעת חיבור ל-API)
 - **ColorSchemeSystem:** ✅ הושלם - כל העמודים (כבר משתמשים ב-getCSSVariableValue)
 - **Icon System:** ✅ הושלם - 11/11 עמודים (כל העמודים טוענים את המערכת)
@@ -65,7 +70,7 @@
 
 ## הערות
 
-1. **Logger Service:** ✅ הושלם - כל 11 העמודים. כל השימושים ב-console.* הוחלפו ל-window.Logger.*
+1. **Logger Service:** ✅ הושלם - כל 11 העמודים. כל השימושים ב-console.*הוחלפו ל-window.Logger.*
 
 2. **FieldRendererService:** ✅ הושלם - כל 11 העמודים טוענים את המערכת. 4 עמודים משתמשים בה בפועל: price-history-page (סטטיסטיקות שינוי), portfolio-state-page (P/L values, טבלת השוואה), comparative-analysis-page (P/L עם אחוזים), trade-history-page (P/L בטבלה).
 
@@ -94,10 +99,12 @@
 **דוח מפורט:** `MOCKUPS_STANDARDIZATION_REPORT.md`
 
 **סטטוס כללי:**
+
 - ✅ **הושלם:** 1/11 עמודים (portfolio-state-page)
 - ⏳ **נדרש:** 10/11 עמודים
 
 **חלוקה לפי מערכות:**
+
 - **UnifiedCacheManager:** 2/11 (18%) - portfolio-state מלא, trade-history חלקי
 - **UnifiedTableSystem:** 2/11 (18%) - portfolio-state, trade-history
 - **InfoSummarySystem:** 1/11 (9%) - portfolio-state

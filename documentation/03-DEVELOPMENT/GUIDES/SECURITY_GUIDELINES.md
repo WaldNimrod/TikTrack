@@ -1,5 +1,7 @@
 # Security Guidelines - TikTrack Development
+
 # ===========================================
+
 # הנחיות אבטחה למפתחים
 
 **תאריך:** 01.12.2025  
@@ -336,7 +338,7 @@ class MyService:
 
 ## שאלות נפוצות
 
-### Q: מה אם Service לא תומך ב-user_id?
+### Q: מה אם Service לא תומך ב-user_id
 
 **A:** צריך להוסיף תמיכה ב-user_id ל-Service:
 
@@ -349,7 +351,7 @@ def get_all(db: Session, user_id: Optional[int] = None) -> List[MyEntity]:
     return query.all()
 ```
 
-### Q: מה אם יש עמוד שלא צריך הגנה?
+### Q: מה אם יש עמוד שלא צריך הגנה
 
 **A:** הוסף ל-`PUBLIC_PAGES` ב-`auth-guard.js`:
 
@@ -361,7 +363,7 @@ const PUBLIC_PAGES = [
 ];
 ```
 
-### Q: מה אם g.user_id הוא None?
+### Q: מה אם g.user_id הוא None
 
 **A:** זה תקין - יכול להיות None אם המשתמש לא מחובר. בדוק:
 

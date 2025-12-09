@@ -1,4 +1,5 @@
 # מדריך שימוש - מערכת ניתוח אינטגרציה
+
 ## Integration Analysis Guide
 
 **גרסה:** 1.0.0  
@@ -11,7 +12,7 @@
 
 מערכת ניתוח האינטגרציה מספקת כלים מקיפים לזיהוי, מיפוי וניתוח של כל האינטגרציות והתלויות בין המערכות הכלליות במערכת TikTrack.
 
-### מה המערכת עושה:
+### מה המערכת עושה
 
 1. **סריקה סטטית** - זיהוי תלויות בקוד
 2. **בדיקה דינמית** - אימות זמינות ב-runtime
@@ -30,6 +31,7 @@
 ```
 
 פקודה זו מריצה את כל הניתוחים ויוצרת:
+
 - מטריצת אינטגרציה
 - גרף תלויות (JSON, Mermaid, DOT, ASCII)
 - דוח ניתוח מקיף
@@ -38,6 +40,7 @@
 ### תוצאות
 
 כל התוצאות נשמרות ב:
+
 - `reports/integration-analysis/` - קבצי JSON ותוצאות
 - `documentation/02-ARCHITECTURE/FRONTEND/INTEGRATION_MATRIX.md` - מטריצה
 - `documentation/05-REPORTS/SYSTEM_INTEGRATION_ANALYSIS_REPORT.md` - דוח מסכם
@@ -51,11 +54,13 @@
 **קובץ:** `scripts/analysis/system-integration-scanner.js`
 
 **שימוש:**
+
 ```bash
 node scripts/analysis/system-integration-scanner.js
 ```
 
 **מה הוא עושה:**
+
 - סורק את כל הקבצים ב-`trading-ui/scripts/services/`
 - סורק את כל הקבצים ב-`trading-ui/scripts/modules/`
 - סורק מערכות כלליות ב-`trading-ui/scripts/`
@@ -64,6 +69,7 @@ node scripts/analysis/system-integration-scanner.js
 - יוצר גרף תלויות
 
 **פלט:**
+
 - `reports/integration-analysis/integration-scan-results.json`
 
 ---
@@ -73,16 +79,19 @@ node scripts/analysis/system-integration-scanner.js
 **קובץ:** `scripts/analysis/system-file-analyzer.js`
 
 **שימוש:**
+
 ```bash
 node scripts/analysis/system-file-analyzer.js <file-path>
 ```
 
 **דוגמה:**
+
 ```bash
 node scripts/analysis/system-file-analyzer.js trading-ui/scripts/services/data-collection-service.js
 ```
 
 **מה הוא עושה:**
+
 - ניתוח מפורט של קובץ יחיד
 - זיהוי imports
 - זיהוי שימוש ב-globals
@@ -90,6 +99,7 @@ node scripts/analysis/system-file-analyzer.js trading-ui/scripts/services/data-c
 - זיהוי נקודות אינטגרציה
 
 **פלט:**
+
 - JSON עם כל המידע על הקובץ
 
 ---
@@ -99,16 +109,19 @@ node scripts/analysis/system-file-analyzer.js trading-ui/scripts/services/data-c
 **קובץ:** `scripts/analysis/runtime-integration-checker.js`
 
 **שימוש:**
+
 ```bash
 node scripts/analysis/runtime-integration-checker.js
 ```
 
 **מה הוא עושה:**
+
 - יוצר HTML test page לבדיקת runtime
 - בודק זמינות מערכות ב-Node.js (סימולציה)
 - מזהה תלויות חסרות
 
 **פלט:**
+
 - `reports/integration-analysis/runtime-integration-test.html` - לפתיחה בדפדפן
 - `reports/integration-analysis/runtime-check-results.json` - תוצאות Node.js
 
@@ -122,17 +135,20 @@ node scripts/analysis/runtime-integration-checker.js
 **קובץ:** `scripts/analysis/initialization-order-validator.js`
 
 **שימוש:**
+
 ```bash
 node scripts/analysis/initialization-order-validator.js
 ```
 
 **מה הוא עושה:**
+
 - בודק את סדר הטעינה ב-`package-manifest.js`
 - מזהה הפרות סדר
 - בודק תלויות initialization
 - מציע סדר אופטימלי
 
 **פלט:**
+
 - `reports/integration-analysis/initialization-order-validation.json`
 
 ---
@@ -142,16 +158,19 @@ node scripts/analysis/initialization-order-validator.js
 **קובץ:** `scripts/analysis/generate-integration-matrix.js`
 
 **שימוש:**
+
 ```bash
 node scripts/analysis/generate-integration-matrix.js
 ```
 
 **מה הוא עושה:**
+
 - קורא את תוצאות הסריקה
 - יוצר מטריצת אינטגרציה מפורטת
 - כולל טבלה עם כל המידע
 
 **פלט:**
+
 - `documentation/02-ARCHITECTURE/FRONTEND/INTEGRATION_MATRIX.md`
 
 ---
@@ -161,11 +180,13 @@ node scripts/analysis/generate-integration-matrix.js
 **קובץ:** `scripts/analysis/generate-dependency-graph.js`
 
 **שימוש:**
+
 ```bash
 node scripts/analysis/generate-dependency-graph.js
 ```
 
 **מה הוא עושה:**
+
 - יוצר גרף תלויות בפורמטים שונים
 - JSON - לניתוח programmatic
 - Mermaid - לויזואליזציה ב-Markdown
@@ -173,6 +194,7 @@ node scripts/analysis/generate-dependency-graph.js
 - ASCII - להצגה במסוף
 
 **פלט:**
+
 - `reports/integration-analysis/dependency-graph.json`
 - `reports/integration-analysis/dependency-graph.mmd`
 - `reports/integration-analysis/dependency-graph.dot`
@@ -185,11 +207,13 @@ node scripts/analysis/generate-dependency-graph.js
 **קובץ:** `scripts/analysis/generate-report.js`
 
 **שימוש:**
+
 ```bash
 node scripts/analysis/generate-report.js
 ```
 
 **מה הוא עושה:**
+
 - יוצר דוח ניתוח מקיף
 - כולל סיכום מנהלים
 - גרף תלויות
@@ -197,6 +221,7 @@ node scripts/analysis/generate-report.js
 - 4 אופציות המלצה מפורטות
 
 **פלט:**
+
 - `documentation/05-REPORTS/SYSTEM_INTEGRATION_ANALYSIS_REPORT.md`
 
 ---
@@ -219,6 +244,7 @@ node scripts/analysis/generate-report.js
 ### גרף תלויות
 
 הגרף מציג:
+
 - **Nodes** - כל מערכת (מסומנת לפי סוג)
 - **Edges** - תלויות בין מערכות
 - **Cycles** - תלויות מעגליות (מסומנות באדום)
@@ -226,6 +252,7 @@ node scripts/analysis/generate-report.js
 ### דוח ניתוח
 
 הדוח כולל:
+
 1. **Executive Summary** - סיכום מהיר
 2. **Dependency Graph** - גרף ויזואלי
 3. **Critical Issues** - בעיות שדורשות טיפול
@@ -281,9 +308,11 @@ node scripts/analysis/generate-dependency-graph.js
 תלויות מעגליות הן בעיה - מערכת A תלויה ב-B, ו-B תלויה ב-A (או דרך שרשרת).
 
 **דוגמה:**
+
 - SystemA → SystemB → SystemC → SystemA
 
 **פתרון:**
+
 - הפרדת האחריות
 - יצירת מערכת מתווכת
 - שינוי ארכיטקטורה
@@ -297,6 +326,7 @@ node scripts/analysis/generate-dependency-graph.js
 **בעיה:** הסקריפט לא מזהה מערכות מסוימות
 
 **פתרון:**
+
 1. בדוק שהקובץ קיים ב-`trading-ui/scripts/`
 2. בדוק שהמערכת מוגדרת ב-KNOWN_SYSTEMS ב-`system-integration-scanner.js`
 3. הוסף את המערכת ל-KNOWN_SYSTEMS אם חסר
@@ -306,6 +336,7 @@ node scripts/analysis/generate-dependency-graph.js
 **בעיה:** תלויות מסוימות לא מזוהות
 
 **פתרון:**
+
 1. בדוק את ה-pattern ב-`system-integration-scanner.js`
 2. הוסף pattern נוסף אם צריך
 3. בדוק שהמערכת נקראת בשם הנכון
@@ -315,6 +346,7 @@ node scripts/analysis/generate-dependency-graph.js
 **בעיה:** שגיאות בפרסור package-manifest.js
 
 **פתרון:**
+
 1. בדוק את התחביר של package-manifest.js
 2. ודא שכל ה-packages מוגדרים נכון
 3. בדוק שה-loadOrder מוגדר כ-numeric
@@ -328,11 +360,13 @@ node scripts/analysis/generate-dependency-graph.js
 כדי להוסיף מערכת חדשה לניתוח:
 
 1. **הוסף ל-KNOWN_SYSTEMS** ב-`system-integration-scanner.js`:
+
 ```javascript
 'NewSystem': { file: 'new-system.js', type: 'System' }
 ```
 
 2. **הוסף ל-patterns:**
+
 ```javascript
 const pattern = /window\.(NewSystem|...)/g;
 ```

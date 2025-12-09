@@ -1,4 +1,5 @@
 # Business Logic Migration Guide
+
 # מדריך מיגרציה - Business Logic Layer
 
 **תאריך יצירה:** 22 נובמבר 2025  
@@ -23,22 +24,25 @@
 
 ## 🎯 מבוא
 
-### למה צריך migration?
+### למה צריך migration
 
 לפני יצירת Business Logic Layer, הלוגיקה העסקית הייתה מפוזרת בין:
+
 - Frontend (חישובים מקומיים ב-JavaScript)
 - Backend (ולידציות ב-models וב-API routes)
 - Page Scripts (לוגיקה ספציפית לעמוד)
 
 **בעיות:**
+
 - חוסר עקביות - אותו חישוב בוצע בצורה שונה במקומות שונים
 - קושי בתחזוקה - שינוי חוק עסקי דרש עדכון במקומות רבים
 - קושי בבדיקות - קשה לבדוק לוגיקה מפוזרת
 - כפילות קוד - אותו קוד נכתב מספר פעמים
 
-### מה השתנה?
+### מה השתנה
 
 **לפני:**
+
 ```javascript
 // Local calculation in page script
 function calculateStopPrice(currentPrice, stopPercentage, side) {
@@ -52,6 +56,7 @@ function calculateStopPrice(currentPrice, stopPercentage, side) {
 ```
 
 **אחרי:**
+
 ```javascript
 // Using Business Logic API wrapper
 const stopPrice = await window.TradesData.calculateStopPrice(
@@ -62,6 +67,7 @@ const stopPrice = await window.TradesData.calculateStopPrice(
 ```
 
 **יתרונות:**
+
 - ✅ עקביות - אותו חישוב בכל מקום
 - ✅ תחזוקה קלה - שינוי במקום אחד
 - ✅ בדיקות קלות - בדיקות מרוכזות
@@ -75,9 +81,10 @@ const stopPrice = await window.TradesData.calculateStopPrice(
 
 ### שלב 1: זיהוי קוד שצריך migration
 
-#### מה צריך למיגר?
+#### מה צריך למיגר
 
 **חישובים:**
+
 - חישובי מחירים (stop price, target price, אחוזים)
 - חישובי השקעה (price, quantity, amount)
 - חישובי P/L (profit/loss)
@@ -86,11 +93,12 @@ const stopPrice = await window.TradesData.calculateStopPrice(
 - חישובי סכומים
 
 **ולידציות:**
+
 - ולידציות של שדות (price, quantity, side, וכו')
 - ולידציות של ערכים (min/max, allowed values)
 - ולידציות מורכבות (תלויות בין שדות)
 
-#### איפה לחפש?
+#### איפה לחפש
 
 1. **Page Scripts** (`trading-ui/scripts/*.js`)
    - פונקציות `calculate*`
@@ -115,7 +123,7 @@ const stopPrice = await window.TradesData.calculateStopPrice(
 
 ### שלב 2: יצירת/שימוש ב-Business Service
 
-#### אם Service כבר קיים:
+#### אם Service כבר קיים
 
 ```python
 # Service already exists - just use it
@@ -125,26 +133,26 @@ service = TradeBusinessService()
 result = service.calculate_stop_price(100.0, 5.0, 'Long')
 ```
 
-#### אם Service לא קיים:
+#### אם Service לא קיים
 
 ראה [Business Logic Developer Guide](BUSINESS_LOGIC_DEVELOPER_GUIDE.md#יצירת-business-service-חדש) לפרטים מלאים.
 
 ### שלב 3: יצירת/שימוש ב-API Endpoint
 
-#### אם Endpoint כבר קיים:
+#### אם Endpoint כבר קיים
 
 ```python
 # Endpoint already exists - just use it
 # POST /api/business/trade/calculate-stop-price
 ```
 
-#### אם Endpoint לא קיים:
+#### אם Endpoint לא קיים
 
 ראה [Business Logic Developer Guide](BUSINESS_LOGIC_DEVELOPER_GUIDE.md#שלב-3-יצירת-api-endpoints) לפרטים מלאים.
 
 ### שלב 4: יצירת/שימוש ב-Frontend Wrapper
 
-#### אם Wrapper כבר קיים:
+#### אם Wrapper כבר קיים
 
 ```javascript
 // Wrapper already exists - just use it
@@ -155,13 +163,13 @@ const stopPrice = await window.TradesData.calculateStopPrice(
 );
 ```
 
-#### אם Wrapper לא קיים:
+#### אם Wrapper לא קיים
 
 ראה [Business Logic Developer Guide](BUSINESS_LOGIC_DEVELOPER_GUIDE.md#שלב-4-יצירת-frontend-wrapper) לפרטים מלאים.
 
 ### שלב 5: עדכון Page Script להשתמש ב-Wrapper
 
-#### לפני:
+#### לפני
 
 ```javascript
 // In trades.js
@@ -178,7 +186,7 @@ function calculateStopPrice(currentPrice, stopPercentage, side) {
 const stopPrice = calculateStopPrice(100, 5, 'Long');
 ```
 
-#### אחרי:
+#### אחרי
 
 ```javascript
 // In trades.js
@@ -190,13 +198,13 @@ const stopPrice = await window.TradesData.calculateStopPrice(100, 5, 'Long');
 
 ### שלב 6: הסרת קוד ישן
 
-#### מה להסיר?
+#### מה להסיר
 
 1. **פונקציות חישוב מקומיות** - אם יש wrapper ב-Data Service
 2. **פונקציות ולידציה מקומיות** - אם יש wrapper ב-Data Service
 3. **קוד כפול** - קוד שכבר קיים ב-Business Service
 
-#### מה לשמור?
+#### מה לשמור
 
 1. **Fallback functions** - אם נדרשות ל-backward compatibility
 2. **UI logic** - לוגיקה ספציפית ל-UI (לא עסקית)
@@ -208,7 +216,7 @@ const stopPrice = await window.TradesData.calculateStopPrice(100, 5, 'Long');
 
 ### דוגמה 1: לפני ואחרי - חישוב Stop Price
 
-#### לפני:
+#### לפני
 
 ```javascript
 // In trades.js or ui-utils.js
@@ -235,7 +243,7 @@ function calculateStopPrice(currentPrice, stopPercentage, side = 'Long') {
 const stopPrice = calculateStopPrice(100, 5, 'Long');
 ```
 
-#### אחרי:
+#### אחרי
 
 ```javascript
 // In trades.js
@@ -256,7 +264,7 @@ try {
 
 ### דוגמה 2: לפני ואחרי - ולידציה של Trade
 
-#### לפני:
+#### לפני
 
 ```javascript
 // In trades.js
@@ -296,7 +304,7 @@ if (!validationResult.is_valid) {
 }
 ```
 
-#### אחרי:
+#### אחרי
 
 ```javascript
 // In trades.js
@@ -315,7 +323,7 @@ if (!validationResult.is_valid) {
 
 ### דוגמה 3: לפני ואחרי - חישוב Investment
 
-#### לפני:
+#### לפני
 
 ```javascript
 // In trades.js or investment-calculation-service.js
@@ -335,7 +343,7 @@ function calculateInvestment(price, quantity, amount) {
 const investment = calculateInvestment(100, 10, null); // Returns 1000
 ```
 
-#### אחרי:
+#### אחרי
 
 ```javascript
 // In trades.js
@@ -354,7 +362,7 @@ const investment = result.amount;
 
 ### דוגמה 4: לפני ואחרי - ולידציה ב-Form Submit
 
-#### לפני:
+#### לפני
 
 ```javascript
 // In trades.js
@@ -383,7 +391,7 @@ async function saveTrade(tradeData) {
 }
 ```
 
-#### אחרי:
+#### אחרי
 
 ```javascript
 // In trades.js
@@ -416,6 +424,7 @@ async function saveTrade(tradeData) {
 **תפקיד:** טעינת מערכות ליבה
 
 **Business Logic Integration:**
+
 - Cache System נטען כאן - נדרש ל-Business Logic API
 - אין צורך בפעולה - Cache System נטען אוטומטית
 
@@ -424,6 +433,7 @@ async function saveTrade(tradeData) {
 **תפקיד:** טעינת מערכות UI
 
 **Business Logic Integration:**
+
 - ✅ לא נדרש - Business Logic לא תלוי ב-UI Systems
 
 #### Stage 3: Page Systems
@@ -431,6 +441,7 @@ async function saveTrade(tradeData) {
 **תפקיד:** טעינת מערכות עמוד ספציפיות
 
 **Business Logic Integration:**
+
 - Data Services נטענים כאן - Business Logic API wrappers זמינים
 - Custom Initializers רצים כאן - יכולים להשתמש ב-Business Logic API
 
@@ -482,6 +493,7 @@ trades: {
 **תפקיד:** ולידציות
 
 **Business Logic Integration:**
+
 - Business Logic API משמש לולידציות מורכבות
 - Form validations יכולים להשתמש ב-Business Logic API
 
@@ -517,6 +529,7 @@ async function validateTradeForm(form) {
 **תפקיד:** סיום איתחול
 
 **Business Logic Integration:**
+
 - Business Logic API משמש לחישובים סופיים
 - Cache invalidation אחרי mutations
 
@@ -628,11 +641,13 @@ if (result.status === 'success' && window.CacheSyncManager?.invalidateByAction) 
 ### 1. תמיד השתמש ב-Wrappers
 
 ✅ **נכון:**
+
 ```javascript
 const result = await window.TradesData.calculateStopPrice(100, 5, 'Long');
 ```
 
 ❌ **לא נכון:**
+
 ```javascript
 const response = await fetch('/api/business/trade/calculate-stop-price', {...});
 ```
@@ -640,6 +655,7 @@ const response = await fetch('/api/business/trade/calculate-stop-price', {...});
 ### 2. בדוק זמינות Data Services
 
 ✅ **נכון:**
+
 ```javascript
 if (window.TradesData?.validateTrade) {
   const result = await window.TradesData.validateTrade(data);
@@ -647,6 +663,7 @@ if (window.TradesData?.validateTrade) {
 ```
 
 ❌ **לא נכון:**
+
 ```javascript
 const result = await window.TradesData.validateTrade(data); // May fail if not loaded
 ```
@@ -654,6 +671,7 @@ const result = await window.TradesData.validateTrade(data); // May fail if not l
 ### 3. השתמש ב-CacheTTLGuard
 
 ✅ **נכון:**
+
 ```javascript
 return await window.CacheTTLGuard.ensure(cacheKey, async () => {
   // API call
@@ -661,6 +679,7 @@ return await window.CacheTTLGuard.ensure(cacheKey, async () => {
 ```
 
 ❌ **לא נכון:**
+
 ```javascript
 const response = await fetch('/api/business/...'); // No caching
 ```
@@ -668,6 +687,7 @@ const response = await fetch('/api/business/...'); // No caching
 ### 4. Invalidate Cache אחרי Mutations
 
 ✅ **נכון:**
+
 ```javascript
 if (result.status === 'success' && window.CacheSyncManager?.invalidateByAction) {
   await window.CacheSyncManager.invalidateByAction('trade-created');
@@ -675,6 +695,7 @@ if (result.status === 'success' && window.CacheSyncManager?.invalidateByAction) 
 ```
 
 ❌ **לא נכון:**
+
 ```javascript
 // No cache invalidation - stale data
 ```
@@ -682,6 +703,7 @@ if (result.status === 'success' && window.CacheSyncManager?.invalidateByAction) 
 ### 5. טיפול בשגיאות
 
 ✅ **נכון:**
+
 ```javascript
 try {
   const result = await window.TradesData.validateTrade(data);
@@ -696,6 +718,7 @@ try {
 ```
 
 ❌ **לא נכון:**
+
 ```javascript
 const result = await window.TradesData.validateTrade(data); // No error handling
 ```
@@ -707,6 +730,7 @@ const result = await window.TradesData.validateTrade(data); // No error handling
 ### 1. שכחת Cache Invalidation
 
 **בעיה:**
+
 ```javascript
 // After creating trade, cache is not invalidated
 await window.TradesData.saveTrade(tradeData);
@@ -714,6 +738,7 @@ await window.TradesData.saveTrade(tradeData);
 ```
 
 **פתרון:**
+
 ```javascript
 const result = await window.TradesData.saveTrade(tradeData);
 if (result.status === 'success' && window.CacheSyncManager?.invalidateByAction) {
@@ -724,6 +749,7 @@ if (result.status === 'success' && window.CacheSyncManager?.invalidateByAction) 
 ### 2. שימוש בקוד ישן במקום Wrapper
 
 **בעיה:**
+
 ```javascript
 // Using old local calculation instead of Business Logic API
 function calculateStopPrice(price, percentage) {
@@ -732,6 +758,7 @@ function calculateStopPrice(price, percentage) {
 ```
 
 **פתרון:**
+
 ```javascript
 // Use Business Logic API wrapper
 const stopPrice = await window.TradesData.calculateStopPrice(price, percentage, 'Long');
@@ -740,6 +767,7 @@ const stopPrice = await window.TradesData.calculateStopPrice(price, percentage, 
 ### 3. אי-שימוש ב-Custom Initializers
 
 **בעיה:**
+
 ```javascript
 // Calling Business Logic API before Data Services are loaded
 window.addEventListener('DOMContentLoaded', async () => {
@@ -748,6 +776,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 ```
 
 **פתרון:**
+
 ```javascript
 // Use Custom Initializer in page-initialization-configs.js
 customInitializers: [
@@ -761,12 +790,14 @@ customInitializers: [
 ### 4. אי-בדיקת זמינות Systems
 
 **בעיה:**
+
 ```javascript
 // Not checking if Cache System is available
 const result = await window.CacheTTLGuard.ensure(...); // May fail
 ```
 
 **פתרון:**
+
 ```javascript
 if (window.CacheTTLGuard?.ensure) {
   return await window.CacheTTLGuard.ensure(cacheKey, async () => {
@@ -781,12 +812,14 @@ const response = await fetch('/api/business/...');
 ### 5. אי-שימוש ב-CacheKeyHelper
 
 **בעיה:**
+
 ```javascript
 // Inconsistent cache keys
 const cacheKey = `business:validate-trade:${JSON.stringify(tradeData)}`;
 ```
 
 **פתרון:**
+
 ```javascript
 // Use CacheKeyHelper for consistent keys
 const cacheKey = window.CacheKeyHelper?.generateCacheKeyFromObject 
@@ -798,13 +831,15 @@ const cacheKey = window.CacheKeyHelper?.generateCacheKeyFromObject
 
 ## 📋 Checklist למיגרציה
 
-### לפני התחלה:
+### לפני התחלה
+
 - [ ] זיהוי כל הקוד שצריך migration
 - [ ] בדיקה אם Business Service קיים
 - [ ] בדיקה אם API Endpoint קיים
 - [ ] בדיקה אם Frontend Wrapper קיים
 
-### במהלך המיגרציה:
+### במהלך המיגרציה
+
 - [ ] יצירת/שימוש ב-Business Service (אם חסר)
 - [ ] יצירת/שימוש ב-API Endpoint (אם חסר)
 - [ ] יצירת/שימוש ב-Frontend Wrapper (אם חסר)
@@ -814,7 +849,8 @@ const cacheKey = window.CacheKeyHelper?.generateCacheKeyFromObject
 - [ ] בדיקת מטמון - וידוא ש-cache עובד
 - [ ] בדיקת cache invalidation - וידוא ש-invalidation עובד
 
-### אחרי המיגרציה:
+### אחרי המיגרציה
+
 - [ ] בדיקות End-to-End
 - [ ] בדיקת ביצועים
 - [ ] תיעוד - עדכון תיעוד אם נדרש

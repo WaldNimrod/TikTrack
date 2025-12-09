@@ -27,6 +27,7 @@
 1. פתח את `ticker-dashboard.html` בדפדפן
 2. פתח את הקונסולה (F12)
 3. טען את המניפסטים:
+
    ```javascript
    // טען את package-manifest.js
    const script1 = document.createElement('script');

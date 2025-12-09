@@ -718,6 +718,11 @@ class UnifiedCacheManager {
             throw new Error('UnifiedCacheManager not initialized');
         }
 
+        // Add user_id to cache key for multi-user support (unless explicitly disabled)
+        if (options.includeUserId !== false) {
+            key = this.buildUserCacheKey(key, options.userId);
+        }
+
         try {
             let removed = false;
             

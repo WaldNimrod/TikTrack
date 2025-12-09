@@ -1,10 +1,13 @@
 # רשימת מערכות כלליות - TikTrack
+
 ## General Systems List
 
 ### 📋 מטרת הקובץ
+
 מסמך זה מרכז את המערכות הכלליות שזמינות בכל הפרויקט, יחד עם מיקומי הקבצים והדוקומנטציה הרלוונטית. לפני כתיבת קוד מקומי חובה לבדוק אם קיימת מערכת כללית התומכת בצורך.
 
 ### 🟢 חבילת בסיס (Core Systems)
+
 | מערכת | קובץ(ים) עיקריים | דוקומנטציה | הערות |
 | --- | --- | --- | --- |
 | מערכת אתחול מאוחדת | `trading-ui/scripts/unified-app-initializer.js`<br>`trading-ui/scripts/page-initialization-configs.js` | [UNIFIED_INITIALIZATION_SYSTEM.md](../02-ARCHITECTURE/FRONTEND/UNIFIED_INITIALIZATION_SYSTEM.md) | אתחול בן 5 שלבים, טוען מודולים ומגדיר תצורת עמוד |
@@ -20,6 +23,7 @@
 | Event Handler Manager | `trading-ui/scripts/event-handler-manager.js` | [EVENT_HANDLER_SYSTEM.md](../02-ARCHITECTURE/FRONTEND/EVENT_HANDLER_SYSTEM.md)<br>[EVENT_HANDLER_DEBUGGING_GUIDE.md](../03-DEVELOPMENT/GUIDES/EVENT_HANDLER_DEBUGGING_GUIDE.md) | Delegation גלובלי, מניעת כפילויות, ניטור האזנות, כלי debugging מתקדמים (v2.0.0), ניטור ביצועים, event tracking, error reporting |
 
 ### 🔵 מערכות CRUD ונתונים
+
 | מערכת | קובץ(ים) עיקריים | דוקומנטציה | הערות |
 | --- | --- | --- | --- |
 | **שירותי נתונים ייעודיים** | `trading-ui/scripts/services/*-data.js` | [DATA_SERVICES_DEVELOPER_GUIDE.md](../03-DEVELOPMENT/GUIDES/DATA_SERVICES_DEVELOPER_GUIDE.md)<br>[DATA_SERVICES_ARCHITECTURE.md](../02-ARCHITECTURE/FRONTEND/DATA_SERVICES_ARCHITECTURE.md) | שירותי נתונים מאוחדים לכל ישות: trades-data.js, executions-data.js, cash-flows-data.js, notes-data.js, trading-accounts-data.js, data-import-data.js, research-data.js, preferences-data.js, alerts-data.js, tickers-data.js. **כל Data Service מכיל Business Logic API wrappers** - ראה [Business Logic API Wrappers](#business-logic-api-wrappers). **tickers-data.js** משתמש ב-`/api/tickers/my` להחזרת רק טיקרים של המשתמש הפעיל עם שדות מותאמים (`name_custom`, `type_custom`, `user_ticker_status`) ✅ **עודכן! דצמבר 2025** |
@@ -39,6 +43,7 @@
 | Alert Condition Renderer | `trading-ui/scripts/services/alert-condition-renderer.js` | [ALERT_CONDITION_SYSTEM.md](../02-ARCHITECTURE/FRONTEND/ALERT_CONDITION_SYSTEM.md) | רינדור תנאי התראות כולל תמיכה בשיטות המסחר |
 
 ### 🎨 מערכות תצוגה ו-UI
+
 | מערכת | קובץ(ים) עיקריים | דוקומנטציה | הערות |
 | --- | --- | --- | --- |
 | Icon System | `trading-ui/scripts/icon-system.js`<br>`trading-ui/scripts/icon-mappings.js` | [ICON_SYSTEM_GUIDE.md](ICON_SYSTEM_GUIDE.md)<br>[ICON_SYSTEM_ARCHITECTURE.md](ICON_SYSTEM_ARCHITECTURE.md) | ניהול מרכזי של איקונים: 17 איקוני ישויות מקוריים + Tabler Icons, אינטגרציה עם Cache ו-Auto-fallback |
@@ -56,6 +61,7 @@
 | Pending Trade Plan Widget | `trading-ui/scripts/pending-trade-plan-widget.js` | [PENDING_TRADE_PLAN_WIDGET_DEVELOPER_GUIDE.md](../03-DEVELOPMENT/GUIDES/PENDING_TRADE_PLAN_WIDGET_DEVELOPER_GUIDE.md) | ווידג'ט דשבורד להצעות שיוך/יצירה, כולל Prefill מודלים ועדכון מטמון מאוחד |
 
 ### 🧩 מערכת ווידג'טים
+
 | מערכת | קובץ(ים) עיקריים | דוקומנטציה | הערות |
 | --- | --- | --- | --- |
 | **רשימת ווידג'טים** | - | [WIDGETS_LIST.md](WIDGETS_LIST.md) | רשימה מלאה של כל הווידג'טים במערכת (Dashboard, Special, TradingView) ✅ **חדש! ינואר 2025** |
@@ -72,23 +78,57 @@
 | **TradingView Widgets System** | `trading-ui/scripts/tradingview-widgets/` | [TRADINGVIEW_WIDGETS_SYSTEM.md](../02-ARCHITECTURE/FRONTEND/TRADINGVIEW_WIDGETS_SYSTEM.md) | מערכת מרכזית לניהול 11 ווידג'טים רשמיים של TradingView |
 
 ### 🔔 התראות, לוגים ומעקב
+
 | מערכת | קובץ(ים) עיקריים | דוקומנטציה | הערות |
 | --- | --- | --- | --- |
 | Logger Service | `trading-ui/scripts/logger-service.js` | [UNIFIED_LOG_SYSTEM_GUIDE.md](../02-ARCHITECTURE/FRONTEND/UNIFIED_LOG_SYSTEM_GUIDE.md)<br>[logger-service.md](../03-API_REFERENCE/logger-service.md) | מערכת לוגים מאוחדת (info/warn/error/debug) + דוחות מפורטים |
 | Warning System | `trading-ui/scripts/warning-system.js` | [NOTIFICATION_SYSTEM.md](../02-ARCHITECTURE/FRONTEND/NOTIFICATION_SYSTEM.md) | תצוגת אזהרות/אישורים, החלפה ל-confirm גלובלי |
 | Notification Category Detector | `trading-ui/scripts/notification-category-detector.js` | [NOTIFICATION_CATEGORY_DETECTOR_SYSTEM.md](../02-ARCHITECTURE/FRONTEND/NOTIFICATION_CATEGORY_DETECTOR_SYSTEM.md) | זיהוי קטגוריות והתאמת מסרים לפי Severity |
 
+### 🛠️ כלי דיבוגינג וניטור
+
+| מערכת | קובץ(ים) עיקריים | דוקומנטציה | הערות |
+| --- | --- | --- | --- |
+| Debugger for Firefox | `.vscode/launch.json`<br>`scripts/debug/launch-firefox.sh` | [BROWSER_DEBUGGING_STANDARDS.md](../03-DEVELOPMENT/GUIDELINES/BROWSER_DEBUGGING_STANDARDS.md)<br>[DEBUGGING_STANDARDS.md](../03-DEVELOPMENT/GUIDELINES/DEBUGGING_STANDARDS.md)<br>[QA_AND_DEBUGGING_GUIDE.md](../03-DEVELOPMENT/TOOLS/QA_AND_DEBUGGING_GUIDE.md) | דיבוגינג ישיר ב-Firefox מתוך IDE - breakpoints, step through, watch expressions, source maps ✅ **חדש! ינואר 2025** |
+| VS Code Python Debugger | `.vscode/launch.json` | [DEBUGGING_STANDARDS.md](../03-DEVELOPMENT/GUIDELINES/DEBUGGING_STANDARDS.md)<br>[QA_AND_DEBUGGING_GUIDE.md](../03-DEVELOPMENT/TOOLS/QA_AND_DEBUGGING_GUIDE.md) | דיבוגינג Python/Flask ישירות מה-IDE ✅ **חדש! ינואר 2025** |
+| System Debug Helper | `trading-ui/scripts/system-debug-helper.js` | [CODE_QUALITY_SYSTEMS_GUIDE.md](../03-DEVELOPMENT/TOOLS/CODE_QUALITY_SYSTEMS_GUIDE.md) | בדיקה מקיפה של המערכת - מטמון, עמודים, שגיאות, ביצועים |
+| EventHandlerManager Debug API | `trading-ui/scripts/event-handler-manager.js` | [EVENT_HANDLER_DEBUGGING_GUIDE.md](../03-DEVELOPMENT/GUIDES/EVENT_HANDLER_DEBUGGING_GUIDE.md) | API דיבוגינג למערכת Event Handler - ניטור אירועים, היסטוריה, שגיאות |
+
+### 📊 כלי ניטור
+
+| מערכת | קובץ(ים) עיקריים | דוקומנטציה | הערות |
+| --- | --- | --- | --- |
+| Health Service | `Backend/services/health_service.py` | [MONITORING_STANDARDS.md](../03-DEVELOPMENT/GUIDELINES/MONITORING_STANDARDS.md)<br>[SERVER_MANAGEMENT_GUIDE.md](../server/SERVER_MANAGEMENT_GUIDE.md) | ניטור בריאות מערכת - Database, Cache, System, API Health |
+| Metrics Collector | `Backend/services/metrics_collector.py` | [MONITORING_STANDARDS.md](../03-DEVELOPMENT/GUIDELINES/MONITORING_STANDARDS.md) | איסוף מדדי ביצועים - Performance, Database, Business, Cache Metrics |
+
+### 🔍 כלי מניעת כפילויות
+
+| מערכת | קובץ(ים) עיקריים | דוקומנטציה | הערות |
+| --- | --- | --- | --- |
+| jscpd | `package.json` (script) | [DUPLICATE_PREVENTION_STANDARDS.md](../03-DEVELOPMENT/GUIDELINES/DUPLICATE_PREVENTION_STANDARDS.md) | Copy/paste detector - זיהוי כפילויות אוטומטי ✅ **חדש! ינואר 2025** |
+| js-duplicate-analyzer.py | `documentation/tools/analysis/js-duplicate-analyzer.py` | [DUPLICATE_PREVENTION_STANDARDS.md](../03-DEVELOPMENT/GUIDELINES/DUPLICATE_PREVENTION_STANDARDS.md) | מנתח כפילויות JavaScript - פונקציות, משתנים, event listeners |
+| advanced-duplicate-detector.js | `scripts/monitors/advanced-duplicate-detector.js` | [DUPLICATE_PREVENTION_STANDARDS.md](../03-DEVELOPMENT/GUIDELINES/DUPLICATE_PREVENTION_STANDARDS.md) | זיהוי כפילויות מתקדם - דוחות מפורטים |
+
+### 🔒 כלי מניעת תהליכים מקבילים
+
+| מערכת | קובץ(ים) עיקריים | דוקומנטציה | הערות |
+| --- | --- | --- | --- |
+| Server Lock Manager | `Backend/utils/server_lock_manager.py` | [PARALLEL_PROCESS_PREVENTION_STANDARDS.md](../03-DEVELOPMENT/GUIDELINES/PARALLEL_PROCESS_PREVENTION_STANDARDS.md)<br>[SERVER_MANAGEMENT_GUIDE.md](../server/SERVER_MANAGEMENT_GUIDE.md) | ניהול תהליכי שרת - מניעת תהליכים מקבילים, lock mechanisms |
+
 ### 📧 מערכות תקשורת
+
 | מערכת | קובץ(ים) עיקריים | דוקומנטציה | הערות |
 | --- | --- | --- | --- |
 | SMTP Service | `Backend/services/email_service.py`<br>`Backend/services/email_templates.py`<br>`Backend/services/smtp_settings_service.py`<br>`trading-ui/scripts/user-profile-smtp.js` | [SMTP_SERVICE_GUIDE.md](../backend/SMTP_SERVICE_GUIDE.md)<br>[EMAIL_TEMPLATES_GUIDE.md](../backend/EMAIL_TEMPLATES_GUIDE.md)<br>[SMTP_MANAGEMENT_GUIDE.md](../admin/SMTP_MANAGEMENT_GUIDE.md)<br>[SMTP_USER_GUIDE.md](../05-USER-GUIDES/SMTP_USER_GUIDE.md) | שירות SMTP גמיש לשליחת מגוון הודעות עם תמיכה ב-templates, הגדרות במערכת הכלליות, ולוגים. תמיכה מלאה ב-RTL ועברית עם header ו-footer קבועים ✅ **חדש! ינואר 2025** |
 
 ### 🤖 מערכות AI וניתוח
+
 | מערכת | קובץ(ים) עיקריים | דוקומנטציה | הערות |
 | --- | --- | --- | --- |
 | AI Analysis System | `trading-ui/scripts/services/ai-analysis-data.js`<br>`trading-ui/scripts/ai-analysis-manager.js`<br>`trading-ui/scripts/ai-result-renderer.js`<br>`trading-ui/scripts/ai-template-selector.js`<br>`trading-ui/scripts/ai-notes-integration.js`<br>`trading-ui/scripts/ai-export-service.js`<br>`Backend/services/ai_analysis_service.py`<br>`Backend/services/llm_providers/*.py` | [AI_ANALYSIS_SYSTEM_DEVELOPER_GUIDE.md](../04-FEATURES/AI_ANALYSIS_SYSTEM_DEVELOPER_GUIDE.md)<br>[AI_ANALYSIS_SYSTEM_USER_GUIDE.md](../04-FEATURES/AI_ANALYSIS_SYSTEM_USER_GUIDE.md)<br>[AI_ANALYSIS_API.md](../backend/AI_ANALYSIS_API.md) | מערכת ניתוח AI למניות עם תמיכה ב-4 תבניות פרומפטים, אינטגרציה עם מנועי LLM (Gemini/Perplexity), ניהול API keys אישיים, שמירה כהערה, וייצוא תוצאות ✅ **חדש! ינואר 2025** |
 
 ### ♻️ מטמון, ביצועים וסנכרון
+
 | מערכת | קובץ(ים) עיקריים | דוקומנטציה | הערות |
 | --- | --- | --- | --- |
 | Cache Stage B-Lite (תצורה זמנית) | `trading-ui/scripts/unified-cache-manager.js`<br>`trading-ui/scripts/cache-clear-menu.js`<br>`trading-ui/scripts/cache-ttl-guard.js` | [CACHE_STAGE_B_LITE.md](../03-DEVELOPMENT/CACHE_STAGE_B_LITE.md) | שכבות Memory/LocalStorage/IndexedDB פעילות, מטמון שרת כבוי (`CACHE_DISABLED=true`), תפריט ניקוי מטמון אחיד, ניהול מפתחות פרופיל ועטיפת TTL לטעינת נתונים |
@@ -98,12 +138,14 @@
 | LocalStorage Events Sync | `trading-ui/scripts/modules/localstorage-sync.js` | [LOCALSTORAGE_EVENTS_SYSTEM.md](../02-ARCHITECTURE/FRONTEND/LOCALSTORAGE_EVENTS_SYSTEM.md) | האזנה לאירועי שינוי אחסון ושמירת עקביות בין טאבים |
 
 ### 🧰 כלי פיתוח ומעקב איכות
+
 | מערכת | קובץ(ים) עיקריים | דוקומנטציה | הערות |
 | --- | --- | --- | --- |
 | Lint Status Service | `trading-ui/scripts/services/lint-status-service.js` | [LINTER_MONITOR_REBUILD_PLAN.md](../02-ARCHITECTURE/FRONTEND/LINTER_MONITOR_REBUILD_PLAN.md) | שליפת דוחות lint מאוחדים (ESLint/Stylelint/HTMLHint/Prettier) והמרתם למודל תצוגה |
 | Lint Monitor Dashboard | `trading-ui/scripts/linter-realtime-monitor.js` | [LINTER_REALTIME_MONITOR.md](../02-ARCHITECTURE/FRONTEND/LINTER_REALTIME_MONITOR.md) | מוטמע בתוך `code-quality-dashboard.html`: מציג כרטיסי מצב, סטטוס כלי, סוגיות פעילות והיסטוריה |
 
 ### 🗄️ מערכות שהועברו לארכיון (לא בשימוש פעיל)
+
 | מערכת | מיקום ארכיון | הערה |
 | --- | --- | --- |
 | Central Refresh System | `archive/trading-ui/scripts/central-refresh-system.js` | הוחלפה ב-CacheSyncManager החל מינואר 2025 |
@@ -112,6 +154,7 @@
 | Memory Optimizer (גרסה קודמת) | `trading-ui/scripts/memory-optimizer.js.backup` | כלול רק כגיבוי, ההגדרות מוזגו ל-Cache Policy |
 
 ### ✅ סיכום
+
 - **סה״כ מערכות פעילות מתועדות:** 30 (לפי הטבלאות לעיל).
 - **חובת שימוש:** לפני כל פיתוח חדש יש לבדוק התאמה למערכת קיימת ולהשתמש בה דרך ה-API המתועד.
 - **עדכון אחרון:** 28 בינואר 2025 (הוספת AI Analysis System, SMTP Service, עדכון תיעוד שירותי תקשורת).

@@ -1,4 +1,5 @@
 # תוכנית השלמה - מיגרציה ל-data-onclick
+
 ## Data-onclick Migration Completion Plan
 
 **תאריך יצירה:** 27 בינואר 2025  
@@ -13,6 +14,7 @@
 ### ✅ מה הושלם
 
 #### שלב 1: תיעוד ומדריכים ✅
+
 - [x] `EVENT_HANDLING_STANDARD.md` - מסמך מרכזי לסטנדרט
 - [x] עדכון `EVENT_HANDLER_SYSTEM.md` - סטנדרטיזציה
 - [x] עדכון `button-system.md` - אינטגרציה
@@ -20,12 +22,14 @@
 - [x] עדכון `INDEX.md` - אינדקס
 
 #### שלב 2: כלי זיהוי ✅
+
 - [x] `detect-onclick-usage.js` - זיהוי `onclick` בקוד
 - [x] `detect-missing-data-onclick.js` - זיהוי כפתורים דינמיים ללא `data-onclick`
 - [x] `verify-event-integration.js` - בדיקת אינטגרציה
 - [x] `migration-status-report.js` - דוח סטטוס HTML
 
 #### שלב 3: מיגרציה של כותרות סידור ✅
+
 - [x] `trading_accounts.html` - 23 כותרות ✅
 - [x] `trades.html` - 13 כותרות ✅
 - [x] `notes.html` - 4 כותרות ✅
@@ -37,6 +41,7 @@
 - [x] **סה"כ: 84 כותרות** ✅
 
 #### שלב 3.1: תיקון מיפויי טבלאות ✅
+
 - [x] תיקון מיפוי `tickers` - שדות מחירים חיצוניים
 - [x] תיקון מיפוי `notes` - שדה `related_object`
 - [x] תיקון מיפוי `alerts` - שדות מחושבים
@@ -45,6 +50,7 @@
 - [x] עדכון `getColumnValue` - טיפול בשדות מחושבים
 
 #### שלב 3.2: אינטגרציה עם EventHandlerManager ✅
+
 - [x] תיקון `event-handler-manager.js` - מניעת התנגשויות
 - [x] וידוא ש-`data-onclick` מקבל עדיפות
 - [x] תיקון `tables.js` - אינטגרציה עם `UnifiedTableSystem`
@@ -56,18 +62,21 @@
 ### שלב 4: מיגרציה של כפתורי פעולות (Actions Buttons) ✅
 
 #### 4.1 כפתורי פעולות סטטיים ב-HTML ✅
+
 - [x] סריקה של כל קבצי ה-HTML
 - [x] זיהוי כפתורים עם `onclick` (לא כותרות סידור)
 - [x] המרה ל-`data-onclick` - 14 כפתורי פילטר הומרו
 - [x] וידוא אינטגרציה עם `Button System`
 
 #### 4.2 כפתורי פעולות דינמיים ב-JS ✅
+
 - [x] סריקה של כל קבצי ה-JS
 - [x] זיהוי יצירת כפתורים דינמיים
 - [x] המרה ל-`data-onclick` - 8 כפתורים דינמיים הומרו
 - [x] וידוא שימוש ב-`Button System` ליצירת כפתורים
 
 **קבצים שטופלו:**
+
 - ✅ `button-helpers.js` - 8 פונקציות fallback
 - ✅ `button-system-demo-core.js` - 2 כפתורי דמו
 - ✅ `positions-portfolio.js` - כפתור toggle
@@ -76,16 +85,19 @@
 ### שלב 5: מיגרציה של כפתורי מודולים ✅
 
 #### 5.1 כפתורי מודולים סטטיים ✅
+
 - [x] סריקה של כפתורי מודולים ב-HTML
 - [x] המרה ל-`data-onclick`
 - [x] וידוא תאימות עם `ModalManagerV2`
 
 #### 5.2 כפתורי מודולים דינמיים ✅
+
 - [x] סריקה של יצירת כפתורי מודולים ב-JS
 - [x] המרה ל-`data-onclick` - 8 כפתורי מודולים הומרו
 - [x] וידוא שימוש ב-`Button System`
 
 **קבצים שטופלו:**
+
 - ✅ `warning-system.js` - 2 כפתורי מודול אישור
 - ✅ `core-systems.js` - 3 כפתורי מודולים
 - ✅ `entity-details-modal.js` - 3 כפתורי מודול
@@ -93,12 +105,14 @@
 ### שלב 6: בדיקות ואימות ✅
 
 #### 6.1 בדיקות אוטומטיות ✅
+
 - [x] הרצת `detect-onclick-usage.js` - 1292 ממצאים (רובם לא קריטיים)
 - [x] הרצת `detect-missing-data-onclick.js` - 33 ממצאים (2 שצריכים מיגרציה, לא קריטיים)
 - [x] הרצת `verify-event-integration.js` - 5/6 מערכות תקינות (100% עבור עמודי משתמש)
 - [x] יצירת `DATA_ONCLICK_MIGRATION_TEST_REPORT.md` - דוח בדיקות מלא
 
 #### 6.2 בדיקות ידניות ✅
+
 - [x] בדיקת כל עמוד - כל הכפתורים עובדים
 - [x] בדיקת סידור לפי - כל הכותרות עובדות
 - [x] בדיקת כפתורי פעולות - כל התפריטים נפתחים
@@ -108,11 +122,13 @@
 ### שלב 7: תיעוד סופי ✅
 
 #### 7.1 עדכון תיעוד ✅
+
 - [x] `EVENT_HANDLING_STANDARD.md` - עדכון מלא
 - [x] `MIGRATION_TO_DATA_ONCLICK.md` - מדריך מלא
 - [x] `DATA_ONCLICK_MIGRATION_TEST_REPORT.md` - דוח סופי נוצר
 
 #### 7.2 עדכון INDEX ✅
+
 - [x] עדכון `INDEX.md` - קישורים לתיעוד החדש
 
 ---
@@ -120,17 +136,20 @@
 ## 📅 לוח זמנים מפורט
 
 ### שבוע 1: מיגרציה של כפתורי פעולות
+
 - **יום 1-2:** סריקה וזיהוי של כל כפתורי הפעולות
 - **יום 3-4:** המרה של כפתורים סטטיים
 - **יום 5:** המרה של כפתורים דינמיים
 - **סוף שבוע:** בדיקות ראשוניות
 
 ### שבוע 2: מיגרציה של כפתורי מודולים
+
 - **יום 1-2:** סריקה וזיהוי של כפתורי מודולים
 - **יום 3-4:** המרה של כפתורים סטטיים ודינמיים
 - **יום 5:** בדיקות ואימות
 
 ### שבוע 3: בדיקות סופיות ותיעוד
+
 - **יום 1-2:** בדיקות אוטומטיות וידניות
 - **יום 3:** תיקון בעיות שזוהו
 - **יום 4:** תיעוד סופי
@@ -143,6 +162,7 @@
 ### שלב 4: מיגרציה של כפתורי פעולות
 
 #### צעד 4.1: זיהוי כפתורי פעולות
+
 ```bash
 # הרצת כלי הזיהוי
 node scripts/detect-onclick-usage.js > reports/onclick-usage.json
@@ -154,11 +174,13 @@ node scripts/detect-onclick-usage.js > reports/onclick-usage.json
 #### צעד 4.2: המרה של כפתורים סטטיים
 
 **דוגמה - לפני:**
+
 ```html
 <button onclick="editRecord(123)">ערוך</button>
 ```
 
 **דוגמה - אחרי:**
+
 ```html
 <button data-button-type="EDIT" 
         data-onclick="editRecord(123)" 
@@ -169,6 +191,7 @@ node scripts/detect-onclick-usage.js > reports/onclick-usage.json
 #### צעד 4.3: המרה של כפתורים דינמיים
 
 **דוגמה - לפני:**
+
 ```javascript
 const button = document.createElement('button');
 button.onclick = () => editRecord(123);
@@ -176,6 +199,7 @@ button.textContent = 'ערוך';
 ```
 
 **דוגמה - אחרי:**
+
 ```javascript
 const button = document.createElement('button');
 button.setAttribute('data-button-type', 'EDIT');
@@ -192,11 +216,13 @@ const buttonHtml = window.ButtonSystem.createButton({
 ### שלב 5: מיגרציה של כפתורי מודולים
 
 #### צעד 5.1: זיהוי כפתורי מודולים
+
 - כפתורי שמירה/ביטול במודולים
 - כפתורי פעולות בתוך מודולים
 - כפתורי סגירה (X)
 
 #### צעד 5.2: המרה
+
 - וידוא שימוש ב-`data-onclick`
 - וידוא תאימות עם `ModalManagerV2`
 - וידוא שימוש ב-`Button System`
@@ -204,6 +230,7 @@ const buttonHtml = window.ButtonSystem.createButton({
 ### שלב 6: בדיקות ואימות
 
 #### בדיקות אוטומטיות
+
 ```bash
 # 1. בדיקת onclick
 node scripts/detect-onclick-usage.js
@@ -225,6 +252,7 @@ node scripts/migration-status-report.js
 #### בדיקות ידניות - רשימת בדיקות
 
 **עמודים לבדיקה:**
+
 1. ✅ `trading_accounts.html` - סידור לפי ✅
 2. `trades.html` - סידור לפי + כפתורי פעולות
 3. `trade_plans.html` - סידור לפי + כפתורי פעולות
@@ -235,6 +263,7 @@ node scripts/migration-status-report.js
 8. `notes.html` - סידור לפי + כפתורי פעולות
 
 **כפתורים לבדיקה בכל עמוד:**
+
 - [ ] כפתורי סידור לפי - כל הכותרות
 - [ ] תפריט פעולות (⚙️) - פתיחה וסגירה
 - [ ] כפתורי פעולות בתפריט - צפייה, עריכה, מחיקה, וכו'
@@ -247,6 +276,7 @@ node scripts/migration-status-report.js
 ## ✅ קריטריונים להשלמה
 
 ### קריטריונים טכניים
+
 - [ ] 0 כפתורים עם `onclick` רגיל (חוץ מ-legacy מוגדר)
 - [ ] 100% כפתורים עם `data-onclick`
 - [ ] 100% אינטגרציה עם `EventHandlerManager`
@@ -254,6 +284,7 @@ node scripts/migration-status-report.js
 - [ ] 100% תאימות עם `Button System`
 
 ### קריטריונים פונקציונליים
+
 - [ ] כל הכפתורים עובדים
 - [ ] כל כותרות הסידור עובדות
 - [ ] כל תפריטי הפעולות עובדים
@@ -261,6 +292,7 @@ node scripts/migration-status-report.js
 - [ ] אין שגיאות בקונסול
 
 ### קריטריונים תיעודיים
+
 - [ ] כל התיעוד מעודכן
 - [ ] דוח השלמה נוצר
 - [ ] INDEX מעודכן
@@ -272,17 +304,20 @@ node scripts/migration-status-report.js
 ### צעדים ראשונים
 
 1. **הרצת כלי זיהוי:**
+
 ```bash
 cd /Users/nimrod/Documents/TikTrack/TikTrackApp
 node scripts/detect-onclick-usage.js > reports/onclick-usage-$(date +%Y%m%d).json
 ```
 
 2. **ניתוח התוצאות:**
+
 - זיהוי כפתורי פעולות (לא כותרות סידור)
 - זיהוי כפתורי מודולים
 - זיהוי כפתורים דינמיים
 
 3. **התחלת מיגרציה:**
+
 - התחלה מעמוד אחד (מומלץ: `trades.html`)
 - וידוא 100% מיגרציה באותו עמוד
 - המשך לשאר העמודים
@@ -306,11 +341,13 @@ node scripts/detect-onclick-usage.js > reports/onclick-usage-$(date +%Y%m%d).jso
 ## 📝 תיעוד ההתקדמות
 
 ### עדכון TODO
+
 - עדכון TODO list בכל שלב
 - סימון משימות שהושלמו
 - הוספת משימות חדשות לפי הצורך
 
 ### עדכון דוח
+
 - עדכון `migration-status-report.html` אחרי כל שלב
 - תיעוד בעיות שזוהו
 - תיעוד פתרונות
@@ -320,6 +357,7 @@ node scripts/detect-onclick-usage.js > reports/onclick-usage-$(date +%Y%m%d).jso
 ## 🎯 יעד סופי
 
 **100% מיגרציה ל-`data-onclick`** עם:
+
 - ✅ כל הכותרות משתמשות ב-`data-onclick`
 - ✅ כל הכפתורים משתמשים ב-`data-onclick`
 - ✅ כל המודולים משתמשים ב-`data-onclick`
@@ -334,6 +372,7 @@ node scripts/detect-onclick-usage.js > reports/onclick-usage-$(date +%Y%m%d).jso
 ## 🎉 סיכום ההשלמה
 
 ### ✅ הושג
+
 - ✅ **8/8 עמודי משתמש ראשיים** - 100% מיגרציה
 - ✅ **84 כותרות סידור** - 100% מיגרציה
 - ✅ **14 כפתורי פילטר** - 100% מיגרציה
@@ -342,12 +381,14 @@ node scripts/detect-onclick-usage.js > reports/onclick-usage-$(date +%Y%m%d).jso
 - ✅ **כל התיעוד** - מעודכן ומלא
 
 ### 📊 סטטיסטיקות סופיות
+
 - **סה"כ כפתורים שהומרו**: 114 כפתורים
 - **עמודי משתמש ראשיים**: 8/8 (100%)
 - **מערכות מאוחדות**: 5/6 תקינות (100% עבור עמודי משתמש)
 - **תיעוד**: 100% מעודכן
 
-### 🚀 המערכת מוכנה!
+### 🚀 המערכת מוכנה
+
 כל הכפתורים הקריטיים בעמודי המשתמש הראשיים הומרו בהצלחה ל-`data-onclick` ומערכת ניהול האירועים עובדת בצורה מלאה ומאוחדת.
 
 **תאריך עדכון אחרון:** 27 בינואר 2025  

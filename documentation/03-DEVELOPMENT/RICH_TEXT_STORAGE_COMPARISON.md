@@ -1,4 +1,5 @@
 # השוואת אחסון תוכן עשיר - HTML vs JSON Delta
+
 ## Rich Text Storage Format Comparison
 
 **תאריך:** 6 בנובמבר 2025  
@@ -31,6 +32,7 @@
 ### HTML - יתרונות
 
 1. **פשטות תצוגה**
+
    ```javascript
    // תצוגה פשוטה מאוד
    element.innerHTML = note.content;
@@ -176,17 +178,21 @@ function validateDelta(delta) {
 ## 📈 השוואת גודל (דוגמאות)
 
 ### טקסט פשוט
+
 ```
 HTML: "<p>טקסט פשוט</p>" (23 תווים)
 Delta: {"ops":[{"insert":"טקסט פשוט\n"}]} (40 תווים)
 ```
+
 **HTML יותר קומפקטי!**
 
 ### טקסט מעוצב
+
 ```
 HTML: "<p><strong>טקסט</strong> <em>מודגש</em></p>" (47 תווים)
 Delta: {"ops":[{"insert":"טקסט","attributes":{"bold":true}},{"insert":" "},{"insert":"מודגש","attributes":{"italic":true}},{"insert":"\n"}]} (120 תווים)
 ```
+
 **HTML הרבה יותר קומפקטי!**
 
 ### מסקנה: HTML יותר קומפקטי לטקסט קצר-בינוני
@@ -198,6 +204,7 @@ Delta: {"ops":[{"insert":"טקסט","attributes":{"bold":true}},{"insert":" "},{
 ### 🥇 HTML - מומלץ ביותר
 
 **סיבות:**
+
 1. ✅ **פשטות מימוש** - הכי פשוט
 2. ✅ **תאימות אוניברסלית** - לא תלוי Quill
 3. ✅ **גודל קטן יותר** - בפועל קומפקטי יותר
@@ -205,12 +212,14 @@ Delta: {"ops":[{"insert":"טקסט","attributes":{"bold":true}},{"insert":" "},{
 5. ✅ **קל לתחזוקה** - HTML הוא סטנדרטי
 
 **מתי לא להשתמש:**
+
 - אם צריך תכונות מתקדמות מאוד (collaborative editing)
 - אם צריך version control על שינויים
 
 ### 🥈 JSON Delta - חלופה מתקדמת
 
 **מתי להשתמש:**
+
 - אם צריך collaborative editing
 - אם צריך version control
 - אם צריך תכונות מתקדמות מאוד
@@ -220,12 +229,14 @@ Delta: {"ops":[{"insert":"טקסט","attributes":{"bold":true}},{"insert":" "},{
 ## 🎯 המלצה סופית - HTML
 
 **למה HTML?**
+
 1. **פשטות** - הכי פשוט למימוש
 2. **תאימות** - תמיד עובד
 3. **גודל** - יותר קומפקטי בפועל
 4. **תצוגה** - ישירות ב-HTML
 
 **אבל:**
+
 - צריך sanitization (DOMPurify)
 - צריך validation של תגים מורשים
 

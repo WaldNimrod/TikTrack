@@ -740,6 +740,23 @@
     max-width: 300px;
 }
 
+/* Chart toolbar for portfolio-state page - horizontal layout */
+#portfolio-state .chart-toolbar,
+.portfolio-state-page .chart-toolbar,
+.chart-toolbar:not(.chart-toolbar-right):not(.chart-toolbar-left) {
+    position: static;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    gap: var(--spacing-xs);
+    min-width: auto;
+    max-width: none;
+    background: transparent;
+    opacity: 1;
+    box-shadow: none;
+    padding: 0;
+}
+
 .chart-toolbar-right {
     inset-inline-end: 10px;
 }

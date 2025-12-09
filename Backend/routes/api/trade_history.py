@@ -760,6 +760,7 @@ def get_trade_full_analysis(trade_id):
         
         # Get trade data for metadata
         from services.trade_service import TradeService
+        from services.entity_details_service import EntityDetailsService
         trade = TradeService.get_by_id(db, trade_id, user_id=user_id)
         trade_data = None
         if trade:
@@ -773,7 +774,33 @@ def get_trade_full_analysis(trade_id):
                 }
                 trade_dict['ticker_id'] = trade.ticker.id
                 trade_dict['ticker_symbol'] = trade.ticker.symbol
+            # Add linked items using EntityDetailsService
+            try:
+                linked_items = EntityDetailsService.get_linked_items(db, 'trade', trade_id)
+                trade_dict['linked_items'] = linked_items if linked_items else []
+            except Exception as e:
+                logger.warning(f"Failed to load linked items for trade {trade_id}: {str(e)}")
+                trade_dict['linked_items'] = []
             trade_data = trade_dict
+        
+        # Get plan vs execution analysis if trade has dates
+        plan_vs_execution_result = None
+        if trade and trade.created_at:
+            try:
+                # Use trade created_at as start_date and closed_at or current date as end_date
+                start_date = trade.created_at
+                end_date = trade.closed_at if trade.closed_at else datetime.now(timezone.utc)
+                
+                plan_vs_execution_result = service.calculate_plan_vs_execution_analysis(
+                    user_id=user_id,
+                    date_range={
+                        'start_date': start_date,
+                        'end_date': end_date
+                    }
+                )
+            except Exception as e:
+                logger.warning(f"Failed to calculate plan vs execution for trade {trade_id}: {str(e)}")
+                plan_vs_execution_result = None
         
         # Combine results
         result = {
@@ -784,6 +811,7 @@ def get_trade_full_analysis(trade_id):
                 'pl_data': chart_result.get('pl_data', [])
             },
             'statistics': statistics_result.get('statistics', {}),
+            'plan_vs_execution': plan_vs_execution_result if plan_vs_execution_result else None,
             'metadata': {
                 'trade_id': trade_id,
                 'trade_data': trade_data,  # Include full trade data in metadata

@@ -302,12 +302,29 @@
      * טיפול בפעולות לאחר עדכון פרופיל
      */
     async handlePostProfileUpdate(updatedUser) {
-      // Update localStorage with updated user (same as auth.js does)
-      try {
-        localStorage.setItem('currentUser', JSON.stringify(updatedUser));
-        window.Logger?.debug('✅ Updated currentUser in localStorage', { page: 'user-profile' });
-      } catch (storageError) {
-        window.Logger?.warn('Failed to update currentUser in localStorage', { error: storageError, page: 'user-profile' });
+      // Update UnifiedCacheManager with updated user (same as auth.js does)
+      if (window.UnifiedCacheManager) {
+        try {
+          await window.UnifiedCacheManager.save('currentUser', updatedUser);
+          window.Logger?.debug('✅ Updated currentUser in UnifiedCacheManager', { page: 'user-profile' });
+        } catch (e) {
+          console.warn('Error saving currentUser to cache:', e);
+          // Fallback to localStorage
+          try {
+            localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+            window.Logger?.debug('✅ Updated currentUser in localStorage (fallback)', { page: 'user-profile' });
+          } catch (storageError) {
+            window.Logger?.warn('Failed to update currentUser in localStorage', { error: storageError, page: 'user-profile' });
+          }
+        }
+      } else {
+        // Fallback to localStorage if UnifiedCacheManager not available
+        try {
+          localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+          window.Logger?.debug('✅ Updated currentUser in localStorage (fallback)', { page: 'user-profile' });
+        } catch (storageError) {
+          window.Logger?.warn('Failed to update currentUser in localStorage', { error: storageError, page: 'user-profile' });
+        }
       }
 
       // Update TikTrackAuth current user if available

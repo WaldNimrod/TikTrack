@@ -1,4 +1,5 @@
 # מדריך סגנונות מאוחד - עמודי מוקאפ
+
 ## Mockups Unified Styles Guide
 
 **תאריך יצירה:** 27 בינואר 2025  
@@ -9,19 +10,22 @@
 
 ## ⚠️ חוקי ITCSS - חובה לפעול לפיהם
 
-### כללי יסוד:
+### כללי יסוד
+
 1. **כל הסגנונות חייבים לעבור דרך ITCSS בלבד**
 2. **ללא inline styles** - אסור להשתמש ב-`style=""` attributes
 3. **ללא סגנונות בתוך HTML** - אסור להשתמש ב-`<style>` tags
 4. **ללא !important** - אסור להשתמש ב-`!important`
 
-### מיקום הסגנונות:
+### מיקום הסגנונות
+
 - **קובץ ראשי:** `trading-ui/styles-new/06-components/_chart-management.css`
 - **קובץ נוסף (אם נדרש):** `trading-ui/styles-new/06-components/_mockups-common.css`
 - **טעינה:** הקבצים נטענים דרך `master.css`
 - **אין צורך להוסיף import** - הקבצים כבר חלק מהמערכת
 
-### שימוש ב-CSS Variables (חובה!):
+### שימוש ב-CSS Variables (חובה!)
+
 - **צבעים:** `--apple-blue`, `--apple-gray-*`, `--color-text-*`, `--apple-green`, `--apple-red`
 - **מרווחים:** `--spacing-xs`, `--spacing-sm`, `--spacing-md`, `--spacing-lg`, `--spacing-xl`
 - **רדיוסים:** `--apple-radius-small`, `--apple-radius-medium`, `--apple-radius-large`
@@ -29,7 +33,8 @@
 - **רקעים:** `--apple-bg-primary`, `--apple-bg-secondary`
 - **מיקום המשתנים:** `trading-ui/styles-new/01-settings/_variables.css`
 
-### RTL Support (חובה!):
+### RTL Support (חובה!)
+
 - שימוש ב-Logical Properties: `margin-inline-start` במקום `margin-left`
 - תמיכה ב-`[dir="rtl"]` selectors
 - שימוש ב-`inset-inline-start` במקום `left`
@@ -38,7 +43,8 @@
 
 ## 📊 סטטיסטיקות
 
-### עמודי מוקאפ:
+### עמודי מוקאפ
+
 1. `trade-history-page.html` - 50 inline styles
 2. `portfolio-state-page.html` - 55 inline styles
 3. `price-history-page.html` - 165 inline styles
@@ -59,9 +65,11 @@
 ## 🎨 רכיבים משותפים - Classes אחידות
 
 ### 1. Navigation Bar (Mockups Navigation)
+
 **מופיע ב:** כל עמודי המוקאפ
 
 **HTML נוכחי:**
+
 ```html
 <div class="mockups-navigation" style="background: #f8f9fa; border-bottom: 2px solid #dee2e6; padding: 15px 0; margin-bottom: 20px;">
     <div class="container-fluid">
@@ -78,6 +86,7 @@
 ```
 
 **CSS Classes (להוספה ל-`_chart-management.css`):**
+
 ```css
 /* ===== Mockups Navigation Bar ===== */
 .mockups-navigation {
@@ -131,6 +140,7 @@
 ```
 
 **HTML מעודכן:**
+
 ```html
 <div class="mockups-navigation">
     <div class="container-fluid">
@@ -154,9 +164,11 @@
 ---
 
 ### 2. Section Headers & Bodies
+
 **מופיע ב:** כל עמודי המוקאפ
 
 **HTML נוכחי:**
+
 ```html
 <div class="content-section" id="section-id">
     <div class="section-header">
@@ -172,6 +184,7 @@
 ```
 
 **CSS Classes (להוספה ל-`_chart-management.css`):**
+
 ```css
 /* ===== Section Headers & Bodies ===== */
 .content-section {
@@ -245,9 +258,11 @@
 ---
 
 ### 3. Compact Statistics Cards
+
 **מופיע ב:** `price-history-page.html`, `portfolio-state-page.html`, `comparative-analysis-page.html`
 
 **HTML נוכחי:**
+
 ```html
 <div class="col-md-3">
     <div class="compact-stat-card">
@@ -259,6 +274,7 @@
 ```
 
 **CSS Classes (להוספה ל-`_chart-management.css`):**
+
 ```css
 /* ===== Compact Statistics Cards ===== */
 .compact-stat-card {
@@ -305,9 +321,11 @@
 ---
 
 ### 4. Chart Control Groups
+
 **מופיע ב:** `price-history-page.html`, `tradingview-test-page.html`
 
 **CSS Classes (כבר מוגדר במסמך הקודם):**
+
 - `.chart-control-group`
 - `.chart-control-label`
 - `.chart-control-buttons`
@@ -320,9 +338,11 @@
 ---
 
 ### 5. Filter Menus
+
 **מופיע ב:** `portfolio-state-page.html`, `trade-history-page.html`, `comparative-analysis-page.html`
 
 **HTML נוכחי:**
+
 ```html
 <div class="filter-group">
     <button class="filter-toggle">פילטר</button>
@@ -333,6 +353,7 @@
 ```
 
 **CSS Classes (להוספה ל-`_chart-management.css`):**
+
 ```css
 /* ===== Filter Menus ===== */
 .filter-group {
@@ -429,9 +450,11 @@
 ---
 
 ### 6. Timeline Components
+
 **מופיע ב:** `trade-history-page.html`
 
 **CSS Classes (להוספה ל-`_chart-management.css`):**
+
 ```css
 /* ===== Timeline Components ===== */
 .timeline-container {
@@ -528,9 +551,11 @@
 ---
 
 ### 7. Modal Styles
+
 **מופיע ב:** `date-comparison-modal.html`, `journal-entry-modal.html`
 
 **CSS Classes (להוספה ל-`_chart-management.css`):**
+
 ```css
 /* ===== Modal Styles ===== */
 .modal-overlay {
@@ -608,9 +633,11 @@
 ---
 
 ### 8. Widget Styles
+
 **מופיע ב:** `history-widget.html`, `emotional-tracking-widget.html`
 
 **CSS Classes (להוספה ל-`_chart-management.css`):**
+
 ```css
 /* ===== Widget Styles ===== */
 .widget-container {
@@ -652,9 +679,11 @@
 ## 📋 רשימת תיקונים לפי עמוד
 
 ### 1. trade-history-page.html
+
 **Inline styles:** 50 מופעים
 
 **רכיבים שצריך לתקן:**
+
 - ✅ Navigation bar
 - ✅ Section headers/bodies
 - ✅ Timeline components
@@ -662,9 +691,11 @@
 - ✅ Statistics cards
 
 ### 2. portfolio-state-page.html
+
 **Inline styles:** 55 מופעים
 
 **רכיבים שצריך לתקן:**
+
 - ✅ Navigation bar
 - ✅ Section headers/bodies
 - ✅ Filter menus
@@ -673,9 +704,11 @@
 - ✅ Date range filters
 
 ### 3. price-history-page.html
+
 **Inline styles:** 165 מופעים
 
 **רכיבים שצריך לתקן:**
+
 - ✅ Navigation bar
 - ✅ Section headers/bodies
 - ✅ Chart control groups (כל הסוגים)
@@ -684,9 +717,11 @@
 - ✅ Volume charts
 
 ### 4. comparative-analysis-page.html
+
 **Inline styles:** 82 מופעים
 
 **רכיבים שצריך לתקן:**
+
 - ✅ Navigation bar
 - ✅ Section headers/bodies
 - ✅ Statistics cards
@@ -694,68 +729,84 @@
 - ✅ Filter menus
 
 ### 5. trading-journal-page.html
+
 **Inline styles:** 30 מופעים
 
 **רכיבים שצריך לתקן:**
+
 - ✅ Navigation bar
 - ✅ Section headers/bodies
 - ✅ Journal entries
 - ✅ Entry forms
 
 ### 6. strategy-analysis-page.html
+
 **Inline styles:** 15 מופעים
 
 **רכיבים שצריך לתקן:**
+
 - ✅ Navigation bar
 - ✅ Section headers/bodies
 - ✅ Strategy cards
 
 ### 7. economic-calendar-page.html
+
 **Inline styles:** 14 מופעים
 
 **רכיבים שצריך לתקן:**
+
 - ✅ Navigation bar
 - ✅ Section headers/bodies
 - ✅ Calendar grid
 
 ### 8. history-widget.html
+
 **Inline styles:** 16 מופעים
 
 **רכיבים שצריך לתקן:**
+
 - ✅ Widget container
 - ✅ Widget header
 - ✅ Widget content
 
 ### 9. emotional-tracking-widget.html
+
 **Inline styles:** 15 מופעים
 
 **רכיבים שצריך לתקן:**
+
 - ✅ Widget container
 - ✅ Widget header
 - ✅ Emotional tracking form
 
 ### 10. date-comparison-modal.html
+
 **Inline styles:** 22 מופעים
 
 **רכיבים שצריך לתקן:**
+
 - ✅ Modal overlay
 - ✅ Modal container
 - ✅ Modal header/body/footer
 - ✅ Date pickers
 
 ### 11. journal-entry-modal.html
+
 **Inline styles:** 17 מופעים
 
 **רכיבים שצריך לתקן:**
+
 - ✅ Modal overlay
 - ✅ Modal container
 - ✅ Modal header/body/footer
 - ✅ Rich text editor
 
 ### 12. tradingview-test-page.html
+
 **Inline styles:** 6 מופעים
 
 **רכיבים שצריך לתקן:**
+
 - ✅ Navigation bar
 - ✅ Chart container
 
@@ -764,6 +815,7 @@
 ## 📝 תוכנית ביצוע כללית
 
 ### שלב 1: יצירת CSS Classes אחידות
+
 1. **הוספה לקובץ:** `trading-ui/styles-new/06-components/_chart-management.css`
    - או יצירת קובץ חדש: `_mockups-common.css` (אם נדרש)
 2. **שימוש ב-CSS Variables:** כל הצבעים, מרווחים, רדיוסים - דרך variables
@@ -771,12 +823,14 @@
 4. **RTL Support:** שימוש ב-logical properties
 
 ### שלב 2: עדכון כל עמודי המוקאפ
+
 1. **הסרת כל ה-inline styles:** מחיקת כל ה-`style=""` attributes
 2. **הסרת כל ה-`<style>` tags:** העברת כל הסגנונות ל-ITCSS
 3. **הוספת classes:** החלפה ב-classes מ-ITCSS
 4. **וידוא טעינה:** וידוא ש-`master.css` נטען
 
 ### שלב 3: בדיקות
+
 1. בדיקת RTL בכל העמודים
 2. בדיקת נגישות
 3. בדיקת responsive
@@ -789,6 +843,7 @@
 ### דוגמה 1: Navigation Bar
 
 **לפני:**
+
 ```html
 <div class="mockups-navigation" style="background: #f8f9fa; border-bottom: 2px solid #dee2e6; padding: 15px 0; margin-bottom: 20px;">
     <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
@@ -799,6 +854,7 @@
 ```
 
 **אחרי:**
+
 ```html
 <div class="mockups-navigation">
     <div class="container-fluid">
@@ -820,6 +876,7 @@
 ### דוגמה 2: Section Header
 
 **לפני:**
+
 ```html
 <div class="section-header">
     <h2 style="margin: 0; font-size: 1.2rem;">כותרת</h2>
@@ -830,6 +887,7 @@
 ```
 
 **אחרי:**
+
 ```html
 <div class="section-header">
     <h2>כותרת</h2>
@@ -845,21 +903,24 @@
 
 ## ✅ סיכום
 
-### בעיות שזוהו:
+### בעיות שזוהו
+
 - ✅ **493 מופעים** של inline styles ב-12 עמודי מוקאפ
 - ✅ כפילויות רבות של סגנונות
 - ✅ אין classes משותפים
 - ✅ קשה לתחזק
 - ✅ מפר את חוקי ITCSS
 
-### פתרונות מוצעים:
+### פתרונות מוצעים
+
 - ✅ יצירת CSS classes אחידות במערכת ITCSS
 - ✅ שימוש ב-CSS variables בלבד
 - ✅ תמיכה ב-RTL
 - ✅ classes משותפים לכל העמודים
 - ✅ תחזוקה קלה ועקביות
 
-### Classes אחידות שנוצרו:
+### Classes אחידות שנוצרו
+
 1. `.mockups-navigation` - Navigation bar
 2. `.section-header`, `.section-body` - Sections
 3. `.compact-stat-card` - Statistics cards

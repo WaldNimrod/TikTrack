@@ -21,6 +21,7 @@
 כל ה-endpoints דורשים authentication. המשתמש מזוהה דרך session או token.
 
 **Headers:**
+
 ```
 Authorization: Bearer <token>
 ```
@@ -36,6 +37,7 @@ Authorization: Bearer <token>
 יצירת ניתוח חדש באמצעות LLM.
 
 **Request Body (Legacy v1.0):**
+
 ```json
 {
   "template_id": 1,
@@ -49,6 +51,7 @@ Authorization: Bearer <token>
 ```
 
 **Request Body (v2.0 - Recommended):**
+
 ```json
 {
   "template_id": 3,
@@ -73,11 +76,13 @@ Authorization: Bearer <token>
 ```
 
 **הערות:**
+
 - גרסה 2.0 מפרידה בין `prompt_variables` (נשלחים ל-LLM) ו-`filters` (לשימוש פנימי בלבד)
 - `trading_account_id` נשמר ב-`filters` ולא נשלח למנוע AI
 - `trade_selection` מגדיר אילו טריידים לנתח
 
 **Response (Success):**
+
 ```json
 {
   "status": "success",
@@ -92,11 +97,13 @@ Authorization: Bearer <token>
 ```
 
 **הערות חשובות:**
+
 - `response_text` ו-`response_json` **נשמרים במסד הנתונים** (לא רק במטמון של הפרונטאנד)
 - התוצאות זמינות גם ב-API response הראשוני וגם במסד הנתונים
 - ניתוחים חוזרים יכולים לגשת לתוצאות מהמסד הנתונים
 
 **Response (Error):**
+
 ```json
 {
   "status": "error",
@@ -106,6 +113,7 @@ Authorization: Bearer <token>
 ```
 
 **Status Codes:**
+
 - `200` - Success
 - `400` - Bad Request (validation error)
 - `401` - Unauthorized
@@ -118,6 +126,7 @@ Authorization: Bearer <token>
 קבלת רשימת כל התבניות הפעילות.
 
 **Response:**
+
 ```json
 {
   "status": "success",
@@ -176,11 +185,13 @@ Authorization: Bearer <token>
 ```
 
 **הערות:**
+
 - כל התבניות תורגמו לעברית
 - שדות עם `integration` נטענים אוטומטית מהמערכת (tickers, reasons, trading_accounts, trading_methods)
 - שדות `date_range` משתמשים ב-`type: "date-range"` עם DateRangePickerService
 
 **Status Codes:**
+
 - `200` - Success
 - `401` - Unauthorized
 - `500` - Server Error
@@ -192,6 +203,7 @@ Authorization: Bearer <token>
 קבלת היסטוריית ניתוחים של המשתמש.
 
 **Query Parameters:**
+
 - `user_id` (required) - User ID
 - `limit` (optional, default: 50) - מספר תוצאות
 - `offset` (optional, default: 0) - offset לפאג'ינציה
@@ -200,6 +212,7 @@ Authorization: Bearer <token>
 - `status` (optional) - סינון לפי סטטוס ('pending' | 'completed' | 'failed')
 
 **Response:**
+
 ```json
 {
   "status": "success",
@@ -222,6 +235,7 @@ Authorization: Bearer <token>
 ```
 
 **Status Codes:**
+
 - `200` - Success
 - `400` - Bad Request (invalid parameters)
 - `401` - Unauthorized
@@ -234,6 +248,7 @@ Authorization: Bearer <token>
 קבלת פרטי ניתוח ספציפי.
 
 **Response:**
+
 ```json
 {
   "status": "success",
@@ -257,6 +272,7 @@ Authorization: Bearer <token>
 ```
 
 **Status Codes:**
+
 - `200` - Success
 - `404` - Not Found
 - `401` - Unauthorized
@@ -270,6 +286,7 @@ Authorization: Bearer <token>
 מחיקת ניתוח ספציפי לפי ID.
 
 **Response (Success):**
+
 ```json
 {
   "status": "success",
@@ -281,6 +298,7 @@ Authorization: Bearer <token>
 ```
 
 **Response (Error):**
+
 ```json
 {
   "status": "error",
@@ -289,12 +307,14 @@ Authorization: Bearer <token>
 ```
 
 **Status Codes:**
+
 - `200` - Success
 - `404` - Not Found or Not Authorized
 - `401` - Unauthorized
 - `500` - Server Error
 
 **הערות:**
+
 - רק המשתמש שיצר את הניתוח יכול למחוק אותו
 - המחיקה היא סופית ולא ניתנת לביטול
 - המטמון של הניתוח ינוקה אוטומטית
@@ -306,6 +326,7 @@ Authorization: Bearer <token>
 עדכון הגדרות LLM Provider (API keys).
 
 **Request Body:**
+
 ```json
 {
   "provider": "gemini",
@@ -314,6 +335,7 @@ Authorization: Bearer <token>
 ```
 
 **Response:**
+
 ```json
 {
   "status": "success",
@@ -326,6 +348,7 @@ Authorization: Bearer <token>
 ```
 
 **Status Codes:**
+
 - `200` - Success
 - `400` - Bad Request (invalid API key)
 - `401` - Unauthorized
@@ -338,6 +361,7 @@ Authorization: Bearer <token>
 קבלת הגדרות LLM Provider נוכחיות.
 
 **Response:**
+
 ```json
 {
   "status": "success",
@@ -351,6 +375,7 @@ Authorization: Bearer <token>
 ```
 
 **Status Codes:**
+
 - `200` - Success
 - `401` - Unauthorized
 - `500` - Server Error
@@ -404,6 +429,7 @@ Authorization: Bearer <token>
 ```
 
 **הסבר:**
+
 - **`prompt_variables`** - משתנים שנשלחים למנוע AI (משמשים להחלפה ב-prompt)
 - **`filters`** - פילטרים לשימוש פנימי בלבד (לא נשלחים ל-LLM, למשל `trading_account_id`)
 - **`trade_selection`** - הגדרת בחירת טריידים לניתוח (`all`, `single`, `multiple`, `filtered`)
@@ -422,6 +448,7 @@ Authorization: Bearer <token>
 ### Integration Types
 
 שדות עם `integration` נטענים אוטומטית:
+
 - `"tickers"` - רשימת טיקרים מהמערכת
 - `"reasons"` - רשימת סיבות השקעה
 - `"trading_accounts"` - רשימת חשבונות מסחר
@@ -482,6 +509,7 @@ Authorization: Bearer <token>
 - **Global:** 1000 בקשות לשעה
 
 **Headers:**
+
 ```
 X-RateLimit-Limit: 10
 X-RateLimit-Remaining: 5
@@ -497,6 +525,7 @@ X-RateLimit-Reset: 1640995200
 ### מטרת המבנה החדש
 
 גרסה 2.0 מאפשרת:
+
 1. **הפרדה ברורה** בין מה שנשלח ל-LLM ומה שמיועד לשימוש פנימי
 2. **גמישות** בבחירת טריידים לניתוח
 3. **שמירת פרמטרים מדויקים** למעקב וניתוח עתידי
@@ -565,6 +594,7 @@ X-RateLimit-Reset: 1640995200
 ```
 
 **הערות חשובות:**
+
 - `condition_focus` הוא `type: "select"` עם `integration: "trading_methods"` (ID של שיטת מסחר)
 - `date_range` משתמש ב-`type: "date-range"` (DateRangePickerService)
 - כל השדות מתורגמים לעברית בממשק המשתמש
@@ -604,6 +634,7 @@ formatted_data = TradeAggregationService.format_trades_for_ai(result)
 שדות `date_range` עם `type: "date-range"` משתמשים ב-`DateRangePickerService` - מערכת כללית לבחירת טווחי תאריכים.
 
 **תכונות:**
+
 - Preset options (היום, השבוע, החודש, השנה, כל זמן)
 - Custom date selection עם HTML5 date picker
 - אוטומטית מתרגם preset strings לתאריכים בפועל

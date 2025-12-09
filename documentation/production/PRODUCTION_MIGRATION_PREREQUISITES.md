@@ -1,5 +1,7 @@
 # Production Migration Prerequisites
+
 # ===================================
+
 # דרישות מוקדמות למיגרציה של הפרודקשן
 
 **תאריך:** נובמבר 2025  
@@ -18,16 +20,19 @@
 ### **1. Docker Container רץ**
 
 **בדיקה:**
+
 ```bash
 docker ps | grep tiktrack-postgres-dev
 ```
 
 **אם לא רץ:**
+
 ```bash
 docker-compose -f docker/docker-compose.dev.yml up -d postgres-dev
 ```
 
 **למה זה חשוב:**
+
 - הפרודקשן משתמש באותו Docker container
 - אם ה-container לא רץ, המיגרציה של הפרודקשן תיכשל
 
@@ -36,16 +41,19 @@ docker-compose -f docker/docker-compose.dev.yml up -d postgres-dev
 ### **2. Development Database קיים ופועל**
 
 **בדיקה:**
+
 ```bash
 docker exec tiktrack-postgres-dev psql -U TikTrakDBAdmin -l | grep TikTrack-db-development
 ```
 
 **בדיקת חיבור:**
+
 ```bash
 docker exec tiktrack-postgres-dev psql -U TikTrakDBAdmin -d TikTrack-db-development -c "SELECT 1;"
 ```
 
 **למה זה חשוב:**
+
 - וידוא שה-PostgreSQL עובד בסביבת הפיתוח
 - אם הפיתוח לא עובד, הפרודקשן לא יעבוד
 
@@ -54,6 +62,7 @@ docker exec tiktrack-postgres-dev psql -U TikTrakDBAdmin -d TikTrack-db-developm
 ### **3. סקריפטי המיגרציה קיימים ומוכנים**
 
 **בדיקה:**
+
 ```bash
 ls -la scripts/db/migrate_production_to_pg.py
 ls -la scripts/db/setup_production_postgresql.sh
@@ -62,12 +71,14 @@ ls -la scripts/db/verify_production_setup.sh
 ```
 
 **בדיקת הרשאות:**
+
 ```bash
 chmod +x scripts/db/*.sh
 chmod +x scripts/db/*.py
 ```
 
 **למה זה חשוב:**
+
 - הסקריפטים צריכים להיות מוכנים להעתקה לפרודקשן
 - ללא הסקריפטים, לא ניתן לבצע מיגרציה
 
@@ -76,11 +87,13 @@ chmod +x scripts/db/*.py
 ### **4. בדיקת syntax של הסקריפטים**
 
 **בדיקת Python:**
+
 ```bash
 python3 -m py_compile scripts/db/migrate_production_to_pg.py
 ```
 
 **בדיקת Bash:**
+
 ```bash
 bash -n scripts/db/setup_production_postgresql.sh
 bash -n scripts/db/backup_postgresql_production.sh
@@ -88,6 +101,7 @@ bash -n scripts/db/verify_production_setup.sh
 ```
 
 **למה זה חשוב:**
+
 - וידוא שהסקריפטים תקינים לפני העתקה
 - חיסכון בזמן בפרודקשן
 
@@ -96,16 +110,19 @@ bash -n scripts/db/verify_production_setup.sh
 ### **5. בדיקת תלויות Python**
 
 **בדיקה:**
+
 ```bash
 python3 -c "import sqlalchemy; import psycopg2; print('✅ All dependencies available')"
 ```
 
 **אם חסר:**
+
 ```bash
 pip install psycopg2-binary sqlalchemy
 ```
 
 **למה זה חשוב:**
+
 - הסקריפטים דורשים `psycopg2` ו-`sqlalchemy`
 - ללא התלויות, המיגרציה תיכשל
 
@@ -114,12 +131,14 @@ pip install psycopg2-binary sqlalchemy
 ### **6. בדיקת גישה ל-Docker**
 
 **בדיקה:**
+
 ```bash
 docker ps
 docker exec tiktrack-postgres-dev psql -U TikTrakDBAdmin -c "SELECT version();"
 ```
 
 **למה זה חשוב:**
+
 - המיגרציה דורשת גישה ל-Docker
 - ללא גישה, לא ניתן ליצור database או לגבות
 
@@ -128,6 +147,7 @@ docker exec tiktrack-postgres-dev psql -U TikTrakDBAdmin -c "SELECT version();"
 ### **7. בדיקת מבנה תיקיות**
 
 **בדיקה:**
+
 ```bash
 # וידוא שתיקיית scripts/db קיימת
 ls -d scripts/db/
@@ -137,6 +157,7 @@ mkdir -p archive/database_backups
 ```
 
 **למה זה חשוב:**
+
 - הסקריפטים מצפים למבנה תיקיות מסוים
 - גיבויים נשמרים ב-`archive/database_backups`
 

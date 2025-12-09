@@ -1,4 +1,5 @@
 # בדיקות ביצועים - TikTrack
+
 ## Performance Tests
 
 ### 📋 **מטרה**
@@ -8,6 +9,7 @@
 ### 🎯 **מדדי ביצועים**
 
 #### 1. **Page Load Time**
+
 ```javascript
 describe('Page Load Performance', () => {
   test('should load index page within 2 seconds', async () => {
@@ -31,6 +33,7 @@ describe('Page Load Performance', () => {
 ```
 
 #### 2. **Memory Usage**
+
 ```javascript
 describe('Memory Usage', () => {
   test('should not exceed 100MB memory usage', async () => {
@@ -49,6 +52,7 @@ describe('Memory Usage', () => {
 ```
 
 #### 3. **Cache Performance**
+
 ```javascript
 describe('Cache Performance', () => {
   test('should cache operations within 100ms', async () => {
@@ -85,6 +89,7 @@ describe('Cache Performance', () => {
 ### 🔧 **הגדרות**
 
 #### **Test Environment**
+
 ```javascript
 // tests/performance/setup.js
 const { test, expect } = require('@playwright/test');
@@ -109,6 +114,7 @@ test.beforeEach(async ({ page }) => {
 ```
 
 #### **Test Data**
+
 ```javascript
 // tests/fixtures/performance-data.json
 {
@@ -134,6 +140,7 @@ test.beforeEach(async ({ page }) => {
 ### 📊 **תרחישי בדיקה**
 
 #### 1. **Large Dataset Performance**
+
 ```javascript
 describe('Large Dataset Performance', () => {
   test('should handle 1000+ trades efficiently', async () => {
@@ -171,6 +178,7 @@ describe('Large Dataset Performance', () => {
 ```
 
 #### 2. **Concurrent User Performance**
+
 ```javascript
 describe('Concurrent User Performance', () => {
   test('should handle multiple concurrent users', async () => {
@@ -194,6 +202,7 @@ describe('Concurrent User Performance', () => {
 ```
 
 #### 3. **Cache Performance Under Load**
+
 ```javascript
 describe('Cache Performance Under Load', () => {
   test('should maintain cache performance under load', async () => {
@@ -239,6 +248,7 @@ npm run test:performance:profile
 ### 🔄 **CI/CD Integration**
 
 הבדיקות רצות אוטומטית ב:
+
 - Pre-commit hooks
 - Pull request validation
 - Deployment pipeline

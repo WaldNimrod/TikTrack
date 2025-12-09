@@ -1,4 +1,5 @@
 # Workflow פשוט - Bundling ללא שכפול
+
 ## Simple Workflow - Bundling Without Duplication
 
 **תאריך יצירה:** 5 בדצמבר 2025  
@@ -37,6 +38,7 @@ trading-ui/
 ## 🔧 Workflow פשוט
 
 ### 1. Development (כרגיל)
+
 ```bash
 # כל הקבצים המקוריים
 trading-ui/scripts/api-config.js
@@ -51,6 +53,7 @@ trading-ui/scripts/notification-system.js
 **לא משתנה כלום!**
 
 ### 2. Build Bundles (כשמוכן)
+
 ```bash
 # Build bundles
 npm run build:bundles
@@ -64,6 +67,7 @@ trading-ui/scripts/bundles/services.bundle.js
 **Bundles לא ב-git** (`.gitignore`)
 
 ### 3. Production (אופציונלי)
+
 ```bash
 # Option A: עם bundles
 USE_BUNDLES=true npm run deploy
@@ -94,6 +98,7 @@ npm run deploy
 ## 🎯 תהליך עבודה יומי
 
 ### Developer (כרגיל)
+
 ```bash
 # 1. עבודה על קוד מקורי
 vim trading-ui/scripts/api-config.js
@@ -109,6 +114,7 @@ git commit -m "Update API config"
 **לא מפריע לפיתוח!**
 
 ### Build Process (במקביל)
+
 ```bash
 # 1. Build bundles (אם צריך)
 npm run build:bundles
@@ -138,14 +144,17 @@ trading-ui/scripts/bundles/
 ## 🎯 סיכום
 
 ### עקרון מרכזי
+
 **Bundles הם build artifacts, לא חלק מהקוד המקורי.**
 
-### מה קורה?
+### מה קורה
+
 1. **Development:** קבצים מקוריים (לא משתנה)
 2. **Build:** יוצר bundles (לא ב-git)
 3. **Production:** משתמש ב-bundles (אופציונלי)
 
 ### תוצאה
+
 - ✅ כל הצוותים עובדים על אותו קוד
 - ✅ Bundles נוצרים רק ב-production
 - ✅ Development לא משתנה

@@ -15,6 +15,155 @@
 let authToken = null;
 let currentUser = null;
 
+// Helper functions for cache operations with consistent key handling
+// CRITICAL: Always use includeUserId: false for auth-related keys to avoid key mismatches
+const authCacheOptions = { includeUserId: false };
+
+async function saveAuthToCache(user, token = 'session_based') {
+  if (!window.UnifiedCacheManager) {
+    window.AuthDebugMonitor?.log('error', '❌ UnifiedCacheManager not available for saveAuthToCache');
+    return false;
+  }
+  
+  window.AuthDebugMonitor?.log('info', '💾 saveAuthToCache called', {
+    userId: user?.id,
+    username: user?.username,
+    tokenType: typeof token
+  });
+  
+  try {
+    await window.UnifiedCacheManager.save('currentUser', user, authCacheOptions);
+    await window.UnifiedCacheManager.save('authToken', token, authCacheOptions);
+    
+    // Verify
+    const verifyUser = await window.UnifiedCacheManager.get('currentUser', authCacheOptions);
+    const verifyToken = await window.UnifiedCacheManager.get('authToken', authCacheOptions);
+    
+    window.AuthDebugMonitor?.log('info', '✅ saveAuthToCache completed', {
+      userSaved: verifyUser !== null,
+      tokenSaved: verifyToken !== null,
+      userId: verifyUser?.id
+    });
+    
+    return true;
+  } catch (error) {
+    window.AuthDebugMonitor?.log('error', '❌ saveAuthToCache failed', {
+      error: error.message,
+      stack: error.stack
+    });
+    return false;
+  }
+}
+
+async function getAuthFromCache() {
+  if (!window.UnifiedCacheManager) {
+    return { user: null, token: null };
+  }
+  
+  try {
+    const user = await window.UnifiedCacheManager.get('currentUser', authCacheOptions);
+    const token = await window.UnifiedCacheManager.get('authToken', authCacheOptions);
+    
+    window.AuthDebugMonitor?.log('info', '🔍 getAuthFromCache', {
+      userFound: user !== null,
+      tokenFound: token !== null,
+      userId: user?.id
+    });
+    
+    return { user, token };
+  } catch (error) {
+    window.AuthDebugMonitor?.log('error', '❌ getAuthFromCache failed', {
+      error: error.message
+    });
+    return { user: null, token: null };
+  }
+}
+
+async function removeAuthFromCache() {
+  if (!window.UnifiedCacheManager) {
+    return false;
+  }
+  
+  window.AuthDebugMonitor?.log('warn', '🗑️ removeAuthFromCache called');
+  
+  try {
+    await window.UnifiedCacheManager.remove('currentUser', authCacheOptions);
+    await window.UnifiedCacheManager.remove('authToken', authCacheOptions);
+    
+    window.AuthDebugMonitor?.log('info', '✅ removeAuthFromCache completed');
+    return true;
+  } catch (error) {
+    window.AuthDebugMonitor?.log('error', '❌ removeAuthFromCache failed', {
+      error: error.message
+    });
+    return false;
+  }
+}
+
+/**
+ * Force logout: clear all auth caches (all layers) and show login modal
+ * Used on 401 / session-expired flows to avoid "phantom auth" states.
+ */
+async function forceLogoutAndPrompt(reason = 'unauthorized') {
+  try {
+    // Stop visibility checks to avoid duplicate fetches
+    if (typeof stopVisibilityCheck === 'function') {
+      stopVisibilityCheck();
+    }
+  } catch (e) {
+    window.Logger?.warn?.('⚠️ [auth.js] Failed to stop visibility check', { error: e?.message });
+  }
+  
+  // Clear in-memory state
+  authToken = null;
+  currentUser = null;
+  
+  // Clear all cache layers if available
+  try {
+    if (window.CacheSyncManager?.clearAll) {
+      await window.CacheSyncManager.clearAll();
+    }
+  } catch (e) {
+    window.Logger?.warn?.('⚠️ [auth.js] CacheSyncManager clearAll failed', { error: e?.message });
+  }
+  
+  try {
+    if (window.UnifiedCacheManager?.clearAll) {
+      await window.UnifiedCacheManager.clearAll({ includeUserId: false });
+    } else {
+      await removeAuthFromCache();
+    }
+  } catch (e) {
+    window.Logger?.warn?.('⚠️ [auth.js] UnifiedCacheManager clearAll failed', { error: e?.message });
+  }
+  
+  // Broadcast logout to other tabs
+  try {
+    const logoutEvent = {
+      type: 'logout',
+      timestamp: new Date().toISOString(),
+      source: 'auth.js',
+      reason
+    };
+    localStorage.setItem('tiktrack_auth_event', JSON.stringify(logoutEvent));
+    setTimeout(() => {
+      localStorage.removeItem('tiktrack_auth_event');
+    }, 100);
+  } catch (e) {
+    window.Logger?.warn?.('⚠️ [auth.js] Failed broadcasting logout event', { error: e?.message });
+  }
+  
+  // Show login modal (preferred) or redirect fallback
+  if (!window.location.pathname.includes('login.html') &&
+      !window.location.pathname.includes('register.html')) {
+    if (typeof window.TikTrackAuth?.showLoginModal === 'function') {
+      await window.TikTrackAuth.showLoginModal();
+    } else {
+      window.location.href = 'login.html';
+    }
+  }
+}
+
 // Setup storage event listener for multi-tab logout/login sync
 if (typeof window.addEventListener === 'function') {
   window.addEventListener('storage', async (event) => {
@@ -26,11 +175,11 @@ if (typeof window.addEventListener === 'function') {
           // Logout event from another tab - clear local state and redirect
           console.log('🔔 Logout event received from another tab');
           
-          // Clear local state
+          // Clear local state using helper function
           authToken = null;
           currentUser = null;
-          localStorage.removeItem('authToken');
-          localStorage.removeItem('currentUser');
+          await removeAuthFromCache();
+          // Keep saved credentials in localStorage for cross-tab sync
           localStorage.removeItem('savedUsername');
           localStorage.removeItem('savedPassword');
           localStorage.removeItem('rememberCredentials');
@@ -86,22 +235,23 @@ if (typeof window.addEventListener === 'function') {
           window.dispatchEvent(new CustomEvent('logout:success'));
           window.dispatchEvent(new CustomEvent('user:logged-out'));
           
-        // Show login modal if not already on login/register page
-        if (!window.location.pathname.includes('login.html') && 
-            !window.location.pathname.includes('register.html')) {
-          if (typeof window.TikTrackAuth?.showLoginModal === 'function') {
-            await window.TikTrackAuth.showLoginModal();
-          } else {
-            // Show login modal instead of redirecting
-      if (typeof window.TikTrackAuth?.showLoginModal === 'function') {
-        await window.TikTrackAuth.showLoginModal();
-      } else {
-        window.location.href = 'login.html';
-      }
+          // Show login modal if not already on login/register page
+          if (!window.location.pathname.includes('login.html') && 
+              !window.location.pathname.includes('register.html')) {
+            if (typeof window.TikTrackAuth?.showLoginModal === 'function') {
+              await window.TikTrackAuth.showLoginModal();
+            } else {
+              window.location.href = 'login.html';
+            }
           }
-        }
         } else if (authEvent.type === 'login') {
           // Login event from another tab - update local state
+          // Only process if it's actually from another tab (not from current tab)
+          if (authEvent.source === 'auth.js' && event.oldValue === null) {
+            // This is from current tab - ignore to prevent infinite loop
+            return;
+          }
+          
           console.log('🔔 Login event received from another tab');
           
           // Check if it's a different user - if so, clear cache and reload
@@ -128,9 +278,19 @@ if (typeof window.addEventListener === 'function') {
             }
           }
           
-          // Reload user data from server
-          if (typeof checkAuthentication === 'function') {
-            await checkAuthentication();
+          // Only reload if user is not already authenticated or user changed
+          if (!currentUser || (newUserId && currentUserId !== newUserId)) {
+            // Reload user data from server (with debounce to prevent rate limiting)
+            if (typeof checkAuthentication === 'function') {
+              // Use debounce to prevent multiple rapid calls
+              if (!window._authCheckPending) {
+                window._authCheckPending = true;
+                setTimeout(async () => {
+                  await checkAuthentication();
+                  window._authCheckPending = false;
+                }, 500);
+              }
+            }
           }
         }
       } catch (error) {
@@ -142,6 +302,10 @@ if (typeof window.addEventListener === 'function') {
 
 // פונקציות התחברות
 async function login(username, password) {
+  // BREAKPOINT: Login start
+  window.AuthDebugMonitor?.log('info', '🔐 LOGIN function called', { username, timestamp: new Date().toISOString() });
+  if (window.DEBUG_AUTH_MONITOR === true) debugger; // Breakpoint helper
+  
   // Use relative URL to work with both development (8080) and production (5001)
   const response = await fetch('/api/auth/login', {
     method: 'POST',
@@ -155,15 +319,30 @@ async function login(username, password) {
   const data = await response.json();
 
   if (!response.ok || data.status !== 'success') {
+    window.AuthDebugMonitor?.log('error', '❌ LOGIN failed', { 
+      username, 
+      status: response.status,
+      error: data.error?.message 
+    });
     throw new Error(data.error?.message || 'שגיאה בהתחברות');
   }
 
-  // Store user in localStorage
+  // BREAKPOINT: After successful login response
+  window.AuthDebugMonitor?.log('info', '✅ LOGIN response received', { 
+    username,
+    hasUser: !!data.data?.user,
+    userId: data.data?.user?.id,
+    userKeys: data.data?.user ? Object.keys(data.data.user) : null
+  });
+  if (window.DEBUG_AUTH_MONITOR === true) debugger; // Breakpoint helper
+
+  // Store user in UnifiedCacheManager - ONLY UnifiedCacheManager, no fallbacks
   if (data.data?.user) {
     currentUser = data.data.user;
-    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+    await saveAuthToCache(currentUser, 'session_based');
   }
 
+  window.AuthDebugMonitor?.log('info', '✅ LOGIN function completed', { username, userId: currentUser?.id });
   return data;
 }
 
@@ -212,17 +391,80 @@ function showLoginError(message, containerId = 'loginError') {
   }
 }
 
-function showLoginSuccess(message, containerId = 'loginSuccess') {
+function showLoginSuccess(message, containerId = 'loginSuccess', showReloadButton = false) {
+  window.AuthDebugMonitor?.log('info', '📢 showLoginSuccess called', {
+    message,
+    containerId,
+    showReloadButton,
+    timestamp: new Date().toISOString()
+  });
+  
   const successDiv = document.getElementById(containerId);
-  if (successDiv) {
-    successDiv.textContent = message;
-    successDiv.style.display = 'block';
-
-    // הסתרת הודעת הצלחה אחרי 3 שניות
+  if (!successDiv) {
+    window.AuthDebugMonitor?.log('error', '❌ showLoginSuccess: Container not found', {
+      containerId
+    });
+    return;
+  }
+  
+  // Clear previous content
+  successDiv.innerHTML = '';
+  
+  // Add message
+  const messageText = document.createElement('div');
+  messageText.textContent = message;
+  messageText.style.marginBottom = showReloadButton ? '1rem' : '0';
+  successDiv.appendChild(messageText);
+  
+  // Add reload button if requested
+  if (showReloadButton) {
+    window.AuthDebugMonitor?.log('info', '🔘 Creating reload button');
+    
+    const reloadButton = document.createElement('button');
+    reloadButton.type = 'button';
+    reloadButton.className = 'btn btn-primary';
+    reloadButton.textContent = '🔄 רענן עמוד';
+    reloadButton.style.marginTop = '0.5rem';
+    reloadButton.style.width = '100%';
+    reloadButton.id = 'loginReloadButton'; // Add ID for easier debugging
+    reloadButton.onclick = () => {
+      window.AuthDebugMonitor?.log('info', '🔄 Manual reload triggered by user', {
+        timestamp: new Date().toISOString(),
+        sessionReady: true
+      });
+      
+      // Log final state before reload
+      window.AuthDebugMonitor?.getCurrentState().then(state => {
+        window.AuthDebugMonitor?.log('info', '🔍 Final state before manual reload', state);
+      });
+      
+      // Small delay to ensure logs are saved
+      setTimeout(() => {
+        window.location.reload();
+      }, 100);
+    };
+    successDiv.appendChild(reloadButton);
+    
+    window.AuthDebugMonitor?.log('info', '✅ Reload button added to DOM', {
+      buttonId: reloadButton.id,
+      buttonText: reloadButton.textContent
+    });
+  }
+  
+  successDiv.style.display = 'block';
+  
+  // Only auto-hide if no reload button
+  if (!showReloadButton) {
     setTimeout(() => {
       successDiv.style.display = 'none';
     }, 3000);
   }
+  
+  window.AuthDebugMonitor?.log('info', '✅ showLoginSuccess completed', {
+    containerId,
+    showReloadButton,
+    display: successDiv.style.display
+  });
 }
 
 function setLoadingState(isLoading, buttonId = 'loginBtn', textId = 'loginBtnText', spinnerId = 'loginBtnSpinner') {
@@ -324,6 +566,11 @@ function showLogin(loginSectionId = 'loginSection', dashboardSectionId = 'dashbo
 }
 
 async function logout() {
+  // Stop visibility check
+  if (typeof stopVisibilityCheck === 'function') {
+    stopVisibilityCheck();
+  }
+  
   try {
     // Call logout API
     await fetch('/api/auth/logout', {
@@ -334,11 +581,11 @@ async function logout() {
     console.warn('Logout API call failed:', error);
   }
   
-  // Clear local state
+  // Clear local state - ONLY UnifiedCacheManager, no fallbacks
   authToken = null;
   currentUser = null;
-  localStorage.removeItem('authToken');
-  localStorage.removeItem('currentUser');
+  await removeAuthFromCache();
+  // Keep saved credentials in localStorage for cross-tab sync
   localStorage.removeItem('savedUsername');
   localStorage.removeItem('savedPassword');
   localStorage.removeItem('rememberCredentials');
@@ -433,18 +680,129 @@ async function logout() {
   }, 100);
 }
 
+/**
+ * Check if user is authenticated (sync version)
+ * IMPORTANT: This function only checks in-memory cache as a quick check.
+ * For actual authentication verification, use checkAuthentication() which checks with the server.
+ * 
+ * @returns {boolean} True if user data exists in memory (may be stale)
+ */
 function isAuthenticated() {
-  // Check if user is in localStorage
-  const storedUser = localStorage.getItem('currentUser');
-  if (storedUser) {
-    try {
-      currentUser = JSON.parse(storedUser);
-      return true;
-    } catch (e) {
-      return false;
-    }
+  // Quick sync check - checks in-memory variable first
+  // NOTE: This should NOT be used for security checks - use checkAuthentication() instead
+  if (currentUser) {
+    return true;
   }
+  // No fallback - UnifiedCacheManager is async, use isAuthenticatedSync() for async check
   return false;
+}
+
+/**
+ * Synchronously check authentication status (server verification)
+ * This is the authoritative check - always verifies with server
+ * 
+ * @returns {Promise<boolean>} True if authenticated, false otherwise
+ */
+async function isAuthenticatedSync() {
+  console.log('[auth.js] isAuthenticatedSync: Starting authentication check');
+  
+  // Check cache - ONLY UnifiedCacheManager, no fallbacks
+  // Use helper function for consistent key handling
+  const { user: cachedUser } = await getAuthFromCache();
+  if (cachedUser) {
+    window.Logger?.info?.('✅ [auth.js] Found cached user', { 
+      page: 'auth', 
+      userId: cachedUser.id || cachedUser.username 
+    });
+  } else {
+    console.log('[auth.js] isAuthenticatedSync: No cached user found');
+  }
+  
+  try {
+    window.AuthDebugMonitor?.log('info', '🔍 isAuthenticatedSync: Checking server authentication');
+    if (window.DEBUG_AUTH_MONITOR === true) debugger; // Breakpoint helper
+    
+    const response = await fetch('/api/auth/me', {
+      method: 'GET',
+      credentials: 'include'
+    });
+    
+    window.AuthDebugMonitor?.log('info', '🔍 isAuthenticatedSync: Server response', {
+      status: response.status,
+      ok: response.ok
+    });
+    
+    if (response.ok) {
+      const data = await response.json();
+      if (data.status === 'success' && data.data?.user) {
+        // Update cache with fresh data - ONLY UnifiedCacheManager, no fallbacks
+        currentUser = data.data.user;
+        
+        window.AuthDebugMonitor?.log('info', '✅ isAuthenticatedSync: User authenticated', {
+          userId: currentUser?.id,
+          username: currentUser?.username
+        });
+        
+        // Use helper function for consistent key handling
+        await saveAuthToCache(currentUser, 'session_based');
+        
+        window.AuthDebugMonitor?.log('info', '✅ isAuthenticatedSync: Saved to cache', {
+          userId: currentUser?.id
+        });
+        return true;
+      }
+    }
+    
+    // Not authenticated - but don't clear cache immediately if we have cached user
+    // It might be a timing issue (session cookie not ready yet)
+    if (response.status === 401) {
+      if (cachedUser) {
+        // We have cached user but server says 401 - might be timing issue
+        // Wait a bit and retry once before clearing cache
+        console.debug('[auth.js] isAuthenticatedSync: 401 but cached user exists, retrying...');
+        await new Promise(resolve => setTimeout(resolve, 1500)); // Wait 1.5 seconds
+        
+        const retryResponse = await fetch('/api/auth/me', {
+          method: 'GET',
+          credentials: 'include'
+        });
+        
+        if (retryResponse.ok) {
+          const retryData = await retryResponse.json();
+          if (retryData.status === 'success' && retryData.data?.user) {
+            // Server check passed on retry - update cache and return true
+            currentUser = retryData.data.user;
+            if (window.UnifiedCacheManager) {
+              await window.UnifiedCacheManager.save('currentUser', currentUser, authCacheOptions);
+              await window.UnifiedCacheManager.save('authToken', 'session_based', authCacheOptions);
+            }
+            return true;
+          }
+        }
+        
+        // Retry failed - but if we have cached user, don't clear cache
+        // The user might be authenticated but server is slow
+        console.debug('[auth.js] isAuthenticatedSync: Retry failed but cached user exists - assuming authenticated');
+        currentUser = cachedUser; // Restore from cache
+        return true; // Assume authenticated if we have cached user
+      } else {
+        // No cached user - safe to clear - ONLY UnifiedCacheManager, no fallbacks
+        currentUser = null;
+        await removeAuthFromCache();
+      }
+    }
+    
+    return false;
+  } catch (error) {
+    // On error, if we have cached user, assume authenticated
+    if (cachedUser) {
+      console.debug('[auth.js] isAuthenticatedSync: Network error but cached user exists - assuming authenticated');
+      currentUser = cachedUser; // Restore from cache
+      return true;
+    }
+    console.warn('Error checking authentication:', error);
+    return false;
+  }
 }
 
 function getAuthToken() {
@@ -452,20 +810,32 @@ function getAuthToken() {
 }
 
 function getCurrentUser() {
+  // Return cached user if available (sync version)
+  if (currentUser) {
+    return currentUser;
+  }
+  
+  // No fallback - UnifiedCacheManager is async, use getCurrentUserAsync() for async check
+  
+  // No user found
+  return null;
+}
+
+/**
+ * Get current user asynchronously from UnifiedCacheManager
+ * @returns {Promise<Object|null>} User object or null
+ */
+async function getCurrentUserAsync() {
   // Return cached user if available
   if (currentUser) {
     return currentUser;
   }
   
-  // Try to load from localStorage
-  const storedUser = localStorage.getItem('currentUser');
+  // Try to load from UnifiedCacheManager using helper function
+  const { user: storedUser } = await getAuthFromCache();
   if (storedUser) {
-    try {
-      currentUser = JSON.parse(storedUser);
-      return currentUser;
-    } catch (e) {
-      console.warn('Failed to parse stored user:', e);
-    }
+    currentUser = storedUser;
+    return currentUser;
   }
   
   // No user found
@@ -506,15 +876,47 @@ function setupLoginForm(formId = 'loginForm', onSuccess = null) {
       authToken = loginData.data?.access_token || 'session_based';
       currentUser = loginData.data?.user;
 
+      // Save to UnifiedCacheManager - ONLY UnifiedCacheManager, no fallbacks
       if (currentUser) {
-        localStorage.setItem('authToken', authToken);
-        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+        if (window.UnifiedCacheManager) {
+          // CRITICAL: Save WITHOUT user_id prefix to avoid key mismatch
+          const saveOptions = { includeUserId: false };
+          
+          window.AuthDebugMonitor?.log('info', '💾 Saving auth data after login form', {
+            userId: currentUser?.id,
+            username: currentUser?.username,
+            authTokenType: typeof authToken
+          });
+          
+          // Use helper function for consistent key handling
+          await saveAuthToCache(currentUser, authToken);
+        } else {
+          window.Logger?.error?.('❌ [auth.js] UnifiedCacheManager not available', { page: 'auth' });
+          window.AuthDebugMonitor?.log('error', '❌ UnifiedCacheManager not available');
+        }
       }
 
       // שמירת פרטי התחברות אם נבחר "זכור אותי"
       saveCredentials(username, password);
 
-      showLoginSuccess('התחברות הצליחה! מעביר לדשבורד...');
+      // Show success message with reload button (instead of auto-reload)
+      window.AuthDebugMonitor?.log('info', '✅ LOGIN FORM: Login successful, showing success message with reload button', {
+        userId: currentUser?.id,
+        username: currentUser?.username,
+        timestamp: new Date().toISOString()
+      });
+      
+      showLoginSuccess('✅ התחברות הצליחה! לחץ על "רענן עמוד" להמשך', 'loginSuccess', true);
+      
+      // Verify button was added
+      setTimeout(() => {
+        const reloadBtn = document.querySelector('#loginSuccess button');
+        if (reloadBtn) {
+          window.AuthDebugMonitor?.log('info', '✅ Reload button successfully added to DOM');
+        } else {
+          window.AuthDebugMonitor?.log('error', '❌ Reload button NOT found in DOM after showLoginSuccess');
+        }
+      }, 100);
 
       // Broadcast login event to other tabs via localStorage
       try {
@@ -544,12 +946,34 @@ function setupLoginForm(formId = 'loginForm', onSuccess = null) {
 
       // הפעלת callback אם קיים
       if (onSuccess && typeof onSuccess === 'function') {
-        setTimeout(() => {
+        setTimeout(async () => {
+          // BREAKPOINT: Before callback after login
+          window.AuthDebugMonitor?.log('info', '🔄 About to call onSuccess callback', {
+            timestamp: new Date().toISOString()
+          });
+          
+          // Verify cache before callback
+          const cacheCheck = await window.AuthDebugMonitor?.checkCacheKeys();
+          window.AuthDebugMonitor?.log('info', '🔍 Cache state before callback', cacheCheck);
+          
+          if (window.DEBUG_AUTH_MONITOR === true) debugger; // Breakpoint helper
+          
           onSuccess();
         }, 1000);
       } else {
         // מעבר לדשבורד אחרי שנייה
-        setTimeout(() => {
+        setTimeout(async () => {
+          // BREAKPOINT: Before redirect after login
+          window.AuthDebugMonitor?.log('info', '🔄 About to redirect after login', {
+            timestamp: new Date().toISOString()
+          });
+          
+          // Verify cache before redirect
+          const cacheCheck = await window.AuthDebugMonitor?.checkCacheKeys();
+          window.AuthDebugMonitor?.log('info', '🔍 Cache state before redirect', cacheCheck);
+          
+          if (window.DEBUG_AUTH_MONITOR === true) debugger; // Breakpoint helper
+          
           // Check if we have a redirect destination from auth guard
           const redirectPath = window.AuthGuard?.getRedirectAfterLogin?.();
           if (redirectPath) {
@@ -562,6 +986,19 @@ function setupLoginForm(formId = 'loginForm', onSuccess = null) {
       }
 
     } catch (error) {
+      // Log error for debugging
+      window.AuthDebugMonitor?.log('error', '❌ LOGIN FORM: Login failed', {
+        error: error.message,
+        stack: error.stack,
+        timestamp: new Date().toISOString()
+      });
+      
+      // Save error for debugging
+      window.AuthDebugMonitor?.saveError(error, {
+        type: 'login_form_error',
+        username: username
+      });
+      
       showLoginError(error.message);
     } finally {
       setLoadingState(false);
@@ -571,35 +1008,58 @@ function setupLoginForm(formId = 'loginForm', onSuccess = null) {
 
 // פונקציה לבדיקת התחברות בעת טעינת הדף
 async function checkAuthentication(onAuthenticated = null, onNotAuthenticated = null) {
-  // Try to get current user from API
+  console.log('[auth.js] checkAuthentication: Starting authentication check');
+  
+  // Prevent multiple simultaneous calls
+  if (window._checkingAuth) {
+    console.log('[auth.js] checkAuthentication: Already checking, skipping...');
+    return;
+  }
+  window._checkingAuth = true;
+  
   try {
+    console.log('[auth.js] checkAuthentication: Checking server authentication...');
     const response = await fetch('/api/auth/me', {
       method: 'GET',
       credentials: 'include'
     });
     
+    console.log('[auth.js] checkAuthentication: Server response status:', response.status);
+    
     if (response.ok) {
       const data = await response.json();
       if (data.status === 'success' && data.data?.user) {
-        currentUser = data.data.user;
-        authToken = 'session_based'; // Session-based auth
-        localStorage.setItem('currentUser', JSON.stringify(currentUser));
-        localStorage.setItem('authToken', authToken);
+        const newUser = data.data.user;
+        const wasAuthenticated = !!currentUser;
+        const userChanged = currentUser?.id !== newUser?.id;
         
-        // Broadcast login event to other tabs
-        try {
-          const loginEvent = {
-            type: 'login',
-            timestamp: new Date().toISOString(),
-            source: 'auth.js',
-            userId: currentUser?.id
-          };
-          localStorage.setItem('tiktrack_auth_event', JSON.stringify(loginEvent));
-          setTimeout(() => {
-            localStorage.removeItem('tiktrack_auth_event');
-          }, 100);
-        } catch (error) {
-          console.warn('Error broadcasting login event to other tabs:', error);
+        currentUser = newUser;
+        authToken = 'session_based'; // Session-based auth
+        // Save to UnifiedCacheManager using helper function
+        await saveAuthToCache(currentUser, authToken);
+        
+        // Mark that user just logged in (prevents auth-guard from checking immediately)
+        if (typeof window.AuthGuard?.markJustLoggedIn === 'function') {
+          window.AuthGuard.markJustLoggedIn();
+        }
+        
+        // Only broadcast login event if user actually changed (new login or user switch)
+        if (!wasAuthenticated || userChanged) {
+          // Broadcast login event to other tabs
+          try {
+            const loginEvent = {
+              type: 'login',
+              timestamp: new Date().toISOString(),
+              source: 'auth.js',
+              userId: currentUser?.id
+            };
+            localStorage.setItem('tiktrack_auth_event', JSON.stringify(loginEvent));
+            setTimeout(() => {
+              localStorage.removeItem('tiktrack_auth_event');
+            }, 100);
+          } catch (error) {
+            console.warn('Error broadcasting login event to other tabs:', error);
+          }
         }
         
         if (onAuthenticated && typeof onAuthenticated === 'function') {
@@ -619,26 +1079,30 @@ async function checkAuthentication(onAuthenticated = null, onNotAuthenticated = 
     if (error.message && !error.message.includes('401')) {
       console.warn('Failed to check authentication:', error);
     }
+  } finally {
+    window._checkingAuth = false;
   }
   
-  // Not authenticated - try localStorage as fallback
-  const storedUser = localStorage.getItem('currentUser');
-  if (storedUser) {
-    try {
-      currentUser = JSON.parse(storedUser);
-      if (onAuthenticated && typeof onAuthenticated === 'function') {
-        onAuthenticated();
-      } else {
-        showDashboard();
-      }
-      return;
-    } catch (e) {
-      // Invalid stored user
-    }
+  // Server check failed - check cache first - ONLY UnifiedCacheManager, no fallbacks
+  let cachedUser = null;
+  if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
+    cachedUser = await window.UnifiedCacheManager.get('currentUser', authCacheOptions);
   }
+  
+  // If server said unauthenticated, always clear auth cache and force login
+  if (cachedUser) {
+    console.debug('[auth.js] checkAuthentication: Server check failed, clearing cached auth and showing login');
+  }
+  currentUser = null;
+  authToken = null;
+  await removeAuthFromCache();
+  
+  // No cached user - safe to clear - ONLY UnifiedCacheManager, no fallbacks
+  currentUser = null;
+  authToken = null;
+  await removeAuthFromCache();
   
   // Not authenticated
-  currentUser = null;
   if (onNotAuthenticated && typeof onNotAuthenticated === 'function') {
     onNotAuthenticated();
   } else {
@@ -730,19 +1194,25 @@ function createLogoutButton(containerId) {
  * הצגת modal כניסה במקום redirect לעמוד כניסה
  */
 async function showLoginModal(onSuccess = null) {
+  window.Logger?.info?.('🔐 [auth.js] showLoginModal called', { page: 'auth' });
+  
   const modalId = 'loginModal';
   
   // Remove existing modal if any
   const existingModal = document.getElementById(modalId);
   if (existingModal) {
+    window.Logger?.info?.('🔍 [auth.js] Removing existing modal', { page: 'auth' });
     existingModal.remove();
   }
   
   // Remove any orphaned backdrops
   const backdrops = document.querySelectorAll('.modal-backdrop');
-  backdrops.forEach(backdrop => backdrop.remove());
+  if (backdrops.length > 0) {
+    window.Logger?.info?.('🔍 [auth.js] Removing orphaned backdrops', { page: 'auth', count: backdrops.length });
+    backdrops.forEach(backdrop => backdrop.remove());
+  }
   
-  // Create modal HTML
+  // Create modal HTML - z-index will be managed by ModalZIndexManager
   const loginModalHTML = `
     <div class="modal fade" id="${modalId}" tabindex="-1" aria-labelledby="${modalId}Label" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
       <div class="modal-dialog modal-dialog-centered">
@@ -760,62 +1230,257 @@ async function showLoginModal(onSuccess = null) {
   
   // Add modal to DOM
   document.body.insertAdjacentHTML('beforeend', loginModalHTML);
+  window.Logger?.info?.('✅ [auth.js] Modal HTML added to DOM', { page: 'auth' });
   
   // Create login interface inside modal
   const container = document.getElementById('loginModalContainer');
   if (container) {
+    window.Logger?.info?.('✅ [auth.js] Container found, creating login interface', { page: 'auth' });
     createLoginInterface('loginModalContainer', async () => {
-      // On successful login, close modal and reload page or redirect
-      const modalElement = document.getElementById(modalId);
-      if (modalElement && window.bootstrap) {
-        const modal = window.bootstrap.Modal.getInstance(modalElement);
-        if (modal) {
-          modal.hide();
+      // On successful login, verify session is ready
+      window.AuthDebugMonitor?.log('info', '✅ Login successful, verifying session', {
+        timestamp: new Date().toISOString()
+      });
+      
+      // Verify session is ready by checking /api/auth/me
+      let sessionReady = false;
+      let sessionError = null;
+      
+      for (let attempt = 0; attempt < 5; attempt++) {
+        try {
+          window.AuthDebugMonitor?.log('info', `🔍 Session verification attempt ${attempt + 1}/5`);
+          
+          const verifyResponse = await fetch('/api/auth/me', {
+            method: 'GET',
+            credentials: 'include'
+          });
+          
+          if (verifyResponse.ok) {
+            const verifyData = await verifyResponse.json();
+            if (verifyData.status === 'success' && verifyData.data?.user) {
+              sessionReady = true;
+              window.AuthDebugMonitor?.log('info', '✅ Session verified successfully', {
+                attempt: attempt + 1,
+                userId: verifyData.data.user.id,
+                username: verifyData.data.user.username
+              });
+              break;
+            } else {
+              sessionError = `Invalid response: ${JSON.stringify(verifyData)}`;
+              window.AuthDebugMonitor?.log('warn', '⚠️ Invalid session response', {
+                attempt: attempt + 1,
+                response: verifyData
+              });
+            }
+          } else {
+            sessionError = `HTTP ${verifyResponse.status}: ${verifyResponse.statusText}`;
+            window.AuthDebugMonitor?.log('warn', '⚠️ Session verification failed', {
+              attempt: attempt + 1,
+              status: verifyResponse.status,
+              statusText: verifyResponse.statusText
+            });
+          }
+        } catch (error) {
+          sessionError = error.message;
+          window.AuthDebugMonitor?.log('error', '❌ Session verification error', {
+            attempt: attempt + 1,
+            error: error.message,
+            stack: error.stack
+          });
+          
+          // Save error for debugging
+          window.AuthDebugMonitor?.saveError(error, {
+            type: 'session_verification_error',
+            attempt: attempt + 1
+          });
+        }
+        
+        // Wait before retry
+        await new Promise(resolve => setTimeout(resolve, 200));
+      }
+      
+      // Log final session status
+      if (sessionReady) {
+        window.AuthDebugMonitor?.log('info', '✅ Session ready - waiting for user to click reload button');
+      } else {
+        window.AuthDebugMonitor?.log('error', '❌ Session NOT ready after 5 attempts', {
+          lastError: sessionError
+        });
+        
+        // Show error in success message
+        const successDiv = document.getElementById('loginSuccess');
+        if (successDiv) {
+          const errorMsg = document.createElement('div');
+          errorMsg.style.color = '#dc3545';
+          errorMsg.style.marginTop = '0.5rem';
+          errorMsg.style.fontSize = '0.9rem';
+          errorMsg.textContent = `⚠️ אזהרה: אימות סשן נכשל. שגיאה: ${sessionError}`;
+          successDiv.appendChild(errorMsg);
         }
       }
       
-      // Wait a bit for modal to close, then reload or redirect
-      setTimeout(() => {
-        if (onSuccess && typeof onSuccess === 'function') {
-          onSuccess();
-        } else {
-          // Reload current page to refresh UI
-          window.location.reload();
-        }
-      }, 300);
+      // Verify cache state
+      const cacheCheck = await window.AuthDebugMonitor?.checkCacheKeys();
+      window.AuthDebugMonitor?.log('info', '🔍 Final cache state before reload', cacheCheck);
+      
+      // Don't close modal or reload automatically - wait for user to click reload button
+      // The reload button is shown in showLoginSuccess with showReloadButton=true
+      
+      if (window.DEBUG_AUTH_MONITOR === true) debugger; // Breakpoint helper
     });
+  } else {
+    window.Logger?.error?.('❌ [auth.js] Container not found', { page: 'auth' });
   }
   
   // Show modal using Bootstrap
   const modalElement = document.getElementById(modalId);
   if (modalElement) {
+    window.Logger?.info?.('✅ [auth.js] Modal element found, checking Bootstrap', { 
+      page: 'auth',
+      hasBootstrap: typeof window.bootstrap !== 'undefined',
+      hasModal: typeof window.bootstrap?.Modal !== 'undefined'
+    });
+    
     // Wait a bit for DOM to be ready
     await new Promise(resolve => setTimeout(resolve, 100));
     
     if (window.bootstrap && window.bootstrap.Modal) {
-      const modal = new window.bootstrap.Modal(modalElement, {
-        backdrop: 'static',
-        keyboard: false
-      });
-      modal.show();
+      window.Logger?.info?.('✅ [auth.js] Bootstrap available, showing modal', { page: 'auth' });
+      try {
+        const modal = new window.bootstrap.Modal(modalElement, {
+          backdrop: 'static',
+          keyboard: false
+        });
+        modal.show();
+        window.Logger?.info?.('✅ [auth.js] Modal.show() called successfully', { page: 'auth' });
+        
+        // Update z-index using ModalZIndexManager (central z-index management system)
+        if (window.ModalZIndexManager && typeof window.ModalZIndexManager.forceUpdate === 'function') {
+          // Use requestAnimationFrame for immediate update, then retry with setTimeout
+          requestAnimationFrame(() => {
+            window.ModalZIndexManager.forceUpdate(modalElement);
+            
+            // Retry after a short delay to ensure z-index is set correctly
+            setTimeout(() => {
+              window.ModalZIndexManager.forceUpdate(modalElement);
+              window.Logger?.info?.('✅ [auth.js] Z-index updated via ModalZIndexManager', { page: 'auth' });
+            }, 100);
+          });
+        } else {
+          window.Logger?.warn?.('⚠️ [auth.js] ModalZIndexManager not available, using fallback', { page: 'auth' });
+        }
+        
+        // Bootstrap creates backdrop asynchronously, so we ensure it exists after a short delay
+        setTimeout(() => {
+          const hasBackdrop = document.querySelector('.modal-backdrop') !== null;
+          const hasShowClass = modalElement.classList.contains('show');
+          const bodyHasModalOpen = document.body.classList.contains('modal-open');
+          
+          if (!hasBackdrop && hasShowClass) {
+            window.Logger?.warn?.('⚠️ [auth.js] Backdrop missing, creating manually', { page: 'auth' });
+            const backdrop = document.createElement('div');
+            backdrop.className = 'modal-backdrop fade show';
+            // Backdrop z-index will be managed by ModalZIndexManager if available
+            if (window.ModalZIndexManager) {
+              backdrop.style.zIndex = window.ModalZIndexManager.BACKDROP_Z_INDEX || '1039';
+            } else {
+              backdrop.style.zIndex = '1040';
+            }
+            document.body.appendChild(backdrop);
+            if (!bodyHasModalOpen) {
+              document.body.classList.add('modal-open');
+            }
+            window.Logger?.info?.('✅ [auth.js] Backdrop created manually', { page: 'auth' });
+          } else if (hasBackdrop) {
+            window.Logger?.info?.('✅ [auth.js] Backdrop exists (created by Bootstrap)', { page: 'auth' });
+          }
+        }, 500); // Wait 500ms for Bootstrap to create backdrop, then check and create if needed
+      } catch (error) {
+        window.Logger?.error?.('❌ [auth.js] Error showing modal', { 
+          page: 'auth',
+          error: error.message,
+          stack: error.stack
+        });
+      }
     } else {
+      window.Logger?.warn?.('⏳ [auth.js] Bootstrap not available, waiting...', { page: 'auth' });
       // Fallback: wait for Bootstrap to load
       let attempts = 0;
       const checkBootstrap = setInterval(() => {
         attempts++;
         if (window.bootstrap && window.bootstrap.Modal) {
           clearInterval(checkBootstrap);
-          const modal = new window.bootstrap.Modal(modalElement, {
-            backdrop: 'static',
-            keyboard: false
+          window.Logger?.info?.('✅ [auth.js] Bootstrap loaded, showing modal', { 
+            page: 'auth',
+            attempts: attempts
           });
-          modal.show();
+          try {
+            const modal = new window.bootstrap.Modal(modalElement, {
+              backdrop: 'static',
+              keyboard: false
+            });
+            modal.show();
+            window.Logger?.info?.('✅ [auth.js] Modal.show() called successfully (after wait)', { page: 'auth' });
+            
+            // Update z-index using ModalZIndexManager (central z-index management system)
+            if (window.ModalZIndexManager && typeof window.ModalZIndexManager.forceUpdate === 'function') {
+              // Use requestAnimationFrame for immediate update, then retry with setTimeout
+              requestAnimationFrame(() => {
+                window.ModalZIndexManager.forceUpdate(modalElement);
+                
+                // Retry after a short delay to ensure z-index is set correctly
+                setTimeout(() => {
+                  window.ModalZIndexManager.forceUpdate(modalElement);
+                  window.Logger?.info?.('✅ [auth.js] Z-index updated via ModalZIndexManager (after wait)', { page: 'auth' });
+                }, 100);
+              });
+            } else {
+              window.Logger?.warn?.('⚠️ [auth.js] ModalZIndexManager not available, using fallback (after wait)', { page: 'auth' });
+            }
+            
+            // Bootstrap creates backdrop asynchronously, so we ensure it exists after a short delay
+            setTimeout(() => {
+              const hasBackdrop = document.querySelector('.modal-backdrop') !== null;
+              const hasShowClass = modalElement.classList.contains('show');
+              const bodyHasModalOpen = document.body.classList.contains('modal-open');
+              
+              if (!hasBackdrop && hasShowClass) {
+                window.Logger?.warn?.('⚠️ [auth.js] Backdrop missing (after wait), creating manually', { page: 'auth' });
+                const backdrop = document.createElement('div');
+                backdrop.className = 'modal-backdrop fade show';
+                // Backdrop z-index will be managed by ModalZIndexManager if available
+                if (window.ModalZIndexManager) {
+                  backdrop.style.zIndex = window.ModalZIndexManager.BACKDROP_Z_INDEX || '1039';
+                } else {
+                  backdrop.style.zIndex = '1040';
+                }
+                document.body.appendChild(backdrop);
+                if (!bodyHasModalOpen) {
+                  document.body.classList.add('modal-open');
+                }
+                window.Logger?.info?.('✅ [auth.js] Backdrop created manually (after wait)', { page: 'auth' });
+              } else if (hasBackdrop) {
+                window.Logger?.info?.('✅ [auth.js] Backdrop exists (created by Bootstrap, after wait)', { page: 'auth' });
+              }
+            }, 500); // Wait 500ms for Bootstrap to create backdrop, then check and create if needed
+          } catch (error) {
+            window.Logger?.error?.('❌ [auth.js] Error showing modal (after wait)', { 
+              page: 'auth',
+              error: error.message,
+              stack: error.stack
+            });
+          }
         } else if (attempts > 50) {
           clearInterval(checkBootstrap);
-          console.error('Bootstrap Modal not available after waiting');
+          window.Logger?.error?.('❌ [auth.js] Bootstrap Modal not available after waiting', { 
+            page: 'auth',
+            attempts: attempts
+          });
         }
       }, 100);
     }
+  } else {
+    window.Logger?.error?.('❌ [auth.js] Modal element not found after adding to DOM', { page: 'auth' });
   }
 }
 
@@ -853,10 +1518,14 @@ async function updateUserProfile(updates) {
     throw new Error(data.error?.message || 'שגיאה בעדכון פרופיל');
   }
 
-  // Update local storage
+  // Update cache
   if (data.data?.user) {
     currentUser = data.data.user;
-    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+    if (window.UnifiedCacheManager) {
+      await window.UnifiedCacheManager.save('currentUser', currentUser, authCacheOptions);
+    } else {
+      window.Logger?.error?.('❌ [auth.js] UnifiedCacheManager not available', { page: 'auth' });
+    }
   }
 
   return data;
@@ -892,8 +1561,10 @@ window.TikTrackAuth = {
   login,
   logout,
   isAuthenticated,
+  isAuthenticatedSync,
   getAuthToken,
   getCurrentUser,
+  getCurrentUserAsync,
   updateUserProfile,
   updatePassword,
   setupLoginForm,
@@ -910,7 +1581,183 @@ window.TikTrackAuth = {
   register,
   loadSavedCredentials,
   showLoginModal,
+  // Helper functions for consistent cache operations
+  saveAuthToCache,
+  getAuthFromCache,
+  removeAuthFromCache,
+  forceLogoutAndPrompt,
 };
+
+// ✅ לוג אימות - ניטור הגדרת window.TikTrackAuth
+if (window.Logger) {
+  window.Logger.info('✅ [auth.js] window.TikTrackAuth defined', {
+    page: 'auth',
+    hasShowLoginModal: typeof window.TikTrackAuth?.showLoginModal === 'function',
+    functions: Object.keys(window.TikTrackAuth || {}),
+    timestamp: new Date().toISOString()
+  });
+} else {
+  console.log('✅ [auth.js] window.TikTrackAuth defined', {
+    hasShowLoginModal: typeof window.TikTrackAuth?.showLoginModal === 'function',
+    functions: Object.keys(window.TikTrackAuth || {})
+  });
+}
 
 // Export register function globally
 window.register = register;
+
+/**
+ * Session validation on visibility change
+ * בודק שהסשן עדיין תקף כשהמשתמש חוזר לטאב
+ * אם הסשן פג תוקף, מנתק את המשתמש ומעביר למסך הכניסה
+ * 
+ * Uses VisibilityChange API instead of periodic checks for better performance
+ */
+let visibilityCheckHandler = null;
+
+function setupVisibilityCheck() {
+  // Remove existing handler if any
+  if (visibilityCheckHandler) {
+    document.removeEventListener('visibilitychange', visibilityCheckHandler);
+  }
+  
+  // Check session when user returns to tab
+  visibilityCheckHandler = async () => {
+    if (document.visibilityState === 'visible') {
+      // Skip check if user just logged in (prevents race condition)
+      if (typeof window.AuthGuard !== 'undefined' && 
+          window.AuthGuard._justLoggedIn && 
+          (Date.now() - (window.AuthGuard._loginTimestamp || 0)) < 3000) {
+        return;
+      }
+      
+      // User returned to tab - check session if user appears authenticated
+      // ONLY UnifiedCacheManager, no fallbacks
+      let storedUser = null;
+      if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
+        storedUser = await window.UnifiedCacheManager.get('currentUser', authCacheOptions);
+      }
+      if (!storedUser) {
+        // No user data - nothing to validate
+        return;
+      }
+      
+      // Add small delay to avoid checking immediately after tab becomes visible
+      // This prevents race conditions with other auth checks
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      try {
+        // Check with server
+        const response = await fetch('/api/auth/me', {
+          method: 'GET',
+          credentials: 'include'
+        });
+        
+        if (!response.ok || response.status === 401) {
+          // Session expired or invalid
+          console.log('🔒 Session expired - logging out...');
+          
+          // Clear local state - ONLY UnifiedCacheManager, no fallbacks
+          currentUser = null;
+          authToken = null;
+          await removeAuthFromCache();
+          
+          // Broadcast logout event to other tabs
+          try {
+            const logoutEvent = {
+              type: 'logout',
+              timestamp: new Date().toISOString(),
+              source: 'auth.js',
+              reason: 'session_expired'
+            };
+            localStorage.setItem('tiktrack_auth_event', JSON.stringify(logoutEvent));
+            setTimeout(() => {
+              localStorage.removeItem('tiktrack_auth_event');
+            }, 100);
+          } catch (error) {
+            console.warn('Error broadcasting logout event:', error);
+          }
+          
+          // Show login modal or redirect
+          if (!window.location.pathname.includes('login.html') &&
+              !window.location.pathname.includes('register.html')) {
+            if (typeof window.TikTrackAuth?.showLoginModal === 'function') {
+              await window.TikTrackAuth.showLoginModal();
+            } else {
+              window.location.href = 'login.html';
+            }
+          }
+        } else {
+          // Session is valid - update cache with fresh data
+          const data = await response.json();
+          if (data.status === 'success' && data.data?.user) {
+            currentUser = data.data.user;
+            if (window.UnifiedCacheManager) {
+              await window.UnifiedCacheManager.save('currentUser', currentUser, authCacheOptions);
+              await window.UnifiedCacheManager.save('authToken', 'session_based', authCacheOptions);
+            } else {
+              window.Logger?.error?.('❌ [auth.js] UnifiedCacheManager not available', { page: 'auth' });
+            }
+          }
+        }
+      } catch (error) {
+        // On error, don't disconnect - might be network issue
+        console.debug('Session validation error (non-critical):', error);
+      }
+    }
+  };
+  
+  // Add event listener
+  document.addEventListener('visibilitychange', visibilityCheckHandler);
+  console.log('✅ Session validation on visibility change enabled');
+}
+
+function stopVisibilityCheck() {
+  if (visibilityCheckHandler) {
+    document.removeEventListener('visibilitychange', visibilityCheckHandler);
+    visibilityCheckHandler = null;
+    console.log('✅ Session validation on visibility change disabled');
+  }
+}
+
+// Setup visibility check when auth.js loads (if user is authenticated)
+// Note: This uses async check, so we need to handle it properly
+if (typeof window !== 'undefined') {
+  const setupVisibilityCheckIfAuthenticated = async () => {
+    // Check UnifiedCacheManager - ONLY UnifiedCacheManager, no fallbacks
+    let storedUser = null;
+    if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
+      storedUser = await window.UnifiedCacheManager.get('currentUser', authCacheOptions);
+    }
+    if (storedUser) {
+      // Setup validation after a short delay to avoid conflicts with initial auth check
+      setTimeout(() => {
+        setupVisibilityCheck();
+      }, 1000);
+    }
+  };
+  
+  if (document.readyState === 'complete') {
+    // Page already loaded
+    setupVisibilityCheckIfAuthenticated();
+  } else {
+    // Wait for page to load
+    window.addEventListener('load', () => {
+      setupVisibilityCheckIfAuthenticated();
+    });
+  }
+}
+
+// Stop visibility check on logout
+// Note: stopVisibilityCheck is called at the start of logout()
+
+// Export session validation functions (for backward compatibility)
+// Note: This must be after window.TikTrackAuth is defined (line 1133)
+// This code runs after window.TikTrackAuth is defined, so we can safely access it
+if (typeof window !== 'undefined' && typeof window.TikTrackAuth !== 'undefined') {
+  window.TikTrackAuth.setupVisibilityCheck = setupVisibilityCheck;
+  window.TikTrackAuth.stopVisibilityCheck = stopVisibilityCheck;
+  // Legacy aliases (deprecated - use setupVisibilityCheck/stopVisibilityCheck)
+  window.TikTrackAuth.startSessionValidation = setupVisibilityCheck;
+  window.TikTrackAuth.stopSessionValidation = stopVisibilityCheck;
+}

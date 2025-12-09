@@ -5,6 +5,7 @@
 This guide provides practical instructions for developers on how to debug event-related issues using the Event Handler Manager system. The system provides comprehensive debugging tools that can help you quickly identify and resolve event handling problems.
 
 **Related Documentation:**
+
 - [Event Handler System - Technical Documentation](../../02-ARCHITECTURE/FRONTEND/EVENT_HANDLER_SYSTEM.md)
 - [Logger Service](../../02-ARCHITECTURE/FRONTEND/LOGGER_SERVICE.md)
 
@@ -34,6 +35,7 @@ window.EventHandlerManager.debug.enableVerboseLogging();
 ```
 
 This will enable:
+
 - Detailed event logging
 - Performance tracking
 - Stack trace collection
@@ -51,6 +53,7 @@ This will enable:
 **Solution Steps:**
 
 1. **Check if the event is being captured:**
+
    ```javascript
    // Get recent event history
    const history = window.EventHandlerManager.debug.getEventHistory(50);
@@ -62,6 +65,7 @@ This will enable:
    ```
 
 2. **Check if element has listeners:**
+
    ```javascript
    // Find listeners for a specific element
    const listeners = window.EventHandlerManager.debug.findListenersForElement('#myButton');
@@ -69,6 +73,7 @@ This will enable:
    ```
 
 3. **Check for errors:**
+
    ```javascript
    // Get error report
    const errors = window.EventHandlerManager.debug.getErrorReport();
@@ -82,12 +87,14 @@ This will enable:
    ```
 
 4. **Enable verbose logging and test:**
+
    ```javascript
    window.EventHandlerManager.debug.enableVerboseLogging();
    // Now click the button and check console for detailed logs
    ```
 
 5. **Check event delegation:**
+
    ```javascript
    // Check if event is handled by delegation
    const stats = window.EventHandlerManager.debug.getStatistics();
@@ -101,6 +108,7 @@ This will enable:
 **Solution Steps:**
 
 1. **Check for duplicate listeners:**
+
    ```javascript
    // Get all listeners
    const listeners = window.EventHandlerManager.debug.getListeners();
@@ -114,6 +122,7 @@ This will enable:
    ```
 
 2. **Check event history for multiple executions:**
+
    ```javascript
    const history = window.EventHandlerManager.debug.getEventHistory(100);
    const recentClicks = history.filter(e => 
@@ -124,6 +133,7 @@ This will enable:
    ```
 
 3. **Check if event is bubbling:**
+
    ```javascript
    // Enable verbose logging to see event propagation
    window.EventHandlerManager.debug.enableVerboseLogging();
@@ -137,12 +147,14 @@ This will enable:
 **Solution Steps:**
 
 1. **Identify slow handlers:**
+
    ```javascript
    const stats = window.EventHandlerManager.debug.getStatistics();
    console.log('Slow handlers:', stats.slowHandlers);
    ```
 
 2. **Get detailed performance data:**
+
    ```javascript
    // Check performance for specific handler
    const handlerInfo = window.EventHandlerManager.debug.getHandlerInfo('click:myHandler');
@@ -154,6 +166,7 @@ This will enable:
    ```
 
 3. **Check overall statistics:**
+
    ```javascript
    const stats = window.EventHandlerManager.debug.getStatistics();
    console.log('Performance by handler:', stats.performanceByHandler);
@@ -165,6 +178,7 @@ This will enable:
    ```
 
 4. **Check event frequency:**
+
    ```javascript
    const stats = window.EventHandlerManager.debug.getStatistics();
    console.log('Events by type:', stats.eventsByType);
@@ -178,6 +192,7 @@ This will enable:
 **Solution Steps:**
 
 1. **Get error report:**
+
    ```javascript
    const errorReport = window.EventHandlerManager.debug.getErrorReport();
    console.log('Total errors:', errorReport.total);
@@ -185,6 +200,7 @@ This will enable:
    ```
 
 2. **Check specific error details:**
+
    ```javascript
    const errors = errorReport.recentErrors;
    errors.forEach(error => {
@@ -197,6 +213,7 @@ This will enable:
    ```
 
 3. **Filter errors by handler:**
+
    ```javascript
    const myHandlerErrors = errorReport.errors.filter(e => 
        e.handlerKey.includes('myHandler')
@@ -205,6 +222,7 @@ This will enable:
    ```
 
 4. **Enable verbose logging to catch errors in real-time:**
+
    ```javascript
    window.EventHandlerManager.debug.enableVerboseLogging();
    // Errors will now be logged with full context
@@ -217,6 +235,7 @@ This will enable:
 **Solution Steps:**
 
 1. **Check event history for propagation issues:**
+
    ```javascript
    const history = window.EventHandlerManager.debug.getEventHistory(50);
    const relatedEvents = history.filter(e => 
@@ -226,12 +245,14 @@ This will enable:
    ```
 
 2. **Use verbose logging to see event flow:**
+
    ```javascript
    window.EventHandlerManager.debug.enableVerboseLogging();
    // Events will now be logged with full DOM hierarchy information
    ```
 
 3. **Simulate event to test:**
+
    ```javascript
    // Simulate click event
    window.EventHandlerManager.debug.simulateEvent('click', '#myButton');
@@ -279,18 +300,21 @@ With additional context object:
 ### Finding Information in Logs
 
 1. **Search by component:**
+
    ```javascript
    // Filter logs by component name
    // In browser console, search for: "component: 'handleDelegatedClick'"
    ```
 
 2. **Search by element:**
+
    ```javascript
    // Filter logs by element selector
    // In browser console, search for: "element: '#myButton'"
    ```
 
 3. **Search by handler:**
+
    ```javascript
    // Filter logs by handler name
    // In browser console, search for: "handler: 'handleClick'"

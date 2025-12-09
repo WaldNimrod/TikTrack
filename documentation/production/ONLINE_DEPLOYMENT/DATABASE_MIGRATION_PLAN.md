@@ -18,12 +18,14 @@
 ## 🎯 מטרת ההעברה
 
 ### מה מעבירים
+
 - ✅ **Schema מלא** - כל הטבלאות, indexes, constraints
 - ✅ **Data** - כל הנתונים הקיימים (trades, executions, וכו')
 - ✅ **Preferences** - הגדרות מערכת
 - ✅ **Users** - משתמשים (אם יש)
 
 ### מה לא מעבירים
+
 - ❌ **Logs** - לוגים ישנים
 - ❌ **Temporary data** - נתונים זמניים
 - ❌ **Test data** - נתוני בדיקה (אם יש)
@@ -48,6 +50,7 @@ pg_dump -U TikTrakDBAdmin -d "TikTrack-db-testing" \
 ```
 
 **בדיקה:**
+
 ```bash
 # בדיקת גודל הגיבוי
 ls -lh tiktrack-testing-backup-*.dump
@@ -61,18 +64,21 @@ pg_restore --list tiktrack-testing-backup-*.dump | head -20
 ### שלב 2: העתקת הגיבוי לשרת
 
 **אפשרות 1: SCP**
+
 ```bash
 # העתקת הגיבוי לשרת
 scp tiktrack-testing-backup-*.dump user@server:/path/to/backups/
 ```
 
 **אפשרות 2: rsync**
+
 ```bash
 # העתקת הגיבוי לשרת
 rsync -avz tiktrack-testing-backup-*.dump user@server:/path/to/backups/
 ```
 
 **אפשרות 3: ישירות דרך PostgreSQL**
+
 ```bash
 # העתקה ישירה (אם יש חיבור ישיר)
 pg_dump -U TikTrakDBAdmin -d "TikTrack-db-testing" -h localhost | \
@@ -84,6 +90,7 @@ pg_dump -U TikTrakDBAdmin -d "TikTrack-db-testing" -h localhost | \
 ### שלב 3: יצירת Database Online
 
 **על השרת:**
+
 ```bash
 # יצירת database חדש
 createdb -U TikTrakDBAdmin "TikTrack-db-online"
@@ -93,6 +100,7 @@ psql -U TikTrakDBAdmin -c "CREATE DATABASE \"TikTrack-db-online\";"
 ```
 
 **בדיקה:**
+
 ```bash
 # בדיקת יצירה
 psql -U TikTrakDBAdmin -l | grep "TikTrack-db-online"
@@ -103,6 +111,7 @@ psql -U TikTrakDBAdmin -l | grep "TikTrack-db-online"
 ### שלב 4: שחזור Database
 
 **על השרת:**
+
 ```bash
 # שחזור מ-custom format
 pg_restore -U TikTrakDBAdmin \
@@ -115,6 +124,7 @@ psql -U TikTrakDBAdmin -d "TikTrack-db-online" < tiktrack-testing-backup-*.sql
 ```
 
 **בדיקה:**
+
 ```bash
 # בדיקת טבלאות
 psql -U TikTrakDBAdmin -d "TikTrack-db-online" -c "\dt"
@@ -130,6 +140,7 @@ psql -U TikTrakDBAdmin -d "TikTrack-db-online" -c "SELECT COUNT(*) FROM trades;"
 ### שלב 1: בדיקת מיגרציות נדרשות
 
 **על השרת:**
+
 ```bash
 # השוואת schema בין testing ל-online
 # (אם יש כלי לזה)
@@ -138,6 +149,7 @@ psql -U TikTrakDBAdmin -d "TikTrack-db-online" -c "SELECT COUNT(*) FROM trades;"
 ### שלב 2: הרצת מיגרציות
 
 **על השרת:**
+
 ```bash
 # הרצת מיגרציות נדרשות
 python3 scripts/production-update/steps/08_run_migrations.py \
@@ -150,18 +162,21 @@ python3 scripts/production-update/steps/08_run_migrations.py \
 ## ✅ Checklist העברת Database
 
 ### לפני העברה
+
 - [ ] גיבוי database testing
 - [ ] בדיקת תקינות הגיבוי
 - [ ] העתקת הגיבוי לשרת
 - [ ] יצירת database online
 
 ### העברה
+
 - [ ] שחזור database על השרת
 - [ ] בדיקת טבלאות
 - [ ] בדיקת data
 - [ ] הרצת מיגרציות (אם נדרש)
 
 ### אחרי העברה
+
 - [ ] בדיקת חיבור מהאפליקציה
 - [ ] בדיקת queries בסיסיים
 - [ ] בדיקת integrity
@@ -172,6 +187,7 @@ python3 scripts/production-update/steps/08_run_migrations.py \
 ## 🔧 כלים וסקריפטים
 
 ### סקריפט גיבוי
+
 ```bash
 #!/bin/bash
 # scripts/deployment/backup_testing_db.sh
@@ -188,6 +204,7 @@ echo "Backup created: $BACKUP_DIR/tiktrack-testing-$TIMESTAMP.dump"
 ```
 
 ### סקריפט העברה
+
 ```bash
 #!/bin/bash
 # scripts/deployment/migrate_db_to_online.sh
@@ -208,16 +225,19 @@ echo "Migration completed"
 ## ⚠️ הערות חשובות
 
 ### לפני העברה
+
 - **חובה:** גיבוי מלא לפני העברה
 - **מומלץ:** בדיקת תקינות הגיבוי
 - **חובה:** בדיקת חיבור לשרת
 
 ### במהלך העברה
+
 - **חובה:** בדיקת תקינות השחזור
 - **מומלץ:** בדיקת מספר רשומות
 - **חובה:** הרצת מיגרציות (אם נדרש)
 
 ### אחרי העברה
+
 - **חובה:** בדיקת חיבור מהאפליקציה
 - **חובה:** בדיקת queries בסיסיים
 - **מומלץ:** בדיקת ביצועים
@@ -227,14 +247,17 @@ echo "Migration completed"
 ## 📊 הערכת זמן
 
 ### גיבוי
+
 - **Database קטן (< 1GB):** 1-5 דקות
 - **Database בינוני (1-10GB):** 5-30 דקות
 - **Database גדול (> 10GB):** 30+ דקות
 
 ### העתקה לשרת
+
 - **תלוי בגודל ו-bandwidth:** 5-60 דקות
 
 ### שחזור
+
 - **Database קטן (< 1GB):** 2-10 דקות
 - **Database בינוני (1-10GB):** 10-60 דקות
 - **Database גדול (> 10GB):** 60+ דקות
@@ -246,10 +269,12 @@ echo "Migration completed"
 ## 🔗 קבצים רלוונטיים
 
 ### Scripts
+
 - `scripts/deployment/backup_testing_db.sh` - גיבוי (אם נוצר)
 - `scripts/deployment/migrate_db_to_online.sh` - העברה (אם נוצר)
 
 ### Documentation
+
 - `documentation/production/ONLINE_DEPLOYMENT/DATABASE_MIGRATION_PLAN.md` - זה הקובץ
 - `documentation/production/PRODUCTION_DATABASE_SETUP_GUIDE.md` - מדריך קיים
 

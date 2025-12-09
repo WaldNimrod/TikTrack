@@ -1,4 +1,5 @@
 # מדריך מעבר ל-data-onclick - TikTrack
+
 ## Migration Guide to data-onclick Standard
 
 **גרסה:** 1.0.0  
@@ -11,7 +12,7 @@
 
 מדריך זה מספק הוראות מפורטות למעבר מכל הכפתורים במערכת לשימוש ב-`data-onclick` כסטנדרט יחיד.
 
-### מי צריך את המדריך הזה?
+### מי צריך את המדריך הזה
 
 - מפתחים המעבירים כפתורים ישנים ל-`data-onclick`
 - מפתחים יוצרים כפתורים חדשים
@@ -83,7 +84,7 @@ node scripts/detect-onclick-usage.js
 
 ### שלב 2: המרת כותרות סידור
 
-#### לפני:
+#### לפני
 
 ```html
 <th class="col-symbol">
@@ -94,7 +95,7 @@ node scripts/detect-onclick-usage.js
 </th>
 ```
 
-#### אחרי:
+#### אחרי
 
 ```html
 <th class="col-symbol">
@@ -106,13 +107,14 @@ node scripts/detect-onclick-usage.js
 ```
 
 **שינויים:**
+
 1. הסר `onclick="if (typeof window.sortTable === 'function') { window.sortTable('positions', 0); }"`
 2. הוסף `data-onclick="window.sortTable('positions', 0)"`
 3. הסר את הבדיקה `if (typeof window.sortTable === 'function')` - `EventHandlerManager` מטפל בשגיאות
 
 ### שלב 3: המרת כפתורי פעולות
 
-#### לפני:
+#### לפני
 
 ```html
 <button onclick="editRecord(123)">ערוך</button>
@@ -137,13 +139,13 @@ node scripts/detect-onclick-usage.js
 
 ### שלב 4: המרת כפתורי מודולים
 
-#### לפני:
+#### לפני
 
 ```html
 <button onclick="window.showModalSafe('modal', 'add')">הוסף</button>
 ```
 
-#### אחרי:
+#### אחרי
 
 ```html
 <button data-button-type="ADD" 
@@ -154,7 +156,7 @@ node scripts/detect-onclick-usage.js
 
 ### שלב 5: המרת כפתורים שנוצרים דינמית
 
-#### לפני:
+#### לפני
 
 ```javascript
 // יצירת כפתור דינמי עם onclick
@@ -162,7 +164,7 @@ const buttonHtml = `<button onclick="deleteRow(${rowId})">מחק</button>`;
 tableRow.innerHTML += buttonHtml;
 ```
 
-#### אחרי:
+#### אחרי
 
 ```javascript
 // יצירת כפתור דינמי עם data-onclick
@@ -180,14 +182,14 @@ tableRow.innerHTML += buttonHtml;
 
 ### שלב 6: בדיקה ואימות
 
-#### בדיקה ידנית:
+#### בדיקה ידנית
 
 1. פתח את העמוד בדפדפן
 2. לחץ על כל כפתור שעבר מיגרציה
 3. בדוק שהפונקציה מבוצעת
 4. בדוק את ה-console לשגיאות
 
-#### בדיקה אוטומטית:
+#### בדיקה אוטומטית
 
 ```bash
 # הרצת כלי בדיקת אינטגרציה
@@ -203,7 +205,7 @@ node scripts/migration-status-report.js
 
 ### דוגמה 1: כותרת סידור בטבלה
 
-#### לפני:
+#### לפני
 
 ```html
 <th class="col-name">
@@ -214,7 +216,7 @@ node scripts/migration-status-report.js
 </th>
 ```
 
-#### אחרי:
+#### אחרי
 
 ```html
 <th class="col-name">
@@ -226,13 +228,14 @@ node scripts/migration-status-report.js
 ```
 
 **שינויים:**
+
 - הסר `onclick="if (typeof window.sortTable === 'function') { window.sortTable('accounts', 0); }"`
 - הוסף `data-onclick="window.sortTable('accounts', 0)"`
 - הסר את הבדיקה `if (typeof window.sortTable === 'function')`
 
 ### דוגמה 2: כפתור פעולה בטבלה
 
-#### לפני:
+#### לפני
 
 ```html
 <td class="actions-cell">
@@ -241,7 +244,7 @@ node scripts/migration-status-report.js
 </td>
 ```
 
-#### אחרי:
+#### אחרי
 
 ```html
 <td class="actions-cell">
@@ -257,19 +260,20 @@ node scripts/migration-status-report.js
 ```
 
 **שינויים:**
+
 - הוסף `data-button-type` לכל כפתור
 - החלף `onclick` ב-`data-onclick`
 - הוסף `data-text` לטקסט הכפתור
 
 ### דוגמה 3: כפתור TOGGLE
 
-#### לפני:
+#### לפני
 
 ```html
 <button onclick="toggleSection('main')">הצג/הסתר</button>
 ```
 
-#### אחרי:
+#### אחרי
 
 ```html
 <button data-button-type="TOGGLE" 
@@ -281,13 +285,13 @@ node scripts/migration-status-report.js
 
 ### דוגמה 4: כפתור עם פרמטרים מורכבים
 
-#### לפני:
+#### לפני
 
 ```html
 <button onclick="window.showEntityDetails('execution', 4, { mode: 'view' })">צפה</button>
 ```
 
-#### אחרי:
+#### אחרי
 
 ```html
 <button data-button-type="VIEW" 
@@ -302,13 +306,13 @@ node scripts/migration-status-report.js
 
 ## ✅ Checklist למיגרציה
 
-### לפני התחלת עבודה:
+### לפני התחלת עבודה
 
 - [ ] קראתי את `EVENT_HANDLING_STANDARD.md`
 - [ ] הבנתי את ההבדל בין `onclick` ל-`data-onclick`
 - [ ] יש לי גישה לכלי האיתור (`detect-onclick-usage.js`)
 
-### במהלך המיגרציה:
+### במהלך המיגרציה
 
 - [ ] זיהיתי את כל הכפתורים עם `onclick` רגיל
 - [ ] המרתי כל כותרת סידור
@@ -318,7 +322,7 @@ node scripts/migration-status-report.js
 - [ ] בדקתי שכל הכפתורים עובדים
 - [ ] בדקתי שאין שגיאות ב-console
 
-### אחרי המיגרציה:
+### אחרי המיגרציה
 
 - [ ] הרצתי את כלי האיתור ובדקתי שאחוז המיגרציה = 100%
 - [ ] הרצתי את כלי בדיקת האינטגרציה
@@ -333,11 +337,13 @@ node scripts/migration-status-report.js
 ### בעיה: כפתור לא עובד אחרי המיגרציה
 
 **סיבות אפשריות:**
+
 1. הפונקציה לא קיימת ב-`window`
 2. שגיאת syntax ב-`data-onclick`
 3. הכפתור disabled
 
 **פתרון:**
+
 ```javascript
 // בדיקה בקונסולה
 const button = document.querySelector('button[data-onclick]');
@@ -396,6 +402,7 @@ if (onclickValue) {
 ## 🔄 היסטוריית עדכונים
 
 ### 2025-01-27 - יצירת מדריך מעבר
+
 - ✅ יצירת מדריך זה
 - ✅ דוגמאות מפורטות לפני/אחרי
 - ✅ Checklist למיגרציה

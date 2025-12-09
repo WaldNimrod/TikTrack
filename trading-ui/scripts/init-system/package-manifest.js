@@ -243,7 +243,7 @@ const PACKAGE_MANIFEST = {
       },
       {
         file: 'auth.js',
-        globalCheck: 'window.isAuthenticated',
+        globalCheck: 'window.TikTrackAuth',
         description: 'Authentication system',
         required: true,
         loadOrder: 9.5
@@ -1353,7 +1353,7 @@ const PACKAGE_MANIFEST = {
     description: 'Entity services',
     version: '1.5.0',
     critical: false,
-    loadOrder: 10,
+    loadOrder: 8, // Changed from 10 to 8 to load before TradingView Charts (19) - fixes loading order issue
     dependencies: ['base', 'services'],
     loadingStrategy: 'defer', // Critical package - entity services, has dependencies on base and services
     scripts: [
@@ -1375,7 +1375,7 @@ const PACKAGE_MANIFEST = {
         file: 'services/portfolio-state-data.js',
         globalCheck: 'window.PortfolioStateData',
         description: 'Portfolio state data service',
-        required: false,  // Required only for portfolio-state-page
+        required: false,  // Required only for portfolio-state
         loadOrder: 8.5
       },
       {

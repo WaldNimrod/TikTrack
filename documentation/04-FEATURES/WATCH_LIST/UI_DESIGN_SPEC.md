@@ -1,4 +1,5 @@
 # מפרט עיצוב ממשק משתמש: Watch List
+
 ## UI Design Specification: Watch List System
 
 **תאריך:** 28 בינואר 2025  
@@ -547,18 +548,21 @@
 ## CSS Classes
 
 ### Watch List Card
+
 - `.watch-list-card` - Card container
 - `.watch-list-card-header` - Header with icon and actions
 - `.watch-list-card-body` - Body with name and stats
 - `.watch-list-card-footer` - Footer with action button
 
 ### Drag & Drop
+
 - `.drag-handle` - Drag handle icon (≡)
 - `.drag-handle-column` - Column containing drag handle
 - `.dragging` - Applied during drag operation
 - `.drag-over` - Applied on drop target
 
 ### Flags
+
 - `.btn-flag` - Flag button
 - `.flag-palette-popup` - Flag color picker popup
 - `.flag-color-btn` - Individual color button in palette
@@ -568,15 +572,18 @@
 ## Responsive Design
 
 ### Mobile (< 768px)
+
 - Cards grid: 1 column
 - Table: Horizontal scroll
 - View mode toggle: Icon only (no text)
 
 ### Tablet (768px - 1024px)
+
 - Cards grid: 2 columns
 - Table: Full width
 
 ### Desktop (> 1024px)
+
 - Cards grid: 3 columns
 - Table: Full width with all columns
 
@@ -585,11 +592,13 @@
 ## Accessibility
 
 ### ARIA Labels
+
 - כל כפתור: `aria-label` בעברית
 - כל טבלה: `aria-label` עם תיאור
 - Drag handles: `aria-label="סדר מחדש"`
 
 ### Keyboard Navigation
+
 - Tab navigation בין כל האלמנטים
 - Enter/Space לפעולות
 - Arrow keys לניווט בטבלה
@@ -598,6 +607,10 @@
 ---
 
 **סיכום:** הממשק תומך בכל הדרישות עם תמיכה מלאה ב-RTL, Responsive Design, ו-Accessibility.
+
+
+
+
 
 
 

@@ -104,6 +104,7 @@
 ### 2.2 זיהוי שימושים מקומיים במקום מערכת מרכזית
 
 **דפוסים לזיהוי:**
+
 - `new bootstrap.Modal()` - להחליף ב-`window.ModalManagerV2.showModal()`
 - `bootstrap.Modal.getInstance()` - להחליף ב-`window.ModalManagerV2`
 - `.modal('show')` - להחליף ב-`window.ModalManagerV2.showModal()`
@@ -225,18 +226,18 @@
 
 ## קבצים רלוונטיים
 
-### מערכת מודלים:
+### מערכת מודלים
 
 - `trading-ui/scripts/modal-manager-v2.js` - המערכת המרכזית
 - `trading-ui/scripts/modal-navigation-manager.js` - ניווט מודלים
 - `trading-ui/scripts/modal-configs/*.js` - קונפיגורציות מודלים
 
-### דוקומנטציה:
+### דוקומנטציה
 
 - `documentation/03-DEVELOPMENT/TOOLS/MODAL_MANAGER_V2_SPECIFICATION.md`
 - `documentation/frontend/UI_STANDARDIZATION_WORK_DOCUMENT.md`
 
-### דוחות שייווצרו:
+### דוחות שייווצרו
 
 - `documentation/05-REPORTS/MODAL_MANAGER_V2_DEVIATIONS_REPORT.md`
 - `documentation/05-REPORTS/MODAL_MANAGER_V2_TESTING_REPORT.md`

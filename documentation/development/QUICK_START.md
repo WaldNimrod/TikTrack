@@ -7,6 +7,7 @@ This guide will help you get up and running with the TikTrack Trading Management
 ## 🚀 Prerequisites
 
 ### **Required Software**
+
 - **Python 3.8+**: Latest stable version
 - **Node.js 16+**: For frontend development
 - **Git**: Version control system
@@ -14,6 +15,7 @@ This guide will help you get up and running with the TikTrack Trading Management
 - **VS Code**: Recommended IDE (or your preferred editor)
 
 ### **System Requirements**
+
 - **Operating System**: Windows 10+, macOS 10.15+, or Linux
 - **Memory**: 8GB RAM minimum, 16GB recommended
 - **Storage**: 2GB free space
@@ -22,12 +24,14 @@ This guide will help you get up and running with the TikTrack Trading Management
 ## ⚡ Quick Setup (5 Minutes)
 
 ### **1. Clone the Repository**
+
 ```bash
 git clone https://github.com/your-org/tiktrack.git
 cd tiktrack
 ```
 
 ### **2. Set Up Python Environment**
+
 ```bash
 # Create virtual environment
 python -m venv venv
@@ -43,6 +47,7 @@ pip install -r requirements.txt
 ```
 
 ### **3. Set Up Frontend**
+
 ```bash
 # Navigate to frontend directory
 cd trading-ui
@@ -52,6 +57,7 @@ cd trading-ui
 ```
 
 ### **4. Initialize Database**
+
 ```bash
 # Navigate back to root
 cd ..
@@ -61,6 +67,7 @@ python Backend/create_fresh_database.py
 ```
 
 ### **5. Start Backend Server**
+
 ```bash
 # Start development server
 python Backend/dev_server.py
@@ -69,11 +76,13 @@ python Backend/dev_server.py
 ## 🎯 Verify Installation
 
 ### **Check Backend**
+
 - Open browser to: `http://localhost:8080`
 - You should see the TikTrack application
 - Database should be accessible
 
 ### **Check Frontend**
+
 - Open browser to: `http://localhost:8080`
 - All pages should load without errors
 - Navigation should work properly
@@ -97,6 +106,7 @@ TikTrack/
 ## 🔧 Development Workflow
 
 ### **1. Making Changes**
+
 ```bash
 # Create feature branch
 git checkout -b feature/your-feature-name
@@ -113,6 +123,7 @@ git push origin feature/your-feature-name
 ```
 
 ### **2. Testing Changes**
+
 ```bash
 # Run backend tests
 # Manual testing - no automated test suite currently
@@ -127,6 +138,7 @@ git push origin feature/your-feature-name
 ```
 
 ### **3. Code Quality**
+
 ```bash
 # Python linting
 pip install flake8
@@ -139,11 +151,13 @@ flake8 Backend/
 ## 🗄️ Database Management
 
 ### **Database Location**
+
 - **File**: `Backend/db/simpleTrade_new.db`
 - **Type**: SQLite database
 - **Backup**: Automatic backups in `backups/` directory
 
 ### **Common Database Operations**
+
 ```bash
 # Reset database to fresh state
 python Backend/create_fresh_database.py
@@ -158,6 +172,7 @@ cp Backend/db/simpleTrade_new.db backups/backup_$(date +%Y%m%d_%H%M%S).db
 ## 🎨 Frontend Development
 
 ### **File Structure**
+
 ```
 trading-ui/
 ├── index.html              # Main application page
@@ -176,6 +191,7 @@ trading-ui/
 ```
 
 ### **Adding New Pages**
+
 1. Create HTML file in `trading-ui/pages/`
 2. Add navigation link in `index.html`
 3. Create corresponding JavaScript file
@@ -185,6 +201,7 @@ trading-ui/
 ## 🔧 Backend Development
 
 ### **File Structure**
+
 ```
 Backend/
 ├── dev_server.py          # Main server file
@@ -195,6 +212,7 @@ Backend/
 ```
 
 ### **Adding New API Endpoints**
+
 1. Define model in `models/`
 2. Create API endpoint in `dev_server.py`
 3. Add validation and error handling
@@ -204,6 +222,7 @@ Backend/
 ## 🧪 Testing
 
 ### **Running Tests**
+
 ```bash
 # Backend tests
 python -m pytest Backend/tests/
@@ -220,6 +239,7 @@ npm test
 ```
 
 ### **Test Data**
+
 - Sample data is created automatically
 - Use `create_fresh_database.py` to reset with sample data
 - Test with various data scenarios
@@ -227,6 +247,7 @@ npm test
 ## 🚨 Common Issues
 
 ### **Port Already in Use**
+
 ```bash
 # Find process using port 8080
 lsof -i :8080
@@ -239,6 +260,7 @@ python Backend/dev_server.py --port 8081
 ```
 
 ### **Database Locked**
+
 ```bash
 # Close any open database connections
 # Restart the development server
@@ -248,6 +270,7 @@ python Backend/create_fresh_database.py
 ```
 
 ### **Frontend Issues**
+
 ```bash
 # Clear browser cache
 # Refresh page with Ctrl+F5
@@ -258,12 +281,14 @@ python Backend/create_fresh_database.py
 ## 📚 Next Steps
 
 ### **Learning Resources**
+
 1. **Read Documentation**: Start with `documentation/README.md`
 2. **Study Code**: Review existing implementations
 3. **Join Team**: Connect with other developers
 4. **Ask Questions**: Use team communication channels
 
 ### **First Tasks**
+
 1. **Familiarize**: Explore all pages and features
 2. **Understand**: Study the codebase structure
 3. **Contribute**: Pick a small bug or feature
@@ -272,6 +297,7 @@ python Backend/create_fresh_database.py
 ## 🔗 Useful Commands
 
 ### **Development Commands**
+
 ```bash
 # Start development
 ./restart
@@ -287,6 +313,7 @@ sqlite3 Backend/db/simpleTrade_new.db ".tables"
 ```
 
 ### **Git Commands**
+
 ```bash
 # Check status
 git status
@@ -304,11 +331,13 @@ git checkout main
 ## 📞 Getting Help
 
 ### **Documentation**
+
 - **Main Docs**: `documentation/README.md`
 - **API Docs**: `documentation/api/`
 - **Database Docs**: `documentation/database/`
 
 ### **Team Support**
+
 - **Slack**: #tiktrack-dev
 - **Email**: dev@tiktrack.com
 - **Issues**: GitHub Issues

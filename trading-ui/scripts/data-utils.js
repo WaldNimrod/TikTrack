@@ -42,7 +42,18 @@ window.isNumeric = isNumeric;
  */
 async function loadCurrenciesFromServer() {
   try {
-    const token = localStorage.getItem('authToken');
+    let token = null;
+    if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
+      try {
+        token = await window.UnifiedCacheManager.get('authToken');
+      } catch (e) {
+        console.warn('Error getting authToken from cache:', e);
+        // Fall through to localStorage fallback
+      }
+    }
+    if (!token) {
+      token = localStorage.getItem('authToken'); // fallback
+    }
     const headers = {
       'Content-Type': 'application/json',
     };
@@ -164,7 +175,18 @@ function generateCurrencyOptions(account = null) {
  * @returns {Promise<Object>} API response
  */
 async function apiCall(url, options = {}) {
-  const token = localStorage.getItem('authToken');
+  let token = null;
+  if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
+    try {
+      token = await window.UnifiedCacheManager.get('authToken');
+    } catch (e) {
+      console.warn('Error getting authToken from cache:', e);
+      // Fall through to localStorage fallback
+    }
+  }
+  if (!token) {
+    token = localStorage.getItem('authToken'); // fallback
+  }
   const headers = {
     'Content-Type': 'application/json',
     ...options.headers,

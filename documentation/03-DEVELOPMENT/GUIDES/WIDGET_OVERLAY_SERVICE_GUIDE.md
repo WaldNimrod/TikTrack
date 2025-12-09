@@ -7,6 +7,7 @@
 ## ארכיטקטורה
 
 המערכת מבוססת על:
+
 - **Event Delegation**: שימוש ב-event delegation על ה-list container במקום binding לכל item
 - **Fixed Positioning**: שימוש ב-`position: fixed` כדי לאפשר ל-overlay לברוח מגבולות הקונטיינר
 - **Viewport-Relative**: חישוב מיקום יחסית ל-viewport (ללא scroll offsets)
@@ -83,6 +84,7 @@
 מגדיר event handlers ל-overlay hover.
 
 **פרמטרים:**
+
 - `listElement` (HTMLElement) - אלמנט הרשימה (container)
 - `itemSelector` (string) - CSS selector ל-items (לדוגמה: `.widget-item`)
 - `detailsSelector` (string) - CSS selector ל-details container (לדוגמה: `.widget-item-details`)
@@ -118,6 +120,7 @@ if (window.WidgetOverlayService && elements.tradesList) {
 מחשב ומציב overlay יחסית ל-item.
 
 **פרמטרים:**
+
 - `item` (HTMLElement) - אלמנט ה-item
 - `details` (HTMLElement) - אלמנט ה-details container
 - `options` (Object, אופציונלי) - אפשרויות קונפיגורציה (כמו ב-setupOverlayHover)
@@ -129,6 +132,7 @@ if (window.WidgetOverlayService && elements.tradesList) {
 מעדכן מיקום overlay (לשימוש ב-scroll/resize events).
 
 **פרמטרים:**
+
 - `item` (HTMLElement) - אלמנט ה-item
 - `details` (HTMLElement) - אלמנט ה-details container
 - `options` (Object, אופציונלי) - אפשרויות קונפיגורציה
@@ -152,6 +156,7 @@ window.addEventListener('scroll', () => {
 מנקה event listeners ומסיר את ה-overlay handlers.
 
 **פרמטרים:**
+
 - `listElement` (HTMLElement) - אלמנט הרשימה (container)
 
 **דוגמה:**
@@ -230,6 +235,7 @@ destroy() {
 ### CSS מרכזי
 
 המערכת מספקת CSS מרכזי ב-`_widget-overlay.css`:
+
 - `.widget-item[data-widget-overlay="true"]` - בסיס ל-items
 - `[data-overlay="true"]` - בסיס ל-overlay
 - `.widget-item-details-content` - תוכן overlay
@@ -275,11 +281,13 @@ destroy() {
 ### Overlay לא נפתח
 
 **סיבות אפשריות:**
+
 1. `WidgetOverlayService` לא נטען - וודא שהוא נטען לפני הוויג'ט
 2. מבנה HTML לא נכון - וודא שיש `data-widget-overlay="true"` ו-`data-overlay="true"`
 3. Selectors לא נכונים - וודא שה-selectors תואמים למבנה HTML
 
 **פתרון:**
+
 ```javascript
 // בדוק אם המערכת נטענה
 if (!window.WidgetOverlayService) {
@@ -299,20 +307,24 @@ if (!item || !details) {
 ### Overlay לא ממוקם נכון
 
 **סיבות אפשריות:**
+
 1. שימוש ב-`window.scrollY`/`window.scrollX` - לא נחוץ עם `position: fixed`
 2. CSS שמשפיע על positioning - בדוק CSS ספציפי לוויג'ט
 
 **פתרון:**
+
 - הסר כל שימוש ב-`window.scrollY`/`window.scrollX`
 - בדוק CSS ספציפי לוויג'ט שלא משפיע על positioning
 
 ### Overlay נחתך על ידי container
 
 **סיבות אפשריות:**
+
 1. `overflow: hidden` על container - צריך `overflow: visible`
 2. z-index נמוך מדי - בדוק את ה-z-index
 
 **פתרון:**
+
 ```css
 /* Container צריך overflow: visible */
 .widget-container {

@@ -1,4 +1,5 @@
 # דוח סטנדרטיזציה ומימוש מערכות קוד כלליות - עמודי מוקאפ
+
 ## Mockups Standardization and General Systems Integration Report
 
 **תאריך:** 30 בינואר 2025  
@@ -30,6 +31,7 @@
 ### שלב 1: אינטגרציות קריטיות
 
 #### 1.1 UnifiedCacheManager ✅
+
 - **דרישה:** הוספת מטמון לכל טעינות נתונים
 - **TTL מומלץ:**
   - נתוני טריידים/ביצועים: 300 שניות (5 דקות)
@@ -38,6 +40,7 @@
 - **אינטגרציה:** CacheSyncManager ל-invalidation
 
 #### 1.2 UnifiedTableSystem ✅
+
 - **דרישה:** רישום כל הטבלאות ב-UnifiedTableSystem
 - **דרישות:**
   - הוספת `data-table-type` לטבלאות
@@ -46,6 +49,7 @@
   - שימוש ב-`UnifiedTableSystem.render()`
 
 #### 1.3 InfoSummarySystem ✅
+
 - **דרישה:** שימוש ב-InfoSummarySystem לכרטיסי סיכום
 - **דרישות:**
   - הגדרת config ב-`info-summary-configs.js`
@@ -55,6 +59,7 @@
 ### שלב 2: שיפורים חשובים
 
 #### 2.1 Button System ✅
+
 - **דרישה:** מעבר מלא מ-`onclick` ל-`data-onclick`
 - **דרישות:**
   - החלפת כל ה-`onclick` ב-HTML
@@ -62,6 +67,7 @@
   - הסרת event handlers מקומיים
 
 #### 2.2 Page State Management ✅
+
 - **דרישה:** שמירת מצב פילטרים, סקשנים וגרפים
 - **דרישות:**
   - `savePageState()` - שמירת מצב
@@ -69,6 +75,7 @@
   - שמירת מצב פילטרים, סקשנים וגרפים
 
 #### 2.3 Error Handling ✅
+
 - **דרישה:** החלפת `Logger.error` ב-`NotificationSystem.showError`
 - **דרישות:**
   - `safeApiCall()` wrapper לטיפול בשגיאות API
@@ -78,18 +85,21 @@
 ### שלב 3: שיפורים נוספים
 
 #### 3.1 Optimization ✅
+
 - **דרישות:**
   - `debounce()` על שינויי פילטרים (300ms)
   - טעינה מקבילית עם `Promise.all()`
   - `safeApiCall()` wrapper
 
 #### 3.2 UX Improvements ✅
+
 - **דרישות:**
   - `showLoadingState()` / `hideLoadingState()`
   - Loading spinners
   - Skeleton screens (אופציונלי)
 
 #### 3.3 Real Data Connection ⏳
+
 - **דרישה:** חיבור לנתונים אמיתיים (Backend)
 - **סטטוס:** ממתין - דורש עבודה ב-Backend
 
@@ -112,6 +122,7 @@
 | **tradingview-test** | ❌ | ❌ | ❌ | ⚠️ | ❌ | ⚠️ | ❌ | ❌ | ⏳ נדרש |
 
 **סימון:**
+
 - ✅ = משולב כראוי
 - ⚠️ = שימוש חלקי/לא מלא
 - ❌ = לא משולב
@@ -125,6 +136,7 @@
 **סטטוס:** ✅ הושלם - סבב שיפורים שני
 
 **אינטגרציות:**
+
 - ✅ UnifiedCacheManager - מטמון מלא (trades, accounts, summary)
 - ✅ UnifiedTableSystem - טבלת trades רשומה
 - ✅ InfoSummarySystem - config מוגדר, שימוש מלא
@@ -135,6 +147,7 @@
 - ✅ Optimization - debounce, Promise.all
 
 **קבצים:**
+
 - `trading-ui/mockups/daily-snapshots/portfolio-state-page.html`
 - `trading-ui/scripts/portfolio-state-page.js`
 - `trading-ui/scripts/info-summary-configs.js` (config נוסף)
@@ -146,6 +159,7 @@
 **סטטוס:** ⏳ נדרש - סטנדרטיזציה מלאה (יש כבר חלק מהאינטגרציות)
 
 **ניתוח:**
+
 - ⚠️ **UnifiedCacheManager:** יש שימוש חלקי - יש cache keys ו-UnifiedCacheManager אבל לא מלא
 - ✅ **UnifiedTableSystem:** יש רישום טבלה (plan vs execution table)
 - ❌ **InfoSummarySystem:** לא משולב
@@ -156,10 +170,12 @@
 - ⚠️ **Optimization:** יש Promise.all אחד - צריך להרחיב
 
 **קבצים:**
+
 - `trading-ui/mockups/daily-snapshots/trade-history-page.html`
 - `trading-ui/scripts/trade-history-page.js`
 
 **פעולות נדרשות:**
+
 1. הרחבת UnifiedCacheManager לכל טעינות נתונים (יש כבר חלק)
 2. בדיקה ואינטגרציה עם InfoSummarySystem
 3. החלפת כל ה-16 onclick ל-data-onclick
@@ -175,6 +191,7 @@
 **סטטוס:** ⏳ נדרש - סטנדרטיזציה מלאה
 
 **ניתוח:**
+
 - ❌ **UnifiedCacheManager:** לא משולב
 - ❌ **UnifiedTableSystem:** לא רלוונטי (אין טבלאות)
 - ⚠️ **InfoSummarySystem:** לא ברור - צריך לבדוק
@@ -185,10 +202,12 @@
 - ❌ **Optimization:** לא משולב
 
 **קבצים:**
+
 - `trading-ui/mockups/daily-snapshots/price-history-page.html`
 - `trading-ui/scripts/price-history-page.js`
 
 **פעולות נדרשות:**
+
 1. הוספת UnifiedCacheManager (אם יש טעינות נתונים)
 2. בדיקה ואינטגרציה עם InfoSummarySystem
 3. בדיקה והחלפת onclick ל-data-onclick
@@ -204,6 +223,7 @@
 **סטטוס:** ⏳ נדרש - סטנדרטיזציה מלאה
 
 **ניתוח:**
+
 - ⚠️ **UnifiedCacheManager:** יש שימוש חלקי (series visibility)
 - ❌ **UnifiedTableSystem:** לא רלוונטי (אין טבלאות)
 - ⚠️ **InfoSummarySystem:** לא ברור - צריך לבדוק
@@ -214,10 +234,12 @@
 - ❌ **Optimization:** לא משולב
 
 **קבצים:**
+
 - `trading-ui/mockups/daily-snapshots/comparative-analysis-page.html`
 - `trading-ui/scripts/comparative-analysis-page.js`
 
 **פעולות נדרשות:**
+
 1. הרחבת UnifiedCacheManager לכל טעינות נתונים
 2. בדיקה ואינטגרציה עם InfoSummarySystem
 3. החלפת כל ה-onclick ל-data-onclick
@@ -233,6 +255,7 @@
 **סטטוס:** ⏳ נדרש - סטנדרטיזציה מלאה
 
 **ניתוח:**
+
 - ❌ **UnifiedCacheManager:** לא משולב
 - ❌ **UnifiedTableSystem:** לא רלוונטי (אין טבלאות)
 - ❌ **InfoSummarySystem:** לא רלוונטי (אין כרטיסי סיכום)
@@ -243,10 +266,12 @@
 - ❌ **Optimization:** לא משולב
 
 **קבצים:**
+
 - `trading-ui/mockups/daily-snapshots/trading-journal-page.html`
 - `trading-ui/scripts/trading-journal-page.js`
 
 **פעולות נדרשות:**
+
 1. הוספת UnifiedCacheManager (אם יש טעינות נתונים)
 2. בדיקה והחלפת onclick ל-data-onclick
 3. הוספת Page State Management (אם יש פילטרים)
@@ -261,6 +286,7 @@
 **סטטוס:** ⏳ נדרש - סטנדרטיזציה מלאה
 
 **ניתוח:**
+
 - ⚠️ **UnifiedCacheManager:** יש שימוש חלקי (series visibility)
 - ❌ **UnifiedTableSystem:** לא רלוונטי (אין טבלאות)
 - ⚠️ **InfoSummarySystem:** לא ברור - צריך לבדוק
@@ -271,10 +297,12 @@
 - ❌ **Optimization:** לא משולב
 
 **קבצים:**
+
 - `trading-ui/mockups/daily-snapshots/strategy-analysis-page.html`
 - `trading-ui/scripts/strategy-analysis-page.js`
 
 **פעולות נדרשות:**
+
 1. הרחבת UnifiedCacheManager לכל טעינות נתונים
 2. בדיקה ואינטגרציה עם InfoSummarySystem
 3. החלפת כל ה-onclick ל-data-onclick
@@ -290,6 +318,7 @@
 **סטטוס:** ⏳ נדרש - סטנדרטיזציה מלאה
 
 **ניתוח:**
+
 - ⚠️ **UnifiedCacheManager:** יש שימוש חלקי (widget config)
 - ❌ **UnifiedTableSystem:** לא רלוונטי (אין טבלאות)
 - ⚠️ **InfoSummarySystem:** יש שימוש - צריך לבדוק אם מלא
@@ -300,10 +329,12 @@
 - ❌ **Optimization:** לא משולב
 
 **קבצים:**
+
 - `trading-ui/mockups/daily-snapshots/economic-calendar-page.html`
 - `trading-ui/scripts/economic-calendar-page.js`
 
 **פעולות נדרשות:**
+
 1. הרחבת UnifiedCacheManager לכל טעינות נתונים
 2. בדיקה ואינטגרציה מלאה עם InfoSummarySystem
 3. החלפת כל ה-onclick ל-data-onclick
@@ -319,6 +350,7 @@
 **סטטוס:** ⏳ נדרש - סטנדרטיזציה מלאה
 
 **ניתוח:**
+
 - ❌ **UnifiedCacheManager:** לא משולב
 - ❌ **UnifiedTableSystem:** לא רלוונטי (אין טבלאות)
 - ⚠️ **InfoSummarySystem:** יש שימוש - צריך לבדוק אם מלא
@@ -329,10 +361,12 @@
 - ❌ **Optimization:** לא משולב
 
 **קבצים:**
+
 - `trading-ui/mockups/daily-snapshots/history-widget.html`
 - `trading-ui/scripts/history-widget.js`
 
 **פעולות נדרשות:**
+
 1. הוספת UnifiedCacheManager (אם יש טעינות נתונים)
 2. בדיקה ואינטגרציה מלאה עם InfoSummarySystem
 3. בדיקה והחלפת onclick ל-data-onclick
@@ -348,6 +382,7 @@
 **סטטוס:** ⏳ נדרש - סטנדרטיזציה מלאה
 
 **ניתוח:**
+
 - ❌ **UnifiedCacheManager:** לא משולב
 - ❌ **UnifiedTableSystem:** לא רלוונטי (אין טבלאות)
 - ⚠️ **InfoSummarySystem:** יש שימוש - צריך לבדוק אם מלא
@@ -358,10 +393,12 @@
 - ❌ **Optimization:** לא משולב
 
 **קבצים:**
+
 - `trading-ui/mockups/daily-snapshots/emotional-tracking-widget.html`
 - `trading-ui/scripts/emotional-tracking-widget.js`
 
 **פעולות נדרשות:**
+
 1. הוספת UnifiedCacheManager (אם יש טעינות נתונים)
 2. בדיקה ואינטגרציה מלאה עם InfoSummarySystem
 3. בדיקה והחלפת onclick ל-data-onclick
@@ -377,6 +414,7 @@
 **סטטוס:** ⏳ נדרש - סטנדרטיזציה מלאה
 
 **ניתוח:**
+
 - ⚠️ **UnifiedCacheManager:** יש שימוש חלקי (selected dates)
 - ❌ **UnifiedTableSystem:** לא רלוונטי (אין טבלאות)
 - ⚠️ **InfoSummarySystem:** לא ברור - צריך לבדוק
@@ -387,10 +425,12 @@
 - ❌ **Optimization:** לא משולב
 
 **קבצים:**
+
 - `trading-ui/mockups/daily-snapshots/date-comparison-modal.html`
 - `trading-ui/scripts/date-comparison-modal.js`
 
 **פעולות נדרשות:**
+
 1. הרחבת UnifiedCacheManager לכל טעינות נתונים
 2. בדיקה ואינטגרציה עם InfoSummarySystem
 3. החלפת כל ה-onclick ל-data-onclick
@@ -406,6 +446,7 @@
 **סטטוס:** ⏳ נדרש - סטנדרטיזציה מלאה
 
 **ניתוח:**
+
 - ❌ **UnifiedCacheManager:** לא משולב
 - ❌ **UnifiedTableSystem:** לא רלוונטי (אין טבלאות)
 - ❌ **InfoSummarySystem:** לא רלוונטי (אין כרטיסי סיכום)
@@ -416,10 +457,12 @@
 - ❌ **Optimization:** לא משולב
 
 **קבצים:**
+
 - `trading-ui/mockups/daily-snapshots/tradingview-test-page.html`
 - `trading-ui/scripts/tradingview-test-page.js` (אם קיים)
 
 **פעולות נדרשות:**
+
 1. הוספת UnifiedCacheManager (אם יש טעינות נתונים)
 2. בדיקה והחלפת onclick ל-data-onclick
 3. הוספת Page State Management (אם יש פילטרים)
@@ -431,23 +474,27 @@
 
 ## 📈 סיכום כללי
 
-### סטטוס כללי:
+### סטטוס כללי
+
 - ✅ **הושלם:** 1/11 עמודים (9%)
 - ⏳ **נדרש:** 10/11 עמודים (91%)
 
-### חלוקה לפי שלבים:
+### חלוקה לפי שלבים
 
-#### שלב 1 - אינטגרציות קריטיות:
+#### שלב 1 - אינטגרציות קריטיות
+
 - ⚠️ **UnifiedCacheManager:** 2/11 (18%) - portfolio-state מלא, trade-history חלקי
 - ✅ **UnifiedTableSystem:** 2/11 (18%) - portfolio-state, trade-history
 - ✅ **InfoSummarySystem:** 1/11 (9%) - portfolio-state
 
-#### שלב 2 - שיפורים חשובים:
+#### שלב 2 - שיפורים חשובים
+
 - ⚠️ **Button System:** 4/11 (36%) - חלקי
 - ✅ **Page State Management:** 2/11 (18%) - portfolio-state, trade-history
 - ⚠️ **Error Handling:** 0/11 (0%) - לא משולב
 
-#### שלב 3 - שיפורים נוספים:
+#### שלב 3 - שיפורים נוספים
+
 - ❌ **Loading States:** 1/11 (9%)
 - ❌ **Optimization:** 1/11 (9%)
 
@@ -455,17 +502,20 @@
 
 ## 🎯 תוכנית פעולה מומלצת
 
-### עדיפות גבוהה (שלב 1):
+### עדיפות גבוהה (שלב 1)
+
 1. **trade-history-page** - עמוד מרכזי עם טבלאות
 2. **comparative-analysis-page** - עמוד מורכב עם גרפים
 3. **strategy-analysis-page** - עמוד מורכב עם גרפים
 
-### עדיפות בינונית (שלב 2):
+### עדיפות בינונית (שלב 2)
+
 4. **economic-calendar-page** - יש כבר חלק מהאינטגרציות
 5. **price-history-page** - עמוד פשוט יחסית
 6. **date-comparison-modal** - מודל חשוב
 
-### עדיפות נמוכה (שלב 3):
+### עדיפות נמוכה (שלב 3)
+
 7. **history-widget** - ווידג'ט קטן
 8. **emotional-tracking-widget** - ווידג'ט קטן
 9. **trading-journal-page** - עמוד פשוט

@@ -9,6 +9,7 @@
 ## סקירה כללית
 
 מערכת עדכון פרודקשן מאוחדת המאפשרת:
+
 - ✅ הרצת כל התהליך בפקודה אחת
 - ✅ הרצת שלבים ספציפיים
 - ✅ דילוג על שלבים
@@ -127,6 +128,7 @@ python scripts/production-update/utils/rollback.py <snapshot_id>
 ## אינטגרציה עם תהליך קיים
 
 המערכת החדשה תואמת לאחור עם הסקריפטים הקיימים:
+
 - כל הסקריפטים הקיימים זמינים ב-`lib/`
 - ניתן להריץ שלבים בודדים גם דרך Master Script
 - הסקריפטים המקוריים ממשיכים לעבוד כרגיל
@@ -158,6 +160,7 @@ python scripts/production-update/master.py
 ### שלב נכשל
 
 אם שלב נכשל:
+
 1. בדוק את הלוגים ב-`_Tmp/production-update-logs/`
 2. תקן את הבעיה
 3. הרץ `--resume` להמשך מהשלב שנכשל
@@ -165,6 +168,7 @@ python scripts/production-update/master.py
 ### Rollback
 
 לשחזור מלא:
+
 ```bash
 python scripts/production-update/utils/rollback.py
 # או עם snapshot ID ספציפי

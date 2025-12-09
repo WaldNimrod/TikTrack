@@ -1,4 +1,5 @@
 # ארכיטקטורת מערכת האיקונים - TikTrack
+
 # Icon System Architecture
 
 ## 📋 סקירה כללית
@@ -148,6 +149,7 @@ await window.IconSystem.clearCache();
 ### 1. Unified Initialization System
 
 **Package Manifest:**
+
 ```javascript
 // trading-ui/scripts/init-system/package-manifest.js
 base: {
@@ -167,6 +169,7 @@ base: {
 ```
 
 **Page Configs:**
+
 ```javascript
 // trading-ui/scripts/page-initialization-configs.js
 'index': {

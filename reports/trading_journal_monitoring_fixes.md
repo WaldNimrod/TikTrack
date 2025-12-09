@@ -23,6 +23,7 @@
 **Action**: Remove direct Chart.js CDN script from HTML, let chart-loader.js handle it.
 
 **File**: `trading-ui/trading-journal.html`
+
 - Remove line 311: `<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" async></script>`
 - Chart-loader.js will handle loading Chart.js when needed
 
@@ -34,6 +35,7 @@
 **Option B**: Add to existing package (e.g., entity-services or as page-specific scripts)
 
 **Recommendation**: Add as page-specific scripts section in package manifest, or create a "trading-journal" package that includes:
+
 - calendar-date-utils.js
 - calendar-data-loader.js  
 - calendar-renderer.js
@@ -44,6 +46,7 @@
 **Action**: Verify Charts Package loadOrder vs Entity Services loadOrder.
 
 Current:
+
 - Charts Package: loadOrder 8
 - Entity Services: loadOrder 10
 
@@ -56,4 +59,6 @@ However, since they're in different packages with async loading, execution order
 - Chart.js should only be loaded via chart-loader.js to avoid conflicts
 - Calendar scripts are page-specific and should be documented
 - Loading order needs verification based on actual dependencies
+
+
 

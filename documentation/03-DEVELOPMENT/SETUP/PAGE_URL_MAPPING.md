@@ -16,6 +16,7 @@
 ### פורמט נכון
 
 ✅ **נכון:**
+
 ```
 http://localhost:8080/ai-analysis
 http://localhost:8080/trades
@@ -23,6 +24,7 @@ http://localhost:8080/preferences
 ```
 
 ❌ **לא נכון:**
+
 ```
 http://localhost:8080/trading-ui/ai-analysis.html
 http://localhost:8080/ai-analysis.html
@@ -47,6 +49,7 @@ def ai_analysis() -> Any:
 ```
 
 **יתרונות:**
+
 - שליטה מלאה על הכתובת
 - אפשרות להוסיף לוגיקה נוספת
 - תיעוד ברור
@@ -69,6 +72,7 @@ def static_files(filename: str) -> Any:
 ```
 
 **איך זה עובד:**
+
 1. המשתמש נכנס ל-`/my-page`
 2. המערכת בודקת אם יש route ספציפי
 3. אם לא, ה-catch-all route מוסיף `.html` אוטומטית
@@ -82,6 +86,7 @@ def static_files(filename: str) -> Any:
 ### שלב 1: צור את קובץ ה-HTML
 
 צור את הקובץ ב-`trading-ui/`:
+
 ```bash
 trading-ui/my-new-page.html
 ```
@@ -104,6 +109,7 @@ def my_new_page() -> Any:
 ### שלב 3: בדוק
 
 העמוד יהיה נגיש ב:
+
 ```
 http://localhost:8080/my-new-page
 ```
@@ -152,6 +158,7 @@ grep -r "my-page.html" Backend/routes/pages.py
 ### דרך 2: בדיקת Catch-all
 
 אם אין route ספציפי, העמוד נגיש דרך catch-all:
+
 ```
 http://localhost:8080/my-page
 ```

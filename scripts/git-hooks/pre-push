@@ -1,0 +1,74 @@
+#!/bin/bash
+
+# TikTrack markdownlint pre-push hook
+# ------------------------------------
+# Checks markdown files for linting errors before push to GitLab
+# Allows bypass with SKIP_MARKDOWNLINT=1
+
+set -euo pipefail
+
+# Allow bypass when explicitly requested
+if [[ "${SKIP_MARKDOWNLINT:-}" == "1" ]]; then
+    echo "[markdownlint] SKIP_MARKDOWNLINT detected, bypassing hook."
+    exit 0
+fi
+
+# Check if markdownlint-cli is installed
+if ! command -v markdownlint &> /dev/null && ! npx markdownlint --version &> /dev/null; then
+    echo "⚠️  markdownlint-cli not found. Install with: npm install --save-dev markdownlint-cli"
+    exit 0
+fi
+
+# Get list of changed markdown files
+changed_files=$(git diff --name-only --diff-filter=ACMR origin/main...HEAD 2>/dev/null || git diff --cached --name-only --diff-filter=ACMR 2>/dev/null || echo "")
+
+# Filter markdown files (exclude ignored directories)
+md_files=""
+if [[ -n "$changed_files" ]]; then
+    while IFS= read -r file; do
+        # Check if it's a markdown file
+        if [[ "$file" == *.md ]]; then
+            # Exclude ignored directories
+            if [[ "$file" != documentation/05-REPORTS/* ]] && \
+               [[ "$file" != documentation/audits/* ]] && \
+               [[ "$file" != .cursor/* ]] && \
+               [[ "$file" != node_modules/* ]] && \
+               [[ "$file" != .git/* ]] && \
+               [[ "$file" != archive/* ]] && \
+               [[ "$file" != backup/* ]] && \
+               [[ "$file" != .pytest_cache/* ]]; then
+                if [[ -z "$md_files" ]]; then
+                    md_files="$file"
+                else
+                    md_files="$md_files $file"
+                fi
+            fi
+        fi
+    done <<< "$changed_files"
+fi
+
+# If no markdown files changed, skip check
+if [[ -z "$md_files" ]]; then
+    exit 0
+fi
+
+echo "🔍 Checking markdown files for linting errors..."
+
+# Run markdownlint on changed files
+if npx markdownlint $md_files --config .markdownlint.json 2>&1; then
+    echo "✅ All markdown files passed linting"
+    exit 0
+else
+    echo ""
+    echo "❌ Markdown linting errors found in the following files:"
+    echo "$md_files"
+    echo ""
+    echo "To fix automatically, run:"
+    echo "  npm run markdownlint:fix"
+    echo ""
+    echo "To bypass this check (not recommended), use:"
+    echo "  SKIP_MARKDOWNLINT=1 git push"
+    echo ""
+    exit 1
+fi
+

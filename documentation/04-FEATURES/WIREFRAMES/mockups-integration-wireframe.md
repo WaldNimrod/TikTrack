@@ -35,6 +35,7 @@
 ```
 
 **מימוש:**
+
 - הוספת כפתור "דשבורד מורחב" בעמודת הפעולות
 - כפתור עם `data-onclick="navigateToTickerDashboard(tickerId)"`
 - שימוש ב-Button System
@@ -59,6 +60,7 @@
 ```
 
 **מימוש:**
+
 - הוספת כפתור "דשבורד מורחב" ב-`EntityDetailsModal`
 - כפתור עם `data-onclick="navigateToTickerDashboard(tickerId)"`
 - פתיחה בחלון חדש או ניווט ישיר
@@ -86,6 +88,7 @@
 ```
 
 **מימוש:**
+
 - הוספת כפתור "היסטוריה" בעמודת הפעולות
 - כפתור עם `data-onclick="navigateToTradeHistory(tradeId)"`
 - ניווט ל-`trade-history-page.html` עם פילטר
@@ -113,6 +116,7 @@
 ```
 
 **מימוש:**
+
 - הוספת כפתור "ניתוח" בעמודת הפעולות
 - כפתור עם `data-onclick="navigateToStrategyAnalysis(planId)"`
 - ניווט ל-`strategy-analysis-page.html` עם פילטר
@@ -138,6 +142,7 @@
 ```
 
 **מימוש:**
+
 - הוספת כפתור "צפה במצב תיק היסטורי" בסעיף סיכום
 - כפתור עם `data-onclick="navigateToPortfolioState()"`
 - ניווט ל-`portfolio-state-page.html`

@@ -1,4 +1,5 @@
 # Trade Aggregation System - TikTrack
+
 ## מערכת כללית לאגרגציית נתוני טריידים
 
 **תאריך יצירה:** 06/12/2025  
@@ -170,6 +171,7 @@ def format_trades_for_ai(aggregated_data: Dict[str, Any]) -> str
 #### החזרה
 
 מחרוזת בפורמט מובנה עם:
+
 - סקירה כללית (סה"כ טריידים, win rate, P/L כולל)
 - פרטי כל טרייד (ID, Status, Ticker, Executions, Trade Plan, Conditions, Position)
 - סיכום סטטיסטיקות
@@ -365,6 +367,7 @@ python3 Backend/scripts/test_trade_aggregation_service.py
 ## 🔄 גרסאות
 
 ### v1.0.0 (06/12/2025)
+
 - ✅ יצירה ראשונית של השירות
 - ✅ תמיכה בפילטרים מרובים
 - ✅ חישוב פוזיציות אוטומטי

@@ -166,3 +166,7 @@ class TestHistoricalDataServicesIntegrationE2E:
             assert 'trading-journal-data' in content, "Trading journal TTL should be configured"
 
 
+
+
+
+

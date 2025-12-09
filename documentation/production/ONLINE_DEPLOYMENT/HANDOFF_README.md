@@ -7,23 +7,28 @@
 
 ## 📌 הקשר והרקע
 
-### המצב הנוכחי:
+### המצב הנוכחי
+
 - יש לנו סביבה שנקראת **"production"** ונמצאת בתיקייה: `production/`
 - זו **סביבת פרודקשן מקומית** (local production) ששימשה עד כה כסביבת פרודקשן מקומית
 - הסביבה מכירה את עצמה כ-`IS_PRODUCTION = True`
 - Database: `TikTrack-db-production`
 - פורט: `5001`
 
-### המעבר ל-3 סביבות:
+### המעבר ל-3 סביבות
+
 כחלק מתהליך המעבר לסביבה אינטרנטית, אנחנו עוברים ל-**3 סביבות**:
+
 1. **Development** - סביבת פיתוח (תיקייה: `TikTrackApp/`)
 2. **Testing** - סביבת בדיקות (תיקייה: `production/` - **תישאר!**)
 3. **Online** - סביבת אונליין (תיקייה חדשה שתיווצר)
 
-### המשימה:
+### המשימה
+
 להפוך את הסביבה הנוכחית (`production/`) מסביבת פרודקשן מקומית לסביבת **Testing**.
 
 ⚠️ **חשוב:** התיקייה `production/` תישאר בשם הזה, אבל התוכן שלה ישתנה:
+
 - הגדרות הסביבה: `IS_PRODUCTION = True` → `IS_TESTING = True`
 - שם Database: `TikTrack-db-production` → `TikTrack-db-testing`
 - ייעוד: סביבת פרודקשן מקומית → סביבת בדיקות לפני עליה לאוויר
@@ -33,16 +38,19 @@
 ## 📋 מסמכים להעברה
 
 ### מסמך ראשי (חובה!) ⭐
+
 **`TESTING_ENVIRONMENT_WORK_INSTRUCTIONS.md`** - הוראות עבודה מפורטות
 
 זה המסמך הראשי - כולל את כל השלבים המפורטים, פקודות, בדיקות, ופתרון בעיות.
 
 ### Quick Reference ⭐
+
 **`TESTING_ENVIRONMENT_QUICK_REFERENCE.md`** - Quick reference מהיר
 
 לשימוש מהיר - פקודות ובדיקות עיקריות.
 
 ### מסמכי תמיכה (אופציונלי)
+
 - `TESTING_ENVIRONMENT_UPDATE_PLAN.md` - תוכנית מפורטת (תיעוד)
 - `TESTING_ENVIRONMENT_CHECKLIST.md` - Checklist מקיף
 
@@ -51,16 +59,19 @@
 ## 🚀 התחלה
 
 ### שלב 1: קריאה
+
 1. קרא את `TESTING_ENVIRONMENT_WORK_INSTRUCTIONS.md` מהתחלה עד הסוף
 2. ודא שהבנת את כל השלבים
 3. ודא שיש לך את כל ההרשאות הנדרשות
 
 ### שלב 2: ביצוע
+
 1. בצע את כל השלבים לפי הסדר
 2. השתמש ב-`TESTING_ENVIRONMENT_QUICK_REFERENCE.md` לבדיקות מהירות
 3. בדוק אחרי כל שלב
 
 ### שלב 3: אימות
+
 1. בצע את כל הבדיקות המפורטות
 2. ודא שהכל עובד
 3. Commit & Push
@@ -69,13 +80,15 @@
 
 ## ⚠️ חשוב לפני התחלה
 
-### חובה:
+### חובה
+
 - ✅ **גיבוי מלא** של database הנוכחי
 - ✅ **גיבוי** של כל קבצי config
 - ✅ **בדיקה** שהסביבה הנוכחית עובדת
 - ✅ **תיעוד** של כל ההגדרות הנוכחיות
 
-### תנאים:
+### תנאים
+
 - ✅ יש גישה ל-PostgreSQL
 - ✅ יש גישה לתיקייה `production/`
 - ✅ יש הרשאות לערוך קבצים
@@ -85,12 +98,14 @@
 
 ## 📝 מה משתנה
 
-### שינויים:
+### שינויים
+
 - שם סביבה: `production` → `testing`
 - שם Database: `TikTrack-db-production` → `TikTrack-db-testing`
 - הגדרות Config: `IS_PRODUCTION = True` → `IS_TESTING = True`
 
-### נשאר זהה:
+### נשאר זהה
+
 - תיקיית הקוד: `production/` (נשאר)
 - פורט: 5001 (נשאר)
 - תהליך עדכון: Master Script נשאר זהה
@@ -131,6 +146,7 @@ curl http://localhost:5001/api/health
 ## 📞 תמיכה
 
 **אם יש בעיות:**
+
 1. בדוק את הלוגים: `production/Backend/server_output.log`
 2. בדוק את ה-config: `production/Backend/config/settings.py`
 3. בדוק את ה-database: `psql -U TikTrakDBAdmin -d "TikTrack-db-testing" -c "\dt"`

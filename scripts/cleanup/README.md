@@ -3,6 +3,7 @@
 This folder stores maintenance utilities that can impact production data. Run them **only** after double-checking the target environment and obtaining explicit approval.
 
 ## Files
+
 - `delete-all-cash-flows.py` – removes all cash flow entries via direct DB access.
 - `delete-all-cash-flows-http.html` – invokes the HTTP endpoint to purge cash flows.
 - `delete-cash-flows-simple.py` – SQLite-based variant of the deletion script.
@@ -10,6 +11,7 @@ This folder stores maintenance utilities that can impact production data. Run th
 - `clear-localStorage.html` – helper page for wiping browser storage during QA sessions.
 
 ## Safe-Run Checklist
+
 1. Backup the relevant database or export the affected tables.
 2. Verify that the development/staging server is targeted (never run against production).
 3. Inform the team via Slack/Ticket and log the execution window.

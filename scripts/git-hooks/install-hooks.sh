@@ -28,7 +28,7 @@ echo "Installing git hooks to: $GIT_HOOKS_DIR"
 echo ""
 
 # Install hooks
-for hook in pre-commit post-merge; do
+for hook in pre-commit pre-push post-merge; do
     if [ -f "$SCRIPT_DIR/$hook" ]; then
         ln -sf "$SCRIPT_DIR/$hook" "$GIT_HOOKS_DIR/$hook"
         chmod +x "$GIT_HOOKS_DIR/$hook"

@@ -7,7 +7,7 @@
 
 **לעדכון מלא ומפורט, ראה:** [`UPDATE_PROCESS.md`](./UPDATE_PROCESS.md)
 
-### תהליך עדכון מהיר:
+### תהליך עדכון מהיר
 
 ```bash
 # 1. עדכון ומיזוג
@@ -36,12 +36,14 @@ git push origin production
 ## מבנה הסביבות
 
 ### סביבת פיתוח (Development)
+
 - **פורט:** 8080
 - **בסיס נתונים:** PostgreSQL (`TikTrack-db-development`)
 - **לוגים:** `Backend/logs/`
 - **הפעלה:** `./start_server.sh`
 
 ### סביבת פרודקשן (Production)
+
 - **פורט:** 5001
 - **בסיס נתונים:** PostgreSQL (`TikTrack-db-production`)
 - **לוגים:** `production/Backend/logs/`
@@ -65,6 +67,7 @@ python3 Backend/scripts/create_production_db.py
 ```
 
 הסקריפט:
+
 - יוצר בסיס נתונים PostgreSQL חדש (`TikTrack-db-production`)
 - מעתיק את כל המבנה והטבלאות
 - מעתיק את כל טבלאות העזר והעדפות
@@ -75,10 +78,12 @@ python3 Backend/scripts/create_production_db.py
 
 **זיהוי סביבה אוטומטי:**
 הסקריפט `start_server.sh` מזהה אוטומטית את הסביבה לפי שם תיקיית העבודה:
+
 - `TikTrackApp-Production` → Production (פורט 5001)
 - `TikTrackApp` → Development (פורט 8080)
 
 **הפעלה:**
+
 ```bash
 ./start_server.sh
 ```
@@ -86,16 +91,19 @@ python3 Backend/scripts/create_production_db.py
 > **✅ הסקריפט מזהה אוטומטית את הסביבה לפי שם התיקיה!**
 
 **אלטרנטיבה (עם override מפורש):**
+
 ```bash
 ./start_server.sh --env production
 ```
 
 או:
+
 ```bash
 ./start_production.sh
 ```
 
 השרת יתחיל על פורט 5001 עם:
+
 - בסיס נתונים: PostgreSQL (`TikTrack-db-production`)
 - לוגים: `production/Backend/logs/`
 - סביבה: Production
@@ -103,25 +111,29 @@ python3 Backend/scripts/create_production_db.py
 ### שלב 3: בדיקת הפעלה
 
 פתח בדפדפן:
+
 - **פיתוח:** http://127.0.0.1:8080
 - **פרודקשן:** http://127.0.0.1:5001
 
 ## קבצים חשובים
 
 ### קבצי הגדרות
+
 - `Backend/config/settings.py` - הגדרות משותפות (קורא מ-env)
 - `Backend/config/settings.prod.py` - הגדרות פרודקשן (לא בשימוש כרגע)
 
 ### סקריפטים
 
-#### סקריפטי הפעלה:
+#### סקריפטי הפעלה
+
 - `start_server.sh` - הפעלה אוטומטית לפי שם תיקיה:
   - `TikTrackApp` → Development (פורט 8080)
   - `TikTrackApp-Production` → Production (פורט 5001)
   - ניתן override עם: `--env development` או `--env production`
 - `start_production.sh` - הפעלת פרודקשן (פורט 5001) - wrapper ל-`start_server.sh --env production`
 
-#### סקריפטי פרודקשן:
+#### סקריפטי פרודקשן
+
 - `production/Backend/scripts/create_production_db.py` - יצירת DB פרודקשן (כולל מיגרציות אוטומטיות)
 - `production/Backend/scripts/backup_database.py` - גיבוי בסיס נתונים פרודקשן
 - `production/Backend/scripts/cleanup_import_sessions.py` - ניקוי סשני ייבוא ישנים (מעל 90 יום)
@@ -130,6 +142,7 @@ python3 Backend/scripts/create_production_db.py
 ### משתני סביבה
 
 המערכת משתמשת במשתנה סביבה `TIKTRACK_ENV`:
+
 - `development` (ברירת מחדל) - פיתוח
 - `production` - פרודקשן
 
@@ -173,15 +186,17 @@ python3 scripts/versioning/bump-version.py \
 
 > ℹ️ כל פקודה מעדכנת אוטומטית את ה-manifest ואת קובץ ההיסטוריה, כולל החתימה (`commit`) והתאריך.
 
-### תהליך עדכון מומלץ:
+### תהליך עדכון מומלץ
 
 1. **עדכון Main Branch:**
+
    ```bash
    git checkout main
    git pull origin main
    ```
 
 2. **מיזוג ל-Production:**
+
    ```bash
    git checkout production
    git pull origin production
@@ -189,16 +204,19 @@ python3 scripts/versioning/bump-version.py \
    ```
 
 3. **סינכרון קוד:**
+
    ```bash
    ./scripts/sync_to_production.py
    ```
 
 4. **בדיקות:**
+
    ```bash
    ./scripts/verify_production_isolation.sh
    ```
 
 5. **Commit & Push:**
+
    ```bash
    git add production/ scripts/ documentation/production/
    git commit -m "feat: Update production from main"
@@ -236,6 +254,7 @@ python3 scripts/run_production_migration.py Backend/migrations/add_entry_price_t
 ```
 
 **תהליך:**
+
 1. עצור את שרת הפרודקשן
 2. הרץ את המיגרציה (או השתמש ב-`run_production_migration.py`)
 3. הפעל מחדש את השרת
@@ -251,6 +270,7 @@ python3 production/Backend/scripts/cleanup_import_sessions.py
 ```
 
 הסקריפט:
+
 - מזהה סשני ייבוא ישנים יותר מ-90 יום
 - מוחק אותם אוטומטית
 - מדווח על מספר הסשנים שנמחקו
@@ -260,6 +280,7 @@ python3 production/Backend/scripts/cleanup_import_sessions.py
 #### ניקוי לוגים
 
 לוגים בפרודקשן נמצאים ב-`production/Backend/logs/`:
+
 - `app.log` - לוגים כלליים
 - `errors.log` - שגיאות בלבד
 - `performance.log` - ביצועים
@@ -271,6 +292,7 @@ python3 production/Backend/scripts/cleanup_import_sessions.py
 ### פורט תפוס
 
 אם הפורט 5001 תפוס:
+
 ```bash
 # בדוק מה רץ על הפורט
 lsof -i :5001
@@ -282,6 +304,7 @@ kill <PID>
 ### בסיס נתונים לא נמצא
 
 אם השרת מתלונן על בסיס נתונים חסר:
+
 ```bash
 # צור בסיס נתונים חדש
 python3 Backend/scripts/create_production_db.py
@@ -290,6 +313,7 @@ python3 Backend/scripts/create_production_db.py
 ### שגיאת foreign keys
 
 אם יש שגיאות foreign keys, ודא שהסקריפט הפעיל foreign keys בסוף:
+
 ```sql
 PRAGMA foreign_keys = ON;
 ```
@@ -304,6 +328,7 @@ PRAGMA foreign_keys = ON;
 ## תמיכה
 
 לשאלות או בעיות, בדוק:
+
 - `PRODUCTION_FILES_LIST.md` - רשימת קבצים פעילים
 - `Backend/scripts/create_production_db.py` - קוד הסקריפט
 - `Backend/config/settings.py` - הגדרות סביבה

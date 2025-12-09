@@ -44,27 +44,42 @@ def setup_auth_middleware(app):
         user_id = session.get('user_id')
         
         if user_id:
-            # Set user context
-            g.user_id = user_id
-            g.username = session.get('username')
-            
-            # Optionally load full user object
+            # Verify session is still valid (not expired)
+            # Flask automatically handles PERMANENT_SESSION_LIFETIME, but we verify user still exists
             try:
                 from services.user_service import UserService
                 user_service = UserService()
                 user = user_service.get_user_by_id(user_id)
-                if user:
+
+                # UserService returns dict; older code expected model instance
+                is_active = False
+                username = session.get('username')
+                if isinstance(user, dict):
+                    is_active = bool(user.get('is_active'))
+                    username = username or user.get('username')
+                elif user is not None:
+                    is_active = getattr(user, 'is_active', False)
+                    username = username or getattr(user, 'username', None)
+
+                if user and is_active:
+                    # User exists and is active - set user context
+                    g.user_id = user_id
+                    g.username = username
                     g.current_user = user
                 else:
-                    # User not found - clear session
-                    logger.warning(f"User {user_id} not found, clearing session")
+                    # User not found or inactive - clear session
+                    logger.warning(f"User {user_id} not found or inactive, clearing session")
                     session.clear()
                     g.user_id = None
                     g.current_user = None
+                    g.username = None
             except Exception as e:
                 logger.error(f"Error loading user {user_id}: {e}")
+                # On error, clear session to be safe
+                session.clear()
                 g.user_id = None
                 g.current_user = None
+                g.username = None
         else:
             # No user in session
             g.user_id = None

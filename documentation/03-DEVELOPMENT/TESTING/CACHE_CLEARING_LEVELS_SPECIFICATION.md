@@ -1,4 +1,5 @@
 # אפיון מערכת רמות ניקוי מטמון - Cache Clearing Levels Specification
+
 # ==============================================================================
 
 **תאריך:** 11 אוקטובר 2025  
@@ -11,13 +12,16 @@
 ## 🎯 **מטרות המערכת**
 
 ### **בעיה:**
+
 - רק 11% מהמטמון מנוקה כיום
 - 7-9 Service Caches לא מכוסים
 - 15-20 Orphan Keys לא מכוסים
 - **תוצאה:** נתונים ישנים, באגים בפיתוח, בזבוז זמן
 
 ### **פתרון:**
+
 מערכת רמות ניקוי מדורגות המכסה **100% מהמטמון**:
+
 - 4 רמות עוצמה (light → medium → full → nuclear)
 - כיסוי מלא של כל המקורות
 - בטיחות מדורגת (light בטוח, nuclear מסוכן)
@@ -59,12 +63,14 @@
 ### **קטגוריה C: Orphan Keys (15-20 keys)**
 
 #### **C.1 State Management (2 keys):**
+
 ```javascript
 'cashFlowsSectionState'           // מצב סקציה (open/closed)
 'executionsTopSectionCollapsed'   // מצב כיווץ
 ```
 
 #### **C.2 User Preferences (4 keys):**
+
 ```javascript
 'colorScheme'          // 'light', 'dark', 'custom'
 'customColorScheme'    // JSON של צבעים מותאמים
@@ -73,12 +79,14 @@
 ```
 
 #### **C.3 Authentication (2 keys - קריטי!):**
+
 ```javascript
 'authToken'      // ⚠️ טוקן אימות
 'currentUser'    // ⚠️ נתוני משתמש
 ```
 
 #### **C.4 Testing/Debug (4 keys):**
+
 ```javascript
 'crud_test_results'        // תוצאות בדיקות CRUD
 'linterLogs'              // logs של linter
@@ -87,11 +95,13 @@
 ```
 
 #### **C.5 Dynamic Keys (patterns):**
+
 ```javascript
 /^sortState_/              // e.g. sortState_trades, sortState_alerts
 /^section-visibility-/     // e.g. section-visibility-alerts-section1
 /^top-section-collapsed-/  // e.g. top-section-collapsed-trades
 ```
+
 **משוער:** 5-10 keys דינמיים
 
 **סה"כ קטגוריה C:** 17-26 keys
@@ -103,16 +113,19 @@
 ### **רמה 1: Light 🟢 (קל)**
 
 **מתי להשתמש:**
+
 - מבחנים מהירים
 - בדיקות ביצועים
 - איפוס memory בלבד
 
 **מה מנוקה:**
+
 1. ✅ UnifiedCacheManager: Memory layer
 2. ✅ Service Caches: כל 7-9 המקורות
 3. ✅ CSS Management: mergedDuplicates + removedDuplicates
 
 **מה לא מנוקה:**
+
 - ❌ localStorage (tiktrack_* ישארו)
 - ❌ IndexedDB (ישאר)
 - ❌ Backend layer (ישאר)
@@ -128,17 +141,20 @@
 ### **רמה 2: Medium 🔵 (בינוני)**
 
 **מתי להשתמש:**
+
 - פיתוח יומיומי
 - איפוס לפני בדיקה
 - **ברירת מחדל לכפתור בתפריט** 🧹
 
 **מה מנוקה:**
+
 1. ✅ כל Light (Memory + Services + CSS)
 2. ✅ UnifiedCacheManager: localStorage layer (tiktrack_*)
 3. ✅ UnifiedCacheManager: IndexedDB layer (unified-cache store)
 4. ✅ UnifiedCacheManager: Backend layer
 
 **מה לא מנוקה:**
+
 - ❌ Orphan keys (ישארו)
 - ❌ localStorage ללא prefix tiktrack_* (ישארו)
 - ❌ IndexedDB database עצמו (רק store מנוקה)
@@ -153,17 +169,20 @@
 ### **רמה 3: Full 🟠 (מלא)**
 
 **מתי להשתמש:**
+
 - לפני commits/push
 - לפני releases
 - פתרון באגים מסתוריים
 - ניקוי מטמון מקיף
 
 **מה מנוקה:**
+
 1. ✅ כל Medium
 2. ✅ כל 15-20 Orphan Keys (רשימה מפורשת)
 3. ✅ Dynamic Keys (sortState_*, section-*, top-section-*)
 
 **מה לא מנוקה:**
+
 - ❌ localStorage ללא prefix/pattern (keys לא מזוהים)
 - ❌ IndexedDB databases אחרים (אם קיימים)
 - ❌ IndexedDB database עצמו (רק stores)
@@ -180,12 +199,14 @@
 ### **רמה 4: Nuclear ☢️ (גרעיני)**
 
 **מתי להשתמש:**
+
 - 🔴 **חירום בלבד!**
 - reset מוחלט של המערכת
 - פתרון בעיות חמורות
 - לפני הדגמות/demos (מצב "נקי מכל")
 
 **מה מנוקה:**
+
 1. ✅ כל Full
 2. ✅ **ALL** localStorage - כולל keys ללא prefix
 3. ✅ **DELETE** entire UnifiedCacheDB database
@@ -198,6 +219,7 @@
 **הפיך:** ❌❌❌ **בלתי הפיך לחלוטין**
 
 **⚠️⚠️⚠️ אזהרות:**
+
 - מוחק גם נתונים של אתרים אחרים ב-localhost!
 - מוחק את כל ה-database (לא רק stores)!
 - דורש refresh מלא של העמוד אחרי!
@@ -246,12 +268,14 @@ await clearAllCache({ level: 'light' })
 **שלבי הניקוי:**
 
 **שלב 1: Memory Layer (UnifiedCacheManager)**
+
 ```javascript
 await window.UnifiedCacheManager.layers.memory.clear();
 // Result: Map.clear() → 0 entries
 ```
 
 **שלב 2: Service Caches (7-9 services)**
+
 ```javascript
 // EntityDetailsAPI
 window.EntityDetailsAPI?.cache?.clear();  // Map.clear()
@@ -274,6 +298,7 @@ removedDuplicates?.clear();
 ```
 
 **שלב 3: דוח**
+
 ```javascript
 {
     level: 'light',
@@ -295,6 +320,7 @@ removedDuplicates?.clear();
 ```
 
 **תרחישי שימוש:**
+
 - ✅ מבחן ביצועים מהיר
 - ✅ איפוס memory לפני בדיקה
 - ✅ ניקוי service caches שנתקעו
@@ -315,6 +341,7 @@ await clearAllCache()  // ברירת מחדל
 **שלב 1-2:** כל Light (Memory + Services)
 
 **שלב 3: localStorage Layer (UnifiedCacheManager)**
+
 ```javascript
 await window.UnifiedCacheManager.layers.localStorage.clear();
 // מנקה רק: tiktrack_user-preferences, tiktrack_ui-state, etc.
@@ -322,6 +349,7 @@ await window.UnifiedCacheManager.layers.localStorage.clear();
 ```
 
 **שלב 4: IndexedDB Layer (UnifiedCacheManager)**
+
 ```javascript
 await window.UnifiedCacheManager.layers.indexedDB.clear();
 // store.clear() - מנקה את unified-cache store
@@ -329,12 +357,14 @@ await window.UnifiedCacheManager.layers.indexedDB.clear();
 ```
 
 **שלב 5: Backend Layer (UnifiedCacheManager)**
+
 ```javascript
 await window.UnifiedCacheManager.layers.backend.clear();
 // Map.clear() - mock local
 ```
 
 **שלב 6: דוח**
+
 ```javascript
 {
     level: 'medium',
@@ -354,6 +384,7 @@ await window.UnifiedCacheManager.layers.backend.clear();
 ```
 
 **תרחישי שימוש:**
+
 - ✅ **פיתוח יומיומי** (מומלץ!)
 - ✅ איפוס לפני בדיקה
 - ✅ כפתור 🧹 בתפריט הראשי
@@ -372,12 +403,14 @@ await clearAllCache({ level: 'full' })
 **שלב 1-5:** כל Medium (Memory + Services + UnifiedCM)
 
 **שלב 6: Orphan Keys - State (2)**
+
 ```javascript
 localStorage.removeItem('cashFlowsSectionState');
 localStorage.removeItem('executionsTopSectionCollapsed');
 ```
 
 **שלב 7: Orphan Keys - Preferences (4)**
+
 ```javascript
 localStorage.removeItem('colorScheme');
 localStorage.removeItem('customColorScheme');
@@ -386,12 +419,14 @@ localStorage.removeItem('consoleSettings');
 ```
 
 **שלב 8: Orphan Keys - Auth (2)**
+
 ```javascript
 localStorage.removeItem('authToken');         // ⚠️
 localStorage.removeItem('currentUser');       // ⚠️
 ```
 
 **שלב 9: Orphan Keys - Testing (4)**
+
 ```javascript
 localStorage.removeItem('crud_test_results');
 localStorage.removeItem('linterLogs');
@@ -400,6 +435,7 @@ localStorage.removeItem('serverMonitorSettings');
 ```
 
 **שלב 10: Dynamic Keys (5-10)**
+
 ```javascript
 Object.keys(localStorage).forEach(key => {
     if (/^sortState_/.test(key)) localStorage.removeItem(key);
@@ -409,6 +445,7 @@ Object.keys(localStorage).forEach(key => {
 ```
 
 **שלב 11: דוח**
+
 ```javascript
 {
     level: 'full',
@@ -429,6 +466,7 @@ Object.keys(localStorage).forEach(key => {
 ```
 
 **תרחישי שימוש:**
+
 - ✅ לפני commit/push
 - ✅ לפני release
 - ✅ פתרון באגים מסתוריים
@@ -450,6 +488,7 @@ await clearAllCache({ level: 'nuclear' })
 **שלב 1-10:** כל Full
 
 **שלב 11: ALL localStorage (no filter!)**
+
 ```javascript
 localStorage.clear();  // ⚠️ מוחק הכל!
 // כולל:
@@ -460,6 +499,7 @@ localStorage.clear();  // ⚠️ מוחק הכל!
 ```
 
 **שלב 12: DELETE IndexedDB Database**
+
 ```javascript
 await indexedDB.deleteDatabase('UnifiedCacheDB');
 // ⚠️ מוחק את כל ה-database!
@@ -467,11 +507,13 @@ await indexedDB.deleteDatabase('UnifiedCacheDB');
 ```
 
 **שלב 13: Session Cleanup**
+
 ```javascript
 sessionStorage.clear();  // אם משתמשים
 ```
 
 **שלב 14: דוח**
+
 ```javascript
 {
     level: 'nuclear',
@@ -494,6 +536,7 @@ sessionStorage.clear();  // אם משתמשים
 ```
 
 **תרחישי שימוש:**
+
 - 🔴 **חירום בלבד!**
 - reset מוחלט
 - לפני הדגמות (מצב "כמו חדש")
@@ -501,6 +544,7 @@ sessionStorage.clear();  // אם משתמשים
 - ⚠️ **לא לשימוש שגרתי!**
 
 **⚠️ דורש לאחר מכן:**
+
 - Page refresh (F5)
 - Login מחדש
 - הגדרת preferences מחדש
@@ -511,6 +555,7 @@ sessionStorage.clear();  // אם משתמשים
 ## 🛡️ **Confirmation Modals**
 
 ### **Light - אישור ירוק 🟢**
+
 ```
 ┌─────────────────────────────────────────┐
 │ 🟢 ניקוי קל (Light)                    │
@@ -535,6 +580,7 @@ sessionStorage.clear();  // אם משתמשים
 ```
 
 ### **Medium - אישור כחול 🔵**
+
 ```
 ┌─────────────────────────────────────────┐
 │ 🔵 ניקוי בינוני (Medium)               │
@@ -559,6 +605,7 @@ sessionStorage.clear();  // אם משתמשים
 ```
 
 ### **Full - אישור כתום 🟠**
+
 ```
 ┌─────────────────────────────────────────┐
 │ 🟠 ניקוי מלא (Full)                    │
@@ -584,6 +631,7 @@ sessionStorage.clear();  // אם משתמשים
 ```
 
 ### **Nuclear - אישור אדום ☢️**
+
 ```
 ┌─────────────────────────────────────────┐
 │ ☢️ ניקוי גרעיני (NUCLEAR)              │
@@ -620,6 +668,7 @@ sessionStorage.clear();  // אם משתמשים
 ### **כרטיסי הרמות (cache-test.html + system-management.html)**
 
 #### **Light Card - ירוק**
+
 ```html
 <div class="level-card level-light">
     <div class="level-icon">🟢</div>
@@ -644,6 +693,7 @@ sessionStorage.clear();  // אם משתמשים
 ```
 
 #### **Medium Card - כחול (ברירת מחדל)**
+
 ```html
 <div class="level-card level-medium">
     <div class="level-icon">🔵</div>
@@ -671,6 +721,7 @@ sessionStorage.clear();  // אם משתמשים
 ```
 
 #### **Full Card - כתום**
+
 ```html
 <div class="level-card level-full">
     <div class="level-icon">🟠</div>
@@ -696,6 +747,7 @@ sessionStorage.clear();  // אם משתמשים
 ```
 
 #### **Nuclear Card - אדום**
+
 ```html
 <div class="level-card level-nuclear">
     <div class="level-icon">☢️</div>
@@ -847,6 +899,7 @@ async function testClearingLevels() {
 ## 📝 **Implementation Checklist**
 
 ### **Phase 1: Core Implementation**
+
 - [ ] ORPHAN_KEYS constant
 - [ ] clearServiceCaches() helper
 - [ ] clearOrphanKeys() helper
@@ -855,6 +908,7 @@ async function testClearingLevels() {
 - [ ] Detailed reporting
 
 ### **Phase 2: UI Components**
+
 - [ ] showClearCacheConfirmation() modal
 - [ ] cache-test.html: 4 level cards
 - [ ] system-management.html: 4 level buttons
@@ -862,6 +916,7 @@ async function testClearingLevels() {
 - [ ] Future features section (disabled)
 
 ### **Phase 3: Testing**
+
 - [ ] testClearingLevels() function
 - [ ] Manual testing per level
 - [ ] Verification of coverage

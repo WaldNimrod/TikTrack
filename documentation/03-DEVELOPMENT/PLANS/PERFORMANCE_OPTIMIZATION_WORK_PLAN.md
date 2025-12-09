@@ -1,4 +1,5 @@
 # תוכנית עבודה מפורטת - אופטימיזציה ביצועים TikTrack
+
 ## Performance Optimization Work Plan
 
 **תאריך יצירה:** 5 בדצמבר 2025  
@@ -89,10 +90,12 @@
    - תיעוד החלטות
 
 **תוצרים:**
+
 - `documentation/03-DEVELOPMENT/PLANS/script-loading-strategy.json` - מטריצת סיווג
 - `documentation/03-DEVELOPMENT/PLANS/script-classification-report.md` - דוח סיווג
 
 **קבצים לעדכון:**
+
 - `trading-ui/scripts/init-system/package-manifest.js` - הוספת `loadingStrategy` לכל script
 
 ---
@@ -104,6 +107,7 @@
 **פעולות:**
 
 1. **גיבוי קבצי HTML:**
+
    ```bash
    # יצירת גיבוי של כל קבצי HTML
    mkdir -p backup/html-before-async-defer-$(date +%Y%m%d)
@@ -112,6 +116,7 @@
    ```
 
 2. **גיבוי קבצי קוד:**
+
    ```bash
    # גיבוי קבצי קוד רלוונטיים
    mkdir -p backup/code-before-async-defer-$(date +%Y%m%d)
@@ -120,6 +125,7 @@
    ```
 
 3. **יצירת snapshot של Git:**
+
    ```bash
    # יצירת branch לגיבוי
    git checkout -b backup/before-async-defer-$(date +%Y%m%d)
@@ -134,6 +140,7 @@
    - תאריך ושעה
 
 **תוצרים:**
+
 - גיבוי מלא של כל קבצי HTML (81 עמודים)
 - גיבוי קבצי קוד רלוונטיים
 - Git branch לגיבוי
@@ -148,6 +155,7 @@
 **פעולות:**
 
 1. **הוספת שדה `loadingStrategy` לכל script:**
+
    ```javascript
    {
      file: 'api-config.js',
@@ -170,9 +178,11 @@
    - בדיקת references
 
 **קבצים לעדכון:**
+
 - `trading-ui/scripts/init-system/package-manifest.js`
 
 **תוצרים:**
+
 - package-manifest.js מעודכן עם loadingStrategy
 - דוח שינויים
 
@@ -185,6 +195,7 @@
 **פעולות:**
 
 1. **הוספת לוגיקת async/defer:**
+
    ```javascript
    sortedScripts.forEach((script) => {
      const loadingStrategy = script.loadingStrategy || 'defer'; // default: defer
@@ -218,9 +229,11 @@
    - כללי סיווג
 
 **קבצים לעדכון:**
+
 - `trading-ui/scripts/generate-script-loading-code.js`
 
 **תוצרים:**
+
 - generate-script-loading-code.js מעודכן
 - דוגמאות HTML שנוצרו
 - דוח בדיקות
@@ -234,6 +247,7 @@
 **פעולות:**
 
 1. **יצירת סקריפט לעדכון אוטומטי:**
+
    ```javascript
    // scripts/update-all-pages-async-defer.js
    const { generateScriptLoadingCode } = require('./generate-script-loading-code');
@@ -264,9 +278,11 @@
    - וידוא תקינות
 
 **קבצים לעדכון:**
+
 - כל 81 קבצי HTML
 
 **תוצרים:**
+
 - כל העמודים מעודכנים
 - diff לפני/אחרי
 - רשימת עמודים שעודכנו
@@ -280,6 +296,7 @@
 **פעולות:**
 
 1. **בדיקות אוטומטיות:**
+
    ```bash
    # בדיקת שגיאות קונסול
    python3 scripts/testing/test_pages_console_errors.py
@@ -305,6 +322,7 @@
    - Edge
 
 **תוצרים:**
+
 - דוח בדיקות אוטומטיות
 - דוח בדיקות ידניות
 - רשימת בעיות שזוהו ותוקנו
@@ -338,6 +356,7 @@
    - סיכונים מזוהים
 
 **תוצרים:**
+
 - `documentation/05-REPORTS/PERFORMANCE_OPTIMIZATION_STAGE_A_REPORT.md` - דוח מלא
 
 ---
@@ -375,6 +394,7 @@
    - **איחוד לפי פונקציונליות:** איחוד קבצים קשורים
 
 3. **יצירת מטריצת איחוד:**
+
    ```json
    {
      "base": {
@@ -406,6 +426,7 @@
    - השוואה לגודל נוכחי
 
 **תוצרים:**
+
 - `documentation/03-DEVELOPMENT/PLANS/bundling-strategy.json` - מטריצת איחוד
 - `documentation/03-DEVELOPMENT/PLANS/bundling-plan.md` - תוכנית מפורטת
 
@@ -418,6 +439,7 @@
 **פעולות:**
 
 1. **יצירת build script:**
+
    ```javascript
    // scripts/build/bundle-packages.js
    const fs = require('fs');
@@ -444,10 +466,12 @@
    - בדיקת גודל
 
 **קבצים חדשים:**
+
 - `scripts/build/bundle-packages.js` - סקריפט איחוד
 - `scripts/build/bundle-config.js` - קונפיגורציה
 
 **תוצרים:**
+
 - build script פועל
 - דוגמאות bundles
 - דוח בדיקות
@@ -461,6 +485,7 @@
 **פעולות:**
 
 1. **הוספת לוגיקת bundles:**
+
    ```javascript
    // בדיקה אם יש bundle או קבצים בודדים
    if (bundleConfig && bundleConfig.bundle) {
@@ -481,9 +506,11 @@
    - בדיקת סדר טעינה
 
 **קבצים לעדכון:**
+
 - `trading-ui/scripts/generate-script-loading-code.js`
 
 **תוצרים:**
+
 - generate-script-loading-code.js מעודכן
 - תמיכה ב-bundles
 - דוח בדיקות
@@ -512,10 +539,12 @@
    - תיקון בעיות
 
 **קבצים לעדכון:**
+
 - `trading-ui/scripts/monitoring-functions.js`
 - `trading-ui/scripts/init-system/package-manifest.js`
 
 **תוצרים:**
+
 - מערכת ניטור מעודכנת
 - תמיכה ב-bundles
 - דוח בדיקות
@@ -543,9 +572,11 @@
    - תיעוד שינויים
 
 **קבצים לעדכון:**
+
 - כל קבצי התיעוד הרלוונטיים
 
 **תוצרים:**
+
 - תיעוד מעודכן מלא
 - מדריכים מעודכנים
 
@@ -573,6 +604,7 @@
    - וידוא תקינות
 
 **תוצרים:**
+
 - כל ה-packages מאוחדים
 - bundles נוצרו
 - דוח יישום
@@ -595,6 +627,7 @@
    - תיקון בעיות
 
 **תוצרים:**
+
 - כל העמודים מעודכנים
 - טעינת bundles
 - דוח עדכון
@@ -623,6 +656,7 @@
 **פעולות:**
 
 1. **הרצת בדיקות אוטומטיות:**
+
    ```bash
    # בדיקת ביצועים
    python3 scripts/testing/test_performance_pages.py
@@ -639,6 +673,7 @@
    - המלצות
 
 **תוצרים:**
+
 - `documentation/05-REPORTS/PERFORMANCE_OPTIMIZATION_FINAL_PERFORMANCE_REPORT.md`
 
 ---
@@ -650,6 +685,7 @@
 **פעולות:**
 
 1. **בדיקות אוטומטיות:**
+
    ```bash
    # בדיקת שגיאות קונסול
    python3 scripts/testing/test_pages_console_errors.py
@@ -674,6 +710,7 @@
    - כל הטבלאות
 
 **תוצרים:**
+
 - `documentation/05-REPORTS/PERFORMANCE_OPTIMIZATION_FUNCTIONALITY_REPORT.md`
 
 ---
@@ -696,6 +733,7 @@
    - Console errors
 
 **תוצרים:**
+
 - `documentation/05-REPORTS/PERFORMANCE_OPTIMIZATION_BROWSER_COMPATIBILITY_REPORT.md`
 
 ---
@@ -717,6 +755,7 @@
    - עדכון כלים
 
 **תוצרים:**
+
 - דוח מערכת ניטור
 - רשימת תיקונים
 
@@ -749,6 +788,7 @@
    - תחזוקה
 
 **תוצרים:**
+
 - `documentation/05-REPORTS/PERFORMANCE_OPTIMIZATION_FINAL_REPORT.md` - דוח סופי מקיף
 
 ---
@@ -767,18 +807,21 @@
 ### קריטריונים להצלחה
 
 **שלב א:**
+
 - ✅ שיפור זמן טעינה של לפחות 30%
 - ✅ 0 שגיאות JavaScript חדשות
 - ✅ כל העמודים עובדים תקין
 - ✅ מערכת הניטור עובדת תקין
 
 **שלב ב:**
+
 - ✅ הפחתת מספר הבקשות ל-50-70
 - ✅ שיפור זמן טעינה נוסף של 40-60%
 - ✅ כל העמודים עובדים תקין
 - ✅ מערכת הניטור מעודכנת ועובדת
 
 **שלב ג:**
+
 - ✅ זמן טעינה < 3 שניות
 - ✅ 0 שגיאות JavaScript
 - ✅ כל הפונקציונליות עובדת
@@ -832,16 +875,19 @@
 ## 📅 לוח זמנים משוער
 
 ### שלב א: async/defer מלא
+
 - **משך זמן:** 2-3 שבועות
 - **תאריך התחלה:** TBD
 - **תאריך סיום:** TBD
 
 ### שלב ב: איחוד קבצים
+
 - **משך זמן:** 4-5 שבועות
 - **תאריך התחלה:** לאחר סיום שלב א
 - **תאריך סיום:** TBD
 
 ### שלב ג: בדיקות מקיפות
+
 - **משך זמן:** 2-3 שבועות
 - **תאריך התחלה:** לאחר סיום שלב ב
 - **תאריך סיום:** TBD

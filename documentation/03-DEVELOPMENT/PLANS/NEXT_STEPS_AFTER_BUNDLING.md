@@ -1,4 +1,5 @@
 # השלבים הבאים - אחרי יישום Bundling
+
 ## Next Steps After Bundling Implementation
 
 **תאריך:** 6 בדצמבר 2025  
@@ -10,17 +11,20 @@
 ## ✅ מה הושלם
 
 ### שלב א: async/defer
+
 - ✅ הושלם בהצלחה
 - ✅ שיפור של 62% בזמן טעינה (מ-10.05s ל-3.79s)
 - ✅ כל העמודים מעודכנים
 
 ### תשתית Bundling
+
 - ✅ Build system (`bundle-packages.js`)
 - ✅ Test system (`test-bundles.js`)
 - ✅ עדכון `generate-script-loading-code.js`
 - ✅ תמיכה ב-development/production modes
 
 ### Bundles שנוצרו
+
 - ✅ 18 packages bundled
 - ✅ Source maps לכל bundle
 - ✅ Compression ממוצע: 52%
@@ -36,6 +40,7 @@
 **פעולות:**
 
 1. **עדכון עמודים נבחרים ל-production mode:**
+
    ```bash
    # עדכון עמוד אחד לבדיקה
    node trading-ui/scripts/generate-script-loading-code.js index --mode=production --use-bundles > temp_index.html
@@ -43,6 +48,7 @@
    ```
 
 2. **בדיקות ביצועים:**
+
    ```bash
    # הרצת בדיקות ביצועים
    python3 scripts/testing/test_performance_pages.py
@@ -92,6 +98,7 @@
 **פעולות:**
 
 1. **עדכון כל העמודים:**
+
    ```bash
    # סקריפט לעדכון אוטומטי
    # עדכון כל 81 העמודים ל-production mode
@@ -144,21 +151,25 @@
 ## 📋 המלצה: סדר עדיפויות
 
 ### שלב 1: בדיקות ביצועים עם Bundles (1-2 ימים) ⭐ מומלץ להתחיל
+
 - מדידת שיפור בפועל
 - זיהוי בעיות מוקדם
 - דוח ביצועים
 
 ### שלב 2: A/B Testing (2-3 ימים)
+
 - השוואה מדויקת
 - וידוא שיפורים
 - תיעוד תוצאות
 
 ### שלב 3: עדכון כל העמודים (3-4 ימים)
+
 - הפעלת bundles בכל העמודים
 - בדיקות מקיפות
 - ניטור
 
 ### שלב 4: בדיקות מקיפות (5-7 ימים)
+
 - בדיקות תקינות מלאות
 - בדיקות Selenium
 - דוח סופי
@@ -168,11 +179,13 @@
 ## 🎯 סיכום
 
 **המצב הנוכחי:**
+
 - ✅ תשתית bundling מוכנה
 - ✅ 18 bundles נוצרו
 - ✅ כל הבדיקות עברו
 
 **השלב הבא המומלץ:**
+
 1. **בדיקות ביצועים עם bundles** - למדוד את השיפור בפועל
 2. **A/B testing** - להשוות בין development ל-production
 3. **עדכון כל העמודים** - הפעלת bundles בכל העמודים

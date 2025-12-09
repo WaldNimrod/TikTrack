@@ -1,4 +1,5 @@
 # סכמת מסד נתונים: מערכת Watch List
+
 ## Database Schema: Watch List System
 
 **תאריך:** 28 בינואר 2025  
@@ -10,6 +11,7 @@
 ## סקירה כללית
 
 מערכת Watch List משתמשת בשתי טבלאות עיקריות:
+
 1. `watch_lists` - רשימות הצפייה של המשתמשים
 2. `watch_list_items` - הטיקרים בכל רשימה
 
@@ -18,6 +20,7 @@
 ## טבלה: `watch_lists`
 
 ### מטרה
+
 אחסון רשימות צפייה מותאמות אישית לכל משתמש.
 
 ### שדות
@@ -57,6 +60,7 @@ INDEX idx_watch_lists_user_order (user_id, display_order)
 ## טבלה: `watch_list_items`
 
 ### מטרה
+
 אחסון הטיקרים בכל רשימה, כולל תמיכה בטיקרים קיימים במערכת וטיקרים חיצוניים.
 
 ### שדות
@@ -108,15 +112,18 @@ INDEX idx_watch_list_items_list_order (watch_list_id, display_order)
 ## Relationships
 
 ### WatchList → User (Many-to-One)
+
 - משתמש יכול להחזיק מספר רשימות
 - Foreign Key: `watch_lists.user_id → users.id`
 
 ### WatchList → WatchListItem (One-to-Many)
+
 - רשימה יכולה להכיל מספר טיקרים
 - Foreign Key: `watch_list_items.watch_list_id → watch_lists.id`
 - CASCADE DELETE: מחיקת רשימה מוחקת את כל הפריטים
 
 ### WatchListItem → Ticker (Many-to-One, Optional)
+
 - פריט יכול להצביע על טיקר במערכת (או להיות חיצוני)
 - Foreign Key: `watch_list_items.ticker_id → tickers.id`
 - SET NULL on DELETE: אם טיקר נמחק, הפריט נשאר עם external_symbol
@@ -197,18 +204,22 @@ CREATE INDEX idx_watch_list_items_list_order ON watch_list_items(watch_list_id, 
 ## Business Rules (Database Level)
 
 ### 1. הגבלת מספר רשימות
+
 - **לא ברמת DB**: בדיקה ב-Business Logic Service
 - **Reason**: גמישות לשינוי בעתיד
 
 ### 2. הגבלת מספר טיקרים לרשימה
+
 - **לא ברמת DB**: בדיקה ב-Business Logic Service
 - **Reason**: גמישות לשינוי בעתיד
 
 ### 3. שמירת סדר ידני
+
 - **DB Level**: שדה `display_order` בכל טבלה
 - **Business Logic**: עדכון order על reorder
 
 ### 4. טיקר יחיד ברשימה
+
 - **DB Level**: UNIQUE constraints
 - **Prevents**: כפילות באותה רשימה
 
@@ -217,12 +228,14 @@ CREATE INDEX idx_watch_list_items_list_order ON watch_list_items(watch_list_id, 
 ## Migration Strategy
 
 ### Step 1: Create Tables
+
 ```sql
 -- Migration: create_watch_lists_tables
 -- Version: migration_20250128_create_watch_lists
 ```
 
 ### Step 2: Add Sample Data (Optional)
+
 ```sql
 -- For testing/development
 INSERT INTO watch_lists (user_id, name, icon, color_hex) 
@@ -234,16 +247,19 @@ VALUES (1, 'Tech Stocks', 'chart-line', '#26baac');
 ## Data Integrity Considerations
 
 ### On Ticker Deletion
+
 - **Scenario**: טיקר נמחק מ-tickers table
 - **Action**: `ticker_id` ב-watch_list_items מוגדר ל-NULL
 - **Result**: הפריט נשאר עם `external_symbol` (אם קיים)
 
 ### On Watch List Deletion
+
 - **Scenario**: רשימה נמחקת
 - **Action**: CASCADE DELETE - כל הפריטים נמחקים
 - **Reason**: אין משמעות לפריטים בלי רשימה
 
 ### On User Deletion
+
 - **Scenario**: משתמש נמחק
 - **Action**: CASCADE DELETE - כל הרשימות נמחקות
 - **Result**: כל הפריטים נמחקים גם (cascade)
@@ -253,12 +269,15 @@ VALUES (1, 'Tech Stocks', 'chart-line', '#26baac');
 ## Performance Considerations
 
 ### Indexes
+
 - ✅ All foreign keys indexed
 - ✅ Composite index for user + order queries
 - ✅ Index on flag_color for filtered queries
 
 ### Query Optimization
+
 - **Common Query**: Get all lists for user with item count
+
   ```sql
   SELECT wl.*, COUNT(wli.id) as item_count
   FROM watch_lists wl
@@ -272,7 +291,8 @@ VALUES (1, 'Tech Stocks', 'chart-line', '#26baac');
 
 ## Future Enhancements (Not in v1)
 
-### Possible Additions:
+### Possible Additions
+
 1. **Shared Watchlists**: `shared_with_user_id` field
 2. **Watchlist Templates**: `template_id` field
 3. **Tags on Items**: Many-to-many עם tags table
@@ -282,6 +302,10 @@ VALUES (1, 'Tech Stocks', 'chart-line', '#26baac');
 ---
 
 **סיכום:** הסכמה תומכת בכל הדרישות עם תמיכה מלאה בטיקרים חיצוניים, ריבוי משתמשים, וסידור ידני. כל ה-constraints ו-indexes מתוכננים לביצועים מיטביים.
+
+
+
+
 
 
 

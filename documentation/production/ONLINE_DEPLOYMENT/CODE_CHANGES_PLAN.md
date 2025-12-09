@@ -9,6 +9,7 @@
 ## 📋 סקירה כללית
 
 עדכון הקוד לתמיכה ב-3 סביבות:
+
 1. **Development** - ללא שינוי
 2. **Testing** - שינוי מ-production
 3. **Online** - חדש
@@ -20,17 +21,20 @@
 ### 1. Backend/config/settings.py
 
 **שינויים נדרשים:**
+
 - הוספת תמיכה ב-`testing` ו-`online` environments
 - הוספת `IS_TESTING` ו-`IS_ONLINE` flags
 - עדכון לוגיקה לזיהוי 3 סביבות
 
 **קוד נוכחי:**
+
 ```python
 ENVIRONMENT = os.getenv("TIKTRACK_ENV", "development").lower()
 IS_PRODUCTION = ENVIRONMENT == "production"
 ```
 
 **קוד חדש:**
+
 ```python
 ENVIRONMENT = os.getenv("TIKTRACK_ENV", "development").lower()
 IS_PRODUCTION = False  # רק אם צריך backward compatibility
@@ -44,11 +48,13 @@ IS_DEVELOPMENT = ENVIRONMENT == "development"
 ### 2. production/Backend/config/settings.py
 
 **שינויים נדרשים:**
+
 - שינוי מ-`production` ל-`testing`
 - שינוי database name מ-`TikTrack-db-production` ל-`TikTrack-db-testing`
 - עדכון `IS_PRODUCTION = False`, `IS_TESTING = True`
 
 **קוד נוכחי:**
+
 ```python
 ENVIRONMENT = os.getenv("TIKTRACK_ENV", "development").lower()
 IS_PRODUCTION = ENVIRONMENT == "production"
@@ -56,6 +62,7 @@ POSTGRES_DB = os.getenv("POSTGRES_DB", "TikTrack-db-production")
 ```
 
 **קוד חדש:**
+
 ```python
 ENVIRONMENT = os.getenv("TIKTRACK_ENV", "testing").lower()  # שינוי
 IS_PRODUCTION = False  # שינוי
@@ -69,11 +76,13 @@ POSTGRES_DB = os.getenv("POSTGRES_DB", "TikTrack-db-testing")  # שינוי
 ### 3. start_server.sh
 
 **שינויים נדרשים:**
+
 - הוספת זיהוי `testing` במקום `production`
 - הוספת זיהוי `online` environment
 - עדכון case statement ל-3 סביבות
 
 **קוד נוכחי:**
+
 ```bash
 if [[ "$workspace_name" == *"Production"* ]]; then
     echo "production"
@@ -83,6 +92,7 @@ fi
 ```
 
 **קוד חדש:**
+
 ```bash
 if [[ "$workspace_name" == *"Online"* ]]; then
     echo "online"
@@ -94,6 +104,7 @@ fi
 ```
 
 **עדכון case statement:**
+
 ```bash
 case "$ENVIRONMENT" in
     testing|test|TESTING|Test)
@@ -116,6 +127,7 @@ esac
 ### 4. online/Backend/config/settings.py (חדש)
 
 **יצירת קובץ חדש:**
+
 ```python
 import os
 from pathlib import Path
@@ -165,12 +177,14 @@ CACHE_ENABLED = True
 ### 5. עדכון סקריפטי sync
 
 **קבצים לעדכון:**
+
 - `scripts/sync_to_production.py` → עדכון ל-`sync_to_testing.py` (אופציונלי)
 - `scripts/sync_to_online.py` - חדש
 
 ### 6. עדכון documentation
 
 **קבצים לעדכון:**
+
 - `documentation/production/UPDATE_PROCESS.md` - הוספת תמיכה ב-online
 - `documentation/production/PRODUCTION_SETUP.md` - עדכון ל-3 סביבות
 
@@ -179,22 +193,26 @@ CACHE_ENABLED = True
 ## ✅ Checklist עדכוני קוד
 
 ### לפני עדכון
+
 - [ ] גיבוי כל הקבצים
 - [ ] יצירת branch חדש (`feature/3-environments`)
 - [ ] בדיקת שינויים לא שמורים
 
 ### עדכון קבצים
+
 - [ ] `Backend/config/settings.py` - הוספת testing/online
 - [ ] `production/Backend/config/settings.py` - שינוי ל-testing
 - [ ] `start_server.sh` - עדכון זיהוי סביבות
 - [ ] יצירת `online/Backend/config/settings.py` (חדש)
 
 ### בדיקות
+
 - [ ] בדיקת Development (ללא שינוי)
 - [ ] בדיקת Testing (אחרי שינויים)
 - [ ] בדיקת Online (אחרי יצירה)
 
 ### אחרי עדכון
+
 - [ ] כל הבדיקות עברו
 - [ ] Commit עם הודעה ברורה
 - [ ] Push ל-remote
@@ -204,16 +222,19 @@ CACHE_ENABLED = True
 ## ⚠️ הערות חשובות
 
 ### לפני עדכון
+
 - **חובה:** גיבוי כל הקבצים
 - **מומלץ:** יצירת branch חדש
 - **חובה:** בדיקת שינויים לא שמורים
 
 ### במהלך עדכון
+
 - **חובה:** בדיקות אחרי כל שינוי
 - **מומלץ:** commit קטנים
 - **חובה:** בדיקת backward compatibility
 
 ### אחרי עדכון
+
 - **חובה:** בדיקות מקיפות
 - **חובה:** עדכון documentation
 - **מומלץ:** code review
@@ -223,15 +244,18 @@ CACHE_ENABLED = True
 ## 🔗 קבצים רלוונטיים
 
 ### קבצי Config
+
 - `Backend/config/settings.py` - Development
 - `production/Backend/config/settings.py` - Testing
 - `online/Backend/config/settings.py` - Online (חדש)
 
 ### Scripts
+
 - `start_server.sh` - עדכון זיהוי
 - `scripts/sync_to_online.py` - חדש
 
 ### Documentation
+
 - `documentation/production/ONLINE_DEPLOYMENT/CODE_CHANGES_PLAN.md` - זה הקובץ
 - `documentation/production/ONLINE_DEPLOYMENT/ENVIRONMENT_SETUP.md` - הגדרת סביבות
 

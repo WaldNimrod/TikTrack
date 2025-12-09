@@ -1,5 +1,7 @@
 # Production Migration - Branch Merge Guide
+
 # ============================================
+
 # מדריך למזיגת ענף המיגרציה ל-main לפני עדכון הפרודקשן
 
 **תאריך:** נובמבר 2025  
@@ -13,6 +15,7 @@
 לפני שהפרודקשן יוכל להשתמש בסקריפטים, **חובה למזג את הענף ל-main**.
 
 **למה?**
+
 - הפרודקשן מעדכן קוד מ-`main` branch
 - הסקריפטים והתיעוד נמצאים ב-`new-db-uopgrde`
 - ללא מזיגה ל-main, הפרודקשן לא יקבל את הקבצים
@@ -82,6 +85,7 @@ ls -la documentation/production/PRODUCTION_MIGRATION_MASTER_GUIDE.md
 ## 📋 **רשימת קבצים שצריכים להיות ב-main**
 
 ### **סקריפטים:**
+
 - ✅ `scripts/db/migrate_production_to_pg.py`
 - ✅ `scripts/db/setup_production_postgresql.sh`
 - ✅ `scripts/db/backup_postgresql_production.sh`
@@ -90,6 +94,7 @@ ls -la documentation/production/PRODUCTION_MIGRATION_MASTER_GUIDE.md
 - ✅ `scripts/db/production_start_server_template.sh`
 
 ### **תיעוד:**
+
 - ✅ `documentation/production/PRODUCTION_MIGRATION_MASTER_GUIDE.md`
 - ✅ `documentation/production/PRODUCTION_MIGRATION_EXECUTION_GUIDE.md`
 - ✅ `documentation/production/PRODUCTION_POSTGRESQL_MIGRATION.md`
@@ -103,16 +108,19 @@ ls -la documentation/production/PRODUCTION_MIGRATION_MASTER_GUIDE.md
 ## ⚠️ **נקודות חשובות**
 
 ### **1. לפני המזיגה:**
+
 - ✅ ודא שכל הבדיקות עוברות
 - ✅ ודא שכל הקבצים committed
 - ✅ ודא שכל הקבצים pushed ל-remote
 
 ### **2. אחרי המזיגה:**
+
 - ✅ ודא שהקבצים ב-main
 - ✅ ודא שהפרודקשן יכול לעדכן מ-main
 - ✅ עדכן את צוות הפרודקשן שהקבצים מוכנים
 
 ### **3. אם יש conflicts:**
+
 - פתור conflicts בזהירות
 - ודא שהקבצים החדשים לא נמחקו
 - בדוק שוב אחרי פתרון

@@ -23,11 +23,13 @@
 **קובץ:** `Backend/routes/api/user_data_import.py`
 
 **שינויים:**
+
 - כל route מקבל `user_id` מ-`g.user_id` (Flask context)
 - בדיקת authentication לפני ביצוע פעולות
 - העברת `user_id` ל-ImportOrchestrator
 
 **דוגמה:**
+
 ```python
 @user_data_import_bp.route('/upload', methods=['POST'])
 def upload_file():
@@ -52,6 +54,7 @@ def upload_file():
 **קובץ:** `Backend/services/user_data_import/import_orchestrator.py`
 
 **שינויים:**
+
 - `create_import_session()` - מקבל `user_id` ושומר ב-ImportSession
 - `execute_import()` - מקבל `user_id` ומעביר לכל הפונקציות
 - `_execute_import_executions()` - מקבל `user_id` ומעביר ל-`enrich_records_with_ticker_ids()`
@@ -59,6 +62,7 @@ def upload_file():
 - `_process_import_pipeline()` - מקבל `user_id` ומעביר ל-validation_service
 
 **דוגמה:**
+
 ```python
 def create_import_session(
     self,
@@ -83,11 +87,13 @@ def create_import_session(
 **קובץ:** `Backend/services/ticker_service.py`
 
 **שינויים:**
+
 - `enrich_records_with_ticker_ids()` - מקבל `user_id` parameter
 - יוצר `user_ticker` association אם טיקר קיים אבל association לא
 - יוצר `ticker` + `user_ticker` אם טיקר לא קיים
 
 **דוגמה:**
+
 ```python
 def enrich_records_with_ticker_ids(
     db: Session, 
@@ -123,11 +129,13 @@ def enrich_records_with_ticker_ids(
 **קובץ:** `Backend/services/user_data_import/validation_service.py`
 
 **שינויים:**
+
 - `_check_missing_tickers()` - מקבל `user_id` parameter
 - בודק `user_tickers` table עם `user_id` (אם `user_id` מסופק)
 - טיקר נחשב חסר אם אין `user_ticker` association למשתמש
 
 **דוגמה:**
+
 ```python
 def _check_missing_tickers(
     self, 
@@ -155,11 +163,13 @@ def _check_missing_tickers(
 **קובץ:** `Backend/services/user_data_import/validation_service.py`
 
 **שינויים:**
+
 - `_load_ticker_cache()` - מקבל `user_id` parameter
 - אם `user_id` מסופק - טוען רק `user_tickers` של המשתמש
 - Fallback: טוען את כל הטיקרים (backward compatibility)
 
 **דוגמה:**
+
 ```python
 def _load_ticker_cache(self, user_id: Optional[int] = None):
     if user_id:
@@ -184,12 +194,14 @@ def _load_ticker_cache(self, user_id: Optional[int] = None):
 ### תרחיש 1: ייבוא עם טיקר קיים + user_ticker קיים
 
 **תהליך:**
+
 1. טיקר קיים ב-`tickers` table
 2. `user_ticker` association קיים
 3. `enrich_records_with_ticker_ids()` מוצא את `ticker_id`
 4. ייבוא ממשיך כרגיל
 
 **קוד:**
+
 ```python
 # enrich_records_with_ticker_ids finds ticker_id
 # user_ticker already exists - no action needed
@@ -199,6 +211,7 @@ enriched_record['ticker_id'] = ticker_id
 ### תרחיש 2: ייבוא עם טיקר קיים + user_ticker לא קיים
 
 **תהליך:**
+
 1. טיקר קיים ב-`tickers` table
 2. `user_ticker` association לא קיים
 3. `enrich_records_with_ticker_ids()` מוצא את `ticker_id`
@@ -206,6 +219,7 @@ enriched_record['ticker_id'] = ticker_id
 5. ייבוא ממשיך כרגיל
 
 **קוד:**
+
 ```python
 # enrich_records_with_ticker_ids finds ticker_id
 # user_ticker doesn't exist - create it
@@ -223,12 +237,14 @@ if not user_ticker:
 ### תרחיש 3: ייבוא עם טיקר חדש
 
 **תהליך:**
+
 1. טיקר לא קיים ב-`tickers` table
 2. `enrich_records_with_ticker_ids()` יוצר `ticker` חדש
 3. יוצר `user_ticker` association אוטומטית
 4. ייבוא ממשיך כרגיל
 
 **קוד:**
+
 ```python
 # Ticker doesn't exist - create it
 new_ticker = TickerService.create(db, ticker_data)
@@ -248,6 +264,7 @@ db.flush()
 ### תרחיש 4: בדיקת טיקרים חסרים - User-Specific
 
 **תהליך:**
+
 1. `_check_missing_tickers()` בודק `user_tickers` עם `user_id`
 2. טיקר נחשב חסר אם:
    - הטיקר לא קיים ב-`tickers` table, או
@@ -255,6 +272,7 @@ db.flush()
 3. רשימת טיקרים חסרים מוצגת למשתמש
 
 **קוד:**
+
 ```python
 # Check user_tickers for this user
 existing_user_tickers = db.query(Ticker.symbol).join(
@@ -289,6 +307,7 @@ missing_tickers = [symbol for symbol in symbols if symbol not in existing_symbol
 ### Fallback למצב ללא user_id
 
 אם `user_id` לא מסופק:
+
 1. `enrich_records_with_ticker_ids()` - לא יוצר `user_ticker` associations
 2. `_check_missing_tickers()` - בודק רק `tickers` table (לא user-specific)
 3. `_load_ticker_cache()` - טוען את כל הטיקרים
@@ -300,12 +319,14 @@ missing_tickers = [symbol for symbol in symbols if symbol not in existing_symbol
 ## קבצים שעודכנו
 
 ### Backend
+
 - `Backend/routes/api/user_data_import.py` - הוספת `g.user_id` לכל routes
 - `Backend/services/user_data_import/import_orchestrator.py` - הוספת `user_id` parameters
 - `Backend/services/ticker_service.py` - `enrich_records_with_ticker_ids()` עם `user_id`
 - `Backend/services/user_data_import/validation_service.py` - `_check_missing_tickers()` user-specific
 
 ### Frontend
+
 - `trading-ui/scripts/import-user-data.js` - כבר משתמש ב-UnifiedAppInitializer
 - `trading-ui/scripts/page-initialization-configs.js` - כבר מוגדר נכון
 
@@ -318,12 +339,14 @@ missing_tickers = [symbol for symbol in symbols if symbol not in existing_symbol
 **קובץ:** `Backend/scripts/test_import_comprehensive.py`
 
 **תרחישי בדיקה:**
+
 1. ייבוא עם טיקר קיים + user_ticker קיים
 2. ייבוא עם טיקר קיים + user_ticker לא קיים
 3. ייבוא עם טיקר חדש
 4. בדיקת user isolation
 
 **הרצה:**
+
 ```bash
 python3 Backend/scripts/test_import_comprehensive.py
 ```

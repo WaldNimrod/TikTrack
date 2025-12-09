@@ -34,11 +34,13 @@ git push origin production
 המערכת מוגנת מפני דריסה כי:
 
 ✅ **sync_to_production.py** עובד רק על `Backend/` ולא על `scripts/`
-   - הוא מעתיק רק מ-`Backend/` ל-`production/Backend/`
-   - `scripts/production-update/` לא נכלל בתהליך
+
+- הוא מעתיק רק מ-`Backend/` ל-`production/Backend/`
+- `scripts/production-update/` לא נכלל בתהליך
 
 ✅ **המערכת נמצאת ב-`scripts/`** ולא ב-`production/`
-   - תהליך העדכון לא נוגע ב-`scripts/` כלל
+
+- תהליך העדכון לא נוגע ב-`scripts/` כלל
 
 ### 3. הגנה נוספת (מומלץ)
 

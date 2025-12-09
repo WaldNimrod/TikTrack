@@ -7,7 +7,7 @@
 
 ## 📊 סיכום טבלאות
 
-### טבלאות פעילות (עם נתונים):
+### טבלאות פעילות (עם נתונים)
 
 | טבלה | רשומות | מטרה | סטטוס |
 |------|--------|------|-------|
@@ -16,7 +16,7 @@
 | `preference_types` | 120 | סוגי העדפות משתמש | ✅ פעיל |
 | `user_preferences` | 120 | העדפות שמורות למשתמשים | ✅ פעיל |
 
-### טבלאות ריקות/לא פעילות:
+### טבלאות ריקות/לא פעילות
 
 | טבלה | רשומות | מטרה | סטטוס |
 |------|--------|------|-------|
@@ -25,7 +25,7 @@
 **תאריך מחיקה:** 29 אוקטובר 2025  
 **סיבה:** טבלה ריקה ולא בשימוש - כל הנתונים נמצאים ב-`user_preferences`
 
-### טבלאות מערכת נפרדות:
+### טבלאות מערכת נפרדות
 
 | טבלה | רשומות | מטרה | סטטוס |
 |------|--------|------|-------|
@@ -38,6 +38,7 @@
 ## 🏗️ מבנה טבלאות
 
 ### 1. `preference_groups` (16 קבוצות)
+
 ```sql
 CREATE TABLE preference_groups (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -49,6 +50,7 @@ CREATE TABLE preference_groups (
 ```
 
 ### 2. `preference_profiles` (2 פרופילים)
+
 ```sql
 CREATE TABLE preference_profiles (
     user_id INTEGER NOT NULL,
@@ -68,6 +70,7 @@ CREATE TABLE preference_profiles (
 ```
 
 ### 3. `preference_types` (120 העדפות)
+
 ```sql
 CREATE TABLE preference_types (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -87,6 +90,7 @@ CREATE TABLE preference_types (
 ```
 
 ### 4. `user_preferences` (120 העדפות שמורות)
+
 ```sql
 CREATE TABLE user_preferences (
     id INTEGER,
@@ -103,6 +107,7 @@ CREATE TABLE user_preferences (
 ```
 
 ### 5. `user_preferences_v3` (0 רשומות - ריקה)
+
 ```sql
 CREATE TABLE user_preferences_v3 (
     user_id INTEGER NOT NULL,
@@ -118,6 +123,7 @@ CREATE TABLE user_preferences_v3 (
 ```
 
 ### 6. `system_setting_groups` (1 קבוצה)
+
 ```sql
 CREATE TABLE system_setting_groups (
     name VARCHAR(100) NOT NULL,
@@ -131,6 +137,7 @@ CREATE TABLE system_setting_groups (
 ```
 
 ### 7. `system_setting_types` (12 הגדרות)
+
 ```sql
 CREATE TABLE system_setting_types (
     group_id INTEGER NOT NULL,
@@ -150,6 +157,7 @@ CREATE TABLE system_setting_types (
 ```
 
 ### 8. `system_settings` (8 הגדרות שמורות)
+
 ```sql
 CREATE TABLE system_settings (
     type_id INTEGER NOT NULL,
@@ -167,9 +175,10 @@ CREATE TABLE system_settings (
 
 ## ⚠️ כפילות זוהתה
 
-### כפילות בין `preference_types` ו-`system_setting_types`:
+### כפילות בין `preference_types` ו-`system_setting_types`
 
 העדפות שמופיעות בשני הטבלאות:
+
 - `borderColor`
 - `console_logs_cache_enabled`
 - `console_logs_initialization_enabled`
@@ -183,7 +192,7 @@ CREATE TABLE system_settings (
 - `statusOpenColor`
 - `statusPendingColor`
 
-### כפילות בין `user_preferences` ו-`user_preferences_v3`:
+### כפילות בין `user_preferences` ו-`user_preferences_v3`
 
 - ✅ **נפתרה:** `user_preferences_v3` נמחקה לחלוטין (29 אוקטובר 2025)
 - ✅ **המערכת הפעילה:** `user_preferences` עם 120 רשומות
@@ -192,17 +201,20 @@ CREATE TABLE system_settings (
 
 ## 🔍 המלצות
 
-### 1. מחיקת טבלה ריקה:
+### 1. מחיקת טבלה ריקה
+
 - ✅ **`user_preferences_v3`** - נמחקה בהצלחה (29 אוקטובר 2025)
   - גיבוי לפני: `simpleTrade_new.db.backup_before_delete_v3_20251029_150628`
   - גיבוי אחרי: `simpleTrade_new.db.backup_after_delete_v3_20251029_150649`
   - כל הנתונים נשארו ב-`user_preferences` (120 רשומות)
 
-### 2. סינון כפילות:
+### 2. סינון כפילות
+
 - העדפות ב-`system_setting_types` שהוספו לאחרונה (12 העדפות) נראות ככפילות
 - יש להחליט האם לשמור על מערכת `system_settings` נפרדת או לאחד הכל ל-`preference_types`
 
-### 3. איחוד מערכות:
+### 3. איחוד מערכות
+
 - אם `system_settings` לא בשימוש פעיל, ניתן למחוק את הטבלאות:
   - `system_setting_groups`
   - `system_setting_types`

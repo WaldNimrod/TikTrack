@@ -33,6 +33,7 @@
 ### קבצי קוד מרכזיים
 
 **Backend:**
+
 - `Backend/services/user_data_import/import_orchestrator.py` - תהליך הייבוא המרכזי (55+ פונקציות)
 - `Backend/connectors/user_data_import/ibkr_connector.py` - פרסור קובץ IBKR
 - `Backend/services/user_data_import/import_validator.py` - Validation לפני ייבוא
@@ -40,6 +41,7 @@
 - `Backend/services/tag_service.py` - ניהול תגיות (מערכת כללית)
 
 **Frontend:**
+
 - `trading-ui/scripts/import-user-data.js` - Import modal ו-state management (9000+ שורות)
 - `trading-ui/data_import.html` - דף ייבוא נתונים
 - `trading-ui/scripts/services/data-import-data.js` - API calls ו-cache management
@@ -91,6 +93,7 @@ trading-ui/
 ### שלב 1: העלאת קובץ וזיהוי חשבון
 
 **תהליך:**
+
 1. המשתמש בוחר ספק נתונים (IBKR/Demo)
 2. המשתמש בוחר תהליך (account_reconciliation/portfolio_positions/taxes_and_fx)
 3. המשתמש מעלה קובץ CSV
@@ -101,6 +104,7 @@ trading-ui/
 8. המשתמש לוחץ "המשך לניתוח"
 
 **API Endpoints:**
+
 - `POST /api/user-data-import/precheck` - בדיקה בסיסית
 - `POST /api/user-data-import/upload` - העלאת קובץ
 - `GET /api/user-data-import/session/<id>/account-link/status` - מצב שיוך
@@ -108,6 +112,7 @@ trading-ui/
 - `POST /api/user-data-import/session/<id>/account-link/select` - בחירת חשבון
 
 **State Management:**
+
 - `selectedFile` - הקובץ שנבחר
 - `activeSessionInfo` - מידע על הסשן הפעיל
 - `currentSessionId` - מזהה הסשן הנוכחי
@@ -116,6 +121,7 @@ trading-ui/
 ### שלב 2: ניתוח ופתרון בעיות
 
 **תהליך:**
+
 1. המערכת מפרסת את הקובץ (`analyze_file`)
 2. המערכת מזהה בעיות:
    - טיקרים חסרים
@@ -130,6 +136,7 @@ trading-ui/
 4. המשתמש לוחץ "המשך לתצוגה מקדימה"
 
 **API Endpoints:**
+
 - `GET /api/user-data-import/session/<id>/analyze` - ניתוח קובץ
 - `GET /api/user-data-import/session/<id>/preview` - תצוגה מקדימה
 - `POST /api/user-data-import/session/<id>/refresh-preview` - רענון תצוגה
@@ -137,27 +144,32 @@ trading-ui/
 - `POST /api/user-data-import/session/<id>/reject-duplicate` - דחיית כפילות
 
 **State Management:**
+
 - `previewData` - נתוני התצוגה המקדימה
 - `problemResolutionState` - מצב פתרון בעיות
 - `currentStep` - השלב הנוכחי (1/2/3/4)
 
 **תכונות מיוחדות:**
+
 - **הוספת טיקרים**: פתיחת מודול טיקרים מתוך שלב 2, עדכון מיידי של רשימת הטיקרים החסרים
 - **עדכון UI דינמי**: רשימת הטיקרים החסרים מתעדכנת מיד אחרי הוספת טיקר, ללא טעינה מחדש מהשרת
 
 ### שלב 3: תצוגה מקדימה ואישור
 
 **תהליך:**
+
 1. המשתמש רואה תצוגה מקדימה של כל הרשומות
 2. המשתמש בוחר סוגי רשומות לייבוא (`selected_types`)
 3. המשתמש מאשר את הייבוא
 4. המשתמש לוחץ "ביצוע ייבוא" או "ביצוע ייבוא + דוח"
 
 **API Endpoints:**
+
 - `GET /api/user-data-import/session/<id>/preview` - תצוגה מקדימה
 - `POST /api/user-data-import/session/<id>/execute` - ביצוע ייבוא
 
 **State Management:**
+
 - `selectedCashflowTypes` - סוגי רשומות שנבחרו
 - `previewData.records_to_import` - רשומות לייבוא
 - `previewData.records_to_skip` - רשומות לדילוג
@@ -165,15 +177,18 @@ trading-ui/
 ### שלב 4: ביצוע ייבוא
 
 **תהליך:**
+
 1. המערכת מייבאת את הרשומות שנבחרו
 2. המערכת משייכת תגיות אוטומטיות
 3. המערכת מעדכנת את הסטטיסטיקות
 4. המשתמש רואה הודעת הצלחה
 
 **API Endpoints:**
+
 - `POST /api/user-data-import/session/<id>/execute` - ביצוע ייבוא
 
 **State Management:**
+
 - `activeSessionInfo` - עדכון סטטיסטיקות
 - `currentSessionId` - ניקוי אחרי ייבוא מוצלח
 
@@ -186,11 +201,13 @@ trading-ui/
 **לפני כל כתיבת פונקציה או קוד מקומי - חובה לבדוק היטב אם קיים קוד כללי במערכת.**
 
 **מקורות מידע:**
+
 - `documentation/frontend/GENERAL_SYSTEMS_LIST.md` - רשימה מלאה של כל המערכות הכלליות
 - `trading-ui/scripts/init-system/package-manifest.js` - חבילות טעינה
 - `documentation/INDEX.md` - אינדקס תיעוד מלא
 
 **דוגמאות למערכות כלליות:**
+
 - `FieldRendererService` - רינדור status, type, amount, side badges
 - `checkLinkedItemsBeforeAction()` - בדיקת פריטים מקושרים לפני מחיקה/ביטול
 - `updatePageSummaryStats()` - עדכון סטטיסטיקות עמוד (ב-ui-utils.js)
@@ -206,11 +223,13 @@ trading-ui/
 #### User ID Passing
 
 **כל ה-API routes חייבים:**
+
 1. לקבל `user_id` מ-`g.user_id` (Flask context)
 2. לבדוק authentication לפני ביצוע פעולות
 3. להעביר `user_id` לכל הפונקציות הפנימיות
 
 **דוגמה:**
+
 ```python
 @user_data_import_bp.route('/upload', methods=['POST'])
 def upload_file():
@@ -233,12 +252,14 @@ def upload_file():
 #### User_Ticker Association
 
 **תהליך יצירת טיקרים:**
+
 1. `TickerService.enrich_records_with_ticker_ids()` מקבל `user_id`
 2. אם טיקר קיים - בודק אם `user_ticker` association קיים
 3. אם `user_ticker` לא קיים - יוצר association
 4. אם טיקר לא קיים - יוצר `ticker` + `user_ticker` association
 
 **דוגמה:**
+
 ```python
 enriched_records = TickerService.enrich_records_with_ticker_ids(
     db_session, 
@@ -250,12 +271,14 @@ enriched_records = TickerService.enrich_records_with_ticker_ids(
 #### בדיקת טיקרים חסרים - User-Specific
 
 **`ValidationService._check_missing_tickers()` עכשיו:**
+
 1. בודק `user_tickers` table עם `user_id` (אם `user_id` מסופק)
 2. טיקר נחשב חסר אם:
    - הטיקר לא קיים ב-`tickers` table, או
    - הטיקר קיים אבל אין `user_ticker` association למשתמש
 
 **דוגמה:**
+
 ```python
 # Set user_id on validation_service
 validation_service.user_id = user_id
@@ -267,15 +290,18 @@ missing_tickers = validation_service._check_missing_tickers(records, user_id=use
 #### ImportSession User ID
 
 **`ImportSession` שומר `user_id`:**
+
 - כל import session משויך למשתמש ספציפי
 - `user_id` נשמר ב-session ונעשה בו שימוש בכל התהליך
 
 **קישור לתיעוד:**
+
 - [USER_TICKER_INTEGRATION.md](../../02-ARCHITECTURE/BACKEND/USER_TICKER_INTEGRATION.md) - ארכיטקטורה מלאה
 - [USER_TICKER_IMPORT.md](./USER_TICKER_IMPORT.md) - תיעוד ייעודי לייבוא
 - `EventHandlerManager` - טיפול באירועים
 
 **דוגמה שגויה (❌):**
+
 ```javascript
 // ❌ DON'T: כתיבת פונקציה מקומית בלי לבדוק מערכות כלליות
 function getStatusClassForTradePlan(status) {
@@ -287,6 +313,7 @@ function getStatusClassForTradePlan(status) {
 ```
 
 **דוגמה נכונה (✅):**
+
 ```javascript
 // ✅ DO: שימוש במערכת כללית קיימת
 window.FieldRendererService.renderStatus(design.status, 'trade_plan')
@@ -297,6 +324,7 @@ window.FieldRendererService.renderStatus(design.status, 'trade_plan')
 **חובה להשתמש ב-`ModalManagerV2` לכל פתיחת/סגירת מודולים.**
 
 **דוגמה:**
+
 ```javascript
 // פתיחת מודול טיקרים מתוך שלב 2
 async function openAddTickerModal(symbol, currency) {
@@ -317,6 +345,7 @@ async function openAddTickerModal(symbol, currency) {
 ```
 
 **⚠️ חשוב:**
+
 - אין להשתמש ב-`bootstrap.Modal` ישירות
 - אין להשתמש ב-`document.getElementById().show()` ישירות
 - כל פתיחת מודול חייבת לעבור דרך `ModalManagerV2`
@@ -326,6 +355,7 @@ async function openAddTickerModal(symbol, currency) {
 **חובה להשתמש ב-`CacheSyncManager` או `UnifiedCacheManager` לכל ניהול מטמון.**
 
 **דוגמה:**
+
 ```javascript
 // ניקוי מטמון אחרי ייבוא מוצלח
 async function invalidateHistoryCache() {
@@ -338,6 +368,7 @@ async function invalidateHistoryCache() {
 ```
 
 **⚠️ חשוב:**
+
 - אין לנקות מטמון ישירות ב-`localStorage` או `IndexedDB`
 - כל ניקוי מטמון חייב לעבור דרך מערכת המטמון המרכזית
 - אחרי ניקוי מטמון, המערכת מבצעת hard reload אוטומטית
@@ -347,6 +378,7 @@ async function invalidateHistoryCache() {
 **חובה להשתמש ב-`EventHandlerManager` לכל event handling.**
 
 **דוגמה:**
+
 ```html
 <!-- HTML -->
 <button data-onclick="openImportUserDataModal()">פתח ייבוא</button>
@@ -358,6 +390,7 @@ async function invalidateHistoryCache() {
 ```
 
 **⚠️ חשוב:**
+
 - אין להשתמש ב-`addEventListener` ישירות לכפתורים
 - כל event handling חייב לעבור דרך `EventHandlerManager`
 - שימוש ב-`data-onclick` ב-HTML
@@ -375,16 +408,19 @@ async function invalidateHistoryCache() {
 **⚠️ חשוב: התגיות נוצרות מראש באופן ידני, לא אוטומטית במהלך הייבוא.**
 
 **סקריפט יצירה:**
+
 ```bash
 python3 Backend/scripts/create_import_tags.py
 ```
 
 **מה הסקריפט עושה:**
+
 1. יוצר קטגוריה "ייבוא נתונים IBKR" (אם לא קיימת)
 2. יוצר תגית עבור כל סקציה ב-`CASHFLOW_SECTION_NAMES`
 3. כל תגית מקבלת תיאור: "נוצר אוטומטית ממודול ייבוא"
 
 **רשימת תגיות:**
+
 - Dividends
 - Interest
 - Borrow Fee Details
@@ -397,6 +433,7 @@ python3 Backend/scripts/create_import_tags.py
 ### שיוך תגיות
 
 **תהליך:**
+
 1. כל רשומה נוצרת ב-`_execute_import_cashflows`
 2. אחרי יצירת כל הרשומות (כולל exchanges), מתבצע commit
 3. אחרי ה-commit, מתבצעת שיוך תגיות:
@@ -404,6 +441,7 @@ python3 Backend/scripts/create_import_tags.py
    - `_assign_tag_to_cashflow()` - משייך תגית לרשומה דרך `TagService.replace_tags_for_entity`
 
 **קוד:**
+
 ```python
 # Backend/services/user_data_import/import_orchestrator.py
 
@@ -443,6 +481,7 @@ for item in cashflows_for_tagging:
 ```
 
 **⚠️ חשוב:**
+
 - שיוך תגיות מתבצע **אחרי** commit, לא לפני
 - `TagService.replace_tags_for_entity` מבצע commit משלו, לכן חייבים להפריד
 - גם רשומות Forex Exchange מקבלות תגיות (לשתי הרשומות FROM/TO)
@@ -450,11 +489,13 @@ for item in cashflows_for_tagging:
 ### הוספת תגית חדשה
 
 **תהליך:**
+
 1. עדכן את `CASHFLOW_SECTION_NAMES` ב-`ibkr_connector.py`
 2. הרץ `python3 Backend/scripts/create_import_tags.py`
 3. בדוק שהתגית נוצרה: `python3 Backend/scripts/check_import_tags.py`
 
 **⚠️ חשוב:**
+
 - אין ליצור תגיות במהלך הייבוא
 - כל התגיות חייבות להיווצר מראש
 - אם תגית כבר קיימת, המערכת תשתמש בה (אפילו אם היא בקטגוריה אחרת)
@@ -468,6 +509,7 @@ for item in cashflows_for_tagging:
 **⚠️ כלל קריטי: פתיחת מודול חייבת להיות פשוטה וישירה, ללא תהליכים מורכבים.**
 
 **דוגמה נכונה:**
+
 ```javascript
 // ✅ DO: פתיחה פשוטה וישירה
 async function openImportUserDataModal() {
@@ -478,6 +520,7 @@ async function openImportUserDataModal() {
 ```
 
 **דוגמה שגויה:**
+
 ```javascript
 // ❌ DON'T: תהליך מורכב עם placeholders ו-wrappers
 let openImportUserDataModal = null;
@@ -492,12 +535,14 @@ window.openImportUserDataModal = openImportUserDataModalWithSessionCleanup;
 ### פתיחת מודול טיקרים מתוך שלב 2
 
 **תהליך:**
+
 1. וידוא שהקונפיגורציה נטענה (`ensureTickersModalConfigLoaded`)
 2. וידוא שהמודול נוצר ב-ModalManagerV2
 3. פתיחת המודול עם פרמטרים (symbol, currency)
 4. רישום hook לעדכון רשימת טיקרים חסרים אחרי שמירה
 
 **קוד:**
+
 ```javascript
 async function openAddTickerModal(symbol, currency) {
     // 1. טעינת קונפיגורציה
@@ -520,6 +565,7 @@ async function openAddTickerModal(symbol, currency) {
 ```
 
 **⚠️ חשוב:**
+
 - אין להשתמש ב-placeholders או wrappers מורכבים
 - כל פתיחת מודול חייבת להיות פשוטה וישירה
 - אין צורך ב-`window._internalFunction` - רק `window.functionName`
@@ -529,6 +575,7 @@ async function openAddTickerModal(symbol, currency) {
 **בעיה:** מודול טיקרים נפתח מאחורי מודול הייבוא.
 
 **פתרון:**
+
 ```css
 /* trading-ui/styles-new/06-components/_modals.css */
 
@@ -547,6 +594,7 @@ async function openAddTickerModal(symbol, currency) {
 ```
 
 **⚠️ חשוב:**
+
 - מודולים מקוננים צריכים z-index גבוה יותר
 - אין להשתמש ב-`!important` אלא אם יש צורך אמיתי (כמו במקרה זה)
 
@@ -559,12 +607,14 @@ async function openAddTickerModal(symbol, currency) {
 **בעיה:** אחרי הוספת טיקר, הרשימה לא מתעדכנת.
 
 **פתרון:**
+
 1. רישום hook על `saveTicker` לפני שמירה
 2. אחרי שמירה מוצלחת, הסרת הטיקר מהרשימה
 3. עדכון `previewData` מקומית
 4. קריאה ל-`displayMissingTickers` לעדכון הטבלה
 
 **קוד:**
+
 ```javascript
 // רישום hook
 function ensureTickerSaveHook() {
@@ -625,6 +675,7 @@ function removeTickerFromMissingList(symbol) {
 ```
 
 **⚠️ חשוב:**
+
 - **אין לקרוא ל-`refreshPreviewData` אחרי הסרת טיקר** - זה יטען מחדש את הנתונים מהשרת (לפני שהטיקר נוסף) ויבטל את העדכון המקומי
 - העדכון המקומי נשמר עד שהמשתמש ממשיך לשלב הבא
 - השרת עדיין לא יודע שהטיקר נוסף (כי זה עדיין לא בוצע ייבוא מחדש)
@@ -632,12 +683,14 @@ function removeTickerFromMissingList(symbol) {
 ### ניטור מפורט
 
 **פונקציית debug:**
+
 ```javascript
 // קריאה בקונסולה
 window.debugTickerSaveProcess()
 ```
 
 **מה הפונקציה מציגה:**
+
 - כל הסמלים החסרים ב-preview data
 - כל הסמלים בטבלה
 - השוואה בין הטבלה ל-preview data
@@ -645,6 +698,7 @@ window.debugTickerSaveProcess()
 - אילו סמלים ב-preview אבל לא בטבלה
 
 **ניטור אוטומטי:**
+
 - כל שלב בתהליך השמירה מדווח לקונסולה עם `[TICKER_SAVE_MONITOR]`
 - כל שלב בתהליך ההסרה מדווח לקונסולה עם `[REMOVE_TICKER_MONITOR]`
 - כל שלב כולל זמנים ומצב מפורט
@@ -656,11 +710,13 @@ window.debugTickerSaveProcess()
 ### בעיה: מודול לא נפתח
 
 **סיבות אפשריות:**
+
 1. הקונפיגורציה לא נטענה
 2. המודול לא נוצר ב-ModalManagerV2
 3. Z-index נמוך מדי (מודול מאחורי מודול אחר)
 
 **פתרון:**
+
 ```javascript
 // 1. וידוא טעינת קונפיגורציה
 await ensureTickersModalConfigLoaded();
@@ -677,11 +733,13 @@ await window.ModalManagerV2.showModal('tickersModal', 'add');
 ### בעיה: רשימת טיקרים לא מתעדכנת
 
 **סיבות אפשריות:**
+
 1. `saveTicker` לא מחזיר תוצאה
 2. `refreshPreviewData` נקרא אחרי הסרת טיקר (מבטל את העדכון)
 3. `removeTickerFromMissingList` לא נקרא
 
 **פתרון:**
+
 1. וידוא ש-`saveTicker` מחזיר `crudResult` מ-`CRUDResponseHandler.handleSaveResponse`
 2. **אין לקרוא ל-`refreshPreviewData` אחרי הסרת טיקר**
 3. וידוא ש-`ensureTickerSaveHook` רשום לפני שמירה
@@ -689,11 +747,13 @@ await window.ModalManagerV2.showModal('tickersModal', 'add');
 ### בעיה: תגיות לא משויכות
 
 **סיבות אפשריות:**
+
 1. התגיות לא נוצרו מראש
 2. `cashflow.id` לא זמין לפני שיוך תגית
 3. `TagService.replace_tags_for_entity` מבצע commit משלו
 
 **פתרון:**
+
 1. הרץ `python3 Backend/scripts/create_import_tags.py`
 2. וידוא ש-`cashflow.id` זמין אחרי commit
 3. שיוך תגיות **אחרי** commit כל הרשומות, לא לפני
@@ -701,11 +761,13 @@ await window.ModalManagerV2.showModal('tickersModal', 'add');
 ### בעיה: Session לא מתנקה אחרי ייבוא
 
 **סיבות אפשריות:**
+
 1. `handleSessionCompletion` לא נקרא
 2. `clearStoredActiveSession` לא נקרא
 3. `currentSessionId` לא מתאפס
 
 **פתרון:**
+
 ```javascript
 function handleSessionCompletion(status, message) {
     // 1. ניקוי state מקומי
@@ -742,12 +804,14 @@ function handleSessionCompletion(status, message) {
 ### 2. כתיבת קוד
 
 **עקרונות:**
+
 - **פשוט וישיר** - אין צורך בתהליכים מורכבים
 - **שימוש במערכות כלליות** - לפני כל כתיבת קוד חדש
 - **תיעוד מלא** - כל פונקציה חייבת JSDoc/docstring
 - **ניטור מפורט** - הוסף לוגים לכל שלב חשוב
 
 **דוגמה:**
+
 ```javascript
 /**
  * פתיחת מודול ייבוא נתונים
@@ -765,12 +829,14 @@ async function openImportUserDataModal() {
 ### 3. בדיקות
 
 **לפני commit:**
+
 1. בדוק שהקוד עובד עם קובץ אמיתי
 2. בדוק שהטבלה מתעדכנת נכון
 3. בדוק שאין שגיאות בקונסולה
 4. בדוק שאין שגיאות בשרת
 
 **בדיקות רגרסיה:**
+
 - פתיחת מודול ייבוא
 - העלאת קובץ
 - ניתוח קובץ
@@ -781,11 +847,13 @@ async function openImportUserDataModal() {
 ### 4. תיעוד
 
 **חובה לעדכן:**
+
 - `documentation/user_data_import/STATUS_REPORT.md` - דוח מצב
 - `documentation/user_data_import/DEVELOPER_GUIDE.md` - מדריך מפתח (קובץ זה)
 - `documentation/user_data_import/INDEX.md` - אינדקס
 
 **מה לכלול:**
+
 - תיאור השינוי
 - מיקום בקוד
 - סיבות לשינוי
@@ -835,6 +903,7 @@ async function openImportUserDataModal() {
 ## קישורים רלוונטיים
 
 ### תיעוד טכני
+
 - [INDEX.md](./INDEX.md) - אינדקס מלא של כל התיעוד הטכני
 - [IMPORT_DATA_FLOW.md](./IMPORT_DATA_FLOW.md) - זרימת המידע המלאה
 - [STATUS_REPORT.md](./STATUS_REPORT.md) - דוח מצב מעודכן
@@ -843,6 +912,7 @@ async function openImportUserDataModal() {
 - [FILTERING_MECHANISM.md](./FILTERING_MECHANISM.md) - מנגנון הסינון
 
 ### מערכות כלליות
+
 - [GENERAL_SYSTEMS_LIST.md](../../frontend/GENERAL_SYSTEMS_LIST.md) - רשימה מלאה של כל המערכות הכלליות
 - [INDEX.md](../../INDEX.md) - אינדקס ראשי של כל התיעוד
 
@@ -853,18 +923,21 @@ async function openImportUserDataModal() {
 ### 2025-01-30 - עדכון מקיף
 
 **תכונות חדשות:**
+
 1. ✅ **תגיות אוטומטיות** - כל רשומה מקבלת תגית עם שם הסקציה
 2. ✅ **פתיחת מודול פשוטה** - פישוט תהליך פתיחת מודול ייבוא
 3. ✅ **עדכון UI דינמי** - רשימת טיקרים מתעדכנת מיד אחרי הוספת טיקר
 4. ✅ **ניטור מפורט** - ניטור מלא של כל תהליך השמירה והעדכון
 
 **תיקונים:**
+
 1. ✅ **תיקון `saveTicker`** - הפונקציה מחזירה תוצאה כעת
 2. ✅ **תיקון `refreshPreviewData`** - לא נקרא אחרי הסרת טיקר
 3. ✅ **תיקון Z-index** - מודול טיקרים מופיע מעל מודול ייבוא
 4. ✅ **תיקון session cleanup** - ניקוי מלא אחרי ייבוא מוצלח
 
 **שיפורי UX:**
+
 1. ✅ **סידור כפתורים** - "ביצוע ייבוא + דוח" לפני "ביצוע ייבוא"
 2. ✅ **הסרת כפתור מיותר** - "המשך סשן פעיל" הוסר
 3. ✅ **תרגום** - "tax" מתורגם ל-"מיסים"

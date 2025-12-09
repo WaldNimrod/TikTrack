@@ -58,12 +58,14 @@
 ```
 
 **יתרונות:**
+
 - ✅ פשוט וישיר
 - ✅ תואם לווידג'טים הקיימים
 - ✅ קל לתחזוקה
 - ✅ ללא overhead של Class
 
 **אין להשתמש ב:**
+
 - ❌ Classes
 - ❌ Global variables
 - ❌ Inline scripts
@@ -154,11 +156,13 @@
 ### 2. ניהול State
 
 **חובה:**
+
 - ✅ שימוש ב-local state object
 - ✅ שמירת מצב initialization
 - ✅ Cache למטאדטה (אם רלוונטי)
 
 **אסור:**
+
 - ❌ Global state
 - ❌ משתנים גלובליים
 - ❌ DOM elements כחלק מה-state
@@ -194,6 +198,7 @@ function cacheElements() {
 ```
 
 **אסור:**
+
 - ❌ חיפוש DOM בכל render
 - ❌ querySelector בכל פעם
 
@@ -255,6 +260,7 @@ init(containerId = CONTAINER_ID, config = {}) {
 ```
 
 **דרישות:**
+
 - ✅ תמיכה ב-container ID מותאם
 - ✅ תמיכה ב-config object
 - ✅ בדיקת initialization כפולה
@@ -300,6 +306,7 @@ window.MyWidget.init('container2', { maxItems: 20 });
 ```
 
 **דרישות:**
+
 - ✅ תמיכה ב-container ID מותאם
 - ✅ קונפיגורציה נפרדת לכל instance
 
@@ -346,6 +353,7 @@ function applyHeightConfiguration() {
 ```
 
 **דרישות:**
+
 - ✅ globalCheck - בדיקת זמינות global
 - ✅ description - תיאור קצר
 - ✅ required - סטטוס חובה
@@ -371,6 +379,7 @@ function applyHeightConfiguration() {
 ```
 
 **דרישות:**
+
 - ✅ packages - רשימת packages
 - ✅ requiredGlobals - בדיקת globals נדרשים
 - ✅ customInitializers - אתחול מותאם
@@ -481,6 +490,7 @@ const tagBadges = window.FieldRendererService?.renderTagBadges(tags);
 ```
 
 **אסור:**
+
 ```javascript
 // ❌ רע - אל תכתוב פונקציות עיצוב מקומיות
 function formatAmount(value) {
@@ -499,6 +509,7 @@ if (window.ButtonSystem?.processButtons) {
 ```
 
 **דרישות:**
+
 - ✅ שימוש ב-data attributes
 - ✅ עיבוד דרך ButtonSystem
 - ✅ ללא inline event handlers
@@ -513,6 +524,7 @@ window.NotificationSystem?.showSuccess?.('Success message');
 ```
 
 **אסור:**
+
 - ❌ alert()
 - ❌ console.error() למשתמש
 - ❌ HTML popups מקומיים
@@ -576,6 +588,7 @@ const details = await window.entityDetailsAPI?.getEntityDetails(type, id);
 **מיקום:** `documentation/03-DEVELOPMENT/GUIDES/WIDGET_NAME_DEVELOPER_GUIDE.md`
 
 **תוכן:**
+
 - סקירה כללית
 - ארכיטקטורה
 - API
@@ -599,11 +612,13 @@ const details = await window.entityDetailsAPI?.getEntityDetails(type, id);
 ## ✅ Checklist ליצירת ווידג'ט חדש
 
 ### תכנון
+
 - [ ] בדוק אם יש ווידג'ט דומה קיים
 - [ ] תכנן את ה-API
 - [ ] תכנן את ה-HTML structure
 
 ### קוד
+
 - [ ] יצרת קובץ JS ב-`trading-ui/scripts/widgets/`
 - [ ] השתמשת ב-Module Pattern (IIFE)
 - [ ] הוספת פונקציית `init()` עם תמיכה ב-config
@@ -613,22 +628,26 @@ const details = await window.entityDetailsAPI?.getEntityDetails(type, id);
 - [ ] Error handling מלא
 
 ### עיצוב
+
 - [ ] יצרת קובץ CSS ב-`trading-ui/styles-new/06-components/`
 - [ ] שימוש בצבעי המערכת
 - [ ] Responsive design
 
 ### מערכות כלליות
+
 - [ ] שימוש ב-FieldRendererService
 - [ ] שימוש ב-ButtonSystem
 - [ ] שימוש ב-NotificationSystem
 - [ ] שימוש ב-Logger
 
 ### שילוב
+
 - [ ] עדכנת Package Manifest
 - [ ] עדכנת Page Config
 - [ ] בדקת טעינה תקינה
 
 ### תיעוד
+
 - [ ] הוספת תיעוד לקובץ הקוד
 - [ ] יצרת מדריך מפתח (אם נדרש)
 - [ ] עדכנת WIDGETS_LIST.md
@@ -642,6 +661,7 @@ const details = await window.entityDetailsAPI?.getEntityDetails(type, id);
 **קובץ:** `trading-ui/scripts/widgets/tag-widget.js`
 
 **מאפיינים:**
+
 - ✅ Module Pattern (IIFE)
 - ✅ Bootstrap Tabs (2 טאבים)
 - ✅ API מלא (`init`, `render`, `destroy`, `refreshTagCloud`)
@@ -658,6 +678,7 @@ const details = await window.entityDetailsAPI?.getEntityDetails(type, id);
 **קובץ:** `trading-ui/scripts/widgets/recent-trades-widget.js`
 
 **מאפיינים:**
+
 - ✅ Module Pattern (IIFE)
 - ✅ פשוט וישיר
 - ✅ שימוש ב-FieldRendererService
@@ -667,26 +688,31 @@ const details = await window.entityDetailsAPI?.getEntityDetails(type, id);
 ## 🔄 Workflow ליצירת ווידג'ט חדש
 
 ### 1. תכנון
+
 - בדוק אם יש ווידג'ט דומה קיים
 - תכנן את ה-API
 - תכנן את ה-HTML structure
 
 ### 2. יצירת קובץ
+
 - צור קובץ ב-`trading-ui/scripts/widgets/`
 - השתמש בתבנית הבסיסית
 - כתוב documentation header
 
 ### 3. יצירת HTML
+
 - הוסף HTML structure לעמוד
 - אם צריך טאבים - השתמש ב-Bootstrap Tabs
 - צור קובץ CSS
 
 ### 4. אינטגרציה
+
 - עדכן Package Manifest
 - עדכן Page Config
 - הוסף ל-requiredGlobals
 
 ### 5. תיעוד
+
 - עדכן WIDGETS_LIST.md
 - יצירת מדריך ספציפי אם נדרש
 
@@ -739,6 +765,10 @@ const details = await window.entityDetailsAPI?.getEntityDetails(type, id);
 
 **מקור:** `documentation/03-DEVELOPMENT/GUIDES/WIDGET_STANDARDS_SUMMARY.md`  
 **עודכן:** 29 ינואר 2025
+
+
+
+
 
 
 

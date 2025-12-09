@@ -1,4 +1,5 @@
 # מדריך הגדרת SendGrid - TikTrack
+
 ## SendGrid Setup Guide
 
 **תאריך יצירה**: 28 בינואר 2025  
@@ -7,7 +8,7 @@
 
 ---
 
-## 🎯 למה SendGrid?
+## 🎯 למה SendGrid
 
 - ✅ **חינמי** עד 100 מיילים ביום
 - ✅ **לא דורש IP קבוע** - מושלם לשרת פיתוח
@@ -65,7 +66,7 @@
 
 ## ⚙️ הגדרה ב-TikTrack
 
-### דרך הממשק (מומלץ):
+### דרך הממשק (מומלץ)
 
 1. פתח `http://localhost:8080/user-profile.html`
 2. גלול לסקשן **"הגדרות SMTP"**
@@ -81,7 +82,7 @@
 4. לחץ על **"עדכן הגדרות SMTP"**
 5. לחץ על **"בדיקת חיבור"** לוודא שהכל עובד
 
-### דרך API (אופציונלי):
+### דרך API (אופציונלי)
 
 ```bash
 curl -X POST http://localhost:8080/api/system-settings/smtp \
@@ -127,11 +128,13 @@ curl -X POST http://localhost:8080/api/system-settings/smtp \
 ### בעיה: "SMTP authentication failed"
 
 **סיבות אפשריות**:
+
 1. **User שגוי** - ודא שה-User הוא `apikey` (לא ה-API Key!)
 2. **API Key שגוי** - ודא שהעתקת את ה-API Key המלא (החל מ-`SG.`)
 3. **API Key לא פעיל** - בדוק ב-SendGrid שהמפתח פעיל
 
 **פתרון**:
+
 - ודא שה-User הוא בדיוק `apikey` (אותיות קטנות)
 - ודא שה-Password הוא ה-API Key המלא (החל מ-`SG.`)
 
@@ -140,6 +143,7 @@ curl -X POST http://localhost:8080/api/system-settings/smtp \
 **סיבה**: כתובת האימייל לא אומתה ב-SendGrid
 
 **פתרון**:
+
 1. עבור ל-SendGrid → Settings → Sender Authentication
 2. ודא שכתובת האימייל מופיעה כ-"Verified"
 3. אם לא, אמת אותה מחדש
@@ -147,10 +151,12 @@ curl -X POST http://localhost:8080/api/system-settings/smtp \
 ### בעיה: "Connection timeout"
 
 **סיבות אפשריות**:
+
 1. חומת אש חוסמת את הפורט
 2. רשת לא יציבה
 
 **פתרון**:
+
 - בדוק חיבור לאינטרנט
 - בדוק הגדרות חומת אש
 
@@ -170,16 +176,17 @@ curl -X POST http://localhost:8080/api/system-settings/smtp \
 
 ## 🔐 אבטחה
 
-### ⚠️ חשוב מאוד:
+### ⚠️ חשוב מאוד
 
 1. **אל תשתף את ה-API Key** עם אחרים
 2. **אל תכניס את ה-API Key** בקוד או בקובצי קונפיגורציה
 3. **הסיסמה נשמרת מוצפנת** במסד הנתונים
 4. **אם ה-API Key נחשף**, מחק אותו ב-SendGrid וצור חדש מיד
 
-### מחזור API Keys:
+### מחזור API Keys
 
 מומלץ להחליף API Keys מדי פעם:
+
 1. צור API Key חדש ב-SendGrid
 2. עדכן את הסיסמה ב-TikTrack
 3. מחק את ה-API Key הישן מ-SendGrid

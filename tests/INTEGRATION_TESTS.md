@@ -1,4 +1,5 @@
 # בדיקות אינטגרציה - TikTrack
+
 ## Integration Tests
 
 ### 📋 **מטרה**
@@ -8,6 +9,7 @@
 ### 🎯 **מערכות נבדקות**
 
 #### 1. **Cache + Logger Integration**
+
 ```javascript
 describe('Cache + Logger Integration', () => {
   test('should log cache operations', async () => {
@@ -24,6 +26,7 @@ describe('Cache + Logger Integration', () => {
 ```
 
 #### 2. **Field Renderer + Button System Integration**
+
 ```javascript
 describe('Field Renderer + Button Integration', () => {
   test('should render buttons with field data', () => {
@@ -37,6 +40,7 @@ describe('Field Renderer + Button Integration', () => {
 ```
 
 #### 3. **Table + Chart Integration**
+
 ```javascript
 describe('Table + Chart Integration', () => {
   test('should update chart when table data changes', () => {
@@ -54,6 +58,7 @@ describe('Table + Chart Integration', () => {
 ### 🔧 **הגדרות**
 
 #### **Test Environment**
+
 ```javascript
 // tests/integration/setup.js
 beforeAll(() => {
@@ -68,6 +73,7 @@ beforeAll(() => {
 ```
 
 #### **Test Data**
+
 ```javascript
 // tests/fixtures/integration-data.json
 {
@@ -84,6 +90,7 @@ beforeAll(() => {
 ### 📊 **תרחישי בדיקה**
 
 #### 1. **User Workflow: Create Trade**
+
 ```javascript
 describe('User Workflow: Create Trade', () => {
   test('should create trade and update all systems', async () => {
@@ -107,6 +114,7 @@ describe('User Workflow: Create Trade', () => {
 ```
 
 #### 2. **System Performance: Large Dataset**
+
 ```javascript
 describe('System Performance: Large Dataset', () => {
   test('should handle 1000+ trades efficiently', async () => {
@@ -132,6 +140,7 @@ describe('System Performance: Large Dataset', () => {
 ```
 
 #### 3. **Error Handling: System Failure**
+
 ```javascript
 describe('Error Handling: System Failure', () => {
   test('should handle cache failure gracefully', async () => {
@@ -171,6 +180,7 @@ npm run test:integration -- --watch
 ### 🔄 **CI/CD Integration**
 
 הבדיקות רצות אוטומטית ב:
+
 - Pre-commit hooks
 - Pull request validation
 - Deployment pipeline

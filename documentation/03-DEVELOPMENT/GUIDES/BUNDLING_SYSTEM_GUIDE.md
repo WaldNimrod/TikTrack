@@ -1,4 +1,5 @@
 # מדריך מערכת Bundling - TikTrack
+
 ## Bundling System Guide
 
 **תאריך יצירה:** 6 בדצמבר 2025  
@@ -20,7 +21,7 @@
 
 ## 🎯 סקירה כללית
 
-### מה זה Bundling?
+### מה זה Bundling
 
 Bundling הוא תהליך של איחוד מספר קבצי JavaScript לקבצים גדולים יותר (bundles). זה מאפשר:
 
@@ -29,7 +30,7 @@ Bundling הוא תהליך של איחוד מספר קבצי JavaScript לקבצ
 - **Minification:** קוד מקוצר ואופטימלי
 - **Source Maps:** תמיכה בדיבוג גם ב-bundles
 
-### איך זה עובד?
+### איך זה עובד
 
 1. **Build Process:** כל package נבנה כ-bundle אחד
 2. **Development Mode:** קבצים מקוריים נטענים בנפרד (קל לדיבוג)
@@ -49,6 +50,7 @@ npm run build:bundles
 ```
 
 **תהליך:**
+
 1. קריאת `package-manifest.js`
 2. זיהוי כל הסקריפטים בכל package
 3. איחוד הסקריפטים ל-bundle אחד עם `esbuild`
@@ -57,6 +59,7 @@ npm run build:bundles
 6. שמירה ב-`trading-ui/scripts/bundles/`
 
 **תוצאה:**
+
 - `trading-ui/scripts/bundles/base.bundle.js` - Bundle של base package
 - `trading-ui/scripts/bundles/services.bundle.js` - Bundle של services package
 - `trading-ui/scripts/bundles/*.bundle.js.map` - Source maps
@@ -68,6 +71,7 @@ npm run build:bundles -- --package=base
 ```
 
 **שימוש:**
+
 - בנייה מחדש של bundle ספציפי
 - תיקון בעיות ב-bundle מסוים
 - בדיקות
@@ -77,6 +81,7 @@ npm run build:bundles -- --package=base
 **קובץ:** `scripts/build/bundle-packages.js`
 
 **הגדרות:**
+
 - **Format:** IIFE (Immediately Invoked Function Expression)
 - **Target:** ES2015 (תמיכה בדפדפנים מ-2015+)
 - **Minify:** true (קוד מקוצר)
@@ -86,12 +91,14 @@ npm run build:bundles -- --package=base
 ### Bundle Structure
 
 כל bundle מכיל:
+
 - **כל הסקריפטים של ה-package** בסדר הנכון (לפי `loadOrder`)
 - **Minification** - קוד מקוצר
 - **Source map** - לדיבוג
 - **IIFE wrapper** - בידוד scope
 
 **דוגמה:**
+
 ```javascript
 // base.bundle.js
 /* Base Package Bundle - Generated: 2025-12-06T... */
@@ -118,6 +125,7 @@ npm run test:bundles
 ```
 
 **בדיקות:**
+
 - וידוא שה-bundle קיים
 - בדיקת גודל (צריך להיות קטן יותר מהמקורי)
 - וידוא שה-source map קיים
@@ -132,6 +140,7 @@ npm run test:bundles -- --package=base
 ### Test Results
 
 **תוצאות תקינות:**
+
 ```
 ✅ Valid: true
 ✅ Source Map: true
@@ -139,6 +148,7 @@ npm run test:bundles -- --package=base
 ```
 
 **תוצאות לא תקינות:**
+
 ```
 ❌ Invalid: false
   - Bundle file not found
@@ -153,22 +163,26 @@ npm run test:bundles -- --package=base
 ### Development Mode (ברירת מחדל)
 
 **שימוש:**
+
 - פיתוח יומיומי
 - דיבוג
 - בדיקות
 
 **תכונות:**
+
 - כל הסקריפטים נטענים בנפרד (קבצים מקוריים)
 - קל לדיבוג - כל קובץ נפרד
 - Source maps זמינים
 - שינויים בקוד נראים מיד
 
 **עדכון HTML:**
+
 ```bash
 node trading-ui/scripts/generate-script-loading-code.js my-page
 ```
 
 **תוצאה:**
+
 ```html
 <script src="scripts/auth.js?v=1.0.0" defer></script>
 <script src="scripts/notification-system.js?v=1.0.0" defer></script>
@@ -179,21 +193,25 @@ node trading-ui/scripts/generate-script-loading-code.js my-page
 ### Production Mode (עם Bundles)
 
 **שימוש:**
+
 - פרודקשן
 - ביצועים מיטביים
 
 **תכונות:**
+
 - כל הסקריפטים של package מאוחדים ל-bundle אחד
 - הפחתה דרמטית במספר בקשות (מ-246 ל-30-50)
 - Minification ו-optimization
 - Source maps זמינים לדיבוג
 
 **עדכון HTML:**
+
 ```bash
 node trading-ui/scripts/generate-script-loading-code.js my-page --mode=production --use-bundles
 ```
 
 **תוצאה:**
+
 ```html
 <script src="scripts/bundles/base.bundle.js?v=1.0.0" defer></script>
 <script src="scripts/bundles/services.bundle.js?v=1.0.0" defer></script>
@@ -279,11 +297,13 @@ python3 scripts/test_pages_console_errors.py --page=my-page
 ### Bundle לא נטען
 
 **סיבות אפשריות:**
+
 1. Bundle לא נבנה - הרץ `npm run build:bundles`
 2. Bundle לא קיים - בדוק ב-`trading-ui/scripts/bundles/`
 3. שגיאת build - בדוק את ה-logs
 
 **פתרון:**
+
 ```bash
 # 1. בדוק אם bundle קיים
 ls -lh trading-ui/scripts/bundles/base.bundle.js
@@ -300,11 +320,13 @@ npm run build:bundles 2>&1 | grep -i error
 ### שגיאות JavaScript אחרי Bundling
 
 **סיבות אפשריות:**
+
 1. בעיית סדר טעינה
 2. בעיית scope
 3. בעיית dependencies
 
 **פתרון:**
+
 1. **בדוק את ה-source map:**
    - פתח DevTools
    - בדוק את ה-source map
@@ -316,6 +338,7 @@ npm run build:bundles 2>&1 | grep -i error
    - זהה את הבעיה
 
 3. **נסה development mode:**
+
    ```bash
    node trading-ui/scripts/generate-script-loading-code.js my-page > temp_my-page.html
    mv temp_my-page.html trading-ui/my-page.html
@@ -324,22 +347,27 @@ npm run build:bundles 2>&1 | grep -i error
 ### Bundle Size גדול מדי
 
 **סיבות אפשריות:**
+
 1. קבצים גדולים ב-package
 2. אין minification
 3. בעיית build
 
 **פתרון:**
+
 1. **בדוק את גודל ה-bundle:**
+
    ```bash
    ls -lh trading-ui/scripts/bundles/base.bundle.js
    ```
 
 2. **השווה למקורי:**
+
    ```bash
    npm run test:bundles -- --package=base
    ```
 
 3. **בדוק את ה-build logs:**
+
    ```bash
    npm run build:bundles 2>&1 | grep -i "base"
    ```
@@ -347,17 +375,21 @@ npm run build:bundles 2>&1 | grep -i error
 ### Source Map לא עובד
 
 **סיבות אפשריות:**
+
 1. Source map לא נוצר
 2. Source map לא נטען
 3. בעיית path
 
 **פתרון:**
+
 1. **בדוק אם source map קיים:**
+
    ```bash
    ls -lh trading-ui/scripts/bundles/base.bundle.js.map
    ```
 
 2. **בדוק את ה-build:**
+
    ```bash
    npm run build:bundles -- --package=base
    ```
@@ -390,14 +422,17 @@ npm run build:bundles 2>&1 | grep -i error
 ## 📚 קבצים קשורים
 
 ### Build Scripts
+
 - `scripts/build/bundle-packages.js` - Build script
 - `scripts/build/test-bundles.js` - Test script
 
 ### Configuration
+
 - `trading-ui/scripts/init-system/package-manifest.js` - Package manifest
 - `trading-ui/scripts/generate-script-loading-code.js` - Script loading code generator
 
 ### Documentation
+
 - `documentation/02-ARCHITECTURE/FRONTEND/UNIFIED_INITIALIZATION_SYSTEM.md` - Initialization system
 - `documentation/03-DEVELOPMENT/GUIDES/PERFORMANCE_OPTIMIZATION_GUIDE.md` - Performance optimization
 

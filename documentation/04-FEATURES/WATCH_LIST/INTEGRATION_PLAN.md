@@ -1,4 +1,5 @@
 # תוכנית אינטגרציה: מערכת Watch List
+
 ## Integration Plan: Watch List System
 
 **תאריך:** 28 בינואר 2025  
@@ -18,6 +19,7 @@
 ### Integration Points
 
 **Package Addition:**
+
 ```javascript
 // trading-ui/scripts/init-system/package-manifest.js
 {
@@ -34,6 +36,7 @@
 ```
 
 **Page Config:**
+
 ```javascript
 // trading-ui/scripts/page-initialization-configs.js
 window.pageInitializationConfigs['watch-lists'] = {
@@ -53,6 +56,7 @@ window.pageInitializationConfigs['watch-lists'] = {
 ```
 
 **Initialization:**
+
 - Watch Lists Data Service יטען ב-Package `watch-lists`
 - UI Service יטען יחד עם Data Service
 - Page-specific logic (`watch-lists.js`) יטען אחרי כל השירותים
@@ -76,16 +80,19 @@ const CACHE_KEYS = {
 ### Cache Strategy
 
 **Watch Lists:**
+
 - Layer: Memory → LocalStorage
 - TTL: 60 seconds
 - Invalidation: On create/update/delete
 
 **Watch List Items:**
+
 - Layer: Memory → LocalStorage
 - TTL: 45 seconds (shorter - changes more frequently)
 - Invalidation: On add/update/remove/reorder
 
 **External Data:**
+
 - Layer: Backend (shared across users)
 - Managed by: ExternalDataService
 - TTL: Per External Data Service settings
@@ -135,6 +142,7 @@ await window.CRUDResponseHandler.handleResponse(response, {
 ```
 
 ### Supported Operations
+
 - `create` - Watch list / Item
 - `update` - Watch list / Item
 - `delete` - Watch list / Item
@@ -147,6 +155,7 @@ await window.CRUDResponseHandler.handleResponse(response, {
 ### Modal Configurations
 
 **Add/Edit Watch List Modal:**
+
 ```javascript
 window.ModalManagerV2.registerModal('watch-list', {
   modalId: 'watchListModal',
@@ -168,6 +177,7 @@ window.ModalManagerV2.registerModal('watch-list', {
 ```
 
 **Add Ticker Modal:**
+
 ```javascript
 window.ModalManagerV2.registerModal('add-ticker', {
   modalId: 'addTickerModal',
@@ -204,6 +214,7 @@ window.UnifiedTableSystem.registry.register('watch_list_items', {
 ```
 
 ### Sorting Integration
+
 - Manual order (`display_order`) - default sort
 - Column sorting - override manual order temporarily
 - Restore manual order on refresh
@@ -235,6 +246,7 @@ const tableIcon = await window.IconSystem.renderIcon('button', 'table', {
 ```
 
 ### Icons Needed
+
 - `eye` - Watch Lists main icon
 - `flag` / `flag-filled` - Flag icons
 - `table` - Table view
@@ -266,6 +278,7 @@ window.FieldRendererService.renderBadge('חיצוני', 'secondary');
 ### Integration Strategy
 
 **Loading External Data:**
+
 ```javascript
 async function loadExternalDataForItems(items) {
   const externalSymbols = items
@@ -288,11 +301,13 @@ async function loadExternalDataForItems(items) {
 ```
 
 **Caching:**
+
 - External data נשמר ב-Backend cache (shared)
 - Frontend cache דרך ExternalDataService
 - TTL: לפי הגדרות External Data Service
 
 **Performance:**
+
 - Batch requests במקום individual requests
 - Use cache when possible
 - Lazy load רק כש-`includeExternalData=true`
@@ -472,10 +487,12 @@ if (state) {
 ### Integration with Tickers
 
 כשטיקר נמחק מהמערכת:
+
 - Item ברשימה נשאר עם `external_symbol`
 - אם אין `external_symbol` → ה-Item מוסר
 
 כשטיקר חדש נוצר:
+
 - אפשרות להוסיף אוטומטית לרשימה (אופציונלי)
 
 ---
@@ -485,11 +502,13 @@ if (state) {
 ### Price Alert Integration
 
 **תכנון עתידי:**
+
 - Alert על שינוי מחיר לטיקר ב-Watch List
 - Alert על breakout/breakdown
 - Alert על volume spike
 
 **Integration Points:**
+
 - Button "Create Alert" ב-item row
 - Pre-fill alert form עם ticker info
 - Link back to watch list from alert
@@ -501,12 +520,14 @@ if (state) {
 ### Export Formats
 
 **CSV:**
+
 ```
 Symbol,Name,Price,Change%,Flag
 AAPL,Apple Inc.,150.25,1.42%,#26baac
 ```
 
 **JSON:**
+
 ```json
 {
   "watch_list": "Tech Stocks",
@@ -515,6 +536,7 @@ AAPL,Apple Inc.,150.25,1.42%,#26baac
 ```
 
 **Symbols List:**
+
 ```
 AAPL,MSFT,GOOGL,TSLA
 ```
@@ -547,16 +569,19 @@ watch-lists.js (Page Logic)
 ## Testing Integration Points
 
 ### Unit Tests
+
 - Data Service CRUD operations
 - UI Service view rendering
 - Cache invalidation logic
 
 ### Integration Tests
+
 - ModalManagerV2 integration
 - UnifiedTableSystem integration
 - ExternalDataService integration
 
 ### E2E Tests
+
 - Full CRUD flow
 - View mode switching
 - Drag & drop reordering
@@ -565,6 +590,10 @@ watch-lists.js (Page Logic)
 ---
 
 **סיכום:** כל האינטגרציות מתוכננות בקפידה עם שימוש במערכות הקיימות ללא יצירת כפילות קוד.
+
+
+
+
 
 
 

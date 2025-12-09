@@ -486,6 +486,10 @@ class TradeBusinessService(BaseBusinessService):
         """
         errors = []
         
+        # Step 0: Explicit user_id validation (BEFORE constraint validation)
+        if 'user_id' not in data or data.get('user_id') is None:
+            errors.append("user_id is required for trade creation")
+        
         # Step 1: Validate against database constraints (FIRST!)
         is_valid, constraint_errors = self.validate_with_constraints(data)
         if not is_valid:

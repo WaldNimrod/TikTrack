@@ -1,4 +1,5 @@
 # מדריך מפתח - Emotional Tracking Widget
+
 ## Developer Guide - Emotional Tracking Widget
 
 **תאריך עדכון אחרון:** 29 בינואר 2025  
@@ -10,12 +11,14 @@
 ## סקירה כללית
 
 Emotional Tracking Widget הוא ווידג'ט לתיעוד רגשי המציג:
+
 - גרף דפוסים רגשיים (Bar Chart)
 - רשימת תיעודים אחרונים
 - תובנות וניתוח דפוסים
 - טופס תיעוד מהיר
 
 **מיקום קבצים:**
+
 - HTML: `trading-ui/mockups/daily-snapshots/emotional-tracking-widget.html`
 - JavaScript: `trading-ui/scripts/emotional-tracking-widget.js`
 - קונפיגורציה: `trading-ui/scripts/page-initialization-configs.js`
@@ -84,11 +87,13 @@ let mockEmotionalEntries = [];
 ### 1. TradingView Charts System
 
 **קבצים:**
+
 - `trading-ui/scripts/charts/vendor/lightweight-charts.standalone.production.js`
 - `trading-ui/scripts/charts/tradingview-theme.js`
 - `trading-ui/scripts/charts/tradingview-adapter.js`
 
 **שימוש:**
+
 ```javascript
 // יצירת גרף
 emotionalPatternsChart = window.TradingViewChartAdapter.createChart(container, options);
@@ -107,6 +112,7 @@ emotionalPatternsSeries.setData(data);
 **קובץ:** `trading-ui/scripts/services/field-renderer-service.js`
 
 **שימוש:**
+
 ```javascript
 // רנדור תאריך
 window.FieldRendererService.renderDate(date, true); // עם זמן
@@ -123,6 +129,7 @@ window.FieldRendererService.renderNumericValue(value, suffix, showPrefix);
 **קובץ:** `trading-ui/scripts/icon-system.js`
 
 **שימוש:**
+
 ```javascript
 // רנדור אייקון
 window.IconSystem.renderIcon('tabler', 'check', { width: 16, height: 16 });
@@ -136,6 +143,7 @@ window.IconSystem.getIconPath('tabler', 'check');
 **קובץ:** `trading-ui/scripts/color-scheme-system-clean.js`
 
 **שימוש:**
+
 ```javascript
 // קבלת צבע מ-CSS variable
 getCSSVariableValue('--primary-color', '#26baac');
@@ -149,6 +157,7 @@ getCSSVariableValue('--border-color', '#e0e0e0');
 **קובץ:** `trading-ui/scripts/notification-system.js`
 
 **שימוש:**
+
 ```javascript
 window.NotificationSystem.showSuccess('תיעוד נשמר בהצלחה', 'תיעוד רגשי');
 window.NotificationSystem.showError('שגיאה בשמירה', 'לא ניתן לשמור את התיעוד');
@@ -160,6 +169,7 @@ window.NotificationSystem.showInfo('מעדכן נתונים...', 'תיעוד ר�
 **קובץ:** `trading-ui/scripts/logger-service.js`
 
 **שימוש:**
+
 ```javascript
 window.Logger.info('✅ Widget initialized', { page: 'emotional-tracking-widget' });
 window.Logger.error('Error initializing widget', { page: 'emotional-tracking-widget', error });
@@ -169,10 +179,12 @@ window.Logger.warn('Warning message', { page: 'emotional-tracking-widget' });
 ### 7. Button System
 
 **קבצים:**
+
 - `trading-ui/scripts/button-system-init.js`
 - `trading-ui/scripts/button-icons.js`
 
 **שימוש ב-HTML:**
+
 ```html
 <button data-button-type="ADD" 
         data-variant="small" 
@@ -186,6 +198,7 @@ window.Logger.warn('Warning message', { page: 'emotional-tracking-widget' });
 **קובץ:** `trading-ui/scripts/date-utils.js`
 
 **שימוש:**
+
 ```javascript
 // פורמט תאריך
 window.dateUtils.formatDate(date, { includeTime: true });
@@ -207,6 +220,7 @@ window.dateUtils.toDateObject({ epochMs: timestamp });
 גרף Bar Chart המציג התפלגות רגשות לאורך זמן (7 ימים) עם TradingView Lightweight Charts.
 
 **נתוני דמה:**
+
 ```javascript
 const emotionData = [
     { time: '2025-01-20', open: 0, high: 3, low: 0, close: 3 },
@@ -218,11 +232,13 @@ const emotionData = [
 **פונקציה:** `initEmotionalPatternsChart()`
 
 **איך לעדכן נתונים:**
+
 1. עדכן את `generateEmotionChartData()` בפונקציה `initEmotionalPatternsChart()`
 2. קרא ל-`emotionalPatternsSeries.setData(emotionData)`
 3. קרא ל-`emotionalPatternsChart.timeScale().fitContent()`
 
 **איך לחבר לנתונים אמיתיים:**
+
 ```javascript
 async function loadEmotionalPatternsData() {
     try {
@@ -253,6 +269,7 @@ async function loadEmotionalPatternsData() {
 רשימה של 10-20 תיעודים אחרונים עם תאריך, רגש, וקישור לטרייד (אם קיים).
 
 **נתוני דמה:**
+
 ```javascript
 const entries = [
     {
@@ -272,10 +289,12 @@ const entries = [
 **פונקציה:** `updateRecentEntries()`
 
 **איך לעדכן נתונים:**
+
 1. עדכן את `generateMockEmotionalEntries()` בפונקציה `updateRecentEntries()`
 2. הפונקציה תעדכן את DOM אוטומטית
 
 **איך לחבר לנתונים אמיתיים:**
+
 ```javascript
 async function loadRecentEntries() {
     try {
@@ -297,6 +316,7 @@ async function loadRecentEntries() {
 2-3 תובנות (info + warning) על דפוסים רגשיים.
 
 **נתוני דמה:**
+
 ```javascript
 const insights = [
     {
@@ -319,10 +339,12 @@ const insights = [
 **פונקציה:** `updateInsights()`
 
 **איך לעדכן נתונים:**
+
 1. עדכן את `generateMockInsights()` בפונקציה `updateInsights()`
 2. הפונקציה תעדכן את DOM אוטומטית
 
 **איך לחבר לנתונים אמיתיים:**
+
 ```javascript
 async function loadInsights() {
     try {
@@ -342,6 +364,7 @@ async function loadInsights() {
 
 **תיאור:**
 טופס מהיר ליצירת תיעוד רגשי חדש עם:
+
 - בחירת רגש (7 כפתורים)
 - קישור לטרייד (אופציונלי)
 - הערות (אופציונלי)
@@ -349,7 +372,9 @@ async function loadInsights() {
 **פונקציה:** `setupQuickEntryForm()`
 
 **איך להוסיף רגש חדש:**
+
 1. הוסף ל-`EMOTION_TYPES`:
+
 ```javascript
 const EMOTION_TYPES = {
     // ... existing emotions
@@ -358,6 +383,7 @@ const EMOTION_TYPES = {
 ```
 
 2. הוסף כפתור ב-HTML:
+
 ```html
 <button class="btn btn-outline-secondary emotion-button" data-emotion="new_emotion">
     <span class="emotion-icon"></span> רגש חדש
@@ -365,6 +391,7 @@ const EMOTION_TYPES = {
 ```
 
 **איך לחבר לנתונים אמיתיים:**
+
 ```javascript
 async function handleSaveEmotion() {
     const data = {
@@ -422,6 +449,7 @@ async function handleSaveEmotion() {
 **קובץ:** `trading-ui/scripts/page-initialization-configs.js`
 
 **קונפיגורציה:**
+
 ```javascript
 'emotional-tracking-widget': {
     packages: [
@@ -513,6 +541,7 @@ updateRecentEntries(newEntries);
 ### הגרף לא נטען
 
 **פתרון:**
+
 1. בדוק ש-`TradingViewChartAdapter` זמין: `typeof window.TradingViewChartAdapter !== 'undefined'`
 2. בדוק ש-`LightweightCharts` נטען: `typeof window.LightweightCharts !== 'undefined'`
 3. בדוק את ה-console לשגיאות
@@ -520,6 +549,7 @@ updateRecentEntries(newEntries);
 ### אייקונים לא מוצגים
 
 **פתרון:**
+
 1. בדוק ש-`IconSystem` זמין: `typeof window.IconSystem !== 'undefined'`
 2. בדוק שהאייקון קיים ב-Tabler Icons
 3. Fallback ל-`info-circle` אם האייקון לא נמצא
@@ -527,6 +557,7 @@ updateRecentEntries(newEntries);
 ### תאריכים לא מוצגים
 
 **פתרון:**
+
 1. בדוק ש-`FieldRendererService` זמין: `typeof window.FieldRendererService !== 'undefined'`
 2. בדוק ש-`dateUtils` זמין: `typeof window.dateUtils !== 'undefined'`
 3. Fallback ל-`toLocaleString()` אם המערכות לא זמינות

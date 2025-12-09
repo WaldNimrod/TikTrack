@@ -1186,7 +1186,13 @@ def get_preferences_version() -> Any:
         גרסה או timestamp של העדכון האחרון
     """
     try:
-        user_id = request.args.get('user_id', 1, type=int)
+        user_id = getattr(g, 'user_id', None)
+        if user_id is None:
+            return jsonify({
+                "success": False,
+                "error": "Authentication required",
+                "timestamp": datetime.now().isoformat()
+            }), 401
         profile_id = request.args.get('profile_id', type=int)
 
         last_update, resolved_profile_id = _get_preferences_version(user_id, profile_id)
@@ -1257,7 +1263,13 @@ def check_preferences_updates() -> Any:
     משמש למערכת polling חלופית ל-WebSocket
     """
     try:
-        user_id = request.args.get('user_id', 1, type=int)
+        user_id = getattr(g, 'user_id', None)
+        if user_id is None:
+            return jsonify({
+                "success": False,
+                "error": "Authentication required",
+                "timestamp": datetime.now().isoformat()
+            }), 401
         profile_id = request.args.get('profile_id', type=int)
         since_param = request.args.get('since')
 

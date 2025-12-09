@@ -1,5 +1,7 @@
 # TikTrack PostgreSQL Startup Guide
+
 # ===================================
+
 # מדריך הפעלת שרת TikTrack עם PostgreSQL
 
 **גרסה:** 1.0  
@@ -18,12 +20,14 @@
 ## ⚠️ **חשוב מאוד - קריאה לפני הפעלה**
 
 ### **❌ מה לא לעשות:**
+
 ```bash
 # ❌ אל תפעיל כך - זה ינסה להשתמש ב-SQLite שכבר לא קיים!
 python3 Backend/app.py
 ```
 
 ### **✅ מה לעשות:**
+
 ```bash
 # ✅ הדרך הנכונה להפעיל את השרת (מגדיר אוטומטית PostgreSQL)
 ./start_server.sh
@@ -39,6 +43,7 @@ python3 Backend/app.py
 ## 🚀 **הפעלת השרת - שלבים**
 
 ### **שלב 1: בדיקת PostgreSQL Container**
+
 ```bash
 # בדוק אם ה-container רץ
 docker ps | grep postgres
@@ -51,12 +56,14 @@ docker ps | grep postgres
 ```
 
 ### **שלב 2: הפעלת השרת**
+
 ```bash
 # הפעל את השרת עם PostgreSQL
 ./start_pg_server.sh
 ```
 
 ### **שלב 3: בדיקת חיבור**
+
 ```bash
 # בדוק שהשרת רץ
 curl http://localhost:8080/api/health
@@ -70,14 +77,17 @@ curl http://localhost:8080/api/system/health
 ## 📁 **קבצים חשובים**
 
 ### **קבצי הפעלה:**
+
 - **`start_pg_server.sh`** - סקריפט הפעלה עם PostgreSQL (השתמש רק בו!)
 - **`start_server.sh`** - סקריפט בסיסי (נקרא על ידי start_pg_server.sh)
 
 ### **קבצי תצורה:**
+
 - **`Backend/config/settings.py`** - הגדרות בסיס נתונים
 - **`docker/docker-compose.dev.yml`** - הגדרות PostgreSQL container
 
 ### **קבצי בסיס נתונים:**
+
 - **PostgreSQL**: Docker volume `postgres-dev-data`
 - **SQLite (ארכיון)**: `archive/database_backups/tiktrack.db`
 
@@ -101,27 +111,32 @@ export POSTGRES_PASSWORD="BigMeZoo1974!?"
 ## 🐳 **ניהול PostgreSQL Container**
 
 ### **הפעלה:**
+
 ```bash
 docker-compose -f docker/docker-compose.dev.yml up -d postgres-dev
 ```
 
 ### **עצירה:**
+
 ```bash
 docker-compose -f docker/docker-compose.dev.yml stop postgres-dev
 ```
 
 ### **הסרה (זהירות - מוחק נתונים!):**
+
 ```bash
 docker-compose -f docker/docker-compose.dev.yml down -v
 ```
 
 ### **בדיקת סטטוס:**
+
 ```bash
 docker ps | grep postgres
 docker logs tiktrack-postgres-dev
 ```
 
 ### **חיבור ידני ל-PostgreSQL:**
+
 ```bash
 docker exec -it tiktrack-postgres-dev psql -U TikTrakDBAdmin -d TikTrack-db-development
 ```
@@ -135,12 +150,14 @@ docker exec -it tiktrack-postgres-dev psql -U TikTrakDBAdmin -d TikTrack-db-deve
 **סיבה:** השרת הופעל בלי משתני סביבה של PostgreSQL.
 
 **פתרון:**
+
 1. עצור את השרת: `kill $(lsof -ti:8080)`
 2. הפעל מחדש: `./start_pg_server.sh`
 
 ### **בעיה: "PostgreSQL container not running"**
 
 **פתרון:**
+
 ```bash
 docker-compose -f docker/docker-compose.dev.yml up -d postgres-dev
 # המתן 10-20 שניות עד שה-container מוכן
@@ -150,6 +167,7 @@ docker ps | grep postgres  # בדוק שהוא healthy
 ### **בעיה: "Port 8080 already in use"**
 
 **פתרון:**
+
 ```bash
 # מצא את התהליך
 lsof -ti:8080
@@ -166,6 +184,7 @@ kill $(lsof -ti:8080)
 **סיבה:** בסיס הנתונים לא מכיל את הפרופילים הנדרשים.
 
 **פתרון:**
+
 1. בדוק שיש נתונים: `docker exec -it tiktrack-postgres-dev psql -U TikTrakDBAdmin -d TikTrack-db-development -c "SELECT * FROM preference_profiles;"`
 2. אם אין נתונים, הרץ את סקריפט המיגרציה: `scripts/db/migrate_sqlite_to_pg.py`
 
@@ -174,11 +193,13 @@ kill $(lsof -ti:8080)
 ## 📊 **בדיקת חיבור לבסיס הנתונים**
 
 ### **בדיקה מהירה:**
+
 ```bash
 curl http://localhost:8080/api/system/health | jq '.components.database'
 ```
 
 ### **בדיקה מפורטת:**
+
 ```bash
 POSTGRES_HOST=localhost POSTGRES_DB=TikTrack-db-development POSTGRES_USER=TikTrakDBAdmin POSTGRES_PASSWORD="BigMeZoo1974!?" python3 << 'PYEOF'
 import sys
@@ -222,10 +243,12 @@ POSTGRES_HOST=localhost POSTGRES_DB=TikTrack-db-development POSTGRES_USER=TikTra
 ## 📚 **משאבים נוספים**
 
 ### **דוקומנטציה קשורה:**
+
 - [Server Management Guide](SERVER_MANAGEMENT_GUIDE.md) - מדריך ניהול שרת כללי
 - [Database Migration Plan](../05-REPORTS/DB_MIGRATION_EXECUTION_PLAN.md) - תוכנית מיגרציה
 
 ### **קבצים חשובים:**
+
 - `start_pg_server.sh` - סקריפט הפעלה
 - `Backend/config/settings.py` - הגדרות בסיס נתונים
 - `docker/docker-compose.dev.yml` - הגדרות PostgreSQL
@@ -235,6 +258,7 @@ POSTGRES_HOST=localhost POSTGRES_DB=TikTrack-db-development POSTGRES_USER=TikTra
 ## 🆘 **תמיכה**
 
 ### **במקרה של בעיות:**
+
 1. **בדוק את הלוגים**: `Backend/logs/errors.log`
 2. **בדוק את ה-container**: `docker logs tiktrack-postgres-dev`
 3. **בדוק חיבור**: הרץ את הבדיקה המפורטת למעלה

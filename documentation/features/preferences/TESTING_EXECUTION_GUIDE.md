@@ -3,6 +3,7 @@
 ## סקירה כללית
 
 מדריך מפורט להרצת כל הבדיקות האוטומטיות למערכת העדפות, כולל:
+
 1. Custom Browser Test (הרצה ישירה בדפדפן)
 2. Playwright E2E Tests (הרצה אוטומטית מלאה)
 3. Puppeteer Tests (אלטרנטיבה)
@@ -10,6 +11,7 @@
 ## אופציה 1: Custom Browser Test (הכי קל)
 
 ### תכונות
+
 - ✅ הרצה ישירה בדפדפן - אין צורך בהתקנות
 - ✅ בדיקות מלאות: Unit, Integration, E2E, Performance
 - ✅ דוחות מפורטים בקונסול
@@ -18,17 +20,20 @@
 ### הוראות הרצה
 
 **שלב 1: טעינת הסקריפט**
+
 1. פתח את עמוד העדפות: `http://localhost:8080/trading-ui/preferences.html`
 2. פתח את הקונסול (F12)
 3. ודא שהסקריפט נטען (אמור להופיע: `✅ Automated preference test suite loaded`)
 
 **שלב 2: הרצת הבדיקות**
+
 ```javascript
 // הרצת כל הבדיקות
 window.runAllPreferenceTests()
 ```
 
 **שלב 3: צפייה בתוצאות**
+
 - התוצאות מוצגות בקונסול
 - תוצאות מפורטות נשמרות ב-`window.preferencesTestResults`
 - גישה לתוצאות: `window.preferencesTestResults`
@@ -84,6 +89,7 @@ window.testPreferencesOptimization() // מהסקריפט הקיים
 ## אופציה 2: Playwright E2E Tests (מומלץ לבדיקות אוטומטיות)
 
 ### תכונות
+
 - ✅ הרצה אוטומטית מלאה
 - ✅ תמיכה ב-Chrome, Firefox, Safari
 - ✅ צילומי מסך על שגיאות
@@ -151,6 +157,7 @@ module.exports = {
 ## אופציה 3: Puppeteer Tests
 
 ### תכונות
+
 - ✅ הרצה אוטומטית ב-Chrome
 - ✅ מעקב אחרי network requests
 - ✅ מדידת ביצועים
@@ -171,31 +178,37 @@ node trading-ui/scripts/testing/automated/preferences-puppeteer.test.js
 ## בדיקות זמינות
 
 ### 1. Unit Tests
+
 - `testPreferencesManagerInitialize()` - אתחול PreferencesManager
 - `testPreferencesManagerLoadGroup()` - טעינת קבוצה
 - `testPreferencesManagerSaveGroup()` - שמירת קבוצה
 - `testPreferencesCacheBuildKey()` - בניית cache key
 
 ### 2. Integration Tests
+
 - `testPageLoadFlow()` - תהליך טעינת עמוד מלא
 - `testSaveFlow()` - תהליך שמירה מלא (עם optimistic update)
 
 ### 3. E2E Tests
+
 - `testCompleteUserFlow()` - תהליך משתמש מלא (פתיחה, שינוי, שמירה)
 
 ### 4. Performance Tests
+
 - `testLoadPerformance()` - מדידת זמן טעינה
 - `testSavePerformance()` - מדידת זמן שמירה
 
 ## קריטריוני הצלחה
 
 ### ביצועים
+
 - ✅ זמן טעינה < 500ms
 - ✅ קריאות API < 3 לעמוד
 - ✅ זמן שמירה < 200ms
 - ✅ cache hit rate > 80%
 
 ### פונקציונליות
+
 - ✅ כל הפונקציות עובדות
 - ✅ אין שגיאות בקונסול
 - ✅ optimistic updates עובדים
@@ -204,16 +217,21 @@ node trading-ui/scripts/testing/automated/preferences-puppeteer.test.js
 ## פתרון בעיות
 
 ### בעיה: PreferencesManager לא זמין
+
 **פתרון:** ודא שהקבצים נטענים בסדר הנכון ב-`package-manifest.js`
 
 ### בעיה: בדיקות נכשלות
-**פתרון:** 
+
+**פתרון:**
+
 1. בדוק שהשרת רץ (`http://localhost:8080`)
 2. בדוק שהדפדפן לא חסום
 3. בדוק את הקונסול לשגיאות
 
 ### בעיה: Playwright לא עובד
+
 **פתרון:**
+
 1. ודא שהתקנת: `npx playwright install`
 2. בדוק שהשרת רץ
 3. נסה עם `--headed` לראות מה קורה
@@ -221,12 +239,14 @@ node trading-ui/scripts/testing/automated/preferences-puppeteer.test.js
 ## סיכום
 
 **האופציה המומלצת:** Custom Browser Test (`preferences-browser-test.js`)
+
 - הכי קל להרצה
 - אין צורך בהתקנות
 - בדיקות מלאות
 - דוחות מפורטים
 
 **לבדיקות CI/CD:** Playwright
+
 - אוטומציה מלאה
 - תמיכה ב-multiple browsers
 - דוחות HTML

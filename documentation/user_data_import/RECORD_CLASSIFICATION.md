@@ -11,12 +11,14 @@
 **CRITICAL RULE**: רק שורות עם פורמט `{Section Name},Data,...` הן רשומות תקפות.
 
 **דוגמאות**:
+
 - ✅ `Dividends,Data,2024-01-15,100.00,USD` - רשומה תקפה
 - ❌ `Dividends,Header,Date,Amount,Currency` - שורת כותרת, לא רשומה
 - ❌ `Dividends,Trailer,Total,500.00` - שורת סיכום, לא רשומה
 - ❌ `Dividends,Total,500.00` - שורת סיכום, לא רשומה
 
 **מימוש**: `IBKRConnector._parse_cashflow_sections()` (שורה 442)
+
 ```python
 if not stripped.startswith(f'{current_section},Data'):
     continue
@@ -54,10 +56,12 @@ CASHFLOW_SECTION_NAMES = {
 ### 1. Deposits & Withdrawals
 
 **לוגיקה**: נפתר לפי סימן הסכום
+
 - `amount > 0` → `deposit`
 - `amount < 0` → `withdrawal`
 
 **דוגמה**:
+
 ```python
 row = {'Amount': '100.00'}
 result = _identify_record_type('Deposits & Withdrawals', row)
@@ -71,10 +75,12 @@ result = _identify_record_type('Deposits & Withdrawals', row)
 ### 2. Interest vs SYEP Interest
 
 **לוגיקה**: בדיקה אם התיאור מכיל "Stock Yield Enhancement" או "SYEP"
+
 - אם כן → `None` (דילוג - כפילות של Interest הכללי)
 - אם לא → `interest`
 
 **דוגמה**:
+
 ```python
 row = {'Description': 'Broker Interest Paid'}
 result = _identify_record_type('Interest', row)
@@ -88,6 +94,7 @@ result = _identify_record_type('Interest', row)
 ### 3. Transfers
 
 **לוגיקה**: נשאר `transfer` (סימן הסכום מציין כיוון)
+
 - `amount > 0` → `transfer_in` (במיפוי storage)
 - `amount < 0` → `transfer_out` (במיפוי storage)
 

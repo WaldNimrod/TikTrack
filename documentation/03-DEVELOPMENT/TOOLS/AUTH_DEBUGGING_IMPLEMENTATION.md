@@ -5,13 +5,15 @@
 
 ---
 
-## 1) ארכיטקטורת אימות
+## 1) ארכיטקטורת אימות ובידוד נתונים
 - **Token בלבד (Bearer)**: ללא cookies. `api-fetch-wrapper.js` מזריק Authorization אוטומטית.
 - **UnifiedCacheManager**: authToken/currentUser נשמרים עם `includeUserId:false` בלבד; פינוי דרך `forceLogoutAndPrompt`.
 - **Login Modal**: מסלול יחיד. כל עמוד מוגן מפעיל `auth-guard.js`; ב-401/חוסר טוקן מוצג המודל.
 - **Z-Index/Stack**: רישום המודל ב־`ModalNavigationService` והפעלת `ModalZIndexManager.forceUpdate(modalElement)` כדי להבטיח שהוא מעל ה-backdrop.
 - **Preferences ברירת מחדל**: `/api/preferences/default` מחזיר צבעי לוגו (#26baac, #fc5a06). טעינה רכה (soft-fail) כשאין משתמש.
 - **Rate Limit (429)**: בעמודים עתירי trade-plans (למשל `/trades_formatted.html`) חובה לצמצם מקביליות, להגדיל דיליי, ולהישען על CacheTTLGuard/RateLimitTracker.
+- **בידוד נתונים מלא**: כל Service Layer מסנן לפי user_id בצורה חובה. משתמשים רואים רק נתונים שלהם.
+- **API Responses**: כוללים user_id נכון בכל entity (למשל Trade.to_dict() כולל user_id).
 
 ---
 

@@ -1144,10 +1144,8 @@ class HeaderSystem {
       }
 
       const isAuthenticated = currentUser && currentUser.id;
-      const logoGreen = '#26baac';
-      const logoOrange = '#fc5a06';
-      const filterGreen = 'invert(66%) sepia(34%) saturate(797%) hue-rotate(128deg) brightness(92%) contrast(88%)';
-      const filterOrange = 'invert(49%) sepia(96%) saturate(1753%) hue-rotate(359deg) brightness(99%) contrast(98%)';
+      const logoGreen = '#26baac';   // מחובר
+      const logoOrange = '#fc5a06';  // מנותק
       
       if (isAuthenticated) {
         // Get user initials
@@ -1176,7 +1174,8 @@ class HeaderSystem {
         authIcon.style.border = `1px solid ${logoGreen}`;
         authIcon.style.borderRadius = '6px';
         authIcon.style.padding = '2px';
-        authIcon.style.filter = filterGreen;
+        authIcon.style.filter = 'none';
+        authIcon.style.boxShadow = `0 0 0 2px ${logoGreen} inset`;
         authIcon.dataset.status = 'logged-in';
         authIcon.title = 'התנתק';
       } else {
@@ -1190,7 +1189,8 @@ class HeaderSystem {
         authIcon.style.border = `1px solid ${logoOrange}`;
         authIcon.style.borderRadius = '6px';
         authIcon.style.padding = '2px';
-        authIcon.style.filter = filterOrange;
+        authIcon.style.filter = 'none';
+        authIcon.style.boxShadow = `0 0 0 2px ${logoOrange} inset`;
         authIcon.dataset.status = 'logged-out';
         authIcon.title = 'התחבר';
       }

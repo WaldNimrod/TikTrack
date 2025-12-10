@@ -12,22 +12,22 @@ todos:
       - phase0_1_scan
   - id: phase1_1_portfolio_state
     content: "שלב 1.1: מימוש Portfolio State Page עם EOD integration"
-    status: pending
+    status: completed
     dependencies:
       - phase0_2_helper
   - id: phase1_1_portfolio_state_test
     content: "שלב 1.1: בדיקות ותיקונים ל-Portfolio State Page"
-    status: pending
+    status: completed
     dependencies:
       - phase1_1_portfolio_state
   - id: phase1_2_trade_history
     content: "שלב 1.2: מימוש Trade History Page עם EOD integration"
-    status: pending
+    status: completed
     dependencies:
       - phase0_2_helper
   - id: phase1_2_trade_history_test
     content: "שלב 1.2: בדיקות ותיקונים ל-Trade History Page"
-    status: pending
+    status: completed
     dependencies:
       - phase1_2_trade_history
   - id: phase2_1_trades

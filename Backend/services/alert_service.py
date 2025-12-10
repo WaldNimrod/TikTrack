@@ -22,7 +22,7 @@ class AlertService:
         try:
             query = db.query(Alert).filter(Alert.user_id == user_id)
             alerts = query.all()
-            logger.info(f"נטענו {len(alerts)} התראות עבור משתמש {user_id}")
+            logger.info(f"Found {len(alerts)} alerts for user_id={user_id}")
             return alerts
         except Exception as e:
             logger.error(f"שגיאה בטעינת התראות עבור משתמש {user_id}: {e}")

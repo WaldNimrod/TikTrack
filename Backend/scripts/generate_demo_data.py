@@ -840,11 +840,12 @@ class DemoDataGenerator:
                 UserTicker.ticker_id == spy.id
             ).first()
             if not existing_spy:
+                from sqlalchemy.sql import func
                 user_ticker = UserTicker(
                     user_id=self.user_cache.id,
                     ticker_id=spy.id,
                     status='open',
-                    created_at=self.db.query(UserTicker).statement.columns.created_at.default.arg
+                    created_at=func.now()
                 )
                 self.db.add(user_ticker)
 

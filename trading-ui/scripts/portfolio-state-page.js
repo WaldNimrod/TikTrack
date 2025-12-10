@@ -47,9 +47,10 @@
 // - getSelectedAccounts() - Getselectedaccounts
 // - loadChartDefaultPeriod() - Loadchartdefaultperiod
 // - checkPortfolioDataCompleteness() - Checkportfoliodatacompleteness
-// - ensurePortfolioHistoricalData() - Ensureportfoliohistoricaldata
+// - ensurePortfolioHistoricalData() - Ensureportfoliohistoricaldata (EOD integrated)
 // - loadPortfolioState() - Loadportfoliostate
 // - loadTrades() - Loadtrades
+// - calculateSummaryFromTrades() - Calculatesummaryfromtrades (EOD integrated)
 // - getLighterColor() - Getlightercolor
 // - syncRangeToOtherCharts() - Syncrangetoothercharts
 // - getTimeDiff() - Gettimediff
@@ -1312,11 +1313,71 @@ async function checkPortfolioDataCompleteness(positions) {
  */
 async function ensurePortfolioHistoricalData(positions, options = {}) {
     const { silent = false, showProgress = true } = options;
-    
+
     if (!Array.isArray(positions) || positions.length === 0) {
         return positions;
     }
 
+    // === EOD INTEGRATION: Try EOD first ===
+    const selectedItem = document.querySelector('#dateRangeFilterMenu .date-range-filter-item.selected');
+    const dateRange = selectedItem ? selectedItem.getAttribute('data-value') : 'היום';
+    const dateRangeObj = getDateRange(dateRange);
+
+    if (dateRangeObj && dateRangeObj.start && dateRangeObj.end) {
+        try {
+            // Load EOD positions data for the date range
+            const eodResult = await window.EODIntegrationHelper.loadEODPositions(
+                null, // global user
+                {
+                    date_from: dateRangeObj.start.toISOString().split('T')[0],
+                    date_to: dateRangeObj.end.toISOString().split('T')[0]
+                }
+            );
+
+            if (eodResult && eodResult.data && Array.isArray(eodResult.data) && eodResult.data.length > 0) {
+                if (window.Logger) {
+                    window.Logger.info('✅ Using EOD data for positions', {
+                        page: 'portfolio-state-page',
+                        recordCount: eodResult.data.length
+                    });
+                }
+
+                // Transform EOD data to expected format for charts
+                const enrichedPositions = positions.map(position => {
+                    // Find matching EOD record
+                    const eodRecord = eodResult.data.find(eod =>
+                        eod.ticker_id === position.ticker_id &&
+                        eod.date_utc === dateRangeObj.end.toISOString().split('T')[0]
+                    );
+
+                    if (eodRecord) {
+                        return {
+                            ...position,
+                            // Use EOD data
+                            market_value: eodRecord.market_value,
+                            unrealized_pl_amount: eodRecord.unrealized_pl_amount,
+                            unrealized_pl_percent: eodRecord.unrealized_pl_percent,
+                            close_price: eodRecord.close_price,
+                            price_source: eodRecord.price_source
+                        };
+                    }
+                    return position;
+                });
+
+                return enrichedPositions;
+            }
+        } catch (eodError) {
+            if (window.Logger) {
+                window.Logger.warn('⚠️ EOD positions data not available, falling back to external data', {
+                    page: 'portfolio-state-page',
+                    error: eodError.message
+                });
+            }
+            // Continue with external data service - no fallback mock data
+        }
+    }
+
+    // === FALLBACK: Use ExternalDataService (only if EOD fails) ===
     if (!window.ExternalDataService) {
         window.Logger?.warn?.('ExternalDataService not available, skipping historical data loading', { page: 'portfolio-state-page' });
         return positions;
@@ -1834,6 +1895,104 @@ function populateYearSelect() {
 
 // Calculate summary from trades (using InfoSummarySystem if available)
 async function calculateSummaryFromTrades(trades) {
+    // === EOD INTEGRATION: Try to load EOD data first ===
+    const selectedItem = document.querySelector('#dateRangeFilterMenu .date-range-filter-item.selected');
+    const dateRange = selectedItem ? selectedItem.getAttribute('data-value') : 'היום';
+    const selectedAccounts = getSelectedAccounts();
+
+    // Validate EOD data availability and show errors if needed
+    if (window.EODValidationService) {
+        try {
+            const validationResult = await window.EODValidationService.validatePortfolioMetrics({
+                dateRange,
+                selectedAccounts,
+                page: 'portfolio-state-page'
+            });
+
+            // Handle validation errors
+            if (window.EODIntegrationHelper) {
+                await window.EODIntegrationHelper.handleEODValidationErrors(validationResult, 'portfolio-metrics', {
+                    date_from: dateRange === 'היום' ? new Date().toISOString().split('T')[0] : undefined,
+                    account_ids: selectedAccounts
+                });
+            }
+
+            // If critical errors found, show notification but continue with fallback
+            if (validationResult.errors && validationResult.errors.length > 0) {
+                const criticalErrors = validationResult.errors.filter(e => e.severity === 'high');
+                if (criticalErrors.length > 0 && window.Logger) {
+                    window.Logger.warn('Critical EOD data errors found, will use fallback calculation', {
+                        page: 'portfolio-state-page',
+                        criticalErrors: criticalErrors.length
+                    });
+                }
+            }
+        } catch (validationError) {
+            if (window.Logger) {
+                window.Logger.warn('EOD validation failed, continuing with fallback', {
+                    page: 'portfolio-state-page',
+                    error: validationError.message
+                });
+            }
+        }
+    }
+
+    // Convert date range to actual dates for EOD API
+    const dateRangeObj = getDateRange(dateRange);
+    if (dateRangeObj && dateRangeObj.start && dateRangeObj.end) {
+        try {
+            // Load EOD portfolio metrics for the date range
+            const eodResult = await window.EODIntegrationHelper.loadEODPortfolioMetrics(
+                null, // global user
+                {
+                    date_from: dateRangeObj.start.toISOString().split('T')[0],
+                    date_to: dateRangeObj.end.toISOString().split('T')[0],
+                    account_id: selectedAccounts && selectedAccounts.length === 1 ? selectedAccounts[0] : undefined
+                }
+            );
+
+            if (eodResult && eodResult.data && Array.isArray(eodResult.data) && eodResult.data.length > 0) {
+                // Use EOD data - get the most recent record
+                const latestRecord = eodResult.data[eodResult.data.length - 1];
+
+                if (window.Logger) {
+                    window.Logger.info('✅ Using EOD data for portfolio summary', {
+                        page: 'portfolio-state-page',
+                        recordCount: eodResult.data.length,
+                        latestDate: latestRecord.date_utc
+                    });
+                }
+
+                // Return EOD data in expected format
+                return {
+                    total_cash_balance: latestRecord.cash_total || 0,
+                    cash_balance_by_account: [], // TODO: Implement account-level EOD data
+                    total_portfolio_value: latestRecord.nav_total || null,
+                    total_realized_pl: latestRecord.realized_pl_amount || 0,
+                    total_unrealized_pl: latestRecord.unrealized_pl_amount || 0,
+                    total_pl: (latestRecord.realized_pl_amount || 0) + (latestRecord.unrealized_pl_amount || 0),
+                    open_positions_count: latestRecord.positions_count_open || 0,
+                    positions_count_by_account: [], // TODO: Implement account-level positions
+                    // Additional EOD fields
+                    twr_daily: latestRecord.twr_daily,
+                    twr_mtd: latestRecord.twr_mtd,
+                    twr_ytd: latestRecord.twr_ytd,
+                    max_drawdown_to_date: latestRecord.max_drawdown_to_date,
+                    data_quality_status: latestRecord.data_quality_status
+                };
+            }
+        } catch (eodError) {
+            if (window.Logger) {
+                window.Logger.warn('⚠️ EOD data not available, falling back to calculated data', {
+                    page: 'portfolio-state-page',
+                    error: eodError.message
+                });
+            }
+            // Continue with regular calculation - no fallback mock data
+        }
+    }
+
+    // === FALLBACK: Calculate from trades (only if EOD fails) ===
     // Get cash balance from snapshot (same as trading_accounts page uses AccountActivityService)
     let totalCashBalance = null;
             const cashBalanceByAccount = {};
@@ -4085,42 +4244,110 @@ async function compareDates() {
         removeComparisonDateBtn.classList.remove('hidden');
     }
     
-    // Load comparison data from API
+    // Load comparison data from EOD API
     let comparisonData = [];
     try {
-        if (window.PortfolioStateData && typeof window.PortfolioStateData.loadComparison === 'function') {
+        // === EOD INTEGRATION: Load comparison data from EOD ===
+        const selectedAccounts = getSelectedAccounts();
+
+        // Load EOD data for date1
+        const eodResult1 = await window.EODIntegrationHelper.loadEODPortfolioMetrics(
+            null, // global user
+            {
+                date_from: date1,
+                date_to: date1,
+                account_id: selectedAccounts && selectedAccounts.length === 1 ? selectedAccounts[0] : undefined
+            }
+        );
+
+        // Load EOD data for date2
+        const eodResult2 = await window.EODIntegrationHelper.loadEODPortfolioMetrics(
+            null, // global user
+            {
+                date_from: date2,
+                date_to: date2,
+                account_id: selectedAccounts && selectedAccounts.length === 1 ? selectedAccounts[0] : undefined
+            }
+        );
+
+        if (eodResult1 && eodResult1.data && eodResult2 && eodResult2.data) {
+            // Get latest records for each date
+            const record1 = eodResult1.data.find(r => r.date_utc === date1) || eodResult1.data[eodResult1.data.length - 1];
+            const record2 = eodResult2.data.find(r => r.date_utc === date2) || eodResult2.data[eodResult2.data.length - 1];
+
+            if (record1 && record2) {
+                if (window.Logger) {
+                    window.Logger.info('✅ Using EOD data for date comparison', {
+                        page: 'portfolio-state-page',
+                        date1,
+                        date2
+                    });
+                }
+
+                comparisonData = [
+                    {
+                        metric: 'יתרות',
+                        value1: record1.cash_total !== null && record1.cash_total !== undefined ? record1.cash_total : null,
+                        value2: record2.cash_total !== null && record2.cash_total !== undefined ? record2.cash_total : null
+                    },
+                    {
+                        metric: 'שווי תיק',
+                        value1: record1.nav_total !== null && record1.nav_total !== undefined ? record1.nav_total : null,
+                        value2: record2.nav_total !== null && record2.nav_total !== undefined ? record2.nav_total : null
+                    },
+                    {
+                        metric: 'P/L כולל',
+                        value1: (record1.realized_pl_amount || 0) + (record1.unrealized_pl_amount || 0),
+                        value2: (record2.realized_pl_amount || 0) + (record2.unrealized_pl_amount || 0)
+                    },
+                    {
+                        metric: 'פוזיציות',
+                        value1: record1.positions_count_open !== null && record1.positions_count_open !== undefined ? record1.positions_count_open : null,
+                        value2: record2.positions_count_open !== null && record2.positions_count_open !== undefined ? record2.positions_count_open : null
+                    },
+                    {
+                        metric: 'TWR יומי',
+                        value1: record1.twr_daily !== null && record1.twr_daily !== undefined ? record1.twr_daily : null,
+                        value2: record2.twr_daily !== null && record2.twr_daily !== undefined ? record2.twr_daily : null
+                    }
+                ];
+            }
+        }
+
+        // === FALLBACK: Use PortfolioStateData (only if EOD fails) ===
+        if (comparisonData.length === 0 && window.PortfolioStateData && typeof window.PortfolioStateData.loadComparison === 'function') {
             const comparison = await window.PortfolioStateData.loadComparison(
                 getSelectedAccounts().length === 1 ? getSelectedAccounts()[0] : null,
                 date1,
                 date2
             );
-            
+
             if (comparison && comparison.is_valid) {
                 const comp = comparison.comparison || {};
                 const state1 = comparison.date1_state || {};
                 const state2 = comparison.date2_state || {};
-                
+
                 // Only use real data - no fallback values
                 comparisonData = [
-                    { 
-                        metric: 'יתרות', 
-                        value1: state1.cash_balance !== null && state1.cash_balance !== undefined ? state1.cash_balance : null, 
-                        value2: state2.cash_balance !== null && state2.cash_balance !== undefined ? state2.cash_balance : null 
+                    {
+                        metric: 'יתרות',
+                        value1: state1.cash_balance !== null && state1.cash_balance !== undefined ? state1.cash_balance : null,
+                        value2: state2.cash_balance !== null && state2.cash_balance !== undefined ? state2.cash_balance : null
                     },
-                    { 
-                        metric: 'שווי תיק', 
-                        value1: state1.portfolio_value !== null && state1.portfolio_value !== undefined ? state1.portfolio_value : null, 
-                        value2: state2.portfolio_value !== null && state2.portfolio_value !== undefined ? state2.portfolio_value : null 
+                    {
+                        metric: 'שווי תיק',
+                        value1: state1.portfolio_value !== null && state1.portfolio_value !== undefined ? state1.portfolio_value : null,
+                        value2: state2.portfolio_value !== null && state2.portfolio_value !== undefined ? state2.portfolio_value : null
                     },
-                    { 
-                        metric: 'P/L כולל', 
-                        value1: state1.total_pl !== null && state1.total_pl !== undefined ? state1.total_pl : null, 
-                        value2: state2.total_pl !== null && state2.total_pl !== undefined ? state2.total_pl : null 
+                    {
+                        metric: 'P/L כולל',
+                        value1: state1.total_pl !== null && state1.total_pl !== undefined ? state1.total_pl : null,
+                        value2: state2.total_pl !== null && state2.total_pl !== undefined ? state2.total_pl : null
                     },
-                    { 
-                        metric: 'פוזיציות', 
-                        value1: state1.positions_count !== null && state1.positions_count !== undefined ? state1.positions_count : null, 
-                        value2: state2.positions_count !== null && state2.positions_count !== undefined ? state2.positions_count : null 
+                    {
+                        metric: 'פוזיציות',
+                        value1: state1.positions_count !== null && state1.positions_count !== undefined ? state1.positions_count : null,
+                        value2: state2.positions_count !== null && state2.positions_count !== undefined ? state2.positions_count : null
                     }
                 ];
             }

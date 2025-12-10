@@ -50,6 +50,7 @@ cash_flows_bp = Blueprint('cash_flows', __name__, url_prefix='/api/cash-flows')
 class CashFlowService:
     def __init__(self):
         self.model = CashFlow
+        self.__name__ = 'CashFlowService'
     
     def get_all(self, db: Session, filters=None, user_id=None):
         query = db.query(CashFlow).options(

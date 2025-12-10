@@ -13,7 +13,7 @@ from config import settings
 
 # Import base classes
 from .base_entity import BaseEntityAPI
-from .base_entity_decorators import api_endpoint, handle_database_session, validate_request
+from .base_entity_decorators import api_endpoint, handle_database_session, validate_request, require_authentication
 from .base_entity_utils import BaseEntityUtils
 
 logger = logging.getLogger(__name__)
@@ -129,6 +129,7 @@ def get_trades_pending_plan_creations():
         return jsonify(error_payload), 500
 
 @trades_bp.route('/', methods=['GET'])
+@require_authentication()
 @cache_with_deps(ttl=60, dependencies=['trades', 'tickers', 'market-data'])
 @handle_database_session()
 def get_trades():

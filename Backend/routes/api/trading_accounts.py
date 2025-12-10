@@ -7,7 +7,7 @@ import logging
 
 # Import base classes
 from .base_entity import BaseEntityAPI
-from .base_entity_decorators import api_endpoint, handle_database_session, validate_request
+from .base_entity_decorators import api_endpoint, handle_database_session, validate_request, require_authentication
 from .base_entity_utils import BaseEntityUtils
 
 logger = logging.getLogger(__name__)
@@ -18,6 +18,7 @@ trading_accounts_bp = Blueprint('trading_accounts', __name__, url_prefix='/api/t
 base_api = BaseEntityAPI('trading_accounts', TradingAccountService, 'trading_accounts')
 
 @trading_accounts_bp.route('/', methods=['GET'])
+@require_authentication()
 @handle_database_session()
 def get_trading_accounts():
     """Get all trading accounts using base API"""

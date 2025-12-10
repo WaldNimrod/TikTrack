@@ -679,6 +679,12 @@ window.FilterManager = class FilterManager {
       }
     }
 
+    // Ensure accounts is an array
+    if (!Array.isArray(accounts)) {
+      accounts = [];
+      window.Logger?.warn?.('⚠️ accounts is not an array, resetting to empty array', { page: 'header-system', accountsType: typeof accounts });
+    }
+
     const openAccounts = accounts.filter(account => account.status === 'open');
 
     openAccounts.forEach(account => {

@@ -44,10 +44,12 @@
 // - loadTrades() - Loadtrades
 // - loadTradesTable() - Loadtradestable
 // - checkAndFetchMissingHistoricalPrices() - Checkandfetchmissinghistoricalprices
-// - loadTradeForAnalysis() - Loadtradeforanalysis
+// - loadTradeForAnalysis() - Loadtradeforanalysis (EOD integrated)
 // - loadDataFromCache() - Loaddatafromcache
 // - saveToCache() - Savetocache
 // - getTradeIdFromURL() - Gettradeidfromurl
+// - calculateEODTradeStatistics() - Calculateeodtradestatistics
+// - calculateVolatility() - Calculatevolatility
 // - savePageState() - Savepagestate
 // - loadPageState() - Loadpagestate
 
@@ -1569,6 +1571,38 @@
             let timelineData = [];
             let planVsExecution = null;
             
+            // === EOD INTEGRATION: Try EOD data first for trade analysis ===
+            let eodTradeMetrics = null;
+            try {
+                if (tradeId) {
+                    eodTradeMetrics = await window.EODIntegrationHelper.loadEODPortfolioMetrics(
+                        null, // global user
+                        {
+                            date_from: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 30 days ago
+                            date_to: new Date().toISOString().split('T')[0]
+                        }
+                    );
+
+                    if (eodTradeMetrics && eodTradeMetrics.data && Array.isArray(eodTradeMetrics.data) && eodTradeMetrics.data.length > 0) {
+                        if (window.Logger) {
+                            window.Logger.info('✅ Using EOD data for trade analysis', {
+                                page: 'trade-history-page',
+                                tradeId,
+                                recordCount: eodTradeMetrics.data.length
+                            });
+                        }
+                    }
+                }
+            } catch (eodError) {
+                if (window.Logger) {
+                    window.Logger.warn('⚠️ EOD trade metrics not available, falling back to regular analysis', {
+                        page: 'trade-history-page',
+                        tradeId,
+                        error: eodError.message
+                    });
+                }
+            }
+
             // Use new API endpoint for full analysis if available
             if (window.TradeHistoryData && typeof window.TradeHistoryData.loadTradeFullAnalysis === 'function') {
                 try {
@@ -2008,12 +2042,47 @@
                 // Store in global object for consistency
                 window.tradeHistoryData.statistics = statistics;
                 if (window.Logger) {
-                    window.Logger.debug('Using statistics from full analysis', { 
+                    window.Logger.debug('Using statistics from full analysis', {
                         page: 'trade-history-page',
                         statisticsKeys: Object.keys(statistics)
                     });
                 }
-            } else {
+            }
+
+            // === EOD INTEGRATION: Enhance statistics with EOD data ===
+            if (eodTradeMetrics && eodTradeMetrics.data && Array.isArray(eodTradeMetrics.data) && eodTradeMetrics.data.length > 0) {
+                try {
+                    // Calculate enhanced statistics using EOD data
+                    const eodStats = calculateEODTradeStatistics(eodTradeMetrics.data, tradeData);
+                    if (eodStats) {
+                        // Merge EOD statistics with existing statistics
+                        statistics = {
+                            ...statistics,
+                            ...eodStats,
+                            // Mark that EOD data was used
+                            dataSource: 'eod_enhanced'
+                        };
+
+                        if (window.Logger) {
+                            window.Logger.info('✅ Enhanced statistics with EOD data', {
+                                page: 'trade-history-page',
+                                tradeId,
+                                eodStatsKeys: Object.keys(eodStats)
+                            });
+                        }
+                    }
+                } catch (eodStatsError) {
+                    if (window.Logger) {
+                        window.Logger.warn('⚠️ Failed to calculate EOD statistics, using regular statistics', {
+                            page: 'trade-history-page',
+                            tradeId,
+                            error: eodStatsError.message
+                        });
+                    }
+                }
+            }
+
+            if (!statistics || Object.keys(statistics).length === 0) {
                 // Calculate duration in days
                 // Main duration: from entry (opened_at) to close (closed_at)
                 // Planning/waiting duration: from creation (created_at or trade_plan.created_at) to opening (opened_at)
@@ -5379,6 +5448,136 @@
             return [];
         }
     };
+
+    /**
+     * Calculate enhanced trade statistics using EOD data
+     *
+     * @param {Array} eodData - EOD portfolio metrics data
+     * @param {Object} tradeData - Trade data for context
+     * @returns {Object} Enhanced statistics
+     */
+    function calculateEODTradeStatistics(eodData, tradeData) {
+        if (!Array.isArray(eodData) || eodData.length === 0) {
+            return null;
+        }
+
+        try {
+            // Filter EOD data to relevant period (around trade dates)
+            let filteredData = eodData;
+
+            if (tradeData && tradeData.created_at) {
+                const tradeStart = new Date(tradeData.created_at);
+                const tradeEnd = tradeData.closed_at ? new Date(tradeData.closed_at) : new Date();
+
+                // Extend range by 30 days before and after for context
+                const extendedStart = new Date(tradeStart);
+                extendedStart.setDate(extendedStart.getDate() - 30);
+
+                const extendedEnd = new Date(tradeEnd);
+                extendedEnd.setDate(extendedEnd.getDate() + 30);
+
+                filteredData = eodData.filter(record => {
+                    const recordDate = new Date(record.date_utc);
+                    return recordDate >= extendedStart && recordDate <= extendedEnd;
+                });
+            }
+
+            if (filteredData.length === 0) {
+                return null;
+            }
+
+            // Calculate EOD-based statistics
+            const navValues = filteredData.map(r => r.nav_total).filter(v => v !== null && v !== undefined);
+            const realizedPLValues = filteredData.map(r => r.realized_pl_amount).filter(v => v !== null && v !== undefined);
+            const unrealizedPLValues = filteredData.map(r => r.unrealized_pl_amount).filter(v => v !== null && v !== undefined);
+
+            const stats = {};
+
+            // NAV statistics
+            if (navValues.length > 0) {
+                stats.average_nav = navValues.reduce((a, b) => a + b, 0) / navValues.length;
+                stats.min_nav = Math.min(...navValues);
+                stats.max_nav = Math.max(...navValues);
+                stats.nav_volatility = calculateVolatility(navValues);
+            }
+
+            // P&L statistics
+            if (realizedPLValues.length > 0) {
+                stats.total_realized_pl_eod = realizedPLValues.reduce((a, b) => a + b, 0);
+                stats.average_realized_pl = realizedPLValues.reduce((a, b) => a + b, 0) / realizedPLValues.length;
+            }
+
+            if (unrealizedPLValues.length > 0) {
+                stats.total_unrealized_pl_eod = unrealizedPLValues.reduce((a, b) => a + b, 0);
+                stats.average_unrealized_pl = unrealizedPLValues.reduce((a, b) => a + b, 0) / unrealizedPLValues.length;
+            }
+
+            // Total P&L from EOD
+            if (stats.total_realized_pl_eod !== undefined && stats.total_unrealized_pl_eod !== undefined) {
+                stats.total_pl_eod = stats.total_realized_pl_eod + stats.total_unrealized_pl_eod;
+            }
+
+            // TWR statistics
+            const twrValues = filteredData.map(r => r.twr_daily).filter(v => v !== null && v !== undefined);
+            if (twrValues.length > 0) {
+                stats.average_twr_daily = twrValues.reduce((a, b) => a + b, 0) / twrValues.length;
+                stats.twr_volatility = calculateVolatility(twrValues);
+                stats.best_twr_day = Math.max(...twrValues);
+                stats.worst_twr_day = Math.min(...twrValues);
+            }
+
+            // Performance metrics
+            const twrMtdValues = filteredData.map(r => r.twr_mtd).filter(v => v !== null && v !== undefined);
+            if (twrMtdValues.length > 0) {
+                stats.average_twr_mtd = twrMtdValues.reduce((a, b) => a + b, 0) / twrMtdValues.length;
+            }
+
+            const twrYtdValues = filteredData.map(r => r.twr_ytd).filter(v => v !== null && v !== undefined);
+            if (twrYtdValues.length > 0) {
+                stats.average_twr_ytd = twrYtdValues.reduce((a, b) => a + b, 0) / twrYtdValues.length;
+            }
+
+            // Risk metrics
+            const drawdownValues = filteredData.map(r => r.max_drawdown_to_date).filter(v => v !== null && v !== undefined);
+            if (drawdownValues.length > 0) {
+                stats.max_drawdown = Math.min(...drawdownValues); // Most negative drawdown
+                stats.average_drawdown = drawdownValues.reduce((a, b) => a + b, 0) / drawdownValues.length;
+            }
+
+            // Data quality info
+            stats.eod_records_count = filteredData.length;
+            stats.data_quality_status = filteredData[filteredData.length - 1]?.data_quality_status || 'unknown';
+
+            return stats;
+
+        } catch (error) {
+            if (window.Logger) {
+                window.Logger.warn('Failed to calculate EOD trade statistics', {
+                    page: 'trade-history-page',
+                    error: error.message
+                });
+            }
+            return null;
+        }
+    }
+
+    /**
+     * Calculate volatility (standard deviation) of an array of values
+     *
+     * @param {Array<number>} values - Array of numeric values
+     * @returns {number} Volatility (standard deviation)
+     */
+    function calculateVolatility(values) {
+        if (!Array.isArray(values) || values.length < 2) {
+            return 0;
+        }
+
+        const mean = values.reduce((a, b) => a + b, 0) / values.length;
+        const squaredDiffs = values.map(value => Math.pow(value - mean, 2));
+        const variance = squaredDiffs.reduce((a, b) => a + b, 0) / (values.length - 1);
+
+        return Math.sqrt(variance);
+    }
 
     // Log export for debugging
     if (window.Logger) {

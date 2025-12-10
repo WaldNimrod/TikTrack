@@ -11,6 +11,55 @@
  * Added: Section toggle functions for opening/closing sections
  */
 
+
+// ===== FUNCTION INDEX =====
+// === Object Methods ===
+// - input._validationHandler() -  Validationhandler
+
+// === Initialization ===
+// - initializeModalBackdrop() - Initializemodalbackdrop
+// - setupFieldValidation() - Setupfieldvalidation
+// - initializeValidation() - Initializevalidation
+
+// === Event Handlers ===
+// - performItemCancellation() - Performitemcancellation
+// - getPageDataFunctions() - Getpagedatafunctions
+// - updateChevronIcon() - Updatechevronicon
+// - generateActionButtons() - Generateactionbuttons
+// - loadTableActionButtons() - Loadtableactionbuttons
+// - loadSectionStates() - Loadsectionstates
+// - isValidPhone() - Isvalidphone
+// - clearFieldValidation() - Clearfieldvalidation
+// - clearValidationErrors() - Clearvalidationerrors
+// - clearValidation() - Clearvalidation
+
+// === UI Functions ===
+// - updatePricesFromPercentages() - Updatepricesfrompercentages
+// - updatePercentagesFromPrices() - Updatepercentagesfromprices
+// - autoRefreshCurrentPage() - Autorefreshcurrentpage
+
+// === Data Functions ===
+// - calculateTargetPrice() - Calculatetargetprice
+// - getCurrentPageName() - Getcurrentpagename
+// - getFieldLabel() - Getfieldlabel
+
+// === Utility Functions ===
+// - formatPercentage() - Formatpercentage
+// - formatPrice() - Formatprice
+
+// === Other ===
+// - calculateStopPrice() - Calculatestopprice
+// - calculatePercentageFromPrice() - Calculatepercentagefromprice
+// - cancelItem() - Cancelitem
+// - viewTickerDetails() - Viewtickerdetails
+// - editTicker() - Editticker
+// - cancelTicker() - Cancelticker
+// - restoreTicker() - Restoreticker
+// - deleteTicker() - Deleteticker
+// - isValidDate() - Isvaliddate
+// - isValidEmail() - Isvalidemail
+// - clearFieldError() - Clearfielderror
+
 // ===== PRICE CALCULATION FUNCTIONS =====
 // These functions are used across multiple pages (trade plans, trades, tickers)
 

@@ -9,6 +9,83 @@
  * Last Updated: January 2025
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - createSearchResultsContainer() - Createsearchresultscontainer
+// - createDuplicateResultsContainer() - Createduplicateresultscontainer
+// - createCssBackup() - Createcssbackup
+// - createComplianceResultsContainer() - Createcomplianceresultscontainer
+// - createNewCssFileFromModal() - Createnewcssfilefrommodal
+// - createNewCssFile() - Createnewcssfile
+// - createCssFileFromTemplate() - Createcssfilefromtemplate
+// - initializeCssManagement() - Initializecssmanagement
+
+// === Core Functions ===
+// - executeUnusedCssRemoval() - Executeunusedcssremoval
+// - executeDuplicateCleanup() - Executeduplicatecleanup
+// - executeSpecificDuplicateCleanup() - Executespecificduplicatecleanup
+// - executeDeleteFromFile() - Executedeletefromfile
+
+// === Event Handlers ===
+// - fetchCssFileContent() - Fetchcssfilecontent
+// - showDeleteConfirmationModal() - Showdeleteconfirmationmodal
+// - confirmDeleteCssFile() - Confirmdeletecssfile
+// - searchInCssContent() - Searchincsscontent
+// - showDeleteFileSelectionModal() - Showdeletefileselectionmodal
+
+// === UI Functions ===
+// - refreshCssStats() - Refreshcssstats
+// - showDynamicModal() - Showdynamicmodal
+// - hideDynamicModal() - Hidedynamicmodal
+// - showCssViewerModal() - Showcssviewermodal
+// - displaySearchResults() - Displaysearchresults
+// - showUnusedCssRemovalModal() - Showunusedcssremovalmodal
+// - displayDuplicateResults() - Displayduplicateresults
+// - showBackupDialog() - Showbackupdialog
+// - showDuplicateCleanupModal() - Showduplicatecleanupmodal
+// - showSpecificDuplicateCleanupModal() - Showspecificduplicatecleanupmodal
+// - displayComplianceResults() - Displaycomplianceresults
+// - showAddCssFileModal() - Showaddcssfilemodal
+// - displayCssFilesTable() - Displaycssfilestable
+
+// === Data Functions ===
+// - validateCssAPI() - Validatecssapi
+// - getCssFilesList() - Getcssfileslist
+// - removeUnusedCssAPI() - Removeunusedcssapi
+// - minifyCssAPI() - Minifycssapi
+// - detectCssDuplicatesAPI() - Detectcssduplicatesapi
+// - checkArchitectureComplianceAPI() - Checkarchitecturecomplianceapi
+// - loadCssFilesList() - Loadcssfileslist
+
+// === Utility Functions ===
+// - validateCss() - Validatecss
+// - checkArchitectureCompliance() - Checkarchitecturecompliance
+
+// === Other ===
+// - editCssFile() - Editcssfile
+// - viewCssFile() - Viewcssfile
+// - deleteCssFile() - Deletecssfile
+// - searchCssRules() - Searchcssrules
+// - clearSearchResults() - Clearsearchresults
+// - clearCssSearch() - Clearcsssearch
+// - removeUnusedCss() - Removeunusedcss
+// - performRemoveUnusedCss() - Performremoveunusedcss
+// - toggleAllUnusedCss() - Toggleallunusedcss
+// - minifyCss() - Minifycss
+// - detectCssDuplicates() - Detectcssduplicates
+// - proceedWithBackup() - Proceedwithbackup
+// - cleanupCssDuplicates() - Cleanupcssduplicates
+// - performCleanupDuplicates() - Performcleanupduplicates
+// - cleanupSpecificDuplicate() - Cleanupspecificduplicate
+// - removeSpecificDuplicate() - Removespecificduplicate
+// - resetAllDuplicates() - Resetallduplicates
+// - clearDuplicateResults() - Clearduplicateresults
+// - clearComplianceResults() - Clearcomplianceresults
+// - openCssEditor() - Opencsseditor
+// - generateDetailedLog() - Generatedetailedlog
+
 // מערכת מעקב אחר כפילויות שכבר אוחדו
 let mergedDuplicates = new Set();
 let removedDuplicates = new Set();

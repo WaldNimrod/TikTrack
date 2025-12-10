@@ -227,6 +227,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.TickerChartWidget', // Ticker Chart Widget
         'window.TradingViewWidgetsFactory', // TradingView Widgets Factory (required for TickerChartWidget)
         'window.WatchListsWidgetService', // Watch Lists Widget Service
+        'window.WatchListsWidget', // Watch Lists Widget
         'window.conditionsInitializer', // Conditions System
         'window.ConditionsUIManager', // Conditions System
         'window.UnifiedAppInitializer', // Unified Init System
@@ -316,6 +317,19 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
             }
           } else {
             window.Logger?.warn?.('⚠️ TickerChartWidget not available', { page: 'page-initialization-configs' });
+          }
+
+          // Initialize watch lists widget
+          if (window.WatchListsWidget) {
+            try {
+              await window.WatchListsWidget.init('watchListsWidgetContainer', {
+                maxItems: 10
+              });
+            } catch (error) {
+              window.Logger?.error?.('❌ Error initializing WatchListsWidget', { error: error.message, stack: error.stack, page: 'page-initialization-configs' });
+            }
+          } else {
+            window.Logger?.warn?.('⚠️ WatchListsWidget not available', { page: 'page-initialization-configs' });
           }
 
           // Initialize positions & portfolio system
@@ -3663,25 +3677,32 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       lastModified: '2025-01-12',
       pageType: 'main',
       packages: [
+        // Standard loading order (see STANDARD_LOADING_ORDER.md)
         "base",
         "services",
         "ui-advanced",
-        "modules",
         "crud",
         "preferences",
         "entity-services",
+        "info-summary",
         "charts",
         "tradingview-charts",
+        "modules",
         "init-system"
       ],
       requiredGlobals: [
         'window.UnifiedAppInitializer', // Unified Init System
         'window.PAGE_CONFIGS', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
+        'window.TikTrackAuth',
+        'window.AuthGuard',
         "NotificationSystem",
         "window.IconSystem",
         "window.FieldRendererService",
         "window.UnifiedTableSystem",
+        "window.InfoSummarySystem",
+        "window.UnifiedProgressManager",
+        "window.ButtonSystem",
         "window.ModalManagerV2",
         "window.LinkedItemsService",
         "window.SelectPopulatorService",
@@ -3699,6 +3720,16 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
           window.Logger?.info('📄 Initializing portfolio-state...', {
             page: 'page-initialization-configs',
           });
+          
+          // Ensure authentication is established before loading page data
+          if (window.AuthGuard?.init) {
+            try {
+              await window.AuthGuard.init();
+              window.Logger?.info('✅ AuthGuard initialized for portfolio-state', { page: 'page-initialization-configs' });
+            } catch (e) {
+              window.Logger?.error('❌ AuthGuard init failed for portfolio-state', { page: 'page-initialization-configs', error: e });
+            }
+          }
           
           // Wait for portfolioStatePage to be available
           if (!window.portfolioStatePage) {

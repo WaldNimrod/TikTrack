@@ -9,6 +9,15 @@
  * Documentation: See documentation/02-ARCHITECTURE/FRONTEND/PREFERENCES_LOADING_BEST_PRACTICES.md
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Data Functions ===
+// - PreferencesLoadingTest.extractScriptTags() - Extractscripttags
+// - PreferencesLoadingTest.extractInlineScripts() - Extractinlinescripts
+// - PreferencesLoadingTest.checkUsesCoreSystems() - Checkusescoresystems
+// - PreferencesLoadingTest.checkNoDirectPreferencesCalls() - Checknodirectpreferencescalls
+
 (function() {
   'use strict';
 

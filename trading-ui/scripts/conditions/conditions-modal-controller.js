@@ -7,6 +7,28 @@
  * the appropriate context, and ensures the modal footer is hidden.
  */
 (function () {
+
+// ===== FUNCTION INDEX =====
+// === Class Methods ===
+// - ConditionsModalController.activateReloadBypass() - Activatereloadbypass
+// - ConditionsModalController.buildModalTitle() - Buildmodaltitle
+// - ConditionsModalController.configureModalUI() - Configuremodalui
+// - ConditionsModalController.deactivateReloadBypass() - Deactivatereloadbypass
+// - ConditionsModalController.ensureModalPosition() - Ensuremodalposition
+// - ConditionsModalController.goBackToParent() - Gobacktoparent
+// - ConditionsModalController.initialize() - Initialize
+// - ConditionsModalController.onModalHidden() - Onmodalhidden
+// - ConditionsModalController.restoreParentModal() - Restoreparentmodal
+// - ConditionsModalController.setupModal() - Setupmodal
+
+// === Object Methods ===
+// - backButton.onclick() - Onclick
+// - conditionsModalNoop() - Conditionsmodalnoop
+// - conditionsModalNoop() - Conditionsmodalnoop
+
+// === Data Functions ===
+// - reloadBypassState() - Reloadbypassstate
+
     const reloadBypassState = (() => {
         const stateKey = '__conditionsReloadBypassState';
         if (window[stateKey]) {
@@ -96,18 +118,7 @@
         }
 
         setupModal() {
-            // Skip modal setup on auth pages (login, register, etc.)
-            const isAuthPage = window.location.pathname.includes('login.html') ||
-                             window.location.pathname.includes('register.html') ||
-                             window.location.pathname.includes('forgot-password.html') ||
-                             window.location.pathname.includes('reset-password.html') ||
-                             document.body.classList.contains('login-page') ||
-                             document.body.classList.contains('auth-page');
-            
-            if (isAuthPage) {
-                // Silently skip - no modal needed on auth pages
-                return;
-            }
+            // No dedicated auth pages; always allow modal setup
             
             this.modalElement = document.getElementById(MODAL_ID);
             if (!this.modalElement) {
@@ -137,15 +148,9 @@
                 
                 if (!this.modalElement) {
                     // Only warn if we're not on an auth page and modal creation failed
-                    const isAuthPage = window.location.pathname.includes('login.html') ||
-                                     window.location.pathname.includes('register.html') ||
-                                     window.location.pathname.includes('forgot-password.html') ||
-                                     window.location.pathname.includes('reset-password.html');
-                    if (!isAuthPage) {
-                        if (!this.loggedMissingModal) {
-                            window.Logger?.info?.('[ConditionsModalController] Modal element not found and could not be created (once)', { page: 'conditions-modal-controller' });
-                            this.loggedMissingModal = true;
-                        }
+                    if (!this.loggedMissingModal) {
+                        window.Logger?.info?.('[ConditionsModalController] Modal element not found and could not be created (once)', { page: 'conditions-modal-controller' });
+                        this.loggedMissingModal = true;
                     }
                     return;
                 }

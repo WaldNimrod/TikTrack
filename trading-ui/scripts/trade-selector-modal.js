@@ -16,6 +16,12 @@
  * @updated February 2, 2025
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === UI Functions ===
+// - getRenderer() - Getrenderer
+
 // ===== TRADE SELECTOR MODAL =====
 
 // Global function to open trade selector modal

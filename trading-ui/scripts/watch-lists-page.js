@@ -58,6 +58,28 @@
  * 
  * ==========================================
  */
+// === Arrow Functions ===
+// - addInfoItem() - Addinfoitem
+// - getColumns() - Getcolumns
+// - retry() - Retry
+
+// === Functions ===
+// - applyDataAttributes() - Applydataattributes
+// - createActionsMenuContent() - Createactionsmenucontent
+// - createFallbackButtons() - Createfallbackbuttons
+// - createFlagButton() - Createflagbutton
+// - deleteCurrentList() - Deletecurrentlist
+// - enrichWatchListItemsWithTickerData() - Enrichwatchlistitemswithtickerdata
+// - loadWatchLists() - Loadwatchlists
+// - refreshFlagLists() - Refreshflaglists
+// - renderCardsView() - Rendercardsview
+// - renderCompactView() - Rendercompactview
+// - restorePageState() - Restorepagestate
+// - savePageState() - Savepagestate
+// - switchList() - Switchlist
+// - updateActionsMenu() - Updateactionsmenu
+// - updateActiveListSelect() - Updateactivelistselect
+// - updateWatchListItemsTable() - Updatewatchlistitemstable
 
 (function() {
     'use strict';

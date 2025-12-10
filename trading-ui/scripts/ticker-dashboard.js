@@ -7,6 +7,49 @@
  * Documentation: See documentation/04-FEATURES/WIREFRAMES/ticker-dashboard-wireframe.md
  */
 
+
+// ===== FUNCTION INDEX =====
+// === Object Methods ===
+// - planLink.onclick() - Onclick
+// - script.onerror() - Onerror
+// - script.onload() - Onload
+
+// === Initialization ===
+// - initTickerDashboard() - Inittickerdashboard
+// - initPriceChart() - Initpricechart
+// - createTradingViewWidget() - Createtradingviewwidget
+// - setupSectionStateSaving() - Setupsectionstatesaving
+// - initializeIcons() - Initializeicons
+
+// === Event Handlers ===
+// - showMissingDataConfirmation() - Showmissingdataconfirmation
+// - renderConditions() - Renderconditions
+// - handleTickerChange() - Handletickerchange
+
+// === UI Functions ===
+// - validateDataBeforeRender() - Validatedatabeforerender
+// - updatePageTitle() - Updatepagetitle
+// - renderKPICards() - Renderkpicards
+// - renderTechnicalIndicators() - Rendertechnicalindicators
+// - renderUserActivity() - Renderuseractivity
+// - showChartPlaceholder() - Showchartplaceholder
+// - refreshData() - Refreshdata
+
+// === Data Functions ===
+// - checkMissingData() - Checkmissingdata
+// - fetchDataFromProvider() - Fetchdatafromprovider
+// - getTickerIdFromURL() - Gettickeridfromurl
+// - getCSSVariableValue() - Getcssvariablevalue
+// - loadTickerSelector() - Loadtickerselector
+// - savePageState() - Savepagestate
+
+// === Other ===
+// - resolveTickerSymbolToId() - Resolvetickersymboltoid
+// - restorePageState() - Restorepagestate
+// - debounce() - Debounce
+// - goBack() - Goback
+// - later() - Later
+
 (function() {
     'use strict';
 

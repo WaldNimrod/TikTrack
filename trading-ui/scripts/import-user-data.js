@@ -3005,13 +3005,6 @@ function updateActiveSessionIndicator() {
     // Removed - old session indicator feature removed from step 1
     // Sessions can be continued from the sessions table instead
     return;
-    
-    // Show indicator and remove d-none class
-    indicator.classList.remove('d-none');
-    indicator.style.display = 'block';
-    indicator.setAttribute('data-has-session', 'true');
-    if (controlsRow) {
-        controlsRow.classList.remove('d-none');
         controlsRow.style.display = ''; // Empty string removes inline style, allowing Bootstrap classes to work
         // Force display if still hidden
         if (window.getComputedStyle(controlsRow).display === 'none') {

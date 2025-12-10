@@ -13,6 +13,22 @@
  * - Direct use of Hebrew strings instead of translation functions
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Core Functions ===
+// - main() - Main
+
+// === Data Functions ===
+// - getAllFiles() - Getallfiles
+
+// === Utility Functions ===
+// - checkPackageManifest() - Checkpackagemanifest
+
+// === Other ===
+// - scanFile() - Scanfile
+// - generateReport() - Generatereport
+
 const fs = require('fs');
 const path = require('path');
 
@@ -183,20 +199,20 @@ function generateReport(results, hasInManifest) {
 
 ## 📊 סיכום כללי
 
-- **סה"כ קבצים נסרקו:** ${results.length}
-- **קבצים המשתמשים במערכת:** ${results.filter(r => r.usingSystem).length}
-- **קבצים עם בעיות:** ${results.filter(r => r.issues.length > 0).length}
-- **סה"כ בעיות נמצאו:** ${results.reduce((sum, r) => sum + r.issues.length, 0)}
+// - **סה"כ קבצים נסרקו:** ${results.length}
+// - **קבצים המשתמשים במערכת:** ${results.filter(r => r.usingSystem).length}
+// - **קבצים עם בעיות:** ${results.filter(r => r.issues.length > 0).length}
+// - **סה"כ בעיות נמצאו:** ${results.reduce((sum, r) => sum + r.issues.length, 0)}
 
 ### פילוח בעיות לפי סוג:
 
-- **פונקציות תרגום מקומיות:** ${results.reduce((sum, r) => sum + r.issues.filter(i => i.type === 'localTranslationFunction').length, 0)}
-- **מפות תרגום מקומיות:** ${results.reduce((sum, r) => sum + r.issues.filter(i => i.type === 'localTranslationMap').length, 0)}
-- **פונקציות פורמט מקומיות:** ${results.reduce((sum, r) => sum + r.issues.filter(i => i.type === 'localFormatFunction').length, 0)}
+// - **פונקציות תרגום מקומיות:** ${results.reduce((sum, r) => sum + r.issues.filter(i => i.type === 'localTranslationFunction').length, 0)}
+// - **מפות תרגום מקומיות:** ${results.reduce((sum, r) => sum + r.issues.filter(i => i.type === 'localTranslationMap').length, 0)}
+// - **פונקציות פורמט מקומיות:** ${results.reduce((sum, r) => sum + r.issues.filter(i => i.type === 'localFormatFunction').length, 0)}
 
 ### סטטוס טעינת המערכת:
 
-- **translation-utils.js במוניפסט:** ${hasInManifest ? '✅ כן' : '❌ לא'}
+// - **translation-utils.js במוניפסט:** ${hasInManifest ? '✅ כן' : '❌ לא'}
 
 ---
 
@@ -217,9 +233,9 @@ function generateReport(results, hasInManifest) {
 **קטגוריה:** ${result.file.endsWith('.html') ? 'HTML' : 'JavaScript'}
 
 #### סטטוס:
-- **משתמש במערכת:** ${result.usingSystem ? '✅ כן' : '❌ לא'}
-- **טוען את המערכת:** ${result.loadingTranslationUtils ? '✅ כן' : '❌ לא (נטען דרך base package)'}
-- **יש בעיות:** ${result.issues.length > 0 ? '⚠️ כן' : '✅ לא'}
+// - **משתמש במערכת:** ${result.usingSystem ? '✅ כן' : '❌ לא'}
+// - **טוען את המערכת:** ${result.loadingTranslationUtils ? '✅ כן' : '❌ לא (נטען דרך base package)'}
+// - **יש בעיות:** ${result.issues.length > 0 ? '⚠️ כן' : '✅ לא'}
 
 `;
 
@@ -230,9 +246,9 @@ function generateReport(results, hasInManifest) {
             result.issues.forEach((issue, index) => {
                 const severityEmoji = issue.severity === 'high' ? '🔴' : issue.severity === 'medium' ? '🟡' : '🟢';
                 report += `${index + 1}. **שורה ${issue.line}:** ${issue.description}
-   - **סוג:** ${issue.type}
-   - **חומרה:** ${severityEmoji} ${issue.severity === 'high' ? 'גבוהה' : issue.severity === 'medium' ? 'בינונית' : 'נמוכה'}
-   - **קוד:** \`${issue.code.substring(0, 100)}${issue.code.length > 100 ? '...' : ''}\`
+// - **סוג:** ${issue.type}
+// - **חומרה:** ${severityEmoji} ${issue.severity === 'high' ? 'גבוהה' : issue.severity === 'medium' ? 'בינונית' : 'נמוכה'}
+// - **קוד:** \`${issue.code.substring(0, 100)}${issue.code.length > 100 ? '...' : ''}\`
 
 `;
             });

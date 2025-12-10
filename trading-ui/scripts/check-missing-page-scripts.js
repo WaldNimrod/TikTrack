@@ -1,3 +1,19 @@
+
+
+// ===== FUNCTION INDEX =====
+
+// === Core Functions ===
+// - main() - Main
+
+// === Data Functions ===
+// - getAllHTMLFiles() - Getallhtmlfiles
+// - getAllJSFiles() - Getalljsfiles
+// - getPageName() - Getpagename
+// - loadsScript() - Loadsscript
+
+// === Other ===
+// - scanDir() - Scandir
+
 #!/usr/bin/env node
 
 /**

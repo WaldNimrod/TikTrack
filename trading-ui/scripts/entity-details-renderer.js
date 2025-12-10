@@ -26,6 +26,41 @@
  * דוקומנטציה: documentation/features/entity-details-system/README.md
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Event Handlers ===
+// - normalizedCanonical() - Normalizedcanonical
+
+// === UI Functions ===
+// - renderAmount() - Renderamount
+// - renderPercent() - Renderpercent
+// - renderQuantity() - Renderquantity
+// - renderStopLossCombined() - Renderstoplosscombined
+// - renderTakeProfitCombined() - Rendertakeprofitcombined
+// - renderQuantityNeutral() - Renderquantityneutral
+// - renderAmountNeutral() - Renderamountneutral
+
+// === Data Functions ===
+// - saveEntityFilterState() - Saveentityfilterstate
+// - loadEntityFilterState() - Loadentityfilterstate
+
+// === Utility Functions ===
+// - formatQuantity() - Formatquantity
+// - formatAmount() - Formatamount
+// - formatPLWithPercent() - Formatplwithpercent
+// - formatAveragePrice() - Formataverageprice
+// - formatPercent() - Formatpercent
+
+// === Other ===
+// - legacyFilterLinkedItems() - Legacyfilterlinkeditems
+// - registerLinkedItem() - Registerlinkeditem
+// - lookupLinkedItemSource() - Lookuplinkeditemsource
+// - resolve() - Resolve
+// - escapeHtml() - Escapehtml
+// - sanitizeText() - Sanitizetext
+// - numberToLocale() - Numbertolocale
+
 // ===== ENTITY DETAILS RENDERER CLASS =====
 
 /**

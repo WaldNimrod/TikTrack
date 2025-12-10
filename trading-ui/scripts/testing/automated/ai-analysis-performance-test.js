@@ -14,6 +14,34 @@
  * @created January 31, 2025
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - testManagerInitPerformance() - Testmanagerinitperformance
+
+// === Core Functions ===
+// - runAllPerformanceTests() - Runallperformancetests
+
+// === Event Handlers ===
+// - logSection() - Logsection
+// - testAPIResponsePerformance() - Testapiresponseperformance
+
+// === UI Functions ===
+// - testRenderingPerformance() - Testrenderingperformance
+
+// === Data Functions ===
+// - testPageLoadTime() - Testpageloadtime
+// - testTemplatesLoadPerformance() - Testtemplatesloadperformance
+// - testHistoryLoadPerformance() - Testhistoryloadperformance
+
+// === Other ===
+// - logPerformanceTest() - Logperformancetest
+// - measureTime() - Measuretime
+// - testCachePerformance() - Testcacheperformance
+// - testMemoryUsage() - Testmemoryusage
+// - testNetworkPerformance() - Testnetworkperformance
+
 (function() {
   'use strict';
 

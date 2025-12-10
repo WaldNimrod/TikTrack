@@ -7,6 +7,15 @@
  * @lastUpdated January 27, 2025
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - initializeNotesModal() - Initializenotesmodal
+
+// === Data Functions ===
+// - saveNoteFallback() - Savenotefallback
+
 // קונפיגורציה למודל הערות
 const notesModalConfig = {
     id: 'notesModal',

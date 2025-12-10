@@ -103,14 +103,25 @@ def login(driver, username: str, password: str) -> bool:
         )
         password_field = driver.find_element(By.ID, "password")
         
+        # Scroll to fields and wait
+        driver.execute_script("arguments[0].scrollIntoView(true);", username_field)
+        time.sleep(0.3)
+        
         username_field.clear()
+        time.sleep(0.1)
         username_field.send_keys(username)
+        time.sleep(0.1)
+        
         password_field.clear()
+        time.sleep(0.1)
         password_field.send_keys(password)
+        time.sleep(0.2)
         
         login_button = WebDriverWait(driver, 10).until(
             EC.element_to_be_clickable((By.ID, "loginBtn"))
         )
+        driver.execute_script("arguments[0].scrollIntoView(true);", login_button)
+        time.sleep(0.2)
         driver.execute_script("arguments[0].click();", login_button)
         
         time.sleep(3)

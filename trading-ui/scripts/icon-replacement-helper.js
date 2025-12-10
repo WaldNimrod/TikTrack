@@ -13,6 +13,13 @@
  * Last Updated: 2025-01-12
  */
 
+
+// ===== FUNCTION INDEX =====
+//
+// === Event Handlers ===
+// - replaceIconsInContext() - Replaceiconsincontext
+// - replaceIconsInHTMLString() - Replaceiconsinhtmlstring
+
 /**
  * Replace all <img> tags with icons using IconSystem
  * @param {HTMLElement|Document} context - Element or document to search within

@@ -747,9 +747,7 @@ async function isAuthenticatedSync() {
     if (window.DEBUG_AUTH_MONITOR === true) debugger; // Breakpoint helper
     
     const response = await fetch('/api/auth/me', {
-      method: 'GET',
-      credentials: 'include'
-    });
+      method: 'GET', });
     
     window.AuthDebugMonitor?.log('info', '🔍 isAuthenticatedSync: Server response', {
       status: response.status,
@@ -787,9 +785,7 @@ async function isAuthenticatedSync() {
         await new Promise(resolve => setTimeout(resolve, 1500)); // Wait 1.5 seconds
         
         const retryResponse = await fetch('/api/auth/me', {
-          method: 'GET',
-          credentials: 'include'
-        });
+          method: 'GET', });
         
         if (retryResponse.ok) {
           const retryData = await retryResponse.json();
@@ -1131,15 +1127,11 @@ async function checkAuthentication(onAuthenticated = null, onNotAuthenticated = 
   if (onNotAuthenticated && typeof onNotAuthenticated === 'function') {
     onNotAuthenticated();
   } else {
-    // Redirect to login if not on login/register page
-    if (!window.location.pathname.includes('login.html') && 
-        !window.location.pathname.includes('register.html')) {
-      // Show login modal instead of redirecting
-      if (typeof window.TikTrackAuth?.showLoginModal === 'function') {
-        await window.TikTrackAuth.showLoginModal();
-      } else {
-        window.location.href = '/';
-      }
+    // Show login modal; fallback to homepage
+    if (typeof window.TikTrackAuth?.showLoginModal === 'function') {
+      await window.TikTrackAuth.showLoginModal();
+    } else {
+      window.location.href = '/';
     }
   }
 }
@@ -1276,9 +1268,7 @@ async function showLoginModal(onSuccess = null) {
           window.AuthDebugMonitor?.log('info', `🔍 Session verification attempt ${attempt + 1}/5`);
           
           const verifyResponse = await fetch('/api/auth/me', {
-            method: 'GET',
-            credentials: 'include'
-          });
+            method: 'GET', });
           
           if (verifyResponse.ok) {
             const verifyData = await verifyResponse.json();
@@ -1532,9 +1522,7 @@ async function updateUserProfile(updates) {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
-    },
-    credentials: 'include',
-    body: JSON.stringify(updates),
+    }, body: JSON.stringify(updates),
   });
 
   const data = await response.json();
@@ -1564,9 +1552,7 @@ async function updatePassword(currentPassword, newPassword) {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
-    },
-    credentials: 'include',
-    body: JSON.stringify({
+    }, body: JSON.stringify({
       current_password: currentPassword,
       new_password: newPassword,
     }),
@@ -1704,13 +1690,10 @@ function setupVisibilityCheck() {
           }
           
           // Show login modal or redirect
-          if (!window.location.pathname.includes('login.html') &&
-              !window.location.pathname.includes('register.html')) {
-            if (typeof window.TikTrackAuth?.showLoginModal === 'function') {
-              await window.TikTrackAuth.showLoginModal();
-            } else {
-              window.location.href = '/';
-            }
+          if (typeof window.TikTrackAuth?.showLoginModal === 'function') {
+            await window.TikTrackAuth.showLoginModal();
+          } else {
+            window.location.href = '/';
           }
         } else {
           // Session is valid - update cache with fresh data

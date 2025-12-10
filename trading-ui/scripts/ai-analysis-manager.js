@@ -1292,9 +1292,7 @@
     async getTradePlanReasons() {
       try {
         // Fetch trade plans from API
-        const response = await fetch('/api/trade-plans/', {
-          credentials: 'include'
-        });
+        const response = await fetch('/api/trade-plans/', { });
         
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -1937,9 +1935,7 @@
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-          },
-          credentials: 'include',
-          body: JSON.stringify({
+          }, body: JSON.stringify({
             template_id: this.selectedTemplate.id,
             variables: variables,
             provider: provider,
@@ -2736,9 +2732,7 @@
         container.appendChild(loadingDiv);
         
         try {
-          const response = await fetch(`/api/ai-analysis/history/${analysisResult.id}`, {
-            credentials: 'include',
-          });
+          const response = await fetch(`/api/ai-analysis/history/${analysisResult.id}`, { });
           
           if (response.ok) {
             const data = await response.json();
@@ -3078,9 +3072,7 @@
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
-            },
-            credentials: 'include',
-            body: JSON.stringify({ analysis_ids: analysisIds })
+            }, body: JSON.stringify({ analysis_ids: analysisIds })
           });
 
           if (response.ok) {
@@ -3182,9 +3174,7 @@
         let analysis = this.history.find(h => h.id === analysisId);
         if (!analysis) {
           // Try to load from API
-          const response = await fetch(`/api/ai-analysis/history/${analysisId}`, {
-            credentials: 'include',
-          });
+          const response = await fetch(`/api/ai-analysis/history/${analysisId}`, { });
           if (!response.ok) {
             throw new Error('Analysis not found');
           }
@@ -3361,9 +3351,7 @@
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-          },
-          credentials: 'include',
-          body: JSON.stringify({
+          }, body: JSON.stringify({
             template_id: templateId,
             variables: variables,
             provider: provider
@@ -3668,9 +3656,7 @@
       
       // Check if saved as note via API
       try {
-        const response = await fetch(`/api/ai-analysis/history/${analysisId}/availability`, {
-          credentials: 'include',
-        });
+        const response = await fetch(`/api/ai-analysis/history/${analysisId}/availability`, { });
         if (response.ok) {
           const data = await response.json();
           if (data.status === 'success' && data.data && data.data.has_note) {
@@ -3942,9 +3928,7 @@
           if (!item) {
             window.Logger?.warn('History item not found, loading from API', { page: 'ai-analysis', id: itemId });
             // Try to load from API if not in history
-            const response = await fetch(`/api/ai-analysis/history/${itemId}`, {
-              credentials: 'include',
-            });
+            const response = await fetch(`/api/ai-analysis/history/${itemId}`, { });
             if (response.ok) {
               const data = await response.json();
               if (data.status === 'success' && data.data) {
@@ -3989,9 +3973,7 @@
 
         // If not in item or cache, try to load from API
         if (!analysisResult || !analysisResult.response_text) {
-          const response = await fetch(`/api/ai-analysis/history/${item.id}`, {
-            credentials: 'include',
-          });
+          const response = await fetch(`/api/ai-analysis/history/${item.id}`, { });
 
           if (!response.ok) {
             throw new Error('Failed to load analysis');
@@ -4033,9 +4015,7 @@
           let noteId = null;
           let noteExists = false;
           try {
-            const availabilityResponse = await fetch(`/api/ai-analysis/history/${item.id}/availability`, {
-              credentials: 'include',
-            });
+            const availabilityResponse = await fetch(`/api/ai-analysis/history/${item.id}/availability`, { });
             if (availabilityResponse.ok) {
               const availabilityData = await availabilityResponse.json();
               if (availabilityData.status === 'success' && availabilityData.data) {
@@ -4050,9 +4030,7 @@
           // If note exists, try to load it
           if (noteExists && noteId) {
             try {
-              const noteResponse = await fetch(`/api/notes/${noteId}`, {
-                credentials: 'include',
-              });
+              const noteResponse = await fetch(`/api/notes/${noteId}`, { });
               if (noteResponse.ok) {
                 const noteData = await noteResponse.json();
                 if (noteData.status === 'success' && noteData.data && noteData.data.content) {

@@ -7,6 +7,16 @@
  * @lastUpdated December 6, 2025
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - initializeWatchListModal() - Initializewatchlistmodal
+// - initializeAddTickerModal() - Initializeaddtickermodal
+
+// === Other ===
+// - waitForModalManager() - Waitformodalmanager
+
 // קונפיגורציה למודל רשימת צפייה (Add/Edit)
 const watchListModalConfig = {
     id: 'watchListModal',

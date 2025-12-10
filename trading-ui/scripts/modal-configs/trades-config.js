@@ -10,13 +10,8 @@
 
 // ===== FUNCTION INDEX =====
 
-// === Functions ===
-// - initializeTradesModal() - Initializetradesmodal
-
 // === Initialization ===
-// - initializeTradesModal() - Initializetradesmodal
-// === Functions ===
-// - initializeTradesModal() - Initializetradesmodal
+// - initializeTradesModal() - Initialize trades modal
 
 const tradesModalConfig = window.tradesModalConfig;
 

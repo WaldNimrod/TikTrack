@@ -4,6 +4,28 @@
  * סקריפט לבדיקת צבעי כפתורים ווריאנטים
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - createDiagnosticsSection() - Creatediagnosticssection
+
+// === Event Handlers ===
+// - getDiagnosticsContainer() - Getdiagnosticscontainer
+// - checkButtonColors() - Checkbuttoncolors
+// - fixButtonColors() - Fixbuttoncolors
+
+// === UI Functions ===
+// - renderDiagnostics() - Renderdiagnostics
+// - updateDiagnosticsState() - Updatediagnosticsstate
+
+// === Data Functions ===
+// - loadDiagnosticsState() - Loaddiagnosticsstate
+// - getExpectedColor() - Getexpectedcolor
+
+// === Other ===
+// - persistDiagnosticsState() - Persistdiagnosticsstate
+
 const DESIGNS_DIAGNOSTICS_STORAGE_KEY = 'designs:diagnostics';
 const DESIGNS_PAGE_STATE_KEY = 'designs';
 

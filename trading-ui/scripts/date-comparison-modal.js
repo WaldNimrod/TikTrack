@@ -9,6 +9,66 @@
  * - documentation/frontend/DATE_COMPARISON_MODAL_DEVELOPER_GUIDE.md
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - initBarChart() - Initbarchart
+// - initLineChart() - Initlinechart
+// - initializePage() - Initializepage
+
+// === Event Handlers ===
+// - handleDate1Change() - Handledate1Change
+// - handleDate2Change() - Handledate2Change
+// - handleNewDateInput() - Handlenewdateinput
+// - handleDateInputChange() - Handledateinputchange
+// - updateAddButtonState() - Updateaddbuttonstate
+// - generateComparisonDataForMultipleDates() - Generatecomparisondataformultipledates
+// - generateComparisonData() - Generatecomparisondata
+// - updateComparisonTable() - Updatecomparisontable
+// - formatPLChange() - Formatplchange
+// - formatNumberChange() - Formatnumberchange
+// - toggleDateComparisonRangeFilterMenu() - Toggledatecomparisonrangefiltermenu
+// - selectDateComparisonRangeOption() - Selectdatecomparisonrangeoption
+// - getDateRangeFromOption() - Getdaterangefromoption
+// - updateDateComparisonRangeFilterText() - Updatedatecomparisonrangefiltertext
+// - exportComparison() - Exportcomparison
+
+// === UI Functions ===
+// - updateSelectedDates() - Updateselecteddates
+// - renderDateInputs() - Renderdateinputs
+// - updateTableHeaders() - Updatetableheaders
+// - updateBarChart() - Updatebarchart
+// - updateLineChart() - Updatelinechart
+// - updateAlerts() - Updatealerts
+// - updateSummary() - Updatesummary
+
+// === Data Functions ===
+// - getCSSVariableValue() - Getcssvariablevalue
+// - saveSelectedDates() - Saveselecteddates
+// - loadLastSelectedDates() - Loadlastselecteddates
+// - generateDateData() - Generatedatedata
+// - generateBarChartData() - Generatebarchartdata
+// - generateLineChartData() - Generatelinechartdata
+// - savePageState() - Savepagestate
+
+// === Utility Functions ===
+// - formatDate() - Formatdate
+// - validateDates() - Validatedates
+// - formatCurrency() - Formatcurrency
+// - formatDateForInput() - Formatdateforinput
+
+// === Other ===
+// - sortDates() - Sortdates
+// - addDateFromInput() - Adddatefrominput
+// - addDateInput() - Adddateinput
+// - removeDateInput() - Removedateinput
+// - compareDates() - Comparedates
+// - seededRandom() - Seededrandom
+// - waitForTradingViewAdapter() - Waitfortradingviewadapter
+// - calculateAlerts() - Calculatealerts
+// - restorePageState() - Restorepagestate
+
 (function() {
     'use strict';
 

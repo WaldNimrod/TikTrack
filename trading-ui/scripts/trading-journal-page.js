@@ -6,6 +6,59 @@
  * Documentation: See documentation/frontend/JAVASCRIPT_ARCHITECTURE.md
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - initializeHeader() - Initializeheader
+// - createAddEntryDropdown() - Createaddentrydropdown
+// - initializePage() - Initializepage
+// - initializeMonthYearSelectors() - Initializemonthyearselectors
+// - setupActivityChartLazyLoading() - Setupactivitychartlazyloading
+
+// === Event Handlers ===
+// - replaceIconsWithIconSystem() - Replaceiconswithiconsystem
+// - renderMenuIcons() - Rendermenuicons
+// - handleAddEntry() - Handleaddentry
+// - updateMonthDisplay() - Updatemonthdisplay
+// - setMonthYear() - Setmonthyear
+// - navigateMonth() - Navigatemonth
+// - generateEntityTypeFilterButtons() - Generateentitytypefilterbuttons
+// - handleEntryClickById() - Handleentryclickbyid
+// - handleEntryClick() - Handleentryclick
+// - handleDoubleClickEntry() - Handledoubleclickentry
+// - prevMonth() - Prevmonth
+// - nextMonth() - Nextmonth
+// - handleActivityChartToggle() - Handleactivitycharttoggle
+// - convertDateToChartTime() - Convertdatetocharttime
+
+// === UI Functions ===
+// - loadAndRenderCalendar() - Loadandrendercalendar
+// - renderJournalEntriesTable() - Renderjournalentriestable
+// - renderJournalEntriesCards() - Renderjournalentriescards
+// - loadAndRenderJournalEntries() - Loadandrenderjournalentries
+// - updateJournalEntriesTableBody() - Updatejournalentriestablebody
+// - renderJournalEntriesTableForModal() - Renderjournalentriestableformodal
+// - renderJournalEntriesCardsForModal() - Renderjournalentriescardsformodal
+// - loadAndRenderActivityChart() - Loadandrenderactivitychart
+// - showDropdown() - Showdropdown
+// - hideDropdown() - Hidedropdown
+
+// === Data Functions ===
+// - getCSSVariableValue() - Getcssvariablevalue
+// - loadPageState() - Loadpagestate
+// - savePageState() - Savepagestate
+// - loadTickerFilter() - Loadtickerfilter
+
+// === Other ===
+// - applyDynamicColors() - Applydynamiccolors
+// - navigateToToday() - Navigatetotoday
+// - filterJournalByEntityType() - Filterjournalbyentitytype
+// - filterJournalByTicker() - Filterjournalbyticker
+// - switchViewMode() - Switchviewmode
+// - zoomToDay() - Zoomtoday
+// - waitForElements() - Waitforelements
+
 (function() {
     'use strict';
 
@@ -15,6 +68,44 @@
 
     // Page name for state management
     const PAGE_NAME = 'trading-journal-page';
+
+    /**
+     * Helpers for date normalization using global date utilities
+     */
+    function getEntryDateEnvelope(entry) {
+        if (!entry) return null;
+        const candidates = [
+            entry.date,
+            entry.created_at,
+            entry.execution_date,
+            entry.updated_at,
+            entry.closed_at,
+            entry.entry_date
+        ];
+        const raw = candidates.find(v => v);
+        if (window.dateUtils?.ensureDateEnvelope) {
+            return window.dateUtils.ensureDateEnvelope(raw);
+        }
+        return raw || null;
+    }
+
+    function entryToDate(entry) {
+        const envelope = getEntryDateEnvelope(entry);
+        if (!envelope) return null;
+
+        if (window.dateUtils?.toDate) {
+            const d = window.dateUtils.toDate(envelope);
+            if (d && !isNaN(d.getTime())) return d;
+        }
+
+        if (envelope && typeof envelope === 'object' && (envelope.utc || envelope.local)) {
+            const d = new Date(envelope.utc || envelope.local);
+            if (!isNaN(d.getTime())) return d;
+        }
+
+        const d = new Date(envelope);
+        return isNaN(d.getTime()) ? null : d;
+    }
 
     /**
      * Initialize Header System
@@ -678,6 +769,54 @@
     }
 
     /**
+     * Initialize month/year selectors for quick navigation
+     */
+    function initializeMonthYearSelectors() {
+        const monthSelect = document.getElementById('monthSelect');
+        const yearSelect = document.getElementById('yearSelect');
+        if (!monthSelect || !yearSelect) return;
+        
+        // Populate months (0-11)
+        if (!monthSelect.hasChildNodes()) {
+            const monthNames = Array.from({ length: 12 }, (_, i) =>
+                new Date(2000, i, 1).toLocaleString('he-IL', { month: 'long' })
+            );
+            monthNames.forEach((name, idx) => {
+                const opt = document.createElement('option');
+                opt.value = String(idx);
+                opt.textContent = name;
+                monthSelect.appendChild(opt);
+            });
+        }
+        
+        // Populate years (range: currentYear-5 .. currentYear+5)
+        if (!yearSelect.hasChildNodes()) {
+            const minYear = currentYear - 5;
+            const maxYear = currentYear + 5;
+            for (let y = maxYear; y >= minYear; y--) {
+                const opt = document.createElement('option');
+                opt.value = String(y);
+                opt.textContent = String(y);
+                yearSelect.appendChild(opt);
+            }
+        }
+        
+        // Set current values
+        monthSelect.value = String(currentMonth);
+        yearSelect.value = String(currentYear);
+        
+        // Attach change handlers
+        monthSelect.onchange = async (e) => {
+            const newMonth = parseInt(e.target.value, 10);
+            await setMonthYear(currentYear, newMonth);
+        };
+        yearSelect.onchange = async (e) => {
+            const newYear = parseInt(e.target.value, 10);
+            await setMonthYear(newYear, currentMonth);
+        };
+    }
+
+    /**
      * Set month and year, then reload calendar and entries
      */
     async function setMonthYear(year, month) {
@@ -1014,14 +1153,17 @@
             const accountName = entry.account_name || '';
             const description = entry.description || entry.summary || entry.content || entry.message || '';
             
-            // Format date
-            const dateDisplay = date ? new Date(date).toLocaleDateString('he-IL', {
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-            }) : '';
+            // Format date (prefer envelope + FieldRenderer)
+            const dateEnvelope = getEntryDateEnvelope(entry) || date;
+            const dateDisplay = FieldRenderer ? 
+                FieldRenderer.renderDate(dateEnvelope, true) : 
+                (date ? new Date(date).toLocaleDateString('he-IL', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                }) : '');
             
             // Get entity label
             const entityLabel = {
@@ -1273,9 +1415,15 @@
             });
             
             const entries = result?.entries || [];
+
+            // Hard guard: ensure we only keep entries within the currently displayed month
+            const entriesForMonth = entries.filter(entry => {
+                const d = entryToDate(entry);
+                return d && d.getFullYear() === currentYear && d.getMonth() === currentMonth;
+            });
             
             // Store entries globally for view switching
-            window.tradingJournalEntries = entries;
+            window.tradingJournalEntries = entriesForMonth;
             
             // Render based on current view mode (default: cards)
             const currentViewMode = window.tradingJournalViewMode || 'cards';
@@ -1401,9 +1549,10 @@
             const accountName = entry.account_name || '';
             const description = entry.description || entry.summary || '';
             
-            // Render date using FieldRendererService
-            const dateCell = date && FieldRenderer ? 
-                FieldRenderer.renderDate(date, { format: 'datetime' }) : 
+            // Render date using FieldRendererService with envelope normalization
+            const dateEnvelope = getEntryDateEnvelope(entry) || date;
+            const dateCell = FieldRenderer ? 
+                FieldRenderer.renderDate(dateEnvelope, true) : 
                 (date ? new Date(date).toLocaleString('he-IL') : '');
             
             // Render entity type using FieldRendererService
@@ -1563,25 +1712,47 @@
         const endDate = new Date(year, month, day);
         endDate.setHours(23, 59, 59, 999);
         
-        const startDateStr = startDate.toISOString().split('T')[0];
-        const endDateStr = endDate.toISOString().split('T')[0];
+            // Full ISO to preserve time range (avoid truncating to 00:00)
+            const startDateStr = startDate.toISOString();
+            const endDateStr = endDate.toISOString();
         
         try {
-            // Load entries for this day
             const entityFilter = window.currentEntityFilter || 'all';
             const tickerFilter = window.currentTickerFilter || null;
             
-            const result = await window.TradingJournalData.loadEntries({
-                start_date: startDateStr,
-                end_date: endDateStr
-            }, {
-                entity_type: entityFilter === 'all' ? 'all' : entityFilter,
-                ticker_symbol: tickerFilter
-            }, {
-                force: false
+            // Try to reuse already-loaded month data to keep parity across views
+            const fromCache = Array.isArray(window.tradingJournalEntries) ? window.tradingJournalEntries : [];
+            const entriesFromCache = fromCache.filter(entry => {
+                const d = window.CalendarDateUtils?.parseDate(entry.date || entry.created_at) || new Date(entry.date || entry.created_at);
+                if (!d || isNaN(d.getTime())) return false;
+                const sameDay = d.getFullYear() === year && d.getMonth() === month && d.getDate() === day;
+                const matchEntity = (entityFilter === 'all') || (entry.entity_type === entityFilter);
+                const matchTicker = !tickerFilter || (entry.ticker_symbol === tickerFilter);
+                return sameDay && matchEntity && matchTicker;
             });
             
-            const entries = result?.entries || [];
+            let entries = entriesFromCache;
+            
+            // Fallback: fetch for the day if cache empty (keeps filters)
+            if (!entries || entries.length === 0) {
+                const result = await window.TradingJournalData.loadEntries({
+                    start_date: startDateStr,
+                    end_date: endDateStr
+                }, {
+                    entity_type: entityFilter === 'all' ? 'all' : entityFilter,
+                    ticker_symbol: tickerFilter
+                }, {
+                    force: false
+                });
+                
+                // Keep only entries that truly fall inside this day (timezone-safe)
+                const dayStart = new Date(startDate);
+                const dayEnd = new Date(endDate);
+                entries = (result?.entries || []).filter(entry => {
+                    const d = window.CalendarDateUtils?.parseDate(entry.date || entry.created_at) || new Date(entry.date || entry.created_at);
+                    return d && !isNaN(d.getTime()) && d >= dayStart && d <= dayEnd;
+                });
+            }
             
             if (entries.length === 0) {
                 if (window.NotificationSystem) {
@@ -1680,7 +1851,7 @@
     }
     
     /**
-     * Render journal entries as table for modal view
+     * Render journal entries as table for modal view (summary + pagination)
      */
     async function renderJournalEntriesTableForModal(entries, container) {
         if (!Array.isArray(entries) || entries.length === 0) {
@@ -1695,94 +1866,174 @@
         }
         
         const FieldRenderer = window.FieldRendererService;
+        const pageSize = 10;
+        const typeLabels = {
+            execution: 'ביצועים',
+            trade: 'טריידים',
+            trade_plan: 'תוכניות',
+            note: 'הערות',
+            alert: 'התראות',
+            cash_flow: 'תזרימי מזומנים',
+            other: 'אחר'
+        };
+        const typeIcons = {
+            execution: 'activity',
+            trade: 'trades',
+            trade_plan: 'clipboard-list',
+            note: 'note',
+            alert: 'bell',
+            cash_flow: 'cash',
+            other: 'list'
+        };
         
-        // Create table HTML
-        const tableHTML = `
-            <table class="table table-striped table-hover">
-                <thead>
-                    <tr>
-                        <th>תאריך</th>
-                        <th>סוג</th>
-                        <th>סטטוס</th>
-                        <th>טיקר</th>
-                        <th>חשבון</th>
-                        <th>תיאור</th>
-                        <th>פעולות</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${entries.map(entry => {
-                        const date = entry.date || entry.created_at || '';
-                        const entityType = entry.entity_type || 'unknown';
-                        const status = entry.status || '';
-                        const tickerSymbol = entry.ticker_symbol || '';
-                        const accountName = entry.account_name || '';
-                        const description = entry.description || entry.summary || entry.content || entry.message || '';
-                        
-                        // Format date
-                        const dateDisplay = date ? new Date(date).toLocaleDateString('he-IL', {
-                            day: '2-digit',
-                            month: '2-digit',
-                            year: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit'
-                        }) : '';
-                        
+        const counts = entries.reduce((acc, entry) => {
+            const t = entry.entity_type || 'other';
+            acc[t] = (acc[t] || 0) + 1;
+            acc.total = (acc.total || 0) + 1;
+            return acc;
+        }, {});
+        
+        const totalPages = Math.max(1, Math.ceil(entries.length / pageSize));
+        let currentPage = 1;
+        
+        const renderPage = async (page) => {
+            currentPage = Math.min(Math.max(page, 1), totalPages);
+            const start = (currentPage - 1) * pageSize;
+            const pageEntries = entries.slice(start, start + pageSize);
+            
+            const summaryHTML = `
+                <div class="d-flex flex-wrap gap-2 mb-3">
+                    ${['execution','trade','trade_plan','note','alert','cash_flow','other'].map(type => {
+                        const count = counts[type] || 0;
+                        if (count === 0) return '';
+                        const icon = typeIcons[type] || 'list';
+                        const label = typeLabels[type] || type;
                         return `
-                            <tr data-entry-type="${entityType}" data-entity-id="${entry.entity_id}">
-                                <td>${dateDisplay}</td>
-                                <td>${FieldRenderer ? FieldRenderer.renderLinkedEntity(entityType, null, { short: true }) : entityType}</td>
-                                <td>${FieldRenderer && status ? FieldRenderer.renderStatus(status, entityType) : status || '-'}</td>
-                                <td>${tickerSymbol || '-'}</td>
-                                <td>${accountName || '-'}</td>
-                                <td>${description || '-'}</td>
-                                <td>
-                                    <button 
-                                        data-button-type="VIEW" 
-                                        data-variant="small" 
-                                        data-icon="/trading-ui/images/icons/tabler/eye.svg" 
-                                        data-entity-type="${entityType}"
-                                        data-entity-id="${entry.entity_id}"
-                                        data-onclick="if (window.tradingJournalPage && window.tradingJournalPage.handleEntryClickById) { window.tradingJournalPage.handleEntryClickById('${entityType}', ${entry.entity_id}); }" 
-                                        title="צפה בפרטים">
-                                    </button>
-                                </td>
-                            </tr>
+                            <span class="badge bg-light text-dark d-flex align-items-center gap-1" data-type="${type}">
+                                <span class="icon-placeholder icon" data-icon="${icon}" data-size="14"></span>
+                                ${label}: ${count}
+                            </span>
                         `;
                     }).join('')}
-                </tbody>
-            </table>
-        `;
-        
-        container.innerHTML = tableHTML;
-        
-        // Replace icons after rendering
-        await replaceIconsWithIconSystem();
-        
-        // Process buttons with ButtonSystem - wait a bit for DOM to settle
-        setTimeout(() => {
-            if (window.advancedButtonSystem && typeof window.advancedButtonSystem.processButtonElement === 'function') {
-                const buttons = container.querySelectorAll('button[data-button-type]');
-                buttons.forEach((btn, index) => {
-                    if (!btn.hasAttribute('data-button-processed')) {
-                        try {
-                            window.advancedButtonSystem.processButtonElement(btn, index);
-                        } catch (error) {
-                            if (window.Logger) {
-                                window.Logger.warn('Error processing button in modal', { 
-                                    page: PAGE_NAME, 
-                                    error: error?.message || error 
-                                });
+                    <span class="badge bg-primary text-light">סה\"כ: ${counts.total || entries.length}</span>
+                </div>
+            `;
+            
+            const tableHTML = `
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>תאריך</th>
+                            <th>סוג</th>
+                            <th>סטטוס</th>
+                            <th>טיקר</th>
+                            <th>חשבון</th>
+                            <th>תיאור</th>
+                            <th>פעולות</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${pageEntries.map(entry => {
+                        const date = entry.date || entry.created_at || '';
+                            const entityType = entry.entity_type || 'unknown';
+                            const status = entry.status || '';
+                            const tickerSymbol = entry.ticker_symbol || '';
+                            const accountName = entry.account_name || '';
+                            const description = entry.description || entry.summary || entry.content || entry.message || '';
+                            
+                        // Format date
+                        const dateEnvelope = getEntryDateEnvelope(entry) || date;
+                        const dateDisplay = FieldRenderer ? 
+                            FieldRenderer.renderDate(dateEnvelope, true) : 
+                            (date ? new Date(date).toLocaleDateString('he-IL', {
+                                day: '2-digit',
+                                month: '2-digit',
+                                year: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                            }) : '');
+                            
+                            return `
+                                <tr data-entry-type="${entityType}" data-entity-id="${entry.entity_id}">
+                                    <td>${dateDisplay}</td>
+                                    <td>${FieldRenderer ? FieldRenderer.renderLinkedEntity(entityType, null, { short: true }) : entityType}</td>
+                                    <td>${FieldRenderer && status ? FieldRenderer.renderStatus(status, entityType) : status || '-'}</td>
+                                    <td>${tickerSymbol || '-'}</td>
+                                    <td>${accountName || '-'}</td>
+                                    <td>${description || '-'}</td>
+                                    <td>
+                                        <button 
+                                            data-button-type="VIEW" 
+                                            data-variant="small" 
+                                            data-icon="/trading-ui/images/icons/tabler/eye.svg" 
+                                            data-entity-type="${entityType}"
+                                            data-entity-id="${entry.entity_id}"
+                                            data-onclick="if (window.tradingJournalPage && window.tradingJournalPage.handleEntryClickById) { window.tradingJournalPage.handleEntryClickById('${entityType}', ${entry.entity_id}); }" 
+                                            title="צפה בפרטים">
+                                        </button>
+                                    </td>
+                                </tr>
+                            `;
+                        }).join('')}
+                    </tbody>
+                </table>
+                <div class="d-flex justify-content-between align-items-center mt-2">
+                    <div class="small text-muted">דף ${currentPage} מתוך ${totalPages}</div>
+                    <div class="d-flex align-items-center gap-2">
+                        <button data-button-type="NAV" data-variant="small" data-icon="chevron-right" data-text="הקודם" ${currentPage === 1 ? 'disabled' : ''} data-action="prev-page"></button>
+                        <button data-button-type="NAV" data-variant="small" data-icon="chevron-left" data-text="הבא" ${currentPage === totalPages ? 'disabled' : ''} data-action="next-page"></button>
+                    </div>
+                </div>
+            `;
+            
+            container.innerHTML = `${summaryHTML}${tableHTML}`;
+            
+            // Replace icons after rendering
+            await replaceIconsWithIconSystem();
+            
+            // Process buttons with ButtonSystem - wait a bit for DOM to settle
+            setTimeout(() => {
+                if (window.advancedButtonSystem && typeof window.advancedButtonSystem.processButtonElement === 'function') {
+                    const buttons = container.querySelectorAll('button[data-button-type]');
+                    buttons.forEach((btn, index) => {
+                        if (!btn.hasAttribute('data-button-processed')) {
+                            try {
+                                window.advancedButtonSystem.processButtonElement(btn, index);
+                            } catch (error) {
+                                if (window.Logger) {
+                                    window.Logger.warn('Error processing button in modal', { 
+                                        page: PAGE_NAME, 
+                                        error: error?.message || error 
+                                    });
+                                }
                             }
                         }
-                    }
+                    });
+                } else if (window.advancedButtonSystem && typeof window.advancedButtonSystem.processButtons === 'function') {
+                    window.advancedButtonSystem.processButtons(container);
+                } else if (window.ButtonSystem && typeof window.ButtonSystem.initializeButtons === 'function') {
+                    window.ButtonSystem.initializeButtons();
+                }
+            }, 50);
+            
+            // Pagination handlers
+            const prevBtn = container.querySelector('button[data-action="prev-page"]');
+            const nextBtn = container.querySelector('button[data-action="next-page"]');
+            if (prevBtn) {
+                prevBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    renderPage(currentPage - 1);
                 });
-            } else if (window.advancedButtonSystem && typeof window.advancedButtonSystem.processButtons === 'function') {
-                window.advancedButtonSystem.processButtons(container);
-            } else if (window.ButtonSystem && typeof window.ButtonSystem.initializeButtons === 'function') {
-                window.ButtonSystem.initializeButtons();
             }
-        }, 100);
+            if (nextBtn) {
+                nextBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    renderPage(currentPage + 1);
+                });
+            }
+        };
+        
+        await renderPage(1);
     }
     
     /**

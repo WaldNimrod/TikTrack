@@ -12,6 +12,21 @@
  * - Positioning context analysis
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - init() - Init
+// - createDebugOverlay() - Createdebugoverlay
+
+// === UI Functions ===
+// - displayResults() - Displayresults
+
+// === Other ===
+// - inspectElement() - Inspectelement
+// - inspectOverlay() - Inspectoverlay
+// - inspectAllActiveOverlays() - Inspectallactiveoverlays
+
 ;(function() {
   'use strict';
 

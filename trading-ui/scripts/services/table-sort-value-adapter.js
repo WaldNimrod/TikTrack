@@ -20,6 +20,12 @@
  * @author TikTrack
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Other ===
+// - TableSortValueAdapter.switch() - Switch
+
 class TableSortValueAdapter {
     /**
      * Resolve a sortable key for the given value.

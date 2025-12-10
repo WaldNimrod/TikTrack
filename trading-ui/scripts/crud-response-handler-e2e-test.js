@@ -14,6 +14,23 @@
  * @created 2025-11-25
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Core Functions ===
+// - runAllTests() - Runalltests
+
+// === Event Handlers ===
+// - testCRUDResponseHandlerAvailability() - Testcrudresponsehandleravailability
+// - testSystemIntegration() - Testsystemintegration
+
+// === Other ===
+// - testGlobalShortcuts() - Testglobalshortcuts
+// - testEntityCRUD() - Testentitycrud
+// - testAllEntities() - Testallentities
+// - testFallback() - Testfallback
+// - printSummary() - Printsummary
+
 (function CRUDResponseHandlerE2ETest() {
     'use strict';
 

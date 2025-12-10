@@ -3,6 +3,54 @@
  * Builds the designs page dynamically from the unified button & color systems.
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - buildLegacyHtml() - Buildlegacyhtml
+// - buildModernHtml() - Buildmodernhtml
+// - buildJsSnippet() - Buildjssnippet
+// - buildVariantData() - Buildvariantdata
+// - createVariantButton() - Createvariantbutton
+// - createColorPreview() - Createcolorpreview
+// - createCodeCell() - Createcodecell
+// - createButtonRow() - Createbuttonrow
+// - initializeButtonFilters() - Initializebuttonfilters
+// - createColorDetailsList() - Createcolordetailslist
+// - createColorTableRow() - Createcolortablerow
+// - initializeColorFilters() - Initializecolorfilters
+// - initializeDesignsPage() - Initializedesignspage
+
+// === Event Handlers ===
+// - resolveButtonText() - Resolvebuttontext
+// - resolveButtonIcon() - Resolvebuttonicon
+// - getFilteredButtons() - Getfilteredbuttons
+// - renderButtonTable() - Renderbuttontable
+// - filterButtons() - Filterbuttons
+// - updateFilterSelection() - Updatefilterselection
+// - getActionColorRows() - Getactioncolorrows
+// - loadButtonTable() - Loadbuttontable
+
+// === UI Functions ===
+// - updateStats() - Updatestats
+// - renderColorTables() - Rendercolortables
+
+// === Data Functions ===
+// - getCssVariableValue() - Getcssvariablevalue
+// - getEntityVariantSet() - Getentityvariantset
+// - getBrandColorRows() - Getbrandcolorrows
+// - getEntityColorRows() - Getentitycolorrows
+// - getStatusColorRows() - Getstatuscolorrows
+// - getInvestmentColorRows() - Getinvestmentcolorrows
+// - getNumericColorRows() - Getnumericcolorrows
+// - getColorRowsByGroup() - Getcolorrowsbygroup
+// - loadFiltersState() - Loadfiltersstate
+
+// === Other ===
+// - escapeAttributeValue() - Escapeattributevalue
+// - resolveColorVariable() - Resolvecolorvariable
+// - persistFiltersState() - Persistfiltersstate
+
 const BUTTON_COLOR_VARIABLES = {
     EDIT: '--color-action-edit',
     DELETE: '--color-action-delete',

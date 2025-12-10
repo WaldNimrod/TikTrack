@@ -16,6 +16,49 @@
  * Date: November 2025
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - setupSectionOpenListeners() - Setupsectionopenlisteners
+// - setupStatisticsFilterHook() - Setupstatisticsfilterhook
+
+// === Event Handlers ===
+// - handleAccountSelection() - Handleaccountselection
+// - syncAccountActivityPagination() - Syncaccountactivitypagination
+// - splitExecutionsByAction() - Splitexecutionsbyaction
+
+// === UI Functions ===
+// - renderMovementRow() - Rendermovementrow
+// - renderAccountActivityRows() - Renderaccountactivityrows
+// - updateActivitySummary() - Updateactivitysummary
+// - updateCurrencyBalancesFooter() - Updatecurrencybalancesfooter
+// - showErrorInTable() - Showerrorintable
+// - getSubtypeDisplay() - Getsubtypedisplay
+// - updateActivityStatistics() - Updateactivitystatistics
+// - renderStatisticsColumn() - Renderstatisticscolumn
+// - renderStatisticsSummaryColumn1() - Renderstatisticssummarycolumn1
+// - renderStatisticsSummaryColumn2() - Renderstatisticssummarycolumn2
+// - renderBreakdownBySubtype() - Renderbreakdownbysubtype
+
+// === Data Functions ===
+// - loadAccountActivity() - Loadaccountactivity
+
+// === Utility Functions ===
+// - formatDate() - Formatdate
+// - formatAmount() - Formatamount
+
+// === Other ===
+// - populateAccountSelector() - Populateaccountselector
+// - populateAccountActivityTable() - Populateaccountactivitytable
+// - openMovementDetails() - Openmovementdetails
+// - clearActivityTable() - Clearactivitytable
+// - normalizeAmountBySubtype() - Normalizeamountbysubtype
+// - calculateActivityStatistics() - Calculateactivitystatistics
+// - combineStatistics() - Combinestatistics
+// - splitCashFlowsByColumn() - Splitcashflowsbycolumn
+// - calculateStatsForType() - Calculatestatsfortype
+
 /* ===== ACCOUNT ACTIVITY SYSTEM ===== */
 window.Logger.info('📁 account-activity.js נטען', { page: 'trading_accounts' });
 

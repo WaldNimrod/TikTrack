@@ -5,6 +5,12 @@
  * Defines ModalManagerV2 configurations for managing tag categories and tags.
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - initializeTagManagementModals() - Initializetagmanagementmodals
+
 const tagCategoryModalConfig = {
     id: 'tagCategoryModal',
     entityType: 'tag_category',

@@ -22,6 +22,21 @@
  * @lastUpdated November 23, 2025
  */
 
+
+// ===== FUNCTION INDEX =====
+// === Class Methods ===
+// - MenuManager.closeMenu() - Closemenu
+// - MenuManager.init() - Init
+// - MenuManager.openMenu() - Openmenu
+// - MenuManager.setupHoverBehavior() - Setuphoverbehavior
+
+// === Event Handlers ===
+// - positionSubmenu() - Positionsubmenu
+// - debouncedPositionSubmenu() - Debouncedpositionsubmenu
+
+// === Other ===
+// - clearTimeouts() - Cleartimeouts
+
 if (window.Logger) {
   window.Logger.info('🚀 Loading Header System v7.0.0...', { page: 'header-system' });
 }

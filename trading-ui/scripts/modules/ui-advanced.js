@@ -16,6 +16,78 @@
  * @since 2025-01-09
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - createEntityLegend() - Createentitylegend
+// - createInvestmentTypeLegend() - Createinvestmenttypelegend
+
+// === Event Handlers ===
+// - getContrastColor() - Getcontrastcolor
+
+// === UI Functions ===
+// - updateEntityColor() - Updateentitycolor
+// - updateEntityColorFromHex() - Updateentitycolorfromhex
+// - updateCSSVariablesFromPreferences() - Updatecssvariablesfrompreferences
+// - updateEntityColors() - Updateentitycolors
+
+// === Data Functions ===
+// - loadAllColorsFromPreferences() - Loadallcolorsfrompreferences
+// - getEntityColor() - Getentitycolor
+// - getStatusColor() - Getstatuscolor
+// - getStatusBackgroundColor() - Getstatusbackgroundcolor
+// - getStatusTextColor() - Getstatustextcolor
+// - getStatusBorderColor() - Getstatusbordercolor
+// - _getOriginalGetEntityBackgroundColor() -  Getoriginalgetentitybackgroundcolor
+// - getEntityBackgroundColor() - Getentitybackgroundcolor
+// - getEntityTextColor() - Getentitytextcolor
+// - getEntityBorderColor() - Getentitybordercolor
+// - getEntityLabel() - Getentitylabel
+// - getInvestmentTypeColor() - Getinvestmenttypecolor
+// - getInvestmentTypeBackgroundColorWrapper3() - Getinvestmenttypebackgroundcolorwrapper3
+// - getInvestmentTypeTextColor() - Getinvestmenttypetextcolor
+// - getInvestmentTypeBorderColor() - Getinvestmenttypebordercolor
+// - getInvestmentTypeEntityType() - Getinvestmenttypeentitytype
+// - getNumericValueColor() - Getnumericvaluecolor
+// - getNumericValueBackgroundColor() - Getnumericvaluebackgroundcolor
+// - getNumericValueTextColor() - Getnumericvaluetextcolor
+// - getNumericValueBorderColor() - Getnumericvaluebordercolor
+// - getValueType() - Getvaluetype
+// - getNumericValueCSSClass() - Getnumericvaluecssclass
+// - getTableColors() - Gettablecolors
+// - getTableColorsWithFallbacks() - Gettablecolorswithfallbacks
+// - getColorPreferences() - Getcolorpreferences
+// - loadColorPreferences() - Loadcolorpreferences
+// - loadColorScheme() - Loadcolorscheme
+// - saveColorScheme() - Savecolorscheme
+// - getCurrentColorScheme() - Getcurrentcolorscheme
+// - getAvailableColorSchemes() - Getavailablecolorschemes
+// - loadDynamicColors() - Loaddynamiccolors
+// - loadPromise() - Loadpromise
+// - getEntityColorFromPrefs() - Getentitycolorfromprefs
+
+// === Other ===
+// - generateAndApplyStatusCSS() - Generateandapplystatuscss
+// - hexToRgb() - Hextorgb
+// - isValidEntityType() - Isvalidentitytype
+// - generateEntityCSS() - Generateentitycss
+// - generateStatusCSS() - Generatestatuscss
+// - generateInvestmentTypeCSS() - Generateinvestmenttypecss
+// - darkenColor() - Darkencolor
+// - isPositiveValue() - Ispositivevalue
+// - isNegativeValue() - Isnegativevalue
+// - isZeroValue() - Iszerovalue
+// - generateNumericValueCSS() - Generatenumericvaluecss
+// - resetEntityColors() - Resetentitycolors
+// - applyColorScheme() - Applycolorscheme
+// - toggleColorScheme() - Togglecolorscheme
+// - applyLightScheme() - Applylightscheme
+// - applyDarkScheme() - Applydarkscheme
+// - applyCustomScheme() - Applycustomscheme
+// - toHex() - Tohex
+// - ensureVar() - Ensurevar
+
 // ===== ENTITY TYPE DEFINITIONS =====
 // הגדרות סוגי ישויות במערכת
 
@@ -36,6 +108,15 @@ let _originalGetStatusBorderColor = null;
     return;
   }
   window.__UI_ADVANCED_INITIALIZED__ = true;
+
+  // Skip heavy init on dynamic-colors-display page to avoid recursion issues
+  try {
+    const path = window.location?.pathname || '';
+    if (path.includes('dynamic-colors-display')) {
+      window.Logger?.warn?.('ui-advanced: skipped init on dynamic-colors-display');
+      return;
+    }
+  } catch (_) { /* noop */ }
 
   if (typeof window.getStatusColor === 'function') {
     const fnStr = window.getStatusColor.toString();

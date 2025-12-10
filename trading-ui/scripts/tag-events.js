@@ -13,6 +13,15 @@
  * - tag-manager:entity-tags-updated
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Event Handlers ===
+// - on() - On
+
+// === Other ===
+// - emit() - Emit
+
 (function tagEventsFactory() {
     const EVENT_PREFIX = 'tag-manager';
 

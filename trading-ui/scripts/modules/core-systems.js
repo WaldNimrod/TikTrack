@@ -1086,11 +1086,7 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
         // Header System - has localStorage fallback, doesn't need cache
         // Skip header for auth pages (login, register, etc.)
         (async () => {
-          const isAuthPage = config.pageType === 'auth' || 
-                            config.name === 'Login' || 
-                            config.name === 'Register' ||
-                            window.location.pathname.includes('login.html') ||
-                            window.location.pathname.includes('register.html');
+          const isAuthPage = false;
           
           if (isAuthPage) {
             if (window.Logger?.debug) {

@@ -34,6 +34,53 @@
  * Documentation: See documentation/03-DEVELOPMENT/GUIDES/UNIFIED_PENDING_ACTIONS_WIDGET_DEVELOPER_GUIDE.md
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - setupOverlayForList() - Setupoverlayforlist
+
+// === Event Handlers ===
+// - getCombinationKey() - Getcombinationkey
+// - getDataForCombination() - Getdataforcombination
+// - loadCombinationData() - Loadcombinationdata
+// - renderCombination() - Rendercombination
+// - setActiveAction() - Setactiveaction
+// - bindEvents() - Bindevents
+// - handleApproveAction() - Handleapproveaction
+// - handleRejectAction() - Handlerejectaction
+
+// === UI Functions ===
+// - renderListItem() - Renderlistitem
+// - updateEntityTabsVisibility() - Updateentitytabsvisibility
+// - updateActivePane() - Updateactivepane
+// - showError() - Showerror
+// - hideError() - Hideerror
+// - showEmptyState() - Showemptystate
+// - hideEmptyState() - Hideemptystate
+// - showList() - Showlist
+// - hideList() - Hidelist
+// - updateCount() - Updatecount
+// - hideAllTabs() - Hidealltabs
+// - showAllTabs() - Showalltabs
+// - showGeneralMessage() - Showgeneralmessage
+// - hideGeneralMessage() - Hidegeneralmessage
+// - showEmptyMessage() - Showemptymessage
+
+// === Data Functions ===
+// - hasData() - Hasdata
+// - setLoading() - Setloading
+
+// === Utility Functions ===
+// - checkTabsVisibility() - Checktabsvisibility
+
+// === API Functions ===
+// - waitForRequiredServices() - Waitforrequiredservices
+
+// === Other ===
+// - cacheElements() - Cacheelements
+// - setActiveEntity() - Setactiveentity
+
 ;(function () {
   'use strict';
 
@@ -181,7 +228,7 @@
         const assignments = await window.TradePlanAssignmentService.getCachedAssignments();
         if (!assignments || assignments.length === 0) return [];
         const dismissedItems = await window.TradePlanAssignmentService.getDismissedItems();
-        return assignments
+        const result = assignments
           .filter(item => {
             const tradeId = item.trade?.id || item.trade_id;
             const planId = item?.primary_suggestion?.plan?.id || item?.primary_suggestion?.trade_plan_id;
@@ -198,7 +245,7 @@
         const creations = await window.TradePlanAssignmentService.getCachedCreations();
         if (!creations || creations.length === 0) return [];
         const dismissedItems = await window.TradePlanAssignmentService.getDismissedItems();
-        return creations
+        const result = creations
           .filter(item => {
             const tradeId = item.trade?.id || item.trade_id;
             const dismissKey = window.TradePlanAssignmentService.getDismissKey('creation', tradeId);

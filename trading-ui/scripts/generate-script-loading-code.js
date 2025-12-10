@@ -7,6 +7,15 @@
  * - TikTrackApp → development (without bundles)
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Event Handlers ===
+// - detectEnvironment() - Detectenvironment
+
+// === Data Functions ===
+// - generateScriptLoadingCode() - Generatescriptloadingcode
+
 const fs = require('fs');
 const path = require('path');
 

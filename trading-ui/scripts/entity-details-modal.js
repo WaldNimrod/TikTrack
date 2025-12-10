@@ -2200,6 +2200,13 @@ if (typeof document !== 'undefined') {
  * אתחול אוטומטי:
  * - DOMContentLoaded listener - אתחול כשה-DOM מוכן
  */
+// === Arrow Functions ===
+// - initModal() - Initmodal
+// - initializeTooltips() - Initializetooltips
+
+// === Functions ===
+// - editTicker() - Editticker
+// - showLinkedItems() - Showlinkeditems
 
 // ===== GLOBAL FUNCTION EXPORTS =====
 

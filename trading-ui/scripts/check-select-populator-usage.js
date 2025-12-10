@@ -8,6 +8,16 @@
  * @created January 2025
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Other ===
+// - scanJavaScriptFile() - Scanjavascriptfile
+// - scanHTMLFile() - Scanhtmlfile
+// - scanPage() - Scanpage
+// - scanAllPages() - Scanallpages
+// - generateReport() - Generatereport
+
 const fs = require('fs');
 const path = require('path');
 
@@ -273,17 +283,17 @@ function generateReport() {
 
 ## 📊 סיכום כללי
 
-- **סה"כ עמודים נסרקו:** ${results.summary.totalPages}
-- **עמודים המשתמשים במערכת:** ${results.summary.pagesWithService}
-- **עמודים עם בעיות:** ${results.summary.pagesWithIssues}
-- **סה"כ בעיות נמצאו:** ${results.summary.totalIssues}
+// - **סה"כ עמודים נסרקו:** ${results.summary.totalPages}
+// - **עמודים המשתמשים במערכת:** ${results.summary.pagesWithService}
+// - **עמודים עם בעיות:** ${results.summary.pagesWithIssues}
+// - **סה"כ בעיות נמצאו:** ${results.summary.totalIssues}
 
 ### פילוח בעיות לפי סוג:
 
-- **טיפול ידני במילוי select:** ${results.summary.issuesByType.manualPopulation || 0}
-- **קריאות fetch ישירות:** ${results.summary.issuesByType.directFetch || 0}
-- **פונקציות מקומיות:** ${results.summary.issuesByType.localFunction || 0}
-- **חסר טעינת המערכת:** ${results.summary.totalPages - results.summary.pagesWithService}
+// - **טיפול ידני במילוי select:** ${results.summary.issuesByType.manualPopulation || 0}
+// - **קריאות fetch ישירות:** ${results.summary.issuesByType.directFetch || 0}
+// - **פונקציות מקומיות:** ${results.summary.issuesByType.localFunction || 0}
+// - **חסר טעינת המערכת:** ${results.summary.totalPages - results.summary.pagesWithService}
 
 ---
 
@@ -299,9 +309,9 @@ function generateReport() {
 **קטגוריה:** ${result.category}
 
 #### סטטוס:
-- **משתמש במערכת:** ${result.usingService ? '✅ כן' : '❌ לא'}
-- **טוען את המערכת:** ${result.loadingService ? '✅ כן' : '❌ לא'}
-- **יש בעיות:** ${result.issues && result.issues.length > 0 ? '⚠️ כן' : '✅ לא'}
+// - **משתמש במערכת:** ${result.usingService ? '✅ כן' : '❌ לא'}
+// - **טוען את המערכת:** ${result.loadingService ? '✅ כן' : '❌ לא'}
+// - **יש בעיות:** ${result.issues && result.issues.length > 0 ? '⚠️ כן' : '✅ לא'}
 
 `;
 
@@ -309,9 +319,9 @@ function generateReport() {
             report += `#### סטיות שנמצאו:\n\n`;
             result.issues.forEach((issue, index) => {
                 report += `${index + 1}. **שורה ${issue.line}:** ${issue.description}
-   - **סוג:** ${issue.type}
-   - **חומרה:** ${issue.severity === 'high' ? '🔴 גבוהה' : '🟡 בינונית'}
-   - **קוד:** \`${issue.code.substring(0, 100)}${issue.code.length > 100 ? '...' : ''}\`
+// - **סוג:** ${issue.type}
+// - **חומרה:** ${issue.severity === 'high' ? '🔴 גבוהה' : '🟡 בינונית'}
+// - **קוד:** \`${issue.code.substring(0, 100)}${issue.code.length > 100 ? '...' : ''}\`
 
 `;
             });

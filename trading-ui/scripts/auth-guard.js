@@ -10,6 +10,21 @@
  * Last Updated: December 2025
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - initAuthGuard() - Initauthguard
+
+// === Event Handlers ===
+// - checkAuthentication() - Checkauthentication
+
+// === UI Functions ===
+// - showLoginModal() - Showloginmodal
+
+// === Other ===
+// - waitForAuthJS() - Waitforauthjs
+
 /**
  * Check authentication status with server
  * @returns {Promise<{authenticated: boolean, user: object|null, error: string|null}>}
@@ -19,14 +34,22 @@ async function checkAuthentication() {
   
   try {
     const response = await fetch('/api/auth/me', {
-      method: 'GET',
-      credentials: 'include'
-    });
+      method: 'GET', });
     
     if (response.ok) {
       const data = await response.json();
       if (data.status === 'success' && data.data?.user) {
         const user = data.data.user;
+        // Keep in-memory user for quick checks (isAuthenticated)
+        try {
+          // Prefer the shared variable from auth.js if present
+          if (typeof currentUser !== 'undefined') {
+            currentUser = user;
+          }
+          window.currentUser = user;
+        } catch (e) {
+          window.Logger?.warn?.('⚠️ [Auth Guard] Failed setting currentUser', { page: 'auth-guard', error: e?.message });
+        }
         window.Logger?.info?.('✅ [Auth Guard] User authenticated', { 
           page: 'auth-guard', 
           userId: user.id, 

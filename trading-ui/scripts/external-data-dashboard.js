@@ -475,8 +475,16 @@
    * @param {Object} progressInfo - Additional progress info (timeEstimate, elapsedTime, etc.)
    */
   function showProgressOverlay(overlayId, step, stepText, description, config = {}, progressInfo = {}) {
-    const progressManager = getProgressManager();
-    if (progressManager) {
+    let progressManager = getProgressManager();
+    // אם קיבלנו מחלקה ולא מופע עם createOverlay – ננסה ליצור מופע
+    if (progressManager && typeof progressManager.createOverlay !== 'function' && typeof window.UnifiedProgressManager === 'function') {
+      try {
+        progressManager = new window.UnifiedProgressManager();
+      } catch (e) {
+        window.Logger?.warn?.(`${MODULE_NAME}:progress-manager-instance-failed`, { error: e?.message });
+      }
+    }
+    if (progressManager && typeof progressManager.createOverlay === 'function') {
       // Create overlay if it doesn't exist
       if (!document.getElementById(overlayId)) {
         progressManager.createOverlay(overlayId, {

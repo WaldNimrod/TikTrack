@@ -6,6 +6,19 @@
  * @since 2025-01-09
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - initializeColorDemoShortcuts() - Initializecolordemoshortcuts
+
+// === UI Functions ===
+// - showAllColorDemos() - Showallcolordemos
+// - hideAllColorDemos() - Hideallcolordemos
+
+// === Other ===
+// - toggleColorDemo() - Togglecolordemo
+
 /**
  * Toggle visibility of color demo sections
  * @param {string} demoId - ID of demo element

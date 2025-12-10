@@ -27,6 +27,9 @@ from .statistics_business_service import StatisticsBusinessService
 from .note_business_service import NoteBusinessService
 from services.position_portfolio_service import PositionPortfolioService
 from services.date_normalization_service import DateNormalizationService
+from services.advanced_cache_service import advanced_cache_service
+from services.external_data.missing_data_checker import MissingDataChecker
+from services.external_data.yahoo_finance_adapter import YahooFinanceAdapter
 from models.trade import Trade
 from models.execution import Execution
 from models.note import Note
@@ -61,6 +64,7 @@ class HistoricalDataBusinessService(BaseBusinessService):
         self.statistics_service = StatisticsBusinessService(db_session)
         self.note_service = NoteBusinessService(db_session)
         self.date_normalizer = DateNormalizationService()
+        self.missing_data_checker = MissingDataChecker(db_session) if db_session else None
     
     # ========================================================================
     # Validation
@@ -167,6 +171,212 @@ class HistoricalDataBusinessService(BaseBusinessService):
             'is_valid': len(errors) == 0,
             'errors': errors
         }
+
+    # ========================================================================
+    # Market Data Completion Helpers
+    # ========================================================================
+
+    def ensure_historical_data(
+        self,
+        ticker_id: int,
+        start_date: datetime,
+        end_date: datetime,
+        min_required: int = 5,
+        buffer_days: int = 5
+    ) -> Dict[str, Any]:
+        """
+        Ensure OHLC data exists for a ticker in the given date range.
+
+        - Checks existing quotes (open/high/low/close not null) with a small buffer.
+        - If missing/insufficient, fetches from YahooFinanceAdapter and persists.
+        - Invalidates market_data_quotes cache dependency after successful save.
+
+        Returns dict with is_valid, fetched_count, existing_count, error (optional)
+        """
+        if not self.db_session:
+            return {
+                'is_valid': False,
+                'error': 'Database session not available',
+                'fetched_count': 0,
+                'existing_count': 0
+            }
+
+        try:
+            from models.external_data import MarketDataQuote, ExternalDataProvider
+
+            # Normalize dates + buffer to cover gaps
+            if start_date.tzinfo is None:
+                start_date = start_date.replace(tzinfo=timezone.utc)
+            if end_date.tzinfo is None:
+                end_date = end_date.replace(tzinfo=timezone.utc)
+
+            range_start = start_date - timedelta(days=buffer_days)
+            range_end = end_date + timedelta(days=buffer_days)
+
+            # Provider (default yahoo_finance)
+            provider = self.db_session.query(ExternalDataProvider).filter(
+                ExternalDataProvider.name == 'yahoo_finance'
+            ).first()
+            if not provider:
+                return {
+                    'is_valid': False,
+                    'error': 'Yahoo Finance provider not configured',
+                    'fetched_count': 0,
+                    'existing_count': 0
+                }
+
+            # Existing quotes with full OHLC
+            existing_quotes = self.db_session.query(MarketDataQuote).filter(
+                MarketDataQuote.ticker_id == ticker_id,
+                MarketDataQuote.provider_id == provider.id,
+                MarketDataQuote.asof_utc >= range_start,
+                MarketDataQuote.asof_utc <= range_end,
+                MarketDataQuote.open_price.isnot(None),
+                MarketDataQuote.high_price.isnot(None),
+                MarketDataQuote.low_price.isnot(None),
+                MarketDataQuote.close_price.isnot(None)
+            ).order_by(MarketDataQuote.asof_utc.asc()).all()
+
+            existing_count = len(existing_quotes)
+            has_coverage = existing_count >= min_required
+            if existing_quotes:
+                earliest = existing_quotes[0].asof_utc
+                latest = existing_quotes[-1].asof_utc
+                has_coverage = has_coverage and earliest <= range_start and latest >= range_end
+
+            if has_coverage:
+                return {
+                    'is_valid': True,
+                    'fetched_count': 0,
+                    'existing_count': existing_count
+                }
+
+            # Need to fetch missing data
+            ticker = self.db_session.query(Ticker).filter(Ticker.id == ticker_id).first()
+            if not ticker:
+                return {
+                    'is_valid': False,
+                    'error': f'Ticker {ticker_id} not found',
+                    'fetched_count': 0,
+                    'existing_count': existing_count
+                }
+
+            # Determine days_back with generous buffer (no fake data)
+            span_days = max(1, int((range_end - range_start).days) + 10)
+            days_back = max(30, span_days)
+
+            adapter = YahooFinanceAdapter(self.db_session, provider_id=provider.id)
+            fetched_count = adapter.fetch_and_save_historical_quotes(ticker, days_back=days_back)
+            self.db_session.commit()
+
+            # Invalidate caches that depend on market_data_quotes
+            try:
+                advanced_cache_service.invalidate_by_dependency('market_data_quotes')
+            except Exception as cache_error:
+                logger.warning(f"Cache invalidation failed after fetching historical data: {cache_error}")
+
+            # Re-count after fetch
+            refreshed_quotes = self.db_session.query(MarketDataQuote).filter(
+                MarketDataQuote.ticker_id == ticker_id,
+                MarketDataQuote.provider_id == provider.id,
+                MarketDataQuote.asof_utc >= range_start,
+                MarketDataQuote.asof_utc <= range_end,
+                MarketDataQuote.open_price.isnot(None),
+                MarketDataQuote.high_price.isnot(None),
+                MarketDataQuote.low_price.isnot(None),
+                MarketDataQuote.close_price.isnot(None)
+            ).order_by(MarketDataQuote.asof_utc.asc()).all()
+
+            refreshed_count = len(refreshed_quotes)
+            refreshed_has_coverage = refreshed_count >= min_required
+            if refreshed_quotes:
+                refreshed_has_coverage = (
+                    refreshed_has_coverage
+                    and refreshed_quotes[0].asof_utc <= range_start
+                    and refreshed_quotes[-1].asof_utc >= range_end
+                )
+
+            if not refreshed_has_coverage:
+                return {
+                    'is_valid': False,
+                    'error': 'Historical OHLC data still incomplete after refresh',
+                    'fetched_count': fetched_count,
+                    'existing_count': refreshed_count
+                }
+
+            return {
+                'is_valid': True,
+                'fetched_count': fetched_count,
+                'existing_count': refreshed_count
+            }
+
+        except Exception as e:
+            logger.error(f"Error ensuring historical data for ticker {ticker_id}: {e}", exc_info=True)
+            self.db_session.rollback()
+            return {
+                'is_valid': False,
+                'error': str(e),
+                'fetched_count': 0,
+                'existing_count': 0
+            }
+
+    def ensure_historical_data_for_tickers(
+        self,
+        ticker_ids: List[int],
+        start_date: datetime,
+        end_date: datetime
+    ) -> Dict[str, Any]:
+        """
+        Ensure OHLC data for multiple tickers in the date range.
+        Stops early on failure and returns summary.
+        """
+        summary = {
+            'is_valid': True,
+            'results': {},
+            'failed': []
+        }
+
+        for ticker_id in ticker_ids:
+            result = self.ensure_historical_data(ticker_id, start_date, end_date)
+            summary['results'][ticker_id] = result
+            if not result.get('is_valid'):
+                summary['is_valid'] = False
+                summary['failed'].append(ticker_id)
+
+        return summary
+
+    def get_user_ticker_ids_in_range(
+        self,
+        user_id: int,
+        start_date: datetime,
+        end_date: datetime,
+        account_id: Optional[int] = None,
+        limit: int = 50
+    ) -> List[int]:
+        """
+        Get distinct ticker IDs for a user within a date range (by trades).
+        """
+        if not self.db_session:
+            return []
+
+        try:
+            query = self.db_session.query(Trade.ticker_id).filter(
+                Trade.user_id == user_id,
+                Trade.ticker_id.isnot(None),
+                Trade.created_at <= end_date
+            )
+
+            if account_id:
+                query = query.filter(Trade.trading_account_id == account_id)
+
+            # Trades active within range (open during or created before end)
+            query = query.filter(or_(Trade.closed_at.is_(None), Trade.closed_at >= start_date))
+
+            ticker_ids = [row[0] for row in query.distinct().limit(limit).all() if row[0]]
+            return ticker_ids
+        except Exception as e:
+            logger.warning(f"Failed to get ticker ids for user {user_id}: {e}")
+            return []
     
     # ========================================================================
     # Portfolio State Calculations
@@ -1946,6 +2156,30 @@ class HistoricalDataBusinessService(BaseBusinessService):
                 }
             
             ticker_id = trade.ticker_id
+
+            # Ensure historical OHLC data exists before building chart
+            ensure_result = self.ensure_historical_data(
+                ticker_id=ticker_id,
+                start_date=chart_start,
+                end_date=chart_end
+            )
+            if not ensure_result.get('is_valid'):
+                return {
+                    'market_prices': [],
+                    'position_data': [],
+                    'pl_data': [],
+                    'is_valid': False,
+                    'error': ensure_result.get('error', 'Missing historical OHLC data'),
+                    'metadata': {
+                        'ticker_id': ticker_id,
+                        'date_range': {
+                            'start': chart_start,
+                            'end': chart_end
+                        },
+                        'fetched_count': ensure_result.get('fetched_count', 0),
+                        'existing_count': ensure_result.get('existing_count', 0)
+                    }
+                }
             
             # Get historical market prices
             from models.external_data import MarketDataQuote, ExternalDataProvider

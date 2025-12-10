@@ -7,6 +7,93 @@
  * Documentation: See documentation/frontend/JAVASCRIPT_ARCHITECTURE.md
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - initializeSeriesControls() - Initializeseriescontrols
+// - initializeHeader() - Initializeheader
+// - createStrategyCategories() - Createstrategycategories
+// - initStrategyPerformanceChart() - Initstrategyperformancechart
+// - initializeRecordFilterTags() - Initializerecordfiltertags
+// - initializeComparisonTags() - Initializecomparisontags
+// - initializePage() - Initializepage
+// - setupEventListeners() - Setupeventlisteners
+
+// === Event Handlers ===
+// - getComparisonParameterValues() - Getcomparisonparametervalues
+// - selectDateRangeOption() - Selectdaterangeoption
+// - handleCustomDateFromChange() - Handlecustomdatefromchange
+// - handleCustomDateToChange() - Handlecustomdatetochange
+// - selectStatusOption() - Selectstatusoption
+// - toggleComparisonParameter() - Togglecomparisonparameter
+// - applyComparisonParameters() - Applycomparisonparameters
+// - resetComparisonParameters() - Resetcomparisonparameters
+// - resetComparisonParametersToDefaults() - Resetcomparisonparameterstodefaults
+// - selectAllOptions() - Selectalloptions
+// - clearAllOptions() - Clearalloptions
+// - generateMockStrategyComparisonTableData() - Generatemockstrategycomparisontabledata
+// - formatComparisonInfo() - Formatcomparisoninfo
+// - updateStrategyComparisonTable() - Updatestrategycomparisontable
+// - updateAllVisualizations() - Updateallvisualizations
+// - saveComparisonParameterState() - Savecomparisonparameterstate
+// - loadComparisonParameterState() - Loadcomparisonparameterstate
+// - replaceStrategyActionButtons() - Replacestrategyactionbuttons
+
+// === UI Functions ===
+// - updateDateRangeFilterText() - Updatedaterangefiltertext
+// - updateStatusFilterText() - Updatestatusfiltertext
+// - renderTagsBadges() - Rendertagsbadges
+// - updateStrategyListTable() - Updatestrategylisttable
+// - updateHeatmap() - Updateheatmap
+// - updateVisualHeatmap() - Updatevisualheatmap
+// - updateChartLegend() - Updatechartlegend
+// - updateStrategyPerformanceChart() - Updatestrategyperformancechart
+// - updateStrategyInsights() - Updatestrategyinsights
+
+// === Data Functions ===
+// - getCSSVariableValue() - Getcssvariablevalue
+// - saveSeriesVisibilityState() - Saveseriesvisibilitystate
+// - loadSeriesVisibilityState() - Loadseriesvisibilitystate
+// - getRecordFilterValues() - Getrecordfiltervalues
+// - getFilterValues() - Getfiltervalues
+// - getDateRange() - Getdaterange
+// - generateMockSeriesData() - Generatemockseriesdata
+// - generateMockHeatmapData() - Generatemockheatmapdata
+// - getColorClass() - Getcolorclass
+// - getColorStyle() - Getcolorstyle
+// - saveRecordFilterState() - Saverecordfilterstate
+// - savePageState() - Savepagestate
+// - loadRecordFilterState() - Loadrecordfilterstate
+// - loadTradingAccounts() - Loadtradingaccounts
+// - loadTradingMethods() - Loadtradingmethods
+// - loadTickers() - Loadtickers
+// - getPercentile() - Getpercentile
+// - getPLPercentile() - Getplpercentile
+// - getAvgPLPercentile() - Getavgplpercentile
+// - getValuePercentile() - Getvaluepercentile
+
+// === Utility Functions ===
+// - formatCurrency() - Formatcurrency
+// - formatPLWithPercent() - Formatplwithpercent
+// - formatInvestmentWithPercent() - Formatinvestmentwithpercent
+// - formatFilterInfo() - Formatfilterinfo
+// - formatDate() - Formatdate
+
+// === Other ===
+// - toggleSeries() - Toggleseries
+// - ensureUnifiedCacheManagerReady() - Ensureunifiedcachemanagerready
+// - waitForTradingViewAdapter() - Waitfortradingviewadapter
+// - toggleDateRangeFilterMenu() - Toggledaterangefiltermenu
+// - toggleStatusFilterMenu() - Togglestatusfiltermenu
+// - applyRecordFilters() - Applyrecordfilters
+// - resetRecordFilters() - Resetrecordfilters
+// - resetRecordFiltersToDefaults() - Resetrecordfilterstodefaults
+// - generateMockTagsForCategory() - Generatemocktagsforcategory
+// - cartesianProduct() - Cartesianproduct
+// - seededRandom() - Seededrandom
+// - restorePageState() - Restorepagestate
+
 (function() {
     'use strict';
 

@@ -14,6 +14,16 @@
  * Date: September 2025
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - initializeBackgroundTasks() - Initializebackgroundtasks
+
+// === Other ===
+// - copyDetailedLogLocal() - Copydetailedloglocal
+// - generateDetailedLog() - Generatedetailedlog
+
 // Global variables
 let currentTaskName = null;
 let refreshInterval = null;

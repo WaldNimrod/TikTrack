@@ -9,6 +9,26 @@
  * 4. או השתמש ב: window.browserPageValidator.validateCurrentPage()
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Class Methods ===
+// - BrowserPageValidator.exportResults() - Exportresults
+
+// === Initialization ===
+// - BrowserPageValidator.startErrorCollection() - Starterrorcollection
+
+// === Event Handlers ===
+// - BrowserPageValidator.stopErrorCollection() - Stoperrorcollection
+// - console.error() - Error
+// - console.warn() - Warn
+
+// === Data Functions ===
+// - BrowserPageValidator.getCurrentPageName() - Getcurrentpagename
+
+// === UI Functions ===
+// - BrowserPageValidator.displayResults() - Displayresults
+
 (function() {
   'use strict';
 

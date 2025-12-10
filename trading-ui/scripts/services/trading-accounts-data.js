@@ -6,6 +6,38 @@
  * exposes helpers for create/update/delete flows.
  */
 (function tradingAccountsDataService() {
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - buildUrl() - Buildurl
+// - createTradingAccount() - Createtradingaccount
+
+// === Event Handlers ===
+// - sendAccountMutation() - Sendaccountmutation
+
+// === UI Functions ===
+// - updateTradingAccount() - Updatetradingaccount
+
+// === Data Functions ===
+// - normalizeAccountsPayload() - Normalizeaccountspayload
+// - saveAccountsCache() - Saveaccountscache
+// - getCachedTradingAccounts() - Getcachedtradingaccounts
+// - notifyLoadError() - Notifyloaderror
+// - fetchTradingAccountsFromApi() - Fetchtradingaccountsfromapi
+// - loadTradingAccountsData() - Loadtradingaccountsdata
+// - fetchTradingAccount() - Fetchtradingaccount
+// - fetchTradingAccountDetails() - Fetchtradingaccountdetails
+
+// === Utility Functions ===
+// - invalidateAccountsCache() - Invalidateaccountscache
+// - validateTradingAccount() - Validatetradingaccount
+
+// === Other ===
+// - resolveBaseUrl() - Resolvebaseurl
+// - clearAccountsCachePattern() - Clearaccountscachepattern
+// - deleteTradingAccount() - Deletetradingaccount
+
   const PRIMARY_CACHE_KEY = 'trading-accounts-data';
   const LEGACY_CACHE_KEYS = ['accounts-data'];
   const ALL_CACHE_KEYS = [PRIMARY_CACHE_KEY, ...LEGACY_CACHE_KEYS];
@@ -153,8 +185,7 @@
     const response = await fetch(url, {
       method: 'GET',
       headers: DEFAULT_HEADERS,
-      signal,
-      credentials: 'include' // Include cookies for session-based auth
+      signal, // Include cookies for session-based auth
     });
     
     // Handle 401/308 authentication errors
@@ -227,8 +258,7 @@
         method,
         headers: DEFAULT_HEADERS,
         body: body ? JSON.stringify(body) : undefined,
-        signal,
-        credentials: 'include' // Include cookies for session-based auth
+        signal, // Include cookies for session-based auth
       });
       
       // Handle 401/308 authentication errors
@@ -269,8 +299,7 @@
     const response = await fetch(url, {
       method: 'GET',
       headers: DEFAULT_HEADERS,
-      signal: options.signal,
-      credentials: 'include' // Include cookies for session-based auth
+      signal: options.signal, // Include cookies for session-based auth
     });
     
     // Handle 401/308 authentication errors
@@ -318,8 +347,7 @@
           const response = await fetch(url, {
             method: 'POST',
             headers: DEFAULT_HEADERS,
-            body: JSON.stringify(accountData),
-            credentials: 'include' // Include cookies for session-based auth
+            body: JSON.stringify(accountData), // Include cookies for session-based auth
           });
           
           // Handle 401/308 authentication errors
@@ -348,8 +376,7 @@
       const response = await fetch(url, {
         method: 'POST',
         headers: DEFAULT_HEADERS,
-        body: JSON.stringify(accountData),
-        credentials: 'include' // Include cookies for session-based auth
+        body: JSON.stringify(accountData), // Include cookies for session-based auth
       });
       
       // Handle 401/308 authentication errors

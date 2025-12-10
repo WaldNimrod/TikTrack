@@ -20,6 +20,32 @@
  * @author TikTrack Development Team
  */
 (function tradePlansDataService() {
+
+// ===== FUNCTION INDEX =====
+
+// === Core Functions ===
+// - executeTradePlan() - Executetradeplan
+
+// === UI Functions ===
+// - updateTradePlan() - Updatetradeplan
+
+// === Data Functions ===
+// - loadTradePlansData() - Loadtradeplansdata
+// - saveTradePlan() - Savetradeplan
+// - fetchTradePlanDetails() - Fetchtradeplandetails
+// - getCachedTradePlans() - Getcachedtradeplans
+
+// === Utility Functions ===
+// - invalidateTradePlansCache() - Invalidatetradeplanscache
+// - validateTradePlan() - Validatetradeplan
+
+// === Other ===
+// - deleteTradePlan() - Deletetradeplan
+// - cancelTradePlan() - Canceltradeplan
+// - copyTradePlan() - Copytradeplan
+// - setCachedTradePlans() - Setcachedtradeplans
+// - clearTradePlansCache() - Cleartradeplanscache
+
   const TRADE_PLANS_DATA_KEY = 'trade-plans-data';
   const TRADE_PLANS_TTL = 45 * 1000; // 45 seconds per audit plan
   const PAGE_LOG_CONTEXT = { page: 'trade-plans-data' };

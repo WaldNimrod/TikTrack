@@ -21,6 +21,28 @@
  * window.runPageStateE2ETests()
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Core Functions ===
+// - runPageStateE2ETests() - Runpagestatee2Etests
+
+// === Event Handlers ===
+// - testSaveSections() - Testsavesections
+// - testLoadSections() - Testloadsections
+
+// === Data Functions ===
+// - testSaveFilters() - Testsavefilters
+// - testLoadFilters() - Testloadfilters
+// - testSaveSort() - Testsavesort
+// - testLoadSort() - Testloadsort
+// - testSaveEntityFilters() - Testsaveentityfilters
+// - testLoadEntityFilters() - Testloadentityfilters
+// - testMigrateLegacyData() - Testmigratelegacydata
+
+// === Other ===
+// - testClearPageState() - Testclearpagestate
+
 (function() {
   'use strict';
 

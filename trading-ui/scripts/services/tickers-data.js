@@ -183,8 +183,7 @@
     const response = await fetch(url, { 
       method: 'GET', 
       headers: DEFAULT_HEADERS, 
-      signal,
-      credentials: 'include' // Include cookies for session-based auth
+      signal, // Include cookies for session-based auth
     });
     
     // Handle 401/308 authentication errors
@@ -199,8 +198,7 @@
         const fallbackResponse = await fetch(fallbackUrl, { 
           method: 'GET', 
           headers: DEFAULT_HEADERS, 
-          signal,
-          credentials: 'include' // Include cookies for session-based auth
+          signal, // Include cookies for session-based auth
         });
         
         // Handle 401/308 authentication errors on fallback
@@ -540,8 +538,7 @@
       
       const response = await fetch(url, {
         method: 'GET',
-        headers: DEFAULT_HEADERS,
-        credentials: 'include', // Include session cookie
+        headers: DEFAULT_HEADERS, // Include session cookie
         signal
       });
 
@@ -582,9 +579,7 @@
       
       const response = await fetch(url, {
         method: 'POST',
-        headers: DEFAULT_HEADERS,
-        credentials: 'include',
-        signal
+        headers: DEFAULT_HEADERS, signal
       });
 
       if (!response.ok) {
@@ -620,9 +615,7 @@
       
       const response = await fetch(url, {
         method: 'DELETE',
-        headers: DEFAULT_HEADERS,
-        credentials: 'include',
-        signal
+        headers: DEFAULT_HEADERS, signal
       });
 
       if (!response.ok) {

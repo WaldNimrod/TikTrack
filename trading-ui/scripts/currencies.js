@@ -1,3 +1,69 @@
+
+
+// ===== FUNCTION INDEX =====
+// === Functions ===
+// - checkLinkedItemsBeforeDelete() - Checklinkeditemsbeforedelete
+// - confirmDeleteCurrency() - Confirmdeletecurrency
+// - deleteCurrency() - Deletecurrency
+// - editCurrency() - Editcurrency
+// - initializeCurrenciesPage() - Initializecurrenciespage
+// - loadCurrencies() - Loadcurrencies
+// - openCurrencyDetails() - Opencurrencydetails
+// - renderCurrenciesTable() - Rendercurrenciestable
+// - showDeleteCurrencyModal() - Showdeletecurrencymodal
+// - showEditCurrencyModal() - Showeditcurrencymodal
+// - updateCurrenciesPageSummaryStats() - Updatecurrenciespagesummarystats
+
+// === Initialization ===
+/**
+ * initializeCurrenciesPage - Initializecurrenciespage
+ *
+ * @returns {{*}} Return description
+ */
+// - initializeCurrenciesPage() - Initializecurrenciespage
+
+// === Event Handlers ===
+/**
+ * confirmDeleteCurrency - Confirmdeletecurrency
+ *
+ * @returns {{*}} Return description
+ */
+// - confirmDeleteCurrency() - Confirmdeletecurrency
+
+// === UI Functions ===
+/**
+ * showEditCurrencyModal - Showeditcurrencymodal
+ *
+ * @param {*} id - Parameter description
+ * @returns {{*}} Return description
+ */
+// - showEditCurrencyModal() - Showeditcurrencymodal
+/**
+ * showDeleteCurrencyModal - Showdeletecurrencymodal
+ *
+ * @param {*} id - Parameter description
+ * @returns {{*}} Return description
+ */
+// - showDeleteCurrencyModal() - Showdeletecurrencymodal
+/**
+ * renderCurrenciesTable - Rendercurrenciestable
+ *
+ * @returns {{*}} Return description
+ */
+// - renderCurrenciesTable() - Rendercurrenciestable
+// - updateCurrenciesPageSummaryStats() - Updatecurrenciespagesummarystats
+
+// === Data Functions ===
+// - loadCurrencies() - Loadcurrencies
+
+// === Utility Functions ===
+// - checkLinkedItemsBeforeDelete() - Checklinkeditemsbeforedelete
+
+// === Other ===
+// - openCurrencyDetails() - Opencurrencydetails
+// - editCurrency() - Editcurrency
+// - deleteCurrency() - Deletecurrency
+
 // ===== קובץ JavaScript לדף מטבעות =====
 /*
  * Currencies.js - Currencies Page Management

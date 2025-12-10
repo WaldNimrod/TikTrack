@@ -7,6 +7,20 @@
  * @lastUpdated January 27, 2025
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Functions ===
+// - initializeExecutionsModal() - Initializeexecutionsmodal
+// - waitForModalManager() - Waitformodalmanager
+// - waitForModalManager() - Waitformodalmanager
+
+// === Initialization ===
+// - initializeExecutionsModal() - Initializeexecutionsmodal
+// === Functions ===
+// - initializeExecutionsModal() - Initializeexecutionsmodal
+// - waitForModalManager() - Waitformodalmanager
+
 // קונפיגורציה למודל ביצועים
 const executionsModalConfig = {
     id: 'executionsModal',

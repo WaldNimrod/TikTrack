@@ -6,6 +6,24 @@
  * גרסה: 1.0.0
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - setupEventListener() - Setupeventlistener
+
+// === Core Functions ===
+// - runAllTests() - Runalltests
+
+// === Event Handlers ===
+// - testPreferencesEvent() - Testpreferencesevent
+
+// === Other ===
+// - test() - Test
+// - addTestResult() - Addtestresult
+// - testPreferencesFlag() - Testpreferencesflag
+// - testBusinessLogicDependency() - Testbusinesslogicdependency
+
 (function() {
   'use strict';
 

@@ -20,6 +20,55 @@
  * @updated January 29, 2025
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - initializeFilters() - Initializefilters
+// - setupWidgetEventListeners() - Setupwidgeteventlisteners
+// - initializeEconomicCalendarWidget() - Initializeeconomiccalendarwidget
+// - initializePreferencesIntegration() - Initializepreferencesintegration
+// - initializeIcons() - Initializeicons
+// - initializeHeader() - Initializeheader
+// - initializePage() - Initializepage
+
+// === Event Handlers ===
+// - handleFilterChange() - Handlefilterchange
+// - loadWidgetConfigFromCache() - Loadwidgetconfigfromcache
+// - saveWidgetConfigToCache() - Savewidgetconfigtocache
+// - getWidgetConfig() - Getwidgetconfig
+// - mapTradingViewEventType() - Maptradingvieweventtype
+// - saveEventFromWidget() - Saveeventfromwidget
+// - removeEvent() - Removeevent
+// - showSaveEventModal() - Showsaveeventmodal
+// - updateWidgetConfig() - Updatewidgetconfig
+// - handlePreferencesLoaded() - Handlepreferencesloaded
+// - renderSavedEvents() - Rendersavedevents
+
+// === UI Functions ===
+// - showLoading() - Showloading
+// - hideLoading() - Hideloading
+// - showError() - Showerror
+// - hideError() - Hideerror
+
+// === Data Functions ===
+// - getCSSVariableValue() - Getcssvariablevalue
+// - loadFilters() - Loadfilters
+// - saveFilters() - Savefilters
+// - mapImportanceToTradingView() - Mapimportancetotradingview
+// - destroyWidget() - Destroywidget
+// - savePageState() - Savepagestate
+
+// === Utility Functions ===
+// - check() - Check
+
+// === Other ===
+// - waitFor() - Waitfor
+// - applyFiltersToUI() - Applyfilterstoui
+// - mapTradingViewImportance() - Maptradingviewimportance
+// - restorePageState() - Restorepagestate
+// - cleanup() - Cleanup
+
 (function() {
     'use strict';
 

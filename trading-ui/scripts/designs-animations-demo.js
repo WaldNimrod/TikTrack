@@ -7,6 +7,12 @@
  * Documentation: See documentation/03-DEVELOPMENT/GUIDES/UNIFIED_UI_POSITIONING_GUIDE.md
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - initAnimationsDemo() - Initanimationsdemo
+
 ;(function() {
   'use strict';
 

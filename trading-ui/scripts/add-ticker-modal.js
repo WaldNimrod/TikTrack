@@ -30,6 +30,12 @@
  * 
  * ==========================================
  */
+// === Functions ===
+// - clearSearchResults() - Clearsearchresults
+// - initializeTickerSearchHandlers() - Initializetickersearchhandlers
+// - loadAllTickers() - Loadalltickers
+// - setupFlagColorPalette() - Setupflagcolorpalette
+// - setupModalEventListener() - Setupmodaleventlistener
 
 (function() {
     'use strict';
@@ -319,9 +325,7 @@
                 headers: {
                     'Content-Type': 'application/json',
                     'Cache-Control': 'no-cache'
-                },
-                credentials: 'include'
-            });
+                }, });
 
             if (!response.ok) {
                 if (response.status === 401) {

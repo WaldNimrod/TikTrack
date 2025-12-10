@@ -10,6 +10,12 @@
  *   debugCurrencyExchangeImport(null, null, 'exchange_c86981839c5f') - בדיקה לפי external_id
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Event Handlers ===
+// - debugCurrencyExchangeImport() - Debugcurrencyexchangeimport
+
 /**
  * בדיקת רשומות המרות מטבע
  * 

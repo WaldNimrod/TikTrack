@@ -11,6 +11,12 @@
  * והמערכת החדשה משתמשת ב-data-attributes
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Event Handlers ===
+// - getButtonClass() - Getbuttonclass
+
 // Button Icons - Using Tabler Icons via IconSystem
 // Fallback to Emojis if IconSystem not available
 const BUTTON_ICONS = {

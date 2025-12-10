@@ -16,6 +16,16 @@
  * @author TikTrack Development Team
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - InitializationChecker.checkDuplicates() - Checkduplicates
+// - InitializationChecker.checkConflicts() - Checkconflicts
+// - InitializationChecker.checkPreferencesInitialization() - Checkpreferencesinitialization
+// - InitializationChecker.analyze() - Analyze
+// - InitializationChecker.printReport() - Printreport
+
 (function() {
   'use strict';
 

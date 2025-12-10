@@ -49,7 +49,7 @@
         // Check authentication
         if (!window.TikTrackAuth || !window.TikTrackAuth.isAuthenticated()) {
           window.Logger?.warn('User not authenticated, redirecting to login', { page: 'user-profile' });
-          window.location.href = 'login.html';
+          window.location.href = '/';
           return;
         }
 
@@ -116,9 +116,7 @@
         if (!user) {
           try {
             const response = await fetch('/api/auth/me', {
-              method: 'GET',
-              credentials: 'include'
-            });
+              method: 'GET', });
 
             if (response.ok) {
               const data = await response.json();
@@ -153,7 +151,7 @@
           // Not authenticated - redirect to login
           if (!user) {
             window.Logger?.warn('User not authenticated, redirecting to login', { page: 'user-profile' });
-            window.location.href = 'login.html';
+            window.location.href = '/';
             return;
           }
         }
@@ -248,9 +246,7 @@
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
-          },
-          credentials: 'include',
-          body: JSON.stringify(formData),
+          }, body: JSON.stringify(formData),
         });
 
         // Use CRUDResponseHandler for response handling
@@ -423,9 +419,7 @@
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
-          },
-          credentials: 'include',
-          body: JSON.stringify({
+          }, body: JSON.stringify({
             current_password: formData.current_password,
             new_password: formData.new_password,
           }),

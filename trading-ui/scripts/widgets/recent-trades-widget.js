@@ -8,6 +8,25 @@
  * - NotificationSystem (optional) for error messaging.
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === UI Functions ===
+// - renderEmpty() - Renderempty
+// - renderList() - Renderlist
+
+// === Data Functions ===
+// - getEpoch() - Getepoch
+
+// === Utility Functions ===
+// - formatDate() - Formatdate
+// - formatAmount() - Formatamount
+// - formatSide() - Formatside
+
+// === Other ===
+// - resolveDateValue() - Resolvedatevalue
+// - normalizeTrades() - Normalizetrades
+
 ;(function () {
   const MAX_ITEMS = 5;
   const CONTAINER_ID = 'recentTrades';

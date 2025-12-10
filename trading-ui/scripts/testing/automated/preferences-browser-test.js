@@ -14,6 +14,38 @@
  * @lastUpdated January 2025
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - testPreferencesCoreInitialize() - Testpreferencescoreinitialize
+
+// === Core Functions ===
+// - runUnitTests() - Rununittests
+// - runE2ETests() - Rune2Etests
+// - runPerformanceTests() - Runperformancetests
+// - runAllTests() - Runalltests
+
+// === Event Handlers ===
+// - runIntegrationTests() - Runintegrationtests
+
+// === Data Functions ===
+// - testPreferencesV4GetGroup() - Testpreferencesv4Getgroup
+// - testPreferencesGroupManagerSaveGroup() - Testpreferencesgroupmanagersavegroup
+// - testPageLoadFlow() - Testpageloadflow
+// - testSaveFlow() - Testsaveflow
+// - testLoadPerformance() - Testloadperformance
+// - testSavePerformance() - Testsaveperformance
+
+// === Utility Functions ===
+// - check() - Check
+
+// === Other ===
+// - logTest() - Logtest
+// - waitFor() - Waitfor
+// - testUnifiedCacheManager() - Testunifiedcachemanager
+// - testCompleteUserFlow() - Testcompleteuserflow
+
 (function() {
   'use strict';
 

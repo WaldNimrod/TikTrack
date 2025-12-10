@@ -13,6 +13,18 @@
  * Last Updated: January 28, 2025
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === AI Analysis ===
+// - UserProfileAIAnalysis.init() - Init
+// - UserProfileAIAnalysis.analyzeProfile() - Analyze Profile
+// - UserProfileAIAnalysis.generateInsights() - Generate Insights
+
+// === UI Functions ===
+// - UserProfileAIAnalysis.displayResults() - Display Results
+// - UserProfileAIAnalysis.updateUI() - Update Ui
+
 (function() {
   'use strict';
 
@@ -67,9 +79,7 @@
 
         const apiUrl = window.API_BASE_URL || '/api';
         const response = await fetch(`${apiUrl}/ai-analysis/llm-provider`, {
-          method: 'GET',
-          credentials: 'include'
-        });
+          method: 'GET', });
 
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -227,9 +237,7 @@
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
-            },
-            credentials: 'include',
-            body: JSON.stringify({
+            }, body: JSON.stringify({
               provider: 'gemini',
               api_key: geminiKey,
               validate: true
@@ -251,9 +259,7 @@
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
-            },
-            credentials: 'include',
-            body: JSON.stringify({
+            }, body: JSON.stringify({
               provider: 'perplexity',
               api_key: perplexityKey,
               validate: true
@@ -333,9 +339,7 @@
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-          },
-          credentials: 'include',
-          body: JSON.stringify({
+          }, body: JSON.stringify({
             provider: 'gemini',
             api_key: geminiKey,
             validate: true
@@ -402,9 +406,7 @@
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-          },
-          credentials: 'include',
-          body: JSON.stringify({
+          }, body: JSON.stringify({
             provider: 'perplexity',
             api_key: perplexityKey,
             validate: true

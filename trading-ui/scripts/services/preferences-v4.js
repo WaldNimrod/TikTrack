@@ -1,3 +1,71 @@
+
+
+// ===== FUNCTION INDEX =====
+// === Arrow Functions ===
+// - p() - P
+
+// === Functions ===
+// - bootstrap() - Bootstrap
+// - dedup() - Dedup
+// - doFetch() - Dofetch
+// - getGroup() - Getgroup
+// - getGroups() - Getgroups
+// - getPreference() - Getpreference
+// - now() - Now
+// - saveGroup() - Savegroup
+// - sleep() - Sleep
+
+// === Data Functions ===
+/**
+ * doFetch - Dofetch
+ *
+ * @param {*} url - Parameter description
+ * @param {*} options = {} - Parameter description
+ * @returns {{*}} Return description
+ */
+// - doFetch() - Dofetch
+/**
+ * getGroup - Getgroup
+ *
+ * @param {*} group - Parameter description
+ * @param {*} profileId = null - Parameter description
+ * @param {*} userId = null - Parameter description
+ * @returns {{*}} Return description
+ */
+// - getGroup() - Getgroup
+/**
+ * getGroups - Getgroups
+ *
+ * @param {*} groups - Parameter description
+ * @param {*} profileId = null - Parameter description
+ * @param {*} userId = null - Parameter description
+ * @returns {{*}} Return description
+ */
+// - getGroups() - Getgroups
+/**
+ * saveGroup - Savegroup
+ *
+ * @param {*} group - Parameter description
+ * @param {*} valuesMap - Parameter description
+ * @param {*} profileId = null - Parameter description
+ * @returns {{*}} Return description
+ */
+// - saveGroup() - Savegroup
+/**
+ * getPreference - Getpreference
+ *
+ * @param {*} name - Parameter description
+ * @returns {{*}} Return description
+ */
+// - getPreference() - Getpreference
+
+// === Other ===
+// - now() - Now
+// - sleep() - Sleep
+// - dedup() - Dedup
+// - bootstrap() - Bootstrap
+// - p() - P
+
 (() => {
   const NS = 'PreferencesV4';
   if (window[NS]) return;
@@ -63,7 +131,7 @@
       if (profileId != null) params.set('profile_id', String(profileId));
       const headers = {};
       if (bootstrapETag) headers['If-None-Match'] = bootstrapETag;
-      const res = await doFetch(`${API.bootstrap}?${params.toString()}`, { headers, credentials: 'include' });
+      const res = await doFetch(`${API.bootstrap}?${params.toString()}`, { headers, });
       if (res.status === 304) {
         window.Logger?.info?.('PreferencesV4 bootstrap 304 (served from cache)', { page: 'preferences-v4' });
         return { profileContext, groups: Object.fromEntries(cacheByGroup), etag: bootstrapETag };
@@ -118,7 +186,7 @@
       const headers = {};
       const cachedETag = etagByGroup.get(group);
       if (cachedETag) headers['If-None-Match'] = cachedETag;
-      const res = await doFetch(`${API.group}?${params.toString()}`, { headers, credentials: 'include' });
+      const res = await doFetch(`${API.group}?${params.toString()}`, { headers, });
       
       window.Logger?.debug?.('🔍 PreferencesV4.getGroup response', {
         page: 'preferences-v4',
@@ -221,9 +289,7 @@
     if (profileId != null) body.profile_id = profileId;
     const res = await doFetch(API.group, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify(body),
+      headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
     });
     const json = await res.json();
     if (!json?.success) throw new Error(json?.error || 'Failed group save');

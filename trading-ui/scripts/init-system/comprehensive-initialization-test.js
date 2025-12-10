@@ -17,6 +17,15 @@
  * @author TikTrack Development Team
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - ComprehensiveInitializationTest.testCoreSystems() - Testcoresystems
+// - ComprehensiveInitializationTest.testDuplicateInitializations() - Testduplicateinitializations
+// - ComprehensiveInitializationTest.testRequiredSystems() - Testrequiredsystems
+// - ComprehensiveInitializationTest.printResults() - Printresults
+
 (function() {
   'use strict';
 

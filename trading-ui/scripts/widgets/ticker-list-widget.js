@@ -25,6 +25,33 @@
  * Documentation: See documentation/03-DEVELOPMENT/GUIDES/TICKER_LIST_WIDGET_DEVELOPER_GUIDE.md
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Event Handlers ===
+// - getChangeColorClass() - Getchangecolorclass
+// - bindEvents() - Bindevents
+
+// === UI Functions ===
+// - showLoading() - Showloading
+// - showError() - Showerror
+// - showEmpty() - Showempty
+// - renderKPICard() - Renderkpicard
+// - renderTickersList() - Rendertickerslist
+
+// === Data Functions ===
+// - loadActiveTickers() - Loadactivetickers
+// - loadWatchListTickers() - Loadwatchlisttickers
+// - loadAllTickers() - Loadalltickers
+
+// === Utility Functions ===
+// - formatAmount() - Formatamount
+// - formatPercent() - Formatpercent
+// - formatVolume() - Formatvolume
+
+// === Other ===
+// - cacheElements() - Cacheelements
+
 ;(function () {
   'use strict';
 

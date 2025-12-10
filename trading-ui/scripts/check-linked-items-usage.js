@@ -13,6 +13,22 @@
  * - Direct modal creation for linked items instead of using showLinkedItemsModal
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Core Functions ===
+// - main() - Main
+
+// === Data Functions ===
+// - getAllFiles() - Getallfiles
+
+// === Utility Functions ===
+// - checkPackageManifest() - Checkpackagemanifest
+
+// === Other ===
+// - scanFile() - Scanfile
+// - generateReport() - Generatereport
+
 const fs = require('fs');
 const path = require('path');
 
@@ -233,21 +249,21 @@ function generateReport(results, hasInManifest) {
 
 ## 📊 סיכום כללי
 
-- **סה"כ קבצים נסרקו:** ${results.length}
-- **קבצים המשתמשים במערכת:** ${results.filter(r => r.usingSystem).length}
-- **קבצים עם בעיות:** ${results.filter(r => r.issues.length > 0).length}
-- **סה"כ בעיות נמצאו:** ${results.reduce((sum, r) => sum + r.issues.length, 0)}
+// - **סה"כ קבצים נסרקו:** ${results.length}
+// - **קבצים המשתמשים במערכת:** ${results.filter(r => r.usingSystem).length}
+// - **קבצים עם בעיות:** ${results.filter(r => r.issues.length > 0).length}
+// - **סה"כ בעיות נמצאו:** ${results.reduce((sum, r) => sum + r.issues.length, 0)}
 
 ### פילוח בעיות לפי סוג:
 
-- **פונקציות הצגה מקומיות:** ${results.reduce((sum, r) => sum + r.issues.filter(i => i.type === 'localShowFunction').length, 0)}
-- **פונקציות בדיקה מקומיות:** ${results.reduce((sum, r) => sum + r.issues.filter(i => i.type === 'localCheckFunction').length, 0)}
-- **פונקציות לוגיקה מקומיות:** ${results.reduce((sum, r) => sum + r.issues.filter(i => i.type === 'localLogicFunction').length, 0)}
-- **יצירת מודלים מקומית:** ${results.reduce((sum, r) => sum + r.issues.filter(i => i.type === 'localModalCreation').length, 0)}
+// - **פונקציות הצגה מקומיות:** ${results.reduce((sum, r) => sum + r.issues.filter(i => i.type === 'localShowFunction').length, 0)}
+// - **פונקציות בדיקה מקומיות:** ${results.reduce((sum, r) => sum + r.issues.filter(i => i.type === 'localCheckFunction').length, 0)}
+// - **פונקציות לוגיקה מקומיות:** ${results.reduce((sum, r) => sum + r.issues.filter(i => i.type === 'localLogicFunction').length, 0)}
+// - **יצירת מודלים מקומית:** ${results.reduce((sum, r) => sum + r.issues.filter(i => i.type === 'localModalCreation').length, 0)}
 
 ### סטטוס טעינת המערכת:
 
-- **linked-items.js ו-linked-items-service.js במוניפסט:** ${hasInManifest ? '✅ כן' : '❌ לא'}
+// - **linked-items.js ו-linked-items-service.js במוניפסט:** ${hasInManifest ? '✅ כן' : '❌ לא'}
 
 ---
 
@@ -268,9 +284,9 @@ function generateReport(results, hasInManifest) {
 **קטגוריה:** ${result.file.endsWith('.html') ? 'HTML' : 'JavaScript'}
 
 #### סטטוס:
-- **משתמש במערכת:** ${result.usingSystem ? '✅ כן' : '❌ לא'}
-- **טוען את המערכת:** ${result.loadingLinkedItems ? '✅ כן' : '❌ לא (נטען דרך entity-services package)'}
-- **יש בעיות:** ${result.issues.length > 0 ? '⚠️ כן' : '✅ לא'}
+// - **משתמש במערכת:** ${result.usingSystem ? '✅ כן' : '❌ לא'}
+// - **טוען את המערכת:** ${result.loadingLinkedItems ? '✅ כן' : '❌ לא (נטען דרך entity-services package)'}
+// - **יש בעיות:** ${result.issues.length > 0 ? '⚠️ כן' : '✅ לא'}
 
 `;
 
@@ -281,9 +297,9 @@ function generateReport(results, hasInManifest) {
             result.issues.forEach((issue, index) => {
                 const severityEmoji = issue.severity === 'high' ? '🔴' : issue.severity === 'medium' ? '🟡' : '🟢';
                 report += `${index + 1}. **שורה ${issue.line}:** ${issue.description}
-   - **סוג:** ${issue.type}
-   - **חומרה:** ${severityEmoji} ${issue.severity === 'high' ? 'גבוהה' : issue.severity === 'medium' ? 'בינונית' : 'נמוכה'}
-   - **קוד:** \`${issue.code.substring(0, 100)}${issue.code.length > 100 ? '...' : ''}\`
+// - **סוג:** ${issue.type}
+// - **חומרה:** ${severityEmoji} ${issue.severity === 'high' ? 'גבוהה' : issue.severity === 'medium' ? 'בינונית' : 'נמוכה'}
+// - **קוד:** \`${issue.code.substring(0, 100)}${issue.code.length > 100 ? '...' : ''}\`
 
 `;
             });

@@ -517,8 +517,7 @@ class CacheSyncManager {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-        },
-        credentials: 'include', // Include session cookie
+        }, // Include session cookie
         body: JSON.stringify({ dependencies, user_id: userId }),
       });
 

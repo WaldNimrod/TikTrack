@@ -2,6 +2,14 @@
  * Update all pages with correct script loading code
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Script Loading ===
+// - updateAllPagesScriptLoading() - Update All Pages Script Loading
+// - validateScriptDependencies() - Validate Script Dependencies
+// - loadRequiredScripts() - Load Required Scripts
+
 const fs = require('fs');
 const path = require('path');
 

@@ -161,8 +161,7 @@
       const response = await fetch(url, { 
         method: 'GET', 
         headers: DEFAULT_HEADERS, 
-        signal,
-        credentials: 'include' // Include cookies for session-based auth
+        signal, // Include cookies for session-based auth
       });
       
       // Handle 401/308 authentication errors

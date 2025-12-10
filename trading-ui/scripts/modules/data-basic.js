@@ -1,3 +1,25 @@
+
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - getColumnDefinition() - Getcolumndefinition
+// - setColumnDefinition() - Setcolumndefinition
+
+// === Event Handlers ===
+// - getTableConfig() - Gettableconfig
+// - setTableConfig() - Settableconfig
+// - updateSortIcons() - Updatesorticons
+
+// === Data Functions ===
+// - getColumnValue() - Getcolumnvalue
+// - getTableMapping() - Gettablemapping
+// - getCustomSortValue() - Getcustomsortvalue
+
+// === Other ===
+// - isTableSupported() - Istablesupported
+// - isDateValue() - Isdatevalue
+
 // ===== LOADING TRACKING =====
 // Loading tracking removed for cleaner console
 

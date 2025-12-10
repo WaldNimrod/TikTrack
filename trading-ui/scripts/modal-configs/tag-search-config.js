@@ -5,6 +5,12 @@
  * Lightweight drawer rendered via ModalManagerV2 for displaying quick tag search results.
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - initializeTagSearchDrawer() - Initializetagsearchdrawer
+
 const tagSearchDrawerConfig = {
     id: 'tagSearchDrawer',
     entityType: 'tag_search',

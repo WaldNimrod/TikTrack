@@ -14,6 +14,15 @@
  * @lastUpdated January 20, 2025
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Event Handlers ===
+// - copyMonitoringResults() - Copymonitoringresults
+
+// === Other ===
+// - waitForNavList() - Waitfornavlist
+
 if (window.Logger) {
   window.Logger.info('🔍 Loading Init System Check...', { page: 'init-check' });
 }

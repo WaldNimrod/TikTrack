@@ -17,6 +17,20 @@
  * - cache של נתונים
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Event Handlers ===
+// - handleRelationTypeChange() - Handlerelationtypechange
+// - handleTickerChange() - Handletickerchange
+
+// === Data Functions ===
+// - getFilteredTickers() - Getfilteredtickers
+
+// === Other ===
+// - populateSelect() - Populateselect
+// - populateRelatedObjects() - Populaterelatedobjects
+
 // ===== SELECT POPULATOR SERVICE =====
 
 class SelectPopulatorService {

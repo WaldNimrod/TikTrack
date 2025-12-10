@@ -18,7 +18,6 @@
  * - תמיכה ב-FormData למקרים מתקדמים
  */
 
-
 // ===== FUNCTION INDEX =====
 // === Event Handlers ===
 // - DataCollectionService.switch() - Switch

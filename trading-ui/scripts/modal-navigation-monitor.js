@@ -6,6 +6,14 @@
  * טען את הסקריפט בקונסול כדי לעקוב אחרי כל הקריאות לשירות הניווט.
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Other ===
+// - snapshot() - Snapshot
+// - logStack() - Logstack
+// - wrapAsync() - Wrapasync
+
 (function() {
     'use strict';
 

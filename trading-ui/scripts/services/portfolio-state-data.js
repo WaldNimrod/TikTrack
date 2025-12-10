@@ -78,8 +78,7 @@
       const base = location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
       const url = `${base}/api/portfolio-state/snapshot?${params.toString()}`;
       
-      const response = await fetch(url, {
-        credentials: 'include' // Include cookies for session-based auth
+      const response = await fetch(url, { // Include cookies for session-based auth
       });
       
       // Handle authentication errors (401/308) - show notification only once
@@ -98,6 +97,17 @@
           }
         }
         throw new Error(`Authentication required (${response.status})`);
+      }
+
+      if (response.status === 424) {
+        const errorPayload = await response.json().catch(() => ({}));
+        const missingTickers = errorPayload?.data?.missing_tickers || errorPayload?.missing_tickers || [];
+        if (missingTickers.length && window.NotificationSystem) {
+          window.NotificationSystem.showError('נתוני מחיר חסרים', `חסרים נתוני OHLC לטיקרים: ${missingTickers.join(', ')}`);
+        }
+        const err = new Error('Missing historical OHLC data');
+        err.missingTickers = missingTickers;
+        throw err;
       }
       
       if (!response.ok) {
@@ -166,10 +176,9 @@
       const base = location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
       const url = `${base}/api/portfolio-state/series?${params.toString()}`;
       
-      const response = await fetch(url, {
-        credentials: 'include' // Include cookies for session-based auth
+      const response = await fetch(url, { // Include cookies for session-based auth
       });
-      
+
       // Handle authentication errors (401/308) - show notification only once
       if (response.status === 401 || response.status === 308) {
         // Use centralized auth error handler if available
@@ -186,6 +195,17 @@
           }
         }
         throw new Error(`Authentication required (${response.status})`);
+      }
+
+      if (response.status === 424) {
+        const errorPayload = await response.json().catch(() => ({}));
+        const missingTickers = errorPayload?.data?.missing_tickers || errorPayload?.missing_tickers || [];
+        if (missingTickers.length && window.NotificationSystem) {
+          window.NotificationSystem.showError('נתוני מחיר חסרים', `חסרים נתוני OHLC לטיקרים: ${missingTickers.join(', ')}`);
+        }
+        const err = new Error('Missing historical OHLC data');
+        err.missingTickers = missingTickers;
+        throw err;
       }
       
       if (!response.ok) {
@@ -256,9 +276,18 @@
       const base = location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
       const url = `${base}/api/portfolio-state/performance?${params.toString()}`;
       
-      const response = await fetch(url, {
-        credentials: 'include' // Include cookies for session-based auth
+      const response = await fetch(url, { // Include cookies for session-based auth
       });
+      if (response.status === 424) {
+        const errorPayload = await response.json().catch(() => ({}));
+        const missingTickers = errorPayload?.data?.missing_tickers || errorPayload?.missing_tickers || [];
+        if (missingTickers.length && window.NotificationSystem) {
+          window.NotificationSystem.showError('נתוני מחיר חסרים', `חסרים נתוני OHLC לטיקרים: ${missingTickers.join(', ')}`);
+        }
+        const err = new Error('Missing historical OHLC data');
+        err.missingTickers = missingTickers;
+        throw err;
+      }
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -318,9 +347,18 @@
       const base = location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
       const url = `${base}/api/portfolio-state/comparison?${params.toString()}`;
       
-      const response = await fetch(url, {
-        credentials: 'include' // Include cookies for session-based auth
+      const response = await fetch(url, { // Include cookies for session-based auth
       });
+      if (response.status === 424) {
+        const errorPayload = await response.json().catch(() => ({}));
+        const missingTickers = errorPayload?.data?.missing_tickers || errorPayload?.missing_tickers || [];
+        if (missingTickers.length && window.NotificationSystem) {
+          window.NotificationSystem.showError('נתוני מחיר חסרים', `חסרים נתוני OHLC לטיקרים: ${missingTickers.join(', ')}`);
+        }
+        const err = new Error('Missing historical OHLC data');
+        err.missingTickers = missingTickers;
+        throw err;
+      }
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }

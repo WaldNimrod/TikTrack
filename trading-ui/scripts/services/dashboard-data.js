@@ -5,6 +5,18 @@
  * כולל תמיכה במטמון הרב-שכבתי ובניקוי משותף לאחר פעולות CRUD.
  */
 (function dashboardDataService() {
+
+// ===== FUNCTION INDEX =====
+
+// === Event Handlers ===
+// - fetchJsonList() - Fetchjsonlist
+
+// === Data Functions ===
+// - normalizeDashboardPayload() - Normalizedashboardpayload
+// - loadDashboardData() - Loaddashboarddata
+// - saveDashboardCache() - Savedashboardcache
+// - invalidateDashboardData() - Invalidatedashboarddata
+
   const CACHE_KEY = 'dashboard-data';
   const DEPENDENT_KEYS = ['dashboard-trades', 'dashboard-alerts', 'dashboard-accounts', 'dashboard-cash-flows'];
   const TTL = 60 * 1000; // 60 שניות – נתוני תצוגה בלבד

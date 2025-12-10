@@ -13,6 +13,16 @@
  * התוצאות יוצגו בקונסולה עם סימון ✅ או ❌ לכל בדיקה
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Event Handlers ===
+// - checkFunction() - Checkfunction
+
+// === Utility Functions ===
+// - checkGlobal() - Checkglobal
+// - checkObjectProperty() - Checkobjectproperty
+
 (function() {
   'use strict';
 

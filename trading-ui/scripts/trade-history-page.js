@@ -6,6 +6,74 @@
  * Documentation: See documentation/frontend/JAVASCRIPT_ARCHITECTURE.md
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - initializeHeader() - Initializeheader
+// - initializePage() - Initializepage
+// - setupHeaderFiltersIntegration() - Setupheaderfiltersintegration
+
+// === Event Handlers ===
+// - showMissingHistoricalDataConfirmation() - Showmissinghistoricaldataconfirmation
+// - renderTradesForSelection() - Rendertradesforselection
+// - renderPlanVsExecution() - Renderplanvsexecution
+// - registerPlanVsExecutionTable() - Registerplanvsexecutiontable
+// - updatePlanVsExecutionTable() - Updateplanvsexecutiontable
+// - renderComparisonValue() - Rendercomparisonvalue
+
+// === UI Functions ===
+// - showTickerSearchModal() - Showtickersearchmodal
+// - renderTickerSearchResults() - Rendertickersearchresults
+// - updateURLWithTradeId() - Updateurlwithtradeid
+// - renderPage() - Renderpage
+// - renderStatistics() - Renderstatistics
+// - renderTradeDetails() - Rendertradedetails
+// - renderTimelineStepsTable() - Rendertimelinestepstable
+// - renderTimelineSteps() - Rendertimelinesteps
+// - renderPlannedValue() - Renderplannedvalue
+// - renderTradeValue() - Rendertradevalue
+// - renderExecutedValue() - Renderexecutedvalue
+// - renderValue() - Rendervalue
+
+// === Data Functions ===
+// - getCSSVariableValue() - Getcssvariablevalue
+// - getInvestmentTypeText() - Getinvestmenttypetext
+// - loadTickers() - Loadtickers
+// - loadInvestmentTypes() - Loadinvestmenttypes
+// - loadTrades() - Loadtrades
+// - loadTradesTable() - Loadtradestable
+// - checkAndFetchMissingHistoricalPrices() - Checkandfetchmissinghistoricalprices
+// - loadTradeForAnalysis() - Loadtradeforanalysis
+// - loadDataFromCache() - Loaddatafromcache
+// - saveToCache() - Savetocache
+// - getTradeIdFromURL() - Gettradeidfromurl
+// - savePageState() - Savepagestate
+// - loadPageState() - Loadpagestate
+
+// === Utility Functions ===
+// - formatDate() - Formatdate
+
+// === Other ===
+// - safeSetInnerHTML() - Safesetinnerhtml
+// - populateTickerFilter() - Populatetickerfilter
+// - openTradeSelectorModal() - Opentradeselectormodal
+// - applyTradeFiltersInternal() - Applytradefiltersinternal
+// - applyTradeFilters() - Applytradefilters
+// - clearTradeFilters() - Cleartradefilters
+// - viewTradeDetails() - Viewtradedetails
+// - selectTradeForAnalysis() - Selecttradeforanalysis
+// - clearSelectedTrade() - Clearselectedtrade
+// - searchTickerForTradeHistory() - Searchtickerfortradehistory
+// - clearTickerSearchResults() - Cleartickersearchresults
+// - selectTickerForTradeHistory() - Selecttickerfortradehistory
+// - selectTradeForHistory() - Selecttradeforhistory
+// - waitForCacheManager() - Waitforcachemanager
+// - waitForTradingView() - Waitfortradingview
+// - restoreChartZoomState() - Restorechartzoomstate
+// - extractDateValue() - Extractdatevalue
+// - extractDate() - Extractdate
+
 (function() {
     'use strict';
 
@@ -718,9 +786,7 @@
                     headers: {
                         'Content-Type': 'application/json',
                         'Cache-Control': 'no-cache'
-                    },
-                    credentials: 'include'
-                });
+                    }, });
                 
                 if (quotesResponse.ok) {
                     const quotesData = await quotesResponse.json();
@@ -1660,9 +1726,7 @@
                 if (!tradeData) {
                     // Fallback: fetch directly from API
                     try {
-                        const response = await fetch(`/api/trades/${tradeId}`, {
-                            credentials: 'include'
-                        });
+                        const response = await fetch(`/api/trades/${tradeId}`, { });
                         if (response.ok) {
                             const data = await response.json();
                             tradeData = data?.data || data;
@@ -2855,9 +2919,7 @@
                     headers: {
                         'Content-Type': 'application/json',
                         'Cache-Control': 'no-cache'
-                    },
-                    credentials: 'include'
-                });
+                    }, });
                 
             let allTickersWithCounts = [];
                 if (response.ok) {
@@ -3059,9 +3121,7 @@
                         headers: {
                             'Content-Type': 'application/json',
                             'Cache-Control': 'no-cache'
-                        },
-                        credentials: 'include'
-                    });
+                        }, });
                     
                     if (response.ok) {
                         const data = await response.json();

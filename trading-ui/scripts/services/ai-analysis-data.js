@@ -170,7 +170,7 @@
                 window.NotificationSystem.showError('נדרשת התחברות', 'system');
               }
               setTimeout(() => {
-                window.location.href = 'login.html';
+                window.location.href = '/';
               }, 1000);
               throw new Error('Authentication required');
             }
@@ -299,9 +299,7 @@
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
-            },
-            credentials: 'include',
-            body: JSON.stringify(data)
+            }, body: JSON.stringify(data)
           });
 
           if (!response.ok) {
@@ -374,9 +372,7 @@
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify(data)
+        }, body: JSON.stringify(data)
       });
 
       if (!response.ok) {
@@ -470,9 +466,7 @@
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
-            },
-            credentials: 'include',
-            body: JSON.stringify({ variables })
+            }, body: JSON.stringify({ variables })
           });
 
           if (!response.ok) {
@@ -496,9 +490,7 @@
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify({ variables })
+        }, body: JSON.stringify({ variables })
       });
 
       if (!response.ok) {
@@ -565,9 +557,7 @@
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify({
+        }, body: JSON.stringify({
           template_id: templateId,
           variables: variables,
           provider: provider,
@@ -583,7 +573,7 @@
           }
           // Redirect to login
           setTimeout(() => {
-            window.location.href = 'login.html';
+            window.location.href = '/';
           }, 1000);
           throw new Error('Authentication required');
         }
@@ -645,9 +635,7 @@
           url.searchParams.set('limit', limit);
           url.searchParams.set('offset', offset);
 
-          const response = await fetch(url.toString(), {
-            credentials: 'include',
-          });
+          const response = await fetch(url.toString(), { });
 
           if (!response.ok) {
             // Handle 401 authentication errors - return empty array instead of throwing
@@ -683,9 +671,7 @@
       url.searchParams.set('limit', limit);
       url.searchParams.set('offset', offset);
 
-      const response = await fetch(url.toString(), {
-        credentials: 'include',
-      });
+      const response = await fetch(url.toString(), { });
 
       if (!response.ok) {
         // Handle 401 authentication errors - return empty array instead of throwing
@@ -728,9 +714,7 @@
       // Use CacheTTLGuard for automatic cache management
       if (window.CacheTTLGuard?.ensure) {
         return await window.CacheTTLGuard.ensure('ai-analysis-providers', async () => {
-          const response = await fetch(buildUrl('/api/ai-analysis/llm-provider'), {
-            credentials: 'include',
-          });
+          const response = await fetch(buildUrl('/api/ai-analysis/llm-provider'), { });
 
           if (!response.ok) {
             // Handle 401 authentication errors - return null instead of throwing
@@ -747,9 +731,7 @@
       }
 
       // Fallback if CacheTTLGuard not available
-      const response = await fetch(buildUrl('/api/ai-analysis/llm-provider'), {
-        credentials: 'include',
-      });
+      const response = await fetch(buildUrl('/api/ai-analysis/llm-provider'), { });
 
       if (!response.ok) {
         // Handle 401 authentication errors - return null instead of throwing
@@ -785,9 +767,7 @@
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify({
+        }, body: JSON.stringify({
           provider: provider,
           api_key: apiKey,
           validate: validate,
@@ -803,7 +783,7 @@
           }
           // Redirect to login
           setTimeout(() => {
-            window.location.href = 'login.html';
+            window.location.href = '/';
           }, 1000);
           throw new Error('Authentication required');
         }
@@ -1025,9 +1005,7 @@
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-      });
+        }, });
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
@@ -1103,9 +1081,7 @@
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-      });
+        }, });
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));

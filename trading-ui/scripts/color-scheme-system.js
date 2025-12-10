@@ -11,6 +11,79 @@
  * @since 2025-01-09
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Event Handlers ===
+// - eventHandler() - Eventhandler
+
+// === UI Functions ===
+// - updateEntityColors() - Updateentitycolors
+// - updateCSSVariablesFromPreferences() - Updatecssvariablesfrompreferences
+
+// === Data Functions ===
+// - getEntityColor() - Getentitycolor
+// - getEntityBackgroundColor() - Getentitybackgroundcolor
+// - getEntityTextColor() - Getentitytextcolor
+// - getEntityBorderColor() - Getentitybordercolor
+// - getEntityLabel() - Getentitylabel
+// - getStatusColor() - Getstatuscolor
+// - getStatusBackgroundColor() - Getstatusbackgroundcolor
+// - getStatusTextColor() - Getstatustextcolor
+// - getStatusBorderColor() - Getstatusbordercolor
+// - getInvestmentTypeColor() - Getinvestmenttypecolor
+// - getInvestmentTypeBackgroundColor() - Getinvestmenttypebackgroundcolor
+// - getInvestmentTypeTextColor() - Getinvestmenttypetextcolor
+// - getInvestmentTypeBorderColor() - Getinvestmenttypebordercolor
+// - getNumericValueColor() - Getnumericvaluecolor
+// - getNumericValueBackgroundColor() - Getnumericvaluebackgroundcolor
+// - getNumericValueTextColor() - Getnumericvaluetextcolor
+// - getNumericValueBorderColor() - Getnumericvaluebordercolor
+// - getValueType() - Getvaluetype
+// - getNumericValueCSSClass() - Getnumericvaluecssclass
+// - getMainHeaderOpacityHex() - Getmainheaderopacityhex
+// - getSubHeaderOpacityHex() - Getsubheaderopacityhex
+// - loadColorScheme() - Loadcolorscheme
+// - saveColorScheme() - Savecolorscheme
+// - getCurrentColorScheme() - Getcurrentcolorscheme
+// - getAvailableColorSchemes() - Getavailablecolorschemes
+// - loadDynamicColors() - Loaddynamiccolors
+// - getEntityColorFromPreferences() - Getentitycolorfrompreferences
+// - getAllEntityColorVariantsFromPreferences() - Getallentitycolorvariantsfrompreferences
+// - loadEntityColorsFromPreferences() - Loadentitycolorsfrompreferences
+// - loadColorPreferences() - Loadcolorpreferences
+// - getTableColors() - Gettablecolors
+// - getTableColorsWithFallbacks() - Gettablecolorswithfallbacks
+// - getEntityColorPref() - Getentitycolorpref
+
+// === Other ===
+// - hexToRgb() - Hextorgb
+// - darkenColor() - Darkencolor
+// - lightenColor() - Lightencolor
+// - isValidEntityType() - Isvalidentitytype
+// - isPositiveValue() - Ispositivevalue
+// - isNegativeValue() - Isnegativevalue
+// - isZeroValue() - Iszerovalue
+// - generateEntityCSS() - Generateentitycss
+// - applyEntityColorsToHeaders() - Applyentitycolorstoheaders
+// - isWarningModal() - Iswarningmodal
+// - generateStatusCSS() - Generatestatuscss
+// - generateInvestmentTypeCSS() - Generateinvestmenttypecss
+// - generateNumericValueCSS() - Generatenumericvaluecss
+// - applyColorScheme() - Applycolorscheme
+// - applyLightScheme() - Applylightscheme
+// - applyDarkScheme() - Applydarkscheme
+// - applyCustomScheme() - Applycustomscheme
+// - toggleColorScheme() - Togglecolorscheme
+// - setCurrentEntityColorFromPage() - Setcurrententitycolorfrompage
+// - setCurrentEntityColorForEntity() - Setcurrententitycolorforentity
+// - findPageClass() - Findpageclass
+// - generateAndApplyEntityCSS() - Generateandapplyentitycss
+// - setVar() - Setvar
+// - computeVariant() - Computevariant
+// - applyNumericPalette() - Applynumericpalette
+// - applyThemeColor() - Applythemecolor
+
 // ===== ENTITY TYPE DEFINITIONS =====
 // עטיפת כל הקובץ בפונקציה כדי למנוע טעינה כפולה
 (function() {

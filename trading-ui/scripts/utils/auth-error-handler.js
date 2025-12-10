@@ -5,6 +5,13 @@
  * Used by all data services to handle authentication failures consistently
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Event Handlers ===
+// - handleAuthenticationError() - Handleauthenticationerror
+// - checkAndHandleAuthError() - Checkandhandleautherror
+
 (function authErrorHandler() {
   'use strict';
 
@@ -47,15 +54,9 @@
         // On successful login, reload the page
         window.location.reload();
       });
-    } else if (typeof window.AuthGuard?.redirectToLogin === 'function') {
-      window.AuthGuard.redirectToLogin();
     } else {
-      // Fallback: redirect to login page
-      const currentPath = window.location.pathname;
-      const loginPath = currentPath.includes('trading-ui') 
-        ? 'trading-ui/login.html' 
-        : 'login.html';
-      window.location.href = loginPath;
+      // Fallback: redirect to homepage (login modal lives there)
+      window.location.href = '/';
     }
   }
 

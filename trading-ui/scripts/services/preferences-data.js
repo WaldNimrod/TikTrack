@@ -153,7 +153,6 @@
       body = null,
       headers = {},
       signal,
-      credentials = 'include',
       // advanced options
       timeoutMs = 15000,
       dedupe = true,
@@ -190,7 +189,6 @@
           },
           body: body ? JSON.stringify(body) : undefined,
           signal: signal || controller.signal,
-          credentials,
         };
         // Send If-None-Match ETag when available
         const etag = etags.get(url);
@@ -200,8 +198,7 @@
         const resp = await fetch(url, {
           ...hdrs,
           body: body ? JSON.stringify(body) : undefined,
-          signal: signal || controller.signal,
-          credentials,
+          signal: signal || controller.signal
         });
         return resp;
       } catch (e) {

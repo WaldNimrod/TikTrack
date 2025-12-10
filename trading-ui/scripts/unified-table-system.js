@@ -21,6 +21,35 @@
  * Last Updated: 2025-01-27
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Event Handlers ===
+// - cloneFiltersForStorage() - Clonefiltersforstorage
+// - tableSorterPrepareUpdateFunction() - Tablesorterprepareupdatefunction
+
+// === Data Functions ===
+// - getTableOverride() - Gettableoverride
+// - getTableIdFromSelector() - Gettableidfromselector
+// - getValueByPath() - Getvaluebypath
+// - registryAwareGetter() - Registryawaregetter
+
+// === API Functions ===
+// - safeCall() - Safecall
+
+// === Other ===
+// - toArray() - Toarray
+// - normalizeText() - Normalizetext
+// - flattenValue() - Flattenvalue
+// - toDate() - Todate
+// - resolveChainSource() - Resolvechainsource
+// - release() - Release
+// - releaseSorter() - Releasesorter
+// - fallbackResolver() - Fallbackresolver
+// - finalize() - Finalize
+// - mergedCustom() - Mergedcustom
+// - resolvedSearchFields() - Resolvedsearchfields
+
 // ===== TABLE REGISTRY =====
 
 /**

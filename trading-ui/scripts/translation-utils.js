@@ -13,6 +13,53 @@
  * Last Updated: August 26, 2025
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - initializeLanguageSystem() - Initializelanguagesystem
+
+// === Event Handlers ===
+// - translateAlertCondition() - Translatealertcondition
+// - translateExecutionAction() - Translateexecutionaction
+// - getCurrencyIcon() - Getcurrencyicon
+// - translateConditionFields() - Translateconditionfields
+// - translateLegacyCondition() - Translatelegacycondition
+// - getConditionAttributeOptions() - Getconditionattributeoptions
+// - getConditionOperatorOptions() - Getconditionoperatoroptions
+
+// === UI Functions ===
+// - updateLanguageDependentElements() - Updatelanguagedependentelements
+// - getTickerCurrencyDisplay() - Gettickercurrencydisplay
+// - getCashFlowCurrencyDisplay() - Getcashflowcurrencydisplay
+
+// === Data Functions ===
+// - getCurrentLanguage() - Getcurrentlanguage
+// - getTickerCurrencySymbol() - Gettickercurrencysymbol
+
+// === Utility Functions ===
+// - formatNumberWithCommas() - Formatnumberwithcommas
+// - formatCurrencyWithCommas() - Formatcurrencywithcommas
+
+// === Other ===
+// - translateAccountStatus() - Translateaccountstatus
+// - translateTickerStatus() - Translatetickerstatus
+// - translateNoteStatus() - Translatenotestatus
+// - translateAlertStatus() - Translatealertstatus
+// - translateAlertType() - Translatealerttype
+// - translateTradePlanStatus() - Translatetradeplanstatus
+// - translateIsTriggered() - Translateistriggered
+// - translateTradeType() - Translatetradetype
+// - translateTradeStatus() - Translatetradestatus
+// - translateTradePlanType() - Translatetradeplantype
+// - translateCashFlowType() - Translatecashflowtype
+// - translateCashFlowSource() - Translatecashflowsource
+// - translateTickerType() - Translatetickertype
+// - translateEntityType() - Translateentitytype
+// - setLanguage() - Setlanguage
+// - colorAmountByValue() - Coloramountbyvalue
+// - findAlertById() - Findalertbyid
+
 // ===== תרגום סטטוסים =====
 
 /**

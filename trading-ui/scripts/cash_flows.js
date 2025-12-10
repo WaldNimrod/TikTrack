@@ -112,8 +112,7 @@ async function loadCashFlowsData(options = {}) {
         'Content-Type': 'application/json',
         'Cache-Control': 'no-cache',
       },
-      signal: loadOptions.signal,
-      credentials: 'include' // Include cookies for session-based auth
+      signal: loadOptions.signal, // Include cookies for session-based auth
     });
     
     // Handle 401/308 authentication errors
@@ -149,14 +148,8 @@ async function loadCashFlowsData(options = {}) {
         window.TikTrackAuth.showLoginModal(() => {
           window.location.reload();
         });
-      } else if (typeof window.AuthGuard?.redirectToLogin === 'function') {
-        window.AuthGuard.redirectToLogin();
       } else {
-        const currentPath = window.location.pathname;
-        const loginPath = currentPath.includes('trading-ui') 
-          ? 'trading-ui/login.html' 
-          : 'login.html';
-        window.location.href = loginPath;
+        window.location.href = '/';
       }
       
       throw new Error('Authentication required');

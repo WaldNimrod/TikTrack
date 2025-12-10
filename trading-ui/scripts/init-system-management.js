@@ -3,6 +3,84 @@
  * עמוד ניהול מערכת האתחול
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - checkDuplicateInitialization() - Checkduplicateinitialization
+
+// === Core Functions ===
+// - runValidator() - Runvalidator
+// - runScriptTests() - Runscripttests
+// - runDependencyTests() - Rundependencytests
+// - runPerformanceTests() - Runperformancetests
+// - runComprehensiveTests() - Runcomprehensivetests
+// - runDetailedPageScan_OLD() - Rundetailedpagescan Old
+
+// === Event Handlers ===
+// - runStandardizationAnalysis() - Runstandardizationanalysis
+// - generateCompleteScriptSection() - Generatecompletescriptsection
+// - loadPagesForScriptGeneration() - Loadpagesforscriptgeneration
+// - onPageSelectedForScriptGen() - Onpageselectedforscriptgen
+// - displayGeneratedContent() - Displaygeneratedcontent
+// - showNotification() - Shownotification
+// - loadAdvancedMonitoring() - Loadadvancedmonitoring
+// - loadValidationTests() - Loadvalidationtests
+// - runValidationTests() - Runvalidationtests
+// - runAdvancedMonitoring() - Runadvancedmonitoring
+// - copyGeneratedContent() - Copygeneratedcontent
+
+// === UI Functions ===
+// - showPerformance() - Showperformance
+// - showPackageStats() - Showpackagestats
+// - showScriptCodeInModal() - Showscriptcodeinmodal
+// - displayTestResults() - Displaytestresults
+// - displayComprehensiveResults() - Displaycomprehensiveresults
+// - showPageDetails() - Showpagedetails
+
+// === Data Functions ===
+// - loadSystemStatus() - Loadsystemstatus
+// - loadPagesMapping() - Loadpagesmapping
+// - loadPackagesList() - Loadpackageslist
+// - loadPerformanceReport() - Loadperformancereport
+// - loadPackagesCheckboxes() - Loadpackagescheckboxes
+// - getSelectedPackages() - Getselectedpackages
+// - generateScriptLoadingCodeForSelectedPage() - Generatescriptloadingcodeforselectedpage
+// - loadScriptTests() - Loadscripttests
+// - loadDependencyTests() - Loaddependencytests
+// - loadPerformanceTests() - Loadperformancetests
+// - checkLoadOrder() - Checkloadorder
+// - waitForPageFullyLoaded() - Waitforpagefullyloaded
+// - getStatusText() - Getstatustext
+// - getDetailedMismatches() - Getdetailedmismatches
+
+// === Utility Functions ===
+// - checkForDuplicates() - Checkforduplicates
+// - checkForMismatches_OLD() - Checkformismatches Old
+// - checkGlobalExists() - Checkglobalexists
+
+// === Other ===
+// - analyzeScripts() - Analyzescripts
+// - copyReportToClipboard() - Copyreporttoclipboard
+// - exportReportAsFile() - Exportreportasfile
+// - generatePage() - Generatepage
+// - generateScriptTagsForPage() - Generatescripttagsforpage
+// - copyGeneratedScriptCode() - Copygeneratedscriptcode
+// - fallbackCopyScriptCode() - Fallbackcopyscriptcode
+// - escapeHtmlForModal() - Escapehtmlformodal
+// - copyToClipboard() - Copytoclipboard
+// - escapeHtml() - Escapehtml
+// - copyDetailedLog() - Copydetailedlog
+// - testSinglePage() - Testsinglepage
+// - waitForScriptsReady() - Waitforscriptsready
+// - exportTestResults() - Exporttestresults
+// - copyAllResults() - Copyallresults
+// - copyComprehensiveResults() - Copycomprehensiveresults
+// - copyDetailedPageResults() - Copydetailedpageresults
+// - copyPackagesList() - Copypackageslist
+// - copyPagesMapping() - Copypagesmapping
+// - copyPerformanceReport() - Copyperformancereport
+
 // Global variables
 let runtimeValidator = null;
 let scriptAnalyzer = null;
@@ -2070,20 +2148,20 @@ function copyDetailedLog() {
     };
     
     const logText = `
-=== TikTrack Advanced Monitoring Log ===
+// === TikTrack Advanced Monitoring Log ===
 תאריך: ${logData.timestamp}
 עמוד: ${logData.page}
 דפדפן: ${logData.userAgent}
 
-=== מערכת אתחול ===
+// === מערכת אתחול ===
 סטטוס: ${logData.systemInfo.unifiedAppStatus}
 חבילות זמינות: ${logData.systemInfo.packageManifest.join(', ')}
 קונפיגורציות עמודים: ${logData.systemInfo.pageConfigs.join(', ')}
 
-=== סקריפטים נטענים ===
+// === סקריפטים נטענים ===
 ${logData.systemInfo.loadedScripts.map((script, index) => `${index + 1}. ${script}`).join('\n')}
 
-=== תוצאות בדיקות ===
+// === תוצאות בדיקות ===
 ${JSON.stringify(logData.tests, null, 2)}
     `.trim();
     

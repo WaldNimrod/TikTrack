@@ -158,6 +158,13 @@ const PACKAGE_MANIFEST = {
         loadOrder: 0
       },
       {
+        file: 'api-fetch-wrapper.js',
+        globalCheck: 'window.APIFetchWrapper',
+        description: 'Global fetch wrapper for Authorization injection and 401 handling',
+        required: true,
+        loadOrder: 0.5
+      },
+      {
         file: 'global-favicon.js',
         globalCheck: 'window.setFavicon',
         description: 'Favicon management',
@@ -1896,7 +1903,7 @@ const PACKAGE_MANIFEST = {
     description: 'TradingView Lightweight Charts system',
     version: '1.0.0',
     critical: false,
-    loadOrder: 19, // Changed from 20 to 19 to load before init-system (22) and after dashboard-widgets (19.5)
+    loadOrder: 19, // Changed from 20 to 19 to load before init-system (22) and after dashboard-widgets (20.5)
     dependencies: ['base'],
     loadingStrategy: 'async', // Non-critical - only for TradingView chart pages
     scripts: [
@@ -2038,7 +2045,7 @@ const PACKAGE_MANIFEST = {
     description: 'Initialization and monitoring systems',
     version: '1.5.0',
     critical: false,
-    loadOrder: 22, // Changed from 20 to 22 to load after all other packages (dashboard-widgets 19.5, tradingview-charts 19, tradingview-widgets 21, watch-lists 20)
+    loadOrder: 22, // Changed from 20 to 22 to load after all other packages (dashboard-widgets 20.5, tradingview-charts 19, tradingview-widgets 21, watch-lists 20)
     dependencies: ['base'], // Only base is required for Logger and basic systems
     loadingStrategy: 'defer', // Critical package - initialization system, must load last, has dependencies on base
     scripts: [
@@ -2111,15 +2118,15 @@ const PACKAGE_MANIFEST = {
     initTime: '~30ms'
   },
 
-  // 19.5 DASHBOARD WIDGETS PACKAGE - Dashboard page components
+  // 20.5 DASHBOARD WIDGETS PACKAGE - Dashboard page components
   'dashboard-widgets': {
     id: 'dashboard-widgets',
     name: 'Dashboard Widgets',
     description: 'Widgets and dashboard interfaces (Pending Executions, Trade Creation)',
     version: '1.0.0',
     critical: false,
-    loadOrder: 19.5,
-    dependencies: ['base', 'services', 'ui-advanced', 'entity-services', 'modules', 'entity-details'],
+    loadOrder: 20.5, // Changed from 19.5 to 20.5 to load after watch-lists (20)
+    dependencies: ['base', 'services', 'ui-advanced', 'entity-services', 'modules', 'entity-details', 'watch-lists'],
     loadingStrategy: 'defer', // Critical package - dashboard widgets, has dependencies on multiple packages
     scripts: [
       {
@@ -2151,18 +2158,22 @@ const PACKAGE_MANIFEST = {
       // - PendingActionsCacheService (shared cache management)
       {
         file: 'widgets/unified-pending-actions-widget.js',
-      },
-      {
-        file: 'widgets/widget-monitor.js',
-        globalCheck: 'window.WidgetMonitor',
-        description: 'Widget monitoring and debugging system',
-        required: false,
-        loadOrder: 99 // Load after all widgets
+        globalCheck: 'window.UnifiedPendingActionsWidget',
+        description: 'Unified pending actions widget',
+        required: true,
+        loadOrder: 2
       },
       {
         file: 'widgets/tag-widget.js',
         globalCheck: 'window.TagWidget',
         description: 'Unified tag widget (cloud + search)',
+        required: true,
+        loadOrder: 5
+      },
+      {
+        file: 'active-alerts-component.js',
+        globalCheck: 'window.updateActiveAlertsComponent',
+        description: 'Active alerts component',
         required: true,
         loadOrder: 5
       },
@@ -2181,18 +2192,18 @@ const PACKAGE_MANIFEST = {
         loadOrder: 7
       },
       {
-        file: 'services/watch-lists-widget-service.js',
-        globalCheck: 'window.WatchListsWidgetService',
-        description: 'Watch lists widget service (mockup)',
+        file: 'widgets/watch-lists-widget.js',
+        globalCheck: 'window.WatchListsWidget',
+        description: 'Watch lists widget for dashboard',
         required: false,
-        loadOrder: 5.5
+        loadOrder: 8
       },
       {
-        file: 'active-alerts-component.js',
-        globalCheck: 'window.updateActiveAlertsComponent',
-        description: 'Active alerts component',
-        required: true,
-        loadOrder: 5
+        file: 'widgets/widget-monitor.js',
+        globalCheck: 'window.WidgetMonitor',
+        description: 'Widget monitoring and debugging system',
+        required: false,
+        loadOrder: 99 // Load after all widgets
       },
       // ⚠️ NOTE: tag-search-config.js moved to modules package (loadOrder: 24)
       // It must load before modal-manager-v2.js which is in modules package
@@ -2201,7 +2212,7 @@ const PACKAGE_MANIFEST = {
         globalCheck: 'window.initializeIndexPage',
         description: 'Dashboard page logic',
         required: true,
-        loadOrder: 8
+        loadOrder: 9
       }
     ],
     estimatedSize: '~110KB',

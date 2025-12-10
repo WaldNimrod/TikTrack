@@ -3,6 +3,19 @@
  * גרסה 2.0 - תיקון שגיאות JavaScript
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Object Methods ===
+// - copyDetailedLog() - Copydetailedlog
+
+// === Event Handlers ===
+// - ServerMonitor.optimizeDatabase() - Optimizedatabase
+// - ServerMonitor.exportLogs() - Exportlogs
+
+// === Global Functions ===
+// - copyDetailedLog() - Copydetailedlog
+
 class ServerMonitor {
   constructor() {
     this.logs = [];
@@ -56,7 +69,12 @@ class ServerMonitor {
   // טעינת הגדרות
   loadSettings() {
     try {
-      const saved = window.PageStateManager?.getItem('serverMonitorSettings');
+      const getItem = window.PageStateManager?.getItem;
+      if (typeof getItem !== 'function') {
+        window.Logger?.warn('⚠️ PageStateManager not available for serverMonitorSettings');
+        return;
+      }
+      const saved = getItem.call(window.PageStateManager, 'serverMonitorSettings');
       if (saved) {
         this.settings = { ...this.settings, ...JSON.parse(saved) };
       }
@@ -68,7 +86,12 @@ class ServerMonitor {
   // שמירת הגדרות
   saveSettings() {
     try {
-      window.PageStateManager?.setItem('serverMonitorSettings', JSON.stringify(this.settings));
+      const setItem = window.PageStateManager?.setItem;
+      if (typeof setItem !== 'function') {
+        window.Logger?.warn('⚠️ PageStateManager not available for saving serverMonitorSettings');
+        return;
+      }
+      setItem.call(window.PageStateManager, 'serverMonitorSettings', JSON.stringify(this.settings));
     } catch (error) {
       window.Logger?.error('❌ שגיאה בשמירת הגדרות:', error);
     }

@@ -17,6 +17,24 @@
  * @date 2025-01-28
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Class Methods ===
+// - MockupPagesComprehensiveTester.generateSummary() - Generatesummary
+// - MockupPagesComprehensiveTester.generateMarkdownReport() - Generatemarkdownreport
+// - MockupPagesComprehensiveTester.exportResults() - Exportresults
+
+// === Initialization ===
+// - MockupPagesComprehensiveTester.initializeConsoleMonitoring() - Initializeconsolemonitoring
+
+// === Event Handlers ===
+// - MockupPagesComprehensiveTester.testConsoleErrors() - Testconsoleerrors
+// - MockupPagesComprehensiveTester.testIntegrations() - Testintegrations
+// - MockupPagesComprehensiveTester.getPageConfig() - Getpageconfig
+// - console.error() - Error
+// - console.warn() - Warn
+
 (function() {
     'use strict';
 

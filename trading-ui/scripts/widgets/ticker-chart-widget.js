@@ -25,6 +25,32 @@
  * Documentation: See documentation/03-DEVELOPMENT/GUIDES/TICKER_CHART_WIDGET_DEVELOPER_GUIDE.md
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - createMiniChart() - Createminichart
+
+// === Event Handlers ===
+// - getChangeColorClass() - Getchangecolorclass
+
+// === UI Functions ===
+// - showLoading() - Showloading
+// - showError() - Showerror
+// - showEmpty() - Showempty
+// - renderChartCard() - Renderchartcard
+// - renderTickers() - Rendertickers
+
+// === Data Functions ===
+// - loadTickers() - Loadtickers
+
+// === Utility Functions ===
+// - formatAmount() - Formatamount
+// - formatPercent() - Formatpercent
+
+// === Other ===
+// - cacheElements() - Cacheelements
+
 ;(function () {
   'use strict';
 

@@ -6,6 +6,87 @@
  * Documentation: See documentation/frontend/JAVASCRIPT_ARCHITECTURE.md
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - initPortfolioPerformanceChart() - Initportfolioperformancechart
+// - initPortfolioValueChart() - Initportfoliovaluechart
+// - initPLTrendChart() - Initpltrendchart
+// - setupChartSynchronization() - Setupchartsynchronization
+// - setupChartControls() - Setupchartcontrols
+// - initializeHeader() - Initializeheader
+// - initializePage() - Initializepage
+
+// === Event Handlers ===
+// - convertDateToChartFormat() - Convertdatetochartformat
+// - selectDateRangeOption() - Selectdaterangeoption
+// - handleCustomDateFromChange() - Handlecustomdatefromchange
+// - handleCustomDateToChange() - Handlecustomdatetochange
+// - selectAccountOption() - Selectaccountoption
+// - loadTradesForMonthYear() - Loadtradesformonthyear
+// - removeComparisonDate() - Removecomparisondate
+
+// === UI Functions ===
+// - updateDateRangeFilterText() - Updatedaterangefiltertext
+// - updateAccountFilterText() - Updateaccountfiltertext
+// - renderNumericValue() - Rendernumericvalue
+// - showLoadingState() - Showloadingstate
+// - hideLoadingState() - Hideloadingstate
+// - renderTradeRow() - Rendertraderow
+// - updateTradesTable() - Updatetradestable
+// - updateTradesSummary() - Updatetradessummary
+// - updateSummaryCards() - Updatesummarycards
+// - renderAmount() - Renderamount
+
+// === Data Functions ===
+// - getCSSVariableValue() - Getcssvariablevalue
+// - loadTradingAccounts() - Loadtradingaccounts
+// - loadInvestmentTypes() - Loadinvestmenttypes
+// - getDateRange() - Getdaterange
+// - getSelectedAccounts() - Getselectedaccounts
+// - loadChartDefaultPeriod() - Loadchartdefaultperiod
+// - checkPortfolioDataCompleteness() - Checkportfoliodatacompleteness
+// - ensurePortfolioHistoricalData() - Ensureportfoliohistoricaldata
+// - loadPortfolioState() - Loadportfoliostate
+// - loadTrades() - Loadtrades
+// - getLighterColor() - Getlightercolor
+// - syncRangeToOtherCharts() - Syncrangetoothercharts
+// - getTimeDiff() - Gettimediff
+// - loadUserPreferences() - Loaduserpreferences
+// - savePageState() - Savepagestate
+// - getColumns() - Getcolumns
+
+// === Utility Functions ===
+// - formatCurrency() - Formatcurrency
+// - formatDate() - Formatdate
+
+// === Other ===
+// - toggleCardDetails() - Togglecarddetails
+// - populateAccountFilterMenu() - Populateaccountfiltermenu
+// - toggleAccountFilterMenu() - Toggleaccountfiltermenu
+// - toggleDateRangeFilterMenu() - Toggledaterangefiltermenu
+// - applyCustomDateRange() - Applycustomdaterange
+// - isDateInRange() - Isdateinrange
+// - debounce() - Debounce
+// - applyFilters() - Applyfilters
+// - applyFiltersInternal() - Applyfiltersinternal
+// - filterTrades() - Filtertrades
+// - clearFilters() - Clearfilters
+// - populateYearSelect() - Populateyearselect
+// - calculateSummaryFromTrades() - Calculatesummaryfromtrades
+// - setChartPeriod() - Setchartperiod
+// - timeRangesEqual() - Timerangesequal
+// - addTime() - Addtime
+// - applyToAllCharts() - Applytoallcharts
+// - compareDates() - Comparedates
+// - waitForScripts() - Waitforscripts
+// - registerPortfolioTradesTable() - Registerportfoliotradestable
+// - restorePageState() - Restorepagestate
+// - restoreSelectedAccounts() - Restoreselectedaccounts
+// - INVESTMENT_TYPES() - Investment Types
+// - later() - Later
+
 (function() {
     'use strict';
 

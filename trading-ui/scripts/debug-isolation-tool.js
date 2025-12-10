@@ -145,14 +145,14 @@
     console.log(`
 🔧 Isolation Tool Loaded
 Available commands:
-  - IsolationTool.toggleComponent('active-alerts', false)  // Hide component
-  - IsolationTool.isolateComponents(['active-alerts'])     // Show only specified
-  - IsolationTool.showAll()                                // Show all
-  - IsolationTool.hideAll()                                // Hide all
-  - IsolationTool.disableAutoInit()                        // Disable auto-init
-  - IsolationTool.enableAutoInit()                         // Enable auto-init
-  - IsolationTool.printStatus()                            // Print status
-  - IsolationTool.getStatus()                              // Get status object
+// - IsolationTool.toggleComponent('active-alerts', false)  // Hide component
+// - IsolationTool.isolateComponents(['active-alerts'])     // Show only specified
+// - IsolationTool.showAll()                                // Show all
+// - IsolationTool.hideAll()                                // Hide all
+// - IsolationTool.disableAutoInit()                        // Disable auto-init
+// - IsolationTool.enableAutoInit()                         // Enable auto-init
+// - IsolationTool.printStatus()                            // Print status
+// - IsolationTool.getStatus()                              // Get status object
     `);
 
 })();

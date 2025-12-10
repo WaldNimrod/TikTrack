@@ -76,8 +76,7 @@
       const base = location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
       const url = `${base}/api/trading-journal/entries?${params.toString()}`;
       
-      const response = await fetch(url, {
-        credentials: 'include' // Include cookies for session-based auth
+      const response = await fetch(url, { // Include cookies for session-based auth
       });
       
       // Handle 401/308 authentication errors
@@ -142,8 +141,7 @@
       const base = location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
       const url = `${base}/api/trading-journal/activity-stats?${params.toString()}`;
       
-      const response = await fetch(url, {
-        credentials: 'include' // Include cookies for session-based auth
+      const response = await fetch(url, { // Include cookies for session-based auth
       });
       
       // Handle 401/308 authentication errors
@@ -213,8 +211,7 @@
       const base = location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
       const url = `${base}/api/trading-journal/calendar?${params.toString()}`;
       
-      const response = await fetch(url, {
-        credentials: 'include' // Include cookies for session-based auth
+      const response = await fetch(url, { // Include cookies for session-based auth
       });
       
       // Handle 401/308 authentication errors
@@ -280,8 +277,7 @@
       const base = location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
       const url = `${base}/api/trading-journal/by-entity?${params.toString()}`;
       
-      const response = await fetch(url, {
-        credentials: 'include' // Include cookies for session-based auth
+      const response = await fetch(url, { // Include cookies for session-based auth
       });
       
       // Handle 401/308 authentication errors

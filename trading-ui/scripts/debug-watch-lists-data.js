@@ -10,6 +10,12 @@
  * 3. Run: window.debugWatchListsData()
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Data Functions ===
+// - debugWatchListsData() - Debugwatchlistsdata
+
 (function() {
     'use strict';
 

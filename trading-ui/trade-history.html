@@ -306,6 +306,7 @@
     <script src="../../scripts/services/trade-plans-data.js?v=1.0.0" defer></script> <!-- Trade plans data service -->
     <!-- [93.5] Load Order: 93.5 | Strategy: defer -->
     <script src="../../scripts/services/trade-history-data.js?v=1.0.0" defer></script> <!-- Trade history data service -->
+    <script src="../../scripts/services/historical-data-helpers.js?v=1.0.0" defer></script> <!-- Shared OHLC helpers -->
     <!-- [94] Load Order: 94 | Strategy: defer -->
     <script src="../../scripts/trade-plan-service.js?v=1.0.0" defer></script> <!-- Trade plan service -->
     <!-- [95] Load Order: 95 | Strategy: defer -->
@@ -797,54 +798,48 @@
             let marketPriceData = [];
             
             // Try to get chart data from global tradeHistoryData first (most reliable)
-            if (window.tradeHistoryData && window.tradeHistoryData.chartData) {
-                chartData = window.tradeHistoryData.chartData;
-                if (chartData.market_prices && Array.isArray(chartData.market_prices)) {
-                    const rawMarketPriceData = chartData.market_prices;
-                    
-                    // Filter out points with missing OHLC values to prevent chart errors
-                    marketPriceData = rawMarketPriceData.filter(item => {
-                        if (!item) return false;
-                        const hasAllOHLC = ['open', 'high', 'low', 'close'].every(
-                            field => item[field] !== null && item[field] !== undefined && !isNaN(item[field])
-                        );
-                        return hasAllOHLC;
-                    });
-                    
-                    const invalidCount = rawMarketPriceData.length - marketPriceData.length;
-                    
-                    // Log market price data structure for debugging
-                    if (window.Logger && rawMarketPriceData.length > 0) {
-                        const samplePrice = rawMarketPriceData[0];
-                        window.Logger.debug('Market price data loaded', { 
-                            page: 'trade-history-page',
-                            count: rawMarketPriceData.length,
-                            validCount: marketPriceData.length,
-                            invalidCount,
-                            samplePrice: {
-                                date: samplePrice.date,
-                                open: samplePrice.open,
-                                high: samplePrice.high,
-                                low: samplePrice.low,
-                                close: samplePrice.close,
-                                price: samplePrice.price,
-                                hasNulls: {
-                                    open: samplePrice.open === null,
-                                    high: samplePrice.high === null,
-                                    low: samplePrice.low === null,
-                                    close: samplePrice.close === null,
-                                    price: samplePrice.price === null
+                if (window.tradeHistoryData && window.tradeHistoryData.chartData) {
+                    chartData = window.tradeHistoryData.chartData;
+                    if (chartData.market_prices && Array.isArray(chartData.market_prices)) {
+                        const rawMarketPriceData = chartData.market_prices;
+
+                        const sanitized = window.HistoricalDataHelpers
+                            ? window.HistoricalDataHelpers.sanitizeOhlcSeries(rawMarketPriceData)
+                            : { cleaned: [], droppedCount: rawMarketPriceData.length };
+
+                        marketPriceData = sanitized.cleaned;
+                        const invalidCount = sanitized.droppedCount;
+
+                        if (window.Logger && rawMarketPriceData.length > 0) {
+                            const samplePrice = rawMarketPriceData[0];
+                            window.Logger.debug('Market price data loaded', { 
+                                page: 'trade-history-page',
+                                count: rawMarketPriceData.length,
+                                validCount: marketPriceData.length,
+                                invalidCount,
+                                samplePrice: {
+                                    date: samplePrice.date,
+                                    open: samplePrice.open,
+                                    high: samplePrice.high,
+                                    low: samplePrice.low,
+                                    close: samplePrice.close,
+                                    price: samplePrice.price,
+                                    hasNulls: {
+                                        open: samplePrice.open === null,
+                                        high: samplePrice.high === null,
+                                        low: samplePrice.low === null,
+                                        close: samplePrice.close === null,
+                                        price: samplePrice.price === null
+                                    }
                                 }
-                            }
-                        });
-                    }
-                    
-                    // Notify if we had to drop data points
-                    if (invalidCount > 0 && window.NotificationSystem) {
-                        window.NotificationSystem.showWarning('חסרים נתוני OHLC', `נמצאו ${invalidCount} נקודות מחיר ללא נתוני OHLC מלאים והן לא יוצגו בגרף.`);
+                            });
+                        }
+
+                        if (invalidCount > 0 && window.NotificationSystem) {
+                            window.NotificationSystem.showWarning('חסרים נתוני OHLC', `נמצאו ${invalidCount} נקודות מחיר ללא נתוני OHLC מלאים והן לא יוצגו בגרף.`);
+                        }
                     }
                 }
-            }
             
             // Try to get timeline data from global tradeHistoryData first (most reliable)
             if (window.tradeHistoryData && window.tradeHistoryData.timelineData && Array.isArray(window.tradeHistoryData.timelineData)) {

@@ -11,6 +11,7 @@ from datetime import datetime
 from pathlib import Path
 from collections import deque
 from typing import Optional
+import requests
 
 try:
     from selenium import webdriver
@@ -219,6 +220,47 @@ def setup_driver():
 def login(driver):
     """Login via the modal on the base page (admin/admin123)"""
     try:
+        print("🔐 Logging in as admin via API (server-side prefetch) ...")
+        api_resp = requests.post(
+            f"{BASE_URL}/api/auth/login",
+            json={"username": TEST_USERNAME, "password": TEST_PASSWORD},
+            timeout=15,
+            allow_redirects=False,
+        )
+        session_cookie = api_resp.cookies.get("session")
+        if api_resp.status_code == 200 and session_cookie:
+            driver.get(f"{BASE_URL}/")
+            WebDriverWait(driver, 15).until(
+                lambda d: d.execute_script('return document.readyState') == 'complete'
+            )
+            driver.add_cookie({
+                "name": "session",
+                "value": session_cookie,
+                "path": "/",
+                "domain": "localhost"
+            })
+            driver.refresh()
+            WebDriverWait(driver, 15).until(
+                lambda d: d.execute_script('return document.readyState') == 'complete'
+            )
+            auth_check = driver.execute_async_script("""
+                const done = arguments[0];
+                const controller = new AbortController();
+                const timeout = setTimeout(() => {
+                    controller.abort();
+                    done({ status: 0, error: 'timeout' });
+                }, 10000);
+                fetch('/api/auth/me', { credentials: 'include', signal: controller.signal })
+                  .then(res => res.json().then(body => { clearTimeout(timeout); done({status: res.status, body}); }))
+                  .catch(err => { clearTimeout(timeout); done({status: 0, error: err && err.message ? err.message : String(err)}); });
+            """)
+            if auth_check.get("status") == 200 and auth_check.get("body", {}).get("status") == "success":
+                print("✅ API login successful, session ready")
+                return True
+            else:
+                print(f"⚠️  API login cookie set but session not verified: {auth_check}")
+
+        print("🔄 API login failed or incomplete, falling back to modal flow ...")
         print("🔐 Logging in as admin via modal on index.html ...")
         driver.get(f"{BASE_URL}/")
         

@@ -17,6 +17,21 @@
  * ואז: window.runModalNavigationE2ETests()
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Event Handlers ===
+// - testBackButton() - Testbackbutton
+// - testCloseRegistration() - Testcloseregistration
+// - testStackOnlyForNested() - Teststackonlyfornested
+// - runModalNavigationE2ETests() - Runmodalnavigatione2Etests
+
+// === Other ===
+// - testOpenPrimaryModal() - Testopenprimarymodal
+// - testOpenNestedModal() - Testopennestedmodal
+// - testBreadcrumb() - Testbreadcrumb
+// - testGoBack() - Testgoback
+
 (function() {
   'use strict';
 

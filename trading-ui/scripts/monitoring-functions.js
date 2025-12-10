@@ -21,6 +21,30 @@
  * @lastUpdated January 27, 2025
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Core Functions ===
+// - runDetailedPageScan() - Rundetailedpagescan
+
+// === Event Handlers ===
+// - getPackageDocumentation() - Getpackagedocumentation
+// - formatComparisonReport() - Formatcomparisonreport
+// - generateFixRecommendations() - Generatefixrecommendations
+
+// === Data Functions ===
+// - waitForPageFullyLoaded() - Waitforpagefullyloaded
+// - getScriptLoadOrder() - Getscriptloadorder
+
+// === Utility Functions ===
+// - checkForMismatches() - Checkformismatches
+// - parseHTMLFile() - Parsehtmlfile
+
+// === Other ===
+// - extractScriptsFromHTML() - Extractscriptsfromhtml
+// - normalizeScriptPath() - Normalizescriptpath
+// - compareHTMLvsDOM() - Comparehtmlvsdom
+
 if (window.Logger) {
   window.Logger.info('🔍 Loading Monitoring Functions...', { page: 'monitoring' });
 }

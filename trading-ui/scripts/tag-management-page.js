@@ -8,6 +8,43 @@
  * - Integrate with UnifiedTableSystem, TagEvents and NotificationSystem
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - initialize() - Initialize
+
+// === Event Handlers ===
+// - attachEventListeners() - Attacheventlisteners
+
+// === UI Functions ===
+// - showError() - Showerror
+// - renderCategoriesTable() - Rendercategoriestable
+// - renderTagsTable() - Rendertagstable
+// - renderUsageTable() - Renderusagetable
+// - refreshAll() - Refreshall
+// - refreshAnalytics() - Refreshanalytics
+
+// === Data Functions ===
+// - loadCategories() - Loadcategories
+// - loadTags() - Loadtags
+// - loadAnalytics() - Loadanalytics
+// - saveTagCategory() - Savetagcategory
+// - saveTag() - Savetag
+
+// === Other ===
+// - log() - Log
+// - populateCategoryFilter() - Populatecategoryfilter
+// - applyFilters() - Applyfilters
+// - resetFilters() - Resetfilters
+// - registerTables() - Registertables
+// - prepareCategoryForm() - Preparecategoryform
+// - prepareTagForm() - Preparetagform
+// - openCategoryModal() - Opencategorymodal
+// - openTagModal() - Opentagmodal
+// - promptDeleteCategory() - Promptdeletecategory
+// - promptDeleteTag() - Promptdeletetag
+
 (function tagManagementPageModule() {
     'use strict';
 

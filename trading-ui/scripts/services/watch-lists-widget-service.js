@@ -19,6 +19,21 @@
  * @author TikTrack Development Team
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - initialize() - Initialize
+
+// === Data Functions ===
+// - getWatchLists() - Getwatchlists
+// - getTickerIdsFromList() - Gettickeridsfromlist
+// - getSelectedWatchListId() - Getselectedwatchlistid
+// - getSelectedWatchListTickerIds() - Getselectedwatchlisttickerids
+
+// === Other ===
+// - setSelectedWatchList() - Setselectedwatchlist
+
 (function watchListsWidgetService() {
     'use strict';
 

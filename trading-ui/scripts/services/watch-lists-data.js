@@ -155,8 +155,7 @@
     const response = await fetch(url, { 
       method: 'GET', 
       headers: DEFAULT_HEADERS, 
-      signal,
-      credentials: 'include' // Include cookies for session-based auth
+      signal, // Include cookies for session-based auth
     });
     
     // Handle 401/308 authentication errors
@@ -206,7 +205,7 @@
     const url = `${base}${separator}api/watch-lists/${listId}?_ts=${Date.now()}`;
     
     try {
-      const response = await fetch(url, { method: 'GET', headers: DEFAULT_HEADERS, signal, credentials: 'include' });
+      const response = await fetch(url, { method: 'GET', headers: DEFAULT_HEADERS, signal, });
       if (!response.ok) {
         if (response.status === 404) {
           throw new Error(`Watch list ${listId} not found`);
@@ -232,7 +231,7 @@
     const url = `${base}${separator}api/watch-lists/${listId}/items?_ts=${Date.now()}`;
     
     try {
-      const response = await fetch(url, { method: 'GET', headers: DEFAULT_HEADERS, signal, credentials: 'include' });
+      const response = await fetch(url, { method: 'GET', headers: DEFAULT_HEADERS, signal, });
       if (!response.ok) {
         if (response.status === 404) {
           throw new Error(`Watch list ${listId} not found`);
@@ -262,9 +261,7 @@
         method: 'POST',
         headers: DEFAULT_HEADERS,
         body: JSON.stringify(payload),
-        signal,
-        credentials: 'include'
-      });
+        signal, });
       
       if (response.ok) {
         // Invalidate cache on success
@@ -293,9 +290,7 @@
         method: 'PUT',
         headers: DEFAULT_HEADERS,
         body: JSON.stringify(payload),
-        signal,
-        credentials: 'include'
-      });
+        signal, });
       
       if (response.ok) {
         // Invalidate cache on success
@@ -324,9 +319,7 @@
       const response = await fetch(url, {
         method: 'DELETE',
         headers: DEFAULT_HEADERS,
-        signal,
-        credentials: 'include'
-      });
+        signal, });
       
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
@@ -401,9 +394,7 @@
         method: 'PUT',
         headers: DEFAULT_HEADERS,
         body: JSON.stringify(payload),
-        signal,
-        credentials: 'include'
-      });
+        signal, });
       
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
@@ -456,9 +447,7 @@
       const response = await fetch(url, {
         method: 'DELETE',
         headers: DEFAULT_HEADERS,
-        signal,
-        credentials: 'include'
-      });
+        signal, });
       
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
@@ -570,9 +559,7 @@
         method: 'POST',
         headers: DEFAULT_HEADERS,
         body: JSON.stringify({ flag_color: flagColor }),
-        signal,
-        credentials: 'include'
-      });
+        signal, });
       
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));

@@ -12,7 +12,6 @@
  * @created December 2025
  */
 
-
 // ===== FUNCTION INDEX =====
 // === Event Handlers ===
 // - AuthDebugMonitor.loadErrors() - Loaderrors

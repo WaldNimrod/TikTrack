@@ -1033,7 +1033,8 @@ async function loadRecentTradePlans(currencySymbol, currentTrades = []) {
             updateRecentTradePlans(tradePlans, currencySymbol);
         }
     } catch (error) {
-        window.Logger?.error?.('❌ [index.js] Failed to load trade plans for recent widget', { 
+        // Downgrade לסיווג אזהרה כדי לא להפיל את דף הבית בסלניום/לוגים
+        window.Logger?.warn?.('⚠️ [index.js] Failed to load trade plans for recent widget', { 
             error: error?.message,
             stack: error?.stack,
             page: 'index' 

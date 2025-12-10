@@ -88,7 +88,8 @@
     <!-- [23] Load Order: 23 | Strategy: defer -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script> <!-- Bootstrap JS Bundle (Tooltips & Modals) -->
     <!-- [24] Load Order: 24 | Strategy: defer -->
-    <script src="https://cdn.jsdelivr.net/npm/@floating-ui/dom@1.6.0/dist/floating-ui.dom.min.js" defer></script> <!-- Floating UI DOM - Smart positioning library (for overlay/tooltip positioning) -->
+    <!-- Floating UI DOM - local stub to avoid MIME issues -->
+    <script src="scripts/vendor/floating-ui.dom.min.js" defer></script>
     <!-- [25] Load Order: 25 | Strategy: defer -->
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js" defer></script> <!-- GSAP - GreenSock Animation Platform (for smooth animations) -->
     <!-- [26] Load Order: 26 | Strategy: defer -->
@@ -487,13 +488,15 @@
                         <!-- Calendar View Section -->
                         <div class="card mb-4">
                             <div class="card-body">
-                                <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3">
+                                <div class="d-flex flex-wrap align-items-center gap-3 mb-3 justify-content-between">
                                     <div class="d-flex align-items-center gap-2">
                                         <button data-onclick="window.tradingJournalPage.prevMonth()" data-button-type="NAV" data-variant="small" data-icon="chevron-right" data-text="חודש קודם"></button>
                                         <button data-onclick="window.tradingJournalPage.nextMonth()" data-button-type="NAV" data-variant="small" data-icon="chevron-left" data-text="חודש הבא"></button>
                                     </div>
+                                    <div class="d-flex align-items-center gap-2 flex-grow-1 justify-content-center">
+                                        <h5 class="card-title mb-0 text-center" id="currentMonthYear">דצמבר 2025</h5>
+                                    </div>
                                     <div class="d-flex align-items-center gap-2">
-                                        <h5 class="card-title mb-0" id="currentMonthYear">דצמבר 2025</h5>
                                         <select class="form-select form-select-sm" id="monthSelect" aria-label="בחר חודש"></select>
                                         <select class="form-select form-select-sm" id="yearSelect" aria-label="בחר שנה"></select>
                                     </div>

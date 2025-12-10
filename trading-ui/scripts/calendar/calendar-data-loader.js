@@ -12,6 +12,14 @@
  * @author TikTrack Development Team
  */
 
+
+// ===== FUNCTION INDEX =====
+// === Class Methods ===
+// - CalendarDataLoader.switch() - Switch
+
+// === Data Functions ===
+// - getDayKey() - Getdaykey
+
 (function() {
     'use strict';
 

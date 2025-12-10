@@ -13,6 +13,61 @@
  * - EventHandlerManager (global button actions)
  */
 class ConditionsUIManager {
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - buildActionsColumn() - Buildactionscolumn
+// - buildRow() - Buildrow
+// - buildTable() - Buildtable
+
+// === Event Handlers ===
+// - getEntityConditionIndex() - Getentityconditionindex
+// - getConditionOwnerIndex() - Getconditionownerindex
+// - getEvaluationCache() - Getevaluationcache
+// - getConditionActionMeta() - Getconditionactionmeta
+// - getConditionActionLabel() - Getconditionactionlabel
+// - getConditionMethodName() - Getconditionmethodname
+// - getConditionOperatorLabel() - Getconditionoperatorlabel
+// - getEvaluationRecord() - Getevaluationrecord
+// - formatEvaluationCell() - Formatevaluationcell
+// - formatActionCell() - Formatactioncell
+// - setConditions() - Setconditions
+// - getConditions() - Getconditions
+// - getCondition() - Getcondition
+// - setEvaluation() - Setevaluation
+// - clearEvaluation() - Clearevaluation
+// - confirmConditionDeletion() - Confirmconditiondeletion
+// - setButtonLoadingState() - Setbuttonloadingstate
+// - dispatchConditionsUpdated() - Dispatchconditionsupdated
+// - deleteConditionViaCrud() - Deleteconditionviacrud
+// - handleAddAnother() - Handleaddanother
+// - handleReturnToParent() - Handlereturntoparent
+// - handleReturnNavigation() - Handlereturnnavigation
+// - handleReturn() - Handlereturn
+
+// === UI Functions ===
+// - updateEntityIndexes() - Updateentityindexes
+
+// === Data Functions ===
+// - getTranslator() - Gettranslator
+// - getCache() - Getcache
+// - getMessage() - Getmessage
+
+// === Utility Functions ===
+// - formatTimestamp() - Formattimestamp
+// - formatParametersHtml() - Formatparametershtml
+// - formatAlertStatsCell() - Formatalertstatscell
+// - formatAutoAlertToggleCell() - Formatautoalerttogglecell
+
+// === Other ===
+// - escapeHtml() - Escapehtml
+// - stripHtml() - Striphtml
+// - extractParameters() - Extractparameters
+// - normalizeAlertStats() - Normalizealertstats
+// - clearCache() - Clearcache
+// - cleanup() - Cleanup
+
     constructor() {
         this.translator = window.conditionsTranslations;
         this.crudManager = window.conditionsCRUDManager;

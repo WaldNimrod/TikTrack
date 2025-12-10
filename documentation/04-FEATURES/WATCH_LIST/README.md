@@ -54,6 +54,21 @@
   - **מבנה:** Top Section (Summary Stats) + Active List View + Flagged Tickers (Optional)
   - **הערה:** Watch Lists Grid Section הוסר - רשימות נבחרות דרך Select Dropdown
 
+### וויג'ט דף הבית
+
+- **[Watch Lists Widget](../../trading-ui/scripts/widgets/watch-lists-widget.js)** - וויג'ט לדף הבית ✅
+  - **גישה:** `http://localhost:8080/` (דף הבית)
+  - **קובץ:** `trading-ui/scripts/widgets/watch-lists-widget.js`
+  - **CSS:** `trading-ui/styles-new/06-components/_watch-lists-widget.css`
+  - **סטטוס:** ✅ מוכן - מימוש מלא הושלם דצמבר 2025
+  - **תכונות:**
+    - תצוגה קומפקטית בלבד (read-only)
+    - בחירת רשימה דרך dropdown בכותרת
+    - בחירה אוטומטית: רשימה אחרונה שהייתה פתוחה או הראשונה
+    - מצבי טעינה וריק
+    - Overlay עם פרטים נוספים על hover
+  - **תיעוד:** [WATCH_LISTS_WIDGET_DEVELOPER_GUIDE.md](../../documentation/03-DEVELOPMENT/GUIDES/WATCH_LISTS_WIDGET_DEVELOPER_GUIDE.md)
+
 ### מוקאפים (להתייחסות)
 
 - **[watch-lists-page.html](../../trading-ui/mockups/watch-lists-page.html)** - מוקאפ מקורי (לא בשימוש)

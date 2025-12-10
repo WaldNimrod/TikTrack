@@ -12,6 +12,20 @@
  * Documentation: See documentation/02-ARCHITECTURE/FRONTEND/TRADINGVIEW_LIGHTWEIGHT_CHARTS/
  */
 
+
+// ===== FUNCTION INDEX =====
+// === Class Methods ===
+// - TradingViewTheme.getChartColors() - Getchartcolors
+// - TradingViewTheme.getEntityColorForSeries() - Getentitycolorforseries
+// - TradingViewTheme.getSeriesColor() - Getseriescolor
+// - TradingViewTheme.getThemeOptions() - Getthemeoptions
+
+// === Data Functions ===
+// - getCSSVariableValue() - Getcssvariablevalue
+
+// === Other ===
+// - hexToRgba() - Hextorgba
+
 (function() {
     'use strict';
 

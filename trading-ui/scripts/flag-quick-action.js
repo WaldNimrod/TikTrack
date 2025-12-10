@@ -22,6 +22,10 @@
  * 
  * ==========================================
  */
+// === Functions ===
+// - createFlagPaletteElement() - Createflagpaletteelement
+// - removeFlag() - Removeflag
+// - updateActiveFlagState() - Updateactiveflagstate
 
 (function() {
     'use strict';

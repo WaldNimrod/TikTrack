@@ -12,7 +12,7 @@
 
 **סטטוס כללי:**
 
-- **Dashboard Widgets:** 7 ווידג'טים
+- **Dashboard Widgets:** 8 ווידג'טים
 - **Special Widgets:** 2 ווידג'טים
 - **TradingView Widgets System:** 11 ווידג'טים
 
@@ -35,6 +35,7 @@
 | **Tag Widget (מאוחד)** | `trading-ui/scripts/widgets/tag-widget.js`<br>`trading-ui/styles-new/06-components/_tag-widget.css` | [TAG_WIDGET_DEVELOPER_GUIDE.md](../03-DEVELOPMENT/GUIDES/TAG_WIDGET_DEVELOPER_GUIDE.md) | ✅ פעיל | ענן תגיות + חיפוש מהיר עם Bootstrap Tabs |
 | **Ticker List Widget** | `trading-ui/scripts/widgets/ticker-list-widget.js`<br>`trading-ui/styles-new/06-components/_ticker-list-widget.css` | [TICKER_LIST_WIDGET_DEVELOPER_GUIDE.md](../03-DEVELOPMENT/GUIDES/TICKER_LIST_WIDGET_DEVELOPER_GUIDE.md) | ✅ פעיל | רשימת טיקרים עם KPI Cards (3 טאבים: פעילים, רשימת צפיה, כל הטיקרים) |
 | **Ticker Chart Widget** | `trading-ui/scripts/widgets/ticker-chart-widget.js`<br>`trading-ui/styles-new/06-components/_ticker-chart-widget.css` | [TICKER_CHART_WIDGET_DEVELOPER_GUIDE.md](../03-DEVELOPMENT/GUIDES/TICKER_CHART_WIDGET_DEVELOPER_GUIDE.md) | ✅ פעיל | גרפים מהירים עם TradingView Mini Charts |
+| **Watch Lists Widget** | `trading-ui/scripts/widgets/watch-lists-widget.js`<br>`trading-ui/styles-new/06-components/_watch-lists-widget.css` | [WATCH_LISTS_WIDGET_DEVELOPER_GUIDE.md](../03-DEVELOPMENT/GUIDES/WATCH_LISTS_WIDGET_DEVELOPER_GUIDE.md) | ✅ פעיל | תצוגה קומפקטית של רשימות צפייה (read-only) |
 
 ### תלויות Dashboard Widgets
 
@@ -106,6 +107,7 @@
 - **Unified Pending Actions Widget:** [UNIFIED_PENDING_ACTIONS_WIDGET_DEVELOPER_GUIDE.md](../03-DEVELOPMENT/GUIDES/UNIFIED_PENDING_ACTIONS_WIDGET_DEVELOPER_GUIDE.md)
 - **Ticker List Widget:** [TICKER_LIST_WIDGET_DEVELOPER_GUIDE.md](../03-DEVELOPMENT/GUIDES/TICKER_LIST_WIDGET_DEVELOPER_GUIDE.md)
 - **Ticker Chart Widget:** [TICKER_CHART_WIDGET_DEVELOPER_GUIDE.md](../03-DEVELOPMENT/GUIDES/TICKER_CHART_WIDGET_DEVELOPER_GUIDE.md)
+- **Watch Lists Widget:** [WATCH_LISTS_WIDGET_DEVELOPER_GUIDE.md](../03-DEVELOPMENT/GUIDES/WATCH_LISTS_WIDGET_DEVELOPER_GUIDE.md)
 - **Pending Trade Plan Widget:** [PENDING_TRADE_PLAN_WIDGET_DEVELOPER_GUIDE.md](../03-DEVELOPMENT/GUIDES/PENDING_TRADE_PLAN_WIDGET_DEVELOPER_GUIDE.md)
 - **History Widget:** [HISTORY_WIDGET_DEVELOPER_GUIDE.md](HISTORY_WIDGET_DEVELOPER_GUIDE.md)
 - **Emotional Tracking Widget:** [EMOTIONAL_TRACKING_WIDGET_DEVELOPER_GUIDE.md](EMOTIONAL_TRACKING_WIDGET_DEVELOPER_GUIDE.md)
@@ -154,8 +156,8 @@
 
 ### סטטיסטיקות
 
-- **סה"כ ווידג'טים:** 20
-  - Dashboard Widgets: 7
+- **סה"כ ווידג'טים:** 21
+  - Dashboard Widgets: 8
   - Special Widgets: 2
   - TradingView Widgets: 11
 

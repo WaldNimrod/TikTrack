@@ -9,6 +9,13 @@
  * @created November 30, 2025
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Other ===
+// - generateSystemManagementDetailedLog() - Generatesystemmanagementdetailedlog
+// - copySystemManagementDetailedLog() - Copysystemmanagementdetailedlog
+
 /**
  * Generate detailed log for system management page
  * יצירת לוג מפורט לעמוד ניהול המערכת

@@ -1077,13 +1077,8 @@ class HeaderSystem {
   }
 
   static createHeader() {
-    // Skip header creation for auth pages (login, register, etc.)
-    const isAuthPage = window.location.pathname.includes('login.html') ||
-                      window.location.pathname.includes('register.html') ||
-                      window.location.pathname.includes('forgot-password.html') ||
-                      window.location.pathname.includes('reset-password.html') ||
-                      document.documentElement.classList.contains('login-page') ||
-                      document.documentElement.classList.contains('auth-page');
+    // No dedicated auth pages; always render header
+    const isAuthPage = false;
     
     if (isAuthPage) {
       window.Logger?.debug('Skipping header creation for auth page', { page: 'header-system' });
@@ -2034,11 +2029,8 @@ if (window.Logger) {
 (function() {
   'use strict';
   
-  // Skip auto-initialization for auth pages
-  const isAuthPage = window.location.pathname.includes('login.html') ||
-                     window.location.pathname.includes('register.html') ||
-                     window.location.pathname.includes('forgot-password.html') ||
-                     window.location.pathname.includes('reset-password.html');
+  // No dedicated auth pages; always initialize header
+  const isAuthPage = false;
   
   if (isAuthPage) {
     if (window.Logger?.debug) {

@@ -15,6 +15,20 @@
  * @author TikTrack Development Team
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Utility Functions ===
+// - PageHealthChecker.checkSystemAvailability() - Checksystemavailability
+// - PageHealthChecker.checkPreferences() - Checkpreferences
+// - PageHealthChecker.checkCache() - Checkcache
+// - PageHealthChecker.recordMetrics() - Recordmetrics
+// - PageHealthChecker.performHealthCheck() - Performhealthcheck
+// - PageHealthChecker.printReport() - Printreport
+
+// === Event Handlers ===
+// - PageHealthChecker.checkConsoleErrors() - Checkconsoleerrors
+
 (function() {
   'use strict';
 

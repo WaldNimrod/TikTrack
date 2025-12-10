@@ -9,6 +9,18 @@
  * @created 2025-01-27
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Monitoring ===
+// - PreferencesRefreshMonitor.init() - Init
+// - PreferencesRefreshMonitor.startMonitoring() - Start Monitoring
+// - PreferencesRefreshMonitor.checkRefreshStatus() - Check Refresh Status
+
+// === UI Functions ===
+// - PreferencesRefreshMonitor.updateUI() - Update Ui
+// - PreferencesRefreshMonitor.displayStatus() - Display Status
+
 (function() {
   'use strict';
 

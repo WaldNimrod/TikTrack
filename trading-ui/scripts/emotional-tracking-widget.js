@@ -9,6 +9,35 @@
  * @lastUpdated 2025-01-29
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - initializeHeader() - Initializeheader
+// - initEmotionalPatternsChart() - Initemotionalpatternschart
+// - createEntryElement() - Createentryelement
+// - createInsightElement() - Createinsightelement
+// - setupQuickEntryForm() - Setupquickentryform
+// - setupMockupNotice() - Setupmockupnotice
+// - initializeWidgets() - Initializewidgets
+// - initializePage() - Initializepage
+
+// === Event Handlers ===
+// - generateEmotionChartData() - Generateemotionchartdata
+// - generateMockEmotionalEntries() - Generatemockemotionalentries
+// - handleSaveEmotion() - Handlesaveemotion
+// - updateEmotionalPatternsChart() - Updateemotionalpatternschart
+
+// === UI Functions ===
+// - updateRecentEntries() - Updaterecententries
+// - updateInsights() - Updateinsights
+
+// === Data Functions ===
+// - getCSSVariableValue() - Getcssvariablevalue
+
+// === Other ===
+// - generateMockInsights() - Generatemockinsights
+
 (function() {
     'use strict';
 

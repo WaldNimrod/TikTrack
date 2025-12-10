@@ -15,6 +15,31 @@
  * Last Updated: January 22, 2025
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - initDatabaseDisplay() - Initdatabasedisplay
+// - createTableHeaders() - Createtableheaders
+// - createTableBodyHTML() - Createtablebodyhtml
+
+// === Event Handlers ===
+// - getSectionId() - Getsectionid
+// - getContainerId() - Getcontainerid
+
+// === UI Functions ===
+// - updateTableDisplay() - Updatetabledisplay
+// - showLoadingState() - Showloadingstate
+// - showErrorState() - Showerrorstate
+// - updateTableInfo() - Updatetableinfo
+// - updateSummaryStats() - Updatesummarystats
+
+// === Data Functions ===
+// - loadAllTables() - Loadalltables
+// - loadTableDataLocal() - Loadtabledatalocal
+// - getTableId() - Gettableid
+// - getCountElementId() - Getcountelementid
+
 // ===== GLOBAL VARIABLES =====
 const tableData = {};
 let totalRecords = 0;

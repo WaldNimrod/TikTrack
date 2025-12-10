@@ -176,15 +176,62 @@ class PortfolioStateTester:
 
             self.logger.info("✅ Login form submitted, waiting for authentication")
 
+            # Wait longer and check authentication status step by step
+            self.logger.info("Waiting for authentication to complete...")
+
+            # First check if login was submitted successfully
+            time.sleep(2)
+
+            # Check for login success/error messages
+            try:
+                success_msg = self.driver.find_element(By.ID, "loginSuccess")
+                if success_msg.is_displayed():
+                    self.logger.info("✅ Login success message displayed")
+            except:
+                pass
+
+            try:
+                error_msg = self.driver.find_element(By.ID, "loginError")
+                if error_msg.is_displayed() and error_msg.text.strip():
+                    self.logger.error(f"❌ Login error message: {error_msg.text}")
+                    return False
+            except:
+                pass
+
             # Wait for authentication to complete
-            WebDriverWait(self.driver, TEST_CONFIG['auth_timeout']).until(
-                lambda d: d.execute_script("""
-                    return window.TikTrackAuth &&
-                           window.TikTrackAuth.isAuthenticated &&
-                           window.TikTrackAuth.isAuthenticated() &&
-                           window.currentUser;
-                """)
-            )
+            try:
+                WebDriverWait(self.driver, 15).until(
+                    lambda d: d.execute_script("""
+                        return window.TikTrackAuth &&
+                               window.TikTrackAuth.isAuthenticated &&
+                               window.TikTrackAuth.isAuthenticated() &&
+                               window.currentUser;
+                    """)
+                )
+            except Exception as e:
+                self.logger.warning(f"Standard auth check failed: {e}")
+
+                # Try alternative check - maybe modal is still open but login succeeded
+                try:
+                    auth_check = self.driver.execute_script("""
+                        return {
+                            tikTrackAuth: !!window.TikTrackAuth,
+                            isAuthenticated: window.TikTrackAuth ? window.TikTrackAuth.isAuthenticated() : false,
+                            currentUser: !!window.currentUser,
+                            userId: window.currentUser ? window.currentUser.id : null,
+                            modalVisible: !!document.querySelector('#loginModal.show')
+                        };
+                    """)
+                    self.logger.info(f"Auth status check: {auth_check}")
+
+                    if auth_check.get('isAuthenticated') and auth_check.get('currentUser'):
+                        self.logger.info("✅ Authentication successful via alternative check")
+                    else:
+                        self.logger.error("❌ Authentication failed - not authenticated")
+                        return False
+                except Exception as e2:
+                    self.logger.error(f"❌ Alternative auth check also failed: {e2}")
+                    return False
 
             # Verify user data
             user_data = self.driver.execute_script("""

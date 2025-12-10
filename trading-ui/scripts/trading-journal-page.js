@@ -473,36 +473,9 @@
   }
 
   /**
-   * Apply dynamic colors to journal entries
-     * Colors are now handled by CSS variables, but we ensure they're applied correctly
-     */
-  const applyDynamicColors = () => {
-    const entries = document.querySelectorAll('.journal-entry-item[data-entry-type]');
-
-    entries.forEach(entry => {
-      const entityType = entry.getAttribute('data-entry-type');
-      if (!entityType) {return;}
-
-      // CSS variables are already set by color-scheme-system
-      // We just ensure the border-left is set (CSS should handle it, but JS ensures it)
-      const entityColor = getCSSVariableValue(
-        `--entity-${entityType.replace('_', '-')}-color`,
-        '#007bff',
-      );
-
-      // Apply to entry border (CSS should handle this, but ensure it's set)
-      if (!entry.style.borderLeftWidth) {
-        entry.style.borderLeftWidth = '3px';
-        entry.style.borderLeftStyle = 'solid';
-        entry.style.borderLeftColor = entityColor;
-      }
-    });
-  }
-
-  /**
      * Load page state from PageStateManager
      */
-  async function loadPageState() {
+  const loadPageState = async () => {
     if (window.PageStateManager && typeof window.PageStateManager.loadPageState === 'function') {
       try {
         const state = await window.PageStateManager.loadPageState(PAGE_NAME);
@@ -582,6 +555,33 @@
     initializeMonthYearSelectors();
 
     // Wait for IconSystem and DOM to be ready
+    /**
+     * Apply dynamic colors to journal entries
+     * Colors are now handled by CSS variables, but we ensure they're applied correctly
+     */
+    const applyDynamicColors = () => {
+      const entries = document.querySelectorAll('.journal-entry-item[data-entry-type]');
+
+      entries.forEach(entry => {
+        const entityType = entry.getAttribute('data-entry-type');
+        if (!entityType) {return;}
+
+        // CSS variables are already set by color-scheme-system
+        // We just ensure the border-left is set (CSS should handle it, but JS ensures it)
+        const entityColor = getCSSVariableValue(
+          `--entity-${entityType.replace('_', '-')}-color`,
+          '#007bff',
+        );
+
+        // Apply to entry border (CSS should handle this, but ensure it's set)
+        if (!entry.style.borderLeftWidth) {
+          entry.style.borderLeftWidth = '3px';
+          entry.style.borderLeftStyle = 'solid';
+          entry.style.borderLeftColor = entityColor;
+        }
+      });
+    };
+
     const initAfterLoad = async () => {
       // Wait for Button System to process buttons
       let retries = 0;

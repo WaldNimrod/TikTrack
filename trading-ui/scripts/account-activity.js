@@ -409,11 +409,20 @@ async function loadAccountActivity(accountId) {
     // Fetch from API
     const response = await fetch(`/api/account-activity/${accountId}`);
 
+    let result;
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      if ([401, 403, 404].includes(response.status)) {
+        // User not authenticated or no account activity - return empty data
+        if (window.Logger && typeof window.Logger.debug === 'function') {
+          window.Logger.debug(`⚠️ Account activity API returned ${response.status}, returning empty data`, { accountId, page: 'trading_accounts' });
+        }
+        result = { status: 'success', data: { currencies: [] } };
+      } else {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+    } else {
+      result = await response.json();
     }
-
-    const result = await response.json();
 
     if (result.status === 'success' && result.data) {
       window.accountActivityState.activityData = result.data;

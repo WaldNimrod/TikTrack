@@ -15,14 +15,19 @@
  */
 
 
-// ===== FUNCTION INDEX =====
+/* ===== FUNCTION INDEX ===== */
 
-// === Initialization ===
-// - initializeBackgroundTasks() - Initializebackgroundtasks
+/* === Initialization === */
+  // - initializeBackgroundTasks() - Initializebackgroundtasks
 
-// === Other ===
-// - copyDetailedLogLocal() - Copydetailedloglocal
-// - generateDetailedLog() - Generatedetailedlog
+/* === Other === */
+  // - copyDetailedLogLocal() - Copydetailedloglocal
+  // - generateDetailedLog() - Generatedetailedlog
+
+/* === EOD Integration Functions === */
+  // - refreshEODJobs() - Refresheodjobs
+  // - renderEODJobs() - Rendereodjobs
+  // - renderEODAlerts() - Rendereodalerts
 
 // Global variables
 let currentTaskName = null;
@@ -960,385 +965,138 @@ const eventHandlers = {
       window.Logger?.error('Failed to toggle modal task:', error);
     }
   },
-};
 
-// Global functions for onclick handlers
-window.executeTask = async function(taskName) {
-  try {
-    utils.showNotification(`מפעיל משימה: ${taskName}`, 'info');
-    const result = await apiService.executeTask(taskName);
-    utils.showNotification(`משימה ${taskName} הופעלה בהצלחה`, 'success');
-
-    // Refresh data with delay to avoid rate limiting
-    await new Promise(resolve => setTimeout(resolve, 500));
-    await eventHandlers.refreshTasks();
-    await new Promise(resolve => setTimeout(resolve, 500));
-    await eventHandlers.refreshHistory();
-
-    return result;
-  } catch (error) {
-    utils.showNotification(`שגיאה בהפעלת משימה ${taskName}: ${error.message}`, 'error');
-    throw error;
-  }
-};
-
-window.toggleTask = async function(taskName) {
-  try {
-    const result = await apiService.toggleTask(taskName);
-    const newStatus = result.new_status ? 'הופעלה' : 'כובתה';
-    utils.showNotification(`משימה ${taskName} ${newStatus} בהצלחה`, 'success');
-
-    // Refresh data with delay to avoid rate limiting
-    await new Promise(resolve => setTimeout(resolve, 500));
-    await eventHandlers.refreshTasks();
-
-    return result;
-  } catch (error) {
-    utils.showNotification(`שגיאה בשינוי סטטוס משימה ${taskName}: ${error.message}`, 'error');
-    throw error;
-  }
-};
-
-window.executeTask = async function(taskName) {
-  try {
-    utils.showNotification(`מפעיל משימה: ${taskName}`, 'info');
-    const result = await apiService.executeTask(taskName);
-    utils.showNotification(`משימה ${taskName} הופעלה בהצלחה`, 'success');
-
-    // Refresh data with delay to avoid rate limiting
-    await new Promise(resolve => setTimeout(resolve, 500));
-    await eventHandlers.refreshTasks();
-    await new Promise(resolve => setTimeout(resolve, 500));
-    await eventHandlers.refreshHistory();
-
-    return result;
-  } catch (error) {
-    utils.showNotification(`שגיאה בהפעלת משימה ${taskName}: ${error.message}`, 'error');
-    throw error;
-  }
-};
-
-window.toggleTask = async function(taskName) {
-  window.Logger?.debug('🔄 toggleTask called with:', taskName);
-  try {
-    const result = await apiService.toggleTask(taskName);
-    window.Logger?.debug('✅ toggleTask result:', result);
-    const newStatus = result.new_status ? 'הופעלה' : 'כובתה';
-    utils.showNotification(`משימה ${taskName} ${newStatus} בהצלחה`, 'success');
-
-    // Refresh data with delay to avoid rate limiting
-    await new Promise(resolve => setTimeout(resolve, 500));
-    await eventHandlers.refreshTasks();
-    await new Promise(resolve => setTimeout(resolve, 500));
-    await eventHandlers.refreshHistory();
-
-    return result;
-  } catch (error) {
-    window.Logger?.error('❌ toggleTask error:', error);
-    utils.showNotification(`שגיאה בשינוי סטטוס משימה ${taskName}: ${error.message}`, 'error');
-    throw error;
-  }
-};
-
-window.stopTask = async function(taskName) {
-  window.Logger?.debug('🛑 stopTask called with:', taskName);
-  try {
-    utils.showNotification(`עוצר משימה: ${taskName}`, 'info');
-    
-    // First disable the task
-    const result = await apiService.toggleTask(taskName);
-    window.Logger?.debug('✅ stopTask result:', result);
-    
-    if (result.new_status === false) {
-      utils.showNotification(`משימה ${taskName} נעצרה בהצלחה`, 'success');
-    } else {
-      utils.showNotification(`משימה ${taskName} כבר לא פעילה`, 'warning');
-    }
-
-    // Refresh data with delay to avoid rate limiting
-    await new Promise(resolve => setTimeout(resolve, 500));
-    await eventHandlers.refreshTasks();
-    await new Promise(resolve => setTimeout(resolve, 500));
-    await eventHandlers.refreshHistory();
-
-    return result;
-  } catch (error) {
-    window.Logger?.error('❌ stopTask error:', error);
-    utils.showNotification(`שגיאה בעצירת משימה ${taskName}: ${error.message}`, 'error');
-    throw error;
-  }
-};
-
-window.showTaskDetails = async function(taskName) {
-  try {
-    // Get task details from API
-    const details = await apiService.getTaskDetails(taskName);
-    
-    // Format details for display
-    const content = `
-      <div class="task-details">
-        <h5>פרטי משימה: ${taskName}</h5>
-        <div class="details-grid">
-          <div class="detail-item">
-            <strong>שם:</strong> ${details.name || taskName}
-          </div>
-          <div class="detail-item">
-            <strong>תיאור:</strong> ${details.description || 'אין תיאור'}
-          </div>
-          <div class="detail-item">
-            <strong>תזמון:</strong> ${details.schedule_interval || 'N/A'}
-          </div>
-          <div class="detail-item">
-            <strong>סטטוס:</strong> ${details.enabled ? 'פעיל' : 'לא פעיל'}
-          </div>
-          <div class="detail-item">
-            <strong>ביצוע אחרון:</strong> ${details.last_run ? utils.formatTimestamp(details.last_run) : 'לא בוצע'}
-          </div>
-          <div class="detail-item">
-            <strong>משך ביצוע:</strong> ${details.last_duration_ms ? utils.formatDuration(details.last_duration_ms) : 'N/A'}
-          </div>
-          <div class="detail-item">
-            <strong>אחוז הצלחה:</strong> ${utils.formatSuccessRate(details.success_rate)}
-          </div>
-        </div>
-      </div>
-    `;
-    
-    // Show details modal using notification system
-    window.showDetailsModal(`פרטי משימה: ${taskName}`, content);
-    
-  } catch (error) {
-    utils.showNotification(`שגיאה בטעינת פרטי המשימה: ${error.message}`, 'error');
-  }
-};
-
-window.startScheduler = function() {
-  eventHandlers.startScheduler();
-};
-
-window.stopScheduler = function() {
-  eventHandlers.stopScheduler();
-};
-
-window.refreshStatus = function() {
-  eventHandlers.refreshStatus();
-};
-
-window.refreshTasks = function() {
-  eventHandlers.refreshTasks();
-};
-
-window.showHistoryDetails = function(executionId) {
-  // TODO: Implement history details modal - ראה: CENTRAL_TASKS_TODO.md (משימה 5)
-  utils.showNotification('פונקציונליות זו תתווסף בקרוב', 'info');
-};
-
-// window.closeModal removed - using global version from tables.js
-
-// Auto-refresh functionality
-const autoRefresh = {
-  /**
-     * Start auto-refresh
-     */
-  start() {
-    if (refreshInterval) {return;}
-
-    refreshInterval = setInterval(async () => {
-      try {
-        await eventHandlers.refreshStatus();
-      } catch (error) {
-        window.Logger?.error('Auto-refresh failed:', error);
-      }
-    }, 30000); // Refresh every 30 seconds
-
-    window.Logger?.debug('Auto-refresh started');
-  },
-
-  /**
-     * Stop auto-refresh
-     */
-  stop() {
-    if (refreshInterval) {
-      clearInterval(refreshInterval);
-      refreshInterval = null;
-      window.Logger?.debug('Auto-refresh stopped');
-    }
-  },
-};
-
-// Detailed log generation and copying functionality
-const detailedLogGenerator = {
-  /**
-   * Generate comprehensive log of all system status and tests
-   */
-  generateDetailedLog() {
-    const timestamp = new Date().toLocaleString('he-IL');
-    const log = [];
-
-    log.push('=== לוג מפורט של מערכת ניהול המשימות ===');
-    log.push(`זמן יצירה: ${timestamp}`);
-    log.push('');
-
-    // System Status
-    log.push('--- מצב המערכת ---');
-    const schedulerStatus = document.getElementById('scheduler-status')?.textContent || 'לא זמין';
-    const totalTasks = document.getElementById('total-tasks')?.textContent || 'לא זמין';
-    const enabledTasks = document.getElementById('enabled-tasks')?.textContent || 'לא זמין';
-    const runningTasks = document.getElementById('running-tasks')?.textContent || 'לא זמין';
-    const successRate = document.getElementById('success-rate')?.textContent || 'לא זמין';
-
-    log.push(`סטטוס Scheduler: ${schedulerStatus}`);
-    log.push(`סה"כ משימות: ${totalTasks}`);
-    log.push(`משימות פעילות: ${enabledTasks}`);
-    log.push(`משימות רצות: ${runningTasks}`);
-    log.push(`אחוז הצלחה: ${successRate}`);
-    log.push('');
-
-    // Console Logs (last 20 entries)
-    log.push('--- לוגים אחרונים מהקונסול ---');
-    if (window.consoleLogs && window.consoleLogs.length > 0) {
-      const recentLogs = window.consoleLogs.slice(-20);
-      recentLogs.forEach(entry => {
-        log.push(`[${entry.timestamp}] ${entry.level}: ${entry.message}`);
-      });
-    } else {
-      log.push('אין לוגים זמינים בקונסול');
-    }
-    log.push('');
-
-    // API Status
-    log.push('--- סטטוס API ---');
-    log.push(`API Base: ${API_BASE}`);
-    log.push(`Server Time: ${new Date().toISOString()}`);
-    log.push(`Local Time: ${new Date().toString()}`);
-    log.push('');
-
-    // Browser Information
-    log.push('--- מידע על הדפדפן ---');
-    log.push(`User Agent: ${navigator.userAgent}`);
-    log.push(`Language: ${navigator.language}`);
-    log.push(`Platform: ${navigator.platform}`);
-    log.push(`Cookies Enabled: ${navigator.cookieEnabled}`);
-    log.push('');
-
-    // Page Elements Status
-    log.push('--- סטטוס אלמנטי העמוד ---');
-    const elements = [
-      'scheduler-status', 'total-tasks', 'enabled-tasks', 'running-tasks',
-      'success-rate', 'tasks-table', 'history-table', 'task-performance-chart',
-    ];
-
-    elements.forEach(elementId => {
-      const element = document.getElementById(elementId);
-      const status = element ? 'קיים' : 'חסר';
-      const content = element ? element.textContent || element.innerHTML.substring(0, 50) : 'N/A';
-      log.push(`${elementId}: ${status} - ${content}`);
-    });
-    log.push('');
-
-    // Performance Information
-    log.push('--- מידע על ביצועים ---');
-    if (window.performance && window.performance.memory) {
-      const memory = window.performance.memory;
-      log.push(`Memory Used: ${(memory.usedJSHeapSize / 1024 / 1024).toFixed(2)} MB`);
-      log.push(`Memory Total: ${(memory.totalJSHeapSize / 1024 / 1024).toFixed(2)} MB`);
-      log.push(`Memory Limit: ${(memory.jsHeapSizeLimit / 1024 / 1024).toFixed(2)} MB`);
-    }
-
-    if (window.performance && window.performance.timing) {
-      const timing = window.performance.timing;
-      const loadTime = timing.loadEventEnd - timing.navigationStart;
-      log.push(`Page Load Time: ${loadTime}ms`);
-    }
-    log.push('');
-
-    // Error Summary
-    log.push('--- סיכום שגיאות ---');
-    if (window.errorLog && window.errorLog.length > 0) {
-      window.errorLog.forEach(error => {
-        log.push(`שגיאה: ${error.message} - ${error.stack}`);
-      });
-    } else {
-      log.push('אין שגיאות מתועדות');
-    }
-    log.push('');
-
-    log.push('=== סוף הלוג ===');
-
-    return log.join('\n');
-  },
-
-  /**
-   * Copy detailed log to clipboard
-   */
-  async copyDetailedLog() {
+  // === EOD INTEGRATION: Refresh EOD jobs ===
+  async refreshEODJobs() {
     try {
-      const log = this.generateDetailedLog();
+      window.Logger?.debug('🔍 Background Tasks - טוען נתוני EOD jobs');
 
-      // Use existing clipboard system (like in external-data-dashboard.js)
-      await navigator.clipboard.writeText(log);
-      utils.showNotification('הלוג המפורט הועתק בהצלחה ללוח!', 'success');
+      // Load EOD job history
+      const jobHistory = await window.EODIntegrationHelper.loadEODJobHistory({ limit: 50 });
+      if (jobHistory && Array.isArray(jobHistory.data)) {
+        // Update UI
+        this.updateEODJobsTable(jobHistory.data);
+        this.updateEODJobsStats(jobHistory.data);
+        this.renderEODJobs(jobHistory.data);
+      }
 
-      // Show log in console for easy access
-      window.Logger?.debug('=== לוג מפורט שהועתק ===');
-      window.Logger?.debug(log);
-      window.Logger?.debug('=== סוף הלוג ===');
+      // Load EOD alerts for monitoring
+      const alerts = await window.EODIntegrationHelper.loadEODAlerts({ limit: 20 });
+      if (alerts && Array.isArray(alerts.data)) {
+        this.renderEODAlerts(alerts.data);
+      }
 
+      window.Logger?.info('✅ EOD jobs data refreshed successfully');
     } catch (error) {
-      window.Logger?.error('Failed to copy log:', error);
-      utils.showNotification('שגיאה בהעתקת הלוג: ' + error.message, 'error');
-
-      // Fallback: show in console
-      const log = this.generateDetailedLog();
-      window.Logger?.debug('=== לוג מפורט (לא הועתק) ===');
-      window.Logger?.debug(log);
-      window.Logger?.debug('=== סוף הלוג ===');
+      window.Logger?.error('❌ Failed to refresh EOD jobs:', error);
+      utils.showNotification('שגיאה בטעינת נתוני EOD jobs', 'error');
     }
   },
-};
 
-// Main initialization
-async function initializeBackgroundTasks() {
-  try {
+  /**
+   * === EOD INTEGRATION: Render EOD jobs in UI ===
+   */
+  renderEODJobs: function(jobHistory) {
+    const eodJobsContainer = document.getElementById('eod-jobs-container');
+    if (!eodJobsContainer) return;
 
-    // Initialize event handlers
-    eventHandlers.init();
+    // Clear existing content
+    eodJobsContainer.innerHTML = '';
 
-    // Initialize real-time log listener
-
-    // Load initial data
-    await Promise.all([
-      eventHandlers.refreshStatus(),
-      eventHandlers.refreshTasks(),
-      eventHandlers.refreshHistory(),
-      eventHandlers.refreshAnalytics(),
-    ]);
-
-    // Start auto-refresh
-    autoRefresh.start();
-
-    // Initialize detailed log button
-    const copyLogBtn = document.getElementById('Btn');
-    if (copyLogBtn) {
-      copyLogBtn.addEventListener('click', () => {
-        detailedLogGenerator.copyDetailedLog();
-      });
+    if (!Array.isArray(jobHistory) || jobHistory.length === 0) {
+      eodJobsContainer.innerHTML = '<div class="text-muted">אין EOD jobs אחרונים</div>';
+      return;
     }
 
-    // Initialize background tasks log
-    if (typeof window.initializeBackgroundTasksLog === 'function') {
-      setTimeout(() => {
-        window.initializeBackgroundTasksLog();
-      }, 1000); // Wait 1 second for all systems to load
+    const jobsList = document.createElement('div');
+    jobsList.className = 'eod-jobs-list';
+
+    jobHistory.forEach(job => {
+      const jobItem = document.createElement('div');
+      jobItem.className = `job-item job-${job.status || 'unknown'}`;
+
+      const statusIcon = job.status === 'success' ? '✅' : job.status === 'running' ? '🔄' : job.status === 'failed' ? '❌' : '⏳';
+      const statusText = job.status === 'success' ? 'הצליח' : job.status === 'running' ? 'רץ' : job.status === 'failed' ? 'נכשל' : 'ממתין';
+
+      const startTime = job.created_at ? new Date(job.created_at).toLocaleString('he-IL') : 'לא ידוע';
+      const endTime = job.updated_at ? new Date(job.updated_at).toLocaleString('he-IL') : '-';
+
+      const duration = job.created_at && job.updated_at ?
+        Math.round((new Date(job.updated_at) - new Date(job.created_at)) / 1000) + ' שניות' : '-';
+
+      jobItem.innerHTML = `
+        <div class="job-header">
+          <span class="job-status-icon">${statusIcon}</span>
+          <span class="job-type">${job.job_type || 'לא ידוע'}</span>
+          <span class="job-status-text">${statusText}</span>
+        </div>
+        <div class="job-details">
+          <div class="job-time">התחלה: ${startTime}</div>
+          <div class="job-time">סיום: ${endTime}</div>
+          <div class="job-duration">משך: ${duration}</div>
+          ${job.message ? `<div class="job-message">${job.message}</div>` : ''}
+        </div>
+        <div class="job-actions">
+          <button class="btn btn-sm btn-outline-primary" onclick="viewEODJobDetails('${job.id}')">פרטים</button>
+          ${job.status === 'running' ? `<button class="btn btn-sm btn-outline-warning" onclick="cancelEODJob('${job.id}')">ביטול</button>` : ''}
+        </div>
+      `;
+
+      jobsList.appendChild(jobItem);
+    });
+
+    eodJobsContainer.appendChild(jobsList);
+  },
+
+  /**
+   * === EOD INTEGRATION: Render EOD alerts in UI ===
+   */
+  renderEODAlerts: function(alerts) {
+    const eodAlertsContainer = document.getElementById('eod-alerts-container');
+    if (!eodAlertsContainer) return;
+
+    // Clear existing content
+    eodAlertsContainer.innerHTML = '';
+
+    const activeAlerts = alerts.filter(alert => alert.status === 'active');
+
+    if (activeAlerts.length === 0) {
+      eodAlertsContainer.innerHTML = '<div class="text-success">אין התראות EOD פעילות</div>';
+      return;
     }
 
-    
+    const alertsList = document.createElement('div');
+    alertsList.className = 'eod-alerts-list';
 
-  } catch (error) {
-    window.Logger?.error('Failed to initialize Background Tasks Management:', error);
-    utils.showNotification('שגיאה באתחול מערכת ניהול המשימות', 'error');
-  }
-}
+    activeAlerts.slice(0, 10).forEach(alert => {
+      const alertItem = document.createElement('div');
+      alertItem.className = `alert-item alert-${alert.severity || 'medium'}`;
+
+      const severityIcon = alert.severity === 'high' ? '🚨' : alert.severity === 'medium' ? '⚠️' : 'ℹ️';
+      const severityText = alert.severity === 'high' ? 'גבוהה' : alert.severity === 'medium' ? 'בינונית' : 'נמוכה';
+
+      const createdAt = alert.created_at ? new Date(alert.created_at).toLocaleString('he-IL') : 'לא ידוע';
+
+      alertItem.innerHTML = `
+        <div class="alert-header">
+          <span class="alert-severity-icon">${severityIcon}</span>
+          <span class="alert-title">${alert.title || 'התראת EOD'}</span>
+          <span class="alert-severity">${severityText}</span>
+        </div>
+        <div class="alert-description">${alert.description || ''}</div>
+        <div class="alert-time">${createdAt}</div>
+        <div class="alert-actions">
+          <button class="btn btn-sm btn-outline-info" onclick="viewEODAlertDetails('${alert.id}')">פרטים</button>
+          <button class="btn btn-sm btn-outline-success" onclick="resolveEODAlert('${alert.id}')">פתור</button>
+        </div>
+      `;
+
+      alertsList.appendChild(alertItem);
+    });
+
+    eodAlertsContainer.appendChild(alertsList);
+
+/* Main initialization */
 
 // Initialize when DOM is ready
 // if (document.readyState === 'loading') {
@@ -1567,6 +1325,50 @@ if (document.readyState === 'loading') {
     }, 1000);
 }
 
-// ===== REAL-TIME LOG LISTENER =====
+/* ===== FUNCTION INDEX ===== */
 
+async function initializeBackgroundTasks() {
+  try {
 
+    // Initialize event handlers
+    eventHandlers.init();
+
+    // Initialize real-time log listener
+
+    // Load initial data
+    await Promise.all([
+      eventHandlers.refreshStatus(),
+      eventHandlers.refreshTasks(),
+      eventHandlers.refreshHistory(),
+      eventHandlers.refreshAnalytics(),
+      eventHandlers.refreshEODJobs(),
+    ]);
+
+    // Start auto-refresh
+    autoRefresh.start();
+
+    // Register table if available
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => {
+        setTimeout(() => {
+          if (typeof window.registerBackgroundTasksTable === 'function') {
+            window.registerBackgroundTasksTable();
+          }
+        }, 1000);
+      });
+    } else {
+      setTimeout(() => {
+        if (typeof window.registerBackgroundTasksTable === 'function') {
+          window.registerBackgroundTasksTable();
+        }
+      }, 1000);
+    }
+
+    window.Logger?.info('✅ Background Tasks initialized successfully');
+  } catch (error) {
+    window.Logger?.error('❌ Failed to initialize Background Tasks:', error);
+  }
+}
+
+}
+}

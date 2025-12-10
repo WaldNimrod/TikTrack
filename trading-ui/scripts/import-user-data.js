@@ -5105,21 +5105,89 @@ function displayExistingRecords(existingRecords) {
 /**
  * Import existing record (force import)
  */
-function importExistingRecord(index) {
-    window.Logger.info('[Import Modal] Importing existing record', { index, page: 'import-user-data' });
-    
-    // TODO: Implement logic to force import this specific record
-    showImportUserDataNotification('ייבוא רשומה קיימת - פונקציונליות תפותח בקרוב', 'info');
+async function importExistingRecord(index) {
+    try {
+        window.Logger.info('[Import Modal] Importing existing record', { index, page: 'import-user-data' });
+
+        // Get current import session ID
+        const sessionId = window.currentImportSessionId; // or get from state
+        if (!sessionId) {
+            throw new Error('No active import session');
+        }
+
+        const response = await fetch(`/api/user-data-import/session/${sessionId}/allow-existing`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                record_index: index,
+                duplicate_type: 'existing_record'
+            })
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.error || `Failed to import record: ${response.status}`);
+        }
+
+        const result = await response.json();
+        window.Logger.info('[Import Modal] Record imported successfully', { index, sessionId, page: 'import-user-data' });
+
+        // Refresh import preview
+        if (typeof window.refreshImportPreview === 'function') {
+            await window.refreshImportPreview(sessionId);
+        }
+
+        showImportUserDataNotification('רשומה נוספה לייבוא בהצלחה', 'success');
+    } catch (error) {
+        window.Logger.error('[Import Modal] Error importing existing record', { index, error: error?.message, page: 'import-user-data' });
+        showImportUserDataNotification(`שגיאה בייבוא רשומה: ${error.message}`, 'error');
+    }
 }
 
 /**
  * Skip existing record
  */
-function skipExistingRecord(index) {
-    window.Logger.info('[Import Modal] Skipping existing record', { index, page: 'import-user-data' });
-    
-    // TODO: Implement logic to skip this specific record
-    showImportUserDataNotification('דילוג על רשומה קיימת - פונקציונליות תפותח בקרוב', 'info');
+async function skipExistingRecord(index) {
+    try {
+        window.Logger.info('[Import Modal] Skipping existing record', { index, page: 'import-user-data' });
+
+        // Get current import session ID
+        const sessionId = window.currentImportSessionId; // or get from state
+        if (!sessionId) {
+            throw new Error('No active import session');
+        }
+
+        const response = await fetch(`/api/user-data-import/session/${sessionId}/reject-duplicate`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                record_index: index,
+                duplicate_type: 'existing_record'
+            })
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.error || `Failed to skip record: ${response.status}`);
+        }
+
+        const result = await response.json();
+        window.Logger.info('[Import Modal] Record skipped successfully', { index, sessionId, page: 'import-user-data' });
+
+        // Refresh import preview
+        if (typeof window.refreshImportPreview === 'function') {
+            await window.refreshImportPreview(sessionId);
+        }
+
+        showImportUserDataNotification('רשומה נדלגה בהצלחה', 'success');
+    } catch (error) {
+        window.Logger.error('[Import Modal] Error skipping existing record', { index, error: error?.message, page: 'import-user-data' });
+        showImportUserDataNotification(`שגיאה בדילוג על רשומה: ${error.message}`, 'error');
+    }
 }
 
 /**

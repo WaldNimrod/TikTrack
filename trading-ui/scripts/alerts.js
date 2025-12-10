@@ -38,6 +38,9 @@
  * EVENT HANDLING (15)
  * - onRelationTypeChange() - onRelationTypeChange function
  * - onRelatedObjectChange() - * טיפול בשינוי סוג שיוך
+ *
+ * EOD INTEGRATION (1)
+ * - loadEODAlertsData() - Load EOD alerts data
  * - toggleConditionFields() - * טיפול בבחירת אובייקט
  * - enableConditionFields() - enableConditionFields function
  * - disableConditionFields() - * Enable condition fields for add modal
@@ -150,17 +153,37 @@ async function loadAlertsDataInternal(options = {}) {
         if (window.Logger && typeof window.Logger.info === 'function') {
           window.Logger.info('📡 קריאה לשרת לקבלת נתוני התראות...', { page: "alerts" });
         }
-        const response = await fetch('/api/alerts/');
+    let token = null;
+    if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
+      token = await window.UnifiedCacheManager.get('authToken');
+    } else {
+      token = localStorage.getItem('authToken'); // fallback
+    }
+    const headers = { 'Content-Type': 'application/json' };
+    if (token) { headers['Authorization'] = `Bearer ${token}`; }
+        const response = await fetch('/api/alerts/', { headers });
         if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+          if ([400, 401, 403, 404].includes(response.status)) {
+            // User not authenticated, validation error, or no alerts - return empty array
+            if (window.Logger && typeof window.Logger.debug === 'function') {
+              window.Logger.debug(`⚠️ Alerts API returned ${response.status}, returning empty data`, { page: "alerts" });
+            }
+            rawAlerts = [];
+          } else {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+        } else {
+          const data = await response.json();
+          if (window.Logger && typeof window.Logger.info === 'function') {
+            window.Logger.info('📊 נתונים שהתקבלו מהשרת:', data, { page: "alerts" });
+          }
+          rawAlerts = data?.data || data;
         }
-
-        const data = await response.json();
-        if (window.Logger && typeof window.Logger.info === 'function') {
-          window.Logger.info('📊 נתונים שהתקבלו מהשרת:', data, { page: "alerts" });
-        }
-        rawAlerts = data?.data || data;
       }
+
+      // === EOD INTEGRATION: Load EOD alerts ===
+      const eodAlerts = await loadEODAlertsData();
+      const eodAlertsList = eodAlerts && eodAlerts.data ? eodAlerts.data : [];
 
       // שמירת הנתונים במשתנה גלובלי
       window.alertsData = Array.isArray(rawAlerts)
@@ -169,6 +192,29 @@ async function loadAlertsDataInternal(options = {}) {
             updated_at: alert.updated_at || alert.triggered_at || alert.created_at || alert.last_evaluated_at || null
           }))
         : [];
+
+      // Add EOD alerts to the data
+      if (eodAlertsList.length > 0) {
+        const eodAlertsFormatted = eodAlertsList.map(eodAlert => ({
+          id: `eod_${eodAlert.id}`,
+          title: eodAlert.title || 'התראת EOD',
+          description: eodAlert.description || '',
+          severity: eodAlert.severity || 'medium',
+          status: eodAlert.status || 'active',
+          type: 'eod',
+          created_at: eodAlert.created_at,
+          updated_at: eodAlert.created_at,
+          triggered_at: eodAlert.created_at,
+          eod_data: eodAlert
+        }));
+
+        window.alertsData = [...window.alertsData, ...eodAlertsFormatted];
+
+        if (window.Logger && typeof window.Logger.info === 'function') {
+          window.Logger.info('✅ הוספו התראות EOD:', eodAlertsList.length, 'התראות', { page: "alerts" });
+        }
+      }
+
       if (window.Logger && typeof window.Logger.info === 'function') {
         window.Logger.info('💾 נתונים נשמרו ב-window.alertsData:', window.alertsData.length, 'התראות', { page: "alerts" });
       }
@@ -2988,8 +3034,17 @@ async function confirmDeleteAlert(alertId) {
         response = await window.AlertsData.deleteAlert(alertId);
       } else {
         // Fallback ל-direct fetch אם השירות לא זמין
+    let token = null;
+    if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
+      token = await window.UnifiedCacheManager.get('authToken');
+    } else {
+      token = localStorage.getItem('authToken'); // fallback
+    }
+    const headers = { 'Content-Type': 'application/json' };
+    if (token) { headers['Authorization'] = `Bearer ${token}`; }
         response = await fetch(`/api/alerts/${alertId}`, {
-          method: 'DELETE',
+          headers,
+          method: 'DELETE'
         });
       }
 
@@ -3796,7 +3851,15 @@ async function loadTradePlansForConditions() {
         } else {
             // Fallback to direct API call if service not available
             window.Logger?.warn('⚠️ SelectPopulatorService not available - using fallback', { page: 'alerts' });
-            const response = await fetch('/api/trade-plans');
+    let token = null;
+    if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
+      token = await window.UnifiedCacheManager.get('authToken');
+    } else {
+      token = localStorage.getItem('authToken'); // fallback
+    }
+    const headers = { 'Content-Type': 'application/json' };
+    if (token) { headers['Authorization'] = `Bearer ${token}`; }
+            const response = await fetch('/api/trade-plans', { headers });
             if (!response.ok) throw new Error('Failed to load trade plans');
             
             const tradePlansData = await response.json();
@@ -3847,7 +3910,15 @@ async function loadTradesForConditions() {
         } else {
             // Fallback to direct API call if service not available
             window.Logger?.warn('⚠️ SelectPopulatorService not available - using fallback', { page: 'alerts' });
-            const response = await fetch('/api/trades');
+    let token = null;
+    if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
+      token = await window.UnifiedCacheManager.get('authToken');
+    } else {
+      token = localStorage.getItem('authToken'); // fallback
+    }
+    const headers = { 'Content-Type': 'application/json' };
+    if (token) { headers['Authorization'] = `Bearer ${token}`; }
+            const response = await fetch('/api/trades', { headers });
             if (!response.ok) throw new Error('Failed to load trades');
             
             const tradesData = await response.json();
@@ -3916,7 +3987,15 @@ async function loadConditionsFromItem() {
             endpoint = `/api/trade-conditions?trade_id=${sourceId}`;
         }
         
-        const response = await fetch(endpoint);
+    let token = null;
+    if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
+      token = await window.UnifiedCacheManager.get('authToken');
+    } else {
+      token = localStorage.getItem('authToken'); // fallback
+    }
+    const headers = { 'Content-Type': 'application/json' };
+    if (token) { headers['Authorization'] = `Bearer ${token}`; }
+        const response = await fetch(endpoint, { headers });
         if (!response.ok) throw new Error('Failed to load conditions');
         
         const conditions = await response.json();
@@ -4175,12 +4254,29 @@ async function refreshConditionEvaluations() {
         showEvaluationLoading();
         
         // קריאה לשרת לקבלת התראות חדשות
-        const response = await fetch('/api/alerts/');
+    let token = null;
+    if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
+      token = await window.UnifiedCacheManager.get('authToken');
+    } else {
+      token = localStorage.getItem('authToken'); // fallback
+    }
+    const headers = { 'Content-Type': 'application/json' };
+    if (token) { headers['Authorization'] = `Bearer ${token}`; }
+        const response = await fetch('/api/alerts/', { headers });
+        let data;
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            if ([401, 403, 404].includes(response.status)) {
+                // User not authenticated or no alerts - return empty array
+                if (window.Logger && typeof window.Logger.debug === 'function') {
+                  window.Logger.debug(`⚠️ Alerts API returned ${response.status} in refreshConditionEvaluations, returning empty data`, { page: "alerts" });
+                }
+                data = { data: [] };
+            } else {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+        } else {
+            data = await response.json();
         }
-        
-        const data = await response.json();
         window.Logger.info('📊 התראות מעודכנות:', data, { page: "alerts" });
         
         // עדכון טבלת ההתראות
@@ -4343,12 +4439,29 @@ async function loadAlertTickerInfo(tickerId) {
     window.Logger?.info?.('🔄 [loadAlertTickerInfo] Loading ticker info', { tickerId }, { page: "alerts" });
     
     // Get ticker data from API
-    const response = await fetch(`/api/tickers/`);
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+    let token = null;
+    if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
+      token = await window.UnifiedCacheManager.get('authToken');
+    } else {
+      token = localStorage.getItem('authToken'); // fallback
     }
-    
-    const data = await response.json();
+    const headers = { 'Content-Type': 'application/json' };
+    if (token) { headers['Authorization'] = `Bearer ${token}`; }
+    const response = await fetch(`/api/tickers/`, { headers });
+    let data;
+    if (!response.ok) {
+      if ([401, 403, 404].includes(response.status)) {
+        // User not authenticated or no tickers - return empty array
+        if (window.Logger && typeof window.Logger.debug === 'function') {
+          window.Logger.debug(`⚠️ Tickers API returned ${response.status} in loadAlertTickerInfo, returning empty data`, { page: "alerts" });
+        }
+        data = { data: [] };
+      } else {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+    } else {
+      data = await response.json();
+    }
     const tickers = data.data || data;
     
     // Find the specific ticker
@@ -4608,5 +4721,31 @@ window.registerAlertsTables = function() {
         defaultSort: { columnIndex: 6, direction: 'desc', key: 'created_at' }
     });
 };
+
+// === EOD INTEGRATION: Load EOD alerts data ===
+async function loadEODAlertsData() {
+    try {
+        window.Logger?.debug('🔍 Alerts Page - טוען התראות EOD');
+
+        // Load EOD alerts from the API
+        const eodAlerts = await window.EODIntegrationHelper.loadEODAlerts({
+            limit: 50,
+            date_from: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] // Last 30 days
+        });
+
+        if (window.Logger && eodAlerts && eodAlerts.data && eodAlerts.data.length > 0) {
+            window.Logger.info(`✅ Loaded EOD alerts: ${eodAlerts.data.length} alerts`, {
+                page: 'alerts'
+            });
+        }
+
+        return eodAlerts;
+
+    } catch (error) {
+        window.Logger?.error('❌ Failed to load EOD alerts data:', error);
+        return { data: [], status: 'error', message: error.message };
+    }
+}
+
 window.clearAlertTickerInfo = clearAlertTickerInfo;
 // Note: saveAlert and deleteAlert removed - using ModalManagerV2 and confirmDeleteAlert instead

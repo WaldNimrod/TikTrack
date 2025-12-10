@@ -3118,23 +3118,29 @@ async function updateTradesOnTickerChange(mode = 'add') {
 }
 
 /**
- * Navigate to ticker page (in development)
- * @param {string} _symbol - Ticker symbol (unused)
+ * Navigate to ticker page
+ * @param {string} symbol - Ticker symbol
  * @returns {void}
  */
-function goToTickerPage(_symbol) {
+function goToTickerPage(symbol) {
   try {
-  // מעבר לדף טיקר
-  if (typeof window.showInfoNotification === 'function') {
-    window.showInfoNotification('מידע', 'מעבר לדף טיקר - בפיתוח');
-  } else {
-    // מעבר לדף טיקר - בפיתוח
-  }
-  // TODO: ניתוב לדף טיקר - ראה: CENTRAL_TASKS_TODO.md (משימה 1)
+    if (!symbol) {
+      window.Logger?.warn?.('No symbol provided for navigation', { page: "executions" });
+      if (typeof window.showWarningNotification === 'function') {
+        window.showWarningNotification('שגיאה', 'לא סופק סימול לניווט');
+      }
+      return;
+    }
+
+    // Navigate to ticker page with symbol parameter
+    const tickerPageUrl = `/tickers.html?tickerSymbol=${encodeURIComponent(symbol)}`;
+    window.location.href = tickerPageUrl;
+
+    window.Logger?.info?.('Navigating to ticker page', { symbol, url: tickerPageUrl, page: "executions" });
   } catch (error) {
-    window.Logger.error('שגיאה במעבר לעמוד טיקר:', error, { page: "executions" });
+    window.Logger?.error?.('Error navigating to ticker page', { symbol, error: error?.message, page: "executions" });
     if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה במעבר לעמוד טיקר', error.message);
+      window.showErrorNotification('שגיאה', `שגיאה במעבר לעמוד טיקר: ${error.message}`);
     }
   }
 }
@@ -3167,51 +3173,87 @@ function showTickerHelp() {
 }
 
 /**
- * Add new ticker (in development)
+ * Add new ticker
  * @returns {void}
  */
 function addNewTicker() {
   try {
-  // הוספת טיקר חדש
-  if (typeof window.showInfoNotification === 'function') {
-    window.showInfoNotification('מידע', 'הוספת טיקר - בפיתוח');
-  } else {
-    // הוספת טיקר - בפיתוח
-  }
-  // TODO: פתיחת מודל הוספת טיקר - ראה: CENTRAL_TASKS_TODO.md (משימה 2)
+    window.Logger?.info?.('Opening add ticker modal', { page: "executions" });
+
+    // Use ModalManagerV2 if available
+    if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
+      window.ModalManagerV2.showModal('addTickerModal', 'add').then(() => {
+        window.Logger?.info?.('Add ticker modal opened successfully', { page: "executions" });
+      }).catch(error => {
+        window.Logger?.error?.('Error opening add ticker modal', { error: error?.message, page: "executions" });
+        throw error;
+      });
+    } else if (window.AddTickerModal && typeof window.AddTickerModal.open === 'function') {
+      // Fallback to direct modal opening
+      window.AddTickerModal.open(null);
+    } else {
+      throw new Error('Modal system not available');
+    }
   } catch (error) {
-    window.Logger.error('שגיאה בהוספת טיקר חדש:', error, { page: "executions" });
+    window.Logger?.error?.('Error opening add ticker modal', { error: error?.message, page: "executions" });
     if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה בהוספת טיקר חדש', error.message);
+      window.showErrorNotification('שגיאה', `שגיאה בפתיחת מודל הוספת טיקר: ${error.message}`);
     }
   }
 }
 
 /**
- * Add new trade plan (in development)
+ * Add new trade plan
  * @returns {void}
  */
 function addNewPlan() {
-  // הוספת תכנון חדש
-  if (typeof window.showInfoNotification === 'function') {
-    window.showInfoNotification('מידע', 'הוספת תכנון - בפיתוח');
-  } else {
-    // הוספת תכנון - בפיתוח
+  try {
+    window.Logger?.info?.('Opening add trade plan modal', { page: "executions" });
+
+    // Use ModalManagerV2 if available
+    if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
+      window.ModalManagerV2.showModal('tradePlansModal', 'add').then(() => {
+        window.Logger?.info?.('Add trade plan modal opened successfully', { page: "executions" });
+      }).catch(error => {
+        window.Logger?.error?.('Error opening add trade plan modal', { error: error?.message, page: "executions" });
+        throw error;
+      });
+    } else {
+      throw new Error('Modal system not available');
+    }
+  } catch (error) {
+    window.Logger?.error?.('Error opening add trade plan modal', { error: error?.message, page: "executions" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה', `שגיאה בפתיחת מודל הוספת תכנון: ${error.message}`);
+    }
   }
-  // TODO: פתיחת מודל הוספת תכנון - ראה: CENTRAL_TASKS_TODO.md (משימה 3)
 }
 
 /**
- * הוספת טרייד חדש
+ * Add new trade
+ * @returns {void}
  */
 function addNewTrade() {
-  // הוספת טרייד חדש
-  if (typeof window.showInfoNotification === 'function') {
-    window.showInfoNotification('מידע', 'הוספת טרייד - בפיתוח');
-  } else {
-    // הוספת טרייד - בפיתוח
+  try {
+    window.Logger?.info?.('Opening add trade modal', { page: "executions" });
+
+    // Use ModalManagerV2 if available
+    if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
+      window.ModalManagerV2.showModal('tradesModal', 'add').then(() => {
+        window.Logger?.info?.('Add trade modal opened successfully', { page: "executions" });
+      }).catch(error => {
+        window.Logger?.error?.('Error opening add trade modal', { error: error?.message, page: "executions" });
+        throw error;
+      });
+    } else {
+      throw new Error('Modal system not available');
+    }
+  } catch (error) {
+    window.Logger?.error?.('Error opening add trade modal', { error: error?.message, page: "executions" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה', `שגיאה בפתיחת מודל הוספת טרייד: ${error.message}`);
+    }
   }
-  // TODO: פתיחת מודל הוספת טרייד - ראה: CENTRAL_TASKS_TODO.md (משימה 4)
 }
 
 /**

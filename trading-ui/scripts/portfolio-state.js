@@ -4781,8 +4781,7 @@ async function initPLTrendChart() {
             }
         });
         
-        // Generate data based on filtered trades - TODO: Load from API
-        // Load P/L data using PortfolioStateData service
+        // Load portfolio data from API
         let plData = {
             realized: [],
             unrealized: [],
@@ -4791,68 +4790,93 @@ async function initPLTrendChart() {
             unrealizedPercent: [],
             totalPercent: []
         };
+
         try {
-            if (window.PortfolioStateData && typeof window.PortfolioStateData.loadSeries === 'function') {
-                const period = currentPeriod['both'] || 'month';
-                const endDate = new Date().toISOString().split('T')[0];
-                const startDate = new Date();
-                const days = period === 'week' ? 7 : period === 'month' ? 30 : period === '3months' ? 90 : period === 'year' ? 365 : 30;
-                startDate.setDate(startDate.getDate() - days);
-                const startDateStr = startDate.toISOString().split('T')[0];
-                
-                const accountId = getSelectedAccounts().length === 1 ? getSelectedAccounts()[0] : null;
-                const series = await window.PortfolioStateData.loadSeries(accountId, startDateStr, endDate, {
-                    interval: 'day'
-                });
-                
-                // Transform series data to chart format
-                if (Array.isArray(series?.snapshots)) {
-                    series.snapshots.forEach(snapshot => {
-                        // CRITICAL: Validate snapshot exists
-                        if (!snapshot) return;
-                        
-                        const dateValue = snapshot.snapshot_date || snapshot.date;
-                        if (!dateValue) return; // No date value
-                        
-                        const time = convertDateToChartFormat(dateValue);
-                        // CRITICAL: Validate time is a non-empty string
-                        if (!time || typeof time !== 'string' || time.trim() === '') {
-                            return; // Skip this snapshot if time is invalid
+            // Load portfolio summary from API
+            const accountId = getSelectedAccounts().length === 1 ? getSelectedAccounts()[0] : null;
+            const portfolioUrl = accountId
+                ? `/api/portfolio/summary?account_id=${accountId}&size=full`
+                : '/api/portfolio/summary?size=full';
+
+            const portfolioResponse = await fetch(portfolioUrl);
+            if (portfolioResponse.ok) {
+                const portfolioData = await portfolioResponse.json();
+
+                // Use portfolio data for charts if available
+                // For now, fallback to existing logic if no chart data from API
+                if (window.PortfolioStateData && typeof window.PortfolioStateData.loadSeries === 'function') {
+                    const period = currentPeriod['both'] || 'month';
+                    const endDate = new Date().toISOString().split('T')[0];
+                    const startDate = new Date();
+                    const days = period === 'week' ? 7 : period === 'month' ? 30 : period === '3months' ? 90 : period === 'year' ? 365 : 30;
+                    startDate.setDate(startDate.getDate() - days);
+                    const startDateStr = startDate.toISOString().split('T')[0];
+
+                    try {
+                        const series = await window.PortfolioStateData.loadSeries(accountId, startDateStr, endDate, {
+                            interval: 'day'
+                        });
+
+                        // Transform series data to chart format
+                        if (Array.isArray(series?.snapshots)) {
+                            series.snapshots.forEach(snapshot => {
+                                // CRITICAL: Validate snapshot exists
+                                if (!snapshot) return;
+
+                                const dateValue = snapshot.snapshot_date || snapshot.date;
+                                if (!dateValue) return; // No date value
+
+                                const time = convertDateToChartFormat(dateValue);
+                                // CRITICAL: Validate time is a non-empty string
+                                if (!time || typeof time !== 'string' || time.trim() === '') {
+                                    return; // Skip this snapshot if time is invalid
+                                }
+
+                                const timeStr = time.trim(); // Use trimmed time string
+
+                                // No fallback values - use null if data not available
+                                const realized = snapshot.total_realized_pl !== null && snapshot.total_realized_pl !== undefined ? snapshot.total_realized_pl : null;
+                                const unrealized = snapshot.total_unrealized_pl !== null && snapshot.total_unrealized_pl !== undefined ? snapshot.total_unrealized_pl : null;
+                                const total = (realized !== null && unrealized !== null) ? realized + unrealized : null;
+                                const baseValue = series.snapshots[0]?.total_value;
+                                const realizedPercent = (baseValue && baseValue > 0 && realized !== null) ? (realized / baseValue) * 100 : null;
+                                const unrealizedPercent = (baseValue && baseValue > 0 && unrealized !== null) ? (unrealized / baseValue) * 100 : null;
+                                const totalPercent = (baseValue && baseValue > 0 && total !== null) ? (total / baseValue) * 100 : null;
+
+                                // Only add data if values are not null AND time is valid
+                                // CRITICAL: Filter out null time values to prevent "Value is null" errors
+                                if (realized !== null && !isNaN(realized) && isFinite(realized)) {
+                                    plData.realized.push({ time: timeStr, value: realized });
+                                }
+                                if (unrealized !== null && !isNaN(unrealized) && isFinite(unrealized)) {
+                                    plData.unrealized.push({ time: timeStr, value: unrealized });
+                                }
+                                if (total !== null && !isNaN(total) && isFinite(total)) {
+                                    plData.total.push({ time: timeStr, value: total });
+                                }
+                                if (realizedPercent !== null && !isNaN(realizedPercent) && isFinite(realizedPercent)) {
+                                    plData.realizedPercent.push({ time: timeStr, value: realizedPercent });
+                                }
+                                if (unrealizedPercent !== null && !isNaN(unrealizedPercent) && isFinite(unrealizedPercent)) {
+                                    plData.unrealizedPercent.push({ time: timeStr, value: unrealizedPercent });
+                                }
+                                if (totalPercent !== null && !isNaN(totalPercent) && isFinite(totalPercent)) {
+                                    plData.totalPercent.push({ time: timeStr, value: totalPercent });
+                                }
+                            });
                         }
-                        
-                        const timeStr = time.trim(); // Use trimmed time string
-                        
-                        // No fallback values - use null if data not available
-                        const realized = snapshot.total_realized_pl !== null && snapshot.total_realized_pl !== undefined ? snapshot.total_realized_pl : null;
-                        const unrealized = snapshot.total_unrealized_pl !== null && snapshot.total_unrealized_pl !== undefined ? snapshot.total_unrealized_pl : null;
-                        const total = (realized !== null && unrealized !== null) ? realized + unrealized : null;
-                        const baseValue = series.snapshots[0]?.total_value;
-                        const realizedPercent = (baseValue && baseValue > 0 && realized !== null) ? (realized / baseValue) * 100 : null;
-                        const unrealizedPercent = (baseValue && baseValue > 0 && unrealized !== null) ? (unrealized / baseValue) * 100 : null;
-                        const totalPercent = (baseValue && baseValue > 0 && total !== null) ? (total / baseValue) * 100 : null;
-                        
-                        // Only add data if values are not null AND time is valid
-                        // CRITICAL: Filter out null time values to prevent "Value is null" errors
-                        if (realized !== null && !isNaN(realized) && isFinite(realized)) {
-                            plData.realized.push({ time: timeStr, value: realized });
-                        }
-                        if (unrealized !== null && !isNaN(unrealized) && isFinite(unrealized)) {
-                            plData.unrealized.push({ time: timeStr, value: unrealized });
-                        }
-                        if (total !== null && !isNaN(total) && isFinite(total)) {
-                            plData.total.push({ time: timeStr, value: total });
-                        }
-                        if (realizedPercent !== null && !isNaN(realizedPercent) && isFinite(realizedPercent)) {
-                            plData.realizedPercent.push({ time: timeStr, value: realizedPercent });
-                        }
-                        if (unrealizedPercent !== null && !isNaN(unrealizedPercent) && isFinite(unrealizedPercent)) {
-                            plData.unrealizedPercent.push({ time: timeStr, value: unrealizedPercent });
-                        }
-                        if (totalPercent !== null && !isNaN(totalPercent) && isFinite(totalPercent)) {
-                            plData.totalPercent.push({ time: timeStr, value: totalPercent });
-                        }
-                    });
+                    } catch (apiError) {
+                        window.Logger?.warn?.('Failed to load portfolio series from API, using fallback', {
+                            error: apiError?.message,
+                            page: 'portfolio-state'
+                        });
+                    }
                 }
+            } else {
+                window.Logger?.warn?.('Failed to load portfolio summary from API', {
+                    status: portfolioResponse.status,
+                    page: 'portfolio-state'
+                });
             }
         } catch (error) {
             // Don't show error notification for auth errors (already handled in service)
@@ -6498,4 +6522,5 @@ async function waitForScripts() {
     window.setChartPeriod = setChartPeriod;
 
 })();
+
 

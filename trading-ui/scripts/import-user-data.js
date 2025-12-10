@@ -3002,78 +3002,7 @@ function updateActiveSessionInfo(updates = {}) {
 }
 
 function updateActiveSessionIndicator() {
-    // Removed - old session indicator feature removed from step 1
-    // Sessions can be continued from the sessions table instead
-    return;
-        controlsRow.style.display = ''; // Empty string removes inline style, allowing Bootstrap classes to work
-        // Force display if still hidden
-        if (window.getComputedStyle(controlsRow).display === 'none') {
-            controlsRow.style.display = 'flex'; // Bootstrap row uses flex
-        }
-    }
-    if (detailsRow) {
-        detailsRow.classList.remove('d-none');
-        detailsRow.style.display = ''; // Empty string removes inline style, allowing Bootstrap classes to work
-        // Force display if still hidden
-        if (window.getComputedStyle(detailsRow).display === 'none') {
-            detailsRow.style.display = 'block'; // Bootstrap row uses block
-        }
-    }
-    
-    const sessionIdEl = document.getElementById('activeSessionIdValue');
-    const statusEl = document.getElementById('activeSessionStatusValue');
-    const fileEl = document.getElementById('activeSessionFileValue');
-    const accountEl = document.getElementById('activeSessionAccountValue');
-    const providerEl = document.getElementById('activeSessionProviderValue');
-    const totalRecordsEl = document.getElementById('activeSessionTotalRecords');
-    const readyRecordsEl = document.getElementById('activeSessionReadyRecords');
-    const skipRecordsEl = document.getElementById('activeSessionSkipRecords');
-    const missingTickersEl = document.getElementById('activeSessionMissingTickers');
-    const duplicateRecordsEl = document.getElementById('activeSessionDuplicateRecords');
-    const existingRecordsEl = document.getElementById('activeSessionExistingRecords');
-    
-    if (sessionIdEl) {
-        sessionIdEl.textContent = `#${activeSessionInfo.sessionId}`;
-    }
-    if (statusEl) {
-        statusEl.textContent = activeSessionInfo.status || 'לא זמין';
-    }
-    if (fileEl) {
-        const sizeLabel = activeSessionInfo.fileSize ? ` (${formatFileSize(activeSessionInfo.fileSize)})` : '';
-        fileEl.textContent = activeSessionInfo.fileName 
-            ? `${activeSessionInfo.fileName}${sizeLabel}`
-            : 'לא נבחר קובץ';
-    }
-    if (accountEl) {
-        accountEl.textContent = activeSessionInfo.accountName || 'לא נבחר חשבון';
-    }
-    if (providerEl) {
-        providerEl.textContent = activeSessionInfo.provider || 'לא נבחר ספק';
-    }
-    const brokerEl = document.getElementById('activeSessionBrokerAccountValue');
-    if (brokerEl) {
-        brokerEl.textContent = activeSessionInfo.fileAccountNumber
-            || activeFileAccountNumber
-            || 'לא זמין';
-    }
-    if (totalRecordsEl) {
-        totalRecordsEl.textContent = activeSessionInfo.totalRecords ?? 0;
-    }
-    if (readyRecordsEl) {
-        readyRecordsEl.textContent = activeSessionInfo.readyRecords ?? 0;
-    }
-    if (skipRecordsEl) {
-        skipRecordsEl.textContent = activeSessionInfo.skipRecords ?? 0;
-    }
-    if (missingTickersEl) {
-        missingTickersEl.textContent = activeSessionInfo.missingTickers ?? 0;
-    }
-    if (duplicateRecordsEl) {
-        duplicateRecordsEl.textContent = activeSessionInfo.duplicateRecords ?? 0;
-    }
-    if (existingRecordsEl) {
-        existingRecordsEl.textContent = activeSessionInfo.existingRecords ?? 0;
-    }
+    // Indicator removed - no-op in current flow
 }
 
 function updateActiveSessionFromAnalysis(results) {

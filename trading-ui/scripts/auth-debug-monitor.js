@@ -149,12 +149,18 @@
       // Intercept console.error
       const originalConsoleError = console.error;
       console.error = (...args) => {
-        const error = args.find(arg => arg instanceof Error) || new Error(args.join(' '));
-        this.saveError(error, {
-          type: 'console_error',
-          args: args.map(arg => String(arg))
-        });
-        originalConsoleError.apply(console, args);
+        try {
+          const error = args.find(arg => arg instanceof Error) || new Error(args.join(' '));
+          this.saveError(error, {
+            type: 'console_error',
+            args: args.map(arg => String(arg))
+          });
+        } catch (e) {
+          // swallow to avoid breaking app on monitor failure
+        }
+        try {
+          originalConsoleError.apply(console, args);
+        } catch (_) {}
       };
       
       this.log('info', '✅ Global error handling setup complete');

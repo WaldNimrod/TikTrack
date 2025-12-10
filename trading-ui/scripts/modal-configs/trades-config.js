@@ -13,13 +13,17 @@
 // === Initialization ===
 // - initializeTradesModal() - Initialize trades modal
 
-const tradesModalConfig = window.tradesModalConfig;
+let tradesModalConfig = window.tradesModalConfig;
+let tradesConfigWarned = false;
 
 // יצירת המודל אם ModalManagerV2 זמין - Deferred initialization
 function initializeTradesModal() {
     if (!tradesModalConfig) {
-        console.warn('⚠️ tradesModalConfig not defined, skipping trades modal init');
-        return true; // avoid retry loops
+        if (!tradesConfigWarned) {
+            tradesConfigWarned = true;
+            console.warn('⚠️ tradesModalConfig not defined, skipping trades modal init (will keep waiting)');
+        }
+        return false; // allow a later retry if config loads late
     }
     if (window.ModalManagerV2 && typeof window.ModalManagerV2.createCRUDModal === 'function') {
         try {

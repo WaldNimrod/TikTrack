@@ -61,8 +61,7 @@
 // - zoomToDay() - Zoomtoday
 // - waitForElements() - Waitforelements
 
-(function() {
-  'use strict';
+'use strict';
 
   // Current month and year for calendar navigation
   let currentMonth = new Date().getMonth();
@@ -2314,13 +2313,3 @@
     } else {
       setTimeout(initAfterLoad, 500);
     }
-  }
-
-  // Initialize when DOM is ready
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => initializePage());
-  } else {
-    // DOM already loaded
-    initializePage();
-  }
-})();

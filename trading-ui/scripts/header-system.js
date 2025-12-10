@@ -1146,6 +1146,8 @@ class HeaderSystem {
       const isAuthenticated = currentUser && currentUser.id;
       const logoGreen = '#26baac';
       const logoOrange = '#fc5a06';
+      const filterGreen = 'invert(66%) sepia(34%) saturate(797%) hue-rotate(128deg) brightness(92%) contrast(88%)';
+      const filterOrange = 'invert(49%) sepia(96%) saturate(1753%) hue-rotate(359deg) brightness(99%) contrast(98%)';
       
       if (isAuthenticated) {
         // Get user initials
@@ -1170,10 +1172,11 @@ class HeaderSystem {
         const profileLink = document.getElementById('filterUserProfileLink');
         if (profileLink) profileLink.style.display = 'block';
         authIcon.style.opacity = '1';
-        authIcon.style.backgroundColor = logoGreen;
+        authIcon.style.backgroundColor = '#ffffff';
+        authIcon.style.border = `1px solid ${logoGreen}`;
         authIcon.style.borderRadius = '6px';
         authIcon.style.padding = '2px';
-        authIcon.style.filter = 'none';
+        authIcon.style.filter = filterGreen;
         authIcon.dataset.status = 'logged-in';
         authIcon.title = 'התנתק';
       } else {
@@ -1183,10 +1186,11 @@ class HeaderSystem {
         const profileLink = document.getElementById('filterUserProfileLink');
         if (profileLink) profileLink.style.display = 'none';
         authIcon.style.opacity = '1';
-        authIcon.style.backgroundColor = logoOrange;
+        authIcon.style.backgroundColor = '#ffffff';
+        authIcon.style.border = `1px solid ${logoOrange}`;
         authIcon.style.borderRadius = '6px';
         authIcon.style.padding = '2px';
-        authIcon.style.filter = 'grayscale(20%)';
+        authIcon.style.filter = filterOrange;
         authIcon.dataset.status = 'logged-out';
         authIcon.title = 'התחבר';
       }

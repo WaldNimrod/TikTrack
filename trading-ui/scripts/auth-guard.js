@@ -32,75 +32,32 @@
 async function checkAuthentication() {
   window.Logger?.info?.('🔐 [Auth Guard] Starting authentication check', { page: 'auth-guard' });
   
+  if (!window.TikTrackAuth || typeof window.TikTrackAuth.checkAuthentication !== 'function') {
+    window.Logger?.error?.('❌ [Auth Guard] TikTrackAuth not available', { page: 'auth-guard' });
+    return { authenticated: false, user: null, error: 'Auth system not ready' };
+  }
+
   try {
-    const response = await fetch('/api/auth/me', {
-      method: 'GET', });
-    
-    if (response.ok) {
-      const data = await response.json();
-      if (data.status === 'success' && data.data?.user) {
-        const user = data.data.user;
-        // Keep in-memory user for quick checks (isAuthenticated)
-        try {
-          // Prefer the shared variable from auth.js if present
-          if (typeof currentUser !== 'undefined') {
-            currentUser = user;
-          }
-          window.currentUser = user;
-        } catch (e) {
-          window.Logger?.warn?.('⚠️ [Auth Guard] Failed setting currentUser', { page: 'auth-guard', error: e?.message });
-        }
-        window.Logger?.info?.('✅ [Auth Guard] User authenticated', { 
-          page: 'auth-guard', 
-          userId: user.id, 
-          username: user.username 
-        });
-        
-        // Save to cache - ONLY UnifiedCacheManager, no fallbacks
-        // Use helper function to ensure consistent key handling
-        if (window.TikTrackAuth?.saveAuthToCache) {
-          await window.TikTrackAuth.saveAuthToCache(user, 'session_based');
-        } else if (window.UnifiedCacheManager) {
-          await window.UnifiedCacheManager.save('currentUser', user, { includeUserId: false });
-          await window.UnifiedCacheManager.save('authToken', 'session_based', { includeUserId: false });
-        } else {
-          window.Logger?.error?.('❌ [Auth Guard] UnifiedCacheManager not available', { page: 'auth-guard' });
-        }
-        
-        return { authenticated: true, user, error: null };
-      } else {
-        window.Logger?.warn?.('⚠️ [Auth Guard] Invalid response format', { page: 'auth-guard', data });
-        return { authenticated: false, user: null, error: 'Invalid response format' };
-      }
-    } else if (response.status === 401) {
-      window.Logger?.info?.('❌ [Auth Guard] User not authenticated (401)', { page: 'auth-guard' });
-      
-      // Clear all auth data and prompt login
-      if (window.TikTrackAuth?.forceLogoutAndPrompt) {
-        await window.TikTrackAuth.forceLogoutAndPrompt('auth_guard_401');
-      } else if (window.TikTrackAuth?.removeAuthFromCache) {
-        await window.TikTrackAuth.removeAuthFromCache();
-      } else if (window.UnifiedCacheManager) {
-        await window.UnifiedCacheManager.remove('currentUser', { includeUserId: false });
-        await window.UnifiedCacheManager.remove('authToken', { includeUserId: false });
-      } else {
-        window.Logger?.error?.('❌ [Auth Guard] UnifiedCacheManager not available', { page: 'auth-guard' });
-      }
-      
-      return { authenticated: false, user: null, error: 'Not authenticated' };
-    } else {
-      window.Logger?.error?.('❌ [Auth Guard] Server error', { 
+    const result = await window.TikTrackAuth.checkAuthentication();
+    if (result?.authenticated) {
+      window.Logger?.info?.('✅ [Auth Guard] User authenticated', { 
         page: 'auth-guard', 
-        status: response.status 
+        userId: result.user?.id, 
+        username: result.user?.username 
       });
-      return { authenticated: false, user: null, error: `Server error: ${response.status}` };
+    } else {
+      window.Logger?.info?.('❌ [Auth Guard] User not authenticated', { 
+        page: 'auth-guard', 
+        error: result?.error 
+      });
     }
+    return result;
   } catch (error) {
-    window.Logger?.error?.('❌ [Auth Guard] Network error', { 
+    window.Logger?.error?.('❌ [Auth Guard] Authentication check failed', { 
       page: 'auth-guard', 
       error: error.message 
     });
-    return { authenticated: false, user: null, error: `Network error: ${error.message}` };
+    return { authenticated: false, user: null, error: error.message };
   }
 }
 
@@ -172,7 +129,26 @@ async function initAuthGuard() {
   // Increased delay to 500ms to give session more time to stabilize
   await new Promise(resolve => setTimeout(resolve, 500));
   
-  const result = await checkAuthentication();
+  // Wait briefly for token to be available (UC or sessionStorage) before first check
+  let tokenReady = false;
+  for (let i = 0; i < 10; i++) {
+    const hasUC = window.UnifiedCacheManager?.initialized;
+    const ucToken = hasUC ? await window.UnifiedCacheManager.get('authToken', { includeUserId: false }).catch(() => null) : null;
+    const ssToken = (typeof sessionStorage !== 'undefined') ? sessionStorage.getItem('dev_authToken') : null;
+    if (ucToken || ssToken) {
+      tokenReady = true;
+      break;
+    }
+    await new Promise(resolve => setTimeout(resolve, 100));
+  }
+  
+  let result = { authenticated: false, user: null, error: 'unknown' };
+  try {
+    const r = await checkAuthentication();
+    if (r) result = r;
+  } catch (e) {
+    window.Logger?.error?.('❌ [Auth Guard] checkAuthentication threw', { error: e?.message });
+  }
   
   if (result.authenticated) {
     window.Logger?.info?.('✅ [Auth Guard] User authenticated, page access granted', { 

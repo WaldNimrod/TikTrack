@@ -2580,6 +2580,13 @@ function getDataStatusBadge(ticker) {
 async function loadTickersDataInternal(options = {}) {
   try {
     window.Logger.info('Loading tickers data', { page: "tickers" });
+
+    // Guard: avoid hitting APIs before authentication is ready
+    const currentUser = window.TikTrackAuth?.getCurrentUser?.();
+    if (!currentUser || !currentUser.id) {
+      window.Logger?.debug?.('⚠️ Skipping tickers load - user not authenticated', { page: 'tickers' });
+      return [];
+    }
     
     // Use TickersData service if available, otherwise fallback to direct API call
     let rawTickers = [];

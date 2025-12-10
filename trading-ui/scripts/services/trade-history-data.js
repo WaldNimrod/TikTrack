@@ -66,6 +66,15 @@
     try {
       const { force = false } = options || {};
       
+      // Guard: skip when no authenticated user
+      if (typeof window.TikTrackAuth?.getCurrentUser === 'function') {
+        const u = window.TikTrackAuth.getCurrentUser();
+        if (!u || !u.id) {
+          window.Logger?.debug?.('⚠️ Trade history skipped - user not authenticated', PAGE_LOG_CONTEXT);
+          return { trades: [], total: 0 };
+        }
+      }
+      
       // Build cache key from filters
       const filtersHash = JSON.stringify(filters);
       const cacheKey = `${TRADE_HISTORY_DATA_KEY}:${filtersHash}`;
@@ -95,7 +104,9 @@
       
       const response = await fetch(url, { });
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const msg = `HTTP error! status: ${response.status}`;
+        window.Logger?.warn?.('⚠️ Trade history load failed, returning empty', { ...PAGE_LOG_CONTEXT, status: response.status, message: msg });
+        return { trades: [], total: 0 };
       }
 
       const data = await response.json();
@@ -108,9 +119,8 @@
       window.Logger?.debug?.('✅ Trade history loaded from API', { ...PAGE_LOG_CONTEXT, count: payload?.trades?.length || 0 });
       return payload;
     } catch (error) {
-      window.Logger?.error?.('❌ Error loading trade history', { ...PAGE_LOG_CONTEXT, error: error?.message || error });
-      window.NotificationSystem?.showError?.('שגיאה', 'שגיאה בטעינת היסטוריית טריידים');
-      throw error;
+      window.Logger?.warn?.('⚠️ Error loading trade history (soft-fail)', { ...PAGE_LOG_CONTEXT, error: error?.message || error });
+      return { trades: [], total: 0 };
     }
   }
 

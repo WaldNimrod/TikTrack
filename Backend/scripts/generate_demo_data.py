@@ -2407,7 +2407,13 @@ def main():
         if args.dry_run:
             print("\n✅ אימות הצליח - מבנה DB תקין")
             return
-        
+
+        # Clear existing data for the user if username is provided
+        if args.username:
+            clear_user_data(db, args.username, dry_run=args.dry_run, verbose=args.verbose)
+            if not args.dry_run:
+                db.commit()  # Commit the clearing operations
+
         # Generate data
         generator = DemoDataGenerator(db, DEMO_CONFIG, dry_run=args.dry_run, verbose=args.verbose, username=args.username)
         results = generator.generate_all()
@@ -2431,6 +2437,73 @@ def main():
         sys.exit(1)
     finally:
         db.close()
+
+
+# ============================================================================
+# Data Clearing Functions
+# ============================================================================
+
+def clear_user_data(db: Session, username: str, dry_run: bool = False, verbose: bool = False) -> None:
+    """Clears existing demo data for a specific user"""
+    if dry_run:
+        print(f"🧹 [DRY RUN] Would clear existing data for user: {username}")
+        return
+
+    # Get user ID
+    user = db.query(User).filter(User.username == username).first()
+    if not user:
+        if verbose:
+            print(f"⚠️  User '{username}' not found, skipping data clearing")
+        return
+
+    user_id = user.id
+
+    if verbose:
+        print(f"🧹 Clearing existing data for user: {username} (ID: {user_id})")
+
+    # Clear user-specific data in reverse dependency order
+    tables_to_clear = [
+        ('ai_analysis_requests', f"user_id = {user_id}"),
+        ('notes', f"user_id = {user_id}"),
+        ('alerts', f"user_id = {user_id}"),
+        ('cash_flows', f"user_id = {user_id}"),
+        ('executions', f"user_id = {user_id}"),
+        ('trades', f"user_id = {user_id}"),
+        ('trade_plans', f"user_id = {user_id}"),
+        ('user_tickers', f"user_id = {user_id}"),
+        ('trading_accounts', f"user_id = {user_id}"),
+    ]
+
+    for table_name, condition in tables_to_clear:
+        try:
+            db.execute(text(f"DELETE FROM {table_name} WHERE {condition}"))
+            if verbose:
+                print(f"  ✅ Cleared {table_name} for user {username}")
+        except Exception as e:
+            print(f"  ❌ Error clearing {table_name}: {e}")
+            # Continue with other tables
+
+    # Clear watch lists and items for this user
+    try:
+        # Get watch list IDs for this user
+        watch_list_ids = db.execute(text(f"SELECT id FROM watch_lists WHERE user_id = {user_id}")).fetchall()
+        watch_list_ids = [row[0] for row in watch_list_ids]
+
+        if watch_list_ids:
+            # Delete watch list items
+            ids_str = ','.join(str(id) for id in watch_list_ids)
+            db.execute(text(f"DELETE FROM watch_list_items WHERE watch_list_id IN ({ids_str})"))
+
+            # Delete watch lists
+            db.execute(text(f"DELETE FROM watch_lists WHERE user_id = {user_id}"))
+
+            if verbose:
+                print(f"  ✅ Cleared watch lists for user {username}")
+    except Exception as e:
+        print(f"  ❌ Error clearing watch lists: {e}")
+
+    if verbose:
+        print(f"✅ Finished clearing existing data for user: {username}")
 
 
 if __name__ == '__main__':

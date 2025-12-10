@@ -65,13 +65,56 @@ let currentUser = null;
 // Helper functions for cache operations with consistent key handling
 // CRITICAL: Always use includeUserId: false for auth-related keys to avoid key mismatches
 const authCacheOptions = { includeUserId: false };
+const DEV_SESSION_TOKEN_KEY = 'dev_authToken';
+const DEV_SESSION_USER_KEY = 'dev_currentUser';
+const authBroadcastChannel = (typeof BroadcastChannel !== 'undefined') ? new BroadcastChannel('tiktrack_auth_channel') : null;
+
+// Bootstrap auth from sessionStorage (dev mode) as early as possible
+(function bootstrapAuthFromSessionStorage() {
+  try {
+    if (typeof sessionStorage === 'undefined') return;
+    const storedToken = sessionStorage.getItem(DEV_SESSION_TOKEN_KEY);
+    const storedUserRaw = sessionStorage.getItem(DEV_SESSION_USER_KEY);
+    if (!storedToken || !storedUserRaw) return;
+    const storedUser = JSON.parse(storedUserRaw);
+    authToken = storedToken;
+    currentUser = storedUser;
+    // Best effort: persist into UC if initialized
+    if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
+      window.UnifiedCacheManager.save('authToken', storedToken, authCacheOptions).catch(() => {});
+      window.UnifiedCacheManager.save('currentUser', storedUser, authCacheOptions).catch(() => {});
+    }
+    window.Logger?.info?.('✅ [auth.js] Bootstrapped auth from sessionStorage', {
+      page: 'auth',
+      hasToken: !!storedToken,
+      hasUser: !!storedUser
+    });
+  } catch (e) {
+    window.Logger?.warn?.('⚠️ [auth.js] Failed to bootstrap auth from sessionStorage', { error: e?.message });
+  }
+})();
+
+function broadcastAuthEvent(eventPayload) {
+  // Broadcast via BroadcastChannel if available
+  if (authBroadcastChannel) {
+    try {
+      authBroadcastChannel.postMessage(eventPayload);
+    } catch (e) {
+      window.Logger?.warn?.('⚠️ [auth.js] BroadcastChannel post failed', { error: e?.message });
+    }
+  }
+  // Also use localStorage event for legacy multi-tab sync
+  try {
+    localStorage.setItem('tiktrack_auth_event', JSON.stringify(eventPayload));
+    setTimeout(() => {
+      localStorage.removeItem('tiktrack_auth_event');
+    }, 100);
+  } catch (e) {
+    window.Logger?.warn?.('⚠️ [auth.js] localStorage auth event failed', { error: e?.message });
+  }
+}
 
 async function saveAuthToCache(user, token = 'session_based') {
-  if (!window.UnifiedCacheManager) {
-    window.AuthDebugMonitor?.log('error', '❌ UnifiedCacheManager not available for saveAuthToCache');
-    return false;
-  }
-  
   window.AuthDebugMonitor?.log('info', '💾 saveAuthToCache called', {
     userId: user?.id,
     username: user?.username,
@@ -79,12 +122,24 @@ async function saveAuthToCache(user, token = 'session_based') {
   });
   
   try {
-    await window.UnifiedCacheManager.save('currentUser', user, authCacheOptions);
-    await window.UnifiedCacheManager.save('authToken', token, authCacheOptions);
+    if (window.UnifiedCacheManager) {
+      await window.UnifiedCacheManager.save('currentUser', user, authCacheOptions);
+      await window.UnifiedCacheManager.save('authToken', token, authCacheOptions);
+    } else if (typeof sessionStorage !== 'undefined') {
+      sessionStorage.setItem(DEV_SESSION_USER_KEY, JSON.stringify(user));
+      sessionStorage.setItem(DEV_SESSION_TOKEN_KEY, token);
+    } else {
+      window.AuthDebugMonitor?.log('error', '❌ No cache layer available for saveAuthToCache');
+      return false;
+    }
     
     // Verify
-    const verifyUser = await window.UnifiedCacheManager.get('currentUser', authCacheOptions);
-    const verifyToken = await window.UnifiedCacheManager.get('authToken', authCacheOptions);
+    const verifyUser = window.UnifiedCacheManager
+      ? await window.UnifiedCacheManager.get('currentUser', authCacheOptions)
+      : JSON.parse(sessionStorage.getItem(DEV_SESSION_USER_KEY) || 'null');
+    const verifyToken = window.UnifiedCacheManager
+      ? await window.UnifiedCacheManager.get('authToken', authCacheOptions)
+      : sessionStorage.getItem(DEV_SESSION_TOKEN_KEY);
     
     window.AuthDebugMonitor?.log('info', '✅ saveAuthToCache completed', {
       userSaved: verifyUser !== null,
@@ -103,21 +158,28 @@ async function saveAuthToCache(user, token = 'session_based') {
 }
 
 async function getAuthFromCache() {
-  if (!window.UnifiedCacheManager) {
-    return { user: null, token: null };
-  }
+  window.AuthDebugMonitor?.log('info', '🔍 getAuthFromCache', {});
   
   try {
-    const user = await window.UnifiedCacheManager.get('currentUser', authCacheOptions);
-    const token = await window.UnifiedCacheManager.get('authToken', authCacheOptions);
-    
-    window.AuthDebugMonitor?.log('info', '🔍 getAuthFromCache', {
-      userFound: user !== null,
-      tokenFound: token !== null,
-      userId: user?.id
-    });
-    
-    return { user, token };
+    if (window.UnifiedCacheManager) {
+      const user = await window.UnifiedCacheManager.get('currentUser', authCacheOptions);
+      const token = await window.UnifiedCacheManager.get('authToken', authCacheOptions);
+      
+      window.AuthDebugMonitor?.log('info', '✅ getAuthFromCache result', {
+        userFound: user !== null,
+        tokenFound: token !== null,
+        userId: user?.id
+      });
+      
+      return { user, token };
+    }
+    if (typeof sessionStorage !== 'undefined') {
+      const user = JSON.parse(sessionStorage.getItem(DEV_SESSION_USER_KEY) || 'null');
+      const token = sessionStorage.getItem(DEV_SESSION_TOKEN_KEY);
+      return { user, token };
+    }
+    window.AuthDebugMonitor?.log('error', '❌ No cache layer available for getAuthFromCache');
+    return { user: null, token: null };
   } catch (error) {
     window.AuthDebugMonitor?.log('error', '❌ getAuthFromCache failed', {
       error: error.message
@@ -127,15 +189,17 @@ async function getAuthFromCache() {
 }
 
 async function removeAuthFromCache() {
-  if (!window.UnifiedCacheManager) {
-    return false;
-  }
-  
   window.AuthDebugMonitor?.log('warn', '🗑️ removeAuthFromCache called');
   
   try {
-    await window.UnifiedCacheManager.remove('currentUser', authCacheOptions);
-    await window.UnifiedCacheManager.remove('authToken', authCacheOptions);
+    if (window.UnifiedCacheManager) {
+      await window.UnifiedCacheManager.remove('currentUser', authCacheOptions);
+      await window.UnifiedCacheManager.remove('authToken', authCacheOptions);
+    }
+    if (typeof sessionStorage !== 'undefined') {
+      sessionStorage.removeItem(DEV_SESSION_USER_KEY);
+      sessionStorage.removeItem(DEV_SESSION_TOKEN_KEY);
+    }
     
     window.AuthDebugMonitor?.log('info', '✅ removeAuthFromCache completed');
     return true;
@@ -192,10 +256,7 @@ async function forceLogoutAndPrompt(reason = 'unauthorized') {
       source: 'auth.js',
       reason
     };
-    localStorage.setItem('tiktrack_auth_event', JSON.stringify(logoutEvent));
-    setTimeout(() => {
-      localStorage.removeItem('tiktrack_auth_event');
-    }, 100);
+    broadcastAuthEvent(logoutEvent);
   } catch (e) {
     window.Logger?.warn?.('⚠️ [auth.js] Failed broadcasting logout event', { error: e?.message });
   }
@@ -335,6 +396,45 @@ if (typeof window.addEventListener === 'function') {
       }
     }
   });
+
+  if (authBroadcastChannel) {
+    authBroadcastChannel.onmessage = async (message) => {
+      const authEvent = message?.data;
+      if (!authEvent) return;
+      try {
+        if (authEvent.type === 'logout') {
+          console.log('🔔 Logout event received via BroadcastChannel');
+          authToken = null;
+          currentUser = null;
+          await removeAuthFromCache();
+          try {
+            sessionStorage.removeItem('redirectAfterLogin');
+          } catch (_) {}
+          if (window.headerSystem?.updateUserDisplay) {
+            window.headerSystem.updateUserDisplay();
+          }
+          window.dispatchEvent(new CustomEvent('logout:success'));
+          window.dispatchEvent(new CustomEvent('user:logged-out'));
+          if (typeof window.TikTrackAuth?.showLoginModal === 'function') {
+            await window.TikTrackAuth.showLoginModal();
+          }
+        } else if (authEvent.type === 'login') {
+          console.log('🔔 Login event received via BroadcastChannel');
+          // Refresh header; optionally re-check auth
+          currentUser = authEvent.user || currentUser;
+          authToken = authEvent.token || authToken;
+          if (window.headerSystem?.updateUserDisplay) {
+            window.headerSystem.updateUserDisplay();
+          }
+          if (typeof checkAuthentication === 'function') {
+            await checkAuthentication();
+          }
+        }
+      } catch (error) {
+        console.error('Error handling auth event via BroadcastChannel:', error);
+      }
+    };
+  }
 }
 
 // פונקציות התחברות
@@ -939,21 +1039,36 @@ function setupLoginForm(formId = 'loginForm', onSuccess = null) {
         }
       }, 100);
 
-      // Broadcast login event to other tabs via localStorage
+      // Broadcast login event to other tabs
+      broadcastAuthEvent({
+        type: 'login',
+        timestamp: new Date().toISOString(),
+        source: 'auth.js',
+        userId: currentUser?.id,
+        user: currentUser,
+        token: authToken
+      });
+
+      // CRITICAL: Load user preferences after successful login
       try {
-        const loginEvent = {
-          type: 'login',
-          timestamp: new Date().toISOString(),
-          source: 'auth.js',
-          userId: currentUser?.id
-        };
-        localStorage.setItem('tiktrack_auth_event', JSON.stringify(loginEvent));
-        // Clear immediately so next change will trigger event again
-        setTimeout(() => {
-          localStorage.removeItem('tiktrack_auth_event');
-        }, 100);
-      } catch (error) {
-        console.warn('Error broadcasting login event to other tabs:', error);
+        window.AuthDebugMonitor?.log('info', '📋 Loading user preferences after login', {
+          userId: currentUser?.id,
+          timestamp: new Date().toISOString()
+        });
+
+        // Load preferences to ensure they are available for the UI
+        if (window.PreferencesData?.loadAllPreferencesRaw) {
+          const prefsPayload = await window.PreferencesData.loadAllPreferencesRaw({ force: true });
+          window.AuthDebugMonitor?.log('info', '✅ User preferences loaded after login', {
+            userId: currentUser?.id,
+            preferencesCount: prefsPayload?.preferences ? Object.keys(prefsPayload.preferences).length : 0
+          });
+        }
+      } catch (prefsError) {
+        window.AuthDebugMonitor?.log('warn', '⚠️ Failed to load preferences after login (non-critical)', {
+          userId: currentUser?.id,
+          error: prefsError?.message
+        });
       }
 
       // Dispatch login success event (for current tab)
@@ -1039,10 +1154,43 @@ async function checkAuthentication(onAuthenticated = null, onNotAuthenticated = 
   window._checkingAuth = true;
   
   try {
+    // Ensure we have a token before hitting the server
+    let tokenAvailable = false;
+    if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
+      const t = await window.UnifiedCacheManager.get('authToken', authCacheOptions).catch(() => null);
+      if (t) tokenAvailable = true;
+    }
+    if (!tokenAvailable && typeof sessionStorage !== 'undefined') {
+      const t = sessionStorage.getItem(DEV_SESSION_TOKEN_KEY);
+      if (t) {
+        tokenAvailable = true;
+        authToken = t;
+        const uRaw = sessionStorage.getItem(DEV_SESSION_USER_KEY);
+        try {
+          const u = uRaw ? JSON.parse(uRaw) : null;
+          currentUser = u;
+          if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
+            await window.UnifiedCacheManager.save('authToken', t, authCacheOptions);
+            if (u) await window.UnifiedCacheManager.save('currentUser', u, authCacheOptions);
+          }
+        } catch (_) {}
+      }
+    }
+
+    if (!tokenAvailable) {
+      window.Logger?.info?.('❌ [auth.js] No token available, skipping /api/auth/me and showing login', { page: 'auth' });
+      if (onNotAuthenticated && typeof onNotAuthenticated === 'function') {
+        onNotAuthenticated();
+      } else if (typeof window.TikTrackAuth?.showLoginModal === 'function') {
+        await window.TikTrackAuth.showLoginModal();
+      }
+      return { authenticated: false, user: null, error: 'no_token' };
+    }
+
     console.log('[auth.js] checkAuthentication: Checking server authentication...');
     const response = await fetch('/api/auth/me', {
-      method: 'GET',
-      headers: await buildAuthHeaders()
+      method: 'GET'
+      // Authorization injected by api-fetch-wrapper
     });
     
     console.log('[auth.js] checkAuthentication: Server response status:', response.status);
@@ -1067,20 +1215,14 @@ async function checkAuthentication(onAuthenticated = null, onNotAuthenticated = 
         // Only broadcast login event if user actually changed (new login or user switch)
         if (!wasAuthenticated || userChanged) {
           // Broadcast login event to other tabs
-          try {
-            const loginEvent = {
-              type: 'login',
-              timestamp: new Date().toISOString(),
-              source: 'auth.js',
-              userId: currentUser?.id
-            };
-            localStorage.setItem('tiktrack_auth_event', JSON.stringify(loginEvent));
-            setTimeout(() => {
-              localStorage.removeItem('tiktrack_auth_event');
-            }, 100);
-          } catch (error) {
-            console.warn('Error broadcasting login event to other tabs:', error);
-          }
+          broadcastAuthEvent({
+            type: 'login',
+            timestamp: new Date().toISOString(),
+            source: 'auth.js',
+            userId: currentUser?.id,
+            user: currentUser,
+            token: authToken
+          });
         }
         
         if (onAuthenticated && typeof onAuthenticated === 'function') {
@@ -1369,18 +1511,38 @@ async function showLoginModal(onSuccess = null) {
         modal.show();
         window.Logger?.info?.('✅ [auth.js] Modal.show() called successfully', { page: 'auth' });
         
+        // Register modal in ModalNavigationService stack before forcing z-index update
+        if (window.ModalNavigationService?.registerModalOpen) {
+          try {
+            window.ModalNavigationService.registerModalOpen(modalElement, {
+              modalId,
+              source: 'auth.js',
+              type: 'auth',
+            });
+          } catch (e) {
+            window.Logger?.warn?.('⚠️ [auth.js] registerModalOpen failed (non-blocking)', {
+              page: 'auth',
+              error: e?.message,
+            });
+          }
+        }
+
         // Update z-index using ModalZIndexManager (central z-index management system)
-        if (window.ModalZIndexManager && typeof window.ModalZIndexManager.forceUpdate === 'function') {
-          // Use requestAnimationFrame for immediate update, then retry with setTimeout
-          requestAnimationFrame(() => {
-            window.ModalZIndexManager.forceUpdate(modalElement);
-            
-            // Retry after a short delay to ensure z-index is set correctly
-            setTimeout(() => {
+        if (window.ModalZIndexManager) {
+          if (typeof window.ModalZIndexManager.forceUpdate === 'function') {
+            // Use requestAnimationFrame for immediate update, then retry with setTimeout
+            requestAnimationFrame(() => {
               window.ModalZIndexManager.forceUpdate(modalElement);
-              window.Logger?.info?.('✅ [auth.js] Z-index updated via ModalZIndexManager', { page: 'auth' });
-            }, 100);
-          });
+              
+              // Retry after a short delay to ensure z-index is set correctly
+              setTimeout(() => {
+                window.ModalZIndexManager.forceUpdate(modalElement);
+                window.Logger?.info?.('✅ [auth.js] Z-index updated via ModalZIndexManager', { page: 'auth' });
+              }, 120);
+            });
+          } else {
+            window.Logger?.warn?.('⚠️ [auth.js] ModalZIndexManager.forceUpdate not available', { page: 'auth' });
+          }
         } else {
           window.Logger?.warn?.('⚠️ [auth.js] ModalZIndexManager not available, using fallback', { page: 'auth' });
         }
@@ -1438,17 +1600,24 @@ async function showLoginModal(onSuccess = null) {
             window.Logger?.info?.('✅ [auth.js] Modal.show() called successfully (after wait)', { page: 'auth' });
             
             // Update z-index using ModalZIndexManager (central z-index management system)
-            if (window.ModalZIndexManager && typeof window.ModalZIndexManager.forceUpdate === 'function') {
-              // Use requestAnimationFrame for immediate update, then retry with setTimeout
-              requestAnimationFrame(() => {
-                window.ModalZIndexManager.forceUpdate(modalElement);
-                
-                // Retry after a short delay to ensure z-index is set correctly
-                setTimeout(() => {
+            if (window.ModalZIndexManager) {
+              if (typeof window.ModalZIndexManager.registerModal === 'function') {
+                window.ModalZIndexManager.registerModal(modalElement);
+              }
+              if (typeof window.ModalZIndexManager.forceUpdate === 'function') {
+                // Use requestAnimationFrame for immediate update, then retry with setTimeout
+                requestAnimationFrame(() => {
                   window.ModalZIndexManager.forceUpdate(modalElement);
-                  window.Logger?.info?.('✅ [auth.js] Z-index updated via ModalZIndexManager (after wait)', { page: 'auth' });
-                }, 100);
-              });
+                  
+                  // Retry after a short delay to ensure z-index is set correctly
+                  setTimeout(() => {
+                    window.ModalZIndexManager.forceUpdate(modalElement);
+                    window.Logger?.info?.('✅ [auth.js] Z-index updated via ModalZIndexManager (after wait)', { page: 'auth' });
+                  }, 100);
+                });
+              } else {
+                window.Logger?.warn?.('⚠️ [auth.js] ModalZIndexManager.forceUpdate not available (after wait)', { page: 'auth' });
+              }
             } else {
               window.Logger?.warn?.('⚠️ [auth.js] ModalZIndexManager not available, using fallback (after wait)', { page: 'auth' });
             }
@@ -1567,6 +1736,48 @@ async function updatePassword(currentPassword, newPassword) {
   return data;
 }
 
+/**
+ * Dev helper: set auth token/user in cache (supports in-memory/sessionStorage when UC disabled)
+ */
+async function devSetAuth(token, user) {
+  authToken = token || authToken;
+  currentUser = user || currentUser;
+  if (currentUser) {
+    await saveAuthToCache(currentUser, authToken || 'session_based');
+  }
+  broadcastAuthEvent({
+    type: 'login',
+    timestamp: new Date().toISOString(),
+    source: 'auth.js',
+    userId: currentUser?.id,
+    user: currentUser,
+    token: authToken
+  });
+  if (window.headerSystem?.updateUserDisplay) {
+    window.headerSystem.updateUserDisplay();
+  }
+  return { user: currentUser, token: authToken };
+}
+
+/**
+ * Dev helper: clear auth token/user
+ */
+async function devClearAuth(reason = 'dev_clear') {
+  authToken = null;
+  currentUser = null;
+  await removeAuthFromCache();
+  broadcastAuthEvent({
+    type: 'logout',
+    timestamp: new Date().toISOString(),
+    source: 'auth.js',
+    reason
+  });
+  if (window.headerSystem?.updateUserDisplay) {
+    window.headerSystem.updateUserDisplay();
+  }
+  return true;
+}
+
 // ייצוא פונקציות גלובליות
 window.TikTrackAuth = {
   login,
@@ -1597,6 +1808,8 @@ window.TikTrackAuth = {
   getAuthFromCache,
   removeAuthFromCache,
   forceLogoutAndPrompt,
+  devSetAuth,
+  devClearAuth,
 };
 
 // ✅ לוג אימות - ניטור הגדרת window.TikTrackAuth
@@ -1660,8 +1873,8 @@ function setupVisibilityCheck() {
       try {
         // Check with server using token header
         const response = await fetch('/api/auth/me', {
-          method: 'GET',
-          headers: await buildAuthHeaders()
+          method: 'GET'
+          // Authorization injected by api-fetch-wrapper
         });
         
         if (!response.ok || response.status === 401) {

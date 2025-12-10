@@ -99,6 +99,17 @@ let _originalGetStatusBackgroundColor = null;
 let _originalGetStatusTextColor = null;
 let _originalGetStatusBorderColor = null;
 
+// Flag to skip heavy logic on the demo page to avoid recursion/RangeError
+const UI_ADVANCED_SKIP_PAGE = (() => {
+  try {
+    if (typeof window !== 'undefined' && window.location && window.location.pathname) {
+      const path = window.location.pathname || '';
+      return path.includes('dynamic-colors-display');
+    }
+  } catch (_) {}
+  return false;
+})();
+
 // Save original functions from color-scheme-system.js if they exist
 // This must run immediately when this script loads (color-scheme-system.js loads before this)
 // CRITICAL: Save the original functions BEFORE they get overwritten by this script's local functions
@@ -110,13 +121,18 @@ let _originalGetStatusBorderColor = null;
   window.__UI_ADVANCED_INITIALIZED__ = true;
 
   // Skip heavy init on dynamic-colors-display page to avoid recursion issues
+  // CRITICAL: Check pathname safely to prevent RangeError
   try {
-    const path = window.location?.pathname || '';
-    if (path.includes('dynamic-colors-display')) {
-      window.Logger?.warn?.('ui-advanced: skipped init on dynamic-colors-display');
-      return;
+    if (typeof window !== 'undefined' && window.location && window.location.pathname) {
+      const path = window.location.pathname;
+      if (path && path.includes('dynamic-colors-display')) {
+        // Silent skip - no logging to prevent recursion
+        return;
+      }
     }
-  } catch (_) { /* noop */ }
+  } catch (_) { 
+    // Silent catch - if we can't check pathname, continue with init
+  }
 
   if (typeof window.getStatusColor === 'function') {
     const fnStr = window.getStatusColor.toString();
@@ -2256,6 +2272,16 @@ async function loadColorPreferences() {
       const prefPayload = await window.PreferencesData.loadAllPreferencesRaw({ force: false });
       if (prefPayload && prefPayload.preferences) {
         const prefs = prefPayload.preferences;
+
+        // DEBUG: Log what colors were loaded
+        if (window.DEBUG_MODE) {
+          console.log('🎨 Color preferences loaded:', {
+            primary: prefs.primary_color,
+            secondary: prefs.secondary_color,
+            chartSecondary: prefs.chartSecondaryColor,
+            allPrefs: Object.keys(prefs).filter(k => k.includes('color'))
+          });
+        }
         
         // עדכון CSS Variables (only if prefs not empty)
         if (Object.keys(prefs).length > 0) {
@@ -2772,6 +2798,11 @@ window.INVESTMENT_TYPE_DESCRIPTIONS = INVESTMENT_TYPE_DESCRIPTIONS;
  * טען צבעים דינמיים מהעדפות
  */
 async function loadDynamicColors() {
+  if (UI_ADVANCED_SKIP_PAGE) {
+    // On the demo page we avoid applying schemes to prevent recursion/RangeError
+    window.Logger?.debug?.('⏭️ Skipping loadDynamicColors on dynamic-colors-display page', { page: 'ui-advanced' });
+    return true;
+  }
   try {
     // Load color scheme from preferences
     if (typeof window.loadColorScheme === 'function') {

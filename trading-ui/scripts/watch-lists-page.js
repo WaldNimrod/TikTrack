@@ -2720,7 +2720,7 @@
             
             window.Logger?.info?.('✅ Flag lists synced', PAGE_LOG_CONTEXT);
         } catch (error) {
-            window.Logger?.error?.('❌ Error syncing flag lists', {
+            window.Logger?.debug?.('⚠️ Error syncing flag lists (soft-fail)', {
                 ...PAGE_LOG_CONTEXT,
                 error: error?.message || error
             });

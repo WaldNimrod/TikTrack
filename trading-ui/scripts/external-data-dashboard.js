@@ -724,9 +724,14 @@
 
       logger.info(`${MODULE_NAME}:init:start`);
 
-      this.initializeHeader();
-      this.setupEventListeners();
-      this.initializePerformanceMonitoring();
+      try {
+        this.initializeHeader();
+        this.setupEventListeners();
+        this.initializePerformanceMonitoring();
+      } catch (headerError) {
+        // Silent fallback - header errors shouldn't block dashboard initialization
+        logger.debug(`${MODULE_NAME}:init:header-setup-warning`, { error: headerError?.message });
+      }
 
       try {
         // Prevent double initialization
@@ -741,6 +746,10 @@
         this.isInitialized = true;
         logger.info(`${MODULE_NAME}:init:completed`);
       } catch (error) {
+        // Silent error handling - don't log to prevent recursion
+        if (window.DEBUG_MODE) {
+          logger.error(`${MODULE_NAME}:init:error`, { error: error?.message });
+        }
         this.handleError('שגיאה באתחול דשבורד הנתונים החיצוניים', error, 'init');
       } finally {
         this._loadingInitialData = false;

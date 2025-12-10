@@ -199,6 +199,25 @@ class EODValidationService {
 }
 ```
 
+#### EOD Integration Helper
+```javascript
+// trading-ui/scripts/services/eod-integration-helper.js
+window.EODIntegrationHelper = {
+    // Core integration
+    integrateEODMetrics(containerId, type, userId, filters, successCallback, fallbackFn),
+
+    // Specific loaders with fallback
+    loadEODPortfolioMetrics(userId, filters, fallbackFn),
+    loadEODPositions(userId, filters, fallbackFn),
+    loadEODCashFlows(userId, filters, fallbackFn),
+
+    // Error handling & validation
+    handleEODError(error, context),
+    validateEODData(data, type),
+    suggestEODRecompute(type, filters)
+};
+```
+
 ### אינטגרציה בעמודים
 
 #### דשבורד טיקר (ticker-dashboard.html)

@@ -53,6 +53,28 @@
     overlaySetup: false
   };
 
+  async function fetchWithRetry(url, options = {}, maxRetries = 3) {
+    let lastError = null;
+    for (let attempt = 0; attempt < maxRetries; attempt++) {
+      try {
+        const response = await fetch(url, options);
+        if (response.status === 429) {
+          const waitTime = Math.min(1000 * Math.pow(2, attempt), 8000);
+          window.Logger?.warn?.('⚠️ watch-lists: Rate limited, retrying', { attempt: attempt + 1, waitTime, page: 'watch-lists-widget' });
+          if (attempt < maxRetries - 1) {
+            await new Promise(r => setTimeout(r, waitTime));
+            continue;
+          }
+        }
+        return response;
+      } catch (err) {
+        lastError = err;
+      }
+    }
+    if (lastError) throw lastError;
+    throw new Error('Rate limit exceeded after retries');
+  }
+
   // ===== DOM Elements Cache =====
   const elements = {
     container: null,
@@ -543,7 +565,7 @@
         return lists || [];
       } else {
         // Fallback to direct API call
-        const response = await fetch('/api/watch-lists');
+        const response = await fetchWithRetry('/api/watch-lists', { method: 'GET' });
         if (!response.ok) {
           throw new Error(`Failed to load watch lists: ${response.status}`);
         }
@@ -571,7 +593,7 @@
         return items || [];
       } else {
         // Fallback to direct API call
-        const response = await fetch(`/api/watch-lists/${listId}/items?includeExternalData=true`);
+        const response = await fetchWithRetry(`/api/watch-lists/${listId}/items?includeExternalData=true`, { method: 'GET' });
         if (!response.ok) {
           throw new Error(`Failed to load watch list items: ${response.status}`);
         }

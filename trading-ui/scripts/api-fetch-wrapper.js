@@ -43,11 +43,16 @@
   }
 
   async function getAuthToken() {
-    if (!window.UnifiedCacheManager || !window.UnifiedCacheManager.initialized) {
-      return null;
-    }
     try {
-      return await window.UnifiedCacheManager.get('authToken', { includeUserId: false });
+      if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
+        const token = await window.UnifiedCacheManager.get('authToken', { includeUserId: false });
+        if (token) return token;
+      }
+      if (typeof sessionStorage !== 'undefined') {
+        const fallback = sessionStorage.getItem('dev_authToken');
+        if (fallback) return fallback;
+      }
+      return null;
     } catch (error) {
       window.Logger?.warn?.('⚠️ [API Fetch Wrapper] Failed to get auth token', { error: error.message });
       return null;

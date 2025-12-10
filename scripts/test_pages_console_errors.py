@@ -218,9 +218,9 @@ def setup_driver():
         return None
 
 def login(driver):
-    """Login using token-based auth (admin/admin123); fallback to modal if needed."""
+    """Login using API token (requests) + sessionStorage injection; fallback to modal if needed."""
     try:
-        print("🔐 Logging in as admin via API token ...")
+        print("🔐 Logging in as admin via API token (backend request) ...")
         token = None
         user = None
         try:
@@ -243,61 +243,33 @@ def login(driver):
                 lambda d: d.execute_script('return document.readyState') == 'complete'
             )
 
-            try:
-                save_result = driver.execute_async_script(
-                    """
-                    const done = arguments[0];
-                    const token = arguments[1];
-                    const user = arguments[2] || null;
-                    let attempts = 0;
-                    function saveToken() {
-                      attempts++;
-                      if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
-                        Promise.resolve(window.UnifiedCacheManager.save('authToken', token, { includeUserId: false }))
-                          .then(() => user ? window.UnifiedCacheManager.save('currentUser', user, { includeUserId: false }) : null)
-                          .then(() => { window.authToken = token; window.currentUser = user; done('ok'); })
-                          .catch(err => done(err && err.message ? err.message : String(err)));
-                      } else if (attempts < 50) {
-                        setTimeout(saveToken, 100);
-                      } else {
-                        done('UnifiedCacheManager not ready');
-                      }
-                    }
-                    saveToken();
-                    """,
-                    token,
-                    user or {},
-                )
-            except Exception as e:
-                print(f"⚠️  Token save via execute_async_script failed: {e}")
-                save_result = "error"
-
-            if save_result != 'ok':
-                print(f"⚠️  Token save reported: {save_result}")
+            driver.execute_script(
+                """
+                sessionStorage.setItem('dev_authToken', arguments[0]);
+                sessionStorage.setItem('dev_currentUser', JSON.stringify(arguments[1] || {}));
+                window.authToken = arguments[0];
+                window.currentUser = arguments[1] || null;
+                """,
+                token,
+                user or {},
+            )
 
             driver.refresh()
-            WebDriverWait(driver, 15).until(
+            WebDriverWait(driver, 20).until(
                 lambda d: d.execute_script('return document.readyState') == 'complete'
             )
 
-            auth_check = driver.execute_async_script(
-                """
-                const done = arguments[0];
-                const controller = new AbortController();
-                const timeout = setTimeout(() => {
-                    controller.abort();
-                    done({ status: 0, error: 'timeout' });
-                }, 10000);
-                fetch('/api/auth/me', { method: 'GET', signal: controller.signal })
-                  .then(res => res.json().then(body => { clearTimeout(timeout); done({status: res.status, body}); }))
-                  .catch(err => { clearTimeout(timeout); done({status: 0, error: err && err.message ? err.message : String(err)}); });
-                """
+            # Verify token via backend directly (Python requests)
+            verify = requests.get(
+                f"{BASE_URL}/api/auth/me",
+                headers={"Authorization": f"Bearer {token}"},
+                timeout=10,
             )
-            if auth_check.get("status") == 200 and auth_check.get("body", {}).get("status") == "success":
+            if verify.status_code == 200 and verify.json().get("status") == "success":
                 print("✅ API token login successful")
                 return True
             else:
-                print(f"⚠️  API token set but session not verified: {auth_check}")
+                print(f"⚠️  API token set but backend verify failed: {verify.status_code} {verify.text[:200]}")
 
         print("🔄 API token path failed or incomplete, falling back to modal flow ...")
         driver.get(f"{BASE_URL}/")

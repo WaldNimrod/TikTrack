@@ -148,30 +148,59 @@
     }
   }
 
-  async function fetchWatchListsFromApi({ signal } = {}) {
+  async function fetchWatchListsFromApi({ signal, maxRetries = 2 } = {}) {
+    // Guard: avoid hitting API before authentication to prevent 401 spam
+    if (typeof window.TikTrackAuth?.getCurrentUser === 'function') {
+      const user = window.TikTrackAuth.getCurrentUser();
+      if (!user || !user.id) {
+        window.Logger?.debug?.('⚠️ Skipping watch lists load - user not authenticated yet', PAGE_LOG_CONTEXT);
+        return [];
+      }
+    }
+
     const base = resolveBaseUrl();
     const separator = base.endsWith('/') ? '' : '/';
     const url = `${base}${separator}api/watch-lists?_ts=${Date.now()}`;
-    const response = await fetch(url, { 
-      method: 'GET', 
-      headers: DEFAULT_HEADERS, 
-      signal, // Include cookies for session-based auth
-    });
     
-    // Handle 401/308 authentication errors
-    if (window.checkAndHandleAuthError && window.checkAndHandleAuthError(response, url)) {
-      throw new Error('Authentication required');
-    }
+    const doFetch = async (attempt = 0) => {
+      const response = await fetch(url, { 
+        method: 'GET', 
+        headers: DEFAULT_HEADERS, 
+        signal,
+      });
+      
+      // Handle 401/308 authentication errors
+      if (window.checkAndHandleAuthError && window.checkAndHandleAuthError(response, url)) {
+        throw new Error('Authentication required');
+      }
+      
+      // Handle 429 rate limiting with exponential backoff
+      if (response.status === 429 && attempt < maxRetries) {
+        const retryAfter = Number(response.headers?.get?.('Retry-After')) || 1;
+        const backoff = Math.min(1000 * Math.pow(2, attempt) + Math.floor(Math.random() * 250), 5000);
+        const waitMs = Math.min(retryAfter * 1000 + backoff, 5000);
+        window.Logger?.warn?.('⚠️ Rate limit hit, retrying...', {
+          ...PAGE_LOG_CONTEXT,
+          attempt: attempt + 1,
+          waitMs,
+        });
+        await new Promise(resolve => setTimeout(resolve, waitMs));
+        return doFetch(attempt + 1);
+      }
+      
+      if (!response.ok) {
+        const error = new Error(`Watch lists load failed (${response.status})`);
+        notifyLoadError(error.message, error);
+        throw error;
+      }
+      
+      const payload = await response.json();
+      const normalized = normalizeWatchListsPayload(payload);
+      await saveWatchListsCache(normalized);
+      return normalized;
+    };
     
-    if (!response.ok) {
-      const error = new Error(`Watch lists load failed (${response.status})`);
-      notifyLoadError(error.message, error);
-      throw error;
-    }
-    const payload = await response.json();
-    const normalized = normalizeWatchListsPayload(payload);
-    await saveWatchListsCache(normalized);
-    return normalized;
+    return doFetch(0);
   }
 
   async function loadWatchListsData(options = {}) {
@@ -225,29 +254,53 @@
   }
 
   async function getWatchListItems(listId, options = {}) {
-    const { signal } = options;
+    const { signal, maxRetries = 2 } = options;
     const base = resolveBaseUrl();
     const separator = base.endsWith('/') ? '' : '/';
     const url = `${base}${separator}api/watch-lists/${listId}/items?_ts=${Date.now()}`;
     
-    try {
-      const response = await fetch(url, { method: 'GET', headers: DEFAULT_HEADERS, signal, });
-      if (!response.ok) {
-        if (response.status === 404) {
-          throw new Error(`Watch list ${listId} not found`);
+    const doFetch = async (attempt = 0) => {
+      try {
+        const response = await fetch(url, { method: 'GET', headers: DEFAULT_HEADERS, signal });
+        
+        // Handle 429 rate limiting with exponential backoff
+        if (response.status === 429 && attempt < maxRetries) {
+          const retryAfter = Number(response.headers?.get?.('Retry-After')) || 1;
+          const backoff = Math.min(1000 * Math.pow(2, attempt) + Math.floor(Math.random() * 250), 5000);
+          const waitMs = Math.min(retryAfter * 1000 + backoff, 5000);
+          window.Logger?.warn?.('⚠️ Rate limit hit, retrying...', {
+            ...PAGE_LOG_CONTEXT,
+            listId,
+            attempt: attempt + 1,
+            waitMs,
+          });
+          await new Promise(resolve => setTimeout(resolve, waitMs));
+          return doFetch(attempt + 1);
         }
-        throw new Error(`Failed to load watch list items (${response.status})`);
+        
+        if (!response.ok) {
+          if (response.status === 404) {
+            throw new Error(`Watch list ${listId} not found`);
+          }
+          throw new Error(`Failed to load watch list items (${response.status})`);
+        }
+        const payload = await response.json();
+        return payload.data || [];
+      } catch (error) {
+        if (error.message.includes('Rate limit') && attempt < maxRetries) {
+          // Already handled in doFetch, but catch here for safety
+          throw error;
+        }
+        window.Logger?.error?.('❌ Error loading watch list items', {
+          ...PAGE_LOG_CONTEXT,
+          listId,
+          error: error?.message,
+        });
+        throw error;
       }
-      const payload = await response.json();
-      return payload.data || [];
-    } catch (error) {
-      window.Logger?.error?.('❌ Error loading watch list items', {
-        ...PAGE_LOG_CONTEXT,
-        listId,
-        error: error?.message,
-      });
-      throw error;
-    }
+    };
+    
+    return doFetch(0);
   }
 
   async function createWatchList(payload, options = {}) {
@@ -527,11 +580,12 @@
       
       return result.data || [];
     } catch (error) {
-      window.Logger?.error?.('❌ Error syncing flag lists', {
+      // Fail soft: log and return empty (flags are optional)
+      window.Logger?.debug?.('⚠️ Error syncing flag lists (soft-fail, returning empty)', {
         ...PAGE_LOG_CONTEXT,
         error: error?.message,
       });
-      throw error;
+      return [];
     }
   }
 

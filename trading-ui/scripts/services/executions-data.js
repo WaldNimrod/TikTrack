@@ -159,9 +159,9 @@
     
     try {
       const response = await fetch(url, { 
-        method: 'GET', 
-        headers: DEFAULT_HEADERS, 
-        signal, // Include cookies for session-based auth
+        method: 'GET',
+        // Authorization injected by api-fetch-wrapper
+        signal
       });
       
       // Handle 401/308 authentication errors

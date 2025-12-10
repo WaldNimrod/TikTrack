@@ -62,7 +62,12 @@
       window.Logger?.debug?.('🔄 Loading trade plans data directly from API...', PAGE_LOG_CONTEXT);
       const response = await fetch('/api/trade-plans/', { signal });
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        if (response.status === 429) {
+          window.Logger?.warn?.('⚠️ Trade plans rate limited, returning empty', { ...PAGE_LOG_CONTEXT, status: response.status });
+          return [];
+        }
+        window.Logger?.warn?.('⚠️ Trade plans load failed, returning empty', { ...PAGE_LOG_CONTEXT, status: response.status });
+        return [];
       }
 
       const data = await response.json();

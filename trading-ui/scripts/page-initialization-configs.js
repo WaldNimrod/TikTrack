@@ -1932,11 +1932,23 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       customInitializers: [
         async pageConfig => {
           window.Logger.info('📈 Initializing Trades Formatted...', { page: 'page-initialization-configs' });
+          // Throttle trade-plans to avoid 429 when page loads
+          if (window.RateLimitTracker?.setDelay) {
+            window.RateLimitTracker.setDelay(1500); // 1.5s between requests on this page
+          }
           if (typeof window.loadTradesData === 'function') {
             if (window.CacheTTLGuard?.ensure) {
               await window.CacheTTLGuard.ensure('trade-data', window.loadTradesData);
             } else {
               await window.loadTradesData();
+            }
+          }
+          // Optionally prefetch limited trade plans with small page size to reduce hits
+          if (typeof window.TradePlansData?.loadTradePlans === 'function') {
+            try {
+              await window.TradePlansData.loadTradePlans({ limit: 20 }); // small batch to avoid bursts
+            } catch (e) {
+              window.Logger?.warn?.('⚠️ Prefetch trade plans failed (non-blocking)', { page: 'trades_formatted', error: e?.message });
             }
           }
         },

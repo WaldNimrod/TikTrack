@@ -42,30 +42,9 @@ window.isNumeric = isNumeric;
  */
 async function loadCurrenciesFromServer() {
   try {
-    let token = null;
-    if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
-      try {
-        token = await window.UnifiedCacheManager.get('authToken');
-      } catch (e) {
-        console.warn('Error getting authToken from cache:', e);
-        // Fall through to localStorage fallback
-      }
-    }
-    if (!token) {
-      token = localStorage.getItem('authToken'); // fallback
-    }
-    const headers = {
-      'Content-Type': 'application/json',
-    };
-
-    if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
-    }
-
-    // Use relative URL to work with both development (8080) and production (5001)
+    // Use relative URL; api-fetch-wrapper injects Authorization automatically
     const response = await fetch('/api/currencies/', {
-      method: 'GET',
-      headers,
+      method: 'GET'
     });
 
     if (response.ok) {

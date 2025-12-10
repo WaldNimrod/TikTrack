@@ -75,33 +75,41 @@
 
 ### סביבה 3: Online (אונליין)
 
-**מיקום:** שרת אינטרנט (uPress VPS)  
-**תיקייה:** על השרת (Git clone)  
-**זיהוי:** משתנה סביבה `TIKTRACK_ENV=online` או שם תיקייה
+**מיקום:** AWS Lightsail (instance קטן)  
+**תיקייה:** על השרת (Git clone, הפעלת `production/` כהעתק של Testing המקומי)  
+**זיהוי:** `TIKTRACK_ENV=testing` (הנחיות החוזרות על ההגדרות המקומיות)
 
 **מפרטים:**
 
-- **פורט:** 80/443 (HTTP/HTTPS דרך Nginx)
-- **Database:** `TikTrack-db-online` (על השרת)
-- **תיקיית קוד:** על השרת (Git clone)
-- **תיקיית לוגים:** על השרת
-- **הפעלה:** systemd service או process manager
+- **פורט:** 5001 (אותו פורט כמו בסביבת Testing המקומית, אין reverse proxy הנדרש)
+- **Database:** `TikTrack-db-testing` – מקבלים `pg_dump` מ־Testing המקומית ומפעילים אותו ישירות
+- **תיקיית קוד:** `production/Backend/`, `production/trading-ui/` (אותו קוד)
+- **תיקיית לוגים:** `production/Backend/logs/`
+- **הפעלה:** `./start_server.sh` או `systemd` service שמבטיח הפעלה אוטומטית אחרי reboot
 
 **תפקיד:**
 
-- סביבת פרודקשן אמיתית
-- גישה מהאינטרנט
-- משתמשים אמיתיים
+- סביבת פרזנטציה/POC קלה לשינויים
+- ניתן להריץ בדיקות ב־5001 ללא סביבות מרובות
+- ניגשים ישירות על ה־IP/域 dns `tiktrack.nimrod.bio`
 
 **שינויים נדרשים:**
 
-- ✅ יצירת `online/Backend/config/settings.py` (חדש)
-- ✅ הגדרות ספציפיות ל-online:
-  - `IS_ONLINE = True`
-  - `POSTGRES_DB = "TikTrack-db-online"`
-  - `HOST = "0.0.0.0"` (להאזנה על כל ה-interfaces)
-  - `PORT = 8080` (פנימי, Nginx מעביר ל-80/443)
-- ✅ עדכון `start_server.sh` לזיהוי `online` environment
+- ✅ קונפיגורציה פשוטה: `TIKTRACK_ENV=testing`, `IS_TESTING=True`, `POSTGRES_DB=TikTrack-db-testing`, `PORT=5001`
+- ✅ `start_server.sh` צריך עדיין לזהות את תיקיית `production/` כ־Testing (הנה קיים כבר)
+- ✅ להגביר את `systemd` service/וודא שהשרת מריץ את ה-App אחרי reboot
+- ✅ להגדיר DNS עם שרת ה־Lightsail (תחת הניהול הקיים) כדי לכוון את `tiktrack.nimrod.bio` לכתובת ה־IP
+- ✅ להפעיל Let’s Encrypt (Certbot) או nginx reverse proxy כאשר רוצים HTTPS
+- ✅ להגדיר ניטור LightSail (CPU/Memory) + LightSail snapshot יומי ו/או `pg_dump`
+- ✅ מסמך מדריך פריסה חדש: `LIGHTSAIL_LIGHT_SETUP.md` (פירוט של תהליך ההפעלה, ה־12$ plan, גיבויים ו־DNS)
+
+### Lightsail Lean Deployment (12$)
+
+- **תצורה:** Lightsail 2 GB RAM / 60 GB SSD (~12$ לחודש)
+- **גישה:** פתיחת SSH + פורט 5001 לכל IP כדי לאפשר פרזנטציה נגישה (אין צורך להגביל IP בשלב הזה)
+- **אבטחה:** HTTPS ניתן להפעיל בקלות בעזרת Certbot; ה־Instance מדווח ל־Lightsail monitoring עבור ניטור בסיסי
+- **גיבוי:** snapshots מובנים + הגדרת `pg_dump` יומית (ניתן בפרטי המדריך `LIGHTSAIL_LIGHT_SETUP.md`)
+- **התאמה עתידית:** במידת הצורך ניתן להרחיב RAM/SSD או להוסיף Load Balancer/CloudFront מאוחר יותר
 
 ---
 

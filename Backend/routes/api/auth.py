@@ -388,7 +388,7 @@ def update_current_user():
         }
     """
     try:
-        user_id = session.get('user_id')
+        user_id = getattr(g, 'user_id', None)
         if not user_id:
             return jsonify({
                 'status': 'error',

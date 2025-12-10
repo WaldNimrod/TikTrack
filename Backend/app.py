@@ -521,6 +521,10 @@ app.register_blueprint(auth_bp)
 app.register_blueprint(background_tasks_bp)
 app.register_blueprint(entity_details_bp)
 
+# EOD Metrics API
+from routes.api.eod_metrics import eod_bp
+app.register_blueprint(eod_bp, url_prefix='/api/eod')
+
 # Business Logic API
 from routes.api.business_logic import business_logic_bp
 app.register_blueprint(business_logic_bp)

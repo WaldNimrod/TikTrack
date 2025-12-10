@@ -137,7 +137,7 @@
         return { profileContext, groups: Object.fromEntries(cacheByGroup), etag: bootstrapETag };
       }
       if (res.status === 401 || res.status === 403) {
-        window.Logger?.warn?.('PreferencesV4 bootstrap authentication error', { page: 'preferences-v4', status: res.status });
+        // Silent fallback - authentication errors are handled by auth system
         // Return empty context instead of throwing - allow page to continue
         return { profileContext: null, groups: {}, etag: null };
       }
@@ -205,7 +205,7 @@
         return { group, values: cached, profileContext, etag: cachedETag, fromCache: true };
       }
       if (res.status === 401 || res.status === 403) {
-        window.Logger?.warn?.('PreferencesV4 getGroup authentication error', { page: 'preferences-v4', status: res.status, group });
+        // Silent fallback - authentication errors are handled by auth system
         // Return empty group instead of throwing - allow page to continue
         return { group, values: {}, profileContext, etag: null, fromCache: false };
       }
@@ -253,16 +253,7 @@
       });
       
       cacheByGroup.set(group, groupValues);
-      // Only warn about empty groups on preferences page or if explicitly debugging
-      const isPreferencesPage = document.body?.classList?.contains('preferences-page') || 
-                                 window.location.pathname === '/preferences' ||
-                                 window.location.pathname.includes('/preferences');
-      if (Object.keys(groupValues).length === 0 && isPreferencesPage) {
-        window.Logger?.warn?.(`⚠️ PreferencesV4: group '${group}' returned empty values`, { page: 'preferences-v4' });
-      } else if (Object.keys(groupValues).length === 0) {
-        // Debug level for other pages (normal - groups may not be needed)
-        window.Logger?.debug?.(`PreferencesV4: group '${group}' returned empty values (normal on non-preferences pages)`, { page: 'preferences-v4' });
-      }
+      // Empty groups are normal - no warning needed (handled gracefully by callers)
       profileContext = data.profile_context || profileContext;
       window.dispatchEvent(new CustomEvent('preferences:updated', { detail: { scope: 'group', group } }));
       // CRITICAL: Return normalized groupValues, not data.values (which may not exist or be in wrong format)

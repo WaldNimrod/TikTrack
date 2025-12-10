@@ -294,7 +294,7 @@
       // Authentication handling: להחזיר אובייקט שגיאה רך במקום להפיל את העמוד
       if (response.status === 401 || response.status === 403) {
         try {
-          window.Logger?.warn?.('⚠️ Preferences request failed with authentication error', {
+          window.Logger?.debug?.('⚠️ Preferences request skipped (auth required)', {
             ...PAGE_LOG_CONTEXT,
             url,
             status: response.status,
@@ -494,7 +494,7 @@
         profileContext?.requested_profile_id ??
         data.requested_profile_id ??
         null,
-      userId: profileContext?.user?.id ?? data.user_id ?? fallback.userId ?? 1,
+      userId: profileContext?.user?.id ?? data.user_id ?? fallback.userId ?? null,
       raw: payload,
     };
   }
@@ -517,22 +517,12 @@
           return user.id;
         }
       }
-      // Fallback to localStorage
-      const storedUser = localStorage.getItem('currentUser');
-      if (storedUser) {
-        try {
-          const user = JSON.parse(storedUser);
-          if (user && user.id) {
-            return user.id;
-          }
-        } catch (e) {
-          // Ignore parse errors
-        }
-      }
+      // Not authenticated
+      return null;
     } catch (e) {
       // Silent fallback
     }
-    return 1; // Default fallback
+    return null; // Default: no user until authenticated
   }
 
   function normalizeProfilesPayload(payload = {}, userId = 1) {
@@ -591,6 +581,10 @@
     if (userId === null || userId === undefined) {
       userId = getCurrentUserId();
     }
+    if (!userId) {
+      window.Logger?.debug?.('⚠️ Preferences request skipped - user not authenticated', PAGE_LOG_CONTEXT);
+      return { value: null };
+    }
     if (!preferenceName) {
       return { value: null };
     }
@@ -646,6 +640,10 @@
     if (userId === null || userId === undefined) {
       userId = getCurrentUserId();
     }
+    if (!userId) {
+      window.Logger?.debug?.('⚠️ Preferences group request skipped - user not authenticated', PAGE_LOG_CONTEXT);
+      return { preferences: {} };
+    }
     if (!groupName) {
       return { preferences: {} };
     }
@@ -694,6 +692,10 @@
     if (userId === null || userId === undefined) {
       userId = getCurrentUserId();
     }
+    if (!userId) {
+      window.Logger?.debug?.('⚠️ Preferences by names skipped - user not authenticated', PAGE_LOG_CONTEXT);
+      return {};
+    }
     if (!Array.isArray(names) || names.length === 0) {
       return {};
     }
@@ -737,6 +739,20 @@
     // Auto-resolve userId if not provided
     if (userId === null || userId === undefined) {
       userId = getCurrentUserId();
+    }
+    if (!userId) {
+      window.Logger?.debug?.('⚠️ Preferences load skipped - user not authenticated', PAGE_LOG_CONTEXT);
+      // Return empty payload with default colors fallback
+      const defaults = await loadDefaultPreferences({ force: false });
+      return {
+        preferences: defaults || {},
+        preferencesMetadata: [],
+        profileContext: null,
+        resolvedProfileId: null,
+        requestedProfileId: profileId,
+        userId: null,
+        raw: { fallback: true, reason: 'not_authenticated' },
+      };
     }
     // High-level deduplication: prevent duplicate calls to this function with same params
     const dedupeKey = buildFunctionDedupeKey('loadAllPreferencesRaw', { userId, profileId, force });
@@ -1160,6 +1176,10 @@
     if (userId === null || userId === undefined) {
       userId = getCurrentUserId();
     }
+    if (!userId) {
+      window.Logger?.debug?.('⚠️ Preferences profiles request skipped - user not authenticated', PAGE_LOG_CONTEXT);
+      return { profiles: [], userId: null };
+    }
     // High-level deduplication: prevent duplicate calls to this function with same params
     const dedupeKey = buildFunctionDedupeKey('loadProfiles', { userId, force });
     if (functionInflight.has(dedupeKey)) {
@@ -1451,6 +1471,82 @@
 
     await saveCache(cacheKey, value, { ttl, layer: 'localStorage' });
     return value;
+  }
+
+  /**
+   * Load default preferences from server when user preferences are not available
+   */
+  async function loadDefaultPreferences({ force = false, ttl = DEFAULT_TTL.all } = {}) {
+    const cacheKey = 'default-preferences-cache';
+
+    if (!force) {
+      const cached = await readCache(cacheKey, { ttl });
+      if (cached && typeof cached === 'object') {
+        window.Logger?.debug?.('✅ Loaded default preferences from cache', PAGE_LOG_CONTEXT);
+        return cached;
+      }
+    }
+
+    window.Logger?.info?.('📡 Loading default preferences from server', PAGE_LOG_CONTEXT);
+
+    try {
+      // Try to get some key default preferences from the API
+      const defaultPrefs = {};
+
+      // Load key color preferences that the UI needs
+      const colorPrefs = ['primary_color', 'secondary_color', 'chartSecondaryColor'];
+      for (const prefName of colorPrefs) {
+        try {
+          const value = await loadDefaultPreference(prefName, { force: true });
+          if (value !== null) {
+            defaultPrefs[prefName] = value;
+          }
+        } catch (e) {
+          window.Logger?.warn?.(`⚠️ Failed to load default ${prefName}`, {
+            ...PAGE_LOG_CONTEXT,
+            error: e?.message
+          });
+        }
+      }
+
+      // Add some basic UI preferences with hardcoded defaults if API fails
+      if (Object.keys(defaultPrefs).length === 0) {
+        window.Logger?.warn?.('⚠️ No default preferences loaded from API, using hardcoded defaults', PAGE_LOG_CONTEXT);
+        // TikTrack logo colors as fallback
+        defaultPrefs.primary_color = '#26baac';
+        defaultPrefs.secondary_color = '#fc5a06';
+        defaultPrefs.chartSecondaryColor = '#26baac';
+      }
+
+      await saveCache(cacheKey, defaultPrefs, { ttl, layer: 'localStorage' });
+
+      window.Logger?.info?.('✅ Default preferences loaded', {
+        ...PAGE_LOG_CONTEXT,
+        count: Object.keys(defaultPrefs).length
+      });
+
+      return defaultPrefs;
+
+    } catch (error) {
+      window.Logger?.error?.('❌ Failed to load default preferences', {
+        ...PAGE_LOG_CONTEXT,
+        error: error?.message
+      });
+
+      // Ultimate fallback - TikTrack logo colors
+      const fallbackPrefs = {
+        primary_color: '#26baac',
+        secondary_color: '#fc5a06',
+        chartSecondaryColor: '#26baac'
+      };
+
+      window.Logger?.warn?.('⚠️ Using hardcoded fallback preferences', {
+        ...PAGE_LOG_CONTEXT,
+        fallbackPrefs
+      });
+
+      return fallbackPrefs;
+    }
   }
 
   async function loadPreferenceInfo(preferenceName) {

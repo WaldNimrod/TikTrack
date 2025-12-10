@@ -341,7 +341,8 @@ async function loadTradingAccounts() {
         // Priority 4: Direct API call (only if no other method worked)
         if (!accounts || accounts.length === 0) {
             try {
-                const response = await fetch('/api/trading-accounts/', { // Include cookies for session-based auth
+                const response = await fetch('/api/trading-accounts/', {
+                    credentials: 'include', // Include cookies for session-based auth
                 });
                 if (response.ok) {
                     const data = await response.json();
@@ -1448,7 +1449,8 @@ async function ensurePortfolioHistoricalData(positions, options = {}) {
     let missingDataInfo = null;
     try {
         // Check missing data via API endpoint (same as ticker-dashboard)
-        const missingDataResponse = await fetch(`/api/external-data/status/tickers/missing-data`, { // Include cookies for session-based auth
+        const missingDataResponse = await fetch(`/api/external-data/status/tickers/missing-data`, {
+            credentials: 'include', // Include cookies for session-based auth
         });
         if (missingDataResponse.ok) {
             const missingDataResult = await missingDataResponse.json();
@@ -1788,7 +1790,8 @@ async function loadTradesData(options = {}) {
                 allTrades = data.trades || [];
             } else {
                 // Fallback to direct API call
-                const response = await fetch(`/api/trade-history/?account_id=${accountId || ''}&start_date=${startDate}&end_date=${endDate}`, { // Include cookies for session-based auth
+                const response = await fetch(`/api/trade-history/?account_id=${accountId || ''}&start_date=${startDate}&end_date=${endDate}`, {
+                    credentials: 'include', // Include cookies for session-based auth
                 });
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
@@ -2146,7 +2149,8 @@ async function calculateSummaryFromTrades(trades) {
             try {
                 const balancePromises = uniqueAccountIds.map(async (accountId) => {
                     try {
-                        const response = await fetch(`/api/account-activity/${accountId}/balances`, { // Include cookies for session-based auth
+                        const response = await fetch(`/api/account-activity/${accountId}/balances`, {
+                            credentials: 'include', // Include cookies for session-based auth
                         });
                         if (!response.ok) {
                             throw new Error(`HTTP error! status: ${response.status}`);
@@ -2838,7 +2842,8 @@ async function updateSummaryCards(data) {
         if (accountIds.length > 0) {
             const balancePromises = accountIds.map(async (accountId) => {
                 try {
-                    const response = await fetch(`/api/account-activity/${accountId}/balances`, { // Include cookies for session-based auth
+                    const response = await fetch(`/api/account-activity/${accountId}/balances`, {
+                        credentials: 'include', // Include cookies for session-based auth
                     });
                     if (response.ok) {
                         const result = await response.json();
@@ -5969,6 +5974,22 @@ async function waitForScripts() {
         // Wait for all scripts to load first
         await waitForScripts();
 
+        // Verify critical globals are available
+        const requiredGlobals = [
+            { key: 'window.UnifiedTableSystem', value: window.UnifiedTableSystem },
+            { key: 'window.InfoSummarySystem', value: window.InfoSummarySystem },
+            { key: 'window.UnifiedProgressManager', value: window.UnifiedProgressManager },
+            { key: 'window.ButtonSystem', value: window.ButtonSystem },
+            { key: 'window.FieldRendererService', value: window.FieldRendererService },
+        ];
+        const missingGlobals = requiredGlobals.filter(item => !item.value).map(item => item.key);
+        if (missingGlobals.length) {
+            window.Logger?.error?.('❌ Missing required globals for portfolio-state', {
+                page: 'portfolio-state-page',
+                missingGlobals
+            });
+        }
+
         // Ensure authenticated session before loading data
         if (window.AuthGuard?.init) {
             try {
@@ -5981,6 +6002,17 @@ async function waitForScripts() {
                 await window.checkAuthentication();
             } catch (e) {
                 window.Logger?.warn?.('⚠️ checkAuthentication failed in initializePage', { page: 'portfolio-state-page', error: e?.message });
+            }
+        }
+        // Ensure TikTrackAuth has in-memory user for isAuthenticated()
+        if (window.TikTrackAuth?.checkAuthentication) {
+            try {
+                const authResult = await window.TikTrackAuth.checkAuthentication();
+                if (authResult?.authenticated && authResult.user) {
+                    window.currentUser = authResult.user;
+                }
+            } catch (e) {
+                window.Logger?.warn?.('⚠️ TikTrackAuth.checkAuthentication failed in initializePage', { page: 'portfolio-state-page', error: e?.message });
             }
         }
         
@@ -6466,3 +6498,4 @@ async function waitForScripts() {
     window.setChartPeriod = setChartPeriod;
 
 })();
+

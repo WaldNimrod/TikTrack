@@ -1,122 +1,62 @@
-# תוכנית דיבוגינג - בעיית מודול כניסה
+# מדריך מערכת – אימות ואוטנטיקציה (מצב נוכחי)
 
-## Authentication Module Debugging Plan
-
-**תאריך:** 9 בדצמבר 2025  
-**בעיה:** מודול כניסה לא מופיע, המערכת עולה ללא משתמש
+**עדכון:** 10 דצמבר 2025  
+**מטרה:** תיעוד מצב קוד נוכחי, ליישום ואבחון אחיד בכל הממשקים (קיימים ועתידיים).
 
 ---
 
-## 📋 סיכום הבעיה
-
-1. **שגיאת syntax ב-`auth.js`** - תוקנה (חסר סוגר סגירה)
-2. **`window.TikTrackAuth` לא מוגדר** - בגלל שגיאת syntax
-3. **`auth-guard.js` מחכה ל-`auth.js`** - אבל לא מוצא את `window.TikTrackAuth`
-4. **מודול כניסה לא מופיע** - כי `showLoginModal` לא זמין
-
----
-
-## 🔧 כלי דיבוגינג זמינים
-
-### 1. Debugger for Firefox
-
-**שימוש:** דיבוגינג JavaScript עם breakpoints
-
-**פקודות:**
-
-```bash
-# הפעל Firefox עם remote debugging
-./scripts/debug/launch-firefox.sh
-
-# ב-VS Code/Cursor:
-# F5 → "Launch Firefox - Development"
-```
-
-**Breakpoints להגדיר:**
-
-- `trading-ui/scripts/auth.js:1138` - הגדרת `window.TikTrackAuth`
-- `trading-ui/scripts/auth-guard.js:80` - `showLoginModal()` function
-- `trading-ui/scripts/auth-guard.js:111` - `initAuthGuard()` function
-
-**Watch Expressions:**
-
-- `typeof window.TikTrackAuth`
-- `typeof window.TikTrackAuth?.showLoginModal`
-- `typeof window.UnifiedCacheManager`
-- `document.readyState`
+## 🧭 ארכיטקטורת אימות – תקציר
+- **Token-based בלבד** (ללא cookies): הזרקת `Authorization: Bearer <token>` נעשית אוטומטית ע"י `api-fetch-wrapper.js`.
+- **UnifiedCacheManager** לכל שכבות המטמון. מפתחות auth נשמרים עם `includeUserId: false` בלבד.
+- **Login Modal** הוא מסלול הכניסה היחיד. `auth-guard.js` מוודא auth בכל עמוד, ומציג את המודל בעת 401/חוסר טוקן.
+- **Z-Index וניהול Stack**: המודל נרשם ל־`ModalNavigationService` ומעודכן ב־`ModalZIndexManager.forceUpdate`.
+- **Preferences ברירת מחדל**: `/api/preferences/default` מחזיר צבעי לוגו (`#26baac`, `#fc5a06`). הטענות העדפות רכות (soft-fail) כשהמשתמש לא מאומת.
+- **Rate Limit (429)**: בעמודים כבדים (למשל trades_formatted) נדרש דיליי/צמצום כמות בקשות ל־`/api/trade-plans/`.
 
 ---
 
-### 2. Logger Service
-
-**שימוש:** ניטור תהליך הטעינה והאימות
-
-**לוגים להוסיף:**
-
-```javascript
-// ב-auth.js - אחרי הגדרת window.TikTrackAuth
-window.Logger.info('✅ window.TikTrackAuth defined', {
-  page: 'auth',
-  hasShowLoginModal: typeof window.TikTrackAuth?.showLoginModal === 'function',
-  functions: Object.keys(window.TikTrackAuth || {})
-});
-
-// ב-auth-guard.js - בתחילת waitForAuthJS
-window.Logger.info('⏳ [Auth Guard] Waiting for auth.js', {
-  page: 'auth-guard',
-  tikTrackAuthExists: typeof window.TikTrackAuth !== 'undefined',
-  showLoginModalExists: typeof window.TikTrackAuth?.showLoginModal === 'function'
-});
-```
+## 📌 נקודות חיבור בקוד (Front)
+- `scripts/api-fetch-wrapper.js` – הזרקת Authorization + טיפול 401.
+- `scripts/auth.js` – login/logout, modal, שמירת auth ל־UnifiedCacheManager, dev helpers.
+- `scripts/auth-guard.js` – בדיקת auth בכל עמוד, הצגת modal בעת 401/חוסר טוקן.
+- `scripts/modal-z-index-manager.js` + `modal-navigation-manager.js` – ניהול stack/z-index למודל כניסה.
+- `scripts/services/preferences-data.js` – טעינת העדפות/ברירת מחדל עם guard על משתמש לא מאומת.
 
 ---
 
-### 3. System Debug Helper
-
-**שימוש:** בדיקה מקיפה של מצב המערכת
-
-**פקודות בקונסולה:**
-
-```javascript
-// בדיקת מערכות אתחול
-window.Logger?.info('🔍 System Debug - Auth Systems', {
-  tikTrackAuth: typeof window.TikTrackAuth,
-  authGuard: typeof window.AuthGuard,
-  unifiedCacheManager: typeof window.UnifiedCacheManager,
-  logger: typeof window.Logger
-});
-
-// בדיקת טעינת סקריפטים
-const scripts = Array.from(document.querySelectorAll('script[src*="auth"]'));
-window.Logger?.info('📜 Auth Scripts Loaded', {
-  scripts: scripts.map(s => s.src),
-  count: scripts.length
-});
-
-// בדיקת שגיאות
-const errors = window.performance.getEntriesByType('resource')
-  .filter(r => r.name.includes('auth') && r.transferSize === 0);
-window.Logger?.warn('⚠️ Failed Script Loads', { errors });
-```
+## 🔧 דיבוג ו-QA
+1. **Firefox Debug**: `./scripts/debug/launch-firefox.sh` → F5 ב־Cursor/VSCode: "Launch Firefox - Development".
+2. **בדיקות סלניום**:  
+   - עמוד יחיד: `python3 scripts/test_pages_console_errors.py --page "/"`  
+   - סוויפ מלא: `python3 scripts/test_pages_console_errors.py`  
+   שימוש ב-admin/admin123 (token login מובנה בסקריפט).
+3. **בריאות שרת**:  
+   - `curl http://localhost:8080/api/health`  
+   - `curl http://localhost:8080/api/preferences/default?preference_name=primary_color`
+4. **Auth Debug Monitor**: חשוף דרך `auth-debug-monitor.js` (לוגי cache/auth, שמירת שגיאות).
 
 ---
 
-### 4. Health Service
+## 🧪 רשימת בדיקות קצרה (Hands-on)
+- כניסה → מופיע modal, לאחר login נשמר token ב־UnifiedCacheManager, HEADER מציג משתמש.
+- ניווט לעמוד מוגן (למשל `/trades.html`) → ללא modal אם token תקף; עם modal אם לא.
+- טעינת העדפות עם טוקן: אין 401; ללא טוקן: soft-fail ולוג debug בלבד.
+- עמודים עם trade-plans כבדים (`/trades_formatted.html`): אין הצפה של 429 אחרי דיליי/RateLimitTracker.
 
-**שימוש:** בדיקת סטטוס השרת והאימות
+---
 
-**פקודות:**
+## 🛠 נקודות כשל שכיחות ומה לבדוק
+- מודל לא מעל backdrop → לבדוק רישום ל־`ModalNavigationService` ואז `ModalZIndexManager.forceUpdate(modalElement)`.
+- 401 ב-tickers/watch-list → לוודא `TikTrackAuth.getCurrentUser()` לפני קריאות דאטה (הגנות קיימות).
+- 429 ב-trade-plans/trades_formatted → להגדיל דיליי, לצמצם page size, ולהשתמש ב־CacheTTLGuard.
 
-```bash
-# Health check כללי
-curl http://localhost:8080/api/health
+---
 
-# Health check מפורט
-curl http://localhost:8080/api/health/detailed
-
-# בדיקת endpoint אימות
-curl -v http://localhost:8080/api/auth/me
-```
+## 📝 הערות ליישום בממשקים חדשים
+- כל קריאת API חייבת לעבור דרך ה־fetch wrapper הגלובלי.
+- אין שימוש ב־localStorage ל-auth; רק UnifiedCacheManager (includeUserId:false).
+- כניסה רק דרך modal; אין דפי login נפרדים.
+- לשמור לוגים ברמת info/debug בלבד; שגיאות auth רכות (לא מפילות עמוד). 
 
 **בדיקות:**
 

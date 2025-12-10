@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
 from Backend.services.eod_metrics_service import EODMetricsService
 from Backend.services.recompute_service import RecomputeService
-from Backend.utils.auth import require_auth
+from .base_entity_decorators import require_authentication
 
 eod_bp = Blueprint('eod_metrics', __name__)
 
@@ -9,10 +9,11 @@ eod_service = EODMetricsService()
 recompute_service = RecomputeService()
 
 @eod_bp.route('/portfolio', methods=['GET'])
-@require_auth
+@require_authentication()
 def get_portfolio_metrics():
     """שליפת מדדי פורטפוליו"""
-    user_id = request.user_id
+    from flask import g
+    user_id = g.user_id
     filters = {
         'account_id': request.args.get('account_id', type=int),
         'date_from': request.args.get('date_from'),
@@ -27,10 +28,11 @@ def get_portfolio_metrics():
         return jsonify({'error': str(e), 'status': 'error'}), 500
 
 @eod_bp.route('/positions', methods=['GET'])
-@require_auth
+@require_authentication()
 def get_positions():
     """שליפת פוזיציות יומיות"""
-    user_id = request.user_id
+    from flask import g
+    user_id = g.user_id
     filters = {
         'account_id': request.args.get('account_id', type=int),
         'ticker_id': request.args.get('ticker_id', type=int),
@@ -45,10 +47,11 @@ def get_positions():
         return jsonify({'error': str(e), 'status': 'error'}), 500
 
 @eod_bp.route('/cash-flows', methods=['GET'])
-@require_auth
+@require_authentication()
 def get_cash_flows():
+    from flask import g
     """שליפת תזרימי מזומן מצטברים"""
-    user_id = request.user_id
+    user_id = g.user_id
     filters = {
         'account_id': request.args.get('account_id', type=int),
         'date_from': request.args.get('date_from'),
@@ -62,10 +65,11 @@ def get_cash_flows():
         return jsonify({'error': str(e), 'status': 'error'}), 500
 
 @eod_bp.route('/recompute', methods=['POST'])
-@require_auth
+@require_authentication()
 def recompute_metrics():
+    from flask import g
     """הפעלת חישוב מחדש"""
-    user_id = request.user_id
+    user_id = g.user_id
     data = request.get_json()
 
     if not data or not data.get('date_from') or not data.get('date_to'):
@@ -83,7 +87,7 @@ def recompute_metrics():
         return jsonify({'error': str(e), 'status': 'error'}), 500
 
 @eod_bp.route('/recompute/<job_id>', methods=['GET'])
-@require_auth
+@require_authentication()
 def get_recompute_status(job_id):
     """קבלת סטטוס job"""
     try:
@@ -93,10 +97,11 @@ def get_recompute_status(job_id):
         return jsonify({'error': str(e), 'status': 'error'}), 500
 
 @eod_bp.route('/recompute/history', methods=['GET'])
-@require_auth
+@require_authentication()
 def get_recompute_history():
+    from flask import g
     """קבלת היסטוריית jobs"""
-    user_id = request.user_id
+    user_id = g.user_id
     limit = request.args.get('limit', 10, type=int)
 
     try:

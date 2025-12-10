@@ -48,6 +48,8 @@
 
 - **[watch-lists.html](../../trading-ui/watch-lists.html)** - עמוד ראשי מלא (Production) ✅
   - **גישה:** `http://localhost:8080/watch-lists`
+- **[index.html](../../trading-ui/index.html)** - וויג'ט דשבורד (Production) ✅
+  - **גישה:** `http://localhost:8080/` (וויג'ט רשימות צפייה)
   - **API:** `/api/watch-lists/*`
   - **Business Service:** `WatchListService`
   - **סטטוס:** ✅ מוכן - מימוש מלא הושלם דצמבר 2025

@@ -45,6 +45,76 @@ window.pageInitializationConfigs['watch-lists'] = {
 
 ---
 
+## וויג'ט דשבורד (Dashboard Widget)
+
+### הוספת וויג'ט חדש לדף הבית
+
+```javascript
+// 1. יצירת קובץ וויג'ט
+// trading-ui/scripts/widgets/watch-lists-widget.js
+
+(function() {
+  'use strict';
+
+  const PAGE_LOG_CONTEXT = { page: 'watch-lists-widget' };
+
+  // Module Pattern
+  const WatchListsWidget = {
+    init: function(containerId, config) {
+      window.Logger?.info('Initializing Watch Lists Widget', PAGE_LOG_CONTEXT);
+      // יישום וויג'ט
+    },
+    render: function() {
+      // רינדור וויג'ט
+    },
+    refresh: function() {
+      // רענון נתונים
+    },
+    destroy: function() {
+      // ניקוי משאבים
+    }
+  };
+
+  // Export to global scope
+  window.WatchListsWidget = WatchListsWidget;
+
+  // Log loading
+  console.log('✅ Watch Lists Widget loaded', PAGE_LOG_CONTEXT);
+  if (window.Logger) {
+    window.Logger.info('Watch Lists Widget loaded', PAGE_LOG_CONTEXT);
+  }
+})();
+```
+
+```javascript
+// 2. הוספה ל-package-manifest.js
+// trading-ui/scripts/init-system/package-manifest.js
+{
+  file: 'widgets/watch-lists-widget.js',
+  globalCheck: 'window.WatchListsWidget',
+  description: 'Watch lists widget for dashboard',
+  required: false,
+  loadOrder: 8
+}
+```
+
+```javascript
+// 3. הוספה ל-page-initialization-configs.js
+// trading-ui/scripts/page-initialization-configs.js
+window.pageInitializationConfigs['index'].customInitializers.push({
+  name: 'WatchListsWidget',
+  initializer: async () => {
+    if (window.WatchListsWidget) {
+      await window.WatchListsWidget.init('watchListsWidgetContainer', {
+        maxItems: 10
+      });
+    }
+  }
+});
+```
+
+---
+
 ## שימוש ב-Data Service
 
 ```javascript

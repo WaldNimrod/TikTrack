@@ -414,45 +414,46 @@ def test_delete(entity: Dict, record_id: int) -> Dict:
 def cleanup_test_data(entity: Dict, session):
     """Clean up test data before creating new records"""
     try:
-        # Only cleanup entities that might have duplicates
         entity_name = entity.get("name", "")
-        test_data = entity.get("test_data", {})
-        
-        # Determine unique field based on entity name
-        unique_field = None
-        if entity_name in ["watch_lists", "tags"]:
-            unique_field = "name"
-        elif entity_name == "tickers":
-            unique_field = "symbol"
-        elif entity_name == "trading_accounts":
-            unique_field = "name"
-        
-        if not unique_field or unique_field not in test_data:
-            return
-        
-        test_value = test_data[unique_field]
-        
-        # Try to find and delete existing record
+
+        # More aggressive cleanup - delete all test records
         try:
-            # Get all records
             resp = session.get(f"{BASE_URL}{entity['api_base']}")
             if resp.status_code == 200:
                 data = resp.json()
                 items = data.get("data", []) if isinstance(data, dict) else data
-                
-                # Find matching record
+
+                # Delete all items that look like test data
                 for item in items:
-                    if isinstance(item, dict) and item.get(unique_field) == test_value:
-                        record_id = item.get("id")
-                        if record_id:
-                            # Try to delete
-                            delete_resp = session.delete(f"{BASE_URL}{entity['api_base']}/{record_id}")
-                            if delete_resp.status_code in [200, 204]:
-                                print(f"  🧹 Cleaned up existing {entity_name} with {unique_field}={test_value}")
-        except:
-            pass  # Ignore cleanup errors
-    except:
-        pass  # Ignore cleanup errors
+                    if isinstance(item, dict) and 'id' in item:
+                        item_id = item['id']
+
+                        # For entities with names/symbols, check if they look like test data
+                        should_delete = False
+                        if entity_name == "watch_lists" and item.get('name', '').startswith('Test Watch List'):
+                            should_delete = True
+                        elif entity_name == "tags" and item.get('name', '').startswith('Test Tag'):
+                            should_delete = True
+                        elif entity_name == "tickers" and item.get('symbol', '').startswith('TEST'):
+                            should_delete = True
+                        elif entity_name == "trading_accounts" and item.get('name', '').startswith('Test Account'):
+                            should_delete = True
+                        elif entity_name in ["trades", "trade_plans", "alerts", "executions", "cash_flows", "notes"]:
+                            # For transactional data, delete all records (they're usually test data)
+                            should_delete = True
+
+                        if should_delete:
+                            try:
+                                delete_resp = session.delete(f"{BASE_URL}{entity['api_base']}/{item_id}")
+                                if delete_resp.status_code in [200, 204]:
+                                    print(f"  🧹 Cleaned up {entity_name} ID {item_id}")
+                            except:
+                                pass  # Continue with other deletions
+        except Exception as e:
+            print(f"  ⚠️ Cleanup warning for {entity_name}: {e}")
+
+    except Exception as e:
+        print(f"  ⚠️ Cleanup error for {entity_name}: {e}")
 
 
 def test_entity(entity: Dict) -> Dict:

@@ -227,6 +227,7 @@ class UnifiedCacheManager {
         this.cache = new Map();
         this.db = null;
         this.hits = 0;
+        this.misses = 0;
         this.responseTimes = [];
         this.stats = {
             operations: {
@@ -551,8 +552,9 @@ class UnifiedCacheManager {
                         this.stats.layers[layer].entries++;
                         
                         const responseTime = performance.now() - startTime;
+                        this.hits++; // Increment hit counter
                         this.updatePerformanceStats(responseTime, true);
-                        
+
                         // window.Logger.info(`✅ Retrieved ${key} from ${layer} layer (${responseTime.toFixed(2, { page: "unified-cache-manager" })}ms)`);
                         return data;
                     }
@@ -573,8 +575,9 @@ class UnifiedCacheManager {
             }
             
             const responseTime = performance.now() - startTime;
+            this.misses++; // Increment miss counter
             this.updatePerformanceStats(responseTime, false);
-            
+
             window.Logger.debug(`❌ Key ${key} not found in any layer`, { page: "unified-cache-manager" });
             return null;
             
@@ -685,11 +688,11 @@ class UnifiedCacheManager {
                     avgResponseTime: this.responseTimes.length > 0 
                         ? this.responseTimes.reduce((a, b) => a + b, 0) / this.responseTimes.length 
                         : 0,
-                    hitRate: this.stats.operations.get > 0 
-                        ? (this.hits / this.stats.operations.get * 100).toFixed(2) 
+                    hitRate: (this.hits + this.misses) > 0
+                        ? (this.hits / (this.hits + this.misses) * 100).toFixed(2)
                         : 0,
-                    missRate: this.stats.operations.get > 0 
-                        ? ((this.stats.operations.get - this.hits) / this.stats.operations.get * 100).toFixed(2) 
+                    missRate: (this.hits + this.misses) > 0
+                        ? (this.misses / (this.hits + this.misses) * 100).toFixed(2)
                         : 0
                 }
             };

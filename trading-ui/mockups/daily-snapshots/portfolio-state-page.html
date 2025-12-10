@@ -311,7 +311,10 @@
 
     <!-- [100] Load Order: 100 | Strategy: defer -->
     <script src="../../scripts/init-system/package-manifest.js?v=1.0.0" defer></script> <!-- Package manifest -->
-    <!-- [101] Load Order: 101 | Strategy: defer -->
+    <!-- [EOD] Load Order: EOD | Strategy: defer -->
+    <script src="scripts/services/eod-metrics-data.js?v=1.0.0" defer></script> <!-- EOD Metrics Data Service -->
+    <!-- [EOD] Load Order: EOD+1 | Strategy: defer -->
+    <script src="scripts/services/eod-validation-service.js?v=1.0.0" defer></script> <!-- EOD Validation Service -->    <!-- [101] Load Order: 101 | Strategy: defer -->
     <script src="../../scripts/page-initialization-configs.js?v=1.0.0" defer></script> <!-- Page initialization configurations -->
     <!-- [102] Load Order: 102 | Strategy: defer -->
     <script src="../../scripts/init-system-check.js?v=1.0.0" defer></script> <!-- Initialization system check -->

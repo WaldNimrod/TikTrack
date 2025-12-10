@@ -424,7 +424,10 @@
 
     <!-- [151] Load Order: 151 | Strategy: defer -->
     <script src="scripts/init-system/package-manifest.js?v=1.0.0" defer></script> <!-- Package manifest -->
-    <!-- [152] Load Order: 152 | Strategy: defer -->
+    <!-- [EOD] Load Order: EOD | Strategy: defer -->
+    <script src="scripts/services/eod-metrics-data.js?v=1.0.0" defer></script> <!-- EOD Metrics Data Service -->
+    <!-- [EOD] Load Order: EOD+1 | Strategy: defer -->
+    <script src="scripts/services/eod-validation-service.js?v=1.0.0" defer></script> <!-- EOD Validation Service -->    <!-- [152] Load Order: 152 | Strategy: defer -->
     <script src="scripts/page-initialization-configs.js?v=1.0.0" defer></script> <!-- Page initialization configurations -->
     <!-- [153] Load Order: 153 | Strategy: defer -->
     <script src="scripts/init-system-check.js?v=1.0.0" defer></script> <!-- Initialization system check -->

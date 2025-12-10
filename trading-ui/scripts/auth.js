@@ -343,14 +343,12 @@ async function login(username, password) {
   window.AuthDebugMonitor?.log('info', '🔐 LOGIN function called', { username, timestamp: new Date().toISOString() });
   if (window.DEBUG_AUTH_MONITOR === true) debugger; // Breakpoint helper
   
-  // Use relative URL to work with both development (8080) and production (5001)
   const response = await fetch('/api/auth/login', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ username, password }),
-    credentials: 'include' // Include cookies for session
+    body: JSON.stringify({ username, password })
   });
 
   const data = await response.json();
@@ -373,10 +371,11 @@ async function login(username, password) {
   });
   if (window.DEBUG_AUTH_MONITOR === true) debugger; // Breakpoint helper
 
-  // Store user in UnifiedCacheManager - ONLY UnifiedCacheManager, no fallbacks
+  // Store user + token in UnifiedCacheManager - ONLY UnifiedCacheManager, no fallbacks
   if (data.data?.user) {
     currentUser = data.data.user;
-    await saveAuthToCache(currentUser, 'session_based');
+    authToken = data.data?.access_token;
+    await saveAuthToCache(currentUser, authToken);
   }
 
   window.AuthDebugMonitor?.log('info', '✅ LOGIN function completed', { username, userId: currentUser?.id });
@@ -396,8 +395,7 @@ async function register(username, password, email, first_name, last_name) {
       email: email || undefined,
       first_name: first_name || undefined,
       last_name: last_name || undefined
-    }),
-    credentials: 'include' // Include cookies for session
+    })
   });
 
   const data = await response.json();
@@ -408,7 +406,8 @@ async function register(username, password, email, first_name, last_name) {
 
   return {
     success: true,
-    user: data.data?.user
+    user: data.data?.user,
+    access_token: data.data?.access_token
   };
 }
 
@@ -595,10 +594,12 @@ async function logout() {
   }
   
   try {
-    // Call logout API
+    // Call logout API (no cookies)
     await fetch('/api/auth/logout', {
       method: 'POST',
-      credentials: 'include'
+      headers: {
+        'Content-Type': 'application/json'
+      }
     });
   } catch (error) {
     console.warn('Logout API call failed:', error);
@@ -855,9 +856,10 @@ async function getCurrentUserAsync() {
   }
   
   // Try to load from UnifiedCacheManager using helper function
-  const { user: storedUser } = await getAuthFromCache();
+  const { user: storedUser, token: storedToken } = await getAuthFromCache();
   if (storedUser) {
     currentUser = storedUser;
+    authToken = storedToken;
     return currentUser;
   }
   
@@ -1044,7 +1046,7 @@ async function checkAuthentication(onAuthenticated = null, onNotAuthenticated = 
     console.log('[auth.js] checkAuthentication: Checking server authentication...');
     const response = await fetch('/api/auth/me', {
       method: 'GET',
-      credentials: 'include'
+      headers: await buildAuthHeaders()
     });
     
     console.log('[auth.js] checkAuthentication: Server response status:', response.status);
@@ -1670,10 +1672,10 @@ function setupVisibilityCheck() {
       await new Promise(resolve => setTimeout(resolve, 500));
       
       try {
-        // Check with server
+        // Check with server using token header
         const response = await fetch('/api/auth/me', {
           method: 'GET',
-          credentials: 'include'
+          headers: await buildAuthHeaders()
         });
         
         if (!response.ok || response.status === 401) {
@@ -1717,7 +1719,7 @@ function setupVisibilityCheck() {
             currentUser = data.data.user;
             if (window.UnifiedCacheManager) {
               await window.UnifiedCacheManager.save('currentUser', currentUser, authCacheOptions);
-              await window.UnifiedCacheManager.save('authToken', 'session_based', authCacheOptions);
+              await window.UnifiedCacheManager.save('authToken', authToken, authCacheOptions);
             } else {
               window.Logger?.error?.('❌ [auth.js] UnifiedCacheManager not available', { page: 'auth' });
             }

@@ -1,9 +1,40 @@
-// EOD Validation & Notification Service - שירות ולידציה והודעות EOD
+/**
+ * EOD Validation & Notification Service - שירות ולידציה והודעות EOD
+ *
+ * שירות זה אחראי על ולידציה של נתוני מדדי EOD, הצגת הודעות שגיאה למשתמש,
+ * וניהול תהליכי חישוב מחדש אוטומטיים. השירות משלב עם NotificationSystem
+ * להצגת הודעות מתקדמות ועם EODMetricsDataService לרענון נתונים.
+ *
+ * @author EOD Historical Metrics System
+ * @version 1.0.0
+ * @since 2025-01-01
+ */
+
 class EODValidationService {
+    /**
+     * יוצר מופע חדש של שירות הולידציה והודעות
+     *
+     * @constructor
+     */
     constructor() {
         this.recomputeJobs = new Map(); // Track active recompute jobs
     }
 
+    /**
+     * מבצע ולידציה מקיפה של מדדי פורטפוליו
+     *
+     * בודק עקביות NAV, ערכים שליליים, חשיפות, איכות נתונים ושגיאות ולידציה שמורות
+     *
+     * @param {Object} metrics - מדדי הפורטפוליו לבדיקה
+     * @param {number} metrics.nav_total - שווי נקי של הפורטפוליו
+     * @param {number} metrics.market_value_total - שווי שוק כולל
+     * @param {number} metrics.cash_total - סכום המזומנים
+     * @param {number} [metrics.exposure_long=0] - חשיפה ארוכה
+     * @param {number} [metrics.exposure_short=0] - חשיפה קצרה
+     * @param {string} [metrics.data_quality_status] - סטטוס איכות נתונים
+     * @param {Array} [metrics.validation_errors] - שגיאות ולידציה שמורות
+     * @returns {Array<Object>} רשימת שגיאות הולידציה שנמצאו
+     */
     validatePortfolioMetrics(metrics) {
         const errors = [];
 
@@ -84,6 +115,15 @@ class EODValidationService {
         return errors;
     }
 
+    /**
+     * מטפל בשגיאות ולידציה ומציג הודעות למשתמש
+     *
+     * מקבץ שגיאות לפי רמת חומרה ומראה הודעות מתאימות
+     *
+     * @async
+     * @param {Object} metrics - מדדי הפורטפוליו
+     * @param {Array<Object>} errors - רשימת שגיאות הולידציה
+     */
     async handleValidationErrors(metrics, errors) {
         if (!errors || errors.length === 0) return;
 
@@ -166,6 +206,13 @@ class EODValidationService {
         }
     }
 
+    /**
+     * מפעיל תהליך חישוב מחדש של מדדי EOD
+     *
+     * @async
+     * @param {number} userId - מזהה המשתמש
+     * @param {string} date - התאריך לחישוב מחדש (YYYY-MM-DD)
+     */
     async triggerRecompute(userId, date) {
         try {
             NotificationSystem.showInfo('מתחיל רענון נתונים...', '', { autoHide: false });
@@ -249,6 +296,14 @@ class EODValidationService {
     }
 
     // Utility methods
+
+    /**
+     * מעצב סכום כמטבע
+     *
+     * @param {number} amount - הסכום לעיצוב
+     * @param {string} [currency='USD'] - סוג המטבע
+     * @returns {string} הסכום המעוצב
+     */
     formatCurrency(amount, currency = 'USD') {
         return new Intl.NumberFormat('en-US', {
             style: 'currency',
@@ -256,11 +311,23 @@ class EODValidationService {
         }).format(amount || 0);
     }
 
+    /**
+     * מעצב תאריך לתצוגה בעברית
+     *
+     * @param {string} dateString - מחרוזת תאריך
+     * @returns {string} התאריך המעוצב
+     */
     formatDate(dateString) {
         return new Date(dateString).toLocaleDateString('he-IL');
     }
 
-    // Batch validation for multiple metrics
+    /**
+     * מבצע ולידציה על מערך של מדדים
+     *
+     * @async
+     * @param {Array<Object>} metricsArray - מערך מדדי פורטפוליו לבדיקה
+     * @returns {Promise<Array<Object>>} רשימת שגיאות לכל מדד
+     */
     async validateBatch(metricsArray) {
         const allErrors = [];
 
@@ -301,3 +368,61 @@ class EODValidationService {
 
 // Global instance
 window.EODValidationService = new EODValidationService();
+
+/**
+ * FUNCTION INDEX - EOD Validation & Notification Service
+ * ====================================================
+ *
+ * Core Validation Methods:
+ * -----------------------
+ * validatePortfolioMetrics(metrics) - ולידציה מקיפה של מדדי פורטפוליו
+ * validateBatch(metricsArray) - ולידציה על מערך מדדים
+ *
+ * Error Handling Methods:
+ * ----------------------
+ * handleValidationErrors(metrics, errors) - טיפול בשגיאות ולידציה
+ * handleBatchValidationErrors(batchErrors) - טיפול בשגיאות batch
+ * showHighSeverityError(error, metrics) - הצגת שגיאות חמורות
+ * showMediumSeverityError(error, metrics) - הצגת שגיאות בינוניות
+ *
+ * Recompute Methods:
+ * -----------------
+ * triggerRecompute(userId, date) - הפעלת חישוב מחדש
+ * monitorRecomputeJob(jobId) - מעקב אחרי משימת חישוב
+ * suggestRecompute(metrics) - הצעת חישוב מחדש
+ *
+ * Utility Methods:
+ * ---------------
+ * formatCurrency(amount, currency) - עיצוב מטבע
+ * formatDate(dateString) - עיצוב תאריך
+ *
+ * Validation Rules:
+ * ---------------
+ * - NAV Consistency: בדיקת עקביות בין nav_total לבין חישוב
+ * - Negative NAV: זיהוי ערכי NAV שליליים לא הגיוניים
+ * - Exposure Consistency: בדיקת עקביות חשיפות
+ * - Data Quality: בדיקת סטטוס איכות נתונים
+ * - Stored Errors: בדיקת שגיאות ולידציה שמורות
+ *
+ * Notification Integration:
+ * -----------------------
+ * - NotificationSystem.showError() - שגיאות חמורות
+ * - NotificationSystem.showWarning() - אזהרות
+ * - NotificationSystem.showConfirm() - בקשות אישור
+ * - NotificationSystem.showInfo() - הודעות מידע
+ * - NotificationSystem.showSuccess() - הודעות הצלחה
+ *
+ * Recompute Workflow:
+ * -----------------
+ * 1. זיהוי בעיית נתונים
+ * 2. הצגת הודעת שגיאה עם אפשרות רענון
+ * 3. הפעלת recompute job דרך EODMetricsDataService
+ * 4. מעקב אחרי סטטוס המשימה
+ * 5. עדכון cache ורענון דף עם נתונים חדשים
+ *
+ * Error Severity Levels:
+ * --------------------
+ * - high: שגיאות חמורות - מציגות confirm dialog עם אפשרות רענון
+ * - medium: שגיאות בינוניות - מציגות warning עם הצעה לרענון
+ * - low: שגיאות קלות - logging בלבד
+ */

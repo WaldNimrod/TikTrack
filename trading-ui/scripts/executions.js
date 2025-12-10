@@ -5,81 +5,101 @@
  * 
  * This index lists all functions in this file, organized by category.
  * 
- * Total Functions: 62
+ * Total Functions: 82
  * 
- * PAGE INITIALIZATION (2)
- * - setupModalConfigurations() - * שחזור מצב סידור - שימוש בפונקציה גלובלית
+ * PAGE INITIALIZATION (5)
+ * - setupModalConfigurations() - setupModalConfigurations function
+ * - setupExecutionCalculationListeners() - * Calculate execution values for add form
+ * - setupEditExecutionCalculationListeners() - setupEditExecutionCalculationListeners function
  * - setupExecutionsFilterFunctions() - setupExecutionsFilterFunctions function
+ * - initializeTradeSuggestionsPagination() - initializeTradeSuggestionsPagination function
  * 
- * DATA LOADING (6)
- * - loadExecutionsData() - * מעבר להתראה ספציפית
- * - loadTickersWithOpenOrClosedTradesAndPlans() - * הגדרת תצורות מודלים
+ * DATA LOADING (10)
+ * - loadExecutionsData() - * Navigate to specific note page
+ * - getExecutionsPaginationOptions() - getExecutionsPaginationOptions function
+ * - preloadSections34Data() - * שחזור מצב סידור - שימוש בפונקציה גלובלית
+ * - loadTickersWithOpenOrClosedTradesAndPlans() - loadTickersWithOpenOrClosedTradesAndPlans function
  * - loadActiveTradesForTicker() - * הפעלה/השבתה של שדה מזהה חיצוני לפי בחירת מקור
  * - loadExecutionTickerInfo() - * Enable execution form fields
- * - loadTradeExecutions() - * מעבר לטרייד המקושר
+ * - loadTradeExecutions() - loadTradeExecutions function
  * - loadTickersSummaryData() - loadTickersSummaryData function
+ * - loadTradeSuggestionsForAll() - loadTradeSuggestionsForAll function
+ * - getTradeSuggestionsFlatData() - * Open trade details modal
  * 
- * DATA MANIPULATION (20)
+ * DATA MANIPULATION (22)
  * - addExecution() - addExecution function
- * - resetAddExecutionForm() - resetAddExecutionForm function
  * - updateRealizedPLField() - updateRealizedPLField function
- * - updateExecutionWrapper() - updateExecutionWrapper function
+ * - saveExecution() - saveExecution function
+ * - updateExecution() - updateExecution function
+ * - updateExecutionsSummary() - * Handle executions filtered data change event
+ * - updateExecutionsCounters() - updateExecutionsCounters function
  * - updateExecutionsTableMain() - updateExecutionsTableMain function
  * - updateTradesOnCheckboxChange() - updateTradesOnCheckboxChange function
  * - updateTradesOnTickerChange() - updateTradesOnTickerChange function
  * - addNewTicker() - * Show ticker help
- * - addNewPlan() - * הוספת טיקר חדש
- * - addNewTrade() - * הוספת טיקר חדש
- * - updateExecutionsSummary() - * הוספת תכנון חדש
+ * - addNewPlan() - * Add new ticker (in development)
+ * - addNewTrade() - * Add new ticker (in development)
  * - calculateAddExecutionValues() - calculateAddExecutionValues function
- * - updateExecutionsTableForTradeModal() - * טעינת ביצועים לטרייד
+ * - updateExecutionsTableForTradeModal() - * Load executions for trade (used in trade modal)
  * - addEditBuySell() - addEditBuySell function
  * - updateExecutionsGlobalData() - updateExecutionsGlobalData function
  * - updateTickersSummaryTable() - updateTickersSummaryTable function
  * - addExecutionForTicker() - * צפייה בפרטי טיקר
- * - updateTickersList() - * הצגה/הסתרה של סקשן הטיקרים
- * - showAddExecutionModal() - showAddExecutionModal function
- * - deleteExecution() - * Show add execution modal
+ * - updateTickersList() - updateTickersList function
+ * - deleteExecution() - deleteExecution function
+ * - updateSuggestionsCount() - updateSuggestionsCount function
+ * - updateTradeSuggestionsTable() - * Get flat data array for sorting
  * 
- * EVENT HANDLING (20)
+ * EVENT HANDLING (29)
  * - editExecution() - editExecution function
- * - resetExecutionForm() - resetExecutionForm function
- * - resetEditExecutionForm() - resetEditExecutionForm function
- * - fillEditExecutionForm() - * הצגת מודל עריכת עסקה
- * - showExecutionLinkedItemsModal() - showExecutionLinkedItemsModal function
- * - goToNote() - * מעבר לתכנון ספציפי
+ * - goToNote() - * Navigate to specific trade plan page
+ * - syncExecutionsPagination() - syncExecutionsPagination function
+ * - setExecutionsFilteredDataset() - setExecutionsFilteredDataset function
+ * - handleExecutionsPageRender() - * Get pagination options for executions table
+ * - handleExecutionsFilteredChange() - * Get pagination options for executions table
+ * - applyExecutionsFilteredData() - * Handle executions page render event
  * - filterExecutionsLocally() - filterExecutionsLocally function
- * - toggleExecutionFormFields() - toggleExecutionFormFields function
+ * - toggleExecutionFormFields() - * Add new trade plan (in development)
  * - enableExecutionFormFields() - * הפעלה/השבתה של שדות הטופס
  * - disableExecutionFormFields() - * הפעלה/השבתה של שדות הטופס
  * - displayExecutionTickerInfo() - displayExecutionTickerInfo function
  * - hideExecutionTickerInfo() - hideExecutionTickerInfo function
- * - calculateExecutionValues() - * הסתרת מידע על הטיקר
- * - calculateEditExecutionValues() - * חישוב ערכים מחושבים לטופס הוספה
+ * - calculateExecutionValues() - * Hide ticker information from execution form
+ * - calculateEditExecutionValues() - * Calculate execution values for add form
  * - linkExistingExecution() - * הוספת קניה/מכירה במודל עריכת טרייד
  * - unlinkExecution() - * הוספת קניה/מכירה במודל עריכת טרייד
- * - toggleTickersSection() - * הוספת עסקה לטיקר
- * - toggleExecutionsSection() - toggleExecutionsSection function
- * - showEditExecutionModal() - * Show add execution modal
  * - performExecutionDeletion() - performExecutionDeletion function
+ * - renderTradeSuggestionsSection() - * Update suggestions count display
+ * - buildTradeSuggestionRow() - buildTradeSuggestionRow function
+ * - toggleAllSuggestions() - toggleAllSuggestions function
+ * - acceptSuggestion() - * Toggle all suggestions checkbox
+ * - rejectSuggestion() - rejectSuggestion function
+ * - acceptAllSuggestions() - acceptAllSuggestions function
+ * - rejectAllSuggestions() - rejectAllSuggestions function
+ * - applySelectedSuggestions() - * Reject all suggestions
+ * - sortTradeSuggestionsTable() - * Get flat data array for sorting
+ * - renderTradeSuggestionsPageRows() - renderTradeSuggestionsPageRows function
+ * - buildTradeSuggestionsFlatList() - buildTradeSuggestionsFlatList function
  * 
  * UI UPDATES (2)
- * - displayLinkedItems() - displayLinkedItems function
- * - showTickerHelp() - * מעבר לדף טיקר (בפיתוח)
+ * - displayLinkedItems() - * Update execution - wrapper for saveExecution in edit mode
+ * - showTickerHelp() - * Navigate to ticker page (in development)
  * 
- * OTHER (12)
+ * OTHER (14)
  * - goToTrade() - goToTrade function
- * - goToPlan() - * מעבר לטרייד ספציפי
- * - goToAlert() - * מעבר לטרייד ספציפי
+ * - goToPlan() - * Navigate to specific trade page
+ * - goToAlert() - * Navigate to specific trade page
  * - isDateInRange() - isDateInRange function
  * - restoreSortState() - restoreSortState function
  * - enableAllFields() - enableAllFields function
- * - goToTickerPage() - * עדכון טריידים כאשר הטיקר משתנה
- * - goToLinkedTrade() - * חישוב ערכים מחושבים לטופס הוספה
+ * - goToTickerPage() - * Update trades list when ticker changes
+ * - goToLinkedTrade() - goToLinkedTrade function
  * - applyAccountFilterWithTradesData() - applyAccountFilterWithTradesData function
  * - toggleExternalIdField() - toggleExternalIdField function
  * - refreshTickersSummary() - refreshTickersSummary function
  * - viewTickerDetails() - * רענון רשימת טיקרים
+ * - restorePageState() - restorePageState function
+ * - openTradeDetailsModal() - openTradeDetailsModal function
  * 
  * ==========================================
  */

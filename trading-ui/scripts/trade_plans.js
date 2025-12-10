@@ -5,68 +5,95 @@
  * 
  * This index lists all functions in this file, organized by category.
  * 
- * Total Functions: 52
+ * Total Functions: 72
  * 
  * PAGE INITIALIZATION (4)
- * - setupPriceCalculation() - * View linked items for trade plan
+ * - setupPriceCalculation() - setupPriceCalculation function
  * - setupEditPriceCalculation() - setupEditPriceCalculation function
- * - (REMOVED: initializeTradePlanConditionsSystem - use centralized window.conditionsInitializer.initialize())
- * - (REMOVED: setupSortableHeadersLocal - use centralized window.setupSortableHeaders() directly)
+ * - setupTradePlanModalNavigation() - * Handle trade plan modal restore
+ * - setupTradePlanConditionsButton() - setupTradePlanConditionsButton function
  * 
- * DATA LOADING (4)
- * - loadTickerInfo() - * Disable edit form fields
+ * DATA LOADING (10)
  * - loadTradePlanTickerInfo() - loadTradePlanTickerInfo function
- * - loadEditTickerInfo() - loadEditTickerInfo function
+ * - getTradePlanModalElements() - getTradePlanModalElements function
  * - loadTradePlansData() - loadTradePlansData function
+ * - getTradePlanModalEntityName() - getTradePlanModalEntityName function
+ * - getTradePlansModalElement() - * Get trade plan modal entity name
+ * - getCachedConditionSummary() - * Get trade plans modal element
+ * - getConditionsTranslator() - getConditionsTranslator function
+ * - getTradePlanConditionsForEvaluation() - getTradePlanConditionsForEvaluation function
+ * - normalizeConditionEvaluationPayload() - normalizeConditionEvaluationPayload function
+ * - loadTradePlanConditionsSummary() - * Normalize condition evaluation payload
  * 
- * DATA MANIPULATION (23)
+ * DATA MANIPULATION (21)
  * - updateTickerInfo() - * Hide ticker information display
  * - updateSharesFromAmount() - updateSharesFromAmount function
- * - updateAmountFromShares() - updateAmountFromShares function
- * - updateFormFieldsWithTickerData() - updateFormFieldsWithTickerData function
- * - updateEditFormFieldsWithTickerData() - * Hide edit ticker information section
- * - updateEditTickerInfo() - updateEditTickerInfo function
+ * - updateAmountFromShares() - * Update shares from planned amount in add modal
+ * - updateEditTickerInfo() - * Hide edit ticker information section in edit modal
  * - updateEditSharesFromAmount() - updateEditSharesFromAmount function
  * - updateEditAmountFromShares() - updateEditAmountFromShares function
  * - addEditCondition() - addEditCondition function
  * - addEditReason() - addEditReason function
- * - addEditImportantNote() - addEditImportantNote function
- * - addEditReminder() - addEditReminder function
- * - addImportantNote() - addImportantNote function
- * - addReminder() - addReminder function
- * - updateDesignsTable() - updateDesignsTable function
+ * - addEditImportantNote() - * Add/edit reason (placeholder for future functionality)
+ * - addEditReminder() - * Add/edit important note (placeholder for future functionality)
+ * - addImportantNote() - * Add/edit reminder (placeholder for future functionality)
+ * - addReminder() - * Add important note (placeholder for add modal)
+ * - updatePricesFromPercentages() - * View linked items for trade plan
+ * - updatePercentagesFromPrices() - updatePercentagesFromPrices function
  * - updateTradePlansTable() - updateTradePlansTable function
  * - updateTradePlansPageSummaryStats() - updateTradePlansPageSummaryStats function
+ * - handleTradePlanConditionSummaryDelete() - * Handle trade plan condition summary edit
+ * - deleteConditionViaCrud() - deleteConditionViaCrud function
+ * - updateTradePlanModalNavigation() - updateTradePlanModalNavigation function
  * - saveTradePlan() - saveTradePlan function
  * - deleteTradePlan() - deleteTradePlan function
  * 
- * EVENT HANDLING (2)
- * - restorePlanningSectionState() - * Setup sortable headers for trade plans table
+ * EVENT HANDLING (18)
+ * - buildTradePlanConfirmationDetails() - * Add reminder functionality (placeholder for add modal)
+ * - performTradePlanCancellation() - performTradePlanCancellation function
+ * - isConditionsModalOpen() - * Get trade plan modal entity name
+ * - clearCachedConditionsSummary() - * Get cached condition summary
+ * - openTradePlanConditionsModal() - * Get cached condition summary
+ * - handleTradePlanConditionsButtonClick() - handleTradePlanConditionsButtonClick function
+ * - handleTradePlanConditionSummaryEdit() - * Handle trade plan conditions button click
+ * - confirmTradePlanConditionDeletion() - confirmTradePlanConditionDeletion function
+ * - buildTradePlanModalNavigationMetadata() - buildTradePlanModalNavigationMetadata function
+ * - registerTradePlanModalNavigation() - * Build trade plan modal navigation metadata
+ * - handleTradePlanModalRestore() - * Update trade plan modal navigation
+ * - handleTradePlanEvaluateConditionsClick() - * Get conditions translator
+ * - evaluatePlanConditions() - evaluatePlanConditions function
+ * - evaluateSinglePlanCondition() - * Evaluate plan conditions
+ * - handleTradePlanConditionRowEvaluate() - * Evaluate single plan condition
+ * - handleTradePlanConditionToggleAlerts() - handleTradePlanConditionToggleAlerts function
+ * - restorePlanningSectionState() - restorePlanningSectionState function
  * - performTradePlanDeletion() - performTradePlanDeletion function
  * 
- * UI UPDATES (6)
- * - displayTickerInfo() - * טעינת מידע על הטיקר (למודל החדש)
- * - displayTradePlanTickerInfo() - displayTradePlanTickerInfo function
+ * UI UPDATES (4)
+ * - displayTradePlanTickerInfo() - * Load ticker information for trade plan modal
  * - hideTickerInfo() - hideTickerInfo function
- * - displayEditTickerInfo() - displayEditTickerInfo function
  * - hideEditTickerInfo() - hideEditTickerInfo function
- * - showEditTradePlanModal() - * Show add trade plan modal
+ * - renderTradePlansTableRows() - renderTradePlansTableRows function
  * 
  * VALIDATION (1)
  * - checkLinkedItemsBeforeCancel() - checkLinkedItemsBeforeCancel function
  * 
+ * UTILITIES (2)
+ * - parseFieldValue() - parseFieldValue function
+ * - parsePriceValue() - * Parse numeric value from input, allowing partial decimal typing
+ * 
  * OTHER (12)
  * - executeTradePlan() - executeTradePlan function
- * - copyTradePlan() - copyTradePlan function
- * - disableFormFields() - * פתיחת מודל הוספת תכנון חדש
- * - enableEditFieldsWrapper() - * Disable form fields for trade plan creation
- * - disableEditFields() - * Enable edit form fields wrapper
- * - reactivateTradePlan() - * בדיקת פריטים מקושרים לפני ביטול תכנון
- * - openCancelTradePlanModal() - * Add reminder functionality (placeholder for add modal)
+ * - reactivateTradePlan() - * שמירת עריכת תכנון
+ * - openCancelTradePlanModal() - openCancelTradePlanModal function
  * - cancelTradePlan() - cancelTradePlan function
  * - viewLinkedItemsForTradePlan() - viewLinkedItemsForTradePlan function
- * - filterTradePlansData() - * עדכון טבלת עיצובים (alias ל-updateTradePlansTable)
+ * - applyTradePlanDefaultRiskLevels() - applyTradePlanDefaultRiskLevels function
+ * - normalizeSharesResult() - * Parse price from entry input (or fallback to display element)
+ * - disableFormFields() - disableFormFields function
+ * - enableEditFieldsWrapper() - enableEditFieldsWrapper function
+ * - disableEditFields() - disableEditFields function
  * - filterTradePlansByType() - filterTradePlansByType function
+ * - restorePageState() - restorePageState function
  * 
  * ==========================================
  */

@@ -5,58 +5,84 @@
  * 
  * This index lists all functions in this file, organized by category.
  * 
- * Total Functions: 35
+ * Total Functions: 61
  * 
- * PAGE INITIALIZATION (3)
+ * PAGE INITIALIZATION (5)
+ * - setupCashFlowTypeFilterDropdown() - * Set active cash flow type filter (buttons and dropdown)
+ * - setupExchangeRowInteractions() - setupExchangeRowInteractions function
  * - initializeCashFlowsPage() - initializeCashFlowsPage function
  * - setupSourceFieldListeners() - setupSourceFieldListeners function
  * - initializeExternalIdFields() - * Setup source field listeners
  * 
- * DATA LOADING (10)
+ * DATA LOADING (11)
  * - loadCashFlowsData() - loadCashFlowsData function
- * - getAccountNameById() - getAccountNameById function
+ * - getCashFlowsPaginationInstance() - * Resolve exchange direction from flow type
+ * - loadCashFlowTypeFilterState() - * Save cash flow type filter state
+ * - getAccountNameById() - * Reapply cash flow type filter
  * - ensureTradingAccountsLoaded() - ensureTradingAccountsLoaded function
- * - loadCashFlows() - * טעינת נתוני חשבונות מסחר אם הם לא נטענו
  * - loadAccountsForCashFlow() - loadAccountsForCashFlow function
  * - loadCurrenciesForCashFlow() - loadCurrenciesForCashFlow function
- * - getCashFlowTypeWithColor() - * Format amount
+ * - getCashFlowTypeWithColor() - getCashFlowTypeWithColor function
  * - getCashFlowTypeText() - getCashFlowTypeText function
- * - loadTradesForCashFlow() - * Edit cash flow
- * - loadTradePlansForCashFlow() - loadTradePlansForCashFlow function
+ * - loadCurrencyExchange() - loadCurrencyExchange function
+ * - getExchangeIdFromCashFlow() - * Check if cash flow is part of currency exchange
  * 
- * DATA MANIPULATION (6)
+ * DATA MANIPULATION (10)
+ * - saveCashFlowTypeFilterState() - * Filter cash flows locally by type
  * - deleteCashFlow() - deleteCashFlow function
- * - updatePageSummaryStats() - Uses InfoSummarySystem from services/statistics-calculator.js
+ * - deleteImportedCashFlows() - deleteImportedCashFlows function
+ * - updatePageSummaryStats() - updatePageSummaryStats function
  * - updateCashFlowsTable() - * Format USD rate
  * - updateCashFlow() - updateCashFlow function
  * - saveCashFlow() - saveCashFlow function
+ * - saveCurrencyExchange() - saveCurrencyExchange function
+ * - deleteCurrencyExchange() - deleteCurrencyExchange function
  * - confirmDeleteCashFlow() - confirmDeleteCashFlow function
  * 
- * EVENT HANDLING (1)
+ * EVENT HANDLING (12)
+ * - resolveExchangeDirectionFromType() - resolveExchangeDirectionFromType function
+ * - setActiveCashFlowTypeButton() - setActiveCashFlowTypeButton function
  * - performCashFlowDeletion() - performCashFlowDeletion function
+ * - syncCashFlowsPagination() - syncCashFlowsPagination function
+ * - groupUnifiedExchanges() - groupUnifiedExchanges function
+ * - renderUnifiedForexExchangesTable() - renderUnifiedForexExchangesTable function
+ * - ensureExchangePairsAdjacency() - ensureExchangePairsAdjacency function
+ * - highlightExchangeGroup() - * Setup exchange row interactions (hover, click handlers)
+ * - clearExchangeHighlight() - * Highlight exchange group
+ * - setCurrencyExchangeSummary() - * Clear exchange highlight
+ * - hydrateCashFlowExchangeDisplay() - hydrateCashFlowExchangeDisplay function
+ * - isCurrencyExchange() - isCurrencyExchange function
  * 
  * UI UPDATES (2)
  * - renderCashFlowsTable() - * טעינת רשימת מטבעות למודולי cash flow
  * - showCashFlowDetails() - * Format USD rate
  * 
- * VALIDATION (2)
+ * VALIDATION (4)
+ * - validateCashFlowAmount() - * Ensure trading accounts data is loaded
+ * - validateCashFlowDate() - * Helper validation function for cash flow amount
  * - validateCashFlowForm() - validateCashFlowForm function
- * - validateEditCashFlowForm() - validateEditCashFlowForm function
+ * - validateEditCashFlowForm() - * Validate cash flow form
  * 
  * UTILITIES (3)
  * - formatAmount() - formatAmount function
- * - formatCashFlowAmount() - * Get cash flow type text
+ * - formatCashFlowAmount() - formatCashFlowAmount function
  * - formatUsdRate() - formatUsdRate function
  * 
- * OTHER (8)
+ * OTHER (14)
+ * - applyFallbackDateSort() - applyFallbackDateSort function
  * - calculateBalance() - calculateBalance function
- * - startAutoRefresh() - * Update cash flows table
+ * - cashFlowMatchesType() - cashFlowMatchesType function
+ * - filterCashFlowsByType() - * Check if cash flow matches type
+ * - filterCashFlowsLocallyByType() - filterCashFlowsLocallyByType function
+ * - reapplyCashFlowTypeFilter() - * Load cash flow type filter state
+ * - resolveCurrencySymbolForCashFlow() - * Get cash flow type text
+ * - startAutoRefresh() - startAutoRefresh function
  * - applyDynamicColors() - * Start auto refresh
  * - applyUserPreferences() - applyUserPreferences function
  * - manageExternalIdField() - * Confirm delete cash flow
  * - editCashFlow() - editCashFlow function
  * - generateDetailedLog() - generateDetailedLog function
- * - generateDetailedLogForCashFlows() - generateDetailedLogForCashFlows function
+ * - restorePageState() - restorePageState function
  * 
  * ==========================================
  */

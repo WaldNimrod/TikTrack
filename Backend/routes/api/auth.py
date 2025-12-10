@@ -332,7 +332,7 @@ def get_current_user():
         }
     """
     try:
-        user_id = session.get('user_id')
+        user_id = getattr(g, 'user_id', None)
         if not user_id:
             return jsonify({
                 'status': 'error',
@@ -352,8 +352,6 @@ def get_current_user():
                 }
             }), 200
         else:
-            # User not found - clear session
-            session.clear()
             return jsonify({
                 'status': 'error',
                 'error': {'message': 'User not found'}

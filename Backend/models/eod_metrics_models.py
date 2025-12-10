@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, Date, Numeric, TIMESTAMP, JSON, Text, Index
 from sqlalchemy.sql import func
-from Backend.database import Base
+from .base import Base
 
 class DailyPortfolioMetrics(Base):
     """טבלת מדדי פורטפוליו יומיים"""

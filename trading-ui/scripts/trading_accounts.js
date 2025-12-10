@@ -5,54 +5,61 @@
  * 
  * This index lists all functions in this file, organized by category.
  * 
- * Total Functions: 38
+ * Total Functions: 42
  * 
- * DATA LOADING (6)
- * - loadDefaultTradingAccounts() - loadDefaultTradingAccounts function
- * - loadTradingAccountsData() - * Load default trading accounts
- * - loadTradingAccounts() - * Update trading accounts summary
- * - loadTradingAccountsDataForTradingAccountsPage() - loadTradingAccountsDataForTradingAccountsPage function
+ * DATA LOADING (12)
+ * - loadCurrenciesFromServer() - loadCurrenciesFromServer function
+ * - loadTradingAccountsFromServer() - * Generate currency options for form
+ * - loadAllTradingAccountsFromServer() - loadAllTradingAccountsFromServer function
+ * - loadDefaultTradingAccounts() - * Load all trading accounts from server (for filter)
+ * - legacyFetchTradingAccounts() - legacyFetchTradingAccounts function
+ * - loadTradingAccountsData() - * Legacy function to fetch trading accounts from server (DEPRECATED)
+ * - loadAccountBalance() - loadAccountBalance function
+ * - loadAccountBalancesBatch() - loadAccountBalancesBatch function
+ * - getCurrencySymbol() - * Load balances for multiple accounts in batch
+ * - loadTradingAccounts() - loadTradingAccounts function
  * - getTradingAccountName() - * בדיקת פריטים מקושרים לפני ביטול חשבון מסחר
  * - getTradingAccounts() - * Generate detailed log for trading accounts page
  * 
- * DATA MANIPULATION (14)
+ * DATA MANIPULATION (12)
  * - updateTradingAccountsTable() - updateTradingAccountsTable function
  * - updateTradingAccountsSummary() - updateTradingAccountsSummary function
  * - updateTradingAccountFilterDisplayText() - updateTradingAccountFilterDisplayText function
  * - deleteTradingAccountFromAPI() - deleteTradingAccountFromAPI function
- * - deleteTradingAccount() - deleteTradingAccount function
- * - confirmDeleteTradingAccount() - * Show success message
+ * - confirmDeleteTradingAccount() - confirmDeleteTradingAccount function
  * - updateTradingAccountFilterMenu() - updateTradingAccountFilterMenu function
  * - deleteTradingAccountWithLinkedItemsCheck() - deleteTradingAccountWithLinkedItemsCheck function
  * - checkLinkedItemsAndDeleteTradingAccount() - checkLinkedItemsAndDeleteTradingAccount function
- * - checkLinkedItemsBeforeDeleteTradingAccount() - * בדיקת פריטים מקושרים לפני ביטול חשבון מסחר
+ * - checkLinkedItemsBeforeDeleteTradingAccount() - * בדיקת מקושרים וביצוע מחיקת חשבון מסחר מסחר
  * - updateTradingAccount() - * בדיקת פריטים מקושרים לפני מחיקת חשבון מסחר מסחר
- * - showAddTradingAccountModal() - showAddTradingAccountModal function
- * - saveTradingAccount() - * Show add trading account modal
+ * - saveTradingAccount() - saveTradingAccount function
  * - deleteTradingAccount() - deleteTradingAccount function
  * 
- * EVENT HANDLING (4)
+ * EVENT HANDLING (5)
+ * - generateCurrencyOptions() - generateCurrencyOptions function
+ * - syncTradingAccountsPagination() - * Enrich trading accounts with balance data
  * - restoreTradingAccountsSectionState() - restoreTradingAccountsSectionState function
  * - performTradingAccountCancellation() - * בדיקת מקושרים וביצוע ביטול חשבון מסחר מסחר
- * - performTradingAccountDeletion() - * בדיקת מקושרים וביצוע מחיקת חשבון מסחר מסחר
  * - performTradingAccountDeletion() - performTradingAccountDeletion function
  * 
  * UI UPDATES (3)
- * - showOpenTradesWarning() - * Show error message
+ * - showOpenTradesWarning() - * Confirm delete trading account
+ * - showEditTradingAccountModalById() - * Show open trades warning
  * - showTradingAccountDetails() - showTradingAccountDetails function
- * - showEditTradingAccountModal() - * Show add trading account modal
  * 
  * VALIDATION (3)
  * - cancelTradingAccountWithLinkedItemsCheck() - cancelTradingAccountWithLinkedItemsCheck function
  * - checkLinkedItemsAndCancelTradingAccount() - checkLinkedItemsAndCancelTradingAccount function
- * - checkLinkedItemsBeforeCancelTradingAccount() - checkLinkedItemsBeforeCancelTradingAccount function
+ * - checkLinkedItemsBeforeCancelTradingAccount() - * בדיקת מקושרים וביצוע מחיקת חשבון מסחר מסחר
  * 
- * OTHER (6)
- * - cancelTradingAccount() - * הצגת מודל חשבון מסחר מסחר (הוספה או עריכה)
+ * OTHER (7)
+ * - enrichAccountsWithBalances() - * Get currency symbol from currency value
+ * - cancelTradingAccount() - cancelTradingAccount function
  * - filterTradingAccountsLocally() - filterTradingAccountsLocally function
  * - restoreTradingAccount() - restoreTradingAccount function
- * - sortTable() - sortTable function
- * - generateDetailedLog() - * Sort table
+ * - generateDetailedLog() - generateDetailedLog function
+ * - restorePageState() - restorePageState function
+ * - waitAndRegisterTables() - waitAndRegisterTables function
  * 
  * ==========================================
  */

@@ -2,7 +2,7 @@ from datetime import date, datetime
 from typing import Dict, List, Optional, Any
 from sqlalchemy.orm import Session
 from sqlalchemy import and_, func
-from Backend.database import get_db
+from config.database import get_db
 from Backend.models.eod_metrics_models import (
     DailyPortfolioMetrics, DailyTickerPositions, DailyCashFlowsAgg
 )
@@ -68,7 +68,7 @@ class EODMetricsService:
         """ולידציה פנימית של המדדים"""
         errors = []
 
-        if not metrics or typeof(metrics) !== 'object':
+        if not metrics or not isinstance(metrics, dict):
             errors.append({
                 'type': 'INVALID_DATA',
                 'message': 'Invalid metrics data structure',
@@ -76,9 +76,20 @@ class EODMetricsService:
             })
             return errors
 
+        # בדיקת ערכים שליליים לא הגיוניים קודם
+        nav_total = metrics.get('nav_total', 0)
+        if nav_total < 0:  # Any negative NAV is problematic
+            errors.append({
+                'type': 'NEGATIVE_NAV',
+                'field': 'nav_total',
+                'value': nav_total,
+                'severity': 'high'
+            })
+            return errors  # Return early if NAV is negative
+
         # בדיקת עקביות NAV
         nav_calculated = (metrics.get('market_value_total', 0) + metrics.get('cash_total', 0))
-        nav_stored = metrics.get('nav_total', 0)
+        nav_stored = nav_total
 
         if abs(nav_stored - nav_calculated) > 0.01:  # tolerance of 1 cent
             errors.append({
@@ -87,15 +98,6 @@ class EODMetricsService:
                 'expected': nav_calculated,
                 'actual': nav_stored,
                 'difference': nav_stored - nav_calculated,
-                'severity': 'high'
-            })
-
-        # בדיקת ערכים שליליים לא הגיוניים
-        if (metrics.get('nav_total', 0) or 0) < -1000:  # Allow small negative for rounding
-            errors.append({
-                'type': 'NEGATIVE_NAV',
-                'field': 'nav_total',
-                'value': metrics.get('nav_total', 0),
                 'severity': 'high'
             })
 

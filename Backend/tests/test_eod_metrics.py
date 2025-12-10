@@ -39,7 +39,9 @@ class TestEODMetricsService:
         metrics = {
             'nav_total': 10000.50,
             'market_value_total': 8000.25,
-            'cash_total': 1500.00  # Should be 2000.25 for consistency
+            'cash_total': 1500.00,  # Should be 2000.25 for consistency
+            'exposure_long': 8000.25,
+            'exposure_short': 0
         }
 
         errors = service.validate_metrics(metrics)

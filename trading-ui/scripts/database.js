@@ -5,7 +5,7 @@
  * 
  * This index lists all functions in this file, organized by category.
  * 
- * Total Functions: 16
+ * Total Functions: 15
  * 
  * PAGE INITIALIZATION (2)
  * - initDatabaseDisplay() - initDatabaseDisplay function
@@ -25,10 +25,9 @@
  * EVENT HANDLING (1)
  * - applySortingFunctionality() - * Format cell value based on column configuration
  * 
- * UTILITIES (5)
+ * UTILITIES (4)
  * - formatCellValue() - formatCellValue function
- * - formatDate() - * Filter table data
- * - formatNumber() - * Format date value
+ * - formatNumber() - * Filter table data
  * - formatCurrency() - * Format date value
  * - formatStatus() - * Format currency value
  * 

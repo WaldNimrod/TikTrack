@@ -10,13 +10,13 @@
     "notes": "יצירת בסיס נתונים פרודקשן עם מפתחות מסודרים ונתוני דוגמה מלאים"
   },
   "development": {
-    "version": "1.3.97.0",
+    "version": "1.3.98.0",
     "major": 1,
     "minor": 3,
-    "patch": 97,
+    "patch": 98,
     "build": 0,
-    "commit": "ad7b1464be7805697f25f71ae77a0492e32d8a7b",
-    "updated_at": "2025-12-10T01:20:13+00:00",
-    "notes": "Implement EOD Historical Metrics System - daily portfolio metrics, positions, cash flows with caching and validation"
+    "commit": "5fbb39e399b9b32712ca7f5e34103fae33400ba2",
+    "updated_at": "2025-12-10T01:31:03+00:00",
+    "notes": "Add comprehensive JSDoc documentation and Function Index to EOD Historical Metrics System services"
   }
 }

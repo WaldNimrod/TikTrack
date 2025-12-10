@@ -1,6 +1,9 @@
 # Manual migration for EOD metrics tables
 # Run with: python3 Backend/alembic upgrade head
 
+revision = 'add_eod_metrics_tables'
+down_revision = None
+
 from alembic import op
 import sqlalchemy as sa
 

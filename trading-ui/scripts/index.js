@@ -5,22 +5,44 @@
  * 
  * This index lists all functions in this file, organized by category.
  * 
- * Total Functions: 17
+ * Total Functions: 28
  * 
- * DATA MANIPULATION (0)
- * - Chart functions - REMOVED: All chart-related functions removed (no longer used on index page)
+ * DATA LOADING (5)
+ * - updateRecentItemsWidget() - updateRecentItemsWidget function
+ * - loadRecentTradePlans() - loadRecentTradePlans function
+ * - legacyFetchDashboardDataFromApi() - legacyFetchDashboardDataFromApi function
+ * - loadDashboardDataFromService() - loadDashboardDataFromService function
+ * - equalizeWidgetHeights() - * Copy detailed log to clipboard
  * 
- * EVENT HANDLING (1)
+ * DATA MANIPULATION (6)
+ * - updateSummaryStats() - updateSummaryStats function
+ * - updateRecentTradePlans() - updateRecentTradePlans function
+ * - updateRecentTrades() - updateRecentTrades function
+ * - updateActiveAlerts() - updateActiveAlerts function
+ * - updateDashboardCount() - updateDashboardCount function
+ * - updatePortfolioSummary() - * Update dashboard count indicators
+ * 
+ * EVENT HANDLING (4)
+ * - toNumber() - toNumber function
+ * - handleDashboardError() - * Show dashboard error message
  * - quickAction() - * Refresh overview data on the index page
+ * - replaceIconsWithIconSystem() - * Execute quick actions on the index page
  * 
- * ICON MANAGEMENT (1)
- * - replaceIconsWithIconSystem() - Replace all <img> tags with IconSystem.renderIcon()
+ * UI UPDATES (1)
+ * - showDashboardError() - showDashboardError function
  * 
- * OTHER (5)
+ * UTILITIES (1)
+ * - formatDateShort() - * Convert value to number
+ * 
+ * OTHER (11)
+ * - resolveDateValue() - * Convert value to number
+ * - normalizeArray() - normalizeArray function
+ * - determineCurrencySymbol() - * Normalize payload to array
+ * - computePortfolioPnL() - * Determine currency symbol from accounts or trades
+ * - processDashboardData() - * Handle dashboard error
  * - switchTableTab() - switchTableTab function
  * - refreshOverview() - * Switch between table tabs on the index page
- * - exportOverview() - * Switch between table tabs on the index page
- * - equalizeWidgetHeights() - Equalize widget heights in each row
+ * - exportOverview() - * Refresh overview data on the index page
  * - generateDetailedLog() - generateDetailedLog function
  * - debugZIndexStatus() - debugZIndexStatus function
  * - copyDetailedLogLocal() - copyDetailedLogLocal function

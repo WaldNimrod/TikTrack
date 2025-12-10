@@ -5,59 +5,70 @@
  * 
  * This index lists all functions in this file, organized by category.
  * 
- * Total Functions: 43
+ * Total Functions: 52
  * 
- * DATA LOADING (11)
+ * PAGE INITIALIZATION (1)
+ * - initializeProviderSymbolFields() - * Load provider symbol mappings for a ticker (for edit mode)
+ * 
+ * DATA LOADING (14)
  * - loadCurrenciesData() - loadCurrenciesData function
  * - getCurrencySymbol() - * Load currencies data from server
- * - getTimeDuration() - * קבלת סמל מטבע לפי מזהה
- * - getTickerTypeStyle() - * חישוב משך הזמן שעבר מתאריך נתון - פורמט אחיד מלא
- * - getTickerStatusStyle() - * קבלת עיצוב סוג טיקר
- * - getTickerStatusLabel() - * קבלת עיצוב סטטוס טיקר
+ * - getTickerTypeStyle() - * Get currency symbol by currency ID
+ * - getTickerStatusStyle() - * Get ticker type style configuration
+ * - getTickerStatusLabel() - getTickerStatusLabel function
+ * - loadTickerProviderSymbols() - loadTickerProviderSymbols function
+ * - loadProviderSymbolFields() - * Initialize provider symbol fields when modal is shown
  * - getTickerSymbol() - * בדיקת פריטים מקושרים לפני מחיקת טיקר
- * - loadTickersData() - * הצגת הודעה
+ * - loadAndRefreshMissingData() - loadAndRefreshMissingData function
+ * - getDataStatusBadge() - getDataStatusBadge function
+ * - loadTickersDataInternal() - * Get data status badge HTML for a ticker
  * - loadColorsAndApplyToHeaders() - loadColorsAndApplyToHeaders function
  * - tryLoadData() - tryLoadData function
  * - getTypeDisplayName() - getTypeDisplayName function
  * 
- * DATA MANIPULATION (14)
- * - updateCurrencyOptions() - updateCurrencyOptions function
- * - updateActiveTradesField() - * פונקציה לעדכון אפשרויות מטבע בטופס
+ * DATA MANIPULATION (13)
+ * - updateCurrencyOptions() - * Get ticker status label in Hebrew
+ * - updateActiveTradesField() - updateActiveTradesField function
  * - updateTickerActiveTradesStatus() - updateTickerActiveTradesStatus function
  * - updateAllActiveTradesStatuses() - updateAllActiveTradesStatuses function
  * - saveTicker() - saveTicker function
  * - updateTicker() - updateTicker function
  * - checkLinkedItemsBeforeDeleteTicker() - checkLinkedItemsBeforeDeleteTicker function
- * - updateAllTickerStatuses() - * בדיקת פריטים מקושרים לפני מחיקת טיקר
+ * - updateAllTickerStatuses() - * בדיקת פריטים מקושרים לפני ביטול טיקר
  * - checkLinkedItemsAndDeleteTicker() - checkLinkedItemsAndDeleteTicker function
  * - deleteTicker() - deleteTicker function
  * - confirmDeleteTicker() - confirmDeleteTicker function
  * - updateTickersSummaryStats() - updateTickersSummaryStats function
- * - updateTickersTable() - * עדכון סטטיסטיקות סיכום טיקרים
- * - showAddTickerModal() - showAddTickerModal function
+ * - updateTickersTable() - updateTickersTable function
  * 
- * EVENT HANDLING (5)
- * - generateTickerCurrencyOptions() - * קבלת תווית סטטוס טיקר
+ * EVENT HANDLING (3)
  * - restoreTickersSectionState() - restoreTickersSectionState function
  * - performTickerCancellation() - * בדיקת מקושרים וביצוע ביטול טיקר
  * - performTickerDeletion() - * בדיקת מקושרים וביצוע מחיקת טיקר
- * - toggleTickersSection() - toggleTickersSection function
  * 
  * UI UPDATES (1)
- * - showEditTickerModal() - * Show add ticker modal
+ * - renderTickersTableRows() - renderTickersTableRows function
  * 
- * VALIDATION (2)
+ * VALIDATION (5)
  * - checkLinkedItemsAndCancelTicker() - checkLinkedItemsAndCancelTicker function
  * - checkLinkedItemsBeforeCancelTicker() - * בדיקת פריטים מקושרים לפני מחיקת טיקר
+ * - checkTickerDataCompleteness() - checkTickerDataCompleteness function
+ * - checkTickersDataCompleteness() - checkTickersDataCompleteness function
+ * - checkTickerExternalData() - checkTickerExternalData function
  * 
- * OTHER (10)
- * - viewTickerDetails() - viewTickerDetails function
- * - viewTickerDetailsOld() - * צפייה בפרטי טיקר
- * - refreshTickerData() - refreshTickerData function
+ * OTHER (15)
+ * - editTicker() - editTicker function
+ * - viewTickerDetails() - * Edit existing ticker
+ * - collectProviderSymbols() - collectProviderSymbols function
+ * - populateProviderSymbolFields() - * Collect provider symbols from form
  * - cancelTicker() - cancelTicker function
  * - performCancelTicker() - performCancelTicker function
  * - reactivateTicker() - reactivateTicker function
- * - clearTickersCache() - clearTickersCache function
+ * - ensureHistoricalDataForTickers() - ensureHistoricalDataForTickers function
+ * - enrichTickersWithFullData() - enrichTickersWithFullData function
+ * - restorePageState() - restorePageState function
+ * - refreshTickerExternalData() - refreshTickerExternalData function
+ * - refreshAllTickersData() - refreshAllTickersData function
  * - refreshYahooFinanceData() - refreshYahooFinanceData function
  * - refreshYahooFinanceDataSilently() - refreshYahooFinanceDataSilently function
  * - filterTickersByType() - filterTickersByType function

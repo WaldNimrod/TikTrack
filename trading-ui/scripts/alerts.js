@@ -5,32 +5,28 @@
  * 
  * This index lists all functions in this file, organized by category.
  * 
- * Total Functions: 57
+ * Total Functions: 49
  * 
- * PAGE INITIALIZATION (2)
+ * PAGE INITIALIZATION (1)
  * - initializeAlertModalTabs() - initializeAlertModalTabs function
  * 
- * DATA LOADING (12)
- * - loadAlertsData() - loadAlertsData function
+ * DATA LOADING (9)
  * - loadModalData() - loadModalData function
  * - getAlertState() - * עריכת התראה
  * - loadAlerts() - loadAlerts function
  * - loadConditionsFromSource() - loadConditionsFromSource function
- * - loadTradePlansForConditions() - * Load conditions from source type (trade_plan or trade)
- * - loadTradesForConditions() - * Load trade plans for conditions selection
- * - loadConditionsFromItem() - * Load trades for conditions selection
+ * - loadTradePlansForConditions() - loadTradePlansForConditions function
+ * - loadTradesForConditions() - loadTradesForConditions function
+ * - loadConditionsFromItem() - loadConditionsFromItem function
  * - showEvaluationLoading() - showEvaluationLoading function
- * - getMethodIdFromCondition() - getMethodIdFromCondition function
- * - loadAlertTickerInfo() - * הצגת מודל הוספת התראה
+ * - loadAlertTickerInfo() - loadAlertTickerInfo function
  * 
- * DATA MANIPULATION (15)
- * - updatePageSummaryStats() - updatePageSummaryStats function
+ * DATA MANIPULATION (12)
  * - updateRadioButtons() - updateRadioButtons function
- * - saveAlert() - * פירוק מחרוזת תנאי התראה
  * - updateStatusAndTriggered() - * בדיקת תקינות שילוב status ו-is_triggered
  * - updateAlert() - updateAlert function
  * - deleteAlertInternal() - deleteAlertInternal function
- * - confirmDeleteAlert() - * מחיקת התראה
+ * - confirmDeleteAlert() - confirmDeleteAlert function
  * - updateAlertStatus() - updateAlertStatus function
  * - updateEvaluationStats() - updateEvaluationStats function
  * - saveAlertData() - * Update evaluation statistics
@@ -38,43 +34,41 @@
  * - createAlertFromCondition() - * Select condition for alert creation
  * - updateModalButtons() - * Initialize tab management for add alert modal
  * - updateEvaluationSummary() - updateEvaluationSummary function
- * - showAddAlertModal() - * ניקוי הממשק המתקדם
  * 
- * EVENT HANDLING (16)
+ * EVENT HANDLING (15)
  * - onRelationTypeChange() - onRelationTypeChange function
  * - onRelatedObjectChange() - * טיפול בשינוי סוג שיוך
  * - toggleConditionFields() - * טיפול בבחירת אובייקט
  * - enableConditionFields() - enableConditionFields function
  * - disableConditionFields() - * Enable condition fields for add modal
- * - enableEditConditionFields() - * Enable condition fields for add modal
- * - disableEditConditionFields() - * Enable condition fields for add modal
+ * - enableEditConditionFields() - * השבתת שדות התנאי
+ * - disableEditConditionFields() - * הפעלת שדות התנאי במודל העריכה
  * - parseAlertCondition() - parseAlertCondition function
  * - validateAlertStatusCombination() - validateAlertStatusCombination function
- * - restoreAlertsSectionState() - * אישור מחיקת התראה
+ * - restoreAlertsSectionState() - restoreAlertsSectionState function
  * - displayAvailableConditions() - displayAvailableConditions function
  * - selectConditionForAlert() - selectConditionForAlert function
  * - evaluateAllConditions() - evaluateAllConditions function
  * - refreshConditionEvaluations() - refreshConditionEvaluations function
  * - displayEvaluationResults() - * הצגת אינדיקטור טעינה להערכת תנאים
  * 
- * UI UPDATES (2)
- * - showEditAlertModal() - * ניקוי הממשק המתקדם
- * - displayAlertTickerInfo() - * מחיקת התראה
+ * UI UPDATES (1)
+ * - displayAlertTickerInfo() - displayAlertTickerInfo function
  * 
  * VALIDATION (1)
  * - validateAlertForm() - validateAlertForm function
  * 
  * OTHER (10)
  * - populateSelect() - populateSelect function
- * - populateRelatedObjects() - * Enable condition fields for add modal
- * - populateEditRelatedObjects() - populateEditRelatedObjects function
- * - editAlert() - editAlert function
+ * - populateRelatedObjects() - * השבתת שדות התנאי במודל העריכה
+ * - editAlert() - * פירוק מחרוזת תנאי התראה
  * - filterAlertsByRelatedObjectTypeWrapper() - filterAlertsByRelatedObjectTypeWrapper function
  * - filterAlertsByRelatedObjectType() - filterAlertsByRelatedObjectType function
  * - reactivateAlert() - reactivateAlert function
- * - toggleAlert() - toggleAlert function
  * - generateDetailedLog() - generateDetailedLog function
  * - generateDetailedLogForAlerts() - generateDetailedLogForAlerts function
+ * - clearAlertTickerInfo() - clearAlertTickerInfo function
+ * - restorePageState() - restorePageState function
  * 
  * ==========================================
  */

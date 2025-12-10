@@ -218,66 +218,102 @@ def setup_driver():
         return None
 
 def login(driver):
-    """Login via the modal on the base page (admin/admin123)"""
+    """Login using token-based auth (admin/admin123); fallback to modal if needed."""
     try:
-        print("🔐 Logging in as admin via API (server-side prefetch) ...")
-        api_resp = requests.post(
-            f"{BASE_URL}/api/auth/login",
-            json={"username": TEST_USERNAME, "password": TEST_PASSWORD},
-            timeout=15,
-            allow_redirects=False,
-        )
-        session_cookie = api_resp.cookies.get("session")
-        if api_resp.status_code == 200 and session_cookie:
+        print("🔐 Logging in as admin via API token ...")
+        token = None
+        user = None
+        try:
+            api_resp = requests.post(
+                f"{BASE_URL}/api/auth/login",
+                json={"username": TEST_USERNAME, "password": TEST_PASSWORD},
+                timeout=15,
+                allow_redirects=False,
+            )
+            if api_resp.status_code == 200:
+                data = api_resp.json()
+                token = data.get("data", {}).get("access_token") or data.get("access_token")
+                user = data.get("data", {}).get("user") or data.get("user")
+        except Exception as api_err:
+            print(f"⚠️  API token login request failed: {api_err}")
+
+        if token:
             driver.get(f"{BASE_URL}/")
             WebDriverWait(driver, 15).until(
                 lambda d: d.execute_script('return document.readyState') == 'complete'
             )
-            driver.add_cookie({
-                "name": "session",
-                "value": session_cookie,
-                "path": "/",
-                "domain": "localhost"
-            })
+
+            try:
+                save_result = driver.execute_async_script(
+                    """
+                    const done = arguments[0];
+                    const token = arguments[1];
+                    const user = arguments[2] || null;
+                    let attempts = 0;
+                    function saveToken() {
+                      attempts++;
+                      if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
+                        Promise.resolve(window.UnifiedCacheManager.save('authToken', token, { includeUserId: false }))
+                          .then(() => user ? window.UnifiedCacheManager.save('currentUser', user, { includeUserId: false }) : null)
+                          .then(() => { window.authToken = token; window.currentUser = user; done('ok'); })
+                          .catch(err => done(err && err.message ? err.message : String(err)));
+                      } else if (attempts < 50) {
+                        setTimeout(saveToken, 100);
+                      } else {
+                        done('UnifiedCacheManager not ready');
+                      }
+                    }
+                    saveToken();
+                    """,
+                    token,
+                    user or {},
+                )
+            except Exception as e:
+                print(f"⚠️  Token save via execute_async_script failed: {e}")
+                save_result = "error"
+
+            if save_result != 'ok':
+                print(f"⚠️  Token save reported: {save_result}")
+
             driver.refresh()
             WebDriverWait(driver, 15).until(
                 lambda d: d.execute_script('return document.readyState') == 'complete'
             )
-            auth_check = driver.execute_async_script("""
+
+            auth_check = driver.execute_async_script(
+                """
                 const done = arguments[0];
                 const controller = new AbortController();
                 const timeout = setTimeout(() => {
                     controller.abort();
                     done({ status: 0, error: 'timeout' });
                 }, 10000);
-                fetch('/api/auth/me', { credentials: 'include', signal: controller.signal })
+                fetch('/api/auth/me', { method: 'GET', signal: controller.signal })
                   .then(res => res.json().then(body => { clearTimeout(timeout); done({status: res.status, body}); }))
                   .catch(err => { clearTimeout(timeout); done({status: 0, error: err && err.message ? err.message : String(err)}); });
-            """)
+                """
+            )
             if auth_check.get("status") == 200 and auth_check.get("body", {}).get("status") == "success":
-                print("✅ API login successful, session ready")
+                print("✅ API token login successful")
                 return True
             else:
-                print(f"⚠️  API login cookie set but session not verified: {auth_check}")
+                print(f"⚠️  API token set but session not verified: {auth_check}")
 
-        print("🔄 API login failed or incomplete, falling back to modal flow ...")
-        print("🔐 Logging in as admin via modal on index.html ...")
+        print("🔄 API token path failed or incomplete, falling back to modal flow ...")
         driver.get(f"{BASE_URL}/")
-        
-        # Wait for page ready
+
         WebDriverWait(driver, 15).until(
             lambda d: d.execute_script('return document.readyState') == 'complete'
         )
-        
-        # Wait for auth system to load
+
         WebDriverWait(driver, 20).until(
             lambda d: d.execute_script(
                 "return !!window.TikTrackAuth && typeof window.TikTrackAuth.showLoginModal === 'function';"
             )
         )
-        
-        # Open login modal explicitly (auth guard should show it automatically)
-        driver.execute_async_script("""
+
+        driver.execute_async_script(
+            """
             const done = arguments[0];
             const timeout = setTimeout(() => done('timeout waiting for showLoginModal'), 10000);
             if (!window.TikTrackAuth || typeof window.TikTrackAuth.showLoginModal !== 'function') {
@@ -288,48 +324,36 @@ def login(driver):
             Promise.resolve(window.TikTrackAuth.showLoginModal())
               .then(() => { clearTimeout(timeout); done('ok'); })
               .catch(err => { clearTimeout(timeout); done(err && err.message ? err.message : String(err)); });
-        """)
-        
-        # Wait for modal and form
+            """
+        )
+
         WebDriverWait(driver, 15).until(
             EC.presence_of_element_located((By.ID, "loginModalContainer"))
         )
         WebDriverWait(driver, 15).until(
             EC.presence_of_element_located((By.ID, "loginForm"))
         )
-        # Ensure modal is shown
-        try:
-            WebDriverWait(driver, 5).until(
-                lambda d: d.execute_script("""
-                    const modal = document.getElementById('loginModal');
-                    return modal && modal.classList.contains('show');
-                """)
-            )
-        except TimeoutException:
-            print("⚠️  Modal not in 'show' state; continuing anyway")
-        
+
         username_field = WebDriverWait(driver, 10).until(
             EC.element_to_be_clickable((By.ID, "username"))
         )
         password_field = driver.find_element(By.ID, "password")
-        
+
         driver.execute_script("arguments[0].scrollIntoView(true);", username_field)
         time.sleep(0.2)
-        
+
         username_field.clear()
         username_field.send_keys(TEST_USERNAME)
         password_field.clear()
         password_field.send_keys(TEST_PASSWORD)
-        
+
         login_button = WebDriverWait(driver, 10).until(
             EC.element_to_be_clickable((By.ID, "loginBtn"))
         )
         driver.execute_script("arguments[0].scrollIntoView(true);", login_button)
         time.sleep(0.2)
         driver.execute_script("arguments[0].click();", login_button)
-        
-        # Detect manual reload button (UI shows it on success) - don't click to avoid interception
-        session_ready = False
+
         try:
             reload_btn = WebDriverWait(driver, 5).until(
                 EC.element_to_be_clickable((By.ID, "loginReloadButton"))
@@ -338,212 +362,40 @@ def login(driver):
             driver.execute_script("arguments[0].scrollIntoView(true);", reload_btn)
             time.sleep(0.2)
             driver.execute_script("arguments[0].click();", reload_btn)
-            # Wait for page load after manual refresh trigger
             WebDriverWait(driver, 20).until(
                 lambda d: d.execute_script('return document.readyState') == 'complete'
             )
             time.sleep(1)
-            # Verify session after reload
-            auth_status_after_reload = driver.execute_async_script("""
-                const done = arguments[0];
-                const controller = new AbortController();
-                const timeout = setTimeout(() => {
-                    controller.abort();
-                    done({ status: 0, error: 'timeout' });
-                }, 10000);
-                fetch('/api/auth/me', { credentials: 'include', signal: controller.signal })
-                  .then(res => res.json().then(body => {
-                      clearTimeout(timeout);
-                      done({status: res.status, body});
-                  }))
-                  .catch(err => {
-                      clearTimeout(timeout);
-                      done({status: 0, error: err && err.message ? err.message : String(err)});
-                  });
-            """)
-            if auth_status_after_reload.get("status") == 200 and auth_status_after_reload.get("body", {}).get("status") == "success":
-                session_ready = True
-                print("✅ Session ready after manual reload")
         except TimeoutException:
             print("⚠️  Reload button not found; continuing without manual reload")
-        
-        # Poll /api/auth/me until session is ready (up to ~5s)
-        auth_status = None
-        for _ in range(10):
-            auth_status = driver.execute_async_script("""
-                const done = arguments[0];
-                const controller = new AbortController();
-                const timeout = setTimeout(() => {
-                    controller.abort();
-                    done({ status: 0, error: 'timeout' });
-                }, 10000);
-                fetch('/api/auth/me', { credentials: 'include', signal: controller.signal })
-                  .then(res => res.json().then(body => {
-                      clearTimeout(timeout);
-                      done({status: res.status, body});
-                  }))
-                  .catch(err => {
-                      clearTimeout(timeout);
-                      done({status: 0, error: err && err.message ? err.message : String(err)});
-                  });
-            """)
-            if auth_status.get("status") == 200 and auth_status.get("body", {}).get("status") == "success":
-                session_ready = True
-                break
-            time.sleep(0.5)
-        
-        # Fallback: call TikTrackAuth.login directly if UI flow did not set the session
-        if not session_ready:
-            fallback_result = driver.execute_async_script("""
-                const done = arguments[0];
-                const username = arguments[1];
-                const password = arguments[2];
-                const timeout = setTimeout(() => done({status: 'error', error: 'timeout'}), 15000);
-                if (!window.TikTrackAuth || typeof window.TikTrackAuth.login !== 'function') {
-                    clearTimeout(timeout);
-                    done({status: 'error', error: 'TikTrackAuth.login missing'});
-                    return;
-                }
-                window.TikTrackAuth.login(username, password)
-                  .then(res => { clearTimeout(timeout); done({status: 'success', data: res}); })
-                  .catch(err => { clearTimeout(timeout); done({status: 'error', error: err && err.message ? err.message : String(err)}); });
-            """, TEST_USERNAME, TEST_PASSWORD)
-            print(f"🛈 Fallback login result: {fallback_result}")
-            
-            # Re-check session after fallback
-            for _ in range(10):
-                auth_status = driver.execute_async_script("""
-                    const done = arguments[0];
-                    const controller = new AbortController();
-                    const timeout = setTimeout(() => {
-                        controller.abort();
-                        done({ status: 0, error: 'timeout' });
-                    }, 10000);
-                    fetch('/api/auth/me', { credentials: 'include', signal: controller.signal })
-                      .then(res => res.json().then(body => {
-                          clearTimeout(timeout);
-                          done({status: res.status, body});
-                      }))
-                      .catch(err => {
-                          clearTimeout(timeout);
-                          done({status: 0, error: err && err.message ? err.message : String(err)});
-                      });
-                """)
-                if auth_status.get("status") == 200 and auth_status.get("body", {}).get("status") == "success":
-                    session_ready = True
-                    break
-                time.sleep(0.5)
-        
-        if session_ready:
-            print("✅ Login successful via modal")
-            
-            # Log and clear any persisted auth debug errors to avoid false positives
-            try:
-                auth_errors = driver.execute_script("""
-                    return (window.debugAuth && window.debugAuth.errors)
-                        ? window.debugAuth.errors().map(e => ({
-                            message: e.message || e.error || JSON.stringify(e),
-                            context: e.context || null,
-                            timestamp: e.timestamp || null
-                        }))
-                        : [];
-                """)
-                if auth_errors:
-                    print(f"⚠️ Persisted auth debug errors detected: {auth_errors}")
-                    driver.execute_script("if (window.debugAuth && window.debugAuth.clearErrors) { window.debugAuth.clearErrors(); }")
-            except Exception:
-                pass
 
-            driver.refresh()
-            WebDriverWait(driver, 20).until(
-                lambda d: d.execute_script('return document.readyState') == 'complete'
-            )
+        auth_status = driver.execute_async_script(
+            """
+            const done = arguments[0];
+            const controller = new AbortController();
+            const timeout = setTimeout(() => {
+                controller.abort();
+                done({ status: 0, error: 'timeout' });
+            }, 10000);
+            fetch('/api/auth/me', { method: 'GET', signal: controller.signal })
+              .then(res => res.json().then(body => {
+                  clearTimeout(timeout);
+                  done({status: res.status, body});
+              }))
+              .catch(err => {
+                  clearTimeout(timeout);
+                  done({status: 0, error: err && err.message ? err.message : String(err)});
+              });
+            """
+        )
+        if auth_status.get("status") == 200 and auth_status.get("body", {}).get("status") == "success":
+            print("✅ Login successful via modal flow")
             return True
-        
-        # Capture debug errors for diagnostics
-        try:
-            debug_errors = driver.execute_script("""
-                return (window.debugAuth && window.debugAuth.errors ? window.debugAuth.errors() : [])
-                  .map(e => ({
-                    message: e.message || e.error || JSON.stringify(e),
-                    context: e.context || null,
-                    timestamp: e.timestamp || null
-                  }));
-            """)
-            if debug_errors:
-                print(f"❌ Auth debug errors: {debug_errors}")
-        except Exception:
-            pass
-
-        # Capture recent browser console messages for context
-        try:
-            logs = driver.get_log('browser')
-            tail_logs = logs[-5:] if len(logs) > 5 else logs
-            if tail_logs:
-                print("🛈 Last browser logs:")
-                for log in tail_logs:
-                    level = log.get('level')
-                    message = log.get('message')
-                    print(f"   [{level}] {message}")
-        except Exception:
-            pass
-        
-        # Capture AuthDebugMonitor logs (persistent across refresh)
-        try:
-            debug_logs = driver.execute_script("""
-                return (window.debugAuth && window.debugAuth.logs ? window.debugAuth.logs() : [])
-                  .slice(-5)
-                  .map(l => ({ level: l.level, message: l.message, timestamp: l.timestamp }));
-            """)
-            if debug_logs:
-                print(f"🛈 Auth debug logs (last 5): {debug_logs}")
-        except Exception:
-            pass
-        
-        # Capture inline login error message (if visible)
-        try:
-            error_text = driver.execute_script("""
-                const el = document.getElementById('loginError');
-                return el ? el.textContent : '';
-            """)
-            if error_text:
-                print(f"❌ Login error message: {error_text}")
-        except Exception:
-            pass
-        
-        print(f"⚠️  Login status unclear: {auth_status}")
-        return False
+        else:
+            print(f"❌ Login failed: {auth_status}")
+            return False
     except Exception as e:
-        print(f"⚠️  Login warning: {e}")
-        # Attempt recovery: wait for page load and check auth once more
-        try:
-            WebDriverWait(driver, 10).until(
-                lambda d: d.execute_script('return document.readyState') == 'complete'
-            )
-            auth_status = driver.execute_async_script("""
-                const done = arguments[0];
-                const controller = new AbortController();
-                const timeout = setTimeout(() => {
-                    controller.abort();
-                    done({ status: 0, error: 'timeout' });
-                }, 10000);
-                fetch('/api/auth/me', { credentials: 'include', signal: controller.signal })
-                  .then(res => res.json().then(body => {
-                      clearTimeout(timeout);
-                      done({status: res.status, body});
-                  }))
-                  .catch(err => {
-                      clearTimeout(timeout);
-                      done({status: 0, error: err && err.message ? err.message : String(err)});
-                  });
-            """)
-            if auth_status.get("status") == 200 and auth_status.get("body", {}).get("status") == "success":
-                print("✅ Session detected after timeout; proceeding")
-                return True
-            else:
-                print(f"❌ Session not ready after recovery attempt: {auth_status}")
-        except Exception as inner:
-            print(f"⚠️  Post-error session check failed: {inner}")
+        print(f"❌ Login process failed: {e}")
         return False
 
 def test_page_console(driver, page_info, retry_count: int = 0):

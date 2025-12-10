@@ -2,7 +2,7 @@ from datetime import date, datetime, timedelta
 from typing import Dict, List, Optional
 from uuid import uuid4
 import asyncio
-from Backend.database import get_db
+from config.database import get_db
 from Backend.models.eod_metrics_models import EODJobRuns
 from Backend.services.eod_metrics_service import EODMetricsService
 

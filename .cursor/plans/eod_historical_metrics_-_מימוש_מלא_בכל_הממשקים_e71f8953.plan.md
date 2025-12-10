@@ -72,7 +72,7 @@ todos:
       - phase2_4_system_management
   - id: phase3_1_research
     content: "שלב 3.1: מימוש Research Page עם EOD integration"
-    status: in_progress
+    status: completed
     dependencies:
       - phase2_4_system_management_test
   - id: phase3_1_research_test
@@ -82,7 +82,7 @@ todos:
       - phase3_1_research
   - id: phase3_2_alerts
     content: "שלב 3.2: מימוש Alerts Page עם EOD-based alerts"
-    status: pending
+    status: in_progress
     dependencies:
       - phase3_1_research_test
   - id: phase3_2_alerts_test

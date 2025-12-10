@@ -95,160 +95,157 @@ class PortfolioStateTester:
             ]
         )
 
+    def authenticate_via_api(self, username: str, password: str) -> bool:
+        """
+        Authenticate via API first, then set session cookies in browser
+        Returns True if authentication successful
+        """
+        try:
+            self.logger.info(f"🔐 Authenticating {username} via API")
+
+            import requests
+
+            # Create a session and login via API
+            session = requests.Session()
+            login_url = f"{BASE_URL}/api/auth/login"
+            login_data = {
+                "username": username,
+                "password": password
+            }
+
+            self.logger.info(f"📡 Making API login request to {login_url}")
+            response = session.post(login_url, json=login_data)
+
+            if response.status_code != 200:
+                self.logger.error(f"❌ API login failed with status {response.status_code}")
+                return False
+
+            login_result = response.json()
+            if not login_result.get('status') == 'success':
+                self.logger.error(f"❌ API login returned error: {login_result}")
+                return False
+
+            user_data = login_result.get('data', {}).get('user', {})
+            self.logger.info(f"✅ API login successful for {username} (ID: {user_data.get('id')})")
+
+            # Now set the session cookie in browser
+            session_cookie = response.cookies.get('session')
+            if session_cookie:
+                self.logger.info("🍪 Setting session cookie in browser")
+                # Add session cookie to browser
+                self.driver.add_cookie({
+                    'name': 'session',
+                    'value': session_cookie,
+                    'path': '/',
+                    'domain': '127.0.0.1',
+                    'secure': False,
+                    'httpOnly': False  # Allow JavaScript access
+                })
+                self.logger.info("✅ Session cookie set in browser")
+            else:
+                self.logger.warning("⚠️ No session cookie found in API response")
+
+            return True
+
+        except Exception as e:
+            self.logger.error(f"❌ API authentication failed: {e}")
+            return False
+
     def authenticate_user(self, username: str, password: str) -> bool:
         """
-        Perform authentication using TikTrack's modal system
+        Perform authentication using API first, then browser
         Returns True if authentication successful
         """
         try:
             self.logger.info(f"🔐 Starting authentication for {username}")
 
-            # Navigate to page
+            # First authenticate via API
+            if not self.authenticate_via_api(username, password):
+                return False
+
+            # Now navigate to the page - should be authenticated
+            self.logger.info("🌐 Navigating to portfolio-state page")
             self.driver.get(PAGE_URL)
-            time.sleep(2)
 
             # Wait for page to be ready
             WebDriverWait(self.driver, TEST_CONFIG['page_load_timeout']).until(
                 lambda d: d.execute_script('return document.readyState') == 'complete'
             )
 
-            # Wait for TikTrackAuth to be ready
-            WebDriverWait(self.driver, TEST_CONFIG['auth_timeout']).until(
-                lambda d: d.execute_script("""
-                    return window.TikTrackAuth &&
-                           typeof window.TikTrackAuth.showLoginModal === 'function' &&
-                           window.Logger;
-                """)
-            )
+            self.logger.info("✅ Page loaded, checking authentication status")
 
-            self.logger.info("✅ TikTrackAuth ready, triggering login modal")
+            # Wait a bit for JavaScript to initialize
+            time.sleep(3)
 
-            # Trigger login modal using TikTrackAuth
-            self.driver.execute_async_script("""
-                const done = arguments[0];
-                const timeout = setTimeout(() => done('timeout'), 15000);
-
-                try {
-                    window.TikTrackAuth.showLoginModal().then(() => {
-                        clearTimeout(timeout);
-                        done('success');
-                    }).catch(err => {
-                        clearTimeout(timeout);
-                        done('error: ' + err.message);
-                    });
-                } catch (e) {
-                    clearTimeout(timeout);
-                    done('exception: ' + e.message);
-                }
-            """)
-
-            # Wait for modal to appear
-            WebDriverWait(self.driver, 15).until(
-                EC.presence_of_element_located((By.ID, "loginModalContainer"))
-            )
-
-            self.logger.info("✅ Login modal appeared")
-
-            # Wait for form elements to be ready
-            username_field = WebDriverWait(self.driver, 10).until(
-                EC.element_to_be_clickable((By.ID, "username"))
-            )
-            password_field = self.driver.find_element(By.ID, "password")
-
-            # Fill credentials
-            username_field.clear()
-            time.sleep(0.1)
-            username_field.send_keys(username)
-
-            password_field.clear()
-            time.sleep(0.1)
-            password_field.send_keys(password)
-
-            # Submit form
-            login_button = WebDriverWait(self.driver, 10).until(
-                EC.element_to_be_clickable((By.ID, "loginBtn"))
-            )
-
-            # Scroll to button and click
-            self.driver.execute_script("arguments[0].scrollIntoView(true);", login_button)
-            time.sleep(0.2)
-            self.driver.execute_script("arguments[0].click();", login_button)
-
-            self.logger.info("✅ Login form submitted, waiting for authentication")
-
-            # Wait longer and check authentication status step by step
-            self.logger.info("Waiting for authentication to complete...")
-
-            # First check if login was submitted successfully
-            time.sleep(2)
-
-            # Check for login success/error messages
-            try:
-                success_msg = self.driver.find_element(By.ID, "loginSuccess")
-                if success_msg.is_displayed():
-                    self.logger.info("✅ Login success message displayed")
-            except:
-                pass
-
-            try:
-                error_msg = self.driver.find_element(By.ID, "loginError")
-                if error_msg.is_displayed() and error_msg.text.strip():
-                    self.logger.error(f"❌ Login error message: {error_msg.text}")
-                    return False
-            except:
-                pass
-
-            # Wait for authentication to complete
-            try:
-                WebDriverWait(self.driver, 15).until(
-                    lambda d: d.execute_script("""
-                        return window.TikTrackAuth &&
-                               window.TikTrackAuth.isAuthenticated &&
-                               window.TikTrackAuth.isAuthenticated() &&
-                               window.currentUser;
-                    """)
-                )
-            except Exception as e:
-                self.logger.warning(f"Standard auth check failed: {e}")
-
-                # Try alternative check - maybe modal is still open but login succeeded
-                try:
-                    auth_check = self.driver.execute_script("""
-                        return {
-                            tikTrackAuth: !!window.TikTrackAuth,
-                            isAuthenticated: window.TikTrackAuth ? window.TikTrackAuth.isAuthenticated() : false,
-                            currentUser: !!window.currentUser,
-                            userId: window.currentUser ? window.currentUser.id : null,
-                            modalVisible: !!document.querySelector('#loginModal.show')
-                        };
-                    """)
-                    self.logger.info(f"Auth status check: {auth_check}")
-
-                    if auth_check.get('isAuthenticated') and auth_check.get('currentUser'):
-                        self.logger.info("✅ Authentication successful via alternative check")
-                    else:
-                        self.logger.error("❌ Authentication failed - not authenticated")
-                        return False
-                except Exception as e2:
-                    self.logger.error(f"❌ Alternative auth check also failed: {e2}")
-                    return False
-
-            # Verify user data
-            user_data = self.driver.execute_script("""
+            # Check authentication status
+            auth_check = self.driver.execute_script("""
                 return {
-                    authenticated: window.TikTrackAuth.isAuthenticated(),
-                    user: window.currentUser,
-                    userId: window.currentUser?.id,
-                    username: window.currentUser?.username
+                    tikTrackAuth: !!window.TikTrackAuth,
+                    isAuthenticated: window.TikTrackAuth ? window.TikTrackAuth.isAuthenticated() : false,
+                    currentUser: !!window.currentUser,
+                    userId: window.currentUser ? window.currentUser.id : null,
+                    username: window.currentUser ? window.currentUser.username : null
                 };
             """)
 
-            if user_data.get('authenticated') and user_data.get('user'):
-                self.logger.info(f"✅ Authentication successful for {username} (ID: {user_data.get('userId')})")
+            self.logger.info(f"🔍 Auth status: {auth_check}")
+
+            if auth_check.get('isAuthenticated') and auth_check.get('currentUser'):
+                self.logger.info(f"✅ Authentication successful for {username} (ID: {auth_check.get('userId')})")
                 return True
             else:
-                self.logger.error(f"❌ Authentication failed - invalid user data: {user_data}")
-                return False
+                self.logger.warning("⚠️ Browser not authenticated, trying modal login")
+
+                # Fallback: try modal login if API auth didn't work
+                try:
+                    # Wait for TikTrackAuth to be ready
+                    WebDriverWait(self.driver, 10).until(
+                        lambda d: d.execute_script("""
+                            return window.TikTrackAuth &&
+                                   typeof window.TikTrackAuth.showLoginModal === 'function';
+                        """)
+                    )
+
+                    # Trigger login modal
+                    self.driver.execute_async_script("""
+                        const done = arguments[0];
+                        window.TikTrackAuth.showLoginModal().then(() => done('success')).catch(err => done('error'));
+                    """)
+
+                    # Wait for modal
+                    WebDriverWait(self.driver, 10).until(
+                        EC.presence_of_element_located((By.ID, "loginModalContainer"))
+                    )
+
+                    # Fill and submit
+                    username_field = WebDriverWait(self.driver, 5).until(
+                        EC.element_to_be_clickable((By.ID, "username"))
+                    )
+                    password_field = self.driver.find_element(By.ID, "password")
+                    login_button = self.driver.find_element(By.ID, "loginBtn")
+
+                    username_field.clear()
+                    username_field.send_keys(username)
+                    password_field.clear()
+                    password_field.send_keys(password)
+
+                    self.driver.execute_script("arguments[0].click();", login_button)
+
+                    # Wait for auth
+                    WebDriverWait(self.driver, 10).until(
+                        lambda d: d.execute_script("""
+                            return window.TikTrackAuth &&
+                                   window.TikTrackAuth.isAuthenticated &&
+                                   window.TikTrackAuth.isAuthenticated();
+                        """)
+                    )
+
+                    self.logger.info("✅ Authentication successful via modal fallback")
+                    return True
+
+                except Exception as e2:
+                    self.logger.error(f"❌ Modal authentication also failed: {e2}")
+                    return False
 
         except Exception as e:
             self.logger.error(f"❌ Authentication error for {username}: {e}")

@@ -34,3 +34,4 @@ codebase (Dec 2025). Summaries are in Hebrew elsewhere; technical depth is here 
 - Frontend Pages & Flows: `FRONTEND_PAGES_AND_FLOWS.md`
 - Runtime & Ops: `RUNTIME_AND_OPS.md`
 - Gaps & Roadmap: `ROADMAP_AND_GAPS.md`
+

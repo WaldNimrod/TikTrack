@@ -1024,13 +1024,30 @@ async function loadRecentTradePlans(currencySymbol, currentTrades = []) {
                 tradePlans = [];
             }
         } else {
-            // Fallback: fetch directly from API
-            const response = await fetch('/api/trade-plans/', { headers: { Accept: 'application/json' } });
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+            // Fallback: fetch directly from API with timeout to prevent hanging
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 second timeout
+
+                const response = await fetch('/api/trade-plans/', {
+                    headers: { Accept: 'application/json' },
+                    signal: controller.signal
+                });
+                clearTimeout(timeoutId);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const payload = await response.json();
+                tradePlans = Array.isArray(payload?.data) ? payload.data : (Array.isArray(payload) ? payload : []);
+            } catch (fetchError) {
+                // If fetch fails, log warning and continue with empty array
+                window.Logger?.warn?.('⚠️ [index.js] Trade plans API fetch failed, continuing with empty data', {
+                    error: fetchError.message,
+                    page: 'index'
+                });
+                tradePlans = [];
             }
-            const payload = await response.json();
-            tradePlans = Array.isArray(payload?.data) ? payload.data : (Array.isArray(payload) ? payload : []);
         }
         
         // Update unified widget if available

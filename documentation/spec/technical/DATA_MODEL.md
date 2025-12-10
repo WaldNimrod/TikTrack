@@ -56,3 +56,4 @@
 - User scoping is expected on all entity queries (filters already present in business services;
   harden for production).
 - External data tables are written by schedulers; avoid manual writes outside adapters.
+

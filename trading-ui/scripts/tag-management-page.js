@@ -300,14 +300,29 @@
 
     async function loadCategories(force = false) {
         try {
+            if (!window.TagService?.fetchCategories) {
+                window.Logger?.warn?.('⚠️ TagService.fetchCategories not available, skipping categories load', { page: 'tag-management-page' });
+                state.categories = [];
+                populateCategoryFilter();
+                renderCategoriesTable(state.categories);
+                return state.categories;
+            }
+
             const categories = await window.TagService.fetchCategories({ force });
             state.categories = Array.isArray(categories) ? categories : [];
             populateCategoryFilter();
             renderCategoriesTable(state.categories);
             return state.categories;
         } catch (error) {
-            showError('טעינת קטגוריות נכשלה', error);
-            throw error;
+            // Soft failure - don't crash the page, just log warning
+            window.Logger?.warn?.('⚠️ Failed to load tag categories, continuing with empty data', {
+                error: error?.message,
+                page: 'tag-management-page'
+            });
+            state.categories = [];
+            populateCategoryFilter();
+            renderCategoriesTable(state.categories);
+            return state.categories;
         }
     }
 

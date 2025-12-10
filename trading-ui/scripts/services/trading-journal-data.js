@@ -85,6 +85,10 @@
       }
       
       if (!response.ok) {
+        if (response.status === 400 || response.status === 401 || response.status === 403) {
+          window.Logger?.warn?.('⚠️ Journal entries API unauthorized/invalid, returning empty', { status: response.status, url }, PAGE_LOG_CONTEXT);
+          return { entries: [] };
+        }
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
@@ -98,6 +102,10 @@
       window.Logger?.debug?.('✅ Journal entries loaded from API', { ...PAGE_LOG_CONTEXT, count: payload?.entries?.length || 0 });
       return payload;
     } catch (error) {
+      if (error?.message?.includes('status: 401') || error?.message?.includes('status: 403') || error?.message?.includes('400')) {
+        window.Logger?.warn?.('⚠️ Journal entries load skipped due to auth/validation', { ...PAGE_LOG_CONTEXT, error: error?.message });
+        return { entries: [] };
+      }
       window.Logger?.error?.('❌ Error loading journal entries', { ...PAGE_LOG_CONTEXT, error: error?.message || error });
       window.NotificationSystem?.showError?.('שגיאה', 'שגיאה בטעינת רשומות יומן');
       throw error;
@@ -150,6 +158,10 @@
       }
       
       if (!response.ok) {
+        if (response.status === 400 || response.status === 401 || response.status === 403) {
+          window.Logger?.warn?.('⚠️ Journal activity stats unauthorized/invalid, returning empty', { status: response.status, url }, PAGE_LOG_CONTEXT);
+          return {};
+        }
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
@@ -163,6 +175,10 @@
       window.Logger?.debug?.('✅ Journal activity stats loaded from API', PAGE_LOG_CONTEXT);
       return payload;
     } catch (error) {
+      if (error?.message?.includes('status: 401') || error?.message?.includes('status: 403') || error?.message?.includes('400')) {
+        window.Logger?.warn?.('⚠️ Journal statistics load skipped due to auth/validation', { ...PAGE_LOG_CONTEXT, error: error?.message });
+        return {};
+      }
       window.Logger?.error?.('❌ Error loading journal statistics', { ...PAGE_LOG_CONTEXT, error: error?.message || error });
       window.NotificationSystem?.showError?.('שגיאה', 'שגיאה בטעינת סטטיסטיקות יומן');
       throw error;
@@ -220,6 +236,10 @@
       }
       
       if (!response.ok) {
+        if (response.status === 400 || response.status === 401 || response.status === 403) {
+          window.Logger?.warn?.('⚠️ Calendar data unauthorized/invalid, returning empty', { status: response.status, url }, PAGE_LOG_CONTEXT);
+          return [];
+        }
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
@@ -233,6 +253,10 @@
       window.Logger?.debug?.('✅ Calendar data loaded from API', PAGE_LOG_CONTEXT);
       return payload;
     } catch (error) {
+      if (error?.message?.includes('status: 401') || error?.message?.includes('status: 403') || error?.message?.includes('400')) {
+        window.Logger?.warn?.('⚠️ Calendar data load skipped due to auth/validation', { ...PAGE_LOG_CONTEXT, error: error?.message });
+        return [];
+      }
       window.Logger?.error?.('❌ Error loading calendar data', { ...PAGE_LOG_CONTEXT, error: error?.message || error });
       window.NotificationSystem?.showError?.('שגיאה', 'שגיאה בטעינת נתוני לוח שנה');
       throw error;
@@ -286,6 +310,10 @@
       }
       
       if (!response.ok) {
+        if (response.status === 400 || response.status === 401 || response.status === 403) {
+          window.Logger?.warn?.('⚠️ Journal entity load unauthorized/invalid, returning empty', { status: response.status, url }, PAGE_LOG_CONTEXT);
+          return {};
+        }
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
@@ -299,6 +327,10 @@
       window.Logger?.debug?.('✅ Journal entries by entity loaded from API', PAGE_LOG_CONTEXT);
       return payload;
     } catch (error) {
+      if (error?.message?.includes('status: 401') || error?.message?.includes('status: 403') || error?.message?.includes('400')) {
+        window.Logger?.warn?.('⚠️ Journal entity load skipped due to auth/validation', { ...PAGE_LOG_CONTEXT, error: error?.message });
+        return {};
+      }
       window.Logger?.error?.('❌ Error loading journal entries by entity', { ...PAGE_LOG_CONTEXT, error: error?.message || error });
       window.NotificationSystem?.showError?.('שגיאה', 'שגיאה בטעינת רשומות יומן לפי ישות');
       throw error;

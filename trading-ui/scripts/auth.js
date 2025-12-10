@@ -1364,11 +1364,11 @@ async function showLoginModal(onSuccess = null) {
     existingModal.remove();
   }
   
-  // Remove any orphaned backdrops
-  const backdrops = document.querySelectorAll('.modal-backdrop');
-  if (backdrops.length > 0) {
-    window.Logger?.info?.('🔍 [auth.js] Removing orphaned backdrops', { page: 'auth', count: backdrops.length });
-    backdrops.forEach(backdrop => backdrop.remove());
+  // Remove orphaned Bootstrap backdrops (leave the global backdrop managed by ModalManagerV2)
+  const strayBackdrops = document.querySelectorAll('.modal-backdrop:not(#globalModalBackdrop)');
+  if (strayBackdrops.length > 0) {
+    window.Logger?.info?.('🔍 [auth.js] Removing orphaned backdrops', { page: 'auth', count: strayBackdrops.length });
+    strayBackdrops.forEach(backdrop => backdrop.remove());
   }
   
   // Create modal HTML - z-index will be managed by ModalZIndexManager
@@ -1389,6 +1389,10 @@ async function showLoginModal(onSuccess = null) {
   
   // Add modal to DOM
   document.body.insertAdjacentHTML('beforeend', loginModalHTML);
+  // Ensure the global backdrop is present and standardized
+  if (window.ModalManagerV2?.ensureGlobalBackdrop) {
+    window.ModalManagerV2.ensureGlobalBackdrop();
+  }
   window.Logger?.info?.('✅ [auth.js] Modal HTML added to DOM', { page: 'auth' });
   
   // Create login interface inside modal
@@ -1510,6 +1514,9 @@ async function showLoginModal(onSuccess = null) {
         });
         modal.show();
         window.Logger?.info?.('✅ [auth.js] Modal.show() called successfully', { page: 'auth' });
+        if (window.ModalZIndexManager?.registerModal) {
+          window.ModalZIndexManager.registerModal(modalElement);
+        }
         
         // Register modal in ModalNavigationService stack before forcing z-index update
         if (window.ModalNavigationService?.registerModalOpen) {
@@ -1547,31 +1554,7 @@ async function showLoginModal(onSuccess = null) {
           window.Logger?.warn?.('⚠️ [auth.js] ModalZIndexManager not available, using fallback', { page: 'auth' });
         }
         
-        // Bootstrap creates backdrop asynchronously, so we ensure it exists after a short delay
-        setTimeout(() => {
-          const hasBackdrop = document.querySelector('.modal-backdrop') !== null;
-          const hasShowClass = modalElement.classList.contains('show');
-          const bodyHasModalOpen = document.body.classList.contains('modal-open');
-          
-          if (!hasBackdrop && hasShowClass) {
-            window.Logger?.warn?.('⚠️ [auth.js] Backdrop missing, creating manually', { page: 'auth' });
-            const backdrop = document.createElement('div');
-            backdrop.className = 'modal-backdrop fade show';
-            // Backdrop z-index will be managed by ModalZIndexManager if available
-            if (window.ModalZIndexManager) {
-              backdrop.style.zIndex = window.ModalZIndexManager.BACKDROP_Z_INDEX || '1039';
-            } else {
-              backdrop.style.zIndex = '1040';
-            }
-            document.body.appendChild(backdrop);
-            if (!bodyHasModalOpen) {
-              document.body.classList.add('modal-open');
-            }
-            window.Logger?.info?.('✅ [auth.js] Backdrop created manually', { page: 'auth' });
-          } else if (hasBackdrop) {
-            window.Logger?.info?.('✅ [auth.js] Backdrop exists (created by Bootstrap)', { page: 'auth' });
-          }
-        }, 500); // Wait 500ms for Bootstrap to create backdrop, then check and create if needed
+        // No manual backdrop creation here; ModalManagerV2/ModalZIndexManager manage the single global backdrop
       } catch (error) {
         window.Logger?.error?.('❌ [auth.js] Error showing modal', { 
           page: 'auth',
@@ -1592,12 +1575,15 @@ async function showLoginModal(onSuccess = null) {
             attempts: attempts
           });
           try {
-            const modal = new window.bootstrap.Modal(modalElement, {
+          const modal = new window.bootstrap.Modal(modalElement, {
               backdrop: 'static',
               keyboard: false
             });
             modal.show();
             window.Logger?.info?.('✅ [auth.js] Modal.show() called successfully (after wait)', { page: 'auth' });
+          if (window.ModalZIndexManager?.registerModal) {
+            window.ModalZIndexManager.registerModal(modalElement);
+          }
             
             // Update z-index using ModalZIndexManager (central z-index management system)
             if (window.ModalZIndexManager) {
@@ -1622,31 +1608,7 @@ async function showLoginModal(onSuccess = null) {
               window.Logger?.warn?.('⚠️ [auth.js] ModalZIndexManager not available, using fallback (after wait)', { page: 'auth' });
             }
             
-            // Bootstrap creates backdrop asynchronously, so we ensure it exists after a short delay
-            setTimeout(() => {
-              const hasBackdrop = document.querySelector('.modal-backdrop') !== null;
-              const hasShowClass = modalElement.classList.contains('show');
-              const bodyHasModalOpen = document.body.classList.contains('modal-open');
-              
-              if (!hasBackdrop && hasShowClass) {
-                window.Logger?.warn?.('⚠️ [auth.js] Backdrop missing (after wait), creating manually', { page: 'auth' });
-                const backdrop = document.createElement('div');
-                backdrop.className = 'modal-backdrop fade show';
-                // Backdrop z-index will be managed by ModalZIndexManager if available
-                if (window.ModalZIndexManager) {
-                  backdrop.style.zIndex = window.ModalZIndexManager.BACKDROP_Z_INDEX || '1039';
-                } else {
-                  backdrop.style.zIndex = '1040';
-                }
-                document.body.appendChild(backdrop);
-                if (!bodyHasModalOpen) {
-                  document.body.classList.add('modal-open');
-                }
-                window.Logger?.info?.('✅ [auth.js] Backdrop created manually (after wait)', { page: 'auth' });
-              } else if (hasBackdrop) {
-                window.Logger?.info?.('✅ [auth.js] Backdrop exists (created by Bootstrap, after wait)', { page: 'auth' });
-              }
-            }, 500); // Wait 500ms for Bootstrap to create backdrop, then check and create if needed
+            // No manual backdrop creation here; ModalManagerV2/ModalZIndexManager manage the single global backdrop
           } catch (error) {
             window.Logger?.error?.('❌ [auth.js] Error showing modal (after wait)', { 
               page: 'auth',

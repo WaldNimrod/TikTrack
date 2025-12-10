@@ -159,3 +159,4 @@ SELECT MIN(date), MAX(date) FROM market_data_quotes WHERE ticker_id = (SELECT id
 ---
 
 *מסמך זה מתאר את הוספת נתונים היסטוריים ל-SPY כחלק מתהליך יצירת נתוני הבסיס. הנתונים נטענים אוטומטית בכל יצירת בסיס נתונים חדש.*
+

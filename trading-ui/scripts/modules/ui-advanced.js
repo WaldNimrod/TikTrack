@@ -137,17 +137,17 @@ if (UI_ADVANCED_SKIP_PAGE) {
   }
   window.__UI_ADVANCED_INITIALIZED__ = true;
 
-  // Skip heavy init on dynamic-colors-display page to avoid recursion issues
+  // Skip heavy init on dynamic-colors-display and trading-journal pages to avoid recursion issues
   // CRITICAL: Check pathname safely to prevent RangeError
   try {
     if (typeof window !== 'undefined' && window.location && window.location.pathname) {
       const path = window.location.pathname;
-      if (path && path.includes('dynamic-colors-display')) {
+      if (path && (path.includes('dynamic-colors-display') || path.includes('trading-journal'))) {
         // Silent skip - no logging to prevent recursion
         return;
       }
     }
-  } catch (_) { 
+  } catch (_) {
     // Silent catch - if we can't check pathname, continue with init
   }
 

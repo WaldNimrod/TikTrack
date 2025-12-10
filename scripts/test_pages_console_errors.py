@@ -194,7 +194,7 @@ rate_tracker = RateLimitTracker(
 def setup_driver():
     """Setup Chrome WebDriver with automatic ChromeDriver management"""
     chrome_options = Options()
-    chrome_options.add_argument('--headless')
+    # chrome_options.add_argument('--headless')  # Removed headless for debugging
     chrome_options.add_argument('--no-sandbox')
     chrome_options.add_argument('--disable-dev-shm-usage')
     chrome_options.add_argument('--disable-gpu')
@@ -247,6 +247,8 @@ def login(driver):
                 """
                 sessionStorage.setItem('dev_authToken', arguments[0]);
                 sessionStorage.setItem('dev_currentUser', JSON.stringify(arguments[1] || {}));
+                localStorage.setItem('authToken', arguments[0]);
+                localStorage.setItem('currentUser', JSON.stringify(arguments[1] || {}));
                 window.authToken = arguments[0];
                 window.currentUser = arguments[1] || null;
                 """,

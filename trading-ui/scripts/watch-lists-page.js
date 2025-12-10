@@ -432,13 +432,9 @@
                     firstItemTickerKeys: activeListItems?.[0]?.ticker ? Object.keys(activeListItems[0].ticker).slice(0, 20) : []
                 });
             } else {
-                window.Logger?.warn?.('⚠️ [MONITOR] Skipping enrichment', {
-                    ...PAGE_LOG_CONTEXT,
-                    itemsCount: activeListItems.length,
-                    entityDetailsAPIAvailable: !!window.entityDetailsAPI,
-                    getEntityDetailsAvailable: !!window.entityDetailsAPI?.getEntityDetails
-                });
-                }
+                // Skip enrichment silently if entityDetailsAPI not available - reduce console noise
+                // This is normal during initialization or when API is not loaded yet
+            }
             }
             
             // Ensure we have data before rendering
@@ -516,10 +512,8 @@
                     uniqueTickers: Object.keys(positionsMap).length
                 });
             } else {
-                window.Logger?.warn?.('⚠️ [MONITOR] Positions API failed', {
-                    ...PAGE_LOG_CONTEXT,
-                    status: portfolioResponse?.status
-                });
+                // Positions API failed - continue without position data
+                // Removed warning log to reduce console noise
             }
         } catch (positionError) {
             // Position data is optional - log but don't fail

@@ -7,16 +7,18 @@
  */
 
 
-// ===== FUNCTION INDEX =====
+/*
+ * ===== FUNCTION INDEX =====
+ */
 
-// === Initialization ===
+/* === Initialization === */
 // - initializeHeader() - Initializeheader
 // - createAddEntryDropdown() - Createaddentrydropdown
 // - initializePage() - Initializepage
 // - initializeMonthYearSelectors() - Initializemonthyearselectors
 // - setupActivityChartLazyLoading() - Setupactivitychartlazyloading
 
-// === Event Handlers ===
+/* === Event Handlers === */
 // - replaceIconsWithIconSystem() - Replaceiconswithiconsystem
 // - renderMenuIcons() - Rendermenuicons
 // - handleAddEntry() - Handleaddentry
@@ -32,7 +34,7 @@
 // - handleActivityChartToggle() - Handleactivitycharttoggle
 // - convertDateToChartTime() - Convertdatetocharttime
 
-// === UI Functions ===
+/* === UI Functions === */
 // - loadAndRenderCalendar() - Loadandrendercalendar
 // - renderJournalEntriesTable() - Renderjournalentriestable
 // - renderJournalEntriesCards() - Renderjournalentriescards
@@ -44,13 +46,13 @@
 // - showDropdown() - Showdropdown
 // - hideDropdown() - Hidedropdown
 
-// === Data Functions ===
+/* === Data Functions === */
 // - getCSSVariableValue() - Getcssvariablevalue
 // - loadPageState() - Loadpagestate
 // - savePageState() - Savepagestate
 // - loadTickerFilter() - Loadtickerfilter
 
-// === Other ===
+/* === Other === */
 // - applyDynamicColors() - Applydynamiccolors
 // - navigateToToday() - Navigatetotoday
 // - filterJournalByEntityType() - Filterjournalbyentitytype
@@ -72,7 +74,7 @@
   /**
    * Helpers for date normalization using global date utilities
    */
-  const getEntryDateEnvelope = (entry) => {
+  const getEntryDateEnvelope = entry => {
     if (!entry) {return null;}
     const candidates = [
       entry.date,
@@ -87,9 +89,9 @@
       return window.dateUtils.ensureDateEnvelope(raw);
     }
     return raw || null;
-  }
+  };
 
-  const entryToDate = (entry) => {
+  const entryToDate = entry => {
     const envelope = getEntryDateEnvelope(entry);
     if (!envelope) {return null;}
 
@@ -105,12 +107,12 @@
 
     const d = new Date(envelope);
     return isNaN(d.getTime()) ? null : d;
-  }
+  };
 
   /**
      * Initialize Header System
      */
-  async function initializeHeader() {
+  const initializeHeader = async function() {
     // Wait for HeaderSystem to be available
     if (typeof window.HeaderSystem !== 'undefined' && typeof window.HeaderSystem.initialize === 'function') {
       try {
@@ -145,28 +147,11 @@
         }
       }, 500);
     }
-  }
-
-  /**
-     * Helper function to get CSS variable value
-     * @param {string} variableName - CSS variable name
-     * @param {string} fallback - Fallback value
-     * @returns {string} CSS variable value or fallback
-     */
-  const getCSSVariableValue = (variableName, fallback) => {
-    try {
-      const value = getComputedStyle(document.documentElement).getPropertyValue(variableName);
-      return value && value.trim() ? value.trim() : fallback;
-    } catch (error) {
-      return fallback;
-    }
-  }
-
   /**
      * Replace all <img> tags with IconSystem.renderIcon()
      * @returns {Promise<void>}
      */
-  async function replaceIconsWithIconSystem() {
+  const replaceIconsWithIconSystem = async function() {
     if (!window.IconSystem || !window.IconSystem.initialized) {
       // Wait for IconSystem to be ready
       if (window.IconSystem && typeof window.IconSystem.initialize === 'function') {
@@ -257,393 +242,100 @@
    * Handle add entry action
    * @param {string} entityType - Entity type to add
    */
-  const handleAddEntry = (entityType) => {
+  const handleAddEntry = async entityType => {
     if (window.Logger) {
       window.Logger.info('Add entry clicked', { entityType, page: 'trading-journal-page' });
     }
 
-    // TODO: Implement actual add entry functionality
-    // For now, just show a notification
-    if (typeof window.showNotification === 'function') {
-      const entityLabels = {
-        'note': 'הערות',
-        'alert': 'התראות',
-        'execution': 'ביצועים',
-        'cash_flow': 'תזרימי מזומנים',
-        'trade_plan': 'תוכנית',
-        'trade': 'טרייד',
-      };
+    // Modal mapping for each entity type
+    const modalMapping = {
+      'note': 'notesModal',
+      'alert': 'alertsModal',
+      'execution': 'executionsModal',
+      'cash_flow': 'cash-flowsModal',
+      'trade_plan': 'trade-plansModal',
+      'trade': 'tradesModal',
+    };
 
-      window.showNotification(
-        `פתיחת טופס הוספת ${entityLabels[entityType] || entityType}`,
-        'info',
-        'יומן מסחר',
-        3000,
-        'ui',
-      );
-    }
-  };
-
-  /**
-   * Create dropdown menu for "Add Entry" button
-   */
-  const createAddEntryDropdown = () => {
-    // Try multiple selectors to find the button
-    const addButton = document.getElementById('add-entry-btn') ||
-                         document.getElementById('add-entry-button') ||
-                         document.querySelector('button[data-button-type="ADD"][id*="add-entry"]') ||
-                         document.querySelector('button[data-button-type="ADD"][data-text="הוסף רשומה"]') ||
-                         document.querySelector('button[data-button-type="ADD"]');
-
-    if (!addButton) {
+    const modalId = modalMapping[entityType];
+    if (!modalId) {
       if (window.Logger) {
-        window.Logger.warn('Add entry button not found', { page: 'trading-journal-page' });
+        window.Logger.warn('Unknown entity type for modal', { entityType, page: 'trading-journal-page' });
       }
       return;
     }
 
-    // Entity types for journal entries (ordered as requested)
-    const entityTypes = [
-      { type: 'note', label: 'הערות', icon: 'note' },
-      { type: 'alert', label: 'התראות', icon: 'bell' },
-      { type: 'execution', label: 'ביצועים', icon: 'activity' },
-      { type: 'cash_flow', label: 'תזרימי מזומן', icon: 'cash' },
-      { type: 'trade_plan', label: 'תוכנית', icon: 'file-text' },
-      { type: 'trade', label: 'טרייד', icon: 'trending-up' },
-    ];
-
-    // Create wrapper for dropdown
-    const wrapper = document.createElement('div');
-    wrapper.className = 'add-entry-dropdown-wrapper';
-    wrapper.style.position = 'relative';
-    wrapper.style.display = 'inline-block';
-
-    // Create dropdown menu
-    const dropdown = document.createElement('div');
-    dropdown.className = 'add-entry-dropdown-menu';
-    dropdown.style.cssText = `
-            position: absolute;
-            top: 100%;
-            right: 0;
-            margin-top: 4px;
-            background: white;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            z-index: 1000;
-            min-width: 200px;
-            padding: 8px;
-            display: none;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.2s ease, visibility 0.2s ease;
-        `;
-
-    // Create menu items
-    entityTypes.forEach(({ type, label, icon }) => {
-      const menuItem = document.createElement('button');
-      menuItem.className = 'add-entry-menu-item';
-      menuItem.setAttribute('data-entity-type', type);
-      menuItem.style.cssText = `
-                display: flex;
-                align-items: center;
-                gap: 8px;
-                width: 100%;
-                padding: 8px 12px;
-                border: none;
-                background: none;
-                text-align: right;
-                cursor: pointer;
-                font-size: 14px;
-                border-radius: 4px;
-                transition: background-color 0.2s;
-            `;
-
-      // Add entity color dynamically
-      menuItem.style.setProperty('--entity-type', type);
-
-      // Create icon placeholder (will be replaced by IconSystem)
-      const iconSpan = document.createElement('span');
-      iconSpan.className = 'menu-item-icon';
-      iconSpan.setAttribute('data-icon-type', 'entity');
-      iconSpan.setAttribute('data-icon-name', type);
-      iconSpan.style.width = '16px';
-      iconSpan.style.height = '16px';
-      iconSpan.style.display = 'inline-block';
-
-      const labelSpan = document.createElement('span');
-      labelSpan.textContent = label;
-
-      menuItem.appendChild(iconSpan);
-      menuItem.appendChild(labelSpan);
-
-      // Add click handler
-      menuItem.addEventListener('click', e => {
-        e.stopPropagation();
-        handleAddEntry(type);
-        hideDropdown();
-      });
-
-      // Add hover effect
-      menuItem.addEventListener('mouseenter', () => {
-        const entityColor = getCSSVariableValue(`--entity-${type.replace('_', '-')}-color`, '#007bff');
-        const entityBg = getCSSVariableValue(`--entity-${type.replace('_', '-')}-bg`, 'rgba(0, 123, 255, 0.1)');
-        menuItem.style.backgroundColor = entityBg;
-        menuItem.style.color = entityColor;
-      });
-
-      menuItem.addEventListener('mouseleave', () => {
-        menuItem.style.backgroundColor = '';
-        menuItem.style.color = '';
-      });
-
-      dropdown.appendChild(menuItem);
-    });
-
-    // Insert wrapper before button
-    addButton.parentNode.insertBefore(wrapper, addButton);
-    wrapper.appendChild(addButton);
-    wrapper.appendChild(dropdown);
-
-    // Setup hover behavior
-    let hoverTimeout = null;
-    let hideTimeout = null;
-
-    const hideDropdown = () => {
-      if (hoverTimeout) {
-        clearTimeout(hoverTimeout);
-        hoverTimeout = null;
+    // Check if ModalManagerV2 is available
+    if (!window.ModalManagerV2 || typeof window.ModalManagerV2.showModal !== 'function') {
+      if (window.Logger) {
+        window.Logger.warn('ModalManagerV2 not available', { page: 'trading-journal-page' });
       }
-      if (hideTimeout) {
-        clearTimeout(hideTimeout);
+      // Fallback to notification
+      if (typeof window.showNotification === 'function') {
+        const entityLabels = {
+          'note': 'הערות',
+          'alert': 'התראות',
+          'execution': 'ביצועים',
+          'cash_flow': 'תזרימי מזומנים',
+          'trade_plan': 'תוכנית',
+          'trade': 'טרייד',
+        };
+        window.showNotification(
+          `פתיחת טופס הוספת ${entityLabels[entityType] || entityType}`,
+          'info',
+          'יומן מסחר',
+          3000,
+          'ui',
+        );
       }
-      hideTimeout = setTimeout(() => {
-        dropdown.style.opacity = '0';
-        dropdown.style.visibility = 'hidden';
-        setTimeout(() => {
-          dropdown.style.display = 'none';
-        }, 200);
-      }, 150);
-    };
-
-    const showDropdown = () => {
-      if (hideTimeout) {
-        clearTimeout(hideTimeout);
-        hideTimeout = null;
-      }
-      if (hoverTimeout) {
-        clearTimeout(hoverTimeout);
-      }
-      hoverTimeout = setTimeout(() => {
-        dropdown.style.display = 'block';
-        setTimeout(() => {
-          dropdown.style.opacity = '1';
-          dropdown.style.visibility = 'visible';
-        }, 10);
-      }, 150);
-    };
-      if (hoverTimeout) {
-        clearTimeout(hoverTimeout);
-        hoverTimeout = null;
-      }
-      if (hideTimeout) {
-        clearTimeout(hideTimeout);
-      }
-      hideTimeout = setTimeout(() => {
-        dropdown.style.opacity = '0';
-        dropdown.style.visibility = 'hidden';
-        setTimeout(() => {
-          dropdown.style.display = 'none';
-        }, 200);
-      }, 200);
-    };
-
-    wrapper.addEventListener('mouseenter', showDropdown);
-    wrapper.addEventListener('mouseleave', hideDropdown);
-    dropdown.addEventListener('mouseenter', () => {
-      if (hideTimeout) {
-        clearTimeout(hideTimeout);
-        hideTimeout = null;
-      }
-    });
-    dropdown.addEventListener('mouseleave', hideDropdown);
-
-    // Render icons in menu items
-    setTimeout(() => renderMenuIcons(), 500);
-  }
-
-  /**
-     * Load page state from PageStateManager
-     */
-  const loadPageState = async () => {
-    if (window.PageStateManager && typeof window.PageStateManager.loadPageState === 'function') {
-      try {
-        const state = await window.PageStateManager.loadPageState(PAGE_NAME);
-        if (state && state.entityFilters) {
-          // Restore month/year if saved
-          if (state.entityFilters.calendarMonth !== undefined) {
-            currentMonth = state.entityFilters.calendarMonth;
-          }
-          if (state.entityFilters.calendarYear !== undefined) {
-            currentYear = state.entityFilters.calendarYear;
-          }
-          // Restore entity filter if saved
-          if (state.entityFilters.entityFilter) {
-            window.currentEntityFilter = state.entityFilters.entityFilter;
-          }
-        }
-      } catch (error) {
-        if (window.Logger) {
-          window.Logger.warn('Failed to load page state', {
-            page: PAGE_NAME,
-            error: error?.message,
-          });
-        }
-      }
+      return;
     }
-  }
 
-  /**
-     * Save page state to PageStateManager
-     */
-  const savePageState = async () => {
-    if (window.PageStateManager && typeof window.PageStateManager.savePageState === 'function') {
-      try {
-        await window.PageStateManager.savePageState(PAGE_NAME, {
-          entityFilters: {
-            calendarMonth: currentMonth,
-            calendarYear: currentYear,
-            entityFilter: window.currentEntityFilter || 'all',
-          },
+    try {
+      // Open the appropriate modal for adding new entity
+      await window.ModalManagerV2.showModal(modalId, 'add', {
+        sourcePage: 'trading-journal',
+        sourceInfo: {
+          page: 'trading-journal',
+          date: new Date().toISOString().split('T')[0], // Current date
+          entityType,
+        },
+      });
+
+      if (window.Logger) {
+        window.Logger.info('Modal opened successfully', { modalId, entityType, page: 'trading-journal-page' });
+      }
+    } catch (error) {
+      if (window.Logger) {
+        window.Logger.error('Failed to open modal', {
+          modalId,
+          entityType,
+          error: error.message,
+          page: 'trading-journal-page',
         });
-      } catch (error) {
-        if (window.Logger) {
-          window.Logger.warn('Failed to save page state', {
-            page: PAGE_NAME,
-            error: error?.message,
-          });
-        }
+      }
+
+      // Fallback to notification
+      if (typeof window.showNotification === 'function') {
+        window.showNotification(
+          `שגיאה בפתיחת טופס הוספת ${entityType}: ${error.message}`,
+          'error',
+          'יומן מסחר',
+          5000,
+          'ui',
+        );
       }
     }
-  }
+  };
 
   /**
-     * Initialize page
-     */
-  const initializePage = async () => {
-    // Initialize Header System first
-    initializeHeader();
 
-    // Wait for Preferences to be loaded
-    if (window.PreferencesCore && typeof window.PreferencesCore.initializeWithLazyLoading === 'function') {
-      window.PreferencesCore.initializeWithLazyLoading().catch(error => {
-        if (window.Logger) {
-          window.Logger.warn('Preferences initialization failed (non-critical)', {
-            page: PAGE_NAME,
-            error,
-          });
-        }
-      });
-    }
-
-    // Load saved page state
-    await loadPageState();
-    if (!window.currentEntityFilter) {
-      window.currentEntityFilter = 'all';
-    }
-    updateMonthDisplay();
-    initializeMonthYearSelectors();
-
-    // Wait for IconSystem and DOM to be ready
-    const initAfterLoad = async () => {
-      // Wait for Button System to process buttons
-      let retries = 0;
-      const maxRetries = 10;
-
-      const waitForElements = () => {
-        const addButton = document.getElementById('add-entry-btn') ||
-                                 document.getElementById('add-entry-button') ||
-                                 document.querySelector('button[data-button-type="ADD"]');
-        const prevButton = document.getElementById('prev-month-btn') ||
-                                  document.querySelector('button[data-action="prev-month"]');
-        const nextButton = document.getElementById('next-month-btn') ||
-                                  document.querySelector('button[data-action="next-month"]');
-
-        return !!(addButton && prevButton && nextButton);
-      };
-
-      // Wait for elements to be available
-      while (!waitForElements() && retries < maxRetries) {
-        await new Promise(resolve => setTimeout(resolve, 200));
-        retries++;
-      }
-
-      // Replace icons
-      await replaceIconsWithIconSystem();
-
-      // Create dropdown menu
-      createAddEntryDropdown();
-
-      // Update initial month display
-      const monthDisplay = document.getElementById('current-month-display');
-      if (monthDisplay) {
-        monthDisplay.textContent = window.CalendarDateUtils.formatMonthDisplay(currentYear, currentMonth);
-      }
-
-      // Show loading state
-      const calendarContainer = document.getElementById('calendar-container') || document.querySelector('.calendar-container');
-      if (calendarContainer && typeof window.showLoadingState === 'function') {
-        window.showLoadingState(calendarContainer.id || 'calendar-container');
-      }
-
-      // Load and render initial calendar with data
-      await loadAndRenderCalendar();
-
-      // Hide loading state
-      if (calendarContainer && typeof window.hideLoadingState === 'function') {
-        window.hideLoadingState(calendarContainer.id || 'calendar-container');
-      }
-
-      // Load and render journal entries (default: cards view)
-      window.tradingJournalViewMode = 'cards';
-      await loadAndRenderJournalEntries();
-
-      // Load ticker filter dropdown
-      await loadTickerFilter();
-
-      // Generate entity type filter buttons
-      await generateEntityTypeFilterButtons();
-
-      // Setup lazy loading for activity chart (only load when section is opened)
-      setupActivityChartLazyLoading();
-
-      // Apply dynamic colors
-      applyDynamicColors();
-    };
-
-    // Wait a bit for all systems to load
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', () => {
-        setTimeout(initAfterLoad, 500);
-      });
-    } else {
-      setTimeout(initAfterLoad, 500);
-    }
-  }
-
-  // Initialize when DOM is ready
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initializePage);
-  } else {
-    // DOM already loaded
-    initializePage();
-  }
 
   /**
      * Load and render calendar with data
      * Uses CalendarDataLoader and CalendarRenderer
      */
-  async function loadAndRenderCalendar() {
+  const loadAndRenderCalendar = async function() {
     // Show loading state
     const calendarContainer = document.getElementById('calendar') ||
                                  document.querySelector('.calendar-grid') ||
@@ -728,7 +420,7 @@
       // If we have EOD data, enhance the calendar with portfolio snapshots
       if (eodPortfolioData && eodPortfolioData.length > 0) {
         try {
-          await enhanceCalendarWithEODData(eodPortfolioData, currentYear, currentMonth);
+          enhanceCalendarWithEODData(eodPortfolioData, currentYear, currentMonth);
         } catch (enhanceError) {
           if (window.Logger) {
             window.Logger.warn('⚠️ Failed to enhance calendar with EOD data', {
@@ -768,7 +460,7 @@
      * @param {number} year - Current year
      * @param {number} month - Current month (0-based)
      */
-  async function enhanceCalendarWithEODData(eodPortfolioData, year, month) {
+  const enhanceCalendarWithEODData = function(eodPortfolioData, _year, _month) {
     if (!eodPortfolioData || !Array.isArray(eodPortfolioData)) {
       return;
     }
@@ -819,7 +511,9 @@
           // Add EOD indicator to the day element
           const eodIndicator = document.createElement('div');
           eodIndicator.className = 'eod-portfolio-indicator';
-          eodIndicator.title = `NAV: $${(eodRecord.nav_total || 0).toLocaleString()}\nP&L: $${(eodRecord.unrealized_pl_amount || 0).toLocaleString()}`;
+          const nav = (eodRecord.nav_total || 0).toLocaleString();
+          const pl = (eodRecord.unrealized_pl_amount || 0).toLocaleString();
+          eodIndicator.title = `NAV: $${nav}\nP&L: $${pl}`;
           eodIndicator.innerHTML = `
                         <small class="text-muted">
                             <i class="fas fa-chart-line"></i>
@@ -874,7 +568,7 @@
     if (yearSelect) {
       yearSelect.value = String(currentYear);
     }
-  }
+  };
 
   /**
      * Initialize month/year selectors for quick navigation
@@ -922,12 +616,12 @@
       const newYear = parseInt(e.target.value, 10);
       await setMonthYear(newYear, currentMonth);
     };
-  }
+  };
 
   /**
      * Set month and year, then reload calendar and entries
      */
-  const setMonthYear = async (year, month) => {
+  const setMonthYear = async function(year, month) {
     currentYear = year;
     currentMonth = month;
     updateMonthDisplay();
@@ -940,7 +634,7 @@
      * Navigate to previous or next month
      * @param {string} direction - 'prev' or 'next'
      */
-  const navigateMonth = async (direction) => {
+  const navigateMonth = async direction => {
     const result = window.CalendarDateUtils.navigateMonth(currentYear, currentMonth, direction);
     await setMonthYear(result.year, result.month);
 
@@ -951,12 +645,12 @@
         page: PAGE_NAME,
       });
     }
-  }
+  };
 
   /**
-     * Navigate to current month (today)
-     */
-  const navigateToToday = async () => {
+   * Navigate to current month (today)
+   */
+  const navigateToToday = async function() {
     const today = new Date();
     currentYear = today.getFullYear();
     currentMonth = today.getMonth();
@@ -986,10 +680,10 @@
   }
 
   /**
-     * Filter journal entries by entity type
-     * @param {string} entityType - Entity type to filter by ('all', 'execution', 'cash_flow', 'trade', 'trade_plan', 'note', 'alert')
-     */
-  async function filterJournalByEntityType(entityType) {
+   * Filter journal entries by entity type
+   * @param {string} entityType - Entity types: 'all', 'execution', etc.
+   */
+  const filterJournalByEntityType = async entityType => {
     const normalizedType = entityType || 'all';
     window.currentEntityFilter = normalizedType;
 
@@ -1018,13 +712,13 @@
         page: PAGE_NAME,
       });
     }
-  }
+  };
 
   /**
      * Filter journal entries by ticker
      * @param {string} tickerSymbol - Ticker symbol to filter by (empty string for all)
      */
-  async function filterJournalByTicker(tickerSymbol) {
+  const filterJournalByTicker = async tickerSymbol => {
     const normalizedTicker = tickerSymbol || '';
     window.currentTickerFilter = normalizedTicker || null;
 
@@ -1043,12 +737,12 @@
         page: PAGE_NAME,
       });
     }
-  }
+  };
 
   /**
      * Load and populate ticker filter dropdown
      */
-  async function loadTickerFilter() {
+  const loadTickerFilter = async function() {
     try {
       const tickerSelect = document.getElementById('tickerFilterSelect');
       if (!tickerSelect) {
@@ -1147,9 +841,180 @@
   }
 
   /**
-     * Render journal entries as table
-     */
-  async function renderJournalEntriesTable(entries) {
+   * Update journal entries table body
+   */
+  const updateJournalEntriesTableBody = async entries => {
+    // Wait a bit for DOM to be ready
+    let table = document.getElementById('journal-entries-table');
+    let retries = 0;
+    while (!table && retries < 10) {
+      await new Promise(resolve => setTimeout(resolve, 100));
+      table = document.getElementById('journal-entries-table');
+      retries++;
+    }
+
+    if (!table) {
+      // Try to find the container and create table if needed
+      const container = document.getElementById('journalEntriesList');
+      if (container) {
+        // Create table structure
+        // Table should already exist in HTML, just find it
+        const existingTable = document.getElementById('journal-entries-table');
+        if (!existingTable) {
+          container.innerHTML = `
+                        <table id="journal-entries-table" class="table table-striped table-hover" data-table-type="trading-journal-entries">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="תאריך" data-classes="btn-link sortable-header px-0" data-onclick="window.sortTable('trading-journal-entries', 0)"></button>
+                                    </th>
+                                    <th>
+                                        <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="סוג" data-classes="btn-link sortable-header px-0" data-onclick="window.sortTable('trading-journal-entries', 1)"></button>
+                                    </th>
+                                    <th>
+                                        <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="סטטוס" data-classes="btn-link sortable-header px-0" data-onclick="window.sortTable('trading-journal-entries', 2)"></button>
+                                    </th>
+                                    <th>
+                                        <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="טיקר" data-classes="btn-link sortable-header px-0" data-onclick="window.sortTable('trading-journal-entries', 3)"></button>
+                                    </th>
+                                    <th>
+                                        <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="חשבון" data-classes="btn-link sortable-header px-0" data-onclick="window.sortTable('trading-journal-entries', 4)"></button>
+                                    </th>
+                                    <th>
+                                        <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="תיאור" data-classes="btn-link sortable-header px-0" data-onclick="window.sortTable('trading-journal-entries', 5)"></button>
+                                    </th>
+                                    <th>פעולות</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    `;
+        }
+        table = document.getElementById('journal-entries-table');
+      }
+    }
+
+    if (!table) {
+      if (window.Logger) {
+        window.Logger.warn('Table not found for updateJournalEntriesTableBody', { page: PAGE_NAME });
+      }
+      return;
+    }
+
+    const tbody = table.querySelector('tbody');
+    if (!tbody) {
+      if (window.Logger) {
+        window.Logger.warn('Table tbody not found for updateJournalEntriesTableBody', { page: PAGE_NAME });
+      }
+      return;
+    }
+
+    // Clear existing rows
+    tbody.innerHTML = '';
+
+    if (!entries || entries.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">אין רשומות להצגה</td></tr>';
+      return;
+    }
+
+    const FieldRenderer = window.FieldRendererService;
+
+    const rowsHTML = entries.map(entry => {
+      const date = entry.date || entry.created_at || '';
+      const entityType = entry.entity_type || 'unknown';
+      const status = entry.status || '';
+      const tickerSymbol = entry.ticker_symbol || '';
+      const accountName = entry.account_name || '';
+      const description = entry.description || '';
+
+      // Render date
+      const dateHTML = FieldRenderer ? FieldRenderer.renderDate(date) : date;
+
+      // Render status
+      const statusHTML = FieldRenderer ? FieldRenderer.renderStatus(status, entityType) : status;
+
+      // Render entity type
+      const entityTypeHTML = FieldRenderer ? FieldRenderer.renderEntityType(entityType) : entityType;
+
+      // Render ticker
+      const tickerHTML = tickerSymbol ? `<a href="#" onclick="window.openTickerPage('${tickerSymbol}'); return false;" class="text-decoration-none">${tickerSymbol}</a>` : '';
+
+      // Render account
+      const accountHTML = accountName || '';
+
+      // Render description
+      const descriptionHTML = description.length > 50 ? `${description.substring(0, 50)}...` : description;
+
+      // Action buttons
+      const actionsHTML = `
+                <button class="btn btn-sm btn-outline-primary me-1" onclick="window.tradingJournalPage.handleEntryClickById('${entityType}', '${entry.entity_id || entry.id}')" title="צפה בפרטים">
+                    <i class="fas fa-eye"></i>
+                </button>
+                <button class="btn btn-sm btn-outline-secondary" onclick="window.tradingJournalPage.zoomToDay(${new Date(date).getDate()}, ${new Date(date).getMonth()}, ${new Date(date).getFullYear()})" title="הצג יום מלא">
+                    <i class="fas fa-calendar-day"></i>
+                </button>
+            `;
+
+      return `
+            <tr data-entity-id="${entry.entity_id || entry.id}" data-entry-type="${entityType}" data-date="${date}">
+                <td>${dateHTML}</td>
+                <td>${entityTypeHTML}</td>
+                <td>${statusHTML}</td>
+                <td>${tickerHTML}</td>
+                <td>${accountHTML}</td>
+                <td>${descriptionHTML}</td>
+                <td>${actionsHTML}</td>
+            </tr>
+        `;
+    }).join('');
+
+    tbody.innerHTML = rowsHTML;
+
+    // Add double-click handler to rows
+    tbody.querySelectorAll('tr[data-entity-id]').forEach(row => {
+      row.addEventListener('dblclick', e => {
+        e.stopPropagation();
+        const entityType = row.getAttribute('data-entry-type');
+        const entityId = row.getAttribute('data-entity-id');
+        if (entityType && entityId && window.tradingJournalPage && window.tradingJournalPage.handleDoubleClickEntry) {
+          const entry = entries.find(entry => entry.entity_type === entityType && entry.entity_id === entityId);
+          if (entry) {
+            window.tradingJournalPage.handleDoubleClickEntry(entry);
+          }
+        }
+      });
+    });
+
+    // Process buttons with ButtonSystem
+    setTimeout(() => {
+      if (window.advancedButtonSystem && typeof window.advancedButtonSystem.processButtonElement === 'function') {
+        const buttons = tbody.querySelectorAll('button[data-button-type]');
+        buttons.forEach((btn, index) => {
+          if (!btn.hasAttribute('data-button-processed')) {
+            try {
+              window.advancedButtonSystem.processButtonElement(btn, index);
+            } catch (error) {
+              if (window.Logger) {
+                window.Logger.warn('Error processing button in table', {
+                  page: PAGE_NAME,
+                  error: error?.message || error,
+                });
+              }
+            }
+          }
+        });
+      } else if (window.advancedButtonSystem && typeof window.advancedButtonSystem.processButtons === 'function') {
+        window.advancedButtonSystem.processButtons(tbody);
+      } else if (window.ButtonSystem && typeof window.ButtonSystem.initializeButtons === 'function') {
+        window.ButtonSystem.initializeButtons();
+      }
+    }, 50);
+  };
+
+  /**
+   * Render journal entries as table
+   */
+  const renderJournalEntriesTable = async entries => {
     const tableContainer = document.getElementById('journalEntriesTable');
     if (!tableContainer) {
       if (window.Logger) {
@@ -1198,7 +1063,7 @@
         tableId: 'journal-entries-table',
         tableType,
         data: entries,
-        render: async (pageData, context) => {
+        render: async (pageData, _context) => {
           await updateJournalEntriesTableBody(pageData);
         },
         pageSize: 20,
@@ -1210,12 +1075,12 @@
 
     // Replace icons after rendering
     await replaceIconsWithIconSystem();
-  }
+  };
 
   /**
      * Render journal entries as cards
      */
-  async function renderJournalEntriesCards(entries) {
+  const renderJournalEntriesCards = async entries => {
     const cardsContainer = document.getElementById('journalEntriesCards');
     if (!cardsContainer) {
       if (window.Logger) {
@@ -1354,12 +1219,12 @@
 
     // Replace icons after rendering
     await replaceIconsWithIconSystem();
-  }
+  };
 
   /**
      * Switch between table and cards view
      */
-  async function switchViewMode(mode) {
+  const switchViewMode = async mode => {
     window.tradingJournalViewMode = mode;
 
     // Update button states
@@ -1382,12 +1247,12 @@
     } else {
       await renderJournalEntriesCards(entries);
     }
-  }
+  };
 
   /**
      * Generate entity type filter buttons using related-object-filters system
      */
-  async function generateEntityTypeFilterButtons() {
+  const generateEntityTypeFilterButtons = async function() {
     try {
       // Wait for generateEntityTypeFilterButton to be available
       let retries = 0;
@@ -1487,7 +1352,7 @@
   /**
      * Load and render journal entries for current month
      */
-  async function loadAndRenderJournalEntries() {
+  const loadAndRenderJournalEntries = async function() {
     try {
       // Get date range for current month
       const { start, end } = window.CalendarDateUtils?.getMonthDateRange(currentYear, currentMonth) ||
@@ -1565,210 +1430,11 @@
     }
   }
 
-  /**
-     * Update journal entries table body
-     */
-  async function updateJournalEntriesTableBody(entries) {
-    // Wait a bit for DOM to be ready
-    let table = document.getElementById('journal-entries-table');
-    let retries = 0;
-    while (!table && retries < 10) {
-      await new Promise(resolve => setTimeout(resolve, 100));
-      table = document.getElementById('journal-entries-table');
-      retries++;
-    }
-
-    if (!table) {
-      // Try to find the container and create table if needed
-      const container = document.getElementById('journalEntriesList');
-      if (container) {
-        // Create table structure
-        // Table should already exist in HTML, just find it
-        const existingTable = document.getElementById('journal-entries-table');
-        if (!existingTable) {
-          container.innerHTML = `
-                        <table id="journal-entries-table" class="table table-striped table-hover" data-table-type="trading-journal-entries">
-                            <thead>
-                                <tr>
-                                    <th>
-                                        <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="תאריך" data-classes="btn-link sortable-header px-0" data-onclick="window.sortTable('trading-journal-entries', 0)"></button>
-                                    </th>
-                                    <th>
-                                        <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="סוג" data-classes="btn-link sortable-header px-0" data-onclick="window.sortTable('trading-journal-entries', 1)"></button>
-                                    </th>
-                                    <th>
-                                        <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="סטטוס" data-classes="btn-link sortable-header px-0" data-onclick="window.sortTable('trading-journal-entries', 2)"></button>
-                                    </th>
-                                    <th>
-                                        <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="טיקר" data-classes="btn-link sortable-header px-0" data-onclick="window.sortTable('trading-journal-entries', 3)"></button>
-                                    </th>
-                                    <th>
-                                        <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="חשבון" data-classes="btn-link sortable-header px-0" data-onclick="window.sortTable('trading-journal-entries', 4)"></button>
-                                    </th>
-                                    <th>
-                                        <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="תיאור" data-classes="btn-link sortable-header px-0" data-onclick="window.sortTable('trading-journal-entries', 5)"></button>
-                                    </th>
-                                    <th>פעולות</th>
-                                </tr>
-                            </thead>
-                            <tbody></tbody>
-                        </table>
-                    `;
-        }
-        table = document.getElementById('journal-entries-table');
-      }
-    }
-
-    if (!table) {
-      if (window.Logger) {
-        window.Logger.warn('Journal entries table not found and could not be created', { page: PAGE_NAME });
-      }
-      return;
-    }
-
-    let tbody = table.querySelector('tbody');
-    if (!tbody) {
-      tbody = document.createElement('tbody');
-      table.appendChild(tbody);
-    }
-
-    if (!Array.isArray(entries) || entries.length === 0) {
-      tbody.innerHTML = `
-                <tr>
-                    <td colspan="7" class="text-center py-4">
-                        <div class="alert alert-info mb-0">
-                            <span class="icon-placeholder icon" data-icon="info-circle" data-size="16" data-alt="info-circle" aria-label="info-circle"></span>
-                            לא נמצאו רשומות יומן
-                        </div>
-                    </td>
-                </tr>
-            `;
-      await replaceIconsWithIconSystem();
-      return;
-    }
-
-    const FieldRenderer = window.FieldRendererService;
-    const rowsHTML = entries.map(entry => {
-      const date = entry.date || entry.created_at || '';
-      const entityType = entry.entity_type || 'unknown';
-      const status = entry.status || '';
-      const side = entry.side || '';
-      const tickerSymbol = entry.ticker_symbol || '';
-      const accountName = entry.account_name || '';
-      const description = entry.description || entry.summary || '';
-
-      // Render date using FieldRendererService with envelope normalization
-      const dateEnvelope = getEntryDateEnvelope(entry) || date;
-      const dateCell = FieldRenderer ?
-        FieldRenderer.renderDate(dateEnvelope, true) :
-        date ? new Date(date).toLocaleString('he-IL') : '';
-
-      // Render entity type using FieldRendererService
-      const entityTypeCell = FieldRenderer ?
-        FieldRenderer.renderLinkedEntity(entityType, null, { short: true }) :
-        entityType;
-
-      // Render status using FieldRendererService
-      // For executions, include side in status cell if available
-      let statusCell = '';
-      if (entityType === 'execution' && side && FieldRenderer) {
-        // For executions, show side in status column
-        statusCell = FieldRenderer.renderSide(side);
-      } else if (status && FieldRenderer) {
-        statusCell = FieldRenderer.renderStatus(status, entityType);
-      } else {
-        statusCell = status || '';
-      }
-
-      // Render ticker - just display the symbol (no special rendering needed for simple symbol)
-      const tickerCell = tickerSymbol || '';
-
-      return `
-                <tr data-entry-type="${entityType}" 
-                    data-entity-id="${entry.entity_id}"
-                    style="cursor: pointer;"
-                    data-onclick="if (window.tradingJournalPage && window.tradingJournalPage.handleEntryClickById) { window.tradingJournalPage.handleEntryClickById('${entityType}', ${entry.entity_id}); }">
-                    <td>${dateCell}</td>
-                    <td>${entityTypeCell}</td>
-                    <td>${statusCell}</td>
-                    <td>${tickerCell}</td>
-                    <td>${accountName}</td>
-                    <td>${description}</td>
-                    <td>
-                        <button data-button-type="VIEW" data-variant="small" data-icon="/trading-ui/images/icons/tabler/eye.svg" 
-                                data-entity-type="${entityType}"
-                                data-entity-id="${entry.entity_id}"
-                                data-onclick="event.stopPropagation(); if (window.tradingJournalPage && window.tradingJournalPage.handleEntryClickById) { window.tradingJournalPage.handleEntryClickById('${entityType}', ${entry.entity_id}); }" 
-                                title="צפה בפרטים"></button>
-                    </td>
-                </tr>
-            `;
-    }).join('');
-
-    tbody.innerHTML = rowsHTML;
-
-    // Add double-click handler to rows
-    tbody.querySelectorAll('tr[data-entity-id]').forEach(row => {
-      row.addEventListener('dblclick', e => {
-        e.stopPropagation();
-        const entityType = row.getAttribute('data-entry-type');
-        const entityId = row.getAttribute('data-entity-id');
-        if (entityType && entityId && window.tradingJournalPage && window.tradingJournalPage.handleDoubleClickEntry) {
-          const entry = entries.find(e => e.entity_type === entityType && e.entity_id == entityId);
-          if (entry) {
-            window.tradingJournalPage.handleDoubleClickEntry(entry);
-          }
-        }
-      });
-    });
-
-    // Replace icons after rendering
-    await replaceIconsWithIconSystem();
-  }
 
   /**
-     * Handle click on journal entry by ID (finds entry from stored entries)
-     * @param {string} entityType - Entity type
-     * @param {number|string} entityId - Entity ID
-     */
-  async function handleEntryClickById(entityType, entityId) {
-    if (!entityType || !entityId) {
-      if (window.Logger) {
-        window.Logger.warn('Invalid parameters for handleEntryClickById', { page: PAGE_NAME, entityType, entityId });
-      }
-      return;
-    }
-
-    // Find entry from stored entries (check both main entries and day zoom entries)
-    const entries = window.tradingJournalEntries || window.tradingJournalDayZoomEntries || [];
-    const entry = entries.find(e => e.entity_type === entityType && e.entity_id == entityId);
-
-    if (!entry) {
-      if (window.Logger) {
-        window.Logger.warn('Entry not found for handleEntryClickById', { page: PAGE_NAME, entityType, entityId });
-      }
-      // Fallback: open entity details directly
-      if (window.showEntityDetails && typeof window.showEntityDetails === 'function') {
-        await window.showEntityDetails(entityType, entityId, {
-          mode: 'view',
-          sourceInfo: {
-            sourceModal: 'trading-journal',
-            sourceType: 'journal_entry',
-            sourceId: entityId,
-          },
-        });
-      }
-      return;
-    }
-
-    // Use existing handleEntryClick function
-    await handleEntryClick(entry);
-  }
-
-  /**
-     * Handle click on journal entry
-     */
-  async function handleEntryClick(entry) {
+   * Handle click on journal entry
+   */
+  const handleEntryClick = async entry => {
     if (!entry || !entry.entity_type || !entry.entity_id) {
       if (window.Logger) {
         window.Logger.warn('Invalid entry for handleEntryClick', { page: PAGE_NAME, entry });
@@ -1803,12 +1469,58 @@
         window.NotificationSystem.showError('שגיאה', 'מערכת פרטי ישויות לא זמינה');
       }
     }
-  }
+  };
 
   /**
-     * Zoom to specific day - show entries for that day in a modal
-     */
-  async function zoomToDay(day, month, year) {
+   * Handle click on journal entry by ID (finds entry from stored entries)
+   * @param {string} entityType - Entity type
+   * @param {number|string} entityId - Entity ID
+   */
+  const handleEntryClickById = async function(entityType, entityId) {
+    if (!entityType || !entityId) {
+      if (window.Logger) {
+        window.Logger.warn('Invalid parameters for handleEntryClickById', { page: PAGE_NAME, entityType, entityId });
+      }
+      return;
+    }
+
+    // Find entry from stored entries (check both main entries and day zoom entries)
+    const entries = window.tradingJournalEntries || window.tradingJournalDayZoomEntries || [];
+    const entry = entries.find(e => e.entity_type === entityType && e.entity_id === entityId);
+
+    if (!entry) {
+      if (window.Logger) {
+        window.Logger.warn('Entry not found for handleEntryClickById', { page: PAGE_NAME, entityType, entityId });
+      }
+      // Fallback: open entity details directly
+      try {
+        if (window.showEntityDetails && typeof window.showEntityDetails === 'function') {
+          await window.showEntityDetails(entityType, entityId, {
+            mode: 'view',
+            sourceInfo: {
+              sourceModal: 'trading-journal',
+              sourceType: 'journal_entry',
+              sourceId: entityId,
+            },
+          });
+        }
+      } catch (error) {
+        if (window.Logger) {
+          window.Logger.error('Error opening entity details', { page: PAGE_NAME, error, entityType, entityId });
+        }
+        if (window.NotificationSystem) {
+          window.NotificationSystem.showError('שגיאה', 'לא ניתן לפתוח פרטי רשומה: ' + (error?.message || 'שגיאה לא ידועה'));
+        }
+      }
+      return;
+    }
+
+    // Use existing handleEntryClick function
+    await handleEntryClick(entry);
+  }
+
+  // Zoom to specific day - show entries for that day in a modal
+  const zoomToDay = async function(day, month, year) {
     if (window.Logger) {
       window.Logger.info('Zooming to day', { page: PAGE_NAME, day, month, year });
     }
@@ -1961,7 +1673,7 @@
   /**
      * Render journal entries as table for modal view (summary + pagination)
      */
-  async function renderJournalEntriesTableForModal(entries, container) {
+  const renderJournalEntriesTableForModal = async function(entries, container) {
     if (!Array.isArray(entries) || entries.length === 0) {
       container.innerHTML = `
                 <div class="alert alert-info text-center w-100">
@@ -2023,7 +1735,7 @@
                             </span>
                         `;
   }).join('')}
-                    <span class="badge bg-primary text-light">סה\"כ: ${counts.total || entries.length}</span>
+                    <span class="badge bg-primary text-light">סה"כ: ${counts.total || entries.length}</span>
                 </div>
             `;
 
@@ -2147,119 +1859,24 @@
   /**
      * Render journal entries as cards for modal view (deprecated - use table)
      */
-  async function renderJournalEntriesCardsForModal(entries, container) {
-    if (!Array.isArray(entries) || entries.length === 0) {
-      container.innerHTML = `
-                <div class="alert alert-info text-center w-100">
-                    <span class="icon-placeholder icon" data-icon="info-circle" data-size="16" data-alt="info-circle" aria-label="info-circle"></span>
-                    לא נמצאו רשומות יומן
-                </div>
-            `;
-      await replaceIconsWithIconSystem();
-      return;
-    }
-
-    // Render cards (similar to renderJournalEntriesCards but for modal)
-    const FieldRenderer = window.FieldRendererService;
-    const cardsHTML = entries.map(entry => {
-      const date = entry.date || entry.created_at || '';
-      const entityType = entry.entity_type || 'unknown';
-      const status = entry.status || '';
-      const side = entry.side || '';
-      const tickerSymbol = entry.ticker_symbol || '';
-      const accountName = entry.account_name || '';
-      const description = entry.description || entry.summary || entry.content || entry.message || '';
-
-      // Format date
-      const dateDisplay = date ? new Date(date).toLocaleDateString('he-IL', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-      }) : '';
-
-      // Get entity label
-      const entityLabel = {
-        'execution': 'ביצוע',
-        'cash_flow': 'תזרים מזומן',
-        'trade': entry.subtype === 'trade_created' ? 'טרייד נוצר' : entry.subtype === 'trade_closed' ? 'טרייד נסגר' : 'טרייד',
-        'trade_plan': entry.subtype === 'trade_plan_created' ? 'תוכנית נוצרה' : entry.subtype === 'trade_plan_cancelled' ? 'תוכנית בוטלה' : 'תוכנית',
-        'note': 'הערה',
-        'alert': 'התראה',
-      }[entityType] || entityType;
-
-      // Build content based on entity type
-      let contentHTML = '';
-      if (entityType === 'execution') {
-        contentHTML = `
-                    <strong>${tickerSymbol || ''}</strong> | 
-                    <strong>${side || ''}</strong> | 
-                    כמות: <strong>${entry.quantity || ''}</strong> | 
-                    מחיר: <strong>${entry.price ? '$' + entry.price : ''}</strong>
-                `;
-      } else if (entityType === 'cash_flow') {
-        contentHTML = `
-                    <strong>${entry.type || ''}</strong> | 
-                    סכום: <strong>${entry.amount ? '$' + entry.amount : ''}</strong> | 
-                    ${description}
-                `;
-      } else if (entityType === 'trade' || entityType === 'trade_plan') {
-        contentHTML = `
-                    <strong>${tickerSymbol || ''}</strong> | 
-                    ${entry.entry_price ? 'מחיר: <strong>$' + entry.entry_price + '</strong>' : ''}
-                    ${description ? ' | ' + description : ''}
-                `;
-      } else {
-        contentHTML = description || '';
-      }
-
-      return `
-                <div class="journal-entry-item mb-3" data-entry-type="${entityType}" data-entity-id="${entry.entity_id}">
-                    <div class="journal-entry-header">
-                        <div>
-                            <div class="journal-entry-date">${dateDisplay}</div>
-                            <div class="journal-entry-type-badge">
-                                ${FieldRenderer ? FieldRenderer.renderLinkedEntity(entityType, null, { short: true }) : entityLabel}
-                            </div>
-                            <div class="journal-entry-content">${contentHTML}</div>
-                        </div>
-                        <div class="journal-entry-actions">
-                            <button data-button-type="VIEW" data-variant="small" data-icon="/trading-ui/images/icons/tabler/eye.svg" 
-                                    data-entity-type="${entityType}"
-                                    data-entity-id="${entry.entity_id}"
-                                    data-onclick="if (window.tradingJournalPage && window.tradingJournalPage.handleEntryClickById) { window.tradingJournalPage.handleEntryClickById('${entityType}', ${entry.entity_id}); }" 
-                                    title="צפה בפרטים"></button>
-                        </div>
-                    </div>
-                </div>
-            `;
-    }).join('');
-
-    container.innerHTML = `<div class="journal-entries-list">${cardsHTML}</div>`;
-
-    // Replace icons after rendering
-    await replaceIconsWithIconSystem();
-  }
-
   /**
      * Handle double click on journal entry - open entity details
      */
-  async function handleDoubleClickEntry(entry) {
+  const handleDoubleClickEntry = async entry => {
     await handleEntryClick(entry);
-  }
+  };
 
   /**
      * Navigate to previous month
      */
-  async function prevMonth() {
+  const prevMonth = async function() {
     await navigateMonth('prev');
   }
 
   /**
      * Navigate to next month
      */
-  async function nextMonth() {
+  const nextMonth = async function() {
     await navigateMonth('next');
   }
 
@@ -2328,12 +1945,12 @@
       });
       observer.disconnect();
     }
-  }
+  };
 
   /**
      * Handle activity chart section toggle
      */
-  const handleActivityChartToggle = async () => {
+  const handleActivityChartToggle = async function() {
     const chartSection = document.querySelector('[data-section="activity-chart-section"]');
     if (!chartSection) {return;}
 
@@ -2355,7 +1972,7 @@
   /**
      * Load and render activity chart
      */
-  const loadAndRenderActivityChart = async () => {
+  const loadAndRenderActivityChart = async function() {
     const container = document.getElementById('activity-chart-container');
     if (!container) {
       if (window.Logger) {
@@ -2561,39 +2178,149 @@
     currentYear: () => currentYear,
   };
 
-  // Make filter functions available globally (for HTML onclick)
+  // Make functions available globally (for HTML onclick)
   window.filterJournalByEntityType = filterJournalByEntityType;
   window.filterJournalByTicker = filterJournalByTicker;
+  window.handleAddEntry = handleAddEntry;
 
   /**
    * Render icons in dropdown menu items
    */
-  const renderMenuIcons = () => {
-    if (!window.IconSystem || !window.IconSystem.initialized) {
-      setTimeout(() => renderMenuIcons(), 500);
-      return;
-    }
 
-    const iconSpans = document.querySelectorAll('.menu-item-icon[data-icon-type="entity"]');
-
-    for (const span of iconSpans) {
-      const entityType = span.getAttribute('data-icon-name');
-      if (!entityType) {continue;}
-
+  /**
+   * Save page state to PageStateManager
+   */
+  const savePageState = async function() {
+    if (window.PageStateManager && typeof window.PageStateManager.savePageState === 'function') {
       try {
-        // Render icon using IconSystem
-        const iconPath = `/trading-ui/images/icons/entities/${entityType}s.svg`;
-        window.IconSystem.renderIcon(span, iconPath, '16px', '16px');
+        await window.PageStateManager.savePageState(PAGE_NAME, {
+          entityFilters: {
+            calendarMonth: currentMonth,
+            calendarYear: currentYear,
+            entityFilter: window.currentEntityFilter || 'all',
+          },
+        });
       } catch (error) {
         if (window.Logger) {
-          window.Logger.warn('Failed to render icon', {
-            icon: iconPath,
-            error,
-            page: 'trading-journal-page',
+          window.Logger.warn('Failed to save page state', {
+            page: PAGE_NAME,
+            error: error?.message,
           });
         }
       }
     }
-  };
+  }
 
+  /**
+   * Load page state from PageStateManager
+   */
+  const loadPageState = async function() {
+    if (window.PageStateManager && typeof window.PageStateManager.loadPageState === 'function') {
+      try {
+        const state = await window.PageStateManager.loadPageState(PAGE_NAME);
+        if (state && state.entityFilters) {
+          // Restore month/year if saved
+          if (state.entityFilters.calendarMonth !== undefined) {
+            currentMonth = state.entityFilters.calendarMonth;
+          }
+          if (state.entityFilters.calendarYear !== undefined) {
+            currentYear = state.entityFilters.calendarYear;
+          }
+          // Restore entity filter if saved
+          if (state.entityFilters.entityFilter) {
+            window.currentEntityFilter = state.entityFilters.entityFilter;
+          }
+        }
+      } catch (error) {
+        if (window.Logger) {
+          window.Logger.warn('Failed to load page state', {
+            page: PAGE_NAME,
+            error: error?.message,
+          });
+        }
+      }
+    }
+  }
+
+  /**
+   * Initialize page
+   */
+  const initializePage = async function() {
+    // Initialize Header System first
+    initializeHeader();
+
+    // Wait for Preferences to be loaded
+    if (window.PreferencesCore && typeof window.PreferencesCore.initializeWithLazyLoading === 'function') {
+      window.PreferencesCore.initializeWithLazyLoading().catch(error => {
+        if (window.Logger) {
+          window.Logger.warn('Preferences initialization failed (non-critical)', {
+            page: PAGE_NAME,
+            error,
+          });
+        }
+      });
+    }
+
+    // Load saved page state
+    await loadPageState();
+    if (!window.currentEntityFilter) {
+      window.currentEntityFilter = 'all';
+    }
+    updateMonthDisplay();
+    initializeMonthYearSelectors();
+
+    // Wait for IconSystem and DOM to be ready
+    const initAfterLoad = async () => {
+      // Wait for Button System to process buttons
+      let retries = 0;
+      const maxRetries = 10;
+
+      while (retries < maxRetries) {
+        if (window.ButtonSystem && window.ButtonSystem.initialized) {
+          break;
+        }
+        await new Promise(resolve => setTimeout(resolve, 100));
+        retries++;
+      }
+
+      if (retries >= maxRetries && window.Logger) {
+        window.Logger.warn('Button System not available after timeout', { page: PAGE_NAME });
+      }
+
+      // Generate entity type filter buttons
+      await generateEntityTypeFilterButtons();
+
+      // Load ticker filter
+      await loadTickerFilter();
+
+      // Load and render journal entries
+      await loadAndRenderJournalEntries();
+
+      // Load and render calendar
+      await loadAndRenderCalendar();
+
+      // Setup lazy loading for activity chart
+      setupActivityChartLazyLoading();
+
+      // Apply dynamic colors - TODO: Implement if needed
+      // applyDynamicColors();
+    }
+
+    // Wait a bit for all systems to load
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => {
+        setTimeout(initAfterLoad, 500);
+      });
+    } else {
+      setTimeout(initAfterLoad, 500);
+    }
+  }
+
+  // Initialize when DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => initializePage());
+  } else {
+    // DOM already loaded
+    initializePage();
+  }
 })();

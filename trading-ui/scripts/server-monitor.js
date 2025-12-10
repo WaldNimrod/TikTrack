@@ -4,7 +4,9 @@
  */
 
 
-// ===== FUNCTION INDEX =====
+/**
+ * ===== FUNCTION INDEX =====
+ */
 
 // === Object Methods ===
 // - copyDetailedLog() - Copydetailedlog
@@ -849,31 +851,7 @@ class ServerMonitor {
       });
     }
   }
-}
 
-// אתחול המערכת כשהדף נטען
-document.addEventListener('DOMContentLoaded', function() {
-  window.Logger?.debug('🎯 DOM loaded, initializing ServerMonitor...');
-  
-  // יצירת instance גלובלי
-  window.serverMonitor = new ServerMonitor();
-  
-  window.Logger?.debug('✅ ServerMonitor initialized successfully');
-});
-
-// יצירת instance גלובלי מיד
-window.serverMonitor = new ServerMonitor();
-
-// הוספת פונקציות גלובליות
-window.copyDetailedLog = () => {
-  if (window.serverMonitor) {
-    return window.serverMonitor.copyDetailedLog();
-  } else {
-    window.Logger?.error('❌ serverMonitor instance לא קיים');
-    if (window.showErrorNotification) {
-      window.showErrorNotification('שגיאה', 'serverMonitor לא אותחל');
-    }
-  }
   // === EOD INTEGRATION: Update UI with EOD performance data ===
   updateEODPerformanceData(performanceData) {
     if (!performanceData) return;
@@ -884,63 +862,21 @@ window.copyDetailedLog = () => {
       eodRunsEl.textContent = performanceData.total_eod_runs.toLocaleString();
     }
 
-    const avgRunTimeEl = document.getElementById('avgRunTime');
-    if (avgRunTimeEl && performanceData.avg_run_time_ms !== undefined) {
-      avgRunTimeEl.textContent = `${(performanceData.avg_run_time_ms / 1000).toFixed(2)} שניות`;
+    const eodSuccessEl = document.getElementById('eodSuccessRate');
+    if (eodSuccessEl && performanceData.success_rate !== undefined) {
+      eodSuccessEl.textContent = Math.round(performanceData.success_rate * 100) + '%';
     }
 
-    const lastRunStatusEl = document.getElementById('lastRunStatus');
-    if (lastRunStatusEl && performanceData.last_run_status) {
-      const statusText = performanceData.last_run_status === 'success' ? 'הצליח' : 'נכשל';
-      const statusClass = performanceData.last_run_status === 'success' ? 'success' : 'error';
-      lastRunStatusEl.textContent = statusText;
-      lastRunStatusEl.className = `status-value ${statusClass}`;
+    const eodAvgTimeEl = document.getElementById('eodAvgProcessingTime');
+    if (eodAvgTimeEl && performanceData.avg_processing_time !== undefined) {
+      eodAvgTimeEl.textContent = Math.round(performanceData.avg_processing_time) + 's';
     }
 
-    const errors24hEl = document.getElementById('errors24h');
-    if (errors24hEl && performanceData.errors_last_24h !== undefined) {
-      errors24hEl.textContent = performanceData.errors_last_24h;
-      errors24hEl.className = `status-value ${performanceData.errors_last_24h > 0 ? 'warning' : 'success'}`;
+    const eodLastRunEl = document.getElementById('eodLastRunTime');
+    if (eodLastRunEl && performanceData.last_run_time) {
+      const lastRun = new Date(performanceData.last_run_time);
+      eodLastRunEl.textContent = lastRun.toLocaleString('he-IL');
     }
-  }
-
-  // === EOD INTEGRATION: Update UI with EOD job status ===
-  updateEODJobStatus(jobHistory) {
-    if (!Array.isArray(jobHistory)) return;
-
-    const jobHistoryContainer = document.getElementById('eodJobHistory');
-    if (!jobHistoryContainer) return;
-
-    // Clear existing content
-    jobHistoryContainer.innerHTML = '';
-
-    if (jobHistory.length === 0) {
-      jobHistoryContainer.innerHTML = '<div class="text-muted">אין jobs אחרונים</div>';
-      return;
-    }
-
-    // Create job history list
-    const jobList = document.createElement('div');
-    jobList.className = 'job-history-list';
-
-    jobHistory.slice(0, 5).forEach(job => {
-      const jobItem = document.createElement('div');
-      jobItem.className = 'job-history-item';
-
-      const statusIcon = job.status === 'success' ? '✅' : job.status === 'running' ? '🔄' : '❌';
-      const jobType = job.job_type || 'unknown';
-      const createdAt = job.created_at ? new Date(job.created_at).toLocaleString('he-IL') : 'לא ידוע';
-
-      jobItem.innerHTML = `
-        <span class="job-status">${statusIcon}</span>
-        <span class="job-type">${jobType}</span>
-        <span class="job-time">${createdAt}</span>
-      `;
-
-      jobList.appendChild(jobItem);
-    });
-
-    jobHistoryContainer.appendChild(jobList);
   }
 
   // === EOD INTEGRATION: Update UI with EOD alerts ===
@@ -966,7 +902,7 @@ window.copyDetailedLog = () => {
 
     activeAlerts.slice(0, 5).forEach(alert => {
       const alertItem = document.createElement('div');
-      alertItem.className = `alert-item ${alert.severity}`;
+      alertItem.className = 'alert-item ' + alert.severity;
 
       const severityIcon = alert.severity === 'high' ? '🚨' : alert.severity === 'medium' ? '⚠️' : 'ℹ️';
       const title = alert.title || 'התראה';

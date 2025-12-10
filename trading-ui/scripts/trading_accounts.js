@@ -568,6 +568,10 @@ async function legacyFetchTradingAccounts() {
   });
 
   if (!response.ok) {
+    if (response.status === 401 || response.status === 403) {
+      window.Logger?.warn?.('⚠️ Trading accounts API unauthorized, returning empty list', { status: response.status }, { page: 'trading_accounts' });
+      return [];
+    }
     throw new Error(`HTTP error! status: ${response.status}`);
   }
 
@@ -586,11 +590,17 @@ async function loadTradingAccountsData(options = {}) {
   }
   try {
     if (typeof window.TradingAccountsData?.loadTradingAccountsData === 'function') {
-      const accounts = await window.TradingAccountsData.loadTradingAccountsData(options);
-      if (window.Logger && typeof window.Logger.info === 'function') {
-        window.Logger.info(`✅ Loaded ${accounts.length} trading accounts (service)`, { page: "trading_accounts" });
+      try {
+        const accounts = await window.TradingAccountsData.loadTradingAccountsData(options);
+        if (window.Logger && typeof window.Logger.info === 'function') {
+          window.Logger.info(`✅ Loaded ${accounts.length} trading accounts (service)`, { page: "trading_accounts" });
+        }
+        return accounts;
+      } catch (serviceError) {
+        if (window.Logger && typeof window.Logger.warn === 'function') {
+          window.Logger.warn('⚠️ TradingAccountsData service failed, falling back to legacy fetch', { error: serviceError.message }, { page: 'trading_accounts' });
+        }
       }
-      return accounts;
     }
 
     const fallback = await legacyFetchTradingAccounts();
@@ -606,6 +616,9 @@ async function loadTradingAccountsData(options = {}) {
     }
     if (typeof window.showErrorNotification === 'function') {
       window.showErrorNotification('שגיאה בטעינת נתוני חשבונות מסחר', error.message);
+    }
+    if (error?.message?.includes('status: 401') || error?.message?.includes('status: 403')) {
+      return [];
     }
     throw error;
   }

@@ -229,12 +229,45 @@ class SelectPopulatorService {
         try {
             // טעינת טיקרים מ-API - רק טיקרים של המשתמש
             console.log(`🔍 [SelectPopulatorService] Fetching user tickers from /api/tickers/my...`);
-            const response = await fetch('/api/tickers/my');
+
+            // Add authentication headers
+            let token = null;
+            if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
+                token = await window.UnifiedCacheManager.get('authToken');
+            } else {
+                token = localStorage.getItem('authToken');
+            }
+            const headers = { 'Content-Type': 'application/json' };
+            if (token) { headers['Authorization'] = `Bearer ${token}`; }
+
+            const response = await fetch('/api/tickers/my', { headers });
             if (!response.ok) {
+                if (response.status === 401 || response.status === 403) {
+                    console.warn(`⚠️ [SelectPopulatorService] /api/tickers/my unauthorized, returning empty list`);
+                    var tickers = [];
+                    return this._populateSelect(select, tickers, {
+                        valueField: 'id',
+                        textField: 'display_text',
+                        includeEmpty: options.includeEmpty !== false,
+                        emptyText: options.emptyText || 'בחר טיקר...',
+                        defaultValue: options.defaultValue
+                    });
+                }
                 // Fallback to /api/tickers/ if /my fails
                 console.warn(`⚠️ [SelectPopulatorService] /api/tickers/my failed, trying /api/tickers/...`);
-                const fallbackResponse = await fetch('/api/tickers/');
+                const fallbackResponse = await fetch('/api/tickers/', { headers });
                 if (!fallbackResponse.ok) {
+                    if (fallbackResponse.status === 401 || fallbackResponse.status === 403) {
+                        console.warn(`⚠️ [SelectPopulatorService] /api/tickers/ unauthorized, returning empty list`);
+                        var tickers = [];
+                        return this._populateSelect(select, tickers, {
+                            valueField: 'id',
+                            textField: 'display_text',
+                            includeEmpty: options.includeEmpty !== false,
+                            emptyText: options.emptyText || 'בחר טיקר...',
+                            defaultValue: options.defaultValue
+                        });
+                    }
                     throw new Error(`HTTP error! status: ${fallbackResponse.status}`);
                 }
                 const fallbackData = await fallbackResponse.json();
@@ -406,7 +439,17 @@ class SelectPopulatorService {
         
         try {
             // טעינת מטבעות מ-API
-            const response = await fetch('/api/currencies/');
+            // Add authentication headers
+            let token = null;
+            if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
+                token = await window.UnifiedCacheManager.get('authToken');
+            } else {
+                token = localStorage.getItem('authToken');
+            }
+            const headers = { 'Content-Type': 'application/json' };
+            if (token) { headers['Authorization'] = `Bearer ${token}`; }
+
+            const response = await fetch('/api/currencies/', { headers });
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
@@ -516,7 +559,17 @@ class SelectPopulatorService {
         
         try {
             // טעינת טריידים מ-API
-            const response = await fetch('/api/trades/');
+            // Add authentication headers
+            let token = null;
+            if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
+                token = await window.UnifiedCacheManager.get('authToken');
+            } else {
+                token = localStorage.getItem('authToken');
+            }
+            const headers = { 'Content-Type': 'application/json' };
+            if (token) { headers['Authorization'] = `Bearer ${token}`; }
+
+            const response = await fetch('/api/trades/', { headers });
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
@@ -575,7 +628,17 @@ class SelectPopulatorService {
         
         try {
             // טעינת תוכניות מ-API
-            const response = await fetch('/api/trade-plans/');
+            // Add authentication headers
+            let token = null;
+            if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
+                token = await window.UnifiedCacheManager.get('authToken');
+            } else {
+                token = localStorage.getItem('authToken');
+            }
+            const headers = { 'Content-Type': 'application/json' };
+            if (token) { headers['Authorization'] = `Bearer ${token}`; }
+
+            const response = await fetch('/api/trade-plans/', { headers });
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }

@@ -38,3 +38,4 @@
   services to keep parity.
 - User scoping: most entity endpoints expect/return user-specific data; ensure auth is enforced
   before production exposure.
+

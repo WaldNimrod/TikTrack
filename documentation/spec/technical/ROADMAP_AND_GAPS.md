@@ -36,3 +36,4 @@
 - Evaluate bundling/build pipeline for frontend to reduce payload and align with ITCSS outputs.
 - Add automated regression packs beyond Selenium console scan (API smoke + targeted UI flows).
 - Formalize deployment playbooks (containers, migrations, feature flags) for production environments.
+

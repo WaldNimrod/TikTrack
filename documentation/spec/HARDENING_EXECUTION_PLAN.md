@@ -143,3 +143,4 @@
 - Deliver per-page readiness table (BL complete? auth enforced? cache/refresh OK? external data
   aligned?).
 - Track open risks: any remaining mockup wiring, auth hardening gaps, scheduler data freshness.
+

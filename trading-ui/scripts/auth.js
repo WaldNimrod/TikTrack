@@ -11,6 +11,53 @@
  * Last Updated: August 23, 2025
  */
 
+
+// ===== FUNCTION INDEX =====
+=== Object Methods ===
+- reloadButton.onclick() - Onclick
+
+// === Initialization ===
+// - setupLoginForm() - Setuploginform
+// - createLoginInterface() - Createlogininterface
+// - createLogoutButton() - Createlogoutbutton
+// - setupVisibilityCheck() - Setupvisibilitycheck
+
+// === Event Handlers ===
+// - checkAuthentication() - Checkauthentication
+// - hasPermission() - Haspermission
+
+// === UI Functions ===
+// - showLoginError() - Showloginerror
+// - showLoginSuccess() - Showloginsuccess
+// - showDashboard() - Showdashboard
+// - showLogin() - Showlogin
+// - showLoginModal() - Showloginmodal
+// - updateUserProfile() - Updateuserprofile
+// - updatePassword() - Updatepassword
+
+// === Data Functions ===
+// - saveAuthToCache() - Saveauthtocache
+// - getAuthFromCache() - Getauthfromcache
+// - setLoadingState() - Setloadingstate
+// - saveCredentials() - Savecredentials
+// - loadSavedCredentials() - Loadsavedcredentials
+// - getAuthToken() - Getauthtoken
+// - getCurrentUser() - Getcurrentuser
+// - getCurrentUserAsync() - Getcurrentuserasync
+
+// === Utility Functions ===
+// - stopVisibilityCheck() - Stopvisibilitycheck
+
+// === Other ===
+// - removeAuthFromCache() - Removeauthfromcache
+// - forceLogoutAndPrompt() - Forcelogoutandprompt
+// - login() - Login
+// - register() - Register
+// - logout() - Logout
+// - isAuthenticated() - Isauthenticated
+// - isAuthenticatedSync() - Isauthenticatedsync
+// - hasRole() - Hasrole
+
 // משתנים גלובליים
 let authToken = null;
 let currentUser = null;
@@ -153,14 +200,9 @@ async function forceLogoutAndPrompt(reason = 'unauthorized') {
     window.Logger?.warn?.('⚠️ [auth.js] Failed broadcasting logout event', { error: e?.message });
   }
   
-  // Show login modal (preferred) or redirect fallback
-  if (!window.location.pathname.includes('login.html') &&
-      !window.location.pathname.includes('register.html')) {
-    if (typeof window.TikTrackAuth?.showLoginModal === 'function') {
-      await window.TikTrackAuth.showLoginModal();
-    } else {
-      window.location.href = '/';
-    }
+  // Show login modal (preferred). No redirect to login.html (page removed).
+  if (typeof window.TikTrackAuth?.showLoginModal === 'function') {
+    await window.TikTrackAuth.showLoginModal();
   }
 }
 
@@ -235,14 +277,9 @@ if (typeof window.addEventListener === 'function') {
           window.dispatchEvent(new CustomEvent('logout:success'));
           window.dispatchEvent(new CustomEvent('user:logged-out'));
           
-          // Show login modal if not already on login/register page
-          if (!window.location.pathname.includes('login.html') && 
-              !window.location.pathname.includes('register.html')) {
-              if (typeof window.TikTrackAuth?.showLoginModal === 'function') {
-                await window.TikTrackAuth.showLoginModal();
-              } else {
-                window.location.href = '/';
-              }
+          // Show login modal (single flow, no login.html redirects)
+          if (typeof window.TikTrackAuth?.showLoginModal === 'function') {
+            await window.TikTrackAuth.showLoginModal();
           }
         } else if (authEvent.type === 'login') {
           // Login event from another tab - update local state
@@ -530,21 +567,7 @@ function loadSavedCredentials(usernameId = 'username', passwordId = 'password', 
 }
 
 function showDashboard(loginSectionId = 'loginSection', dashboardSectionId = 'dashboardSection') {
-  // If called from login page, redirect to dashboard instead
-  if (window.location.pathname.includes('login.html') || 
-      window.location.pathname.includes('register.html')) {
-    // Check if we have a redirect destination from auth guard
-    const redirectPath = window.AuthGuard?.getRedirectAfterLogin?.();
-    if (redirectPath) {
-      window.location.href = redirectPath;
-    } else {
-      // Default to index.html (dashboard)
-      window.location.href = 'index.html';
-    }
-    return;
-  }
-
-  // Original behavior for pages with login/dashboard sections
+  // Original behavior for pages with login/dashboard sections (no page redirect)
   const loginSection = document.getElementById(loginSectionId);
   const dashboardSection = document.getElementById(dashboardSectionId);
 

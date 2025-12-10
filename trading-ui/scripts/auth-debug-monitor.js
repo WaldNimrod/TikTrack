@@ -12,6 +12,33 @@
  * @created December 2025
  */
 
+
+// ===== FUNCTION INDEX =====
+// === Event Handlers ===
+// - AuthDebugMonitor.loadErrors() - Loaderrors
+// - AuthDebugMonitor.saveError() - Saveerror
+// - AuthDebugMonitor.clearErrors() - Clearerrors
+// - AuthDebugMonitor.getAllErrors() - Getallerrors
+// - AuthDebugMonitor.loadLogs() - Loadlogs
+// - AuthDebugMonitor.saveLogs() - Savelogs
+// - AuthDebugMonitor.log() - Log
+// - AuthDebugMonitor.getCurrentUserId() - Getcurrentuserid
+// - AuthDebugMonitor.interceptAuthFunctions() - Interceptauthfunctions
+// - AuthDebugMonitor.getAllLogs() - Getalllogs
+// - AuthDebugMonitor.clearLogs() - Clearlogs
+// - AuthDebugMonitor.exportLogs() - Exportlogs
+// - console.error() - Error
+// - request.onsuccess() - Onsuccess
+// - getRequest.onsuccess() - Onsuccess
+// - getRequest.onerror() - Onerror
+// - transaction.onerror() - Onerror
+// - request.onupgradeneeded() - Onupgradeneeded
+
+// === Initialization ===
+// - AuthDebugMonitor.setupGlobalErrorHandling() - Setupglobalerrorhandling
+// - AuthDebugMonitor.setupCacheMonitoring() - Setupcachemonitoring
+// - AuthDebugMonitor.setupInterceptors() - Setupinterceptors
+
 (function() {
   'use strict';
 

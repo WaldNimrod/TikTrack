@@ -22,6 +22,16 @@
  * @lastUpdated November 23, 2025
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Event Handlers ===
+// - positionSubmenu() - Positionsubmenu
+// - debouncedPositionSubmenu() - Debouncedpositionsubmenu
+
+// === Other ===
+// - clearTimeouts() - Cleartimeouts
+
 if (window.Logger) {
   window.Logger.info('🚀 Loading Header System v7.0.0...', { page: 'header-system' });
 }
@@ -1108,7 +1118,7 @@ class HeaderSystem {
       const userSection = document.getElementById('filterUserSection');
       const userAvatar = document.getElementById('filterUserAvatar');
       const userInitials = document.getElementById('filterUserInitials');
-      const authIcon = document.getElementById('filterAuthIcon');
+    const authIcon = document.getElementById('filterAuthIcon');
       
       if (!userSection || !userAvatar || !userInitials || !authIcon) {
         // User section might not exist on all pages
@@ -1134,6 +1144,8 @@ class HeaderSystem {
       }
 
       const isAuthenticated = currentUser && currentUser.id;
+      const logoGreen = '#26baac';
+      const logoOrange = '#fc5a06';
       
       if (isAuthenticated) {
         // Get user initials
@@ -1157,7 +1169,12 @@ class HeaderSystem {
         userSection.style.display = 'flex';
         const profileLink = document.getElementById('filterUserProfileLink');
         if (profileLink) profileLink.style.display = 'block';
-        authIcon.style.opacity = '0.7';
+        authIcon.style.opacity = '1';
+        authIcon.style.backgroundColor = logoGreen;
+        authIcon.style.borderRadius = '6px';
+        authIcon.style.padding = '2px';
+        authIcon.style.filter = 'none';
+        authIcon.dataset.status = 'logged-in';
         authIcon.title = 'התנתק';
       } else {
         // Show login icon only
@@ -1165,7 +1182,12 @@ class HeaderSystem {
         userSection.style.display = 'flex';
         const profileLink = document.getElementById('filterUserProfileLink');
         if (profileLink) profileLink.style.display = 'none';
-        authIcon.style.opacity = '0.7';
+        authIcon.style.opacity = '1';
+        authIcon.style.backgroundColor = logoOrange;
+        authIcon.style.borderRadius = '6px';
+        authIcon.style.padding = '2px';
+        authIcon.style.filter = 'grayscale(20%)';
+        authIcon.dataset.status = 'logged-out';
         authIcon.title = 'התחבר';
       }
     } catch (error) {

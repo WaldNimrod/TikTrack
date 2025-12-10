@@ -32,22 +32,22 @@ todos:
       - phase1_2_trade_history
   - id: phase2_1_trades
     content: "שלב 2.1: מימוש Trades Page עם EOD integration"
-    status: pending
+    status: completed
     dependencies:
       - phase1_2_trade_history_test
   - id: phase2_1_trades_test
     content: "שלב 2.1: בדיקות ותיקונים ל-Trades Page"
-    status: pending
+    status: completed
     dependencies:
       - phase2_1_trades
   - id: phase2_2_executions
     content: "שלב 2.2: מימוש Executions Page עם EOD integration"
-    status: pending
+    status: completed
     dependencies:
       - phase2_1_trades_test
   - id: phase2_2_executions_test
     content: "שלב 2.2: בדיקות ותיקונים ל-Executions Page"
-    status: pending
+    status: completed
     dependencies:
       - phase2_2_executions
   - id: phase2_3_server_monitor

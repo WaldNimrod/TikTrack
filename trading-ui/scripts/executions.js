@@ -31,9 +31,10 @@
  * - updateRealizedPLField() - updateRealizedPLField function
  * - saveExecution() - saveExecution function
  * - updateExecution() - updateExecution function
- * - updateExecutionsSummary() - * Handle executions filtered data change event
+ * - updateExecutionsSummary() - * Handle executions filtered data change event (EOD integrated)
  * - updateExecutionsCounters() - updateExecutionsCounters function
- * - updateExecutionsTableMain() - updateExecutionsTableMain function
+ * - updateExecutionsTableMain() - updateExecutionsTableMain function (EOD integrated)
+ * - loadEODExecutionsData() - Load EOD data for executions
  * - updateTradesOnCheckboxChange() - updateTradesOnCheckboxChange function
  * - updateTradesOnTickerChange() - updateTradesOnTickerChange function
  * - addNewTicker() - * Show ticker help
@@ -1269,6 +1270,49 @@ async function updateExecutionsTableMain(executions, options = {}) {
   }
 
   executions = Array.isArray(executions) ? executions : [];
+
+  // === EOD INTEGRATION: Enrich executions with EOD data ===
+  let enrichedExecutions = [...executions];
+  try {
+    const eodExecutionsData = await loadEODExecutionsData(executions);
+    if (eodExecutionsData && Array.isArray(eodExecutionsData)) {
+      // Merge EOD data with executions
+      enrichedExecutions = executions.map(execution => {
+        const eodData = eodExecutionsData.find(eod => eod.execution_id === execution.id);
+        if (eodData) {
+          return {
+            ...execution,
+            eod_metrics: eodData,
+            // Enhanced execution metrics using EOD
+            eod_performance: {
+              realized_pl: eodData.realized_pl_amount,
+              unrealized_pl: eodData.unrealized_pl_amount,
+              total_pl: (eodData.realized_pl_amount || 0) + (eodData.unrealized_pl_amount || 0),
+              execution_rate: eodData.execution_rate,
+              slippage_amount: eodData.slippage_amount
+            }
+          };
+        }
+        return execution;
+      });
+
+      if (window.Logger) {
+        window.Logger.info('✅ Enriched executions with EOD data', {
+          page: 'executions',
+          originalCount: executions.length,
+          enrichedCount: enrichedExecutions.length
+        });
+      }
+    }
+  } catch (eodError) {
+    if (window.Logger) {
+      window.Logger.warn('⚠️ Failed to enrich executions with EOD data, using original data', {
+        page: 'executions',
+        error: eodError.message
+      });
+    }
+    // Continue with original executions data - no fallback mock data
+  }
   // updateExecutionsTableMain called with executions
   const tbody = document.querySelector('#executionsTable tbody');
   if (!tbody) {
@@ -5791,4 +5835,95 @@ function buildTradeSuggestionsFlatList(sourceData) {
         }
     });
     return flatData;
+};
+
+/**
+ * Load EOD data for executions
+ * @param {Array} executions - Array of execution objects
+ * @returns {Promise<Array>} EOD metrics for executions
+ */
+async function loadEODExecutionsData(executions) {
+    if (!Array.isArray(executions) || executions.length === 0) {
+        return [];
+    }
+
+    try {
+        // Get execution IDs for EOD query
+        const executionIds = executions.map(exec => exec.id).filter(id => id);
+
+        if (executionIds.length === 0) {
+            return [];
+        }
+
+        // Use EODIntegrationHelper to load execution-specific metrics
+        // Since EOD currently focuses on portfolio-level metrics,
+        // we'll use portfolio metrics and filter by date ranges around execution dates
+        const eodResults = [];
+
+        for (const execution of executions) {
+            if (!execution.created_at) continue;
+
+            try {
+                // Get portfolio metrics around the execution date
+                const executionDate = new Date(execution.created_at);
+                const startDate = new Date(executionDate);
+                startDate.setDate(startDate.getDate() - 1); // Day before
+                const endDate = new Date(executionDate);
+                endDate.setDate(endDate.getDate() + 1); // Day after for execution monitoring
+
+                const eodData = await window.EODIntegrationHelper.loadEODPortfolioMetrics(
+                    null, // global user
+                    {
+                        date_from: startDate.toISOString().split('T')[0],
+                        date_to: endDate.toISOString().split('T')[0]
+                    }
+                );
+
+                if (eodData && eodData.data && Array.isArray(eodData.data) && eodData.data.length > 0) {
+                    // Find the record closest to execution date
+                    const executionDateStr = executionDate.toISOString().split('T')[0];
+                    const closestRecord = eodData.data.find(r => r.date_utc === executionDateStr) ||
+                                        eodData.data[0]; // Fallback to first record
+
+                    if (closestRecord) {
+                        eodResults.push({
+                            execution_id: execution.id,
+                            ...closestRecord,
+                            // Calculate execution-specific metrics
+                            execution_rate: execution.quantity ? (execution.filled_quantity || execution.quantity) / execution.quantity : 0,
+                            slippage_amount: execution.expected_price && execution.actual_price ?
+                                execution.actual_price - execution.expected_price : 0
+                        });
+                    }
+                }
+            } catch (executionError) {
+                if (window.Logger) {
+                    window.Logger.warn(`Failed to load EOD data for execution ${execution.id}`, {
+                        page: 'executions',
+                        executionId: execution.id,
+                        error: executionError.message
+                    });
+                }
+                // Continue with next execution
+            }
+        }
+
+        if (window.Logger && eodResults.length > 0) {
+            window.Logger.info(`✅ Loaded EOD data for ${eodResults.length} executions`, {
+                page: 'executions',
+                totalExecutions: executions.length
+            });
+        }
+
+        return eodResults;
+
+    } catch (error) {
+        if (window.Logger) {
+            window.Logger.warn('Failed to load EOD executions data', {
+                page: 'executions',
+                error: error.message
+            });
+        }
+        return [];
+    }
 }

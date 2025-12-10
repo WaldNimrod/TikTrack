@@ -27,9 +27,10 @@
  * - loadTradeConditionsSummary() - loadTradeConditionsSummary function
  * 
  * DATA MANIPULATION (19)
- * - updateTradesSummary() - updateTradesSummary function
+ * - updateTradesSummary() - updateTradesSummary function (EOD integrated)
  * - updateTradesCounters() - * Update trades summary statistics
- * - updateTradesTable() - updateTradesTable function
+ * - updateTradesTable() - updateTradesTable function (EOD integrated)
+ * - loadEODTradeData() - Load EOD data for trades
  * - deleteTradeRecord() - deleteTradeRecord function
  * - addEditImportantNote() - addEditImportantNote function
  * - addEditReminder() - * Add important note to edit modal
@@ -848,7 +849,7 @@ async function loadTickerDataForTrades(trades) {
  */
 async function updateTradesTable(trades) {
   window.Logger.info('🔍 updateTradesTable called with:', trades?.length || 0, 'trades', { page: "trades" });
-  
+
   // בדיקה שהנתונים תקינים
   if (!trades || !Array.isArray(trades)) {
     window.Logger.error('❌ Invalid trades data:', trades, { page: "trades" });
@@ -856,8 +857,53 @@ async function updateTradesTable(trades) {
     return;
   }
 
+  // === EOD INTEGRATION: Enrich trades with EOD data ===
+  let enrichedTrades = [...trades];
+  try {
+    const eodTradeData = await loadEODTradeData(trades);
+    if (eodTradeData && Array.isArray(eodTradeData)) {
+      // Merge EOD data with trades
+      enrichedTrades = trades.map(trade => {
+        const eodData = eodTradeData.find(eod => eod.trade_id === trade.id);
+        if (eodData) {
+          return {
+            ...trade,
+            eod_metrics: eodData,
+            // Enhanced P&L calculations using EOD
+            eod_realized_pl: eodData.realized_pl_amount,
+            eod_unrealized_pl: eodData.unrealized_pl_amount,
+            eod_total_pl: (eodData.realized_pl_amount || 0) + (eodData.unrealized_pl_amount || 0),
+            eod_performance_data: {
+              twr_daily: eodData.twr_daily,
+              twr_mtd: eodData.twr_mtd,
+              twr_ytd: eodData.twr_ytd,
+              max_drawdown: eodData.max_drawdown_to_date
+            }
+          };
+        }
+        return trade;
+      });
+
+      if (window.Logger) {
+        window.Logger.info('✅ Enriched trades with EOD data', {
+          page: 'trades',
+          originalCount: trades.length,
+          enrichedCount: enrichedTrades.length
+        });
+      }
+    }
+  } catch (eodError) {
+    if (window.Logger) {
+      window.Logger.warn('⚠️ Failed to enrich trades with EOD data, using original data', {
+        page: 'trades',
+        error: eodError.message
+      });
+    }
+    // Continue with original trades data - no fallback mock data
+  }
+
   // טעינת נתוני טיקר עדכניים
-  const tickerDataMap = await loadTickerDataForTrades(trades);
+  const tickerDataMap = await loadTickerDataForTrades(enrichedTrades);
 
   // בדיקה אם אנחנו בדף הנכון
   const tradesTable = document.querySelector('#tradesTable');
@@ -4987,4 +5033,91 @@ window.registerTradesTables = function() {
         defaultSort: { columnIndex: 10, direction: 'desc', key: 'created_at' }
     });
 };
+
+/**
+ * Load EOD data for trades
+ * @param {Array} trades - Array of trade objects
+ * @returns {Promise<Array>} EOD metrics for trades
+ */
+async function loadEODTradeData(trades) {
+    if (!Array.isArray(trades) || trades.length === 0) {
+        return [];
+    }
+
+    try {
+        // Get trade IDs for EOD query
+        const tradeIds = trades.map(trade => trade.id).filter(id => id);
+
+        if (tradeIds.length === 0) {
+            return [];
+        }
+
+        // Use EODIntegrationHelper to load trade-specific metrics
+        // Since EOD currently focuses on portfolio-level metrics,
+        // we'll use portfolio metrics and filter by date ranges around trade dates
+        const eodResults = [];
+
+        for (const trade of trades) {
+            if (!trade.created_at) continue;
+
+            try {
+                // Get portfolio metrics around the trade date
+                const tradeDate = new Date(trade.created_at);
+                const startDate = new Date(tradeDate);
+                startDate.setDate(startDate.getDate() - 1); // Day before
+                const endDate = new Date(tradeDate);
+                endDate.setDate(endDate.getDate() + 30); // 30 days after for monitoring
+
+                const eodData = await window.EODIntegrationHelper.loadEODPortfolioMetrics(
+                    null, // global user
+                    {
+                        date_from: startDate.toISOString().split('T')[0],
+                        date_to: endDate.toISOString().split('T')[0]
+                    }
+                );
+
+                if (eodData && eodData.data && Array.isArray(eodData.data) && eodData.data.length > 0) {
+                    // Find the record closest to trade date
+                    const tradeDateStr = tradeDate.toISOString().split('T')[0];
+                    const closestRecord = eodData.data.find(r => r.date_utc === tradeDateStr) ||
+                                        eodData.data[0]; // Fallback to first record
+
+                    if (closestRecord) {
+                        eodResults.push({
+                            trade_id: trade.id,
+                            ...closestRecord
+                        });
+                    }
+                }
+            } catch (tradeError) {
+                if (window.Logger) {
+                    window.Logger.warn(`Failed to load EOD data for trade ${trade.id}`, {
+                        page: 'trades',
+                        tradeId: trade.id,
+                        error: tradeError.message
+                    });
+                }
+                // Continue with next trade
+            }
+        }
+
+        if (window.Logger && eodResults.length > 0) {
+            window.Logger.info(`✅ Loaded EOD data for ${eodResults.length} trades`, {
+                page: 'trades',
+                totalTrades: trades.length
+            });
+        }
+
+        return eodResults;
+
+    } catch (error) {
+        if (window.Logger) {
+            window.Logger.warn('Failed to load EOD trade data', {
+                page: 'trades',
+                error: error.message
+            });
+        }
+        return [];
+    }
+}
 

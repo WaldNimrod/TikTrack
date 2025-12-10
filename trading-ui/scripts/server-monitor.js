@@ -16,6 +16,12 @@
 // === Global Functions ===
 // - copyDetailedLog() - Copydetailedlog
 
+// === EOD Integration Functions ===
+// - loadEODMonitoringData() - Loadeodmonitoringdata
+// - updateEODPerformanceData() - Updateeodperformancedata
+// - updateEODJobStatus() - Updateeodjobstatus
+// - updateEODAlerts() - Updateeodalerts
+
 class ServerMonitor {
   constructor() {
     this.logs = [];
@@ -64,6 +70,7 @@ class ServerMonitor {
     this.startMonitoring();
     this.loadSystemInfo();
     this.loadHealthData();
+    this.loadEODMonitoringData(); // EOD INTEGRATION: Load EOD monitoring data
   }
 
   // טעינת הגדרות
@@ -548,6 +555,37 @@ class ServerMonitor {
     } catch (error) {
       window.Logger?.error('❌ שגיאה בטעינת נתוני בריאות:', error);
     }
+
+    // EOD INTEGRATION: Load EOD monitoring data as part of health data
+    await this.loadEODMonitoringData();
+  }
+
+  // === EOD INTEGRATION: Load EOD monitoring data ===
+  async loadEODMonitoringData() {
+    try {
+      window.Logger?.debug('🔍 ServerMonitor - טוען נתוני ניטור EOD');
+
+      // Load EOD performance stats
+      const performanceStats = await window.EODIntegrationHelper.loadEODPerformanceStats();
+      if (performanceStats) {
+        this.updateEODPerformanceData(performanceStats);
+      }
+
+      // Load EOD job status
+      const jobHistory = await window.EODIntegrationHelper.loadEODJobHistory({ limit: 10 });
+      if (jobHistory && Array.isArray(jobHistory.data)) {
+        this.updateEODJobStatus(jobHistory.data);
+      }
+
+      // Load EOD alerts
+      const alerts = await window.EODIntegrationHelper.loadEODAlerts({ severity: 'high', limit: 5 });
+      if (alerts && Array.isArray(alerts.data)) {
+        this.updateEODAlerts(alerts.data);
+      }
+
+    } catch (error) {
+      window.Logger?.error('❌ שגיאה בטעינת נתוני ניטור EOD:', error);
+    }
   }
 
   // עדכון נתוני בריאות בממשק
@@ -835,6 +873,115 @@ window.copyDetailedLog = () => {
     if (window.showErrorNotification) {
       window.showErrorNotification('שגיאה', 'serverMonitor לא אותחל');
     }
+  }
+  // === EOD INTEGRATION: Update UI with EOD performance data ===
+  updateEODPerformanceData(performanceData) {
+    if (!performanceData) return;
+
+    // Update EOD performance metrics
+    const eodRunsEl = document.getElementById('eodRunsCount');
+    if (eodRunsEl && performanceData.total_eod_runs !== undefined) {
+      eodRunsEl.textContent = performanceData.total_eod_runs.toLocaleString();
+    }
+
+    const avgRunTimeEl = document.getElementById('avgRunTime');
+    if (avgRunTimeEl && performanceData.avg_run_time_ms !== undefined) {
+      avgRunTimeEl.textContent = `${(performanceData.avg_run_time_ms / 1000).toFixed(2)} שניות`;
+    }
+
+    const lastRunStatusEl = document.getElementById('lastRunStatus');
+    if (lastRunStatusEl && performanceData.last_run_status) {
+      const statusText = performanceData.last_run_status === 'success' ? 'הצליח' : 'נכשל';
+      const statusClass = performanceData.last_run_status === 'success' ? 'success' : 'error';
+      lastRunStatusEl.textContent = statusText;
+      lastRunStatusEl.className = `status-value ${statusClass}`;
+    }
+
+    const errors24hEl = document.getElementById('errors24h');
+    if (errors24hEl && performanceData.errors_last_24h !== undefined) {
+      errors24hEl.textContent = performanceData.errors_last_24h;
+      errors24hEl.className = `status-value ${performanceData.errors_last_24h > 0 ? 'warning' : 'success'}`;
+    }
+  }
+
+  // === EOD INTEGRATION: Update UI with EOD job status ===
+  updateEODJobStatus(jobHistory) {
+    if (!Array.isArray(jobHistory)) return;
+
+    const jobHistoryContainer = document.getElementById('eodJobHistory');
+    if (!jobHistoryContainer) return;
+
+    // Clear existing content
+    jobHistoryContainer.innerHTML = '';
+
+    if (jobHistory.length === 0) {
+      jobHistoryContainer.innerHTML = '<div class="text-muted">אין jobs אחרונים</div>';
+      return;
+    }
+
+    // Create job history list
+    const jobList = document.createElement('div');
+    jobList.className = 'job-history-list';
+
+    jobHistory.slice(0, 5).forEach(job => {
+      const jobItem = document.createElement('div');
+      jobItem.className = 'job-history-item';
+
+      const statusIcon = job.status === 'success' ? '✅' : job.status === 'running' ? '🔄' : '❌';
+      const jobType = job.job_type || 'unknown';
+      const createdAt = job.created_at ? new Date(job.created_at).toLocaleString('he-IL') : 'לא ידוע';
+
+      jobItem.innerHTML = `
+        <span class="job-status">${statusIcon}</span>
+        <span class="job-type">${jobType}</span>
+        <span class="job-time">${createdAt}</span>
+      `;
+
+      jobList.appendChild(jobItem);
+    });
+
+    jobHistoryContainer.appendChild(jobList);
+  }
+
+  // === EOD INTEGRATION: Update UI with EOD alerts ===
+  updateEODAlerts(alerts) {
+    if (!Array.isArray(alerts)) return;
+
+    const alertsContainer = document.getElementById('eodAlerts');
+    if (!alertsContainer) return;
+
+    // Clear existing content
+    alertsContainer.innerHTML = '';
+
+    const activeAlerts = alerts.filter(alert => alert.status === 'active');
+
+    if (activeAlerts.length === 0) {
+      alertsContainer.innerHTML = '<div class="text-success">אין התראות פעילות</div>';
+      return;
+    }
+
+    // Create alerts list
+    const alertsList = document.createElement('div');
+    alertsList.className = 'alerts-list';
+
+    activeAlerts.slice(0, 5).forEach(alert => {
+      const alertItem = document.createElement('div');
+      alertItem.className = `alert-item ${alert.severity}`;
+
+      const severityIcon = alert.severity === 'high' ? '🚨' : alert.severity === 'medium' ? '⚠️' : 'ℹ️';
+      const title = alert.title || 'התראה';
+      const createdAt = alert.created_at ? new Date(alert.created_at).toLocaleString('he-IL') : 'לא ידוע';
+
+      alertItem.innerHTML = `
+        <span class="alert-icon">${severityIcon}</span>
+        <span class="alert-title">${title}</span>
+        <span class="alert-time">${createdAt}</span>
+      `;
+
+      alertsList.appendChild(alertItem);
+    });
+
+    alertsContainer.appendChild(alertsList);
   }
 };
 

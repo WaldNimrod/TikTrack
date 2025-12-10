@@ -52,7 +52,7 @@ todos:
       - phase2_2_executions
   - id: phase2_3_server_monitor
     content: "שלב 2.3: מימוש Server Monitor עם EOD monitoring"
-    status: pending
+    status: in_progress
     dependencies:
       - phase2_2_executions_test
   - id: phase2_3_server_monitor_test

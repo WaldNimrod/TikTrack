@@ -52,7 +52,7 @@ todos:
       - phase2_2_executions
   - id: phase2_3_server_monitor
     content: "שלב 2.3: מימוש Server Monitor עם EOD monitoring"
-    status: in_progress
+    status: completed
     dependencies:
       - phase2_2_executions_test
   - id: phase2_3_server_monitor_test
@@ -62,12 +62,12 @@ todos:
       - phase2_3_server_monitor
   - id: phase2_4_system_management
     content: "שלב 2.4: מימוש System Management עם EOD job management"
-    status: pending
+    status: completed
     dependencies:
       - phase2_3_server_monitor_test
   - id: phase2_4_system_management_test
     content: "שלב 2.4: בדיקות ותיקונים ל-System Management"
-    status: pending
+    status: completed
     dependencies:
       - phase2_4_system_management
   - id: phase3_1_research

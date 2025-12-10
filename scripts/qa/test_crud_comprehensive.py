@@ -178,13 +178,15 @@ ENTITIES = [
 
 # Session for authenticated requests
 session = None
+# Bearer token for authentication
+auth_token = None
 
 
 def login() -> bool:
-    """Login and get session"""
-    global session
+    """Login and get session with token"""
+    global session, auth_token
     session = requests.Session()
-    
+
     try:
         # Login
         login_data = {
@@ -192,8 +194,19 @@ def login() -> bool:
             "password": TEST_PASSWORD
         }
         response = session.post(f"{BASE_URL}/api/auth/login", json=login_data, timeout=10)
-        
+
         if response.status_code == 200:
+            # Extract token from response
+            data = response.json()
+            auth_token = data.get("data", {}).get("access_token")
+            if not auth_token:
+                print("❌ No access token in login response")
+                return False
+
+            # Set Authorization header for all future requests
+            session.headers.update({
+                'Authorization': f'Bearer {auth_token}'
+            })
             # Get available IDs and populate test data
             ids = get_available_ids(session)
             timestamp = int(time.time())

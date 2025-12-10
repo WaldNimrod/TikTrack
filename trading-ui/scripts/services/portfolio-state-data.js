@@ -78,7 +78,8 @@
       const base = location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
       const url = `${base}/api/portfolio-state/snapshot?${params.toString()}`;
       
-      const response = await fetch(url, { // Include cookies for session-based auth
+      const response = await fetch(url, {
+        credentials: 'include' // Include cookies for session-based auth
       });
       
       // Handle authentication errors (401/308) - show notification only once
@@ -176,7 +177,8 @@
       const base = location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
       const url = `${base}/api/portfolio-state/series?${params.toString()}`;
       
-      const response = await fetch(url, { // Include cookies for session-based auth
+      const response = await fetch(url, {
+        credentials: 'include' // Include cookies for session-based auth
       });
 
       // Handle authentication errors (401/308) - show notification only once
@@ -276,7 +278,8 @@
       const base = location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
       const url = `${base}/api/portfolio-state/performance?${params.toString()}`;
       
-      const response = await fetch(url, { // Include cookies for session-based auth
+      const response = await fetch(url, {
+        credentials: 'include' // Include cookies for session-based auth
       });
       if (response.status === 424) {
         const errorPayload = await response.json().catch(() => ({}));
@@ -347,7 +350,8 @@
       const base = location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
       const url = `${base}/api/portfolio-state/comparison?${params.toString()}`;
       
-      const response = await fetch(url, { // Include cookies for session-based auth
+      const response = await fetch(url, {
+        credentials: 'include' // Include cookies for session-based auth
       });
       if (response.status === 424) {
         const errorPayload = await response.json().catch(() => ({}));

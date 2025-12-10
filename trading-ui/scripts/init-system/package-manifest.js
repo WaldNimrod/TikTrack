@@ -2125,7 +2125,7 @@ const PACKAGE_MANIFEST = {
     description: 'Widgets and dashboard interfaces (Pending Executions, Trade Creation)',
     version: '1.0.0',
     critical: false,
-    loadOrder: 20.5, // Changed from 19.5 to 20.5 to load after watch-lists (20)
+    loadOrder: 20.6, // Changed from 20.5 to 20.6 to load after ai-analysis (20.5)
     dependencies: ['base', 'services', 'ui-advanced', 'entity-services', 'modules', 'entity-details', 'watch-lists'],
     loadingStrategy: 'defer', // Critical package - dashboard widgets, has dependencies on multiple packages
     scripts: [

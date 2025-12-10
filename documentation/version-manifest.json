@@ -10,13 +10,13 @@
     "notes": "יצירת בסיס נתונים פרודקשן עם מפתחות מסודרים ונתוני דוגמה מלאים"
   },
   "development": {
-    "version": "1.3.103.0",
+    "version": "1.3.104.0",
     "major": 1,
     "minor": 3,
-    "patch": 103,
+    "patch": 104,
     "build": 0,
-    "commit": "29ffcbc66459885a0f8badf5fcc395fb009d8086",
-    "updated_at": "2025-12-10T21:12:03+00:00",
-    "notes": "Finalize remaining UI and plan updates"
+    "commit": "d79e2768393cd632e6941de52e97f363395a02c4",
+    "updated_at": "2025-12-10T21:19:16+00:00",
+    "notes": "EOD Historical Metrics - Phase 2 Complete: All Medium Priority Pages (Trades, Executions, Server Monitor, System Management)"
   }
 }

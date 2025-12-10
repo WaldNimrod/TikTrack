@@ -10,13 +10,13 @@
     "notes": "יצירת בסיס נתונים פרודקשן עם מפתחות מסודרים ונתוני דוגמה מלאים"
   },
   "development": {
-    "version": "1.3.98.0",
+    "version": "1.3.99.0",
     "major": 1,
     "minor": 3,
-    "patch": 98,
+    "patch": 99,
     "build": 0,
-    "commit": "5fbb39e399b9b32712ca7f5e34103fae33400ba2",
-    "updated_at": "2025-12-10T01:31:03+00:00",
-    "notes": "Add comprehensive JSDoc documentation and Function Index to EOD Historical Metrics System services"
+    "commit": "03fbdae462367ccc591caa852b4176d07e359572",
+    "updated_at": "2025-12-10T20:44:11+00:00",
+    "notes": "EOD Historical Metrics - Phase 0 Complete: Comprehensive scanning and EODIntegrationHelper expansion"
   }
 }

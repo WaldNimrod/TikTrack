@@ -110,6 +110,23 @@ const UI_ADVANCED_SKIP_PAGE = (() => {
   return false;
 })();
 
+if (UI_ADVANCED_SKIP_PAGE) {
+  // Skip heavy logic on the demo page; provide safe stubs to avoid errors
+  window.Logger?.debug?.('⏭️ Skipping ui-advanced on dynamic-colors-display page', { page: 'ui-advanced' });
+  window.__UI_ADVANCED_INITIALIZED__ = true;
+  window.UI_ADVANCED_DISABLED = true;
+  window.getStatusColor = () => '';
+  window.getStatusBackgroundColor = () => '';
+  window.getStatusTextColor = () => '';
+  window.getStatusBorderColor = () => '';
+  window.getTableColors = () => ({});
+  window.getTableColorsWithFallbacks = () => ({});
+  window.getColorPreferences = () => ({});
+  window.loadColorScheme = async () => {};
+  window.applyColorScheme = () => {};
+  window.loadDynamicColors = async () => true;
+} else {
+
 // Save original functions from color-scheme-system.js if they exist
 // This must run immediately when this script loads (color-scheme-system.js loads before this)
 // CRITICAL: Save the original functions BEFORE they get overwritten by this script's local functions
@@ -2827,6 +2844,6 @@ window.loadDynamicColors = loadDynamicColors;
 // Auto-load on DOM ready
 // הוסר DOMContentLoaded listener כדי למנוע כפילות עם core-systems.js
 // loadDynamicColors נקרא דרך מערכת האתחול המאוחדת
-
 // Color Scheme System loaded successfully
 
+} // end !UI_ADVANCED_SKIP_PAGE

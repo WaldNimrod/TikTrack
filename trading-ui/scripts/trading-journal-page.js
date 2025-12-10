@@ -709,19 +709,89 @@
         }
         
         try {
+            // Try to load EOD portfolio metrics for the month
+            let eodPortfolioData = null;
+            if (window.EODIntegrationHelper && window.EODIntegrationHelper.isEODAvailable()) {
+                try {
+                    const userId = window.g?.user_id || window.TikTrackAuth?.currentUser?.id;
+                    if (userId) {
+                        // Calculate date range for the month
+                        const monthStart = new Date(currentYear, currentMonth, 1);
+                        const monthEnd = new Date(currentYear, currentMonth + 1, 0);
+
+                        if (window.Logger) {
+                            window.Logger.info('🔄 Loading EOD portfolio metrics for calendar month', {
+                                userId,
+                                year: currentYear,
+                                month: currentMonth,
+                                dateFrom: monthStart.toISOString().split('T')[0],
+                                dateTo: monthEnd.toISOString().split('T')[0],
+                                page: PAGE_NAME
+                            });
+                        }
+
+                        // Load EOD portfolio metrics for the entire month - NO FALLBACK!
+                        const eodResult = await window.EODIntegrationHelper.loadEODPortfolioMetrics(
+                            userId,
+                            {
+                                date_from: monthStart.toISOString().split('T')[0],
+                                date_to: monthEnd.toISOString().split('T')[0]
+                            }
+                        );
+
+                        if (eodResult && eodResult.data && Array.isArray(eodResult.data) && eodResult.data.length > 0) {
+                            eodPortfolioData = eodResult.data;
+                            if (window.Logger) {
+                                window.Logger.info('✅ EOD portfolio metrics loaded for calendar', {
+                                    userId,
+                                    recordsCount: eodPortfolioData.length,
+                                    source: eodResult.source,
+                                    page: PAGE_NAME
+                                });
+                            }
+                        }
+                    }
+                } catch (eodError) {
+                    if (window.Logger) {
+                        window.Logger.warn('⚠️ EOD loading failed for calendar, proceeding without', {
+                            error: eodError.message,
+                            year: currentYear,
+                            month: currentMonth,
+                            page: PAGE_NAME
+                        });
+                    }
+                }
+            }
+
             // Load data using CalendarDataLoader
             // CRITICAL: Pass both entityFilter and tickerFilter to calendar
             const dayData = await window.CalendarDataLoader.loadMonthDataWithCache(
-                currentYear, 
-                currentMonth, 
-                { 
+                currentYear,
+                currentMonth,
+                {
                     entityFilter: window.currentEntityFilter || 'all',
-                    tickerFilter: window.currentTickerFilter || null
+                    tickerFilter: window.currentTickerFilter || null,
+                    eodPortfolioData: eodPortfolioData // Pass EOD data to enrich calendar
                 }
             );
 
             // Render using CalendarRenderer
             await window.CalendarRenderer.render(currentYear, currentMonth, dayData);
+
+            // If we have EOD data, enhance the calendar with portfolio snapshots
+            if (eodPortfolioData && eodPortfolioData.length > 0) {
+                try {
+                    await enhanceCalendarWithEODData(eodPortfolioData, currentYear, currentMonth);
+                } catch (enhanceError) {
+                    if (window.Logger) {
+                        window.Logger.warn('⚠️ Failed to enhance calendar with EOD data', {
+                            error: enhanceError.message,
+                            recordsCount: eodPortfolioData.length,
+                            page: PAGE_NAME
+                        });
+                    }
+                }
+            }
             
             // Hide loading state
             if (calendarContainer && typeof window.hideLoadingState === 'function') {
@@ -741,6 +811,97 @@
                 window.Logger.error('Error loading calendar', { page: PAGE_NAME, error });
             }
             throw error;
+        }
+    }
+
+    /**
+     * Enhance calendar with EOD portfolio data
+     *
+     * @param {Array} eodPortfolioData - EOD portfolio metrics array
+     * @param {number} year - Current year
+     * @param {number} month - Current month (0-based)
+     */
+    async function enhanceCalendarWithEODData(eodPortfolioData, year, month) {
+        if (!eodPortfolioData || !Array.isArray(eodPortfolioData)) {
+            return;
+        }
+
+        // Create a map of date -> EOD data for quick lookup
+        const eodDataMap = {};
+        eodPortfolioData.forEach(record => {
+            if (record && record.date_utc) {
+                const dateKey = record.date_utc.split('T')[0]; // YYYY-MM-DD
+                eodDataMap[dateKey] = record;
+            }
+        });
+
+        // Find all calendar day elements
+        const dayElements = document.querySelectorAll('.calendar-day, .day-cell, [data-date]');
+        if (dayElements.length === 0) {
+            if (window.Logger) {
+                window.Logger.warn('⚠️ No calendar day elements found for EOD enhancement', {
+                    dayElementsCount: dayElements.length,
+                    page: PAGE_NAME
+                });
+            }
+            return;
+        }
+
+        let enhancedCount = 0;
+        dayElements.forEach(dayElement => {
+            try {
+                // Extract date from element (try different selectors)
+                let dateStr = null;
+
+                // Try data-date attribute
+                if (dayElement.dataset && dayElement.dataset.date) {
+                    dateStr = dayElement.dataset.date;
+                }
+                // Try text content or other attributes
+                else if (dayElement.textContent && dayElement.textContent.trim()) {
+                    // Try to extract date from text or other attributes
+                    const dateMatch = dayElement.textContent.trim().match(/(\d{4}-\d{2}-\d{2})/);
+                    if (dateMatch) {
+                        dateStr = dateMatch[1];
+                    }
+                }
+
+                if (dateStr && eodDataMap[dateStr]) {
+                    const eodRecord = eodDataMap[dateStr];
+
+                    // Add EOD indicator to the day element
+                    const eodIndicator = document.createElement('div');
+                    eodIndicator.className = 'eod-portfolio-indicator';
+                    eodIndicator.title = `NAV: $${(eodRecord.nav_total || 0).toLocaleString()}\nP&L: $${(eodRecord.unrealized_pl_amount || 0).toLocaleString()}`;
+                    eodIndicator.innerHTML = `
+                        <small class="text-muted">
+                            <i class="fas fa-chart-line"></i>
+                            NAV: $${((eodRecord.nav_total || 0) / 1000).toFixed(1)}K
+                        </small>
+                    `;
+
+                    // Add to day element
+                    dayElement.appendChild(eodIndicator);
+                    enhancedCount++;
+                }
+            } catch (elementError) {
+                if (window.Logger) {
+                    window.Logger.warn('⚠️ Failed to enhance calendar day with EOD', {
+                        error: elementError.message,
+                        dayElement: dayElement.outerHTML?.substring(0, 100),
+                        page: PAGE_NAME
+                    });
+                }
+            }
+        });
+
+        if (window.Logger) {
+            window.Logger.info('✅ Enhanced calendar with EOD portfolio data', {
+                totalDays: dayElements.length,
+                enhancedDays: enhancedCount,
+                eodRecords: eodPortfolioData.length,
+                page: PAGE_NAME
+            });
         }
     }
 

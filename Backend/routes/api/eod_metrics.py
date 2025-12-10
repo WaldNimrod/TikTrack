@@ -109,3 +109,124 @@ def get_recompute_history():
         return jsonify({'data': jobs, 'status': 'success'})
     except Exception as e:
         return jsonify({'error': str(e), 'status': 'error'}), 500
+
+# System & Monitoring APIs
+
+@eod_bp.route('/jobs/status', methods=['GET'])
+@require_authentication()
+def get_job_status():
+    """קבלת סטטוס משימות EOD"""
+    from flask import g
+    user_id = g.user_id
+    filters = {
+        'job_type': request.args.get('job_type'),
+        'status': request.args.get('status')
+    }
+
+    try:
+        status = eod_service.get_job_status(user_id, filters)
+        return jsonify({'data': status, 'status': 'success'})
+    except Exception as e:
+        return jsonify({'error': str(e), 'status': 'error'}), 500
+
+@eod_bp.route('/jobs/history', methods=['GET'])
+@require_authentication()
+def get_job_history():
+    """קבלת היסטוריית משימות EOD"""
+    from flask import g
+    user_id = g.user_id
+    filters = {
+        'limit': request.args.get('limit', 10, type=int),
+        'job_type': request.args.get('job_type'),
+        'date_from': request.args.get('date_from')
+    }
+
+    try:
+        history = eod_service.get_job_history(user_id, filters)
+        return jsonify({'data': history, 'status': 'success'})
+    except Exception as e:
+        return jsonify({'error': str(e), 'status': 'error'}), 500
+
+@eod_bp.route('/performance', methods=['GET'])
+@require_authentication()
+def get_performance_stats():
+    """קבלת סטטיסטיקות ביצועים של EOD"""
+    from flask import g
+    user_id = g.user_id
+    filters = {
+        'period': request.args.get('period', '24h')
+    }
+
+    try:
+        stats = eod_service.get_performance_stats(user_id, filters)
+        return jsonify({'data': stats, 'status': 'success'})
+    except Exception as e:
+        return jsonify({'error': str(e), 'status': 'error'}), 500
+
+# Data Access APIs
+
+@eod_bp.route('/tables/<table_name>', methods=['GET'])
+@require_authentication()
+def get_table_data(table_name):
+    """קבלת נתוני טבלה ישירות"""
+    from flask import g
+    user_id = g.user_id
+    filters = {
+        'limit': request.args.get('limit', 100, type=int),
+        'offset': request.args.get('offset', 0, type=int),
+        'date_from': request.args.get('date_from'),
+        'date_to': request.args.get('date_to')
+    }
+
+    try:
+        data = eod_service.get_table_data(user_id, table_name, filters)
+        return jsonify({'data': data, 'status': 'success'})
+    except Exception as e:
+        return jsonify({'error': str(e), 'status': 'error'}), 500
+
+@eod_bp.route('/alerts', methods=['GET'])
+@require_authentication()
+def get_validation_alerts():
+    """קבלת התראות מבוססות EOD"""
+    from flask import g
+    user_id = g.user_id
+    filters = {
+        'severity': request.args.get('severity'),
+        'date_from': request.args.get('date_from')
+    }
+
+    try:
+        alerts = eod_service.get_validation_alerts(user_id, filters)
+        return jsonify({'data': alerts, 'status': 'success'})
+    except Exception as e:
+        return jsonify({'error': str(e), 'status': 'error'}), 500
+
+@eod_bp.route('/comparison', methods=['GET'])
+@require_authentication()
+def get_comparison_data():
+    """קבלת נתונים להשוואות היסטוריות"""
+    from flask import g
+    user_id = g.user_id
+    filters = {
+        'date_ranges': request.args.get('date_ranges'),
+        'metrics': request.args.get('metrics')
+    }
+
+    # Parse JSON parameters
+    if filters.date_ranges:
+        try:
+            filters.date_ranges = eval(filters.date_ranges)  # Safe since we control input
+        except:
+            filters.date_ranges = None
+
+    if filters.metrics:
+        try:
+            filters.metrics = eval(filters.metrics)  # Safe since we control input
+        except:
+            filters.metrics = None
+
+    try:
+        data = eod_service.get_comparison_data(user_id, filters)
+        return jsonify({'data': data, 'status': 'success'})
+    except Exception as e:
+        return jsonify({'error': str(e), 'status': 'error'}), 500

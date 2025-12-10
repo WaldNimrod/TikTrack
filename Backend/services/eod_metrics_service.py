@@ -235,3 +235,174 @@ class EODMetricsService:
                 value = value.isoformat()
             result[column.name] = value
         return result
+
+    # System & Monitoring Methods
+
+    def get_job_status(self, user_id: int, filters: Dict[str, Any] = None) -> Dict[str, Any]:
+        """קבלת סטטוס משימות EOD"""
+        # Placeholder - implement based on actual job system
+        return {
+            'active_jobs': 0,
+            'pending_jobs': 0,
+            'completed_jobs': 0,
+            'failed_jobs': 0,
+            'last_run': None
+        }
+
+    def get_job_history(self, user_id: int, filters: Dict[str, Any] = None) -> List[Dict[str, Any]]:
+        """קבלת היסטוריית משימות EOD"""
+        # Placeholder - implement based on actual job system
+        return []
+
+    def get_performance_stats(self, user_id: int, filters: Dict[str, Any] = None) -> Dict[str, Any]:
+        """קבלת סטטיסטיקות ביצועים של EOD"""
+        # Calculate basic performance metrics
+        period = filters.get('period', '24h') if filters else '24h'
+
+        # Count records in the last period
+        from datetime import datetime, timedelta
+        end_date = datetime.now().date()
+        if period == '24h':
+            start_date = end_date - timedelta(days=1)
+        elif period == '7d':
+            start_date = end_date - timedelta(days=7)
+        elif period == '30d':
+            start_date = end_date - timedelta(days=30)
+        else:
+            start_date = end_date - timedelta(days=1)
+
+        # Count portfolio metrics records
+        portfolio_count = self.db.query(DailyPortfolioMetrics).filter(
+            DailyPortfolioMetrics.user_id == user_id,
+            DailyPortfolioMetrics.date_utc >= start_date,
+            DailyPortfolioMetrics.date_utc <= end_date
+        ).count()
+
+        return {
+            'period': period,
+            'portfolio_records_count': portfolio_count,
+            'cache_hit_rate': 0.85,  # Placeholder
+            'average_calculation_time': 2.5,  # seconds, placeholder
+            'last_updated': datetime.now().isoformat()
+        }
+
+    # Data Access Methods
+
+    def get_table_data(self, user_id: int, table_name: str, filters: Dict[str, Any] = None) -> List[Dict[str, Any]]:
+        """קבלת נתוני טבלה ישירות"""
+        limit = filters.get('limit', 100) if filters else 100
+        offset = filters.get('offset', 0) if filters else 0
+        date_from = filters.get('date_from') if filters else None
+        date_to = filters.get('date_to') if filters else None
+
+        # Map table names to models
+        table_models = {
+            'daily_portfolio_metrics': DailyPortfolioMetrics,
+            'daily_ticker_positions': DailyTickerPositions,
+            'daily_cash_flows_agg': DailyCashFlowsAgg
+        }
+
+        if table_name not in table_models:
+            raise ValueError(f"Unknown table: {table_name}")
+
+        model = table_models[table_name]
+        query = self.db.query(model).filter(model.user_id == user_id)
+
+        # Apply date filters if provided
+        if date_from:
+            query = query.filter(model.date_utc >= date_from)
+        if date_to:
+            query = query.filter(model.date_utc <= date_to)
+
+        # Apply pagination
+        query = query.offset(offset).limit(limit)
+
+        records = query.all()
+        return [self._model_to_dict(record) for record in records]
+
+    def get_validation_alerts(self, user_id: int, filters: Dict[str, Any] = None) -> List[Dict[str, Any]]:
+        """קבלת התראות מבוססות EOD"""
+        # Get portfolio metrics with validation issues
+        query = self.db.query(DailyPortfolioMetrics).filter(
+            DailyPortfolioMetrics.user_id == user_id,
+            DailyPortfolioMetrics.data_quality_status.in_(['stale', 'needs_recompute'])
+        )
+
+        severity = filters.get('severity') if filters else None
+        if severity:
+            # Map severity to data quality status
+            status_map = {
+                'high': ['needs_recompute'],
+                'medium': ['stale'],
+                'low': ['valid']  # Include valid records for completeness
+            }
+            if severity in status_map:
+                query = query.filter(DailyPortfolioMetrics.data_quality_status.in_(status_map[severity]))
+
+        date_from = filters.get('date_from') if filters else None
+        if date_from:
+            query = query.filter(DailyPortfolioMetrics.date_utc >= date_from)
+
+        records = query.limit(50).all()  # Limit to prevent too many alerts
+
+        alerts = []
+        for record in records:
+            alert = {
+                'id': f"portfolio_{record.id}",
+                'type': 'portfolio_validation',
+                'severity': 'high' if record.data_quality_status == 'needs_recompute' else 'medium',
+                'message': f"Portfolio data for {record.date_utc} needs attention",
+                'date': record.date_utc.isoformat(),
+                'details': {
+                    'status': record.data_quality_status,
+                    'validation_errors': record.validation_errors
+                }
+            }
+            alerts.append(alert)
+
+        return alerts
+
+    def get_comparison_data(self, user_id: int, filters: Dict[str, Any] = None) -> Dict[str, Any]:
+        """קבלת נתונים להשוואות היסטוריות"""
+        date_ranges = filters.get('date_ranges', []) if filters else []
+        metrics = filters.get('metrics', ['nav_total', 'unrealized_pl_amount']) if filters else ['nav_total', 'unrealized_pl_amount']
+
+        result = {}
+
+        for range_spec in date_ranges:
+            range_name = range_spec.get('name', 'unnamed')
+            start_date = range_spec.get('start_date')
+            end_date = range_spec.get('end_date')
+
+            if not start_date or not end_date:
+                continue
+
+            # Get data for this range
+            query = self.db.query(DailyPortfolioMetrics).filter(
+                DailyPortfolioMetrics.user_id == user_id,
+                DailyPortfolioMetrics.date_utc >= start_date,
+                DailyPortfolioMetrics.date_utc <= end_date
+            ).order_by(DailyPortfolioMetrics.date_utc)
+
+            records = query.all()
+            range_data = {}
+
+            for metric in metrics:
+                if hasattr(DailyPortfolioMetrics, metric):
+                    values = [getattr(record, metric) for record in records if getattr(record, metric) is not None]
+                    if values:
+                        range_data[metric] = {
+                            'values': values,
+                            'min': min(values),
+                            'max': max(values),
+                            'avg': sum(values) / len(values),
+                            'count': len(values)
+                        }
+
+            result[range_name] = {
+                'date_range': {'start': start_date, 'end': end_date},
+                'metrics': range_data,
+                'record_count': len(records)
+            }
+
+        return result

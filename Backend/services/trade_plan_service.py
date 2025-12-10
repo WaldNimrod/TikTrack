@@ -82,11 +82,12 @@ class TradePlanService:
         return query.first()
     
     @staticmethod
-    def get_by_account(db: Session, trading_account_id: int, user_id: Optional[int] = None) -> List[TradePlan]:
-        """Get trade plans by account (filtered by user_id if provided)"""
-        query = db.query(TradePlan).filter(TradePlan.trading_account_id == trading_account_id)
-        if user_id is not None:
-            query = query.filter(TradePlan.user_id == user_id)
+    def get_by_account(db: Session, trading_account_id: int, user_id: int) -> List[TradePlan]:
+        """Get trade plans by account for a specific user (user_id is required for data isolation)"""
+        query = db.query(TradePlan).filter(
+            TradePlan.trading_account_id == trading_account_id,
+            TradePlan.user_id == user_id
+        )
         return query.all()
     
     @staticmethod

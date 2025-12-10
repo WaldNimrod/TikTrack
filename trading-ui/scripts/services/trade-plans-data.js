@@ -55,9 +55,21 @@
     'Content-Type': 'application/json',
     'Cache-Control': 'no-cache',
   };
+  const IS_TRADES_FORMATTED_PAGE = (() => {
+    try {
+      return typeof window !== 'undefined' && window.location?.pathname?.includes('trades_formatted');
+    } catch (_) {
+      return false;
+    }
+  })();
 
   async function loadTradePlansData(options = {}) {
     const { force = false, ttl = TRADE_PLANS_TTL, signal } = options;
+    if (IS_TRADES_FORMATTED_PAGE && !force) {
+      // On the heavy formatted view, avoid hammering the API to prevent 429s
+      window.Logger?.debug?.('⏭️ Skipping trade plans API on trades_formatted page (returning empty)', PAGE_LOG_CONTEXT);
+      return [];
+    }
     const loader = async () => {
       window.Logger?.debug?.('🔄 Loading trade plans data directly from API...', PAGE_LOG_CONTEXT);
       const response = await fetch('/api/trade-plans/', { signal });

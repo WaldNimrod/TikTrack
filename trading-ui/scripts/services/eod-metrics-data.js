@@ -187,6 +187,153 @@ class EODMetricsDataService {
         return data;
     }
 
+    /**
+     * מקבל סטטוס משימות EOD (לניטור שרת)
+     *
+     * @async
+     * @param {Object} [filters={}] - מסננים
+     * @returns {Promise<Object>} סטטוס משימות EOD
+     * @throws {Error} אם הבקשה נכשלה
+     */
+    async getJobStatus(filters = {}) {
+        const params = new URLSearchParams();
+        if (filters.job_type) params.append('job_type', filters.job_type);
+        if (filters.status) params.append('status', filters.status);
+
+        const cacheKey = `${this.cachePrefix}job_status_${JSON.stringify(filters)}`;
+
+        return await CacheTTLGuard.get(cacheKey, async () => {
+            const response = await fetch(`${this.baseUrl}/jobs/status?${params}`);
+            if (!response.ok) {
+                throw new Error(`Failed to fetch job status: ${response.status}`);
+            }
+            return await response.json();
+        });
+    }
+
+    /**
+     * מקבל היסטוריית משימות EOD
+     *
+     * @async
+     * @param {Object} [filters={}] - מסננים
+     * @returns {Promise<Array>} היסטוריית משימות
+     * @throws {Error} אם הבקשה נכשלה
+     */
+    async getJobHistory(filters = {}) {
+        const params = new URLSearchParams();
+        if (filters.limit) params.append('limit', filters.limit);
+        if (filters.job_type) params.append('job_type', filters.job_type);
+        if (filters.date_from) params.append('date_from', filters.date_from);
+
+        const cacheKey = `${this.cachePrefix}job_history_${JSON.stringify(filters)}`;
+
+        return await CacheTTLGuard.get(cacheKey, async () => {
+            const response = await fetch(`${this.baseUrl}/jobs/history?${params}`);
+            if (!response.ok) {
+                throw new Error(`Failed to fetch job history: ${response.status}`);
+            }
+            return await response.json();
+        });
+    }
+
+    /**
+     * מקבל נתוני טבלה ישירות (ל-DB Display)
+     *
+     * @async
+     * @param {string} tableName - שם הטבלה
+     * @param {Object} [filters={}] - מסננים
+     * @returns {Promise<Object>} נתוני טבלה
+     * @throws {Error} אם הבקשה נכשלה
+     */
+    async getTableData(tableName, filters = {}) {
+        const params = new URLSearchParams();
+        if (filters.limit) params.append('limit', filters.limit);
+        if (filters.offset) params.append('offset', filters.offset);
+        if (filters.date_from) params.append('date_from', filters.date_from);
+        if (filters.date_to) params.append('date_to', filters.date_to);
+
+        const cacheKey = `${this.cachePrefix}table_${tableName}_${JSON.stringify(filters)}`;
+
+        return await CacheTTLGuard.get(cacheKey, async () => {
+            const response = await fetch(`${this.baseUrl}/tables/${tableName}?${params}`);
+            if (!response.ok) {
+                throw new Error(`Failed to fetch table data: ${response.status}`);
+            }
+            return await response.json();
+        });
+    }
+
+    /**
+     * מקבל התראות מבוססות EOD
+     *
+     * @async
+     * @param {Object} [filters={}] - מסננים
+     * @returns {Promise<Array>} רשימת התראות
+     * @throws {Error} אם הבקשה נכשלה
+     */
+    async getValidationAlerts(filters = {}) {
+        const params = new URLSearchParams();
+        if (filters.severity) params.append('severity', filters.severity);
+        if (filters.date_from) params.append('date_from', filters.date_from);
+
+        const cacheKey = `${this.cachePrefix}alerts_${JSON.stringify(filters)}`;
+
+        return await CacheTTLGuard.get(cacheKey, async () => {
+            const response = await fetch(`${this.baseUrl}/alerts?${params}`);
+            if (!response.ok) {
+                throw new Error(`Failed to fetch alerts: ${response.status}`);
+            }
+            return await response.json();
+        });
+    }
+
+    /**
+     * מקבל סטטיסטיקות ביצועים של EOD
+     *
+     * @async
+     * @param {Object} [filters={}] - מסננים
+     * @returns {Promise<Object>} סטטיסטיקות ביצועים
+     * @throws {Error} אם הבקשה נכשלה
+     */
+    async getPerformanceStats(filters = {}) {
+        const params = new URLSearchParams();
+        if (filters.period) params.append('period', filters.period);
+
+        const cacheKey = `${this.cachePrefix}performance_${JSON.stringify(filters)}`;
+
+        return await CacheTTLGuard.get(cacheKey, async () => {
+            const response = await fetch(`${this.baseUrl}/performance?${params}`);
+            if (!response.ok) {
+                throw new Error(`Failed to fetch performance stats: ${response.status}`);
+            }
+            return await response.json();
+        });
+    }
+
+    /**
+     * מקבל נתונים להשוואות היסטוריות (ל-Research Page)
+     *
+     * @async
+     * @param {Object} [filters={}] - מסננים
+     * @returns {Promise<Object>} נתונים להשוואה
+     * @throws {Error} אם הבקשה נכשלה
+     */
+    async getComparisonData(filters = {}) {
+        const params = new URLSearchParams();
+        if (filters.date_ranges) params.append('date_ranges', JSON.stringify(filters.date_ranges));
+        if (filters.metrics) params.append('metrics', JSON.stringify(filters.metrics));
+
+        const cacheKey = `${this.cachePrefix}comparison_${JSON.stringify(filters)}`;
+
+        return await CacheTTLGuard.get(cacheKey, async () => {
+            const response = await fetch(`${this.baseUrl}/comparison?${params}`);
+            if (!response.ok) {
+                throw new Error(`Failed to fetch comparison data: ${response.status}`);
+            }
+            return await response.json();
+        });
+    }
+
     // Utility methods
 
     /**
@@ -227,11 +374,23 @@ window.EODMetricsDataService = new EODMetricsDataService();
  * -------------
  * constructor() - יוצר מופע חדש של השירות
  *
- * Data Retrieval Methods:
- * ----------------------
+ * Portfolio & Trading Data:
+ * ------------------------
  * getPortfolioMetrics(userId, filters) - מקבל מדדי פורטפוליו יומיים
  * getPositions(userId, filters) - מקבל נתוני פוזיציות יומיות
  * getCashFlows(userId, filters) - מקבל נתוני תזרימי מזומנים יומיים
+ *
+ * System & Monitoring:
+ * -------------------
+ * getJobStatus(filters) - מקבל סטטוס משימות EOD
+ * getJobHistory(filters) - מקבל היסטוריית משימות EOD
+ * getPerformanceStats(filters) - מקבל סטטיסטיקות ביצועים
+ *
+ * Data Access:
+ * -----------
+ * getTableData(tableName, filters) - מקבל נתוני טבלה ישירות
+ * getValidationAlerts(filters) - מקבל התראות מבוססות EOD
+ * getComparisonData(filters) - מקבל נתונים להשוואות היסטוריות
  *
  * Recompute Methods:
  * -----------------

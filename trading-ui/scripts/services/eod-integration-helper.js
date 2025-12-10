@@ -12,20 +12,31 @@
 // ===== FUNCTION INDEX =====
 // === Core Integration Functions ===
 // - integrateEODMetrics() - אינטגרציה מלאה עם EOD APIs
-// - loadEODDataWithFallback() - טעינת נתונים עם fallback
+// - loadEODDataStrict() - טעינת נתונים ללא fallback
 // - handleEODError() - טיפול בשגיאות EOD
 // - showEODLoadingState() - הצגת מצב טעינה
 // - hideEODLoadingState() - הסתרת מצב טעינה
 //
-// === Specific Data Loaders ===
+// === Portfolio & Trading Data Loaders ===
 // - loadEODPortfolioMetrics() - טעינת מדדי פורטפוליו
 // - loadEODPositions() - טעינת פוזיציות
 // - loadEODCashFlows() - טעינת תזרימי מזומנים
+//
+// === System & Monitoring Functions ===
+// - loadEODJobStatus() - טעינת סטטוס משימות EOD
+// - loadEODJobHistory() - טעינת היסטוריית משימות EOD
+// - loadEODPerformanceStats() - טעינת סטטיסטיקות ביצועים
+//
+// === Data Access Functions ===
+// - loadEODTable() - טעינת טבלאות EOD ישירות
+// - loadEODAlerts() - טעינת התראות מבוססות EOD
+// - loadEODComparisonData() - טעינת נתונים להשוואות היסטוריות
 //
 // === Validation & Quality ===
 // - validateEODData() - ולידציה של נתוני EOD
 // - handleEODValidationErrors() - טיפול בשגיאות ולידציה
 // - suggestEODRecompute() - הצעה לחישוב מחדש
+// - performEODRecompute() - ביצוע חישוב מחדש
 //
 // === Utilities ===
 // - formatEODError() - עיצוב הודעות שגיאה
@@ -300,74 +311,159 @@
     }
 
     /**
-     * טוען מדדי פורטפוליו מ-EOD עם fallback
+     * טוען סטטוס משימות EOD (לניטור שרת ומערכת)
+     *
+     * @param {Object} filters - מסננים
+     * @returns {Promise<Object>} סטטוס משימות EOD
+     */
+    async function loadEODJobStatus(filters = {}) {
+        return loadEODDataStrict(
+            'job-status',
+            null, // global status
+            filters,
+            () => window.EODMetricsDataService.getJobStatus(filters)
+        );
+    }
+
+    /**
+     * טוען היסטוריית משימות EOD (לניהול מערכת)
+     *
+     * @param {Object} filters - מסננים (date range, job types)
+     * @returns {Promise<Object>} היסטוריית משימות
+     */
+    async function loadEODJobHistory(filters = {}) {
+        return loadEODDataStrict(
+            'job-history',
+            null, // global history
+            filters,
+            () => window.EODMetricsDataService.getJobHistory(filters)
+        );
+    }
+
+    /**
+     * טוען טבלאות EOD ישירות (ל-DB Display)
+     *
+     * @param {string} tableName - שם הטבלה
+     * @param {Object} filters - מסננים
+     * @returns {Promise<Object>} נתוני טבלה
+     */
+    async function loadEODTable(tableName, filters = {}) {
+        return loadEODDataStrict(
+            `table-${tableName}`,
+            null, // direct table access
+            filters,
+            () => window.EODMetricsDataService.getTableData(tableName, filters)
+        );
+    }
+
+    /**
+     * טוען התראות מבוססות EOD (ל-Alerts Page)
+     *
+     * @param {Object} filters - מסננים
+     * @returns {Promise<Object>} התראות EOD
+     */
+    async function loadEODAlerts(filters = {}) {
+        return loadEODDataStrict(
+            'alerts',
+            null, // global alerts
+            filters,
+            () => window.EODMetricsDataService.getValidationAlerts(filters)
+        );
+    }
+
+    /**
+     * טוען סטטיסטיקות ביצועים של EOD (לניטור)
+     *
+     * @param {Object} filters - מסננים
+     * @returns {Promise<Object>} סטטיסטיקות ביצועים
+     */
+    async function loadEODPerformanceStats(filters = {}) {
+        return loadEODDataStrict(
+            'performance',
+            null, // global stats
+            filters,
+            () => window.EODMetricsDataService.getPerformanceStats(filters)
+        );
+    }
+
+    /**
+     * טוען נתונים להשוואות היסטוריות (ל-Research Page)
+     *
+     * @param {Object} filters - מסננים (date ranges, metrics)
+     * @returns {Promise<Object>} נתונים להשוואה
+     */
+    async function loadEODComparisonData(filters = {}) {
+        return loadEODDataStrict(
+            'comparison',
+            null, // global comparison data
+            filters,
+            () => window.EODMetricsDataService.getComparisonData(filters)
+        );
+    }
+
+    /**
+     * טוען מדדי פורטפוליו מ-EOD - ללא fallback!
      *
      * @async
      * @param {number} userId - מזהה המשתמש
      * @param {Object} filters - מסננים
-     * @param {Function} fallbackFn - פונקציית fallback (אופציונלי)
-     * @returns {Promise<Object>} נתוני מדדי פורטפוליו
+     * @returns {Promise<Object>} נתוני מדדי פורטפוליו או שגיאה מפורטת
      */
-    async function loadEODPortfolioMetrics(userId, filters = {}, fallbackFn = null) {
-        return loadEODDataWithFallback(
+    async function loadEODPortfolioMetrics(userId, filters = {}) {
+        return loadEODDataStrict(
             'portfolio',
             userId,
             filters,
-            () => window.EODMetricsDataService.getPortfolioMetrics(userId, filters),
-            fallbackFn
+            () => window.EODMetricsDataService.getPortfolioMetrics(userId, filters)
         );
     }
 
     /**
-     * טוען פוזיציות מ-EOD עם fallback
+     * טוען פוזיציות מ-EOD - ללא fallback!
      *
      * @async
      * @param {number} userId - מזהה המשתמש
      * @param {Object} filters - מסננים
-     * @param {Function} fallbackFn - פונקציית fallback (אופציונלי)
-     * @returns {Promise<Object>} נתוני פוזיציות
+     * @returns {Promise<Object>} נתוני פוזיציות או שגיאה מפורטת
      */
-    async function loadEODPositions(userId, filters = {}, fallbackFn = null) {
-        return loadEODDataWithFallback(
+    async function loadEODPositions(userId, filters = {}) {
+        return loadEODDataStrict(
             'positions',
             userId,
             filters,
-            () => window.EODMetricsDataService.getPositions(userId, filters),
-            fallbackFn
+            () => window.EODMetricsDataService.getPositions(userId, filters)
         );
     }
 
     /**
-     * טוען תזרימי מזומנים מ-EOD עם fallback
+     * טוען תזרימי מזומנים מ-EOD - ללא fallback!
      *
      * @async
      * @param {number} userId - מזהה המשתמש
      * @param {Object} filters - מסננים
-     * @param {Function} fallbackFn - פונקציית fallback (אופציונלי)
-     * @returns {Promise<Object>} נתוני תזרימי מזומנים
+     * @returns {Promise<Object>} נתוני תזרימי מזומנים או שגיאה מפורטת
      */
-    async function loadEODCashFlows(userId, filters = {}, fallbackFn = null) {
-        return loadEODDataWithFallback(
+    async function loadEODCashFlows(userId, filters = {}) {
+        return loadEODDataStrict(
             'cash-flows',
             userId,
             filters,
-            () => window.EODMetricsDataService.getCashFlows(userId, filters),
-            fallbackFn
+            () => window.EODMetricsDataService.getCashFlows(userId, filters)
         );
     }
 
     /**
-     * טוען נתונים מ-EOD עם fallback mechanism
+     * טוען נתונים מ-EOD - ללא fallback כלל!
+     * אם אין נתונים אמיתיים - מציג הודעת שגיאה מפורטת
      *
      * @async
      * @param {string} type - סוג הנתונים
      * @param {number} userId - מזהה המשתמש
      * @param {Object} filters - מסננים
      * @param {Function} eodFn - פונקציית EOD
-     * @param {Function} fallbackFn - פונקציית fallback
-     * @returns {Promise<Object>} נתונים עם סטטוס
+     * @returns {Promise<Object>} נתונים או שגיאה מפורטת
      */
-    async function loadEODDataWithFallback(type, userId, filters, eodFn, fallbackFn = null) {
+    async function loadEODDataStrict(type, userId, filters, eodFn) {
         const cacheKey = getEODCacheKey(type, userId, filters);
 
         // Try to load from cache first
@@ -466,33 +562,37 @@
             }
         }
 
-        // All attempts failed, try fallback if available
-        if (fallbackFn && CONFIG.fallbackEnabled) {
-            try {
-                if (window.Logger) {
-                    window.Logger.info('All EOD attempts failed, using fallback', { type, userId });
-                }
+        // No fallback allowed! If EOD data is not available, show detailed error message
+        const errorDetails = {
+            dataType: type,
+            userId,
+            filters,
+            lastError: lastError.message,
+            attempts: CONFIG.retryAttempts + 1
+        };
 
-                const fallbackData = await fallbackFn();
-                return {
-                    data: fallbackData,
-                    source: 'fallback',
-                    isEOD: false
-                };
-            } catch (fallbackError) {
-                if (window.Logger) {
-                    window.Logger.error('Fallback also failed', { type, userId, fallbackError: fallbackError.message });
-                }
-            }
+        const detailedErrorMsg = `נתוני ${type} היסטוריים לא זמינים. ` +
+            `לא ניתן לטעון נתונים אמיתיים מהשרת. ` +
+            `אנא פנה למנהל המערכת או נסה שוב מאוחר יותר. ` +
+            `(פרטים: ${JSON.stringify(errorDetails)})`;
+
+        if (window.Logger) {
+            window.Logger.error('EOD data completely unavailable - no fallback used', errorDetails);
         }
 
-        // Everything failed
-        handleEODError(lastError, `load ${type}`);
-        throw lastError;
+        // Show detailed error message to user - NO FALLBACK DATA!
+        if (window.NotificationSystem) {
+            window.NotificationSystem.showError(
+                'נתונים היסטוריים לא זמינים',
+                detailedErrorMsg
+            );
+        }
+
+        throw new Error(detailedErrorMsg);
     }
 
     /**
-     * אינטגרציה מלאה עם EOD APIs
+     * אינטגרציה מלאה עם EOD APIs - ללא fallback!
      *
      * @async
      * @param {string} containerId - מזהה הקונטיינר
@@ -500,23 +600,22 @@
      * @param {number} userId - מזהה המשתמש
      * @param {Object} filters - מסננים
      * @param {Function} successCallback - callback להצלחה
-     * @param {Function} fallbackFn - פונקציית fallback
-     * @returns {Promise<Object>} תוצאת האינטגרציה
+     * @returns {Promise<Object>} תוצאת האינטגרציה או שגיאה מפורטת
      */
-    async function integrateEODMetrics(containerId, type, userId, filters = {}, successCallback, fallbackFn = null) {
+    async function integrateEODMetrics(containerId, type, userId, filters = {}, successCallback) {
         try {
             showEODLoadingState(containerId);
 
             let result;
             switch (type) {
                 case 'portfolio':
-                    result = await loadEODPortfolioMetrics(userId, filters, fallbackFn);
+                    result = await loadEODPortfolioMetrics(userId, filters);
                     break;
                 case 'positions':
-                    result = await loadEODPositions(userId, filters, fallbackFn);
+                    result = await loadEODPositions(userId, filters);
                     break;
                 case 'cash-flows':
-                    result = await loadEODCashFlows(userId, filters, fallbackFn);
+                    result = await loadEODCashFlows(userId, filters);
                     break;
                 default:
                     throw new Error(`Unknown EOD type: ${type}`);
@@ -532,30 +631,40 @@
 
         } catch (error) {
             hideEODLoadingState(containerId);
-            handleEODError(error, `integrate ${type}`);
-
+            // Don't call handleEODError here - loadEODDataStrict already handles error display
             throw error;
         }
     }
 
     // Export functions
     window.EODIntegrationHelper = {
-        // Core functions
+        // Core functions - NO FALLBACK!
         integrateEODMetrics,
-        loadEODDataWithFallback,
+        loadEODDataStrict,
         handleEODError,
         showEODLoadingState,
         hideEODLoadingState,
 
-        // Specific loaders
+        // Specific loaders - Portfolio & Trading
         loadEODPortfolioMetrics,
         loadEODPositions,
         loadEODCashFlows,
 
-        // Validation
+        // System & Monitoring functions
+        loadEODJobStatus,
+        loadEODJobHistory,
+        loadEODPerformanceStats,
+
+        // Data Access functions
+        loadEODTable,
+        loadEODAlerts,
+        loadEODComparisonData,
+
+        // Validation & Recompute
         validateEODData,
         handleEODValidationErrors,
         suggestEODRecompute,
+        performEODRecompute,
 
         // Utilities
         formatEODError,

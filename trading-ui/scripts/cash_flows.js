@@ -230,7 +230,7 @@ async function loadCashFlowsData(options = {}) {
       applyFallbackDateSort(normalizedCashFlows);
     }
 
-    updatePageSummaryStats();
+    await updatePageSummaryStats();
 
     if (typeof window.registerCashFlowsTables === 'function') {
       window.registerCashFlowsTables();
@@ -1762,13 +1762,54 @@ async function renderCashFlowsTable() {
  * @returns {void}
  * Uses InfoSummarySystem from services/statistics-calculator.js
  */
-function updatePageSummaryStats() {
+async function updatePageSummaryStats() {
   try {
     const summarySource = Array.isArray(window.filteredCashFlowsData) && window.filteredCashFlowsData.length > 0
       ? window.filteredCashFlowsData
       : (Array.isArray(window.allCashFlowsData) && window.allCashFlowsData.length > 0
           ? window.allCashFlowsData
           : (cashFlowsData || []));
+
+    // Try to enhance summary with EOD cash flow data
+    let enhancedSummarySource = summarySource;
+    if (window.EODIntegrationHelper && window.EODIntegrationHelper.isEODAvailable()) {
+      try {
+        const userId = window.g?.user_id || window.TikTrackAuth?.currentUser?.id;
+        if (userId) {
+          // Load EOD cash flows for current period
+                        const eodResult = await window.EODIntegrationHelper.loadEODCashFlows(
+                            userId,
+                            {
+                                date_from: '2025-01-01', // Could be made dynamic
+                                date_to: new Date().toISOString().split('T')[0]
+                            }
+                        );
+
+          if (eodResult && eodResult.data && Array.isArray(eodResult.data) && eodResult.data.length > 0) {
+            // For now, just log that EOD data is available
+            // In a full implementation, you'd merge EOD cash flow aggregations
+            if (window.Logger) {
+              window.Logger.info('✅ EOD cash flow data available for summary enhancement', {
+                page: 'cash_flows',
+                eodRecords: eodResult.data.length,
+                source: eodResult.source,
+                totalEODCashFlows: eodResult.data.reduce((sum, record) => sum + (record.net_flow || 0), 0)
+              });
+            }
+
+            // Store EOD data for potential use in summary calculations
+            window.eodCashFlowsData = eodResult.data;
+          }
+        }
+      } catch (eodError) {
+        if (window.Logger) {
+          window.Logger.warn('⚠️ EOD cash flow loading failed for summary, proceeding without', {
+            page: 'cash_flows',
+            error: eodError.message
+          });
+        }
+      }
+    }
 
     // Use global InfoSummarySystem if available
     if (window.InfoSummarySystem && window.INFO_SUMMARY_CONFIGS && window.INFO_SUMMARY_CONFIGS.cash_flows) {
@@ -1884,10 +1925,10 @@ async function syncCashFlowsPagination(cashFlows) {
             });
           }
         },
-        onFilteredDataChange: ({ filteredData }) => {
+        onFilteredDataChange: async ({ filteredData }) => {
           window.filteredCashFlowsData = Array.isArray(filteredData) ? filteredData : [];
           if (typeof updatePageSummaryStats === 'function') {
-            updatePageSummaryStats();
+            await updatePageSummaryStats();
           }
           // Update count element with total filtered records (not just current page)
           // Use generic updateTableCount function
@@ -2648,7 +2689,7 @@ async function updateCashFlowsTable(cashFlows, options = {}) {
 
   // עדכון סטטיסטיקות רק אם לא מדלגים
   if (!skipSummary) {
-    updatePageSummaryStats();
+    await updatePageSummaryStats();
   }
   
   window.Logger?.info('✅ [updateCashFlowsTable] Completed', {
@@ -2686,7 +2727,7 @@ function startAutoRefresh() {
   //     
   //     // עדכון סטטיסטיקות
   //     if (typeof updatePageSummaryStats === 'function') {
-  //       updatePageSummaryStats();
+  //       await updatePageSummaryStats();
   //     }
   //     
   //     window.Logger.info('Automatic update completed successfully', { page: 'cash_flows' });

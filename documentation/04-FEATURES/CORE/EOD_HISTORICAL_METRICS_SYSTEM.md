@@ -199,23 +199,26 @@ class EODValidationService {
 }
 ```
 
-#### EOD Integration Helper
+#### EOD Integration Helper - ללא fallback!
 ```javascript
 // trading-ui/scripts/services/eod-integration-helper.js
 window.EODIntegrationHelper = {
-    // Core integration
-    integrateEODMetrics(containerId, type, userId, filters, successCallback, fallbackFn),
+    // Core integration - NO FALLBACK!
+    integrateEODMetrics(containerId, type, userId, filters, successCallback),
 
-    // Specific loaders with fallback
-    loadEODPortfolioMetrics(userId, filters, fallbackFn),
-    loadEODPositions(userId, filters, fallbackFn),
-    loadEODCashFlows(userId, filters, fallbackFn),
+    // Specific loaders - STRICT MODE (no mock data allowed!)
+    loadEODPortfolioMetrics(userId, filters), // Shows detailed error if no real data
+    loadEODPositions(userId, filters),        // Shows detailed error if no real data
+    loadEODCashFlows(userId, filters),         // Shows detailed error if no real data
 
     // Error handling & validation
     handleEODError(error, context),
     validateEODData(data, type),
     suggestEODRecompute(type, filters)
 };
+
+// חוק אבסולוטי: אם אין נתונים אמיתיים - מציג הודעת שגיאה מפורטת!
+// אסור להשתמש בנתוני דמה, fallback, או default values!
 ```
 
 ### אינטגרציה בעמודים

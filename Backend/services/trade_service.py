@@ -10,8 +10,8 @@ logger = logging.getLogger(__name__)
 
 class TradeService:
     @staticmethod
-    def get_all(db: Session, user_id: Optional[int] = None) -> List[Trade]:
-        """Get all trades (filtered by user_id if provided)"""
+    def get_all(db: Session, user_id: int) -> List[Trade]:
+        """Get all trades for a specific user (user_id is required for data isolation)"""
         import logging
         logger = logging.getLogger(__name__)
         
@@ -29,9 +29,7 @@ class TradeService:
             joinedload(Trade.account),
             joinedload(Trade.ticker),
             joinedload(Trade.trade_plan)
-        )
-        if user_id is not None:
-            query = query.filter(Trade.user_id == user_id)
+        ).filter(Trade.user_id == user_id)
         trades = query.all()
         
         logger.info(f"Loaded {len(trades)} trades")

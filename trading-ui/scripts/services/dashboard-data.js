@@ -50,12 +50,13 @@
     return [];
   }
 
-  function normalizeDashboardPayload({ trades = [], alerts = [], accounts = [], cashFlows = [] }) {
+  function normalizeDashboardPayload({ trades = [], alerts = [], accounts = [], cashFlows = [], eodPortfolioSummary = null }) {
     return {
       trades,
       alerts,
       accounts,
       cashFlows,
+      eodPortfolioSummary,
       loadedAt: Date.now()
     };
   }
@@ -75,7 +76,46 @@
       fetchJsonList(ENDPOINTS.cashFlows, 'תזרימי מזומנים').catch(() => [])
     ]);
 
-    const payload = normalizeDashboardPayload({ trades, alerts, accounts, cashFlows });
+    // Try to load EOD portfolio metrics for today's summary
+    let eodPortfolioSummary = null;
+    if (window.EODIntegrationHelper && window.EODIntegrationHelper.isEODAvailable()) {
+      try {
+        const userId = window.g?.user_id || window.TikTrackAuth?.currentUser?.id;
+        if (userId) {
+          const today = new Date().toISOString().split('T')[0];
+
+                        const eodResult = await window.EODIntegrationHelper.loadEODPortfolioMetrics(
+                            userId,
+                            {
+                                date_from: today,
+                                date_to: today
+                            }
+                        );
+
+          if (eodResult && eodResult.data && Array.isArray(eodResult.data) && eodResult.data.length > 0) {
+            // Take the latest record (should be only one for today)
+            eodPortfolioSummary = eodResult.data[eodResult.data.length - 1];
+
+            if (window.Logger) {
+              window.Logger.info('✅ EOD portfolio summary loaded for dashboard', {
+                userId,
+                date: today,
+                navTotal: eodPortfolioSummary.nav_total,
+                source: eodResult.source
+              });
+            }
+          }
+        }
+      } catch (eodError) {
+        if (window.Logger) {
+          window.Logger.warn('⚠️ EOD portfolio summary failed for dashboard, proceeding without', {
+            error: eodError.message
+          });
+        }
+      }
+    }
+
+    const payload = normalizeDashboardPayload({ trades, alerts, accounts, cashFlows, eodPortfolioSummary });
     await saveDashboardCache(payload);
     return payload;
   }

@@ -13,8 +13,8 @@
 
 
 // ===== FUNCTION INDEX =====
-=== Object Methods ===
-- reloadButton.onclick() - Onclick
+// === Object Methods ===
+// - reloadButton.onclick() - Onclick
 
 // === Initialization ===
 // - setupLoginForm() - Setuploginform

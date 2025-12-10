@@ -1,3 +1,13 @@
+// ===== FUNCTION INDEX =====
+// === Object Methods ===
+// - this.preferenceLoadInProgress() - Preferenceloadinprogress
+
+// === Event Handlers ===
+// - handler() - Handler
+
+// === Other ===
+// - generateDetailedLog() - Generatedetailedlog
+
 // Fallback גלובלי למקרה ש-Logger לא נטען
 if (!window.Logger) {
     window.Logger = {

@@ -1,0 +1,96 @@
+{
+  "script_loaded": {
+    "scriptFound": false,
+    "scriptLoaded": null,
+    "scriptSrc": null
+  },
+  "system_status": {
+    "infoSummaryConfigs": "undefined",
+    "infoSummaryConfigsExists": false,
+    "infoSummarySystem": "undefined",
+    "infoSummarySystemExists": false
+  },
+  "manifest_status": {
+    "infoSummaryPackage": {
+      "critical": false,
+      "dependencies": [
+        "base",
+        "services"
+      ],
+      "description": "Unified data summary system for all pages",
+      "estimatedSize": "~25KB",
+      "id": "info-summary",
+      "initTime": "~15ms",
+      "loadOrder": 17.5,
+      "loadingStrategy": "defer",
+      "name": "Info Summary Package",
+      "scripts": [
+        {
+          "description": "Core data summary system",
+          "file": "info-summary-system.js",
+          "globalCheck": "window.InfoSummarySystem",
+          "loadOrder": 1,
+          "required": true
+        },
+        {
+          "description": "Page configurations for data summary",
+          "file": "info-summary-configs.js",
+          "globalCheck": "window.INFO_SUMMARY_CONFIGS",
+          "loadOrder": 2,
+          "required": true
+        }
+      ],
+      "version": "1.0.0"
+    },
+    "packageManifest": "object",
+    "packageManifestExists": true
+  },
+  "package_check": {
+    "dependencies": [
+      "base",
+      "services"
+    ],
+    "loadOrder": 17.5,
+    "loadingStrategy": "defer",
+    "packageExists": true,
+    "scripts": 2
+  },
+  "page_config": {
+    "hasInfoSummary": true,
+    "packages": [
+      "base",
+      "services",
+      "ui-advanced",
+      "crud",
+      "preferences",
+      "entity-services",
+      "info-summary",
+      "charts",
+      "tradingview-charts",
+      "modules",
+      "init-system"
+    ],
+    "requiredGlobals": [
+      "window.UnifiedAppInitializer",
+      "window.PAGE_CONFIGS",
+      "window.PACKAGE_MANIFEST",
+      "window.TikTrackAuth",
+      "window.AuthGuard",
+      "NotificationSystem",
+      "window.IconSystem",
+      "window.FieldRendererService",
+      "window.UnifiedTableSystem",
+      "window.InfoSummarySystem",
+      "window.UnifiedProgressManager",
+      "window.ButtonSystem",
+      "window.ModalManagerV2",
+      "window.LinkedItemsService",
+      "window.SelectPopulatorService",
+      "window.DataCollectionService",
+      "window.CRUDResponseHandler",
+      "window.PortfolioStateData",
+      "window.CacheControlMenu"
+    ]
+  },
+  "errors": []
+}

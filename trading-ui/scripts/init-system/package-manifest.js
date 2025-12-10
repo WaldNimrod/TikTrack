@@ -1876,6 +1876,12 @@ const PACKAGE_MANIFEST = {
     loadOrder: 17.5, // Changed from 18 to 17.5 to load before TradingView Charts (19)
     dependencies: ['base', 'services'],
     loadingStrategy: 'defer', // Critical package - info summary, has dependencies on base and services
+
+    // CRITICAL LESSON: Always verify script loading in HTML!
+    // This package was missing from portfolio-state.html causing "Missing required globals" errors
+    // Remember: package-manifest.js defines WHAT to load, but HTML defines WHERE to load it
+    // Always check both when adding new packages to pages!
+
     scripts: [
       {
         file: 'info-summary-system.js',

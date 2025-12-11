@@ -527,6 +527,30 @@ function showLoginError(message, containerId = 'loginError') {
   }
 }
 
+function closeLoginModal() {
+  const modalId = 'loginModal';
+  const modalEl = document.getElementById(modalId);
+  if (!modalEl) {return;}
+  try {
+    const inst = window.bootstrap?.Modal?.getInstance(modalEl) || (window.bootstrap?.Modal ? new window.bootstrap.Modal(modalEl) : null);
+    if (inst) {
+      inst.hide();
+    }
+    modalEl.classList.remove('show');
+    modalEl.style.display = 'none';
+    if (window.ModalNavigationService?.pop) {
+      window.ModalNavigationService.pop(modalId);
+    }
+    if (window.ModalZIndexManager?.forceUpdate) {
+      window.ModalZIndexManager.forceUpdate();
+    }
+    setTimeout(() => modalEl.remove(), 150);
+  } catch (e) {
+    window.Logger?.warn?.('⚠️ [auth.js] closeLoginModal failed', { error: e?.message });
+    modalEl.remove();
+  }
+}
+
 function showLoginSuccess(message, containerId = 'loginSuccess', showReloadButton = false) {
   window.AuthDebugMonitor?.log('info', '📢 showLoginSuccess called', {
     message,
@@ -830,9 +854,9 @@ function isAuthenticated() {
 async function isAuthenticatedSync() {
   console.log('[auth.js] isAuthenticatedSync: Starting authentication check');
   
-  // Check cache - ONLY UnifiedCacheManager, no fallbacks
+  // Check cache - ONLY UnifiedCacheManager (or dev sessionStorage fallback inside helper)
   // Use helper function for consistent key handling
-  const { user: cachedUser } = await getAuthFromCache();
+  const { user: cachedUser, token: cachedToken } = await getAuthFromCache();
   if (cachedUser) {
     window.Logger?.info?.('✅ [auth.js] Found cached user', { 
       page: 'auth', 
@@ -847,7 +871,9 @@ async function isAuthenticatedSync() {
     if (window.DEBUG_AUTH_MONITOR === true) debugger; // Breakpoint helper
     
     const response = await fetch('/api/auth/me', {
-      method: 'GET', });
+      method: 'GET',
+      headers: cachedToken ? { 'Authorization': `Bearer ${cachedToken}` } : undefined
+    });
     
     window.AuthDebugMonitor?.log('info', '🔍 isAuthenticatedSync: Server response', {
       status: response.status,
@@ -1156,19 +1182,32 @@ async function checkAuthentication(onAuthenticated = null, onNotAuthenticated = 
   try {
     // Ensure we have a token before hitting the server
     let tokenAvailable = false;
+    let effectiveToken = null;
     if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
       const t = await window.UnifiedCacheManager.get('authToken', authCacheOptions).catch(() => null);
-      if (t) tokenAvailable = true;
+      if (t) {
+        tokenAvailable = true;
+        effectiveToken = t;
+      }
     }
     if (!tokenAvailable && typeof sessionStorage !== 'undefined') {
       const t = sessionStorage.getItem(DEV_SESSION_TOKEN_KEY);
       if (t) {
         tokenAvailable = true;
+        effectiveToken = t;
         authToken = t;
         const uRaw = sessionStorage.getItem(DEV_SESSION_USER_KEY);
         try {
           const u = uRaw ? JSON.parse(uRaw) : null;
           currentUser = u;
+          // Mirror to globals for dev/no-cache flows
+          window.authToken = authToken;
+          window.currentUser = currentUser;
+          // Mirror to localStorage so api-fetch-wrapper can pick it up if needed
+          localStorage.setItem('authToken', authToken);
+          if (currentUser) {
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+          }
           if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
             await window.UnifiedCacheManager.save('authToken', t, authCacheOptions);
             if (u) await window.UnifiedCacheManager.save('currentUser', u, authCacheOptions);
@@ -1189,8 +1228,9 @@ async function checkAuthentication(onAuthenticated = null, onNotAuthenticated = 
 
     console.log('[auth.js] checkAuthentication: Checking server authentication...');
     const response = await fetch('/api/auth/me', {
-      method: 'GET'
-      // Authorization injected by api-fetch-wrapper
+      method: 'GET',
+      headers: effectiveToken ? { 'Authorization': `Bearer ${effectiveToken}` } : undefined
+      // Authorization also injected by api-fetch-wrapper if present
     });
     
     console.log('[auth.js] checkAuthentication: Server response status:', response.status);
@@ -1203,9 +1243,18 @@ async function checkAuthentication(onAuthenticated = null, onNotAuthenticated = 
         const userChanged = currentUser?.id !== newUser?.id;
         
         currentUser = newUser;
-        authToken = 'session_based'; // Session-based auth
+        // Preserve real token if available (dev/no-cache uses bearer token)
+        authToken = effectiveToken || authToken || 'session_based'; // Session-based fallback
+        // Mirror to globals/localStorage for dev/no-cache flows
+        window.authToken = authToken;
+        window.currentUser = currentUser;
+        localStorage.setItem('authToken', authToken);
+        localStorage.setItem('currentUser', JSON.stringify(currentUser));
         // Save to UnifiedCacheManager using helper function
         await saveAuthToCache(currentUser, authToken);
+
+        // Close login modal if present (prevents lingering modal in dev/no-cache)
+        closeLoginModal();
         
         // Mark that user just logged in (prevents auth-guard from checking immediately)
         if (typeof window.AuthGuard?.markJustLoggedIn === 'function') {
@@ -1354,6 +1403,28 @@ function createLogoutButton(containerId) {
  */
 async function showLoginModal(onSuccess = null) {
   window.Logger?.info?.('🔐 [auth.js] showLoginModal called', { page: 'auth' });
+  // Skip if already authenticated (dev/no-cache support via globals/session/localStorage)
+  try {
+    const devToken = (typeof sessionStorage !== 'undefined') ? sessionStorage.getItem(DEV_SESSION_TOKEN_KEY) : null;
+    const devUser = (typeof sessionStorage !== 'undefined') ? sessionStorage.getItem(DEV_SESSION_USER_KEY) : null;
+    const lsToken = (typeof localStorage !== 'undefined') ? localStorage.getItem('authToken') : null;
+    if (currentUser || authToken || devToken || lsToken) {
+      window.Logger?.info?.('ℹ️ [auth.js] showLoginModal skipped - token/user already present', {
+        hasCurrentUser: !!currentUser,
+        hasAuthToken: !!authToken,
+        hasDevToken: !!devToken,
+        hasLSToken: !!lsToken
+      });
+      // If a stale modal exists, remove it
+      const stale = document.getElementById('loginModal');
+      if (stale) {
+        stale.remove();
+      }
+      return;
+    }
+  } catch (e) {
+    window.Logger?.warn?.('⚠️ [auth.js] showLoginModal skip check failed', { error: e?.message });
+  }
   
   const modalId = 'loginModal';
   
@@ -1392,6 +1463,35 @@ async function showLoginModal(onSuccess = null) {
   // Ensure the global backdrop is present and standardized
   if (window.ModalManagerV2?.ensureGlobalBackdrop) {
     window.ModalManagerV2.ensureGlobalBackdrop();
+  }
+
+  // Z-Index handling via central systems (ModalZIndexManager + ModalNavigationService)
+  const modalEl = document.getElementById(modalId);
+  const stack = window.ModalNavigationService?.getStack?.() || [];
+  const stackIndex = stack.length; // push-as-new-top
+  const zDefaults = { modal: 1200, dialog: 1201, content: 1202, backdrop: 1199 };
+  const zCalc = (window.ModalZIndexManager?.calculateModalZIndex)
+    ? window.ModalZIndexManager.calculateModalZIndex(stackIndex, stackIndex + 1)
+    : zDefaults;
+
+  if (modalEl) {
+    const dialog = modalEl.querySelector('.modal-dialog');
+    const content = modalEl.querySelector('.modal-content');
+    modalEl.style.zIndex = zCalc.modal;
+    if (dialog) dialog.style.zIndex = zCalc.dialog;
+    if (content) content.style.zIndex = zCalc.content;
+    const globalBackdrop = document.getElementById('globalModalBackdrop');
+    if (globalBackdrop) {
+      globalBackdrop.style.zIndex = zCalc.backdrop;
+    }
+    // Register in navigation stack to keep nesting order consistent
+    if (window.ModalNavigationService?.push) {
+      window.ModalNavigationService.push({ modalId, element: modalEl, source: 'auth-login', timestamp: Date.now() });
+    }
+    // Force z-index recalculation using the central manager if available
+    if (window.ModalZIndexManager?.forceUpdate) {
+      window.ModalZIndexManager.forceUpdate(modalEl);
+    }
   }
   window.Logger?.info?.('✅ [auth.js] Modal HTML added to DOM', { page: 'auth' });
   
@@ -1463,6 +1563,23 @@ async function showLoginModal(onSuccess = null) {
       // Log final session status
       if (sessionReady) {
         window.AuthDebugMonitor?.log('info', '✅ Session ready - waiting for user to click reload button');
+        // Auto-close modal in automated flows (e.g., Selenium) to avoid blocking pages
+        const modalInstance = window.bootstrap?.Modal?.getInstance(modalEl) || (window.bootstrap?.Modal ? new window.bootstrap.Modal(modalEl) : null);
+        if (modalInstance) {
+          modalInstance.hide();
+        }
+        modalEl.classList.remove('show');
+        modalEl.style.display = 'none';
+        // Remove from navigation stack if present
+        if (window.ModalNavigationService?.pop) {
+          window.ModalNavigationService.pop(modalId);
+        }
+        // Update z-index stack
+        if (window.ModalZIndexManager?.forceUpdate) {
+          window.ModalZIndexManager.forceUpdate();
+        }
+        // Remove element after a short delay to allow transitions
+        setTimeout(() => modalEl.remove(), 150);
       } else {
         window.AuthDebugMonitor?.log('error', '❌ Session NOT ready after 5 attempts', {
           lastError: sessionError
@@ -1740,6 +1857,339 @@ async function devClearAuth(reason = 'dev_clear') {
   return true;
 }
 
+/**
+ * Registration modal (reuses register + login flows)
+ */
+async function showRegisterModal(onSuccess = null) {
+  const modalId = 'registerModal';
+  document.getElementById(modalId)?.remove();
+  const modalHtml = `
+    <div class="modal fade" id="${modalId}" tabindex="-1" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header border-0 pb-0">
+            <h5 class="modal-title">הרשמה</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div id="registerErrorModal" class="alert alert-danger" style="display:none;"></div>
+            <div id="registerSuccessModal" class="alert alert-success" style="display:none;"></div>
+            <form id="registerFormModal" novalidate>
+              <div class="mb-3">
+                <label for="registerUsernameModal" class="form-label">שם משתמש</label>
+                <input type="text" class="form-control" id="registerUsernameModal" required autocomplete="username">
+              </div>
+              <div class="mb-3">
+                <label for="registerEmailModal" class="form-label">אימייל (אופציונלי)</label>
+                <input type="email" class="form-control" id="registerEmailModal" autocomplete="email">
+              </div>
+              <div class="mb-3">
+                <label for="registerPasswordModal" class="form-label">סיסמה</label>
+                <input type="password" class="form-control" id="registerPasswordModal" required autocomplete="new-password">
+              </div>
+              <div class="mb-3">
+                <label for="registerPasswordConfirmModal" class="form-label">אימות סיסמה</label>
+                <input type="password" class="form-control" id="registerPasswordConfirmModal" required autocomplete="new-password">
+              </div>
+              <button type="submit" class="btn btn-primary w-100" id="registerSubmitBtn">
+                <span id="registerSubmitBtnText">הרשמה</span>
+                <span id="registerSubmitBtnSpinner" style="display:none;">⏳</span>
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  document.body.insertAdjacentHTML('beforeend', modalHtml);
+  window.ModalManagerV2?.ensureGlobalBackdrop?.();
+
+  const form = document.getElementById('registerFormModal');
+  const errorBox = document.getElementById('registerErrorModal');
+  const successBox = document.getElementById('registerSuccessModal');
+
+  const showError = message => {
+    if (errorBox) {
+      errorBox.textContent = message;
+      errorBox.style.display = 'block';
+    }
+  };
+  const showSuccess = message => {
+    if (successBox) {
+      successBox.textContent = message;
+      successBox.style.display = 'block';
+    }
+  };
+
+  if (form) {
+    form.addEventListener('submit', async e => {
+      e.preventDefault();
+      if (errorBox) errorBox.style.display = 'none';
+      if (successBox) successBox.style.display = 'none';
+
+      const username = document.getElementById('registerUsernameModal')?.value?.trim();
+      const email = document.getElementById('registerEmailModal')?.value?.trim();
+      const password = document.getElementById('registerPasswordModal')?.value || '';
+      const confirm = document.getElementById('registerPasswordConfirmModal')?.value || '';
+
+      if (!username || !password) {
+        showError('יש למלא שם משתמש וסיסמה');
+        return;
+      }
+      if (password !== confirm) {
+        showError('הסיסמאות אינן תואמות');
+        return;
+      }
+
+      setLoadingState(true, 'registerSubmitBtn', 'registerSubmitBtnText', 'registerSubmitBtnSpinner');
+      try {
+        await register(username, password, email);
+        showSuccess('✅ הרשמה הצליחה, מתחבר...');
+        await login(username, password);
+        if (typeof onSuccess === 'function') {
+          await onSuccess();
+        } else {
+          window.location.href = '/';
+        }
+      } catch (err) {
+        showError(err?.message || 'שגיאה בהרשמה');
+      } finally {
+        setLoadingState(false, 'registerSubmitBtn', 'registerSubmitBtnText', 'registerSubmitBtnSpinner');
+      }
+    });
+  }
+
+  const modalEl = document.getElementById(modalId);
+  if (modalEl && window.bootstrap?.Modal) {
+    const modal = new window.bootstrap.Modal(modalEl, { backdrop: 'static', keyboard: false });
+    modal.show();
+    window.ModalZIndexManager?.registerModal?.(modalEl);
+  }
+}
+
+/**
+ * Forgot password modal
+ */
+async function showForgotPasswordModal(onSuccess = null) {
+  const modalId = 'forgotPasswordModal';
+  document.getElementById(modalId)?.remove();
+  const modalHtml = `
+    <div class="modal fade" id="${modalId}" tabindex="-1" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header border-0 pb-0">
+            <h5 class="modal-title">שחזור סיסמה</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div id="forgotErrorModal" class="alert alert-danger" style="display:none;"></div>
+            <div id="forgotSuccessModal" class="alert alert-success" style="display:none;"></div>
+            <p class="text-muted mb-3">הזן אימייל או שם משתמש ונשלח קישור לאיפוס.</p>
+            <form id="forgotPasswordFormModal" novalidate>
+              <div class="mb-3">
+                <label for="forgotEmailOrUsernameModal" class="form-label">אימייל או שם משתמש</label>
+                <input type="text" class="form-control" id="forgotEmailOrUsernameModal" required autocomplete="username email">
+              </div>
+              <button type="submit" class="btn btn-primary w-100" id="forgotSubmitBtn">
+                <span id="forgotSubmitBtnText">שלח קישור איפוס</span>
+                <span id="forgotSubmitBtnSpinner" style="display:none;">⏳</span>
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  document.body.insertAdjacentHTML('beforeend', modalHtml);
+  window.ModalManagerV2?.ensureGlobalBackdrop?.();
+
+  const form = document.getElementById('forgotPasswordFormModal');
+  const errorBox = document.getElementById('forgotErrorModal');
+  const successBox = document.getElementById('forgotSuccessModal');
+
+  const showError = message => {
+    if (errorBox) {
+      errorBox.textContent = message;
+      errorBox.style.display = 'block';
+    }
+  };
+  const showSuccess = message => {
+    if (successBox) {
+      successBox.textContent = message;
+      successBox.style.display = 'block';
+    }
+  };
+
+  if (form) {
+    form.addEventListener('submit', async e => {
+      e.preventDefault();
+      if (errorBox) errorBox.style.display = 'none';
+      if (successBox) successBox.style.display = 'none';
+
+      const value = document.getElementById('forgotEmailOrUsernameModal')?.value?.trim();
+      if (!value) {
+        showError('יש להזין אימייל או שם משתמש');
+        return;
+      }
+
+      const payload = value.includes('@') ? { email: value } : { username: value };
+
+      setLoadingState(true, 'forgotSubmitBtn', 'forgotSubmitBtnText', 'forgotSubmitBtnSpinner');
+      try {
+        const response = await fetch('/api/auth/password-reset/request', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await response.json();
+        if (!response.ok || data.status !== 'success') {
+          throw new Error(data.error?.message || 'שליחה נכשלה');
+        }
+        showSuccess(data.data?.message || 'אם המשתמש קיים, נשלח קישור איפוס.');
+        if (typeof onSuccess === 'function') {
+          await onSuccess();
+        }
+      } catch (err) {
+        showError(err?.message || 'שליחה נכשלה');
+      } finally {
+        setLoadingState(false, 'forgotSubmitBtn', 'forgotSubmitBtnText', 'forgotSubmitBtnSpinner');
+      }
+    });
+  }
+
+  const modalEl = document.getElementById(modalId);
+  if (modalEl && window.bootstrap?.Modal) {
+    const modal = new window.bootstrap.Modal(modalEl, { backdrop: 'static', keyboard: false });
+    modal.show();
+    window.ModalZIndexManager?.registerModal?.(modalEl);
+  }
+}
+
+/**
+ * Reset password modal (token-based)
+ */
+async function showResetPasswordModal(tokenFromUrl = null, onSuccess = null) {
+  const modalId = 'resetPasswordModal';
+  document.getElementById(modalId)?.remove();
+
+  const token = tokenFromUrl || new URLSearchParams(window.location.search).get('token');
+  const modalHtml = `
+    <div class="modal fade" id="${modalId}" tabindex="-1" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header border-0 pb-0">
+            <h5 class="modal-title">איפוס סיסמה</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div id="resetErrorModal" class="alert alert-danger" style="display:none;"></div>
+            <div id="resetSuccessModal" class="alert alert-success" style="display:none;"></div>
+            <p class="text-muted mb-3">הזן סיסמה חדשה. מינימום 6 תווים.</p>
+            <form id="resetPasswordFormModal" novalidate>
+              <div class="mb-3">
+                <label for="resetPasswordModalInput" class="form-label">סיסמה חדשה</label>
+                <input type="password" class="form-control" id="resetPasswordModalInput" required autocomplete="new-password">
+              </div>
+              <div class="mb-3">
+                <label for="resetPasswordConfirmModal" class="form-label">אימות סיסמה</label>
+                <input type="password" class="form-control" id="resetPasswordConfirmModal" required autocomplete="new-password">
+              </div>
+              <button type="submit" class="btn btn-primary w-100" id="resetSubmitBtn">
+                <span id="resetSubmitBtnText">אפס סיסמה</span>
+                <span id="resetSubmitBtnSpinner" style="display:none;">⏳</span>
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  document.body.insertAdjacentHTML('beforeend', modalHtml);
+  window.ModalManagerV2?.ensureGlobalBackdrop?.();
+
+  const form = document.getElementById('resetPasswordFormModal');
+  const errorBox = document.getElementById('resetErrorModal');
+  const successBox = document.getElementById('resetSuccessModal');
+
+  const showError = message => {
+    if (errorBox) {
+      errorBox.textContent = message;
+      errorBox.style.display = 'block';
+    }
+  };
+  const showSuccess = message => {
+    if (successBox) {
+      successBox.textContent = message;
+      successBox.style.display = 'block';
+    }
+  };
+
+  if (form) {
+    form.addEventListener('submit', async e => {
+      e.preventDefault();
+      if (errorBox) errorBox.style.display = 'none';
+      if (successBox) successBox.style.display = 'none';
+
+      const newPassword = document.getElementById('resetPasswordModalInput')?.value || '';
+      const confirm = document.getElementById('resetPasswordConfirmModal')?.value || '';
+
+      if (!token) {
+        showError('טוקן איפוס חסר');
+        return;
+      }
+      if (!newPassword || newPassword.length < 6) {
+        showError('סיסמה חייבת להכיל לפחות 6 תווים');
+        return;
+      }
+      if (newPassword !== confirm) {
+        showError('הסיסמאות אינן תואמות');
+        return;
+      }
+
+      setLoadingState(true, 'resetSubmitBtn', 'resetSubmitBtnText', 'resetSubmitBtnSpinner');
+      try {
+        const validateResponse = await fetch('/api/auth/password-reset/validate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token })
+        });
+        const validateData = await validateResponse.json();
+        if (!validateResponse.ok || validateData.status !== 'success' || validateData.data?.valid !== true) {
+          throw new Error(validateData.error?.message || 'הקישור לא תקף או שפג תוקפו');
+        }
+
+        const response = await fetch('/api/auth/password-reset/reset', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token, new_password: newPassword })
+        });
+        const data = await response.json();
+        if (!response.ok || data.status !== 'success') {
+          throw new Error(data.error?.message || 'איפוס נכשל');
+        }
+        showSuccess(data.data?.message || 'הסיסמה אופסה בהצלחה');
+        if (typeof onSuccess === 'function') {
+          await onSuccess();
+        }
+      } catch (err) {
+        showError(err?.message || 'איפוס נכשל');
+      } finally {
+        setLoadingState(false, 'resetSubmitBtn', 'resetSubmitBtnText', 'resetSubmitBtnSpinner');
+      }
+    });
+  }
+
+  const modalEl = document.getElementById(modalId);
+  if (modalEl && window.bootstrap?.Modal) {
+    const modal = new window.bootstrap.Modal(modalEl, { backdrop: 'static', keyboard: false });
+    modal.show();
+    window.ModalZIndexManager?.registerModal?.(modalEl);
+  }
+}
+
 // ייצוא פונקציות גלובליות
 window.TikTrackAuth = {
   login,
@@ -1772,6 +2222,9 @@ window.TikTrackAuth = {
   forceLogoutAndPrompt,
   devSetAuth,
   devClearAuth,
+  showRegisterModal,
+  showForgotPasswordModal,
+  showResetPasswordModal,
 };
 
 // ✅ לוג אימות - ניטור הגדרת window.TikTrackAuth

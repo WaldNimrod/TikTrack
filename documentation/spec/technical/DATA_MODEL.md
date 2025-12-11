@@ -57,3 +57,4 @@
   harden for production).
 - External data tables are written by schedulers; avoid manual writes outside adapters.
 
+

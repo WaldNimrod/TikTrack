@@ -15,12 +15,15 @@ import requests
 
 try:
     from selenium import webdriver
-    from selenium.webdriver.chrome.service import Service
-    from selenium.webdriver.chrome.options import Options
+    from selenium.webdriver.firefox.service import Service
+    from selenium.webdriver.firefox.options import Options
+    from selenium.webdriver.chrome.service import Service as ChromeService
+    from selenium.webdriver.chrome.options import Options as ChromeOptions
     from selenium.webdriver.common.by import By
     from selenium.webdriver.support.ui import WebDriverWait
     from selenium.webdriver.support import expected_conditions as EC
     from selenium.common.exceptions import TimeoutException, WebDriverException
+    from webdriver_manager.firefox import GeckoDriverManager
     from webdriver_manager.chrome import ChromeDriverManager
 except ImportError:
     print("❌ Error: selenium or webdriver-manager not installed.")
@@ -191,31 +194,55 @@ rate_tracker = RateLimitTracker(
     window_seconds=RATE_LIMIT_CONFIG['window_seconds']
 )
 
-def setup_driver():
-    """Setup Chrome WebDriver with automatic ChromeDriver management"""
-    chrome_options = Options()
-    # chrome_options.add_argument('--headless')  # Removed headless for debugging
-    chrome_options.add_argument('--no-sandbox')
-    chrome_options.add_argument('--disable-dev-shm-usage')
-    chrome_options.add_argument('--disable-gpu')
-    chrome_options.add_argument('--window-size=1920,1080')
-    chrome_options.add_experimental_option('excludeSwitches', ['enable-logging'])
-    
-    # Enable logging
-    chrome_options.set_capability('goog:loggingPrefs', {'browser': 'ALL', 'performance': 'ALL'})
-    
-    try:
-        # Use webdriver-manager to automatically download and manage ChromeDriver
-        service = Service(ChromeDriverManager().install())
-        driver = webdriver.Chrome(service=service, options=chrome_options)
-        # Prevent long async script hangs when page reloads during login
-        # Increased to handle slower reloads during modal flow
+def setup_driver(prefer_chrome: bool = False):
+    """
+    Setup WebDriver (Chrome fallback) with options for console error testing.
+    prefer_chrome: if True, use Chrome; otherwise try Firefox Dev first, then Chrome.
+    """
+    last_error = None
+
+    def create_firefox():
+        firefox_options = Options()
+        # firefox_options.add_argument('--headless')  # intentionally visible for debugging
+        firefox_options.set_preference('devtools.console.stdout.content', True)
+        firefox_options.add_argument('--no-sandbox')
+        firefox_options.add_argument('--disable-dev-shm-usage')
+        firefox_options.add_argument('--width=1920')
+        firefox_options.add_argument('--height=1080')
+        dev_edition_path = "/Applications/Firefox Developer Edition.app/Contents/MacOS/firefox"
+        if Path(dev_edition_path).exists():
+            firefox_options.binary_location = dev_edition_path
+        service = Service(GeckoDriverManager().install())
+        driver = webdriver.Firefox(service=service, options=firefox_options)
         driver.set_script_timeout(60)
         return driver
-    except Exception as e:
-        print(f"❌ Error setting up Chrome driver: {e}")
-        print("💡 Make sure Chrome browser is installed")
-        return None
+
+    def create_chrome():
+        chrome_options = ChromeOptions()
+        chrome_options.add_argument('--no-sandbox')
+        chrome_options.add_argument('--disable-dev-shm-usage')
+        chrome_options.add_argument('--disable-gpu')
+        chrome_options.add_argument('--window-size=1920,1080')
+        service = ChromeService(ChromeDriverManager().install())
+        driver = webdriver.Chrome(service=service, options=chrome_options)
+        driver.set_script_timeout(60)
+        return driver
+
+    try:
+        if prefer_chrome:
+            return create_chrome()
+        # Try Firefox first
+        return create_firefox()
+    except Exception as e1:
+        last_error = e1
+        print(f"⚠️ Firefox driver failed: {e1}")
+        # Fallback to Chrome
+        try:
+            return create_chrome()
+        except Exception as e2:
+            print(f"❌ Error setting up any driver: Firefox: {e1} | Chrome: {e2}")
+            print("💡 Make sure Firefox Dev or Chrome is installed. Using webdriver-manager for drivers.")
+            return None
 
 def login(driver):
     """Login using API token (requests) + sessionStorage injection; fallback to modal if needed."""
@@ -389,7 +416,9 @@ def test_page_console(driver, page_info, retry_count: int = 0):
         "has_core_systems": False,
         "initialization_status": {},
         "rate_limit_retries": retry_count,
-        "timestamp": datetime.now().isoformat()
+        "timestamp": datetime.now().isoformat(),
+        "login_modal_present": False,
+        "login_modal_visible": False,
     }
     
     try:
@@ -403,8 +432,11 @@ def test_page_console(driver, page_info, retry_count: int = 0):
         # Record request
         rate_tracker.record_request()
         
-        # Clear previous logs
-        driver.get_log('browser')
+        # Clear previous logs (if supported)
+        try:
+            driver.get_log('browser')
+        except AttributeError:
+            pass
         
         # Navigate to page
         start_time = time.time()
@@ -424,8 +456,11 @@ def test_page_console(driver, page_info, retry_count: int = 0):
         # Wait additional time for JavaScript to execute
         time.sleep(2)
         
-        # Get console logs
-        logs = driver.get_log('browser')
+        # Get console logs (if supported)
+        try:
+            logs = driver.get_log('browser')
+        except AttributeError:
+            logs = []
         for log in logs:
             level = log.get('level', '').upper()
             message = log.get('message', '')
@@ -513,6 +548,33 @@ def test_page_console(driver, page_info, retry_count: int = 0):
         
         if page_status.get("globalErrors"):
             result["page_errors"].append(page_status["globalErrors"])
+
+        # Detect login modal presence + visibility (to avoid false positives from hidden markup)
+        try:
+            login_modal_info = driver.execute_script("""
+                const selectors = [
+                    '#loginModalContainer',
+                    '#login-modal',
+                    '.login-modal',
+                    '[data-modal="login"]',
+                    '[data-modal-type="login"]'
+                ];
+                const els = selectors.flatMap(sel => Array.from(document.querySelectorAll(sel)));
+                const visible = els.some(el => {
+                    const style = window.getComputedStyle(el);
+                    const rect = el.getBoundingClientRect();
+                    return style.display !== 'none' &&
+                           style.visibility !== 'hidden' &&
+                           style.opacity !== '0' &&
+                           rect.width > 1 && rect.height > 1;
+                });
+                return { present: els.length > 0, visible };
+            """)
+            result["login_modal_present"] = bool(login_modal_info.get("present"))
+            result["login_modal_visible"] = bool(login_modal_info.get("visible"))
+        except Exception:
+            # Non-fatal; ignore detection errors
+            pass
         
         # Check for critical errors
         critical_errors = [
@@ -582,7 +644,7 @@ def main():
     parser.add_argument('--page', type=str, help='Test specific page URL (e.g., /watch-list.html)')
     args = parser.parse_args()
     
-    # Filter pages if --page is specified
+    # Filter pages if --page is specified, or use quick test pages
     pages_to_test = ALL_PAGES
     if args.page:
         page_url = args.page if args.page.startswith('/') else '/' + args.page
@@ -593,6 +655,12 @@ def main():
             for p in [p for p in ALL_PAGES if 'watch-list' in p['url'].lower()]:
                 print(f"  - {p['url']} ({p['name']})")
             return
+    else:
+        # Quick test - only 3 critical pages to verify login modal fix
+        pages_to_test = [
+            p for p in ALL_PAGES
+            if p['url'] in ['/', '/trades.html', '/alerts.html']
+        ]
     
     print("=" * 80)
     if args.page:
@@ -606,7 +674,8 @@ def main():
     print("=" * 80)
     print()
     
-    driver = setup_driver()
+    # Prefer Chrome to avoid GitHub rate limits on geckodriver download
+    driver = setup_driver(prefer_chrome=True)
     if not driver:
         print("❌ Failed to setup WebDriver. Exiting.")
         return
@@ -675,6 +744,8 @@ def main():
     print(f"⚠️  עמודים עם אזהרות: {len(with_warnings)}/{len(results)}")
     print(f"📄 עמודים עם Header: {len(with_header)}/{len(results)} ({len(with_header)/len(results)*100:.1f}%)")
     print(f"⚙️  עמודים עם Core Systems: {len(with_core_systems)}/{len(results)} ({len(with_core_systems)/len(results)*100:.1f}%)")
+    print(f"🔐 עמודים עם מודל Login (נוכחות): {len([r for r in results if r.get('login_modal_present')])}/{len(results)}")
+    print(f"🔓 עמודים עם מודל Login גלוי: {len([r for r in results if r.get('login_modal_visible')])}/{len(results)}")
     
     # Rate limiting statistics
     rate_stats = rate_tracker.get_stats()

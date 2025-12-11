@@ -183,7 +183,7 @@ else:
 
 **טבלת פרופילים נוכחית:**
 
-```
+```text
 ID: 0, user_id: 0, name: "ברירת מחדל", is_active: 0, is_default: 1  ✅
 ID: 2, user_id: 1, name: "פרופיל-נימרוד1", is_active: 1, is_default: 0  ✅
 ```

@@ -786,3 +786,4 @@ const details = await window.entityDetailsAPI?.getEntityDetails(type, id);
 
 
 
+

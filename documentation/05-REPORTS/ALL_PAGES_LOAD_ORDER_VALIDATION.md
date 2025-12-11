@@ -1,5 +1,5 @@
 # דוח בדיקת סדר טעינה - כל העמודים
-**תאריך:** 2025-12-03
+**תאריך:** 2025-12-10
 **גרסה:** 1.5.0
 **סטטוס:** ✅ כל העמודים תקינים
 
@@ -7,7 +7,7 @@
 
 ## 📊 סיכום
 
-- **עמודים תקינים:** 59
+- **עמודים תקינים:** 63
 - **עמודים עם בעיות:** 0
 - **סה"כ בעיות סדר טעינה:** 0
 - **סה"כ סקריפטים חסרים:** 0
@@ -41,7 +41,6 @@
 - forgot-password
 - index
 - init-system-management
-- login
 - add-ticker-modal
 - daily-snapshots-comparative-analysis-page
 - daily-snapshots-date-comparison-modal
@@ -59,23 +58,28 @@
 - watch-lists-page
 - notes
 - notifications-center
+- portfolio-state
 - preferences-groups-management
 - preferences
 - register
 - research
 - reset-password
 - server-monitor
+- strategy-analysis
 - system-management
 - tag-management
 - ticker-dashboard
 - tickers
-- tooltip-editor
+- trade-history
 - trade_plans
 - trades
 - trades_formatted
+- trading-journal
 - trading_accounts
 - tradingview-widgets-showcase
 - user-profile
+- watch-list
+- watch-lists
 
 ---
 

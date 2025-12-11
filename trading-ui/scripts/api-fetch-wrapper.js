@@ -48,6 +48,14 @@
         const token = await window.UnifiedCacheManager.get('authToken', { includeUserId: false });
         if (token) return token;
       }
+      // Dev/no-cache fallbacks
+      if (window.authToken) {
+        return window.authToken;
+      }
+      if (typeof localStorage !== 'undefined') {
+        const lsToken = localStorage.getItem('authToken');
+        if (lsToken) return lsToken;
+      }
       if (typeof sessionStorage !== 'undefined') {
         const fallback = sessionStorage.getItem('dev_authToken');
         if (fallback) return fallback;

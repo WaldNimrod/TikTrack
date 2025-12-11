@@ -59,3 +59,4 @@
 - Ready UI, BL to strengthen: index, data_import, research.
 - Mockups ready for integration: daily snapshots set, watch-list modals, tradingview test page.
 
+

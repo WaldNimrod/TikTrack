@@ -179,13 +179,18 @@
 |------|--------|------|
 | **button-color-mapping.html** | מיפוי צבעי כפתורים | `http://localhost:8080/button-color-mapping.html` |
 | **button-color-mapping-simple.html** | מיפוי צבעי כפתורים - פשוט | `http://localhost:8080/button-color-mapping-simple.html` |
-| **conditions-modals.html** | מודלים של תנאים | `http://localhost:8080/conditions-modals.html` |
 | **preferences-groups-management.html** | ניהול קבוצות העדפות | `http://localhost:8080/preferences-groups-management.html` |
 | **tag-management.html** | ניהול תגיות | `http://localhost:8080/tag-management.html` |
 | **cache-management.html** | ניהול מטמון | `http://localhost:8080/cache-management.html` |
 | **code-quality-dashboard.html** | דשבורד איכות קוד | `http://localhost:8080/code-quality-dashboard.html` |
 | **init-system-management.html** | ניהול מערכת אתחול | `http://localhost:8080/init-system-management.html` |
-| **conditions-test.html** | בדיקת תנאים | `http://localhost:8080/conditions-test.html` |
+
+### עמודי מוקאפים - תנאים
+
+| עמוד | תיאור | גישה |
+|------|--------|------|
+| **conditions-modals.html** | מודלי תנאים מרוכזים | `http://localhost:8080/conditions-modals.html` |
+| **conditions-test.html** | בדיקות/דוגמאות למערכת תנאים | `http://localhost:8080/conditions-test.html` |
 
 ### עמודי רשימות מעקב (מוקאפים)
 

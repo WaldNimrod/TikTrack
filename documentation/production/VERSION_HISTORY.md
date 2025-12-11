@@ -58,3 +58,5 @@ This log records every production version update, including manual major/minor a
 | 2025-11-30T11:41:55+00:00 | 1.3.14.4 | 1.3.14.3 | 0d9d22ce8ecd73c37e9cbe203c044c0820ef6cea | 32f799344a83e17d01be48d4cbb32eb643d91e7d | build | Final fix: sm-section-server improvements |
 | 2025-11-30T11:42:07+00:00 | 1.3.14.5 | 1.3.14.4 | f7825f199ba48d4215a9ed4235d38ea11a13dc08 | 0d9d22ce8ecd73c37e9cbe203c044c0820ef6cea | build | Final sm-section-server fix |
 | 2025-12-06T23:58:04+00:00 | 1.3.15.0 | 1.3.14.5 | e681f2eca2e2c21aa652e78746375808974f5931 | f7825f199ba48d4215a9ed4235d38ea11a13dc08 | patch | יצירת בסיס נתונים פרודקשן עם מפתחות מסודרים ונתוני דוגמה מלאים |
+| 2025-12-11T01:13:26+00:00 | 1.3.16.0 | 1.3.15.0 | 656e7b7643f7a55221a56b43841940ac0741b404 | e681f2eca2e2c21aa652e78746375808974f5931 | patch | ייצוב מלא ו-CRUD מקצה לקצה - הפרויקט מוכן לייצור |
+| 2025-12-11T01:13:59+00:00 | 1.3.17.0 | 1.3.16.0 | 656e7b7643f7a55221a56b43841940ac0741b404 | 656e7b7643f7a55221a56b43841940ac0741b404 | patch | ייצוב מלא ו-CRUD מקצה לקצה - הפרויקט מוכן לייצור |

@@ -1,6 +1,6 @@
 # רשימת שיפורים כלליים לעמודי מוקאפ
 
-# General Mockup Pages Improvements Checklist
+## General Mockup Pages Improvements Checklist
 
 **תאריך יצירה:** 22 נובמבר 2025  
 **מבוסס על:** `trade-history-page.html`  
@@ -167,7 +167,8 @@
 - [ ] Fallback לתצוגה ידנית אם `FieldRendererService` לא זמין
 - [ ] עדכון דינמי של סטטוס ב-`DOMContentLoaded`
 - [ ] תמיכה בכל הסטטוסים: `open`, `closed`, `cancelled`
-- [ ] **חשוב:** במערכת יש רק שלושה סטטוסים: `open`, `closed`, `cancelled`. אין להשתמש ב-`active`, `completed`, `pending` - אלה לא קיימים במערכת
+- [ ] **חשוב:** במערכת יש רק שלושה סטטוסים: `open`, `closed`, `cancelled`.
+  אין להשתמש ב-`active`, `completed`, `pending` - אלה לא קיימים במערכת
 
 ---
 

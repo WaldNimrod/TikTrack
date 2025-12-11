@@ -1,4 +1,5 @@
 # מדריך מפתחים - מערכת איתחול מאוחדת
+
 ## Initialization System Developer Guide
 
 **תאריך יצירה:** 2025-12-04  
@@ -21,7 +22,7 @@
 
 ## 🎯 סקירה כללית
 
-### מה זה Unified Initialization System?
+### מה זה Unified Initialization System
 
 מערכת איתחול מאוחדת היא נקודת הכניסה המרכזית לכל עמוד ב-TikTrack. היא אחראית על:
 
@@ -64,17 +65,20 @@ trading-ui/scripts/
 ### 4 שלבי איתחול
 
 #### Stage 1: Detect and Analyze
+
 - זיהוי עמוד (שם, סוג, pathname)
 - ניתוח מערכות זמינות (Logger, NotificationSystem, HeaderSystem, וכו')
 - זיהוי דרישות (filters, validation, tables, charts)
 
 #### Stage 2: Prepare Configuration
+
 - טעינת page config מ-`page-initialization-configs.js`
 - העתקת `packages` array (קריטי לאתחול העדפות)
 - העתקת `requiredGlobals`, `customInitializers`, וכו'
 - אימות תלויות
 
 #### Stage 3: Execute Initialization
+
 - Cache System initialization
 - Preferences initialization (אם `packages` כולל 'preferences')
 - Application initialization:
@@ -84,6 +88,7 @@ trading-ui/scripts/
 - Custom initializers (אם מוגדרים)
 
 #### Stage 4: Finalize
+
 - State restoration (שחזור מצב סקשנים, וכו')
 - Success notifications (אם נדרש)
 - Performance metrics logging
@@ -251,6 +256,7 @@ trading-ui/scripts/
 ```
 
 **כללי סיווג:**
+
 - **`defer`** - לסקריפטים קריטיים עם תלויות (מומלץ לרוב הסקריפטים)
 - **`async`** - לסקריפטים לא קריטיים ללא תלויות (dev-tools, monitoring)
 - **`sync`** - רק במקרים מיוחדים מאוד (כמעט לא משתמשים)
@@ -339,16 +345,19 @@ Bundles מאפשרים איחוד מספר קבצי JavaScript לקבצים גד
 ### Development Mode (ברירת מחדל)
 
 **שימוש:**
+
 - פיתוח יומיומי
 - דיבוג
 - בדיקות
 
 **תכונות:**
+
 - כל הסקריפטים נטענים בנפרד
 - קל לדיבוג
 - שינויים בקוד נראים מיד
 
 **עדכון HTML:**
+
 ```bash
 node trading-ui/scripts/generate-script-loading-code.js my-page
 ```
@@ -356,15 +365,18 @@ node trading-ui/scripts/generate-script-loading-code.js my-page
 ### Production Mode (עם Bundles)
 
 **שימוש:**
+
 - פרודקשן
 - ביצועים מיטביים
 
 **תכונות:**
+
 - כל הסקריפטים של package מאוחדים ל-bundle אחד
 - הפחתה דרמטית במספר בקשות
 - Minification ו-optimization
 
 **בניית Bundles:**
+
 ```bash
 # בניית כל ה-bundles
 npm run build:bundles
@@ -374,6 +386,7 @@ npm run build:bundles -- --package=my-package
 ```
 
 **בדיקת Bundles:**
+
 ```bash
 # בדיקת כל ה-bundles
 npm run test:bundles
@@ -383,6 +396,7 @@ npm run test:bundles -- --package=my-package
 ```
 
 **עדכון HTML ל-Production Mode:**
+
 ```bash
 # 1. גיבוי
 cp trading-ui/my-page.html trading-ui/my-page.html.backup
@@ -399,11 +413,13 @@ mv temp_my-page.html trading-ui/my-page.html
 #### Bundle לא נטען
 
 **סיבות אפשריות:**
+
 1. Bundle לא נבנה - הרץ `npm run build:bundles`
 2. Bundle לא קיים - בדוק ב-`trading-ui/scripts/bundles/`
 3. שגיאת build - בדוק את ה-logs
 
 **פתרון:**
+
 - המערכת נופלת אוטומטית לקבצים המקוריים
 - בדוק את ה-console לשגיאות
 - הרץ `npm run test:bundles` לבדיקה
@@ -411,11 +427,13 @@ mv temp_my-page.html trading-ui/my-page.html
 #### שגיאות JavaScript אחרי Bundling
 
 **סיבות אפשריות:**
+
 1. בעיית סדר טעינה
 2. בעיית scope
 3. בעיית dependencies
 
 **פתרון:**
+
 - בדוק את ה-source map
 - בדוק את ה-console לשגיאות
 - נסה development mode לבדיקה
@@ -429,6 +447,7 @@ mv temp_my-page.html trading-ui/my-page.html
 **בעיה:** Header לא מופיע בעמוד
 
 **פתרון:**
+
 1. בדוק Console - האם יש שגיאות?
 2. בדוק Network - האם `header-system.js` נטען?
 3. בדוק `window.HeaderSystem` - האם קיים?
@@ -439,6 +458,7 @@ mv temp_my-page.html trading-ui/my-page.html
 **בעיה:** Script לא נטען או לא עובד
 
 **פתרון:**
+
 1. בדוק `package-manifest.js` - האם ה-script מוגדר?
 2. בדוק `page-initialization-configs.js` - האם ה-package ב-`packages` array?
 3. בדוק `requiredGlobals` - האם ה-global מוגדר?
@@ -449,6 +469,7 @@ mv temp_my-page.html trading-ui/my-page.html
 **בעיה:** "Missing dependency" או "Package not found"
 
 **פתרון:**
+
 1. בדוק `package-manifest.js` - האם התלויות מוגדרות נכון?
 2. בדוק `loadOrder` - האם ה-package נטען לפני התלויות שלו?
 3. בדוק `page-initialization-configs.js` - האם כל ה-packages ב-`packages` array?

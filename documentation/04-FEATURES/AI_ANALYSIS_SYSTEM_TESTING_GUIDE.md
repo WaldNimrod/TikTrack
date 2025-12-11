@@ -17,6 +17,7 @@
 ## 🌐 Browser Tests (הכי קל)
 
 ### תכונות
+
 - ✅ הרצה ישירה בדפדפן - אין צורך בהתקנות
 - ✅ בדיקות מלאות: Unit, Integration, E2E, Performance
 - ✅ דוחות מפורטים בקונסול
@@ -25,17 +26,20 @@
 ### הוראות הרצה
 
 **שלב 1: טעינת הסקריפט**
+
 1. פתח את עמוד AI Analysis: `http://localhost:8080/trading-ui/ai-analysis.html`
 2. פתח את הקונסול (F12)
 3. ודא שהסקריפט נטען (אמור להופיע: `✅ AI Analysis automated test suite loaded`)
 
 **שלב 2: הרצת הבדיקות**
+
 ```javascript
 // הרצת כל הבדיקות
 window.runAllAIAnalysisTests()
 ```
 
 **שלב 3: צפייה בתוצאות**
+
 - התוצאות מוצגות בקונסול
 - תוצאות מפורטות נשמרות ב-`window.aiAnalysisTestResults`
 - גישה לתוצאות: `window.aiAnalysisTestResults`
@@ -92,6 +96,7 @@ Total Duration: 1234.56ms
 ## 🎭 Playwright E2E Tests
 
 ### תכונות
+
 - ✅ הרצה אוטומטית מלאה
 - ✅ תמיכה ב-Chrome, Firefox, Safari
 - ✅ צילומי מסך על שגיאות
@@ -103,11 +108,13 @@ Total Duration: 1234.56ms
 - ✅ Performance timing measurement
 
 ### תוצאות סופיות (05.01.2025)
+
 - **16/16 tests עוברים** (100%) ✅
 - **0/16 tests נכשלים** (0%)
 - **1/17 test מושמט** (conditional skip - Retry mechanism)
 
 ### רשימת כל ה-Tests
+
 1. ✅ Page loads successfully
 2. ✅ Templates load and display
 3. ✅ Template selection shows form
@@ -127,6 +134,7 @@ Total Duration: 1234.56ms
 17. ✅ User profile AI Analysis manager loads
 
 ### שיפורים טכניים
+
 - **Helper Functions:** `findButtonInModal` למציאת buttons במודלים
 - **Multiple Strategies:** חיפוש לפי ID, data-onclick, text content
 - **Fallback Mechanisms:** אסטרטגיות גיבוי לכל interaction
@@ -174,6 +182,7 @@ python3 Backend/scripts/verify_test_users.py --create-missing
 ```
 
 **Test User:**
+
 - Username: `nimrod`
 - Password: `nimw`
 
@@ -274,11 +283,13 @@ module.exports = {
 ### בדיקות Playwright E2E
 
 **תוצאות סופיות (05.01.2025):**
+
 - ✅ **16/16 tests עוברים** (100%)
 - ❌ **0/16 tests נכשלים** (0%)
 - ⏭️ **1/17 test מושמט** (conditional skip)
 
 **ביצועים:**
+
 - זמן טעינת scripts: ~6-14ms
 - זמן initialization: ~520-600ms
 - זמן טעינה כולל: ~2700-2800ms
@@ -294,6 +305,7 @@ npx playwright test --reporter=json > test-results.json
 ```
 
 **דוחות מפורטים:**
+
 - `documentation/05-REPORTS/AI_ANALYSIS_E2E_TESTS_FIX_REPORT.md` - דוח תיקון מפורט
 - `documentation/05-REPORTS/AI_ANALYSIS_E2E_TESTS_FINAL_REPORT.md` - דוח סופי
 
@@ -304,6 +316,7 @@ npx playwright test --reporter=json > test-results.json
 ### בדיקות ידניות למחיקה
 
 #### 1. בדיקת מחיקה של ניתוח בודד
+
 1. פתח את עמוד AI Analysis
 2. צור ניתוח חדש (או השתמש בניתוח קיים)
 3. לחץ על כפתור "מחק" בטבלת ההיסטוריה
@@ -314,6 +327,7 @@ npx playwright test --reporter=json > test-results.json
    - הודעה על הצלחה מוצגת
 
 #### 2. בדיקת מחיקה עם cache
+
 1. צור ניתוח חדש
 2. פתח את התוצאות (הנתונים נשמרים למטמון)
 3. לחץ על "מחק"
@@ -323,6 +337,7 @@ npx playwright test --reporter=json > test-results.json
    - הרשומה נעלמת מהטבלה
 
 #### 3. בדיקת ביטול מחיקה
+
 1. לחץ על "מחק" על ניתוח
 2. לחץ על "ביטול" בחלון האישור
 3. **תוצאה צפויה:**
@@ -332,6 +347,7 @@ npx playwright test --reporter=json > test-results.json
 ### בדיקת API למחיקה
 
 #### DELETE /api/ai-analysis/history/{id}
+
 ```bash
 # מחיקת ניתוח (צריך להיות מחובר)
 curl -X DELETE http://localhost:8080/api/ai-analysis/history/123 \
@@ -340,6 +356,7 @@ curl -X DELETE http://localhost:8080/api/ai-analysis/history/123 \
 ```
 
 **תוצאה צפויה:**
+
 - `200 OK` עם `{ "status": "success", "data": { "deleted_id": 123 } }`
 - הניתוח נמחק מה-DB
 - המטמון מנוקה (Frontend)
@@ -347,12 +364,15 @@ curl -X DELETE http://localhost:8080/api/ai-analysis/history/123 \
 ### בדיקות Edge Cases
 
 #### 1. מחיקת ניתוח שלא קיים
+
 - **תוצאה צפויה:** `404 Not Found`
 
 #### 2. מחיקת ניתוח של משתמש אחר
+
 - **תוצאה צפויה:** `404 Not Found` (לא authorized)
 
 #### 3. מחיקת ניתוח ללא authentication
+
 - **תוצאה צפויה:** `401 Unauthorized`
 
 ---
@@ -362,6 +382,7 @@ curl -X DELETE http://localhost:8080/api/ai-analysis/history/123 \
 ### בעיה: הבדיקות לא רצות
 
 **פתרון:**
+
 1. ודא שהשרת רץ: `http://localhost:8080`
 2. ודא שהעמוד נטען ללא שגיאות
 3. בדוק את הקונסול לשגיאות JavaScript
@@ -369,6 +390,7 @@ curl -X DELETE http://localhost:8080/api/ai-analysis/history/123 \
 ### בעיה: Templates לא נטענים
 
 **פתרון:**
+
 1. בדוק שהשרת רץ
 2. בדוק את Network tab ב-DevTools
 3. ודא שה-API endpoint זמין: `/api/ai-analysis/templates`
@@ -376,6 +398,7 @@ curl -X DELETE http://localhost:8080/api/ai-analysis/history/123 \
 ### בעיה: Playwright לא מוצא את העמוד
 
 **פתרון:**
+
 1. ודא שהשרת רץ על פורט 8080
 2. בדוק את `BASE_URL` ב-`ai-analysis-e2e.spec.js`
 3. ודא שהנתיב נכון: `/trading-ui/ai-analysis.html`
@@ -383,6 +406,7 @@ curl -X DELETE http://localhost:8080/api/ai-analysis/history/123 \
 ### בעיה: Buttons לא נמצאים במודלים
 
 **פתרון:**
+
 1. ה-tests משתמשים ב-helper function `findButtonInModal`
 2. ה-helper מחפש buttons ב-multiple strategies:
    - לפי ID
@@ -393,6 +417,7 @@ curl -X DELETE http://localhost:8080/api/ai-analysis/history/123 \
 ### בעיה: Authentication נכשל
 
 **פתרון:**
+
 1. ודא שמשתמש test קיים: `python3 Backend/scripts/verify_test_users.py`
 2. בדוק credentials: `nimrod` / `nimw`
 3. ודא שהשרת רץ ו-API זמין
@@ -412,11 +437,13 @@ curl -X DELETE http://localhost:8080/api/ai-analysis/history/123 \
 ## 📚 תיעוד נוסף
 
 ### דוחות מפורטים
+
 - [דוח תיקון E2E Tests](../../05-REPORTS/AI_ANALYSIS_E2E_TESTS_FIX_REPORT.md) - דוח תיקון מפורט
 - [דוח סופי E2E Tests](../../05-REPORTS/AI_ANALYSIS_E2E_TESTS_FINAL_REPORT.md) - דוח סופי עם כל הפרטים
 - [תוכנית בדיקה מעמיקה](../../testing/AI_ANALYSIS_E2E_DEEP_INVESTIGATION_PLAN.md) - תוכנית הבדיקה המעמיקה
 
 ### מסמכי ניתוח
+
 - [מיפוי Selectors](../../testing/AI_ANALYSIS_E2E_SELECTORS_MAPPING.md) - מיפוי מלא של selectors
 - [ניתוח Services](../../testing/AI_ANALYSIS_E2E_SERVICES_ANALYSIS.md) - ניתוח JavaScript services
 - [ניתוח Authentication](../../testing/AI_ANALYSIS_E2E_AUTH_ANALYSIS.md) - ניתוח מערכת authentication
@@ -428,6 +455,7 @@ curl -X DELETE http://localhost:8080/api/ai-analysis/history/123 \
 ## 📝 שינויים אחרונים
 
 ### עדכון: 1 בפברואר 2025
+
 - ✅ נוספו בדיקות למחיקה (Delete Tests)
 - ✅ נוסף כפתור מחיקה בטבלת ההיסטוריה
 - ✅ נוסף DELETE endpoint ל-API

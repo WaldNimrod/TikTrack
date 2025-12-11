@@ -10,7 +10,7 @@
 
 **לעדכון מלא ומפורט, ראה:** [`UPDATE_PROCESS.md`](./UPDATE_PROCESS.md)
 
-### תהליך עדכון מהיר:
+### תהליך עדכון מהיר
 
 ```bash
 # 1. עדכון ומיזוג
@@ -128,15 +128,17 @@ TikTrackApp/
 
 **📖 למדריך מפורט ומלא:** [`UPDATE_PROCESS.md`](./UPDATE_PROCESS.md)
 
-### תהליך עדכון מלא (5 שלבים):
+### תהליך עדכון מלא (5 שלבים)
 
 #### שלב 1: עדכון Main Branch
+
 ```bash
 git checkout main
 git pull origin main
 ```
 
 #### שלב 2: מיזוג Main → Production
+
 ```bash
 git checkout production
 git pull origin production
@@ -145,17 +147,20 @@ git merge main
 ```
 
 #### שלב 3: סינכרון קוד
+
 ```bash
 ./scripts/sync_to_production.py
 ```
 
 #### שלב 4: בדיקות ואימות
+
 ```bash
 ./scripts/verify_production_isolation.sh
 ./scripts/verify_production.sh
 ```
 
 #### שלב 5: Commit & Push
+
 ```bash
 git add production/ scripts/ documentation/production/
 git commit -m "feat: Update production from main - [תאריך]"
@@ -211,6 +216,7 @@ python3 scripts/create_production_db.py
 ```
 
 הסקריפט:
+
 1. קורא מ-PostgreSQL פיתוח (`TikTrack-db-development`)
 2. יוצר PostgreSQL פרודקשן (`TikTrack-db-production`)
 3. מעתיק את כל מבנה הטבלאות
@@ -233,6 +239,7 @@ cd production
 ```
 
 הסקריפט:
+
 - בודק קונפליקטים על פורט 5001
 - מאמת שכל הקבצים קיימים
 - מפעיל את השרת במצב foreground
@@ -253,6 +260,7 @@ cd production
 ```
 
 הסקריפט בודק:
+
 - ✅ מבנה תקיות תקין
 - ✅ כל הקבצים הנדרשים קיימים
 - ✅ בסיס נתונים קיים
@@ -262,12 +270,14 @@ cd production
 ## Git Branches
 
 ### main (development)
+
 - כל הקוד כולל tests, migrations, וכו'
 - עבודה יומיומית
 - פורט: 8080
 - DB: PostgreSQL (`TikTrack-db-production`)
 
 ### production (production)
+
 - רק קבצים פעילים מ-`production/Backend/`
 - קוד נקי ללא tests/migrations
 - עדכון רק דרך sync script

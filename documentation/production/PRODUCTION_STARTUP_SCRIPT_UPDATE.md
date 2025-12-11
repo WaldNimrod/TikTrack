@@ -1,5 +1,7 @@
 # Production Startup Script Update Guide
+
 # =======================================
+
 # מדריך עדכון סקריפט ההפעלה של הפרודקשן
 
 **גרסה:** 1.0  
@@ -119,11 +121,13 @@ fi
 אחרי העדכון, בדוק:
 
 1. **הפעל את השרת:**
+
    ```bash
    ./start_server.sh
    ```
 
 2. **ודא שמשתני הסביבה מוגדרים:**
+
    ```bash
    # השרת אמור להציג:
    # [INFO] Setting PostgreSQL environment variables (production defaults)...
@@ -131,6 +135,7 @@ fi
    ```
 
 3. **ודא שה-container נבדק:**
+
    ```bash
    # השרת אמור להציג:
    # Checking PostgreSQL container...
@@ -138,6 +143,7 @@ fi
    ```
 
 4. **בדוק חיבור לבסיס הנתונים:**
+
    ```bash
    curl http://localhost:5001/api/system/health
    ```

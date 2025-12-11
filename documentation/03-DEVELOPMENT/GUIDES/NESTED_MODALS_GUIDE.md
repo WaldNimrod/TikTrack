@@ -1,4 +1,5 @@
 # מדריך מפתחים: מודולים מקוננים
+
 ## Nested Modals Developer Guide
 
 **תאריך יצירה:** ינואר 2025  
@@ -27,6 +28,7 @@ await window.ModalManagerV2.showModal('alertsModal', 'add');
 ```
 
 המערכת תטפל אוטומטית ב:
+
 - ✅ z-index דינמי
 - ✅ ניקוי backdrops כפולים
 - ✅ dimming של מודול ראשון

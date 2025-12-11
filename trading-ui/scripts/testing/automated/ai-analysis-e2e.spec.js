@@ -11,6 +11,12 @@
  * @created January 28, 2025
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Event Handlers ===
+// - findButtonInModal() - Findbuttoninmodal
+
 const { test, expect } = require('@playwright/test');
 const { authenticateUser, waitForAuthentication, verifyAuthentication } = require('./playwright-auth-helper');
 
@@ -833,9 +839,7 @@ test.describe('AI Analysis System - E2E Tests', () => {
     // Get history to find a failed analysis
     const historyResponse = await page.evaluate(async () => {
       const response = await fetch('/api/ai-analysis/history', {
-        method: 'GET',
-        credentials: 'include'
-      });
+        method: 'GET', });
       return response.json();
     });
     
@@ -854,9 +858,7 @@ test.describe('AI Analysis System - E2E Tests', () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
-        },
-        credentials: 'include',
-        body: JSON.stringify({
+        }, body: JSON.stringify({
           max_retries: 3,
           use_fallback_provider: true
         })

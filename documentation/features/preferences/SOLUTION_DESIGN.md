@@ -5,6 +5,7 @@
 ## 3.1 עקרונות הפתרון
 
 ### עקרון 1: Single Source of Truth
+
 **מערכת אחת מרכזית לניהול העדפות**
 
 - `PreferencesManager` - נקודת כניסה אחת לכל פעולות העדפות
@@ -12,6 +13,7 @@
 - אין כפילויות
 
 ### עקרון 2: Optimistic Updates
+
 **עדכון UI מיד אחרי שמירה, ללא טעינה מחדש**
 
 - אחרי שמירה מוצלחת: עדכון UI עם הערכים שנשמרו
@@ -19,6 +21,7 @@
 - רק במקרה של שגיאה: טעינה מחדש מהשרת
 
 ### עקרון 3: Smart Cache
+
 **ניהול מטמון חכם עם invalidation מדויק**
 
 - ניקוי מטמון רק כשצריך
@@ -27,6 +30,7 @@
 - Invalidation patterns אחידים
 
 ### עקרון 4: Lazy Loading
+
 **טעינה רק כשצריך**
 
 - טעינה ראשונית: רק critical preferences
@@ -34,6 +38,7 @@
 - Background loading: רק preferences לא קריטיים
 
 ### עקרון 5: Event-Driven
+
 **שימוש ב-events במקום קריאות ישירות**
 
 - Events מוגדרים היטב
@@ -59,9 +64,11 @@ PreferencesManager (מרכזי)
 ### תפקידים
 
 #### PreferencesManager
+
 **תפקיד:** מנהל מרכזי - נקודת כניסה אחת
 
 **תכונות:**
+
 - `initialize()` - אתחול מערכת
 - `loadGroup(groupName)` - טעינת קבוצה
 - `saveGroup(groupName, preferences)` - שמירת קבוצה
@@ -69,59 +76,73 @@ PreferencesManager (מרכזי)
 - `updateField(fieldId, value)` - עדכון אופטימי של שדה
 
 **תלויות:**
+
 - PreferencesData (API)
 - PreferencesCache (Cache)
 - PreferencesUI (UI)
 - PreferencesEvents (Events)
 
 #### PreferencesData
+
 **תפקיד:** תקשורת עם API בלבד
 
 **תכונות:**
+
 - `loadGroupPreferences(groupName, userId, profileId)` - טעינה מהשרת
 - `saveGroupPreferences(groupName, preferences, userId, profileId)` - שמירה לשרת
 - `getAllPreferences(userId, profileId)` - טעינת כל ההעדפות
 
 **תלויות:**
+
 - אין (רק API calls)
 
 #### PreferencesCache
+
 **תפקיד:** ניהול מטמון בלבד
 
 **תכונות:**
+
 - `get(key, options)` - קריאה מכל השכבות
 - `set(key, value, options)` - שמירה לכל השכבות
 - `invalidate(pattern)` - ניקוי מטמון (ללא טעינה מחדש!)
 - `clearGroup(groupName)` - ניקוי מטמון של קבוצה
 
 **תלויות:**
+
 - UnifiedCacheManager (layer נמוך)
 
 #### PreferencesUI
+
 **תפקיד:** עדכון UI בלבד
 
 **תכונות:**
+
 - `populateGroup(sectionId, preferences)` - מילוי קבוצה
 - `updateField(fieldId, value)` - עדכון שדה בודד
 - `markFieldAsModified(fieldId)` - סימון שדה כנערך
 
 **תלויות:**
+
 - אין (רק DOM manipulation)
 
 #### PreferencesEvents
+
 **תפקיד:** תקשורת בין שכבות
 
 **תכונות:**
+
 - `dispatch(eventName, detail)` - שליחת event
 - `listen(eventName, handler)` - האזנה ל-event
 
 **Events:**
+
 - `preferences:loaded` - העדפות נטענו
 - `preferences:saved` - העדפות נשמרו
 - `preferences:field-updated` - שדה עודכן
 - `preferences:group-updated` - קבוצה עודכנה
 
 **תלויות:**
+
 - אין (רק window events)
 
 ## 3.3 תהליך טעינה אופטימלי
@@ -215,11 +236,13 @@ PreferencesManager (מרכזי)
 **פורמט אחיד:** `preference_{type}_{identifier}_{userId}_{profileId}`
 
 **דוגמאות:**
+
 - `preference_single_atr_period_1_0` - העדפה בודדת
 - `preference_group_trading_settings_1_0` - קבוצת העדפות
 - `preference_all__1_0` - כל ההעדפות
 
 **יתרונות:**
+
 - קל לזהות מפתחות קשורים
 - קל לנקות מטמון של קבוצה
 - קל לדבאג
@@ -227,12 +250,14 @@ PreferencesManager (מרכזי)
 ### Invalidation Strategy
 
 **מתי לנקות מטמון:**
+
 1. אחרי שמירה מוצלחת - רק עדכון מטמון (לא ניקוי!)
 2. אחרי שגיאה בשמירה - ניקוי + טעינה מחדש
 3. אחרי החלפת פרופיל - ניקוי כל המטמון
 4. אחרי ניקוי ידני - ניקוי + טעינה מחדש (אם צריך)
 
 **מתי לא לנקות מטמון:**
+
 - אחרי שמירה מוצלחת (רק עדכון!)
 - אחרי טעינה רגילה
 - אחרי population
@@ -240,12 +265,14 @@ PreferencesManager (מרכזי)
 ### Cache Layers
 
 **סדר בדיקה:**
+
 1. Memory (מהיר ביותר)
 2. localStorage (מהיר, persistent)
 3. IndexedDB (איטי יותר, persistent, גדול)
 4. Backend API (איטי ביותר)
 
 **אסטרטגיה:**
+
 - קריאה: memory → localStorage → IndexedDB → API
 - שמירה: memory + localStorage + IndexedDB (כל השכבות)
 
@@ -254,6 +281,7 @@ PreferencesManager (מרכזי)
 **ברירת מחדל:** 5 דקות (300,000ms)
 
 **ניתן להגדרה:**
+
 - Critical preferences: 1 דקה
 - Group preferences: 5 דקות
 - All preferences: 10 דקות
@@ -263,8 +291,10 @@ PreferencesManager (מרכזי)
 ### Events מוגדרים
 
 #### preferences:loaded
+
 **נשלח:** אחרי טעינת העדפות
 **Detail:**
+
 ```javascript
 {
   userId: number,
@@ -275,8 +305,10 @@ PreferencesManager (מרכזי)
 ```
 
 #### preferences:saved
+
 **נשלח:** אחרי שמירה מוצלחת
 **Detail:**
+
 ```javascript
 {
   groupName: string,
@@ -287,8 +319,10 @@ PreferencesManager (מרכזי)
 ```
 
 #### preferences:field-updated
+
 **נשלח:** אחרי עדכון שדה בודד
 **Detail:**
+
 ```javascript
 {
   fieldId: string,
@@ -298,8 +332,10 @@ PreferencesManager (מרכזי)
 ```
 
 #### preferences:group-updated
+
 **נשלח:** אחרי עדכון קבוצה
 **Detail:**
+
 ```javascript
 {
   groupName: string,
@@ -310,8 +346,10 @@ PreferencesManager (מרכזי)
 ```
 
 #### preferences:save-failed
+
 **נשלח:** אחרי שגיאה בשמירה
 **Detail:**
+
 ```javascript
 {
   groupName: string,
@@ -323,6 +361,7 @@ PreferencesManager (מרכזי)
 ### Event Listeners
 
 **מינימליים:**
+
 - רק listeners שצריכים לעדכן UI
 - לא listeners שטוענים מחדש מהשרת
 - לא listeners שמפעילים population
@@ -396,22 +435,26 @@ class PreferencesUI {
 ## 3.8 Migration Plan
 
 ### שלב 1: יצירת PreferencesManager
+
 - יצירת PreferencesManager class
 - יצירת PreferencesCache class
 - יצירת PreferencesEvents class
 - יצירת PreferencesUI class (wrapper)
 
 ### שלב 2: Integration
+
 - עדכון PreferencesGroupManager להשתמש ב-PreferencesManager
 - עדכון PreferencesUIV4 להשתמש ב-PreferencesManager
 - שמירה על backward compatibility
 
 ### שלב 3: Optimization
+
 - הסרת טעינות מיותרות
 - איחוד population
 - אופטימיזציה של מטמון
 
 ### שלב 4: Cleanup
+
 - הסרת קוד מיותר
 - איחוד מערכות מקבילות
 - תיעוד
@@ -421,6 +464,7 @@ class PreferencesUI {
 ### Wrappers
 
 **PreferencesUI (legacy):**
+
 ```javascript
 window.PreferencesUI = {
   loadAllPreferences: (userId, profileId) => {
@@ -433,6 +477,7 @@ window.PreferencesUI = {
 ```
 
 **PreferencesGroupManager (existing):**
+
 ```javascript
 // שימוש ב-PreferencesManager פנימית
 // API חיצוני נשאר זהה
@@ -446,6 +491,7 @@ window.PreferencesUI = {
 **Events:** 5
 
 **יתרונות:**
+
 - נקודת כניסה אחת
 - Optimistic updates
 - ניהול מטמון יעיל

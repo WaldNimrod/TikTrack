@@ -46,12 +46,14 @@ trading-ui/scripts/tradingview-widgets/
 **תפקיד:** הגדרות ברירת מחדל לכל 11 הווידג'טים
 
 **פונקציות עיקריות:**
+
 - `getConfig(widgetType)` - קבלת הגדרות לווידג'ט מסוים
 - `validateConfig(widgetType, config)` - ולידציה של קונפיגורציה
 - `getAvailableTypes()` - קבלת רשימת כל סוגי הווידג'טים
 - `supportsRTL(widgetType)` - בדיקה אם ווידג'ט תומך ב-RTL
 
 **11 סוגי ווידג'טים:**
+
 1. `advanced-chart` - Advanced Real-Time Chart
 2. `symbol-overview` - Symbol Overview
 3. `mini-chart` - Mini Chart
@@ -71,6 +73,7 @@ trading-ui/scripts/tradingview-widgets/
 **תפקיד:** אינטגרציה עם מערכת הצבעים הדינמית
 
 **Fallback Chain:**
+
 1. העדפות משתמש (`window.currentPreferences`)
 2. ColorManager cache
 3. CSS variables
@@ -78,6 +81,7 @@ trading-ui/scripts/tradingview-widgets/
 5. Logo colors (final fallback)
 
 **פונקציות עיקריות:**
+
 - `getChartColors()` - קבלת צבעי גרפים מהעדפות
 - `getWidgetColorConfig(widgetType, userColors)` - קבלת קונפיגורציית צבעים לווידג'ט
 - `watchColorChanges(callback)` - מעקב אחר שינויי צבעים
@@ -85,6 +89,7 @@ trading-ui/scripts/tradingview-widgets/
 - `getLocale()` - קבלת locale נוכחי
 
 **מפתחות צבעים:**
+
 - `chartPrimaryColor` → Primary color (`#26baac`)
 - `chartSecondaryColor` → Secondary color (`#fc5a06`)
 - `chartBackgroundColor` → Background
@@ -100,6 +105,7 @@ trading-ui/scripts/tradingview-widgets/
 **תפקיד:** Factory ליצירת ווידג'טים עם יצירת IDs אוטומטית
 
 **פונקציות עיקריות:**
+
 - `generateContainerId(prefix)` - יצירת ID ייחודי
 - `ensureUniqueContainerId(containerId)` - וידוא ייחודיות ID
 - `releaseContainerId(containerId)` - שחרור ID
@@ -109,6 +115,7 @@ trading-ui/scripts/tradingview-widgets/
 - ... (פונקציות לכל 11 הווידג'טים)
 
 **יצירת IDs אוטומטית:**
+
 - אם `containerId` לא מסופק, נוצר אוטומטית
 - פורמט: `{prefix}-{timestamp}-{random}`
 - מניעת התנגשויות עם registry פנימי
@@ -120,6 +127,7 @@ trading-ui/scripts/tradingview-widgets/
 **תפקיד:** מערכת ניהול מרכזית לכל הווידג'טים
 
 **פונקציות עיקריות:**
+
 - `init()` - אתחול המערכת (ממתין לתלויות)
 - `createWidget(config)` - יצירת ווידג'ט חדש
 - `updateWidget(widgetId, updates)` - עדכון ווידג'ט (משחזר עם קונפיגורציה חדשה)
@@ -133,6 +141,7 @@ trading-ui/scripts/tradingview-widgets/
 - `getStats()` - סטטיסטיקות על הווידג'טים
 
 **ניהול Lifecycle:**
+
 - Registry פנימי (`_widgets` Map) - מעקב אחר כל הווידג'טים
 - ResizeObserver - מעקב אחר שינויי גודל
 - Color watchers - עדכון אוטומטי בעת שינוי צבעים
@@ -150,23 +159,27 @@ trading-ui/scripts/tradingview-widgets/
 **Load Order:** 21
 
 **קבצים:**
+
 1. `tradingview-widgets-config.js` (loadOrder: 1)
 2. `tradingview-widgets-colors.js` (loadOrder: 2)
 3. `tradingview-widgets-factory.js` (loadOrder: 3)
 4. `tradingview-widgets-core.js` (loadOrder: 4)
 
 **עמודים מוגדרים:**
+
 - `tradingview-widgets-showcase` - עמוד showcase
 - `price-history-page` - עמוד היסטוריית מחירים
 
 ### 2. מערכת הצבעים
 
 **אינטגרציה:**
+
 - קריאת צבעים מ-`window.currentPreferences`
 - Fallback ל-CSS variables
 - עדכון אוטומטי בעת שינוי צבעים
 
 **מפתחות צבעים:**
+
 - `chartPrimaryColor` - צבע ראשי (`#26baac`)
 - `chartSecondaryColor` - צבע משני (`#fc5a06`)
 - `chartBackgroundColor` - רקע
@@ -178,6 +191,7 @@ trading-ui/scripts/tradingview-widgets/
 ### 3. Responsive Design
 
 **תמיכה:**
+
 - `autosize: true` (ברירת מחדל) - התאמה אוטומטית
 - ResizeObserver - מעקב אחר שינויי גודל
 - Debounce של resize events (150ms)
@@ -279,6 +293,7 @@ window.TradingViewWidgetsManager.refreshAllWidgets();
 ## גרסה
 
 **1.0.0** - 24 נובמבר 2025
+
 - יצירת מערכת Core
 - תמיכה ב-11 ווידג'טים
 - אינטגרציה עם מערכת הצבעים

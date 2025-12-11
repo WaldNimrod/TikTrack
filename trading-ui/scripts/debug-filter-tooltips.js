@@ -7,6 +7,15 @@
  * Usage: Load this script and call debugFilterTooltips() in console
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - initializeTooltipsForContainer() - Initializetooltipsforcontainer
+
+// === Other ===
+// - debugFilterTooltips() - Debugfiltertooltips
+
 /**
  * Debug filter tooltips initialization
  * @function debugFilterTooltips

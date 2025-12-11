@@ -3,6 +3,14 @@
  * Registers the portfolio table with the UnifiedTableSystem.
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Table Registration ===
+// - registerTablePortfolio() - Register Table Portfolio
+// - setupPortfolioColumns() - Setup Portfolio Columns
+// - initializePortfolioTable() - Initialize Portfolio Table
+
 window.registerPortfolioTable = function registerPortfolioTable() {
     if (!window.UnifiedTableSystem || !window.UnifiedTableSystem.registry || typeof window.UnifiedTableSystem.registry.register !== 'function') {
         window.Logger?.warn('⚠️ UnifiedTableSystem not available for portfolio registration', { page: 'register-table-portfolio' });

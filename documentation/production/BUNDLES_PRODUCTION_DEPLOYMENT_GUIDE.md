@@ -1,4 +1,5 @@
 # מדריך פריסת Bundles לפרודקשן
+
 ## Bundles Production Deployment Guide
 
 **תאריך:** 6 בדצמבר 2025  
@@ -24,10 +25,12 @@
 
 מדריך זה מפרט את התהליך המלא לפריסת מערכת ה-bundles בסביבת הפרודקשן.
 
-### מה זה Bundles?
+### מה זה Bundles
+
 Bundles הם קבצי JavaScript מאוחדים המכילים מספר scripts יחד, מה שמשפר את ביצועי הטעינה ומפחית את מספר בקשות הרשת.
 
-### למה זה חשוב?
+### למה זה חשוב
+
 - ✅ **ביצועים טובים יותר** - פחות בקשות רשת
 - ✅ **טעינה מהירה יותר** - קבצים מאוחדים
 - ✅ **אופטימיזציה** - מיניפיקציה ואופטימיזציה אוטומטית
@@ -36,7 +39,7 @@ Bundles הם קבצי JavaScript מאוחדים המכילים מספר scripts 
 
 ## ✅ דרישות מוקדמות
 
-### לפני תחילת התהליך, ודאו שיש:
+### לפני תחילת התהליך, ודאו שיש
 
 - [ ] **גישה לסביבת הפרודקשן** (`TikTrackApp-Production`)
 - [ ] **Node.js מותקן** (גרסה 18+)
@@ -45,7 +48,7 @@ Bundles הם קבצי JavaScript מאוחדים המכילים מספר scripts 
 - [ ] **גישה לשרת הפרודקשן**
 - [ ] **גיבוי מלא** של סביבת הפרודקשן
 
-### בדיקות מוקדמות:
+### בדיקות מוקדמות
 
 ```bash
 # בדיקת Node.js
@@ -84,6 +87,7 @@ git pull origin main
 #### 1.2 פתרון Conflicts (אם יש)
 
 אם יש conflicts:
+
 1. פתור אותם ידנית
 2. ודא שהקוד מעודכן
 3. commit את השינויים
@@ -113,6 +117,7 @@ npm run build:bundles
 ```
 
 **פלט צפוי:**
+
 ```
 Building bundles...
 ✅ base.bundle.js
@@ -130,6 +135,7 @@ npm run test:bundles
 ```
 
 **פלט צפוי:**
+
 ```
 Testing bundles...
 ✅ All bundles exist
@@ -149,6 +155,7 @@ node scripts/update-all-pages-to-bundles.js
 ```
 
 **פלט צפוי:**
+
 ```
 ================================================================================
 📦 Updating All Pages to Production Mode with Bundles
@@ -175,6 +182,7 @@ grep "Mode: production | Use Bundles: true" trading-ui/index.html
 ```
 
 **צריך להחזיר:**
+
 ```
 <!-- 🔧 Mode: production | Use Bundles: true -->
 ```
@@ -196,11 +204,13 @@ curl http://localhost:5001/api/health
 #### 4.2 בדיקת עמוד ראשי
 
 פתח בדפדפן:
+
 ```
 http://localhost:5001/
 ```
 
 **בדוק:**
+
 - [ ] העמוד נטען בהצלחה
 - [ ] אין שגיאות בקונסולה
 - [ ] כל הפונקציונליות עובדת
@@ -217,6 +227,7 @@ python3 scripts/test_pages_console_errors.py
 ```
 
 **תוצאות צפויות:**
+
 - ✅ לפחות 90% מהעמודים ללא שגיאות
 - ✅ כל העמודים המרכזיים ללא שגיאות
 - ⚠️ מותרות אזהרות לא קריטיות
@@ -229,6 +240,7 @@ python3 scripts/testing/test_performance_pages.py
 ```
 
 **תוצאות צפויות:**
+
 - ✅ זמן טעינה ממוצע: < 3 שניות
 - ✅ מספר בקשות: < 100
 - ✅ גודל כולל: < 5MB
@@ -241,6 +253,7 @@ npm run test:bundles
 ```
 
 **תוצאות צפויות:**
+
 - ✅ כל ה-bundles קיימים
 - ✅ כל ה-bundles עם source maps
 - ✅ גודל bundles סביר
@@ -519,11 +532,13 @@ main();
 ### בעיה 1: Bundles לא נבנים
 
 **תסמינים:**
+
 ```
 Error: Cannot find module 'esbuild'
 ```
 
 **פתרון:**
+
 ```bash
 npm install esbuild
 ```
@@ -536,6 +551,7 @@ npm install esbuild
 עמודים עדיין עם `Mode: development`
 
 **פתרון:**
+
 ```bash
 # עדכון ידני של עמוד
 node trading-ui/scripts/generate-script-loading-code.js index --mode=production --use-bundles > temp.html
@@ -550,6 +566,7 @@ node trading-ui/scripts/generate-script-loading-code.js index --mode=production 
 שגיאות JavaScript בקונסולה
 
 **פתרון:**
+
 1. בדוק את `console_errors_report.json`
 2. בדוק את ה-bundles נבנו נכון
 3. בדוק את source maps קיימים
@@ -559,6 +576,7 @@ node trading-ui/scripts/generate-script-loading-code.js index --mode=production 
 ## 📞 תמיכה
 
 אם נתקלתם בבעיות:
+
 1. בדקו את ה-logs ב-`Backend/logs/`
 2. בדקו את `console_errors_report.json`
 3. צרו issue ב-GitLab עם:

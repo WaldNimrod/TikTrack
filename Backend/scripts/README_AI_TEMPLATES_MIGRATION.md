@@ -1,12 +1,15 @@
 # AI Templates Migration Script
 
 ## תיאור
+
 סקריפט להרצת migration של תבניות AI Analysis על כל בסיסי הנתונים:
+
 1. **Development** - בסיס הנתונים של פיתוח
 2. **Production** - בסיס הנתונים של פרודקשן
 3. **Demo** - בסיס הנתונים של דוגמה
 
 ## תהליך
+
 1. ✅ הרצת migration על Development DB
 2. ✅ בדיקות תקינות (validation)
 3. ✅ אם הכל תקין - הרצה על Production ו-Demo DBs
@@ -14,6 +17,7 @@
 ## שימוש
 
 ### הרצה בסיסית
+
 ```bash
 cd Backend
 python3 scripts/update_ai_templates_migration.py
@@ -24,6 +28,7 @@ python3 scripts/update_ai_templates_migration.py
 הסקריפט משתמש במשתני סביבה הבאים:
 
 #### Development (ברירת מחדל)
+
 - `POSTGRES_HOST` (default: localhost)
 - `POSTGRES_PORT` (default: 5432)
 - `POSTGRES_DB` (default: TikTrack-db-development)
@@ -31,6 +36,7 @@ python3 scripts/update_ai_templates_migration.py
 - `POSTGRES_PASSWORD` (default: BigMeZoo1974!?)
 
 #### Production
+
 - `POSTGRES_PROD_HOST` (default: localhost)
 - `POSTGRES_PROD_PORT` (default: 5432)
 - `POSTGRES_PROD_DB` (default: TikTrack-db-production)
@@ -38,6 +44,7 @@ python3 scripts/update_ai_templates_migration.py
 - `POSTGRES_PROD_PASSWORD` (default: BigMeZoo1974!?)
 
 #### Demo
+
 - `POSTGRES_DEMO_HOST` (default: localhost)
 - `POSTGRES_DEMO_PORT` (default: 5432)
 - `POSTGRES_DEMO_DB` (default: TikTrack-db-demo)
@@ -45,6 +52,7 @@ python3 scripts/update_ai_templates_migration.py
 - `POSTGRES_DEMO_PASSWORD` (default: BigMeZoo1974!?)
 
 ### דוגמה עם משתני סביבה מותאמים
+
 ```bash
 export POSTGRES_PROD_HOST=production-db.example.com
 export POSTGRES_PROD_PASSWORD=your-secure-password
@@ -54,6 +62,7 @@ python3 scripts/update_ai_templates_migration.py
 ## בדיקות תקינות
 
 הסקריפט מבצע את הבדיקות הבאות:
+
 1. ✅ בדיקה שיש תבניות ב-DB
 2. ✅ בדיקה שיש תבנית "Equity Research Analysis"
 3. ✅ בדיקה שהמשתנים עודכנו נכון:

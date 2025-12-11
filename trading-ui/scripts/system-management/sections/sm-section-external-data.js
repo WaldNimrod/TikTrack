@@ -10,6 +10,19 @@
  * @author TikTrack Development Team
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Utility Functions ===
+// - formatNumberValue() - Formatnumbervalue
+// - formatPercentValue() - Formatpercentvalue
+// - formatDateTimeValue() - Formatdatetimevalue
+// - formatRelativeTimeValue() - Formatrelativetimevalue
+
+// === Other ===
+// - sanitizeText() - Sanitizetext
+// - setElementText() - Setelementtext
+
 class SMExternalDataSection extends SMBaseSection {
   constructor(sectionId, config) {
     super(sectionId, { autoRefresh: true, refreshInterval: 120000, ...config });

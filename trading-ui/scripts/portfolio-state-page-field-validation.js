@@ -6,6 +6,19 @@
  * הרצה: debugPortfolioFields() בקונסולה
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Event Handlers ===
+// - checkDateRangeOptions() - Checkdaterangeoptions
+
+// === Utility Functions ===
+// - checkTradingAccounts() - Checktradingaccounts
+// - checkInvestmentTypes() - Checkinvestmenttypes
+
+// === Other ===
+// - compareWithHeaderSystem() - Comparewithheadersystem
+
 (function() {
     'use strict';
     

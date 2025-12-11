@@ -5,6 +5,13 @@
  * Used by all data services to handle authentication failures consistently
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Event Handlers ===
+// - handleAuthenticationError() - Handleauthenticationerror
+// - checkAndHandleAuthError() - Checkandhandleautherror
+
 (function authErrorHandler() {
   'use strict';
 
@@ -14,10 +21,23 @@
    * @param {string} url - The URL that failed (for logging)
    * @returns {void}
    */
-  function handleAuthenticationError(url) {
-    // Clear any stale auth data
-    localStorage.removeItem('currentUser');
-    localStorage.removeItem('authToken');
+  async function handleAuthenticationError(url) {
+    // Clear any stale auth data using UnifiedCacheManager
+    if (window.UnifiedCacheManager) {
+      try {
+        await window.UnifiedCacheManager.remove('currentUser');
+        await window.UnifiedCacheManager.remove('authToken');
+      } catch (e) {
+        console.warn('Error clearing auth cache:', e);
+        // Fallback to localStorage
+        localStorage.removeItem('currentUser');
+        localStorage.removeItem('authToken');
+      }
+    } else {
+      // Fallback to localStorage if UnifiedCacheManager not available
+      localStorage.removeItem('currentUser');
+      localStorage.removeItem('authToken');
+    }
     
     // Show error notification
     if (window.NotificationSystem) {
@@ -34,15 +54,9 @@
         // On successful login, reload the page
         window.location.reload();
       });
-    } else if (typeof window.AuthGuard?.redirectToLogin === 'function') {
-      window.AuthGuard.redirectToLogin();
     } else {
-      // Fallback: redirect to login page
-      const currentPath = window.location.pathname;
-      const loginPath = currentPath.includes('trading-ui') 
-        ? 'trading-ui/login.html' 
-        : 'login.html';
-      window.location.href = loginPath;
+      // Fallback: redirect to homepage (login modal lives there)
+      window.location.href = '/';
     }
   }
 
@@ -50,11 +64,11 @@
    * Check if response is an authentication error and handle it
    * @param {Response} response - Fetch response object
    * @param {string} url - The URL that was called (for logging)
-   * @returns {boolean} - true if authentication error was handled
+   * @returns {Promise<boolean>} - true if authentication error was handled
    */
-  function checkAndHandleAuthError(response, url) {
+  async function checkAndHandleAuthError(response, url) {
     if (response.status === 401 || response.status === 308) {
-      handleAuthenticationError(url);
+      await handleAuthenticationError(url);
       return true;
     }
     return false;

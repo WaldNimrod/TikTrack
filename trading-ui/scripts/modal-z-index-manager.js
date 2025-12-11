@@ -22,6 +22,23 @@
  * - documentation/03-DEVELOPMENT/GUIDES/NESTED_MODALS_GUIDE.md
  */
 
+// ===== FUNCTION INDEX =====
+
+// === Class Methods ===
+// - ModalZIndexManager.calculateModalZIndex() - Calculatemodalzindex
+// - ModalZIndexManager.resetAllZIndexes() - Resetallzindexes
+// - ModalZIndexManager.destroy() - Destroy
+
+// === Initialization ===
+// - ModalZIndexManager.init() - Init
+// - ModalZIndexManager.setupNavigationListener() - Setupnavigationlistener
+
+// === UI Functions ===
+// - ModalZIndexManager.updateModalZIndex() - Updatemodalzindex
+// - ModalZIndexManager.updateAllModalZIndexes() - Updateallmodalzindexes
+// - ModalZIndexManager.updateBackdropZIndex() - Updatebackdropzindex
+// - ModalZIndexManager.forceUpdate() - Forceupdate
+
 (function() {
     'use strict';
 

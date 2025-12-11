@@ -1,4 +1,5 @@
 # מערכת Watch List - TikTrack
+
 ## Watch List System
 
 **תאריך:** 28 בינואר 2025  
@@ -16,6 +17,7 @@
 ## מסמכי אפיון
 
 ### מפרטים עיקריים
+
 1. **[WATCHLIST_SPEC.md](WATCHLIST_SPEC.md)** - מפרט מלא של המערכת
 2. **[DATABASE_SCHEMA.md](DATABASE_SCHEMA.md)** - סכמת מסד נתונים מפורטת
 3. **[API_REFERENCE.md](API_REFERENCE.md)** - תיעוד API מלא
@@ -24,14 +26,17 @@
 6. **[INTEGRATION_PLAN.md](INTEGRATION_PLAN.md)** - תוכנית אינטגרציה
 
 ### מחקר וניתוח
+
 7. **[WATCHLIST_COMPARATIVE_ANALYSIS.md](WATCHLIST_COMPARATIVE_ANALYSIS.md)** - ניתוח השוואתי למערכות קיימות
 8. **[UI_PATTERNS_ANALYSIS.md](UI_PATTERNS_ANALYSIS.md)** - ניתוח דפוסי ממשק
 
 ### מדריכים
+
 9. **[DEVELOPER_GUIDE.md](DEVELOPER_GUIDE.md)** - מדריך למפתחים
 10. **[UI_GUIDE.md](UI_GUIDE.md)** - מדריך משתמש
 
 ### אינטגרציות
+
 11. **[EXTERNAL_DATA_INTEGRATION.md](EXTERNAL_DATA_INTEGRATION.md)** - אינטגרציה נתונים חיצוניים
 12. **[ALERTS_INTEGRATION_PLAN.md](ALERTS_INTEGRATION_PLAN.md)** - תכנון אינטגרציה Alerts (עתידי)
 
@@ -40,19 +45,41 @@
 ## עמודים ומודלים
 
 ### עמודים Production
-- **[watch-list.html](../../trading-ui/watch-list.html)** - עמוד ראשי מלא (Production) ✅
-  - **גישה:** `http://localhost:8080/watch-list`
+
+- **[watch-lists.html](../../trading-ui/watch-lists.html)** - עמוד ראשי מלא (Production) ✅
+  - **גישה:** `http://localhost:8080/watch-lists`
+- **[index.html](../../trading-ui/index.html)** - וויג'ט דשבורד (Production) ✅
+  - **גישה:** `http://localhost:8080/` (וויג'ט רשימות צפייה)
   - **API:** `/api/watch-lists/*`
   - **Business Service:** `WatchListService`
   - **סטטוס:** ✅ מוכן - מימוש מלא הושלם דצמבר 2025
+  - **מבנה:** Top Section (Summary Stats) + Active List View + Flagged Tickers (Optional)
+  - **הערה:** Watch Lists Grid Section הוסר - רשימות נבחרות דרך Select Dropdown
+
+### וויג'ט דף הבית
+
+- **[Watch Lists Widget](../../trading-ui/scripts/widgets/watch-lists-widget.js)** - וויג'ט לדף הבית ✅
+  - **גישה:** `http://localhost:8080/` (דף הבית)
+  - **קובץ:** `trading-ui/scripts/widgets/watch-lists-widget.js`
+  - **CSS:** `trading-ui/styles-new/06-components/_watch-lists-widget.css`
+  - **סטטוס:** ✅ מוכן - מימוש מלא הושלם דצמבר 2025
+  - **תכונות:**
+    - תצוגה קומפקטית בלבד (read-only)
+    - בחירת רשימה דרך dropdown בכותרת
+    - בחירה אוטומטית: רשימה אחרונה שהייתה פתוחה או הראשונה
+    - מצבי טעינה וריק
+    - Overlay עם פרטים נוספים על hover
+  - **תיעוד:** [WATCH_LISTS_WIDGET_DEVELOPER_GUIDE.md](../../documentation/03-DEVELOPMENT/GUIDES/WATCH_LISTS_WIDGET_DEVELOPER_GUIDE.md)
 
 ### מוקאפים (להתייחסות)
+
 - **[watch-lists-page.html](../../trading-ui/mockups/watch-lists-page.html)** - מוקאפ מקורי (לא בשימוש)
 - **[watch-list-modal.html](../../trading-ui/mockups/watch-list-modal.html)** - מוקאפ מודל רשימת צפייה
 - **[add-ticker-modal.html](../../trading-ui/mockups/add-ticker-modal.html)** - מוקאפ מודל הוספת טיקר
 - **[flag-quick-action.html](../../trading-ui/mockups/flag-quick-action.html)** - Flag Palette
 
 ### תיעוד מוקאפים
+
 - **[MOCKUPS/MOCKUP_SPEC.md](MOCKUPS/MOCKUP_SPEC.md)** - מפרט המוקאפים
 - **[MOCKUPS/MOCKUP_STANDARDIZATION.md](MOCKUPS/MOCKUP_STANDARDIZATION.md)** - סטנדרטיזציה
 
@@ -61,12 +88,14 @@
 ## תכונות עיקריות
 
 ### ניהול רשימות
+
 - ✅ עד 20 רשימות למשתמש
 - ✅ שם, איקון, צבע לכל רשימה
 - ✅ סידור ידני (Drag & Drop)
 - ✅ תצוגות מרובות (Table, Cards, Compact)
 
 ### ניהול טיקרים
+
 - ✅ עד 50 טיקרים לרשימה
 - ✅ טיקרים במערכת וחיצוניים
 - ✅ מערכת דגלים (8 צבעים)
@@ -74,6 +103,7 @@
 - ✅ סידור ידני
 
 ### נתונים חיצוניים
+
 - ✅ משיכה מרוכזת
 - ✅ Caching משותף
 - ✅ תדירות נמוכה
@@ -83,6 +113,7 @@
 ## שלבי מימוש
 
 ### Phase 1: Core (נוכחי)
+
 - Database schema
 - Backend API
 - Frontend Services
@@ -90,6 +121,7 @@
 - Basic functionality
 
 ### Phase 2: Future
+
 - Alerts integration
 - Export functionality
 - Shared watchlists
@@ -100,10 +132,12 @@
 ## קבצים שנוצרו
 
 ### תיעוד
+
 - 12 מסמכי אפיון ותיעוד מלאים
 - כל המפרטים מפורטים ומקיפים
 
 ### מוקאפים
+
 - 4 קבצי HTML מוכנים
 - מבנה סטנדרטי מלא
 - דוגמאות נתונים

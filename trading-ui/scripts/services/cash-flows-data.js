@@ -5,6 +5,45 @@
  * Ensures every operation uses UnifiedCacheManager + CacheTTLGuard policies.
  */
 (function cashFlowsDataService() {
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - buildUrl() - Buildurl
+// - buildUrlWithParams() - Buildurlwithparams
+// - createCashFlow() - Createcashflow
+// - createCurrencyExchange() - Createcurrencyexchange
+
+// === Event Handlers ===
+// - sendCashFlowMutation() - Sendcashflowmutation
+// - sendExchangeMutation() - Sendexchangemutation
+// - updateCurrencyExchange() - Updatecurrencyexchange
+// - deleteCurrencyExchange() - Deletecurrencyexchange
+// - fetchCurrencyExchange() - Fetchcurrencyexchange
+// - calculateCurrencyConversion() - Calculatecurrencyconversion
+
+// === UI Functions ===
+// - updateCashFlow() - Updatecashflow
+
+// === Data Functions ===
+// - normalizeCashFlowsPayload() - Normalizecashflowspayload
+// - saveCache() - Savecache
+// - notifyLoadError() - Notifyloaderror
+// - fetchCashFlowsFromApi() - Fetchcashflowsfromapi
+// - loadCashFlowsData() - Loadcashflowsdata
+// - fetchCashFlowDetails() - Fetchcashflowdetails
+
+// === Utility Functions ===
+// - invalidateCache() - Invalidatecache
+// - validateCashFlow() - Validatecashflow
+
+// === Other ===
+// - resolveBaseUrl() - Resolvebaseurl
+// - normalizeCashFlowRecord() - Normalizecashflowrecord
+// - clearCachePattern() - Clearcachepattern
+// - deleteCashFlow() - Deletecashflow
+// - calculateCashFlowBalance() - Calculatecashflowbalance
+
   const CACHE_KEY = 'cash-flows-data';
   const DEFAULT_TTL = 60 * 1000; // 60 seconds
   const PAGE_LOG_CONTEXT = { page: 'cash-flows-data' };
@@ -162,15 +201,20 @@
     const response = await fetch(url, {
       method: 'GET',
       headers: DEFAULT_HEADERS,
-      signal,
-      credentials: 'include' // Include cookies for session-based auth
+      signal, // Include cookies for session-based auth
     });
 
     // Handle 401/308 authentication errors
     if (response.status === 401 || response.status === 308) {
-      // Clear any stale auth data
-      localStorage.removeItem('currentUser');
-      localStorage.removeItem('authToken');
+      // Clear any stale auth data using UnifiedCacheManager
+      if (window.UnifiedCacheManager) {
+        try {
+          await window.UnifiedCacheManager.remove('currentUser', { includeUserId: false });
+          await window.UnifiedCacheManager.remove('authToken', { includeUserId: false });
+        } catch (e) {
+          console.warn('Error clearing auth cache:', e);
+        }
+      }
       
       // Show error notification
       if (window.NotificationSystem) {
@@ -186,14 +230,8 @@
         window.TikTrackAuth.showLoginModal(() => {
           window.location.reload();
         });
-      } else if (typeof window.AuthGuard?.redirectToLogin === 'function') {
-        window.AuthGuard.redirectToLogin();
       } else {
-        const currentPath = window.location.pathname;
-        const loginPath = currentPath.includes('trading-ui') 
-          ? 'trading-ui/login.html' 
-          : 'login.html';
-        window.location.href = loginPath;
+        window.location.href = '/';
       }
       
       throw new Error('Authentication required');

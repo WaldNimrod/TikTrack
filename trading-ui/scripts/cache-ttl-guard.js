@@ -8,6 +8,15 @@
  *   await CacheTTLGuard.ensure('trades-data', window.loadTradesData);
  */
 (function() {
+
+// ===== FUNCTION INDEX =====
+//
+// === Event Handlers ===
+// - setConfig() - Setconfig
+//
+// === Other ===
+// - ensure() - Ensure
+
   'use strict';
 
   const CACHE_TTL_CONFIG = {

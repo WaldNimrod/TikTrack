@@ -1,4 +1,5 @@
 # Historical Data Services - Frontend Architecture Documentation
+
 # Historical Data Services - תיעוד ארכיטקטורה Frontend
 
 **תאריך יצירה:** 7 דצמבר 2025  
@@ -28,7 +29,7 @@ Historical Data Services הם 3 שירותי נתונים ב-Frontend המספק
 - **PortfolioStateData** - מצב תיק היסטורי
 - **TradingJournalData** - יומן מסחר
 
-### עקרונות מרכזיים:
+### עקרונות מרכזיים
 
 1. **Cache-first strategy** - שימוש ב-UnifiedCacheManager (4 שכבות)
 2. **Error handling אחיד** - שימוש ב-NotificationSystem ו-Logger Service
@@ -39,7 +40,7 @@ Historical Data Services הם 3 שירותי נתונים ב-Frontend המספק
 
 ## 🏗️ ארכיטקטורה
 
-### מבנה כללי:
+### מבנה כללי
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -92,12 +93,39 @@ Historical Data Services הם 3 שירותי נתונים ב-Frontend המספק
    - Cache key: `trade-history-data:{filtersHash}`
    - TTL: 5 minutes
 
-2. **`loadStatistics(filters, options)`**
-   - טעינת סטטיסטיקות טריידים
+2. **`loadTradeTimeline(tradeId, options)`**
+   - טעינת ציר זמן של טרייד ספציפי
+   - כולל: כל האובייקטים המקושרים, חישובי פוזיציה, P/L
+   - Cache key: `trade-history-timeline-{trade_id}`
+   - TTL: IndexedDB, 2 ימים (prod) / 1 יום (dev)
+   - Dependencies: `trades`, `executions`, `trade-plans`, `notes`, `alerts`, `cash-flows`
+
+3. **`loadTradeChartData(tradeId, options)`**
+   - טעינת נתוני גרף לטרייד
+   - כולל: מחירי שוק היסטוריים, נתוני פוזיציה, נתוני P/L
+   - Cache key: `trade-history-chart-data-{trade_id}`
+   - TTL: IndexedDB, 2 ימים (prod) / 1 יום (dev)
+   - Dependencies: `trades`, `executions`, `market_data_quotes`
+
+4. **`loadTradeStatistics(tradeId, options)`**
+   - טעינת סטטיסטיקות מפורטות לטרייד
+   - Cache key: `trade-history-statistics-{trade_id}`
+   - TTL: Backend, 5 דקות (dev) / 10 דקות (prod)
+   - Dependencies: `trades`, `executions`
+
+5. **`loadTradeFullAnalysis(tradeId, options)`**
+   - טעינת ניתוח מלא לטרייד (timeline + chart + statistics)
+   - מיועד לעמוד trade-history בלבד
+   - Cache key: `trade-history-full-analysis-{trade_id}`
+   - TTL: IndexedDB, 2 ימים
+   - Dependencies: כל ה-dependencies של ה-endpoints הנפרדים
+
+6. **`loadStatistics(filters, options)`**
+   - טעינת סטטיסטיקות טריידים (כללי)
    - Cache key: `trade-history-statistics:{filtersHash}`
    - TTL: 5 minutes
 
-3. **`loadAggregated(groupBy, filters, options)`**
+7. **`loadAggregated(groupBy, filters, options)`**
    - טעינת אגרגציה של טריידים
    - Cache key: `trade-history-aggregated:{filtersHash}`
    - TTL: 5 minutes
@@ -179,6 +207,7 @@ Historical Data Services הם 3 שירותי נתונים ב-Frontend המספק
 ### UnifiedCacheManager Configuration
 
 **Trade History:**
+
 ```javascript
 'trade-history-data': { 
   layer: 'backend', 
@@ -194,6 +223,7 @@ Historical Data Services הם 3 שירותי נתונים ב-Frontend המספק
 ```
 
 **Portfolio State:**
+
 ```javascript
 'portfolio-state-snapshot-*': { 
   layer: 'backend', 
@@ -209,6 +239,7 @@ Historical Data Services הם 3 שירותי נתונים ב-Frontend המספק
 ```
 
 **Trading Journal:**
+
 ```javascript
 'trading-journal-*': { 
   layer: 'backend', 
@@ -229,14 +260,17 @@ Historical Data Services הם 3 שירותי נתונים ב-Frontend המספק
 ### Cache Dependencies
 
 **Trade History:**
+
 - תלוי ב: `trades`, `executions`, `trade-plans`
 - Invalidation: כאשר נוצרים/מתעדכנים/נמחקים טריידים, ביצועים או תוכניות
 
 **Portfolio State:**
+
 - תלוי ב: `executions`, `market_data_quotes`, `trades`
 - Invalidation: כאשר נוצרים/מתעדכנים/נמחקים ביצועים, מחירי שוק או טריידים
 
 **Trading Journal:**
+
 - תלוי ב: `notes`, `trades`, `executions`
 - Invalidation: כאשר נוצרים/מתעדכנים/נמחקים הערות, טריידים או ביצועים
 
@@ -244,7 +278,7 @@ Historical Data Services הם 3 שירותי נתונים ב-Frontend המספק
 
 ## ⚠️ Error Handling
 
-### תבנית אחידה:
+### תבנית אחידה
 
 ```javascript
 try {
@@ -258,7 +292,7 @@ try {
 }
 ```
 
-### Error Handling ב-Data Services:
+### Error Handling ב-Data Services
 
 1. **Logger Service** - כל שגיאה נרשמת ב-Logger
 2. **NotificationSystem** - הודעת שגיאה למשתמש
@@ -271,6 +305,7 @@ try {
 ### trade-history-page.js
 
 **שימוש:**
+
 ```javascript
 // Load trade history
 const data = await window.TradeHistoryData.loadTradeHistory(filters);
@@ -285,6 +320,7 @@ const analysis = await window.TradeHistoryData.loadPlanVsExecution(dateRange);
 ### portfolio-state-page.js
 
 **שימוש:**
+
 ```javascript
 // Load snapshot
 const snapshot = await window.PortfolioStateData.loadSnapshot(accountId, date);
@@ -296,6 +332,7 @@ const series = await window.PortfolioStateData.loadSeries(accountId, startDate, 
 ### trading-journal-page.js
 
 **שימוש:**
+
 ```javascript
 // Load entries
 const entries = await window.TradingJournalData.loadEntries(dateRange, filters);
@@ -378,12 +415,14 @@ const calendar = await window.TradingJournalData.loadCalendarData(
 ### 1. תמיד להשתמש ב-Data Services
 
 ❌ **לא נכון:**
+
 ```javascript
 // Direct API call
 const response = await fetch('/api/trade-history/');
 ```
 
 ✅ **נכון:**
+
 ```javascript
 // Use Data Service
 const data = await window.TradeHistoryData.loadTradeHistory(filters);
@@ -410,6 +449,7 @@ const data = await window.TradeHistoryData.loadTradeHistory(filters);
 ## 📚 קבצים רלוונטיים
 
 ### Frontend
+
 - `trading-ui/scripts/services/trade-history-data.js` - Trade History Data Service
 - `trading-ui/scripts/services/portfolio-state-data.js` - Portfolio State Data Service
 - `trading-ui/scripts/services/trading-journal-data.js` - Trading Journal Data Service
@@ -417,6 +457,7 @@ const data = await window.TradeHistoryData.loadTradeHistory(filters);
 - `trading-ui/scripts/cache-ttl-guard.js` - Cache TTL Guard
 
 ### Documentation
+
 - `documentation/02-ARCHITECTURE/BACKEND/HISTORICAL_DATA_SERVICE.md` - Backend Documentation
 - `documentation/03-DEVELOPMENT/PLANS/HISTORICAL_PAGES_FULL_IMPLEMENTATION_PLAN.md` - Implementation Plan
 
@@ -427,6 +468,11 @@ const data = await window.TradeHistoryData.loadTradeHistory(filters);
 - ✅ TradeHistoryData - מוכן
 - ✅ PortfolioStateData - מוכן
 - ✅ TradingJournalData - מוכן
+- ✅ trading-journal-page.js - מימוש מלא (07.12.2025)
+  - טעינת נתונים אמיתיים מהבקאנד
+  - רינדור דינמי של רשומות
+  - פילטרים לפי entity type
+  - אינטגרציה עם מערכות כלליות
 - ✅ Cache Integration - מוכן
 - ✅ Page Integration - מוכן
 - ⏳ Full Implementation - pending (placeholder functions need implementation)

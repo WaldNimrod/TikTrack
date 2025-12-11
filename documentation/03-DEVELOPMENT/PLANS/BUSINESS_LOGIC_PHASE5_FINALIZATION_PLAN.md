@@ -1,4 +1,5 @@
 # תוכנית עבודה מקיפה - השלמת Business Logic Layer ובדיקות סופיות
+
 # Business Logic Phase 5: Finalization and Comprehensive Testing Plan
 
 **תאריך:** 22 נובמבר 2025  
@@ -130,6 +131,7 @@
 **קריטי:** זה השלב החשוב ביותר - ללא תיקון זה, כל ה-Business Services לא בודקים constraints מבסיס הנתונים, מה שיוצר כפילות וסיכון לאי-עקביות.
 
 **דרישות:**
+
 - ✅ כל Service חייב לממש `table_name` property
 - ✅ כל Service חייב לעדכן `__init__()` לקבל `db_session`
 - ✅ כל Service חייב לעדכן `validate()` להשתמש ב-`validate_with_constraints()` כשלב ראשון
@@ -166,11 +168,13 @@
 6. הוספת import של `Tuple` מ-typing
 
 **בדיקות בסיסיות אחרי שלב זה:**
+
 - ✅ וידוא ש-BaseBusinessService מתקמפל ללא שגיאות
 - ✅ וידוא ש-`validate_with_constraints()` עובד עם `table_name=None` (StatisticsBusinessService)
 - ✅ וידוא ש-`validate_with_constraints()` עובד עם `table_name='trades'` (TradeBusinessService)
 
 **דרישות:**
+
 - כל Service חייב לממש `table_name` property
 - Services ללא table (כמו Statistics) יחזירו `None`
 - `validate_with_constraints()` יטפל אוטומטית ב-None cases
@@ -261,6 +265,7 @@ class BaseBusinessService(ABC):
 11. `Backend/services/business_logic/statistics_business_service.py` - **אין table_name** (service לחישובים, לא ישות DB)
 
 **בדיקות בסיסיות אחרי שלב זה:**
+
 - ✅ וידוא שכל Service מתקמפל ללא שגיאות
 - ✅ וידוא שכל Service מחזיר `table_name` נכון
 - ✅ וידוא ש-StatisticsBusinessService מחזיר `None`
@@ -273,6 +278,7 @@ class BaseBusinessService(ABC):
 3. עדכון `validate()` להשתמש ב-`validate_with_constraints()` כשלב ראשון (רק אם יש table_name)
 
 **הערה חשובה - StatisticsBusinessService:**
+
 - StatisticsBusinessService הוא service לחישובים, לא ישות DB
 - אין לו table_name - יחזיר `None`
 - `validate_with_constraints()` יחזיר `True, []` (skip constraint validation)
@@ -400,6 +406,7 @@ class StatisticsBusinessService(BaseBusinessService):
 3. עדכון כל ה-calculate endpoints (אופציונלי - לא דורש db_session, אבל יכול להיות שימושי)
 
 **בדיקות בסיסיות אחרי שלב זה:**
+
 - ✅ וידוא שכל validate endpoint מתקמפל ללא שגיאות
 - ✅ וידוא ש-`@handle_database_session()` עובד
 - ✅ וידוא ש-`db_session` מועבר ל-Service
@@ -465,6 +472,7 @@ def validate_[entity]():
 ```
 
 **הערה חשובה - @handle_database_session():**
+
 - ✅ Decorator קיים ב-`routes/api/base_entity_decorators.py`
 - ✅ הוא מספק `g.db` (Session object) אוטומטית
 - ✅ צריך לייבא: `from routes.api.base_entity_decorators import handle_database_session`
@@ -623,13 +631,13 @@ def validate_preference():
 - `validateProfile(profileData)` - ולידציה של profile
 - `validateDependencies(preferences)` - ולידציה של תלויות
 
-### שלב 5.1.5: עדכון __init__.py
+### שלב 5.1.5: עדכון **init**.py
 
 **קובץ לעדכון:** `Backend/services/business_logic/__init__.py`
 
 **תוכן:**
 
-- הוספת `PreferencesBusinessService` ל-imports ול-__all__
+- הוספת `PreferencesBusinessService` ל-imports ול-**all**
 
 ### שלב 5.1.6: יצירת Tests
 
@@ -643,6 +651,7 @@ def validate_preference():
 - בדיקות אינטגרציה עם ValidationService
 
 **בדיקות בסיסיות אחרי Phase 5.1:**
+
 - ✅ וידוא ש-PreferencesBusinessService מתקמפל ללא שגיאות
 - ✅ וידוא ש-API endpoints עובדים
 - ✅ וידוא ש-Frontend wrappers עובדים
@@ -681,6 +690,7 @@ def validate_preference():
 **הערה:** לשמור על הפונקציות הקיימות (CRUD) ולהוסיף wrappers חדשים עם suffix `ViaAPI`.
 
 **בדיקות בסיסיות אחרי Phase 5.2:**
+
 - ✅ וידוא ש-Statistics wrappers עובדים
 - ✅ וידוא ש-Tag wrappers עובדים
 - ✅ בדיקת API calls מ-Frontend
@@ -751,6 +761,7 @@ def validate_preference():
 - **הוספת סעיף "Validation Integration"** - איך להשתמש ב-ValidationService ו-BusinessRulesRegistry
 
 **בדיקות בסיסיות אחרי Phase 5.3:**
+
 - ✅ וידוא שהתיעוד מעודכן ומדויק
 - ✅ וידוא שכל הקישורים עובדים
 
@@ -910,23 +921,26 @@ def validate_preference():
 
 ## תשובות לשאלות פתוחות
 
-### שאלה 4: StatisticsBusinessService - האם דרושה טבלה?
+### שאלה 4: StatisticsBusinessService - האם דרושה טבלה
 
 **תשובה:**
 
 **לא, אין צורך בטבלה.**
 
 `StatisticsBusinessService` הוא service לחישובים, לא ישות DB. הוא:
+
 - מחשב סטטיסטיקות על נתונים שמועברים אליו (רשימות של dictionaries)
 - לא מייצג ישות DB ספציפית
 - לא צריך `table_name` - יחזיר `None`
 
 **מה השירות יחזיר:**
+
 - `table_name` property: `None`
 - `validate_with_constraints()` יחזיר `True, []` (skip constraint validation אוטומטית)
 - `db_session` יכול להיות שימושי לחישובים מורכבים (כמו `calculate_time_weighted_return`) אבל לא לולידציה של constraints
 
 **התוכנית נכונה:**
+
 - התוכנית כבר מציינת ש-StatisticsBusinessService יחזיר `None` ל-table_name
 - אין צורך בשינויים בתוכנית
 - ההתנהגות המתוארת בתוכנית נכונה ומתאימה
@@ -956,7 +970,7 @@ def validate_preference():
 
 ## קבצים ליצירה/עדכון
 
-### קבצים חדשים:
+### קבצים חדשים
 
 1. `Backend/services/business_logic/preferences_business_service.py`
 2. `Backend/tests/services/business_logic/test_preferences_business_service.py`
@@ -970,7 +984,7 @@ def validate_preference():
 10. `documentation/05-REPORTS/BUSINESS_LOGIC_COMPLETE_FINAL_SUMMARY.md`
 11. ✅ `documentation/05-REPORTS/VALIDATION_ARCHITECTURE_ANALYSIS.md` (נוצר)
 
-### קבצים לעדכון:
+### קבצים לעדכון
 
 1. `Backend/services/business_logic/base_business_service.py` - **קריטי: הוספת ValidationService**
 2. `Backend/services/business_logic/trade_business_service.py` - **קריטי: אינטגרציה עם ValidationService**

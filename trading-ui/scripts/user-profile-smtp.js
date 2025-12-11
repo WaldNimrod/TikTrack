@@ -63,9 +63,7 @@
 
         const apiUrl = window.API_BASE_URL || '/api';
         const response = await fetch(`${apiUrl}/system-settings/smtp`, {
-          method: 'GET',
-          credentials: 'include'
-        });
+          method: 'GET', });
 
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -194,9 +192,7 @@
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-          },
-          credentials: 'include',
-          body: JSON.stringify(settings),
+          }, body: JSON.stringify(settings),
         });
 
         const data = await response.json();
@@ -254,9 +250,7 @@
 
         const apiUrl = window.API_BASE_URL || '/api';
         const response = await fetch(`${apiUrl}/system-settings/smtp/test`, {
-          method: 'POST',
-          credentials: 'include'
-        });
+          method: 'POST', });
 
         const data = await response.json();
 
@@ -316,9 +310,7 @@
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-          },
-          credentials: 'include',
-          body: JSON.stringify({ email: testEmail }),
+          }, body: JSON.stringify({ email: testEmail }),
         });
 
         const data = await response.json();

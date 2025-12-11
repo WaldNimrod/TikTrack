@@ -3,6 +3,17 @@
  * בודק אוטומטית איזו הגדרת CSS יותר חזקה ומשפיעה בפועל
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === CSS Analysis ===
+// - CSSSpecificityAnalyzer.analyze() - Analyze
+// - CSSSpecificityAnalyzer.calculateSpecificity() - Calculate Specificity
+// - CSSSpecificityAnalyzer.compareRules() - Compare Rules
+
+// === Utility ===
+// - CSSSpecificityAnalyzer.formatResults() - Format Results
+
 class CSSSpecificityAnalyzer {
     constructor() {
         this.duplicates = [];

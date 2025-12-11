@@ -95,6 +95,7 @@ def test_rate_limiting()
 **קובץ:** `trading-ui/tests/ai-analysis-browser-tests.js`
 
 **בדיקות:**
+
 1. **טעינת עמוד**
    - בדיקת טעינת כל ה-components
    - בדיקת זמינות מערכות
@@ -298,6 +299,12 @@ test('XSS prevention in results', () => {
 
 **תאריך עדכון אחרון:** 28 בינואר 2025  
 **גרסה:** 1.0.0
+
+
+
+
+
+
 
 
 

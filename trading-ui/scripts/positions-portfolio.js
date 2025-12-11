@@ -18,6 +18,48 @@
  * Documentation: documentation/04-FEATURES/CORE/POSITIONS_PORTFOLIO_SYSTEM.md
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - createDiagnosticsMessageFromPortfolio() - Creatediagnosticsmessagefromportfolio
+// - createDiagnosticsMessageFromAccount() - Creatediagnosticsmessagefromaccount
+// - setupPositionsSectionOpenListener() - Setuppositionssectionopenlistener
+// - setupPortfolioFilters() - Setupportfoliofilters
+// - setupSummaryToggle() - Setupsummarytoggle
+// - createStatCard() - Createstatcard
+
+// === Event Handlers ===
+// - normalizePositionsPayload() - Normalizepositionspayload
+// - notifyMissingExecutionsOnce() - Notifymissingexecutionsonce
+// - setPositionsDiagnostics() - Setpositionsdiagnostics
+// - getNoPositionsMessage() - Getnopositionsmessage
+// - populatePositionsAccountSelector() - Populatepositionsaccountselector
+// - handlePositionsAccountSelection() - Handlepositionsaccountselection
+// - loadAccountPositions() - Loadaccountpositions
+// - syncPositionsTablePagination() - Syncpositionstablepagination
+// - renderPositionsTable() - Renderpositionstable
+// - syncPortfolioTablePagination() - Syncportfoliotablepagination
+// - updatePortfolioSummaryToggleButton() - Updateportfoliosummarytogglebutton
+// - clearPositionsTable() - Clearpositionstable
+
+// === UI Functions ===
+// - renderDiagnosticsBanner() - Renderdiagnosticsbanner
+// - renderPortfolioTable() - Renderportfoliotable
+// - renderPortfolioSummaryFallback() - Renderportfoliosummaryfallback
+
+// === Data Functions ===
+// - normalizePortfolioPayload() - Normalizeportfoliopayload
+// - loadPortfolio() - Loadportfolio
+// - loadPortfolioSummary() - Loadportfoliosummary
+
+// === Utility Functions ===
+// - formatCurrencyHebrew() - Formatcurrencyhebrew
+
+// === Other ===
+// - setPortfolioDiagnostics() - Setportfoliodiagnostics
+// - populatePortfolioAccountSelector() - Populateportfolioaccountselector
+
 /* ===== POSITIONS & PORTFOLIO SYSTEM ===== */
 window.Logger.info('📁 positions-portfolio.js נטען', { page: "trading_accounts" });
 

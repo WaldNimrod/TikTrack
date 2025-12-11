@@ -9,6 +9,7 @@
 ### אופציה 1: הפרדה אנכית עם שני פאנלים נפרדים ⭐ (מומלץ)
 
 **תיאור:**
+
 - **פאנל עליון:** "סינון רשומות" - איזה טריידים להשוות
   - תאריכים
   - חשבון מסחר
@@ -21,18 +22,21 @@
   - אפשרות לבחור מספר פרמטרים להשוואה במקביל
 
 **יתרונות:**
+
 - הפרדה ויזואלית ברורה
 - המשתמש רואה את שני התהליכים במקביל
 - אינטואיטיבי וקל להבנה
 - לא דורש ניווט בין דפים
 
 **דוגמאות:**
+
 - **Tableau:** משתמש בהפרדה בין Filters (סינון) ל-Dimensions (פרמטרים להשוואה)
   - [Tableau Filters vs Dimensions](https://help.tableau.com/current/pro/desktop/en-us/filtering.htm)
 - **Power BI:** Slicers (סינון) נפרדים מ-Visual Fields (פרמטרים להשוואה)
   - [Power BI Slicers Guide](https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualization-slicers)
 
 **עיצוב מוצע:**
+
 ```
 ┌─────────────────────────────────────────┐
 │ 🔍 סינון רשומות להשוואה                │
@@ -55,19 +59,23 @@
 ### אופציה 2: לשוניות (Tabs)
 
 **תיאור:**
+
 - **לשונית 1:** "סינון רשומות"
 - **לשונית 2:** "פרמטרים להשוואה"
 
 **יתרונות:**
+
 - חוסך מקום במסך
 - הפרדה ברורה בין התהליכים
 - נפוץ במערכות רבות
 
 **חסרונות:**
+
 - המשתמש לא רואה את שני התהליכים במקביל
 - דורש מעבר בין לשוניות
 
 **דוגמאות:**
+
 - **Google Analytics:** משתמש בלשוניות להפרדת Dimensions מ-Metrics
   - [Google Analytics Interface](https://support.google.com/analytics/answer/1008015)
 - **Microsoft Excel Power Query:** לשוניות נפרדות לסינון ולעיבוד
@@ -78,20 +86,24 @@
 ### אופציה 3: חלון מודאלי (Modal) לבחירת פרמטרים
 
 **תיאור:**
+
 - הסינון נשאר בעמוד הראשי
 - כפתור "הגדר פרמטרים להשוואה" פותח חלון מודאלי
 - בחלון המודאלי: בחירת סוג השקעה, שיטות מסחר וכו'
 
 **יתרונות:**
+
 - הסינון נגיש תמיד
 - בחירת הפרמטרים היא פעולה נפרדת ומובחנת
 - לא תופס מקום במסך הראשי
 
 **חסרונות:**
+
 - דורש פתיחת חלון נוסף
 - פחות נוח לעריכה מהירה
 
 **דוגמאות:**
+
 - **TradingView Screener:** סינון במסך הראשי, הגדרות השוואה בחלון נפרד
   - [TradingView Screener](https://www.tradingview.com/screener/)
 - **Bloomberg Terminal:** סינון ראשי + חלונות קופצים להגדרות מתקדמות
@@ -101,20 +113,24 @@
 ### אופציה 4: ממשק דו-שלבי (Wizard)
 
 **תיאור:**
+
 - **שלב 1:** סינון הרשומות
 - **שלב 2:** בחירת פרמטרים להשוואה
 - כל שלב מוצג בנפרד עם כפתורי "הבא" / "חזור"
 
 **יתרונות:**
+
 - מנחה את המשתמש בתהליך
 - מונע בלבול
 - מתאים למשתמשים חדשים
 
 **חסרונות:**
+
 - פחות נוח למשתמשים מנוסים
 - דורש ניווט בין שלבים
 
 **דוגמאות:**
+
 - **SurveyMonkey:** תהליך יצירת סקר בשלבים
 - **Google Forms:** יצירת טופס בשלבים
 
@@ -123,19 +139,23 @@
 ### אופציה 5: פאנל צד (Sidebar) לסינון + אזור מרכזי להשוואה
 
 **תיאור:**
+
 - **Sidebar שמאלי:** כלי הסינון (תאריכים, חשבון, תגיות)
 - **אזור מרכזי:** בחירת פרמטרים להשוואה + תוצאות
 
 **יתרונות:**
+
 - סינון נגיש תמיד
 - מקום רב לתוצאות
 - נפוץ במערכות BI
 
 **חסרונות:**
+
 - תופס מקום בצד
 - פחות מתאים למסכים קטנים
 
 **דוגמאות:**
+
 - **Tableau Desktop:** Sidebar לסינון, אזור מרכזי לבניית ויזואליזציות
   - [Tableau Interface](https://help.tableau.com/current/pro/desktop/en-us/get_started.htm)
 - **Looker (Google Cloud):** Sidebar לסינון, אזור מרכזי לניתוח
@@ -147,6 +167,7 @@
 **אופציה מומלצת: אופציה 1 - הפרדה אנכית עם שני פאנלים**
 
 **סיבות:**
+
 1. ✅ הפרדה ויזואלית ברורה ביותר
 2. ✅ המשתמש רואה את שני התהליכים במקביל
 3. ✅ אינטואיטיבי - "סינון" למעלה, "השוואה" למטה
@@ -173,6 +194,7 @@
 ```
 
 **הבדלים ויזואליים:**
+
 - צבע רקע שונה לכל פאנל
 - אייקונים שונים (מסנן vs גרף)
 - כותרות ברורות
@@ -185,6 +207,7 @@
 ### אופציה 1: הפרדה אנכית (מומלץ) ⭐
 
 **Tableau Desktop Interface:**
+
 - **Filters Panel (שמאל):** סינון הנתונים
   - https://help.tableau.com/current/pro/desktop/en-us/filtering.htm
   - תמונות: https://help.tableau.com/current/pro/desktop/en-us/filter_shelves.htm
@@ -193,6 +216,7 @@
   - תמונות: https://help.tableau.com/current/pro/desktop/en-us/datafields_typesandroles.htm
 
 **Power BI Desktop:**
+
 - **Slicers (Visual Filters):** סינון הנתונים
   - https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualization-slicers
   - תמונות: https://learn.microsoft.com/en-us/power-bi/create-reports/power-bi-report-add-filter
@@ -201,6 +225,7 @@
   - תמונות: https://learn.microsoft.com/en-us/power-bi/create-reports/desktop-visualization-pane#visual-fields-pane
 
 **דוגמה ויזואלית - Tableau Layout:**
+
 ```
 ┌─────────────────────────────────────────────────────────┐
 │  Tableau Desktop                                        │
@@ -229,44 +254,52 @@
 ### אופציה 2: לשוניות (Tabs)
 
 **Google Analytics:**
+
 - **Dimensions vs Metrics:** הפרדה בין סוגי נתונים
   - https://support.google.com/analytics/answer/1008015
   - https://support.google.com/analytics/answer/1033861 (Dimensions)
   - https://support.google.com/analytics/answer/1033861 (Metrics)
 
 **Excel Power Query:**
+
 - **Filter vs Transform Tabs:**
   - https://support.microsoft.com/en-us/office/power-query-overview-and-learning-13144592-05b2-4c0f-a5f0-1326d1e8efc5
 
 ### אופציה 3: חלון מודאלי
 
 **TradingView Screener:**
+
 - **Main Screen:** סינון מניות
   - https://www.tradingview.com/screener/
 - **Compare Modal:** השוואת מניות נבחרות
   - לחץ על "Compare" במסך Screener
 
 **Bloomberg Terminal:**
+
 - סינון ראשי + חלונות קופצים להגדרות מתקדמות
 
 ### אופציה 4: ממשק דו-שלבי (Wizard)
 
 **SurveyMonkey:**
+
 - יצירת סקר בשלבים
   - https://help.surveymonkey.com/articles/en_US/kb/How-do-I-create-a-survey
 
 **Google Forms:**
+
 - יצירת טופס בשלבים
   - https://support.google.com/docs/answer/6281888
 
 ### אופציה 5: Sidebar לסינון
 
 **Tableau Desktop (Full Layout):**
+
 - Sidebar שמאלי מלא עם Filters, Dimensions, Measures
   - https://help.tableau.com/current/pro/desktop/en-us/get_started.htm
   - תמונות: https://help.tableau.com/current/pro/desktop/en-us/environment_workspace.htm
 
 **Looker (Google Cloud BI):**
+
 - Sidebar לסינון + אזור מרכזי לניתוח
   - https://cloud.google.com/looker/docs/exploring-data
 
@@ -275,6 +308,7 @@
 ### דוגמה 1: Tableau - הפרדה אנכית מלאה
 
 **מבנה הממשק:**
+
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │  Tableau Desktop - Workspace                                     │
@@ -313,6 +347,7 @@
 ```
 
 **הסבר:**
+
 - **Filters (עליון):** סינון הרשומות - תאריכים, חשבון
 - **Dimensions (אמצע):** פרמטרים להשוואה - סוג השקעה, שיטות מסחר
 - **Measures (תחתון):** מדדים להצגה - P/L, אחוז הצלחה
@@ -320,6 +355,7 @@
 ### דוגמה 2: Power BI - Slicers נפרדים מ-Visual Fields
 
 **מבנה הממשק:**
+
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │  Power BI Desktop                                                │
@@ -355,6 +391,7 @@
 ### דוגמה 3: ממשק מוצע לניתוח השוואתי (אופציה 1)
 
 **עיצוב מפורט:**
+
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │  ניתוח השוואתי - TikTrack                                       │
@@ -397,6 +434,7 @@
 ```
 
 **הבדלים ויזואליים:**
+
 - **פאנל סינון:** רקע כחול בהיר (#E3F2FD), אייקון מסנן
 - **פאנל השוואה:** רקע ירוק בהיר (#E8F5E9), אייקון גרף
 - **גבולות ברורים:** קו מפריד בין הפאנלים

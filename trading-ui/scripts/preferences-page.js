@@ -2,23 +2,23 @@
  * ==========================================
  * FUNCTION INDEX
  * ==========================================
- *
+ * 
  * This index lists all functions in this file, organized by category.
- *
+ * 
  * Total Functions: 4
- *
+ * 
  * PAGE INITIALIZATION (1)
  * - initializePreferencesPage() - initializePreferencesPage function
- *
+ * 
  * DATA LOADING (1)
  * - loadAccountsForPreferences() - loadAccountsForPreferences function
- *
+ * 
  * DATA MANIPULATION (1)
  * - createNewProfile() - createNewProfile function
- *
+ * 
  * OTHER (1)
  * - switchActiveProfile() - switchActiveProfile function
- *
+ * 
  * ==========================================
  */
 /**

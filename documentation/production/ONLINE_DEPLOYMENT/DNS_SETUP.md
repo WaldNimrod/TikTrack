@@ -15,15 +15,19 @@
 ## 🔍 בדיקת זמינות הדומיין
 
 ### שלב 1: בדיקת בעלות על הדומיין
+
 **שאלות לבדיקה:**
+
 - האם `nimrod.bio` בבעלותך?
 - האם יש גישה ל-DNS management?
 - איזה DNS provider? (Cloudflare, Namecheap, אחר)
 
 ### שלב 2: בדיקת זמינות סאב-דומיין
+
 **סאב-דומיין:** `tiktrack.nimrod.bio`
 
 **בדיקה:**
+
 ```bash
 # בדיקת DNS resolution
 nslookup tiktrack.nimrod.bio
@@ -36,6 +40,7 @@ host tiktrack.nimrod.bio
 ```
 
 **תוצאה צפויה (לפני הגדרה):**
+
 - `NXDOMAIN` - לא קיים
 - או `SERVFAIL` - לא מוגדר
 
@@ -44,7 +49,9 @@ host tiktrack.nimrod.bio
 ## ⚙️ הגדרת DNS Record
 
 ### שלב 1: קבלת IP של השרת
+
 **לאחר קבלת תשובה מ-uPress:**
+
 - קבלת IP address של VPS
 - או hostname של השרת
 
@@ -56,6 +63,7 @@ host tiktrack.nimrod.bio
 **TTL:** 300-3600 שניות (מומלץ: 3600)
 
 **דוגמה:**
+
 ```
 Type: A
 Name: tiktrack
@@ -66,11 +74,13 @@ TTL: 3600
 ### שלב 3: יצירת CNAME (אלטרנטיבה)
 
 **אם uPress מספק hostname:**
+
 - **סוג:** CNAME Record
 - **שם:** `tiktrack`
 - **ערך:** hostname של uPress (למשל: `server.upress.co.il`)
 
 **דוגמה:**
+
 ```
 Type: CNAME
 Name: tiktrack
@@ -83,11 +93,13 @@ TTL: 3600
 ## 🔄 תהליך הגדרה
 
 ### שלב 1: כניסה ל-DNS Provider
+
 1. התחברות ל-DNS provider (Cloudflare, Namecheap, וכו')
 2. בחירת הדומיין `nimrod.bio`
 3. מעבר ל-DNS Management / DNS Records
 
 ### שלב 2: יצירת Record
+
 1. לחיצה על "Add Record" / "Create Record"
 2. בחירת סוג: A Record או CNAME
 3. מילוי הפרטים:
@@ -96,6 +108,7 @@ TTL: 3600
    - **TTL:** 3600
 
 ### שלב 3: שמירה
+
 1. שמירת ה-Record
 2. המתנה ל-propagation (5-60 דקות)
 
@@ -104,6 +117,7 @@ TTL: 3600
 ## ✅ בדיקת הגדרה
 
 ### בדיקה 1: DNS Resolution
+
 ```bash
 # בדיקת DNS
 nslookup tiktrack.nimrod.bio
@@ -114,6 +128,7 @@ nslookup tiktrack.nimrod.bio
 ```
 
 ### בדיקה 2: Ping
+
 ```bash
 # בדיקת חיבור
 ping tiktrack.nimrod.bio
@@ -123,6 +138,7 @@ ping tiktrack.nimrod.bio
 ```
 
 ### בדיקה 3: HTTP
+
 ```bash
 # בדיקת HTTP (לאחר הגדרת Nginx)
 curl -I http://tiktrack.nimrod.bio
@@ -136,11 +152,13 @@ curl -I http://tiktrack.nimrod.bio
 ## ⏰ זמן Propagation
 
 ### זמן Propagation
+
 - **מינימום:** 5-15 דקות
 - **ממוצע:** 30-60 דקות
 - **מקסימום:** עד 48 שעות (נדיר)
 
 ### גורמים המשפיעים
+
 - **TTL:** TTL נמוך = propagation מהיר יותר
 - **DNS Provider:** חלק מהירים יותר
 - **מיקום:** propagation גלובלי לוקח זמן
@@ -150,10 +168,12 @@ curl -I http://tiktrack.nimrod.bio
 ## 🔧 הגדרות מומלצות
 
 ### TTL
+
 - **לפני הגדרה:** TTL נמוך (300 שניות) - לבדיקות
 - **אחרי הגדרה:** TTL גבוה (3600 שניות) - ליציבות
 
 ### DNS Provider
+
 - **מומלץ:** Cloudflare (חינם, מהיר, אבטחה)
 - **אלטרנטיבות:** Namecheap, GoDaddy, אחר
 
@@ -162,16 +182,19 @@ curl -I http://tiktrack.nimrod.bio
 ## 📝 Checklist הגדרת DNS
 
 ### לפני הגדרה
+
 - [ ] בדיקת בעלות על `nimrod.bio`
 - [ ] בדיקת גישה ל-DNS management
 - [ ] קבלת IP או hostname מ-uPress
 
 ### הגדרה
+
 - [ ] יצירת A Record או CNAME
 - [ ] מילוי הפרטים (Name, Value, TTL)
 - [ ] שמירת ה-Record
 
 ### אחרי הגדרה
+
 - [ ] בדיקת DNS resolution
 - [ ] בדיקת ping
 - [ ] המתנה ל-propagation
@@ -182,10 +205,12 @@ curl -I http://tiktrack.nimrod.bio
 ## 🔗 קבצים רלוונטיים
 
 ### Documentation
+
 - `documentation/production/ONLINE_DEPLOYMENT/DNS_SETUP.md` - זה הקובץ
 - `documentation/production/ONLINE_DEPLOYMENT/SSL_SETUP.md` - הגדרת SSL
 
 ### Scripts
+
 - `scripts/deployment/check_dns.py` - סקריפט בדיקת DNS (אם נוצר)
 
 ---
@@ -193,10 +218,12 @@ curl -I http://tiktrack.nimrod.bio
 ## ⚠️ הערות חשובות
 
 ### לפני הגדרת DNS
+
 - **חובה:** לקבל IP או hostname מ-uPress לפני הגדרה
 - **מומלץ:** לבדוק את ה-IP עם ping לפני הגדרה
 
 ### אחרי הגדרת DNS
+
 - **חובה:** לבדוק DNS resolution לפני המשך
 - **מומלץ:** להמתין ל-propagation לפני הגדרת SSL
 

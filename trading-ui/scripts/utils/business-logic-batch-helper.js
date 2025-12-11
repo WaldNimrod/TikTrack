@@ -12,6 +12,14 @@
  *   ]);
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Event Handlers ===
+// - executeBatchOperations() - Executebatchoperations
+// - executeBatchOperationsChunked() - Executebatchoperationschunked
+// - executeBatchOperationsWithCache() - Executebatchoperationswithcache
+
 (function() {
   'use strict';
 

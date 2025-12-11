@@ -119,7 +119,8 @@ async function bundlePackage(packageId, packageConfig) {
     }
     
     bundledContent += `\n})();\n`;
-    
+    bundledContent += `//# sourceMappingURL=${packageId}.bundle.js.map\n`;
+
     // Write bundled content
     fs.writeFileSync(outputFile, bundledContent);
     

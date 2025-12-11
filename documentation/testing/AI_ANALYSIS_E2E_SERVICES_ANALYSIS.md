@@ -45,6 +45,7 @@
 **קובץ:** `trading-ui/scripts/services/ai-analysis-data.js`
 
 **חשיפה ל-window:**
+
 ```javascript
 window.AIAnalysisData = {
   loadTemplates,
@@ -65,6 +66,7 @@ window.AIAnalysisData = {
 **Load Order:** 31 (ב-SERVICES PACKAGE)
 
 **תלות:**
+
 - `CacheTTLGuard`
 - `UnifiedCacheManager`
 - `CacheSyncManager`
@@ -74,6 +76,7 @@ window.AIAnalysisData = {
 **קובץ:** `trading-ui/scripts/ai-analysis-manager.js`
 
 **חשיפה ל-window:**
+
 ```javascript
 window.AIAnalysisManager = AIAnalysisManager;
 ```
@@ -81,11 +84,13 @@ window.AIAnalysisManager = AIAnalysisManager;
 **Load Order:** 92 (ב-AI ANALYSIS PACKAGE)
 
 **Initialization:**
+
 - Auto-initializes כאשר ה-DOM מוכן
 - או דרך `page-initialization-configs.js`
 - דורש: `window.AIAnalysisData` להיות זמין
 
 **תלות:**
+
 - `AIAnalysisData`
 - `AITemplateSelector`
 - `AIResultRenderer`
@@ -98,6 +103,7 @@ window.AIAnalysisManager = AIAnalysisManager;
 **קובץ:** `trading-ui/scripts/ai-template-selector.js`
 
 **חשיפה ל-window:**
+
 ```javascript
 window.AITemplateSelector = AITemplateSelector;
 ```
@@ -105,6 +111,7 @@ window.AITemplateSelector = AITemplateSelector;
 **Load Order:** 93 (ב-AI ANALYSIS PACKAGE)
 
 **תלות:**
+
 - אין תלות חובה (עובד עצמאית)
 
 ### 4. AIResultRenderer
@@ -112,6 +119,7 @@ window.AITemplateSelector = AITemplateSelector;
 **קובץ:** `trading-ui/scripts/ai-result-renderer.js`
 
 **חשיפה ל-window:**
+
 ```javascript
 window.AIResultRenderer = AIResultRenderer;
 ```
@@ -119,6 +127,7 @@ window.AIResultRenderer = AIResultRenderer;
 **Load Order:** 94 (ב-AI ANALYSIS PACKAGE)
 
 **תלות:**
+
 - `marked` (Markdown parser library)
 
 ### 5. AINotesIntegration
@@ -126,6 +135,7 @@ window.AIResultRenderer = AIResultRenderer;
 **קובץ:** `trading-ui/scripts/ai-notes-integration.js`
 
 **חשיפה ל-window:**
+
 ```javascript
 window.AINotesIntegration = AINotesIntegration;
 ```
@@ -133,6 +143,7 @@ window.AINotesIntegration = AINotesIntegration;
 **Load Order:** 95 (ב-AI ANALYSIS PACKAGE)
 
 **תלות:**
+
 - `ModalManagerV2`
 - `NotesDataService`
 - `RichTextEditorService`
@@ -142,6 +153,7 @@ window.AINotesIntegration = AINotesIntegration;
 **קובץ:** `trading-ui/scripts/ai-export-service.js`
 
 **חשיפה ל-window:**
+
 ```javascript
 window.AIExportService = AIExportService;
 ```
@@ -149,6 +161,7 @@ window.AIExportService = AIExportService;
 **Load Order:** 96 (ב-AI ANALYSIS PACKAGE)
 
 **תלות:**
+
 - `AIAnalysisData` (קורא ל-export functions)
 
 ---
@@ -166,17 +179,20 @@ window.AIExportService = AIExportService;
 ### 2. Auto-Initialization
 
 **AIAnalysisManager:**
+
 - Auto-initializes דרך `page-initialization-configs.js`
 - או דרך DOMContentLoaded event
 - קורא ל-`AIAnalysisData.loadTemplates()`, `loadHistory()`, וכו'
 
 **Other Services:**
+
 - נטענים מיד כש-script tag נטען
 - נחשפים ל-`window` מיד
 
 ### 3. Dependencies
 
 **AIAnalysisManager תלוי ב:**
+
 - `AIAnalysisData` ✅
 - `AITemplateSelector` ✅
 - `AIResultRenderer` ✅ (optional)
@@ -196,6 +212,7 @@ window.AIExportService = AIExportService;
 ### 2. Timing Issues
 
 **בעיה:** גם אם authentication עובד, יש timing issues:
+
 - Scripts נטענים אסינכרונית
 - Services עלולים לא להיות זמינים מיד
 - Initialization צריך זמן
@@ -207,6 +224,7 @@ window.AIExportService = AIExportService;
 **בעיה:** ה-tests מחפשים services בשמות ספציפיים.
 
 **Services ב-tests:**
+
 - `AIAnalysisData` ✅ - קיים
 - `AIAnalysisManager` ✅ - קיים
 - `AITemplateSelector` ✅ - קיים
@@ -223,6 +241,7 @@ window.AIExportService = AIExportService;
 ### 1. Authentication לפני Navigation
 
 לפני navigation לדף, צריך לבצע authentication:
+
 - Login
 - Verify authentication
 - Navigate לדף
@@ -231,6 +250,7 @@ window.AIExportService = AIExportService;
 ### 2. Wait For Services
 
 לפני בדיקת services:
+
 ```javascript
 await page.waitForFunction(() => {
   return window.AIAnalysisData !== undefined &&
@@ -245,6 +265,7 @@ await page.waitForFunction(() => {
 ### 3. Wait For Initialization
 
 לאחר שה-services זמינים, צריך לחכות ש-AIAnalysisManager מתאתחל:
+
 ```javascript
 await page.waitForFunction(() => {
   return window.AIAnalysisManager && 

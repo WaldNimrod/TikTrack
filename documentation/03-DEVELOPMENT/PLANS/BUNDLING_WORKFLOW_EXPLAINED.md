@@ -1,4 +1,5 @@
 # הסבר Workflow - Bundling ללא שכפול קוד
+
 ## Workflow Explanation - Bundling Without Code Duplication
 
 **תאריך יצירה:** 5 בדצמבר 2025  
@@ -18,6 +19,7 @@
 ## ✅ הפתרון: Bundles הם Build Artifacts
 
 ### עקרון מרכזי
+
 **Bundles הם לא חלק מהקוד המקורי - הם build artifacts שנוצרים בזמן build.**
 
 ### מבנה הקוד
@@ -35,7 +37,7 @@ trading-ui/
       ...
 ```
 
-### מה קורה?
+### מה קורה
 
 1. **Development (כרגיל):**
    - כל הקבצים המקוריים נשארים
@@ -59,6 +61,7 @@ trading-ui/
 ### אפשרות 1: Build Artifacts (מומלץ)
 
 #### Development (כרגיל)
+
 ```bash
 # כל הקבצים המקוריים
 trading-ui/scripts/api-config.js
@@ -71,6 +74,7 @@ trading-ui/scripts/notification-system.js
 ```
 
 #### Production Build
+
 ```bash
 # 1. Build bundles
 npm run build:bundles
@@ -88,6 +92,7 @@ npm run update-pages --mode production
 ```
 
 #### Git
+
 ```bash
 # .gitignore
 trading-ui/scripts/bundles/
@@ -97,6 +102,7 @@ trading-ui/scripts/bundles/
 ```
 
 **יתרונות:**
+
 - ✅ לא צריך branch נפרד
 - ✅ לא צריך שכפול קוד
 - ✅ כל הצוותים עובדים על אותו קוד
@@ -107,6 +113,7 @@ trading-ui/scripts/bundles/
 ### אפשרות 2: Feature Flag (גמיש יותר)
 
 #### Development (כרגיל)
+
 ```javascript
 // config.js
 const USE_BUNDLES = false; // Development mode
@@ -120,6 +127,7 @@ if (USE_BUNDLES && fs.existsSync(bundlePath)) {
 ```
 
 #### Production
+
 ```javascript
 // config.js
 const USE_BUNDLES = process.env.USE_BUNDLES === 'true';
@@ -129,6 +137,7 @@ const USE_BUNDLES = process.env.USE_BUNDLES === 'true';
 ```
 
 **יתרונות:**
+
 - ✅ HTML files לא משתנים
 - ✅ מעבר קל בין מצבים
 - ✅ A/B testing קל
@@ -137,7 +146,7 @@ const USE_BUNDLES = process.env.USE_BUNDLES === 'true';
 
 ### אפשרות 3: Branch נפרד (אם צריך)
 
-#### אם בכל זאת רוצים branch נפרד:
+#### אם בכל זאת רוצים branch נפרד
 
 ```bash
 # 1. יצירת branch
@@ -178,6 +187,7 @@ trading-ui/
 ```
 
 ### .gitignore
+
 ```
 trading-ui/scripts/bundles/
 *.bundle.js
@@ -187,6 +197,7 @@ trading-ui/scripts/bundles/
 ### Workflow
 
 #### 1. Development (כרגיל)
+
 ```bash
 # כל הקבצים המקוריים
 # HTML files משתמשים בקבצים המקוריים
@@ -194,6 +205,7 @@ trading-ui/scripts/bundles/
 ```
 
 #### 2. Build Bundles (כשמוכן)
+
 ```bash
 # Build bundles
 npm run build:bundles
@@ -202,6 +214,7 @@ npm run build:bundles
 ```
 
 #### 3. Production Deploy
+
 ```bash
 # Option A: עם bundles
 USE_BUNDLES=true npm run deploy
@@ -211,6 +224,7 @@ npm run deploy
 ```
 
 #### 4. HTML Files
+
 ```html
 <!-- Development: קבצים מקוריים -->
 <script src="scripts/api-config.js?v=1.0.0" defer></script>
@@ -224,6 +238,7 @@ npm run deploy
 ## 🎯 תהליך עבודה יומי
 
 ### Developer (כרגיל)
+
 ```bash
 # 1. עבודה על קוד מקורי
 vim trading-ui/scripts/api-config.js
@@ -237,6 +252,7 @@ git commit -m "Update API config"
 ```
 
 ### Build Process (במקביל)
+
 ```bash
 # 1. Build bundles (אם צריך)
 npm run build:bundles
@@ -254,19 +270,22 @@ USE_BUNDLES=true npm run deploy
 
 ## ✅ סיכום
 
-### מה לא צריך:
+### מה לא צריך
+
 - ❌ Branch נפרד
 - ❌ שכפול קוד
 - ❌ שינוי קוד מקורי
 - ❌ עצירת פיתוח
 
-### מה כן צריך:
+### מה כן צריך
+
 - ✅ Build script (יוצר bundles)
 - ✅ .gitignore (bundles לא ב-git)
 - ✅ Feature flag (אופציונלי)
 - ✅ HTML files נשארים עם קבצים מקוריים (default)
 
-### תוצאה:
+### תוצאה
+
 - ✅ כל הצוותים עובדים על אותו קוד
 - ✅ Bundles נוצרים רק ב-production
 - ✅ Development לא משתנה

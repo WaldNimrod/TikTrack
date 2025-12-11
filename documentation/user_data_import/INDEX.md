@@ -7,9 +7,11 @@
 ## מסמכי הליבה
 
 ### 1. IMPORT_DATA_FLOW.md
+
 **תיאור**: זרימת המידע המלאה בתהליך הייבוא, מהעלאת הקובץ ועד לשמירה בבסיס הנתונים.
 
 **תוכן**:
+
 - שלב 1: Upload & Session Creation
 - שלב 2: File Analysis
 - שלב 3: Preview Generation
@@ -20,9 +22,11 @@
 **קישור**: [IMPORT_DATA_FLOW.md](./IMPORT_DATA_FLOW.md)
 
 ### 2. RECORD_CLASSIFICATION.md
+
 **תיאור**: לוגיקת זיהוי וסיווג רשומות תזרימי מזומנים מקובץ IBKR.
 
 **תוכן**:
+
 - כלל 1: עמודה שנייה חייבת להיות "Data"
 - כלל 2: מיפוי ישיר משם סקציה ל-cashflow_type
 - CASHFLOW_SECTION_NAMES mapping
@@ -32,9 +36,11 @@
 **קישור**: [RECORD_CLASSIFICATION.md](./RECORD_CLASSIFICATION.md)
 
 ### 3. CURRENCY_EXCHANGE_IMPORT.md
+
 **תיאור**: תהליך ייבוא רשומות המרות מטבע, תוך עקיבה אחר המבנה של יצירה ידנית.
 
 **תוכן**:
+
 - מבנה סטנדרטי (עקוב אחר CashFlowService.create_exchange)
 - תהליך הייבוא (5 שלבים)
 - חישוב נכון (to_amount, fee_amount)
@@ -44,9 +50,11 @@
 **קישור**: [CURRENCY_EXCHANGE_IMPORT.md](./CURRENCY_EXCHANGE_IMPORT.md)
 
 ### 4. FILTERING_MECHANISM.md
+
 **תיאור**: מנגנון הסינון לפי `selected_types` עם 3 נקודות סינון להבטחת דיוק 100%.
 
 **תוכן**:
+
 - נקודה 1: _build_preview_payload
 - נקודה 2: execute_import
 - נקודה 3: _execute_import_cashflows
@@ -128,17 +136,21 @@
 ## עקרונות יסוד
 
 ### 1. עמודה שנייה חייבת להיות "Data"
+
 רק שורות עם פורמט `{Section Name},Data,...` הן רשומות תקפות.
 
 ### 2. 3 נקודות סינון
+
 - `_build_preview_payload`: סינון ראשוני
 - `execute_import`: Double-check filtering
 - `_execute_import_cashflows`: Final check
 
 ### 3. Atomic Operations
+
 FROM + TO נוצרים יחד או לא נוצרים כלל (על ידי `CashFlowHelperService.create_exchange()`).
 
 ### 4. State Management
+
 `selected_types` נשמר ב-`preview_data` לפני commit ונשלח מה-Frontend ב-API calls.
 
 ## קישורים חיצוניים
@@ -150,9 +162,11 @@ FROM + TO נוצרים יחד או לא נוצרים כלל (על ידי `CashFl
 ## דוח מצב
 
 ### STATUS_REPORT.md
+
 **תיאור**: דוח מצב מקיף על תהליכי הייבוא, כולל בעיות ידועות, תהליכי בדיקה, וכפתור המחיקה.
 
 **תוכן**:
+
 - בעיות ידועות (5 בעיות)
 - תהליכי בדיקה (3 בדיקות)
 - כפתור מחיקת רשומות מייבוא (פירוט מלא)
@@ -165,9 +179,11 @@ FROM + TO נוצרים יחד או לא נוצרים כלל (על ידי `CashFl
 ## מדריך מפתח עתידי
 
 ### DEVELOPER_GUIDE.md
+
 **תיאור**: מדריך מקיף למפתח העתידי - איך להרחיב ולתחזק את מערכת הייבוא ללא שבירת הארכיטקטורה.
 
 **תוכן**:
+
 - סקירה כללית וארכיטקטורה
 - שלבי התהליך (4 שלבים)
 - מערכות כלליות - חובה להשתמש

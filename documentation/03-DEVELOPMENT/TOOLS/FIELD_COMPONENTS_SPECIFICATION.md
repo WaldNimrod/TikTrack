@@ -1,4 +1,5 @@
 # Field Components Specification - TikTrack Modal System
+
 ## תכנון מפורט של כל רכיבי השדות לשימוש חוזר
 
 **תאריך יצירה**: 12 בינואר 2025  
@@ -18,6 +19,7 @@
 ## 🏗️ מבנה בסיסי לכל רכיב
 
 ### Base Field Component Class
+
 ```javascript
 /**
  * Base Field Component - TikTrack Modal System
@@ -1192,14 +1194,16 @@ window.FieldComponentFactory = FieldComponentFactory;
 
 ## 🎯 המלצות ליישום
 
-### עקרונות עיצוב:
+### עקרונות עיצוב
+
 1. **סטנדרטים מלאים** - JSDoc, שמות משתנים באנגלית, פונקציות בעברית
 2. **אינטגרציה מלאה** - שימוש בכל המערכות הקיימות
 3. **ולידציה מובנית** - כל רכיב כולל ולידציה מלאה
 4. **עיצוב אחיד** - כל הרכיבים נראים זהה
 5. **ביצועים טובים** - רכיבים קלים ומהירים
 
-### דוגמת שימוש:
+### דוגמת שימוש
+
 ```javascript
 // יצירת שדה טקסט
 const textField = FieldComponentFactory.createFieldComponent('text', {

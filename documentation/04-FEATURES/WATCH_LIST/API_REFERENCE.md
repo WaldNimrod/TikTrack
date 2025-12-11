@@ -1,4 +1,5 @@
 # תיעוד API: מערכת Watch List
+
 ## API Reference: Watch List System
 
 **תאריך:** 28 בינואר 2025  
@@ -21,9 +22,11 @@
 **מטרה:** קבלת כל רשימות הצפייה של המשתמש
 
 **Parameters:**
+
 - `user_id` (query, optional): מזהה משתמש (אם לא ב-context)
 
 **Response:**
+
 ```json
 {
   "status": "success",
@@ -48,6 +51,7 @@
 ```
 
 **Error Responses:**
+
 - `401`: Authentication required
 - `500`: Server error
 
@@ -58,6 +62,7 @@
 **מטרה:** יצירת רשימה חדשה
 
 **Request Body:**
+
 ```json
 {
   "name": "Energy Sector",
@@ -68,18 +73,22 @@
 ```
 
 **Required Fields:**
+
 - `name`: שם הרשימה (max 100 chars)
 
 **Optional Fields:**
+
 - `icon`: שם איקון מ-IconSystem
 - `color_hex`: צבע רשימה (#RRGGBB)
 - `view_mode`: 'table', 'cards', 'compact' (default: 'table')
 
 **Validation:**
+
 - Max 20 lists per user (checked in Business Logic Service)
 - Unique name per user
 
 **Response:**
+
 ```json
 {
   "status": "success",
@@ -99,6 +108,7 @@
 ```
 
 **Error Responses:**
+
 - `400`: Validation error (missing name, duplicate name, max lists exceeded)
 - `401`: Authentication required
 - `500`: Server error
@@ -110,9 +120,11 @@
 **מטרה:** קבלת פרטי רשימה ספציפית
 
 **Parameters:**
+
 - `id` (path): מזהה הרשימה
 
 **Response:**
+
 ```json
 {
   "status": "success",
@@ -135,6 +147,7 @@
 ```
 
 **Error Responses:**
+
 - `404`: List not found
 - `403`: Permission denied (list belongs to another user)
 - `401`: Authentication required
@@ -146,6 +159,7 @@
 **מטרה:** עדכון רשימה
 
 **Request Body:**
+
 ```json
 {
   "name": "Technology Stocks",
@@ -162,6 +176,7 @@
 **Response:** כמו GET /api/watch-lists/:id
 
 **Error Responses:**
+
 - `400`: Validation error
 - `404`: List not found
 - `403`: Permission denied
@@ -176,6 +191,7 @@
 **Cascade:** כל הפריטים נמחקים אוטומטית
 
 **Response:**
+
 ```json
 {
   "status": "success",
@@ -185,6 +201,7 @@
 ```
 
 **Error Responses:**
+
 - `404`: List not found
 - `403`: Permission denied
 - `401`: Authentication required
@@ -196,6 +213,7 @@
 **מטרה:** סידור מחדש של רשימות
 
 **Request Body:**
+
 ```json
 {
   "order": [
@@ -207,6 +225,7 @@
 ```
 
 **Response:**
+
 ```json
 {
   "status": "success",
@@ -224,10 +243,12 @@
 **מטרה:** קבלת כל הטיקרים ברשימה
 
 **Parameters:**
+
 - `id` (path): מזהה הרשימה
 - `include_external_data` (query, optional): האם לכלול נתוני מחיר חיצוניים (default: false)
 
 **Response:**
+
 ```json
 {
   "status": "success",
@@ -289,6 +310,7 @@
 **מטרה:** הוספת טיקר לרשימה
 
 **Request Body - Ticker במערכת:**
+
 ```json
 {
   "ticker_id": 5
@@ -296,6 +318,7 @@
 ```
 
 **Request Body - Ticker חיצוני:**
+
 ```json
 {
   "external_symbol": "TSLA",
@@ -306,15 +329,18 @@
 **Required:** אחד מתוך `ticker_id` או `external_symbol`
 
 **Optional Fields:**
+
 - `flag_color`: צבע דגל (#RRGGBB)
 - `notes`: הערות
 - `display_order`: מיקום בסדר (default: end)
 
 **Validation:**
+
 - Max 50 items per list (checked in Business Logic Service)
 - Ticker לא יכול להיות כפול ברשימה
 
 **Response:**
+
 ```json
 {
   "status": "success",
@@ -333,6 +359,7 @@
 ```
 
 **Error Responses:**
+
 - `400`: Validation error (missing ticker, duplicate, max items exceeded)
 - `404`: Watch list not found
 - `403`: Permission denied
@@ -345,6 +372,7 @@
 **מטרה:** עדכון פריט (דגל, הערות, מיקום)
 
 **Request Body:**
+
 ```json
 {
   "flag_color": "#fc5a06",
@@ -358,6 +386,7 @@
 **Response:** כמו GET item
 
 **Error Responses:**
+
 - `400`: Validation error
 - `404`: Item not found
 - `403`: Permission denied
@@ -369,6 +398,7 @@
 **מטרה:** הסרת טיקר מרשימה
 
 **Response:**
+
 ```json
 {
   "status": "success",
@@ -384,6 +414,7 @@
 **מטרה:** סידור מחדש של פריטים ברשימה
 
 **Request Body:**
+
 ```json
 {
   "order": [
@@ -395,6 +426,7 @@
 ```
 
 **Response:**
+
 ```json
 {
   "status": "success",
@@ -410,6 +442,7 @@
 **מטרה:** העתקת פריט לרשימה אחרת
 
 **Request Body:**
+
 ```json
 {
   "item_id": 1,
@@ -418,14 +451,17 @@
 ```
 
 **Required Fields:**
+
 - `item_id`: מזהה הפריט להעתקה
 - `target_list_id`: מזהה רשימה יעד
 
 **Validation:**
+
 - Target list must belong to same user
 - Item must not already exist in target list
 
 **Response:**
+
 ```json
 {
   "status": "success",
@@ -452,10 +488,12 @@
 **מטרה:** קבלת כל הטיקרים עם דגל בצבע ספציפי
 
 **Parameters:**
+
 - `color` (path): צבע דגל (#RRGGBB)
 - `user_id` (query, optional): מזהה משתמש
 
 **Response:**
+
 ```json
 {
   "status": "success",
@@ -488,9 +526,11 @@
 **מטרה:** קבלת כל הטיקרים החיצוניים של המשתמש
 
 **Parameters:**
+
 - `user_id` (query, optional): מזהה משתמש
 
 **Response:**
+
 ```json
 {
   "status": "success",
@@ -514,9 +554,11 @@
 ## External Data Integration
 
 ### רקע
+
 טיקרים חיצוניים זקוקים לנתוני מחיר מ-external data providers.
 
 **אסטרטגיה:**
+
 - משיכה מרוכזת פעם אחת לכל טיקר
 - Caching משותף לכל המשתמשים
 - תדירות נמוכה (לפי הגדרות מערכת הנתונים החיצוניים)
@@ -524,11 +566,13 @@
 ### Endpoint: GET /api/watch-lists/:id/items (with external_data)
 
 כשמשלחים `include_external_data=true`, השרת:
+
 1. מזהה טיקרים חיצוניים ברשימה
 2. שולף נתוני מחיר מ-cache/API
 3. מחזיר אותם ב-`external_data` field
 
 **External Data Structure:**
+
 ```json
 {
   "external_data": {
@@ -548,6 +592,7 @@
 ## Error Handling
 
 ### Standard Error Response
+
 ```json
 {
   "status": "error",
@@ -582,6 +627,7 @@
 **מיקום:** `Backend/services/watch_list_service.py`
 
 **Methods:**
+
 - `create_watch_list(db, user_id, data)` - יצירת רשימה
 - `update_watch_list(db, list_id, user_id, data)` - עדכון רשימה
 - `delete_watch_list(db, list_id, user_id)` - מחיקת רשימה
@@ -595,6 +641,7 @@
 - `convert_external_to_system(db, item_id, user_id)` - המרת טיקר חיצוני למערכת
 
 **Validation Constants:**
+
 ```python
 MAX_WATCH_LISTS_PER_USER = 20  # TODO: Move to admin settings
 MAX_TICKERS_PER_LIST = 50      # TODO: Move to admin settings
@@ -605,11 +652,13 @@ MAX_TICKERS_PER_LIST = 50      # TODO: Move to admin settings
 ## Cache Strategy
 
 ### Invalidation
+
 - `watch_lists` - invalidate על create/update/delete של רשימה
 - `watch_list_items` - invalidate על create/update/delete של פריט
 - `external_data` - נשלט על ידי External Data Service
 
 ### Cache Keys
+
 - `watch_lists:user:{user_id}`
 - `watch_list:{list_id}`
 - `watch_list_items:list:{list_id}`
@@ -618,6 +667,12 @@ MAX_TICKERS_PER_LIST = 50      # TODO: Move to admin settings
 ---
 
 **סיכום:** API תומך בכל הפעולות הנדרשות עם validation מלא, error handling, ותמיכה מלאה בטיקרים חיצוניים עם אינטגרציה למערכת הנתונים החיצוניים.
+
+
+
+
+
+
 
 
 

@@ -1,4 +1,5 @@
 # מערכת Pagination System
+
 ## Pagination System Documentation
 
 **תאריך יצירה:** 27 בינואר 2025  
@@ -139,6 +140,7 @@ pagination.render();
 יצירת instance חדש של pagination.
 
 **Parameters:**
+
 - `tableId` (string) - מזהה הטבלה (ID attribute)
 - `options` (Object) - אפשרויות קונפיגורציה:
   - `tableType` (string) - סוג הטבלה (data-table-type)
@@ -159,6 +161,7 @@ pagination.render();
 **Returns:** `PaginationInstance` או `null` (אם הטבלה במודול)
 
 **Example:**
+
 ```javascript
 const pagination = window.PaginationSystem.create('tradesTable', {
     tableType: 'trades',
@@ -173,6 +176,7 @@ const pagination = window.PaginationSystem.create('tradesTable', {
 קבלת instance קיים של pagination.
 
 **Parameters:**
+
 - `tableId` (string) - מזהה הטבלה
 
 **Returns:** `PaginationInstance` או `null`
@@ -182,6 +186,7 @@ const pagination = window.PaginationSystem.create('tradesTable', {
 מחיקת instance של pagination.
 
 **Parameters:**
+
 - `tableId` (string) - מזהה הטבלה
 
 ---
@@ -193,6 +198,7 @@ const pagination = window.PaginationSystem.create('tradesTable', {
 עדכון הנתונים ב-pagination.
 
 **Parameters:**
+
 - `data` (Array) - מערך הנתונים החדש
 
 #### `getCurrentPageData()`
@@ -214,6 +220,7 @@ const pagination = window.PaginationSystem.create('tradesTable', {
 מעבר לעמוד מסוים.
 
 **Parameters:**
+
 - `pageNumber` (number) - מספר העמוד
 
 #### `setPageSize(newPageSize)`
@@ -221,6 +228,7 @@ const pagination = window.PaginationSystem.create('tradesTable', {
 שינוי גודל עמוד.
 
 **Parameters:**
+
 - `newPageSize` (number) - גודל עמוד חדש
 
 #### `render()`
@@ -248,6 +256,7 @@ Wrapper ל-`PaginationSystem.destroy()`.
 יצירה או עדכון של pagination קיים.
 
 **Parameters:**
+
 - `tableId` (string) - מזהה הטבלה
 - `options` (Object) - אפשרויות קונפיגורציה
 
@@ -258,6 +267,7 @@ Wrapper ל-`PaginationSystem.destroy()`.
 פונקציה מרכזית לאינטגרציה עם טבלאות.
 
 **Parameters:**
+
 - `options.tableId` (string) - מזהה הטבלה
 - `options.tableType` (string) - סוג הטבלה
 - `options.data` (Array) - מערך הנתונים
@@ -269,6 +279,7 @@ Wrapper ל-`PaginationSystem.destroy()`.
 **Returns:** `Promise<PaginationInstance|null>`
 
 **Example:**
+
 ```javascript
 await window.updateTableWithPagination({
     tableId: 'tradesTable',
@@ -288,16 +299,19 @@ await window.updateTableWithPagination({
 המערכת מזהה טבלאות בתוך modals ומניעה יצירת pagination עבורן.
 
 **זיהוי מודולים:**
+
 ```javascript
 table.closest('.modal, [class*="modal"]')
 ```
 
 **נקודות בדיקה:**
+
 1. `PaginationSystem.create()` - בודק לפני יצירה
 2. `PaginationInstance.render()` - בודק לפני רינדור
 3. `updateTableWithPagination()` - בודק לפני אינטגרציה
 
 **התנהגות:**
+
 - אם טבלה נמצאת במודול, המערכת מחזירה `null` ולא יוצרת pagination
 - מוצג `console.warn` למפתח
 - הטבלה מציגה את כל הנתונים (ללא pagination)
@@ -309,11 +323,13 @@ table.closest('.modal, [class*="modal"]')
 המערכת משתמשת ב-Tabler Icons לכפתורי ניווט.
 
 **Icons:**
+
 - `ti-chevron-right` - כפתור "הקודם" (RTL)
 - `ti-chevron-left` - כפתור "הבא" (RTL)
 
 **טעינה:**
 Tabler Icons נטענים מ-CDN דרך `master.css`:
+
 ```css
 @import url('https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css');
 ```
@@ -325,6 +341,7 @@ Tabler Icons נטענים מ-CDN דרך `master.css`:
 המערכת תומכת בשמירת העדפות משתמש עבור גודל עמוד.
 
 **שימוש:**
+
 ```javascript
 // שמירת העדפה
 pagination.setPageSize(50); // נשמר אוטומטית
@@ -340,6 +357,7 @@ const savedPageSize = window.getPaginationSize('trades'); // מחזיר העדפ
 המערכת משתמשת ב-`TableDataRegistry` לשמירת נתונים וסינכרון.
 
 **תכונות:**
+
 - שמירת נתונים מלאים
 - שמירת נתונים מסוננים
 - שמירת נתוני עמוד נוכחי
@@ -352,9 +370,11 @@ const savedPageSize = window.getPaginationSize('trades'); // מחזיר העדפ
 המערכת תומכת ב-responsive design.
 
 **Breakpoints:**
+
 - **≤768px:** Flex-direction: column, יישור מרכזי, כפתורים עם min-width 100px
 
 **עיצוב:**
+
 - תצוגה מלאה: `justify-content: flex-start`, gap: 10px
 - תצוגה מצומצמת: `justify-content: center`, gap: 8px
 
@@ -439,11 +459,13 @@ pagination.goToPage(3);
 ### Pagination לא מופיע
 
 **סיבות אפשריות:**
+
 1. הטבלה נמצאת במודול (נבדק אוטומטית)
 2. `render()` לא נקרא
 3. הנתונים ריקים
 
 **פתרון:**
+
 ```javascript
 // בדיקה ידנית
 const table = document.getElementById('myTable');
@@ -464,6 +486,7 @@ if (pagination) {
 **סיבה:** `showCompactPagination` מוגדר ל-`false`
 
 **פתרון:**
+
 ```javascript
 const pagination = window.PaginationSystem.create('myTable', {
     showCompactPagination: true // מופעל כברירת מחדל
@@ -476,6 +499,7 @@ const pagination = window.PaginationSystem.create('myTable', {
 
 **פתרון:**
 וודא ש-`master.css` כולל:
+
 ```css
 @import url('https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css');
 ```

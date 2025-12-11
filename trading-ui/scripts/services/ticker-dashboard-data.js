@@ -6,6 +6,17 @@
  * Documentation: See documentation/04-FEATURES/WIREFRAMES/ticker-dashboard-wireframe.md
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Event Handlers ===
+// - loadTickerConditions() - Loadtickerconditions
+
+// === Data Functions ===
+// - loadTickerDashboardData() - Loadtickerdashboarddata
+// - loadTickerUserActivity() - Loadtickeruseractivity
+// - loadHistoricalData() - Loadhistoricaldata
+
 (function() {
     'use strict';
 

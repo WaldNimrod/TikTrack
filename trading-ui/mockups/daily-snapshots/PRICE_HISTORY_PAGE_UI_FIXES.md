@@ -1,4 +1,5 @@
 # תיקוני ממשק - עמוד היסטוריית מחירים
+
 ## Price History Page UI Fixes
 
 **תאריך יצירה:** 27 בינואר 2025  
@@ -13,6 +14,7 @@
 👉 **[MOCKUPS_UNIFIED_STYLES_GUIDE.md](./MOCKUPS_UNIFIED_STYLES_GUIDE.md)**
 
 המדריך המקיף כולל:
+
 - ✅ כל 12 עמודי המוקאפ
 - ✅ 493 מופעים של inline styles שצריך לתקן
 - ✅ Classes אחידות לכל הרכיבים המשותפים
@@ -25,25 +27,29 @@
 
 ## ⚠️ חוקי ITCSS - חובה לפעול לפיהם
 
-### כללי יסוד:
+### כללי יסוד
+
 1. **כל הסגנונות חייבים לעבור דרך ITCSS בלבד**
 2. **ללא inline styles** - אסור להשתמש ב-`style=""` attributes
 3. **ללא סגנונות בתוך HTML** - אסור להשתמש ב-`<style>` tags
 4. **ללא !important** - אסור להשתמש ב-`!important`
 
-### מיקום הסגנונות:
+### מיקום הסגנונות
+
 - **קובץ:** `trading-ui/styles-new/06-components/_chart-management.css`
 - **טעינה:** הקובץ כבר נטען דרך `master.css` (שורה 76)
 - **אין צורך להוסיף import** - הקובץ כבר חלק מהמערכת
 
-### שימוש ב-CSS Variables (חובה!):
+### שימוש ב-CSS Variables (חובה!)
+
 - **צבעים:** `--apple-blue`, `--apple-gray-*`, `--color-text-*`
 - **מרווחים:** `--spacing-xs`, `--spacing-sm`, `--spacing-md`, `--spacing-lg`
 - **רדיוסים:** `--apple-radius-small`, `--apple-radius-medium`
 - **צללים:** `--apple-shadow-light`, `--apple-shadow-medium`
 - **מיקום המשתנים:** `trading-ui/styles-new/01-settings/_variables.css`
 
-### RTL Support (חובה!):
+### RTL Support (חובה!)
+
 - שימוש ב-Logical Properties: `margin-inline-start` במקום `margin-left`
 - תמיכה ב-`[dir="rtl"]` selectors
 
@@ -52,16 +58,19 @@
 ## 🔴 בעיות קריטיות בממשק
 
 ### 1. **יותר מדי Inline Styles (165 מופעים!)**
+
 - **בעיה:** כל הכפתורים, הקבוצות והאלמנטים משתמשים ב-inline styles
 - **השפעה:** קשה לתחזק, לא עקבי, לא ניתן לשנות עיצוב מרכזית, **מפר את חוקי ITCSS**
 - **פתרון:** הוספת CSS classes לקובץ `_chart-management.css` במערכת ITCSS
 
 ### 2. **כפתורים עם סגנונות חוזרים**
+
 - **בעיה:** כל כפתור מגדיר את אותם סגנונות שוב ושוב
 - **דוגמה:** `padding: 4px 8px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 0.75rem;`
 - **פתרון:** יצירת classes: `.chart-control-btn`, `.chart-control-btn.active`, `.unit-size-btn`, וכו'
 
 ### 3. **קבוצות כפתורים עם סגנונות חוזרים**
+
 - **בעיה:** כל קבוצת כפתורים מגדירה את אותם סגנונות
 - **דוגמה:** `display: flex; gap: 3px; background: rgba(248, 249, 250, 0.9); padding: 4px; border-radius: 6px; border: 1px solid #dee2e6;`
 - **פתרון:** יצירת class: `.chart-control-group`
@@ -73,9 +82,11 @@
 ### קטגוריה 1: כפתורי בקרת גרף
 
 #### 1.1 כפתורי יחידת זמן (Unit Size Buttons)
+
 **מיקום:** שורות 193-198
 
 **בעיות:**
+
 - Inline styles חוזרים בכל כפתור
 - אין class משותף
 - מצב active מוגדר inline
@@ -156,6 +167,7 @@
 ```
 
 #### 1.2 כפתורי טווח זמן (Time Range Buttons)
+
 **מיקום:** שורות 202-210
 
 **פתרון:** הוספה ל-`_chart-management.css` עם CSS variables
@@ -208,6 +220,7 @@
 ```
 
 #### 1.3 כפתורי סוג גרף (Chart Type Buttons)
+
 **מיקום:** שורות 213-225
 
 **פתרון:** הוספה ל-`_chart-management.css` עם CSS variables
@@ -266,9 +279,11 @@
 ```
 
 #### 1.4 כפתורי מצב תצוגה (View Mode Buttons)
+
 **מיקום:** שורות 231-236
 
 **פתרון:**
+
 ```css
 .chart-view-mode-group {
     display: flex;
@@ -311,9 +326,11 @@
 ```
 
 #### 1.5 כפתורי סולם Y (Y-Axis Scale Buttons)
+
 **מיקום:** שורות 239-248
 
 **פתרון:**
+
 ```css
 .chart-y-scale-group {
     display: flex;
@@ -363,9 +380,11 @@
 ```
 
 #### 1.6 כפתורי נפח, זום, מחוונים, וכו' (Volume, Zoom, Indicators, etc.)
+
 **מיקום:** שורות 250-323
 
 **פתרון כללי:**
+
 ```css
 /* Base classes לכל קבוצות הכפתורים */
 .chart-control-group {
@@ -431,9 +450,11 @@
 ### קטגוריה 2: כרטיסי סטטיסטיקה
 
 #### 2.1 כרטיסי סטטיסטיקה קומפקטיים
+
 **מיקום:** שורות 144-171
 
 **בעיות:**
+
 - Inline styles
 - אין classes משותפים
 
@@ -481,6 +502,7 @@
 ### קטגוריה 3: Toolbars (Indicators, Drawing Tools)
 
 #### 3.1 Indicators Toolbar
+
 **מיקום:** שורות 328-386
 
 **פתרון:** הוספה ל-`_chart-management.css` עם CSS variables
@@ -550,6 +572,7 @@
 ```
 
 #### 3.2 Drawing Tools Toolbar
+
 **מיקום:** שורות 388-429
 
 **פתרון:** שימוש באותם classes כמו Indicators Toolbar
@@ -559,9 +582,11 @@
 ### קטגוריה 4: Navigation Bar (Mockups)
 
 #### 4.1 Mockups Navigation Bar
+
 **מיקום:** שורות 58-74
 
 **בעיות:**
+
 - Inline styles
 - לא עקבי עם שאר המערכת
 
@@ -612,6 +637,7 @@
 ## 🎨 שיפורי עיצוב נוספים
 
 ### 1. **שימוש ב-CSS Variables (חובה!)**
+
 - **כל הצבעים:** דרך `--apple-blue`, `--apple-gray-*`, `--color-text-*`
 - **כל המרווחים:** דרך `--spacing-xs`, `--spacing-sm`, `--spacing-md`, וכו'
 - **כל הרדיוסים:** דרך `--apple-radius-small`, `--apple-radius-medium`
@@ -619,17 +645,20 @@
 - **מיקום המשתנים:** `trading-ui/styles-new/01-settings/_variables.css`
 
 ### 2. **RTL Support (חובה!)**
+
 - **Logical Properties:** שימוש ב-`margin-inline-start` במקום `margin-left`
 - **Flex Directions:** וידוא שכל ה-flex directions תומכים ב-RTL
 - **Positioning:** שימוש ב-`inset-inline-start` במקום `left` (ב-RTL)
 - **דוגמה:** `[dir="rtl"] .chart-toolbar-right { right: auto; left: 10px; }`
 
 ### 3. **נגישות**
+
 - הוספת `aria-label` לכל הכפתורים
 - וידוא שיש `title` לכל כפתור
 - שיפור contrast ratios
 
 ### 4. **Responsive Design**
+
 - וידוא שהכפתורים מתאימים למסכים קטנים
 - שימוש ב-media queries
 
@@ -638,18 +667,21 @@
 ## 📝 תוכנית ביצוע
 
 ### שלב 1: הוספת CSS Classes ל-ITCSS
+
 1. **הוספה לקובץ:** `trading-ui/styles-new/06-components/_chart-management.css`
 2. **שימוש ב-CSS Variables:** כל הצבעים, מרווחים, רדיוסים - דרך variables
 3. **ללא !important:** כל הסגנונות ללא !important
 4. **RTL Support:** שימוש ב-logical properties (`margin-inline-start` במקום `margin-left`)
 
 ### שלב 2: עדכון HTML
+
 1. **הסרת כל ה-inline styles:** מחיקת כל ה-`style=""` attributes
 2. **הוספת classes:** החלפה ב-classes מ-ITCSS
 3. **וידוא טעינה:** וידוא ש-`master.css` נטען (כולל `_chart-management.css`)
 4. **בדיקת RTL:** וידוא שהכל עובד ב-RTL
 
 ### שלב 3: בדיקות
+
 1. בדיקת RTL
 2. בדיקת נגישות
 3. בדיקת responsive
@@ -659,7 +691,8 @@
 
 ## 🔧 דוגמאות קוד
 
-### לפני (עם inline styles):
+### לפני (עם inline styles)
+
 ```html
 <div style="display: flex; flex-direction: column; gap: 2px;">
     <div style="font-size: 0.65rem; color: #6c757d; font-weight: 600; padding: 0 2px;">יחידת זמן</div>
@@ -669,7 +702,8 @@
 </div>
 ```
 
-### אחרי (עם CSS classes):
+### אחרי (עם CSS classes)
+
 ```html
 <div class="chart-unit-size-group">
     <div class="chart-unit-size-label">יחידת זמן</div>
@@ -683,21 +717,24 @@
 
 ## ✅ סיכום
 
-### בעיות שזוהו:
+### בעיות שזוהו
+
 - ✅ 165 מופעים של inline styles
 - ✅ כפתורים עם סגנונות חוזרים
 - ✅ קבוצות כפתורים עם סגנונות חוזרים
 - ✅ אין classes משותפים
 - ✅ קשה לתחזק
 
-### פתרונות מוצעים:
+### פתרונות מוצעים
+
 - ✅ יצירת CSS classes במערכת הכללית
 - ✅ שימוש ב-CSS variables
 - ✅ תמיכה ב-RTL
 - ✅ שיפור נגישות
 - ✅ responsive design
 
-### סדר עדיפויות:
+### סדר עדיפויות
+
 1. **קריטי:** יצירת CSS classes לכפתורים
 2. **חשוב:** העברת inline styles ל-classes
 3. **אופציונלי:** שיפורי עיצוב נוספים

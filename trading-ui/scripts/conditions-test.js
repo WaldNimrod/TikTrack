@@ -17,6 +17,24 @@
  * @author TikTrack Development Team
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - ConditionsTestManager.constructor() - Constructor
+// - ConditionsTestManager.init() - Init
+// - ConditionsTestManager.initializeTestPage() - Initialize Test Page
+
+// === Test Functions ===
+// - ConditionsTestManager.runAllTests() - Run All Tests
+// - ConditionsTestManager.runSpecificTest() - Run Specific Test
+// - ConditionsTestManager.validateTestResults() - Validate Test Results
+
+// === UI Functions ===
+// - ConditionsTestManager.updateTestUI() - Update Test Ui
+// - ConditionsTestManager.displayTestResults() - Display Test Results
+// - ConditionsTestManager.showTestDetails() - Show Test Details
+
 class ConditionsTestManager {
     constructor() {
         this.initialized = false;

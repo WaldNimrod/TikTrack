@@ -884,20 +884,20 @@ class EventHandlerManager {
         }
         
         // Handle button clicks with data-action
-        if (target.matches('[data-action]')) {
+        if (target && target.nodeType === Node.ELEMENT_NODE && target.matches('[data-action]')) {
             const action = target.getAttribute('data-action');
             this.executeAction(action, target, event);
         }
         
         // Handle modal triggers
-        if (target.matches('[data-modal-trigger]')) {
+        if (target && target.nodeType === Node.ELEMENT_NODE && target.matches('[data-modal-trigger]')) {
             const modalType = target.getAttribute('data-modal-trigger');
             this.openModal(modalType, target, event);
         }
         
         // Handle sortable headers - but only if they don't have onclick or data-onclick attributes
         // Elements with data-onclick are already handled above (lines 89-130)
-        if (target.matches('.sortable-header')) {
+        if (target && target.nodeType === Node.ELEMENT_NODE && target.matches('.sortable-header')) {
             // Skip if element has onclick or data-onclick attribute - let it handle itself
             if (!target.hasAttribute('onclick') && !target.hasAttribute('data-onclick')) {
                 this.handleSortableClick(target, event);
@@ -1058,7 +1058,7 @@ class EventHandlerManager {
         }
         
         // Debug logging for filter changes
-        if (target.matches('[data-filter-change]')) {
+        if (target && target.nodeType === Node.ELEMENT_NODE && target.matches('[data-filter-change]')) {
             const filterType = target.getAttribute('data-filter-change');
             this._log('debug', 'Detected filter change', {
                 component: 'handleDelegatedChange',
@@ -1071,13 +1071,13 @@ class EventHandlerManager {
         }
         
         // Handle form field changes
-        if (target.matches('[data-field-change]')) {
+        if (target && target.nodeType === Node.ELEMENT_NODE && target.matches('[data-field-change]')) {
             const fieldName = target.getAttribute('data-field-change');
             this.handleFieldChange(fieldName, target, event);
         }
         
         // Handle filter changes
-        if (target.matches('[data-filter-change]')) {
+        if (target && target.nodeType === Node.ELEMENT_NODE && target.matches('[data-filter-change]')) {
             const filterType = target.getAttribute('data-filter-change');
             this.handleFilterChange(filterType, target, event);
         }
@@ -1093,12 +1093,12 @@ class EventHandlerManager {
         const target = event.target;
         
         // Handle real-time validation
-        if (target.matches('[data-validate-on-input]')) {
+        if (target && target.nodeType === Node.ELEMENT_NODE && target.matches('[data-validate-on-input]')) {
             this.handleRealTimeValidation(target, event);
         }
         
         // Handle search inputs
-        if (target.matches('[data-search-input]')) {
+        if (target && target.nodeType === Node.ELEMENT_NODE && target.matches('[data-search-input]')) {
             this.handleSearchInput(target, event);
         }
     }
@@ -1113,7 +1113,7 @@ class EventHandlerManager {
         const target = event.target;
         
         // Handle field validation on blur
-        if (target.matches('[data-validate-on-blur]')) {
+        if (target && target.nodeType === Node.ELEMENT_NODE && target.matches('[data-validate-on-blur]')) {
             this.handleFieldValidation(target, event);
         }
     }
@@ -1864,8 +1864,16 @@ class EventHandlerManager {
      * @returns {Object} Relevant attributes object
      */
     _getRelevantAttributes(element) {
-        if (!element) return {};
+        // Guard against non-element targets (e.g., document, window, text nodes)
+        if (!element || typeof element.hasAttribute !== 'function' || typeof element.getAttribute !== 'function') {
+            return {};
+        }
         
+        // Guard: ensure element is a valid DOM Element to avoid TypeError on window/document
+        if (!element || element.nodeType !== Node.ELEMENT_NODE) {
+            return {};
+        }
+
         const relevant = {};
         const relevantAttrs = [
             'data-onclick', 'data-onchange', 'data-action', 'data-modal-trigger',
@@ -2253,7 +2261,7 @@ class EventHandlerManager {
                         // This is a simplified check - in real implementation, 
                         // we'd need to track element associations more carefully
                         return entry.element === selector || 
-                               entry.element && element.matches(entry.element);
+                               entry.element && element && element.nodeType === Node.ELEMENT_NODE && element.matches(entry.element);
                     })
                     .map(entry => ({
                         handlerKey: entry.handlerKey,

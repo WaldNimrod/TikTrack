@@ -1,4 +1,5 @@
 # דוח סטנדרטיזציה - עמודי מוקאפ
+
 # Mockups Standardization Report
 
 **תאריך:** 2025-11-27T16:54:58.557Z  
@@ -11,7 +12,8 @@
 
 ## סיכום כללי
 
-### חלוקה לפי חומרה:
+### חלוקה לפי חומרה
+
 - 🔴 **קריטי:** 12
 - 🟠 **גבוה:** 10
 - 🟡 **בינוני:** 9
@@ -26,6 +28,7 @@
 ✅ **סה"כ בעיות:** 0
 
 **סטטיסטיקות:**
+
 - Inline styles: 0 style tags, 0 inline attributes
 - CSS imports: ✅ master.css, ✅ header-styles.css
 - Header System: ✅ script, ✅ initialization
@@ -38,6 +41,7 @@
 ✅ **סה"כ בעיות:** 0
 
 **סטטיסטיקות:**
+
 - Inline styles: 0 style tags, 0 inline attributes
 - CSS imports: ✅ master.css, ✅ header-styles.css
 - Header System: ✅ script, ✅ initialization
@@ -50,6 +54,7 @@
 ✅ **סה"כ בעיות:** 0
 
 **סטטיסטיקות:**
+
 - Inline styles: 0 style tags, 0 inline attributes
 - CSS imports: ✅ master.css, ✅ header-styles.css
 - Header System: ✅ script, ✅ initialization
@@ -62,6 +67,7 @@
 ✅ **סה"כ בעיות:** 0
 
 **סטטיסטיקות:**
+
 - Inline styles: 0 style tags, 0 inline attributes
 - CSS imports: ✅ master.css, ✅ header-styles.css
 - Header System: ✅ script, ✅ initialization
@@ -74,6 +80,7 @@
 ✅ **סה"כ בעיות:** 0
 
 **סטטיסטיקות:**
+
 - Inline styles: 0 style tags, 0 inline attributes
 - CSS imports: ✅ master.css, ✅ header-styles.css
 - Header System: ✅ script, ✅ initialization
@@ -86,6 +93,7 @@
 ✅ **סה"כ בעיות:** 0
 
 **סטטיסטיקות:**
+
 - Inline styles: 0 style tags, 0 inline attributes
 - CSS imports: ✅ master.css, ✅ header-styles.css
 - Header System: ✅ script, ✅ initialization
@@ -98,6 +106,7 @@
 ✅ **סה"כ בעיות:** 0
 
 **סטטיסטיקות:**
+
 - Inline styles: 0 style tags, 0 inline attributes
 - CSS imports: ✅ master.css, ✅ header-styles.css
 - Header System: ✅ script, ✅ initialization
@@ -110,6 +119,7 @@
 ✅ **סה"כ בעיות:** 0
 
 **סטטיסטיקות:**
+
 - Inline styles: 0 style tags, 0 inline attributes
 - CSS imports: ✅ master.css, ✅ header-styles.css
 - Header System: ✅ script, ✅ initialization
@@ -129,6 +139,7 @@
   - שורה: 117
 
 **סטטיסטיקות:**
+
 - Inline styles: 0 style tags, 0 inline attributes
 - CSS imports: ✅ master.css, ✅ header-styles.css
 - Header System: ✅ script, ✅ initialization
@@ -150,6 +161,7 @@
   - שורה: 469
 
 **סטטיסטיקות:**
+
 - Inline styles: 0 style tags, 0 inline attributes
 - CSS imports: ✅ master.css, ✅ header-styles.css
 - Header System: ✅ script, ✅ initialization
@@ -175,6 +187,7 @@
   - שורה: 28
 
 **סטטיסטיקות:**
+
 - Inline styles: 0 style tags, 0 inline attributes
 - CSS imports: ✅ master.css, ✅ header-styles.css
 - Header System: ✅ script, ✅ initialization
@@ -200,6 +213,7 @@
 - 🔴 **header-system-js:** Missing header-system.js script
 
 **סטטיסטיקות:**
+
 - Inline styles: 0 style tags, 0 inline attributes
 - CSS imports: ✅ master.css, ❌ header-styles.css
 - Header System: ❌ script, ❌ initialization
@@ -225,6 +239,7 @@
 - 🔴 **header-system-js:** Missing header-system.js script
 
 **סטטיסטיקות:**
+
 - Inline styles: 0 style tags, 0 inline attributes
 - CSS imports: ✅ master.css, ❌ header-styles.css
 - Header System: ❌ script, ❌ initialization
@@ -250,6 +265,7 @@
 - 🔴 **header-system-js:** Missing header-system.js script
 
 **סטטיסטיקות:**
+
 - Inline styles: 0 style tags, 0 inline attributes
 - CSS imports: ✅ master.css, ❌ header-styles.css
 - Header System: ❌ script, ❌ initialization
@@ -262,6 +278,7 @@
 ✅ **סה"כ בעיות:** 0
 
 **סטטיסטיקות:**
+
 - Inline styles: 0 style tags, 0 inline attributes
 - CSS imports: ✅ master.css, ✅ header-styles.css
 - Header System: ✅ script, ✅ initialization

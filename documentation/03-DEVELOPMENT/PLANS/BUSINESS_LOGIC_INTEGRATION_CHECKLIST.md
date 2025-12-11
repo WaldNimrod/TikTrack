@@ -1,4 +1,5 @@
 # רשימת בדיקות אינטגרציה - Business Logic Layer
+
 # Integration Checklist - Business Logic Layer
 
 **תאריך יצירה:** 22 נובמבר 2025  
@@ -24,7 +25,7 @@
 
 ## ✅ בדיקות אינטגרציה - Data Services
 
-### לכל Data Service (trades-data.js, executions-data.js, וכו'):
+### לכל Data Service (trades-data.js, executions-data.js, וכו')
 
 - [ ] **טעינה סטטית**: Service נטען סטטית ב-HTML
 - [ ] **Package Manifest**: Service מוגדר נכון ב-`package-manifest.js`
@@ -39,9 +40,10 @@
 
 ## ✅ בדיקות אינטגרציה - Custom Initializers
 
-### לכל Custom Initializer:
+### לכל Custom Initializer
 
 - [ ] **בדיקת זמינות Data Services**:
+
   ```javascript
   if (!window.TradesData) {
     window.Logger?.warn?.('TradesData not available', { page: 'page-name' });
@@ -50,6 +52,7 @@
   ```
 
 - [ ] **בדיקת זמינות Cache System**:
+
   ```javascript
   if (!window.UnifiedCacheManager) {
     window.Logger?.warn?.('UnifiedCacheManager not available', { page: 'page-name' });
@@ -58,6 +61,7 @@
   ```
 
 - [ ] **בדיקת זמינות Preferences (אם נדרש)**:
+
   ```javascript
   // Wait for critical preferences
   await new Promise((resolve) => {
@@ -72,6 +76,7 @@
   ```
 
 - [ ] **שימוש ב-Business Logic API**:
+
   ```javascript
   try {
     const result = await window.TradesData.calculateStopPrice(100, 10, 'Long');
@@ -141,14 +146,14 @@
 
 ## ✅ בדיקות אינטגרציה - Preferences Loading Events
 
-### אם Business Logic API תלוי בהעדפות:
+### אם Business Logic API תלוי בהעדפות
 
 - [ ] **המתנה ל-event**: ממתינים ל-`preferences:critical-loaded`
 - [ ] **בדיקת flag**: בודקים `window.__preferencesCriticalLoaded`
 - [ ] **Timeout fallback**: Timeout fallback (3s dev, 5s prod)
 - [ ] **Error handling**: Error handling אם העדפות לא נטענו
 
-### אם Business Logic API לא תלוי בהעדפות:
+### אם Business Logic API לא תלוי בהעדפות
 
 - [ ] **אין תלות**: אין תלות בהעדפות
 - [ ] **עובד מיד**: עובד מיד ללא המתנה
@@ -157,7 +162,7 @@
 
 ## ✅ בדיקות אינטגרציה - Error Handling
 
-### לכל Business Logic API call:
+### לכל Business Logic API call
 
 - [ ] **Try-Catch**: כל ה-calls כוללים try-catch
 - [ ] **Error Logging**: כל ה-errors נרשמים ב-Logger
@@ -168,7 +173,7 @@
 
 ## ✅ בדיקות אינטגרציה - Performance
 
-### לכל Business Logic API call:
+### לכל Business Logic API call
 
 - [ ] **Response Time**: Response time < 200ms
 - [ ] **Cache Hit Rate**: Cache hit rate > 80%
@@ -179,7 +184,7 @@
 
 ## 📋 סיכום
 
-### לפני התחלת אינטגרציה:
+### לפני התחלת אינטגרציה
 
 1. ✅ הבנת מערכת האיתחול
 2. ✅ הבנת 5 שלבי איתחול
@@ -189,7 +194,7 @@
 6. ✅ הבנת Preferences Loading Events
 7. ✅ הבנת Cache System
 
-### במהלך אינטגרציה:
+### במהלך אינטגרציה
 
 1. ✅ בדיקת זמינות Data Services
 2. ✅ בדיקת זמינות Cache System
@@ -198,7 +203,7 @@
 5. ✅ Error handling מקיף
 6. ✅ Cache integration נכון
 
-### אחרי אינטגרציה:
+### אחרי אינטגרציה
 
 1. ✅ בדיקת כל 5 שלבי איתחול
 2. ✅ בדיקת Cache System

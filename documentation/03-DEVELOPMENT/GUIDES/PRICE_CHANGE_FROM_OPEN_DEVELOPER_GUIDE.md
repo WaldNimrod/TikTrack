@@ -10,11 +10,12 @@
 
 ---
 
-## 🎯 מה זה?
+## 🎯 מה זה
 
 מערכת זו מוסיפה חישוב והצגה של שינויי מחיר מפתיחת המסחר (09:30 ET) בנוסף לשינוי היומי הקיים (ביחס ליום הקודם).
 
 **דוגמה:**
+
 - מחיר פתיחה: $100.00
 - מחיר נוכחי: $105.50
 - שינוי מפתיחה: +$5.50 (+5.50%)
@@ -185,6 +186,7 @@ FieldRendererService.renderTickerInfo(tickerData, 'compact');
 ### 4.3 מודולי הוספה/עריכה
 
 המודולים הבאים משתמשים ב-`FieldRendererService.renderTickerInfo()`:
+
 - `trade_plans.js` - `updateEditTickerInfo()`
 - `trades.js` - `updateEditTradePriceFromTicker()`
 - `executions.js` - `displayExecutionTickerInfo()`
@@ -318,6 +320,7 @@ assert(html.includes('מפתיחה'), 'Should display change from open');
 ## 📚 קבצים רלוונטיים
 
 ### Backend
+
 - `Backend/models/external_data.py` - MarketDataQuote model
 - `Backend/services/external_data/yahoo_finance_adapter.py` - חילוץ נתונים מ-Yahoo Finance
 - `Backend/services/external_data/data_normalizer.py` - נרמול נתונים
@@ -326,6 +329,7 @@ assert(html.includes('מפתיחה'), 'Should display change from open');
 - `Backend/migrations/add_open_price_fields_to_market_data_quote.py` - Migration script
 
 ### Frontend
+
 - `trading-ui/scripts/tickers.js` - טבלת טיקרים
 - `trading-ui/scripts/services/field-renderer-service.js` - רכיב תצוגה
 - `trading-ui/scripts/entity-details-renderer.js` - מודול פרטי טיקר
@@ -334,6 +338,7 @@ assert(html.includes('מפתיחה'), 'Should display change from open');
 - `trading-ui/scripts/executions.js` - מודול ביצועים
 
 ### תיעוד
+
 - `documentation/02-ARCHITECTURE/BACKEND/PRICE_CHANGE_FROM_OPEN_ANALYSIS.md` - ניתוח מפורט
 - `documentation/03-DEVELOPMENT/GUIDES/PRICE_CHANGE_FROM_OPEN_DEVELOPER_GUIDE.md` - מדריך זה
 
@@ -344,11 +349,13 @@ assert(html.includes('מפתיחה'), 'Should display change from open');
 ### בעיה: נתונים לא מוצגים
 
 **סיבות אפשריות:**
+
 1. עדיין לא בוצע fetch חדש מ-Yahoo Finance
 2. Yahoo Finance לא החזיר `regularMarketOpen`
 3. Cache ישן
 
 **פתרון:**
+
 ```python
 # בדיקת נתונים בבסיס הנתונים
 quote = db.query(MarketDataQuote).filter(
@@ -365,6 +372,7 @@ if quote and quote.open_price is None:
 ### בעיה: חישוב שגוי
 
 **בדיקה:**
+
 ```python
 # וידוא שהחישוב נכון
 open_price = 100.00
@@ -382,6 +390,7 @@ assert abs(change_percent - quote.change_pct_from_open) < 0.01
 ## 📝 היסטוריית שינויים
 
 ### גרסה 1.0 (25 בנובמבר 2025)
+
 - ✅ הוספת שדות חדשים ל-MarketDataQuote
 - ✅ עדכון Yahoo Finance Adapter
 - ✅ עדכון Frontend להצגת שינוי מפתיחה
@@ -392,6 +401,7 @@ assert abs(change_percent - quote.change_pct_from_open) < 0.01
 ## 🤝 תמיכה
 
 לשאלות או בעיות, פנה ל:
+
 - **תיעוד ארכיטקטוני**: `documentation/02-ARCHITECTURE/BACKEND/PRICE_CHANGE_FROM_OPEN_ANALYSIS.md`
 - **צוות פיתוח**: TikTrack Development Team
 

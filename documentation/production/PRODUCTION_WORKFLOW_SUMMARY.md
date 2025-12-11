@@ -1,5 +1,7 @@
 # Production Workflow Summary
+
 # ============================
+
 # סיכום תהליכי עבודה לפרודקשן
 
 **תאריך:** נובמבר 2025  
@@ -26,6 +28,7 @@
 ## 📋 **Checklist מהיר**
 
 ### **שינוי רגיל:**
+
 - [ ] `enforce_workflow.sh` ✅
 - [ ] `pre_change_check.sh` ✅
 - [ ] גיבוי ✅
@@ -34,6 +37,7 @@
 - [ ] Commit ✅
 
 ### **מיגרציה:**
+
 - [ ] `enforce_workflow.sh` ✅
 - [ ] `pre_change_check.sh` ✅
 - [ ] `check_production_prerequisites.sh` ✅

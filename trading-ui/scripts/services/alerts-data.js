@@ -155,8 +155,7 @@
     const response = await fetch(url, { 
       method: 'GET', 
       headers: DEFAULT_HEADERS, 
-      signal,
-      credentials: 'include' // Include cookies for session-based auth
+      signal, // Include cookies for session-based auth
     });
     
     // Handle 401/308 authentication errors
@@ -165,6 +164,12 @@
     }
     
     if (!response.ok) {
+      // Soft-fail for auth/validation errors to avoid page crash
+      if (response.status === 400 || response.status === 401 || response.status === 403) {
+        const softError = new Error(`Alert load failed (${response.status})`);
+        notifyLoadError(softError.message, softError);
+        return [];
+      }
       const error = new Error(`Alert load failed (${response.status})`);
       notifyLoadError(error.message, error);
       throw error;

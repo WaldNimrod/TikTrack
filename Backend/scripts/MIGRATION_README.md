@@ -50,14 +50,17 @@ python3 Backend/scripts/migrate_to_multi_user.py
 python3 Backend/scripts/migrate_to_multi_user.py
 ```
 
-## מה המיגרציה עושה?
+## מה המיגרציה עושה
 
 ### שלב 1: גיבוי
+
 - יוצר גיבוי של בסיס הנתונים ב-`backup/multi_user_migration_YYYYMMDD_HHMMSS/`
 - הגיבוי הוא בפורמט PostgreSQL custom format (דחוס)
 
 ### שלב 2: הוספת עמודות user_id
+
 מוסיף עמודת `user_id` לטבלאות הבאות:
+
 - `trading_accounts`
 - `trades`
 - `trade_plans`
@@ -68,10 +71,12 @@ python3 Backend/scripts/migrate_to_multi_user.py
 - `import_sessions`
 
 כל עמודה כוללת:
+
 - Foreign key ל-`users.id`
 - Index לביצועים
 
 ### שלב 3: יצירת משתמש ברירת מחדל
+
 - בודק אם קיים משתמש עם `is_default = true`
 - אם לא קיים, יוצר משתמש חדש:
   - **Username**: `default_user`
@@ -79,20 +84,25 @@ python3 Backend/scripts/migrate_to_multi_user.py
   - **⚠️ חשוב**: יש לשנות את הסיסמה אחרי המיגרציה!
 
 ### שלב 4: העברת נתונים
+
 - מעביר את כל השורות עם `user_id = NULL` למשתמש ברירת מחדל
 - מבצע UPDATE לכל הטבלאות
 
 ### שלב 5: הגדרת NOT NULL
+
 - משנה את עמודת `user_id` ל-NOT NULL אחרי שהעביר את כל הנתונים
 
 ### שלב 6: יצירת טבלת user_tickers
+
 - יוצרת טבלת junction `user_tickers`
 - כוללת unique constraint על `(user_id, ticker_id)`
 
 ### שלב 7: העברת טיקרים
+
 - מוסיף את כל הטיקרים הקיימים לרשימת המשתמש ברירת מחדל
 
 ### שלב 8: אימות
+
 - בודק שהמיגרציה הצליחה
 - מדווח על בעיות אם יש
 
@@ -145,7 +155,9 @@ pg_restore -h localhost -U TikTrakDBAdmin -d TikTrack-db-development \
 ## פתרון בעיות
 
 ### שגיאה: "pg_dump: command not found"
+
 **פתרון**: התקן את PostgreSQL client tools:
+
 ```bash
 # macOS
 brew install postgresql
@@ -155,12 +167,15 @@ sudo apt-get install postgresql-client
 ```
 
 ### שגיאה: "DATABASE_URL is not configured"
+
 **פתרון**: הגדר את משתני הסביבה או השתמש ב-`start_server.sh`
 
 ### שגיאה: "Column already exists"
+
 **פתרון**: זה תקין - המיגרציה כבר רצה בעבר. הסקריפט בטוח להרצה חוזרת.
 
 ### שגיאה: "Foreign key constraint failed"
+
 **פתרון**: ודא שיש לפחות משתמש אחד במערכת לפני המיגרציה.
 
 ## הערות חשובות
@@ -173,6 +188,7 @@ sudo apt-get install postgresql-client
 ## תמיכה
 
 אם נתקלת בבעיות:
+
 1. בדוק את הלוגים בקונסול
 2. בדוק את קובץ הגיבוי
 3. ודא שהשרת לא רץ בזמן המיגרציה

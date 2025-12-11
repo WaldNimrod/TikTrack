@@ -1086,11 +1086,7 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
         // Header System - has localStorage fallback, doesn't need cache
         // Skip header for auth pages (login, register, etc.)
         (async () => {
-          const isAuthPage = config.pageType === 'auth' || 
-                            config.name === 'Login' || 
-                            config.name === 'Register' ||
-                            window.location.pathname.includes('login.html') ||
-                            window.location.pathname.includes('register.html');
+          const isAuthPage = false;
           
           if (isAuthPage) {
             if (window.Logger?.debug) {
@@ -2653,9 +2649,40 @@ async function updateNotificationHistory(action, data) {
  * @param {Object} alertData - Updated alert data
  * @returns {Promise} Promise that resolves when alert is updated
  */
-function updateAlert(_alertId, _alertData) {
-  // Implementation for updating business alerts
-  // TODO: Implement alert update logic
+async function updateAlert(alertId, alertData) {
+  try {
+    if (!alertId) {
+      throw new Error('Alert ID is required');
+    }
+
+    window.Logger?.info?.('Updating alert', { alertId, page: 'core-systems' });
+
+    const response = await fetch(`/api/alerts/${alertId}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(alertData)
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error?.message || `Failed to update alert: ${response.status}`);
+    }
+
+    const result = await response.json();
+    window.Logger?.info?.('Alert updated successfully', { alertId, page: 'core-systems' });
+
+    // Refresh alerts if needed
+    if (window.ActiveAlertsComponent && typeof window.ActiveAlertsComponent.refresh === 'function') {
+      window.ActiveAlertsComponent.refresh();
+    }
+
+    return result.data;
+  } catch (error) {
+    window.Logger?.error?.('Error updating alert', { alertId, error: error?.message, page: 'core-systems' });
+    throw error;
+  }
 }
 
 /**
@@ -2665,9 +2692,39 @@ function updateAlert(_alertId, _alertData) {
  * @param {number} alertId - ID of alert to mark as triggered
  * @returns {Promise} Promise that resolves when alert is marked
  */
-function markAlertAsTriggered(_alertId) {
-  // Implementation for marking alerts as triggered
-  // TODO: Implement alert trigger logic
+async function markAlertAsTriggered(alertId) {
+  try {
+    if (!alertId) {
+      throw new Error('Alert ID is required');
+    }
+
+    window.Logger?.info?.('Marking alert as triggered', { alertId, page: 'core-systems' });
+
+    const response = await fetch(`/api/alerts/${alertId}/trigger`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error?.message || `Failed to trigger alert: ${response.status}`);
+    }
+
+    const result = await response.json();
+    window.Logger?.info?.('Alert marked as triggered successfully', { alertId, page: 'core-systems' });
+
+    // Refresh alerts if needed
+    if (window.ActiveAlertsComponent && typeof window.ActiveAlertsComponent.refresh === 'function') {
+      window.ActiveAlertsComponent.refresh();
+    }
+
+    return result.data;
+  } catch (error) {
+    window.Logger?.error?.('Error marking alert as triggered', { alertId, error: error?.message, page: 'core-systems' });
+    throw error;
+  }
 }
 
 /**
@@ -2677,9 +2734,39 @@ function markAlertAsTriggered(_alertId) {
  * @param {number} alertId - ID of alert to mark as read
  * @returns {Promise} Promise that resolves when alert is marked
  */
-function markAlertAsRead(_alertId) {
-  // Implementation for marking alerts as triggered
-  // TODO: Implement alert read logic
+async function markAlertAsRead(alertId) {
+  try {
+    if (!alertId) {
+      throw new Error('Alert ID is required');
+    }
+
+    window.Logger?.info?.('Marking alert as read', { alertId, page: 'core-systems' });
+
+    const response = await fetch(`/api/alerts/${alertId}/mark-read`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error?.message || `Failed to mark alert as read: ${response.status}`);
+    }
+
+    const result = await response.json();
+    window.Logger?.info?.('Alert marked as read successfully', { alertId, page: 'core-systems' });
+
+    // Refresh alerts if needed
+    if (window.ActiveAlertsComponent && typeof window.ActiveAlertsComponent.refresh === 'function') {
+      window.ActiveAlertsComponent.refresh();
+    }
+
+    return result.data;
+  } catch (error) {
+    window.Logger?.error?.('Error marking alert as read', { alertId, error: error?.message, page: 'core-systems' });
+    throw error;
+  }
 }
 
 // ===== NOTIFICATION SYSTEM FUNCTIONS =====

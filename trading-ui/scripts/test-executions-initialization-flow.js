@@ -6,6 +6,26 @@
  * בודק האם העמוד ממש את מערכת האיתחול המאוחדת נכון
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - hasInitializeTradeCreation() - Hasinitializetradecreation
+
+// === Event Handlers ===
+// - logEvent() - Logevent
+// - hasDirectDOMContentLoaded() - Hasdirectdomcontentloaded
+// - hasSectionsRestoredWait() - Hassectionsrestoredwait
+// - hasMutationObserver() - Hasmutationobserver
+// - eventListenerCount() - Eventlistenercount
+// - hasExecutionsLoadedListener() - Hasexecutionsloadedlistener
+// - hasMutationObserverForTradeCreation() - Hasmutationobserverfortradecreation
+
+// === Other ===
+// - logIssue() - Logissue
+// - logDuplicate() - Logduplicate
+// - timeoutCount() - Timeoutcount
+
 (function() {
   'use strict';
 

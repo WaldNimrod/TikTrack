@@ -5,6 +5,7 @@
 This document describes the comprehensive JavaScript architecture implemented in TikTrack, featuring a **unified initialization system** with 40+ organized script files, clear separation of concerns, and a complete Chart Management System.
 
 ### 🎯 **Unified Initialization System** (Updated December 2025)
+
 - **Single Point of Entry:** One centralized initialization system (`UnifiedAppInitializer`)
 - **4-Stage Initialization:** Detect → Prepare → Execute → Finalize
 - **Package System:** 25 packages with dependency management
@@ -16,6 +17,7 @@ This document describes the comprehensive JavaScript architecture implemented in
 - **Bundling Support:** Development and production modes with bundle optimization
 
 ### 🏆 **COMPLETE: 95/95 General Systems (100%)**
+
 - **All Systems Implemented:** Every general system in the application is now fully implemented
 - **Header System Fixed:** HeaderSystem.initialize working perfectly
 - **API Issues Resolved:** All APIs working without 500 errors
@@ -27,6 +29,7 @@ This document describes the comprehensive JavaScript architecture implemented in
 ## 🎯 **Unified Initialization System**
 
 ### **📋 New Architecture Overview**
+
 The new unified initialization system replaces 111 DOMContentLoaded listeners across 66 files with a single, efficient system:
 
 | Component | Description | File |
@@ -38,6 +41,7 @@ The new unified initialization system replaces 111 DOMContentLoaded listeners ac
 | **Master Initialization** | Advanced initialization with performance monitoring | `master-initialization.js` |
 
 ### **🔄 5-Stage Initialization Process**
+
 1. **Stage 1: Core Systems** - Notification, Preferences, Storage
 2. **Stage 2: UI Systems** - Header, Filter, UI Utilities  
 3. **Stage 3: Page Systems** - Page-specific initialization
@@ -45,9 +49,11 @@ The new unified initialization system replaces 111 DOMContentLoaded listeners ac
 5. **Stage 5: Finalization** - State restoration, notifications
 
 ### **🔧 Section State Persistence System**
+
 The unified initialization system includes a comprehensive section state persistence mechanism:
 
 #### **Key Features:**
+
 - **Automatic State Saving:** Section open/close states saved to localStorage
 - **Cross-Page Persistence:** States maintained across page navigation
 - **Refresh Recovery:** States restored after page refresh
@@ -55,18 +61,21 @@ The unified initialization system includes a comprehensive section state persist
 - **Universal Coverage:** Works across all 29 main pages
 
 #### **Technical Implementation:**
+
 - **Storage Format:** `localStorage.setItem('${sectionId}SectionHidden', 'true/false')`
 - **Restoration Function:** `restoreAllSectionStates()` called in finalization stage
 - **Section Detection:** Supports both `id` and `data-section` attributes
 - **Icon Updates:** Automatic icon state updates (▲/▼)
 
 #### **Fixed Issues:**
+
 - **localStorage Format Mismatch:** Fixed boolean vs string storage inconsistency
 - **Timing Issues:** Added delay to ensure DOM readiness
 - **Missing Data Attributes:** Added `data-section="top"` to all 24 top-sections
 - **Cross-Page Consistency:** Unified state management across all pages
 
 ### **⚡ Performance Benefits**
+
 - **Before:** 111 DOMContentLoaded listeners, slow initialization
 - **After:** 10 DOMContentLoaded listeners, 2ms initialization time
 - **Improvement:** 44% reduction in listeners, 99% faster initialization
@@ -74,14 +83,16 @@ The unified initialization system includes a comprehensive section state persist
 ### **🚀 Performance Optimization (December 2025)**
 
 #### **Script Loading Strategies (async/defer)**
+
 - **async/defer Implementation:** All scripts use `defer` or `async` attributes for parallel loading
 - **Load Time Improvement:** 61% reduction (from 10.05s to 3.87s average)
-- **Loading Strategy:** 
+- **Loading Strategy:**
   - `defer` for critical scripts with dependencies (maintains execution order)
   - `async` for non-critical scripts without dependencies
 - **Configuration:** Defined in `package-manifest.js` via `loadingStrategy` attribute
 
 #### **Bundling System**
+
 - **Build System:** `scripts/build/bundle-packages.js` - Creates optimized bundles using esbuild
 - **Test System:** `scripts/build/test-bundles.js` - Validates bundle integrity
 - **Development Mode:** Individual script files (easy debugging)
@@ -93,6 +104,7 @@ The unified initialization system includes a comprehensive section state persist
   - Script Count: 80-85% reduction (from 110 to 18-25 bundles)
 
 #### **Script Loading Code Generation**
+
 - **Tool:** `trading-ui/scripts/generate-script-loading-code.js`
 - **Features:**
   - Automatic script tag generation based on `package-manifest.js`
@@ -101,6 +113,7 @@ The unified initialization system includes a comprehensive section state persist
   - Bundle support with fallback to individual files
 
 **Related Documentation:**
+
 - `documentation/02-ARCHITECTURE/FRONTEND/UNIFIED_INITIALIZATION_SYSTEM.md` - Complete initialization system documentation
 - `documentation/03-DEVELOPMENT/GUIDES/BUNDLING_SYSTEM_GUIDE.md` - Bundling system guide
 - `documentation/03-DEVELOPMENT/GUIDES/PERFORMANCE_OPTIMIZATION_GUIDE.md` - Performance optimization guide
@@ -108,6 +121,7 @@ The unified initialization system includes a comprehensive section state persist
 ## 🗂️ Global Functions Index
 
 ### 🎯 **Unified Initialization Functions**
+
 | Function | Description | File |
 |----------|-------------|------|
 | `window.initializeUnifiedApp(options)` | Main initialization entry point | `unified-app-initializer.js` |
@@ -117,18 +131,21 @@ The unified initialization system includes a comprehensive section state persist
 | `window.initializeApplication(config)` | Core application initialization | `application-initializer.js` |
 
 ### 🔍 **System Management Functions**
+
 | Function | Description | File |
 |----------|-------------|------|
 | `window.checkDependencies()` | Check system dependencies and circular references | `system-management.js` |
 | `window.copyDetailedLog()` | Copy detailed system log to clipboard | `system-management.js` |
 
 ### 🎨 **Modal Management Functions**
+
 | Function | Description | File |
 |----------|-------------|------|
 | `window.closeModal()` | Close modal dialogs | `tables.js` |
 | `window.closeModalGlobal()` | Global modal closing (alias) | `tables.js` |
 
 ### 📊 Core System Functions (`page-utils.js`)
+
 | Function | Description |
 |----------|-------------|
 | `window.initializePage(pageName)` | Initialize current page functionality |
@@ -143,6 +160,7 @@ The unified initialization system includes a comprehensive section state persist
 | `window.getPageInfo(pageName)` | Get page information |
 
 ### 🔄 Global confirm() Replacement System (NEW!)
+
 | Function | Description |
 |----------|-------------|
 | `window.confirm()` | **OVERRIDDEN** - Now shows custom styled confirmation dialog |
@@ -152,6 +170,7 @@ The unified initialization system includes a comprehensive section state persist
 | `window.overrideNativeConfirm()` | Function to override native confirm |
 
 ### 🎨 UI Utilities (`ui-utils.js`)
+
 | Function | Description |
 |----------|-------------|
 | `window.showModal(modalId)` | Show modal dialog |
@@ -185,19 +204,23 @@ The unified initialization system includes a comprehensive section state persist
 | `window.loadScriptsOnce(sources, options)` | Sequential loader that preserves order across multiple scripts |
 
 ### Lazy Script Loading Utilities
+
 The dashboard widgets use the shared script loader utilities to avoid loading heavy trade-modals on initial render.  
 `PendingExecutionTradeCreation.ensureTradeModalDependencies()` relies on `loadScriptOnce`/`loadScriptsOnce` to fetch:
+
 - Bootstrap bundle (guard rails ensure `window.bootstrap` קיים לפני קריאת `ModalManagerV2`)
 - Modal navigation & manager systems
 - Trade modal configuration (selectors, save handler)
 - Validation utilities
 
 This guarantees:
+
 - Zero redundant script tags across widgets
 - Deterministic load order before opening the trade modal
 - Clear error reporting when a dependency fails
 
 ### 📊 Data Utilities (`data-utils.js`)
+
 | Function | Description |
 |----------|-------------|
 | `window.isNumeric(value)` | Check if value is numeric |
@@ -217,6 +240,7 @@ This guarantees:
 | `window.validateDate(value, fieldName)` | Validate date field |
 
 ### ✅ Validation Utilities (`validation-utils.js`)
+
 | Function | Description |
 |----------|-------------|
 | `window.isValidDate(dateString)` | Validate date string |
@@ -242,6 +266,7 @@ This guarantees:
 | `window.clearValidation()` | Clear validation system |
 
 ### 🔔 Notification System (`notification-system.js`)
+
 | Function | Description |
 |----------|-------------|
 | `window.createAlert(alertData)` | Create new alert |
@@ -257,6 +282,7 @@ This guarantees:
 | `window.loadLinkedItemsData(itemId, itemType)` | Load linked items data |
 
 ### 🏠 Dashboard Loader (`index.js`)
+
 | Function | Description |
 |----------|-------------|
 | `window.loadDashboardData(options)` | מאחד טעינת טריידים, התראות, חשבונות ותזרימי מזומנים עם `CacheTTLGuard`/`UnifiedCacheManager`, ומעדכן את כרטיסי הדשבורד וה-Info Summary |
@@ -266,6 +292,7 @@ This guarantees:
 > **Implementation notes:** מערך הטעינה משתמש ב-`FieldRendererService` לעיצוב סכומים ותאריכים, מוודא שמזהי המטבע מתקבלים מחשבונות/טריידים, ורושם שגיאות דרך `Logger` + מערכת ההתראות המאוחדת. כך נשמרת תאימות לכללי "אין נתוני דמו" וכן לדרישות ה-Cache Stage B-Lite.
 
 ### 📋 Table System (`tables.js`)
+
 | Function | Description |
 |----------|-------------|
 | `window.sortTableData(columnIndex, data, tableType, updateFunction)` | Sort table data |
@@ -276,6 +303,7 @@ This guarantees:
 | `window.sortTable(tableType, columnIndex, dataArray, updateFunction)` | Legacy sort table |
 
 ### 🏠 Dashboard Widgets (`pending-trade-plan-widget.js`)
+
 - **תכלית:** הצגת טריידים ללא תוכנית מסחר והצעת פעולות (שיוך לתוכנית קיימת או יצירת תוכנית חדשה).
 - **תלויות:** `FieldRendererService`, `ButtonSystem`, `ModalManagerV2`, `UnifiedCacheManager`, `CacheSyncManager.invalidateByAction('trade-plan-linked')`.
 - **מקורות נתונים:**  
@@ -292,6 +320,7 @@ This guarantees:
 | `window.getDefaultColumnDefs(tableType)` | Get default column definitions |
 
 ### ⚙️ Preferences System (`preferences.js`)
+
 | Function | Description |
 |----------|-------------|
 | `window.getPreference(preferenceName)` | Get single preference |
@@ -309,6 +338,7 @@ This guarantees:
 | `window.initializePreferences()` | Initialize preferences system |
 
 ### 🎯 Preferences Page (`preferences-page.js`)
+
 | Function | Description |
 |----------|-------------|
 | `window.loadTradingAccountsForPreferences()` | Load trading accounts for preferences page |
@@ -319,6 +349,7 @@ This guarantees:
 ### 📊 Entity Service Functions
 
 #### Trading Accounts (`trading_accounts.js`)
+
 | Function | Description |
 |----------|-------------|
 | `window.loadTradingAccountsFromServer()` | Load trading accounts from server |
@@ -335,6 +366,7 @@ This guarantees:
 | `window.loadTradingAccountsDataForTradingAccountsPage()` | Load trading accounts data for trading accounts page |
 
 #### Tickers (`tickers.js`)
+
 | Function | Description |
 |----------|-------------|
 | `window.loadTickersData()` | Load tickers data |
@@ -355,6 +387,7 @@ This guarantees:
 | `window.updateTickersSummaryStats()` | Update tickers summary stats |
 
 #### Trades (`trades.js`)
+
 | Function | Description |
 |----------|-------------|
 | `window.loadTradesData()` | Load trades data |
@@ -367,6 +400,7 @@ This guarantees:
 | `window.cancelTradeFromAPI(tradeId)` | Cancel trade from API |
 
 #### Trade Plans (`trade_plans.js`)
+
 | Function | Description |
 |----------|-------------|
 | `window.loadTradePlansData()` | Load trade plans data |
@@ -379,6 +413,7 @@ This guarantees:
 | `window.cancelTradePlanFromAPI(tradePlanId)` | Cancel trade plan from API |
 
 #### Executions (`executions.js`)
+
 | Function | Description |
 |----------|-------------|
 | `window.loadExecutionsData()` | Load executions data |
@@ -398,6 +433,7 @@ This guarantees:
 | `window.validateExecutionDate(input)` | Validate execution date |
 
 #### Alerts (`alerts.js`)
+
 | Function | Description |
 |----------|-------------|
 | `window.loadAlertsData()` | Load alerts data |
@@ -411,6 +447,7 @@ This guarantees:
 | `window.validateAlertStatusCombination(status, isTriggered)` | Validate alert status combination |
 
 #### Cash Flows (`cash_flows.js`)
+
 | Function | Description |
 |----------|-------------|
 | `window.loadCashFlowsData()` | Load cash flows data |
@@ -423,6 +460,7 @@ This guarantees:
 | `window.cancelCashFlowFromAPI(cashFlowId)` | Cancel cash flow from API |
 
 #### Notes (`notes.js`)
+
 | Function | Description |
 |----------|-------------|
 | `window.loadNotesData()` | Load notes data |
@@ -437,6 +475,7 @@ This guarantees:
 ### 🔧 System Functions
 
 #### Header System (`header-system.js`) - **UNIFIED SYSTEM**
+
 | Function | Description |
 |----------|-------------|
 | `window.HeaderSystem` | Main header system class |
@@ -459,7 +498,9 @@ This guarantees:
 | `window.clearSearchFilter()` | Clear search filter |
 
 #### Related Object Filters (`related-object-filters.js`)
+
 ⚠️ **חשוב**: זהו חלק ממערכת האובייקטים המקושרים (linked-items.js)
+
 | Function | Description |
 |----------|-------------|
 | `window.filterByRelatedObjectType(type, data, updateFunction, countSelector, itemName)` | פילטר לפי סוג אובייקט מקושר |
@@ -470,6 +511,7 @@ This guarantees:
 | `window.getTradingAccountIdByName(tradingAccountName)` | Get trading account ID by name |
 
 #### Menu System (`menu.js`)
+
 | Function | Description |
 |----------|-------------|
 | `window.resetFiltersManually()` | Reset filters manually |
@@ -482,6 +524,7 @@ This guarantees:
 ### 🛠️ Utility Functions
 
 #### Translation (`translation-utils.js`)
+
 | Function | Description |
 |----------|-------------|
 | `window.translateField(value, fieldName)` | Translate field value |
@@ -493,6 +536,7 @@ This guarantees:
 | `window.formatTime(time)` | Format time |
 
 #### Date Utilities (`date-utils.js`)
+
 | Function | Description |
 |----------|-------------|
 | `window.formatDate(date)` | Format date |
@@ -504,6 +548,7 @@ This guarantees:
 | `window.getDateRange(startDate, endDate)` | Get date range |
 
 #### Page Utilities (`page-utils.js`)
+
 | Function | Description |
 |----------|-------------|
 | `window.getCurrentPageName()` | Get current page name |
@@ -513,6 +558,7 @@ This guarantees:
 | `window.getPageData()` | Get page data |
 
 #### Linked Items (`linked-items.js`)
+
 | Function | Description |
 |----------|-------------|
 | `window.showLinkedItemsModal(itemId, itemType)` | Show linked items modal |
@@ -521,6 +567,7 @@ This guarantees:
 | `window.getLinkedItemsCount(itemId, itemType)` | Get linked items count |
 
 #### Warning System (`warning-system.js`)
+
 | Function | Description |
 |----------|-------------|
 | `window.showWarningModal(title, message, callback)` | Show warning modal |
@@ -529,6 +576,7 @@ This guarantees:
 | `window.showErrorModal(title, message)` | Show error modal |
 
 #### CRUD Utilities (`crud-utils.js`)
+
 | Function | Description |
 |----------|-------------|
 | `window.createItem(itemType, itemData)` | Create new item |
@@ -541,6 +589,7 @@ This guarantees:
 ### 📊 Monitoring & Development
 
 #### Linter Monitor (`linter-realtime-monitor.js`)
+
 | Function | Description |
 |----------|-------------|
 | `window.copyUnresolvedIssuesLog()` | Copy unresolved issues log |
@@ -569,6 +618,7 @@ This guarantees:
 | `window.clearProjectFilesCache()` | Clear project files cache |
 
 #### Project Files Scanner (`project-files-scanner.js`) - **NEW**
+
 | Function | Description |
 |----------|-------------|
 | `window.getProjectFiles()` | Get all project files with caching |
@@ -592,6 +642,7 @@ This guarantees:
 | `window.calculateTotalSize()` | Calculate total size |
 
 #### Chart Management System (`chart-management.js`) - **NEW**
+
 | Function | Description |
 |----------|-------------|
 | `window.createTestChart()` | Create test chart with real data |
@@ -617,6 +668,7 @@ This guarantees:
 ### 🆕 Additional Global Systems - **NEW DISCOVERIES**
 
 #### JS-Map Utilities (`js-map-utils.js`) - **NEW**
+
 || Function | Description |
 ||----------|-------------|
 || `window.toggleAllSections()` | Toggle all JS-Map sections |
@@ -627,6 +679,7 @@ This guarantees:
 || `window.initializeErrorTracking()` | Initialize error tracking system |
 
 #### Color Scheme System (`color-scheme-system.js`) - **NEW**
+
 || Function | Description |
 ||----------|-------------|
 || `window.getEntityColor(entity)` | Get color for entity type |
@@ -637,6 +690,7 @@ This guarantees:
 || `window.applyColorScheme(scheme)` | Apply color scheme |
 
 #### System Management (`system-management.js`) - **NEW**
+
 || Function | Description |
 ||----------|-------------|
 || `window.getSystemStatus()` | Get system status |
@@ -646,6 +700,7 @@ This guarantees:
 || `window.getSystemMetrics()` | Get system metrics |
 
 #### Pagination System (`pagination-system.js`) - **NEW**
+
 || Function | Description |
 ||----------|-------------|
 || `window.initializePagination()` | Initialize pagination |
@@ -656,6 +711,7 @@ This guarantees:
 || `window.setPageSize(size)` | Set page size |
 
 #### Central Refresh System (`central-refresh-system.js`) - **NEW**
+
 || Function | Description |
 ||----------|-------------|
 || `window.refreshAllData()` | Refresh all data |
@@ -665,11 +721,13 @@ This guarantees:
 || `window.getRefreshStatus()` | Get refresh status |
 
 ## 🚨 **עדכון דחוף - 4 בספטמבר 2025**
+
 **בעיה קריטית זוהתה במערכת הנתונים החיצוניים** - הנתונים נאספים מ-Yahoo Finance API אבל לא נשמרים בבסיס הנתונים. המערכת 90% מושלמת עם בעיה אחת קריטית שצריכה פתרון.
 
 ## 🏗️ Architecture Overview
 
 ### Project Structure
+
 ```
 trading-ui/scripts/
 ├── 🏛️ Core Files
@@ -739,6 +797,7 @@ trading-ui/scripts/
 ## 📥 File Loading Order
 
 ### Standard Loading Order (All Pages)
+
 ```html
 <!-- 1. Header system -->
 <script src="scripts/header-system.js"></script>
@@ -774,33 +833,41 @@ trading-ui/scripts/
 ## 🏛️ Core Files
 
 ### page-utils.js
+
 **Purpose**: Page initialization and management
+
 - Page-specific initialization
 - State management
 - Navigation utilities
 - Filter management
 
 ### header-system.js
+
 **Purpose**: Unified header system
+
 - Navigation management
 - Filter system integration
 
 ## 🎯 Table Identification System
 
 ### Overview
+
 The TikTrack JavaScript architecture implements a sophisticated table identification system that supports both dedicated pages and unified database views. This system ensures consistent behavior across all table operations including sorting, filtering, and data management.
 
 ### System Components
 
 #### 1. **Table Mappings (`table-mappings.js`)**
+
 Centralized column mapping system for all tables.
 
 **Purpose:**
+
 - Defines column structure for each table type
 - Provides consistent field access across pages
 - Supports sorting and filtering operations
 
 **Key Functions:**
+
 ```javascript
 // Get column value for sorting/filtering
 function getColumnValue(item, columnIndex, tableType)
@@ -813,9 +880,11 @@ function isTableSupported(tableType)
 ```
 
 #### 2. **Global Table System (`tables.js`)**
+
 Universal table operations system.
 
 **Key Functions:**
+
 ```javascript
 // Universal table sorter
 window.sortTableData(columnIndex, data, tableType, updateFunction)
@@ -829,14 +898,17 @@ window.getSortState(tableType)
 ```
 
 #### 3. **Page-Specific Table Functions**
+
 Each page implements its own table identification method.
 
 ### Table Identification Methods
 
 #### **Method 1: CSS Class-Based (Specific Pages)**
+
 Used in dedicated pages like `tickers.html`, `accounts.html`, `trades.html`.
 
 **Structure:**
+
 ```html
 <div class="content-section tickers-page">
   <table class="table" id="tickersTable" data-table-type="tickers">
@@ -846,6 +918,7 @@ Used in dedicated pages like `tickers.html`, `accounts.html`, `trades.html`.
 ```
 
 **Implementation:**
+
 ```javascript
 // In tickers.js
 function sortTable(columnIndex) {
@@ -859,15 +932,18 @@ function sortTable(columnIndex) {
 ```
 
 **Characteristics:**
+
 - Container has page-specific CSS class
 - Page-specific JavaScript files contain local functions
 - Functions know table type from context
 - Single table per page
 
 #### **Method 2: Data Attribute-Based (Database Display)**
+
 Used in unified database display page (`db_display.html`).
 
 **Structure:**
+
 ```html
 <table class="table" id="tradePlansTable" data-table-type="trade_plans">
 <table class="table" id="tradesTable" data-table-type="trades">
@@ -875,6 +951,7 @@ Used in unified database display page (`db_display.html`).
 ```
 
 **Implementation:**
+
 ```javascript
 // In database.js
 function sortTable(columnIndex, tableId) {
@@ -901,6 +978,7 @@ function sortTable(columnIndex, tableId) {
 ```
 
 **Characteristics:**
+
 - Each table has `data-table-type` attribute
 - Global function handles multiple tables
 - Function determines table type dynamically
@@ -909,6 +987,7 @@ function sortTable(columnIndex, tableId) {
 ### Filter System Integration
 
 #### **Specific Pages Filtering**
+
 ```javascript
 // In simple-filter.js
 applyFiltersToTradePlansTable() {
@@ -923,6 +1002,7 @@ applyFiltersToAlertsTable() {
 ```
 
 #### **Database Display Page Filtering**
+
 ```javascript
 // In simple-filter.js
 applyFiltersToDatabaseDisplayTables() {
@@ -961,11 +1041,13 @@ applyFiltersToDatabaseDisplayTables() {
 ### Best Practices
 
 #### **1. Consistent Naming**
+
 - Use consistent table IDs: `[tableName]Table`
 - Use consistent `data-table-type` values
 - Follow naming conventions across all pages
 
 #### **2. Error Handling**
+
 ```javascript
 function sortTable(columnIndex, tableId) {
     const table = document.getElementById(tableId);
@@ -988,12 +1070,14 @@ function sortTable(columnIndex, tableId) {
 ```
 
 #### **3. Performance Optimization**
+
 - Cache table references when possible
 - Use efficient DOM queries
 - Minimize redundant table type lookups
 - Implement proper cleanup for event listeners
 
 #### **4. Maintainability**
+
 - Keep table mappings centralized
 - Use consistent data structures
 - Document table type values
@@ -1002,6 +1086,7 @@ function sortTable(columnIndex, tableId) {
 ### Integration with Other Systems
 
 #### **Header System Integration**
+
 ```javascript
 // Header system provides filter integration
 function initializeHeaderFilters() {
@@ -1013,6 +1098,7 @@ function initializeHeaderFilters() {
 ```
 
 #### **Translation System Integration**
+
 ```javascript
 // Translation system works with table data
 function translateTableData(data, tableType) {
@@ -1028,7 +1114,9 @@ function translateTableData(data, tableType) {
 ```
 
 ### console-cleanup.js
+
 **Purpose**: Console cleanup and logging
+
 - Console message filtering
 - Development logging
 - Error tracking
@@ -1036,7 +1124,9 @@ function translateTableData(data, tableType) {
 ## 🛠️ Utility Files
 
 ### ui-utils.js
+
 **Purpose**: Shared UI functions and Section Toggle System
+
 - Modal management
 - Button handling
 - Form validation
@@ -1052,35 +1142,45 @@ function translateTableData(data, tableType) {
 **Documentation**: [Section Toggle System](SECTION_TOGGLE_SYSTEM.md)
 
 ### data-utils.js
+
 **Purpose**: Shared data functions
+
 - API communication
 - Data formatting
 - Error handling
 - Data validation
 
 ### date-utils.js
+
 **Purpose**: Date functions
+
 - Date formatting
 - Date validation
 - Date calculations
 - Timezone handling
 
 ### tables.js
+
 **Purpose**: Global table system
+
 - Table initialization
 - Sorting functionality
 - Pagination
 - Data display
 
 ### translation-utils.js
+
 **Purpose**: Translation functions
+
 - Text translation
 - Field mapping
 - Language support
 - Localization
 
 ### warning-system.js
+
 **Purpose**: Central warning system
+
 - Warning display
 - Confirmation dialogs
 - Error messages
@@ -1089,35 +1189,45 @@ function translateTableData(data, tableType) {
 ## 📄 Page Files
 
 ### accounts.js
+
 **Purpose**: Account management
+
 - Account CRUD operations
 - Account validation
 - Account display
 - Account linking
 
 ### alerts.js
+
 **Purpose**: Alert management
+
 - Alert CRUD operations
 - Alert conditions
 - Alert notifications
 - Alert status management
 
 ### trades.js
+
 **Purpose**: Trade management
+
 - Trade CRUD operations
 - Trade calculations
 - Trade status management
 - Trade linking
 
 ### executions.js
+
 **Purpose**: Execution management
+
 - Execution CRUD operations
 - Execution calculations
 - Execution linking
 - Execution display
 
 ### tickers.js
+
 **Purpose**: Ticker management
+
 - Ticker CRUD operations
 - Ticker validation
 - Ticker display
@@ -1126,7 +1236,9 @@ function translateTableData(data, tableType) {
 ## 🔧 System Files
 
 ### header-system.js
+
 **Purpose**: Unified header and filter system
+
 - Navigation menu
 - Multi-select filters (status, type, account)
 - Single-select filters (date range)
@@ -1136,14 +1248,18 @@ function translateTableData(data, tableType) {
 - Table integration
 
 ### constraint-manager.js
+
 **Purpose**: Constraint manager
+
 - Database constraints
 - Validation rules
 - Constraint display
 - Constraint management
 
 ### icon-system.js & icon-mappings.js
+
 **Purpose**: Central icon management system
+
 - Unified icon system for all icons in the application
 - Support for 17 original entity icons (entities/ directory)
 - Support for Tabler Icons (5800+ free icons, MIT license)
@@ -1155,6 +1271,7 @@ function translateTableData(data, tableType) {
 **Documentation**: [ICON_SYSTEM_GUIDE.md](ICON_SYSTEM_GUIDE.md), [ICON_SYSTEM_ARCHITECTURE.md](ICON_SYSTEM_ARCHITECTURE.md)
 
 **Key Functions**:
+
 - `window.IconSystem.getIconPath(type, name)` - Get icon path
 - `window.IconSystem.renderIcon(type, name, options)` - Render icon as HTML
 - `window.IconSystem.getEntityIcon(entityType)` - Get entity icon (checks entities/ first)
@@ -1164,6 +1281,7 @@ function translateTableData(data, tableType) {
 - `window.IconSystem.getChartIcon(chartIcon)` - Get chart icon (Tabler)
 
 **Icon Types**:
+
 - Entity icons: 17 original icons (tickers, trades, trade_plans, etc.)
 - Button icons: Replaced Emojis with Tabler icons
 - Category icons: Replaced FontAwesome with Tabler icons
@@ -1173,18 +1291,23 @@ function translateTableData(data, tableType) {
 ## 🎯 Key Principles
 
 ### 1. Modularity
+
 Each file has a specific purpose and responsibility, making the system maintainable and scalable.
 
 ### 2. Separation of Concerns
+
 Clear separation between core functions, utilities, page-specific code, and system components.
 
 ### 3. Reusability
+
 Utility functions are designed to be reusable across different pages and components.
 
 ### 4. Consistency
+
 Standardized naming conventions and patterns across all files.
 
 ### 5. Performance
+
 Optimized loading order and efficient function organization.
 
 ## 📊 File Statistics
@@ -1202,6 +1325,7 @@ Optimized loading order and efficient function organization.
 ## 🎨 CSS Architecture Integration
 
 ### Small Row Cards - Generic Component
+
 The system includes a generic component for small cards displayed in rows:
 
 | **Class Name** | **Purpose** | **File Location** |
@@ -1214,6 +1338,7 @@ The system includes a generic component for small cards displayed in rows:
 **Usage**: Used in JS-Map page for statistics display and can be reused in other pages that need similar small card layouts.
 
 ### 📈 Recent Updates (January 21, 2025)
+
 - **Added:** Chart Management System - Complete implementation with 6 new files
 - **Added:** `chart-management.js` - Chart management page functionality
 - **Added:** `chart-system.js` - Core chart system with Chart.js integration
@@ -1234,18 +1359,21 @@ The system includes a generic component for small cards displayed in rows:
 ## 🔄 Maintenance Guidelines
 
 ### Adding New Files
+
 1. Identify the appropriate category
 2. Follow naming conventions
 3. Update loading order if needed
 4. Document the file purpose
 
 ### Modifying Existing Files
+
 1. Maintain the file's primary purpose
 2. Update documentation
 3. Test across related pages
 4. Ensure backward compatibility
 
 ### Removing Files
+
 1. Check for dependencies
 2. Update loading order
 3. Remove references
@@ -1262,16 +1390,19 @@ The system includes a generic component for small cards displayed in rows:
 ## 🔄 Global Table Refresh System (New in v2.9.0)
 
 ### Overview
+
 מערכת רענון טבלאות גלובלית חדשה הוטמעה ב-`ui-utils.js` לטיפול אחיד ויעיל ברענון טבלאות אחרי פעולות CRUD בכל העמודים.
 
 ### Core Functions
 
 #### `enhancedTableRefresh(loadDataFunction, updateActiveFieldsFunction, operationName, delay)`
+
 - **תפקיד**: רענון טבלה משופר עם כפיית DOM reflow
 - **פרמטרים**: פונקציית טעינת נתונים, עדכון שדות פעילים, שם פעולה, עיכוב
 - **יתרונות**: לוגים אחידים, טיפול בשגיאות, אופטימיזציה של ביצועים
 
 #### `handleApiResponseWithRefresh(response, options)`
+
 - **תפקיד**: טיפול אוטומטי בתגובות API עם רענון טבלה
 - **תכונות**:
   - טיפול אחיד בהצלחה, 404, ושגיאות
@@ -1280,10 +1411,12 @@ The system includes a generic component for small cards displayed in rows:
   - תמיכה בפונקציות callback מותאמות
 
 #### `autoRefreshCurrentPage(operationName)`
+
 - **תפקיד**: רענון אוטומטי לפי עמוד נוכחי
 - **זיהוי אוטומטי**: מזהה את העמוד הנוכחי ופונקציות הנתונים המתאימות
 
 ### Page Function Mapping
+
 ```javascript
 const pageFunctions = {
   'tickers': { loadData: loadTickersData, updateActive: updateActiveTradesField },
@@ -1297,6 +1430,7 @@ const pageFunctions = {
 ### Usage Examples
 
 **Before (50+ lines of repetitive code):**
+
 ```javascript
 if (response.ok) {
   // success handling
@@ -1314,6 +1448,7 @@ if (response.ok) {
 ```
 
 **After (10 lines with global system):**
+
 ```javascript
 const handled = await window.handleApiResponseWithRefresh(response, {
   loadDataFunction: window.loadTickersData,
@@ -1325,6 +1460,7 @@ const handled = await window.handleApiResponseWithRefresh(response, {
 ```
 
 ### Benefits
+
 1. **Code Reduction**: 80% less code in CRUD operations
 2. **Consistency**: Uniform behavior across all pages
 3. **Maintainability**: Single point of change for refresh logic
@@ -1333,6 +1469,7 @@ const handled = await window.handleApiResponseWithRefresh(response, {
 6. **Debugging**: Comprehensive logging for all operations
 
 ### Implementation Status
+
 - ✅ **Tickers Page**: Delete and reactivate functions updated
 - ⏳ **Other Pages**: Ready for migration to new system
 - ✅ **Global Functions**: All exported to window object

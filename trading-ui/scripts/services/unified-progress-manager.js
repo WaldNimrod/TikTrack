@@ -11,6 +11,19 @@
  * @author TikTrack Development Team
  */
 
+// ===== FUNCTION INDEX =====
+
+// === Class Methods ===
+// - UnifiedProgressManager.removeOverlay() - Removeoverlay
+
+// === Initialization ===
+// - UnifiedProgressManager.createOverlay() - Createoverlay
+
+// === UI Functions ===
+// - UnifiedProgressManager.showProgress() - Showprogress
+// - UnifiedProgressManager.hideProgress() - Hideprogress
+// - UnifiedProgressManager.updateProgress() - Updateprogress
+
 (function() {
     'use strict';
 

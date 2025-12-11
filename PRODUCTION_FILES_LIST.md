@@ -18,23 +18,28 @@
 
 ## Additional Files Required for Production
 
-### Core Files:
+### Core Files
+
 - ✅ `Backend/app.py` - Main server file
 - ✅ `Backend/requirements.txt` - Python dependencies
 - ✅ `start_production.sh` - **NEW** - Production startup script
 
-### Config Files:
+### Config Files
+
 - ✅ `Backend/config/preferences_defaults.json` - Default preferences
 
-### Database:
+### Database
+
 - ✅ `Backend/db/tiktrack.db` - **NEW** - Production database
 - ❌ `Backend/db/tiktrack.db` - Development only
 
-### Logs:
+### Logs
+
 - ✅ `Backend/logs-production/` - **NEW** - Production logs directory
 - ❌ `Backend/logs/` - Development only
 
-### Scripts:
+### Scripts
+
 - ✅ `Backend/scripts/backup_database.py` - Database backup utility
 - ✅ `Backend/scripts/create_production_db.py` - **NEW** - Production DB creation script
 
@@ -203,15 +208,18 @@
 
 ## Files NOT Required for Production
 
-### Tests:
+### Tests
+
 - ❌ `Backend/tests/` - All test files (28 files)
 - ❌ `Backend/test_*.py` - Test files in root (3 files)
 
-### Migrations:
+### Migrations
+
 - ❌ `Backend/migrations/` - All migration files (62 files)
 - ⚠️ **Note:** Migrations should be run manually before DB transfer if needed
 
-### Development Scripts:
+### Development Scripts
+
 - ❌ `Backend/scripts/add_*.py` - Data addition scripts
 - ❌ `Backend/scripts/migrate_*.py` - Migration scripts
 - ❌ `Backend/scripts/test_*.py` - Test scripts
@@ -224,13 +232,15 @@
 - ❌ `Backend/scripts/cleanup_*.py` - Cleanup scripts
 - ❌ `Backend/scripts/deploy.sh` - Docker deployment (not needed)
 
-### Old/Backup Files:
+### Old/Backup Files
+
 - ❌ `Backend/app.py.backup_*` - Backup files
 - ❌ `Backend/*.backup` - All backup files
 - ❌ `Backend/ARCHITECTURE_DOCUMENTATION*.html` - Old documentation
 - ❌ `Backend/create_fresh_database.py` - Development only
 
-### Other Files:
+### Other Files
+
 - ❌ `Backend/Makefile` - Not needed
 - ❌ `Backend/Dockerfile` - Not needed (unless using Docker)
 - ❌ `Backend/docker-compose.yml` - Not needed (unless using Docker)

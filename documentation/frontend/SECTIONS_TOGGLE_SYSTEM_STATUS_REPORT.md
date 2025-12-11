@@ -16,7 +16,8 @@
 | ⚠️ עמודים עם בעיות | 0 | 0% |
 | **סה"כ עמודים נבדקים** | **39** | **100%** |
 
-### סטטיסטיקות מפורטות:
+### סטטיסטיקות מפורטות
+
 - **עמודים עם סקשנים:** 39/39 (100%)
 - **עמודים עם custom toggle functions:** 0 ✅ (כולן הוסרו)
 - **עמודים עם CSS classes מפריעים:** 0 ✅ (תוקן)
@@ -25,7 +26,8 @@
 - **עמודים עם data-section attributes:** 39/39 (100%) ✅
 - **סה"כ sections עודכנו:** 128 sections ב-39 עמודים ✅
 
-### חלוקה לפי קטגוריות:
+### חלוקה לפי קטגוריות
+
 - **עמודים מרכזיים:** 11 עמודים ✅
 - **עמודים טכניים:** 8 עמודים ✅
 - **עמודי כלי פיתוח:** 9 עמודים ✅
@@ -35,7 +37,7 @@
 
 ## ✅ כל העמודים תקינים (39 עמודים)
 
-### עמודים מרכזיים (11):
+### עמודים מרכזיים (11)
 
 1. ✅ **index.html**
    - משתמש במערכת הכללית
@@ -97,7 +99,7 @@
     - ✅ **תוקן:** תוקן HTML עם class כפול (2 מקומות)
     - תקין לחלוטין
 
-### עמודים טכניים (8):
+### עמודים טכניים (8)
 
 12. ✅ **db_display.html**
     - משתמש במערכת הכללית
@@ -140,7 +142,7 @@
     - נוספו `data-section` attributes ל-5 sections
     - תקין לחלוטין
 
-### עמודי כלי פיתוח (9):
+### עמודי כלי פיתוח (9)
 
 20. ✅ **cache-management.html**
     - משתמש במערכת הכללית
@@ -187,7 +189,7 @@
     - נוספו `data-section` attributes ל-4 sections
     - תקין לחלוטין
 
-### עמודי מוקאפ (11):
+### עמודי מוקאפ (11)
 
 29. ✅ **trade-history-page.html**
     - משתמש במערכת הכללית
@@ -289,23 +291,27 @@
 
 ## 📋 סיכום לפי קטגוריה
 
-### עמודים מרכזיים (11 עמודים):
+### עמודים מרכזיים (11 עמודים)
+
 - ✅ כל העמודים תקינים
 - ✅ כל העמודים עם `data-section` attributes
 - ✅ אין custom toggle functions
 - ✅ אין manipulation של style.display
 
-### עמודים טכניים (8 עמודים):
+### עמודים טכניים (8 עמודים)
+
 - ✅ כל העמודים תקינים
 - ✅ כל העמודים עם `data-section` attributes
 - ✅ אין custom toggle functions
 
-### עמודי כלי פיתוח (9 עמודים):
+### עמודי כלי פיתוח (9 עמודים)
+
 - ✅ כל העמודים תקינים
 - ✅ כל העמודים עם `data-section` attributes
 - ✅ אין custom toggle functions
 
-### עמודי מוקאפ (11 עמודים):
+### עמודי מוקאפ (11 עמודים)
+
 - ✅ כל העמודים תקינים
 - ✅ כל העמודים עם `data-section` attributes (או אין sections כלל)
 - ✅ אין custom toggle functions
@@ -315,11 +321,13 @@
 ## 🔧 מערכת הכללית (Reference)
 
 **קבצים:**
+
 - `trading-ui/scripts/ui-utils.js` - `window.toggleSection()` ו-`window.restoreAllSectionStates()`
 - `trading-ui/scripts/modules/ui-basic.js` - `window.toggleSection()` (async version)
 - `trading-ui/scripts/page-initialization-configs.js` - קונפיגורציות ברירת מחדל
 
 **תכונות:**
+
 - ✅ שמירת מצב ב-UnifiedCacheManager
 - ✅ תמיכה ב-CSS classes (d-flex, d-block, d-none)
 - ✅ תמיכה ב-inline styles
@@ -330,6 +338,7 @@
 - ✅ תמיכה ב-lazy loading
 
 **אופן שימוש:**
+
 ```html
 <!-- ב-HTML: -->
 <div class="content-section" id="section-id" data-section="section-id">
@@ -349,7 +358,8 @@ window.toggleSection('section-id');
 
 ## ✅ דוגמאות טובות
 
-### executions.html:
+### executions.html
+
 ```html
 <div class="content-section" id="main" data-section="main">
   <div class="section-header">
@@ -359,7 +369,8 @@ window.toggleSection('section-id');
 </div>
 ```
 
-### trade-history-page.html (מוקאפ):
+### trade-history-page.html (מוקאפ)
+
 ```html
 <div class="top-section" data-section="trade-history-top-section">
   <div class="section-header">
@@ -373,14 +384,16 @@ window.toggleSection('section-id');
 
 ## 📝 רשימת קבצים שנערכו
 
-### קבצי JavaScript:
+### קבצי JavaScript
+
 1. ✅ `trading-ui/scripts/trading_accounts.js` - הוסר style.display manipulation
 2. ✅ `trading-ui/scripts/db_extradata.js` - הוסרה custom toggle function
 3. ✅ `trading-ui/scripts/notifications-center.js` - הוסרה custom toggle function
 4. ✅ `trading-ui/scripts/trade_plans.js` - הוסר export מיותר
 5. ✅ `trading-ui/scripts/page-initialization-configs.js` - עודכנה קונפיגורציה
 
-### קבצי HTML - עמודים מרכזיים וטכניים:
+### קבצי HTML - עמודים מרכזיים וטכניים
+
 1. ✅ `trading-ui/trading_accounts.html` - תוקן class כפול (3 מקומות)
 2. ✅ `trading-ui/preferences.html` - תוקן class כפול (2 מקומות)
 3. ✅ `trading-ui/trades.html` - נוסף data-section
@@ -407,7 +420,8 @@ window.toggleSection('section-id');
 24. ✅ `trading-ui/dynamic-colors-display.html` - נוספו data-section attributes (4 sections)
 25. ✅ `trading-ui/designs.html` - נוספו data-section attributes (4 sections)
 
-### קבצי HTML - עמודי מוקאפ:
+### קבצי HTML - עמודי מוקאפ
+
 26. ✅ `trading-ui/mockups/daily-snapshots/history-widget.html` - נוסף data-section
 27. ✅ `trading-ui/mockups/daily-snapshots/emotional-tracking-widget.html` - נוסף data-section
 

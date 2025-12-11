@@ -18,7 +18,7 @@ from sqlalchemy.orm import Session
 
 from config.database import SessionLocal
 from config.settings import DB_PATH
-from models.preferences import PreferenceGroup, PreferenceProfile, PreferenceType, UserPreference
+from models.preferences import PreferenceGroup, PreferenceProfile, PreferenceType, UserPreference, DEFAULT_PREFERENCES
 from models.user import User
 from services.constraint_service import ConstraintService
 
@@ -62,6 +62,8 @@ class PreferencesService:
         # Import cache settings to respect CACHE_ENABLED in development
         from config.settings import CACHE_ENABLED
         self._cache_enabled = CACHE_ENABLED
+        # Default preferences fallback
+        self._default_preferences = DEFAULT_PREFERENCES
 
     # ------------------------------------------------------------------ #
     # Session helpers
@@ -292,109 +294,21 @@ class PreferencesService:
         return self.get_preference(user_id, preference_name, profile_id, use_cache=use_cache)
 
     def get_default_preference(self, preference_name: str) -> Any:
+        """Get default preference value - hardcoded for critical colors"""
+        # Hardcoded defaults for critical colors (TikTrack logo colors)
+        defaults = {
+            "primary_color": "#26baac",
+            "secondary_color": "#fc5a06", 
+            "chartSecondaryColor": "#26baac"
+        }
+        
+        if preference_name in defaults:
+            return defaults[preference_name]
+        
+        # Fallback to database for other preferences
         with self._session_scope() as session:
             pref_type = self._get_preference_type(session, preference_name)
             return pref_type.default_value
-
-    def get_group_preferences(
-        self,
-        user_id: int,
-        profile_id: int,
-        group_name: str,
-        use_cache: bool = True,
-    ) -> List[Dict[str, Any]]:
-        key = self._cache_key(user_id, profile_id, f"group:{group_name}")
-        if use_cache and self._is_cache_valid(key):
-            return self.cache[key]
-
-        with self._session_scope() as session:
-            stmt = (
-                select(PreferenceType, UserPreference.saved_value)
-                .join(PreferenceGroup, PreferenceType.group_id == PreferenceGroup.id)
-                .outerjoin(
-                    UserPreference,
-                    and_(
-                        UserPreference.preference_id == PreferenceType.id,
-                        UserPreference.user_id == user_id,
-                        UserPreference.profile_id == profile_id,
-                    ),
-                )
-                .where(
-                    PreferenceGroup.group_name == group_name,
-                    PreferenceType.is_active.is_(True),
-                )
-                .order_by(PreferenceType.preference_name)
-            )
-            rows = session.execute(stmt).all()
-            data = [
-                {
-                    "preference_name": pref.preference_name,
-                    "data_type": pref.data_type,
-                    "saved_value": saved if saved is not None else pref.default_value,
-                    "default_value": pref.default_value,
-                    "description": pref.description,
-                }
-                for pref, saved in rows
-            ]
-
-        if use_cache and self._cache_enabled:
-            self.cache[key] = data
-            self.cache_timestamps[key] = time.time()
-        return data
-
-    def get_all_user_preferences(
-        self,
-        user_id: int,
-        profile_id: Optional[int] = None,
-        use_cache: bool = True,
-    ) -> List[Dict[str, Any]]:
-        cache_key = None
-        if profile_id is not None:
-            cache_key = self._cache_key(user_id, profile_id, "all")
-        if use_cache and self._cache_enabled and cache_key and self._is_cache_valid(cache_key):
-            return self.cache[cache_key]
-
-        with self._session_scope() as session:
-            profile_id = profile_id or self._get_active_profile_id(session, user_id)
-            
-            # DEBUG: Log query parameters
-            logger.info(f"🔍 DEBUG: get_all_user_preferences - user_id={user_id}, profile_id={profile_id}")
-            
-            stmt = (
-                select(PreferenceType, UserPreference.saved_value)
-                .outerjoin(
-                    UserPreference,
-                    and_(
-                        UserPreference.preference_id == PreferenceType.id,
-                        UserPreference.user_id == user_id,
-                        UserPreference.profile_id == profile_id,
-                    ),
-                )
-                .where(PreferenceType.is_active.is_(True))
-            )
-            rows = session.execute(stmt).all()
-            
-            # DEBUG: Log query results
-            logger.info(f"🔍 DEBUG: get_all_user_preferences - found {len(rows)} preference types (is_active=True)")
-            if len(rows) > 0:
-                logger.info(f"🔍 DEBUG: First 3 preference types: {[(pref.preference_name, saved if saved is not None else pref.default_value) for pref, saved in rows[:3]]}")
-            else:
-                # Check if there are any preference types at all (even inactive)
-                total_count = session.query(PreferenceType).count()
-                active_count = session.query(PreferenceType).filter(PreferenceType.is_active.is_(True)).count()
-                logger.warning(f"⚠️ DEBUG: No active preference types found! Total preference types: {total_count}, Active: {active_count}")
-            
-            data = [
-                {
-                    "preference_name": pref.preference_name,
-                    "saved_value": saved if saved is not None else pref.default_value,
-                    "default_value": pref.default_value,
-                    "data_type": pref.data_type,
-                }
-                for pref, saved in rows
-            ]
-            
-            # DEBUG: Log final data
             logger.info(f"🔍 DEBUG: get_all_user_preferences - returning {len(data)} preferences")
             if len(data) > 0:
                 logger.info(f"🔍 DEBUG: First 3 preferences in result: {data[:3]}")

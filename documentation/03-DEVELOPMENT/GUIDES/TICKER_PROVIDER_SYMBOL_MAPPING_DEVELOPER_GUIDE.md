@@ -323,18 +323,21 @@ except Exception as e:
 ### Mapping Not Working
 
 1. **Check if mapping exists**:
+
 ```python
 mappings = TickerSymbolMappingService.get_all_mappings(db, ticker_id)
 print(mappings)
 ```
 
 2. **Check provider ID**:
+
 ```python
 provider_id = TickerSymbolMappingService.get_provider_id_by_name(db, 'yahoo_finance')
 print(f"Provider ID: {provider_id}")
 ```
 
 3. **Check cache**:
+
 ```python
 # Clear cache and retry
 TickerSymbolMappingService.invalidate_cache_for_ticker(ticker_id)
@@ -343,6 +346,7 @@ TickerSymbolMappingService.invalidate_cache_for_ticker(ticker_id)
 ### Import Not Creating Mappings
 
 1. **Check metadata structure**:
+
 ```python
 # Ensure display_symbol is in metadata
 metadata = {
@@ -352,6 +356,7 @@ metadata = {
 ```
 
 2. **Check import orchestrator**:
+
 ```python
 # Verify _create_provider_symbol_mapping_if_needed is called
 # Check logs for mapping creation messages
@@ -360,12 +365,14 @@ metadata = {
 ### Performance Issues
 
 1. **Check cache hit rate**:
+
 ```python
 # Cache should handle most lookups
 # If performance is slow, check database indexes
 ```
 
 2. **Batch operations**:
+
 ```python
 # Use batch methods when possible
 quotes = adapter.get_quotes_batch(tickers=tickers)
@@ -422,12 +429,14 @@ Provider symbol mappings are automatically displayed in the ticker entity detail
 ```
 
 **Display Format**:
+
 - Section title: "מיפויי ספקים" (Provider Mappings)
 - Each mapping: "Provider Name: Provider Symbol"
 - Right-aligned, RTL layout
 - Consistent styling with other ticker fields
 
 **Example Display**:
+
 ```
 מיפויי ספקים
 Yahoo Finance: SP5C.MI
@@ -436,6 +445,7 @@ Yahoo Finance: SP5C.MI
 ### Rich Text Support
 
 Ticker remarks field supports rich text:
+
 - Uses `_sanitizeRichText()` for safe HTML rendering
 - Supports HTML formatting (bold, italic, lists, links)
 - Preserves line breaks

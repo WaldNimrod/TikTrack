@@ -1,4 +1,5 @@
 # מדריך יצירת בסיס נתונים פרודקשן
+
 ## Production Database Setup Guide
 
 **תאריך יצירה:** ינואר 2025  
@@ -35,11 +36,13 @@
 ## ✅ דרישות מקדימות
 
 1. **PostgreSQL Docker Container** - חייב להיות פעיל
+
    ```bash
    docker ps | grep postgres
    ```
 
 2. **Environment Variables** - מוגדרים נכון:
+
    ```bash
    export POSTGRES_HOST=localhost
    export POSTGRES_DB=TikTrack-db-production
@@ -134,18 +137,21 @@ python3 Backend/scripts/create_fresh_production_database.py --verbose
 לאחר הרצת הסקריפט, הוא בודק אוטומטית:
 
 1. **כל טבלה מתחילה מ-1**
+
    ```sql
    SELECT MIN(id) FROM <table_name>
    -- צריך להחזיר 1
    ```
 
 2. **מפתחות רציפים (ללא פערים)**
+
    ```sql
    SELECT MAX(id), COUNT(*) FROM <table_name>
    -- MAX(id) צריך להיות שווה ל-COUNT(*)
    ```
 
 3. **Sequences מאופסים**
+
    ```sql
    SELECT last_value FROM <table_name>_id_seq
    -- צריך להיות 1 או מספר המשתמשים הקיימים
@@ -168,6 +174,7 @@ python3 Backend/scripts/create_fresh_production_database.py --verbose
 ### שגיאה: "PostgreSQL container is not running"
 
 **פתרון:**
+
 ```bash
 docker-compose -f docker/docker-compose.dev.yml up -d postgres-dev
 ```
@@ -175,6 +182,7 @@ docker-compose -f docker/docker-compose.dev.yml up -d postgres-dev
 ### שגיאה: "Backup failed"
 
 **פתרון:**
+
 - בדוק שהתיקייה `archive/database_backups/` קיימת
 - בדוק הרשאות כתיבה
 - המשך ללא גיבוי (הסקריפט ימשיך עם אזהרה)
@@ -182,6 +190,7 @@ docker-compose -f docker/docker-compose.dev.yml up -d postgres-dev
 ### שגיאה: "TRUNCATE failed"
 
 **פתרון:**
+
 - בדוק שהטבלאות קיימות
 - בדוק Foreign Key constraints
 - הסקריפט ממשיך עם טבלאות אחרות
@@ -189,12 +198,14 @@ docker-compose -f docker/docker-compose.dev.yml up -d postgres-dev
 ### שגיאה: "Sequence reset failed"
 
 **פתרון:**
+
 - זה לא קריטי - הסקריפט ממשיך
 - Sequences יתוקנו אוטומטית בעת יצירת רשומות חדשות
 
 ### שגיאה: "User creation failed"
 
 **פתרון:**
+
 - בדוק שהטבלת `users` קיימת
 - בדוק שהטבלת `currencies` קיימת (נדרש ליצירת users)
 - בדוק logs לפרטים נוספים

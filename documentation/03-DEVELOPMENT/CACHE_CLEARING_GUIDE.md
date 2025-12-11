@@ -23,7 +23,8 @@
 
 מערכת ניקוי המטמון המעודכנת כוללת **4 רמות ניקוי** עם **מערכת ולידציה מקיפה** ודוחות מפורטים. המערכת מיועדת לעזור למפתחים לנקות את המטמון בצורה מדויקת בהתאם לצורך.
 
-### תכונות מרכזיות:
+### תכונות מרכזיות
+
 - ✅ **ניקוי דינמי** - זיהוי אוטומטי של כל Service Caches
 - ✅ **ולידציה מקיפה** - בדיקה אוטומטית אחרי כל ניקוי
 - ✅ **דוחות מפורטים** - מידע מלא על מה שנמחק
@@ -36,10 +37,12 @@
 ### 🟢 **Light (25% כיסוי)**
 
 **מה מנקה:**
+
 - Memory Layer - כל הנתונים הזמניים בזיכרון הדפדפן
 - Service Caches - כל המטמון של שירותים חיצוניים
 
 **מה לא נוגע:**
+
 - localStorage
 - IndexedDB
 - מטמון שרת
@@ -52,12 +55,14 @@
 ### 🔵 **Medium (60% כיסוי)**
 
 **מה מנקה:**
+
 - כל מה שב-Light
 - localStorage Layer - מפתחות `tiktrack_*` בלבד
 - IndexedDB Layer - מסד נתונים מקומי
 - Backend Layer - מטמון שרת
 
 **מה לא נוגע:**
+
 - Orphan Keys (הגדרות מחוץ למערכת המרכזית)
 
 **זמן משוער:** < 500ms
@@ -67,6 +72,7 @@
 ### 🟠 **Full (100% כיסוי)**
 
 **מה מנקה:**
+
 - כל מה שב-Medium
 - **Orphan Keys** - כל המפתחות מחוץ למערכת המרכזית:
   - **State:** `cashFlowsSectionState`, `executionsTopSectionCollapsed`
@@ -84,6 +90,7 @@
 ### ☢️ **Nuclear (150%+ כיסוי)**
 
 **מה מנקה:**
+
 - כל מה שב-Full
 - **ALL localStorage** - כולל נתונים לא של TikTrack
 - **Complete IndexedDB** - מחיקת כל המסד
@@ -98,6 +105,7 @@
 ## מתי להשתמש בכל רמה
 
 ### 🟢 **Light - ניקוי קל**
+
 ```
 ✅ שינויים בקבצי JS/CSS
 ✅ תיקוני bugs בלוגיקה  
@@ -110,6 +118,7 @@
 ---
 
 ### 🔵 **Medium - ניקוי בינוני**
+
 ```
 ✅ שינויי נתונים מהשרת
 ✅ עדכוני API responses
@@ -122,6 +131,7 @@
 ---
 
 ### 🟠 **Full - ניקוי מלא**
+
 ```
 ✅ שינויי הגדרות משתמש
 ✅ עדכוני מערכת אימות
@@ -134,6 +144,7 @@
 ---
 
 ### ☢️ **Nuclear - ניקוי גרעיני**
+
 ```
 ✅ איפוס מוחלט לפני גרסה חדשה
 ✅ שינויי תשתית מערכת
@@ -149,25 +160,30 @@
 
 המערכת כוללת ולידציה אוטומטית שאפשר להפעיל עם `validateAfter: true`.
 
-### מה הולידציה בודקת:
+### מה הולידציה בודקת
 
 #### **לכל הרמות:**
+
 - ✅ Memory Layer נוקה לחלוטין
 - ✅ Service Caches נוקו
 
 #### **Medium ומעלה:**
+
 - ✅ localStorage keys עם prefix `tiktrack_*` נוקו
 - ✅ IndexedDB entries נוקו
 - ✅ Backend cache נוקה
 
 #### **Full ומעלה:**
+
 - ✅ Orphan Keys נוקו לפי קטגוריות
 - ✅ Dynamic pattern keys נוקו
 
 #### **Nuclear בלבד:**
+
 - ✅ כמעט כל localStorage נוקה (מאפשר מפתחות דפדפן)
 
-### תוצאות ולידציה:
+### תוצאות ולידציה
+
 ```javascript
 {
   success: true/false,
@@ -183,7 +199,8 @@
 
 ## דוחות מפורטים
 
-### מבנה הדוח:
+### מבנה הדוח
+
 ```javascript
 {
   timestamp: "2025-10-15T12:00:00.000Z",
@@ -204,7 +221,8 @@
 }
 ```
 
-### העתקה ללוח:
+### העתקה ללוח
+
 ```javascript
 // זמין גלובלית
 window.copyCacheReportToClipboard(report);
@@ -214,14 +232,15 @@ window.copyCacheReportToClipboard(report);
 
 ## שימוש בממשק
 
-### בעמוד ניהול המטמון (`/system-management`):
+### בעמוד ניהול המטמון (`/system-management`)
 
 1. **בחר רמת ניקוי:** Light/Medium/Full/Nuclear
 2. **הפעל ולידציה** (אופציונלי): סמן את ה-checkbox
 3. **לחץ על כפתור** - התהליך יתחיל
 4. **קבל דוח** - הודעה מפורטת עם תוצאות
 
-### בתפריט הראשי (כפתור 🧹):
+### בתפריט הראשי (כפתור 🧹)
+
 - **ברירת מחדל:** Full level
 - **ללא ולידציה** (מהיר)
 
@@ -229,13 +248,15 @@ window.copyCacheReportToClipboard(report);
 
 ## דוגמאות קוד
 
-### ניקוי פשוט:
+### ניקוי פשוט
+
 ```javascript
 // ניקוי מהיר ללא ולידציה
 await clearAllCache({ level: 'medium' });
 ```
 
-### ניקוי עם ולידציה:
+### ניקוי עם ולידציה
+
 ```javascript
 // ניקוי עם בדיקה מקיפה
 const results = await clearAllCache({ 
@@ -246,7 +267,8 @@ const results = await clearAllCache({
 console.log('ניקוי הושלם:', results.validation.success);
 ```
 
-### ניקוי בפיתוח:
+### ניקוי בפיתוח
+
 ```javascript
 // ניקוי מהיר בפיתוח
 await clearAllCache({ 
@@ -256,7 +278,8 @@ await clearAllCache({
 });
 ```
 
-### העתקת דוח ללוח:
+### העתקת דוח ללוח
+
 ```javascript
 // אחרי ניקוי עם ולידציה
 const results = await clearAllCache({ 
@@ -273,7 +296,9 @@ await copyCacheReportToClipboard(results.detailedReport);
 ## פתרון בעיות
 
 ### בעיה: ניקוי לא עובד
+
 **פתרון:** בדוק שהמערכת מאותחלת
+
 ```javascript
 if (!window.UnifiedCacheManager?.initialized) {
   console.error('UnifiedCacheManager not initialized');
@@ -281,7 +306,9 @@ if (!window.UnifiedCacheManager?.initialized) {
 ```
 
 ### בעיה: ולידציה נכשלת
+
 **פתרון:** בדוק דוח ולידציה
+
 ```javascript
 if (results.validation && !results.validation.success) {
   console.log('בעיות:', results.validation.issues);
@@ -290,14 +317,18 @@ if (results.validation && !results.validation.success) {
 ```
 
 ### בעיה: Nuclear לא מנקה הכל
+
 **פתרון:** זה תקין - Nuclear מתיר מפתחות דפדפן בסיסיים
+
 ```javascript
 // בדיקה ידנית של localStorage
 console.log('מפתחות שנותרו:', Object.keys(localStorage));
 ```
 
 ### בעיה: דוח לא מועתק ללוח
+
 **פתרון:** בדוק הרשאות דפדפן
+
 ```javascript
 try {
   await navigator.clipboard.writeText(text);
@@ -310,17 +341,20 @@ try {
 
 ## המלצות
 
-### למפתחים:
+### למפתחים
+
 1. **השתמשו ב-Light** לשינויים תכופים
 2. **הפעילו ולידציה** בפיתוח פעיל
 3. **שמרו דוחות** לבעיות מורכבות
 
-### לייצור:
+### לייצור
+
 1. **Medium** לרוב הבעיות
 2. **Full** רק עם אישור מפיק
 3. **Nuclear** חירום בלבד
 
-### בדיקות:
+### בדיקות
+
 1. תמיד בחנו את דוח הולידציה
 2. שמרו העתקות דוחות ל-debugging
 3. בדקו זמני ביצוע לפי הציפיות

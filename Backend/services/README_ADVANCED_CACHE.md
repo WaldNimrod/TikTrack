@@ -7,26 +7,31 @@
 ## תכונות עיקריות
 
 ### 🚀 **Caching עם TTL**
+
 - **Time To Live**: כל רשומת cache כוללת זמן תפוגה
 - **Expiration אוטומטי**: רשומות פגי תוקף נמחקות אוטומטית
 - **Cleanup thread**: תהליך רקע לניקוי רשומות פגי תוקף
 
 ### 🔗 **ניהול Dependencies**
+
 - **Dependency mapping**: מעקב אחר תלויות בין רשומות cache
 - **Invalidation חכם**: ביטול cache לפי dependencies
 - **Pattern invalidation**: ביטול cache לפי תבניות (wildcards)
 
 ### 💾 **אופטימיזציה של זיכרון**
+
 - **Memory limits**: הגבלת שימוש זיכרון (ברירת מחדל: 100MB)
 - **LRU optimization**: הסרת רשומות פחות נגישות
 - **Memory monitoring**: מעקב אחר שימוש זיכרון בזמן אמת
 
 ### 📊 **ניטור ביצועים**
+
 - **Hit rate tracking**: מעקב אחר אחוז פגיעות
 - **Statistics**: סטטיסטיקות מפורטות על פעילות ה-cache
 - **Health checks**: בדיקות בריאות אוטומטיות
 
 ### 🔒 **Thread Safety**
+
 - **RLock**: שימוש ב-Reentrant Lock לפעולות בטוחות
 - **Concurrent access**: תמיכה בגישה מקבילה
 - **Atomic operations**: פעולות אטומיות על ה-cache
@@ -34,6 +39,7 @@
 ## שימוש בסיסי
 
 ### Decorator פשוט
+
 ```python
 from services.advanced_cache_service import cache_for
 
@@ -43,6 +49,7 @@ def get_all_tickers(db):
 ```
 
 ### Decorator עם Dependencies
+
 ```python
 from services.advanced_cache_service import cache_with_deps
 
@@ -52,6 +59,7 @@ def get_ticker_with_trades(ticker_id, db):
 ```
 
 ### Invalidation ידני
+
 ```python
 from services.advanced_cache_service import invalidate_cache
 
@@ -65,21 +73,25 @@ invalidate_cache('trades')
 ## API Endpoints
 
 ### סטטיסטיקות Cache
+
 ```
 GET /api/cache/stats
 ```
 
 ### בדיקת בריאות
+
 ```
 GET /api/cache/health
 ```
 
 ### ניקוי Cache
+
 ```
 POST /api/cache/clear
 ```
 
 ### Invalidation לפי Dependency
+
 ```
 POST /api/cache/invalidate
 {
@@ -88,6 +100,7 @@ POST /api/cache/invalidate
 ```
 
 ### מידע על המערכת
+
 ```
 GET /api/cache/info
 ```
@@ -95,11 +108,13 @@ GET /api/cache/info
 ## דף בדיקה
 
 דף בדיקה מלא זמין בכתובת:
+
 ```
 /cache-test
 ```
 
 הדף כולל:
+
 - הצגת סטטיסטיקות בזמן אמת
 - בדיקות בריאות
 - פעולות ניהול cache
@@ -109,6 +124,7 @@ GET /api/cache/info
 ## ארכיטקטורה
 
 ### CacheEntry
+
 ```python
 class CacheEntry:
     data: Any           # הנתונים המאוחסנים
@@ -120,6 +136,7 @@ class CacheEntry:
 ```
 
 ### AdvancedCacheService
+
 ```python
 class AdvancedCacheService:
     cache: Dict[str, CacheEntry]      # ה-cache הראשי
@@ -131,16 +148,19 @@ class AdvancedCacheService:
 ## שיקולי ביצועים
 
 ### Memory Management
+
 - **Default limit**: 100MB
 - **Cleanup interval**: 5 דקות
 - **Optimization threshold**: 80% של המקסימום
 
 ### TTL Recommendations
+
 - **High frequency data**: 60-300 שניות
 - **Medium frequency data**: 300-1800 שניות
 - **Low frequency data**: 1800+ שניות
 
 ### Dependency Strategy
+
 - **Entity-based**: `tickers`, `trades`, `accounts`
 - **Table-based**: `quotes`, `alerts`, `notes`
 - **Pattern-based**: `ticker_*`, `trade_*`
@@ -148,6 +168,7 @@ class AdvancedCacheService:
 ## דוגמאות שימוש מתקדמות
 
 ### Cache עם Multiple Dependencies
+
 ```python
 @cache_with_deps(
     ttl=1200, 
@@ -159,6 +180,7 @@ def get_portfolio_summary(user_id, db):
 ```
 
 ### Invalidation לפי Pattern
+
 ```python
 # ביטול כל ה-cache שמתחיל ב-ticker
 advanced_cache_service.invalidate_pattern('ticker_*')
@@ -168,6 +190,7 @@ advanced_cache_service.invalidate_pattern('trade_*')
 ```
 
 ### Health Monitoring
+
 ```python
 # בדיקת בריאות ה-cache
 health = cache_health_check()
@@ -183,6 +206,7 @@ if health['status'] == 'warning':
 ### בעיות נפוצות
 
 #### Memory Usage גבוה
+
 ```python
 # בדיקת שימוש זיכרון
 stats = get_cache_stats()
@@ -193,6 +217,7 @@ clear_cache()
 ```
 
 #### Hit Rate נמוך
+
 ```python
 # בדיקת סטטיסטיקות
 stats = get_cache_stats()
@@ -204,6 +229,7 @@ if stats['stats']['invalidations'] > stats['stats']['hits']:
 ```
 
 #### Performance Issues
+
 ```python
 # בדיקת בריאות
 health = cache_health_check()
@@ -217,12 +243,14 @@ print(f"Expired entries: {stats['expired_entries']}")
 ## עתיד
 
 ### תכונות מתוכננות
+
 - **Redis integration**: תמיכה ב-Redis כחלק מה-cache
 - **Distributed caching**: תמיכה ב-cache מבוזר
 - **Advanced patterns**: תבניות invalidation מתקדמות
 - **Metrics export**: ייצוא מדדים למערכות ניטור חיצוניות
 
 ### אופטימיזציות
+
 - **Compression**: דחיסת נתונים ב-cache
 - **Serialization**: שיפור יעילות שמירה
 - **Background warming**: חימום cache מראש
@@ -230,6 +258,7 @@ print(f"Expired entries: {stats['expired_entries']}")
 ## תמיכה
 
 לשאלות ובעיות:
+
 1. בדוק את הלוגים של השרת
 2. השתמש בדף הבדיקה `/cache-test`
 3. בדוק את ה-API endpoints

@@ -705,7 +705,7 @@ window.TradingViewWidgetsManager.createWidget({
 
 ## קבצים ליצירה/עדכון
 
-### קבצים חדשים:
+### קבצים חדשים
 
 1. `trading-ui/scripts/tradingview-widgets/tradingview-widgets-core.js`
 2. `trading-ui/scripts/tradingview-widgets/tradingview-widgets-config.js`
@@ -715,7 +715,7 @@ window.TradingViewWidgetsManager.createWidget({
 6. `documentation/02-ARCHITECTURE/FRONTEND/TRADINGVIEW_WIDGETS_SYSTEM.md`
 7. `documentation/02-ARCHITECTURE/FRONTEND/TRADINGVIEW_WIDGETS_DEVELOPER_GUIDE.md`
 
-### קבצים לעדכון:
+### קבצים לעדכון
 
 1. `trading-ui/scripts/init-system/package-manifest.js` - הוספת package
 2. `trading-ui/scripts/page-initialization-configs.js` - הוספת ל-pages

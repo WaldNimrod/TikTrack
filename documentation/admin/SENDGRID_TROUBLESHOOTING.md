@@ -1,4 +1,5 @@
 # פתרון בעיות SendGrid - TikTrack
+
 ## SendGrid Troubleshooting Guide
 
 **תאריך יצירה**: 28 בינואר 2025  
@@ -88,13 +89,13 @@
 
 ## 🔍 בדיקת לוגים
 
-### בדיקת לוגים במסד הנתונים:
+### בדיקת לוגים במסד הנתונים
 
 ```bash
 python3 Backend/scripts/check_smtp_password.py
 ```
 
-### בדיקת לוגים בשרת:
+### בדיקת לוגים בשרת
 
 בדוק את הלוגים ב-`Backend/logs/` עבור שגיאות SMTP.
 

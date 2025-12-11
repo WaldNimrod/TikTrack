@@ -23,6 +23,7 @@ python3 scripts/versioning/bump-version.py --help
 ## 🔄 תרחישים נפוצים ב-main
 
 1. **סיום פיתוח / Merge משמעותי ל-main**  
+
    ```bash
    git checkout main
    git pull origin main
@@ -34,6 +35,7 @@ python3 scripts/versioning/bump-version.py --help
    ```
 
 2. **Build נוסף (CI / QA)**  
+
    ```bash
    python3 scripts/versioning/bump-version.py \
      --env development \
@@ -42,6 +44,7 @@ python3 scripts/versioning/bump-version.py --help
    ```
 
 3. **קפיצת Major/Minor** (נמרוד בלבד)  
+
    ```bash
    python3 scripts/versioning/bump-version.py \
      --env development \

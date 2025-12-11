@@ -15,15 +15,18 @@
 ## סקירה כללית
 
 מערכת ראש הדף (Header System) היא מערכת מרכזית ב-TikTrack המספקת:
+
 - תפריט ניווט ראשי עם תת-תפריטים
 - מערכת פילטרים מאוחדת (סטטוס, סוג, חשבון, תאריך)
 - אינטגרציה עם מערכות טבלאות, מיון, pagination, ו-cache
 
 ### קבצים נוכחיים
+
 - `trading-ui/scripts/header-system.js` - **1429 שורות** (הופחת מ-5265 שורות - 73% הפחתה)
 - `trading-ui/styles-new/header-styles.css` - **528 שורות** (הופחת מ-654 שורות - 19% הפחתה)
 
 ### מטרת הכתיבה מחדש ✅ **הושלם**
+
 - ✅ הפחתת מורכבות מ-5265 שורות ל-1429 שורות (73% הפחתה)
 - ✅ ביטול כפילויות ולולאות קשות
 - ✅ קוד פשוט, נקי, ויעיל
@@ -36,11 +39,13 @@
 ### 1. כפילויות ב-Event Listeners
 
 **בעיה**: יש 3 מקומות שונים שמנסים לנקות event listeners:
+
 - `HeaderSystem.cleanup()` - שורות 87-243
 - `setupEventListeners()` - שורות 965-1280 (cleanup + setup)
 - `setupHoverBehavior()` - שורות 3563-4161 (cleanup + setup)
 
 **דוגמה**:
+
 ```javascript
 // ב-cleanup()
 button.removeEventListener('mouseenter', button.__hoverHandlers.mouseenter);
@@ -60,6 +65,7 @@ element.parentNode.replaceChild(clone, element);
 ### 2. לוגיקה מורכבת מאוד ב-Hover Behavior
 
 **בעיה**: הקוד ב-`setupHoverBehavior()` כולל:
+
 - 600+ שורות של לוגיקה מורכבת
 - בדיקות מרובות של `relatedTarget`, `elementFromPoint`, `getBoundingClientRect`
 - timeouts מרובים עם cleanup מורכב
@@ -67,6 +73,7 @@ element.parentNode.replaceChild(clone, element);
 - global mouse move listener מורכב
 
 **דוגמה**:
+
 ```javascript
 // שורה 3865-4010 - mouseleave handler מורכב מאוד
 const mouseleaveHandler = (e) => {
@@ -84,12 +91,14 @@ const mouseleaveHandler = (e) => {
 ### 3. מערכת Portals מורכבת מדי
 
 **בעיה**: מערכת portals כוללת:
+
 - יצירת clone של התפריט המקורי
 - positioning מורכב עם scroll/resize listeners
 - event listeners כפולים (מקורי + portal)
 - cleanup מורכב
 
 **דוגמה**:
+
 ```javascript
 // שורה 2922-3010 - openFilterMenuPortal
 function openFilterMenuPortal(originalMenuEl, anchorBtn, kind) {
@@ -110,12 +119,14 @@ function openFilterMenuPortal(originalMenuEl, anchorBtn, kind) {
 ### 4. Tracking System מורכב מדי
 
 **בעיה**: מערכת tracking כוללת:
+
 - Maps מרובים (calls, timestamps, callCounts)
 - Stack traces לכל קריאה
 - בדיקות של rapid duplicates
 - פונקציות debug מורכבות
 
 **דוגמה**:
+
 ```javascript
 // שורה 2787-2920 - trackMenuOpen
 function trackMenuOpen(functionName, menuId, details = {}) {
@@ -141,6 +152,7 @@ function trackMenuOpen(functionName, menuId, details = {}) {
 ### תפריט ראשי (Navigation Menu)
 
 #### פריטי תפריט
+
 1. **בית** - `/` - ללא תת-תפריט
 2. **תכנון** - `/trade_plans` - ללא תת-תפריט
 3. **מעקב** - `/trades` - ללא תת-תפריט
@@ -160,6 +172,7 @@ function trackMenuOpen(functionName, menuId, details = {}) {
    - ייבוא/ייצוא
 
 #### התנהגות Hover
+
 - **פתיחה**: כאשר העכבר נכנס לפריט עם תת-תפריט, התת-תפריט נפתח אוטומטית
 - **סגירה**: כאשר העכבר יוצא מהפריט והתת-תפריט, התת-תפריט נסגר אוטומטית
 - **עיכוב**: 150ms לפתיחה, 200ms לסגירה
@@ -169,6 +182,7 @@ function trackMenuOpen(functionName, menuId, details = {}) {
 ### מערכת פילטרים (Filter System)
 
 #### פילטרים זמינים
+
 1. **פילטר סטטוס** (`statusFilterMenu`)
    - ערכים: "הכול", "פתוח", "סגור", "מבוטל"
    - multi-select
@@ -189,6 +203,7 @@ function trackMenuOpen(functionName, menuId, details = {}) {
    - single-select
 
 #### התנהגות Hover
+
 - **פתיחה**: כאשר העכבר נכנס לכפתור הפילטר, התפריט נפתח אוטומטית
 - **סגירה**: כאשר העכבר יוצא מהכפתור והתפריט, התפריט נסגר אוטומטית
 - **עיכוב**: 150ms לפתיחה, 220ms לסגירה
@@ -197,27 +212,32 @@ function trackMenuOpen(functionName, menuId, details = {}) {
 - **כפתור סגירה**: כל פילטר כולל כפתור סגירה עגול, קטן, בצבע משני, ממוקם במרכז על קו התחתון של הפילטר
 
 #### עדכון טקסט
+
 - כל פילטר מציג את הערכים הנבחרים בכפתור
 - אם נבחר "הכול" או אין בחירה, מציג "הכול" / "כל זמן"
 - אם נבחרו מספר ערכים, מציג את מספר הערכים או את הערכים
 
 #### יישום פילטרים
+
 - בחירת ערך בפילטר מפעילה אוטומטית את הפילטרים על הטבלאות
 - אינטגרציה עם `UnifiedTableSystem.filter.apply()`
 - עדכון `TableDataRegistry` עם filteredData
 - עדכון pagination עם filteredData
 
 #### שמירת מצב
+
 - שמירת מצב פילטרים ב-`UnifiedCacheManager` או `PageStateManager`
 - טעינת מצב שמור בעת טעינת העמוד
 - fallback ל-localStorage אם Cache לא זמין
 
 #### שדה חיפוש
+
 - שדה חיפוש חופשי עם רוחב מקסימלי של **150px** (הופחת מ-300px ב-50%)
 - כפתור ניקוי חיפוש מובנה
 - אינטגרציה עם מערכת הפילטרים
 
 #### כפתור Toggle פילטרים
+
 - כפתור toggle משני ממוקם על קו סוף אזור הפילטר
 - עיצוב: עגול, צבע משני, קטן ב-50% מהגודל המקורי
 - ממורכז למרכז העמוד
@@ -293,6 +313,7 @@ MenuManager (Class)
 ### Global Functions (שמירה על תאימות)
 
 #### Filter Functions
+
 ```javascript
 // Selection functions
 window.selectStatusOption(status)
@@ -317,6 +338,7 @@ window.toggleHeaderFilters()
 ```
 
 #### Header System API
+
 ```javascript
 // Initialize
 window.HeaderSystem.initialize()
@@ -333,29 +355,35 @@ window.filterSystem
 ## אינטגרציות
 
 ### Core Systems
+
 - **קובץ**: `trading-ui/scripts/modules/core-systems.js`
 - **פונקציה**: `initializeHeaderSystem()`
 - **דרישה**: קריאה ל-`window.HeaderSystem.initialize()`
 
 ### Unified Initialization
+
 - **קובץ**: `trading-ui/scripts/unified-app-initializer.js`
 - **דרישה**: תמיכה ב-UnifiedInitializationSystem
 
 ### Unified Table System
+
 - **קובץ**: `trading-ui/scripts/unified-table-system.js`
 - **פונקציה**: `UnifiedTableSystem.filter.apply(tableType, context)`
 - **דרישה**: יישום פילטרים דרך UnifiedTableSystem
 
 ### Pagination System
+
 - **קובץ**: `trading-ui/scripts/pagination-system.js`
 - **פונקציות**: `setData()`, `filter()`
 - **דרישה**: עדכון pagination עם filteredData
 
 ### Cache System
+
 - **קובץ**: `trading-ui/scripts/unified-cache-manager.js`
 - **דרישה**: שמירת מצב פילטרים ב-cache
 
 ### TableDataRegistry
+
 - **קובץ**: `trading-ui/scripts/table-data-registry.js`
 - **פונקציה**: `setFilteredData()`
 - **דרישה**: עדכון registry עם filteredData
@@ -444,10 +472,12 @@ window.filterSystem
 ### שיפורי עיצוב ותפקוד
 
 #### 1. יישור תפריט
+
 - **שינוי**: התפריט הראשי מיושר כעת לתחילת השורה (ימין ב-RTL)
 - **יישום**: `justify-content: flex-start` ב-`.header-nav` ו-`.main-nav`
 
 #### 2. כפתור סגירה לפילטרים
+
 - **תכונה חדשה**: כל פילטר כולל כפתור סגירה
 - **עיצוב**:
   - עגול (`border-radius: 50%`)
@@ -457,12 +487,14 @@ window.filterSystem
 - **מיקום**: `position: absolute; bottom: 0.5rem; left: 50%; transform: translateX(-50%)`
 
 #### 3. התנהגות מולטיסלקט
+
 - **שינוי**: פילטרים עם מולטיסלקט (סטטוס, סוג, חשבון) לא נסגרים אחרי בחירה
 - **יתרון**: מאפשר בחירה מרובה של ערכים ללא צורך לפתוח את הפילטר שוב
 - **סגירה**: הפילטר נסגר רק ביציאת העכבר מהפילטר
 - **יוצא מן הכלל**: פילטר תאריך (single-select) נסגר אחרי בחירה
 
 #### 4. כפתור Toggle משני
+
 - **שינוי**: כפתור toggle ראשי הוסר, רק המשני נשאר
 - **עיצוב**:
   - עגול (`border-radius: 50%`)
@@ -473,6 +505,7 @@ window.filterSystem
 - **תיקון חשוב**: הכפתור תמיד גלוי גם כשהפילטר סגור, כדי לאפשר פתיחה מחדש
 
 #### 5. הקטנת שדה חיפוש
+
 - **שינוי**: רוחב מקסימלי של שדה החיפוש הופחת מ-300px ל-150px (50% הפחתה)
 
 ### סטטיסטיקות סופיות
@@ -486,6 +519,7 @@ window.filterSystem
 ### בדיקות
 
 כל הפונקציונליות נבדקה בהצלחה:
+
 - ✅ תפריט ראשי - פתיחה, סגירה, hover
 - ✅ פילטרים - פתיחה, סגירה, בחירה, מולטיסלקט
 - ✅ אינטגרציה - Core Systems, Tables, Cache, Pagination

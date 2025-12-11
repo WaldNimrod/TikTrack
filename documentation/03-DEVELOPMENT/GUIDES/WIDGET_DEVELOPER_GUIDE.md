@@ -65,12 +65,14 @@
 ### Module Pattern (IIFE) - **מומלץ**
 
 **יתרונות:**
+
 - ✅ פשוט וישיר
 - ✅ תואם לווידג'טים הקיימים
 - ✅ קל לתחזוקה
 - ✅ ללא overhead של Class
 
 **דוגמה:**
+
 ```javascript
 ;(function () {
   'use strict';
@@ -462,6 +464,7 @@ function applyHeightConfiguration() {
 ### 1. שימוש במערכות כלליות
 
 **✅ טוב:**
+
 ```javascript
 // השתמש ב-FieldRendererService
 const formattedAmount = window.FieldRendererService?.renderAmount(value, currency);
@@ -477,6 +480,7 @@ window.NotificationSystem?.showError?.('Error message');
 ```
 
 **❌ רע:**
+
 ```javascript
 // אל תכתוב פונקציות עיצוב מקומיות
 function formatAmount(value) {
@@ -487,6 +491,7 @@ function formatAmount(value) {
 ### 2. ניהול State
 
 **✅ טוב:**
+
 ```javascript
 const state = {
   initialized: false,
@@ -496,6 +501,7 @@ const state = {
 ```
 
 **❌ רע:**
+
 ```javascript
 // אל תשתמש ב-globals
 window.myWidgetData = null; // Bad
@@ -504,6 +510,7 @@ window.myWidgetData = null; // Bad
 ### 3. Cache DOM Elements
 
 **✅ טוב:**
+
 ```javascript
 const elements = {
   container: null,
@@ -518,6 +525,7 @@ function cacheElements() {
 ```
 
 **❌ רע:**
+
 ```javascript
 // אל תחפש אלמנטים בכל פעם
 function render() {
@@ -528,6 +536,7 @@ function render() {
 ### 4. Error Handling
 
 **✅ טוב:**
+
 ```javascript
 try {
   const data = await fetchData();
@@ -541,6 +550,7 @@ try {
 ### 5. Documentation
 
 **✅ טוב:**
+
 ```javascript
 /**
  * Widget description
@@ -562,6 +572,7 @@ try {
 **קובץ:** `trading-ui/scripts/widgets/recent-trades-widget.js`
 
 **מאפיינים:**
+
 - Module Pattern (IIFE)
 - שימוש ב-FieldRendererService
 - פשוט וישיר
@@ -571,6 +582,7 @@ try {
 **קובץ:** `trading-ui/scripts/widgets/tag-widget.js`
 
 **מאפיינים:**
+
 - Module Pattern (IIFE)
 - Bootstrap Tabs (2 טאבים)
 - API לשילוב בעמודים נוספים
@@ -583,6 +595,7 @@ try {
 **קובץ:** `trading-ui/scripts/history-widget.js`
 
 **מאפיינים:**
+
 - Bootstrap Tabs פנימיים
 - גרפים (TradingView)
 - State management מתקדם

@@ -1,4 +1,5 @@
 # דוח מצב בדיקות - TikTrack
+
 ## Test Status Report
 
 **תאריך:** 2025-11-14  
@@ -36,6 +37,7 @@
 > 💡 **TIP:** לכל שינוי שמשפיע על העדפות (UI או API) חובה להריץ גם את שני הסטים לעיל ולציין את הפקודות בדוח ה-PR.
 
 ### הפריטים שנותרו לטיפול
+
 | תחום | סטטוס נוכחי | הערות |
 | --- | --- | --- |
 | Code Coverage | ✅ Statements 90.47%, Lines 92.07% (יעד ≥90% הושג) | כל מערכות הטבלאות, value adapters ו־trades/performance adapters מכוסות; חריגי `tag-events.js` ו-`tag-service.js` נשארו כרשימת מעקב (תחת טיפול). |
@@ -43,6 +45,7 @@
 | ESLint (`npm run check:all`) | ⚠️ עדיין נכשל | 81,413 שגיאות ו־4,801 אזהרות – מטופל בשלבי הריפקטורינג הבאים. |
 
 ## 🔍 תוצאות מדידה עדכניות (נובמבר 2025)
+
 - `npm run test -- --coverage --runInBand` (5.50 שניות)  
   - ✅ 66 סוויטות, 762 טסטים, 0 דילוגים  
   - כיסוי: Statements 90.47%, Branches 66.69%, Functions 93.05%, Lines 92.07%.
@@ -62,6 +65,7 @@
 > הפרק הבא משאיר את הדוח הקודם להקשר בלבד. נתוני ההצלחה שם אינם משקפים את המצב הנוכחי ויעודכנו מחדש בסוף תהליך הריפקטורינג.
 
 ### תוצאות הבדיקות (ינואר 2025)
+
 ```
 Test Suites: 31+ passed (עם Integration ו-Backend)
 Tests:       220+ passed (72 טסטים חדשים נוספו)
@@ -71,6 +75,7 @@ Success Rate: 100.00%
 ```
 
 ### סטטיסטיקות (היסטורי)
+
 - ✅ **31+ Test Suites** - Unit Tests
 - ✅ **5 Integration Test Suites** - חדש
 - ✅ **17 Backend Test Suites** - חדש (Routes + Services + Models)
@@ -85,6 +90,7 @@ Success Rate: 100.00%
 ## 🎯 כיסוי מערכות
 
 ### מערכות Core (חבילת בסיס) - ✅ 8/8
+
 | מערכת | קובץ טסט | סטטוס |
 | --- | --- | --- |
 | Unified Initialization System | `unified-app-initializer.test.js` | ✅ 2 טסטים |
@@ -97,6 +103,7 @@ Success Rate: 100.00%
 | Event Handler Manager | `event-handler-manager.test.js` | ✅ 9 טסטים |
 
 ### מערכות CRUD ונתונים - ✅ 7/7
+
 | מערכת | קובץ טסט | סטטוס |
 | --- | --- | --- |
 | Data Collection Service | `data-collection-service.test.js` | ✅ 2 טסטים |
@@ -108,6 +115,7 @@ Success Rate: 100.00%
 | Alert Condition Renderer | `alert-condition-renderer.test.js` | ✅ 2 טסטים |
 
 ### מערכות תצוגה ו-UI - ✅ 7/7
+
 | מערכת | קובץ טסט | סטטוס |
 | --- | --- | --- |
 | Header & Filters System | `header-system.test.js` | ✅ 2 טסטים |
@@ -119,6 +127,7 @@ Success Rate: 100.00%
 | Table System | `table-system.test.js` | ✅ 7 טסטים |
 
 ### מערכות התראות, לוגים ומעקב - ✅ 3/3
+
 | מערכת | קובץ טסט | סטטוס |
 | --- | --- | --- |
 | Logger Service | `logger-service.test.js` | ✅ 5 טסטים |
@@ -126,6 +135,7 @@ Success Rate: 100.00%
 | Notification Category Detector | `notification-category-detector.test.js` | ✅ 2 טסטים |
 
 ### מערכות מטמון, ביצועים וסנכרון - ✅ 4/4
+
 | מערכת | קובץ טסט | סטטוס |
 | --- | --- | --- |
 | Unified Cache Manager | `unified-cache-manager.test.js` | ✅ 2 טסטים |
@@ -134,6 +144,7 @@ Success Rate: 100.00%
 | LocalStorage Events Sync | `localstorage-sync.test.js` | ✅ 1 טסט |
 
 ### מערכות נוספות - ✅ 3/3
+
 | מערכת | קובץ טסט | סטטוס |
 | --- | --- | --- |
 | Chart System | `chart-system.test.js` | ✅ 3 טסטים |
@@ -144,6 +155,7 @@ Success Rate: 100.00%
 ## 🆕 הוספות חדשות
 
 ### Integration Tests (5 קבצים חדשים)
+
 - ✅ `modal-systems-integration.test.js` - אינטגרציה בין Modal Manager + Modal Navigation + Entity Details
 - ✅ `notification-cache-integration.test.js` - אינטגרציה בין Notification System + Cache Manager
 - ✅ `crud-flow-integration.test.js` - אינטגרציה של זרימת CRUD מלאה
@@ -151,6 +163,7 @@ Success Rate: 100.00%
 - ✅ `initialization-flow-integration.test.js` - אינטגרציה של זרימת אתחול מלאה
 
 ### Backend Route Tests (8 קבצים חדשים)
+
 - ✅ `test_trades_routes.py` - בדיקות Routes של Trades
 - ✅ `test_alerts_routes.py` - בדיקות Routes של Alerts
 - ✅ `test_trading_accounts_routes.py` - בדיקות Routes של Trading Accounts
@@ -161,6 +174,7 @@ Success Rate: 100.00%
 - ✅ `test_entity_details_routes.py` - בדיקות Routes של Entity Details
 
 ### Backend Service Tests (6 קבצים חדשים)
+
 - ✅ `test_trade_service.py` - בדיקות Trade Service
 - ✅ `test_alert_service.py` - בדיקות Alert Service
 - ✅ `test_preferences_service.py` - בדיקות Preferences Service
@@ -169,11 +183,13 @@ Success Rate: 100.00%
 - ✅ `test_position_calculator_service.py` - בדיקות Position Calculator Service
 
 ### Backend Model Tests (3 קבצים חדשים)
+
 - ✅ `test_trade_model.py` - בדיקות Trade Model
 - ✅ `test_alert_model.py` - בדיקות Alert Model
 - ✅ `test_preferences_model.py` - בדיקות Preferences Model
 
 ### E2E Tests (5 קבצים חדשים/מעודכנים)
+
 - ✅ `cash_flows.test.js` - בדיקות עמוד Cash Flows
 - ✅ `notes.test.js` - בדיקות עמוד Notes
 - ✅ `trading_accounts.test.js` - בדיקות עמוד Trading Accounts
@@ -181,6 +197,7 @@ Success Rate: 100.00%
 - ✅ `preferences-flow.test.js` - בדיקות זרימת העדפות
 
 ### Edge Cases & Error Handling (80+ טסטים חדשים)
+
 - ✅ `notification-system.test.js` - 20+ טסטים חדשים
 - ✅ `cache-sync-manager.test.js` - 10+ טסטים חדשים
 - ✅ `event-handler-manager.test.js` - 8+ טסטים חדשים
@@ -195,6 +212,7 @@ Success Rate: 100.00%
 ## 📁 מבנה קבצי הבדיקות
 
 ### קבצי טסט Unit (31 קבצים)
+
 ```
 tests/unit/
 ├── alert-condition-renderer.test.js
@@ -231,6 +249,7 @@ tests/unit/
 ```
 
 ### קבצי עזר (3 קבצים)
+
 ```
 tests/utils/
 ├── mock-helpers.js          # Mock functions משותפים
@@ -243,7 +262,9 @@ tests/utils/
 ## 🔧 תשתית הבדיקות
 
 ### מערכת טעינה לטסטים (`test-loader.js`)
+
 ✅ **מכבדת את סדר הטעינה האמיתי:**
+
 - Stage 1: Standalone Core (notification-system, ui-utils, וכו')
 - Stage 2: Core Modules (8 מודולים מאוחדים)
 - Stage 3: Core Utilities (global-favicon, page-utils, header-system)
@@ -256,7 +277,9 @@ tests/utils/
 - Stage 10: Initializer
 
 ### Mock Helpers (`mock-helpers.js`)
+
 ✅ **פונקציות Mock משותפות:**
+
 - `createMockElement()` - יצירת אלמנטים DOM
 - `createMockEvent()` - יצירת אירועים
 - `createMockFetch()` - Mocking fetch API
@@ -265,7 +288,9 @@ tests/utils/
 - `createMockTimer()` - Mocking timers
 
 ### Test Fixtures (`test-fixtures.js`)
+
 ✅ **נתוני בדיקה משותפים:**
+
 - `createMockTrade()` - נתוני trade לדוגמה
 - `createMockAccount()` - נתוני account לדוגמה
 - `createMockAlert()` - נתוני alert לדוגמה
@@ -277,6 +302,7 @@ tests/utils/
 ## 📈 Code Coverage
 
 ### סטטוס נוכחי
+
 ```
 File                                         | % Stmts | % Branch | % Funcs | % Lines |
 ---------------------------------------------|---------|----------|---------|---------|
@@ -294,6 +320,7 @@ scripts/services/tag-service.js              |   79.10 |    43.31 |   90.62 |   
 ```
 
 ### Adapter Gap Scan (נובמבר 2025)
+
 | Adapter | קובץ | כיסוי Statements | סטטוס |
 | --- | --- | --- | --- |
 | Table Sort Value Adapter | `trading-ui/scripts/services/table-sort-value-adapter.js` | ‎94.44‎% | ✅ מטופל – טסטים חדשים (`table-sort-value-adapter.test.js`) מכסים כל מסלול. |
@@ -302,11 +329,13 @@ scripts/services/tag-service.js              |   79.10 |    43.31 |   90.62 |   
 | Tag Service (acts as Tag Adapter) | `trading-ui/scripts/services/tag-service.js` | ‎79.10‎% | ⚠️ משלים התנהגות CRUD/analytics – סומן לרמת כיסוי ≥90% בגל הבא. |
 
 ### הערות חשובות
+
 - **Phase 1:** תשתית + 40% threshold – הושלם.  
 - **Phase 2 (עכשיו):** חיזוק מערכות הליבה (button/color/tag) מעל 90% – בוצע, אך קבצי legacy ללא טסטים ממשיכים למשוך את הממוצע.  
 - **המשך:** להוסיף טסטים ייעודיים ל־`table-mappings.js`, `tables.js`, value adapters ולנקות `no-console` על מנת להגיע ליעד ≥90%.
 
 **גורמי ההתקדמות:**
+
 - הוספת טסטים לכל תרחישי ה-CRUD, cache invalidation ו-analytics של Tag Service תוך שימוש במערכות הכלליות.
 - תיקון `CACHE_KEYS.analytics` במערכת הכללית כדי למנוע `undefined` ולשמר invalidation מאוחד.
 - שימוש עקבי ב־`test-loader.js` וב-mock המאוחד כדי לשמור על תאימות לכלל המערכות.
@@ -316,6 +345,7 @@ scripts/services/tag-service.js              |   79.10 |    43.31 |   90.62 |   
 ## ✅ הישגים
 
 ### מה הושג
+
 1. ✅ **תשתית בדיקות מלאה** - כל המערכות מכוסות בטסטים בסיסיים
 2. ✅ **מערכת טעינה לטסטים** - מכבדת את סדר הטעינה האמיתי
 3. ✅ **Mock Helpers משותפים** - קוד משותף לכל הטסטים
@@ -325,6 +355,7 @@ scripts/services/tag-service.js              |   79.10 |    43.31 |   90.62 |   
 7. ✅ **ניקוי טסטים כפולים** - `chart-system.test.js` הוסר (תכולה מכוסה באינטגרציה), `cache-logger-integration.test.js` עודכן לפעילות מלאה
 
 ### מה עוד צריך
+
 1. ⏳ **הרחבת טסטים קיימים** - Edge Cases ו-Error Handling
 2. ⏳ **יצירת טסטי Backend** - routes/services/models
 3. ⏳ **יצירת טסטי Integration** - אינטגרציה בין מערכות
@@ -335,15 +366,18 @@ scripts/services/tag-service.js              |   79.10 |    43.31 |   90.62 |   
 ## 🎯 המלצות להמשך
 
 ### עדיפות גבוהה
+
 1. **הרחבת טסטים קיימים** - הוספת Edge Cases ו-Error Handling
 2. **יצירת טסטי Integration** - בדיקת אינטגרציה בין מערכות
 3. **יצירת טסטי Backend** - בדיקת routes/services/models
 
 ### עדיפות בינונית
+
 4. **הגדלת Code Coverage** - מעבר מ-0% ל-40%+
 5. **יצירת טסטי E2E** - בדיקות end-to-end
 
 ### עדיפות נמוכה
+
 6. **אופטימיזציה של ביצועים** - הקטנת זמן ביצוע הטסטים
 7. **יצירת טסטי Performance** - בדיקת ביצועים
 
@@ -352,12 +386,14 @@ scripts/services/tag-service.js              |   79.10 |    43.31 |   90.62 |   
 ## 📝 הערות טכניות
 
 ### בעיות שזוהו וטופלו
+
 1. ✅ **בעיות Mock Implementation** - תוקן עם `jest.spyOn`
 2. ✅ **בעיות window.location** - תוקן עם הגדרה נכונה לפני טעינת קוד
 3. ✅ **פונקציות לא מוגדרות** - תוקן עם עדכון טסטים ל-API האמיתי
 4. ✅ **תלויות חסרות** - תוקן עם מערכת טעינה לטסטים
 
 ### בעיות ידועות
+
 - ⚠️ **Code Coverage 0%** - זה נורמלי בשלב הראשון, יגדל עם הרחבת הטסטים
 - ⚠️ **זמן ביצוע** - ~3.7 שניות, יכול להיות מהיר יותר עם אופטימיזציה
 

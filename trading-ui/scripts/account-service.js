@@ -135,7 +135,7 @@ async function getAccountsByStatus(status) {
 async function cancelAccount(accountId) {
   // ביטול חשבון מסחר
 
-  const response = await fetch(`/api/accounts/${accountId}`, {
+  const response = await fetch(`/api/trading-accounts/${accountId}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ status: 'cancelled' }),
@@ -167,7 +167,7 @@ async function cancelAccount(accountId) {
 async function reactivateAccount(accountId) {
   // הפעלה מחדש של חשבון מסחר
 
-  const response = await fetch(`/api/accounts/${accountId}`, {
+  const response = await fetch(`/api/trading-accounts/${accountId}`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ status: 'open' }),
@@ -198,7 +198,7 @@ async function reactivateAccount(accountId) {
  */
 async function getAccountById(accountId) {
   try {
-    const response = await fetch(`/api/accounts/${accountId}`);
+    const response = await fetch(`/api/trading-accounts/${accountId}`);
     if (response.ok) {
       const data = await response.json();
       return data.data || data;

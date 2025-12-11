@@ -1,4 +1,5 @@
 # מדריך הגדרת Mailjet - TikTrack
+
 ## Mailjet Setup Guide
 
 **תאריך יצירה**: 28 בינואר 2025  
@@ -77,7 +78,7 @@ Mailjet הוא שירות SMTP לשליחת אימיילים. מדריך זה מ
 
 ## ⚙️ שלב 3: הגדרה ב-TikTrack
 
-### דרך הסקריפט (מומלץ):
+### דרך הסקריפט (מומלץ)
 
 ```bash
 python3 Backend/scripts/set_mailjet_api_keys.py \
@@ -86,7 +87,7 @@ python3 Backend/scripts/set_mailjet_api_keys.py \
   "nimrod@mezoo.co"
 ```
 
-### דרך הממשק:
+### דרך הממשק
 
 1. פתח `http://localhost:8080/user-profile.html`
 2. גלול לסקשן **"הגדרות SMTP"**
@@ -119,20 +120,20 @@ python3 Backend/scripts/set_mailjet_api_keys.py \
 
 ## ✅ בדיקות
 
-### בדיקת חיבור:
+### בדיקת חיבור
 
 ```bash
 python3 Backend/scripts/test_mailjet_connection.py
 ```
 
-### בדיקה דרך הממשק:
+### בדיקה דרך הממשק
 
 1. פתח `http://localhost:8080/user-profile.html`
 2. גלול לסקשן **"הגדרות SMTP"**
 3. לחץ **"בדיקת חיבור"**
 4. אם הכל תקין, תראה: ✅ **"חיבור SMTP תקין!"**
 
-### שליחת מייל בדיקה:
+### שליחת מייל בדיקה
 
 1. בממשק SMTP, הזן כתובת אימייל ב-**"Test Email"**
 2. לחץ **"שליחת מייל בדיקה"**
@@ -145,6 +146,7 @@ python3 Backend/scripts/test_mailjet_connection.py
 ### שגיאה: "Authentication failed"
 
 **פתרון**:
+
 1. ודא שה-API Key נכון (32 תווים hex)
 2. ודא שה-Secret Key נכון (32 תווים hex)
 3. ודא שהעתקת את המפתחות במלואם (ללא רווחים)
@@ -152,6 +154,7 @@ python3 Backend/scripts/test_mailjet_connection.py
 ### שגיאה: "Connection unexpectedly closed"
 
 **פתרון**:
+
 1. ודא שכתובת האימייל מאומתת ב-Mailjet
 2. בדוק את חיבור האינטרנט
 3. נסה פורט 465 עם SSL במקום 587 עם TLS
@@ -159,6 +162,7 @@ python3 Backend/scripts/test_mailjet_connection.py
 ### מיילים לא מגיעים
 
 **פתרון**:
+
 1. ודא שכתובת האימייל מאומתת ב-Mailjet
 2. בדוק את תיקיית הספאם
 3. בדוק את לוגי Mailjet ב-Dashboard → Activity

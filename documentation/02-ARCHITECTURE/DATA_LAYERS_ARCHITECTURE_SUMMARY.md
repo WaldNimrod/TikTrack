@@ -1,4 +1,5 @@
 # ארכיטקטורת שכבות המידע - סיכום High-Level
+
 # Data Layers Architecture Summary
 
 **תאריך יצירה:** 22 נובמבר 2025  
@@ -23,7 +24,7 @@
 
 מערכת TikTrack משתמשת בארכיטקטורה רב-שכבתית לניהול נתונים, עם הפרדה ברורה בין שכבות אחסון, עיבוד והצגה.
 
-### עקרונות ארכיטקטוניים מרכזיים:
+### עקרונות ארכיטקטוניים מרכזיים
 
 1. **הפרדת אחריות (Separation of Concerns)**
    - כל שכבה אחראית לתחום ספציפי
@@ -44,7 +45,7 @@
 
 ## 🏗️ שכבות המידע - מבט על
 
-### דיאגרמה כללית:
+### דיאגרמה כללית
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -114,6 +115,7 @@
 ### 1. Database Layer (שכבת בסיס הנתונים)
 
 **אפיון:**
+
 - **מטרה:** אחסון נתונים persistent
 - **טכנולוגיה:** PostgreSQL (production) / SQLite (development)
 - **ORM:** SQLAlchemy
@@ -124,6 +126,7 @@
   - Indexes לביצועים
 
 **קוד בפועל:**
+
 - ✅ **Models:** `Backend/models/` - כל ה-models יורשים מ-`BaseModel`
 - ✅ **Database:** PostgreSQL מוגדר ב-`docker-compose.dev.yml`
 - ✅ **Base Model:** `Backend/models/base.py` - מספק `id`, `created_at`, `to_dict()`
@@ -136,6 +139,7 @@
 ### 2. Business Logic Layer (שכבת לוגיקה עסקית)
 
 **אפיון:**
+
 - **מטרה:** עיבוד נתונים, ולידציה, חוקי עסק
 - **מיקום:** `Backend/services/business_logic/`
 - **תכונות:**
@@ -145,6 +149,7 @@
   - API Endpoints: `/api/business/*`
 
 **קוד בפועל:**
+
 - ✅ **Base Service:** `Backend/services/business_logic/base_business_service.py`
 - ✅ **Business Rules Registry:** `Backend/services/business_logic/business_rules_registry.py`
 - ✅ **Services קיימים (11):**
@@ -168,7 +173,8 @@
 
 **סטטוס:** ✅ **מיושם במלואו** - 11 Services קיימים, 1 חסר (אופציונלי)
 
-**📋 ראה:** 
+**📋 ראה:**
+
 - `documentation/02-ARCHITECTURE/BACKEND/BUSINESS_LOGIC_LAYER.md` - תיעוד מלא
 - `documentation/02-ARCHITECTURE/BACKEND/BUSINESS_RULES_REGISTRY.md` - חוקי עסק
 - `documentation/03-DEVELOPMENT/GUIDES/BUSINESS_LOGIC_DEVELOPER_GUIDE.md` - מדריך מפתחים
@@ -179,6 +185,7 @@
 ### 3. API Layer (שכבת API)
 
 **אפיון:**
+
 - **מטרה:** ממשק RESTful בין Frontend ל-Backend
 - **טכנולוגיה:** Flask Blueprints
 - **תכונות:**
@@ -188,6 +195,7 @@
   - Cache invalidation decorators
 
 **קוד בפועל:**
+
 - ✅ **Blueprints:** `Backend/routes/api/` - כל entity יש blueprint נפרד
 - ✅ **Base Classes:** `BaseEntityAPI`, `BaseEntityUtils` - ממשק אחיד
 - ✅ **Decorators:** `@cache_with_invalidation`, `@validate_request` - קיימים
@@ -202,26 +210,31 @@
 **אפיון:**
 
 #### 4.1 Frontend Memory
+
 - **מטרה:** נתונים זמניים (<100KB)
 - **TTL:** עד רענון דף
 - **דוגמאות:** מצב UI, נתוני עמוד זמניים
 
 #### 4.2 localStorage
+
 - **מטרה:** נתונים פשוטים (<1MB)
 - **TTL:** 1 שעה (ברירת מחדל)
 - **דוגמאות:** העדפות משתמש, מצב מסננים
 
 #### 4.3 IndexedDB
+
 - **מטרה:** נתונים מורכבים (>1MB)
 - **TTL:** 24 שעות (ברירת מחדל)
 - **דוגמאות:** היסטוריית התראות, ניתוחי קוד
 
 #### 4.4 Backend Cache
+
 - **מטרה:** נתונים קריטיים עם TTL
 - **TTL:** 30 שניות - 5 דקות
 - **דוגמאות:** נתוני שוק, נתוני טריידים
 
 **קוד בפועל:**
+
 - ✅ **UnifiedCacheManager:** `trading-ui/scripts/unified-cache-manager.js`
 - ✅ **4 שכבות:** Memory, localStorage, IndexedDB, Backend Cache - כולן מיושמות
 - ✅ **API אחיד:** `save()`, `get()`, `remove()`, `clear()` - ממשק אחיד
@@ -235,6 +248,7 @@
 ### 5. Data Services Layer (שכבת שירותי נתונים)
 
 **אפיון:**
+
 - **מטרה:** ממשק אחיד לכל API interactions
 - **מיקום:** `trading-ui/scripts/services/`
 - **תכונות:**
@@ -244,6 +258,7 @@
   - Cache invalidation
 
 **ממשק אחיד:**
+
 ```javascript
 window.{EntityName}Data = {
   KEY: 'cache-key',
@@ -260,6 +275,7 @@ window.{EntityName}Data = {
 ```
 
 **קוד בפועל:**
+
 - ✅ **Data Services:** 12 services קיימים:
   - `trades-data.js`
   - `executions-data.js`
@@ -286,6 +302,7 @@ window.{EntityName}Data = {
 ### 6. Presentation Layer (שכבת הצגה)
 
 **אפיון:**
+
 - **מטרה:** UI logic, form handling, user interactions
 - **מיקום:** `trading-ui/*.html`, `trading-ui/scripts/*.js`
 - **תכונות:**
@@ -295,6 +312,7 @@ window.{EntityName}Data = {
   - Event Handling
 
 **קוד בפועל:**
+
 - ✅ **Page Scripts:** כל עמוד יש script משלו
 - ✅ **CRUDResponseHandler:** טיפול אחיד בתגובות CRUD
 - ✅ **Event Handling:** מערכת `data-onclick` מאוחדת
@@ -303,6 +321,7 @@ window.{EntityName}Data = {
 **סטטוס:** ✅ **מיושם בהתאם לאפיון**
 
 **אינטגרציה עם Business Logic Layer:**
+
 - ✅ כל Data Service מכיל Business Logic API wrappers
 - ✅ Wrappers משתמשים ב-CacheTTLGuard למטמון אוטומטי
 - ✅ Cache invalidation אחרי mutations דרך CacheSyncManager
@@ -315,6 +334,7 @@ window.{EntityName}Data = {
 ### אינטגרציה עם מערכות טעינה ואיתחול
 
 **5 שלבי איתחול:**
+
 - ✅ **Stage 1 (Core Systems):** Cache System נטען - נדרש ל-Business Logic API
 - ✅ **Stage 2 (UI Systems):** לא נדרש ל-Business Logic
 - ✅ **Stage 3 (Page Systems):** Data Services נטענים - Business Logic API wrappers זמינים
@@ -322,34 +342,41 @@ window.{EntityName}Data = {
 - ✅ **Stage 5 (Finalization):** Business Logic API משמש לחישובים סופיים
 
 **Packages System:**
+
 - ✅ Data Services מוגדרים ב-`services` package
 - ✅ Business Logic API wrappers נטענים עם Data Services
 
 **Page Configs:**
+
 - ✅ כל עמוד מגדיר `requiredGlobals` (כולל Data Services)
 - ✅ Custom Initializers יכולים להשתמש ב-Business Logic API
 
 **Preferences Loading Events:**
+
 - ✅ Business Logic API לא תלוי ב-Preferences (לרוב)
 - ✅ אם נדרש, יש לבדוק `window.__preferencesCriticalLoaded`
 
 ### אינטגרציה עם מערכות מטמון
 
 **4 שכבות מטמון:**
+
 - ✅ **Memory Cache:** תוצאות חישובים (TTL 30 שניות)
 - ✅ **localStorage:** תוצאות ולידציות (TTL 60 שניות)
 - ✅ **IndexedDB:** תוצאות חישובים מורכבים
 - ✅ **Backend Cache:** ⏳ כבוי כרגע (CACHE_DISABLED=true)
 
 **CacheTTLGuard:**
+
 - ✅ כל Business Logic API wrapper משתמש ב-CacheTTLGuard
 - ✅ TTL מוגדר לפי סוג פעולה (30s חישובים, 60s ולידציות)
 
 **CacheSyncManager:**
+
 - ✅ Cache invalidation אחרי mutations
 - ✅ סנכרון Frontend ↔ Backend
 
 **Cache Key Helper:**
+
 - ✅ מפתחות מטמון אופטימליים ועקביים
 - ✅ שימוש ב-`CacheKeyHelper.generateCacheKeyFromObject()`
 
@@ -357,7 +384,7 @@ window.{EntityName}Data = {
 
 ## 🔄 זרימת נתונים
 
-### טעינת נתונים (Read Flow):
+### טעינת נתונים (Read Flow)
 
 ```
 1. Page Script
@@ -393,7 +420,7 @@ window.{EntityName}Data = {
 15. Update UI (Table, Display, etc.)
 ```
 
-### יצירה/עדכון/מחיקה (Write Flow):
+### יצירה/עדכון/מחיקה (Write Flow)
 
 ```
 1. Page Script (User Action)
@@ -425,7 +452,7 @@ window.{EntityName}Data = {
 
 ## 📊 השוואה: אפיון מול קוד בפועל
 
-### ✅ התאמה מלאה:
+### ✅ התאמה מלאה
 
 | שכבה | אפיון | קוד בפועל | סטטוס |
 |------|-------|-----------|-------|
@@ -435,7 +462,7 @@ window.{EntityName}Data = {
 | **Data Services** | ממשק אחיד, Cache-first | ✅ 12 services עם ממשק אחיד | ✅ **100%** |
 | **Presentation** | Page Scripts, UI Components | ✅ Page scripts, CRUDResponseHandler | ✅ **100%** |
 
-### ✅ התאמה מלאה (עודכן):
+### ✅ התאמה מלאה (עודכן)
 
 | שכבה | אפיון | קוד בפועל | סטטוס |
 |------|-------|-----------|-------|
@@ -450,6 +477,7 @@ window.{EntityName}Data = {
 **סטטוס:** ✅ **הושלם בהצלחה**
 
 **הישגים:**
+
 - ✅ Business Rules Registry מרכזי נוצר
 - ✅ 11 Business Services נוצרו (מתוך 12 - 1 אופציונלי)
 - ✅ 29+ API endpoints פעילים
@@ -463,15 +491,18 @@ window.{EntityName}Data = {
 ### 2. Cache Strategy - אופטימיזציה אפשרית
 
 **בעיה:**
+
 - TTL קבועים לכל service
 - אין התאמה דינמית לעומס
 - אין monitoring של cache hit rates
 
 **השפעה:**
+
 - אולי יותר מדי cache misses
 - אולי יותר מדי cache hits (נתונים ישנים)
 
 **המלצה:**
+
 - הוספת monitoring ל-cache performance
 - התאמה דינמית של TTL לפי usage patterns
 - Analytics dashboard ל-cache
@@ -479,15 +510,18 @@ window.{EntityName}Data = {
 ### 3. Error Handling - אי-עקביות
 
 **בעיה:**
+
 - Error handling שונה בין services
 - לא כל השגיאות מתועדות באותו אופן
 - אין error recovery strategy מרכזית
 
 **השפעה:**
+
 - קושי ב-debugging
 - חוויית משתמש לא עקבית
 
 **המלצה:**
+
 - סטנדרטיזציה של error handling
 - Error recovery strategies
 - Centralized error logging
@@ -499,6 +533,7 @@ window.{EntityName}Data = {
 ### 1. ✅ Business Logic Layer - הושלם
 
 **פעולות:**
+
 - ✅ **הושלם:** Base Service class, Business Rules Registry, API Blueprint
 - ✅ **הושלם:** 11 Business Services (Note, TradingAccount, TradePlan, Ticker, Currency, Tag - כולם נוצרו)
 - ✅ **הושלם:** 21+ Frontend Wrappers
@@ -508,7 +543,8 @@ window.{EntityName}Data = {
 
 **סטטוס:** ✅ **הושלם בהצלחה**
 
-**📋 ראה:** 
+**📋 ראה:**
+
 - `documentation/02-ARCHITECTURE/BACKEND/BUSINESS_LOGIC_LAYER.md` - תיעוד מלא
 - `documentation/02-ARCHITECTURE/BACKEND/BUSINESS_RULES_REGISTRY.md` - חוקי עסק
 - `documentation/03-DEVELOPMENT/GUIDES/BUSINESS_LOGIC_DEVELOPER_GUIDE.md` - מדריך מפתחים
@@ -516,6 +552,7 @@ window.{EntityName}Data = {
 ### 2. שיפור Cache Monitoring
 
 **פעולות:**
+
 - הוספת metrics ל-cache hit/miss rates
 - Dashboard ל-cache performance
 - Alerts על cache issues
@@ -525,6 +562,7 @@ window.{EntityName}Data = {
 ### 3. סטנדרטיזציה של Error Handling
 
 **פעולות:**
+
 - יצירת Error Handling Service מרכזי
 - סטנדרטיזציה של error messages
 - Error recovery strategies
@@ -534,6 +572,7 @@ window.{EntityName}Data = {
 ### 4. תיעוד ארכיטקטורה מפורט
 
 **פעולות:**
+
 - תיעוד מפורט של כל שכבה
 - דיאגרמות זרימת נתונים
 - Decision records (ADR)
@@ -545,12 +584,14 @@ window.{EntityName}Data = {
 ## 📚 מסמכים קשורים
 
 ### תיעוד ארכיטקטורה
+
 - [Unified Cache System](../../04-FEATURES/CORE/UNIFIED_CACHE_SYSTEM.md) - תיעוד מלא של מערכת המטמון
 - [Data Services Architecture](./FRONTEND/DATA_SERVICES_ARCHITECTURE.md) - תיעוד מפורט של Data Services
 - [Backend Architecture](./BACKEND/README.md) - תיעוד Backend
 - [CRUD Backend Implementation Guide](./FRONTEND/CRUD_BACKEND_IMPLEMENTATION_GUIDE.md) - מדריך יישום CRUD
 
 ### Business Logic Layer
+
 - [Business Logic Complete System Reference](../../03-DEVELOPMENT/PLANS/BUSINESS_LOGIC_COMPLETE_SYSTEM_REFERENCE.md) - **הפניה מלאה למערכת** (כולל כל הישויות, המערכות, העמודים והאינטגרציות)
 - [Business Logic Refactoring Comprehensive Plan](../../03-DEVELOPMENT/PLANS/BUSINESS_LOGIC_REFACTORING_COMPREHENSIVE_PLAN.md) - תוכנית עבודה מקיפה
 - [Business Logic Integration Checklist](../../03-DEVELOPMENT/PLANS/BUSINESS_LOGIC_INTEGRATION_CHECKLIST.md) - רשימת בדיקות אינטגרציה
@@ -560,26 +601,27 @@ window.{EntityName}Data = {
 
 ## 📝 סיכום
 
-### נקודות חוזק:
+### נקודות חוזק
 
 1. ✅ **ארכיטקטורה ברורה** - הפרדה טובה בין שכבות
 2. ✅ **Cache System מתקדם** - 4 שכבות עם החלטה אוטומטית
 3. ✅ **Data Services מאוחדים** - ממשק אחיד לכל ה-entities
 4. ✅ **API Layer מאורגן** - Blueprints, Base classes, Decorators
 
-### נקודות לשיפור:
+### נקודות לשיפור
 
 1. ⏳ **Business Logic Layer** - 5 Services קיימים, 7 חסרים, צריך להשלים
 2. ⚠️ **Cache Monitoring** - חסר monitoring ו-analytics
 3. ⚠️ **Error Handling** - דורש סטנדרטיזציה
 
-### הערכת מצב כללית:
+### הערכת מצב כללית
 
 **90% התאמה בין אפיון לקוד בפועל** (+5% מהעדכון הקודם)
 
 המערכת מיושמת היטב ברוב השכבות. Business Logic Layer מאורגן חלקית (5 Services קיימים, 7 חסרים), עם פערים קטנים בעיקר בהשלמת Services נוספים ו-Cache Monitoring.
 
 **📋 ראה:**
+
 - `documentation/03-DEVELOPMENT/PLANS/BUSINESS_LOGIC_COMPLETE_SYSTEM_REFERENCE.md` - הפניה מלאה למערכת
 - `documentation/03-DEVELOPMENT/PLANS/BUSINESS_LOGIC_REFACTORING_COMPREHENSIVE_PLAN.md` - תוכנית עבודה מקיפה
 

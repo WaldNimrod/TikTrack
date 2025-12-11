@@ -1,4 +1,5 @@
 # בדיקות End-to-End - TikTrack
+
 ## E2E Tests
 
 ### 📋 **מטרה**
@@ -8,6 +9,7 @@
 ### 🎯 **זרימות משתמש**
 
 #### 1. **User Login & Dashboard**
+
 ```javascript
 describe('User Login & Dashboard', () => {
   test('should login and view dashboard', async () => {
@@ -28,6 +30,7 @@ describe('User Login & Dashboard', () => {
 ```
 
 #### 2. **Create New Trade**
+
 ```javascript
 describe('Create New Trade', () => {
   test('should create trade successfully', async () => {
@@ -55,6 +58,7 @@ describe('Create New Trade', () => {
 ```
 
 #### 3. **Edit Existing Trade**
+
 ```javascript
 describe('Edit Existing Trade', () => {
   test('should edit trade successfully', async () => {
@@ -79,6 +83,7 @@ describe('Edit Existing Trade', () => {
 ```
 
 #### 4. **Delete Trade**
+
 ```javascript
 describe('Delete Trade', () => {
   test('should delete trade successfully', async () => {
@@ -104,6 +109,7 @@ describe('Delete Trade', () => {
 ### 🔧 **הגדרות**
 
 #### **Test Environment**
+
 ```javascript
 // tests/e2e/setup.js
 const { test, expect } = require('@playwright/test');
@@ -132,6 +138,7 @@ test.beforeEach(async ({ page }) => {
 ```
 
 #### **Test Data**
+
 ```javascript
 // tests/fixtures/e2e-data.json
 {
@@ -151,6 +158,7 @@ test.beforeEach(async ({ page }) => {
 ### 📊 **תרחישי בדיקה**
 
 #### 1. **Complete User Journey**
+
 ```javascript
 describe('Complete User Journey', () => {
   test('should complete full user workflow', async () => {
@@ -193,6 +201,7 @@ describe('Complete User Journey', () => {
 ```
 
 #### 2. **Performance Testing**
+
 ```javascript
 describe('Performance Testing', () => {
   test('should load page within 3 seconds', async () => {
@@ -232,6 +241,7 @@ describe('Performance Testing', () => {
 ```
 
 #### 3. **Error Handling**
+
 ```javascript
 describe('Error Handling', () => {
   test('should handle API errors gracefully', async () => {
@@ -291,6 +301,7 @@ npm run test:e2e -- --headed
 ### 🔄 **CI/CD Integration**
 
 הבדיקות רצות אוטומטית ב:
+
 - Pre-commit hooks
 - Pull request validation
 - Deployment pipeline

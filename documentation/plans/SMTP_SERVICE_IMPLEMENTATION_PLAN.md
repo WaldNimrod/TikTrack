@@ -19,6 +19,7 @@
 **קובץ חדש**: `documentation/backend/SMTP_SERVICE_GUIDE.md`
 
 **תוכן**:
+
 - סקירה כללית של השירות
 - ארכיטקטורה ומבנה
 - הגדרת SMTP במערכת
@@ -34,6 +35,7 @@
 **קובץ חדש**: `documentation/admin/SMTP_MANAGEMENT_GUIDE.md`
 
 **תוכן**:
+
 - הוראות גישה לממשק ניהול SMTP (בעמוד פרופיל משתמש)
 - הגדרת שרת SMTP
 - בדיקת חיבור
@@ -46,6 +48,7 @@
 **קובץ חדש**: `documentation/backend/EMAIL_TEMPLATES_GUIDE.md`
 
 **תוכן**:
+
 - מבנה תבנית מייל (Header עם לוגו, Body, Footer עם פרטים)
 - דרישות RTL ועברית
 - רשימת templates זמינים
@@ -55,9 +58,11 @@
 ### 1.4 עדכון תיעוד קיים
 
 **קובץ**: `documentation/INDEX.md`
+
 - הוספת קישורים לתיעוד SMTP
 
 **קובץ**: `documentation/frontend/GENERAL_SYSTEMS_LIST.md`
+
 - הוספת SMTP Service לרשימה (בחלק "מערכות תקשורת" - חלק חדש)
 - קישור ל-SMTP_SERVICE_GUIDE.md
 - תיאור: "שירות SMTP גמיש לשליחת מגוון הודעות עם תמיכה ב-templates, הגדרות במערכת הכלליות, ולוגים"
@@ -69,6 +74,7 @@
 **קובץ**: `Backend/services/email_service.py`
 
 **שינויים**:
+
 - הוספת קריאת הגדרות SMTP מ-SystemSettingsService במקום משתני סביבה בלבד
 - תמיכה ב-fallback למשתני סביבה אם אין הגדרות במערכת
 - הוספת פונקציה `load_settings_from_db(db_session)` לטעינת הגדרות
@@ -78,6 +84,7 @@
 - **הערות קוד**: הוספת Function Index בתחילת הקובץ, Python docstrings מלאים לכל פונקציה
 
 **פונקציות חדשות**:
+
 ```python
 def load_settings_from_db(self, db_session: Session) -> bool
 def validate_settings(self) -> Dict[str, Any]
@@ -85,6 +92,7 @@ def test_connection(self, db_session: Optional[Session] = None) -> Dict[str, Any
 ```
 
 **הערות קוד**:
+
 - הוספת Function Index בתחילת הקובץ
 - JSDoc/Python docstrings מלאים לכל פונקציה
 - הערות בעברית ואנגלית לפי הסטנדרט
@@ -94,6 +102,7 @@ def test_connection(self, db_session: Optional[Session] = None) -> Dict[str, Any
 **קובץ חדש**: `Backend/services/email_templates.py`
 
 **תוכן**:
+
 - מערכת templates למיילים
 - תמיכה ב-HTML templates עם placeholders
 - פונקציה `render_template(template_name, context)` לעיבוד templates
@@ -113,34 +122,40 @@ def test_connection(self, db_session: Optional[Session] = None) -> Dict[str, Any
   - **Responsive**: תמיכה במכשירים ניידים
 
 **פונקציות**:
+
 - `get_email_header(logo_url=None)` - יצירת header עם לוגו
 - `get_email_footer(contact_info=None)` - יצירת footer עם פרטים
 - `render_template(template_name, context)` - עיבוד template מלא
 - `wrap_email_content(content_html, logo_url=None, contact_info=None)` - עטיפת תוכן ב-header ו-footer
 
 **הערות קוד**:
+
 - Function Index מלא בתחילת הקובץ
 - Python docstrings מפורטים לכל פונקציה
 - הערות בעברית ואנגלית
 
 **Templates זמינים**:
+
 - `password_reset` - איפוס סיסמה
 - `system_notification` - התראות מערכת
 - `business_notification` - התראות עסקיות
 - `general` - template כללי
 
 **הערות קוד**:
+
 - Function Index מלא
 - Python docstrings מפורטים
 
 ### 2.3 הוספת Email Queue/Logging
 
 **קובץ חדש**: `Backend/models/email_log.py`
+
 - מודל לשמירת לוג של שליחות מייל
 - שדות: recipient, subject, status, sent_at, error_message, email_type, user_id
 - אינטגרציה עם User model
 
 **קובץ**: `Backend/services/email_service.py`
+
 - הוספת לוגינג אוטומטי לכל שליחת מייל
 - שמירת תוצאות השליחה ב-email_log
 - **שימוש ב-Logger Service**: כל פעולת לוג דרך `logging` module של Python עם context מלא (recipient, subject, status, error)
@@ -153,6 +168,7 @@ def test_connection(self, db_session: Optional[Session] = None) -> Dict[str, Any
 **קובץ חדש**: `Backend/scripts/migrations/add_smtp_settings.py`
 
 **תוכן**:
+
 - יצירת group: `smtp_settings`
 - יצירת setting types:
   - `smtp_host` (string, default: "smtp.gmail.com")
@@ -172,6 +188,7 @@ def test_connection(self, db_session: Optional[Session] = None) -> Dict[str, Any
 **קובץ חדש**: `Backend/services/smtp_settings_service.py`
 
 **פונקציות**:
+
 - `get_smtp_settings(db_session)` - קבלת כל הגדרות SMTP
 - `update_smtp_settings(db_session, settings, updated_by)` - עדכון הגדרות
 - `encrypt_password(password)` - הצפנת סיסמה (Fernet encryption)
@@ -179,11 +196,13 @@ def test_connection(self, db_session: Optional[Session] = None) -> Dict[str, Any
 - `validate_smtp_settings(settings)` - ולידציה של הגדרות
 
 **אינטגרציה עם מערכות כלליות**:
+
 - `SystemSettingsService` - קריאה ושמירת הגדרות
 - `logging` module - לוגים עם context מלא
 - `UnifiedCacheManager` (Frontend) - מטמון הגדרות (אם נדרש)
 
 **הערות קוד**:
+
 - Function Index מלא בתחילת הקובץ
 - Python docstrings מפורטים לכל פונקציה
 - הערות בעברית ואנגלית
@@ -193,6 +212,7 @@ def test_connection(self, db_session: Optional[Session] = None) -> Dict[str, Any
 **קובץ**: `Backend/routes/api/system_settings.py` (או קובץ חדש `Backend/routes/api/smtp_settings.py`)
 
 **Endpoints**:
+
 - `GET /api/system-settings/smtp` - קבלת הגדרות SMTP
 - `POST /api/system-settings/smtp` - עדכון הגדרות SMTP
 - `POST /api/system-settings/smtp/test` - בדיקת חיבור SMTP
@@ -201,11 +221,13 @@ def test_connection(self, db_session: Optional[Session] = None) -> Dict[str, Any
 **אבטחה**: דורש הרשאות מנהל (בדיקה דרך auth middleware)
 
 **אינטגרציה עם מערכות כלליות**:
+
 - `SystemSettingsService` - קריאה ושמירת הגדרות
 - `EmailService` - שליחת מיילים ובדיקת חיבור
 - `logging` module - לוגים
 
 **הערות קוד**:
+
 - Function Index מלא בתחילת הקובץ
 - Python docstrings מפורטים לכל endpoint
 - הערות בעברית ואנגלית
@@ -217,7 +239,9 @@ def test_connection(self, db_session: Optional[Session] = None) -> Dict[str, Any
 **קובץ**: `trading-ui/user-profile.html`
 
 **שינויים**:
+
 - הוספת `content-section` חדש בתוך `section-body` של `top-section`:
+
 ```html
 <!-- SMTP Settings Section -->
 <div class="content-section" id="smtp-settings-section" data-section="smtp-settings">
@@ -240,6 +264,7 @@ def test_connection(self, db_session: Optional[Session] = None) -> Dict[str, Any
 **קובץ חדש**: `trading-ui/scripts/user-profile-smtp.js`
 
 **מבנה**:
+
 - Object: `UserProfileSMTP` (חלק מ-`UserProfilePage` או מודול נפרד)
 - טעינת הגדרות SMTP מה-API
 - טופס עריכה להגדרות SMTP
@@ -249,6 +274,7 @@ def test_connection(self, db_session: Optional[Session] = None) -> Dict[str, Any
 - הצגת היסטוריית שליחות (מתוך email_log)
 
 **UI Components**:
+
 - Form fields: Host, Port, User, Password (masked), From Email, From Name, Use TLS, Enabled
 - Test Connection button עם spinner
 - Send Test Email button עם input לכתובת מייל
@@ -256,6 +282,7 @@ def test_connection(self, db_session: Optional[Session] = None) -> Dict[str, Any
 - Recent emails table (אופציונלי)
 
 **אינטגרציה עם מערכות כלליות** (חובה):
+
 - `window.Logger` - לכל הלוגים (info/warn/error/debug עם context)
 - `window.NotificationSystem` - להתראות (showSuccess/showError)
 - `window.UnifiedCacheManager` - למטמון הגדרות SMTP (TTL: 5 דקות)
@@ -264,8 +291,10 @@ def test_connection(self, db_session: Optional[Session] = None) -> Dict[str, Any
 - `window.EventHandlerManager` - לניהול אירועים (אם נדרש)
 
 **הערות קוד** (חובה):
+
 - Function Index מלא בתחילת הקובץ (בפורמט הסטנדרטי)
 - JSDoc מלא לכל פונקציה:
+
   ```javascript
   /**
    * Description in Hebrew
@@ -276,6 +305,7 @@ def test_connection(self, db_session: Optional[Session] = None) -> Dict[str, Any
    * // Example usage
    */
   ```
+
 - הערות בעברית ואנגלית לפי הסטנדרט
 
 ### 4.3 עדכון user-profile.js
@@ -283,6 +313,7 @@ def test_connection(self, db_session: Optional[Session] = None) -> Dict[str, Any
 **קובץ**: `trading-ui/scripts/user-profile.js`
 
 **שינויים**:
+
 - הוספת `initSMTPModule()` ב-`UserProfilePage.init()`
 - הוספת import/טעינה של `user-profile-smtp.js`
 - אינטגרציה עם `UserProfileSMTP` module
@@ -292,6 +323,7 @@ def test_connection(self, db_session: Optional[Session] = None) -> Dict[str, Any
 **קובץ**: `trading-ui/styles-new/07-pages/_user-profile.css`
 
 **תוכן**:
+
 - עיצוב טופס הגדרות SMTP
 - עיצוב status indicators
 - עיצוב טבלת היסטוריית מיילים (אם נדרש)
@@ -303,6 +335,7 @@ def test_connection(self, db_session: Optional[Session] = None) -> Dict[str, Any
 **קובץ**: `Backend/services/password_reset_service.py`
 
 **שינויים**:
+
 - שימוש ב-EmailService המעודכן
 - קריאת הגדרות SMTP מ-SystemSettings
 - שימוש ב-email templates
@@ -312,6 +345,7 @@ def test_connection(self, db_session: Optional[Session] = None) -> Dict[str, Any
 **קובץ**: `Backend/services/email_service.py`
 
 **שינויים**:
+
 - שימוש ב-template system מ-`email_templates.py`
 - שימוש ב-`wrap_email_content()` לעטיפת תוכן ב-header (לוגו) ו-footer (פרטים כלליים)
 - RTL מלא (`dir="rtl"`, `lang="he"`)
@@ -325,6 +359,7 @@ def test_connection(self, db_session: Optional[Session] = None) -> Dict[str, Any
 **קובץ חדש**: `Backend/tests/test_email_service.py`
 
 **תוכן**:
+
 - בדיקת טעינת הגדרות
 - בדיקת ולידציה
 - בדיקת render templates
@@ -335,6 +370,7 @@ def test_connection(self, db_session: Optional[Session] = None) -> Dict[str, Any
 **קובץ חדש**: `Backend/tests/test_smtp_integration.py`
 
 **תוכן**:
+
 - בדיקת חיבור SMTP אמיתי
 - בדיקת שליחת מייל בדיקה
 - בדיקת איפוס סיסמה עם מייל אמיתי
@@ -344,6 +380,7 @@ def test_connection(self, db_session: Optional[Session] = None) -> Dict[str, Any
 **קובץ חדש**: `Backend/scripts/test_smtp_service.py`
 
 **תוכן**:
+
 - סקריפט לבדיקת SMTP service
 - שליחת מייל בדיקה
 - בדיקת templates
@@ -356,6 +393,7 @@ def test_connection(self, db_session: Optional[Session] = None) -> Dict[str, Any
 **קובץ חדש**: `Backend/scripts/setup_smtp_defaults.py`
 
 **תוכן**:
+
 - הגדרת ברירת מחדל: admin@mezoo.co
 - הצפנת סיסמה ושמירה
 - הגדרת smtp.gmail.com (כי זה Google Workspace)
@@ -376,6 +414,7 @@ def test_connection(self, db_session: Optional[Session] = None) -> Dict[str, Any
 ## קבצים חדשים
 
 ### Backend
+
 - `Backend/services/email_templates.py`
 - `Backend/models/email_log.py`
 - `Backend/services/smtp_settings_service.py`
@@ -387,9 +426,11 @@ def test_connection(self, db_session: Optional[Session] = None) -> Dict[str, Any
 - `Backend/tests/test_smtp_integration.py`
 
 ### Frontend
+
 - `trading-ui/scripts/user-profile-smtp.js`
 
 ### Documentation
+
 - `documentation/backend/SMTP_SERVICE_GUIDE.md`
 - `documentation/admin/SMTP_MANAGEMENT_GUIDE.md`
 - `documentation/backend/EMAIL_TEMPLATES_GUIDE.md`
@@ -397,17 +438,20 @@ def test_connection(self, db_session: Optional[Session] = None) -> Dict[str, Any
 ## קבצים לעדכון
 
 ### Backend
+
 - `Backend/services/email_service.py` - שדרוג משמעותי
 - `Backend/services/password_reset_service.py` - אינטגרציה
 - `Backend/models/__init__.py` - הוספת EmailLog
 - `Backend/routes/api/system_settings.py` - הוספת endpoints (או קובץ חדש)
 
 ### Frontend
+
 - `trading-ui/scripts/user-profile.js` - הוספת SMTP module
 - `trading-ui/user-profile.html` - הוספת SMTP section
 - `trading-ui/styles-new/07-pages/_user-profile.css` - עיצוב SMTP
 
 ### Documentation
+
 - `documentation/INDEX.md`
 - `documentation/frontend/GENERAL_SYSTEMS_LIST.md`
 
@@ -420,19 +464,19 @@ def test_connection(self, db_session: Optional[Session] = None) -> Dict[str, Any
 3. **Header ו-Footer קבועים**: כל תבנית חייבת לכלול:
    - Header: לוגו TikTrack + כותרת מערכת
    - Footer: פרטי יצירת קשר + זכויות יוצרים + הודעת "מייל אוטומטי"
-4. **Logger Service**: 
+4. **Logger Service**:
    - Frontend: שימוש ב-`window.Logger` (info/warn/error/debug) עם context מלא
    - Backend: שימוש ב-`logging` module של Python עם context מלא
-5. **אינטגרציה עם מערכות כלליות**: 
+5. **אינטגרציה עם מערכות כלליות**:
    - חובה לקרוא `GENERAL_SYSTEMS_LIST.md` לפני התחלה
    - וידוא אינטגרציה מלאה עם: Logger, NotificationSystem, UnifiedCacheManager, CacheSyncManager
    - עדכון `GENERAL_SYSTEMS_LIST.md` עם המערכת החדשה + קישור לדוקומנטציה
-6. **הערות קוד**: 
+6. **הערות קוד**:
    - כל קובץ חייב להכיל Function Index מלא בתחילת הקובץ (בפורמט הסטנדרטי)
    - JSDoc מלא לכל פונקציה (Frontend)
    - Python docstrings מלאים לכל פונקציה (Backend)
    - הערות בעברית ואנגלית
-7. **עמוד אחד בלבד**: 
+7. **עמוד אחד בלבד**:
    - **אין ליצור עמודים נוספים!**
    - כל הפונקציונאליות סביב משתמשים תהיה בעמוד `user-profile.html` בלבד
    - SMTP Settings יוצגו כ-`content-section` נוסף בתוך `user-profile.html`

@@ -1,5 +1,7 @@
 # LLM Server Management Guide
+
 # ===========================
+
 # Quick reference guide for AI developers working with TikTrack server
 
 **Purpose:** Quick reference for AI developers and automated systems  
@@ -11,16 +13,19 @@
 ## 🚀 **Quick Start Commands**
 
 ### **Start Server (ONLY Method)**
+
 ```bash
 ./start_server.sh
 ```
 
 ### **Check for Conflicts Only**
+
 ```bash
 ./start_server.sh --check-only
 ```
 
 ### **Force Start (Dangerous - Not Recommended)**
+
 ```bash
 ./start_server.sh --force
 ```
@@ -28,15 +33,18 @@
 ## 📁 **Active Server Files (ONLY These)**
 
 ### **Main Server Files:**
+
 - **`Backend/app.py`** - Main server file (ONLY active server)
 - **`start_server.sh`** - Startup script (ONLY way to start server)
 - **`Backend/utils/server_lock_manager.py`** - Process management
 
 ### **API Management Files:**
+
 - **`Backend/routes/api/server_management.py`** - Server management API
 - **`Backend/routes/api/server_logs.py`** - Server logs API
 
 ### **All Other Server Files:**
+
 - **❌ REMOVED** - All old server scripts moved to archive
 - **❌ REMOVED** - dev_server.py, dev_server_optimized.py
 - **❌ REMOVED** - restart-bg.sh, run-background.sh
@@ -47,6 +55,7 @@
 ## ❌ **What NOT to Do**
 
 ### **NEVER run these commands:**
+
 ```bash
 # ❌ WRONG - Don't run directly
 python3 Backend/app.py
@@ -58,6 +67,7 @@ python3 Backend/dev_server_optimized.py
 ```
 
 ### **Why these are wrong:**
+
 - No process conflict detection
 - Can create multiple server instances
 - No error handling
@@ -68,38 +78,54 @@ python3 Backend/dev_server_optimized.py
 ## 🔍 **Troubleshooting Common Issues**
 
 ### **Issue: "Port 8080 already in use"**
+
 **Solution:**
+
 1. Check for existing processes:
+
    ```bash
    ./start_server.sh --check-only
    ```
+
 2. If conflicts found, kill existing process:
+
    ```bash
    kill [PID]
    ```
+
 3. Start server again:
+
    ```bash
    ./start_server.sh
    ```
 
 ### **Issue: "Server won't start"**
+
 **Solution:**
+
 1. Check Python installation:
+
    ```bash
    python3 --version
    ```
+
 2. Check file permissions:
+
    ```bash
    ls -la start_server.sh
    chmod +x start_server.sh
    ```
+
 3. Check for file conflicts:
+
    ```bash
    ./start_server.sh --check-only
    ```
 
 ### **Issue: "Permission denied"**
+
 **Solution:**
+
 ```bash
 chmod +x start_server.sh
 chmod +x Backend/utils/server_lock_manager.py
@@ -110,16 +136,19 @@ chmod +x Backend/utils/server_lock_manager.py
 ## 📊 **Server Status Commands**
 
 ### **Check if server is running:**
+
 ```bash
 lsof -i :8080
 ```
 
 ### **Find TikTrack processes:**
+
 ```bash
 ps aux | grep -E "(app\.py|tiktrack)" | grep -v grep
 ```
 
 ### **Check server logs:**
+
 ```bash
 tail -f Backend/logs/app.log
 ```
@@ -129,27 +158,37 @@ tail -f Backend/logs/app.log
 ## 🛠️ **Development Workflow**
 
 ### **Normal Development Cycle:**
+
 1. **Start server:**
+
    ```bash
    ./start_server.sh
    ```
+
 2. **Make code changes**
 3. **Stop server:** `Ctrl+C`
 4. **Restart server:**
+
    ```bash
    ./start_server.sh
    ```
 
 ### **If you see conflicts:**
+
 1. **Check what's running:**
+
    ```bash
    ./start_server.sh --check-only
    ```
+
 2. **Kill conflicting process:**
+
    ```bash
    kill [PID]
    ```
+
 3. **Start fresh:**
+
    ```bash
    ./start_server.sh
    ```
@@ -159,11 +198,13 @@ tail -f Backend/logs/app.log
 ## 📝 **Logging and Monitoring**
 
 ### **Log Files Location:**
+
 - **Main logs:** `Backend/logs/app.log`
 - **Error logs:** `Backend/logs/errors.log`
 - **Server management:** `Backend/logs/server.log`
 
 ### **Monitor logs in real-time:**
+
 ```bash
 # All logs
 tail -f Backend/logs/app.log
@@ -194,33 +235,47 @@ tail -f Backend/logs/server.log
 ## 🚨 **Emergency Procedures**
 
 ### **If server is completely stuck:**
+
 1. **Find all Python processes:**
+
    ```bash
    ps aux | grep python
    ```
+
 2. **Kill TikTrack processes:**
+
    ```bash
    kill -9 [PID]
    ```
+
 3. **Verify port is free:**
+
    ```bash
    lsof -i :8080
    ```
+
 4. **Start fresh:**
+
    ```bash
    ./start_server.sh
    ```
 
 ### **If startup script fails:**
+
 1. **Check Python:**
+
    ```bash
    python3 --version
    ```
+
 2. **Check files exist:**
+
    ```bash
    ls -la start_server.sh Backend/app.py Backend/utils/server_lock_manager.py
    ```
+
 3. **Check permissions:**
+
    ```bash
    chmod +x start_server.sh
    ```
@@ -230,18 +285,21 @@ tail -f Backend/logs/server.log
 ## 📋 **Checklist for AI Developers**
 
 ### **Before starting server:**
+
 - [ ] Use `./start_server.sh` (not direct Python)
 - [ ] Check for existing processes first
 - [ ] Ensure Python3 is available
 - [ ] Verify file permissions
 
 ### **If conflicts detected:**
+
 - [ ] Read the error message carefully
 - [ ] Note the PID of conflicting process
 - [ ] Kill the conflicting process
 - [ ] Try starting again
 
 ### **After server starts:**
+
 - [ ] Verify server is accessible at `http://127.0.0.1:8080`
 - [ ] Check logs for any errors
 - [ ] Monitor for multiple processes

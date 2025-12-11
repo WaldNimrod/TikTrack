@@ -11,11 +11,13 @@
 ### שלב 0.1: שמירת שינויים ✅
 
 **בוצע:**
+
 - ✅ כל הקבצים החדשים נוספו ל-Git
 - ✅ Commit בוצע: `feat: Add production update system - initial handoff`
 - ✅ 23 קבצים חדשים/מעודכנים
 
 **קבצים שנוספו:**
+
 - 14 מסמכי תעוד חדשים
 - 4 סקריפטים חדשים
 - 5 קבצים מעודכנים
@@ -23,6 +25,7 @@
 ### שלב 0.2: Push ל-main ✅
 
 **בוצע:**
+
 - ✅ Commit נמזג ל-main branch
 - ✅ Push ל-remote בוצע
 - ✅ כל הקבצים זמינים ב-`origin/main`
@@ -32,6 +35,7 @@
 ### שלב 0.3: יצירת Changelog ✅
 
 **בוצע:**
+
 - ✅ Changelog נוצר בהצלחה
 - ✅ מיקום: `_Tmp/production_sync_changelog_20251121_135301.md`
 - ✅ כולל: רשימת שינויים, commits אחרונים, שינויים קריטיים
@@ -39,11 +43,13 @@
 ### שלב 0.4: Pre-Sync Validation ⚠️
 
 **תוצאה:**
+
 - ⚠️ נמצאו שינויים לא שמורים (38 קבצים)
 - ⚠️ נמצאו קבצי backup (93 קבצים)
 - ✅ כל הקבצים הקריטיים קיימים
 
 **הערה:** השינויים הלא שמורים הם בעיקר:
+
 - קבצי DB (`.db`)
 - קבצי PID (`.pid`)
 - קבצי `.DS_Store`
@@ -53,16 +59,18 @@
 
 ---
 
-## 📦 מה הועבר ל-main?
+## 📦 מה הועבר ל-main
 
-### סקריפטים (4 קבצים חדשים):
+### סקריפטים (4 קבצים חדשים)
+
 - ✅ `scripts/production-update/preserve_production_changes.py`
 - ✅ `scripts/production-update/prepare_changelog.py`
 - ✅ `scripts/production-update/document_server_changes.py`
 - ✅ `scripts/pre_sync_validation.py`
 - ✅ `scripts/sync_verifier.py` (כבר היה, עודכן)
 
-### מסמכי תעוד (14 מסמכים חדשים):
+### מסמכי תעוד (14 מסמכים חדשים)
+
 - ✅ `documentation/production/HANDOFF_CHECKLIST.md`
 - ✅ `documentation/production/HANDOFF_TO_PRODUCTION_TEAM.md`
 - ✅ `documentation/production/INITIAL_HANDOFF.md`
@@ -75,7 +83,8 @@
 - ✅ `documentation/production/SHARED_WORKSPACE.md`
 - ✅ ועוד 4 מסמכים נוספים
 
-### קבצים מעודכנים (5 קבצים):
+### קבצים מעודכנים (5 קבצים)
+
 - ✅ `scripts/sync_to_production.py` - הוספת DB protection
 - ✅ `scripts/sync_ui_to_production.py` - שיפורי sync
 - ✅ `scripts/verify_production.sh` - רשימת קבצים שונים
@@ -83,11 +92,12 @@
 
 ---
 
-## 🎯 מה הלאה?
+## 🎯 מה הלאה
 
-### צוות הפרודקשן צריך:
+### צוות הפרודקשן צריך
 
 1. **למשוך מ-main:**
+
    ```bash
    git checkout production
    git pull origin production
@@ -95,6 +105,7 @@
    ```
 
 2. **לבדוק שהכל במקום:**
+
    ```bash
    ls -la scripts/production-update/master.py
    ls -la documentation/production/INITIAL_HANDOFF.md
@@ -106,6 +117,7 @@
    - `PROCESS_STEPS_TABLE.md` - טבלת שלבים
 
 4. **להתקין:**
+
    ```bash
    chmod +x scripts/production-update/*.py
    chmod +x scripts/sync_verifier.py
@@ -113,6 +125,7 @@
    ```
 
 5. **לבדוק:**
+
    ```bash
    python3 scripts/production-update/master.py --dry-run
    ```

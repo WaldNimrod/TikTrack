@@ -21,6 +21,7 @@ The Event Handler System (`event-handler-manager.js`) is a centralized event man
 ### Event Delegation
 
 The system uses global event delegation for common events:
+
 - **Click** (capture phase) - Main click handler
 - **Change** - Form field changes
 - **Input** - Input events for validation/search
@@ -87,6 +88,7 @@ window.EventHandlerManager.init();
 Add an event listener with deduplication and tracking.
 
 **Parameters:**
+
 - `eventName` (string) - Event name (e.g., 'click', 'change')
 - `handler` (Function) - Event handler function
 - `options` (Object, optional) - Event options (e.g., { capture: true })
@@ -94,6 +96,7 @@ Add an event listener with deduplication and tracking.
 **Returns:** `boolean` - True if listener was added, false if duplicate
 
 **Example:**
+
 ```javascript
 const added = window.EventHandlerManager.addEventListener('click', handleClick, { capture: true });
 ```
@@ -103,12 +106,14 @@ const added = window.EventHandlerManager.addEventListener('click', handleClick, 
 Remove a previously registered event listener.
 
 **Parameters:**
+
 - `eventName` (string) - Event name
 - `handler` (Function) - Event handler function (must be same reference)
 
 **Returns:** `boolean` - True if listener was removed, false if not found
 
 **Example:**
+
 ```javascript
 const removed = window.EventHandlerManager.removeEventListener('click', handleClick);
 ```
@@ -118,6 +123,7 @@ const removed = window.EventHandlerManager.removeEventListener('click', handleCl
 Clean up all event listeners and reset the system.
 
 **Example:**
+
 ```javascript
 window.EventHandlerManager.cleanup();
 ```
@@ -133,6 +139,7 @@ Get all listeners with detailed information.
 **Returns:** `Array` - Array of listener objects with full metadata
 
 **Example:**
+
 ```javascript
 const listeners = window.EventHandlerManager.debug.getListeners();
 console.log('Total listeners:', listeners.length);
@@ -144,11 +151,13 @@ console.log('First listener:', listeners[0]);
 Get event history (last N events).
 
 **Parameters:**
+
 - `count` (number, optional) - Number of events to return (default: 50)
 
 **Returns:** `Array` - Array of recent event entries (most recent first)
 
 **Example:**
+
 ```javascript
 const recentEvents = window.EventHandlerManager.debug.getEventHistory(20);
 recentEvents.forEach(event => {
@@ -163,6 +172,7 @@ Get comprehensive statistics.
 **Returns:** `Object` - Statistics object with all metrics
 
 **Example:**
+
 ```javascript
 const stats = window.EventHandlerManager.debug.getStatistics();
 console.log('Total events:', stats.totalEvents);
@@ -171,6 +181,7 @@ console.log('Slow handlers:', stats.slowHandlers);
 ```
 
 **Statistics Object Structure:**
+
 ```javascript
 {
     totalEvents: number,
@@ -205,11 +216,13 @@ console.log('Slow handlers:', stats.slowHandlers);
 Get detailed information about a specific handler.
 
 **Parameters:**
+
 - `handlerKey` (string) - Handler key (format: "eventName:handlerName")
 
 **Returns:** `Object|null` - Handler information or null if not found
 
 **Example:**
+
 ```javascript
 const info = window.EventHandlerManager.debug.getHandlerInfo('click:handleClick');
 if (info) {
@@ -224,11 +237,13 @@ if (info) {
 Find all listeners for a specific element.
 
 **Parameters:**
+
 - `selector` (string) - CSS selector for the element
 
 **Returns:** `Array` - Array of matching listeners
 
 **Example:**
+
 ```javascript
 const listeners = window.EventHandlerManager.debug.findListenersForElement('#myButton');
 ```
@@ -238,11 +253,13 @@ const listeners = window.EventHandlerManager.debug.findListenersForElement('#myB
 Find all listeners for a specific event type.
 
 **Parameters:**
+
 - `eventName` (string) - Event name (click, change, etc.)
 
 **Returns:** `Array` - Array of listeners for this event
 
 **Example:**
+
 ```javascript
 const clickListeners = window.EventHandlerManager.debug.findListenersForEvent('click');
 ```
@@ -252,6 +269,7 @@ const clickListeners = window.EventHandlerManager.debug.findListenersForEvent('c
 Simulate an event on an element.
 
 **Parameters:**
+
 - `eventName` (string) - Event name to simulate
 - `elementSelector` (string) - CSS selector for target element
 - `eventData` (Object, optional) - Additional event data
@@ -259,6 +277,7 @@ Simulate an event on an element.
 **Returns:** `boolean` - True if event was dispatched
 
 **Example:**
+
 ```javascript
 window.EventHandlerManager.debug.simulateEvent('click', '#myButton', { button: 0 });
 ```
@@ -268,6 +287,7 @@ window.EventHandlerManager.debug.simulateEvent('click', '#myButton', { button: 0
 Enable verbose logging mode.
 
 **Example:**
+
 ```javascript
 window.EventHandlerManager.debug.enableVerboseLogging();
 ```
@@ -277,6 +297,7 @@ window.EventHandlerManager.debug.enableVerboseLogging();
 Disable verbose logging mode.
 
 **Example:**
+
 ```javascript
 window.EventHandlerManager.debug.disableVerboseLogging();
 ```
@@ -288,6 +309,7 @@ Get error report with all errors and context.
 **Returns:** `Object` - Error report object
 
 **Example:**
+
 ```javascript
 const errorReport = window.EventHandlerManager.debug.getErrorReport();
 console.log('Total errors:', errorReport.total);
@@ -295,6 +317,7 @@ console.log('Recent errors:', errorReport.recentErrors);
 ```
 
 **Error Report Structure:**
+
 ```javascript
 {
     total: number,
@@ -320,6 +343,7 @@ console.log('Recent errors:', errorReport.recentErrors);
 Clear event history.
 
 **Example:**
+
 ```javascript
 window.EventHandlerManager.debug.clearHistory();
 ```
@@ -329,6 +353,7 @@ window.EventHandlerManager.debug.clearHistory();
 Clear all statistics.
 
 **Example:**
+
 ```javascript
 window.EventHandlerManager.debug.clearStatistics();
 ```
@@ -383,11 +408,13 @@ Auto-wired to nearest section container.
 ## Debug Mode
 
 Debug mode is automatically enabled when:
+
 - Running on localhost (127.0.0.1, 0.0.0.0)
 - URL contains `debug=true` or `dev=true`
 - Port is 8080 (development)
 
 In debug mode:
+
 - Performance tracking is enabled
 - Stack traces are collected
 - Verbose logging is available
@@ -406,18 +433,21 @@ In debug mode:
 ### Event Not Firing
 
 1. Check if listener is registered:
+
    ```javascript
    const listeners = window.EventHandlerManager.debug.getListeners();
    console.log(listeners);
    ```
 
 2. Check event history:
+
    ```javascript
    const history = window.EventHandlerManager.debug.getEventHistory();
    console.log(history);
    ```
 
 3. Check for errors:
+
    ```javascript
    const errors = window.EventHandlerManager.debug.getErrorReport();
    console.log(errors.recentErrors);
@@ -426,12 +456,14 @@ In debug mode:
 ### Slow Performance
 
 1. Check for slow handlers:
+
    ```javascript
    const stats = window.EventHandlerManager.debug.getStatistics();
    console.log('Slow handlers:', stats.slowHandlers);
    ```
 
 2. Check handler performance:
+
    ```javascript
    const info = window.EventHandlerManager.debug.getHandlerInfo('click:myHandler');
    console.log('Average execution time:', info.performance.avg);
@@ -459,6 +491,7 @@ if (existing) {
 ## Version History
 
 ### v2.0.0 (2025-01-27)
+
 - Added advanced debugging and monitoring capabilities
 - Integrated with Logger Service
 - Added performance tracking
@@ -467,6 +500,7 @@ if (existing) {
 - Added event history and statistics
 
 ### v1.0.0 (2025-01-26)
+
 - Initial release
 - Basic event delegation
 - Duplicate listener prevention

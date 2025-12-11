@@ -1,4 +1,5 @@
 # דוח פריסת Bundles לפרודקשן
+
 ## Production Bundles Deployment Report
 
 **תאריך:** [YYYY-MM-DD]  
@@ -36,6 +37,7 @@
 | Core Systems תקינים | [מספר] ([אחוז]%) | > 90% |
 
 **עמודים עם שגיאות:**
+
 - [ ] [שם עמוד] - [תיאור שגיאה]
 
 ---

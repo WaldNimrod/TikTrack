@@ -3,6 +3,7 @@
 ## מטרה
 
 לשפר משמעותית את איכות הניתוחים על ידי:
+
 1. הוספת נתוני טריידים מלאים למנוע AI
 2. הסרת trading_account מהמידע הנשלח (שמירה כפילטר בלבד)
 3. התאמת תבניות ושדות לכל סוג ניתוח
@@ -17,12 +18,14 @@
 **קובץ חדש:** `Backend/services/trade_aggregation_service.py`
 
 **תפקידים:**
+
 - מערכת כללית לאגרגציית נתוני טריידים לשימושים שונים (AI Analysis, דוחות, סטטיסטיקות, וכו')
 - הבאת טריידים לפי פילטרים שונים (ticker, account, date range, investment type, trading method, trade ID)
 - איגוד נתונים מלאים: Trade + Executions + TradePlan + Conditions + Position
 - פורמט נתונים מובנה וניתן להרחבה
 
 **פונקציות עיקריות:**
+
 - `aggregate_trades()` - אגרגציה כללית של טריידים עם כל הנתונים
 - `get_trades_by_filters()` - הבאת טריידים לפי פילטרים
 - `enrich_trade_data()` - העשרת טרייד בודד בנתונים מלאים
@@ -31,6 +34,7 @@
 - `get_trade_summary()` - סיכום סטטיסטיקות טריידים
 
 **פילטרים נתמכים:**
+
 - `trade_ids` - רשימת IDs ספציפיים
 - `ticker_id` / `ticker_symbol` - סינון לפי טיקר
 - `trading_account_id` - סינון לפי חשבון
@@ -43,6 +47,7 @@
 ### 1.2 מבנה נתונים מובנה
 
 **מבנה Trade Enriched:**
+
 ```python
 {
     "trade": {
@@ -131,6 +136,7 @@
 ```
 
 **מבנה Aggregate Result:**
+
 ```python
 {
     "trades": [
@@ -165,6 +171,7 @@
 **קובץ חדש:** `documentation/backend/TRADE_AGGREGATION_SYSTEM.md`
 
 **תיעוד:**
+
 - סקירה כללית של המערכת
 - API של הפונקציות
 - דוגמאות שימוש
@@ -181,12 +188,14 @@
 **קובץ:** `Backend/services/ai_analysis_service.py`
 
 **שינויים:**
+
 - הרחבת `build_prompt()` לקבל `trade_data` נוסף
 - הוספת נתוני טריידים בפורמט מובנה ב-prompt
 - זיהוי סוג תבנית (Portfolio Performance, Technical, Risk) והוספת נתונים רלוונטיים
 - פורמט נתונים קריא למנוע AI
 
 **לוגיקה:**
+
 ```python
 def build_prompt(template, variables, trade_data=None):
     prompt = str(template.prompt_text)
@@ -196,6 +205,7 @@ def build_prompt(template, variables, trade_data=None):
 ```
 
 **פורמט נתונים למנוע AI:**
+
 ```
 === TRADING DATA ===
 
@@ -245,6 +255,7 @@ Summary:
 **קובץ:** `Backend/services/ai_analysis_service.py`
 
 **שינויים:**
+
 - זיהוי תבנית Portfolio Performance / Technical / Risk
 - קריאה ל-`TradeAggregationService.aggregate_trades()` לפי הפילטרים
 - קריאה ל-`TradeAggregationService.format_trades_for_ai()` לפורמט נתונים
@@ -252,6 +263,7 @@ Summary:
 - שמירת פילטרים נפרדים (כולל trading_account) ב-variables_json
 
 **מבנה variables_json משופר (גרסה 2.0):**
+
 ```json
 {
     "version": "2.0",
@@ -301,12 +313,14 @@ Summary:
 **קובץ:** `Backend/migrations/seed_ai_prompt_templates.py`
 
 **שינויים:**
+
 - הסרת `Trading Account: {trading_account}` מה-prompt
 - הוספת סעיף "Trading Data" ב-prompt שיכיל נתונים מובנים
 - עדכון המבנה לניתוח נתוני טריידים אמיתיים
 - הוספת הנחיות מפורטות למנוע לנתח נתונים אמיתיים
 
 **Prompt חדש:**
+
 ```
 Act as a senior portfolio analyst at a top-tier trading firm. You excel at analyzing trading performance, identifying patterns in execution, and providing actionable recommendations for portfolio optimization. Analyze the trading data provided below and structure your response according to the framework.
 
@@ -376,12 +390,14 @@ Build the report this way:
 ### 3.2 תבנית Technical Analysis - הוספת נתוני טריידים
 
 **שינויים:**
+
 - הוספת נתוני טריידים קיימים לטיקר (אם יש)
 - ניתוח ביצועי טריידים קודמים בניתוח הטכני
 - השוואת תכנון טכני לביצוע בפועל
 - הוספת פילטרים רלוונטיים
 
 **הוספה ל-prompt:**
+
 ```
 === PREVIOUS TRADES PERFORMANCE ===
 {trade_data_structured}
@@ -392,12 +408,14 @@ Analyze how previous trades performed with this ticker and incorporate lessons l
 ### 3.3 תבנית Risk & Conditions - הוספת נתוני תכנון
 
 **שינויים:**
+
 - הוספת נתוני Trade Plans ו-Conditions בפורמט מובנה
 - ניתוח יעילות תנאים בפועל
 - השוואת תכנון לביצוע
 - ניתוח false positives/negatives
 
 **הוספה ל-prompt:**
+
 ```
 === TRADE PLAN & CONDITIONS DATA ===
 {trade_data_structured}
@@ -548,6 +566,7 @@ Analyze the effectiveness of conditions, compare planned vs actual execution, an
 **קובץ:** `trading-ui/scripts/ai-analysis-manager.js`
 
 **שינויים:**
+
 - הוספת שדות חדשים לפי תבנית
 - טיפול ב-trade_selection_type (תלות בין שדות - הצגת/הסתרת single_trade_id)
 - טעינת רשימת טריידים לבחירה (אם נבחר "טרייד בודד")
@@ -560,9 +579,11 @@ Analyze the effectiveness of conditions, compare planned vs actual execution, an
 **קובץ:** `trading-ui/scripts/ai-analysis-manager.js`
 
 **שינויים:**
+
 - הפרדת prompt_variables מ-filters
 - בניית מבנה trade_selection לפי בחירת המשתמש
 - שליחת מבנה משופר ל-API:
+
 ```javascript
 {
     template_id: 3,
@@ -599,6 +620,7 @@ Analyze the effectiveness of conditions, compare planned vs actual execution, an
 **קובץ:** `Backend/routes/api/ai_analysis.py`
 
 **שינויים:**
+
 - קבלת מבנה variables משופר (גרסה 2.0)
 - הפרדת prompt_variables מ-filters
 - קריאה ל-`TradeAggregationService.aggregate_trades()` לפי trade_selection
@@ -606,6 +628,7 @@ Analyze the effectiveness of conditions, compare planned vs actual execution, an
 - שמירת מבנה מלא ב-variables_json (למעקב עתידי)
 
 **לוגיקה:**
+
 ```python
 # Extract variables structure
 variables = data.get('variables', {})
@@ -656,6 +679,7 @@ request_obj = ai_analysis_service.generate_analysis(
 **קובץ:** `Backend/services/ai_analysis_service.py`
 
 **מבנה:**
+
 ```json
 {
     "version": "2.0",
@@ -696,6 +720,7 @@ request_obj = ai_analysis_service.generate_analysis(
 ```
 
 **תמיכה ב-backward compatibility:**
+
 - אם variables הוא dict פשוט (גרסה 1.0) - ממיר אוטומטית ל-2.0
 - שמירה תמיד בגרסה 2.0
 
@@ -708,6 +733,7 @@ request_obj = ai_analysis_service.generate_analysis(
 **קובץ חדש:** `documentation/backend/TRADE_AGGREGATION_SYSTEM.md`
 
 **תיעוד:**
+
 - סקירה כללית של המערכת
 - API של הפונקציות
 - דוגמאות שימוש
@@ -720,6 +746,7 @@ request_obj = ai_analysis_service.generate_analysis(
 **קובץ חדש:** `documentation/04-FEATURES/AI_ANALYSIS_TRADE_DATA_FORMAT.md`
 
 **תיעוד:**
+
 - פורמט נתוני טריידים שנשלחים למנוע
 - מבנה variables_json (גרסה 2.0)
 - דוגמאות לכל סוג ניתוח
@@ -730,6 +757,7 @@ request_obj = ai_analysis_service.generate_analysis(
 **קובץ:** `documentation/04-FEATURES/AI_ANALYSIS_SYSTEM_DEVELOPER_GUIDE.md`
 
 **עדכונים:**
+
 - הוספת סעיף על Trade Aggregation System
 - הסבר על מבנה variables_json החדש
 - דוגמאות לשימוש בנתוני טריידים
@@ -739,6 +767,7 @@ request_obj = ai_analysis_service.generate_analysis(
 **קובץ:** `documentation/frontend/GENERAL_SYSTEMS_LIST.md`
 
 **הוספה:**
+
 - Trade Aggregation Service - מערכת כללית לאגרגציית נתוני טריידים
 
 ---
@@ -794,6 +823,7 @@ request_obj = ai_analysis_service.generate_analysis(
 ### פורמט נתונים למנוע AI
 
 הנתונים יוצגו בפורמט קריא ומבני למנוע:
+
 - רשימות ברורות
 - מספרים ומחירים בפורמט USD
 - אחוזים ומדדים מחושבים

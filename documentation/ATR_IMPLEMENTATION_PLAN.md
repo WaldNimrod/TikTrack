@@ -9,11 +9,13 @@
 ### 1.1 בחינת מבנה הנתונים הקיים
 
 **מצב נוכחי**:
+
 - **MarketDataQuote**: מכיל `price`, `open_price`, `change_pct_day`, `volume` - **חסרים**: `high_price`, `low_price`, `close_price` יומיים
 - **IntradayDataSlot**: מכיל OHLC אבל זה intraday (15 דקות), לא יומי - לא מתאים ל-ATR יומי
 - **מסקנה קריטית**: צריך להוסיף שדות יומיים `high_price`, `low_price`, `close_price` ל-MarketDataQuote
 
 **מדיניות שמירה**:
+
 - עד 30 יום: לשמור OHLC מלא (open, high, low, close)
 - מעבר ל-30 יום: לשמור רק open/close יומי (לא high/low) - זה הרבה יותר חשוב ממחירים בתוך היום
 - **המלצה**: ליצור cleanup script שמסיר high/low מעבר ל-30 יום
@@ -41,12 +43,14 @@
 **קובץ**: `Backend/models/external_data.py`
 
 **שינויים**:
+
 - הוספת `high_price = Column(Float, nullable=True)` - מחיר גבוה יומי
 - הוספת `low_price = Column(Float, nullable=True)` - מחיר נמוך יומי  
 - הוספת `close_price = Column(Float, nullable=True)` - מחיר סגירה יומי (של היום הקודם)
 - **הערה**: `open_price` כבר קיים ✅
 
 **Migration**: `Backend/migrations/add_daily_ohlc_fields_to_market_data_quote.py`
+
 - הוספת `high_price` (FLOAT NULL)
 - הוספת `low_price` (FLOAT NULL)
 - הוספת `close_price` (FLOAT NULL)
@@ -79,6 +83,7 @@
 **קובץ**: `Backend/services/external_data/yahoo_finance_adapter.py`
 
 **שינויים**:
+
 - הוספת שמירת `high_price`, `low_price`, `close_price` ב-`_parse_quote_response`
 - הסרת חישוב ATR ישיר מ-`_parse_quote_response` (להעביר ל-ATRCalculator)
 - הוספת פונקציה `_check_data_conflicts` - בודקת התנגשויות לפני טעינה מהספק
@@ -90,6 +95,7 @@
 **קובץ**: `Backend/services/external_data/data_normalizer.py`
 
 **שינויים**:
+
 - הוספת `atr` ו-`atr_period` ל-`NormalizedQuote` dataclass
 - הוספת `high_price`, `low_price`, `close_price` ל-`NormalizedQuote` dataclass
 - הוספת `_aggregate_atr` - נורמליזציה של ATR מספקים שונים
@@ -108,6 +114,7 @@
 **קובץ**: `Backend/migrations/add_atr_period_preference.py`
 
 **פרטים**:
+
 - שם העדפה: `atr_period`
 - **קבוצה**: `trading_settings` (group_id = 3 - הגדרות מסחר) - **לא external_data**
 - סוג: `number`
@@ -120,6 +127,7 @@
 **קובץ**: `trading-ui/preferences.html`
 
 **שינויים**:
+
 - הוספת שדה `atr_period` ל-`section3` (הגדרות מסחר) - **לא סקשן חדש**
 - שדה: `atr_period` עם input type="number", min=3, max=90, default=14
 - מיקום: בתוך סקשן "הגדרות מסחר" (section3)
@@ -130,6 +138,7 @@
 **קובץ**: `Backend/services/external_data/atr_calculator.py`
 
 **שינויים**:
+
 - קריאה להעדפת המשתמש דרך `PreferencesService` או `UserService`
 - קבוצת העדפות: `trading_settings` (לא `external_data`)
 - שימוש בערך מהעדפות במקום hardcoded 14
@@ -142,6 +151,7 @@
 **קובץ**: `Backend/services/entity_details_service.py`
 
 **שינויים**:
+
 - הוספת `atr` ו-`atr_period` לנתוני ticker (בשורה ~495)
 - קריאה ל-`ATRCalculator.get_atr_with_fallback` במקום חישוב ישיר
 - העברת `user_id` ל-`get_atr_with_fallback` כדי לקרוא העדפות
@@ -151,6 +161,7 @@
 **קובץ**: `trading-ui/scripts/entity-details-renderer.js`
 
 **שינויים**:
+
 - הוספת ATR ל-`renderMarketData` (שורה ~339)
 - שימוש ב-FieldRendererService אם יש פונקציה מתאימה
 - תצוגה בפורמט: "ATR: {value} (period: {period} days)"
@@ -159,6 +170,7 @@
 ### 4.3 הוספת ATR ל-API Response
 
 **קבצים**:
+
 - `Backend/routes/external_data/quotes.py` - כבר מעודכן ✅
 - `Backend/routes/api/quotes_v1.py` - כבר מעודכן ✅
 - `Backend/services/entity_details_service.py` - להוסיף ATR לנתוני ticker
@@ -170,6 +182,7 @@
 **קובץ**: `trading-ui/scripts/services/field-renderer-service.js`
 
 **בדיקה**: האם יש פונקציה להצגת ערכים מספריים טכניים
+
 - אם יש - להשתמש בה
 - אם אין - להוסיף פונקציה `renderTechnicalIndicator(value, period, unit)`
 
@@ -178,6 +191,7 @@
 **קובץ**: `Backend/services/external_data/atr_calculator.py`
 
 **שינויים**:
+
 - במקרה של התנגשות נתונים - להחזיר metadata עם אזהרה
 - Frontend יציג אזהרה דרך `NotificationSystem.showWarning`
 
@@ -186,6 +200,7 @@
 **קובץ**: `Backend/services/external_data/data_normalizer.py`
 
 **עקרונות ארכיטקטורה**:
+
 - כל ספק עתידי יעבור דרך `DataNormalizer` - לא ישירות ל-ATRCalculator
 - `NormalizedQuote` יכיל `atr` - כך שכל ספק יכול להחזיר ATR
 - `ATRCalculator` יעבוד עם `NormalizedQuote` - לא עם ספק ספציפי
@@ -199,6 +214,7 @@
 **קובץ**: `Backend/scripts/add_historical_daily_ohlc_data_for_atr_test.py`
 
 **פונקציונליות**:
+
 - בוחר ticker דוגמה (למשל AAPL)
 - מוסיף MarketDataQuote היסטוריים (15+ ימים) עם:
   - `open_price` - מחיר פתיחה יומי
@@ -220,34 +236,38 @@
 ## שלב 7: Migrations Database
 
 ### 7.1 Migration להוספת שדות ATR
+
 **קובץ**: `Backend/migrations/add_atr_fields_to_market_data_quote.py` - כבר קיים ✅
 
 **פעולה**: להריץ את ה-migration אם עדיין לא הורץ
 
 ### 7.2 Migration להוספת שדות OHLC יומיים
+
 **קובץ חדש**: `Backend/migrations/add_daily_ohlc_fields_to_market_data_quote.py`
 
 **שינויים**:
+
 - הוספת `high_price` (FLOAT NULL)
 - הוספת `low_price` (FLOAT NULL)
 - הוספת `close_price` (FLOAT NULL)
 - Script idempotent
 
 ### 7.3 Migration להוספת העדפת ATR Period
+
 **קובץ**: `Backend/migrations/add_atr_period_preference.py`
 
 **פעולה**: להריץ את ה-migration
 
 ## סיכום קבצים לשינוי
 
-### קבצים חדשים:
+### קבצים חדשים
 
 1. `Backend/services/external_data/atr_calculator.py` - Service לחישוב ATR עם fallback
 2. `Backend/migrations/add_daily_ohlc_fields_to_market_data_quote.py` - Migration להוספת high/low/close יומיים
 3. `Backend/migrations/add_atr_period_preference.py` - Migration להעדפת ATR period
 4. `Backend/scripts/add_historical_daily_ohlc_data_for_atr_test.py` - סקריפט לנתוני דוגמה
 
-### קבצים לעדכון:
+### קבצים לעדכון
 
 1. `Backend/models/external_data.py` - הוספת `high_price`, `low_price`, `close_price` ל-MarketDataQuote
 2. `Backend/services/external_data/yahoo_finance_adapter.py` - שמירת OHLC יומי, הסרת חישוב ATR ישיר, הוספת בדיקת התנגשויות
@@ -257,7 +277,7 @@
 6. `trading-ui/preferences.html` - הוספת שדה `atr_period` ל-section3 (הגדרות מסחר) - **לא סקשן חדש**
 7. `trading-ui/scripts/services/field-renderer-service.js` - הוספת פונקציה להצגת אינדיקטורים טכניים (אם נדרש)
 
-### קבצים שכבר מעודכנים (לא צריך לשנות):
+### קבצים שכבר מעודכנים (לא צריך לשנות)
 
 1. `Backend/models/external_data.py` - ATR fields ✅
 2. `Backend/routes/external_data/quotes.py` - ATR in API ✅
@@ -278,7 +298,7 @@
 
 ## מסקנות והמלצות להמשך
 
-### מסקנות מבדיקת הארכיטקטורה:
+### מסקנות מבדיקת הארכיטקטורה
 
 1. **מחיר פתיחה וסגירה יומי**:
    - ✅ `open_price` כבר קיים ב-MarketDataQuote
@@ -304,10 +324,12 @@
 ### 8.1 הוספת העדפות רמזור
 
 **העדפות חדשות**:
+
 - **atr_high_threshold**: גבול ATR גבוה (ברירת מחדל 3%)
 - **atr_danger_threshold**: גבול ATR מסוכן (ברירת מחדל 5%)
 
 **לוגיקת רמזור**:
+
 - **ירוק**: ATR < גבול גבוה (3%) - נמוך
 - **צהוב**: גבול גבוה (3%) ≤ ATR < גבול מסוכן (5%) - בינוני
 - **אדום**: ATR ≥ גבול מסוכן (5%) - גבוה
@@ -319,6 +341,7 @@
 **פונקציה חדשה**: `FieldRendererService.renderATR(atrValue, atrPercent, options = {})`
 
 **פרמטרים**:
+
 - `atrValue`: ערך ATR מוחלט (מספר)
 - `atrPercent`: ערך ATR באחוזים (מספר)
 - `options`: אובייקט אופציונלי
@@ -328,6 +351,7 @@
   - `showBadge`: להציג badge רמזור (default: true)
 
 **לוגיקה**:
+
 1. טעינת העדפות `atr_high_threshold` ו-`atr_danger_threshold`
 2. חישוב רמת רמזור לפי `atrPercent`
 3. יצירת HTML עם ערך ATR ו-badge רמזור
@@ -335,6 +359,7 @@
 ### 8.3 עדכון מקומות תצוגה
 
 **מקומות לעדכון**:
+
 - מודול פרטי טיקר (`entity-details-renderer.js`)
 - טופס הוספת ביצוע (`executions.js`)
 - טופס הוספת תכנון מסחר (`trade_plans.js`)
@@ -342,6 +367,7 @@
 - כל מקום אחר שמציג ATR
 
 **שימוש**:
+
 - החלפת תצוגה ידנית של ATR ב-`FieldRendererService.renderATR()`
 - העברת `atrPercent` מחושב (ATR / מחיר נוכחי * 100)
 

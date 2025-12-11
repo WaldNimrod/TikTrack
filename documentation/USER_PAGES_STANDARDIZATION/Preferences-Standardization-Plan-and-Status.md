@@ -6,10 +6,12 @@ Scope: User Pages Standardization → Preferences (`trading-ui/preferences.html`
 
 
 ### 1) Objective
+
 Unify and harden the Preferences page so it consistently loads, validates, saves, and displays the user’s actual preferences across all sections. Ensure correctness under cache (dev/prod), profile switching, and legacy data formats, while instrumenting the pipeline for smart, low-noise tracing.
 
 
 ### 2) Page and Key Files
+
 - UI page: `trading-ui/preferences.html`
 - Page script: `trading-ui/scripts/preferences.js`
 - Frontend services:
@@ -23,6 +25,7 @@ Unify and harden the Preferences page so it consistently loads, validates, saves
 
 
 ### 3) Full Work Plan (Phases and Tasks)
+
 - prefs-map-names-to-fields: Map preference names to field IDs/names across all sections (basic_settings, colors_unified, trading_settings, filter_settings), including historical exceptions.
 - prefs-normalize-all-endpoints: Enforce normalized key→value map for all/group/single fetches and auto-migrate old cached array formats.
 - prefs-init-sequencing: Fix initialization order so a normalized payload is awaited before populating UI and saving initial state.
@@ -36,6 +39,7 @@ Unify and harden the Preferences page so it consistently loads, validates, saves
 
 
 ### 4) Completed Work (Highlights)
+
 - Fixed missing/legacy backend compatibility:
   - `Backend/services/preferences_service.py`:
     - `build_profile_context()` accepts extra kwargs (e.g., `use_cache`) and resolves profile context robustly.
@@ -61,7 +65,9 @@ Unify and harden the Preferences page so it consistently loads, validates, saves
 
 
 ### 5) Current State and Gaps
+
 Current symptoms (reported) — BEFORE latest fixes:
+
 - Some fields still show defaults instead of user data, notably:
   - Colors (many show black)
   - Default page size
@@ -74,6 +80,7 @@ Current symptoms (reported) — BEFORE latest fixes:
   - Color group bi-directional normalization gaps (DOM→model, model→DOM).
 
 Status of phases (AFTER latest fixes):
+
 - Mapping: Completed. `nameAliases` + reverse mapping added in `preferences-group-manager.js` with bidirectional DOM↔key support (includes colors, filters, notifications, charts).
 - Normalization: Completed. Enforced normalized map for group/all/multiple; added cache auto-migration guards in `preferences-data.js`.
 - Init sequencing: Completed. Populate now gated after normalized payload and profile context via `PreferencesUI.loadAllPreferences()` flow.
@@ -87,12 +94,14 @@ Status of phases (AFTER latest fixes):
 
 
 ### 6) What’s Next (Actionable Tasks)
+
 1) Consolidate preferences system docs: finalize loading order notes and troubleshooting matrix.
 2) Extend tests (integration) for profile switching + audit table refresh.
 3) Monitor unresolved fields log in staging and expand `nameAliases` if new historical keys are detected.
 
 
 ### 7) Technical Guidance and Conventions
+
 - Always use general systems first (FieldRendererService, ModalManagerV2, CRUDResponseHandler, UnifiedCacheManager).
 - Never fabricate defaults: if data is missing, surface via the notification system; do not invent values.
 - Use `CSS.escape()` for dynamic selectors.
@@ -102,6 +111,7 @@ Status of phases (AFTER latest fixes):
 
 
 ### 8) Appendix — Reference Changes (Selected Diffs/Notes)
+
 - `preferences_service.py`:
   - `build_profile_context()` extended signature; returns `versions`, `generated_at`.
   - `get_preferences_by_names()` accepts `names`/`preference_names` and returns a key→value map.
@@ -116,6 +126,7 @@ Status of phases (AFTER latest fixes):
 
 
 ### 9) Ownership and Review
+
 - Implementation: Assistant (Cursor), under Nimrod’s direction.
 - Review/Acceptance: Nimrod.
 - Release: per production process (`documentation/production/UPDATE_PROCESS.md`), after full test pass and cache policy alignment.

@@ -15,6 +15,18 @@
  * @lastUpdated December 5, 2025
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Core Functions ===
+// - runComprehensiveTests() - Runcomprehensivetests
+
+// === Data Functions ===
+// - checkPageLoadingOrder() - Checkpageloadingorder
+
+// === Other ===
+// - testPageCRUD() - Testpagecrud
+
 /**
  * רשימת העמודים המרכזיים לבדיקה
  */

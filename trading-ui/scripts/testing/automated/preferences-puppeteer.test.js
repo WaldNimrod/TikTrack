@@ -14,6 +14,24 @@
  * @lastUpdated January 2025
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Core Functions ===
+// - runAllTests() - Runalltests
+
+// === UI Functions ===
+// - testPageRefresh() - Testpagerefresh
+// - testOptimisticUpdate() - Testoptimisticupdate
+
+// === Data Functions ===
+// - testPageLoad() - Testpageload
+// - testLoadGroup() - Testloadgroup
+// - testSavePreference() - Testsavepreference
+
+// === Other ===
+// - logTest() - Logtest
+
 const puppeteer = require('puppeteer');
 const path = require('path');
 

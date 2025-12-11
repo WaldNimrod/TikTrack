@@ -16,6 +16,16 @@
  * @lastUpdated 15 אוקטובר 2025
  */
 
+
+// ===== FUNCTION INDEX =====
+// === Object Methods ===
+// - dbRequest.onerror() - Onerror
+// - dbRequest.onsuccess() - Onsuccess
+
+// === Other ===
+// - generateDetailedLog() - Generatedetailedlog
+// - copyDetailedLog() - Copydetailedlog
+
 // Logger initialization check - use console if Logger not available
 if (window.Logger && typeof window.Logger.info === 'function') {
     window.Logger.info('⚙️ Cache Management Page - JavaScript loaded');

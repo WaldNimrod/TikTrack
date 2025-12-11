@@ -10,6 +10,24 @@
  * Run this in browser console after page load
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Core Functions ===
+// - runAllTests() - Runalltests
+
+// === Data Functions ===
+// - testTickersDataService() - Testtickersdataservice
+// - testAPIEndpoints() - Testapiendpoints
+
+// === API Functions ===
+// - testSelectPopulatorService() - Testselectpopulatorservice
+
+// === Other ===
+// - logTest() - Logtest
+// - testTickerSelectors() - Testtickerselectors
+// - testTickersPage() - Testtickerspage
+
 (function() {
     'use strict';
     

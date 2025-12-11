@@ -71,6 +71,7 @@ const widget = window.TradingViewWidgetsManager.createWidget({
 ```
 
 **פרמטרים נדרשים:**
+
 - `symbol` - סמל המניה (פורמט: EXCHANGE:SYMBOL)
 - `container_id` - מזהה קונטיינר
 
@@ -93,6 +94,7 @@ const widget = window.TradingViewWidgetsManager.createWidget({
 ```
 
 **פרמטרים נדרשים:**
+
 - `symbols` - מערך של סמלים
 - `container_id` - מזהה קונטיינר
 
@@ -516,6 +518,7 @@ try {
 ## גרסה
 
 **1.0.0** - 24 נובמבר 2025
+
 - מדריך מפתח מלא
 - דוגמאות לכל 11 הווידג'טים
 - Best practices

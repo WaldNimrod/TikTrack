@@ -520,6 +520,24 @@ class AIAnalysisService:
         else:
             raise ValueError(f"Unsupported provider: {provider}")
         
+        # Extract prompt_variables, filters, and trade_selection from variables
+        # Support both v2.0 structure and legacy v1.0 structure
+        # MUST be done BEFORE template_needs_trade_data check because prompt_variables is used later
+        prompt_variables = variables
+        filters = {}
+        trade_selection = {}
+        
+        if isinstance(variables, dict) and variables.get('version') == '2.0':
+            # New v2.0 structure
+            prompt_variables = variables.get('prompt_variables', variables)
+            filters = variables.get('filters', {})
+            trade_selection = variables.get('trade_selection', {})
+        elif isinstance(variables, dict) and 'prompt_variables' in variables:
+            # Partial v2.0 structure (without version)
+            prompt_variables = variables.get('prompt_variables', variables)
+            filters = variables.get('filters', {})
+            trade_selection = variables.get('trade_selection', {})
+        
         # Determine if this template needs trade data
         # Templates that benefit from trade data: Portfolio Performance (3), Technical Analysis (2), Risk & Conditions (4)
         template_needs_trade_data = template_id in [2, 3, 4]
@@ -529,23 +547,6 @@ class AIAnalysisService:
         if template_needs_trade_data:
             try:
                 from services.trade_aggregation_service import TradeAggregationService
-                
-                # Extract trade selection and filters from variables
-                # Support both v2.0 structure and legacy v1.0 structure
-                prompt_variables = variables
-                filters = {}
-                trade_selection = {}
-                
-                if isinstance(variables, dict) and variables.get('version') == '2.0':
-                    # New v2.0 structure
-                    prompt_variables = variables.get('prompt_variables', variables)
-                    filters = variables.get('filters', {})
-                    trade_selection = variables.get('trade_selection', {})
-                elif isinstance(variables, dict) and 'prompt_variables' in variables:
-                    # Partial v2.0 structure (without version)
-                    prompt_variables = variables.get('prompt_variables', variables)
-                    filters = variables.get('filters', {})
-                    trade_selection = variables.get('trade_selection', {})
                 
                 # Build aggregation parameters
                 agg_params = {'user_id': user_id}
@@ -571,6 +572,9 @@ class AIAnalysisService:
                     agg_params['ticker_symbol'] = criteria['ticker_symbol']
                 elif prompt_variables.get('ticker_symbol'):
                     agg_params['ticker_symbol'] = prompt_variables['ticker_symbol']
+                elif prompt_variables.get('stock_ticker'):
+                    # Also check stock_ticker (template 1 uses stock_ticker, not ticker_symbol)
+                    agg_params['ticker_symbol'] = prompt_variables['stock_ticker']
                 
                 if criteria.get('investment_type'):
                     agg_params['investment_type'] = criteria['investment_type']
@@ -631,7 +635,8 @@ class AIAnalysisService:
                 trade_data_str = f"Error fetching trade data: {str(e)}"
         
         # Build prompt with trade data if available
-        prompt = PromptTemplateService.build_prompt(template, prompt_variables if isinstance(variables, dict) and 'prompt_variables' in variables else variables, trade_data_str)
+        # prompt_variables is already extracted above (works for both v2.0 and legacy formats)
+        prompt = PromptTemplateService.build_prompt(template, prompt_variables, trade_data_str)
         
         # Create request record - save full variables structure
         request = AIAnalysisRequest(
@@ -654,14 +659,41 @@ class AIAnalysisService:
                 # Provider returned an error response
                 error_msg = response.get('error', 'Unknown error from LLM provider')
                 error_code = response.get('error_code') or categorize_error(Exception(error_msg), error_msg)
-                user_message, _ = get_error_message(error_code, 'he')
+                
+                # Format detailed error message with provider and additional info
+                from services.ai_analysis_error_codes import format_error_response
+                error_response = format_error_response(
+                    error_code=error_code,
+                    original_message=error_msg,
+                    language='he',
+                    provider=provider,  # Include provider name
+                    reset_time=response.get('reset_time'),  # If provider returns reset time
+                    retry_after=response.get('retry_after_minutes')  # If provider returns retry after
+                )
+                user_message = error_response.get('message', error_msg)
                 
                 setattr(request, 'status', 'failed')
-                setattr(request, 'error_message', user_message)  # User-friendly message
-                # Store error code in error_message with format: "ERROR_CODE: user_message"
-                # This allows frontend to extract error code if needed
+                
+                # Store detailed error message with error code for frontend parsing
+                # Format: "ERROR_CODE: detailed_message"
                 setattr(request, 'error_message', f"{error_code}: {user_message}")
-                logger.error(f"LLM provider returned error [{error_code}]: {error_msg}")
+                
+                # Store additional error data as temporary attribute for to_dict() to include in API response
+                # This will be available in the immediate API response before saving to DB
+                error_data = {
+                    'error_code': error_code,
+                    'message': user_message,
+                    'provider': provider
+                }
+                if response.get('reset_time'):
+                    error_data['reset_time'] = response.get('reset_time')
+                if response.get('retry_after_minutes'):
+                    error_data['retry_after_minutes'] = response.get('retry_after_minutes')
+                
+                # Store as temporary attribute for to_dict()
+                setattr(request, '_error_data', error_data)
+                
+                logger.error(f"LLM provider returned error [{error_code}]: {error_msg} (provider: {provider})")
             elif not response.get('text'):
                 # No text in response
                 error_code = AIAnalysisErrorCodes.PROVIDER_NO_RESPONSE
@@ -680,10 +712,27 @@ class AIAnalysisService:
         except Exception as e:
             logger.error(f"Error generating analysis: {e}", exc_info=True)
             error_code = categorize_error(e, str(e))
-            user_message, _ = get_error_message(error_code, 'he')
+            
+            # Format detailed error message with provider info
+            from services.ai_analysis_error_codes import format_error_response
+            error_response = format_error_response(
+                error_code=error_code,
+                original_message=str(e),
+                language='he',
+                provider=provider  # Include provider name even for exceptions
+            )
+            user_message = error_response.get('message', str(e))
             
             setattr(request, 'status', 'failed')
             setattr(request, 'error_message', f"{error_code}: {user_message}")
+            
+            # Store additional error data as temporary attribute for to_dict()
+            error_data = {
+                'error_code': error_code,
+                'message': user_message,
+                'provider': provider  # Include provider even for exceptions
+            }
+            setattr(request, '_error_data', error_data)
         
         db.commit()
         return request

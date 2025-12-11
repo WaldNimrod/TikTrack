@@ -23,7 +23,7 @@ function myFunction() {
 
 ## When to Use Error Handling
 
-### ✅ Always Use try-catch For:
+### ✅ Always Use try-catch For
 
 1. **API Calls**
    - Fetch requests
@@ -45,7 +45,7 @@ function myFunction() {
    - Async/await
    - Timeouts
 
-### ❌ Optional Use For:
+### ❌ Optional Use For
 
 1. **Simple getters/setters**
 2. **Pure utility functions with no side effects**

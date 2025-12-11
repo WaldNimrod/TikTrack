@@ -1,4 +1,5 @@
 # תוכנית קביעת Bundles כחלק קבוע במערכת
+
 ## Permanent Bundles Setup Plan
 
 **תאריך:** 6 בדצמבר 2025  
@@ -6,6 +7,7 @@
 **סטטוס:** ✅ **הושלם - Environment-Aware**
 
 **⚠️ עדכון:** התוכנית עודכנה להיות Environment-Aware:
+
 - Development (`TikTrackApp`) - ללא bundles (אוטומטי)
 - Production (`TikTrackApp-Production`) - עם bundles (אוטומטי)
 
@@ -14,6 +16,7 @@
 ## 🎯 מטרה
 
 לקבע את מערכת ה-bundles כחלק קבוע, יציב ויחיד במערכת, כך שהיא תהיה:
+
 - ✅ ברירת מחדל ב-production
 - ✅ חלק מתהליך ה-build האוטומטי
 - ✅ מתועדת ומנוהלת
@@ -28,16 +31,19 @@
 #### 1.1 עדכון `generate-script-loading-code.js`
 
 **מצב נוכחי:**
+
 ```javascript
 function generateScriptLoadingCode(pageName, mode = 'development', useBundles = false)
 ```
 
 **שינוי נדרש:**
+
 ```javascript
 function generateScriptLoadingCode(pageName, mode = 'production', useBundles = true)
 ```
 
 **פעולות:**
+
 - [ ] שינוי default values ל-`mode = 'production'` ו-`useBundles = true`
 - [ ] עדכון ה-help text
 - [ ] הוספת validation ש-bundles קיימים ב-production mode
@@ -53,11 +59,13 @@ function generateScriptLoadingCode(pageName, mode = 'production', useBundles = t
 **יצירת סקריפט:** `scripts/build/pre-build-check.js`
 
 **תפקיד:**
+
 - בדיקה שכל ה-bundles קיימים
 - בניית bundles חסרים
 - validation של bundles
 
 **פעולות:**
+
 - [ ] יצירת `scripts/build/pre-build-check.js`
 - [ ] הוספת validation checks
 - [ ] הוספת auto-build ל-bundles חסרים
@@ -67,11 +75,13 @@ function generateScriptLoadingCode(pageName, mode = 'production', useBundles = t
 **יצירת סקריפט:** `scripts/build/post-build-validation.js`
 
 **תפקיד:**
+
 - בדיקה שכל העמודים משתמשים ב-bundles
 - validation של script loading code
 - בדיקת גודל bundles
 
 **פעולות:**
+
 - [ ] יצירת `scripts/build/post-build-validation.js`
 - [ ] הוספת validation checks
 - [ ] הוספת size checks
@@ -93,6 +103,7 @@ function generateScriptLoadingCode(pageName, mode = 'production', useBundles = t
 ```
 
 **פעולות:**
+
 - [ ] הוספת `build` script
 - [ ] הוספת `prebuild` hook
 - [ ] הוספת `build:validate` script
@@ -107,6 +118,7 @@ function generateScriptLoadingCode(pageName, mode = 'production', useBundles = t
 **קובץ:** `documentation/03-DEVELOPMENT/GUIDES/BUNDLING_SYSTEM_GUIDE.md`
 
 **עדכונים נדרשים:**
+
 - [ ] הוספת סעיף "Bundles as Default"
 - [ ] הסבר על תהליך ה-build האוטומטי
 - [ ] הסבר על validation checks
@@ -117,6 +129,7 @@ function generateScriptLoadingCode(pageName, mode = 'production', useBundles = t
 **קובץ:** `documentation/02-ARCHITECTURE/FRONTEND/UNIFIED_INITIALIZATION_SYSTEM.md`
 
 **עדכונים נדרשים:**
+
 - [ ] עדכון סעיף "Bundling System" - bundles הם ברירת מחדל
 - [ ] הסבר על production mode
 - [ ] הסבר על development mode (ללא bundles)
@@ -126,6 +139,7 @@ function generateScriptLoadingCode(pageName, mode = 'production', useBundles = t
 **קובץ:** `documentation/INDEX.md`
 
 **עדכונים נדרשים:**
+
 - [ ] עדכון קישורים
 - [ ] הוספת סעיף "Build System"
 
@@ -138,11 +152,13 @@ function generateScriptLoadingCode(pageName, mode = 'production', useBundles = t
 **יצירת סקריפט:** `scripts/build/check-bundle-existence.js`
 
 **תפקיד:**
+
 - בדיקה שכל ה-bundles הנדרשים קיימים
 - דוח על bundles חסרים
 - המלצות לתיקון
 
 **פעולות:**
+
 - [ ] יצירת `scripts/build/check-bundle-existence.js`
 - [ ] הוספת checks לכל packages
 - [ ] הוספת error reporting
@@ -152,11 +168,13 @@ function generateScriptLoadingCode(pageName, mode = 'production', useBundles = t
 **יצירת סקריפט:** `scripts/build/validate-pages-bundles.js`
 
 **תפקיד:**
+
 - בדיקה שכל העמודים משתמשים ב-bundles
 - דוח על עמודים שלא משתמשים ב-bundles
 - המלצות לתיקון
 
 **פעולות:**
+
 - [ ] יצירת `scripts/build/validate-pages-bundles.js`
 - [ ] הוספת checks לכל עמודים
 - [ ] הוספת error reporting
@@ -166,11 +184,13 @@ function generateScriptLoadingCode(pageName, mode = 'production', useBundles = t
 **עדכון:** `scripts/build/test-bundles.js`
 
 **תפקיד:**
+
 - בדיקת גודל bundles
 - אזהרות על bundles גדולים מדי
 - המלצות לאופטימיזציה
 
 **פעולות:**
+
 - [ ] הוספת size checks
 - [ ] הוספת warnings
 - [ ] הוספת recommendations
@@ -184,11 +204,13 @@ function generateScriptLoadingCode(pageName, mode = 'production', useBundles = t
 **יצירת סקריפט:** `.git/hooks/pre-commit` (או `husky`)
 
 **תפקיד:**
+
 - בדיקה שכל ה-bundles נבנו
 - validation של bundles
 - מניעת commit אם יש בעיות
 
 **פעולות:**
+
 - [ ] יצירת pre-commit hook
 - [ ] הוספת bundle checks
 - [ ] הוספת validation
@@ -198,11 +220,13 @@ function generateScriptLoadingCode(pageName, mode = 'production', useBundles = t
 **עדכון:** `.github/workflows/` או CI config
 
 **תפקיד:**
+
 - build bundles ב-CI
 - validation של bundles
 - tests עם bundles
 
 **פעולות:**
+
 - [ ] הוספת build step
 - [ ] הוספת validation step
 - [ ] הוספת test step
@@ -216,11 +240,13 @@ function generateScriptLoadingCode(pageName, mode = 'production', useBundles = t
 **יצירת קובץ:** `.env.example` או `config/build.config.js`
 
 **תפקיד:**
+
 - הגדרת default mode
 - הגדרת bundle settings
 - הגדרת validation settings
 
 **פעולות:**
+
 - [ ] יצירת config file
 - [ ] הוספת environment variables
 - [ ] הוספת documentation
@@ -230,11 +256,13 @@ function generateScriptLoadingCode(pageName, mode = 'production', useBundles = t
 **עדכון:** תעוד ו-scripts
 
 **תפקיד:**
+
 - הסבר על development mode (ללא bundles)
 - הסבר על production mode (עם bundles)
 - הוראות מעבר בין modes
 
 **פעולות:**
+
 - [ ] עדכון תעוד
 - [ ] הוספת scripts למעבר בין modes
 - [ ] הוספת validation
@@ -248,11 +276,13 @@ function generateScriptLoadingCode(pageName, mode = 'production', useBundles = t
 **יצירת סקריפט:** `scripts/build/monitor-build.js`
 
 **תפקיד:**
+
 - מעקב אחרי build times
 - מעקב אחרי bundle sizes
 - alerts על שינויים משמעותיים
 
 **פעולות:**
+
 - [ ] יצירת monitoring script
 - [ ] הוספת metrics collection
 - [ ] הוספת alerts
@@ -262,11 +292,13 @@ function generateScriptLoadingCode(pageName, mode = 'production', useBundles = t
 **עדכון:** monitoring system
 
 **תפקיד:**
+
 - מעקב אחרי bundle loading
 - מעקב אחרי errors
 - alerts על בעיות
 
 **פעולות:**
+
 - [ ] עדכון monitoring system
 - [ ] הוספת bundle metrics
 - [ ] הוספת alerts
@@ -332,11 +364,13 @@ function generateScriptLoadingCode(pageName, mode = 'production', useBundles = t
 ## 📝 הערות
 
 ### Development Mode
+
 - Development mode ימשיך להשתמש ב-scripts בודדים (ללא bundles)
 - זה מאפשר debugging קל יותר
 - Production mode ישתמש ב-bundles (ברירת מחדל)
 
 ### Backward Compatibility
+
 - עדיין אפשר להשתמש ב-`--mode=development` או `--no-bundles`
 - זה מאפשר גמישות במידת הצורך
 - אבל ברירת מחדל היא production עם bundles

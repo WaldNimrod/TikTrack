@@ -7,6 +7,7 @@ This document provides comprehensive testing guidelines and checklists for all T
 ## 🎯 Testing Strategy
 
 ### ✅ **Testing Levels**
+
 - **Unit Testing**: Individual function and component testing
 - **Integration Testing**: Module interaction testing
 - **System Testing**: End-to-end functionality testing
@@ -14,6 +15,7 @@ This document provides comprehensive testing guidelines and checklists for all T
 - **Security Testing**: Vulnerability and access control testing
 
 ### 🔧 **Testing Tools**
+
 - **Python**: pytest, unittest
 - **JavaScript**: Manual testing
 - **API Testing**: Postman, curl
@@ -23,6 +25,7 @@ This document provides comprehensive testing guidelines and checklists for all T
 ## 🏗️ Testing Architecture
 
 ### Test Directory Structure
+
 ```
 Backend/
 ├── tests/
@@ -43,6 +46,7 @@ Backend/
 ```
 
 ### Frontend Testing Structure
+
 ```
 trading-ui/
 ├── tests/
@@ -60,6 +64,7 @@ trading-ui/
 ## 📊 Module Testing Checklist
 
 ### 🔐 **Authentication Module**
+>
 > 📋 **כל הבדיקות הועברו ל**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md)
   > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Registration confirmation
 
@@ -77,6 +82,7 @@ trading-ui/
   > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Concurrent session management
 
 ### 💰 **Accounts Module**
+>
 > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) **Account CRUD Operations**
   > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Create new account
   > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Read account details
@@ -98,6 +104,7 @@ trading-ui/
   > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Cascade delete handling
 
 ### 📈 **Trades Module**
+>
 > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) **Trade CRUD Operations**
   > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Create new trade
   > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Read trade details
@@ -119,6 +126,7 @@ trading-ui/
   > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Performance metrics
 
 ### 🎯 **Tickers Module**
+>
 > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) **Ticker CRUD Operations**
   > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Create new ticker
   > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Read ticker details
@@ -140,6 +148,7 @@ trading-ui/
   > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Cascade operations
 
 ### 🔔 **Alerts Module**
+>
 > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) **Alert CRUD Operations**
   > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Create new alert
   > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Read alert details
@@ -160,6 +169,7 @@ trading-ui/
   > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Alert deactivation
 
 ### 📝 **Notes Module**
+>
 > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) **Note CRUD Operations**
   > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Create new note
   > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Read note details
@@ -180,6 +190,7 @@ trading-ui/
   > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Note filtering
 
 ### 💸 **Cash Flows Module**
+>
 > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) **Cash Flow CRUD Operations**
   > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Create new cash flow
   > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Read cash flow details
@@ -200,6 +211,7 @@ trading-ui/
   > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Period-based summaries
 
 ### ⚙️ **Preferences Module**
+>
 > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) **Preferences CRUD Operations**
   > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Create user preferences
   > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Read preference settings
@@ -220,6 +232,7 @@ trading-ui/
   > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Multi-user support
 
 ### 🗄️ **Database Module**
+>
 > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) **Database Operations**
   > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Connection management
   > 📋 **הועבר לקובץ מרכזי**: [../../CENTRAL_TASKS_TODO.md](../../CENTRAL_TASKS_TODO.md) Transaction handling
@@ -243,6 +256,7 @@ trading-ui/
 ### Unit Testing Examples
 
 #### Model Testing
+
 ```python
 import pytest
 from Backend.models.trade import Trade
@@ -281,6 +295,7 @@ class TestTradeModel:
 ```
 
 #### Service Testing
+
 ```python
 import pytest
 from Backend.services.trade_service import TradeService
@@ -324,6 +339,7 @@ class TestTradeService:
 ### Integration Testing Examples
 
 #### API Testing
+
 ```python
 import pytest
 from Backend.app import app
@@ -381,6 +397,7 @@ class TestTradeAPI:
 ### Frontend Testing Examples
 
 #### JavaScript Unit Testing
+
 ```javascript
 // test/trade-service.test.js
 describe('TradeService', () => {
@@ -437,6 +454,7 @@ describe('TradeService', () => {
 ## 🚀 Performance Testing
 
 ### Load Testing
+
 ```python
 import time
 import requests
@@ -475,6 +493,7 @@ def load_test_api():
 ```
 
 ### Database Performance Testing
+
 ```python
 import time
 from Backend.services.trade_service import TradeService
@@ -501,6 +520,7 @@ def test_database_performance():
 ## 🔧 Test Automation
 
 ### Continuous Integration
+
 ```yaml
 # .github/workflows/test.yml
 name: Tests
@@ -541,6 +561,7 @@ jobs:
 ```
 
 ### Test Reporting
+
 ```python
 # Generate test report
 def generate_test_report():

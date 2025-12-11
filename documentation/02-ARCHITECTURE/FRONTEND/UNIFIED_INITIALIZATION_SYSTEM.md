@@ -1,4 +1,5 @@
 # מערכת איתחול מאוחדת - TikTrack
+
 ## Unified Initialization System
 
 **תאריך יצירה:** 24 בנובמבר 2025  
@@ -61,6 +62,7 @@ trading-ui/scripts/
 ```
 
 **שינוי חשוב (דצמבר 2025):**
+
 - `core-systems.js` הועבר מ-`base` package ל-`init-system` package
 - `init-system` נטען אחרון (loadOrder: 22) - אחרי כל המערכות
 - `init-system` תלוי רק ב-`base` package (1 תלות במקום 25)
@@ -74,11 +76,13 @@ trading-ui/scripts/
 **תפקיד:** נקודת הכניסה המרכזית לכל איתחול עמוד
 
 **שינוי חשוב (דצמבר 2025):**
+
 - `UnifiedAppInitializer` עבר מ-`base` package ל-`init-system` package
 - נטען אחרון כדי שכל המערכות יהיו זמינות לפני איתחול
 - תלויות הופחתו מ-25 ל-1 (`base` בלבד)
 
 **מבנה:**
+
 ```javascript
 class UnifiedAppInitializer {
   constructor() {
@@ -115,6 +119,7 @@ class UnifiedAppInitializer {
 **תפקיד:** זיהוי עמוד וניתוח מערכות זמינות
 
 **פעולות:**
+
 1. **זיהוי עמוד:**
    - קריאת `window.location.pathname`
    - זיהוי שם העמוד (index, trades, executions, וכו')
@@ -139,6 +144,7 @@ class UnifiedAppInitializer {
 **תפקיד:** הכנת קונפיגורציה אופטימלית לאיתחול
 
 **פעולות:**
+
 1. **טעינת Page Config:**
    - קריאת `window.pageInitializationConfigs[pageName]`
    - Fallback ל-`window.PAGE_CONFIGS[pageName]` (legacy)
@@ -165,6 +171,7 @@ class UnifiedAppInitializer {
 **תפקיד:** ביצוע איתחול כל המערכות
 
 **פעולות:**
+
 1. **Cache System Initialization:**
    - אתחול UnifiedCacheManager
    - אתחול CacheTTLGuard
@@ -195,6 +202,7 @@ class UnifiedAppInitializer {
 **תפקיד:** סיום איתחול ופעולות סופיות
 
 **פעולות:**
+
 1. **State Restoration:**
    - שחזור מצב סקשנים (sections)
    - שחזור מצב פילטרים
@@ -257,6 +265,7 @@ class UnifiedAppInitializer {
 **תפקיד:** מערכות ליבה בסיסיות הנדרשות לכל עמוד
 
 **סקריפטים מרכזיים:**
+
 - `api-config.js` - הגדרות API
 - `notification-system.js` - מערכת התראות
 - `ui-utils.js` - כלי עזר UI
@@ -273,6 +282,7 @@ class UnifiedAppInitializer {
 **תפקיד:** שירותים כלליים למערכת
 
 **סקריפטים מרכזיים:**
+
 - `services/field-renderer-service.js` - רינדור שדות
 - `services/crud-response-handler.js` - טיפול בתגובות CRUD
 - `https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js` - **jsPDF library** (נדרש ל-AI analysis PDF export)
@@ -290,6 +300,7 @@ class UnifiedAppInitializer {
 **תפקיד:** מודולים כלליים למערכת
 
 **סקריפטים מרכזיים:**
+
 - `modal-navigation-manager.js` - ניהול ניווט מודלים
 - `modal-z-index-manager.js` - **ניהול z-index דינמי למודלים מקוננים**
 - `modal-manager-v2.js` - מנהל מודלים V2
@@ -305,6 +316,7 @@ class UnifiedAppInitializer {
 **תפקיד:** שירותי ישויות
 
 **סקריפטים מרכזיים:**
+
 - `services/trades-data.js` - שירות נתוני טריידים
 - `services/trade-plans-data.js` - **שירות נתוני תכניות מסחר**
 - `services/notes-data.js` - שירות נתוני הערות
@@ -520,16 +532,19 @@ scripts: [
 #### 1. `defer` - טעינה מושהית (מומלץ לסקריפטים קריטיים)
 
 **שימוש:**
+
 - סקריפטים קריטיים עם תלויות
 - סקריפטים שצריכים להיטען בסדר מסוים
 - כל ה-packages הקריטיים (base, services, modules, ui-advanced, crud, preferences)
 
 **התנהגות:**
+
 - הסקריפט נטען במקביל ל-parsing של HTML
 - הסקריפט רץ **אחרי** שה-HTML נטען במלואו
 - **סדר הביצוע נשמר** - סקריפטים עם `defer` רצים לפי הסדר שמופיעים ב-HTML
 
 **דוגמה:**
+
 ```html
 <script src="scripts/auth.js?v=1.0.0" defer></script>
 <script src="scripts/notification-system.js?v=1.0.0" defer></script>
@@ -539,16 +554,19 @@ scripts: [
 #### 2. `async` - טעינה אסינכרונית (מומלץ לסקריפטים לא קריטיים)
 
 **שימוש:**
+
 - סקריפטים לא קריטיים
 - סקריפטים ללא תלויות
 - dev-tools, monitoring scripts
 
 **התנהגות:**
+
 - הסקריפט נטען במקביל ל-parsing של HTML
 - הסקריפט רץ **מיד כשהוא מוכן** (לא מחכה ל-HTML)
 - **סדר הביצוע לא מובטח** - הסקריפט הראשון שמוכן ירוץ ראשון
 
 **דוגמה:**
+
 ```html
 <script src="scripts/dev-tools.js?v=1.0.0" async></script>
 <!-- רץ מיד כשהוא מוכן, לא מחכה לסקריפטים אחרים -->
@@ -557,10 +575,12 @@ scripts: [
 #### 3. `sync` - טעינה סינכרונית (נדיר מאוד)
 
 **שימוש:**
+
 - רק במקרים מיוחדים מאוד
 - סקריפטים שצריכים לחסום את הטעינה
 
 **התנהגות:**
+
 - הסקריפט נטען ובוצע **לפני** המשך parsing של HTML
 - חוסם את הטעינה - לא מומלץ
 
@@ -597,7 +617,8 @@ scripts: [
 
 ### כללי סיווג
 
-#### Packages עם `defer` (קריטיים):
+#### Packages עם `defer` (קריטיים)
+
 - `base` - חובה לכל עמוד
 - `services` - שירותים בסיסיים
 - `modules` - מודולים ומערכות
@@ -608,7 +629,8 @@ scripts: [
 - `conditions` - תנאים
 - `init-system` - מערכת איתחול
 
-#### Packages עם `async` (לא קריטיים):
+#### Packages עם `async` (לא קריטיים)
+
 - `dev-tools` - כלי פיתוח
 - `monitoring` - ניטור (חלק מ-init-system)
 
@@ -625,6 +647,7 @@ node trading-ui/scripts/generate-script-loading-code.js index --mode=production 
 ```
 
 הכלי:
+
 1. קורא את `package-manifest.js` ו-`page-initialization-configs.js`
 2. ממיין packages לפי `loadOrder`
 3. יוצר תגי `<script>` עם `loadingStrategy` הנכון
@@ -643,17 +666,20 @@ node trading-ui/scripts/generate-script-loading-code.js index --mode=production 
 #### Development Mode (ברירת מחדל)
 
 **שימוש:**
+
 - פיתוח יומיומי
 - דיבוג
 - בדיקות
 
 **תכונות:**
+
 - כל הסקריפטים נטענים בנפרד (קבצים מקוריים)
 - קל לדיבוג - כל קובץ נפרד
 - Source maps זמינים
 - שינויים בקוד נראים מיד
 
 **דוגמה:**
+
 ```html
 <script src="scripts/auth.js?v=1.0.0" defer></script>
 <script src="scripts/notification-system.js?v=1.0.0" defer></script>
@@ -664,16 +690,19 @@ node trading-ui/scripts/generate-script-loading-code.js index --mode=production 
 #### Production Mode (עם Bundles)
 
 **שימוש:**
+
 - פרודקשן
 - ביצועים מיטביים
 
 **תכונות:**
+
 - כל הסקריפטים של package מאוחדים ל-bundle אחד
 - הפחתה דרמטית במספר בקשות (מ-246 ל-30-50)
 - Minification ו-optimization
 - Source maps זמינים לדיבוג
 
 **דוגמה:**
+
 ```html
 <script src="scripts/bundles/base.bundle.js?v=1.0.0" defer></script>
 <script src="scripts/bundles/services.bundle.js?v=1.0.0" defer></script>
@@ -693,6 +722,7 @@ npm run build:bundles -- --package=base
 ```
 
 **תהליך:**
+
 1. קריאת `package-manifest.js`
 2. זיהוי כל הסקריפטים בכל package
 3. איחוד הסקריפטים ל-bundle אחד עם `esbuild`
@@ -711,6 +741,7 @@ npm run test:bundles -- --package=base
 ```
 
 **בדיקות:**
+
 - וידוא שה-bundle קיים
 - בדיקת גודל (צריך להיות קטן יותר מהמקורי)
 - וידוא שה-source map קיים
@@ -719,12 +750,14 @@ npm run test:bundles -- --package=base
 ### מבנה Bundle
 
 כל bundle מכיל:
+
 - **כל הסקריפטים של ה-package** בסדר הנכון (לפי `loadOrder`)
 - **Minification** - קוד מקוצר
 - **Source map** - לדיבוג
 - **IIFE wrapper** - בידוד scope
 
 **דוגמה:**
+
 ```javascript
 // base.bundle.js
 (function() {
@@ -741,16 +774,19 @@ npm run test:bundles -- --package=base
 #### תהליך עדכון
 
 1. **גיבוי קובץ HTML המקורי:**
+
    ```bash
    cp trading-ui/index.html trading-ui/index.html.backup
    ```
 
 2. **יצירת HTML עם bundles:**
+
    ```bash
    node trading-ui/scripts/generate-script-loading-code.js index --mode=production --use-bundles > temp_index.html
    ```
 
 3. **החלפת הקובץ:**
+
    ```bash
    mv temp_index.html trading-ui/index.html
    ```
@@ -795,11 +831,13 @@ if (useBundles && fs.existsSync(bundlePath)) {
 #### Bundle לא נטען
 
 **סיבות אפשריות:**
+
 1. Bundle לא נבנה - הרץ `npm run build:bundles`
 2. Bundle לא קיים - בדוק ב-`trading-ui/scripts/bundles/`
 3. שגיאת build - בדוק את ה-logs
 
 **פתרון:**
+
 - המערכת נופלת אוטומטית לקבצים המקוריים
 - בדוק את ה-console לשגיאות
 - הרץ `npm run test:bundles` לבדיקה
@@ -807,11 +845,13 @@ if (useBundles && fs.existsSync(bundlePath)) {
 #### שגיאות JavaScript אחרי Bundling
 
 **סיבות אפשריות:**
+
 1. בעיית סדר טעינה
 2. בעיית scope
 3. בעיית dependencies
 
 **פתרון:**
+
 - בדוק את ה-source map
 - בדוק את ה-console לשגיאות
 - נסה development mode לבדיקה
@@ -904,24 +944,28 @@ if (useBundles && fs.existsSync(bundlePath)) {
 
 ## 📚 קבצים רלוונטיים
 
-### קבצי קוד:
+### קבצי קוד
+
 - `trading-ui/scripts/modules/core-systems.js` - מערכת איתחול מרכזית
 - `trading-ui/scripts/init-system/package-manifest.js` - מניפסט חבילות
 - `trading-ui/scripts/page-initialization-configs.js` - הגדרות עמודים
 - `trading-ui/scripts/monitoring-functions.js` - פונקציות ניטור
 
-### קבצי דוקומנטציה:
+### קבצי דוקומנטציה
+
 - `documentation/frontend/JAVASCRIPT_ARCHITECTURE.md` - ארכיטקטורה כללית
 - `documentation/REFACTOR_INITIALIZATION_SYSTEM_COMPLETION_REPORT.md` - דוח השלמה
 - `documentation/05-REPORTS/BUSINESS_LOGIC_INITIALIZATION_INTEGRATION_ANALYSIS.md` - ניתוח אינטגרציה
 - `documentation/03-DEVELOPMENT/TOOLS/PACKAGE_LOAD_ORDER_AUDIT_TOOLS_GUIDE.md` - מדריך מקיף לכלי בדיקת סדר טעינה ותלויות ✅ **חדש! דצמבר 2025**
 
-### כלי בדיקה:
+### כלי בדיקה
+
 - `trading-ui/init-system-management.html` - ממשק ניטור
 - `trading-ui/scripts/init-system/all-pages-monitoring-test.js` - בדיקת כל העמודים
 - `trading-ui/scripts/init-system/comprehensive-initialization-test.js` - בדיקה מקיפה
 
-### כלי בדיקה אוטומטיים (scripts/audit/):
+### כלי בדיקה אוטומטיים (scripts/audit/)
+
 - `validate-package-dependencies.js` - בדיקת תלויות וסדר טעינה של חבילות ✅ **חדש! דצמבר 2025**
 - `validate-all-pages-load-order.js` - בדיקת סדר טעינה בכל עמודי המערכת
 - `fix-all-pages-load-order-v2.js` - תיקון אוטומטי של סדר טעינה
@@ -959,6 +1003,7 @@ if (useBundles && fs.existsSync(bundlePath)) {
 **תאריך:** 4 בדצמבר 2025
 
 **שינויים מרכזיים:**
+
 1. **העברת `core-systems.js` ל-`init-system` package**
    - `UnifiedAppInitializer` עבר מ-`base` package ל-`init-system` package
    - נטען אחרון (loadOrder: 22) - אחרי כל המערכות
@@ -975,12 +1020,14 @@ if (useBundles && fs.existsSync(bundlePath)) {
    - תיקון לבעיית טעינה מאוחרת - בודק `document.readyState` ומריץ איתחול ישירות אם נדרש
 
 **תוצאות:**
+
 - ✅ הפחתת תלויות: 25 → 1 (96% הפחתה)
 - ✅ איחוד מערכות: 2 → 1 מערכת איתחול
 - ✅ סדר טעינה מיטוב: `init-system` נטען אחרון
 - ✅ 40 עמודים עודכנו בהצלחה
 
 **דוחות:**
+
 - `documentation/05-REPORTS/INIT_REFACTOR_COMPLETION_REPORT.md` - דוח סיום מלא
 - `documentation/05-REPORTS/INIT_PERFORMANCE_COMPARISON.md` - דוח ביצועים
 
@@ -994,6 +1041,7 @@ if (useBundles && fs.existsSync(bundlePath)) {
 `documentation/02-ARCHITECTURE/FRONTEND/UNIFIED_INITIALIZATION_SYSTEM_API.md`
 
 התיעוד כולל:
+
 - כל המתודות של `UnifiedAppInitializer`
 - כל הפרמטרים והערכים המוחזרים
 - דוגמאות שימוש מפורטות
@@ -1020,6 +1068,7 @@ if (useBundles && fs.existsSync(bundlePath)) {
 `documentation/03-DEVELOPMENT/TOOLS/PACKAGE_LOAD_ORDER_AUDIT_TOOLS_GUIDE.md`
 
 המדריך כולל:
+
 - רשימת כל כלי הבדיקה
 - מדריך שימוש מפורט לכל כלי
 - תרחישי שימוש נפוצים

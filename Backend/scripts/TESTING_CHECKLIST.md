@@ -1,4 +1,5 @@
 # ✅ רשימת בדיקות - מערכת Multi-User
+
 ## TikTrack - November 29, 2025
 
 רשימת בדיקות מקיפה עם אפשרות לסמן כל בדיקה.
@@ -8,6 +9,7 @@
 ## 🔐 Authentication (7 בדיקות)
 
 ### Backend API
+
 - [ ] `POST /api/auth/register` - הרשמה מצליחה
 - [ ] `POST /api/auth/register` - הרשמה עם username קיים נכשלת
 - [ ] `POST /api/auth/login` - התחברות מצליחה
@@ -17,6 +19,7 @@
 - [ ] `POST /api/auth/logout` - התנתקות מצליחה
 
 ### Frontend
+
 - [ ] עמוד `/login.html` נטען
 - [ ] התחברות דרך UI מצליחה
 - [ ] עמוד `/register.html` נטען
@@ -28,19 +31,23 @@
 ## 🔒 Data Isolation (8 בדיקות)
 
 ### Trades
+
 - [ ] משתמש 1 רואה רק את הטריידים שלו
 - [ ] משתמש 2 רואה רק את הטריידים שלו
 - [ ] משתמש 1 לא רואה את הטריידים של משתמש 2
 
 ### Trade Plans
+
 - [ ] משתמש 1 רואה רק את התוכניות שלו
 - [ ] משתמש 2 רואה רק את התוכניות שלו
 
 ### Trading Accounts
+
 - [ ] משתמש 1 רואה רק את החשבונות שלו
 - [ ] משתמש 2 רואה רק את החשבונות שלו
 
 ### Executions, Cash Flows, Alerts, Notes
+
 - [ ] כל ישות מסוננת לפי user_id
 
 ---

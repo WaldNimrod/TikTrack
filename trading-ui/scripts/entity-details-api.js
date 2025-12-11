@@ -2007,6 +2007,9 @@ async function refreshEntityData(entityType, entityId) {
  * 
  * ==========================================
  */
+// === Arrow Functions ===
+// - enrichLinkedItems() - Enrichlinkeditems
+// - pick() - Pick
 
 /**
  * Debug cash flow data - פונקציה גלובלית לניטור נתוני תזרים מזומנים

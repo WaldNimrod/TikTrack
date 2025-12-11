@@ -18,6 +18,12 @@
  * @lastUpdated December 1, 2025
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Core Functions ===
+// - runCRUDAutomatedTests() - Runcrudautomatedtests
+
 /**
  * הרצת בדיקות אוטומטיות על 8 העמודים המרכזיים
  * @returns {Promise<Object>} דוח תוצאות

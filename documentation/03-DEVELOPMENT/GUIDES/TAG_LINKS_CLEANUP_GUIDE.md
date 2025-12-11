@@ -127,10 +127,12 @@ python3 Backend/scripts/cleanup_orphaned_tag_links.py --schedule --remove
 ### Event listener לא מופעל
 
 **סימפטומים:**
+
 - Tags לא נוקים בעת מחיקת entity
 - Orphaned links נוצרים
 
 **פתרונות:**
+
 1. וודא שה-event listener נרשם (import של הקובץ)
 2. בדוק שה-entity type מוגדר ב-`SUPPORTED_ENTITY_TYPES`
 3. בדוק את ה-logs לשגיאות בניקוי tags
@@ -138,6 +140,7 @@ python3 Backend/scripts/cleanup_orphaned_tag_links.py --schedule --remove
 ### שגיאות בניקוי tags לא מונעות מחיקה
 
 **זה התנהגות תקינה!** Event listeners לא אמורים לחסום מחיקה. אם יש שגיאה בניקוי tags:
+
 - השגיאה תירשם ב-log
 - המחיקה תתבצע בכל מקרה
 - אפשר לנקות tags ידנית אחר כך עם הסקריפט
@@ -157,6 +160,7 @@ python3 Backend/scripts/cleanup_orphaned_tag_links.py --remove
 1. צור entity עם tags
 2. מחק את ה-entity דרך API
 3. וודא שה-tags נוקו:
+
    ```sql
    SELECT * FROM tag_links WHERE entity_type = 'cash_flow' AND entity_id = <deleted_id>;
    ```
@@ -190,6 +194,12 @@ python3 Backend/scripts/cleanup_orphaned_tag_links.py --remove
 
 - **ארכיטקטורה:** [TAG_LINKS_CLEANUP_SYSTEM.md](../../02-ARCHITECTURE/BACKEND/TAG_LINKS_CLEANUP_SYSTEM.md)
 - **Tag Service:** [TAG_SERVICE_DEVELOPER_GUIDE.md](TAG_SERVICE_DEVELOPER_GUIDE.md)
+
+
+
+
+
+
 
 
 

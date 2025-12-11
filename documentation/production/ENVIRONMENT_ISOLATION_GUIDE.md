@@ -1,5 +1,7 @@
 # Environment Isolation Guide
+
 # =============================
+
 # מדריך לבידוד סביבות פיתוח ופרודקשן
 
 **תאריך:** נובמבר 2025  
@@ -10,6 +12,7 @@
 ## ⚠️ **בעיית הבידוד**
 
 ### **המצב הנוכחי:**
+
 - ✅ שתי הסביבות (פיתוח ופרודקשן) על אותו מחשב
 - ✅ שתי הסביבות משתמשות באותו Docker container (`tiktrack-postgres-dev`)
 - ✅ ההפרדה היא רק ב:
@@ -18,6 +21,7 @@
   - Database names נפרדים (`TikTrack-db-development` vs `TikTrack-db-production`)
 
 ### **הסיכונים:**
+
 - ❌ אם container נפל - שתי הסביבות נפגעות
 - ❌ אם יש בעיה ב-container - שתי הסביבות נפגעות
 - ❌ קשה לבדוק שינויים בלי להשפיע על השני
@@ -30,14 +34,17 @@
 ### **רמה 1: הפרדת Databases (כבר קיים) ✅**
 
 **מה יש:**
+
 - `TikTrack-db-development` - לפיתוח
 - `TikTrack-db-production` - לפרודקשן
 
 **איך זה עובד:**
+
 - כל סביבה מתחברת ל-database שלה בלבד
 - אין גישה cross-database (אלא אם כן מפורש)
 
 **אימות:**
+
 ```bash
 # בדיקת databases
 docker exec tiktrack-postgres-dev psql -U TikTrakDBAdmin -l | grep TikTrack
@@ -52,12 +59,14 @@ docker exec tiktrack-postgres-dev psql -U TikTrakDBAdmin -l | grep TikTrack
 ### **רמה 2: Environment Variables נפרדים**
 
 **מה צריך:**
+
 - כל סביבה משתמשת במשתני סביבה שונים
 - משתני סביבה מוגדרים בסקריפטי הפעלה
 
 **איך זה עובד:**
 
 **פיתוח (`start_server.sh`):**
+
 ```bash
 export POSTGRES_HOST=localhost
 export POSTGRES_DB=TikTrack-db-development
@@ -66,6 +75,7 @@ export POSTGRES_PASSWORD="BigMeZoo1974!?"
 ```
 
 **פרודקשן (`start_server.sh`):**
+
 ```bash
 export POSTGRES_HOST=localhost
 export POSTGRES_DB=TikTrack-db-production
@@ -74,6 +84,7 @@ export POSTGRES_PASSWORD="BigMeZoo1974!?"
 ```
 
 **אימות:**
+
 ```bash
 # בפיתוח
 ./start_server.sh
@@ -89,10 +100,12 @@ export POSTGRES_PASSWORD="BigMeZoo1974!?"
 ### **רמה 3: תיקיות נפרדות (כבר קיים) ✅**
 
 **מה יש:**
+
 - פיתוח: `/Users/nimrod/Documents/TikTrack/TikTrackApp`
 - פרודקשן: `/Users/nimrod/Documents/TikTrack/TikTrackApp-Production`
 
 **איך זה עובד:**
+
 - כל סביבה בקוד נפרד
 - כל סביבה בלוגים נפרדים
 - כל סביבה בהגדרות נפרדות
@@ -102,10 +115,12 @@ export POSTGRES_PASSWORD="BigMeZoo1974!?"
 ### **רמה 4: פורטים נפרדים (כבר קיים) ✅**
 
 **מה יש:**
+
 - פיתוח: פורט `8080`
 - פרודקשן: פורט `5001`
 
 **איך זה עובד:**
+
 - כל סביבה מאזינה על פורט שונה
 - אין התנגשויות
 
@@ -116,15 +131,18 @@ export POSTGRES_PASSWORD="BigMeZoo1974!?"
 **מה צריך:**
 
 #### **1. תהליך עדכון מסודר:**
+
 - פיתוח → main → production
 - לא לעדכן ישירות בפרודקשן
 - תמיד דרך Git
 
 #### **2. בדיקות לפני שינויים:**
+
 - תמיד לבדוק בפיתוח קודם
 - רק אחרי בדיקה - להעביר לפרודקשן
 
 #### **3. גיבויים לפני שינויים:**
+
 - תמיד לגבות לפני שינויים בפרודקשן
 - שמירת גיבויים נפרדים
 
@@ -147,10 +165,12 @@ GRANT ALL PRIVILEGES ON DATABASE "TikTrack-db-production" TO tiktrack_prod;
 ```
 
 **יתרונות:**
+
 - בידוד ברמת הרשאות
 - אם user אחד נפרץ - השני בטוח
 
 **חסרונות:**
+
 - יותר מורכב לניהול
 - צריך לעדכן את כל הקונפיגורציות
 
@@ -173,10 +193,12 @@ networks:
 ```
 
 **יתרונות:**
+
 - בידוד ברמת רשת
 - containers לא יכולים לתקשר
 
 **חסרונות:**
+
 - יותר מורכב
 - צריך containers נפרדים
 
@@ -185,6 +207,7 @@ networks:
 ### **3. Volumes נפרדים**
 
 **כבר קיים:**
+
 - כל database ב-volume נפרד
 - נתונים לא מתערבבים
 
@@ -218,9 +241,11 @@ networks:
 ### **תרחיש 1: Container נפל**
 
 **מה קורה:**
+
 - שתי הסביבות נפגעות
 
 **פתרון:**
+
 ```bash
 # בדיקה מהירה
 docker ps | grep postgres
@@ -238,9 +263,11 @@ docker-compose -f docker/docker-compose.dev.yml up -d postgres-dev
 ### **תרחיש 2: Database נמחק בטעות**
 
 **מה קורה:**
+
 - אם נמחק database אחד - רק סביבה אחת נפגעת
 
 **פתרון:**
+
 ```bash
 # גיבוי אוטומטי לפני כל שינוי
 ./scripts/db/backup_postgresql_production.sh
@@ -257,9 +284,11 @@ docker exec -i tiktrack-postgres-dev psql \
 ### **תרחיש 3: שינוי בטעות ב-database הלא נכון**
 
 **מה קורה:**
+
 - שינוי בפיתוח במקום פרודקשן או להיפך
 
 **פתרון:**
+
 - תמיד לבדוק `POSTGRES_DB` לפני שינוי
 - להשתמש בסקריפטים שמכירים את הסביבה
 - לא לעשות שינויים ידניים ב-SQL
@@ -269,9 +298,11 @@ docker exec -i tiktrack-postgres-dev psql \
 ### **תרחיש 4: Container restart משפיע על שתי הסביבות**
 
 **מה קורה:**
+
 - restart של container משפיע על שתי הסביבות
 
 **פתרון:**
+
 - תמיד לבדוק מי משתמש ב-container לפני restart
 - לתאם עם צוותים אחרים
 - להשתמש ב-health checks
@@ -333,17 +364,20 @@ psql -h localhost -U TikTrakDBAdmin -d TikTrack-db-production -c "SELECT current
 ## 🎯 **המלצות**
 
 ### **בידוד טוב (נוכחי):**
+
 - ✅ Databases נפרדים
 - ✅ תיקיות נפרדות
 - ✅ פורטים נפרדים
 - ✅ Environment variables נפרדים
 
 ### **שיפורים אפשריים:**
+
 - ⚠️ Users נפרדים (אם נדרש)
 - ⚠️ Networks נפרדים (אם נדרש)
 - ⚠️ Containers נפרדים (אם נדרש - מורכב יותר)
 
 ### **חשוב:**
+
 - ✅ תהליכי עבודה מסודרים
 - ✅ בדיקות לפני שינויים
 - ✅ גיבויים לפני שינויים

@@ -1,4 +1,5 @@
 # Stage B-Lite Cache Strategy
+
 # ============================
 
 **Status:** Active – Interim cache approach  
@@ -119,6 +120,7 @@
 | Full Clear + Refresh | `CacheControlMenu.triggerAction('full')` → `UnifiedCacheManager.clearAllCacheDetailed({ autoRefresh: true })` | All | Yes + countdown |
 
 Each action:
+
 - Emits `cache:clear` event.
 - Logs entry with timestamp, user action.
 - Reports metadata (`profileId`, `userId`, `page`) to `/api/cache/log`.
@@ -141,6 +143,7 @@ All environments share identical frontend cache configuration files.
 > ראה גם [CHECKLIST מפורט](TESTING/CACHE_STAGE_B_LITE_VALIDATION_CHECKLIST.md) לבדיקות צעד-אחר-צעד.
 
 1. **Global Cache Controls**  
+
 - [ ] Buttons exist in header menu on every page (dev/prod).  
 - [ ] Each action logs entry in `cache.log` and `/api/cache/log`.  
 - [ ] After “Full Clear + Refresh” data loads fresh.
@@ -152,6 +155,7 @@ All environments share identical frontend cache configuration files.
    - [ ] Positions & Portfolio respect TTL upon navigation.
 
 3. **No Non-central Cache**  
+
 - [ ] No `window.*Data` assignments left or they are mirrored into `UnifiedCacheManager`.  
 - [ ] `localStorage` access only via `UnifiedCacheManager`.
 
@@ -160,6 +164,7 @@ All environments share identical frontend cache configuration files.
 ## 7. Roadmap to Full Architecture
 
 Stage B-Lite is a stepping stone toward the complete architecture:  
+
 1. Implement backend `cache/sync` endpoints.  
 2. Activate `CacheSyncManager` and Policy Manager.  
 3. Introduce environment-specific configs (staging vs production).  

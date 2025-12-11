@@ -17,6 +17,7 @@
 ### 1. Current Quote (מחיר נוכחי)
 
 **תדירות:**
+
 - **Active trades, market hours:** 5 דקות
 - **Active trades, off hours:** 60 דקות
 - **Open tickers, market hours:** 15 דקות
@@ -37,6 +38,7 @@
 **תדירות:** פעם ביום (אחרי סגירת השוק)
 
 **אינדיקטורים:**
+
 - **ATR (Average True Range):** תלוי בנתונים היסטוריים
 - **Volatility (30-day):** תלוי בנתונים היסטוריים
 - **MA 20 (Moving Average 20):** תלוי בנתונים היסטוריים
@@ -70,11 +72,13 @@ policy = DataRefreshPolicy(db_session)
 בודקת אם השעה הנוכחית היא בשעות השוק (NYSE: 9:30 AM - 4:00 PM ET, ימי חול).
 
 **Parameters:**
+
 - `now_utc` (datetime, optional) - זמן לבדיקה (ברירת מחדל: עכשיו)
 
 **Returns:** `bool` - `True` אם בשעות השוק
 
 **Example:**
+
 ```python
 if policy.is_market_hours():
     # Market is open
@@ -86,11 +90,13 @@ if policy.is_market_hours():
 בודקת אם לטיקר יש trades פעילים.
 
 **Parameters:**
+
 - `ticker_id` (int) - מזהה הטיקר
 
 **Returns:** `bool` - `True` אם יש trades פעילים
 
 **Example:**
+
 ```python
 if policy.has_active_trades(ticker_id):
     # Ticker has active trades
@@ -102,14 +108,17 @@ if policy.has_active_trades(ticker_id):
 מחזירה עדיפות רענון לטיקר (מספר גבוה יותר = עדיפות גבוהה יותר).
 
 **Parameters:**
+
 - `ticker_id` (int) - מזהה הטיקר
 
 **Returns:** `int` - עדיפות רענון:
+
 - **100:** טיקרים עם trades פעילים
 - **50:** טיקרים פתוחים ללא trades פעילים
 - **10:** טיקרים סגורים/מבוטלים
 
 **Example:**
+
 ```python
 priority = policy.get_refresh_priority(ticker_id)
 if priority >= 50:
@@ -122,6 +131,7 @@ if priority >= 50:
 בודקת אם צריך לרענן quote נוכחי.
 
 **Parameters:**
+
 - `ticker_id` (int) - מזהה הטיקר
 - `last_refresh_time` (datetime, optional) - זמן רענון אחרון
 - `ticker_status` (str) - סטטוס הטיקר ('open', 'closed', 'cancelled')
@@ -131,6 +141,7 @@ if priority >= 50:
 **Returns:** `bool` - `True` אם צריך לרענן
 
 **Example:**
+
 ```python
 if policy.should_refresh_quote(ticker_id, last_refresh, ticker.status, has_active):
     # Need to refresh quote
@@ -142,6 +153,7 @@ if policy.should_refresh_quote(ticker_id, last_refresh, ticker.status, has_activ
 בודקת אם צריך לרענן נתונים היסטוריים.
 
 **Parameters:**
+
 - `ticker_id` (int) - מזהה הטיקר
 - `last_refresh_time` (datetime, optional) - זמן רענון אחרון
 - `now_utc` (datetime, optional) - זמן לבדיקה (ברירת מחדל: עכשיו)
@@ -149,6 +161,7 @@ if policy.should_refresh_quote(ticker_id, last_refresh, ticker.status, has_activ
 **Returns:** `bool` - `True` אם צריך לרענן (אחרי 5 PM NY time, פעם ביום)
 
 **Example:**
+
 ```python
 if policy.should_refresh_historical(ticker_id, last_historical_refresh):
     # Need to refresh historical data
@@ -160,6 +173,7 @@ if policy.should_refresh_historical(ticker_id, last_historical_refresh):
 בודקת אם צריך לרענן אינדיקטור טכני.
 
 **Parameters:**
+
 - `ticker_id` (int) - מזהה הטיקר
 - `indicator_type` (str) - סוג האינדיקטור ('volatility_30', 'ma_20', 'ma_150', 'week52', 'atr')
 - `last_refresh_time` (datetime, optional) - זמן רענון אחרון
@@ -168,6 +182,7 @@ if policy.should_refresh_historical(ticker_id, last_historical_refresh):
 **Returns:** `bool` - `True` אם צריך לרענן (אחרי 5 PM NY time, פעם ביום)
 
 **Example:**
+
 ```python
 if policy.should_refresh_indicator(ticker_id, 'ma_20', last_ma20_refresh):
     # Need to refresh MA 20
@@ -224,6 +239,7 @@ self.policy_config = {
 ### 1. שימוש ב-Policy לפני טעינה
 
 ✅ **נכון:**
+
 ```python
 # Check policy before loading
 if policy.should_refresh_quote(ticker_id, last_refresh, ticker.status, has_active):
@@ -232,6 +248,7 @@ if policy.should_refresh_quote(ticker_id, last_refresh, ticker.status, has_activ
 ```
 
 ❌ **לא נכון:**
+
 ```python
 # Always load without checking
 # Load quote - לא יעיל!
@@ -240,6 +257,7 @@ if policy.should_refresh_quote(ticker_id, last_refresh, ticker.status, has_activ
 ### 2. שימוש ב-Priority למיון
 
 ✅ **נכון:**
+
 ```python
 # Sort tickers by priority
 tickers.sort(key=lambda t: policy.get_refresh_priority(t.id), reverse=True)
@@ -248,6 +266,7 @@ tickers.sort(key=lambda t: policy.get_refresh_priority(t.id), reverse=True)
 ### 3. בדיקת שעות שוק
 
 ✅ **נכון:**
+
 ```python
 # Check market hours before deciding refresh frequency
 if policy.is_market_hours():

@@ -1,14 +1,17 @@
 # TikTrack Server Restart System Guide
+
 # ====================================
 
 ## 🎯 **CURRENT STATUS: Unified Server Management System**
 
 ### **New System Architecture (October 2025):**
+
 - **Main Startup Script**: `start_server.sh` - Unified entry point with process conflict detection
 - **Process Manager**: `Backend/utils/server_lock_manager.py` - Automatic conflict detection and prevention
 - **Legacy Scripts**: Archived to `archive/server-scripts-old-*/` - No longer in use
 
 ### **Key Changes:**
+
 1. **Process Conflict Detection** - Automatically prevents multiple server instances
 2. **Unified Startup** - Single script handles all server operations
 3. **Detailed Error Messages** - Clear guidance when conflicts are detected
@@ -20,16 +23,19 @@
 ## 🚀 **Current Recommended Usage**
 
 ### **Start Server (Primary Method):**
+
 ```bash
 ./start_server.sh
 ```
 
 ### **Check for Conflicts:**
+
 ```bash
 ./start_server.sh --check-only
 ```
 
 ### **Force Start (Not Recommended):**
+
 ```bash
 ./start_server.sh --force
 ```
@@ -39,6 +45,7 @@
 ## 📋 **What Was Archived**
 
 The following scripts have been moved to `archive/server-scripts-old-*/`:
+
 - `Backend/dev_server.py` - Old development server
 - `Backend/dev_server_optimized.py` - Optimized development server  
 - `restart-bg.sh` - Background restart script
@@ -52,18 +59,21 @@ The following scripts have been moved to `archive/server-scripts-old-*/`:
 ## ⚠️ **Multiple Processes Issue - SOLVED**
 
 ### **The Problem (Before):**
+
 - Multiple server scripts could run simultaneously
 - Processes would "stick" in background
 - Confusion about which server was running
 - Performance issues and data refresh problems
 
 ### **The Solution (Now):**
+
 - **Automatic Detection**: System detects existing TikTrack processes
 - **Conflict Prevention**: Blocks startup if conflicts found
 - **Clear Error Messages**: Detailed information about conflicting processes
 - **Resolution Guidance**: Step-by-step instructions to resolve conflicts
 
 ### **Example Error Message:**
+
 ```
 🚫 ERROR: TikTrack Server Already Running
 ================================================================================
@@ -91,12 +101,14 @@ To resolve this issue:
 ## 🔧 **Technical Details**
 
 ### **Process Detection Logic:**
+
 1. **Port Scanning**: Checks for processes listening on port 8080
 2. **Process Identification**: Identifies TikTrack servers by command line keywords
 3. **Conflict Resolution**: Provides detailed information and resolution steps
 4. **Safe Startup**: Only starts if no conflicts detected
 
 ### **Integration Points:**
+
 - **Logging System**: Uses existing `Backend/config/logging.py`
 - **Error Handling**: Comprehensive error messages with user guidance
 - **Signal Handling**: Graceful shutdown with Ctrl+C
@@ -116,16 +128,19 @@ To resolve this issue:
 ## 🎯 **Migration Notes**
 
 ### **For Developers:**
+
 - **Old Way**: `python3 Backend/app.py` ❌
 - **New Way**: `./start_server.sh` ✅
 
 ### **For AI Assistants:**
+
 - Always use `./start_server.sh` to start the server
 - Never run Python directly
 - Check for conflicts first with `--check-only`
 - Read error messages carefully - they contain specific guidance
 
 ### **For CI/CD Systems:**
+
 - Use `./start_server.sh --check-only` to verify no conflicts
 - Use `./start_server.sh` for normal startup
 - Monitor logs in `Backend/logs/` for detailed information
@@ -133,14 +148,17 @@ To resolve this issue:
 **Key Insight**: The server can start in background and become available gradually, so scripts don't need to wait for full initialization. The main issue was terminal communication, not script logic.
 
 ### **Final Working Solution**
+
 The current system successfully:
+
 - ✅ **Script Enhancement**: `restart` script works with both terminals
 - ✅ **Terminal Scripts**: `open-terminal.sh`, `start-dev.sh`, `stop-dev.sh` for macOS Terminal
 - ✅ **Immediate Control Return**: Works perfectly in macOS Terminal
 - ✅ **Clear Documentation**: Complete setup guide in `TERMINAL_SETUP.md`
 - ✅ **All Cache Modes**: Works reliably for development, no-cache, production, preserve
 
-**Test Results**: 
+**Test Results**:
+
 - **macOS Terminal**: Script works perfectly, returns control immediately
 - **Cursor Terminal**: Script works but with output buffering issues
 - **Recommendation**: Use macOS Terminal for all server operations
@@ -149,18 +167,21 @@ The current system successfully:
 
 **Process Analysis**:
 The restart process was divided into 5 stages:
+
 1. **Preparation** - Environment setup and validation ✅
 2. **Stop** - Server cleanup and process termination ✅
 3. **Start** - Server initialization in background ✅
 4. **Wait** - Health checks and readiness verification ❌ (Problematic)
 5. **Finish** - Status reporting and control return ❌ (Never reached)
 
-**Critical Discovery**: 
+**Critical Discovery**:
+
 1. **Stage 4 (Wait)** was the root cause of hanging in complex scenarios
 2. **Terminal Communication** was the main issue - Cursor's pseudo-terminal causes output buffering
 3. **macOS Terminal** works perfectly with all scripts
 
-**Solution Strategy**: 
+**Solution Strategy**:
+
 1. **Skip stage 4** entirely and return control immediately after stage 3
 2. **Use macOS Terminal** for all server operations
 3. **Provide dedicated scripts** for terminal management
@@ -175,17 +196,20 @@ The restart process was divided into 5 stages:
 Based on the terminal communication analysis, the recommended approach is:
 
 **Use macOS Terminal for all server operations:**
+
 - ✅ **Cursor**: For code editing and development
 - ✅ **macOS Terminal**: For server operations and scripts
 
 ### **Available Scripts**
 
 #### **1. Terminal Management Scripts**
+
 - **`open-terminal.sh`**: Opens macOS Terminal with TikTrack project
 - **`start-dev.sh`**: Starts development server in macOS Terminal
 - **`stop-dev.sh`**: Stops development server
 
 #### **2. Usage Examples**
+
 ```bash
 # Start development server
 ./start-dev.sh development
@@ -198,6 +222,7 @@ Based on the terminal communication analysis, the recommended approach is:
 ```
 
 #### **3. Cache Mode Options**
+
 - `development`: Development cache mode
 - `no-cache`: No cache mode
 - `production`: Production cache mode
@@ -206,6 +231,7 @@ Based on the terminal communication analysis, the recommended approach is:
 ### **Terminal Setup Guide**
 
 Complete setup instructions are available in `TERMINAL_SETUP.md`:
+
 - Terminal configuration
 - Profile settings
 - Development workflow
@@ -221,7 +247,8 @@ Complete setup instructions are available in `TERMINAL_SETUP.md`:
 
 ### **Implementation Status**
 
-#### **✅ Completed**:
+#### **✅ Completed**
+
 - Enhanced `restart` script with terminal compatibility
 - Created `open-terminal.sh` for terminal management
 - Created `start-dev.sh` for server startup
@@ -229,14 +256,16 @@ Complete setup instructions are available in `TERMINAL_SETUP.md`:
 - Complete documentation in `TERMINAL_SETUP.md`
 - Terminal communication analysis and solution
 
-#### **✅ Tested**:
+#### **✅ Tested**
+
 - macOS Terminal: Works perfectly
 - Cursor Terminal: Works with limitations
 - All cache modes: development, no-cache, production, preserve
 - Server startup and shutdown: Reliable
 - Control return: Immediate in macOS Terminal
 
-#### **✅ Ready for Production**:
+#### **✅ Ready for Production**
+
 - All scripts are executable and tested
 - Documentation is complete and up-to-date
 - Workflow is established and documented
@@ -249,16 +278,19 @@ Based on comprehensive analysis of the current system, server complexity, and de
 ### **Why Progressive Health Checks?**
 
 **Team Profile Analysis:**
+
 - **Small Team**: Limited resources, need for independent development
 - **Medium Timeline**: 2-3 weeks available for implementation
 - **Early Development Stage**: Many changes expected, need for flexibility
 
 **System Requirements:**
+
 - **Complex Server**: 23+ blueprints, background services, external data integration
 - **Long Startup Time**: 10-30 seconds for full initialization
 - **Cache System Integration**: Multiple cache layers need coordination
 
 **Progressive Health Checks Benefits:**
+
 - ✅ **No Server Dependencies**: Uses existing endpoints only
 - ✅ **High Flexibility**: Easy to adapt to server changes
 - ✅ **Independent Development**: No coordination with backend team needed
@@ -272,6 +304,7 @@ Based on comprehensive analysis of the current system, server complexity, and de
 **Purpose**: Enhanced restart script with terminal compatibility and immediate control return.
 
 **Features**:
+
 - Cache mode management (development, no-cache, production, preserve)
 - Terminal compatibility (works with both Cursor and macOS Terminal)
 - Immediate control return (no waiting for server initialization)
@@ -279,6 +312,7 @@ Based on comprehensive analysis of the current system, server complexity, and de
 - Clear status feedback
 
 **Usage**:
+
 ```bash
 # Recommended: Use with macOS Terminal
 ./restart --cache-mode=development  # Development mode
@@ -288,35 +322,42 @@ Based on comprehensive analysis of the current system, server complexity, and de
 ```
 
 **Terminal Compatibility**:
+
 - ✅ **macOS Terminal**: Works perfectly, returns control immediately
 - ⚠️ **Cursor Terminal**: Works but with output buffering issues
 
 ### 2. **Terminal Management Scripts**
 
 #### **`open-terminal.sh`**
+
 **Purpose**: Opens macOS Terminal with TikTrack project directory.
 
 **Features**:
+
 - Auto-navigates to project directory
 - Sets up development environment
 - Displays terminal information
 - Custom tab title
 
 **Usage**:
+
 ```bash
 ./open-terminal.sh
 ```
 
 #### **`start-dev.sh`**
+
 **Purpose**: Starts development server in macOS Terminal.
 
 **Features**:
+
 - Opens macOS Terminal automatically
 - Starts server with specified cache mode
 - Provides usage instructions
 - Custom tab title
 
 **Usage**:
+
 ```bash
 ./start-dev.sh development    # Development mode
 ./start-dev.sh no-cache       # No cache mode
@@ -324,35 +365,41 @@ Based on comprehensive analysis of the current system, server complexity, and de
 ```
 
 #### **`stop-dev.sh`**
+
 **Purpose**: Stops development server and cleans up processes.
 
 **Features**:
+
 - Kills server processes on port 8080
 - Cleans up Python processes
 - Provides status feedback
 - Prepares for next startup
 
 **Usage**:
+
 ```bash
 ./stop-dev.sh
 ```
 
 ### 3. **Development Workflow**
 
-#### **Recommended Workflow**:
+#### **Recommended Workflow**
+
 1. **Code Editing**: Use Cursor for all code editing
 2. **Server Operations**: Use macOS Terminal for all server operations
 3. **Start Server**: `./start-dev.sh development`
 4. **Stop Server**: `./stop-dev.sh`
 5. **Manual Operations**: `./open-terminal.sh`
 
-#### **Benefits**:
+#### **Benefits**
+
 - ✅ **Reliable Control**: macOS Terminal always returns control
 - ✅ **Full Output**: Complete script output display
 - ✅ **Color Support**: Full ANSI color support
 - ✅ **No Buffering**: Immediate output without delays
 
 **Cache Modes**:
+
 - `development`: TTL 10 seconds (fast development)
 - `no-cache`: Cache disabled (immediate updates)
 - `production`: TTL 5 minutes (performance)
@@ -363,6 +410,7 @@ Based on comprehensive analysis of the current system, server complexity, and de
 **Purpose**: Fast restart for development and testing scenarios.
 
 **Features**:
+
 - Simple process termination
 - Basic port cleanup
 - Fast startup (5-10 seconds)
@@ -370,6 +418,7 @@ Based on comprehensive analysis of the current system, server complexity, and de
 - No complex error handling
 
 **Configuration**:
+
 ```bash
 SERVER_PORT=8080
 SERVER_HOST="127.0.0.1"
@@ -377,6 +426,7 @@ MAX_STARTUP_TIME=10  # seconds
 ```
 
 **Process**:
+
 1. Stop Python processes
 2. Clear port 8080
 3. Start server
@@ -388,6 +438,7 @@ MAX_STARTUP_TIME=10  # seconds
 **Purpose**: Comprehensive restart for production and troubleshooting scenarios.
 
 **Features**:
+
 - Complete process termination
 - Full cache and port cleanup
 - Retry logic (3 attempts)
@@ -395,6 +446,7 @@ MAX_STARTUP_TIME=10  # seconds
 - Comprehensive health checks
 
 **Configuration**:
+
 ```bash
 SERVER_PORT=8080
 SERVER_HOST="127.0.0.1"
@@ -404,6 +456,7 @@ MAX_STARTUP_TIME=30  # seconds
 ```
 
 **Process**:
+
 1. Kill all Python processes
 2. Clear port completely
 3. Clear all cache
@@ -419,6 +472,7 @@ MAX_STARTUP_TIME=30  # seconds
 The TikTrack server is a complex Flask application that requires significant time to fully initialize:
 
 **Startup Components**:
+
 1. **Database Initialization** - Connection pool setup, table creation
 2. **Blueprint Registration** - 23+ API route blueprints
 3. **Background Services** - Task scheduler, data refresh scheduler
@@ -432,11 +486,13 @@ The TikTrack server is a complex Flask application that requires significant tim
 ### **Current Timeout Configuration**
 
 **Quick Restart**:
+
 - `curl` timeout: 1 second
 - Startup wait: 10 seconds
 - **Issue**: Too short for complex server
 
 **Complete Restart**:
+
 - `curl` timeout: 5 seconds
 - Startup wait: 30 seconds
 - **Issue**: Still may be too short for full initialization
@@ -444,16 +500,19 @@ The TikTrack server is a complex Flask application that requires significant tim
 ## 🔧 Current Limitations
 
 ### **1. Timeout Issues**
+
 - Server needs 10-30 seconds to fully initialize
 - Scripts use 1-5 second timeouts
 - Results in perceived "hanging" when server is actually starting
 
 ### **2. Health Check Limitations**
+
 - Basic health checks don't verify full server readiness
 - No endpoint to check if all services are initialized
 - Missing verification of background tasks and external data
 
 ### **3. Cache System Disconnect**
+
 - Frontend has UnifiedCacheManager
 - Backend has AdvancedCacheService
 - No synchronization between systems
@@ -462,12 +521,14 @@ The TikTrack server is a complex Flask application that requires significant tim
 ## 📊 Performance Characteristics
 
 ### **Quick Restart**
+
 - **Time**: 5-10 seconds
 - **Use Case**: Development, testing
 - **Reliability**: Good for simple changes
 - **Limitations**: May not catch all issues
 
 ### **Complete Restart**
+
 - **Time**: 30-60 seconds
 - **Use Case**: Production, troubleshooting
 - **Reliability**: High, with retry logic
@@ -476,16 +537,19 @@ The TikTrack server is a complex Flask application that requires significant tim
 ## 🚨 Known Issues
 
 ### **1. Hanging Scripts**
+
 **Problem**: Scripts appear to hang during server startup
 **Root Cause**: Server takes longer to initialize than script timeouts
 **Current Status**: Partially resolved with increased timeouts
 
 ### **2. Cache Mode Inconsistency**
+
 **Problem**: Cache modes not fully synchronized between Frontend and Backend
 **Root Cause**: Separate cache systems without proper integration
 **Current Status**: Environment variables set but not fully utilized
 
 ### **3. Health Check Inadequacy**
+
 **Problem**: Health checks don't verify full server readiness
 **Root Cause**: Basic endpoint checks don't verify all services
 **Current Status**: Needs comprehensive readiness endpoint
@@ -493,6 +557,7 @@ The TikTrack server is a complex Flask application that requires significant tim
 ## 🔍 Troubleshooting
 
 ### **Script Hangs**
+
 ```bash
 # Check if server is actually starting
 ps aux | grep python3 | grep dev_server
@@ -505,6 +570,7 @@ cd Backend && python3 dev_server.py
 ```
 
 ### **Cache Issues**
+
 ```bash
 # Check cache mode
 curl -s http://localhost:8080/api/server/current-mode
@@ -514,6 +580,7 @@ curl -X POST http://localhost:8080/api/cache/clear
 ```
 
 ### **Health Check Failures**
+
 ```bash
 # Check basic health
 curl -s http://localhost:8080/api/health
@@ -525,14 +592,17 @@ curl -s http://localhost:8080/api/health/detailed
 ## 🏗️ **FINAL SYSTEM ARCHITECTURE: Progressive Health Checks**
 
 ### **System Overview**
+
 The TikTrack Progressive Health Checks system is a comprehensive server restart and monitoring solution that provides intelligent, adaptive health checking with detailed progress reporting and seamless integration with existing cache modes.
 
 ### **System Components**
 
 #### **1. Main Restart Script (`restart`) - Enhanced**
+
 **Purpose**: Unified entry point with Progressive Health Checks integration
 **Location**: `/restart`
 **Features**:
+
 - Progressive health checks mode (`--progressive`)
 - Cache mode integration (development, no-cache, production, preserve)
 - Adaptive timeout calculation
@@ -541,6 +611,7 @@ The TikTrack Progressive Health Checks system is a comprehensive server restart 
 - Verbose and debug modes
 
 **Usage Examples**:
+
 ```bash
 ./restart --progressive                           # Progressive mode with preserve cache
 ./restart --progressive --cache-mode=development  # Progressive mode with development cache
@@ -550,9 +621,11 @@ The TikTrack Progressive Health Checks system is a comprehensive server restart 
 ```
 
 #### **2. Progressive Health Checks Script (`restart_progressive.sh`)**
+
 **Purpose**: Core progressive health checking engine
 **Location**: `/restart_progressive.sh`
 **Features**:
+
 - 6-level hierarchical health checking
 - Adaptive timeout system
 - Parallel execution for non-critical levels
@@ -561,9 +634,11 @@ The TikTrack Progressive Health Checks system is a comprehensive server restart 
 - Performance metrics collection
 
 #### **3. Configuration System**
+
 **Purpose**: Centralized configuration management
 **Location**: `~/.tiktrack_restart_config`
 **Features**:
+
 - Environment variable management
 - Cache mode factor configuration
 - Timeout customization
@@ -573,6 +648,7 @@ The TikTrack Progressive Health Checks system is a comprehensive server restart 
 ### **Health Check Architecture**
 
 #### **Level Hierarchy**
+
 ```
 Level 1: Basic Server Response (Critical)
 ├── Endpoint: GET /
@@ -612,6 +688,7 @@ Level 6: External Data (Non-Critical)
 ```
 
 #### **Execution Flow**
+
 ```
 Start
 ├── Load Configuration
@@ -631,6 +708,7 @@ Start
 ### **Adaptive Timeout System**
 
 #### **Timeout Calculation Formula**
+
 ```
 base_timeout = 10 seconds
 server_complexity_factor = 30 (based on 23+ blueprints + services)
@@ -639,12 +717,14 @@ adaptive_timeout = base_timeout + (server_complexity_factor * cache_mode_factor)
 ```
 
 #### **Cache Mode Factors**
+
 - **no-cache**: 0.6 (28 seconds total) - Fastest startup
 - **development**: 0.8 (34 seconds total) - Fast development cycles
 - **preserve**: 1.0 (40 seconds total) - Standard startup
 - **production**: 1.2 (46 seconds total) - Full initialization
 
 #### **Timeout Examples**
+
 ```bash
 # No-cache mode
 10 + (30 * 0.6) = 28 seconds
@@ -659,6 +739,7 @@ adaptive_timeout = base_timeout + (server_complexity_factor * cache_mode_factor)
 ### **Progress Reporting System**
 
 #### **Visual Progress Indicators**
+
 ```
 [2025-09-28 10:00:00] PROGRESS [████████████░░░░░░░░] 60%
 [2025-09-28 10:00:01] INFO: Level 3/6: Cache System (15s timeout)
@@ -667,6 +748,7 @@ adaptive_timeout = base_timeout + (server_complexity_factor * cache_mode_factor)
 ```
 
 #### **Final Status Report**
+
 ```
 🎯 Progressive Health Check Summary:
 ====================================
@@ -686,16 +768,19 @@ adaptive_timeout = base_timeout + (server_complexity_factor * cache_mode_factor)
 ### **Error Handling and Recovery**
 
 #### **Critical Failure Handling**
+
 - **Level 1 Failure**: Server not running - immediate exit
 - **Level 2 Failure**: API not working - immediate exit  
 - **Level 4 Failure**: Database not accessible - immediate exit
 
 #### **Non-Critical Failure Handling**
+
 - **Level 3 Failure**: Cache system timeout - continue with warning
 - **Level 5 Failure**: Background services not ready - continue with warning
 - **Level 6 Failure**: External data not available - continue with warning
 
 #### **Fallback Mechanism**
+
 ```
 Progressive Health Check Fails
 ├── Log failure reason
@@ -708,6 +793,7 @@ Progressive Health Check Fails
 ### **Configuration Management**
 
 #### **Configuration File Structure**
+
 ```bash
 # ~/.tiktrack_restart_config
 PROGRESSIVE_MAX_TIMEOUT=60
@@ -719,6 +805,7 @@ PROGRESSIVE_CACHE_FACTOR_OVERRIDE=
 ```
 
 #### **Environment Variables**
+
 ```bash
 export TIKTRACK_DEV_MODE="true"           # Development mode
 export TIKTRACK_CACHE_DISABLED="false"    # Cache enabled
@@ -729,12 +816,14 @@ export PROGRESSIVE_VERBOSE=true           # Verbose output
 ### **Integration with Existing Systems**
 
 #### **Cache Mode Integration**
+
 - **Automatic Detection**: Reads current cache mode from server
 - **Adaptive Timeouts**: Adjusts timeouts based on cache mode
 - **Environment Variables**: Sets appropriate environment variables
 - **Fallback Support**: Maintains compatibility with legacy system
 
 #### **Legacy System Compatibility**
+
 - **Backward Compatibility**: All existing commands continue to work
 - **Gradual Migration**: Progressive mode is opt-in
 - **Fallback Support**: Automatic fallback to legacy system on failure
@@ -743,6 +832,7 @@ export PROGRESSIVE_VERBOSE=true           # Verbose output
 ### **Performance Characteristics**
 
 #### **Typical Performance Metrics**
+
 - **Average Health Check Time**: 15-25 seconds
 - **Critical Levels Time**: 8-15 seconds
 - **Non-Critical Levels Time**: 5-10 seconds (parallel)
@@ -751,6 +841,7 @@ export PROGRESSIVE_VERBOSE=true           # Verbose output
 - **False Negative Rate**: <5%
 
 #### **Resource Usage**
+
 - **CPU Usage**: Minimal (mostly I/O bound)
 - **Memory Usage**: <10MB
 - **Network Usage**: 6 HTTP requests per check
@@ -759,6 +850,7 @@ export PROGRESSIVE_VERBOSE=true           # Verbose output
 ### **Monitoring and Logging**
 
 #### **Log Levels**
+
 - **INFO**: Normal operation messages
 - **SUCCESS**: Successful health checks
 - **WARNING**: Non-critical failures
@@ -766,6 +858,7 @@ export PROGRESSIVE_VERBOSE=true           # Verbose output
 - **PROGRESS**: Progress indicators
 
 #### **Log Output Examples**
+
 ```
 [2025-09-28 10:00:00] INFO: Starting Progressive Health Check (max 60s)...
 [2025-09-28 10:00:01] PROGRESS [████░░░░░░░░░░░░░░░░] 20%
@@ -778,6 +871,7 @@ export PROGRESSIVE_VERBOSE=true           # Verbose output
 ### **User Interface**
 
 #### **Command Line Interface**
+
 ```bash
 # Basic usage
 ./restart --progressive
@@ -793,10 +887,13 @@ export PROGRESSIVE_VERBOSE=true           # Verbose output
 ```
 
 #### **Help System**
+
 ```bash
 ./restart --help
 ```
+
 Shows comprehensive help including:
+
 - All available options
 - Cache mode explanations
 - Usage examples
@@ -805,12 +902,14 @@ Shows comprehensive help including:
 ### **Troubleshooting and Support**
 
 #### **Built-in Diagnostics**
+
 - **Debug Mode**: Shows detailed curl commands and responses
 - **Verbose Mode**: Provides detailed progress information
 - **Configuration Validation**: Checks configuration file validity
 - **Endpoint Testing**: Tests individual endpoints manually
 
 #### **Error Recovery**
+
 - **Automatic Retry**: Built-in retry logic with exponential backoff
 - **Graceful Degradation**: Continues with partial success
 - **Fallback System**: Automatic fallback to legacy system
@@ -819,11 +918,13 @@ Shows comprehensive help including:
 ## 🏗️ **DETAILED SPECIFICATION: Progressive Health Checks Architecture**
 
 ### **Core Concept**
+
 The Progressive Health Checks system tests server components in a hierarchical order with adaptive timeouts, providing detailed feedback on each component's status while maintaining flexibility for server changes.
 
 ### **Health Check Levels**
 
 #### **Level 1: Basic Server Response (5s timeout)**
+
 - **Endpoint**: `GET /`
 - **Purpose**: Verify server process is running and responding
 - **Timeout**: 5 seconds
@@ -831,6 +932,7 @@ The Progressive Health Checks system tests server components in a hierarchical o
 - **Critical**: Yes - if fails, server is not running
 
 #### **Level 2: API Health (10s timeout)**
+
 - **Endpoint**: `GET /api/health`
 - **Purpose**: Verify API layer is functional
 - **Timeout**: 10 seconds
@@ -838,6 +940,7 @@ The Progressive Health Checks system tests server components in a hierarchical o
 - **Critical**: Yes - if fails, API is not working
 
 #### **Level 3: Cache System (15s timeout)**
+
 - **Endpoint**: `GET /api/cache/stats`
 - **Purpose**: Verify cache system is operational
 - **Timeout**: 15 seconds
@@ -845,6 +948,7 @@ The Progressive Health Checks system tests server components in a hierarchical o
 - **Critical**: No - can continue without cache
 
 #### **Level 4: Database Connectivity (20s timeout)**
+
 - **Endpoint**: `GET /api/accounts/`
 - **Purpose**: Verify database is accessible and responsive
 - **Timeout**: 20 seconds
@@ -852,6 +956,7 @@ The Progressive Health Checks system tests server components in a hierarchical o
 - **Critical**: Yes - if fails, database is not working
 
 #### **Level 5: Background Services (25s timeout)**
+
 - **Endpoint**: `GET /api/tasks/status`
 - **Purpose**: Verify background task manager is running
 - **Timeout**: 25 seconds
@@ -859,6 +964,7 @@ The Progressive Health Checks system tests server components in a hierarchical o
 - **Critical**: No - can continue without background tasks
 
 #### **Level 6: External Data (30s timeout)**
+
 - **Endpoint**: `GET /api/external-data/status`
 - **Purpose**: Verify external data integration is working
 - **Timeout**: 30 seconds
@@ -868,6 +974,7 @@ The Progressive Health Checks system tests server components in a hierarchical o
 ### **Adaptive Timeout System**
 
 #### **Base Timeout Calculation**
+
 ```
 base_timeout = 10 seconds
 server_complexity_factor = 30 (based on 23+ blueprints + services)
@@ -876,12 +983,14 @@ adaptive_timeout = base_timeout + (server_complexity_factor * cache_mode_factor)
 ```
 
 #### **Cache Mode Factors**
+
 - **development**: 0.8 (faster startup, less cache initialization)
 - **no-cache**: 0.6 (fastest startup, no cache initialization)
 - **production**: 1.2 (slower startup, full cache initialization)
 - **preserve**: 1.0 (standard startup time)
 
 #### **Example Calculations**
+
 - **no-cache mode**: 10 + (30 * 0.6) = 28 seconds
 - **development mode**: 10 + (30 * 0.8) = 34 seconds
 - **production mode**: 10 + (30 * 1.2) = 46 seconds
@@ -889,11 +998,13 @@ adaptive_timeout = base_timeout + (server_complexity_factor * cache_mode_factor)
 ### **Progressive Check Logic**
 
 #### **Sequential vs Parallel Approach**
+
 - **Critical Levels (1, 2, 4)**: Sequential - must pass before continuing
 - **Non-Critical Levels (3, 5, 6)**: Parallel - can run simultaneously
 - **Maximum Total Time**: 60 seconds regardless of mode
 
 #### **Failure Handling**
+
 - **Critical Failure**: Stop immediately, report error
 - **Non-Critical Failure**: Log warning, continue to next level
 - **Timeout**: Log timeout, continue to next level
@@ -902,6 +1013,7 @@ adaptive_timeout = base_timeout + (server_complexity_factor * cache_mode_factor)
 ### **Detailed Output System**
 
 #### **Progress Reporting**
+
 ```
 [2025-09-28 10:00:00] INFO: Starting Progressive Health Check...
 [2025-09-28 10:00:01] INFO: Level 1/6: Basic Server Response (5s timeout)
@@ -920,6 +1032,7 @@ adaptive_timeout = base_timeout + (server_complexity_factor * cache_mode_factor)
 ```
 
 #### **Final Status Report**
+
 ```
 🎯 Health Check Summary:
 ========================
@@ -942,6 +1055,7 @@ adaptive_timeout = base_timeout + (server_complexity_factor * cache_mode_factor)
 #### **Day 1-2: Core Infrastructure**
 
 **Create `restart_progressive.sh` script:**
+
 ```bash
 #!/bin/bash
 
@@ -1016,6 +1130,7 @@ test_health_level() {
 ```
 
 **Implement adaptive timeout calculation:**
+
 ```bash
 # Function to calculate adaptive timeout based on cache mode
 get_adaptive_timeout() {
@@ -1044,6 +1159,7 @@ get_adaptive_timeout() {
 ```
 
 **Create logging system with progress reporting:**
+
 ```bash
 # Enhanced logging with progress tracking
 log_progress() {
@@ -1080,6 +1196,7 @@ report_progress() {
 #### **Day 3-4: Health Check Levels**
 
 **Implement Level 1-3 health checks:**
+
 ```bash
 # Main progressive health check function
 progressive_health_check() {
@@ -1156,6 +1273,7 @@ progressive_health_check() {
 ```
 
 **Add retry logic and error handling:**
+
 ```bash
 # Enhanced retry logic with exponential backoff
 retry_with_backoff() {
@@ -1201,6 +1319,7 @@ handle_timeout() {
 #### **Day 5: Testing and Validation**
 
 **Test with different cache modes:**
+
 ```bash
 # Test all cache modes
 echo "Testing cache modes..."
@@ -1227,6 +1346,7 @@ grep "Overall Status" test_preserve.log
 ```
 
 **Validate timeout calculations:**
+
 ```bash
 # Test timeout calculations
 test_timeout_calculation() {
@@ -1257,6 +1377,7 @@ test_timeout_calculation "production" 46
 ```
 
 **Test failure scenarios:**
+
 ```bash
 # Test critical failure scenarios
 test_critical_failures() {
@@ -1288,6 +1409,7 @@ test_critical_failures
 ```
 
 **Document initial results:**
+
 ```bash
 # Generate test report
 generate_test_report() {
@@ -1331,6 +1453,7 @@ generate_test_report
 #### **Day 1-2: Advanced Levels**
 
 **Implement Level 4-6 health checks:**
+
 ```bash
 # Level 4: Database Connectivity
 test_database_connectivity() {
@@ -1436,6 +1559,7 @@ test_external_data() {
 ```
 
 **Add parallel execution for non-critical levels:**
+
 ```bash
 # Parallel execution for non-critical levels
 test_non_critical_levels_parallel() {
@@ -1474,6 +1598,7 @@ test_non_critical_levels_parallel() {
 ```
 
 **Implement comprehensive error handling:**
+
 ```bash
 # Comprehensive error handling system
 handle_health_check_error() {
@@ -1536,6 +1661,7 @@ detect_error_type() {
 ```
 
 **Add detailed status reporting:**
+
 ```bash
 # Detailed status reporting system
 generate_detailed_status_report() {
@@ -1606,6 +1732,7 @@ EOF
 #### **Day 3-4: Integration**
 
 **Integrate with existing `restart` script:**
+
 ```bash
 # Add to main restart script
 add_progressive_option() {
@@ -1660,6 +1787,7 @@ run_restart_with_progressive() {
 ```
 
 **Add cache mode detection and adaptation:**
+
 ```bash
 # Enhanced cache mode detection
 detect_and_adapt_cache_mode() {
@@ -1715,6 +1843,7 @@ get_adaptive_timeout_for_mode() {
 ```
 
 **Implement fallback to current system:**
+
 ```bash
 # Fallback mechanism
 fallback_to_current_system() {
@@ -1742,6 +1871,7 @@ progressive_health_check_with_fallback() {
 ```
 
 **Add configuration options:**
+
 ```bash
 # Configuration management
 load_progressive_config() {
@@ -1780,6 +1910,7 @@ EOF
 #### **Day 5: Optimization**
 
 **Optimize timeout values based on testing:**
+
 ```bash
 # Timeout optimization system
 optimize_timeout_values() {
@@ -1829,6 +1960,7 @@ optimize_timeout_values "preserve"
 ```
 
 **Improve error messages and user feedback:**
+
 ```bash
 # Enhanced error message system
 generate_user_friendly_error_message() {
@@ -1953,6 +2085,7 @@ provide_helpful_suggestions() {
 ```
 
 **Add performance metrics:**
+
 ```bash
 # Performance metrics collection
 collect_performance_metrics() {
@@ -2035,6 +2168,7 @@ analyze_performance_trends() {
 ```
 
 **Final testing and validation:**
+
 ```bash
 # Comprehensive final testing
 run_final_validation_tests() {
@@ -2110,6 +2244,7 @@ run_final_validation_tests() {
 #### **Day 1-2: Production Testing**
 
 **Test with real server scenarios:**
+
 ```bash
 # Production testing scenarios
 run_production_tests() {
@@ -2172,6 +2307,7 @@ run_production_tests
 ```
 
 **Validate with different server states:**
+
 ```bash
 # Server state validation
 validate_different_server_states() {
@@ -2231,6 +2367,7 @@ validate_different_server_states
 ```
 
 **Test edge cases and error conditions:**
+
 ```bash
 # Edge case testing
 test_edge_cases() {
@@ -2298,6 +2435,7 @@ test_edge_cases
 ```
 
 **Performance benchmarking:**
+
 ```bash
 # Performance benchmarking
 run_performance_benchmarks() {
@@ -2388,6 +2526,7 @@ run_performance_benchmarks
 #### **Day 3-4: Documentation and Training**
 
 **Update user documentation:**
+
 ```bash
 # Create user quick reference
 cat > "PROGRESSIVE_HEALTH_CHECKS_QUICK_REFERENCE.md" << 'EOF'
@@ -2419,6 +2558,7 @@ EOF
 ```
 
 **Create troubleshooting guide:**
+
 ```bash
 # Create comprehensive troubleshooting guide
 cat > "TROUBLESHOOTING_GUIDE.md" << 'EOF'
@@ -2448,6 +2588,7 @@ EOF
 ```
 
 **Train team on new system:**
+
 ```bash
 # Create training materials
 cat > "TEAM_TRAINING.md" << 'EOF'
@@ -2475,11 +2616,13 @@ cat > "TEAM_TRAINING.md" << 'EOF'
 5. Monitor performance trends
 EOF
 ```
+
 - Create maintenance procedures
 
 #### **Day 5: Go-Live**
 
 **Deploy to production:**
+
 ```bash
 # Production deployment script
 deploy_to_production() {
@@ -2530,6 +2673,7 @@ deploy_to_production
 ```
 
 **Monitor initial usage:**
+
 ```bash
 # Initial usage monitoring
 monitor_initial_usage() {
@@ -2589,6 +2733,7 @@ monitor_initial_usage
 ```
 
 **Collect feedback:**
+
 ```bash
 # Feedback collection system
 collect_feedback() {
@@ -2713,6 +2858,7 @@ collect_feedback
 ```
 
 **Plan future improvements:**
+
 ```bash
 # Future improvements planning
 plan_future_improvements() {
@@ -2817,10 +2963,13 @@ The TikTrack Progressive Health Checks system provides intelligent server restar
 ### **Quick Start Guide**
 
 #### **1. Basic Progressive Restart**
+
 ```bash
 ./restart --progressive
 ```
+
 **What it does:**
+
 - Detects current cache mode automatically
 - Calculates adaptive timeout (28-46 seconds based on mode)
 - Tests 6 health check levels
@@ -2828,20 +2977,26 @@ The TikTrack Progressive Health Checks system provides intelligent server restar
 - Continues even if non-critical components fail
 
 #### **2. Development Mode Restart**
+
 ```bash
 ./restart --progressive --cache-mode=development
 ```
+
 **What it does:**
+
 - Sets development cache mode (TTL: 10 seconds)
 - Uses 34-second adaptive timeout
 - Optimized for fast development cycles
 - Less strict on non-critical components
 
 #### **3. Production Mode Restart**
+
 ```bash
 ./restart --progressive --cache-mode=production
 ```
+
 **What it does:**
+
 - Sets production cache mode (TTL: 5 minutes)
 - Uses 46-second adaptive timeout
 - Most comprehensive testing
@@ -2850,37 +3005,49 @@ The TikTrack Progressive Health Checks system provides intelligent server restar
 ### **Advanced Usage**
 
 #### **Custom Timeout Override**
+
 ```bash
 ./restart --progressive --max-timeout=90
 ```
+
 **Use when:**
+
 - Server is particularly slow
 - Debugging startup issues
 - First-time setup
 
 #### **Critical Components Only**
+
 ```bash
 ./restart --progressive --critical-only
 ```
+
 **Use when:**
+
 - Quick functionality check
 - Non-critical services are known to be down
 - Faster execution needed
 
 #### **Verbose Output**
+
 ```bash
 ./restart --progressive --verbose
 ```
+
 **Use when:**
+
 - Debugging issues
 - Need detailed progress information
 - Troubleshooting health check failures
 
 #### **Debug Mode**
+
 ```bash
 ./restart --progressive --debug
 ```
+
 **Use when:**
+
 - Investigating specific endpoint failures
 - Need to see raw server responses
 - Advanced troubleshooting
@@ -2888,6 +3055,7 @@ The TikTrack Progressive Health Checks system provides intelligent server restar
 ### **Understanding Health Check Results**
 
 #### **Success Indicators**
+
 ```
 ✅ Level 1/6: Basic Server Response - OK (2s)
 ✅ Level 2/6: API Health - OK (3s)
@@ -2902,6 +3070,7 @@ The TikTrack Progressive Health Checks system provides intelligent server restar
 ```
 
 #### **Partial Success (Normal)**
+
 ```
 ✅ Level 1/6: Basic Server Response - OK (2s)
 ✅ Level 2/6: API Health - OK (3s)
@@ -2916,6 +3085,7 @@ The TikTrack Progressive Health Checks system provides intelligent server restar
 ```
 
 #### **Critical Failure (Action Required)**
+
 ```
 ✅ Level 1/6: Basic Server Response - OK (2s)
 ❌ Level 2/6: API Health - FAILED (10s)
@@ -2925,24 +3095,28 @@ The TikTrack Progressive Health Checks system provides intelligent server restar
 ### **Cache Mode Guide**
 
 #### **Development Mode**
+
 - **Purpose**: Fast development cycles
 - **Cache TTL**: 10 seconds
 - **Timeout**: 34 seconds
 - **Use for**: Code changes, testing, debugging
 
 #### **No-Cache Mode**
+
 - **Purpose**: Immediate updates, debugging
 - **Cache TTL**: Disabled
 - **Timeout**: 28 seconds
 - **Use for**: Cache debugging, immediate data updates
 
 #### **Production Mode**
+
 - **Purpose**: Performance and stability
 - **Cache TTL**: 5 minutes
 - **Timeout**: 46 seconds
 - **Use for**: Production deployments, performance testing
 
 #### **Preserve Mode**
+
 - **Purpose**: Maintain current state
 - **Cache TTL**: Current setting
 - **Timeout**: 40 seconds
@@ -2951,24 +3125,28 @@ The TikTrack Progressive Health Checks system provides intelligent server restar
 ### **Troubleshooting Common Issues**
 
 #### **Issue: "Level 3/6: Cache System - TIMEOUT"**
+
 **What it means**: Cache system is taking longer to initialize
 **Is it a problem**: No - system works without cache
 **What to do**: Continue - this is normal for first startup
 **When to worry**: If it happens consistently, check cache configuration
 
 #### **Issue: "Level 6/6: External Data - FAILED"**
+
 **What it means**: External data service is not available
 **Is it a problem**: No - system works without external data
 **What to do**: Continue - check external data configuration later
 **When to worry**: If you need external data functionality
 
 #### **Issue: "Level 4/6: Database Connectivity - FAILED"**
+
 **What it means**: Database is not accessible
 **Is it a problem**: Yes - this is critical
 **What to do**: Check database connection, restart database if needed
 **When to worry**: Always - this prevents system operation
 
 #### **Issue: "Health check timeout after 60s"**
+
 **What it means**: Server is taking too long to start
 **Is it a problem**: Yes - server may be stuck
 **What to do**: Check server logs, try manual restart
@@ -2977,18 +3155,21 @@ The TikTrack Progressive Health Checks system provides intelligent server restar
 ### **Performance Expectations**
 
 #### **Typical Performance**
+
 - **Development Mode**: 15-25 seconds
 - **No-Cache Mode**: 12-20 seconds
 - **Production Mode**: 25-40 seconds
 - **Preserve Mode**: 20-30 seconds
 
 #### **When Performance is Good**
+
 - Health check completes within expected time
 - Success rate >90% for critical levels
 - No critical failures
 - Consistent performance across restarts
 
 #### **When to Investigate**
+
 - Health check takes >60 seconds
 - Success rate <80% for critical levels
 - Frequent critical failures
@@ -2997,6 +3178,7 @@ The TikTrack Progressive Health Checks system provides intelligent server restar
 ### **Configuration Management**
 
 #### **Creating Configuration File**
+
 ```bash
 # Create configuration file
 cat > ~/.tiktrack_restart_config << EOF
@@ -3009,6 +3191,7 @@ EOF
 ```
 
 #### **Modifying Configuration**
+
 ```bash
 # Edit configuration file
 nano ~/.tiktrack_restart_config
@@ -3019,6 +3202,7 @@ export PROGRESSIVE_VERBOSE=true
 ```
 
 #### **Configuration Options**
+
 - **PROGRESSIVE_MAX_TIMEOUT**: Maximum total timeout (default: 60)
 - **PROGRESSIVE_LEVEL_TIMEOUT**: Per-level timeout (default: 30)
 - **PROGRESSIVE_RETRY_ATTEMPTS**: Retry attempts per level (default: 3)
@@ -3028,21 +3212,25 @@ export PROGRESSIVE_VERBOSE=true
 ### **Best Practices**
 
 #### **Daily Development**
+
 1. Use `./restart --progressive --cache-mode=development` for code changes
 2. Use `./restart --progressive --critical-only` for quick checks
 3. Use `./restart --progressive --verbose` when debugging
 
 #### **Production Deployments**
+
 1. Use `./restart --progressive --cache-mode=production` for deployments
 2. Always check final status report
 3. Verify all critical levels pass
 
 #### **Troubleshooting**
+
 1. Start with `./restart --progressive --debug` for detailed information
 2. Check server logs if health checks fail
 3. Use fallback to legacy system if needed
 
 #### **Performance Optimization**
+
 1. Adjust timeouts based on your server's performance
 2. Use critical-only mode for faster checks
 3. Monitor success rates and adjust configuration
@@ -3052,18 +3240,22 @@ export PROGRESSIVE_VERBOSE=true
 ### **Basic Usage**
 
 #### **Quick Restart with Progressive Checks**
+
 ```bash
 ./restart --progressive
 ```
+
 - Uses progressive health checks
 - Adaptive timeout based on cache mode
 - Detailed progress reporting
 - Continues even if non-critical components fail
 
 #### **Complete Restart with Progressive Checks**
+
 ```bash
 ./restart complete --progressive
 ```
+
 - Full progressive health check
 - All 6 levels tested
 - Maximum 60-second timeout
@@ -3072,24 +3264,30 @@ export PROGRESSIVE_VERBOSE=true
 ### **Advanced Usage**
 
 #### **Custom Timeout Override**
+
 ```bash
 ./restart --progressive --max-timeout=90
 ```
+
 - Override maximum timeout (default: 60 seconds)
 - Useful for slow systems or debugging
 
 #### **Skip Non-Critical Levels**
+
 ```bash
 ./restart --progressive --critical-only
 ```
+
 - Test only critical levels (1, 2, 4)
 - Faster execution
 - Good for basic functionality testing
 
 #### **Verbose Output**
+
 ```bash
 ./restart --progressive --verbose
 ```
+
 - Detailed output for each health check
 - Useful for debugging and troubleshooting
 - Shows exact timing and response details
@@ -3097,25 +3295,31 @@ export PROGRESSIVE_VERBOSE=true
 ### **Cache Mode Integration**
 
 #### **Development Mode**
+
 ```bash
 ./restart --cache-mode=development --progressive
 ```
+
 - Adaptive timeout: ~34 seconds
 - Optimized for fast development cycles
 - Less strict on non-critical components
 
 #### **No-Cache Mode**
+
 ```bash
 ./restart --cache-mode=no-cache --progressive
 ```
+
 - Adaptive timeout: ~28 seconds
 - Fastest startup time
 - Minimal cache-related delays
 
 #### **Production Mode**
+
 ```bash
 ./restart --cache-mode=production --progressive
 ```
+
 - Adaptive timeout: ~46 seconds
 - Most comprehensive testing
 - Strict validation of all components
@@ -3125,24 +3329,29 @@ export PROGRESSIVE_VERBOSE=true
 #### **Common Issues**
 
 **Issue: "Level 3/6: Cache System - TIMEOUT"**
+
 - **Cause**: Cache system taking longer to initialize
 - **Solution**: Normal for first startup, check cache configuration
 - **Action**: Continue - system will work without cache
 
 **Issue: "Level 6/6: External Data - FAILED"**
+
 - **Cause**: External data service not available
 - **Solution**: Check external data configuration
 - **Action**: Continue - system works without external data
 
 **Issue: "Level 4/6: Database Connectivity - FAILED"**
+
 - **Cause**: Database not accessible
 - **Solution**: Check database connection and locks
 - **Action**: Critical failure - restart required
 
 #### **Debug Mode**
+
 ```bash
 ./restart --progressive --debug
 ```
+
 - Shows detailed curl commands
 - Displays raw server responses
 - Useful for diagnosing specific issues
@@ -3150,6 +3359,7 @@ export PROGRESSIVE_VERBOSE=true
 ### **Configuration Options**
 
 #### **Environment Variables**
+
 ```bash
 export PROGRESSIVE_MAX_TIMEOUT=90        # Maximum total timeout
 export PROGRESSIVE_LEVEL_TIMEOUT=30      # Per-level timeout
@@ -3158,6 +3368,7 @@ export PROGRESSIVE_VERBOSE=true          # Verbose output
 ```
 
 #### **Configuration File**
+
 ```bash
 # ~/.tiktrack_restart_config
 PROGRESSIVE_MAX_TIMEOUT=90
@@ -3176,12 +3387,14 @@ The TikTrack Progressive Health Checks system requires minimal maintenance but b
 ### **Regular Maintenance Tasks**
 
 #### **Daily Maintenance (5 minutes)**
+
 - **Check Health Check Logs**: Review daily health check results
 - **Monitor Success Rates**: Ensure >95% success rate for critical levels
 - **Verify Performance**: Check that health checks complete within expected time
 - **Review Error Patterns**: Look for recurring issues
 
 **Commands:**
+
 ```bash
 # Check recent health check results
 grep "Progressive Health Check" logs/restart.log | tail -10
@@ -3194,6 +3407,7 @@ grep "Total Time" logs/restart.log | tail -5
 ```
 
 #### **Weekly Maintenance (15 minutes)**
+
 - **Review Health Check Patterns**: Analyze success/failure patterns
 - **Update Timeout Values**: Adjust based on server performance
 - **Check Server Endpoints**: Verify all health check endpoints are available
@@ -3201,6 +3415,7 @@ grep "Total Time" logs/restart.log | tail -5
 - **Performance Analysis**: Review health check timing trends
 
 **Commands:**
+
 ```bash
 # Analyze health check patterns
 grep -E "(SUCCESS|FAILED|TIMEOUT)" logs/restart.log | sort | uniq -c
@@ -3215,6 +3430,7 @@ grep "Total Time" logs/restart.log | awk '{print $NF}' | sort -n
 ```
 
 #### **Monthly Maintenance (30 minutes)**
+
 - **Performance Benchmarking**: Compare performance against baseline
 - **Documentation Updates**: Update any changed procedures
 - **Error Pattern Analysis**: Deep dive into recurring issues
@@ -3222,6 +3438,7 @@ grep "Total Time" logs/restart.log | awk '{print $NF}' | sort -n
 - **System Health Assessment**: Overall system health evaluation
 
 **Commands:**
+
 ```bash
 # Performance benchmarking
 ./restart --progressive --cache-mode=development --verbose > benchmark_dev.log
@@ -3237,6 +3454,7 @@ cat ~/.tiktrack_restart_config
 ### **Configuration Management**
 
 #### **Configuration File Maintenance**
+
 ```bash
 # Backup current configuration
 cp ~/.tiktrack_restart_config ~/.tiktrack_restart_config.backup
@@ -3249,6 +3467,7 @@ source ~/.tiktrack_restart_config && echo "Configuration loaded successfully"
 ```
 
 #### **Environment Variable Management**
+
 ```bash
 # Set environment variables
 export PROGRESSIVE_MAX_TIMEOUT=90
@@ -3265,6 +3484,7 @@ unset PROGRESSIVE_VERBOSE
 ### **Performance Monitoring**
 
 #### **Key Performance Indicators (KPIs)**
+
 - **Health Check Success Rate**: Target >95%
 - **Average Health Check Time**: Target <30 seconds
 - **Critical Level Success Rate**: Target >98%
@@ -3272,6 +3492,7 @@ unset PROGRESSIVE_VERBOSE
 - **False Negative Rate**: Target <5%
 
 #### **Performance Monitoring Commands**
+
 ```bash
 # Monitor success rates
 grep "Success Rate" logs/restart.log | tail -20
@@ -3287,6 +3508,7 @@ grep "TIMEOUT" logs/restart.log | tail -10
 ```
 
 #### **Performance Optimization**
+
 ```bash
 # Test different timeout configurations
 PROGRESSIVE_MAX_TIMEOUT=45 ./restart --progressive --cache-mode=development
@@ -3301,6 +3523,7 @@ PROGRESSIVE_MAX_TIMEOUT=90 ./restart --progressive --cache-mode=development
 #### **Common Issues and Solutions**
 
 **Issue 1: Health Check Timeout**
+
 ```
 Symptoms: "Health check timeout after 60s"
 Causes: Server startup issues, network problems, endpoint unavailability
@@ -3313,6 +3536,7 @@ Solutions:
 ```
 
 **Issue 2: Critical Level Failures**
+
 ```
 Symptoms: "Level 2/6: API Health - FAILED"
 Causes: API not responding, server not fully started
@@ -3324,6 +3548,7 @@ Solutions:
 ```
 
 **Issue 3: Database Connectivity Issues**
+
 ```
 Symptoms: "Level 4/6: Database Connectivity - FAILED"
 Causes: Database not running, connection issues, locks
@@ -3335,6 +3560,7 @@ Solutions:
 ```
 
 **Issue 4: Cache System Issues**
+
 ```
 Symptoms: "Level 3/6: Cache System - TIMEOUT"
 Causes: Cache system slow to initialize, configuration issues
@@ -3346,6 +3572,7 @@ Solutions:
 ```
 
 **Issue 5: External Data Issues**
+
 ```
 Symptoms: "Level 6/6: External Data - FAILED"
 Causes: External service unavailable, network issues
@@ -3359,6 +3586,7 @@ Solutions:
 #### **Advanced Troubleshooting**
 
 **Debug Mode Analysis**
+
 ```bash
 # Run with debug mode
 ./restart --progressive --debug > debug_output.log
@@ -3370,6 +3598,7 @@ grep "Error" debug_output.log
 ```
 
 **Endpoint Testing**
+
 ```bash
 # Test individual endpoints
 curl -v http://localhost:8080/
@@ -3381,6 +3610,7 @@ curl -v http://localhost:8080/api/external-data/status
 ```
 
 **Server State Analysis**
+
 ```bash
 # Check server process
 ps aux | grep python3 | grep dev_server
@@ -3398,12 +3628,14 @@ top -p $(pgrep -f dev_server)
 ### **Log Management**
 
 #### **Log File Locations**
+
 - **Main Log**: `logs/restart.log`
 - **Server Log**: `logs/app.log`
 - **Debug Log**: `debug_output.log` (when using --debug)
 - **Configuration Log**: `~/.tiktrack_restart_config`
 
 #### **Log Rotation**
+
 ```bash
 # Rotate logs weekly
 logrotate -f /etc/logrotate.d/tiktrack
@@ -3414,6 +3646,7 @@ touch logs/restart.log
 ```
 
 #### **Log Analysis**
+
 ```bash
 # Analyze success patterns
 grep "SUCCESS" logs/restart.log | wc -l
@@ -3431,6 +3664,7 @@ grep -E "(FAILED|TIMEOUT)" logs/restart.log | sort | uniq -c | sort -nr
 ### **System Health Assessment**
 
 #### **Weekly Health Check**
+
 ```bash
 # Run comprehensive health check
 ./restart --progressive --verbose --cache-mode=development > weekly_health.log
@@ -3443,6 +3677,7 @@ grep "Overall Status" weekly_health.log
 ```
 
 #### **Monthly Health Assessment**
+
 ```bash
 # Run full system assessment
 ./restart --progressive --debug --cache-mode=development > monthly_assessment.log
@@ -3460,6 +3695,7 @@ grep "Overall Status" monthly_assessment_prod.log >> health_report.txt
 ### **Backup and Recovery**
 
 #### **Configuration Backup**
+
 ```bash
 # Backup configuration
 cp ~/.tiktrack_restart_config ~/.tiktrack_restart_config.backup.$(date +%Y%m%d)
@@ -3473,6 +3709,7 @@ cp restart_progressive.sh restart_progressive.sh.backup.$(date +%Y%m%d)
 ```
 
 #### **Recovery Procedures**
+
 ```bash
 # Restore configuration
 cp ~/.tiktrack_restart_config.backup.20250928 ~/.tiktrack_restart_config
@@ -3488,6 +3725,7 @@ tar -xzf logs_backup_20250928.tar.gz
 ### **Upgrade and Migration**
 
 #### **System Upgrades**
+
 ```bash
 # Backup current system
 ./backup_restart_system.sh
@@ -3503,6 +3741,7 @@ diff old_performance.log new_performance.log
 ```
 
 #### **Configuration Migration**
+
 ```bash
 # Export current configuration
 env | grep PROGRESSIVE > current_config.env
@@ -3517,6 +3756,7 @@ source new_config.env
 ### **Performance Optimization**
 
 #### **Timeout Optimization**
+
 ```bash
 # Test different timeout values
 for timeout in 30 45 60 90; do
@@ -3526,6 +3766,7 @@ done
 ```
 
 #### **Cache Mode Optimization**
+
 ```bash
 # Test different cache modes
 for mode in development no-cache production preserve; do
@@ -3535,6 +3776,7 @@ done
 ```
 
 #### **Retry Logic Optimization**
+
 ```bash
 # Test different retry settings
 for retries in 1 2 3 5; do
@@ -3546,6 +3788,7 @@ done
 ### **Security Considerations**
 
 #### **Configuration Security**
+
 ```bash
 # Secure configuration file
 chmod 600 ~/.tiktrack_restart_config
@@ -3555,6 +3798,7 @@ grep -i "password\|secret\|key" ~/.tiktrack_restart_config
 ```
 
 #### **Log Security**
+
 ```bash
 # Secure log files
 chmod 644 logs/restart.log
@@ -3567,12 +3811,14 @@ grep -i "password\|secret\|key" logs/restart.log
 ### **Documentation Maintenance**
 
 #### **Keep Documentation Updated**
+
 - Update procedures when system changes
 - Document new issues and solutions
 - Update performance baselines
 - Review and update troubleshooting guides
 
 #### **Documentation Review Schedule**
+
 - **Weekly**: Review and update common issues
 - **Monthly**: Review and update procedures
 - **Quarterly**: Comprehensive documentation review
@@ -3583,12 +3829,14 @@ grep -i "password\|secret\|key" logs/restart.log
 ### **Regular Maintenance Tasks**
 
 #### **Weekly**
+
 - Review health check logs for patterns
 - Update timeout values if needed
 - Check for new server endpoints
 - Validate cache mode factors
 
 #### **Monthly**
+
 - Performance benchmarking
 - Update documentation
 - Review error patterns
@@ -3599,16 +3847,19 @@ grep -i "password\|secret\|key" logs/restart.log
 #### **Health Check Failures**
 
 **All Levels Failing**
+
 - Check if server is running: `ps aux | grep python3`
 - Check port availability: `lsof -i :8080`
 - Try manual server start: `cd Backend && python3 dev_server.py`
 
 **Specific Level Failures**
+
 - Check server logs: `tail -f logs/app.log`
 - Test endpoint manually: `curl -v http://localhost:8080/api/health`
 - Check server configuration
 
 **Timeout Issues**
+
 - Increase timeout values in configuration
 - Check server performance
 - Consider server optimization
@@ -3616,12 +3867,14 @@ grep -i "password\|secret\|key" logs/restart.log
 #### **Performance Issues**
 
 **Slow Health Checks**
+
 - Check network connectivity
 - Verify server performance
 - Consider reducing timeout values
 - Use `--critical-only` mode
 
 **Inconsistent Results**
+
 - Check server stability
 - Verify endpoint availability
 - Review retry logic
@@ -3630,18 +3883,21 @@ grep -i "password\|secret\|key" logs/restart.log
 ### **Future Enhancements**
 
 #### **Short-term (1-2 months)**
+
 - Add more health check levels
 - Implement health check caching
 - Add performance metrics
 - Create health check dashboard
 
 #### **Medium-term (3-6 months)**
+
 - Integrate with monitoring systems
 - Add predictive health checks
 - Implement automatic recovery
 - Create health check API
 
 #### **Long-term (6+ months)**
+
 - Machine learning for timeout optimization
 - Predictive failure detection
 - Automatic server optimization
@@ -3650,12 +3906,14 @@ grep -i "password\|secret\|key" logs/restart.log
 ## 🎯 Best Practices
 
 ### **When to Use Quick Restart**
+
 - Simple code changes
 - Development testing
 - Quick iterations
 - When server is responsive
 
 ### **When to Use Complete Restart**
+
 - After major changes
 - When experiencing issues
 - Production deployments
@@ -3663,6 +3921,7 @@ grep -i "password\|secret\|key" logs/restart.log
 - When quick restart fails
 
 ### **Cache Mode Selection**
+
 - **Development**: Fast iteration, frequent changes
 - **No-cache**: Debugging, immediate updates
 - **Production**: Performance, stability
@@ -3671,13 +3930,16 @@ grep -i "password\|secret\|key" logs/restart.log
 ## 📞 Support
 
 ### **Getting Help**
+
 1. Check script output for specific error messages
 2. Verify server is actually starting with `ps aux | grep python3`
 3. Check port usage with `lsof -i :8080`
 4. Try manual server start for comparison
 
 ### **Reporting Issues**
+
 Include:
+
 - Full script output
 - Server process status
 - Port usage information
@@ -3689,18 +3951,21 @@ Include:
 ### **Key Performance Indicators (KPIs)**
 
 #### **Reliability Metrics**
+
 - **Health Check Success Rate**: >95% for critical levels
 - **Server Startup Success Rate**: >90% within timeout
 - **False Positive Rate**: <5% (healthy server marked as unhealthy)
 - **False Negative Rate**: <2% (unhealthy server marked as healthy)
 
 #### **Performance Metrics**
+
 - **Average Health Check Time**: <30 seconds
 - **Timeout Accuracy**: Within 10% of actual server startup time
 - **Cache Mode Adaptation**: 20% improvement in timeout accuracy
 - **User Satisfaction**: <5% complaints about hanging scripts
 
 #### **Maintenance Metrics**
+
 - **Configuration Changes**: <2 per month
 - **Script Updates**: <1 per month
 - **Documentation Updates**: <1 per quarter
@@ -3709,18 +3974,21 @@ Include:
 ### **Validation Criteria**
 
 #### **Phase 1 Validation (Week 1)**
+
 - ✅ All 6 health check levels implemented
 - ✅ Adaptive timeout calculation working
 - ✅ Basic error handling functional
 - ✅ Progress reporting accurate
 
 #### **Phase 2 Validation (Week 2)**
+
 - ✅ Integration with existing restart script
 - ✅ Cache mode adaptation working
 - ✅ Fallback system functional
 - ✅ Configuration options working
 
 #### **Phase 3 Validation (Week 3)**
+
 - ✅ Production testing successful
 - ✅ Performance benchmarks met
 - ✅ User training completed
@@ -3729,6 +3997,7 @@ Include:
 ### **Acceptance Criteria**
 
 #### **Functional Requirements**
+
 - [ ] Progressive health checks work for all 6 levels
 - [ ] Adaptive timeouts adjust correctly for cache modes
 - [ ] Error handling provides clear feedback
@@ -3736,6 +4005,7 @@ Include:
 - [ ] Fallback to current system if needed
 
 #### **Non-Functional Requirements**
+
 - [ ] Health check completion within 60 seconds
 - [ ] 95% success rate for critical levels
 - [ ] Clear progress reporting
@@ -3743,6 +4013,7 @@ Include:
 - [ ] Easy configuration and maintenance
 
 #### **User Experience Requirements**
+
 - [ ] Clear progress indication
 - [ ] Helpful error messages
 - [ ] Easy troubleshooting
@@ -3754,18 +4025,21 @@ Include:
 ### **Technical Risks**
 
 #### **Risk 1: Server Endpoint Changes**
+
 - **Probability**: Medium
 - **Impact**: High
 - **Mitigation**: Use stable endpoints, implement fallback checks
 - **Contingency**: Manual health check configuration
 
 #### **Risk 2: Timeout Calculation Inaccuracy**
+
 - **Probability**: Low
 - **Impact**: Medium
 - **Mitigation**: Extensive testing, configurable timeouts
 - **Contingency**: Manual timeout override
 
 #### **Risk 3: Integration Issues**
+
 - **Probability**: Low
 - **Impact**: Medium
 - **Mitigation**: Gradual integration, fallback system
@@ -3774,12 +4048,14 @@ Include:
 ### **Operational Risks**
 
 #### **Risk 4: User Adoption**
+
 - **Probability**: Low
 - **Impact**: Medium
 - **Mitigation**: Good documentation, training, gradual rollout
 - **Contingency**: Keep current system as backup
 
 #### **Risk 5: Maintenance Overhead**
+
 - **Probability**: Medium
 - **Impact**: Low
 - **Mitigation**: Automated testing, clear documentation
@@ -3788,6 +4064,7 @@ Include:
 ### **Business Risks**
 
 #### **Risk 6: Development Delays**
+
 - **Probability**: Low
 - **Impact**: Medium
 - **Mitigation**: Phased implementation, fallback system
@@ -3796,6 +4073,7 @@ Include:
 ## 📋 **PROJECT TIMELINE AND MILESTONES**
 
 ### **Week 1: Foundation**
+
 - **Day 1-2**: Core infrastructure and basic health checks
 - **Day 3-4**: Level 1-3 implementation and testing
 - **Day 5**: Initial validation and documentation
@@ -3803,6 +4081,7 @@ Include:
 **Milestone 1**: Basic progressive health checks working
 
 ### **Week 2: Enhancement**
+
 - **Day 1-2**: Level 4-6 implementation and parallel execution
 - **Day 3-4**: Integration with existing system
 - **Day 5**: Optimization and performance tuning
@@ -3810,6 +4089,7 @@ Include:
 **Milestone 2**: Full progressive health check system
 
 ### **Week 3: Deployment**
+
 - **Day 1-2**: Production testing and validation
 - **Day 3-4**: Documentation and training
 - **Day 5**: Go-live and monitoring
@@ -3817,6 +4097,7 @@ Include:
 **Milestone 3**: Production deployment complete
 
 ### **Success Criteria**
+
 - All milestones met on time
 - Performance metrics achieved
 - User acceptance >90%
@@ -3833,6 +4114,7 @@ Include:
 ## 📋 **CHANGELOG**
 
 ### **Version 4.0.0 (September 28, 2025)**
+
 - ✅ **Terminal Communication Issue Resolved**: Identified and solved Cursor pseudo-terminal issues
 - ✅ **macOS Terminal Integration**: Created dedicated scripts for macOS Terminal usage
 - ✅ **Enhanced Restart Script**: Improved terminal compatibility and control return
@@ -3841,6 +4123,7 @@ Include:
 - ✅ **Production Ready**: All scripts tested and ready for production use
 
 ### **Version 3.0.0 (September 28, 2025)**
+
 - ✅ **Progressive Health Checks Architecture**: Comprehensive specification
 - ✅ **Implementation Plan**: Detailed development roadmap
 - ✅ **User Guide**: Complete usage documentation

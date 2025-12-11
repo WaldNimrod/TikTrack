@@ -22,6 +22,7 @@
 מערכת הווידג'טים במערכת TikTrack מספקת דרך סטנדרטית ליצירת רכיבים עצמאיים שניתן לשלב בעמודים שונים.
 
 **מטרות:**
+
 - ✅ סטנדרט אחיד לווידג'טים
 - ✅ שימוש חוזר
 - ✅ אינטגרציה עם מערכות כלליות
@@ -36,12 +37,14 @@
 ### Module Pattern (IIFE) - **מומלץ ביותר**
 
 **יתרונות:**
+
 - ✅ פשוט וישיר
 - ✅ תואם לווידג'טים הקיימים
 - ✅ קל לתחזוקה
 - ✅ ללא overhead
 
 **דוגמה:**
+
 ```javascript
 ;(function () {
   'use strict';
@@ -57,6 +60,7 @@
 ```
 
 **דוגמאות במערכת:**
+
 - Recent Trades Widget
 - Recent Trade Plans Widget
 - Tag Widget
@@ -66,11 +70,13 @@
 ### Bootstrap Tabs - **לטאבים**
 
 **יתרונות:**
+
 - ✅ כבר קיים במערכת (Bootstrap 5)
 - ✅ נגישות מובנית
 - ✅ תמיכה RTL
 
 **דוגמאות:**
+
 - Tag Widget (ענן + חיפוש)
 - History Widget (טאבים פנימיים)
 
@@ -85,6 +91,7 @@
 ### מערכות בסיסיות
 
 **FieldRendererService:**
+
 ```javascript
 // רינדור שדות אחיד
 const formattedAmount = window.FieldRendererService?.renderAmount(value, currency);
@@ -92,6 +99,7 @@ const formattedDate = window.FieldRendererService?.renderDate(dateValue);
 ```
 
 **ButtonSystem:**
+
 ```javascript
 // עיבוד כפתורים
 if (window.ButtonSystem?.processButtons) {
@@ -100,6 +108,7 @@ if (window.ButtonSystem?.processButtons) {
 ```
 
 **NotificationSystem:**
+
 ```javascript
 // התראות
 window.NotificationSystem?.showError?.('Error message');
@@ -108,11 +117,13 @@ window.NotificationSystem?.showError?.('Error message');
 ### שירותי נתונים
 
 **TagService:**
+
 ```javascript
 const tags = await window.TagService?.getTagCloudData();
 ```
 
 **DashboardData:**
+
 ```javascript
 const dashboardData = await window.DashboardData?.load();
 ```
@@ -120,6 +131,7 @@ const dashboardData = await window.DashboardData?.load();
 ### מערכות מודלים
 
 **ModalManagerV2:**
+
 ```javascript
 await window.ModalManagerV2?.showModal('modalId', 'view');
 ```
@@ -131,12 +143,14 @@ await window.ModalManagerV2?.showModal('modalId', 'view');
 ### ✅ Good Patterns
 
 **1. שימוש במערכות כלליות:**
+
 ```javascript
 // ✅ טוב
 const formatted = window.FieldRendererService?.renderAmount(value);
 ```
 
 **2. Cache DOM Elements:**
+
 ```javascript
 // ✅ טוב
 const elements = {
@@ -149,6 +163,7 @@ function cacheElements() {
 ```
 
 **3. State Management:**
+
 ```javascript
 // ✅ טוב
 const state = {
@@ -160,6 +175,7 @@ const state = {
 ### ❌ Anti-patterns
 
 **1. פונקציות עיצוב מקומיות:**
+
 ```javascript
 // ❌ רע - השתמש ב-FieldRendererService
 function formatAmount(value) {
@@ -168,6 +184,7 @@ function formatAmount(value) {
 ```
 
 **2. חיפוש DOM כל פעם:**
+
 ```javascript
 // ❌ רע - Cache elements
 function render() {
@@ -176,6 +193,7 @@ function render() {
 ```
 
 **3. Global state:**
+
 ```javascript
 // ❌ רע - השתמש ב-local state
 window.myWidgetData = null;
@@ -214,6 +232,7 @@ const cached = state.metadataCache.get(key);
 ### תמיכה ב-Multiple Instances
 
 **Pattern:**
+
 ```javascript
 const MyWidget = {
   init(containerId = DEFAULT_CONTAINER, config = {}) {
@@ -225,6 +244,7 @@ const MyWidget = {
 ```
 
 **שימוש:**
+
 ```javascript
 // Instance 1
 window.MyWidget.init('container1', { maxItems: 10 });
@@ -248,6 +268,12 @@ window.MyWidget.init('container2', { maxItems: 20 });
 
 **מקור:** `documentation/02-ARCHITECTURE/FRONTEND/WIDGET_SYSTEM_ARCHITECTURE.md`  
 **עודכן:** 21 ינואר 2025
+
+
+
+
+
+
 
 
 

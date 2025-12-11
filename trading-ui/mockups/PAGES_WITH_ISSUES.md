@@ -1,4 +1,5 @@
 # רשימת עמודים עם בעיות - עמודי מוקאפ
+
 # Pages with Issues List - Mockups Pages
 
 **תאריך עדכון:** 28.11.2025, 23:16:48  
@@ -39,11 +40,13 @@
 **נתיב:** `/mockups/daily-snapshots/comparative-analysis-page.html`
 
 **בעיות:**
+
 - ❌ **שגיאות Preferences (2 שגיאות)**
   - Error saving preference `comparative-analysis-comparison-params`
   - Error saving preference `comparative-analysis-filters`
 
 **פרטים:**
+
 - Header System: ✅ עובד
 - כפתורים: 43 (0 עובדים, 10 שבורים)
 - ממשקים: 25 (0 עובדים, 10 שבורים)
@@ -57,10 +60,12 @@
 **נתיב:** `/mockups/daily-snapshots/economic-calendar-page.html`
 
 **בעיות:**
+
 - ❌ **שגיאת 404 (1 שגיאה)**
   - Failed to load resource (קובץ חסר)
 
 **פרטים:**
+
 - Header System: ✅ עובד
 - כפתורים: 36 (0 עובדים, 10 שבורים)
 - ממשקים: 4 (0 עובדים, 4 שבורים)
@@ -74,12 +79,14 @@
 **נתיב:** `/mockups/daily-snapshots/emotional-tracking-widget.html`
 
 **בעיות:**
+
 - ❌ **שגיאת JavaScript Syntax**
-  - `Unexpected token ')'` 
+  - `Unexpected token ')'`
 - ❌ **שגיאת Runtime**
   - `e.includes is not a function`
 
 **פרטים:**
+
 - Header System: ✅ עובד
 - כפתורים: 25 (0 עובדים, 10 שבורים)
 - ממשקים: 3 (0 עובדים, 3 שבורים)
@@ -87,6 +94,7 @@
 **חומרה:** 🔴 גבוהה (שגיאות JavaScript מונעות תפקוד)
 
 **קבצים רלוונטיים:**
+
 - `trading-ui/scripts/emotional-tracking-widget.js`
 
 ---
@@ -96,12 +104,14 @@
 **נתיב:** `/mockups/daily-snapshots/history-widget.html`
 
 **בעיות:**
+
 - ❌ **שגיאת JavaScript Async/Await**
   - `await is only valid in async functions`
 - ❌ **שגיאת Runtime**
   - `e.includes is not a function`
 
 **פרטים:**
+
 - Header System: ✅ עובד
 - כפתורים: 21 (0 עובדים, 10 שבורים)
 - ממשקים: 1 (0 עובדים, 1 שבור)
@@ -109,6 +119,7 @@
 **חומרה:** 🔴 גבוהה (שגיאות JavaScript מונעות תפקוד)
 
 **קבצים רלוונטיים:**
+
 - `trading-ui/scripts/history-widget.js`
 
 ---
@@ -118,6 +129,7 @@
 **נתיב:** `/mockups/daily-snapshots/portfolio-state-page.html`
 
 **בעיות:**
+
 - ❌ **שגיאת JavaScript Syntax**
   - `Unexpected token 'catch'`
 - ❌ **שגיאת Runtime**
@@ -126,6 +138,7 @@
   - Failed to load resource (2 קבצים חסרים)
 
 **פרטים:**
+
 - Header System: ✅ עובד
 - כפתורים: 38 (0 עובדים, 10 שבורים)
 - ממשקים: 5 (0 עובדים, 5 שבורים)
@@ -133,6 +146,7 @@
 **חומרה:** 🔴 גבוהה (מספר בעיות המשלבות syntax, runtime ו-404)
 
 **קבצים רלוונטיים:**
+
 - `trading-ui/scripts/portfolio-state-page.js`
 
 ---
@@ -142,10 +156,12 @@
 **נתיב:** `/mockups/daily-snapshots/strategy-analysis-page.html`
 
 **בעיות:**
+
 - ❌ **שגיאת 404 (1 שגיאה)**
   - Failed to load resource (קובץ חסר)
 
 **פרטים:**
+
 - Header System: ✅ עובד
 - כפתורים: 50 (0 עובדים, 10 שבורים)
 - ממשקים: 18 (0 עובדים, 10 שבורים)
@@ -153,6 +169,7 @@
 **חומרה:** 🔴 גבוהה (משאב חסר עלול למנוע תפקוד)
 
 **קבצים רלוונטיים:**
+
 - `trading-ui/scripts/strategy-analysis-page.js`
 
 ---
@@ -162,6 +179,7 @@
 **נתיב:** `/mockups/daily-snapshots/trade-history-page.html`
 
 **בעיות:**
+
 - ❌ **שגיאת JavaScript Syntax**
   - `missing ) after argument list`
 - ❌ **שגיאת Runtime**
@@ -171,6 +189,7 @@
   - Error details
 
 **פרטים:**
+
 - Header System: ✅ עובד
 - כפתורים: 33 (0 עובדים, 10 שבורים)
 - ממשקים: 6 (0 עובדים, 6 שבורים)
@@ -178,6 +197,7 @@
 **חומרה:** 🔴 גבוהה (מספר בעיות syntax ו-runtime)
 
 **קבצים רלוונטיים:**
+
 - `trading-ui/scripts/trade-history-page.js`
 
 ---
@@ -227,19 +247,19 @@
 
 ## סדר עדיפויות לתיקון
 
-### עדיפות 1 - 🔴 קריטי (יש לתקן מיד):
+### עדיפות 1 - 🔴 קריטי (יש לתקן מיד)
 
 1. **portfolio-state-page** - 4 בעיות (syntax, runtime, 404)
 2. **trade-history-page** - 4 בעיות (syntax, runtime, קונסולה)
 3. **emotional-tracking-widget** - 2 בעיות (syntax, runtime)
 4. **history-widget** - 2 בעיות (async/await, runtime)
 
-### עדיפות 2 - 🔴 חשוב:
+### עדיפות 2 - 🔴 חשוב
 
 5. **economic-calendar-page** - 1 בעיה (404)
 6. **strategy-analysis-page** - 1 בעיה (404)
 
-### עדיפות 3 - 🟡 שיפור:
+### עדיפות 3 - 🟡 שיפור
 
 7. **comparative-analysis-page** - 2 בעיות (Preferences - לא קריטי)
 

@@ -8,7 +8,7 @@
 
 ## 📋 סקירת המצב הנוכחי
 
-### מערכת האיקונים הקיימת:
+### מערכת האיקונים הקיימת
 
 1. **Bootstrap Icons (CDN)**
    - מיקום: `<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">`
@@ -29,7 +29,7 @@
    - שימוש ישיר ב-HTML/JS
    - נמצא ב-`unified-log-display.js` ל-page icons
 
-### מיפוי איקונים במערכת:
+### מיפוי איקונים במערכת
 
 1. **Entity Icons** - `entity-details-modal.js`
    - `getEntityIcon(entityType)` - מחזיר נתיב ל-SVG
@@ -48,9 +48,10 @@
 
 ## 🎯 אסטרטגיית שילוב Tabler Icons
 
-### אפשרויות שילוב:
+### אפשרויות שילוב
 
 #### **אופציה 1: SVG Files (מומלץ)** ⭐
+
 - **יתרונות:**
   - שליטה מלאה בגודל וצבע
   - עובד עם המבנה הקיים (`<img src="...">`)
@@ -62,6 +63,7 @@
   - לא אוטומטי
 
 #### **אופציה 2: Webfont/CDN**
+
 - **יתרונות:**
   - שימוש קל: `<i class="ti ti-..."></i>`
   - לא צריך לטפל בקבצים
@@ -72,6 +74,7 @@
   - גודל גדול יותר
 
 #### **אופציה 3: npm Package + Build**
+
 - **יתרונות:**
   - אוטומטי ומנוהל
   - גרסאות קבועות
@@ -95,6 +98,7 @@ npm install @tabler/icons@latest --no-save
 ```
 
 **פעולות:**
+
 1. הורד את החבילה או clone מה-GitHub
 2. הקבצים נמצאים ב-`icons/` בתיקיית החבילה
 3. יש מעל 5800 איקונים - נצטרך רק חלק מהם
@@ -102,10 +106,12 @@ npm install @tabler/icons@latest --no-save
 ### שלב 2: יצירת מיפוי איקונים
 
 **יצירת קובץ מיפוי מרכזי:**
+
 - `trading-ui/scripts/icon-mappings.js`
 - מגדיר מיפוי בין entity types לשמות Tabler Icons
 
 **דוגמה למיפוי:**
+
 ```javascript
 const TABLER_ICON_MAPPINGS = {
     // Entity Icons
@@ -167,13 +173,16 @@ const TABLER_ICON_MAPPINGS = {
 ### שלב 3: העתקת קבצי SVG
 
 **תיקיית יעד:**
+
 - `trading-ui/images/icons/tabler/` (תיקייה חדשה)
 
 **סקריפט להעתקה:**
+
 - יצירת `scripts/icons/copy-tabler-icons.js`
 - קורא את המיפוי ומעתיק רק את הקבצים הנדרשים
 
 **מבנה תיקיות מוצע:**
+
 ```
 trading-ui/images/icons/
 ├── tabler/
@@ -189,6 +198,7 @@ trading-ui/images/icons/
 ### שלב 4: עדכון מערכת האיקונים
 
 **יצירת מערכת איקונים מרכזית:**
+
 - `trading-ui/scripts/icon-system.js`
 - פונקציות מרכזיות:
   - `getIconPath(type, name)` - מחזיר נתיב לאיקון
@@ -196,6 +206,7 @@ trading-ui/images/icons/
   - `getTablerIcon(name)` - מחזיר נתיב לאיקון Tabler
 
 **דוגמה:**
+
 ```javascript
 class IconSystem {
     static getIconPath(type, name, options = {}) {
@@ -220,6 +231,7 @@ class IconSystem {
 ### שלב 5: עדכון קבצי המערכת
 
 **קבצים לעדכון:**
+
 1. `entity-details-modal.js` - `getEntityIcon()`
 2. `linked-items-service.js` - `getLinkedItemIcon()`
 3. `notification-category-detector.js` - `getCategoryIcon()`
@@ -227,6 +239,7 @@ class IconSystem {
 5. כל עמוד אחר המשתמש באיקונים מותאמים
 
 **דוגמה לעדכון:**
+
 ```javascript
 // לפני:
 getEntityIcon(entityType) {
@@ -246,6 +259,7 @@ getEntityIcon(entityType) {
 ### שלב 6: הסרת איקונים ישנים
 
 **לאחר שכל המערכת עובדת:**
+
 1. העברת איקונים ישנים ל-backup
 2. מחיקת קבצים מותאמים אישית שכבר לא בשימוש
 3. תיעוד השינויים
@@ -257,6 +271,7 @@ getEntityIcon(entityType) {
 ### שלב 1: הוספת CDN ל-HTML
 
 **בכל עמוד HTML או ב-master template:**
+
 ```html
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
 ```
@@ -277,6 +292,7 @@ getEntityIcon(entityType) {
 ### שלב 3: עדכון מיפוי
 
 **עדכון המיפוי ליצור HTML עם classes:**
+
 ```javascript
 class IconSystem {
     static renderIcon(type, name, options = {}) {
@@ -295,7 +311,8 @@ class IconSystem {
 
 ## 🔍 מיפוי איקונים מומלץ
 
-### Entity Icons:
+### Entity Icons
+
 | Entity Type | Tabler Icon Name | הערות |
 |------------|------------------|-------|
 | ticker | `chart-line` | או `chart-bar` |
@@ -310,7 +327,8 @@ class IconSystem {
 | research | `search` | |
 | home | `home` | |
 
-### Chart Icons:
+### Chart Icons
+
 | Chart Icon | Tabler Icon Name | הערות |
 |-----------|------------------|-------|
 | type-line | `chart-line` | |
@@ -326,12 +344,14 @@ class IconSystem {
 
 ## 📦 קבצים לבדיקה
 
-### לפני התחלה:
+### לפני התחלה
+
 1. בדוק אילו איקונים בשימוש במערכת
 2. בדוק את [Tabler Icons Gallery](https://tabler.io/icons) למציאת איקונים מתאימים
 3. צור רשימה של איקונים נדרשים
 
-### קבצים מרכזיים לעדכון:
+### קבצים מרכזיים לעדכון
+
 1. `trading-ui/scripts/icon-system.js` (חדש)
 2. `trading-ui/scripts/icon-mappings.js` (חדש)
 3. `trading-ui/scripts/entity-details-modal.js`
@@ -345,28 +365,33 @@ class IconSystem {
 ## ✅ רשימת בדיקה (Checklist)
 
 ### שלב 1: הכנה
+
 - [ ] הורדת/התקנת Tabler Icons
 - [ ] סקירת איקונים זמינים ב-[Tabler Icons Gallery](https://tabler.io/icons)
 - [ ] יצירת רשימת איקונים נדרשים
 
 ### שלב 2: מיפוי
+
 - [ ] יצירת `icon-mappings.js` עם כל המיפויים
 - [ ] בדיקת התאמה בין איקונים ישנים לחדשים
 - [ ] תיעוד איקונים שלא נמצאו תואם
 
 ### שלב 3: מימוש
+
 - [ ] יצירת `icon-system.js`
 - [ ] העתקת קבצי SVG הנדרשים
 - [ ] עדכון קבצי המערכת
 - [ ] בדיקת תאימות
 
 ### שלב 4: בדיקות
+
 - [ ] בדיקה בכל העמודים
 - [ ] בדיקה בכל הדפדפנים
 - [ ] בדיקת ביצועים
 - [ ] בדיקת נגישות
 
 ### שלב 5: ניקוי
+
 - [ ] הסרת איקונים ישנים
 - [ ] עדכון תיעוד
 - [ ] עדכון README

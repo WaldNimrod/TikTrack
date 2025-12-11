@@ -1,0 +1,10 @@
+documentation/05-REPORTS/
+documentation/audits/
+*.json
+.cursor/
+node_modules/
+.git/
+archive/
+backup/
+.pytest_cache/
+

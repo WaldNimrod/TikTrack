@@ -1,4 +1,5 @@
 # מפרט מימוש - תיעוד רגשי
+
 ## Emotional Tracking Implementation Specification
 
 **תאריך יצירה:** 29 בינואר 2025  
@@ -12,6 +13,7 @@
 מסמך זה מגדיר את מפרט המימוש המלא למערכת תיעוד רגשי, החל משכבת הלוגיקה העסקית ועד לבסיס הנתונים.
 
 **מסמכים קשורים:**
+
 - `documentation/frontend/EMOTIONAL_TRACKING_DATA_STRUCTURE.md` - מבנה נתונים מפורט
 - `documentation/frontend/EMOTIONAL_TRACKING_WIDGET_DEVELOPER_GUIDE.md` - מדריך מפתח למוקאפ
 
@@ -431,24 +433,28 @@ def calculate_positive_emotions_for_profitable_trades(db: Session, user_id: int)
 ## 5. שלבי מימוש מוצעים
 
 ### שלב 1: Backend Foundation
+
 1. יצירת טבלת `emotional_entries`
 2. יצירת מודל `EmotionalEntry`
 3. יצירת Service `EmotionalEntryService`
 4. יצירת API Routes בסיסיים (CRUD)
 
 ### שלב 2: Frontend Integration
+
 1. יצירת Frontend Service
 2. עדכון `emotional-tracking-widget.js` לחיבור ל-API
 3. אינטגרציה עם מטמון
 4. עדכון כל הווידג'טים לנתונים אמיתיים
 
 ### שלב 3: Business Logic
+
 1. מימוש חישוב תובנות
 2. מימוש ניתוח דפוסים
 3. מימוש קורלציות
 4. מימוש אלגוריתמי Machine Learning (אופציונלי)
 
 ### שלב 4: Advanced Features
+
 1. התראות על דפוסים שליליים
 2. דוחות רגשיים
 3. השוואות בין תקופות

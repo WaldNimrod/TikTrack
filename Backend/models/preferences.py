@@ -128,3 +128,10 @@ class Preference(BaseModel):
 
     def __repr__(self):
         return f"<Preference(key='{self.key}', value='{self.value}')>"
+
+# Default preferences for fallback when user preferences are not available
+DEFAULT_PREFERENCES = {
+    "primary_color": "#26baac",
+    "secondary_color": "#fc5a06",
+    "chartSecondaryColor": "#26baac",
+}

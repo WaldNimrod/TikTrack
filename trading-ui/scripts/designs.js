@@ -10,6 +10,15 @@
  */
 
 
+// ===== FUNCTION INDEX =====
+
+// === Data Functions ===
+// - getColumns() - Getcolumns
+
+// === Other ===
+// - generateDetailedLog() - Generatedetailedlog
+
+
 /**
  * Toggle all sections visibility
  */

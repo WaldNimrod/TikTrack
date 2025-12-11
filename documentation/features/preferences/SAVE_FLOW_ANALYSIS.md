@@ -13,6 +13,7 @@
 **מיקום:** שורות 512-617
 
 **תהליך:**
+
 ```javascript
 async saveGroup(groupName) {
   // 1. Collect form data
@@ -40,6 +41,7 @@ async saveGroup(groupName) {
 ```
 
 **שלבים אחרי שמירה:**
+
 1. `refreshUserPreferences()` - ניקוי מטמון
 2. `refreshGroupState()` - טעינה מחדש מהשרת
 3. `populateGroupFields()` - מילוי שדות מחדש
@@ -52,6 +54,7 @@ async saveGroup(groupName) {
 **מיקום:** שורות 991-1093
 
 **תהליך:**
+
 ```javascript
 async function savePreferences({ preferences = {}, userId = 1, profileId = null }) {
   // 1. Save to backend
@@ -84,6 +87,7 @@ async function savePreferences({ preferences = {}, userId = 1, profileId = null 
 ```
 
 **שלבים אחרי שמירה:**
+
 1. `CacheSyncManager.invalidateByAction()` - ניקוי מטמון
 2. `clearCachePattern()` - ניקוי מטמון ישיר (fallback)
 3. `refreshUserPreferences()` - רענון מטמון
@@ -95,6 +99,7 @@ async function savePreferences({ preferences = {}, userId = 1, profileId = null 
 **מיקום:** שורות 1005-1080
 
 **תהליך:**
+
 ```javascript
 async saveGroupPreferences(groupName, preferences, userId = null, profileId = null) {
   // 1. Save via API client
@@ -113,6 +118,7 @@ async saveGroupPreferences(groupName, preferences, userId = null, profileId = nu
 ```
 
 **שלבים אחרי שמירה:**
+
 1. `UnifiedCacheManager.remove()` - ניקוי מטמון
 2. `Object.assign()` - עדכון state מקומי
 
@@ -179,6 +185,7 @@ PreferencesGroupManager.populateGroupFields() - מילוי שדות מחדש
 ### טעינה מיותרת 3: populateGroupFields() פעמיים
 
 **מיקום:**
+
 - `preferences-group-manager.js:713` - ב-refreshGroupState()
 - Event listener `preferences:updated` - ב-preferences-ui-v4.js:254
 
@@ -199,6 +206,7 @@ PreferencesGroupManager.populateGroupFields() - מילוי שדות מחדש
 ### 1. refreshUserPreferences()
 
 **מיקומים:**
+
 - `preferences-group-manager.js:571` - אחרי saveGroup()
 - `preferences-data.js:1037` - אחרי savePreferences()
 - `unified-cache-manager.js:3270` - ניקוי מטמון
@@ -214,6 +222,7 @@ PreferencesGroupManager.populateGroupFields() - מילוי שדות מחדש
 ### 3. loadGroupData()
 
 **מיקומים:**
+
 - `preferences-group-manager.js:265` - כשפותחים section
 - `unified-cache-manager.js:3287` - ב-refreshUserPreferences()
 
@@ -222,6 +231,7 @@ PreferencesGroupManager.populateGroupFields() - מילוי שדות מחדש
 ### 4. populateGroupFields()
 
 **מיקומים:**
+
 - `preferences-group-manager.js:313` - ב-loadGroupData()
 - `preferences-group-manager.js:713` - ב-refreshGroupState()
 - `preferences-ui-v4.js:234` - ב-initialize()
@@ -236,6 +246,7 @@ PreferencesGroupManager.populateGroupFields() - מילוי שדות מחדש
 **מספר קריאות ל-refresh/reload:** 4
 
 **המלצות:**
+
 1. הסרת `refreshGroupState()` אחרי שמירה מוצלחת
 2. הסרת `loadGroupData()` מ-`refreshUserPreferences()`
 3. עדכון אופטימי של UI עם הערכים שנשמרו

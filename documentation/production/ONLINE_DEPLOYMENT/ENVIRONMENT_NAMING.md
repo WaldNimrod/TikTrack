@@ -19,6 +19,7 @@
 ## 🔍 זיהוי לפי שם תיקייה
 
 ### לוגיקה נוכחית (לפני שינויים)
+
 ```bash
 # start_server.sh
 if [[ "$workspace_name" == *"Production"* ]]; then
@@ -29,6 +30,7 @@ fi
 ```
 
 ### לוגיקה חדשה (אחרי שינויים)
+
 ```bash
 # start_server.sh
 if [[ "$workspace_name" == *"Online"* ]]; then
@@ -49,11 +51,13 @@ fi
 ### משתנה סביבה: `TIKTRACK_ENV`
 
 **ערכים אפשריים:**
+
 - `development` → Development
 - `testing` → Testing
 - `online` → Online
 
 **שימוש:**
+
 ```bash
 # Development
 export TIKTRACK_ENV=development
@@ -73,10 +77,12 @@ export TIKTRACK_ENV=online
 ## 📝 שמות Databases
 
 ### לפני השינויים
+
 - `TikTrack-db-development` ✅ נשאר
 - `TikTrack-db-production` ⚠️ ישתנה
 
 ### אחרי השינויים
+
 - `TikTrack-db-development` ✅ נשאר
 - `TikTrack-db-testing` ⚠️ שינוי מ-production
 - `TikTrack-db-online` ⚠️ חדש
@@ -86,6 +92,7 @@ export TIKTRACK_ENV=online
 ## 🏷️ שמות סביבות בקוד
 
 ### משתנים בקוד
+
 ```python
 # Backend/config/settings.py
 ENVIRONMENT = os.getenv("TIKTRACK_ENV", "development").lower()
@@ -95,6 +102,7 @@ IS_ONLINE = ENVIRONMENT == "online"          # חדש
 ```
 
 ### אחרי השינויים
+
 ```python
 # Development
 ENVIRONMENT = "development"
@@ -120,6 +128,7 @@ IS_ONLINE = True  # חדש
 ## 🔗 מיפוי סביבות
 
 ### Development
+
 - **תיקייה:** `TikTrackApp/`
 - **זיהוי:** `TikTrackApp` → `development`
 - **פורט:** 8080
@@ -127,6 +136,7 @@ IS_ONLINE = True  # חדש
 - **Config:** `Backend/config/settings.py`
 
 ### Testing
+
 - **תיקייה:** `TikTrackApp-Production/`
 - **זיהוי:** `TikTrackApp-Production` → `testing`
 - **פורט:** 5001
@@ -134,6 +144,7 @@ IS_ONLINE = True  # חדש
 - **Config:** `production/Backend/config/settings.py`
 
 ### Online
+
 - **תיקייה:** `TikTrackApp-Online/` (על השרת)
 - **זיהוי:** `TikTrackApp-Online` → `online` או `TIKTRACK_ENV=online`
 - **פורט:** 80/443 (דרך Nginx)
@@ -145,6 +156,7 @@ IS_ONLINE = True  # חדש
 ## ✅ כללי שמות
 
 ### Databases
+
 - **פורמט:** `TikTrack-db-{environment}`
 - **דוגמאות:**
   - `TikTrack-db-development`
@@ -152,10 +164,12 @@ IS_ONLINE = True  # חדש
   - `TikTrack-db-online`
 
 ### Environment Variables
+
 - **פורמט:** `TIKTRACK_ENV={environment}`
 - **ערכים:** `development`, `testing`, `online`
 
 ### Directory Names
+
 - **פורמט:** `TikTrackApp-{Environment}`
 - **דוגמאות:**
   - `TikTrackApp` (development)

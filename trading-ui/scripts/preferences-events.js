@@ -13,6 +13,12 @@
  * @lastUpdated January 2025
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Event Handlers ===
+// - wrappedHandler() - Wrappedhandler
+
 // ============================================================================
 // PREFERENCES EVENTS CLASS
 // ============================================================================

@@ -1,4 +1,5 @@
 # דוח מצב - תהליכי ייבוא נתונים
+
 **תאריך עדכון**: 2025-01-30  
 **סטטוס כללי**: ✅ שיפורים משמעותיים - בדיקות פעילות
 
@@ -30,12 +31,14 @@
 ### קבצי קוד מרכזיים
 
 **Backend:**
+
 - `Backend/services/user_data_import/import_orchestrator.py` - תהליך הייבוא המרכזי (55+ פונקציות)
 - `Backend/connectors/user_data_import/ibkr_connector.py` - פרסור קובץ IBKR
 - `Backend/services/user_data_import/import_validator.py` - Validation לפני ייבוא
 - `Backend/services/cash_flow_service.py` - יצירת רשומות cash flow
 
 **Frontend:**
+
 - `trading-ui/scripts/import-user-data.js` - Import modal ו-state management
 - `trading-ui/cash_flows.html` - דף תזרימי מזומנים
 - `trading-ui/scripts/cash_flows.js` - פונקציות דף cash flows
@@ -49,12 +52,14 @@
 **תיאור**: מערכת הייבוא לא תמכה ב-user isolation ו-user_ticker associations.
 
 **מיקום בקוד**:
+
 - `Backend/routes/api/user_data_import.py` - לא השתמש ב-`g.user_id`
 - `Backend/services/user_data_import/import_orchestrator.py` - `user_id=1` hardcoded
 - `Backend/services/ticker_service.py` - לא יוצר `user_ticker` associations
 - `Backend/services/user_data_import/validation_service.py` - לא בודק `user_tickers`
 
 **סטטוס**: ✅ תוקן (דצמבר 2025)
+
 - ✅ כל API routes משתמשים ב-`g.user_id`
 - ✅ `ImportOrchestrator` מקבל ומעביר `user_id`
 - ✅ `enrich_records_with_ticker_ids()` יוצר `user_ticker` associations
@@ -62,6 +67,7 @@
 - ✅ `_load_ticker_cache()` תומך ב-user-specific cache
 
 **פעולות שנעשו**:
+
 1. הוספת `g.user_id` לכל routes ב-`user_data_import.py`
 2. החלפת כל `user_id=1` hardcoded ב-`import_orchestrator.py`
 3. הוספת `user_id` parameter ל-`enrich_records_with_ticker_ids()`
@@ -78,17 +84,20 @@
 **תיאור**: למרות 3 נקודות סינון, לפעמים כל הרשומות מיובאות גם אם נבחר רק סוג אחד.
 
 **מיקום בקוד**:
+
 - `Backend/services/user_data_import/import_orchestrator.py`:
   - `_build_preview_payload()` - נקודת סינון ראשונה
   - `execute_import()` - נקודת סינון שנייה
   - `_execute_import_cashflows()` - נקודת סינון שלישית
 
 **סטטוס**: 🔄 בתיקון
+
 - ✅ הוספנו validation checks ב-3 נקודות
 - ✅ הוספנו לוגים מפורטים
 - ⚠️ עדיין יש דיווחים על בעיות
 
 **פעולות שנעשו**:
+
 1. הוספת validation ב-`execute_import()` - בודק שכל הרשומות תואמות ל-`selected_types`
 2. הוספת validation ב-`_execute_import_cashflows()` - בדיקה אחרונה לפני שמירה
 3. וידוא ש-`selected_types` נשמר ב-`preview_data`
@@ -103,6 +112,7 @@
 **תיאור**: רשומות המרות מטבע (forex_conversion) לפעמים מסווגות כ-"other" במקום `currency_exchange_from`/`to`, ולכן לא מקושרות נכון.
 
 **מיקום בקוד**:
+
 - `Backend/connectors/user_data_import/ibkr_connector.py`:
   - `_identify_record_type()` - זיהוי סוג רשומה
   - `_build_forex_cashflows()` - יצירת רשומות Forex
@@ -110,11 +120,13 @@
   - `_build_preview_payload()` - זיווג Forex records
 
 **סטטוס**: 🔄 בתיקון
+
 - ✅ וידאנו ש-`storage_type` נפתר לפני זיווג Forex
 - ✅ שיפרנו את לוגיקת הזיווג
 - ⚠️ עדיין יש דיווחים על בעיות
 
 **פעולות שנעשו**:
+
 1. וידוא ש-`storage_type` נפתר ב-`_build_preview_payload` *לפני* לוגיקת זיווג Forex
 2. שיפור לוגיקת הזיווג - התאמה לפי `cashflow_type='forex_conversion'` או `storage_type`
 3. הוספת לוגים מפורטים לזיווג
@@ -128,16 +140,19 @@
 **תיאור**: רשומות כמו `dividend_accrual`, `interest_accrual` עדיין נוצרות למרות שאמורות להיות מסוננות.
 
 **מיקום בקוד**:
+
 - `Backend/connectors/user_data_import/ibkr_connector.py`:
   - `_identify_record_type()` - זיהוי סוג רשומה
   - `_parse_cashflow_sections()` - פרסור סקציות
 
 **סטטוס**: ✅ תוקן (אבל עדיין יש דיווחים)
+
 - ✅ הוספנו explicit skipping ב-`_identify_record_type()` - מחזיר `None` ל-`dividend_accrual`, `interest_accrual`, `syep_activity`, `syep_interest`, `cash_report`
 - ✅ הוספנו filtering ב-`_build_preview_payload()` - מעביר ל-`records_to_skip`
 - ⚠️ עדיין יש דיווחים על רשומות מוזרות (למשל record 39 - `dividend_accrual` שמופיע כ-`other_positive`)
 
 **פעולות שנעשו**:
+
 1. חיזוק לוגיקת ה-skipping ב-`IBKRConnector._identify_record_type()` - מחזיר `None` במפורש
 2. הוספת filtering ב-`ImportOrchestrator._build_preview_payload()` - מעביר ל-`records_to_skip`
 3. הוספת לוגים לסקציות שמוסרות
@@ -151,6 +166,7 @@
 **תיאור**: כפתור "מחק רשומות מייבוא" בדף cash flows גורם לשגיאת 500 Internal Server Error.
 
 **מיקום בקוד**:
+
 - `Backend/routes/api/cash_flows.py`:
   - `delete_imported_cash_flows()` - endpoint למחיקה
 - `trading-ui/scripts/cash_flows.js`:
@@ -159,11 +175,13 @@
   - כפתור "מחק רשומות מייבוא"
 
 **סטטוס**: ✅ תוקן
+
 - ✅ תיקון Flask routing - העברת route `/delete-imported` לפני route `/<int:cash_flow_id>`
 - ✅ החזרת מחיקת תגים - שיפור הלוגיקה למחיקת תגים לפני מחיקת רשומות
 - ✅ שיפור הטיפול בשגיאות
 
 **פעולות שנעשו**:
+
 1. תיקון סדר ה-routes ב-Flask - route ספציפי לפני parameterized route
 2. החזרת מחיקת תגים - מחיקת תגים לפני מחיקת רשומות cash flow
 3. שיפור הלוגים - הוספנו לוגים מפורטים לכל שלב
@@ -177,6 +195,7 @@
 **תיאור**: ניסיון לשנות שיוך חשבון מציג שגיאה למרות שהפעולה אמורה לבצע בדיוק את זה.
 
 **מיקום בקוד**:
+
 - `Backend/services/user_data_import/import_orchestrator.py`:
   - `link_account()` - שיוך חשבון
   - `_enforce_account_link()` - בדיקת שיוך
@@ -184,11 +203,13 @@
   - `submitAccountLinkSelection()` - UI לשיוך
 
 **סטטוס**: ✅ תוקן
+
 - ✅ תיקון `_enforce_account_link()` - בדיקה אם השיוך כבר מאושר בסשן או בבסיס הנתונים
 - ✅ שיפור הלוגיקה - דילוג על בדיקות מיותרות אם השיוך כבר קיים
 - ✅ עדכון `file_account_number` - הוספה לכל רשומה ב-`_ensure_cashflow_account_binding()`
 
 **פעולות שנעשו**:
+
 1. תיקון `_enforce_account_link()` - בדיקה אם השיוך כבר מאושר לפני ביצוע בדיקות נוספות
 2. הוספת `file_account_number` לכל רשומה - קבוע לכל הקובץ, נשמר ב-metadata
 3. שיפור הלוגיקה - דילוג על בדיקות מיותרות
@@ -202,17 +223,20 @@
 **מטרה**: לוודא שרק סוג אחד של רשומות מיובא כאשר נבחר רק סוג אחד בממשק.
 
 **תהליך**:
+
 1. העלאת קובץ IBKR
 2. בחירת רק סוג אחד (למשל `interest`)
 3. ביצוע ייבוא
 4. בדיקה שהרשומות בבסיס הנתונים תואמות לסוג שנבחר
 
 **תוצאות**:
+
 - ⚠️ לפעמים כל הרשומות מיובאות למרות הבחירה
 - ✅ הוספנו validation checks ב-3 נקודות
 - ⚠️ עדיין יש דיווחים על בעיות
 
 **סקריפטי בדיקה**:
+
 - `Backend/scripts/test_filtering_logic.py` - בדיקת לוגיקת סינון
 - `Backend/scripts/validate_import_session.py` - בדיקת סשן ספציפי
 
@@ -223,18 +247,21 @@
 **מטרה**: לבדוק ייבוא של סוג אחד בלבד - ריבית.
 
 **תהליך**:
+
 1. ✅ תיקון זיהוי רשומות ריבית - הוספת validation לעמודה השלישית (לא כולל "total")
 2. ✅ תיקון סינון "Borrow Fees" - הוספת לוגיקה לדילוג על רשומות "Borrow Fees" מסוג interest
 3. ✅ ביצוע ייבוא - 5 רשומות ריבית (לא 6 - הושמטה רשומת "Borrow Fees")
 4. ✅ בדיקה שהרשומות בבסיס הנתונים הן רק `interest`
 
 **תיקונים שבוצעו**:
+
 - ✅ תיקון `_parse_cashflow_sections()` - הוספת validation לעמודה השלישית
 - ✅ תיקון `_identify_record_type()` - הוספת לוגיקה לדילוג על "Borrow Fees" מסוג interest
 - ✅ תיקון `_build_preview_payload()` - תיקון return statement למניעת fall-through
 - ✅ תיקון validation - הרפיה של דרישת `source_account`
 
 **תוצאות**:
+
 - ✅ זיהוי מדויק של 5 רשומות ריבית (לא 4, לא 6)
 - ✅ הושמטה רשומת "Borrow Fees" כצפוי
 - ✅ כל הרשומות מיובאות עם `external_account_number` נכון
@@ -246,12 +273,14 @@
 **מטרה**: לבדוק את כפתור המחיקה ולזהות את הבעיה שגורמת לשגיאת 500.
 
 **תהליך**:
+
 1. ✅ יצירת endpoint `/api/cash-flows/delete-imported`
 2. ✅ הוספת כפתור בדף cash flows
 3. ✅ תיקון שגיאת 500 - תיקון Flask routing
 4. ✅ החזרת מחיקת תגים - שיפור הלוגיקה
 
 **פעולות שנעשו**:
+
 1. ✅ יצירת endpoint ב-`Backend/routes/api/cash_flows.py`
 2. ✅ הוספת כפתור ב-`trading-ui/cash_flows.html`
 3. ✅ יצירת פונקציה `deleteImportedCashFlows()` ב-`trading-ui/scripts/cash_flows.js`
@@ -271,6 +300,7 @@
 ### מיקום
 
 **HTML**: `trading-ui/cash_flows.html`
+
 ```html
 <button data-button-type="DELETE" 
         data-variant="warning" 
@@ -283,6 +313,7 @@
 ```
 
 **JavaScript**: `trading-ui/scripts/cash_flows.js`
+
 - פונקציה: `deleteImportedCashFlows()` (שורה 792)
 - חלון אישור לפני מחיקה
 - קריאה ל-API endpoint
@@ -290,6 +321,7 @@
 - רענון אוטומטי של הטבלה
 
 **Backend API**: `Backend/routes/api/cash_flows.py`
+
 - Endpoint: `DELETE /api/cash-flows/delete-imported` (שורה 603)
 - מחק רק רשומות עם `source='file_import'`
 - מחזיר מספר רשומות שנמחקו
@@ -301,16 +333,19 @@
 **תיאור**: הכפתור גורם לשגיאת 500 למרות שהחלון אישור מוצג.
 
 **תיקונים שנעשו**:
+
 1. ✅ תיקון קריאת `showConfirmationDialog` - עכשיו מעבירים פרמטרים נפרדים במקום אובייקט
 2. ✅ הסרת `db.commit()` כפול - ה-decorator `@handle_database_session(auto_commit=True)` עושה commit אוטומטית
 3. ✅ שיפור הלוגים - הוספנו לוגים מפורטים לכל שלב
 4. ✅ הסרה זמנית של מחיקת תגים - לבידוד הבעיה
 
 **סטטוס**: 🔄 בתיקון פעיל
+
 - ⚠️ עדיין יש שגיאת 500
 - 🔍 נדרש לבדוק את לוגי השרת כדי לזהות את השגיאה המדויקת
 
 **קוד רלוונטי**:
+
 ```python
 # Backend/routes/api/cash_flows.py - שורה 603-660
 @cash_flows_bp.route('/delete-imported', methods=['DELETE'])
@@ -448,6 +483,7 @@ def delete_imported_cash_flows():
 ### 2025-01-30 - עדכון מקיף: פישוט, תגיות, ועדכון UI דינמי
 
 **תכונות חדשות:**
+
 1. ✅ **תגיות אוטומטיות לרשומות ייבוא** - כל רשומת cash flow שנוצרת במהלך ייבוא מקבלת תגית אוטומטית
    - **שם התגית**: שם הסקציה באנגלית כפי שמופיע בקובץ המקור (למשל "Dividends", "Interest", "Borrow Fee Details")
    - **קטגוריה**: כל התגיות נמצאות בקטגוריה ייעודית "ייבוא נתונים [provider]" (למשל "ייבוא נתונים IBKR")
@@ -478,6 +514,7 @@ def delete_imported_cash_flows():
    - **מיקום בקוד**: `trading-ui/scripts/import-user-data.js` - `ensureTickerSaveHook()`, `removeTickerFromMissingList()`
 
 **תיקונים עיקריים:**
+
 1. ✅ **תיקון `saveTicker`** - הפונקציה מחזירה תוצאה כעת (`return crudResult`)
    - **מיקום**: `trading-ui/scripts/ticker-service.js`, `trading-ui/scripts/tickers.js`
    - **תוצאה**: `saveSuccess` מזהה נכון שהשמירה הצליחה
@@ -506,6 +543,7 @@ def delete_imported_cash_flows():
 ### 2025-01-30 - הוספת תגיות אוטומטיות לרשומות ייבוא (מידע ישן - מועבר לעיל)
 
 **תכונה חדשה**:
+
 1. ✅ **תגיות אוטומטיות לרשומות ייבוא** - כל רשומת cash flow שנוצרת במהלך ייבוא מקבלת תגית אוטומטית
    - **שם התגית**: שם הסקציה באנגלית כפי שמופיע בקובץ המקור (למשל "Dividends", "Interest", "Borrow Fee Details")
    - **קטגוריה**: כל התגיות נמצאות בקטגוריה ייעודית "ייבוא נתונים [provider]" (למשל "ייבוא נתונים IBKR")
@@ -520,6 +558,7 @@ def delete_imported_cash_flows():
 ### 2025-01-30 - סבב שיפורים משמעותי
 
 **תיקונים עיקריים**:
+
 1. ✅ **תיקון כפתור מחיקת רשומות מייבוא** - תיקון Flask routing, החזרת מחיקת תגים
 2. ✅ **תיקון זיהוי רשומות ריבית** - הוספת validation לעמודה השלישית, סינון "Borrow Fees"
 3. ✅ **תיקון preview data** - תיקון return statement ב-`_build_preview_payload()` למניעת fall-through
@@ -537,6 +576,7 @@ def delete_imported_cash_flows():
 15. ✅ **תיקון third column validation** - הוספת validation לעמודה השלישית (לא כולל "total")
 
 **שיפורי UX**:
+
 - ✅ שיפור תצוגת סשן פעיל - כפתורי resume/reset מוצגים נכון
 - ✅ שיפור תצוגת שם החשבון - fallback logic משופר
 - ✅ תמיכה ב-rich text - הערות מוצגות עם שבירות שורה ועיצוב HTML
@@ -561,6 +601,7 @@ def delete_imported_cash_flows():
 ## קבצים שעודכנו
 
 ### Backend
+
 - `Backend/connectors/user_data_import/ibkr_connector.py` - תיקון זיהוי רשומות, validation עמודה שלישית
 - `Backend/services/user_data_import/import_orchestrator.py` - תיקונים רבים: preview, account binding, description format, **תגיות אוטומטיות** (פונקציות `_get_import_category`, `_get_section_tag`, `_assign_tag_to_cashflow`)
 - `Backend/services/user_data_import/session_manager.py` - תיקון session resumption
@@ -569,6 +610,7 @@ def delete_imported_cash_flows():
 - `Backend/scripts/create_import_tags.py` - סקריפט ליצירת תגיות ייבוא מראש
 
 ### Frontend
+
 - `trading-ui/scripts/import-user-data.js` - **פישוט פתיחת מודול** (הסרת wrappers), **עדכון UI דינמי** (רשימת טיקרים), **ניטור מפורט**, פישוט session management, תיקון errors
 - `trading-ui/scripts/ticker-service.js` - **תיקון `saveTicker`** (החזרת תוצאה)
 - `trading-ui/scripts/tickers.js` - **תיקון `saveTicker`** (החזרת תוצאה)

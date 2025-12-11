@@ -20,10 +20,12 @@
 ## 🎯 סקירה כללית
 
 **Tag Widget** הוא ווידג'ט מאוחד המשלב שתי פונקציונליות:
+
 - **ענן תגיות** - הצגת תגיות לפי עוצמת שימוש עם סולם צבעים
 - **חיפוש מהיר** - חיפוש תגיות לפי שם וישות
 
 **מאפיינים:**
+
 - ✅ Bootstrap Tabs (2 טאבים)
 - ✅ Module Pattern (IIFE)
 - ✅ אינטגרציה עם TagService
@@ -32,6 +34,7 @@
 - ✅ גובה 3 שורות במצב סגור עם הרחבה על hover
 
 **קבצים:**
+
 - **JavaScript:** `trading-ui/scripts/widgets/tag-widget.js`
 - **CSS:** `trading-ui/styles-new/06-components/_tag-widget.css`
 
@@ -62,6 +65,7 @@
 ### Bootstrap Tabs
 
 הווידג'ט משתמש ב-Bootstrap 5 Tabs לניווט בין 2 טאבים:
+
 - **ענן תגיות** (Cloud Tab)
 - **חיפוש מהיר** (Search Tab)
 
@@ -76,6 +80,7 @@
 מאתחל את הווידג'ט.
 
 **Parameters:**
+
 - `containerId` (string, optional) - מזהה קונטיינר (ברירת מחדל: `'tagWidgetContainer'`)
 - `config` (object, optional) - תצורת אתחול
   - `config.defaultTab` (string) - טאב פעיל ברירת מחדל (`'cloud'` או `'search'`)
@@ -84,6 +89,7 @@
   - `config.rowHeight` (number, optional) - גובה כל שורה בפיקסלים (ברירת מחדל: `20`)
 
 **Example:**
+
 ```javascript
 // אתחול ברירת מחדל
 window.TagWidget.init();
@@ -106,10 +112,12 @@ window.TagWidget.init('tagWidgetContainer', {
 מעדכן את הווידג'ט עם נתונים חדשים.
 
 **Parameters:**
+
 - `data` (object, optional) - נתונים לעדכון
   - `data.tags` (array) - רשימת תגיות לעדכון ענן
 
 **Example:**
+
 ```javascript
 window.TagWidget.render({
   tags: [
@@ -124,10 +132,12 @@ window.TagWidget.render({
 מרענן את ענן התגיות.
 
 **Parameters:**
+
 - `options` (object, optional) - אופציות רענון
   - `options.force` (boolean) - כפיית טעינה מחדש (ברירת מחדל: `false`)
 
 **Example:**
+
 ```javascript
 // רענון רגיל
 await window.TagWidget.refreshTagCloud();
@@ -141,12 +151,14 @@ await window.TagWidget.refreshTagCloud({ force: true });
 מנקה את הווידג'ט ומסיר את כל ה-event listeners.
 
 **מה זה עושה:**
+
 - מנקה את ה-state
 - מסיר event listeners מכל ה-elements
 - מנקה את ה-autocomplete
 - מנקה את ה-metadata cache
 
 **Example:**
+
 ```javascript
 window.TagWidget.destroy();
 ```
@@ -157,9 +169,10 @@ window.TagWidget.destroy();
 
 הווידג'ט משתמש ב-**AutocompleteService** לשיפור חוויית המשתמש בטאב החיפוש.
 
-### מה זה Autocomplete?
+### מה זה Autocomplete
 
 כאשר המשתמש מקליד בטאב החיפוש, מופיע overlay עם הצעות תגיות לפי:
+
 - שימוש נפוץ (usage_count)
 - קטגוריה (אם יש)
 - סינון לפי ישות (entity filter)
@@ -172,7 +185,7 @@ window.TagWidget.destroy();
 - ✅ **Entity Filter Integration**: ריענון אוטומטי של suggestions כשמשנים entity filter
 - ✅ **RTL Support**: תמיכה מלאה ב-RTL
 
-### איך זה עובד?
+### איך זה עובד
 
 האינטגרציה מתבצעת אוטומטית ב-`initAutocomplete()` שנקראת מ-`TagWidget.init()`:
 
@@ -343,6 +356,7 @@ button[data-tier="4"] {
 ```
 
 **שימוש בקונפיגורציה:**
+
 ```javascript
 // הגדרת גובה מותאמת לכל אינסטנס
 window.TagWidget.init('tagWidgetContainer', {
@@ -408,6 +422,7 @@ await window.TagWidget.refreshTagCloud({ force: true });
 ### Packages
 
 הווידג'ט נטען דרך החבילה `dashboard-widgets`:
+
 - `base`
 - `services`
 - `entity-services`

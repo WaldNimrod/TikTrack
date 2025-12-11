@@ -304,66 +304,63 @@
     },
 
     /**
-     * Open template selection modal (without template ID - opens modal first)
+     * Open template selection - redirects to wizard interface
+     * @deprecated Old modal system removed - this function now only opens wizard
      */
     async openTemplateSelectionModal() {
       try {
-        // Show template selection modal
-        if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
-          await window.ModalManagerV2.showModal('aiTemplateSelectionModal', 'view');
-        } else if (window.bootstrap && window.bootstrap.Modal) {
-          const modalElement = document.getElementById('aiTemplateSelectionModal');
-          if (modalElement) {
-            const modal = new bootstrap.Modal(modalElement, { backdrop: false, keyboard: true });
-            modal.show();
-          }
+        // Use new wizard interface (old modals removed)
+        if (window.AIAnalysisWizard && typeof window.AIAnalysisWizard.openWizard === 'function') {
+          await window.AIAnalysisWizard.openWizard('new');
+          window.Logger?.info('AI Analysis Wizard opened', { page: 'ai-analysis' });
+        } else {
+          throw new Error('AI Analysis Wizard not available');
         }
-
-        window.Logger?.info('Template selection modal opened', { page: 'ai-analysis' });
       } catch (error) {
-        window.Logger?.error('Error opening template selection modal', error, { page: 'ai-analysis' });
+        window.Logger?.error('Error opening AI Analysis Wizard', error, { page: 'ai-analysis' });
         if (window.NotificationSystem) {
-          window.NotificationSystem.showError('שגיאה בפתיחת מודול בחירת תבנית', 'system');
+          window.NotificationSystem.showError('שגיאה בפתיחת וויזארד ניתוח AI', 'system');
         }
       }
     },
 
     /**
-     * Handle template selection from modal
+     * Handle template selection - opens wizard with selected template
+     * @deprecated Old modal system removed - this function now only opens wizard
      */
     async handleTemplateSelectionFromModal(templateId) {
       try {
-        // Ensure we're using the correct context (AIAnalysisManager)
-        const manager = window.AIAnalysisManager || this;
-        
+        // Use new wizard interface (old modals removed)
+        if (!window.AIAnalysisWizard || typeof window.AIAnalysisWizard.openWizard !== 'function') {
+          throw new Error('AI Analysis Wizard not available');
+        }
+
+        // Ensure wizard is initialized
+        if (!window.AIAnalysisWizard.initialized) {
+          await window.AIAnalysisWizard.init();
+        }
+
         // Ensure we have access to templates
-        if (!manager.templates || manager.templates.length === 0) {
-          window.Logger?.warn('Templates not loaded yet, loading now...', { page: 'ai-analysis' });
-          manager.templates = await window.AIAnalysisData?.loadTemplates() || [];
+        if (!window.AIAnalysisWizard.templates || window.AIAnalysisWizard.templates.length === 0) {
+          window.AIAnalysisWizard.templates = await window.AIAnalysisData?.loadTemplates() || [];
         }
 
         // Convert templateId to number for comparison
         const id = typeof templateId === 'string' ? parseInt(templateId, 10) : templateId;
-        manager.selectedTemplate = manager.templates.find((t) => t.id === id);
-        if (!manager.selectedTemplate) {
-          window.Logger?.warn('Template not found', { page: 'ai-analysis', templateId, id, availableIds: manager.templates.map(t => t.id) });
+        const template = window.AIAnalysisWizard.templates.find((t) => t.id === id);
+        
+        if (!template) {
+          window.Logger?.warn('Template not found', { page: 'ai-analysis', templateId: id });
           throw new Error('Template not found');
         }
 
-        // Close template selection modal
-        if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
-          window.ModalManagerV2.hideModal('aiTemplateSelectionModal');
-        } else if (bootstrap?.Modal) {
-        const templateModal = bootstrap.Modal.getInstance(document.getElementById('aiTemplateSelectionModal'));
-        if (templateModal) {
-          templateModal.hide();
-          }
-        }
+        // Open wizard and select template
+        await window.AIAnalysisWizard.openWizard('new');
+        
+        // Select template in wizard
+        window.AIAnalysisWizard.handleTemplateSelection(id);
 
-        // Open variables modal
-        await manager.openVariablesModal();
-
-        window.Logger?.info('Template selected, opening variables modal', { page: 'ai-analysis', templateId });
+        window.Logger?.info('Template selected, wizard opened', { page: 'ai-analysis', templateId: id });
       } catch (error) {
         window.Logger?.error('Error selecting template', error, { page: 'ai-analysis' });
         if (window.NotificationSystem) {
@@ -373,7 +370,8 @@
     },
 
     /**
-     * Open variables modal
+     * Open variables modal (legacy - kept for compatibility but should use wizard)
+     * @deprecated Old modal system removed - use AIAnalysisWizard.openWizard() instead
      */
     async openVariablesModal() {
       try {
@@ -805,29 +803,58 @@
           label.className = 'form-label';
           label.textContent = variable.label || variable.key;
           label.setAttribute('for', `var_modal_${variable.key}`);
+          
+          // Add required asterisk if field is required
+          if (variable.required) {
+            const asterisk = document.createElement('span');
+            asterisk.className = 'text-danger';
+            asterisk.textContent = ' *';
+            label.appendChild(asterisk);
+          }
 
           // Check if this is a date_range field - use DateRangePickerService
-          const isDateRange = variable.key === 'date_range' || variable.type === 'date-range';
+          // Must check BEFORE creating select/text inputs
+          const isDateRange = (variable.key === 'date_range' || variable.type === 'date-range') && 
+                             window.DateRangePickerService;
           
-          // Check if variable should be text input (text/number type without options)
-          const shouldBeTextInput = !isDateRange &&
-                                    (variable.type === 'text' || variable.type === 'number') && 
-                                    (!variable.options || !Array.isArray(variable.options) || variable.options.length === 0) &&
-                                    variable.key !== 'ticker_symbol' && 
-                                    variable.key !== 'stock_ticker' &&
-                                    variable.key !== 'trading_account' &&
-                                    variable.key !== 'account_id' &&
-                                    variable.integration !== 'trading_accounts';
+          // Log for debugging
+          if (variable.key === 'date_range') {
+            window.Logger?.debug('Detected date_range field', {
+              key: variable.key,
+              type: variable.type,
+              isDateRange: isDateRange,
+              DateRangePickerServiceAvailable: !!window.DateRangePickerService,
+              page: 'ai-analysis'
+            });
+          }
           
           let select, textInput;
           let isTextInput = false;
           let isDateRangeField = false;
           
-          if (isDateRange && window.DateRangePickerService) {
+          // If it's a date range field, skip select/text creation - will handle separately
+          if (isDateRange) {
             // Use DateRangePickerService for date_range fields
             isDateRangeField = true;
-            // Will render using DateRangePickerService.render() below
-          } else if (shouldBeTextInput) {
+            window.Logger?.debug('Setting isDateRangeField=true for date_range', {
+              key: variable.key,
+              type: variable.type,
+              DateRangePickerServiceAvailable: !!window.DateRangePickerService,
+              page: 'ai-analysis'
+            });
+            // Will render using DateRangePickerService.render() below - skip to that section
+            // Don't create select or text input for date range fields
+          } else {
+            // Check if variable should be text input (text/number type without options)
+            const shouldBeTextInput = (variable.type === 'text' || variable.type === 'number') && 
+                                      (!variable.options || !Array.isArray(variable.options) || variable.options.length === 0) &&
+                                      variable.key !== 'ticker_symbol' && 
+                                      variable.key !== 'stock_ticker' &&
+                                      variable.key !== 'trading_account' &&
+                                      variable.key !== 'account_id' &&
+                                      variable.integration !== 'trading_accounts';
+          
+            if (shouldBeTextInput) {
             // Create text/number input for simple fields (like single_trade_id)
             textInput = document.createElement('input');
             textInput.type = variable.type === 'number' ? 'number' : 'text';
@@ -843,35 +870,38 @@
             if (variable.required) {
               textInput.required = true;
             }
-            isTextInput = true;
-          } else {
-            // Always create a select dropdown with "אחר" option
-            select = document.createElement('select');
-            select.className = 'form-select';
-            select.id = `var_modal_${variable.key}`;
-            select.name = variable.key;
-          }
-          
-          // Add empty option (only if not using tickers or accounts - they will add their own)
-          // Skip if this is a text input field
-          if (!isTextInput) {
-            const isTickerField = (variable.key === 'ticker_symbol' || variable.key === 'stock_ticker') &&
-                                  window.SelectPopulatorService && 
-                                  typeof window.SelectPopulatorService.populateTickersSelect === 'function';
-            
-            const isAccountField = (variable.key === 'trading_account' || variable.key === 'account_id' || variable.integration === 'trading_accounts') &&
-                                   window.SelectPopulatorService && 
-                                   typeof window.SelectPopulatorService.populateAccountsSelect === 'function';
-            
-            if (!isTickerField && !isAccountField) {
-              const emptyOption = document.createElement('option');
-              emptyOption.value = '';
-              emptyOption.textContent = 'בחר...';
-              select.appendChild(emptyOption);
+              isTextInput = true;
+            } else {
+              // Always create a select dropdown with "אחר" option
+              select = document.createElement('select');
+              select.className = 'form-select';
+              select.id = `var_modal_${variable.key}`;
+              select.name = variable.key;
             }
           }
+          
+          // Skip select/text handling if it's a date range field (will be handled separately)
+          if (!isDateRangeField) {
+            // Add empty option (only if not using tickers or accounts - they will add their own)
+            // Skip if this is a text input field
+            if (!isTextInput) {
+              const isTickerField = (variable.key === 'ticker_symbol' || variable.key === 'stock_ticker') &&
+                                    window.SelectPopulatorService && 
+                                    typeof window.SelectPopulatorService.populateTickersSelect === 'function';
+              
+              const isAccountField = (variable.key === 'trading_account' || variable.key === 'account_id' || variable.integration === 'trading_accounts') &&
+                                     window.SelectPopulatorService && 
+                                     typeof window.SelectPopulatorService.populateAccountsSelect === 'function';
+              
+              if (!isTickerField && !isAccountField) {
+                const emptyOption = document.createElement('option');
+                emptyOption.value = '';
+                emptyOption.textContent = 'בחר...';
+                select.appendChild(emptyOption);
+              }
+            }
 
-          // Populate options based on variable type and key (only for select fields)
+            // Populate options based on variable type and key (only for select fields)
           let options = [];
           
           if (variable.key === 'investment_type' && window.VALID_INVESTMENT_TYPES) {
@@ -979,9 +1009,9 @@
             }
           }
 
-          // Create hidden text/textarea input for "אחר" value (only for select fields)
-          let otherInput;
-          if (!isTextInput) {
+            // Create hidden text/textarea input for "אחר" value (only for select fields)
+            let otherInput;
+            if (!isTextInput) {
             if (variable.type === 'textarea') {
               otherInput = document.createElement('textarea');
               otherInput.rows = variable.rows || 3;
@@ -1008,16 +1038,16 @@
                 otherInputEl.required = false;
               }
             });
-          }
 
             // Set default value if provided (only for select fields)
             if (!isTextInput) {
-            if (variable.default_value) {
-              select.value = variable.default_value;
-            }
+              if (variable.default_value) {
+                select.value = variable.default_value;
+              }
 
-            if (variable.required) {
-              select.required = true;
+              if (variable.required) {
+                select.required = true;
+              }
             }
 
             // Handle conditional display (e.g., single_trade_id depends on trade_selection_type)
@@ -1051,49 +1081,35 @@
               }
             }
 
-            col.appendChild(label);
-            col.appendChild(select);
-            col.appendChild(otherInput);
-            container.appendChild(col);
-          } else {
-            // For text input, just add label and input
-            
-            // Handle conditional display for text inputs too
-            if (variable.conditional_display) {
-              const dependsOn = variable.conditional_display.depends_on;
-              const showWhen = variable.conditional_display.show_when;
-              
-              // Initially hide if conditional
-              col.style.display = 'none';
-              
-              // Find the dependent field
-              const dependentSelect = document.getElementById(`var_modal_${dependsOn}`) || document.getElementById(`var_${dependsOn}`);
-              if (dependentSelect) {
-                // Handler function to show/hide based on dependency
-                const updateVisibility = () => {
-                  if (dependentSelect.value === showWhen) {
-                    col.style.display = '';
-                  } else {
-                    col.style.display = 'none';
-                    textInput.value = '';
-                  }
-                };
-                
-                // Set initial visibility
-                updateVisibility();
-                
-                // Add listener for changes
-                dependentSelect.addEventListener('change', updateVisibility);
+            // Append to container based on type (only if not date range field)
+            if (!isDateRangeField) {
+              if (isTextInput) {
+                // For text input, just add label and input
+                col.appendChild(label);
+                col.appendChild(textInput);
+                container.appendChild(col);
+              } else {
+                // For select, add label, select, and other input
+                col.appendChild(label);
+                col.appendChild(select);
+                if (otherInput) {
+                  col.appendChild(otherInput);
+                }
+                container.appendChild(col);
               }
             }
-            
-            col.appendChild(label);
-            col.appendChild(textInput);
-            container.appendChild(col);
           }
           
-          // Handle date range fields separately (after text/select handling)
+          // Handle date range fields separately (MUST handle after select/text to avoid creating select)
           if (isDateRangeField && window.DateRangePickerService) {
+            // Create col if not already created (since we skipped select/text creation)
+            // col should already exist from line 838, but check anyway
+            if (!col || col.parentNode) {
+              // If col already appended, create new one
+              col = document.createElement('div');
+              col.className = 'col-md-4 mb-3';
+            }
+            
             // Render date range picker using DateRangePickerService
             const dateRangeConfig = {
               id: `var_modal_${variable.key}`,
@@ -1104,6 +1120,7 @@
             };
             
             const dateRangeHTML = window.DateRangePickerService.render(dateRangeConfig);
+            // Replace col content with date range picker HTML (includes label with asterisk)
             col.innerHTML = dateRangeHTML;
             
             // Handle conditional display
@@ -1185,11 +1202,11 @@
                 if (tickerOptionsCount > 1) {
                   // Mark as populated
                   selectEl.removeAttribute('data-needs-ticker-population');
-                
-                // After tickers are populated, add "אחר" option at the end
-                const otherOption = document.createElement('option');
-                otherOption.value = '__other__';
-                otherOption.textContent = 'אחר';
+                  
+                  // After tickers are populated, add "אחר" option at the end
+                  const otherOption = document.createElement('option');
+                  otherOption.value = '__other__';
+                  otherOption.textContent = 'אחר';
                   selectEl.appendChild(otherOption);
                   
                   window.Logger?.info('✅ Added "אחר" option after tickers', { 
@@ -1219,7 +1236,8 @@
               }
             }, 200); // Small delay to ensure DOM is ready
           }
-        }
+        } // End of for loop
+      } // End of try block
       } catch (error) {
         window.Logger?.error('Error rendering variables form in modal', error, { page: 'ai-analysis' });
         const errorDiv = document.createElement('div');
@@ -1274,9 +1292,7 @@
     async getTradePlanReasons() {
       try {
         // Fetch trade plans from API
-        const response = await fetch('/api/trade-plans/', {
-          credentials: 'include'
-        });
+        const response = await fetch('/api/trade-plans/', { });
         
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -1919,9 +1935,7 @@
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-          },
-          credentials: 'include',
-          body: JSON.stringify({
+          }, body: JSON.stringify({
             template_id: this.selectedTemplate.id,
             variables: variables,
             provider: provider,
@@ -2484,28 +2498,132 @@
       // Check if analysis failed or has no response
       if (analysisResult.status === 'failed') {
         const errorMessage = analysisResult.error_message || 'שגיאה לא ידועה ביצירת הניתוח';
+        
+        // Parse error message to extract error code and detailed info
+        let errorCode = null;
+        let displayMessage = errorMessage;
+        let provider = analysisResult.provider || null;
+        let resetTime = null;
+        let retryAfter = null;
+        
+        // Extract error code from format "ERROR_CODE: message" or just use message
+        if (errorMessage.includes(': ')) {
+          const parts = errorMessage.split(': ', 2);
+          if (parts.length >= 2 && parts[0].startsWith('AI_')) {
+            errorCode = parts[0];
+            displayMessage = parts[1];
+          }
+        }
+        
+        // Build detailed error message
+        let detailedMessage = displayMessage;
+        const details = [];
+        
+        // Add provider info if available
+        if (provider) {
+          const providerNames = {
+            'gemini': 'Gemini',
+            'perplexity': 'Perplexity'
+          };
+          details.push(`מנוע AI: ${providerNames[provider] || provider}`);
+        }
+        
+        // Add reset time if available (from error_data_json or metadata)
+        if (analysisResult.error_data_json) {
+          try {
+            const errorData = JSON.parse(analysisResult.error_data_json);
+            if (errorData.reset_time) {
+              resetTime = errorData.reset_time;
+            }
+            if (errorData.retry_after_minutes) {
+              retryAfter = errorData.retry_after_minutes;
+            }
+            if (errorData.provider && !provider) {
+              provider = errorData.provider;
+              const providerNames = {
+                'gemini': 'Gemini',
+                'perplexity': 'Perplexity'
+              };
+              details.push(`מנוע AI: ${providerNames[provider] || provider}`);
+            }
+          } catch (e) {
+            window.Logger?.warn('Error parsing error_data_json', { error: e, page: 'ai-analysis' });
+          }
+        }
+        
+        if (resetTime) {
+          try {
+            const resetDate = new Date(resetTime);
+            const formattedTime = resetDate.toLocaleString('he-IL', {
+              year: 'numeric',
+              month: '2-digit',
+              day: '2-digit',
+              hour: '2-digit',
+              minute: '2-digit'
+            });
+            details.push(`המכסה מתאפסת ב: ${formattedTime}`);
+          } catch (e) {
+            details.push(`המכסה מתאפסת ב: ${resetTime}`);
+          }
+        } else if (retryAfter !== null) {
+          details.push(`ניתן לנסות שוב בעוד: ${retryAfter} דקות`);
+        }
+        
+        // Add action link based on error code
+        if (errorCode && (errorCode === 'AI_1007' || errorCode === 'AI_1004')) {
+          // Quota exceeded or rate limit - suggest checking settings
+          details.push('<a href="preferences.html#ai-settings" class="text-white text-decoration-underline">לבדיקת הגדרות מכסה ומפתחות API</a>');
+        }
+        
         // Check if error message is in English - if so, apply LTR direction
-        const isEnglish = /^[a-zA-Z]/.test(errorMessage.trim()) || /[a-zA-Z]{3,}/.test(errorMessage);
+        const isEnglish = /^[a-zA-Z]/.test(displayMessage.trim()) || /[a-zA-Z]{3,}/.test(displayMessage);
         
         container.textContent = '';
         const alert = document.createElement('div');
         alert.className = 'alert alert-danger';
+        
         const h5 = document.createElement('h5');
         h5.textContent = '❌ הניתוח נכשל';
         alert.appendChild(h5);
+        
+        // Main error message
         const p = document.createElement('p');
-        p.textContent = errorMessage;
+        p.innerHTML = `<strong>${displayMessage}</strong>`;
         // Apply LTR direction for English messages
         if (isEnglish) {
           p.style.direction = 'ltr';
           p.style.textAlign = 'left';
         }
         alert.appendChild(p);
+        
+        // Add details section if we have additional info
+        if (details.length > 0) {
+          const detailsDiv = document.createElement('div');
+          detailsDiv.className = 'mt-3';
+          detailsDiv.style.fontSize = '0.9rem';
+          const detailsTitle = document.createElement('strong');
+          detailsTitle.textContent = 'פרטים נוספים:';
+          detailsDiv.appendChild(detailsTitle);
+          const detailsList = document.createElement('ul');
+          detailsList.className = 'mb-0 mt-2';
+          detailsList.style.paddingRight = '1.5rem';
+          details.forEach(detail => {
+            const li = document.createElement('li');
+            li.innerHTML = detail;
+            detailsList.appendChild(li);
+          });
+          detailsDiv.appendChild(detailsList);
+          alert.appendChild(detailsDiv);
+        }
+        
+        // Add request ID
         if (analysisResult.id) {
           const small = document.createElement('small');
+          small.className = 'd-block mt-2';
           small.textContent = `מספר בקשה: ${analysisResult.id}`;
           alert.appendChild(small);
         }
+        
         container.appendChild(alert);
         return;
       }
@@ -2614,9 +2732,7 @@
         container.appendChild(loadingDiv);
         
         try {
-          const response = await fetch(`/api/ai-analysis/history/${analysisResult.id}`, {
-            credentials: 'include',
-          });
+          const response = await fetch(`/api/ai-analysis/history/${analysisResult.id}`, { });
           
           if (response.ok) {
             const data = await response.json();
@@ -2956,9 +3072,7 @@
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
-            },
-            credentials: 'include',
-            body: JSON.stringify({ analysis_ids: analysisIds })
+            }, body: JSON.stringify({ analysis_ids: analysisIds })
           });
 
           if (response.ok) {
@@ -3052,6 +3166,7 @@
 
     /**
      * Re-run analysis with same parameters
+     * Now uses wizard interface in rerun mode
      */
     async rerunAnalysis(analysisId) {
       try {
@@ -3059,9 +3174,7 @@
         let analysis = this.history.find(h => h.id === analysisId);
         if (!analysis) {
           // Try to load from API
-          const response = await fetch(`/api/ai-analysis/history/${analysisId}`, {
-            credentials: 'include',
-          });
+          const response = await fetch(`/api/ai-analysis/history/${analysisId}`, { });
           if (!response.ok) {
             throw new Error('Analysis not found');
           }
@@ -3073,7 +3186,14 @@
           }
         }
         
-        await this.rerunAnalysisWithData(analysis);
+        // Use wizard in rerun mode
+        if (window.AIAnalysisWizard && typeof window.AIAnalysisWizard.openWizard === 'function') {
+          await window.AIAnalysisWizard.openWizard('rerun', analysis);
+          window.Logger?.info('AI Analysis Wizard opened in rerun mode', { analysisId, page: 'ai-analysis' });
+        } else {
+          // Fallback to old method
+          await this.rerunAnalysisWithData(analysis);
+        }
       } catch (error) {
         window.Logger?.error('Error re-running analysis', error, { page: 'ai-analysis' });
         if (window.NotificationSystem) {
@@ -3231,9 +3351,7 @@
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-          },
-          credentials: 'include',
-          body: JSON.stringify({
+          }, body: JSON.stringify({
             template_id: templateId,
             variables: variables,
             provider: provider
@@ -3538,9 +3656,7 @@
       
       // Check if saved as note via API
       try {
-        const response = await fetch(`/api/ai-analysis/history/${analysisId}/availability`, {
-          credentials: 'include',
-        });
+        const response = await fetch(`/api/ai-analysis/history/${analysisId}/availability`, { });
         if (response.ok) {
           const data = await response.json();
           if (data.status === 'success' && data.data && data.data.has_note) {
@@ -3812,9 +3928,7 @@
           if (!item) {
             window.Logger?.warn('History item not found, loading from API', { page: 'ai-analysis', id: itemId });
             // Try to load from API if not in history
-            const response = await fetch(`/api/ai-analysis/history/${itemId}`, {
-              credentials: 'include',
-            });
+            const response = await fetch(`/api/ai-analysis/history/${itemId}`, { });
             if (response.ok) {
               const data = await response.json();
               if (data.status === 'success' && data.data) {
@@ -3859,9 +3973,7 @@
 
         // If not in item or cache, try to load from API
         if (!analysisResult || !analysisResult.response_text) {
-          const response = await fetch(`/api/ai-analysis/history/${item.id}`, {
-            credentials: 'include',
-          });
+          const response = await fetch(`/api/ai-analysis/history/${item.id}`, { });
 
           if (!response.ok) {
             throw new Error('Failed to load analysis');
@@ -3903,9 +4015,7 @@
           let noteId = null;
           let noteExists = false;
           try {
-            const availabilityResponse = await fetch(`/api/ai-analysis/history/${item.id}/availability`, {
-              credentials: 'include',
-            });
+            const availabilityResponse = await fetch(`/api/ai-analysis/history/${item.id}/availability`, { });
             if (availabilityResponse.ok) {
               const availabilityData = await availabilityResponse.json();
               if (availabilityData.status === 'success' && availabilityData.data) {
@@ -3920,9 +4030,7 @@
           // If note exists, try to load it
           if (noteExists && noteId) {
             try {
-              const noteResponse = await fetch(`/api/notes/${noteId}`, {
-                credentials: 'include',
-              });
+              const noteResponse = await fetch(`/api/notes/${noteId}`, { });
               if (noteResponse.ok) {
                 const noteData = await noteResponse.json();
                 if (noteData.status === 'success' && noteData.data && noteData.data.content) {

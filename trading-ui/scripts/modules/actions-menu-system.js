@@ -17,6 +17,31 @@
  * No manual initialization needed.
  */
 
+
+// ===== FUNCTION INDEX =====
+// === Object Methods ===
+// - debugActionsMenu() - Debugactionsmenu
+// - debugActionsMenu() - Debugactionsmenu
+// - debugActionsMenuHover() - Debugactionsmenuhover
+// - debugActionsMenuHover() - Debugactionsmenuhover
+// - debugActionsMenuOverflow() - Debugactionsmenuoverflow
+// - debugActionsMenuOverflow() - Debugactionsmenuoverflow
+// - debugActionsMenuZIndex() - Debugactionsmenuzindex
+// - debugActionsMenuZIndex() - Debugactionsmenuzindex
+
+// === Event Handlers ===
+// - actionsMenuDebugLog() - Actionsmenudebuglog
+// - handleMouseLeave() - Handlemouseleave
+
+// === UI Functions ===
+// - clearHideTimeout() - Clearhidetimeout
+
+// === Utility Functions ===
+// - checkOverflow() - Checkoverflow
+
+// === Other ===
+// - observePopup() - Observepopup
+
 const ACTIONS_MENU_DEBUG_ENABLED = window.ActionsMenuDebugMode === true;
 const actionsMenuDebugLog = (...args) => {
     if (ACTIONS_MENU_DEBUG_ENABLED) {

@@ -3,6 +3,7 @@
 ## מטרה
 
 לתכנן מחדש את מערכת ה-overlay לוויג'טים כדי לפתור את הבעיות הבסיסיות:
+
 1. **Gap Problem** - Overlay נסגר כשהעכבר עובר על gap בין items
 2. **Z-index Problem** - Overlays נפתחים מאחורי items אחרים אחרי מספר פתיחות
 
@@ -13,16 +14,19 @@
 ### בעיה 1: Gap Problem
 
 **תיאור:**
+
 - יש `margin-bottom: 0.75rem` בין items
 - כשהעכבר עובר על ה-gap, `mouseleave` נשלח
 - ה-overlay נסגר למרות שהעכבר עדיין "באזור" של ה-item
 
 **סיבות:**
+
 - `mouseleave` נשלח גם כשהעכבר עובר על gap (לא על element)
 - אין "bridge" בין item ל-overlay
 - ה-logic הנוכחי לא מטפל ב-gaps בצורה חכמה
 
 **פתרונות אפשריים:**
+
 1. **Invisible Bridge Elements** - יצירת אלמנטים בלתי נראים שממלאים את ה-gaps
 2. **Smart Mouse Tracking** - מעקב אחר מיקום העכבר וזיהוי אם הוא "באזור" של item+overlay
 3. **Delayed Close** - עיכוב בסגירת overlay עם timeout
@@ -31,16 +35,19 @@
 ### בעיה 2: Z-index Problem
 
 **תיאור:**
+
 - כל overlay מקבל `z-index: 1050` קבוע
 - Items מקבלים `z-index: 10` כש-hovered
 - אחרי מספר פתיחות, overlays נפתחים מאחורי items אחרים
 
 **סיבות:**
+
 - אין ניהול דינמי של z-index
 - כל overlay מקבל אותו z-index
 - אין "stacking context" נכון
 
 **פתרונות אפשריים:**
+
 1. **Dynamic Z-index Manager** - מערכת שמעלה את ה-overlay הפעיל
 2. **Stacking Context Management** - ניהול נכון של stacking contexts
 3. **Portal Pattern** - העברת overlays ל-body עם z-index גבוה
@@ -49,14 +56,14 @@
 
 ## פתרון מוצע: ארכיטקטורה חדשה
 
-### עקרונות עיצוב:
+### עקרונות עיצוב
 
 1. **Unified Overlay Manager** - מערכת מרכזית אחת שמנהלת את כל ה-overlays
 2. **Smart Gap Handling** - טיפול חכם ב-gaps עם invisible bridges
 3. **Dynamic Z-index** - ניהול דינמי של z-index לכל overlay
 4. **Event Coordination** - תיאום בין events של items, gaps, ו-overlays
 
-### רכיבים:
+### רכיבים
 
 1. **OverlayManager** - מנהל מרכזי
    - ניהול z-index דינמי
@@ -78,23 +85,27 @@
 ## שלבי יישום
 
 ### שלב 1: ניתוח מעמיק
+
 - [ ] בדיקת כל ה-gaps ב-3 הוויג'טים
 - [ ] בדיקת z-index hierarchy הנוכחית
 - [ ] זיהוי כל edge cases
 
 ### שלב 2: עיצוב ארכיטקטורה
+
 - [ ] עיצוב OverlayManager
 - [ ] עיצוב GapBridge
 - [ ] עיצוב ZIndexStack
 - [ ] תיעוד API
 
 ### שלב 3: מימוש
+
 - [ ] מימוש OverlayManager
 - [ ] מימוש GapBridge
 - [ ] מימוש ZIndexStack
 - [ ] אינטגרציה עם 3 הוויג'טים
 
 ### שלב 4: בדיקות
+
 - [ ] בדיקת gap handling
 - [ ] בדיקת z-index management
 - [ ] בדיקת edge cases
@@ -104,29 +115,34 @@
 
 ## החלטות עיצוב
 
-### Gap Handling - איזה פתרון?
+### Gap Handling - איזה פתרון
 
 **אפשרות 1: Invisible Bridge Elements** ✅ מומלץ
+
 - **יתרונות:** פשוט, אמין, לא תלוי ב-mouse tracking
 - **חסרונות:** מוסיף DOM elements
 
 **אפשרות 2: Smart Mouse Tracking**
+
 - **יתרונות:** לא מוסיף DOM
 - **חסרונות:** מורכב, תלוי ב-performance
 
 **אפשרות 3: Delayed Close**
+
 - **יתרונות:** פשוט
 - **חסרונות:** UX לא טוב (עיכוב)
 
 **החלטה:** **אפשרות 1** - Invisible Bridge Elements
 
-### Z-index Management - איזה פתרון?
+### Z-index Management - איזה פתרון
 
 **אפשרות 1: Dynamic Z-index Manager** ✅ מומלץ
+
 - **יתרונות:** גמיש, נשלט
 - **חסרונות:** צריך ניהול state
 
 **אפשרות 2: Portal Pattern**
+
 - **יתרונות:** פשוט, z-index גבוה תמיד
 - **חסרונות:** מורכב יותר (צריך repositioning)
 

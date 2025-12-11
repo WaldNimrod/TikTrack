@@ -1,4 +1,5 @@
 # Modal Base Component Specification - TikTrack Modal System
+
 ## תכנון מפורט של רכיב המודל הבסיסי
 
 **תאריך יצירה**: 12 בינואר 2025  
@@ -17,7 +18,8 @@
 
 ## 🏗️ מבנה HTML בסיסי
 
-### מבנה המודל המלא:
+### מבנה המודל המלא
+
 ```html
 <div class="modal fade" id="{modalId}" tabindex="-1" 
      aria-labelledby="{modalId}Label" aria-hidden="true"
@@ -52,7 +54,8 @@
 </div>
 ```
 
-### פרמטרים דינמיים:
+### פרמטרים דינמיים
+
 - `{modalId}` - מזהה ייחודי למודל
 - `{size}` - גודל מודל (sm, lg, xl)
 - `{title}` - כותרת המודל
@@ -60,7 +63,8 @@
 - `{saveFunction}` - פונקציית שמירה
 - `{dynamic-fields}` - שדות דינמיים
 
-### משתני צבעים דינמיים:
+### משתני צבעים דינמיים
+
 - `--entity-color-light` - צבע הישות בהיר (רקע כותרת)
 - `--entity-color-dark` - צבע הישות כהה (טקסט כותרת, כפתור סגור, כפתור שמור)
 
@@ -69,9 +73,11 @@
 ## 🎨 סוגי כותרות (Header Types)
 
 ### 1. modal-header-colored (ברירת מחדל)
+
 **שימוש**: רוב המודלים
 **צבע**: ירוק (Primary Color)
 **CSS**:
+
 ```css
 .modal-header-colored {
   background: linear-gradient(135deg, 
@@ -84,9 +90,11 @@
 ```
 
 ### 2. modal-header-danger
+
 **שימוש**: מודלי מחיקה, התראות
 **צבע**: אדום
 **CSS**:
+
 ```css
 .modal-header-danger {
   background: linear-gradient(135deg, #dc3545, #c82333);
@@ -97,9 +105,11 @@
 ```
 
 ### 3. modal-header-success
+
 **שימוש**: תוכניות מסחר
 **צבע**: ירוק כהה
 **CSS**:
+
 ```css
 .modal-header-success {
   background: linear-gradient(135deg, #28a745, #20c997);
@@ -110,9 +120,11 @@
 ```
 
 ### 4. modal-header-info
+
 **שימוש**: טיקרים
 **צבע**: כחול
 **CSS**:
+
 ```css
 .modal-header-info {
   background: linear-gradient(135deg, #17a2b8, #138496);
@@ -123,9 +135,11 @@
 ```
 
 ### 5. modal-header-warning
+
 **שימוש**: התראות, אזהרות
 **צבע**: כתום
 **CSS**:
+
 ```css
 .modal-header-warning {
   background: linear-gradient(135deg, #ffc107, #e0a800);
@@ -140,16 +154,19 @@
 ## 📏 גדלי מודלים (Modal Sizes)
 
 ### 1. modal-sm (קטן)
+
 **שימוש**: מודלים פשוטים עם מעט שדות
 **רוחב**: 300px
 **דוגמה**: אישור מחיקה, הודעות קצרות
 
 ### 2. modal-lg (בינוני) - ברירת מחדל
+
 **שימוש**: רוב מודלי CRUD
 **רוחב**: 800px
 **דוגמה**: הוספת/עריכת ישות רגילה
 
 ### 3. modal-xl (גדול)
+
 **שימוש**: מודלים מורכבים עם הרבה שדות
 **רוחב**: 1140px
 **דוגמה**: תוכניות מסחר, התראות מורכבות
@@ -159,7 +176,9 @@
 ## 🎯 עקרונות עיצוב - חיסכון במקום
 
 ### 1. כותרות וכפתורים לא גדולים מידי
+
 **גודל פונט מאוזן**:
+
 ```css
 .modal-title {
   font-size: 1.1rem;
@@ -175,7 +194,9 @@
 ```
 
 ### 2. ריווח מינימלי בין אלמנטים
+
 **Spacing tight**:
+
 ```css
 .modal-body {
   padding: 1rem 1.5rem;
@@ -192,7 +213,9 @@
 ```
 
 ### 3. שדות מאורגנים ב-2-3 עמודות
+
 **פריסה יעילה**:
+
 ```css
 .modal-body .row {
   margin: 0 -0.5rem;
@@ -210,7 +233,9 @@
 ```
 
 ### 4. שדות טקסט ברוחב אחיד
+
 **גודל אחיד**:
+
 ```css
 .modal-body .form-control {
   height: 38px;
@@ -233,7 +258,9 @@
 ```
 
 ### 5. עקביות מלאה בעיצוב
+
 **סגנונות אחידים**:
+
 ```css
 .modal-content {
   border-radius: 6px;
@@ -259,6 +286,7 @@
 ## 📱 תמיכה רספונסיבית מלאה
 
 ### Mobile (עד 768px)
+
 ```css
 @media (max-width: 768px) {
   .modal-dialog {
@@ -287,6 +315,7 @@
 ```
 
 ### Tablet (768px - 1024px)
+
 ```css
 @media (min-width: 768px) and (max-width: 1024px) {
   .modal-dialog.modal-lg {
@@ -306,6 +335,7 @@
 ```
 
 ### Desktop (מעל 1024px)
+
 ```css
 @media (min-width: 1024px) {
   .modal-dialog.modal-lg {
@@ -332,7 +362,8 @@
 
 ## 🔄 RTL מלא
 
-### כיוון RTL:
+### כיוון RTL
+
 ```css
 .modal {
   direction: rtl;
@@ -373,7 +404,8 @@
 }
 ```
 
-### כפתורים משמאל:
+### כפתורים משמאל
+
 ```css
 .modal-footer {
   justify-content: flex-start;
@@ -393,7 +425,8 @@
 
 ## 🎨 אינטגרציה עם מערכת הצבעים הדינמית
 
-### משתני CSS דינמיים:
+### משתני CSS דינמיים
+
 ```css
 .modal-header-colored {
   background: linear-gradient(135deg, 
@@ -431,7 +464,8 @@
 }
 ```
 
-### עדכון דינמי לפי סוג ישות:
+### עדכון דינמי לפי סוג ישות
+
 ```javascript
 function applyEntityColors(modalId, entityType) {
   const modal = document.getElementById(modalId);
@@ -457,7 +491,9 @@ function applyEntityColors(modalId, entityType) {
 ## 🔧 אינטגרציה עם מערכות קיימות
 
 ### 1. Button System
+
 **אוטומטית**: כל כפתור עם `data-button-type` מעובד אוטומטית
+
 ```html
 <button data-button-type="CLOSE" data-bs-dismiss="modal" data-text="סגור"></button>
 <button data-button-type="CANCEL" data-bs-dismiss="modal" data-text="ביטול"></button>
@@ -465,7 +501,9 @@ function applyEntityColors(modalId, entityType) {
 ```
 
 ### 2. Validation System
+
 **אוטומטית**: כל שדה מקבל ולידציה בזמן אמת
+
 ```javascript
 window.initializeValidation('entityForm', {
   entityName: {required: true, minLength: 3},
@@ -474,7 +512,9 @@ window.initializeValidation('entityForm', {
 ```
 
 ### 3. Data Collection Service
+
 **אוטומטית**: איסוף נתונים מהטופס
+
 ```javascript
 const formData = DataCollectionService.collectFormData({
   name: { id: 'entityName', type: 'text' },
@@ -483,14 +523,18 @@ const formData = DataCollectionService.collectFormData({
 ```
 
 ### 4. Select Populator Service
+
 **אוטומטית**: מילוי select boxes
+
 ```javascript
 await SelectPopulatorService.populateTickersSelect('entityTicker');
 await SelectPopulatorService.populateAccountsSelect('entityAccount');
 ```
 
 ### 5. CRUD Response Handler
+
 **אוטומטית**: טיפול בתגובות API
+
 ```javascript
 await CRUDResponseHandler.handleSaveResponse(response, {
   modalId: 'entityModal',
@@ -503,7 +547,8 @@ await CRUDResponseHandler.handleSaveResponse(response, {
 
 ## 📋 דוגמת שימוש מלא
 
-### יצירת מודל CRUD:
+### יצירת מודל CRUD
+
 ```javascript
 function createCRUDModal(config) {
   const modalHTML = `
@@ -567,14 +612,16 @@ function initializeModalSystems(modalId, config) {
 
 ## 🎯 המלצות ליישום
 
-### עקרונות עיצוב:
+### עקרונות עיצוב
+
 1. **חיסכון במקום** - כל אלמנט בגודל מינימלי נדרש
 2. **עקביות מלאה** - אותו עיצוב בכל המודלים
 3. **רספונסיבי** - תמיכה מלאה בכל המכשירים
 4. **RTL מלא** - תמיכה מלאה בעברית
 5. **אינטגרציה מלאה** - שימוש בכל המערכות הקיימות
 
-### דרישות טכניות:
+### דרישות טכניות
+
 1. **ITCSS** - אפס inline styles או !important
 2. **משתני CSS דינמיים** - חיבור להעדפות משתמש
 3. **Bootstrap 5** - תמיכה מלאה

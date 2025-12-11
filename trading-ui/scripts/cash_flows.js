@@ -5,58 +5,84 @@
  * 
  * This index lists all functions in this file, organized by category.
  * 
- * Total Functions: 35
+ * Total Functions: 61
  * 
- * PAGE INITIALIZATION (3)
+ * PAGE INITIALIZATION (5)
+ * - setupCashFlowTypeFilterDropdown() - * Set active cash flow type filter (buttons and dropdown)
+ * - setupExchangeRowInteractions() - setupExchangeRowInteractions function
  * - initializeCashFlowsPage() - initializeCashFlowsPage function
  * - setupSourceFieldListeners() - setupSourceFieldListeners function
  * - initializeExternalIdFields() - * Setup source field listeners
  * 
- * DATA LOADING (10)
+ * DATA LOADING (11)
  * - loadCashFlowsData() - loadCashFlowsData function
- * - getAccountNameById() - getAccountNameById function
+ * - getCashFlowsPaginationInstance() - * Resolve exchange direction from flow type
+ * - loadCashFlowTypeFilterState() - * Save cash flow type filter state
+ * - getAccountNameById() - * Reapply cash flow type filter
  * - ensureTradingAccountsLoaded() - ensureTradingAccountsLoaded function
- * - loadCashFlows() - * טעינת נתוני חשבונות מסחר אם הם לא נטענו
  * - loadAccountsForCashFlow() - loadAccountsForCashFlow function
  * - loadCurrenciesForCashFlow() - loadCurrenciesForCashFlow function
- * - getCashFlowTypeWithColor() - * Format amount
+ * - getCashFlowTypeWithColor() - getCashFlowTypeWithColor function
  * - getCashFlowTypeText() - getCashFlowTypeText function
- * - loadTradesForCashFlow() - * Edit cash flow
- * - loadTradePlansForCashFlow() - loadTradePlansForCashFlow function
+ * - loadCurrencyExchange() - loadCurrencyExchange function
+ * - getExchangeIdFromCashFlow() - * Check if cash flow is part of currency exchange
  * 
- * DATA MANIPULATION (6)
+ * DATA MANIPULATION (10)
+ * - saveCashFlowTypeFilterState() - * Filter cash flows locally by type
  * - deleteCashFlow() - deleteCashFlow function
- * - updatePageSummaryStats() - Uses InfoSummarySystem from services/statistics-calculator.js
+ * - deleteImportedCashFlows() - deleteImportedCashFlows function
+ * - updatePageSummaryStats() - updatePageSummaryStats function
  * - updateCashFlowsTable() - * Format USD rate
  * - updateCashFlow() - updateCashFlow function
  * - saveCashFlow() - saveCashFlow function
+ * - saveCurrencyExchange() - saveCurrencyExchange function
+ * - deleteCurrencyExchange() - deleteCurrencyExchange function
  * - confirmDeleteCashFlow() - confirmDeleteCashFlow function
  * 
- * EVENT HANDLING (1)
+ * EVENT HANDLING (12)
+ * - resolveExchangeDirectionFromType() - resolveExchangeDirectionFromType function
+ * - setActiveCashFlowTypeButton() - setActiveCashFlowTypeButton function
  * - performCashFlowDeletion() - performCashFlowDeletion function
+ * - syncCashFlowsPagination() - syncCashFlowsPagination function
+ * - groupUnifiedExchanges() - groupUnifiedExchanges function
+ * - renderUnifiedForexExchangesTable() - renderUnifiedForexExchangesTable function
+ * - ensureExchangePairsAdjacency() - ensureExchangePairsAdjacency function
+ * - highlightExchangeGroup() - * Setup exchange row interactions (hover, click handlers)
+ * - clearExchangeHighlight() - * Highlight exchange group
+ * - setCurrencyExchangeSummary() - * Clear exchange highlight
+ * - hydrateCashFlowExchangeDisplay() - hydrateCashFlowExchangeDisplay function
+ * - isCurrencyExchange() - isCurrencyExchange function
  * 
  * UI UPDATES (2)
  * - renderCashFlowsTable() - * טעינת רשימת מטבעות למודולי cash flow
  * - showCashFlowDetails() - * Format USD rate
  * 
- * VALIDATION (2)
+ * VALIDATION (4)
+ * - validateCashFlowAmount() - * Ensure trading accounts data is loaded
+ * - validateCashFlowDate() - * Helper validation function for cash flow amount
  * - validateCashFlowForm() - validateCashFlowForm function
- * - validateEditCashFlowForm() - validateEditCashFlowForm function
+ * - validateEditCashFlowForm() - * Validate cash flow form
  * 
  * UTILITIES (3)
  * - formatAmount() - formatAmount function
- * - formatCashFlowAmount() - * Get cash flow type text
+ * - formatCashFlowAmount() - formatCashFlowAmount function
  * - formatUsdRate() - formatUsdRate function
  * 
- * OTHER (8)
+ * OTHER (14)
+ * - applyFallbackDateSort() - applyFallbackDateSort function
  * - calculateBalance() - calculateBalance function
- * - startAutoRefresh() - * Update cash flows table
+ * - cashFlowMatchesType() - cashFlowMatchesType function
+ * - filterCashFlowsByType() - * Check if cash flow matches type
+ * - filterCashFlowsLocallyByType() - filterCashFlowsLocallyByType function
+ * - reapplyCashFlowTypeFilter() - * Load cash flow type filter state
+ * - resolveCurrencySymbolForCashFlow() - * Get cash flow type text
+ * - startAutoRefresh() - startAutoRefresh function
  * - applyDynamicColors() - * Start auto refresh
  * - applyUserPreferences() - applyUserPreferences function
  * - manageExternalIdField() - * Confirm delete cash flow
  * - editCashFlow() - editCashFlow function
  * - generateDetailedLog() - generateDetailedLog function
- * - generateDetailedLogForCashFlows() - generateDetailedLogForCashFlows function
+ * - restorePageState() - restorePageState function
  * 
  * ==========================================
  */
@@ -112,15 +138,27 @@ async function loadCashFlowsData(options = {}) {
         'Content-Type': 'application/json',
         'Cache-Control': 'no-cache',
       },
-      signal: loadOptions.signal,
-      credentials: 'include' // Include cookies for session-based auth
+      signal: loadOptions.signal, // Include cookies for session-based auth
     });
     
     // Handle 401/308 authentication errors
     if (response.status === 401 || response.status === 308) {
-      // Clear any stale auth data
-      localStorage.removeItem('currentUser');
-      localStorage.removeItem('authToken');
+      // Clear any stale auth data using UnifiedCacheManager
+      if (window.UnifiedCacheManager) {
+        try {
+          await window.UnifiedCacheManager.remove('currentUser');
+          await window.UnifiedCacheManager.remove('authToken');
+        } catch (e) {
+          console.warn('Error clearing auth cache:', e);
+          // Fallback to localStorage
+          localStorage.removeItem('currentUser');
+          localStorage.removeItem('authToken');
+        }
+      } else {
+        // Fallback to localStorage if UnifiedCacheManager not available
+        localStorage.removeItem('currentUser');
+        localStorage.removeItem('authToken');
+      }
       
       // Show error notification
       if (window.NotificationSystem) {
@@ -136,14 +174,8 @@ async function loadCashFlowsData(options = {}) {
         window.TikTrackAuth.showLoginModal(() => {
           window.location.reload();
         });
-      } else if (typeof window.AuthGuard?.redirectToLogin === 'function') {
-        window.AuthGuard.redirectToLogin();
       } else {
-        const currentPath = window.location.pathname;
-        const loginPath = currentPath.includes('trading-ui') 
-          ? 'trading-ui/login.html' 
-          : 'login.html';
-        window.location.href = loginPath;
+        window.location.href = '/';
       }
       
       throw new Error('Authentication required');
@@ -198,7 +230,7 @@ async function loadCashFlowsData(options = {}) {
       applyFallbackDateSort(normalizedCashFlows);
     }
 
-    updatePageSummaryStats();
+    await updatePageSummaryStats();
 
     if (typeof window.registerCashFlowsTables === 'function') {
       window.registerCashFlowsTables();
@@ -1730,13 +1762,54 @@ async function renderCashFlowsTable() {
  * @returns {void}
  * Uses InfoSummarySystem from services/statistics-calculator.js
  */
-function updatePageSummaryStats() {
+async function updatePageSummaryStats() {
   try {
     const summarySource = Array.isArray(window.filteredCashFlowsData) && window.filteredCashFlowsData.length > 0
       ? window.filteredCashFlowsData
       : (Array.isArray(window.allCashFlowsData) && window.allCashFlowsData.length > 0
           ? window.allCashFlowsData
           : (cashFlowsData || []));
+
+    // Try to enhance summary with EOD cash flow data
+    let enhancedSummarySource = summarySource;
+    if (window.EODIntegrationHelper && window.EODIntegrationHelper.isEODAvailable()) {
+      try {
+        const userId = window.g?.user_id || window.TikTrackAuth?.currentUser?.id;
+        if (userId) {
+          // Load EOD cash flows for current period
+                        const eodResult = await window.EODIntegrationHelper.loadEODCashFlows(
+                            userId,
+                            {
+                                date_from: '2025-01-01', // Could be made dynamic
+                                date_to: new Date().toISOString().split('T')[0]
+                            }
+                        );
+
+          if (eodResult && eodResult.data && Array.isArray(eodResult.data) && eodResult.data.length > 0) {
+            // For now, just log that EOD data is available
+            // In a full implementation, you'd merge EOD cash flow aggregations
+            if (window.Logger) {
+              window.Logger.info('✅ EOD cash flow data available for summary enhancement', {
+                page: 'cash_flows',
+                eodRecords: eodResult.data.length,
+                source: eodResult.source,
+                totalEODCashFlows: eodResult.data.reduce((sum, record) => sum + (record.net_flow || 0), 0)
+              });
+            }
+
+            // Store EOD data for potential use in summary calculations
+            window.eodCashFlowsData = eodResult.data;
+          }
+        }
+      } catch (eodError) {
+        if (window.Logger) {
+          window.Logger.warn('⚠️ EOD cash flow loading failed for summary, proceeding without', {
+            page: 'cash_flows',
+            error: eodError.message
+          });
+        }
+      }
+    }
 
     // Use global InfoSummarySystem if available
     if (window.InfoSummarySystem && window.INFO_SUMMARY_CONFIGS && window.INFO_SUMMARY_CONFIGS.cash_flows) {
@@ -1852,10 +1925,10 @@ async function syncCashFlowsPagination(cashFlows) {
             });
           }
         },
-        onFilteredDataChange: ({ filteredData }) => {
+        onFilteredDataChange: async ({ filteredData }) => {
           window.filteredCashFlowsData = Array.isArray(filteredData) ? filteredData : [];
           if (typeof updatePageSummaryStats === 'function') {
-            updatePageSummaryStats();
+            await updatePageSummaryStats();
           }
           // Update count element with total filtered records (not just current page)
           // Use generic updateTableCount function
@@ -2616,7 +2689,7 @@ async function updateCashFlowsTable(cashFlows, options = {}) {
 
   // עדכון סטטיסטיקות רק אם לא מדלגים
   if (!skipSummary) {
-    updatePageSummaryStats();
+    await updatePageSummaryStats();
   }
   
   window.Logger?.info('✅ [updateCashFlowsTable] Completed', {
@@ -2654,7 +2727,7 @@ function startAutoRefresh() {
   //     
   //     // עדכון סטטיסטיקות
   //     if (typeof updatePageSummaryStats === 'function') {
-  //       updatePageSummaryStats();
+  //       await updatePageSummaryStats();
   //     }
   //     
   //     window.Logger.info('Automatic update completed successfully', { page: 'cash_flows' });

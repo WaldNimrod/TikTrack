@@ -51,6 +51,7 @@ window.ExternalDataService
 מביא quote לטיקר בודד.
 
 **Parameters:**
+
 - `symbol` (string) - סמל הטיקר (למשל 'AAPL')
 - `options` (Object, optional) - אופציות נוספות
   - `forceRefresh` (boolean) - האם לכפות רענון גם אם יש נתונים עדכניים
@@ -58,6 +59,7 @@ window.ExternalDataService
 **Returns:** `Promise<Object>` - נתוני quote מנורמלים
 
 **Example:**
+
 ```javascript
 const quote = await window.ExternalDataService.getQuote('AAPL', { forceRefresh: true });
 console.log(quote.price, quote.change_pct_day);
@@ -70,6 +72,7 @@ console.log(quote.price, quote.change_pct_day);
 מביא quotes למספר טיקרים (batch operation).
 
 **Parameters:**
+
 - `symbols` (Array<string>) - מערך של סמלי טיקרים
 - `options` (Object, optional) - אופציות נוספות
   - `maxBatchSize` (number) - גודל מקסימלי של batch (ברירת מחדל: 25)
@@ -77,6 +80,7 @@ console.log(quote.price, quote.change_pct_day);
 **Returns:** `Promise<Array<Object>>` - מערך של quotes מנורמלים
 
 **Example:**
+
 ```javascript
 const quotes = await window.ExternalDataService.getQuotes(['AAPL', 'MSFT', 'GOOGL']);
 quotes.forEach(quote => console.log(quote.symbol, quote.price));
@@ -89,6 +93,7 @@ quotes.forEach(quote => console.log(quote.symbol, quote.price));
 מרענן נתונים לטיקר בודד כולל quote נוכחי, נתונים היסטוריים, וחישובים טכניים.
 
 **Parameters:**
+
 - `tickerId` (number) - מזהה הטיקר
 - `options` (Object, optional) - אופציות נוספות
   - `forceRefresh` (boolean, default: true) - האם לכפות רענון גם אם יש נתונים עדכניים
@@ -96,11 +101,13 @@ quotes.forEach(quote => console.log(quote.symbol, quote.price));
   - `daysBack` (number, default: 150) - מספר ימים של נתונים היסטוריים
 
 **Returns:** `Promise<Object>` - נתוני טיקר מעודכנים כולל:
+
 - Quote נוכחי
 - נתונים היסטוריים (150 ימים)
 - חישובים טכניים (ATR, MA20, MA150, Volatility, 52W)
 
 **Example:**
+
 ```javascript
 const tickerData = await window.ExternalDataService.refreshTickerData(1424, {
   forceRefresh: true,
@@ -111,9 +118,11 @@ console.log(tickerData.price, tickerData.historical_quotes_count);
 ```
 
 **Backend Endpoint:**
+
 - `POST /api/external-data/quotes/{tickerId}/refresh`
 
 **מה הפונקציה עושה:**
+
 1. מרענן quote נוכחי מהספק החיצוני
 2. מוריד נתונים היסטוריים (150 ימים)
 3. מחשב חישובים טכניים (ATR, MA20, MA150, Volatility, 52W)
@@ -126,12 +135,14 @@ console.log(tickerData.price, tickerData.historical_quotes_count);
 מרענן נתונים למספר טיקרים (batch operation).
 
 **Parameters:**
+
 - `tickersData` (Array<Object>) - מערך של נתוני טיקרים
 - `buttonId` (string|null, optional) - מזהה כפתור לעדכון UI
 
 **Returns:** `Promise<Object>` - אובייקט עם נתונים מעודכנים (symbol -> data)
 
 **Example:**
+
 ```javascript
 const tickers = [{ symbol: 'AAPL' }, { symbol: 'MSFT' }];
 const updatedData = await window.ExternalDataService.refreshTickersData(tickers, 'refreshBtn');
@@ -144,11 +155,13 @@ const updatedData = await window.ExternalDataService.refreshTickersData(tickers,
 מרענן נתונים למספר טיקרים ללא עדכון UI.
 
 **Parameters:**
+
 - `tickersData` (Array<Object>) - מערך של נתוני טיקרים
 
 **Returns:** `Promise<Object|null>` - אובייקט עם נתונים מעודכנים או null
 
 **Example:**
+
 ```javascript
 const tickers = [{ symbol: 'AAPL' }, { symbol: 'MSFT' }];
 const updatedData = await window.ExternalDataService.refreshTickersDataSilently(tickers);
@@ -163,6 +176,7 @@ const updatedData = await window.ExternalDataService.refreshTickersDataSilently(
 **Returns:** `Promise<Object>` - סטטוס המערכת
 
 **Example:**
+
 ```javascript
 const status = await window.ExternalDataService.getSystemStatus();
 console.log(status.providers, status.cache);
@@ -175,9 +189,11 @@ console.log(status.providers, status.cache);
 מנקה מטמון.
 
 **Parameters:**
+
 - `symbols` (Array<string>|null) - סמלי טיקרים לניקוי, או null לניקוי כל המטמון
 
 **Example:**
+
 ```javascript
 // נקה מטמון לטיקר ספציפי
 window.ExternalDataService.clearCache(['AAPL']);
@@ -195,6 +211,7 @@ window.ExternalDataService.clearCache();
 **Returns:** `Object` - סטטיסטיקות מטמון
 
 **Example:**
+
 ```javascript
 const stats = window.ExternalDataService.getCacheStats();
 console.log(stats.totalEntries, stats.validEntries);
@@ -266,6 +283,7 @@ const tickerData = await window.ExternalDataService.refreshTickerData(tickerId, 
 ## Error Handling
 
 המערכת כוללת retry logic אוטומטי:
+
 - **maxRetries**: 3 ניסיונות (ברירת מחדל)
 - **retryDelay**: 1 שנייה בין ניסיונות (ברירת מחדל)
 - **Rate limiting**: 100 בקשות לדקה (ברירת מחדל)
@@ -275,6 +293,7 @@ const tickerData = await window.ExternalDataService.refreshTickerData(tickerId, 
 ## Rate Limiting
 
 המערכת כוללת rate limiting מובנה:
+
 - **maxRequestsPerWindow**: 100 בקשות
 - **requestWindow**: 60 שניות
 
@@ -309,12 +328,14 @@ const tickerData = await window.ExternalDataService.refreshTickerData(tickerId, 
 ### 1. שימוש במערכת הכללית
 
 ✅ **נכון:**
+
 ```javascript
 // שימוש במערכת הכללית
 await window.ExternalDataService.refreshTickerData(tickerId);
 ```
 
 ❌ **לא נכון:**
+
 ```javascript
 // קריאה ישירה ל-API - לא להשתמש!
 await fetch(`/api/external-data/quotes/${tickerId}/refresh`, { method: 'POST' });
@@ -323,6 +344,7 @@ await fetch(`/api/external-data/quotes/${tickerId}/refresh`, { method: 'POST' })
 ### 2. Cache Management
 
 ✅ **נכון:**
+
 ```javascript
 // נקה מטמון לפני refresh
 window.ExternalDataService.clearCache(['AAPL']);
@@ -332,6 +354,7 @@ await window.ExternalDataService.getQuote('AAPL', { forceRefresh: true });
 ### 3. Error Handling
 
 ✅ **נכון:**
+
 ```javascript
 try {
   const quote = await window.ExternalDataService.getQuote('AAPL');
@@ -344,12 +367,14 @@ try {
 ### 4. Batch Operations
 
 ✅ **נכון:**
+
 ```javascript
 // השתמש ב-batch operations לטיקרים מרובים
 const quotes = await window.ExternalDataService.getQuotes(['AAPL', 'MSFT', 'GOOGL']);
 ```
 
 ❌ **לא נכון:**
+
 ```javascript
 // לא לעשות loop עם getQuote
 for (const symbol of symbols) {

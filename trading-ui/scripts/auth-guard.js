@@ -1,212 +1,222 @@
 /**
- * Authentication Guard - Route protection for pages
- * מערכת הגנת נתיבים - בדיקת אימות לפני טעינת עמודים
+ * Authentication Guard - Simple authentication check
+ * מערכת הגנת נתיבים - בדיקת אימות פשוטה
  *
- * This script checks authentication before allowing access to protected pages.
- * If user is not authenticated, redirects to login page.
- *
- * Dependencies:
- * - auth.js (authentication functions)
+ * Simple logic: Check if user is authenticated -> Yes: Continue, No: Show login modal
+ * לוגיקה פשוטה: בדוק אם משתמש מחובר -> כן: המשך, לא: הצג מודול כניסה
  *
  * File: trading-ui/scripts/auth-guard.js
- * Version: 1.0
+ * Version: 2.0 - Simplified
  * Last Updated: December 2025
  */
 
-// Pages that don't require authentication
-const PUBLIC_PAGES = [
-  'login.html',
-  'register.html',
-  'reset-password.html',
-  'forgot-password.html'
-];
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - initAuthGuard() - Initauthguard
+
+// === Event Handlers ===
+// - checkAuthentication() - Checkauthentication
+
+// === UI Functions ===
+// - showLoginModal() - Showloginmodal
+
+// === Other ===
+// - waitForAuthJS() - Waitforauthjs
 
 /**
- * Check if current page is public (doesn't require authentication)
- * @returns {boolean} True if page is public
+ * Check authentication status with server
+ * @returns {Promise<{authenticated: boolean, user: object|null, error: string|null}>}
  */
-function isPublicPage() {
-  const currentPage = window.location.pathname.split('/').pop() || 'index.html';
-  return PUBLIC_PAGES.some(page => currentPage.includes(page));
+async function checkAuthentication() {
+  window.Logger?.info?.('🔐 [Auth Guard] Starting authentication check', { page: 'auth-guard' });
+  
+  if (!window.TikTrackAuth || typeof window.TikTrackAuth.checkAuthentication !== 'function') {
+    window.Logger?.error?.('❌ [Auth Guard] TikTrackAuth not available', { page: 'auth-guard' });
+    return { authenticated: false, user: null, error: 'Auth system not ready' };
+  }
+
+  try {
+    const result = await window.TikTrackAuth.checkAuthentication();
+    if (result?.authenticated) {
+      window.Logger?.info?.('✅ [Auth Guard] User authenticated', { 
+        page: 'auth-guard', 
+        userId: result.user?.id, 
+        username: result.user?.username 
+      });
+    } else {
+      window.Logger?.info?.('❌ [Auth Guard] User not authenticated', { 
+        page: 'auth-guard', 
+        error: result?.error 
+      });
+    }
+    return result;
+  } catch (error) {
+    window.Logger?.error?.('❌ [Auth Guard] Authentication check failed', { 
+      page: 'auth-guard', 
+      error: error.message 
+    });
+    return { authenticated: false, user: null, error: error.message };
+  }
+}
+
+/**
+ * Show login modal
+ */
+async function showLoginModal() {
+  window.Logger?.info?.('🔐 [Auth Guard] Showing login modal', { page: 'auth-guard' });
+  
+  // ✅ לוג אימות - בדיקת זמינות
+  window.Logger?.info?.('🔍 [Auth Guard] showLoginModal - checking availability', {
+    page: 'auth-guard',
+    tikTrackAuthExists: typeof window.TikTrackAuth !== 'undefined',
+    showLoginModalExists: typeof window.TikTrackAuth?.showLoginModal === 'function',
+    timestamp: new Date().toISOString()
+  });
+  
+  // Wait for auth.js to load if not available yet
+  if (typeof window.TikTrackAuth?.showLoginModal !== 'function') {
+    window.Logger?.info?.('⏳ [Auth Guard] Waiting for auth.js to load...', { page: 'auth-guard' });
+    
+    // Wait up to 5 seconds for auth.js to load
+    for (let i = 0; i < 50; i++) {
+      await new Promise(resolve => setTimeout(resolve, 100));
+      if (typeof window.TikTrackAuth?.showLoginModal === 'function') {
+        window.Logger?.info?.('✅ [Auth Guard] auth.js loaded', { 
+          page: 'auth-guard',
+          attempts: i + 1
+        });
+        break;
+      }
+    }
+  }
+  
+  if (typeof window.TikTrackAuth?.showLoginModal === 'function') {
+    window.Logger?.info?.('✅ [Auth Guard] Calling window.TikTrackAuth.showLoginModal', { page: 'auth-guard' });
+    try {
+      await window.TikTrackAuth.showLoginModal(() => {
+        window.Logger?.info?.('✅ [Auth Guard] Login successful, reloading page', { page: 'auth-guard' });
+        window.location.reload();
+      });
+      window.Logger?.info?.('✅ [Auth Guard] showLoginModal completed successfully', { page: 'auth-guard' });
+    } catch (error) {
+      window.Logger?.error?.('❌ [Auth Guard] Error calling showLoginModal', {
+        page: 'auth-guard',
+        error: error.message,
+        stack: error.stack
+      });
+    }
+  } else {
+    window.Logger?.error?.('❌ [Auth Guard] Login modal function not available after waiting', {
+      page: 'auth-guard',
+      tikTrackAuthExists: typeof window.TikTrackAuth !== 'undefined',
+      tikTrackAuthType: typeof window.TikTrackAuth,
+      showLoginModalExists: typeof window.TikTrackAuth?.showLoginModal === 'function'
+    });
+  }
 }
 
 /**
  * Initialize authentication guard
- * Checks authentication and redirects to login if needed
+ * Checks authentication on page load
  */
 async function initAuthGuard() {
-  // For public pages (login, register, etc.), check if user is already authenticated
-  // If authenticated, redirect to dashboard
-  if (isPublicPage()) {
-    // Check if user is already authenticated (both local and server)
-    const isAuth = typeof isAuthenticated === 'function' ? isAuthenticated() : false;
-    
-    if (isAuth) {
-      // Double-check with server to ensure authentication is valid
-      try {
-        const response = await fetch('/api/auth/me', {
-          method: 'GET',
-          credentials: 'include'
-        });
-        
-        if (response.ok) {
-          const data = await response.json();
-          if (data.status === 'success' && data.data?.user) {
-            // User is authenticated - redirect to dashboard
-            const redirectPath = getRedirectAfterLogin();
-            if (redirectPath) {
-              window.location.href = redirectPath;
-            } else {
-              window.location.href = 'index.html';
-            }
-            return;
-          }
-        } else if (response.status === 401) {
-          // 401 is expected when not authenticated - silently handle it
-          // Don't log as error to avoid console pollution
-        }
-      } catch (error) {
-        // Only log non-401 errors to avoid console pollution
-        // 401 errors are expected and handled silently
-        if (error.message && !error.message.includes('401') && !error.message.includes('UNAUTHORIZED')) {
-          console.debug('Auth guard: Server check failed, staying on login page', error);
-        }
-      }
+  window.Logger?.info?.('🚀 [Auth Guard] Initializing', { page: 'auth-guard' });
+  
+  // Small delay to allow session cookie to be set after page reload
+  // This prevents race condition where we check auth before session is ready
+  // Increased delay to 500ms to give session more time to stabilize
+  await new Promise(resolve => setTimeout(resolve, 500));
+  
+  // Wait briefly for token to be available (UC or sessionStorage) before first check
+  let tokenReady = false;
+  for (let i = 0; i < 10; i++) {
+    const hasUC = window.UnifiedCacheManager?.initialized;
+    const ucToken = hasUC ? await window.UnifiedCacheManager.get('authToken', { includeUserId: false }).catch(() => null) : null;
+    const ssToken = (typeof sessionStorage !== 'undefined') ? sessionStorage.getItem('dev_authToken') : null;
+    if (ucToken || ssToken) {
+      tokenReady = true;
+      break;
     }
-    
-    // Not authenticated - stay on public page
-    return;
+    await new Promise(resolve => setTimeout(resolve, 100));
   }
   
-  // Check if auth functions are available
-  if (typeof checkAuthentication !== 'function') {
-    console.warn('Auth guard: checkAuthentication function not found. Loading auth.js...');
-    // Try to load auth.js if not already loaded
-    const script = document.createElement('script');
-    script.src = 'scripts/auth.js';
-    script.onload = () => {
-      checkAuthAndRedirect();
-    };
-    script.onerror = () => {
-      console.error('Auth guard: Failed to load auth.js');
-    };
-    document.head.appendChild(script);
-    return;
-  }
-  
-  // Check authentication
-  await checkAuthAndRedirect();
-}
-
-/**
- * Check authentication and redirect if needed
- */
-async function checkAuthAndRedirect() {
+  let result = { authenticated: false, user: null, error: 'unknown' };
   try {
-    // Check if user is authenticated
-    const isAuth = typeof isAuthenticated === 'function' ? isAuthenticated() : false;
+    const r = await checkAuthentication();
+    if (r) result = r;
+  } catch (e) {
+    window.Logger?.error?.('❌ [Auth Guard] checkAuthentication threw', { error: e?.message });
+  }
+  
+  if (result.authenticated) {
+    window.Logger?.info?.('✅ [Auth Guard] User authenticated, page access granted', { 
+      page: 'auth-guard',
+      userId: result.user?.id 
+    });
+    // User is authenticated - page can load normally
+    return;
+  } else {
+    window.Logger?.warn?.('❌ [Auth Guard] User not authenticated, showing login modal', { 
+      page: 'auth-guard',
+      error: result.error 
+    });
+    // User is not authenticated - show login modal
+    await showLoginModal();
+  }
+}
+
+// Initialize when DOM is ready and auth.js is loaded
+// We wait for auth.js to be available before running auth-guard
+async function waitForAuthJS() {
+  // ✅ לוג אימות - תחילת waitForAuthJS
+  window.Logger?.info?.('⏳ [Auth Guard] waitForAuthJS started', {
+    page: 'auth-guard',
+    tikTrackAuthExists: typeof window.TikTrackAuth !== 'undefined',
+    showLoginModalExists: typeof window.TikTrackAuth?.showLoginModal === 'function',
+    documentReadyState: document.readyState,
+    timestamp: new Date().toISOString()
+  });
+  
+  // Wait for auth.js to load (check if window.TikTrackAuth exists)
+  if (typeof window.TikTrackAuth === 'undefined') {
+    window.Logger?.info?.('⏳ [Auth Guard] Waiting for auth.js to load...', { page: 'auth-guard' });
     
-    if (!isAuth) {
-      // Try to verify with server
-      const response = await fetch('/api/auth/me', {
-        method: 'GET',
-        credentials: 'include'
-      });
-      
-      if (!response.ok) {
-        // 401 is expected when not authenticated - silently handle it
-        // Other errors should be logged
-        if (response.status !== 401) {
-          console.warn('Auth guard: Unexpected error checking authentication:', response.status);
-        }
-        // Not authenticated - redirect to login
-        redirectToLogin();
-        return;
-      }
-      
-      const data = await response.json();
-      if (data.status !== 'success' || !data.data?.user) {
-        // Not authenticated - redirect to login
-        redirectToLogin();
-        return;
-      }
-      
-      // User is authenticated - update local storage
-      if (typeof window !== 'undefined' && window.localStorage) {
-        window.localStorage.setItem('currentUser', JSON.stringify(data.data.user));
-        window.localStorage.setItem('authToken', 'session_based');
+    // Wait up to 3 seconds for auth.js to load
+    for (let i = 0; i < 30; i++) {
+      await new Promise(resolve => setTimeout(resolve, 100));
+      if (typeof window.TikTrackAuth !== 'undefined') {
+        window.Logger?.info?.('✅ [Auth Guard] auth.js loaded', { 
+          page: 'auth-guard',
+          attempts: i + 1,
+          hasShowLoginModal: typeof window.TikTrackAuth?.showLoginModal === 'function'
+        });
+        break;
       }
     }
-    
-    // User is authenticated - continue
-    return true;
-  } catch (error) {
-    console.warn('Auth guard: Error checking authentication:', error);
-    // On error, redirect to login to be safe
-    redirectToLogin();
-    return false;
-  }
-}
-
-/**
- * Show login modal instead of redirecting to login page
- * הצגת modal כניסה במקום redirect לעמוד כניסה
- */
-async function redirectToLogin() {
-  const currentPath = window.location.pathname;
-  
-  // Store intended destination for redirect after login
-  if (currentPath && !currentPath.includes('login.html') && !currentPath.includes('register.html')) {
-    sessionStorage.setItem('redirectAfterLogin', currentPath);
-  }
-  
-  // Show login modal instead of redirecting
-  if (typeof window.TikTrackAuth?.showLoginModal === 'function') {
-    await window.TikTrackAuth.showLoginModal(() => {
-      // On successful login, redirect to intended destination or dashboard
-      const redirectPath = getRedirectAfterLogin();
-      if (redirectPath) {
-        window.location.href = redirectPath;
-      } else {
-        window.location.href = 'index.html';
-      }
-    });
   } else {
-    // Fallback: redirect to login page if modal not available
-    const loginPath = currentPath.includes('trading-ui') 
-      ? 'trading-ui/login.html' 
-      : 'login.html';
-    window.location.href = loginPath;
+    window.Logger?.info?.('✅ [Auth Guard] auth.js already loaded', {
+      page: 'auth-guard',
+      hasShowLoginModal: typeof window.TikTrackAuth?.showLoginModal === 'function'
+    });
   }
+  
+  // Now initialize auth guard
+  await initAuthGuard();
 }
 
-/**
- * Get redirect destination after login
- * @returns {string|null} Path to redirect to, or null
- */
-function getRedirectAfterLogin() {
-  const redirect = sessionStorage.getItem('redirectAfterLogin');
-  if (redirect) {
-    sessionStorage.removeItem('redirectAfterLogin');
-    return redirect;
-  }
-  return null;
-}
-
-// Initialize auth guard when DOM is ready
+// Start when DOM is ready
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initAuthGuard);
+  document.addEventListener('DOMContentLoaded', waitForAuthJS);
 } else {
-  // DOM is already ready
-  initAuthGuard();
+  // DOM already ready, start immediately
+  waitForAuthJS();
 }
 
 // Export functions globally
 window.AuthGuard = {
   init: initAuthGuard,
-  checkAuth: checkAuthAndRedirect,
-  redirectToLogin,
-  getRedirectAfterLogin,
-  isPublicPage
+  checkAuth: checkAuthentication,
+  showLoginModal
 };
-

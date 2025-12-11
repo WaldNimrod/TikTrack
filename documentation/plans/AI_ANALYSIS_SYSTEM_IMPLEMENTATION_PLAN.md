@@ -24,9 +24,11 @@
 ## 🎯 סקירה כללית
 
 ### מטרת המערכת
+
 יישום מערכת AI לניתוח מניות עם תמיכה ב-4 תבניות פרומפטים, אינטגרציה עם מנועי LLM (Perplexity/Gemini), ניהול API keys למשתמשים, והצגת תוצאות כולל אינפוגרפיקות.
 
 ### עקרונות יסוד
+
 1. **אינטגרציה מלאה** - שימוש בכל המערכות הקיימות במערכת
 2. **ITCSS מדויק** - ללא inline styles או styles בתוך HTML
 3. **מערכת כפתורים מרכזית** - כל הכפתורים דרך `data-onclick`
@@ -40,9 +42,11 @@
 ## 📚 שלב 0: דוקומנטציה מלאה
 
 ### 0.1 מדריך מפתחים מקיף
+
 **קובץ:** `documentation/04-FEATURES/AI_ANALYSIS_SYSTEM_DEVELOPER_GUIDE.md`
 
 **תוכן:**
+
 - ארכיטקטורה מלאה של המערכת
 - זרימת נתונים מפורטת (Frontend ↔ Backend ↔ LLM)
 - API Reference מלא (כל ה-endpoints)
@@ -52,9 +56,11 @@
 - Integration Points עם מערכות קיימות
 
 ### 0.2 דוקומנטציה למשתמש
+
 **קובץ:** `documentation/04-FEATURES/AI_ANALYSIS_SYSTEM_USER_GUIDE.md`
 
 **תוכן:**
+
 - מדריך שימוש מלא במערכת
 - הסבר על כל תבנית פרומפט
 - איך להשיג API keys (Perplexity + Gemini)
@@ -62,15 +68,19 @@
 - הסבר על אינפוגרפיקות
 
 ### 0.3 דוקומנטציה טכנית
+
 **קבצים:**
+
 - `documentation/backend/AI_ANALYSIS_API.md` - API documentation מלא
 - `documentation/02-ARCHITECTURE/BACKEND/AI_ANALYSIS_ARCHITECTURE.md` - Backend architecture
 - `documentation/02-ARCHITECTURE/FRONTEND/AI_ANALYSIS_ARCHITECTURE.md` - Frontend architecture
 
 ### 0.4 תוכנית בדיקות
+
 **קובץ:** `documentation/04-FEATURES/AI_ANALYSIS_SYSTEM_TEST_PLAN.md`
 
 **תוכן:**
+
 - Unit Tests (Backend + Frontend)
 - Integration Tests (API + LLM Providers)
 - Browser Tests (מלא - כל התכונות)
@@ -83,12 +93,15 @@
 ## 📝 תבניות הפרומפטים
 
 ### תבנית 1: Equity Research Analysis
+
 **משתנים:**
+
 - Stock Ticker / Company Name
 - Investment Thesis
 - Goal
 
 **אינטגרציה עם מערכת:**
+
 - שימוש ב-Investment Types: `swing`, `investment`, `passive`, `day_trading`, `scalping`
 - שימוש ב-Trading Methods מהמערכת (6 שיטות מסחר)
 - שימוש ב-Conditions System להצגת תנאים רלוונטיים
@@ -96,7 +109,9 @@
 **מבנה:** Fundamental Analysis, Thesis Validation, Sector & Macro View, Catalyst Watch, Investment Summary
 
 ### תבנית 2: Technical Analysis Deep Dive
+
 **משתנים:**
+
 - Stock Ticker / Company Name
 - Time Frame: [1 day / 1 week / 1 month / 3 months / 1 year]
 - Technical Indicators: [בחירה מרשימת Trading Methods במערכת]
@@ -104,6 +119,7 @@
 - Investment Type: [בחירה מ-Investment Types במערכת]
 
 **אינטגרציה עם מערכת:**
+
 - שימוש ב-Trading Methods מהמערכת (6 שיטות מסחר)
 - שימוש ב-Method Parameters מהמערכת
 - שימוש ב-Conditions System להצגת תנאים טכניים
@@ -112,7 +128,9 @@
 **מבנה:** Price Action Analysis, Technical Indicators Review, Chart Pattern Identification, Support & Resistance Analysis, Trading Setup Assessment, Technical Summary
 
 ### תבנית 3: Trade Performance & Portfolio Analysis
+
 **משתנים:**
+
 - Ticker Symbol
 - Date Range: [Start date - End date]
 - Analysis Focus: [Performance Review / Risk Assessment / Optimization Recommendations]
@@ -120,6 +138,7 @@
 - Trading Account: [אופציונלי - סינון לפי חשבון מסחר]
 
 **אינטגרציה עם מערכת:**
+
 - שימוש בנתוני Trades מהמערכת (`/api/trades/*`)
 - שימוש בנתוני Executions מהמערכת (`/api/executions/*`)
 - שימוש ב-Investment Types לסינון
@@ -129,7 +148,9 @@
 **מבנה:** Performance Overview, Trade Pattern Analysis, Risk Assessment, Execution Quality Review, Portfolio Optimization Recommendations, Action Plan
 
 ### תבנית 4: Risk & Conditions Analysis (מומלץ להוסיף)
+
 **משתנים:**
+
 - Ticker Symbol
 - Trade Plan ID: [אופציונלי - ניתוח תנאי תוכנית]
 - Trade ID: [אופציונלי - ניתוח תנאי טרייד]
@@ -137,6 +158,7 @@
 - Investment Type: [בחירה מ-Investment Types במערכת]
 
 **אינטגרציה עם מערכת:**
+
 - שימוש ב-Plan Conditions מהמערכת (`/api/trade-plans/{id}/conditions`)
 - שימוש ב-Trade Conditions מהמערכת (`/api/trades/{id}/conditions`)
 - שימוש ב-Alerts מהמערכת (`/api/alerts/*`)
@@ -152,6 +174,7 @@
 ### Backend Components
 
 #### 1. Database Models
+
 **קובץ:** `Backend/models/ai_analysis.py`
 
 ```python
@@ -194,6 +217,7 @@ class UserLLMProvider(BaseModel):
 ```
 
 #### 2. Services
+
 **קובץ:** `Backend/services/ai_analysis_service.py`
 
 ```python
@@ -219,12 +243,15 @@ class LLMProviderManager:
 ```
 
 #### 3. LLM Provider Adapters
+
 **קבצים:**
+
 - `Backend/services/llm_providers/base_provider.py` - ממשק בסיס
 - `Backend/services/llm_providers/gemini_provider.py` - Gemini adapter
 - `Backend/services/llm_providers/perplexity_provider.py` - Perplexity adapter
 
 **Base Provider Interface:**
+
 ```python
 class BaseLLMProvider:
     def send_prompt(self, prompt: str, api_key: str) -> dict
@@ -233,6 +260,7 @@ class BaseLLMProvider:
 ```
 
 #### 4. API Routes
+
 **קובץ:** `Backend/routes/api/ai_analysis.py`
 
 ```python
@@ -261,9 +289,11 @@ GET /api/ai-analysis/llm-provider
 ### Frontend Components
 
 #### 1. Main Page
+
 **קובץ:** `trading-ui/ai-analysis.html`
 
 **מבנה:**
+
 - בחירת תבנית (cards עם icons)
 - טופס משתנים דינמי לפי תבנית
 - בחירת מנוע LLM
@@ -277,6 +307,7 @@ GET /api/ai-analysis/llm-provider
 - היסטוריית ניתוחים
 
 #### 2. Services
+
 **קובץ:** `trading-ui/scripts/services/ai-analysis-data.js`
 
 ```javascript
@@ -295,7 +326,9 @@ window.AIAnalysisData = {
 ```
 
 #### 3. UI Components
+
 **קבצים:**
+
 - `trading-ui/scripts/ai-analysis-manager.js` - ניהול UI של ניתוחים
 - `trading-ui/scripts/ai-result-renderer.js` - רינדור תוצאות + אינפוגרפיקות
 - `trading-ui/scripts/ai-template-selector.js` - בחירת תבנית
@@ -303,9 +336,11 @@ window.AIAnalysisData = {
 - `trading-ui/scripts/ai-notes-integration.js` - אינטגרציה עם מערכת הערות
 
 #### 4. User Profile Integration
+
 **קובץ:** `trading-ui/user-profile.html` (עדכון)
 
 **תוספות:**
+
 - סקשן "הגדרות AI Analysis"
 - שדות API keys (Gemini + Perplexity)
 - בחירת מנוע ברירת מחדל
@@ -313,7 +348,9 @@ window.AIAnalysisData = {
 - Validation של API keys
 
 #### 5. Notes Integration
+
 **אינטגרציה עם מערכת הערות:**
+
 - שמירת תוצאות AI Analysis כהערה
 - קישור הערה לטיקר/טרייד/תוכנית מסחר
 - שימוש ב-NotesData.createNote()
@@ -321,11 +358,14 @@ window.AIAnalysisData = {
 - Rich Text Editor (Quill) לתמיכה ב-markdown
 
 **API:**
+
 - `POST /api/notes/` - יצירת הערה
 - `NotesData.createNote()` - Frontend service
 
 #### 6. Export Functionality
+
 **ייצוא תוצאות:**
+
 - ייצוא ל-PDF
 - ייצוא ל-Markdown
 - ייצוא ל-HTML
@@ -336,26 +376,33 @@ window.AIAnalysisData = {
 ## 🔗 אינטגרציה עם מערכות קיימות
 
 ### 1. מערכת התנאים (Conditions System)
+
 **שימוש:**
+
 - תבנית 2 (Technical Analysis): שימוש ב-Trading Methods להצגת תנאים טכניים
 - תבנית 4 (Risk & Conditions): שימוש ב-Plan Conditions ו-Trade Conditions
 
 **API:**
+
 - `/api/trading-methods` - רשימת שיטות מסחר
 - `/api/trade-plans/{id}/conditions` - תנאי תוכנית
 - `/api/trades/{id}/conditions` - תנאי טרייד
 
 **Frontend:**
+
 - `window.conditionsFormGenerator` - יצירת טפסי תנאים
 - `window.AlertConditionRenderer` - רינדור תנאים
 
 ### 2. סוגי השקעה (Investment Types)
+
 **שימוש:**
+
 - תבנית 1: סינון לפי Investment Type
 - תבנית 2: בחירת Investment Type לניתוח טכני
 - תבנית 3: סינון נתונים לפי Investment Type
 
 **ערכים:**
+
 - `swing` - סווינג
 - `investment` - השקעה
 - `passive` - פאסיבי
@@ -363,16 +410,20 @@ window.AIAnalysisData = {
 - `scalping` - סקלפינג
 
 **API:**
+
 - `/api/trades?investment_type=swing` - סינון טריידים
 - Business Rules: `Backend/services/business_logic/business_rules_registry.py`
 
 ### 3. מערכת הכפתורים (Button System)
+
 **שימוש:**
+
 - כל הכפתורים בעמוד דרך `data-onclick`
 - שימוש ב-`data-button-type` (ADD, TOGGLE, SORT, וכו')
 - שימוש ב-`ButtonSystem` ליצירת כפתורים דינמיים
 
 **דוגמה:**
+
 ```html
 <button 
   data-button-type="PRIMARY" 
@@ -384,66 +435,86 @@ window.AIAnalysisData = {
 ```
 
 ### 4. מערכת הצבעים הדינמיים (Color Scheme System)
+
 **שימוש:**
+
 - כל הצבעים מהעדפות (`PreferencesData.loadAllPreferencesRaw`)
 - שימוש ב-`ColorManager` לטעינת צבעים
 - שימוש ב-`updateCSSVariablesFromPreferences` לעדכון CSS Variables
 - אין hardcoded colors - הכל מהעדפות
 
 **Frontend:**
+
 - `window.ColorManager.loadAllColors()`
 - `window.updateCSSVariablesFromPreferences(preferences)`
 
 ### 5. מערכת הרינדור (Field Renderer Service)
+
 **שימוש:**
+
 - רינדור Status, Amount, Date, Badges
 - שימוש ב-`FieldRendererService.renderStatus()`
 - שימוש ב-`FieldRendererService.renderAmount()`
 
 **Frontend:**
+
 - `window.FieldRendererService.renderStatus(status, entityType)`
 - `window.FieldRendererService.renderAmount(amount, currency)`
 
 ### 6. מערכת המודלים (Modal Manager V2)
+
 **שימוש:**
+
 - מודל עזרה להסבר API keys
 - מודל עריכה של תבניות (אם נדרש)
 - מודל הצגת תוצאות מפורטות
 
 **Frontend:**
+
 - `window.ModalManagerV2.showModal(modalId, mode)`
 
 ### 7. מערכת התראות (Notification System)
+
 **שימוש:**
+
 - הודעות הצלחה/שגיאה
 - התראות על validation errors
 - התראות על API key validation
 
 **Frontend:**
+
 - `window.NotificationSystem.showSuccess(message)`
 - `window.NotificationSystem.showError(message)`
 
 ### 8. מערכת המטמון (Unified Cache System)
+
 **שימוש:**
+
 - מטמון תבניות פרומפטים
 - מטמון היסטוריית ניתוחים
 - מטמון הגדרות LLM Provider
 
 **Frontend:**
+
 - `window.UnifiedCacheManager.set(key, value, ttl)`
 - `window.UnifiedCacheManager.get(key)`
 - `window.CacheTTLGuard.wrap(fn, ttl)`
 
 ### 9. מערכת הטבלאות (Unified Table System)
+
 **שימוש:**
+
 - טבלת היסטוריית ניתוחים
 - טבלת תבניות (אם נדרש)
 
 **Frontend:**
+
 - `window.UnifiedTableSystem.renderTable(containerId, data, config)`
 
 ### 10. מערכת הנתונים (Data Services)
+
 **שימוש:**
+
 - `TradesData` - נתוני טריידים
 - `ExecutionsData` - נתוני ביצועים
 - `TradingAccountsData` - נתוני חשבונות
@@ -451,28 +522,34 @@ window.AIAnalysisData = {
 - `NotesData` - נתוני הערות
 
 **Frontend:**
+
 - `window.TradesData.loadTrades(filters)`
 - `window.ExecutionsData.loadExecutions(filters)`
 - `window.NotesData.createNote(options)` - יצירת הערה מתוצאות AI
 
 ### 11. מערכת הערות (Notes System)
+
 **שימוש:**
+
 - שמירת תוצאות AI Analysis כהערה
 - קישור הערה לטיקר/טרייד/תוכנית מסחר
 - Rich Text Editor לתמיכה ב-markdown
 
 **API:**
+
 - `POST /api/notes/` - יצירת הערה
 - `related_type_id`: 1=trading_account, 2=trade, 3=trade_plan, 4=ticker
 - `related_id`: ID של האובייקט המקושר
 - `content`: תוכן הערה (Rich text, עד 10000 תווים)
 
 **Frontend:**
+
 - `window.NotesData.createNote({ payload })` - יצירת הערה
 - `window.ModalManagerV2.showModal('notesModal', 'add')` - פתיחת מודל הערה
 - `notesModalConfig` - קונפיגורציה למודל הערה
 
 **זרימת שמירה כהערה:**
+
 1. משתמש לוחץ "שמור כהערה" על תוצאות ניתוח
 2. מודל בחירה: בחר טיקר/טרייד/תוכנית (אופציונלי)
 3. פתיחת מודל הערה עם תוכן מוכן (markdown → HTML)
@@ -486,6 +563,7 @@ window.AIAnalysisData = {
 ## 🎨 מבנה עמודים לפי ITCSS
 
 ### מבנה HTML
+
 ```html
 <!DOCTYPE html>
 <html lang="he" dir="rtl" class="ai-analysis-page">
@@ -525,6 +603,7 @@ window.AIAnalysisData = {
 ```
 
 ### כללי ITCSS
+
 1. **אין inline styles** - כל ה-styles ב-CSS files
 2. **אין styles בתוך HTML** - רק classes
 3. **שימוש במחלקות קיימות** - מקסימום שימוש במחלקות מ-ITCSS
@@ -540,6 +619,7 @@ window.AIAnalysisData = {
    - 09-utilities: Utilities
 
 ### CSS Files ליצירה
+
 **קובץ:** `trading-ui/styles-new/07-pages/_ai-analysis.css`
 
 ```css
@@ -560,9 +640,11 @@ window.AIAnalysisData = {
 ## ⚙️ מערכת איתחול וטעינה
 
 ### 1. עדכון Package Manifest
+
 **קובץ:** `trading-ui/scripts/init-system/package-manifest.js`
 
 **הוספת חבילה חדשה:**
+
 ```javascript
 'ai-analysis': {
   id: 'ai-analysis',
@@ -608,6 +690,7 @@ window.AIAnalysisData = {
 ```
 
 ### 2. עדכון Page Initialization Configs
+
 **קובץ:** `trading-ui/scripts/page-initialization-configs.js`
 
 ```javascript
@@ -650,6 +733,7 @@ window.AIAnalysisData = {
 ```
 
 ### 3. עדכון User Profile Config
+
 **קובץ:** `trading-ui/scripts/page-initialization-configs.js`
 
 ```javascript
@@ -665,6 +749,7 @@ window.AIAnalysisData = {
 ## ✏️ מערכת עריכה של תבניות
 
 ### מבנה תבנית ב-DB
+
 ```json
 {
   "name": "Equity Research Analysis",
@@ -700,15 +785,18 @@ window.AIAnalysisData = {
 ```
 
 ### ממשק עריכה (אם נדרש)
+
 **קובץ:** `trading-ui/scripts/ai-template-editor.js`
 
 **תכונות:**
+
 - עריכת prompt text
 - עריכת משתנים (הוספה/מחיקה/עריכה)
 - Preview של תבנית
 - Validation לפני שמירה
 
 **API:**
+
 - `POST /api/ai-analysis/templates` - יצירת תבנית
 - `PUT /api/ai-analysis/templates/{id}` - עדכון תבנית
 - `DELETE /api/ai-analysis/templates/{id}` - מחיקת תבנית
@@ -718,31 +806,39 @@ window.AIAnalysisData = {
 ## 🧪 בדיקות מקיפות
 
 ### 1. Unit Tests (Backend)
+
 **קבצים:**
+
 - `Backend/tests/test_ai_analysis_service.py`
 - `Backend/tests/test_llm_providers.py`
 - `Backend/tests/test_prompt_template_service.py`
 
 **בדיקות:**
+
 - יצירת ניתוח
 - שמירת תבנית
 - Validation של API keys
 - Parsing של responses
 
 ### 2. Integration Tests
+
 **קבצים:**
+
 - `Backend/tests/test_ai_analysis_api.py`
 - `Backend/tests/test_llm_integration.py`
 
 **בדיקות:**
+
 - API endpoints
 - אינטגרציה עם LLM providers
 - Error handling
 
 ### 3. Browser Tests (מלא)
+
 **קובץ:** `trading-ui/tests/ai-analysis-browser-tests.js`
 
 **בדיקות:**
+
 - טעינת עמוד
 - בחירת תבנית
 - מילוי טופס
@@ -752,20 +848,26 @@ window.AIAnalysisData = {
 - ניהול API keys
 
 ### 4. E2E Tests
+
 **בדיקות:**
+
 - זרימה מלאה: בחירת תבנית → מילוי משתנים → יצירת ניתוח → הצגת תוצאות
 - זרימת API keys: הוספת key → validation → שימוש
 - זרימת היסטוריה: יצירת ניתוח → שמירה → הצגה בהיסטוריה
 
 ### 5. Performance Tests
+
 **בדיקות:**
+
 - זמן תגובה של LLM providers
 - זמן טעינת עמוד
 - זמן רינדור תוצאות
 - זמן טעינת היסטוריה
 
 ### 6. Security Tests
+
 **בדיקות:**
+
 - הצפנת API keys
 - Validation של API keys
 - Authorization (רק משתמש יכול לראות את הניתוחים שלו)
@@ -776,11 +878,13 @@ window.AIAnalysisData = {
 ## 📋 שלבי יישום
 
 ### שלב 1: דוקומנטציה (FIRST)
+
 1. כתיבת כל הדוקומנטציה (Developer Guide, User Guide, API Docs, Test Plan)
 2. עדכון INDEX.md
 3. עדכון GENERAL_SYSTEMS_LIST.md
 
 ### שלב 2: Backend Foundation
+
 1. יצירת מודלים ב-DB (`ai_analysis.py`)
 2. Migration script ליצירת טבלאות
 3. יצירת base provider interface
@@ -791,6 +895,7 @@ window.AIAnalysisData = {
 8. יצירת LLMProviderManager
 
 ### שלב 3: API Layer
+
 1. יצירת routes ב-`ai_analysis.py`
 2. אינטגרציה עם authentication
 3. Validation של inputs
@@ -798,6 +903,7 @@ window.AIAnalysisData = {
 5. Encryption של API keys
 
 ### שלב 4: Frontend - User Profile
+
 1. הוספת סקשן API keys ב-`user-profile.html`
 2. יצירת מודל עזרה עם הסברים
 3. שמירת הגדרות ב-DB
@@ -805,6 +911,7 @@ window.AIAnalysisData = {
 5. אינטגרציה עם מערכת הכפתורים
 
 ### שלב 5: Frontend - Main Page
+
 1. יצירת `ai-analysis.html` לפי מבנה ITCSS
 2. UI לבחירת תבנית (cards)
 3. טופס דינמי למשתנים
@@ -814,6 +921,7 @@ window.AIAnalysisData = {
 7. אינטגרציה עם מערכת הצבעים
 
 ### שלב 6: Result Rendering
+
 1. יצירת `ai-result-renderer.js`
 2. Parsing של markdown responses
 3. תמיכה באינפוגרפיקות (charts/tables)
@@ -837,12 +945,14 @@ window.AIAnalysisData = {
    - המרת markdown ל-HTML נקי
 
 ### שלב 7: איתחול וטעינה
+
 1. עדכון package-manifest.js
 2. עדכון page-initialization-configs.js
 3. בדיקת טעינה מדויקת
 4. בדיקת ניטור מערכת
 
 ### שלב 8: אינטגרציה עם מערכות
+
 1. אינטגרציה עם Conditions System
 2. אינטגרציה עם Investment Types
 3. אינטגרציה עם Trading Methods
@@ -861,6 +971,7 @@ window.AIAnalysisData = {
 7. אינטגרציה עם כל המערכות האחרות
 
 ### שלב 9: בדיקות
+
 1. Unit Tests
 2. Integration Tests
 3. Browser Tests (מלא)
@@ -869,6 +980,7 @@ window.AIAnalysisData = {
 6. Security Tests
 
 ### שלב 10: עדכון דוקומנטציה
+
 1. עדכון Developer Guide לפי יישום בפועל
 2. עדכון User Guide לפי יישום בפועל
 3. עדכון API Docs לפי יישום בפועל
@@ -878,6 +990,7 @@ window.AIAnalysisData = {
 ## 📦 קבצים עיקריים ליצירה/עדכון
 
 ### Backend
+
 - `Backend/models/ai_analysis.py` (חדש)
 - `Backend/services/ai_analysis_service.py` (חדש)
 - `Backend/services/llm_providers/base_provider.py` (חדש)
@@ -890,6 +1003,7 @@ window.AIAnalysisData = {
 **הערה:** אין צורך ב-API נוסף ל-Notes - משתמשים ב-`/api/notes/` הקיים
 
 ### Frontend
+
 - `trading-ui/ai-analysis.html` (חדש)
 - `trading-ui/scripts/services/ai-analysis-data.js` (חדש)
 - `trading-ui/scripts/ai-analysis-manager.js` (חדש)
@@ -904,6 +1018,7 @@ window.AIAnalysisData = {
 **הערה:** אין צורך בעדכון `notes-config.js` - משתמשים בקונפיגורציה הקיימת
 
 ### Documentation
+
 - `documentation/04-FEATURES/AI_ANALYSIS_SYSTEM_DEVELOPER_GUIDE.md` (חדש)
 - `documentation/04-FEATURES/AI_ANALYSIS_SYSTEM_USER_GUIDE.md` (חדש)
 - `documentation/backend/AI_ANALYSIS_API.md` (חדש)
@@ -912,6 +1027,7 @@ window.AIAnalysisData = {
 - `documentation/04-FEATURES/AI_ANALYSIS_SYSTEM_TEST_PLAN.md` (חדש)
 
 ### Configuration
+
 - `trading-ui/scripts/init-system/package-manifest.js` (עדכון)
 - `trading-ui/scripts/page-initialization-configs.js` (עדכון)
 
@@ -920,27 +1036,32 @@ window.AIAnalysisData = {
 ## 🔐 אבטחה
 
 ### 1. הצפנת API Keys
+
 - שימוש ב-`cryptography` library
 - הצפנה לפני שמירה ב-DB
 - פענוח רק בעת שימוש
 - API keys לעולם לא נשלחים ל-frontend
 
 ### 2. Authorization
+
 - רק משתמש יכול לראות את הניתוחים שלו
 - Validation של user_id בכל request
 - API keys מוצפנים וקשורים למשתמש ספציפי
 
 ### 3. Rate Limiting
+
 - הגבלת בקשות למנוע abuse
 - Rate limiting per user
 - Timeout handling ל-LLM requests
 
 ### 4. Input Validation
+
 - Validation של כל ה-inputs
 - Sanitization של markdown responses
 - XSS prevention בתוצאות
 
 ### 5. Notes Integration Security
+
 - Validation של related_type_id ו-related_id
 - Authorization - רק משתמש יכול ליצור הערה
 - Content sanitization לפני שמירה
@@ -950,12 +1071,14 @@ window.AIAnalysisData = {
 ## 📊 מחקר מנועי LLM
 
 ### Perplexity AI
+
 - **Free Tier:** יש API חינמי עם מגבלות
 - **Pricing:** Pay-per-use model
 - **Documentation:** https://docs.perplexity.ai
 - **Features:** Real-time web search, citations
 
 ### Google Gemini
+
 - **Free Tier:** יש API חינמי (Gemini 1.5 Flash)
 - **Pricing:** Free tier עם quotas יומיים
 - **Documentation:** https://ai.google.dev/docs

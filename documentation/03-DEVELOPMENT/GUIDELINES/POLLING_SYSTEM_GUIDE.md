@@ -1,4 +1,5 @@
 # Polling System Guide - TikTrack
+
 ## מדריך מערכת Polling לעדכוני Cache אוטומטיים
 
 **תאריך:** 13 ינואר 2025  
@@ -9,9 +10,11 @@
 
 ## 📋 תקציר
 
-### מה זה Polling System?
+### מה זה Polling System
+
 מערכת שבודקת כל 10 שניות האם היו שינויים ב-cache במערכת.  
 **פתרון פשוט ויציב** למקרים של:
+
 - 2 tabs פתוחים
 - Background tasks שמעדכנים נתונים
 - 2 users במערכת
@@ -22,7 +25,7 @@
 
 ## 🏗️ ארכיטקטורה
 
-### רכיבים:
+### רכיבים
 
 ```
 Frontend (polling-manager.js)
@@ -56,6 +59,7 @@ class CacheChangeLog:
 ```
 
 **שימוש:**
+
 ```python
 log = CacheChangeLog(
     keys=['trades', 'dashboard'],
@@ -73,6 +77,7 @@ db.commit()
 **קובץ:** `Backend/services/cache_changes_tracker.py`
 
 **מתודות:**
+
 ```python
 # Log change
 cache_changes_tracker.log_change(
@@ -97,12 +102,14 @@ deleted = cache_changes_tracker.cleanup_old_logs(days_to_keep=7)
 **Route:** `GET /api/cache/changes`
 
 **Parameters:**
+
 ```
 ?since=2025-01-13T02:30:00.000Z  (optional, default: last 60s)
 ?limit=100                        (optional, default: 100)
 ```
 
 **Response:**
+
 ```json
 {
     "changes": [
@@ -144,6 +151,7 @@ def create_trade():
 **קובץ:** `trading-ui/scripts/modules/polling-manager.js`
 
 **מתודות:**
+
 ```javascript
 // Start polling (every 10 seconds)
 window.PollingManager.start();
@@ -160,6 +168,7 @@ const stats = window.PollingManager.getStats();
 ```
 
 **Flow:**
+
 ```javascript
 1. Polling starts (every 10s)
 2. Fetch /api/cache/changes?since=lastCheck
@@ -182,6 +191,7 @@ Polling עובד רק כל 10 שניות.
 LocalStorage Events עובדים **מיידית** בין tabs!
 
 **איך זה עובד:**
+
 ```javascript
 // Tab 1: משתמש מנקה cache
 window.LocalStorageSync.broadcast(['trades', 'tickers']);
@@ -197,19 +207,24 @@ window.LocalStorageSync.broadcast(['trades', 'tickers']);
 ## 🎯 תרחישי שימוש
 
 ### תרחיש 1: Single User, Single Tab
+
 **מה קורה:**
+
 ```
 1. User creates trade
 2. CRUD invalidation: cache cleared immediately ✅
 3. Table refreshed immediately ✅
 4. Polling: no effect (already updated)
 ```
+
 **Delay:** 0 שניות (מיידי)
 
 ---
 
 ### תרחיש 2: Single User, 2 Tabs
+
 **מה קורה:**
+
 ```
 Tab 1: User creates trade
     ↓
@@ -219,9 +234,11 @@ Tab 1: clearAllCache() → LocalStorage.broadcast()
     ↓
 Tab 2: Storage event → cache cleared → refresh
 ```
+
 **Delay:** <100ms (כמעט מיידי!)
 
 **Alternative flow (without manual clear):**
+
 ```
 Tab 1: User creates trade
     ↓
@@ -229,12 +246,15 @@ Backend: Logs to cache_change_log
     ↓
 Tab 2: Polling (every 10s) → detects change → refresh
 ```
+
 **Delay:** עד 10 שניות
 
 ---
 
 ### תרחיש 3: Background Task
+
 **מה קורה:**
+
 ```
 Backend Task: Updates prices automatically
     ↓
@@ -242,12 +262,15 @@ Backend Task: Updates prices automatically
     ↓
 All Frontend tabs: Polling detects change → refresh
 ```
+
 **Delay:** עד 10 שניות
 
 ---
 
 ### תרחיש 4: 2 Users
+
 **מה קורה:**
+
 ```
 User A: Creates trade
     ↓
@@ -255,6 +278,7 @@ Backend: Logs to cache_change_log
     ↓
 User B: Polling detects change → refresh
 ```
+
 **Delay:** עד 10 שניות
 
 ---
@@ -266,12 +290,14 @@ User B: Polling detects change → refresh
 **Default:** 10 seconds (10000ms)
 
 **לשנות:**
+
 ```javascript
 // התחל עם תדירות אחרת (5 seconds):
 window.PollingManager.start(5000);
 ```
 
 **המלצות:**
+
 - **5s** - אם צריך real-time יותר (יותר עומס על שרת)
 - **10s** - ברירת מחדל (מאוזן)
 - **30s** - אם עומס על שרת (עדיין OK)
@@ -283,6 +309,7 @@ window.PollingManager.start(5000);
 **Default:** שמירה של 7 ימים
 
 **לשנות ב-Backend:**
+
 ```python
 # Cleanup old logs (keep only 3 days)
 cache_changes_tracker.cleanup_old_logs(days_to_keep=3)
@@ -290,6 +317,7 @@ cache_changes_tracker.cleanup_old_logs(days_to_keep=3)
 
 **אוטומטי:**  
 הוסף background task שרץ פעם ביום:
+
 ```python
 @background_task(schedule='daily')
 def cleanup_cache_logs():
@@ -301,6 +329,7 @@ def cleanup_cache_logs():
 ## 🧪 Testing
 
 ### Test 1: Polling Works
+
 ```javascript
 // Console:
 window.PollingManager.getStats()
@@ -317,6 +346,7 @@ window.PollingManager.getStats()
 ---
 
 ### Test 2: Multi-Tab Works
+
 ```javascript
 // Tab 1: Open trades page
 // Tab 2: Open trades page
@@ -332,6 +362,7 @@ window.PollingManager.getStats()
 ---
 
 ### Test 3: Backend Logging
+
 ```bash
 # Create a trade via API
 curl -X POST http://localhost:8080/api/trades ...
@@ -353,6 +384,7 @@ curl http://localhost:8080/api/cache/changes?since=...
 ## 🐛 Troubleshooting
 
 ### בעיה: "Polling not starting"
+
 ```javascript
 // Check if PollingManager loaded:
 console.log(window.PollingManager);  // should be defined
@@ -368,6 +400,7 @@ window.PollingManager.start();
 ---
 
 ### בעיה: "Getting 404 on /api/cache/changes"
+
 ```bash
 # Check if blueprint registered:
 curl http://localhost:8080/api/cache/changes
@@ -379,6 +412,7 @@ curl http://localhost:8080/api/cache/changes
 ---
 
 ### בעיה: "Table doesn't exist"
+
 ```bash
 # Check if migration ran:
 sqlite3 Backend/db/simpleTrade_new.db "SELECT * FROM cache_change_log LIMIT 1;"
@@ -392,6 +426,7 @@ sqlite3 Backend/db/simpleTrade_new.db < Backend/migrations/add_cache_change_log_
 ## 📊 Monitoring
 
 ### Check Polling Status
+
 ```javascript
 // In browser console:
 const stats = window.PollingManager.getStats();
@@ -407,6 +442,7 @@ console.table(stats);
 ```
 
 ### Check Change Logs
+
 ```bash
 # Via API:
 curl "http://localhost:8080/api/cache/changes/stats" | python3 -m json.tool
@@ -424,6 +460,7 @@ curl "http://localhost:8080/api/cache/changes/stats" | python3 -m json.tool
 ## 💡 Best Practices
 
 ### 1. בדוק שהPolling רץ
+
 ```javascript
 // בDOMContentLoaded או init:
 if (window.PollingManager) {
@@ -432,18 +469,21 @@ if (window.PollingManager) {
 ```
 
 ### 2. Cleanup logs באופן קבוע
+
 ```python
 # Background task - daily:
 cache_changes_tracker.cleanup_old_logs(days_to_keep=7)
 ```
 
 ### 3. LocalStorage לMulti-Tab
+
 ```javascript
 // ב-clearAllCache() או CRUD operations:
 window.LocalStorageSync.broadcast(['trades', 'dashboard']);
 ```
 
 ### 4. תדירות מותאמת
+
 ```javascript
 // לשרת עמוס → הפחת תדירות:
 window.PollingManager.start(30000);  // 30 seconds
@@ -454,17 +494,20 @@ window.PollingManager.start(30000);  // 30 seconds
 ## 🔚 סיכום
 
 **Polling System:**
+
 - ✅ פשוט - אין WebSocket/Socket.IO
 - ✅ יציב - לא תלוי בconnection
 - ✅ Multi-tab - עם LocalStorage sync
 - ⚠️ Delay - עד 10s (נדיר)
 
 **מתאים עבור:**
+
 - ✅ מערכות single/few users
 - ✅ שינויים לא תכופים
 - ✅ כשיציבות חשובה יותר מreal-time
 
 **לא מתאים עבור:**
+
 - ❌ מערכות real-time קריטיות
 - ❌ הרבה users (עומס על שרת)
 - ❌ שינויים כל שנייה

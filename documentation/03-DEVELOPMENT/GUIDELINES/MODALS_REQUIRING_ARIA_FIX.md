@@ -1,4 +1,5 @@
 # רשימת Modals שדורשים תיקון ARIA
+
 # ========================================
 
 **תאריך:** 11 אוקטובר 2025  
@@ -10,18 +11,22 @@
 ## ✅ **כבר תוקנו (6 modals)**
 
 ### **1. core-systems.js (3 modals):**
+
 - ✅ `finalSuccessModal` - showFinalSuccessNotification() - שורה ~2200
 - ✅ `clearCacheConfirmationModal` - showClearCacheConfirmation() - שורה ~2105
 - ✅ `detailedNotificationModal` - showDetailedNotification() - שורה ~3060
 
 ### **2. warning-system.js (1 modal):**
+
 - ✅ confirmation modal - showConfirmationDialog() - שורה ~145
 
 ### **3. entity-details-modal.js (1 modal):**
+
 - ✅ `entityDetailsModal` - createModalStructure() - שורה ~95
 - **תיקון:** הסרת `aria-hidden="true"` מה-HTML (modal סטטי)
 
 ### **4. linked-items.js (1 modal):**
+
 - ✅ linked items modal - createModal() - שורה ~945
 - **תיקון:** MutationObserver inline (modal דינמי)
 
@@ -32,12 +37,14 @@
 ## ⏸️ **נותר לתיקון (7 קבצים)**
 
 ### **קובץ 1: server-monitor.js**
+
 **מיקום:** `trading-ui/scripts/server-monitor.js`  
 **עמוד:** `server-monitor.html`  
 **שימוש:** מוניטור שרת - כלי פיתוח  
 **קריטיות:** 🟡 בינונית
 
 **Modals לתיקון:**
+
 ```bash
 grep -n "insertAdjacentHTML.*modal" trading-ui/scripts/server-monitor.js
 grep -n "new bootstrap.Modal" trading-ui/scripts/server-monitor.js
@@ -48,12 +55,14 @@ grep -n "new bootstrap.Modal" trading-ui/scripts/server-monitor.js
 ---
 
 ### **קובץ 2: system-management.js**
+
 **מיקום:** `trading-ui/scripts/system-management.js`  
 **עמוד:** `system-management.html`  
 **שימוש:** ניהול מערכת - כלי פיתוח  
 **קריטיות:** 🟡 בינונית
 
 **Modals לתיקון:**
+
 ```bash
 grep -n "insertAdjacentHTML.*modal" trading-ui/scripts/system-management.js
 ```
@@ -63,12 +72,14 @@ grep -n "insertAdjacentHTML.*modal" trading-ui/scripts/system-management.js
 ---
 
 ### **קובץ 3: css-management.js**
+
 **מיקום:** `trading-ui/scripts/css-management.js`  
 **עמוד:** כלי ניהול CSS  
 **שימוש:** ניהול CSS duplicates - כלי פיתוח  
 **קריטיות:** 🟡 בינונית
 
 **Modals לתיקון:**
+
 ```bash
 grep -n "modal fade" trading-ui/scripts/css-management.js
 ```
@@ -78,12 +89,14 @@ grep -n "modal fade" trading-ui/scripts/css-management.js
 ---
 
 ### **קובץ 4: linter-realtime-monitor.js**
+
 **מיקום:** `trading-ui/scripts/linter-realtime-monitor.js`  
 **עמוד:** `linter-realtime-monitor.html`  
 **שימוש:** Linter monitor - כלי פיתוח  
 **קריטיות:** 🟢 נמוכה
 
 **Modals לתיקון:**
+
 ```bash
 grep -n "modal fade" trading-ui/scripts/linter-realtime-monitor.js
 ```
@@ -93,12 +106,14 @@ grep -n "modal fade" trading-ui/scripts/linter-realtime-monitor.js
 ---
 
 ### **קובץ 5: constraints.js**
+
 **מיקום:** `trading-ui/scripts/constraints.js`  
 **עמוד:** ניהול אילוצים  
 **שימוש:** database constraints - כלי פיתוח  
 **קריטיות:** 🟢 נמוכה
 
 **Modals לתיקון:**
+
 ```bash
 grep -n "modal fade" trading-ui/scripts/constraints.js
 ```
@@ -108,6 +123,7 @@ grep -n "modal fade" trading-ui/scripts/constraints.js
 ---
 
 ### **~~קובץ 6: entity-details-modal.js~~** ✅ **תוקן!**
+
 **מיקום:** `trading-ui/scripts/entity-details-modal.js`  
 **עמוד:** כל העמודים (שימוש כללי)  
 **שימוש:** הצגת פרטי ישויות - **משתמש קצה**  
@@ -120,6 +136,7 @@ grep -n "modal fade" trading-ui/scripts/constraints.js
 ---
 
 ### **~~קובץ 7: linked-items.js~~** ✅ **תוקן!**
+
 **מיקום:** `trading-ui/scripts/linked-items.js`  
 **עמוד:** כל העמודים (שימוש כללי)  
 **שימוש:** פריטים מקושרים - **משתמש קצה**  
@@ -132,12 +149,14 @@ grep -n "modal fade" trading-ui/scripts/constraints.js
 ---
 
 ### **קובץ 8: entity-details-system.js**
+
 **מיקום:** `trading-ui/scripts/entity-details-system/entity-details-system.js`  
 **עמוד:** כל העמודים  
 **שימוש:** מערכת פרטי ישויות  
 **קריטיות:** 🟡 בינונית
 
 **Modals לתיקון:**
+
 ```bash
 grep -n "modal fade" trading-ui/scripts/entity-details-system/entity-details-system.js
 ```
@@ -149,15 +168,18 @@ grep -n "modal fade" trading-ui/scripts/entity-details-system/entity-details-sys
 ## 🎯 **סדר עדיפויות מומלץ**
 
 ### **~~עדיפות 1 (קריטי - משתמש קצה):~~** ✅ **הושלם!**
+
 1. ✅ ~~`entity-details-modal.js`~~ - **תוקן!**
 2. ✅ ~~`linked-items.js`~~ - **תוקן!**
 
 ### **עדיפות 2 (חשוב - כלי פיתוח תכופים):**
+
 3. `server-monitor.js` - משתמשים בו הרבה
 4. `system-management.js` - משתמשים בו הרבה
 5. `css-management.js` - 8 modals, שווה לתקן
 
 ### **עדיפות 3 (נמוך - שימוש נדיר):**
+
 6. `linter-realtime-monitor.js`
 7. `constraints.js`
 8. `entity-details-system.js`
@@ -205,6 +227,7 @@ grep -n "new bootstrap.Modal" trading-ui/scripts/FILE.js
 ## 📝 **Template לתיקון**
 
 ### **חפש דפוס זה:**
+
 ```javascript
 document.body.insertAdjacentHTML('beforeend', modalHtml);
 const modalElement = document.getElementById('MODAL_ID');
@@ -213,11 +236,13 @@ modal.show();
 ```
 
 ### **החלף ב:**
+
 ```javascript
 const modal = window.createAndShowModal(modalHtml, 'MODAL_ID');
 ```
 
 ### **אם יש event listeners:**
+
 ```javascript
 // לפני
 document.body.insertAdjacentHTML('beforeend', modalHtml);
@@ -251,6 +276,7 @@ document.getElementById('cancel-btn').onclick = () => { ... };
 ✅ דוגמאות לפני/אחרי  
 
 **כשתרצה לתקן modal:**
+
 1. פתח את המדריך הזה
 2. העתק את ה-Template
 3. החלף בקובץ

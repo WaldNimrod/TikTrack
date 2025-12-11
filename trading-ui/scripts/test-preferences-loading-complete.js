@@ -9,6 +9,21 @@
  * Documentation: See documentation/02-ARCHITECTURE/FRONTEND/PREFERENCES_LOADING_BEST_PRACTICES.md
  */
 
+
+// ===== FUNCTION INDEX =====
+// === Class Methods ===
+// - PreferencesLoadingCompleteTest.checkFlags() - Checkflags
+// - PreferencesLoadingCompleteTest.checkLoadOrder() - Checkloadorder
+// - PreferencesLoadingCompleteTest.cleanupEventListeners() - Cleanupeventlisteners
+// - PreferencesLoadingCompleteTest.generateJSONReport() - Generatejsonreport
+// - PreferencesLoadingCompleteTest.measurePerformance() - Measureperformance
+// - PreferencesLoadingCompleteTest.printSummary() - Printsummary
+// - PreferencesLoadingCompleteTest.setupEventListeners() - Setupeventlisteners
+// - PreferencesLoadingCompleteTest.updatePerformanceMetrics() - Updateperformancemetrics
+
+// === Event Handlers ===
+// - handler() - Handler
+
 (function() {
   'use strict';
 

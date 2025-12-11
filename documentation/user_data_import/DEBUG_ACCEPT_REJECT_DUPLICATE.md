@@ -1,11 +1,13 @@
 # דיבוג - בעיית Accept/Reject Duplicate
 
 ## הבעיה
+
 כאשר מאשרים או דוחים כפילות, הרשומה עדיין מוצגת לדילוג בשלב 3 ולא מיובאת בפועל.
 
 ## זרימת הנתונים
 
 ### 1. Accept Duplicate (`accept_duplicate`)
+
 - **מיקום**: `Backend/services/user_data_import/import_orchestrator.py` שורה 4159
 - **פעולה**:
   1. טוען `preview_data` מה-cache/database
@@ -14,6 +16,7 @@
   4. מעדכן את ה-cache עם `_update_preview_cache`
 
 ### 2. Reject Duplicate (`reject_duplicate`)
+
 - **מיקום**: `Backend/services/user_data_import/import_orchestrator.py` שורה 4262
 - **פעולה**:
   1. טוען `preview_data` מה-cache/database
@@ -22,6 +25,7 @@
   4. מעדכן את ה-cache עם `_update_preview_cache`
 
 ### 3. Execute Import (`execute_import`)
+
 - **מיקום**: `Backend/services/user_data_import/import_orchestrator.py` שורה 2443
 - **בעיה**: בשורה 2487, הפונקציה קוראת ל-`generate_preview` מחדש
 - **התוצאה**: כל השינויים שבוצעו ב-`accept_duplicate` נמחקים!
@@ -29,6 +33,7 @@
 ## דרכי דיבוג
 
 ### 1. הוספת לוגים ב-`accept_duplicate`
+
 ```python
 logger.info(f"🔍 [ACCEPT_DUPLICATE] Before: records_to_import={len(preview_data.get('records_to_import', []))}, records_to_skip={len(preview_data.get('records_to_skip', []))}")
 # ... קוד accept ...
@@ -37,6 +42,7 @@ logger.info(f"🔍 [ACCEPT_DUPLICATE] Moved record_index={record_index} from ski
 ```
 
 ### 2. הוספת לוגים ב-`execute_import`
+
 ```python
 logger.info(f"🔍 [EXECUTE_IMPORT] Before generate_preview: Loading preview from cache...")
 preview_data = self._ensure_preview_data(session_id, session=import_session)
@@ -44,6 +50,7 @@ logger.info(f"🔍 [EXECUTE_IMPORT] Preview from cache: records_to_import={len(p
 ```
 
 ### 3. בדיקת Cache
+
 ```python
 # ב-`_update_preview_cache`:
 logger.info(f"🔍 [UPDATE_CACHE] Updating cache for session {session_id}")
@@ -55,6 +62,7 @@ logger.info(f"🔍 [ENSURE_PREVIEW] From cache: {bool(cached_preview)}, From DB:
 ```
 
 ### 4. בדיקת Frontend
+
 ```javascript
 // ב-`acceptDuplicate`:
 console.log('🔍 [ACCEPT] Before:', {
@@ -72,12 +80,15 @@ console.log('🔍 [ACCEPT] After refresh:', {
 ## פתרון אפשרי
 
 ### שינוי ב-`execute_import`
+
 במקום:
+
 ```python
 preview_result = self.generate_preview(session_id, requested_task_type, selected_types=selected_types)
 ```
 
 להשתמש ב:
+
 ```python
 preview_data = self._ensure_preview_data(session_id, session=import_session)
 if not preview_data:
@@ -89,6 +100,7 @@ else:
 ```
 
 ## קבצים לבדיקה
+
 - `Backend/services/user_data_import/import_orchestrator.py`:
   - `accept_duplicate` (שורה 4159)
   - `reject_duplicate` (שורה 4262)

@@ -9,6 +9,7 @@
 ## 🎯 מטרה
 
 לתקן את תהליך שמירת הערות מ-AI Analysis כך שהוא יעבוד בהתאם לארכיטקטורה הקיימת:
+
 - שימוש ב-Business Logic Layer
 - ולידציה לפני יצירה
 - לוגים מפורטים לניטור
@@ -18,7 +19,7 @@
 
 ## 📊 אבחון הבעיה
 
-### בעיות זוהו:
+### בעיות זוהו
 
 1. **תוכן לא מועבר לשרת** - התוכן נאסף ב-frontend אבל לא מגיע ל-backend
 2. **user_id לא מועבר** - ה-user_id לא נוסף ל-note_data (תוקן בקוד אבל השרת לא רענן)
@@ -29,7 +30,7 @@
 
 ## 🏗️ ארכיטקטורה קיימת
 
-### Business Logic Layer:
+### Business Logic Layer
 
 - ✅ **NoteBusinessService** קיים: `Backend/services/business_logic/note_business_service.py`
 - ✅ **API endpoint** קיים: `/api/business/note/validate`
@@ -38,7 +39,7 @@
   2. Business Rules Registry
   3. Complex Business Rules
 
-### ארכיטקטורה מומלצת:
+### ארכיטקטורה מומלצת
 
 ```
 Frontend (saveNote)
@@ -70,6 +71,7 @@ Create Note
 **שינויים:**
 
 1. **הוספת Business Logic Service ל-create_note:**
+
    ```python
    from services.business_logic import NoteBusinessService
    
@@ -93,11 +95,13 @@ Create Note
    ```
 
 2. **שיפור לוגים:**
+
    ```python
    logger.info(f"Creating note with data: content_length={len(content)}, related_type_id={related_type_id}, related_id={related_id}, user_id={user_id}")
    ```
 
 3. **לוגים לפני ולידציה:**
+
    ```python
    logger.debug(f"Note data before validation: {note_data}")
    ```
@@ -107,11 +111,13 @@ Create Note
 **בעיה:** התוכן לא מועבר לשרת
 
 **בדיקה נדרשת:**
+
 - בדיקה מה נשלח בפועל ב-request body
 - אימות ש-`request.get_json()` מחזיר את התוכן
 - אימות ש-sanitization לא מוחק את התוכן
 
 **תיקון:**
+
 ```python
 # בדיקת תוכן לפני sanitization
 if not content or len(content.strip()) == 0:
@@ -134,6 +140,7 @@ if len(content) != original_length:
 **קובץ:** `trading-ui/scripts/notes.js` או `trading-ui/scripts/modal-configs/notes-config.js`
 
 **שינוי אופציונלי:**
+
 - קריאה ל-`/api/business/note/validate` לפני שליחת ה-create request
 - הצגת שגיאות ולידציה למשתמש לפני ניסיון שמירה
 
@@ -141,7 +148,7 @@ if len(content) != original_length:
 
 ## 📝 לוגים מפורטים לניטור
 
-### Backend - לוגים מומלצים:
+### Backend - לוגים מומלצים
 
 ```python
 # תחילת create_note
@@ -171,7 +178,7 @@ logger.info(f"✅ Note created successfully: id={note.id}")
 
 ## 🧪 בדיקות נדרשות
 
-### 1. בדיקת איסוף תוכן:
+### 1. בדיקת איסוף תוכן
 
 ```python
 # בדיקה מה נשלח בפועל
@@ -180,7 +187,7 @@ logger.info(f"🔍 DEBUG: Full request data: {data}")
 logger.info(f"🔍 DEBUG: Content type: {type(data.get('content'))}, Value: {data.get('content')[:100] if data.get('content') else 'None'}")
 ```
 
-### 2. בדיקת user_id:
+### 2. בדיקת user_id
 
 ```python
 # בדיקה שה-user_id נכון
@@ -188,7 +195,7 @@ user_id = getattr(g, 'user_id', None)
 logger.info(f"🔍 DEBUG: User ID from context: {user_id}, Type: {type(user_id)}")
 ```
 
-### 3. בדיקת ולידציה:
+### 3. בדיקת ולידציה
 
 ```python
 # בדיקת תוצאות ולידציה
@@ -221,12 +228,14 @@ logger.info(f"🔍 DEBUG: Validation result: {validation_result}")
 
 ## 📚 קבצים לשינוי
 
-### Backend:
+### Backend
+
 1. `Backend/routes/api/notes.py` - הוספת Business Logic Layer
 2. `Backend/routes/api/notes.py` - שיפור לוגים
 3. `Backend/routes/api/notes.py` - תיקון איסוף תוכן
 
-### Frontend (אופציונלי):
+### Frontend (אופציונלי)
+
 1. `trading-ui/scripts/notes.js` - ולידציה לפני שליחה
 
 ---

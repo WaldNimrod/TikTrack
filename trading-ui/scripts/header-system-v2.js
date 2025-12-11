@@ -22,6 +22,21 @@
  * @lastUpdated November 23, 2025
  */
 
+
+// ===== FUNCTION INDEX =====
+// === Class Methods ===
+// - MenuManager.closeMenu() - Closemenu
+// - MenuManager.init() - Init
+// - MenuManager.openMenu() - Openmenu
+// - MenuManager.setupHoverBehavior() - Setuphoverbehavior
+
+// === Event Handlers ===
+// - positionSubmenu() - Positionsubmenu
+// - debouncedPositionSubmenu() - Debouncedpositionsubmenu
+
+// === Other ===
+// - clearTimeouts() - Cleartimeouts
+
 if (window.Logger) {
   window.Logger.info('🚀 Loading Header System v7.0.0...', { page: 'header-system' });
 }
@@ -1105,6 +1120,9 @@ class HeaderSystem {
                             <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/trade-history-page.html">📈 היסטוריית טרייד</a></li>
                             <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/trading-journal-page.html">📓 יומן מסחר</a></li>
                             <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/tradingview-test-page.html">📈 גראפים TV</a></li>
+                            <li class="separator"></li>
+                            <li><a class="tiktrack-dropdown-item" href="/conditions-modals.html">🧩 מודלי תנאים</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/conditions-test.html">🧪 בדיקות תנאים</a></li>
                             <li class="separator"></li>
                             <li><a class="tiktrack-dropdown-item" href="/mockups/add-ticker-modal.html">➕ הוספת טיקר</a></li>
                             <li><a class="tiktrack-dropdown-item" href="/mockups/flag-quick-action.html">🚩 פעולה מהירה</a></li>

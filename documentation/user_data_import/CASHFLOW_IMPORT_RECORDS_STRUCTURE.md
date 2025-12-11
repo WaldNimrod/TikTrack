@@ -48,6 +48,7 @@
 ### שלב 1: פרסור מהקובץ (IBKR Connector)
 
 הקובץ נפרס לסקציות:
+
 - `Deposits & Withdrawals` → `deposit` / `withdrawal`
 - `Dividends` → `dividend`
 - `Interest` → `interest`
@@ -61,6 +62,7 @@
 ### שלב 2: Normalization & Validation
 
 הרשומות עוברות:
+
 - נרמול תאריכים
 - אימות מטבעות
 - אימות חשבונות
@@ -76,7 +78,8 @@
 
 הרשומות נשמרות לבסיס הנתונים עם:
 
-#### רשומות רגילות (לא Forex):
+#### רשומות רגילות (לא Forex)
+
 ```python
 CashFlow(
     trading_account_id=import_session.trading_account_id,
@@ -93,7 +96,8 @@ CashFlow(
 )
 ```
 
-#### רשומות Forex (Exchange):
+#### רשומות Forex (Exchange)
+
 ```python
 # FROM record
 CashFlow(
@@ -129,6 +133,7 @@ CashFlow(
 ## דוגמאות מהקובץ
 
 ### דוגמה 1: Dividend
+
 ```
 מקור בקובץ: Dividends section
 cashflow_type: 'dividend'
@@ -140,6 +145,7 @@ description: "מקור תזרים: Dividend"
 ```
 
 ### דוגמה 2: Forex Conversion
+
 ```
 מקור בקובץ: Trades section (Forex row)
 cashflow_type: 'forex_conversion'
@@ -159,6 +165,7 @@ metadata: {
 ```
 
 ### דוגמה 3: Deposit
+
 ```
 מקור בקובץ: Deposits & Withdrawals section
 cashflow_type: 'deposit'
@@ -170,6 +177,7 @@ description: "מקור תזרים: Deposit"
 ```
 
 ### דוגמה 4: Dividend Accrual
+
 ```
 מקור בקובץ: Change in Dividend Accruals section
 cashflow_type: 'dividend_accrual'
@@ -183,12 +191,14 @@ description: "מקור תזרים: Dividend accrual"
 
 ## מיפוי Cash Report → Import Records
 
-### פעילויות ב-Cash Report שלא מיובאות:
+### פעילויות ב-Cash Report שלא מיובאות
+
 - **Trades (Sales)** / **Trades (Purchase)** - אלה חלק מעסקאות, לא תזרימי מזומנים
 - **Cash FX Translation Gain/Loss** - רווח/הפסד לא ממומש, לא תזרים מזומנים
 - **Commissions** - כלולות ב-executions או ב-forex_conversion, לא נפרדות
 
-### פעילויות ב-Cash Report שמיובאות:
+### פעילויות ב-Cash Report שמיובאות
+
 - **Deposits** → `deposit`
 - **Account Transfers** → `transfer_in` / `transfer_out`
 - **Dividends** → `dividend`
@@ -196,7 +206,8 @@ description: "מקור תזרים: Dividend accrual"
 - **Broker Interest Paid and Received** → `interest`
 - **Withholding Tax** → `tax`
 
-### פעילויות שמיובאות אבל לא ב-Cash Report:
+### פעילויות שמיובאות אבל לא ב-Cash Report
+
 - **Forex Conversions** - חלק מ-"Trades" section
 - **Dividend Accruals** - רשומות חשבונאיות, לא תזרימי מזומנים
 - **Interest Accruals** - רשומות חשבונאיות, לא תזרימי מזומנים

@@ -11,6 +11,7 @@
 ### 1. Floating UI (לשעבר Popper.js) - **מומלץ ביותר**
 
 **למה:**
+
 - ✅ פתרון מוכח למיקום overlays/tooltips
 - ✅ מטפל אוטומטית ב-transform, overflow, viewport boundaries
 - ✅ תמיכה מלאה ב-RTL
@@ -19,6 +20,7 @@
 - ✅ פעיל ותחזוקה טובה
 
 **מה זה פותר:**
+
 - בעיות מיקום overlay (הזזה ימינה/שמאלה)
 - התחשבות ב-transform על parent containers
 - התחשבות ב-overflow
@@ -26,6 +28,7 @@
 - RTL positioning
 
 **איך להשתמש:**
+
 ```javascript
 import {computePosition, flip, shift, offset} from '@floating-ui/dom';
 
@@ -43,6 +46,7 @@ floatingElement.style.top = `${y}px`;
 ```
 
 **אינטגרציה:**
+
 - החלפת `positionOverlay` ב-`widget-overlay-service.js` לשימוש ב-Floating UI
 - שמירה על API קיים (backward compatible)
 
@@ -51,17 +55,20 @@ floatingElement.style.top = `${y}px`;
 ### 2. GSAP (GreenSock Animation Platform)
 
 **למה:**
+
 - ✅ אנימציות חלקות ומתקדמות
 - ✅ ביצועים מעולים
 - ✅ תמיכה בכל הדפדפנים
 - ✅ Timeline system חזק
 
 **מה זה פותר:**
+
 - אנימציות פתיחה/סגירה של overlay
 - אנימציות hover עדינות
 - אנימציות transitions
 
 **איך להשתמש:**
+
 ```javascript
 // Simple fade in
 gsap.to(overlay, {
@@ -78,6 +85,7 @@ tl.to(overlay, {opacity: 1, duration: 0.1})
 ```
 
 **אינטגרציה:**
+
 - הוספת אנימציות עדינות ל-overlay open/close
 - שמירה על CSS transitions כגיבוי
 
@@ -86,15 +94,18 @@ tl.to(overlay, {opacity: 1, duration: 0.1})
 ### 3. Anime.js
 
 **למה:**
+
 - ✅ קל ופשוט
 - ✅ קל משקל (~17KB)
 - ✅ API אינטואיטיבי
 
 **מה זה פותר:**
+
 - אנימציות פשוטות
 - אנימציות hover
 
 **איך להשתמש:**
+
 ```javascript
 anime({
   targets: overlay,
@@ -110,11 +121,13 @@ anime({
 ## המלצה: Floating UI + GSAP
 
 ### Floating UI למיקום
+
 - פותר את כל בעיות המיקום
 - קל משקל
 - מוכח ופעיל
 
 ### GSAP לאנימציות
+
 - אנימציות חלקות
 - ביצועים מעולים
 - Timeline system חזק
@@ -126,11 +139,13 @@ anime({
 ### שלב 1: Floating UI (עדיפות גבוהה)
 
 **קבצים לעדכון:**
+
 - `trading-ui/scripts/services/widget-overlay-service.js` - החלפת `positionOverlay`
 - `trading-ui/test-widgets-overlay.html` - הוספת CDN link
 - `trading-ui/scripts/init-system/package-manifest.js` - הוספת Floating UI
 
 **שינויים:**
+
 1. הוספת Floating UI מ-CDN
 2. החלפת `positionOverlay` לשימוש ב-`computePosition`
 3. שמירה על API קיים (backward compatible)
@@ -143,11 +158,13 @@ anime({
 ### שלב 2: GSAP לאנימציות (אופציונלי)
 
 **קבצים לעדכון:**
+
 - `trading-ui/scripts/services/widget-overlay-service.js` - הוספת אנימציות
 - `trading-ui/test-widgets-overlay.html` - הוספת CDN link
 - CSS - שמירה על transitions כגיבוי
 
 **שינויים:**
+
 1. הוספת GSAP מ-CDN
 2. החלפת CSS transitions ב-GSAP animations
 3. הוספת אנימציות עדינות (fade, slide, scale)
@@ -160,12 +177,14 @@ anime({
 ## יתרונות
 
 ### Floating UI
+
 - ✅ פותר בעיות מיקום אוטומטית
 - ✅ לא צריך לטפל ב-transform/overflow ידנית
 - ✅ תמיכה מלאה ב-RTL
 - ✅ קל משקל
 
 ### GSAP
+
 - ✅ אנימציות חלקות
 - ✅ ביצועים מעולים
 - ✅ Timeline system חזק
@@ -176,10 +195,12 @@ anime({
 ## חסרונות
 
 ### Floating UI
+
 - ❌ תלות חיצונית נוספת
 - ❌ צריך ללמוד API חדש
 
 ### GSAP
+
 - ❌ תלות חיצונית נוספת
 - ❌ גודל קובץ (~45KB gzipped)
 
@@ -188,6 +209,7 @@ anime({
 ## החלטה
 
 **מומלץ להתחיל עם Floating UI בלבד:**
+
 - פותר את הבעיה העיקרית (מיקום)
 - קל משקל
 - מוכח ופעיל
@@ -198,11 +220,13 @@ anime({
 ## קבצים לעדכון
 
 ### Floating UI
+
 - `trading-ui/scripts/services/widget-overlay-service.js`
 - `trading-ui/test-widgets-overlay.html`
 - `trading-ui/scripts/init-system/package-manifest.js`
 
 ### GSAP (אופציונלי)
+
 - `trading-ui/scripts/services/widget-overlay-service.js`
 - `trading-ui/test-widgets-overlay.html`
 

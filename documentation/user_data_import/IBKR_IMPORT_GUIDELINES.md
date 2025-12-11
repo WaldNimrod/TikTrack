@@ -32,7 +32,7 @@
 
 # 2. ⚠ ההבדל המהותי: PDF ≠ CSV
 
-## מה ה-PDF של IBKR מציג?
+## מה ה-PDF של IBKR מציג
 
 דוח PDF/HTML של IBKR מכיל:
 
@@ -45,7 +45,7 @@
 * הערכות חשבונאיות שונות
 * Consolidations (עמלות ברמת חשבון, לא ברמת טרייד)
 
-## מה ה-CSV מציג?
+## מה ה-CSV מציג
 
 רק רשומות Raw אמיתיות:
 
@@ -113,7 +113,7 @@
 
 ---
 
-# 5. ✔ איך TikTrack צריכה לחשב נתונים?
+# 5. ✔ איך TikTrack צריכה לחשב נתונים
 
 תבסס על Light Model:
 
@@ -271,10 +271,10 @@ TikTrack מציגה:
 
 ## קישורים רלוונטיים
 
-- `Backend/connectors/user_data_import/ibkr_connector.py` - פרסור קובץ IBKR
-- `Backend/services/user_data_import/import_orchestrator.py` - תהליך הייבוא
-- `Backend/services/cash_flow_service.py` - יצירת תזרימים
-- `Backend/models/cash_flow.py` - מודל CashFlow
+* `Backend/connectors/user_data_import/ibkr_connector.py` - פרסור קובץ IBKR
+* `Backend/services/user_data_import/import_orchestrator.py` - תהליך הייבוא
+* `Backend/services/cash_flow_service.py` - יצירת תזרימים
+* `Backend/models/cash_flow.py` - מודל CashFlow
 
 ---
 

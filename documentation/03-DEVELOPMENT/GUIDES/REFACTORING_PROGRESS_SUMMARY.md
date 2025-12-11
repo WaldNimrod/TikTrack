@@ -1,9 +1,11 @@
 # סיכום התקדמות ריפקטורינג - ווידג'ט פעולות ממתינות מאוחד
 
 ## תאריך עדכון
+
 2025-01-28
 
 ## סטטוס כללי
+
 ✅ **Phase 1 הושלם** - כל ה-Services נוצרו  
 ✅ **Phase 2.1-2.2 הושלם** - ריפקטורינג חלקי של עמוד ביצועים  
 ✅ **Phase 3 הושלם** - ריפקטורינג הווידג'ט המאוחד להשתמש ב-services  
@@ -14,7 +16,7 @@
 
 ## Phase 1: יצירת Services משותפים ✅
 
-### קבצים שנוצרו:
+### קבצים שנוצרו
 
 1. **`trading-ui/scripts/services/execution-clustering-service.js`** ✅
    - Service לטעינת אשכולות יצירת טריידים
@@ -40,7 +42,7 @@
    - כולל: `renderClusterCard()`, `renderClusterListItem()`, `openTradeModalFromCluster()`, `handleTradeCreated()`
    - משתמש ב-`ClusterTable` ל-rendering טבלאות
 
-### עדכונים:
+### עדכונים
 
 - ✅ `trading-ui/scripts/init-system/package-manifest.js` - הוספת כל ה-services למניפסט
 
@@ -53,6 +55,7 @@
 **קובץ:** `trading-ui/scripts/executions.js`
 
 **מה השתנה:**
+
 - ✅ הסרת התלות ב-`PendingExecutionTradeCreation.initializeExecutionsSection()`
 - ✅ יצירת פונקציה חדשה `initializeTradeCreationClustersSection()` המשתמשת ב:
   - `ExecutionClusteringService.fetchClusters()` לטעינת נתונים
@@ -61,6 +64,7 @@
   - Event handlers מותאמים אישית
 
 **פונקציות שנוצרו/עודכנו:**
+
 - `initializeTradeCreationClustersSection()` - אתחול סקשן
 - `loadAndRenderClusters()` - טעינה ו-rendering
 - `renderClusters()` - rendering של cards
@@ -73,12 +77,14 @@
 **קובץ:** `trading-ui/scripts/executions.js`
 
 **מה השתנה:**
+
 - ✅ ריפקטורינג `loadTradeSuggestionsForAll()` להשתמש ב-`ExecutionAssignmentService.fetchHighlights()`
 - ✅ המרת highlights למבנה הנתונים הצפוי
 - ✅ עדכון `rejectSuggestion()` להשתמש ב-`ExecutionAssignmentService.dismissItem()`
 - ✅ הוספת cache invalidation אחרי accept/reject
 
 **פונקציות שעודכנו:**
+
 - `loadTradeSuggestionsForAll()` - משתמש ב-service במקום API calls ישירים
 - `rejectSuggestion()` - משתמש ב-service לדחיית הצעות
 - `acceptSuggestion()` - הוספת cache invalidation
@@ -92,6 +98,7 @@
 **סטטוס:** ✅ הושלם
 
 **מה בוצע:**
+
 1. ✅ עדכון `getDataForCombination()` להשתמש ב-services:
    - `createTrades` → `ExecutionClusteringService.getCachedClusters()`
    - `assignTrades` → `ExecutionAssignmentService.getCachedHighlights()`
@@ -124,11 +131,13 @@
 **סטטוס:** ✅ הושלם
 
 **קבצים שנמחקו:**
+
 - ✅ `trading-ui/scripts/pending-execution-trade-creation.js` - נמחק
 - ✅ `trading-ui/scripts/pending-executions-widget.js` - נמחק
 - ✅ `trading-ui/scripts/pending-trade-plan-widget.js` - נמחק
 
 **מה בוצע:**
+
 1. ✅ ווידוא שכל הקוד עובד עם ה-services החדשים
 2. ✅ מחיקת קבצים
 3. ✅ הסרה מ-`package-manifest.js` - הוחלף בהערה על השירותים החדשים
@@ -141,6 +150,7 @@
 **סטטוס:** 🔄 בתהליך
 
 **מה צריך לעדכן:**
+
 1. ⏳ עדכון `WIDGETS_LIST.md` - הסרת 3 הווידג'טים הישנים, הוספת הווידג'ט המאוחד
 2. ⏳ עדכון `GENERAL_SYSTEMS_LIST.md` - הוספת ה-services החדשים
 3. ⏳ יצירת/עדכון developer guide לווידג'ט המאוחד
@@ -178,25 +188,29 @@
 
 ## קבצים ששונו
 
-### קבצים חדשים:
+### קבצים חדשים
+
 - `trading-ui/scripts/services/execution-clustering-service.js`
 - `trading-ui/scripts/services/execution-assignment-service.js`
 - `trading-ui/scripts/services/trade-plan-assignment-service.js`
 - `trading-ui/scripts/services/pending-actions-cache-service.js`
 - `trading-ui/scripts/services/execution-cluster-helpers.js`
 
-### קבצים שעודכנו:
+### קבצים שעודכנו
+
 - ✅ `trading-ui/scripts/executions.js` (ריפקטורינג מלא)
 - ✅ `trading-ui/scripts/widgets/unified-pending-actions-widget.js` (ריפקטורינג מלא)
 - ✅ `trading-ui/scripts/trades.js` (עדכון להסיר תלות ב-widgets ישנים)
 - ✅ `trading-ui/scripts/init-system/package-manifest.js` (הוספת services, הסרת widgets ישנים)
 
-### קבצים שנמחקו:
+### קבצים שנמחקו
+
 - ✅ `trading-ui/scripts/pending-execution-trade-creation.js`
 - ✅ `trading-ui/scripts/pending-executions-widget.js`
 - ✅ `trading-ui/scripts/pending-trade-plan-widget.js`
 
-### קבצים שצריך לעדכן:
+### קבצים שצריך לעדכן
+
 - ⏳ `documentation/frontend/WIDGETS_LIST.md` (Phase 5)
 - ⏳ `documentation/frontend/GENERAL_SYSTEMS_LIST.md` (Phase 5)
 

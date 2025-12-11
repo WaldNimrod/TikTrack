@@ -193,12 +193,14 @@ https://github.com/WaldNimrod/TikTrack/blob/main/documentation/production/ONLINE
 
 ## 📋 קישורים
 
-### מסמך מפורט:
+### מסמך מפורט
+
 ```
 https://github.com/WaldNimrod/TikTrack/blob/main/documentation/production/ONLINE_DEPLOYMENT/MISSING_TASKS_AFTER_HANDOFF.md
 ```
 
-### תיקייה:
+### תיקייה
+
 ```
 https://github.com/WaldNimrod/TikTrack/tree/main/documentation/production/ONLINE_DEPLOYMENT
 ```

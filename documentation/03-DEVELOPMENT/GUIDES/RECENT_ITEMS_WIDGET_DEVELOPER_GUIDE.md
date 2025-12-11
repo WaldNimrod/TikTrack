@@ -20,10 +20,12 @@
 ## 🎯 סקירה כללית
 
 **Recent Items Widget** הוא ווידג'ט מאוחד המציג:
+
 - **טריידים אחרונים** - רשימת הטריידים האחרונים שנוצרו
 - **תוכניות אחרונות** - רשימת התוכניות האחרונות שנוצרו
 
 **מאפיינים:**
+
 - ✅ Bootstrap Tabs (2 טאבים)
 - ✅ Module Pattern (IIFE)
 - ✅ Hover overlay להצגת פרטים מפורטים
@@ -31,6 +33,7 @@
 - ✅ תמיכה ב-multiple instances
 
 **קבצים:**
+
 - **JavaScript:** `trading-ui/scripts/widgets/recent-items-widget.js`
 - **CSS:** `trading-ui/styles-new/06-components/_recent-items-widget.css`
 
@@ -62,6 +65,7 @@
 ### Bootstrap Tabs
 
 הווידג'ט משתמש ב-Bootstrap 5 Tabs לניווט בין 2 טאבים:
+
 - **טריידים אחרונים** (Trades Tab)
 - **תוכניות אחרונות** (Plans Tab)
 
@@ -72,21 +76,25 @@
 הווידג'ט משתמש ב-**WidgetOverlayService** המרכזי לניהול overlay של פרטים נוספים.
 
 **מבנה HTML נדרש:**
+
 - `data-widget-overlay="true"` על ה-item (אופציונלי - לא נדרש)
 - `data-overlay="true"` על ה-details container
 
 **תיעוד:**
+
 - [WIDGET_OVERLAY_SERVICE_GUIDE.md](WIDGET_OVERLAY_SERVICE_GUIDE.md) - Widget Overlay Service
 - [UNIFIED_UI_POSITIONING_GUIDE.md](UNIFIED_UI_POSITIONING_GUIDE.md) - Unified UI Positioning Service (Floating UI)
 
 **הערה:** `WidgetOverlayService` משתמש ב-`Unified UI Positioning Service` למיקום חכם באמצעות Floating UI (עם fallback אוטומטי). האנימציות מבוצעות באמצעות GSAP (אופציונלי) עם fallback ל-CSS transitions.
 
 **אנימציות:**
+
 - אנימציות fade in/out חלקות בעת פתיחה/סגירה של overlay
 - משך אנימציה: 100ms (ברירת מחדל)
 - ראה [UNIFIED_UI_POSITIONING_GUIDE.md](UNIFIED_UI_POSITIONING_GUIDE.md) - פרק GSAP Integration
 
 **התנהגות פשוטה ומינימלית:**
+
 - **mouseenter** על item → פתיחת overlay (סוגר את כל האחרים)
 - **mouseleave** מ-item → סגירה (אלא אם העכבר עובר לאוברליי של אותו item או עדיין בתוך אותו item)
 - **mouseleave** מ-overlay → סגירה (אלא אם העכבר עובר חזרה לאותו item)
@@ -95,6 +103,7 @@
 הקוד בודק אם `relatedTarget` עדיין בתוך אותו item - אם כן, ה-overlay נשאר פתוח. זה מונע סגירה לא רצויה כשהעכבר עובר בין אלמנטים בתוך אותו item.
 
 כל פריט מציג:
+
 - **Header Section** - תמיד גלוי: שם, תאריך, סכום
 - **Details Section** - מוצג על hover: פרטים נוספים (צד, סטטוס, כמות, וכו')
 
@@ -107,12 +116,14 @@
 מאתחל את הווידג'ט.
 
 **Parameters:**
+
 - `containerId` (string, optional) - מזהה קונטיינר (ברירת מחדל: `'recentItemsWidgetContainer'`)
 - `config` (object, optional) - תצורת אתחול
   - `config.defaultTab` (string) - טאב פעיל ברירת מחדל (`'trades'` או `'plans'`)
   - `config.maxItems` (number, optional) - מספר מקסימלי של פריטים להצגה בכל טאב (ברירת מחדל: `5`)
 
 **Example:**
+
 ```javascript
 // אתחול ברירת מחדל
 window.RecentItemsWidget.init();
@@ -134,12 +145,14 @@ window.RecentItemsWidget.init('recentItemsWidgetContainer', {
 מעדכן את הווידג'ט עם נתונים חדשים.
 
 **Parameters:**
+
 - `data` (object) - נתונים לעדכון
   - `data.trades` (array, optional) - רשימת טריידים
   - `data.tradePlans` (array, optional) - רשימת תוכניות
   - `data.currencySymbol` (string, optional) - סמל מטבע (ברירת מחדל: `'$'`)
 
 **Example:**
+
 ```javascript
 window.RecentItemsWidget.render({
   trades: [
@@ -154,6 +167,7 @@ window.RecentItemsWidget.render({
 ```
 
 **הערות:**
+
 - אם `trades` או `tradePlans` לא מסופקים, הווידג'ט ישמור את הנתונים הקיימים
 - אם מערך ריק מסופק, הווידג'ט ינקה את הטאב המתאים רק אם הוא כבר היה ריק
 
@@ -162,11 +176,13 @@ window.RecentItemsWidget.render({
 מנקה את הווידג'ט ומסיר את כל ה-event listeners.
 
 **מה זה עושה:**
+
 - מנקה את ה-state
 - מסיר event listeners מכל ה-elements
 - מנקה את כל הפריטים
 
 **Example:**
+
 ```javascript
 window.RecentItemsWidget.destroy();
 ```
@@ -320,21 +336,25 @@ window.RecentItemsWidget.init('recentItemsWidgetContainer', {
 הווידג'ט משתמש ב-**WidgetOverlayService** המרכזי לניהול overlay של פרטים נוספים.
 
 **מבנה HTML נדרש:**
+
 - `data-widget-overlay="true"` על ה-item
 - `data-overlay="true"` על ה-details container
 
 **תיעוד:**
+
 - [WIDGET_OVERLAY_SERVICE_GUIDE.md](WIDGET_OVERLAY_SERVICE_GUIDE.md) - Widget Overlay Service
 - [UNIFIED_UI_POSITIONING_GUIDE.md](UNIFIED_UI_POSITIONING_GUIDE.md) - Unified UI Positioning Service (Floating UI)
 
 **הערה:** `WidgetOverlayService` משתמש ב-`Unified UI Positioning Service` למיקום חכם באמצעות Floating UI (עם fallback אוטומטי). האנימציות מבוצעות באמצעות GSAP (אופציונלי) עם fallback ל-CSS transitions.
 
 **אנימציות:**
+
 - אנימציות fade in/out חלקות בעת פתיחה/סגירה של overlay
 - משך אנימציה: 200ms (ברירת מחדל)
 - ראה [UNIFIED_UI_POSITIONING_GUIDE.md](UNIFIED_UI_POSITIONING_GUIDE.md) - פרק GSAP Integration
 
 ה-overlay מוצג אוטומטית על hover על כל פריט. ה-overlay מציג:
+
 - פרטים נוספים שלא מוצגים ב-header
 - מידע מפורט על הטרייד/תוכנית
 
@@ -413,6 +433,7 @@ window.RecentItemsWidget.destroy();
 ### Packages
 
 הווידג'ט נטען דרך החבילה `dashboard-widgets`:
+
 - `base`
 - `services`
 - `entity-services`

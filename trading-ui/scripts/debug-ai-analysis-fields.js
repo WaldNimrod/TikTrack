@@ -6,6 +6,19 @@
  * הרצה: debugAIAnalysisFields() בקונסולה
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Data Functions ===
+// - getAllFieldsInfo() - Getallfieldsinfo
+
+// === Utility Functions ===
+// - checkTickerField() - Checktickerfield
+// - checkTradingAccountField() - Checktradingaccountfield
+// - checkInvestmentTypeField() - Checkinvestmenttypefield
+// - checkTradingMethodsField() - Checktradingmethodsfield
+// - checkDateRangeField() - Checkdaterangefield
+
 (function() {
     'use strict';
     

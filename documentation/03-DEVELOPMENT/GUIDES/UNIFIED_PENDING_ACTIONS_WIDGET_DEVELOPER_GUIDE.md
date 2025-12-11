@@ -22,12 +22,14 @@
 **Unified Pending Actions Widget** הוא ווידג'ט מאוחד המציג פעולות ממתינות לשיוך ויצירת טריידים ותוכניות מרשומות ביצוע.
 
 **מאפיינים:**
+
 - ✅ Bootstrap Tabs (nested tabs: Action + Entity)
 - ✅ Module Pattern (IIFE)
 - ✅ שימוש ב-services משותפים
 - ✅ 4 קומבינציות: Assign Plans, Assign Trades, Create Plans, Create Trades
 
 **קבצים:**
+
 - **JavaScript:** `trading-ui/scripts/widgets/unified-pending-actions-widget.js`
 - **CSS:** `trading-ui/styles-new/06-components/_unified-pending-actions-widget.css`
 
@@ -60,10 +62,12 @@
 ### Bootstrap Tabs (Nested)
 
 הווידג'ט משתמש ב-Bootstrap 5 Tabs עם nested structure:
+
 - **Action Tabs:** "שיוך" (Assign) / "יצירת חדש" (Create)
 - **Entity Tabs:** "תוכניות" (Plans) / "טריידים" (Trades)
 
 **4 קומבינציות:**
+
 1. **Assign Plans** - שיוך תוכניות לטריידים
 2. **Assign Trades** - שיוך ביצועים לטריידים
 3. **Create Plans** - יצירת תוכניות מטריידים
@@ -74,21 +78,25 @@
 הווידג'ט משתמש ב-**WidgetOverlayService** המרכזי לניהול overlay של פרטים נוספים.
 
 **מבנה HTML נדרש:**
+
 - `data-widget-overlay="true"` על ה-item
 - `data-overlay="true"` על ה-details container
 
 **תיעוד:**
+
 - [WIDGET_OVERLAY_SERVICE_GUIDE.md](WIDGET_OVERLAY_SERVICE_GUIDE.md) - Widget Overlay Service
 - [UNIFIED_UI_POSITIONING_GUIDE.md](UNIFIED_UI_POSITIONING_GUIDE.md) - Unified UI Positioning Service (Floating UI)
 
 **הערה:** `WidgetOverlayService` משתמש ב-`Unified UI Positioning Service` למיקום חכם באמצעות Floating UI (עם fallback אוטומטי). האנימציות מבוצעות באמצעות GSAP (אופציונלי) עם fallback ל-CSS transitions.
 
 **אנימציות:**
+
 - אנימציות fade in/out חלקות בעת פתיחה/סגירה של overlay
 - משך אנימציה: 100ms (ברירת מחדל)
 - ראה [UNIFIED_UI_POSITIONING_GUIDE.md](UNIFIED_UI_POSITIONING_GUIDE.md) - פרק GSAP Integration
 
 **התנהגות פשוטה ומינימלית:**
+
 - **mouseenter** על item → פתיחת overlay (סוגר את כל האחרים)
 - **mouseleave** מ-item → סגירה (אלא אם העכבר עובר לאוברליי של אותו item או עדיין בתוך אותו item)
 - **mouseleave** מ-overlay → סגירה (אלא אם העכבר עובר חזרה לאותו item)
@@ -97,6 +105,7 @@
 הקוד בודק אם `relatedTarget` עדיין בתוך אותו item - אם כן, ה-overlay נשאר פתוח. זה מונע סגירה לא רצויה כשהעכבר עובר בין אלמנטים בתוך אותו item.
 
 כל פריט מציג:
+
 - **Header Section** - תמיד גלוי: שם, תאריך, סכום, כפתורי פעולה
 - **Details Section** - מוצג על hover: פרטים נוספים (חשבון, פעולה, הצעות שיוך, וכו')
 
@@ -109,6 +118,7 @@
 מאתחל את הווידג'ט.
 
 **Parameters:**
+
 - `containerId` (string, optional) - מזהה קונטיינר (ברירת מחדל: `'unifiedPendingActionsWidgetContainer'`)
 - `config` (object, optional) - תצורת אתחול
   - `config.defaultItemsLimit` (number, optional) - מספר מקסימלי של פריטים להצגה (ברירת מחדל: `4`)
@@ -116,6 +126,7 @@
   - `config.defaultEntity` (string, optional) - ישות פעילה ברירת מחדל (`'plans'` או `'trades'`)
 
 **Example:**
+
 ```javascript
 // אתחול ברירת מחדל
 await window.UnifiedPendingActionsWidget.init();
@@ -135,6 +146,7 @@ await window.UnifiedPendingActionsWidget.init('unifiedPendingActionsWidgetContai
 מעדכן את כל הקומבינציות.
 
 **Example:**
+
 ```javascript
 await window.UnifiedPendingActionsWidget.render();
 ```
@@ -144,6 +156,7 @@ await window.UnifiedPendingActionsWidget.render();
 מרענן את כל הנתונים וטוען מחדש מהשרת.
 
 **Example:**
+
 ```javascript
 await window.UnifiedPendingActionsWidget.refresh();
 ```
@@ -153,6 +166,7 @@ await window.UnifiedPendingActionsWidget.refresh();
 מנקה את הווידג'ט ומסיר את כל ה-event listeners.
 
 **Example:**
+
 ```javascript
 window.UnifiedPendingActionsWidget.destroy();
 ```
@@ -162,6 +176,7 @@ window.UnifiedPendingActionsWidget.destroy();
 מחזיר את המצב הנוכחי של הווידג'ט (read-only).
 
 **Returns:**
+
 ```javascript
 {
   initialized: boolean,
@@ -172,6 +187,7 @@ window.UnifiedPendingActionsWidget.destroy();
 ```
 
 **Example:**
+
 ```javascript
 const state = window.UnifiedPendingActionsWidget.getState();
 console.log('Active combination:', `${state.activeAction}-${state.activeEntity}`);
@@ -374,6 +390,7 @@ if (state.initialized) {
 ### שימוש ב-Widgets ישנים
 
 **כרגע הווידג'ט עדיין משתמש ב-widgets ישנים כגיבוי:**
+
 - `PendingExecutionTradeCreation` - עבור Create Trades
 - `PendingExecutionsHighlights` - עבור Assign Trades
 - `PendingTradePlanWidget` - עבור Assign/Create Plans
@@ -405,6 +422,7 @@ if (state.initialized) {
 ### Packages
 
 הווידג'ט נטען דרך החבילה `dashboard-widgets`:
+
 - `base`
 - `services`
 - `entity-services`
@@ -416,25 +434,31 @@ if (state.initialized) {
 ### 30 בנובמבר 2025 - תיקון user_id Filtering ושיפורים
 
 #### תיקון Backend - user_id Filtering
+
 **בעיה:** `ExecutionClusteringService.get_pending_executions` לא סינן לפי `user_id`, מה שעלול לגרום להצגת ביצועים של משתמשים אחרים.
 
 **תיקון:**
+
 - הוספת פרמטר `user_id` ל-`get_pending_executions` ב-`Backend/services/execution_clustering_service.py`
 - הוספת סינון `Execution.user_id == user_id` לשאילתה
 - עדכון `get_execution_trade_creation_clusters` להעביר `user_id` ל-`get_pending_executions`
 - עדכון API endpoint `/api/executions/pending-assignment/trade-creation-clusters` לקבל `user_id` מ-`g.user_id`
 
 **קבצים שעודכנו:**
+
 - `Backend/services/execution_clustering_service.py`
 - `Backend/routes/api/executions.py`
 
 #### שיפורים ב-Frontend
+
 **שיפורים:**
+
 - הוספת לוגים מפורטים ב-`getDataForCombination` ו-`loadCombinationData`
 - תיקון `getCachedClusters` ב-`execution-clustering-service.js` להחזיר תמיד array (לא null)
 - שיפור טיפול בשגיאות
 
 **קבצים שעודכנו:**
+
 - `trading-ui/scripts/widgets/unified-pending-actions-widget.js`
 - `trading-ui/scripts/services/execution-clustering-service.js`
 

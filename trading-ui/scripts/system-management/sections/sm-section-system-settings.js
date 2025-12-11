@@ -67,9 +67,7 @@ class SMSystemSettingsSection extends SMBaseSection {
     try {
       const apiUrl = window.API_BASE_URL || '/api';
       const response = await fetch(`${apiUrl}/system-settings/smtp`, {
-        method: 'GET',
-        credentials: 'include'
-      });
+        method: 'GET', });
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -95,9 +93,7 @@ class SMSystemSettingsSection extends SMBaseSection {
     try {
       const apiUrl = window.API_BASE_URL || '/api';
       const response = await fetch(`${apiUrl}/system-settings/external-data`, {
-        method: 'GET',
-        credentials: 'include'
-      });
+        method: 'GET', });
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -123,9 +119,7 @@ class SMSystemSettingsSection extends SMBaseSection {
     try {
       const apiUrl = window.API_BASE_URL || '/api';
       const response = await fetch(`${apiUrl}/system-setting-groups`, {
-        method: 'GET',
-        credentials: 'include'
-      });
+        method: 'GET', });
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -534,9 +528,7 @@ class SMSystemSettingsSection extends SMBaseSection {
       const apiUrl = window.API_BASE_URL || '/api';
       const response = await fetch(`${apiUrl}/system-settings/smtp`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify(settings)
+        headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(settings)
       });
 
       const data = await response.json();
@@ -580,9 +572,7 @@ class SMSystemSettingsSection extends SMBaseSection {
     try {
       const apiUrl = window.API_BASE_URL || '/api';
       const response = await fetch(`${apiUrl}/system-settings/smtp/test`, {
-        method: 'POST',
-        credentials: 'include'
-      });
+        method: 'POST', });
 
       const data = await response.json();
 
@@ -629,9 +619,7 @@ class SMSystemSettingsSection extends SMBaseSection {
       const apiUrl = window.API_BASE_URL || '/api';
       const response = await fetch(`${apiUrl}/system-settings/smtp/test-email`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ email: testEmail })
+        headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: testEmail })
       });
 
       const data = await response.json();
@@ -681,9 +669,7 @@ class SMSystemSettingsSection extends SMBaseSection {
       const apiUrl = window.API_BASE_URL || '/api';
       const response = await fetch(`${apiUrl}/system-settings/external-data`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify(settings)
+        headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(settings)
       });
 
       const data = await response.json();

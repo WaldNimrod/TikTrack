@@ -1,5 +1,7 @@
 # Production Migration - Merged to Main ✅
+
 # =========================================
+
 # אישור מזיגה מוצלחת ל-main
 
 **תאריך:** נובמבר 2025  
@@ -16,6 +18,7 @@
 ## 📦 **קבצים שמוזגו**
 
 ### **סקריפטים (7 קבצים):**
+
 - ✅ `scripts/db/migrate_production_to_pg.py`
 - ✅ `scripts/db/setup_production_postgresql.sh`
 - ✅ `scripts/db/backup_postgresql_production.sh`
@@ -24,6 +27,7 @@
 - ✅ `scripts/db/production_start_server_template.sh`
 
 ### **תיעוד (7 קבצים):**
+
 - ✅ `PRODUCTION_MIGRATION_MASTER_GUIDE.md`
 - ✅ `PRODUCTION_MIGRATION_EXECUTION_GUIDE.md`
 - ✅ `PRODUCTION_POSTGRESQL_MIGRATION.md`
@@ -37,11 +41,13 @@
 ## ✅ **אימותים שבוצעו**
 
 ### **לפני המזיגה:**
+
 - ✅ כל השינויים נדחפו ל-`new-db-uopgrde`
 - ✅ כל הבדיקות עוברות
 - ✅ כל הקבצים תקינים
 
 ### **אחרי המזיגה:**
+
 - ✅ כל הקבצים קיימים ב-`main`
 - ✅ בדיקת דרישות מוקדמות עוברת ב-`main`
 - ✅ סביבת הפיתוח עובדת תקין
@@ -62,6 +68,7 @@ git merge main
 ```
 
 הקבצים יהיו זמינים ב:
+
 - `scripts/db/migrate_production_to_pg.py`
 - `scripts/db/setup_production_postgresql.sh`
 - `documentation/production/PRODUCTION_MIGRATION_MASTER_GUIDE.md`
@@ -71,6 +78,7 @@ git merge main
 ## 📋 **הצעדים הבאים לצוות הפרודקשן**
 
 1. **עדכון מ-main:**
+
    ```bash
    git checkout production
    git pull origin production

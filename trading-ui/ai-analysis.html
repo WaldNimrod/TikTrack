@@ -176,6 +176,15 @@
                             <span>ניתוח AI</span>
                         </div>
                         <div class="section-actions">
+                            <button type="button" 
+                                    data-button-type="PRIMARY" 
+                                    data-variant="small" 
+                                    data-text="צור ניתוח חדש" 
+                                    data-onclick="window.AIAnalysisWizard?.openWizard('new')" 
+                                    id="openWizardFromHeaderBtn"
+                                    title="צור ניתוח AI חדש">
+                                <span>צור ניתוח חדש</span>
+                            </button>
                             <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('header')" data-text="הצג/הסתר" title="הצג/הסתר סקשן"></button>
                         </div>
                     </div>
@@ -227,76 +236,9 @@
     </div>
 
     <!-- ===== AI Analysis Modals ===== -->
-    <!-- Modal 1: Template Selection -->
-    <div class="modal fade" id="aiTemplateSelectionModal" tabindex="-1" aria-labelledby="aiTemplateSelectionModalLabel" aria-hidden="true" data-bs-backdrop="false" data-bs-keyboard="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header modal-header-colored">
-                    <h5 class="modal-title" id="aiTemplateSelectionModalLabel">בחירת תבנית ניתוח</h5>
-                    <button type="button" data-button-type="CLOSE" data-bs-dismiss="modal" data-text="" title="סגור"></button>
-                </div>
-                <div class="modal-body">
-                    <div id="templatesContainerModal" class="row g-3">
-                        <!-- Templates will be loaded here -->
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal 2: Variables Form -->
-    <div class="modal fade modal-nested" id="aiVariablesModal" tabindex="-1" aria-labelledby="aiVariablesModalLabel" aria-hidden="true" data-bs-backdrop="false" data-bs-keyboard="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header modal-header-colored">
-                    <div class="modal-navigation-breadcrumb" id="aiVariablesModalBreadcrumb"></div>
-                    <h5 class="modal-title" id="aiVariablesModalLabel">משתני ניתוח</h5>
-                    <button type="button" data-button-type="BACK" data-variant="small" data-text="" title="חזור" id="aiVariablesBackBtn"></button>
-                    <button type="button" data-button-type="CLOSE" data-bs-dismiss="modal" data-text="" title="סגור"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="aiAnalysisFormModal">
-                        <div id="variablesContainerModal" class="row g-3">
-                            <!-- Variables will be loaded here dynamically -->
-                        </div>
-                        
-                        <!-- בחירת מנוע LLM ושפת משוב -->
-                        <div class="row g-3 mt-3">
-                            <div class="col-md-6">
-                                <label class="form-label" for="llmProviderModal">מנוע AI</label>
-                                <select id="llmProviderModal" class="form-select" required>
-                                    <option value="">בחר מנוע AI...</option>
-                                    <option value="gemini">Gemini (מומלץ למתחילים)</option>
-                                    <option value="perplexity">Perplexity</option>
-                                </select>
-                                <small class="form-text text-muted">בחר מנוע AI לניתוח. ודא שהגדרת מפתח API בפרופיל המשתמש.</small>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label" for="responseLanguageModal">שפת המשוב</label>
-                                <select id="responseLanguageModal" class="form-select" name="response_language">
-                                    <option value="hebrew" selected>עברית</option>
-                                    <option value="english">English</option>
-                                </select>
-                                <small class="form-text text-muted">בחר בשפה שבה תרצה לקבל את תוצאות הניתוח.</small>
-                            </div>
-                        </div>
-
-                        <!-- כפתור יצירת ניתוח -->
-                        <div class="row g-3 mt-3">
-                            <div class="col-12 d-flex justify-content-end">
-                                <button type="submit" data-button-type="PRIMARY" data-variant="full" data-text="צור ניתוח" id="generateAnalysisBtnModal">
-                                    <span id="generateAnalysisBtnTextModal">צור ניתוח</span>
-                                    <span id="generateAnalysisBtnSpinnerModal" class="hide">⏳ יוצר ניתוח...</span>
-                                </button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal 3: Results -->
+    <!-- Note: Old modals (aiTemplateSelectionModal, aiVariablesModal) were removed - now using Wizard interface -->
+    
+    <!-- Modal: Results (Still used for rerun and direct result viewing) -->
     <div class="modal fade modal-nested" id="aiResultsModal" tabindex="-1" aria-labelledby="aiResultsModalLabel" aria-hidden="true" data-bs-backdrop="false" data-bs-keyboard="true">
         <div class="modal-dialog modal-xl modal-dialog-scrollable">
             <div class="modal-content">
@@ -343,6 +285,201 @@
                     <!-- אזור תוצאות -->
                     <div id="resultsContainerModal" class="markdown-body">
                         <!-- Results will be rendered here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== AI Analysis Wizard Modal (New) ===== -->
+    <div class="modal fade" id="aiAnalysisWizardModal" tabindex="-1" aria-labelledby="aiAnalysisWizardModalLabel" aria-hidden="true" data-bs-backdrop="false" data-bs-keyboard="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header modal-header-colored">
+                    <h5 class="modal-title" id="aiAnalysisWizardModalLabel">יצירת ניתוח AI</h5>
+                    <button type="button" data-button-type="CLOSE" data-bs-dismiss="modal" data-text="" title="סגור"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Steps Header Bar -->
+                    <div class="steps-header-bar d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
+                        <!-- Step Indicator -->
+                        <div class="import-steps-indicator">
+                            <div class="step" data-step="1">
+                                <div class="step-number">1</div>
+                                <div class="step-label">בחירת ניתוח ומנוע</div>
+                            </div>
+                            <div class="step" data-step="2">
+                                <div class="step-number">2</div>
+                                <div class="step-label">פילטרים ומאפיינים</div>
+                            </div>
+                            <div class="step" data-step="3">
+                                <div class="step-number">3</div>
+                                <div class="step-label">תוצאות</div>
+                            </div>
+                        </div>
+                        <!-- Header Actions -->
+                        <div class="steps-header-actions d-flex align-items-center gap-2 flex-wrap" id="wizardHeaderActions">
+                            <!-- Step 1 Actions -->
+                            <div class="step-header-group align-items-center gap-2 flex-wrap d-none" id="wizardStep1Actions">
+                                <button data-button-type="PRIMARY"
+                                        data-text="המשך לשלב 2"
+                                        data-onclick="window.AIAnalysisWizard?.goToStep(2)"
+                                        id="wizardContinueToStep2"
+                                        disabled></button>
+                            </div>
+                            <!-- Step 2 Actions -->
+                            <div class="step-header-group align-items-center gap-2 flex-wrap d-none" id="wizardStep2Actions">
+                                <button data-button-type="SECONDARY"
+                                        data-text="חזור"
+                                        data-onclick="window.AIAnalysisWizard?.goToStep(1)"
+                                        id="wizardBackToStep1"></button>
+                                <button data-button-type="PRIMARY"
+                                        data-text="המשך לשלב 3"
+                                        data-onclick="window.AIAnalysisWizard?.goToStep(3)"
+                                        id="wizardContinueToStep3"
+                                        disabled></button>
+                            </div>
+                            <!-- Step 3 Actions -->
+                            <div class="step-header-group align-items-center gap-2 flex-wrap d-none" id="wizardStep3Actions">
+                                <button type="button" 
+                                        data-button-type="PRIMARY" 
+                                        data-variant="small" 
+                                        data-text="שמור כהערה" 
+                                        data-onclick="window.AIAnalysisManager?.saveAsNote()" 
+                                        id="wizardSaveAsNoteBtn"
+                                        title="שמור כהערה"></button>
+                                <div class="btn-group">
+                                    <button type="button" 
+                                            data-button-type="SECONDARY" 
+                                            data-variant="small" 
+                                            data-icon-type="EXPORT"
+                                            data-text="" 
+                                            id="wizardExportBtn"
+                                            class="dropdown-toggle"
+                                            data-bs-toggle="dropdown"
+                                            aria-expanded="false"
+                                            title="ייצא">
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <li><a class="dropdown-item" href="#" data-onclick="window.AIAnalysisManager?.exportToPDF()" id="wizardExportPDFBtn">ייצא ל-PDF</a></li>
+                                        <li><a class="dropdown-item" href="#" data-onclick="window.AIAnalysisManager?.exportToMarkdown()" id="wizardExportMarkdownBtn">ייצא ל-Markdown</a></li>
+                                        <li><a class="dropdown-item" href="#" data-onclick="window.AIAnalysisManager?.exportToHTML()" id="wizardExportHTMLBtn">ייצא ל-HTML</a></li>
+                                    </ul>
+                                </div>
+                                <button data-button-type="SECONDARY"
+                                        data-text="חזור"
+                                        data-onclick="window.AIAnalysisWizard?.goToStep(2)"
+                                        id="wizardBackToStep2"></button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 1: Engine, Language, Template Selection -->
+                    <div class="import-step" id="ai-wizard-step-1" data-step="1">
+                        <div class="step-content">
+                            <h3 class="mb-4">בחירת מנוע, שפה ותבנית ניתוח</h3>
+                            
+                            <!-- Engine and Language Selection - Moved to top -->
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-6">
+                                    <label class="form-label" for="wizardProviderSelect">
+                                        מנוע AI <span class="text-danger">*</span>
+                                    </label>
+                                    <select id="wizardProviderSelect" class="form-select" required>
+                                        <option value="">בחר מנוע AI...</option>
+                                        <option value="gemini">Gemini (מומלץ למתחילים)</option>
+                                        <option value="perplexity">Perplexity</option>
+                                    </select>
+                                    <small class="form-text text-muted">בחר מנוע AI לניתוח. ודא שהגדרת מפתח API בפרופיל המשתמש.</small>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label" for="wizardLanguageSelect">שפת המשוב</label>
+                                    <select id="wizardLanguageSelect" class="form-select" name="response_language">
+                                        <option value="hebrew" selected>עברית</option>
+                                        <option value="english">English</option>
+                                    </select>
+                                    <small class="form-text text-muted">בחר בשפה שבה תרצה לקבל את תוצאות הניתוח.</small>
+                                </div>
+                            </div>
+
+                            <!-- Template Selection -->
+                            <div class="mb-4">
+                                <label class="form-label fw-bold">
+                                    בחר תבנית ניתוח <span class="text-danger">*</span>
+                                </label>
+                                <div id="wizardTemplatesContainer" class="row g-3">
+                                    <!-- Templates will be loaded here -->
+                                    <div class="col-12 text-center">
+                                        <div class="spinner-border text-primary" role="status">
+                                            <span class="visually-hidden">טוען תבניות...</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Filters and Variables -->
+                    <div class="import-step d-none" id="ai-wizard-step-2" data-step="2">
+                        <div class="step-content">
+                            <h3 class="mb-4">הגדרת פילטרים ומאפיינים</h3>
+                            
+                            <!-- Accordion Container -->
+                            <div id="wizardStep2Accordion">
+                                <!-- Filters Section -->
+                                <div class="content-section" id="wizardFiltersSection" data-section="filters-section">
+                                    <div class="section-header">
+                                        <div class="table-title">
+                                            <img src="images/icons/tabler/filter.svg" alt="פילטרים" class="section-icon">
+                                            <span>פילטרים</span>
+                                        </div>
+                                        <div class="section-actions">
+                                            <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('filters-section')" data-text="הצג/הסתר" title="הצג/הסתר סקשן"></button>
+                                        </div>
+                                    </div>
+                                    <div class="section-body">
+                                        <div id="wizardFiltersContainer">
+                                            <!-- Filters will be loaded here -->
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Variables Section -->
+                                <div class="content-section" id="wizardVariablesSection" data-section="variables-section">
+                                    <div class="section-header">
+                                        <div class="table-title">
+                                            <img src="images/icons/entities/research.svg" alt="מאפיינים" class="section-icon">
+                                            <span>מאפיינים לניתוח</span>
+                                        </div>
+                                        <div class="section-actions">
+                                            <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('variables-section')" data-text="הצג/הסתר" title="הצג/הסתר סקשן"></button>
+                                        </div>
+                                    </div>
+                                    <div class="section-body">
+                                        <div id="wizardVariablesContainer">
+                                            <!-- Variables will be loaded here -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Results -->
+                    <div class="import-step d-none" id="ai-wizard-step-3" data-step="3">
+                        <div class="step-content">
+                            <h3 class="mb-4">תוצאות הניתוח</h3>
+                            
+                            <!-- Results Container -->
+                            <div id="wizardResultsContainer" class="markdown-body">
+                                <!-- Results will be rendered here -->
+                                <div class="text-center">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">טוען תוצאות...</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -629,6 +766,8 @@
     <script src="https://cdn.jsdelivr.net/npm/marked@9.1.6/marked.min.js" defer></script> <!-- Markdown parser library (for AI result rendering) -->
     <!-- [93] Load Order: 93 | Strategy: defer -->
     <script src="scripts/ai-analysis-manager.js?v=1.0.0" defer></script> <!-- AI Analysis UI manager -->
+    <!-- [93.5] Load Order: 93.5 | Strategy: defer -->
+    <script src="scripts/ai-analysis-wizard.js?v=1.0.0" defer></script> <!-- AI Analysis Wizard (3-step interface) -->
     <!-- [94] Load Order: 94 | Strategy: defer -->
     <script src="scripts/ai-template-selector.js?v=1.0.0" defer></script> <!-- Template selector component -->
     <!-- [95] Load Order: 95 | Strategy: defer -->

@@ -159,6 +159,56 @@
  * @linkedItemsFeature August 24, 2025 - Complete linked items modal system
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - createLinkedItemsModalContent() - Createlinkeditemsmodalcontent
+// - createBasicItemInfo() - Createbasiciteminfo
+// - createModal() - Createmodal
+// - createDetailedItemInfo() - Createdetailediteminfo
+// - createTradeDetails() - Createtradedetails
+// - createAccountDetails() - Createaccountdetails
+// - createTickerDetails() - Createtickerdetails
+// - createAlertDetails() - Createalertdetails
+// - createCashFlowDetails() - Createcashflowdetails
+// - createNoteDetails() - Createnotedetails
+// - createTradePlanDetails() - Createtradeplandetails
+// - createExecutionDetails() - Createexecutiondetails
+// - createCSVFromLinkedItems() - Createcsvfromlinkeditems
+
+// === Event Handlers ===
+// - getRulesExplanation() - Getrulesexplanation
+// - viewLinkedItemsForExecution() - Viewlinkeditemsforexecution
+// - checkLinkedItemsBeforeAction() - Checklinkeditemsbeforeaction
+// - checkLinkedItemsAndPerformAction() - Checklinkeditemsandperformaction
+
+// === UI Functions ===
+// - showLinkedItemsModal() - Showlinkeditemsmodal
+// - getRelatedObjectDisplay() - Getrelatedobjectdisplay
+
+// === Data Functions ===
+// - getTradePlanDetails() - Gettradeplandetails
+// - exportLinkedItemsData() - Exportlinkeditemsdata
+// - downloadCSV() - Downloadcsv
+// - getRelatedObjectTypeName() - Getrelatedobjecttypename
+// - getRelatedObjectTypeNameHebrew() - Getrelatedobjecttypenamehebrew
+// - getRelatedObjectSymbol() - Getrelatedobjectsymbol
+// - loadLinkedItemsData() - Loadlinkeditemsdata
+
+// === Utility Functions ===
+// - checkLinkedItems() - Checklinkeditems
+
+// === Other ===
+// - viewLinkedItems() - Viewlinkeditems
+// - viewLinkedItemsForTrade() - Viewlinkeditemsfortrade
+// - viewLinkedItemsForAccount() - Viewlinkeditemsforaccount
+// - viewLinkedItemsForTicker() - Viewlinkeditemsforticker
+// - viewLinkedItemsForAlert() - Viewlinkeditemsforalert
+// - viewLinkedItemsForCashFlow() - Viewlinkeditemsforcashflow
+// - viewLinkedItemsForNote() - Viewlinkeditemsfornote
+// - viewLinkedItemsForTradePlan() - Viewlinkeditemsfortradeplan
+
 // ===== LINKED ITEMS VIEWING SYSTEM =====
 /**
  * Global function for viewing linked items

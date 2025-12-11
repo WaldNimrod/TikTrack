@@ -7,9 +7,11 @@ This directory contains comprehensive guides and references for developing with 
 ## 📁 Directory Structure
 
 ### Development Guides
+
 Contains guides for various aspects of TikTrack development.
 
 **Files:**
+
 - `DEVELOPMENT_CACHE_GUIDE.md`
 - `bootstrap-5-menu-classes-reference.md`
 - `linter-config.md`
@@ -20,15 +22,18 @@ Contains guides for various aspects of TikTrack development.
 ## 🎯 Guide Categories
 
 ### Cache System
+
 - Advanced Cache System Guide
 - Cache Monitoring and Management
 
 ### CSS and Styling
+
 - Bootstrap 5 Menu Classes Reference
 - CSS Migration Guide
 - Menu Classes Comparison
 
 ### Development Tools
+
 - Linter Configuration
 - Menu Migration Workplan
 

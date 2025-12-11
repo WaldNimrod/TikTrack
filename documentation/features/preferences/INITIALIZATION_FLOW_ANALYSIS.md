@@ -13,6 +13,7 @@
 **מיקום:** שורות 384-412
 
 **תהליך:**
+
 ```javascript
 async pageConfig => {
   // 1. Load trading accounts
@@ -40,6 +41,7 @@ async pageConfig => {
 ```
 
 **תלויות:**
+
 - `window.PreferencesUIV4.initialize()` או `window.PreferencesUI.initialize()`
 - `window.loadAccountsForPreferences()`
 - `window.loadDefaultColors()`
@@ -52,6 +54,7 @@ async pageConfig => {
 **מיקום:** שורות 18-264
 
 **תהליך:**
+
 ```javascript
 async initialize() {
   // Step 1: Initialize lazy loading FIRST
@@ -80,12 +83,14 @@ async initialize() {
 ```
 
 **תלויות:**
+
 - `window.PreferencesCore.initializeWithLazyLoading()`
 - `window.PreferencesV4.bootstrap()`
 - `window.updatePreferencesSummary()`
 - Event: `preferences:updated`
 
 **בעיות מזוהות:**
+
 - `_populateAllFormFields()` נקרא פעמיים: פעם אחת ב-initialize() ופעם נוספת ב-event listener
 
 ### 3. דרך PreferencesUI.initialize()
@@ -95,6 +100,7 @@ async initialize() {
 **מיקום:** שורות 595-651
 
 **תהליך:**
+
 ```javascript
 async initialize() {
   // 0) Bootstrap barrier first
@@ -117,6 +123,7 @@ async initialize() {
 ```
 
 **תלויות:**
+
 - `this.bootstrap()`
 - `window.PreferencesData.loadProfiles()`
 - `window.LazyLoader.initialize()`
@@ -129,6 +136,7 @@ async initialize() {
 **מיקום:** שורות 1076-1129
 
 **תהליך:**
+
 ```javascript
 async initializeWithLazyLoading(userId = null, profileId = null) {
   const finalUserId = userId || this.currentUserId || 1;
@@ -148,6 +156,7 @@ async initializeWithLazyLoading(userId = null, profileId = null) {
 ```
 
 **תלויות:**
+
 - `window.LazyLoader.initialize()`
 - `this.getCriticalPreferences()`
 
@@ -158,6 +167,7 @@ async initializeWithLazyLoading(userId = null, profileId = null) {
 **מיקום:** שורות 239-290
 
 **תהליך:**
+
 ```javascript
 async initialize(userId = 1, profileId = 0) {
   // Load critical preferences immediately
@@ -174,6 +184,7 @@ async initialize(userId = 1, profileId = 0) {
 ```
 
 **תלויות:**
+
 - `this.loadCriticalPreferences()`
 - `this.startBackgroundLoading()`
 - Event: `preferences:critical-loaded`
@@ -204,6 +215,7 @@ async initialize(userId = 1, profileId = 0) {
 ### כפילות 1: LazyLoader.initialize()
 
 **מיקום:**
+
 - נקרא מ-`PreferencesCore.initializeWithLazyLoading()`
 - נקרא מ-`PreferencesUI.initialize()`
 
@@ -212,6 +224,7 @@ async initialize(userId = 1, profileId = 0) {
 ### כפילות 2: _populateAllFormFields()
 
 **מיקום:**
+
 - נקרא מ-`PreferencesUIV4.initialize()` (שורה 234)
 - נקרא מ-event listener `preferences:updated` (שורה 254)
 
@@ -220,6 +233,7 @@ async initialize(userId = 1, profileId = 0) {
 ### כפילות 3: Bootstrap
 
 **מיקום:**
+
 - `PreferencesUI.bootstrap()` (שורה 563)
 - `PreferencesV4.bootstrap()` (שורה 62)
 
@@ -240,6 +254,7 @@ async initialize(userId = 1, profileId = 0) {
 **מספר נקודות כניסה:** 5
 
 **המלצות:**
+
 1. איחוד נקודת כניסה אחת - PreferencesManager.initialize()
 2. הסרת כפילויות ב-population
 3. איחוד bootstrap functions

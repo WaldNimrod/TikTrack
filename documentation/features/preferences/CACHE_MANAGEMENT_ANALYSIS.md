@@ -13,11 +13,13 @@
 **תיאור:** מטמון בזיכרון (Map/object)
 
 **שימוש:**
+
 - מהיר ביותר
 - נמחק ב-refresh
 - לא נשמר בין sessions
 
 **דוגמאות:**
+
 ```javascript
 // UnifiedCacheManager.layers.memory
 this.layers.memory = new Map();
@@ -30,11 +32,13 @@ this.layers.memory = new Map();
 **תיאור:** מטמון בדפדפן (persistent)
 
 **שימוש:**
+
 - נשמר בין sessions
 - מוגבל ל-5-10MB
 - נמחק ידנית או ב-TTL
 
 **דוגמאות:**
+
 ```javascript
 // UnifiedCacheManager.layers.localStorage
 localStorage.setItem(key, JSON.stringify(value));
@@ -49,11 +53,13 @@ localStorage.removeItem(key);
 **תיאור:** מטמון מתקדם בדפדפן (persistent, גדול)
 
 **שימוש:**
+
 - נשמר בין sessions
 - יכול להיות גדול מאוד
 - async API
 
 **דוגמאות:**
+
 ```javascript
 // UnifiedCacheManager.layers.indexedDB
 await this.layers.indexedDB.put(key, value);
@@ -68,6 +74,7 @@ await this.layers.indexedDB.delete(key);
 **תיאור:** מטמון בשרת
 
 **שימוש:**
+
 - ETag/304 responses
 - Server-side caching
 
@@ -78,6 +85,7 @@ await this.layers.indexedDB.delete(key);
 **קובץ:** `trading-ui/scripts/unified-cache-manager.js`
 
 **פונקציות:**
+
 - `get(key, options)` - קריאה מכל השכבות
 - `set(key, value, options)` - שמירה לכל השכבות
 - `save(key, value, options)` - alias ל-set
@@ -85,6 +93,7 @@ await this.layers.indexedDB.delete(key);
 - `refreshUserPreferences()` - רענון מטמון העדפות
 
 **תהליך קריאה:**
+
 ```
 get(key)
   ↓
@@ -98,6 +107,7 @@ API call - אם אין, טען מהשרת + שמור בכל השכבות
 ```
 
 **תהליך שמירה:**
+
 ```
 set(key, value)
   ↓
@@ -115,6 +125,7 @@ IndexedDB.put(key, value)
 **מיקום:** שורות 939-1003
 
 **תהליך:**
+
 ```javascript
 async loadGroupPreferences(groupName, userId, profileId, forceRefresh = false) {
   const cacheKey = `preference_group_${groupName}_${userId}_${profileId}`;
@@ -160,6 +171,7 @@ async loadGroupPreferences(groupName, userId, profileId, forceRefresh = false) {
 **מיקום:** שורות 691-863
 
 **תהליך:**
+
 ```javascript
 async loadAllPreferencesRaw({ userId, profileId, force, ttl } = {}) {
   const cacheKey = buildCacheKey(KEY_PREFIXES.all, [
@@ -200,6 +212,7 @@ async loadAllPreferencesRaw({ userId, profileId, force, ttl } = {}) {
 ### 4. PreferencesData - Cache Keys
 
 **פורמטים שונים:**
+
 - `preference_{name}_{userId}_{profileId}` - העדפה בודדת
 - `preference_group_{groupName}_{userId}_{profileId}` - קבוצת העדפות
 - `preferences_all_u{userId}_p{profileId}` - כל ההעדפות
@@ -214,6 +227,7 @@ async loadAllPreferencesRaw({ userId, profileId, force, ttl } = {}) {
 **מיקום:** `unified-cache-manager.js:3200-3330`
 
 **תהליך:**
+
 ```javascript
 async refreshUserPreferences(profileId, groupName, opts = {}) {
   // 1. זיהוי מפתחות להסרה
@@ -233,6 +247,7 @@ async refreshUserPreferences(profileId, groupName, opts = {}) {
 ```
 
 **בעיות:**
+
 - טעינה מחדש מהשרת אחרי ניקוי מטמון (מיותר!)
 - לא ברור מתי צריך לטעון מחדש
 
@@ -241,6 +256,7 @@ async refreshUserPreferences(profileId, groupName, opts = {}) {
 **מיקום:** `preferences-core-new.js:1033-1043`
 
 **תהליך:**
+
 ```javascript
 async clearGroupCache(groupName, userId, profileId) {
   const cacheKey = `preference_group_${groupName}_${userId}_${profileId}`;
@@ -249,6 +265,7 @@ async clearGroupCache(groupName, userId, profileId) {
 ```
 
 **בעיות:**
+
 - רק מנקה מטמון, לא מעדכן UI
 - לא מנקה מטמון של כל ההעדפות
 
@@ -257,6 +274,7 @@ async clearGroupCache(groupName, userId, profileId) {
 **מיקום:** `services/preferences-data.js:1018-1029`
 
 **תהליך:**
+
 ```javascript
 if (CacheSyncManager?.invalidateByAction) {
   await CacheSyncManager.invalidateByAction('preference-updated');
@@ -268,6 +286,7 @@ if (CacheSyncManager?.invalidateByAction) {
 ```
 
 **בעיות:**
+
 - שתי דרכים שונות לניקוי מטמון
 - לא ברור מתי להשתמש באיזו
 
@@ -276,6 +295,7 @@ if (CacheSyncManager?.invalidateByAction) {
 ### Race Condition 1: Concurrent Loads
 
 **תרחיש:**
+
 1. Thread A: `loadGroupPreferences('trading_settings')` - אין במטמון, מתחיל API call
 2. Thread B: `loadGroupPreferences('trading_settings')` - אין במטמון, מתחיל API call
 3. שני API calls רצים במקביל
@@ -288,6 +308,7 @@ if (CacheSyncManager?.invalidateByAction) {
 ### Race Condition 2: Save + Load
 
 **תרחיש:**
+
 1. Thread A: `saveGroup()` - שומר העדפות
 2. Thread A: `refreshUserPreferences()` - מנקה מטמון
 3. Thread B: `loadGroupPreferences()` - אין במטמון, טוען מהשרת
@@ -299,6 +320,7 @@ if (CacheSyncManager?.invalidateByAction) {
 ### Race Condition 3: Cache Invalidation + Read
 
 **תרחיש:**
+
 1. Thread A: `remove(cacheKey)` - מוחק מטמון
 2. Thread B: `get(cacheKey)` - קורא מטמון (עדיין יש!)
 3. Thread A: `set(cacheKey, newValue)` - שומר ערך חדש
@@ -309,15 +331,19 @@ if (CacheSyncManager?.invalidateByAction) {
 ## Cache Keys לא עקביים
 
 ### פורמט 1: `preference_{name}_{userId}_{profileId}`
+
 **מיקום:** preferences-core-new.js
 
 ### פורמט 2: `preference_group_{groupName}_{userId}_{profileId}`
+
 **מיקום:** preferences-core-new.js
 
 ### פורמט 3: `preferences_all_u{userId}_p{profileId}`
+
 **מיקום:** preferences-data.js
 
 ### פורמט 4: `tiktrack_preference_...`
+
 **מיקום:** unified-cache-manager.js (עם prefix)
 
 **בעיה:** פורמטים שונים מקשים על ניהול מטמון
@@ -331,6 +357,7 @@ if (CacheSyncManager?.invalidateByAction) {
 **מספר פורמטי cache keys:** 4
 
 **המלצות:**
+
 1. איחוד פורמט cache keys - `preference_{type}_{identifier}_{userId}_{profileId}`
 2. הוספת deduplication בכל נקודות הכניסה
 3. הסרת טעינה מחדש מ-`refreshUserPreferences()`

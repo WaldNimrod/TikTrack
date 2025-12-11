@@ -1,4 +1,5 @@
 # Business Rules Registry - Documentation
+
 # Business Rules Registry - תיעוד
 
 **תאריך יצירה:** 22 נובמבר 2025  
@@ -28,26 +29,29 @@ Business Rules Registry הוא מרשם מרכזי לכל חוקי העסק במ
 - **תחזוקה קלה** - שינוי חוק עסקי במקום אחד משפיע על כל המערכת
 - **עקביות** - הבטחת עקביות בלוגיקה העסקית
 
-### חלוקה בין Constraints ל-Business Rules:
+### חלוקה בין Constraints ל-Business Rules
 
 **Database Constraints (ValidationService):**
+
 - אילוצים בסיסיים מבסיס הנתונים (NOT NULL, UNIQUE, FOREIGN KEY, ENUM, RANGE, CHECK)
 - נבדקים כשלב ראשון ב-`validate()` דרך `validate_with_constraints()`
 
 **Business Rules (BusinessRulesRegistry):**
+
 - חוקי עסק מורכבים (min/max, allowed_values, required)
 - חוקים שלא ניתן לבטא ב-constraints
 - נבדקים כשלב שני ב-`validate()` דרך `registry.validate_value()`
 
 **הערה חשובה:** אין כפילות - Constraints בודקים אילוצים בסיסיים, Business Rules בודקים חוקים מורכבים יותר.
 
-### מיקום:
+### מיקום
 
 **קובץ:** `Backend/services/business_logic/business_rules_registry.py`
 
-### שימוש:
+### שימוש
 
 כל Business Service משתמש ב-Registry לולידציה של נתונים:
+
 - `TradeBusinessService` - ולידציה של trades
 - `ExecutionBusinessService` - ולידציה של executions
 - `AlertBusinessService` - ולידציה של alerts
@@ -57,7 +61,7 @@ Business Rules Registry הוא מרשם מרכזי לכל חוקי העסק במ
 
 ## 🏗️ מבנה ה-Registry
 
-### מבנה כללי:
+### מבנה כללי
 
 ```python
 BUSINESS_RULES: Dict[str, Dict[str, Any]] = {
@@ -73,7 +77,7 @@ BUSINESS_RULES: Dict[str, Dict[str, Any]] = {
 }
 ```
 
-### BusinessRulesRegistry Class:
+### BusinessRulesRegistry Class
 
 ```python
 class BusinessRulesRegistry:
@@ -97,7 +101,7 @@ class BusinessRulesRegistry:
         """Get all business rules."""
 ```
 
-### Global Instance:
+### Global Instance
 
 ```python
 # Global registry instance
@@ -125,6 +129,7 @@ business_rules_registry = BusinessRulesRegistry()
 | `status` | string | - | - | ✅ | `['open', 'closed', 'cancelled']` |
 
 **הערות:**
+
 - `quantity` תומך בשברים (fractional shares)
 - `take_profit_percent` תומך באחוזים גבוהים (עד 10,000%)
 - `side` תומך ב-4 ערכים: buy, sell, long, short
@@ -141,6 +146,7 @@ business_rules_registry = BusinessRulesRegistry()
 | `status` | string | - | - | ✅ | `['pending', 'completed', 'cancelled']` |
 
 **הערות:**
+
 - `action` תומך ב-4 פעולות: buy, sell, short, cover
 - `status` תומך ב-3 סטטוסים: pending, completed, cancelled
 
@@ -156,6 +162,7 @@ business_rules_registry = BusinessRulesRegistry()
 | `change_percent` | float | -100 | 100 | ❌ | - |
 
 **הערות:**
+
 - `condition_number` תלוי בסוג התנאי (min/max לא מוגדרים)
 - `condition_attribute` תומך ב-3 סוגים: price, change, volume
 - `change_percent` תומך בערכים שליליים (ירידות) וחיוביים (עליות)
@@ -171,6 +178,7 @@ business_rules_registry = BusinessRulesRegistry()
 | `source` | string | - | - | ✅ | `['manual', 'automatic']` |
 
 **הערות:**
+
 - `amount` תומך בסכומים גדולים (עד מיליארד)
 - `type` תומך ב-5 סוגים: income, expense, fee, tax, interest
 - `source` תומך ב-2 מקורות: manual, automatic
@@ -184,6 +192,7 @@ business_rules_registry = BusinessRulesRegistry()
 | `calculation_types` | string | - | - | ✅ | `['kpi', 'summary', 'average', 'position', 'portfolio']` |
 
 **הערות:**
+
 - `calculation_types` תומך ב-5 סוגי חישובים: kpi, summary, average, position, portfolio
 
 ### Note Rules
@@ -193,6 +202,7 @@ business_rules_registry = BusinessRulesRegistry()
 **סטטוס:** ⏳ חוקים לא מוגדרים ב-Registry (ולידציה ב-NoteBusinessService)
 
 **הערות:**
+
 - ולידציה של notes מתבצעת ב-NoteBusinessService ישירות
 - אין חוקים מרכזיים ב-Registry עבור notes
 
@@ -203,6 +213,7 @@ business_rules_registry = BusinessRulesRegistry()
 **סטטוס:** ⏳ חוקים לא מוגדרים ב-Registry (ולידציה ב-TradingAccountBusinessService)
 
 **הערות:**
+
 - ולידציה של trading accounts מתבצעת ב-TradingAccountBusinessService ישירות
 - אין חוקים מרכזיים ב-Registry עבור trading accounts
 
@@ -213,6 +224,7 @@ business_rules_registry = BusinessRulesRegistry()
 **סטטוס:** ⏳ חוקים לא מוגדרים ב-Registry (ולידציה ב-TradePlanBusinessService)
 
 **הערות:**
+
 - ולידציה של trade plans מתבצעת ב-TradePlanBusinessService ישירות
 - אין חוקים מרכזיים ב-Registry עבור trade plans
 
@@ -223,6 +235,7 @@ business_rules_registry = BusinessRulesRegistry()
 **סטטוס:** ⏳ חוקים לא מוגדרים ב-Registry (ולידציה ב-TickerBusinessService)
 
 **הערות:**
+
 - ולידציה של tickers מתבצעת ב-TickerBusinessService ישירות
 - אין חוקים מרכזיים ב-Registry עבור tickers
 
@@ -233,6 +246,7 @@ business_rules_registry = BusinessRulesRegistry()
 **סטטוס:** ⏳ חוקים לא מוגדרים ב-Registry (ולידציה ב-CurrencyBusinessService)
 
 **הערות:**
+
 - ולידציה של currencies מתבצעת ב-CurrencyBusinessService ישירות
 - אין חוקים מרכזיים ב-Registry עבור currencies
 
@@ -243,6 +257,7 @@ business_rules_registry = BusinessRulesRegistry()
 **סטטוס:** ⏳ חוקים לא מוגדרים ב-Registry (ולידציה ב-TagBusinessService)
 
 **הערות:**
+
 - ולידציה של tags מתבצעת ב-TagBusinessService ישירות
 - אין חוקים מרכזיים ב-Registry עבור tags
 
@@ -405,7 +420,7 @@ BUSINESS_RULES['new_entity'] = {
 
 ## ✅ Validation
 
-### איך ה-Registry משמש לולידציה:
+### איך ה-Registry משמש לולידציה
 
 #### 1. Type Validation
 
@@ -479,7 +494,7 @@ class TradeBusinessService(BaseBusinessService):
 
 ## 📊 סיכום
 
-### ישויות עם חוקים ב-Registry:
+### ישויות עם חוקים ב-Registry
 
 | ישות | מספר חוקים | סטטוס |
 | --- | --- | --- |

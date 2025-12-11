@@ -1,4 +1,5 @@
 # מדריך בדיקות בדפדפן - מערכת Multi-User
+
 ## TikTrack - November 29, 2025
 
 מדריך מפורט לבדיקות ידניות מלאות בדפדפן.
@@ -8,11 +9,13 @@
 ## 🔧 הכנות
 
 ### 1. ודא שהשרת רץ
+
 ```bash
 curl http://localhost:8080/api/health
 ```
 
 ### 2. נקה cache של הדפדפן
+
 - פתח Developer Tools (F12)
 - לחץ ימני על כפתור Refresh
 - בחר "Empty Cache and Hard Reload"
@@ -24,6 +27,7 @@ curl http://localhost:8080/api/health
 ### 1. בדיקת ממשק כניסה בפתיחה
 
 **צעדים:**
+
 1. פתח `http://localhost:8080/index.html` (או `http://localhost:8080/`)
 2. **תוצאה צפויה:** המערכת אמורה להעביר אוטומטית ל-`login.html` אם המשתמש לא מחובר
 
@@ -37,13 +41,14 @@ curl http://localhost:8080/api/health
 **URL:** `http://localhost:8080/login.html`
 
 **צעדים:**
+
 1. פתח את העמוד
 2. ודא שהטופס מופיע
 3. מלא:
    - Username: `nimrod`
    - Password: `nimrod123`
 4. לחץ על "התחבר"
-5. **תוצאה צפויה:** 
+5. **תוצאה צפויה:**
    - התחברות מצליחה
    - מעבר אוטומטי ל-index.html
    - שם המשתמש מופיע ב-header
@@ -58,6 +63,7 @@ curl http://localhost:8080/api/health
 **URL:** `http://localhost:8080/register.html`
 
 **צעדים:**
+
 1. פתח את העמוד
 2. מלא את הטופס:
    - Username: `test_user_new_` + timestamp (למשל: `test_user_new_1234567890`)
@@ -76,6 +82,7 @@ curl http://localhost:8080/api/health
 **❌ נכשל:** אם יש שגיאה
 
 **בדיקת שגיאה:**
+
 - נסה להרשם שוב עם אותו username
 - **תוצאה צפויה:** שגיאה "Username already exists"
 
@@ -84,6 +91,7 @@ curl http://localhost:8080/api/health
 ### 4. בדיקת Header - תצוגת משתמש
 
 **צעדים:**
+
 1. התחבר למערכת
 2. בדוק את ה-header (בחלק העליון)
 3. **תוצאה צפויה:**
@@ -98,6 +106,7 @@ curl http://localhost:8080/api/health
 ### 5. בדיקת התנתקות
 
 **צעדים:**
+
 1. התחבר למערכת
 2. לחץ על כפתור "התנתק" ב-header
 3. **תוצאה צפויה:**
@@ -115,6 +124,7 @@ curl http://localhost:8080/api/health
 **URL:** `http://localhost:8080/user-profile.html`
 
 **צעדים:**
+
 1. התחבר למערכת
 2. פתח את העמוד user-profile.html
 3. **תוצאה צפויה:**
@@ -132,6 +142,7 @@ curl http://localhost:8080/api/health
 **URL:** `http://localhost:8080/user-profile.html`
 
 **צעדים:**
+
 1. התחבר למערכת
 2. פתח את עמוד הפרופיל
 3. שנה את הפרטים:
@@ -148,6 +159,7 @@ curl http://localhost:8080/api/health
 **❌ נכשל:** אם יש שגיאה
 
 **בדיקת עדכון ב-header:**
+
 - לאחר עדכון, בדוק את ה-header
 - **תוצאה צפויה:** שם המשתמש מתעדכן (אם display_name השתנה)
 
@@ -158,6 +170,7 @@ curl http://localhost:8080/api/health
 **URL:** `http://localhost:8080/user-profile.html`
 
 **צעדים:**
+
 1. התחבר למערכת
 2. פתח את עמוד הפרופיל
 3. מלא את טופס שינוי הסיסמה:
@@ -173,6 +186,7 @@ curl http://localhost:8080/api/health
 **❌ נכשל:** אם יש שגיאה
 
 **בדיקת שגיאות:**
+
 - נסה עם סיסמה נוכחית שגויה
 - **תוצאה צפויה:** שגיאה "Current password is incorrect"
 - נסה עם סיסמה חדשה קצרה מדי (< 6 תווים)
@@ -181,6 +195,7 @@ curl http://localhost:8080/api/health
 - **תוצאה צפויה:** שגיאה "הסיסמאות החדשות אינן תואמות"
 
 **בדיקת התחברות עם סיסמה חדשה:**
+
 1. התנתק
 2. נסה להתחבר עם הסיסמה החדשה
 3. **תוצאה צפויה:** התחברות מצליחה
@@ -190,6 +205,7 @@ curl http://localhost:8080/api/health
 ### 9. בדיקת סינון נתונים לפי משתמש
 
 **צעדים:**
+
 1. התחבר כמשתמש 1 (nimrod)
 2. פתח `/trades`
 3. רשום כמה טריידים יש (למשל: 81)
@@ -210,6 +226,7 @@ curl http://localhost:8080/api/health
 ### 10. בדיקת טיקרים משותפים
 
 **צעדים:**
+
 1. התחבר
 2. פתח `/tickers`
 3. **תוצאה צפויה:** מופיעים כל הטיקרים (89)
@@ -228,6 +245,7 @@ curl http://localhost:8080/api/health
 ### 11. בדיקת Auth Guard
 
 **צעדים:**
+
 1. התנתק מהמערכת
 2. נסה לגשת ישירות ל-`http://localhost:8080/trades.html`
 3. **תוצאה צפויה:** מעבר אוטומטי ל-login.html
@@ -242,6 +260,7 @@ curl http://localhost:8080/api/health
 ### 12. בדיקת Preferences per User
 
 **צעדים:**
+
 1. התחבר כמשתמש 1
 2. פתח `/preferences`
 3. שנה העדפה כלשהי (למשל: theme)
@@ -257,6 +276,7 @@ curl http://localhost:8080/api/health
 ### 13. בדיקת Cache Isolation
 
 **צעדים:**
+
 1. התחבר כמשתמש 1
 2. פתח Developer Tools → Application → Local Storage
 3. בדוק את מפתחות ה-cache
@@ -293,19 +313,25 @@ curl http://localhost:8080/api/health
 ## 🐛 בעיות נפוצות ופתרונות
 
 ### בעיה: ממשק כניסה לא מופיע בפתיחה
+
 **פתרון:**
+
 1. ודא ש-`auth.js` ו-`auth-guard.js` נטענים ב-index.html
 2. בדוק ב-Console אם יש שגיאות JavaScript
 3. נקה cache של הדפדפן
 
 ### בעיה: התחברות לא עובדת
+
 **פתרון:**
+
 1. בדוק שהשרת רץ
 2. בדוק ב-Network tab אם ה-request ל-`/api/auth/login` נשלח
 3. בדוק את ה-response - האם יש שגיאה?
 
 ### בעיה: עדכון סיסמה לא עובד
+
 **פתרון:**
+
 1. ודא שהסיסמה הנוכחית נכונה
 2. ודא שהסיסמה החדשה ארוכה מספיק (6+ תווים)
 3. בדוק ב-Network tab את ה-request ל-`/api/auth/me/password`
@@ -315,6 +341,7 @@ curl http://localhost:8080/api/health
 ## ✅ קריטריונים להצלחה
 
 כל הבדיקות צריכות לעבור:
+
 - ✅ ממשק כניסה מופיע בפתיחה
 - ✅ התחברות והתנתקות עובדות
 - ✅ הרשמה עובדת

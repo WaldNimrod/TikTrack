@@ -78,6 +78,54 @@
  * @refactoringPhase 6 - Modular Architecture
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - buildDisplayString() - Builddisplaystring
+
+// === Event Handlers ===
+// - getUserTimezone() - Getusertimezone
+// - setUserTimezone() - Setusertimezone
+// - padDurationPart() - Paddurationpart
+// - formatDurationParts() - Formatdurationparts
+// - getDurationSince() - Getdurationsince
+// - getEpochMilliseconds() - Getepochmilliseconds
+// - formatDateOnly() - Formatdateonly
+// - formatLongDate() - Formatlongdate
+// - formatTimeOnly() - Formattimeonly
+// - addMonths() - Addmonths
+
+// === Data Functions ===
+// - getLatestTimestamp() - Getlatesttimestamp
+// - translateDateRangeToDates() - Translatedaterangetodates
+
+// === Utility Functions ===
+// - parseEnvelope() - Parseenvelope
+// - formatEnvelope() - Formatenvelope
+// - formatWithIntl() - Formatwithintl
+// - formatDate() - Formatdate
+// - formatDateTime() - Formatdatetime
+// - formatShortDate() - Formatshortdate
+// - formatDateFull() - Formatdatefull
+// - formatDateNormal() - Formatdatenormal
+// - formatDateShort() - Formatdateshort
+// - parseDate() - Parsedate
+
+// === Other ===
+// - isDateEnvelope() - Isdateenvelope
+// - toDateObject() - Todateobject
+// - resolvePropertyPath() - Resolvepropertypath
+// - ensureDateEnvelope() - Ensuredateenvelope
+// - toISOString() - Toisostring
+// - toDate() - Todate
+// - isValidDate() - Isvaliddate
+// - isPastDate() - Ispastdate
+// - isFutureDate() - Isfuturedate
+// - daysDifference() - Daysdifference
+// - addDays() - Adddays
+// - adaptDateEnvelopes() - Adaptdateenvelopes
+
 const DEFAULT_LOCALE = 'he-IL';
 let userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
 

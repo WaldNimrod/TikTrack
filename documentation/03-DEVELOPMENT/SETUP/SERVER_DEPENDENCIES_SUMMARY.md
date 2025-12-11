@@ -14,31 +14,37 @@
 ## 🔧 חבילות בסיס (Core Dependencies)
 
 ### Flask & Web Framework
+
 - `Flask==2.3.3` - Web framework
 - `Flask-CORS==4.0.0` - Cross-Origin Resource Sharing
 - `Werkzeug==2.3.7` - WSGI utilities
 
 ### Database
+
 - `SQLAlchemy==2.0.23` - ORM
 - `psycopg2-binary==2.9.9` - PostgreSQL adapter
 
 
 ### Production Server
+
 - `gunicorn==21.2.0` - Production WSGI server
 - `waitress==2.1.2` - Production WSGI server (Windows)
 - `requests==2.31.0` - HTTP library
 
 ### Security & Encryption
+
 - `cryptography==41.0.7` - Encryption (SMTP passwords, API keys)
 - `bcrypt==4.1.2` - Password hashing
 
 ### Utilities
+
 - `urllib3<2.0` - HTTP client (SSL compatibility)
 - `bleach==6.1.0` - HTML sanitization
 - `pytz==2023.3` - Timezone support
 - `yfinance==0.2.18` - Yahoo Finance integration
 
 ### Testing
+
 - `pytest==7.4.3` - Testing framework
 - `pytest-cov==4.1.0` - Coverage plugin
 - `pytest-html==4.1.1` - HTML reports
@@ -51,43 +57,52 @@
 ## 🤖 חבילות AI Analysis (נוספו ינואר 2025)
 
 ### httpx (v0.28.1)
+
 **תפקיד:** HTTP client עבור Perplexity AI API
 
 **למה נדרש:**
+
 - אינטגרציה עם Perplexity AI API
 - תמיכה ב-async/await
 - תמיכה ב-HTTP/2
 
 **התקנה:**
+
 ```bash
 pip install httpx==0.28.1
 ```
 
 **תלויות:**
+
 - `anyio` - Async I/O
 - `httpcore` - Low-level HTTP
 - `certifi` - SSL certificates
 - `idna` - Domain names
 
 **שימוש:**
+
 - `Backend/services/llm_providers/perplexity_provider.py`
 
 ---
 
 ### google-generativeai (v0.8.5)
+
 **תפקיד:** Google Gemini API client
 
 **למה נדרש:**
+
 - אינטגרציה עם Google Gemini API
 - תמיכה ב-Gemini 1.5 Flash (חינמי)
 - תמיכה ב-multimodal content
 
 **התקנה:**
+
 ```bash
 pip install google-generativeai==0.8.5
 ```
 
 **תלויות עיקריות:**
+
 - `google-ai-generativelanguage==0.6.15` - Gemini API core
 - `google-api-core==2.28.1` - Google API core
 - `google-api-python-client==2.187.0` - Google API client
@@ -98,6 +113,7 @@ pip install google-generativeai==0.8.5
 - `tqdm` - Progress bars
 
 **שימוש:**
+
 - `Backend/services/llm_providers/gemini_provider.py`
 
 ---
@@ -171,16 +187,19 @@ conn.close()
 ## 🌍 דרישות לכל סביבה
 
 ### ✅ Development
+
 - כל החבילות הבסיסיות
 - `httpx==0.28.1`
 - `google-generativeai==0.8.5`
 
 ### ✅ Production
+
 - כל החבילות הבסיסיות
 - `httpx==0.28.1`
 - `google-generativeai==0.8.5`
 
 ### ✅ CI/CD
+
 - כל החבילות הבסיסיות
 - `httpx==0.28.1`
 - `google-generativeai==0.8.5`

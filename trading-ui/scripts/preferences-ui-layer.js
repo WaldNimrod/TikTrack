@@ -13,6 +13,17 @@
  * @lastUpdated January 2025
  */
 
+// ===== FUNCTION INDEX =====
+
+// === UI Layer ===
+// - PreferencesUILayer.init() - Init
+// - PreferencesUILayer.render() - Render
+// - PreferencesUILayer.update() - Update
+
+// === Event Handlers ===
+// - PreferencesUILayer.handleSave() - Handle Save
+// - PreferencesUILayer.handleReset() - Handle Reset
+
 // ============================================================================
 // PREFERENCES UI LAYER CLASS
 // ============================================================================

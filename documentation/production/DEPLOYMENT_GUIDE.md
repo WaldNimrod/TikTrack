@@ -28,6 +28,7 @@ git push origin main
 ### שלב 2: בדיקות
 
 לפני יצירת release:
+
 1. בדוק שהכל עובד בסביבת פיתוח
 2. הרץ בדיקות
 3. ודא שאין שגיאות
@@ -63,20 +64,23 @@ git checkout v1.0.1
 
 אם יש שינויים במבנה בסיס הנתונים:
 
-### לפני עדכון הקוד:
+### לפני עדכון הקוד
 
 1. **גבה את בסיס הנתונים:**
+
    ```bash
    python3 Backend/scripts/backup_database.py
    ```
 
 2. **הרץ migrations (אם יש):**
+
    ```bash
    # לדוגמה, אם יש migration scripts
    python3 Backend/migrations/your_migration.py
    ```
 
 3. **ודא שהכל עובד:**
+
    ```bash
    ./start_production.sh
    ```
@@ -101,6 +105,7 @@ git checkout v1.0.0  # או tag אחר
 לאחר עדכון, בדוק:
 
 1. **Health Check:**
+
    ```bash
    curl http://127.0.0.1:5001/api/health
    ```
@@ -111,6 +116,7 @@ git checkout v1.0.0  # או tag אחר
    - ודא שאין שגיאות בקונסול
 
 3. **בדיקת לוגים:**
+
    ```bash
    tail -f Backend/logs-production/app.log
    ```
@@ -158,6 +164,7 @@ git checkout v1.0.1
 ### בעיות ביצועים
 
 אם יש בעיות ביצועים אחרי עדכון:
+
 1. בדוק את `performance.log`
 2. נקה את ה-cache אם צריך
 3. בדוק את הגדרות ה-cache ב-`config/settings.py`
@@ -165,6 +172,7 @@ git checkout v1.0.1
 ## תמיכה
 
 לשאלות או בעיות:
+
 - בדוק את `PRODUCTION_SETUP.md`
 - בדוק את הלוגים ב-`Backend/logs-production/`
 - בדוק את ה-Git history: `git log --oneline`

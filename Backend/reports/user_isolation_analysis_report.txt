@@ -1,0 +1,1033 @@
+================================================================================
+User Isolation Issues Analysis Report
+================================================================================
+
+Total Issues Found: 92
+  - High Severity: 42
+  - Medium Severity: 50
+
+Issues by Type:
+  - missing_user_id_check: 36
+  - missing_user_id_parameter: 30
+  - user_id_not_used: 6
+  - user_id_resolved_but_not_used: 20
+
+================================================================================
+Detailed Issues
+================================================================================
+
+[MEDIUM] routes/api/alerts.py:35
+  Function: get_alerts
+  Issue Type: missing_user_id_parameter
+  Details:
+    - Has user_id getattr: False
+    - Has user_id filter: False
+    - Has user_id parameter: False
+    - Has resolve_user_id: False
+    - Has DB query: False
+    - Has service call: True
+
+[MEDIUM] routes/api/alerts.py:46
+  Function: get_alert
+  Issue Type: missing_user_id_parameter
+  Details:
+    - Has user_id getattr: False
+    - Has user_id filter: False
+    - Has user_id parameter: False
+    - Has resolve_user_id: False
+    - Has DB query: False
+    - Has service call: True
+
+[MEDIUM] routes/api/cash_flows.py:95
+  Function: get_cash_flows
+  Issue Type: missing_user_id_parameter
+  Details:
+    - Has user_id getattr: False
+    - Has user_id filter: False
+    - Has user_id parameter: False
+    - Has resolve_user_id: False
+    - Has DB query: False
+    - Has service call: True
+
+[MEDIUM] routes/api/cash_flows.py:1301
+  Function: delete_currency_exchange
+  Issue Type: missing_user_id_parameter
+  Details:
+    - Has user_id getattr: False
+    - Has user_id filter: False
+    - Has user_id parameter: False
+    - Has resolve_user_id: False
+    - Has DB query: False
+    - Has service call: True
+
+[MEDIUM] routes/api/currencies.py:24
+  Function: get_currencies
+  Issue Type: missing_user_id_parameter
+  Details:
+    - Has user_id getattr: False
+    - Has user_id filter: False
+    - Has user_id parameter: False
+    - Has resolve_user_id: False
+    - Has DB query: False
+    - Has service call: True
+
+[MEDIUM] routes/api/currencies.py:58
+  Function: get_currency
+  Issue Type: missing_user_id_parameter
+  Details:
+    - Has user_id getattr: False
+    - Has user_id filter: False
+    - Has user_id parameter: False
+    - Has resolve_user_id: False
+    - Has DB query: False
+    - Has service call: True
+
+[MEDIUM] routes/api/currencies.py:97
+  Function: create_currency
+  Issue Type: missing_user_id_parameter
+  Details:
+    - Has user_id getattr: False
+    - Has user_id filter: False
+    - Has user_id parameter: False
+    - Has resolve_user_id: False
+    - Has DB query: False
+    - Has service call: True
+
+[MEDIUM] routes/api/currencies.py:202
+  Function: update_currency
+  Issue Type: missing_user_id_parameter
+  Details:
+    - Has user_id getattr: False
+    - Has user_id filter: False
+    - Has user_id parameter: False
+    - Has resolve_user_id: False
+    - Has DB query: False
+    - Has service call: True
+
+[MEDIUM] routes/api/currencies.py:342
+  Function: delete_currency
+  Issue Type: missing_user_id_parameter
+  Details:
+    - Has user_id getattr: False
+    - Has user_id filter: False
+    - Has user_id parameter: False
+    - Has resolve_user_id: False
+    - Has DB query: False
+    - Has service call: True
+
+[MEDIUM] routes/api/executions.py:131
+  Function: get_execution
+  Issue Type: missing_user_id_parameter
+  Details:
+    - Has user_id getattr: False
+    - Has user_id filter: False
+    - Has user_id parameter: False
+    - Has resolve_user_id: False
+    - Has DB query: False
+    - Has service call: True
+
+[MEDIUM] routes/api/plan_conditions.py:581
+  Function: delete_plan_condition
+  Issue Type: missing_user_id_parameter
+  Details:
+    - Has user_id getattr: True
+    - Has user_id filter: True
+    - Has user_id parameter: False
+    - Has resolve_user_id: False
+    - Has DB query: True
+    - Has service call: True
+
+[MEDIUM] routes/api/tags.py:70
+  Function: list_categories
+  Issue Type: user_id_resolved_but_not_used
+  Details:
+    - Has user_id getattr: False
+    - Has user_id filter: False
+    - Has user_id parameter: False
+    - Has resolve_user_id: True
+    - Has DB query: False
+    - Has service call: False
+
+[MEDIUM] routes/api/tags.py:142
+  Function: update_category
+  Issue Type: user_id_resolved_but_not_used
+  Details:
+    - Has user_id getattr: False
+    - Has user_id filter: False
+    - Has user_id parameter: False
+    - Has resolve_user_id: True
+    - Has DB query: False
+    - Has service call: False
+
+[MEDIUM] routes/api/tags.py:195
+  Function: delete_category
+  Issue Type: user_id_resolved_but_not_used
+  Details:
+    - Has user_id getattr: False
+    - Has user_id filter: False
+    - Has user_id parameter: False
+    - Has resolve_user_id: True
+    - Has DB query: False
+    - Has service call: False
+
+[MEDIUM] routes/api/tags.py:229
+  Function: search_tags
+  Issue Type: user_id_resolved_but_not_used
+  Details:
+    - Has user_id getattr: False
+    - Has user_id filter: False
+    - Has user_id parameter: False
+    - Has resolve_user_id: True
+    - Has DB query: False
+    - Has service call: False
+
+[MEDIUM] routes/api/tags.py:274
+  Function: get_tag_cloud
+  Issue Type: user_id_resolved_but_not_used
+  Details:
+    - Has user_id getattr: False
+    - Has user_id filter: False
+    - Has user_id parameter: False
+    - Has resolve_user_id: True
+    - Has DB query: False
+    - Has service call: False
+
+[MEDIUM] routes/api/tags.py:295
+  Function: list_tags
+  Issue Type: user_id_resolved_but_not_used
+  Details:
+    - Has user_id getattr: False
+    - Has user_id filter: False
+    - Has user_id parameter: False
+    - Has resolve_user_id: True
+    - Has DB query: False
+    - Has service call: False
+
+[MEDIUM] routes/api/tags.py:363
+  Function: update_tag
+  Issue Type: user_id_resolved_but_not_used
+  Details:
+    - Has user_id getattr: False
+    - Has user_id filter: False
+    - Has user_id parameter: False
+    - Has resolve_user_id: True
+    - Has DB query: False
+    - Has service call: False
+
+[MEDIUM] routes/api/tags.py:416
+  Function: delete_tag
+  Issue Type: user_id_resolved_but_not_used
+  Details:
+    - Has user_id getattr: False
+    - Has user_id filter: False
+    - Has user_id parameter: False
+    - Has resolve_user_id: True
+    - Has DB query: False
+    - Has service call: False
+
+[MEDIUM] routes/api/tags.py:447
+  Function: get_entity_tags
+  Issue Type: user_id_resolved_but_not_used
+  Details:
+    - Has user_id getattr: False
+    - Has user_id filter: False
+    - Has user_id parameter: False
+    - Has resolve_user_id: True
+    - Has DB query: False
+    - Has service call: False
+
+[MEDIUM] routes/api/tags.py:480
+  Function: assign_tags
+  Issue Type: user_id_resolved_but_not_used
+  Details:
+    - Has user_id getattr: False
+    - Has user_id filter: False
+    - Has user_id parameter: False
+    - Has resolve_user_id: True
+    - Has DB query: False
+    - Has service call: False
+
+[MEDIUM] routes/api/tags.py:598
+  Function: get_suggestions
+  Issue Type: user_id_resolved_but_not_used
+  Details:
+    - Has user_id getattr: False
+    - Has user_id filter: False
+    - Has user_id parameter: False
+    - Has resolve_user_id: True
+    - Has DB query: False
+    - Has service call: False
+
+[MEDIUM] routes/api/tags.py:634
+  Function: get_analytics
+  Issue Type: user_id_resolved_but_not_used
+  Details:
+    - Has user_id getattr: False
+    - Has user_id filter: False
+    - Has user_id parameter: False
+    - Has resolve_user_id: True
+    - Has DB query: False
+    - Has service call: False
+
+[MEDIUM] routes/api/tickers.py:80
+  Function: get_tickers
+  Issue Type: missing_user_id_parameter
+  Details:
+    - Has user_id getattr: True
+    - Has user_id filter: False
+    - Has user_id parameter: False
+    - Has resolve_user_id: False
+    - Has DB query: False
+    - Has service call: True
+
+[MEDIUM] routes/api/tickers.py:350
+  Function: get_tickers_with_trade_counts
+  Issue Type: user_id_resolved_but_not_used
+  Details:
+    - Has user_id getattr: False
+    - Has user_id filter: False
+    - Has user_id parameter: False
+    - Has resolve_user_id: True
+    - Has DB query: False
+    - Has service call: True
+
+[MEDIUM] routes/api/tickers.py:467
+  Function: check_linked_items
+  Issue Type: missing_user_id_parameter
+  Details:
+    - Has user_id getattr: False
+    - Has user_id filter: False
+    - Has user_id parameter: False
+    - Has resolve_user_id: False
+    - Has DB query: False
+    - Has service call: True
+
+[MEDIUM] routes/api/tickers.py:758
+  Function: update_ticker
+  Issue Type: missing_user_id_parameter
+  Details:
+    - Has user_id getattr: True
+    - Has user_id filter: True
+    - Has user_id parameter: False
+    - Has resolve_user_id: False
+    - Has DB query: True
+    - Has service call: True
+
+[MEDIUM] routes/api/tickers.py:889
+  Function: get_ticker_provider_symbols
+  Issue Type: missing_user_id_parameter
+  Details:
+    - Has user_id getattr: False
+    - Has user_id filter: False
+    - Has user_id parameter: False
+    - Has resolve_user_id: False
+    - Has DB query: False
+    - Has service call: True
+
+[MEDIUM] routes/api/tickers.py:926
+  Function: delete_ticker
+  Issue Type: missing_user_id_parameter
+  Details:
+    - Has user_id getattr: True
+    - Has user_id filter: True
+    - Has user_id parameter: False
+    - Has resolve_user_id: False
+    - Has DB query: True
+    - Has service call: True
+
+[MEDIUM] routes/api/tickers.py:1114
+  Function: update_ticker_status_auto
+  Issue Type: missing_user_id_parameter
+  Details:
+    - Has user_id getattr: False
+    - Has user_id filter: False
+    - Has user_id parameter: False
+    - Has resolve_user_id: False
+    - Has DB query: False
+    - Has service call: True
+
+[MEDIUM] routes/api/tickers.py:1166
+  Function: update_all_statuses_auto
+  Issue Type: missing_user_id_parameter
+  Details:
+    - Has user_id getattr: False
+    - Has user_id filter: False
+    - Has user_id parameter: False
+    - Has resolve_user_id: False
+    - Has DB query: False
+    - Has service call: True
+
+[MEDIUM] routes/api/tickers.py:1329
+  Function: admin_delete_ticker
+  Issue Type: missing_user_id_parameter
+  Details:
+    - Has user_id getattr: True
+    - Has user_id filter: True
+    - Has user_id parameter: False
+    - Has resolve_user_id: False
+    - Has DB query: True
+    - Has service call: True
+
+[MEDIUM] routes/api/trade_conditions.py:392
+  Function: delete_trade_condition
+  Issue Type: missing_user_id_parameter
+  Details:
+    - Has user_id getattr: True
+    - Has user_id filter: True
+    - Has user_id parameter: False
+    - Has resolve_user_id: False
+    - Has DB query: True
+    - Has service call: True
+
+[MEDIUM] routes/api/trade_plans.py:28
+  Function: get_trade_plans
+  Issue Type: missing_user_id_parameter
+  Details:
+    - Has user_id getattr: False
+    - Has user_id filter: False
+    - Has user_id parameter: False
+    - Has resolve_user_id: False
+    - Has DB query: False
+    - Has service call: True
+
+[MEDIUM] routes/api/trade_plans.py:37
+  Function: get_trade_plan
+  Issue Type: missing_user_id_parameter
+  Details:
+    - Has user_id getattr: False
+    - Has user_id filter: False
+    - Has user_id parameter: False
+    - Has resolve_user_id: False
+    - Has DB query: False
+    - Has service call: True
+
+[MEDIUM] routes/api/trade_plans.py:148
+  Function: update_trade_plan
+  Issue Type: missing_user_id_parameter
+  Details:
+    - Has user_id getattr: False
+    - Has user_id filter: False
+    - Has user_id parameter: False
+    - Has resolve_user_id: False
+    - Has DB query: False
+    - Has service call: True
+
+[MEDIUM] routes/api/trade_plans.py:207
+  Function: confirm_status_change
+  Issue Type: missing_user_id_parameter
+  Details:
+    - Has user_id getattr: False
+    - Has user_id filter: False
+    - Has user_id parameter: False
+    - Has resolve_user_id: False
+    - Has DB query: False
+    - Has service call: True
+
+[MEDIUM] routes/api/trade_plans.py:375
+  Function: delete_trade_plan
+  Issue Type: missing_user_id_parameter
+  Details:
+    - Has user_id getattr: False
+    - Has user_id filter: False
+    - Has user_id parameter: False
+    - Has resolve_user_id: False
+    - Has DB query: False
+    - Has service call: True
+
+[MEDIUM] routes/api/trades.py:280
+  Function: get_trade
+  Issue Type: missing_user_id_parameter
+  Details:
+    - Has user_id getattr: False
+    - Has user_id filter: False
+    - Has user_id parameter: False
+    - Has resolve_user_id: False
+    - Has DB query: False
+    - Has service call: True
+
+[MEDIUM] routes/api/trades.py:443
+  Function: update_trade
+  Issue Type: missing_user_id_parameter
+  Details:
+    - Has user_id getattr: False
+    - Has user_id filter: False
+    - Has user_id parameter: False
+    - Has resolve_user_id: False
+    - Has DB query: False
+    - Has service call: True
+
+[MEDIUM] routes/api/trades.py:591
+  Function: delete_trade
+  Issue Type: missing_user_id_parameter
+  Details:
+    - Has user_id getattr: False
+    - Has user_id filter: False
+    - Has user_id parameter: False
+    - Has resolve_user_id: False
+    - Has DB query: False
+    - Has service call: True
+
+[MEDIUM] routes/api/trading_accounts.py:22
+  Function: get_trading_accounts
+  Issue Type: missing_user_id_parameter
+  Details:
+    - Has user_id getattr: False
+    - Has user_id filter: False
+    - Has user_id parameter: False
+    - Has resolve_user_id: False
+    - Has DB query: False
+    - Has service call: True
+
+[MEDIUM] routes/api/trading_accounts.py:55
+  Function: get_trading_account
+  Issue Type: missing_user_id_parameter
+  Details:
+    - Has user_id getattr: False
+    - Has user_id filter: False
+    - Has user_id parameter: False
+    - Has resolve_user_id: False
+    - Has DB query: False
+    - Has service call: True
+
+[MEDIUM] routes/api/watch_lists.py:98
+  Function: get_watch_lists
+  Issue Type: user_id_resolved_but_not_used
+  Details:
+    - Has user_id getattr: False
+    - Has user_id filter: False
+    - Has user_id parameter: False
+    - Has resolve_user_id: True
+    - Has DB query: False
+    - Has service call: False
+
+[MEDIUM] routes/api/watch_lists.py:218
+  Function: get_watch_list
+  Issue Type: user_id_resolved_but_not_used
+  Details:
+    - Has user_id getattr: False
+    - Has user_id filter: False
+    - Has user_id parameter: False
+    - Has resolve_user_id: True
+    - Has DB query: False
+    - Has service call: False
+
+[MEDIUM] routes/api/watch_lists.py:345
+  Function: delete_watch_list
+  Issue Type: user_id_resolved_but_not_used
+  Details:
+    - Has user_id getattr: False
+    - Has user_id filter: False
+    - Has user_id parameter: False
+    - Has resolve_user_id: True
+    - Has DB query: False
+    - Has service call: False
+
+[MEDIUM] routes/api/watch_lists.py:586
+  Function: remove_ticker_from_list
+  Issue Type: user_id_resolved_but_not_used
+  Details:
+    - Has user_id getattr: False
+    - Has user_id filter: False
+    - Has user_id parameter: False
+    - Has resolve_user_id: True
+    - Has DB query: False
+    - Has service call: False
+
+[MEDIUM] routes/api/watch_lists.py:629
+  Function: reorder_items
+  Issue Type: user_id_resolved_but_not_used
+  Details:
+    - Has user_id getattr: False
+    - Has user_id filter: False
+    - Has user_id parameter: False
+    - Has resolve_user_id: True
+    - Has DB query: False
+    - Has service call: False
+
+[MEDIUM] routes/api/watch_lists.py:770
+  Function: sync_flag_lists
+  Issue Type: user_id_resolved_but_not_used
+  Details:
+    - Has user_id getattr: False
+    - Has user_id filter: False
+    - Has user_id parameter: False
+    - Has resolve_user_id: True
+    - Has DB query: False
+    - Has service call: False
+
+[MEDIUM] routes/api/watch_lists.py:832
+  Function: sync_single_flag_list
+  Issue Type: user_id_resolved_but_not_used
+  Details:
+    - Has user_id getattr: False
+    - Has user_id filter: False
+    - Has user_id parameter: False
+    - Has resolve_user_id: True
+    - Has DB query: False
+    - Has service call: False
+
+[HIGH] routes/api/alerts.py:553
+  Function: get_alerts_by_entity
+  Issue Type: user_id_not_used
+  Details:
+    - Has user_id getattr: True
+    - Has user_id filter: False
+    - Has user_id parameter: False
+    - Has resolve_user_id: False
+    - Has DB query: False
+    - Has service call: False
+
+[HIGH] routes/api/business_logic.py:1375
+  Function: validate_ai_analysis
+  Issue Type: user_id_not_used
+  Details:
+    - Has user_id getattr: True
+    - Has user_id filter: False
+    - Has user_id parameter: False
+    - Has resolve_user_id: False
+    - Has DB query: False
+    - Has service call: False
+
+[HIGH] routes/api/cash_flows.py:267
+  Function: delete_imported_cash_flows
+  Issue Type: missing_user_id_check
+  Details:
+    - Has user_id getattr: False
+    - Has user_id filter: False
+    - Has user_id parameter: False
+    - Has resolve_user_id: False
+    - Has DB query: True
+    - Has service call: True
+
+[HIGH] routes/api/cash_flows.py:734
+  Function: delete_all_cash_flows
+  Issue Type: missing_user_id_check
+  Details:
+    - Has user_id getattr: False
+    - Has user_id filter: False
+    - Has user_id parameter: False
+    - Has resolve_user_id: False
+    - Has DB query: True
+    - Has service call: True
+
+[HIGH] routes/api/cash_flows.py:786
+  Function: create_currency_exchange
+  Issue Type: missing_user_id_check
+  Details:
+    - Has user_id getattr: False
+    - Has user_id filter: False
+    - Has user_id parameter: False
+    - Has resolve_user_id: False
+    - Has DB query: True
+    - Has service call: False
+
+[HIGH] routes/api/cash_flows.py:1057
+  Function: update_currency_exchange
+  Issue Type: missing_user_id_check
+  Details:
+    - Has user_id getattr: False
+    - Has user_id filter: False
+    - Has user_id parameter: False
+    - Has resolve_user_id: False
+    - Has DB query: True
+    - Has service call: False
+
+[HIGH] routes/api/email_logs.py:31
+  Function: get_email_logs
+  Issue Type: missing_user_id_check
+  Details:
+    - Has user_id getattr: False
+    - Has user_id filter: True
+    - Has user_id parameter: False
+    - Has resolve_user_id: False
+    - Has DB query: True
+    - Has service call: False
+
+[HIGH] routes/api/email_logs.py:138
+  Function: get_email_log_statistics
+  Issue Type: missing_user_id_check
+  Details:
+    - Has user_id getattr: False
+    - Has user_id filter: False
+    - Has user_id parameter: False
+    - Has resolve_user_id: False
+    - Has DB query: True
+    - Has service call: False
+
+[HIGH] routes/api/email_logs.py:237
+  Function: get_email_log
+  Issue Type: missing_user_id_check
+  Details:
+    - Has user_id getattr: False
+    - Has user_id filter: False
+    - Has user_id parameter: False
+    - Has resolve_user_id: False
+    - Has DB query: True
+    - Has service call: False
+
+[HIGH] routes/api/executions.py:472
+  Function: batch_assign_executions
+  Issue Type: missing_user_id_check
+  Details:
+    - Has user_id getattr: False
+    - Has user_id filter: False
+    - Has user_id parameter: False
+    - Has resolve_user_id: False
+    - Has DB query: True
+    - Has service call: False
+
+[HIGH] routes/api/external_data_providers.py:24
+  Function: get_external_data_providers
+  Issue Type: missing_user_id_check
+  Details:
+    - Has user_id getattr: False
+    - Has user_id filter: False
+    - Has user_id parameter: False
+    - Has resolve_user_id: False
+    - Has DB query: True
+    - Has service call: False
+
+[HIGH] routes/api/external_data_providers.py:77
+  Function: get_external_data_provider
+  Issue Type: missing_user_id_check
+  Details:
+    - Has user_id getattr: False
+    - Has user_id filter: False
+    - Has user_id parameter: False
+    - Has resolve_user_id: False
+    - Has DB query: True
+    - Has service call: False
+
+[HIGH] routes/api/note_relation_types.py:23
+  Function: get_note_relation_types
+  Issue Type: missing_user_id_check
+  Details:
+    - Has user_id getattr: False
+    - Has user_id filter: False
+    - Has user_id parameter: False
+    - Has resolve_user_id: False
+    - Has DB query: True
+    - Has service call: False
+
+[HIGH] routes/api/note_relation_types.py:49
+  Function: get_note_relation_type
+  Issue Type: missing_user_id_check
+  Details:
+    - Has user_id getattr: False
+    - Has user_id filter: False
+    - Has user_id parameter: False
+    - Has resolve_user_id: False
+    - Has DB query: True
+    - Has service call: False
+
+[HIGH] routes/api/note_relation_types.py:144
+  Function: update_note_relation_type
+  Issue Type: missing_user_id_check
+  Details:
+    - Has user_id getattr: False
+    - Has user_id filter: False
+    - Has user_id parameter: False
+    - Has resolve_user_id: False
+    - Has DB query: True
+    - Has service call: False
+
+[HIGH] routes/api/note_relation_types.py:217
+  Function: delete_note_relation_type
+  Issue Type: missing_user_id_check
+  Details:
+    - Has user_id getattr: False
+    - Has user_id filter: False
+    - Has user_id parameter: False
+    - Has resolve_user_id: False
+    - Has DB query: True
+    - Has service call: True
+
+[HIGH] routes/api/notes.py:502
+  Function: update_note
+  Issue Type: missing_user_id_check
+  Details:
+    - Has user_id getattr: False
+    - Has user_id filter: False
+    - Has user_id parameter: False
+    - Has resolve_user_id: False
+    - Has DB query: True
+    - Has service call: False
+
+[HIGH] routes/api/notes.py:685
+  Function: delete_note
+  Issue Type: missing_user_id_check
+  Details:
+    - Has user_id getattr: False
+    - Has user_id filter: False
+    - Has user_id parameter: False
+    - Has resolve_user_id: False
+    - Has DB query: True
+    - Has service call: True
+
+[HIGH] routes/api/plan_conditions.py:1246
+  Function: toggle_condition_alert
+  Issue Type: missing_user_id_check
+  Details:
+    - Has user_id getattr: False
+    - Has user_id filter: False
+    - Has user_id parameter: False
+    - Has resolve_user_id: False
+    - Has DB query: True
+    - Has service call: False
+
+[HIGH] routes/api/plan_conditions_list.py:24
+  Function: get_plan_conditions
+  Issue Type: missing_user_id_check
+  Details:
+    - Has user_id getattr: False
+    - Has user_id filter: False
+    - Has user_id parameter: False
+    - Has resolve_user_id: False
+    - Has DB query: True
+    - Has service call: False
+
+[HIGH] routes/api/preference_groups.py:24
+  Function: get_preference_groups
+  Issue Type: missing_user_id_check
+  Details:
+    - Has user_id getattr: False
+    - Has user_id filter: False
+    - Has user_id parameter: False
+    - Has resolve_user_id: False
+    - Has DB query: True
+    - Has service call: False
+
+[HIGH] routes/api/preference_groups.py:61
+  Function: get_preference_group
+  Issue Type: missing_user_id_check
+  Details:
+    - Has user_id getattr: False
+    - Has user_id filter: False
+    - Has user_id parameter: False
+    - Has resolve_user_id: False
+    - Has DB query: True
+    - Has service call: False
+
+[HIGH] routes/api/preferences.py:907
+  Function: activate_profile
+  Issue Type: user_id_not_used
+  Details:
+    - Has user_id getattr: True
+    - Has user_id filter: False
+    - Has user_id parameter: False
+    - Has resolve_user_id: False
+    - Has DB query: False
+    - Has service call: False
+
+[HIGH] routes/api/quotes_last.py:40
+  Function: get_quotes_last
+  Issue Type: missing_user_id_check
+  Details:
+    - Has user_id getattr: False
+    - Has user_id filter: False
+    - Has user_id parameter: False
+    - Has resolve_user_id: False
+    - Has DB query: True
+    - Has service call: False
+
+[HIGH] routes/api/quotes_last.py:75
+  Function: get_quote_last
+  Issue Type: missing_user_id_check
+  Details:
+    - Has user_id getattr: False
+    - Has user_id filter: False
+    - Has user_id parameter: False
+    - Has resolve_user_id: False
+    - Has DB query: True
+    - Has service call: False
+
+[HIGH] routes/api/quotes_v1.py:34
+  Function: get_quotes_batch
+  Issue Type: missing_user_id_check
+  Details:
+    - Has user_id getattr: False
+    - Has user_id filter: False
+    - Has user_id parameter: False
+    - Has resolve_user_id: False
+    - Has DB query: True
+    - Has service call: False
+
+[HIGH] routes/api/quotes_v1.py:128
+  Function: get_quote
+  Issue Type: missing_user_id_check
+  Details:
+    - Has user_id getattr: False
+    - Has user_id filter: False
+    - Has user_id parameter: False
+    - Has resolve_user_id: False
+    - Has DB query: True
+    - Has service call: False
+
+[HIGH] routes/api/system_setting_groups.py:24
+  Function: get_system_setting_groups
+  Issue Type: missing_user_id_check
+  Details:
+    - Has user_id getattr: False
+    - Has user_id filter: False
+    - Has user_id parameter: False
+    - Has resolve_user_id: False
+    - Has DB query: True
+    - Has service call: False
+
+[HIGH] routes/api/system_setting_groups.py:62
+  Function: get_system_setting_group
+  Issue Type: missing_user_id_check
+  Details:
+    - Has user_id getattr: False
+    - Has user_id filter: False
+    - Has user_id parameter: False
+    - Has resolve_user_id: False
+    - Has DB query: True
+    - Has service call: False
+
+[HIGH] routes/api/tickers.py:161
+  Function: get_my_tickers
+  Issue Type: user_id_not_used
+  Details:
+    - Has user_id getattr: True
+    - Has user_id filter: False
+    - Has user_id parameter: False
+    - Has resolve_user_id: False
+    - Has DB query: False
+    - Has service call: False
+
+[HIGH] routes/api/tickers.py:394
+  Function: get_ticker
+  Issue Type: missing_user_id_check
+  Details:
+    - Has user_id getattr: False
+    - Has user_id filter: False
+    - Has user_id parameter: False
+    - Has resolve_user_id: False
+    - Has DB query: True
+    - Has service call: True
+
+[HIGH] routes/api/tickers.py:993
+  Function: update_active_trades
+  Issue Type: missing_user_id_check
+  Details:
+    - Has user_id getattr: False
+    - Has user_id filter: False
+    - Has user_id parameter: False
+    - Has resolve_user_id: False
+    - Has DB query: True
+    - Has service call: True
+
+[HIGH] routes/api/tickers.py:1055
+  Function: update_all_active_trades
+  Issue Type: missing_user_id_check
+  Details:
+    - Has user_id getattr: False
+    - Has user_id filter: False
+    - Has user_id parameter: False
+    - Has resolve_user_id: False
+    - Has DB query: True
+    - Has service call: True
+
+[HIGH] routes/api/tickers.py:1200
+  Function: cancel_ticker
+  Issue Type: missing_user_id_check
+  Details:
+    - Has user_id getattr: False
+    - Has user_id filter: False
+    - Has user_id parameter: False
+    - Has resolve_user_id: False
+    - Has DB query: True
+    - Has service call: True
+
+[HIGH] routes/api/tickers.py:1285
+  Function: add_ticker_to_user
+  Issue Type: user_id_not_used
+  Details:
+    - Has user_id getattr: True
+    - Has user_id filter: False
+    - Has user_id parameter: False
+    - Has resolve_user_id: False
+    - Has DB query: False
+    - Has service call: False
+
+[HIGH] routes/api/tickers.py:1396
+  Function: remove_ticker_from_user
+  Issue Type: user_id_not_used
+  Details:
+    - Has user_id getattr: True
+    - Has user_id filter: False
+    - Has user_id parameter: False
+    - Has resolve_user_id: False
+    - Has DB query: False
+    - Has service call: False
+
+[HIGH] routes/api/trading_methods.py:30
+  Function: get_trading_methods
+  Issue Type: missing_user_id_check
+  Details:
+    - Has user_id getattr: False
+    - Has user_id filter: False
+    - Has user_id parameter: False
+    - Has resolve_user_id: False
+    - Has DB query: True
+    - Has service call: False
+
+[HIGH] routes/api/trading_methods.py:75
+  Function: get_trading_method
+  Issue Type: missing_user_id_check
+  Details:
+    - Has user_id getattr: False
+    - Has user_id filter: False
+    - Has user_id parameter: False
+    - Has resolve_user_id: False
+    - Has DB query: True
+    - Has service call: False
+
+[HIGH] routes/api/user_data_import.py:525
+  Function: get_session
+  Issue Type: missing_user_id_check
+  Details:
+    - Has user_id getattr: False
+    - Has user_id filter: False
+    - Has user_id parameter: False
+    - Has resolve_user_id: False
+    - Has DB query: True
+    - Has service call: False
+
+[HIGH] routes/api/user_data_import.py:1057
+  Function: allow_existing_record
+  Issue Type: missing_user_id_check
+  Details:
+    - Has user_id getattr: False
+    - Has user_id filter: False
+    - Has user_id parameter: False
+    - Has resolve_user_id: False
+    - Has DB query: True
+    - Has service call: False
+
+[HIGH] routes/api/user_data_import.py:1392
+  Function: get_trading_accounts
+  Issue Type: missing_user_id_check
+  Details:
+    - Has user_id getattr: False
+    - Has user_id filter: False
+    - Has user_id parameter: False
+    - Has resolve_user_id: False
+    - Has DB query: True
+    - Has service call: False
+
+[HIGH] routes/api/user_preferences_list.py:26
+  Function: get_user_preferences
+  Issue Type: missing_user_id_check
+  Details:
+    - Has user_id getattr: False
+    - Has user_id filter: False
+    - Has user_id parameter: False
+    - Has resolve_user_id: False
+    - Has DB query: True
+    - Has service call: False
+
+================================================================================
+Files Checked: 57
+================================================================================

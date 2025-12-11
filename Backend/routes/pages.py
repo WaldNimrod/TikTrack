@@ -70,6 +70,11 @@ def research() -> Any:
     """Research page"""
     return send_from_directory(UI_DIR, "research.html")
 
+@pages_bp.route('/strategy-analysis')
+def strategy_analysis() -> Any:
+    """Strategy Analysis page"""
+    return send_from_directory(UI_DIR, "strategy-analysis.html")
+
 
 
 @pages_bp.route('/cash_flows')
@@ -103,6 +108,12 @@ def currencies() -> Any:
 def preferences() -> Any:
     """Preferences page"""
     return send_from_directory(UI_DIR, "preferences.html")
+
+@pages_bp.route('/user-profile')
+@pages_bp.route('/user-profile.html')
+def user_profile() -> Any:
+    """User profile management page"""
+    return send_from_directory(UI_DIR, "user-profile.html")
 
 @pages_bp.route('/ai-analysis')
 def ai_analysis() -> Any:

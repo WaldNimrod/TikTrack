@@ -305,26 +305,19 @@ class WatchListService:
 
         # Check if this is a flag list
         is_flag_list = getattr(watch_list, 'is_flag_list', 0)
+        flag_entity_type = getattr(watch_list, 'flag_entity_type', None)
         flag_color = getattr(watch_list, 'flag_color', None)
         
-        if is_flag_list and flag_color:
-            # Flag list: return all items with this flag color from all user's lists
-            logger.debug("Fetching items for flag list %s (color: %s)", list_id, flag_color)
+        if is_flag_list and flag_entity_type:
+            # Flag list: return all items that are in this flag list
+            # Flag is determined by which flag list ticker is in, not stored in item
+            logger.debug("Fetching items for flag list %s (entityType: %s, color: %s)", list_id, flag_entity_type, flag_color)
             
-            # Get all user's watch lists
-            all_user_lists = WatchListService.get_watch_lists(db, user_id)
-            all_list_ids = [wl.id for wl in all_user_lists]
-            
-            if not all_list_ids:
-                return []
-            
-            # Get all items with this flag color
+            # Get all items in this flag list
+            # The flag list itself contains items - we just return them
             return (
                 db.query(WatchListItem)
-                .filter(
-                    WatchListItem.watch_list_id.in_(all_list_ids),
-                    WatchListItem.flag_color == flag_color
-                )
+                .filter(WatchListItem.watch_list_id == list_id)
                 .order_by(WatchListItem.display_order.asc())
                 .all()
             )
@@ -347,6 +340,7 @@ class WatchListService:
         external_symbol: Optional[str] = None,
         external_name: Optional[str] = None,
         flag_color: Optional[str] = None,
+        flag_entity_type: Optional[str] = None,
         notes: Optional[str] = None
     ) -> WatchListItem:
         """
@@ -359,7 +353,8 @@ class WatchListService:
             ticker_id: Ticker ID from system (optional, if None then external_symbol required)
             external_symbol: External ticker symbol (optional, if None then ticker_id required)
             external_name: External ticker name (optional)
-            flag_color: Flag color in hex format (optional)
+            flag_color: Flag color in hex format (optional, for display)
+            flag_entity_type: Flag entity type (optional, constant identifier: trade, trade_plan, etc.)
             notes: User notes (optional)
 
         Returns:
@@ -411,12 +406,12 @@ class WatchListService:
         ).scalar() or 0
 
         # Create item
+        # NOTE: Do NOT store flag_color or flag_entity_type in item - flag is determined by which flag list the ticker is in
         item = WatchListItem(
             watch_list_id=list_id,
             ticker_id=ticker_id,
             external_symbol=external_symbol,
             external_name=external_name,
-            flag_color=flag_color,
             display_order=max_order + 1,
             notes=notes
         )
@@ -464,6 +459,7 @@ class WatchListService:
         item_id: int,
         user_id: int,
         flag_color: Optional[str] = None,
+        flag_entity_type: Optional[str] = None,
         display_order: Optional[int] = None,
         notes: Optional[str] = None
     ) -> Optional[WatchListItem]:
@@ -491,8 +487,8 @@ class WatchListService:
             logger.warning("Watch list item %s not found for user %s during update", item_id, user_id)
             return None
 
-        if flag_color is not None:
-            item.flag_color = flag_color
+        # NOTE: Do NOT update flag_color or flag_entity_type - flag is determined by which flag list the ticker is in
+        # These parameters are kept for backward compatibility but are ignored
         if display_order is not None:
             item.display_order = display_order
         if notes is not None:
@@ -503,7 +499,7 @@ class WatchListService:
         db.commit()
         db.refresh(item)
         
-        logger.info("Updated watch list item %s", item_id)
+        logger.info("Updated watch list item %s (display_order=%s, notes=%s)", item_id, item.display_order, item.notes)
         return item
 
     @staticmethod
@@ -559,42 +555,53 @@ class WatchListService:
     # --------------------------------------------------------------------- #
 
     @staticmethod
-    def get_or_create_flag_list(db: Session, user_id: int, flag_color: str) -> WatchList:
+    def get_or_create_flag_list(db: Session, user_id: int, flag_entity_type: str, flag_color: Optional[str] = None) -> WatchList:
         """
-        Get or create a dynamic flag list for a specific flag color.
+        Get or create a dynamic flag list for a specific entity type.
         Flag lists are automatically managed - they show all tickers with the flag.
+        
+        Uses entityType (constant) for identification, not color (varies by user preferences).
         
         Args:
             db: Database session
             user_id: User ID
-            flag_color: Flag color in hex format (e.g., '#26baac')
+            flag_entity_type: Entity type (trade, trade_plan, account, etc.) - constant identifier
+            flag_color: Flag color in hex format (optional, for display only)
         
         Returns:
             WatchList object (existing or newly created)
         """
-        # Map flag colors to Hebrew names
+        # Map entity types to Hebrew names (constant, not color-dependent)
         flag_names = {
-            '#26baac': 'דגל Trade',
-            '#0056b3': 'דגל Trade Plan',
-            '#28a745': 'דגל Account',
-            '#20c997': 'דגל Cash Flow',
-            '#dc3545': 'דגל Ticker',
-            '#fc5a06': 'דגל Alert',
-            '#6f42c1': 'דגל Note',
-            '#17a2b8': 'דגל Execution'
+            'trade': 'דגל Trade',
+            'trade_plan': 'דגל Trade Plan',
+            'account': 'דגל Account',
+            'cash_flow': 'דגל Cash Flow',
+            'ticker': 'דגל Ticker',
+            'alert': 'דגל Alert',
+            'note': 'דגל Note',
+            'execution': 'דגל Execution'
         }
         
-        flag_list_name = flag_names.get(flag_color, f'דגל {flag_color}')
+        flag_list_name = flag_names.get(flag_entity_type, f'דגל {flag_entity_type}')
         
-        # Check if flag list exists
+        # Check if flag list exists by entityType (not color - colors vary by user)
         existing = db.query(WatchList).filter(
             WatchList.user_id == user_id,
             WatchList.is_flag_list == 1,
-            WatchList.flag_color == flag_color
+            WatchList.flag_entity_type == flag_entity_type
         ).first()
         
         if existing:
-            logger.debug("Found existing flag list %s for color %s", existing.id, flag_color)
+            # Update color if provided (user preferences may have changed)
+            if flag_color and existing.flag_color != flag_color:
+                existing.flag_color = flag_color
+                existing.color_hex = flag_color
+                db.commit()
+                db.refresh(existing)
+                logger.debug("Updated flag list %s color to %s (entityType: %s)", existing.id, flag_color, flag_entity_type)
+            else:
+                logger.debug("Found existing flag list %s for entityType %s", existing.id, flag_entity_type)
             return existing
         
         # Create new flag list
@@ -607,18 +614,19 @@ class WatchListService:
             user_id=user_id,
             name=flag_list_name,
             icon='flag-filled',
-            color_hex=flag_color,
+            color_hex=flag_color,  # For display only
             display_order=max_order + 1,
             view_mode='table',
             is_flag_list=1,
-            flag_color=flag_color
+            flag_color=flag_color,  # For display only
+            flag_entity_type=flag_entity_type  # For identification (constant)
         )
         
         db.add(flag_list)
         db.commit()
         db.refresh(flag_list)
         
-        logger.info("Created flag list %s for color %s (user %s)", flag_list.id, flag_color, user_id)
+        logger.info("Created flag list %s for entityType %s (color: %s, user %s)", flag_list.id, flag_entity_type, flag_color, user_id)
         return flag_list
 
     @staticmethod

@@ -12,6 +12,7 @@
 **מקור:** `MarketDataQuote` - השדה `latest_quote`
 
 **שדות נדרשים:**
+
 - `price` / `current_price` - מחיר נוכחי (חיוני)
 - `change_pct_day` / `daily_change_percent` - שינוי יומי באחוזים
 - `change_amount_day` / `daily_change` - שינוי יומי בכסף
@@ -25,11 +26,13 @@
 
 ### 2. ATR (Average True Range)
 
-**מקור:** 
+**מקור:**
+
 1. `MarketDataQuote.atr` (אם קיים)
 2. `ATRCalculator.get_atr_with_fallback()` (אם לא קיים)
 
 **דרישות:**
+
 - Quotes עם `high_price`, `low_price`, `close_price`
 - מינימום 14 quotes (לחישוב ATR 14)
 - אם אין מספיק נתונים, ATR יהיה `null`
@@ -43,6 +46,7 @@
 **מקור:** `Week52Calculator.calculate_52w_range()`
 
 **דרישות:**
+
 - Quotes עם `high_price`, `low_price` (לא null)
 - מינימום 10 quotes (לחישוב אמין)
 - נתונים מ-52 השבועות האחרונים (365 ימים)
@@ -56,6 +60,7 @@
 **מקור:** `TechnicalIndicatorsCalculator.calculate_volatility()`
 
 **דרישות:**
+
 - Quotes עם `close_price` (לא null)
 - מינימום 30 quotes (לחישוב תנודתיות 30 יום)
 - נתונים מ-30 הימים האחרונים
@@ -69,6 +74,7 @@
 **מקור:** `TechnicalIndicatorsCalculator.calculate_sma(period=20)`
 
 **דרישות:**
+
 - Quotes עם `close_price` (לא null)
 - מינימום 20 quotes עם `close_price`
 
@@ -81,6 +87,7 @@
 **מקור:** `TechnicalIndicatorsCalculator.calculate_sma(period=150)`
 
 **דרישות:**
+
 - Quotes עם `close_price` (לא null)
 - מינימום 120 quotes עם `close_price` (80% מ-150) - **עודכן דצמבר 2025**
 - המערכת מחשבת MA 150 גם עם 120-149 quotes כדי להתחשב בסופי שבוע וחגים
@@ -91,15 +98,17 @@
 
 ---
 
-## 🔍 מהיכן ticker 7 (QQQ) שואב את המידע?
+## 🔍 מהיכן ticker 7 (QQQ) שואב את המידע
 
 **Ticker 7 (QQQ) - Invesco QQQ Trust:**
+
 - ✅ **469 quotes** במערכת
 - ✅ **312 quotes עם close_price**
 - ✅ **Date range:** 2025-11-21 עד 2025-12-02 (11 ימים)
 - ✅ **Status:** open
 
 **נתונים זמינים:**
+
 - ✅ Price data - יש `latest_quote`
 - ✅ ATR - יש מספיק quotes עם high/low/close
 - ✅ 52W - יש מספיק quotes (10+)
@@ -109,15 +118,16 @@
 
 ---
 
-## ⚠️ האם המידע זמין לכל שאר הטיקרים?
+## ⚠️ האם המידע זמין לכל שאר הטיקרים
 
-### טיקרים עם נתונים מלאים (כמו QQQ):
+### טיקרים עם נתונים מלאים (כמו QQQ)
+
 - Ticker 82 (AMD): 470 quotes, 314 עם close_price ✅
 - Ticker 18 (AVGO): 468 quotes, 312 עם close_price ✅
 - Ticker 67 (INTC): 467 quotes, 312 עם close_price ✅
 - Ticker 87 (WMT): 467 quotes, 312 עם close_price ✅
 
-### טיקרים שעלולים להיות בעייתיים:
+### טיקרים שעלולים להיות בעייתיים
 
 1. **טיקרים ללא quotes כלל:**
    - לא יהיו להם נתוני מחיר בסיסיים
@@ -140,7 +150,8 @@
 
 ## 🎯 המלצות
 
-### 1. בדיקת זמינות נתונים לפני תצוגה:
+### 1. בדיקת זמינות נתונים לפני תצוגה
+
 ```javascript
 // Check if ticker has required data
 const hasRequiredData = tickerData.current_price !== undefined || tickerData.price !== undefined;
@@ -149,18 +160,21 @@ if (!hasRequiredData) {
 }
 ```
 
-### 2. טיפול בנתונים חסרים:
+### 2. טיפול בנתונים חסרים
+
 - ATR: הצג "N/A" אם `atr === null`
 - 52W: הצג "N/A" אם `week52_high === null` או `week52_low === null`
 - Volatility: הצג "N/A" אם `volatility === null`
 - MA 20: הצג "N/A" אם `ma_20 === null`
 - MA 150: הצג "N/A" אם `ma_150 === null`
 
-### 3. הודעות שגיאה ברורות:
+### 3. הודעות שגיאה ברורות
+
 - אם אין `latest_quote`: "אין נתוני מחיר זמינים לטיקר זה"
 - אם אין מספיק נתונים ל-MA 150: "נדרשים 150 quotes עם close_price לחישוב MA 150"
 
-### 4. בדיקת זמינות לפני חישוב:
+### 4. בדיקת זמינות לפני חישוב
+
 - בדוק אם יש `latest_quote` לפני כל חישוב
 - בדוק אם יש מספיק quotes לפני חישוב MA/Volatility
 - בדוק אם יש high/low לפני חישוב 52W
@@ -180,11 +194,13 @@ if (!hasRequiredData) {
 4. **52W Range** - מחושב מיד אם יש 10+ quotes
 
 **יתרונות:**
+
 - החישובים זמינים מיד בקריאה הבאה ל-`get_entity_details`
 - שיפור ביצועים - חישובים מתבצעים פעם אחת ונשמרים ב-cache
 - חישובים מתבצעים גם אם cache disabled (אבל לא נשמרים)
 
 **מיקום בקוד:**
+
 - `Backend/routes/external_data/quotes.py` - פונקציה `refresh_ticker_quote()`
 - `Backend/services/external_data/technical_indicators_calculator.py` - חישוב MA עם 80% מהנתונים
 
@@ -203,11 +219,13 @@ if (!hasRequiredData) {
 4. **שלב 4:** מסיים טעינה
 
 **תכונות:**
+
 - הצגת אחוז התקדמות דינמי
 - הודעות עדכון לכל שלב
 - סגירה אוטומטית בסיום
 
 **מיקום בקוד:**
+
 - `trading-ui/scripts/services/unified-progress-manager.js` - שירות Progress Manager
 - `trading-ui/scripts/ticker-dashboard.js` - שימוש ב-`UnifiedProgressManager`
 
@@ -226,11 +244,13 @@ if (!hasRequiredData) {
 4. חזרה על התהליך עד שכל הנתונים זמינים או עד 10 ניסיונות
 
 **תכונות:**
+
 - בדיקה אוטומטית של נתונים חסרים
 - ניסיונות חוזרים אוטומטיים
 - הודעות עדכון למשתמש
 
 **מיקום בקוד:**
+
 - `trading-ui/scripts/ticker-dashboard.js` - פונקציה `fetchDataFromProvider()`
 
 ---
@@ -238,17 +258,20 @@ if (!hasRequiredData) {
 ## 📝 סיכום
 
 **הנתונים החיוניים:**
+
 1. ✅ `latest_quote` מ-`MarketDataQuote` - **קריטי לכל הנתונים**
 2. ✅ Quotes היסטוריים עם `close_price` - **קריטי ל-MA ו-Volatility**
 3. ✅ Quotes היסטוריים עם `high_price`, `low_price` - **קריטי ל-52W ו-ATR**
 
 **האם זמין לכל הטיקרים?**
+
 - ❌ **לא** - תלוי בנתונים שנאספו מ-Yahoo Finance
 - ✅ טיקרים עם נתונים מלאים (כמו QQQ) - יעבדו מצוין
 - ⚠️ טיקרים עם נתונים חלקיים - יציגו "N/A" בשדות חסרים
 - ❌ טיקרים ללא quotes - לא יציגו נתונים כלל
 
 **שיפורים חדשים (דצמבר 2025):**
+
 - ✅ Pre-calculation של חישובים טכניים
 - ✅ MA 150 מחושב גם עם 80% מהנתונים (120 quotes במקום 150)
 - ✅ Progress overlay עם 4 שלבים
@@ -266,7 +289,7 @@ if (!hasRequiredData) {
 **מימוש חדש:**
 דשבורד טיקרים (`tickers.html`) עכשיו כולל אינטגרציה מלאה עם מערכת הנתונים החיצוניים:
 
-### תכונות חדשות:
+### תכונות חדשות
 
 1. **בדיקה אוטומטית של נתונים חסרים:**
    - `checkTickerDataCompleteness(ticker)` - בודקת את שלמות הנתונים לכל טיקר
@@ -293,7 +316,7 @@ if (!hasRequiredData) {
    - מציגה: ✅ מלא (ירוק), ⚠️ חלקי (צהוב), ❌ חסר (אדום)
    - מוצגת בעמודת הסטטוס בטבלת הטיקרים
 
-### שימוש:
+### שימוש
 
 ```javascript
 // טעינת נתונים עם העשרה אוטומטית
@@ -304,13 +327,13 @@ await loadTickersDataInternal({
 });
 ```
 
-### שמירת נתונים:
+### שמירת נתונים
 
 - נתונים בסיסיים נשמרים ב-`CacheTTLGuard` עם TTL של 5 דקות
 - נתונים מלאים (עם חישובים טכניים) נשמרים ב-`UnifiedCacheManager` עם TTL של שעה
 - נתונים היסטוריים נשמרים ב-cache עם TTL של שעה
 
-### מיקום בקוד:
+### מיקום בקוד
 
 - `trading-ui/scripts/tickers.js` - כל הפונקציות החדשות
 - `trading-ui/tickers.html` - דשבורד טיקרים
@@ -322,6 +345,7 @@ await loadTickersDataInternal({
 **תאריך:** דצמבר 2025
 
 **שיפורים חדשים:**
+
 - ✅ אינטגרציה מלאה עם מערכת הנתונים החיצוניים
 - ✅ בדיקה אוטומטית של נתונים חסרים
 - ✅ טעינה אוטומטית של נתונים היסטוריים
@@ -330,6 +354,7 @@ await loadTickersDataInternal({
 - ✅ שמירת נתונים נטענים ב-cache
 
 **יתרונות:**
+
 - נתונים מלאים זמינים מיד בטעינת הדף
 - זיהוי אוטומטי של טיקרים עם נתונים חסרים
 - טעינה אוטומטית של נתונים חסרים

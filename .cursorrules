@@ -138,6 +138,33 @@ This is a fundamental rule that ALL future chats must follow.
 
 This is a fundamental rule that ALL future chats must follow. Any documentation files (.md, .txt, .html documentation) must be created ONLY within the documentation/ directory.
 
+## Markdown Documentation Standards - CRITICAL
+**כל קבצי ה-markdown חייבים לעבור בדיקת markdownlint לפני commit ו-push.**
+
+### Requirements:
+1. **MUST RUN BEFORE COMMIT**: Always run `npm run markdownlint:check` before committing markdown files
+2. **AUTO-FIX**: Use `npm run markdownlint:fix` to automatically fix most linting errors
+3. **PRE-PUSH CHECK**: The pre-push hook automatically checks changed markdown files before push
+4. **BYPASS**: Only use `SKIP_MARKDOWNLINT=1 git push` in emergency situations
+5. **IGNORED DIRECTORIES**: `documentation/05-REPORTS/` and `documentation/audits/` are excluded from checks
+
+### Configuration:
+- **Config File**: `.markdownlint.json` - Project-specific markdownlint rules
+- **Ignore File**: `.markdownlintignore` - Files and directories to exclude
+- **Scope**: All `.md` files in the project (documentation, README files, guides)
+- **Excluded**: `documentation/05-REPORTS/`, `documentation/audits/`, `.cursor/`, `node_modules/`, `.git/`, `archive/`, `backup/`
+- **Line Length**: 120 characters (does not apply to code blocks)
+- **Heading Style**: ATX (`#` style)
+- **Indentation**: 2 spaces
+
+### Common Issues:
+- Missing blank lines around headings, lists, and code blocks
+- Line length exceeding 120 characters
+- Invalid link fragments (especially with Hebrew text)
+- Missing language specification in fenced code blocks
+
+This is a fundamental rule that ALL future chats must follow.
+
 ## Project Structure
 - All documentation: `documentation/` directory only
 - Code files: `Backend/`, `trading-ui/`, `scripts/`
@@ -438,3 +465,40 @@ python3 scripts/test_pages_console_errors.py
 ```
 
 **This is a fundamental rule that ALL future chats must follow.**
+
+## Debugging and Monitoring Standards - CRITICAL
+
+**כל דיבוגינג וניטור חייבים לעמוד בסטנדרטים המוגדרים.**
+
+### Requirements:
+1. **Browser Debugging**: Always use Firefox for debugging (even though it's not the default browser)
+   - **CRITICAL**: When pressing F5 in VS Code/Cursor, MUST select "🚀 Launch Firefox - Development (RECOMMENDED)" from the configuration list
+   - **DO NOT**: Press F5 without selecting a configuration - this will open the default browser (likely Chrome)
+   - **Alternative**: Use `./scripts/debug/launch-firefox.sh` script to always launch Firefox
+   - **Check**: Run `npm run debug:check-browser` to verify Firefox is being used
+2. **Breakpoints**: Always set breakpoints in IDE (VS Code/Cursor), not in browser DevTools
+3. **Console Logs**: Use `window.Logger.*` instead of `console.log()`, remove before commit
+4. **Debug Mode**: Always enabled in development
+5. **Error Tracking**: Required for all critical errors
+6. **Duplicate Prevention**: Must check GENERAL_SYSTEMS_LIST.md before writing new code
+7. **Process Monitoring**: Must check for existing processes before starting new ones
+
+### Documentation:
+- **Main Guide**: `documentation/03-DEVELOPMENT/TOOLS/QA_AND_DEBUGGING_GUIDE.md` - Complete QA and debugging guide
+- **Quick Reference**: `documentation/03-DEVELOPMENT/TOOLS/DEBUGGING_QUICK_REFERENCE.md` - Quick reference card
+- **Browser Standards**: `documentation/03-DEVELOPMENT/GUIDELINES/BROWSER_DEBUGGING_STANDARDS.md` - Browser debugging standards
+- **Debugging Standards**: `documentation/03-DEVELOPMENT/GUIDELINES/DEBUGGING_STANDARDS.md` - General debugging standards
+- **Monitoring Standards**: `documentation/03-DEVELOPMENT/GUIDELINES/MONITORING_STANDARDS.md` - Monitoring standards
+- **Duplicate Prevention**: `documentation/03-DEVELOPMENT/GUIDELINES/DUPLICATE_PREVENTION_STANDARDS.md` - Duplicate prevention standards
+- **Parallel Process Prevention**: `documentation/03-DEVELOPMENT/GUIDELINES/PARALLEL_PROCESS_PREVENTION_STANDARDS.md` - Parallel process prevention standards
+
+### Tools:
+- **Firefox Debugger**: 
+  - **Recommended**: Use `./scripts/debug/launch-firefox.sh` script
+  - **Alternative**: VS Code/Cursor F5 → **MUST SELECT** "🚀 Launch Firefox - Development (RECOMMENDED)"
+  - **Check**: Run `npm run debug:check-browser` to verify Firefox is being used
+- **Python Debugger**: Use VS Code Python debugger (F5 → "Python: Flask App")
+- **Duplicate Detection**: Use `npm run check:duplicates` before commit
+- **Process Monitoring**: Use `python3 Backend/utils/server_lock_manager.py` before starting server
+
+This is a fundamental rule that ALL future chats must follow when debugging and monitoring.

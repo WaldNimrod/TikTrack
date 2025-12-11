@@ -21,6 +21,24 @@
  * - documentation/02-ARCHITECTURE/FRONTEND/WIDGET_OVERLAY_SYSTEM.md
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - WidgetZIndexManager.init() - Init
+
+// === Data Functions ===
+// - WidgetZIndexManager.registerOverlay() - Registeroverlay
+// - WidgetZIndexManager.unregisterOverlay() - Unregisteroverlay
+// - WidgetZIndexManager.calculateOverlayZIndex() - Calculateoverlayzindex
+// - WidgetZIndexManager.getOverlayZIndex() - Getoverlayzindex
+// - WidgetZIndexManager.clearAll() - Clearall
+// - WidgetZIndexManager.destroy() - Destroy
+
+// === UI Functions ===
+// - WidgetZIndexManager.updateOverlayZIndex() - Updateoverlayzindex
+// - WidgetZIndexManager.updateAllOverlayZIndexes() - Updatealloverlayzindexes
+
 (function() {
     'use strict';
 

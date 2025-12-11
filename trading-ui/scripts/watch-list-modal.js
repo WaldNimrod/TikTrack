@@ -27,6 +27,12 @@
  * 
  * ==========================================
  */
+// === Functions ===
+// - populateBootstrapIcons() - Populatebootstrapicons
+// - populateIconSelector() - Populateiconselector
+// - populateTablerIcons() - Populatetablericons
+// - selectIcon() - Selecticon
+// - setupViewModeSelector() - Setupviewmodeselector
 
 (function() {
     'use strict';

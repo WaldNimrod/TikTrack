@@ -144,26 +144,31 @@
 ### כללי שילוב חשובים
 
 **1. Section Header:**
+
 - ✅ **חייב** להכיל רק את הכותרת (`<h2>`) וכפתור ה-toggle
 - ❌ **אסור** לכלול כפתורי בקרה של הגרף בתוך `section-header`
 - ✅ משתמש בסגנונות הסטנדרטיים של המערכת (אין סגנונות מיוחדים)
 
 **2. Section Body:**
+
 - ✅ **חייב** להיות קונטיינר ראשי אחיד - נשאר אחיד לכל הקונטיינרים במערכת
 - ✅ מקבל `padding: 4px` מכל צד (מוגדר אוטומטית ב-CSS)
 - ✅ יכול להכיל גם אלמנטים נוספים מעל או מתחת לגרף
 
 **3. Chart Controls Wrapper:**
+
 - ✅ **חייב** להיות בתוך `section-body` - **מעל** `chart-container-wrapper`
 - ✅ **חייב** להיות עם `direction: ltr` ו-`text-align: left` (inline style)
 - ✅ מקבל `margin-bottom: 4px` (ריווח בין הכפתורים לגרף)
 
 **4. Chart Container Wrapper:**
+
 - ✅ **חייב** להיות בתוך `section-body` - **מתחת** ל-`chart-controls-wrapper`
 - ✅ **חייב** להיות עם `direction: ltr` ו-`text-align: left` (מוגדר ב-CSS)
 - ✅ תופס 100% רוחב אבל יושב בתוך `section-body`
 
 **5. TradingView Chart Wrapper & Container:**
+
 - ✅ **חייב** להיות בתוך `chart-container-wrapper`
 - ✅ **חייב** להיות עם `direction: ltr` (מוגדר ב-CSS)
 - ✅ **חייב** להיות עם `display: block`, `width: 100%`, `height` מוגדר
@@ -273,15 +278,18 @@
 11 ישויות × 3 וריאנטים = 33 צבעים:
 
 **ישויות:**
+
 - `trade`, `trade_plan`, `execution`, `trading_account`, `cash_flow`
 - `ticker`, `alert`, `note`, `constraint`, `design`, `research`
 
 **וריאנטים:**
+
 - `base` - צבע בסיסי (`--entity-{type}-color`)
 - `dark` - צבע כהה (`--entity-{type}-text`)
 - `light` - צבע בהיר (`--entity-{type}-bg`)
 
 **דוגמה:**
+
 ```css
 .tradingview-series-trade-base {
     color: var(--entity-trade-color);
@@ -366,6 +374,7 @@ const series = window.TradingViewChartAdapter.addLineSeries(chart, {
 ### בעיה: הגרף לא מוצג / צר
 
 **סיבות אפשריות:**
+
 1. הקונטיינר לא עם `display: block`
 2. הקונטיינר לא עם `width: 100%`
 3. הקונטיינר לא עם `height` מוגדר
@@ -374,6 +383,7 @@ const series = window.TradingViewChartAdapter.addLineSeries(chart, {
 6. הפונקציה initChart לא נקראת - בדוק בקונסול
 
 **פתרון:**
+
 ```css
 .tradingview-chart-container {
     display: block;
@@ -386,6 +396,7 @@ const series = window.TradingViewChartAdapter.addLineSeries(chart, {
 ```
 
 **בדיקות JavaScript:**
+
 - בדוק ש-`window.TradingViewChartAdapter` קיים
 - בדוק ש-`window.LightweightCharts` קיים
 - בדוק שהפונקציה `initChart()` נקראת
@@ -397,6 +408,7 @@ const series = window.TradingViewChartAdapter.addLineSeries(chart, {
 **סיבה:** Section layout לא נכון
 
 **פתרון:**
+
 ```css
 #price-chart-section {
     display: flex;
@@ -422,6 +434,7 @@ const series = window.TradingViewChartAdapter.addLineSeries(chart, {
 **סיבה:** `position: relative` חסר על ה-wrapper
 
 **פתרון:**
+
 ```css
 .tradingview-chart-wrapper {
     position: relative;
@@ -442,12 +455,14 @@ const series = window.TradingViewChartAdapter.addLineSeries(chart, {
 ### בעיה: הגרף לא נטען (TradingView Adapter לא זמין)
 
 **סיבות אפשריות:**
+
 1. הספריות לא נטענות - בדוק 404 errors
 2. הסדר של טעינת הספריות לא נכון
 3. `waitForTradingViewAdapter()` לא ממתינה מספיק זמן
 4. שגיאות JavaScript מונעות טעינה
 
 **פתרון:**
+
 ```javascript
 // וודא שהספריות נטענות בסדר הנכון:
 // 1. lightweight-charts.standalone.production.js
@@ -470,12 +485,14 @@ async function waitForTradingViewAdapter() {
 ### בעיה: הגרף לא מתאתחל (initChart לא נקראת)
 
 **סיבות אפשריות:**
+
 1. DOMContentLoaded event לא מופעל
 2. הפונקציה initChart לא מוגדרת לפני DOMContentLoaded
 3. שגיאות JavaScript מונעות ביצוע
 4. Container לא קיים ב-DOM
 
 **פתרון:**
+
 ```javascript
 // וודא שהפונקציה מוגדרת לפני DOMContentLoaded
 async function initChart() {

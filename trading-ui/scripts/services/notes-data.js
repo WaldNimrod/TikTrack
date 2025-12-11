@@ -5,6 +5,42 @@
  * Ensures cache policies via UnifiedCacheManager + CacheTTLGuard.
  */
 (function notesDataService() {
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - buildUrl() - Buildurl
+// - buildMutationRequest() - Buildmutationrequest
+// - createNote() - Createnote
+
+// === Event Handlers ===
+// - sendNoteMutation() - Sendnotemutation
+// - validateNoteRelation() - Validatenoterelation
+
+// === UI Functions ===
+// - updateNote() - Updatenote
+
+// === Data Functions ===
+// - normalizeNotesPayload() - Normalizenotespayload
+// - saveNotesCache() - Savenotescache
+// - notifyLoadError() - Notifyloaderror
+// - fetchNotesFromApi() - Fetchnotesfromapi
+// - loadNotesData() - Loadnotesdata
+// - isFormDataPayload() - Isformdatapayload
+// - fetchNoteDetails() - Fetchnotedetails
+// - getCachedNotes() - Getcachednotes
+
+// === Utility Functions ===
+// - invalidateNotesCache() - Invalidatenotescache
+// - validateNote() - Validatenote
+
+// === Other ===
+// - resolveBaseUrl() - Resolvebaseurl
+// - normalizeNoteRecord() - Normalizenoterecord
+// - clearNotesCachePattern() - Clearnotescachepattern
+// - deleteNote() - Deletenote
+// - setCachedNotes() - Setcachednotes
+
   const CACHE_KEY = 'notes-data';
   const DEFAULT_TTL = 90 * 1000; // 90 שניות
   const PAGE_LOG_CONTEXT = { page: 'notes-data' };
@@ -158,8 +194,7 @@
     const response = await fetch(url.toString(), {
       method: 'GET',
       headers: DEFAULT_HEADERS,
-      signal,
-      credentials: 'include' // Include cookies for session-based auth
+      signal, // Include cookies for session-based auth
     });
     
     // Handle 401/308 authentication errors

@@ -26,6 +26,20 @@
  * - אינטגרציה מלאה עם מערכת צבעים דינמית (3 ווריאנטים)
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === UI Functions ===
+// - renderCard() - Rendercard
+// - renderHeader() - Renderheader
+
+// === Utility Functions ===
+// - formatAmount() - Formatamount
+// - formatDate() - Formatdate
+
+// === Other ===
+// - fmt() - Fmt
+
 // ===== FIELD RENDERER SERVICE =====
 
 class FieldRendererService {

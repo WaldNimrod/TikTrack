@@ -21,12 +21,14 @@
 **API Endpoint**: `POST /api/user-data-import/upload`
 
 **תהליך**:
+
 1. קובץ CSV נשלח מה-Frontend
 2. `ImportOrchestrator.create_import_session()` יוצר סשן חדש
 3. תוכן הקובץ נשמר ב-`session.summary_data['file_content']`
 4. `connector_type` נשמר ב-`session.summary_data['connector_type']`
 
 **נתונים שנשמרים**:
+
 - `file_content`: תוכן הקובץ המלא
 - `connector_type`: סוג הקונקטור (ibkr)
 - `trading_account_id`: מזהה חשבון המסחר
@@ -37,6 +39,7 @@
 **API Endpoint**: `GET /api/user-data-import/session/<id>/analyze`
 
 **תהליך**:
+
 1. `ImportOrchestrator.analyze_file()` נקרא
 2. `IBKRConnector.parse_file()` מפרס את הקובץ
 3. `_parse_cashflow_sections()` מזהה רשומות לפי:
@@ -46,6 +49,7 @@
 5. רשומות גולמיות נשמרות ב-`session.summary_data['raw_records']`
 
 **נתונים שנשמרים**:
+
 - `raw_records`: רשומות גולמיות מהקובץ
 - `analysis_results`: תוצאות הניתוח
 
@@ -54,6 +58,7 @@
 **API Endpoint**: `GET /api/user-data-import/session/<id>/preview?selected_types=...`
 
 **תהליך**:
+
 1. `ImportOrchestrator.generate_preview(selected_types)` נקרא
 2. `_build_preview_payload()` בונה את ה-preview:
    - סינון ראשוני לפי `selected_types` (אם מועבר)
@@ -63,12 +68,14 @@
 4. `preview_data` נשמר ב-`session.summary_data['preview_data']`
 
 **נתונים שנשמרים**:
+
 - `preview_data.records_to_import`: רשומות לייבוא (מסוננות)
 - `preview_data.records_to_skip`: רשומות לדילוג
 - `preview_data.selected_types`: רשימת סוגים שנבחרו (CRITICAL)
 - `preview_data.summary`: סיכום סטטיסטיקות
 
 **נקודת סינון 1**: `_build_preview_payload`
+
 - סינון לפי `selected_types` אם מועבר
 - רק רשומות מסוגים שנבחרו נשארות ב-`records_to_import`
 
@@ -77,6 +84,7 @@
 **API Endpoint**: `POST /api/user-data-import/session/<id>/execute`
 
 **תהליך**:
+
 1. `ImportOrchestrator.execute_import(selected_types)` נקרא
 2. **CRITICAL**: טעינת `selected_types` מ-`preview_data` אם לא מועבר כפרמטר
 3. **נקודת סינון 2**: סינון double-check ב-`execute_import`
@@ -91,10 +99,12 @@
    - **שיוך תגיות אוטומטיות** - אחרי commit, שיוך תגיות לכל הרשומות (כולל exchanges)
 
 **נקודת סינון 2**: `execute_import`
+
 - Double-check filtering לפני ייבוא
 - וידוא ש-`selected_types` נשמר ב-`preview_data`
 
 **נקודת סינון 3**: `_execute_import_cashflows`
+
 - Final check לפני יצירה
 - סינון אחרון של `records_to_import` לפי `selected_types`
 
@@ -103,20 +113,24 @@
 ### Backend - Import Session
 
 **שמירה**:
+
 - `selected_types` נשמר ב-`preview_data` לפני commit
 - נשמר ב-JSON serialization (עובר דרך `_make_payload_json_safe`)
 
 **טעינה**:
+
 - `execute_import` טוען `selected_types` מ-`preview_data` אם לא מועבר כפרמטר
 - `accept_duplicate` טוען `selected_types` מ-`preview_data` לסינון
 
 ### Frontend - selectedCashflowTypes
 
 **שמירה**:
+
 - `selectedCashflowTypes` נשמר ב-localStorage/UnifiedCache (אופציונלי)
 - נשלח ב-API call ל-`execute_import`
 
 **טעינה**:
+
 - `displayPreviewData()` טוען `selectedCashflowTypes` מ-`preview_data.selected_types`
 - `resumeActiveImportSession()` טוען את ה-preview ומעדכן את `selectedCashflowTypes`
 
@@ -129,6 +143,7 @@
 ## תגיות אוטומטיות
 
 **תהליך שיוך תגיות:**
+
 1. כל רשומה נוצרת ב-`_execute_import_cashflows`
 2. רשומות נאספות ל-`cashflows_for_tagging` עם `section_name`
 3. אחרי יצירת כל הרשומות (כולל exchanges), מתבצע **commit יחיד**
@@ -138,6 +153,7 @@
 5. גם רשומות Forex Exchange מקבלות תגיות (לשתי הרשומות FROM/TO)
 
 **⚠️ חשוב:**
+
 - שיוך תגיות מתבצע **אחרי** commit, לא לפני
 - `TagService.replace_tags_for_entity` מבצע commit משלו, לכן חייבים להפריד
 - התגיות נוצרות מראש (לא במהלך הייבוא) - ראה `Backend/scripts/create_import_tags.py`

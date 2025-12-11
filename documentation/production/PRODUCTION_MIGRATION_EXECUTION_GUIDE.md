@@ -1,5 +1,7 @@
 # Production Migration Execution Guide
+
 # =====================================
+
 # מדריך ביצוע מיגרציה של הפרודקשן
 
 **תאריך:** נובמבר 2025  
@@ -20,6 +22,7 @@
 ### **קבצים להעתקה:**
 
 1. **סקריפטי מיגרציה:**
+
    ```bash
    # מהפרויקט הנוכחי לפרודקשן
    cp scripts/db/migrate_production_to_pg.py /Users/nimrod/Documents/TikTrack/TikTrackApp-Production/scripts/db/
@@ -30,6 +33,7 @@
    ```
 
 2. **הגדרת הרשאות:**
+
    ```bash
    cd /Users/nimrod/Documents/TikTrack/TikTrackApp-Production
    chmod +x scripts/db/*.sh
@@ -53,6 +57,7 @@ cd /Users/nimrod/Documents/TikTrack/TikTrackApp-Production
 ```
 
 **למה זה חשוב:**
+
 - וידוא שאתה בסביבה הנכונה
 - וידוא שה-database name נכון
 - יצירת גיבוי אוטומטי
@@ -94,11 +99,13 @@ cd /Users/nimrod/Documents/TikTrack/TikTrackApp-Production
 ```
 
 הסקריפט:
+
 - יוצר את `TikTrack-db-production` database
 - מאתחל את כל הטבלאות (ריקות)
 - מעתיק טבלאות מערכת מ-SQLite (אם קיים ב-`Backend/db/tiktrack.db`)
 
 **אם SQLite לא נמצא:**
+
 - הסקריפט יצור database ריק
 - תוכל להריץ מיגרציה מאוחר יותר (ראה צעד 4)
 
@@ -152,6 +159,7 @@ docker exec tiktrack-postgres-dev psql -U TikTrakDBAdmin -d TikTrack-db-producti
    - `check_postgresql_container()`
 
 3. **הוסף קריאות לפונקציות** בפונקציה `main()`:
+
    ```bash
    # Setup PostgreSQL environment variables (production mode)
    setup_postgresql_env
@@ -171,22 +179,26 @@ docker exec tiktrack-postgres-dev psql -U TikTrakDBAdmin -d TikTrack-db-producti
 ### **בדיקת השרת:**
 
 1. **הפעל את השרת:**
+
    ```bash
    cd /Users/nimrod/Documents/TikTrack/TikTrackApp-Production
    ./start_server.sh
    ```
 
 2. **בדוק health endpoint:**
+
    ```bash
    curl http://localhost:5001/api/system/health
    ```
 
 3. **בדוק חיבור לבסיס נתונים:**
+
    ```bash
    curl http://localhost:5001/api/system/health | jq '.components.database'
    ```
 
 4. **בדוק API endpoints:**
+
    ```bash
    # בדוק endpoints שדורשים טבלאות מערכת
    curl http://localhost:5001/api/currencies
@@ -266,17 +278,21 @@ docker exec -i tiktrack-postgres-dev psql \
 ## 🔧 **פתרון בעיות**
 
 ### **בעיה: "Container not running"**
+
 ```bash
 docker-compose -f docker/docker-compose.dev.yml up -d postgres-dev
 ```
 
 ### **בעיה: "Database already exists"**
+
 הסקריפט ישאל אם למחוק וליצור מחדש, או מחק ידנית:
+
 ```bash
 docker exec tiktrack-postgres-dev psql -U TikTrakDBAdmin -c "DROP DATABASE \"TikTrack-db-production\";"
 ```
 
 ### **בעיה: "SQLite not found"**
+
 - הסקריפט ייצור database ריק
 - הרץ מיגרציה ידנית עם `migrate_production_to_pg.py`
 
@@ -285,12 +301,14 @@ docker exec tiktrack-postgres-dev psql -U TikTrakDBAdmin -c "DROP DATABASE \"Tik
 ## 📚 **משאבים**
 
 ### **סקריפטים:**
+
 - `scripts/db/setup_production_postgresql.sh` - התקנה מלאה
 - `scripts/db/migrate_production_to_pg.py` - מיגרציה ידנית
 - `scripts/db/backup_postgresql_production.sh` - גיבוי
 - `scripts/db/verify_production_setup.sh` - אימות
 
 ### **דוקומנטציה:**
+
 - `PRODUCTION_POSTGRESQL_MIGRATION.md` - מדריך מיגרציה מפורט
 - `PRODUCTION_STARTUP_SCRIPT_UPDATE.md` - עדכון סקריפט הפעלה
 - `PRODUCTION_MIGRATION_CHECKLIST.md` - רשימת בדיקות

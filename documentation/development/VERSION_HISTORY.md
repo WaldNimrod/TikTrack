@@ -160,6 +160,7 @@ This log tracks version bumps for the development environment (branch `main`). M
 | 2025-11-29T08:00:43+00:00 | 1.3.41.0 | 1.3.40.0 | 48a408ff686e8f80802b174f321872e1f334263c | 50d675f0e020d2ffdd30cac1bc6689fc4161d52a | patch | קונסולה נקייה 100% - השלמת בדיקות ותיקונים לכל 36 העמודים
 
 תיקונים עיקריים:
+
 - הוחלפו כל console.* calls ב-Logger Service (0 console calls)
 - נוסף Bootstrap CSS ישירות לכל העמודים החסרים
 - הושלם IconSystem בכל העמודים
@@ -168,6 +169,7 @@ This log tracks version bumps for the development environment (branch `main`). M
 - תוקנו 36/36 עמודים (100% מושלמים)
 
 שיפורים:
+
 - 24 → 36 עמודים מושלמים (67% → 100%)
 - 0 console calls (לפני: 9+ בעמוד)
 - 0 שגיאות קריטיות
@@ -175,12 +177,14 @@ This log tracks version bumps for the development environment (branch `main`). M
 | 2025-11-29T15:53:58+00:00 | 1.3.42.0 | 1.3.41.0 | f8c7fd01a0225ea70aedb8797b309e1b5c7c15cd | 48a408ff686e8f80802b174f321872e1f334263c | patch | תיקון: תיקון תצוגת ראש הדף בכל המערכת
 
 תיקונים עיקריים:
+
 - תיקון template literal ב-header-system.js שגרם לשגיאת תחביר
 - הוספת filter-toggle-main שחסר (כפתור טוגל ראשי)
 - הוספת header-styles.css ל-research.html
 - הסתרת פילטרים בעמוד research (דשבורד עתידי)
 
 שיפורים:
+
 - Header נטען כראוי בכל העמודים
 - research.html: header ללא פילטרים (כמבוקש)
 - trades.html: header עם פילטרים (כמבוקש)
@@ -188,6 +192,7 @@ This log tracks version bumps for the development environment (branch `main`). M
 | 2025-11-29T16:31:38+00:00 | 1.3.43.0 | 1.3.42.0 | ef44ce88126eda61f160956ec90c1dbf3ad80de8 | f8c7fd01a0225ea70aedb8797b309e1b5c7c15cd | patch | תיקון: שיפורים נוספים במערכת
 
 תיקונים עיקריים:
+
 - שיפורים במערכת אימות (auth.js, auth.py)
 - עדכוני icon mappings
 - שיפורי עיצוב (layout.css)
@@ -245,3 +250,20 @@ This log tracks version bumps for the development environment (branch `main`). M
 | 2025-12-06T23:23:45+00:00 | 1.3.92.0 | 1.3.91.0 | b703d5d01f7467fb911a0cfdd6efe0d81d847b50 | 815776016857f0342073693c066a92cadeeafd7b | patch | Add backup file patterns to .gitignore |
 | 2025-12-06T23:26:17+00:00 | 1.3.93.0 | 1.3.92.0 | a793ffce0ac81f18d7d0c647ade506685b0499dd | b703d5d01f7467fb911a0cfdd6efe0d81d847b50 | patch | שילוב 3 עמודי מוקאפים במערכת - היסטוריית טרייד, מצב תיק היסטורי, יומן מסחר |
 | 2025-12-07T01:37:09+00:00 | 1.3.94.0 | 1.3.93.0 | 6ce1411ca4c4e975da85211d5bf7a5efa282ab42 | a793ffce0ac81f18d7d0c647ade506685b0499dd | patch | תיקון: סגירת מודול הוספת טיקר לרשימה אחרי שמירה - תיקון CRUDResponseHandler.handleResponse |
+| 2025-12-07T20:12:12+00:00 | 1.3.95.0 | 1.3.94.0 | 5a67c6e1adeb18ea15065551c3737d77275fd7b9 | 6ce1411ca4c4e975da85211d5bf7a5efa282ab42 | patch | Replace old AI analysis modal interface with 3-step wizard and improve error messages |
+| 2025-12-10T01:18:27+00:00 | 1.3.96.0 | 1.3.95.0 | edcdaf059b5d892a75b2607f41214bf54a3bb1dd | 5a67c6e1adeb18ea15065551c3737d77275fd7b9 | patch | Fix SQLAlchemy NULL comparison bug in historical data service |
+| 2025-12-10T01:20:13+00:00 | 1.3.97.0 | 1.3.96.0 | ad7b1464be7805697f25f71ae77a0492e32d8a7b | edcdaf059b5d892a75b2607f41214bf54a3bb1dd | patch | Implement EOD Historical Metrics System - daily portfolio metrics, positions, cash flows with caching and validation |
+| 2025-12-10T01:31:03+00:00 | 1.3.98.0 | 1.3.97.0 | 5fbb39e399b9b32712ca7f5e34103fae33400ba2 | ad7b1464be7805697f25f71ae77a0492e32d8a7b | patch | Add comprehensive JSDoc documentation and Function Index to EOD Historical Metrics System services |
+| 2025-12-10T20:44:11+00:00 | 1.3.99.0 | 1.3.98.0 | 03fbdae462367ccc591caa852b4176d07e359572 | 5fbb39e399b9b32712ca7f5e34103fae33400ba2 | patch | EOD Historical Metrics - Phase 0 Complete: Comprehensive scanning and EODIntegrationHelper expansion |
+| 2025-12-10T20:59:59+00:00 | 1.3.100.0 | 1.3.99.0 | 8d3db3dcdd39f9ca2639e6eb20780157e2046310 | 03fbdae462367ccc591caa852b4176d07e359572 | patch | EOD Historical Metrics - Phase 1 Complete: Portfolio State & Trade History Pages with full EOD integration |
+| 2025-12-10T21:11:08+00:00 | 1.3.101.0 | 1.3.100.0 | 7acdd2878bf1c02920c1e0c35ce20a918d31b1aa | 8d3db3dcdd39f9ca2639e6eb20780157e2046310 | patch | Complete user data isolation and authentication implementation - critical security fixes |
+| 2025-12-10T21:11:46+00:00 | 1.3.102.0 | 1.3.101.0 | c4a9435fd6927c66415bd0a62daa7fc228a9f4d5 | 7acdd2878bf1c02920c1e0c35ce20a918d31b1aa | patch | Update auth documentation with data isolation details |
+| 2025-12-10T21:12:03+00:00 | 1.3.103.0 | 1.3.102.0 | 29ffcbc66459885a0f8badf5fcc395fb009d8086 | c4a9435fd6927c66415bd0a62daa7fc228a9f4d5 | patch | Finalize remaining UI and plan updates |
+| 2025-12-10T21:19:16+00:00 | 1.3.104.0 | 1.3.103.0 | d79e2768393cd632e6941de52e97f363395a02c4 | 29ffcbc66459885a0f8badf5fcc395fb009d8086 | patch | EOD Historical Metrics - Phase 2 Complete: All Medium Priority Pages (Trades, Executions, Server Monitor, System Management) |
+| 2025-12-10T21:20:17+00:00 | 1.3.105.0 | 1.3.104.0 | 95a7692cc5e3e3d61eb190e3cf59316c5b3ab1bc | d79e2768393cd632e6941de52e97f363395a02c4 | patch | System refactoring: Authentication & EOD integration - Fix watch-lists widget loading, Bearer token auth, EOD research integration |
+| 2025-12-10T21:20:34+00:00 | 1.3.106.0 | 1.3.105.0 | 031b9434a773de3a56aa1951015edbc5989bd440 | 95a7692cc5e3e3d61eb190e3cf59316c5b3ab1bc | patch | Additional system refactoring: Research EOD integration, portfolio testing improvements |
+| 2025-12-10T21:41:14+00:00 | 1.3.107.0 | 1.3.106.0 | 764bcaab9a4b7027d6bcfc68b594f12654862f23 | 031b9434a773de3a56aa1951015edbc5989bd440 | patch | Complete watch-lists widget implementation & system improvements |
+| 2025-12-10T21:46:27+00:00 | 1.3.108.0 | 1.3.107.0 | 860116e4345d99173aa98feb494ddda8aceb5397 | 764bcaab9a4b7027d6bcfc68b594f12654862f23 | patch | Fix InfoSummarySystem loading issue - add missing script tags to portfolio-state.html and create comprehensive package validation tools |
+| 2025-12-10T22:04:15+00:00 | 1.3.109.0 | 1.3.108.0 | c8f9882907ec245c21ffcda2a5fdbba9e43cb5c7 | 860116e4345d99173aa98feb494ddda8aceb5397 | patch | Fix bundle source map references and rebuild all bundles with latest InfoSummarySystem changes |
+| 2025-12-10T22:19:38+00:00 | 1.3.110.0 | 1.3.109.0 | 582c54989f50d6bfb569032615100397f1a85989 | c8f9882907ec245c21ffcda2a5fdbba9e43cb5c7 | patch | Complete PRE_LAUNCH_CODE_TASKS.md sections 2-5 - Executions, Portfolio, Alert, and Import functionality |
+| 2025-12-10T22:28:00+00:00 | 1.3.111.0 | 1.3.110.0 | 436935d4bd29c0e658c8cfa1dfed9baf4dbb70fd | 582c54989f50d6bfb569032615100397f1a85989 | patch | Comprehensive stabilization - reduced errors from 23.1% to 0% across all 52 pages |

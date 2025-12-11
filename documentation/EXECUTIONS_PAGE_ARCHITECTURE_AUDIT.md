@@ -1,4 +1,5 @@
 # Executions Page Architecture Audit
+
 # בדיקת ארכיטקטורה - עמוד ביצועים
 
 **תאריך:** 03.12.2025  
@@ -8,10 +9,10 @@
 
 ## 📊 סיכום בדיקת ארכיטקטורה
 
-### ✅ מה עובד נכון:
+### ✅ מה עובד נכון
 
 1. **שימוש ב-Data Service** ✅
-   - העמוד משתמש ב-`window.ExecutionsData.loadExecutionsData()` 
+   - העמוד משתמש ב-`window.ExecutionsData.loadExecutionsData()`
    - לא קורא ישירות ל-API
    - מממש את הארכיטקטורה נכון
 
@@ -25,7 +26,7 @@
    - העמוד משתמש ב-`ExecutionsData.calculateExecutionValues()`
    - העמוד משתמש ב-`ExecutionsData.createExecution()`, `updateExecution()`, `deleteExecution()`
 
-### ❌ בעיות זוהו:
+### ❌ בעיות זוהו
 
 1. **השרת מחזיר רשימה ריקה** ❌
    - `/api/executions/` מחזיר `{ data: [], message: "Retrieved 0 executions records" }`
@@ -50,6 +51,7 @@
 **הבעיה העיקרית:** השרת מחזיר רשימה ריקה כי אין ביצועים עם `user_id = 10` (המשתמש המחובר).
 
 **פעולות נדרשות:**
+
 1. לבדוק מה `user_id` של הביצועים במערכת
 2. לבדוק אם צריך לשנות את `user_id` של הביצועים או את המשתמש המחובר
 
@@ -60,11 +62,13 @@
 ### 1. שכבת הלוגיקה העסקית
 
 **לפי התיעוד:**
+
 - עמוד צריך להשתמש ב-Data Service (`ExecutionsData`)
 - Data Service משתמש ב-CacheTTLGuard או UnifiedCacheManager
 - לא לקרוא ישירות ל-API
 
 **בפועל:**
+
 - ✅ העמוד משתמש ב-`ExecutionsData.loadExecutionsData()`
 - ✅ Data Service משתמש ב-CacheTTLGuard
 - ✅ לא קורא ישירות ל-API
@@ -74,6 +78,7 @@
 ### 2. זרימת נתונים
 
 **לפי התיעוד:**
+
 ```
 Page Script (executions.js)
     ↓
@@ -93,6 +98,7 @@ Database Query
 ```
 
 **בפועל:**
+
 - ✅ העמוד קורא ל-`ExecutionsData.loadExecutionsData()`
 - ✅ Data Service קורא ל-`CacheTTLGuard.ensure()`
 - ✅ API call ל-`/api/executions/` מתבצע
@@ -103,10 +109,12 @@ Database Query
 ### 3. עדכון נתונים גלובליים
 
 **לפי התיעוד:**
+
 - `loadExecutionsData` צריך לעדכן את `window.executionsData`
 - צריך לקרוא ל-`updateExecutionsGlobalData()` לעדכון `allExecutions` ו-`filteredExecutions`
 
 **בפועל:**
+
 - ✅ `loadExecutionsData` מעדכן את `window.executionsData`
 - ✅ קורא ל-`updateExecutionsGlobalData(executionsData)`
 - ❌ אבל `executionsData` ריק (0 פריטים) כי השרת מחזיר רשימה ריקה
@@ -120,10 +128,12 @@ Database Query
 ### בעיה #1: השרת מחזיר רשימה ריקה
 
 **תיאור:**
+
 - `/api/executions/` מחזיר `{ data: [], message: "Retrieved 0 executions records" }`
 - למרות שיש 407 ביצועים במערכת
 
 **סיבות אפשריות:**
+
 1. **בעיה עם user_id filtering:** ✅ **זוהה**
    - `base_entity.py` שורה 72: `user_id = getattr(g, 'user_id', None)`
    - `ExecutionService.get_all()` שורה 35-36: `if user_id is not None: query = query.filter(Execution.user_id == user_id)`
@@ -140,6 +150,7 @@ Database Query
    - אולי הם שייכים ל-`user_id` אחר (לא 10)
 
 **פעולות נדרשות:**
+
 1. ✅ **נבדק:** `g.user_id = 10` (מהמשתמש המחובר)
 2. ✅ **נבדק:** Session פעיל ונכון
 3. ⚠️ **צריך לבדוק:** מה `user_id` של הביצועים במערכת
@@ -148,10 +159,12 @@ Database Query
 ### בעיה #2: הטבלה לא מציגה נתונים
 
 **תיאור:**
+
 - `updateExecutionsTableMain` נקרא אבל לא ממלא את השורות
 - יש 20 שורות ריקות ב-tbody
 
 **סיבות אפשריות:**
+
 1. **בעיה ברינדור** (תוקן חלקית):
    - `updateExecutionsTableMain` לא מעתיק את ה-attributes נכון
    - **תוקן:** שימוש ב-`cloneNode(true)` במקום העתקה ידנית
@@ -161,6 +174,7 @@ Database Query
    - כי השרת מחזיר רשימה ריקה
 
 **פעולות נדרשות:**
+
 1. ✅ תוקן: שימוש ב-`cloneNode(true)`
 2. צריך לפתור את בעיה #1 (השרת מחזיר רשימה ריקה)
 
@@ -169,16 +183,19 @@ Database Query
 ## 📋 תוכנית פעולה
 
 ### שלב 1: פתרון בעיית השרת
+
 1. לבדוק מה `g.user_id` ב-`base_entity.py`
 2. לבדוק אם יש session פעיל
 3. לבדוק את ה-database query ישירות
 4. לבדוק אם יש ביצועים ב-database
 
 ### שלב 2: בדיקת רינדור
+
 1. ✅ תוקן: שימוש ב-`cloneNode(true)`
 2. לבדוק אחרי פתרון בעיה #1
 
 ### שלב 3: בדיקת ארכיטקטורה מלאה
+
 1. לבדוק אם כל ה-Business Logic API wrappers עובדים
 2. לבדוק אם ה-Cache System עובד נכון
 3. לבדוק אם יש קריאות ישירות ל-API (לא אמור להיות)

@@ -1,4 +1,5 @@
 # סטנדרטיזציה ממשק משתמש
+
 ## UI Standardization Work Document
 
 **תאריך יצירה:** 28 בינואר 2025  
@@ -12,7 +13,8 @@
 
 המטרה היא ליצור מערכת ממשק משתמש אחידה, מדויקת וללא קוד כפול עד כמה שניתן, תוך אינטגרציה מלאה בין המערכות השונות ולוגיקת תהליכים דומה בעמודים השונים.
 
-### יעדים ספציפיים:
+### יעדים ספציפיים
+
 1. **קוד אחיד** - כל העמודים משתמשים באותם דפוסים ומערכות מרכזיות
 2. **אין כפילויות** - קוד מקומי כפול מוחלף במערכות מרכזיות
 3. **אינטגרציה מלאה** - כל המערכות עובדות יחד בצורה חלקה
@@ -23,15 +25,17 @@
 
 ## 📋 שיטות עבודה מפורטות
 
-### תהליך עבודה קבוע (5 שלבים):
+### תהליך עבודה קבוע (5 שלבים)
 
 #### שלב 1: לימוד מעמיק של המערכת
+
 - קריאת דוקומנטציה מלאה של המערכת
 - הבנת הארכיטקטורה והשימוש הנכון
 - זיהוי דפוסי שימוש נפוצים
 - זיהוי מקרים קצה ואפשרויות התאמה
 
 #### שלב 2: סריקת כלל העמודים והכנת דוח סטיות
+
 - סריקה מפורטת של כל 34 העמודים במערכת
 - זיהוי שימושים מקומיים במקום מערכת מרכזית
 - זיהוי כפילויות קוד
@@ -42,6 +46,7 @@
   - רשימת בעיות שזוהו
 
 #### שלב 3: תיקון רוחבי לכל העמודים
+
 - תיקון כל הסטיות בכל העמודים
 - החלפת קוד מקומי במערכת מרכזית
 - מחיקת כפילויות
@@ -52,6 +57,7 @@
   - אינדקס פונקציות ו-JSDoc
 
 #### שלב 4: בדיקות פר עמוד
+
 - בדיקה מפורטת של כל עמוד אחרי התיקונים
 - וידוא שהפונקציונליות עובדת
 - בדיקת ביצועים
@@ -59,6 +65,7 @@
 - רישום תוצאות הבדיקות במטריצה
 
 #### שלב 5: עדכון מסמך העבודה המרכזי
+
 - עדכון מטריצת השלמת תיקונים
 - עדכון אחוזי ביצוע
 - סימון בדיקה סופית בדפדפן
@@ -69,6 +76,7 @@
 ## 📋 רשימת עמודים מלאה (38 עמודים)
 
 ### עמודים מרכזיים (13 עמודים)
+
 1. `index.html` - דשבורד ראשי
 2. `trades.html` - ניהול טריידים
 3. `trade_plans.html` - תכניות מסחר
@@ -84,6 +92,7 @@
 13. `ticker-dashboard.html` - דשבורד טיקר (דורש פרמטר `tickerId`)
 
 ### עמודים טכניים (12 עמודים)
+
 12. `db_display.html` - תצוגת בסיס נתונים
 13. `db_extradata.html` - נתונים נוספים
 14. `constraints.html` - אילוצי מערכת
@@ -98,10 +107,12 @@
 23. `tradingview-test-page.html` - בדיקת TradingView Lightweight Charts
 
 ### עמודים משניים (2 עמודים)
+
 24. `external-data-dashboard.html` - דשבורד נתונים חיצוניים
 25. `chart-management.html` - ניהול גרפים
 
 ### עמודי מוקאפ (11 עמודים)
+
 26. `portfolio-state-page.html` - מצב תיק היסטורי
 27. `trade-history-page.html` - היסטוריית טרייד
 28. `price-history-page.html` - היסטוריית מחירים
@@ -121,6 +132,7 @@
 ## 🎨 רשימת מערכות כלליות לממשק משתמש (מעודכן לפי GENERAL_SYSTEMS_LIST.md)
 
 ### 🔴 מערכות קריטיות (חובה בכל עמוד)
+
 1. **Unified Initialization System** - מערכת אתחול מאוחדת
    - `unified-app-initializer.js`, `page-initialization-configs.js`
    - אתחול 5 שלבים, טעינת חבילות, ניטור
@@ -138,7 +150,7 @@
      - החלפת 8 שימושים ישירים ב-`alert()` ו-`confirm()`
      - וידוא טעינת notification-system.js ו-warning-system.js בכל העמודים
      - ניקוי קוד כפול וטיפול ב-fallback תקינים
-   - **דוחות:** 
+   - **דוחות:**
      - `NOTIFICATION_SYSTEM_DEVIATIONS_REPORT.md` - דוח סטיות
      - `NOTIFICATION_SYSTEM_TESTING_REPORT.md` - דוח בדיקות
 
@@ -161,6 +173,7 @@
    - **סטטוס:** ✅ הושלם - תמיכה מלאה במודלים מקוננים
 
 ### 🟠 מערכות חשובות (רוב העמודים)
+
 7. **Unified Table System** - מערכת טבלאות מאוחדת ✅
    - `unified-table-system.js`, `tables.js`, `table-mappings.js`
    - רינדור, מיון, פילטור, pagination
@@ -225,65 +238,68 @@
      - `CRUD_RESPONSE_HANDLER_E2E_TEST_RESULTS.md` - דוח בדיקות E2E (7/7 עמודים - 100%)
 
 10. **Select Populator Service** - מילוי Selectים ✅
-   - `select-populator-service.js`
-   - מילוי Selectים מבוססי API כולל caching
-   - **תאריך השלמה:** 26 בנובמבר 2025
-   - **סטטוס:** ✅ הושלם - תיקונים קריטיים בוצעו, 4 תיקונים, 0 שגיאות לינטר
-   - **תיקונים שבוצעו:**
-     - ✅ הוספת `populateSelectWithData()` ב-SelectPopulatorService - פונקציה ציבורית למילוי select עם נתונים קיימים
-     - ✅ תיקון `populateSelect()` ב-trades.js - החלפה לשימוש ב-SelectPopulatorService.populateSelectWithData()
-     - ✅ תיקון `populateSelect()` ב-alerts.js - החלפה לשימוש ב-SelectPopulatorService.populateSelectWithData()
-     - ✅ תיקון טיפול ידני ב-executions.js - החלפה לשימוש ב-SelectPopulatorService.populateSelectWithData()
-   - **תוצאות:**
-     - 4 תיקונים קריטיים בוצעו
-     - 0 שגיאות לינטר בקבצים ששונו
-     - המערכת נטענת דרך services package בכל העמודים הרלוונטיים
-     - רוב הבעיות שזוהו הן false positives (fetch שאינם למילוי select)
-   - **דוחות:**
-     - `SELECT_POPULATOR_SERVICE_DEVIATIONS_REPORT.md` - דוח סטיות
-     - `SELECT_POPULATOR_SERVICE_STANDARDIZATION_REPORT.md` - דוח סטנדרטיזציה
-     - `SELECT_POPULATOR_SERVICE_COMPLETION_REPORT.md` - דוח השלמה
+
+- `select-populator-service.js`
+- מילוי Selectים מבוססי API כולל caching
+- **תאריך השלמה:** 26 בנובמבר 2025
+- **סטטוס:** ✅ הושלם - תיקונים קריטיים בוצעו, 4 תיקונים, 0 שגיאות לינטר
+- **תיקונים שבוצעו:**
+  - ✅ הוספת `populateSelectWithData()` ב-SelectPopulatorService - פונקציה ציבורית למילוי select עם נתונים קיימים
+  - ✅ תיקון `populateSelect()` ב-trades.js - החלפה לשימוש ב-SelectPopulatorService.populateSelectWithData()
+  - ✅ תיקון `populateSelect()` ב-alerts.js - החלפה לשימוש ב-SelectPopulatorService.populateSelectWithData()
+  - ✅ תיקון טיפול ידני ב-executions.js - החלפה לשימוש ב-SelectPopulatorService.populateSelectWithData()
+- **תוצאות:**
+  - 4 תיקונים קריטיים בוצעו
+  - 0 שגיאות לינטר בקבצים ששונו
+  - המערכת נטענת דרך services package בכל העמודים הרלוונטיים
+  - רוב הבעיות שזוהו הן false positives (fetch שאינם למילוי select)
+- **דוחות:**
+  - `SELECT_POPULATOR_SERVICE_DEVIATIONS_REPORT.md` - דוח סטיות
+  - `SELECT_POPULATOR_SERVICE_STANDARDIZATION_REPORT.md` - דוח סטנדרטיזציה
+  - `SELECT_POPULATOR_SERVICE_COMPLETION_REPORT.md` - דוח השלמה
 
 11. **Data Collection Service** - איסוף נתונים ✅
-   - `data-collection-service.js`
-   - איסוף/הצבת נתוני טפסים במפה אחידה
-   - **תאריך השלמה:** 26 בנובמבר 2025
-   - **סטטוס:** ✅ הושלם - תיקונים קריטיים בוצעו, 0 שגיאות לינטר
-   - **תיקונים שבוצעו:**
-     - ✅ תיקון alerts.js - 10+ מופעים (querySelector().value, getElementById().value, field.value = '')
-     - ✅ תיקון cash_flows.js - 8 מופעים (תוקן קודם)
-     - ✅ תיקון constraint-manager.js - 6 מופעים (תוקן קודם)
-     - ✅ תיקון css-management.js - 5 מופעים (תוקן קודם)
-     - ✅ תיקון currencies.js - 4 מופעים (תוקן קודם)
-   - **תוצאות:**
-     - ~36 מופעים תוקנו ב-6 קבצים
-     - 0 שגיאות לינטר בקבצים ששונו
-     - המערכת נטענת דרך services package בכל העמודים הרלוונטיים
-   - **דוחות:**
-     - `DATA_COLLECTION_SERVICE_DEVIATIONS_REPORT.md` - דוח סטיות
-     - `DATA_COLLECTION_SERVICE_STANDARDIZATION_SUMMARY.md` - סיכום סטנדרטיזציה
+
+- `data-collection-service.js`
+- איסוף/הצבת נתוני טפסים במפה אחידה
+- **תאריך השלמה:** 26 בנובמבר 2025
+- **סטטוס:** ✅ הושלם - תיקונים קריטיים בוצעו, 0 שגיאות לינטר
+- **תיקונים שבוצעו:**
+  - ✅ תיקון alerts.js - 10+ מופעים (querySelector().value, getElementById().value, field.value = '')
+  - ✅ תיקון cash_flows.js - 8 מופעים (תוקן קודם)
+  - ✅ תיקון constraint-manager.js - 6 מופעים (תוקן קודם)
+  - ✅ תיקון css-management.js - 5 מופעים (תוקן קודם)
+  - ✅ תיקון currencies.js - 4 מופעים (תוקן קודם)
+- **תוצאות:**
+  - ~36 מופעים תוקנו ב-6 קבצים
+  - 0 שגיאות לינטר בקבצים ששונו
+  - המערכת נטענת דרך services package בכל העמודים הרלוונטיים
+- **דוחות:**
+  - `DATA_COLLECTION_SERVICE_DEVIATIONS_REPORT.md` - דוח סטיות
+  - `DATA_COLLECTION_SERVICE_STANDARDIZATION_SUMMARY.md` - סיכום סטנדרטיזציה
 
 12. **Icon System** - מערכת איקונים ✅
-   - `icon-system.js`, `icon-mappings.js`
-   - ניהול מרכזי של איקונים
-   - **תאריך השלמה:** 26 בנובמבר 2025
-   - **סטטוס:** ✅ הושלם - תיקונים קריטיים בוצעו, 0 שגיאות לינטר
-   - **תיקונים שבוצעו:**
-     - ✅ תיקון strategy-analysis-page.js - 6 מופעים (alert-triangle, note, info-circle)
-     - ✅ תיקון background-tasks.js - 4 מופעים (loader, player-stop, refresh)
-     - ✅ תיקון notifications-center.js - 10 שימושים (תוקן קודם)
-     - ✅ תיקון active-alerts-component.js - כל השימושים (תוקן קודם)
-     - ✅ תיקון unified-log-display.js - 26 שימושים (תוקן קודם)
-     - ✅ תיקון tickers.js, index.js, executions.js - שימושים נוספים (תוקן קודם)
-   - **תוצאות:**
-     - ~50+ מופעים תוקנו ב-12+ קבצים
-     - 0 שגיאות לינטר בקבצים ששונו
-     - המערכת נטענת דרך base package בכל העמודים
-     - כל האיקונים במיפוי קיימים פיזית
-   - **דוחות:**
-     - `ICON_SYSTEM_DEVIATIONS_REPORT.md` - דוח סטיות
-     - `ICON_SYSTEM_FINAL_REPORT.md` - דוח סופי
-     - `ICON_SYSTEM_COMPLETION_STATUS.md` - סטטוס השלמה
+
+- `icon-system.js`, `icon-mappings.js`
+- ניהול מרכזי של איקונים
+- **תאריך השלמה:** 26 בנובמבר 2025
+- **סטטוס:** ✅ הושלם - תיקונים קריטיים בוצעו, 0 שגיאות לינטר
+- **תיקונים שבוצעו:**
+  - ✅ תיקון strategy-analysis-page.js - 6 מופעים (alert-triangle, note, info-circle)
+  - ✅ תיקון background-tasks.js - 4 מופעים (loader, player-stop, refresh)
+  - ✅ תיקון notifications-center.js - 10 שימושים (תוקן קודם)
+  - ✅ תיקון active-alerts-component.js - כל השימושים (תוקן קודם)
+  - ✅ תיקון unified-log-display.js - 26 שימושים (תוקן קודם)
+  - ✅ תיקון tickers.js, index.js, executions.js - שימושים נוספים (תוקן קודם)
+- **תוצאות:**
+  - ~50+ מופעים תוקנו ב-12+ קבצים
+  - 0 שגיאות לינטר בקבצים ששונו
+  - המערכת נטענת דרך base package בכל העמודים
+  - כל האיקונים במיפוי קיימים פיזית
+- **דוחות:**
+  - `ICON_SYSTEM_DEVIATIONS_REPORT.md` - דוח סטיות
+  - `ICON_SYSTEM_FINAL_REPORT.md` - דוח סופי
+  - `ICON_SYSTEM_COMPLETION_STATUS.md` - סטטוס השלמה
 
 13. **Header & Filters System** - מערכת כותרת ופילטרים ✅ **הושלם**
     - `header-system.js`
@@ -301,22 +317,23 @@
     - **דוחות:** BUTTON_SYSTEM_DEVIATIONS_REPORT.md, BUTTON_SYSTEM_STANDARDIZATION_SUMMARY.md
 
 15. **Color Scheme System** - מערכת צבעים ✅ **הושלם**
-   - `color-scheme-system.js`
-   - ניהול צבעים גלובלי, יישום צבעי המותג
-   - **תאריך השלמה:** 26 בנובמבר 2025
-   - **סטטוס:** ✅ הושלם - תיקונים קריטיים בוצעו, 0 שגיאות לינטר
-   - **תיקונים שבוצעו:**
-     - ✅ תיקון `ui-advanced.js` - החלפת פונקציות מקומיות (getEntityColor, getStatusColor, getEntityBackgroundColor, getEntityTextColor) בשימוש במערכת המרכזית עם fallback
-     - ✅ תיקון `entity-details-renderer.js` - הסרת fallbacks hardcoded מ-8 פונקציות render (#0d6efd, #6c757d, #019193, #26baac)
-     - ✅ תיקון `portfolio-state-page.js` - החלפת 12 מופעים של #6A5ACD בצבעים דינמיים מהמערכת המרכזית
-   - **תוצאות:**
-     - 3 קבצים קריטיים תוקנו
-     - 0 שגיאות לינטר בקבצים ששונו
-     - כל הפונקציות המקומיות משתמשות במערכת המרכזית
-     - המערכת נטענת דרך base package בכל העמודים הרלוונטיים
-   - **דוחות:**
-     - `COLOR_SCHEME_SYSTEM_DEVIATIONS_REPORT.md` - דוח סטיות (13,503 ממצאים - רובם ב-CSS, לא קריטי)
-     - `COLOR_SCHEME_SYSTEM_STANDARDIZATION_REPORT.md` - דוח סטנדרטיזציה
+
+- `color-scheme-system.js`
+- ניהול צבעים גלובלי, יישום צבעי המותג
+- **תאריך השלמה:** 26 בנובמבר 2025
+- **סטטוס:** ✅ הושלם - תיקונים קריטיים בוצעו, 0 שגיאות לינטר
+- **תיקונים שבוצעו:**
+  - ✅ תיקון `ui-advanced.js` - החלפת פונקציות מקומיות (getEntityColor, getStatusColor, getEntityBackgroundColor, getEntityTextColor) בשימוש במערכת המרכזית עם fallback
+  - ✅ תיקון `entity-details-renderer.js` - הסרת fallbacks hardcoded מ-8 פונקציות render (#0d6efd, #6c757d, #019193, #26baac)
+  - ✅ תיקון `portfolio-state-page.js` - החלפת 12 מופעים של #6A5ACD בצבעים דינמיים מהמערכת המרכזית
+- **תוצאות:**
+  - 3 קבצים קריטיים תוקנו
+  - 0 שגיאות לינטר בקבצים ששונו
+  - כל הפונקציות המקומיות משתמשות במערכת המרכזית
+  - המערכת נטענת דרך base package בכל העמודים הרלוונטיים
+- **דוחות:**
+  - `COLOR_SCHEME_SYSTEM_DEVIATIONS_REPORT.md` - דוח סטיות (13,503 ממצאים - רובם ב-CSS, לא קריטי)
+  - `COLOR_SCHEME_SYSTEM_STANDARDIZATION_REPORT.md` - דוח סטנדרטיזציה
 
 16. **Actions Menu Toolkit** ✅ - תפריטי פעולה
     - `actions-menu-system.js`
@@ -389,7 +406,7 @@
       - שופר תיעוד openNoteDetails (פותח מודל הוספה, לא פרטים)
       - עדכון סקריפט סריקה להתעלם מפונקציות שפותחות מודל הוספה
     - **תוצאה:** 0 סטיות נותרו, 100% עמידה בסטנדרט
-    - **דוחות:** 
+    - **דוחות:**
       - `documentation/05-REPORTS/ENTITY_DETAILS_MODAL_DEVIATIONS_REPORT.md`
       - `documentation/05-REPORTS/ENTITY_DETAILS_MODAL_STANDARDIZATION_SUMMARY.md`
 
@@ -408,6 +425,7 @@
       - `CONDITIONS_SYSTEM_TESTING_REPORT.md` - דוח בדיקות
 
 ### 🟡 מערכות משניות (חלקן מהעמודים)
+
 21. **Page State Management** - ניהול מצב עמוד
     - `page-state-manager.js` - המערכת המרכזית
     - `page-utils.js` - פונקציות עזר
@@ -442,29 +460,33 @@
       - `TRANSLATION_UTILITIES_TESTING_REPORT.md` - דוח בדיקות
 
 23. **Event Handler Manager** - ניהול אירועים (v2.0.0 - שופר עם כלי debugging מתקדמים)
-   - `event-handler-manager.js`
-   - ✅ שופר: כלי debugging מתקדמים, ניטור ביצועים, event tracking, error reporting
-   - ✅ דוקומנטציה: [EVENT_HANDLER_SYSTEM.md](../02-ARCHITECTURE/FRONTEND/EVENT_HANDLER_SYSTEM.md)
-   - ✅ מדריך למפתח: [EVENT_HANDLER_DEBUGGING_GUIDE.md](../03-DEVELOPMENT/GUIDES/EVENT_HANDLER_DEBUGGING_GUIDE.md)
-    - Delegation גלובלי, מניעת כפילויות
+
+- `event-handler-manager.js`
+- ✅ שופר: כלי debugging מתקדמים, ניטור ביצועים, event tracking, error reporting
+- ✅ דוקומנטציה: [EVENT_HANDLER_SYSTEM.md](../02-ARCHITECTURE/FRONTEND/EVENT_HANDLER_SYSTEM.md)
+- ✅ מדריך למפתח: [EVENT_HANDLER_DEBUGGING_GUIDE.md](../03-DEVELOPMENT/GUIDES/EVENT_HANDLER_DEBUGGING_GUIDE.md)
+  - Delegation גלובלי, מניעת כפילויות
 
 24. **Logger Service** - מערכת לוגים מאוחדת ✅
-   - `logger-service.js`
-   - מערכת לוגים מאוחדת (info/warn/error/debug) + דוחות מפורטים
-   - **תאריך השלמה:** ינואר 2025
-   - **סטטוס:** ✅ הושלם - כל העמודים משתמשים במערכת
+
+- `logger-service.js`
+- מערכת לוגים מאוחדת (info/warn/error/debug) + דוחות מפורטים
+- **תאריך השלמה:** ינואר 2025
+- **סטטוס:** ✅ הושלם - כל העמודים משתמשים במערכת
 
 25. **Warning System** - מערכת אזהרות ✅
-   - `warning-system.js`
-   - תצוגת אזהרות/אישורים, החלפה ל-confirm גלובלי
-   - **תאריך השלמה:** 28 בינואר 2025
-   - **סטטוס:** מושלם - כל 36 העמודים משתמשים במערכת
+
+- `warning-system.js`
+- תצוגת אזהרות/אישורים, החלפה ל-confirm גלובלי
+- **תאריך השלמה:** 28 בינואר 2025
+- **סטטוס:** מושלם - כל 36 העמודים משתמשים במערכת
 
 26. **Notification Category Detector** - זיהוי קטגוריות התראות ✅
-   - `notification-category-detector.js`
-   - זיהוי קטגוריות והתאמת מסרים לפי Severity
-   - **תאריך השלמה:** ינואר 2025
-   - **סטטוס:** ✅ הושלם
+
+- `notification-category-detector.js`
+- זיהוי קטגוריות והתאמת מסרים לפי Severity
+- **תאריך השלמה:** ינואר 2025
+- **סטטוס:** ✅ הושלם
 
 27. **Default Value Setter** - ברירות מחדל ✅
     - `default-value-setter.js`
@@ -545,94 +567,111 @@
 ### 🟢 מערכות נוספות (מתוך GENERAL_SYSTEMS_LIST.md)
 
 31. **Data Services** - שירותי נתונים ייעודיים ✅
-   - `trading-ui/scripts/services/*-data.js`
-   - שירותי נתונים מאוחדים לכל ישות עם Business Logic API Wrappers
-   - **סטטוס:** ✅ פעיל - כל הישויות משתמשות בשירותי נתונים מרכזיים
+
+- `trading-ui/scripts/services/*-data.js`
+- שירותי נתונים מאוחדים לכל ישות עם Business Logic API Wrappers
+- **סטטוס:** ✅ פעיל - כל הישויות משתמשות בשירותי נתונים מרכזיים
 
 32. **Business Logic API Wrappers** - עטיפות לוגיקה עסקית ✅
-   - `trading-ui/scripts/services/*-data.js`, `statistics-calculator.js`, `tag-service.js`
-   - 32 wrappers ל-Business Logic API (Trade, Execution, Alert, Statistics, Cash Flow, Note, Trading Account, Trade Plan, Ticker, Tag, Preferences)
-   - **סטטוס:** ✅ פעיל - כל ה-wrappers משתמשים ב-CacheTTLGuard
+
+- `trading-ui/scripts/services/*-data.js`, `statistics-calculator.js`, `tag-service.js`
+- 32 wrappers ל-Business Logic API (Trade, Execution, Alert, Statistics, Cash Flow, Note, Trading Account, Trade Plan, Ticker, Tag, Preferences)
+- **סטטוס:** ✅ פעיל - כל ה-wrappers משתמשים ב-CacheTTLGuard
 
 33. **Investment Calculation Service** - חישוב השקעות ✅
-   - `investment-calculation-service.js`
-   - חישוב דו־כיווני סכום↔כמות↔מחיר + ריסק ברירת מחדל
-   - **סטטוס:** ✅ פעיל
+
+- `investment-calculation-service.js`
+- חישוב דו־כיווני סכום↔כמות↔מחיר + ריסק ברירת מחדל
+- **סטטוס:** ✅ פעיל
 
 34. **Trade Plan Matching Service** - התאמת תוכניות מסחר ✅
-   - `Backend/services/trade_plan_matching_service.py`
-   - התאמת טריידים לתוכניות והפקת הצעות ליצירת תוכניות חדשות
-   - **סטטוס:** ✅ פעיל
+
+- `Backend/services/trade_plan_matching_service.py`
+- התאמת טריידים לתוכניות והפקת הצעות ליצירת תוכניות חדשות
+- **סטטוס:** ✅ פעיל
 
 35. **Tag Service** - מערכת ניהול תגיות ✅
-   - `tag-service.js`, `tag-ui-manager.js`, `Backend/services/tag_service.py`
-   - ניהול תגיות: קטגוריות, תגיות, שיוכים, אנליטיקה והצעות
-   - **סטטוס:** ✅ פעיל
+
+- `tag-service.js`, `tag-ui-manager.js`, `Backend/services/tag_service.py`
+- ניהול תגיות: קטגוריות, תגיות, שיוכים, אנליטיקה והצעות
+- **סטטוס:** ✅ פעיל
 
 36. **Tag Links Cleanup System** - ניקוי תגיות ✅
-   - `Backend/services/tag_service.py`, `Backend/models/*.py`, `Backend/scripts/cleanup_orphaned_tag_links.py`
-   - ניקוי אוטומטי של tag links בעת מחיקת entities
-   - **תאריך השלמה:** ינואר 2025
-   - **סטטוס:** ✅ הושלם
+
+- `Backend/services/tag_service.py`, `Backend/models/*.py`, `Backend/scripts/cleanup_orphaned_tag_links.py`
+- ניקוי אוטומטי של tag links בעת מחיקת entities
+- **תאריך השלמה:** ינואר 2025
+- **סטטוס:** ✅ הושלם
 
 37. **Alert Condition Renderer** - רינדור תנאי התראות ✅
-   - `alert-condition-renderer.js`
-   - רינדור תנאי התראות כולל תמיכה בשיטות המסחר
-   - **סטטוס:** ✅ פעיל
+
+- `alert-condition-renderer.js`
+- רינדור תנאי התראות כולל תמיכה בשיטות המסחר
+- **סטטוס:** ✅ פעיל
 
 38. **Autocomplete Service** - מערכת autocomplete כללית ✅
-   - `autocomplete-service.js`
-   - מערכת autocomplete כללית לשימוש חוזר - overlay עם suggestions, keyboard navigation, RTL support
-   - **תאריך השלמה:** ינואר 2025
-   - **סטטוס:** ✅ הושלם
+
+- `autocomplete-service.js`
+- מערכת autocomplete כללית לשימוש חוזר - overlay עם suggestions, keyboard navigation, RTL support
+- **תאריך השלמה:** ינואר 2025
+- **סטטוס:** ✅ הושלם
 
 39. **TradingView Widgets System** - מערכת ווידג'טים TradingView ✅
-   - `trading-ui/scripts/tradingview-widgets/`
-   - מערכת מרכזית לניהול 11 ווידג'טים רשמיים של TradingView
-   - **סטטוס:** ✅ פעיל
+
+- `trading-ui/scripts/tradingview-widgets/`
+- מערכת מרכזית לניהול 11 ווידג'טים רשמיים של TradingView
+- **סטטוס:** ✅ פעיל
 
 40. **Unified Cache Manager** - מערכת מטמון מאוחדת ✅
-   - `unified-cache-manager.js`
-   - בחירת שכבת מטמון (Memory/LocalStorage/IndexedDB/Backend) והחזרות TTL
-   - **סטטוס:** ✅ פעיל - כל העמודים משתמשים במערכת
+
+- `unified-cache-manager.js`
+- בחירת שכבת מטמון (Memory/LocalStorage/IndexedDB/Backend) והחזרות TTL
+- **סטטוס:** ✅ פעיל - כל העמודים משתמשים במערכת
 
 41. **Cache Sync Manager** - סנכרון מטמון ✅
-   - `cache-sync-manager.js`
-   - סנכרון Frontend ↔ Backend, ניהול invalidation patterns, dependencies
-   - **תאריך השלמה:** ינואר 2025
-   - **סטטוס:** ✅ הושלם - שילוב מלא ב-9 עמודים מרכזיים
+
+- `cache-sync-manager.js`
+- סנכרון Frontend ↔ Backend, ניהול invalidation patterns, dependencies
+- **תאריך השלמה:** ינואר 2025
+- **סטטוס:** ✅ הושלם - שילוב מלא ב-9 עמודים מרכזיים
 
 42. **Cache Policy Manager** - ניהול מדיניות מטמון ✅
-   - `cache-policy-manager.js`
-   - כלל אחיד למדיניות מטמון לפי סוג נתון ותוקף
-   - **סטטוס:** ✅ פעיל
+
+- `cache-policy-manager.js`
+- כלל אחיד למדיניות מטמון לפי סוג נתון ותוקף
+- **סטטוס:** ✅ פעיל
 
 43. **LocalStorage Events Sync** - סנכרון אירועי LocalStorage ✅
-   - `modules/localstorage-sync.js`
-   - האזנה לאירועי שינוי אחסון ושמירת עקביות בין טאבים
-   - **סטטוס:** ✅ פעיל
+
+- `modules/localstorage-sync.js`
+- האזנה לאירועי שינוי אחסון ושמירת עקביות בין טאבים
+- **סטטוס:** ✅ פעיל
 
 44. **Lint Status Service** - שירות סטטוס Lint ✅
-   - `lint-status-service.js`
-   - שליפת דוחות lint מאוחדים (ESLint/Stylelint/HTMLHint/Prettier)
-   - **סטטוס:** ✅ פעיל
+
+- `lint-status-service.js`
+- שליפת דוחות lint מאוחדים (ESLint/Stylelint/HTMLHint/Prettier)
+- **סטטוס:** ✅ פעיל
 
 45. **Lint Monitor Dashboard** - דשבורד ניטור Lint ✅
-   - `linter-realtime-monitor.js`
-   - מוטמע בתוך `code-quality-dashboard.html`: מציג כרטיסי מצב, סטטוס כלי, סוגיות פעילות
-   - **סטטוס:** ✅ פעיל
+
+- `linter-realtime-monitor.js`
+- מוטמע בתוך `code-quality-dashboard.html`: מציג כרטיסי מצב, סטטוס כלי, סוגיות פעילות
+- **סטטוס:** ✅ פעיל
 
 46. **SMTP Service** - שירות SMTP ✅
-   - `Backend/services/email_service.py`, `email_templates.py`, `smtp_settings_service.py`
-   - שירות SMTP גמיש לשליחת מגוון הודעות עם תמיכה ב-templates, הגדרות במערכת הכלליות
-   - **תאריך השלמה:** ינואר 2025
-   - **סטטוס:** ✅ הושלם
+
+- `Backend/services/email_service.py`, `email_templates.py`, `smtp_settings_service.py`
+- שירות SMTP גמיש לשליחת מגוון הודעות עם תמיכה ב-templates, הגדרות במערכת הכלליות
+- **תאריך השלמה:** ינואר 2025
+- **סטטוס:** ✅ הושלם
 
 47. **AI Analysis System** - מערכת ניתוח AI ✅
-   - `ai-analysis-data.js`, `ai-analysis-manager.js`, `ai-result-renderer.js`, `Backend/services/ai_analysis_service.py`
-   - מערכת ניתוח AI למניות עם תמיכה ב-4 תבניות פרומפטים, אינטגרציה עם מנועי LLM
-   - **תאריך השלמה:** ינואר 2025
-   - **סטטוס:** ✅ הושלם
+
+- `ai-analysis-data.js`, `ai-analysis-manager.js`, `ai-result-renderer.js`, `Backend/services/ai_analysis_service.py`
+- מערכת ניתוח AI למניות עם תמיכה ב-4 תבניות פרומפטים, אינטגרציה עם מנועי LLM
+- **תאריך השלמה:** ינואר 2025
+- **סטטוס:** ✅ הושלם
 
 **סה"כ מערכות מתועדות:** 47 מערכות (מתוך GENERAL_SYSTEMS_LIST.md)
 
@@ -640,14 +679,16 @@
 
 ## 📊 מטריצת השלמת תיקונים ובדיקות
 
-### הסבר המטריצה:
+### הסבר המטריצה
+
 - **✅ הושלם** - התיקון הושלם, נבדק ועובד
 - **⏳ בתהליך** - התיקון בתהליך, עדיין לא הושלם
 - **❌ לא התחיל** - טרם התחיל התיקון
 - **🧪 נבדק בדפדפן** - בוצעה בדיקה סופית בדפדפן
 - **📝 אחוז ביצוע** - אחוז התיקונים שהושלמו מתוך סך הכל
 
-### סטטוס כללי:
+### סטטוס כללי
+
 - **עמודים מושלמים:** 12/38 (31.6%) - כולל 13 עמודים מרכזיים (כולל ticker-dashboard.html שהושלם)
 - **מערכות מושלמות:** 16/47 (34.0%) - מתוך 47 מערכות מתועדות ב-GENERAL_SYSTEMS_LIST.md
   - ✅ Unified Initialization System
@@ -671,7 +712,8 @@
 - **מערכות בתהליך:** 0/26 (0%)
 - **תאים במטריצה מושלמים:** 447/1786 (25.0%) - 38 עמודים × 47 מערכות
 
-### מטריצה מפורטת (38 עמודים × 47 מערכות = 1786 תאים):
+### מטריצה מפורטת (38 עמודים × 47 מערכות = 1786 תאים)
+
 **הערה:** המטריצה המלאה כוללת 47 מערכות מתוך GENERAL_SYSTEMS_LIST.md. מטריצה מפורטת חלקית להלן (26 מערכות מרכזיות):
 
 | עמוד | Unified Init | Section Toggle | Notifications | Modals | Tables | Field Renderer | CRUD Handler | Select Populator | Data Collection | Icons | Header | Buttons | Colors | Actions Menu | Info Summary | Pagination | Entity Details | Conditions | Page State | Translation | Event Handler | Modal Nav | Default Values | Sort Adapter | Linked Items | Trade Plan Widget | אחוז ביצוע |
@@ -716,6 +758,7 @@
 | **tradingview-test-page.html** (מוקאפ) | ✅ | ✅ | ✅ | ⏳ | ⏳ | ✅ | ⏳ | ⏳ | ⏳ | ✅ | ✅ | ✅ | ✅ | ⏳ | ⏳ | ⏳ | ⏳ | ⏳ | ✅ | ✅ | ✅ | ⏳ | ⏳ | ✅ | ⏳ | ⏳ | ⏳ |
 
 **סימני סטטוס:**
+
 - ✅ = הושלם ובדוק
 - ⏳ = בתהליך / לא רלוונטי
 - ❌ = לא התחיל
@@ -725,17 +768,21 @@
 ## ✅ מערכות שהושלמו
 
 ### 1. Unified Initialization System ✅ **הושלם**
+
 **תאריך השלמה:** 28 בינואר 2025  
 **סטטוס:** מושלם - כל 36 העמודים משתמשים במערכת  
 **תיעוד:** [UNIFIED_INITIALIZATION_SYSTEM.md](02-ARCHITECTURE/FRONTEND/UNIFIED_INITIALIZATION_SYSTEM.md)
 **דוחות:**
+
 - `INITIALIZATION_SYSTEM_COMPREHENSIVE_VALIDATION.md` - בדיקה מקיפה
 - `INITIALIZATION_SYSTEM_PACKAGE_MANIFEST_AUDIT.md` - בדיקת חבילות
 
 ### 2. UI Utilities & Section Toggle ✅ **הושלם**
+
 **תאריך השלמה:** 28 בינואר 2025  
 **סטטוס:** מושלם - כל 39 העמודים (כולל מוקאפ) משתמשים במערכת  
 **תיקונים שבוצעו:**
+
 - הוספת `data-section` attributes לכל הסקשנים
 - הסרת custom toggle functions
 - כל העמודים משתמשים ב-`window.toggleSection()` ו-`window.restoreAllSectionStates()`
@@ -744,9 +791,11 @@
 **תיעוד:** [SECTION_TOGGLE_SYSTEM.md](02-ARCHITECTURE/FRONTEND/SECTION_TOGGLE_SYSTEM.md)
 
 ### 3. Modal Manager V2 ✅ **הושלם**
+
 **תאריך השלמה:** 28 בינואר 2025  
 **סטטוס:** מושלם - כל 36 העמודים משתמשים במערכת המרכזית  
 **תיקונים שבוצעו:**
+
 - החלפת 25+ מופעים של `bootstrap.Modal` ישיר ב-ModalManagerV2
 - החלפת 18+ פונקציות מקומיות במערכת המרכזית
 - שיפור ModalManagerV2 לתמיכה במודלים דינמיים
@@ -759,14 +808,16 @@
 - שיפור ModalManagerV2 לתמיכה במודלים דינמיים
 - שיפור `ui-utils.js` ו-`createAndShowModal` להשתמש ב-ModalManagerV2
 - תיקון 15 קבצים במלואם
-**תיעוד:** 
+**תיעוד:**
 - [MODAL_MANAGER_V2_FINAL_REPORT.md](../05-REPORTS/MODAL_MANAGER_V2_FINAL_REPORT.md)
 - [MODAL_MANAGER_V2_SPECIFICATION.md](../03-DEVELOPMENT/TOOLS/MODAL_MANAGER_V2_SPECIFICATION.md)
 
 ### 4. Field Renderer Service ✅
+
 **תאריך השלמה:** 28 בינואר 2025  
 **סטטוס:** מושלם - כל 36 העמודים משתמשים במערכת המרכזית  
 **תיקונים שבוצעו:**
+
 - החלפת 12+ פונקציות מקומיות במערכת המרכזית
 - הסרת fallback logic מיותר ב-15+ מקומות
 - וידוא טעינת field-renderer-service.js בכל העמודים דרך SERVICES package
@@ -776,9 +827,11 @@
 - [FIELD_RENDERER_SYSTEM_TESTING_REPORT.md](../05-REPORTS/FIELD_RENDERER_SYSTEM_TESTING_REPORT.md)
 
 ### 6. Icon System ✅
+
 **תאריך השלמה:** 12 בינואר 2025  
 **סטטוס:** 95% הושלם - כל האיקונים במיפוי קיימים פיזית, תיקון אוטומטי לכל העמודים  
 **תיקונים שבוצעו:**
+
 - הוספת 15+ איקונים חסרים למיפוי (`icon-mappings.js`)
 - תיקון 6 קבצי JavaScript מרכזיים: notifications-center.js, active-alerts-component.js, unified-log-display.js, tickers.js, index.js, executions.js
 - יצירת `icon-replacement-helper.js` - פונקציה כללית להחלפת איקונים
@@ -794,9 +847,11 @@
 - [ICON_SYSTEM_ARCHITECTURE.md](ICON_SYSTEM_ARCHITECTURE.md)
 
 ### 5. Unified Table System ✅
+
 **תאריך השלמה:** 26 בנובמבר 2025  
 **סטטוס:** מושלם - כל 36 העמודים משתמשים במערכת המרכזית  
 **תיקונים שבוצעו:**
+
 - הוספת `data-table-type` ל-52 טבלאות ב-28 קבצים
 - החלפת פונקציות מקומיות (`loadTableDataLocal`, `updateTableDisplay`) במערכת המרכזית
 - יצירת סקריפטים אוטומטיים לסריקה ותיקון
@@ -807,9 +862,11 @@
 - [UNIFIED_TABLE_SYSTEM_COMPREHENSIVE_FINAL_REPORT.md](../05-REPORTS/UNIFIED_TABLE_SYSTEM_COMPREHENSIVE_FINAL_REPORT.md)
 
 ### 7. Data Collection Service ⏳
+
 **תאריך התחלה:** 28 בינואר 2025  
 **סטטוס:** בתהליך - תיקונים ראשוניים הושלמו (~6.5%)  
 **תיקונים שבוצעו:**
+
 - תיקון 4 קבצים: cash_flows.js (8 מופעים), alerts.js (3 מופעים), constraint-manager.js (6 מופעים), css-management.js (5 מופעים), currencies.js (4 מופעים)
 - יצירת fieldMap עבור currency exchange form
 - הוספת fallback logic לכל השימושים
@@ -820,9 +877,11 @@
 - [DATA_COLLECTION_SERVICE_FINAL_REPORT.md](../05-REPORTS/DATA_COLLECTION_SERVICE_FINAL_REPORT.md)
 
 ### 12. Button System ✅
+
 **תאריך השלמה:** 26 בנובמבר 2025  
 **סטטוס:** **הושלם במלואו - 100%**  
 **תיקונים שבוצעו:**
+
 - החלפת 494 שימושים ב-onclick ישיר ב-data-onclick (100% הצלחה)
 - הוספת data-button-type ל-230 כפתורים (100% כיסוי)
 - תיקון 17 קבצי HTML
@@ -835,9 +894,11 @@
 - [BUTTON_SYSTEM_FINAL_COMPLETION_REPORT.md](../05-REPORTS/BUTTON_SYSTEM_FINAL_COMPLETION_REPORT.md)
 
 ### 15. Info Summary System ✅
+
 **תאריך השלמה:** 26 בנובמבר 2025  
 **סטטוס:** **הושלם במלואו - 100%**  
 **תיקונים שבוצעו:**
+
 - הוספת 5 configs חסרים (preferences, db_display, background-tasks, notifications-center, external-data-dashboard)
 - וידוא טעינת info-summary-system.js ב-5 עמודים חסרים
 - תיקון 2 מקומות ב-portfolio-state-page.js להשתמש ב-InfoSummarySystem
@@ -852,12 +913,14 @@
 **תיעוד:**
 - [INFO_SUMMARY_SYSTEM_DEVIATIONS_REPORT.md](../05-REPORTS/INFO_SUMMARY_SYSTEM_DEVIATIONS_REPORT.md)
 - [INFO_SUMMARY_SYSTEM_STANDARDIZATION_REPORT.md](../05-REPORTS/INFO_SUMMARY_SYSTEM_STANDARDIZATION_REPORT.md)
-    - [INFO_SUMMARY_SYSTEM_TESTING_REPORT.md](../05-REPORTS/INFO_SUMMARY_SYSTEM_TESTING_REPORT.md)
+  - [INFO_SUMMARY_SYSTEM_TESTING_REPORT.md](../05-REPORTS/INFO_SUMMARY_SYSTEM_TESTING_REPORT.md)
 
 ### 21. Default Value Setter ✅
+
 **תאריך השלמה:** 28 בינואר 2025  
 **סטטוס:** מושלם - כל 11 העמודים המרכזיים משתמשים במערכת (100%)  
 **תיקונים שבוצעו:**
+
 - תיקון `trade_plans.js` - שיפור השימוש ב-DefaultValueSetter (גם עבור datetime-local)
 - תיקון `auth.js` - החלפת הגדרת ערך לוגי מקומי ב-DefaultValueSetter.setLogicalDefault()
 - ModalManagerV2 כבר משתמש ב-DefaultValueSetter - זה מבטיח שרוב המודלים משתמשים במערכת אוטומטית
@@ -874,9 +937,11 @@
 **תיעוד:** `services/default-value-setter.js`
 
 ### 22. Event Handler Manager (v2.0.0) ✅
+
 **תאריך השלמה:** 27 בינואר 2025  
 **סטטוס:** ✅ **100% הושלם בהצלחה** - שופר עם כלי debugging מתקדמים  
 **שיפורים שבוצעו:**
+
 - הוספת Event Registry מפורט עם metadata מלא (timestamp, source, stack trace, performance)
 - הוספת Event Tracking עם היסטוריית אירועים (100 אירועים אחרונים)
 - הוספת Performance Monitoring - מדידת זמן ביצוע, זיהוי handlers איטיים
@@ -927,9 +992,10 @@
 
 ## 📝 הערות והתקדמות
 
-### עדכונים אחרונים:
+### עדכונים אחרונים
 
 **28 בינואר 2025:**
+
 - ✅ **הושלמה סטנדרטיזציה של Default Value Setter (100% הצלחה)**
   - סריקה מקיפה של 315 קבצי JavaScript - זיהוי 582 סטיות (רובן false positives)
   - תיקון 2 קבצים: trade_plans.js (שיפור השימוש ב-DefaultValueSetter), auth.js (החלפת הגדרת ערך לוגי מקומי)
@@ -940,6 +1006,7 @@
   - **תוצאה:** 100% מהעמודים המרכזיים משתמשים במערכת, 0 סטיות קריטיות נותרו
 
 **27 בינואר 2025:**
+
 - ✅ **הושלמה שיפור מלא של Event Handler Manager (v2.0.0) - 100% הצלחה**
   - הוספת מערכת ניטור מתקדמת: Event Registry, Event Tracking, Performance Monitoring
   - אינטגרציה מלאה עם Logger Service - כל הלוגים עוברים דרך Logger
@@ -964,6 +1031,7 @@
   - **תוצאה:** מערכת debugging מקיפה מוכנה לשימוש, 100% מהתכונות עובדות, תיעוד מלא
 
 **26 בנובמבר 2025:**
+
 - ✅ **הושלמה סטנדרטיזציה של Button System (96% הצלחה - 696 מתוך 724 סטיות)**
   - סריקה מקיפה של 36 עמודים - זיהוי 724 סטיות
   - החלפת 494 שימושים ב-onclick ישיר ב-data-onclick (100% הצלחה)
@@ -985,6 +1053,7 @@
   - **תוצאה:** 83% מהעמודים משתמשים במערכת Header System המרכזית, כל העמודים המרכזיים עברו
 
 **25 בנובמבר 2025:**
+
 - ✅ **הושלמה סטנדרטיזציה מלאה של CRUD Response Handler (8 עמודים מרכזיים - 100%)**
   - תיקון 6 קבצים: trades.js, trade_plans.js, alerts.js, trading_accounts.js, notes.js, cash_flows.js
   - הוספת crud-response-handler.js ל-13 עמודים חסרים (טכניים, משניים ומוקאפ)
@@ -994,6 +1063,7 @@
   - **תוצאה:** 100% מהעמודים המרכזיים משתמשים במערכת המרכזית, 0 טיפול ידני בתגובות CRUD
 
 **26 בנובמבר 2025:**
+
 - ✅ **הושלמה סטנדרטיזציה מלאה של CRUD Response Handler עבור tickers, preferences, index**
   - תיקון `preferences-data.js` - `savePreference()`, `savePreferences()` - הוחלף ב-CRUDResponseHandler
   - תיקון `index.js` - `fetchJsonList()`, `loadDashboardData()`, `handleDashboardError()` - הוחלף ב-CRUDResponseHandler.handleLoadResponse/handleError
@@ -1017,6 +1087,7 @@
   - **תוצאה:** כל 3 העמודים משתמשים במערכת המרכזית, כל הבדיקות עברו בהצלחה (100%)
 
 **28 בינואר 2025:**
+
 - ✅ **הושלמה סטנדרטיזציה מלאה של Default Value Setter (100% הצלחה)**
   - סריקה מקיפה של 315 קבצי JavaScript - זיהוי 582 סטיות (רובן false positives)
   - תיקון `trade_plans.js` - שיפור השימוש ב-DefaultValueSetter (גם עבור datetime-local)
@@ -1091,7 +1162,8 @@
 **תאריך סריקה:** 25 בנובמבר 2025  
 **סטטוס:** תיקונים קריטיים הושלמו, בעיות נוספות נדרשות לבדיקה
 
-#### תיקונים שבוצעו:
+#### תיקונים שבוצעו
+
 1. ✅ **`trades.js` - `updateTrade()`** - הוחלף טיפול ידני ב-CRUDResponseHandler
 2. ✅ **`trade_plans.js` - `executeTradePlan()`** - הוחלף טיפול ידני ב-CRUDResponseHandler
 3. ✅ **הוספת `crud-response-handler.js` לעמודים חסרים:**
@@ -1104,9 +1176,10 @@
    - `dynamic-colors-display.html`
    - `external-data-dashboard.html`
 
-#### בעיות שנותרו לטיפול (נדרשות בדיקה נוספת):
+#### בעיות שנותרו לטיפול (נדרשות בדיקה נוספת)
 
 **קטגוריה 1: שגיאות `.catch()` שאינן קשורות ל-CRUD (לא דורש תיקון)**
+
 - `trades.js` - שורה 723, 1308: שגיאות בטעינת נתונים (לא CRUD)
 - `portfolio-state-page.js` - שורה 671: שגיאות ב-cache invalidation (לא CRUD)
 - `trade-history-page.js` - שורה 410: שגיאות בטעינת נתונים (לא CRUD)
@@ -1114,15 +1187,18 @@
 - **החלטה:** לא דורש תיקון - אלה אינן פעולות CRUD
 
 **קטגוריה 2: הודעות `showSuccessNotification`/`showErrorNotification` לגיטימיות (לא דורש תיקון)**
+
 - `index.js` - שורה 588, 1494, 1497: הודעות על טעינת נתונים, רענון מטמון (לא CRUD)
 - `preferences.js` - הודעות על שמירת העדפות (יכול להיות CRUD אבל לא תמיד)
 - **החלטה:** נדרש לבדוק כל מקרה לגופו - חלק לגיטימיים, חלק יכולים להיות מוחלפים
 
 **קטגוריה 3: פונקציות Mock שאינן CRUD אמיתי (לא דורש תיקון)**
+
 - `emotional-tracking-widget.js` - שורה 516: `handleSaveEmotion()` הוא mock function ללא API call
 - **החלטה:** לא דורש תיקון - זה mock data ולא CRUD אמיתי
 
 **קטגוריה 4: בעיות HIGH severity שדורשות בדיקה נוספת:**
+
 - `alerts.js` - שורה 3169: `manualResponseCheck` - נדרש לבדוק אם זה CRUD או לא
 - `trading_accounts.js` - שורה 2267: `manualErrorHandling` - נדרש לבדוק אם זה CRUD או לא
 - `executions.js` - שורה 1921: `manualErrorHandling` - נדרש לבדוק אם זה CRUD או לא
@@ -1133,20 +1209,24 @@
 - `external-data-dashboard.js` - שורה 858: `manualErrorHandling` - נדרש לבדוק אם זה CRUD או לא
 
 **קטגוריה 5: שימושים ב-`response.ok` ו-`response.json()` שאינם CRUD (לא דורש תיקון)**
+
 - רוב השימושים ב-`response.ok` ו-`response.json()` הם בטעינת נתונים (GET) ולא פעולות CRUD
 - **החלטה:** לא דורש תיקון - אלה אינן פעולות CRUD
 
-#### המלצות לטיפול:
+#### המלצות לטיפול
+
 1. **בדיקה ידנית** של כל הבעיות בקטגוריה 4 - לזהות אם הן קשורות ל-CRUD או לא
 2. **תיקון רק פעולות CRUD אמיתיות** - לא לתקן שגיאות בטעינת נתונים או cache invalidation
 3. **תיעוד החלטות** - לתעד כל החלטה על בעיה שלא תוקנה (למה לא תוקנה)
 
-#### דוחות:
+#### דוחות
+
 - `CRUD_RESPONSE_HANDLER_DEVIATIONS_REPORT.md` - דוח סטיות מלא (1140 בעיות זוהו, רובן לא קשורות ל-CRUD)
 
 ---
 
 **26 בנובמבר 2025:**
+
 - ✅ **הושלמה סטנדרטיזציה מלאה של Table Sort Value Adapter (100% הצלחה)**
   - סריקה מקיפה של 25 עמודים - זיהוי 7 directSort issues, 26 manualDateParse, 85 directDateEnvelope, 3 manualNumber
   - תיקון 7 קבצים: index.js, data_import.js, cash_flows.js, constraints.js, notifications-center.js, widgets/recent-trades-widget.js, table-mappings.js
@@ -1156,6 +1236,7 @@
   - **דוחות:** TABLE_SORT_VALUE_ADAPTER_DEVIATIONS_REPORT.md
 
 **26 בנובמבר 2025:**
+
 - ✅ **הושלמה סטנדרטיזציה מלאה של Pending Trade Plan Widget (100% הצלחה)**
   - שימוש ב-CRUDResponseHandler.handleSaveResponse ב-assignTradeToPlan
   - שימוש ב-CRUDResponseHandler.handleLoadResponse ב-fetchAssignments ו-fetchCreations
@@ -1164,6 +1245,7 @@
   - **דוחות:** PENDING_TRADE_PLAN_WIDGET_DEVIATIONS_REPORT.md (0 סטיות), PENDING_TRADE_PLAN_WIDGET_TESTING_REPORT.md, pending-trade-plan-widget-e2e-test.js
 
 **30 בינואר 2025:**
+
 - ✅ **הושלמה סטנדרטיזציה מלאה של user-profile.html (100% הצלחה)**
   - תיקון 15 סטיות (4 קריטיות, 7 חשובות, 4 משניות)
   - שימוש ב-CRUDResponseHandler ב-`handleProfileUpdate()` ו-`handlePasswordChange()`
@@ -1176,7 +1258,8 @@
 **עדכון אחרון:** 1 בדצמבר 2025  
 **גרסה:** 1.0.9
 
-### עדכונים אחרונים (1 בדצמבר 2025):
+### עדכונים אחרונים (1 בדצמבר 2025)
+
 - ✅ **שלב 4 (בדיקות ותיקונים בעדיפות גבוהה) הושלם:**
   - **תיקון innerHTML בעדיפות גבוהה:** 113 מופעים ב-4 קבצים מרכזיים
     - `init-system-management.js` (45 מופעים)
@@ -1189,7 +1272,8 @@
   - **ITCSS:** 21/36 עמודים עברו (58%)
   - **דוחות שנוצרו:** `STANDARDIZATION_PHASE_4_TEST_RESULTS.json`, `STANDARDIZATION_PHASE_4_TEST_REPORT.md`
 
-### עדכונים קודמים (3 בפברואר 2025):
+### עדכונים קודמים (3 בפברואר 2025)
+
 - ✅ **שלב 3 (תיקון רוחבי) הושלם בהצלחה:**
   - **שלב 3.1:** הוספת Packages חסרים (29/30 עמודים - 97%)
     - עדכון `page-initialization-configs.js` עם 165 packages חסרים ו-344 globals חסרים

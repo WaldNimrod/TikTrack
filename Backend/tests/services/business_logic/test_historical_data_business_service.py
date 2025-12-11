@@ -223,7 +223,8 @@ class TestHistoricalDataBusinessService:
         result = service.calculate_portfolio_snapshot_series(
             user_id=1,
             account_id=None,
-            dates=dates
+            dates=dates,
+            interval='day'
         )
         
         assert isinstance(result, dict)
@@ -232,6 +233,50 @@ class TestHistoricalDataBusinessService:
             assert 'snapshots' in result
             assert 'count' in result
             assert isinstance(result['snapshots'], list)
+    
+    def test_calculate_portfolio_comparison_no_session(self):
+        """Test portfolio comparison calculation without database session."""
+        date1 = datetime(2025, 1, 1, tzinfo=timezone.utc)
+        date2 = datetime(2025, 1, 31, tzinfo=timezone.utc)
+        
+        result = self.service.calculate_portfolio_comparison(
+            user_id=1,
+            account_id=2,
+            date1=date1,
+            date2=date2
+        )
+        
+        # Should return invalid result without session
+        assert isinstance(result, dict)
+        assert 'is_valid' in result
+        assert result.get('is_valid') is False
+        assert 'error' in result
+    
+    def test_calculate_portfolio_comparison_with_session(self, db_session: Session):
+        """Test portfolio comparison calculation with database session."""
+        service = HistoricalDataBusinessService(db_session=db_session)
+        date1 = datetime.now(timezone.utc) - timedelta(days=30)
+        date2 = datetime.now(timezone.utc)
+        
+        result = service.calculate_portfolio_comparison(
+            user_id=1,
+            account_id=None,
+            date1=date1,
+            date2=date2
+        )
+        
+        assert isinstance(result, dict)
+        assert 'is_valid' in result
+        if result.get('is_valid'):
+            assert 'date1_state' in result
+            assert 'date2_state' in result
+            assert 'comparison' in result
+            assert 'cash_balance' in result['date1_state']
+            assert 'portfolio_value' in result['date1_state']
+            assert 'total_pl' in result['date1_state']
+            assert 'cash_balance_change' in result['comparison']
+            assert 'portfolio_value_change' in result['comparison']
+            assert 'total_pl_change' in result['comparison']
     
     # ========================================================================
     # Trade History Calculation Tests

@@ -91,6 +91,7 @@ pip install selenium webdriver-manager requests
 ### Credentials
 
 כל הבדיקות משתמשות ב:
+
 - **Username:** `admin`
 - **Password:** `admin123`
 
@@ -170,19 +171,24 @@ pip install selenium webdriver-manager requests
 ## פתרון בעיות
 
 ### שגיאה: "selenium not installed"
+
 ```bash
 pip install selenium webdriver-manager
 ```
 
 ### שגיאה: "Connection refused"
+
 ודא שהשרת רץ:
+
 ```bash
 ./start_server.sh
 ```
 
 ### שגיאה: "Authentication failed"
+
 ודא שהמשתמש admin קיים במערכת עם הסיסמה admin123
 
 ### בדיקות Selenium לא עובדות
+
 ודא ש-Chrome מותקן במחשב. ChromeDriver מותקן אוטומטית על ידי webdriver-manager.
 

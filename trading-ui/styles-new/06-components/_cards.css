@@ -401,6 +401,8 @@
   color: var(--apple-text-primary);
   margin-bottom: 1rem;
   display: flex;
+  justify-content: center;
+  text-align: center;
   align-items: center;
   gap: 0.5rem;
 }

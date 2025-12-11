@@ -6,6 +6,107 @@
  * Documentation: See documentation/frontend/JAVASCRIPT_ARCHITECTURE.md
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - initializeSeriesControls() - Initializeseriescontrols
+// - createComparisonCategories() - Createcomparisoncategories
+// - initComparisonChart() - Initcomparisonchart
+// - initializeTagsFilter() - Initializetagsfilter
+// - initializeRecordFilterTags() - Initializerecordfiltertags
+// - initializeComparisonTags() - Initializecomparisontags
+// - initializeHeader() - Initializeheader
+// - initializePage() - Initializepage
+
+// === Event Handlers ===
+// - getComparisonParameterValues() - Getcomparisonparametervalues
+// - selectDateRangeOption() - Selectdaterangeoption
+// - handleCustomDateFromChange() - Handlecustomdatefromchange
+// - handleCustomDateToChange() - Handlecustomdatetochange
+// - generateMockComparisonTableData() - Generatemockcomparisontabledata
+// - formatComparisonInfo() - Formatcomparisoninfo
+// - updateComparisonTable() - Updatecomparisontable
+// - updateAllVisualizationsInternal() - Updateallvisualizationsinternal
+// - updateAllVisualizations() - Updateallvisualizations
+// - updateComparisonChart() - Updatecomparisonchart
+// - selectAllOptions() - Selectalloptions
+// - clearAllOptions() - Clearalloptions
+// - selectSideOption() - Selectsideoption
+// - selectStatusOption() - Selectstatusoption
+// - toggleComparisonParameter() - Togglecomparisonparameter
+// - applyComparisonParameters() - Applycomparisonparameters
+// - selectAllComparisonParameters() - Selectallcomparisonparameters
+// - clearAllComparisonParameters() - Clearallcomparisonparameters
+// - resetComparisonParameters() - Resetcomparisonparameters
+// - resetComparisonParametersToDefaults() - Resetcomparisonparameterstodefaults
+// - saveComparisonParameterState() - Savecomparisonparameterstate
+// - loadComparisonParameterState() - Loadcomparisonparameterstate
+
+// === UI Functions ===
+// - updateDateRangeFilterText() - Updatedaterangefiltertext
+// - renderTagsBadges() - Rendertagsbadges
+// - updateHeatmap() - Updateheatmap
+// - showHeatmapTooltip() - Showheatmaptooltip
+// - hideHeatmapTooltip() - Hideheatmaptooltip
+// - updateVisualHeatmap() - Updatevisualheatmap
+// - showVisualHeatmapTooltip() - Showvisualheatmaptooltip
+// - hideVisualHeatmapTooltip() - Hidevisualheatmaptooltip
+// - updateChartLegend() - Updatechartlegend
+// - updateSideFilterText() - Updatesidefiltertext
+// - updateStatusFilterText() - Updatestatusfiltertext
+
+// === Data Functions ===
+// - getCSSVariableValue() - Getcssvariablevalue
+// - saveSeriesVisibilityState() - Saveseriesvisibilitystate
+// - loadSeriesVisibilityState() - Loadseriesvisibilitystate
+// - getRecordFilterValues() - Getrecordfiltervalues
+// - getFilterValues() - Getfiltervalues
+// - getDateRange() - Getdaterange
+// - saveFilterState() - Savefilterstate
+// - loadFilterState() - Loadfilterstate
+// - generateMockSeriesData() - Generatemockseriesdata
+// - generateMockHeatmapData() - Generatemockheatmapdata
+// - getColorClass() - Getcolorclass
+// - getColorStyle() - Getcolorstyle
+// - loadTradingAccounts() - Loadtradingaccounts
+// - loadTradingMethods() - Loadtradingmethods
+// - loadTickers() - Loadtickers
+// - saveRecordFilterState() - Saverecordfilterstate
+// - loadRecordFilterState() - Loadrecordfilterstate
+// - getPercentile() - Getpercentile
+// - getPLPercentile() - Getplpercentile
+// - getAvgPLPercentile() - Getavgplpercentile
+// - getValuePercentile() - Getvaluepercentile
+
+// === Utility Functions ===
+// - formatCurrency() - Formatcurrency
+// - formatPLWithPercent() - Formatplwithpercent
+// - formatInvestmentWithPercent() - Formatinvestmentwithpercent
+// - formatFilterInfo() - Formatfilterinfo
+// - formatDate() - Formatdate
+
+// === Other ===
+// - toggleSeries() - Toggleseries
+// - waitForTradingViewAdapter() - Waitfortradingviewadapter
+// - toggleDateRangeFilterMenu() - Toggledaterangefiltermenu
+// - restorePageState() - Restorepagestate
+// - generateMockTagsForCategory() - Generatemocktagsforcategory
+// - cartesianProduct() - Cartesianproduct
+// - seededRandom() - Seededrandom
+// - filterByCategory() - Filterbycategory
+// - toggleSideFilterMenu() - Togglesidefiltermenu
+// - toggleStatusFilterMenu() - Togglestatusfiltermenu
+// - applyRecordFilters() - Applyrecordfilters
+// - selectAllRecordFilters() - Selectallrecordfilters
+// - clearAllRecordFilters() - Clearallrecordfilters
+// - resetRecordFilters() - Resetrecordfilters
+// - resetRecordFiltersToDefaults() - Resetrecordfilterstodefaults
+// - applyFilters() - Applyfilters
+// - resetFilters() - Resetfilters
+// - resetToDefaults() - Resettodefaults
+// - exportComparativeAnalysis() - Exportcomparativeanalysis
+
 (function() {
     'use strict';
 

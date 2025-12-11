@@ -9,6 +9,21 @@
  * - No gap bridges, no mousemove handlers, no complexity
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - setupOverlayHover() - Setupoverlayhover
+
+// === Event Handlers ===
+// - positionOverlay() - Positionoverlay
+// - updatePosition() - Updateposition
+// - handleOverlayEnter() - Handleoverlayenter
+// - handleOverlayLeave() - Handleoverlayleave
+
+// === Other ===
+// - destroy() - Destroy
+
 ;(function widgetOverlayServiceFactory() {
   'use strict';
 

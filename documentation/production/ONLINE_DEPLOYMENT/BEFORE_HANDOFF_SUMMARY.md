@@ -9,6 +9,7 @@
 ## ✅ מה צריך לעשות (רשימה מהירה)
 
 ### 1. וידוא מסמכים מוכנים ✅
+
 - [x] `TESTING_ENVIRONMENT_WORK_INSTRUCTIONS.md` - הוראות עבודה מפורטות
 - [x] `TESTING_ENVIRONMENT_QUICK_REFERENCE.md` - Quick reference
 - [x] `HANDOFF_README.md` - README להעברה
@@ -21,6 +22,7 @@
 ### 2. Commit & Push ל-Git
 
 **פקודות:**
+
 ```bash
 # 1. מעבר לתיקיית הפרויקט
 cd /path/to/TikTrackApp
@@ -52,12 +54,14 @@ git push origin main
 ### 3. בדיקת תקינות מסמכים
 
 **בדיקות:**
+
 - [ ] כל המסמכים נפתחים ונקראים
 - [ ] כל הפקודות נכונות
 - [ ] כל הנתיבים נכונים
 - [ ] אין שגיאות כתיב
 
 **פקודה לבדיקה:**
+
 ```bash
 # בדיקת שכל הקבצים קיימים ולא ריקים
 for file in documentation/production/ONLINE_DEPLOYMENT/TESTING_ENVIRONMENT*.md; do
@@ -76,6 +80,7 @@ done
 ### 4. יצירת הודעה לצוות
 
 **הודעה מומלצת:**
+
 ```
 שלום,
 
@@ -111,17 +116,20 @@ documentation/production/ONLINE_DEPLOYMENT/
 ## 📋 Checklist סופי
 
 ### לפני העברה
+
 - [ ] כל המסמכים נשמרו ב-Git
 - [ ] Commit & Push הושלמו
 - [ ] בדיקת תקינות מסמכים
 - [ ] הודעה לצוות מוכנה
 
 ### העברה
+
 - [ ] העברת המסמכים לצוות (או קישור ל-Git)
 - [ ] וידוא שהצוות קיבל
 - [ ] הסבר על המסמכים
 
 ### אחרי העברה
+
 - [ ] מעקב אחר התקדמות
 - [ ] תמיכה בבעיות
 
@@ -130,6 +138,7 @@ documentation/production/ONLINE_DEPLOYMENT/
 ## 🚀 תהליך מהיר
 
 ### שלב 1: Git
+
 ```bash
 cd /path/to/TikTrackApp
 git add documentation/production/ONLINE_DEPLOYMENT/
@@ -138,12 +147,14 @@ git push origin main
 ```
 
 ### שלב 2: בדיקה
+
 ```bash
 # בדיקת שכל הקבצים קיימים
 ls -la documentation/production/ONLINE_DEPLOYMENT/TESTING_ENVIRONMENT*.md
 ```
 
 ### שלב 3: העברה
+
 - העבר קישור ל-Git repository
 - או העבר את הקבצים:
   - `TESTING_ENVIRONMENT_WORK_INSTRUCTIONS.md` ⭐
@@ -154,12 +165,14 @@ ls -la documentation/production/ONLINE_DEPLOYMENT/TESTING_ENVIRONMENT*.md
 
 ## 📝 מסמכים להעברה
 
-### חובה:
+### חובה
+
 1. **`TESTING_ENVIRONMENT_WORK_INSTRUCTIONS.md`** - הוראות עבודה מפורטות ⭐
 2. **`TESTING_ENVIRONMENT_QUICK_REFERENCE.md`** - Quick reference ⭐
 3. **`HANDOFF_README.md`** - README להעברה
 
-### אופציונלי:
+### אופציונלי
+
 4. `TESTING_ENVIRONMENT_UPDATE_PLAN.md` - תוכנית מפורטת
 5. `TESTING_ENVIRONMENT_CHECKLIST.md` - Checklist מקיף
 
@@ -168,6 +181,7 @@ ls -la documentation/production/ONLINE_DEPLOYMENT/TESTING_ENVIRONMENT*.md
 ## ⚠️ דחיפות
 
 **דחוף לבצע:**
+
 1. ✅ Commit & Push ל-Git
 2. ✅ בדיקת תקינות מסמכים
 3. ✅ העברה לצוות הטסטים

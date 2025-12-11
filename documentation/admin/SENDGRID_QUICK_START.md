@@ -1,4 +1,5 @@
 # מדריך מהיר - SendGrid (אחרי יצירת חשבון)
+
 ## SendGrid Quick Start Guide
 
 **תאריך יצירה**: 28 בינואר 2025  
@@ -7,7 +8,7 @@
 
 ---
 
-## 🎯 אתה בממשק SendGrid - מה הלאה?
+## 🎯 אתה בממשק SendGrid - מה הלאה
 
 אם כבר יצרת חשבון ונכנסת לממשק, בצע את השלבים הבאים:
 
@@ -95,43 +96,54 @@
 
 הכנס את הפרטים הבאים:
 
-#### Host (שרת SMTP):
+#### Host (שרת SMTP)
+
 ```
 smtp.sendgrid.net
 ```
 
-#### Port (פורט):
+#### Port (פורט)
+
 ```
 587
 ```
 
-#### User (שם משתמש):
+#### User (שם משתמש)
+
 ```
 apikey
 ```
+
 ⚠️ **חשוב מאוד**: זה המילה המילולית `apikey` (אותיות קטנות), **לא** ה-API Key שלך!
 
-#### Password (סיסמה):
+#### Password (סיסמה)
+
 ```
 SG.xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ```
+
 ⚠️ **זה ה-API Key** שהעתקת בשלב 2 (החל מ-`SG.`)
 
-#### From Email (כתובת שולח):
+#### From Email (כתובת שולח)
+
 ```
 admin@mezoo.co
 ```
+
 ⚠️ **זה הכתובת שאימתת** בשלב 1 (Sender Verification)
 
-#### From Name (שם שולח):
+#### From Name (שם שולח)
+
 ```
 TikTrack
 ```
 
-#### Use TLS (שימוש ב-TLS):
+#### Use TLS (שימוש ב-TLS)
+
 ✅ **סמן** (מופעל)
 
-#### Enabled (מופעל):
+#### Enabled (מופעל)
+
 ✅ **סמן** (מופעל)
 
 ### ג. שמירה
@@ -176,6 +188,7 @@ TikTrack
    - ✅ נכון: `SG.xxxxx...` (ה-API Key המלא)
 
 **פתרון**:
+
 - ודא שה-User הוא בדיוק `apikey` (אותיות קטנות, ללא רווחים)
 - ודא שה-Password הוא ה-API Key המלא (החל מ-`SG.`)
 
@@ -184,6 +197,7 @@ TikTrack
 **סיבה**: כתובת האימייל לא אומתה ב-SendGrid
 
 **פתרון**:
+
 1. חזור ל-SendGrid → Settings → Sender Authentication
 2. ודא שכתובת האימייל מופיעה כ-**"Verified"** ✅
 3. אם לא, אמת אותה מחדש (ראה שלב 1)
@@ -191,6 +205,7 @@ TikTrack
 ### בעיה: "Connection timeout"
 
 **פתרון**:
+
 - בדוק חיבור לאינטרנט
 - בדוק הגדרות חומת אש
 - נסה שוב

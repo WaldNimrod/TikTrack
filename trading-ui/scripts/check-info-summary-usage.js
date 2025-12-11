@@ -8,6 +8,19 @@
  * @created November 2025
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Event Handlers ===
+// - findFunctionEnd() - Findfunctionend
+
+// === Other ===
+// - scanJavaScriptFile() - Scanjavascriptfile
+// - scanHTMLFile() - Scanhtmlfile
+// - scanPage() - Scanpage
+// - scanAllPages() - Scanallpages
+// - generateReport() - Generatereport
+
 const fs = require('fs');
 const path = require('path');
 
@@ -405,20 +418,20 @@ function generateReport() {
 
 ## 📊 סיכום כללי
 
-- **סה"כ עמודים נסרקו:** ${results.summary.totalPages}
-- **עמודים המשתמשים במערכת:** ${results.summary.pagesWithService}
-- **עמודים עם summary element:** ${results.summary.pagesWithSummaryElement}
-- **עמודים עם config:** ${results.summary.pagesWithConfig}
-- **עמודים עם בעיות:** ${results.summary.pagesWithIssues}
-- **סה"כ בעיות נמצאו:** ${results.summary.totalIssues}
+// - **סה"כ עמודים נסרקו:** ${results.summary.totalPages}
+// - **עמודים המשתמשים במערכת:** ${results.summary.pagesWithService}
+// - **עמודים עם summary element:** ${results.summary.pagesWithSummaryElement}
+// - **עמודים עם config:** ${results.summary.pagesWithConfig}
+// - **עמודים עם בעיות:** ${results.summary.pagesWithIssues}
+// - **סה"כ בעיות נמצאו:** ${results.summary.totalIssues}
 
 ### פילוח בעיות לפי סוג:
 
-- **עדכון summary עם innerHTML ישיר:** ${results.summary.issuesByType.manualInnerHTML || 0}
-- **פונקציות מקומיות:** ${results.summary.issuesByType.localFunctions || 0}
-- **חישוב ידני של סטטיסטיקות:** ${results.summary.issuesByType.manualCalculations || 0}
-- **חסר טעינת המערכת:** ${results.summary.issuesByType.missingService || 0}
-- **חסר config:** ${results.summary.issuesByType.missingConfig || 0}
+// - **עדכון summary עם innerHTML ישיר:** ${results.summary.issuesByType.manualInnerHTML || 0}
+// - **פונקציות מקומיות:** ${results.summary.issuesByType.localFunctions || 0}
+// - **חישוב ידני של סטטיסטיקות:** ${results.summary.issuesByType.manualCalculations || 0}
+// - **חסר טעינת המערכת:** ${results.summary.issuesByType.missingService || 0}
+// - **חסר config:** ${results.summary.issuesByType.missingConfig || 0}
 
 ---
 
@@ -434,11 +447,11 @@ function generateReport() {
 **קטגוריה:** ${result.category}
 
 #### סטטוס:
-- **משתמש במערכת:** ${result.usingService ? '✅ כן' : '❌ לא'}
-- **טוען את המערכת:** ${result.loadingService ? '✅ כן' : '❌ לא'}
-- **יש summary element:** ${result.hasSummaryElement ? '✅ כן' : '❌ לא'}
-- **יש config:** ${result.hasConfig ? '✅ כן' : '❌ לא'}
-- **יש בעיות:** ${result.issues && result.issues.length > 0 ? '⚠️ כן' : '✅ לא'}
+// - **משתמש במערכת:** ${result.usingService ? '✅ כן' : '❌ לא'}
+// - **טוען את המערכת:** ${result.loadingService ? '✅ כן' : '❌ לא'}
+// - **יש summary element:** ${result.hasSummaryElement ? '✅ כן' : '❌ לא'}
+// - **יש config:** ${result.hasConfig ? '✅ כן' : '❌ לא'}
+// - **יש בעיות:** ${result.issues && result.issues.length > 0 ? '⚠️ כן' : '✅ לא'}
 
 `;
 
@@ -447,9 +460,9 @@ function generateReport() {
             result.issues.forEach((issue, index) => {
                 const severityEmoji = issue.severity === 'high' ? '🔴' : '🟡';
                 report += `${index + 1}. **שורה ${issue.line}:** ${issue.description}
-   - **סוג:** ${issue.type}
-   - **חומרה:** ${severityEmoji} ${issue.severity === 'high' ? 'גבוהה' : 'בינונית'}
-   - **קוד:** \`${issue.code.substring(0, 100)}${issue.code.length > 100 ? '...' : ''}\`
+// - **סוג:** ${issue.type}
+// - **חומרה:** ${severityEmoji} ${issue.severity === 'high' ? 'גבוהה' : 'בינונית'}
+// - **קוד:** \`${issue.code.substring(0, 100)}${issue.code.length > 100 ? '...' : ''}\`
 
 `;
             });

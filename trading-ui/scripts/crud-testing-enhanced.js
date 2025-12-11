@@ -2486,23 +2486,23 @@ function generateMarkdownReport(report) {
 
 ## 📊 סיכום כללי
 
-- **ציון כללי:** ${report.summary.overallScore}/100
-- **עמודים תקינים:** ${report.summary.passedEntities}/${report.summary.totalEntities}
-- **עמודים בעייתיים:** ${report.summary.problematicEntities}
-- **זמן בדיקות:** ${report.summary.totalTestTime} שניות
-- **זמן תגובה ממוצע:** ${report.summary.avgResponseTime}ms
+// - **ציון כללי:** ${report.summary.overallScore}/100
+// - **עמודים תקינים:** ${report.summary.passedEntities}/${report.summary.totalEntities}
+// - **עמודים בעייתיים:** ${report.summary.problematicEntities}
+// - **זמן בדיקות:** ${report.summary.totalTestTime} שניות
+// - **זמן תגובה ממוצע:** ${report.summary.avgResponseTime}ms
 
 ## 📊 פירוט לפי סוג
 
 ### 👥 עמודי משתמש
-- **ציון ממוצע:** ${report.breakdown.userPages.avgScore}/100
-- **תקינים:** ${report.breakdown.userPages.passed}/${report.breakdown.userPages.total}
-- **דורשים תיקון:** ${report.breakdown.userPages.problematic}
+// - **ציון ממוצע:** ${report.breakdown.userPages.avgScore}/100
+// - **תקינים:** ${report.breakdown.userPages.passed}/${report.breakdown.userPages.total}
+// - **דורשים תיקון:** ${report.breakdown.userPages.problematic}
 
 ### 🔧 כלי פיתוח
-- **ציון ממוצע:** ${report.breakdown.devTools.avgScore}/100
-- **תקינים:** ${report.breakdown.devTools.passed}/${report.breakdown.devTools.total}
-- **דורשים תיקון:** ${report.breakdown.devTools.problematic}
+// - **ציון ממוצע:** ${report.breakdown.devTools.avgScore}/100
+// - **תקינים:** ${report.breakdown.devTools.passed}/${report.breakdown.devTools.total}
+// - **דורשים תיקון:** ${report.breakdown.devTools.problematic}
 
 ${
   report.problematicPages.length > 0
@@ -2578,18 +2578,18 @@ function generateTextReport(report) {
 נוצר: ${new Date(report.summary.timestamp).toLocaleString('he-IL')}
 
 סיכום כללי:
-- ציון כללי: ${report.summary.overallScore}/100
-- עמודים תקינים: ${report.summary.passedEntities}/${report.summary.totalEntities}
-- עמודים בעייתיים: ${report.summary.problematicEntities}
-- זמן בדיקות: ${report.summary.totalTestTime} שניות
+// - ציון כללי: ${report.summary.overallScore}/100
+// - עמודים תקינים: ${report.summary.passedEntities}/${report.summary.totalEntities}
+// - עמודים בעייתיים: ${report.summary.problematicEntities}
+// - זמן בדיקות: ${report.summary.totalTestTime} שניות
 
 עמודי משתמש:
-- ציון ממוצע: ${report.breakdown.userPages.avgScore}/100
-- תקינים: ${report.breakdown.userPages.passed}/${report.breakdown.userPages.total}
+// - ציון ממוצע: ${report.breakdown.userPages.avgScore}/100
+// - תקינים: ${report.breakdown.userPages.passed}/${report.breakdown.userPages.total}
 
 כלי פיתוח:
-- ציון ממוצע: ${report.breakdown.devTools.avgScore}/100
-- תקינים: ${report.breakdown.devTools.passed}/${report.breakdown.devTools.total}
+// - ציון ממוצע: ${report.breakdown.devTools.avgScore}/100
+// - תקינים: ${report.breakdown.devTools.passed}/${report.breakdown.devTools.total}
 
 ${
   report.problematicPages.length > 0

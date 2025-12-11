@@ -1,15 +1,17 @@
 # ModalManagerV2 Specification - TikTrack Modal System
+
 ## תכנון מפורט של מנהל המודלים המרכזי החדש
 
 **תאריך יצירה**: 12 בינואר 2025  
 **מטרה**: תכנון מפורט של ModalManagerV2 עם אינטגרציה מלאה בכל המערכות הקיימות
 
 > **⚠️ חשוב - מודול תזרימי מזומנים יוצא דופן:**
-> 
+>
 > מודול העריכה של תזרימי מזומנים (`cashFlowModal`) הוא **יוצא דופן** במערכת כי הוא מטפל בשני סוגי ישויות שונות עם ממשק עריכה אחד:
+>
 > - **תזרימי מזומנים רגילים** - רשומה אחת פשוטה
 > - **המרות מטבע** - שתי רשומות מחוברות (FROM + TO) שצריכות להיות ערוכות יחד
-> 
+>
 > **קרא את התיעוד המלא:** [CASH_FLOWS_EDIT_MODAL_ARCHITECTURE.md](../../04-FEATURES/CORE/CASH_FLOWS_EDIT_MODAL_ARCHITECTURE.md)
 
 ---
@@ -26,6 +28,7 @@
 ## 🏗️ מבנה המחלקה
 
 ### ModalManagerV2 Class
+
 ```javascript
 /**
  * ModalManagerV2 - TikTrack Modal System
@@ -796,7 +799,8 @@ destroyModal(modalId) {
 
 ## 🎯 דוגמת שימוש מלא
 
-### יצירת מודל CRUD:
+### יצירת מודל CRUD
+
 ```javascript
 // יצירת מודל תזרימי מזומנים
 const cashFlowModal = ModalManagerV2.createCRUDModal({
@@ -863,14 +867,16 @@ await ModalManagerV2.showEditModal('cashFlowModal', 'cash_flow', 123);
 ```
 
 > **⚠️ חשוב - מודול תזרימי מזומנים יוצא דופן:**
-> 
+>
 > מודול העריכה של תזרימי מזומנים (`cashFlowModal`) הוא **יוצא דופן** במערכת כי הוא מטפל בשני סוגי ישויות שונות:
+>
 > 1. **תזרימי מזומנים רגילים** - רשומה אחת פשוטה
 > 2. **המרות מטבע** - שתי רשומות מחוברות (FROM + TO) שצריכות להיות ערוכות יחד
-> 
+>
 > **קרא את התיעוד המלא:** [CASH_FLOWS_EDIT_MODAL_ARCHITECTURE.md](../../04-FEATURES/CORE/CASH_FLOWS_EDIT_MODAL_ARCHITECTURE.md)
-> 
+>
 > **חובה לזכור:**
+>
 > - תמיד להשתמש ב-`editCashFlow(id)` - לא לקרוא ישירות ל-`showEditModal` או `loadCurrencyExchange`
 > - הזיהוי אוטומטי - `editCashFlow` מזהה אוטומטית אם זה תזרים רגיל או המרת מטבע
 > - המרת מטבע תמיד מורכבת משתי רשומות, לא ניתן לערוך אחת בלבד
@@ -879,14 +885,16 @@ await ModalManagerV2.showEditModal('cashFlowModal', 'cash_flow', 123);
 
 ## 🎯 המלצות ליישום
 
-### עקרונות עיצוב:
+### עקרונות עיצוב
+
 1. **אינטגרציה מלאה** - שימוש בכל המערכות הקיימות
 2. **ביצועים טובים** - lazy loading ו-caching
 3. **טיפול בשגיאות** - try-catch בכל הפונקציות
 4. **תיעוד מלא** - JSDoc לכל פונקציה
 5. **תאימות לאחור** - תמיכה ב-ModalManager הישן
 
-### דרישות טכניות:
+### דרישות טכניות
+
 1. **Bootstrap 5** - תמיכה מלאה
 2. **RTL מלא** - כיוון ימין-שמאל
 3. **ITCSS** - אפס inline styles

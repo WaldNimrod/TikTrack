@@ -1,4 +1,5 @@
 # מדריך תיקון מהיר: ARIA Modal Warning
+
 # ==========================================
 
 **תאריך:** 11 אוקטובר 2025  
@@ -10,6 +11,7 @@
 ## 🚨 **הבעיה**
 
 ### **אזהרה בקונסול:**
+
 ```
 Blocked aria-hidden on an element because its descendant retained focus.
 Element with focus: <button...>
@@ -17,6 +19,7 @@ Ancestor with aria-hidden: <div.modal fade#...>
 ```
 
 ### **מתי זה קורה:**
+
 - Modals שנוצרים **דינמית** ב-JavaScript (לא ב-HTML)
 - Bootstrap מוסיף `aria-hidden="true"` בזמן פתיחה **וסגירה**
 - כפתורים בmodal מקבלים focus בזמן ש-`aria-hidden="true"`
@@ -29,6 +32,7 @@ Ancestor with aria-hidden: <div.modal fade#...>
 ### **שלב 1: השתמש ב-Helper Function**
 
 **במקום:**
+
 ```javascript
 // ❌ לא לעשות ככה
 document.body.insertAdjacentHTML('beforeend', modalHtml);
@@ -38,6 +42,7 @@ modal.show();
 ```
 
 **עשה:**
+
 ```javascript
 // ✅ עשה ככה
 const modal = window.createAndShowModal(modalHtml, 'myModal');
@@ -117,6 +122,7 @@ window.createAndShowModal = function(modalHtml, modalId, options = {}) {
 ```
 
 **למה זה עובד:**
+
 - Observer מונע מ-Bootstrap להשאיר `aria-hidden="true"`
 - עובד **גם בפתיחה וגם בסגירה**
 - מנותק אוטומטית אחרי סגירה
@@ -244,12 +250,14 @@ function showMyModal(data) {
 ## 🧪 **איך לבדוק שהתיקון עבד**
 
 ### **לפני התיקון:**
+
 1. פתח את העמוד
 2. פתח Console (F12)
 3. פתח modal
 4. ❌ תראה: `Blocked aria-hidden...`
 
 ### **אחרי התיקון:**
+
 1. פתח את העמוד
 2. פתח Console (F12)
 3. פתח modal
@@ -261,12 +269,14 @@ function showMyModal(data) {
 ## 🚫 **מה לא לעשות**
 
 ### **❌ לא לנסות:**
+
 - להוסיף `aria-hidden="false"` ב-HTML
 - להסיר `aria-hidden` עם `setTimeout`
 - להשתמש ב-`focus: false` ב-Bootstrap
 - לכתוב Observer ידני בכל modal
 
 ### **✅ רק:**
+
 השתמש ב-`window.createAndShowModal()` - זה פותר הכל!
 
 ---
@@ -282,14 +292,17 @@ function showMyModal(data) {
 ## 🎓 **הבנה מעמיקה (אופציונלי)**
 
 ### **למה Bootstrap מוסיף aria-hidden?**
+
 - לנגישות - להסתיר את שאר הדף מ-screen readers
 - לכוון focus רק ל-modal
 
 ### **למה זה יוצר בעיה?**
+
 - Bootstrap מוסיף את זה **לפני** שהוא מסיר את ה-focus מהכפתור
 - גם **בסגירה** - מוסיף aria-hidden אבל הכפתור עדיין יש עליו focus
 
 ### **למה MutationObserver פותר את זה?**
+
 - עוקב אחרי השינויים בזמן אמת
 - מסיר `aria-hidden="true"` **מיד** כשBootstrap מוסיף
 - עובד **לאורך כל lifecycle** (show + hide)

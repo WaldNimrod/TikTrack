@@ -1,4 +1,5 @@
 # ניתוח פערים בכיסוי ניקוי המטמון - Cache Coverage Gap Analysis
+
 # =========================================================================
 
 **תאריך:** 11 אוקטובר 2025  
@@ -11,6 +12,7 @@
 ## 🔍 **ממצאים**
 
 ### **מה מכוסה (4 שכבות UnifiedCacheManager):**
+
 1. ✅ **Memory** - `MemoryLayer.cache` (Map)
 2. ✅ **localStorage** - רק `tiktrack_*` keys
 3. ✅ **IndexedDB** - רק `UnifiedCacheDB → unified-cache` store
@@ -21,7 +23,9 @@
 ## 🔴 **מה לא מכוסה - Service Caches**
 
 ### **1. Entity Details Service**
+
 **קובץ:** `entity-details-api.js`
+
 ```javascript
 class EntityDetailsAPI {
     constructor() {
@@ -32,6 +36,7 @@ class EntityDetailsAPI {
 ```
 
 **מה מאוחסן:**
+
 - פרטי entities (trades, alerts, etc.)
 - נתונים שנשלפו מהשרת
 - TTL: 5 דקות
@@ -41,7 +46,9 @@ class EntityDetailsAPI {
 ---
 
 ### **2. External Data Service**
+
 **קובץ:** `external-data-service.js`
+
 ```javascript
 class ExternalDataService {
     constructor() {
@@ -52,6 +59,7 @@ class ExternalDataService {
 ```
 
 **מה מאוחסן:**
+
 - נתוני Yahoo Finance
 - מחירי מניות
 - TTL: 1 דקה
@@ -61,7 +69,9 @@ class ExternalDataService {
 ---
 
 ### **3. Yahoo Finance Service**
+
 **קובץ:** `yahoo-finance-service.js`
+
 ```javascript
 class YahooFinanceService {
     constructor() {
@@ -73,6 +83,7 @@ class YahooFinanceService {
 ```
 
 **מה מאוחסן:**
+
 - נתוני מניות
 - Promises של בקשות בטעינה
 - TTL: 5 דקות
@@ -84,6 +95,7 @@ class YahooFinanceService {
 ### **4. Chart Adapters (3 classes)**
 
 **A. Trades Adapter** (`charts/adapters/trades-adapter.js`)
+
 ```javascript
 class TradesAdapter {
     constructor() {
@@ -94,6 +106,7 @@ class TradesAdapter {
 ```
 
 **B. Linter Adapter** (`charts/adapters/linter-adapter.js`)
+
 ```javascript
 class LinterAdapter {
     constructor() {
@@ -104,6 +117,7 @@ class LinterAdapter {
 ```
 
 **C. Performance Adapter** (`charts/adapters/performance-adapter.js`)
+
 ```javascript
 class PerformanceAdapter {
     constructor() {
@@ -118,7 +132,9 @@ class PerformanceAdapter {
 ---
 
 ### **5. Chart System**
+
 **קובץ:** `charts/chart-system.js`
+
 ```javascript
 class ChartSystem {
     constructor() {
@@ -133,7 +149,9 @@ class ChartSystem {
 ---
 
 ### **6. Unified Log Manager**
+
 **קובץ:** `unified-log-manager.js`
+
 ```javascript
 class UnifiedLogManager {
     constructor() {
@@ -150,13 +168,16 @@ class UnifiedLogManager {
 ---
 
 ### **7. CSS Management**
+
 **קובץ:** `css-management.js`
+
 ```javascript
 let mergedDuplicates = new Set();   // ❌ לא מנוקה!
 let removedDuplicates = new Set();  // ❌ לא מנוקה!
 ```
 
 **מה מאוחסן:**
+
 - רשימת CSS duplicates שכבר אוחדו
 - רשימת duplicates שהוסרו
 
@@ -185,6 +206,7 @@ let removedDuplicates = new Set();  // ❌ לא מנוקה!
 ## ❌ **הבעיות**
 
 ### **1. clearExpiredCache()**
+
 ```javascript
 // בודק רק localStorage עם prefix 'tiktrack_'!
 for (let i = 0; i < localStorage.length; i++) {
@@ -196,6 +218,7 @@ for (let i = 0; i < localStorage.length; i++) {
 ```
 
 **בעיה:**
+
 - ❌ לא בודק Memory layer
 - ❌ לא בודק IndexedDB
 - ❌ לא בודק Service Caches
@@ -204,6 +227,7 @@ for (let i = 0; i < localStorage.length; i++) {
 ---
 
 ### **2. clearCacheByCategory()**
+
 ```javascript
 const categoryPatterns = {
     'auth': ['authToken', 'savedUsername', ...],
@@ -215,6 +239,7 @@ await clearCacheByPattern(pattern);
 ```
 
 **בעיה:**
+
 - ❌ `clearCacheByPattern()` בודק רק Memory + localStorage!
 - ❌ לא בודק IndexedDB
 - ❌ לא בודק Service Caches
@@ -223,6 +248,7 @@ await clearCacheByPattern(pattern);
 ---
 
 ### **3. clearCacheByPattern()**
+
 ```javascript
 // בודק רק 2 מקורות:
 if (layer === 'all' || layer === 'memory') {
@@ -402,12 +428,14 @@ await window.CacheRegistry.clearAll();
 ## 📋 **רשימת כל ה-Caches במערכת**
 
 ### **קטגוריה A: UnifiedCacheManager (מכוסה ✅)**
+
 1. ✅ Memory Layer (Map)
 2. ⚠️ localStorage Layer (רק tiktrack_*)
 3. ✅ IndexedDB Layer (unified-cache store)
 4. ✅ Backend Layer (Map מקומי)
 
 ### **קטגוריה B: Service Caches (לא מכוסה ❌)**
+
 5. ❌ EntityDetailsAPI.cache (Map)
 6. ❌ ExternalDataService.cache (Map)
 7. ❌ YahooFinanceService.cache (Map)
@@ -417,6 +445,7 @@ await window.CacheRegistry.clearAll();
 11. ❌ PerformanceAdapter.cache (Map)
 
 ### **קטגוריה C: State Management (לא צריך לנקות 🟢)**
+
 12. 🟢 ChartSystem.charts (Map) - registry
 13. 🟢 ChartSystem.adapters (Map) - registry
 14. 🟢 ChartTheme.themes (Map) - configuration
@@ -426,10 +455,12 @@ await window.CacheRegistry.clearAll();
 18. 🟢 MigrationHelper.rollbackData (Map) - temporary
 
 ### **קטגוריה D: CSS Management (לא מכוסה ❌)**
+
 19. ❌ mergedDuplicates (Set)
 20. ❌ removedDuplicates (Set)
 
 ### **קטגוריה E: Orphan Keys (לא מכוסה ❌)**
+
 21-35. ❌ 15+ localStorage keys ללא prefix
 
 ---
@@ -451,6 +482,7 @@ await window.CacheRegistry.clearAll();
 ## ⚠️ **השלכות**
 
 ### **תרחיש בעייתי:**
+
 ```
 1. משתמש מעדכן trade
 2. EntityDetailsAPI מחזיק version ישנה ב-cache
@@ -467,6 +499,7 @@ await window.CacheRegistry.clearAll();
 ### **פתרון מומלץ: Registry + Auto-Clear**
 
 **1. יצירת CacheRegistry גלובלי:**
+
 ```javascript
 window.CacheRegistry = {
     caches: new Map(),
@@ -513,6 +546,7 @@ window.CacheRegistry = {
 ```
 
 **2. רישום בכל שירות:**
+
 ```javascript
 // entity-details-api.js
 if (window.CacheRegistry) {
@@ -524,6 +558,7 @@ if (window.CacheRegistry) {
 ```
 
 **3. clearAllCache() משופר:**
+
 ```javascript
 // נקה UnifiedCacheManager
 await UnifiedCacheManager.clear('all');
@@ -544,6 +579,7 @@ await window.CacheRegistry.clearAll();
 **❌ לא!**
 
 **כיסוי נוכחי:**
+
 - ✅ **11%** - UnifiedCacheManager בלבד
 - ❌ **26%** - Service Caches לא מכוסים
 - ❌ **43%** - Orphan Keys לא מכוסים
@@ -564,12 +600,14 @@ await window.CacheRegistry.clearAll();
 הפערים נפתרו ע"י יישום מערכת רמות ניקוי מקיפה:
 
 #### **כיסוי חדש:**
+
 - ✅ **UnifiedCacheManager:** 4 שכבות (רמה Medium)
 - ✅ **Service Caches:** 7-9 services (רמה Light)
 - ✅ **Orphan Keys:** 15-20 keys (רמה Full)
 - ✅ **סה"כ:** 100% כיסוי ברמה Full!
 
 #### **הקוד:**
+
 ```javascript
 // clearServiceCaches() - מנקה 7-9 services
 // clearOrphanKeys() - מנקה 15-20 orphans
@@ -582,11 +620,13 @@ await window.CacheRegistry.clearAll();
 ```
 
 #### **ממשק:**
+
 - **cache-test.html:** 4 כרטיסים + טבלה + בדיקות
 - **system-management.html:** 4 כפתורים
 - **תפריט ראשי:** כפתור 🧹 → Medium
 
 #### **בדיקות:**
+
 - `testClearingLevels()` - בדיקה אוטומטית
 - Validation per level
 - Before/After snapshots

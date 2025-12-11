@@ -9,6 +9,7 @@
 ### סטנדרט חדש לכל עמודי המוקאפ
 
 **מבנה HTML מומלץ:**
+
 ```html
 <div class="chart-container-wrapper">
     <div class="tradingview-chart-wrapper [custom-class]">
@@ -23,11 +24,13 @@
 ```
 
 **יתרונות:**
+
 - מבנה אחיד לכל הגרפים במערכת
 - תמיכה ב-responsive design
 - קל לתחזוקה ועדכון
 
 **יישום:**
+
 - ✅ `comparative-analysis-page.html` - גרף השוואות
 - ✅ `portfolio-state-page.html` - גרפי תיק
 - ✅ `trade-history-page.html` - גרף טיימליין
@@ -40,6 +43,7 @@
 ### שימוש ב-wrapper החיצוני לחישוב רוחב
 
 **קוד JavaScript:**
+
 ```javascript
 // Get wrapper for width calculation (if exists)
 const wrapper = container.closest('.chart-container-wrapper') || container.parentElement;
@@ -54,6 +58,7 @@ comparisonChart = window.TradingViewChartAdapter.createChart(container, {
 ```
 
 **יישום ב-resize handler:**
+
 ```javascript
 window.addEventListener('resize', () => {
     if (comparisonChart) {
@@ -68,6 +73,7 @@ window.addEventListener('resize', () => {
 ```
 
 **יתרונות:**
+
 - הגרף משתרע על כל הרוחב הזמין
 - תמיכה ב-responsive design
 - עובד נכון גם עם wrapper נוסף
@@ -79,21 +85,25 @@ window.addEventListener('resize', () => {
 ### שימוש ב-data-icon במקום emoji
 
 **לפני (❌):**
+
 ```html
 <button data-button-type="SETTINGS" data-variant="small" data-icon="⚙️" title="הגדרות תצוגה"></button>
 ```
 
 **אחרי (✅):**
+
 ```html
 <button data-button-type="SETTINGS" data-variant="small" data-icon="settings" title="הגדרות תצוגה"></button>
 ```
 
 **יתרונות:**
+
 - עקביות עם מערכת האייקונים של המערכת
 - תמיכה ב-IconSystem
 - תצוגה אחידה בכל הדפדפנים
 
 **יישום:**
+
 - ✅ `comparative-analysis-page.html` - כפתור הגדרות
 
 ---
@@ -103,6 +113,7 @@ window.addEventListener('resize', () => {
 ### כל הקונטיינרים בתוך main-content
 
 **מבנה נכון:**
+
 ```html
 <div class="background-wrapper">
     <div class="page-body">
@@ -120,11 +131,13 @@ window.addEventListener('resize', () => {
 ```
 
 **בעיות שתוקנו:**
+
 - ❌ קונטיינרים שיצאו מ-`main-content`
 - ❌ divs מיותרים שגרמו לסגירה לא נכונה
 - ❌ indentation לא נכון
 
 **יישום:**
+
 - ✅ `comparative-analysis-page.html` - תיקון מבנה heatmap section ו-chart section
 
 ---
@@ -134,6 +147,7 @@ window.addEventListener('resize', () => {
 ### יצירת רווח בין קטגוריות על ציר X
 
 **יישום:**
+
 ```javascript
 // כל קטגוריה מקבלת 2 ימים: יום אחד לנתונים + יום אחד לרווח
 const daysPerCategory = 2; // 1 day for data + 1 day for spacing
@@ -149,11 +163,13 @@ tableData.forEach((cat, catIndex) => {
 ```
 
 **יתרונות:**
+
 - רווח ברור בין כל קטגוריה לקטגוריה
 - קריאות טובה יותר של הגרף
 - תמיכה בסדרות מרובות
 
 **יישום:**
+
 - ✅ `comparative-analysis-page.html` - גרף השוואות
 
 ---
@@ -163,6 +179,7 @@ tableData.forEach((cat, catIndex) => {
 ### שמירת מבנה הליבלים גם לאחר שינוי סדרות
 
 **יישום:**
+
 ```javascript
 const daysPerCategory = 2; // 1 day for data + 1 day for spacing
 
@@ -190,11 +207,13 @@ comparisonChart.timeScale().applyOptions({
 ```
 
 **יתרונות:**
+
 - ליבלים יציבים גם לאחר שינוי הסדרות המוצגות
 - חישוב מבוסס על בלוקים של 2 ימים (לא תלוי במספר הסדרות)
 - תצוגה במרכז כל קבוצת קטגוריות
 
 **יישום:**
+
 - ✅ `comparative-analysis-page.html` - גרף השוואות
 
 ---
@@ -204,6 +223,7 @@ comparisonChart.timeScale().applyOptions({
 ### סדרות מוצגות זו לצד זו בתוך כל קטגוריה
 
 **יישום:**
+
 ```javascript
 // כל סדרה בתוך קטגוריה מקבלת offset של שעה אחת
 const timeOffset = visibleIndex * secondsPerHour; // Each series gets 1 hour offset
@@ -211,11 +231,13 @@ const time = categoryBaseTime + timeOffset;
 ```
 
 **יתרונות:**
+
 - סדרות מוצגות זו לצד זו (grouped bars)
 - לא חופפות אחת על השנייה
 - קריאות טובה יותר
 
 **יישום:**
+
 - ✅ `comparative-analysis-page.html` - גרף השוואות
 
 ---
@@ -225,6 +247,7 @@ const time = categoryBaseTime + timeOffset;
 ### שימוש ב-Unix timestamps (seconds) לנתוני time-series
 
 **יישום:**
+
 ```javascript
 // Base timestamp: 2024-01-01 00:00:00 UTC (in seconds)
 const baseTimestamp = Math.floor(new Date('2024-01-01T00:00:00Z').getTime() / 1000);
@@ -236,25 +259,27 @@ const time = baseTimestamp + (categoryIndex * daysPerCategory * secondsPerDay) +
 ```
 
 **יתרונות:**
+
 - תאימות מלאה עם LightweightCharts
 - חישובים מדויקים
 - תמיכה ב-time-series rendering
 
 **יישום:**
+
 - ✅ `comparative-analysis-page.html` - generateMockSeriesData
 
 ---
 
 ## סיכום - סעיפים רלוונטיים לכלל עמודי המוקאפ
 
-### סעיפים כלליים (חייבים ליישם בכל עמוד עם גרפים):
+### סעיפים כלליים (חייבים ליישם בכל עמוד עם גרפים)
 
 1. **מבנה קונטיינרים לגרפים** - שימוש ב-`chart-container-wrapper` ו-`tradingview-chart-wrapper`
 2. **חישוב רוחב גרף** - שימוש ב-wrapper החיצוני לחישוב רוחב
 3. **מערכת אייקונים** - שימוש ב-`data-icon` במקום emoji
 4. **מבנה HTML נכון** - כל הקונטיינרים בתוך `main-content`
 
-### סעיפים ספציפיים לגרפי השוואה:
+### סעיפים ספציפיים לגרפי השוואה
 
 5. **רווח בין קטגוריות** - שימוש ב-`daysPerCategory = 2`
 6. **ליבלים על ציר X** - חישוב מבוסס בלוקים של 2 ימים
@@ -265,7 +290,7 @@ const time = baseTimestamp + (categoryIndex * daysPerCategory * secondsPerDay) +
 
 ## קבצים שצריך לעדכן
 
-### עמודי מוקאפ עם גרפים:
+### עמודי מוקאפ עם גרפים
 
 - ✅ `comparative-analysis-page.html` - עודכן במלואו
 - ⚠️ `portfolio-state-page.html` - יש לבדוק מבנה קונטיינרים
@@ -274,7 +299,7 @@ const time = baseTimestamp + (categoryIndex * daysPerCategory * secondsPerDay) +
 - ⚠️ `strategy-analysis-page.html` - יש לבדוק מבנה קונטיינרים
 - ⚠️ `tradingview-test-page.html` - יש לבדוק מבנה קונטיינרים
 
-### עמודי מוקאפ עם כפתורים:
+### עמודי מוקאפ עם כפתורים
 
 - ✅ `comparative-analysis-page.html` - עודכן לשימוש ב-`data-icon`
 - ⚠️ כל עמודי המוקאפ האחרים - יש לבדוק ולעדכן emoji ל-`data-icon`

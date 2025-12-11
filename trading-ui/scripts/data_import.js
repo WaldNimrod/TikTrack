@@ -445,11 +445,19 @@
                 }
 
                 if (!response.ok) {
-                    throw new Error(`קוד שגיאה ${response.status} בהבאת היסטוריה לחשבון ${account.id}`);
+                    if ([401, 403, 404].includes(response.status)) {
+                        // User not authenticated or no import history - return empty array
+                        if (window.Logger && typeof window.Logger.debug === 'function') {
+                            window.Logger.debug(`⚠️ Import history API returned ${response.status}, returning empty data`, { accountId: account.id, page: PAGE_NAME });
+                        }
+                        sessions = [];
+                    } else {
+                        throw new Error(`קוד שגיאה ${response.status} בהבאת היסטוריה לחשבון ${account.id}`);
+                    }
+                } else {
+                    const payload = await response.json();
+                    sessions = payload.sessions || payload.data || [];
                 }
-
-                const payload = await response.json();
-                sessions = payload.sessions || payload.data || [];
                 
                 // Debug: Log API response
                 if (window.Logger && Logger.DEBUG_MODE && Array.isArray(sessions) && sessions.length > 0) {

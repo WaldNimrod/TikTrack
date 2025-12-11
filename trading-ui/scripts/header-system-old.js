@@ -38,6 +38,33 @@
  * @lastUpdated January 15, 2025
  */
 
+
+// ===== FUNCTION INDEX =====
+// === Object Methods ===
+// - __headerSystemMouseMoveHandler() -   Headersystemmousemovehandler
+// - __headerSystemMouseMoveHandler() -   Headersystemmousemovehandler
+
+// === Initialization ===
+// - setupHoverBehavior() - Setuphoverbehavior
+// - ensureHeaderInitialization() - Ensureheaderinitialization
+
+// === Event Handlers ===
+// - positionPortal() - Positionportal
+// - updateFilterSelections() - Updatefilterselections
+// - addPortalEventListeners() - Addportaleventlisteners
+// - updatePortalSelections() - Updateportalselections
+// - eventHandler() - Eventhandler
+// - clickHandler() - Clickhandler
+// - mouseenterHandler() - Mouseenterhandler
+// - mouseleaveHandler() - Mouseleavehandler
+
+// === Other ===
+// - logFilterMenuDiagnostics() - Logfiltermenudiagnostics
+// - trackMenuOpen() - Trackmenuopen
+// - openFilterMenuPortal() - Openfiltermenuportal
+// - closeFilterMenuPortal() - Closefiltermenuportal
+// - closeAllFilterMenus() - Closeallfiltermenus
+
 // Removed debug log - file loading is tracked internally
 if (window.Logger) {
   window.Logger.info('🚀 Loading Header System v6.0.0...', { page: 'header-system' });

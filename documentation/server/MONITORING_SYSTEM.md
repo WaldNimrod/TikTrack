@@ -8,13 +8,15 @@
 
 ### 1. Metrics Collection
 
-#### סוגי מדדי ביצועים:
+#### סוגי מדדי ביצועים
+
 - **Performance Metrics**: CPU, זיכרון, דיסק, רשת
 - **Database Metrics**: גודל, מספר רשומות, אינדקסים
 - **Business Metrics**: סטטיסטיקות עסקיות
 - **Cache Metrics**: hit rate, memory usage
 
 #### קובץ: `Backend/services/metrics_collector.py`
+
 ```python
 class MetricsCollector:
     def collect_performance_metrics(self) -> Dict[str, Any]:
@@ -32,13 +34,15 @@ class MetricsCollector:
 
 ### 2. Health Checks
 
-#### בדיקות בריאות:
+#### בדיקות בריאות
+
 - **Database Health**: חיבור, ביצועים, גודל
 - **Cache Health**: זמינות, ביצועים, memory usage
 - **System Health**: CPU, זיכרון, דיסק
 - **API Health**: זמינות endpoints, זמני תגובה
 
 #### קובץ: `Backend/services/health_service.py`
+
 ```python
 class HealthService:
     def comprehensive_health_check(self) -> Dict[str, Any]:
@@ -52,13 +56,15 @@ class HealthService:
 
 ### 3. Advanced Logging
 
-#### תכונות:
+#### תכונות
+
 - **Correlation ID**: מעקב אחר בקשות
 - **Rotating Logs**: סיבוב אוטומטי של קבצי לוג
 - **Performance Logs**: לוגי ביצועים נפרדים
 - **Error Logs**: לוגי שגיאות מפורטים
 
 #### קובץ: `Backend/config/logging.py`
+
 ```python
 # הגדרת לוגים עם Correlation ID
 formatter = logging.Formatter(
@@ -75,21 +81,25 @@ handler = RotatingFileHandler(
 
 ## API Endpoints
 
-### Health Checks:
+### Health Checks
+
 - `GET /api/health` - בדיקת בריאות בסיסית
 - `GET /api/health/detailed` - בדיקה מפורטת עם מגמות
 
-### Metrics Collection:
+### Metrics Collection
+
 - `POST /api/metrics/collect` - איסוף כל המדדי ביצועים
 - `GET /api/metrics/report` - דוח מדדי ביצועים
 
-### Cache Monitoring:
+### Cache Monitoring
+
 - `GET /api/cache/stats` - סטטיסטיקות cache
 - `POST /api/cache/clear` - ניקוי cache
 
 ## דוגמאות שימוש
 
-### בדיקת בריאות מערכת:
+### בדיקת בריאות מערכת
+
 ```bash
 # בדיקה בסיסית
 curl http://localhost:8080/api/health
@@ -98,7 +108,8 @@ curl http://localhost:8080/api/health
 curl http://localhost:8080/api/health/detailed
 ```
 
-### איסוף מדדי ביצועים:
+### איסוף מדדי ביצועים
+
 ```bash
 # איסוף כל המדדי ביצועים
 curl -X POST http://localhost:8080/api/metrics/collect
@@ -107,7 +118,8 @@ curl -X POST http://localhost:8080/api/metrics/collect
 curl "http://localhost:8080/api/metrics/report?hours=24"
 ```
 
-### ניטור cache:
+### ניטור cache
+
 ```bash
 # סטטיסטיקות cache
 curl http://localhost:8080/api/cache/stats
@@ -118,7 +130,8 @@ curl -X POST http://localhost:8080/api/cache/clear
 
 ## דוחות אוטומטיים
 
-### דוח בריאות מערכת:
+### דוח בריאות מערכת
+
 ```json
 {
   "status": "healthy",
@@ -138,7 +151,8 @@ curl -X POST http://localhost:8080/api/cache/clear
 }
 ```
 
-### דוח מדדי ביצועים:
+### דוח מדדי ביצועים
+
 ```json
 {
   "performance": {
@@ -159,7 +173,8 @@ curl -X POST http://localhost:8080/api/cache/clear
 
 ## ניטור מתקדם
 
-### Performance Monitoring:
+### Performance Monitoring
+
 ```python
 from utils.performance_monitor import monitor_performance
 
@@ -169,7 +184,8 @@ def database_operation():
     pass
 ```
 
-### System Metrics:
+### System Metrics
+
 ```python
 from services.metrics_collector import metrics_collector
 
@@ -181,13 +197,15 @@ print(f"Memory: {metrics['system']['memory_percent']}%")
 
 ## קבצי לוג
 
-### סוגי לוגים:
+### סוגי לוגים
+
 - `logs/app.log` - לוגי אפליקציה כללים
 - `logs/performance.log` - לוגי ביצועים
 - `logs/database.log` - לוגי בסיס נתונים
 - `logs/errors.log` - לוגי שגיאות
 
-### ניהול לוגים:
+### ניהול לוגים
+
 ```python
 # הגדרת correlation ID
 import logging
@@ -197,12 +215,14 @@ logger.info("Operation completed", extra={"correlation_id": "req-123"})
 
 ## התראות וניטור
 
-### סטטוסי בריאות:
+### סטטוסי בריאות
+
 - **Healthy**: הכל תקין
 - **Warning**: בעיה קלה שדורשת תשומת לב
 - **Critical**: בעיה חמורה שדורשת פעולה מיידית
 
-### מדדי ביצועים:
+### מדדי ביצועים
+
 - **Excellent**: ביצועים מעולים
 - **Good**: ביצועים טובים
 - **Fair**: ביצועים סבירים
@@ -210,13 +230,15 @@ logger.info("Operation completed", extra={"correlation_id": "req-123"})
 
 ## פתרון בעיות
 
-### בעיות נפוצות:
+### בעיות נפוצות
+
 1. **זיכרון גבוה**: בדוק memory_percent ב-metrics
 2. **CPU גבוה**: בדוק cpu_percent ו-processes
 3. **דיסק מלא**: בדוק disk_percent
 4. **בסיס נתונים איטי**: בדוק database metrics
 
-### לוגים לבדיקה:
+### לוגים לבדיקה
+
 ```bash
 # בדיקת לוגי ביצועים
 tail -f logs/performance.log

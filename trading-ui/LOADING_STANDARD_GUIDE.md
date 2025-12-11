@@ -7,11 +7,13 @@
 ## עקרונות יסוד
 
 ### 1. סדר טעינה קריטי
+
 - **CSS**: Bootstrap חייב להיטען לפני CSS שלנו
 - **JavaScript**: המערכת המאוחדת חייבת להיטען בסדר הנכון
 - **IndexedDB**: חייב להיות מאותחל לפני כל מערכת אחרת
 
 ### 2. ארכיטקטורה מאוחדת
+
 - כל העמודים משתמשים באותה מערכת אתחול
 - אין קבצי `*-init.js` נפרדים
 - כל הפונקציונליות נמצאת במערכת המאוחדת
@@ -19,6 +21,7 @@
 ## מבנה תקן הטעינה
 
 ### שלב 1: CSS Loading
+
 ```html
 <!-- Bootstrap CSS (חובה ראשון) -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -42,6 +45,7 @@
 ```
 
 ### שלב 2: JavaScript Loading (בסדר קריטי)
+
 ```html
 <!-- Error Handlers (חובה ראשון) -->
 <script src="scripts/error-handlers.js"></script>
@@ -88,16 +92,19 @@
 ## דרישות חובה
 
 ### 1. מערכת אתחול מאוחדת
+
 - **חובה**: כל עמוד חייב לטעון את המערכת המאוחדת
 - **אסור**: שימוש בקבצי `*-init.js` נפרדים
 - **חובה**: סדר טעינה נכון של המערכת המאוחדת
 
 ### 2. IndexedDB Initialization
+
 - **חובה**: IndexedDB מאותחל במערכת המאוחדת
 - **אסור**: אתחול IndexedDB מחוץ למערכת המאוחדת
 - **חובה**: המתנה לאתחול IndexedDB לפני שימוש
 
 ### 3. Template Structure
+
 ```html
 <body>
     <div class="background-wrapper">
@@ -140,14 +147,16 @@
 
 ## בדיקות איכות
 
-### בדיקות חובה לכל עמוד חדש:
+### בדיקות חובה לכל עמוד חדש
+
 1. **טעינה**: האם העמוד נטען ללא שגיאות?
 2. **מערכת מאוחדת**: האם המערכת המאוחדת נטענת?
 3. **IndexedDB**: האם IndexedDB מאותחל?
 4. **Race Condition**: האם אין הודעות "UnifiedIndexedDB not initialized yet"?
 5. **פונקציונליות**: האם כל הפונקציות עובדות?
 
-### בדיקות בקונסולה:
+### בדיקות בקונסולה
+
 ```javascript
 // בדיקה שהמערכת המאוחדת נטענה
 console.log('Unified App Initializer:', window.unifiedAppInit);
@@ -162,6 +171,7 @@ console.log('IndexedDB Ready:', window.UnifiedIndexedDB && window.UnifiedIndexed
 ## קבצים אסורים
 
 ❌ **אסור לשימוש** (נמחקו):
+
 - `background-tasks-init.js`
 - `cash-flows-init.js`
 - `executions-init.js`
@@ -172,18 +182,21 @@ console.log('IndexedDB Ready:', window.UnifiedIndexedDB && window.UnifiedIndexed
 ## קבצים נדרשים
 
 ✅ **חובה לשימוש**:
+
 - `page-initialization-configs.js`
 - `unified-app-initializer.js`
 
 ## תחזוקה
 
-### עדכון התקן:
+### עדכון התקן
+
 1. עדכן את `LOADING_STANDARD_TEMPLATE.html`
 2. עדכן את `LOADING_STANDARD_GUIDE.md`
 3. בדוק שכל העמודים עומדים בתקן
 4. עדכן את רשימת העמודים שעברו סטנדרטיזציה
 
-### בדיקות תקופתיות:
+### בדיקות תקופתיות
+
 - בדוק שאין עמודים חדשים שלא עומדים בתקן
 - בדוק שאין חזרה לשימוש בקבצי `*-init.js`
 - בדוק שהמערכת המאוחדת עובדת בכל העמודים

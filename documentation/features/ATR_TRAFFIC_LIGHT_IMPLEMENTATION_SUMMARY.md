@@ -1,14 +1,17 @@
 # סיכום מימוש מערכת רמזור ATR
 
 ## תאריך מימוש
+
 ינואר 2025
 
 ## סטטוס
+
 ✅ **הושלם במלואו**
 
 ## סקירה כללית
 
 מערכת רמזור ATR מספקת אינדיקציה ויזואלית מהירה של רמת התנודתיות (volatility) של נכס, באמצעות 3 רמות צבע:
+
 - **ירוק**: ATR נמוך - תנודתיות נמוכה (< 3%)
 - **צהוב**: ATR בינוני - תנודתיות בינונית (3% - 5%)
 - **אדום**: ATR גבוה - תנודתיות גבוהה (≥ 5%)
@@ -16,6 +19,7 @@
 ## קבצים שנוצרו
 
 ### Backend
+
 1. **`Backend/migrations/add_atr_threshold_preferences.py`**
    - מיגרציה להוספת 2 העדפות חדשות למסד הנתונים
    - `atr_high_threshold` (ברירת מחדל: 3.0%)
@@ -26,6 +30,7 @@
    - בודק קיום העדפות, ערכי ברירת מחדל, אילוצים ושיוך לקבוצה
 
 ### Frontend
+
 1. **`trading-ui/scripts/services/field-renderer-service.js`**
    - הוספת פונקציה `FieldRendererService.renderATR()`
    - לוגיקת רמזור מלאה עם תמיכה בהעדפות משתמש
@@ -35,6 +40,7 @@
    - כולל בדיקות יחידה, אינטגרציה, CSS, E2E וביצועים
 
 ### תיעוד
+
 1. **`documentation/features/ATR_TRAFFIC_LIGHT_SYSTEM.md`**
    - תיעוד מלא של מערכת הרמזור
    - לוגיקת חישוב, דוגמאות שימוש ואינטגרציה
@@ -49,9 +55,11 @@
 ## קבצים שעודכנו
 
 ### Backend
+
 - אין קבצים שעודכנו (רק קבצים חדשים)
 
 ### Frontend
+
 1. **`trading-ui/preferences.html`**
    - הוספת 2 שדות העדפות חדשים בסקשן `trading_settings`
    - הוספת סקריפט בדיקות
@@ -77,6 +85,7 @@
 ## תכונות מימוש
 
 ### 1. העדפות משתמש
+
 - ✅ `atr_high_threshold` - גבול ATR גבוה (ברירת מחדל: 3.0%)
 - ✅ `atr_danger_threshold` - גבול ATR מסוכן (ברירת מחדל: 5.0%)
 - ✅ שיוך לקבוצת `trading_settings`
@@ -84,6 +93,7 @@
 - ✅ תמיכה בעדכון דרך ממשק העדפות
 
 ### 2. מערכת רנדור
+
 - ✅ `FieldRendererService.renderATR()` - פונקציה מרכזית לרנדור ATR
 - ✅ תמיכה בהעדפות משתמש (טעינה אוטומטית)
 - ✅ תמיכה בגבולות מותאמים אישית
@@ -91,16 +101,19 @@
 - ✅ תצוגה עם ערך ובאדג' רמזור
 
 ### 3. אינטגרציה
+
 - ✅ אינטגרציה עם `EntityDetailsRenderer`
 - ✅ תצוגה במודול פרטי טיקר
 - ✅ תמיכה ב-async/await
 
 ### 4. CSS
+
 - ✅ Classes לרמזור (green/yellow/red)
 - ✅ Styling לערך ובאדג'
 - ✅ תמיכה ב-RTL
 
 ### 5. בדיקות
+
 - ✅ בדיקות Backend (מיגרציה והעדפות)
 - ✅ בדיקות Frontend (יחידה, אינטגרציה, CSS, E2E, ביצועים)
 - ✅ מדריך בדיקות מקיף
@@ -108,6 +121,7 @@
 ## תוצאות בדיקות
 
 ### בדיקות Backend
+
 ```
 ✅ ALL TESTS PASSED
 - Preferences exist in database
@@ -118,9 +132,11 @@
 ```
 
 ### בדיקות Frontend
+
 להרצה: `window.runATRTests()` בקונסול הדפדפן
 
 **קטגוריות בדיקות:**
+
 - Unit Tests: 4 בדיקות
 - Integration Tests: 2 בדיקות
 - CSS Tests: 1 בדיקה
@@ -132,12 +148,14 @@
 ## שימוש במערכת
 
 ### רנדור ATR בסיסי
+
 ```javascript
 const html = await FieldRendererService.renderATR(2.5, 2.5);
 // Output: <span class="atr-value atr-green">...</span>
 ```
 
 ### רנדור ATR עם גבולות מותאמים
+
 ```javascript
 const html = await FieldRendererService.renderATR(2.5, 2.5, {
     highThreshold: 2.0,
@@ -146,6 +164,7 @@ const html = await FieldRendererService.renderATR(2.5, 2.5, {
 ```
 
 ### שימוש ב-EntityDetailsRenderer
+
 ```javascript
 const tickerData = {
     atr: 2.5,
@@ -207,16 +226,19 @@ if (atrPercent < highThreshold) {
 ## מיגרציות
 
 ### מיגרציה שהורצה
+
 ```bash
 Backend/migrations/add_atr_threshold_preferences.py
 ```
 
 **תוצאה:**
+
 - ✅ `atr_high_threshold` נוסף למסד הנתונים
 - ✅ `atr_danger_threshold` נוסף למסד הנתונים
 - ✅ שתי ההעדפות משויכות ל-`trading_settings`
 
 **בסיסי נתונים:**
+
 - ✅ Development: הורצה בהצלחה
 - ⏳ Production: יש להריץ
 - ⏳ Demo: יש להריץ (אם קיים)
@@ -224,22 +246,26 @@ Backend/migrations/add_atr_threshold_preferences.py
 ## תיעוד
 
 ### קבצי תיעוד שנוצרו
+
 1. `documentation/features/ATR_TRAFFIC_LIGHT_SYSTEM.md` - תיעוד מערכת
 2. `documentation/features/ATR_TRAFFIC_LIGHT_TESTING.md` - מדריך בדיקות
 3. `documentation/features/ATR_TRAFFIC_LIGHT_IMPLEMENTATION_SUMMARY.md` - סיכום מימוש
 
 ### קבצי תיעוד שעודכנו
+
 1. `documentation/ATR_IMPLEMENTATION_PLAN.md` - הוספת סעיף רמזור
 
 ## צעדים הבאים (אופציונלי)
 
 1. **הרצת מיגרציה על Production**
+
    ```bash
    export POSTGRES_DB=TikTrack-db-production
    python3 Backend/migrations/add_atr_threshold_preferences.py
    ```
 
 2. **הרצת מיגרציה על Demo** (אם קיים)
+
    ```bash
    export POSTGRES_DB=TikTrack-db-demo
    python3 Backend/migrations/add_atr_threshold_preferences.py
@@ -260,6 +286,7 @@ Backend/migrations/add_atr_threshold_preferences.py
 ✅ **כל המשימות הושלמו בהצלחה**
 
 המערכת מוכנה לשימוש ומספקת:
+
 - רמזור ATR ויזואלי (ירוק/צהוב/אדום)
 - הגדרת גבולות מותאמת אישית
 - אינטגרציה מלאה עם מערכת הרינדור

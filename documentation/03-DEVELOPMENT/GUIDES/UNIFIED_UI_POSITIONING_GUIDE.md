@@ -5,6 +5,7 @@
 `UnifiedUIPositioning` הוא שירות מרכזי למיקום אלמנטי UI במערכת, המשתמש ב-Floating UI library למיקום חכם עם fallback אוטומטי למיקום ידני.
 
 **יתרונות:**
+
 - מיקום חכם אוטומטי (מטפל ב-transform, overflow, viewport boundaries)
 - תמיכה מלאה ב-RTL
 - Fallback אוטומטי אם Floating UI לא נטען
@@ -22,6 +23,7 @@
 ממקם אלמנט floating יחסית לאלמנט reference.
 
 **Parameters:**
+
 - `referenceElement` (HTMLElement) - אלמנט ה-reference (הפריט)
 - `floatingElement` (HTMLElement) - אלמנט ה-floating (ה-overlay)
 - `options` (Object) - אפשרויות מיקום:
@@ -36,6 +38,7 @@
 **Returns:** `Promise<void>`
 
 **Example:**
+
 ```javascript
 await window.UnifiedUIPositioning.positionElement(
   itemElement,
@@ -56,6 +59,7 @@ await window.UnifiedUIPositioning.positionElement(
 מגדיר event handlers ל-overlay hover על רשימת פריטים.
 
 **Parameters:**
+
 - `listElement` (HTMLElement) - אלמנט הרשימה
 - `itemSelector` (string) - selector לפריטים (למשל: `'.widget-item'`)
 - `detailsSelector` (string) - selector ל-overlay (למשל: `'.widget-details'` או `'[data-overlay="true"]'`)
@@ -70,6 +74,7 @@ await window.UnifiedUIPositioning.positionElement(
   - `useAnimations` (boolean) - האם להשתמש באנימציות GSAP (default: `true`)
 
 **התנהגות פשוטה ומינימלית:**
+
 - **mouseenter** על item → פתיחת overlay (סוגר את כל האחרים)
 - **mouseleave** מ-item → סגירה (אלא אם העכבר עובר לאוברליי של אותו item או עדיין בתוך אותו item)
 - **mouseleave** מ-overlay → סגירה (אלא אם העכבר עובר חזרה לאותו item)
@@ -78,6 +83,7 @@ await window.UnifiedUIPositioning.positionElement(
 הקוד בודק אם `relatedTarget` עדיין בתוך אותו item - אם כן, ה-overlay נשאר פתוח. זה מונע סגירה לא רצויה כשהעכבר עובר בין אלמנטים בתוך אותו item (למשל מ-`<span>` ל-`<div>`).
 
 **Example:**
+
 ```javascript
 window.UnifiedUIPositioning.setupOverlay(
   document.getElementById('widgetList'),
@@ -100,9 +106,11 @@ window.UnifiedUIPositioning.setupOverlay(
 מסיר event handlers ומנקה resources.
 
 **Parameters:**
+
 - `listElement` (HTMLElement) - אלמנט הרשימה שנוצר עבורו overlay
 
 **Example:**
+
 ```javascript
 window.UnifiedUIPositioning.destroy(document.getElementById('widgetList'));
 ```
@@ -114,6 +122,7 @@ window.UnifiedUIPositioning.destroy(document.getElementById('widgetList'));
 מנהל אנימציות לפתיחה/סגירה של אלמנט.
 
 **Parameters:**
+
 - `element` (HTMLElement) - אלמנט לאנימציה
 - `action` (string) - `'show'` או `'hide'`
 - `options` (Object) - אפשרויות:
@@ -121,6 +130,7 @@ window.UnifiedUIPositioning.destroy(document.getElementById('widgetList'));
   - `ease` (string) - easing function (default: `'power2.out'`)
 
 **Example:**
+
 ```javascript
 window.UnifiedUIPositioning.animateElement(overlayElement, 'show', {
   duration: 200,
@@ -137,6 +147,7 @@ window.UnifiedUIPositioning.animateElement(overlayElement, 'show', {
 **Returns:** `boolean`
 
 **Example:**
+
 ```javascript
 if (window.UnifiedUIPositioning.isAvailable()) {
   // Floating UI is loaded
@@ -154,6 +165,7 @@ if (window.UnifiedUIPositioning.isAvailable()) {
 **Returns:** `boolean`
 
 **Example:**
+
 ```javascript
 if (window.UnifiedUIPositioning.isGSAPAvailable()) {
   // GSAP animations available
@@ -252,6 +264,7 @@ GSAP נטען מ-CDN (אופציונלי) דרך package-manifest.js:
 ```
 
 **סדר טעינה:**
+
 - Floating UI (loadOrder: 16.5)
 - **GSAP (loadOrder: 16.6)** ← נטען מיד אחרי Floating UI
 - Unified UI Positioning Service (loadOrder: 8.15)
@@ -262,6 +275,7 @@ GSAP נטען מ-CDN (אופציונלי) דרך package-manifest.js:
 אם GSAP זמין, המערכת משתמשת בו לאנימציות חלקות. אחרת, משתמשים ב-CSS transitions אוטומטית.
 
 **סוגי אנימציות:**
+
 - **Fade in/out** - אנימציית שקיפות (opacity)
 - **Slide** - אנימציית החלקה (translateY)
 - **Scale** - אנימציית גודל (scale)
@@ -295,6 +309,7 @@ if (window.UnifiedUIPositioning.isGSAPAvailable()) {
 
 **Fallback:**
 אם GSAP לא נטען, המערכת משתמשת ב-CSS transitions אוטומטית:
+
 ```css
 transition: opacity 200ms ease-in-out, transform 200ms ease-in-out;
 ```
@@ -344,6 +359,7 @@ if (window.UnifiedUIPositioning && window.UnifiedUIPositioning.isAvailable()) {
 ### בעיה: Overlay לא ממוקם נכון
 
 **פתרון:**
+
 1. בדוק ש-Floating UI נטען: `window.UnifiedUIPositioning.isAvailable()`
 2. בדוק ש-overlay יש `position: fixed` או `position: absolute`
 3. בדוק שאין CSS שמשפיע על המיקום (transform, overflow)
@@ -351,6 +367,7 @@ if (window.UnifiedUIPositioning && window.UnifiedUIPositioning.isAvailable()) {
 ### בעיה: Overlay נחתך על ידי container
 
 **פתרון:**
+
 1. ודא ש-container יש `overflow: visible`
 2. בדוק שאין transform על parent containers
 3. Floating UI מטפל בזה אוטומטית אם זמין
@@ -358,6 +375,7 @@ if (window.UnifiedUIPositioning && window.UnifiedUIPositioning.isAvailable()) {
 ### בעיה: אנימציות לא עובדות
 
 **פתרון:**
+
 1. בדוק ש-GSAP נטען: `window.UnifiedUIPositioning.isGSAPAvailable()`
 2. אם GSAP לא זמין, המערכת משתמשת ב-CSS transitions אוטומטית
 3. ודא ש-`useAnimations: true` ב-options

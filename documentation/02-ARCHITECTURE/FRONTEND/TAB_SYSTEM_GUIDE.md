@@ -22,6 +22,7 @@
 Bootstrap 5 Tabs הוא הפתרון הסטנדרטי לטאבים במערכת TikTrack. הוא משמש בווידג'טים, מודלים, ועמודים שונים.
 
 **יתרונות:**
+
 - ✅ כבר קיים במערכת (Bootstrap 5)
 - ✅ נגישות מובנית
 - ✅ תמיכה RTL
@@ -132,6 +133,7 @@ tab.show(); // Switch to tab 2
 **HTML:** `trading-ui/index.html`
 
 **מאפיינים:**
+
 - 2 טאבים: ענן תגיות + חיפוש מהיר
 - Event listeners לטאב switching
 - State management (`activeTab`)
@@ -150,6 +152,7 @@ if (elements.cloudTab) {
 **קובץ:** `trading-ui/scripts/modal-manager-v2.js`
 
 **מאפיינים:**
+
 - Function ליצירת HTML של טאבים
 - תמיכה ב-tabs configuration
 
@@ -164,6 +167,7 @@ generateTabsHTML(tabs, modalId) {
 **קובץ:** `trading-ui/scripts/history-widget.js`
 
 **מאפיינים:**
+
 - טאבים פנימיים בווידג'ט
 - Custom tab switching logic
 - טעינת נתונים לפי טאב פעיל
@@ -175,6 +179,7 @@ generateTabsHTML(tabs, modalId) {
 ### 1. תמיד השתמש ב-Bootstrap Tabs
 
 **✅ טוב:**
+
 ```html
 <ul class="nav nav-tabs">
   <!-- Bootstrap tabs -->
@@ -182,6 +187,7 @@ generateTabsHTML(tabs, modalId) {
 ```
 
 **❌ רע:**
+
 ```html
 <!-- אל תצור tabs מותאמים אישית -->
 <div class="custom-tabs">
@@ -192,6 +198,7 @@ generateTabsHTML(tabs, modalId) {
 ### 2. שימוש נכון ב-Attributes
 
 **חובה לכל טאב:**
+
 - `data-bs-toggle="tab"` - מפעיל Bootstrap tabs
 - `data-bs-target="#paneId"` - מציין את ה-pane target
 - `role="tab"` / `role="tabpanel"` - נגישות
@@ -201,6 +208,7 @@ generateTabsHTML(tabs, modalId) {
 ### 3. State Management
 
 **✅ טוב:**
+
 ```javascript
 const state = {
   activeTab: 'cloud'
@@ -261,6 +269,12 @@ tab.addEventListener('shown.bs.tab', async () => {
 
 **מקור:** `documentation/02-ARCHITECTURE/FRONTEND/TAB_SYSTEM_GUIDE.md`  
 **עודכן:** 21 ינואר 2025
+
+
+
+
+
+
 
 
 

@@ -67,6 +67,7 @@
 ### 2.1 סריקה אוטומטית ראשונית
 
 **שימוש בכלי אוטומטי לסריקה ראשונית:**
+
 - הרצת `build-tools/scan-hardcoded-colors.js` לסריקת כל הקבצים
   - סריקת קבצי JavaScript (`.js`) - זיהוי צבעים hardcoded
   - סריקת קבצי CSS (`.css`) - זיהוי צבעים hardcoded
@@ -84,6 +85,7 @@
 ### 2.2 זיהוי קבצים שכבר משתמשים במערכת
 
 **זיהוי שימושים תקינים:**
+
 - חיפוש שימושים ב-`window.getEntityColor()`, `window.getStatusColor()`, `window.getNumericValueColor()`
 - חיפוש שימושים ב-`window.colorSchemeSystem.*`
 - חיפוש שימושים ב-CSS variables (`--entity-*`, `--current-entity-color`)
@@ -98,6 +100,7 @@
 ### 2.3 סריקה מפורטת של כל 36 העמודים
 
 **עמודים מרכזיים (11):**
+
 - `trading-ui/index.html` + `trading-ui/scripts/index.js`
 - `trading-ui/trades.html` + `trading-ui/scripts/trades.js`
 - `trading-ui/trade_plans.html` + `trading-ui/scripts/trade_plans.js`
@@ -111,6 +114,7 @@
 - `trading-ui/preferences.html` + `trading-ui/scripts/preferences*.js` (בדיקת אינטגרציה מיוחדת עם ColorManager)
 
 **עמודים טכניים (12):**
+
 - `trading-ui/db_display.html` + `trading-ui/scripts/db_display.js`
 - `trading-ui/db_extradata.html` + `trading-ui/scripts/db_extradata.js`
 - `trading-ui/constraints.html` + `trading-ui/scripts/constraints.js`
@@ -125,10 +129,12 @@
 - `trading-ui/designs.html` + `trading-ui/scripts/designs.js`
 
 **עמודי כלי פיתוח (2):**
+
 - `trading-ui/external-data-dashboard.html` + `trading-ui/scripts/external-data-dashboard.js`
 - `trading-ui/chart-management.html` + `trading-ui/scripts/chart-management.js`
 
 **עמודי מוקאפ (11):**
+
 - `trading-ui/mockups/daily-snapshots/portfolio-state-page.html` + `trading-ui/scripts/portfolio-state-page.js`
 - `trading-ui/mockups/daily-snapshots/trade-history-page.html` + `trading-ui/scripts/trade-history-page.js`
 - `trading-ui/mockups/daily-snapshots/price-history-page.html` + `trading-ui/scripts/price-history-page.js`
@@ -146,6 +152,7 @@
 לכל עמוד, לזהות:
 
 **בקבצי JavaScript:**
+
 - שימוש ישיר בצבעים hardcoded (hex codes כמו `#26baac`, `#fc5a06`)
 - שימוש ישיר ב-CSS variables ללא דרך המערכת (`--primary-color` ישיר)
 - פונקציות מקומיות לניהול צבעים (`getColorForEntity()`, `getStatusColorLocal()`, וכו')
@@ -157,11 +164,13 @@
 - טיפול ידני בצבעים בהתאם לסוג ישות (trade/alert/execution)
 
 **בקבצי CSS:**
+
 - צבעים hardcoded במקום CSS variables
 - שימוש ב-`var(--color, #ff0000)` עם fallback hardcoded (במקום להסיר fallback או להשתמש במערכת)
 - צבעים hardcoded שלא מוגדרים ב-color-scheme-system
 
 **בקבצי HTML:**
+
 - inline styles עם צבעים hardcoded (`style="color: #26baac"`)
 - inline styles עם צבעים שצריכים להיות דרך המערכת
 
@@ -185,6 +194,7 @@
 ### 2.7 בדיקת אינטגרציה עם Preferences page
 
 **בדיקה מיוחדת:**
+
 - וידוא ש-`preferences-colors.js` משתמש ב-ColorSchemeSystem
 - וידוא ש-`ColorManager` עובד נכון עם המערכת
 - בדיקת שמירה וטעינת צבעים מהעדפות
@@ -193,11 +203,13 @@
 ### 2.8 בדיקת טעינת המערכת בכל העמודים
 
 **בדיקת package manifest:**
+
 - וידוא ש-`color-scheme-system.js` מוגדר ב-`init-system/package-manifest.js`
 - וידוא שהמערכת נטענת דרך packages
 - בדיקת סדר טעינה (לפני קבצי עמוד)
 
 **בדיקת HTML:**
+
 - וידוא ש-`color-scheme-system.js` נטען (דרך package system או ישירות)
 - בדיקת סדר הטעינה
 
@@ -206,6 +218,7 @@
 ליצור קובץ דוח: `documentation/05-REPORTS/COLOR_SCHEME_SYSTEM_DEVIATIONS_REPORT.md`
 
 הדוח יכלול:
+
 - **סיכום כללי:**
   - מספר עמודים נסרקים
   - מספר בעיות שנמצאו
@@ -232,14 +245,17 @@
 ### 3.1 החלפת צבעים hardcoded ב-JavaScript
 
 לכל עמוד שמכיל צבעים hardcoded:
+
 - זיהוי כל הצבעים hardcoded
 - החלפה ב-`window.getEntityColor()`, `window.getStatusColor()`, או `window.getNumericValueColor()`
 - וידוא fallback אם המערכת לא זמינה:
+
   ```javascript
   const color = (typeof window.getEntityColor === 'function') 
     ? window.getEntityColor('trade') 
     : '#26baac'; // fallback only if system unavailable
   ```
+
 - תיעוד כל החלפה
 
 ### 3.2 החלפת צבעים hardcoded ב-CSS
@@ -280,6 +296,7 @@
 ### 3.7 וידוא טעינת color-scheme-system.js
 
 לכל עמוד:
+
 - וידוא ש-`color-scheme-system.js` מוגדר ב-package manifest
 - וידוא שהטעינה היא דרך package system
 - וידוא שהטעינה היא לפני קובץ העמוד
@@ -289,6 +306,7 @@
 ### 3.8 עדכון package manifest
 
 **בדיקה ועדכון:**
+
 - בדיקת `trading-ui/scripts/init-system/package-manifest.js`
 - וידוא ש-`color-scheme-system.js` נמצא ב-packages הרלוונטיים
 - הוספה ל-packages חסרים אם נדרש
@@ -297,6 +315,7 @@
 ### 3.9 וידוא אינטגרציה עם Preferences page
 
 **בדיקה מיוחדת:**
+
 - וידוא ש-`preferences-colors.js` משתמש נכון ב-ColorSchemeSystem
 - וידוא ש-`ColorManager` עובד עם המערכת
 - בדיקת שמירה וטעינת צבעים
@@ -305,6 +324,7 @@
 ### 3.10 וידוא עמידה בכללי הקוד
 
 לכל קובץ ששונה:
+
 - ארכיטקטורה מדויקת - שימוש נכון ב-API
 - אינטגרציה מלאה - fallback כאשר נדרש
 - הערות מסודרות - JSDoc לכל פונקציה ששונתה
@@ -318,6 +338,7 @@
 ### 4.1 בדיקה מפורטת של כל עמוד אחרי התיקונים
 
 לכל עמוד:
+
 - פתיחה בדפדפן
 - בדיקת טעינת `color-scheme-system.js`:
   - בקונסולה: `typeof window.getEntityColor !== 'undefined'`
@@ -363,6 +384,7 @@
 ליצור קובץ דוח: `documentation/05-REPORTS/COLOR_SCHEME_SYSTEM_TESTING_REPORT.md`
 
 הדוח יכלול:
+
 - **סיכום כללי:**
   - מספר עמודים שנבדקו
   - מספר עמודים שעברו
@@ -414,21 +436,25 @@
 
 ## קבצים רלוונטיים
 
-### מערכת Color Scheme System:
+### מערכת Color Scheme System
+
 - `trading-ui/scripts/color-scheme-system.js` - המערכת המרכזית (~1646 שורות)
 - `trading-ui/scripts/preferences-colors.js` - אינטגרציה עם Preferences page
 - `trading-ui/scripts/init-system/package-manifest.js` - הגדרת package loading
 
-### כלי אוטומטיים:
+### כלי אוטומטיים
+
 - `build-tools/scan-hardcoded-colors.js` - סריקת צבעים hardcoded
 
-### דוקומנטציה:
+### דוקומנטציה
+
 - `documentation/frontend/JAVASCRIPT_ARCHITECTURE.md` - אזכור המערכת
 - `documentation/frontend/README.md` - אזכור המערכת
 - `documentation/frontend/GENERAL_SYSTEMS_LIST.md` - אזכור המערכת
 - `documentation/frontend/UI_STANDARDIZATION_WORK_DOCUMENT.md` - מסמך העבודה המרכזי
 
-### דוחות שייווצרו:
+### דוחות שייווצרו
+
 - `documentation/05-REPORTS/COLOR_SCHEME_SYSTEM_DEVIATIONS_REPORT.md` - דוח סטיות
 - `documentation/05-REPORTS/COLOR_SCHEME_SYSTEM_TESTING_REPORT.md` - דוח בדיקות
 

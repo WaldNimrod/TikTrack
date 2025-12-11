@@ -1,12 +1,15 @@
 # מדריך מערכות בקרה ואיכות קוד - TikTrack
+
 ## Code Quality & Control Systems Guide
 
 ### 📅 תאריך עדכון
+
 14 בנובמבר 2025 – Code Quality Dashboard v2 (Function Index + Lint Monitor)
 
 > עדכון קודם: 28 בינואר 2025 (הסריקה המקיפה הראשונה)
 
 ### 🎯 מטרת המדריך
+
 מדריך מקיף לכל מערכות בקרה ואיכות הקוד במערכת TikTrack. המדריך משמש כקובץ עבודה מרכזי לנושא איכות הקוד ודיבגינג, ומספק למפתחים גישה מלאה לכל הכלים והתהליכים הקיימים.
 
 ---
@@ -14,6 +17,7 @@
 ## 🆕 עדכון 14.11.2025 – Code Quality Dashboard V2
 
 ### נקודות מפתח
+
 - **Function Index Validator חי:** `POST /api/quality-check/function-index` הושלם ב-`Backend/routes/api/quality_check.py`. הפונקציה `build_function_index_report()` סורקת את `trading-ui/scripts` (ללא ספריות ארכיון/מודולרי) ומחזירה מטריקות חדשות: `filesWithIndex`, `filesWithoutIndex`, `coveragePercentage`, פירוט עמודים וחותמת `generatedAt`.
 - **כרטיס Timespan מחייב:** בדשבורד נוסף Alert עם תיעוד של מגבלת 30 הימים לדוחות Function Index. הרחבת timespan תחייב עדכון API, מסדי נתונים וקובצי report.
 - **Fallback "unavailable":** אם ה-API מושבת או עדיין לא נפרס, `code-quality-dashboard.js` מציג כרטיס מידע עם הודעה מוסברת ותאריך עדכון אחרון ולא עוצר את שאר הבדיקות.
@@ -23,12 +27,14 @@
 - **אפס שגיאות לינט:** הקבצים המרכזיים (`code-quality-dashboard.js`, `linter-realtime-monitor.js`, `lint-status-service.js`, HTML/CSS נלווים) עברו יישור ESLint/HTMLHint/Prettier כדי למנוע עצירת הרצת `lint:collect`.
 
 ### תזכור תפעולי
+
 1. הרצת לינט: `npm run lint:collect` (נשמר ב-`reports/linter/latest.json`).
 2. צפייה/העתקה: מהדשבורד, השתמש בכפתורי ההורדה/העתקה או פתח את קובץ ה-JSON ישירות.
 3. טיפול בשגיאה: במקרה של כשל, פתח את מודול הפרטים → העתק את הטבלה דרך הכפתור ייעודי ושלח ב-Slack/git issue.
 4. Function Index ידני: אם רוצים לעדכן את האינדקס עצמו, ניתן להריץ `node scripts/generators/generate-function-index.js` ורק אז להפעיל את הבדיקה מחדש.
 
 ### 🔁 תהליך הרצת טסטים סטנדרטי (Front + Back)
+
 - **הפעלה מלאה (חובה לפני PR):**
   - Frontend: `npm run test -- --coverage --runInBand`
   - Backend: `python3 -m pytest`
@@ -38,6 +44,7 @@
 - **תעוד תוצאות:** לאחר כל ריצה משמעותית יש לעדכן את `tests/TEST_STATUS_REPORT.md` (סעיף “איך להריץ את כל הטסטים”) עם תאריך/פקודות/כיסוי, ולצרף את הפקודות בפול-ריקווסט.
 
 ### רפרנסים מהירים
+
 - Frontend: `trading-ui/scripts/code-quality-dashboard.js`, `trading-ui/scripts/linter-realtime-monitor.js`, `trading-ui/code-quality-dashboard.html`
 - Backend: `Backend/routes/api/quality_check.py` (`build_function_index_report`, `run_script` helpers), `Backend/routes/api/quality_lint.py`
 - תיעוד משלים: `documentation/frontend/LINTER_REALTIME_MONITOR.md` (UI וזרימות מודול השגיאות)
@@ -47,9 +54,11 @@
 ## 🎉 **סריקה מקיפה של כל המערכות - הושלמה בהצלחה**
 
 ### **תאריך השלמה:** 28 בינואר 2025
+
 ### **סטטוס:** ✅ הושלם - ניתוח מקיף של כל המערכות
 
 #### **הישגי הסריקה המקיפה:**
+
 - **ציון בריאות כללי:** 78/100 (+12 מהסריקה הקודמת)
 - **קבצים נסרקו:** 140 קבצים (JavaScript, CSS, HTML)
 - **מערכות כלליות:** 70 קבצים (modules, services, core scripts)
@@ -57,6 +66,7 @@
 - **זמן סריקה:** 45 דקות
 
 #### **ממצאים עיקריים:**
+
 - **כפילויות קוד:** 3,626 כפילויות זוהו (35 קריטיות)
 - **console.log מיותרים:** 1,247 מופעים בקבצי debug
 - **Error handling gaps:** 165 פונקציות ללא try-catch
@@ -64,16 +74,19 @@
 - **Inline styles:** 17 קבצי HTML עם styles מוטמעים
 
 #### **קבצים בעייתיים ביותר:**
+
 - `init-system-management.js`: 85 console.log + 57 פונקציות
 - `core-systems.js`: 187 console.log + 46 כפילויות
 - `import-user-data-old.js`: 79 console.log + 157 פונקציות _(הכלי הועבר לארכיון בנובמבר 2025)_
 
 #### **דוחות שנוצרו:**
+
 - `COMPREHENSIVE_SYSTEM_STATUS_REPORT.md` - דוח מצב מקיף
 - `SYSTEM_IMPROVEMENT_ACTION_PLAN.md` - תוכנית שיפור מפורטת
 - `SYSTEM_QUALITY_METRICS.json` - מדדים כמותיים
 
 #### **המלצות מיידיות:**
+
 1. **איחוד 35 פונקציות כפולות זהות** (עדיפות קריטית)
 2. **ניקוי 1,247 console.log מיותרים** (עדיפות קריטית)
 3. **הוספת error handling ל-165 פונקציות** (עדיפות קריטית)
@@ -85,6 +98,7 @@
 ## 📊 **מערכות בקרה מרכזיות (Core Quality Systems)**
 
 ### **1. עמוד איכות הקוד המרכזי**
+
 - **מיקום**: `trading-ui/code-quality-dashboard.html`
 - **סקריפט**: `trading-ui/scripts/code-quality-dashboard.js`
 - **גישה**: `http://localhost:8080/code-quality-dashboard`
@@ -95,6 +109,7 @@
   - Function Index management
   - Real-time quality metrics
 - **שימוש**:
+
   ```javascript
   // הרצת כל הבדיקות
   runAllChecks()
@@ -107,6 +122,7 @@
   ```
 
 ### **2. מערכת בדיקות CRUD מתקדמת**
+
 - **מיקום**: `trading-ui/crud-testing-dashboard-smart.html`
 - **סקריפט**: `trading-ui/scripts/crud-testing-enhanced.js`
 - **גישה**: `http://localhost:8080/crud-testing-dashboard-smart`
@@ -116,6 +132,7 @@
   - מדידת זמני תגובה וביצועים
   - עמודי משתמש: בדיקות מעמיקות (7-10 דקות לכל עמוד)
 - **שימוש**:
+
   ```javascript
   // בדיקות אוטומטיות
   runAllBasicTests()
@@ -128,6 +145,7 @@
 ## 🔍 **כלי ניתוח קוד (Code Analysis Tools)**
 
 ### **3. מנתח כפילויות JavaScript**
+
 - **מיקום**: `documentation/tools/analysis/js-duplicate-analyzer.py`
 - **הרצה**: `python3 documentation/tools/analysis/js-duplicate-analyzer.py`
 - **תכונות**:
@@ -138,6 +156,7 @@
 - **תוצאות**: דוח JSON מפורט עם כל הכפילויות
 
 ### **4. מנתח כפילויות HTML**
+
 - **מיקום**: `documentation/tools/analysis/html-duplicate-analyzer.py`
 - **הרצה**: `python3 documentation/tools/analysis/html-duplicate-analyzer.py`
 - **תכונות**:
@@ -147,6 +166,7 @@
 - **תוצאות**: דוח JSON מפורט עם כל הכפילויות
 
 ### **5. מנתח CSS מתקדם**
+
 - **מיקום**: `documentation/tools/css/css-analyzer.py`
 - **הרצה**: `python3 documentation/tools/css/css-analyzer.py`
 - **תכונות**:
@@ -161,31 +181,100 @@
 ## 🛠️ **כלי אופטימיזציה (Optimization Tools)**
 
 ### **6. CSS Deduplicator**
+
 - **מיקום**: `documentation/tools/css/css-deduplicator.py`
 - **הרצה**: `python3 documentation/tools/css/css-deduplicator.py`
 - **תכונות**: הסרת כפילויות CSS אוטומטית
 
 ### **7. CSS Unifier**
+
 - **מיקום**: `documentation/tools/css/css-unifier.py`
 - **הרצה**: `python3 documentation/tools/css/css-unifier.py`
 - **תכונות**: איחוד CSS rules ויצירת דוחות
 
 ### **8. Fast CSS Duplicate Fixer**
+
 - **מיקום**: `documentation/tools/css/fast-css-duplicate-fixer.py`
 - **הרצה**: `python3 documentation/tools/css/fast-css-duplicate-fixer.py`
 - **תכונות**: תיקון מהיר של כפילויות CSS עם הגבלת זמן
 
 ---
 
+## 📝 **Markdown Linting**
+
+### **Markdownlint - בדיקת איכות קבצי Markdown**
+
+- **מיקום**: `markdownlint-cli` (npm package)
+- **קובץ הגדרות**: `.markdownlint.json`
+- **קובץ התעלמות**: `.markdownlintignore`
+- **סקריפטים**:
+  - `npm run markdownlint:check` - בדיקה ללא תיקון
+  - `npm run markdownlint:fix` - תיקון אוטומטי
+  - `npm run markdownlint:report` - דוח JSON מפורט
+
+#### **תכונות**
+
+- בדיקת עקביות בפורמט markdown
+- זיהוי שגיאות תחביר
+- בדיקת סגנון כתיבה
+- בדיקת בעיות נגישות
+- בדיקת קריאות
+
+#### **הגדרות מותאמות לפרויקט**
+
+- **אורך שורה**: 120 תווים (לא חל על code blocks)
+- **סגנון כותרות**: ATX (`#` style)
+- **הזחה**: 2 רווחים
+- **Scope**: כל קבצי `.md` בפרויקט (documentation, README, guides)
+- **תיקיות מוחרגות**: `documentation/05-REPORTS/`, `documentation/audits/`, `.cursor/`, `node_modules/`, `.git/`, `archive/`, `backup/`
+
+#### **שימוש**
+
+```bash
+# בדיקה לפני commit
+npm run markdownlint:check
+
+# תיקון אוטומטי
+npm run markdownlint:fix
+
+# דוח מפורט
+npm run markdownlint:report
+```
+
+#### **Git Hooks Integration**
+
+- **pre-push hook**: בודק קבצי markdown ששונו לפני push
+- **Bypass**: `SKIP_MARKDOWNLINT=1 git push` (רק במקרי חירום)
+- **מיקום**: `scripts/git-hooks/pre-push`
+
+#### **שגיאות נפוצות**
+
+1. **MD013** - שורה ארוכה מ-120 תווים
+2. **MD032** - חסרים רווחים סביב רשימות
+3. **MD031** - חסרים רווחים סביב code blocks
+4. **MD022** - חסרים רווחים סביב כותרות
+5. **MD040** - code blocks ללא שפת תכנות
+6. **MD051** - קישורים לא תקינים (בעיקר עם עברית)
+
+#### **תיעוד נוסף**
+
+- **כללי כתיבה**: `documentation/DOCUMENTATION_WORKING_RULES.md` (סעיף Markdown Quality Standards)
+- **מדריך מפורט**: `documentation/03-DEVELOPMENT/GUIDELINES/MARKDOWN_STANDARDS.md`
+- **Cursor Rules**: `.cursorrules` (סעיף Markdown Documentation Standards)
+
+---
+
 ## 📊 **מערכות ניטור (Monitoring Systems)**
 
 ### **9. מערכת ניטור שרת מתקדמת**
+
 - **מיקום**: `scripts/server-monitor-v2.js`
 - **תכונות**:
   - ניטור בריאות שרת בזמן אמת
   - Rate limiting protection
   - ניטור ביצועים ומשאבים
 - **שימוש**:
+
   ```javascript
   // אתחול מערכת ניטור
   const monitor = new ServerMonitor()
@@ -198,24 +287,28 @@
   ```
 
 ### **10. מערכת ניטור לינטר**
+
 - **מיקום**: `scripts/linter-realtime-monitor.js` (מוטמע בתוך `code-quality-dashboard.html`)
 - **תכונות**:
   - טעינת דוח `npm run lint:collect` ותרגומו לכרטיסי סטטוס, טבלת סוגיות והיסטוריה
   - כפתורי פעולה מובנים (רענון, הרצת דוח מלא, הורדת JSON, העתקת לוג)
   - אינטגרציה מלאה עם `LintStatusService` + UnifiedTableSystem
 - **שימוש**:
+
   ```javascript
   // אתחול מתוך הדשבורד
   await window.initializeLintMonitor();
   ```
 
 ### **11. מערכת ניטור ביצועים**
+
 - **מיקום**: `scripts/system-management.js`
 - **תכונות**:
   - ניטור בריאות מערכת מקיף
   - מדדי ביצועים (CPU, זיכרון, דיסק)
   - התראות וניטור שגיאות
 - **שימוש**:
+
   ```javascript
   // עדכון כרטיסי בריאות
   updateHealthCards(data)
@@ -228,30 +321,64 @@
 
 ## 🧪 **כלי בדיקות (Testing Tools)**
 
-### **12. מערכת בדיקות מקיפה**
+### **12. Selenium Testing System**
+
+- **מיקום**: `scripts/test_pages_console_errors.py`
+- **תכונות**:
+  - בדיקות אוטומטיות בדפדפן
+  - בדיקת שגיאות JavaScript בזמן ריצה
+  - הודעות קונסול (errors, warnings)
+  - איתחול מערכות (Header, Core Systems, Preferences)
+  - זמני טעינה
+  - שגיאות קריטיות (Maximum call stack, Uncaught errors, SyntaxError)
+- **שימוש**:
+
+  ```bash
+  # התקנה (פעם אחת)
+  pip install selenium webdriver-manager
+  
+  # הרצת בדיקות מלאות
+  python3 scripts/test_pages_console_errors.py
+  
+  # בדיקת עמוד ספציפי
+  python3 scripts/test_pages_console_errors.py --page "/"
+  ```
+
+- **תוצאות**:
+  - `console_errors_report.json` - דוח מלא
+  - פלט בקונסול עם סיכום
+- **תיעוד**: [Selenium Testing Guide](../TESTING/SELENIUM_TESTING_GUIDE.md), [QA and Debugging Guide](QA_AND_DEBUGGING_GUIDE.md), [Selenium Testing Rule](../../../.cursorrules) ✅ **חדש! ינואר 2025**
+
+### **13. מערכת בדיקות מקיפה**
+
 - **מיקום**: `scripts/linter-testing-system.js`
 - **תכונות**:
   - בדיקות מקיפות למערכת הלינטר
   - בדיקות רכיבי מערכת, ביצועים, אבטחה, פונקציונליות
 - **שימוש**:
+
   ```javascript
   // הרצת בדיקות מקיפות
   runComprehensiveTests()
   ```
 
-### **13. Test Runner**
+### **14. Test Runner**
+
 - **מיקום**: `scripts/test-runner.js`
 - **תכונות**: הרצת בדיקות אוטומטיות
 - **שימוש**:
+
   ```javascript
   const runner = new TestRunner()
   await runner.runAllTests()
   ```
 
-### **14. Migration Testing Suite**
+### **15. Migration Testing Suite**
+
 - **מיקום**: `scripts/migration-testing-suite.js`
 - **תכונות**: בדיקות מיגרציה מקיפות
 - **שימוש**:
+
   ```javascript
   const suite = new MigrationTestingSuite()
   await suite.runAllTests()
@@ -261,7 +388,8 @@
 
 ## 📈 **כלי ניטור מתקדמים (Advanced Monitoring)**
 
-### **15. מנתח כפילויות מתקדם**
+### **16. מנתח כפילויות מתקדם**
+
 - **מיקום**: `scripts/monitors/advanced-duplicate-detector.js`
 - **הרצה**: `node scripts/monitors/advanced-duplicate-detector.js`
 - **תכונות**:
@@ -270,22 +398,26 @@
   - דירוג כפילויות לפי רמת דמיון
 - **תוצאות**: דוח JSON מפורט עם קטגוריזציה
 
-### **16. מנתח איכות פונקציות**
+### **17. מנתח איכות פונקציות**
+
 - **מיקום**: `scripts/monitors/duplicate-function-analyzer.js`
 - **תכונות**:
   - ניתוח איכות פונקציות
   - חישוב מורכבות קוד
   - זיהוי פונקציות בעייתיות
 - **שימוש**:
+
   ```javascript
   const analyzer = new DuplicateFunctionAnalyzer()
   analyzer.analyzeFunctionQuality(func)
   ```
 
-### **17. מערכת לינטר אמיתית**
+### **18. מערכת לינטר אמיתית**
+
 - **מיקום**: `scripts/real-linter-system.js`
 - **תכונות**: סריקת קבצים וניתוח מתקדם
 - **שימוש**:
+
   ```javascript
   const linter = new RealLinterSystem()
   await linter.scanFiles()
@@ -295,7 +427,8 @@
 
 ## 📋 **כלי דיווח ותיעוד (Reporting Tools)**
 
-### **18. Error Handling Coverage Monitor**
+### **19. Error Handling Coverage Monitor**
+
 - **מיקום**: `scripts/monitors/error-handling-monitor.js`
 - **הרצה**: `node scripts/monitors/error-handling-monitor.js`
 - **תכונות**:
@@ -304,7 +437,8 @@
   - סטטיסטיקות כיסוי לכל עמוד
 - **תוצאות**: דוחות ב-`reports/error-handling-coverage-*.{json,md}`
 
-### **19. JSDoc Coverage Reporter**
+### **20. JSDoc Coverage Reporter**
+
 - **מיקום**: `scripts/monitors/jsdoc-coverage.js`
 - **הרצה**: `node scripts/monitors/jsdoc-coverage.js`
 - **תכונות**:
@@ -313,7 +447,8 @@
   - דוחות מפורטים
 - **תוצאות**: דוחות ב-`reports/jsdoc-coverage-*.{json,md}`
 
-### **20. Function Index Generator**
+### **21. Function Index Generator**
+
 - **מיקום**: `scripts/generators/generate-function-index.js`
 - **הרצה**: `node scripts/generators/generate-function-index.js`
 - **תכונות**:
@@ -322,7 +457,8 @@
   - עדכון אינדקס בכל הקבצים
 - **תוצאות**: עדכון כל הקבצים עם Function Index מעודכן
 
-### **21. Naming Conventions Validator**
+### **22. Naming Conventions Validator**
+
 - **מיקום**: `scripts/monitors/naming-conventions-validator.js`
 - **הרצה**: `node scripts/monitors/naming-conventions-validator.js`
 - **תכונות**:
@@ -334,13 +470,15 @@
 
 ## 🚀 **כלי ביצועים (Performance Tools)**
 
-### **22. Performance Optimizer**
+### **23. Performance Optimizer**
+
 - **מיקום**: `documentation/frontend/PERFORMANCE_OPTIMIZER_GUIDE.md`
 - **תכונות**:
   - ניטור ביצועים בזמן אמת
   - אופטימיזציה אוטומטית
   - מדדי ביצועים מפורטים
 - **שימוש**:
+
   ```javascript
   const optimizer = window.InitPerformanceOptimizer
   const metrics = optimizer.getMetrics()
@@ -348,13 +486,15 @@
   await optimizer.applyOptimizations()
   ```
 
-### **23. Performance Monitor (Backend)**
+### **24. Performance Monitor (Backend)**
+
 - **מיקום**: `Backend/utils/performance_monitor.py`
 - **תכונות**:
   - ניטור ביצועי פונקציות
   - ניטור ביצועי database queries
   - מדידת זמני תגובה
 - **שימוש**:
+
   ```python
   from utils.performance_monitor import monitor_performance
   
@@ -368,26 +508,30 @@
 
 ## 📊 **דשבורדים וויזואליזציה (Dashboards)**
 
-### **24. System Management Dashboard**
+### **25. System Management Dashboard**
+
 - **מיקום**: `scripts/system-management.js`
 - **תכונות**:
   - דשבורד ניהול מערכת מקיף
   - ניטור בריאות מערכת
   - סטטיסטיקות ביצועים
 - **שימוש**:
+
   ```javascript
   const manager = new SystemManagement()
   manager.updateHealthCards(data)
   manager.updateSystemInfo(data)
   ```
 
-### **25. Project Files Scanner**
+### **26. Project Files Scanner**
+
 - **מיקום**: `scripts/project-files-scanner.js`
 - **תכונות**:
   - סריקה מקיפה של קבצי פרויקט
   - זיהוי סוגי קבצים
   - ניתוח מבנה פרויקט
 - **שימוש**:
+
   ```javascript
   const scanner = new ProjectFilesScanner()
   scanner.getStaticFileLists()
@@ -397,7 +541,8 @@
 
 ## 🔍 **כלי לוגר וניטור (Logging & Monitoring Tools)**
 
-### **26. מערכת לוגר מתקדמת**
+### **27. מערכת לוגר מתקדמת**
+
 - **מיקום**: `trading-ui/scripts/logger-service.js`
 - **תכונות**:
   - לוגים מקיפים עם שליטה מלאה על רמות הלוג
@@ -405,6 +550,7 @@
   - מצב DEBUG ו-Production
   - ניטור ביצועים פעיל
 - **שימוש**:
+
   ```javascript
   // לוגים ברמות שונות
   window.Logger.debug('מידע מפורט לפיתוח', context)
@@ -414,7 +560,27 @@
   window.Logger.critical('שגיאות קריטיות', context)
   ```
 
-### **27. מערכת לוגר Backend**
+### **28. מערכת ניטור בריאות מערכת**
+
+- **מיקום**: `Backend/services/health_service.py`
+- **תכונות**:
+  - בדיקות בריאות מקיפות
+  - Database Health, Cache Health, System Health, API Health
+  - מדדי ביצועים (CPU, זיכרון, דיסק)
+  - התראות וניטור שגיאות
+- **שימוש**:
+
+  ```python
+  from services.health_service import HealthService
+  
+  health_service = HealthService()
+  health_data = health_service.comprehensive_health_check()
+  ```
+
+### **29. מערכת איסוף מדדי ביצועים**
+
+### **30. מערכת לוגר Backend**
+
 - **מיקום**: `Backend/config/logging.py`
 - **תכונות**:
   - Rotating Logs עם סיבוב אוטומטי
@@ -427,22 +593,8 @@
   - `logs/database.log` - לוגי בסיס נתונים
   - `logs/errors.log` - לוגי שגיאות
 
-### **28. מערכת ניטור בריאות מערכת**
-- **מיקום**: `Backend/services/health_service.py`
-- **תכונות**:
-  - בדיקות בריאות מקיפות
-  - Database Health, Cache Health, System Health, API Health
-  - מדדי ביצועים (CPU, זיכרון, דיסק)
-  - התראות וניטור שגיאות
-- **שימוש**:
-  ```python
-  from services.health_service import HealthService
-  
-  health_service = HealthService()
-  health_data = health_service.comprehensive_health_check()
-  ```
+---
 
-### **29. מערכת איסוף מדדי ביצועים**
 - **מיקום**: `Backend/services/metrics_collector.py`
 - **תכונות**:
   - Performance Metrics (CPU, זיכרון, דיסק, רשת)
@@ -450,6 +602,7 @@
   - Business Metrics (סטטיסטיקות עסקיות)
   - Cache Metrics (hit rate, memory usage)
 - **שימוש**:
+
   ```python
   from services.metrics_collector import MetricsCollector
   
@@ -461,7 +614,45 @@
 
 ## 🛠️ **כלי דיבגינג ופתרון בעיות (Debugging & Troubleshooting Tools)**
 
-### **30. System Debug Helper**
+### **31. Debugger for Firefox**
+
+- **מיקום**: `.vscode/launch.json`
+- **תכונות**:
+  - דיבוגינג ישיר ב-Firefox מתוך IDE
+  - Breakpoints, Step through, Watch expressions
+  - Source maps support
+  - Conditional breakpoints ו-Logpoints
+- **שימוש**:
+
+  ```bash
+  # הפעל Firefox עם remote debugging
+  ./scripts/debug/launch-firefox.sh
+  
+  # או ב-VS Code/Cursor:
+  # לחץ F5 → בחר "Launch Firefox - Development"
+  ```
+
+- **תיעוד**: [Browser Debugging Standards](../GUIDELINES/BROWSER_DEBUGGING_STANDARDS.md), [Debugging Standards](../GUIDELINES/DEBUGGING_STANDARDS.md), [QA and Debugging Guide](QA_AND_DEBUGGING_GUIDE.md)
+
+### **32. VS Code Python Debugger**
+
+- **מיקום**: `.vscode/launch.json`
+- **תכונות**:
+  - דיבוגינג Python/Flask ישירות מה-IDE
+  - Breakpoints, Step through, Watch expressions
+  - Debug console
+  - Conditional breakpoints
+- **שימוש**:
+
+  ```bash
+  # ב-VS Code/Cursor:
+  # לחץ F5 → בחר "Python: Flask App"
+  ```
+
+- **תיעוד**: [Debugging Standards](../GUIDELINES/DEBUGGING_STANDARDS.md), [QA and Debugging Guide](QA_AND_DEBUGGING_GUIDE.md)
+
+### **33. System Debug Helper**
+
 - **מיקום**: `trading-ui/scripts/system-debug-helper.js`
 - **תכונות**:
   - בדיקה מקיפה של כל המערכת
@@ -469,6 +660,7 @@
   - בדיקת כל העמודים
   - בדיקת שגיאות וביצועים
 - **שימוש**:
+
   ```javascript
   // הדבק בקונסולה של הדפדפן
   window.debugSystem()      // בדיקה מקיפה
@@ -478,60 +670,12 @@
   window.debugPerformance() // בדיקת ביצועים
   ```
 
-### **31. Smart Initialization System Validator**
-- **מיקום**: `scripts/init-validator.js`
-- **תכונות**:
-  - ולידציה מקיפה של מערכת האתחול החכמה
-  - בדיקת זמינות מערכות
-  - ולידציה של קונפיגורציות עמודים
-  - זיהוי תלויות מעגליות
-  - ולידציה של הגדרות ביצועים
-- **שימוש**:
-  ```javascript
-  // הרצת ולידציה מקיפה
-  const results = await window.InitValidator.runComprehensiveValidation()
-  
-  // הצגת תוצאות
-  window.InitValidator.displayResults()
-  
-  // ייצוא תוצאות
-  window.InitValidator.exportResults()
-  ```
-
-### **32. System Management Dashboard**
-- **מיקום**: `scripts/system-management.js`
-- **תכונות**:
-  - דשבורד ניהול מערכת מקיף
-  - בדיקת בריאות מערכת מקיפה
-  - ניטור ביצועים ומשאבים
-  - התראות וניטור שגיאות
-- **שימוש**:
-  ```javascript
-  // הרצת בדיקת מערכת מקיפה
-  SystemManagement.runSystemCheck()
-  
-  // רענון נתוני מערכת
-  SystemManagement.refreshSystemData()
-  ```
-
-### **33. Project Files Scanner**
-- **מיקום**: `scripts/project-files-scanner.js`
-- **תכונות**:
-  - סריקה מקיפה של קבצי פרויקט
-  - זיהוי סוגי קבצים
-  - ניתוח מבנה פרויקט
-  - רשימות קבצים סטטיות
-- **שימוש**:
-  ```javascript
-  const scanner = new ProjectFilesScanner()
-  scanner.getStaticFileLists()
-  ```
-
 ---
 
 ## 🔧 **כלי ניהול מטמון ושרת (Cache & Server Management Tools)**
 
 ### **34. Cache Management System**
+
 - **מיקום**: `documentation/server/CURSOR_TASKS_GUIDE.md`
 - **תכונות**:
   - ניהול מטמון מתקדם
@@ -539,6 +683,7 @@
   - ניקוי מטמון
   - הצגת תלויות מטמון
 - **שימוש**:
+
   ```bash
   # בדיקת סטטוס מטמון
   curl -s http://localhost:8080/api/cache/status
@@ -551,6 +696,7 @@
   ```
 
 ### **35. Server Management System**
+
 - **מיקום**: `documentation/server/SERVER_MANAGEMENT_GUIDE.md`
 - **תכונות**:
   - ניהול שרת מתקדם
@@ -558,6 +704,7 @@
   - ניטור ביצועים
   - ניהול לוגים
 - **שימוש**:
+
   ```bash
   # בדיקת בריאות שרת
   curl -s http://localhost:8080/api/system/health
@@ -570,6 +717,7 @@
   ```
 
 ### **36. Restart Script System**
+
 - **מיקום**: `documentation/server/RESTART_SCRIPT_GUIDE.md`
 - **תכונות**:
   - הפעלה מחדש מתקדמת של השרת
@@ -577,6 +725,7 @@
   - מצבי debug ו-verbose
   - אבחון מובנה
 - **שימוש**:
+
   ```bash
   # הפעלה מחדש עם בדיקות בריאות
   ./restart --progressive
@@ -593,6 +742,7 @@
 ## 📊 **כלי ולידציה ובדיקות (Validation & Testing Tools)**
 
 ### **37. Naming Conventions Validator**
+
 - **מיקום**: `scripts/monitors/naming-conventions-validator.js`
 - **הרצה**: `node scripts/monitors/naming-conventions-validator.js`
 - **תכונות**:
@@ -604,6 +754,7 @@
 - **תוצאות**: דוחות ב-`reports/naming-conventions-*.{json,md}`
 
 ### **38. Real Linter System**
+
 - **מיקום**: `scripts/real-linter-system.js`
 - **תכונות**:
   - מערכת Linter אמיתית
@@ -611,12 +762,14 @@
   - זיהוי בעיות ותיקון אוטומטי
   - סריקת קבצי JS, CSS, HTML
 - **שימוש**:
+
   ```javascript
   const linter = new RealLinterSystem()
   await linter.scanFiles()
   ```
 
 ### **39. Button System Tests**
+
 - **מיקום**: `scripts/button_system_tests.py`
 - **תכונות**:
   - בדיקות מערכת כפתורים
@@ -625,6 +778,7 @@
 - **הרצה**: `python3 scripts/button_system_tests.py`
 
 ### **40. Warning System**
+
 - **מיקום**: `scripts/warning-system.js`
 - **תכונות**:
   - מערכת התראות מתקדמת
@@ -632,6 +786,7 @@
   - התראות שגיאות
   - התראות ביצועים
 - **שימוש**:
+
   ```javascript
   showValidationWarning(fieldId, message, duration)
   showErrorWarning(message, duration)
@@ -643,34 +798,42 @@
 ## 📚 **תעוד ומדריכים (Documentation)**
 
 ### **41. Tools Optimization Report**
+
 - **מיקום**: `documentation/03-DEVELOPMENT/TOOLS/TOOLS_OPTIMIZATION_REPORT.md`
 - **תוכן**: דוח מקיף על כל הכלים שנוצרו
 
 ### **42. CRUD Testing Guide**
+
 - **מיקום**: `trading-ui/CRUD_TESTING_GUIDE.md`
 - **תוכן**: מדריך שימוש בעמוד בדיקות CRUD
 
 ### **43. Performance Optimizer Guide**
+
 - **מיקום**: `documentation/frontend/PERFORMANCE_OPTIMIZER_GUIDE.md`
 - **תוכן**: מדריך אופטימיזציית ביצועים
 
 ### **44. Monitoring System Documentation**
+
 - **מיקום**: `documentation/server/MONITORING_SYSTEM.md`
 - **תוכן**: תיעוד מערכת ניטור מתקדמת
 
 ### **45. Logger System Specification**
+
 - **מיקום**: `documentation/LOGGER_SYSTEM_SPECIFICATION.md`
 - **תוכן**: אפיון מלא של מערכת הלוגר
 
 ### **46. Developer Tools Guide**
+
 - **מיקום**: `documentation/frontend/DEVELOPER_TOOLS_GUIDE.md`
 - **תוכן**: מדריך כלי מפתח מקיף
 
 ### **47. Troubleshooting Guide**
+
 - **מיקום**: `documentation/frontend/TROUBLESHOOTING_GUIDE.md`
 - **תוכן**: מדריך פתרון בעיות
 
 ### **48. Team Training Guide**
+
 - **מיקום**: `documentation/frontend/TEAM_TRAINING_GUIDE.md`
 - **תוכן**: מדריך הכשרת צוות עם כלי דיבגינג
 
@@ -678,25 +841,29 @@
 
 ## 🔧 **תהליכים מרכזיים בכל מערכת**
 
-### **תהליכי סריקה וניתוח**:
+### **תהליכי סריקה וניתוח**
+
 1. **סריקה מקיפה** - כל הקבצים במערכת
 2. **זיהוי כפילויות** - פונקציות, משתנים, CSS, HTML
 3. **ניתוח איכות** - Error Handling, JSDoc, Naming
 4. **דיווח מפורט** - JSON + Markdown reports
 
-### **תהליכי אופטימיזציה**:
+### **תהליכי אופטימיזציה**
+
 1. **הסרה אוטומטית** - כפילויות ברורות
 2. **איחוד קוד** - פונקציות דומות
 3. **ניקוי CSS** - הסרת !important, inline styles
 4. **תיקון HTML** - הסרת מודלים ישנים
 
-### **תהליכי ניטור**:
+### **תהליכי ניטור**
+
 1. **ניטור בזמן אמת** - בריאות מערכת
 2. **מדדי ביצועים** - CPU, זיכרון, דיסק
 3. **התראות אוטומטיות** - בעיות קריטיות
 4. **דוחות מגמות** - ניתוח היסטורי
 
-### **תהליכי בדיקה**:
+### **תהליכי בדיקה**
+
 1. **בדיקות CRUD** - כל הישויות במערכת
 2. **בדיקות API** - חיבור ופונקציונליות
 3. **בדיקות UI** - ממשק משתמש
@@ -706,9 +873,10 @@
 
 ## 🎯 **מדריך שימוש למפתחים**
 
-### **תהליך עבודה יומי**:
+### **תהליך עבודה יומי**
 
-#### **1. לפני התחלת עבודה**:
+#### **1. לפני התחלת עבודה**
+
 ```bash
 # בדיקת מצב כללי
 python3 documentation/tools/analysis/js-duplicate-analyzer.py
@@ -716,12 +884,14 @@ python3 documentation/tools/css/css-analyzer.py
 node scripts/monitors/error-handling-monitor.js
 ```
 
-#### **2. במהלך הפיתוח**:
+#### **2. במהלך הפיתוח**
+
 - השתמש בעמוד איכות הקוד: `http://localhost:8080/code-quality-dashboard`
 - הרץ בדיקות CRUD: `http://localhost:8080/crud-testing-dashboard-smart`
 - בדוק ניטור שרת: `http://localhost:8080/system-management`
 
-#### **3. לפני commit**:
+#### **3. לפני commit**
+
 ```bash
 # הרצת כל הבדיקות
 node scripts/monitors/error-handling-monitor.js
@@ -731,7 +901,8 @@ python3 documentation/tools/analysis/js-duplicate-analyzer.py
 python3 documentation/tools/css/css-analyzer.py
 ```
 
-#### **4. בדיקת ביצועים**:
+#### **4. בדיקת ביצועים**
+
 ```bash
 # בדיקת בריאות מערכת
 curl http://localhost:8080/api/health
@@ -740,9 +911,10 @@ curl http://localhost:8080/api/health
 curl -X POST http://localhost:8080/api/metrics/collect
 ```
 
-### **כלים מומלצים לפי סוג בעיה**:
+### **כלים מומלצים לפי סוג בעיה**
 
-#### **כפילויות קוד**:
+#### **כפילויות קוד**
+
 - `js-duplicate-analyzer.py` - כפילויות JavaScript
 - `html-duplicate-analyzer.py` - כפילויות HTML
 - `css-analyzer.py` - כפילויות CSS
@@ -750,37 +922,43 @@ curl -X POST http://localhost:8080/api/metrics/collect
 
 > החל מנובמבר 2025 תוצאות `advanced-duplicate-detector.js` מוצגות בסקשן "זיהוי כפילויות" בדשבורד איכות הקוד (`/code-quality-dashboard`) במקום העמוד הייעודי הישן.
 
-#### **בעיות איכות**:
+#### **בעיות איכות**
+
 - `error-handling-monitor.js` - Error Handling
 - `jsdoc-coverage.js` - תיעוד JSDoc
 - `naming-conventions-validator.js` - קונבנציות שמות
 - `real-linter-system.js` - מערכת Linter אמיתית
 
-#### **בעיות ביצועים**:
+#### **בעיות ביצועים**
+
 - `server-monitor-v2.js` - ניטור שרת
 - `system-management.js` - ניטור מערכת
 - `performance_monitor.py` - ניטור ביצועים
 - `metrics_collector.py` - איסוף מדדי ביצועים
 
-#### **בדיקות פונקציונליות**:
+#### **בדיקות פונקציונליות**
+
 - `crud-testing-enhanced.js` - בדיקות CRUD
 - `linter-testing-system.js` - בדיקות מקיפות
 - `test-runner.js` - בדיקות אוטומטיות
 - `button_system_tests.py` - בדיקות מערכת כפתורים
 
-#### **דיבגינג ופתרון בעיות**:
+#### **דיבגינג ופתרון בעיות**
+
 - `system-debug-helper.js` - כלי דיבגינג מקיף
 - `init-validator.js` - ולידטור מערכת אתחול
 - `project-files-scanner.js` - סריקת קבצי פרויקט
 - `warning-system.js` - מערכת התראות מתקדמת
 
-#### **ניטור ולוגר**:
+#### **ניטור ולוגר**
+
 - `logger-service.js` - מערכת לוגר מתקדמת
 - `logging.py` - מערכת לוגר Backend
 - `health_service.py` - ניטור בריאות מערכת
 - `system-management.js` - דשבורד ניהול מערכת
 
-#### **ניהול מטמון ושרת**:
+#### **ניהול מטמון ושרת**
+
 - `CURSOR_TASKS_GUIDE.md` - ניהול מטמון
 - `SERVER_MANAGEMENT_GUIDE.md` - ניהול שרת
 - `RESTART_SCRIPT_GUIDE.md` - הפעלה מחדש מתקדמת
@@ -789,7 +967,8 @@ curl -X POST http://localhost:8080/api/metrics/collect
 
 ## 📈 **מדדי איכות נוכחיים**
 
-### **Error Handling Coverage (ינואר 2025)**:
+### **Error Handling Coverage (ינואר 2025)**
+
 ```
 Total Functions:     525
 With Coverage:       316
@@ -797,15 +976,18 @@ Without Coverage:    209
 Coverage:            60.19%
 ```
 
-### **JSDoc Coverage**:
+### **JSDoc Coverage**
+
 - **מטרה**: 100% כיסוי
 - **סטטוס**: בדיקה נדרשת
 
-### **Naming Conventions**:
+### **Naming Conventions**
+
 - **מטרה**: 100% עמידה
 - **סטטוס**: בדיקה נדרשת
 
-### **Function Index**:
+### **Function Index**
+
 - **מטרה**: 100% כיסוי
 - **סטטוס**: בדיקה נדרשת
 
@@ -813,13 +995,15 @@ Coverage:            60.19%
 
 ## 🚨 **התראות ובעיות קריטיות**
 
-### **בעיות שדורשות טיפול מיידי**:
+### **בעיות שדורשות טיפול מיידי**
+
 1. **Error Handling Coverage נמוך** - 60.19% (מטרה: 90%+)
 2. **כפילויות קוד** - זיהוי וטיפול נדרש
 3. **CSS !important** - הסרה נדרשת
 4. **Inline styles** - המרה ל-CSS classes
 
-### **בעיות ביצועים**:
+### **בעיות ביצועים**
+
 1. **זמני תגובה גבוהים** - אופטימיזציה נדרשת
 2. **שימוש זיכרון גבוה** - ניטור נדרש
 3. **Cache hit rate נמוך** - אופטימיזציה נדרשת
@@ -829,9 +1013,11 @@ Coverage:            60.19%
 ## 🎉 **פרויקט 13 Pages Quality Fix - הושלם בהצלחה**
 
 ### **תאריך השלמה**: 26 בינואר 2025
+
 ### **סטטוס**: ✅ **הושלם בהצלחה מלאה**
 
-#### **הישגים מרכזיים**:
+#### **הישגים מרכזיים**
+
 - ✅ **100% פתרון בעיות קריטיות**: כל 156 הבעיות נפתרו
 - ✅ **100% פונקציונליות**: כל 13 העמודים עובדים בצורה מושלמת
 - ✅ **100% Modal System V2**: מיגרציה מלאה למערכת מודלים מאוחדת
@@ -839,7 +1025,8 @@ Coverage:            60.19%
 - ✅ **100% איכות קוד**: ניקוי ואופטימיזציה מקיפים
 - ✅ **100% ביצועים**: אופטימיזציה של זמני טעינה ותגובה
 
-#### **שיפורים כמותיים**:
+#### **שיפורים כמותיים**
+
 - **זמן טעינה ממוצע**: שיפור של 44% (3.2s → 1.8s)
 - **ביצוע JavaScript**: שיפור של 64% (1.1s → 0.4s)
 - **זמן פענוח CSS**: שיפור של 63% (0.8s → 0.3s)
@@ -847,7 +1034,8 @@ Coverage:            60.19%
 - **גודל Bundle**: הפחתה של 26% (2.3MB → 1.7MB)
 - **בקשות רשת**: הפחתה של 35% (23 → 15)
 
-#### **איכות קוד**:
+#### **איכות קוד**
+
 - **שגיאות JavaScript**: 47 → 0 (100% פתרון)
 - **הצהרות !important**: 23 → 0 (100% הסרה)
 - **סטיילים inline**: 15 → 0 (100% הסרה)
@@ -855,12 +1043,14 @@ Coverage:            60.19%
 - **Console.log statements**: 156 → 0 (100% ניקוי)
 - **קוד מת**: 12 בלוקים → 0 (100% הסרה)
 
-#### **מערכת מודלים**:
+#### **מערכת מודלים**
+
 - **לפני**: 8 מערכות מודלים מפוצלות
 - **אחרי**: 1 מערכת מודלים מאוחדת (Modal System V2)
 - **תכונות**: Configuration-driven, Component-based, Validation System, Dynamic Styling, RTL Support
 
-#### **תיעוד פרויקט**:
+#### **תיעוד פרויקט**
+
 - [13 Pages Quality Fix Report](13_PAGES_QUALITY_FIX_REPORT.md)
 - [Manual Browser Testing Report](MANUAL_BROWSER_TESTING_REPORT.md)
 - [Functional Testing Report](FUNCTIONAL_TESTING_REPORT.md)
@@ -870,19 +1060,22 @@ Coverage:            60.19%
 
 ## 📋 **רשימת משימות עתידיות**
 
-### **שיפורים קצרי טווח (1-2 שבועות)**:
+### **שיפורים קצרי טווח (1-2 שבועות)**
+
 - [ ] השגת 90% Error Handling Coverage
 - [ ] השגת 100% JSDoc Coverage
 - [ ] תיקון כל הפרות Naming Conventions
 - [ ] הסרת כל ה-!important מ-CSS
 
-### **שיפורים בינוני טווח (1-2 חודשים)**:
+### **שיפורים בינוני טווח (1-2 חודשים)**
+
 - [ ] השגת 95%+ Error Handling Coverage
 - [ ] יצירת דשבורדים לאיכות קוד
 - [ ] אינטגרציה עם CI/CD pipeline
 - [ ] אוטומציה מלאה של בדיקות איכות
 
-### **שיפורים ארוכי טווח (3-6 חודשים)**:
+### **שיפורים ארוכי טווח (3-6 חודשים)**
+
 - [ ] הרחבת כלים לסוגי קבצים נוספים
 - [ ] אינטגרציה עם כלי ניהול פרויקטים
 - [ ] הצעות אוטומטיות לשיפור קוד
@@ -892,12 +1085,14 @@ Coverage:            60.19%
 
 ## 🔗 **קישורים חשובים**
 
-### **עמודים מרכזיים**:
+### **עמודים מרכזיים**
+
 - [עמוד איכות הקוד](http://localhost:8080/code-quality-dashboard)
 - [דשבורד בדיקות CRUD](http://localhost:8080/crud-testing-dashboard-smart)
 - [ניהול מערכת](http://localhost:8080/system-management)
 
-### **תיעוד נוסף**:
+### **תיעוד נוסף**
+
 - [Tools Optimization Report](TOOLS_OPTIMIZATION_REPORT.md)
 - [Error Handling Guide](error-handling-guide.md)
 - [Developer Workflow Guide](developer-workflow-guide.md)
@@ -906,13 +1101,16 @@ Coverage:            60.19%
 
 ## 📞 **תמיכה ועזרה**
 
-### **לשאלות או בעיות**:
+### **לשאלות או בעיות**
+
 1. בדוק את המדריכים הרלוונטיים
 2. עיין בקוד המקור של הכלים
 3. פנה לצוות הפיתוח
 
-### **עדכון המדריך**:
+### **עדכון המדריך**
+
 המדריך מתעדכן באופן קבוע עם:
+
 - כלים חדשים שנוספו
 - דוחות מצב עדכניים
 - ניתוחי איכות קוד
@@ -923,6 +1121,7 @@ Coverage:            60.19%
 **סה"כ: 48 מערכות וכלים** לטיוב קוד, בקרה ואיכות במערכת TikTrack, עם ממשקים מתקדמים וכלי אוטומציה מקיפים.
 
 **הישגי פרויקט 13 Pages Quality Fix**:
+
 - ✅ **100% הצלחה** בכל המדדים הקריטיים
 - ✅ **44% שיפור ביצועים** ממוצע
 - ✅ **104% שיפור איכות קוד** ממוצע

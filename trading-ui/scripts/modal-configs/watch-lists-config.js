@@ -7,6 +7,16 @@
  * @lastUpdated December 6, 2025
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - initializeWatchListModal() - Initializewatchlistmodal
+// - initializeAddTickerModal() - Initializeaddtickermodal
+
+// === Other ===
+// - waitForModalManager() - Waitformodalmanager
+
 // קונפיגורציה למודל רשימת צפייה (Add/Edit)
 const watchListModalConfig = {
     id: 'watchListModal',
@@ -169,41 +179,49 @@ const addTickerModalConfig = {
                         <div class="d-flex gap-1 align-items-center flex-wrap" id="flagColorPaletteContainer" style="flex: 1;">
                             <button type="button" class="flag-color-btn-add-modal" 
                                     data-color="#26baac" 
+                                    data-entity-type="trade"
                                     style="background-color: #26baac; width: 20px; height: 20px; border: 2px solid transparent; border-radius: 3px; cursor: pointer; transition: all 0.2s;"
                                     title="Trade">
                             </button>
                             <button type="button" class="flag-color-btn-add-modal" 
                                     data-color="#0056b3" 
+                                    data-entity-type="trade_plan"
                                     style="background-color: #0056b3; width: 20px; height: 20px; border: 2px solid transparent; border-radius: 3px; cursor: pointer; transition: all 0.2s;"
                                     title="Trade Plan">
                             </button>
                             <button type="button" class="flag-color-btn-add-modal" 
                                     data-color="#28a745" 
+                                    data-entity-type="account"
                                     style="background-color: #28a745; width: 20px; height: 20px; border: 2px solid transparent; border-radius: 3px; cursor: pointer; transition: all 0.2s;"
                                     title="Account">
                             </button>
                             <button type="button" class="flag-color-btn-add-modal" 
                                     data-color="#20c997" 
+                                    data-entity-type="cash_flow"
                                     style="background-color: #20c997; width: 20px; height: 20px; border: 2px solid transparent; border-radius: 3px; cursor: pointer; transition: all 0.2s;"
                                     title="Cash Flow">
                             </button>
                             <button type="button" class="flag-color-btn-add-modal" 
                                     data-color="#dc3545" 
+                                    data-entity-type="ticker"
                                     style="background-color: #dc3545; width: 20px; height: 20px; border: 2px solid transparent; border-radius: 3px; cursor: pointer; transition: all 0.2s;"
                                     title="Ticker">
                             </button>
                             <button type="button" class="flag-color-btn-add-modal" 
                                     data-color="#fc5a06" 
+                                    data-entity-type="alert"
                                     style="background-color: #fc5a06; width: 20px; height: 20px; border: 2px solid transparent; border-radius: 3px; cursor: pointer; transition: all 0.2s;"
                                     title="Alert">
                             </button>
                             <button type="button" class="flag-color-btn-add-modal" 
                                     data-color="#6f42c1" 
+                                    data-entity-type="note"
                                     style="background-color: #6f42c1; width: 20px; height: 20px; border: 2px solid transparent; border-radius: 3px; cursor: pointer; transition: all 0.2s;"
                                     title="Note">
                             </button>
                             <button type="button" class="flag-color-btn-add-modal" 
                                     data-color="#17a2b8" 
+                                    data-entity-type="execution"
                                     style="background-color: #17a2b8; width: 20px; height: 20px; border: 2px solid transparent; border-radius: 3px; cursor: pointer; transition: all 0.2s;"
                                     title="Execution">
                             </button>

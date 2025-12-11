@@ -25,6 +25,7 @@
 **זיהוי:** שם תיקייה `TikTrackApp` → `development`
 
 **מפרטים:**
+
 - **פורט:** 8080
 - **Database:** `TikTrack-db-development`
 - **תיקיית קוד:** `Backend/`, `trading-ui/`
@@ -32,6 +33,7 @@
 - **הפעלה:** `./start_server.sh` (אוטומטי)
 
 **תפקיד:**
+
 - פיתוח פעיל
 - בדיקות מקומיות
 - ניסויים
@@ -47,6 +49,7 @@
 **זיהוי:** שם תיקייה `TikTrackApp-Production` → `testing`
 
 **מפרטים:**
+
 - **פורט:** 5001
 - **Database:** `TikTrack-db-testing` (שינוי מ-`TikTrack-db-production`)
 - **תיקיית קוד:** `production/Backend/`, `production/trading-ui/`
@@ -54,12 +57,14 @@
 - **הפעלה:** `./start_server.sh` (אוטומטי - מזהה Production → testing)
 
 **תפקיד:**
+
 - בדיקות לפני עליה לאוויר
 - בדיקת קונפיגורציות production
 - בדיקת מיגרציות
 - בדיקת ביצועים
 
 **שינויים נדרשים:**
+
 - ✅ שינוי `production/Backend/config/settings.py`:
   - `IS_PRODUCTION = False` → `IS_TESTING = True`
   - `POSTGRES_DB = "TikTrack-db-testing"` (שינוי מ-production)
@@ -70,30 +75,41 @@
 
 ### סביבה 3: Online (אונליין)
 
-**מיקום:** שרת אינטרנט (uPress VPS)  
-**תיקייה:** על השרת (Git clone)  
-**זיהוי:** משתנה סביבה `TIKTRACK_ENV=online` או שם תיקייה
+**מיקום:** AWS Lightsail (instance קטן)  
+**תיקייה:** על השרת (Git clone, הפעלת `production/` כהעתק של Testing המקומי)  
+**זיהוי:** `TIKTRACK_ENV=testing` (הנחיות החוזרות על ההגדרות המקומיות)
 
 **מפרטים:**
-- **פורט:** 80/443 (HTTP/HTTPS דרך Nginx)
-- **Database:** `TikTrack-db-online` (על השרת)
-- **תיקיית קוד:** על השרת (Git clone)
-- **תיקיית לוגים:** על השרת
-- **הפעלה:** systemd service או process manager
+
+- **פורט:** 5001 (אותו פורט כמו בסביבת Testing המקומית, אין reverse proxy הנדרש)
+- **Database:** `TikTrack-db-testing` – מקבלים `pg_dump` מ־Testing המקומית ומפעילים אותו ישירות
+- **תיקיית קוד:** `production/Backend/`, `production/trading-ui/` (אותו קוד)
+- **תיקיית לוגים:** `production/Backend/logs/`
+- **הפעלה:** `./start_server.sh` או `systemd` service שמבטיח הפעלה אוטומטית אחרי reboot
 
 **תפקיד:**
-- סביבת פרודקשן אמיתית
-- גישה מהאינטרנט
-- משתמשים אמיתיים
+
+- סביבת פרזנטציה/POC קלה לשינויים
+- ניתן להריץ בדיקות ב־5001 ללא סביבות מרובות
+- ניגשים ישירות על ה־IP/域 dns `tiktrack.nimrod.bio`
 
 **שינויים נדרשים:**
-- ✅ יצירת `online/Backend/config/settings.py` (חדש)
-- ✅ הגדרות ספציפיות ל-online:
-  - `IS_ONLINE = True`
-  - `POSTGRES_DB = "TikTrack-db-online"`
-  - `HOST = "0.0.0.0"` (להאזנה על כל ה-interfaces)
-  - `PORT = 8080` (פנימי, Nginx מעביר ל-80/443)
-- ✅ עדכון `start_server.sh` לזיהוי `online` environment
+
+- ✅ קונפיגורציה פשוטה: `TIKTRACK_ENV=testing`, `IS_TESTING=True`, `POSTGRES_DB=TikTrack-db-testing`, `PORT=5001`
+- ✅ `start_server.sh` צריך עדיין לזהות את תיקיית `production/` כ־Testing (הנה קיים כבר)
+- ✅ להגביר את `systemd` service/וודא שהשרת מריץ את ה-App אחרי reboot
+- ✅ להגדיר DNS עם שרת ה־Lightsail (תחת הניהול הקיים) כדי לכוון את `tiktrack.nimrod.bio` לכתובת ה־IP
+- ✅ להפעיל Let’s Encrypt (Certbot) או nginx reverse proxy כאשר רוצים HTTPS
+- ✅ להגדיר ניטור LightSail (CPU/Memory) + LightSail snapshot יומי ו/או `pg_dump`
+- ✅ מסמך מדריך פריסה חדש: `LIGHTSAIL_LIGHT_SETUP.md` (פירוט של תהליך ההפעלה, ה־12$ plan, גיבויים ו־DNS)
+
+### Lightsail Lean Deployment (12$)
+
+- **תצורה:** Lightsail 2 GB RAM / 60 GB SSD (~12$ לחודש)
+- **גישה:** פתיחת SSH + פורט 5001 לכל IP כדי לאפשר פרזנטציה נגישה (אין צורך להגביל IP בשלב הזה)
+- **אבטחה:** HTTPS ניתן להפעיל בקלות בעזרת Certbot; ה־Instance מדווח ל־Lightsail monitoring עבור ניטור בסיסי
+- **גיבוי:** snapshots מובנים + הגדרת `pg_dump` יומית (ניתן בפרטי המדריך `LIGHTSAIL_LIGHT_SETUP.md`)
+- **התאמה עתידית:** במידת הצורך ניתן להרחיב RAM/SSD או להוסיף Load Balancer/CloudFront מאוחר יותר
 
 ---
 
@@ -102,10 +118,12 @@
 ### שיטה 1: שם תיקייה (קיים)
 
 **כרגע:**
+
 - `TikTrackApp` → `development` (פורט 8080)
 - `TikTrackApp-Production` → `production` (פורט 5001)
 
 **אחרי השינויים:**
+
 - `TikTrackApp` → `development` (פורט 8080) ✅ ללא שינוי
 - `TikTrackApp-Production` → `testing` (פורט 5001) ⚠️ שינוי
 - `TikTrackApp-Online` → `online` (פורט 80/443) ⚠️ חדש
@@ -113,10 +131,12 @@
 ### שיטה 2: משתנה סביבה (קיים)
 
 **כרגע:**
+
 - `TIKTRACK_ENV=development` → development
 - `TIKTRACK_ENV=production` → production
 
 **אחרי השינויים:**
+
 - `TIKTRACK_ENV=development` → development ✅ ללא שינוי
 - `TIKTRACK_ENV=testing` → testing ⚠️ שינוי מ-production
 - `TIKTRACK_ENV=online` → online ⚠️ חדש
@@ -124,6 +144,7 @@
 ### עדכון `start_server.sh`
 
 **שינויים נדרשים:**
+
 ```bash
 # הוספת זיהוי testing
 if [[ "$workspace_name" == *"Production"* ]]; then
@@ -159,10 +180,12 @@ esac
 ## 💾 שמות Databases
 
 ### לפני השינויים
+
 - `TikTrack-db-development` - פיתוח ✅ נשאר
 - `TikTrack-db-production` - פרודקשן ⚠️ ישתנה
 
 ### אחרי השינויים
+
 - `TikTrack-db-development` - פיתוח ✅ נשאר
 - `TikTrack-db-testing` - טסטים ⚠️ שינוי מ-production
 - `TikTrack-db-online` - אונליין ⚠️ חדש
@@ -170,6 +193,7 @@ esac
 ### תהליך שינוי שם Database
 
 **שינוי מ-production ל-testing:**
+
 ```sql
 -- יצירת database חדש
 CREATE DATABASE "TikTrack-db-testing";
@@ -186,6 +210,7 @@ pg_dump -d "TikTrack-db-production" | psql -d "TikTrack-db-testing"
 ## 📁 מבנה תיקיות
 
 ### לפני השינויים
+
 ```
 TikTrackApp/
 ├── Backend/              # Development
@@ -196,6 +221,7 @@ TikTrackApp/
 ```
 
 ### אחרי השינויים
+
 ```
 TikTrackApp/
 ├── Backend/              # Development ✅ ללא שינוי
@@ -210,6 +236,7 @@ TikTrackApp-Online/        # Online (על השרת)
 ```
 
 **הערה:** מבנה התיקיות נשאר זהה, רק המשמעות משתנה:
+
 - `production/` → משמש לטסטים (לא לפרודקשן אמיתי)
 - `online/` → משמש לפרודקשן אמיתי (חדש)
 
@@ -220,6 +247,7 @@ TikTrackApp-Online/        # Online (על השרת)
 ### Development (ללא שינוי)
 
 **`Backend/config/settings.py`:**
+
 ```python
 ENVIRONMENT = os.getenv("TIKTRACK_ENV", "development").lower()
 IS_PRODUCTION = False
@@ -234,6 +262,7 @@ HOST = "127.0.0.1"
 ### Testing (שינוי מ-production)
 
 **`production/Backend/config/settings.py`:**
+
 ```python
 ENVIRONMENT = os.getenv("TIKTRACK_ENV", "testing").lower()
 IS_PRODUCTION = False  # שינוי מ-True
@@ -248,6 +277,7 @@ HOST = "127.0.0.1"
 ### Online (חדש)
 
 **`online/Backend/config/settings.py` (חדש):**
+
 ```python
 ENVIRONMENT = os.getenv("TIKTRACK_ENV", "online").lower()
 IS_PRODUCTION = False
@@ -264,6 +294,7 @@ HOST = "0.0.0.0"  # להאזנה על כל ה-interfaces
 ## 🔄 תהליך שינוי מ-Production ל-Testing
 
 ### שלב 1: שינוי שם Database
+
 ```bash
 # 1. יצירת database חדש
 createdb -U TikTrakDBAdmin "TikTrack-db-testing"
@@ -277,6 +308,7 @@ psql -U TikTrakDBAdmin -d "TikTrack-db-testing" -c "\dt"
 ```
 
 ### שלב 2: עדכון Config
+
 ```python
 # production/Backend/config/settings.py
 IS_PRODUCTION = False  # שינוי
@@ -285,6 +317,7 @@ POSTGRES_DB = "TikTrack-db-testing"  # שינוי
 ```
 
 ### שלב 3: עדכון start_server.sh
+
 ```bash
 # הוספת זיהוי testing במקום production
 if [[ "$workspace_name" == *"Production"* ]]; then
@@ -293,6 +326,7 @@ fi
 ```
 
 ### שלב 4: בדיקות
+
 ```bash
 # הפעלת סביבת testing
 ./start_server.sh
@@ -306,6 +340,7 @@ psql -U TikTrakDBAdmin -d "TikTrack-db-testing" -c "SELECT COUNT(*) FROM trades;
 ## 🆕 יצירת סביבת Online
 
 ### שלב 1: יצירת מבנה תיקיות (על השרת)
+
 ```bash
 # על השרת
 mkdir -p /path/to/TikTrackApp-Online
@@ -317,12 +352,14 @@ git checkout online  # או branch אחר
 ```
 
 ### שלב 2: יצירת קונפיגורציה
+
 ```bash
 # יצירת online/Backend/config/settings.py
 # (ראה דוגמה למעלה)
 ```
 
 ### שלב 3: יצירת Database
+
 ```bash
 # על השרת
 createdb -U TikTrakDBAdmin "TikTrack-db-online"
@@ -333,6 +370,7 @@ pg_dump -U TikTrakDBAdmin -d "TikTrack-db-testing" --schema-only | \
 ```
 
 ### שלב 4: העתקת Data (אופציונלי)
+
 ```bash
 # העתקת data מ-testing ל-online (אם נדרש)
 pg_dump -U TikTrakDBAdmin -d "TikTrack-db-testing" --data-only | \
@@ -344,16 +382,19 @@ pg_dump -U TikTrakDBAdmin -d "TikTrack-db-testing" --data-only | \
 ## ✅ Checklist הגדרת סביבות
 
 ### Development
+
 - [ ] נשארת ללא שינוי
 - [ ] בדיקה שהכל עובד
 
 ### Testing
+
 - [ ] שינוי שם database מ-production ל-testing
 - [ ] עדכון `production/Backend/config/settings.py`
 - [ ] עדכון `start_server.sh` לזיהוי testing
 - [ ] בדיקות שהכל עובד
 
 ### Online
+
 - [ ] יצירת מבנה תיקיות על השרת
 - [ ] יצירת `online/Backend/config/settings.py`
 - [ ] יצירת database `TikTrack-db-online`
@@ -368,15 +409,18 @@ pg_dump -U TikTrakDBAdmin -d "TikTrack-db-testing" --data-only | \
 ## 🔗 קבצים רלוונטיים
 
 ### קבצי Config
+
 - `Backend/config/settings.py` - Development (ללא שינוי)
 - `production/Backend/config/settings.py` - Testing (שינוי)
 - `online/Backend/config/settings.py` - Online (חדש)
 
 ### סקריפטים
+
 - `start_server.sh` - עדכון לזיהוי 3 סביבות
 - `scripts/sync_to_online.py` - חדש (סינכרון ל-online)
 
 ### Documentation
+
 - `documentation/production/ONLINE_DEPLOYMENT/ENVIRONMENT_SETUP.md` - זה הקובץ
 - `documentation/production/ONLINE_DEPLOYMENT/ENVIRONMENT_NAMING.md` - שמות וזיהוי
 

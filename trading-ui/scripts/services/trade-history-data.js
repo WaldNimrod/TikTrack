@@ -66,6 +66,15 @@
     try {
       const { force = false } = options || {};
       
+      // Guard: skip when no authenticated user
+      if (typeof window.TikTrackAuth?.getCurrentUser === 'function') {
+        const u = window.TikTrackAuth.getCurrentUser();
+        if (!u || !u.id) {
+          window.Logger?.debug?.('⚠️ Trade history skipped - user not authenticated', PAGE_LOG_CONTEXT);
+          return { trades: [], total: 0 };
+        }
+      }
+      
       // Build cache key from filters
       const filtersHash = JSON.stringify(filters);
       const cacheKey = `${TRADE_HISTORY_DATA_KEY}:${filtersHash}`;
@@ -93,9 +102,11 @@
       const base = location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
       const url = `${base}/api/trade-history/?${params.toString()}`;
       
-      const response = await fetch(url);
+      const response = await fetch(url, { });
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const msg = `HTTP error! status: ${response.status}`;
+        window.Logger?.warn?.('⚠️ Trade history load failed, returning empty', { ...PAGE_LOG_CONTEXT, status: response.status, message: msg });
+        return { trades: [], total: 0 };
       }
 
       const data = await response.json();
@@ -108,9 +119,8 @@
       window.Logger?.debug?.('✅ Trade history loaded from API', { ...PAGE_LOG_CONTEXT, count: payload?.trades?.length || 0 });
       return payload;
     } catch (error) {
-      window.Logger?.error?.('❌ Error loading trade history', { ...PAGE_LOG_CONTEXT, error: error?.message || error });
-      window.NotificationSystem?.showError?.('שגיאה', 'שגיאה בטעינת היסטוריית טריידים');
-      throw error;
+      window.Logger?.warn?.('⚠️ Error loading trade history (soft-fail)', { ...PAGE_LOG_CONTEXT, error: error?.message || error });
+      return { trades: [], total: 0 };
     }
   }
 
@@ -162,7 +172,7 @@
       const base = location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
       const url = `${base}/api/trade-history/statistics?${params.toString()}`;
       
-      const response = await fetch(url);
+      const response = await fetch(url, { });
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -220,7 +230,7 @@
       const base = location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
       const url = `${base}/api/trade-history/aggregated?${params.toString()}`;
       
-      const response = await fetch(url);
+      const response = await fetch(url, { });
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -275,7 +285,7 @@
       const base = location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
       const url = `${base}/api/trade-history/plan-vs-execution?${params.toString()}`;
       
-      const response = await fetch(url);
+      const response = await fetch(url, { });
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -297,6 +307,226 @@
   }
 
   /**
+   * Load trade timeline with all linked items and calculations
+   * 
+   * @param {number} tradeId - Trade ID
+   * @param {Object} [options] - Options
+   * @param {boolean} [options.force=false] - Force fresh data (skip cache)
+   * @param {boolean} [options.include_durations=true] - Include duration calculations
+   * @returns {Promise<Object>} Timeline data
+   */
+  async function loadTradeTimeline(tradeId, options = {}) {
+    try {
+      const { force = false, include_durations = true } = options || {};
+      
+      // Build cache key
+      const cacheKey = `trade-history-timeline-${tradeId}`;
+      
+      if (!force && typeof window.UnifiedCacheManager?.get === 'function') {
+        const cached = await window.UnifiedCacheManager.get(cacheKey);
+        if (cached) {
+          window.Logger?.debug?.('📦 Trade timeline loaded from cache', { ...PAGE_LOG_CONTEXT, tradeId });
+          return cached;
+        }
+      }
+
+      window.Logger?.debug?.('🔄 Loading trade timeline from API...', { ...PAGE_LOG_CONTEXT, tradeId });
+      
+      // Build query string
+      const params = new URLSearchParams();
+      if (include_durations !== undefined) {
+        params.append('include_durations', include_durations.toString());
+      }
+      
+      const base = location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
+      const url = `${base}/api/trade-history/${tradeId}/timeline?${params.toString()}`;
+      
+      const response = await fetch(url, { });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const payload = data?.data || data;
+
+      if (typeof window.UnifiedCacheManager?.save === 'function') {
+        await window.UnifiedCacheManager.save(cacheKey, payload);
+      }
+
+      window.Logger?.debug?.('✅ Trade timeline loaded from API', { ...PAGE_LOG_CONTEXT, tradeId, items: payload?.timeline?.length || 0 });
+      return payload;
+    } catch (error) {
+      window.Logger?.error?.('❌ Error loading trade timeline', { ...PAGE_LOG_CONTEXT, tradeId, error: error?.message || error });
+      window.NotificationSystem?.showError?.('שגיאה', 'שגיאה בטעינת טיימליין טרייד');
+      throw error;
+    }
+  }
+
+  /**
+   * Load trade chart data including market prices, position data, and P/L
+   * 
+   * @param {number} tradeId - Trade ID
+   * @param {Object} [options] - Options
+   * @param {boolean} [options.force=false] - Force fresh data (skip cache)
+   * @param {number} [options.days_before=7] - Days before first record
+   * @param {number} [options.days_after=7] - Days after last record
+   * @returns {Promise<Object>} Chart data
+   */
+  async function loadTradeChartData(tradeId, options = {}) {
+    try {
+      const { force = false, days_before = 7, days_after = 7 } = options || {};
+      
+      // Build cache key
+      const cacheKey = `trade-history-chart-data-${tradeId}`;
+      
+      if (!force && typeof window.UnifiedCacheManager?.get === 'function') {
+        const cached = await window.UnifiedCacheManager.get(cacheKey);
+        if (cached) {
+          window.Logger?.debug?.('📦 Trade chart data loaded from cache', { ...PAGE_LOG_CONTEXT, tradeId });
+          return cached;
+        }
+      }
+
+      window.Logger?.debug?.('🔄 Loading trade chart data from API...', { ...PAGE_LOG_CONTEXT, tradeId });
+      
+      // Build query string
+      const params = new URLSearchParams();
+      params.append('days_before', days_before.toString());
+      params.append('days_after', days_after.toString());
+      
+      const base = location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
+      const url = `${base}/api/trade-history/${tradeId}/chart-data?${params.toString()}`;
+      
+      const response = await fetch(url, { });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const payload = data?.data || data;
+
+      if (typeof window.UnifiedCacheManager?.save === 'function') {
+        await window.UnifiedCacheManager.save(cacheKey, payload);
+      }
+
+      window.Logger?.debug?.('✅ Trade chart data loaded from API', { ...PAGE_LOG_CONTEXT, tradeId });
+      return payload;
+    } catch (error) {
+      window.Logger?.error?.('❌ Error loading trade chart data', { ...PAGE_LOG_CONTEXT, tradeId, error: error?.message || error });
+      window.NotificationSystem?.showError?.('שגיאה', 'שגיאה בטעינת נתוני גרף טרייד');
+      throw error;
+    }
+  }
+
+  /**
+   * Load detailed trade statistics
+   * 
+   * @param {number} tradeId - Trade ID
+   * @param {Object} [options] - Options
+   * @param {boolean} [options.force=false] - Force fresh data (skip cache)
+   * @returns {Promise<Object>} Trade statistics
+   */
+  async function loadTradeStatistics(tradeId, options = {}) {
+    try {
+      const { force = false } = options || {};
+      
+      // Build cache key
+      const cacheKey = `trade-history-statistics-${tradeId}`;
+      
+      if (!force && typeof window.UnifiedCacheManager?.get === 'function') {
+        const cached = await window.UnifiedCacheManager.get(cacheKey);
+        if (cached) {
+          window.Logger?.debug?.('📦 Trade statistics loaded from cache', { ...PAGE_LOG_CONTEXT, tradeId });
+          return cached;
+        }
+      }
+
+      window.Logger?.debug?.('🔄 Loading trade statistics from API...', { ...PAGE_LOG_CONTEXT, tradeId });
+      
+      const base = location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
+      const url = `${base}/api/trade-history/${tradeId}/statistics`;
+      
+      const response = await fetch(url, { });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const payload = data?.data || data;
+
+      if (typeof window.UnifiedCacheManager?.save === 'function') {
+        await window.UnifiedCacheManager.save(cacheKey, payload);
+      }
+
+      window.Logger?.debug?.('✅ Trade statistics loaded from API', { ...PAGE_LOG_CONTEXT, tradeId });
+      return payload;
+    } catch (error) {
+      window.Logger?.error?.('❌ Error loading trade statistics', { ...PAGE_LOG_CONTEXT, tradeId, error: error?.message || error });
+      window.NotificationSystem?.showError?.('שגיאה', 'שגיאה בטעינת סטטיסטיקות טרייד');
+      throw error;
+    }
+  }
+
+  /**
+   * Load complete trade analysis (timeline + chart data + statistics)
+   * This is a unified endpoint optimized for the trade-history page
+   * 
+   * @param {number} tradeId - Trade ID
+   * @param {Object} [options] - Options
+   * @param {boolean} [options.force=false] - Force fresh data (skip cache)
+   * @param {number} [options.days_before=7] - Days before first record
+   * @param {number} [options.days_after=7] - Days after last record
+   * @param {boolean} [options.include_durations=true] - Include duration calculations
+   * @returns {Promise<Object>} Complete analysis data
+   */
+  async function loadTradeFullAnalysis(tradeId, options = {}) {
+    try {
+      const { force = false, days_before = 7, days_after = 7, include_durations = true } = options || {};
+      
+      // Build cache key
+      const cacheKey = `trade-history-full-analysis-${tradeId}`;
+      
+      if (!force && typeof window.UnifiedCacheManager?.get === 'function') {
+        const cached = await window.UnifiedCacheManager.get(cacheKey);
+        if (cached) {
+          window.Logger?.debug?.('📦 Trade full analysis loaded from cache', { ...PAGE_LOG_CONTEXT, tradeId });
+          return cached;
+        }
+      }
+
+      window.Logger?.debug?.('🔄 Loading trade full analysis from API...', { ...PAGE_LOG_CONTEXT, tradeId });
+      
+      // Build query string
+      const params = new URLSearchParams();
+      params.append('days_before', days_before.toString());
+      params.append('days_after', days_after.toString());
+      params.append('include_durations', include_durations.toString());
+      
+      const base = location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
+      const url = `${base}/api/trade-history/${tradeId}/full-analysis?${params.toString()}`;
+      
+      const response = await fetch(url, { });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const payload = data?.data || data;
+
+      if (typeof window.UnifiedCacheManager?.save === 'function') {
+        await window.UnifiedCacheManager.save(cacheKey, payload);
+      }
+
+      window.Logger?.debug?.('✅ Trade full analysis loaded from API', { ...PAGE_LOG_CONTEXT, tradeId });
+      return payload;
+    } catch (error) {
+      window.Logger?.error?.('❌ Error loading trade full analysis', { ...PAGE_LOG_CONTEXT, tradeId, error: error?.message || error });
+      window.NotificationSystem?.showError?.('שגיאה', 'שגיאה בטעינת ניתוח מלא של טרייד');
+      throw error;
+    }
+  }
+
+  /**
    * Invalidate trade history cache
    * 
    * @returns {Promise<void>}
@@ -309,7 +539,12 @@
           TRADE_HISTORY_DATA_KEY,
           'trade-history-statistics',
           'trade-history-aggregated',
-          'trade-history-plan-vs-execution'
+          'trade-history-plan-vs-execution',
+          'trade-history-timeline',
+          'trade-history-chart-data',
+          'trade-history-position-data',
+          'trade-history-pl-data',
+          'trade-history-full-analysis'
         ];
         
         for (const key of keys) {
@@ -332,6 +567,10 @@
     loadStatistics,
     loadAggregated,
     loadPlanVsExecution,
+    loadTradeTimeline,
+    loadTradeChartData,
+    loadTradeStatistics,
+    loadTradeFullAnalysis,
     invalidateCache
   };
 

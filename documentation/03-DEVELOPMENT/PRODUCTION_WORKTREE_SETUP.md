@@ -29,31 +29,38 @@
 ## 3. שלבי הקמה (חד־פעמי)
 
 1. **וודא שהריפו נקי:**  
+
    ```bash
    cd ~/Documents/TikTrack/TikTrackApp
    git status -sb
    ```
+
    יש להמשיך רק אם אין שינויים לא שמורים.
 
 2. **עדכן את הענפים לפני יצירת worktree:**  
+
    ```bash
    git checkout main && git pull origin main
    git fetch origin production
    ```
 
 3. **צור Worktree חדש לפרודקשן:**  
+
    ```bash
    git worktree add ../TikTrackApp-Production production
    ```
+
    - אם התיקייה `TikTrackApp-Production` אינה קיימת – Git יוצר אותה אוטומטית.
    - אם התיקייה קיימת ואינה ריקה – הפקודה תכשל; יש לרוקן/להסיר אותה קודם.
 
 4. **אימות:**  
+
    ```bash
    ls -1 ..
    cd ../TikTrackApp-Production
    git status -sb
    ```
+
    יש לוודא שהמצב מציג `## production...origin/production`.
 
 ---
@@ -64,26 +71,32 @@
 השלבים מתבצעים מה־worktree (`~/Documents/TikTrack/TikTrackApp-Production/`).
 
 ### 4.1 הכנה
+
 ```bash
 cd ~/Documents/TikTrack/TikTrackApp-Production
 git pull origin production
 ```
 
 ### 4.2 מיזוג main → production
+
 ```bash
 # מתוך worktree הפרודקשן
 git merge --ff-only origin/main
 ```
+
 - אם מתבצע פיתוח פעיל בפרודקשן, ניתן להחליף ל-`git merge main` ולפתור קונפליקטים ידנית.
 
 ### 4.3 בדיקות התאמה
+
 הרץ את הסקריפטים הסטנדרטיים (מתוך worktree):
+
 ```bash
 ./scripts/verify_production_isolation.sh
 ./scripts/verify_production.sh
 ```
 
 ### 4.4 Commit & Push
+
 ```bash
 git status -sb
 git add .
@@ -97,17 +110,21 @@ git push origin production
 
 1. **פיתוח רגיל:** כל העבודה נמשכת ב-`TikTrackApp/` על ענף `main`.
 2. **הכנת עדכון לפרודקשן:**
+
    ```bash
    cd ~/Documents/TikTrack/TikTrackApp
    git checkout main
    git pull origin main
    ```
+
 3. **כניסה לסביבת production:**
+
    ```bash
    cd ../TikTrackApp-Production
    git pull origin production
    git merge --ff-only origin/main
    ```
+
 4. **בדיקות חובה:**  
    - `./scripts/verify_production_isolation.sh`  
    - `./scripts/verify_production.sh`  
@@ -121,6 +138,7 @@ git push origin production
 - **Hooks קיימים:** ניתן להשאירם בריפו הראשי; אין צורך לעדכן אותם.
 - **סקריפטים קיימים:** כל הסקריפטים שהיו תלויים בנתיב `production/` צריכים לרוץ מתוך worktree זהה (למעט עדכון מסלולים מוחלטים, אם קיים).
 - **מומלץ:** להוסיף alias ב-shell:
+
   ```bash
   alias tt-dev='cd ~/Documents/TikTrack/TikTrackApp'
   alias tt-prod='cd ~/Documents/TikTrack/TikTrackApp-Production'
@@ -131,11 +149,13 @@ git push origin production
 ## 7. Rollback והחלפת סביבת production
 
 1. **למחיקת worktree (אם נדרש):**
+
    ```bash
    cd ~/Documents/TikTrack
    git worktree remove TikTrackApp-Production
    rm -rf TikTrackApp-Production
    ```
+
    > מומלץ רק אם בטוחים שהשינויים ב-push בוצעו.
 
 2. **יצירה מחדש:** חזרה לסעיף 3 (שלבי הקמה).

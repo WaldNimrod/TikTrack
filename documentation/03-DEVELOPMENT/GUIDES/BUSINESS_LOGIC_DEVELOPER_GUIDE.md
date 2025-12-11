@@ -1,4 +1,5 @@
 # Business Logic Developer Guide
+
 # מדריך מפתחים - Business Logic Layer
 
 **תאריך יצירה:** 22 נובמבר 2025  
@@ -23,7 +24,7 @@
 
 ## 🎯 מבוא
 
-### מה זה Business Logic Layer?
+### מה זה Business Logic Layer
 
 Business Logic Layer הוא שכבת הלוגיקה העסקית המרכזית במערכת TikTrack. השכבה אחראית על:
 
@@ -31,7 +32,7 @@ Business Logic Layer הוא שכבת הלוגיקה העסקית המרכזית 
 - **חישובים עסקיים** - ביצוע חישובים מורכבים (מחירים, אחוזים, P/L, וכו')
 - **אכיפת חוקי עסק** - יישום חוקי עסק מרכזיים דרך Business Rules Registry
 
-### למה הוא קיים?
+### למה הוא קיים
 
 1. **הפרדת אחריות** - כל הלוגיקה העסקית ב-Backend, Frontend מכיל רק UI logic
 2. **מרכזיות** - כל החישובים והולידציות במקום אחד
@@ -39,7 +40,7 @@ Business Logic Layer הוא שכבת הלוגיקה העסקית המרכזית 
 4. **תחזוקה קלה** - שינוי חוק עסקי במקום אחד משפיע על כל המערכת
 5. **עקביות** - הבטחת עקביות בלוגיקה העסקית בין Frontend ל-Backend
 
-### ארכיטקטורה כללית:
+### ארכיטקטורה כללית
 
 ```
 Frontend (UI) → Data Service → Business Logic API → Business Service → Business Rules Registry
@@ -140,7 +141,7 @@ class ExampleBusinessService(BaseBusinessService):
         return results
 ```
 
-### שלב 2: הוספת Service ל-__init__.py
+### שלב 2: הוספת Service ל-**init**.py
 
 **מיקום:** `Backend/services/business_logic/__init__.py`
 
@@ -304,7 +305,7 @@ BUSINESS_RULES: Dict[str, Dict[str, Any]] = {
 
 ### קריאה מ-Frontend
 
-#### דרך Data Service Wrapper (מומלץ):
+#### דרך Data Service Wrapper (מומלץ)
 
 ```javascript
 // Using wrapper from Data Service
@@ -318,7 +319,7 @@ if (!validationResult.is_valid) {
 }
 ```
 
-#### דרך API ישירה (לא מומלץ):
+#### דרך API ישירה (לא מומלץ)
 
 ```javascript
 // Direct API call (not recommended - use wrapper instead)
@@ -376,6 +377,7 @@ Business Logic API משולב ב-5 שלבי האיתחול של UnifiedAppInitia
 **תפקיד:** טעינת מערכות ליבה
 
 **Business Logic Integration:**
+
 - Cache System (UnifiedCacheManager, CacheTTLGuard, CacheSyncManager) נטען כאן
 - Cache System נדרש לכל ה-Business Logic API calls
 
@@ -386,6 +388,7 @@ Business Logic API משולב ב-5 שלבי האיתחול של UnifiedAppInitia
 **תפקיד:** טעינת מערכות UI
 
 **Business Logic Integration:**
+
 - ✅ לא נדרש - Business Logic לא תלוי ב-UI Systems
 
 #### Stage 3: Page Systems
@@ -393,6 +396,7 @@ Business Logic API משולב ב-5 שלבי האיתחול של UnifiedAppInitia
 **תפקיד:** טעינת מערכות עמוד ספציפיות
 
 **Business Logic Integration:**
+
 - Data Services נטענים כאן (כולל Business Logic API wrappers)
 - Custom Initializers רצים כאן - יכולים להשתמש ב-Business Logic API
 
@@ -435,6 +439,7 @@ async function initializeTradesPage(pageConfig) {
 **תפקיד:** ולידציות
 
 **Business Logic Integration:**
+
 - Business Logic API משמש לולידציות מורכבות
 - Form validations יכולים להשתמש ב-Business Logic API
 
@@ -470,6 +475,7 @@ async function validateTradeForm(form) {
 **תפקיד:** סיום איתחול
 
 **Business Logic Integration:**
+
 - Business Logic API משמש לחישובים סופיים
 - Cache invalidation אחרי mutations
 
@@ -546,6 +552,7 @@ trades: {
 ### Preferences Loading Events
 
 **Events:**
+
 - `preferences:critical-loaded` - Preferences קריטיים נטענו
 - `preferences:all-loaded` - כל ה-Preferences נטענו
 
@@ -723,11 +730,13 @@ trades: {
 ### 1. תמיד השתמש ב-Wrappers
 
 ✅ **נכון:**
+
 ```javascript
 const result = await window.TradesData.calculateStopPrice(100, 5, 'Long');
 ```
 
 ❌ **לא נכון:**
+
 ```javascript
 const response = await fetch('/api/business/trade/calculate-stop-price', {...});
 ```
@@ -735,6 +744,7 @@ const response = await fetch('/api/business/trade/calculate-stop-price', {...});
 ### 2. בדוק זמינות Data Services
 
 ✅ **נכון:**
+
 ```javascript
 if (window.TradesData?.validateTrade) {
   const result = await window.TradesData.validateTrade(data);
@@ -742,6 +752,7 @@ if (window.TradesData?.validateTrade) {
 ```
 
 ❌ **לא נכון:**
+
 ```javascript
 const result = await window.TradesData.validateTrade(data); // May fail if not loaded
 ```
@@ -749,6 +760,7 @@ const result = await window.TradesData.validateTrade(data); // May fail if not l
 ### 3. השתמש ב-CacheTTLGuard
 
 ✅ **נכון:**
+
 ```javascript
 return await window.CacheTTLGuard.ensure(cacheKey, async () => {
   // API call
@@ -756,6 +768,7 @@ return await window.CacheTTLGuard.ensure(cacheKey, async () => {
 ```
 
 ❌ **לא נכון:**
+
 ```javascript
 const response = await fetch('/api/business/...'); // No caching
 ```
@@ -763,6 +776,7 @@ const response = await fetch('/api/business/...'); // No caching
 ### 4. Invalidate Cache אחרי Mutations
 
 ✅ **נכון:**
+
 ```javascript
 if (result.status === 'success' && window.CacheSyncManager?.invalidateByAction) {
   await window.CacheSyncManager.invalidateByAction('trade-created');
@@ -770,6 +784,7 @@ if (result.status === 'success' && window.CacheSyncManager?.invalidateByAction) 
 ```
 
 ❌ **לא נכון:**
+
 ```javascript
 // No cache invalidation - stale data
 ```
@@ -777,6 +792,7 @@ if (result.status === 'success' && window.CacheSyncManager?.invalidateByAction) 
 ### 5. טיפול בשגיאות
 
 ✅ **נכון:**
+
 ```javascript
 try {
   const result = await window.TradesData.validateTrade(data);
@@ -791,6 +807,7 @@ try {
 ```
 
 ❌ **לא נכון:**
+
 ```javascript
 const result = await window.TradesData.validateTrade(data); // No error handling
 ```
@@ -802,6 +819,7 @@ const result = await window.TradesData.validateTrade(data); // No error handling
 ### 1. שכחת Cache Invalidation
 
 **בעיה:**
+
 ```javascript
 // After creating trade, cache is not invalidated
 await window.TradesData.saveTrade(tradeData);
@@ -809,6 +827,7 @@ await window.TradesData.saveTrade(tradeData);
 ```
 
 **פתרון:**
+
 ```javascript
 const result = await window.TradesData.saveTrade(tradeData);
 if (result.status === 'success' && window.CacheSyncManager?.invalidateByAction) {
@@ -819,6 +838,7 @@ if (result.status === 'success' && window.CacheSyncManager?.invalidateByAction) 
 ### 2. שימוש בקוד ישן במקום Wrapper
 
 **בעיה:**
+
 ```javascript
 // Using old local calculation instead of Business Logic API
 function calculateStopPrice(price, percentage) {
@@ -827,6 +847,7 @@ function calculateStopPrice(price, percentage) {
 ```
 
 **פתרון:**
+
 ```javascript
 // Use Business Logic API wrapper
 const stopPrice = await window.TradesData.calculateStopPrice(price, percentage, 'Long');
@@ -835,6 +856,7 @@ const stopPrice = await window.TradesData.calculateStopPrice(price, percentage, 
 ### 3. אי-שימוש ב-Custom Initializers
 
 **בעיה:**
+
 ```javascript
 // Calling Business Logic API before Data Services are loaded
 window.addEventListener('DOMContentLoaded', async () => {
@@ -843,6 +865,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 ```
 
 **פתרון:**
+
 ```javascript
 // Use Custom Initializer in page-initialization-configs.js
 customInitializers: [
@@ -856,12 +879,14 @@ customInitializers: [
 ### 4. אי-בדיקת זמינות Systems
 
 **בעיה:**
+
 ```javascript
 // Not checking if Cache System is available
 const result = await window.CacheTTLGuard.ensure(...); // May fail
 ```
 
 **פתרון:**
+
 ```javascript
 if (window.CacheTTLGuard?.ensure) {
   return await window.CacheTTLGuard.ensure(cacheKey, async () => {
@@ -876,12 +901,14 @@ const response = await fetch('/api/business/...');
 ### 5. אי-שימוש ב-CacheKeyHelper
 
 **בעיה:**
+
 ```javascript
 // Inconsistent cache keys
 const cacheKey = `business:validate-trade:${JSON.stringify(tradeData)}`;
 ```
 
 **פתרון:**
+
 ```javascript
 // Use CacheKeyHelper for consistent keys
 const cacheKey = window.CacheKeyHelper?.generateCacheKeyFromObject 

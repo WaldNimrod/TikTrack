@@ -1,4 +1,5 @@
 # LocalStorage Sync Guide - TikTrack
+
 ## מדריך סנכרון בין Tabs דרך LocalStorage Events
 
 **תאריך:** 13 ינואר 2025  
@@ -9,7 +10,8 @@
 
 ## 📋 תקציר
 
-### מה זה LocalStorage Sync?
+### מה זה LocalStorage Sync
+
 מנגנון לעדכון **מיידי** בין tabs שונים באותו דפדפן.  
 משתמש ב-Storage Events של הדפדפן - built-in, אין צורך בשרת!
 
@@ -18,9 +20,9 @@
 
 ---
 
-## 🎯 למה זה נחוץ?
+## 🎯 למה זה נחוץ
 
-### הבעיה ללא Sync:
+### הבעיה ללא Sync
 
 ```
 Tab 1: User creates trade
@@ -38,7 +40,7 @@ Tab 2: Refreshed ✅
 
 ---
 
-### הפתרון עם Sync:
+### הפתרון עם Sync
 
 ```
 Tab 1: User creates trade
@@ -56,15 +58,17 @@ Tab 2: Cache cleared + refreshed ✅
 
 ---
 
-## 🏗️ איך זה עובד?
+## 🏗️ איך זה עובד
 
 ### Browser Storage Events
 
 **הdפדפן מפעיל 'storage' event כאשר:**
+
 - Tab אחר משנה localStorage
 - **לא** ב-tab שעשה את השינוי עצמו!
 
 **דוגמה:**
+
 ```javascript
 // Tab 1:
 localStorage.setItem('test', 'value');
@@ -86,6 +90,7 @@ window.addEventListener('storage', (e) => {
 **קובץ:** `trading-ui/scripts/modules/localstorage-sync.js`
 
 **Constructor:**
+
 ```javascript
 class LocalStorageSync {
     constructor() {
@@ -96,6 +101,7 @@ class LocalStorageSync {
 ```
 
 **Auto-initialized:**
+
 ```javascript
 window.LocalStorageSync = new LocalStorageSync();
 // ✅ מתחיל להאזין מיד!
@@ -106,6 +112,7 @@ window.LocalStorageSync = new LocalStorageSync();
 ### Broadcast Method
 
 **שימוש:**
+
 ```javascript
 // Broadcast cache invalidation to other tabs:
 window.LocalStorageSync.broadcast(
@@ -115,6 +122,7 @@ window.LocalStorageSync.broadcast(
 ```
 
 **מה קורה:**
+
 ```javascript
 // Step 1: Write to localStorage
 localStorage.setItem('tiktrack_cache_invalidation', JSON.stringify({
@@ -178,6 +186,7 @@ if (window.LocalStorageSync) {
 ### 2. CRUD Operations - Future Enhancement
 
 **אופציונלי:**
+
 ```javascript
 // בtrades.js אחרי save מוצלח:
 async function saveTrade() {
@@ -201,6 +210,7 @@ async function saveTrade() {
 ## ⚠️ Limitations
 
 ### 1. רק בין Tabs של אותו User
+
 ```
 User A (Chrome) → User B (Firefox): ❌ לא עובד
 User A (Tab 1) → User A (Tab 2): ✅ עובד
@@ -211,6 +221,7 @@ User A (Tab 1) → User A (Tab 2): ✅ עובד
 ---
 
 ### 2. לא עובד בין Devices
+
 ```
 User A (Desktop) → User A (Mobile): ❌ לא עובד
 ```
@@ -220,6 +231,7 @@ User A (Desktop) → User A (Mobile): ❌ לא עובד
 ---
 
 ### 3. localStorage בלבד
+
 ```
 sessionStorage: ❌ לא מפעיל storage events
 IndexedDB: ❌ אין events
@@ -231,13 +243,15 @@ IndexedDB: ❌ אין events
 
 ## 📊 Performance
 
-### Impact:
+### Impact
+
 - **Memory:** ~1KB (class + listener)
 - **CPU:** כמעט 0 (רק כשיש event)
 - **Network:** 0 (local only!)
 - **Latency:** <100ms בין tabs
 
-### Browser Support:
+### Browser Support
+
 - ✅ Chrome/Edge: מלא
 - ✅ Firefox: מלא
 - ✅ Safari: מלא
@@ -248,6 +262,7 @@ IndexedDB: ❌ אין events
 ## 🔚 סיכום
 
 **LocalStorage Sync:**
+
 - ✅ מיידי (<100ms)
 - ✅ ללא שרת
 - ✅ פשוט מאוד
@@ -255,6 +270,7 @@ IndexedDB: ❌ אין events
 - ❌ רק בין tabs של אותו user
 
 **שילוב עם Polling:**
+
 - LocalStorage → מיידי בין tabs ✅
 - Polling → כיסוי כל השאר (10s delay) ✅
 

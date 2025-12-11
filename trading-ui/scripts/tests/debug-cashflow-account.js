@@ -11,6 +11,12 @@
  * 4. Press Enter
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Event Handlers ===
+// - changeHandler() - Changehandler
+
 (function() {
     console.log('🔍 Starting Cash Flow Account Field Debug...\n');
     

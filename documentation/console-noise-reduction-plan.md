@@ -16,14 +16,16 @@
 
 ## מערכת הלוגר הקיימת
 
-### תכונות עיקריות:
+### תכונות עיקריות
+
 1. **רמות לוג**: DEBUG, INFO, WARN, ERROR, CRITICAL
 2. **קטגוריות**: מיפוי דפים לקטגוריות (initialization, ui_components, notifications, cache, system, business)
 3. **העדפות משתמש**: שליטה על לוגים לפי קטגוריה
 4. **שליחה לשרת**: batching אוטומטי (רק במצב DEBUG או שגיאות)
 5. **מצב DEBUG**: נקבע לפי hostname או URL parameters
 
-### API של הלוגר:
+### API של הלוגר
+
 ```javascript
 // רמות לוג
 Logger.debug(message, context)
@@ -43,7 +45,8 @@ Logger.cacheOperation(operation, key, context)
 
 ### שלב 1: זיהוי לוגים חשובים להעברה
 
-#### קטגוריות לוגים שצריך להעביר:
+#### קטגוריות לוגים שצריך להעביר
+
 1. **לוגים עסקיים** (business):
    - פעולות CRUD (יצירה, עדכון, מחיקה)
    - טעינת נתונים
@@ -62,7 +65,8 @@ Logger.cacheOperation(operation, key, context)
    - שגיאות אתחול
    - בעיות טעינה
 
-#### לוגים שלא צריך להעביר:
+#### לוגים שלא צריך להעביר
+
 - לוגי debug זמניים
 - לוגים של פיתוח (debug-*.js)
 - לוגים של בדיקות (test-*.js)
@@ -70,7 +74,8 @@ Logger.cacheOperation(operation, key, context)
 
 ### שלב 2: החלפת לוגים לפי סדר עדיפות
 
-#### עדיפות גבוהה (תיקון מיידי):
+#### עדיפות גבוהה (תיקון מיידי)
+
 1. **קבצים מרכזיים**:
    - `modal-manager-v2.js` (324 לוגים)
    - `modules/core-systems.js` (258 לוגים)
@@ -81,7 +86,8 @@ Logger.cacheOperation(operation, key, context)
    - כל `console.error` → `Logger.error`
    - כל `console.warn` → `Logger.warn`
 
-#### עדיפות בינונית:
+#### עדיפות בינונית
+
 1. **לוגים עסקיים**:
    - `trades.js`, `alerts.js`, `cash_flows.js`, וכו'
    - פעולות CRUD
@@ -91,7 +97,8 @@ Logger.cacheOperation(operation, key, context)
    - פעולות משתמש
    - אירועי UI
 
-#### עדיפות נמוכה:
+#### עדיפות נמוכה
+
 1. **לוגי debug**:
    - `console.log` פשוטים
    - לוגים זמניים
@@ -99,6 +106,7 @@ Logger.cacheOperation(operation, key, context)
 ### שלב 3: דוגמאות להחלפה
 
 #### דוגמה 1: שגיאות
+
 ```javascript
 // ❌ לפני
 console.error('Failed to load data', error);
@@ -112,6 +120,7 @@ Logger.error('Failed to load data', {
 ```
 
 #### דוגמה 2: פעולות עסקיות
+
 ```javascript
 // ❌ לפני
 console.log('Trade created successfully', tradeId);
@@ -125,6 +134,7 @@ Logger.info('Trade created successfully', {
 ```
 
 #### דוגמה 3: API calls
+
 ```javascript
 // ❌ לפני
 console.log('API call:', method, url);
@@ -136,6 +146,7 @@ Logger.apiCall(method, url, status, duration, {
 ```
 
 #### דוגמה 4: Cache operations
+
 ```javascript
 // ❌ לפני
 console.log('Cache miss for key:', key);
@@ -147,6 +158,7 @@ Logger.cacheOperation('miss', key, {
 ```
 
 #### דוגמה 5: Performance
+
 ```javascript
 // ❌ לפני
 console.log('Data loaded in', duration, 'ms');
@@ -161,24 +173,28 @@ Logger.performance('Data loaded', duration, {
 ### שלב 4: כללי החלפה
 
 #### כלל 1: שגיאות תמיד
+
 ```javascript
 // כל console.error → Logger.error
 console.error(...) → Logger.error(message, { ...context, page: 'page-name' })
 ```
 
 #### כלל 2: אזהרות תמיד
+
 ```javascript
 // כל console.warn → Logger.warn
 console.warn(...) → Logger.warn(message, { ...context, page: 'page-name' })
 ```
 
 #### כלל 3: לוגים עסקיים
+
 ```javascript
 // console.log עם context עסקי → Logger.info
 console.log('User action', data) → Logger.info('User action', { ...data, page: 'page-name' })
 ```
 
 #### כלל 4: לוגי debug
+
 ```javascript
 // console.log פשוטים → Logger.debug (רק במצב DEBUG)
 console.log('Debug info') → Logger.debug('Debug info', { page: 'page-name' })
@@ -186,14 +202,16 @@ console.log('Debug info') → Logger.debug('Debug info', { page: 'page-name' })
 
 ### שלב 5: קבצים לעדכון (לפי עדיפות)
 
-#### עדיפות גבוהה:
+#### עדיפות גבוהה
+
 1. `trading-ui/scripts/modal-manager-v2.js` - 324 לוגים
 2. `trading-ui/scripts/modules/core-systems.js` - 258 לוגים
 3. `trading-ui/scripts/notifications-center.js` - 110 לוגים
 4. `trading-ui/scripts/header-system.js` - 92 לוגים
 5. `trading-ui/scripts/entity-details-renderer.js` - 90 לוגים
 
-#### עדיפות בינונית:
+#### עדיפות בינונית
+
 6. `trading-ui/scripts/modules/business-module.js` - 53 לוגים
 7. `trading-ui/scripts/services/crud-response-handler.js` - 72 לוגים
 8. `trading-ui/scripts/trades.js` - 9 לוגים
@@ -202,12 +220,14 @@ console.log('Debug info') → Logger.debug('Debug info', { page: 'page-name' })
 
 ### שלב 6: בדיקות
 
-#### בדיקות אוטומטיות:
+#### בדיקות אוטומטיות
+
 1. ספירת console.* calls לפני ואחרי
 2. בדיקת שימוש ב-Logger במקום console
 3. בדיקת context נכון (page, type, וכו')
 
-#### בדיקות ידניות:
+#### בדיקות ידניות
+
 1. פתיחת קונסולה - פחות רעש
 2. בדיקת לוגים חשובים ב-Logger
 3. בדיקת שליחה לשרת (במצב DEBUG)
@@ -215,6 +235,7 @@ console.log('Debug info') → Logger.debug('Debug info', { page: 'page-name' })
 ## דוגמאות לוגים לדוגמה
 
 ### דוגמה 1: שגיאת API
+
 ```javascript
 // לפני
 console.error('API call failed:', error);
@@ -230,6 +251,7 @@ Logger.error('API call failed', {
 ```
 
 ### דוגמה 2: פעולת משתמש
+
 ```javascript
 // לפני
 console.log('User clicked edit button', tradeId);
@@ -242,6 +264,7 @@ Logger.userAction('edit_trade', {
 ```
 
 ### דוגמה 3: טעינת נתונים
+
 ```javascript
 // לפני
 console.log('Loading trades...');
@@ -254,6 +277,7 @@ Logger.info('Loading trades', {
 ```
 
 ### דוגמה 4: Cache miss
+
 ```javascript
 // לפני
 console.log('Cache miss for trades');
@@ -265,6 +289,7 @@ Logger.cacheOperation('miss', 'trades', {
 ```
 
 ### דוגמה 5: ביצועים
+
 ```javascript
 // לפני
 const start = Date.now();
@@ -291,6 +316,7 @@ Logger.performance('Data processing', Date.now() - start, {
 ## תוצאות צפויות
 
 לאחר השלמת התוכנית:
+
 - ✅ הפחתה של 70-80% ברעש בקונסולה
 - ✅ לוגים חשובים נשלחים לשרת
 - ✅ שליטה טובה יותר על לוגים לפי קטגוריה
@@ -299,7 +325,8 @@ Logger.performance('Data processing', Date.now() - start, {
 
 ## קבצים לעדכון - סיכום
 
-### עדיפות גבוהה (5 קבצים):
+### עדיפות גבוהה (5 קבצים)
+
 1. `modal-manager-v2.js` - 324 לוגים
 2. `modules/core-systems.js` - 258 לוגים
 3. `notifications-center.js` - 110 לוגים
@@ -308,7 +335,8 @@ Logger.performance('Data processing', Date.now() - start, {
 
 **סה"כ עדיפות גבוהה**: 874 לוגים
 
-### עדיפות בינונית (10 קבצים):
+### עדיפות בינונית (10 קבצים)
+
 6. `modules/business-module.js` - 53 לוגים
 7. `services/crud-response-handler.js` - 72 לוגים
 8. `trades.js` - 9 לוגים
@@ -322,7 +350,8 @@ Logger.performance('Data processing', Date.now() - start, {
 
 **סה"כ עדיפות בינונית**: ~253 לוגים
 
-### סה"כ לעדכון:
+### סה"כ לעדכון
+
 - **עדיפות גבוהה**: 874 לוגים
 - **עדיפות בינונית**: 253 לוגים
 - **סה"כ**: 1,127 לוגים (מתוך 4,954)

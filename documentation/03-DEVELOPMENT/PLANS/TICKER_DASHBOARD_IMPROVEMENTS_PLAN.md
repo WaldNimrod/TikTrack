@@ -11,6 +11,7 @@
 ### 1. ATR - שימוש במנגנון הקיים
 
 **בעיה נוכחית:**
+
 - יש כפילות קוד לחישוב ATR ב-`ticker-dashboard.js`
 - קיים מנגנון מוכן ב-`ATRCalculator` (Backend) ו-`FieldRendererService.renderATR` (Frontend)
 - צריך להשתמש במנגנון הקיים במקום כפילות
@@ -32,10 +33,12 @@
    - הסרת כפילות ב-`renderKPICards` ו-`renderTechnicalIndicators`
 
 **קבצים לעדכון:**
+
 - `trading-ui/scripts/ticker-dashboard.js` - הסרת כפילות, שימוש ב-`FieldRendererService.renderATR()`
 - `Backend/services/entity_details_service.py` - וידוא ש-ATR נכלל בנתוני ticker
 
 **תיעוד:**
+
 - `documentation/ATR_IMPLEMENTATION_PLAN.md` - תוכנית מימוש ATR
 - `documentation/features/ATR_TRAFFIC_LIGHT_SYSTEM.md` - מערכת רמזור ATR
 
@@ -44,6 +47,7 @@
 ### 2. 52W - חישוב מחיר שיא ושפל ל-52 שבועות
 
 **דרישה:**
+
 - לממש חישוב מחיר שיא ושפל ל-52 שבועות אחרונים
 - להשתמש באותה לוגיקה כמו ATR (מנגנון כללי)
 - להציג ב-KPI Cards
@@ -76,14 +80,17 @@
    - פורמט: `"52W: {low} - {high}"` עם עיצוב נכון
 
 **קבצים חדשים:**
+
 - `Backend/services/external_data/week52_calculator.py` - Service לחישוב 52W
 
 **קבצים לעדכון:**
+
 - `Backend/services/entity_details_service.py` - הוספת 52W לנתוני ticker
 - `trading-ui/scripts/ticker-dashboard.js` - תצוגת 52W ב-KPI Cards
 - `trading-ui/scripts/services/field-renderer-service.js` - פונקציה להצגת 52W (אופציונלי)
 
 **תיעוד:**
+
 - `documentation/ATR_IMPLEMENTATION_PLAN.md` - דוגמה ללוגיקה דומה
 
 ---
@@ -91,6 +98,7 @@
 ### 3. גרף מחיר - מימוש TradingView Lightweight Charts
 
 **דרישה:**
+
 - לבדוק את עמוד המוקאפ `price-history-page.html`
 - ללמוד תעוד TradingView Lightweight Charts
 - לממש גרף מחיר בדשבורד לפי התעוד
@@ -123,10 +131,12 @@
    - Volume overlay toggle
 
 **קבצים לעדכון:**
+
 - `trading-ui/scripts/ticker-dashboard.js` - שיפור `initPriceChart()`
 - `trading-ui/scripts/services/ticker-dashboard-data.js` - שיפור `loadHistoricalData()`
 
 **תיעוד:**
+
 - `documentation/02-ARCHITECTURE/FRONTEND/TRADINGVIEW_FEATURES_CHECKLIST.md`
 - `trading-ui/mockups/daily-snapshots/price-history-page.html` - דוגמה
 
@@ -135,6 +145,7 @@
 ### 4. מדדים טכניים - איחוד לסקשן העליון
 
 **דרישה:**
+
 - לאחד את כל המדדים הטכניים לסקשן העליון
 - להסיר כפילות ATR
 - להוסיף מנגנונים כלליים לחישוב נתונים חסרים
@@ -179,10 +190,12 @@
    - הוספת info icons ליד כל מדד
 
 **קבצים חדשים:**
+
 - `trading-ui/scripts/services/technical-indicators-help.js` - הסברים בעברית
 - `Backend/services/external_data/technical_indicators_calculator.py` - חישוב מדדים
 
 **קבצים לעדכון:**
+
 - `trading-ui/ticker-dashboard.html` - הסרת סקשן נפרד, הוספת info icons
 - `trading-ui/scripts/ticker-dashboard.js` - הסרת `renderTechnicalIndicators()`, איחוד ל-`renderKPICards()`
 - `Backend/services/entity_details_service.py` - הוספת מדדים טכניים
@@ -192,6 +205,7 @@
 ### 5. תנאי דוגמה לטיקר QQQ
 
 **דרישה:**
+
 - לייצר תנאי דוגמה לטיקר QQQ (ticker_id=7) לצורך בדיקה
 
 **פעולות:**
@@ -211,9 +225,11 @@
    - הוספת תנאים דרך `/api/trade-plans/{id}/conditions`
 
 **קבצים חדשים:**
+
 - `Backend/scripts/create_sample_condition_for_qqq.py` - סקריפט ליצירת תנאי דוגמה
 
 **קבצים לבדיקה:**
+
 - `Backend/routes/api/trade_plans.py` - API ליצירת Trade Plans
 - `Backend/models/trade_plan.py` - מודל Trade Plan
 
@@ -241,19 +257,22 @@
 
 ## קבצים מרכזיים
 
-### Frontend:
+### Frontend
+
 - `trading-ui/scripts/ticker-dashboard.js` - לוגיקה ראשית
 - `trading-ui/scripts/services/ticker-dashboard-data.js` - שירותי נתונים
 - `trading-ui/scripts/services/field-renderer-service.js` - רינדור שדות
 - `trading-ui/ticker-dashboard.html` - HTML
 
-### Backend:
+### Backend
+
 - `Backend/services/entity_details_service.py` - שירות פרטי ישויות
 - `Backend/services/external_data/atr_calculator.py` - חישוב ATR
 - `Backend/services/external_data/week52_calculator.py` - חישוב 52W (חדש)
 - `Backend/services/external_data/technical_indicators_calculator.py` - חישוב מדדים (חדש)
 
-### תיעוד:
+### תיעוד
+
 - `documentation/ATR_IMPLEMENTATION_PLAN.md` - תוכנית ATR
 - `documentation/02-ARCHITECTURE/FRONTEND/TRADINGVIEW_FEATURES_CHECKLIST.md` - תעוד TradingView
 

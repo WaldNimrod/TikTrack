@@ -1,0 +1,131 @@
+{
+  "summary": {
+    "total": 9,
+    "passed": 8,
+    "failed": 1,
+    "timestamp": "2025-12-07T23:40:07.366380"
+  },
+  "results": [
+    {
+      "test": "Login",
+      "success": true,
+      "message": "Logged in successfully",
+      "details": {},
+      "timestamp": "2025-12-07T23:38:41.609563"
+    },
+    {
+      "test": "Page Load",
+      "success": true,
+      "message": "All systems loaded",
+      "details": {
+        "ModalManagerV2": true,
+        "WatchListsDataService": true,
+        "WatchListsPage": true,
+        "WatchListsUIService": true
+      },
+      "timestamp": "2025-12-07T23:38:50.854664"
+    },
+    {
+      "test": "Open Add List Modal",
+      "success": true,
+      "message": "Modal opened successfully",
+      "details": {},
+      "timestamp": "2025-12-07T23:39:04.562922"
+    },
+    {
+      "test": "Table Sorting",
+      "success": true,
+      "message": "Table registered for sorting",
+      "details": {
+        "has_sort": true,
+        "is_registered": true
+      },
+      "timestamp": "2025-12-07T23:39:13.112696"
+    },
+    {
+      "test": "Value Change Calculation",
+      "success": true,
+      "message": "Column exists",
+      "details": {
+        "has_column": true,
+        "has_data": true
+      },
+      "timestamp": "2025-12-07T23:39:22.027694"
+    },
+    {
+      "test": "Flag List Protection",
+      "success": true,
+      "message": "Flag list deletion is protected",
+      "details": {
+        "flag_list_found": true,
+        "delete_called": true,
+        "has_notification": true
+      },
+      "timestamp": "2025-12-07T23:39:32.783791"
+    },
+    {
+      "test": "Flag List Display",
+      "success": true,
+      "message": "Flag list display code exists",
+      "details": {
+        "found": false,
+        "has_code": true,
+        "results": []
+      },
+      "timestamp": "2025-12-07T23:39:41.303570"
+    },
+    {
+      "test": "Flag Buttons All Views",
+      "success": true,
+      "message": "Flag buttons code exists in all views",
+      "details": {
+        "table": false,
+        "cards": false,
+        "compact": false,
+        "has_items": {
+          "cardsItems": 0,
+          "compactItems": 0,
+          "hasCards": true,
+          "hasCompact": true,
+          "hasTable": true,
+          "tableRows": 1
+        },
+        "cards_code": true,
+        "compact_code": true
+      },
+      "timestamp": "2025-12-07T23:39:53.818353"
+    },
+    {
+      "test": "Flag Palette Functionality",
+      "success": false,
+      "message": "Flag palette did not open",
+      "details": {
+        "palette_info": {
+          "error": null,
+          "hasFlagQuickAction": true,
+          "hasWatchListsPage": true,
+          "palette_created": true,
+          "palette_opened": true,
+          "palette_visible": false
+        },
+        "final_check": {
+          "display": "block",
+          "exists": true,
+          "left": "418.406px",
+          "offsetParent": false,
+          "position": "fixed",
+          "top": "227px",
+          "visibility": "visible",
+          "visible": false,
+          "zIndex": "1050"
+        },
+        "flag_info": {
+          "found": true,
+          "hasButton": true,
+          "itemId": "60"
+        }
+      },
+      "timestamp": "2025-12-07T23:40:07.258128"
+    }
+  ]
+}

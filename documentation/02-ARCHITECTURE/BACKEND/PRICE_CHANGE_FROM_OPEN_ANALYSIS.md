@@ -33,6 +33,7 @@
 ### 📝 קבצים שנוצרו/עודכנו
 
 **Backend (7 קבצים):**
+
 - `Backend/models/external_data.py`
 - `Backend/migrations/add_open_price_fields_to_market_data_quote.py` (חדש)
 - `Backend/services/external_data/yahoo_finance_adapter.py`
@@ -43,6 +44,7 @@
 - `Backend/services/ticker_service.py`
 
 **Frontend (6 קבצים):**
+
 - `trading-ui/scripts/services/field-renderer-service.js`
 - `trading-ui/scripts/tickers.js`
 - `trading-ui/scripts/entity-details-renderer.js`
@@ -51,6 +53,7 @@
 - `trading-ui/scripts/executions.js`
 
 **תיעוד:**
+
 - `documentation/02-ARCHITECTURE/BACKEND/PRICE_CHANGE_FROM_OPEN_ANALYSIS.md` (קובץ זה)
 - `documentation/03-DEVELOPMENT/GUIDES/PRICE_CHANGE_FROM_OPEN_DEVELOPER_GUIDE.md` (חדש)
 
@@ -65,6 +68,7 @@
 לפי בדיקת הקוד הקיים, Yahoo Finance API מספק את השדות הבאים ב-`meta` object:
 
 **שדות קיימים במערכת:**
+
 - ✅ `regularMarketPrice` - מחיר נוכחי
 - ✅ `regularMarketChange` - שינוי ביחס ליום הקודם (כספי)
 - ✅ `regularMarketChangePercent` - שינוי ביחס ליום הקודם (אחוז)
@@ -72,6 +76,7 @@
 - ✅ `regularMarketVolume` - נפח מסחר
 
 **שדה חדש נדרש:**
+
 - ✅ `regularMarketOpen` - **זמין ב-Yahoo Finance API** - מחיר פתיחה של יום המסחר
 
 ### 1.2 אימות זמינות
@@ -79,6 +84,7 @@
 לפי תיעוד Yahoo Finance API, השדה `regularMarketOpen` זמין ב-`meta` object של התגובה.
 
 **דוגמת תגובה מ-Yahoo Finance:**
+
 ```json
 {
   "chart": {
@@ -103,6 +109,7 @@
 ### 2.1 MarketDataQuote Model
 
 **שדות קיימים:**
+
 ```python
 class MarketDataQuote(BaseModel):
     price = Column(Float, nullable=False)                    # מחיר נוכחי
@@ -113,6 +120,7 @@ class MarketDataQuote(BaseModel):
 ```
 
 **שדות חסרים (נדרשים):**
+
 - `open_price` - מחיר פתיחה יומי
 - `change_pct_from_open` - שינוי % מפתיחת המסחר
 - `change_amount_from_open` - שינוי כספי מפתיחת המסחר
@@ -120,6 +128,7 @@ class MarketDataQuote(BaseModel):
 ### 2.2 QuoteData Dataclass
 
 **שדות קיימים:**
+
 ```python
 @dataclass
 class QuoteData:
@@ -131,6 +140,7 @@ class QuoteData:
 ```
 
 **שדות חסרים (נדרשים):**
+
 - `open_price: Optional[float] = None`
 - `change_pct_from_open: Optional[float] = None`
 - `change_amount_from_open: Optional[float] = None`
@@ -142,23 +152,27 @@ class QuoteData:
 ### 3.1 תרחיש דוגמה
 
 **נתוני מניה לדוגמה:**
+
 - **מחיר סגירה אתמול**: $103.00
 - **מחיר פתיחה היום**: $100.00
 - **מחיר נוכחי**: $105.50
 
 ### 3.2 חישוב שינויי מחיר
 
-#### שינוי ביחס ליום הקודם (קיים):
+#### שינוי ביחס ליום הקודם (קיים)
+
 - **שינוי כספי**: $105.50 - $103.00 = **+$2.50**
 - **שינוי באחוזים**: ($2.50 / $103.00) × 100 = **+2.42%**
 
-#### שינוי מפתיחת המסחר (חדש - נדרש):
+#### שינוי מפתיחת המסחר (חדש - נדרש)
+
 - **שינוי כספי**: $105.50 - $100.00 = **+$5.50**
 - **שינוי באחוזים**: ($5.50 / $100.00) × 100 = **+5.50%**
 
 ### 3.3 דוגמת JSON Response
 
 **תגובה נוכחית (ללא שינוי מפתיחה):**
+
 ```json
 {
   "price": 105.50,
@@ -169,6 +183,7 @@ class QuoteData:
 ```
 
 **תגובה מורחבת (עם שינוי מפתיחה):**
+
 ```json
 {
   "price": 105.50,
@@ -190,6 +205,7 @@ class QuoteData:
 **קובץ**: `Backend/models/external_data.py`
 
 **שינויים נדרשים:**
+
 ```python
 class MarketDataQuote(BaseModel):
     # ... שדות קיימים ...
@@ -207,6 +223,7 @@ class MarketDataQuote(BaseModel):
 **קובץ**: `Backend/services/external_data/yahoo_finance_adapter.py`
 
 **שינויים נדרשים:**
+
 ```python
 @dataclass
 class QuoteData:
@@ -223,6 +240,7 @@ class QuoteData:
 **פונקציה**: `_parse_quote_response()`
 
 **שינויים נדרשים:**
+
 ```python
 def _parse_quote_response(self, symbol: str, data: Dict) -> Optional[QuoteData]:
     # ... קוד קיים ...
@@ -248,6 +266,7 @@ def _parse_quote_response(self, symbol: str, data: Dict) -> Optional[QuoteData]:
 **קובץ**: `Backend/services/external_data/data_normalizer.py`
 
 **שינויים נדרשים:**
+
 - הוספת `open_price` ל-`NormalizedQuote` dataclass
 - הוספת `change_pct_from_open` ו-`change_amount_from_open`
 - עדכון פונקציות aggregation
@@ -259,6 +278,7 @@ def _parse_quote_response(self, symbol: str, data: Dict) -> Optional[QuoteData]:
 **פונקציה**: `_cache_quote_by_ticker()`
 
 **שינויים נדרשים:**
+
 ```python
 def _cache_quote_by_ticker(self, quote: QuoteData, ticker: Ticker):
     # ... קוד קיים ...
@@ -275,21 +295,25 @@ def _cache_quote_by_ticker(self, quote: QuoteData, ticker: Ticker):
 ### 4.6 שלב 6: עדכון API Endpoints
 
 **קבצים:**
+
 - `Backend/routes/api/tickers.py`
 - `Backend/services/entity_details_service.py`
 - `Backend/services/position_portfolio_service.py`
 
 **שינויים נדרשים:**
+
 - הוספת השדות החדשים לתגובות API
 - עדכון documentation של endpoints
 
 ### 4.7 שלב 7: עדכון Frontend
 
 **קבצים:**
+
 - `trading-ui/scripts/external-data-service.js`
 - `trading-ui/scripts/entity-details-api.js`
 
 **שינויים נדרשים:**
+
 - הוספת שדות חדשים ל-display logic
 - עדכון UI components להצגת שינוי מפתיחה
 
@@ -306,11 +330,13 @@ def _cache_quote_by_ticker(self, quote: QuoteData, ticker: Ticker):
 ### 5.2 לוגיקת מחיר פתיחה
 
 **מחיר פתיחה יומי** (`regularMarketOpen`):
+
 - נקבע ב-09:30 ET (פתיחת המסחר)
 - נשאר קבוע לאורך כל יום המסחר
 - מתאפס למחרת ב-09:30 ET
 
 **חישוב שינוי מפתיחה:**
+
 - **במהלך יום המסחר**: מחיר נוכחי - מחיר פתיחה היום
 - **לאחר סגירת המסחר**: מחיר סגירה - מחיר פתיחה היום
 - **לפני פתיחת המסחר**: לא רלוונטי (אין מחיר פתיחה עדיין)
@@ -318,21 +344,25 @@ def _cache_quote_by_ticker(self, quote: QuoteData, ticker: Ticker):
 ### 5.3 דוגמה לפי שעות
 
 **09:30 ET** (פתיחת מסחר):
+
 - מחיר פתיחה: $100.00
 - מחיר נוכחי: $100.00
 - שינוי מפתיחה: $0.00 (0%)
 
 **12:00 ET** (במהלך המסחר):
+
 - מחיר פתיחה: $100.00
 - מחיר נוכחי: $105.50
 - שינוי מפתיחה: +$5.50 (+5.50%)
 
 **16:00 ET** (סגירת מסחר):
+
 - מחיר פתיחה: $100.00
 - מחיר נוכחי: $102.00
 - שינוי מפתיחה: +$2.00 (+2.00%)
 
 **09:30 ET למחרת**:
+
 - מחיר פתיחה חדש: $102.50
 - מחיר נוכחי: $102.50
 - שינוי מפתיחה: $0.00 (0%) - מחיר פתיחה חדש
@@ -344,6 +374,7 @@ def _cache_quote_by_ticker(self, quote: QuoteData, ticker: Ticker):
 ### 6.1 טיפול בנתונים חסרים
 
 **אם `regularMarketOpen` לא זמין:**
+
 - לא לחשב שינוי מפתיחה
 - להשאיר `open_price`, `change_pct_from_open`, `change_amount_from_open` כ-`None`
 - לא להציג שגיאה - זה נתון אופציונלי
@@ -351,6 +382,7 @@ def _cache_quote_by_ticker(self, quote: QuoteData, ticker: Ticker):
 ### 6.2 עדכון מחיר פתיחה
 
 **מתי לעדכן:**
+
 - בכל fetch חדש מ-Yahoo Finance
 - רק אם `regularMarketOpen` זמין בתגובה
 - אם מחיר פתיחה השתנה (נדיר - רק אם יש תיקון נתונים)
@@ -358,12 +390,14 @@ def _cache_quote_by_ticker(self, quote: QuoteData, ticker: Ticker):
 ### 6.3 Cache Invalidation
 
 **מתי לנקות cache:**
+
 - לא נדרש - מחיר פתיחה מתעדכן אוטומטית בכל fetch
 - אם יש בעיה עם נתונים ישנים, לנקות cache של ticker ספציפי
 
 ### 6.4 Backward Compatibility
 
 **תאימות לאחור:**
+
 - שדות חדשים הם `nullable=True` - לא ישבור קוד קיים
 - Frontend צריך לבדוק אם שדות קיימים לפני הצגה
 - API endpoints מחזירים שדות חדשים רק אם זמינים
@@ -381,6 +415,7 @@ def _cache_quote_by_ticker(self, quote: QuoteData, ticker: Ticker):
 ### 7.2 סדר עדיפויות
 
 **גבוה:**
+
 1. הרחבת מודל בסיס הנתונים
 2. עדכון Yahoo Finance Adapter
 3. עדכון Cache Logic

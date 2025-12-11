@@ -20,6 +20,7 @@
 ## סקירה כללית
 
 מערכת האופטימיזציה של טעינת נתונים חיצוניים מבטיחה שהמערכת:
+
 - **טוענת רק נתונים חסרים** (לא את כל הנתונים)
 - **משתמשת בגודל קבוצות אופטימלי** (25 טיקרים)
 - **טוענת נתונים היסטוריים פעם ביום** (אחרי סגירת השוק)
@@ -63,6 +64,7 @@ Database + Cache
 **תפקיד:** מזהה בדיוק מה חסר לכל טיקר.
 
 **שימוש:**
+
 ```python
 from services.external_data.missing_data_checker import MissingDataChecker
 
@@ -87,6 +89,7 @@ if missing_data['should_refresh_historical']:
 **תפקיד:** מגדיר תדירויות רענון שונות לסוגי נתונים.
 
 **שימוש:**
+
 ```python
 from services.external_data.data_refresh_policy import DataRefreshPolicy
 
@@ -106,6 +109,7 @@ if policy.should_refresh_quote(ticker_id, last_refresh, ticker.status, has_activ
 **תפקיד:** רענון אוטומטי של נתונים ברקע.
 
 **תכונות:**
+
 - רענון quotes נוכחיים (בהתאם ל-DataRefreshPolicy)
 - טעינת נתונים היסטוריים פעם ביום (אחרי 5 PM NY time)
 - חישוב אינדיקטורים אוטומטי (אחרי טעינת נתונים היסטוריים)
@@ -113,6 +117,7 @@ if policy.should_refresh_quote(ticker_id, last_refresh, ticker.status, has_activ
 - לוגיקה דינמית להקטנת גודל קבוצה במקרה של שגיאות
 
 **שימוש:**
+
 ```python
 from services.data_refresh_scheduler import DataRefreshScheduler
 
@@ -127,6 +132,7 @@ scheduler.start()  # Start automatic refresh
 **תפקיד:** טעינת נתונים מ-Yahoo Finance.
 
 **תכונות:**
+
 - גודל קבוצות אופטימלי (25 טיקרים)
 - Rate limiting
 - Retry logic
@@ -139,6 +145,7 @@ scheduler.start()  # Start automatic refresh
 ### 1. טעינת נתונים חסרים לטיקר בודד
 
 **Frontend:**
+
 ```javascript
 // Use MissingDataChecker API first
 const missingData = await fetch('/api/external-data/status/tickers/missing-data');
@@ -155,6 +162,7 @@ if (tickersWithMissing.data.recommendations.find(r => r.ticker_id === tickerId))
 ```
 
 **Backend:**
+
 ```python
 # Endpoint: POST /api/external-data/quotes/{ticker_id}/refresh
 from services.external_data.missing_data_checker import MissingDataChecker
@@ -179,6 +187,7 @@ if missing_data['should_refresh_indicators']:
 ### 2. טעינת נתונים חסרים לכל הטיקרים
 
 **Frontend:**
+
 ```javascript
 // Get list of tickers with missing data
 const missingData = await fetch('/api/external-data/status/tickers/missing-data');
@@ -193,6 +202,7 @@ for (const ticker of tickers.data.recommendations) {
 ```
 
 **Backend:**
+
 ```python
 # Endpoint: POST /api/external-data/refresh/all
 from services.external_data.missing_data_checker import MissingDataChecker
@@ -210,6 +220,7 @@ for ticker in open_tickers:
 ### 3. טעינת נתונים מלאה (כל הנתונים)
 
 **Frontend:**
+
 ```javascript
 // Load full data (current + historical + indicators)
 await window.ExternalDataService.refreshTickerData(tickerId, {
@@ -220,6 +231,7 @@ await window.ExternalDataService.refreshTickerData(tickerId, {
 ```
 
 **Backend:**
+
 ```python
 # Endpoint: POST /api/external-data/refresh/full
 # This endpoint still uses MissingDataChecker to optimize
@@ -233,6 +245,7 @@ await window.ExternalDataService.refreshTickerData(tickerId, {
 ### 1. תמיד לבדוק מה חסר לפני טעינה
 
 ✅ **נכון:**
+
 ```python
 # Check what's missing first
 missing_data = checker.check_missing_data(ticker_id)
@@ -243,6 +256,7 @@ if missing_data['should_refresh_quote']:
 ```
 
 ❌ **לא נכון:**
+
 ```python
 # Always load everything - לא יעיל!
 # Load quote, historical, indicators - always
@@ -251,6 +265,7 @@ if missing_data['should_refresh_quote']:
 ### 2. שימוש ב-DataRefreshPolicy
 
 ✅ **נכון:**
+
 ```python
 # Use policy to determine refresh frequency
 if policy.should_refresh_quote(ticker_id, last_refresh, ticker.status, has_active):
@@ -259,6 +274,7 @@ if policy.should_refresh_quote(ticker_id, last_refresh, ticker.status, has_activ
 ```
 
 ❌ **לא נכון:**
+
 ```python
 # Always refresh without checking policy
 # Refresh quote - always
@@ -267,6 +283,7 @@ if policy.should_refresh_quote(ticker_id, last_refresh, ticker.status, has_activ
 ### 3. גודל קבוצות אופטימלי
 
 ✅ **נכון:**
+
 ```python
 # Use optimal batch size (25)
 batch_size = 25
@@ -277,6 +294,7 @@ for i in range(0, len(tickers), batch_size):
 ```
 
 ❌ **לא נכון:**
+
 ```python
 # Too small or too large batches
 batch_size = 5  # Too small - inefficient
@@ -286,6 +304,7 @@ batch_size = 100  # Too large - may cause errors
 ### 4. לוגיקה דינמית להקטנת גודל קבוצה
 
 ✅ **נכון:**
+
 ```python
 # Dynamic batch size adjustment
 if failure_rate > 0.5:
@@ -299,6 +318,7 @@ if failure_rate > 0.5:
 ### בעיה: המערכת טוענת את כל הנתונים גם אם רק חלק חסר
 
 **פתרון:**
+
 - ודא ש-`MissingDataChecker` משמש לפני טעינה
 - ודא ש-`forceRefresh: false` ב-Frontend
 - בדוק את ה-endpoint ב-Backend - האם הוא משתמש ב-`MissingDataChecker`?
@@ -306,6 +326,7 @@ if failure_rate > 0.5:
 ### בעיה: Rate limiting (429 errors)
 
 **פתרון:**
+
 - זה נורמלי בבדיקות אוטומטיות מהירות
 - Rate limiting הוא מנגנון הגנה חשוב
 - אין צורך בשינוי
@@ -313,6 +334,7 @@ if failure_rate > 0.5:
 ### בעיה: נתונים היסטוריים לא נטענים
 
 **פתרון:**
+
 - בדוק אם Scheduler רץ (`/api/external-data/status/scheduler/monitoring`)
 - בדוק אם זה אחרי 5 PM NY time (נתונים היסטוריים נטענים פעם ביום)
 - בדוק את ה-logs של Scheduler
@@ -320,6 +342,7 @@ if failure_rate > 0.5:
 ### בעיה: אינדיקטורים לא מחושבים
 
 **פתרון:**
+
 - ודא שיש מספיק נתונים היסטוריים (150 quotes ל-MA 150)
 - בדוק את ה-logs של `_calculate_technical_indicators()`
 - ודא ש-`TechnicalIndicatorsCalculator` ו-`Week52Calculator` עובדים

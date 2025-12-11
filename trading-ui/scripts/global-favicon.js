@@ -8,6 +8,20 @@
  * @created 2025-09-22
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Event Handlers ===
+// - setGlobalFavicon() - Setglobalfavicon
+// - setPageSpecificFavicon() - Setpagespecificfavicon
+// - autoSetFavicon() - Autosetfavicon
+// - setFavicon() - Setfavicon
+// - updateFaviconBasedOnStatus() - Updatefaviconbasedonstatus
+// - restoreFaviconFromStatus() - Restorefaviconfromstatus
+
+// === Data Functions ===
+// - getCurrentAppStatus() - Getcurrentappstatus
+
 /**
  * Set favicon for the current page
  * מגדיר favicon לעמוד הנוכחי

@@ -10,6 +10,12 @@
  * 3. Run: window.debugWatchListsData()
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Data Functions ===
+// - debugWatchListsData() - Debugwatchlistsdata
+
 (function() {
     'use strict';
 
@@ -222,5 +228,11 @@
         console.log('💡 Run window.debugWatchListsData() in console after selecting a list with items');
     }
 })();
+
+
+
+
+
+
 
 

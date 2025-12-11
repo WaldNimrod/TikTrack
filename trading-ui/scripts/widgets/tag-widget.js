@@ -13,6 +13,64 @@
  * Documentation: See documentation/03-DEVELOPMENT/GUIDES/TAG_WIDGET_DEVELOPER_GUIDE.md
  */
 
+
+// ===== FUNCTION INDEX =====
+// === Object Methods ===
+// - firstButton.onclick() - Onclick
+// - lastButton.onclick() - Onclick
+// - nextButton.onclick() - Onclick
+// - pageButton.onclick() - Onclick
+// - prevButton.onclick() - Onclick
+
+// === Initialization ===
+// - initAutocomplete() - Initautocomplete
+// - buildDrawerRow() - Builddrawerrow
+// - buildEntitySubtitle() - Buildentitysubtitle
+
+// === Event Handlers ===
+// - applyHeightConfiguration() - Applyheightconfiguration
+// - bindEvents() - Bindevents
+// - handleQuickSearchSubmit() - Handlequicksearchsubmit
+// - addPaginationControls() - Addpaginationcontrols
+// - processButtons() - Processbuttons
+// - handleApproveAction() - Handleapproveaction
+// - handleRejectAction() - Handlerejectaction
+
+// === UI Functions ===
+// - refreshTagCloud() - Refreshtagcloud
+// - showTagCloudError() - Showtagclouderror
+// - renderTagCloud() - Rendertagcloud
+// - updateStatus() - Updatestatus
+// - hideDrawerMessages() - Hidedrawermessages
+// - showDrawerError() - Showdrawererror
+// - renderDrawerRows() - Renderdrawerrows
+
+// === Data Functions ===
+// - getTierClass() - Gettierclass
+// - getTierNumber() - Gettiernumber
+// - hydrateRowMetadata() - Hydraterowmetadata
+// - resolveEntityMetadata() - Resolveentitymetadata
+// - loadMoreResults() - Loadmoreresults
+
+// === Utility Functions ===
+// - formatDate() - Formatdate
+// - check() - Check
+
+// === Other ===
+// - cacheElements() - Cacheelements
+// - ensureDrawerChrome() - Ensuredrawerchrome
+// - toggleTagCloudState() - Toggletagcloudstate
+// - applyTagFromCloud() - Applytagfromcloud
+// - performSearch() - Performsearch
+// - countAssignments() - Countassignments
+// - waitForRequired() - Waitforrequired
+// - openDrawer() - Opendrawer
+// - hydrateDrawer() - Hydratedrawer
+// - goToPage() - Gotopage
+// - navigateToEntity() - Navigatetoentity
+// - openEntityDetails() - Openentitydetails
+// - escapeHtml() - Escapehtml
+
 ;(function () {
   'use strict';
 

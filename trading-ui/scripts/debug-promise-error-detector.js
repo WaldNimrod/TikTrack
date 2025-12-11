@@ -6,6 +6,21 @@
  * ומדווח על כל מקרה שבו Promise מועבר במקום string.
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - init() - Init
+
+// === Event Handlers ===
+// - monitorFetch() - Monitorfetch
+// - monitorScriptSrc() - Monitorscriptsrc
+// - monitorHref() - Monitorhref
+// - monitorSetAttribute() - Monitorsetattribute
+
+// === Other ===
+// - logError() - Logerror
+
 (function() {
     'use strict';
 

@@ -1,4 +1,5 @@
 # תיקון שגיאות 404 - עמודי מוקאפ
+
 # 404 Errors Fixed - Mockups Pages
 
 **תאריך:** $(date +"%Y-%m-%d %H:%M")

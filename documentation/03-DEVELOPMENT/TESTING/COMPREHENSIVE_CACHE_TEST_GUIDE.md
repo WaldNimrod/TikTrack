@@ -1,4 +1,5 @@
 # מדריך בדיקה מקיפה - מערכת רמות ניקוי מטמון
+
 # =======================================================
 
 **תאריך:** 11 אוקטובר 2025  
@@ -26,13 +27,16 @@
 ### **תכולת הבדיקה:**
 
 #### **Light Level Test:**
+
 **דוגמים:**
+
 1. Memory: `test-light-memory`
 2. localStorage tiktrack_*: `tiktrack_test-light-ls`
 3. IndexedDB: `test-light-idb`
 4. Orphan: `test-light-orphan`
 
 **Validates:**
+
 - ✅ Memory cleared
 - ✅ localStorage preserved
 - ✅ IndexedDB preserved
@@ -41,7 +45,9 @@
 ---
 
 #### **Medium Level Test:**
+
 **דוגמים:**
+
 1. Memory: `test-med-memory`
 2. localStorage: `tiktrack_test-med-ls`
 3. IndexedDB: `test-med-idb`
@@ -50,6 +56,7 @@
 6. Orphan 2: `colorScheme` (real orphan!)
 
 **Validates:**
+
 - ✅ Memory cleared
 - ✅ localStorage cleared
 - ✅ IndexedDB cleared
@@ -59,9 +66,11 @@
 ---
 
 #### **Full Level Test:**
+
 **דוגמים מכל קטגוריה:**
 
 **קטגוריה 1: State (2 keys)**
+
 1. `cashFlowsSectionState`
 2. `executionsTopSectionCollapsed`
 
@@ -90,6 +99,7 @@
 16. `some-random-key` (should be preserved)
 
 **Validates:**
+
 - ✅ All 15 orphans cleared (100%)
 - ✅ Validated per category (5 categories)
 - ✅ Non-orphan key preserved
@@ -98,14 +108,17 @@
 ---
 
 #### **Nuclear Level Test:**
+
 **⚠️ Manual only - too destructive!**
 
 **If you really need to test:**
+
 ```javascript
 await testLevel_Nuclear_Confirmed()
 ```
 
 **Validates:**
+
 - ALL localStorage cleared (count=0)
 - IndexedDB database deleted
 - sessionStorage cleared
@@ -117,6 +130,7 @@ await testLevel_Nuclear_Confirmed()
 ## 📋 **איך להריץ**
 
 ### **Option 1: בממשק (מומלץ)**
+
 1. פתח http://localhost:8080/cache-test
 2. גלול ל"בדיקות מערכת מטמון"
 3. לחץ **"🔬 בדיקה מקיפה"**
@@ -124,6 +138,7 @@ await testLevel_Nuclear_Confirmed()
 5. קבל הודעה עם תוצאות
 
 ### **Option 2: בConsole**
+
 ```javascript
 // בדיקה מלאה של כל הרמות
 const results = await runComprehensiveCacheClearingTest();
@@ -133,6 +148,7 @@ console.table(results);
 ```
 
 ### **Option 3: רמה ספציפית**
+
 ```javascript
 // בדוק רק Light
 const lightResult = await testLevel_Light();
@@ -148,6 +164,7 @@ console.log(fullResult);
 ```
 
 ### **Option 4: Quick Verify**
+
 ```javascript
 // בדיקה מהירה - דוגם key אחד בלבד מכל ענף
 await quickVerifyLevel('light');   // 2 שניות
@@ -254,6 +271,7 @@ Before: {memory: true, localStorage: true, indexedDB: true, backend: true, ...}
 ## 🔍 **Refresh Detection - איך לדעת שהיה ריענון**
 
 ### **בעיה:**
+
 ```javascript
 // Value זהה - איך נדע שהיה refresh?
 localStorage.setItem('key', 'value');
@@ -276,6 +294,7 @@ console.log(check);
 ```
 
 **דוגמה מלאה:**
+
 ```javascript
 // Step 1: Create marker
 const original = createRefreshMarker('test-refresh-key');
@@ -450,6 +469,7 @@ console.log('Was refreshed?', check);
 ```
 
 **פירוש:**
+
 - ✅ **כל 15 ה-orphans נמחקו** (100%)
 - ✅ **כל 5 הקטגוריות עברו** (State, Prefs, Auth, Testing, Dynamic)
 - ✅ **Keys שלא ברשימה נשמרו** (בטיחות)
@@ -459,6 +479,7 @@ console.log('Was refreshed?', check);
 ## 🎯 **תרחישי בדיקה**
 
 ### **תרחיש 1: לפני release**
+
 ```javascript
 // וודא שכל הרמות עובדות
 const results = await runComprehensiveCacheClearingTest();
@@ -474,6 +495,7 @@ if (results.light.passed && results.medium.passed && results.full.passed) {
 ---
 
 ### **תרחיש 2: debug ספציפי**
+
 ```javascript
 // יש בעיה עם orphan keys?
 const fullResult = await testLevel_Full();
@@ -488,6 +510,7 @@ console.log(fullResult.details.categories);
 ---
 
 ### **תרחיש 3: בדיקה מהירה יומיומית**
+
 ```javascript
 // בדוק רק Medium (ברירת המחדל)
 const result = await quickVerifyLevel('medium');
@@ -500,6 +523,7 @@ if (result.passed) {
 ---
 
 ### **תרחיש 4: Refresh Detection**
+
 ```javascript
 // רוצה לדעת אם UnifiedCacheManager באמת שומר מחדש
 
@@ -527,6 +551,7 @@ await UnifiedCacheManager.save(marker.key, marker.value);
 ## ✅ **Expected Results**
 
 ### **All Tests Passed:**
+
 ```
 ✅ Tests Passed: 3/3
 📊 Success Rate: 100.0%
@@ -551,14 +576,17 @@ Nuclear: ⚠️ Manual only
 ### **If a Test Fails:**
 
 **Light Failed:**
+
 - ❌ Problem: Memory not clearing
 - → Check: UnifiedCacheManager.layers.memory.clear()
 
 **Medium Failed:**
+
 - ❌ Problem: localStorage not clearing
 - → Check: LocalStorageLayer.clear() implementation
 
 **Full Failed:**
+
 - ❌ Problem: Orphans not clearing
 - → Check: ORPHAN_KEYS constant
 - → Check: clearOrphanKeys() function
@@ -569,6 +597,7 @@ Nuclear: ⚠️ Manual only
 ## 🔧 **Troubleshooting**
 
 ### **בעיה: "Memory not cleared in Light"**
+
 ```javascript
 // Debug:
 console.log(window.UnifiedCacheManager.layers.memory.cache);
@@ -578,6 +607,7 @@ console.log(window.UnifiedCacheManager.layers.memory.cache);
 ```
 
 ### **בעיה: "Orphans not cleared in Full"**
+
 ```javascript
 // Debug: check which orphans stayed
 const remaining = [];
@@ -595,6 +625,7 @@ console.log('Remaining orphans:', remaining);
 ```
 
 ### **בעיה: "Test hangs/freezes"**
+
 ```javascript
 // הוסף timeout
 Promise.race([
@@ -610,6 +641,7 @@ Promise.race([
 ## 📝 **Manual Testing Checklist**
 
 ### **לפני כל release:**
+
 - [ ] הרץ `runComprehensiveCacheClearingTest()`
 - [ ] וודא 3/3 passed
 - [ ] בדוק Console - אין שגיאות
@@ -623,6 +655,7 @@ Promise.race([
 ## 🎓 **Advanced Usage**
 
 ### **דוגמה: בדיקת Service Cache ספציפי**
+
 ```javascript
 // בדוק אם YahooFinanceService מנוקה ב-Light
 
@@ -639,6 +672,7 @@ console.log('After:', window.YahooFinanceService.cache.size);
 ```
 
 ### **דוגמה: בדיקת Dynamic Pattern**
+
 ```javascript
 // בדוק אם sortState_* מנוקה ב-Full
 

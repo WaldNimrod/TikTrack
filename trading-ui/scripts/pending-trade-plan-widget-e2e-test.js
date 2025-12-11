@@ -20,6 +20,29 @@
  * ואז: window.runPendingTradePlanWidgetE2ETests()
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - testWidgetInitialization() - Testwidgetinitialization
+
+// === Event Handlers ===
+// - testOpenPlanCreationModal() - Testopenplancreationmodal
+// - testDismissSuggestion() - Testdismisssuggestion
+
+// === UI Functions ===
+// - testRendering() - Testrendering
+// - testAutoRefresh() - Testautorefresh
+
+// === Data Functions ===
+// - testDataLoading() - Testdataloading
+// - runPendingTradePlanWidgetE2ETests() - Runpendingtradeplanwidgete2Etests
+
+// === Other ===
+// - testAssignTradeToPlan() - Testassigntradetoplan
+// - testCacheClearing() - Testcacheclearing
+// - testGeneralSystemsUsage() - Testgeneralsystemsusage
+
 (function() {
   'use strict';
 

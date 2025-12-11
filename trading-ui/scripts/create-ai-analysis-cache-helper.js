@@ -8,6 +8,12 @@
  * 3. Run: createAIAnalysisCacheEntries()
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - createAIAnalysisCacheEntries() - Createaianalysiscacheentries
+
 async function createAIAnalysisCacheEntries() {
   console.log('🔧 Creating AI Analysis cache entries...');
   
@@ -18,9 +24,7 @@ async function createAIAnalysisCacheEntries() {
 
   // Get all completed analyses
   try {
-    const response = await fetch('/api/ai-analysis/history', {
-      credentials: 'include'
-    });
+    const response = await fetch('/api/ai-analysis/history', { });
     
     if (!response.ok) {
       console.error('❌ Failed to fetch history');
@@ -104,6 +108,12 @@ async function createAIAnalysisCacheEntries() {
 window.createAIAnalysisCacheEntries = createAIAnalysisCacheEntries;
 
 console.log('✅ Helper script loaded. Run: createAIAnalysisCacheEntries()');
+
+
+
+
+
+
 
 
 

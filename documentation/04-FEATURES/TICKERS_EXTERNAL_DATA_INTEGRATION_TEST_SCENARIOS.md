@@ -1,6 +1,7 @@
 # תרחישי בדיקה - אינטגרציה דשבורד טיקרים עם מערכת נתונים חיצוניים
 
 ## מטרה
+
 מסמך זה מכיל תרחישי בדיקה מדויקים ומפורטים לבדיקת האינטגרציה המלאה בין דשבורד הטיקרים למערכת הנתונים החיצוניים.
 
 **תאריך יצירה:** 6 בדצמבר 2025  
@@ -27,9 +28,11 @@
 ## תרחיש 1: טעינה ראשונית של עמוד טיקרים
 
 ### מטרה
+
 לבדוק שעמוד הטיקרים נטען בהצלחה וכל המערכות הנדרשות זמינות.
 
 ### תנאים מקדימים
+
 - השרת רץ על `http://127.0.0.1:8080`
 - יש לפחות טיקר אחד במסד הנתונים
 - המשתמש מחובר למערכת
@@ -44,6 +47,7 @@
    - פתח את Console (F12)
    - בדוק שאין שגיאות קריטיות (SEVERE)
    - בדוק שההודעות הבאות מופיעות:
+
      ```
      ✅ Logger Service initialized successfully
      ✅ Header System v7.0.0 loaded successfully
@@ -56,6 +60,7 @@
 3. **בדיקת זמינות פונקציות**
    - בחר Console
    - הרץ את הפקודות הבאות:
+
      ```javascript
      typeof window.checkTickerDataCompleteness === 'function'
      typeof window.checkTickersDataCompleteness === 'function'
@@ -64,6 +69,7 @@
      typeof window.loadAndRefreshMissingData === 'function'
      typeof window.getDataStatusBadge === 'function'
      ```
+
    - **תוצאה צפויה:** כל הפקודות מחזירות `true`
 
 4. **בדיקת טעינת טבלה**
@@ -82,11 +88,13 @@
 ### תוצאות צפויות
 
 ✅ **הצלחה:**
+
 - העמוד נטען ללא שגיאות
 - כל הפונקציות זמינות
 - הטבלה מוצגת עם נתונים
 
 ❌ **כשלון:**
+
 - שגיאות JavaScript בקונסול
 - פונקציות חסרות
 - טבלה ריקה או לא מופיעה
@@ -96,9 +104,11 @@
 ## תרחיש 2: בדיקת שלמות נתונים אוטומטית
 
 ### מטרה
+
 לבדוק שהמערכת בודקת אוטומטית את שלמות הנתונים לכל טיקר.
 
 ### תנאים מקדימים
+
 - עמוד טיקרים פתוח
 - יש לפחות 3 טיקרים במסד הנתונים
 
@@ -114,15 +124,18 @@
 
 3. **בדיקת לוגים**
    - חפש בלוגים את ההודעות הבאות:
+
      ```
      Enriching tickers with full data
      Found tickers with incomplete data
      ```
+
    - בדוק שהמערכת בודקת את השלמות של כל טיקר
 
 4. **בדיקת פונקציה ידנית**
    - בחר Console
    - הרץ:
+
      ```javascript
      // קבלת רשימת טיקרים
      const tickers = window.TableDataRegistry?.getFilteredData('tickers') || [];
@@ -133,7 +146,9 @@
        console.log('Data Completeness Summary:', result);
      }
      ```
+
    - **תוצאה צפויה:** אובייקט עם:
+
      ```javascript
      {
        total: 58,
@@ -147,11 +162,13 @@
 ### תוצאות צפויות
 
 ✅ **הצלחה:**
+
 - המערכת בודקת אוטומטית את שלמות הנתונים
 - הלוגים מציגים סיכום מדויק
 - הפונקציה `checkTickersDataCompleteness` עובדת
 
 ❌ **כשלון:**
+
 - אין לוגים של בדיקת שלמות
 - הפונקציה לא עובדת או מחזירה שגיאה
 
@@ -160,9 +177,11 @@
 ## תרחיש 3: העשרת נתונים אוטומטית
 
 ### מטרה
+
 לבדוק שהמערכת מעשירה אוטומטית את הנתונים עם נתונים מלאים (היסטוריים + חישובים טכניים).
 
 ### תנאים מקדימים
+
 - עמוד טיקרים פתוח
 - יש לפחות טיקר אחד עם נתונים בסיסיים
 
@@ -178,16 +197,19 @@
 
 3. **בדיקת לוגים של העשרה**
    - חפש בלוגים את ההודעות הבאות:
+
      ```
      Enriching tickers with full data
      Enriched ticker with full data
      Loaded full ticker data from cache
      ```
+
    - בדוק שהמערכת מעשירה את הנתונים
 
 4. **בדיקת נתונים מועשרים**
    - בחר Console
    - הרץ:
+
      ```javascript
      // קבלת רשימת טיקרים
      const tickers = window.TableDataRegistry?.getFilteredData('tickers') || [];
@@ -205,26 +227,31 @@
        historicalCount: enrichedTicker.historical_quotes_count
      });
      ```
+
    - **תוצאה צפויה:** לפחות חלק מהשדות מופיעים (ATR, Week52, וכו')
 
 5. **בדיקת Cache**
    - הרץ:
+
      ```javascript
      // בדיקת Cache
      const cacheKey = `ticker-full-${tickers[0].id}`;
      const cached = await window.UnifiedCacheManager?.get(cacheKey, 'memory');
      console.log('Cached Data:', cached ? 'Found' : 'Not Found');
      ```
+
    - **תוצאה צפויה:** הנתונים נשמרים ב-Cache
 
 ### תוצאות צפויות
 
 ✅ **הצלחה:**
+
 - המערכת מעשירה אוטומטית את הנתונים
 - הנתונים נשמרים ב-Cache
 - השדות הטכניים (ATR, Week52, וכו') מופיעים
 
 ❌ **כשלון:**
+
 - אין לוגים של העשרה
 - הנתונים לא מועשרים
 - Cache לא עובד
@@ -234,9 +261,11 @@
 ## תרחיש 4: הצגת אינדיקטורי סטטוס
 
 ### מטרה
+
 לבדוק שהאינדיקטורים של סטטוס נתונים מוצגים בטבלה.
 
 ### תנאים מקדימים
+
 - עמוד טיקרים פתוח
 - יש לפחות טיקר אחד עם נתונים מועשרים
 
@@ -254,6 +283,7 @@
    - בחר Element Inspector
    - בחר אחד מה-Badges
    - בדוק שה-CSS Classes הבאים קיימים:
+
      ```css
      .data-status-badge
      .status-full / .status-partial / .status-missing
@@ -262,6 +292,7 @@
 3. **בדיקת פונקציה ידנית**
    - בחר Console
    - הרץ:
+
      ```javascript
      // קבלת רשימת טיקרים
      const tickers = window.TableDataRegistry?.getFilteredData('tickers') || [];
@@ -272,6 +303,7 @@
        console.log('Status Badge HTML:', badge);
      }
      ```
+
    - **תוצאה צפויה:** HTML של Badge עם Class מתאים
 
 4. **בדיקת מספר Badges**
@@ -281,11 +313,13 @@
 ### תוצאות צפויות
 
 ✅ **הצלחה:**
+
 - Badges מוצגים בכל שורה
 - הצבעים נכונים (ירוק/צהוב/אדום)
 - ה-CSS Classes נכונים
 
 ❌ **כשלון:**
+
 - אין Badges בטבלה
 - Badges לא מוצגים נכון
 - CSS Classes חסרים
@@ -295,9 +329,11 @@
 ## תרחיש 5: טעינת נתונים היסטוריים חסרים
 
 ### מטרה
+
 לבדוק שהמערכת טוענת אוטומטית נתונים היסטוריים חסרים.
 
 ### תנאים מקדימים
+
 - עמוד טיקרים פתוח
 - יש לפחות טיקר אחד עם פחות מ-150 quotes היסטוריים
 
@@ -306,6 +342,7 @@
 1. **זיהוי טיקר עם נתונים חסרים**
    - בחר Console
    - הרץ:
+
      ```javascript
      // קבלת רשימת טיקרים
      const tickers = window.TableDataRegistry?.getFilteredData('tickers') || [];
@@ -322,10 +359,12 @@
        historicalCount: incompleteTicker?.historical_quotes_count
      });
      ```
+
    - **תוצאה צפויה:** טיקר עם `historical_quotes_count < 150`
 
 2. **טעינת נתונים היסטוריים**
    - הרץ:
+
      ```javascript
      if (incompleteTicker && typeof window.ensureHistoricalDataForTickers === 'function') {
        const result = await window.ensureHistoricalDataForTickers([incompleteTicker], {
@@ -335,11 +374,13 @@
        console.log('Historical Data Load Result:', result);
      }
      ```
+
    - **תוצאה צפויה:** Progress Overlay מופיע, נתונים נטענים
 
 3. **בדיקת Progress Overlay**
    - בדוק ש-Progress Overlay מופיע
    - בדוק שההודעות הבאות מופיעות:
+
      ```
      טוען נתונים היסטוריים
      טוען נתונים היסטוריים עבור [SYMBOL] (1/1)
@@ -348,6 +389,7 @@
 4. **בדיקת תוצאה**
    - המתן לסיום התהליך (30-60 שניות)
    - בדוק שהנתונים נטענו:
+
      ```javascript
      // בדיקת נתונים מעודכנים
      const updatedTicker = await window.entityDetailsAPI.getEntityDetails('ticker', incompleteTicker.id, {
@@ -357,16 +399,19 @@
      
      console.log('Updated Historical Count:', updatedTicker.historical_quotes_count);
      ```
+
    - **תוצאה צפויה:** `historical_quotes_count >= 150`
 
 ### תוצאות צפויות
 
 ✅ **הצלחה:**
+
 - Progress Overlay מופיע
 - נתונים היסטוריים נטענים
 - מספר ה-quotes עולה
 
 ❌ **כשלון:**
+
 - Progress Overlay לא מופיע
 - נתונים לא נטענים
 - שגיאות בקונסול
@@ -376,9 +421,11 @@
 ## תרחיש 6: רענון נתונים חסרים
 
 ### מטרה
+
 לבדוק שהמערכת מרעננת אוטומטית נתונים חסרים.
 
 ### תנאים מקדימים
+
 - עמוד טיקרים פתוח
 - יש לפחות טיקר אחד עם נתונים חסרים
 
@@ -387,6 +434,7 @@
 1. **זיהוי טיקרים עם נתונים חסרים**
    - בחר Console
    - הרץ:
+
      ```javascript
      // קבלת רשימת טיקרים
      const tickers = window.TableDataRegistry?.getFilteredData('tickers') || [];
@@ -395,10 +443,12 @@
      const completeness = await window.checkTickersDataCompleteness(tickers);
      console.log('Completeness Summary:', completeness);
      ```
+
    - **תוצאה צפויה:** רשימת טיקרים עם נתונים חסרים
 
 2. **רענון נתונים חסרים**
    - הרץ:
+
      ```javascript
      if (typeof window.loadAndRefreshMissingData === 'function') {
        const result = await window.loadAndRefreshMissingData(tickers, {
@@ -408,11 +458,13 @@
        console.log('Refresh Result:', result);
      }
      ```
+
    - **תוצאה צפויה:** Progress Overlay מופיע, נתונים מתעדכנים
 
 3. **בדיקת Progress Overlay**
    - בדוק ש-Progress Overlay מופיע
    - בדוק שההודעות הבאות מופיעות:
+
      ```
      מרענן נתונים חסרים
      מרענן נתונים עבור [SYMBOL] (1/N)
@@ -421,21 +473,25 @@
 4. **בדיקת תוצאה**
    - המתן לסיום התהליך (1-2 דקות)
    - בדוק שהנתונים התעדכנו:
+
      ```javascript
      // בדיקת שלמות נתונים מעודכנת
      const updatedCompleteness = await window.checkTickersDataCompleteness(tickers);
      console.log('Updated Completeness:', updatedCompleteness);
      ```
+
    - **תוצאה צפויה:** מספר הטיקרים עם נתונים חסרים ירד
 
 ### תוצאות צפויות
 
 ✅ **הצלחה:**
+
 - Progress Overlay מופיע
 - נתונים מתעדכנים
 - מספר הטיקרים עם נתונים חסרים ירד
 
 ❌ **כשלון:**
+
 - Progress Overlay לא מופיע
 - נתונים לא מתעדכנים
 - שגיאות בקונסול
@@ -445,9 +501,11 @@
 ## תרחיש 7: ניהול Cache
 
 ### מטרה
+
 לבדוק שהמערכת מנהלת נכון את ה-Cache.
 
 ### תנאים מקדימים
+
 - עמוד טיקרים פתוח
 - יש לפחות טיקר אחד עם נתונים מועשרים
 
@@ -456,6 +514,7 @@
 1. **בדיקת שמירה ב-Cache**
    - בחר Console
    - הרץ:
+
      ```javascript
      // קבלת רשימת טיקרים
      const tickers = window.TableDataRegistry?.getFilteredData('tickers') || [];
@@ -466,18 +525,22 @@
      const cached = await window.UnifiedCacheManager?.get(cacheKey, 'memory');
      console.log('Cached Data:', cached ? 'Found' : 'Not Found');
      ```
+
    - **תוצאה צפויה:** הנתונים נמצאים ב-Cache
 
 2. **בדיקת טעינה מ-Cache**
    - רענן את העמוד (F5)
    - בדוק בלוגים:
+
      ```
      Loaded full ticker data from cache
      ```
+
    - **תוצאה צפויה:** הנתונים נטענים מ-Cache (מהיר יותר)
 
 3. **בדיקת Invalidation**
    - הרץ:
+
      ```javascript
      // Invalidation של Cache
      await window.UnifiedCacheManager?.delete(cacheKey, 'memory');
@@ -489,16 +552,19 @@
      });
      console.log('Fresh Data:', freshData);
      ```
+
    - **תוצאה צפויה:** נתונים חדשים נטענים מהשרת
 
 ### תוצאות צפויות
 
 ✅ **הצלחה:**
+
 - נתונים נשמרים ב-Cache
 - נתונים נטענים מ-Cache
 - Invalidation עובד
 
 ❌ **כשלון:**
+
 - Cache לא עובד
 - נתונים לא נשמרים
 - Invalidation לא עובד
@@ -508,9 +574,11 @@
 ## תרחיש 8: Progress Overlay
 
 ### מטרה
+
 לבדוק ש-Progress Overlay מופיע נכון במהלך תהליכים ארוכים.
 
 ### תנאים מקדימים
+
 - עמוד טיקרים פתוח
 - `UnifiedProgressManager` זמין
 
@@ -519,14 +587,17 @@
 1. **בדיקת זמינות UnifiedProgressManager**
    - בחר Console
    - הרץ:
+
      ```javascript
      typeof window.UnifiedProgressManager !== 'undefined'
      typeof window.UnifiedProgressManager.showProgress === 'function'
      ```
+
    - **תוצאה צפויה:** `true`
 
 2. **הצגת Progress Overlay ידנית**
    - הרץ:
+
      ```javascript
      const overlayId = 'test-progress';
      window.UnifiedProgressManager.createOverlay(overlayId, {
@@ -537,30 +608,37 @@
      });
      window.UnifiedProgressManager.showProgress(overlayId, 1, 'מתחיל', 'תיאור שלב 1');
      ```
+
    - **תוצאה צפויה:** Progress Overlay מופיע במרכז המסך
 
 3. **עדכון Progress**
    - הרץ:
+
      ```javascript
      window.UnifiedProgressManager.updateProgress(overlayId, 50, '50% הושלם');
      ```
+
    - **תוצאה צפויה:** ה-Progress Bar מתעדכן ל-50%
 
 4. **הסתרת Progress**
    - הרץ:
+
      ```javascript
      window.UnifiedProgressManager.hideProgress(overlayId);
      ```
+
    - **תוצאה צפויה:** Progress Overlay נעלם
 
 ### תוצאות צפויות
 
 ✅ **הצלחה:**
+
 - Progress Overlay מופיע
 - Progress מתעדכן
 - Progress נסגר נכון
 
 ❌ **כשלון:**
+
 - Progress Overlay לא מופיע
 - Progress לא מתעדכן
 - שגיאות בקונסול
@@ -570,9 +648,11 @@
 ## תרחיש 9: אינטגרציה עם External Data Dashboard
 
 ### מטרה
+
 לבדוק שהאינטגרציה עם External Data Dashboard עובדת.
 
 ### תנאים מקדימים
+
 - עמוד טיקרים פתוח
 - External Data Dashboard זמין
 
@@ -600,11 +680,13 @@
 ### תוצאות צפויות
 
 ✅ **הצלחה:**
+
 - טבלת "טיקרים עם נתונים חסרים" מופיעה
 - כפתור "רענון" עובד
 - הנתונים מתעדכנים
 
 ❌ **כשלון:**
+
 - טבלה לא מופיעה
 - כפתור "רענון" לא עובד
 - נתונים לא מתעדכנים
@@ -614,9 +696,11 @@
 ## תרחיש 10: בדיקת ביצועים
 
 ### מטרה
+
 לבדוק שהביצועים תקינים גם עם מספר גדול של טיקרים.
 
 ### תנאים מקדימים
+
 - יש לפחות 50 טיקרים במסד הנתונים
 - עמוד טיקרים פתוח
 
@@ -633,6 +717,7 @@
 2. **מדידת זמן העשרה**
    - בחר Console
    - הרץ:
+
      ```javascript
      const startTime = performance.now();
      
@@ -645,6 +730,7 @@
      const endTime = performance.now();
      console.log(`Enrichment Time: ${(endTime - startTime) / 1000} seconds`);
      ```
+
    - **תוצאה צפויה:** פחות מ-30 שניות ל-10 טיקרים
 
 3. **בדיקת שימוש ב-Cache**
@@ -655,11 +741,13 @@
 ### תוצאות צפויות
 
 ✅ **הצלחה:**
+
 - זמן טעינה ראשונית: פחות מ-10 שניות
 - זמן העשרה: פחות מ-3 שניות לטיקר
 - Cache משפר את הביצועים
 
 ❌ **כשלון:**
+
 - זמן טעינה ארוך מדי
 - העשרה איטית
 - Cache לא משפר ביצועים
@@ -671,6 +759,7 @@
 ### קריטריוני הצלחה כלליים
 
 ✅ **כל התרחישים עברו:**
+
 - כל הפונקציות זמינות ועובדות
 - האינטגרציה רצה אוטומטית
 - Progress Overlay מופיע
@@ -678,11 +767,13 @@
 - הביצועים תקינים
 
 ⚠️ **תרחישים עם אזהרות:**
+
 - חלק מהפונקציות עובדות
 - יש בעיות קלות בביצועים
 - Cache לא תמיד עובד
 
 ❌ **תרחישים שנכשלו:**
+
 - פונקציות חסרות או לא עובדות
 - האינטגרציה לא רצה
 - שגיאות קריטיות

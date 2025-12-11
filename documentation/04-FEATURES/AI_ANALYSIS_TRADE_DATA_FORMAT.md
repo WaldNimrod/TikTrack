@@ -1,4 +1,5 @@
 # AI Analysis Trade Data Format - TikTrack
+
 ## פורמט נתוני טריידים למערכת ניתוח AI
 
 **תאריך יצירה:** 06/12/2025  
@@ -23,6 +24,7 @@
 מערכת AI Analysis משתמשת ב-`TradeAggregationService` לאגרגציית נתוני טריידים מלאים, ומעצבת אותם לפורמט מובנה שמתאים למנועי AI.
 
 הפורמט כולל:
+
 - נתוני טרייד בסיסיים
 - ביצועים (Executions)
 - תוכניות מסחר (Trade Plans)
@@ -328,6 +330,7 @@ prompt = PromptTemplateService.build_prompt(
 ## 🔄 גרסאות
 
 ### v1.0.0 (06/12/2025)
+
 - ✅ יצירה ראשונית של הפורמט
 - ✅ תמיכה בכל סוגי הטריידים
 - ✅ כלול Trade Plans ו-Conditions

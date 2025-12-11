@@ -158,6 +158,13 @@ const PACKAGE_MANIFEST = {
         loadOrder: 0
       },
       {
+        file: 'api-fetch-wrapper.js',
+        globalCheck: 'window.APIFetchWrapper',
+        description: 'Global fetch wrapper for Authorization injection and 401 handling',
+        required: true,
+        loadOrder: 0.5
+      },
+      {
         file: 'global-favicon.js',
         globalCheck: 'window.setFavicon',
         description: 'Favicon management',
@@ -243,7 +250,7 @@ const PACKAGE_MANIFEST = {
       },
       {
         file: 'auth.js',
-        globalCheck: 'window.isAuthenticated',
+        globalCheck: 'window.TikTrackAuth',
         description: 'Authentication system',
         required: true,
         loadOrder: 9.5
@@ -1353,7 +1360,7 @@ const PACKAGE_MANIFEST = {
     description: 'Entity services',
     version: '1.5.0',
     critical: false,
-    loadOrder: 10,
+    loadOrder: 8, // Changed from 10 to 8 to load before TradingView Charts (19) - fixes loading order issue
     dependencies: ['base', 'services'],
     loadingStrategy: 'defer', // Critical package - entity services, has dependencies on base and services
     scripts: [
@@ -1375,7 +1382,7 @@ const PACKAGE_MANIFEST = {
         file: 'services/portfolio-state-data.js',
         globalCheck: 'window.PortfolioStateData',
         description: 'Portfolio state data service',
-        required: false,  // Required only for portfolio-state-page
+        required: false,  // Required only for portfolio-state
         loadOrder: 8.5
       },
       {
@@ -1391,6 +1398,34 @@ const PACKAGE_MANIFEST = {
         description: 'Trade history page script (page-specific)',
         required: false,  // Required only for trade-history page
         loadOrder: 10
+      },
+      {
+        file: 'calendar/calendar-date-utils.js',
+        globalCheck: 'window.CalendarDateUtils',
+        description: 'Calendar date utilities for trading journal',
+        required: false,  // Required only for trading-journal-page
+        loadOrder: 10.5
+      },
+      {
+        file: 'calendar/calendar-data-loader.js',
+        globalCheck: 'window.CalendarDataLoader',
+        description: 'Calendar data loader for trading journal',
+        required: false,  // Required only for trading-journal-page
+        loadOrder: 10.6
+      },
+      {
+        file: 'calendar/calendar-renderer.js',
+        globalCheck: 'window.CalendarRenderer',
+        description: 'Calendar renderer for trading journal',
+        required: false,  // Required only for trading-journal-page
+        loadOrder: 10.7
+      },
+      {
+        file: 'trading-journal-page.js',
+        globalCheck: 'window.tradingJournalPage',
+        description: 'Trading journal page script (page-specific)',
+        required: false,  // Required only for trading-journal-page
+        loadOrder: 10.8
       },
       {
         file: 'account-service.js',
@@ -1859,9 +1894,15 @@ const PACKAGE_MANIFEST = {
     description: 'Unified data summary system for all pages',
     version: '1.0.0',
     critical: false,
-    loadOrder: 18,
+    loadOrder: 17.5, // Changed from 18 to 17.5 to load before TradingView Charts (19)
     dependencies: ['base', 'services'],
     loadingStrategy: 'defer', // Critical package - info summary, has dependencies on base and services
+
+    // CRITICAL LESSON: Always verify script loading in HTML!
+    // This package was missing from portfolio-state.html causing "Missing required globals" errors
+    // Remember: package-manifest.js defines WHAT to load, but HTML defines WHERE to load it
+    // Always check both when adding new packages to pages!
+
     scripts: [
       {
         file: 'info-summary-system.js',
@@ -1889,7 +1930,7 @@ const PACKAGE_MANIFEST = {
     description: 'TradingView Lightweight Charts system',
     version: '1.0.0',
     critical: false,
-    loadOrder: 19, // Changed from 20 to 19 to load before init-system (22) and after dashboard-widgets (19.5)
+    loadOrder: 19, // Changed from 20 to 19 to load before init-system (22) and after dashboard-widgets (20.5)
     dependencies: ['base'],
     loadingStrategy: 'async', // Non-critical - only for TradingView chart pages
     scripts: [
@@ -2031,7 +2072,7 @@ const PACKAGE_MANIFEST = {
     description: 'Initialization and monitoring systems',
     version: '1.5.0',
     critical: false,
-    loadOrder: 22, // Changed from 20 to 22 to load after all other packages (dashboard-widgets 19.5, tradingview-charts 19, tradingview-widgets 21, watch-lists 20)
+    loadOrder: 22, // Changed from 20 to 22 to load after all other packages (dashboard-widgets 20.5, tradingview-charts 19, tradingview-widgets 21, watch-lists 20)
     dependencies: ['base'], // Only base is required for Logger and basic systems
     loadingStrategy: 'defer', // Critical package - initialization system, must load last, has dependencies on base
     scripts: [
@@ -2104,15 +2145,15 @@ const PACKAGE_MANIFEST = {
     initTime: '~30ms'
   },
 
-  // 19.5 DASHBOARD WIDGETS PACKAGE - Dashboard page components
+  // 20.5 DASHBOARD WIDGETS PACKAGE - Dashboard page components
   'dashboard-widgets': {
     id: 'dashboard-widgets',
     name: 'Dashboard Widgets',
     description: 'Widgets and dashboard interfaces (Pending Executions, Trade Creation)',
     version: '1.0.0',
     critical: false,
-    loadOrder: 19.5,
-    dependencies: ['base', 'services', 'ui-advanced', 'entity-services', 'modules', 'entity-details'],
+    loadOrder: 20.6, // Changed from 20.5 to 20.6 to load after ai-analysis (20.5)
+    dependencies: ['base', 'services', 'ui-advanced', 'entity-services', 'modules', 'entity-details', 'watch-lists'],
     loadingStrategy: 'defer', // Critical package - dashboard widgets, has dependencies on multiple packages
     scripts: [
       {
@@ -2144,18 +2185,22 @@ const PACKAGE_MANIFEST = {
       // - PendingActionsCacheService (shared cache management)
       {
         file: 'widgets/unified-pending-actions-widget.js',
-      },
-      {
-        file: 'widgets/widget-monitor.js',
-        globalCheck: 'window.WidgetMonitor',
-        description: 'Widget monitoring and debugging system',
-        required: false,
-        loadOrder: 99 // Load after all widgets
+        globalCheck: 'window.UnifiedPendingActionsWidget',
+        description: 'Unified pending actions widget',
+        required: true,
+        loadOrder: 2
       },
       {
         file: 'widgets/tag-widget.js',
         globalCheck: 'window.TagWidget',
         description: 'Unified tag widget (cloud + search)',
+        required: true,
+        loadOrder: 5
+      },
+      {
+        file: 'active-alerts-component.js',
+        globalCheck: 'window.updateActiveAlertsComponent',
+        description: 'Active alerts component',
         required: true,
         loadOrder: 5
       },
@@ -2174,18 +2219,18 @@ const PACKAGE_MANIFEST = {
         loadOrder: 7
       },
       {
-        file: 'services/watch-lists-widget-service.js',
-        globalCheck: 'window.WatchListsWidgetService',
-        description: 'Watch lists widget service (mockup)',
+        file: 'widgets/watch-lists-widget.js',
+        globalCheck: 'window.WatchListsWidget',
+        description: 'Watch lists widget for dashboard',
         required: false,
-        loadOrder: 5.5
+        loadOrder: 8
       },
       {
-        file: 'active-alerts-component.js',
-        globalCheck: 'window.updateActiveAlertsComponent',
-        description: 'Active alerts component',
-        required: true,
-        loadOrder: 5
+        file: 'widgets/widget-monitor.js',
+        globalCheck: 'window.WidgetMonitor',
+        description: 'Widget monitoring and debugging system',
+        required: false,
+        loadOrder: 99 // Load after all widgets
       },
       // ⚠️ NOTE: tag-search-config.js moved to modules package (loadOrder: 24)
       // It must load before modal-manager-v2.js which is in modules package
@@ -2194,7 +2239,7 @@ const PACKAGE_MANIFEST = {
         globalCheck: 'window.initializeIndexPage',
         description: 'Dashboard page logic',
         required: true,
-        loadOrder: 8
+        loadOrder: 9
       }
     ],
     estimatedSize: '~110KB',

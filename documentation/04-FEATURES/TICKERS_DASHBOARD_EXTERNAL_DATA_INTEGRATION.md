@@ -27,9 +27,11 @@
 בודקת את שלמות הנתונים עבור טיקר בודד.
 
 **פרמטרים:**
+
 - `ticker` (Object) - אובייקט טיקר
 
 **מחזירה:**
+
 ```javascript
 {
   hasPrice: boolean,              // האם יש נתוני מחיר
@@ -47,6 +49,7 @@
 ```
 
 **דוגמה:**
+
 ```javascript
 const completeness = checkTickerDataCompleteness(ticker);
 if (completeness.completeness < 100) {
@@ -59,9 +62,11 @@ if (completeness.completeness < 100) {
 בודקת את שלמות הנתונים עבור רשימת טיקרים.
 
 **פרמטרים:**
+
 - `tickers` (Array) - מערך של טיקרים
 
 **מחזירה:**
+
 ```javascript
 {
   total: number,                  // סה"כ טיקרים
@@ -73,6 +78,7 @@ if (completeness.completeness < 100) {
 ```
 
 **מיקום בקוד:**
+
 - `trading-ui/scripts/tickers.js` - שורות 1933-2020
 
 ---
@@ -86,21 +92,25 @@ if (completeness.completeness < 100) {
 טוענת נתונים היסטוריים לטיקרים שחסרים להם.
 
 **פרמטרים:**
+
 - `tickers` (Array) - מערך של טיקרים
 - `options` (Object) - אופציות:
   - `silent` (boolean) - האם להציג לוגים (ברירת מחדל: false)
   - `showProgress` (boolean) - האם להציג progress overlay (ברירת מחדל: true)
 
 **מחזירה:**
+
 - `Promise<Array>` - מערך של טיקרים עם נתונים היסטוריים
 
 **תהליך:**
+
 1. מזהה טיקרים שחסרים להם נתונים היסטוריים (< 150 quotes)
 2. טוענת נתונים היסטוריים דרך `ExternalDataService.refreshTickerData()`
 3. שומרת נתונים ב-cache
 4. מחזירה טיקרים מעודכנים
 
 **דוגמה:**
+
 ```javascript
 const tickersWithData = await ensureHistoricalDataForTickers(tickers, {
   silent: false,
@@ -109,6 +119,7 @@ const tickersWithData = await ensureHistoricalDataForTickers(tickers, {
 ```
 
 **מיקום בקוד:**
+
 - `trading-ui/scripts/tickers.js` - שורות 2022-2206
 
 ---
@@ -122,6 +133,7 @@ const tickersWithData = await ensureHistoricalDataForTickers(tickers, {
 מעשירה טיקרים עם נתונים מלאים מ-`EntityDetailsAPI`, כולל חישובים טכניים.
 
 **פרמטרים:**
+
 - `tickers` (Array) - מערך של טיקרים בסיסיים
 - `options` (Object) - אופציות:
   - `silent` (boolean) - האם להציג לוגים (ברירת מחדל: false)
@@ -129,9 +141,11 @@ const tickersWithData = await ensureHistoricalDataForTickers(tickers, {
   - `forceRefresh` (boolean) - האם לכפות רענון (ברירת מחדל: false)
 
 **מחזירה:**
+
 - `Promise<Array>` - מערך של טיקרים מעושרים
 
 **תהליך:**
+
 1. בודקת cache לכל טיקר
 2. אם לא נמצא ב-cache, טוענת מ-`EntityDetailsAPI.getEntityDetails()`
 3. משלימה נתונים בסיסיים עם נתונים מלאים (חישובים טכניים)
@@ -139,6 +153,7 @@ const tickersWithData = await ensureHistoricalDataForTickers(tickers, {
 5. מחזירה טיקרים מעושרים
 
 **נתונים מעושרים כוללים:**
+
 - נתוני מחיר נוכחיים
 - נתונים היסטוריים (historical_quotes_count)
 - ATR (atr)
@@ -148,6 +163,7 @@ const tickersWithData = await ensureHistoricalDataForTickers(tickers, {
 - MA 150 (ma_150)
 
 **דוגמה:**
+
 ```javascript
 const enrichedTickers = await enrichTickersWithFullData(tickers, {
   showProgress: true,
@@ -156,6 +172,7 @@ const enrichedTickers = await enrichTickersWithFullData(tickers, {
 ```
 
 **מיקום בקוד:**
+
 - `trading-ui/scripts/tickers.js` - שורות 2208-2318
 
 ---
@@ -169,12 +186,14 @@ const enrichedTickers = await enrichTickersWithFullData(tickers, {
 מזהה ומרעננת נתונים חסרים עבור טיקרים.
 
 **פרמטרים:**
+
 - `tickers` (Array) - מערך של טיקרים
 - `options` (Object) - אופציות:
   - `silent` (boolean) - האם להציג לוגים (ברירת מחדל: false)
   - `showProgress` (boolean) - האם להציג progress overlay (ברירת מחדל: true)
 
 **מחזירה:**
+
 ```javascript
 {
   total: number,        // סה"כ טיקרים שזוהו כחסרים
@@ -185,6 +204,7 @@ const enrichedTickers = await enrichTickersWithFullData(tickers, {
 ```
 
 **תהליך:**
+
 1. קוראת ל-`/api/external-data/status/tickers/missing-data` לזיהוי טיקרים עם נתונים חסרים
 2. מזהה טיקרים שחסרים להם:
    - נתוני מחיר נוכחיים
@@ -194,6 +214,7 @@ const enrichedTickers = await enrichTickersWithFullData(tickers, {
 4. מחזירה סיכום של הפעולה
 
 **דוגמה:**
+
 ```javascript
 const results = await loadAndRefreshMissingData(tickers, {
   showProgress: true
@@ -202,6 +223,7 @@ console.log(`Refreshed ${results.refreshed} out of ${results.total} tickers`);
 ```
 
 **מיקום בקוד:**
+
 - `trading-ui/scripts/tickers.js` - שורות 2320-2467
 
 ---
@@ -215,23 +237,28 @@ console.log(`Refreshed ${results.refreshed} out of ${results.total} tickers`);
 מחזירה badge HTML עם סטטוס נתונים ויזואלי.
 
 **פרמטרים:**
+
 - `ticker` (Object) - אובייקט טיקר
 
 **מחזירה:**
+
 - `string` - HTML badge element
 
 **סטטוסים:**
+
 - ✅ **מלא** (ירוק) - כל הנתונים זמינים (100%)
 - ⚠️ **חלקי** (צהוב) - נתונים חלקיים (50-99%)
 - ❌ **חלקי/חסר** (אדום) - נתונים חסרים (< 50%)
 
 **דוגמה:**
+
 ```javascript
 const badgeHtml = getDataStatusBadge(ticker);
 // Returns: '<span class="badge bg-success" title="כל הנתונים זמינים">מלא</span>'
 ```
 
 **מיקום בקוד:**
+
 - `trading-ui/scripts/tickers.js` - שורות 2469-2496
 
 **תצוגה:**
@@ -246,17 +273,20 @@ const badgeHtml = getDataStatusBadge(ticker);
 הנתונים נטענים נשמרים ב-cache כך שיהיו זמינים בהרצה הבאה:
 
 #### נתונים בסיסיים
+
 - **Cache:** `CacheTTLGuard` או `UnifiedCacheManager`
 - **Key:** `tickers-basic` (דרך `TickersData.loadTickersData()`)
 - **TTL:** 5 דקות (300 שניות)
 
 #### נתונים מלאים (עם חישובים טכניים)
+
 - **Cache:** `UnifiedCacheManager`
 - **Key:** `ticker-full-{tickerId}`
 - **TTL:** 1 שעה (3600 שניות)
 - **Layer:** memory
 
 #### נתונים היסטוריים
+
 - **Cache:** `UnifiedCacheManager`
 - **Key:** `ticker-historical-{tickerId}`
 - **TTL:** 1 שעה (3600 שניות)
@@ -382,6 +412,7 @@ console.log(`Refreshed ${refreshResults.refreshed} tickers`);
 **תאריך עדכון:** דצמבר 2025
 
 **שיפורים חדשים:**
+
 - ✅ אינטגרציה מלאה עם מערכת הנתונים החיצוניים
 - ✅ בדיקה אוטומטית של נתונים חסרים
 - ✅ טעינה אוטומטית של נתונים היסטוריים
@@ -390,6 +421,7 @@ console.log(`Refreshed ${refreshResults.refreshed} tickers`);
 - ✅ שמירת נתונים נטענים ב-cache
 
 **מיקום בקוד:**
+
 - `trading-ui/scripts/tickers.js` - כל הפונקציות החדשות
 - `trading-ui/tickers.html` - דשבורד טיקרים
 

@@ -15,6 +15,7 @@
 **תיאור:** מילוי שדות בקבוצת העדפות ספציפית
 
 **תהליך:**
+
 ```javascript
 populateGroupFields(sectionId, preferences) {
   const section = document.getElementById(sectionId);
@@ -39,10 +40,12 @@ populateGroupFields(sectionId, preferences) {
 ```
 
 **נקרא מ:**
+
 - `loadGroupData()` - שורה 313
 - `refreshGroupState()` - שורה 813
 
 **תכונות:**
+
 - בדיקת focus/modification לפני עדכון
 - תמיכה ב-checkbox, select, input
 - normalization של ערכים
@@ -56,6 +59,7 @@ populateGroupFields(sectionId, preferences) {
 **תיאור:** מילוי כל שדות הטופס
 
 **תהליך:**
+
 ```javascript
 async _populateAllFormFields() {
   const form = document.getElementById('preferencesForm');
@@ -93,10 +97,12 @@ async _populateAllFormFields() {
 ```
 
 **נקרא מ:**
+
 - `initialize()` - שורה 234
 - Event listener `preferences:updated` - שורה 254
 
 **תכונות:**
+
 - מילוי כל השדות בטופס
 - תמיכה בכל סוגי השדות
 - גם קורא ל-populateGroupFields() (כפילות!)
@@ -110,6 +116,7 @@ async _populateAllFormFields() {
 **תיאור:** מילוי טופס (legacy)
 
 **תהליך:**
+
 ```javascript
 populateForm(preferences) {
   Object.keys(preferences).forEach(key => {
@@ -126,6 +133,7 @@ populateForm(preferences) {
 ```
 
 **נקרא מ:**
+
 - `loadAllPreferences()` - שורה 1087
 
 ## Event Listeners שמפעילים Population
@@ -135,6 +143,7 @@ populateForm(preferences) {
 **מיקום:** `preferences-ui-v4.js:249-260`
 
 **תהליך:**
+
 ```javascript
 window.addEventListener('preferences:updated', (e) => {
   const scope = e?.detail?.scope;
@@ -147,6 +156,7 @@ window.addEventListener('preferences:updated', (e) => {
 ```
 
 **נשלח מ:**
+
 - `refreshGroupState()` - שורה 685
 - `updateGlobalPreferences()` - שורה 1277
 
@@ -157,6 +167,7 @@ window.addEventListener('preferences:updated', (e) => {
 **מיקום:** `preferences-group-manager.js:685-694`
 
 **תהליך:**
+
 ```javascript
 window.dispatchEvent(new CustomEvent('preferences:group-updated', {
   detail: {
@@ -169,9 +180,11 @@ window.dispatchEvent(new CustomEvent('preferences:group-updated', {
 ```
 
 **נשלח מ:**
+
 - `refreshGroupState()` - שורה 685
 
 **מאזינים:**
+
 - אין listeners ישירים (אולי דרך event delegation)
 
 ### 3. preferences:types-refresh
@@ -179,6 +192,7 @@ window.dispatchEvent(new CustomEvent('preferences:group-updated', {
 **מיקום:** `preferences-group-manager.js:598-601`
 
 **תהליך:**
+
 ```javascript
 window.dispatchEvent(new CustomEvent('preferences:types-refresh', {
   detail: { source: 'preferences-group-manager', groupName, savedKeys },
@@ -186,9 +200,11 @@ window.dispatchEvent(new CustomEvent('preferences:types-refresh', {
 ```
 
 **נשלח מ:**
+
 - `saveGroup()` - שורה 598
 
 **מאזינים:**
+
 - לא ידוע (אולי ב-audit table)
 
 ## מתי Population מתבצע
@@ -196,6 +212,7 @@ window.dispatchEvent(new CustomEvent('preferences:types-refresh', {
 ### 1. טעינת עמוד
 
 **תהליך:**
+
 ```
 initialize()
   ↓
@@ -207,6 +224,7 @@ PreferencesGroupManager.populateGroupFields() - דרך _populateAllFormFields()
 ### 2. פתיחת Section
 
 **תהליך:**
+
 ```
 openSection(sectionId)
   ↓
@@ -218,6 +236,7 @@ populateGroupFields(sectionId, preferences)
 ### 3. אחרי שמירה
 
 **תהליך:**
+
 ```
 saveGroup()
   ↓
@@ -237,6 +256,7 @@ _populateAllFormFields() - שוב! ⚠️
 ### 4. אחרי refresh
 
 **תהליך:**
+
 ```
 refreshUserPreferences()
   ↓
@@ -250,10 +270,12 @@ populateGroupFields() - מילוי שדות
 ### כפילות 1: populateGroupFields() פעמיים
 
 **מיקום:**
+
 - `_populateAllFormFields()` קורא ל-`populateGroupFields()` (שורה 551)
 - `refreshGroupState()` קורא ל-`populateGroupFields()` (שורה 813)
 
 **תרחיש:**
+
 1. `_populateAllFormFields()` נקרא
 2. בתוכו קורא ל-`populateGroupFields()` לכל section
 3. `refreshGroupState()` נקרא
@@ -264,10 +286,12 @@ populateGroupFields() - מילוי שדות
 ### כפילות 2: _populateAllFormFields() פעמיים
 
 **מיקום:**
+
 - `initialize()` - שורה 234
 - Event listener `preferences:updated` - שורה 254
 
 **תרחיש:**
+
 1. `initialize()` קורא ל-`_populateAllFormFields()`
 2. Event `preferences:updated` נשלח
 3. Event listener קורא ל-`_populateAllFormFields()` שוב
@@ -277,10 +301,12 @@ populateGroupFields() - מילוי שדות
 ### כפילות 3: populateForm() + populateGroupFields()
 
 **מיקום:**
+
 - `loadAllPreferences()` קורא ל-`populateForm()` (שורה 1087)
 - `_populateAllFormFields()` קורא ל-`populateGroupFields()` (שורה 551)
 
 **תרחיש:**
+
 1. `loadAllPreferences()` קורא ל-`populateForm()` - ממלא כל השדות
 2. `_populateAllFormFields()` קורא ל-`populateGroupFields()` - ממלא שוב
 
@@ -293,6 +319,7 @@ populateGroupFields() - מילוי שדות
 **מספר כפילויות מזוהות:** 3
 
 **המלצות:**
+
 1. איחוד ל-population אחת - `populateGroupFields()` בלבד
 2. הסרת `_populateAllFormFields()` או שימוש בו רק ב-initialize()
 3. הסרת event listener `preferences:updated` או בדיקה אם כבר בוצע population

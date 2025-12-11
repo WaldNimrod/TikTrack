@@ -1,4 +1,5 @@
 # מדריך מערכת האיקונים - TikTrack
+
 # Icon System Guide
 
 ## 📋 סקירה כללית
@@ -105,6 +106,7 @@ const iconPath = await window.IconSystem.getChartIcon('type-line');
 מחזיר נתיב לאיקון.
 
 **Parameters:**
+
 - `type` (string): סוג האיקון (entity, button, category, chart, page)
 - `name` (string): שם האיקון
 - `options` (object): אפשרויות (skipCache, etc.)
@@ -112,6 +114,7 @@ const iconPath = await window.IconSystem.getChartIcon('type-line');
 **Returns:** `Promise<string>` - נתיב לאיקון
 
 **Example:**
+
 ```javascript
 const path = await window.IconSystem.getIconPath('button', 'edit');
 ```
@@ -123,6 +126,7 @@ const path = await window.IconSystem.getIconPath('button', 'edit');
 **חשוב:** עבור Tabler Icons, הפונקציה מחזירה **inline SVG** במקום `<img>` tag, מה שמאפשר תמיכה בצבעים דינמיים דרך CSS. Entity Icons נשארים כ-`<img>` tags (צבעים קבועים).
 
 **Parameters:**
+
 - `type` (string): סוג האיקון
 - `name` (string): שם האיקון
 - `options` (object): אפשרויות
@@ -134,6 +138,7 @@ const path = await window.IconSystem.getIconPath('button', 'edit');
 **Returns:** `Promise<string>` - HTML string (inline SVG עבור Tabler Icons, `<img>` עבור Entity Icons)
 
 **Example:**
+
 ```javascript
 // Tabler Icon - מחזיר inline SVG עם תמיכה בצבעים דינמיים
 const html = await window.IconSystem.renderIcon('button', 'edit', {
@@ -156,6 +161,7 @@ const entityHtml = await window.IconSystem.renderIcon('entity', 'trade', {
 Wrapper ל-entity icons. תמיד בודק ב-entities/ קודם.
 
 **Parameters:**
+
 - `entityType` (string): סוג הישות
 
 **Returns:** `Promise<string>` - נתיב לאיקון
@@ -165,6 +171,7 @@ Wrapper ל-entity icons. תמיד בודק ב-entities/ קודם.
 Wrapper ל-button icons. משתמש ב-Tabler Icons.
 
 **Parameters:**
+
 - `buttonType` (string): סוג הכפתור
 
 **Returns:** `Promise<string>` - נתיב לאיקון
@@ -174,6 +181,7 @@ Wrapper ל-button icons. משתמש ב-Tabler Icons.
 Wrapper ל-category icons. משתמש ב-Tabler Icons.
 
 **Parameters:**
+
 - `category` (string): שם הקטגוריה
 
 **Returns:** `Promise<string>` - נתיב לאיקון
@@ -183,6 +191,7 @@ Wrapper ל-category icons. משתמש ב-Tabler Icons.
 Wrapper ל-page icons. משתמש ב-Tabler Icons.
 
 **Parameters:**
+
 - `pageName` (string): שם העמוד (למשל 'trades.html')
 
 **Returns:** `Promise<string>` - נתיב לאיקון
@@ -192,6 +201,7 @@ Wrapper ל-page icons. משתמש ב-Tabler Icons.
 Wrapper ל-chart icons. משתמש ב-Tabler Icons.
 
 **Parameters:**
+
 - `chartIcon` (string): שם איקון הגרף
 
 **Returns:** `Promise<string>` - נתיב לאיקון
@@ -293,6 +303,7 @@ button > .icon:only-child {
 ```
 
 **דוגמה:**
+
 ```html
 <!-- כפתור עם רק איקון - ממורכז אוטומטית -->
 <button class="btn">
@@ -445,14 +456,16 @@ successButton.innerHTML = checkIcon;
 
 ## 👨‍💻 מדריך למפתח העתידי
 
-### מתי להשתמש ב-Tabler Icons vs Entity Icons?
+### מתי להשתמש ב-Tabler Icons vs Entity Icons
 
 **Tabler Icons** - לכל איקון שצריך:
+
 - ✅ שינוי צבע דינמי
 - ✅ התאמה לצבע הכפתור/אלמנט
 - ✅ איקונים כלליים (כפתורים, קטגוריות, עמודים)
 
 **Entity Icons** - רק ל-17 הישויות המקוריות:
+
 - ✅ איקוני ישויות ספציפיים (trades, alerts, accounts, etc.)
 - ✅ צבעים קבועים (לא ניתן לשנות)
 
@@ -536,6 +549,7 @@ const BUTTON_ICONS = {
 ### איקון לא מוצג
 
 1. **בדוק שהמערכת נטענה:**
+
    ```javascript
    if (typeof window.IconSystem === 'undefined') {
        console.error('IconSystem not loaded');
@@ -547,6 +561,7 @@ const BUTTON_ICONS = {
    - Tabler icons: `trading-ui/images/icons/tabler/${iconName}.svg`
 
 3. **נקה cache:**
+
    ```javascript
    await window.IconSystem.clearCache();
    ```
@@ -559,6 +574,7 @@ const BUTTON_ICONS = {
 ### Cache לא מתעדכן
 
 - נקה cache ידנית:
+
   ```javascript
   await window.IconSystem.invalidateCache('button', 'edit');
   ```
@@ -566,6 +582,7 @@ const BUTTON_ICONS = {
 ### איקון לא משנה צבע (Tabler Icons)
 
 1. **בדוק שהאיקון מוטמע כ-inline SVG:**
+
    ```javascript
    // בדוק ב-console
    const icon = document.querySelector('.icon');
@@ -573,12 +590,14 @@ const BUTTON_ICONS = {
    ```
 
 2. **בדוק שה-SVG משתמש ב-currentColor:**
+
    ```javascript
    const svg = document.querySelector('svg.icon');
    console.log(svg.getAttribute('stroke')); // צריך להיות 'currentColor'
    ```
 
 3. **ודא שהכפתור/אלמנט ההורה מגדיר צבע:**
+
    ```css
    .btn {
        color: var(--primary-color); /* האיקון יורש את זה */
@@ -588,6 +607,7 @@ const BUTTON_ICONS = {
 ### איקון לא ממורכז בכפתור
 
 - בדוק שיש רק איקון בכפתור (ללא טקסט):
+
   ```html
   <!-- ✅ נכון - ימורכז -->
   <button class="btn"><svg class="icon">...</svg></button>
@@ -597,6 +617,7 @@ const BUTTON_ICONS = {
   ```
 
 - בדוק שה-CSS נטען:
+
   ```css
   button:has(> .icon:only-child) {
       justify-content: center !important;

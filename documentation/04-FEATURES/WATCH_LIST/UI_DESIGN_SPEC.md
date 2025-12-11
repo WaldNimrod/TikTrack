@@ -1,4 +1,5 @@
 # מפרט עיצוב ממשק משתמש: Watch List
+
 ## UI Design Specification: Watch List System
 
 **תאריך:** 28 בינואר 2025  
@@ -21,12 +22,6 @@
 │  ┌───────────────────────────────────┐  │
 │  │ Title + "רשימה חדשה" Button      │  │
 │  │ Summary Stats Cards               │  │
-│  └───────────────────────────────────┘  │
-├─────────────────────────────────────────┤
-│  Watch Lists Section                    │
-│  ┌───────────────────────────────────┐  │
-│  │ [List Card] [List Card] [List...] │  │
-│  │  Grid of Watch List Cards         │  │
 │  └───────────────────────────────────┘  │
 ├─────────────────────────────────────────┤
 │  Active List View Section               │
@@ -115,87 +110,7 @@
 
 ---
 
-## Section 2: Watch Lists Grid
-
-### HTML Structure
-
-```html
-<section class="content-section" id="watch-lists-section" data-section="watch-lists">
-  <div class="section-header">
-    <div class="table-title">
-      <img src="/trading-ui/images/icons/tabler/list.svg" 
-           class="icon section-icon" 
-           alt="Lists">
-      <span>רשימות צפייה</span>
-    </div>
-    <div class="table-actions">
-      <button type="button"
-              data-button-type="TOGGLE"
-              data-variant="small"
-              data-onclick="toggleSection('watch-lists-section')"
-              data-text="הצג/הסתר">
-      </button>
-    </div>
-  </div>
-  <div class="section-body">
-    <div class="row g-3" id="watchListsGrid">
-      <!-- Watch List Cards will be rendered here -->
-    </div>
-  </div>
-</section>
-```
-
-### Watch List Card Structure
-
-```html
-<div class="col-md-4 col-sm-6" 
-     data-watch-list-id="{id}"
-     draggable="true">
-  <div class="watch-list-card">
-    <div class="watch-list-card-header" style="background-color: {color_hex}20;">
-      <div class="watch-list-card-icon">
-        <img src="/trading-ui/images/icons/tabler/{icon}.svg" 
-             class="icon" 
-             alt="{icon}">
-      </div>
-      <div class="watch-list-card-actions">
-        <button type="button"
-                data-button-type="EDIT"
-                data-variant="small"
-                data-onclick="window.WatchListsPage?.editList({id})">
-        </button>
-        <button type="button"
-                data-button-type="DELETE"
-                data-variant="small"
-                data-onclick="window.WatchListsPage?.deleteList({id})">
-        </button>
-      </div>
-    </div>
-    <div class="watch-list-card-body">
-      <h5 class="watch-list-card-title">{name}</h5>
-      <div class="watch-list-card-stats">
-        <span class="stat-item">
-          <img src="/trading-ui/images/icons/tabler/chart-line.svg" 
-               class="icon stat-icon" 
-               alt="items">
-          {item_count} טיקרים
-        </span>
-      </div>
-    </div>
-    <div class="watch-list-card-footer">
-      <button type="button"
-              class="btn btn-sm btn-primary w-100"
-              data-onclick="window.WatchListsPage?.selectList({id})">
-        פתח רשימה
-      </button>
-    </div>
-  </div>
-</div>
-```
-
----
-
-## Section 3: Active List View
+## Section 2: Active List View
 
 ### HTML Structure
 
@@ -356,7 +271,7 @@
 
 ---
 
-## Section 4: Flagged Tickers (Optional)
+## Section 3: Flagged Tickers (Optional)
 
 ### HTML Structure
 
@@ -547,18 +462,21 @@
 ## CSS Classes
 
 ### Watch List Card
+
 - `.watch-list-card` - Card container
 - `.watch-list-card-header` - Header with icon and actions
 - `.watch-list-card-body` - Body with name and stats
 - `.watch-list-card-footer` - Footer with action button
 
 ### Drag & Drop
+
 - `.drag-handle` - Drag handle icon (≡)
 - `.drag-handle-column` - Column containing drag handle
 - `.dragging` - Applied during drag operation
 - `.drag-over` - Applied on drop target
 
 ### Flags
+
 - `.btn-flag` - Flag button
 - `.flag-palette-popup` - Flag color picker popup
 - `.flag-color-btn` - Individual color button in palette
@@ -568,15 +486,18 @@
 ## Responsive Design
 
 ### Mobile (< 768px)
+
 - Cards grid: 1 column
 - Table: Horizontal scroll
 - View mode toggle: Icon only (no text)
 
 ### Tablet (768px - 1024px)
+
 - Cards grid: 2 columns
 - Table: Full width
 
 ### Desktop (> 1024px)
+
 - Cards grid: 3 columns
 - Table: Full width with all columns
 
@@ -585,11 +506,13 @@
 ## Accessibility
 
 ### ARIA Labels
+
 - כל כפתור: `aria-label` בעברית
 - כל טבלה: `aria-label` עם תיאור
 - Drag handles: `aria-label="סדר מחדש"`
 
 ### Keyboard Navigation
+
 - Tab navigation בין כל האלמנטים
 - Enter/Space לפעולות
 - Arrow keys לניווט בטבלה
@@ -598,6 +521,10 @@
 ---
 
 **סיכום:** הממשק תומך בכל הדרישות עם תמיכה מלאה ב-RTL, Responsive Design, ו-Accessibility.
+
+
+
+
 
 
 

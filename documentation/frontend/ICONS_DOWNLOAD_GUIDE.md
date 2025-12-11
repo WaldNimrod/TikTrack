@@ -1,4 +1,5 @@
 # מדריך הורדת איקונים חסרים - TikTrack
+
 # Missing Icons Download Guide
 
 **תאריך עדכון:** 27 בינואר 2025  
@@ -9,15 +10,17 @@
 ## 📋 סקירה כללית
 
 מערכת TikTrack משתמשת ב-**Tabler Icons** כספריית האיקונים הראשית. כל האיקונים נשמרים בתיקייה:
+
 ```
 trading-ui/images/icons/tabler/
 ```
 
-## 🔍 איך לבדוק אילו איקונים חסרים?
+## 🔍 איך לבדוק אילו איקונים חסרים
 
 ### 1. בדיקה ידנית
 
 בדוק את הקונסול בדפדפן - אם יש שגיאת 404 על איקון, הוא חסר:
+
 ```
 Failed to load resource: the server responded with a status of 404 (Not Found)
 /trading-ui/images/icons/tabler/[icon-name].svg
@@ -26,11 +29,13 @@ Failed to load resource: the server responded with a status of 404 (Not Found)
 ### 2. בדיקה אוטומטית
 
 הרץ את הסקריפט:
+
 ```bash
 python3 scripts/icons/scan-missing-icons.py
 ```
 
 הסקריפט יחפש:
+
 - איקונים שמוזכרים בקוד אבל לא קיימים בתיקייה
 - נתיבי איקונים ישנים
 - שימוש ב-FontAwesome/Bootstrap Icons
@@ -38,6 +43,7 @@ python3 scripts/icons/scan-missing-icons.py
 ### 3. בדיקה ב-`icon-mappings.js`
 
 פתח את `trading-ui/scripts/icon-mappings.js` וחפש הערות:
+
 ```javascript
 // Missing icons - using alternatives
 'info-circle': 'note', // info-circle not available, using note
@@ -49,11 +55,12 @@ python3 scripts/icons/scan-missing-icons.py
 
 ---
 
-## 📥 איך להוריד איקונים מ-Tabler Icons?
+## 📥 איך להוריד איקונים מ-Tabler Icons
 
 ### שיטה 1: הורדה ידנית (מומלץ)
 
 1. **פתח את אתר Tabler Icons:**
+
    ```
    https://tabler.io/icons
    ```
@@ -75,11 +82,13 @@ python3 scripts/icons/scan-missing-icons.py
 ### שיטה 2: הורדה מרוכזת (GitHub)
 
 1. **פתח את ה-GitHub Repository:**
+
    ```
    https://github.com/tabler/tabler-icons
    ```
 
 2. **נווט לתיקיית SVG:**
+
    ```
    https://github.com/tabler/tabler-icons/tree/master/icons
    ```
@@ -92,16 +101,19 @@ python3 scripts/icons/scan-missing-icons.py
 ### שיטה 3: שימוש ב-npm (למפתחים)
 
 אם יש לך גישה ל-npm:
+
 ```bash
 npm install @tabler/icons
 ```
 
 האיקונים יהיו ב:
+
 ```
 node_modules/@tabler/icons/icons/
 ```
 
 העתק את האיקונים הנדרשים ל:
+
 ```
 trading-ui/images/icons/tabler/
 ```
@@ -125,6 +137,7 @@ trading-ui/images/icons/
 ```
 
 **חשוב:**
+
 - ✅ הוסף איקונים חדשים רק ל-`tabler/`
 - ❌ אל תגע ב-`entities/` (איקונים מקוריים)
 - ❌ אל תמחק איקונים קיימים
@@ -133,7 +146,7 @@ trading-ui/images/icons/
 
 ## ✅ רשימת איקונים חסרים ידועים
 
-### איקונים שהיו חסרים ונוספו למערכת:
+### איקונים שהיו חסרים ונוספו למערכת
 
 | שם איקון | סטטוס | הערות |
 |----------|-------|--------|
@@ -145,7 +158,7 @@ trading-ui/images/icons/
 
 ---
 
-## 🔧 איך להוסיף איקון חדש?
+## 🔧 איך להוסיף איקון חדש
 
 ### שלב 1: הורד את האיקון
 
@@ -159,6 +172,7 @@ cp ~/Downloads/heart.svg trading-ui/images/icons/tabler/heart.svg
 ```
 
 **חשוב:**
+
 - שם הקובץ חייב להיות **lowercase**
 - השתמש במקפים במקום רווחים: `user-circle` ולא `userCircle`
 - סיומת חייבת להיות `.svg`
@@ -189,14 +203,18 @@ buttons: {
 ### בעיה: האיקון לא מוצג
 
 **פתרונות:**
+
 1. **בדוק את שם הקובץ:**
+
    ```bash
    ls -la trading-ui/images/icons/tabler/[icon-name].svg
    ```
+
    - ודא שהשם מדויק (case-sensitive)
    - ודא שיש `.svg` בסוף
 
 2. **בדוק את הנתיב בקוד:**
+
    ```javascript
    // נכון:
    '/trading-ui/images/icons/tabler/heart.svg'
@@ -213,11 +231,13 @@ buttons: {
 ### בעיה: האיקון לא קיים ב-Tabler Icons
 
 **פתרונות:**
+
 1. **חפש אלטרנטיבה ב-Tabler:**
    - פתח את https://tabler.io/icons
    - חפש איקון דומה
 
 2. **עדכן את `icon-mappings.js`:**
+
    ```javascript
    buttons: {
        // במקום האיקון החסר, השתמש באלטרנטיבה
@@ -234,17 +254,20 @@ buttons: {
 
 ## 📚 משאבים נוספים
 
-### אתרים רשמיים:
+### אתרים רשמיים
+
 - **Tabler Icons:** https://tabler.io/icons
 - **GitHub Repository:** https://github.com/tabler/tabler-icons
 - **Documentation:** https://tabler.io/docs/icons/usage
 
-### דוקומנטציה פנימית:
+### דוקומנטציה פנימית
+
 - **Icon System Architecture:** `documentation/frontend/ICON_SYSTEM_ARCHITECTURE.md`
 - **Icon System Guide:** `documentation/frontend/ICON_SYSTEM_GUIDE.md`
 - **Icon Implementation Status:** `documentation/frontend/ICON_IMPLEMENTATION_STATUS_REPORT.md`
 
-### קבצים מרכזיים:
+### קבצים מרכזיים
+
 - **Icon Mappings:** `trading-ui/scripts/icon-mappings.js`
 - **Icon System:** `trading-ui/scripts/icon-system.js`
 - **Icon Directory:** `trading-ui/images/icons/tabler/`
@@ -271,6 +294,7 @@ buttons: {
    - אם האיקון נקרא `user-circle` ב-Tabler, השתמש בשם זה
 
 2. **בדיקת איקונים קיימים:**
+
    ```bash
    # רשימת כל האיקונים הקיימים
    ls trading-ui/images/icons/tabler/

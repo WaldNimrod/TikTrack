@@ -15,30 +15,35 @@
 ## 📋 רשימת מודולים עם שדות תאריך
 
 ### 1. **Executions** (`executions-config.js`)
+
 - **שדה:** `executionDate` (type: `datetime-local`)
 - **מיפוי שדות:** `date` -> `executionDate`
 - **שדה DateEnvelope:** `date_envelope`
 - **סטטוס:** ✅ תוקן ופועל
 
 ### 2. **Trades** (`trades-config.js`)
+
 - **שדה:** `tradeEntryDate` (type: `datetime-local`)
 - **מיפוי שדות:** `created_at`/`opened_at` -> `tradeEntryDate`
 - **שדה DateEnvelope:** `created_at_envelope` / `opened_at_envelope`
 - **סטטוס:** ✅ תוקן ופועל
 
 ### 3. **Trade Plans** (`trade-plans-config.js`)
+
 - **שדה:** `tradePlanEntryDate` (type: `datetime-local`)
 - **מיפוי שדות:** `created_at`/`entry_date` -> `tradePlanEntryDate`
 - **שדה DateEnvelope:** `created_at_envelope` / `entry_date_envelope`
 - **סטטוס:** ✅ תוקן ופועל
 
 ### 4. **Alerts** (`alerts-config.js`)
+
 - **שדה:** `alertExpiryDate` (type: `date`)
 - **מיפוי שדות:** `expiry_date` -> `alertExpiryDate`
 - **שדה DateEnvelope:** `expiry_date_envelope`
 - **סטטוס:** ✅ תוקן ופועל
 
 ### 5. **Cash Flows** (`cash-flows-config.js`)
+
 - **שדה:** `cashFlowDate` (type: `date`)
 - **מיפוי שדות:** `date` -> `cashFlowDate`
 - **שדה DateEnvelope:** `date_envelope`
@@ -152,6 +157,7 @@ if (dateObj && !isNaN(dateObj.getTime())) {
 ### בדיקה אוטומטית
 
 הרץ בקונסול:
+
 ```javascript
 // בדיקה עבור execution
 await debugPopulateFormDates(executionId);

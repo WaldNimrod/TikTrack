@@ -17,7 +17,7 @@ export POSTGRES_PASSWORD="BigMeZoo1974!?"
 python3 scripts/test_atr_threshold_preferences.py
 ```
 
-### מה נבדק:
+### מה נבדק
 
 1. **קיום העדפות במסד הנתונים**
    - בדיקה ש-`atr_high_threshold` קיים
@@ -45,7 +45,7 @@ python3 scripts/test_atr_threshold_preferences.py
 2. פתח את קונסול הדפדפן (F12)
 3. הרץ: `window.runATRTests()`
 
-### קטגוריות בדיקות:
+### קטגוריות בדיקות
 
 #### 1. בדיקות יחידה (Unit Tests)
 
@@ -130,6 +130,7 @@ python3 add_atr_threshold_preferences.py
 ```
 
 המיגרציה צריכה:
+
 - לבדוק אם ההעדפות כבר קיימות (idempotent)
 - להוסיף את ההעדפות אם הן לא קיימות
 - לתקן sequence אם נדרש
@@ -159,6 +160,7 @@ Success Rate: XX.XX%
 ### בעיה: העדפות לא נטענות
 
 **פתרון**:
+
 1. בדוק שהמיגרציה הורצה בהצלחה
 2. בדוק שהעדפות קיימות במסד הנתונים
 3. בדוק שהמשתמש והפרופיל נכונים
@@ -166,6 +168,7 @@ Success Rate: XX.XX%
 ### בעיה: רמזור לא משתנה
 
 **פתרון**:
+
 1. בדוק שהעדפות נטענו נכון (בקונסול)
 2. בדוק ש-`atrPercent` מחושב נכון
 3. בדוק שהגבולות נכונים
@@ -173,6 +176,7 @@ Success Rate: XX.XX%
 ### בעיה: CSS לא מוצג
 
 **פתרון**:
+
 1. בדוק ש-`_badges-status.css` נטען
 2. בדוק שה-classes קיימים (atr-green, atr-yellow, atr-red)
 3. רענן את הדף עם Ctrl+F5

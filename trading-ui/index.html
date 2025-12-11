@@ -392,7 +392,39 @@
             </div>
         </div>
         
-        <!-- שורה שלישית: וויגיט גרפים -->
+        <!-- שורה שלישית: רשימות צפייה -->
+        <div class="row g-3 mb-3">
+            <div class="col-12">
+                <div class="card h-100" id="watchListsWidgetContainer">
+                    <div class="card-header d-flex align-items-center justify-content-between gap-2">
+                        <h5 class="mb-0 d-flex align-items-center gap-2">
+                            <span class="icon-placeholder icon" data-icon="eye" data-size="16" data-alt="רשימות צפייה" aria-label="רשימות צפייה"></span>
+                            <span>רשימות צפייה</span>
+                        </h5>
+                        <select id="watchListsWidgetSelect" 
+                                class="form-select form-select-sm" 
+                                style="min-width: 200px; font-weight: 600;">
+                            <option value="">טוען רשימות...</option>
+                        </select>
+                    </div>
+                    <div class="card-body">
+                        <div id="watchListsWidgetLoading" class="d-flex align-items-center justify-content-center text-muted small">
+                            <div class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></div>
+                            <span>טוען רשימת צפייה...</span>
+                        </div>
+                        <div id="watchListsWidgetError" class="alert alert-danger d-none" role="alert">
+                            <span class="alert-text">שגיאה בטעינת רשימת צפייה</span>
+                        </div>
+                        <div id="watchListsWidgetEmpty" class="alert alert-info d-none" role="status">
+                            <span class="alert-text">אין רשימות צפייה. צור רשימה חדשה בעמוד רשימות צפייה.</span>
+                        </div>
+                        <ul class="list-group" id="watchListsWidgetList"></ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- שורה רביעית: וויגיט גרפים -->
         <div class="row g-3 mb-3">
             <div class="col-12">
                 <div class="card h-100" id="tickerChartWidgetContainer">
@@ -580,6 +612,8 @@
     <script src="scripts/cache-clear-menu.js?v=1.0.0" defer></script> <!-- Cache clearing control (Stage B-Lite) -->
     <!-- [13] Load Order: 13 | Strategy: defer -->
     <script src="scripts/cache-ttl-guard.js?v=1.0.0" defer></script> <!-- TTL guard for entity loaders -->
+    <!-- [13.5] Load Order: 13.5 | Strategy: defer -->
+    <script src="scripts/auth-debug-monitor.js?v=1.0.0" defer></script> <!-- Authentication debug monitor -->
     <!-- [14] Load Order: 14 | Strategy: defer -->
     <script src="scripts/auth.js?v=1.0.0" defer></script> <!-- Authentication system -->
     <!-- [15] Load Order: 15 | Strategy: defer -->
@@ -838,16 +872,16 @@
     <!-- =============================================================== -->
     <!-- ===== PACKAGE 11/13: DASHBOARD WIDGETS ===== -->
     <!-- =============================================================== -->
-    <!-- Load Order: 19.5 | Description: Widgets and dashboard interfaces (Pending Executions, Trade Creation) -->
-    <!-- Dependencies: base, services, ui-advanced, entity-services, modules, entity-details -->
+    <!-- Load Order: 20.5 | Description: Widgets and dashboard interfaces (Pending Executions, Trade Creation) -->
+    <!-- Dependencies: base, services, ui-advanced, entity-services, modules, entity-details, watch-lists -->
     <!-- Critical: NO | Version: 1.0.0 -->
 
     <!-- [105] Load Order: 105 | Strategy: defer -->
     <script src="scripts/services/dashboard-data.js?v=1.0.0" defer></script> <!-- Unified dashboard data service -->
     <!-- [106] Load Order: 106 | Strategy: defer -->
-    <script src="scripts/widgets/unified-pending-actions-widget.js?v=1.0.0" defer></script> <!-- undefined -->
-    <!-- [107] Load Order: 107 | Strategy: defer -->
     <script src="scripts/widgets/recent-items-widget.js?v=1.0.0" defer></script> <!-- Unified recent trades and trade plans widget -->
+    <!-- [107] Load Order: 107 | Strategy: defer -->
+    <script src="scripts/widgets/unified-pending-actions-widget.js?v=1.0.0" defer></script> <!-- Unified pending actions widget -->
     <!-- [108] Load Order: 108 | Strategy: defer -->
     <script src="scripts/widgets/tag-widget.js?v=1.0.0" defer></script> <!-- Unified tag widget (cloud + search) -->
     <!-- [109] Load Order: 109 | Strategy: defer -->
@@ -857,6 +891,8 @@
     <!-- [111] Load Order: 111 | Strategy: defer -->
     <script src="scripts/widgets/ticker-chart-widget.js?v=1.0.0" defer></script> <!-- Ticker chart widget with mini charts -->
     <!-- [112] Load Order: 112 | Strategy: defer -->
+    <script src="scripts/widgets/watch-lists-widget.js?v=1.0.0" defer></script> <!-- Watch lists widget for dashboard -->
+    <!-- [113] Load Order: 113 | Strategy: defer -->
     <script src="scripts/index.js?v=1.0.0" defer></script> <!-- Dashboard page logic -->
 
     <!-- =============================================================== -->
@@ -884,7 +920,12 @@
 
     <!-- [117] Load Order: 117 | Strategy: defer -->
     <script src="scripts/init-system/package-manifest.js?v=1.0.0" defer></script> <!-- Package manifest -->
-    <!-- [118] Load Order: 118 | Strategy: defer -->
+    <!-- [EOD] Load Order: EOD | Strategy: defer -->
+    <script src="scripts/services/eod-metrics-data.js?v=1.0.0" defer></script> <!-- EOD Metrics Data Service -->
+    <!-- [EOD] Load Order: EOD+1 | Strategy: defer -->
+    <script src="scripts/services/eod-validation-service.js?v=1.0.0" defer></script> <!-- EOD Validation Service -->
+    <!-- [EOD] Load Order: EOD+2 | Strategy: defer -->
+    <script src="scripts/services/eod-integration-helper.js?v=1.0.0" defer></script> <!-- EOD Integration Helper -->    <!-- [118] Load Order: 118 | Strategy: defer -->
     <script src="scripts/page-initialization-configs.js?v=1.0.0" defer></script> <!-- Page initialization configurations -->
     <!-- [119] Load Order: 119 | Strategy: defer -->
     <script src="scripts/init-system-check.js?v=1.0.0" defer></script> <!-- Initialization system check -->

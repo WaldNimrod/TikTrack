@@ -22,6 +22,16 @@
  * @lastUpdated November 23, 2025
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Event Handlers ===
+// - positionSubmenu() - Positionsubmenu
+// - debouncedPositionSubmenu() - Debouncedpositionsubmenu
+
+// === Other ===
+// - clearTimeouts() - Cleartimeouts
+
 if (window.Logger) {
   window.Logger.info('🚀 Loading Header System v7.0.0...', { page: 'header-system' });
 }
@@ -669,6 +679,12 @@ window.FilterManager = class FilterManager {
       }
     }
 
+    // Ensure accounts is an array
+    if (!Array.isArray(accounts)) {
+      accounts = [];
+      window.Logger?.warn?.('⚠️ accounts is not an array, resetting to empty array', { page: 'header-system', accountsType: typeof accounts });
+    }
+
     const openAccounts = accounts.filter(account => account.status === 'open');
 
     openAccounts.forEach(account => {
@@ -1067,13 +1083,8 @@ class HeaderSystem {
   }
 
   static createHeader() {
-    // Skip header creation for auth pages (login, register, etc.)
-    const isAuthPage = window.location.pathname.includes('login.html') ||
-                      window.location.pathname.includes('register.html') ||
-                      window.location.pathname.includes('forgot-password.html') ||
-                      window.location.pathname.includes('reset-password.html') ||
-                      document.documentElement.classList.contains('login-page') ||
-                      document.documentElement.classList.contains('auth-page');
+    // No dedicated auth pages; always render header
+    const isAuthPage = false;
     
     if (isAuthPage) {
       window.Logger?.debug('Skipping header creation for auth page', { page: 'header-system' });
@@ -1108,7 +1119,7 @@ class HeaderSystem {
       const userSection = document.getElementById('filterUserSection');
       const userAvatar = document.getElementById('filterUserAvatar');
       const userInitials = document.getElementById('filterUserInitials');
-      const authIcon = document.getElementById('filterAuthIcon');
+    const authIcon = document.getElementById('filterAuthIcon');
       
       if (!userSection || !userAvatar || !userInitials || !authIcon) {
         // User section might not exist on all pages
@@ -1134,6 +1145,8 @@ class HeaderSystem {
       }
 
       const isAuthenticated = currentUser && currentUser.id;
+      const logoGreen = '#26baac';   // מחובר
+      const logoOrange = '#fc5a06';  // מנותק
       
       if (isAuthenticated) {
         // Get user initials
@@ -1157,7 +1170,14 @@ class HeaderSystem {
         userSection.style.display = 'flex';
         const profileLink = document.getElementById('filterUserProfileLink');
         if (profileLink) profileLink.style.display = 'block';
-        authIcon.style.opacity = '0.7';
+        authIcon.style.opacity = '1';
+        authIcon.style.backgroundColor = '#ffffff';
+        authIcon.style.border = `1px solid ${logoGreen}`;
+        authIcon.style.borderRadius = '6px';
+        authIcon.style.padding = '2px';
+        authIcon.style.filter = 'none';
+        authIcon.style.boxShadow = `0 0 0 2px ${logoGreen} inset`;
+        authIcon.dataset.status = 'logged-in';
         authIcon.title = 'התנתק';
       } else {
         // Show login icon only
@@ -1165,7 +1185,14 @@ class HeaderSystem {
         userSection.style.display = 'flex';
         const profileLink = document.getElementById('filterUserProfileLink');
         if (profileLink) profileLink.style.display = 'none';
-        authIcon.style.opacity = '0.7';
+        authIcon.style.opacity = '1';
+        authIcon.style.backgroundColor = '#ffffff';
+        authIcon.style.border = `1px solid ${logoOrange}`;
+        authIcon.style.borderRadius = '6px';
+        authIcon.style.padding = '2px';
+        authIcon.style.filter = 'none';
+        authIcon.style.boxShadow = `0 0 0 2px ${logoOrange} inset`;
+        authIcon.dataset.status = 'logged-out';
         authIcon.title = 'התחבר';
       }
     } catch (error) {
@@ -1207,6 +1234,7 @@ class HeaderSystem {
                       </a>
                       <ul class="tiktrack-dropdown-menu">
                         <li><a class="tiktrack-dropdown-item" href="/watch-list">רשימות צפייה</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/trading-journal">📓 יומן מסחר</a></li>
                       </ul>
                     </li>
                     <li class="tiktrack-nav-item dropdown">
@@ -1216,10 +1244,10 @@ class HeaderSystem {
                       </a>
                       <ul class="tiktrack-dropdown-menu">
                         <li><a class="tiktrack-dropdown-item" href="/ai-analysis">אנליזת AI</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/strategy-analysis">📊 ניתוח אסטרטגיות</a></li>
                         <li class="separator"></li>
                         <li><a class="tiktrack-dropdown-item" href="/trade-history">📈 היסטוריית טרייד</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/portfolio-state">💼 מצב תיק היסטורי</a></li>
-                        <li><a class="tiktrack-dropdown-item" href="/trading-journal">📓 יומן מסחר</a></li>
                       </ul>
                     </li>
                     <li class="tiktrack-nav-item dropdown">
@@ -1242,7 +1270,7 @@ class HeaderSystem {
                         <span class="tiktrack-dropdown-arrow">▼</span>
                       </a>
                       <ul class="tiktrack-dropdown-menu">
-                        <li><a class="tiktrack-dropdown-item" href="/user-profile">👤 פרופיל משתמש</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/user-profile.html">👤 פרופיל משתמש</a></li>
                         <li class="separator"></li>
                         <li><a class="tiktrack-dropdown-item" href="/data_import">ייבוא נתונים</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/tag-management">ניהול תגיות</a></li>
@@ -1289,6 +1317,9 @@ class HeaderSystem {
                             <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/trade-history-page.html">📈 היסטוריית טרייד</a></li>
                             <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/trading-journal-page.html">📓 יומן מסחר</a></li>
                             <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/tradingview-test-page.html">📈 גראפים TV</a></li>
+                            <li class="separator"></li>
+                            <li><a class="tiktrack-dropdown-item" href="/conditions-modals.html">🧩 מודלי תנאים</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/conditions-test.html">🧪 בדיקות תנאים</a></li>
                             <li class="separator"></li>
                             <li><a class="tiktrack-dropdown-item" href="/mockups/add-ticker-modal.html">➕ הוספת טיקר</a></li>
                             <li><a class="tiktrack-dropdown-item" href="/mockups/flag-quick-action.html">🚩 פעולה מהירה</a></li>
@@ -1485,7 +1516,7 @@ class HeaderSystem {
             </div>
 
             <div class="filter-user-section" id="filterUserSection" style="margin-right: auto; display: flex; align-items: center; gap: 8px;">
-              <a href="/user-profile" class="user-profile-link" id="filterUserProfileLink" title="פרופיל משתמש" style="text-decoration: none; display: none;">
+              <a href="/user-profile.html" class="user-profile-link" id="filterUserProfileLink" title="פרופיל משתמש" style="text-decoration: none; display: none;">
                 <div class="user-avatar-badge" id="filterUserAvatar" style="width: 36px; height: 36px; border-radius: 50%; background: #26baac; color: white; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 14px; cursor: pointer;">
                   <span id="filterUserInitials">?</span>
                 </div>
@@ -1858,7 +1889,7 @@ window.handleHeaderLogout = async function(event) {
       if (typeof window.TikTrackAuth?.showLoginModal === 'function') {
         await window.TikTrackAuth.showLoginModal();
       } else {
-        window.location.href = '/login.html';
+        window.location.href = '/';
       }
     }
   } else {
@@ -1866,7 +1897,7 @@ window.handleHeaderLogout = async function(event) {
     if (typeof window.TikTrackAuth?.showLoginModal === 'function') {
       await window.TikTrackAuth.showLoginModal();
     } else {
-      window.location.href = '/login.html';
+      window.location.href = '/';
     }
   }
 };
@@ -2007,11 +2038,8 @@ if (window.Logger) {
 (function() {
   'use strict';
   
-  // Skip auto-initialization for auth pages
-  const isAuthPage = window.location.pathname.includes('login.html') ||
-                     window.location.pathname.includes('register.html') ||
-                     window.location.pathname.includes('forgot-password.html') ||
-                     window.location.pathname.includes('reset-password.html');
+  // No dedicated auth pages; always initialize header
+  const isAuthPage = false;
   
   if (isAuthPage) {
     if (window.Logger?.debug) {

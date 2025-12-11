@@ -270,10 +270,32 @@ class TestPortfolioStateAPI:
                     'is_valid': True,
                     'errors': []
                 }
-                mock_service_instance.calculate_portfolio_state_at_date.return_value = {
-                    'positions': [],
-                    'total_value': 1000.0,
-                    'total_pl': 0.0,
+                # Updated to use calculate_portfolio_comparison instead of two separate calls
+                mock_service_instance.calculate_portfolio_comparison.return_value = {
+                    'date1_state': {
+                        'date': '2025-01-01T00:00:00Z',
+                        'cash_balance': 5000.0,
+                        'portfolio_value': 10000.0,
+                        'total_pl': 1000.0,
+                        'total_pl_percent': 10.0,
+                        'positions_count': 5
+                    },
+                    'date2_state': {
+                        'date': '2025-01-31T00:00:00Z',
+                        'cash_balance': 5500.0,
+                        'portfolio_value': 11000.0,
+                        'total_pl': 1500.0,
+                        'total_pl_percent': 13.6,
+                        'positions_count': 6
+                    },
+                    'comparison': {
+                        'cash_balance_change': 500.0,
+                        'portfolio_value_change': 1000.0,
+                        'portfolio_value_change_percent': 10.0,
+                        'total_pl_change': 500.0,
+                        'total_pl_change_percent': 50.0,
+                        'positions_count_change': 1
+                    },
                     'is_valid': True
                 }
                 mock_service.return_value = mock_service_instance
@@ -283,6 +305,10 @@ class TestPortfolioStateAPI:
                 assert response.status_code == 200
                 data = json.loads(response.data)
                 assert data['status'] == 'success'
+                assert 'data' in data
+                assert 'comparison' in data['data']
+                assert 'date1_state' in data['data']
+                assert 'date2_state' in data['data']
         finally:
             for p in patches:
                 p.stop()

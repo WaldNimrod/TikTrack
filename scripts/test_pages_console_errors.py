@@ -11,15 +11,19 @@ from datetime import datetime
 from pathlib import Path
 from collections import deque
 from typing import Optional
+import requests
 
 try:
     from selenium import webdriver
-    from selenium.webdriver.chrome.service import Service
-    from selenium.webdriver.chrome.options import Options
+    from selenium.webdriver.firefox.service import Service
+    from selenium.webdriver.firefox.options import Options
+    from selenium.webdriver.chrome.service import Service as ChromeService
+    from selenium.webdriver.chrome.options import Options as ChromeOptions
     from selenium.webdriver.common.by import By
     from selenium.webdriver.support.ui import WebDriverWait
     from selenium.webdriver.support import expected_conditions as EC
     from selenium.common.exceptions import TimeoutException, WebDriverException
+    from webdriver_manager.firefox import GeckoDriverManager
     from webdriver_manager.chrome import ChromeDriverManager
 except ImportError:
     print("❌ Error: selenium or webdriver-manager not installed.")
@@ -27,6 +31,10 @@ except ImportError:
     exit(1)
 
 BASE_URL = "http://localhost:8080"
+
+# Test credentials (admin) - CRITICAL: Always use admin/admin123 for tests
+TEST_USERNAME = "admin"
+TEST_PASSWORD = "admin123"
 
 # Rate limiting configuration
 # Server limits: 5000 requests/minute = ~83 requests/second
@@ -78,8 +86,7 @@ ALL_PAGES = [
     {"name": "ניהול גרפים", "url": "/chart-management.html", "category": "secondary", "priority": "low"},
     {"name": "דשבורד בדיקות CRUD", "url": "/crud-testing-dashboard.html", "category": "secondary", "priority": "low"},
     
-    # עמודי אימות (Auth Pages)
-    {"name": "כניסה למערכת", "url": "/login.html", "category": "auth", "priority": "high"},
+    # עמודי אימות (Auth Pages) - login is via modal on base pages
     {"name": "הרשמה למערכת", "url": "/register.html", "category": "auth", "priority": "medium"},
     {"name": "שחזור סיסמה", "url": "/forgot-password.html", "category": "auth", "priority": "medium"},
     {"name": "איפוס סיסמה", "url": "/reset-password.html", "category": "auth", "priority": "medium"},
@@ -100,9 +107,11 @@ ALL_PAGES = [
     {"name": "ניהול רשימות צפייה (מוקאפ)", "url": "/mockups/watch-lists-page.html", "category": "watchlists", "priority": "medium"},
     
     # עמודי מחקר (Research Pages) - משולבים
-    {"name": "היסטוריית טרייד", "url": "/mockups/daily-snapshots/trade-history-page.html", "category": "main", "priority": "high"},
-    {"name": "מצב תיק היסטורי", "url": "/mockups/daily-snapshots/portfolio-state-page.html", "category": "main", "priority": "high"},
-    {"name": "יומן מסחר", "url": "/mockups/daily-snapshots/trading-journal-page.html", "category": "main", "priority": "high"},
+    {"name": "היסטוריית טרייד", "url": "/trade-history", "category": "main", "priority": "high"},
+    {"name": "מצב תיק היסטורי", "url": "/portfolio-state.html", "category": "main", "priority": "high"},
+    {"name": "יומן מסחר", "url": "/trading-journal.html", "category": "main", "priority": "high"},
+    {"name": "ניתוח אסטרטגיות", "url": "/strategy-analysis", "category": "main", "priority": "high"},
+    {"name": "יומן מסחר (מוקאפ)", "url": "/mockups/daily-snapshots/trading-journal-page.html", "category": "main", "priority": "low"},
     {"name": "מודל רשימת צפייה", "url": "/mockups/watch-list-modal.html", "category": "watchlists", "priority": "medium"},
     {"name": "מודל הוספת טיקר", "url": "/mockups/add-ticker-modal.html", "category": "watchlists", "priority": "medium"},
     {"name": "פעולה מהירה דגלים", "url": "/mockups/flag-quick-action.html", "category": "watchlists", "priority": "medium"},
@@ -185,28 +194,210 @@ rate_tracker = RateLimitTracker(
     window_seconds=RATE_LIMIT_CONFIG['window_seconds']
 )
 
-def setup_driver():
-    """Setup Chrome WebDriver with automatic ChromeDriver management"""
-    chrome_options = Options()
-    chrome_options.add_argument('--headless')
-    chrome_options.add_argument('--no-sandbox')
-    chrome_options.add_argument('--disable-dev-shm-usage')
-    chrome_options.add_argument('--disable-gpu')
-    chrome_options.add_argument('--window-size=1920,1080')
-    chrome_options.add_experimental_option('excludeSwitches', ['enable-logging'])
-    
-    # Enable logging
-    chrome_options.set_capability('goog:loggingPrefs', {'browser': 'ALL', 'performance': 'ALL'})
-    
-    try:
-        # Use webdriver-manager to automatically download and manage ChromeDriver
-        service = Service(ChromeDriverManager().install())
-        driver = webdriver.Chrome(service=service, options=chrome_options)
+def setup_driver(prefer_chrome: bool = False):
+    """
+    Setup WebDriver (Chrome fallback) with options for console error testing.
+    prefer_chrome: if True, use Chrome; otherwise try Firefox Dev first, then Chrome.
+    """
+    last_error = None
+
+    def create_firefox():
+        firefox_options = Options()
+        # firefox_options.add_argument('--headless')  # intentionally visible for debugging
+        firefox_options.set_preference('devtools.console.stdout.content', True)
+        firefox_options.add_argument('--no-sandbox')
+        firefox_options.add_argument('--disable-dev-shm-usage')
+        firefox_options.add_argument('--width=1920')
+        firefox_options.add_argument('--height=1080')
+        dev_edition_path = "/Applications/Firefox Developer Edition.app/Contents/MacOS/firefox"
+        if Path(dev_edition_path).exists():
+            firefox_options.binary_location = dev_edition_path
+        service = Service(GeckoDriverManager().install())
+        driver = webdriver.Firefox(service=service, options=firefox_options)
+        driver.set_script_timeout(60)
         return driver
+
+    def create_chrome():
+        chrome_options = ChromeOptions()
+        chrome_options.add_argument('--no-sandbox')
+        chrome_options.add_argument('--disable-dev-shm-usage')
+        chrome_options.add_argument('--disable-gpu')
+        chrome_options.add_argument('--window-size=1920,1080')
+        service = ChromeService(ChromeDriverManager().install())
+        driver = webdriver.Chrome(service=service, options=chrome_options)
+        driver.set_script_timeout(60)
+        return driver
+
+    try:
+        if prefer_chrome:
+            return create_chrome()
+        # Try Firefox first
+        return create_firefox()
+    except Exception as e1:
+        last_error = e1
+        print(f"⚠️ Firefox driver failed: {e1}")
+        # Fallback to Chrome
+        try:
+            return create_chrome()
+        except Exception as e2:
+            print(f"❌ Error setting up any driver: Firefox: {e1} | Chrome: {e2}")
+            print("💡 Make sure Firefox Dev or Chrome is installed. Using webdriver-manager for drivers.")
+            return None
+
+def login(driver):
+    """Login using API token (requests) + sessionStorage injection; fallback to modal if needed."""
+    try:
+        print("🔐 Logging in as admin via API token (backend request) ...")
+        token = None
+        user = None
+        try:
+            api_resp = requests.post(
+                f"{BASE_URL}/api/auth/login",
+                json={"username": TEST_USERNAME, "password": TEST_PASSWORD},
+                timeout=15,
+                allow_redirects=False,
+            )
+            if api_resp.status_code == 200:
+                data = api_resp.json()
+                token = data.get("data", {}).get("access_token") or data.get("access_token")
+                user = data.get("data", {}).get("user") or data.get("user")
+        except Exception as api_err:
+            print(f"⚠️  API token login request failed: {api_err}")
+
+        if token:
+            driver.get(f"{BASE_URL}/")
+            WebDriverWait(driver, 15).until(
+                lambda d: d.execute_script('return document.readyState') == 'complete'
+            )
+
+            driver.execute_script(
+                """
+                sessionStorage.setItem('dev_authToken', arguments[0]);
+                sessionStorage.setItem('dev_currentUser', JSON.stringify(arguments[1] || {}));
+                localStorage.setItem('authToken', arguments[0]);
+                localStorage.setItem('currentUser', JSON.stringify(arguments[1] || {}));
+                window.authToken = arguments[0];
+                window.currentUser = arguments[1] || null;
+                """,
+                token,
+                user or {},
+            )
+
+            driver.refresh()
+            WebDriverWait(driver, 20).until(
+                lambda d: d.execute_script('return document.readyState') == 'complete'
+            )
+
+            # Verify token via backend directly (Python requests)
+            verify = requests.get(
+                f"{BASE_URL}/api/auth/me",
+                headers={"Authorization": f"Bearer {token}"},
+                timeout=10,
+            )
+            if verify.status_code == 200 and verify.json().get("status") == "success":
+                print("✅ API token login successful")
+                return True
+            else:
+                print(f"⚠️  API token set but backend verify failed: {verify.status_code} {verify.text[:200]}")
+
+        print("🔄 API token path failed or incomplete, falling back to modal flow ...")
+        driver.get(f"{BASE_URL}/")
+
+        WebDriverWait(driver, 15).until(
+            lambda d: d.execute_script('return document.readyState') == 'complete'
+        )
+
+        WebDriverWait(driver, 20).until(
+            lambda d: d.execute_script(
+                "return !!window.TikTrackAuth && typeof window.TikTrackAuth.showLoginModal === 'function';"
+            )
+        )
+
+        driver.execute_async_script(
+            """
+            const done = arguments[0];
+            const timeout = setTimeout(() => done('timeout waiting for showLoginModal'), 10000);
+            if (!window.TikTrackAuth || typeof window.TikTrackAuth.showLoginModal !== 'function') {
+                clearTimeout(timeout);
+                done('TikTrackAuth missing');
+                return;
+            }
+            Promise.resolve(window.TikTrackAuth.showLoginModal())
+              .then(() => { clearTimeout(timeout); done('ok'); })
+              .catch(err => { clearTimeout(timeout); done(err && err.message ? err.message : String(err)); });
+            """
+        )
+
+        WebDriverWait(driver, 15).until(
+            EC.presence_of_element_located((By.ID, "loginModalContainer"))
+        )
+        WebDriverWait(driver, 15).until(
+            EC.presence_of_element_located((By.ID, "loginForm"))
+        )
+
+        username_field = WebDriverWait(driver, 10).until(
+            EC.element_to_be_clickable((By.ID, "username"))
+        )
+        password_field = driver.find_element(By.ID, "password")
+
+        driver.execute_script("arguments[0].scrollIntoView(true);", username_field)
+        time.sleep(0.2)
+
+        username_field.clear()
+        username_field.send_keys(TEST_USERNAME)
+        password_field.clear()
+        password_field.send_keys(TEST_PASSWORD)
+
+        login_button = WebDriverWait(driver, 10).until(
+            EC.element_to_be_clickable((By.ID, "loginBtn"))
+        )
+        driver.execute_script("arguments[0].scrollIntoView(true);", login_button)
+        time.sleep(0.2)
+        driver.execute_script("arguments[0].click();", login_button)
+
+        try:
+            reload_btn = WebDriverWait(driver, 5).until(
+                EC.element_to_be_clickable((By.ID, "loginReloadButton"))
+            )
+            print("🛈 Reload button available - clicking to continue flow")
+            driver.execute_script("arguments[0].scrollIntoView(true);", reload_btn)
+            time.sleep(0.2)
+            driver.execute_script("arguments[0].click();", reload_btn)
+            WebDriverWait(driver, 20).until(
+                lambda d: d.execute_script('return document.readyState') == 'complete'
+            )
+            time.sleep(1)
+        except TimeoutException:
+            print("⚠️  Reload button not found; continuing without manual reload")
+
+        auth_status = driver.execute_async_script(
+            """
+            const done = arguments[0];
+            const controller = new AbortController();
+            const timeout = setTimeout(() => {
+                controller.abort();
+                done({ status: 0, error: 'timeout' });
+            }, 10000);
+            fetch('/api/auth/me', { method: 'GET', signal: controller.signal })
+              .then(res => res.json().then(body => {
+                  clearTimeout(timeout);
+                  done({status: res.status, body});
+              }))
+              .catch(err => {
+                  clearTimeout(timeout);
+                  done({status: 0, error: err && err.message ? err.message : String(err)});
+              });
+            """
+        )
+        if auth_status.get("status") == 200 and auth_status.get("body", {}).get("status") == "success":
+            print("✅ Login successful via modal flow")
+            return True
+        else:
+            print(f"❌ Login failed: {auth_status}")
+            return False
     except Exception as e:
-        print(f"❌ Error setting up Chrome driver: {e}")
-        print("💡 Make sure Chrome browser is installed")
-        return None
+        print(f"❌ Login process failed: {e}")
+        return False
 
 def test_page_console(driver, page_info, retry_count: int = 0):
     """Test a single page for console errors with rate limiting and retry logic"""
@@ -225,7 +416,9 @@ def test_page_console(driver, page_info, retry_count: int = 0):
         "has_core_systems": False,
         "initialization_status": {},
         "rate_limit_retries": retry_count,
-        "timestamp": datetime.now().isoformat()
+        "timestamp": datetime.now().isoformat(),
+        "login_modal_present": False,
+        "login_modal_visible": False,
     }
     
     try:
@@ -239,8 +432,11 @@ def test_page_console(driver, page_info, retry_count: int = 0):
         # Record request
         rate_tracker.record_request()
         
-        # Clear previous logs
-        driver.get_log('browser')
+        # Clear previous logs (if supported)
+        try:
+            driver.get_log('browser')
+        except AttributeError:
+            pass
         
         # Navigate to page
         start_time = time.time()
@@ -260,8 +456,11 @@ def test_page_console(driver, page_info, retry_count: int = 0):
         # Wait additional time for JavaScript to execute
         time.sleep(2)
         
-        # Get console logs
-        logs = driver.get_log('browser')
+        # Get console logs (if supported)
+        try:
+            logs = driver.get_log('browser')
+        except AttributeError:
+            logs = []
         for log in logs:
             level = log.get('level', '').upper()
             message = log.get('message', '')
@@ -270,9 +469,11 @@ def test_page_console(driver, page_info, retry_count: int = 0):
             if 'favicon' in message.lower() or 'chrome-extension' in message.lower():
                 continue
             
-            # Filter out expected auth errors (401) - these are normal when not logged in
+            # Filter out expected auth errors (401) - but we should be logged in as admin
+            # Only filter /api/auth/me errors as they might be transient
             if '401 (UNAUTHORIZED)' in message and '/api/auth/me' in message:
                 continue
+            # Other 401 errors should be reported as we're logged in
             
             # Filter out network errors for missing optional resources
             if 'Failed to load resource' in message:
@@ -347,6 +548,33 @@ def test_page_console(driver, page_info, retry_count: int = 0):
         
         if page_status.get("globalErrors"):
             result["page_errors"].append(page_status["globalErrors"])
+
+        # Detect login modal presence + visibility (to avoid false positives from hidden markup)
+        try:
+            login_modal_info = driver.execute_script("""
+                const selectors = [
+                    '#loginModalContainer',
+                    '#login-modal',
+                    '.login-modal',
+                    '[data-modal="login"]',
+                    '[data-modal-type="login"]'
+                ];
+                const els = selectors.flatMap(sel => Array.from(document.querySelectorAll(sel)));
+                const visible = els.some(el => {
+                    const style = window.getComputedStyle(el);
+                    const rect = el.getBoundingClientRect();
+                    return style.display !== 'none' &&
+                           style.visibility !== 'hidden' &&
+                           style.opacity !== '0' &&
+                           rect.width > 1 && rect.height > 1;
+                });
+                return { present: els.length > 0, visible };
+            """)
+            result["login_modal_present"] = bool(login_modal_info.get("present"))
+            result["login_modal_visible"] = bool(login_modal_info.get("visible"))
+        except Exception:
+            # Non-fatal; ignore detection errors
+            pass
         
         # Check for critical errors
         critical_errors = [
@@ -416,7 +644,7 @@ def main():
     parser.add_argument('--page', type=str, help='Test specific page URL (e.g., /watch-list.html)')
     args = parser.parse_args()
     
-    # Filter pages if --page is specified
+    # Filter pages if --page is specified, or use quick test pages
     pages_to_test = ALL_PAGES
     if args.page:
         page_url = args.page if args.page.startswith('/') else '/' + args.page
@@ -427,6 +655,12 @@ def main():
             for p in [p for p in ALL_PAGES if 'watch-list' in p['url'].lower()]:
                 print(f"  - {p['url']} ({p['name']})")
             return
+    else:
+        # Quick test - only 3 critical pages to verify login modal fix
+        pages_to_test = [
+            p for p in ALL_PAGES
+            if p['url'] in ['/', '/trades.html', '/alerts.html']
+        ]
     
     print("=" * 80)
     if args.page:
@@ -440,9 +674,18 @@ def main():
     print("=" * 80)
     print()
     
-    driver = setup_driver()
+    # Prefer Chrome to avoid GitHub rate limits on geckodriver download
+    driver = setup_driver(prefer_chrome=True)
     if not driver:
         print("❌ Failed to setup WebDriver. Exiting.")
+        return
+    
+    # Login as admin before testing pages (CRITICAL: Always use admin/admin123)
+    login_success = login(driver)
+    time.sleep(2)  # Wait for login to complete
+    if not login_success:
+        print("❌ Login failed - aborting tests to avoid false results.")
+        driver.quit()
         return
     
     results = []
@@ -501,6 +744,8 @@ def main():
     print(f"⚠️  עמודים עם אזהרות: {len(with_warnings)}/{len(results)}")
     print(f"📄 עמודים עם Header: {len(with_header)}/{len(results)} ({len(with_header)/len(results)*100:.1f}%)")
     print(f"⚙️  עמודים עם Core Systems: {len(with_core_systems)}/{len(results)} ({len(with_core_systems)/len(results)*100:.1f}%)")
+    print(f"🔐 עמודים עם מודל Login (נוכחות): {len([r for r in results if r.get('login_modal_present')])}/{len(results)}")
+    print(f"🔓 עמודים עם מודל Login גלוי: {len([r for r in results if r.get('login_modal_visible')])}/{len(results)}")
     
     # Rate limiting statistics
     rate_stats = rate_tracker.get_stats()

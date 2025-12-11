@@ -1,4 +1,5 @@
 # מבנה נתונים - תיעוד רגשי
+
 ## Emotional Tracking Data Structure
 
 **תאריך יצירה:** 29 בינואר 2025  
@@ -43,6 +44,7 @@
 | `stressed` | מתוח | `mood-stressed` |
 
 **הערות:**
+
 - רשימה סגורה - לא ניתן להוסיף רגשות חדשים ללא שינוי במערכת
 - כל רגש צריך אייקון ייחודי
 - ערכים באנגלית (כמו כל המערכת)
@@ -60,6 +62,7 @@
 ### 2.1 סוגי גרפים נדרשים
 
 #### Bar Chart - התפלגות רגשות
+
 ```json
 {
   "chart_type": "bar",
@@ -77,6 +80,7 @@
 ```
 
 #### Pie Chart - התפלגות רגשות
+
 ```json
 {
   "chart_type": "pie",
@@ -89,6 +93,7 @@
 ```
 
 #### Line Chart - מגמה לאורך זמן
+
 ```json
 {
   "chart_type": "line",
@@ -140,6 +145,7 @@
 ### 4.1 סוגי תובנות
 
 #### תובנה חיובית (Info)
+
 ```json
 {
   "type": "insight",
@@ -155,6 +161,7 @@
 ```
 
 #### אזהרה (Warning)
+
 ```json
 {
   "type": "pattern",
@@ -234,6 +241,7 @@ CREATE INDEX idx_emotional_entries_emotion_type ON emotional_entries(emotion_typ
 ### 6.3 Query Parameters
 
 **לכל ה-endpoints:**
+
 - `?user_id={id}` - סינון לפי משתמש
 - `?trade_id={id}` - סינון לפי טרייד
 - `?emotion_type={type}` - סינון לפי רגש
@@ -262,11 +270,13 @@ CREATE INDEX idx_emotional_entries_emotion_type ON emotional_entries(emotion_typ
 **שאלה פתוחה:** האם להשתמש ב-`notes` table הקיים או בטבלה נפרדת?
 
 **אפשרות 1:** שימוש ב-`notes` table
+
 - ✅ אין צורך בטבלה חדשה
 - ✅ מערכת קישור קיימת (`related_type_id`, `related_id`)
 - ❌ לא מתאים - Notes זה טקסט חופשי, לא מבנה מובנה
 
 **אפשרות 2:** טבלה נפרדת `emotional_entries`
+
 - ✅ מבנה מובנה וספציפי
 - ✅ ביצועים טובים יותר (אינדקסים)
 - ✅ קל לניתוח ושאילתות

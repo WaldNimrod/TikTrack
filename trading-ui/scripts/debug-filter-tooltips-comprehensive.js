@@ -8,6 +8,29 @@
  * Usage: Copy and paste into browser console
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - monitorButtonSystemInit() - Monitorbuttonsysteminit
+// - manualTooltipInit() - Manualtooltipinit
+
+// === Event Handlers ===
+// - monitorFilterButtonsHTML() - Monitorfilterbuttonshtml
+// - monitorDOMMutations() - Monitordommutations
+// - monitorPageLoad() - Monitorpageload
+
+// === Data Functions ===
+// - getComprehensiveReport() - Getcomprehensivereport
+
+// === Utility Functions ===
+// - checkSourceHTML() - Checksourcehtml
+
+// === Other ===
+// - debugLog() - Debuglog
+// - debugWarn() - Debugwarn
+// - debugError() - Debugerror
+
 // CRITICAL: Define the object IMMEDIATELY before IIFE to ensure it's always available
 // This prevents "ReferenceError: debugFilterTooltips is not defined" errors
 if (typeof window.debugFilterTooltips === 'undefined') {

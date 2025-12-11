@@ -1,4 +1,5 @@
 # דוח: Keys יתומים במטמון - Orphan Cache Keys Report
+
 # ========================================================
 
 **תאריך:** 11 אוקטובר 2025  
@@ -25,6 +26,7 @@ keys.forEach(key => {
 ## 📋 **Keys יתומים שנמצאו**
 
 ### **1. State Management (מצב UI)**
+
 ```javascript
 // cash_flows.js
 'cashFlowsSectionState'             // fallback
@@ -39,6 +41,7 @@ keys.forEach(key => {
 ```
 
 ### **2. Testing & Debug**
+
 ```javascript
 // crud-testing-dashboard.js
 'crud_test_results'                 // fallback
@@ -52,6 +55,7 @@ keys.forEach(key => {
 ```
 
 ### **3. User Preferences**
+
 ```javascript
 // modules/ui-advanced.js (fallbacks)
 'colorScheme'                       // e.g. 'light', 'dark', 'custom'
@@ -65,6 +69,7 @@ keys.forEach(key => {
 ```
 
 ### **4. Authentication (⚠️ קריטי!)**
+
 ```javascript
 // auth.js
 'authToken'                         // ⚠️ טוקן אימות!
@@ -72,6 +77,7 @@ keys.forEach(key => {
 ```
 
 ### **5. Backup Files (ישנים)**
+
 ```javascript
 // server-monitor-backup-*.js
 'serverMonitorSettings'             // קבצי גיבוי ישנים
@@ -96,11 +102,13 @@ keys.forEach(key => {
 ## ⚠️ **השלכות**
 
 ### **1. פיתוח:**
+
 - ✅ **רוב ה-Keys הם Fallbacks** - נכתבים רק אם UnifiedCacheManager לא זמין
 - ⚠️ **בפיתוח תקין** - כנראה לא יווצרו (UnifiedCacheManager פעיל)
 - ❌ **אם יש crash** - Keys יכולים להישאר "תקועים"
 
 ### **2. נתונים ישנים:**
+
 ```javascript
 // דוגמה: משתמש עדכן צבע אבל fallback נשאר ישן
 colorScheme: 'dark'           // ✅ ב-UnifiedCacheManager (נוקה)
@@ -110,6 +118,7 @@ localStorage.colorScheme: 'light'  // ❌ fallback ישן (לא נוקה!)
 ```
 
 ### **3. אבטחה (Authentication):**
+
 ```javascript
 // ⚠️ קריטי!
 localStorage.authToken: 'old-token'
@@ -130,20 +139,24 @@ localStorage.currentUser: '{...}'
 הבעיה נפתרה ע"י יישום מערכת רמות ניקוי עם 4 רמות עוצמה:
 
 #### **רמה 1: Light** - Memory + Services בלבד (25% כיסוי)
+
 - לא נוגע ב-orphans
 - בטוח למבחנים
 
 #### **רמה 2: Medium** - + UnifiedCacheManager (60% כיסוי)
+
 - כפתור 🧹 בתפריט הראשי
 - לא נוגע ב-orphans
 - מומלץ לפיתוח יומיומי
 
 #### **רמה 3: Full** - + Orphan Keys (100% כיסוי) ✅
+
 - **מנקה את כל 15-20 ה-orphan keys!**
 - כולל: authToken, currentUser, colorScheme, etc.
 - כולל: dynamic keys (sortState_*, section-*, etc.)
 
 #### **רמה 4: Nuclear** - + ALL localStorage + DELETE DB (150%+ כיסוי)
+
 - reset מוחלט
 - חירום בלבד
 
@@ -172,19 +185,23 @@ window.clearAllCache({ level: 'full' });  // ✅ מנקה orphans!
 ### **ממשק משתמש:**
 
 **cache-test.html:**
+
 - 4 כרטיסים צבעוניים לכל רמה
 - טבלת השוואה
 - כפתור בדיקה אוטומטית
 
 **system-management.html:**
+
 - 4 כפתורים קומפקטיים
 - tooltips מפורטים
 
 **תפריט ראשי:**
+
 - כפתור 🧹 → Medium (לא מנקה orphans)
 - לניקוי מלא: cache-test או system-management
 
 ### **בדיקות:**
+
 ```javascript
 // בדיקה אוטומטית של 3 רמות
 await testClearingLevels();
@@ -220,6 +237,7 @@ await clearAllCache({
 ## 🎯 **המלצות**
 
 ### **1. תיקון מיידי (קריטי):**
+
 ```javascript
 // הוסף ל-clearAllCache():
 const authKeys = ['authToken', 'currentUser'];
@@ -227,6 +245,7 @@ authKeys.forEach(key => localStorage.removeItem(key));
 ```
 
 ### **2. תיקון בינוני (Fallbacks):**
+
 ```javascript
 // הוסף ל-clearAllCache():
 const fallbackKeys = [
@@ -243,6 +262,7 @@ fallbackKeys.forEach(key => localStorage.removeItem(key));
 ```
 
 ### **3. תיקון ארוך טווח:**
+
 - ✅ **העבר הכל ל-UnifiedCacheManager** (בעדיפות ראשונה)
 - ✅ **אל תשתמש ב-localStorage ישירות** (fallback בלבד!)
 - ✅ **השתמש תמיד ב-prefix `tiktrack_`** אם חייבים localStorage ישיר
@@ -279,6 +299,7 @@ console.table(orphans.map(key => ({
   3. **authToken/currentUser לא מנוקים** - בעיית אבטחה פוטנציאלית
 
 ### **פתרון:**
+
 הוסף רשימת keys יתומים ל-`clearAllCache()` (ראה אופציה 1 למעלה).
 
 ---

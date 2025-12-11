@@ -57,12 +57,6 @@ This log records every production version update, including manual major/minor a
 | 2025-11-30T11:41:34+00:00 | 1.3.14.3 | 1.3.14.2 | 32f799344a83e17d01be48d4cbb32eb643d91e7d | f5a67b43b18ceb797e97959702b509c5aeec2b4c | build | Additional fixes: ai-analysis-manager, info-summary-system, pagination-system |
 | 2025-11-30T11:41:55+00:00 | 1.3.14.4 | 1.3.14.3 | 0d9d22ce8ecd73c37e9cbe203c044c0820ef6cea | 32f799344a83e17d01be48d4cbb32eb643d91e7d | build | Final fix: sm-section-server improvements |
 | 2025-11-30T11:42:07+00:00 | 1.3.14.5 | 1.3.14.4 | f7825f199ba48d4215a9ed4235d38ea11a13dc08 | 0d9d22ce8ecd73c37e9cbe203c044c0820ef6cea | build | Final sm-section-server fix |
-| 2025-12-01T11:22:31+00:00 | 1.3.15.0 | 1.3.14.5 | 2035548a024bcd7abd1e565ff671d5b0d6e8466e | f7825f199ba48d4215a9ed4235d38ea11a13dc08 | patch | Add security audit reports for user data isolation and page protection |
-| 2025-12-07T00:15:34+00:00 | 1.3.16.0 | 1.3.15.0 | 467a64e97d608953959fb2a60892f2f35feae662 | 2035548a024bcd7abd1e565ff671d5b0d6e8466e | patch | Production update: Fix AIAnalysisBusinessService and middleware, server running on port 5001 |
-| 2025-12-07T00:23:40+00:00 | 1.3.17.0 | 1.3.16.0 | f86b5bf795daa4f71ba67e505719113735c8179e | 467a64e97d608953959fb2a60892f2f35feae662 | patch | עדכון לאחר משיכת שינויים מצוות פרודקשן - שילוב שינויים מקומיים |
-| 2025-12-07T17:03:22+00:00 | 1.3.18.0 | 1.3.17.0 | ad2a13783756ea2e296b8b0d35cc92ad61d181fa | f86b5bf795daa4f71ba67e505719113735c8179e | patch | Convert production environment to testing environment |
-| 2025-12-07T17:18:59+00:00 | 1.3.16.0 | 1.3.15.0 | 2cc5da95af2e1da357b87a88f2a06e2bab958bdd | e681f2eca2e2c21aa652e78746375808974f5931 | patch | Merge main into production - resolve conflicts and preserve testing environment |
-| 2025-12-07T17:20:22+00:00 | 1.3.17.0 | 1.3.16.0 | c3cea3465bb8d039a6b8f097a952ce5ddf9314b1 | 2cc5da95af2e1da357b87a88f2a06e2bab958bdd | patch | Add new API files from main merge |
-| 2025-12-07T17:31:05+00:00 | 1.3.18.0 | 1.3.17.0 | 37522a1ba215cfda56c07ca0ae50c61dd9cb7b43 | c3cea3465bb8d039a6b8f097a952ce5ddf9314b1 | patch | Add Testing Environment Rules to Cursor rules |
-| 2025-12-07T17:42:35+00:00 | 1.3.19.0 | 1.3.18.0 | 5f36e61d2d40b02b3ac4acb06b155d35d5de1acd | 37522a1ba215cfda56c07ca0ae50c61dd9cb7b43 | patch | Add admin login requirement to Selenium Testing Rule |
-| 2025-12-11T02:21:21+00:00 | 1.3.20.0 | 1.3.19.0 | ebf04e25ad364299cf54841997308c33bf0e3927 | 5f36e61d2d40b02b3ac4acb06b155d35d5de1acd | patch | Preserve production changes before main sync |
+| 2025-12-06T23:58:04+00:00 | 1.3.15.0 | 1.3.14.5 | e681f2eca2e2c21aa652e78746375808974f5931 | f7825f199ba48d4215a9ed4235d38ea11a13dc08 | patch | יצירת בסיס נתונים פרודקשן עם מפתחות מסודרים ונתוני דוגמה מלאים |
+| 2025-12-11T01:13:26+00:00 | 1.3.16.0 | 1.3.15.0 | 656e7b7643f7a55221a56b43841940ac0741b404 | e681f2eca2e2c21aa652e78746375808974f5931 | patch | ייצוב מלא ו-CRUD מקצה לקצה - הפרויקט מוכן לייצור |
+| 2025-12-11T01:13:59+00:00 | 1.3.17.0 | 1.3.16.0 | 656e7b7643f7a55221a56b43841940ac0741b404 | 656e7b7643f7a55221a56b43841940ac0741b404 | patch | ייצוב מלא ו-CRUD מקצה לקצה - הפרויקט מוכן לייצור |

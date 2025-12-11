@@ -73,6 +73,7 @@
 | **11** | Start Server | פרודקשן | `production` | כן (אופציונלי) | 1 דק' | הפעלת שרת |
 
 **שימוש:**
+
 ```bash
 # בסביבת הפרודקשן
 python3 scripts/production-update/master.py

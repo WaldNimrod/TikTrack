@@ -20,6 +20,52 @@
  * @lastUpdated September 4, 2025 - Fixed function calls + debug log
  */
 
+
+// ===== FUNCTION INDEX =====
+// === Functions ===
+// - renderPreferenceList() - Renderpreferencelist
+
+// === Initialization ===
+// - initializeNotificationsCenter() - Initializenotificationscenter
+
+// === Core Functions ===
+// - executeClearHistory() - Executeclearhistory
+
+// === Event Handlers ===
+// - getTypeIcon() - Gettypeicon
+// - refreshNotifications() - Refreshnotifications
+// - testSuccessNotification() - Testsuccessnotification
+// - testErrorNotification() - Testerrornotification
+// - testWarningNotification() - Testwarningnotification
+// - testInfoNotification() - Testinfonotification
+// - testConfirmationDialog() - Testconfirmationdialog
+// - copyNotificationsToClipboard() - Copynotificationstoclipboard
+// - showNotificationLogNew() - Shownotificationlognew
+// - loadNotificationLog() - Loadnotificationlog
+
+// === UI Functions ===
+// - showSystemLogsNew() - Showsystemlogsnew
+// - showErrorReportsNew() - Showerrorreportsnew
+
+// === Data Functions ===
+// - loadCategoriesOverview() - Loadcategoriesoverview
+// - loadCategoryStatsLegacy() - Loadcategorystatslegacy
+// - loadPreferencesOverview() - Loadpreferencesoverview
+// - loadOverviewData() - Loadoverviewdata
+// - getPeriodMs() - Getperiodms
+// - loadCategoryStats() - Loadcategorystats
+
+// === Other ===
+// - copyFilteredHistoryToClipboard() - Copyfilteredhistorytoclipboard
+// - clearHistory() - Clearhistory
+// - filterHistory() - Filterhistory
+// - testDetailsModal() - Testdetailsmodal
+// - copyDetailedLog() - Copydetailedlog
+// - generateDetailedLog() - Generatedetailedlog
+// - activateUnifiedLogSystem() - Activateunifiedlogsystem
+// - exportAllLogs() - Exportalllogs
+// - testUnifiedLogSystem() - Testunifiedlogsystem
+
 // ===== GLOBAL FUNCTIONS (defined early for class access) =====
 
 /**
@@ -83,7 +129,8 @@ async function loadCategoriesOverview() {
     ];
 
     let html = '<div class="row">';
-    categories.forEach(category => {
+    // Use for...of loop to support async/await
+    for (const category of categories) {
       // Calculate category statistics from actual notification history
       let categoryCount = 0;
       if (window.notificationsCenter && window.notificationsCenter.history) {
@@ -158,7 +205,7 @@ async function loadCategoriesOverview() {
           </div>
         </div>
       `;
-    });
+    }
     html += '</div>';
 
     // Insert using DOMParser
@@ -233,6 +280,22 @@ async function loadPreferencesOverview() {
       { key: 'console_logs_development_enabled', title: 'לוגים למפתחים', type: 'boolean' },
       { key: 'console_logs_performance_enabled', title: 'לוגי ביצועים', type: 'boolean' }
     ];
+
+  // Render preference list (fallback-simple to avoid ReferenceError)
+  function renderPreferenceList(items = [], preferences = {}) {
+    if (!Array.isArray(items)) return '';
+    const ul = document.createElement('ul');
+    ul.className = 'list-unstyled mb-0';
+    items.forEach(item => {
+      const li = document.createElement('li');
+      li.className = 'd-flex align-items-center mb-2';
+      const enabled = preferences[item.key] === true;
+      const icon = enabled ? '✅' : '⚪';
+      li.textContent = `${icon} ${item.title}`;
+      ul.appendChild(li);
+    });
+    return ul.outerHTML;
+  }
 
     // Render icons using IconSystem
     let slidersIcon = '<img src="/trading-ui/images/icons/tabler/sliders.svg" width="16" height="16" alt="settings" class="icon me-2">';
@@ -380,7 +443,7 @@ class NotificationsCenter {
   }
 
 
-  addNotification(type, title, message, time = 'now') {
+  async addNotification(type, title, message, time = 'now') {
     // Auto-detect category if not provided
     let category = 'general';
     if (typeof window.detectNotificationCategory === 'function') {

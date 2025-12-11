@@ -13,6 +13,7 @@
 כל המרת מטבע יוצרת **2 רשומות** בבסיס הנתונים:
 
 #### FROM Record (ממטבע)
+
 ```python
 CashFlow(
     type='currency_exchange_from',
@@ -27,6 +28,7 @@ CashFlow(
 ```
 
 #### TO Record (למטבע)
+
 ```python
 CashFlow(
     type='currency_exchange_to',
@@ -47,11 +49,13 @@ CashFlow(
 **מיקום**: `IBKRConnector._parse_trades_section()`
 
 **תנאים**:
+
 - סקציה: "Trades"
 - `Asset Category='Forex'`
 - `DataDiscriminator='Order'`
 
 **דוגמה**:
+
 ```
 Trades,Data,Order,Forex,ILS.USD,2024-01-15,1000.00,0.27,270.00,0.50
 ```
@@ -61,11 +65,13 @@ Trades,Data,Order,Forex,ILS.USD,2024-01-15,1000.00,0.27,270.00,0.50
 **מיקום**: `IBKRConnector._build_forex_cashflows()`
 
 **תהליך**:
+
 1. יצירת 2 רשומות: FROM + TO
 2. `cashflow_type='forex_conversion'` (לפני זיווג)
 3. metadata מלא: `exchange_rate`, `source_currency`, `target_currency`, `quantity`, `symbol`
 
 **דוגמה**:
+
 ```python
 from_record = {
     'cashflow_type': 'forex_conversion',
@@ -100,6 +106,7 @@ to_record = {
 **מיקום**: `ImportOrchestrator._build_preview_payload()` (שורות 1497-1699)
 
 **תהליך**:
+
 1. זיהוי רשומות FROM ו-TO
 2. זיווג לפי:
    - תאריך (זהה)
@@ -110,6 +117,7 @@ to_record = {
 4. עדכון metadata בשתי הרשומות
 
 **דוגמה**:
+
 ```python
 # לפני זיווג
 from_record['external_id'] = 'cashflow_1_1'
@@ -127,6 +135,7 @@ to_record['metadata']['exchange_external_id'] = 'exchange_abc123'
 **מיקום**: `ImportOrchestrator._build_preview_payload()` (שורות 1454-1495)
 
 **תהליך**:
+
 - אם `selected_types=['forex_conversion']`, שתי הרשומות (FROM + TO) נשארות
 - אם לא, שתיהן מוסרות
 
@@ -135,11 +144,13 @@ to_record['metadata']['exchange_external_id'] = 'exchange_abc123'
 **מיקום**: `ImportOrchestrator._execute_import_cashflows()` (שורות 2781-3033)
 
 **תהליך**:
+
 1. קיבוץ רשומות לפי `external_id` (exchange_*)
 2. Validation של זוג (ImportValidator.validate_exchange_pair)
 3. יצירה אטומית באמצעות `CashFlowHelperService.create_exchange()`
 
 **דוגמה**:
+
 ```python
 svc_result = CashFlowHelperService.create_exchange(
     db_session=self.db_session,
@@ -162,10 +173,12 @@ svc_result = CashFlowHelperService.create_exchange(
 **נוסחה**: `to_amount = from_amount * exchange_rate`
 
 **מקורות נתונים**:
+
 - `from_amount`: מ-`metadata.quantity` (מועדף) או `abs(amount)`
 - `exchange_rate`: מ-`metadata.exchange_rate` (מועדף) או `trade_price`
 
 **דוגמה**:
+
 ```python
 from_amount = 1000.0  # ILS
 exchange_rate = 0.27  # ILS/USD
@@ -185,6 +198,7 @@ to_amount = 1000.0 * 0.27 = 270.0  # USD
 **מימוש**: `CashFlowHelperService.create_exchange()` עושה commit רק אחרי יצירת שתי הרשומות.
 
 **יתרונות**:
+
 - אין מצב של FROM ללא TO או להיפך
 - עקביות נתונים מובטחת
 - Rollback אוטומטי במקרה של שגיאה
@@ -194,6 +208,7 @@ to_amount = 1000.0 * 0.27 = 270.0  # USD
 **מיקום**: `ImportValidator.validate_exchange_pair()`
 
 **בדיקות**:
+
 1. FROM record: `type='currency_exchange_from'`, `amount < 0`
 2. TO record: `type='currency_exchange_to'`, `amount > 0`
 3. `external_id` זהה (אם קיים)
@@ -203,11 +218,13 @@ to_amount = 1000.0 * 0.27 = 270.0  # USD
 ## דוגמה מלאה
 
 ### קובץ IBKR
+
 ```
 Trades,Data,Order,Forex,ILS.USD,2024-01-15,1000.00,0.27,270.00,0.50
 ```
 
 ### רשומות ב-Preview
+
 ```python
 from_record = {
     'cashflow_type': 'forex_conversion',
@@ -241,6 +258,7 @@ to_record = {
 ```
 
 ### רשומות בבסיס הנתונים
+
 ```python
 # FROM
 CashFlow(

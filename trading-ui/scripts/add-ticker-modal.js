@@ -30,6 +30,12 @@
  * 
  * ==========================================
  */
+// === Functions ===
+// - clearSearchResults() - Clearsearchresults
+// - initializeTickerSearchHandlers() - Initializetickersearchhandlers
+// - loadAllTickers() - Loadalltickers
+// - setupFlagColorPalette() - Setupflagcolorpalette
+// - setupModalEventListener() - Setupmodaleventlistener
 
 (function() {
     'use strict';
@@ -161,8 +167,21 @@
         freshFlagButtons.forEach(btn => {
             btn.addEventListener('click', () => {
                 const color = btn.getAttribute('data-color');
+                const entityType = btn.getAttribute('data-entity-type');
                 if (color && freshFlagInput) {
                     freshFlagInput.value = color;
+                    // Store entityType in a hidden field or data attribute
+                    const flagEntityTypeInput = document.getElementById('itemFlagEntityType');
+                    if (flagEntityTypeInput) {
+                        flagEntityTypeInput.value = entityType || '';
+                    } else {
+                        // Create hidden input if it doesn't exist
+                        const hiddenInput = document.createElement('input');
+                        hiddenInput.type = 'hidden';
+                        hiddenInput.id = 'itemFlagEntityType';
+                        hiddenInput.value = entityType || '';
+                        freshFlagInput.parentNode.appendChild(hiddenInput);
+                    }
                     
                     // Update active state - remove from all
                     freshFlagButtons.forEach(b => {
@@ -178,7 +197,7 @@
                     btn.style.boxShadow = '0 0 0 2px #212529';
                     btn.style.transform = 'scale(1.2)';
                     
-                    window.Logger?.debug?.('✅ Flag color selected', { ...PAGE_LOG_CONTEXT, color });
+                    window.Logger?.debug?.('✅ Flag color selected', { ...PAGE_LOG_CONTEXT, color, entityType });
                 }
             });
 
@@ -201,6 +220,10 @@
         if (freshClearBtn && freshFlagInput) {
             freshClearBtn.addEventListener('click', () => {
                 freshFlagInput.value = '';
+                const flagEntityTypeInput = document.getElementById('itemFlagEntityType');
+                if (flagEntityTypeInput) {
+                    flagEntityTypeInput.value = '';
+                }
                 freshFlagButtons.forEach(b => {
                     b.classList.remove('active');
                     b.style.borderColor = 'transparent';
@@ -302,9 +325,7 @@
                 headers: {
                     'Content-Type': 'application/json',
                     'Cache-Control': 'no-cache'
-                },
-                credentials: 'include'
-            });
+                }, });
 
             if (!response.ok) {
                 if (response.status === 401) {
@@ -539,7 +560,8 @@
             // Collect form data
             const formData = window.DataCollectionService.collectFormData({
                 ticker_id: { id: 'selectedTickerId', type: 'int', default: selectedTickerId },
-                flag_color: { id: 'itemFlagColor', type: 'text' }
+                flag_color: { id: 'itemFlagColor', type: 'text' },
+                flag_entity_type: { id: 'itemFlagEntityType', type: 'text' }
             });
 
             // Add via data service
@@ -548,6 +570,21 @@
 
                 // Handle response manually
                 if (result) {
+                    // If flag was set, use setFlag to handle flag list management
+                    if (formData.flag_color && formData.flag_entity_type) {
+                        try {
+                            // Use the same setFlag logic to add ticker to flag list
+                            if (window.WatchListsUIService?.setFlag && result.id) {
+                                await window.WatchListsUIService.setFlag(result.id, formData.flag_color, formData.flag_entity_type);
+                            }
+                        } catch (error) {
+                            window.Logger?.warn?.('⚠️ Error setting flag after adding ticker', { 
+                                ...PAGE_LOG_CONTEXT, 
+                                error: error?.message || error 
+                            });
+                        }
+                    }
+                    
                     // Show success notification
                     if (typeof window.showSuccessNotification === 'function') {
                         window.showSuccessNotification('הצלחה', 'טיקר נוסף לרשימה בהצלחה');
@@ -565,6 +602,11 @@
                     }
                     if (window.WatchListsPage?.renderSummaryStats) {
                         window.WatchListsPage.renderSummaryStats();
+                    }
+                    
+                    // Reload watch lists
+                    if (window.WatchListsPage?.loadWatchLists) {
+                        await window.WatchListsPage.loadWatchLists();
                     }
                 } else {
                     // Error already handled by data service

@@ -250,7 +250,21 @@
     <script src="../../scripts/preferences-group-manager.js?v=1.0.0" defer></script> <!-- Preferences group manager -->
 
     <!-- =============================================================== -->
-    <!-- ===== PACKAGE 7/11: CHARTS PACKAGE ===== -->
+    <!-- ===== PACKAGE 7/13: EXTERNAL DATA PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 7 | Description: External data systems -->
+    <!-- Dependencies: base, services -->
+    <!-- Critical: NO | Version: 1.5.0 -->
+
+    <!-- [117] Load Order: 117 | Strategy: async -->
+    <script src="../../scripts/yahoo-finance-service.js?v=1.0.0" async></script> <!-- Yahoo Finance service -->
+    <!-- [118] Load Order: 118 | Strategy: async -->
+    <script src="../../scripts/external-data-service.js?v=1.0.0" async></script> <!-- External data service -->
+    <!-- [119] Load Order: 119 | Strategy: async -->
+    <script src="../../scripts/external-data-settings-service.js?v=1.0.0" async></script> <!-- External data settings -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 8/13: CHARTS PACKAGE ===== -->
     <!-- =============================================================== -->
     <!-- Load Order: 8 | Description: Chart and graph systems -->
     <!-- Dependencies: base, services -->
@@ -292,6 +306,7 @@
     <script src="../../scripts/services/trade-plans-data.js?v=1.0.0" defer></script> <!-- Trade plans data service -->
     <!-- [93.5] Load Order: 93.5 | Strategy: defer -->
     <script src="../../scripts/services/trade-history-data.js?v=1.0.0" defer></script> <!-- Trade history data service -->
+    <script src="../../scripts/services/historical-data-helpers.js?v=1.0.0" defer></script> <!-- Shared OHLC helpers -->
     <!-- [94] Load Order: 94 | Strategy: defer -->
     <script src="../../scripts/trade-plan-service.js?v=1.0.0" defer></script> <!-- Trade plan service -->
     <!-- [95] Load Order: 95 | Strategy: defer -->
@@ -353,7 +368,7 @@
     <!-- ===== PAGE-SPECIFIC SCRIPTS ===== -->
     <!-- =============================================================== -->
     <!-- Trade History Page Script -->
-    <script src="../../scripts/trade-history-page.js?v=1.0.0" defer></script>
+    <script src="../../scripts/trade-history-page.js?v=1.0.2" defer></script>
 
     <!-- =============================================================== -->
     <!-- ===== END SCRIPT LOADING ORDER ===== -->
@@ -539,14 +554,32 @@
                     </div>
                     <div class="section-body">
                         <div class="timeline-absolute-wrapper" id="timelineAbsoluteWrapper">
-                            <div id="timelineAbsolute" class="timeline-absolute d-flex overflow-x-auto">
+                            <!-- Table format for timeline steps -->
+                            <div class="table-responsive">
+                                <table class="table table-hover" id="timelineStepsTable">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 50px;">איקון</th>
+                                            <th style="width: 120px;">סוג</th>
+                                            <th>פרטים</th>
+                                            <th style="width: 150px;">פעולות</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="timelineStepsTableBody">
+                                        <tr>
+                                            <td colspan="4" class="text-center py-4">
+                                                <div class="spinner-border text-primary" role="status">
+                                                    <span class="visually-hidden">טוען...</span>
+                                                </div>
+                                                <p class="mt-2">טוען פירוט צעדים...</p>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <!-- Legacy timeline view (kept for backward compatibility) -->
+                            <div id="timelineAbsolute" class="timeline-absolute d-flex overflow-x-auto" style="display: none;">
                                 <!-- Timeline steps will be rendered dynamically -->
-                                <div class="text-center py-4 w-100">
-                                    <div class="spinner-border text-primary" role="status">
-                                        <span class="visually-hidden">טוען...</span>
-                                    </div>
-                                    <p class="mt-2">טוען פירוט צעדים...</p>
-                                </div>
                             </div>
                         </div>
                     </div>
@@ -566,25 +599,32 @@
                         <!-- Chart Controls Wrapper (LTR, in section-body, above chart) -->
                         <div class="chart-controls-wrapper">
                             <div class="chart-controls mb-2">
-                            <button id="timelineZoomIn" title="זום פנימה" data-button-type="VIEW" data-variant="small">
-                                    <span data-icon="info-circle" class="icon"></span>
+                            <button id="timelineZoomIn" title="זום פנימה" data-button-type="VIEW" data-variant="small" class="btn btn-sm btn-outline-secondary">
+                                    <span data-icon="zoom-in" class="icon"></span>
                             </button>
-                            <button id="timelineZoomOut" title="זום החוצה" data-button-type="VIEW" data-variant="small">
-                                    <span data-icon="info-circle" class="icon"></span>
+                            <button id="timelineZoomOut" title="זום החוצה" data-button-type="VIEW" data-variant="small" class="btn btn-sm btn-outline-secondary">
+                                    <span data-icon="zoom-out" class="icon"></span>
                             </button>
-                            <button id="timelineReset" title="איפוס זום" data-button-type="REFRESH" data-variant="small">
+                            <button id="timelineReset" title="איפוס זום" data-button-type="REFRESH" data-variant="small" class="btn btn-sm btn-outline-secondary">
                                 <span data-icon="refresh" class="icon"></span>
                             </button>
-                            <button id="timelinePanLeft" title="תזוזה ימינה (לעבר העתיד)" data-button-type="VIEW" data-variant="small">
-                                    <span data-icon="info-circle" class="icon"></span>
+                            <button id="timelinePanLeft" title="תזוזה ימינה (לעבר העתיד)" data-button-type="VIEW" data-variant="small" class="btn btn-sm btn-outline-secondary">
+                                    <span data-icon="arrow-right" class="icon"></span>
                             </button>
-                            <button id="timelinePanRight" title="תזוזה שמאלה (לעבר העבר)" data-button-type="VIEW" data-variant="small">
-                                    <span data-icon="info-circle" class="icon"></span>
+                            <button id="timelinePanRight" title="תזוזה שמאלה (לעבר העבר)" data-button-type="VIEW" data-variant="small" class="btn btn-sm btn-outline-secondary">
+                                    <span data-icon="arrow-left" class="icon"></span>
                             </button>
                             </div>
                         </div>
                         <!-- Timeline Chart (includes market price) -->
                         <!-- Chart Container Wrapper (קונטיינר ייעודי לגרף) -->
+                        <!-- Chart Legend -->
+                        <div id="timelineChartLegend" class="chart-legend mb-3" style="display: none;">
+                            <div class="d-flex flex-wrap gap-2 justify-content-center">
+                                <!-- Legend items will be populated dynamically -->
+                            </div>
+                        </div>
+                        
                         <div class="chart-container-wrapper">
                             <div class="tradingview-chart-wrapper timeline-chart-container timeline-chart-container-fixed">
                                 <div class="tradingview-chart-container tradingview-timeline-chart-container" id="timelineChart">
@@ -594,11 +634,12 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="chart-legend mt-2">
-                            <div class="chart-legend-item">
-                                <span class="chart-legend-color chart-legend-color-primary"></span>
-                                <span>מחיר שוק</span>
+                        <!-- Chart Legend (will be populated dynamically) -->
+                        <div id="timelineChartLegend" class="chart-legend mt-2" style="display: none;">
+                            <div class="d-flex flex-wrap gap-2 justify-content-center">
+                                <!-- Legend items will be populated dynamically -->
                             </div>
+                        </div>
                             <div class="chart-legend-item">
                                 <span class="chart-legend-color chart-legend-color-success chart-legend-color-circle"></span>
                                 <span>כניסה</span>
@@ -751,23 +792,106 @@
                 isInitializingTimelineChart = false;
             }
             
-            // Get timeline data from tradeHistoryPage or global
+            // Get timeline data and chart data from tradeHistoryPage or global
             let timelineData = [];
+            let chartData = null;
+            let marketPriceData = [];
             
-            // Try to get data from global tradeHistoryData first (most reliable)
+            // Try to get chart data from global tradeHistoryData first (most reliable)
+                if (window.tradeHistoryData && window.tradeHistoryData.chartData) {
+                    chartData = window.tradeHistoryData.chartData;
+                    if (chartData.market_prices && Array.isArray(chartData.market_prices)) {
+                        const rawMarketPriceData = chartData.market_prices;
+
+                        const sanitized = window.HistoricalDataHelpers
+                            ? window.HistoricalDataHelpers.sanitizeOhlcSeries(rawMarketPriceData)
+                            : { cleaned: [], droppedCount: rawMarketPriceData.length };
+
+                        marketPriceData = sanitized.cleaned;
+                        const invalidCount = sanitized.droppedCount;
+
+                        if (window.Logger && rawMarketPriceData.length > 0) {
+                            const samplePrice = rawMarketPriceData[0];
+                            window.Logger.debug('Market price data loaded', { 
+                                page: 'trade-history-page',
+                                count: rawMarketPriceData.length,
+                                validCount: marketPriceData.length,
+                                invalidCount,
+                                samplePrice: {
+                                    date: samplePrice.date,
+                                    open: samplePrice.open,
+                                    high: samplePrice.high,
+                                    low: samplePrice.low,
+                                    close: samplePrice.close,
+                                    price: samplePrice.price,
+                                    hasNulls: {
+                                        open: samplePrice.open === null,
+                                        high: samplePrice.high === null,
+                                        low: samplePrice.low === null,
+                                        close: samplePrice.close === null,
+                                        price: samplePrice.price === null
+                                    }
+                                }
+                            });
+                        }
+
+                        if (invalidCount > 0 && window.NotificationSystem) {
+                            window.NotificationSystem.showWarning('חסרים נתוני OHLC', `נמצאו ${invalidCount} נקודות מחיר ללא נתוני OHLC מלאים והן לא יוצגו בגרף.`);
+                        }
+                    }
+                }
+            
+            // Try to get timeline data from global tradeHistoryData first (most reliable)
             if (window.tradeHistoryData && window.tradeHistoryData.timelineData && Array.isArray(window.tradeHistoryData.timelineData)) {
                 const rawTimelineData = window.tradeHistoryData.timelineData;
                 if (rawTimelineData && rawTimelineData.length > 0) {
                     // Transform to chart format
-                    const startDate = new Date(rawTimelineData[0].date);
+                    // Extract date from DateEnvelope if needed
+                    let startDateObj = null;
+                    if (window.dateUtils && typeof window.dateUtils.toDateObject === 'function') {
+                        startDateObj = window.dateUtils.toDateObject(rawTimelineData[0].date);
+                    } else {
+                        // Fallback: handle DateEnvelope manually
+                        const firstDate = rawTimelineData[0].date;
+                        if (firstDate && typeof firstDate === 'object' && 'epochMs' in firstDate) {
+                            startDateObj = new Date(firstDate.epochMs);
+                        } else if (firstDate && typeof firstDate === 'object' && 'utc' in firstDate) {
+                            startDateObj = new Date(firstDate.utc);
+                        } else {
+                            startDateObj = new Date(firstDate);
+                        }
+                    }
+                    
+                    if (!startDateObj || isNaN(startDateObj.getTime())) {
+                        throw new Error('Invalid start date in timeline data');
+                    }
                     
                     // Calculate cumulative position and P/L
                     let currentPosition = 0;
                     let cumulativeRealizedPL = 0;
                     
                     timelineData = rawTimelineData.map((point, index) => {
-                        const date = new Date(point.date);
-                        const daysFromStart = Math.floor((date - startDate) / (1000 * 60 * 60 * 24));
+                        // Extract date from DateEnvelope if needed
+                        let dateObj = null;
+                        if (window.dateUtils && typeof window.dateUtils.toDateObject === 'function') {
+                            dateObj = window.dateUtils.toDateObject(point.date);
+                        } else {
+                            // Fallback: handle DateEnvelope manually
+                            if (point.date && typeof point.date === 'object' && 'epochMs' in point.date) {
+                                dateObj = new Date(point.date.epochMs);
+                            } else if (point.date && typeof point.date === 'object' && 'utc' in point.date) {
+                                dateObj = new Date(point.date.utc);
+                            } else {
+                                dateObj = new Date(point.date);
+                            }
+                        }
+                        
+                        if (!dateObj || isNaN(dateObj.getTime())) {
+                            // Skip invalid dates
+                            return null;
+                        }
+                        
+                        const daysFromStart = Math.floor((dateObj.getTime() - startDateObj.getTime()) / (1000 * 60 * 60 * 24));
                         
                         // Update position based on execution
                         if (point.type === 'Execution') {
@@ -779,21 +903,73 @@
                             cumulativeRealizedPL += point.pl || 0;
                         }
                         
-                        // Calculate unrealized PL (placeholder)
-                        const unrealizedPL = 0;
+                        // Get unrealized PL, position value, and average price from timeline data if available
+                        // These should be calculated by backend, but we have fallback calculations here
+                        let unrealizedPL = point.unrealizedPL !== undefined && point.unrealizedPL !== null ? point.unrealizedPL : 0;
+                        let positionValue = point.positionValue !== undefined && point.positionValue !== null ? point.positionValue : 0;
+                        let averagePrice = point.averagePrice !== undefined && point.averagePrice !== null ? point.averagePrice : 0;
+                        
+                        // If not provided by backend, calculate from available data
+                        if (averagePrice === 0 && point.totalBoughtQuantity && point.totalBoughtQuantity > 0 && point.totalBoughtAmount) {
+                            averagePrice = point.totalBoughtAmount / point.totalBoughtQuantity;
+                        }
+                        
+                        // Calculate position value if not provided
+                        if (positionValue === 0 && currentPosition !== 0) {
+                            // Try to get market price for this date
+                            let marketPrice = null;
+                            if (marketPriceData && marketPriceData.length > 0) {
+                                // Find closest market price to this date
+                                for (const price of marketPriceData) {
+                                    let priceDateObj = null;
+                                    if (window.dateUtils && typeof window.dateUtils.toDateObject === 'function') {
+                                        priceDateObj = window.dateUtils.toDateObject(price.date);
+                                    } else if (price.date && typeof price.date === 'object' && 'epochMs' in price.date) {
+                                        priceDateObj = new Date(price.date.epochMs);
+                                    } else {
+                                        priceDateObj = new Date(price.date);
+                                    }
+                                    if (priceDateObj && !isNaN(priceDateObj.getTime())) {
+                                        const diff = Math.abs(priceDateObj.getTime() - dateObj.getTime());
+                                        if (!marketPrice || diff < Math.abs(marketPrice.date.getTime() - dateObj.getTime())) {
+                                            marketPrice = { price: price.close || price.price, date: priceDateObj };
+                                        }
+                                    }
+                                }
+                            }
+                            
+                            if (marketPrice && marketPrice.price) {
+                                positionValue = Math.abs(currentPosition) * marketPrice.price;
+                                // Calculate unrealized PL if not provided
+                                if (unrealizedPL === 0 && averagePrice > 0) {
+                                    const currentCost = Math.abs(currentPosition) * averagePrice;
+                                    if (currentPosition > 0) {
+                                        // Long position
+                                        unrealizedPL = positionValue - currentCost;
+                                    } else if (currentPosition < 0) {
+                                        // Short position
+                                        unrealizedPL = currentCost - positionValue;
+                                    }
+                                }
+                            }
+                        }
+                        
                         const totalPL = cumulativeRealizedPL + unrealizedPL;
                         
                         // Format date as DD/MM/YYYY
-                        const day = String(date.getDate()).padStart(2, '0');
-                        const month = String(date.getMonth() + 1).padStart(2, '0');
-                        const year = date.getFullYear();
+                        const day = String(dateObj.getDate()).padStart(2, '0');
+                        const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+                        const year = dateObj.getFullYear();
                         const dateStr = `${day}/${month}/${year}`;
                         
                         return {
                             date: dateStr,
+                            dateObj: dateObj,  // Keep Date object for calculations
                             type: point.type,
                             id: point.id,
                             positionSize: currentPosition,
+                            positionValue: positionValue,
+                            averagePrice: averagePrice,
                             realizedPL: cumulativeRealizedPL,
                             unrealizedPL: unrealizedPL,
                             totalPL: totalPL,
@@ -896,70 +1072,79 @@
             
             // Convert dates to TradingView format
             // TradingView Lightweight Charts supports:
-            // 1. String format: 'YYYY-MM-DD' (for daily data)
-            // 2. Unix timestamp (number) - for precise time with seconds/milliseconds
-            // For multiple points on same date/time, we add a small offset (seconds) to ensure unique timestamps
-            function convertDateToTradingView(dateStr, index = 0) {
-                if (!dateStr) return dateStr;
+            // 1. String format: 'YYYY-MM-DD' (for daily data) - RECOMMENDED for daily candlestick data
+            // 2. Unix timestamp (number in seconds) - for precise time with seconds/milliseconds
+            // For daily market price data, we use YYYY-MM-DD format (no offset needed)
+            function convertDateToTradingView(dateValue, index = 0) {
+                if (!dateValue) return null;
                 
-                // Try to parse as Date first (handles various formats)
                 let dateObj = null;
-                if (dateStr.includes('T') || dateStr.includes('Z')) {
-                    // ISO format
-                    dateObj = new Date(dateStr);
-                } else {
-                    // Try different formats: DD/MM/YYYY, DD.MM.YYYY, DD/MM/YYYY HH:MM, DD.MM.YYYY HH:MM
-                    // Parse full date with time if available
-                    const dateTimeParts = dateStr.split(' ');
-                    const dateOnly = dateTimeParts[0];
-                    const timeOnly = dateTimeParts[1] || null;
-                    
-                    const parts = dateOnly.split(/[./-]/);
-                    if (parts.length === 3) {
-                        const day = parts[0].padStart(2, '0');
-                        const month = parts[1].padStart(2, '0');
-                        const year = parts[2];
-                        
-                        // If time is available, use it; otherwise use date only
-                        if (timeOnly) {
-                            const timeParts = timeOnly.split(':');
-                            const hours = timeParts[0] || '00';
-                            const minutes = timeParts[1] || '00';
-                            const seconds = timeParts[2] || '00';
-                            dateObj = new Date(`${year}-${month}-${day}T${hours}:${minutes}:${seconds}`);
-                        } else {
-                            dateObj = new Date(`${year}-${month}-${day}`);
-                        }
+                
+                // Handle DateEnvelope object (from backend)
+                if (typeof dateValue === 'object' && dateValue.utc) {
+                    dateObj = new Date(dateValue.utc);
+                } else if (typeof dateValue === 'object' && 'epochMs' in dateValue) {
+                    dateObj = new Date(dateValue.epochMs);
+                } else if (typeof dateValue === 'string') {
+                    // ISO format or other string formats
+                    if (dateValue.includes('T') || dateValue.includes('Z')) {
+                        dateObj = new Date(dateValue);
                     } else {
-                        dateObj = new Date(dateStr);
+                        // Try parsing as DD/MM/YYYY or DD.MM.YYYY
+                        const parts = dateValue.split(/[./-]/);
+                        if (parts.length === 3) {
+                            const day = parts[0].padStart(2, '0');
+                            const month = parts[1].padStart(2, '0');
+                            const year = parts[2].split(' ')[0]; // Remove time if present
+                            dateObj = new Date(`${year}-${month}-${day}`);
+                        } else {
+                            dateObj = new Date(dateValue);
+                        }
                     }
+                } else if (dateValue instanceof Date) {
+                    dateObj = dateValue;
+                } else {
+                    return null;
                 }
                 
-                // If valid date, return as unix timestamp (for precise time handling)
-                // Add small offset (index * 1 second) to ensure unique timestamps for multiple points on same date/time
-                // This allows the chart to display all points correctly
-                if (dateObj && !isNaN(dateObj.getTime())) {
-                    // Return as unix timestamp (seconds since epoch)
-                    // Add index seconds to ensure uniqueness when multiple points have same date/time
-                    const baseTimestamp = Math.floor(dateObj.getTime() / 1000);
-                    return baseTimestamp + index; // Add index seconds for uniqueness
+                // Validate date
+                if (!dateObj || isNaN(dateObj.getTime())) {
+                    return null;
                 }
                 
-                // Fallback: try to extract from string and return as unix timestamp
-                const parts = dateStr.split(/[./-]/);
-                if (parts.length === 3) {
-                    const day = parts[0].padStart(2, '0');
-                    const month = parts[1].padStart(2, '0');
-                    const year = parts[2].split(' ')[0]; // Remove time if present
-                    const fallbackDate = new Date(`${year}-${month}-${day}`);
-                    if (fallbackDate && !isNaN(fallbackDate.getTime())) {
-                        const baseTimestamp = Math.floor(fallbackDate.getTime() / 1000);
-                        return baseTimestamp + index; // Add index seconds for uniqueness
-                    }
-                    return `${year}-${month}-${day}`;
+                // Use epoch seconds to avoid null/parse issues in Lightweight Charts
+                return Math.floor(dateObj.getTime() / 1000);
+            }
+            
+            // CRITICAL: Only initialize chart if we have valid data
+            // Check for valid market price data before creating chart
+            const hasValidMarketPriceData = marketPriceData && 
+                                          Array.isArray(marketPriceData) && 
+                                          marketPriceData.length > 0 &&
+                                          marketPriceData.some(item => {
+                                              // Check if item has at least one valid OHLC value
+                                              return (item.open !== null && item.open !== undefined && !isNaN(item.open)) ||
+                                                     (item.high !== null && item.high !== undefined && !isNaN(item.high)) ||
+                                                     (item.low !== null && item.low !== undefined && !isNaN(item.low)) ||
+                                                     (item.close !== null && item.close !== undefined && !isNaN(item.close));
+                                          });
+            
+            if (!hasValidMarketPriceData) {
+                if (window.Logger) {
+                    window.Logger.warn('No market price data available', { 
+                        page: 'trade-history-page',
+                        hasMarketPriceData: !!(marketPriceData && marketPriceData.length > 0),
+                        marketPriceDataLength: marketPriceData?.length || 0,
+                        hasTimelineData: timelineData.length > 0
+                    });
                 }
-                
-                return dateStr;
+                if (window.NotificationSystem) {
+                    window.NotificationSystem.showWarning(
+                        'נתונים חסרים',
+                        'אין נתוני מחיר זמינים להצגה בגרף. נא לבדוק את הנתונים או לטעון נתונים היסטוריים.'
+                    );
+                }
+                return; // Don't create chart without market price data
             }
             
             // Create chart with TradingView
@@ -997,91 +1182,677 @@
                     }
                 });
                 
+                // Store all series for legend and tooltips
+                const chartSeries = {};
+                
+                // 1. Market Price (Candlestick) - Right Scale
+                let marketPriceErrorShown = false; // Track if error was shown to avoid duplicates
+                
+                if (marketPriceData && marketPriceData.length > 0) {
+                    // Helper function to safely get numeric value
+                    const getNumericValue = (value, fallback = null) => {
+                        if (value === null || value === undefined) {
+                            return fallback;
+                        }
+                        if (typeof value === 'string' && value.trim() === '') {
+                            return fallback;
+                        }
+                        const num = typeof value === 'number' ? value : parseFloat(value);
+                        if (isNaN(num)) {
+                            return fallback;
+                        }
+                        return num;
+                    };
+                    
+                    // Log raw market price data before processing
+                    if (window.Logger) {
+                        const sampleItem = marketPriceData[0];
+                        window.Logger.debug('Processing market price data', { 
+                            page: 'trade-history-page',
+                            totalItems: marketPriceData.length,
+                            sampleItem: {
+                                date: sampleItem.date,
+                                open: sampleItem.open,
+                                high: sampleItem.high,
+                                low: sampleItem.low,
+                                close: sampleItem.close,
+                                price: sampleItem.price,
+                                types: {
+                                    open: typeof sampleItem.open,
+                                    high: typeof sampleItem.high,
+                                    low: typeof sampleItem.low,
+                                    close: typeof sampleItem.close,
+                                    price: typeof sampleItem.price
+                                }
+                            }
+                        });
+                    }
+                    
+                    const candlestickData = marketPriceData.map((item, index) => {
+                        // Prefer date_envelope from backend; fallback to raw date string
+                        const rawDate = item.date_envelope || item.date;
+                        
+                        let dateObj = null;
+                        if (window.dateUtils && typeof window.dateUtils.toDateObject === 'function') {
+                            dateObj = window.dateUtils.toDateObject(rawDate);
+                        } else if (rawDate && typeof rawDate === 'object' && 'epochMs' in rawDate) {
+                            dateObj = new Date(rawDate.epochMs);
+                        } else if (rawDate && typeof rawDate === 'object' && 'utc' in rawDate) {
+                            dateObj = new Date(rawDate.utc);
+                        } else {
+                            dateObj = new Date(rawDate);
+                        }
+                        if (!dateObj || isNaN(dateObj.getTime())) {
+                            return null;
+                        }
+                        const time = convertDateToTradingView(dateObj.toISOString(), index);
+                        
+                        // Validate time is valid
+                        if (time === null || time === undefined || (typeof time === 'number' && isNaN(time))) {
+                            return null; // Skip invalid time
+                        }
+                        
+                        // Get OHLC values - NO FALLBACK - if data is missing, skip this point
+                        // Rule: No mock data, no fallback data - if data doesn't exist, show error to user
+                        const open = getNumericValue(item.open);
+                        const high = getNumericValue(item.high);
+                        const low = getNumericValue(item.low);
+                        const close = getNumericValue(item.close);
+                        
+                        // All OHLC values must be present and valid - no fallback
+                        if (open === null || high === null || low === null || close === null) {
+                            // Missing data - skip this point (will show error to user if no data points remain)
+                            if (window.Logger) {
+                                window.Logger.debug('Missing OHLC data, skipping point', { 
+                                    page: 'trade-history-page', 
+                                    date: item.date,
+                                    hasOpen: open !== null,
+                                    hasHigh: high !== null,
+                                    hasLow: low !== null,
+                                    hasClose: close !== null
+                                });
+                            }
+                            return null;
+                        }
+                        
+                        // Final validation: ensure all values are valid numbers (not NaN)
+                        if (isNaN(open) || isNaN(high) || isNaN(low) || isNaN(close)) {
+                            if (window.Logger) {
+                                window.Logger.warn('Invalid OHLC values (NaN)', { 
+                                    page: 'trade-history-page', 
+                                    open, high, low, close
+                                });
+                            }
+                            return null;
+                        }
+                        
+                        // Ensure high >= low (basic validation)
+                        let validHigh = Number(high);
+                        let validLow = Number(low);
+                        if (validHigh < validLow) {
+                            if (window.Logger) {
+                                window.Logger.warn('Invalid OHLC: high < low, swapping values', { 
+                                    page: 'trade-history-page', 
+                                    originalHigh: validHigh, 
+                                    originalLow: validLow
+                                });
+                            }
+                            // Fix: swap if needed (data correction, not fallback)
+                            const temp = validHigh;
+                            validHigh = validLow;
+                            validLow = temp;
+                        }
+                        
+                        return {
+                            time: time,
+                            open: Number(open), // Ensure it's a number, not string
+                            high: validHigh,
+                            low: validLow,
+                            close: Number(close)
+                        };
+                    }).filter(d => {
+                        // Filter out null values and ensure all required fields are valid
+                        if (!d || !d.time) return false;
+                        if (d.open === null || d.high === null || d.low === null || d.close === null) return false;
+                        if (isNaN(d.open) || isNaN(d.high) || isNaN(d.low) || isNaN(d.close)) return false;
+                        return true;
+                    });
+                    
+                    if (candlestickData.length > 0) {
+                        // Final validation: ensure all data points are valid before sending to chart
+                        const validatedCandlestickData = candlestickData.filter(d => {
+                            if (!d) return false;
+                            // Validate time
+                            if (d.time === null || d.time === undefined || (typeof d.time === 'number' && isNaN(d.time))) {
+                                if (window.Logger) {
+                                    window.Logger.warn('Invalid time in candlestick data', { page: 'trade-history-page', time: d.time, data: d });
+                                }
+                                return false;
+                            }
+                            // Validate all price fields are valid numbers
+                            const fields = ['open', 'high', 'low', 'close'];
+                            for (const field of fields) {
+                                const value = d[field];
+                                if (value === null || value === undefined || isNaN(value) || typeof value !== 'number') {
+                                    if (window.Logger) {
+                                        window.Logger.warn(`Invalid ${field} in candlestick data`, { page: 'trade-history-page', field, value, data: d });
+                                    }
+                                    return false;
+                                }
+                            }
+                            // Ensure high >= low
+                            if (d.high < d.low) {
+                                if (window.Logger) {
+                                    window.Logger.warn('Invalid OHLC: high < low', { page: 'trade-history-page', high: d.high, low: d.low, data: d });
+                                }
+                                return false;
+                            }
+                            return true;
+                        });
+                        
+                        if (window.Logger) {
+                            window.Logger.debug('Candlestick data validation', { 
+                                page: 'trade-history-page', 
+                                originalCount: candlestickData.length,
+                                validatedCount: validatedCandlestickData.length,
+                                filteredOut: candlestickData.length - validatedCandlestickData.length
+                            });
+                        }
+                        
+                        if (validatedCandlestickData.length > 0) {
+                            // Final check: ensure no null values in the data
+                            const finalCandlestickData = validatedCandlestickData.filter(d => {
+                                if (!d) return false;
+                                // Check all required fields
+                                const requiredFields = ['time', 'open', 'high', 'low', 'close'];
+                                for (const field of requiredFields) {
+                                    const value = d[field];
+                                    if (value === null || value === undefined || (typeof value === 'number' && isNaN(value))) {
+                                        if (window.Logger) {
+                                            window.Logger.warn(`Invalid ${field} in final candlestick data`, { 
+                                                page: 'trade-history-page', 
+                                                field, 
+                                                value, 
+                                                data: d 
+                                            });
+                                        }
+                                        return false;
+                                    }
+                                }
+                                return true;
+                            });
+                            
+                            if (window.Logger) {
+                                window.Logger.debug('Final candlestick data check', { 
+                                    page: 'trade-history-page', 
+                                    validatedCount: validatedCandlestickData.length,
+                                    finalCount: finalCandlestickData.length,
+                                    sampleData: finalCandlestickData.length > 0 ? finalCandlestickData[0] : null
+                                });
+                            }
+                            
+                            if (finalCandlestickData.length > 0) {
+                                try {
+                                    const candlestickSeries = window.TradingViewChartAdapter.addCandlestickSeries(timelineChart, {
+                                        priceScaleId: 'right',
+                                        title: 'מחיר נכס',
+                                        priceFormat: {
+                                            type: 'price',
+                                            precision: 2,
+                                            minMove: 0.01
+                                        }
+                                    });
+                                    
+                                    // Final validation before setData - check every single point for null/undefined/NaN
+                                    const safeCandlestickData = finalCandlestickData.filter(d => {
+                                        if (!d) return false;
+                                        // Check time
+                                        if (d.time === null || d.time === undefined || (typeof d.time === 'number' && isNaN(d.time))) {
+                                            if (window.Logger) {
+                                                window.Logger.warn('Filtering out point with invalid time', { page: 'trade-history-page', time: d.time });
+                                            }
+                                            return false;
+                                        }
+                                        // Check all OHLC values are valid numbers (not null, not undefined, not NaN)
+                                        const fields = ['open', 'high', 'low', 'close'];
+                                        for (const field of fields) {
+                                            const value = d[field];
+                                            if (value === null || value === undefined || (typeof value === 'number' && isNaN(value)) || typeof value !== 'number') {
+                                                if (window.Logger) {
+                                                    window.Logger.warn(`Filtering out point with invalid ${field}`, { 
+                                                        page: 'trade-history-page', 
+                                                        field, 
+                                                        value, 
+                                                        type: typeof value,
+                                                        isNull: value === null,
+                                                        isUndefined: value === undefined,
+                                                        isNaN: typeof value === 'number' && isNaN(value)
+                                                    });
+                                                }
+                                                return false;
+                                            }
+                                        }
+                                        // Ensure high >= low
+                                        if (d.high < d.low) {
+                                            if (window.Logger) {
+                                                window.Logger.warn('Filtering out point with high < low', { 
+                                                    page: 'trade-history-page', 
+                                                    high: d.high, 
+                                                    low: d.low 
+                                                });
+                                            }
+                                            return false;
+                                        }
+                                        return true;
+                                    });
+                                    
+                                    // Ensure data is sorted by time (required by Lightweight Charts)
+                                    safeCandlestickData.sort((a, b) => a.time - b.time);
+                                    
+                                    if (window.Logger) {
+                                        window.Logger.info('Final candlestick data validation before setData', { 
+                                            page: 'trade-history-page', 
+                                            originalCount: finalCandlestickData.length,
+                                            safeCount: safeCandlestickData.length,
+                                            filteredOut: finalCandlestickData.length - safeCandlestickData.length,
+                                            firstPoint: safeCandlestickData.length > 0 ? safeCandlestickData[0] : null,
+                                            lastPoint: safeCandlestickData.length > 0 ? safeCandlestickData[safeCandlestickData.length - 1] : null
+                                        });
+                                    }
+                                    
+                                    if (safeCandlestickData.length === 0) {
+                                        if (window.Logger) {
+                                            window.Logger.error('No valid candlestick data after final validation', { 
+                                                page: 'trade-history-page',
+                                                originalCount: finalCandlestickData.length
+                                            });
+                                        }
+                                        throw new Error('No valid candlestick data available');
+                                    }
+                                    
+                                    // Log first few data points before setData
+                                    if (window.Logger && safeCandlestickData.length > 0) {
+                                        window.Logger.debug('Setting candlestick data', { 
+                                            page: 'trade-history-page', 
+                                            dataPoints: safeCandlestickData.length,
+                                            firstPoint: safeCandlestickData[0],
+                                            lastPoint: safeCandlestickData[safeCandlestickData.length - 1]
+                                        });
+                                    }
+                                    
+                                    // CRITICAL: Final check - ensure no null/undefined values before setData
+                                    const finalSafeData = safeCandlestickData.filter(d => {
+                                        if (!d) return false;
+                                        // Validate all fields are valid numbers, not null
+                                        if (d.time === null || d.time === undefined) return false;
+                                        if (d.open === null || d.open === undefined || isNaN(d.open)) return false;
+                                        if (d.high === null || d.high === undefined || isNaN(d.high)) return false;
+                                        if (d.low === null || d.low === undefined || isNaN(d.low)) return false;
+                                        if (d.close === null || d.close === undefined || isNaN(d.close)) return false;
+                                        if (d.high < d.low) return false; // Invalid OHLC
+                                        return true;
+                                    });
+                                    
+                                    if (finalSafeData.length === 0) {
+                                        if (window.Logger) {
+                                            window.Logger.error('❌ No valid candlestick data after final null check', { 
+                                                page: 'trade-history-page',
+                                                originalCount: safeCandlestickData.length
+                                            });
+                                        }
+                                        if (window.NotificationSystem) {
+                                            window.NotificationSystem.showError(
+                                                'נתונים חסרים',
+                                                'לא נמצאו נתוני מחיר תקינים להצגה בגרף. נא לבדוק את הנתונים בבסיס הנתונים.'
+                                            );
+                                        }
+                                        throw new Error('No valid candlestick data after final validation');
+                                    }
+                                    
+                                    if (window.Logger) {
+                                        window.Logger.info('Final candlestick data validation before setData', { 
+                                            page: 'trade-history-page', 
+                                            originalCount: finalCandlestickData.length,
+                                            safeCount: finalSafeData.length,
+                                            filteredOut: finalCandlestickData.length - finalSafeData.length,
+                                            firstPoint: finalSafeData.length > 0 ? finalSafeData[0] : null,
+                                            lastPoint: finalSafeData.length > 0 ? finalSafeData[finalSafeData.length - 1] : null
+                                        });
+                                    }
+                                    
+                                    try {
+                                        candlestickSeries.setData(finalSafeData);
+                                    } catch (setDataError) {
+                                        if (window.Logger) {
+                                            window.Logger.error('❌ Error in setData call', { 
+                                                page: 'trade-history-page',
+                                                error: setDataError?.message || setDataError,
+                                                dataPoints: finalSafeData.length,
+                                                firstPoint: finalSafeData[0],
+                                                lastPoint: finalSafeData[finalSafeData.length - 1]
+                                            });
+                                        }
+                                        throw setDataError; // Re-throw to trigger fallback
+                                    }
+                                    
+                                    chartSeries.marketPrice = candlestickSeries;
+                                    if (window.Logger) {
+                                        window.Logger.debug('Candlestick series added successfully', { 
+                                            page: 'trade-history-page', 
+                                            dataPoints: finalCandlestickData.length 
+                                        });
+                                    }
+                                } catch (error) {
+                                    if (window.Logger) {
+                                        window.Logger.error('Failed to add candlestick series', { 
+                                            page: 'trade-history-page', 
+                                            error: error?.message || error,
+                                            stack: error?.stack,
+                                            dataPoints: finalCandlestickData.length,
+                                            sampleData: finalCandlestickData[0]
+                                        });
+                                    }
+                                    // Fallback to line series
+                                    const lineData = finalCandlestickData
+                                        .map(d => {
+                                            if (!d || d.time === null || d.close === null || isNaN(d.close)) {
+                                                return null;
+                                            }
+                                            return {
+                                                time: d.time,
+                                                value: d.close
+                                            };
+                                        })
+                                        .filter(d => d !== null);
+                                    
+                                    if (lineData.length > 0) {
+                                        try {
+                                            const priceLineSeries = window.TradingViewChartAdapter.addLineSeries(timelineChart, {
+                                                priceScaleId: 'right',
+                                                color: primaryColor,
+                                                lineWidth: 2,
+                                                title: 'מחיר נכס'
+                                            });
+                                            priceLineSeries.setData(lineData);
+                                            chartSeries.marketPrice = priceLineSeries;
+                                        } catch (lineError) {
+                                            if (window.Logger) {
+                                                window.Logger.error('Failed to add line series fallback', { 
+                                                    page: 'trade-history-page', 
+                                                    error: lineError?.message || lineError 
+                                                });
+                                            }
+                                        }
+                                    }
+                                }
+                            } else {
+                                if (window.Logger) {
+                                    window.Logger.warn('No valid candlestick data after final check', { 
+                                        page: 'trade-history-page', 
+                                        validatedCount: validatedCandlestickData.length 
+                                    });
+                                }
+                                // Show warning to user - no mock/fallback data
+                                if (!marketPriceErrorShown && window.NotificationSystem && typeof window.NotificationSystem.showWarning === 'function') {
+                                    window.NotificationSystem.showWarning(
+                                        'נתוני מחיר חסרים',
+                                        'אין נתוני מחיר תקפים להצגת גרף המחיר. נא לבדוק שהנתונים נטענו מהשרת או לטעון נתוני מחיר היסטוריים.'
+                                    );
+                                    marketPriceErrorShown = true;
+                                }
+                            }
+                        } else {
+                            if (window.Logger) {
+                                window.Logger.warn('No valid candlestick data after validation', { 
+                                    page: 'trade-history-page', 
+                                    originalCount: candlestickData.length 
+                                });
+                            }
+                            // Show warning to user - no mock/fallback data
+                            if (!marketPriceErrorShown && window.NotificationSystem && typeof window.NotificationSystem.showWarning === 'function') {
+                                window.NotificationSystem.showWarning(
+                                    'נתוני מחיר חסרים',
+                                    'אין נתוני מחיר תקפים להצגת גרף המחיר. נא לבדוק שהנתונים נטענו מהשרת או לטעון נתוני מחיר היסטוריים.'
+                                );
+                                marketPriceErrorShown = true;
+                            }
+                        }
+                    }
+                } else {
+                    // No market price data at all
+                    if (window.Logger) {
+                        window.Logger.warn('No market price data available', { 
+                            page: 'trade-history-page' 
+                        });
+                    }
+                    // Show warning to user - no mock/fallback data
+                    if (!marketPriceErrorShown && window.NotificationSystem && typeof window.NotificationSystem.showWarning === 'function') {
+                        window.NotificationSystem.showWarning(
+                            'נתוני מחיר חסרים',
+                            'אין נתוני מחיר זמינים להצגת גרף המחיר. נא לבדוק שהנתונים נטענו מהשרת או לטעון נתוני מחיר היסטוריים.'
+                        );
+                        marketPriceErrorShown = true;
+                    }
+                }
+                
                 // Convert data to TradingView format
                 // Use index to handle multiple points on same date
                 const positionSizeData = timelineData.map((d, index) => {
-                    const time = convertDateToTradingView(d.date, index);
+                    // Use dateObj if available, otherwise use date string
+                    const dateToConvert = d.dateObj ? d.dateObj.toISOString() : d.date;
+                    const time = convertDateToTradingView(dateToConvert, index);
+                    if (time === null || time === undefined) {
+                        return null; // Skip invalid dates
+                    }
                     return {
                         time: time,
                         value: d.positionSize !== null && d.positionSize !== undefined ? d.positionSize : 0
                     };
-                }).filter(d => d.time && !isNaN(d.value)); // Filter out invalid data
+                }).filter(d => d !== null && d.time !== null && d.time !== undefined && !isNaN(d.value)); // Filter out invalid data
                 
-                // Position Size - Left Scale, Stepped Line
-                const positionSizeSeries = window.TradingViewChartAdapter.addLineSeries(timelineChart, {
-                    priceScaleId: 'left',
-                    color: mutedColor,
-                    lineWidth: 3,
-                    lineType: 1, // Stepped
-                    title: 'גודל פוזיציה'
-                });
-                
+                // 2. Position Size - Left Scale, Stepped Line
                 if (positionSizeData.length > 0) {
-                    positionSizeSeries.setData(positionSizeData);
+                    try {
+                        const positionSizeSeries = window.TradingViewChartAdapter.addLineSeries(timelineChart, {
+                            priceScaleId: 'left',
+                            color: mutedColor,
+                            lineWidth: 3,
+                            lineType: 1, // Stepped
+                            title: 'גודל פוזיציה'
+                        });
+                        positionSizeSeries.setData(positionSizeData);
+                        chartSeries.positionSize = positionSizeSeries;
+                    } catch (error) {
+                        if (window.Logger) {
+                            window.Logger.warn('Failed to add position size series', { 
+                                page: 'trade-history-page', 
+                                error: error?.message || error 
+                            });
+                        }
+                    }
                 }
                 
-                // Realized P/L - Right Scale
-                const realizedPLSeries = window.TradingViewChartAdapter.addLineSeries(timelineChart, {
-                    priceScaleId: 'right',
-                    color: successColor,
-                    lineWidth: 2,
-                    lineType: 0, // Normal
-                    title: 'P/L ממומש'
-                });
+                // 3. Position Value (Area) - Right Scale
+                const positionValueData = timelineData.map((d, index) => {
+                    const dateToConvert = d.dateObj ? d.dateObj.toISOString() : d.date;
+                    const time = convertDateToTradingView(dateToConvert, index);
+                    if (time === null || time === undefined) {
+                        return null; // Skip invalid dates
+                    }
+                    return {
+                        time: time,
+                        value: d.positionValue !== null && d.positionValue !== undefined ? d.positionValue : 0
+                    };
+                }).filter(d => d !== null && d.time !== null && d.time !== undefined && !isNaN(d.value));
                 
+                if (positionValueData.length > 0) {
+                    try {
+                        const positionValueSeries = window.TradingViewChartAdapter.addAreaSeries(timelineChart, {
+                            priceScaleId: 'right',
+                            lineColor: '#26baac',
+                            topColor: 'rgba(38, 186, 172, 0.2)',
+                            bottomColor: 'rgba(38, 186, 172, 0.0)',
+                            lineWidth: 2,
+                            title: 'שווי פוזיציה'
+                        });
+                        positionValueSeries.setData(positionValueData);
+                        chartSeries.positionValue = positionValueSeries;
+                    } catch (error) {
+                        if (window.Logger) {
+                            window.Logger.warn('Failed to add position value series', { 
+                                page: 'trade-history-page', 
+                                error: error?.message || error 
+                            });
+                        }
+                    }
+                }
+                
+                // 4. Average Price (Line) - Right Scale
+                const averagePriceData = timelineData.map((d, index) => {
+                    const dateToConvert = d.dateObj ? d.dateObj.toISOString() : d.date;
+                    const time = convertDateToTradingView(dateToConvert, index);
+                    if (time === null || time === undefined) {
+                        return null; // Skip invalid dates
+                    }
+                    return {
+                        time: time,
+                        value: d.averagePrice !== null && d.averagePrice !== undefined ? d.averagePrice : 0
+                    };
+                }).filter(d => d !== null && d.time !== null && d.time !== undefined && !isNaN(d.value) && d.value > 0);
+                
+                if (averagePriceData.length > 0) {
+                    try {
+                        const averagePriceSeries = window.TradingViewChartAdapter.addLineSeries(timelineChart, {
+                            priceScaleId: 'right',
+                            color: '#6c757d',
+                            lineWidth: 2,
+                            lineType: 2, // Dashed
+                            title: 'מחיר ממוצע',
+                            priceFormat: {
+                                type: 'price',
+                                precision: 2,
+                                minMove: 0.01
+                            }
+                        });
+                        averagePriceSeries.setData(averagePriceData);
+                        chartSeries.averagePrice = averagePriceSeries;
+                    } catch (error) {
+                        if (window.Logger) {
+                            window.Logger.warn('Failed to add average price series', { 
+                                page: 'trade-history-page', 
+                                error: error?.message || error 
+                            });
+                        }
+                    }
+                }
+                
+                // 5. Realized P/L - Right Scale
                 const realizedPLData = timelineData.map((d, index) => {
-                    const time = convertDateToTradingView(d.date, index);
+                    // Use dateObj if available, otherwise use date string
+                    const dateToConvert = d.dateObj ? d.dateObj.toISOString() : d.date;
+                    const time = convertDateToTradingView(dateToConvert, index);
+                    if (time === null || time === undefined) {
+                        return null; // Skip invalid dates
+                    }
                     return {
                         time: time,
                         value: d.realizedPL !== null && d.realizedPL !== undefined ? d.realizedPL : 0
                     };
-                }).filter(d => d.time && !isNaN(d.value));
+                }).filter(d => d !== null && d.time !== null && d.time !== undefined && !isNaN(d.value));
                 
                 if (realizedPLData.length > 0) {
-                    realizedPLSeries.setData(realizedPLData);
+                    try {
+                        const realizedPLSeries = window.TradingViewChartAdapter.addLineSeries(timelineChart, {
+                            priceScaleId: 'right',
+                            color: successColor,
+                            lineWidth: 2,
+                            lineType: 0, // Normal
+                            title: 'P/L ממומש'
+                        });
+                        realizedPLSeries.setData(realizedPLData);
+                        chartSeries.realizedPL = realizedPLSeries;
+                    } catch (error) {
+                        if (window.Logger) {
+                            window.Logger.warn('Failed to add realized P/L series', { 
+                                page: 'trade-history-page', 
+                                error: error?.message || error 
+                            });
+                        }
+                    }
                 }
                 
-                // Unrealized P/L - Right Scale
-                const unrealizedPLSeries = window.TradingViewChartAdapter.addLineSeries(timelineChart, {
-                    priceScaleId: 'right',
-                    color: warningColor,
-                    lineWidth: 2,
-                    lineType: 0, // Normal
-                    title: 'P/L לא ממומש'
-                });
-                
+                // 6. Unrealized P/L - Right Scale
                 const unrealizedPLData = timelineData.map((d, index) => {
-                    const time = convertDateToTradingView(d.date, index);
+                    // Use dateObj if available, otherwise use date string
+                    const dateToConvert = d.dateObj ? d.dateObj.toISOString() : d.date;
+                    const time = convertDateToTradingView(dateToConvert, index);
+                    if (time === null || time === undefined) {
+                        return null; // Skip invalid dates
+                    }
                     return {
                         time: time,
                         value: d.unrealizedPL !== null && d.unrealizedPL !== undefined ? d.unrealizedPL : 0
                     };
-                }).filter(d => d.time && !isNaN(d.value));
+                }).filter(d => d !== null && d.time !== null && d.time !== undefined && !isNaN(d.value));
                 
                 if (unrealizedPLData.length > 0) {
-                    unrealizedPLSeries.setData(unrealizedPLData);
+                    try {
+                        const unrealizedPLSeries = window.TradingViewChartAdapter.addLineSeries(timelineChart, {
+                            priceScaleId: 'right',
+                            color: warningColor,
+                            lineWidth: 2,
+                            lineType: 0, // Normal
+                            title: 'P/L לא ממומש'
+                        });
+                        unrealizedPLSeries.setData(unrealizedPLData);
+                        chartSeries.unrealizedPL = unrealizedPLSeries;
+                    } catch (error) {
+                        if (window.Logger) {
+                            window.Logger.warn('Failed to add unrealized P/L series', { 
+                                page: 'trade-history-page', 
+                                error: error?.message || error 
+                            });
+                        }
+                    }
                 }
                 
-                // Total P/L - Right Scale
-                const totalPLSeries = window.TradingViewChartAdapter.addLineSeries(timelineChart, {
-                    priceScaleId: 'right',
-                    color: primaryColor,
-                    lineWidth: 3,
-                    lineType: 0, // Normal
-                    title: 'P/L כולל'
-                });
-                
+                // 7. Total P/L - Right Scale
                 const totalPLData = timelineData.map((d, index) => {
-                    const time = convertDateToTradingView(d.date, index);
+                    // Use dateObj if available, otherwise use date string
+                    const dateToConvert = d.dateObj ? d.dateObj.toISOString() : d.date;
+                    const time = convertDateToTradingView(dateToConvert, index);
+                    if (time === null || time === undefined) {
+                        return null; // Skip invalid dates
+                    }
                     return {
                         time: time,
                         value: d.totalPL !== null && d.totalPL !== undefined ? d.totalPL : 0
                     };
-                }).filter(d => d.time && !isNaN(d.value));
+                }).filter(d => d !== null && d.time !== null && d.time !== undefined && !isNaN(d.value));
                 
                 if (totalPLData.length > 0) {
-                    totalPLSeries.setData(totalPLData);
+                    try {
+                        const totalPLSeries = window.TradingViewChartAdapter.addLineSeries(timelineChart, {
+                            priceScaleId: 'right',
+                            color: primaryColor,
+                            lineWidth: 3,
+                            lineType: 0, // Normal
+                            title: 'P/L כולל'
+                        });
+                        totalPLSeries.setData(totalPLData);
+                        chartSeries.totalPL = totalPLSeries;
+                    } catch (error) {
+                        if (window.Logger) {
+                            window.Logger.warn('Failed to add total P/L series', { 
+                                page: 'trade-history-page', 
+                                error: error?.message || error 
+                            });
+                        }
+                    }
                 }
+                
+                // Store chart series globally for tooltips and legend
+                window._timelineChartSeries = chartSeries;
                 
                 // Fit content
                 timelineChart.timeScale().fitContent();
@@ -1098,11 +1869,21 @@
                 );
                 loadingTextNodes.forEach(node => node.remove());
                 
+                // Setup tooltips for all series
+                setupChartTooltips(timelineChart, chartSeries, timelineData, marketPriceData);
+                
+                // Setup legend
+                setupChartLegend(chartSeries);
+                
+                // Setup chart controls (zoom, pan, reset)
+                setupChartControls(timelineChart);
+                
                 if (window.Logger) {
                     window.Logger.info('Timeline chart initialized successfully', { 
                         page: 'trade-history-page', 
                         dataPoints: timelineData.length,
-                        seriesCount: 4
+                        marketPricePoints: marketPriceData.length,
+                        seriesCount: Object.keys(chartSeries).length
                     });
                 }
             } catch (error) {
@@ -1113,6 +1894,357 @@
                 isInitializingTimelineChart = false;
             }
         };
+        
+        /**
+         * Setup tooltips for chart series
+         * @param {Object} chart - Chart instance
+         * @param {Object} series - Series object with all series
+         * @param {Array} timelineData - Timeline data
+         * @param {Array} marketPriceData - Market price data
+         */
+        function setupChartTooltips(chart, series, timelineData, marketPriceData) {
+            if (!chart || !series) return;
+            
+            // Create tooltip element
+            const tooltip = document.createElement('div');
+            tooltip.id = 'timelineChartTooltip';
+            tooltip.className = 'chart-tooltip';
+            tooltip.style.cssText = 'position: absolute; display: none; padding: 8px; background: rgba(0, 0, 0, 0.8); color: white; border-radius: 4px; font-size: 12px; pointer-events: none; z-index: 1000;';
+            document.body.appendChild(tooltip);
+            
+            // Subscribe to crosshair move
+            chart.subscribeCrosshairMove(param => {
+                if (!param.point || param.time === undefined) {
+                    tooltip.style.display = 'none';
+                    return;
+                }
+                
+                // Find closest data point
+                const time = param.time;
+                let closestTimelinePoint = null;
+                let minDiff = Infinity;
+                
+                for (const point of timelineData) {
+                    const pointTime = convertDateToTradingView(point.dateObj ? point.dateObj.toISOString() : point.date, 0);
+                    const diff = Math.abs(pointTime - time);
+                    if (diff < minDiff) {
+                        minDiff = diff;
+                        closestTimelinePoint = point;
+                    }
+                }
+                
+                // Find closest market price
+                let closestMarketPrice = null;
+                let minPriceDiff = Infinity;
+                
+                for (const price of marketPriceData) {
+                    let dateObj = null;
+                    if (window.dateUtils && typeof window.dateUtils.toDateObject === 'function') {
+                        dateObj = window.dateUtils.toDateObject(price.date);
+                    } else if (price.date && typeof price.date === 'object' && 'epochMs' in price.date) {
+                        dateObj = new Date(price.date.epochMs);
+                    } else if (price.date && typeof price.date === 'object' && 'utc' in price.date) {
+                        dateObj = new Date(price.date.utc);
+                    } else {
+                        dateObj = new Date(price.date);
+                    }
+                    if (dateObj && !isNaN(dateObj.getTime())) {
+                        const priceTime = convertDateToTradingView(dateObj.toISOString(), 0);
+                        const diff = Math.abs(priceTime - time);
+                        if (diff < minPriceDiff) {
+                            minPriceDiff = diff;
+                            closestMarketPrice = price;
+                        }
+                    }
+                }
+                
+                if (!closestTimelinePoint && !closestMarketPrice) {
+                    tooltip.style.display = 'none';
+                    return;
+                }
+                
+                // Build tooltip content
+                let tooltipContent = '<div style="direction: rtl; text-align: right;">';
+                
+                // Date
+                if (closestTimelinePoint && closestTimelinePoint.dateObj) {
+                    const dateStr = window.FieldRendererService?.renderDate(closestTimelinePoint.dateObj, true) || 
+                                   closestTimelinePoint.dateObj.toLocaleString('he-IL');
+                    tooltipContent += `<div style="font-weight: bold; margin-bottom: 4px;">${dateStr}</div>`;
+                } else if (closestMarketPrice) {
+                    let dateObj = null;
+                    if (window.dateUtils && typeof window.dateUtils.toDateObject === 'function') {
+                        dateObj = window.dateUtils.toDateObject(closestMarketPrice.date);
+                    } else if (closestMarketPrice.date && typeof closestMarketPrice.date === 'object' && 'epochMs' in closestMarketPrice.date) {
+                        dateObj = new Date(closestMarketPrice.date.epochMs);
+                    } else {
+                        dateObj = new Date(closestMarketPrice.date);
+                    }
+                    if (dateObj && !isNaN(dateObj.getTime())) {
+                        const dateStr = window.FieldRendererService?.renderDate(dateObj, true) || 
+                                       dateObj.toLocaleString('he-IL');
+                        tooltipContent += `<div style="font-weight: bold; margin-bottom: 4px;">${dateStr}</div>`;
+                    }
+                }
+                
+                // Market Price
+                if (closestMarketPrice) {
+                    tooltipContent += '<div style="margin-top: 4px;"><strong>מחיר נכס:</strong><br/>';
+                    if (closestMarketPrice.open !== undefined && closestMarketPrice.open !== null) {
+                        tooltipContent += `פתיחה: ${closestMarketPrice.open.toFixed(2)}<br/>`;
+                    }
+                    if (closestMarketPrice.high !== undefined && closestMarketPrice.high !== null) {
+                        tooltipContent += `שיא: ${closestMarketPrice.high.toFixed(2)}<br/>`;
+                    }
+                    if (closestMarketPrice.low !== undefined && closestMarketPrice.low !== null) {
+                        tooltipContent += `שפל: ${closestMarketPrice.low.toFixed(2)}<br/>`;
+                    }
+                    if (closestMarketPrice.close !== undefined && closestMarketPrice.close !== null) {
+                        tooltipContent += `סגירה: ${closestMarketPrice.close.toFixed(2)}<br/>`;
+                    }
+                    tooltipContent += '</div>';
+                }
+                
+                // Position Data
+                if (closestTimelinePoint) {
+                    tooltipContent += '<div style="margin-top: 4px;"><strong>פוזיציה:</strong><br/>';
+                    if (closestTimelinePoint.positionSize !== undefined && closestTimelinePoint.positionSize !== null) {
+                        tooltipContent += `גודל: ${closestTimelinePoint.positionSize.toFixed(2)}<br/>`;
+                    }
+                    if (closestTimelinePoint.positionValue !== undefined && closestTimelinePoint.positionValue !== null) {
+                        tooltipContent += `שווי: ${closestTimelinePoint.positionValue.toFixed(2)}<br/>`;
+                    }
+                    if (closestTimelinePoint.averagePrice !== undefined && closestTimelinePoint.averagePrice !== null && closestTimelinePoint.averagePrice > 0) {
+                        tooltipContent += `מחיר ממוצע: ${closestTimelinePoint.averagePrice.toFixed(2)}<br/>`;
+                    }
+                    tooltipContent += '</div>';
+                    
+                    // P/L Data
+                    tooltipContent += '<div style="margin-top: 4px;"><strong>רווח/הפסד:</strong><br/>';
+                    if (closestTimelinePoint.realizedPL !== undefined && closestTimelinePoint.realizedPL !== null) {
+                        const plColor = closestTimelinePoint.realizedPL >= 0 ? '#28a745' : '#dc3545';
+                        tooltipContent += `<span style="color: ${plColor};">ממומש: ${closestTimelinePoint.realizedPL.toFixed(2)}</span><br/>`;
+                    }
+                    if (closestTimelinePoint.unrealizedPL !== undefined && closestTimelinePoint.unrealizedPL !== null) {
+                        const plColor = closestTimelinePoint.unrealizedPL >= 0 ? '#28a745' : '#dc3545';
+                        tooltipContent += `<span style="color: ${plColor};">לא ממומש: ${closestTimelinePoint.unrealizedPL.toFixed(2)}</span><br/>`;
+                    }
+                    if (closestTimelinePoint.totalPL !== undefined && closestTimelinePoint.totalPL !== null) {
+                        const plColor = closestTimelinePoint.totalPL >= 0 ? '#28a745' : '#dc3545';
+                        tooltipContent += `<span style="color: ${plColor}; font-weight: bold;">סה"כ: ${closestTimelinePoint.totalPL.toFixed(2)}</span>`;
+                    }
+                    tooltipContent += '</div>';
+                }
+                
+                tooltipContent += '</div>';
+                tooltip.innerHTML = tooltipContent;
+                
+                // Position tooltip
+                const container = document.getElementById('timelineChart');
+                if (container) {
+                    const rect = container.getBoundingClientRect();
+                    tooltip.style.left = (param.point.x + rect.left) + 'px';
+                    tooltip.style.top = (param.point.y + rect.top - 10) + 'px';
+                    tooltip.style.display = 'block';
+                }
+            });
+        }
+        
+        /**
+         * Setup legend for chart series
+         * @param {Object} series - Series object with all series
+         */
+        function setupChartLegend(series) {
+            const legendContainer = document.getElementById('timelineChartLegend');
+            if (!legendContainer) return;
+            
+            const legendItems = legendContainer.querySelector('.d-flex');
+            if (!legendItems) return;
+            
+            // Clear existing legend
+            legendItems.innerHTML = '';
+            
+            // Series configuration with colors and labels
+            const seriesConfig = [
+                { key: 'marketPrice', label: 'מחיר נכס', color: '#26baac', defaultVisible: true },
+                { key: 'positionSize', label: 'גודל פוזיציה', color: '#6c757d', defaultVisible: true },
+                { key: 'positionValue', label: 'שווי פוזיציה', color: '#26baac', defaultVisible: true },
+                { key: 'averagePrice', label: 'מחיר ממוצע', color: '#6c757d', defaultVisible: true },
+                { key: 'realizedPL', label: 'P/L ממומש', color: '#28a745', defaultVisible: true },
+                { key: 'unrealizedPL', label: 'P/L לא ממומש', color: '#ffc107', defaultVisible: true },
+                { key: 'totalPL', label: 'P/L כולל', color: '#26baac', defaultVisible: true }
+            ];
+            
+            // Create legend items
+            seriesConfig.forEach(config => {
+                if (!series[config.key]) return;
+                
+                const legendItem = document.createElement('div');
+                legendItem.className = 'chart-legend-item';
+                legendItem.style.cssText = 'display: flex; align-items: center; gap: 4px; cursor: pointer; padding: 4px 8px; border-radius: 4px;';
+                legendItem.dataset.seriesKey = config.key;
+                
+                // Checkbox
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.checked = config.defaultVisible;
+                checkbox.style.cssText = 'cursor: pointer;';
+                
+                // Color indicator
+                const colorIndicator = document.createElement('span');
+                colorIndicator.style.cssText = `width: 16px; height: 16px; background-color: ${config.color}; border-radius: 2px; display: inline-block;`;
+                
+                // Label
+                const label = document.createElement('span');
+                label.textContent = config.label;
+                label.style.cssText = 'font-size: 12px;';
+                
+                legendItem.appendChild(checkbox);
+                legendItem.appendChild(colorIndicator);
+                legendItem.appendChild(label);
+                
+                // Toggle series visibility
+                checkbox.addEventListener('change', (e) => {
+                    const seriesInstance = series[config.key];
+                    if (seriesInstance && typeof seriesInstance.setVisible === 'function') {
+                        seriesInstance.setVisible(e.target.checked);
+                    } else if (seriesInstance && typeof seriesInstance.applyOptions === 'function') {
+                        seriesInstance.applyOptions({ visible: e.target.checked });
+                    }
+                    
+                    // Update legend item style
+                    if (e.target.checked) {
+                        legendItem.style.opacity = '1';
+                    } else {
+                        legendItem.style.opacity = '0.5';
+                    }
+                });
+                
+                legendItems.appendChild(legendItem);
+            });
+            
+            // Show legend if there are items
+            if (legendItems.children.length > 0) {
+                legendContainer.style.display = 'block';
+            }
+        }
+        
+        /**
+         * Setup chart controls (zoom, pan, reset)
+         * @param {Object} chart - Chart instance
+         */
+        function setupChartControls(chart) {
+            if (!chart) return;
+            
+            const zoomInBtn = document.getElementById('timelineZoomIn');
+            const zoomOutBtn = document.getElementById('timelineZoomOut');
+            const resetBtn = document.getElementById('timelineReset');
+            const panLeftBtn = document.getElementById('timelinePanLeft');
+            const panRightBtn = document.getElementById('timelinePanRight');
+            
+            // Zoom In
+            if (zoomInBtn) {
+                zoomInBtn.addEventListener('click', () => {
+                    try {
+                        const timeScale = chart.timeScale();
+                        const visibleRange = timeScale.getVisibleRange();
+                        if (visibleRange && visibleRange.from && visibleRange.to) {
+                            const range = visibleRange.to - visibleRange.from;
+                            const center = (visibleRange.from + visibleRange.to) / 2;
+                            const newRange = range * 0.7; // Zoom in by 30%
+                            timeScale.setVisibleRange({
+                                from: center - newRange / 2,
+                                to: center + newRange / 2
+                            });
+                        }
+                    } catch (error) {
+                        if (window.Logger) {
+                            window.Logger.warn('Error zooming in', { page: 'trade-history-page', error });
+                        }
+                    }
+                });
+            }
+            
+            // Zoom Out
+            if (zoomOutBtn) {
+                zoomOutBtn.addEventListener('click', () => {
+                    try {
+                        const timeScale = chart.timeScale();
+                        const visibleRange = timeScale.getVisibleRange();
+                        if (visibleRange && visibleRange.from && visibleRange.to) {
+                            const range = visibleRange.to - visibleRange.from;
+                            const center = (visibleRange.from + visibleRange.to) / 2;
+                            const newRange = range * 1.4; // Zoom out by 40%
+                            timeScale.setVisibleRange({
+                                from: center - newRange / 2,
+                                to: center + newRange / 2
+                            });
+                        }
+                    } catch (error) {
+                        if (window.Logger) {
+                            window.Logger.warn('Error zooming out', { page: 'trade-history-page', error });
+                        }
+                    }
+                });
+            }
+            
+            // Reset (fit content)
+            if (resetBtn) {
+                resetBtn.addEventListener('click', () => {
+                    try {
+                        chart.timeScale().fitContent();
+                    } catch (error) {
+                        if (window.Logger) {
+                            window.Logger.warn('Error resetting zoom', { page: 'trade-history-page', error });
+                        }
+                    }
+                });
+            }
+            
+            // Pan Left (move to future)
+            if (panLeftBtn) {
+                panLeftBtn.addEventListener('click', () => {
+                    try {
+                        const timeScale = chart.timeScale();
+                        const visibleRange = timeScale.getVisibleRange();
+                        if (visibleRange && visibleRange.from && visibleRange.to) {
+                            const range = visibleRange.to - visibleRange.from;
+                            const shift = range * 0.3; // Shift by 30% of visible range
+                            timeScale.setVisibleRange({
+                                from: visibleRange.from + shift,
+                                to: visibleRange.to + shift
+                            });
+                        }
+                    } catch (error) {
+                        if (window.Logger) {
+                            window.Logger.warn('Error panning left', { page: 'trade-history-page', error });
+                        }
+                    }
+                });
+            }
+            
+            // Pan Right (move to past)
+            if (panRightBtn) {
+                panRightBtn.addEventListener('click', () => {
+                    try {
+                        const timeScale = chart.timeScale();
+                        const visibleRange = timeScale.getVisibleRange();
+                        if (visibleRange && visibleRange.from && visibleRange.to) {
+                            const range = visibleRange.to - visibleRange.from;
+                            const shift = range * 0.3; // Shift by 30% of visible range
+                            timeScale.setVisibleRange({
+                                from: visibleRange.from - shift,
+                                to: visibleRange.to - shift
+                            });
+                        }
+                    } catch (error) {
+                        if (window.Logger) {
+                            window.Logger.warn('Error panning right', { page: 'trade-history-page', error });
+                        }
+                    }
+                });
+            }
+        }
     </script>
     
 </body>

@@ -248,6 +248,7 @@ listElement.addEventListener('mouseenter', function(event) {
 ```
 
 **יתרונות:**
+
 - ביצועים טובים יותר (פחות event listeners)
 - תמיכה ב-dynamic content (items שנוספים/מוסרים)
 - ניקוי קל יותר
@@ -268,12 +269,14 @@ listElement.addEventListener('mouseenter', function(event) {
 ```
 
 **תכונות:**
+
 - אלמנטים בלתי נראים (`opacity: 0`, `background: transparent`)
 - מקבלים event listeners זהים ל-items
 - נמחקים אוטומטית ב-destroy()
 - z-index: 5 (בין items (1) ל-hovered items (10))
 
 **CSS:**
+
 ```css
 .widget-overlay-gap-bridge,
 [data-gap-bridge="true"] {
@@ -298,12 +301,14 @@ listElement.addEventListener('mouseenter', function(event) {
 ```
 
 **תכונות:**
+
 - ניהול stack של overlays פעילים
 - כל overlay חדש מקבל z-index גבוה יותר
 - עדכון אוטומטי בעת פתיחה/סגירה
 - Cleanup אוטומטי
 
 **שימוש:**
+
 ```javascript
 // Automatically called by WidgetOverlayService
 const zIndex = window.WidgetZIndexManager.registerOverlay(overlayElement, itemElement);
@@ -373,6 +378,7 @@ const overlayConfig = activeOverlays.get(listElement);
 ### Widget Dependencies
 
 הוויג'טים תלויים ב-`WidgetOverlayService`:
+
 - RecentItemsWidget
 - UnifiedPendingActionsWidget
 - כל וויג'ט עתידי עם overlay
@@ -382,6 +388,7 @@ const overlayConfig = activeOverlays.get(listElement);
 ### 1. Event Delegation
 
 שימוש ב-event delegation במקום binding לכל item:
+
 - פחות event listeners
 - ביצועים טובים יותר
 - תמיכה ב-dynamic content
@@ -389,6 +396,7 @@ const overlayConfig = activeOverlays.get(listElement);
 ### 2. requestAnimationFrame
 
 שימוש ב-`requestAnimationFrame` ל-positioning:
+
 - מבטיח ש-DOM מוכן
 - מבטיח positioning מדויק
 - מבטיח smooth animations
@@ -396,6 +404,7 @@ const overlayConfig = activeOverlays.get(listElement);
 ### 3. WeakMap for Tracking
 
 שימוש ב-`WeakMap` לעיקוב active overlays:
+
 - לא מונע garbage collection
 - אוטומטי cleanup
 

@@ -1,10 +1,12 @@
 # מערכת ניהול Z-Index למודולים מקוננים
+
 ## Nested Modals Z-Index Management System
 
 **תאריך יצירה:** ינואר 2025  
 **תאריך עדכון אחרון:** 28 בינואר 2025  
 **גרסה:** 2.0.0  
 **מערכות קשורות:**
+
 - Modal Manager V2 (`modal-manager-v2.js`)
 - Modal Navigation System (`modal-navigation-manager.js`)
 - Modal Z-Index Manager (`modal-z-index-manager.js`)
@@ -67,6 +69,7 @@ backdrop z-index = BACKDROP_Z_INDEX
 ```
 
 **דוגמה:**
+
 - מודול ראשון (stackIndex = 0): modal=1040, dialog=1041, content=1042
 - מודול שני (stackIndex = 1): modal=1050, dialog=1051, content=1052
 - מודול שלישי (stackIndex = 2): modal=1060, dialog=1061, content=1062
@@ -152,6 +155,7 @@ _cleanupBootstrapBackdrops() {
 ```
 
 **קריאות:**
+
 1. בעת `ensureGlobalBackdrop()` - לפני יצירת backdrop
 2. בעת `shown.bs.modal` - אחרי פתיחת modal
 3. בעת `showModal()` - אחרי `modal.show()`

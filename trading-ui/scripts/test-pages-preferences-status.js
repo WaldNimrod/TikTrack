@@ -6,6 +6,17 @@
  * Usage: Run in browser console on any page
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Event Handlers ===
+// - checkPageConfig() - Checkpageconfig
+
+// === Utility Functions ===
+// - checkHTMLScripts() - Checkhtmlscripts
+// - checkRuntimeStatus() - Checkruntimestatus
+// - checkAllPages() - Checkallpages
+
 (function() {
   'use strict';
 

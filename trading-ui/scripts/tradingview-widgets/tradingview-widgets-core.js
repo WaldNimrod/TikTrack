@@ -10,6 +10,12 @@
  * @module TradingViewWidgetsManager
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Event Handlers ===
+// - handleResize() - Handleresize
+
 (function() {
   'use strict';
 

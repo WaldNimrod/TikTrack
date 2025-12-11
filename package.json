@@ -61,8 +61,12 @@
     "docs:add": "npm run jsdoc:add",
     "docs:update": "npm run docs:add && npm run docs:generate",
     "ci:prefs-guards": "bash scripts/ci/preferences-guards.sh",
+    "build": "npm run build:bundles && npm run build:validate",
     "build:bundles": "node scripts/build/bundle-packages.js",
     "build:bundles:package": "node scripts/build/bundle-packages.js",
+    "build:validate": "node scripts/build/post-build-validation.js",
+    "prebuild": "node scripts/build/pre-build-check.js",
+    "build:all": "npm run prebuild && npm run build:bundles && npm run build:validate",
     "test:bundles": "node scripts/build/test-bundles.js"
   },
   "repository": {

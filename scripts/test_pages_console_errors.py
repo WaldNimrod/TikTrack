@@ -30,7 +30,7 @@ except ImportError:
     print("   Install with: pip install selenium webdriver-manager")
     exit(1)
 
-BASE_URL = "http://localhost:8080"
+BASE_URL = "http://localhost:5001"
 
 # Test credentials (admin) - CRITICAL: Always use admin/admin123 for tests
 TEST_USERNAME = "admin"

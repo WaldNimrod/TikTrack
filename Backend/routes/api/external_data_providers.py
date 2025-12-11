@@ -6,11 +6,12 @@ Description: API routes for managing external data providers
 Updated: 17 November 2025 - Migrated to SQLAlchemy
 """
 
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, g
 from sqlalchemy.orm import Session
 from config.database import get_db
 from models.external_data import ExternalDataProvider
 from services.advanced_cache_service import cache_for
+from routes.api.base_entity_decorators import handle_database_session
 import logging
 from typing import Dict, Any
 
@@ -20,11 +21,24 @@ logger = logging.getLogger(__name__)
 external_data_providers_bp = Blueprint('external_data_providers', __name__, url_prefix='/api/external-data-providers')
 
 @external_data_providers_bp.route('/', methods=['GET'])
+@handle_database_session()
 @cache_for(ttl=600)  # Cache for 10 minutes - providers don't change often
 def get_external_data_providers():
-    """Get all external data providers using SQLAlchemy"""
-    db: Session = next(get_db())
+    """Get all external data providers using SQLAlchemy (requires authentication)"""
+    db: Session = g.db
+    
+    # Get user_id from Flask context (set by auth middleware)
+    user_id = getattr(g, 'user_id', None)
+    
+    if user_id is None:
+        return jsonify({
+            'status': 'error',
+            'message': 'User authentication required',
+            'version': '1.0'
+        }), 401
+    
     try:
+        # External data providers are system-wide (shared), but require authentication
         providers = db.query(ExternalDataProvider).order_by(ExternalDataProvider.id).all()
         
         # Convert to list of dictionaries
@@ -69,15 +83,26 @@ def get_external_data_providers():
             'message': f'Error retrieving external data providers: {str(e)}',
             'version': '1.0'
         }), 500
-    finally:
-        db.close()
 
 @external_data_providers_bp.route('/<int:provider_id>', methods=['GET'])
+@handle_database_session()
 @cache_for(ttl=600)
 def get_external_data_provider(provider_id):
-    """Get a specific external data provider by ID using SQLAlchemy"""
-    db: Session = next(get_db())
+    """Get a specific external data provider by ID using SQLAlchemy (requires authentication)"""
+    db: Session = g.db
+    
+    # Get user_id from Flask context (set by auth middleware)
+    user_id = getattr(g, 'user_id', None)
+    
+    if user_id is None:
+        return jsonify({
+            'status': 'error',
+            'message': 'User authentication required',
+            'version': '1.0'
+        }), 401
+    
     try:
+        # External data providers are system-wide (shared), but require authentication
         provider = db.query(ExternalDataProvider).filter(ExternalDataProvider.id == provider_id).first()
         
         if not provider:
@@ -124,5 +149,3 @@ def get_external_data_provider(provider_id):
             'message': f'Error retrieving external data provider: {str(e)}',
             'version': '1.0'
         }), 500
-    finally:
-        db.close()

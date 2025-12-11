@@ -21,6 +21,7 @@ from typing import Dict, List, Any, Optional, Tuple
 from sqlalchemy.orm import Session
 from flask import jsonify, request, g
 import logging
+import inspect
 from datetime import datetime
 
 from services.date_normalization_service import DateNormalizationService
@@ -70,27 +71,39 @@ class BaseEntityAPI:
             
             # Get user_id from Flask context (set by auth middleware)
             user_id = getattr(g, 'user_id', None)
-            
+
             # Get records from service directly (no cache for CRUD tables)
             # This ensures fresh data on every request
             if hasattr(self.service_class, 'get_all'):
                 # Check if service.get_all accepts user_id parameter
-                import inspect
                 sig = inspect.signature(self.service_class.get_all)
                 params = list(sig.parameters.keys())
-                
-                if 'user_id' in params:
+                has_user_id_param = 'user_id' in params
+
+                print(f"DEBUG: user_id={user_id}, entity={self.entity_name}, has_user_id_param={has_user_id_param}")
+                self.logger.info(f"BaseEntityAPI.get_all: user_id from g={user_id}, entity={self.entity_name}")
+                params = list(sig.parameters.keys())
+                self.logger.info(f"Service {self.service_class.__name__}.get_all params: {params}")
+
+                if 'user_id' in params and user_id is not None:
                     # Service supports user_id filtering
+                    print(f"DEBUG: Calling service with user_id={user_id}")
+                    self.logger.info(f"Calling service with user_id={user_id}")
                     if len(sig.parameters) > 2 and 'filters' in params:
                         records = self.service_class.get_all(db, filters, user_id=user_id)
                     elif len(sig.parameters) > 1:
                         records = self.service_class.get_all(db, user_id=user_id)
                     else:
+                        print(f"DEBUG: Service has user_id param but signature doesn't match")
+                        self.logger.warning(f"Service has user_id param but signature doesn't match, calling without user_id")
                         records = self.service_class.get_all(db)
-                elif len(sig.parameters) > 1 and 'filters' in params:
-                    records = self.service_class.get_all(db, filters)
                 else:
-                    records = self.service_class.get_all(db)
+                    print(f"DEBUG: No user_id filtering - user_id={user_id}, has_param={'user_id' in params}")
+                    self.logger.warning(f"No user_id in service params or user_id is None, calling without filtering")
+                    if len(sig.parameters) > 1 and 'filters' in params:
+                        records = self.service_class.get_all(db, filters)
+                    else:
+                        records = self.service_class.get_all(db)
                 
                 # If service returns enhanced data (dicts), use it directly
                 if records and isinstance(records[0], dict):
@@ -100,7 +113,11 @@ class BaseEntityAPI:
                     data = [record.to_dict() if hasattr(record, 'to_dict') else record for record in records]
             else:
                 # Fallback to direct query if service doesn't have get_all
-                records = db.query(self.service_class.model).all()
+                query = db.query(self.service_class.model)
+                # Add user_id filter if model has user_id and user_id is available
+                if user_id is not None and hasattr(self.service_class.model, 'user_id'):
+                    query = query.filter(self.service_class.model.user_id == user_id)
+                records = query.all()
                 data = [record.to_dict() if hasattr(record, 'to_dict') else record for record in records]
             
             data = normalizer.normalize_output(data)
@@ -132,7 +149,7 @@ class BaseEntityAPI:
             # Get record from service
             if hasattr(self.service_class, 'get_by_id'):
                 # Check if service.get_by_id accepts user_id parameter
-                import inspect
+
                 sig = inspect.signature(self.service_class.get_by_id)
                 if 'user_id' in sig.parameters:
                     record = self.service_class.get_by_id(db, entity_id, user_id=user_id)
@@ -189,7 +206,7 @@ class BaseEntityAPI:
             # Create record via service
             if hasattr(self.service_class, 'create'):
                 # Check if service.create accepts user_id parameter
-                import inspect
+
                 sig = inspect.signature(self.service_class.create)
                 if 'user_id' in sig.parameters:
                     record = self.service_class.create(db, normalized_data, user_id=user_id)
@@ -238,7 +255,7 @@ class BaseEntityAPI:
             
             # Check if record exists (with user_id check)
             if hasattr(self.service_class, 'get_by_id'):
-                import inspect
+
                 sig = inspect.signature(self.service_class.get_by_id)
                 if 'user_id' in sig.parameters:
                     existing_record = self.service_class.get_by_id(db, entity_id, user_id=user_id)
@@ -261,7 +278,7 @@ class BaseEntityAPI:
             
             # Update record via service
             if hasattr(self.service_class, 'update'):
-                import inspect
+
                 sig = inspect.signature(self.service_class.update)
                 if 'user_id' in sig.parameters:
                     record = self.service_class.update(db, entity_id, normalized_data, user_id=user_id)
@@ -307,7 +324,7 @@ class BaseEntityAPI:
             
             # Check if record exists (with user_id check)
             if hasattr(self.service_class, 'get_by_id'):
-                import inspect
+
                 sig = inspect.signature(self.service_class.get_by_id)
                 if 'user_id' in sig.parameters:
                     existing_record = self.service_class.get_by_id(db, entity_id, user_id=user_id)
@@ -356,7 +373,7 @@ class BaseEntityAPI:
             
             # Delete record via service
             if hasattr(self.service_class, 'delete'):
-                import inspect
+
                 sig = inspect.signature(self.service_class.delete)
                 if 'user_id' in sig.parameters:
                     self.service_class.delete(db, entity_id, user_id=user_id)

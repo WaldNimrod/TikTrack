@@ -36,24 +36,21 @@ trade_history_bp = Blueprint('trade_history', __name__, url_prefix='/api/trade-h
 user_service = UserService()
 
 
-def _resolve_user_id() -> int:
+def _resolve_user_id() -> Optional[int]:
     """
     Return active user id from Flask context (set by auth middleware).
-    Falls back to default user if not authenticated (for backward compatibility).
+    
+    Returns None if user is not authenticated (for proper authorization checks).
+    No fallback to default user - this ensures proper access control.
     """
     # Primary: Get from Flask context (set by auth middleware)
     user_id = getattr(g, 'user_id', None)
     if user_id is not None:
         return user_id
     
-    # Fallback: Check query parameter
-    user_id = request.args.get('user_id', type=int)
-    if user_id is not None:
-        return user_id
-    
-    # Fallback: Default user (for backward compatibility and tools)
-    default_user = user_service.get_default_user()
-    return default_user["id"] if default_user else 1
+    # No fallback - return None to trigger proper authorization checks
+    # This ensures users can only access their own data
+    return None
 
 
 @trade_history_bp.route('/', methods=['GET'])
@@ -79,8 +76,15 @@ def get_trade_history():
     try:
         db: Session = g.db
         
-        # Resolve user_id with fallback
+        # Resolve user_id - CRITICAL: user_id is required for authorization
         user_id = _resolve_user_id()
+        if user_id is None:
+            normalizer = BaseEntityUtils.get_request_normalizer(request)
+            error_payload = BaseEntityUtils.create_error_payload(
+                normalizer,
+                "User authentication required. Please log in to access trade history."
+            )
+            return jsonify(error_payload), 401
         
         normalizer = BaseEntityUtils.get_request_normalizer(request)
         
@@ -474,6 +478,383 @@ def get_aggregated_trade_history():
         error_payload = BaseEntityUtils.create_error_payload(
             normalizer,
             f"Error retrieving aggregated trade history: {str(e)}"
+        )
+        return jsonify(error_payload), 500
+
+
+@trade_history_bp.route('/<int:trade_id>/timeline', methods=['GET'])
+@handle_database_session()
+@cache_with_deps(ttl=172800, dependencies=['trades', 'executions', 'trade-plans', 'notes', 'alerts', 'cash-flows'])
+def get_trade_timeline(trade_id):
+    """
+    Get complete timeline for a trade with all linked items and calculations.
+    
+    Query Parameters:
+        include_durations (optional): Include duration calculations between items (default: true)
+    
+    Returns:
+        JSON response with timeline data
+    """
+    normalizer = None
+    try:
+        db: Session = g.db
+        
+        # Resolve user_id - CRITICAL: user_id is required for authorization
+        user_id = _resolve_user_id()
+        if user_id is None:
+            normalizer = BaseEntityUtils.get_request_normalizer(request)
+            error_payload = BaseEntityUtils.create_error_payload(
+                normalizer,
+                "User authentication required. Please log in to access trade timeline."
+            )
+            return jsonify(error_payload), 401
+        
+        normalizer = BaseEntityUtils.get_request_normalizer(request)
+        
+        # Parse query parameters
+        include_durations = request.args.get('include_durations', 'true').lower() == 'true'
+        
+        service = HistoricalDataBusinessService(db_session=db)
+        
+        # Get timeline
+        result = service.calculate_trade_timeline(
+            trade_id=trade_id,
+            user_id=user_id,
+            include_durations=include_durations
+        )
+        
+        if not result.get('is_valid'):
+            error_payload = BaseEntityUtils.create_error_payload(
+                normalizer,
+                result.get('error', 'Failed to calculate timeline')
+            )
+            return jsonify(error_payload), 400
+        
+        payload = BaseEntityUtils.create_success_payload(
+            normalizer,
+            data=result
+        )
+        
+        return jsonify(payload), 200
+        
+    except Exception as e:
+        logger.error(f"Error getting trade timeline for trade {trade_id}: {str(e)}", exc_info=True)
+        error_payload = BaseEntityUtils.create_error_payload(
+            normalizer,
+            f"Error retrieving trade timeline: {str(e)}"
+        )
+        return jsonify(error_payload), 500
+
+
+@trade_history_bp.route('/<int:trade_id>/chart-data', methods=['GET'])
+@handle_database_session()
+@cache_with_deps(ttl=172800, dependencies=['trades', 'executions', 'market_data_quotes'])
+def get_trade_chart_data(trade_id):
+    """
+    Get chart data for a trade including market prices, position data, and P/L.
+    
+    Query Parameters:
+        days_before (optional): Days before first record to include (default: 7)
+        days_after (optional): Days after last record to include (default: 7)
+    
+    Returns:
+        JSON response with chart data
+    """
+    normalizer = None
+    try:
+        db: Session = g.db
+        
+        # Resolve user_id - CRITICAL: user_id is required for authorization
+        user_id = _resolve_user_id()
+        if user_id is None:
+            normalizer = BaseEntityUtils.get_request_normalizer(request)
+            error_payload = BaseEntityUtils.create_error_payload(
+                normalizer,
+                "User authentication required. Please log in to access trade chart data."
+            )
+            return jsonify(error_payload), 401
+        
+        normalizer = BaseEntityUtils.get_request_normalizer(request)
+        
+        # Parse query parameters
+        days_before = request.args.get('days_before', type=int) or 7
+        days_after = request.args.get('days_after', type=int) or 7
+        
+        # Validate parameters
+        if days_before < 0 or days_before > 30:
+            error_payload = BaseEntityUtils.create_error_payload(
+                normalizer,
+                "days_before must be between 0 and 30"
+            )
+            return jsonify(error_payload), 400
+        
+        if days_after < 0 or days_after > 30:
+            error_payload = BaseEntityUtils.create_error_payload(
+                normalizer,
+                "days_after must be between 0 and 30"
+            )
+            return jsonify(error_payload), 400
+        
+        service = HistoricalDataBusinessService(db_session=db)
+        
+        # Get chart data
+        result = service.calculate_trade_chart_data(
+            trade_id=trade_id,
+            user_id=user_id,
+            days_before=days_before,
+            days_after=days_after
+        )
+        
+        if not result.get('is_valid'):
+            error_payload = BaseEntityUtils.create_error_payload(
+                normalizer,
+                result.get('error', 'Failed to calculate chart data')
+            )
+            return jsonify(error_payload), 400
+        
+        payload = BaseEntityUtils.create_success_payload(
+            normalizer,
+            data=result
+        )
+        
+        return jsonify(payload), 200
+        
+    except Exception as e:
+        logger.error(f"Error getting trade chart data for trade {trade_id}: {str(e)}", exc_info=True)
+        error_payload = BaseEntityUtils.create_error_payload(
+            normalizer,
+            f"Error retrieving trade chart data: {str(e)}"
+        )
+        return jsonify(error_payload), 500
+
+
+@trade_history_bp.route('/<int:trade_id>/statistics', methods=['GET'])
+@handle_database_session()
+@cache_with_deps(ttl=300, dependencies=['trades', 'executions'])
+def get_trade_statistics_detailed(trade_id):
+    """
+    Get detailed statistics for a trade.
+    
+    Returns:
+        JSON response with detailed statistics
+    """
+    normalizer = None
+    try:
+        db: Session = g.db
+        
+        # Resolve user_id - CRITICAL: user_id is required for authorization
+        user_id = _resolve_user_id()
+        if user_id is None:
+            normalizer = BaseEntityUtils.get_request_normalizer(request)
+            error_payload = BaseEntityUtils.create_error_payload(
+                normalizer,
+                "User authentication required. Please log in to access trade statistics."
+            )
+            return jsonify(error_payload), 401
+        
+        normalizer = BaseEntityUtils.get_request_normalizer(request)
+        
+        service = HistoricalDataBusinessService(db_session=db)
+        
+        # Get statistics
+        result = service.calculate_trade_statistics_detailed(
+            trade_id=trade_id,
+            user_id=user_id
+        )
+        
+        if not result.get('is_valid'):
+            error_payload = BaseEntityUtils.create_error_payload(
+                normalizer,
+                result.get('error', 'Failed to calculate statistics')
+            )
+            return jsonify(error_payload), 400
+        
+        payload = BaseEntityUtils.create_success_payload(
+            normalizer,
+            data=result
+        )
+        
+        return jsonify(payload), 200
+        
+    except Exception as e:
+        logger.error(f"Error getting trade statistics for trade {trade_id}: {str(e)}", exc_info=True)
+        error_payload = BaseEntityUtils.create_error_payload(
+            normalizer,
+            f"Error retrieving trade statistics: {str(e)}"
+        )
+        return jsonify(error_payload), 500
+
+
+@trade_history_bp.route('/<int:trade_id>/full-analysis', methods=['GET'])
+@handle_database_session()
+@cache_with_deps(ttl=172800, dependencies=['trades', 'executions', 'trade-plans', 'notes', 'alerts', 'cash-flows', 'market_data_quotes'])
+def get_trade_full_analysis(trade_id):
+    """
+    Get complete analysis for a trade including timeline, chart data, and statistics.
+    This is a unified endpoint optimized for the trade-history page.
+    
+    Query Parameters:
+        days_before (optional): Days before first record to include (default: 7)
+        days_after (optional): Days after last record to include (default: 7)
+        include_durations (optional): Include duration calculations between items (default: true)
+    
+    Returns:
+        JSON response with complete analysis data
+    """
+    normalizer = None
+    try:
+        db: Session = g.db
+        
+        # Resolve user_id - CRITICAL: user_id is required for authorization
+        user_id = _resolve_user_id()
+        if user_id is None:
+            normalizer = BaseEntityUtils.get_request_normalizer(request)
+            error_payload = BaseEntityUtils.create_error_payload(
+                normalizer,
+                "User authentication required. Please log in to access trade analysis."
+            )
+            return jsonify(error_payload), 401
+        
+        normalizer = BaseEntityUtils.get_request_normalizer(request)
+        
+        # Parse query parameters
+        days_before = request.args.get('days_before', type=int) or 7
+        days_after = request.args.get('days_after', type=int) or 7
+        include_durations = request.args.get('include_durations', 'true').lower() == 'true'
+        
+        # Validate parameters
+        if days_before < 0 or days_before > 30:
+            error_payload = BaseEntityUtils.create_error_payload(
+                normalizer,
+                "days_before must be between 0 and 30"
+            )
+            return jsonify(error_payload), 400
+        
+        if days_after < 0 or days_after > 30:
+            error_payload = BaseEntityUtils.create_error_payload(
+                normalizer,
+                "days_after must be between 0 and 30"
+            )
+            return jsonify(error_payload), 400
+        
+        service = HistoricalDataBusinessService(db_session=db)
+        
+        # Get all data sequentially
+        timeline_result = service.calculate_trade_timeline(
+            trade_id=trade_id,
+            user_id=user_id,
+            include_durations=include_durations
+        )
+        
+        chart_result = service.calculate_trade_chart_data(
+            trade_id=trade_id,
+            user_id=user_id,
+            days_before=days_before,
+            days_after=days_after
+        )
+        
+        statistics_result = service.calculate_trade_statistics_detailed(
+            trade_id=trade_id,
+            user_id=user_id
+        )
+        # Get trade data for metadata
+        from services.trade_service import TradeService
+        from services.entity_details_service import EntityDetailsService
+        trade = TradeService.get_by_id(db, trade_id, user_id=user_id)
+        trade_data = None
+        if trade:
+            trade_dict = trade.to_dict()
+            # Add ticker info if available
+            if trade.ticker:
+                trade_dict['ticker'] = {
+                    'id': trade.ticker.id,
+                    'symbol': trade.ticker.symbol,
+                    'name': trade.ticker.name
+                }
+                trade_dict['ticker_id'] = trade.ticker.id
+                trade_dict['ticker_symbol'] = trade.ticker.symbol
+            # Add linked items using EntityDetailsService
+            try:
+                linked_items = EntityDetailsService.get_linked_items(db, 'trade', trade_id)
+                trade_dict['linked_items'] = linked_items if linked_items else []
+            except Exception as e:
+                logger.warning(f"Failed to load linked items for trade {trade_id}: {str(e)}")
+                trade_dict['linked_items'] = []
+            trade_data = trade_dict
+        
+        # Get plan vs execution analysis if trade has dates
+        plan_vs_execution_result = None
+        if trade and trade.created_at:
+            try:
+                # Use trade created_at as start_date and closed_at or current date as end_date
+                start_date = trade.created_at
+                end_date = trade.closed_at if trade.closed_at else datetime.now(timezone.utc)
+                
+                plan_vs_execution_result = service.calculate_plan_vs_execution_analysis(
+                    user_id=user_id,
+                    date_range={
+                        'start_date': start_date,
+                        'end_date': end_date
+                    }
+                )
+            except Exception as e:
+                logger.warning(f"Failed to calculate plan vs execution for trade {trade_id}: {str(e)}")
+                plan_vs_execution_result = None
+        
+        # Combine results
+        result = {
+            'timeline': timeline_result.get('timeline', []),
+            'chart_data': {
+                'market_prices': chart_result.get('market_prices', []),
+                'position_data': chart_result.get('position_data', []),
+                'pl_data': chart_result.get('pl_data', [])
+            },
+            'statistics': statistics_result.get('statistics', {}),
+            'plan_vs_execution': plan_vs_execution_result if plan_vs_execution_result else None,
+            'metadata': {
+                'trade_id': trade_id,
+                'trade_data': trade_data,  # Include full trade data in metadata
+                **timeline_result.get('metadata', {}),
+                'chart_metadata': chart_result.get('metadata', {}),
+                'statistics_metadata': statistics_result.get('metadata', {})
+            },
+            'is_valid': (
+                timeline_result.get('is_valid', False) and
+                chart_result.get('is_valid', False) and
+                statistics_result.get('is_valid', False) and
+                (plan_vs_execution_result.get('is_valid', True) if plan_vs_execution_result else True)
+            )
+        }
+        
+        if not result['is_valid']:
+            errors = []
+            if not timeline_result.get('is_valid'):
+                errors.append(timeline_result.get('error', 'Timeline calculation failed'))
+            if not chart_result.get('is_valid'):
+                errors.append(chart_result.get('error', 'Chart data calculation failed'))
+            if not statistics_result.get('is_valid'):
+                errors.append(statistics_result.get('error', 'Statistics calculation failed'))
+            if plan_vs_execution_result and not plan_vs_execution_result.get('is_valid', True):
+                errors.append(plan_vs_execution_result.get('error', 'Plan vs execution calculation failed'))
+            
+            error_payload = BaseEntityUtils.create_error_payload(
+                normalizer,
+                f"Failed to calculate full analysis: {', '.join(errors)}"
+            )
+            return jsonify(error_payload), 400
+        
+        payload = BaseEntityUtils.create_success_payload(
+            normalizer,
+            data=result
+        )
+        
+        return jsonify(payload), 200
+        
+    except Exception as e:
+        logger.error(f"Error getting full analysis for trade {trade_id}: {str(e)}", exc_info=True)
+        error_payload = BaseEntityUtils.create_error_payload(
+            normalizer,
+            f"Error retrieving full analysis: {str(e)}"
         )
         return jsonify(error_payload), 500
 

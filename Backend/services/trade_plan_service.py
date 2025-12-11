@@ -51,11 +51,17 @@ class TradePlanService:
         )
         if user_id is not None:
             query = query.filter(TradePlan.user_id == user_id)
+            logger.info(f"Applied user_id filter: {user_id}")
         plans = query.all()
-        logger.info(f"Loaded {len(plans)} trade plans with joinedload")
+        logger.info(f"Loaded {len(plans)} trade plans with joinedload (user_id={user_id})")
         
-        # Verify count matches
-        if sql_count is not None and len(plans) != sql_count:
+        # Verify count matches expected (filtered count if user_id provided)
+        expected_count = sql_count if user_id is None else None  # We don't have filtered SQL count
+        if user_id is not None:
+            # For filtered queries, we can't easily verify against SQL count
+            # Just trust the ORM result
+            pass
+        elif sql_count is not None and len(plans) != sql_count:
             logger.warning(f"⚠️ Mismatch: SQL count={sql_count}, ORM count={len(plans)}")
             # Force reload without joinedload as fallback
             db.expire_all()
@@ -82,11 +88,12 @@ class TradePlanService:
         return query.first()
     
     @staticmethod
-    def get_by_account(db: Session, trading_account_id: int, user_id: Optional[int] = None) -> List[TradePlan]:
-        """Get trade plans by account (filtered by user_id if provided)"""
-        query = db.query(TradePlan).filter(TradePlan.trading_account_id == trading_account_id)
-        if user_id is not None:
-            query = query.filter(TradePlan.user_id == user_id)
+    def get_by_account(db: Session, trading_account_id: int, user_id: int) -> List[TradePlan]:
+        """Get trade plans by account for a specific user (user_id is required for data isolation)"""
+        query = db.query(TradePlan).filter(
+            TradePlan.trading_account_id == trading_account_id,
+            TradePlan.user_id == user_id
+        )
         return query.all()
     
     @staticmethod

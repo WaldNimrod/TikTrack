@@ -98,6 +98,27 @@ def get_portfolio_snapshot():
                 f"Validation failed: {', '.join(validation_result['errors'])}"
             )
             return jsonify(error_payload), 400
+
+        # Ensure historical OHLC data exists for relevant tickers (no fallbacks)
+        ticker_ids = service.get_user_ticker_ids_in_range(
+            user_id=user_id,
+            start_date=target_date - timedelta(days=2),
+            end_date=target_date + timedelta(days=2),
+            account_id=account_id
+        )
+        if ticker_ids:
+            ensure_result = service.ensure_historical_data_for_tickers(
+                ticker_ids=ticker_ids,
+                start_date=target_date - timedelta(days=2),
+                end_date=target_date + timedelta(days=2)
+            )
+            if not ensure_result.get('is_valid'):
+                error_payload = BaseEntityUtils.create_error_payload(
+                    normalizer,
+                    "Missing historical OHLC data; please refresh external data and retry",
+                    extra={'missing_tickers': ensure_result.get('failed', [])}
+                )
+                return jsonify(error_payload), 424  # Failed Dependency
         
         # Get portfolio snapshot
         result = service.calculate_portfolio_state_at_date(
@@ -196,6 +217,27 @@ def get_portfolio_series():
                 f"Validation failed: {', '.join(validation_result['errors'])}"
             )
             return jsonify(error_payload), 400
+
+        # Ensure historical OHLC data exists for relevant tickers (no fallbacks)
+        ticker_ids = service.get_user_ticker_ids_in_range(
+            user_id=user_id,
+            start_date=start_date,
+            end_date=end_date,
+            account_id=account_id
+        )
+        if ticker_ids:
+            ensure_result = service.ensure_historical_data_for_tickers(
+                ticker_ids=ticker_ids,
+                start_date=start_date,
+                end_date=end_date
+            )
+            if not ensure_result.get('is_valid'):
+                error_payload = BaseEntityUtils.create_error_payload(
+                    normalizer,
+                    "Missing historical OHLC data; please refresh external data and retry",
+                    extra={'missing_tickers': ensure_result.get('failed', [])}
+                )
+                return jsonify(error_payload), 424  # Failed Dependency
         
         # Generate dates list based on interval
         dates = []
@@ -311,6 +353,27 @@ def get_portfolio_performance():
                 f"Validation failed: {', '.join(validation_result['errors'])}"
             )
             return jsonify(error_payload), 400
+
+        # Ensure historical OHLC data exists for relevant tickers (no fallbacks)
+        ticker_ids = service.get_user_ticker_ids_in_range(
+            user_id=user_id,
+            start_date=start_date,
+            end_date=end_date,
+            account_id=account_id
+        )
+        if ticker_ids:
+            ensure_result = service.ensure_historical_data_for_tickers(
+                ticker_ids=ticker_ids,
+                start_date=start_date,
+                end_date=end_date
+            )
+            if not ensure_result.get('is_valid'):
+                error_payload = BaseEntityUtils.create_error_payload(
+                    normalizer,
+                    "Missing historical OHLC data; please refresh external data and retry",
+                    extra={'missing_tickers': ensure_result.get('failed', [])}
+                )
+                return jsonify(error_payload), 424  # Failed Dependency
         
         # Get portfolio performance
         result = service.calculate_portfolio_performance_range(
@@ -406,34 +469,35 @@ def get_portfolio_comparison():
                 f"Validation failed: {', '.join(validation_result['errors'])}"
             )
             return jsonify(error_payload), 400
+
+        # Ensure historical OHLC data exists for relevant tickers (no fallbacks)
+        ticker_ids = service.get_user_ticker_ids_in_range(
+            user_id=user_id,
+            start_date=min(date1, date2),
+            end_date=max(date1, date2),
+            account_id=account_id
+        )
+        if ticker_ids:
+            ensure_result = service.ensure_historical_data_for_tickers(
+                ticker_ids=ticker_ids,
+                start_date=min(date1, date2),
+                end_date=max(date1, date2)
+            )
+            if not ensure_result.get('is_valid'):
+                error_payload = BaseEntityUtils.create_error_payload(
+                    normalizer,
+                    "Missing historical OHLC data; please refresh external data and retry",
+                    extra={'missing_tickers': ensure_result.get('failed', [])}
+                )
+                return jsonify(error_payload), 424  # Failed Dependency
         
-        # Get portfolio snapshots for both dates
-        snapshot1 = service.calculate_portfolio_state_at_date(
+        # Get portfolio comparison using the dedicated method
+        result = service.calculate_portfolio_comparison(
             user_id=user_id,
             account_id=account_id,
-            target_date=date1,
-            include_closed=False
+            date1=date1,
+            date2=date2
         )
-        
-        snapshot2 = service.calculate_portfolio_state_at_date(
-            user_id=user_id,
-            account_id=account_id,
-            target_date=date2,
-            include_closed=False
-        )
-        
-        # Build comparison result
-        result = {
-            'date1': date1.isoformat(),
-            'date2': date2.isoformat(),
-            'snapshot1': snapshot1,
-            'snapshot2': snapshot2,
-            'comparison': {
-                'value_change': snapshot2.get('total_value', 0.0) - snapshot1.get('total_value', 0.0),
-                'pl_change': snapshot2.get('total_pl', 0.0) - snapshot1.get('total_pl', 0.0)
-            },
-            'is_valid': True
-        }
         
         payload = BaseEntityUtils.create_success_payload(
             normalizer,

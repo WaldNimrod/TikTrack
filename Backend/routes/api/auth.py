@@ -3,10 +3,11 @@
 Authentication API Routes - User registration and login
 """
 
-from flask import Blueprint, request, jsonify, session
+from flask import Blueprint, request, jsonify, current_app, g
 from typing import Dict, Any
 import logging
 from datetime import datetime
+from itsdangerous import URLSafeTimedSerializer, BadSignature, SignatureExpired
 
 from services.auth_service import AuthService
 from services.password_reset_service import PasswordResetService
@@ -19,6 +20,13 @@ auth_bp = Blueprint('auth', __name__, url_prefix='/api/auth')
 # Initialize auth service
 auth_service = AuthService()
 password_reset_service = PasswordResetService()
+
+
+def _get_serializer():
+    return URLSafeTimedSerializer(
+        current_app.config['SECRET_KEY'],
+        salt='tiktrack-auth-token'
+    )
 
 
 @auth_bp.route('/register', methods=['POST'])
@@ -85,14 +93,18 @@ def register():
         )
         
         if result['success']:
-            # Set session
-            session['user_id'] = result['user']['id']
-            session['username'] = result['user']['username']
+            # Create token (no cookies)
+            serializer = _get_serializer()
+            token = serializer.dumps({
+                "user_id": result['user']['id'],
+                "username": result['user']['username']
+            })
             
             return jsonify({
                 'status': 'success',
                 'data': {
                     'user': result['user'],
+                    'access_token': token,
                     'message': 'User registered successfully'
                 }
             }), 201
@@ -159,13 +171,12 @@ def login():
         result = auth_service.authenticate_user(username, password)
         
         if result['success']:
-            # Set session
-            session['user_id'] = result['user']['id']
-            session['username'] = result['user']['username']
-            
-            # For now, we use session-based auth
-            # In the future, we can add JWT tokens here
-            access_token = 'session_based'
+            # Create token (no cookies)
+            serializer = _get_serializer()
+            access_token = serializer.dumps({
+                "user_id": result['user']['id'],
+                "username": result['user']['username']
+            })
             
             return jsonify({
                 'status': 'success',
@@ -192,27 +203,15 @@ def login():
 @auth_bp.route('/logout', methods=['POST'])
 def logout():
     """
-    Logout user and clear session
-    
-    Returns:
-        {
-            "status": "success",
-            "data": {
-                "message": "Logged out successfully"
-            }
-        }
+    Logout user (stateless) - client removes token
     """
     try:
-        # Clear session
-        session.clear()
-        
         return jsonify({
             'status': 'success',
             'data': {
                 'message': 'Logged out successfully'
             }
         }), 200
-            
     except Exception as e:
         logger.error(f"Error in logout endpoint: {e}")
         return jsonify({
@@ -242,7 +241,7 @@ def update_password():
         }
     """
     try:
-        user_id = session.get('user_id')
+        user_id = getattr(g, 'user_id', None)
         if not user_id:
             return jsonify({
                 'status': 'error',
@@ -333,7 +332,7 @@ def get_current_user():
         }
     """
     try:
-        user_id = session.get('user_id')
+        user_id = getattr(g, 'user_id', None)
         if not user_id:
             return jsonify({
                 'status': 'error',
@@ -353,8 +352,6 @@ def get_current_user():
                 }
             }), 200
         else:
-            # User not found - clear session
-            session.clear()
             return jsonify({
                 'status': 'error',
                 'error': {'message': 'User not found'}
@@ -391,7 +388,7 @@ def update_current_user():
         }
     """
     try:
-        user_id = session.get('user_id')
+        user_id = getattr(g, 'user_id', None)
         if not user_id:
             return jsonify({
                 'status': 'error',

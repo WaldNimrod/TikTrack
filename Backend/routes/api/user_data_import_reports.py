@@ -9,7 +9,7 @@ Version: 1.0
 Last Updated: 2025-01-26
 """
 
-from flask import Blueprint, jsonify, request, send_file, abort
+from flask import Blueprint, jsonify, request, send_file, abort, g
 import os
 import json
 import logging
@@ -34,7 +34,12 @@ def list_user_reports():
         JSON response with list of user reports
     """
     try:
-        user_id = request.args.get('user_id', 1)  # TODO: Get from auth
+        user_id = getattr(g, 'user_id', None)
+        if user_id is None:
+            return jsonify({
+                'status': 'error',
+                'message': 'Authentication required'
+            }), 401
         reports = report_generator.get_user_reports(user_id)
         
         return jsonify({
@@ -62,7 +67,12 @@ def get_live_report(session_id):
         JSON response with live report data
     """
     try:
-        user_id = request.args.get('user_id', 1)  # TODO: Get from auth
+        user_id = getattr(g, 'user_id', None)
+        if user_id is None:
+            return jsonify({
+                'status': 'error',
+                'message': 'Authentication required'
+            }), 401
         report_filename = f"import_live_report_{session_id}.json"
         report_path = report_generator.get_report_file_path(user_id, report_filename)
         
@@ -99,7 +109,12 @@ def download_report(session_id):
         File download response
     """
     try:
-        user_id = request.args.get('user_id', 1)  # TODO: Get from auth
+        user_id = getattr(g, 'user_id', None)
+        if user_id is None:
+            return jsonify({
+                'status': 'error',
+                'message': 'Authentication required'
+            }), 401
         report_type = request.args.get('type', 'live')  # 'live' or 'final'
         
         if report_type == 'live':
@@ -159,7 +174,12 @@ def finalize_report(session_id):
         JSON response with finalization results
     """
     try:
-        user_id = request.args.get('user_id', 1)  # TODO: Get from auth
+        user_id = getattr(g, 'user_id', None)
+        if user_id is None:
+            return jsonify({
+                'status': 'error',
+                'message': 'Authentication required'
+            }), 401
         data = request.get_json() or {}
         
         # Get live report
@@ -213,7 +233,12 @@ def list_session_files(session_id):
         JSON response with list of session files
     """
     try:
-        user_id = request.args.get('user_id', 1)  # TODO: Get from auth
+        user_id = getattr(g, 'user_id', None)
+        if user_id is None:
+            return jsonify({
+                'status': 'error',
+                'message': 'Authentication required'
+            }), 401
         user_dir = report_generator.get_user_report_dir(user_id)
         
         if not os.path.exists(user_dir):
@@ -261,7 +286,12 @@ def download_session_file(session_id, filename):
         File download response
     """
     try:
-        user_id = request.args.get('user_id', 1)  # TODO: Get from auth
+        user_id = getattr(g, 'user_id', None)
+        if user_id is None:
+            return jsonify({
+                'status': 'error',
+                'message': 'Authentication required'
+            }), 401
         user_dir = report_generator.get_user_report_dir(user_id)
         file_path = os.path.join(user_dir, filename)
         
@@ -301,7 +331,12 @@ def cleanup_old_reports():
         JSON response with cleanup results
     """
     try:
-        user_id = request.args.get('user_id', 1)  # TODO: Get from auth
+        user_id = getattr(g, 'user_id', None)
+        if user_id is None:
+            return jsonify({
+                'status': 'error',
+                'message': 'Authentication required'
+            }), 401
         days_to_keep = request.args.get('days', 30, type=int)
         
         report_generator.cleanup_old_reports(user_id, days_to_keep)

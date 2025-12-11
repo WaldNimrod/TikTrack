@@ -824,15 +824,14 @@ class DemoDataGenerator:
     def _create_user_tickers(self) -> None:
         """יוצר שיוכי טיקרים למשתמש דרך user_tickers"""
         print(f"\n🔗 יוצר שיוכי טיקרים למשתמש...")
-        
+
         if not self.user_cache:
             raise DataGenerationError('user_tickers', "משתמש לא נמצא")
-        
-        # Get only tickers created in this run for this user
-        # This ensures we only associate tickers created for this specific user
-        tickers_to_associate = self.created_tickers_in_this_run.copy() if self.created_tickers_in_this_run else []
-        
-        # Add SPY if exists (it's a system ticker, should be available to all users)
+
+        # Get the number of tickers to associate from config
+        target_count = self.config['tickers']['count']
+
+        # First, ensure SPY is available to all users
         spy = self.db.query(Ticker).filter(Ticker.symbol == 'SPY').first()
         if spy:
             # Check if SPY association already exists
@@ -840,22 +839,53 @@ class DemoDataGenerator:
                 UserTicker.user_id == self.user_cache.id,
                 UserTicker.ticker_id == spy.id
             ).first()
-            if not existing_spy and spy not in tickers_to_associate:
-                tickers_to_associate.append(spy)
-        
-        if not tickers_to_associate:
-            print("   ⚠️  אין טיקרים לשיוך")
+            if not existing_spy:
+                from sqlalchemy.sql import func
+                user_ticker = UserTicker(
+                    user_id=self.user_cache.id,
+                    ticker_id=spy.id,
+                    status='open',
+                    created_at=func.now()
+                )
+                self.db.add(user_ticker)
+
+        # Get all available tickers (not just those created in this run)
+        # This includes system tickers and any others available
+        all_tickers = self.db.query(Ticker).filter(Ticker.status == 'open').all()
+
+        # Filter out tickers this user already has associations with
+        existing_associations = self.db.query(UserTicker.ticker_id).filter(
+            UserTicker.user_id == self.user_cache.id
+        ).all()
+        existing_ticker_ids = {row[0] for row in existing_associations}
+
+        available_tickers = [t for t in all_tickers if t.id not in existing_ticker_ids]
+
+        if not available_tickers:
+            print(f"   ⚠️  אין טיקרים נוספים לשיוך (יש כבר {len(existing_ticker_ids)} שיוכים)")
             return
-        
+
+        # Calculate how many more associations we need to reach target
+        current_count = len(existing_ticker_ids)
+        needed_count = max(0, target_count - current_count)
+
+        if needed_count == 0:
+            print(f"   ✅ כבר יש {current_count} שיוכי טיקרים (יעד: {target_count})")
+            return
+
+        # Limit to needed count
+        if len(available_tickers) > needed_count:
+            available_tickers = available_tickers[:needed_count]
+
         created = 0
-        for ticker in tickers_to_associate:
+        for ticker in available_tickers:
             try:
                 # Check if association already exists
                 existing = self.db.query(UserTicker).filter(
                     UserTicker.user_id == self.user_cache.id,
                     UserTicker.ticker_id == ticker.id
                 ).first()
-                
+
                 if not existing:
                     from sqlalchemy.sql import func
                     user_ticker = UserTicker(
@@ -878,25 +908,36 @@ class DemoDataGenerator:
     def _create_trading_accounts(self) -> None:
         """יוצר חשבונות מסחר"""
         print(f"\n💼 יוצר {self.config['trading_accounts']['count']} חשבונות מסחר...")
-        
+
         usd_currency = self.currency_cache.get('USD')
         if not usd_currency:
             raise DataGenerationError('trading_accounts', "מטבע USD לא נמצא")
-        
+
         # Get other currency (ILS or EUR)
         other_currency = None
         for symbol in ['ILS', 'EUR']:
             if symbol in self.currency_cache:
                 other_currency = self.currency_cache[symbol]
                 break
-        
+
         if not other_currency:
             other_currency = usd_currency  # Fallback
-        
+
         if not self.user_cache:
             raise DataGenerationError('trading_accounts', "משתמש לא נמצא")
-        
-        # Account 1: Primary (70% activity, all swing)
+
+        # Clear any existing trading accounts for this user (safety measure)
+        existing_accounts = self.db.query(TradingAccount).filter(
+            TradingAccount.user_id == self.user_cache.id
+        ).all()
+        for account in existing_accounts:
+            self.db.delete(account)
+        self.db.flush()
+
+        count = self.config['trading_accounts']['count']
+        created_accounts = []
+
+        # Always create primary account first (USD)
         # CRITICAL: Primary account MUST be in USD currency
         account1 = TradingAccount(
             user_id=self.user_cache.id,
@@ -908,21 +949,37 @@ class DemoDataGenerator:
             total_value=150000.0
         )
         self.db.add(account1)
-        
-        # Account 2: Other currency (long-term investments)
-        account2 = TradingAccount(
-            user_id=self.user_cache.id,
-            name=f"חשבון מסחר {other_currency.symbol}",
-            currency_id=other_currency.id,
-            status='open',
-            opening_balance=200000.0,
-            cash_balance=180000.0,
-            total_value=220000.0
-        )
-        self.db.add(account2)
-        
+        created_accounts.append(account1)
+
+        # Create additional accounts if needed
+        for i in range(1, count):
+            if i == 1 and other_currency.id != usd_currency.id:
+                # Second account: Other currency (long-term investments)
+                account = TradingAccount(
+                    user_id=self.user_cache.id,
+                    name=f"חשבון מסחר {other_currency.symbol}",
+                    currency_id=other_currency.id,
+                    status='open',
+                    opening_balance=200000.0,
+                    cash_balance=180000.0,
+                    total_value=220000.0
+                )
+            else:
+                # Additional accounts in USD
+                account = TradingAccount(
+                    user_id=self.user_cache.id,
+                    name=f"חשבון מסחר נוסף {i+1}",
+                    currency_id=usd_currency.id,
+                    status='open',
+                    opening_balance=50000.0,
+                    cash_balance=25000.0,
+                    total_value=75000.0
+                )
+            self.db.add(account)
+            created_accounts.append(account)
+
         self.db.flush()
-        
+
         # CRITICAL: Verify primary account is in USD
         if account1.currency_id != usd_currency.id:
             raise DataGenerationError(
@@ -930,23 +987,23 @@ class DemoDataGenerator:
                 f"חשבון ראשי נוצר במטבע שגוי! (ID: {account1.currency_id} במקום USD ID: {usd_currency.id})",
                 "החשבון הראשי חייב להיות תמיד ב-USD"
             )
-        
+
         # Verify account1 is indeed in USD (double-check from database)
         account1_currency = self.db.execute(text('''
-            SELECT c.symbol FROM currencies c 
+            SELECT c.symbol FROM currencies c
             WHERE c.id = :currency_id
         '''), {'currency_id': account1.currency_id}).scalar()
-        
+
         if account1_currency != 'USD':
             raise DataGenerationError(
                 'trading_accounts',
                 f"חשבון ראשי נוצר במטבע {account1_currency} במקום USD!",
                 "החשבון הראשי חייב להיות תמיד ב-USD"
             )
-        
-        self.relationship_manager.accounts = [account1, account2]
-        self.created_count['accounts'] = 2
-        print(f"   ✅ נוצרו 2 חשבונות מסחר")
+
+        self.relationship_manager.accounts = created_accounts
+        self.created_count['accounts'] = len(created_accounts)
+        print(f"   ✅ נוצרו {len(created_accounts)} חשבונות מסחר")
         print(f"   ✅ החשבון הראשי במטבע USD (ID: {usd_currency.id})")
     
     def _create_trade_plans(self) -> None:
@@ -2407,7 +2464,13 @@ def main():
         if args.dry_run:
             print("\n✅ אימות הצליח - מבנה DB תקין")
             return
-        
+
+        # Clear existing data for the user if username is provided
+        if args.username:
+            clear_user_data(db, args.username, dry_run=args.dry_run, verbose=args.verbose)
+            if not args.dry_run:
+                db.commit()  # Commit the clearing operations
+
         # Generate data
         generator = DemoDataGenerator(db, DEMO_CONFIG, dry_run=args.dry_run, verbose=args.verbose, username=args.username)
         results = generator.generate_all()
@@ -2431,6 +2494,85 @@ def main():
         sys.exit(1)
     finally:
         db.close()
+
+
+# ============================================================================
+# Data Clearing Functions
+# ============================================================================
+
+def clear_user_data(db: Session, username: str, dry_run: bool = False, verbose: bool = False) -> None:
+    """Clears existing demo data for a specific user"""
+    if dry_run:
+        print(f"🧹 [DRY RUN] Would clear existing data for user: {username}")
+        return
+
+    # Get user ID
+    user = db.query(User).filter(User.username == username).first()
+    if not user:
+        if verbose:
+            print(f"⚠️  User '{username}' not found, skipping data clearing")
+        return
+
+    user_id = user.id
+
+    if verbose:
+        print(f"🧹 Clearing existing data for user: {username} (ID: {user_id})")
+
+    # Clear user-specific data in reverse dependency order
+    tables_to_clear = [
+        'ai_analysis_requests',
+        'notes',
+        'alerts',
+        'cash_flows',
+        'executions',
+        'trades',
+        'trade_plans',
+        'user_tickers',
+        'trading_accounts',
+    ]
+
+    for table_name in tables_to_clear:
+        try:
+            if table_name == 'cash_flows':
+                # For cash_flows, also clear orphaned records (those with invalid trade_id)
+                db.execute(text("""
+                    DELETE FROM cash_flows
+                    WHERE user_id = :user_id
+                       OR (trade_id IS NOT NULL AND trade_id NOT IN (
+                           SELECT id FROM trades WHERE user_id = :user_id
+                       ))
+                """), {"user_id": user_id})
+            else:
+                db.execute(text(f"DELETE FROM {table_name} WHERE user_id = :user_id"), {"user_id": user_id})
+            if verbose:
+                print(f"  ✅ Cleared {table_name} for user {username}")
+        except Exception as e:
+            print(f"  ❌ Error clearing {table_name}: {e}")
+            # Continue with other tables
+
+    # Clear watch lists and items for this user
+    try:
+        # Get watch list IDs for this user
+        result = db.execute(text("SELECT id FROM watch_lists WHERE user_id = :user_id"), {"user_id": user_id}).fetchall()
+        watch_list_ids = [row[0] for row in result]
+
+        if watch_list_ids:
+            # Delete watch list items using parameterized query
+            if watch_list_ids:
+                placeholders = ','.join([':id_' + str(i) for i in range(len(watch_list_ids))])
+                params = {f'id_{i}': wid for i, wid in enumerate(watch_list_ids)}
+                db.execute(text(f"DELETE FROM watch_list_items WHERE watch_list_id IN ({placeholders})"), params)
+
+            # Delete watch lists
+            db.execute(text("DELETE FROM watch_lists WHERE user_id = :user_id"), {"user_id": user_id})
+
+            if verbose:
+                print(f"  ✅ Cleared watch lists for user {username}")
+    except Exception as e:
+        print(f"  ❌ Error clearing watch lists: {e}")
+
+    if verbose:
+        print(f"✅ Finished clearing existing data for user: {username}")
 
 
 if __name__ == '__main__':

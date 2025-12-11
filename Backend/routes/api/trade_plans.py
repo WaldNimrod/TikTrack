@@ -8,7 +8,7 @@ import logging
 
 # Import base classes
 from .base_entity import BaseEntityAPI
-from .base_entity_decorators import api_endpoint, handle_database_session, validate_request
+from .base_entity_decorators import api_endpoint, handle_database_session, validate_request, require_authentication
 from .base_entity_utils import BaseEntityUtils
 
 logger = logging.getLogger(__name__)
@@ -24,11 +24,15 @@ def _get_date_normalizer():
     return BaseEntityUtils.get_request_normalizer(request, preferences_service=preferences_service)
 
 @trade_plans_bp.route('/', methods=['GET'])
+@require_authentication()
+@api_endpoint(cache_ttl=60, rate_limit=60)
 @handle_database_session()
 def get_trade_plans():
     """Get all trade plans using base API"""
+    print(f"DEBUG: get_trade_plans called, user_id={getattr(g, 'user_id', None)}")
     db: Session = g.db
     response, status_code = base_api.get_all(db)
+    print(f"DEBUG: get_trade_plans returning {len(response.get('data', []))} items")
     return jsonify(response), status_code
 
 @trade_plans_bp.route('/<int:plan_id>', methods=['GET'])

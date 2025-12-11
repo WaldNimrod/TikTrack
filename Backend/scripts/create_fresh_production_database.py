@@ -705,11 +705,61 @@ def create_demo_data(db: Session, verbose: bool = False) -> bool:
             print(f"\n❌ שגיאה ביצירת נתוני דוגמה (exit code: {result.returncode})")
         
         return success
-        
+
     except Exception as e:
         print(f"❌ שגיאה ביצירת נתוני דוגמה: {e}")
         import traceback
         traceback.print_exc()
+        return False
+
+
+def load_historical_data_for_spy(db: Session, verbose: bool = False) -> bool:
+    """
+    Load historical market data for SPY ticker from 2024-01-01 to today
+    """
+    if verbose:
+        print("\n" + "=" * 70)
+        print("📈 שלב 5.5: טעינת נתונים היסטוריים ל-SPY")
+        print("=" * 70)
+
+    try:
+        from datetime import datetime
+        from services.external_data.yahoo_finance_adapter import YahooFinanceAdapter
+
+        # Find SPY ticker
+        spy_ticker = db.query(Ticker).filter(Ticker.symbol == 'SPY').first()
+        if not spy_ticker:
+            print("❌ טיקר SPY לא נמצא בבסיס הנתונים")
+            return False
+
+        # Calculate days from 2024-01-01 to today
+        start_date = datetime(2024, 1, 1)
+        today = datetime.now()
+        days_back = (today - start_date).days
+
+        if verbose:
+            print(f"   📅 טוען נתונים מ-2024-01-01 ({days_back} ימים)")
+
+        # Initialize Yahoo Finance adapter
+        adapter = YahooFinanceAdapter(db)
+
+        # Fetch and save historical quotes
+        quotes_saved = adapter.fetch_and_save_historical_quotes(spy_ticker, days_back=days_back)
+
+        success = quotes_saved > 0
+
+        if success and verbose:
+            print(f"   ✅ נטענו {quotes_saved} נקודות נתונים היסטוריים ל-SPY")
+        elif not success:
+            print("   ⚠️  לא נטענו נתונים היסטוריים ל-SPY")
+
+        return success
+
+    except Exception as e:
+        print(f"❌ שגיאה בטעינת נתונים היסטוריים ל-SPY: {e}")
+        if verbose:
+            import traceback
+            traceback.print_exc()
         return False
 
 
@@ -923,7 +973,16 @@ def main():
         else:
             if args.verbose:
                 print("\n🎨 שלב 5: יצירת נתוני דוגמה (DRY-RUN - מדלג)")
-        
+
+        # Step 5.5: Load historical data for SPY
+        if not args.dry_run:
+            if not load_historical_data_for_spy(db, verbose=args.verbose):
+                print("⚠️  אזהרה: טעינת נתונים היסטוריים ל-SPY נכשלה")
+                # Continue anyway - this is not critical
+        else:
+            if args.verbose:
+                print("\n📈 שלב 5.5: טעינת נתונים היסטוריים ל-SPY (DRY-RUN - מדלג)")
+
         # Step 6: Verify sequential IDs
         if not verify_sequential_ids(db, verbose=args.verbose):
             print("⚠️  אזהרה: נמצאו בעיות במפתחות")

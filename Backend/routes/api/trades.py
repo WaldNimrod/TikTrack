@@ -13,7 +13,7 @@ from config import settings
 
 # Import base classes
 from .base_entity import BaseEntityAPI
-from .base_entity_decorators import api_endpoint, handle_database_session, validate_request
+from .base_entity_decorators import api_endpoint, handle_database_session, validate_request, require_authentication
 from .base_entity_utils import BaseEntityUtils
 
 logger = logging.getLogger(__name__)
@@ -129,6 +129,7 @@ def get_trades_pending_plan_creations():
         return jsonify(error_payload), 500
 
 @trades_bp.route('/', methods=['GET'])
+@require_authentication()
 @cache_with_deps(ttl=60, dependencies=['trades', 'tickers', 'market-data'])
 @handle_database_session()
 def get_trades():
@@ -140,6 +141,7 @@ def get_trades():
     
     # Get filtering parameters
     trading_account_id = request.args.get('trading_account_id', type=int)
+    ticker_id = request.args.get('ticker_id', type=int)
     status = request.args.get('status')
     
     # Pagination parameters
@@ -151,7 +153,11 @@ def get_trades():
         normalizer = _get_date_normalizer()
         
         # If there are filtering parameters, use appropriate function
-        if trading_account_id and status:
+        if ticker_id:
+            logger.info(f"Filtering trades by ticker_id={ticker_id}")
+            trades = TradeService.get_by_ticker(db, ticker_id, user_id=user_id)
+            logger.info(f"Found {len(trades)} trades for ticker {ticker_id}")
+        elif trading_account_id and status:
             logger.info(f"Filtering trades by trading_account_id={trading_account_id} and status={status}")
             trades = TradeService.get_by_account_and_status(db, trading_account_id, status, user_id=user_id)
             logger.info(f"Found {len(trades)} trades for account {trading_account_id} with status {status}")
@@ -316,6 +322,16 @@ def create_trade():
     try:
         # Get user_id from Flask context (set by auth middleware)
         user_id = getattr(g, 'user_id', None)
+        
+        # CRITICAL: user_id is required for trade creation
+        if user_id is None:
+            normalizer = _get_date_normalizer()
+            return jsonify({
+                "status": "error",
+                "error": {"message": "User authentication required. Please log in to create trades."},
+                "timestamp": normalizer.now_envelope(),
+                "version": "1.0"
+            }), 401
         
         normalizer = _get_date_normalizer()
         data = request.get_json() or {}

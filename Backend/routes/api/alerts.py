@@ -550,19 +550,25 @@ def cancel_alert(alert_id: int):
 
 # New endpoints for getting alerts by entity
 @alerts_bp.route('/entity/<entity_type>/<int:entity_id>', methods=['GET'])
+@handle_database_session()
 def get_alerts_by_entity(entity_type: str, entity_id: int):
-    """Get alerts by entity type and ID"""
+    """Get alerts by entity type and ID (filtered by user_id)"""
     try:
         # Get user_id from Flask context (set by auth middleware)
-        from flask import g
         user_id = getattr(g, 'user_id', None)
         
-        db: Session = next(get_db())
-        alerts = AlertService.get_alerts_by_entity(db, entity_type, entity_id)
+        if user_id is None:
+            normalizer = _get_date_normalizer()
+            return jsonify({
+                "status": "error",
+                "error": {"message": "User authentication required"},
+                "timestamp": normalizer.now_envelope(),
+                "version": "1.0"
+            }), 401
         
-        # Filter by user_id if authenticated
-        if user_id is not None:
-            alerts = [alert for alert in alerts if alert.user_id == user_id]
+        db: Session = g.db
+        # Pass user_id to service for proper filtering
+        alerts = AlertService.get_alerts_by_entity(db, entity_type, entity_id, user_id=user_id)
         normalizer = _get_date_normalizer()
         return jsonify({
             "status": "success",
@@ -589,7 +595,5 @@ def get_alerts_by_entity(entity_type: str, entity_id: int):
             "timestamp": normalizer.now_envelope(),
             "version": "1.0"
         }), 500
-    finally:
-        db.close()
 
 

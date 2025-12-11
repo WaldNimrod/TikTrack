@@ -19,6 +19,15 @@
  * Last Updated: 2025-01-30
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Event Handlers ===
+// - getButtonTooltip() - Getbuttontooltip
+
+// === Data Functions ===
+// - getPageTooltips() - Getpagetooltips
+
 const BUTTON_TOOLTIPS_CONFIG = {
   /**
    * Global Default Tooltips - Used when page-specific tooltip not found

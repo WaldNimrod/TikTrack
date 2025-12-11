@@ -5,6 +5,38 @@
  * clipping/hiding issues in tables.
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Event Handlers ===
+// - testPositioning() - Testpositioning
+
+// === Functions ===
+// - addDebugResult() - Adddebugresult
+// - addDebugResult() - Adddebugresult
+// - clearResults() - Clearresults
+// - clearResults() - Clearresults
+// - runAllTests() - Runalltests
+// - runAllTests() - Runalltests
+// - testDOMStructure() - Testdomstructure
+// - testDOMStructure() - Testdomstructure
+// - testOverflowParents() - Testoverflowparents
+// - testOverflowParents() - Testoverflowparents
+// - testPositioning() - Testpositioning
+// === Functions ===
+// - addDebugResult() - Adddebugresult
+// - clearResults() - Clearresults
+// - runAllTests() - Runalltests
+// - testDOMStructure() - Testdomstructure
+// - testOverflowParents() - Testoverflowparents
+// - testPositioning() - Testpositioning
+
+// === Other ===
+// - addDebugResult() - Adddebugresult
+// - testDOMStructure() - Testdomstructure
+// - testOverflowParents() - Testoverflowparents
+// - clearResults() - Clearresults
+
 // Global debug results container
 window.debugResults = [];
 

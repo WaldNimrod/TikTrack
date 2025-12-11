@@ -6,6 +6,17 @@
  * גרסה: 1.0.0
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Core Functions ===
+// - runAllTests() - Runalltests
+
+// === Other ===
+// - test() - Test
+// - testWrapper() - Testwrapper
+// - testErrorHandling() - Testerrorhandling
+
 (function() {
   'use strict';
 

@@ -13,6 +13,22 @@
  * - Local condition modal opening functions
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - checkPageInitializationConfigs() - Checkpageinitializationconfigs
+
+// === Core Functions ===
+// - main() - Main
+
+// === Data Functions ===
+// - getAllFiles() - Getallfiles
+
+// === Other ===
+// - scanFile() - Scanfile
+// - generateReport() - Generatereport
+
 const fs = require('fs');
 const path = require('path');
 
@@ -188,16 +204,16 @@ function generateReport(results, pagesWithConditions) {
 
 ## 📊 סיכום כללי
 
-- **סה"כ קבצים נסרקו:** ${results.length}
-- **קבצים המשתמשים במערכת:** ${results.filter(r => r.usingSystem).length}
-- **קבצים עם בעיות:** ${results.filter(r => r.issues.length > 0).length}
-- **סה"כ בעיות נמצאו:** ${results.reduce((sum, r) => sum + r.issues.length, 0)}
+// - **סה"כ קבצים נסרקו:** ${results.length}
+// - **קבצים המשתמשים במערכת:** ${results.filter(r => r.usingSystem).length}
+// - **קבצים עם בעיות:** ${results.filter(r => r.issues.length > 0).length}
+// - **סה"כ בעיות נמצאו:** ${results.reduce((sum, r) => sum + r.issues.length, 0)}
 
 ### פילוח בעיות לפי סוג:
 
-- **פונקציות מקומיות לניהול תנאים:** ${results.reduce((sum, r) => sum + r.issues.filter(i => i.type === 'localFunction').length, 0)}
-- **פונקציות מקומיות ב-alerts.js:** ${results.reduce((sum, r) => sum + r.issues.filter(i => i.type === 'localAlertFunction').length, 0)}
-- **קריאות ישירות ל-API:** ${results.reduce((sum, r) => sum + r.issues.filter(i => i.type === 'directApiCall').length, 0)}
+// - **פונקציות מקומיות לניהול תנאים:** ${results.reduce((sum, r) => sum + r.issues.filter(i => i.type === 'localFunction').length, 0)}
+// - **פונקציות מקומיות ב-alerts.js:** ${results.reduce((sum, r) => sum + r.issues.filter(i => i.type === 'localAlertFunction').length, 0)}
+// - **קריאות ישירות ל-API:** ${results.reduce((sum, r) => sum + r.issues.filter(i => i.type === 'directApiCall').length, 0)}
 
 ---
 
@@ -219,9 +235,9 @@ function generateReport(results, pagesWithConditions) {
 **קטגוריה:** ${result.file.endsWith('.html') ? 'HTML' : 'JavaScript'}
 
 #### סטטוס:
-- **משתמש במערכת:** ${result.usingSystem ? '✅ כן' : '❌ לא'}
-- **טוען את המערכת:** ${hasPackage ? '✅ כן' : '❌ לא'}
-- **יש בעיות:** ${result.issues.length > 0 ? '⚠️ כן' : '✅ לא'}
+// - **משתמש במערכת:** ${result.usingSystem ? '✅ כן' : '❌ לא'}
+// - **טוען את המערכת:** ${hasPackage ? '✅ כן' : '❌ לא'}
+// - **יש בעיות:** ${result.issues.length > 0 ? '⚠️ כן' : '✅ לא'}
 
 `;
 
@@ -232,9 +248,9 @@ function generateReport(results, pagesWithConditions) {
             result.issues.forEach((issue, index) => {
                 const severityEmoji = issue.severity === 'high' ? '🔴' : issue.severity === 'medium' ? '🟡' : '🟢';
                 report += `${index + 1}. **שורה ${issue.line}:** ${issue.description}
-   - **סוג:** ${issue.type}
-   - **חומרה:** ${severityEmoji} ${issue.severity === 'high' ? 'גבוהה' : issue.severity === 'medium' ? 'בינונית' : 'נמוכה'}
-   - **קוד:** \`${issue.code.substring(0, 100)}${issue.code.length > 100 ? '...' : ''}\`
+// - **סוג:** ${issue.type}
+// - **חומרה:** ${severityEmoji} ${issue.severity === 'high' ? 'גבוהה' : issue.severity === 'medium' ? 'בינונית' : 'נמוכה'}
+// - **קוד:** \`${issue.code.substring(0, 100)}${issue.code.length > 100 ? '...' : ''}\`
 
 `;
             });

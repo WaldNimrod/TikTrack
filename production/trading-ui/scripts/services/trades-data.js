@@ -20,6 +20,34 @@
  * @author TikTrack Development Team
  */
 (function tradesDataService() {
+
+// ===== FUNCTION INDEX =====
+
+// === UI Functions ===
+// - updateTrade() - Updatetrade
+
+// === Data Functions ===
+// - loadTradesData() - Loadtradesdata
+// - saveTrade() - Savetrade
+// - getTradeDetails() - Gettradedetails
+// - getCachedTrades() - Getcachedtrades
+// - calculateTargetPrice() - Calculatetargetprice
+
+// === Utility Functions ===
+// - invalidateTradesCache() - Invalidatetradescache
+// - validateTrade() - Validatetrade
+
+// === Other ===
+// - deleteTrade() - Deletetrade
+// - closeTrade() - Closetrade
+// - copyTrade() - Copytrade
+// - setCachedTrades() - Setcachedtrades
+// - calculateStopPrice() - Calculatestopprice
+// - calculatePercentageFromPrice() - Calculatepercentagefromprice
+// - calculateInvestment() - Calculateinvestment
+// - calculatePL() - Calculatepl
+// - calculateRiskReward() - Calculateriskreward
+
   const TRADES_DATA_KEY = 'trades-data';
   const TRADES_TTL = 45 * 1000; // 45 seconds per audit plan
   const PAGE_LOG_CONTEXT = { page: 'trades-data' };
@@ -40,10 +68,24 @@
       }
 
       window.Logger?.debug?.('🔄 Loading trades data from API...', PAGE_LOG_CONTEXT);
-    let response = await fetch('/api/trades/');
+    let response = await fetch('/api/trades/', { // Include cookies for session-based auth
+    });
+    
+    // Handle 401/308 authentication errors
+    if (window.checkAndHandleAuthError && window.checkAndHandleAuthError(response, '/api/trades/')) {
+      throw new Error('Authentication required');
+    }
+    
     if (!response.ok) {
       // Retry without trailing slash once
-      const retry = await fetch('/api/trades');
+      const retry = await fetch('/api/trades', { // Include cookies for session-based auth
+      });
+      
+      // Handle 401/308 authentication errors on retry
+      if (window.checkAndHandleAuthError && window.checkAndHandleAuthError(retry, '/api/trades')) {
+        throw new Error('Authentication required');
+      }
+      
       if (!retry.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }

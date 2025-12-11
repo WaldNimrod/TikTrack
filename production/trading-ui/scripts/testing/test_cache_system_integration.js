@@ -6,6 +6,19 @@
  * גרסה: 1.0.0
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Core Functions ===
+// - runAllTests() - Runalltests
+
+// === Other ===
+// - test() - Test
+// - addTestResult() - Addtestresult
+// - testUnifiedCacheManager() - Testunifiedcachemanager
+// - testCacheTTLGuard() - Testcachettlguard
+// - testCacheSyncManager() - Testcachesyncmanager
+
 (function() {
   'use strict';
 

@@ -1,4 +1,5 @@
 # תיקון Inline Styles - עמודי מוקאפ
+
 # Inline Styles Fixed - Mockups Pages
 
 **תאריך:** 29.11.2025
@@ -12,14 +13,17 @@
 ### 1. `comparative-analysis-page.js`
 
 **תיקון:**
+
 - שורה 46: `style="background-color: ${color};"` → `style="--series-color: ${color};"`
 - שורה 2074: `style="background-color: ${color};"` → `style="--series-color: ${color};"`
 
 **שינוי:**
+
 - הוחלף inline style ישיר ב-CSS variable דרך inline style
 - ה-CSS rule משתמש ב-`var(--series-color, transparent)` במקום inline style ישיר
 
 **קבצים מעודכנים:**
+
 - `trading-ui/scripts/comparative-analysis-page.js`
 - `trading-ui/styles-new/06-components/_chart-management.css`
 
@@ -28,13 +32,16 @@
 ### 2. `watch-lists-page.js`
 
 **תיקון:**
+
 - שורות 687, 695: `el.style.backgroundColor` ו-`el.style.color` → `el.style.setProperty('--dynamic-bg-color', ...)`
 
 **שינוי:**
+
 - הוחלף `.style.backgroundColor` ו-`.style.color` ב-CSS variables דרך `setProperty()`
 - ה-CSS rules משתמשים ב-`var(--dynamic-bg-color, transparent)` ו-`var(--dynamic-icon-color, currentColor)`
 
 **קבצים מעודכנים:**
+
 - `trading-ui/scripts/watch-lists-page.js`
 - `trading-ui/styles-new/06-components/_mockups-common.css`
 

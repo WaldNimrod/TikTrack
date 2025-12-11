@@ -15,6 +15,34 @@
  * Last Updated: January 22, 2025
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - initDatabaseDisplay() - Initdatabasedisplay
+// - createTableHeaders() - Createtableheaders
+// - createTableBodyHTML() - Createtablebodyhtml
+
+// === Event Handlers ===
+// - getSectionId() - Getsectionid
+// - getContainerId() - Getcontainerid
+
+// === UI Functions ===
+// - updateTableDisplay() - Updatetabledisplay
+// - showLoadingState() - Showloadingstate
+// - showErrorState() - Showerrorstate
+// - updateTableInfo() - Updatetableinfo
+// - updateSummaryStats() - Updatesummarystats
+
+// === Data Functions ===
+// - loadAllTables() - Loadalltables
+// - loadTableDataLocal() - Loadtabledatalocal
+// - getTableId() - Gettableid
+// - getCountElementId() - Getcountelementid
+
+// === EOD Integration Functions ===
+// - loadEODTableData() - Handle EOD table loading
+
 // ===== GLOBAL VARIABLES =====
 const tableData = {};
 let totalRecords = 0;
@@ -48,17 +76,26 @@ async function loadAllTables() {
     { api: 'executions', container: 'executionsContainer' },
     { api: 'alerts', container: 'alertsContainer' },
     { api: 'notes', container: 'notesContainer' },
-    { api: 'cash-flows', container: 'cashFlowsContainer' }
+    { api: 'cash-flows', container: 'cashFlowsContainer' },
+
+    // === EOD INTEGRATION: Add EOD tables ===
+    { api: 'eod/daily-portfolio-metrics', container: 'eodPortfolioMetricsContainer', isEOD: true },
+    { api: 'eod/daily-ticker-positions', container: 'eodTickerPositionsContainer', isEOD: true },
+    { api: 'eod/daily-cash-flow-agg', container: 'eodCashFlowAggContainer', isEOD: true }
   ];
   
   totalRecords = 0;
   
   for (const table of tables) {
     try {
-      window.Logger?.debug('Loading table', { page: 'db_display', api: table.api });
-      await loadTableDataLocal(table.api, table.container);
+      // Reduced logging - only log errors, not debug info for each table
+      await loadTableDataLocal(table.api, table.container, table.isEOD);
     } catch (error) {
-      window.Logger?.error('Error loading table', { page: 'db_display', api: table.api, error: error?.message || error });
+      // Log only actual errors, not missing data warnings
+      if (error?.message?.includes('HTTP error') || error?.message?.includes('Failed to load')) {
+        window.Logger?.warn('Table load failed', { page: 'db_display', api: table.api, error: error?.message });
+      }
+      // Continue silently for other tables
     }
   }
   
@@ -75,9 +112,9 @@ async function loadAllTables() {
  * @param {string} tableType - The table type to load (with dashes)
  * @param {string} containerId - The container ID for the table
  */
-async function loadTableDataLocal(tableType, containerId) {
+async function loadTableDataLocal(tableType, containerId, isEOD = false) {
   try {
-    window.Logger?.debug('Loading data for table type', { page: 'db_display', tableType });
+    // Removed debug logging to reduce console noise
 
     // Show loading state
     showLoadingState(tableType);
@@ -85,8 +122,38 @@ async function loadTableDataLocal(tableType, containerId) {
     // Use centralized loadTableData function from services package if available
     // Otherwise fallback to direct fetch
     let data = [];
-    
-    if (typeof window.loadTableData === 'function') {
+
+    // === EOD INTEGRATION: Handle EOD tables ===
+    if (isEOD) {
+      try {
+        window.Logger?.debug('Loading EOD table data', { page: 'db_display', tableType });
+
+        // Map EOD table types to EODIntegrationHelper functions
+        const eodTableMap = {
+          'eod/daily-portfolio-metrics': 'loadEODPortfolioMetrics',
+          'eod/daily-ticker-positions': 'loadEODTickerPositions',
+          'eod/daily-cash-flow-agg': 'loadEODCashFlows'
+        };
+
+        const helperFunction = eodTableMap[tableType];
+        if (helperFunction && window.EODIntegrationHelper && typeof window.EODIntegrationHelper[helperFunction] === 'function') {
+          const result = await window.EODIntegrationHelper[helperFunction]({
+            limit: 100, // Limit for display purposes
+            date_from: '2024-01-01', // Show recent data
+            date_to: new Date().toISOString().split('T')[0]
+          });
+
+          data = result && result.data ? result.data : [];
+          window.Logger?.debug('Loaded EOD table data', { page: 'db_display', tableType, recordCount: data.length });
+        } else {
+          throw new Error(`EOD helper function not available: ${helperFunction}`);
+        }
+      } catch (eodError) {
+        window.Logger?.error('Failed to load EOD table data', { page: 'db_display', tableType, error: eodError?.message });
+        // Continue with empty data for EOD tables (no fallback data)
+        data = [];
+      }
+    } else if (typeof window.loadTableData === 'function') {
       // Convert table type with dashes to table type without dashes for mapping
       const tableTypeNormalized = tableType.replace(/-/g, '_');
       try {

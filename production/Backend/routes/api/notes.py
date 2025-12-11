@@ -509,9 +509,19 @@ def update_note(note_id: int):
         logger.info(f"📋 Request form: {dict(request.form) if request.form else 'No form data'}")
         logger.info(f"📋 Request JSON: {request.get_json() if request.is_json else 'Not JSON'}")
         
+        # Get user_id from Flask context (set by auth middleware)
+        user_id = getattr(g, 'user_id', None)
+        
+        if user_id is None:
+            return jsonify({
+                "status": "error",
+                "error": {"message": "User authentication required"},
+                "version": "1.0"
+            }), 401
+        
         # Use the session from the decorator (in g.db)
         db: Session = g.db
-        note = db.query(Note).filter(Note.id == note_id).first()
+        note = db.query(Note).filter(Note.id == note_id, Note.user_id == user_id).first()
         if note:
             logger.info(f"✅ Found note: {note.id}")
             
@@ -685,9 +695,19 @@ def update_note(note_id: int):
 def delete_note(note_id: int):
     """Delete note"""
     try:
+        # Get user_id from Flask context (set by auth middleware)
+        user_id = getattr(g, 'user_id', None)
+        
+        if user_id is None:
+            return jsonify({
+                "status": "error",
+                "error": {"message": "User authentication required"},
+                "version": "1.0"
+            }), 401
+        
         # Use the session from the decorator (in g.db)
         db: Session = g.db
-        note = db.query(Note).filter(Note.id == note_id).first()
+        note = db.query(Note).filter(Note.id == note_id, Note.user_id == user_id).first()
         if note:
             # Delete attached file if exists
             if note.attachment:

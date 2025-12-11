@@ -1,39 +1,13 @@
 /*
- * ==========================================
- * FUNCTION INDEX
- * ==========================================
- * MODAL NAVIGATION SERVICE (16)
- * - constructor()
- * - init()
- * - subscribe(listener)
- * - unsubscribe(listener)
- * - registerModalOpen(modalElement, metadata)
- * - registerModalClose(modalId)
- * - updateModalMetadata(modalId, updates)
- * - getStack(options)
- * - getActiveEntry()
- * - getActiveModalId()
- * - getParentEntry(modalId)
- * - canGoBack()
- * - goBack()
- * - navigateTo(modalId)
- * - clear()
- * - _hideModal(modalId)
- * MODAL NAVIGATION UI (7)
- * - constructor(service)
- * - init()
- * - onStateChange(state)
- * - refreshOpenModals()
- * - updateModalNavigation(modalElement)
- * - getBreadcrumb(modalElement)
- * - _attachBreadcrumbHandlers(container)
- * UTILITIES (5)
- * - resolvePageName(explicitName)
- * - resolveModalElement(modalId)
- * - extractModalTitle(modalElement)
- * - buildDisplayLabel(entry)
- * - cloneMetadata(entry)
- * ==========================================
+ * Function Index (summary)
+ * ------------------------
+ * Modal Navigation Service: constructor, init, subscribe/unsubscribe, registerModalOpen/Close,
+ * updateModalMetadata, getStack, getActiveEntry/getActiveModalId, getParentEntry, canGoBack,
+ * goBack, navigateTo, clear, _hideModal.
+ * Modal Navigation UI: constructor, init, onStateChange, refreshOpenModals,
+ * updateModalNavigation, getBreadcrumb, _attachBreadcrumbHandlers.
+ * Utilities: resolvePageName, resolveModalElement, extractModalTitle,
+ * buildDisplayLabel, cloneMetadata.
  */
 
 const ENTITY_LABELS = {
@@ -49,6 +23,12 @@ const ENTITY_LABELS = {
   trade_selector: 'בחירת טרייד'
 };
 
+/**
+ * resolvePageName - Resolvepagename
+ *
+ * @param {*} explicitName = null - Parameter description
+ * @returns {{*}} Return description
+ */
 function resolvePageName(explicitName = null) {
   if (explicitName && typeof explicitName === 'string') {
     return explicitName;

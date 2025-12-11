@@ -12,7 +12,7 @@ Version: 1.0.0
 Last Updated: January 28, 2025
 """
 
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, g
 from sqlalchemy.orm import Session
 from sqlalchemy import func, and_
 from config.database import get_db
@@ -20,6 +20,7 @@ from models.email_log import EmailLog
 from datetime import datetime, timedelta
 from typing import Dict, Any, List, Optional
 import logging
+from .base_entity_decorators import handle_database_session
 
 logger = logging.getLogger(__name__)
 
@@ -28,15 +29,15 @@ email_logs_bp = Blueprint('email_logs', __name__, url_prefix='/api/email-logs')
 
 
 @email_logs_bp.route('', methods=['GET'])
+@handle_database_session()
 def get_email_logs():
     """
-    Get email logs with optional filtering
+    Get email logs with optional filtering (filtered by authenticated user)
     
     Query Parameters:
         - status: Filter by status (success, failed, pending)
         - email_type: Filter by email type (password_reset, test, etc.)
         - recipient: Filter by recipient email
-        - user_id: Filter by user ID
         - days: Number of days to look back (default: 7)
         - limit: Maximum number of logs to return (default: 100)
         - offset: Offset for pagination (default: 0)
@@ -46,21 +47,30 @@ def get_email_logs():
     Returns:
         JSON: Email logs with metadata
     """
-    db: Session = next(get_db())
+    db: Session = g.db
+    
+    # Get user_id from Flask context (set by auth middleware)
+    user_id = getattr(g, 'user_id', None)
+    
+    if user_id is None:
+        return jsonify({
+            'success': False,
+            'error': 'User authentication required'
+        }), 401
+    
     try:
         # Get query parameters
         status = request.args.get('status')
         email_type = request.args.get('email_type')
         recipient = request.args.get('recipient')
-        user_id = request.args.get('user_id', type=int)
         days = int(request.args.get('days', 7))
         limit = int(request.args.get('limit', 100))
         offset = int(request.args.get('offset', 0))
         sort_by = request.args.get('sort_by', 'created_at')
         sort_order = request.args.get('sort_order', 'desc')
         
-        # Build query
-        query = db.query(EmailLog)
+        # Build query - always filter by authenticated user
+        query = db.query(EmailLog).filter(EmailLog.user_id == user_id)
         
         # Apply filters
         if status:
@@ -71,9 +81,6 @@ def get_email_logs():
         
         if recipient:
             query = query.filter(EmailLog.recipient == recipient)
-        
-        if user_id:
-            query = query.filter(EmailLog.user_id == user_id)
         
         # Date range filter
         if days > 0:
@@ -114,7 +121,6 @@ def get_email_logs():
                     'status': status,
                     'email_type': email_type,
                     'recipient': recipient,
-                    'user_id': user_id,
                     'days': days
                 },
                 'sort': {
@@ -130,14 +136,13 @@ def get_email_logs():
             'success': False,
             'error': f'Failed to get email logs: {str(e)}'
         }), 500
-    finally:
-        db.close()
 
 
 @email_logs_bp.route('/statistics', methods=['GET'])
+@handle_database_session()
 def get_email_log_statistics():
     """
-    Get email log statistics
+    Get email log statistics (filtered by authenticated user)
     
     Query Parameters:
         - days: Number of days to look back (default: 7)
@@ -145,13 +150,23 @@ def get_email_log_statistics():
     Returns:
         JSON: Email log statistics
     """
-    db: Session = next(get_db())
+    db: Session = g.db
+    
+    # Get user_id from Flask context (set by auth middleware)
+    user_id = getattr(g, 'user_id', None)
+    
+    if user_id is None:
+        return jsonify({
+            'success': False,
+            'error': 'User authentication required'
+        }), 401
+    
     try:
         days = int(request.args.get('days', 7))
         date_from = datetime.now() - timedelta(days=days) if days > 0 else None
         
-        # Build base query
-        base_query = db.query(EmailLog)
+        # Build base query - always filter by authenticated user
+        base_query = db.query(EmailLog).filter(EmailLog.user_id == user_id)
         if date_from:
             base_query = base_query.filter(EmailLog.created_at >= date_from)
         
@@ -167,7 +182,7 @@ def get_email_log_statistics():
         type_counts = db.query(
             EmailLog.email_type,
             func.count(EmailLog.id).label('count')
-        )
+        ).filter(EmailLog.user_id == user_id)
         if date_from:
             type_counts = type_counts.filter(EmailLog.created_at >= date_from)
         type_counts = type_counts.group_by(EmailLog.email_type).all()
@@ -178,7 +193,7 @@ def get_email_log_statistics():
         recipient_counts = db.query(
             EmailLog.recipient,
             func.count(EmailLog.id).label('count')
-        )
+        ).filter(EmailLog.user_id == user_id)
         if date_from:
             recipient_counts = recipient_counts.filter(EmailLog.created_at >= date_from)
         recipient_counts = recipient_counts.group_by(EmailLog.recipient).order_by(
@@ -194,6 +209,7 @@ def get_email_log_statistics():
             day_end = datetime.now() - timedelta(days=i)
             count = db.query(EmailLog).filter(
                 and_(
+                    EmailLog.user_id == user_id,
                     EmailLog.created_at >= day_start,
                     EmailLog.created_at < day_end
                 )
@@ -229,14 +245,13 @@ def get_email_log_statistics():
             'success': False,
             'error': f'Failed to get email log statistics: {str(e)}'
         }), 500
-    finally:
-        db.close()
 
 
 @email_logs_bp.route('/<int:log_id>', methods=['GET'])
+@handle_database_session()
 def get_email_log(log_id: int):
     """
-    Get a specific email log by ID
+    Get a specific email log by ID (filtered by authenticated user)
     
     Args:
         log_id: Email log ID
@@ -244,9 +259,22 @@ def get_email_log(log_id: int):
     Returns:
         JSON: Email log details
     """
-    db: Session = next(get_db())
+    db: Session = g.db
+    
+    # Get user_id from Flask context (set by auth middleware)
+    user_id = getattr(g, 'user_id', None)
+    
+    if user_id is None:
+        return jsonify({
+            'success': False,
+            'error': 'User authentication required'
+        }), 401
+    
     try:
-        log = db.query(EmailLog).filter(EmailLog.id == log_id).first()
+        log = db.query(EmailLog).filter(
+            EmailLog.id == log_id,
+            EmailLog.user_id == user_id
+        ).first()
         
         if not log:
             return jsonify({
@@ -265,6 +293,4 @@ def get_email_log(log_id: int):
             'success': False,
             'error': f'Failed to get email log: {str(e)}'
         }), 500
-    finally:
-        db.close()
 

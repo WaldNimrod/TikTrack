@@ -61,12 +61,70 @@ def _get_date_normalizer():
     return DateNormalizationService(timezone_name)
 
 @executions_bp.route('/', methods=['GET'])
+@cache_with_deps(ttl=60, dependencies=['executions', 'trades'])
 @handle_database_session()
 def get_executions():
-    """Get all executions using base API with rate limiting"""
+    """Get all executions with pagination and optimization"""
     db: Session = g.db
-    response, status_code = base_api.get_all(db)
-    return jsonify(response), status_code
+    
+    # Get user_id from Flask context (set by auth middleware)
+    user_id = getattr(g, 'user_id', None)
+    
+    # Pagination parameters
+    page = request.args.get('page', type=int, default=1)
+    per_page = request.args.get('per_page', type=int, default=100)
+    per_page = min(per_page, 500)  # Max 500 per page
+    
+    try:
+        normalizer = _get_date_normalizer()
+        
+        # Get executions with joinedload for relationships (optimize N+1)
+        from models.execution import Execution
+        from sqlalchemy.orm import joinedload
+        
+        query = db.query(Execution).options(
+            joinedload(Execution.ticker),
+            joinedload(Execution.trading_account),
+            joinedload(Execution.trade)
+        )
+        
+        if user_id is not None:
+            query = query.filter(Execution.user_id == user_id)
+        
+        # Get total count before pagination
+        total_count = query.count()
+        
+        # Apply pagination
+        executions = query.order_by(Execution.date.desc(), Execution.created_at.desc()).offset((page - 1) * per_page).limit(per_page).all()
+        
+        # Convert to dict
+        data = [execution.to_dict() if hasattr(execution, 'to_dict') else execution for execution in executions]
+        data = normalizer.normalize_output(data)
+        
+        response = {
+            "status": "success",
+            "data": data,
+            "pagination": {
+                "page": page,
+                "per_page": per_page,
+                "total": total_count,
+                "pages": (total_count + per_page - 1) // per_page
+            },
+            "timestamp": normalizer.now_envelope(),
+            "version": "1.0"
+        }
+        
+        return jsonify(response), 200
+        
+    except Exception as e:
+        logger.error(f"Error getting executions: {str(e)}")
+        normalizer = _get_date_normalizer()
+        return jsonify({
+            "status": "error",
+            "error": {"message": f"Failed to retrieve executions: {str(e)}"},
+            "timestamp": normalizer.now_envelope(),
+            "version": "1.0"
+        }), 500
 
 @executions_bp.route('/<int:execution_id>', methods=['GET'])
 @handle_database_session()
@@ -414,6 +472,17 @@ def suggest_trades_for_execution(execution_id: int):
 def batch_assign_executions():
     """Batch assign executions to trades with validation and rollback support"""
     db: Session = g.db
+    
+    # Get user_id from Flask context (set by auth middleware)
+    user_id = getattr(g, 'user_id', None)
+    
+    if user_id is None:
+        return jsonify({
+            "status": "error",
+            "error": {"message": "User authentication required"},
+            "version": "1.0"
+        }), 401
+    
     try:
         # Get JSON data - handle None case when content-type is not application/json
         data = request.get_json() or {}
@@ -444,18 +513,24 @@ def batch_assign_executions():
                 })
                 continue
             
-            execution = db.query(Execution).filter(Execution.id == execution_id).first()
+            execution = db.query(Execution).filter(
+                Execution.id == execution_id,
+                Execution.user_id == user_id
+            ).first()
             if not execution:
                 validation_errors.append({
                     "execution_id": execution_id,
                     "trade_id": trade_id,
-                    "error": "Execution not found"
+                    "error": "Execution not found or access denied"
                 })
                 continue
             
-            # Verify trade exists
+            # Verify trade exists and belongs to user
             from models.trade import Trade
-            trade = db.query(Trade).filter(Trade.id == trade_id).first()
+            trade = db.query(Trade).filter(
+                Trade.id == trade_id,
+                Trade.user_id == user_id
+            ).first()
             if not trade:
                 validation_errors.append({
                     "execution_id": execution_id,

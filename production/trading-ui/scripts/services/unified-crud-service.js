@@ -809,6 +809,7 @@ class UnifiedCRUDService {
             'execution': '/api/executions',
             'cash_flow': '/api/cash-flows',
             'note': '/api/notes',
+            'watch_list': '/api/watch-lists',
             'import_session': '/api/user-data-import/session'
         };
 
@@ -835,6 +836,7 @@ class UnifiedCRUDService {
             'execution': 'execution',
             'cash_flow': 'cash-flow',
             'note': 'note',
+            'watch_list': 'watch-list',
             'import_session': 'import-session'
         };
 
@@ -869,6 +871,7 @@ class UnifiedCRUDService {
             'execution',
             'cash_flow',
             'note',
+            'watch_list',
             'import_session'
         ];
 
@@ -899,6 +902,7 @@ class UnifiedCRUDService {
             'execution': () => window.loadExecutionsData?.(),
             'cash_flow': () => window.loadCashFlowsData?.(),
             'note': () => window.loadNotesData?.({ force: true }),
+            'watch_list': () => window.WatchListsPage?.loadWatchLists?.(),
             'import_session': () => window.refreshDataImportHistory?.()
         };
 
@@ -946,6 +950,10 @@ class UnifiedCRUDService {
             'note': {
                 create: window.NotesData?.createNote,
                 update: window.NotesData?.updateNote
+            },
+            'watch_list': {
+                create: window.WatchListsDataService?.createWatchList,
+                update: window.WatchListsDataService?.updateWatchList
             }
         };
 

@@ -37,11 +37,12 @@ class TradingAccountService:
         return query.first()
     
     @staticmethod
-    def get_open_trading_accounts(db: Session, user_id: Optional[int] = None) -> List[TradingAccount]:
-        """Get all open trading_accounts for a user"""
-        query = db.query(TradingAccount).filter(TradingAccount.status == 'open')
-        if user_id is not None:
-            query = query.filter(TradingAccount.user_id == user_id)
+    def get_open_trading_accounts(db: Session, user_id: int) -> List[TradingAccount]:
+        """Get all open trading_accounts for a specific user (user_id is required for data isolation)"""
+        query = db.query(TradingAccount).filter(
+            TradingAccount.status == 'open',
+            TradingAccount.user_id == user_id
+        )
         return query.all()
     
     @staticmethod

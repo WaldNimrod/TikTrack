@@ -14,6 +14,34 @@
  * @lastUpdated August 26, 2025
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Event Handlers ===
+// - generateCurrencyOptions() - Generatecurrencyoptions
+// - convertAmountToShares() - Convertamounttoshares
+// - convertSharesToAmount() - Convertsharestoamount
+
+// === UI Functions ===
+// - getCurrencyDisplay() - Getcurrencydisplay
+
+// === Data Functions ===
+// - loadCurrenciesFromServer() - Loadcurrenciesfromserver
+// - apiCall() - Apicall
+// - loadDataFromAPI() - Loaddatafromapi
+// - validateDataStructure() - Validatedatastructure
+// - filterDataBySearch() - Filterdatabysearch
+// - getUserPreference() - Getuserpreference
+
+// === Utility Functions ===
+// - validateRequired() - Validaterequired
+// - validateNumber() - Validatenumber
+// - validateDate() - Validatedate
+
+// === Other ===
+// - calculateDefaultPrices() - Calculatedefaultprices
+// - clearUserPreferencesCache() - Clearuserpreferencescache
+
 // ===== Utility Functions =====
 
 /**
@@ -162,24 +190,13 @@ function generateCurrencyOptions(account = null) {
  * @returns {Promise<Object>} API response
  */
 async function apiCall(url, options = {}) {
-  let token = null;
-  if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
-    token = await window.UnifiedCacheManager.get('authToken');
-  } else {
-    token = localStorage.getItem('authToken'); // fallback
-  }
-  const headers = {
-    'Content-Type': 'application/json',
-    ...options.headers,
-  };
-
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
-  }
-
+  // Rely on global fetch wrapper to inject Authorization automatically
   const response = await fetch(url, {
     ...options,
-    headers,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    }
   });
 
   if (!response.ok) {

@@ -3,6 +3,12 @@
  * יצירת תבניות עמודים חדשים
  */
 class PageTemplateGenerator {
+
+// ===== FUNCTION INDEX =====
+
+// === Data Functions ===
+// - PageTemplateGenerator.generate() - Generate
+
   /**
    * Generate HTML for new page
    */

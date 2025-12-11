@@ -23,6 +23,33 @@
  * Documentation: See documentation/03-DEVELOPMENT/GUIDES/RECENT_ITEMS_WIDGET_DEVELOPER_GUIDE.md
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - setupOverlayForList() - Setupoverlayforlist
+// - buildTradeItem() - Buildtradeitem
+// - buildTradePlanItem() - Buildtradeplanitem
+
+// === Event Handlers ===
+// - bindItemEvents() - Binditemevents
+// - resetTabPanesPositioning() - Resettabpanespositioning
+// - bindEvents() - Bindevents
+// - handleItemClick() - Handleitemclick
+
+// === UI Functions ===
+// - renderTrades() - Rendertrades
+// - renderTradePlans() - Rendertradeplans
+
+// === Utility Functions ===
+// - formatDateShort() - Formatdateshort
+// - formatAmount() - Formatamount
+
+// === Other ===
+// - resolveDateValue() - Resolvedatevalue
+// - sortByDate() - Sortbydate
+// - cacheElements() - Cacheelements
+
 ;(function () {
   'use strict';
 

@@ -10,6 +10,20 @@
  * @author TikTrack Development Team
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - ModalBackdropMonitor.init() - Init
+// - ModalBackdropMonitor.start() - Start
+
+// === Event Handlers ===
+// - ModalBackdropMonitor.stop() - Stop
+// - ModalBackdropMonitor.check() - Check
+// - ModalBackdropMonitor.getReport() - Getreport
+// - ModalBackdropMonitor.getErrors() - Geterrors
+// - ModalBackdropMonitor.getWarnings() - Getwarnings
+
 (function() {
     'use strict';
 

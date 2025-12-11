@@ -14,6 +14,20 @@
  * - documentation/03-DEVELOPMENT/GUIDES/NESTED_MODALS_GUIDE.md
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - ModalZIndexMonitor.init() - Init
+// - ModalZIndexMonitor.start() - Start
+
+// === Event Handlers ===
+// - ModalZIndexMonitor.stop() - Stop
+// - ModalZIndexMonitor.check() - Check
+// - ModalZIndexMonitor.getReport() - Getreport
+// - ModalZIndexMonitor.getErrors() - Geterrors
+// - ModalZIndexMonitor.getWarnings() - Getwarnings
+
 (function() {
     'use strict';
 

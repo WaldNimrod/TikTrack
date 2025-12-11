@@ -14,7 +14,7 @@ Date: January 2025
 """
 
 from sqlalchemy import Column, String, Integer, ForeignKey, DateTime, CheckConstraint, UniqueConstraint
-from sqlalchemy.orm import relationship, Mapped
+from sqlalchemy.orm import relationship, Mapped, Session
 from .base import BaseModel
 from typing import Dict, Any, Optional, List
 from datetime import datetime, timezone
@@ -86,6 +86,12 @@ class WatchList(BaseModel):
                                 comment="Default sort column - max 50 chars, optional")
     default_sort_direction = Column(String(4), nullable=False, default='asc',
                                    comment="Default sort direction - 'asc' or 'desc', default 'asc'")
+    is_flag_list = Column(Integer, nullable=False, default=0,
+                         comment="Whether this is an automatic flag list (0=no, 1=yes)")
+    flag_color = Column(String(7), nullable=True,
+                       comment="Flag color for flag lists - only set if is_flag_list=1")
+    flag_entity_type = Column(String(50), nullable=True,
+                             comment="Flag entity type (trade, trade_plan, etc.) - constant identifier, not color")
     updated_at = Column(DateTime(timezone=True), nullable=True,
                        comment="Last update timestamp")
     
@@ -132,6 +138,9 @@ class WatchList(BaseModel):
             'view_mode': self.view_mode,
             'default_sort_column': self.default_sort_column,
             'default_sort_direction': self.default_sort_direction,
+            'is_flag_list': bool(getattr(self, 'is_flag_list', 0)),
+            'flag_color': getattr(self, 'flag_color', None),
+            'flag_entity_type': getattr(self, 'flag_entity_type', None),
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'updated_at': getattr(self, 'updated_at', None)
         }
@@ -195,6 +204,8 @@ class WatchListItem(BaseModel):
                           comment="External ticker name - max 100 chars, optional")
     flag_color = Column(String(7), nullable=True, index=True,
                        comment="Flag color in hex format (#RRGGBB) - max 7 chars, optional")
+    flag_entity_type = Column(String(50), nullable=True, index=True,
+                             comment="Flag entity type (trade, trade_plan, etc.) - constant identifier, not color")
     display_order = Column(Integer, nullable=False, default=0,
                           comment="Manual display order within list - default 0")
     notes = Column(String(500), nullable=True,
@@ -211,9 +222,13 @@ class WatchListItem(BaseModel):
         ticker_ref = f"ticker_id={self.ticker_id}" if self.ticker_id else f"external_symbol='{self.external_symbol}'"
         return f"<WatchListItem(id={self.id}, watch_list_id={self.watch_list_id}, {ticker_ref})>"
     
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self, db: Optional[Session] = None, user_id: Optional[int] = None) -> Dict[str, Any]:
         """
         Convert watch list item to JSON dictionary
+        
+        Args:
+            db: Optional database session to check flag lists
+            user_id: Optional user ID to check flag lists
         
         Returns:
             Dict[str, Any]: Dictionary with all watch list item fields
@@ -226,7 +241,8 @@ class WatchListItem(BaseModel):
                 'ticker_id': 5,
                 'external_symbol': None,
                 'external_name': None,
-                'flag_color': '#26baac',
+                'flag_color': '#26baac',  # From flag list if ticker is in one
+                'flag_entity_type': 'trade',  # From flag list if ticker is in one
                 'display_order': 0,
                 'notes': 'Tech stock to watch',
                 'created_at': '2025-01-28T10:00:00Z',
@@ -239,7 +255,6 @@ class WatchListItem(BaseModel):
             'ticker_id': self.ticker_id,
             'external_symbol': self.external_symbol,
             'external_name': self.external_name,
-            'flag_color': self.flag_color,
             'display_order': self.display_order,
             'notes': self.notes,
             'created_at': self.created_at.isoformat() if self.created_at else None,
@@ -247,6 +262,46 @@ class WatchListItem(BaseModel):
         }
         if data['updated_at']:
             data['updated_at'] = data['updated_at'].isoformat()
+        
+        # CRITICAL: Flag color is determined by which flag list the ticker is in
+        # Check if this ticker is in any flag list for this user
+        flag_color = None
+        flag_entity_type = None
+        
+        if db and user_id and (self.ticker_id or self.external_symbol):
+            # Get all flag lists for this user
+            flag_lists = db.query(WatchList).filter(
+                WatchList.user_id == user_id,
+                WatchList.is_flag_list == 1,
+                WatchList.flag_entity_type.isnot(None)
+            ).all()
+            
+            # Check if ticker is in any flag list
+            for flag_list in flag_lists:
+                # Check if ticker is in this flag list
+                if self.ticker_id:
+                    # Check by ticker_id
+                    flag_item = db.query(WatchListItem).filter(
+                        WatchListItem.watch_list_id == flag_list.id,
+                        WatchListItem.ticker_id == self.ticker_id
+                    ).first()
+                elif self.external_symbol:
+                    # Check by external_symbol
+                    flag_item = db.query(WatchListItem).filter(
+                        WatchListItem.watch_list_id == flag_list.id,
+                        WatchListItem.external_symbol == self.external_symbol
+                    ).first()
+                else:
+                    flag_item = None
+                
+                if flag_item:
+                    # Ticker is in this flag list - use its flag color
+                    flag_color = flag_list.flag_color
+                    flag_entity_type = flag_list.flag_entity_type
+                    break  # Only one flag per ticker
+        
+        data['flag_color'] = flag_color
+        data['flag_entity_type'] = flag_entity_type
         
         # Add ticker data if ticker relationship is loaded
         if hasattr(self, 'ticker') and self.ticker is not None:

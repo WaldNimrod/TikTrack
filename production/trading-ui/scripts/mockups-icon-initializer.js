@@ -8,6 +8,12 @@
  * Usage: Add this script to mockup pages after IconSystem is loaded
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - initializeIcons() - Initializeicons
+
 (function() {
     'use strict';
 

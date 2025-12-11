@@ -14,6 +14,15 @@
  * @lastUpdated January 20, 2025
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Event Handlers ===
+// - copyMonitoringResults() - Copymonitoringresults
+
+// === Other ===
+// - waitForNavList() - Waitfornavlist
+
 if (window.Logger) {
   window.Logger.info('🔍 Loading Init System Check...', { page: 'init-check' });
 }
@@ -154,13 +163,13 @@ class InitSystemCheck {
             pageName = 'tag-management';
         }
         
-        // Handle mockup pages with specific URL patterns
-        if (path.includes('trade-history-page')) {
-            pageName = 'trade-history-page';
-        } else if (path.includes('portfolio-state-page')) {
-            pageName = 'portfolio-state-page';
-        } else if (path.includes('trading-journal-page')) {
-            pageName = 'trading-journal-page';
+        // Handle historical pages with specific URL patterns
+        if (path.includes('trade-history')) {
+            pageName = 'trade-history';
+        } else if (path.includes('portfolio-state')) {
+            pageName = 'portfolio-state';
+        } else if (path.includes('trading-journal')) {
+            pageName = 'trading-journal';
         }
         
         // For mockup pages, check if there's a class on html element

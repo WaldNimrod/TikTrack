@@ -9,6 +9,29 @@
  * Documentation: See documentation/05-REPORTS/PREFERENCES_PAGES_FIXES_SUMMARY.md
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Class Methods ===
+// - PreferencesPagesScanner.extractScriptTags() - Extractscripttags
+// - PreferencesPagesScanner.hasPreferencesPackage() - Haspreferencespackage
+// - PreferencesPagesScanner.identifyIssues() - Identifyissues
+// - PreferencesPagesScanner.generateReport() - Generatereport
+
+// === Utility Functions ===
+// - PreferencesPagesScanner.checkBootstrapDuplicates() - Checkbootstrapduplicates
+// - PreferencesPagesScanner.checkDuplicateScripts() - Checkduplicatescripts
+// - PreferencesPagesScanner.checkRequiredFiles() - Checkrequiredfiles
+
+// === Data Functions ===
+// - PreferencesPagesScanner.checkLoadOrder() - Checkloadorder
+
+// === Event Handlers ===
+// - PreferencesPagesScanner.exportReportAsJSON() - Exportreportasjson
+
+// === UI Functions ===
+// - PreferencesPagesScanner.displayReport() - Displayreport
+
 (function() {
   'use strict';
 

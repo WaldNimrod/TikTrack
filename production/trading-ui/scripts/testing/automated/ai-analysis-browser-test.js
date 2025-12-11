@@ -14,6 +14,24 @@
  * @created January 28, 2025
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Core Functions ===
+// - runUnitTests() - Rununittests
+// - runE2ETests() - Rune2Etests
+// - runPerformanceTests() - Runperformancetests
+// - runAllTests() - Runalltests
+
+// === Event Handlers ===
+// - logSection() - Logsection
+// - waitForFunction() - Waitforfunction
+// - runIntegrationTests() - Runintegrationtests
+
+// === Other ===
+// - logTest() - Logtest
+// - waitForElement() - Waitforelement
+
 (function() {
   'use strict';
 

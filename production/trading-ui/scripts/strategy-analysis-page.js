@@ -7,6 +7,93 @@
  * Documentation: See documentation/frontend/JAVASCRIPT_ARCHITECTURE.md
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - initializeSeriesControls() - Initializeseriescontrols
+// - initializeHeader() - Initializeheader
+// - createStrategyCategories() - Createstrategycategories
+// - initStrategyPerformanceChart() - Initstrategyperformancechart
+// - initializeRecordFilterTags() - Initializerecordfiltertags
+// - initializeComparisonTags() - Initializecomparisontags
+// - initializePage() - Initializepage
+// - setupEventListeners() - Setupeventlisteners
+
+// === Event Handlers ===
+// - getComparisonParameterValues() - Getcomparisonparametervalues
+// - selectDateRangeOption() - Selectdaterangeoption
+// - handleCustomDateFromChange() - Handlecustomdatefromchange
+// - handleCustomDateToChange() - Handlecustomdatetochange
+// - selectStatusOption() - Selectstatusoption
+// - toggleComparisonParameter() - Togglecomparisonparameter
+// - applyComparisonParameters() - Applycomparisonparameters
+// - resetComparisonParameters() - Resetcomparisonparameters
+// - resetComparisonParametersToDefaults() - Resetcomparisonparameterstodefaults
+// - selectAllOptions() - Selectalloptions
+// - clearAllOptions() - Clearalloptions
+// - generateMockStrategyComparisonTableData() - Generatemockstrategycomparisontabledata
+// - formatComparisonInfo() - Formatcomparisoninfo
+// - updateStrategyComparisonTable() - Updatestrategycomparisontable
+// - updateAllVisualizations() - Updateallvisualizations
+// - saveComparisonParameterState() - Savecomparisonparameterstate
+// - loadComparisonParameterState() - Loadcomparisonparameterstate
+// - replaceStrategyActionButtons() - Replacestrategyactionbuttons
+
+// === UI Functions ===
+// - updateDateRangeFilterText() - Updatedaterangefiltertext
+// - updateStatusFilterText() - Updatestatusfiltertext
+// - renderTagsBadges() - Rendertagsbadges
+// - updateStrategyListTable() - Updatestrategylisttable
+// - updateHeatmap() - Updateheatmap
+// - updateVisualHeatmap() - Updatevisualheatmap
+// - updateChartLegend() - Updatechartlegend
+// - updateStrategyPerformanceChart() - Updatestrategyperformancechart
+// - updateStrategyInsights() - Updatestrategyinsights
+
+// === Data Functions ===
+// - getCSSVariableValue() - Getcssvariablevalue
+// - saveSeriesVisibilityState() - Saveseriesvisibilitystate
+// - loadSeriesVisibilityState() - Loadseriesvisibilitystate
+// - getRecordFilterValues() - Getrecordfiltervalues
+// - getFilterValues() - Getfiltervalues
+// - getDateRange() - Getdaterange
+// - generateMockSeriesData() - Generatemockseriesdata
+// - generateMockHeatmapData() - Generatemockheatmapdata
+// - getColorClass() - Getcolorclass
+// - getColorStyle() - Getcolorstyle
+// - saveRecordFilterState() - Saverecordfilterstate
+// - savePageState() - Savepagestate
+// - loadRecordFilterState() - Loadrecordfilterstate
+// - loadTradingAccounts() - Loadtradingaccounts
+// - loadTradingMethods() - Loadtradingmethods
+// - loadTickers() - Loadtickers
+// - getPercentile() - Getpercentile
+// - getPLPercentile() - Getplpercentile
+// - getAvgPLPercentile() - Getavgplpercentile
+// - getValuePercentile() - Getvaluepercentile
+
+// === Utility Functions ===
+// - formatCurrency() - Formatcurrency
+// - formatPLWithPercent() - Formatplwithpercent
+// - formatInvestmentWithPercent() - Formatinvestmentwithpercent
+// - formatFilterInfo() - Formatfilterinfo
+// - formatDate() - Formatdate
+
+// === Other ===
+// - toggleSeries() - Toggleseries
+// - ensureUnifiedCacheManagerReady() - Ensureunifiedcachemanagerready
+// - waitForTradingViewAdapter() - Waitfortradingviewadapter
+// - toggleDateRangeFilterMenu() - Toggledaterangefiltermenu
+// - toggleStatusFilterMenu() - Togglestatusfiltermenu
+// - applyRecordFilters() - Applyrecordfilters
+// - resetRecordFilters() - Resetrecordfilters
+// - resetRecordFiltersToDefaults() - Resetrecordfilterstodefaults
+// - generateMockTagsForCategory() - Generatemocktagsforcategory
+// - cartesianProduct() - Cartesianproduct
+// - seededRandom() - Seededrandom
+// - restorePageState() - Restorepagestate
+
 (function() {
     'use strict';
 
@@ -69,9 +156,40 @@ function toggleSeries(seriesKey, visible) {
     updateStrategyPerformanceChart(getFilterValues());
 }
 
+// Helper: ensure UnifiedCacheManager זמין ו מאותחל
+async function ensureUnifiedCacheManagerReady() {
+    // אם כבר מאותחל - לצאת מהר
+    if (window.UnifiedCacheManager?.initialized || window.UnifiedCacheManager?.isInitialized?.()) {
+        return true;
+    }
+    // נסיון לאתחל אם יש initialize
+    if (typeof window.UnifiedCacheManager?.initialize === 'function') {
+        try {
+            await window.UnifiedCacheManager.initialize();
+            return window.UnifiedCacheManager.initialized === true;
+        } catch (e) {
+            if (window.Logger) {
+                window.Logger.warn('UnifiedCacheManager initialize failed (strategy-analysis), continuing without cache', { error: e });
+            }
+        }
+    }
+    // נסיון טעינת סקריפט אם לא נטען
+    if (!window.UnifiedCacheManager && typeof window.loadScriptOnce === 'function') {
+        try {
+            await window.loadScriptOnce('/scripts/unified-cache-manager.js');
+        } catch (e) {
+            if (window.Logger) {
+                window.Logger.warn('UnifiedCacheManager script load failed (strategy-analysis)', { error: e });
+            }
+        }
+    }
+    return !!window.UnifiedCacheManager;
+}
+
 // Save series visibility state using UnifiedCacheManager
 async function saveSeriesVisibilityState() {
     try {
+        await ensureUnifiedCacheManagerReady();
         if (window.UnifiedCacheManager && (window.UnifiedCacheManager.initialized || window.UnifiedCacheManager.isInitialized?.())) {
             await window.UnifiedCacheManager.save(CACHE_KEY_SERIES_VISIBILITY, seriesVisibility, {
                 layer: 'localStorage',
@@ -93,6 +211,7 @@ async function saveSeriesVisibilityState() {
 // Load series visibility state using UnifiedCacheManager
 async function loadSeriesVisibilityState() {
     try {
+        await ensureUnifiedCacheManagerReady();
         if (window.UnifiedCacheManager && (window.UnifiedCacheManager.initialized || window.UnifiedCacheManager.isInitialized?.())) {
             const savedState = await window.UnifiedCacheManager.get(CACHE_KEY_SERIES_VISIBILITY);
             if (savedState && typeof savedState === 'object') {
@@ -678,7 +797,6 @@ async function resetRecordFiltersToDefaults() {
             }
             // NOTE: Removed fallback to window.getPreference to prevent recursion
             // window.getPreference just calls PreferencesCore.getPreference again, causing recursion
-            }
         } catch (error) {
             if (window.Logger) {
                 window.Logger.warn('Failed to get default trading account from preferences, using first account', { page: 'strategy-analysis-page', error });
@@ -1712,6 +1830,54 @@ function updateStrategyComparisonTable(filters) {
     }
 }
 
+// Update strategy list table
+function updateStrategyListTable(strategyData) {
+    const tbody = document.getElementById('strategy-list-table-body');
+    if (!tbody) return;
+    
+    if (!strategyData || strategyData.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">אין נתונים להצגה</td></tr>';
+        return;
+    }
+    
+    // Build table rows using FieldRendererService
+    const rowsHTML = strategyData.map(strategy => {
+        // Use FieldRendererService for P/L
+        const totalPLDisplay = window.FieldRendererService && typeof window.FieldRendererService.renderAmount === 'function'
+            ? window.FieldRendererService.renderAmount(strategy.totalPL || 0, '$', 0, true)
+            : `<span class="${strategy.totalPL >= 0 ? 'text-success' : 'text-danger'}">$${Math.abs(strategy.totalPL || 0).toLocaleString()}</span>`;
+        
+        // Build strategy name from paramValues if available
+        const strategyName = strategy.name || Object.values(strategy.paramValues || {}).join(' + ') || 'אסטרטגיה ללא שם';
+        const strategyDescription = strategy.description || 'אין תיאור';
+        
+        // Actions menu
+        const actionsMenu = window.createActionsMenu && typeof window.createActionsMenu === 'function'
+            ? window.createActionsMenu([
+                { type: 'EDIT', onclick: `window.editStrategy && window.editStrategy('${strategyName.replace(/'/g, "\\'")}')`, title: `ערוך אסטרטגיה: ${strategyName}` },
+                { type: 'DELETE', onclick: `window.deleteStrategy && window.deleteStrategy('${strategyName.replace(/'/g, "\\'")}')`, title: `מחק אסטרטגיה: ${strategyName}` }
+            ])
+            : `<button class="btn btn-sm btn-outline-primary" data-button-type="EDIT" title="ערוך אסטרטגיה: ${strategyName}">ערוך</button> <button class="btn btn-sm btn-outline-danger" data-button-type="DELETE" title="מחק אסטרטגיה: ${strategyName}">מחק</button>`;
+        
+        return `
+            <tr>
+                <td><strong>${strategyName}</strong></td>
+                <td>${strategyDescription}</td>
+                <td>${strategy.trades || 0}</td>
+                <td>${totalPLDisplay}</td>
+                <td>${strategy.successRate || 0}%</td>
+                <td class="actions-cell" data-strategy-name="${strategyName.replace(/"/g, '&quot;')}">${actionsMenu}</td>
+            </tr>
+        `;
+    }).join('');
+    
+    // Update table body
+    tbody.innerHTML = rowsHTML;
+    
+    // Replace action buttons with actions menu if needed
+    replaceStrategyActionButtons();
+}
+
 // Update heatmap
 function updateHeatmap(filters) {
     const data = generateMockHeatmapData(filters);
@@ -2324,6 +2490,20 @@ async function updateStrategyPerformanceChart(filters) {
 async function updateAllVisualizations() {
     const filters = getFilterValues();
     
+    // Get strategy data for InfoSummarySystem
+    const strategyData = generateMockStrategyComparisonTableData(filters).data;
+    
+    // Update InfoSummarySystem if available
+    if (window.InfoSummarySystem && window.INFO_SUMMARY_CONFIGS && window.INFO_SUMMARY_CONFIGS['strategy-analysis']) {
+        try {
+            await window.InfoSummarySystem.calculateAndRender(strategyData, window.INFO_SUMMARY_CONFIGS['strategy-analysis']);
+        } catch (error) {
+            if (window.Logger) {
+                window.Logger.warn('Error updating InfoSummarySystem', { error, page: 'strategy-analysis-page' });
+            }
+        }
+    }
+    
     // Update table
     updateStrategyComparisonTable(filters);
     
@@ -2338,6 +2518,9 @@ async function updateAllVisualizations() {
     
     // Update insights
     await updateStrategyInsights(filters);
+    
+    // Update strategy list table
+    updateStrategyListTable(strategyData);
 }
 
 // Update strategy insights
@@ -2840,7 +3023,6 @@ async function loadTradingAccounts() {
             }
             // NOTE: Removed fallback to window.getPreference to prevent recursion
             // window.getPreference just calls PreferencesCore.getPreference again, causing recursion
-            }
             
             // Select default account if found
             if (defaultAccountId && select.options.length > 0) {
@@ -2997,8 +3179,8 @@ function replaceStrategyActionButtons() {
 
         // Replace buttons with Actions Menu
         const actionsMenuHtml = window.createActionsMenu([
-            { type: 'EDIT', onclick: `window.editStrategy && window.editStrategy('${strategyName.replace(/'/g, "\\'")}')`, title: 'ערוך' },
-            { type: 'DELETE', onclick: `window.deleteStrategy && window.deleteStrategy('${strategyName.replace(/'/g, "\\'")}')`, title: 'מחק' }
+            { type: 'EDIT', onclick: `window.editStrategy && window.editStrategy('${strategyName.replace(/'/g, "\\'")}')`, title: `ערוך אסטרטגיה: ${strategyName}` },
+            { type: 'DELETE', onclick: `window.deleteStrategy && window.deleteStrategy('${strategyName.replace(/'/g, "\\'")}')`, title: `מחק אסטרטגיה: ${strategyName}` }
         ]);
 
         if (actionsMenuHtml) {

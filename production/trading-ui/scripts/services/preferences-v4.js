@@ -1,3 +1,71 @@
+
+
+// ===== FUNCTION INDEX =====
+// === Arrow Functions ===
+// - p() - P
+
+// === Functions ===
+// - bootstrap() - Bootstrap
+// - dedup() - Dedup
+// - doFetch() - Dofetch
+// - getGroup() - Getgroup
+// - getGroups() - Getgroups
+// - getPreference() - Getpreference
+// - now() - Now
+// - saveGroup() - Savegroup
+// - sleep() - Sleep
+
+// === Data Functions ===
+/**
+ * doFetch - Dofetch
+ *
+ * @param {*} url - Parameter description
+ * @param {*} options = {} - Parameter description
+ * @returns {{*}} Return description
+ */
+// - doFetch() - Dofetch
+/**
+ * getGroup - Getgroup
+ *
+ * @param {*} group - Parameter description
+ * @param {*} profileId = null - Parameter description
+ * @param {*} userId = null - Parameter description
+ * @returns {{*}} Return description
+ */
+// - getGroup() - Getgroup
+/**
+ * getGroups - Getgroups
+ *
+ * @param {*} groups - Parameter description
+ * @param {*} profileId = null - Parameter description
+ * @param {*} userId = null - Parameter description
+ * @returns {{*}} Return description
+ */
+// - getGroups() - Getgroups
+/**
+ * saveGroup - Savegroup
+ *
+ * @param {*} group - Parameter description
+ * @param {*} valuesMap - Parameter description
+ * @param {*} profileId = null - Parameter description
+ * @returns {{*}} Return description
+ */
+// - saveGroup() - Savegroup
+/**
+ * getPreference - Getpreference
+ *
+ * @param {*} name - Parameter description
+ * @returns {{*}} Return description
+ */
+// - getPreference() - Getpreference
+
+// === Other ===
+// - now() - Now
+// - sleep() - Sleep
+// - dedup() - Dedup
+// - bootstrap() - Bootstrap
+// - p() - P
+
 (() => {
   const NS = 'PreferencesV4';
   if (window[NS]) return;
@@ -63,13 +131,13 @@
       if (profileId != null) params.set('profile_id', String(profileId));
       const headers = {};
       if (bootstrapETag) headers['If-None-Match'] = bootstrapETag;
-      const res = await doFetch(`${API.bootstrap}?${params.toString()}`, { headers, credentials: 'include' });
+      const res = await doFetch(`${API.bootstrap}?${params.toString()}`, { headers, });
       if (res.status === 304) {
         window.Logger?.info?.('PreferencesV4 bootstrap 304 (served from cache)', { page: 'preferences-v4' });
         return { profileContext, groups: Object.fromEntries(cacheByGroup), etag: bootstrapETag };
       }
       if (res.status === 401 || res.status === 403) {
-        window.Logger?.warn?.('PreferencesV4 bootstrap authentication error', { page: 'preferences-v4', status: res.status });
+        // Silent fallback - authentication errors are handled by auth system
         // Return empty context instead of throwing - allow page to continue
         return { profileContext: null, groups: {}, etag: null };
       }
@@ -118,7 +186,7 @@
       const headers = {};
       const cachedETag = etagByGroup.get(group);
       if (cachedETag) headers['If-None-Match'] = cachedETag;
-      const res = await doFetch(`${API.group}?${params.toString()}`, { headers, credentials: 'include' });
+      const res = await doFetch(`${API.group}?${params.toString()}`, { headers, });
       
       window.Logger?.debug?.('🔍 PreferencesV4.getGroup response', {
         page: 'preferences-v4',
@@ -137,7 +205,7 @@
         return { group, values: cached, profileContext, etag: cachedETag, fromCache: true };
       }
       if (res.status === 401 || res.status === 403) {
-        window.Logger?.warn?.('PreferencesV4 getGroup authentication error', { page: 'preferences-v4', status: res.status, group });
+        // Silent fallback - authentication errors are handled by auth system
         // Return empty group instead of throwing - allow page to continue
         return { group, values: {}, profileContext, etag: null, fromCache: false };
       }
@@ -185,16 +253,7 @@
       });
       
       cacheByGroup.set(group, groupValues);
-      // Only warn about empty groups on preferences page or if explicitly debugging
-      const isPreferencesPage = document.body?.classList?.contains('preferences-page') || 
-                                 window.location.pathname === '/preferences' ||
-                                 window.location.pathname.includes('/preferences');
-      if (Object.keys(groupValues).length === 0 && isPreferencesPage) {
-        window.Logger?.warn?.(`⚠️ PreferencesV4: group '${group}' returned empty values`, { page: 'preferences-v4' });
-      } else if (Object.keys(groupValues).length === 0) {
-        // Debug level for other pages (normal - groups may not be needed)
-        window.Logger?.debug?.(`PreferencesV4: group '${group}' returned empty values (normal on non-preferences pages)`, { page: 'preferences-v4' });
-      }
+      // Empty groups are normal - no warning needed (handled gracefully by callers)
       profileContext = data.profile_context || profileContext;
       window.dispatchEvent(new CustomEvent('preferences:updated', { detail: { scope: 'group', group } }));
       // CRITICAL: Return normalized groupValues, not data.values (which may not exist or be in wrong format)
@@ -221,9 +280,7 @@
     if (profileId != null) body.profile_id = profileId;
     const res = await doFetch(API.group, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify(body),
+      headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
     });
     const json = await res.json();
     if (!json?.success) throw new Error(json?.error || 'Failed group save');

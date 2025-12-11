@@ -176,26 +176,37 @@
   }
 
   async function fetchTickersFromApi({ signal } = {}) {
+    // Guard: avoid hitting API before authentication to prevent 401 spam
+    if (typeof window.TikTrackAuth?.getCurrentUser === 'function') {
+      const user = window.TikTrackAuth.getCurrentUser();
+      if (!user || !user.id) {
+        window.Logger?.debug?.('⚠️ Skipping tickers load - user not authenticated yet', PAGE_LOG_CONTEXT);
+        return [];
+      }
+    }
+
     const base = resolveBaseUrl();
     const separator = base.endsWith('/') ? '' : '/';
     // Use /api/tickers/my to get only user's tickers
     const url = `${base}${separator}api/tickers/my?_ts=${Date.now()}`;
-    const response = await fetch(url, { method: 'GET', headers: DEFAULT_HEADERS, signal });
+    const response = await fetch(url, { 
+      method: 'GET',
+      // Authorization injected by api-fetch-wrapper
+      signal
+    });
+
     if (!response.ok) {
-      // Fallback to /api/tickers/ if /my fails
-      if (response.status === 401 || response.status === 404) {
-        const fallbackUrl = `${base}${separator}api/tickers/?_ts=${Date.now()}`;
-        const fallbackResponse = await fetch(fallbackUrl, { method: 'GET', headers: DEFAULT_HEADERS, signal });
-        if (!fallbackResponse.ok) {
-          const error = new Error(`Ticker load failed (${fallbackResponse.status})`);
-          notifyLoadError(error.message, error);
-          throw error;
-        }
-        const fallbackPayload = await fallbackResponse.json();
-        const normalized = normalizeTickersPayload(fallbackPayload);
-        await saveTickersCache(normalized);
-        return normalized;
+      // Soft-fail on auth issues to avoid noisy 401s
+      if (response.status === 401 || response.status === 403) {
+        window.Logger?.debug?.('⚠️ Tickers load blocked - unauthorized', { ...PAGE_LOG_CONTEXT, status: response.status });
+        return [];
       }
+      // Soft-fail on missing resource
+      if (response.status === 404) {
+        window.Logger?.warn?.('⚠️ Tickers endpoint returned 404', { ...PAGE_LOG_CONTEXT, status: response.status });
+        return [];
+      }
+
       const error = new Error(`Ticker load failed (${response.status})`);
       notifyLoadError(error.message, error);
       throw error;
@@ -518,8 +529,7 @@
       
       const response = await fetch(url, {
         method: 'GET',
-        headers: DEFAULT_HEADERS,
-        credentials: 'include', // Include session cookie
+        headers: DEFAULT_HEADERS, // Include session cookie
         signal
       });
 
@@ -560,9 +570,7 @@
       
       const response = await fetch(url, {
         method: 'POST',
-        headers: DEFAULT_HEADERS,
-        credentials: 'include',
-        signal
+        headers: DEFAULT_HEADERS, signal
       });
 
       if (!response.ok) {
@@ -598,9 +606,7 @@
       
       const response = await fetch(url, {
         method: 'DELETE',
-        headers: DEFAULT_HEADERS,
-        credentials: 'include',
-        signal
+        headers: DEFAULT_HEADERS, signal
       });
 
       if (!response.ok) {

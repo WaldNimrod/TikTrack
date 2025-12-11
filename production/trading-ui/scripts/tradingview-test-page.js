@@ -6,6 +6,33 @@
  * Documentation: See documentation/frontend/JAVASCRIPT_ARCHITECTURE.md
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - createChart() - Createchart
+// - initializeAndRunTests() - Initializeandruntests
+// - setupCopyButton() - Setupcopybutton
+// - initializeHeader() - Initializeheader
+// - initializePage() - Initializepage
+
+// === Core Functions ===
+// - runSingleTest() - Runsingletest
+// - runAllTests() - Runalltests
+
+// === Event Handlers ===
+// - captureConsoleLog() - Captureconsolelog
+
+// === UI Functions ===
+// - updateTestSummary() - Updatetestsummary
+
+// === Data Functions ===
+// - getCSSVariableValue() - Getcssvariablevalue
+
+// === Other ===
+// - copyDetailedLog() - Copydetailedlog
+// - preferencesPromise() - Preferencespromise
+
 (function() {
     'use strict';
     
@@ -124,12 +151,12 @@
                     info.style.display = 'block';
                     const infoHTML = `
                         <strong>Methods:</strong><br>
-                        - createChart: ${typeof adapter.createChart === 'function' ? '✅' : '❌'}<br>
-                        - addLineSeries: ${typeof adapter.addLineSeries === 'function' ? '✅' : '❌'}<br>
-                        - addAreaSeries: ${typeof adapter.addAreaSeries === 'function' ? '✅' : '❌'}<br>
-                        - addCandlestickSeries: ${typeof adapter.addCandlestickSeries === 'function' ? '✅' : '❌'}<br>
-                        - destroyChart: ${typeof adapter.destroyChart === 'function' ? '✅' : '❌'}<br>
-                        - applyTheme: ${typeof adapter.applyTheme === 'function' ? '✅' : '❌'}
+// - createChart: ${typeof adapter.createChart === 'function' ? '✅' : '❌'}<br>
+// - addLineSeries: ${typeof adapter.addLineSeries === 'function' ? '✅' : '❌'}<br>
+// - addAreaSeries: ${typeof adapter.addAreaSeries === 'function' ? '✅' : '❌'}<br>
+// - addCandlestickSeries: ${typeof adapter.addCandlestickSeries === 'function' ? '✅' : '❌'}<br>
+// - destroyChart: ${typeof adapter.destroyChart === 'function' ? '✅' : '❌'}<br>
+// - applyTheme: ${typeof adapter.applyTheme === 'function' ? '✅' : '❌'}
                     `;
                     info.textContent = '';
                     const parser = new DOMParser();

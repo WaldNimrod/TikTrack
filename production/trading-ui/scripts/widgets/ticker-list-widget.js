@@ -25,6 +25,33 @@
  * Documentation: See documentation/03-DEVELOPMENT/GUIDES/TICKER_LIST_WIDGET_DEVELOPER_GUIDE.md
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Event Handlers ===
+// - getChangeColorClass() - Getchangecolorclass
+// - bindEvents() - Bindevents
+
+// === UI Functions ===
+// - showLoading() - Showloading
+// - showError() - Showerror
+// - showEmpty() - Showempty
+// - renderKPICard() - Renderkpicard
+// - renderTickersList() - Rendertickerslist
+
+// === Data Functions ===
+// - loadActiveTickers() - Loadactivetickers
+// - loadWatchListTickers() - Loadwatchlisttickers
+// - loadAllTickers() - Loadalltickers
+
+// === Utility Functions ===
+// - formatAmount() - Formatamount
+// - formatPercent() - Formatpercent
+// - formatVolume() - Formatvolume
+
+// === Other ===
+// - cacheElements() - Cacheelements
+
 ;(function () {
   'use strict';
 
@@ -57,6 +84,28 @@
       all: null
     }
   };
+
+  async function fetchWithRetry(url, options = {}, maxRetries = 3, pageTag = 'ticker-list-widget') {
+    let lastError = null;
+    for (let attempt = 0; attempt < maxRetries; attempt++) {
+      try {
+        const response = await fetch(url, options);
+        if (response.status === 429) {
+          const waitTime = Math.min(1000 * Math.pow(2, attempt), 10000); // up to 10s
+          window.Logger?.warn?.('⚠️ Rate limited, retrying', { page: pageTag, attempt: attempt + 1, waitTime });
+          if (attempt < maxRetries - 1) {
+            await new Promise(r => setTimeout(r, waitTime));
+            continue;
+          }
+        }
+        return response;
+      } catch (err) {
+        lastError = err;
+      }
+    }
+    if (lastError) throw lastError;
+    throw new Error('Rate limit exceeded after retries');
+  }
 
   // DOM Elements cache
   const elements = {
@@ -424,13 +473,13 @@
     state.activeTickers = [];
 
     try {
-      const response = await fetch('/api/tickers/with-initial-data', {
+      const response = await fetchWithRetry('/api/tickers/with-initial-data', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json'
         }
-      });
+      }, 3, 'ticker-list-widget');
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -468,6 +517,18 @@
       }
     } catch (error) {
       window.Logger?.error?.('❌ TickerListWidget: Error loading active tickers', { error: error.message, stack: error.stack, page: 'ticker-list-widget' });
+      // Fallback: try cached tickers if available
+      if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
+        try {
+          const cached = await window.UnifiedCacheManager.get('tickers-data', {});
+          if (cached && Array.isArray(cached)) {
+            window.Logger?.info?.('✅ TickerListWidget: Loaded from cache after error', { count: cached.length, page: 'ticker-list-widget' });
+            state.activeTickers = cached;
+            await renderTickersList('active', state.activeTickers);
+            return;
+          }
+        } catch (_) {}
+      }
       showError('active', `שגיאה בטעינת טיקרים פעילים: ${error.message}`);
       if (window.NotificationSystem?.showError) {
         window.NotificationSystem.showError('שגיאה בטעינת נתונים', `לא ניתן היה לטעון טיקרים פעילים: ${error.message}`);

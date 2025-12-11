@@ -14,6 +14,13 @@
  * @lastUpdated January 2025
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Data Functions ===
+// - loadPromise() - Loadpromise
+// - savePromise() - Savepromise
+
 // ============================================================================
 // PREFERENCES MANAGER CLASS
 // ============================================================================

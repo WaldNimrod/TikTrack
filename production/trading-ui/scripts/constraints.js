@@ -7,6 +7,34 @@
  * @since 2025-01-15
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - startValidation() - Startvalidation
+
+// === Event Handlers ===
+// - showValidationModal() - Showvalidationmodal
+// - performRealValidation() - Performrealvalidation
+// - checkDatabaseConstraint() - Checkdatabaseconstraint
+// - checkDataViolations() - Checkdataviolations
+// - validateConstraintData() - Validateconstraintdata
+// - validateNotNullConstraint() - Validatenotnullconstraint
+// - validateUniqueConstraint() - Validateuniqueconstraint
+// - validateCheckConstraint() - Validatecheckconstraint
+// - validateEnumConstraint() - Validateenumconstraint
+// - validateForeignKeyConstraint() - Validateforeignkeyconstraint
+// - validateRangeConstraint() - Validaterangeconstraint
+// - checkUIValidation() - Checkuivalidation
+// - validateSingleConstraint() - Validatesingleconstraint
+// - displayValidationResults() - Displayvalidationresults
+
+// === Utility Functions ===
+// - validateNext() - Validatenext
+
+// === Other ===
+// - generateDetailedLog() - Generatedetailedlog
+
 // ===== GLOBAL VARIABLES =====
 let constraintsMonitor;
 

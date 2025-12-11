@@ -27,6 +27,12 @@
  * 
  * ==========================================
  */
+// === Functions ===
+// - populateBootstrapIcons() - Populatebootstrapicons
+// - populateIconSelector() - Populateiconselector
+// - populateTablerIcons() - Populatetablericons
+// - selectIcon() - Selecticon
+// - setupViewModeSelector() - Setupviewmodeselector
 
 (function() {
     'use strict';
@@ -450,22 +456,9 @@
             titleEl.textContent = currentMode === 'edit' ? 'עריכת רשימה' : 'רשימה חדשה';
         }
 
-        // Ensure selectors are populated (wait a bit for DOM to be ready)
-        setTimeout(async () => {
-            await populateIconSelector();
-            populateColorPalette();
-            setupViewModeSelector();
-        }, 100);
-
-        if (currentMode === 'edit' && data) {
-            await populateForm(data);
-        } else {
-            await resetForm();
-        }
-
-        // Open via ModalManagerV2
+        // Open via ModalManagerV2 first
         if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
-            window.ModalManagerV2.showModal('watchListModal', currentMode, data).catch(error => {
+            await window.ModalManagerV2.showModal('watchListModal', currentMode, data).catch(error => {
                 window.Logger?.error('Error showing watch list modal via ModalManagerV2', { error, modalId: 'watchListModal', page: 'watch-list-modal' });
                 // Fallback to bootstrap if ModalManagerV2 fails
                 if (bootstrap?.Modal && modal) {
@@ -478,23 +471,49 @@
             const bsModal = new bootstrap.Modal(modal);
             bsModal.show();
         }
+
+        // Wait for modal to be fully shown, then populate form and initialize selectors
+        setTimeout(async () => {
+            // Ensure selectors are populated
+            await populateIconSelector();
+            populateColorPalette();
+            setupViewModeSelector();
+            
+            // Populate form AFTER modal is shown and ModalManagerV2.populateForm has run
+            if (currentMode === 'edit' && data) {
+                await populateForm(data);
+            } else {
+                await resetForm();
+            }
+        }, 400);
     }
 
     /**
      * Close watch list modal
      */
     function closeWatchListModal() {
+        const modal = document.getElementById('watchListModal');
+        if (!modal) {
+            return;
+        }
+
+        // Try ModalManagerV2 first
         if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
             window.ModalManagerV2.hideModal('watchListModal');
         } else if (bootstrap?.Modal) {
-            const modal = document.getElementById('watchListModal');
-            if (modal) {
-                const bsModal = bootstrap.Modal.getInstance(modal);
-                if (bsModal) {
-                    bsModal.hide();
+            // Fallback to Bootstrap modal
+            const bsModal = bootstrap.Modal.getInstance(modal);
+            if (bsModal) {
+                bsModal.hide();
+            } else {
+                // If no instance exists, create one and hide
+                const newModal = bootstrap.Modal.getOrCreateInstance(modal, { backdrop: false });
+                if (newModal) {
+                    newModal.hide();
                 }
             }
         }
+        
         resetForm();
     }
 
@@ -619,11 +638,17 @@
                 await window.CRUDResponseHandler.handleResponse(result, {
                     entityType: 'watch_list',
                     operation: currentMode === 'edit' ? 'update' : 'create',
-                    onSuccess: () => {
+                    modalId: 'watchListModal',
+                    onSuccess: async () => {
+                        // Close modal first
                         closeWatchListModal();
+                        
+                        // Small delay to ensure modal is closed
+                        await new Promise(resolve => setTimeout(resolve, 100));
+                        
                         // Refresh parent page
                         if (window.WatchListsPage?.loadWatchLists) {
-                            window.WatchListsPage.loadWatchLists();
+                            await window.WatchListsPage.loadWatchLists();
                         }
                         if (window.WatchListsPage?.renderSummaryStats) {
                             window.WatchListsPage.renderSummaryStats();
@@ -631,6 +656,15 @@
                     },
                     showNotification: true
                 });
+            } else if (result && result.success) {
+                // Fallback if CRUDResponseHandler is not available
+                closeWatchListModal();
+                if (window.WatchListsPage?.loadWatchLists) {
+                    await window.WatchListsPage.loadWatchLists();
+                }
+                if (window.WatchListsPage?.renderSummaryStats) {
+                    window.WatchListsPage.renderSummaryStats();
+                }
             }
         } catch (error) {
             window.Logger?.error?.('❌ Error saving watch list', { ...PAGE_LOG_CONTEXT, error: error?.message || error });

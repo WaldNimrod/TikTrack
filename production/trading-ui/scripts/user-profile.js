@@ -49,7 +49,7 @@
         // Check authentication
         if (!window.TikTrackAuth || !window.TikTrackAuth.isAuthenticated()) {
           window.Logger?.warn('User not authenticated, redirecting to login', { page: 'user-profile' });
-          window.location.href = 'login.html';
+          window.location.href = '/';
           return;
         }
 
@@ -116,9 +116,7 @@
         if (!user) {
           try {
             const response = await fetch('/api/auth/me', {
-              method: 'GET',
-              credentials: 'include'
-            });
+              method: 'GET', });
 
             if (response.ok) {
               const data = await response.json();
@@ -153,7 +151,7 @@
           // Not authenticated - redirect to login
           if (!user) {
             window.Logger?.warn('User not authenticated, redirecting to login', { page: 'user-profile' });
-            window.location.href = 'login.html';
+            window.location.href = '/';
             return;
           }
         }
@@ -248,9 +246,7 @@
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
-          },
-          credentials: 'include',
-          body: JSON.stringify(formData),
+          }, body: JSON.stringify(formData),
         });
 
         // Use CRUDResponseHandler for response handling
@@ -302,15 +298,38 @@
      * טיפול בפעולות לאחר עדכון פרופיל
      */
     async handlePostProfileUpdate(updatedUser) {
-      // Update TikTrackAuth current user
+      // Update UnifiedCacheManager with updated user (same as auth.js does)
+      if (window.UnifiedCacheManager) {
+        try {
+          await window.UnifiedCacheManager.save('currentUser', updatedUser);
+          window.Logger?.debug('✅ Updated currentUser in UnifiedCacheManager', { page: 'user-profile' });
+        } catch (e) {
+          console.warn('Error saving currentUser to cache:', e);
+          // Fallback to localStorage
+          try {
+            localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+            window.Logger?.debug('✅ Updated currentUser in localStorage (fallback)', { page: 'user-profile' });
+          } catch (storageError) {
+            window.Logger?.warn('Failed to update currentUser in localStorage', { error: storageError, page: 'user-profile' });
+          }
+        }
+      } else {
+        // Fallback to localStorage if UnifiedCacheManager not available
+        try {
+          localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+          window.Logger?.debug('✅ Updated currentUser in localStorage (fallback)', { page: 'user-profile' });
+        } catch (storageError) {
+          window.Logger?.warn('Failed to update currentUser in localStorage', { error: storageError, page: 'user-profile' });
+        }
+      }
+
+      // Update TikTrackAuth current user if available
       if (window.TikTrackAuth) {
-        window.PageStateManager?.setItem('currentUser', JSON.stringify(updatedUser));
         const currentUser = window.TikTrackAuth.getCurrentUser();
         if (currentUser) {
           Object.assign(currentUser, updatedUser);
+          window.Logger?.debug('✅ Updated TikTrackAuth currentUser', { page: 'user-profile' });
         }
-      } else {
-        window.PageStateManager?.setItem('currentUser', JSON.stringify(updatedUser));
       }
 
       // Update UnifiedCacheManager cache
@@ -400,9 +419,7 @@
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
-          },
-          credentials: 'include',
-          body: JSON.stringify({
+          }, body: JSON.stringify({
             current_password: formData.current_password,
             new_password: formData.new_password,
           }),

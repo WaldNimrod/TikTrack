@@ -39,6 +39,23 @@
   min-width: 150px;
 }
 
+/* Limit input and select field widths to 300px max */
+.user-profile-page .form-control,
+.user-profile-page .form-select {
+  max-width: 300px;
+}
+
+/* Limit input-group width (for API key fields with toggle button) */
+.user-profile-page .input-group {
+  max-width: 300px;
+}
+
+/* Align all buttons to the left (end in RTL) */
+.user-profile-page .d-flex.justify-content-start,
+.user-profile-page .d-flex.justify-content-end {
+  justify-content: flex-end; /* Left in RTL = end of line */
+}
+
 /* SMTP Settings Section */
 .user-profile-page #smtpStatus {
   margin-top: 1rem;

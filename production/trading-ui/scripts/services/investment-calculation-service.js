@@ -10,6 +10,75 @@
  * @author TikTrack
  */
 (function () {
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - createContext() - Createcontext
+
+// === Event Handlers ===
+// - getSelectedOptionText() - Getselectedoptiontext
+// - getPriceFromContext() - Getpricefromcontext
+// - handler() - Handler
+// - handleQuantityCommit() - Handlequantitycommit
+// - handleStopPercentCommit() - Handlestoppercentcommit
+// - handleTargetPercentCommit() - Handletargetpercentcommit
+// - handleAmountCommit() - Handleamountcommit
+// - handleSideChange() - Handlesidechange
+// - handleTickerChange() - Handletickerchange
+
+// === UI Functions ===
+// - parseDisplayValue() - Parsedisplayvalue
+// - formatQuantityDisplay() - Formatquantitydisplay
+// - formatCurrencyDisplay() - Formatcurrencydisplay
+// - formatRatioDisplay() - Formatratiodisplay
+// - renderAmountWithVariant() - Renderamountwithvariant
+// - updatePercentFromPrices() - Updatepercentfromprices
+// - updatePriceFromPercent() - Updatepricefrompercent
+// - renderSideDisplay() - Rendersidedisplay
+// - renderSummaryCard() - Rendersummarycard
+// - updateSummary() - Updatesummary
+// - updateFromAmount() - Updatefromamount
+// - updateFromQuantity() - Updatefromquantity
+
+// === Data Functions ===
+// - computeTargetPercent() - Computetargetpercent
+// - computeSummaryData() - Computesummarydata
+// - getRiskCacheKey() - Getriskcachekey
+// - loadDefaultRiskPercents() - Loaddefaultriskpercents
+// - markTargetPercentModified() - Marktargetpercentmodified
+// - syncTargetPercent() - Synctargetpercent
+
+// === Utility Functions ===
+// - parseNumericString() - Parsenumericstring
+// - parseInputValue() - Parseinputvalue
+// - formatPercent() - Formatpercent
+// - formatAmount() - Formatamount
+// - formatQuantity() - Formatquantity
+
+// === Other ===
+// - resolveElement() - Resolveelement
+// - isPositiveNumber() - Ispositivenumber
+// - computeStopPercent() - Computestoppercent
+// - computePriceFromPercent() - Computepricefrompercent
+// - normalizeSide() - Normalizeside
+// - escapeHtmlText() - Escapehtmltext
+// - computeQuantityFromInvestment() - Computequantityfrominvestment
+// - computeInvestmentFromQuantity() - Computeinvestmentfromquantity
+// - markFieldAsUserModified() - Markfieldasusermodified
+// - markFieldAsSystemGenerated() - Markfieldassystemgenerated
+// - attachRiskListeners() - Attachrisklisteners
+// - applyDefaultRiskLevels() - Applydefaultrisklevels
+// - withLock() - Withlock
+// - syncValues() - Syncvalues
+// - attachListeners() - Attachlisteners
+// - applyValue() - Applyvalue
+// - promise() - Promise
+// - markQuantityModified() - Markquantitymodified
+// - markStopPercentModified() - Markstoppercentmodified
+// - syncStopPercent() - Syncstoppercent
+// - markAmountModified() - Markamountmodified
+
     'use strict';
 
     const DEFAULT_OPTIONS = {

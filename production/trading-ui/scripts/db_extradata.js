@@ -11,6 +11,34 @@
  * @since 2025-10-30
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - initDatabaseExtraData() - Initdatabaseextradata
+// - createTableHeaders() - Createtableheaders
+// - createTableRows() - Createtablerows
+
+// === Event Handlers ===
+// - getSectionId() - Getsectionid
+// - getContainerId() - Getcontainerid
+
+// === UI Functions ===
+// - showLoadingState() - Showloadingstate
+// - showErrorState() - Showerrorstate
+// - updateTableDisplay() - Updatetabledisplay
+// - updateTableInfo() - Updatetableinfo
+// - updateSummaryStats() - Updatesummarystats
+
+// === Data Functions ===
+// - loadAllTables() - Loadalltables
+// - loadTableDataLocal() - Loadtabledatalocal
+// - getCountElementId() - Getcountelementid
+// - getTableId() - Gettableid
+
+// === Utility Functions ===
+// - formatCellValue() - Formatcellvalue
+
 // ===== GLOBAL VARIABLES =====
 let totalRecords = 0;
 let tableData = {};

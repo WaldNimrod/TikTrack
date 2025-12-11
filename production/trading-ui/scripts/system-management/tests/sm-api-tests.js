@@ -87,9 +87,7 @@ class SMAPITests {
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json'
-        },
-        credentials: 'include'
-      });
+        }, });
       const responseTime = performance.now() - startTime;
       
       result.tests.reachable = {
@@ -181,6 +179,13 @@ if (window.location.hostname === 'localhost' || window.location.hostname === '12
     }, 5000);
   });
 }
+
+
+
+
+
+
+
 
 
 

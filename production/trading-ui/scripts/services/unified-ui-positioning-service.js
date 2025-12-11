@@ -15,6 +15,26 @@
  * Documentation: See documentation/03-DEVELOPMENT/GUIDES/UNIFIED_UI_POSITIONING_GUIDE.md
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - setupOverlay() - Setupoverlay
+
+// === Event Handlers ===
+// - positionElement() - Positionelement
+// - positionWithFloatingUI() - Positionwithfloatingui
+// - positionManually() - Positionmanually
+// - handleOverlayEnter() - Handleoverlayenter
+// - handleOverlayLeave() - Handleoverlayleave
+
+// === Other ===
+// - animateElement() - Animateelement
+// - closeOverlayForItem() - Closeoverlayforitem
+// - destroy() - Destroy
+// - isAvailable() - Isavailable
+// - isGSAPAvailable() - Isgsapavailable
+
 ;(function unifiedUIPositioningServiceFactory() {
   'use strict';
 

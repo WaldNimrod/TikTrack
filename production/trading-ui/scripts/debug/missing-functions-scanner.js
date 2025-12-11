@@ -8,6 +8,20 @@
  * Usage: Open browser console and run this script or include in debug page
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Core Functions ===
+// - runScan() - Runscan
+
+// === Event Handlers ===
+// - checkFunctionExists() - Checkfunctionexists
+
+// === Other ===
+// - scanPageFile() - Scanpagefile
+// - scanAllPages() - Scanallpages
+// - generateReport() - Generatereport
+
 (function() {
     'use strict';
 

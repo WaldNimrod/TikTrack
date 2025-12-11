@@ -1,4 +1,5 @@
 """
+# pyright: reportGeneralTypeIssues=false
 API Routes for Watch Lists Management - TikTrack
 ================================================
 
@@ -45,21 +46,33 @@ user_service = UserService()
 def _resolve_user_id() -> int:
     """
     Return active user id from Flask context (set by auth middleware).
-    Falls back to default user if not authenticated (for backward compatibility).
+    Requires authentication - no fallback to default user.
     """
     # Primary: Get from Flask context (set by auth middleware)
     user_id = getattr(g, 'user_id', None)
     if user_id is not None:
         return user_id
     
-    # Fallback: Check query parameter
-    user_id = request.args.get('user_id', type=int)
-    if user_id is not None:
-        return user_id
+    # No authentication - raise error
+    # User must be logged in via session
+    raise ValueError("User not authenticated. Please log in first.")
+
+
+def _handle_auth_error(e: ValueError) -> tuple:
+    """
+    Handle authentication errors consistently across all endpoints.
     
-    # Fallback: Default user (for backward compatibility and tools)
-    default_user = user_service.get_default_user()
-    return default_user["id"] if default_user else 1
+    Args:
+        e: ValueError raised by _resolve_user_id()
+    
+    Returns:
+        Tuple of (jsonify response, status_code)
+    """
+    return jsonify({
+        "status": "error",
+        "error": {"message": str(e)},
+        "version": "1.0"
+    }), 401
 
 
 def _get_watch_lists_normalizer() -> DateNormalizationService:
@@ -86,7 +99,10 @@ def get_watch_lists():
         JSON response with list of watch lists
     """
     db: Session = g.db
-    user_id = _resolve_user_id()
+    try:
+        user_id = _resolve_user_id()
+    except ValueError as e:
+        return _handle_auth_error(e)
     
     try:
         normalizer = _get_watch_lists_normalizer()
@@ -134,7 +150,11 @@ def create_watch_list():
         JSON response with created watch list
     """
     db: Session = g.db
-    user_id = _resolve_user_id()
+    try:
+        user_id = _resolve_user_id()
+    except ValueError as e:
+        return _handle_auth_error(e)
+    
     data = request.get_json() or {}
     
     try:
@@ -258,7 +278,11 @@ def update_watch_list(list_id: int):
         JSON response with updated watch list
     """
     db: Session = g.db
-    user_id = _resolve_user_id()
+    try:
+        user_id = _resolve_user_id()
+    except ValueError as e:
+        return _handle_auth_error(e)
+    
     data = request.get_json() or {}
     
     try:
@@ -325,7 +349,10 @@ def delete_watch_list(list_id: int):
         JSON response with success status
     """
     db: Session = g.db
-    user_id = _resolve_user_id()
+    try:
+        user_id = _resolve_user_id()
+    except ValueError as e:
+        return _handle_auth_error(e)
     
     try:
         normalizer = _get_watch_lists_normalizer()
@@ -376,7 +403,8 @@ def get_watch_list_items(list_id: int):
         items = WatchListService.get_watch_list_items(db, list_id, user_id)
         
         # Convert to dict and normalize dates
-        items_data = [item.to_dict() for item in items]
+        # Pass db and user_id to to_dict() so it can check flag lists
+        items_data = [item.to_dict(db=db, user_id=user_id) for item in items]
         items_data = normalizer.normalize_output(items_data)
         
         return jsonify({
@@ -425,7 +453,11 @@ def add_ticker_to_list(list_id: int):
         JSON response with created item
     """
     db: Session = g.db
-    user_id = _resolve_user_id()
+    try:
+        user_id = _resolve_user_id()
+    except ValueError as e:
+        return _handle_auth_error(e)
+    
     data = request.get_json() or {}
     
     try:
@@ -439,11 +471,13 @@ def add_ticker_to_list(list_id: int):
             external_symbol=data.get('external_symbol'),
             external_name=data.get('external_name'),
             flag_color=data.get('flag_color'),
+            flag_entity_type=data.get('flag_entity_type'),
             notes=data.get('notes')
         )
         
         # Convert to dict and normalize dates
-        item_data = item.to_dict()
+        # Pass db and user_id to to_dict() so it can check flag lists
+        item_data = item.to_dict(db=db, user_id=user_id)
         item_data = normalizer.normalize_output([item_data])[0]
         
         return jsonify({
@@ -490,7 +524,11 @@ def update_watch_list_item(item_id: int):
         JSON response with updated item
     """
     db: Session = g.db
-    user_id = _resolve_user_id()
+    try:
+        user_id = _resolve_user_id()
+    except ValueError as e:
+        return _handle_auth_error(e)
+    
     data = request.get_json() or {}
     
     try:
@@ -501,6 +539,7 @@ def update_watch_list_item(item_id: int):
             item_id=item_id,
             user_id=user_id,
             flag_color=data.get('flag_color'),
+            flag_entity_type=data.get('flag_entity_type'),
             display_order=data.get('display_order'),
             notes=data.get('notes')
         )
@@ -513,7 +552,8 @@ def update_watch_list_item(item_id: int):
             }), 404
         
         # Convert to dict and normalize dates
-        item_data = item.to_dict()
+        # Pass db and user_id to to_dict() so it can check flag lists
+        item_data = item.to_dict(db=db, user_id=user_id)
         item_data = normalizer.normalize_output([item_data])[0]
         
         return jsonify({
@@ -605,7 +645,11 @@ def reorder_items(list_id: int):
         JSON response with success status
     """
     db: Session = g.db
-    user_id = _resolve_user_id()
+    try:
+        user_id = _resolve_user_id()
+    except ValueError as e:
+        return _handle_auth_error(e)
+    
     data = request.get_json() or {}
     
     try:
@@ -640,6 +684,202 @@ def reorder_items(list_id: int):
         return jsonify({
             "status": "error",
             "error": {"message": f"Failed to reorder items: {str(e)}"},
+            "version": "1.0"
+        }), 500
+
+
+@watch_lists_bp.route('/flags/<color>', methods=['GET'], endpoint='get_flagged_tickers')
+@handle_database_session()
+@api_endpoint(cache_ttl=60, rate_limit=60)
+def get_flagged_tickers(color: str):
+    """
+    Get all tickers with a specific flag color across all user's watch lists.
+    
+    Args:
+        color: Flag color in hex format (e.g., '#26baac')
+    
+    Returns:
+        JSON response with list of flagged items
+    """
+    db: Session = g.db
+    user_id = _resolve_user_id()
+    
+    try:
+        normalizer = _get_watch_lists_normalizer()
+        
+        # Get all watch lists for user
+        watch_lists = WatchListService.get_watch_lists(db, user_id)
+        list_ids = [wl.id for wl in watch_lists]
+        
+        if not list_ids:
+            return jsonify({
+                "status": "success",
+                "data": [],
+                "count": 0,
+                "timestamp": normalizer.now_envelope(),
+                "version": "1.0"
+            }), 200
+        
+        # Get all items from user's lists
+        # Flag color is determined by which flag list the ticker is in, not stored in item
+        from models.watch_list import WatchListItem
+        all_items = (
+            db.query(WatchListItem)
+            .filter(WatchListItem.watch_list_id.in_(list_ids))
+            .order_by(WatchListItem.display_order.asc())
+            .all()
+        )
+        
+        # Filter items by flag color (check which flag list ticker is in)
+        items_data = []
+        for item in all_items:
+            # Pass db and user_id to to_dict() so it can check flag lists
+            item_dict = item.to_dict(db=db, user_id=user_id)
+            
+            # Only include items with the specified flag color
+            if item_dict.get('flag_color') == color:
+                # Add watch list name
+                watch_list = next((wl for wl in watch_lists if wl.id == item.watch_list_id), None)
+                if watch_list:
+                    item_dict['watch_list_name'] = watch_list.name
+                items_data.append(item_dict)
+        
+        items_data = normalizer.normalize_output(items_data)
+        
+        return jsonify({
+            "status": "success",
+            "data": items_data,
+            "count": len(items_data),
+            "timestamp": normalizer.now_envelope(),
+            "version": "1.0"
+        }), 200
+    except Exception as e:
+        import traceback
+        error_trace = traceback.format_exc()
+        logger.error(f"Error getting flagged tickers: {str(e)}\nTraceback:\n{error_trace}")
+        return jsonify({
+            "status": "error",
+            "error": {"message": f"Failed to retrieve flagged tickers: {str(e)}"},
+            "version": "1.0"
+        }), 500
+
+
+@watch_lists_bp.route('/flag-lists/sync', methods=['POST'], endpoint='sync_flag_lists')
+@handle_database_session()
+def sync_flag_lists():
+    """
+    Sync all flag lists for the current user.
+    Creates flag lists if they don't exist and syncs their items.
+    
+    Returns:
+        JSON response with sync status
+    """
+    db: Session = g.db
+    try:
+        user_id = _resolve_user_id()
+    except ValueError as e:
+        return _handle_auth_error(e)
+    
+    try:
+        normalizer = _get_watch_lists_normalizer()
+        
+        # Get all 8 flag entity types (constant identifiers, not colors)
+        flag_entity_types = [
+            'trade',
+            'trade_plan',
+            'account',
+            'cash_flow',
+            'ticker',
+            'alert',
+            'note',
+            'execution'
+        ]
+        
+        synced_lists = []
+        
+        # Get or create flag lists and sync them
+        # Note: We don't pass colors here - they will be set by frontend based on user preferences
+        for entity_type in flag_entity_types:
+            flag_list = WatchListService.get_or_create_flag_list(db, user_id, entity_type, flag_color=None)
+            WatchListService.sync_flag_list_items(db, flag_list.id, user_id)
+            synced_lists.append(flag_list.to_dict())
+        
+        # Normalize dates
+        synced_lists = normalizer.normalize_output(synced_lists)
+        
+        return jsonify({
+            "status": "success",
+            "data": synced_lists,
+            "count": len(synced_lists),
+            "message": "Flag lists synced successfully",
+            "timestamp": normalizer.now_envelope(),
+            "version": "1.0"
+        }), 200
+    except Exception as e:
+        import traceback
+        error_trace = traceback.format_exc()
+        logger.error(f"Error syncing flag lists: {str(e)}\nTraceback:\n{error_trace}")
+        return jsonify({
+            "status": "error",
+            "error": {"message": f"Failed to sync flag lists: {str(e)}"},
+            "version": "1.0"
+        }), 500
+
+
+@watch_lists_bp.route('/flag-lists/<entity_type>/sync', methods=['POST'], endpoint='sync_single_flag_list')
+@handle_database_session()
+def sync_single_flag_list(entity_type: str):
+    """
+    Sync a single flag list for a specific entity type.
+    
+    Args:
+        entity_type: Entity type (trade, trade_plan, account, etc.) - constant identifier
+    
+    Request Body (optional):
+        {
+            "flag_color": "#26baac"  # For display only, from user preferences
+        }
+    
+    Returns:
+        JSON response with sync status
+    """
+    db: Session = g.db
+    try:
+        user_id = _resolve_user_id()
+    except ValueError as e:
+        return _handle_auth_error(e)
+    
+    try:
+        normalizer = _get_watch_lists_normalizer()
+        
+        # Get color from request body if provided (from user preferences)
+        data = request.get_json() or {}
+        flag_color = data.get('flag_color')
+        
+        # Get or create flag list by entityType (not color)
+        flag_list = WatchListService.get_or_create_flag_list(db, user_id, entity_type, flag_color=flag_color)
+        
+        # Sync items
+        WatchListService.sync_flag_list_items(db, flag_list.id, user_id)
+        
+        # Get updated list data
+        list_data = flag_list.to_dict()
+        list_data = normalizer.normalize_output([list_data])[0]
+        
+        return jsonify({
+            "status": "success",
+            "data": list_data,
+            "message": "Flag list synced successfully",
+            "timestamp": normalizer.now_envelope(),
+            "version": "1.0"
+        }), 200
+    except Exception as e:
+        import traceback
+        error_trace = traceback.format_exc()
+        logger.error(f"Error syncing flag list {color}: {str(e)}\nTraceback:\n{error_trace}")
+        return jsonify({
+            "status": "error",
+            "error": {"message": f"Failed to sync flag list: {str(e)}"},
             "version": "1.0"
         }), 500
 

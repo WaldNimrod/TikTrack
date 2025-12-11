@@ -8,6 +8,29 @@
  * @created January 2025
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Event Handlers ===
+// - testDataCollection() - Testdatacollection
+// - testCRUDValidation() - Testcrudvalidation
+
+// === UI Functions ===
+// - testFieldRenderer() - Testfieldrenderer
+// - updateSummary() - Updatesummary
+
+// === Data Functions ===
+// - testSetFormData() - Testsetformdata
+
+// === Other ===
+// - testResetForm() - Testresetform
+// - testSelectPopulator() - Testselectpopulator
+// - testCRUDSuccess() - Testcrudsuccess
+// - testCRUDServerError() - Testcrudservererror
+// - testDefaultValues() - Testdefaultvalues
+// - testPreferenceValues() - Testpreferencevalues
+// - testStatistics() - Teststatistics
+
 // ===== GLOBAL TEST DATA =====
 
 const testResults = {

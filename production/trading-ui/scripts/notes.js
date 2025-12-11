@@ -5,62 +5,61 @@
  * 
  * This index lists all functions in this file, organized by category.
  * 
- * Total Functions: 40
+ * Total Functions: 38
  * 
  * PAGE INITIALIZATION (1)
  * - setupNoteValidationEvents() - setupNoteValidationEvents function
  * 
- * DATA LOADING (5)
+ * DATA LOADING (6)
+ * - loadAdditionalNotesData() - loadAdditionalNotesData function
  * - downloadFile() - downloadFile function
  * - getEditorContent() - * ניקוי עיצוב בעורך
  * - getTypeDisplayName() - getTypeDisplayName function
- * - loadNoteForViewing() - * View a note
+ * - loadNoteForViewing() - loadNoteForViewing function
  * - getNoteRelatedDisplay() - getNoteRelatedDisplay function
  * 
- * DATA MANIPULATION (11)
- * - deleteNote() - * Open note details modal
+ * DATA MANIPULATION (10)
+ * - deleteNote() - * Edit note
  * - updateNotesTable() - updateNotesTable function
  * - updateNotesSummary() - updateNotesSummary function
  * - updateGridFromComponent() - updateGridFromComponent function
  * - updateRadioButtons() - updateRadioButtons function
- * - saveNote() - saveNote function
+ * - saveNote() - * ולידציה של טופס הערה
  * - updateNoteFromModal() - updateNoteFromModal function
  * - confirmDeleteNote() - confirmDeleteNote function
  * - deleteNoteFromServer() - deleteNoteFromServer function
  * - removeCurrentAttachment() - removeCurrentAttachment function
- * - showAddNoteModal() - * Replace current attachment
  * 
  * EVENT HANDLING (3)
  * - onNoteRelationTypeChange() - onNoteRelationTypeChange function
  * - clearNoteValidationErrors() - clearNoteValidationErrors function
- * - setEditorContent() - * קבלת תוכן מעורך הטקסט
+ * - setEditorContent() - setEditorContent function
  * 
- * UI UPDATES (3)
+ * UI UPDATES (2)
  * - showTickerPage() - * שחזור מצב סידור - שימוש בפונקציה גלובלית
- * - displayCurrentAttachment() - * Edit current note
- * - showEditNoteModal() - * Toggle section using global function
+ * - displayCurrentAttachment() - displayCurrentAttachment function
  * 
- * VALIDATION (2)
+ * VALIDATION (1)
  * - validateNoteForm() - validateNoteForm function
- * - validateEditNoteForm() - * ולידציה של טופס הערה
  * 
  * UTILITIES (2)
  * - formatText() - * פונקציה להצגת דף טיקר (כרגע הודעת "בפיתוח")
  * - clearFormatting() - clearFormatting function
  * 
- * OTHER (12)
- * - viewLinkedItems() - viewLinkedItems function
+ * OTHER (13)
  * - openNoteDetails() - openNoteDetails function
- * - editNote() - * Open note details modal
+ * - editNote() - * Open add note modal (not view details)
  * - populateSelect() - * Update grid from component filters
  * - populateEditSelectByType() - * Handle note relation type change
+ * - populateEditSelectByTypeFallback() - populateEditSelectByTypeFallback function
  * - clearSelectedFile() - clearSelectedFile function
  * - restoreSortState() - restoreSortState function
  * - filterNotesData() - filterNotesData function
  * - filterNotesByType() - * Filter notes data by search term
- * - viewNote() - * Get display name for type
+ * - viewNote() - viewNote function
  * - editCurrentNote() - editCurrentNote function
  * - replaceCurrentAttachment() - replaceCurrentAttachment function
+ * - restorePageState() - * Replace current attachment
  * 
  * ==========================================
  */
@@ -609,7 +608,8 @@ async function updateNotesTable(notes, options = {}) {
   try {
     const { skipPagination = false } = options;
     window.Logger.info('🟢🟢🟢 updateNotesTable נקראה (פונקציה רגילה) עם', notes ? notes.length : 0, 'הערות', { page: "notes" });
-    window.Logger.info('🔍🔍🔵 Stack trace:', new Error().stack, { page: "notes" });
+    // Removed stack trace logging - it was causing false positive errors in testing
+    // window.Logger.info('🔍🔍🔵 Stack trace:', new Error().stack, { page: "notes" });
     
     const tbody = document.querySelector('#notesTable tbody');
     if (!tbody) {

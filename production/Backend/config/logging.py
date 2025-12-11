@@ -12,10 +12,9 @@ def setup_logging() -> logging.Logger:
     import os
     ENVIRONMENT = os.getenv('TIKTRACK_ENV', 'development').lower()
     IS_PRODUCTION = ENVIRONMENT == 'production'
-    IS_TESTING = ENVIRONMENT == 'testing'
     
-    # Create logs directory - different for production/testing vs development
-    if IS_PRODUCTION or IS_TESTING:
+    # Create logs directory - different for production vs development
+    if IS_PRODUCTION:
         log_dir = Path("logs-production")
     else:
         log_dir = Path("logs")
@@ -109,9 +108,8 @@ def get_cache_logger() -> logging.Logger:
         import os
         ENVIRONMENT = os.getenv('TIKTRACK_ENV', 'development').lower()
         IS_PRODUCTION = ENVIRONMENT == 'production'
-        IS_TESTING = ENVIRONMENT == 'testing'
         
-        if IS_PRODUCTION or IS_TESTING:
+        if IS_PRODUCTION:
             log_dir = Path("logs-production")
         else:
             log_dir = Path("logs")

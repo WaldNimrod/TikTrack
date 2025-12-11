@@ -227,6 +227,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.TickerChartWidget', // Ticker Chart Widget
         'window.TradingViewWidgetsFactory', // TradingView Widgets Factory (required for TickerChartWidget)
         'window.WatchListsWidgetService', // Watch Lists Widget Service
+        'window.WatchListsWidget', // Watch Lists Widget
         'window.conditionsInitializer', // Conditions System
         'window.ConditionsUIManager', // Conditions System
         'window.UnifiedAppInitializer', // Unified Init System
@@ -316,6 +317,19 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
             }
           } else {
             window.Logger?.warn?.('⚠️ TickerChartWidget not available', { page: 'page-initialization-configs' });
+          }
+
+          // Initialize watch lists widget
+          if (window.WatchListsWidget) {
+            try {
+              await window.WatchListsWidget.init('watchListsWidgetContainer', {
+                maxItems: 10
+              });
+            } catch (error) {
+              window.Logger?.error?.('❌ Error initializing WatchListsWidget', { error: error.message, stack: error.stack, page: 'page-initialization-configs' });
+            }
+          } else {
+            window.Logger?.warn?.('⚠️ WatchListsWidget not available', { page: 'page-initialization-configs' });
           }
 
           // Initialize positions & portfolio system
@@ -1918,11 +1932,23 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       customInitializers: [
         async pageConfig => {
           window.Logger.info('📈 Initializing Trades Formatted...', { page: 'page-initialization-configs' });
+          // Throttle trade-plans to avoid 429 when page loads
+          if (window.RateLimitTracker?.setDelay) {
+            window.RateLimitTracker.setDelay(1500); // 1.5s between requests on this page
+          }
           if (typeof window.loadTradesData === 'function') {
             if (window.CacheTTLGuard?.ensure) {
               await window.CacheTTLGuard.ensure('trade-data', window.loadTradesData);
             } else {
               await window.loadTradesData();
+            }
+          }
+          // Optionally prefetch limited trade plans with small page size to reduce hits
+          if (typeof window.TradePlansData?.loadTradePlans === 'function') {
+            try {
+              await window.TradePlansData.loadTradePlans({ limit: 20 }); // small batch to avoid bursts
+            } catch (e) {
+              window.Logger?.warn?.('⚠️ Prefetch trade plans failed (non-blocking)', { page: 'trades_formatted', error: e?.message });
             }
           }
         },
@@ -2322,6 +2348,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'crud',
         'entity-services',
         'watch-lists',
+        'tradingview-widgets', // Required for mini charts in cards view
         'init-system',
       ],
       requiredGlobals: [
@@ -2338,6 +2365,8 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.CRUDResponseHandler',
         'window.UnifiedTableSystem',
         'window.PageStateManager',
+        'window.TradingViewWidgetsFactory', // Required for mini charts
+        'window.TradingViewWidgetsColors', // Required for theme support
       ],
       description: 'ניהול רשימות צפייה - יצירה, עריכה, מחיקה וניהול טיקרים',
       lastModified: '2025-12-06',
@@ -3374,6 +3403,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'ui-advanced',
         'crud',
         'entity-services',
+        'entity-details', // Required for enriching ticker data with market prices, positions, etc.
         'watch-lists',
         'init-system'
       ],
@@ -3388,10 +3418,17 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.ModalManagerV2',
         'window.HeaderSystem',
         'window.UnifiedTableSystem',
+        'window.createActionsMenu', // Actions Menu System - required for actions menu
         'window.validateTextField', // Validation functions
-        'window.tickersModalConfig' // Required for nested ticker addition modal
+        'window.tickersModalConfig', // Required for nested ticker addition modal
+        'window.AddTickerModal', // Required for add ticker modal
+        'window.addTickerToList', // Required for add ticker modal save function
+        'window.entityDetailsAPI' // Required for enriching ticker data with market prices, positions, etc.
       ],
-      pageSpecificScripts: ['scripts/watch-lists-page.js'],
+      pageSpecificScripts: [
+        'scripts/watch-lists-page.js',
+        'scripts/add-ticker-modal.js' // Add ticker modal
+      ],
       description: 'עמוד ניהול רשימות צפייה - production',
       lastModified: '2025-12-06',
       pageType: 'main',
@@ -3402,7 +3439,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       sectionsDefaultState: 'open',
       sectionDefaultStates: {
         'top': 'open',
-        'watch-lists': 'open',
         'active-list': 'open',
         'flagged': 'closed'
       },
@@ -3647,35 +3683,44 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
           });
         },
       ],
-    },    'portfolio-state-page': {
+    },    'portfolio-state': {
       name: 'מצב תיק היסטורי',
       description: 'עמוד מצב תיק היסטורי - ניתוח וצפייה במצב תיק בנקודות זמן שונות',
       lastModified: '2025-01-12',
       pageType: 'main',
       packages: [
+        // Standard loading order (see STANDARD_LOADING_ORDER.md)
         "base",
         "services",
         "ui-advanced",
-        "modules",
         "crud",
         "preferences",
         "entity-services",
+        "info-summary",
         "charts",
+        "tradingview-charts",
+        "modules",
         "init-system"
       ],
       requiredGlobals: [
         'window.UnifiedAppInitializer', // Unified Init System
         'window.PAGE_CONFIGS', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
+        'window.TikTrackAuth',
+        'window.AuthGuard',
         "NotificationSystem",
         "window.IconSystem",
         "window.FieldRendererService",
         "window.UnifiedTableSystem",
+        "window.InfoSummarySystem",
+        "window.UnifiedProgressManager",
+        "window.ButtonSystem",
         "window.ModalManagerV2",
         "window.LinkedItemsService",
         "window.SelectPopulatorService",
         "window.DataCollectionService",
-        "window.CRUDResponseHandler"
+        "window.CRUDResponseHandler",
+        "window.PortfolioStateData" // Portfolio State Data Service
       ],
       preloadAssets: ['portfolio-state-page-data'],
       cacheStrategy: 'standard',
@@ -3684,9 +3729,19 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       requiresTables: true,
       customInitializers: [
         async pageConfig => {
-          window.Logger?.info('📄 Initializing portfolio-state-page...', {
+          window.Logger?.info('📄 Initializing portfolio-state...', {
             page: 'page-initialization-configs',
           });
+          
+          // Ensure authentication is established before loading page data
+          if (window.AuthGuard?.init) {
+            try {
+              await window.AuthGuard.init();
+              window.Logger?.info('✅ AuthGuard initialized for portfolio-state', { page: 'page-initialization-configs' });
+            } catch (e) {
+              window.Logger?.error('❌ AuthGuard init failed for portfolio-state', { page: 'page-initialization-configs', error: e });
+            }
+          }
           
           // Wait for portfolioStatePage to be available
           if (!window.portfolioStatePage) {
@@ -3712,23 +3767,23 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
           if (typeof window.portfolioStatePage.initializePage === 'function') {
             try {
               await window.portfolioStatePage.initializePage();
-              window.Logger?.info('✅ Portfolio State Page initialized via UnifiedAppInitializer', {
+              window.Logger?.info('✅ Portfolio State initialized via UnifiedAppInitializer', {
                 page: 'page-initialization-configs',
               });
             } catch (error) {
-              window.Logger?.error('❌ Error initializing Portfolio State Page', {
+              window.Logger?.error('❌ Error initializing Portfolio State', {
                 page: 'page-initialization-configs',
                 error,
               });
             }
           } else {
-            window.Logger?.info('ℹ️ Portfolio State Page will initialize via DOMContentLoaded', {
+            window.Logger?.info('ℹ️ Portfolio State will initialize via DOMContentLoaded', {
               page: 'page-initialization-configs',
             });
           }
         },
       ],
-    },    'trade-history-page': {
+    },    'trade-history': {
       name: 'היסטוריית טרייד',
       description: 'עמוד היסטוריית טרייד - ניתוח וצפייה בהיסטוריית טריידים',
       lastModified: '2025-01-12',
@@ -3744,6 +3799,8 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         "entity-details",
         "info-summary",
         "charts",
+        "tradingview-charts", // Required for TradingView charts in trade history
+        "external-data", // Required for loading external historical data
         "init-system"
       ],
       requiredGlobals: [
@@ -3759,7 +3816,10 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         "window.InfoSummarySystem",
         "window.SelectPopulatorService",
         "window.DataCollectionService",
-        "window.CRUDResponseHandler"
+        "window.CRUDResponseHandler",
+        "window.ExternalDataService", // Required for loading external historical data
+        "window.TradeHistoryData", // Trade History Data Service
+        "window.tradeHistoryPage" // Trade History Page Script
       ],
       preloadAssets: ['trade-history-page-data'],
       cacheStrategy: 'standard',
@@ -3768,7 +3828,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       requiresTables: true,
       customInitializers: [
         async pageConfig => {
-          window.Logger?.info('📄 Initializing trade-history-page...', {
+          window.Logger?.info('📄 Initializing trade-history...', {
             page: 'page-initialization-configs',
           });
           
@@ -3909,7 +3969,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
           });
         },
       ],
-    },    'trading-journal-page': {
+    },    'trading-journal': {
       name: 'יומן מסחר',
       description: 'עמוד יומן מסחר - ניהול ותצוגת יומן מסחר עם לוח שנה',
       lastModified: '2025-01-12',
@@ -3921,6 +3981,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         "modules",
         "crud",
         "preferences",
+        "tradingview-charts", // Required for TradingView activity chart
         "entity-services",
         "entity-details",
         "info-summary",
@@ -3938,7 +3999,10 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         "window.InfoSummarySystem",
         "window.SelectPopulatorService",
         "window.DataCollectionService",
-        "window.CRUDResponseHandler"
+        "window.CRUDResponseHandler",
+        "window.TradingJournalData", // Trading Journal Data Service
+        "window.TradingViewChartAdapter", // TradingView chart adapter for activity chart
+        "window.LightweightCharts" // TradingView Lightweight Charts library
       ],
       preloadAssets: ['trading-journal-page-data'],
       cacheStrategy: 'standard',
@@ -3950,6 +4014,29 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
           window.Logger?.info('📄 Initializing trading-journal-page...', {
             page: 'page-initialization-configs',
           });
+          
+          // Wait for TradingViewChartAdapter to be available
+          if (!window.TradingViewChartAdapter) {
+            window.Logger?.warn('⚠️ TradingViewChartAdapter not available yet, waiting...', {
+              page: 'page-initialization-configs',
+            });
+            
+            let retries = 0;
+            while (!window.TradingViewChartAdapter && retries < 50) {
+              await new Promise(resolve => setTimeout(resolve, 100));
+              retries++;
+            }
+            
+            if (!window.TradingViewChartAdapter) {
+              window.Logger?.error('❌ TradingViewChartAdapter not available after wait', {
+                page: 'page-initialization-configs',
+              });
+            } else {
+              window.Logger?.info('✅ TradingViewChartAdapter loaded', {
+                page: 'page-initialization-configs',
+              });
+            }
+          }
           
           // Wait for tradingJournalPage to be available
           if (!window.tradingJournalPage) {
@@ -4027,6 +4114,79 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
           window.Logger?.info('📄 Initializing strategy-analysis-page...', {
             page: 'page-initialization-configs',
           });
+        },
+      ],
+    },    'strategy-analysis': {
+      name: 'ניתוח אסטרטגיות',
+      description: 'עמוד ניתוח אסטרטגיות - ניתוח ביצועי אסטרטגיות מסחר',
+      lastModified: '2025-01-27',
+      pageType: 'main',
+      packages: [
+        "base",
+        "services",
+        "ui-advanced",
+        "modules",
+        "crud",
+        "preferences",
+        "entity-services",
+        "entity-details",
+        "info-summary",
+        "conditions",
+        "tradingview-charts",
+        "init-system"
+      ],
+      requiredGlobals: [
+        'window.UnifiedAppInitializer',
+        'window.PAGE_CONFIGS',
+        'window.PACKAGE_MANIFEST',
+        "NotificationSystem",
+        "window.IconSystem",
+        "window.FieldRendererService",
+        "window.SelectPopulatorService",
+        "window.DataCollectionService",
+        "window.DefaultValueSetter",
+        "window.TableSortValueAdapter",
+        "window.LinkedItemsService",
+        "window.CRUDResponseHandler",
+        "window.createActionsMenu",
+        "window.ModalNavigationManager",
+        "window.ModalManagerV2",
+        "window.conditionsInitializer",
+        "window.ConditionsUIManager",
+        "window.PaginationSystem",
+        "window.InfoSummarySystem",
+        "window.TradingViewChartAdapter"
+      ],
+      preloadAssets: ['strategy-analysis-data'],
+      cacheStrategy: 'standard',
+      requiresFilters: true,
+      requiresValidation: false,
+      requiresTables: true,
+      customInitializers: [
+        async pageConfig => {
+          window.Logger?.info('📊 Initializing strategy-analysis page...', {
+            page: 'page-initialization-configs',
+          });
+          
+          // Wait for strategy-analysis-page.js to be available
+          if (window.strategyAnalysisPage && typeof window.strategyAnalysisPage.initializePage === 'function') {
+            await window.strategyAnalysisPage.initializePage();
+          } else {
+            // Wait up to 5 seconds for the script to load
+            let retries = 0;
+            while ((!window.strategyAnalysisPage || typeof window.strategyAnalysisPage?.initializePage !== 'function') && retries < 50) {
+              await new Promise(resolve => setTimeout(resolve, 100));
+              retries++;
+            }
+            
+            if (window.strategyAnalysisPage && typeof window.strategyAnalysisPage.initializePage === 'function') {
+              await window.strategyAnalysisPage.initializePage();
+            } else {
+              window.Logger?.warn('⚠️ strategyAnalysisPage.initializePage not available', {
+                page: 'page-initialization-configs',
+              });
+            }
+          }
         },
       ],
     },    'economic-calendar-page': {

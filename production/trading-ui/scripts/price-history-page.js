@@ -7,6 +7,24 @@
  * Documentation: See documentation/frontend/JAVASCRIPT_ARCHITECTURE.md
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - initTradingViewWidget() - Inittradingviewwidget
+// - setupTradingViewWidgetTickerSelector() - Setuptradingviewwidgettickerselector
+// - initializeHeader() - Initializeheader
+// - initializePage() - Initializepage
+
+// === UI Functions ===
+// - updateTradingViewWidgetSymbol() - Updatetradingviewwidgetsymbol
+
+// === Data Functions ===
+// - savePageState() - Savepagestate
+
+// === Other ===
+// - restorePageState() - Restorepagestate
+
 (function() {
     'use strict';
 

@@ -8,6 +8,14 @@
  * @created 26 בנובמבר 2025
  */
 
+/* ===== Hide watch-lists-section (removed from HTML) ===== */
+#watch-lists-section {
+    display: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    overflow: hidden !important;
+}
+
 /* ===== Watch List Card ===== */
 .watch-list-card {
     border: 1px solid var(--border-color, #dee2e6);
@@ -114,13 +122,14 @@
 
 /* ===== Flag Palette Popup ===== */
 .flag-palette-popup {
-    position: absolute;
+    position: fixed; /* Changed from absolute to fixed for better positioning */
     background: white;
     border: 1px solid var(--border-color, #dee2e6);
     border-radius: 8px;
     padding: 1rem;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     z-index: 1050;
+    display: none; /* Hidden by default, shown via JavaScript */
 }
 
 .flag-palette-header {
@@ -176,7 +185,7 @@
 .watch-list-item-card {
     border: 1px solid var(--border-color, #dee2e6);
     border-radius: 8px;
-    padding: 1rem;
+    padding: 0.25rem; /* Reduced padding (from 1rem to 0.25rem) - uniform from all sides */
     transition: all 0.2s;
 }
 
@@ -612,5 +621,100 @@
     font-size: 1.2rem;
     font-weight: bold;
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* ===== Compact View Overlay ===== */
+/* Base overlay styles are in _widget-overlay.css */
+/* Watch List specific styles below */
+.watch-list-compact-item {
+    position: relative;
+    overflow: visible;
+    z-index: 1;
+}
+
+.watch-list-compact-item.is-hovered {
+    z-index: 10;
+}
+
+.watch-list-compact-overlay {
+    /* Inherits base styles from _widget-overlay.css [data-overlay="true"] */
+    /* Additional watch-list specific styles can be added here if needed */
+}
+
+.watch-list-compact-overlay-content {
+    /* Inherits from _widget-overlay.css .widget-item-details-content */
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.watch-list-compact-overlay-row {
+    /* Inherits from _widget-overlay.css .widget-item-details-row */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding-block: 0.25rem;
+    font-size: 0.85rem;
+}
+
+.watch-list-compact-overlay-row + .watch-list-compact-overlay-row {
+    border-top: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.watch-list-compact-overlay-label {
+    /* Inherits from _widget-overlay.css .widget-item-details-label */
+    font-weight: 500;
+    color: var(--text-muted, #6c757d);
+    flex-shrink: 0;
+}
+
+.watch-list-compact-overlay-value {
+    /* Inherits from _widget-overlay.css .widget-item-details-value */
+    text-align: end;
+    flex: 1;
+    min-width: 0;
+    word-break: break-word;
+}
+
+/* RTL Support */
+[dir="rtl"] .watch-list-compact-overlay-value {
+    text-align: start;
+}
+
+/* ===== Cards View Mini Chart ===== */
+.watch-list-item-card [id^="watch-list-chart-"] {
+    min-height: 150px;
+    border-radius: 4px;
+    overflow: hidden;
+    background-color: var(--background-light, #f8f9fa);
+}
+
+/* Ensure TradingView widget container fits properly */
+.watch-list-item-card [id^="watch-list-chart-"] iframe {
+    border: none;
+    width: 100%;
+    height: 100%;
+}
+
+/* Cards view - reduced padding for compact cards */
+#watchListItemsCards .card-body {
+    padding: 0.25rem !important; /* Uniform padding from all sides */
+}
+
+#watchListItemsCards .card {
+    margin-bottom: 0.25rem; /* Reduced margin between cards */
+}
+
+/* Cards view info row styling */
+.watch-list-item-card .d-flex.flex-wrap.gap-2,
+.watch-list-item-card .d-flex.flex-wrap.gap-1 {
+    font-size: 0.85rem;
+    line-height: 1.4;
+}
+
+.watch-list-item-card .d-flex.flex-wrap.gap-2 > span,
+.watch-list-item-card .d-flex.flex-wrap.gap-1 > span {
+    white-space: nowrap;
 }
 

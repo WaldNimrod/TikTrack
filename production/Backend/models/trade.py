@@ -50,6 +50,7 @@ class Trade(BaseModel):
             # Return all necessary fields for the frontend while leaving datetime objects intact.
             result = {
                 "id": self.id,
+                "user_id": self.user_id,
                 "trading_account_id": self.trading_account_id,
                 "ticker_id": self.ticker_id,
                 "trade_plan_id": self.trade_plan_id,

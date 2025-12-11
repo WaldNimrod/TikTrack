@@ -294,7 +294,19 @@ from routes.pages import pages_bp
 app = Flask(__name__)
 # Set secret key for session management
 app.config['SECRET_KEY'] = os.getenv('FLASK_SECRET_KEY', 'dev-secret-key-change-in-production')
-CORS(app)
+# Configure session lifetime - sessions expire after 24 hours of inactivity
+from datetime import timedelta
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=24)
+# Configure session cookie security
+# HttpOnly: Prevents JavaScript access (XSS protection)
+app.config['SESSION_COOKIE_HTTPONLY'] = True
+# Secure: Only send over HTTPS (in production)
+from config.settings import IS_PRODUCTION
+app.config['SESSION_COOKIE_SECURE'] = IS_PRODUCTION
+# SameSite: CSRF protection while maintaining UX
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+# Configure CORS to support session cookies
+CORS(app, supports_credentials=True, origins=['http://localhost:8080', 'http://127.0.0.1:8080', 'http://localhost:5001', 'http://127.0.0.1:5001'])
 
 # Legacy SQLAlchemy compatibility layer for tests
 db = LegacyDBProxy(app)
@@ -510,11 +522,18 @@ app.register_blueprint(auth_bp)
 app.register_blueprint(background_tasks_bp)
 app.register_blueprint(entity_details_bp)
 
+# EOD Metrics API
+from routes.api.eod_metrics import eod_bp
+app.register_blueprint(eod_bp, url_prefix='/api/eod')
+
 # Business Logic API
 from routes.api.business_logic import business_logic_bp
 app.register_blueprint(business_logic_bp)
 
 # Historical Data API
+from routes.api.trade_history import trade_history_bp
+from routes.api.portfolio_state import portfolio_state_bp
+from routes.api.trading_journal import trading_journal_bp
 app.register_blueprint(trade_history_bp)
 app.register_blueprint(portfolio_state_bp)
 app.register_blueprint(trading_journal_bp)
@@ -556,6 +575,7 @@ app.register_blueprint(user_data_import_reports_bp, url_prefix='/api/user-data-i
 app.register_blueprint(external_quotes_bp, name='external_quotes')
 app.register_blueprint(status_bp)
 # API quotes endpoints (specification compliant)
+app.register_blueprint(quotes_bp)
 
 app.register_blueprint(pages_bp)
 

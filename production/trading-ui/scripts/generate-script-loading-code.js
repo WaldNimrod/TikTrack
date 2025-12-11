@@ -7,6 +7,15 @@
  * - TikTrackApp → development (without bundles)
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Event Handlers ===
+// - detectEnvironment() - Detectenvironment
+
+// === Data Functions ===
+// - generateScriptLoadingCode() - Generatescriptloadingcode
+
 const fs = require('fs');
 const path = require('path');
 
@@ -132,8 +141,9 @@ function generateScriptLoadingCode(pageName, mode = null, useBundles = null) {
     html += `    <!-- Critical: ${pkg.critical ? 'YES' : 'NO'} | Version: ${pkg.version} -->\n\n`;
     
     // Sort scripts within package by loadOrder
+    // Include all scripts - required and optional (required: false) are both needed
+    // The package is included in pageConfig.packages, so all its scripts should be loaded
     const sortedScripts = (pkg.scripts || [])
-      .filter(script => script.required !== false)
       .sort((a, b) => (a.loadOrder || 0) - (b.loadOrder || 0));
     
     // Check if bundle exists for this package
@@ -181,8 +191,9 @@ function generateScriptLoadingCode(pageName, mode = null, useBundles = null) {
     } else {
       // Use individual scripts (development mode or bundle doesn't exist)
       sortedScripts.forEach((script) => {
-        // Get loading strategy from package (default: defer for critical packages)
-        const loadingStrategy = pkg.loadingStrategy || 'defer';
+        // Include all scripts (required and optional) - they're in the package for a reason
+        // Get loading strategy from script or package (default: defer for critical packages)
+        const loadingStrategy = script.loadingStrategy || pkg.loadingStrategy || 'defer';
         
         html += `    <!-- [${scriptCounter}] Load Order: ${scriptCounter} | Strategy: ${loadingStrategy} -->\n`;
         
@@ -215,7 +226,19 @@ function generateScriptLoadingCode(pageName, mode = null, useBundles = null) {
   html += '    <!-- ===== PAGE-SPECIFIC SCRIPTS ===== -->\n';
   html += '    <!-- =============================================================== -->\n\n';
   
-  // Add page-specific scripts that are not in packages
+  // First, add the main page-specific script (e.g., cash_flows.js, alerts.js, trades.js)
+  // This is the primary script file for each page
+  const mainPageScript = `${pageName}.js`;
+  // __dirname is trading-ui/scripts, so the script is in the same directory
+  const mainPageScriptPath = path.join(__dirname, mainPageScript);
+  if (fs.existsSync(mainPageScriptPath) && !loadedScripts.has(mainPageScript)) {
+    html += `    <!-- [${scriptCounter}] Page-specific: ${mainPageScript} | Strategy: defer -->\n`;
+    html += `    <script src="scripts/${mainPageScript}?v=1.0.0" defer></script> <!-- Main page script -->\n\n`;
+    loadedScripts.add(mainPageScript);
+    scriptCounter++;
+  }
+  
+  // Add other page-specific scripts that are not in packages
   const pageSpecificScripts = [
     `${pageName}-manager.js`,
     `${pageName}-selector.js`,

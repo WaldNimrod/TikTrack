@@ -15,7 +15,20 @@
  *
  * Related Documentation:
  * - documentation/frontend/GENERAL_SYSTEMS_LIST.md
+ * - documentation/02-ARCHITECTURE/FRONTEND/HISTORICAL_DATA_SERVICES.md
  * - documentation/03-DEVELOPMENT/PLANS/HISTORICAL_PAGES_FULL_IMPLEMENTATION_PLAN.md
+ *
+ * Function Index:
+ * ==============
+ * 
+ * DATA LOADING (4):
+ * - loadSnapshot(accountId, date, options) - Load portfolio snapshot at specific date
+ * - loadSeries(accountId, startDate, endDate, options) - Load portfolio series for charts
+ * - loadPerformance(accountId, dateRange, options) - Load portfolio performance over date range
+ * - loadComparison(accountId, date1, date2, options) - Load portfolio comparison between dates
+ * 
+ * CACHE MANAGEMENT (1):
+ * - invalidateCache() - Invalidate all portfolio state cache
  *
  * @version 1.0.0
  * @created January 2025
@@ -65,7 +78,39 @@
       const base = location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
       const url = `${base}/api/portfolio-state/snapshot?${params.toString()}`;
       
-      const response = await fetch(url);
+      const response = await fetch(url, {
+        credentials: 'include' // Include cookies for session-based auth
+      });
+      
+      // Handle authentication errors (401/308) - show notification only once
+      if (response.status === 401 || response.status === 308) {
+        // Use centralized auth error handler if available
+        if (typeof window.handleAuthenticationError === 'function') {
+          window.handleAuthenticationError(url);
+        } else {
+          // Fallback: show single notification
+          if (!window._authErrorShown) {
+            window._authErrorShown = true;
+            window.NotificationSystem?.showError?.(
+              'נדרשת התחברות',
+              'עליך להתחבר למערכת כדי לצפות בנתונים. אנא התחבר כדי להמשיך.'
+            );
+          }
+        }
+        throw new Error(`Authentication required (${response.status})`);
+      }
+
+      if (response.status === 424) {
+        const errorPayload = await response.json().catch(() => ({}));
+        const missingTickers = errorPayload?.data?.missing_tickers || errorPayload?.missing_tickers || [];
+        if (missingTickers.length && window.NotificationSystem) {
+          window.NotificationSystem.showError('נתוני מחיר חסרים', `חסרים נתוני OHLC לטיקרים: ${missingTickers.join(', ')}`);
+        }
+        const err = new Error('Missing historical OHLC data');
+        err.missingTickers = missingTickers;
+        throw err;
+      }
+      
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -80,8 +125,13 @@
       window.Logger?.debug?.('✅ Portfolio snapshot loaded from API', PAGE_LOG_CONTEXT);
       return payload;
     } catch (error) {
-      window.Logger?.error?.('❌ Error loading portfolio snapshot', { ...PAGE_LOG_CONTEXT, error: error?.message || error });
-      window.NotificationSystem?.showError?.('שגיאה', 'שגיאה בטעינת מצב תיק');
+      // Don't show error notification for auth errors (already handled above)
+      if (error?.message?.includes('Authentication required')) {
+        window.Logger?.warn?.('⚠️ Authentication required for portfolio snapshot', { ...PAGE_LOG_CONTEXT });
+      } else {
+        window.Logger?.error?.('❌ Error loading portfolio snapshot', { ...PAGE_LOG_CONTEXT, error: error?.message || error });
+        window.NotificationSystem?.showError?.('שגיאה', 'שגיאה בטעינת מצב תיק');
+      }
       throw error;
     }
   }
@@ -127,7 +177,39 @@
       const base = location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
       const url = `${base}/api/portfolio-state/series?${params.toString()}`;
       
-      const response = await fetch(url);
+      const response = await fetch(url, {
+        credentials: 'include' // Include cookies for session-based auth
+      });
+
+      // Handle authentication errors (401/308) - show notification only once
+      if (response.status === 401 || response.status === 308) {
+        // Use centralized auth error handler if available
+        if (typeof window.handleAuthenticationError === 'function') {
+          window.handleAuthenticationError(url);
+        } else {
+          // Fallback: show single notification
+          if (!window._authErrorShown) {
+            window._authErrorShown = true;
+            window.NotificationSystem?.showError?.(
+              'נדרשת התחברות',
+              'עליך להתחבר למערכת כדי לצפות בנתונים. אנא התחבר כדי להמשיך.'
+            );
+          }
+        }
+        throw new Error(`Authentication required (${response.status})`);
+      }
+
+      if (response.status === 424) {
+        const errorPayload = await response.json().catch(() => ({}));
+        const missingTickers = errorPayload?.data?.missing_tickers || errorPayload?.missing_tickers || [];
+        if (missingTickers.length && window.NotificationSystem) {
+          window.NotificationSystem.showError('נתוני מחיר חסרים', `חסרים נתוני OHLC לטיקרים: ${missingTickers.join(', ')}`);
+        }
+        const err = new Error('Missing historical OHLC data');
+        err.missingTickers = missingTickers;
+        throw err;
+      }
+      
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -142,8 +224,13 @@
       window.Logger?.debug?.('✅ Portfolio series loaded from API', PAGE_LOG_CONTEXT);
       return payload;
     } catch (error) {
-      window.Logger?.error?.('❌ Error loading portfolio series', { ...PAGE_LOG_CONTEXT, error: error?.message || error });
-      window.NotificationSystem?.showError?.('שגיאה', 'שגיאה בטעינת סדרת מצב תיק');
+      // Don't show error notification for auth errors (already handled above)
+      if (error?.message?.includes('Authentication required')) {
+        window.Logger?.warn?.('⚠️ Authentication required for portfolio series', { ...PAGE_LOG_CONTEXT });
+      } else {
+        window.Logger?.error?.('❌ Error loading portfolio series', { ...PAGE_LOG_CONTEXT, error: error?.message || error });
+        window.NotificationSystem?.showError?.('שגיאה', 'שגיאה בטעינת סדרת מצב תיק');
+      }
       throw error;
     }
   }
@@ -191,7 +278,19 @@
       const base = location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
       const url = `${base}/api/portfolio-state/performance?${params.toString()}`;
       
-      const response = await fetch(url);
+      const response = await fetch(url, {
+        credentials: 'include' // Include cookies for session-based auth
+      });
+      if (response.status === 424) {
+        const errorPayload = await response.json().catch(() => ({}));
+        const missingTickers = errorPayload?.data?.missing_tickers || errorPayload?.missing_tickers || [];
+        if (missingTickers.length && window.NotificationSystem) {
+          window.NotificationSystem.showError('נתוני מחיר חסרים', `חסרים נתוני OHLC לטיקרים: ${missingTickers.join(', ')}`);
+        }
+        const err = new Error('Missing historical OHLC data');
+        err.missingTickers = missingTickers;
+        throw err;
+      }
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -251,7 +350,19 @@
       const base = location.protocol === 'file:' ? 'http://127.0.0.1:8080' : '';
       const url = `${base}/api/portfolio-state/comparison?${params.toString()}`;
       
-      const response = await fetch(url);
+      const response = await fetch(url, {
+        credentials: 'include' // Include cookies for session-based auth
+      });
+      if (response.status === 424) {
+        const errorPayload = await response.json().catch(() => ({}));
+        const missingTickers = errorPayload?.data?.missing_tickers || errorPayload?.missing_tickers || [];
+        if (missingTickers.length && window.NotificationSystem) {
+          window.NotificationSystem.showError('נתוני מחיר חסרים', `חסרים נתוני OHLC לטיקרים: ${missingTickers.join(', ')}`);
+        }
+        const err = new Error('Missing historical OHLC data');
+        err.missingTickers = missingTickers;
+        throw err;
+      }
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -313,4 +424,7 @@
 
   window.Logger?.debug?.('✅ PortfolioStateData service initialized', PAGE_LOG_CONTEXT);
 })();
+
+
+
 

@@ -19,6 +19,31 @@
  * @since 2025-01-02
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - WidgetMonitor.initialize() - Initialize
+// - WidgetMonitor.monitorWidgetInitialization() - Monitorwidgetinitialization
+// - WidgetMonitor.monitorOverlaySetups() - Monitoroverlaysetups
+// - WidgetMonitor.checkDuplicateInitializations() - Checkduplicateinitializations
+// - RecentItemsWidget.init() - Init
+// - UnifiedPendingActionsWidget.init() - Init
+// - TagWidget.init() - Init
+// - WidgetOverlayService.setupOverlayHover() - Setupoverlayhover
+
+// === Event Handlers ===
+// - WidgetMonitor.monitorEventListeners() - Monitoreventlisteners
+// - WidgetMonitor.monitorDataFetching() - Monitordatafetching
+// - WidgetMonitor.addIssue() - Addissue
+// - WidgetMonitor.checkAll() - Checkall
+// - WidgetMonitor.checkOverlayDuplicates() - Checkoverlayduplicates
+// - WidgetMonitor.checkEventListenerLeaks() - Checkeventlistenerleaks
+// - WidgetMonitor.monitorUndefinedFunctions() - Monitorundefinedfunctions
+// - WidgetMonitor.checkUndefinedFunctions() - Checkundefinedfunctions
+// - WidgetMonitor.generateReport() - Generatereport
+// - WidgetMonitor.clear() - Clear
+
 ;(function() {
   'use strict';
 

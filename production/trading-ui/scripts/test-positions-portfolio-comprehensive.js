@@ -19,6 +19,13 @@
  * 10. Data Formatting
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Other ===
+// - test() - Test
+// - warn() - Warn
+
 window.testPositionsPortfolioSystem = async function() {
   console.log('🔍 ===== COMPREHENSIVE POSITIONS/PORTFOLIO SYSTEM TEST =====');
   console.log('');

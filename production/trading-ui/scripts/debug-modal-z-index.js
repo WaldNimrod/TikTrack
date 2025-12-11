@@ -5,6 +5,12 @@
  * שימוש: הקלד בקונסולה: window.debugModalZIndex()
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Other ===
+// - debugModalZIndex() - Debugmodalzindex
+
 (function() {
     'use strict';
 

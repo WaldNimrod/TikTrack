@@ -3,6 +3,12 @@
  * כלי ניתוח סקריפטים
  */
 class ScriptAnalyzer {
+
+// ===== FUNCTION INDEX =====
+
+// === Other ===
+// - ScriptAnalyzer.analyze() - Analyze
+
   /**
    * Analyze page scripts
    */

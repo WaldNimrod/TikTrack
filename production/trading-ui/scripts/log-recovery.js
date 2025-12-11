@@ -19,6 +19,29 @@
  * ========================================
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Event Handlers ===
+// - handleLogEntry() - Handlelogentry
+// - handleCriticalError() - Handlecriticalerror
+// - handleWarning() - Handlewarning
+// - handleSuccess() - Handlesuccess
+// - monitorPerformance() - Monitorperformance
+// - monitorSecurity() - Monitorsecurity
+
+// === UI Functions ===
+// - updateLogDisplay() - Updatelogdisplay
+
+// === Data Functions ===
+// - loadLogs() - Loadlogs
+// - getAllLogEntries() - Getalllogentries
+
+// === Other ===
+// - addLogEntry() - Addlogentry
+// - copyUnresolvedIssuesLog() - Copyunresolvedissueslog
+// - attemptRecovery() - Attemptrecovery
+
 /**
  * טעינת לוגים
  * Load logs

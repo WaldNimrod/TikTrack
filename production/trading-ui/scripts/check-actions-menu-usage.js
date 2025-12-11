@@ -11,6 +11,26 @@
  * 3. Missing actions-menu-system.js loading
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Event Handlers ===
+// - getStatusDescription() - Getstatusdescription
+
+// === Data Functions ===
+// - getStatusText() - Getstatustext
+
+// === Utility Functions ===
+// - checkPackageManifest() - Checkpackagemanifest
+// - formatPageIssues() - Formatpageissues
+
+// === Other ===
+// - scanJavaScriptFile() - Scanjavascriptfile
+// - scanHTMLFile() - Scanhtmlfile
+// - findJavaScriptFile() - Findjavascriptfile
+// - scanAllPages() - Scanallpages
+// - generateReport() - Generatereport
+
 const fs = require('fs');
 const path = require('path');
 
@@ -293,9 +313,9 @@ function generateReport() {
 
 ## 📊 סיכום כללי
 
-- **סה"כ קבצים נסרקו:** ${totalFilesScanned}
-- **קבצים עם בעיות:** ${filesWithIssues}
-- **סה"כ בעיות:** ${deviations.reduce((sum, d) => sum + d.issues.length, 0)}
+// - **סה"כ קבצים נסרקו:** ${totalFilesScanned}
+// - **קבצים עם בעיות:** ${filesWithIssues}
+// - **סה"כ בעיות:** ${deviations.reduce((sum, d) => sum + d.issues.length, 0)}
 
 ---
 

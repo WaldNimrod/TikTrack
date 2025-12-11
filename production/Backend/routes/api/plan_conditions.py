@@ -5,7 +5,8 @@ API endpoints for plan conditions management
 
 from __future__ import annotations
 
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, g
+from sqlalchemy.orm import Session
 from datetime import datetime
 import logging
 import json
@@ -20,6 +21,7 @@ from services.preferences_service import PreferencesService
 from services.alert_service import AlertService
 from config.database import get_db
 from .base_entity_utils import BaseEntityUtils
+from .base_entity_decorators import handle_database_session
 
 logger = logging.getLogger(__name__)
 
@@ -1243,32 +1245,41 @@ def delete_condition_alert(condition_id):
         }), 500
 
 @plan_conditions_bp.route('/<int:condition_id>/alert/toggle', methods=['POST'])
+@handle_database_session()
 def toggle_condition_alert(condition_id):
-    """Toggle alert creation for a condition"""
+    """Toggle alert creation for a condition (for authenticated user)"""
+    db_session: Session = g.db
+    
+    # Get user_id from Flask context (set by auth middleware)
+    user_id = getattr(g, 'user_id', None)
+    
+    if user_id is None:
+        return jsonify({'status': 'error', 'message': 'User authentication required'}), 401
+    
     try:
-        db_session = next(get_db())
-        try:
-            condition = db_session.query(PlanCondition).filter(PlanCondition.id == condition_id).first()
-            if not condition:
-                return jsonify({'status': 'error', 'message': f'Plan condition with ID {condition_id} not found'}), 404
-            
-            # Toggle auto_generate_alerts
-            condition.auto_generate_alerts = not condition.auto_generate_alerts
-            db_session.commit()
-            
-            return jsonify({
-                'status': 'success',
-                'data': {
-                    'condition_id': condition_id,
-                    'auto_generate_alerts': condition.auto_generate_alerts
-                },
-                'message': f'Alert generation {"enabled" if condition.auto_generate_alerts else "disabled"} for condition {condition_id}'
-            }), 200
-            
-        except Exception as e:
-            raise e
-        finally:
-            db_session.close()
+        # Filter by user_id through trade_plan - plan conditions belong to trade plans
+        from models.trade_plan import TradePlan
+        condition = db_session.query(PlanCondition).join(
+            TradePlan, PlanCondition.trade_plan_id == TradePlan.id
+        ).filter(
+            PlanCondition.id == condition_id,
+            TradePlan.user_id == user_id
+        ).first()
+        if not condition:
+            return jsonify({'status': 'error', 'message': f'Plan condition with ID {condition_id} not found or access denied'}), 404
+        
+        # Toggle auto_generate_alerts
+        condition.auto_generate_alerts = not condition.auto_generate_alerts
+        db_session.commit()
+        
+        return jsonify({
+            'status': 'success',
+            'data': {
+                'condition_id': condition_id,
+                'auto_generate_alerts': condition.auto_generate_alerts
+            },
+            'message': f'Alert generation {"enabled" if condition.auto_generate_alerts else "disabled"} for condition {condition_id}'
+        }), 200
             
     except Exception as e:
         logger.error(f"Error toggling alert for condition {condition_id}: {str(e)}")

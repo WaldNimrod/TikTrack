@@ -6,6 +6,20 @@
  * גרסה: 1.0.0
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Core Functions ===
+// - runAllTests() - Runalltests
+
+// === Event Handlers ===
+// - testPageConfigs() - Testpageconfigs
+
+// === Other ===
+// - test() - Test
+// - addTestResult() - Addtestresult
+// - testPackagesSystem() - Testpackagessystem
+
 (function() {
   'use strict';
 

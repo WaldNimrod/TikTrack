@@ -13,7 +13,7 @@ from config import settings
 
 # Import base classes
 from .base_entity import BaseEntityAPI
-from .base_entity_decorators import api_endpoint, handle_database_session, validate_request
+from .base_entity_decorators import api_endpoint, handle_database_session, validate_request, require_authentication
 from .base_entity_utils import BaseEntityUtils
 
 logger = logging.getLogger(__name__)
@@ -129,9 +129,11 @@ def get_trades_pending_plan_creations():
         return jsonify(error_payload), 500
 
 @trades_bp.route('/', methods=['GET'])
+@require_authentication()
+@cache_with_deps(ttl=60, dependencies=['trades', 'tickers', 'market-data'])
 @handle_database_session()
 def get_trades():
-    """Get all trades with filtering options - enhanced with market data"""
+    """Get all trades with filtering options - enhanced with market data (OPTIMIZED)"""
     db: Session = g.db
     
     # Get user_id from Flask context (set by auth middleware)
@@ -139,22 +141,23 @@ def get_trades():
     
     # Get filtering parameters
     trading_account_id = request.args.get('trading_account_id', type=int)
+    ticker_id = request.args.get('ticker_id', type=int)
     status = request.args.get('status')
     
+    # Pagination parameters
+    page = request.args.get('page', type=int, default=1)
+    per_page = request.args.get('per_page', type=int, default=100)
+    per_page = min(per_page, 500)  # Max 500 per page
+    
     try:
-        # Monitoring: log DB configuration and current trades row count
-        try:
-            raw_count = db.execute("SELECT COUNT(*) FROM trades").scalar()
-        except Exception as _e:
-            raw_count = None
-        logger.info(
-            "Trades API debug: DATABASE_URL=%s, trades_count=%s",
-            getattr(settings, "DATABASE_URL", None),
-            raw_count,
-        )
         normalizer = _get_date_normalizer()
+        
         # If there are filtering parameters, use appropriate function
-        if trading_account_id and status:
+        if ticker_id:
+            logger.info(f"Filtering trades by ticker_id={ticker_id}")
+            trades = TradeService.get_by_ticker(db, ticker_id, user_id=user_id)
+            logger.info(f"Found {len(trades)} trades for ticker {ticker_id}")
+        elif trading_account_id and status:
             logger.info(f"Filtering trades by trading_account_id={trading_account_id} and status={status}")
             trades = TradeService.get_by_account_and_status(db, trading_account_id, status, user_id=user_id)
             logger.info(f"Found {len(trades)} trades for account {trading_account_id} with status {status}")
@@ -165,39 +168,76 @@ def get_trades():
         else:
             trades = TradeService.get_all(db, user_id=user_id)
         
+        # Apply pagination
+        total_count = len(trades)
+        start_idx = (page - 1) * per_page
+        end_idx = start_idx + per_page
+        paginated_trades = trades[start_idx:end_idx]
+        
         # Convert trades to dict with market data and position data
         trade_dicts = []
-        trade_ids = [trade.id for trade in trades]
+        trade_ids = [trade.id for trade in paginated_trades]
         
         # Calculate positions for all trades in batch
         positions = position_calculator.calculate_positions_batch(db, trade_ids)
         
-        for trade in trades:
-            trade_dict = trade.to_dict()
-            
-            # Add market data from ticker if available
-            if hasattr(trade, 'ticker') and trade.ticker:
-                # Get latest market data for the ticker
+        # OPTIMIZATION: Batch fetch market data for all tickers (fixes N+1 problem)
+        ticker_ids = list(set([trade.ticker_id for trade in paginated_trades if hasattr(trade, 'ticker_id') and trade.ticker_id]))
+        market_data_map = {}
+        
+        if ticker_ids:
+            try:
+                from models.external_data import MarketDataQuote
+                from sqlalchemy import text, func
+                
+                # Get latest market data for all tickers in one query using window function
+                # This is more efficient than N+1 queries
+                placeholders = ','.join([str(tid) for tid in ticker_ids])
+                query = text(f"""
+                    SELECT ticker_id, price, change_pct_day, change_amount_day
+                    FROM (
+                        SELECT ticker_id, price, change_pct_day, change_amount_day,
+                               ROW_NUMBER() OVER (PARTITION BY ticker_id ORDER BY fetched_at DESC) as rn
+                        FROM market_data_quotes
+                        WHERE ticker_id IN ({placeholders})
+                    ) ranked
+                    WHERE rn = 1
+                """)
+                
+                result = db.execute(query)
+                for row in result:
+                    market_data_map[row.ticker_id] = {
+                        'current_price': float(row.price) if row.price is not None else None,
+                        'daily_change': float(row.change_pct_day) if row.change_pct_day is not None else None,
+                        'change_amount': float(row.change_amount_day) if row.change_amount_day is not None else None
+                    }
+            except Exception as market_error:
+                logger.warning(f"Error batch fetching market data: {str(market_error)}")
+                # Fallback: try simple query without window function
                 try:
                     from models.external_data import MarketDataQuote
-                    latest_quote = db.query(MarketDataQuote).filter(
-                        MarketDataQuote.ticker_id == trade.ticker.id
-                    ).order_by(MarketDataQuote.fetched_at.desc()).first()
-                    
-                    if latest_quote:
-                        trade_dict['current_price'] = latest_quote.price
-                        trade_dict['daily_change'] = latest_quote.change_pct_day
-                        trade_dict['change_amount'] = latest_quote.change_amount_day
-                    else:
-                        trade_dict['current_price'] = None
-                        trade_dict['daily_change'] = None
-                        trade_dict['change_amount'] = None
-                except Exception as market_error:
-                    # Handle database corruption or other errors gracefully
-                    logger.warning(f"Error fetching market data for trade {trade.id} (ticker {trade.ticker.id}): {str(market_error)}")
-                    trade_dict['current_price'] = None
-                    trade_dict['daily_change'] = None
-                    trade_dict['change_amount'] = None
+                    for ticker_id in ticker_ids:
+                        latest_quote = db.query(MarketDataQuote).filter(
+                            MarketDataQuote.ticker_id == ticker_id
+                        ).order_by(MarketDataQuote.fetched_at.desc()).first()
+                        if latest_quote:
+                            market_data_map[ticker_id] = {
+                                'current_price': latest_quote.price,
+                                'daily_change': latest_quote.change_pct_day,
+                                'change_amount': latest_quote.change_amount_day
+                            }
+                except:
+                    pass
+        
+        for trade in paginated_trades:
+            trade_dict = trade.to_dict()
+            
+            # Add market data from batch map
+            if trade.ticker_id in market_data_map:
+                market_data = market_data_map[trade.ticker_id]
+                trade_dict['current_price'] = market_data['current_price']
+                trade_dict['daily_change'] = market_data['daily_change']
+                trade_dict['change_amount'] = market_data['change_amount']
             else:
                 trade_dict['current_price'] = None
                 trade_dict['daily_change'] = None
@@ -208,14 +248,17 @@ def get_trades():
             
             trade_dicts.append(trade_dict)
         
-        if trade_dicts:
-            logger.info(f"First trade data: {trade_dicts[0]}")
-        
         trade_dicts = normalizer.normalize_output(trade_dicts)
         
         return jsonify({
             "status": "success",
             "data": trade_dicts,
+            "pagination": {
+                "page": page,
+                "per_page": per_page,
+                "total": total_count,
+                "pages": (total_count + per_page - 1) // per_page
+            },
             "message": "Trades retrieved successfully",
             "timestamp": normalizer.now_envelope(),
             "version": "1.0"
@@ -279,6 +322,16 @@ def create_trade():
     try:
         # Get user_id from Flask context (set by auth middleware)
         user_id = getattr(g, 'user_id', None)
+        
+        # CRITICAL: user_id is required for trade creation
+        if user_id is None:
+            normalizer = _get_date_normalizer()
+            return jsonify({
+                "status": "error",
+                "error": {"message": "User authentication required. Please log in to create trades."},
+                "timestamp": normalizer.now_envelope(),
+                "version": "1.0"
+            }), 401
         
         normalizer = _get_date_normalizer()
         data = request.get_json() or {}

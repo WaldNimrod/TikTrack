@@ -607,6 +607,7 @@ class AdvancedButtonSystem {
         let attributes = element.getAttribute('data-attributes') || '';
         const text = element.getAttribute('data-text') || '';
         const icon = element.getAttribute('data-icon') || '';
+        const iconPath = element.getAttribute('data-icon-path') || '';
         // CRITICAL: Generate unique ID to prevent conflicts
         // If data-id is provided, use it; otherwise create unique ID based on button type and index
         let id = element.getAttribute('data-id');
@@ -676,7 +677,7 @@ class AdvancedButtonSystem {
 
         const newButton = this.createButtonFromData(
             buttonType, onClick, classes, attributes, text, id,
-            entityType, size, style, variant, icon, tooltipConfig
+            entityType, size, style, variant, icon, tooltipConfig, iconPath
         );
 
         if (newButton) {
@@ -787,14 +788,32 @@ class AdvancedButtonSystem {
     }
 
     createButtonFromData(type, onClick, classes, attributes, text, id,
-                         entityType, size, style, variant, iconOverride = '', tooltipConfig = null) {
+                         entityType, size, style, variant, iconOverride = '', tooltipConfig = null, iconPathFromElement = '') {
         if (window.BUTTON_ICONS && window.BUTTON_TEXTS && window.getButtonClass) {
             // Handle null/undefined type (for custom buttons without data-button-type)
             const typeUpper = type ? type.toUpperCase() : '';
-            // Get icon path - Use iconOverride if provided, otherwise try BUTTON_ICONS
-            let iconPath = (iconOverride !== undefined && iconOverride !== null && iconOverride !== '') 
-                ? iconOverride 
-                : (typeUpper && window.BUTTON_ICONS[typeUpper] ? window.BUTTON_ICONS[typeUpper] : '');
+            // Get icon path - Check iconPathFromElement first, then iconOverride, then BUTTON_ICONS
+            let iconPath = '';
+            if (iconPathFromElement && iconPathFromElement !== '') {
+                iconPath = iconPathFromElement;
+            } else if (iconOverride !== undefined && iconOverride !== null && iconOverride !== '') {
+                iconPath = iconOverride;
+            } else if (typeUpper && window.BUTTON_ICONS && window.BUTTON_ICONS[typeUpper]) {
+                iconPath = window.BUTTON_ICONS[typeUpper];
+            }
+            
+            // If iconPath is just a name (not a path), construct Tabler icon path
+            // BUT: Skip if it's an emoji (contains Unicode characters)
+            if (iconPath && !iconPath.includes('/') && !iconPath.startsWith('http') && !iconPath.startsWith('<') && !iconPath.includes('.')) {
+                // Check if it's an emoji or Unicode symbol (not ASCII)
+                // This includes emojis, arrows, and other Unicode symbols
+                const isEmojiOrUnicode = /[^\x00-\x7F]/.test(iconPath) || 
+                                         /[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]|[\u{1F600}-\u{1F64F}]|[\u{1F680}-\u{1F6FF}]|[\u{1F900}-\u{1F9FF}]|[\u{1FA00}-\u{1FA6F}]|[\u{1FA70}-\u{1FAFF}]|[\u{2190}-\u{21FF}]|[\u{2300}-\u{23FF}]|[\u{2B00}-\u{2BFF}]|[\u{FE00}-\u{FE0F}]/u.test(iconPath);
+                if (!isEmojiOrUnicode) {
+                    // It's likely an icon name - construct Tabler icon path
+                    iconPath = `/trading-ui/images/icons/tabler/${iconPath}.svg`;
+                }
+            }
             
             // Convert icon path to HTML - use img tag initially, enhance to inline SVG later for Tabler icons
             let icon = '';
@@ -1249,7 +1268,7 @@ class AdvancedButtonSystem {
     }
 
     addButton(container, type, onClick, classes = '', attributes = '', text = '', id = '', variant = 'normal', icon = '') {
-        const buttonHtml = this.createButtonFromData(type, onClick, classes, attributes, text, id, '', '', variant, icon);
+        const buttonHtml = this.createButtonFromData(type, onClick, classes, attributes, text, id, '', '', variant, icon, null, '');
         container.insertAdjacentHTML('beforeend', buttonHtml);
         this.logger.debug(`Added dynamic button: ${type}`);
     }
@@ -1257,7 +1276,8 @@ class AdvancedButtonSystem {
     updateButton(buttonId, type, onClick, classes = '', attributes = '', text = '', variant = 'normal', icon = '') {
         const element = document.getElementById(buttonId);
         if (element) {
-            const newButton = this.createButtonFromData(type, onClick, classes, attributes, text, buttonId, '', '', variant, icon);
+            const iconPath = element.getAttribute('data-icon-path') || '';
+            const newButton = this.createButtonFromData(type, onClick, classes, attributes, text, buttonId, '', '', variant, icon, null, iconPath);
             element.outerHTML = newButton;
             this.logger.debug(`Updated button: ${buttonId}`);
         } else {

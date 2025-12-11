@@ -5,54 +5,61 @@
  * 
  * This index lists all functions in this file, organized by category.
  * 
- * Total Functions: 38
+ * Total Functions: 42
  * 
- * DATA LOADING (6)
- * - loadDefaultTradingAccounts() - loadDefaultTradingAccounts function
- * - loadTradingAccountsData() - * Load default trading accounts
- * - loadTradingAccounts() - * Update trading accounts summary
- * - loadTradingAccountsDataForTradingAccountsPage() - loadTradingAccountsDataForTradingAccountsPage function
+ * DATA LOADING (12)
+ * - loadCurrenciesFromServer() - loadCurrenciesFromServer function
+ * - loadTradingAccountsFromServer() - * Generate currency options for form
+ * - loadAllTradingAccountsFromServer() - loadAllTradingAccountsFromServer function
+ * - loadDefaultTradingAccounts() - * Load all trading accounts from server (for filter)
+ * - legacyFetchTradingAccounts() - legacyFetchTradingAccounts function
+ * - loadTradingAccountsData() - * Legacy function to fetch trading accounts from server (DEPRECATED)
+ * - loadAccountBalance() - loadAccountBalance function
+ * - loadAccountBalancesBatch() - loadAccountBalancesBatch function
+ * - getCurrencySymbol() - * Load balances for multiple accounts in batch
+ * - loadTradingAccounts() - loadTradingAccounts function
  * - getTradingAccountName() - * בדיקת פריטים מקושרים לפני ביטול חשבון מסחר
  * - getTradingAccounts() - * Generate detailed log for trading accounts page
  * 
- * DATA MANIPULATION (14)
+ * DATA MANIPULATION (12)
  * - updateTradingAccountsTable() - updateTradingAccountsTable function
  * - updateTradingAccountsSummary() - updateTradingAccountsSummary function
  * - updateTradingAccountFilterDisplayText() - updateTradingAccountFilterDisplayText function
  * - deleteTradingAccountFromAPI() - deleteTradingAccountFromAPI function
- * - deleteTradingAccount() - deleteTradingAccount function
- * - confirmDeleteTradingAccount() - * Show success message
+ * - confirmDeleteTradingAccount() - confirmDeleteTradingAccount function
  * - updateTradingAccountFilterMenu() - updateTradingAccountFilterMenu function
  * - deleteTradingAccountWithLinkedItemsCheck() - deleteTradingAccountWithLinkedItemsCheck function
  * - checkLinkedItemsAndDeleteTradingAccount() - checkLinkedItemsAndDeleteTradingAccount function
- * - checkLinkedItemsBeforeDeleteTradingAccount() - * בדיקת פריטים מקושרים לפני ביטול חשבון מסחר
+ * - checkLinkedItemsBeforeDeleteTradingAccount() - * בדיקת מקושרים וביצוע מחיקת חשבון מסחר מסחר
  * - updateTradingAccount() - * בדיקת פריטים מקושרים לפני מחיקת חשבון מסחר מסחר
- * - showAddTradingAccountModal() - showAddTradingAccountModal function
- * - saveTradingAccount() - * Show add trading account modal
+ * - saveTradingAccount() - saveTradingAccount function
  * - deleteTradingAccount() - deleteTradingAccount function
  * 
- * EVENT HANDLING (4)
+ * EVENT HANDLING (5)
+ * - generateCurrencyOptions() - generateCurrencyOptions function
+ * - syncTradingAccountsPagination() - * Enrich trading accounts with balance data
  * - restoreTradingAccountsSectionState() - restoreTradingAccountsSectionState function
  * - performTradingAccountCancellation() - * בדיקת מקושרים וביצוע ביטול חשבון מסחר מסחר
- * - performTradingAccountDeletion() - * בדיקת מקושרים וביצוע מחיקת חשבון מסחר מסחר
  * - performTradingAccountDeletion() - performTradingAccountDeletion function
  * 
  * UI UPDATES (3)
- * - showOpenTradesWarning() - * Show error message
+ * - showOpenTradesWarning() - * Confirm delete trading account
+ * - showEditTradingAccountModalById() - * Show open trades warning
  * - showTradingAccountDetails() - showTradingAccountDetails function
- * - showEditTradingAccountModal() - * Show add trading account modal
  * 
  * VALIDATION (3)
  * - cancelTradingAccountWithLinkedItemsCheck() - cancelTradingAccountWithLinkedItemsCheck function
  * - checkLinkedItemsAndCancelTradingAccount() - checkLinkedItemsAndCancelTradingAccount function
- * - checkLinkedItemsBeforeCancelTradingAccount() - checkLinkedItemsBeforeCancelTradingAccount function
+ * - checkLinkedItemsBeforeCancelTradingAccount() - * בדיקת מקושרים וביצוע מחיקת חשבון מסחר מסחר
  * 
- * OTHER (6)
- * - cancelTradingAccount() - * הצגת מודל חשבון מסחר מסחר (הוספה או עריכה)
+ * OTHER (7)
+ * - enrichAccountsWithBalances() - * Get currency symbol from currency value
+ * - cancelTradingAccount() - cancelTradingAccount function
  * - filterTradingAccountsLocally() - filterTradingAccountsLocally function
  * - restoreTradingAccount() - restoreTradingAccount function
- * - sortTable() - sortTable function
- * - generateDetailedLog() - * Sort table
+ * - generateDetailedLog() - generateDetailedLog function
+ * - restorePageState() - restorePageState function
+ * - waitAndRegisterTables() - waitAndRegisterTables function
  * 
  * ==========================================
  */
@@ -561,6 +568,10 @@ async function legacyFetchTradingAccounts() {
   });
 
   if (!response.ok) {
+    if (response.status === 401 || response.status === 403) {
+      window.Logger?.warn?.('⚠️ Trading accounts API unauthorized, returning empty list', { status: response.status }, { page: 'trading_accounts' });
+      return [];
+    }
     throw new Error(`HTTP error! status: ${response.status}`);
   }
 
@@ -579,11 +590,17 @@ async function loadTradingAccountsData(options = {}) {
   }
   try {
     if (typeof window.TradingAccountsData?.loadTradingAccountsData === 'function') {
-      const accounts = await window.TradingAccountsData.loadTradingAccountsData(options);
-      if (window.Logger && typeof window.Logger.info === 'function') {
-        window.Logger.info(`✅ Loaded ${accounts.length} trading accounts (service)`, { page: "trading_accounts" });
+      try {
+        const accounts = await window.TradingAccountsData.loadTradingAccountsData(options);
+        if (window.Logger && typeof window.Logger.info === 'function') {
+          window.Logger.info(`✅ Loaded ${accounts.length} trading accounts (service)`, { page: "trading_accounts" });
+        }
+        return accounts;
+      } catch (serviceError) {
+        if (window.Logger && typeof window.Logger.warn === 'function') {
+          window.Logger.warn('⚠️ TradingAccountsData service failed, falling back to legacy fetch', { error: serviceError.message }, { page: 'trading_accounts' });
+        }
       }
-      return accounts;
     }
 
     const fallback = await legacyFetchTradingAccounts();
@@ -599,6 +616,9 @@ async function loadTradingAccountsData(options = {}) {
     }
     if (typeof window.showErrorNotification === 'function') {
       window.showErrorNotification('שגיאה בטעינת נתוני חשבונות מסחר', error.message);
+    }
+    if (error?.message?.includes('status: 401') || error?.message?.includes('status: 403')) {
+      return [];
     }
     throw error;
   }

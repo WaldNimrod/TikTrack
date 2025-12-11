@@ -93,6 +93,22 @@ class AIAnalysisRequest(BaseModel):
                 result['error_message'] = self.error_message
                 result['error_code'] = None
         
+        # Include additional error data if available (from _error_data temporary attribute)
+        # This includes provider, reset_time, retry_after_minutes, etc.
+        if hasattr(self, '_error_data') and self._error_data:
+            result['error_data_json'] = json.dumps(self._error_data)
+        elif self.error_message and result.get('error_code'):
+            # Try to reconstruct basic error_data from available fields
+            error_data = {
+                'error_code': result['error_code'],
+                'message': result['error_message'],
+                'provider': self.provider  # Always available from model
+            }
+            result['error_data_json'] = json.dumps(error_data)
+        
+        # Always include provider in result (available from model field)
+        result['provider'] = self.provider
+        
         # Include response_text only if explicitly requested
         # response_text is saved to DB and can also be saved to frontend cache
         if include_response:

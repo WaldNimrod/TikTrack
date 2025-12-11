@@ -1,4 +1,18 @@
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - BrowserPageValidator.startErrorCollection() - Starterrorcollection
+
+// === Event Handlers ===
+// - BrowserPageValidator.stopErrorCollection() - Stoperrorcollection
+// - console.error() - Error
+// - console.warn() - Warn
+
+// === Data Functions ===
+// - BrowserPageValidator.getCurrentPageName() - Getcurrentpagename
+
 (async function() {
   'use strict';
   

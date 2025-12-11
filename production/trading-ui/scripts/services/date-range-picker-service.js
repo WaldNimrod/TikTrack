@@ -18,6 +18,12 @@
  * @author TikTrack Development Team
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === UI Functions ===
+// - updateDisplayAndTrigger() - Updatedisplayandtrigger
+
 (function() {
     'use strict';
 

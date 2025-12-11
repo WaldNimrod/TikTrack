@@ -8,6 +8,21 @@
  * @created 2025-01-06
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Event Handlers ===
+// - getModuleConfig() - Getmoduleconfig
+
+// === Data Functions ===
+// - getPageRequirements() - Getpagerequirements
+// - getAllModules() - Getallmodules
+// - getModulesByCategory() - Getmodulesbycategory
+// - getRecommendedStrategy() - Getrecommendedstrategy
+
+// === Other ===
+// - calculateTotalSize() - Calculatetotalsize
+
 // ============================================================================
 // DYNAMIC LOADER CONFIGURATION - תצורת טעינה דינמית
 // ============================================================================

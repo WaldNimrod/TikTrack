@@ -9,6 +9,30 @@
  * @created January 2025
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Core Functions ===
+// - runAllATRTests() - Runallatrtests
+
+// === Event Handlers ===
+// - testEntityDetailsRendererIntegration() - Testentitydetailsrendererintegration
+
+// === UI Functions ===
+// - testFieldRendererServiceExists() - Testfieldrendererserviceexists
+// - testRenderATRWithDefaults() - Testrenderatrwithdefaults
+// - testRenderATRWithCustomThresholds() - Testrenderatrwithcustomthresholds
+// - testRenderATRWithNullValues() - Testrenderatrwithnullvalues
+// - testRenderATRPerformance() - Testrenderatrperformance
+
+// === Data Functions ===
+// - testPreferencesLoading() - Testpreferencesloading
+
+// === Other ===
+// - logTest() - Logtest
+// - testCSSClassesExist() - Testcssclassesexist
+// - testTickerDetailsPage() - Testtickerdetailspage
+
 (function() {
     'use strict';
 

@@ -176,6 +176,15 @@
                             <span>ניתוח AI</span>
                         </div>
                         <div class="section-actions">
+                            <button type="button" 
+                                    data-button-type="PRIMARY" 
+                                    data-variant="small" 
+                                    data-text="צור ניתוח חדש" 
+                                    data-onclick="window.AIAnalysisWizard?.openWizard('new')" 
+                                    id="openWizardFromHeaderBtn"
+                                    title="צור ניתוח AI חדש">
+                                <span>צור ניתוח חדש</span>
+                            </button>
                             <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('header')" data-text="הצג/הסתר" title="הצג/הסתר סקשן"></button>
                         </div>
                     </div>
@@ -227,76 +236,9 @@
     </div>
 
     <!-- ===== AI Analysis Modals ===== -->
-    <!-- Modal 1: Template Selection -->
-    <div class="modal fade" id="aiTemplateSelectionModal" tabindex="-1" aria-labelledby="aiTemplateSelectionModalLabel" aria-hidden="true" data-bs-backdrop="false" data-bs-keyboard="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header modal-header-colored">
-                    <h5 class="modal-title" id="aiTemplateSelectionModalLabel">בחירת תבנית ניתוח</h5>
-                    <button type="button" data-button-type="CLOSE" data-bs-dismiss="modal" data-text="" title="סגור"></button>
-                </div>
-                <div class="modal-body">
-                    <div id="templatesContainerModal" class="row g-3">
-                        <!-- Templates will be loaded here -->
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal 2: Variables Form -->
-    <div class="modal fade modal-nested" id="aiVariablesModal" tabindex="-1" aria-labelledby="aiVariablesModalLabel" aria-hidden="true" data-bs-backdrop="false" data-bs-keyboard="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header modal-header-colored">
-                    <div class="modal-navigation-breadcrumb" id="aiVariablesModalBreadcrumb"></div>
-                    <h5 class="modal-title" id="aiVariablesModalLabel">משתני ניתוח</h5>
-                    <button type="button" data-button-type="BACK" data-variant="small" data-text="" title="חזור" id="aiVariablesBackBtn"></button>
-                    <button type="button" data-button-type="CLOSE" data-bs-dismiss="modal" data-text="" title="סגור"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="aiAnalysisFormModal">
-                        <div id="variablesContainerModal" class="row g-3">
-                            <!-- Variables will be loaded here dynamically -->
-                        </div>
-                        
-                        <!-- בחירת מנוע LLM ושפת משוב -->
-                        <div class="row g-3 mt-3">
-                            <div class="col-md-6">
-                                <label class="form-label" for="llmProviderModal">מנוע AI</label>
-                                <select id="llmProviderModal" class="form-select" required>
-                                    <option value="">בחר מנוע AI...</option>
-                                    <option value="gemini">Gemini (מומלץ למתחילים)</option>
-                                    <option value="perplexity">Perplexity</option>
-                                </select>
-                                <small class="form-text text-muted">בחר מנוע AI לניתוח. ודא שהגדרת מפתח API בפרופיל המשתמש.</small>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label" for="responseLanguageModal">שפת המשוב</label>
-                                <select id="responseLanguageModal" class="form-select" name="response_language">
-                                    <option value="hebrew" selected>עברית</option>
-                                    <option value="english">English</option>
-                                </select>
-                                <small class="form-text text-muted">בחר בשפה שבה תרצה לקבל את תוצאות הניתוח.</small>
-                            </div>
-                        </div>
-
-                        <!-- כפתור יצירת ניתוח -->
-                        <div class="row g-3 mt-3">
-                            <div class="col-12 d-flex justify-content-end">
-                                <button type="submit" data-button-type="PRIMARY" data-variant="full" data-text="צור ניתוח" id="generateAnalysisBtnModal">
-                                    <span id="generateAnalysisBtnTextModal">צור ניתוח</span>
-                                    <span id="generateAnalysisBtnSpinnerModal" class="hide">⏳ יוצר ניתוח...</span>
-                                </button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal 3: Results -->
+    <!-- Note: Old modals (aiTemplateSelectionModal, aiVariablesModal) were removed - now using Wizard interface -->
+    
+    <!-- Modal: Results (Still used for rerun and direct result viewing) -->
     <div class="modal fade modal-nested" id="aiResultsModal" tabindex="-1" aria-labelledby="aiResultsModalLabel" aria-hidden="true" data-bs-backdrop="false" data-bs-keyboard="true">
         <div class="modal-dialog modal-xl modal-dialog-scrollable">
             <div class="modal-content">
@@ -349,6 +291,201 @@
         </div>
     </div>
 
+    <!-- ===== AI Analysis Wizard Modal (New) ===== -->
+    <div class="modal fade" id="aiAnalysisWizardModal" tabindex="-1" aria-labelledby="aiAnalysisWizardModalLabel" aria-hidden="true" data-bs-backdrop="false" data-bs-keyboard="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header modal-header-colored">
+                    <h5 class="modal-title" id="aiAnalysisWizardModalLabel">יצירת ניתוח AI</h5>
+                    <button type="button" data-button-type="CLOSE" data-bs-dismiss="modal" data-text="" title="סגור"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Steps Header Bar -->
+                    <div class="steps-header-bar d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
+                        <!-- Step Indicator -->
+                        <div class="import-steps-indicator">
+                            <div class="step" data-step="1">
+                                <div class="step-number">1</div>
+                                <div class="step-label">בחירת ניתוח ומנוע</div>
+                            </div>
+                            <div class="step" data-step="2">
+                                <div class="step-number">2</div>
+                                <div class="step-label">פילטרים ומאפיינים</div>
+                            </div>
+                            <div class="step" data-step="3">
+                                <div class="step-number">3</div>
+                                <div class="step-label">תוצאות</div>
+                            </div>
+                        </div>
+                        <!-- Header Actions -->
+                        <div class="steps-header-actions d-flex align-items-center gap-2 flex-wrap" id="wizardHeaderActions">
+                            <!-- Step 1 Actions -->
+                            <div class="step-header-group align-items-center gap-2 flex-wrap d-none" id="wizardStep1Actions">
+                                <button data-button-type="PRIMARY"
+                                        data-text="המשך לשלב 2"
+                                        data-onclick="window.AIAnalysisWizard?.goToStep(2)"
+                                        id="wizardContinueToStep2"
+                                        disabled></button>
+                            </div>
+                            <!-- Step 2 Actions -->
+                            <div class="step-header-group align-items-center gap-2 flex-wrap d-none" id="wizardStep2Actions">
+                                <button data-button-type="SECONDARY"
+                                        data-text="חזור"
+                                        data-onclick="window.AIAnalysisWizard?.goToStep(1)"
+                                        id="wizardBackToStep1"></button>
+                                <button data-button-type="PRIMARY"
+                                        data-text="המשך לשלב 3"
+                                        data-onclick="window.AIAnalysisWizard?.goToStep(3)"
+                                        id="wizardContinueToStep3"
+                                        disabled></button>
+                            </div>
+                            <!-- Step 3 Actions -->
+                            <div class="step-header-group align-items-center gap-2 flex-wrap d-none" id="wizardStep3Actions">
+                                <button type="button" 
+                                        data-button-type="PRIMARY" 
+                                        data-variant="small" 
+                                        data-text="שמור כהערה" 
+                                        data-onclick="window.AIAnalysisManager?.saveAsNote()" 
+                                        id="wizardSaveAsNoteBtn"
+                                        title="שמור כהערה"></button>
+                                <div class="btn-group">
+                                    <button type="button" 
+                                            data-button-type="SECONDARY" 
+                                            data-variant="small" 
+                                            data-icon-type="EXPORT"
+                                            data-text="" 
+                                            id="wizardExportBtn"
+                                            class="dropdown-toggle"
+                                            data-bs-toggle="dropdown"
+                                            aria-expanded="false"
+                                            title="ייצא">
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <li><a class="dropdown-item" href="#" data-onclick="window.AIAnalysisManager?.exportToPDF()" id="wizardExportPDFBtn">ייצא ל-PDF</a></li>
+                                        <li><a class="dropdown-item" href="#" data-onclick="window.AIAnalysisManager?.exportToMarkdown()" id="wizardExportMarkdownBtn">ייצא ל-Markdown</a></li>
+                                        <li><a class="dropdown-item" href="#" data-onclick="window.AIAnalysisManager?.exportToHTML()" id="wizardExportHTMLBtn">ייצא ל-HTML</a></li>
+                                    </ul>
+                                </div>
+                                <button data-button-type="SECONDARY"
+                                        data-text="חזור"
+                                        data-onclick="window.AIAnalysisWizard?.goToStep(2)"
+                                        id="wizardBackToStep2"></button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 1: Engine, Language, Template Selection -->
+                    <div class="import-step" id="ai-wizard-step-1" data-step="1">
+                        <div class="step-content">
+                            <h3 class="mb-4">בחירת מנוע, שפה ותבנית ניתוח</h3>
+                            
+                            <!-- Engine and Language Selection - Moved to top -->
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-6">
+                                    <label class="form-label" for="wizardProviderSelect">
+                                        מנוע AI <span class="text-danger">*</span>
+                                    </label>
+                                    <select id="wizardProviderSelect" class="form-select" required>
+                                        <option value="">בחר מנוע AI...</option>
+                                        <option value="gemini">Gemini (מומלץ למתחילים)</option>
+                                        <option value="perplexity">Perplexity</option>
+                                    </select>
+                                    <small class="form-text text-muted">בחר מנוע AI לניתוח. ודא שהגדרת מפתח API בפרופיל המשתמש.</small>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label" for="wizardLanguageSelect">שפת המשוב</label>
+                                    <select id="wizardLanguageSelect" class="form-select" name="response_language">
+                                        <option value="hebrew" selected>עברית</option>
+                                        <option value="english">English</option>
+                                    </select>
+                                    <small class="form-text text-muted">בחר בשפה שבה תרצה לקבל את תוצאות הניתוח.</small>
+                                </div>
+                            </div>
+
+                            <!-- Template Selection -->
+                            <div class="mb-4">
+                                <label class="form-label fw-bold">
+                                    בחר תבנית ניתוח <span class="text-danger">*</span>
+                                </label>
+                                <div id="wizardTemplatesContainer" class="row g-3">
+                                    <!-- Templates will be loaded here -->
+                                    <div class="col-12 text-center">
+                                        <div class="spinner-border text-primary" role="status">
+                                            <span class="visually-hidden">טוען תבניות...</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Filters and Variables -->
+                    <div class="import-step d-none" id="ai-wizard-step-2" data-step="2">
+                        <div class="step-content">
+                            <h3 class="mb-4">הגדרת פילטרים ומאפיינים</h3>
+                            
+                            <!-- Accordion Container -->
+                            <div id="wizardStep2Accordion">
+                                <!-- Filters Section -->
+                                <div class="content-section" id="wizardFiltersSection" data-section="filters-section">
+                                    <div class="section-header">
+                                        <div class="table-title">
+                                            <img src="images/icons/tabler/filter.svg" alt="פילטרים" class="section-icon">
+                                            <span>פילטרים</span>
+                                        </div>
+                                        <div class="section-actions">
+                                            <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('filters-section')" data-text="הצג/הסתר" title="הצג/הסתר סקשן"></button>
+                                        </div>
+                                    </div>
+                                    <div class="section-body">
+                                        <div id="wizardFiltersContainer">
+                                            <!-- Filters will be loaded here -->
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Variables Section -->
+                                <div class="content-section" id="wizardVariablesSection" data-section="variables-section">
+                                    <div class="section-header">
+                                        <div class="table-title">
+                                            <img src="images/icons/entities/research.svg" alt="מאפיינים" class="section-icon">
+                                            <span>מאפיינים לניתוח</span>
+                                        </div>
+                                        <div class="section-actions">
+                                            <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('variables-section')" data-text="הצג/הסתר" title="הצג/הסתר סקשן"></button>
+                                        </div>
+                                    </div>
+                                    <div class="section-body">
+                                        <div id="wizardVariablesContainer">
+                                            <!-- Variables will be loaded here -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Results -->
+                    <div class="import-step d-none" id="ai-wizard-step-3" data-step="3">
+                        <div class="step-content">
+                            <h3 class="mb-4">תוצאות הניתוח</h3>
+                            
+                            <!-- Results Container -->
+                            <div id="wizardResultsContainer" class="markdown-body">
+                                <!-- Results will be rendered here -->
+                                <div class="text-center">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">טוען תוצאות...</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- =============================================================== -->
         <!-- =============================================================== -->
         <!-- =============================================================== -->
@@ -366,8 +503,19 @@
     <!-- =============================================================== -->
     <!-- ⚠️ DO NOT MODIFY MANUALLY - Generated by generate-script-loading-code.js -->
     <!-- 📋 Loading Order: BASE → SERVICES → MODULES → UI-ADVANCED → CRUD → PREFERENCES → INIT-SYSTEM -->
-    <!-- 🎯 Page: ai-analysis | Generated: 2025-12-05T20:51:04.264Z -->
+    <!-- =============================================================== -->
+    <!-- ===== START SCRIPT LOADING ORDER ===== -->
+    <!-- =============================================================== -->
+    <!-- ⚠️ DO NOT MODIFY MANUALLY - Generated by generate-script-loading-code.js -->
+    <!-- 📋 Loading Order: BASE → SERVICES → MODULES → UI-ADVANCED → CRUD → PREFERENCES → INIT-SYSTEM -->
+    <!-- =============================================================== -->
+    <!-- ===== START SCRIPT LOADING ORDER ===== -->
+    <!-- =============================================================== -->
+    <!-- ⚠️ DO NOT MODIFY MANUALLY - Generated by generate-script-loading-code.js -->
+    <!-- 📋 Loading Order: BASE → SERVICES → MODULES → UI-ADVANCED → CRUD → PREFERENCES → INIT-SYSTEM -->
+    <!-- 🎯 Page: ai-analysis | Generated: 2025-12-07T01:43:45.315Z -->
     <!-- 📦 Packages: base, services, ui-advanced, modules, preferences, entity-services, info-summary, ai-analysis, init-system -->
+    <!-- 🔧 Mode: development | Use Bundles: false -->
 
     <!-- =============================================================== -->
     <!-- ===== PACKAGE 1/9: BASE PACKAGE ===== -->
@@ -451,22 +599,24 @@
     <!-- [33] Load Order: 33 | Strategy: defer -->
     <script src="scripts/services/preferences-data.js?v=1.0.0" defer></script> <!-- Preferences data service (API + Cache) -->
     <!-- [34] Load Order: 34 | Strategy: defer -->
-    <script src="scripts/services/crud-response-handler.js?v=1.0.0" defer></script> <!-- CRUD response handler -->
+    <script src="scripts/services/unified-progress-manager.js?v=1.0.0" defer></script> <!-- Unified progress manager for process tracking -->
     <!-- [35] Load Order: 35 | Strategy: defer -->
-    <script src="scripts/services/unified-crud-service.js?v=1.0.0" defer></script> <!-- Unified CRUD service for all entities -->
+    <script src="scripts/services/crud-response-handler.js?v=1.0.0" defer></script> <!-- CRUD response handler -->
     <!-- [36] Load Order: 36 | Strategy: defer -->
-    <script src="scripts/services/investment-calculation-service.js?v=1.0.0" defer></script> <!-- Investment form amount ↔ quantity calculations -->
+    <script src="scripts/services/unified-crud-service.js?v=1.0.0" defer></script> <!-- Unified CRUD service for all entities -->
     <!-- [37] Load Order: 37 | Strategy: defer -->
-    <script src="scripts/services/tag-service.js?v=1.0.0" defer></script> <!-- Central tag service (tag management and retrieval) -->
+    <script src="scripts/services/investment-calculation-service.js?v=1.0.0" defer></script> <!-- Investment form amount ↔ quantity calculations -->
     <!-- [38] Load Order: 38 | Strategy: defer -->
-    <script src="scripts/services/table-sort-value-adapter.js?v=1.0.0" defer></script> <!-- Adapter for unified sort values (DateEnvelope, legacy) -->
+    <script src="scripts/services/tag-service.js?v=1.0.0" defer></script> <!-- Central tag service (tag management and retrieval) -->
     <!-- [39] Load Order: 39 | Strategy: defer -->
-    <script src="scripts/services/lint-status-service.js?v=1.0.0" defer></script> <!-- Unified linter status service (API reading and data conversion) -->
+    <script src="scripts/services/table-sort-value-adapter.js?v=1.0.0" defer></script> <!-- Adapter for unified sort values (DateEnvelope, legacy) -->
     <!-- [40] Load Order: 40 | Strategy: defer -->
-    <script src="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.min.js" defer></script> <!-- Quill.js - Rich Text Editor Library -->
+    <script src="scripts/services/lint-status-service.js?v=1.0.0" defer></script> <!-- Unified linter status service (API reading and data conversion) -->
     <!-- [41] Load Order: 41 | Strategy: defer -->
-    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js" defer></script> <!-- DOMPurify - HTML Sanitizer -->
+    <script src="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.min.js" defer></script> <!-- Quill.js - Rich Text Editor Library -->
     <!-- [42] Load Order: 42 | Strategy: defer -->
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js" defer></script> <!-- DOMPurify - HTML Sanitizer -->
+    <!-- [43] Load Order: 43 | Strategy: defer -->
     <script src="scripts/services/rich-text-editor-service.js?v=1.0.0" defer></script> <!-- Rich text editor service -->
 
     <!-- =============================================================== -->
@@ -476,43 +626,43 @@
     <!-- Dependencies: base, services -->
     <!-- Critical: NO | Version: 1.5.0 -->
 
-    <!-- [43] Load Order: 43 | Strategy: defer -->
-    <script src="scripts/modal-navigation-manager.js?v=1.0.0" defer></script> <!-- Nested modal navigation system -->
     <!-- [44] Load Order: 44 | Strategy: defer -->
-    <script src="scripts/modal-z-index-manager.js?v=1.0.0" defer></script> <!-- Dynamic z-index management for nested modals -->
+    <script src="scripts/modal-navigation-manager.js?v=1.0.0" defer></script> <!-- Nested modal navigation system -->
     <!-- [45] Load Order: 45 | Strategy: defer -->
-    <script src="scripts/tag-ui-manager.js?v=1.0.0" defer></script> <!-- Tag selection management in modals -->
+    <script src="scripts/modal-z-index-manager.js?v=1.0.0" defer></script> <!-- Dynamic z-index management for nested modals -->
     <!-- [46] Load Order: 46 | Strategy: defer -->
-    <script src="scripts/tag-events.js?v=1.0.0" defer></script> <!-- Global tag events system -->
+    <script src="scripts/tag-ui-manager.js?v=1.0.0" defer></script> <!-- Tag selection management in modals -->
     <!-- [47] Load Order: 47 | Strategy: defer -->
-    <script src="scripts/modules/data-basic.js?v=1.0.0" defer></script> <!-- Basic data -->
+    <script src="scripts/tag-events.js?v=1.0.0" defer></script> <!-- Global tag events system -->
     <!-- [48] Load Order: 48 | Strategy: defer -->
-    <script src="scripts/modules/ui-basic.js?v=1.0.0" defer></script> <!-- Basic interface -->
+    <script src="scripts/modules/data-basic.js?v=1.0.0" defer></script> <!-- Basic data -->
     <!-- [49] Load Order: 49 | Strategy: defer -->
-    <script src="scripts/modules/data-advanced.js?v=1.0.0" defer></script> <!-- Advanced data -->
+    <script src="scripts/modules/ui-basic.js?v=1.0.0" defer></script> <!-- Basic interface -->
     <!-- [50] Load Order: 50 | Strategy: defer -->
-    <script src="scripts/modules/ui-advanced.js?v=1.0.0" defer></script> <!-- Advanced interface -->
+    <script src="scripts/modules/data-advanced.js?v=1.0.0" defer></script> <!-- Advanced data -->
     <!-- [51] Load Order: 51 | Strategy: defer -->
-    <script src="scripts/modules/communication-module.js?v=1.0.0" defer></script> <!-- Communication module -->
+    <script src="scripts/modules/ui-advanced.js?v=1.0.0" defer></script> <!-- Advanced interface -->
     <!-- [52] Load Order: 52 | Strategy: defer -->
-    <script src="scripts/modules/business-module.js?v=1.0.0" defer></script> <!-- Business module -->
+    <script src="scripts/modules/communication-module.js?v=1.0.0" defer></script> <!-- Communication module -->
     <!-- [53] Load Order: 53 | Strategy: defer -->
-    <script src="scripts/modules/localstorage-sync.js?v=1.0.0" defer></script> <!-- localStorage synchronization -->
+    <script src="scripts/modules/business-module.js?v=1.0.0" defer></script> <!-- Business module -->
     <!-- [54] Load Order: 54 | Strategy: defer -->
-    <script src="scripts/modules/dynamic-loader-config.js?v=1.0.0" defer></script> <!-- Dynamic loader configuration -->
+    <script src="scripts/modules/localstorage-sync.js?v=1.0.0" defer></script> <!-- localStorage synchronization -->
     <!-- [55] Load Order: 55 | Strategy: defer -->
-    <script src="scripts/import-user-data.js?v=1.0.0" defer></script> <!-- Execution data import modal -->
+    <script src="scripts/modules/dynamic-loader-config.js?v=1.0.0" defer></script> <!-- Dynamic loader configuration -->
     <!-- [56] Load Order: 56 | Strategy: defer -->
-    <script src="scripts/modal-configs/trades-config.js?v=1.0.0" defer></script> <!-- Trades modal configuration -->
+    <script src="scripts/import-user-data.js?v=1.0.0" defer></script> <!-- Execution data import modal -->
     <!-- [57] Load Order: 57 | Strategy: defer -->
-    <script src="scripts/modal-configs/trade-plans-config.js?v=1.0.0" defer></script> <!-- Trade plans modal configuration -->
+    <script src="scripts/modal-configs/trades-config.js?v=1.0.0" defer></script> <!-- Trades modal configuration -->
     <!-- [58] Load Order: 58 | Strategy: defer -->
-    <script src="scripts/modal-configs/cash-flows-config.js?v=1.0.0" defer></script> <!-- Cash flows modal configuration -->
+    <script src="scripts/modal-configs/trade-plans-config.js?v=1.0.0" defer></script> <!-- Trade plans modal configuration -->
     <!-- [59] Load Order: 59 | Strategy: defer -->
-    <script src="scripts/modal-configs/tag-management-config.js?v=1.0.0" defer></script> <!-- Tag system modal configuration -->
-    <!-- [59.5] Load Order: 59.5 | Strategy: defer -->
-    <script src="scripts/modal-configs/notes-config.js?v=1.0.0" defer></script> <!-- Notes modal configuration (required for Save as Note feature) -->
+    <script src="scripts/modal-configs/watch-lists-config.js?v=1.0.0" defer></script> <!-- Watch lists modal configuration -->
     <!-- [60] Load Order: 60 | Strategy: defer -->
+    <script src="scripts/modal-configs/cash-flows-config.js?v=1.0.0" defer></script> <!-- Cash flows modal configuration -->
+    <!-- [61] Load Order: 61 | Strategy: defer -->
+    <script src="scripts/modal-configs/tag-management-config.js?v=1.0.0" defer></script> <!-- Tag system modal configuration -->
+    <!-- [62] Load Order: 62 | Strategy: defer -->
     <script src="scripts/modal-manager-v2.js?v=1.0.0" defer></script> <!-- Modal manager V2 - MUST load after all modal configs -->
 
     <!-- =============================================================== -->
@@ -522,13 +672,13 @@
     <!-- Dependencies: base, services, modules -->
     <!-- Critical: NO | Version: 1.5.0 -->
 
-    <!-- [61] Load Order: 61 | Strategy: defer -->
-    <script src="scripts/tables.js?v=1.0.0" defer></script> <!-- Table system -->
-    <!-- [62] Load Order: 62 | Strategy: defer -->
-    <script src="scripts/table-data-registry.js?v=1.0.0" defer></script> <!-- Table data registry -->
     <!-- [63] Load Order: 63 | Strategy: defer -->
-    <script src="scripts/pagination-system.js?v=1.0.0" defer></script> <!-- Pagination system -->
+    <script src="scripts/tables.js?v=1.0.0" defer></script> <!-- Table system -->
     <!-- [64] Load Order: 64 | Strategy: defer -->
+    <script src="scripts/table-data-registry.js?v=1.0.0" defer></script> <!-- Table data registry -->
+    <!-- [65] Load Order: 65 | Strategy: defer -->
+    <script src="scripts/pagination-system.js?v=1.0.0" defer></script> <!-- Pagination system -->
+    <!-- [66] Load Order: 66 | Strategy: defer -->
     <script src="scripts/modules/actions-menu-system.js?v=1.0.0" defer></script> <!-- Actions menu system -->
 
     <!-- =============================================================== -->
@@ -538,31 +688,31 @@
     <!-- Dependencies: base, services -->
     <!-- Critical: NO | Version: 1.5.0 -->
 
-    <!-- [65] Load Order: 65 | Strategy: defer -->
-    <script src="scripts/preferences-cache.js?v=1.0.0" defer></script> <!-- Preferences cache management layer -->
-    <!-- [66] Load Order: 66 | Strategy: defer -->
-    <script src="scripts/services/preferences-v4.js?v=1.0.0" defer></script> <!-- Preferences V4 SDK (group-first) -->
     <!-- [67] Load Order: 67 | Strategy: defer -->
-    <script src="scripts/preferences-events.js?v=1.0.0" defer></script> <!-- Preferences event system -->
+    <script src="scripts/preferences-cache.js?v=1.0.0" defer></script> <!-- Preferences cache management layer -->
     <!-- [68] Load Order: 68 | Strategy: defer -->
-    <script src="scripts/preferences-core-new.js?v=1.0.0" defer></script> <!-- Preferences core (without colors) -->
+    <script src="scripts/services/preferences-v4.js?v=1.0.0" defer></script> <!-- Preferences V4 SDK (group-first) -->
     <!-- [69] Load Order: 69 | Strategy: defer -->
-    <script src="scripts/preferences-ui-layer.js?v=1.0.0" defer></script> <!-- Preferences UI layer -->
+    <script src="scripts/preferences-events.js?v=1.0.0" defer></script> <!-- Preferences event system -->
     <!-- [70] Load Order: 70 | Strategy: defer -->
-    <script src="scripts/preferences-colors.js?v=1.0.0" defer></script> <!-- Color system (60+ preferences) -->
+    <script src="scripts/preferences-core-new.js?v=1.0.0" defer></script> <!-- Preferences core (without colors) -->
     <!-- [71] Load Order: 71 | Strategy: defer -->
-    <script src="scripts/preferences-manager.js?v=1.0.0" defer></script> <!-- Preferences manager (central) -->
+    <script src="scripts/preferences-ui-layer.js?v=1.0.0" defer></script> <!-- Preferences UI layer -->
     <!-- [72] Load Order: 72 | Strategy: defer -->
-    <script src="scripts/preferences-profiles.js?v=1.0.0" defer></script> <!-- Profile management -->
+    <script src="scripts/preferences-colors.js?v=1.0.0" defer></script> <!-- Color system (60+ preferences) -->
     <!-- [73] Load Order: 73 | Strategy: defer -->
-    <script src="scripts/preferences-lazy-loader.js?v=1.0.0" defer></script> <!-- lazy loading system -->
+    <script src="scripts/preferences-manager.js?v=1.0.0" defer></script> <!-- Preferences manager (central) -->
     <!-- [74] Load Order: 74 | Strategy: defer -->
-    <script src="scripts/preferences-validation.js?v=1.0.0" defer></script> <!-- validation system -->
+    <script src="scripts/preferences-profiles.js?v=1.0.0" defer></script> <!-- Profile management -->
     <!-- [75] Load Order: 75 | Strategy: defer -->
-    <script src="scripts/preferences-ui-v4.js?v=1.0.0" defer></script> <!-- User interface V4 (Group-First) -->
+    <script src="scripts/preferences-lazy-loader.js?v=1.0.0" defer></script> <!-- lazy loading system -->
     <!-- [76] Load Order: 76 | Strategy: defer -->
-    <script src="scripts/preferences-ui.js?v=1.0.0" defer></script> <!-- User interface -->
+    <script src="scripts/preferences-validation.js?v=1.0.0" defer></script> <!-- validation system -->
     <!-- [77] Load Order: 77 | Strategy: defer -->
+    <script src="scripts/preferences-ui-v4.js?v=1.0.0" defer></script> <!-- User interface V4 (Group-First) -->
+    <!-- [78] Load Order: 78 | Strategy: defer -->
+    <script src="scripts/preferences-ui.js?v=1.0.0" defer></script> <!-- User interface -->
+    <!-- [79] Load Order: 79 | Strategy: defer -->
     <script src="scripts/preferences-group-manager.js?v=1.0.0" defer></script> <!-- Preferences group manager -->
 
     <!-- =============================================================== -->
@@ -572,25 +722,25 @@
     <!-- Dependencies: base, services -->
     <!-- Critical: NO | Version: 1.5.0 -->
 
-    <!-- [78] Load Order: 78 | Strategy: defer -->
-    <script src="scripts/account-service.js?v=1.0.0" defer></script> <!-- Account service -->
-    <!-- [79] Load Order: 79 | Strategy: defer -->
-    <script src="scripts/alert-service.js?v=1.0.0" defer></script> <!-- Alert service -->
     <!-- [80] Load Order: 80 | Strategy: defer -->
-    <script src="scripts/ticker-service.js?v=1.0.0" defer></script> <!-- Ticker service -->
+    <script src="scripts/account-service.js?v=1.0.0" defer></script> <!-- Account service -->
     <!-- [81] Load Order: 81 | Strategy: defer -->
-    <script src="scripts/services/trade-plans-data.js?v=1.0.0" defer></script> <!-- Trade plans data service -->
+    <script src="scripts/alert-service.js?v=1.0.0" defer></script> <!-- Alert service -->
     <!-- [82] Load Order: 82 | Strategy: defer -->
-    <script src="scripts/trade-plan-service.js?v=1.0.0" defer></script> <!-- Trade plan service -->
+    <script src="scripts/ticker-service.js?v=1.0.0" defer></script> <!-- Ticker service -->
     <!-- [83] Load Order: 83 | Strategy: defer -->
-    <script src="scripts/condition-translator.js?v=1.0.0" defer></script> <!-- Condition translator -->
+    <script src="scripts/services/trade-plans-data.js?v=1.0.0" defer></script> <!-- Trade plans data service -->
     <!-- [84] Load Order: 84 | Strategy: defer -->
-    <script src="scripts/constraints.js?v=1.0.0" defer></script> <!-- Constraints system -->
+    <script src="scripts/trade-plan-service.js?v=1.0.0" defer></script> <!-- Trade plan service -->
     <!-- [85] Load Order: 85 | Strategy: defer -->
-    <script src="scripts/services/linked-items-service.js?v=1.0.0" defer></script> <!-- Shared logic service for linked items -->
+    <script src="scripts/condition-translator.js?v=1.0.0" defer></script> <!-- Condition translator -->
     <!-- [86] Load Order: 86 | Strategy: defer -->
-    <script src="scripts/linked-items.js?v=1.0.0" defer></script> <!-- Linked items -->
+    <script src="scripts/constraints.js?v=1.0.0" defer></script> <!-- Constraints system -->
     <!-- [87] Load Order: 87 | Strategy: defer -->
+    <script src="scripts/services/linked-items-service.js?v=1.0.0" defer></script> <!-- Shared logic service for linked items -->
+    <!-- [88] Load Order: 88 | Strategy: defer -->
+    <script src="scripts/linked-items.js?v=1.0.0" defer></script> <!-- Linked items -->
+    <!-- [89] Load Order: 89 | Strategy: defer -->
     <script src="scripts/related-object-filters.js?v=1.0.0" defer></script> <!-- Related object filters -->
 
     <!-- =============================================================== -->
@@ -600,9 +750,9 @@
     <!-- Dependencies: base, services -->
     <!-- Critical: NO | Version: 1.0.0 -->
 
-    <!-- [88] Load Order: 88 | Strategy: defer -->
+    <!-- [90] Load Order: 90 | Strategy: defer -->
     <script src="scripts/info-summary-system.js?v=1.0.0" defer></script> <!-- Core data summary system -->
-    <!-- [89] Load Order: 89 | Strategy: defer -->
+    <!-- [91] Load Order: 91 | Strategy: defer -->
     <script src="scripts/info-summary-configs.js?v=1.0.0" defer></script> <!-- Page configurations for data summary -->
 
     <!-- =============================================================== -->
@@ -612,21 +762,20 @@
     <!-- Dependencies: base, services, ui-advanced, modules, preferences, entity-services -->
     <!-- Critical: NO | Version: 1.0.0 -->
 
-    <!-- [90] Load Order: 90 | Strategy: defer -->
-    <script src="https://cdn.jsdelivr.net/npm/marked@9.1.6/marked.min.js" defer></script> <!-- Markdown parser library (for AI result rendering) -->
-    <!-- [91] Load Order: 91 | Strategy: defer -->
-    <script src="scripts/ai-analysis-manager.js?v=1.0.0" defer></script> <!-- AI Analysis UI manager -->
     <!-- [92] Load Order: 92 | Strategy: defer -->
-    <script src="scripts/ai-template-selector.js?v=1.0.0" defer></script> <!-- Template selector component -->
+    <script src="https://cdn.jsdelivr.net/npm/marked@9.1.6/marked.min.js" defer></script> <!-- Markdown parser library (for AI result rendering) -->
     <!-- [93] Load Order: 93 | Strategy: defer -->
-    <script src="scripts/ai-result-renderer.js?v=1.0.0" defer></script> <!-- AI result renderer with markdown and infographics -->
+    <script src="scripts/ai-analysis-manager.js?v=1.0.0" defer></script> <!-- AI Analysis UI manager -->
+    <!-- [93.5] Load Order: 93.5 | Strategy: defer -->
+    <script src="scripts/ai-analysis-wizard.js?v=1.0.0" defer></script> <!-- AI Analysis Wizard (3-step interface) -->
     <!-- [94] Load Order: 94 | Strategy: defer -->
-    <script src="scripts/ai-notes-integration.js?v=1.0.0" defer></script> <!-- AI analysis notes integration -->
+    <script src="scripts/ai-template-selector.js?v=1.0.0" defer></script> <!-- Template selector component -->
     <!-- [95] Load Order: 95 | Strategy: defer -->
+    <script src="scripts/ai-result-renderer.js?v=1.0.0" defer></script> <!-- AI result renderer with markdown and infographics -->
+    <!-- [96] Load Order: 96 | Strategy: defer -->
+    <script src="scripts/ai-notes-integration.js?v=1.0.0" defer></script> <!-- AI analysis notes integration -->
+    <!-- [97] Load Order: 97 | Strategy: defer -->
     <script src="scripts/ai-export-service.js?v=1.0.0" defer></script> <!-- AI analysis export service -->
-    <!-- [95.5] Load Order: 95.5 | Strategy: defer -->
-    <script src="scripts/debug-trading-methods.js?v=1.0.0" defer></script> <!-- Debug helper for Trading Methods (development only) -->
-    <script src="scripts/debug-ai-analysis-fields.js?v=1.0.0" defer></script> <!-- Debug helper for AI Analysis fields validation -->
 
     <!-- =============================================================== -->
     <!-- ===== PACKAGE 9/9: INITIALIZATION PACKAGE ===== -->
@@ -635,15 +784,15 @@
     <!-- Dependencies: base -->
     <!-- Critical: NO | Version: 1.5.0 -->
 
-    <!-- [96] Load Order: 96 | Strategy: defer -->
-    <script src="scripts/init-system/package-manifest.js?v=1.0.0" defer></script> <!-- Package manifest -->
-    <!-- [97] Load Order: 97 | Strategy: defer -->
-    <script src="scripts/page-initialization-configs.js?v=1.0.0" defer></script> <!-- Page initialization configurations -->
     <!-- [98] Load Order: 98 | Strategy: defer -->
-    <script src="scripts/init-system-check.js?v=1.0.0" defer></script> <!-- Initialization system check -->
+    <script src="scripts/init-system/package-manifest.js?v=1.0.0" defer></script> <!-- Package manifest -->
     <!-- [99] Load Order: 99 | Strategy: defer -->
-    <script src="scripts/monitoring-functions.js?v=1.0.0" defer></script> <!-- Page monitoring functions -->
+    <script src="scripts/page-initialization-configs.js?v=1.0.0" defer></script> <!-- Page initialization configurations -->
     <!-- [100] Load Order: 100 | Strategy: defer -->
+    <script src="scripts/init-system-check.js?v=1.0.0" defer></script> <!-- Initialization system check -->
+    <!-- [101] Load Order: 101 | Strategy: defer -->
+    <script src="scripts/monitoring-functions.js?v=1.0.0" defer></script> <!-- Page monitoring functions -->
+    <!-- [102] Load Order: 102 | Strategy: defer -->
     <script src="scripts/modules/core-systems.js?v=1.0.0" defer></script> <!-- Unified initialization system - single entry point (required for all pages) -->
 
     <!-- =============================================================== -->
@@ -653,8 +802,7 @@
     <!-- =============================================================== -->
     <!-- ===== FINAL SUMMARY ===== -->
     <!-- =============================================================== -->
-    <!-- 📊 Total Scripts Processed: 100 | Unique Scripts Loaded: 100 -->
-    <!-- 🔧 For maintenance: Use generate-script-loading-code.js -->
-</body>
+    <!-- 📊 Total Scripts Processed: 102 | Unique Scripts Loaded: 102 -->
+    <!-- 🔧 For maintenance: Use generate-script-loading-code.js --></body>
 </html>
 

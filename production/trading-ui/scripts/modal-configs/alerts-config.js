@@ -7,6 +7,15 @@
  * @lastUpdated January 27, 2025
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - initializeAlertsModal() - Initializealertsmodal
+
+// === Data Functions ===
+// - saveAlertFallback() - Savealertfallback
+
 // קונפיגורציה למודל התראות
 const alertsModalConfig = {
     id: 'alertsModal',

@@ -22,6 +22,31 @@
  * דוקומנטציה מפורטת: documentation/frontend/JAVASCRIPT_ARCHITECTURE.md
  */
 
+
+// ===== FUNCTION INDEX =====
+//
+// === Event Handlers ===
+// - showValidationWarning() - Showvalidationwarning
+// - showConfirmationDialog() - Showconfirmationdialog
+// - globalConfirm() - Globalconfirm
+// - overrideNativeConfirm() - Overridenativeconfirm
+// - smartConfirmReplacement() - Smartconfirmreplacement
+// - cleanupFunctions() - Cleanupfunctions
+//
+// === UI Functions ===
+// - showDeleteWarning() - Showdeletewarning
+//
+// === API Functions ===
+// - invokeCallbacks() - Invokecallbacks
+// === Object Methods ===
+// - confirmationModalCancel() - Confirmationmodalcancel
+// - confirmationModalCancel() - Confirmationmodalcancel
+// - confirmationModalConfirm() - Confirmationmodalconfirm
+// - confirmationModalConfirm() - Confirmationmodalconfirm
+
+// === Other ===
+// - closeModal() - Closemodal
+
 // ===== VALIDATION WARNING FUNCTIONS =====
 
 /**

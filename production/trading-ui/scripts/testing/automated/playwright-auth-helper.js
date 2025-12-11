@@ -13,6 +13,20 @@
  * @created December 4, 2025
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Event Handlers ===
+// - waitForAuthentication() - Waitforauthentication
+// - verifyAuthentication() - Verifyauthentication
+
+// === Data Functions ===
+// - getCurrentUser() - Getcurrentuser
+
+// === Other ===
+// - authenticateUser() - Authenticateuser
+// - logoutUser() - Logoutuser
+
 /**
  * Authenticate user with Playwright
  * @param {Page} page - Playwright page object
@@ -29,7 +43,7 @@ async function authenticateUser(page, username, password, options = {}) {
     timeout = 30000
   } = options;
 
-  const loginURL = `${baseURL}/trading-ui/login.html`;
+  const loginURL = `${baseURL}/`;
 
   try {
     // Navigate to login page
@@ -80,12 +94,12 @@ async function authenticateUser(page, username, password, options = {}) {
 
     // Wait for navigation (happens after 1 second delay in auth.js)
     try {
-      await page.waitForURL(url => !url.includes('login.html'), { timeout: 10000 });
+      await page.waitForURL(url => !url.includes('/login'), { timeout: 10000 });
     } catch (e) {
       // If navigation doesn't happen, that's okay - we're authenticated
       // Just verify we're not on login page
       const currentURL = page.url();
-      if (currentURL.includes('login.html')) {
+      if (currentURL.includes('/login')) {
         // Wait a bit more for redirect
         await page.waitForTimeout(2000);
       }
@@ -120,11 +134,11 @@ async function authenticateUser(page, username, password, options = {}) {
     
     // Additional verification: check that we're not on login page anymore (if redirect happened)
     const currentURL = page.url();
-    if (currentURL.includes('login.html')) {
+    if (currentURL.includes('/login')) {
       // If still on login page, wait a bit more for redirect
       await page.waitForTimeout(2000);
       const finalURL = page.url();
-      if (finalURL.includes('login.html')) {
+      if (finalURL.includes('/login')) {
         // Still on login page - but we have localStorage, so authentication worked
         // This might be okay if redirect didn't happen yet
         // Just log a warning

@@ -5,6 +5,15 @@
  * Run in console: debugExecutionTickerLoading()
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - setupModalWatcher() - Setupmodalwatcher
+
+// === Other ===
+// - addTimeline() - Addtimeline
+
 window.debugExecutionTickerLoading = async function() {
     console.log('🔍 ===== DEBUG: ExecutionTicker Loading =====');
     console.log('📅 Start time:', new Date().toISOString());

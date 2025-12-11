@@ -8,6 +8,15 @@
  *   await CacheTTLGuard.ensure('trades-data', window.loadTradesData);
  */
 (function() {
+
+// ===== FUNCTION INDEX =====
+//
+// === Event Handlers ===
+// - setConfig() - Setconfig
+//
+// === Other ===
+// - ensure() - Ensure
+
   'use strict';
 
   const CACHE_TTL_CONFIG = {
@@ -31,7 +40,23 @@
     'business:calculate-percentage-from-price': { ttl: 60 * 1000 }, // Increased from 30s
     'business:calculate-execution-values': { ttl: 60 * 1000 }, // Increased from 30s - complex calculation
     'business:calculate-average-price': { ttl: 60 * 1000 }, // Increased from 30s
-    'business:validate-execution': { ttl: 120 * 1000 }, // Increased from 60s - validation results are stable
+    'business:validate-execution': { ttl: 120 * 1000 },
+    // Historical Data Services - Optimized TTL
+    'trade-history-data': { ttl: 5 * 60 * 1000 }, // 5 minutes
+    'trade-history-data-*': { ttl: 5 * 60 * 1000 },
+    'trade-history-statistics-*': { ttl: 5 * 60 * 1000 },
+    'trade-history-aggregated-*': { ttl: 5 * 60 * 1000 },
+    'trade-history-plan-vs-execution-*': { ttl: 5 * 60 * 1000 },
+    'portfolio-state-data': { ttl: 10 * 60 * 1000 }, // 10 minutes - historical data changes less
+    'portfolio-state-snapshot-*': { ttl: 10 * 60 * 1000 },
+    'portfolio-state-series-*': { ttl: 10 * 60 * 1000 },
+    'portfolio-state-performance-*': { ttl: 10 * 60 * 1000 },
+    'portfolio-state-comparison-*': { ttl: 10 * 60 * 1000 },
+    'trading-journal-data': { ttl: 3 * 60 * 1000 }, // 3 minutes - changes more frequently
+    'trading-journal-data-*': { ttl: 3 * 60 * 1000 },
+    'trading-journal-statistics-*': { ttl: 3 * 60 * 1000 },
+    'trading-journal-calendar-*': { ttl: 3 * 60 * 1000 },
+    'trading-journal-by-entity-*': { ttl: 3 * 60 * 1000 }, // Increased from 60s - validation results are stable
     'business:validate-condition-value': { ttl: 120 * 1000 }, // Increased from 60s
     'business:validate-alert': { ttl: 120 * 1000 }, // Increased from 60s
     // New Business Logic API cache configs
@@ -50,7 +75,11 @@
     // AI Analysis cache configs
     'ai-analysis-templates': { ttl: 60 * 60 * 1000 }, // 1 hour - stable data
     'ai-analysis-history': { ttl: 5 * 60 * 1000 },   // 5 minutes - frequently updated
-    'ai-analysis-providers': { ttl: 5 * 60 * 1000 } // 5 minutes - user settings
+    'ai-analysis-providers': { ttl: 5 * 60 * 1000 }, // 5 minutes - user settings
+    // Historical Data Services cache configs
+    'trade-history-data': { ttl: 5 * 60 * 1000 }, // 5 minutes
+    'portfolio-state-data': { ttl: 10 * 60 * 1000 }, // 10 minutes
+    'trading-journal-data': { ttl: 3 * 60 * 1000 } // 3 minutes
   };
 
   async function ensure(key, loaderFn, options = {}) {

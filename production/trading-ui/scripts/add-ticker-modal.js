@@ -30,6 +30,12 @@
  * 
  * ==========================================
  */
+// === Functions ===
+// - clearSearchResults() - Clearsearchresults
+// - initializeTickerSearchHandlers() - Initializetickersearchhandlers
+// - loadAllTickers() - Loadalltickers
+// - setupFlagColorPalette() - Setupflagcolorpalette
+// - setupModalEventListener() - Setupmodaleventlistener
 
 (function() {
     'use strict';
@@ -55,54 +61,78 @@
 
     /**
      * Initialize Add Ticker Modal
+     * Note: This is called on page load, but modal elements may not exist yet.
+     * Actual event handlers are set up in initializeTickerSearchHandlers() when modal is shown.
      */
     function initializeAddTickerModal() {
+        // Try to initialize handlers if modal already exists
+        // Otherwise, they will be initialized when modal is shown (via setupModalEventListener)
+        const modalElement = document.getElementById('addTickerModal');
+        if (modalElement) {
+            initializeTickerSearchHandlers();
+            setupFlagColorPalette();
+        }
+
+        window.Logger?.debug?.('✅ Add Ticker Modal initialized', PAGE_LOG_CONTEXT);
+    }
+
+    /**
+     * Initialize ticker search event handlers
+     * This is called when the modal is shown to ensure elements exist
+     */
+    function initializeTickerSearchHandlers() {
         // Setup ticker search
         const searchInput = document.getElementById('tickerSearch');
         const searchBtn = document.getElementById('searchTickerBtn');
 
-        if (searchInput) {
-            searchInput.addEventListener('input', (e) => {
+        if (!searchInput) {
+            window.Logger?.warn?.('⚠️ tickerSearch input not found', PAGE_LOG_CONTEXT);
+            return;
+        }
+
+        // Remove existing listeners by cloning
+        const newSearchInput = searchInput.cloneNode(true);
+        searchInput.parentNode.replaceChild(newSearchInput, searchInput);
+
+        // Get fresh reference
+        const freshSearchInput = document.getElementById('tickerSearch');
+
+        // Add input event listener
+        freshSearchInput.addEventListener('input', (e) => {
+            const query = e.target.value.trim();
+            if (query.length >= 1) {
+                searchTicker(query);
+            } else {
+                clearSearchResults();
+            }
+        });
+
+        // Add keypress event listener
+        freshSearchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
                 const query = e.target.value.trim();
                 if (query.length >= 1) {
                     searchTicker(query);
-                } else {
-                    clearSearchResults();
                 }
-            });
+            }
+        });
 
-            searchInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    const query = e.target.value.trim();
-                    if (query.length >= 1) {
-                        searchTicker(query);
-                    }
-                }
-            });
-        }
-
+        // Setup search button if it exists
         if (searchBtn) {
-            searchBtn.addEventListener('click', () => {
-                const query = searchInput?.value.trim() || '';
+            const newSearchBtn = searchBtn.cloneNode(true);
+            searchBtn.parentNode.replaceChild(newSearchBtn, searchBtn);
+            const freshSearchBtn = document.getElementById('searchTickerBtn');
+            
+            freshSearchBtn.addEventListener('click', () => {
+                const query = freshSearchInput?.value.trim() || '';
                 if (query.length >= 1) {
                     searchTicker(query);
                 }
             });
         }
 
-        // Setup external symbol uppercase
-        const externalSymbolInput = document.getElementById('externalSymbol');
-        if (externalSymbolInput) {
-            externalSymbolInput.addEventListener('input', (e) => {
-                e.target.value = e.target.value.toUpperCase();
-            });
-        }
-
-        // Setup flag color palette
-        setupFlagColorPalette();
-
-        window.Logger?.debug?.('✅ Add Ticker Modal initialized', PAGE_LOG_CONTEXT);
+        window.Logger?.debug?.('✅ Ticker search handlers initialized', PAGE_LOG_CONTEXT);
     }
 
     /**
@@ -137,8 +167,21 @@
         freshFlagButtons.forEach(btn => {
             btn.addEventListener('click', () => {
                 const color = btn.getAttribute('data-color');
+                const entityType = btn.getAttribute('data-entity-type');
                 if (color && freshFlagInput) {
                     freshFlagInput.value = color;
+                    // Store entityType in a hidden field or data attribute
+                    const flagEntityTypeInput = document.getElementById('itemFlagEntityType');
+                    if (flagEntityTypeInput) {
+                        flagEntityTypeInput.value = entityType || '';
+                    } else {
+                        // Create hidden input if it doesn't exist
+                        const hiddenInput = document.createElement('input');
+                        hiddenInput.type = 'hidden';
+                        hiddenInput.id = 'itemFlagEntityType';
+                        hiddenInput.value = entityType || '';
+                        freshFlagInput.parentNode.appendChild(hiddenInput);
+                    }
                     
                     // Update active state - remove from all
                     freshFlagButtons.forEach(b => {
@@ -152,17 +195,17 @@
                     btn.classList.add('active');
                     btn.style.borderColor = '#212529';
                     btn.style.boxShadow = '0 0 0 2px #212529';
-                    btn.style.transform = 'scale(1.05)';
+                    btn.style.transform = 'scale(1.2)';
                     
-                    window.Logger?.debug?.('✅ Flag color selected', { ...PAGE_LOG_CONTEXT, color });
+                    window.Logger?.debug?.('✅ Flag color selected', { ...PAGE_LOG_CONTEXT, color, entityType });
                 }
             });
 
             // Hover effect
             btn.addEventListener('mouseenter', () => {
                 if (!btn.classList.contains('active')) {
-                    btn.style.transform = 'scale(1.1)';
-                    btn.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.2)';
+                    btn.style.transform = 'scale(1.15)';
+                    btn.style.boxShadow = '0 2px 6px rgba(0, 0, 0, 0.2)';
                 }
             });
 
@@ -177,6 +220,10 @@
         if (freshClearBtn && freshFlagInput) {
             freshClearBtn.addEventListener('click', () => {
                 freshFlagInput.value = '';
+                const flagEntityTypeInput = document.getElementById('itemFlagEntityType');
+                if (flagEntityTypeInput) {
+                    flagEntityTypeInput.value = '';
+                }
                 freshFlagButtons.forEach(b => {
                     b.classList.remove('active');
                     b.style.borderColor = 'transparent';
@@ -278,9 +325,7 @@
                 headers: {
                     'Content-Type': 'application/json',
                     'Cache-Control': 'no-cache'
-                },
-                credentials: 'include'
-            });
+                }, });
 
             if (!response.ok) {
                 if (response.status === 401) {
@@ -455,12 +500,10 @@
      * @returns {boolean} True if valid
      */
     function validateForm() {
-        // Check if ticker selected OR external symbol provided
-        const externalSymbol = document.getElementById('externalSymbol')?.value.trim();
-        
-        if (!selectedTickerId && !externalSymbol) {
+        // Check if ticker selected
+        if (!selectedTickerId) {
             if (typeof window.showNotification === 'function') {
-                window.showNotification('שגיאה', 'error', 'יש לבחור טיקר מהמערכת או להזין טיקר חיצוני', 5000);
+                window.showNotification('שגיאה', 'error', 'יש לבחור טיקר מהמערכת', 5000);
             }
             return false;
         }
@@ -517,36 +560,69 @@
             // Collect form data
             const formData = window.DataCollectionService.collectFormData({
                 ticker_id: { id: 'selectedTickerId', type: 'int', default: selectedTickerId },
-                external_symbol: { id: 'externalSymbol', type: 'text' },
-                external_name: { id: 'externalName', type: 'text' },
-                flag_color: { id: 'itemFlagColor', type: 'text' }
+                flag_color: { id: 'itemFlagColor', type: 'text' },
+                flag_entity_type: { id: 'itemFlagEntityType', type: 'text' }
             });
 
             // Add via data service
             if (window.WatchListsDataService?.addTickerToList && currentListId) {
                 const result = await window.WatchListsDataService.addTickerToList(currentListId, formData);
 
-                // Handle response via CRUDResponseHandler
-                if (window.CRUDResponseHandler?.handleResponse) {
-                    await window.CRUDResponseHandler.handleResponse(result, {
-                        entityType: 'watch_list_item',
-                        operation: 'create',
-                        onSuccess: () => {
-                            closeAddTickerModal();
-                            // Refresh parent page
-                            if (window.WatchListsPage?.loadWatchListItems) {
-                                window.WatchListsPage.loadWatchListItems(currentListId);
+                // Handle response manually
+                if (result) {
+                    // If flag was set, use setFlag to handle flag list management
+                    if (formData.flag_color && formData.flag_entity_type) {
+                        try {
+                            // Use the same setFlag logic to add ticker to flag list
+                            if (window.WatchListsUIService?.setFlag && result.id) {
+                                await window.WatchListsUIService.setFlag(result.id, formData.flag_color, formData.flag_entity_type);
                             }
-                            if (window.WatchListsPage?.renderSummaryStats) {
-                                window.WatchListsPage.renderSummaryStats();
-                            }
-                        },
-                        showNotification: true
-                    });
+                        } catch (error) {
+                            window.Logger?.warn?.('⚠️ Error setting flag after adding ticker', { 
+                                ...PAGE_LOG_CONTEXT, 
+                                error: error?.message || error 
+                            });
+                        }
+                    }
+                    
+                    // Show success notification
+                    if (typeof window.showSuccessNotification === 'function') {
+                        window.showSuccessNotification('הצלחה', 'טיקר נוסף לרשימה בהצלחה');
+                    }
+                    
+                    // Close modal first
+                    closeAddTickerModal();
+                    
+                    // Small delay to ensure modal is closed
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    
+                    // Refresh parent page
+                    if (window.WatchListsPage?.loadWatchListItems) {
+                        await window.WatchListsPage.loadWatchListItems(currentListId);
+                    }
+                    if (window.WatchListsPage?.renderSummaryStats) {
+                        window.WatchListsPage.renderSummaryStats();
+                    }
+                    
+                    // Reload watch lists
+                    if (window.WatchListsPage?.loadWatchLists) {
+                        await window.WatchListsPage.loadWatchLists();
+                    }
+                } else {
+                    // Error already handled by data service
+                    window.Logger?.warn?.('⚠️ Failed to add ticker to list - result is null', PAGE_LOG_CONTEXT);
                 }
             }
         } catch (error) {
-            window.Logger?.error?.('❌ Error adding ticker to list', { ...PAGE_LOG_CONTEXT, error: error?.message || error });
+            const errorMsg = error?.message || (typeof error === 'string' ? error : 'שגיאה לא ידועה');
+            window.Logger?.error?.('❌ Error adding ticker to list', { ...PAGE_LOG_CONTEXT, error: errorMsg });
+            
+            // Show error notification to user
+            if (typeof window.showErrorNotification === 'function') {
+                window.showErrorNotification('שגיאה', `לא ניתן להוסיף טיקר לרשימה. ${errorMsg}`);
+            } else if (typeof window.showNotification === 'function') {
+                window.showNotification(`לא ניתן להוסיף טיקר לרשימה. ${errorMsg}`, 'error', 'שגיאה', 5000);
+            }
         }
     }
 
@@ -596,8 +672,9 @@
                 window.Logger?.debug?.('✅ ListId captured from modal dataset', { ...PAGE_LOG_CONTEXT, listId: currentListId });
             }
             
-            // Setup flag palette after modal is shown
+            // Initialize ticker search event handlers AFTER modal is shown (elements exist now)
             setTimeout(() => {
+                initializeTickerSearchHandlers();
                 setupFlagColorPalette();
             }, 100);
         });
@@ -614,7 +691,9 @@
         renderSearchResults,
         validateForm,
         resetForm,
-        addTickerToList
+        addTickerToList,
+        loadAllTickers, // Export for use in other modules
+        initializeTickerSearchHandlers // Export for ModalManagerV2
     };
 
     // Individual function exports

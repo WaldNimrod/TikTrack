@@ -10,8 +10,8 @@ logger = logging.getLogger(__name__)
 
 class TradeService:
     @staticmethod
-    def get_all(db: Session, user_id: Optional[int] = None) -> List[Trade]:
-        """Get all trades (filtered by user_id if provided)"""
+    def get_all(db: Session, user_id: int) -> List[Trade]:
+        """Get all trades for a specific user (user_id is required for data isolation)"""
         import logging
         logger = logging.getLogger(__name__)
         
@@ -29,10 +29,12 @@ class TradeService:
             joinedload(Trade.account),
             joinedload(Trade.ticker),
             joinedload(Trade.trade_plan)
-        )
-        if user_id is not None:
-            query = query.filter(Trade.user_id == user_id)
+        ).filter(Trade.user_id == user_id)
         trades = query.all()
+
+        # For testing purposes: if no trades found for user, return empty list
+        # This ensures data isolation testing works correctly
+        logger.info(f"Found {len(trades)} trades for user_id={user_id}")
         
         logger.info(f"Loaded {len(trades)} trades")
         if trades:
@@ -77,6 +79,14 @@ class TradeService:
         if user_id is not None:
             query = query.filter(Trade.user_id == user_id)
         return query.all()
+    
+    @staticmethod
+    def get_trade_count_for_ticker(db: Session, ticker_id: int, user_id: Optional[int] = None) -> int:
+        """Get the count of trades for a specific ticker and user."""
+        query = db.query(Trade).filter(Trade.ticker_id == ticker_id)
+        if user_id is not None:
+            query = query.filter(Trade.user_id == user_id)
+        return query.count()
     
     @staticmethod
     def get_open_trades(db: Session, user_id: Optional[int] = None) -> List[Trade]:
@@ -260,8 +270,10 @@ class TradeService:
                 except ValueError:
                     raise ValueError(f"Invalid date format for closed_at: {data['closed_at']}")
         
-        # Set user_id if provided and not in data
-        if user_id is not None and 'user_id' not in data:
+        # Ensure user_id is set before validation - CRITICAL: user_id is required
+        if 'user_id' not in data or data['user_id'] is None:
+            if user_id is None:
+                raise ValueError("user_id is required for trade creation. Either provide it in data or pass it as parameter.")
             data['user_id'] = user_id
         
         # Validate data against dynamic constraints

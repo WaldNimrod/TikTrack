@@ -7,6 +7,13 @@
  * Usage: Call window.testUnifiedTableSystem() in browser console
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Other ===
+// - test() - Test
+// - warn() - Warn
+
 window.testUnifiedTableSystem = function() {
   console.log('🔍 ===== UNIFIED TABLE SYSTEM TEST =====');
   console.log('');

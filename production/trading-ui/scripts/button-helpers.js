@@ -6,6 +6,21 @@
  * ומשמרות את הלוגיקה המורכבת של הפונקציות הישנות
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - createCancelButtonHelper() - Createcancelbuttonhelper
+// - createDeleteButtonByTypeHelper() - Createdeletebuttonbytypehelper
+// - createEditButtonHelper() - Createeditbuttonhelper
+// - createDeleteButtonHelper() - Createdeletebuttonhelper
+// - createLinkButtonHelper() - Createlinkbuttonhelper
+// - createCloseButtonHelper() - Createclosebuttonhelper
+// - createSortButtonHelper() - Createsortbuttonhelper
+// - createToggleButtonHelper() - Createtogglebuttonhelper
+// - createFilterButtonHelper() - Createfilterbuttonhelper
+// - createButtonHelper() - Createbuttonhelper
+
 /**
  * יצירת כפתור ביטול/הפעלה מחדש עם לוגיקה מורכבת
  * @param {HTMLElement} container - אלמנט ה-container

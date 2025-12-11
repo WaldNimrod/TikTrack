@@ -208,10 +208,20 @@ class CodeQualityDashboard {
             return data;
 
         } catch (error) {
+            // Soft failure - don't crash the dashboard
             if (window.Logger) {
-                window.Logger.error('Error running Error Handling check:', error, { page: 'code-quality-dashboard' });
+                window.Logger.warn('⚠️ Error Handling check failed, continuing with empty data', {
+                    error: error?.message,
+                    page: 'code-quality-dashboard'
+                });
             }
-            throw error;
+            // Return empty data instead of throwing
+            const emptyData = {
+                summary: { coveragePercentage: 0, withErrorHandling: 0, withoutErrorHandling: 0 },
+                files: []
+            };
+            this.lastCheckResults.errorHandling = emptyData;
+            return emptyData;
         }
     }
 
@@ -236,10 +246,20 @@ class CodeQualityDashboard {
             return data;
 
         } catch (error) {
+            // Soft failure - don't crash the dashboard
             if (window.Logger) {
-                window.Logger.error('Error running JSDoc check:', error, { page: 'code-quality-dashboard' });
+                window.Logger.warn('⚠️ JSDoc check failed, continuing with empty data', {
+                    error: error?.message,
+                    page: 'code-quality-dashboard'
+                });
             }
-            throw error;
+            // Return empty data instead of throwing
+            const emptyData = {
+                summary: { coveragePercentage: 0, withJSDoc: 0, withoutJSDoc: 0 },
+                files: []
+            };
+            this.lastCheckResults.jsdoc = emptyData;
+            return emptyData;
         }
     }
 

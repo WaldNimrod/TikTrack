@@ -3,6 +3,27 @@
  * גרסה 2.0 - תיקון שגיאות JavaScript
  */
 
+
+/**
+ * ===== FUNCTION INDEX =====
+ */
+
+// === Object Methods ===
+// - copyDetailedLog() - Copydetailedlog
+
+// === Event Handlers ===
+// - ServerMonitor.optimizeDatabase() - Optimizedatabase
+// - ServerMonitor.exportLogs() - Exportlogs
+
+// === Global Functions ===
+// - copyDetailedLog() - Copydetailedlog
+
+// === EOD Integration Functions ===
+// - loadEODMonitoringData() - Loadeodmonitoringdata
+// - updateEODPerformanceData() - Updateeodperformancedata
+// - updateEODJobStatus() - Updateeodjobstatus
+// - updateEODAlerts() - Updateeodalerts
+
 class ServerMonitor {
   constructor() {
     this.logs = [];
@@ -51,12 +72,18 @@ class ServerMonitor {
     this.startMonitoring();
     this.loadSystemInfo();
     this.loadHealthData();
+    this.loadEODMonitoringData(); // EOD INTEGRATION: Load EOD monitoring data
   }
 
   // טעינת הגדרות
   loadSettings() {
     try {
-      const saved = window.PageStateManager?.getItem('serverMonitorSettings');
+      const getItem = window.PageStateManager?.getItem;
+      if (typeof getItem !== 'function') {
+        window.Logger?.warn('⚠️ PageStateManager not available for serverMonitorSettings');
+        return;
+      }
+      const saved = getItem.call(window.PageStateManager, 'serverMonitorSettings');
       if (saved) {
         this.settings = { ...this.settings, ...JSON.parse(saved) };
       }
@@ -68,7 +95,12 @@ class ServerMonitor {
   // שמירת הגדרות
   saveSettings() {
     try {
-      window.PageStateManager?.setItem('serverMonitorSettings', JSON.stringify(this.settings));
+      const setItem = window.PageStateManager?.setItem;
+      if (typeof setItem !== 'function') {
+        window.Logger?.warn('⚠️ PageStateManager not available for saving serverMonitorSettings');
+        return;
+      }
+      setItem.call(window.PageStateManager, 'serverMonitorSettings', JSON.stringify(this.settings));
     } catch (error) {
       window.Logger?.error('❌ שגיאה בשמירת הגדרות:', error);
     }
@@ -525,6 +557,37 @@ class ServerMonitor {
     } catch (error) {
       window.Logger?.error('❌ שגיאה בטעינת נתוני בריאות:', error);
     }
+
+    // EOD INTEGRATION: Load EOD monitoring data as part of health data
+    await this.loadEODMonitoringData();
+  }
+
+  // === EOD INTEGRATION: Load EOD monitoring data ===
+  async loadEODMonitoringData() {
+    try {
+      window.Logger?.debug('🔍 ServerMonitor - טוען נתוני ניטור EOD');
+
+      // Load EOD performance stats
+      const performanceStats = await window.EODIntegrationHelper.loadEODPerformanceStats();
+      if (performanceStats) {
+        this.updateEODPerformanceData(performanceStats);
+      }
+
+      // Load EOD job status
+      const jobHistory = await window.EODIntegrationHelper.loadEODJobHistory({ limit: 10 });
+      if (jobHistory && Array.isArray(jobHistory.data)) {
+        this.updateEODJobStatus(jobHistory.data);
+      }
+
+      // Load EOD alerts
+      const alerts = await window.EODIntegrationHelper.loadEODAlerts({ severity: 'high', limit: 5 });
+      if (alerts && Array.isArray(alerts.data)) {
+        this.updateEODAlerts(alerts.data);
+      }
+
+    } catch (error) {
+      window.Logger?.error('❌ שגיאה בטעינת נתוני ניטור EOD:', error);
+    }
   }
 
   // עדכון נתוני בריאות בממשק
@@ -788,30 +851,73 @@ class ServerMonitor {
       });
     }
   }
-}
 
-// אתחול המערכת כשהדף נטען
-document.addEventListener('DOMContentLoaded', function() {
-  window.Logger?.debug('🎯 DOM loaded, initializing ServerMonitor...');
-  
-  // יצירת instance גלובלי
-  window.serverMonitor = new ServerMonitor();
-  
-  window.Logger?.debug('✅ ServerMonitor initialized successfully');
-});
+  // === EOD INTEGRATION: Update UI with EOD performance data ===
+  updateEODPerformanceData(performanceData) {
+    if (!performanceData) return;
 
-// יצירת instance גלובלי מיד
-window.serverMonitor = new ServerMonitor();
-
-// הוספת פונקציות גלובליות
-window.copyDetailedLog = () => {
-  if (window.serverMonitor) {
-    return window.serverMonitor.copyDetailedLog();
-  } else {
-    window.Logger?.error('❌ serverMonitor instance לא קיים');
-    if (window.showErrorNotification) {
-      window.showErrorNotification('שגיאה', 'serverMonitor לא אותחל');
+    // Update EOD performance metrics
+    const eodRunsEl = document.getElementById('eodRunsCount');
+    if (eodRunsEl && performanceData.total_eod_runs !== undefined) {
+      eodRunsEl.textContent = performanceData.total_eod_runs.toLocaleString();
     }
+
+    const eodSuccessEl = document.getElementById('eodSuccessRate');
+    if (eodSuccessEl && performanceData.success_rate !== undefined) {
+      eodSuccessEl.textContent = Math.round(performanceData.success_rate * 100) + '%';
+    }
+
+    const eodAvgTimeEl = document.getElementById('eodAvgProcessingTime');
+    if (eodAvgTimeEl && performanceData.avg_processing_time !== undefined) {
+      eodAvgTimeEl.textContent = Math.round(performanceData.avg_processing_time) + 's';
+    }
+
+    const eodLastRunEl = document.getElementById('eodLastRunTime');
+    if (eodLastRunEl && performanceData.last_run_time) {
+      const lastRun = new Date(performanceData.last_run_time);
+      eodLastRunEl.textContent = lastRun.toLocaleString('he-IL');
+    }
+  }
+
+  // === EOD INTEGRATION: Update UI with EOD alerts ===
+  updateEODAlerts(alerts) {
+    if (!Array.isArray(alerts)) return;
+
+    const alertsContainer = document.getElementById('eodAlerts');
+    if (!alertsContainer) return;
+
+    // Clear existing content
+    alertsContainer.innerHTML = '';
+
+    const activeAlerts = alerts.filter(alert => alert.status === 'active');
+
+    if (activeAlerts.length === 0) {
+      alertsContainer.innerHTML = '<div class="text-success">אין התראות פעילות</div>';
+      return;
+    }
+
+    // Create alerts list
+    const alertsList = document.createElement('div');
+    alertsList.className = 'alerts-list';
+
+    activeAlerts.slice(0, 5).forEach(alert => {
+      const alertItem = document.createElement('div');
+      alertItem.className = 'alert-item ' + alert.severity;
+
+      const severityIcon = alert.severity === 'high' ? '🚨' : alert.severity === 'medium' ? '⚠️' : 'ℹ️';
+      const title = alert.title || 'התראה';
+      const createdAt = alert.created_at ? new Date(alert.created_at).toLocaleString('he-IL') : 'לא ידוע';
+
+      alertItem.innerHTML = `
+        <span class="alert-icon">${severityIcon}</span>
+        <span class="alert-title">${title}</span>
+        <span class="alert-time">${createdAt}</span>
+      `;
+
+      alertsList.appendChild(alertItem);
+    });
+
+    alertsContainer.appendChild(alertsList);
   }
 };
 

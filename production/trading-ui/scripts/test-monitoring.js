@@ -10,6 +10,22 @@
  * @author TikTrack Development Team
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - initializeTestMonitoringPage() - Initializetestmonitoringpage
+// - setupTestMonitoringHandlers() - Setuptestmonitoringhandlers
+
+// === Event Handlers ===
+// - loadTestMonitoringData() - Loadtestmonitoringdata
+// - testNotification() - Testnotification
+// - testDataCollection() - Testdatacollection
+
+// === Other ===
+// - testCache() - Testcache
+// - testLogger() - Testlogger
+
 // ===== PAGE INITIALIZATION =====
 
 /**

@@ -78,6 +78,75 @@
  * ========================================
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - setupDateValidation() - Setupdatevalidation
+// - setupSortEventListeners() - Setupsorteventlisteners
+
+// === Event Handlers ===
+// - formatDailyChange() - Formatdailychange
+// - performTradeCancellation() - Performtradecancellation
+// - performTradeDeletion() - Performtradedeletion
+// - onShowClosedTradesChange() - Onshowclosedtradeschange
+// - validateTradeStatusChange() - Validatetradestatuschange
+// - getCurrentPosition() - Getcurrentposition
+// - clearDateValidationMessages() - Cleardatevalidationmessages
+// - validateTradePlanChange() - Validatetradeplanchange
+// - validateTradeChanges() - Validatetradechanges
+// - validateTickerChange() - Validatetickerchange
+// - showTickerChangeConfirmation() - Showtickerchangeconfirmation
+// - confirmDeleteTrade() - Confirmdeletetrade
+
+// === UI Functions ===
+// - updateTradesTable() - Updatetradestable
+// - updateTickerFromTradePlan() - Updatetickerfromtradeplan
+// - updateTickersListForClosedTrades() - Updatetickerslistforclosedtrades
+// - updateTableStats() - Updatetablestats
+// - updateEditTradeTickerFromPlan() - Updateedittradetickerfromplan
+// - updateEditTradePriceFromTicker() - Updateedittradepricefromticker
+// - refreshTrades() - Refreshtrades
+// - updateTrade() - Updatetrade
+
+// === Data Functions ===
+// - getInvestmentTypeColor() - Getinvestmenttypecolor
+// - loadTradesData() - Loadtradesdata
+// - _REMOVED_loadEditTradeModalData() -  Removed Loadedittrademodaldata
+// - _REMOVED_saveEditTradeData() -  Removed Saveedittradedata
+// - saveNewTradeRecord() - Savenewtraderecord
+// - loadModalData() - Loadmodaldata
+// - loadTradePlanDates() - Loadtradeplandates
+// - filterTradesData() - Filtertradesdata
+
+// === Utility Functions ===
+// - checkLinkedItemsAndCancel() - Checklinkeditemsandcancel
+// - validateTradeForm() - Validatetradeform
+// - checkLinkedItemsBeforeDelete() - Checklinkeditemsbeforedelete
+// - checkLinkedItemsBeforeCancel() - Checklinkeditemsbeforecancel
+// - validateDateFields() - Validatedatefields
+// - validateTradePlanDate() - Validatetradeplandate
+
+// === Other ===
+// - addInvestmentTypeColorLegend() - Addinvestmenttypecolorlegend
+// - viewTickerDetails() - Viewtickerdetails
+// - viewAccountDetails() - Viewaccountdetails
+// - viewTradePlanDetails() - Viewtradeplandetails
+// - editTradeRecord() - Edittraderecord
+// - cancelTradeRecord() - Canceltraderecord
+// - deleteTradeRecord() - Deletetraderecord
+// - addEditImportantNote() - Addeditimportantnote
+// - addEditReminder() - Addeditreminder
+// - disableTradeFormFields() - Disabletradeformfields
+// - enableTradeFormFields() - Enabletradeformfields
+// - addImportantNote() - Addimportantnote
+// - addReminder() - Addreminder
+// - addEditBuySell() - Addeditbuysell
+// - applyStatusFilterToTrades() - Applystatusfiltertotrades
+// - reactivateTrade() - Reactivatetrade
+// - generateDetailedLog() - Generatedetailedlog
+// - _REMOVED_copyDetailedLog() -  Removed Copydetailedlog
+
 // בדיקה שהפונקציות הנדרשות נטענו
 if (typeof showErrorNotification === 'undefined') {
   // console.error('showErrorNotification לא נטענה!');

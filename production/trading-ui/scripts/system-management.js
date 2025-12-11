@@ -9,6 +9,32 @@
  * @lastUpdated September 4, 2025
  */
 
+// ===== FUNCTION INDEX =====
+
+// === Object Methods ===
+// - init() - Initialize system management
+// - loadSystemData() - Load system data
+// - updateDashboard() - Update dashboard with data
+// - loadEODJobManagementData() - Load EOD job management data
+// - updateEODJobHistory() - Update EOD job history
+// - updateEODJobStatus() - Update EOD job status
+// - updateEODAlertsManagement() - Update EOD alerts management
+// - triggerEODJob() - Trigger EOD job
+
+// === Static Methods ===
+// - initializeDashboard() - Initialize dashboard
+// - setupEventListeners() - Setup event listeners
+// - refreshSystemData() - Refresh system data
+// - showNotification() - Show notification
+
+// === Global Functions ===
+// - copyDetailedLog() - Copy detailed log
+// - viewEODJobDetails() - View EOD job details
+// - cancelEODJob() - Cancel EOD job
+// - viewEODAlertDetails() - View EOD alert details
+// - resolveEODAlert() - Resolve EOD alert
+// - triggerEODRecalculation() - Trigger EOD recalculation
+
 class SystemManagement {
   constructor() {
     this.isInitialized = false;
@@ -1060,17 +1086,21 @@ class SystemManagement {
       // Load primary data provider
       await SystemManagement.loadPrimaryDataProvider();
 
-      // Load system overview
-      const overviewResponse = await fetch('/api/system/overview');
-      const overviewData = await overviewResponse.json();
+    // Load system overview
+    const overviewResponse = await fetch('/api/system/overview');
+    const overviewData = await overviewResponse.json();
 
-      if (overviewData.status === 'success') {
-        this.currentData = overviewData.data;
-        this.updateDashboard(overviewData.data);
-        window.Logger?.debug('✅ System data loaded successfully');
-      } else {
-        throw new Error(overviewData.message || 'Failed to load system data');
-      }
+    if (overviewData.status === 'success') {
+      this.currentData = overviewData.data;
+
+      // === EOD INTEGRATION: Load EOD job management data ===
+      await this.loadEODJobManagementData();
+
+      this.updateDashboard(overviewData.data);
+      window.Logger?.debug('✅ System data loaded successfully');
+    } else {
+      throw new Error(overviewData.message || 'Failed to load system data');
+    }
 
     } catch (error) {
       window.Logger?.error('❌ Error loading system data:', error);
@@ -1993,7 +2023,214 @@ class SystemManagement {
       }
     }
   }
-}// Initialize dashboard when DOM is ready
+
+  // === EOD INTEGRATION: Load EOD job management data ===
+  async loadEODJobManagementData() {
+    try {
+      window.Logger?.debug('🔍 SystemManagement - טוען נתוני ניהול EOD jobs');
+
+      // Load EOD job history
+      const jobHistory = await window.EODIntegrationHelper.loadEODJobHistory({ limit: 20 });
+      if (jobHistory && Array.isArray(jobHistory.data)) {
+        this.updateEODJobHistory(jobHistory.data);
+      }
+
+      // Load EOD job status
+      const jobStatus = await window.EODIntegrationHelper.loadEODJobStatus();
+      if (jobStatus) {
+        this.updateEODJobStatus(jobStatus);
+      }
+
+      // Load EOD alerts for management
+      const alerts = await window.EODIntegrationHelper.loadEODAlerts({ limit: 10 });
+      if (alerts && Array.isArray(alerts.data)) {
+        this.updateEODAlertsManagement(alerts.data);
+      }
+
+    } catch (error) {
+      window.Logger?.error('❌ שגיאה בטעינת נתוני ניהול EOD jobs:', error);
+    }
+  }
+
+  // === EOD INTEGRATION: Update UI with EOD job history ===
+  updateEODJobHistory(jobHistory) {
+    if (!Array.isArray(jobHistory)) return;
+
+    const jobHistoryContainer = document.getElementById('eodJobHistory');
+    if (!jobHistoryContainer) return;
+
+    // Clear existing content
+    jobHistoryContainer.innerHTML = '';
+
+    if (jobHistory.length === 0) {
+      jobHistoryContainer.innerHTML = '<div class="text-muted">אין היסטוריית jobs</div>';
+      return;
+    }
+
+    // Create job history table
+    const table = document.createElement('table');
+    table.className = 'table table-sm table-striped';
+
+    const thead = document.createElement('thead');
+    thead.innerHTML = `
+      <tr>
+        <th>סוג Job</th>
+        <th>סטטוס</th>
+        <th>התחלה</th>
+        <th>סיום</th>
+        <th>משך</th>
+        <th>פעולות</th>
+      </tr>
+    `;
+    table.appendChild(thead);
+
+    const tbody = document.createElement('tbody');
+
+    jobHistory.forEach(job => {
+      const row = document.createElement('tr');
+
+      const statusIcon = job.status === 'success' ? '✅' : job.status === 'running' ? '🔄' : job.status === 'failed' ? '❌' : '⏳';
+      const statusText = job.status === 'success' ? 'הצליח' : job.status === 'running' ? 'רץ' : job.status === 'failed' ? 'נכשל' : 'ממתין';
+
+      const startTime = job.created_at ? new Date(job.created_at).toLocaleString('he-IL') : 'לא ידוע';
+      const endTime = job.updated_at ? new Date(job.updated_at).toLocaleString('he-IL') : '-';
+
+      const duration = job.created_at && job.updated_at ?
+        Math.round((new Date(job.updated_at) - new Date(job.created_at)) / 1000) + ' שניות' : '-';
+
+      row.innerHTML = `
+        <td>${job.job_type || 'לא ידוע'}</td>
+        <td><span class="status-${job.status}">${statusIcon} ${statusText}</span></td>
+        <td>${startTime}</td>
+        <td>${endTime}</td>
+        <td>${duration}</td>
+        <td>
+          <button class="btn btn-sm btn-outline-primary" onclick="viewEODJobDetails('${job.id}')">פרטים</button>
+          ${job.status === 'running' ? `<button class="btn btn-sm btn-outline-warning" onclick="cancelEODJob('${job.id}')">ביטול</button>` : ''}
+        </td>
+      `;
+
+      tbody.appendChild(row);
+    });
+
+    table.appendChild(tbody);
+    jobHistoryContainer.appendChild(table);
+  }
+
+  // === EOD INTEGRATION: Update UI with EOD job status ===
+  updateEODJobStatus(jobStatus) {
+    if (!jobStatus) return;
+
+    // Update EOD job status indicators
+    const eodStatusEl = document.getElementById('eodJobStatus');
+    if (eodStatusEl) {
+      const statusText = jobStatus.status === 'idle' ? 'לא פעיל' :
+                        jobStatus.status === 'running' ? 'רץ' : 'לא ידוע';
+      const statusClass = jobStatus.status === 'idle' ? 'success' :
+                         jobStatus.status === 'running' ? 'warning' : 'secondary';
+
+      eodStatusEl.textContent = statusText;
+      eodStatusEl.className = `status-value ${statusClass}`;
+    }
+
+    const currentJobEl = document.getElementById('currentEODJob');
+    if (currentJobEl) {
+      currentJobEl.textContent = jobStatus.current_job || 'אין job פעיל';
+    }
+  }
+
+  // === EOD INTEGRATION: Update UI with EOD alerts for management ===
+  updateEODAlertsManagement(alerts) {
+    if (!Array.isArray(alerts)) return;
+
+    const alertsContainer = document.getElementById('eodAlertsManagement');
+    if (!alertsContainer) return;
+
+    // Clear existing content
+    alertsContainer.innerHTML = '';
+
+    const activeAlerts = alerts.filter(alert => alert.status === 'active');
+
+    if (activeAlerts.length === 0) {
+      alertsContainer.innerHTML = '<div class="text-success">אין התראות פעילות</div>';
+      return;
+    }
+
+    // Create alerts management table
+    const table = document.createElement('table');
+    table.className = 'table table-sm';
+
+    const thead = document.createElement('thead');
+    thead.innerHTML = `
+      <tr>
+        <th>חומרה</th>
+        <th>כותרת</th>
+        <th>זמן</th>
+        <th>פעולות</th>
+      </tr>
+    `;
+    table.appendChild(thead);
+
+    const tbody = document.createElement('tbody');
+
+    activeAlerts.forEach(alert => {
+      const row = document.createElement('tr');
+
+      const severityIcon = alert.severity === 'high' ? '🚨' : alert.severity === 'medium' ? '⚠️' : 'ℹ️';
+      const severityText = alert.severity === 'high' ? 'גבוהה' : alert.severity === 'medium' ? 'בינונית' : 'נמוכה';
+
+      const createdAt = alert.created_at ? new Date(alert.created_at).toLocaleString('he-IL') : 'לא ידוע';
+
+      row.innerHTML = `
+        <td><span class="severity-${alert.severity}">${severityIcon} ${severityText}</span></td>
+        <td>${alert.title || 'התראה'}</td>
+        <td>${createdAt}</td>
+        <td>
+          <button class="btn btn-sm btn-outline-info" onclick="viewEODAlertDetails('${alert.id}')">פרטים</button>
+          <button class="btn btn-sm btn-outline-success" onclick="resolveEODAlert('${alert.id}')">פתור</button>
+        </td>
+      `;
+
+      tbody.appendChild(row);
+    });
+
+    table.appendChild(tbody);
+    alertsContainer.appendChild(table);
+  }
+
+  // === EOD INTEGRATION: Manual EOD job trigger ===
+  async triggerEODJob(jobType, params = {}) {
+    try {
+      window.Logger?.info(`🔄 Triggering EOD job: ${jobType}`, { params });
+
+      const response = await fetch('/api/eod/jobs/trigger', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          job_type: jobType,
+          ...params
+        })
+      });
+
+      const result = await response.json();
+
+      if (result.status === 'success') {
+        SystemManagement.showNotification('✅ Job EOD הופעל בהצלחה', 'success');
+        // Reload data to show new job
+        await this.loadEODJobManagementData();
+      } else {
+        throw new Error(result.message || 'Failed to trigger EOD job');
+      }
+
+    } catch (error) {
+      window.Logger?.error('❌ Failed to trigger EOD job:', error);
+      SystemManagement.showNotification(`❌ שגיאה בהפעלת job EOD: ${error.message}`, 'error');
+    }
+  }
+};
+
 document.addEventListener('DOMContentLoaded', () => {
   window.systemManagement = new SystemManagement();
   window.systemManagement.init();
@@ -2006,6 +2243,140 @@ document.addEventListener('DOMContentLoaded', () => {
   window.runBackup = SystemManagement.runBackup;
   window.restoreFromBackup = SystemManagement.restoreFromBackup;
   window.copyCheckResultsToClipboard = SystemManagement.copyCheckResultsToClipboard;
+
+  // EOD INTEGRATION: Make EOD functions globally available
+  window.viewEODJobDetails = async function(jobId) {
+    try {
+      const response = await fetch(`/api/eod/jobs/${jobId}`);
+      const result = await response.json();
+
+      if (result.status === 'success') {
+        const job = result.data;
+        const details = `
+          Job ID: ${job.id}
+          סוג: ${job.job_type}
+          סטטוס: ${job.status}
+          התחלה: ${job.created_at ? new Date(job.created_at).toLocaleString('he-IL') : 'לא ידוע'}
+          סיום: ${job.updated_at ? new Date(job.updated_at).toLocaleString('he-IL') : 'לא ידוע'}
+          הודעה: ${job.message || 'אין'}
+          פרטים: ${JSON.stringify(job.details || {}, null, 2)}
+        `;
+
+        alert(details); // Simple alert for now - can be enhanced with modal
+      } else {
+        SystemManagement.showNotification('❌ שגיאה בטעינת פרטי job', 'error');
+      }
+    } catch (error) {
+      window.Logger?.error('Failed to load EOD job details:', error);
+      SystemManagement.showNotification('❌ שגיאה בטעינת פרטי job', 'error');
+    }
+  };
+
+  window.cancelEODJob = async function(jobId) {
+    if (!confirm('האם אתה בטוח שברצונך לבטל את ה-job?')) return;
+
+    try {
+      const response = await fetch(`/api/eod/jobs/${jobId}/cancel`, {
+        method: 'POST'
+      });
+
+      const result = await response.json();
+
+      if (result.status === 'success') {
+        SystemManagement.showNotification('✅ Job EOD בוטל בהצלחה', 'success');
+        // Reload data
+        if (window.systemManagement) {
+          await window.systemManagement.loadEODJobManagementData();
+        }
+      } else {
+        throw new Error(result.message || 'Failed to cancel EOD job');
+      }
+    } catch (error) {
+      window.Logger?.error('Failed to cancel EOD job:', error);
+      SystemManagement.showNotification(`❌ שגיאה בביטול job: ${error.message}`, 'error');
+    }
+  };
+
+  window.viewEODAlertDetails = async function(alertId) {
+    try {
+      const response = await fetch(`/api/eod/alerts/${alertId}`);
+      const result = await response.json();
+
+      if (result.status === 'success') {
+        const alert = result.data;
+        const details = `
+          Alert ID: ${alert.id}
+          כותרת: ${alert.title}
+          תיאור: ${alert.description}
+          חומרה: ${alert.severity}
+          סטטוס: ${alert.status}
+          זמן יצירה: ${alert.created_at ? new Date(alert.created_at).toLocaleString('he-IL') : 'לא ידוע'}
+          פרטים: ${JSON.stringify(alert.details || {}, null, 2)}
+        `;
+
+        alert(details); // Simple alert for now - can be enhanced with modal
+      } else {
+        SystemManagement.showNotification('❌ שגיאה בטעינת פרטי התראה', 'error');
+      }
+    } catch (error) {
+      window.Logger?.error('Failed to load EOD alert details:', error);
+      SystemManagement.showNotification('❌ שגיאה בטעינת פרטי התראה', 'error');
+    }
+  };
+
+  window.resolveEODAlert = async function(alertId) {
+    try {
+      const response = await fetch(`/api/eod/alerts/${alertId}/resolve`, {
+        method: 'POST'
+      });
+
+      const result = await response.json();
+
+      if (result.status === 'success') {
+        SystemManagement.showNotification('✅ התראה EOD נפתרה בהצלחה', 'success');
+        // Reload data
+        if (window.systemManagement) {
+          await window.systemManagement.loadEODJobManagementData();
+        }
+      } else {
+        throw new Error(result.message || 'Failed to resolve EOD alert');
+      }
+    } catch (error) {
+      window.Logger?.error('Failed to resolve EOD alert:', error);
+      SystemManagement.showNotification(`❌ שגיאה בפתרון התראה: ${error.message}`, 'error');
+    }
+  };
+
+  window.triggerEODRecalculation = async function(dateFrom, dateTo, userId = null) {
+    try {
+      const response = await fetch('/api/eod/recompute', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          date_from: dateFrom,
+          date_to: dateTo,
+          user_id: userId
+        })
+      });
+
+      const result = await response.json();
+
+      if (result.status === 'success') {
+        SystemManagement.showNotification('✅ חישוב מחדש של EOD הופעל בהצלחה', 'success');
+        // Reload data
+        if (window.systemManagement) {
+          await window.systemManagement.loadEODJobManagementData();
+        }
+      } else {
+        throw new Error(result.message || 'Failed to trigger EOD recalculation');
+      }
+    } catch (error) {
+      window.Logger?.error('Failed to trigger EOD recalculation:', error);
+      SystemManagement.showNotification(`❌ שגיאה בחישוב מחדש: ${error.message}`, 'error');
+    }
+  };
 });
 
 // Cleanup on page unload

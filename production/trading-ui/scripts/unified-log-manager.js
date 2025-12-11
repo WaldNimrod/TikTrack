@@ -29,6 +29,12 @@
  * @author TikTrack Development Team
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Event Handlers ===
+// - request.onsuccess() - Onsuccess
+
 // ===== UNIFIED LOG MANAGER =====
 
 class UnifiedLogManager {

@@ -1,3 +1,13 @@
+// ===== FUNCTION INDEX =====
+// === Object Methods ===
+// - this.preferenceLoadInProgress() - Preferenceloadinprogress
+
+// === Event Handlers ===
+// - handler() - Handler
+
+// === Other ===
+// - generateDetailedLog() - Generatedetailedlog
+
 // Fallback גלובלי למקרה ש-Logger לא נטען
 if (!window.Logger) {
     window.Logger = {
@@ -124,7 +134,9 @@ class Logger {
         'tickers': 'business',
         'trade-plans': 'business',
         'cash-flows': 'business',
-        'notes': 'business'
+        'notes': 'business',
+        'trade-history': 'business',
+        'trade-history-page': 'business'
     };
 
     registerPreferenceListeners() {

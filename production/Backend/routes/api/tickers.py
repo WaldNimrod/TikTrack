@@ -1,4 +1,5 @@
 """
+# pyright: reportGeneralTypeIssues=false
 API Routes for Ticker Management - TikTrack
 
 This module contains all API endpoints for managing tickers in the system.
@@ -21,6 +22,7 @@ from flask import Blueprint, jsonify, request, g
 from sqlalchemy.orm import Session
 from config.database import get_db
 from services.ticker_service import TickerService
+from services.trade_service import TradeService
 from services.advanced_cache_service import cache_for, invalidate_cache
 from services.tag_service import TagService
 from services.date_normalization_service import DateNormalizationService
@@ -45,22 +47,13 @@ base_api = BaseEntityAPI('tickers', TickerService, 'tickers')
 preferences_service = PreferencesService()
 user_service = UserService()
 
-def _resolve_user_id() -> int:
+def _resolve_user_id() -> Optional[int]:
     """Return active user id from Flask context (set by auth middleware).
-    Falls back to default user if not authenticated (for backward compatibility)."""
+    Returns None if user is not authenticated (for proper authorization checks).
+    No fallback to default user - this ensures proper access control."""
     # Primary: Get from Flask context (set by auth middleware)
     user_id = getattr(g, 'user_id', None)
-    if user_id is not None:
-        return user_id
-    
-    # Fallback: Check query parameter
-    user_id = request.args.get('user_id', type=int)
-    if user_id is not None:
-        return user_id
-    
-    # Fallback: Default user (for backward compatibility and tools)
-    default_user = user_service.get_default_user()
-    return default_user["id"] if default_user else 1
+    return user_id
 
 def _get_tickers_normalizer() -> DateNormalizationService:
     """Resolve timezone and create a DateNormalizationService for tickers endpoints."""
@@ -77,16 +70,20 @@ def _get_tickers_normalizer() -> DateNormalizationService:
 @tickers_bp.route('/', methods=['GET'])
 @handle_database_session()
 def get_tickers():
-    """Get all tickers or tickers for a specific user if user_id is provided"""
+    """Get tickers for the current authenticated user"""
     db: Session = g.db
-    user_id = getattr(g, 'user_id', None) or request.args.get('user_id', type=int)
+    user_id = _resolve_user_id()
+    
+    if user_id is None:
+        return jsonify({
+            "status": "error",
+            "error": {"message": "User authentication required. Please log in to access tickers."},
+            "version": "1.0"
+        }), 401
     
     try:
-        if user_id:
-            tickers = TickerService.get_user_tickers(db, user_id)
-        else:
-            # If no user_id, fetch all tickers (e.g., shared/public tickers)
-            tickers = TickerService.get_all(db)
+        # Always filter by user_id - no public/shared tickers
+        tickers = TickerService.get_user_tickers(db, user_id)
         
         # Convert tickers to dict with market data
         tickers_data = []
@@ -344,12 +341,87 @@ def get_tickers_with_initial_data():
             "version": "1.0"
         }), 500
 
+@tickers_bp.route('/with-trade-counts', methods=['GET'])
+@handle_database_session()
+def get_tickers_with_trade_counts():
+    """
+    Get all tickers with the count of associated trades.
+    
+    Returns:
+        JSON response with a list of tickers, each including a 'trade_count' field.
+    """
+    db: Session = g.db
+    user_id = _resolve_user_id()
+    normalizer = _get_tickers_normalizer()
+
+    # Check authentication - user_id must not be None
+    if user_id is None:
+        return jsonify({
+            "status": "error",
+            "error": {"message": "User authentication required. Please log in to access tickers."},
+            "version": "1.0"
+        }), 401
+
+    try:
+        # Get all tickers (TickerService.get_all doesn't take user_id)
+        tickers = TickerService.get_all(db)
+        tickers_with_counts = []
+        
+        # Check if user_id is default user (fallback)
+        # If it's default user, get total trade count for all users
+        # Otherwise, filter by user_id
+        default_user = user_service.get_default_user()
+        default_user_id = default_user["id"] if default_user else 1
+        
+        for ticker in tickers:
+            ticker_dict = ticker.to_dict()
+            # If user_id is default user (1), get total count for all users
+            # Otherwise, filter by user_id
+            if user_id == default_user_id:
+                # Get total trade count for all users (default user means show all)
+                trade_count = TradeService.get_trade_count_for_ticker(db, ticker.id, None)
+            else:
+                # Filter by specific user_id
+                trade_count = TradeService.get_trade_count_for_ticker(db, ticker.id, user_id)
+            ticker_dict['trade_count'] = trade_count
+            tickers_with_counts.append(ticker_dict)
+        
+        payload = BaseEntityUtils.create_success_payload(normalizer, data=tickers_with_counts)
+        return jsonify(payload), 200
+    except Exception as e:
+        logger.error(f"Error getting tickers with trade counts: {str(e)}", exc_info=True)
+        error_payload = BaseEntityUtils.create_error_payload(normalizer, f"Error retrieving tickers with trade counts: {str(e)}")
+        return jsonify(error_payload), 500
+
 @tickers_bp.route('/<int:ticker_id>', methods=['GET'])
 @handle_database_session()
 def get_ticker(ticker_id: int):
-    """Get ticker by ID with market data"""
+    """Get ticker by ID with market data (only if user has access)"""
     db: Session = g.db
+    
     try:
+        user_id = _resolve_user_id()
+        
+        if user_id is None:
+            return jsonify({
+                "status": "error",
+                "error": {"message": "User authentication required. Please log in to access tickers."},
+                "version": "1.0"
+            }), 401
+        # Check if user has access to this ticker
+        from models.user_ticker import UserTicker
+        user_ticker = db.query(UserTicker).filter(
+            UserTicker.ticker_id == ticker_id,
+            UserTicker.user_id == user_id
+        ).first()
+        
+        if not user_ticker:
+            return jsonify({
+                "status": "error",
+                "error": {"message": "Ticker not found or access denied"},
+                "version": "1.0"
+            }), 404
+        
         ticker = TickerService.get_by_id(db, ticker_id)
         if ticker:
             # Add market data like in get_all method
@@ -945,11 +1017,41 @@ def delete_ticker(ticker_id: int):
     # Don't close db here - handle_database_session decorator will do it
 
 @tickers_bp.route('/<int:ticker_id>/update-active-trades', methods=['PUT'])
+@handle_database_session()
 def update_active_trades(ticker_id: int):
-    """Update only the active_trades field for a ticker"""
-    try:
-        db: Session = next(get_db())
+    """Update only the active_trades field for a ticker (for authenticated user)"""
+    db: Session = g.db
+    
+    # Get user_id from Flask context (set by auth middleware)
+    user_id = _resolve_user_id()
+    
+    if user_id is None:
         normalizer = _get_tickers_normalizer()
+        return jsonify({
+            "status": "error",
+            "error": {"message": "User authentication required"},
+            "timestamp": normalizer.now_envelope(),
+            "version": "1.0"
+        }), 401
+    
+    try:
+        normalizer = _get_tickers_normalizer()
+        
+        # Verify user has access to this ticker
+        from models.user_ticker import UserTicker
+        user_ticker = db.query(UserTicker).filter(
+            UserTicker.ticker_id == ticker_id,
+            UserTicker.user_id == user_id
+        ).first()
+        
+        if not user_ticker:
+            return jsonify({
+                "status": "error",
+                "error": {"message": "Ticker not found or access denied"},
+                "timestamp": normalizer.now_envelope(),
+                "version": "1.0"
+            }), 404
+        
         ticker = TickerService.get_by_id(db, ticker_id)
         
         if not ticker:
@@ -960,19 +1062,21 @@ def update_active_trades(ticker_id: int):
                 "version": "1.0"
             }), 404
         
-        # Check if there are active plans or trades for this ticker
+        # Check if there are active plans or trades for this ticker (for this user)
         from models.trade import Trade
         from models.trade_plan import TradePlan
         
-        # Check active trades
+        # Check active trades (for this user)
         active_trades = db.query(Trade).filter(
             Trade.ticker_id == ticker_id,
+            Trade.user_id == user_id,
             Trade.status == 'open'
         ).count()
         
-        # Check active trade plans
+        # Check active trade plans (for this user)
         active_plans = db.query(TradePlan).filter(
             TradePlan.ticker_id == ticker_id,
+            TradePlan.user_id == user_id,
             TradePlan.status == 'open'
         ).count()
         
@@ -1002,18 +1106,29 @@ def update_active_trades(ticker_id: int):
             "timestamp": normalizer.now_envelope(),
             "version": "1.0"
         }), 500
-    finally:
-        db.close()
 
 @tickers_bp.route('/update-all-active-trades', methods=['POST'])
+@handle_database_session()
 @invalidate_cache(['tickers', 'dashboard'])  # Invalidate cache after updating all active trades
 def update_all_active_trades():
-    """Update active_trades field for all tickers based on open trades and plans"""
+    """Update active_trades field for all user tickers based on open trades and plans"""
+    db: Session = g.db
+    
+    # Get user_id from Flask context (set by auth middleware)
+    user_id = _resolve_user_id()
+    
+    if user_id is None:
+        normalizer = _get_tickers_normalizer()
+        return jsonify({
+            "status": "error",
+            "error": {"message": "User authentication required"},
+            "timestamp": normalizer.now_envelope(),
+            "version": "1.0"
+        }), 401
+    
     try:
-        db: Session = next(get_db())
-        
-        # Get all tickers
-        tickers = TickerService.get_all(db)
+        # Get all user tickers
+        tickers = TickerService.get_user_tickers(db, user_id)
         
         updated_count = 0
         
@@ -1024,12 +1139,14 @@ def update_all_active_trades():
             
             active_trades = db.query(Trade).filter(
                 Trade.ticker_id == ticker.id,
+                Trade.user_id == user_id,
                 Trade.status == 'open'
             ).count()
             
             # Check active trade plans
             active_plans = db.query(TradePlan).filter(
                 TradePlan.ticker_id == ticker.id,
+                TradePlan.user_id == user_id,
                 TradePlan.status == 'open'
             ).count()
             
@@ -1062,15 +1179,42 @@ def update_all_active_trades():
             "error": {"message": str(e)},
             "version": "1.0"
         }), 500
-    finally:
-        db.close()
 
 @tickers_bp.route('/<int:ticker_id>/update-status-auto', methods=['PUT'])
+@handle_database_session()
 def update_ticker_status_auto(ticker_id: int):
-    """Update ticker status automatically based on linked trades and trade plans"""
-    try:
-        db: Session = next(get_db())
+    """Update ticker status automatically based on linked trades and trade plans (for authenticated user)"""
+    db: Session = g.db
+    
+    # Get user_id from Flask context (set by auth middleware)
+    user_id = _resolve_user_id()
+    
+    if user_id is None:
         normalizer = _get_tickers_normalizer()
+        return jsonify({
+            "status": "error",
+            "error": {"message": "User authentication required"},
+            "timestamp": normalizer.now_envelope(),
+            "version": "1.0"
+        }), 401
+    
+    try:
+        normalizer = _get_tickers_normalizer()
+        
+        # Verify user has access to this ticker
+        from models.user_ticker import UserTicker
+        user_ticker = db.query(UserTicker).filter(
+            UserTicker.ticker_id == ticker_id,
+            UserTicker.user_id == user_id
+        ).first()
+        
+        if not user_ticker:
+            return jsonify({
+                "status": "error",
+                "error": {"message": "Ticker not found or access denied"},
+                "timestamp": normalizer.now_envelope(),
+                "version": "1.0"
+            }), 404
         
         # Check that ticker exists
         ticker = TickerService.get_by_id(db, ticker_id)
@@ -1113,21 +1257,36 @@ def update_ticker_status_auto(ticker_id: int):
             "timestamp": normalizer.now_envelope(),
             "version": "1.0"
         }), 500
-    finally:
-        db.close()
 
 @tickers_bp.route('/update-all-statuses-auto', methods=['POST'])
+@handle_database_session()
 @invalidate_cache(['tickers', 'dashboard'])  # Invalidate cache after updating all statuses
 def update_all_statuses_auto():
-    """Update status for all non-cancelled tickers automatically"""
+    """Update status for all user tickers automatically"""
+    db: Session = g.db
+    
+    # Get user_id from Flask context (set by auth middleware)
+    user_id = _resolve_user_id()
+    
+    if user_id is None:
+        return jsonify({
+            "status": "error",
+            "error": {"message": "User authentication required"},
+            "version": "1.0"
+        }), 401
+    
     try:
-        db: Session = next(get_db())
+        # Get all user tickers
+        tickers = TickerService.get_user_tickers(db, user_id)
         
-        # Update all ticker statuses automatically
-        updated_count = TickerService.update_all_ticker_statuses_auto(db)
+        updated_count = 0
+        for ticker in tickers:
+            # Update ticker status automatically
+            success = TickerService.update_ticker_status_auto(db, ticker.id)
+            if success:
+                updated_count += 1
         
-        # Get updated tickers for response
-        tickers = TickerService.get_all(db)
+        db.commit()
         
         return jsonify({
             "status": "success",
@@ -1147,18 +1306,41 @@ def update_all_statuses_auto():
             "error": {"message": str(e)},
             "version": "1.0"
         }), 500
-    finally:
-        db.close()
 
 @tickers_bp.route('/<int:ticker_id>/cancel', methods=['POST'])
+@handle_database_session()
 @invalidate_cache(['tickers', 'dashboard'])  # Invalidate cache after cancelling ticker
 def cancel_ticker(ticker_id: int):
-    """Cancel ticker"""
-    db = None
+    """Cancel ticker (for authenticated user)"""
+    db: Session = g.db
+    
+    # Get user_id from Flask context (set by auth middleware)
+    user_id = _resolve_user_id()
+    
+    if user_id is None:
+        return jsonify({
+            "status": "error",
+            "error": {"message": "User authentication required"},
+            "version": "1.0"
+        }), 401
+    
     try:
         data = request.get_json() if request.is_json else {}
         cancel_reason = data.get('cancel_reason', 'Cancelled by user')
-        db: Session = next(get_db())
+        
+        # Verify user has access to this ticker
+        from models.user_ticker import UserTicker
+        user_ticker = db.query(UserTicker).filter(
+            UserTicker.ticker_id == ticker_id,
+            UserTicker.user_id == user_id
+        ).first()
+        
+        if not user_ticker:
+            return jsonify({
+                "status": "error",
+                "error": {"message": "Ticker not found or access denied"},
+                "version": "1.0"
+            }), 404
         
         # Check that ticker exists
         ticker = TickerService.get_by_id(db, ticker_id)
@@ -1177,19 +1359,21 @@ def cancel_ticker(ticker_id: int):
                 "version": "1.0"
             }), 400
         
-        # Check active_trades constraint - prevent cancellation if ticker has active trades
+        # Check active_trades constraint - prevent cancellation if ticker has active trades (for this user)
         from models.trade import Trade
         from models.trade_plan import TradePlan
         
-        # Check actual open trades
+        # Check actual open trades (for this user)
         open_trades_count = db.query(Trade).filter(
             Trade.ticker_id == ticker_id,
+            Trade.user_id == user_id,
             Trade.status == 'open'
         ).count()
         
-        # Check actual open trade plans
+        # Check actual open trade plans (for this user)
         open_plans_count = db.query(TradePlan).filter(
             TradePlan.ticker_id == ticker_id,
+            TradePlan.user_id == user_id,
             TradePlan.status == 'open'
         ).count()
         
@@ -1200,26 +1384,18 @@ def cancel_ticker(ticker_id: int):
                 "version": "1.0"
             }), 400
         
-        # Update ticker status to cancelled
-        success = TickerService.update(db, ticker_id, {
-            'status': 'cancelled'
-        })
+        # Update user_ticker status to cancelled (not the ticker itself - it's shared)
+        user_ticker.status = 'cancelled'
+        db.commit()
         
-        if success:
-            # Get updated ticker
-            updated_ticker = TickerService.get_by_id(db, ticker_id)
-            return jsonify({
-                "status": "success",
-                "data": updated_ticker.to_dict(),
-                "message": "Ticker cancelled successfully",
-                "version": "1.0"
-            })
-        else:
-            return jsonify({
-                "status": "error",
-                "error": {"message": "Failed to cancel ticker"},
-                "version": "1.0"
-            }), 500
+        # Get updated ticker
+        updated_ticker = TickerService.get_by_id(db, ticker_id)
+        return jsonify({
+            "status": "success",
+            "data": updated_ticker.to_dict(),
+            "message": "Ticker cancelled successfully",
+            "version": "1.0"
+        })
         
     except Exception as e:
         logger.error(f"Error cancelling ticker {ticker_id}: {str(e)}")
@@ -1228,9 +1404,6 @@ def cancel_ticker(ticker_id: int):
             "error": {"message": str(e)},
             "version": "1.0"
         }), 400
-    finally:
-        if db:
-            db.close()
 
 # Endpoint removed - status updates automatically now
 

@@ -7,6 +7,16 @@
  * @lastUpdated December 6, 2025
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - initializeWatchListModal() - Initializewatchlistmodal
+// - initializeAddTickerModal() - Initializeaddtickermodal
+
+// === Other ===
+// - waitForModalManager() - Waitformodalmanager
+
 // קונפיגורציה למודל רשימת צפייה (Add/Edit)
 const watchListModalConfig = {
     id: 'watchListModal',
@@ -152,113 +162,88 @@ const addTickerModalConfig = {
             id: 'tickerSearchSection',
             html: `
                 <div class="mb-3">
-                    <label for="tickerSearch" class="form-label fw-bold">חיפוש טיקר מהמערכת</label>
-                    <div class="alert alert-info d-flex justify-content-between align-items-center mb-2">
-                        <small class="mb-0">אם לא נמצא הטיקר הדרוש, יש להוסיף למערכת</small>
-                        <button type="button" 
-                                class="btn btn-sm btn-outline-primary"
-                                data-onclick="if(window.ModalManagerV2){window.ModalManagerV2.showModal('tickersModal','add');}">
-                            <i class="bi bi-plus-circle"></i> הוסף טיקר חדש
-                        </button>
+                    <div class="d-flex align-items-center gap-3 mb-2">
+                        <label for="tickerSearch" class="form-label fw-bold mb-0">חיפוש טיקר מהמערכת</label>
                     </div>
-                    <div class="row g-2 align-items-end">
-                        <div class="col-md-8">
+                    <div class="d-flex align-items-end gap-2 mb-2">
+                        <div style="max-width: 200px; flex: 1;">
                             <input type="text" 
                                    class="form-control" 
                                    id="tickerSearch" 
-                                   placeholder="הקלד symbol או שם...">
+                                   placeholder="הקלד symbol או שם..."
+                                   style="max-width: 200px;">
                         </div>
-                        <div class="col-md-4">
-                            <label class="form-label small mb-1">דגל</label>
-                            <div class="d-flex gap-2 flex-wrap align-items-center" id="flagColorPaletteContainer">
-                                <button type="button" class="flag-color-btn-add-modal" 
-                                        data-color="#26baac" 
-                                        style="background-color: #26baac; width: 32px; height: 32px; border: 2px solid transparent; border-radius: 4px; cursor: pointer; transition: all 0.2s;"
-                                        title="Trade">
-                                </button>
-                                <button type="button" class="flag-color-btn-add-modal" 
-                                        data-color="#0056b3" 
-                                        style="background-color: #0056b3; width: 32px; height: 32px; border: 2px solid transparent; border-radius: 4px; cursor: pointer; transition: all 0.2s;"
-                                        title="Trade Plan">
-                                </button>
-                                <button type="button" class="flag-color-btn-add-modal" 
-                                        data-color="#28a745" 
-                                        style="background-color: #28a745; width: 32px; height: 32px; border: 2px solid transparent; border-radius: 4px; cursor: pointer; transition: all 0.2s;"
-                                        title="Account">
-                                </button>
-                                <button type="button" class="flag-color-btn-add-modal" 
-                                        data-color="#20c997" 
-                                        style="background-color: #20c997; width: 32px; height: 32px; border: 2px solid transparent; border-radius: 4px; cursor: pointer; transition: all 0.2s;"
-                                        title="Cash Flow">
-                                </button>
-                                <button type="button" class="flag-color-btn-add-modal" 
-                                        data-color="#dc3545" 
-                                        style="background-color: #dc3545; width: 32px; height: 32px; border: 2px solid transparent; border-radius: 4px; cursor: pointer; transition: all 0.2s;"
-                                        title="Ticker">
-                                </button>
-                                <button type="button" class="flag-color-btn-add-modal" 
-                                        data-color="#fc5a06" 
-                                        style="background-color: #fc5a06; width: 32px; height: 32px; border: 2px solid transparent; border-radius: 4px; cursor: pointer; transition: all 0.2s;"
-                                        title="Alert">
-                                </button>
-                                <button type="button" class="flag-color-btn-add-modal" 
-                                        data-color="#6f42c1" 
-                                        style="background-color: #6f42c1; width: 32px; height: 32px; border: 2px solid transparent; border-radius: 4px; cursor: pointer; transition: all 0.2s;"
-                                        title="Note">
-                                </button>
-                                <button type="button" class="flag-color-btn-add-modal" 
-                                        data-color="#17a2b8" 
-                                        style="background-color: #17a2b8; width: 32px; height: 32px; border: 2px solid transparent; border-radius: 4px; cursor: pointer; transition: all 0.2s;"
-                                        title="Execution">
-                                </button>
-                                <button type="button" class="btn btn-sm btn-outline-secondary p-1" 
-                                        id="clearFlagColorBtn"
-                                        style="font-size: 0.75rem; padding: 0.125rem 0.5rem !important;"
-                                        title="הסר דגל">
-                                    <i class="bi bi-x"></i>
-                                </button>
-                            </div>
-                            <input type="hidden" id="itemFlagColor" value="">
+                    </div>
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <label class="form-label small mb-0 me-1">דגל:</label>
+                        <div class="d-flex gap-1 align-items-center flex-wrap" id="flagColorPaletteContainer" style="flex: 1;">
+                            <button type="button" class="flag-color-btn-add-modal" 
+                                    data-color="#26baac" 
+                                    data-entity-type="trade"
+                                    style="background-color: #26baac; width: 20px; height: 20px; border: 2px solid transparent; border-radius: 3px; cursor: pointer; transition: all 0.2s;"
+                                    title="Trade">
+                            </button>
+                            <button type="button" class="flag-color-btn-add-modal" 
+                                    data-color="#0056b3" 
+                                    data-entity-type="trade_plan"
+                                    style="background-color: #0056b3; width: 20px; height: 20px; border: 2px solid transparent; border-radius: 3px; cursor: pointer; transition: all 0.2s;"
+                                    title="Trade Plan">
+                            </button>
+                            <button type="button" class="flag-color-btn-add-modal" 
+                                    data-color="#28a745" 
+                                    data-entity-type="account"
+                                    style="background-color: #28a745; width: 20px; height: 20px; border: 2px solid transparent; border-radius: 3px; cursor: pointer; transition: all 0.2s;"
+                                    title="Account">
+                            </button>
+                            <button type="button" class="flag-color-btn-add-modal" 
+                                    data-color="#20c997" 
+                                    data-entity-type="cash_flow"
+                                    style="background-color: #20c997; width: 20px; height: 20px; border: 2px solid transparent; border-radius: 3px; cursor: pointer; transition: all 0.2s;"
+                                    title="Cash Flow">
+                            </button>
+                            <button type="button" class="flag-color-btn-add-modal" 
+                                    data-color="#dc3545" 
+                                    data-entity-type="ticker"
+                                    style="background-color: #dc3545; width: 20px; height: 20px; border: 2px solid transparent; border-radius: 3px; cursor: pointer; transition: all 0.2s;"
+                                    title="Ticker">
+                            </button>
+                            <button type="button" class="flag-color-btn-add-modal" 
+                                    data-color="#fc5a06" 
+                                    data-entity-type="alert"
+                                    style="background-color: #fc5a06; width: 20px; height: 20px; border: 2px solid transparent; border-radius: 3px; cursor: pointer; transition: all 0.2s;"
+                                    title="Alert">
+                            </button>
+                            <button type="button" class="flag-color-btn-add-modal" 
+                                    data-color="#6f42c1" 
+                                    data-entity-type="note"
+                                    style="background-color: #6f42c1; width: 20px; height: 20px; border: 2px solid transparent; border-radius: 3px; cursor: pointer; transition: all 0.2s;"
+                                    title="Note">
+                            </button>
+                            <button type="button" class="flag-color-btn-add-modal" 
+                                    data-color="#17a2b8" 
+                                    data-entity-type="execution"
+                                    style="background-color: #17a2b8; width: 20px; height: 20px; border: 2px solid transparent; border-radius: 3px; cursor: pointer; transition: all 0.2s;"
+                                    title="Execution">
+                            </button>
+                            <button type="button" class="btn btn-sm btn-outline-secondary p-1" 
+                                    id="clearFlagColorBtn"
+                                    style="font-size: 0.7rem; padding: 0.1rem 0.3rem !important; min-width: 20px; height: 20px;"
+                                    title="הסר דגל">
+                                <i class="bi bi-x"></i>
+                            </button>
+                            <button type="button" 
+                                    class="btn btn-sm btn-outline-primary ms-auto"
+                                    data-onclick="if(window.ModalManagerV2){window.ModalManagerV2.showModal('tickersModal','add');}">
+                                <i class="bi bi-plus-circle"></i> הוסף טיקר
+                            </button>
                         </div>
+                        <input type="hidden" id="itemFlagColor" value="">
+                    </div>
+                    <div class="mb-2">
+                        <small class="text-muted">לא נמצא? הוסף למערכת</small>
                     </div>
                     <div id="tickerSearchResults" class="mt-2">
                         <!-- Search results will appear here -->
-                    </div>
-                </div>
-            `,
-            rowClass: 'row',
-            colClass: 'col-12'
-        },
-        {
-            type: 'separator',
-            id: 'addTickerSeparator1'
-        },
-        {
-            type: 'custom',
-            id: 'externalTickerSection',
-            html: `
-                <div class="mb-3">
-                    <label class="form-label fw-bold">או הוסף טיקר חיצוני</label>
-                    <p class="text-muted small mb-3">
-                        טיקר שלא נמצא במערכת. נתוני מחיר ייטענו אוטומטית מהשרת.
-                    </p>
-                    <div class="row g-2">
-                        <div class="col-md-6">
-                            <label for="externalSymbol" class="form-label small">Symbol *</label>
-                            <input type="text" 
-                                   class="form-control text-uppercase" 
-                                   id="externalSymbol" 
-                                   placeholder="לדוגמה: TSLA"
-                                   maxlength="10">
-                        </div>
-                        <div class="col-md-6">
-                            <label for="externalName" class="form-label small">שם (אופציונלי)</label>
-                            <input type="text" 
-                                   class="form-control" 
-                                   id="externalName" 
-                                   placeholder="לדוגמה: Tesla Inc."
-                                   maxlength="100">
-                        </div>
                     </div>
                 </div>
             `,

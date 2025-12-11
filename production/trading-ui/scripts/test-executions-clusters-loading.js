@@ -13,6 +13,15 @@
  * הסקריפט יבצע ניטור מפורט ויציג דוח מפורט
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Utility Functions ===
+// - logCheck() - Logcheck
+
+// === Other ===
+// - logTimeline() - Logtimeline
+
 (function() {
   'use strict';
 
@@ -448,6 +457,13 @@
     timeline: monitor.timeline
   };
 })();
+
+
+
+
+
+
+
 
 
 

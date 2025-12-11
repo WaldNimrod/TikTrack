@@ -171,7 +171,13 @@ const CACHE_DEPENDENCIES = {
         'accounts-data',
         'cash-flows-data'
     ],
-    'statistics-data': ['trades-data', 'executions-data']
+    'statistics-data': ['trades-data', 'executions-data'],
+    
+    // Historical Data Level
+    'trade-history-data': ['trades', 'executions', 'trade-plans'],
+    'portfolio-state-snapshot-*': ['executions', 'market_data_quotes', 'trades'],
+    'portfolio-state-series-*': ['executions', 'market_data_quotes', 'trades'],
+    'trading-journal-*': ['notes', 'trades', 'executions']
 };
 
 // TTL Policies Configuration
@@ -221,6 +227,7 @@ class UnifiedCacheManager {
         this.cache = new Map();
         this.db = null;
         this.hits = 0;
+        this.misses = 0;
         this.responseTimes = [];
         this.stats = {
             operations: {
@@ -264,6 +271,16 @@ class UnifiedCacheManager {
             'market-data': { layer: 'backend', ttl: 30000, compress: false },
             'alerts-data': { layer: 'memory', ttl: 60000, compress: false, dependencies: ['accounts-data'] },
             'alert-{id}': { layer: 'memory', ttl: 60000, compress: false, dependencies: ['alerts-data'] },
+            // Historical Data Services
+            'trade-history-data': { layer: 'backend', ttl: 300000, compress: false, dependencies: ['trades', 'executions', 'trade-plans'] },
+            'trade-history-statistics-*': { layer: 'backend', ttl: 300000, compress: false },
+            'trade-history-aggregated-*': { layer: 'backend', ttl: 300000, compress: false },
+            'trade-history-plan-vs-execution-*': { layer: 'backend', ttl: 300000, compress: false },
+            'portfolio-state-snapshot-*': { layer: 'backend', ttl: 600000, compress: false, dependencies: ['executions', 'market_data_quotes', 'trades'] },
+            'portfolio-state-series-*': { layer: 'backend', ttl: 600000, compress: false },
+            'portfolio-state-performance-*': { layer: 'backend', ttl: 600000, compress: false },
+            'portfolio-state-comparison-*': { layer: 'backend', ttl: 600000, compress: false },
+            'trading-journal-*': { layer: 'backend', ttl: 180000, compress: false, dependencies: ['notes', 'trades', 'executions'] },
             'trading-accounts-data': { layer: 'memory', ttl: 60000, compress: false, dependencies: ['user-preferences'] },
             'trading-account-{id}': { layer: 'memory', ttl: 60000, compress: false, dependencies: ['trading-accounts-data'] },
             'executions-data': { layer: 'memory', ttl: 45000, compress: false, dependencies: ['accounts-data'] },
@@ -276,7 +293,46 @@ class UnifiedCacheManager {
             'account-balance-*': { layer: 'backend', ttl: 60000, compress: false, dependencies: ['accounts-data', 'cash-flows-data', 'executions-data'] },
             'positions-account-*': { layer: 'backend', ttl: 300000, compress: false, dependencies: ['executions', 'market_data_quotes'] },
             'portfolio-*': { layer: 'backend', ttl: 300000, compress: false, dependencies: ['executions', 'market_data_quotes'] },
-            'portfolio-summary-*': { layer: 'backend', ttl: 300000, compress: false, dependencies: ['executions', 'market_data_quotes'] }
+            'portfolio-summary-*': { layer: 'backend', ttl: 300000, compress: false, dependencies: ['executions', 'market_data_quotes'] },
+            // Trade History - Timeline and Chart Data (IndexedDB, 2 days for historical data)
+            'trade-history-timeline-*': { 
+                layer: 'indexedDB', 
+                ttl: 172800000, // 2 days (prod) / 86400000 (dev - 1 day)
+                compress: true, 
+                dependencies: ['trades', 'executions', 'trade-plans', 'notes', 'alerts', 'cash-flows'] 
+            },
+            'trade-history-chart-data-*': { 
+                layer: 'indexedDB', 
+                ttl: 172800000, // 2 days (prod) / 86400000 (dev - 1 day)
+                compress: true, 
+                dependencies: ['trades', 'executions', 'market_data_quotes'] 
+            },
+            'trade-history-position-data-*': { 
+                layer: 'indexedDB', 
+                ttl: 172800000, // 2 days
+                compress: true, 
+                dependencies: ['trades', 'executions'] 
+            },
+            'trade-history-pl-data-*': { 
+                layer: 'indexedDB', 
+                ttl: 172800000, // 2 days
+                compress: true, 
+                dependencies: ['trades', 'executions', 'market_data_quotes'] 
+            },
+            // Trade History - Statistics (Backend cache, shorter TTL for dynamic data)
+            'trade-history-statistics-*': { 
+                layer: 'backend', 
+                ttl: 300000, // 5 minutes (dev) / 600000 (prod - 10 minutes)
+                compress: false, 
+                dependencies: ['trades', 'executions'] 
+            },
+            // Trade History - Full Analysis (IndexedDB, 2 days - unified endpoint)
+            'trade-history-full-analysis-*': { 
+                layer: 'indexedDB', 
+                ttl: 172800000, // 2 days (prod) / 86400000 (dev - 1 day)
+                compress: true, 
+                dependencies: ['trades', 'executions', 'trade-plans', 'notes', 'alerts', 'cash-flows', 'market_data_quotes'] 
+            }
         };
         
         // ממשקי שכבות מטמון
@@ -386,12 +442,14 @@ class UnifiedCacheManager {
                 errorStack: error.stack
             });
             
-            // הודעת שגיאה
-            if (window.notificationSystem) {
-                window.notificationSystem.showNotification(
-                    'שגיאה באתחול מערכת מטמון מאוחדת',
-                    'error'
-                );
+            // הודעת שגיאה (Fallback למערכת ההתראות הכללית)
+            const notifyError =
+                window.NotificationSystem?.showError
+                || window.NotificationSystem?.showNotification
+                || window.showErrorNotification
+                || window.notificationSystem?.showNotification;
+            if (typeof notifyError === 'function') {
+                notifyError('שגיאה באתחול מערכת מטמון מאוחדת', 'error');
             }
             
             // Don't throw - let the system continue with localStorage fallback
@@ -494,8 +552,9 @@ class UnifiedCacheManager {
                         this.stats.layers[layer].entries++;
                         
                         const responseTime = performance.now() - startTime;
+                        this.hits++; // Increment hit counter
                         this.updatePerformanceStats(responseTime, true);
-                        
+
                         // window.Logger.info(`✅ Retrieved ${key} from ${layer} layer (${responseTime.toFixed(2, { page: "unified-cache-manager" })}ms)`);
                         return data;
                     }
@@ -516,8 +575,9 @@ class UnifiedCacheManager {
             }
             
             const responseTime = performance.now() - startTime;
+            this.misses++; // Increment miss counter
             this.updatePerformanceStats(responseTime, false);
-            
+
             window.Logger.debug(`❌ Key ${key} not found in any layer`, { page: "unified-cache-manager" });
             return null;
             
@@ -628,11 +688,11 @@ class UnifiedCacheManager {
                     avgResponseTime: this.responseTimes.length > 0 
                         ? this.responseTimes.reduce((a, b) => a + b, 0) / this.responseTimes.length 
                         : 0,
-                    hitRate: this.stats.operations.get > 0 
-                        ? (this.hits / this.stats.operations.get * 100).toFixed(2) 
+                    hitRate: (this.hits + this.misses) > 0
+                        ? (this.hits / (this.hits + this.misses) * 100).toFixed(2)
                         : 0,
-                    missRate: this.stats.operations.get > 0 
-                        ? ((this.stats.operations.get - this.hits) / this.stats.operations.get * 100).toFixed(2) 
+                    missRate: (this.hits + this.misses) > 0
+                        ? (this.misses / (this.hits + this.misses) * 100).toFixed(2)
                         : 0
                 }
             };
@@ -661,6 +721,11 @@ class UnifiedCacheManager {
         if (!this.initialized) {
             window.Logger.error('❌ Unified Cache Manager not initialized - cannot remove', { page: "unified-cache-manager", key });
             throw new Error('UnifiedCacheManager not initialized');
+        }
+
+        // Add user_id to cache key for multi-user support (unless explicitly disabled)
+        if (options.includeUserId !== false) {
+            key = this.buildUserCacheKey(key, options.userId);
         }
 
         try {
@@ -854,12 +919,14 @@ class UnifiedCacheManager {
             if (cleared) {
                 window.Logger.info(`✅ Cleared ${type} cache`, { page: "unified-cache-manager" });
                 
-                // הודעת הצלחה
-                if (window.notificationSystem) {
-                    window.notificationSystem.showNotification(
-                        `מטמון ${type} נוקה בהצלחה`,
-                        'success'
-                    );
+                // הודעת הצלחה (Fallback למערכת ההתראות הכללית)
+                const notifySuccess =
+                    window.NotificationSystem?.showSuccess
+                    || window.NotificationSystem?.showNotification
+                    || window.showNotification
+                    || window.notificationSystem?.showNotification;
+                if (typeof notifySuccess === 'function') {
+                    notifySuccess(`מטמון ${type} נוקה בהצלחה`, 'success');
                 }
             }
             

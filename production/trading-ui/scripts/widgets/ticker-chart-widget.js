@@ -25,6 +25,32 @@
  * Documentation: See documentation/03-DEVELOPMENT/GUIDES/TICKER_CHART_WIDGET_DEVELOPER_GUIDE.md
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - createMiniChart() - Createminichart
+
+// === Event Handlers ===
+// - getChangeColorClass() - Getchangecolorclass
+
+// === UI Functions ===
+// - showLoading() - Showloading
+// - showError() - Showerror
+// - showEmpty() - Showempty
+// - renderChartCard() - Renderchartcard
+// - renderTickers() - Rendertickers
+
+// === Data Functions ===
+// - loadTickers() - Loadtickers
+
+// === Utility Functions ===
+// - formatAmount() - Formatamount
+// - formatPercent() - Formatpercent
+
+// === Other ===
+// - cacheElements() - Cacheelements
+
 ;(function () {
   'use strict';
 
@@ -46,6 +72,28 @@
     loading: false,
     error: null
   };
+
+  async function fetchWithRetry(url, options = {}, maxRetries = 3, pageTag = 'ticker-chart-widget') {
+    let lastError = null;
+    for (let attempt = 0; attempt < maxRetries; attempt++) {
+      try {
+        const response = await fetch(url, options);
+        if (response.status === 429) {
+          const waitTime = Math.min(1000 * Math.pow(2, attempt), 10000); // up to 10s
+          window.Logger?.warn?.('⚠️ Rate limited, retrying', { page: pageTag, attempt: attempt + 1, waitTime });
+          if (attempt < maxRetries - 1) {
+            await new Promise(r => setTimeout(r, waitTime));
+            continue;
+          }
+        }
+        return response;
+      } catch (err) {
+        lastError = err;
+      }
+    }
+    if (lastError) throw lastError;
+    throw new Error('Rate limit exceeded after retries');
+  }
 
   // DOM Elements cache
   const elements = {
@@ -396,13 +444,13 @@
     state.tickers = [];
 
     try {
-      const response = await fetch('/api/tickers/with-initial-data', {
+      const response = await fetchWithRetry('/api/tickers/with-initial-data', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json'
         }
-      });
+      }, 3, 'ticker-chart-widget');
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -445,6 +493,18 @@
       }
     } catch (error) {
       window.Logger?.error?.('❌ TickerChartWidget: Error loading tickers', { error: error.message, stack: error.stack, page: 'ticker-chart-widget' });
+      // Fallback to cache if available
+      if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
+        try {
+          const cached = await window.UnifiedCacheManager.get('tickers-data', {});
+          if (cached && Array.isArray(cached)) {
+            window.Logger?.info?.('✅ TickerChartWidget: Loaded from cache after error', { count: cached.length, page: 'ticker-chart-widget' });
+            state.tickers = cached;
+            await renderTickers(state.tickers);
+            return;
+          }
+        } catch (_) {}
+      }
       showError(`שגיאה בטעינת טיקרים: ${error.message}`);
       if (window.NotificationSystem?.showError) {
         window.NotificationSystem.showError('שגיאה בטעינת נתונים', `לא ניתן היה לטעון טיקרים: ${error.message}`);

@@ -3002,85 +3002,7 @@ function updateActiveSessionInfo(updates = {}) {
 }
 
 function updateActiveSessionIndicator() {
-    // Removed - old session indicator feature removed from step 1
-    // Sessions can be continued from the sessions table instead
-    return;
-    
-    // Show indicator and remove d-none class
-    indicator.classList.remove('d-none');
-    indicator.style.display = 'block';
-    indicator.setAttribute('data-has-session', 'true');
-    if (controlsRow) {
-        controlsRow.classList.remove('d-none');
-        controlsRow.style.display = ''; // Empty string removes inline style, allowing Bootstrap classes to work
-        // Force display if still hidden
-        if (window.getComputedStyle(controlsRow).display === 'none') {
-            controlsRow.style.display = 'flex'; // Bootstrap row uses flex
-        }
-    }
-    if (detailsRow) {
-        detailsRow.classList.remove('d-none');
-        detailsRow.style.display = ''; // Empty string removes inline style, allowing Bootstrap classes to work
-        // Force display if still hidden
-        if (window.getComputedStyle(detailsRow).display === 'none') {
-            detailsRow.style.display = 'block'; // Bootstrap row uses block
-        }
-    }
-    
-    const sessionIdEl = document.getElementById('activeSessionIdValue');
-    const statusEl = document.getElementById('activeSessionStatusValue');
-    const fileEl = document.getElementById('activeSessionFileValue');
-    const accountEl = document.getElementById('activeSessionAccountValue');
-    const providerEl = document.getElementById('activeSessionProviderValue');
-    const totalRecordsEl = document.getElementById('activeSessionTotalRecords');
-    const readyRecordsEl = document.getElementById('activeSessionReadyRecords');
-    const skipRecordsEl = document.getElementById('activeSessionSkipRecords');
-    const missingTickersEl = document.getElementById('activeSessionMissingTickers');
-    const duplicateRecordsEl = document.getElementById('activeSessionDuplicateRecords');
-    const existingRecordsEl = document.getElementById('activeSessionExistingRecords');
-    
-    if (sessionIdEl) {
-        sessionIdEl.textContent = `#${activeSessionInfo.sessionId}`;
-    }
-    if (statusEl) {
-        statusEl.textContent = activeSessionInfo.status || 'לא זמין';
-    }
-    if (fileEl) {
-        const sizeLabel = activeSessionInfo.fileSize ? ` (${formatFileSize(activeSessionInfo.fileSize)})` : '';
-        fileEl.textContent = activeSessionInfo.fileName 
-            ? `${activeSessionInfo.fileName}${sizeLabel}`
-            : 'לא נבחר קובץ';
-    }
-    if (accountEl) {
-        accountEl.textContent = activeSessionInfo.accountName || 'לא נבחר חשבון';
-    }
-    if (providerEl) {
-        providerEl.textContent = activeSessionInfo.provider || 'לא נבחר ספק';
-    }
-    const brokerEl = document.getElementById('activeSessionBrokerAccountValue');
-    if (brokerEl) {
-        brokerEl.textContent = activeSessionInfo.fileAccountNumber
-            || activeFileAccountNumber
-            || 'לא זמין';
-    }
-    if (totalRecordsEl) {
-        totalRecordsEl.textContent = activeSessionInfo.totalRecords ?? 0;
-    }
-    if (readyRecordsEl) {
-        readyRecordsEl.textContent = activeSessionInfo.readyRecords ?? 0;
-    }
-    if (skipRecordsEl) {
-        skipRecordsEl.textContent = activeSessionInfo.skipRecords ?? 0;
-    }
-    if (missingTickersEl) {
-        missingTickersEl.textContent = activeSessionInfo.missingTickers ?? 0;
-    }
-    if (duplicateRecordsEl) {
-        duplicateRecordsEl.textContent = activeSessionInfo.duplicateRecords ?? 0;
-    }
-    if (existingRecordsEl) {
-        existingRecordsEl.textContent = activeSessionInfo.existingRecords ?? 0;
-    }
+    // Indicator removed - no-op in current flow
 }
 
 function updateActiveSessionFromAnalysis(results) {
@@ -5183,21 +5105,89 @@ function displayExistingRecords(existingRecords) {
 /**
  * Import existing record (force import)
  */
-function importExistingRecord(index) {
-    window.Logger.info('[Import Modal] Importing existing record', { index, page: 'import-user-data' });
-    
-    // TODO: Implement logic to force import this specific record
-    showImportUserDataNotification('ייבוא רשומה קיימת - פונקציונליות תפותח בקרוב', 'info');
+async function importExistingRecord(index) {
+    try {
+        window.Logger.info('[Import Modal] Importing existing record', { index, page: 'import-user-data' });
+
+        // Get current import session ID
+        const sessionId = window.currentImportSessionId; // or get from state
+        if (!sessionId) {
+            throw new Error('No active import session');
+        }
+
+        const response = await fetch(`/api/user-data-import/session/${sessionId}/allow-existing`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                record_index: index,
+                duplicate_type: 'existing_record'
+            })
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.error || `Failed to import record: ${response.status}`);
+        }
+
+        const result = await response.json();
+        window.Logger.info('[Import Modal] Record imported successfully', { index, sessionId, page: 'import-user-data' });
+
+        // Refresh import preview
+        if (typeof window.refreshImportPreview === 'function') {
+            await window.refreshImportPreview(sessionId);
+        }
+
+        showImportUserDataNotification('רשומה נוספה לייבוא בהצלחה', 'success');
+    } catch (error) {
+        window.Logger.error('[Import Modal] Error importing existing record', { index, error: error?.message, page: 'import-user-data' });
+        showImportUserDataNotification(`שגיאה בייבוא רשומה: ${error.message}`, 'error');
+    }
 }
 
 /**
  * Skip existing record
  */
-function skipExistingRecord(index) {
-    window.Logger.info('[Import Modal] Skipping existing record', { index, page: 'import-user-data' });
-    
-    // TODO: Implement logic to skip this specific record
-    showImportUserDataNotification('דילוג על רשומה קיימת - פונקציונליות תפותח בקרוב', 'info');
+async function skipExistingRecord(index) {
+    try {
+        window.Logger.info('[Import Modal] Skipping existing record', { index, page: 'import-user-data' });
+
+        // Get current import session ID
+        const sessionId = window.currentImportSessionId; // or get from state
+        if (!sessionId) {
+            throw new Error('No active import session');
+        }
+
+        const response = await fetch(`/api/user-data-import/session/${sessionId}/reject-duplicate`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                record_index: index,
+                duplicate_type: 'existing_record'
+            })
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.error || `Failed to skip record: ${response.status}`);
+        }
+
+        const result = await response.json();
+        window.Logger.info('[Import Modal] Record skipped successfully', { index, sessionId, page: 'import-user-data' });
+
+        // Refresh import preview
+        if (typeof window.refreshImportPreview === 'function') {
+            await window.refreshImportPreview(sessionId);
+        }
+
+        showImportUserDataNotification('רשומה נדלגה בהצלחה', 'success');
+    } catch (error) {
+        window.Logger.error('[Import Modal] Error skipping existing record', { index, error: error?.message, page: 'import-user-data' });
+        showImportUserDataNotification(`שגיאה בדילוג על רשומה: ${error.message}`, 'error');
+    }
 }
 
 /**

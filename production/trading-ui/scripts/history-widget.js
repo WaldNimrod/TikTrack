@@ -9,6 +9,39 @@
  * @lastUpdated 2025-01-27
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - initializeHeader() - Initializeheader
+// - initWeeklyPLChart() - Initweeklyplchart
+// - initTabs() - Inittabs
+// - createQuickLinksActionsMenu() - Createquicklinksactionsmenu
+// - setupQuickLinksPositioning() - Setupquicklinkspositioning
+// - setupQuickLinks() - Setupquicklinks
+// - initializeWidgets() - Initializewidgets
+// - initializePage() - Initializepage
+
+// === UI Functions ===
+// - updateChartLabels() - Updatechartlabels
+// - updateDailyStats() - Updatedailystats
+// - updatePLStats() - Updateplstats
+// - updateMarketValueStats() - Updatemarketvaluestats
+// - refreshWidget() - Refreshwidget
+
+// === Data Functions ===
+// - getCSSVariableValue() - Getcssvariablevalue
+// - getDateRangeData() - Getdaterangedata
+
+// === Utility Functions ===
+// - formatValue() - Formatvalue
+// - check() - Check
+
+// === Other ===
+// - toggleChartDateRangeMenu() - Togglechartdaterangemenu
+// - selectChartDateRange() - Selectchartdaterange
+// - waitForSystem() - Waitforsystem
+
 (function() {
     'use strict';
 

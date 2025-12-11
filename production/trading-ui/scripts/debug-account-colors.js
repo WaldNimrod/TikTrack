@@ -1,3 +1,12 @@
+
+
+// ===== FUNCTION INDEX =====
+
+// === Debug Functions ===
+// - debugAccountColors() - Debug Account Colors
+// - testColorSchemes() - Test Color Schemes
+// - validateColorUsage() - Validate Color Usage
+
 // ===== DIAGNOSTIC CODE FOR TRADING ACCOUNTS PAGE COLORS =====
 // העתק את כל הקוד הזה לקונסולה ותראה את כל המידע
 

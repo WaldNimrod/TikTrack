@@ -7,6 +7,15 @@
  * @lastUpdated January 27, 2025
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - initializeTickersModal() - Initializetickersmodal
+
+// === Other ===
+// - waitForModalManager() - Waitformodalmanager
+
 (function initTickersModalConfiguration() {
     const GLOBAL_KEY = '__TICKERS_MODAL_CONFIG_SOURCE__';
 

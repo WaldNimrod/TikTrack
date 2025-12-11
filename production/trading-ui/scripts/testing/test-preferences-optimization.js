@@ -16,6 +16,20 @@
  *   window.testPreferencesOptimization()
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Core Functions ===
+// - runAllTests() - Runalltests
+
+// === Data Functions ===
+// - testPageLoad() - Testpageload
+// - testSavePerformance() - Testsaveperformance
+// - countAPICalls() - Countapicalls
+
+// === Other ===
+// - testCachePerformance() - Testcacheperformance
+
 (function() {
   'use strict';
 

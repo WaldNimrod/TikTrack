@@ -10,6 +10,12 @@
  * @author TikTrack Development Team
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Data Functions ===
+// - getCSSVariableValue() - Getcssvariablevalue
+
 function getCSSVariableValue(variableName, fallback) {
   try {
     if (typeof window !== 'undefined' && window.getComputedStyle) {

@@ -70,6 +70,11 @@ def research() -> Any:
     """Research page"""
     return send_from_directory(UI_DIR, "research.html")
 
+@pages_bp.route('/strategy-analysis')
+def strategy_analysis() -> Any:
+    """Strategy Analysis page"""
+    return send_from_directory(UI_DIR, "strategy-analysis.html")
+
 
 
 @pages_bp.route('/cash_flows')
@@ -103,6 +108,12 @@ def currencies() -> Any:
 def preferences() -> Any:
     """Preferences page"""
     return send_from_directory(UI_DIR, "preferences.html")
+
+@pages_bp.route('/user-profile')
+@pages_bp.route('/user-profile.html')
+def user_profile() -> Any:
+    """User profile management page"""
+    return send_from_directory(UI_DIR, "user-profile.html")
 
 @pages_bp.route('/ai-analysis')
 def ai_analysis() -> Any:
@@ -144,6 +155,21 @@ def test_header_only() -> Any:
 def chart_management() -> Any:
     """Chart management page"""
     return send_from_directory(UI_DIR, "chart-management.html")
+
+@pages_bp.route('/trade-history')
+def trade_history() -> Any:
+    """Trade history page"""
+    return send_from_directory(UI_DIR, "trade-history.html")
+
+@pages_bp.route('/portfolio-state')
+def portfolio_state() -> Any:
+    """Portfolio state page"""
+    return send_from_directory(UI_DIR, "portfolio-state.html")
+
+@pages_bp.route('/trading-journal')
+def trading_journal() -> Any:
+    """Trading journal page"""
+    return send_from_directory(UI_DIR, "trading-journal.html")
 
 
 

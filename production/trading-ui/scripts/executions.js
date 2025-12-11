@@ -5,81 +5,102 @@
  * 
  * This index lists all functions in this file, organized by category.
  * 
- * Total Functions: 62
+ * Total Functions: 82
  * 
- * PAGE INITIALIZATION (2)
- * - setupModalConfigurations() - * שחזור מצב סידור - שימוש בפונקציה גלובלית
+ * PAGE INITIALIZATION (5)
+ * - setupModalConfigurations() - setupModalConfigurations function
+ * - setupExecutionCalculationListeners() - * Calculate execution values for add form
+ * - setupEditExecutionCalculationListeners() - setupEditExecutionCalculationListeners function
  * - setupExecutionsFilterFunctions() - setupExecutionsFilterFunctions function
+ * - initializeTradeSuggestionsPagination() - initializeTradeSuggestionsPagination function
  * 
- * DATA LOADING (6)
- * - loadExecutionsData() - * מעבר להתראה ספציפית
- * - loadTickersWithOpenOrClosedTradesAndPlans() - * הגדרת תצורות מודלים
+ * DATA LOADING (10)
+ * - loadExecutionsData() - * Navigate to specific note page
+ * - getExecutionsPaginationOptions() - getExecutionsPaginationOptions function
+ * - preloadSections34Data() - * שחזור מצב סידור - שימוש בפונקציה גלובלית
+ * - loadTickersWithOpenOrClosedTradesAndPlans() - loadTickersWithOpenOrClosedTradesAndPlans function
  * - loadActiveTradesForTicker() - * הפעלה/השבתה של שדה מזהה חיצוני לפי בחירת מקור
  * - loadExecutionTickerInfo() - * Enable execution form fields
- * - loadTradeExecutions() - * מעבר לטרייד המקושר
+ * - loadTradeExecutions() - loadTradeExecutions function
  * - loadTickersSummaryData() - loadTickersSummaryData function
+ * - loadTradeSuggestionsForAll() - loadTradeSuggestionsForAll function
+ * - getTradeSuggestionsFlatData() - * Open trade details modal
  * 
- * DATA MANIPULATION (20)
+ * DATA MANIPULATION (22)
  * - addExecution() - addExecution function
- * - resetAddExecutionForm() - resetAddExecutionForm function
  * - updateRealizedPLField() - updateRealizedPLField function
- * - updateExecutionWrapper() - updateExecutionWrapper function
- * - updateExecutionsTableMain() - updateExecutionsTableMain function
+ * - saveExecution() - saveExecution function
+ * - updateExecution() - updateExecution function
+ * - updateExecutionsSummary() - * Handle executions filtered data change event (EOD integrated)
+ * - updateExecutionsCounters() - updateExecutionsCounters function
+ * - updateExecutionsTableMain() - updateExecutionsTableMain function (EOD integrated)
+ * - loadEODExecutionsData() - Load EOD data for executions
  * - updateTradesOnCheckboxChange() - updateTradesOnCheckboxChange function
  * - updateTradesOnTickerChange() - updateTradesOnTickerChange function
  * - addNewTicker() - * Show ticker help
- * - addNewPlan() - * הוספת טיקר חדש
- * - addNewTrade() - * הוספת טיקר חדש
- * - updateExecutionsSummary() - * הוספת תכנון חדש
+ * - addNewPlan() - * Add new ticker (in development)
+ * - addNewTrade() - * Add new ticker (in development)
  * - calculateAddExecutionValues() - calculateAddExecutionValues function
- * - updateExecutionsTableForTradeModal() - * טעינת ביצועים לטרייד
+ * - updateExecutionsTableForTradeModal() - * Load executions for trade (used in trade modal)
  * - addEditBuySell() - addEditBuySell function
  * - updateExecutionsGlobalData() - updateExecutionsGlobalData function
  * - updateTickersSummaryTable() - updateTickersSummaryTable function
  * - addExecutionForTicker() - * צפייה בפרטי טיקר
- * - updateTickersList() - * הצגה/הסתרה של סקשן הטיקרים
- * - showAddExecutionModal() - showAddExecutionModal function
- * - deleteExecution() - * Show add execution modal
+ * - updateTickersList() - updateTickersList function
+ * - deleteExecution() - deleteExecution function
+ * - updateSuggestionsCount() - updateSuggestionsCount function
+ * - updateTradeSuggestionsTable() - * Get flat data array for sorting
  * 
- * EVENT HANDLING (20)
+ * EVENT HANDLING (29)
  * - editExecution() - editExecution function
- * - resetExecutionForm() - resetExecutionForm function
- * - resetEditExecutionForm() - resetEditExecutionForm function
- * - fillEditExecutionForm() - * הצגת מודל עריכת עסקה
- * - showExecutionLinkedItemsModal() - showExecutionLinkedItemsModal function
- * - goToNote() - * מעבר לתכנון ספציפי
+ * - goToNote() - * Navigate to specific trade plan page
+ * - syncExecutionsPagination() - syncExecutionsPagination function
+ * - setExecutionsFilteredDataset() - setExecutionsFilteredDataset function
+ * - handleExecutionsPageRender() - * Get pagination options for executions table
+ * - handleExecutionsFilteredChange() - * Get pagination options for executions table
+ * - applyExecutionsFilteredData() - * Handle executions page render event
  * - filterExecutionsLocally() - filterExecutionsLocally function
- * - toggleExecutionFormFields() - toggleExecutionFormFields function
+ * - toggleExecutionFormFields() - * Add new trade plan (in development)
  * - enableExecutionFormFields() - * הפעלה/השבתה של שדות הטופס
  * - disableExecutionFormFields() - * הפעלה/השבתה של שדות הטופס
  * - displayExecutionTickerInfo() - displayExecutionTickerInfo function
  * - hideExecutionTickerInfo() - hideExecutionTickerInfo function
- * - calculateExecutionValues() - * הסתרת מידע על הטיקר
- * - calculateEditExecutionValues() - * חישוב ערכים מחושבים לטופס הוספה
+ * - calculateExecutionValues() - * Hide ticker information from execution form
+ * - calculateEditExecutionValues() - * Calculate execution values for add form
  * - linkExistingExecution() - * הוספת קניה/מכירה במודל עריכת טרייד
  * - unlinkExecution() - * הוספת קניה/מכירה במודל עריכת טרייד
- * - toggleTickersSection() - * הוספת עסקה לטיקר
- * - toggleExecutionsSection() - toggleExecutionsSection function
- * - showEditExecutionModal() - * Show add execution modal
  * - performExecutionDeletion() - performExecutionDeletion function
+ * - renderTradeSuggestionsSection() - * Update suggestions count display
+ * - buildTradeSuggestionRow() - buildTradeSuggestionRow function
+ * - toggleAllSuggestions() - toggleAllSuggestions function
+ * - acceptSuggestion() - * Toggle all suggestions checkbox
+ * - rejectSuggestion() - rejectSuggestion function
+ * - acceptAllSuggestions() - acceptAllSuggestions function
+ * - rejectAllSuggestions() - rejectAllSuggestions function
+ * - applySelectedSuggestions() - * Reject all suggestions
+ * - sortTradeSuggestionsTable() - * Get flat data array for sorting
+ * - renderTradeSuggestionsPageRows() - renderTradeSuggestionsPageRows function
+ * - buildTradeSuggestionsFlatList() - buildTradeSuggestionsFlatList function
  * 
  * UI UPDATES (2)
- * - displayLinkedItems() - displayLinkedItems function
- * - showTickerHelp() - * מעבר לדף טיקר (בפיתוח)
+ * - displayLinkedItems() - * Update execution - wrapper for saveExecution in edit mode
+ * - showTickerHelp() - * Navigate to ticker page (in development)
  * 
- * OTHER (12)
+ * OTHER (14)
  * - goToTrade() - goToTrade function
- * - goToPlan() - * מעבר לטרייד ספציפי
- * - goToAlert() - * מעבר לטרייד ספציפי
+ * - goToPlan() - * Navigate to specific trade page
+ * - goToAlert() - * Navigate to specific trade page
  * - isDateInRange() - isDateInRange function
  * - restoreSortState() - restoreSortState function
  * - enableAllFields() - enableAllFields function
- * - goToTickerPage() - * עדכון טריידים כאשר הטיקר משתנה
- * - goToLinkedTrade() - * חישוב ערכים מחושבים לטופס הוספה
+ * - goToTickerPage() - * Update trades list when ticker changes
+ * - goToLinkedTrade() - goToLinkedTrade function
  * - applyAccountFilterWithTradesData() - applyAccountFilterWithTradesData function
  * - toggleExternalIdField() - toggleExternalIdField function
  * - refreshTickersSummary() - refreshTickersSummary function
  * - viewTickerDetails() - * רענון רשימת טיקרים
+ * - restorePageState() - restorePageState function
+ * - openTradeDetailsModal() - openTradeDetailsModal function
  * 
  * ==========================================
  */
@@ -1249,6 +1270,49 @@ async function updateExecutionsTableMain(executions, options = {}) {
   }
 
   executions = Array.isArray(executions) ? executions : [];
+
+  // === EOD INTEGRATION: Enrich executions with EOD data ===
+  let enrichedExecutions = [...executions];
+  try {
+    const eodExecutionsData = await loadEODExecutionsData(executions);
+    if (eodExecutionsData && Array.isArray(eodExecutionsData)) {
+      // Merge EOD data with executions
+      enrichedExecutions = executions.map(execution => {
+        const eodData = eodExecutionsData.find(eod => eod.execution_id === execution.id);
+        if (eodData) {
+          return {
+            ...execution,
+            eod_metrics: eodData,
+            // Enhanced execution metrics using EOD
+            eod_performance: {
+              realized_pl: eodData.realized_pl_amount,
+              unrealized_pl: eodData.unrealized_pl_amount,
+              total_pl: (eodData.realized_pl_amount || 0) + (eodData.unrealized_pl_amount || 0),
+              execution_rate: eodData.execution_rate,
+              slippage_amount: eodData.slippage_amount
+            }
+          };
+        }
+        return execution;
+      });
+
+      if (window.Logger) {
+        window.Logger.info('✅ Enriched executions with EOD data', {
+          page: 'executions',
+          originalCount: executions.length,
+          enrichedCount: enrichedExecutions.length
+        });
+      }
+    }
+  } catch (eodError) {
+    if (window.Logger) {
+      window.Logger.warn('⚠️ Failed to enrich executions with EOD data, using original data', {
+        page: 'executions',
+        error: eodError.message
+      });
+    }
+    // Continue with original executions data - no fallback mock data
+  }
   // updateExecutionsTableMain called with executions
   const tbody = document.querySelector('#executionsTable tbody');
   if (!tbody) {
@@ -3054,23 +3118,29 @@ async function updateTradesOnTickerChange(mode = 'add') {
 }
 
 /**
- * Navigate to ticker page (in development)
- * @param {string} _symbol - Ticker symbol (unused)
+ * Navigate to ticker page
+ * @param {string} symbol - Ticker symbol
  * @returns {void}
  */
-function goToTickerPage(_symbol) {
+function goToTickerPage(symbol) {
   try {
-  // מעבר לדף טיקר
-  if (typeof window.showInfoNotification === 'function') {
-    window.showInfoNotification('מידע', 'מעבר לדף טיקר - בפיתוח');
-  } else {
-    // מעבר לדף טיקר - בפיתוח
-  }
-  // TODO: ניתוב לדף טיקר - ראה: CENTRAL_TASKS_TODO.md (משימה 1)
+    if (!symbol) {
+      window.Logger?.warn?.('No symbol provided for navigation', { page: "executions" });
+      if (typeof window.showWarningNotification === 'function') {
+        window.showWarningNotification('שגיאה', 'לא סופק סימול לניווט');
+      }
+      return;
+    }
+
+    // Navigate to ticker page with symbol parameter
+    const tickerPageUrl = `/tickers.html?tickerSymbol=${encodeURIComponent(symbol)}`;
+    window.location.href = tickerPageUrl;
+
+    window.Logger?.info?.('Navigating to ticker page', { symbol, url: tickerPageUrl, page: "executions" });
   } catch (error) {
-    window.Logger.error('שגיאה במעבר לעמוד טיקר:', error, { page: "executions" });
+    window.Logger?.error?.('Error navigating to ticker page', { symbol, error: error?.message, page: "executions" });
     if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה במעבר לעמוד טיקר', error.message);
+      window.showErrorNotification('שגיאה', `שגיאה במעבר לעמוד טיקר: ${error.message}`);
     }
   }
 }
@@ -3103,51 +3173,87 @@ function showTickerHelp() {
 }
 
 /**
- * Add new ticker (in development)
+ * Add new ticker
  * @returns {void}
  */
 function addNewTicker() {
   try {
-  // הוספת טיקר חדש
-  if (typeof window.showInfoNotification === 'function') {
-    window.showInfoNotification('מידע', 'הוספת טיקר - בפיתוח');
-  } else {
-    // הוספת טיקר - בפיתוח
-  }
-  // TODO: פתיחת מודל הוספת טיקר - ראה: CENTRAL_TASKS_TODO.md (משימה 2)
+    window.Logger?.info?.('Opening add ticker modal', { page: "executions" });
+
+    // Use ModalManagerV2 if available
+    if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
+      window.ModalManagerV2.showModal('addTickerModal', 'add').then(() => {
+        window.Logger?.info?.('Add ticker modal opened successfully', { page: "executions" });
+      }).catch(error => {
+        window.Logger?.error?.('Error opening add ticker modal', { error: error?.message, page: "executions" });
+        throw error;
+      });
+    } else if (window.AddTickerModal && typeof window.AddTickerModal.open === 'function') {
+      // Fallback to direct modal opening
+      window.AddTickerModal.open(null);
+    } else {
+      throw new Error('Modal system not available');
+    }
   } catch (error) {
-    window.Logger.error('שגיאה בהוספת טיקר חדש:', error, { page: "executions" });
+    window.Logger?.error?.('Error opening add ticker modal', { error: error?.message, page: "executions" });
     if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה בהוספת טיקר חדש', error.message);
+      window.showErrorNotification('שגיאה', `שגיאה בפתיחת מודל הוספת טיקר: ${error.message}`);
     }
   }
 }
 
 /**
- * Add new trade plan (in development)
+ * Add new trade plan
  * @returns {void}
  */
 function addNewPlan() {
-  // הוספת תכנון חדש
-  if (typeof window.showInfoNotification === 'function') {
-    window.showInfoNotification('מידע', 'הוספת תכנון - בפיתוח');
-  } else {
-    // הוספת תכנון - בפיתוח
+  try {
+    window.Logger?.info?.('Opening add trade plan modal', { page: "executions" });
+
+    // Use ModalManagerV2 if available
+    if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
+      window.ModalManagerV2.showModal('tradePlansModal', 'add').then(() => {
+        window.Logger?.info?.('Add trade plan modal opened successfully', { page: "executions" });
+      }).catch(error => {
+        window.Logger?.error?.('Error opening add trade plan modal', { error: error?.message, page: "executions" });
+        throw error;
+      });
+    } else {
+      throw new Error('Modal system not available');
+    }
+  } catch (error) {
+    window.Logger?.error?.('Error opening add trade plan modal', { error: error?.message, page: "executions" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה', `שגיאה בפתיחת מודל הוספת תכנון: ${error.message}`);
+    }
   }
-  // TODO: פתיחת מודל הוספת תכנון - ראה: CENTRAL_TASKS_TODO.md (משימה 3)
 }
 
 /**
- * הוספת טרייד חדש
+ * Add new trade
+ * @returns {void}
  */
 function addNewTrade() {
-  // הוספת טרייד חדש
-  if (typeof window.showInfoNotification === 'function') {
-    window.showInfoNotification('מידע', 'הוספת טרייד - בפיתוח');
-  } else {
-    // הוספת טרייד - בפיתוח
+  try {
+    window.Logger?.info?.('Opening add trade modal', { page: "executions" });
+
+    // Use ModalManagerV2 if available
+    if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
+      window.ModalManagerV2.showModal('tradesModal', 'add').then(() => {
+        window.Logger?.info?.('Add trade modal opened successfully', { page: "executions" });
+      }).catch(error => {
+        window.Logger?.error?.('Error opening add trade modal', { error: error?.message, page: "executions" });
+        throw error;
+      });
+    } else {
+      throw new Error('Modal system not available');
+    }
+  } catch (error) {
+    window.Logger?.error?.('Error opening add trade modal', { error: error?.message, page: "executions" });
+    if (typeof window.showErrorNotification === 'function') {
+      window.showErrorNotification('שגיאה', `שגיאה בפתיחת מודל הוספת טרייד: ${error.message}`);
+    }
   }
-  // TODO: פתיחת מודל הוספת טרייד - ראה: CENTRAL_TASKS_TODO.md (משימה 4)
 }
 
 /**
@@ -5771,4 +5877,95 @@ function buildTradeSuggestionsFlatList(sourceData) {
         }
     });
     return flatData;
+};
+
+/**
+ * Load EOD data for executions
+ * @param {Array} executions - Array of execution objects
+ * @returns {Promise<Array>} EOD metrics for executions
+ */
+async function loadEODExecutionsData(executions) {
+    if (!Array.isArray(executions) || executions.length === 0) {
+        return [];
+    }
+
+    try {
+        // Get execution IDs for EOD query
+        const executionIds = executions.map(exec => exec.id).filter(id => id);
+
+        if (executionIds.length === 0) {
+            return [];
+        }
+
+        // Use EODIntegrationHelper to load execution-specific metrics
+        // Since EOD currently focuses on portfolio-level metrics,
+        // we'll use portfolio metrics and filter by date ranges around execution dates
+        const eodResults = [];
+
+        for (const execution of executions) {
+            if (!execution.created_at) continue;
+
+            try {
+                // Get portfolio metrics around the execution date
+                const executionDate = new Date(execution.created_at);
+                const startDate = new Date(executionDate);
+                startDate.setDate(startDate.getDate() - 1); // Day before
+                const endDate = new Date(executionDate);
+                endDate.setDate(endDate.getDate() + 1); // Day after for execution monitoring
+
+                const eodData = await window.EODIntegrationHelper.loadEODPortfolioMetrics(
+                    null, // global user
+                    {
+                        date_from: startDate.toISOString().split('T')[0],
+                        date_to: endDate.toISOString().split('T')[0]
+                    }
+                );
+
+                if (eodData && eodData.data && Array.isArray(eodData.data) && eodData.data.length > 0) {
+                    // Find the record closest to execution date
+                    const executionDateStr = executionDate.toISOString().split('T')[0];
+                    const closestRecord = eodData.data.find(r => r.date_utc === executionDateStr) ||
+                                        eodData.data[0]; // Fallback to first record
+
+                    if (closestRecord) {
+                        eodResults.push({
+                            execution_id: execution.id,
+                            ...closestRecord,
+                            // Calculate execution-specific metrics
+                            execution_rate: execution.quantity ? (execution.filled_quantity || execution.quantity) / execution.quantity : 0,
+                            slippage_amount: execution.expected_price && execution.actual_price ?
+                                execution.actual_price - execution.expected_price : 0
+                        });
+                    }
+                }
+            } catch (executionError) {
+                if (window.Logger) {
+                    window.Logger.warn(`Failed to load EOD data for execution ${execution.id}`, {
+                        page: 'executions',
+                        executionId: execution.id,
+                        error: executionError.message
+                    });
+                }
+                // Continue with next execution
+            }
+        }
+
+        if (window.Logger && eodResults.length > 0) {
+            window.Logger.info(`✅ Loaded EOD data for ${eodResults.length} executions`, {
+                page: 'executions',
+                totalExecutions: executions.length
+            });
+        }
+
+        return eodResults;
+
+    } catch (error) {
+        if (window.Logger) {
+            window.Logger.warn('Failed to load EOD executions data', {
+                page: 'executions',
+                error: error.message
+            });
+        }
+        return [];
+    }
 }

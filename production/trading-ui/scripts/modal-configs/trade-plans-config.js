@@ -7,6 +7,12 @@
  * @lastUpdated January 27, 2025
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - initializeTradePlansModal() - Initializetradeplansmodal
+
 // קונפיגורציה למודל תוכניות מסחר
 const tradePlansModalConfig = {
     id: 'tradePlansModal',

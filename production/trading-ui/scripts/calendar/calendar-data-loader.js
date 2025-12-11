@@ -12,6 +12,14 @@
  * @author TikTrack Development Team
  */
 
+
+// ===== FUNCTION INDEX =====
+// === Class Methods ===
+// - CalendarDataLoader.switch() - Switch
+
+// === Data Functions ===
+// - getDayKey() - Getdaykey
+
 (function() {
     'use strict';
 
@@ -31,14 +39,15 @@
          * @returns {Promise<Object>} Aggregated data by day
          */
         static async loadMonthData(year, month, options = {}) {
-            const { force = false, entityFilter = 'all' } = options;
+            const { force = false, entityFilter = 'all', tickerFilter = null } = options;
             
             if (window.Logger) {
                 window.Logger.info('Loading calendar month data', {
                     ...PAGE_LOG_CONTEXT,
                     year,
                     month,
-                    entityFilter
+                    entityFilter,
+                    tickerFilter
                 });
             }
 
@@ -46,18 +55,29 @@
             const { start, end } = window.CalendarDateUtils?.getMonthDateRange(year, month) || 
                                   this._getMonthDateRange(year, month);
 
-            // Load data from all services
-            const [executions, trades, notes, alerts, cashFlows, tradePlans] = await Promise.all([
-                this._loadExecutions(start, end, entityFilter, force),
-                this._loadTrades(start, end, entityFilter, force),
-                this._loadNotes(start, end, entityFilter, force),
-                this._loadAlerts(start, end, entityFilter, force),
-                this._loadCashFlows(start, end, entityFilter, force),
-                this._loadTradePlans(start, end, entityFilter, force)
-            ]);
-
-            // Aggregate by day
-            const aggregated = this._aggregateByDay(executions, trades, notes, alerts, cashFlows, tradePlans, year, month);
+            // Prefer unified data from TradingJournalData (ensures parity with list/cards)
+            let aggregated = null;
+            const unifiedEntries = await this._loadEntriesFromTradingJournal(start, end, {
+                entityFilter,
+                tickerFilter,
+                force
+            });
+            
+            if (Array.isArray(unifiedEntries) && unifiedEntries.length > 0) {
+                aggregated = this._aggregateEntriesByDay(unifiedEntries, year, month);
+            } else {
+                // Fallback to legacy per-entity loaders
+                const [executions, trades, notes, alerts, cashFlows, tradePlans] = await Promise.all([
+                    this._loadExecutions(start, end, entityFilter, tickerFilter, force),
+                    this._loadTrades(start, end, entityFilter, tickerFilter, force),
+                    this._loadNotes(start, end, entityFilter, tickerFilter, force),
+                    this._loadAlerts(start, end, entityFilter, tickerFilter, force),
+                    this._loadCashFlows(start, end, entityFilter, tickerFilter, force),
+                    this._loadTradePlans(start, end, entityFilter, tickerFilter, force)
+                ]);
+    
+                aggregated = this._aggregateByDay(executions, trades, notes, alerts, cashFlows, tradePlans, year, month);
+            }
 
             if (window.Logger) {
                 window.Logger.info('Calendar month data loaded', {
@@ -75,7 +95,7 @@
          * Load executions for date range
          * @private
          */
-        static async _loadExecutions(start, end, entityFilter, force) {
+        static async _loadExecutions(start, end, entityFilter, tickerFilter, force) {
             if (entityFilter !== 'all' && entityFilter !== 'execution') {
                 return [];
             }
@@ -83,7 +103,15 @@
             try {
                 if (window.ExecutionsData?.loadExecutionsData) {
                     const allExecutions = await window.ExecutionsData.loadExecutionsData({ force });
-                    return this._filterByDateRange(allExecutions, start, end, 'execution_date', 'date');
+                    let filtered = this._filterByDateRange(allExecutions, start, end, 'execution_date', 'date');
+                    // Filter by ticker if provided
+                    if (tickerFilter) {
+                        filtered = filtered.filter(e => {
+                            const ticker = e.ticker_symbol || e.ticker?.symbol || e.ticker_id;
+                            return ticker === tickerFilter;
+                        });
+                    }
+                    return filtered;
                 }
             } catch (error) {
                 if (window.Logger) {
@@ -100,7 +128,7 @@
          * Load trades for date range
          * @private
          */
-        static async _loadTrades(start, end, entityFilter, force) {
+        static async _loadTrades(start, end, entityFilter, tickerFilter, force) {
             if (entityFilter !== 'all' && entityFilter !== 'trade') {
                 return [];
             }
@@ -108,7 +136,15 @@
             try {
                 if (window.TradesData?.loadTradesData) {
                     const allTrades = await window.TradesData.loadTradesData({ force });
-                    return this._filterByDateRange(allTrades, start, end, 'opened_at', 'created_at');
+                    let filtered = this._filterByDateRange(allTrades, start, end, 'opened_at', 'created_at');
+                    // Filter by ticker if provided
+                    if (tickerFilter) {
+                        filtered = filtered.filter(t => {
+                            const ticker = t.ticker_symbol || t.ticker?.symbol || t.ticker_id;
+                            return ticker === tickerFilter;
+                        });
+                    }
+                    return filtered;
                 }
             } catch (error) {
                 if (window.Logger) {
@@ -125,7 +161,7 @@
          * Load notes for date range
          * @private
          */
-        static async _loadNotes(start, end, entityFilter, force) {
+        static async _loadNotes(start, end, entityFilter, tickerFilter, force) {
             if (entityFilter !== 'all' && entityFilter !== 'note') {
                 return [];
             }
@@ -133,7 +169,15 @@
             try {
                 if (window.NotesData?.loadNotesData) {
                     const allNotes = await window.NotesData.loadNotesData({ force });
-                    return this._filterByDateRange(allNotes, start, end, 'created_at', 'date');
+                    let filtered = this._filterByDateRange(allNotes, start, end, 'created_at', 'date');
+                    // Filter by ticker if provided (notes may have related_object with ticker)
+                    if (tickerFilter) {
+                        filtered = filtered.filter(n => {
+                            const ticker = n.ticker_symbol || n.related_object?.ticker_symbol || n.ticker_id;
+                            return ticker === tickerFilter;
+                        });
+                    }
+                    return filtered;
                 }
             } catch (error) {
                 if (window.Logger) {
@@ -150,7 +194,7 @@
          * Load alerts for date range
          * @private
          */
-        static async _loadAlerts(start, end, entityFilter, force) {
+        static async _loadAlerts(start, end, entityFilter, tickerFilter, force) {
             if (entityFilter !== 'all' && entityFilter !== 'alert') {
                 return [];
             }
@@ -158,7 +202,15 @@
             try {
                 if (window.AlertsData?.loadAlertsData) {
                     const allAlerts = await window.AlertsData.loadAlertsData({ force });
-                    return this._filterByDateRange(allAlerts, start, end, 'triggered_at', 'created_at', 'expiry_date');
+                    let filtered = this._filterByDateRange(allAlerts, start, end, 'triggered_at', 'created_at', 'expiry_date');
+                    // Filter by ticker if provided
+                    if (tickerFilter) {
+                        filtered = filtered.filter(a => {
+                            const ticker = a.ticker_symbol || a.ticker?.symbol || a.ticker_id;
+                            return ticker === tickerFilter;
+                        });
+                    }
+                    return filtered;
                 }
             } catch (error) {
                 if (window.Logger) {
@@ -175,7 +227,7 @@
          * Load cash flows for date range
          * @private
          */
-        static async _loadCashFlows(start, end, entityFilter, force) {
+        static async _loadCashFlows(start, end, entityFilter, tickerFilter, force) {
             if (entityFilter !== 'all' && entityFilter !== 'cash_flow') {
                 return [];
             }
@@ -183,7 +235,15 @@
             try {
                 if (window.CashFlowsData?.loadCashFlowsData) {
                     const allCashFlows = await window.CashFlowsData.loadCashFlowsData({ force });
-                    return this._filterByDateRange(allCashFlows, start, end, 'date');
+                    let filtered = this._filterByDateRange(allCashFlows, start, end, 'date');
+                    // Filter by ticker if provided (cash flows usually don't have ticker, but check anyway)
+                    if (tickerFilter) {
+                        filtered = filtered.filter(cf => {
+                            const ticker = cf.ticker_symbol || cf.ticker?.symbol || cf.ticker_id;
+                            return ticker === tickerFilter;
+                        });
+                    }
+                    return filtered;
                 }
             } catch (error) {
                 if (window.Logger) {
@@ -200,7 +260,7 @@
          * Load trade plans for date range
          * @private
          */
-        static async _loadTradePlans(start, end, entityFilter, force) {
+        static async _loadTradePlans(start, end, entityFilter, tickerFilter, force) {
             if (entityFilter !== 'all' && entityFilter !== 'trade_plan') {
                 return [];
             }
@@ -208,7 +268,15 @@
             try {
                 if (window.TradePlansData?.loadTradePlansData) {
                     const allTradePlans = await window.TradePlansData.loadTradePlansData({ force });
-                    return this._filterByDateRange(allTradePlans, start, end, 'entry_date', 'created_at');
+                    let filtered = this._filterByDateRange(allTradePlans, start, end, 'entry_date', 'created_at');
+                    // Filter by ticker if provided
+                    if (tickerFilter) {
+                        filtered = filtered.filter(tp => {
+                            const ticker = tp.ticker_symbol || tp.ticker?.symbol || tp.ticker_id;
+                            return ticker === tickerFilter;
+                        });
+                    }
+                    return filtered;
                 }
             } catch (error) {
                 if (window.Logger) {
@@ -346,8 +414,8 @@
          * @returns {Promise<Object>} Aggregated data
          */
         static async loadMonthDataWithCache(year, month, options = {}) {
-            const { force = false, entityFilter = 'all' } = options;
-            const cacheKey = `${CALENDAR_DATA_KEY}-${year}-${month}-${entityFilter}`;
+            const { force = false, entityFilter = 'all', tickerFilter = null } = options;
+            const cacheKey = `${CALENDAR_DATA_KEY}-${year}-${month}-${entityFilter}-${tickerFilter || 'all'}`;
 
             // Use CacheTTLGuard if available
             if (window.CacheTTLGuard?.ensure && !force) {
@@ -378,6 +446,95 @@
 
             // Fallback to direct load
             return await this.loadMonthData(year, month, options);
+        }
+
+        /**
+         * Load unified journal entries from TradingJournalData for the month
+         * @private
+         */
+        static async _loadEntriesFromTradingJournal(start, end, { entityFilter = 'all', tickerFilter = null, force = false } = {}) {
+            if (!window.TradingJournalData || typeof window.TradingJournalData.loadEntries !== 'function') {
+                return [];
+            }
+            
+            try {
+                // Use full ISO with end-of-day to avoid excluding last-day items
+                const startISO = new Date(start);
+                startISO.setHours(0, 0, 0, 0);
+                const endISO = new Date(end);
+                endISO.setHours(23, 59, 59, 999);
+
+                const result = await window.TradingJournalData.loadEntries({
+                    start_date: startISO.toISOString(),
+                    end_date: endISO.toISOString()
+                }, {
+                    entity_type: entityFilter === 'all' ? 'all' : entityFilter,
+                    ticker_symbol: tickerFilter || null
+                }, {
+                    force
+                });
+                
+                return result?.entries || [];
+            } catch (error) {
+                if (window.Logger) {
+                    window.Logger.warn('Failed unified journal load for calendar, falling back to legacy loaders', {
+                        ...PAGE_LOG_CONTEXT,
+                        error: error?.message || error
+                    });
+                }
+                return [];
+            }
+        }
+
+        /**
+         * Aggregate unified entries by day (from TradingJournalData)
+         * @private
+         */
+        static _aggregateEntriesByDay(entries, year, month) {
+            const aggregated = {};
+
+            const getDayKey = (date) => {
+                const d = window.CalendarDateUtils?.parseDate(date) || new Date(date);
+                if (isNaN(d.getTime())) return null;
+                if (d.getFullYear() !== year || d.getMonth() !== month) return null;
+                return d.getDate();
+            };
+
+            entries.forEach(entry => {
+                const day = getDayKey(entry.date || entry.created_at);
+                if (!day) return;
+
+                if (!aggregated[day]) {
+                    aggregated[day] = { executions: [], trades: [], notes: [], alerts: [], cashFlows: [], tradePlans: [], others: [] };
+                }
+
+                const bucket = aggregated[day];
+                switch (entry.entity_type) {
+                    case 'execution':
+                        bucket.executions.push(entry);
+                        break;
+                    case 'trade':
+                        bucket.trades.push(entry);
+                        break;
+                    case 'note':
+                        bucket.notes.push(entry);
+                        break;
+                    case 'alert':
+                        bucket.alerts.push(entry);
+                        break;
+                    case 'cash_flow':
+                        bucket.cashFlows.push(entry);
+                        break;
+                    case 'trade_plan':
+                        bucket.tradePlans.push(entry);
+                        break;
+                    default:
+                        bucket.others.push(entry);
+                        break;
+                }
+            });
+
+            return aggregated;
         }
     }
 

@@ -3,6 +3,23 @@
  * בדיקות אוטומטיות למערכת התראות
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Core Functions ===
+// - runAllTests() - Runalltests
+
+// === Event Handlers ===
+// - testFunctionAvailability() - Testfunctionavailability
+// - testSmartFunctions() - Testsmartfunctions
+// - testBasicNotifications() - Testbasicnotifications
+// - testAutoDetection() - Testautodetection
+
+// === Other ===
+// - testCategories() - Testcategories
+// - testPerformance() - Testperformance
+// - quickTest() - Quicktest
+
 console.log('🧪 Notification System Tester loaded');
 
 // ===== בדיקות בסיסיות =====

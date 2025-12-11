@@ -22,12 +22,24 @@
  * @lastUpdated November 23, 2025
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Event Handlers ===
+// - positionSubmenu() - Positionsubmenu
+// - debouncedPositionSubmenu() - Debouncedpositionsubmenu
+
+// === Other ===
+// - clearTimeouts() - Cleartimeouts
+
 if (window.Logger) {
   window.Logger.info('🚀 Loading Header System v7.0.0...', { page: 'header-system' });
 }
 
 // ===== FilterManager Class =====
-class FilterManager {
+// Prevent duplicate declaration
+if (typeof window.FilterManager === 'undefined') {
+window.FilterManager = class FilterManager {
   constructor() {
     this.currentFilters = {
       search: '',
@@ -56,6 +68,11 @@ class FilterManager {
         ? window.getCurrentPageName() 
         : 'default';
       try {
+        // אתחול PageStateManager אם לא מאותחל
+        if (!window.PageStateManager.initialized) {
+          await window.PageStateManager.initialize();
+        }
+        
         const savedFilters = await window.PageStateManager.loadFilters(pageName);
         if (savedFilters) {
           this.currentFilters = { ...this.currentFilters, ...savedFilters };
@@ -64,34 +81,47 @@ class FilterManager {
         }
       } catch (err) {
         window.Logger?.warn?.('⚠️ Failed to load filters via PageStateManager', err, { page: 'header-system' });
-      }
-    }
-
-    const saved = localStorage.getItem('headerFilters');
-    if (saved) {
-      try {
-        this.currentFilters = { ...this.currentFilters, ...JSON.parse(saved) };
-        this.updateUI();
-      } catch (e) {
-        window.Logger?.warn?.('⚠️ Error loading saved filters', e, { page: 'header-system' });
+        // Fallback ל-localStorage רק אם PageStateManager לא זמין בכלל
+        if (!window.PageStateManager) {
+          const saved = localStorage.getItem('headerFilters');
+          if (saved) {
+            try {
+              this.currentFilters = { ...this.currentFilters, ...JSON.parse(saved) };
+              this.updateUI();
+            } catch (e) {
+              window.Logger?.warn?.('⚠️ Error loading saved filters from localStorage', e, { page: 'header-system' });
+            }
+          }
+        }
       }
     }
   }
 
   async saveFilters() {
-    if (window.PageStateManager && window.PageStateManager.initialized) {
+    if (window.PageStateManager) {
       const pageName = typeof window.getCurrentPageName === 'function' 
         ? window.getCurrentPageName() 
         : 'default';
       try {
+        // אתחול PageStateManager אם לא מאותחל
+        if (!window.PageStateManager.initialized) {
+          await window.PageStateManager.initialize();
+        }
+        
         await window.PageStateManager.saveFilters(pageName, this.currentFilters);
         return;
       } catch (err) {
         window.Logger?.warn?.('⚠️ Failed to save filters via PageStateManager', err, { page: 'header-system' });
+        // Fallback ל-localStorage רק אם PageStateManager לא זמין בכלל
+        if (!window.PageStateManager) {
+          localStorage.setItem('headerFilters', JSON.stringify(this.currentFilters));
+        }
       }
+    } else {
+      // Fallback ל-localStorage רק אם PageStateManager לא זמין בכלל
+      window.Logger?.warn?.('⚠️ PageStateManager not available, using localStorage fallback', { page: 'header-system' });
+      localStorage.setItem('headerFilters', JSON.stringify(this.currentFilters));
     }
-
-    localStorage.setItem('headerFilters', JSON.stringify(this.currentFilters));
   }
 
   setupHoverBehavior() {
@@ -467,22 +497,78 @@ class FilterManager {
 
   async applyFilters() {
     if (!window.UnifiedTableSystem || !window.UnifiedTableSystem.filter) {
+      // Fallback: show all data if UnifiedTableSystem is not available
+      window.Logger?.warn?.('⚠️ applyFilters: UnifiedTableSystem not available, showing all data', {
+        page: 'header-system',
+      });
       return;
     }
 
     const context = this.buildFilterContext();
     const targets = this._resolveTargetTables();
 
-    for (const target of targets) {
-      try {
-        await this.applyFiltersToTable(target.tableId, context, target.tableType);
-      } catch (error) {
+    // Check for double filters (header filters + page-specific filters)
+    const hasPageSpecificFilters = this._detectPageSpecificFilters();
+    if (hasPageSpecificFilters && context.hasActiveFilters) {
+      this._showDoubleFilterNotification();
+    }
+
+    // Apply filters to all tables in parallel
+    const filterPromises = targets.map(target => {
+      return this.applyFiltersToTable(target.tableId, context, target.tableType).catch(error => {
         window.Logger?.warn?.('⚠️ applyFilters: failed to process table', {
           tableId: target.tableId,
           error: error?.message || error,
           page: 'header-system',
         });
+        // Fallback: return empty array to continue processing other tables
+        return [];
+      });
+    });
+
+    await Promise.all(filterPromises);
+  }
+
+  _detectPageSpecificFilters() {
+    // Check for common page-specific filter patterns
+    const pageSpecificFilterSelectors = [
+      '.related-object-filters',
+      '.entity-type-filters',
+      '[data-filter-type="related-object"]',
+      '[data-filter-type="entity-type"]',
+      '#relatedObjectFilters',
+      '#entityTypeFilters',
+      '.portfolio-side-filter-btn.active', // Portfolio local filters
+      '#portfolioAccountFilter', // Portfolio account filter
+    ];
+
+    for (const selector of pageSpecificFilterSelectors) {
+      const element = document.querySelector(selector);
+      if (element && element.offsetParent !== null) {
+        // Check if any filter is active
+        const activeFilters = element.querySelectorAll('.selected, .active, [data-selected="true"]');
+        if (activeFilters.length > 0) {
+          return true;
+        }
       }
+    }
+
+    return false;
+  }
+
+  _showDoubleFilterNotification() {
+    if (typeof window.showNotification === 'function') {
+      window.showNotification(
+        'פילטרים כפולים מופעלים: פילטרים מראש הדף ופילטרים פנימיים. התוצאות מוצגות לפי שני הפילטרים יחד.',
+        'info',
+        'מידע',
+        4000,
+        'system'
+      );
+    } else if (window.Logger) {
+      window.Logger.info('ℹ️ Double filters active: header filters + page-specific filters', {
+        page: 'header-system',
+      });
     }
   }
 
@@ -593,22 +679,34 @@ class FilterManager {
       }
     }
 
+    // Ensure accounts is an array
+    if (!Array.isArray(accounts)) {
+      accounts = [];
+      window.Logger?.warn?.('⚠️ accounts is not an array, resetting to empty array', { page: 'header-system', accountsType: typeof accounts });
+    }
+
     const openAccounts = accounts.filter(account => account.status === 'open');
 
     openAccounts.forEach(account => {
       const accountItem = document.createElement('div');
       accountItem.className = 'account-filter-item';
       accountItem.setAttribute('data-value', account.id.toString());
-      accountItem.innerHTML = `<span class="option-text">${account.name || account.id}</span>`;
+      const span = document.createElement('span');
+      span.className = 'option-text';
+      span.textContent = account.name || account.id;
+      accountItem.appendChild(span);
       accountMenu.appendChild(accountItem);
     });
 
     window.Logger?.info?.(`✅ Loaded ${openAccounts.length} open trading accounts for filter`, { page: 'header-system' });
   }
 }
+} // End of if (typeof window.FilterManager === 'undefined')
 
 // ===== MenuManager Class =====
-class MenuManager {
+// Prevent duplicate declaration
+if (typeof window.MenuManager === 'undefined') {
+window.MenuManager = class MenuManager {
   constructor() {
     this.openMenuId = null;
     this.hoverTimeouts = new Map();
@@ -651,26 +749,249 @@ class MenuManager {
         }, 150);
       });
 
-      item.addEventListener('mouseleave', () => {
+      item.addEventListener('mouseleave', (e) => {
         clearTimeouts();
+        // Check if mouse is moving to menu or submenu
+        const relatedTarget = e.relatedTarget;
+        const submenu = menu.querySelector('.level3-submenu');
+        
+        // Don't close if moving to menu or submenu
+        if (menu.contains(relatedTarget) || (submenu && submenu.contains(relatedTarget))) {
+          return;
+        }
+        
         closeTimeout = setTimeout(() => {
           if (!item.matches(':hover') && !menu.matches(':hover')) {
-            this.closeMenu(menu.id);
+            const activeSubmenu = menu.querySelector('.level3-submenu:not([style*="display: none"])');
+            if (!activeSubmenu || !activeSubmenu.matches(':hover')) {
+              this.closeMenu(menu.id);
+            }
           }
-        }, 200);
+        }, 800);
       });
 
       menu.addEventListener('mouseenter', () => {
         clearTimeouts();
       });
 
-      menu.addEventListener('mouseleave', () => {
+      menu.addEventListener('mouseleave', (e) => {
         clearTimeouts();
+        // Check if mouse is moving to level 3 submenu
+        const submenu = menu.querySelector('.level3-submenu');
+        const relatedTarget = e.relatedTarget;
+        
+        // Don't close if moving to submenu or its parent
+        if (submenu && (submenu.contains(relatedTarget) || menu.querySelector('.dropdown-submenu')?.contains(relatedTarget))) {
+          return;
+        }
+        
         closeTimeout = setTimeout(() => {
           if (!item.matches(':hover') && !menu.matches(':hover')) {
             this.closeMenu(menu.id);
           }
-        }, 200);
+        }, 800);
+      });
+
+      // Handle level 3 submenu hover
+      const submenus = menu.querySelectorAll('.level3-submenu');
+      submenus.forEach(submenu => {
+        let isPositioning = false;
+        let lastPosition = null;
+        let positionTimeout = null;
+        
+        // Position submenu to prevent overflow with debouncing
+        const positionSubmenu = (source = 'unknown') => {
+          // Prevent concurrent positioning calls
+          if (isPositioning) {
+            window.Logger?.debug?.('⏸️ Submenu positioning already in progress, skipping', { source, submenu: submenu.id || 'unnamed' });
+            return;
+          }
+          
+          // Check if submenu is visible using computed style
+          const computedStyle = window.getComputedStyle(submenu);
+          if (computedStyle.display === 'none' || computedStyle.visibility === 'hidden' || computedStyle.opacity === '0') {
+            window.Logger?.debug?.('👻 Submenu not visible, skipping position check', { source });
+            return;
+          }
+          
+          isPositioning = true;
+          window.Logger?.debug?.('🔍 Checking submenu position', { source, submenu: submenu.id || 'unnamed' });
+          
+          // Wait for submenu to be fully rendered
+          setTimeout(() => {
+            try {
+              // Get current state BEFORE making any changes
+              const hasBottomAligned = submenu.classList.contains('bottom-aligned');
+              const submenuRect = submenu.getBoundingClientRect();
+              const viewportHeight = window.innerHeight;
+              
+              // Calculate position based on CURRENT state (before change)
+              // If already bottom-aligned, we need to check what it would be in top position
+              // If in top position, check current bottom space
+              let bottomSpace;
+              let needsBottomAlign;
+              
+              if (hasBottomAligned) {
+                // Currently bottom-aligned - check what it would be in top position
+                // We need to temporarily remove the class to measure
+                submenu.classList.remove('bottom-aligned');
+                // Force reflow
+                void submenu.offsetHeight;
+                const topRect = submenu.getBoundingClientRect();
+                bottomSpace = viewportHeight - topRect.bottom;
+                // Restore original state
+                submenu.classList.add('bottom-aligned');
+                void submenu.offsetHeight;
+                
+                // If in top position it would overflow, keep bottom-aligned
+                needsBottomAlign = bottomSpace < 10;
+                window.Logger?.debug?.('🔍 Currently bottom-aligned, checking top position', {
+                  topPositionBottom: topRect.bottom.toFixed(1),
+                  topPositionBottomSpace: bottomSpace.toFixed(1)
+                });
+              } else {
+                // Currently in top position - check current bottom space
+                bottomSpace = viewportHeight - submenuRect.bottom;
+                needsBottomAlign = bottomSpace < 10;
+                window.Logger?.debug?.('🔍 Currently in top position', {
+                  currentBottom: submenuRect.bottom.toFixed(1),
+                  bottomSpace: bottomSpace.toFixed(1)
+                });
+              }
+              
+              // Check if position has actually changed
+              const currentPosition = needsBottomAlign ? 'bottom' : 'top';
+              const wasBottomAligned = hasBottomAligned;
+              
+              if (lastPosition === currentPosition && wasBottomAligned === needsBottomAlign) {
+                window.Logger?.debug?.('✅ Submenu position unchanged, skipping update', { 
+                  position: currentPosition, 
+                  bottomSpace: bottomSpace.toFixed(1),
+                  wasBottomAligned,
+                  needsBottomAlign
+                });
+                isPositioning = false;
+                return;
+              }
+              
+              window.Logger?.info?.('📍 Updating submenu position', { 
+                from: lastPosition || (wasBottomAligned ? 'bottom' : 'top'),
+                to: currentPosition,
+                bottomSpace: bottomSpace.toFixed(1),
+                viewportHeight,
+                currentBottom: submenuRect.bottom.toFixed(1),
+                wasBottomAligned,
+                needsBottomAlign
+              });
+              
+              // Update position
+              if (needsBottomAlign && !wasBottomAligned) {
+                submenu.classList.add('bottom-aligned');
+                window.Logger?.debug?.('⬇️ Added bottom-aligned class');
+              } else if (!needsBottomAlign && wasBottomAligned) {
+                submenu.classList.remove('bottom-aligned');
+                window.Logger?.debug?.('⬆️ Removed bottom-aligned class');
+              }
+              
+              lastPosition = currentPosition;
+            } catch (error) {
+              window.Logger?.error?.('❌ Error positioning submenu', { error: error.message });
+            } finally {
+              isPositioning = false;
+            }
+          }, 10);
+        };
+
+        // Debounced version for resize and observer
+        const debouncedPositionSubmenu = (source) => {
+          if (positionTimeout) {
+            clearTimeout(positionTimeout);
+          }
+          positionTimeout = setTimeout(() => {
+            positionSubmenu(source);
+          }, 100);
+        };
+
+        // Check position on hover - using MutationObserver to detect CSS changes
+        const parentSubmenu = submenu.closest('.dropdown-submenu');
+        if (parentSubmenu) {
+          // Check position when parent is hovered
+          parentSubmenu.addEventListener('mouseenter', () => {
+            lastPosition = null; // Reset position cache on new hover
+            setTimeout(() => positionSubmenu('mouseenter'), 100);
+          });
+          
+          // Use MutationObserver to detect when submenu becomes visible
+          // But ignore changes we made ourselves (class changes)
+          let isOurChange = false;
+          const observer = new MutationObserver((mutations) => {
+            // Ignore if we're the ones making the change
+            if (isOurChange) {
+              isOurChange = false;
+              return;
+            }
+            
+            // Check if submenu became visible
+            const computedStyle = window.getComputedStyle(submenu);
+            if (computedStyle.display !== 'none' && computedStyle.visibility !== 'hidden' && computedStyle.opacity !== '0') {
+              debouncedPositionSubmenu('mutation-observer');
+            }
+          });
+          
+          observer.observe(submenu, {
+            attributes: true,
+            attributeFilter: ['style', 'class'],
+            attributeOldValue: true
+          });
+          
+          // Store observer for cleanup if needed
+          submenu._positionObserver = observer;
+          
+          // Intercept class changes to mark them as ours
+          const originalClassListAdd = submenu.classList.add.bind(submenu.classList);
+          const originalClassListRemove = submenu.classList.remove.bind(submenu.classList);
+          
+          submenu.classList.add = function(...args) {
+            if (args.includes('bottom-aligned')) {
+              isOurChange = true;
+            }
+            return originalClassListAdd(...args);
+          };
+          
+          submenu.classList.remove = function(...args) {
+            if (args.includes('bottom-aligned')) {
+              isOurChange = true;
+            }
+            return originalClassListRemove(...args);
+          };
+        }
+
+        submenu.addEventListener('mouseenter', () => {
+          clearTimeouts();
+          debouncedPositionSubmenu('submenu-mouseenter');
+        });
+
+        submenu.addEventListener('mouseleave', () => {
+          clearTimeouts();
+          closeTimeout = setTimeout(() => {
+            if (!item.matches(':hover') && !menu.matches(':hover') && !submenu.matches(':hover')) {
+              this.closeMenu(menu.id);
+            }
+          }, 800);
+        });
+
+        // Check position on window resize (debounced)
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+          clearTimeout(resizeTimeout);
+          resizeTimeout = setTimeout(() => {
+            const computedStyle = window.getComputedStyle(submenu);
+            if (computedStyle.display !== 'none' && computedStyle.visibility !== 'hidden' && computedStyle.opacity !== '0') {
+              lastPosition = null; // Reset on resize
+              debouncedPositionSubmenu('window-resize');
+            }
+          }, 150);
+        });
       });
     });
   }
@@ -717,14 +1038,21 @@ class MenuManager {
       }
     });
   }
-}
+};
+} // End of if (typeof window.MenuManager === 'undefined')
 
 // ===== HeaderSystem Class =====
 class HeaderSystem {
   constructor() {
     this.isInitialized = false;
-    this.filterManager = new FilterManager();
-    this.menuManager = new MenuManager();
+    if (!window.FilterManager) {
+      throw new Error('FilterManager is not defined. Make sure header-system.js is loaded correctly.');
+    }
+    if (!window.MenuManager) {
+      throw new Error('MenuManager is not defined. Make sure header-system.js is loaded correctly.');
+    }
+    this.filterManager = new window.FilterManager();
+    this.menuManager = new window.MenuManager();
   }
 
   init() {
@@ -740,6 +1068,7 @@ class HeaderSystem {
       this.setupEventListeners();
       this.menuManager.init();
       this.filterManager.init();
+      this.updateUserDisplay(); // Update user display after header creation
       this.isInitialized = true;
       
       window.Logger?.info?.('✅ HeaderSystem.init() completed', { page: 'header-system' });
@@ -754,6 +1083,14 @@ class HeaderSystem {
   }
 
   static createHeader() {
+    // No dedicated auth pages; always render header
+    const isAuthPage = false;
+    
+    if (isAuthPage) {
+      window.Logger?.debug('Skipping header creation for auth page', { page: 'header-system' });
+      return;
+    }
+
     const headerElement = document.getElementById('unified-header');
     if (!headerElement) {
       if (!document.body) {
@@ -766,13 +1103,111 @@ class HeaderSystem {
 
     const existingHeader = document.getElementById('unified-header');
     const headerHTML = HeaderSystem.getHeaderHTML();
-    existingHeader.innerHTML = headerHTML;
+    existingHeader.textContent = '';
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(headerHTML, 'text/html');
+    doc.body.childNodes.forEach(node => {
+        existingHeader.appendChild(node.cloneNode(true));
+    });
+  }
+
+  /**
+   * Update user display in filter row
+   */
+  updateUserDisplay() {
+    try {
+      const userSection = document.getElementById('filterUserSection');
+      const userAvatar = document.getElementById('filterUserAvatar');
+      const userInitials = document.getElementById('filterUserInitials');
+    const authIcon = document.getElementById('filterAuthIcon');
+      
+      if (!userSection || !userAvatar || !userInitials || !authIcon) {
+        // User section might not exist on all pages
+        return;
+      }
+
+      // Get current user
+      let currentUser = null;
+      if (typeof window.getCurrentUser === 'function') {
+        currentUser = window.getCurrentUser();
+      } else if (typeof window.TikTrackAuth?.getCurrentUser === 'function') {
+        currentUser = window.TikTrackAuth.getCurrentUser();
+      } else {
+        // Try localStorage
+        const storedUser = localStorage.getItem('currentUser');
+        if (storedUser) {
+          try {
+            currentUser = JSON.parse(storedUser);
+          } catch (e) {
+            // Ignore parse errors
+          }
+        }
+      }
+
+      const isAuthenticated = currentUser && currentUser.id;
+      const logoGreen = '#26baac';   // מחובר
+      const logoOrange = '#fc5a06';  // מנותק
+      
+      if (isAuthenticated) {
+        // Get user initials
+        const firstName = currentUser.first_name || '';
+        const lastName = currentUser.last_name || '';
+        const username = currentUser.username || '';
+        
+        let initials = '';
+        if (firstName && lastName) {
+          initials = (firstName.charAt(0) + lastName.charAt(0)).toUpperCase();
+        } else if (firstName) {
+          initials = firstName.charAt(0).toUpperCase();
+        } else if (username) {
+          initials = username.substring(0, 2).toUpperCase();
+        } else {
+          initials = '?';
+        }
+        
+        userInitials.textContent = initials;
+        userAvatar.style.display = 'flex';
+        userSection.style.display = 'flex';
+        const profileLink = document.getElementById('filterUserProfileLink');
+        if (profileLink) profileLink.style.display = 'block';
+        authIcon.style.opacity = '1';
+        authIcon.style.backgroundColor = '#ffffff';
+        authIcon.style.border = `1px solid ${logoGreen}`;
+        authIcon.style.borderRadius = '6px';
+        authIcon.style.padding = '2px';
+        authIcon.style.filter = 'none';
+        authIcon.style.boxShadow = `0 0 0 2px ${logoGreen} inset`;
+        authIcon.dataset.status = 'logged-in';
+        authIcon.title = 'התנתק';
+      } else {
+        // Show login icon only
+        userAvatar.style.display = 'none';
+        userSection.style.display = 'flex';
+        const profileLink = document.getElementById('filterUserProfileLink');
+        if (profileLink) profileLink.style.display = 'none';
+        authIcon.style.opacity = '1';
+        authIcon.style.backgroundColor = '#ffffff';
+        authIcon.style.border = `1px solid ${logoOrange}`;
+        authIcon.style.borderRadius = '6px';
+        authIcon.style.padding = '2px';
+        authIcon.style.filter = 'none';
+        authIcon.style.boxShadow = `0 0 0 2px ${logoOrange} inset`;
+        authIcon.dataset.status = 'logged-out';
+        authIcon.title = 'התחבר';
+      }
+    } catch (error) {
+      window.Logger?.warn?.('⚠️ Failed to update user display in filter row', {
+        error: error?.message || error,
+        page: 'header-system',
+      });
+    }
   }
 
   static getHeaderHTML() {
     const pathname = window.location.pathname || '';
     const href = window.location.href || '';
     const isMockupPage = pathname.includes('/mockups/') || href.includes('/mockups/');
+    const isResearchPage = pathname.includes('/research') || href.includes('/research');
     const imagePathPrefix = isMockupPage ? '../../' : '';
     
     return `
@@ -784,7 +1219,7 @@ class HeaderSystem {
                   <ul class="tiktrack-nav-list">
                     <li class="tiktrack-nav-item">
                       <a href="/" class="tiktrack-nav-link" data-page="home">
-                        <img src="${imagePathPrefix}images/icons/entities/home.svg" alt="בית" width="36" height="36" class="nav-icon home-icon-only">
+                        <img src="${imagePathPrefix}images/icons/entities/home.svg" alt="בית" width="36" height="36" class="nav-icon home-icon-only" data-icon-replace="entity:home">
                       </a>
                     </li>
                     <li class="tiktrack-nav-item">
@@ -792,15 +1227,28 @@ class HeaderSystem {
                         <span class="nav-text">תכנון</span>
                       </a>
                     </li>
-                    <li class="tiktrack-nav-item">
-                      <a href="/trades" class="tiktrack-nav-link" data-page="trades">
+                    <li class="tiktrack-nav-item dropdown">
+                      <a href="/trades" class="tiktrack-nav-link tiktrack-dropdown-toggle" data-page="trades">
                         <span class="nav-text">מעקב</span>
+                        <span class="tiktrack-dropdown-arrow">▼</span>
                       </a>
+                      <ul class="tiktrack-dropdown-menu">
+                        <li><a class="tiktrack-dropdown-item" href="/watch-list">רשימות צפייה</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/trading-journal">📓 יומן מסחר</a></li>
+                      </ul>
                     </li>
-                    <li class="tiktrack-nav-item">
-                      <a href="/research" class="tiktrack-nav-link" data-page="research">
+                    <li class="tiktrack-nav-item dropdown">
+                      <a href="/research" class="tiktrack-nav-link tiktrack-dropdown-toggle" data-page="research">
                         <span class="nav-text">מחקר</span>
+                        <span class="tiktrack-dropdown-arrow">▼</span>
                       </a>
+                      <ul class="tiktrack-dropdown-menu">
+                        <li><a class="tiktrack-dropdown-item" href="/ai-analysis">אנליזת AI</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/strategy-analysis">📊 ניתוח אסטרטגיות</a></li>
+                        <li class="separator"></li>
+                        <li><a class="tiktrack-dropdown-item" href="/trade-history">📈 היסטוריית טרייד</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/portfolio-state">💼 מצב תיק היסטורי</a></li>
+                      </ul>
                     </li>
                     <li class="tiktrack-nav-item dropdown">
                       <a href="#" class="tiktrack-nav-link tiktrack-dropdown-toggle" data-page="data">
@@ -822,6 +1270,8 @@ class HeaderSystem {
                         <span class="tiktrack-dropdown-arrow">▼</span>
                       </a>
                       <ul class="tiktrack-dropdown-menu">
+                        <li><a class="tiktrack-dropdown-item" href="/user-profile.html">👤 פרופיל משתמש</a></li>
+                        <li class="separator"></li>
                         <li><a class="tiktrack-dropdown-item" href="/data_import">ייבוא נתונים</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/tag-management">ניהול תגיות</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/preferences">העדפות</a></li>
@@ -856,9 +1306,25 @@ class HeaderSystem {
                         <li class="dropdown-submenu">
                           <a class="tiktrack-dropdown-item" href="#">📐 מוקאפים <span class="tiktrack-dropdown-arrow" style="font-size: 0.7rem;">◀</span></a>
                           <ul class="level3-submenu">
+                            <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/comparative-analysis-page.html">📊 ניתוח השוואתי</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/date-comparison-modal.html">📅 השוואת תאריכים</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/economic-calendar-page.html">📆 לוח כלכלי</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/emotional-tracking-widget.html">😊 תיעוד רגשי</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/history-widget.html">📜 ווידג'ט היסטוריה</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/portfolio-state-page.html">💼 מצב תיק היסטורי</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/price-history-page.html">💰 היסטוריית מחירים</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/strategy-analysis-page.html">🎯 ניתוח אסטרטגיות</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/trade-history-page.html">📈 היסטוריית טרייד</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/trading-journal-page.html">📓 יומן מסחר</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/tradingview-test-page.html">📈 גראפים TV</a></li>
+                            <li class="separator"></li>
                             <li><a class="tiktrack-dropdown-item" href="/conditions-modals.html">🧩 מודלי תנאים</a></li>
                             <li><a class="tiktrack-dropdown-item" href="/conditions-test.html">🧪 בדיקות תנאים</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/tradingview-test-page.html">📈 גראפים TV</a></li>
+                            <li class="separator"></li>
+                            <li><a class="tiktrack-dropdown-item" href="/mockups/add-ticker-modal.html">➕ הוספת טיקר</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/mockups/flag-quick-action.html">🚩 פעולה מהירה</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/mockups/watch-list-modal.html">👁️ רשימת מעקב</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/mockups/watch-lists-page.html">📋 רשימות מעקב</a></li>
                           </ul>
                         </li>
                         <li><a class="tiktrack-dropdown-item" href="/chart-management">📊 ניהול גרפים</a></li>
@@ -910,15 +1376,16 @@ class HeaderSystem {
               </div>
 
               <div class="logo-section">
-                <div class="logo">
+                <a href="/" class="logo">
                   <img src="${imagePathPrefix}images/logo.svg" alt="TikTrack Logo" class="logo-image">
                   <span class="logo-text">פשוט לנהל תיק</span>
-                </div>
+                </a>
               </div>
+              
             </div>
           </div>
 
-        <div class="header-filters" id="headerFilters" data-section="filters">
+        ${!isResearchPage ? `<div class="header-filters" id="headerFilters" data-section="filters">
           <div class="filters-container">
             <div class="filter-group status-filter">
               <div class="filter-dropdown">
@@ -960,8 +1427,8 @@ class HeaderSystem {
                   <div class="type-filter-item" data-value="השקעה">
                     <span class="option-text">השקעה</span>
                   </div>
-                  <div class="type-filter-item" data-value="פסיבי">
-                    <span class="option-text">פסיבי</span>
+                  <div class="type-filter-item" data-value="פאסיבי">
+                    <span class="option-text">פאסיבי</span>
                   </div>
                   <button class="filter-close-btn" onclick="window.headerSystem?.filterManager?.closeFilter('typeFilterMenu')" title="סגור">×</button>
                 </div>
@@ -1047,15 +1514,30 @@ class HeaderSystem {
                 <span class="btn-text">×</span>
               </button>
             </div>
+
+            <div class="filter-user-section" id="filterUserSection" style="margin-right: auto; display: flex; align-items: center; gap: 8px;">
+              <a href="/user-profile.html" class="user-profile-link" id="filterUserProfileLink" title="פרופיל משתמש" style="text-decoration: none; display: none;">
+                <div class="user-avatar-badge" id="filterUserAvatar" style="width: 36px; height: 36px; border-radius: 50%; background: #26baac; color: white; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 14px; cursor: pointer;">
+                  <span id="filterUserInitials">?</span>
+                </div>
+              </a>
+              <button class="auth-toggle-btn" id="filterAuthToggleBtn" 
+                      onclick="handleHeaderLogout(event)"
+                      style="width: 36px; height: 36px; border: none; background: transparent; cursor: pointer; padding: 0; display: flex; align-items: center; justify-content: center;"
+                      title="התחבר/התנתק">
+                <img src="${imagePathPrefix}images/icons/tabler/user.svg" alt="התחבר/התנתק" style="width: 24px; height: 24px; opacity: 0.7;" id="filterAuthIcon">
+              </button>
+            </div>
           </div>
         </div>
         
-        <div class="filter-toggle-section filter-toggle-secondary">
-          <button class="header-filter-toggle-btn" id="headerFilterToggleBtnSecondary" title="הצג/הסתר פילטרים" 
+        <div class="filter-toggle-section filter-toggle-main">
+          <button class="header-filter-toggle-btn" id="headerFilterToggleBtnMain" title="הצג/הסתר פילטרים" 
                   data-onclick="toggleHeaderFilters()">
-            <span class="header-filter-arrow">▼</span>
+            <span class="header-filter-arrow">▲</span>
           </button>
         </div>
+        ` : ''}
         
         </div>
     `;
@@ -1229,7 +1711,12 @@ window.handleSearchInput = function(event) {
 window.clearSearchFilter = function() {
   const searchInput = document.getElementById('searchFilterInput');
   if (searchInput) {
-    searchInput.value = '';
+    // Use DataCollectionService to clear field if available
+    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+      window.DataCollectionService.setValue('searchFilterInput', '', 'text');
+    } else {
+      searchInput.value = '';
+    }
     if (window.headerSystem && window.headerSystem.filterManager) {
       window.headerSystem.filterManager.currentFilters.search = '';
       window.headerSystem.filterManager.saveFilters();
@@ -1307,7 +1794,12 @@ window.resetAllFilters = async function() {
     // Reset search input
     const searchInput = document.getElementById('searchFilterInput');
     if (searchInput) {
-      searchInput.value = defaultFilters.search;
+      // Use DataCollectionService to set value if available
+      if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+        window.DataCollectionService.setValue('searchFilterInput', defaultFilters.search, 'text');
+      } else {
+        searchInput.value = defaultFilters.search;
+      }
     }
 
     window.Logger?.info?.('✅ resetAllFilters completed', { page: 'header-system' });
@@ -1328,6 +1820,85 @@ window.resetAllFilters = async function() {
     window.headerSystem.filterManager.updateUI();
     window.headerSystem.filterManager.saveFilters();
     window.headerSystem.filterManager.applyFilters();
+  }
+};
+
+// ===== User Display Update =====
+// Update user display when authentication state changes
+if (typeof window.addEventListener === 'function') {
+  // Listen for authentication events
+  window.addEventListener('user:logged-in', () => {
+    if (window.headerSystem) {
+      window.headerSystem.updateUserDisplay();
+    }
+  });
+  
+  window.addEventListener('user:logged-out', () => {
+    if (window.headerSystem) {
+      window.headerSystem.updateUserDisplay();
+    }
+  });
+
+  // Listen for login/logout events from auth.js
+  window.addEventListener('login:success', () => {
+    if (window.headerSystem) {
+      window.headerSystem.updateUserDisplay();
+    }
+  });
+  
+  window.addEventListener('logout:success', () => {
+    if (window.headerSystem) {
+      window.headerSystem.updateUserDisplay();
+    }
+  });
+
+  // Also update on page load after a short delay
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+      setTimeout(() => {
+        if (window.headerSystem) {
+          window.headerSystem.updateUserDisplay();
+        }
+      }, 500);
+    });
+  } else {
+    setTimeout(() => {
+      if (window.headerSystem) {
+        window.headerSystem.updateUserDisplay();
+      }
+    }, 500);
+  }
+}
+
+// ===== Global Logout Handler =====
+window.handleHeaderLogout = async function(event) {
+  if (event) {
+    event.preventDefault();
+    event.stopPropagation();
+  }
+
+  // Check if user is authenticated
+  const isAuth = window.TikTrackAuth?.isAuthenticated?.() || false;
+  
+  if (isAuth) {
+    // User is authenticated - perform logout (which will show login modal)
+    if (window.TikTrackAuth?.logout) {
+      await window.TikTrackAuth.logout();
+    } else {
+      // Fallback if TikTrackAuth not available - show login modal
+      if (typeof window.TikTrackAuth?.showLoginModal === 'function') {
+        await window.TikTrackAuth.showLoginModal();
+      } else {
+        window.location.href = '/';
+      }
+    }
+  } else {
+    // User is not authenticated - show login modal
+    if (typeof window.TikTrackAuth?.showLoginModal === 'function') {
+      await window.TikTrackAuth.showLoginModal();
+    } else {
+      window.location.href = '/';
+    }
   }
 };
 
@@ -1459,4 +2030,153 @@ if (window.HeaderSystem && !window.HeaderSystem.createFilterSystem) {
 if (window.Logger) {
   window.Logger.info('✅ Header System v7.0.0 loaded successfully!', { page: 'header-system' });
 }
+
+// ===== AUTO-INITIALIZATION FALLBACK =====
+// Ensure header is initialized on all pages (except auth pages) even if UnifiedAppInitializer doesn't run
+// זה מבטיח שה-header יתאחל בכל עמוד (חוץ מ-auth pages) גם אם UnifiedAppInitializer לא רץ
+
+(function() {
+  'use strict';
+  
+  // No dedicated auth pages; always initialize header
+  const isAuthPage = false;
+  
+  if (isAuthPage) {
+    if (window.Logger?.debug) {
+      window.Logger.debug('Skipping Header System auto-initialization for auth page', { page: 'header-system' });
+    }
+    return;
+  }
+  
+  // Function to initialize header with retry logic
+  const ensureHeaderInitialized = async () => {
+    // Check if header is already initialized
+    if (window.headerSystem && window.headerSystem.isInitialized) {
+      if (window.Logger?.debug) {
+        window.Logger.debug('Header System already initialized, skipping auto-init', { page: 'header-system' });
+      }
+      return;
+    }
+    
+    // Check if UnifiedAppInitializer exists and might initialize the header
+    const hasUnifiedAppInitializer = typeof window.UnifiedAppInitializer !== 'undefined' || 
+                                     typeof window.initializeUnifiedApp !== 'undefined' ||
+                                     (window.globalInitializationState && window.globalInitializationState.unifiedAppInitializing);
+    
+    if (hasUnifiedAppInitializer) {
+      // Wait longer for UnifiedAppInitializer to initialize the header
+      let waitCount = 0;
+      const maxWait = 50; // 5 seconds - give UnifiedAppInitializer enough time
+      
+      while (waitCount < maxWait) {
+        // Check if header was initialized
+        if (window.headerSystem && window.headerSystem.isInitialized) {
+          if (window.Logger?.debug) {
+            window.Logger.debug('Header System initialized by UnifiedAppInitializer', { 
+              waitCount,
+              page: 'header-system' 
+            });
+          }
+          return;
+        }
+        
+        // Check if UnifiedAppInitializer is still initializing
+        if (window.globalInitializationState && window.globalInitializationState.unifiedAppInitializing) {
+          await new Promise(resolve => setTimeout(resolve, 100));
+          waitCount++;
+          continue;
+        }
+        
+        // Check if UnifiedAppInitializer finished initializing
+        if (window.globalInitializationState && window.globalInitializationState.unifiedAppInitialized) {
+          // UnifiedAppInitializer finished, check one more time if header was initialized
+          await new Promise(resolve => setTimeout(resolve, 200));
+          if (window.headerSystem && window.headerSystem.isInitialized) {
+            if (window.Logger?.debug) {
+              window.Logger.debug('Header System initialized by UnifiedAppInitializer (after completion)', { 
+                waitCount,
+                page: 'header-system' 
+              });
+            }
+            return;
+          }
+          // UnifiedAppInitializer finished but didn't initialize header, break and initialize ourselves
+          break;
+        }
+        
+        // Wait a bit more
+        await new Promise(resolve => setTimeout(resolve, 100));
+        waitCount++;
+      }
+    }
+    
+    // Initialize header if not already initialized
+    if (!window.headerSystem || !window.headerSystem.isInitialized) {
+      // Mark that fallback initialization is being used
+      window.__headerSystemInitMethod = 'fallback';
+      
+      if (window.Logger?.info) {
+        window.Logger.info('🔄 Auto-initializing Header System (FALLBACK METHOD)', {
+          hasUnifiedAppInitializer,
+          unifiedAppInitialized: window.globalInitializationState?.unifiedAppInitialized,
+          unifiedAppInitializing: window.globalInitializationState?.unifiedAppInitializing,
+          page: window.location.pathname
+        }, { page: 'header-system' });
+      }
+      
+      // Also log to console for easy tracking
+      console.log('🔄 [HEADER INIT] Using FALLBACK method for:', window.location.pathname);
+      
+      // Store in localStorage for tracking
+      try {
+        const initLog = {
+          page: window.location.pathname,
+          method: 'fallback',
+          timestamp: new Date().toISOString()
+        };
+        const existingLogs = JSON.parse(localStorage.getItem('__headerInitLogs') || '[]');
+        existingLogs.push(initLog);
+        localStorage.setItem('__headerInitLogs', JSON.stringify(existingLogs));
+      } catch (e) {
+        // Ignore localStorage errors
+      }
+      
+      try {
+        if (typeof window.initializeHeaderSystem === 'function') {
+          window.initializeHeaderSystem();
+        } else if (typeof window.HeaderSystem !== 'undefined' && typeof window.HeaderSystem.initialize === 'function') {
+          window.HeaderSystem.initialize();
+        } else {
+          if (window.Logger?.warn) {
+            window.Logger.warn('⚠️ Header System initialization functions not available', {
+              initializeHeaderSystemExists: typeof window.initializeHeaderSystem !== 'undefined',
+              HeaderSystemExists: typeof window.HeaderSystem !== 'undefined'
+            }, { page: 'header-system' });
+          }
+        }
+      } catch (error) {
+        if (window.Logger?.error) {
+          window.Logger.error('❌ Error auto-initializing Header System', {
+            error: error.message,
+            stack: error.stack
+          }, { page: 'header-system' });
+        } else {
+          console.error('❌ Error auto-initializing Header System:', error);
+        }
+      }
+    }
+  };
+  
+  // Initialize when DOM is ready
+  // Use longer delay to ensure UnifiedAppInitializer has time to initialize first
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+      // Wait 1 second after DOMContentLoaded to allow UnifiedAppInitializer to start
+      setTimeout(ensureHeaderInitialized, 1000);
+    });
+  } else {
+    // DOM is already loaded, wait longer to allow other systems to initialize first
+    setTimeout(ensureHeaderInitialized, 1500);
+  }
+})();
 

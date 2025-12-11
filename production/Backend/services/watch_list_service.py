@@ -285,6 +285,7 @@ class WatchListService:
     def get_watch_list_items(db: Session, list_id: int, user_id: int) -> List[WatchListItem]:
         """
         Get all items in a watch list, ordered by display_order.
+        For flag lists (is_flag_list=1), returns all items with the flag color from all user's lists.
 
         Args:
             db: Database session
@@ -302,13 +303,33 @@ class WatchListService:
         if not watch_list:
             raise ValueError(f"Watch list {list_id} not found or doesn't belong to user {user_id}")
 
-        logger.debug("Fetching items for watch list %s", list_id)
-        return (
-            db.query(WatchListItem)
-            .filter(WatchListItem.watch_list_id == list_id)
-            .order_by(WatchListItem.display_order.asc())
-            .all()
-        )
+        # Check if this is a flag list
+        is_flag_list = getattr(watch_list, 'is_flag_list', 0)
+        flag_entity_type = getattr(watch_list, 'flag_entity_type', None)
+        flag_color = getattr(watch_list, 'flag_color', None)
+        
+        if is_flag_list and flag_entity_type:
+            # Flag list: return all items that are in this flag list
+            # Flag is determined by which flag list ticker is in, not stored in item
+            logger.debug("Fetching items for flag list %s (entityType: %s, color: %s)", list_id, flag_entity_type, flag_color)
+            
+            # Get all items in this flag list
+            # The flag list itself contains items - we just return them
+            return (
+                db.query(WatchListItem)
+                .filter(WatchListItem.watch_list_id == list_id)
+                .order_by(WatchListItem.display_order.asc())
+                .all()
+            )
+        else:
+            # Regular list: return items from this list only
+            logger.debug("Fetching items for watch list %s", list_id)
+            return (
+                db.query(WatchListItem)
+                .filter(WatchListItem.watch_list_id == list_id)
+                .order_by(WatchListItem.display_order.asc())
+                .all()
+            )
 
     @staticmethod
     def add_ticker_to_list(
@@ -319,6 +340,7 @@ class WatchListService:
         external_symbol: Optional[str] = None,
         external_name: Optional[str] = None,
         flag_color: Optional[str] = None,
+        flag_entity_type: Optional[str] = None,
         notes: Optional[str] = None
     ) -> WatchListItem:
         """
@@ -331,7 +353,8 @@ class WatchListService:
             ticker_id: Ticker ID from system (optional, if None then external_symbol required)
             external_symbol: External ticker symbol (optional, if None then ticker_id required)
             external_name: External ticker name (optional)
-            flag_color: Flag color in hex format (optional)
+            flag_color: Flag color in hex format (optional, for display)
+            flag_entity_type: Flag entity type (optional, constant identifier: trade, trade_plan, etc.)
             notes: User notes (optional)
 
         Returns:
@@ -383,12 +406,12 @@ class WatchListService:
         ).scalar() or 0
 
         # Create item
+        # NOTE: Do NOT store flag_color or flag_entity_type in item - flag is determined by which flag list the ticker is in
         item = WatchListItem(
             watch_list_id=list_id,
             ticker_id=ticker_id,
             external_symbol=external_symbol,
             external_name=external_name,
-            flag_color=flag_color,
             display_order=max_order + 1,
             notes=notes
         )
@@ -436,6 +459,7 @@ class WatchListService:
         item_id: int,
         user_id: int,
         flag_color: Optional[str] = None,
+        flag_entity_type: Optional[str] = None,
         display_order: Optional[int] = None,
         notes: Optional[str] = None
     ) -> Optional[WatchListItem]:
@@ -463,8 +487,8 @@ class WatchListService:
             logger.warning("Watch list item %s not found for user %s during update", item_id, user_id)
             return None
 
-        if flag_color is not None:
-            item.flag_color = flag_color
+        # NOTE: Do NOT update flag_color or flag_entity_type - flag is determined by which flag list the ticker is in
+        # These parameters are kept for backward compatibility but are ignored
         if display_order is not None:
             item.display_order = display_order
         if notes is not None:
@@ -475,7 +499,7 @@ class WatchListService:
         db.commit()
         db.refresh(item)
         
-        logger.info("Updated watch list item %s", item_id)
+        logger.info("Updated watch list item %s (display_order=%s, notes=%s)", item_id, item.display_order, item.notes)
         return item
 
     @staticmethod
@@ -525,6 +549,111 @@ class WatchListService:
         
         logger.info("Updated display order for watch list %s", list_id)
         return True
+
+    # --------------------------------------------------------------------- #
+    # Flag List Operations (Automatic Dynamic Lists)
+    # --------------------------------------------------------------------- #
+
+    @staticmethod
+    def get_or_create_flag_list(db: Session, user_id: int, flag_entity_type: str, flag_color: Optional[str] = None) -> WatchList:
+        """
+        Get or create a dynamic flag list for a specific entity type.
+        Flag lists are automatically managed - they show all tickers with the flag.
+        
+        Uses entityType (constant) for identification, not color (varies by user preferences).
+        
+        Args:
+            db: Database session
+            user_id: User ID
+            flag_entity_type: Entity type (trade, trade_plan, account, etc.) - constant identifier
+            flag_color: Flag color in hex format (optional, for display only)
+        
+        Returns:
+            WatchList object (existing or newly created)
+        """
+        # Map entity types to Hebrew names (constant, not color-dependent)
+        flag_names = {
+            'trade': 'דגל Trade',
+            'trade_plan': 'דגל Trade Plan',
+            'account': 'דגל Account',
+            'cash_flow': 'דגל Cash Flow',
+            'ticker': 'דגל Ticker',
+            'alert': 'דגל Alert',
+            'note': 'דגל Note',
+            'execution': 'דגל Execution'
+        }
+        
+        flag_list_name = flag_names.get(flag_entity_type, f'דגל {flag_entity_type}')
+        
+        # Check if flag list exists by entityType (not color - colors vary by user)
+        existing = db.query(WatchList).filter(
+            WatchList.user_id == user_id,
+            WatchList.is_flag_list == 1,
+            WatchList.flag_entity_type == flag_entity_type
+        ).first()
+        
+        if existing:
+            # Update color if provided (user preferences may have changed)
+            if flag_color and existing.flag_color != flag_color:
+                existing.flag_color = flag_color
+                existing.color_hex = flag_color
+                db.commit()
+                db.refresh(existing)
+                logger.debug("Updated flag list %s color to %s (entityType: %s)", existing.id, flag_color, flag_entity_type)
+            else:
+                logger.debug("Found existing flag list %s for entityType %s", existing.id, flag_entity_type)
+            return existing
+        
+        # Create new flag list
+        # Get next display_order (flag lists should appear after regular lists)
+        max_order = db.query(func.max(WatchList.display_order)).filter(
+            WatchList.user_id == user_id
+        ).scalar() or 0
+        
+        flag_list = WatchList(
+            user_id=user_id,
+            name=flag_list_name,
+            icon='flag-filled',
+            color_hex=flag_color,  # For display only
+            display_order=max_order + 1,
+            view_mode='table',
+            is_flag_list=1,
+            flag_color=flag_color,  # For display only
+            flag_entity_type=flag_entity_type  # For identification (constant)
+        )
+        
+        db.add(flag_list)
+        db.commit()
+        db.refresh(flag_list)
+        
+        logger.info("Created flag list %s for entityType %s (color: %s, user %s)", flag_list.id, flag_entity_type, flag_color, user_id)
+        return flag_list
+
+    @staticmethod
+    def sync_flag_list_items(db: Session, list_id: int, user_id: int) -> bool:
+        """
+        Sync flag list - this is a no-op for flag lists since they are dynamic views.
+        Flag lists don't store items - they dynamically show all items with the flag color.
+        This method exists for API compatibility but doesn't need to do anything.
+        
+        Args:
+            db: Database session
+            list_id: Flag list ID
+            user_id: User ID (for validation)
+        
+        Returns:
+            True if successful
+        """
+        # Verify it's a flag list
+        flag_list = WatchListService.get_watch_list_by_id(db, list_id, user_id)
+        if not flag_list or not getattr(flag_list, 'is_flag_list', 0):
+            raise ValueError(f"List {list_id} is not a flag list")
+        
+        # Flag lists are dynamic - no sync needed
+        # The get_watch_list_items method already handles dynamic flag lists
+        logger.debug("Flag list %s is dynamic - no sync needed", list_id)
+        return True
+
 
 
 

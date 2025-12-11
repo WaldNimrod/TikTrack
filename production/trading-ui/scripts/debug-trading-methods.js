@@ -3,6 +3,12 @@
  * Run this in browser console when the modal is open
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Other ===
+// - debugTradingMethodsModal() - Debugtradingmethodsmodal
+
 async function debugTradingMethodsModal() {
   console.log('🔍 Starting Trading Methods Debug...\n');
   

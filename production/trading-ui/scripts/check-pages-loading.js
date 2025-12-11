@@ -9,6 +9,13 @@
  * @created 2025-01-27
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Utility Functions ===
+// - checkPagePackages() - Checkpagepackages
+// - checkAllPages() - Checkallpages
+
 /**
  * Check if all packages are loaded correctly for a page
  */

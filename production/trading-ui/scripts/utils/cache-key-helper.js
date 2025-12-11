@@ -14,6 +14,16 @@
  *   const key = generateCacheKey('business:calculate-stop-price', { price: 100, percentage: 5 });
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Other ===
+// - simpleHash() - Simplehash
+// - normalizeValue() - Normalizevalue
+// - generateCacheKey() - Generatecachekey
+// - generateCacheKeyFromObject() - Generatecachekeyfromobject
+// - hashObject() - Hashobject
+
 (function() {
   'use strict';
 

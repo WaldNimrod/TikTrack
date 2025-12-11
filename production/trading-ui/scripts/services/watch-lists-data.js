@@ -35,6 +35,7 @@
  * - updateWatchList(listId, payload, options) - Update existing watch list
  * - deleteWatchList(listId, options) - Delete watch list
  * - addTickerToList(listId, tickerData, options) - Add ticker to list
+ * - updateWatchListItem(listId, itemId, payload, options) - Update watch list item
  * - removeTickerFromList(itemId, options) - Remove ticker from list
  * - updateItemOrder(listId, itemsOrder, options) - Update item display order
  *
@@ -147,20 +148,59 @@
     }
   }
 
-  async function fetchWatchListsFromApi({ signal } = {}) {
+  async function fetchWatchListsFromApi({ signal, maxRetries = 2 } = {}) {
+    // Guard: avoid hitting API before authentication to prevent 401 spam
+    if (typeof window.TikTrackAuth?.getCurrentUser === 'function') {
+      const user = window.TikTrackAuth.getCurrentUser();
+      if (!user || !user.id) {
+        window.Logger?.debug?.('⚠️ Skipping watch lists load - user not authenticated yet', PAGE_LOG_CONTEXT);
+        return [];
+      }
+    }
+
     const base = resolveBaseUrl();
     const separator = base.endsWith('/') ? '' : '/';
     const url = `${base}${separator}api/watch-lists?_ts=${Date.now()}`;
-    const response = await fetch(url, { method: 'GET', headers: DEFAULT_HEADERS, signal });
-    if (!response.ok) {
-      const error = new Error(`Watch lists load failed (${response.status})`);
-      notifyLoadError(error.message, error);
-      throw error;
-    }
-    const payload = await response.json();
-    const normalized = normalizeWatchListsPayload(payload);
-    await saveWatchListsCache(normalized);
-    return normalized;
+    
+    const doFetch = async (attempt = 0) => {
+      const response = await fetch(url, { 
+        method: 'GET', 
+        headers: DEFAULT_HEADERS, 
+        signal,
+      });
+      
+      // Handle 401/308 authentication errors
+      if (window.checkAndHandleAuthError && window.checkAndHandleAuthError(response, url)) {
+        throw new Error('Authentication required');
+      }
+      
+      // Handle 429 rate limiting with exponential backoff
+      if (response.status === 429 && attempt < maxRetries) {
+        const retryAfter = Number(response.headers?.get?.('Retry-After')) || 1;
+        const backoff = Math.min(1000 * Math.pow(2, attempt) + Math.floor(Math.random() * 250), 5000);
+        const waitMs = Math.min(retryAfter * 1000 + backoff, 5000);
+        window.Logger?.warn?.('⚠️ Rate limit hit, retrying...', {
+          ...PAGE_LOG_CONTEXT,
+          attempt: attempt + 1,
+          waitMs,
+        });
+        await new Promise(resolve => setTimeout(resolve, waitMs));
+        return doFetch(attempt + 1);
+      }
+      
+      if (!response.ok) {
+        const error = new Error(`Watch lists load failed (${response.status})`);
+        notifyLoadError(error.message, error);
+        throw error;
+      }
+      
+      const payload = await response.json();
+      const normalized = normalizeWatchListsPayload(payload);
+      await saveWatchListsCache(normalized);
+      return normalized;
+    };
+    
+    return doFetch(0);
   }
 
   async function loadWatchListsData(options = {}) {
@@ -194,7 +234,7 @@
     const url = `${base}${separator}api/watch-lists/${listId}?_ts=${Date.now()}`;
     
     try {
-      const response = await fetch(url, { method: 'GET', headers: DEFAULT_HEADERS, signal });
+      const response = await fetch(url, { method: 'GET', headers: DEFAULT_HEADERS, signal, });
       if (!response.ok) {
         if (response.status === 404) {
           throw new Error(`Watch list ${listId} not found`);
@@ -214,29 +254,53 @@
   }
 
   async function getWatchListItems(listId, options = {}) {
-    const { signal } = options;
+    const { signal, maxRetries = 2 } = options;
     const base = resolveBaseUrl();
     const separator = base.endsWith('/') ? '' : '/';
     const url = `${base}${separator}api/watch-lists/${listId}/items?_ts=${Date.now()}`;
     
-    try {
-      const response = await fetch(url, { method: 'GET', headers: DEFAULT_HEADERS, signal });
-      if (!response.ok) {
-        if (response.status === 404) {
-          throw new Error(`Watch list ${listId} not found`);
+    const doFetch = async (attempt = 0) => {
+      try {
+        const response = await fetch(url, { method: 'GET', headers: DEFAULT_HEADERS, signal });
+        
+        // Handle 429 rate limiting with exponential backoff
+        if (response.status === 429 && attempt < maxRetries) {
+          const retryAfter = Number(response.headers?.get?.('Retry-After')) || 1;
+          const backoff = Math.min(1000 * Math.pow(2, attempt) + Math.floor(Math.random() * 250), 5000);
+          const waitMs = Math.min(retryAfter * 1000 + backoff, 5000);
+          window.Logger?.warn?.('⚠️ Rate limit hit, retrying...', {
+            ...PAGE_LOG_CONTEXT,
+            listId,
+            attempt: attempt + 1,
+            waitMs,
+          });
+          await new Promise(resolve => setTimeout(resolve, waitMs));
+          return doFetch(attempt + 1);
         }
-        throw new Error(`Failed to load watch list items (${response.status})`);
+        
+        if (!response.ok) {
+          if (response.status === 404) {
+            throw new Error(`Watch list ${listId} not found`);
+          }
+          throw new Error(`Failed to load watch list items (${response.status})`);
+        }
+        const payload = await response.json();
+        return payload.data || [];
+      } catch (error) {
+        if (error.message.includes('Rate limit') && attempt < maxRetries) {
+          // Already handled in doFetch, but catch here for safety
+          throw error;
+        }
+        window.Logger?.error?.('❌ Error loading watch list items', {
+          ...PAGE_LOG_CONTEXT,
+          listId,
+          error: error?.message,
+        });
+        throw error;
       }
-      const payload = await response.json();
-      return payload.data || [];
-    } catch (error) {
-      window.Logger?.error?.('❌ Error loading watch list items', {
-        ...PAGE_LOG_CONTEXT,
-        listId,
-        error: error?.message,
-      });
-      throw error;
-    }
+    };
+    
+    return doFetch(0);
   }
 
   async function createWatchList(payload, options = {}) {
@@ -250,20 +314,15 @@
         method: 'POST',
         headers: DEFAULT_HEADERS,
         body: JSON.stringify(payload),
-        signal,
-      });
+        signal, });
       
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error?.message || `Failed to create watch list (${response.status})`);
+      if (response.ok) {
+        // Invalidate cache on success
+        await invalidateWatchListsCache();
       }
       
-      const result = await response.json();
-      
-      // Invalidate cache
-      await invalidateWatchListsCache();
-      
-      return result.data || null;
+      // Return Response object (not parsed data) - UnifiedCRUDService/CRUDResponseHandler will handle it
+      return response;
     } catch (error) {
       window.Logger?.error?.('❌ Error creating watch list', {
         ...PAGE_LOG_CONTEXT,
@@ -284,20 +343,15 @@
         method: 'PUT',
         headers: DEFAULT_HEADERS,
         body: JSON.stringify(payload),
-        signal,
-      });
+        signal, });
       
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error?.message || `Failed to update watch list (${response.status})`);
+      if (response.ok) {
+        // Invalidate cache on success
+        await invalidateWatchListsCache();
       }
       
-      const result = await response.json();
-      
-      // Invalidate cache
-      await invalidateWatchListsCache();
-      
-      return result.data || null;
+      // Return Response object (not parsed data) - UnifiedCRUDService/CRUDResponseHandler will handle it
+      return response;
     } catch (error) {
       window.Logger?.error?.('❌ Error updating watch list', {
         ...PAGE_LOG_CONTEXT,
@@ -318,8 +372,7 @@
       const response = await fetch(url, {
         method: 'DELETE',
         headers: DEFAULT_HEADERS,
-        signal,
-      });
+        signal, });
       
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
@@ -375,6 +428,68 @@
     }
   }
 
+  async function updateWatchListItem(listId, itemId, payload, options = {}) {
+    const { signal } = options;
+    const base = resolveBaseUrl();
+    const separator = base.endsWith('/') ? '' : '/';
+    const url = `${base}${separator}api/watch-lists/items/${itemId}`;
+    
+    try {
+      window.Logger?.debug?.('🔄 Updating watch list item', {
+        ...PAGE_LOG_CONTEXT,
+        listId,
+        itemId,
+        payload,
+        url
+      });
+      
+      const response = await fetch(url, {
+        method: 'PUT',
+        headers: DEFAULT_HEADERS,
+        body: JSON.stringify(payload),
+        signal, });
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        const errorMsg = errorData.error?.message || `Failed to update watch list item (${response.status})`;
+        window.Logger?.error?.('❌ Error updating watch list item', {
+          ...PAGE_LOG_CONTEXT,
+          listId,
+          itemId,
+          payload,
+          status: response.status,
+          error: errorMsg,
+          errorData
+        });
+        throw new Error(errorMsg);
+      }
+      
+      // Parse response to verify data was saved
+      const responseData = await response.json().catch(() => ({}));
+      window.Logger?.debug?.('✅ Watch list item updated successfully', {
+        ...PAGE_LOG_CONTEXT,
+        listId,
+        itemId,
+        responseData: responseData?.data || responseData
+      });
+      
+      // Invalidate cache on success
+      await invalidateWatchListsCache();
+      
+      // Return parsed data for immediate UI update
+      return responseData?.data || responseData;
+    } catch (error) {
+      window.Logger?.error?.('❌ Error updating watch list item', {
+        ...PAGE_LOG_CONTEXT,
+        listId,
+        itemId,
+        payload,
+        error: error?.message || error,
+      });
+      throw error;
+    }
+  }
+
   async function removeTickerFromList(itemId, options = {}) {
     const { signal } = options;
     const base = resolveBaseUrl();
@@ -385,8 +500,7 @@
       const response = await fetch(url, {
         method: 'DELETE',
         headers: DEFAULT_HEADERS,
-        signal,
-      });
+        signal, });
       
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
@@ -396,7 +510,8 @@
       // Invalidate cache
       await invalidateWatchListsCache();
       
-      return true;
+      // Return response for consistency with other CRUD operations
+      return response;
     } catch (error) {
       window.Logger?.error?.('❌ Error removing ticker from watch list', {
         ...PAGE_LOG_CONTEXT,
@@ -440,6 +555,87 @@
     }
   }
 
+  async function syncFlagLists(options = {}) {
+    const { signal } = options;
+    const base = resolveBaseUrl();
+    const separator = base.endsWith('/') ? '' : '/';
+    const url = `${base}${separator}api/watch-lists/flag-lists/sync`;
+    
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: DEFAULT_HEADERS,
+        signal,
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error?.message || `Failed to sync flag lists (${response.status})`);
+      }
+      
+      const result = await response.json();
+      
+      // Invalidate cache
+      await invalidateWatchListsCache();
+      
+      return result.data || [];
+    } catch (error) {
+      // Fail soft: log and return empty (flags are optional)
+      window.Logger?.debug?.('⚠️ Error syncing flag lists (soft-fail, returning empty)', {
+        ...PAGE_LOG_CONTEXT,
+        error: error?.message,
+      });
+      return [];
+    }
+  }
+
+  async function syncSingleFlagList(flagColor, entityType = null, options = {}) {
+    const { signal } = options;
+    const base = resolveBaseUrl();
+    const separator = base.endsWith('/') ? '' : '/';
+    
+    // Use entityType if provided, otherwise try to find it from color
+    if (!entityType && flagColor) {
+      const flagColors = window.WatchListsUIService?.getFlagColors?.() || [];
+      const flagColorObj = flagColors.find(fc => fc.value === flagColor);
+      if (flagColorObj) {
+        entityType = flagColorObj.entityType;
+      }
+    }
+    
+    // Use entityType for identification (constant), not color (varies by user)
+    const identifier = entityType || flagColor;
+    const url = `${base}${separator}api/watch-lists/flag-lists/${encodeURIComponent(identifier)}/sync`;
+    
+    try {
+      // Send color in body for display purposes (from user preferences)
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: DEFAULT_HEADERS,
+        body: JSON.stringify({ flag_color: flagColor }),
+        signal, });
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error?.message || `Failed to sync flag list (${response.status})`);
+      }
+      
+      const result = await response.json();
+      
+      // Invalidate cache
+      await invalidateWatchListsCache();
+      
+      return result.data || null;
+    } catch (error) {
+      window.Logger?.error?.('❌ Error syncing flag list', {
+        ...PAGE_LOG_CONTEXT,
+        flagColor,
+        error: error?.message,
+      });
+      throw error;
+    }
+  }
+
   // Export to window
   window.WatchListsData = {
     // Cache management
@@ -458,8 +654,13 @@
     updateWatchList,
     deleteWatchList,
     addTickerToList,
+    updateWatchListItem,
     removeTickerFromList,
     updateItemOrder,
+    
+    // Flag list operations
+    syncFlagLists,
+    syncSingleFlagList,
   };
 
   // Also export as WatchListsDataService for consistency

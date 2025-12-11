@@ -21,6 +21,30 @@
  * @lastUpdated January 27, 2025
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Core Functions ===
+// - runDetailedPageScan() - Rundetailedpagescan
+
+// === Event Handlers ===
+// - getPackageDocumentation() - Getpackagedocumentation
+// - formatComparisonReport() - Formatcomparisonreport
+// - generateFixRecommendations() - Generatefixrecommendations
+
+// === Data Functions ===
+// - waitForPageFullyLoaded() - Waitforpagefullyloaded
+// - getScriptLoadOrder() - Getscriptloadorder
+
+// === Utility Functions ===
+// - checkForMismatches() - Checkformismatches
+// - parseHTMLFile() - Parsehtmlfile
+
+// === Other ===
+// - extractScriptsFromHTML() - Extractscriptsfromhtml
+// - normalizeScriptPath() - Normalizescriptpath
+// - compareHTMLvsDOM() - Comparehtmlvsdom
+
 if (window.Logger) {
   window.Logger.info('🔍 Loading Monitoring Functions...', { page: 'monitoring' });
 }
@@ -144,7 +168,7 @@ async function checkForMismatches(pageName, pageConfig, htmlScripts = null) {
         'trading-journal-page.js',
         'date-comparison-modal.js',
         'trade-history-page.js',
-        'portfolio-state-page.js',
+        'portfolio-state.js',
         'price-history-page.js',
         'comparative-analysis-page.js',
         'strategy-analysis-page.js',
@@ -771,8 +795,8 @@ async function runDetailedPageScan(pageName, pageConfig) {
         currentPage = 'watch-list';
     } else if (path.includes('trade-history-page')) {
         currentPage = 'trade-history-page';
-    } else if (path.includes('portfolio-state-page')) {
-        currentPage = 'portfolio-state-page';
+    } else if (path.includes('portfolio-state')) {
+        currentPage = 'portfolio-state';
     } else if (path.includes('trading-journal-page')) {
         currentPage = 'trading-journal-page';
     }

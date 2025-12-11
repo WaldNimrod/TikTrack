@@ -6,11 +6,11 @@ Description: API routes for listing all user preferences from database table
 Updated: 17 November 2025 - Migrated to SQLAlchemy
 """
 
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, g
 from sqlalchemy.orm import Session
 from config.database import get_db
 from models.preferences import UserPreference
-from routes.api.base_entity_decorators import require_authentication
+from routes.api.base_entity_decorators import require_authentication, handle_database_session
 from services.advanced_cache_service import cache_for
 import logging
 from typing import Dict, Any
@@ -22,12 +22,27 @@ user_preferences_list_bp = Blueprint('user_preferences_list', __name__, url_pref
 
 @user_preferences_list_bp.route('/', methods=['GET'])
 @require_authentication()
+@handle_database_session()
 @cache_for(ttl=300)  # Cache for 5 minutes
 def get_user_preferences():
-    """Get all user preferences using SQLAlchemy"""
-    db: Session = next(get_db())
+    """Get all user preferences for authenticated user using SQLAlchemy"""
+    db: Session = g.db
+    
+    # Get user_id from Flask context (set by auth middleware)
+    user_id = getattr(g, 'user_id', None)
+    
+    if user_id is None:
+        return jsonify({
+            'status': 'error',
+            'message': 'User authentication required',
+            'version': '1.0'
+        }), 401
+    
     try:
-        preferences = db.query(UserPreference).order_by(UserPreference.id).all()
+        # Filter by user_id - user preferences are user-specific
+        preferences = db.query(UserPreference).filter(
+            UserPreference.user_id == user_id
+        ).order_by(UserPreference.id).all()
         
         # Convert to list of dictionaries
         result = []
@@ -58,5 +73,3 @@ def get_user_preferences():
             'message': f'Error retrieving user preferences: {str(e)}',
             'version': '1.0'
         }), 500
-    finally:
-        db.close()

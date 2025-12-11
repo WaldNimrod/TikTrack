@@ -1377,9 +1377,25 @@ def validate_ai_analysis():
     try:
         data = request.get_json() or {}
         
+        # Log incoming data for debugging
+        logger.debug(f"🔍 validate_ai_analysis: received data: {data}")
+        logger.debug(f"🔍 validate_ai_analysis: template_id type: {type(data.get('template_id'))}, value: {data.get('template_id')}")
+        
+        # Validate template_id is not a dict (bug fix)
+        if isinstance(data.get('template_id'), dict):
+            logger.warning(f"⚠️ validate_ai_analysis: template_id is a dict! Original: {data.get('template_id')}")
+            # Try to extract actual template_id from nested dict
+            if 'template_id' in data.get('template_id', {}):
+                data['template_id'] = data['template_id']['template_id']
+                logger.info(f"✅ Extracted template_id from nested dict: {data['template_id']}")
+            else:
+                logger.error(f"❌ Cannot extract template_id from dict: {data.get('template_id')}")
+        
         # Get user_id from session/g and add to data for validation
         user_id = session.get('user_id') or getattr(g, 'user_id', None) or 1
         data['user_id'] = user_id
+        
+        logger.debug(f"🔍 validate_ai_analysis: after processing - template_id: {data.get('template_id')}, type: {type(data.get('template_id'))}")
         
         # Set db_session for business service
         ai_analysis_business_service.db_session = g.db

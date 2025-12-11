@@ -124,6 +124,9 @@ class CacheSyncManager {
       'alert-created': ['alerts-data', 'dashboard-data'],
       'alert-updated': ['alerts-data', 'dashboard-data', 'business:validate-condition-value*', 'business:validate-alert*'],
       'alert-deleted': ['alerts-data', 'dashboard-data'],
+      'watch-list-updated': ['watch-lists-data', 'watch-list-*'],
+      'watch-list-created': ['watch-lists-data', 'watch-list-*'],
+      'watch-list-deleted': ['watch-lists-data', 'watch-list-*'],
       'import-session-deleted': ['data-import-data', 'data-import-accounts'],
     };
   }
@@ -146,8 +149,13 @@ class CacheSyncManager {
       this.startQueueProcessing();
       this.initialized = true;
 
-      if (window.notificationSystem) {
-        window.notificationSystem.showNotification('מערכת סינכרון מטמון אותחלה בהצלחה', 'success');
+      const notifySuccess =
+        window.NotificationSystem?.showSuccess
+        || window.NotificationSystem?.showNotification
+        || window.showNotification
+        || window.notificationSystem?.showNotification;
+      if (typeof notifySuccess === 'function') {
+        notifySuccess('מערכת סינכרון מטמון אותחלה בהצלחה', 'success');
       }
 
       return true;
@@ -156,8 +164,13 @@ class CacheSyncManager {
         window.Logger.error('❌ Failed to initialize Cache Sync Manager:', error, { page: 'cache' });
       }
 
-      if (window.notificationSystem) {
-        window.notificationSystem.showNotification('שגיאה באתחול מערכת סינכרון מטמון', 'error');
+      const notifyError =
+        window.NotificationSystem?.showError
+        || window.NotificationSystem?.showNotification
+        || window.showErrorNotification
+        || window.notificationSystem?.showNotification;
+      if (typeof notifyError === 'function') {
+        notifyError('שגיאה באתחול מערכת סינכרון מטמון', 'error');
       }
 
       return false;
@@ -504,8 +517,7 @@ class CacheSyncManager {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-        },
-        credentials: 'include', // Include session cookie
+        }, // Include session cookie
         body: JSON.stringify({ dependencies, user_id: userId }),
       });
 

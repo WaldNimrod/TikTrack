@@ -6,6 +6,38 @@
  * exposes helpers for create/update/delete flows.
  */
 (function tradingAccountsDataService() {
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - buildUrl() - Buildurl
+// - createTradingAccount() - Createtradingaccount
+
+// === Event Handlers ===
+// - sendAccountMutation() - Sendaccountmutation
+
+// === UI Functions ===
+// - updateTradingAccount() - Updatetradingaccount
+
+// === Data Functions ===
+// - normalizeAccountsPayload() - Normalizeaccountspayload
+// - saveAccountsCache() - Saveaccountscache
+// - getCachedTradingAccounts() - Getcachedtradingaccounts
+// - notifyLoadError() - Notifyloaderror
+// - fetchTradingAccountsFromApi() - Fetchtradingaccountsfromapi
+// - loadTradingAccountsData() - Loadtradingaccountsdata
+// - fetchTradingAccount() - Fetchtradingaccount
+// - fetchTradingAccountDetails() - Fetchtradingaccountdetails
+
+// === Utility Functions ===
+// - invalidateAccountsCache() - Invalidateaccountscache
+// - validateTradingAccount() - Validatetradingaccount
+
+// === Other ===
+// - resolveBaseUrl() - Resolvebaseurl
+// - clearAccountsCachePattern() - Clearaccountscachepattern
+// - deleteTradingAccount() - Deletetradingaccount
+
   const PRIMARY_CACHE_KEY = 'trading-accounts-data';
   const LEGACY_CACHE_KEYS = ['accounts-data'];
   const ALL_CACHE_KEYS = [PRIMARY_CACHE_KEY, ...LEGACY_CACHE_KEYS];
@@ -149,11 +181,17 @@
   }
 
   async function fetchTradingAccountsFromApi({ signal } = {}) {
-    const response = await fetch(buildUrl('/api/trading-accounts/'), {
+    const url = buildUrl('/api/trading-accounts/');
+    const response = await fetch(url, {
       method: 'GET',
       headers: DEFAULT_HEADERS,
-      signal,
+      signal, // Include cookies for session-based auth
     });
+    
+    // Handle 401/308 authentication errors
+    if (window.checkAndHandleAuthError && window.checkAndHandleAuthError(response, url)) {
+      throw new Error('Authentication required');
+    }
 
     if (!response.ok) {
       const error = new Error(`טעינת חשבונות נכשלה (${response.status})`);
@@ -205,7 +243,61 @@
         }
       }
 
-      return await loader();
+      const accounts = await loader();
+
+      // Try to enrich accounts with EOD metrics
+      if (window.EODIntegrationHelper && window.EODIntegrationHelper.isEODAvailable() && Array.isArray(accounts)) {
+        try {
+          const userId = window.g?.user_id || window.TikTrackAuth?.currentUser?.id;
+          if (userId) {
+            // Load EOD portfolio metrics for today to get account-level data
+            const today = new Date().toISOString().split('T')[0];
+
+                        const eodResult = await window.EODIntegrationHelper.loadEODPortfolioMetrics(
+                            userId,
+                            {
+                                date_from: today,
+                                date_to: today
+                            }
+                        );
+
+            if (eodResult && eodResult.data && Array.isArray(eodResult.data) && eodResult.data.length > 0) {
+              // Enrich accounts with EOD data
+              const enrichedAccounts = accounts.map(account => {
+                // For now, add basic EOD info to each account
+                // In a real implementation, you'd match by account_id
+                return {
+                  ...account,
+                  eod: {
+                    lastUpdated: eodResult.data[0].computed_at,
+                    source: eodResult.source
+                  }
+                };
+              });
+
+              if (window.Logger) {
+                window.Logger.info('✅ Trading accounts enriched with EOD data', {
+                  ...PAGE_LOG_CONTEXT,
+                  accountsCount: enrichedAccounts.length,
+                  eodRecords: eodResult.data.length,
+                  source: eodResult.source
+                });
+              }
+
+              return enrichedAccounts;
+            }
+          }
+        } catch (eodError) {
+          if (window.Logger) {
+            window.Logger.warn('⚠️ EOD enrichment failed for trading accounts, returning regular accounts', {
+              ...PAGE_LOG_CONTEXT,
+              error: eodError.message
+            });
+          }
+        }
+      }
+
+      return accounts;
     } catch (error) {
       notifyLoadError('שגיאה בטעינת חשבונות מסחר', error);
       throw error;
@@ -215,12 +307,18 @@
   async function sendAccountMutation({ accountId, method, body, signal }) {
     const endpoint = accountId ? `/api/trading-accounts/${accountId}` : '/api/trading-accounts';
     try {
-      const response = await fetch(buildUrl(endpoint), {
+      const url = buildUrl(endpoint);
+      const response = await fetch(url, {
         method,
         headers: DEFAULT_HEADERS,
         body: body ? JSON.stringify(body) : undefined,
-        signal,
+        signal, // Include cookies for session-based auth
       });
+      
+      // Handle 401/308 authentication errors
+      if (window.checkAndHandleAuthError && window.checkAndHandleAuthError(response, url)) {
+        throw new Error('Authentication required');
+      }
 
       // CRITICAL: Do NOT read response.json() here - let CRUDResponseHandler handle it
       // Reading the response body here would consume it, causing CRUDResponseHandler to fail
@@ -251,11 +349,17 @@
   }
 
   async function fetchTradingAccount(accountId, options = {}) {
-    const response = await fetch(buildUrl(`/api/trading-accounts/${accountId}`), {
+    const url = buildUrl(`/api/trading-accounts/${accountId}`);
+    const response = await fetch(url, {
       method: 'GET',
       headers: DEFAULT_HEADERS,
-      signal: options.signal,
+      signal: options.signal, // Include cookies for session-based auth
     });
+    
+    // Handle 401/308 authentication errors
+    if (window.checkAndHandleAuthError && window.checkAndHandleAuthError(response, url)) {
+      throw new Error('Authentication required');
+    }
     if (!response.ok) {
       const error = new Error(`טעינת פרטי חשבון מסחר ${accountId} נכשלה (${response.status})`);
       window.Logger?.error?.('❌ Failed to fetch trading account details', {
@@ -293,11 +397,17 @@
       // Use CacheTTLGuard for automatic cache management
       if (window.CacheTTLGuard?.ensure) {
         return await window.CacheTTLGuard.ensure(cacheKey, async () => {
-          const response = await fetch('/api/business/trading-account/validate', {
+          const url = '/api/business/trading-account/validate';
+          const response = await fetch(url, {
             method: 'POST',
             headers: DEFAULT_HEADERS,
-            body: JSON.stringify(accountData)
+            body: JSON.stringify(accountData), // Include cookies for session-based auth
           });
+          
+          // Handle 401/308 authentication errors
+          if (window.checkAndHandleAuthError && window.checkAndHandleAuthError(response, url)) {
+            throw new Error('Authentication required');
+          }
 
           if (!response.ok) {
             const errorData = await response.json();
@@ -316,11 +426,17 @@
       }
       
       // Fallback if CacheTTLGuard not available
-      const response = await fetch('/api/business/trading-account/validate', {
+      const url = '/api/business/trading-account/validate';
+      const response = await fetch(url, {
         method: 'POST',
         headers: DEFAULT_HEADERS,
-        body: JSON.stringify(accountData)
+        body: JSON.stringify(accountData), // Include cookies for session-based auth
       });
+      
+      // Handle 401/308 authentication errors
+      if (window.checkAndHandleAuthError && window.checkAndHandleAuthError(response, url)) {
+        throw new Error('Authentication required');
+      }
 
       if (!response.ok) {
         const errorData = await response.json();

@@ -8,6 +8,12 @@
  *   generateTickerDashboardScripts()
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Other ===
+// - generateTickerDashboardScripts() - Generatetickerdashboardscripts
+
 (function() {
   'use strict';
 

@@ -10,13 +10,13 @@
     "notes": "ייצוב מלא ו-CRUD מקצה לקצה - הפרויקט מוכן לייצור"
   },
   "development": {
-    "version": "1.3.111.0",
+    "version": "1.3.112.0",
     "major": 1,
     "minor": 3,
-    "patch": 111,
+    "patch": 112,
     "build": 0,
-    "commit": "436935d4bd29c0e658c8cfa1dfed9baf4dbb70fd",
-    "updated_at": "2025-12-10T22:28:00+00:00",
-    "notes": "Comprehensive stabilization - reduced errors from 23.1% to 0% across all 52 pages"
+    "commit": "d814d0c74935b83b55a6c78f358661e12fcc0e4c",
+    "updated_at": "2025-12-12T00:13:02+00:00",
+    "notes": "Improve login UX by auto-reloading page after successful login"
   }
 }

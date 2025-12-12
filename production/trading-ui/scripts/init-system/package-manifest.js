@@ -148,7 +148,7 @@ const PACKAGE_MANIFEST = {
     critical: true,
     loadOrder: 1,
     dependencies: [],
-    loadingStrategy: 'defer', // Critical package with dependencies - must maintain load order
+    loadingStrategy: 'async', // Changed to async to avoid execution order conflicts in bundle
     scripts: [
       {
         file: 'api-config.js',
@@ -171,13 +171,7 @@ const PACKAGE_MANIFEST = {
         required: true,
         loadOrder: 1
       },
-      {
-        file: 'notification-system.js',
-        globalCheck: 'window.NotificationSystem',
-        description: 'Notification system',
-        required: true,
-        loadOrder: 2
-      },
+      // REMOVED: notification-system.js - May cause conflicts when bundled, loaded separately
       {
         file: 'cache-sync-manager.js',
         globalCheck: 'window.CacheSyncManager',
@@ -185,20 +179,8 @@ const PACKAGE_MANIFEST = {
         required: true,
         loadOrder: 3
       },
-      {
-        file: 'ui-utils.js',
-        globalCheck: 'window.toggleSection',
-        description: 'UI utilities',
-        required: true,
-        loadOrder: 4
-      },
-      {
-        file: 'warning-system.js',
-        globalCheck: 'window.WarningSystem',
-        description: 'Warning system',
-        required: true,
-        loadOrder: 5
-      },
+      // REMOVED: ui-utils.js - May cause conflicts when bundled, loaded separately
+      // REMOVED: warning-system.js - May cause conflicts when bundled, loaded separately
       {
         file: 'error-handlers.js',
         globalCheck: 'window.handleApiError',
@@ -248,34 +230,10 @@ const PACKAGE_MANIFEST = {
         required: true,
         loadOrder: 9
       },
-      {
-        file: 'auth.js',
-        globalCheck: 'window.TikTrackAuth',
-        description: 'Authentication system',
-        required: true,
-        loadOrder: 9.5
-      },
-      {
-        file: 'auth-guard.js',
-        globalCheck: 'window.AuthGuard',
-        description: 'Page protection - authentication guard',
-        required: true,
-        loadOrder: 9.6
-      },
-      {
-        file: 'logger-service.js',
-        globalCheck: 'window.Logger',
-        description: 'Advanced logging service',
-        required: true,
-        loadOrder: 10
-      },
-      {
-        file: 'header-system.js',
-        globalCheck: 'window.HeaderSystem',
-        description: 'Header system',
-        required: true,
-        loadOrder: 11
-      },
+      // REMOVED: auth.js - Causes conflicts when bundled, loaded separately
+      // REMOVED: auth-guard.js - Causes conflicts when bundled, loaded separately
+      // REMOVED: logger-service.js - May cause conflicts when bundled, loaded separately
+      // REMOVED: header-system.js - May cause conflicts when bundled, loaded separately
       {
         file: 'quick-quality-check.js',
         globalCheck: 'window.runQuickQualityCheck',
@@ -335,13 +293,7 @@ const PACKAGE_MANIFEST = {
         loadOrder: 16.6,
         external: true
       },
-      {
-        file: 'event-handler-manager.js',
-        globalCheck: 'window.EventHandlerManager',
-        description: 'Central event management system',
-        required: true,
-        loadOrder: 17
-      },
+      // REMOVED: event-handler-manager.js - May cause conflicts when bundled, loaded separately
       {
         file: 'button-system-init.js',
         globalCheck: 'window.ButtonSystem',
@@ -374,6 +326,124 @@ const PACKAGE_MANIFEST = {
     ],
     estimatedSize: '~280KB',
     initTime: '~150ms'
+  },
+
+  // 1.1. CORE UI PACKAGE - Core UI systems (loaded separately to avoid bundle conflicts)
+  'core-ui': {
+    id: 'core-ui',
+    name: 'Core UI Package',
+    description: 'Core UI systems loaded separately to avoid bundle conflicts',
+    version: '1.5.0',
+    critical: true,
+    loadOrder: 1.1,
+    dependencies: ['base'],
+    loadingStrategy: 'defer',
+    files: [
+      'notification-system.js',
+      'ui-utils.js',
+      'warning-system.js',
+      'logger-service.js',
+      'event-handler-manager.js'
+    ],
+    scripts: [
+      {
+        file: 'notification-system.js',
+        globalCheck: 'window.NotificationSystem',
+        description: 'Notification system',
+        required: true,
+        loadOrder: 1
+      },
+      {
+        file: 'ui-utils.js',
+        globalCheck: 'window.toggleSection',
+        description: 'UI utilities',
+        required: true,
+        loadOrder: 2
+      },
+      {
+        file: 'warning-system.js',
+        globalCheck: 'window.WarningSystem',
+        description: 'Warning system',
+        required: true,
+        loadOrder: 3
+      },
+      {
+        file: 'logger-service.js',
+        globalCheck: 'window.Logger',
+        description: 'Advanced logging service',
+        required: true,
+        loadOrder: 4
+      },
+      {
+        file: 'event-handler-manager.js',
+        globalCheck: 'window.EventHandlerManager',
+        description: 'Central event management system',
+        required: true,
+        loadOrder: 5
+      }
+    ],
+    estimatedSize: '~120KB',
+    initTime: '~70ms'
+  },
+
+  // 1.2. HEADER PACKAGE - Header system (loaded separately to avoid conflicts)
+  header: {
+    id: 'header',
+    name: 'Header Package',
+    description: 'Header and filter systems loaded separately to avoid bundle conflicts',
+    version: '1.5.0',
+    critical: true,
+    loadOrder: 1.2,
+    dependencies: ['base'],
+    loadingStrategy: 'defer',
+    files: [
+      'header-system.js'
+    ],
+    scripts: [
+      {
+        file: 'header-system.js',
+        globalCheck: 'window.HeaderSystem',
+        description: 'Header system',
+        required: true,
+        loadOrder: 1
+      }
+    ],
+    estimatedSize: '~50KB',
+    initTime: '~30ms'
+  },
+
+  // 1.5. AUTH PACKAGE - Authentication (loaded separately to avoid conflicts)
+  auth: {
+    id: 'auth',
+    name: 'Authentication Package',
+    description: 'Authentication systems loaded separately to avoid bundle conflicts',
+    version: '1.5.0',
+    critical: true,
+    loadOrder: 1.5,
+    dependencies: ['base'],
+    loadingStrategy: 'defer',
+    files: [
+      'auth.js',
+      'auth-guard.js'
+    ],
+    scripts: [
+      {
+        file: 'auth.js',
+        globalCheck: 'window.TikTrackAuth',
+        description: 'Authentication system',
+        required: true,
+        loadOrder: 1
+      },
+      {
+        file: 'auth-guard.js',
+        globalCheck: 'window.AuthGuard',
+        description: 'Page protection - authentication guard',
+        required: true,
+        loadOrder: 2
+      }
+    ],
+    estimatedSize: '~150KB',
+    initTime: '~80ms'
   },
 
   // 2. SERVICES PACKAGE - General services

@@ -12,13 +12,15 @@ const fs = require('fs');
 const path = require('path');
 
 // Import package manifest
-let PACKAGE_MANIFEST;
+let manifestModule;
 try {
-  PACKAGE_MANIFEST = require(path.join(__dirname, '../../trading-ui/scripts/init-system/package-manifest.js'));
+  manifestModule = require(path.join(__dirname, '../../trading-ui/scripts/init-system/package-manifest.js'));
 } catch (error) {
   console.error('❌ Cannot load package manifest:', error.message);
   process.exit(1);
 }
+
+const PACKAGE_MANIFEST = manifestModule.PACKAGE_MANIFEST;
 
 function checkBundleExistence() {
   console.log('🔍 Checking bundle existence...');

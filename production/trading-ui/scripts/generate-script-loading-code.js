@@ -28,9 +28,13 @@ const path = require('path');
 function detectEnvironment() {
   const cwd = process.cwd();
   const workspaceName = path.basename(cwd);
-  
+
   // Check for Production in directory name (case-insensitive)
   if (workspaceName.includes('Production') || workspaceName.includes('production')) {
+    // TikTrackApp-Production should use testing environment
+    if (workspaceName === 'TikTrackApp-Production') {
+      return 'testing';
+    }
     return 'production';
   } else if (workspaceName === 'TikTrackApp') {
     return 'development';
@@ -99,9 +103,9 @@ function generateScriptLoadingCode(pageName, mode = null, useBundles = null) {
   }
   
   // Auto-set useBundles based on environment
-  // Production uses bundles, development doesn't
+  // Production and testing use bundles, development doesn't
   if (useBundles === null) {
-    useBundles = (mode === 'production');
+    useBundles = (mode === 'production' || mode === 'testing');
   }
   const pageConfig = PAGE_CONFIGS[pageName];
   if (!pageConfig) {
@@ -112,7 +116,18 @@ function generateScriptLoadingCode(pageName, mode = null, useBundles = null) {
   const packages = pageConfig.packages || ['base'];
   
   // Determine if we should use bundles
-  const shouldUseBundles = useBundles && mode === 'production';
+  // Production and testing use bundles, development doesn't
+  const shouldUseBundles = useBundles && (mode === 'production' || mode === 'testing');
+
+  // For our separated bundles, use defer instead of bundle attribute
+  const getBundleStrategy = (packageName) => {
+    const separatedBundles = ['core-ui', 'header', 'auth', 'core-init'];
+    if (separatedBundles.includes(packageName)) {
+      return 'defer';
+    } else {
+      return 'async';
+    }
+  };
   
   let html = '';
   html += '    <!-- =============================================================== -->\n';
@@ -147,18 +162,27 @@ function generateScriptLoadingCode(pageName, mode = null, useBundles = null) {
       .sort((a, b) => (a.loadOrder || 0) - (b.loadOrder || 0));
     
     // Check if bundle exists for this package
-    const bundlePath = path.join(__dirname, 'bundles', `${pkg.id}.bundle.js`);
+    // Look in both locations: development and production
+    let bundlePath = path.join(__dirname, 'bundles', `${pkg.id}.bundle.js`);
+    if (!fs.existsSync(bundlePath)) {
+      bundlePath = path.join(__dirname, '..', '..', 'production', 'trading-ui', 'scripts', 'bundles', `${pkg.id}.bundle.js`);
+    }
     const bundleExists = shouldUseBundles && fs.existsSync(bundlePath);
+    console.log(`Package ${pkg.id}: bundlePath=${bundlePath}, exists=${fs.existsSync(bundlePath)}, bundleExists=${bundleExists}`);
     
     if (bundleExists && sortedScripts.length > 0) {
       // Use bundle for the entire package
-      const loadingStrategy = pkg.loadingStrategy || 'defer';
+      const loadingStrategy = getBundleStrategy(pkg.id);
+      console.log(`Package ${pkg.id} -> pkg.loadingStrategy: ${pkg.loadingStrategy}, getBundleStrategy: ${loadingStrategy}`);
       html += `    <!-- [${scriptCounter}] Package Bundle: ${pkg.id}.bundle.js | Strategy: ${loadingStrategy} -->\n`;
       
       const bundleSrc = `scripts/bundles/${pkg.id}.bundle.js?v=1.0.0`;
       let scriptTag;
       if (loadingStrategy === 'sync') {
         scriptTag = `    <script src="${bundleSrc}"></script> <!-- ${pkg.name} bundle -->\n`;
+      } else if (loadingStrategy === 'bundle') {
+        // 'bundle' is not a valid script attribute, use defer instead
+        scriptTag = `    <script src="${bundleSrc}" defer></script> <!-- ${pkg.name} bundle -->\n`;
       } else {
         scriptTag = `    <script src="${bundleSrc}" ${loadingStrategy}></script> <!-- ${pkg.name} bundle -->\n`;
       }
@@ -313,7 +337,8 @@ if (noBundlesArg !== undefined) {
   useBundles = false;
 } else {
   // Auto-set based on mode
-  useBundles = (mode === 'production');
+  // Production and testing use bundles, development doesn't
+  useBundles = (mode === 'production' || mode === 'testing');
 }
 
 if (pageName) {

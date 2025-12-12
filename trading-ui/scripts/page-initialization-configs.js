@@ -195,6 +195,10 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       // - 'init-system': מערכות אתחול וניטור (נטען בכל עמוד)
       packages: [
         'base',
+        'core-ui', // Core UI systems loaded separately to avoid bundle conflicts
+        'header', // Header system loaded separately to avoid bundle conflicts
+        'auth', // Authentication loaded separately to avoid bundle conflicts
+        'core-init', // Core initialization loaded separately to avoid bundle conflicts
         'services',
         'ui-advanced',
         'modules', // Required for ModalManagerV2 (tag search drawer)
@@ -414,6 +418,10 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       name: 'Tag Management',
       packages: [
         'base',
+        'core-ui', // Core UI systems loaded separately to avoid bundle conflicts
+        'header', // Header system loaded separately to avoid bundle conflicts
+        'auth', // Authentication loaded separately to avoid bundle conflicts
+        'core-init', // Core initialization loaded separately to avoid bundle conflicts
         'services',
         'modules',
         'ui-advanced',
@@ -467,6 +475,10 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       // NOTE: constraint-manager.js נטען בנפרד כקובץ page-specific (לא דרך חבילת system-management)
       packages: [
         'base',
+        'core-ui', // Core UI systems loaded separately to avoid bundle conflicts
+        'header', // Header system loaded separately to avoid bundle conflicts
+        'auth', // Authentication loaded separately to avoid bundle conflicts
+        'core-init', // Core initialization loaded separately to avoid bundle conflicts
         'services',
         'ui-advanced',
         'modules', // Required for ModalManagerV2
@@ -525,6 +537,10 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       pageType: 'management',
       packages: [
         'base',
+        'core-ui', // Core UI systems loaded separately to avoid bundle conflicts
+        'header', // Header system loaded separately to avoid bundle conflicts
+        'auth', // Authentication loaded separately to avoid bundle conflicts
+        'core-init', // Core initialization loaded separately to avoid bundle conflicts
         'services',
         'ui-advanced',
         'modules',
@@ -609,6 +625,10 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       // - 'init-system': מערכות אתחול וניטור (נטען בכל עמוד)
       packages: [
         'base',
+        'core-ui', // Core UI systems loaded separately to avoid bundle conflicts
+        'header', // Header system loaded separately to avoid bundle conflicts
+        'auth', // Authentication loaded separately to avoid bundle conflicts
+        'core-init', // Core initialization loaded separately to avoid bundle conflicts
         'services',
         'modules',
         'ui-advanced',
@@ -709,6 +729,10 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       // - 'init-system': מערכות אתחול וניטור (נטען בכל עמוד)
       packages: [
         'base',
+        'core-ui', // Core UI systems loaded separately to avoid bundle conflicts
+        'header', // Header system loaded separately to avoid bundle conflicts
+        'auth', // Authentication loaded separately to avoid bundle conflicts
+        'core-init', // Core initialization loaded separately to avoid bundle conflicts
         'services',
         'ui-advanced',
         'modules',
@@ -838,6 +862,10 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       // 📦 Required packages for the Data Import dashboard
       packages: [
         'base',
+        'core-ui', // Core UI systems loaded separately to avoid bundle conflicts
+        'header', // Header system loaded separately to avoid bundle conflicts
+        'auth', // Authentication loaded separately to avoid bundle conflicts
+        'core-init', // Core initialization loaded separately to avoid bundle conflicts
         'services',
         'ui-advanced',
         'modules',
@@ -905,6 +933,10 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       // - 'init-system': מערכות אתחול וניטור (נטען בכל עמוד)
       packages: [
         'base',
+        'core-ui', // Core UI systems loaded separately to avoid bundle conflicts
+        'header', // Header system loaded separately to avoid bundle conflicts
+        'auth', // Authentication loaded separately to avoid bundle conflicts
+        'core-init', // Core initialization loaded separately to avoid bundle conflicts
         'services',
         'modules',
         'ui-advanced',
@@ -1003,6 +1035,10 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       // - 'init-system': מערכות אתחול וניטור (נטען בכל עמוד)
       packages: [
         'base',
+        'core-ui', // Core UI systems loaded separately to avoid bundle conflicts
+        'header', // Header system loaded separately to avoid bundle conflicts
+        'auth', // Authentication loaded separately to avoid bundle conflicts
+        'core-init', // Core initialization loaded separately to avoid bundle conflicts
         'services',
         'ui-advanced',
         'modules',
@@ -1095,6 +1131,10 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       // - 'init-system': מערכות אתחול וניטור (נטען בכל עמוד)
       packages: [
         'base',
+        'core-ui', // Core UI systems loaded separately to avoid bundle conflicts
+        'header', // Header system loaded separately to avoid bundle conflicts
+        'auth', // Authentication loaded separately to avoid bundle conflicts
+        'core-init', // Core initialization loaded separately to avoid bundle conflicts
         'services',
         'ui-advanced',
         'modules',
@@ -1293,6 +1333,10 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       // - 'init-system': מערכות אתחול וניטור (נטען בכל עמוד)
       packages: [
         'base',
+        'core-ui', // Core UI systems loaded separately to avoid bundle conflicts
+        'header', // Header system loaded separately to avoid bundle conflicts
+        'auth', // Authentication loaded separately to avoid bundle conflicts
+        'core-init', // Core initialization loaded separately to avoid bundle conflicts
         'services',
         'ui-advanced',
         'modules',
@@ -1366,6 +1410,10 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       // - 'init-system': מערכות אתחול וניטור (נטען בכל עמוד)
       packages: [
         'base',
+        'core-ui', // Core UI systems loaded separately to avoid bundle conflicts
+        'header', // Header system loaded separately to avoid bundle conflicts
+        'auth', // Authentication loaded separately to avoid bundle conflicts
+        'core-init', // Core initialization loaded separately to avoid bundle conflicts
         'services',
         'ui-advanced',
         'modules',
@@ -1428,6 +1476,10 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       // 📦 STANDARD BASIC PACKAGE FOR ALL PAGES:
       packages: [
         'base',
+        'core-ui', // Core UI systems loaded separately to avoid bundle conflicts
+        'header', // Header system loaded separately to avoid bundle conflicts
+        'auth', // Authentication loaded separately to avoid bundle conflicts
+        'core-init', // Core initialization loaded separately to avoid bundle conflicts
         'services',
         'ui-advanced',
         'modules',
@@ -1504,6 +1556,10 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       // - 'init-system': מערכות אתחול וניטור (נטען בכל עמוד)
       packages: [
         'base',
+        'core-ui', // Core UI systems loaded separately to avoid bundle conflicts
+        'header', // Header system loaded separately to avoid bundle conflicts
+        'auth', // Authentication loaded separately to avoid bundle conflicts
+        'core-init', // Core initialization loaded separately to avoid bundle conflicts
         'services',
         'ui-advanced',
         'modules',
@@ -1597,6 +1653,10 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       // החבילות הדרושות למערכת הניהול המשולבת
       packages: [
         'base',
+        'core-ui', // Core UI systems loaded separately to avoid bundle conflicts
+        'header', // Header system loaded separately to avoid bundle conflicts
+        'auth', // Authentication loaded separately to avoid bundle conflicts
+        'core-init', // Core initialization loaded separately to avoid bundle conflicts
         'services',
         'ui-advanced',
         'modules',
@@ -1677,6 +1737,10 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
 
       packages: [
         'base',
+        'core-ui', // Core UI systems loaded separately to avoid bundle conflicts
+        'header', // Header system loaded separately to avoid bundle conflicts
+        'auth', // Authentication loaded separately to avoid bundle conflicts
+        'core-init', // Core initialization loaded separately to avoid bundle conflicts
         'services',
         'ui-advanced',
         'modules',
@@ -1739,6 +1803,10 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
 
       packages: [
         'base',
+        'core-ui', // Core UI systems loaded separately to avoid bundle conflicts
+        'header', // Header system loaded separately to avoid bundle conflicts
+        'auth', // Authentication loaded separately to avoid bundle conflicts
+        'core-init', // Core initialization loaded separately to avoid bundle conflicts
         'services',
         'ui-advanced',
         'modules',
@@ -1823,6 +1891,10 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       name: 'Notifications Center',
       packages: [
         'base',
+        'core-ui', // Core UI systems loaded separately to avoid bundle conflicts
+        'header', // Header system loaded separately to avoid bundle conflicts
+        'auth', // Authentication loaded separately to avoid bundle conflicts
+        'core-init', // Core initialization loaded separately to avoid bundle conflicts
         'services',
         'ui-advanced',
         'modules',
@@ -2025,6 +2097,10 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       name: 'Background Tasks',
       packages: [
         'base',
+        'core-ui', // Core UI systems loaded separately to avoid bundle conflicts
+        'header', // Header system loaded separately to avoid bundle conflicts
+        'auth', // Authentication loaded separately to avoid bundle conflicts
+        'core-init', // Core initialization loaded separately to avoid bundle conflicts
         'services',
         'ui-advanced',
         'modules',
@@ -2244,6 +2320,10 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       name: 'TradingView Lightweight Charts Test Page',
       packages: [
         'base',
+        'core-ui', // Core UI systems loaded separately to avoid bundle conflicts
+        'header', // Header system loaded separately to avoid bundle conflicts
+        'auth', // Authentication loaded separately to avoid bundle conflicts
+        'core-init', // Core initialization loaded separately to avoid bundle conflicts
         'services',
         'ui-advanced',
         'modules',
@@ -2343,6 +2423,10 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       name: 'Watch Lists',
       packages: [
         'base',
+        'core-ui', // Core UI systems loaded separately to avoid bundle conflicts
+        'header', // Header system loaded separately to avoid bundle conflicts
+        'auth', // Authentication loaded separately to avoid bundle conflicts
+        'core-init', // Core initialization loaded separately to avoid bundle conflicts
         'services',
         'ui-advanced',
         'crud',
@@ -2517,6 +2601,10 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       name: 'Database Extra Data',
       packages: [
         'base',
+        'core-ui', // Core UI systems loaded separately to avoid bundle conflicts
+        'header', // Header system loaded separately to avoid bundle conflicts
+        'auth', // Authentication loaded separately to avoid bundle conflicts
+        'core-init', // Core initialization loaded separately to avoid bundle conflicts
         'services',
         'ui-advanced',
         'crud',
@@ -2562,6 +2650,10 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       name: 'System Constraints',
       packages: [
         'base',
+        'core-ui', // Core UI systems loaded separately to avoid bundle conflicts
+        'header', // Header system loaded separately to avoid bundle conflicts
+        'auth', // Authentication loaded separately to avoid bundle conflicts
+        'core-init', // Core initialization loaded separately to avoid bundle conflicts
         'services',
         'ui-advanced',
         'modules',
@@ -2628,6 +2720,10 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       name: 'CSS Management',
       packages: [
         'base',
+        'core-ui', // Core UI systems loaded separately to avoid bundle conflicts
+        'header', // Header system loaded separately to avoid bundle conflicts
+        'auth', // Authentication loaded separately to avoid bundle conflicts
+        'core-init', // Core initialization loaded separately to avoid bundle conflicts
         'services',
         'ui-advanced',
         'modules',
@@ -2683,6 +2779,10 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       name: 'Dynamic Colors Display',
       packages: [
         'base',
+        'core-ui', // Core UI systems loaded separately to avoid bundle conflicts
+        'header', // Header system loaded separately to avoid bundle conflicts
+        'auth', // Authentication loaded separately to avoid bundle conflicts
+        'core-init', // Core initialization loaded separately to avoid bundle conflicts
         'services',
         'ui-advanced',
         'modules',
@@ -2737,6 +2837,10 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       name: 'Design Gallery',
       packages: [
         'base',
+        'core-ui', // Core UI systems loaded separately to avoid bundle conflicts
+        'header', // Header system loaded separately to avoid bundle conflicts
+        'auth', // Authentication loaded separately to avoid bundle conflicts
+        'core-init', // Core initialization loaded separately to avoid bundle conflicts
         'services',
         'ui-advanced',
         'modules',
@@ -2792,6 +2896,10 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       name: 'Chart Management',
       packages: [
         'base',
+        'core-ui', // Core UI systems loaded separately to avoid bundle conflicts
+        'header', // Header system loaded separately to avoid bundle conflicts
+        'auth', // Authentication loaded separately to avoid bundle conflicts
+        'core-init', // Core initialization loaded separately to avoid bundle conflicts
         'services',
         'ui-advanced',
         'modules',
@@ -3397,6 +3505,10 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       name: 'Watch List Page',
       packages: [
         'base',
+        'core-ui', // Core UI systems loaded separately to avoid bundle conflicts
+        'header', // Header system loaded separately to avoid bundle conflicts
+        'auth', // Authentication loaded separately to avoid bundle conflicts
+        'core-init', // Core initialization loaded separately to avoid bundle conflicts
         'services',
         'validation', // Required for form validation - must load before modules/ui-advanced
         'modules', // Required for ModalManagerV2 and watch-lists-config.js
@@ -3460,6 +3572,10 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       name: 'Watch List Modal',
       packages: [
         'base',
+        'core-ui', // Core UI systems loaded separately to avoid bundle conflicts
+        'header', // Header system loaded separately to avoid bundle conflicts
+        'auth', // Authentication loaded separately to avoid bundle conflicts
+        'core-init', // Core initialization loaded separately to avoid bundle conflicts
         'services',
         'ui-advanced',
         'watch-lists'
@@ -3491,6 +3607,10 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       name: 'Add Ticker Modal',
       packages: [
         'base',
+        'core-ui', // Core UI systems loaded separately to avoid bundle conflicts
+        'header', // Header system loaded separately to avoid bundle conflicts
+        'auth', // Authentication loaded separately to avoid bundle conflicts
+        'core-init', // Core initialization loaded separately to avoid bundle conflicts
         'services',
         'validation',
         'modules', // Required for tickersModalConfig and ModalManagerV2
@@ -3525,6 +3645,10 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       name: 'Flag Quick Action',
       packages: [
         'base',
+        'core-ui', // Core UI systems loaded separately to avoid bundle conflicts
+        'header', // Header system loaded separately to avoid bundle conflicts
+        'auth', // Authentication loaded separately to avoid bundle conflicts
+        'core-init', // Core initialization loaded separately to avoid bundle conflicts
         'services',
         'ui-advanced',
         'watch-lists'
@@ -3555,6 +3679,10 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       name: 'AI Analysis',
       packages: [
         'base',
+        'core-ui', // Core UI systems loaded separately to avoid bundle conflicts
+        'header', // Header system loaded separately to avoid bundle conflicts
+        'auth', // Authentication loaded separately to avoid bundle conflicts
+        'core-init', // Core initialization loaded separately to avoid bundle conflicts
         'services',
         'ui-advanced',
         'modules',
@@ -3637,6 +3765,10 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
       pageType: 'development',
       packages: [
         'base',
+        'core-ui', // Core UI systems loaded separately to avoid bundle conflicts
+        'header', // Header system loaded separately to avoid bundle conflicts
+        'auth', // Authentication loaded separately to avoid bundle conflicts
+        'core-init', // Core initialization loaded separately to avoid bundle conflicts
         'services',
         'ui-advanced',
         'modules',

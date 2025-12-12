@@ -1,18 +1,8 @@
 /*
  * ==========================================
- * PACKAGE MANIFEST - Critical Loading Order
+ * FUNCTION INDEX
  * ==========================================
- *
- * 🚨 CRITICAL FIX: Loading Order Dependencies (2025-12-12)
- * --------------------------------------------------
- * The loading order was FIXED to resolve ReferenceError issues that caused
- * 95% of console errors across all pages.
- *
- * KEY FIX: auth package (loadOrder: 1.0) now loads BEFORE header package (loadOrder: 1.2)
- * This ensures window.TikTrackAuth.showLoginModal is available when header-system.js needs it.
- *
- * IMPACT: Reduced console errors from 3,863 to ~150 total across all pages.
- *
+ * 
  * This file defines the PACKAGE MANIFEST structure.
  * 
  * MAIN STRUCTURE:
@@ -158,7 +148,39 @@ const PACKAGE_MANIFEST = {
     critical: true,
     loadOrder: 1,
     dependencies: [],
-    loadingStrategy: 'async', // Changed to async to avoid execution order conflicts in bundle
+    loadingStrategy: 'defer', // Critical package with dependencies - must maintain load order
+    files: [
+      'api-config.js',
+      'api-fetch-wrapper.js',
+      'global-favicon.js',
+      'notification-system.js',
+      'cache-sync-manager.js',
+      'ui-utils.js',
+      'warning-system.js',
+      'error-handlers.js',
+      'unified-cache-manager.js',
+      'icon-mappings.js',
+      'icon-system.js',
+      'icon-replacement-helper.js',
+      'cache-clear-menu.js',
+      'cache-ttl-guard.js',
+      'auth.js',
+      'auth-guard.js',
+      'logger-service.js',
+      'header-system.js',
+      'quick-quality-check.js',
+      'page-state-manager.js',
+      'page-utils.js',
+      'translation-utils.js',
+      'button-icons.js',
+      'https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js',
+      'https://cdn.jsdelivr.net/npm/@floating-ui/dom@1.6.0/dist/floating-ui.dom.min.js',
+      'https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js',
+      'event-handler-manager.js',
+      'button-system-init.js',
+      'color-scheme-system.js',
+      'debug-modal-z-index.js'
+    ],
     scripts: [
       {
         file: 'api-config.js',
@@ -181,7 +203,13 @@ const PACKAGE_MANIFEST = {
         required: true,
         loadOrder: 1
       },
-      // REMOVED: notification-system.js - May cause conflicts when bundled, loaded separately
+      {
+        file: 'notification-system.js',
+        globalCheck: 'window.NotificationSystem',
+        description: 'Notification system',
+        required: true,
+        loadOrder: 2
+      },
       {
         file: 'cache-sync-manager.js',
         globalCheck: 'window.CacheSyncManager',
@@ -189,8 +217,20 @@ const PACKAGE_MANIFEST = {
         required: true,
         loadOrder: 3
       },
-      // REMOVED: ui-utils.js - May cause conflicts when bundled, loaded separately
-      // REMOVED: warning-system.js - May cause conflicts when bundled, loaded separately
+      {
+        file: 'ui-utils.js',
+        globalCheck: 'window.toggleSection',
+        description: 'UI utilities',
+        required: true,
+        loadOrder: 4
+      },
+      {
+        file: 'warning-system.js',
+        globalCheck: 'window.WarningSystem',
+        description: 'Warning system',
+        required: true,
+        loadOrder: 5
+      },
       {
         file: 'error-handlers.js',
         globalCheck: 'window.handleApiError',
@@ -240,10 +280,34 @@ const PACKAGE_MANIFEST = {
         required: true,
         loadOrder: 9
       },
-      // REMOVED: auth.js - Causes conflicts when bundled, loaded separately
-      // REMOVED: auth-guard.js - Causes conflicts when bundled, loaded separately
-      // REMOVED: logger-service.js - May cause conflicts when bundled, loaded separately
-      // REMOVED: header-system.js - May cause conflicts when bundled, loaded separately
+      {
+        file: 'auth.js',
+        globalCheck: 'window.TikTrackAuth',
+        description: 'Authentication system',
+        required: true,
+        loadOrder: 9.5
+      },
+      {
+        file: 'auth-guard.js',
+        globalCheck: 'window.AuthGuard',
+        description: 'Page protection - authentication guard',
+        required: true,
+        loadOrder: 9.6
+      },
+      {
+        file: 'logger-service.js',
+        globalCheck: 'window.Logger',
+        description: 'Advanced logging service',
+        required: true,
+        loadOrder: 10
+      },
+      {
+        file: 'header-system.js',
+        globalCheck: 'window.HeaderSystem',
+        description: 'Header system',
+        required: true,
+        loadOrder: 11
+      },
       {
         file: 'quick-quality-check.js',
         globalCheck: 'window.runQuickQualityCheck',
@@ -303,7 +367,13 @@ const PACKAGE_MANIFEST = {
         loadOrder: 16.6,
         external: true
       },
-      // REMOVED: event-handler-manager.js - May cause conflicts when bundled, loaded separately
+      {
+        file: 'event-handler-manager.js',
+        globalCheck: 'window.EventHandlerManager',
+        description: 'Central event management system',
+        required: true,
+        loadOrder: 17
+      },
       {
         file: 'button-system-init.js',
         globalCheck: 'window.ButtonSystem',
@@ -338,128 +408,6 @@ const PACKAGE_MANIFEST = {
     initTime: '~150ms'
   },
 
-  // 1.1. CORE UI PACKAGE - Core UI systems (loaded separately to avoid bundle conflicts)
-  'core-ui': {
-    id: 'core-ui',
-    name: 'Core UI Package',
-    description: 'Core UI systems loaded separately to avoid bundle conflicts',
-    version: '1.5.0',
-    critical: true,
-    loadOrder: 1.1,
-    dependencies: ['base'],
-    loadingStrategy: 'defer',
-    files: [
-      'notification-system.js',
-      'ui-utils.js',
-      'warning-system.js',
-      'logger-service.js',
-      'event-handler-manager.js'
-    ],
-    scripts: [
-      {
-        file: 'notification-system.js',
-        globalCheck: 'window.NotificationSystem',
-        description: 'Notification system',
-        required: true,
-        loadOrder: 1
-      },
-      {
-        file: 'ui-utils.js',
-        globalCheck: 'window.toggleSection',
-        description: 'UI utilities',
-        required: true,
-        loadOrder: 2
-      },
-      {
-        file: 'warning-system.js',
-        globalCheck: 'window.WarningSystem',
-        description: 'Warning system',
-        required: true,
-        loadOrder: 3
-      },
-      {
-        file: 'logger-service.js',
-        globalCheck: 'window.Logger',
-        description: 'Advanced logging service',
-        required: true,
-        loadOrder: 4
-      },
-      {
-        file: 'event-handler-manager.js',
-        globalCheck: 'window.EventHandlerManager',
-        description: 'Central event management system',
-        required: true,
-        loadOrder: 5
-      }
-    ],
-    estimatedSize: '~120KB',
-    initTime: '~70ms'
-  },
-
-  // 1.2. HEADER PACKAGE - Header system (loaded separately to avoid conflicts)
-  header: {
-    id: 'header',
-    name: 'Header Package',
-    description: 'Header and filter systems loaded separately to avoid bundle conflicts',
-    version: '1.5.0',
-    critical: true,
-    loadOrder: 1.2,
-    dependencies: ['base'],
-    loadingStrategy: 'defer',
-    files: [
-      'header-system.js'
-    ],
-    scripts: [
-      {
-        file: 'header-system.js',
-        globalCheck: 'window.HeaderSystem',
-        description: 'Header system',
-        required: true,
-        loadOrder: 1
-      }
-    ],
-    estimatedSize: '~50KB',
-    initTime: '~30ms'
-  },
-
-  // 1.5. AUTH PACKAGE - Authentication (loaded separately to avoid conflicts)
-  // 🔴 CRITICAL: AUTH PACKAGE - Must load FIRST (loadOrder: 1.0)
-  // 📋 Dependencies: Required by header-system.js (window.TikTrackAuth.showLoginModal)
-  // 📅 Updated: 2025-12-12 - Changed loadOrder from 1.5 to 1.0 to fix ReferenceError issues
-  // 🎯 Impact: Resolved 95% of console errors across all pages
-  auth: {
-    id: 'auth',
-    name: 'Authentication Package',
-    description: 'Authentication systems loaded FIRST to provide dependencies for other packages',
-    version: '1.5.0',
-    critical: true,
-    loadOrder: 1.0,
-    dependencies: ['base'],
-    loadingStrategy: 'defer',
-    files: [
-      'auth.js',
-      'auth-guard.js'
-    ],
-    scripts: [
-      {
-        file: 'auth.js',
-        globalCheck: 'window.TikTrackAuth',
-        description: 'Authentication system',
-        required: true,
-        loadOrder: 1
-      },
-      {
-        file: 'auth-guard.js',
-        globalCheck: 'window.AuthGuard',
-        description: 'Page protection - authentication guard',
-        required: true,
-        loadOrder: 2
-      }
-    ],
-    estimatedSize: '~150KB',
-    initTime: '~80ms'
-  },
-
   // 2. SERVICES PACKAGE - General services
   services: {
     id: 'services',
@@ -470,6 +418,40 @@ const PACKAGE_MANIFEST = {
     loadOrder: 2,
     dependencies: ['base'],
     loadingStrategy: 'defer', // Critical package - required for most pages, has dependencies on base
+    files: [
+      'services/data-collection-service.js',
+      'services/date-range-picker-service.js',
+      'services/field-renderer-service.js',
+      'services/select-populator-service.js',
+      'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js',
+      'services/ai-analysis-data.js',
+      'services/statistics-calculator.js',
+      'services/default-value-setter.js',
+      'services/preferences-data.js',
+      'services/executions-data.js',
+      'services/crud-response-handler.js',
+      'services/unified-crud-service.js',
+      'services/research-data.js',
+      'services/investment-calculation-service.js',
+      'services/unified-progress-manager.js',
+      'services/tag-service.js',
+      'services/autocomplete-service.js',
+      'services/widget-z-index-manager.js',
+      'services/unified-ui-positioning-service.js',
+      'services/widget-overlay-service.js',
+      'services/widget-overlay-debugger.js',
+      'services/table-sort-value-adapter.js',
+      'services/lint-status-service.js',
+      'services/alert-condition-renderer.js',
+      'https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.min.js',
+      'https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js',
+      'services/rich-text-editor-service.js',
+      'services/pending-actions-cache-service.js',
+      'services/execution-clustering-service.js',
+      'services/execution-assignment-service.js',
+      'services/trade-plan-assignment-service.js',
+      'services/execution-cluster-helpers.js'
+    ],
     scripts: [
       {
         file: 'services/data-collection-service.js',
@@ -1926,7 +1908,7 @@ const PACKAGE_MANIFEST = {
   //   critical: false,
   //   loadOrder: 16,
   //   dependencies: ['base'],
-  //   scripts: [], // ⚠️ Scripts removed - already in base package
+    scripts: [], // ⚠️ Scripts removed - already in base package
   //   estimatedSize: '~0KB',
   //   initTime: '~0ms',
   //   deprecated: true,

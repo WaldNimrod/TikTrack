@@ -4,6 +4,8 @@ from pathlib import Path
 # Environment detection - check if production mode is requested
 ENVIRONMENT = os.getenv("TIKTRACK_ENV", "development").lower()
 IS_PRODUCTION = ENVIRONMENT == "production"
+IS_TESTING = ENVIRONMENT == "testing"
+IS_ONLINE = ENVIRONMENT == "online"
 
 # Paths
 BASE_DIR = Path(__file__).parent.parent
@@ -16,7 +18,16 @@ DB_PATH = DB_DIR / "tiktrack.db"  # Deprecated - kept for backward compatibility
 # PostgreSQL database configuration (required - no SQLite support)
 POSTGRES_HOST = os.getenv("POSTGRES_HOST")
 POSTGRES_PORT = os.getenv("POSTGRES_PORT", "5432")
-POSTGRES_DB = os.getenv("POSTGRES_DB", "TikTrack-db-development")
+
+# Database name per environment (Testing/Online/Development)
+if IS_TESTING:
+    DEFAULT_DB_NAME = "TikTrack-db-testing"
+elif IS_ONLINE:
+    DEFAULT_DB_NAME = "TikTrack-db-online"
+else:
+    DEFAULT_DB_NAME = "TikTrack-db-development"
+
+POSTGRES_DB = os.getenv("POSTGRES_DB", DEFAULT_DB_NAME)
 POSTGRES_USER = os.getenv("POSTGRES_USER", "TikTrakDBAdmin")
 POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD", "BigMeZoo1974!?")
 
@@ -54,15 +65,18 @@ USING_SQLITE = False
 # Flask settings
 DEBUG = False
 HOST = "127.0.0.1"
-PORT = 5001 if IS_PRODUCTION else 8080
+PORT = 5001 if (IS_PRODUCTION or IS_TESTING) else 8080
 
 # Development/Production settings
-if IS_PRODUCTION:
+if IS_PRODUCTION or IS_TESTING:
     DEVELOPMENT_MODE = False
     CACHE_DISABLED = False
+    # Disable excessive logging in testing environment to prevent rate limiting
+    DISABLE_FRONTEND_LOGGING = True
 else:
     DEVELOPMENT_MODE = os.getenv("TIKTRACK_DEV_MODE", "true").lower() == "true"
     CACHE_DISABLED = os.getenv("TIKTRACK_CACHE_DISABLED", "true").lower() == "true"
+    DISABLE_FRONTEND_LOGGING = False
 
 # Cache settings
 DEFAULT_CACHE_TTL = 10 if DEVELOPMENT_MODE else 300
@@ -71,4 +85,20 @@ CACHE_ENABLED = not CACHE_DISABLED
 # Checks (skip in testing mode)
 if not os.getenv("TESTING") and not UI_DIR.exists():
     raise FileNotFoundError(f"UI directory not found at: {UI_DIR}")
+
+# Export key flags
+__all__ = [
+    "ENVIRONMENT",
+    "IS_PRODUCTION",
+    "IS_TESTING",
+    "IS_ONLINE",
+    "DATABASE_URL",
+    "UI_DIR",
+    "PORT",
+    "HOST",
+    "DEBUG",
+    "DEVELOPMENT_MODE",
+    "CACHE_DISABLED",
+    "CACHE_ENABLED",
+]
 

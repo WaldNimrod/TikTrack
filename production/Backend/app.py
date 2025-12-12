@@ -611,26 +611,30 @@ def debug_log():
 def logs_batch():
     """Batch logging endpoint for frontend logs with rate limiting"""
     try:
-        # Simple rate limiting - allow max 10 requests per second
-        import time
-        current_time = time.time()
-        
-        # Check if we have rate limiting data
-        if not hasattr(app, 'rate_limit_data'):
-            app.rate_limit_data = {'requests': [], 'last_cleanup': current_time}
-        
-        # Clean old requests (older than 1 second)
-        app.rate_limit_data['requests'] = [
-            req_time for req_time in app.rate_limit_data['requests'] 
-            if current_time - req_time < 1.0
-        ]
-        
-        # Check rate limit (max 10 requests per second)
-        if len(app.rate_limit_data['requests']) >= 10:
-            return jsonify({"status": "rate_limited", "message": "Too many requests"}), 429
-        
-        # Add current request
-        app.rate_limit_data['requests'].append(current_time)
+        from config.settings import IS_TESTING
+
+        # Skip rate limiting in testing environment
+        if not IS_TESTING:
+            # Simple rate limiting - allow max 10 requests per second
+            import time
+            current_time = time.time()
+
+            # Check if we have rate limiting data
+            if not hasattr(app, 'rate_limit_data'):
+                app.rate_limit_data = {'requests': [], 'last_cleanup': current_time}
+
+            # Clean old requests (older than 1 second)
+            app.rate_limit_data['requests'] = [
+                req_time for req_time in app.rate_limit_data['requests']
+                if current_time - req_time < 1.0
+            ]
+
+            # Check rate limit (max 10 requests per second)
+            if len(app.rate_limit_data['requests']) >= 10:
+                return jsonify({"status": "rate_limited", "message": "Too many requests"}), 429
+
+            # Add current request
+            app.rate_limit_data['requests'].append(current_time)
         
         data = request.get_json()
         if data and 'logs' in data:

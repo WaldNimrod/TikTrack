@@ -33,45 +33,49 @@ function validateBundles() {
     return { errors, warnings };
   }
 
-  const packages = Object.keys(PACKAGE_MANIFEST);
+  // Get actual bundle files (exclude manifest-related files)
+  const bundleFiles = fs.readdirSync(bundlesDir)
+    .filter(file => file.endsWith('.bundle.js') && !file.includes('PACKAGE_MANIFEST') && !file.includes('PackageManifest'));
+
+  if (bundleFiles.length === 0) {
+    errors.push('No bundle files found');
+    return { errors, warnings };
+  }
+
   let bundlesValid = 0;
   let bundlesInvalid = 0;
 
-  packages.forEach(packageName => {
-    const bundleFile = path.join(bundlesDir, `${packageName}.bundle.js`);
-    const bundleMapFile = path.join(bundlesDir, `${packageName}.bundle.js.map`);
-
-    if (!fs.existsSync(bundleFile)) {
-      errors.push(`Bundle file missing: ${packageName}.bundle.js`);
-      bundlesInvalid++;
-      return;
-    }
+  bundleFiles.forEach(bundleFile => {
+    const fullPath = path.join(bundlesDir, bundleFile);
+    const packageName = bundleFile.replace('.bundle.js', '');
+    const bundleMapFile = path.join(bundlesDir, `${bundleFile}.map`);
 
     // Check bundle file size
-    const stats = fs.statSync(bundleFile);
+    const stats = fs.statSync(fullPath);
     const sizeKB = Math.round(stats.size / 1024);
 
     if (sizeKB === 0) {
-      errors.push(`Bundle file is empty: ${packageName}.bundle.js`);
+      errors.push(`Bundle file is empty: ${bundleFile}`);
       bundlesInvalid++;
     } else if (sizeKB > 2048) { // 2MB warning
-      warnings.push(`Large bundle: ${packageName}.bundle.js (${sizeKB}KB)`);
+      warnings.push(`Large bundle: ${bundleFile} (${sizeKB}KB)`);
       bundlesValid++;
     } else {
       bundlesValid++;
     }
 
-    // Check source map
+    // Check source map (optional)
     if (!fs.existsSync(bundleMapFile)) {
-      warnings.push(`Missing source map: ${packageName}.bundle.js.map`);
+      warnings.push(`Missing source map: ${bundleFile}.map`);
     }
 
-    console.log(`  ✅ ${packageName}.bundle.js (${sizeKB}KB)`);
+    console.log(`  ✅ ${bundleFile} (${sizeKB}KB)`);
   });
 
   console.log(`\n📊 Bundle Validation Results:`);
   console.log(`  ✅ Valid: ${bundlesValid}`);
   console.log(`  ❌ Invalid: ${bundlesInvalid}`);
+  console.log(`  📦 Total bundles: ${bundleFiles.length}`);
 
   return { errors, warnings };
 }

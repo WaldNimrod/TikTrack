@@ -10,6 +10,8 @@ const path = require('path');
 
 // Load package manifest
 const manifestPath = path.join(__dirname, '..', '..', 'trading-ui', 'scripts', 'init-system', 'package-manifest.js');
+console.log(`📋 Reading manifest from: ${manifestPath}`);
+console.log(`📋 Manifest exists: ${fs.existsSync(manifestPath)}`);
 let PACKAGE_MANIFEST = {};
 
 try {
@@ -42,6 +44,9 @@ try {
     }
   }
   
+  console.log(`📋 Loaded ${Object.keys(PACKAGE_MANIFEST).length} packages from manifest`);
+  console.log(`📋 Base package has ${PACKAGE_MANIFEST.base?.scripts?.length || 0} scripts`);
+
   if (!PACKAGE_MANIFEST || Object.keys(PACKAGE_MANIFEST).length === 0) {
     throw new Error('PACKAGE_MANIFEST is empty or not found');
   }
@@ -122,7 +127,15 @@ async function bundlePackage(packageId, packageConfig) {
     bundledContent += `//# sourceMappingURL=${packageId}.bundle.js.map\n`;
 
     // Write bundled content
+    console.log(`    📝 Writing bundle to: ${outputFile}`);
+    console.log(`    📝 Bundle dir: ${path.dirname(outputFile)}`);
+    console.log(`    📝 Bundle exists before write: ${fs.existsSync(outputFile)}`);
     fs.writeFileSync(outputFile, bundledContent);
+    console.log(`    📝 Bundle exists after write: ${fs.existsSync(outputFile)}`);
+    if (fs.existsSync(outputFile)) {
+      const size = fs.statSync(outputFile).size;
+      console.log(`    📝 Bundle size: ${size} bytes`);
+    }
     
     // Create empty source map file (to avoid errors)
     const sourceMap = {

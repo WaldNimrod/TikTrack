@@ -1,13 +1,13 @@
 {
   "production": {
-    "version": "1.3.20.11",
+    "version": "1.3.21.0",
     "major": 1,
     "minor": 3,
-    "patch": 20,
-    "build": 11,
-    "commit": "bf13d5efc1bfdbe8da6985bcfb2bcf3df43cb648",
-    "updated_at": "2025-12-16T23:08:58+00:00",
-    "notes": "Improve session management - add cache readiness check, debug logging"
+    "patch": 21,
+    "build": 0,
+    "commit": "8253fbcfa5c92a62bf71cc82713ce61c19a9dcf7",
+    "updated_at": "2025-12-16T23:11:52+00:00",
+    "notes": "Fix Selenium WebDriver setup to use Chrome instead of Firefox"
   },
   "development": {
     "version": "1.3.111.0",

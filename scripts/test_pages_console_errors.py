@@ -24,6 +24,7 @@ try:
     from selenium.webdriver.support import expected_conditions as EC
     from selenium.common.exceptions import TimeoutException, WebDriverException
     from webdriver_manager.firefox import GeckoDriverManager
+    from webdriver_manager.chrome import ChromeDriverManager
 except ImportError:
     print("❌ Error: selenium or webdriver-manager not installed.")
     print("   Install with: pip install selenium webdriver-manager")
@@ -200,19 +201,15 @@ def setup_driver(prefer_chrome: bool = False):
     """
     last_error = None
 
-    def create_chrome():
-        chrome_options = Options()
-        # chrome_options.add_argument('--headless')  # intentionally visible for debugging
-        chrome_options.set_preference('devtools.console.stdout.content', True)
-        chrome_options.add_argument('--no-sandbox')
-        chrome_options.add_argument('--disable-dev-shm-usage')
-        chrome_options.add_argument('--width=1920')
-        chrome_options.add_argument('--height=1080')
-        dev_edition_path = "/Applications/Firefox Developer Edition.app/Contents/MacOS/chrome"
-        if Path(dev_edition_path).exists():
-            chrome_options.binary_location = dev_edition_path
+    def create_firefox():
+        firefox_options = Options()
+        firefox_options.set_preference('devtools.console.stdout.content', True)
+        firefox_options.add_argument('--no-sandbox')
+        firefox_options.add_argument('--disable-dev-shm-usage')
+        firefox_options.add_argument('--width=1920')
+        firefox_options.add_argument('--height=1080')
         service = Service(GeckoDriverManager().install())
-        driver = webdriver.Firefox(service=service, options=chrome_options)
+        driver = webdriver.Firefox(service=service, options=firefox_options)
         driver.set_script_timeout(60)
         return driver
 
@@ -222,8 +219,8 @@ def setup_driver(prefer_chrome: bool = False):
         chrome_options.add_argument('--disable-dev-shm-usage')
         chrome_options.add_argument('--disable-gpu')
         chrome_options.add_argument('--window-size=1920,1080')
-        service = FirefoxService(GeckoDriverManager().install())
-        driver = webdriver.Firefox(service=service, options=chrome_options)
+        service = Service(ChromeDriverManager().install())
+        driver = webdriver.Chrome(service=service, options=chrome_options)
         driver.set_script_timeout(60)
         return driver
 
@@ -231,7 +228,7 @@ def setup_driver(prefer_chrome: bool = False):
         if prefer_chrome:
             return create_chrome()
         # Try Firefox first
-        return create_chrome()
+        return create_firefox()
     except Exception as e1:
         last_error = e1
         print(f"⚠️ Firefox driver failed: {e1}")

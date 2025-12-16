@@ -6,6 +6,7 @@
 ---
 
 ## 1) ארכיטקטורת אימות ובידוד נתונים
+
 - **Token בלבד (Bearer)**: ללא cookies. `api-fetch-wrapper.js` מזריק Authorization אוטומטית.
 - **UnifiedCacheManager**: authToken/currentUser נשמרים עם `includeUserId:false` בלבד; פינוי דרך `forceLogoutAndPrompt`.
 - **Login Modal**: מסלול יחיד. כל עמוד מוגן מפעיל `auth-guard.js`; ב-401/חוסר טוקן מוצג המודל.
@@ -18,6 +19,7 @@
 ---
 
 ## 2) אינדקס קבצים מרכזיים
+
 - Auth/Guard: `trading-ui/scripts/auth.js`, `trading-ui/scripts/auth-guard.js`
 - Fetch גלובלי: `trading-ui/scripts/api-fetch-wrapper.js`
 - Cache: `trading-ui/scripts/unified-cache-manager.js`
@@ -28,6 +30,7 @@
 ---
 
 ## 3) Checklist למפתחים
+
 1. **בריאות שרת**  
    - `curl http://localhost:8080/api/health`  
    - `curl http://localhost:8080/api/preferences/default?preference_name=primary_color` → `#26baac`
@@ -47,6 +50,7 @@
 ---
 
 ## 4) רצף Login לדוגמה
+
 ```javascript
 // auth-guard כבר רץ
 await window.TikTrackAuth.showLoginModal(); // modal מוצג
@@ -59,6 +63,7 @@ await window.TikTrackAuth.showLoginModal(); // modal מוצג
 ---
 
 ## 5) דיבוג וכלים
+
 - **Firefox Debug**: `./scripts/debug/launch-firefox.sh` → F5 (“Launch Firefox - Development”).
 - **Auth Debug Monitor**: לוגי cache/auth, שגיאות נשמרות; זמין בדפדפן.
 - **בדיקת auth מהירה**: `curl -H "Authorization: Bearer <token>" http://localhost:8080/api/auth/me`
@@ -67,6 +72,7 @@ await window.TikTrackAuth.showLoginModal(); // modal מוצג
 ---
 
 ## 6) הנחיות יישום לממשקים חדשים
+
 - כל fetch עובר דרך ה-wrapper הגלובלי; אין `credentials: 'include'`.
 - auth נשמר ונמחק רק ב-`UnifiedCacheManager` (includeUserId:false); אין שימוש ב-localStorage ל-auth.
 - כניסה רק דרך modal; אין דפי login.
@@ -76,6 +82,7 @@ await window.TikTrackAuth.showLoginModal(); // modal מוצג
 ---
 
 ## 7) נקודות כשל נפוצות
+
 - מודל מאחורי backdrop → לרשום למנהל הניווט ואז `ModalZIndexManager.forceUpdate(modalElement)`.
 - 401 ב-tickers/watch-list → לבדוק `TikTrackAuth.getCurrentUser()` לפני קריאות, ולאשר טוקן ב-UC.
 - 429 ב-trade-plans → להפחית page size, להגדיל דיליי, להשתמש ב-cache.
@@ -83,6 +90,7 @@ await window.TikTrackAuth.showLoginModal(); // modal מוצג
 ---
 
 ## 8) תפעול/QA מהיר
+
 - **פינוי auth**: `window.TikTrackAuth.forceLogoutAndPrompt('manual')` מנקה את כל שכבות המטמון ומשדר logout לטאבים.
 - **סדר טעינה**: `api-fetch-wrapper.js` (0.5) לפני הכל; `auth.js` (9.5) לפני `auth-guard.js` (9.6).
 - **Header סטטוס**: אייקון ירוק מחובר / כתום מנותק לאחר login/logout.

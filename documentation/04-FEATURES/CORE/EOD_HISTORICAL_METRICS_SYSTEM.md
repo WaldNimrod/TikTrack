@@ -28,6 +28,7 @@
 ## מדדים לשימור יומי
 
 ### פורטפוליו (EOD)
+
 - `nav_total` - שווי תיק כולל
 - `nav_base_currency` - שווי תיק במטבע בסיס
 - `cash_total` - יתרות מזומן כולל
@@ -35,6 +36,7 @@
 - `exposure_long/short` - חשיפות פוזיציות
 
 ### P&L יומי ומצטבר
+
 - `unrealized_pl_amount/percent` - רווח/הפסד לא מומש
 - `realized_pl_amount` - רווח/הפסד מומש
 - `realized_pl_to_date` - רווח/הפסד מצטבר
@@ -42,16 +44,19 @@
 - `fees_today/taxes_today/dividends_today` - עמלות/מסים/דיבידנדים
 
 ### ביצועים
+
 - `twr_daily/mtd/ytd` - Time-Weighted Return
 - `mwr_daily` - Money-Weighted Return (אם זמין)
 - `max_drawdown_to_date` - מקסימום שונא
 
 ### יתרות ותזרימים
+
 - `cash_balances_by_currency` - יתרות מזומן לפי מטבע
 - `inflows/outflows/dividends/fees/taxes/fx_adjustments` - תזרימי מזומן יומיים
 - `net_flow` - תזרים נטו
 
 ### בקרת איכות נתונים
+
 - `data_quality_status` - סטטוס איכות (valid/stale/needs_recompute)
 - `missing_quotes_count` - מספר quotes חסרים
 - `stale_quotes_count` - מספר quotes לא עדכניים
@@ -60,6 +65,7 @@
 ## עמודים משולבים עם EOD Integration
 
 ### ✅ Phase 1: עמודי עדיפות גבוהה
+
 1. **Portfolio State Page** (`/portfolio-state.html`)
    - EOD portfolio metrics (NAV, cash, positions)
    - Historical P&L calculations
@@ -71,6 +77,7 @@
    - Performance metrics
 
 ### ✅ Phase 2: עמודי עדיפות בינונית
+
 3. **Trades Page** (`/trades.html`)
    - EOD trade data integration
    - Real-time metrics display
@@ -90,6 +97,7 @@
    - Recompute functionality
 
 ### ✅ Phase 3: עמודי עדיפות נמוכה
+
 7. **Research Page** (`/research.html`)
    - EOD portfolio performance analysis
    - Return and volatility insights
@@ -111,6 +119,7 @@
 ### טבלאות מרכזיות
 
 #### daily_portfolio_metrics
+
 ```sql
 CREATE TABLE daily_portfolio_metrics (
     id SERIAL PRIMARY KEY,
@@ -142,6 +151,7 @@ CREATE TABLE daily_portfolio_metrics (
 ```
 
 #### daily_ticker_positions
+
 ```sql
 CREATE TABLE daily_ticker_positions (
     id SERIAL PRIMARY KEY,
@@ -164,6 +174,7 @@ CREATE TABLE daily_ticker_positions (
 ```
 
 #### daily_cash_flows_agg
+
 ```sql
 CREATE TABLE daily_cash_flows_agg (
     id SERIAL PRIMARY KEY,
@@ -183,6 +194,7 @@ CREATE TABLE daily_cash_flows_agg (
 ```
 
 #### eod_job_runs
+
 ```sql
 CREATE TABLE eod_job_runs (
     id SERIAL PRIMARY KEY,
@@ -201,6 +213,7 @@ CREATE TABLE eod_job_runs (
 ### שכבת שירותים (Backend)
 
 #### EODMetricsService
+
 - `calculate_daily_portfolio_metrics(user_id, account_id, date)` - חישוב מדדי פורטפוליו
 - `calculate_daily_positions(user_id, account_id, date)` - חישוב פוזיציות טיקר
 - `calculate_daily_cash_flows(user_id, account_id, date)` - צבירה תזרימי מזומן
@@ -208,6 +221,7 @@ CREATE TABLE eod_job_runs (
 - `save_metrics(metrics, validation_result)` - שמירה עם סטטוס ולידציה
 
 #### RecomputeService
+
 - `recompute_user_date_range(user_id, start_date, end_date)` - חישוב מחדש לטווח תאריכים
 - `recompute_account_date_range(account_id, start_date, end_date)` - חישוב מחדש לחשבון ספציפי
 - `queue_recompute_job(job_data)` - הוספה לתור batch
@@ -216,27 +230,33 @@ CREATE TABLE eod_job_runs (
 ### שכבת API
 
 #### GET /api/eod/metrics/portfolio
+
 - פרמטרים: user_id, account_id?, date_from, date_to, include_positions=true/false
 - תשובה: array של daily_portfolio_metrics + positions אם requested
 
 #### GET /api/eod/metrics/positions
+
 - פרמטרים: user_id, account_id?, ticker_id?, date_from, date_to
 - תשובה: array של daily_ticker_positions
 
 #### GET /api/eod/metrics/cash-flows
+
 - פרמטרים: user_id, account_id?, date_from, date_to
 - תשובה: array של daily_cash_flows_agg
 
 #### POST /api/eod/recompute
+
 - body: {user_id, account_ids?, date_from, date_to}
 - תשובה: {job_id, status: 'queued'}
 
 #### GET /api/eod/recompute/{job_id}
+
 - תשובה: {status, progress_percent?, errors?, duration_seconds}
 
 ### שכבת Frontend
 
 #### EODMetricsDataService
+
 ```javascript
 // trading-ui/scripts/services/eod-metrics-data.js
 class EODMetricsDataService {
@@ -251,6 +271,7 @@ class EODMetricsDataService {
 ```
 
 #### EOD Validation & Notification Service
+
 ```javascript
 // trading-ui/scripts/services/eod-validation-service.js
 class EODValidationService {
@@ -262,7 +283,8 @@ class EODValidationService {
 }
 ```
 
-#### EOD Integration Helper - ללא fallback!
+#### EOD Integration Helper - ללא fallback
+
 ```javascript
 // trading-ui/scripts/services/eod-integration-helper.js
 window.EODIntegrationHelper = {
@@ -287,30 +309,36 @@ window.EODIntegrationHelper = {
 ### אינטגרציה בעמודים
 
 #### דשבורד טיקר (ticker-dashboard.html)
+
 - נשאר מקור המנגנון החסרים/Retry
 - משתמש ב-EODMetricsDataService להצגה
 - מציע "רענון כללי" לכל העמודים
 
 #### יומן מסחר (trading-journal.html)
+
 - KPI יומי/גרף פעילות מה-EOD שמור
 - כפתור רענון מפעיל RecomputeService
 - fallback ל-Recompute אם חסרים
 
 #### דף הבית (index.html)
+
 - KPI עליונים + widgets → EOD שמור
 - כפתור רענון → Recompute
 
 #### עמודי מוקאפ
+
 - trade-history-page.html: EOD per date/תיק
 - portfolio-state-page.html: חתכי NAV/פוזיציות/יתרות EOD
 
 ### ולידציה ו-Runtime Calculations
 
 #### הפרדה ברורה
+
 - **EOD (שמור)**: NAV, P&L מצטבר, ביצועים, יתרות סגירה, פוזיציות סגירה
 - **Runtime (חי)**: אינטראדיי, סימולציות, Stop/Target, סכום↔כמות↔מחיר
 
 #### ולידציה
+
 ```javascript
 // ב-EODMetricsService.validate()
 const navCalculated = positions.reduce((sum, pos) => sum + pos.market_value, 0) + cashTotal;
@@ -327,6 +355,7 @@ if (Math.abs(navStored - navCalculated) > tolerance) {
 ### תהליכי EOD
 
 #### יום סגירה אוטומטי
+
 1. איסוף quotes סגירה מ-external data
 2. חישוב פוזיציות (market_value, unrealized_pl)
 3. צבירת תזרימי מזומן
@@ -336,6 +365,7 @@ if (Math.abs(navStored - navCalculated) > tolerance) {
 7. invalidation של cache TTL
 
 #### Recompute ידני/אוטומטי
+
 1. זיהוי חסרים/פערים
 2. הוספה ל-queue batch
 3. עיבוד ברקע עם progress tracking
@@ -345,27 +375,32 @@ if (Math.abs(navStored - navCalculated) > tolerance) {
 ### בדיקות
 
 #### יחידה (Backend)
+
 - חישובי NAV/P&L/performances
 - המרות FX
 - ולידציה פערים
 - כתיבה/קריאה לטבלאות EOD
 
 #### אינטגרציה (Backend)
+
 - זרימת EOD מלאה על נתוני אמת
 - טיפול בשגיאות quotes חסרים
 - Recompute queue/batch
 
 #### חוזה API
+
 - מבני תשובה EOD
 - סטטוסי ולידציה
 - Recompute
 
 #### Frontend
+
 - Info Summary/Statistics Calculator מול EOD
 - Page State Manager לפילטרי תאריך/חשבון/טיקר
 - CacheTTLGuard + CacheSyncManager
 
 #### Selenium
+
 - לאחר מימוש: `python3 scripts/test_pages_console_errors.py`
 
 ## תוצאות בדיקות ואימות

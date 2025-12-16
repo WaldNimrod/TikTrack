@@ -6,6 +6,7 @@
 ---
 
 ## 🧭 ארכיטקטורת אימות – תקציר
+
 - **Token-based בלבד** (ללא cookies): הזרקת `Authorization: Bearer <token>` נעשית אוטומטית ע"י `api-fetch-wrapper.js`.
 - **UnifiedCacheManager** לכל שכבות המטמון. מפתחות auth נשמרים עם `includeUserId: false` בלבד.
 - **Login Modal** הוא מסלול הכניסה היחיד. `auth-guard.js` מוודא auth בכל עמוד, ומציג את המודל בעת 401/חוסר טוקן.
@@ -16,6 +17,7 @@
 ---
 
 ## 📌 נקודות חיבור בקוד (Front)
+
 - `scripts/api-fetch-wrapper.js` – הזרקת Authorization + טיפול 401.
 - `scripts/auth.js` – login/logout, modal, שמירת auth ל־UnifiedCacheManager, dev helpers.
 - `scripts/auth-guard.js` – בדיקת auth בכל עמוד, הצגת modal בעת 401/חוסר טוקן.
@@ -25,6 +27,7 @@
 ---
 
 ## 🔧 דיבוג ו-QA
+
 1. **Firefox Debug**: `./scripts/debug/launch-firefox.sh` → F5 ב־Cursor/VSCode: "Launch Firefox - Development".
 2. **בדיקות סלניום**:  
    - עמוד יחיד: `python3 scripts/test_pages_console_errors.py --page "/"`  
@@ -38,6 +41,7 @@
 ---
 
 ## 🧪 רשימת בדיקות קצרה (Hands-on)
+
 - כניסה → מופיע modal, לאחר login נשמר token ב־UnifiedCacheManager, HEADER מציג משתמש.
 - ניווט לעמוד מוגן (למשל `/trades.html`) → ללא modal אם token תקף; עם modal אם לא.
 - טעינת העדפות עם טוקן: אין 401; ללא טוקן: soft-fail ולוג debug בלבד.
@@ -46,6 +50,7 @@
 ---
 
 ## 🛠 נקודות כשל שכיחות ומה לבדוק
+
 - מודל לא מעל backdrop → לבדוק רישום ל־`ModalNavigationService` ואז `ModalZIndexManager.forceUpdate(modalElement)`.
 - 401 ב-tickers/watch-list → לוודא `TikTrackAuth.getCurrentUser()` לפני קריאות דאטה (הגנות קיימות).
 - 429 ב-trade-plans/trades_formatted → להגדיל דיליי, לצמצם page size, ולהשתמש ב־CacheTTLGuard.
@@ -53,10 +58,11 @@
 ---
 
 ## 📝 הערות ליישום בממשקים חדשים
+
 - כל קריאת API חייבת לעבור דרך ה־fetch wrapper הגלובלי.
 - אין שימוש ב־localStorage ל-auth; רק UnifiedCacheManager (includeUserId:false).
 - כניסה רק דרך modal; אין דפי login נפרדים.
-- לשמור לוגים ברמת info/debug בלבד; שגיאות auth רכות (לא מפילות עמוד). 
+- לשמור לוגים ברמת info/debug בלבד; שגיאות auth רכות (לא מפילות עמוד).
 
 **בדיקות:**
 

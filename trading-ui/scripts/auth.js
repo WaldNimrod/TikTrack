@@ -1046,24 +1046,24 @@ function setupLoginForm(formId = 'loginForm', onSuccess = null) {
       // שמירת פרטי התחברות אם נבחר "זכור אותי"
       saveCredentials(username, password);
 
-      // Show success message with reload button (instead of auto-reload)
-      window.AuthDebugMonitor?.log('info', '✅ LOGIN FORM: Login successful, showing success message with reload button', {
+      // Auto-reload page after successful login (instead of showing reload button)
+      window.AuthDebugMonitor?.log('info', '✅ LOGIN FORM: Login successful, auto-reloading page', {
         userId: currentUser?.id,
         username: currentUser?.username,
         timestamp: new Date().toISOString()
       });
-      
-      showLoginSuccess('✅ התחברות הצליחה! לחץ על "רענן עמוד" להמשך', 'loginSuccess', true);
-      
-      // Verify button was added
+
+      // Show brief success message then auto-reload
+      showLoginSuccess('✅ התחברות הצליחה! העמוד ירענן אוטומטית...', 'loginSuccess', false);
+
+      // Auto-reload after a short delay to allow user to see success message
       setTimeout(() => {
-        const reloadBtn = document.querySelector('#loginSuccess button');
-        if (reloadBtn) {
-          window.AuthDebugMonitor?.log('info', '✅ Reload button successfully added to DOM');
-        } else {
-          window.AuthDebugMonitor?.log('error', '❌ Reload button NOT found in DOM after showLoginSuccess');
-        }
-      }, 100);
+        window.AuthDebugMonitor?.log('info', '🔄 Auto-reloading page after successful login', {
+          userId: currentUser?.id,
+          timestamp: new Date().toISOString()
+        });
+        window.location.reload();
+      }, 1500);
 
       // Broadcast login event to other tabs
       broadcastAuthEvent({
@@ -1500,111 +1500,28 @@ async function showLoginModal(onSuccess = null) {
   if (container) {
     window.Logger?.info?.('✅ [auth.js] Container found, creating login interface', { page: 'auth' });
     createLoginInterface('loginModalContainer', async () => {
-      // On successful login, verify session is ready
-      window.AuthDebugMonitor?.log('info', '✅ Login successful, verifying session', {
+      // Login successful - page will auto-reload, just log success
+      window.AuthDebugMonitor?.log('info', '✅ Login completed successfully - page will auto-reload', {
         timestamp: new Date().toISOString()
       });
-      
-      // Verify session is ready by checking /api/auth/me
-      let sessionReady = false;
-      let sessionError = null;
-      
-      for (let attempt = 0; attempt < 5; attempt++) {
-        try {
-          window.AuthDebugMonitor?.log('info', `🔍 Session verification attempt ${attempt + 1}/5`);
-          
-          const verifyResponse = await fetch('/api/auth/me', {
-            method: 'GET', });
-          
-          if (verifyResponse.ok) {
-            const verifyData = await verifyResponse.json();
-            if (verifyData.status === 'success' && verifyData.data?.user) {
-              sessionReady = true;
-              window.AuthDebugMonitor?.log('info', '✅ Session verified successfully', {
-                attempt: attempt + 1,
-                userId: verifyData.data.user.id,
-                username: verifyData.data.user.username
-              });
-              break;
-            } else {
-              sessionError = `Invalid response: ${JSON.stringify(verifyData)}`;
-              window.AuthDebugMonitor?.log('warn', '⚠️ Invalid session response', {
-                attempt: attempt + 1,
-                response: verifyData
-              });
-            }
-          } else {
-            sessionError = `HTTP ${verifyResponse.status}: ${verifyResponse.statusText}`;
-            window.AuthDebugMonitor?.log('warn', '⚠️ Session verification failed', {
-              attempt: attempt + 1,
-              status: verifyResponse.status,
-              statusText: verifyResponse.statusText
-            });
-          }
-        } catch (error) {
-          sessionError = error.message;
-          window.AuthDebugMonitor?.log('error', '❌ Session verification error', {
-            attempt: attempt + 1,
-            error: error.message,
-            stack: error.stack
-          });
-          
-          // Save error for debugging
-          window.AuthDebugMonitor?.saveError(error, {
-            type: 'session_verification_error',
-            attempt: attempt + 1
-          });
-        }
-        
-        // Wait before retry
-        await new Promise(resolve => setTimeout(resolve, 200));
+
+      // Close modal since page will reload
+      const modalInstance = window.bootstrap?.Modal?.getInstance(modalEl) || (window.bootstrap?.Modal ? new window.bootstrap.Modal(modalEl) : null);
+      if (modalInstance) {
+        modalInstance.hide();
       }
-      
-      // Log final session status
-      if (sessionReady) {
-        window.AuthDebugMonitor?.log('info', '✅ Session ready - waiting for user to click reload button');
-        // Auto-close modal in automated flows (e.g., Selenium) to avoid blocking pages
-        const modalInstance = window.bootstrap?.Modal?.getInstance(modalEl) || (window.bootstrap?.Modal ? new window.bootstrap.Modal(modalEl) : null);
-        if (modalInstance) {
-          modalInstance.hide();
-        }
-        modalEl.classList.remove('show');
-        modalEl.style.display = 'none';
-        // Remove from navigation stack if present
-        if (window.ModalNavigationService?.pop) {
-          window.ModalNavigationService.pop(modalId);
-        }
-        // Update z-index stack
-        if (window.ModalZIndexManager?.forceUpdate) {
-          window.ModalZIndexManager.forceUpdate();
-        }
-        // Remove element after a short delay to allow transitions
-        setTimeout(() => modalEl.remove(), 150);
-      } else {
-        window.AuthDebugMonitor?.log('error', '❌ Session NOT ready after 5 attempts', {
-          lastError: sessionError
-        });
-        
-        // Show error in success message
-        const successDiv = document.getElementById('loginSuccess');
-        if (successDiv) {
-          const errorMsg = document.createElement('div');
-          errorMsg.style.color = '#dc3545';
-          errorMsg.style.marginTop = '0.5rem';
-          errorMsg.style.fontSize = '0.9rem';
-          errorMsg.textContent = `⚠️ אזהרה: אימות סשן נכשל. שגיאה: ${sessionError}`;
-          successDiv.appendChild(errorMsg);
-        }
+      modalEl.classList.remove('show');
+      modalEl.style.display = 'none';
+      // Remove from navigation stack if present
+      if (window.ModalNavigationService?.pop) {
+        window.ModalNavigationService.pop(modalId);
       }
-      
-      // Verify cache state
-      const cacheCheck = await window.AuthDebugMonitor?.checkCacheKeys();
-      window.AuthDebugMonitor?.log('info', '🔍 Final cache state before reload', cacheCheck);
-      
-      // Don't close modal or reload automatically - wait for user to click reload button
-      // The reload button is shown in showLoginSuccess with showReloadButton=true
-      
-      if (window.DEBUG_AUTH_MONITOR === true) debugger; // Breakpoint helper
+      // Update z-index stack
+      if (window.ModalZIndexManager?.forceUpdate) {
+        window.ModalZIndexManager.forceUpdate();
+      }
+      // Remove element after a short delay to allow transitions
+      setTimeout(() => modalEl.remove(), 150);
     });
   } else {
     window.Logger?.error?.('❌ [auth.js] Container not found', { page: 'auth' });

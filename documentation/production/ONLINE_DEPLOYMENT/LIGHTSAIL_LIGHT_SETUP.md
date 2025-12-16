@@ -29,20 +29,27 @@
 ### 2. התקנת סביבת הפיתוח
 
 1. התחבר ב־SSH:
+
    ```bash
    ssh ubuntu@<Lightsail-IP>
    ```
+
 2. התקן Python 3.11, PostgreSQL 15, Git:
+
    ```bash
    sudo apt update
    sudo apt install -y python3.11 python3.11-venv python3-pip postgresql postgresql-contrib git
    ```
+
 3. צור משתמש `tiktrack` (אופציונלי) ושלוט בזכויות:
+
    ```bash
    sudo adduser tiktrack
    sudo usermod -aG sudo tiktrack
    ```
+
 4. Clone את הקוד:
+
    ```bash
    sudo -u tiktrack -H bash -c "
    git clone https://github.com/WaldNimrod/TikTrack.git /home/tiktrack/TikTrackApp-Online
@@ -54,25 +61,32 @@
 ### 3. הגדרת PostgreSQL
 
 1. התחבר ל־psql ויצור DB:
+
    ```bash
    sudo -u postgres createdb TikTrack-db-testing
    ```
+
 2. ייבא את ה־schema/נתונים מהמחשב המקומי (העתק `pg_dump`):
+
    ```bash
    sudo -u postgres psql TikTrack-db-testing < /path/to/backup.dump
    ```
+
 3. ודא שה־POSTGRES_USER וה־PASSWORD מוגדרים ב־`production/Backend/config/settings.py`.
 
 ### 4. קונפיגורציה והרצה
 
 1. צא ללייב:
+
    ```bash
    cd /home/tiktrack/TikTrackApp-Online/production
    python3.11 -m venv .venv
    source .venv/bin/activate
    pip install -r Backend/requirements.txt
    ```
+
 2. הדגש את הערכים:
+
    ```bash
    export TIKTRACK_ENV=testing
    export POSTGRES_DB=TikTrack-db-testing
@@ -80,20 +94,26 @@
    export POSTGRES_USER=TikTrakDBAdmin
    export POSTGRES_PASSWORD="BigMeZoo1974!?"
    ```
+
 3. הרץ `start_server.sh`:
+
    ```bash
    cd Backend
    ./start_server.sh
    ```
+
 4. אם רוצים, הפעל `systemd` service ל־`start_server.sh` כדי שהוא יתחיל מחדש.
 
 ### 5. HTTPS ו־DNS
 
 1. התקן nginx ו־Certbot:
+
    ```bash
    sudo apt install -y nginx certbot python3-certbot-nginx
    ```
+
 2. צור קובץ nginx שמפנה 5001:
+
    ```nginx
    server {
      listen 80;
@@ -105,10 +125,13 @@
      }
    }
    ```
+
 3. קבל SSL:
+
    ```bash
    sudo certbot --nginx -d tiktrack.nimrod.bio
    ```
+
 4. ודא שה־DNS `tiktrack.nimrod.bio` מנוהל בשרת הקיים ומצביע על Static IP.
 
 ## 🧪 ניטור, גיבוי ובדיקות
@@ -133,6 +156,7 @@
 - גישה פתוחה ונוחות לפרזנטציה.  
 - ניתן להרחיב בעתיד ל־Nginx/SSL מלא ופיצול DB.  
 - הקפד לעדכן את DNS, לשמור על environment נכונים ולבצע גיבויים מתמשכים.
+
 
 
 

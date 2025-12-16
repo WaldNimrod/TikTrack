@@ -9,6 +9,39 @@
  * @lastUpdated 2025-01-27
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - initializeHeader() - Initializeheader
+// - initWeeklyPLChart() - Initweeklyplchart
+// - initTabs() - Inittabs
+// - createQuickLinksActionsMenu() - Createquicklinksactionsmenu
+// - setupQuickLinksPositioning() - Setupquicklinkspositioning
+// - setupQuickLinks() - Setupquicklinks
+// - initializeWidgets() - Initializewidgets
+// - initializePage() - Initializepage
+
+// === UI Functions ===
+// - updateChartLabels() - Updatechartlabels
+// - updateDailyStats() - Updatedailystats
+// - updatePLStats() - Updateplstats
+// - updateMarketValueStats() - Updatemarketvaluestats
+// - refreshWidget() - Refreshwidget
+
+// === Data Functions ===
+// - getCSSVariableValue() - Getcssvariablevalue
+// - getDateRangeData() - Getdaterangedata
+
+// === Utility Functions ===
+// - formatValue() - Formatvalue
+// - check() - Check
+
+// === Other ===
+// - toggleChartDateRangeMenu() - Togglechartdaterangemenu
+// - selectChartDateRange() - Selectchartdaterange
+// - waitForSystem() - Waitforsystem
+
 (function() {
     'use strict';
 
@@ -154,11 +187,17 @@
             // Update total value label
             const totalValueElement = document.getElementById('chartTotalValue');
             if (totalValueElement && typeof window.FieldRendererService !== 'undefined') {
-                totalValueElement.innerHTML = window.FieldRendererService.renderNumericValue(
+                const htmlContent = window.FieldRendererService.renderNumericValue(
                     totalValue,
                     '$',
                     false
                 );
+                totalValueElement.textContent = '';
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(htmlContent, 'text/html');
+                doc.body.childNodes.forEach(node => {
+                    totalValueElement.appendChild(node.cloneNode(true));
+                });
                 // Update color based on value
                 totalValueElement.className = 'chart-label-value ' + (totalValue >= 0 ? 'text-success' : 'text-danger');
             } else if (totalValueElement) {
@@ -169,11 +208,17 @@
             // Update change percent label - use finalChangePercent that has consistent sign
             const changePercentElement = document.getElementById('chartChangePercent');
             if (changePercentElement && typeof window.FieldRendererService !== 'undefined') {
-                changePercentElement.innerHTML = window.FieldRendererService.renderNumericValue(
+                const htmlContent = window.FieldRendererService.renderNumericValue(
                     finalChangePercent,
                     '%',
                     true
                 );
+                changePercentElement.textContent = '';
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(htmlContent, 'text/html');
+                doc.body.childNodes.forEach(node => {
+                    changePercentElement.appendChild(node.cloneNode(true));
+                });
                 changePercentElement.className = 'chart-label-value ' + (finalChangePercent >= 0 ? 'text-success' : 'text-danger');
             } else if (changePercentElement) {
                 changePercentElement.textContent = finalChangePercent > 0 ? `+${finalChangePercent.toFixed(2)}%` : `${finalChangePercent.toFixed(2)}%`;
@@ -345,7 +390,11 @@
                 window.Logger.info('✅ P/L chart initialized', { page: 'history-widget', dateRange: currentChartDateRange });
             }
         } catch (error) {
-            if (window.Logger) {
+            const errorMsg = error?.message || (typeof error === 'string' ? error : 'שגיאה לא ידועה');
+            if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {
+                window.NotificationSystem.showError('שגיאה בטעינת גרף P/L', 
+                    `לא ניתן לטעון את גרף הרווח/הפסד. ${errorMsg}`);
+            } else if (window.Logger) {
                 window.Logger.error('Error initializing P/L chart', { 
                     page: 'history-widget', 
                     error 
@@ -354,7 +403,11 @@
             // Show error message in container
             const container = document.getElementById('weeklyPLChartContainer');
             if (container) {
-                container.innerHTML = '<div class="text-muted text-center p-3">שגיאה בטעינת הגרף</div>';
+                container.innerHTML.textContent = '';
+        const div = document.createElement('div');
+        div.className = 'text-muted text-center p-3';
+        div.textContent = 'שגיאה בטעינת הגרף';
+        container.innerHTML.appendChild(div);
             }
         }
     }
@@ -380,14 +433,22 @@
                 { ticker: 'ALAB', fullName: 'ASTERA LABS INC', dailyPL: -46.0, change: 6.00, lastPrice: 147.80, priceChangePercent: 4.23 }
             ];
 
-            tbody.innerHTML = '';
+            tbody.textContent = '';
             
             dailyData.forEach(item => {
                 const row = document.createElement('tr');
                 
                 // Instrument (Ticker + Full Name)
                 const instrumentCell = document.createElement('td');
-                instrumentCell.innerHTML = `<div><strong>${item.ticker}</strong></div><div class="text-muted small">${item.fullName}</div>`;
+                instrumentCell.textContent = '';
+        // Convert HTML string to DOM elements safely
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(`<div><strong>${item.ticker}</strong></div><div class="text-muted small">${item.fullName}</div>`, 'text/html');
+        const fragment = document.createDocumentFragment();
+        Array.from(doc.body.childNodes).forEach(node => {
+            fragment.appendChild(node.cloneNode(true));
+        });
+        instrumentCell.appendChild(fragment);
                 row.appendChild(instrumentCell);
                 
                 // Daily P&L / Change
@@ -409,14 +470,35 @@
                     changeHtml = item.change > 0 ? `+${item.change.toFixed(2)}` : `${item.change.toFixed(3)}`;
                 }
                 
-                plChangeCell.innerHTML = `<div>${plHtml}</div><div class="small">${changeHtml}</div>`;
+                plChangeCell.textContent = '';
+                const plDiv = document.createElement('div');
+                const parser = new DOMParser();
+                const plDoc = parser.parseFromString(plHtml, 'text/html');
+                plDoc.body.childNodes.forEach(node => {
+                    plDiv.appendChild(node.cloneNode(true));
+                });
+                plChangeCell.appendChild(plDiv);
+                const changeDiv = document.createElement('div');
+                changeDiv.className = 'small';
+                changeDiv.textContent = changeHtml;
+                plChangeCell.appendChild(changeDiv);
                 row.appendChild(plChangeCell);
                 
                 // Last Price (with percentage change)
                 const lastPriceCell = document.createElement('td');
                 const priceColor = item.priceChangePercent >= 0 ? 'text-success' : 'text-danger';
                 const priceSign = item.priceChangePercent >= 0 ? '+' : '';
-                lastPriceCell.innerHTML = `<div class="${priceColor}"><strong>${item.lastPrice.toFixed(2)}</strong></div><div class="small ${priceColor}">${priceSign}${item.priceChangePercent.toFixed(2)}%</div>`;
+                lastPriceCell.textContent = '';
+                const priceDiv = document.createElement('div');
+                priceDiv.className = priceColor;
+                const strong = document.createElement('strong');
+                strong.textContent = item.lastPrice.toFixed(2);
+                priceDiv.appendChild(strong);
+                lastPriceCell.appendChild(priceDiv);
+                const percentDiv = document.createElement('div');
+                percentDiv.className = `small ${priceColor}`;
+                percentDiv.textContent = `${priceSign}${item.priceChangePercent.toFixed(2)}%`;
+                lastPriceCell.appendChild(percentDiv);
                 row.appendChild(lastPriceCell);
                 
                 tbody.appendChild(row);
@@ -467,14 +549,23 @@
                 { ticker: 'QUBT', fullName: 'QUANTUM COMPUTIN...', unrealizedPL: -1380, mktVal: 5730, lastPrice: 11.49, priceChangePercent: 12.60 }
             ];
 
-            tbody.innerHTML = '';
+            tbody.textContent = '';
             
             plData.forEach(item => {
                 const row = document.createElement('tr');
                 
                 // Instrument (Ticker + Full Name)
                 const instrumentCell = document.createElement('td');
-                instrumentCell.innerHTML = `<div><strong>${item.ticker}</strong></div><div class="text-muted small">${item.fullName}</div>`;
+                instrumentCell.textContent = '';
+                const tickerDiv = document.createElement('div');
+                const strong = document.createElement('strong');
+                strong.textContent = item.ticker;
+                tickerDiv.appendChild(strong);
+                instrumentCell.appendChild(tickerDiv);
+                const nameDiv = document.createElement('div');
+                nameDiv.className = 'text-muted small';
+                nameDiv.textContent = item.fullName;
+                instrumentCell.appendChild(nameDiv);
                 row.appendChild(instrumentCell);
                 
                 // Unrealized P&L / Market Value
@@ -483,17 +574,34 @@
                 const plValue = formatValue(item.unrealizedPL);
                 const mktValValue = formatValue(item.mktVal);
                 
-                plMktValCell.innerHTML = `
-                    <div class="${plColor}"><strong>${plValue}K</strong></div>
-                    <div class="small text-muted">${mktValValue}K</div>
-                `;
+                plMktValCell.textContent = '';
+                const plDiv = document.createElement('div');
+                plDiv.className = plColor;
+                const plStrong = document.createElement('strong');
+                plStrong.textContent = `${plValue}K`;
+                plDiv.appendChild(plStrong);
+                plMktValCell.appendChild(plDiv);
+                const mktValDiv = document.createElement('div');
+                mktValDiv.className = 'small text-muted';
+                mktValDiv.textContent = `${mktValValue}K`;
+                plMktValCell.appendChild(mktValDiv);
                 row.appendChild(plMktValCell);
                 
                 // Last Price (with percentage change)
                 const lastPriceCell = document.createElement('td');
                 const priceColor = item.priceChangePercent >= 0 ? 'text-success' : 'text-danger';
                 const priceSign = item.priceChangePercent >= 0 ? '+' : '';
-                lastPriceCell.innerHTML = `<div class="${priceColor}"><strong>${item.lastPrice.toFixed(2)}</strong></div><div class="small ${priceColor}">${priceSign}${item.priceChangePercent.toFixed(2)}%</div>`;
+                lastPriceCell.textContent = '';
+                const priceDiv = document.createElement('div');
+                priceDiv.className = priceColor;
+                const strong = document.createElement('strong');
+                strong.textContent = item.lastPrice.toFixed(2);
+                priceDiv.appendChild(strong);
+                lastPriceCell.appendChild(priceDiv);
+                const percentDiv = document.createElement('div');
+                percentDiv.className = `small ${priceColor}`;
+                percentDiv.textContent = `${priceSign}${item.priceChangePercent.toFixed(2)}%`;
+                lastPriceCell.appendChild(percentDiv);
                 row.appendChild(lastPriceCell);
                 
                 tbody.appendChild(row);
@@ -533,14 +641,23 @@
                 { ticker: 'IBIT', fullName: 'ISHARES BITCOIN TRU...', mktVal: 25300, position: 500, lastPrice: 50.62, priceChangePercent: 5.52 }
             ];
 
-            tbody.innerHTML = '';
+            tbody.textContent = '';
             
             marketValueData.forEach(item => {
                 const row = document.createElement('tr');
                 
                 // Instrument (Ticker + Full Name)
                 const instrumentCell = document.createElement('td');
-                instrumentCell.innerHTML = `<div><strong>${item.ticker}</strong></div><div class="text-muted small">${item.fullName}</div>`;
+                instrumentCell.textContent = '';
+                const tickerDiv = document.createElement('div');
+                const strong = document.createElement('strong');
+                strong.textContent = item.ticker;
+                tickerDiv.appendChild(strong);
+                instrumentCell.appendChild(tickerDiv);
+                const nameDiv = document.createElement('div');
+                nameDiv.className = 'text-muted small';
+                nameDiv.textContent = item.fullName;
+                instrumentCell.appendChild(nameDiv);
                 row.appendChild(instrumentCell);
                 
                 // Market Value / Position
@@ -548,17 +665,33 @@
                 const mktValValue = formatValue(item.mktVal);
                 const positionValue = item.position >= 1000 ? `${(item.position / 1000).toFixed(2)}K` : item.position.toString();
                 
-                mktValPositionCell.innerHTML = `
-                    <div><strong>${mktValValue}K</strong></div>
-                    <div class="small text-muted">${positionValue}</div>
-                `;
+                mktValPositionCell.textContent = '';
+                const mktValDiv = document.createElement('div');
+                const mktValStrong = document.createElement('strong');
+                mktValStrong.textContent = `${mktValValue}K`;
+                mktValDiv.appendChild(mktValStrong);
+                mktValPositionCell.appendChild(mktValDiv);
+                const positionDiv = document.createElement('div');
+                positionDiv.className = 'small text-muted';
+                positionDiv.textContent = positionValue;
+                mktValPositionCell.appendChild(positionDiv);
                 row.appendChild(mktValPositionCell);
                 
                 // Last Price (with percentage change)
                 const lastPriceCell = document.createElement('td');
                 const priceColor = item.priceChangePercent >= 0 ? 'text-success' : 'text-danger';
                 const priceSign = item.priceChangePercent >= 0 ? '+' : '';
-                lastPriceCell.innerHTML = `<div class="${priceColor}"><strong>${item.lastPrice.toFixed(2)}</strong></div><div class="small ${priceColor}">${priceSign}${item.priceChangePercent.toFixed(2)}%</div>`;
+                lastPriceCell.textContent = '';
+                const priceDiv = document.createElement('div');
+                priceDiv.className = priceColor;
+                const strong = document.createElement('strong');
+                strong.textContent = item.lastPrice.toFixed(2);
+                priceDiv.appendChild(strong);
+                lastPriceCell.appendChild(priceDiv);
+                const percentDiv = document.createElement('div');
+                percentDiv.className = `small ${priceColor}`;
+                percentDiv.textContent = `${priceSign}${item.priceChangePercent.toFixed(2)}%`;
+                lastPriceCell.appendChild(percentDiv);
                 row.appendChild(lastPriceCell);
                 
                 tbody.appendChild(row);
@@ -643,34 +776,90 @@
 
     /**
      * Create Quick Links Actions Menu with icons and text
+     * Uses centralized Actions Menu Toolkit (window.createActionsMenu)
+     * 
+     * @param {Array} buttons - Array of button objects with icon, text, title, onclick
+     * @returns {Promise<string>} HTML string for actions menu
      */
-    function createQuickLinksActionsMenu(buttons) {
+    async function createQuickLinksActionsMenu(buttons) {
         if (!buttons || buttons.length === 0) {
             return '';
         }
         
-        const menuButtons = buttons.map((button) => {
-            const icon = button.icon || '../../images/icons/tabler/eye.svg';
-            const text = button.text || '';
-            const title = button.title || '';
-            const onclick = button.onclick || '';
+        // Use centralized Actions Menu Toolkit
+        if (typeof window.createActionsMenu === 'function') {
+            // Convert buttons to format expected by createActionsMenu
+            const formattedButtons = await Promise.all(buttons.map(async (button) => {
+                const iconPath = button.icon || '../../images/icons/tabler/eye.svg';
+                const text = button.text || '';
+                const title = button.title || 'קישור מהיר';
+                const onclick = button.onclick || '';
+                
+                // Get icon HTML (async for IconSystem)
+                let iconHtml = `<img src="${iconPath}" width="16" height="16" alt="${text}" class="icon me-1">`;
+                if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {
+                    try {
+                        const iconName = iconPath.split('/').pop().replace('.svg', '');
+                        iconHtml = await window.IconSystem.renderIcon('button', iconName, { size: '16', alt: text, class: 'icon me-1' });
+                    } catch (error) {
+                        // Fallback already set
+                    }
+                }
+                
+                // Store icon and text for later use
+                return {
+                    type: 'LINK',
+                    onclick: onclick,
+                    title: title,
+                    _iconHtml: iconHtml, // Store custom icon HTML
+                    _text: text // Store text
+                };
+            }));
             
-            return `<button class="btn actions-menu-item" data-variant="small" data-button-type="LINK" data-onclick='${onclick}' title="${title}" style="margin-right: 4px;">
-                <img src="${icon}" width="16" height="16" alt="${text}" class="icon me-1"> ${text}
-            </button>`;
-        }).join('');
+            // Use createActionsMenu to create the menu structure
+            const menuHtml = window.createActionsMenu(formattedButtons);
+            
+            if (menuHtml) {
+                // Parse and modify the HTML to add text to buttons
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(menuHtml, 'text/html');
+                const tempDiv = doc.body;
+                
+                const menuButtons = tempDiv.querySelectorAll('.actions-menu-item');
+                formattedButtons.forEach((button, index) => {
+                    if (menuButtons[index] && button._iconHtml && button._text) {
+                        // Replace icon with icon + text
+                        menuButtons[index].textContent = '';
+                        const parser2 = new DOMParser();
+                        const iconDoc = parser2.parseFromString(`${button._iconHtml} ${button._text}`, 'text/html');
+                        iconDoc.body.childNodes.forEach(node => {
+                            menuButtons[index].appendChild(node.cloneNode(true));
+                        });
+                    }
+                });
+                
+                // Add ID to wrapper for positioning
+                const wrapper = tempDiv.querySelector('.actions-menu-wrapper');
+                if (wrapper) {
+                    wrapper.id = 'quickLinksActionsMenuWrapper';
+                    const popup = wrapper.querySelector('.actions-menu-popup');
+                    if (popup) {
+                        popup.id = 'quickLinksActionsMenuPopup';
+                    }
+                    // Update tooltip for trigger button
+                    const trigger = wrapper.querySelector('.actions-trigger');
+                    if (trigger) {
+                        trigger.setAttribute('data-tooltip', 'קישורים מהירים');
+                    }
+                }
+                
+                return tempDiv.innerHTML;
+            }
+        }
         
-        // Get menu trigger icon - using ⋮ (three dots) if icon not available
-        const menuIcon = '<span style="font-size: 18px; line-height: 1;">⋮</span>';
-        
-        return `
-            <div class="actions-menu-wrapper" id="quickLinksActionsMenuWrapper">
-                <button class="btn actions-trigger" data-tooltip="קישורים מהירים" data-tooltip-placement="top" data-tooltip-trigger="hover">${menuIcon}</button>
-                <div class="actions-menu-popup" id="quickLinksActionsMenuPopup">
-                    ${menuButtons}
-                </div>
-            </div>
-        `;
+        // Fallback if createActionsMenu is not available
+        window.Logger?.warn('⚠️ [createQuickLinksActionsMenu] window.createActionsMenu not available, using fallback');
+        return '';
     }
     
     /**
@@ -734,7 +923,7 @@
      * Setup Quick Links
      * Creates actions menu for quick links (like table action menus)
      */
-    function setupQuickLinks() {
+    async function setupQuickLinks() {
         try {
             const container = document.getElementById('quickLinksActionsMenuContainer');
             if (!container) {
@@ -777,8 +966,13 @@
             ];
             
             // Custom create actions menu with icons and text
-            const actionsMenuHTML = createQuickLinksActionsMenu(quickLinksButtons);
-            container.innerHTML = actionsMenuHTML;
+            const actionsMenuHTML = await createQuickLinksActionsMenu(quickLinksButtons);
+            container.textContent = '';
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(actionsMenuHTML, 'text/html');
+            doc.body.childNodes.forEach(node => {
+                container.appendChild(node.cloneNode(true));
+            });
             
             // Setup positioning that checks available space
             setupQuickLinksPositioning();
@@ -811,6 +1005,12 @@
      */
     async function refreshWidget() {
         try {
+            // Show loading state
+            const widgetContainer = document.getElementById('history-widget-container') || document.querySelector('.history-widget-container');
+            if (widgetContainer && typeof window.showLoadingState === 'function') {
+                window.showLoadingState(widgetContainer.id || 'history-widget-container');
+            }
+            
             if (window.NotificationSystem) {
                 window.NotificationSystem.showInfo('מרענן נתונים...', 'רענון ווידג\'ט היסטוריה');
             }
@@ -822,6 +1022,11 @@
             updateDailyStats();
             updatePLStats();
             updateMarketValueStats();
+            
+            // Hide loading state
+            if (widgetContainer && typeof window.hideLoadingState === 'function') {
+                window.hideLoadingState(widgetContainer.id || 'history-widget-container');
+            }
 
             // Show success notification
             if (window.NotificationSystem) {
@@ -848,6 +1053,12 @@
      * Initialize all widgets
      */
     async function initializeWidgets() {
+        // Show loading state
+        const widgetContainer = document.getElementById('history-widget-container') || document.querySelector('.history-widget-container');
+        if (widgetContainer && typeof window.showLoadingState === 'function') {
+            window.showLoadingState(widgetContainer.id || 'history-widget-container');
+        }
+        
         try {
             // Wait for required systems to be available
             let retries = 0;
@@ -892,12 +1103,21 @@
 
             // Setup links
             setupQuickLinks();
+            
+            // Hide loading state
+            if (widgetContainer && typeof window.hideLoadingState === 'function') {
+                window.hideLoadingState(widgetContainer.id || 'history-widget-container');
+            }
 
             if (window.Logger) {
                 window.Logger.info('✅ All widgets initialized', { page: 'history-widget' });
             }
         } catch (error) {
-            if (window.Logger) {
+            const errorMsg = error?.message || (typeof error === 'string' ? error : 'שגיאה לא ידועה');
+            if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {
+                window.NotificationSystem.showError('שגיאה באתחול ווידג\'ט', 
+                    `לא ניתן לאתחל את הווידג'ט. ${errorMsg}`);
+            } else if (window.Logger) {
                 window.Logger.error('Error initializing widgets', { 
                     page: 'history-widget', 
                     error 

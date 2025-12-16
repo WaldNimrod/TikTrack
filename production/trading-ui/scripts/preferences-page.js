@@ -2,23 +2,23 @@
  * ==========================================
  * FUNCTION INDEX
  * ==========================================
- *
+ * 
  * This index lists all functions in this file, organized by category.
- *
+ * 
  * Total Functions: 4
- *
+ * 
  * PAGE INITIALIZATION (1)
  * - initializePreferencesPage() - initializePreferencesPage function
- *
+ * 
  * DATA LOADING (1)
  * - loadAccountsForPreferences() - loadAccountsForPreferences function
- *
+ * 
  * DATA MANIPULATION (1)
  * - createNewProfile() - createNewProfile function
- *
+ * 
  * OTHER (1)
  * - switchActiveProfile() - switchActiveProfile function
- *
+ * 
  * ==========================================
  */
 /**
@@ -253,7 +253,11 @@ async function loadAccountsForPreferences() {
         accountsBeforeFilter: accounts.length,
       });
 
-      accountSelect.innerHTML = '<option value="">בחר חשבון מסחר...</option>';
+      accountSelect.textContent = '';
+      const defaultOption = document.createElement('option');
+      defaultOption.value = '';
+      defaultOption.textContent = 'בחר חשבון מסחר...';
+      accountSelect.appendChild(defaultOption);
 
       const filteredAccounts = accounts.filter(account => 
         account && (account.status === 'open' || account.status === 'active' || account.is_active === true)
@@ -448,7 +452,12 @@ async function createNewProfile() {
     }
 
     // Clear input
-    nameInput.value = '';
+    // Use DataCollectionService to clear field if available
+    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+      window.DataCollectionService.setValue(nameInput.id, '', 'text');
+    } else {
+      nameInput.value = '';
+    }
 
     // Reload page after 1.5 seconds
     setTimeout(() => {
@@ -630,6 +639,10 @@ async function copyDetailedLogLocal() {
 // ==========================================================================
 
 const PreferenceTypesAudit = (() => {
+  const state = {
+    preferenceTypes: []
+  };
+
   const escapeSelector = value => {
     if (!value) {
       return '';
@@ -734,6 +747,44 @@ const PreferenceTypesAudit = (() => {
     label.textContent = `${baseText} (ID ${preferenceId})`;
   };
 
+  /**
+   * Register preference_types table with UnifiedTableSystem
+   */
+  const registerPreferenceTypesTable = () => {
+    if (!window.UnifiedTableSystem || !window.UnifiedTableSystem.registry) {
+      window.Logger?.warn?.('⚠️ UnifiedTableSystem not available for preference_types registration', { page: 'preferences' });
+      return false;
+    }
+
+    const tableType = 'preference_types';
+
+    if (window.UnifiedTableSystem.registry.isRegistered && window.UnifiedTableSystem.registry.isRegistered(tableType)) {
+      window.Logger?.debug?.('ℹ️ Preference types table already registered', { page: 'preferences' });
+      return true;
+    }
+
+    window.UnifiedTableSystem.registry.register(tableType, {
+      dataGetter: () => {
+        return PreferenceTypesAudit.state?.preferenceTypes || [];
+      },
+      updateFunction: (data) => {
+        // Update state and re-render
+        if (PreferenceTypesAudit.state) {
+          PreferenceTypesAudit.state.preferenceTypes = Array.isArray(data) ? data : [];
+          renderPreferenceTypesAuditTable();
+        }
+      },
+      tableSelector: '#preferenceTypesAuditTable',
+      columns: window.TABLE_COLUMN_MAPPINGS?.preference_types || [],
+      sortable: true,
+      filterable: true,
+      defaultSort: { columnIndex: 0, direction: 'asc' }
+    });
+
+    window.Logger?.info?.('✅ Registered preference_types table with UnifiedTableSystem', { page: 'preferences' });
+    return true;
+  };
+
   const renderPreferenceTypesAuditTable = async () => {
     const container = document.getElementById('preferenceTypesAuditContainer');
     const tableBody = document.getElementById('preferenceTypesAuditTableBody');
@@ -755,7 +806,14 @@ const PreferenceTypesAudit = (() => {
       return;
     }
 
-    tableBody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">טוען נתונים...</td></tr>';
+    tableBody.textContent = '';
+    const row = document.createElement('tr');
+    const cell = document.createElement('td');
+    cell.colSpan = 6;
+    cell.className = 'text-center text-muted';
+    cell.textContent = 'טוען נתונים...';
+    row.appendChild(cell);
+    tableBody.appendChild(row);
 
     try {
       window.Logger?.info('📡 [Types Table] Calling PreferencesData.loadPreferenceTypes', {
@@ -775,6 +833,9 @@ const PreferenceTypesAudit = (() => {
       });
 
       const { types = [] } = result || {};
+      
+      // Update state for UnifiedTableSystem
+      state.preferenceTypes = types;
 
       window.Logger?.info('📋 [Types Table] Preference types audit payload received', {
         page: 'preferences-page',
@@ -823,7 +884,14 @@ const PreferenceTypesAudit = (() => {
           page: 'preferences-page',
           result: result,
         });
-        tableBody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">לא נמצאו סוגי העדפות.</td></tr>';
+        tableBody.textContent = '';
+        const row = document.createElement('tr');
+        const cell = document.createElement('td');
+        cell.colSpan = 6;
+        cell.className = 'text-center text-muted';
+        cell.textContent = 'לא נמצאו סוגי העדפות.';
+        row.appendChild(cell);
+        tableBody.appendChild(row);
         return;
       }
 
@@ -873,7 +941,7 @@ const PreferenceTypesAudit = (() => {
         fragment.appendChild(row);
       });
 
-      tableBody.innerHTML = '';
+      tableBody.textContent = '';
       tableBody.appendChild(fragment);
 
       window.Logger?.info('✅ [Types Table] Preference types audit table rendered successfully', {
@@ -888,16 +956,42 @@ const PreferenceTypesAudit = (() => {
         errorStack: error.stack,
         errorName: error.name,
       });
-      tableBody.innerHTML = `<tr><td colspan="6" class="text-center text-danger">שגיאה בטעינת הנתונים: ${error.message}</td></tr>`;
+      tableBody.textContent = '';
+      const row = document.createElement('tr');
+      const cell = document.createElement('td');
+      cell.colSpan = 6;
+      cell.className = 'text-center text-danger';
+      cell.textContent = `שגיאה בטעינת הנתונים: ${error.message}`;
+      row.appendChild(cell);
+      tableBody.appendChild(row);
     }
   };
 
   return {
     renderPreferenceTypesAuditTable,
+    registerPreferenceTypesTable,
   };
 })();
 
 window.renderPreferenceTypesAuditTable = PreferenceTypesAudit.renderPreferenceTypesAuditTable;
+window.registerPreferenceTypesTable = PreferenceTypesAudit.registerPreferenceTypesTable;
+
+// Auto-register table when page loads
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+      if (typeof window.registerPreferenceTypesTable === 'function') {
+        window.registerPreferenceTypesTable();
+      }
+    }, 1000);
+  });
+} else {
+  setTimeout(() => {
+    if (typeof window.registerPreferenceTypesTable === 'function') {
+      window.registerPreferenceTypesTable();
+    }
+  }, 1000);
+}
 
 /**
  * Initialize page-specific functionality

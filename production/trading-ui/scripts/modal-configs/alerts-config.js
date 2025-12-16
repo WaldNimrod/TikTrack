@@ -7,6 +7,15 @@
  * @lastUpdated January 27, 2025
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - initializeAlertsModal() - Initializealertsmodal
+
+// === Data Functions ===
+// - saveAlertFallback() - Savealertfallback
+
 // קונפיגורציה למודל התראות
 const alertsModalConfig = {
     id: 'alertsModal',
@@ -304,12 +313,12 @@ async function saveAlertFallback() {
     const statusHidden = form.querySelector('#alertStatus_hidden');
     const isTriggeredHidden = form.querySelector('#alertIsTriggered_hidden');
     
-    // Collect basic form data
-    const relatedType = form.querySelector('#alertRelatedType')?.value || '';
-    const relatedId = form.querySelector('#alertRelatedObject')?.value || '';
-    const conditionAttribute = form.querySelector('#alertType')?.value || '';
-    const conditionOperator = form.querySelector('#alertCondition')?.value || '';
-    const conditionNumber = form.querySelector('#alertValue')?.value || '';
+    // Collect basic form data - use DataCollectionService if available
+    const relatedType = window.DataCollectionService?.getValue('alertRelatedType', 'text', '') || '';
+    const relatedId = window.DataCollectionService?.getValue('alertRelatedObject', 'text', '') || '';
+    const conditionAttribute = window.DataCollectionService?.getValue('alertType', 'text', '') || '';
+    const conditionOperator = window.DataCollectionService?.getValue('alertCondition', 'text', '') || '';
+    const conditionNumber = window.DataCollectionService?.getValue('alertValue', 'text', '') || '';
     const expiryDate = form.querySelector('#alertExpiryDate')?.value || null;
     
     // Get status and is_triggered from hidden fields (preferred) or parse from combined field

@@ -7,6 +7,20 @@
  * @lastUpdated January 27, 2025
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Functions ===
+// - initializeTradingAccountsModal() - Initializetradingaccountsmodal
+// - waitForModalManager() - Waitformodalmanager
+// - waitForModalManager() - Waitformodalmanager
+
+// === Initialization ===
+// - initializeTradingAccountsModal() - Initializetradingaccountsmodal
+// === Functions ===
+// - initializeTradingAccountsModal() - Initializetradingaccountsmodal
+// - waitForModalManager() - Waitformodalmanager
+
 // קונפיגורציה למודל חשבונות מסחר
 const tradingAccountsModalConfig = {
     id: 'tradingAccountsModal',

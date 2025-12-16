@@ -12,6 +12,20 @@
  * Documentation: See documentation/02-ARCHITECTURE/FRONTEND/TRADINGVIEW_LIGHTWEIGHT_CHARTS/
  */
 
+
+// ===== FUNCTION INDEX =====
+// === Class Methods ===
+// - TradingViewTheme.getChartColors() - Getchartcolors
+// - TradingViewTheme.getEntityColorForSeries() - Getentitycolorforseries
+// - TradingViewTheme.getSeriesColor() - Getseriescolor
+// - TradingViewTheme.getThemeOptions() - Getthemeoptions
+
+// === Data Functions ===
+// - getCSSVariableValue() - Getcssvariablevalue
+
+// === Other ===
+// - hexToRgba() - Hextorgba
+
 (function() {
     'use strict';
 
@@ -129,22 +143,33 @@
             
             // Priority 1: Get colors from user preferences (chart-specific)
             // עדיפות ראשונה: צבעים מהעדפות המשתמש לגרפים
+            // שימוש במערכת המרכזית - הסרת fallbacks hardcoded
             const backgroundColor = getCSSVariableValue('--chart-background-color', 
-                getCSSVariableValue('--card-background', '#ffffff'));
+                getCSSVariableValue('--card-background', ''));
             const textColor = getCSSVariableValue('--chart-text-color', 
-                getCSSVariableValue('--text-color', '#000000'));
+                getCSSVariableValue('--text-color', ''));
             const gridColor = getCSSVariableValue('--chart-grid-color', 
-                getCSSVariableValue('--border-color', '#e0e0e0'));
+                getCSSVariableValue('--border-color', ''));
             const borderColor = getCSSVariableValue('--chart-border-color', 
-                getCSSVariableValue('--border-color', '#e0e0e0'));
+                getCSSVariableValue('--border-color', ''));
             
-            // Fallback colors for general use
-            const primaryColor = getCSSVariableValue('--primary-color', '#26baac');
-            const successColor = getCSSVariableValue('--success-color', '#28a745');
-            const warningColor = getCSSVariableValue('--warning-color', '#ffc107');
-            const dangerColor = getCSSVariableValue('--danger-color', '#dc3545');
-            const infoColor = getCSSVariableValue('--info-color', '#17a2b8');
-            const mutedColor = getCSSVariableValue('--muted-color', '#6c757d');
+            // Fallback colors for general use - שימוש במערכת המרכזית
+            const getEntityColorFn = (typeof window.getEntityColor === 'function') ? window.getEntityColor : null;
+            const getNumericColorFn = (typeof window.getNumericValueColor === 'function') ? window.getNumericValueColor : null;
+            const getStatusColorFn = (typeof window.getStatusColor === 'function') ? window.getStatusColor : null;
+            
+            const primaryColor = getCSSVariableValue('--primary-color', 
+                (getEntityColorFn ? getEntityColorFn('trade') : '') || '');
+            const successColor = getCSSVariableValue('--success-color', 
+                (getNumericColorFn ? getNumericColorFn(1, 'medium') : '') || '');
+            const warningColor = getCSSVariableValue('--warning-color', 
+                (getStatusColorFn ? getStatusColorFn('warning', 'medium') : '') || '');
+            const dangerColor = getCSSVariableValue('--danger-color', 
+                (getNumericColorFn ? getNumericColorFn(-1, 'medium') : '') || '');
+            const infoColor = getCSSVariableValue('--info-color', 
+                (getEntityColorFn ? getEntityColorFn('ticker') : '') || '');
+            const mutedColor = getCSSVariableValue('--muted-color', 
+                (getEntityColorFn ? getEntityColorFn('preference') : '') || '');
 
             const options = {
                 layout: {
@@ -203,13 +228,24 @@
          * @returns {string} Color string
          */
         getSeriesColor(type = 'primary', alpha = 1) {
+            // שימוש במערכת המרכזית - הסרת fallbacks hardcoded
+            const getEntityColorFn = (typeof window.getEntityColor === 'function') ? window.getEntityColor : null;
+            const getNumericColorFn = (typeof window.getNumericValueColor === 'function') ? window.getNumericValueColor : null;
+            const getStatusColorFn = (typeof window.getStatusColor === 'function') ? window.getStatusColor : null;
+            
             const colorMap = {
-                primary: getCSSVariableValue('--primary-color', '#26baac'),
-                success: getCSSVariableValue('--success-color', '#28a745'),
-                warning: getCSSVariableValue('--warning-color', '#ffc107'),
-                danger: getCSSVariableValue('--danger-color', '#dc3545'),
-                info: getCSSVariableValue('--info-color', '#17a2b8'),
-                muted: getCSSVariableValue('--muted-color', '#6c757d'),
+                primary: getCSSVariableValue('--primary-color', 
+                    (getEntityColorFn ? getEntityColorFn('trade') : '') || ''),
+                success: getCSSVariableValue('--success-color', 
+                    (getNumericColorFn ? getNumericColorFn(1, 'medium') : '') || ''),
+                warning: getCSSVariableValue('--warning-color', 
+                    (getStatusColorFn ? getStatusColorFn('warning', 'medium') : '') || ''),
+                danger: getCSSVariableValue('--danger-color', 
+                    (getNumericColorFn ? getNumericColorFn(-1, 'medium') : '') || ''),
+                info: getCSSVariableValue('--info-color', 
+                    (getEntityColorFn ? getEntityColorFn('ticker') : '') || ''),
+                muted: getCSSVariableValue('--muted-color', 
+                    (getEntityColorFn ? getEntityColorFn('preference') : '') || ''),
             };
 
             const color = colorMap[type] || colorMap.primary;
@@ -229,19 +265,20 @@
          * @returns {Object} Colors object
          */
         getChartColors() {
+            // שימוש במערכת המרכזית - הסרת fallbacks hardcoded
             return {
                 // Priority 1: User preferences for charts
                 primary: getCSSVariableValue('--chart-primary-color', this.getSeriesColor('primary')),
                 background: getCSSVariableValue('--chart-background-color', 
-                    getCSSVariableValue('--card-background', '#ffffff')),
+                    getCSSVariableValue('--card-background', '')),
                 text: getCSSVariableValue('--chart-text-color', 
-                    getCSSVariableValue('--text-color', '#000000')),
+                    getCSSVariableValue('--text-color', '')),
                 grid: getCSSVariableValue('--chart-grid-color', 
-                    getCSSVariableValue('--border-color', '#e0e0e0')),
+                    getCSSVariableValue('--border-color', '')),
                 border: getCSSVariableValue('--chart-border-color', 
-                    getCSSVariableValue('--border-color', '#e0e0e0')),
+                    getCSSVariableValue('--border-color', '')),
                 point: getCSSVariableValue('--chart-point-color', this.getSeriesColor('primary')),
-                // Fallback colors
+                // Fallback colors - שימוש במערכת המרכזית
                 success: this.getSeriesColor('success'),
                 warning: this.getSeriesColor('warning'),
                 danger: this.getSeriesColor('danger'),

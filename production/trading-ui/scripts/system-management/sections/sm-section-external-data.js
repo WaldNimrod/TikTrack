@@ -10,6 +10,19 @@
  * @author TikTrack Development Team
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Utility Functions ===
+// - formatNumberValue() - Formatnumbervalue
+// - formatPercentValue() - Formatpercentvalue
+// - formatDateTimeValue() - Formatdatetimevalue
+// - formatRelativeTimeValue() - Formatrelativetimevalue
+
+// === Other ===
+// - sanitizeText() - Sanitizetext
+// - setElementText() - Setelementtext
+
 class SMExternalDataSection extends SMBaseSection {
   constructor(sectionId, config) {
     super(sectionId, { autoRefresh: true, refreshInterval: 120000, ...config });
@@ -18,43 +31,64 @@ class SMExternalDataSection extends SMBaseSection {
   }
 
   async ensureDashboard() {
-    if (!window.externalDataDashboard) {
-      if (typeof window.ExternalDataDashboard !== 'function') {
-        throw new Error('ExternalDataDashboard is not available');
+    // Try to get existing dashboard instance
+    if (window.externalDataDashboard) {
+      if (!window.externalDataDashboard.isInitialized) {
+        await window.externalDataDashboard.init();
       }
+      return window.externalDataDashboard;
+    }
+    
+    // Try to create new instance if class is available
+    if (typeof window.ExternalDataDashboard === 'function') {
       window.externalDataDashboard = new window.ExternalDataDashboard();
+      if (!window.externalDataDashboard.isInitialized) {
+        await window.externalDataDashboard.init();
+      }
+      return window.externalDataDashboard;
     }
-
-    if (!window.externalDataDashboard.isInitialized) {
-      await window.externalDataDashboard.init();
-    }
-
-    return window.externalDataDashboard;
+    
+    // If dashboard is not available, return null and handle gracefully
+    // Note: ExternalDataDashboard is optional for system-management page
+    // It's only loaded on the external-data-dashboard page itself
+    return null;
   }
 
   async loadData() {
-    const dashboard = await this.ensureDashboard();
+    try {
+      const dashboard = await this.ensureDashboard();
+      
+      // If dashboard is not available, show empty state
+      if (!dashboard) {
+        this.showEmptyState('External Data Dashboard לא זמין - נא לטעון את העמוד מחדש');
+        return;
+      }
 
-    if (this.hasFetchedOnce) {
-      await Promise.allSettled([
-        dashboard.loadSystemStatus(),
-        dashboard.loadCacheStats(),
-        dashboard.loadProviders(),
-        dashboard.loadLogs()
-      ]);
-    } else {
-      this.hasFetchedOnce = true;
+      if (this.hasFetchedOnce) {
+        await Promise.allSettled([
+          dashboard.loadSystemStatus(),
+          dashboard.loadCacheStats(),
+          dashboard.loadProviders(),
+          dashboard.loadLogs()
+        ]);
+      } else {
+        this.hasFetchedOnce = true;
+      }
+
+      const data = {
+        status: dashboard.statusData || null,
+        cache: dashboard.cacheStats?.data || dashboard.cacheStats || null,
+        providers: Array.isArray(dashboard.providers) ? dashboard.providers : [],
+        logs: Array.isArray(dashboard.logs) ? dashboard.logs : []
+      };
+
+      this.lastData = data;
+      this.render(data);
+    } catch (error) {
+      console.error('❌ Failed to load external data:', error);
+      this.showEmptyState('שגיאה בטעינת נתוני External Data');
+      throw error;
     }
-
-    const data = {
-      status: dashboard.statusData || null,
-      cache: dashboard.cacheStats?.data || dashboard.cacheStats || null,
-      providers: Array.isArray(dashboard.providers) ? dashboard.providers : [],
-      logs: Array.isArray(dashboard.logs) ? dashboard.logs : []
-    };
-
-    this.lastData = data;
-    this.render(data);
   }
 
   ensureLayout() {
@@ -63,12 +97,17 @@ class SMExternalDataSection extends SMBaseSection {
     }
 
     this.container.classList.add('sm-external-data-container');
-    this.container.innerHTML = `
+    this.container.textContent = '';
+    const sectionHTML = `
       <div class="card">
         <div class="card-body">
           <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 mb-3">
             <h3 class="mb-0">מערכת נתונים חיצוניים</h3>
-            <div class="d-flex flex-wrap gap-2" id="smExtActions">
+            <div class="d-flex flex-wrap gap-2 align-items-center">
+              <a href="/external-data-dashboard" class="btn btn-sm btn-outline-primary me-2">
+                <i class="fas fa-external-link-alt me-1"></i> דשבורד מלא
+              </a>
+              <div id="smExtActions">
               <button data-button-type="REFRESH" data-text="רענון סטטוס" data-onclick="ExternalDataDashboardActions.refreshStatus(event)" data-refresh-after-action="true"></button>
               <button data-button-type="REFRESH" data-text="רענון ספקים" data-onclick="ExternalDataDashboardActions.refreshProviders(event)" data-refresh-after-action="true"></button>
               <button data-button-type="PLAY" data-text="רענון מלא" data-onclick="ExternalDataDashboardActions.refreshAllExternalData(event)" data-refresh-after-action="true"></button>
@@ -76,6 +115,7 @@ class SMExternalDataSection extends SMBaseSection {
               <button data-button-type="MENU" data-text="אופטימיזציה" data-onclick="ExternalDataDashboardActions.optimizeExternalCache(event)" data-refresh-after-action="true"></button>
               <button data-button-type="REFRESH" data-text="רענון לוגים" data-onclick="ExternalDataDashboardActions.refreshLogs(event)" data-size="small" data-refresh-after-action="true"></button>
               <button data-button-type="COPY" data-text="העתקת לוג" data-onclick="ExternalDataDashboardActions.copyDetailedLog(event)"></button>
+              </div>
             </div>
           </div>
 
@@ -175,7 +215,11 @@ class SMExternalDataSection extends SMBaseSection {
     }
 
     if (!providers || !providers.length) {
-      container.innerHTML = '<div class="list-group-item text-muted">אין נתונים זמינים</div>';
+      container.textContent = '';
+      const div = document.createElement('div');
+      div.className = 'list-group-item text-muted';
+      div.textContent = 'אין נתונים זמינים';
+      container.appendChild(div);
       return;
     }
 
@@ -212,9 +256,23 @@ class SMExternalDataSection extends SMBaseSection {
 
     if (providers.length > 5) {
       const additional = providers.length - 5;
-      container.innerHTML = `${items}<div class="list-group-item text-muted small">+${formatNumberValue(additional)} ספקים נוספים</div>`;
+      container.textContent = '';
+      const parser = new DOMParser();
+      const itemsDoc = parser.parseFromString(items, 'text/html');
+      itemsDoc.body.childNodes.forEach(node => {
+          container.appendChild(node.cloneNode(true));
+      });
+      const additionalDiv = document.createElement('div');
+      additionalDiv.className = 'list-group-item text-muted small';
+      additionalDiv.textContent = `+${formatNumberValue(additional)} ספקים נוספים`;
+      container.appendChild(additionalDiv);
     } else {
-      container.innerHTML = items;
+      container.textContent = '';
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(items, 'text/html');
+      doc.body.childNodes.forEach(node => {
+          container.appendChild(node.cloneNode(true));
+      });
     }
   }
 
@@ -225,7 +283,11 @@ class SMExternalDataSection extends SMBaseSection {
     }
 
     if (!logs || !logs.length) {
-      container.innerHTML = '<div class="list-group-item text-muted">אין אירועים אחרונים</div>';
+      container.textContent = '';
+      const div = document.createElement('div');
+      div.className = 'list-group-item text-muted';
+      div.textContent = 'אין אירועים אחרונים';
+      container.appendChild(div);
       return;
     }
 
@@ -244,7 +306,12 @@ class SMExternalDataSection extends SMBaseSection {
       `;
     }).join('');
 
-    container.innerHTML = items;
+    container.textContent = '';
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(items, 'text/html');
+    doc.body.childNodes.forEach(node => {
+        container.appendChild(node.cloneNode(true));
+    });
   }
 
   getLogLevelBadge(level) {

@@ -145,6 +145,14 @@ const TABLE_COLUMN_MAPPINGS = {
     { key: 'completed_at', sortType: 'dateEnvelope' }      // 9 - עודכן לאחרונה
   ],
 
+  // טבלת היסטוריית ניתוחי AI (AI Analysis History)
+  'ai_analysis_history': [
+    { key: 'template_name', sortType: 'string' },          // 0 - תבנית
+    { key: 'provider', sortType: 'string' },               // 1 - מנוע
+    { key: 'status', sortType: 'string' },                  // 2 - סטטוס
+    { key: 'created_at', sortType: 'dateEnvelope' }        // 3 - נוצר ב
+  ],
+
   // טבלת התראות (Alerts) - Alerts Page Structure (מוצג בפועל)
   'alerts': [
     'related_object',        // 0 - קשור ל (מחושב)
@@ -345,6 +353,12 @@ const TABLE_COLUMN_SORT_TYPES = {
     skipped_records: 'numeric',
     created_at: 'dateEnvelope',
     completed_at: 'dateEnvelope'
+  },
+  ai_analysis_history: {
+    template_name: 'string',
+    provider: 'string',
+    status: 'string',
+    created_at: 'dateEnvelope'
   },
   tickers: {
     symbol: 'string',
@@ -629,6 +643,15 @@ function getColumnValue(item, columnIndex, tableType) {
     if (!value && value !== 0) {
       return null;
     }
+    
+    // Use TableSortValueAdapter if available for consistent date parsing
+    if (typeof window.TableSortValueAdapter?.getSortValue === 'function') {
+      const sortValue = window.TableSortValueAdapter.getSortValue({ value: value, type: 'auto' });
+      if (typeof sortValue === 'number' && !Number.isNaN(sortValue)) {
+        return sortValue;
+      }
+    }
+    
     // If it's already a DateEnvelope object
     if (value && typeof value === 'object' && typeof value.epochMs === 'number' && !Number.isNaN(value.epochMs)) {
       return value.epochMs;
@@ -663,6 +686,16 @@ function getColumnValue(item, columnIndex, tableType) {
     if (typeof rawValue === 'number' && Number.isFinite(rawValue)) {
       return rawValue;
     }
+    
+    // Use TableSortValueAdapter if available for consistent date parsing
+    if (typeof window.TableSortValueAdapter?.getSortValue === 'function') {
+      const sortValue = window.TableSortValueAdapter.getSortValue({ value: rawValue, type: 'date' });
+      if (typeof sortValue === 'number' && !Number.isNaN(sortValue)) {
+        return sortValue;
+      }
+    }
+    
+    // Fallback to manual parsing
     if (typeof rawValue === 'string') {
       const trimmed = rawValue.trim();
       if (!trimmed) {

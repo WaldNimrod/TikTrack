@@ -13,6 +13,61 @@
  * - EventHandlerManager (global button actions)
  */
 class ConditionsUIManager {
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - buildActionsColumn() - Buildactionscolumn
+// - buildRow() - Buildrow
+// - buildTable() - Buildtable
+
+// === Event Handlers ===
+// - getEntityConditionIndex() - Getentityconditionindex
+// - getConditionOwnerIndex() - Getconditionownerindex
+// - getEvaluationCache() - Getevaluationcache
+// - getConditionActionMeta() - Getconditionactionmeta
+// - getConditionActionLabel() - Getconditionactionlabel
+// - getConditionMethodName() - Getconditionmethodname
+// - getConditionOperatorLabel() - Getconditionoperatorlabel
+// - getEvaluationRecord() - Getevaluationrecord
+// - formatEvaluationCell() - Formatevaluationcell
+// - formatActionCell() - Formatactioncell
+// - setConditions() - Setconditions
+// - getConditions() - Getconditions
+// - getCondition() - Getcondition
+// - setEvaluation() - Setevaluation
+// - clearEvaluation() - Clearevaluation
+// - confirmConditionDeletion() - Confirmconditiondeletion
+// - setButtonLoadingState() - Setbuttonloadingstate
+// - dispatchConditionsUpdated() - Dispatchconditionsupdated
+// - deleteConditionViaCrud() - Deleteconditionviacrud
+// - handleAddAnother() - Handleaddanother
+// - handleReturnToParent() - Handlereturntoparent
+// - handleReturnNavigation() - Handlereturnnavigation
+// - handleReturn() - Handlereturn
+
+// === UI Functions ===
+// - updateEntityIndexes() - Updateentityindexes
+
+// === Data Functions ===
+// - getTranslator() - Gettranslator
+// - getCache() - Getcache
+// - getMessage() - Getmessage
+
+// === Utility Functions ===
+// - formatTimestamp() - Formattimestamp
+// - formatParametersHtml() - Formatparametershtml
+// - formatAlertStatsCell() - Formatalertstatscell
+// - formatAutoAlertToggleCell() - Formatautoalerttogglecell
+
+// === Other ===
+// - escapeHtml() - Escapehtml
+// - stripHtml() - Striphtml
+// - extractParameters() - Extractparameters
+// - normalizeAlertStats() - Normalizealertstats
+// - clearCache() - Clearcache
+// - cleanup() - Cleanup
+
     constructor() {
         this.translator = window.conditionsTranslations;
         this.crudManager = window.conditionsCRUDManager;
@@ -62,11 +117,14 @@ class ConditionsUIManager {
     }
 
     renderLayout() {
-        this.container.innerHTML = `
-            <div class="conditions-manager conditions-manager--form-only">
-                <div id="conditionsFormContainer" class="conditions-form-container conditions-form-container--two-column"></div>
-            </div>
-        `;
+        this.container.textContent = '';
+        const managerDiv = document.createElement('div');
+        managerDiv.className = 'conditions-manager conditions-manager--form-only';
+        const formContainer = document.createElement('div');
+        formContainer.id = 'conditionsFormContainer';
+        formContainer.className = 'conditions-form-container conditions-form-container--two-column';
+        managerDiv.appendChild(formContainer);
+        this.container.appendChild(managerDiv);
     }
 
     bindStaticEvents() {
@@ -76,7 +134,7 @@ class ConditionsUIManager {
     async refreshConditions(force = false) {
         const listContainer = this.container.querySelector('#conditionsListContainer');
         if (listContainer) {
-            listContainer.innerHTML = '';
+            listContainer.textContent = '';
         }
         try {
             this.conditions = await this.crudManager.readConditions(this.entityId, !force);
@@ -257,7 +315,7 @@ class ConditionsUIManager {
     closeConditionForm() {
         const container = this.container.querySelector('#conditionsFormContainer');
         if (container) {
-            container.innerHTML = '';
+            container.textContent = '';
             container.style.display = 'none';
         }
         if (this.formGenerator?.destroyActionNotesEditor) {
@@ -318,12 +376,14 @@ class ConditionsUIManager {
 
     renderError(message) {
         if (!this.container) return;
-        this.container.innerHTML = `
-            <div class="alert alert-danger">
-                <i class="fas fa-exclamation-triangle me-2"></i>
-                ${message}
-            </div>
-        `;
+        this.container.textContent = '';
+        const alertDiv = document.createElement('div');
+        alertDiv.className = 'alert alert-danger';
+        const icon = document.createElement('i');
+        icon.className = 'fas fa-exclamation-triangle me-2';
+        alertDiv.appendChild(icon);
+        alertDiv.appendChild(document.createTextNode(' ' + message));
+        this.container.appendChild(alertDiv);
     }
 
     showPostSaveConfirmation(actionType = 'create', savedCondition = null) {
@@ -350,23 +410,45 @@ class ConditionsUIManager {
         modal.className = 'modal fade show conditions-confirm-modal';
         modal.setAttribute('role', 'dialog');
         modal.style.display = 'block';
-        modal.innerHTML = `
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">${title}</h5>
-                        <button type="button" class="btn-close conditions-confirm-close" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <p class="mb-0">${message}</p>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-primary conditions-confirm-add">${confirmLabel}</button>
-                        <button type="button" class="btn btn-outline-secondary conditions-confirm-return">${cancelLabel}</button>
-                    </div>
-                </div>
-            </div>
-        `;
+        modal.textContent = '';
+        const modalDialog = document.createElement('div');
+        modalDialog.className = 'modal-dialog modal-dialog-centered';
+        const modalContent = document.createElement('div');
+        modalContent.className = 'modal-content';
+        const modalHeader = document.createElement('div');
+        modalHeader.className = 'modal-header';
+        const modalTitle = document.createElement('h5');
+        modalTitle.className = 'modal-title';
+        modalTitle.textContent = title;
+        const closeBtn = document.createElement('button');
+        closeBtn.type = 'button';
+        closeBtn.className = 'btn-close conditions-confirm-close';
+        closeBtn.setAttribute('aria-label', 'Close');
+        modalHeader.appendChild(modalTitle);
+        modalHeader.appendChild(closeBtn);
+        const modalBody = document.createElement('div');
+        modalBody.className = 'modal-body';
+        const p = document.createElement('p');
+        p.className = 'mb-0';
+        p.textContent = message;
+        modalBody.appendChild(p);
+        const modalFooter = document.createElement('div');
+        modalFooter.className = 'modal-footer';
+        const addBtn = document.createElement('button');
+        addBtn.type = 'button';
+        addBtn.className = 'btn btn-primary conditions-confirm-add';
+        addBtn.textContent = confirmLabel;
+        const returnBtn = document.createElement('button');
+        returnBtn.type = 'button';
+        returnBtn.className = 'btn btn-outline-secondary conditions-confirm-return';
+        returnBtn.textContent = cancelLabel;
+        modalFooter.appendChild(addBtn);
+        modalFooter.appendChild(returnBtn);
+        modalContent.appendChild(modalHeader);
+        modalContent.appendChild(modalBody);
+        modalContent.appendChild(modalFooter);
+        modalDialog.appendChild(modalContent);
+        modal.appendChild(modalDialog);
 
         const cleanup = () => {
             try {
@@ -649,7 +731,12 @@ window.ConditionsUIManager = ConditionsUIManager;
             return '';
         }
         const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = value;
+        tempDiv.textContent = '';
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(value, 'text/html');
+        doc.body.childNodes.forEach(node => {
+            tempDiv.appendChild(node.cloneNode(true));
+        });
         return tempDiv.textContent || tempDiv.innerText || '';
     }
 

@@ -98,7 +98,6 @@ class PageStandardizer {
         'scripts/server-monitor.js?v=1.0.0',
       ],
       'dev-tools': [
-        'scripts/linter-realtime-monitor.js?v=1.0.0',
         'scripts/crud-testing-dashboard.js?v=1.0.0',
         'scripts/css-duplicates-analyzer.js?v=1.0.0',
       ],

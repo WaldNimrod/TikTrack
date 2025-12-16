@@ -429,4 +429,3 @@ pg_dump -U TikTrakDBAdmin -d "TikTrack-db-testing" --data-only | \
 **עודכן:** ינואר 2025  
 **גרסה:** 1.0
 
-

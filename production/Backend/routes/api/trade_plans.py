@@ -8,7 +8,7 @@ import logging
 
 # Import base classes
 from .base_entity import BaseEntityAPI
-from .base_entity_decorators import api_endpoint, handle_database_session, validate_request
+from .base_entity_decorators import api_endpoint, handle_database_session, validate_request, require_authentication
 from .base_entity_utils import BaseEntityUtils
 
 logger = logging.getLogger(__name__)
@@ -24,11 +24,15 @@ def _get_date_normalizer():
     return BaseEntityUtils.get_request_normalizer(request, preferences_service=preferences_service)
 
 @trade_plans_bp.route('/', methods=['GET'])
+@require_authentication()
+@api_endpoint(cache_ttl=60, rate_limit=60)
 @handle_database_session()
 def get_trade_plans():
     """Get all trade plans using base API"""
+    print(f"DEBUG: get_trade_plans called, user_id={getattr(g, 'user_id', None)}")
     db: Session = g.db
     response, status_code = base_api.get_all(db)
+    print(f"DEBUG: get_trade_plans returning {len(response.get('data', []))} items")
     return jsonify(response), status_code
 
 @trade_plans_bp.route('/<int:plan_id>', methods=['GET'])
@@ -41,11 +45,14 @@ def get_trade_plan(plan_id: int):
     return jsonify(response), status_code
 
 @trade_plans_bp.route('/account/<int:trading_account_id>', methods=['GET'])
+@handle_database_session()
 def get_trade_plans_by_account(trading_account_id: int):
     """Get trade plans by account"""
     try:
-        db: Session = next(get_db())
-        plans = TradePlanService.get_by_account(db, trading_account_id)
+        db: Session = g.db
+        # Get user_id from Flask context (set by auth middleware)
+        user_id = getattr(g, 'user_id', None)
+        plans = TradePlanService.get_by_account(db, trading_account_id, user_id=user_id)
         normalizer = _get_date_normalizer()
         payload = BaseEntityUtils.create_success_payload(
             normalizer,
@@ -61,8 +68,6 @@ def get_trade_plans_by_account(trading_account_id: int):
             "שגיאה בטעינת תכנונים לחשבון"
         )
         return jsonify(payload), 500
-    finally:
-        db.close()
 
 @trade_plans_bp.route('/', methods=['POST'])
 @handle_database_session(auto_commit=True, auto_close=True)
@@ -70,14 +75,62 @@ def get_trade_plans_by_account(trading_account_id: int):
 def create_trade_plan():
     """Create new trade plan"""
     try:
+        # Get user_id from Flask context (set by auth middleware)
+        user_id = getattr(g, 'user_id', None)
+        
         data = request.get_json() or {}
+        
+        # Validate required field: entry_price
+        if 'entry_price' not in data or data['entry_price'] is None:
+            normalizer = _get_date_normalizer()
+            return jsonify({
+                "status": "error",
+                "error": {"message": "entry_price is required"},
+                "timestamp": normalizer.now_envelope(),
+                "version": "1.0"
+            }), 400
+        
         # Sanitize HTML content for notes field
         if 'notes' in data and data['notes']:
             data['notes'] = BaseEntityUtils.sanitize_rich_text(data['notes'])
+        
         db: Session = g.db
+        
+        # Verify trading_account belongs to user if provided
+        if 'trading_account_id' in data and user_id is not None:
+            from models.trading_account import TradingAccount
+            account = db.query(TradingAccount).filter(
+                TradingAccount.id == data['trading_account_id'],
+                TradingAccount.user_id == user_id
+            ).first()
+            if not account:
+                normalizer = _get_date_normalizer()
+                return jsonify({
+                    "status": "error",
+                    "error": {"message": "Trading account not found or does not belong to user"},
+                    "timestamp": normalizer.now_envelope(),
+                    "version": "1.0"
+                }), 404
+        
+        # Verify ticker belongs to user if provided
+        if 'ticker_id' in data and user_id is not None:
+            from models.user_ticker import UserTicker
+            user_ticker = db.query(UserTicker).filter(
+                UserTicker.user_id == user_id,
+                UserTicker.ticker_id == data['ticker_id']
+            ).first()
+            if not user_ticker:
+                normalizer = _get_date_normalizer()
+                return jsonify({
+                    "status": "error",
+                    "error": {"message": "Ticker not found or does not belong to user"},
+                    "timestamp": normalizer.now_envelope(),
+                    "version": "1.0"
+                }), 404
+        
         normalizer = _get_date_normalizer()
         normalized_payload = BaseEntityUtils.normalize_input(normalizer, data)
-        plan = TradePlanService.create(db, normalized_payload)
+        plan = TradePlanService.create(db, normalized_payload, user_id=user_id)
         payload = BaseEntityUtils.create_success_payload(
             normalizer,
             plan.to_dict(),

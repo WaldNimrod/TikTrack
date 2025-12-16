@@ -71,9 +71,19 @@ class ModalManagerV2 {
             assignedValue = includeTime
                 ? today.toISOString().slice(0, 16)
                 : today.toISOString().slice(0, 10);
-            inputElement.value = assignedValue;
+            // Use DataCollectionService to set value if available
+            if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+              window.DataCollectionService.setValue(inputElement.id, assignedValue, type === 'date' ? 'date' : 'dateOnly');
+            } else {
+              inputElement.value = assignedValue;
+            }
         } else {
-            inputElement.value = assignedValue;
+            // Use DataCollectionService to set value if available
+            if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+              window.DataCollectionService.setValue(inputElement.id, assignedValue, 'text');
+            } else {
+              inputElement.value = assignedValue;
+            }
         }
 
         inputElement.dataset.systemGenerated = 'true';
@@ -137,6 +147,8 @@ class ModalManagerV2 {
         
         // מאזין לפתיחת מודלים
         document.addEventListener('shown.bs.modal', (event) => {
+            // ניקוי backdrops של Bootstrap לאחר פתיחת modal
+            this._cleanupBootstrapBackdrops();
             this.handleModalShown(event.target);
         });
         
@@ -523,6 +535,24 @@ class ModalManagerV2 {
             fieldsHTML = this.generateFieldsHTML(config.fields);
         }
         
+        // Generate default title in Hebrew if not provided
+        let defaultTitle = 'הוספת ישות';
+        if (config.entityType && !config.title?.add) {
+            const ENTITY_LABELS = {
+                ticker: 'טיקר',
+                trade: 'טרייד',
+                trade_plan: 'תכנון',
+                execution: 'ביצוע',
+                trading_account: 'חשבון מסחר',
+                account: 'חשבון מסחר',
+                alert: 'התראה',
+                cash_flow: 'תזרים מזומנים',
+                note: 'הערה'
+            };
+            const entityLabel = ENTITY_LABELS[config.entityType] || config.entityType;
+            defaultTitle = `הוספת ${entityLabel}`;
+        }
+        
         return `
             <div class="modal fade" id="${config.id}" tabindex="-1" 
                  aria-labelledby="${config.id}Label" aria-hidden="true"
@@ -534,7 +564,7 @@ class ModalManagerV2 {
                              style="background-color: var(--current-entity-color-light) !important; border-bottom: 2px solid var(--current-entity-color-dark)">
                             <!-- Breadcrumb navigation -->
                             <div class="modal-navigation-breadcrumb" style="order: 0; width: 100%; margin-bottom: 0.5rem;"></div>
-                            <h5 class="modal-title" id="${config.id}Label" style="color: var(--current-entity-color-dark) !important; order: 1;">${config.title.add || 'הוספת ישות'}</h5>
+                            <h5 class="modal-title" id="${config.id}Label" style="color: var(--current-entity-color-dark) !important; order: 1;">${config.title?.add || defaultTitle}</h5>
                             <!-- Back button - uses the button system -->
                             <button type="button" 
                                     data-button-type="BACK" 
@@ -831,6 +861,41 @@ class ModalManagerV2 {
                         <div class="invalid-feedback"></div>
                     </div>
                 `;
+            
+            case 'date-range':
+                // Use DateRangePickerService for date range picker
+                if (!window.DateRangePickerService) {
+                    console.error('DateRangePickerService not loaded. Please include date-range-picker-service.js');
+                    return `
+                        <div class="mb-3">
+                            <label class="form-label">${field.label} ${requiredStar}</label>
+                            <div class="alert alert-warning">Date range picker service not available</div>
+                        </div>
+                    `;
+                }
+                
+                const rangeConfig = {
+                    id: field.id || `dateRange_${Date.now()}`,
+                    label: field.label || 'טווח תאריכים',
+                    fromFieldId: field.fromFieldId || `${field.id}_from`,
+                    toFieldId: field.toFieldId || `${field.id}_to`,
+                    presetFieldId: field.presetFieldId || `${field.id}_preset`,
+                    required: field.required || false,
+                    defaultValue: field.defaultValue || '',
+                    availablePresets: field.availablePresets || null,
+                    containerClass: field.containerClass || ''
+                };
+                
+                // Store config for initialization
+                if (!window._dateRangePickerConfigs) {
+                    window._dateRangePickerConfigs = {};
+                }
+                window._dateRangePickerConfigs[rangeConfig.id] = {
+                    config: rangeConfig,
+                    onChange: field.onChange || null
+                };
+                
+                return window.DateRangePickerService.render(rangeConfig);
                 
             case 'select':
                 // Check if this is a tag multi-select field
@@ -1148,7 +1213,9 @@ class ModalManagerV2 {
                         modalId === 'tickersModal' ? 'tickersModalConfig' : null,
                         modalId === 'executionsModal' ? 'executionsModalConfig' : null,
                         modalId === 'cashFlowModal' ? 'cashFlowModalConfig' : null,
-                        modalId === 'notesModal' ? 'notesModalConfig' : null
+                        modalId === 'notesModal' ? 'notesModalConfig' : null,
+                        modalId === 'watchListModal' ? 'watchListModalConfig' : null,
+                        modalId === 'addTickerModal' ? 'addTickerModalConfig' : null
                     ].filter(Boolean); // הסרת null values
                     
                     for (const name of possibleNames) {
@@ -1169,16 +1236,28 @@ class ModalManagerV2 {
                         throw createError;
                     }
                 } else {
-                    console.error(`❌ [ModalManagerV2] Modal ${modalId} not found and no configuration available`);
-                    console.error(`   Checked: window.${modalId}Config, window.${modalId.replace('Modal', '')}ModalConfig`);
-                    console.error(`   Available window properties:`, Object.keys(window).filter(k => k.includes('Modal') || k.includes('Config')));
-                    if (window.showErrorNotification) {
-                        window.showErrorNotification('שגיאה', `מודל ${modalId} לא נמצא. אנא רענן את הדף.`);
+                    // בדיקה אם המודל קיים ב-DOM (מודל דינמי שנוצר ב-runtime)
+                    const dynamicModal = document.getElementById(modalId);
+                    if (dynamicModal) {
+                        console.log(`✅ [ModalManagerV2] Found dynamic modal in DOM: ${modalId}`);
+                        // רישום המודל הדינמי במפה (ללא config)
+                        this.modals.set(modalId, {
+                            element: dynamicModal,
+                            config: null,
+                            isActive: false,
+                            isDynamic: true
+                        });
+                    } else {
+                        console.error(`❌ [ModalManagerV2] Modal ${modalId} not found and no configuration available`);
+                        console.error(`   Checked: window.${modalId}Config, window.${modalId.replace('Modal', '')}ModalConfig`);
+                        if (window.showErrorNotification) {
+                            window.showErrorNotification('שגיאה', `מודל ${modalId} לא נמצא. אנא רענן את הדף.`);
+                        }
+                        throw new Error(`Modal ${modalId} not found and could not be created - no configuration found`);
                     }
-                    throw new Error(`Modal ${modalId} not found and could not be created - no configuration found`);
                 }
                 
-                // בדיקה שוב שהמודל נוצר
+                // בדיקה שוב שהמודל נוצר או נמצא
                 if (!this.modals.has(modalId)) {
                     console.error(`❌ Modal ${modalId} still not found after creation attempt`);
                     throw new Error(`Modal ${modalId} could not be created`);
@@ -1197,14 +1276,68 @@ class ModalManagerV2 {
                 throw new Error(`Modal ${modalId} element not found`);
             }
             
-            console.log(`✅ [ModalManagerV2] Modal found, proceeding to show:`, { modalId, mode });
+            // CRITICAL: Ensure modal is the last child in body for proper z-index stacking
+            // This ensures that when opening a nested modal, it appears above the parent modal
+            // Always move to end, even if already in body (to ensure correct order)
+            if (modalElement.parentElement === document.body) {
+                // Move to end of body to ensure it's on top
+                document.body.appendChild(modalElement);
+                window.Logger?.info('🔍 [Z-INDEX] Modal moved to end of body', {
+                    modalId,
+                    page: 'modal-manager-v2'
+                });
+            } else if (modalElement.parentElement) {
+                // Modal is in a different parent - move to body
+                document.body.appendChild(modalElement);
+                window.Logger?.info('🔍 [Z-INDEX] Modal moved from parent to end of body', {
+                    modalId,
+                    previousParent: modalElement.parentElement?.id || 'unknown',
+                    page: 'modal-manager-v2'
+                });
+            }
             
+            console.log(`✅ [ModalManagerV2] Modal found, proceeding to show:`, { modalId, mode, isDynamic: modalInfo.isDynamic });
+            
+            // אם זה מודל דינמי (ללא config), נשתמש בטיפול מינימלי
+            if (modalInfo.isDynamic) {
+                // למודלים דינמיים - פשוט פתיחה דרך Bootstrap
+                if (!bootstrap || !bootstrap.Modal) {
+                    throw new Error('Bootstrap Modal not available for dynamic modal');
+                }
+                // Use getOrCreateInstance instead of new - prevents duplicate instances
+                let modal = bootstrap.Modal.getInstance(modalElement);
+                if (!modal) {
+                    modal = bootstrap.Modal.getOrCreateInstance(modalElement, {
+                        backdrop: false,
+                        keyboard: true
+                    });
+                }
+                modal.show();
+                modalInfo.isActive = true;
+                this.activeModal = modalId;
+                return;
+            }
+            
+            // למודלים רגילים עם config - טיפול מלא
             // עדכון כותרת לפי מצב
             this.updateModalTitle(modalElement, modalInfo.config, mode);
+            
+            // Save mode and entityData in modalInfo for later access
+            modalInfo.currentMode = mode;
+            modalInfo.currentEntityData = entityData;
+            modalInfo.lastOptions = options;
             
             const formElement = modalElement.querySelector('form');
             if (formElement) {
                 formElement.dataset.modalMode = mode;
+                if (entityData && entityData.id) {
+                    formElement.dataset.entityId = entityData.id;
+                }
+            }
+            
+            // Also store in modal element dataset for easy access
+            if (entityData && entityData.id) {
+                modalElement.dataset.listId = entityData.id;
             }
             
             // איפוס טופס
@@ -1240,11 +1373,50 @@ class ModalManagerV2 {
             
             // מילוי selects (חייב להיות לפני populateForm)
             // Note: populateSelects already handles defaultFromPreferences
-            await this.populateSelects(modalElement, modalInfo.config);
+            // Pass mode to ensure defaultFromPreferences is false in edit mode
+            await this.populateSelects(modalElement, modalInfo.config, mode);
             
             
             if (modalId === 'cashFlowModal' && typeof window.initializeExternalIdFields === 'function') {
                 window.initializeExternalIdFields();
+            }
+            
+            // Handle prefill data in add mode (before showing modal)
+            if (mode === 'add' && options?.prefill) {
+                window.Logger?.info('📝 [ModalManagerV2] Handling prefill data in add mode', {
+                    modalId,
+                    prefillKeys: Object.keys(options.prefill),
+                    page: 'modal-manager-v2'
+                });
+                
+                // Map prefill keys to form field names if needed
+                // For notes modal, map noteContent -> content, noteRelatedType -> related_type_id, etc.
+                const prefillData = { ...options.prefill };
+                
+                // Map note-specific prefill keys to form field names
+                if (modalId === 'notesModal') {
+                    if (prefillData.noteContent !== undefined) {
+                        prefillData.content = prefillData.noteContent;
+                        delete prefillData.noteContent;
+                    }
+                    if (prefillData.noteRelatedType !== undefined) {
+                        prefillData.related_type_id = prefillData.noteRelatedType;
+                        delete prefillData.noteRelatedType;
+                    }
+                    if (prefillData.noteRelatedObject !== undefined) {
+                        prefillData.related_id = prefillData.noteRelatedObject;
+                        delete prefillData.noteRelatedObject;
+                    }
+                }
+                
+                window.Logger?.info('📝 [ModalManagerV2] Mapped prefill data', {
+                    modalId,
+                    mappedPrefillKeys: Object.keys(prefillData),
+                    page: 'modal-manager-v2'
+                });
+                
+                // Populate form with prefill data
+                await this.populateForm(modalElement, prefillData);
             }
             
             // מילוי נתונים אם במצב עריכה/צפייה (אחרי populateSelects!)
@@ -1320,9 +1492,17 @@ class ModalManagerV2 {
                 if (modalId === 'tradePlansModal') {
                     console.log('🔍 [TradePlan Edit] Starting post-populateForm updates...');
                     
-                    // Log current field values
+                    // Log current field values - use DataCollectionService if available
                     const logFieldValues = () => {
-                        const fields = {
+                        const fields = window.DataCollectionService ? {
+                            ticker: window.DataCollectionService.getValue('tradePlanTicker', 'text', ''),
+                            price: window.DataCollectionService.getValue('tradePlanEntryPrice', 'number', ''),
+                            quantity: window.DataCollectionService.getValue('tradePlanQuantity', 'number', ''),
+                            amount: window.DataCollectionService.getValue('planAmount', 'number', ''),
+                            stop: window.DataCollectionService.getValue('tradePlanStopLoss', 'number', ''),
+                            target: window.DataCollectionService.getValue('tradePlanTakeProfit', 'number', ''),
+                            side: window.DataCollectionService.getValue('tradePlanSide', 'text', '')
+                        } : {
                             ticker: modalElement.querySelector('#tradePlanTicker')?.value,
                             price: modalElement.querySelector('#tradePlanEntryPrice')?.value,
                             quantity: modalElement.querySelector('#tradePlanQuantity')?.value,
@@ -1421,9 +1601,17 @@ class ModalManagerV2 {
                 if (modalId === 'tradesModal') {
                     console.log('🔍 [Trade Edit] Starting post-populateForm updates...');
                     
-                    // Log current field values
+                    // Log current field values - use DataCollectionService if available
                     const logFieldValues = () => {
-                        const fields = {
+                        const fields = window.DataCollectionService ? {
+                            ticker: window.DataCollectionService.getValue('tradeTicker', 'text', ''),
+                            price: window.DataCollectionService.getValue('tradeEntryPrice', 'number', ''),
+                            quantity: window.DataCollectionService.getValue('tradeQuantity', 'number', ''),
+                            amount: window.DataCollectionService.getValue('tradeTotalInvestment', 'number', ''),
+                            stop: window.DataCollectionService.getValue('tradeStopLoss', 'number', ''),
+                            target: window.DataCollectionService.getValue('tradeTakeProfit', 'number', ''),
+                            side: window.DataCollectionService.getValue('tradeSide', 'text', '')
+                        } : {
                             ticker: modalElement.querySelector('#tradeTicker')?.value,
                             price: modalElement.querySelector('#tradeEntryPrice')?.value,
                             quantity: modalElement.querySelector('#tradeQuantity')?.value,
@@ -1539,15 +1727,29 @@ class ModalManagerV2 {
                 throw new Error(`Modal element ${modalId} not in DOM`);
             }
             
-            const modal = new bootstrap.Modal(modalElement, {
-                backdrop: false, // ננהל backdrop מרכזית
-                keyboard: true
-            });
-            
-            // בדיקה שהמודל נוצר בהצלחה
+            // Use getOrCreateInstance instead of new - prevents duplicate instances
+            // This fixes the issue where modals don't open because of conflicting instances
+            let modal = bootstrap.Modal.getInstance(modalElement);
             if (!modal) {
-                console.error('❌ Failed to create Bootstrap modal instance');
-                throw new Error('Failed to create Bootstrap modal instance');
+                // Create new instance only if one doesn't exist
+                modal = bootstrap.Modal.getOrCreateInstance(modalElement, {
+                    backdrop: false, // ננהל backdrop מרכזית
+                    keyboard: true
+                });
+            } else {
+                // If instance exists, ensure it has correct options
+                // Note: Bootstrap doesn't allow changing options on existing instances,
+                // but we can ensure backdrop is handled correctly
+                window.Logger?.debug?.('Using existing Bootstrap Modal instance', {
+                    modalId,
+                    page: 'modal-manager-v2'
+                });
+            }
+            
+            // בדיקה שהמודל נוצר/נמצא בהצלחה
+            if (!modal) {
+                console.error('❌ Failed to get or create Bootstrap modal instance');
+                throw new Error('Failed to get or create Bootstrap modal instance');
             }
             
             modalElement.dataset.modalMode = mode;
@@ -1581,15 +1783,39 @@ class ModalManagerV2 {
                 }
             }
             
+            // ניטור לפני פתיחת המודול
+            const stackBeforeShow = window.ModalNavigationService?.getStack?.() || [];
+            const currentZIndexBefore = modalElement.style.zIndex || getComputedStyle(modalElement).zIndex || 'none';
+            const backdropsBeforeShow = Array.from(document.querySelectorAll('.modal-backdrop')).map(b => ({
+                id: b.id,
+                zIndex: b.style.zIndex || getComputedStyle(b).zIndex,
+                hasShowClass: b.classList.contains('show')
+            }));
+            
+            window.Logger?.info('🔍 [Z-INDEX] ModalManagerV2.showModal: Before showing modal', {
+                modalId,
+                mode,
+                isNested,
+                stackLengthBefore: stackBeforeShow.length,
+                stackBefore: stackBeforeShow.map((e, idx) => ({
+                    index: idx,
+                    modalId: e.modalId,
+                    hasElement: !!e.element
+                })),
+                currentZIndex: currentZIndexBefore,
+                backdropsBeforeShow,
+                hasModalZIndexManager: !!window.ModalZIndexManager,
+                page: 'modal-manager-v2'
+            });
+
             // הוספת modal-nested class אם נפתח כמודל מקונן (לפני modal.show())
             if (isNested && modalElement) {
                 modalElement.classList.add('modal-nested', 'modal-nested-level-2');
                 // הגדרת offset גבוה יותר למודל מקונן (40 במקום 20)
                 modalElement.style.setProperty('--modal-nested-offset', '40');
-                window.Logger?.debug(`Modal ${modalId} marked as nested before show()`, {
+                window.Logger?.info('🔍 [Z-INDEX] ModalManagerV2.showModal: Modal marked as nested', {
                     modalId,
                     stackLength: window.ModalNavigationService?.getStack?.()?.length || 0,
-                    domCheck: true,
                     page: 'modal-manager-v2'
                 });
             } else if (modalElement) {
@@ -1598,9 +1824,154 @@ class ModalManagerV2 {
                 modalElement.style.removeProperty('--modal-nested-offset');
             }
             
+            window.Logger?.info('🔍 [Z-INDEX] ModalManagerV2.showModal: Calling modal.show()', {
+                modalId,
+                hasBootstrapModal: !!modal,
+                page: 'modal-manager-v2'
+            });
+            
+            // ניקוי backdrops של Bootstrap לפני modal.show() כדי למנוע backdrop כפול
+            this._cleanupBootstrapBackdrops();
+            
             modal.show();
+            
+            // CRITICAL FIX: Ensure modal has position fixed (Bootstrap should add this, but we ensure it)
+            // This fixes the issue where modal has display:block but offsetParent is null
+            const computedStyle = window.getComputedStyle(modalElement);
+            if (computedStyle.position !== 'fixed') {
+                modalElement.style.position = 'fixed';
+                modalElement.style.top = '0';
+                modalElement.style.left = '0';
+                modalElement.style.width = '100%';
+                modalElement.style.height = '100%';
+                window.Logger?.debug?.('🔧 [ModalManagerV2] Fixed modal position to fixed', {
+                    modalId,
+                    previousPosition: computedStyle.position,
+                    page: 'modal-manager-v2'
+                });
+            }
+            
+            // Wait for Bootstrap's show event before continuing
+            // This ensures the modal is fully visible before we manipulate it
+            await new Promise((resolve) => {
+                const checkModal = () => {
+                    const style = window.getComputedStyle(modalElement);
+                    if (modalElement.classList.contains('show') && 
+                        style.display !== 'none' &&
+                        style.position === 'fixed' &&
+                        modalElement.offsetParent !== null) {
+                        resolve();
+                    } else {
+                        // Wait a bit more if modal not fully shown
+                        setTimeout(checkModal, 50);
+                    }
+                };
+                // Start checking after a short delay to allow Bootstrap to apply classes
+                setTimeout(checkModal, 100);
+                // Fallback timeout - resolve after 1 second even if modal not fully shown
+                setTimeout(resolve, 1000);
+            });
+            
+            // CRITICAL: After modal is shown, ensure it's the last modal in DOM for proper z-index stacking
+            // This is especially important for nested modals
+            if (modalElement.parentElement === document.body) {
+                // Move to end of body to ensure it's on top
+                document.body.appendChild(modalElement);
+                window.Logger?.info('🔍 [Z-INDEX] Modal moved to end of body after show', {
+                    modalId,
+                    page: 'modal-manager-v2'
+                });
+            }
+            
             this.bindDismissButtons(modalElement);
+            
+            // ניקוי נוסף אחרי modal.show() למקרה ש-Bootstrap יצר backdrop חדש
+            const cleanedBackdrops = this._cleanupBootstrapBackdrops();
+            
+            window.Logger?.info('🔍 [Z-INDEX] ModalManagerV2.showModal: After modal.show(), before backdrop management', {
+                modalId,
+                cleanedBackdrops,
+                page: 'modal-manager-v2'
+            });
+            
             this.ensureGlobalBackdrop();
+            
+            // ניטור אחרי ensureGlobalBackdrop
+            const backdropsAfterBackdrop = Array.from(document.querySelectorAll('.modal-backdrop')).map(b => ({
+                id: b.id,
+                zIndex: b.style.zIndex || getComputedStyle(b).zIndex,
+                hasShowClass: b.classList.contains('show')
+            }));
+            
+            window.Logger?.info('🔍 [Z-INDEX] ModalManagerV2.showModal: After ensureGlobalBackdrop', {
+                modalId,
+                backdropsAfterBackdrop,
+                page: 'modal-manager-v2'
+            });
+            
+            // עדכון z-index דרך ModalZIndexManager
+            // שימוש ב-requestAnimationFrame לעדכון מיידי יותר
+            if (window.ModalZIndexManager && typeof window.ModalZIndexManager.forceUpdate === 'function') {
+                window.Logger?.info('🔍 [Z-INDEX] ModalManagerV2.showModal: Scheduling z-index forceUpdate', {
+                    modalId,
+                    method: 'requestAnimationFrame + setTimeout',
+                    page: 'modal-manager-v2'
+                });
+                
+                // עדכון מיידי עם requestAnimationFrame, ואז retry עם setTimeout
+                const updateZIndex = () => {
+                    const stackAfterDelay = window.ModalNavigationService?.getStack?.() || [];
+                    window.Logger?.info('🔍 [Z-INDEX] ModalManagerV2.showModal: Calling forceUpdate', {
+                        modalId,
+                        stackLengthAfterDelay: stackAfterDelay.length,
+                        stackAfterDelay: stackAfterDelay.map((e, idx) => ({
+                            index: idx,
+                            modalId: e.modalId,
+                            hasElement: !!e.element
+                        })),
+                        page: 'modal-manager-v2'
+                    });
+                    
+                    window.ModalZIndexManager.forceUpdate(modalElement);
+                    
+                    // ניטור אחרי forceUpdate
+                    requestAnimationFrame(() => {
+                        const finalZIndex = modalElement.style.zIndex || getComputedStyle(modalElement).zIndex || 'none';
+                        const dialogZIndex = modalElement.querySelector('.modal-dialog') ? (getComputedStyle(modalElement.querySelector('.modal-dialog')).zIndex) : 'none';
+                        const contentZIndex = modalElement.querySelector('.modal-content') ? (getComputedStyle(modalElement.querySelector('.modal-content')).zIndex) : 'none';
+                        
+                        window.Logger?.info('🔍 [Z-INDEX] ModalManagerV2.showModal: After forceUpdate', {
+                            modalId,
+                            zIndexBefore: currentZIndexBefore,
+                            zIndexAfter: finalZIndex,
+                            dialogZIndex,
+                            contentZIndex,
+                            zIndexChanged: currentZIndexBefore !== finalZIndex,
+                            page: 'modal-manager-v2'
+                        });
+                        
+                        // Retry אם z-index לא השתנה (race condition)
+                        if (currentZIndexBefore === finalZIndex && stackAfterDelay.length > 0) {
+                            setTimeout(() => {
+                                window.ModalZIndexManager.forceUpdate(modalElement);
+                            }, 50);
+                        }
+                    });
+                };
+                
+                // עדכון מיידי עם requestAnimationFrame
+                requestAnimationFrame(() => {
+                    updateZIndex();
+                    // Retry עם setTimeout למקרה שה-stack עדיין לא התעדכן
+                    setTimeout(updateZIndex, 50);
+                });
+            } else {
+                window.Logger?.warn('🔍 [Z-INDEX] ModalManagerV2.showModal: ModalZIndexManager not available', {
+                    modalId,
+                    hasModalZIndexManager: !!window.ModalZIndexManager,
+                    page: 'modal-manager-v2'
+                });
+            }
             
             if (mode === 'edit' && entityData) {
                 const entityId = entityData.id != null ? String(entityData.id) : '';
@@ -2068,23 +2439,30 @@ class ModalManagerV2 {
                 modalElement.addEventListener('shown.bs.modal', initializeRichTextEditorsHandler, { once: true });
             }
             
-            const navigationMetadata = {
-                modalId,
-                modalType: 'crud-modal',
-                entityType: modalInfo.config.entityType,
-                entityId: mode === 'edit' && entityData ? entityData.id : null,
-                title: modalElement.querySelector(`#${modalId}Label`)?.textContent || modalInfo.config.title[mode] || '',
-                mode
-            };
+            // Modal Navigation System - רק למודלים מקוננים (nested modals)
+            // בדיקה אם יש stack - רק אז זה מודל מקונן שצריך רישום
+            const hasStack = window.ModalNavigationService?.getStack?.()?.length > 0;
+            
+            if (hasStack) {
+                const navigationMetadata = {
+                    modalId,
+                    modalType: 'crud-modal',
+                    entityType: modalInfo.config.entityType,
+                    entityId: mode === 'edit' && entityData ? entityData.id : null,
+                    title: modalElement.querySelector(`#${modalId}Label`)?.textContent || modalInfo.config.title[mode] || '',
+                    mode
+                };
 
-            if (window.ModalNavigationService?.registerModalOpen) {
-                await window.ModalNavigationService.registerModalOpen(modalElement, navigationMetadata);
-            } else if (window.pushModalToNavigation) {
-                await window.pushModalToNavigation(modalElement, navigationMetadata);
-            }
+                if (window.ModalNavigationService?.registerModalOpen) {
+                    await window.ModalNavigationService.registerModalOpen(modalElement, navigationMetadata);
+                } else if (window.pushModalToNavigation) {
+                    await window.pushModalToNavigation(modalElement, navigationMetadata);
+                }
 
-            if (window.modalNavigationManager?.updateModalNavigation) {
-                window.modalNavigationManager.updateModalNavigation(modalElement);
+                // עדכון UI (breadcrumb וכפתור חזרה) רק במודלים מקוננים
+                if (window.modalNavigationManager?.updateModalNavigation) {
+                    window.modalNavigationManager.updateModalNavigation(modalElement);
+                }
             }
             
             // Apply remaining defaults after modal shows (date, source, etc.)
@@ -2182,7 +2560,11 @@ class ModalManagerV2 {
                         } else {
                             // Disable and clear if no type selected
                             relatedObjectField.disabled = true;
-                            relatedObjectField.innerHTML = '<option value="">בחר אובייקט...</option>';
+                            relatedObjectField.textContent = '';
+                            const defaultOption = document.createElement('option');
+                            defaultOption.value = '';
+                            defaultOption.textContent = 'בחר אובייקט...';
+                            relatedObjectField.appendChild(defaultOption);
                             console.log('⚠️ noteRelatedObject disabled - no type selected');
                         }
                     };
@@ -2269,14 +2651,23 @@ class ModalManagerV2 {
                                 : alertRelatedObjectField.value || (formDataForAlerts && formDataForAlerts.related_id) || null;
                             await this.populateAlertRelatedObjects(form, relatedTypeId, normalizedSelectedId);
                             if (normalizedSelectedId) {
-                                alertRelatedObjectField.value = normalizedSelectedId;
+                                // Use DataCollectionService to set value if available
+                                if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+                                  window.DataCollectionService.setValue(alertRelatedObjectField.id, normalizedSelectedId, 'int');
+                                } else {
+                                  alertRelatedObjectField.value = normalizedSelectedId;
+                                }
                             }
                             await this.updateAlertTickerDisplay(form, null);
                             this.handleAlertLinkedEntityUpdate(null);
                         } else {
                             alertRelatedObjectField.disabled = true;
                             alertRelatedObjectField.setAttribute('disabled', 'disabled');
-                            alertRelatedObjectField.innerHTML = '<option value="">בחר אובייקט...</option>';
+                            alertRelatedObjectField.textContent = '';
+                            const defaultOption = document.createElement('option');
+                            defaultOption.value = '';
+                            defaultOption.textContent = 'בחר אובייקט...';
+                            alertRelatedObjectField.appendChild(defaultOption);
                             await this.updateAlertTickerDisplay(form, null);
                             this.handleAlertLinkedEntityUpdate(null);
                         }
@@ -2309,7 +2700,11 @@ class ModalManagerV2 {
                         // In add mode or no type selected - disable the field
                         alertRelatedObjectField.disabled = true;
                         alertRelatedObjectField.setAttribute('disabled', 'disabled');
-                        alertRelatedObjectField.innerHTML = '<option value="">בחר אובייקט...</option>';
+                        alertRelatedObjectField.textContent = '';
+                        const option = document.createElement('option');
+                        option.value = '';
+                        option.textContent = 'בחר אובייקט...';
+                        alertRelatedObjectField.appendChild(option);
                         console.log('⚠️ alertRelatedObject disabled (add mode or no type selected)');
                     } else {
                         // Field might be enabled by populateForm - don't disable it
@@ -2686,7 +3081,8 @@ class ModalManagerV2 {
             'execution': 'executions',
             'ticker': 'tickers',
             'trade_plan': 'trade-plans',
-            'note': 'notes'
+            'note': 'notes',
+            'watch_list': 'watch-lists'
         };
         return pluralMap[entityType] || `${entityType}s`;
     }
@@ -2710,7 +3106,12 @@ class ModalManagerV2 {
             if (input.type === 'checkbox' || input.type === 'radio') {
                 input.checked = false;
             } else {
-                input.value = '';
+                // Use DataCollectionService to clear field if available
+                if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+                  window.DataCollectionService.setValue(input.id, '', 'text');
+                } else {
+                  input.value = '';
+                }
             }
         });
         
@@ -3053,7 +3454,15 @@ class ModalManagerV2 {
                                 // Populate based on field type - explicitly check for cashFlowAccount
                                 // IMPORTANT: Pass the value as defaultValue so it's set correctly during population
                                 // Convert empty string to null for defaultValue (empty string means "no selection")
-                                const defaultValueForSelect = (selectValue === '' || selectValue === null || selectValue === undefined) ? null : selectValue;
+                                // Ensure proper type conversion for numeric IDs
+                                let defaultValueForSelect = null;
+                                if (selectValue !== '' && selectValue !== null && selectValue !== undefined) {
+                                    // Try to parse as integer for ID fields (accounts, trades, etc.)
+                                    const parsed = parseInt(selectValue);
+                                    defaultValueForSelect = (!isNaN(parsed) && parsed.toString() === String(selectValue).trim()) 
+                                        ? parsed 
+                                        : selectValue;
+                                }
                                 
                                 const isTagMultiSelect = field.classList?.contains?.('tag-multi-select');
 
@@ -3342,6 +3751,33 @@ class ModalManagerV2 {
                             isNaN: dateObj ? isNaN(dateObj.getTime()) : 'no dateObj',
                             valueKeys: actualValue && typeof actualValue === 'object' ? Object.keys(actualValue) : null
                         });
+                    }
+                } else if (field.type === 'date-range' && actualValue && window.DateRangePickerService) {
+                    // Date range type - use DateRangePickerService to set value
+                    // Value can be preset name or "YYYY-MM-DD - YYYY-MM-DD" string
+                    let dateRangeValue = '';
+                    
+                    if (typeof actualValue === 'string') {
+                        dateRangeValue = actualValue;
+                    } else if (actualValue && typeof actualValue === 'object') {
+                        // Handle object with from/to dates
+                        if (actualValue.from && actualValue.to) {
+                            dateRangeValue = `${actualValue.from} - ${actualValue.to}`;
+                        } else if (actualValue.start && actualValue.end) {
+                            // Handle Date objects
+                            const from = actualValue.start instanceof Date 
+                                ? actualValue.start.toISOString().split('T')[0]
+                                : actualValue.start;
+                            const to = actualValue.end instanceof Date
+                                ? actualValue.end.toISOString().split('T')[0]
+                                : actualValue.end;
+                            dateRangeValue = `${from} - ${to}`;
+                        }
+                    }
+                    
+                    if (dateRangeValue) {
+                        window.DateRangePickerService.setValue(field.id, dateRangeValue);
+                        console.log(`📝 Set date-range field ${field.id} to: ${dateRangeValue}`);
                     }
                 } else if (field.type === 'datetime-local' && actualValue) {
                     // Convert date value to datetime-local format (YYYY-MM-DDTHH:MM)
@@ -4209,6 +4645,12 @@ class ModalManagerV2 {
                 'related_type_id': 'noteRelatedType',
                 'related_id': 'noteRelatedObject',
                 'attachment': 'noteAttachment' // Map attachment to noteAttachment field
+            },
+            'watch_list': {
+                'name': 'watchListName',
+                'icon': 'watchListIcon',
+                'icon_library': 'watchListIconLibrary',
+                'view_mode': 'watchListViewMode'
             }
         };
         
@@ -4281,8 +4723,15 @@ class ModalManagerV2 {
                     // Handle 'today' special value for datetime-local fields
                     if (field.defaultValue !== undefined && field.defaultValue !== null) {
                         if (field.type === 'datetime-local' && field.defaultValue === 'today') {
-                            const today = new Date();
-                            fieldElement.value = today.toISOString().slice(0, 16);
+                            // Use DefaultValueSetter if available
+                            if (window.DefaultValueSetter && typeof window.DefaultValueSetter.setCurrentDateTime === 'function') {
+                                window.DefaultValueSetter.setCurrentDateTime(fieldElement.id);
+                            } else {
+                                // Fallback if DefaultValueSetter is not available
+                                const today = new Date();
+                                today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
+                                fieldElement.value = today.toISOString().slice(0, 16);
+                            }
                         } else {
                             fieldElement.value = field.defaultValue;
                         }
@@ -4325,8 +4774,15 @@ class ModalManagerV2 {
                 
                 // Apply defaultTime if field is date
                 if (field.type === 'date' && field.defaultTime === 'now') {
-                    const today = new Date();
-                    fieldElement.value = today.toISOString().slice(0, 10);
+                    // Use DefaultValueSetter if available
+                    if (window.DefaultValueSetter && typeof window.DefaultValueSetter.setCurrentDate === 'function') {
+                        window.DefaultValueSetter.setCurrentDate(fieldElement.id);
+                    } else {
+                        // Fallback if DefaultValueSetter is not available
+                        const today = new Date();
+                        today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
+                        fieldElement.value = today.toISOString().slice(0, 10);
+                    }
                     console.log(`Applied default date for ${field.id}`);
                     continue;
                 }
@@ -4393,7 +4849,13 @@ class ModalManagerV2 {
         if (expiryInput && !expiryInput.value) {
             const expiryDate = new Date(now);
             expiryDate.setFullYear(expiryDate.getFullYear() + 1);
-            expiryInput.value = expiryDate.toISOString().slice(0, 10);
+            // Use DefaultValueSetter if available
+            if (window.DefaultValueSetter && typeof window.DefaultValueSetter.setCurrentDate === 'function') {
+                window.DefaultValueSetter.setCurrentDate(expiryInput.id);
+            } else {
+                // Fallback if DefaultValueSetter is not available
+                expiryInput.value = expiryDate.toISOString().slice(0, 10);
+            }
         }
     }
 
@@ -4454,6 +4916,51 @@ class ModalManagerV2 {
         }
         
         return false;
+    }
+
+    /**
+     * Initialize date range pickers - אתחול date range pickers
+     * 
+     * @param {HTMLElement} modalElement - אלמנט המודל
+     * @param {Object} config - קונפיגורציה של המודל
+     * @private
+     */
+    initializeDateRangePickers(modalElement, config) {
+        if (!window.DateRangePickerService) {
+            return; // Service not loaded
+        }
+
+        // Get all field configs
+        const allFieldConfigs = [];
+        if (config?.fields && Array.isArray(config.fields)) {
+            allFieldConfigs.push(...config.fields);
+        }
+        if (config?.tabs && Array.isArray(config.tabs)) {
+            config.tabs.forEach(tab => {
+                if (tab.fields && Array.isArray(tab.fields)) {
+                    allFieldConfigs.push(...tab.fields);
+                }
+            });
+        }
+
+        // Initialize date range pickers
+        allFieldConfigs.forEach(field => {
+            if (field.type === 'date-range') {
+                const pickerId = field.id || `dateRange_${Date.now()}`;
+                
+                // Wait a bit for DOM to be ready
+                setTimeout(() => {
+                    if (window._dateRangePickerConfigs && window._dateRangePickerConfigs[pickerId]) {
+                        const { config: rangeConfig, onChange } = window._dateRangePickerConfigs[pickerId];
+                        window.DateRangePickerService.initialize(pickerId, onChange);
+                        delete window._dateRangePickerConfigs[pickerId]; // Clean up
+                    } else {
+                        // Fallback initialization
+                        window.DateRangePickerService.initialize(pickerId, field.onChange || null);
+                    }
+                }, 100);
+            }
+        });
     }
 
     /**
@@ -4707,7 +5214,11 @@ class ModalManagerV2 {
         if (typeof window.setCurrencyExchangeSummary === 'function') {
             window.setCurrencyExchangeSummary(null);
         } else if (netAmountField) {
-            netAmountField.innerHTML = '<div class="text-muted small">הצמד יוצג לאחר שמירה.</div>';
+            netAmountField.textContent = '';
+            const div = document.createElement('div');
+            div.className = 'text-muted small';
+            div.textContent = 'הצמד יוצג לאחר שמירה.';
+            netAmountField.appendChild(div);
         }
         
         console.log('🔵 Fields found:', {
@@ -4959,7 +5470,12 @@ class ModalManagerV2 {
             
             // Update net amount display field
             if (netAmountField) {
-                netAmountField.innerHTML = summaryHTML;
+                netAmountField.textContent = '';
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(summaryHTML, 'text/html');
+                doc.body.childNodes.forEach(node => {
+                    netAmountField.appendChild(node.cloneNode(true));
+                });
                 console.log('✅ Net amount field updated with detailed summary');
             } else {
                 console.warn('⚠️ netAmountField not found');
@@ -5204,9 +5720,10 @@ class ModalManagerV2 {
      * 
      * @param {HTMLElement} modalElement - אלמנט המודל
      * @param {Object} config - קונפיגורציה של המודל
+     * @param {string} mode - מצב המודל (add, edit, view) - משפיע על defaultFromPreferences
      * @private
      */
-    async populateSelects(modalElement, config) {
+    async populateSelects(modalElement, config, mode = 'add') {
         // Check dependencies with validation
         const deps = this._checkDependencies();
         
@@ -5265,7 +5782,7 @@ class ModalManagerV2 {
                     }
                     
                     const { fieldConfig } = result;
-                    await this._populateSingleSelect(select, selectId, fieldConfig, config);
+                    await this._populateSingleSelect(select, selectId, fieldConfig, config, mode);
                 }
             }
         } else {
@@ -5286,7 +5803,7 @@ class ModalManagerV2 {
                 }
                 
                 const { fieldConfig } = result;
-                await this._populateSingleSelect(select, selectId, fieldConfig, config);
+                await this._populateSingleSelect(select, selectId, fieldConfig, config, mode);
             }
         }
     }
@@ -5294,11 +5811,19 @@ class ModalManagerV2 {
     /**
      * Populate a single select field
      * @private
+     * @param {HTMLElement} select - אלמנט ה-select
+     * @param {string} selectId - מזהה ה-select
+     * @param {Object} fieldConfig - קונפיגורציה של השדה
+     * @param {Object} config - קונפיגורציה של המודל
+     * @param {string} mode - מצב המודל (add, edit, view) - משפיע על defaultFromPreferences
      */
-    async _populateSingleSelect(select, selectId, fieldConfig, config) {
+    async _populateSingleSelect(select, selectId, fieldConfig, config, mode = 'add') {
         // Check if this field has defaultFromPreferences in config
+        // CRITICAL: In edit mode, never use defaultFromPreferences - always use the existing value
         let shouldUseDefaultFromPrefs = false;
-        if (fieldConfig && fieldConfig.defaultFromPreferences) {
+        if (mode === 'edit') {
+            shouldUseDefaultFromPrefs = false; // Never use preferences in edit mode
+        } else if (fieldConfig && fieldConfig.defaultFromPreferences) {
             shouldUseDefaultFromPrefs = true;
         }
         
@@ -6141,6 +6666,18 @@ class ModalManagerV2 {
             }
         }
 
+        // For Add Ticker Modal - initialize ticker search handlers
+        if (modalId === 'addTickerModal') {
+            if (window.AddTickerModal && typeof window.AddTickerModal.init === 'function') {
+                // Initialize ticker search handlers when modal is shown
+                setTimeout(() => {
+                    if (typeof window.AddTickerModal.initializeTickerSearchHandlers === 'function') {
+                        window.AddTickerModal.initializeTickerSearchHandlers();
+                    }
+                }, 100);
+            }
+        }
+
         // For Tickers modal - load provider symbol fields
         if (modalId === 'tickersModal') {
             // Load provider symbol fields when modal is shown
@@ -6169,25 +6706,8 @@ class ModalManagerV2 {
         }
 
         if (modalId === 'cashFlowModal') {
-            const form = modalElement.querySelector('#cashFlowModalForm');
-            const mode = form?.dataset?.mode || modalElement.dataset?.mode || 'add';
-
-            if (mode !== 'edit') {
-                if (window.DefaultValueSetter && typeof window.DefaultValueSetter.setCurrentDate === 'function') {
-                    window.DefaultValueSetter.setCurrentDate('cashFlowDate');
-                    window.DefaultValueSetter.setCurrentDate('currencyExchangeDate');
-                } else {
-                    const addDateField = document.getElementById('cashFlowDate');
-                    const exchangeDateField = document.getElementById('currencyExchangeDate');
-                    const today = new Date().toISOString().slice(0, 10);
-                    if (addDateField && !addDateField.value) {
-                        addDateField.value = today;
-                    }
-                    if (exchangeDateField && !exchangeDateField.value) {
-                        exchangeDateField.value = today;
-                    }
-                }
-            }
+            // Date fields are now handled by applyRemainingDefaults which processes defaultTime: 'now'
+            // This handler only needs to manage account-currency relationship
             
             // Handle account selection - update currency to account's primary currency
             const accountSelects = [
@@ -6254,6 +6774,283 @@ class ModalManagerV2 {
                 }
             });
         }
+        
+        // For Watch List modal - populate icon selector
+        if (modalId === 'watchListModal') {
+            // Wait a bit for modal to be fully rendered
+            setTimeout(async () => {
+                try {
+                    // Check if WatchListModal functions are available
+                    if (window.WatchListModal && typeof window.WatchListModal.populateIconSelector === 'function') {
+                        await window.WatchListModal.populateIconSelector();
+                        window.Logger?.info?.('✅ Watch List icon selector populated via ModalManagerV2', { page: 'modal-manager-v2' });
+                    } else if (window.WatchListModal && typeof window.WatchListModal.init === 'function') {
+                        // Fallback: call init which should populate icons
+                        await window.WatchListModal.init();
+                    } else {
+                        // Use inline function to populate icons
+                        await this.populateWatchListIcons(modalElement);
+                    }
+                    
+                    // Setup view mode selector
+                    this.setupWatchListViewModeSelector(modalElement);
+                } catch (error) {
+                    window.Logger?.error?.('❌ Error populating watch list icons', { error: error?.message || error, page: 'modal-manager-v2' });
+                }
+            }, 300);
+        }
+    }
+    
+    /**
+     * Populate watch list icon selector
+     * @param {HTMLElement} modalElement - The modal element
+     * @private
+     */
+    async populateWatchListIcons(modalElement) {
+        const tablerSelector = modalElement.querySelector('#watchListIconSelector');
+        const bootstrapSelector = modalElement.querySelector('#watchListBootstrapIconSelector');
+        
+        if (!tablerSelector && !bootstrapSelector) {
+            window.Logger?.warn?.('⚠️ Watch list icon selectors not found', { page: 'modal-manager-v2' });
+            return;
+        }
+        
+        // Wait for IconSystem
+        if (!window.IconSystem) {
+            window.Logger?.warn?.('⚠️ IconSystem not available for watch list icons', { page: 'modal-manager-v2' });
+            return;
+        }
+        
+        if (!window.IconSystem.initialized) {
+            try {
+                await window.IconSystem.initialize();
+            } catch (error) {
+                window.Logger?.error?.('❌ Error initializing IconSystem', { error: error?.message || error, page: 'modal-manager-v2' });
+                return;
+            }
+        }
+        
+        // Populate Tabler icons
+        if (tablerSelector) {
+            const tablerIcons = [
+                '', 'chart-line', 'eye', 'flame', 'coins', 
+                'table', 'cards', 'bookmark', 'tag', 'activity', 
+                'wallet', 'calendar', 'pencil', 'trash', 
+                'plus', 'check', 'x', 'search', 'filter', 'settings', 'download', 
+                'upload', 'refresh', 'archive', 'copy', 'link', 'info-circle', 
+                'alert-triangle'
+            ];
+            
+            tablerSelector.innerHTML = '';
+            
+            for (const iconName of tablerIcons) {
+                const iconItem = document.createElement('div');
+                iconItem.className = 'icon-selector-item';
+                iconItem.dataset.icon = iconName;
+                iconItem.dataset.library = 'tabler';
+                
+                if (iconName === '') {
+                    iconItem.innerHTML = '<div class="icon-preview no-icon"><span>ללא</span></div>';
+                } else {
+                    try {
+                        const iconHTML = await window.IconSystem.renderIcon('button', iconName, {
+                            size: '24',
+                            alt: iconName,
+                            class: 'icon-preview-icon'
+                        });
+                        iconItem.innerHTML = `<div class="icon-preview">${iconHTML}</div>`;
+                    } catch (error) {
+                        iconItem.innerHTML = `<div class="icon-preview"><span>${iconName}</span></div>`;
+                    }
+                }
+                
+                iconItem.addEventListener('click', () => {
+                    this.selectWatchListIcon(iconName, 'tabler', modalElement);
+                });
+                
+                tablerSelector.appendChild(iconItem);
+            }
+        }
+        
+        // Populate Bootstrap icons
+        if (bootstrapSelector) {
+            const bootstrapIcons = [
+                '', 
+                { class: 'bi-graph-up', color: '#26baac' },
+                { class: 'bi-eye', color: '#0056b3' },
+                { class: 'bi-star-fill', color: '#ffc107' },
+                { class: 'bi-heart-fill', color: '#dc3545' },
+                { class: 'bi-fire', color: '#fc5a06' },
+                { class: 'bi-coin', color: '#ffc107' },
+                { class: 'bi-list-ul', color: '#6c757d' },
+                { class: 'bi-table', color: '#28a745' },
+                { class: 'bi-grid-3x3', color: '#17a2b8' },
+                { class: 'bi-bookmark-fill', color: '#6f42c1' },
+                { class: 'bi-tag-fill', color: '#20c997' },
+                { class: 'bi-tags-fill', color: '#20c997' },
+                { class: 'bi-pie-chart-fill', color: '#fd7e14' },
+                { class: 'bi-activity', color: '#28a745' },
+                { class: 'bi-wallet2', color: '#0056b3' },
+                { class: 'bi-cash-stack', color: '#28a745' },
+                { class: 'bi-calendar-event', color: '#17a2b8' },
+                { class: 'bi-clock-history', color: '#6c757d' },
+                { class: 'bi-pencil-fill', color: '#0056b3' },
+                { class: 'bi-trash-fill', color: '#dc3545' },
+                { class: 'bi-plus-circle-fill', color: '#28a745' },
+                { class: 'bi-check-circle-fill', color: '#28a745' },
+                { class: 'bi-x-circle-fill', color: '#dc3545' },
+                { class: 'bi-search', color: '#6c757d' },
+                { class: 'bi-funnel-fill', color: '#6f42c1' },
+                { class: 'bi-gear-fill', color: '#6c757d' },
+                { class: 'bi-download', color: '#0056b3' },
+                { class: 'bi-upload', color: '#28a745' },
+                { class: 'bi-arrow-clockwise', color: '#17a2b8' },
+                { class: 'bi-archive-fill', color: '#6c757d' },
+                { class: 'bi-copy', color: '#0056b3' },
+                { class: 'bi-link-45deg', color: '#26baac' },
+                { class: 'bi-info-circle-fill', color: '#17a2b8' },
+                { class: 'bi-exclamation-triangle-fill', color: '#ffc107' }
+            ];
+            
+            bootstrapSelector.innerHTML = '';
+            
+            for (const iconData of bootstrapIcons) {
+                const iconItem = document.createElement('div');
+                iconItem.className = 'icon-selector-item';
+                
+                let iconClass = '';
+                let iconColor = '';
+                
+                if (typeof iconData === 'string') {
+                    iconClass = iconData;
+                } else {
+                    iconClass = iconData.class;
+                    iconColor = iconData.color;
+                }
+                
+                iconItem.dataset.icon = iconClass;
+                iconItem.dataset.library = 'bootstrap';
+                
+                if (iconClass === '') {
+                    iconItem.innerHTML = '<div class="icon-preview no-icon"><span>ללא</span></div>';
+                } else {
+                    const colorStyle = iconColor ? `style="font-size: 24px; color: ${iconColor};"` : 'style="font-size: 24px;"';
+                    iconItem.innerHTML = `<div class="icon-preview"><i class="${iconClass}" ${colorStyle}></i></div>`;
+                }
+                
+                iconItem.addEventListener('click', () => {
+                    this.selectWatchListIcon(iconClass, 'bootstrap', modalElement);
+                });
+                
+                bootstrapSelector.appendChild(iconItem);
+            }
+        }
+        
+        window.Logger?.info?.('✅ Watch list icons populated', { page: 'modal-manager-v2' });
+    }
+    
+    /**
+     * Select watch list icon
+     * @param {string} iconName - Icon name/class
+     * @param {string} library - Icon library
+     * @param {HTMLElement} modalElement - The modal element
+     * @private
+     */
+    async selectWatchListIcon(iconName, library, modalElement) {
+        const iconInput = modalElement.querySelector('#watchListIcon');
+        const libraryInput = modalElement.querySelector('#watchListIconLibrary');
+        const preview = modalElement.querySelector('#watchListSelectedIconPreview');
+        
+        if (!iconInput || !libraryInput || !preview) {
+            return;
+        }
+        
+        iconInput.value = iconName;
+        libraryInput.value = library;
+        
+        // Remove active class from all items
+        modalElement.querySelectorAll('.icon-selector-item').forEach(item => {
+            item.classList.remove('active');
+        });
+        
+        // Add active class to selected item
+        const selectedItem = modalElement.querySelector(`[data-icon="${iconName}"][data-library="${library}"]`);
+        if (selectedItem) {
+            selectedItem.classList.add('active');
+        }
+        
+        // Update preview
+        if (iconName === '') {
+            preview.innerHTML = '<span class="icon-preview-placeholder">ללא איקון</span>';
+        } else if (library === 'bootstrap') {
+            preview.innerHTML = `<i class="${iconName}" style="font-size: 20px;"></i>`;
+        } else {
+            try {
+                if (window.IconSystem) {
+                    const iconHTML = await window.IconSystem.renderIcon('button', iconName, {
+                        size: '20',
+                        alt: iconName,
+                        class: 'icon-preview-icon'
+                    });
+                    preview.innerHTML = iconHTML;
+                } else {
+                    preview.innerHTML = `<span>${iconName}</span>`;
+                }
+            } catch (error) {
+                preview.innerHTML = `<span>${iconName}</span>`;
+            }
+        }
+    }
+    
+    /**
+     * Setup watch list view mode selector
+     * @param {HTMLElement} modalElement - The modal element
+     * @private
+     */
+    setupWatchListViewModeSelector(modalElement) {
+        const viewModeInput = modalElement.querySelector('#watchListViewMode');
+        const radioButtons = modalElement.querySelectorAll('input[name="watchListViewMode"]');
+        
+        if (!viewModeInput || !radioButtons.length) {
+            return;
+        }
+        
+        // Initialize: if hidden input has a value, update radio buttons to match
+        // Otherwise, use checked radio value or default to 'table'
+        const hiddenInputValue = viewModeInput.value?.trim();
+        if (hiddenInputValue) {
+            // Update radio buttons to match hidden input value
+            radioButtons.forEach(radio => {
+                radio.checked = (radio.value === hiddenInputValue);
+            });
+        } else {
+            // Initialize with checked radio value (if any)
+            const checkedRadio = Array.from(radioButtons).find(radio => radio.checked);
+            if (checkedRadio && checkedRadio.value) {
+                viewModeInput.value = checkedRadio.value;
+            } else {
+                // Default to 'table' if nothing is checked
+                viewModeInput.value = 'table';
+                // Also check the first radio (table) if nothing is checked
+                const firstRadio = radioButtons[0];
+                if (firstRadio && firstRadio.value === 'table') {
+                    firstRadio.checked = true;
+                }
+            }
+        }
+        
+        radioButtons.forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                if (e.target.checked) {
+                    viewModeInput.value = e.target.value;
+                }
+            });
+        });
+        
+        // Initialize tooltips
+        if (window.advancedButtonSystem && typeof window.advancedButtonSystem.initializeTooltips === 'function') {
+            window.advancedButtonSystem.initializeTooltips(modalElement);
+        }
     }
 
     /**
@@ -6264,6 +7061,20 @@ class ModalManagerV2 {
      */
     handleModalHidden(modalElement) {
         const modalId = modalElement.id;
+        
+        // Fix ARIA accessibility: Remove aria-hidden from focused elements before closing
+        // This prevents the warning about aria-hidden on elements with focus
+        const activeElement = document.activeElement;
+        if (activeElement && modalElement.contains(activeElement)) {
+            // If the active element is inside the modal, blur it first
+            if (typeof activeElement.blur === 'function') {
+                activeElement.blur();
+            }
+            // Remove aria-hidden from active element if it exists
+            if (activeElement.hasAttribute('aria-hidden')) {
+                activeElement.removeAttribute('aria-hidden');
+            }
+        }
         
         if (this.modals.has(modalId)) {
             this.modals.get(modalId).isActive = false;
@@ -6377,12 +7188,19 @@ class ModalManagerV2 {
      */
     insertModalIntoDOM(modalHTML) {
         // יצירת אלמנט זמני
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = modalHTML;
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(modalHTML, 'text/html');
+        const tempDiv = doc.body;
         
         const modalElement = tempDiv.firstElementChild;
         
-        // הוספה לדף
+        // הוספה לדף - תמיד בסוף body כדי להבטיח z-index נכון
+        // אם המודל כבר קיים, נזיז אותו לסוף
+        const existingModal = document.getElementById(modalElement.id);
+        if (existingModal && existingModal !== modalElement) {
+            existingModal.remove();
+        }
+        
         document.body.appendChild(modalElement);
         
         return modalElement;
@@ -6400,9 +7218,38 @@ class ModalManagerV2 {
         const titleElement = modalElement.querySelector('.modal-title');
         if (!titleElement) return;
         
-        const title = config.title && config.title[mode] ? 
-            config.title[mode] : 
-            `${mode === 'add' ? 'הוספת' : mode === 'edit' ? 'עריכת' : 'צפייה ב'}${config.entityType}`;
+        // If title is explicitly provided in config, use it
+        if (config.title && config.title[mode]) {
+            titleElement.textContent = config.title[mode];
+            return;
+        }
+        
+        // Otherwise, generate title from entityType (translate to Hebrew)
+        let entityLabel = config.entityType;
+        
+        // Try to get Hebrew label from ENTITY_LABELS (modal-navigation-manager)
+        if (window.ModalNavigationService && typeof window.ModalNavigationService.getEntityLabel === 'function') {
+            entityLabel = window.ModalNavigationService.getEntityLabel(config.entityType) || entityLabel;
+        } else if (window.LinkedItemsService && typeof window.LinkedItemsService.getEntityLabel === 'function') {
+            entityLabel = window.LinkedItemsService.getEntityLabel(config.entityType) || entityLabel;
+        } else {
+            // Fallback: use ENTITY_LABELS from modal-navigation-manager if available
+            const ENTITY_LABELS = {
+                ticker: 'טיקר',
+                trade: 'טרייד',
+                trade_plan: 'תכנון',
+                execution: 'ביצוע',
+                trading_account: 'חשבון מסחר',
+                account: 'חשבון מסחר',
+                alert: 'התראה',
+                cash_flow: 'תזרים מזומנים',
+                note: 'הערה'
+            };
+            entityLabel = ENTITY_LABELS[config.entityType] || entityLabel;
+        }
+        
+        const modePrefix = mode === 'add' ? 'הוספת' : mode === 'edit' ? 'עריכת' : 'צפייה ב';
+        const title = `${modePrefix} ${entityLabel}`;
         
         titleElement.textContent = title;
         
@@ -6451,6 +7298,9 @@ class ModalManagerV2 {
      * @private
      */
     initializeModalSystems(modalElement, config) {
+        // Initialize date range pickers first (must be before other systems that may depend on them)
+        this.initializeDateRangePickers(modalElement, config);
+        
         // אתחול מערכת הכפתורים
         this.initializeButtons(modalElement);
         
@@ -6561,7 +7411,11 @@ class ModalManagerV2 {
             if (alertRelatedObjectField) {
                 alertRelatedObjectField.disabled = true;
                 alertRelatedObjectField.setAttribute('disabled', 'disabled');
-                alertRelatedObjectField.innerHTML = '<option value="">בחר אובייקט...</option>';
+                alertRelatedObjectField.textContent = '';
+                const option = document.createElement('option');
+                option.value = '';
+                option.textContent = 'בחר אובייקט...';
+                alertRelatedObjectField.appendChild(option);
             }
 
             if (alertTickerField && data.ticker_id) {
@@ -6750,7 +7604,9 @@ class ModalManagerV2 {
         
         if (!tickerId) {
             tickerDisplay && (tickerDisplay.textContent = '-');
-            tickerInfo && (tickerInfo.innerHTML = '');
+            if (tickerInfo) {
+                tickerInfo.textContent = '';
+            }
             
             if (typeof window.clearAlertTickerInfo === 'function') {
                 window.clearAlertTickerInfo();
@@ -6787,25 +7643,44 @@ class ModalManagerV2 {
             }
             if (tickerInfo) {
                 if (window.FieldRendererService && typeof window.FieldRendererService.renderTickerInfo === 'function') {
-                    tickerInfo.innerHTML = window.FieldRendererService.renderTickerInfo(ticker);
+                    tickerInfo.textContent = '';
+                    const tickerHTML = window.FieldRendererService.renderTickerInfo(ticker);
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(tickerHTML, 'text/html');
+                    doc.body.childNodes.forEach(node => {
+                        tickerInfo.appendChild(node.cloneNode(true));
+                    });
                 } else {
-                    tickerInfo.innerHTML = `
-                        <div class="ticker-info-display">
-                            <div class="d-flex flex-wrap align-items-center gap-2">
-                                <strong>${(ticker.currency_symbol || '$')}${(ticker.current_price || 0).toFixed(2)}</strong>
-                                <span class="${(ticker.daily_change || 0) >= 0 ? 'text-success' : 'text-danger'}">
-                                    ${(ticker.daily_change || 0) >= 0 ? '↗' : '↘'} ${(ticker.daily_change || 0).toFixed(2)} (${(ticker.daily_change_percent || 0).toFixed(2)}%)
-                                </span>
-                                <span class="text-muted small">נפח: ${(ticker.volume || 0).toLocaleString('he-IL')}</span>
-                            </div>
-                        </div>
-                    `;
+                    tickerInfo.textContent = '';
+                    const container = document.createElement('div');
+                    container.className = 'ticker-info-display';
+                    const flexDiv = document.createElement('div');
+                    flexDiv.className = 'd-flex flex-wrap align-items-center gap-2';
+                    const strong = document.createElement('strong');
+                    strong.textContent = `${(ticker.currency_symbol || '$')}${(ticker.current_price || 0).toFixed(2)}`;
+                    flexDiv.appendChild(strong);
+                    const changeSpan = document.createElement('span');
+                    changeSpan.className = (ticker.daily_change || 0) >= 0 ? 'text-success' : 'text-danger';
+                    changeSpan.textContent = `${(ticker.daily_change || 0) >= 0 ? '↗' : '↘'} ${(ticker.daily_change || 0).toFixed(2)} (${(ticker.daily_change_percent || 0).toFixed(2)}%)`;
+                    flexDiv.appendChild(changeSpan);
+                    const volumeSpan = document.createElement('span');
+                    volumeSpan.className = 'text-muted small';
+                    volumeSpan.textContent = `נפח: ${(ticker.volume || 0).toLocaleString('he-IL')}`;
+                    flexDiv.appendChild(volumeSpan);
+                    container.appendChild(flexDiv);
+                    tickerInfo.appendChild(container);
                 }
             }
         } catch (error) {
             console.warn('⚠️ Error loading ticker info (fallback):', error);
             tickerDisplay && (tickerDisplay.textContent = 'שגיאה בטעינת טיקר');
-            tickerInfo && (tickerInfo.innerHTML = '<small class="text-muted">לא ניתן לטעון פרטי טיקר</small>');
+            if (tickerInfo) {
+                tickerInfo.textContent = '';
+                const small = document.createElement('small');
+                small.className = 'text-muted';
+                small.textContent = 'לא ניתן לטעון פרטי טיקר';
+                tickerInfo.appendChild(small);
+            }
             window.Logger?.error?.('❌ [updateAlertTickerDisplay] Fallback failed', {
                 tickerId,
                 error: error?.message || error
@@ -6861,7 +7736,7 @@ class ModalManagerV2 {
             const items = result.data || result || [];
             
             // ניקוי ה-select
-            alertRelatedObjectField.innerHTML = '';
+            alertRelatedObjectField.textContent = '';
             
             // הוספת אופציה ריקה
             const emptyOption = document.createElement('option');
@@ -7028,7 +7903,7 @@ class ModalManagerV2 {
             }
             
             // ניקוי ה-select
-            noteRelatedObjectField.innerHTML = '';
+            noteRelatedObjectField.textContent = '';
             
             // הוספת אופציה ריקה
             const emptyOption = document.createElement('option');
@@ -7137,6 +8012,24 @@ class ModalManagerV2 {
             
             console.log(`✅ Populated noteRelatedObject with ${items.length} items for type ${relatedTypeId}`);
             
+            // Set the selected value if provided
+            if (selectedRelatedId) {
+                const selectedValue = String(selectedRelatedId);
+                noteRelatedObjectField.value = selectedValue;
+                console.log(`✅ Set noteRelatedObject value to: ${selectedValue}`);
+                
+                // Verify the value was set correctly
+                if (noteRelatedObjectField.value !== selectedValue) {
+                    console.warn(`⚠️ Value ${selectedValue} was not set correctly, current value: ${noteRelatedObjectField.value}`);
+                    // Try to find matching option
+                    const matchingOption = Array.from(noteRelatedObjectField.options).find(opt => opt.value === selectedValue);
+                    if (matchingOption) {
+                        noteRelatedObjectField.value = matchingOption.value;
+                        console.log(`✅ Found and set matching option: ${matchingOption.value} (${matchingOption.textContent})`);
+                    }
+                }
+            }
+            
             // Debug: Check what was actually added to the select
             const allOptions = noteRelatedObjectField.querySelectorAll('option');
             console.log(`🔍 [DEBUG] Total options in select: ${allOptions.length}`);
@@ -7161,31 +8054,159 @@ class ModalManagerV2 {
         }
     }
 
+    /**
+     * Clean up Bootstrap backdrops - ניקוי backdrops של Bootstrap
+     * מונע backdrop כפול על ידי הסרת כל backdrops של Bootstrap חוץ מ-globalModalBackdrop
+     * 
+     * @private
+     */
+    _cleanupBootstrapBackdrops() {
+        try {
+            // מציאת כל ה-backdrops ב-DOM
+            const allBackdrops = document.querySelectorAll('.modal-backdrop');
+            const backdropsBefore = Array.from(allBackdrops).map(b => ({
+                id: b.id,
+                className: b.className,
+                zIndex: b.style.zIndex || getComputedStyle(b).zIndex,
+                hasShowClass: b.classList.contains('show')
+            }));
+            
+            let removedCount = 0;
+            const removedBackdrops = [];
+            
+            // ניקוי כל backdrops חוץ מ-globalModalBackdrop
+            allBackdrops.forEach(backdrop => {
+                // אם זה לא ה-globalBackdrop שלנו - מחק אותו
+                if (backdrop.id !== 'globalModalBackdrop') {
+                    removedBackdrops.push({
+                        id: backdrop.id || 'no-id',
+                        className: backdrop.className,
+                        zIndex: backdrop.style.zIndex || getComputedStyle(backdrop).zIndex
+                    });
+                    window.Logger?.info('🔍 [BACKDROP] Removing Bootstrap backdrop', {
+                        backdropId: backdrop.id || 'no-id',
+                        backdropClasses: backdrop.className,
+                        zIndex: backdrop.style.zIndex || getComputedStyle(backdrop).zIndex,
+                        page: 'modal-manager-v2'
+                    });
+                    backdrop.remove();
+                    removedCount++;
+                }
+            });
+            
+            const backdropsAfter = Array.from(document.querySelectorAll('.modal-backdrop')).map(b => ({
+                id: b.id,
+                className: b.className,
+                zIndex: b.style.zIndex || getComputedStyle(b).zIndex,
+                hasShowClass: b.classList.contains('show')
+            }));
+            
+            if (removedCount > 0 || allBackdrops.length > 0) {
+                window.Logger?.info('🔍 [BACKDROP] Cleaned up Bootstrap backdrops', {
+                    removedCount,
+                    backdropsBefore: backdropsBefore,
+                    removedBackdrops: removedBackdrops,
+                    backdropsAfter: backdropsAfter,
+                    page: 'modal-manager-v2'
+                });
+            }
+            
+            return removedCount;
+        } catch (error) {
+            window.Logger?.warn('🔍 [BACKDROP] Error cleaning up Bootstrap backdrops', {
+                error: error?.message,
+                page: 'modal-manager-v2'
+            });
+            return 0;
+        }
+    }
+
     ensureGlobalBackdrop() {
         const activeCount = this._getActiveModalCount();
+        
+        window.Logger?.info('🔍 [BACKDROP] ensureGlobalBackdrop called', {
+            activeCount,
+            hasGlobalBackdrop: !!this.globalBackdrop,
+            globalBackdropInDOM: this.globalBackdrop ? document.body.contains(this.globalBackdrop) : false,
+            existingBackdropInDOM: !!document.getElementById('globalModalBackdrop'),
+            allBackdropsInDOM: Array.from(document.querySelectorAll('.modal-backdrop')).map(b => ({
+                id: b.id,
+                className: b.className,
+                zIndex: b.style.zIndex || getComputedStyle(b).zIndex,
+                hasShowClass: b.classList.contains('show')
+            })),
+            page: 'modal-manager-v2'
+        });
+
         if (activeCount <= 0) {
+            window.Logger?.info('🔍 [BACKDROP] No active modals, updating visibility', {
+                activeCount,
+                page: 'modal-manager-v2'
+            });
             this.updateGlobalBackdropVisibility();
             return;
         }
 
+        // ניקוי backdrops של Bootstrap לפני יצירת globalBackdrop
+        const cleanedBackdrops = this._cleanupBootstrapBackdrops();
+        window.Logger?.info('🔍 [BACKDROP] Cleaned Bootstrap backdrops', {
+            cleanedCount: cleanedBackdrops,
+            page: 'modal-manager-v2'
+        });
+
+        const backdropExistedBefore = !!this.globalBackdrop && document.body.contains(this.globalBackdrop);
+        const existingBackdropInDOM = document.getElementById('globalModalBackdrop');
+
         if (!this.globalBackdrop || !document.body.contains(this.globalBackdrop)) {
-            const existingBackdrop = document.getElementById('globalModalBackdrop');
-            if (existingBackdrop) {
-                this.globalBackdrop = existingBackdrop;
+            if (existingBackdropInDOM) {
+                window.Logger?.info('🔍 [BACKDROP] Reusing existing backdrop from DOM', {
+                    backdropId: existingBackdropInDOM.id,
+                    zIndex: existingBackdropInDOM.style.zIndex || getComputedStyle(existingBackdropInDOM).zIndex,
+                    page: 'modal-manager-v2'
+                });
+                this.globalBackdrop = existingBackdropInDOM;
             } else {
+                window.Logger?.info('🔍 [BACKDROP] Creating new global backdrop', {
+                    page: 'modal-manager-v2'
+                });
                 const backdrop = document.createElement('div');
                 backdrop.id = 'globalModalBackdrop';
                 backdrop.className = 'modal-backdrop fade global-modal-backdrop';
                 backdrop.addEventListener('click', this.backdropClickHandler, { passive: true });
                 document.body.appendChild(backdrop);
                 this.globalBackdrop = backdrop;
+                
+                window.Logger?.info('🔍 [BACKDROP] New global backdrop created and appended', {
+                    backdropId: backdrop.id,
+                    parentElement: backdrop.parentElement?.tagName || 'none',
+                    zIndex: backdrop.style.zIndex || getComputedStyle(backdrop).zIndex,
+                    page: 'modal-manager-v2'
+                });
             }
         }
 
         if (this.globalBackdrop) {
+            const zIndexBefore = this.globalBackdrop.style.zIndex || getComputedStyle(this.globalBackdrop).zIndex || 'none';
+            const hasShowClassBefore = this.globalBackdrop.classList.contains('show');
+            
             requestAnimationFrame(() => {
                 if (this.globalBackdrop) {
                     this.globalBackdrop.classList.add('show');
+                    
+                    const zIndexAfter = this.globalBackdrop.style.zIndex || getComputedStyle(this.globalBackdrop).zIndex || 'none';
+                    const hasShowClassAfter = this.globalBackdrop.classList.contains('show');
+                    
+                    window.Logger?.info('🔍 [BACKDROP] Global backdrop show class added', {
+                        backdropId: this.globalBackdrop.id,
+                        zIndexBefore,
+                        zIndexAfter,
+                        hasShowClassBefore,
+                        hasShowClassAfter,
+                        isVisible: this.globalBackdrop.offsetParent !== null,
+                        display: getComputedStyle(this.globalBackdrop).display,
+                        opacity: getComputedStyle(this.globalBackdrop).opacity,
+                        page: 'modal-manager-v2'
+                    });
                 }
             });
         }
@@ -7194,25 +8215,97 @@ class ModalManagerV2 {
         if (!document.body.style.overflow) {
             document.body.style.overflow = 'hidden';
         }
+
+        window.Logger?.info('🔍 [BACKDROP] ensureGlobalBackdrop completed', {
+            activeCount,
+            hasGlobalBackdrop: !!this.globalBackdrop,
+            globalBackdropId: this.globalBackdrop?.id,
+            globalBackdropZIndex: this.globalBackdrop ? (this.globalBackdrop.style.zIndex || getComputedStyle(this.globalBackdrop).zIndex) : 'none',
+            globalBackdropHasShow: this.globalBackdrop ? this.globalBackdrop.classList.contains('show') : false,
+            bodyHasModalOpen: document.body.classList.contains('modal-open'),
+            page: 'modal-manager-v2'
+        });
     }
 
     updateGlobalBackdropVisibility() {
         const activeCount = this._getActiveModalCount();
-        if (activeCount > 0) {
+        
+        // בדיקה מדויקת של מספר המודולים הפתוחים
+        const openModals = document.querySelectorAll('.modal.show');
+        const actualActiveCount = Array.from(openModals).filter(modal => {
+            // בדיקה שהמודל באמת גלוי
+            return modal.offsetParent !== null && 
+                   getComputedStyle(modal).display !== 'none' &&
+                   getComputedStyle(modal).visibility !== 'hidden';
+        }).length;
+        
+        window.Logger?.info('🔍 [BACKDROP] updateGlobalBackdropVisibility called', {
+            activeCount,
+            actualActiveCount,
+            openModalsCount: openModals.length,
+            hasGlobalBackdrop: !!this.globalBackdrop,
+            globalBackdropInDOM: this.globalBackdrop ? document.body.contains(this.globalBackdrop) : false,
+            allBackdropsInDOM: Array.from(document.querySelectorAll('.modal-backdrop')).map(b => ({
+                id: b.id,
+                className: b.className,
+                zIndex: b.style.zIndex || getComputedStyle(b).zIndex,
+                hasShowClass: b.classList.contains('show')
+            })),
+            bodyHasModalOpen: document.body.classList.contains('modal-open'),
+            page: 'modal-manager-v2'
+        });
+
+        // שימוש במספר המודולים הגלויים בפועל
+        if (actualActiveCount > 0) {
+            window.Logger?.info('🔍 [BACKDROP] Active modals exist, ensuring backdrop', {
+                actualActiveCount,
+                page: 'modal-manager-v2'
+            });
             this.ensureGlobalBackdrop();
             return;
         }
 
+        // ניקוי כל ה-backdrops אם אין מודולים פתוחים
+        this._cleanupBootstrapBackdrops();
+        
         if (this.globalBackdrop) {
             const backdrop = this.globalBackdrop;
+            const backdropZIndexBefore = backdrop.style.zIndex || getComputedStyle(backdrop).zIndex;
+            const hasShowClassBefore = backdrop.classList.contains('show');
+            
+            window.Logger?.info('🔍 [BACKDROP] Hiding and removing global backdrop', {
+                backdropId: backdrop.id,
+                zIndexBefore: backdropZIndexBefore,
+                hasShowClassBefore,
+                actualActiveCount,
+                page: 'modal-manager-v2'
+            });
+
             const removeBackdrop = () => {
                 backdrop.removeEventListener('transitionend', removeBackdrop);
+                
+                window.Logger?.info('🔍 [BACKDROP] Removing global backdrop from DOM', {
+                    backdropId: backdrop.id,
+                    parentNode: backdrop.parentNode?.tagName || 'none',
+                    page: 'modal-manager-v2'
+                });
+                
                 if (backdrop.parentNode) {
                     backdrop.parentNode.removeChild(backdrop);
                 }
                 if (this.globalBackdrop === backdrop) {
                     this.globalBackdrop = null;
                 }
+                
+                // ניקוי נוסף של כל ה-backdrops שנותרו
+                this._cleanupBootstrapBackdrops();
+                
+                window.Logger?.info('🔍 [BACKDROP] Global backdrop removed', {
+                    backdropRemoved: !document.body.contains(backdrop),
+                    globalBackdropIsNull: !this.globalBackdrop,
+                    allBackdropsRemaining: Array.from(document.querySelectorAll('.modal-backdrop')).length,
+                    page: 'modal-manager-v2'
+                });
             };
 
             backdrop.classList.remove('show');
@@ -7222,6 +8315,18 @@ class ModalManagerV2 {
 
         document.body.classList.remove('modal-open');
         document.body.style.overflow = '';
+        
+        window.Logger?.info('🔍 [BACKDROP] updateGlobalBackdropVisibility completed', {
+            activeCount,
+            actualActiveCount,
+            bodyHasModalOpen: document.body.classList.contains('modal-open'),
+            bodyOverflow: document.body.style.overflow,
+            allBackdropsRemaining: Array.from(document.querySelectorAll('.modal-backdrop')).map(b => ({
+                id: b.id,
+                zIndex: b.style.zIndex || getComputedStyle(b).zIndex
+            })),
+            page: 'modal-manager-v2'
+        });
     }
 
     handleGlobalBackdropClick(event) {
@@ -7461,9 +8566,9 @@ if (typeof window.showModalSafe === 'undefined') {
             }
         }
     };
-    console.log('✅ [showModalSafe] Helper function created');
+    // Helper function created
 } else {
-    console.log('✅ [showModalSafe] Helper function already exists - skipping duplicate definition');
+    // Helper function already exists - skipping duplicate definition
 }
 
 // אתחול אוטומטי כאשר הדף נטען

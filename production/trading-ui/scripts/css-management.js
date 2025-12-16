@@ -9,6 +9,83 @@
  * Last Updated: January 2025
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - createSearchResultsContainer() - Createsearchresultscontainer
+// - createDuplicateResultsContainer() - Createduplicateresultscontainer
+// - createCssBackup() - Createcssbackup
+// - createComplianceResultsContainer() - Createcomplianceresultscontainer
+// - createNewCssFileFromModal() - Createnewcssfilefrommodal
+// - createNewCssFile() - Createnewcssfile
+// - createCssFileFromTemplate() - Createcssfilefromtemplate
+// - initializeCssManagement() - Initializecssmanagement
+
+// === Core Functions ===
+// - executeUnusedCssRemoval() - Executeunusedcssremoval
+// - executeDuplicateCleanup() - Executeduplicatecleanup
+// - executeSpecificDuplicateCleanup() - Executespecificduplicatecleanup
+// - executeDeleteFromFile() - Executedeletefromfile
+
+// === Event Handlers ===
+// - fetchCssFileContent() - Fetchcssfilecontent
+// - showDeleteConfirmationModal() - Showdeleteconfirmationmodal
+// - confirmDeleteCssFile() - Confirmdeletecssfile
+// - searchInCssContent() - Searchincsscontent
+// - showDeleteFileSelectionModal() - Showdeletefileselectionmodal
+
+// === UI Functions ===
+// - refreshCssStats() - Refreshcssstats
+// - showDynamicModal() - Showdynamicmodal
+// - hideDynamicModal() - Hidedynamicmodal
+// - showCssViewerModal() - Showcssviewermodal
+// - displaySearchResults() - Displaysearchresults
+// - showUnusedCssRemovalModal() - Showunusedcssremovalmodal
+// - displayDuplicateResults() - Displayduplicateresults
+// - showBackupDialog() - Showbackupdialog
+// - showDuplicateCleanupModal() - Showduplicatecleanupmodal
+// - showSpecificDuplicateCleanupModal() - Showspecificduplicatecleanupmodal
+// - displayComplianceResults() - Displaycomplianceresults
+// - showAddCssFileModal() - Showaddcssfilemodal
+// - displayCssFilesTable() - Displaycssfilestable
+
+// === Data Functions ===
+// - validateCssAPI() - Validatecssapi
+// - getCssFilesList() - Getcssfileslist
+// - removeUnusedCssAPI() - Removeunusedcssapi
+// - minifyCssAPI() - Minifycssapi
+// - detectCssDuplicatesAPI() - Detectcssduplicatesapi
+// - checkArchitectureComplianceAPI() - Checkarchitecturecomplianceapi
+// - loadCssFilesList() - Loadcssfileslist
+
+// === Utility Functions ===
+// - validateCss() - Validatecss
+// - checkArchitectureCompliance() - Checkarchitecturecompliance
+
+// === Other ===
+// - editCssFile() - Editcssfile
+// - viewCssFile() - Viewcssfile
+// - deleteCssFile() - Deletecssfile
+// - searchCssRules() - Searchcssrules
+// - clearSearchResults() - Clearsearchresults
+// - clearCssSearch() - Clearcsssearch
+// - removeUnusedCss() - Removeunusedcss
+// - performRemoveUnusedCss() - Performremoveunusedcss
+// - toggleAllUnusedCss() - Toggleallunusedcss
+// - minifyCss() - Minifycss
+// - detectCssDuplicates() - Detectcssduplicates
+// - proceedWithBackup() - Proceedwithbackup
+// - cleanupCssDuplicates() - Cleanupcssduplicates
+// - performCleanupDuplicates() - Performcleanupduplicates
+// - cleanupSpecificDuplicate() - Cleanupspecificduplicate
+// - removeSpecificDuplicate() - Removespecificduplicate
+// - resetAllDuplicates() - Resetallduplicates
+// - clearDuplicateResults() - Clearduplicateresults
+// - clearComplianceResults() - Clearcomplianceresults
+// - openCssEditor() - Opencsseditor
+// - generateDetailedLog() - Generatedetailedlog
+
 // מערכת מעקב אחר כפילויות שכבר אוחדו
 let mergedDuplicates = new Set();
 let removedDuplicates = new Set();
@@ -19,7 +96,7 @@ let removedDuplicates = new Set();
  * רענון נתוני CSS
  */
 async function refreshCssStats() {
-    console.log('🔄 רענון נתוני CSS...');
+    window.Logger?.debug('🔄 רענון נתוני CSS...');
     
     try {
         // חישוב נתונים מקומיים במקום API
@@ -45,7 +122,7 @@ async function refreshCssStats() {
         if (totalRulesElement) totalRulesElement.textContent = totalRules.toString();
         
     } catch (error) {
-        console.error('❌ שגיאה ברענון נתוני CSS:', error);
+        window.Logger?.error('❌ שגיאה ברענון נתוני CSS:', error);
         if (typeof window.showErrorNotification === 'function') {
             window.showErrorNotification('שגיאה', 'שגיאה ברענון נתוני CSS');
         }
@@ -56,7 +133,7 @@ async function refreshCssStats() {
  * בדיקת תקינות CSS
  */
 async function validateCss() {
-    console.log('✅ מתחיל בדיקת תקינות...');
+    window.Logger?.debug('✅ מתחיל בדיקת תקינות...');
     
     try {
         if (typeof window.showInfoNotification === 'function') {
@@ -75,10 +152,10 @@ async function validateCss() {
             }
         }
         
-        console.log(`📊 בדיקת תקינות הושלמה: ${validationResults.errors.length} שגיאות, ${validationResults.warnings.length} אזהרות`);
+        window.Logger?.debug(`📊 בדיקת תקינות הושלמה: ${validationResults.errors.length} שגיאות, ${validationResults.warnings.length} אזהרות`);
         
     } catch (error) {
-        console.error('❌ שגיאה בבדיקת תקינות:', error);
+        window.Logger?.error('❌ שגיאה בבדיקת תקינות:', error);
         if (typeof window.showErrorNotification === 'function') {
             window.showErrorNotification('שגיאה', 'שגיאה בבדיקת תקינות: ' + error.message);
         }
@@ -122,7 +199,7 @@ async function validateCssAPI() {
         return validationResults;
         
     } catch (error) {
-        console.error('❌ שגיאה בבדיקת תקינות:', error);
+        window.Logger?.error('❌ שגיאה בבדיקת תקינות:', error);
         if (typeof window.showErrorNotification === 'function') {
             window.showErrorNotification('שגיאה', 'שגיאה בבדיקת תקינות CSS');
         }
@@ -139,7 +216,7 @@ async function validateCssAPI() {
  * עריכת קובץ CSS
  */
 async function editCssFile(filename) {
-    console.log(`✏️ עריכת קובץ: ${filename}`);
+    window.Logger?.debug(`✏️ עריכת קובץ: ${filename}`);
     
     try {
     if (typeof window.showInfoNotification === 'function') {
@@ -169,7 +246,7 @@ async function editCssFile(filename) {
         }
         
     } catch (error) {
-        console.error(`❌ שגיאה בעריכת ${filename}:`, error);
+        window.Logger?.error(`❌ שגיאה בעריכת ${filename}:`, error);
         if (typeof window.showErrorNotification === 'function') {
             window.showErrorNotification('שגיאה', `שגיאה בעריכת ${filename}: ${error.message}`);
         }
@@ -180,7 +257,7 @@ async function editCssFile(filename) {
  * צפייה בקובץ CSS
  */
 async function viewCssFile(filename) {
-    console.log(`👁️ צפייה בקובץ: ${filename}`);
+    window.Logger?.debug(`👁️ צפייה בקובץ: ${filename}`);
     
     try {
     if (typeof window.showInfoNotification === 'function') {
@@ -194,7 +271,7 @@ async function viewCssFile(filename) {
         }
         
     } catch (error) {
-        console.error(`❌ שגיאה בצפייה ב-${filename}:`, error);
+        window.Logger?.error(`❌ שגיאה בצפייה ב-${filename}:`, error);
         if (typeof window.showErrorNotification === 'function') {
             window.showErrorNotification('שגיאה', `שגיאה בצפייה ב-${filename}: ${error.message}`);
         }
@@ -244,7 +321,7 @@ async function fetchCssFileContent(filename) {
         return content;
         
     } catch (error) {
-        console.error(`❌ שגיאה בטעינת קובץ ${filename}:`, error);
+        window.Logger?.error(`❌ שגיאה בטעינת קובץ ${filename}:`, error);
         if (typeof window.showErrorNotification === 'function') {
             window.showErrorNotification('שגיאה', `שגיאה בטעינת קובץ ${filename}`);
         }
@@ -253,9 +330,65 @@ async function fetchCssFileContent(filename) {
 }
 
 /**
+ * Helper function to show dynamic modal via ModalManagerV2 or Bootstrap fallback
+ * @private
+ */
+async function showDynamicModal(modalId, modalHTML) {
+    // Remove existing modal if any
+    const existingModal = document.getElementById(modalId);
+    if (existingModal) {
+        existingModal.remove();
+    }
+    
+    // Add modal to body
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+    
+    // Show modal via ModalManagerV2 (supports dynamic modals)
+    const modalElement = document.getElementById(modalId);
+    if (modalElement) {
+        if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
+            try {
+                await window.ModalManagerV2.showModal(modalId, 'view');
+            } catch (error) {
+                // Fallback to Bootstrap if ModalManagerV2 fails
+                window.Logger?.warn(`${modalId} not available in ModalManagerV2, using Bootstrap fallback`, { page: 'css-management' });
+                if (bootstrap?.Modal) {
+                    const modal = new bootstrap.Modal(modalElement);
+                    modal.show();
+                }
+            }
+        } else {
+            // Fallback to Bootstrap modal
+            if (bootstrap?.Modal) {
+                const modal = new bootstrap.Modal(modalElement);
+                modal.show();
+            }
+        }
+    }
+}
+
+/**
+ * Helper function to hide dynamic modal via ModalManagerV2 or Bootstrap fallback
+ * @private
+ */
+function hideDynamicModal(modalId) {
+    if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
+        window.ModalManagerV2.hideModal(modalId);
+    } else {
+        // Fallback to Bootstrap modal
+        if (bootstrap?.Modal) {
+            const modal = window.ModalManagerV2?.getInstance(document.getElementById(modalId));
+            if (modal) {
+                modal.hide();
+            }
+        }
+    }
+}
+
+/**
  * הצגת מודל צפייה בקובץ CSS
  */
-function showCssViewerModal(filename, content) {
+async function showCssViewerModal(filename, content) {
     const modalHTML = `
         <div class="modal fade" id="cssViewerModal" tabindex="-1">
             <div class="modal-dialog modal-xl">
@@ -278,37 +411,21 @@ function showCssViewerModal(filename, content) {
         </div>
     `;
     
-    const existingModal = document.getElementById('cssViewerModal');
-    if (existingModal) {
-        existingModal.remove();
-    }
-    
-    document.body.insertAdjacentHTML('beforeend', modalHTML);
-    
-    // בדיקה אם Bootstrap זמין
-    if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
-        const modal = new bootstrap.Modal(document.getElementById('cssViewerModal'));
-        modal.show();
-    } else {
-        console.error('Bootstrap Modal לא זמין');
-        if (typeof window.showErrorNotification === 'function') {
-            window.showErrorNotification('שגיאה', 'Bootstrap Modal לא זמין');
-        }
-    }
+    await showDynamicModal('cssViewerModal', modalHTML);
 }
 
 /**
  * מחיקת קובץ CSS
  */
 async function deleteCssFile(filename) {
-    console.log(`🗑️ מחיקת קובץ: ${filename}`);
+    window.Logger?.debug(`🗑️ מחיקת קובץ: ${filename}`);
     showDeleteConfirmationModal(filename);
 }
 
 /**
  * הצגת מודל אישור מחיקה
  */
-function showDeleteConfirmationModal(filename) {
+async function showDeleteConfirmationModal(filename) {
     const modalHTML = `
         <div class="modal fade" id="deleteConfirmationModal" tabindex="-1">
             <div class="modal-dialog">
@@ -330,23 +447,7 @@ function showDeleteConfirmationModal(filename) {
         </div>
     `;
     
-    const existingModal = document.getElementById('deleteConfirmationModal');
-    if (existingModal) {
-        existingModal.remove();
-    }
-    
-    document.body.insertAdjacentHTML('beforeend', modalHTML);
-    
-    // בדיקה אם Bootstrap זמין
-    if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
-        const modal = new bootstrap.Modal(document.getElementById('deleteConfirmationModal'));
-        modal.show();
-    } else {
-        console.error('Bootstrap Modal לא זמין');
-        if (typeof window.showErrorNotification === 'function') {
-            window.showErrorNotification('שגיאה', 'Bootstrap Modal לא זמין');
-        }
-    }
+    await showDynamicModal('deleteConfirmationModal', modalHTML);
 }
 
 /**
@@ -358,10 +459,7 @@ async function confirmDeleteCssFile(filename) {
         const response = { ok: true };
         
         if (response.ok) {
-            if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
-                const modal = bootstrap.Modal.getInstance(document.getElementById('deleteConfirmationModal'));
-                if (modal) modal.hide();
-            }
+                hideDynamicModal('deleteConfirmationModal');
             
             if (typeof window.showSuccessNotification === 'function') {
                 window.showSuccessNotification('מחיקה', `קובץ ${filename} נמחק בהצלחה`);
@@ -376,7 +474,7 @@ async function confirmDeleteCssFile(filename) {
         }
         
     } catch (error) {
-        console.error(`❌ שגיאה במחיקת ${filename}:`, error);
+        window.Logger?.error(`❌ שגיאה במחיקת ${filename}:`, error);
         if (typeof window.showErrorNotification === 'function') {
             window.showErrorNotification('שגיאה', `שגיאה במחיקת ${filename}: ${error.message}`);
         }
@@ -387,7 +485,14 @@ async function confirmDeleteCssFile(filename) {
  * חיפוש כללי CSS
  */
 async function searchCssRules() {
-    const searchTerm = document.getElementById('cssSearchInput').value.trim();
+    let searchTerm;
+    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) {
+        searchTerm = window.DataCollectionService.getValue('cssSearchInput', 'text', '').trim();
+    } else {
+        // Fallback if DataCollectionService is not available
+        const searchInput = document.getElementById('cssSearchInput');
+        searchTerm = searchInput ? searchInput.value.trim() : '';
+    }
     
     if (!searchTerm) {
         if (typeof window.showWarningNotification === 'function') {
@@ -396,7 +501,7 @@ async function searchCssRules() {
         return;
     }
     
-    console.log(`🔍 חיפוש: ${searchTerm}`);
+    window.Logger?.debug(`🔍 חיפוש: ${searchTerm}`);
     
     try {
         const cssFiles = await getCssFilesList();
@@ -417,7 +522,7 @@ async function searchCssRules() {
         }
         
     } catch (error) {
-        console.error('❌ שגיאה בחיפוש:', error);
+        window.Logger?.error('❌ שגיאה בחיפוש:', error);
         if (typeof window.showErrorNotification === 'function') {
             window.showErrorNotification('שגיאה', 'שגיאה בחיפוש CSS: ' + error.message);
         }
@@ -442,7 +547,7 @@ async function getCssFilesList() {
         return cssFiles;
         
     } catch (error) {
-        console.error('❌ שגיאה בטעינת רשימת קבצי CSS:', error);
+        window.Logger?.error('❌ שגיאה בטעינת רשימת קבצי CSS:', error);
         if (typeof window.showErrorNotification === 'function') {
             window.showErrorNotification('שגיאה', 'שגיאה בטעינת רשימת קבצי CSS');
         }
@@ -506,7 +611,18 @@ function displaySearchResults(results, searchTerm) {
             `;
         });
         
-        container.innerHTML = html;
+        // Insert using tempDiv
+        container.textContent = '';
+        const tempDiv = document.createElement('div');
+        tempDiv.textContent = '';
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        doc.body.childNodes.forEach(node => {
+            tempDiv.appendChild(node.cloneNode(true));
+        });
+        while (tempDiv.firstChild) {
+          container.appendChild(tempDiv.firstChild);
+        }
     }
 }
 
@@ -520,7 +636,10 @@ function createSearchResultsContainer() {
         resultsContainer.id = 'searchResults';
         resultsContainer.className = 'search-results-container mt-3';
         
-        resultsContainer.innerHTML = `
+        resultsContainer.textContent = '';
+        // Convert HTML string to DOM elements safely
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(`
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">🔍 תוצאות חיפוש</h5>
@@ -532,7 +651,12 @@ function createSearchResultsContainer() {
                     <!-- תוצאות חיפוש יוצגו כאן -->
                 </div>
             </div>
-        `;
+        `, 'text/html');
+        const fragment = document.createDocumentFragment();
+        Array.from(doc.body.childNodes).forEach(node => {
+            fragment.appendChild(node.cloneNode(true));
+        });
+        resultsContainer.appendChild(fragment);
         
         searchSection.appendChild(resultsContainer);
     }
@@ -552,9 +676,21 @@ function clearSearchResults() {
  * ניקוי חיפוש CSS
  */
 function clearCssSearch() {
-    const searchInput = document.getElementById('cssSearchInput');
-    if (searchInput) {
+    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+        window.DataCollectionService.setValue('cssSearchInput', '', 'text');
+    } else {
+        // Fallback if DataCollectionService is not available
+        const searchInput = document.getElementById('cssSearchInput');
+        if (searchInput) {
+            // Use DataCollectionService to clear field if available
+    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+      window.DataCollectionService.setValue('cssSearchInput', '', 'text');
+    } else {
+      if (searchInput) {
         searchInput.value = '';
+      }
+    }
+        }
     }
     
     clearSearchResults();
@@ -564,7 +700,7 @@ function clearCssSearch() {
  * הסרת CSS לא בשימוש
  */
 async function removeUnusedCss() {
-    console.log('🧹 מתחיל הסרת CSS לא בשימוש...');
+    window.Logger?.debug('🧹 מתחיל הסרת CSS לא בשימוש...');
     
     // הצגת חלון גיבוי
     showBackupDialog(async () => {
@@ -584,10 +720,10 @@ async function performRemoveUnusedCss() {
         const cleanupResults = await removeUnusedCssAPI();
         
         // הצגת מודל בחירה
-        showUnusedCssRemovalModal(cleanupResults);
+        await showUnusedCssRemovalModal(cleanupResults);
         
     } catch (error) {
-        console.error('❌ שגיאה בהסרת CSS לא בשימוש:', error);
+        window.Logger?.error('❌ שגיאה בהסרת CSS לא בשימוש:', error);
         if (typeof window.showErrorNotification === 'function') {
             window.showErrorNotification('שגיאה', 'שגיאה בהסרת CSS לא בשימוש: ' + error.message);
         }
@@ -597,7 +733,7 @@ async function performRemoveUnusedCss() {
 /**
  * הצגת מודל בחירת הסרת CSS לא בשימוש
  */
-function showUnusedCssRemovalModal(cleanupResults) {
+async function showUnusedCssRemovalModal(cleanupResults) {
     const modalHTML = `
         <div class="modal fade" id="unusedCssRemovalModal" tabindex="-1">
             <div class="modal-dialog modal-xl">
@@ -667,18 +803,7 @@ function showUnusedCssRemovalModal(cleanupResults) {
         existingModal.remove();
     }
     
-    document.body.insertAdjacentHTML('beforeend', modalHTML);
-    
-    // בדיקה אם Bootstrap זמין
-    if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
-        const modal = new bootstrap.Modal(document.getElementById('unusedCssRemovalModal'));
-        modal.show();
-    } else {
-        console.error('Bootstrap Modal לא זמין');
-        if (typeof window.showErrorNotification === 'function') {
-            window.showErrorNotification('שגיאה', 'Bootstrap Modal לא זמין');
-        }
-    }
+    await showDynamicModal('unusedCssRemovalModal', modalHTML);
 }
 
 /**
@@ -711,10 +836,7 @@ async function executeUnusedCssRemoval() {
         const response = { ok: true, removedRules: totalRemoved, files: selectedFiles };
         
         if (response.ok) {
-            if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
-                const modal = bootstrap.Modal.getInstance(document.getElementById('unusedCssRemovalModal'));
-                if (modal) modal.hide();
-            }
+            hideDynamicModal('unusedCssRemovalModal');
             
             if (typeof window.showSuccessNotification === 'function') {
                 window.showSuccessNotification('הסרה הושלמה', `${response.removedRules} כללים הוסרו מ-${response.files.length} קבצים`);
@@ -731,7 +853,7 @@ async function executeUnusedCssRemoval() {
         }
         
     } catch (error) {
-        console.error('❌ שגיאה בהסרת CSS לא בשימוש:', error);
+        window.Logger?.error('❌ שגיאה בהסרת CSS לא בשימוש:', error);
         if (typeof window.showErrorNotification === 'function') {
             window.showErrorNotification('שגיאה', 'שגיאה בהסרת CSS לא בשימוש: ' + error.message);
         }
@@ -760,7 +882,7 @@ async function removeUnusedCssAPI() {
         return removalData;
         
     } catch (error) {
-        console.error('❌ שגיאה בהסרת CSS לא בשימוש:', error);
+        window.Logger?.error('❌ שגיאה בהסרת CSS לא בשימוש:', error);
         if (typeof window.showErrorNotification === 'function') {
             window.showErrorNotification('שגיאה', 'שגיאה בהסרת CSS לא בשימוש');
         }
@@ -777,7 +899,7 @@ async function removeUnusedCssAPI() {
  * דחיסת CSS
  */
 async function minifyCss() {
-    console.log('🗜️ מתחיל דחיסת CSS...');
+    window.Logger?.debug('🗜️ מתחיל דחיסת CSS...');
     
     try {
         if (typeof window.showInfoNotification === 'function') {
@@ -786,14 +908,14 @@ async function minifyCss() {
         
         const minifyResults = await minifyCssAPI();
         
-        console.log(`📊 דחיסה הושלמה: ${minifyResults.originalSize} → ${minifyResults.minifiedSize} (${minifyResults.savings}% חיסכון)`);
+        window.Logger?.debug(`📊 דחיסה הושלמה: ${minifyResults.originalSize} → ${minifyResults.minifiedSize} (${minifyResults.savings}% חיסכון)`);
 
     if (typeof window.showSuccessNotification === 'function') {
             window.showSuccessNotification('דחיסה הושלמה', `חיסכון של ${minifyResults.savings}% בגודל`);
         }
         
     } catch (error) {
-        console.error('❌ שגיאה בדחיסת CSS:', error);
+        window.Logger?.error('❌ שגיאה בדחיסת CSS:', error);
         if (typeof window.showErrorNotification === 'function') {
             window.showErrorNotification('שגיאה', 'שגיאה בדחיסת CSS: ' + error.message);
         }
@@ -820,7 +942,7 @@ async function minifyCssAPI() {
         return minifyData;
         
     } catch (error) {
-        console.error('❌ שגיאה בדחיסת CSS:', error);
+        window.Logger?.error('❌ שגיאה בדחיסת CSS:', error);
         if (typeof window.showErrorNotification === 'function') {
             window.showErrorNotification('שגיאה', 'שגיאה בדחיסת CSS');
         }
@@ -837,7 +959,7 @@ async function minifyCssAPI() {
  * סריקת כפילויות CSS
  */
 async function detectCssDuplicates() {
-    console.log('🔍 מתחיל סריקת כפילויות...');
+    window.Logger?.debug('🔍 מתחיל סריקת כפילויות...');
     
     try {
         if (typeof window.showInfoNotification === 'function') {
@@ -848,14 +970,14 @@ async function detectCssDuplicates() {
         
         displayDuplicateResults(duplicates);
         
-        console.log(`📊 סריקה הושלמה: ${duplicates.totalFiles} קבצים, ${duplicates.duplicates.length} כפילויות`);
+        window.Logger?.debug(`📊 סריקה הושלמה: ${duplicates.totalFiles} קבצים, ${duplicates.duplicates.length} כפילויות`);
 
     if (typeof window.showSuccessNotification === 'function') {
             window.showSuccessNotification('סריקה הושלמה', `נמצאו ${duplicates.duplicates.length} כפילויות`);
         }
         
     } catch (error) {
-        console.error('❌ שגיאה בסריקת כפילויות:', error);
+        window.Logger?.error('❌ שגיאה בסריקת כפילויות:', error);
         if (typeof window.showErrorNotification === 'function') {
             window.showErrorNotification('שגיאה', 'שגיאה בסריקת כפילויות: ' + error.message);
         }
@@ -941,7 +1063,7 @@ async function detectCssDuplicatesAPI() {
         return duplicatesData;
         
     } catch (error) {
-        console.error('❌ שגיאה בזיהוי כפילויות:', error);
+        window.Logger?.error('❌ שגיאה בזיהוי כפילויות:', error);
         if (typeof window.showErrorNotification === 'function') {
             window.showErrorNotification('שגיאה', 'שגיאה בזיהוי כפילויות CSS');
         }
@@ -1020,7 +1142,12 @@ function displayDuplicateResults(results) {
             `;
         }
         
-        container.innerHTML = html;
+        container.textContent = '';
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        doc.body.childNodes.forEach(node => {
+            container.appendChild(node.cloneNode(true));
+        });
     }
 }
 
@@ -1034,7 +1161,8 @@ function createDuplicateResultsContainer() {
         resultsContainer.id = 'duplicateResults';
         resultsContainer.className = 'duplicate-results-container mt-3';
         
-        resultsContainer.innerHTML = `
+        resultsContainer.textContent = '';
+        const resultsHTML = `
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">🔍 תוצאות כפילויות</h5>
@@ -1047,6 +1175,11 @@ function createDuplicateResultsContainer() {
                 </div>
             </div>
         `;
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(resultsHTML, 'text/html');
+        doc.body.childNodes.forEach(node => {
+            resultsContainer.appendChild(node.cloneNode(true));
+        });
         
         duplicateSection.appendChild(resultsContainer);
     }
@@ -1055,7 +1188,7 @@ function createDuplicateResultsContainer() {
 /**
  * הצגת חלון גיבוי לפני פעולות
  */
-function showBackupDialog(actionCallback) {
+async function showBackupDialog(actionCallback) {
     const modalHTML = `
         <div class="modal fade" id="backupDialogModal" tabindex="-1">
             <div class="modal-dialog">
@@ -1093,21 +1226,10 @@ function showBackupDialog(actionCallback) {
         existingModal.remove();
     }
     
-    document.body.insertAdjacentHTML('beforeend', modalHTML);
-    
     // שמירת callback לפעולה
     window.backupActionCallback = actionCallback;
     
-    // בדיקה אם Bootstrap זמין
-    if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
-        const modal = new bootstrap.Modal(document.getElementById('backupDialogModal'));
-        modal.show();
-    } else {
-        console.error('Bootstrap Modal לא זמין');
-        if (typeof window.showErrorNotification === 'function') {
-            window.showErrorNotification('שגיאה', 'Bootstrap Modal לא זמין');
-        }
-    }
+    await showDynamicModal('backupDialogModal', modalHTML);
 }
 
 /**
@@ -1137,10 +1259,7 @@ async function proceedWithBackup() {
         }
         
         // סגירת המודל
-        if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
-            const modal = bootstrap.Modal.getInstance(document.getElementById('backupDialogModal'));
-            if (modal) modal.hide();
-        }
+        hideDynamicModal('backupDialogModal');
         
         // ביצוע הפעולה המקורית
         if (window.backupActionCallback) {
@@ -1148,7 +1267,7 @@ async function proceedWithBackup() {
         }
         
     } catch (error) {
-        console.error('❌ שגיאה בגיבוי:', error);
+        window.Logger?.error('❌ שגיאה בגיבוי:', error);
         if (typeof window.showErrorNotification === 'function') {
             window.showErrorNotification('שגיאה', 'שגיאה בגיבוי: ' + error.message);
         }
@@ -1172,12 +1291,12 @@ async function createCssBackup() {
             totalSize: '2.4 MB'
         };
         
-        console.log(`💾 גיבוי נוצר: ${backupFile}`);
+        window.Logger?.debug(`💾 גיבוי נוצר: ${backupFile}`);
         
         return response;
         
     } catch (error) {
-        console.error('❌ שגיאה ביצירת גיבוי:', error);
+        window.Logger?.error('❌ שגיאה ביצירת גיבוי:', error);
         return { success: false, error: error.message };
     }
 }
@@ -1186,7 +1305,7 @@ async function createCssBackup() {
  * ניקוי כפילויות CSS
  */
 async function cleanupCssDuplicates(selector = null) {
-    console.log('🧹 מתחיל ניקוי כפילויות...');
+    window.Logger?.debug('🧹 מתחיל ניקוי כפילויות...');
     
     // הצגת חלון גיבוי
     showBackupDialog(async () => {
@@ -1207,11 +1326,11 @@ async function performCleanupDuplicates(selector = null) {
             await cleanupSpecificDuplicate(selector, duplicates);
         } else {
             // ניקוי כללי - הצגת בחירת קובץ איחוד
-            showDuplicateCleanupModal(duplicates);
+            await showDuplicateCleanupModal(duplicates);
         }
         
     } catch (error) {
-        console.error('❌ שגיאה בניקוי כפילויות:', error);
+        window.Logger?.error('❌ שגיאה בניקוי כפילויות:', error);
         if (typeof window.showErrorNotification === 'function') {
             window.showErrorNotification('שגיאה', 'שגיאה בניקוי כפילויות: ' + error.message);
         }
@@ -1221,7 +1340,7 @@ async function performCleanupDuplicates(selector = null) {
 /**
  * הצגת מודל בחירת קובץ איחוד לכפילויות
  */
-function showDuplicateCleanupModal(duplicates) {
+async function showDuplicateCleanupModal(duplicates) {
     const modalHTML = `
         <div class="modal fade" id="duplicateCleanupModal" tabindex="-1">
             <div class="modal-dialog modal-lg">
@@ -1265,25 +1384,21 @@ function showDuplicateCleanupModal(duplicates) {
         existingModal.remove();
     }
     
-    document.body.insertAdjacentHTML('beforeend', modalHTML);
-    
-    // בדיקה אם Bootstrap זמין
-    if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
-        const modal = new bootstrap.Modal(document.getElementById('duplicateCleanupModal'));
-        modal.show();
-    } else {
-        console.error('Bootstrap Modal לא זמין');
-        if (typeof window.showErrorNotification === 'function') {
-            window.showErrorNotification('שגיאה', 'Bootstrap Modal לא זמין');
-        }
-    }
+    await showDynamicModal('duplicateCleanupModal', modalHTML);
 }
 
 /**
  * ביצוע איחוד כפילויות
  */
 async function executeDuplicateCleanup() {
-    const targetFile = document.getElementById('mergeTargetFile').value;
+    let targetFile;
+    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) {
+        targetFile = window.DataCollectionService.getValue('mergeTargetFile', 'text', '');
+    } else {
+        // Fallback if DataCollectionService is not available
+        const targetFileElement = document.getElementById('mergeTargetFile');
+        targetFile = targetFileElement ? targetFileElement.value : '';
+    }
     
     if (!targetFile) {
         if (typeof window.showWarningNotification === 'function') {
@@ -1305,10 +1420,7 @@ async function executeDuplicateCleanup() {
                 mergedDuplicates.add(dup.selector);
             });
             
-            if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
-                const modal = bootstrap.Modal.getInstance(document.getElementById('duplicateCleanupModal'));
-                if (modal) modal.hide();
-            }
+            hideDynamicModal('duplicateCleanupModal');
             
             if (typeof window.showSuccessNotification === 'function') {
                 window.showSuccessNotification('איחוד הושלם', `${response.mergedRules} כפילויות אוחדו לקובץ ${targetFile}`);
@@ -1322,7 +1434,7 @@ async function executeDuplicateCleanup() {
         }
         
     } catch (error) {
-        console.error('❌ שגיאה באיחוד כפילויות:', error);
+        window.Logger?.error('❌ שגיאה באיחוד כפילויות:', error);
         if (typeof window.showErrorNotification === 'function') {
             window.showErrorNotification('שגיאה', 'שגיאה באיחוד כפילויות: ' + error.message);
         }
@@ -1342,13 +1454,13 @@ async function cleanupSpecificDuplicate(selector, duplicates) {
     }
     
     // הצגת בחירת קובץ איחוד לכפילות ספציפית
-    showSpecificDuplicateCleanupModal(selector, duplicate);
+    await showSpecificDuplicateCleanupModal(selector, duplicate);
 }
 
 /**
  * הצגת מודל בחירת קובץ איחוד לכפילות ספציפית
  */
-function showSpecificDuplicateCleanupModal(selector, duplicate) {
+async function showSpecificDuplicateCleanupModal(selector, duplicate) {
     const modalHTML = `
         <div class="modal fade" id="specificDuplicateCleanupModal" tabindex="-1">
             <div class="modal-dialog">
@@ -1389,25 +1501,21 @@ function showSpecificDuplicateCleanupModal(selector, duplicate) {
         existingModal.remove();
     }
     
-    document.body.insertAdjacentHTML('beforeend', modalHTML);
-    
-    // בדיקה אם Bootstrap זמין
-    if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
-        const modal = new bootstrap.Modal(document.getElementById('specificDuplicateCleanupModal'));
-        modal.show();
-    } else {
-        console.error('Bootstrap Modal לא זמין');
-        if (typeof window.showErrorNotification === 'function') {
-            window.showErrorNotification('שגיאה', 'Bootstrap Modal לא זמין');
-        }
-    }
+    await showDynamicModal('specificDuplicateCleanupModal', modalHTML);
 }
 
 /**
  * ביצוע איחוד כפילות ספציפית
  */
 async function executeSpecificDuplicateCleanup(selector) {
-    const targetFile = document.getElementById('specificMergeTargetFile').value;
+    let targetFile;
+    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) {
+        targetFile = window.DataCollectionService.getValue('specificMergeTargetFile', 'text', '');
+    } else {
+        // Fallback if DataCollectionService is not available
+        const targetFileElement = document.getElementById('specificMergeTargetFile');
+        targetFile = targetFileElement ? targetFileElement.value : '';
+    }
     
     if (!targetFile) {
         if (typeof window.showWarningNotification === 'function') {
@@ -1424,10 +1532,7 @@ async function executeSpecificDuplicateCleanup(selector) {
             // הוספת הכפילות לרשימת הכפילויות שאוחדו
             mergedDuplicates.add(selector);
             
-            if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
-                const modal = bootstrap.Modal.getInstance(document.getElementById('specificDuplicateCleanupModal'));
-                if (modal) modal.hide();
-            }
+            hideDynamicModal('specificDuplicateCleanupModal');
             
             if (typeof window.showSuccessNotification === 'function') {
                 window.showSuccessNotification('איחוד הושלם', `הכפילות ${selector} אוחדה לקובץ ${targetFile}`);
@@ -1441,7 +1546,7 @@ async function executeSpecificDuplicateCleanup(selector) {
         }
         
     } catch (error) {
-        console.error('❌ שגיאה באיחוד כפילות ספציפית:', error);
+        window.Logger?.error('❌ שגיאה באיחוד כפילות ספציפית:', error);
         if (typeof window.showErrorNotification === 'function') {
             window.showErrorNotification('שגיאה', 'שגיאה באיחוד כפילות ספציפית: ' + error.message);
         }
@@ -1464,13 +1569,13 @@ async function removeSpecificDuplicate(selector) {
     }
     
     // הצגת מודל בחירת קובץ למחיקה
-    showDeleteFileSelectionModal(selector, duplicate);
+    await showDeleteFileSelectionModal(selector, duplicate);
 }
 
 /**
  * הצגת מודל בחירת קובץ למחיקה
  */
-function showDeleteFileSelectionModal(selector, duplicate) {
+async function showDeleteFileSelectionModal(selector, duplicate) {
     const modalHTML = `
         <div class="modal fade" id="deleteFileSelectionModal" tabindex="-1">
             <div class="modal-dialog">
@@ -1509,24 +1614,21 @@ function showDeleteFileSelectionModal(selector, duplicate) {
         existingModal.remove();
     }
     
-    document.body.insertAdjacentHTML('beforeend', modalHTML);
-    
-    if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
-        const modal = new bootstrap.Modal(document.getElementById('deleteFileSelectionModal'));
-        modal.show();
-    } else {
-        console.error('Bootstrap Modal לא זמין');
-        if (typeof window.showErrorNotification === 'function') {
-            window.showErrorNotification('שגיאה', 'Bootstrap Modal לא זמין');
-        }
-    }
+    await showDynamicModal('deleteFileSelectionModal', modalHTML);
 }
 
 /**
  * ביצוע מחיקה מקובץ ספציפי
  */
 async function executeDeleteFromFile(selector) {
-    const targetFile = document.getElementById('deleteFromFile').value;
+    let targetFile;
+    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) {
+        targetFile = window.DataCollectionService.getValue('deleteFromFile', 'text', '');
+    } else {
+        // Fallback if DataCollectionService is not available
+        const targetFileElement = document.getElementById('deleteFromFile');
+        targetFile = targetFileElement ? targetFileElement.value : '';
+    }
     
     if (!targetFile) {
         if (typeof window.showWarningNotification === 'function') {
@@ -1542,10 +1644,7 @@ async function executeDeleteFromFile(selector) {
             const deleteInfo = `${selector}||${targetFile}`;
             removedDuplicates.add(deleteInfo);
             
-            if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
-                const modal = bootstrap.Modal.getInstance(document.getElementById('deleteFileSelectionModal'));
-                if (modal) modal.hide();
-            }
+            hideDynamicModal('deleteFileSelectionModal');
             
             if (typeof window.showSuccessNotification === 'function') {
                 window.showSuccessNotification('מחיקה הושלמה', `הכפילות ${selector} נמחקה מהקובץ ${targetFile}`);
@@ -1556,7 +1655,7 @@ async function executeDeleteFromFile(selector) {
             }, 1000);
             
         } catch (error) {
-            console.error('❌ שגיאה במחיקת כפילות:', error);
+            window.Logger?.error('❌ שגיאה במחיקת כפילות:', error);
             if (typeof window.showErrorNotification === 'function') {
                 window.showErrorNotification('שגיאה', 'שגיאה במחיקת כפילות: ' + error.message);
             }
@@ -1594,7 +1693,7 @@ function clearDuplicateResults() {
  * בדיקת תאימות ITCSS
  */
 async function checkArchitectureCompliance() {
-    console.log('🏗️ מתחיל בדיקת תאימות ITCSS...');
+    window.Logger?.debug('🏗️ מתחיל בדיקת תאימות ITCSS...');
     
     try {
         if (typeof window.showInfoNotification === 'function') {
@@ -1605,14 +1704,14 @@ async function checkArchitectureCompliance() {
         
         displayComplianceResults(complianceResults);
         
-        console.log(`📊 בדיקת תאימות הושלמה: ${complianceResults.compliantFiles}/${complianceResults.totalFiles} קבצים תואמים`);
+        window.Logger?.debug(`📊 בדיקת תאימות הושלמה: ${complianceResults.compliantFiles}/${complianceResults.totalFiles} קבצים תואמים`);
         
         if (typeof window.showSuccessNotification === 'function') {
             window.showSuccessNotification('בדיקת תאימות הושלמה', `${complianceResults.compliantPercentage}% תאימות`);
         }
         
     } catch (error) {
-        console.error('❌ שגיאה בבדיקת תאימות:', error);
+        window.Logger?.error('❌ שגיאה בבדיקת תאימות:', error);
         if (typeof window.showErrorNotification === 'function') {
             window.showErrorNotification('שגיאה', 'שגיאה בבדיקת תאימות ITCSS: ' + error.message);
         }
@@ -1656,7 +1755,7 @@ async function checkArchitectureComplianceAPI() {
         return complianceData;
         
     } catch (error) {
-        console.error('❌ שגיאה בבדיקת תאימות:', error);
+        window.Logger?.error('❌ שגיאה בבדיקת תאימות:', error);
         if (typeof window.showErrorNotification === 'function') {
             window.showErrorNotification('שגיאה', 'שגיאה בבדיקת תאימות ITCSS');
         }
@@ -1725,7 +1824,12 @@ function displayComplianceResults(results) {
             html += `</ul>`;
         }
         
-        container.innerHTML = html;
+        container.textContent = '';
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        doc.body.childNodes.forEach(node => {
+            container.appendChild(node.cloneNode(true));
+        });
     }
 }
 
@@ -1739,7 +1843,8 @@ function createComplianceResultsContainer() {
         resultsContainer.id = 'complianceResults';
         resultsContainer.className = 'compliance-results-container mt-3';
         
-        resultsContainer.innerHTML = `
+        resultsContainer.textContent = '';
+        const resultsHTML = `
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">🏗️ תוצאות תאימות ITCSS</h5>
@@ -1752,6 +1857,11 @@ function createComplianceResultsContainer() {
                 </div>
             </div>
         `;
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(resultsHTML, 'text/html');
+        doc.body.childNodes.forEach(node => {
+            resultsContainer.appendChild(node.cloneNode(true));
+        });
         
         complianceSection.appendChild(resultsContainer);
     }
@@ -1770,7 +1880,7 @@ function clearComplianceResults() {
 /**
  * הצגת מודל הוספת קובץ CSS
  */
-function showAddCssFileModal() {
+async function showAddCssFileModal() {
     const modalHTML = `
         <div class="modal fade" id="addCssFileModal" tabindex="-1">
             <div class="modal-dialog">
@@ -1807,12 +1917,22 @@ function showAddCssFileModal() {
     
     document.body.insertAdjacentHTML('beforeend', modalHTML);
     
-    // בדיקה אם Bootstrap זמין
-    if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
-        const modal = new bootstrap.Modal(document.getElementById('addCssFileModal'));
+    // פתיחה דרך ModalManagerV2
+    if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
+        window.ModalManagerV2.showModal('addCssFileModal', 'add').catch(error => {
+            window.Logger?.error('Error showing add CSS file modal via ModalManagerV2', { error, modalId: 'addCssFileModal', page: 'css-management' });
+            // Fallback to bootstrap if ModalManagerV2 fails
+            if (bootstrap?.Modal) {
+                const modal = window.ModalManagerV2?.openModal(document.getElementById('addCssFileModal'));
+                modal.show();
+            }
+        });
+    } else if (bootstrap?.Modal) {
+        // Fallback to Bootstrap modal
+        const modal = window.ModalManagerV2?.openModal(document.getElementById('addCssFileModal'));
         modal.show();
     } else {
-        console.error('Bootstrap Modal לא זמין');
+        window.Logger?.error('Bootstrap Modal לא זמין');
         if (typeof window.showErrorNotification === 'function') {
             window.showErrorNotification('שגיאה', 'Bootstrap Modal לא זמין');
         }
@@ -1823,8 +1943,17 @@ function showAddCssFileModal() {
  * יצירת קובץ CSS חדש מהמודל
  */
 async function createNewCssFileFromModal() {
-    const fileName = document.getElementById('newCssFileName').value.trim();
-    const content = document.getElementById('newCssFileContent').value.trim();
+    let fileName, content;
+    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) {
+        fileName = window.DataCollectionService.getValue('newCssFileName', 'text', '').trim();
+        content = window.DataCollectionService.getValue('newCssFileContent', 'text', '').trim();
+    } else {
+        // Fallback if DataCollectionService is not available
+        const fileNameElement = document.getElementById('newCssFileName');
+        const contentElement = document.getElementById('newCssFileContent');
+        fileName = fileNameElement ? fileNameElement.value.trim() : '';
+        content = contentElement ? contentElement.value.trim() : '';
+    }
     
     if (!fileName) {
         if (typeof window.showWarningNotification === 'function') {
@@ -1840,10 +1969,7 @@ async function createNewCssFileFromModal() {
         const response = { ok: true };
         
         if (response.ok) {
-            if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
-                const modal = bootstrap.Modal.getInstance(document.getElementById('addCssFileModal'));
-                if (modal) modal.hide();
-            }
+            hideDynamicModal('addCssFileModal');
 
     if (typeof window.showSuccessNotification === 'function') {
                 window.showSuccessNotification('הצלחה', `קובץ ${fullFileName} נוצר בהצלחה`);
@@ -1857,7 +1983,7 @@ async function createNewCssFileFromModal() {
         }
         
     } catch (error) {
-        console.error(`❌ שגיאה ביצירת ${fullFileName}:`, error);
+        window.Logger?.error(`❌ שגיאה ביצירת ${fullFileName}:`, error);
         if (typeof window.showErrorNotification === 'function') {
             window.showErrorNotification('שגיאה', `שגיאה ביצירת ${fullFileName}: ${error.message}`);
         }
@@ -1867,8 +1993,8 @@ async function createNewCssFileFromModal() {
 /**
  * יצירת קובץ CSS חדש
  */
-function createNewCssFile() {
-    showAddCssFileModal();
+async function createNewCssFile() {
+    await showAddCssFileModal();
 }
 
 /**
@@ -1897,7 +2023,7 @@ async function openCssEditor() {
  * טעינת רשימת קבצי CSS אמיתיים
  */
 async function loadCssFilesList() {
-    console.log('📁 טוען רשימת קבצי CSS...');
+    window.Logger?.debug('📁 טוען רשימת קבצי CSS...');
     
     try {
         // רשימת קבצי CSS מהמערכת החדשה
@@ -1932,7 +2058,7 @@ async function loadCssFilesList() {
         
         
     } catch (error) {
-        console.error('❌ שגיאה בטעינת רשימת קבצי CSS:', error);
+        window.Logger?.error('❌ שגיאה בטעינת רשימת קבצי CSS:', error);
         if (typeof window.showErrorNotification === 'function') {
             window.showErrorNotification('שגיאה', 'שגיאה בטעינת רשימת קבצי CSS');
         }
@@ -1946,11 +2072,12 @@ function displayCssFilesTable(files) {
     const tbody = document.querySelector('#cssFilesTable tbody');
     if (!tbody) return;
     
-    tbody.innerHTML = '';
+    tbody.textContent = '';
     
     files.forEach(file => {
         const row = document.createElement('tr');
-        row.innerHTML = `
+        row.textContent = '';
+        const rowHTML = `
             <td><code>${file.name}</code></td>
             <td>${file.size}</td>
             <td>${file.rules}</td>
@@ -1964,6 +2091,14 @@ function displayCssFilesTable(files) {
                 </div>
             </td>
         `;
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(`<table><tbody><tr>${rowHTML}</tr></tbody></table>`, 'text/html');
+        const tempRow = doc.body.querySelector('tr');
+        if (tempRow) {
+            Array.from(tempRow.children).forEach(cell => {
+                row.appendChild(cell.cloneNode(true));
+            });
+        }
         tbody.appendChild(row);
     });
 }
@@ -1972,7 +2107,7 @@ function displayCssFilesTable(files) {
  * אתחול עמוד ניהול CSS
  */
 function initializeCssManagement() {
-    console.log('🎨 אתחול עמוד ניהול CSS...');
+    window.Logger?.debug('🎨 אתחול עמוד ניהול CSS...');
     
     refreshCssStats();
     loadCssFilesList();
@@ -2080,7 +2215,7 @@ window.loadCSSManagement = async function loadCSSManagement() {
 
 // Error handling
 window.addEventListener('error', (e) => {
-    console.error('❌ שגיאה כללית:', e.error);
+    window.Logger?.error('❌ שגיאה כללית:', e.error);
 });
 
 /**

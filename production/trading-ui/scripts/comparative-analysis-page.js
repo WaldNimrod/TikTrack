@@ -6,6 +6,107 @@
  * Documentation: See documentation/frontend/JAVASCRIPT_ARCHITECTURE.md
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - initializeSeriesControls() - Initializeseriescontrols
+// - createComparisonCategories() - Createcomparisoncategories
+// - initComparisonChart() - Initcomparisonchart
+// - initializeTagsFilter() - Initializetagsfilter
+// - initializeRecordFilterTags() - Initializerecordfiltertags
+// - initializeComparisonTags() - Initializecomparisontags
+// - initializeHeader() - Initializeheader
+// - initializePage() - Initializepage
+
+// === Event Handlers ===
+// - getComparisonParameterValues() - Getcomparisonparametervalues
+// - selectDateRangeOption() - Selectdaterangeoption
+// - handleCustomDateFromChange() - Handlecustomdatefromchange
+// - handleCustomDateToChange() - Handlecustomdatetochange
+// - generateMockComparisonTableData() - Generatemockcomparisontabledata
+// - formatComparisonInfo() - Formatcomparisoninfo
+// - updateComparisonTable() - Updatecomparisontable
+// - updateAllVisualizationsInternal() - Updateallvisualizationsinternal
+// - updateAllVisualizations() - Updateallvisualizations
+// - updateComparisonChart() - Updatecomparisonchart
+// - selectAllOptions() - Selectalloptions
+// - clearAllOptions() - Clearalloptions
+// - selectSideOption() - Selectsideoption
+// - selectStatusOption() - Selectstatusoption
+// - toggleComparisonParameter() - Togglecomparisonparameter
+// - applyComparisonParameters() - Applycomparisonparameters
+// - selectAllComparisonParameters() - Selectallcomparisonparameters
+// - clearAllComparisonParameters() - Clearallcomparisonparameters
+// - resetComparisonParameters() - Resetcomparisonparameters
+// - resetComparisonParametersToDefaults() - Resetcomparisonparameterstodefaults
+// - saveComparisonParameterState() - Savecomparisonparameterstate
+// - loadComparisonParameterState() - Loadcomparisonparameterstate
+
+// === UI Functions ===
+// - updateDateRangeFilterText() - Updatedaterangefiltertext
+// - renderTagsBadges() - Rendertagsbadges
+// - updateHeatmap() - Updateheatmap
+// - showHeatmapTooltip() - Showheatmaptooltip
+// - hideHeatmapTooltip() - Hideheatmaptooltip
+// - updateVisualHeatmap() - Updatevisualheatmap
+// - showVisualHeatmapTooltip() - Showvisualheatmaptooltip
+// - hideVisualHeatmapTooltip() - Hidevisualheatmaptooltip
+// - updateChartLegend() - Updatechartlegend
+// - updateSideFilterText() - Updatesidefiltertext
+// - updateStatusFilterText() - Updatestatusfiltertext
+
+// === Data Functions ===
+// - getCSSVariableValue() - Getcssvariablevalue
+// - saveSeriesVisibilityState() - Saveseriesvisibilitystate
+// - loadSeriesVisibilityState() - Loadseriesvisibilitystate
+// - getRecordFilterValues() - Getrecordfiltervalues
+// - getFilterValues() - Getfiltervalues
+// - getDateRange() - Getdaterange
+// - saveFilterState() - Savefilterstate
+// - loadFilterState() - Loadfilterstate
+// - generateMockSeriesData() - Generatemockseriesdata
+// - generateMockHeatmapData() - Generatemockheatmapdata
+// - getColorClass() - Getcolorclass
+// - getColorStyle() - Getcolorstyle
+// - loadTradingAccounts() - Loadtradingaccounts
+// - loadTradingMethods() - Loadtradingmethods
+// - loadTickers() - Loadtickers
+// - saveRecordFilterState() - Saverecordfilterstate
+// - loadRecordFilterState() - Loadrecordfilterstate
+// - getPercentile() - Getpercentile
+// - getPLPercentile() - Getplpercentile
+// - getAvgPLPercentile() - Getavgplpercentile
+// - getValuePercentile() - Getvaluepercentile
+
+// === Utility Functions ===
+// - formatCurrency() - Formatcurrency
+// - formatPLWithPercent() - Formatplwithpercent
+// - formatInvestmentWithPercent() - Formatinvestmentwithpercent
+// - formatFilterInfo() - Formatfilterinfo
+// - formatDate() - Formatdate
+
+// === Other ===
+// - toggleSeries() - Toggleseries
+// - waitForTradingViewAdapter() - Waitfortradingviewadapter
+// - toggleDateRangeFilterMenu() - Toggledaterangefiltermenu
+// - restorePageState() - Restorepagestate
+// - generateMockTagsForCategory() - Generatemocktagsforcategory
+// - cartesianProduct() - Cartesianproduct
+// - seededRandom() - Seededrandom
+// - filterByCategory() - Filterbycategory
+// - toggleSideFilterMenu() - Togglesidefiltermenu
+// - toggleStatusFilterMenu() - Togglestatusfiltermenu
+// - applyRecordFilters() - Applyrecordfilters
+// - selectAllRecordFilters() - Selectallrecordfilters
+// - clearAllRecordFilters() - Clearallrecordfilters
+// - resetRecordFilters() - Resetrecordfilters
+// - resetRecordFiltersToDefaults() - Resetrecordfilterstodefaults
+// - applyFilters() - Applyfilters
+// - resetFilters() - Resetfilters
+// - resetToDefaults() - Resettodefaults
+// - exportComparativeAnalysis() - Exportcomparativeanalysis
+
 (function() {
     'use strict';
 
@@ -20,46 +121,21 @@ function getCSSVariableValue(variableName, fallback) {
 }
 
 // Get entity color dynamically from system
-function getEntityColor(entityType) {
-    // Try to use color-scheme-system if available
-    if (window.getEntityColor && typeof window.getEntityColor === 'function') {
-        const color = window.getEntityColor(entityType);
-        if (color) return color;
-    }
-    
-    // Try CSS variable
-    const cssVar = getCSSVariableValue(`--entity-${entityType.replace('_', '-')}-color`, '');
-    if (cssVar) return cssVar;
-    
-    // Fallback to default entity colors from color-scheme-system
-    const defaultColors = {
-        'trade': '#26baac',
-        'trade_plan': '#28a745',
-        'execution': '#17a2b8',
-        'account': '#6f42c1',
-        'trading_account': '#28a745',
-        'cash_flow': '#fd7e14',
-        'ticker': '#20c997',
-        'alert': '#dc3545',
-        'note': '#6c757d',
-        'constraint': '#e83e8c',
-        'design': '#6f42c1',
-        'research': '#17a2b8',
-        'preference': '#adb5bd',
-        'development': '#fc5a06',
-        'position': '#0d6efd'
-    };
-    
-    return defaultColors[entityType] || getCSSVariableValue('--primary-color', '#26baac');
-}
+// ⚠️ REMOVED: Local getEntityColor() function - use centralized Color Scheme System
+// Use window.getEntityColor() directly instead
+// All hardcoded fallbacks removed - system must load colors from preferences
 
 // Initialize series checkboxes UI
 function initializeSeriesControls() {
     const container = document.getElementById('series-checkboxes-container');
     if (!container) return;
     
-    container.innerHTML = AVAILABLE_SERIES.map(series => {
-        const color = getEntityColor(series.entityType);
+    // Build checkboxes HTML and insert using tempDiv
+    const checkboxesHTML = AVAILABLE_SERIES.map(series => {
+        // Use centralized Color Scheme System directly - no local function
+        const color = (typeof window.getEntityColor === 'function') 
+            ? window.getEntityColor(series.entityType) 
+            : '';
         const isChecked = seriesVisibility[series.key] !== false; // Default true
         return `
             <div class="series-checkbox-container">
@@ -69,12 +145,22 @@ function initializeSeriesControls() {
                        ${isChecked ? 'checked' : ''}
                        data-onchange="toggleSeries('${series.key}', this.checked)">
                 <label for="series-${series.key}" class="series-checkbox-label">
-                    <div class="series-color-indicator" style="background-color: ${color};"></div>
+                    <div class="series-color-indicator" ${color ? `style="--series-color: ${color};"` : ''}></div>
                     <span class="form-label-small">${series.label}</span>
                 </label>
-            </div>
-        `;
+                </div>
+            `;
     }).join('');
+    
+    // Insert using DOMParser
+    container.textContent = '';
+    if (checkboxesHTML) {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(checkboxesHTML, 'text/html');
+        Array.from(doc.body.childNodes).forEach(node => {
+            container.appendChild(node.cloneNode(true));
+        });
+    }
 }
 
 // Toggle series visibility
@@ -91,7 +177,7 @@ async function saveSeriesVisibilityState() {
             await window.PreferencesCore.savePreference(PREF_SERIES_VISIBILITY, seriesVisibility);
         } else {
             // Fallback to localStorage
-            localStorage.setItem(PREF_SERIES_VISIBILITY, JSON.stringify(seriesVisibility));
+            window.PageStateManager?.setItem(PREF_SERIES_VISIBILITY, JSON.stringify(seriesVisibility));
         }
     } catch (error) {
         if (window.Logger) {
@@ -108,7 +194,7 @@ async function loadSeriesVisibilityState() {
             savedState = await window.PreferencesCore.getPreference(PREF_SERIES_VISIBILITY);
         } else {
             // Fallback to localStorage
-            const saved = localStorage.getItem(PREF_SERIES_VISIBILITY);
+            const saved = window.PageStateManager?.getItem(PREF_SERIES_VISIBILITY);
             if (saved) {
                 savedState = JSON.parse(saved);
             }
@@ -168,17 +254,25 @@ async function waitForTradingViewAdapter() {
     }
     
     if (typeof window.TradingViewChartAdapter === 'undefined') {
-        if (window.Logger) {
+        const errorMsg = 'TradingViewChartAdapter not loaded';
+        if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {
+            window.NotificationSystem.showError('שגיאה בטעינת גרפים', 
+                'ספריית TradingView לא נטענה. נא לרענן את העמוד.');
+        } else if (window.Logger) {
             window.Logger.error('❌ TradingViewChartAdapter not available', { page: 'comparative-analysis-page', timeout: maxRetries * 50 });
         }
-        throw new Error('TradingViewChartAdapter not loaded');
+        throw new Error(errorMsg);
     }
     
     if (typeof window.LightweightCharts === 'undefined' && typeof window.lightweightCharts === 'undefined') {
-        if (window.Logger) {
+        const errorMsg = 'LightweightCharts not loaded';
+        if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {
+            window.NotificationSystem.showError('שגיאה בטעינת גרפים', 
+                'ספריית LightweightCharts לא נטענה. נא לרענן את העמוד.');
+        } else if (window.Logger) {
             window.Logger.error('❌ LightweightCharts not available', { page: 'comparative-analysis-page', timeout: maxRetries * 50 });
         }
-        throw new Error('LightweightCharts not loaded');
+        throw new Error(errorMsg);
     }
     
     if (window.Logger) {
@@ -548,19 +642,143 @@ async function saveFilterState() {
         const filters = getFilterValues();
         // Use PageStateManager if available
         if (window.PageStateManager) {
-            await window.PageStateManager.savePageState('comparative-analysis-page', {
-                filters: filters
-            });
+            try {
+                await window.PageStateManager.savePageState('comparative-analysis-page', {
+                    filters: filters
+                });
+            } catch (pageStateError) {
+                // Fallback to PreferencesCore if PageStateManager fails
+                if (window.PreferencesCore && typeof window.PreferencesCore.savePreference === 'function') {
+                    try {
+                        const result = await window.PreferencesCore.savePreference(PREF_FILTERS, filters);
+                        // Check if save was successful - if not, fallback to localStorage
+                        if (!result || (result.success === false)) {
+                            window.PageStateManager?.setItem(PREF_FILTERS, JSON.stringify(filters));
+                        }
+                    } catch (prefError) {
+                        // Final fallback to localStorage
+                        window.PageStateManager?.setItem(PREF_FILTERS, JSON.stringify(filters));
+                    }
+                } else {
+                    // Fallback to localStorage
+                    window.PageStateManager?.setItem(PREF_FILTERS, JSON.stringify(filters));
+                }
+            }
         } else if (window.PreferencesCore && typeof window.PreferencesCore.savePreference === 'function') {
-            await window.PreferencesCore.savePreference(PREF_FILTERS, filters);
+            try {
+                const result = await window.PreferencesCore.savePreference(PREF_FILTERS, filters);
+                // Check if save was successful
+                if (!result || (result.success === false)) {
+                    // Save failed, fallback to localStorage
+                    if (window.Logger) {
+                        window.Logger.warn('Preference save failed, using localStorage fallback', { 
+                            page: 'comparative-analysis-page', 
+                            preference: PREF_FILTERS
+                        });
+                    }
+                    window.PageStateManager?.setItem(PREF_FILTERS, JSON.stringify(filters));
+                }
+            } catch (prefError) {
+                // If preference doesn't exist in database, fallback to localStorage
+                if (window.Logger) {
+                    window.Logger.warn('Preference save error, using localStorage fallback', { 
+                        page: 'comparative-analysis-page', 
+                        preference: PREF_FILTERS,
+                        error: prefError 
+                    });
+                }
+                window.PageStateManager?.setItem(PREF_FILTERS, JSON.stringify(filters));
+            }
         } else {
             // Fallback to localStorage
-            localStorage.setItem(PREF_FILTERS, JSON.stringify(filters));
+            window.PageStateManager?.setItem(PREF_FILTERS, JSON.stringify(filters));
         }
     } catch (error) {
         if (window.Logger) {
             window.Logger.warn('Failed to save filter state', { page: 'comparative-analysis-page', error });
         }
+        // Final fallback: always try localStorage
+        try {
+            const filters = getFilterValues();
+            window.PageStateManager?.setItem(PREF_FILTERS, JSON.stringify(filters));
+        } catch (e) {
+            // Log localStorage errors (non-critical - already attempted fallback)
+            if (window.Logger) {
+                window.Logger.warn('Failed to save preference to localStorage (final fallback failed)', { 
+                    preference: 'comparative-analysis-filters',
+                    error: e,
+                    page: 'comparative-analysis-page' 
+                });
+            }
+        }
+    }
+}
+
+// Restore page state (filters, sections, charts)
+async function restorePageState() {
+    if (!window.PageStateManager) {
+        // Fallback to existing load functions
+        await loadFilterState();
+        await loadRecordFilterState();
+        await loadComparisonParameterState();
+        return;
+    }
+
+    try {
+        const state = await window.PageStateManager.loadPageState('comparative-analysis-page');
+        if (!state || !state.filters) {
+            // Fallback to existing load functions
+            await loadFilterState();
+            await loadRecordFilterState();
+            await loadComparisonParameterState();
+            return;
+        }
+
+        // Restore filters if available
+        if (state.filters) {
+            // Restore record filters
+            if (state.filters.recordFilters) {
+                // Restore trading accounts
+                if (state.filters.recordFilters.tradingAccounts) {
+                    const select = document.getElementById('recordFilterTradingAccounts');
+                    if (select) {
+                        Array.from(select.options).forEach(opt => {
+                            opt.selected = state.filters.recordFilters.tradingAccounts.includes(parseInt(opt.value));
+                        });
+                    }
+                }
+            }
+
+            // Restore comparison parameters if available
+            if (state.filters.comparisonParams) {
+                // Comparison parameters will be restored by loadComparisonParameterState
+            }
+        }
+
+        // Restore section states if available
+        if (state.sections) {
+            Object.keys(state.sections).forEach(sectionId => {
+                const section = document.getElementById(sectionId);
+                if (section) {
+                    const sectionBody = section.querySelector('.section-body');
+                    if (sectionBody) {
+                        sectionBody.style.display = state.sections[sectionId] ? 'none' : 'block';
+                    }
+                }
+            });
+        }
+
+        if (window.Logger) {
+            window.Logger.debug('✅ Restored page state', { page: 'comparative-analysis-page' });
+        }
+    } catch (error) {
+        if (window.Logger) {
+            window.Logger.warn('Failed to restore page state, using fallback', { error, page: 'comparative-analysis-page' });
+        }
+        // Fallback to existing load functions
+        await loadFilterState();
+        await loadRecordFilterState();
+        await loadComparisonParameterState();
     }
 }
 
@@ -572,7 +790,7 @@ async function loadFilterState() {
             filters = await window.PreferencesCore.getPreference(PREF_FILTERS);
         } else {
             // Fallback to localStorage
-            const saved = localStorage.getItem(PREF_FILTERS);
+            const saved = window.PageStateManager?.getItem(PREF_FILTERS);
             if (saved) {
                 filters = JSON.parse(saved);
             }
@@ -620,11 +838,21 @@ async function loadFilterState() {
                     if (customInputs) {
                         customInputs.style.display = 'block';
                     }
-                    if (filters.dateRangeStart && document.getElementById('customDateFrom')) {
-                        document.getElementById('customDateFrom').value = filters.dateRangeStart;
-                    }
-                    if (filters.dateRangeEnd && document.getElementById('customDateTo')) {
-                        document.getElementById('customDateTo').value = filters.dateRangeEnd;
+                    // Use DataCollectionService to set values if available
+                    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+                        if (filters.dateRangeStart) {
+                            window.DataCollectionService.setValue('customDateFrom', filters.dateRangeStart, 'dateOnly');
+                        }
+                        if (filters.dateRangeEnd) {
+                            window.DataCollectionService.setValue('customDateTo', filters.dateRangeEnd, 'dateOnly');
+                        }
+                    } else {
+                        if (filters.dateRangeStart && document.getElementById('customDateFrom')) {
+                            document.getElementById('customDateFrom').value = filters.dateRangeStart;
+                        }
+                        if (filters.dateRangeEnd && document.getElementById('customDateTo')) {
+                            document.getElementById('customDateTo').value = filters.dateRangeEnd;
+                        }
                     }
                 }
                 updateDateRangeFilterText();
@@ -1369,7 +1597,15 @@ function updateComparisonTable(filters) {
         '<th class="text-end">מקס בנקודה</th>' +
         '<th class="text-end">סה"כ קניות</th>';
     
-    thead.innerHTML = headerHTML;
+    // Insert header using DOMParser
+    thead.textContent = '';
+    if (headerHTML) {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(headerHTML, 'text/html');
+        Array.from(doc.body.childNodes).forEach(node => {
+            thead.appendChild(node.cloneNode(true));
+        });
+    }
     
     // Calculate colspan for summary and info rows
     const summaryColspan = paramHeaders.length + 6; // param columns + 6 data columns (trades, avgPL, totalPL, successRate, maxInvestment, totalPurchases)
@@ -1481,7 +1717,16 @@ function updateComparisonTable(filters) {
             </tr>
         `;
         
-        tbody.innerHTML = dataRows + summaryRow;
+        // Insert rows using DOMParser
+        tbody.textContent = '';
+        const rowsHTML = dataRows + summaryRow;
+        if (rowsHTML) {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(rowsHTML, 'text/html');
+            Array.from(doc.body.childNodes).forEach(node => {
+                tbody.appendChild(node.cloneNode(true));
+            });
+        }
         
         // Fade in
         tbody.style.opacity = '1';
@@ -1496,12 +1741,13 @@ function updateComparisonTable(filters) {
         summary.style.transition = 'opacity 0.3s';
         summary.style.opacity = '0';
         setTimeout(() => {
-            summary.innerHTML = `
-                <strong>סיכום:</strong>
-                סה"כ קטגוריות: ${totalCategories} |
-                סה"כ טריידים: ${totalTrades} |
-                P/L כולל: ${formatCurrency(totalPL)}
-            `;
+            // Note: This is a mockup page summary display, not a standard summary element
+            // Consider using InfoSummarySystem if this page becomes production-ready
+            summary.textContent = '';
+            const strong = document.createElement('strong');
+            strong.textContent = 'סיכום:';
+            summary.appendChild(strong);
+            summary.appendChild(document.createTextNode(` סה"כ קטגוריות: ${totalCategories} | סה"כ טריידים: ${totalTrades} | P/L כולל: ${formatCurrency(totalPL)}`));
             summary.style.opacity = '1';
         }, 150);
     }
@@ -1512,7 +1758,15 @@ function updateComparisonTable(filters) {
         filterInfo.style.opacity = '0';
         setTimeout(() => {
             const filterText = formatFilterInfo(filters.recordFilters);
-            filterInfo.innerHTML = `<strong>פרמטרי סינון:</strong> ${filterText}`;
+            filterInfo.textContent = '';
+        // Convert HTML string to DOM elements safely
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(`<strong>פרמטרי סינון:</strong> ${filterText}`, 'text/html');
+        const fragment = document.createDocumentFragment();
+        Array.from(doc.body.childNodes).forEach(node => {
+            fragment.appendChild(node.cloneNode(true));
+        });
+        filterInfo.appendChild(fragment);
             filterInfo.style.opacity = '1';
         }, 150);
     }
@@ -1523,7 +1777,11 @@ function updateComparisonTable(filters) {
         comparisonInfo.style.opacity = '0';
         setTimeout(() => {
             const comparisonText = formatComparisonInfo(filters.comparisonParameters);
-            comparisonInfo.innerHTML = `<strong>פרמטרי השוואה:</strong> ${comparisonText}`;
+            comparisonInfo.textContent = '';
+            const strong = document.createElement('strong');
+            strong.textContent = 'פרמטרי השוואה:';
+            comparisonInfo.appendChild(strong);
+            comparisonInfo.appendChild(document.createTextNode(` ${comparisonText}`));
             comparisonInfo.style.opacity = '1';
         }, 150);
     }
@@ -1536,7 +1794,8 @@ function updateHeatmap(filters) {
     
     if (!tbody) return;
     
-    tbody.innerHTML = data.map((item, index) => {
+    tbody.textContent = '';
+    data.forEach((item, index) => {
         // Calculate percentages for investment values
         const totalMaxInvestment = data.reduce((sum, it) => sum + (it.maxInvestmentAtPoint || 0), 0);
         const totalTotalPurchases = data.reduce((sum, it) => sum + (it.totalPurchases || 0), 0);
@@ -1552,7 +1811,7 @@ function updateHeatmap(filters) {
             ? ((item.totalPL / item.totalInvestment) * 100) 
             : null;
         
-        return `
+        const rowHTML = `
         <tr class="heatmap-row" data-category="${item.category}" data-index="${index}" 
             onmouseover="showHeatmapTooltip(event, ${JSON.stringify(item).replace(/"/g, '&quot;')})"
             onmouseout="hideHeatmapTooltip()"
@@ -1566,7 +1825,17 @@ function updateHeatmap(filters) {
             <td class="text-end" style="${getColorStyle(item.totalPurchasesPercentile, item.totalPurchases || 0)}" data-value="${item.totalPurchases || 0}">${formatInvestmentWithPercent(item.totalPurchases || 0, totalPurchasesPercent)}</td>
         </tr>
     `;
-    }).join('');
+        
+        // Convert HTML string to DOM elements safely
+        if (rowHTML) {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(rowHTML, 'text/html');
+            const row = doc.body.querySelector('tr');
+            if (row) {
+                tbody.appendChild(row.cloneNode(true));
+            }
+        }
+    });
     
     // Add hover effects
     tbody.querySelectorAll('.heatmap-row').forEach(row => {
@@ -1599,15 +1868,23 @@ function showHeatmapTooltip(event, item) {
         pointer-events: none;
         box-shadow: 0 2px 8px rgba(0,0,0,0.3);
     `;
-    tooltip.innerHTML = `
-        <strong>${item.category}</strong><br>
-        טריידים: ${item.trades}<br>
-        P/L ממוצע: ${formatCurrency(item.avgPL)}<br>
-        P/L כולל: ${formatCurrency(item.totalPL)}<br>
-        אחוז הצלחה: ${item.successRate}%<br>
-        מקס בנקודה: ${formatCurrency(item.maxInvestmentAtPoint || 0)}<br>
-        סה"כ קניות: ${formatCurrency(item.totalPurchases || 0)}
-    `;
+    // Note: This is a tooltip for a mockup page, not a standard summary element
+    tooltip.textContent = '';
+    const strong = document.createElement('strong');
+    strong.textContent = item.category;
+    tooltip.appendChild(strong);
+    tooltip.appendChild(document.createElement('br'));
+    tooltip.appendChild(document.createTextNode(`טריידים: ${item.trades}`));
+    tooltip.appendChild(document.createElement('br'));
+    tooltip.appendChild(document.createTextNode(`P/L ממוצע: ${formatCurrency(item.avgPL)}`));
+    tooltip.appendChild(document.createElement('br'));
+    tooltip.appendChild(document.createTextNode(`P/L כולל: ${formatCurrency(item.totalPL)}`));
+    tooltip.appendChild(document.createElement('br'));
+    tooltip.appendChild(document.createTextNode(`אחוז הצלחה: ${item.successRate}%`));
+    tooltip.appendChild(document.createElement('br'));
+    tooltip.appendChild(document.createTextNode(`מקס בנקודה: ${formatCurrency(item.maxInvestmentAtPoint || 0)}`));
+    tooltip.appendChild(document.createElement('br'));
+    tooltip.appendChild(document.createTextNode(`סה"כ קניות: ${formatCurrency(item.totalPurchases || 0)}`));
     
     document.body.appendChild(tooltip);
     
@@ -1691,7 +1968,7 @@ function updateVisualHeatmap(filters) {
     }
     
     // Clear grid
-    grid.innerHTML = '';
+    grid.textContent = '';
     
     // Create cells
     sortedData.forEach((item, index) => {
@@ -1734,11 +2011,21 @@ function updateVisualHeatmap(filters) {
             formattedValue = value.toString();
         }
         
-        cell.innerHTML = `
-            <div class="heatmap-cell-label">${item.category}</div>
-            <div class="heatmap-cell-value">${formattedValue}</div>
-            ${currentSortBy === 'totalPL' ? `<div class="heatmap-cell-percent">${item.successRate}% הצלחה</div>` : ''}
-        `;
+        cell.textContent = '';
+        const labelDiv = document.createElement('div');
+        labelDiv.className = 'heatmap-cell-label';
+        labelDiv.textContent = item.category;
+        cell.appendChild(labelDiv);
+        const valueDiv = document.createElement('div');
+        valueDiv.className = 'heatmap-cell-value';
+        valueDiv.textContent = formattedValue;
+        cell.appendChild(valueDiv);
+        if (currentSortBy === 'totalPL') {
+            const percentDiv = document.createElement('div');
+            percentDiv.className = 'heatmap-cell-percent';
+            percentDiv.textContent = `${item.successRate}% הצלחה`;
+            cell.appendChild(percentDiv);
+        }
         
         // Add hover tooltip
         cell.addEventListener('mouseenter', (e) => {
@@ -1777,15 +2064,23 @@ function showVisualHeatmapTooltip(event, item) {
     }
     
     const tooltipEl = document.getElementById('visual-heatmap-tooltip');
-    tooltipEl.innerHTML = `
-        <strong>${item.category}</strong><br>
-        P/L כולל: ${formatCurrency(item.totalPL)}<br>
-        P/L ממוצע: ${formatCurrency(item.avgPL)}<br>
-        אחוז הצלחה: ${item.successRate}%<br>
-        טריידים: ${item.trades}<br>
-        מקס בנקודה: ${formatCurrency(item.maxInvestmentAtPoint || 0)}<br>
-        סה"כ קניות: ${formatCurrency(item.totalPurchases || 0)}
-    `;
+    // Note: This is a tooltip for a mockup page, not a standard summary element
+    tooltipEl.textContent = '';
+    const strong = document.createElement('strong');
+    strong.textContent = item.category;
+    tooltipEl.appendChild(strong);
+    tooltipEl.appendChild(document.createElement('br'));
+    tooltipEl.appendChild(document.createTextNode(`P/L כולל: ${formatCurrency(item.totalPL)}`));
+    tooltipEl.appendChild(document.createElement('br'));
+    tooltipEl.appendChild(document.createTextNode(`P/L ממוצע: ${formatCurrency(item.avgPL)}`));
+    tooltipEl.appendChild(document.createElement('br'));
+    tooltipEl.appendChild(document.createTextNode(`אחוז הצלחה: ${item.successRate}%`));
+    tooltipEl.appendChild(document.createElement('br'));
+    tooltipEl.appendChild(document.createTextNode(`טריידים: ${item.trades}`));
+    tooltipEl.appendChild(document.createElement('br'));
+    tooltipEl.appendChild(document.createTextNode(`מקס בנקודה: ${formatCurrency(item.maxInvestmentAtPoint || 0)}`));
+    tooltipEl.appendChild(document.createElement('br'));
+    tooltipEl.appendChild(document.createTextNode(`סה"כ קניות: ${formatCurrency(item.totalPurchases || 0)}`));
     tooltipEl.classList.add('show');
     
     // Position tooltip
@@ -1809,15 +2104,25 @@ async function initComparisonChart() {
         
         const container = document.getElementById('comparison-chart-container');
         if (!container) {
+            // Silent error - container might not exist in some views
             if (window.Logger) {
-                window.Logger.error('Comparison chart container not found', { page: 'comparative-analysis-page' });
+                window.Logger.warn('Comparison chart container not found', { page: 'comparative-analysis-page' });
             }
             return;
         }
         
         // Get wrapper for width calculation (if exists)
         const wrapper = container.closest('.chart-container-wrapper') || container.parentElement;
-        const containerWidth = wrapper ? wrapper.clientWidth : container.clientWidth;
+        const containerWidth = wrapper ? wrapper.clientWidth : (container.clientWidth || container.offsetWidth || 800);
+        const containerHeight = container.clientHeight || container.offsetHeight || window.innerHeight * 0.5;
+        
+        if (containerWidth === 0 || containerHeight === 0) {
+            if (window.Logger) {
+                window.Logger.warn('Comparison chart container has zero dimensions, waiting...', { page: 'comparative-analysis-page' });
+            }
+            setTimeout(() => initComparisonChart(), 100);
+            return;
+        }
         
         // Remove loading indicator
         const loading = container.querySelector('.chart-loading');
@@ -1851,7 +2156,7 @@ async function initComparisonChart() {
                 horzLines: { visible: true, color: getCSSVariableValue('--border-color', '#e0e0e0') }
             },
             width: containerWidth,
-            height: 300,
+            height: containerHeight,
             timeScale: {
                 visible: true,
                 timeVisible: true,
@@ -1903,7 +2208,10 @@ async function initComparisonChart() {
                         categories = seriesData.categories;
                     }
                     
-                    const color = getEntityColor(seriesConfig.entityType);
+                    // Use centralized Color Scheme System directly - no local function
+                    const color = (typeof window.getEntityColor === 'function') 
+                        ? window.getEntityColor(seriesConfig.entityType) 
+                        : '';
                     const series = comparisonChart.addSeries(lightweightCharts.HistogramSeries, {
                         color: color,
                     priceFormat: {
@@ -1928,7 +2236,10 @@ async function initComparisonChart() {
                         categories = seriesData.categories;
                     }
                     
-                    const color = getEntityColor(seriesConfig.entityType);
+                    // Use centralized Color Scheme System directly - no local function
+                    const color = (typeof window.getEntityColor === 'function') 
+                        ? window.getEntityColor(seriesConfig.entityType) 
+                        : '';
                     const series = window.TradingViewChartAdapter.addAreaSeries(comparisonChart, {
                         lineColor: color,
                         topColor: color,
@@ -1991,14 +2302,35 @@ async function initComparisonChart() {
         }
         
     } catch (error) {
-        if (window.Logger) {
+        const errorMsg = error?.message || (typeof error === 'string' ? error : 'שגיאה לא ידועה');
+        if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {
+            window.NotificationSystem.showError('שגיאה בטעינת גרף השוואה', 
+                `לא ניתן לטעון את הגרף. ${errorMsg}`);
+        } else if (window.Logger) {
             window.Logger.error('Error initializing comparison chart', { page: 'comparative-analysis-page', error });
         }
         const container = document.getElementById('comparison-chart-container');
         if (container) {
             const loading = container.querySelector('.chart-loading');
             if (loading) {
-                loading.innerHTML = '<img src="../../images/icons/tabler/alert-triangle.svg" width="16" height="16" alt="alert-triangle" class="icon"> שגיאה בטעינת גרף';
+                let alertIcon = '<img src="../../images/icons/tabler/alert-triangle.svg" width="16" height="16" alt="alert-triangle" class="icon">';
+                if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {
+                    try {
+                        alertIcon = await window.IconSystem.renderIcon('button', 'alert-triangle', { size: '16', alt: 'alert-triangle', class: 'icon' });
+                    } catch (error) {
+                        // Fallback already set
+                    }
+                }
+                loading.textContent = '';
+                // alertIcon is already HTML string from IconSystem or fallback
+                if (alertIcon) {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(alertIcon, 'text/html');
+                    Array.from(doc.body.childNodes).forEach(node => {
+                        loading.appendChild(node.cloneNode(true));
+                    });
+                }
+                loading.appendChild(document.createTextNode(' שגיאה בטעינת גרף'));
                 loading.style.color = '#dc3545';
             }
         }
@@ -2015,17 +2347,28 @@ function updateChartLegend() {
     // Add legend item for each visible series
     AVAILABLE_SERIES.forEach(seriesConfig => {
         if (seriesVisibility[seriesConfig.key] !== false && chartSeries[seriesConfig.key]) {
-            const color = getEntityColor(seriesConfig.entityType);
+            // Use centralized Color Scheme System directly - no local function
+            const color = (typeof window.getEntityColor === 'function') 
+                ? window.getEntityColor(seriesConfig.entityType) 
+                : '';
         legendItems.push(`
                 <div class="series-checkbox-container">
-                    <div class="series-legend-color" style="background-color: ${color};"></div>
+                    <div class="series-legend-color" ${color ? `style="--series-color: ${color};"` : ''}></div>
                     <span class="form-label-small"><strong>${seriesConfig.label}</strong></span>
             </div>
         `);
     }
     });
     
-    legend.innerHTML = legendItems.join('');
+    legend.textContent = '';
+    const legendHTML = legendItems.join('');
+    if (legendHTML) {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(legendHTML, 'text/html');
+        Array.from(doc.body.childNodes).forEach(node => {
+            legend.appendChild(node.cloneNode(true));
+        });
+    }
 }
 
 
@@ -2100,7 +2443,10 @@ async function updateComparisonChart(filters) {
                         categories = seriesData.categories;
                     }
                     
-                    const color = getEntityColor(seriesConfig.entityType);
+                    // Use centralized Color Scheme System directly - no local function
+                    const color = (typeof window.getEntityColor === 'function') 
+                        ? window.getEntityColor(seriesConfig.entityType) 
+                        : '';
                     const series = comparisonChart.addSeries(lightweightCharts.HistogramSeries, {
                         color: color,
                     priceFormat: {
@@ -2162,7 +2508,11 @@ async function updateComparisonChart(filters) {
         
         comparisonChart.timeScale().fitContent();
     } catch (error) {
-        if (window.Logger) {
+        const errorMsg = error?.message || (typeof error === 'string' ? error : 'שגיאה לא ידועה');
+        if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {
+            window.NotificationSystem.showError('שגיאה בעדכון גרף השוואה', 
+                `לא ניתן לעדכן את הגרף. ${errorMsg}`);
+        } else if (window.Logger) {
             window.Logger.error('Error updating comparison chart', { page: 'comparative-analysis-page', error });
         }
         // Fallback: reinitialize
@@ -2381,10 +2731,16 @@ function resetRecordFilters() {
     dateRangeItems.forEach(item => item.classList.remove('selected'));
     
     // Clear custom date inputs
-    const fromInput = document.getElementById('customDateFrom');
-    const toInput = document.getElementById('customDateTo');
-    if (fromInput) fromInput.value = '';
-    if (toInput) toInput.value = '';
+    // Use DataCollectionService to clear fields if available
+    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+        window.DataCollectionService.setValue('customDateFrom', '', 'dateOnly');
+        window.DataCollectionService.setValue('customDateTo', '', 'dateOnly');
+    } else {
+        const fromInput = document.getElementById('customDateFrom');
+        const toInput = document.getElementById('customDateTo');
+        if (fromInput) fromInput.value = '';
+        if (toInput) toInput.value = '';
+    }
     updateDateRangeFilterText();
     
     // Clear trading accounts
@@ -2437,10 +2793,16 @@ function resetRecordFiltersToDefaults() {
     if (yearItem) yearItem.classList.add('selected');
     
     // Clear custom date inputs
-    const fromInput = document.getElementById('customDateFrom');
-    const toInput = document.getElementById('customDateTo');
-    if (fromInput) fromInput.value = '';
-    if (toInput) toInput.value = '';
+    // Use DataCollectionService to clear fields if available
+    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+        window.DataCollectionService.setValue('customDateFrom', '', 'dateOnly');
+        window.DataCollectionService.setValue('customDateTo', '', 'dateOnly');
+    } else {
+        const fromInput = document.getElementById('customDateFrom');
+        const toInput = document.getElementById('customDateTo');
+        if (fromInput) fromInput.value = '';
+        if (toInput) toInput.value = '';
+    }
     updateDateRangeFilterText();
     
     // Set trading accounts to first account only
@@ -2552,8 +2914,14 @@ function toggleComparisonParameter(paramType) {
                 withoutPlan.disabled = !checkbox.checked;
                 // If enabled, select both options by default
                 if (checkbox.checked) {
-                    withPlan.checked = true;
-                    withoutPlan.checked = true;
+                    // Use DefaultValueSetter for logical defaults
+                    if (window.DefaultValueSetter && typeof window.DefaultValueSetter.setLogicalDefault === 'function') {
+                        window.DefaultValueSetter.setLogicalDefault(withPlan.id, true);
+                        window.DefaultValueSetter.setLogicalDefault(withoutPlan.id, true);
+                    } else {
+                        withPlan.checked = true;
+                        withoutPlan.checked = true;
+                    }
                 }
             }
             break;
@@ -2724,6 +3092,11 @@ function resetComparisonParametersToDefaults() {
 
 // ===== Data Loading Functions =====
 async function loadTradingAccounts() {
+    // Show loading state
+    const select = document.getElementById('recordFilterTradingAccounts');
+    if (select && typeof window.showLoadingState === 'function') {
+        window.showLoadingState('recordFilterTradingAccounts');
+    }
     try {
         const select = document.getElementById('recordFilterTradingAccounts');
         if (!select) return;
@@ -2731,9 +3104,13 @@ async function loadTradingAccounts() {
         // Try to use trading-accounts-data service
         if (window.tradingAccountsData && typeof window.tradingAccountsData.loadTradingAccountsData === 'function') {
             const accounts = await window.tradingAccountsData.loadTradingAccountsData();
-            select.innerHTML = accounts.map(acc => 
-                `<option value="${acc.id}">${acc.name || `Account #${acc.id}`}</option>`
-            ).join('');
+            select.textContent = '';
+            accounts.forEach(acc => {
+                const option = document.createElement('option');
+                option.value = acc.id;
+                option.textContent = acc.name || `Account #${acc.id}`;
+                select.appendChild(option);
+            });
         } else {
             // Fallback: fetch from API with caching
             const cacheKey = window.createCacheKey ? 
@@ -2744,9 +3121,13 @@ async function loadTradingAccounts() {
             if (window.UnifiedCacheManager) {
                 const cachedData = await window.UnifiedCacheManager.get(cacheKey, 'memory');
                 if (cachedData) {
-                    select.innerHTML = cachedData.map(acc => 
-                        `<option value="${acc.id}">${acc.name || `Account #${acc.id}`}</option>`
-                    ).join('');
+                    select.textContent = '';
+                    cachedData.forEach(acc => {
+                        const option = document.createElement('option');
+                        option.value = acc.id;
+                        option.textContent = acc.name || `Account #${acc.id}`;
+                        select.appendChild(option);
+                    });
                     return;
                 }
             }
@@ -2754,9 +3135,13 @@ async function loadTradingAccounts() {
             try {
                 const data = await window.safeApiCall('/api/trading-accounts/');
                 const accounts = data.data || data || [];
-                select.innerHTML = accounts.map(acc => 
-                    `<option value="${acc.id}">${acc.name || `Account #${acc.id}`}</option>`
-                ).join('');
+                select.textContent = '';
+                accounts.forEach(acc => {
+                    const option = document.createElement('option');
+                    option.value = acc.id;
+                    option.textContent = acc.name || `Account #${acc.id}`;
+                    select.appendChild(option);
+                });
                 
                 // Save to cache
                 if (window.UnifiedCacheManager) {
@@ -2764,32 +3149,46 @@ async function loadTradingAccounts() {
                 }
             } catch (apiError) {
                 // Error already handled by safeApiCall, fallback to mock data
-                select.innerHTML = `
-                    <option value="1">Account #1</option>
-                    <option value="2">Account #2</option>
-                    <option value="3">Account #3</option>
-                `;
+                select.textContent = '';
+                [1, 2, 3].forEach(id => {
+                    const option = document.createElement('option');
+                    option.value = id;
+                    option.textContent = `Account #${id}`;
+                    select.appendChild(option);
+                });
             }
+        }
+        
+        // Hide loading state
+        if (select && typeof window.hideLoadingState === 'function') {
+            window.hideLoadingState('recordFilterTradingAccounts');
         }
         
         if (window.Logger) {
             window.Logger.info('✅ Trading accounts loaded', { page: 'comparative-analysis-page' });
         }
     } catch (error) {
+        // Hide loading state on error
+        if (select && typeof window.hideLoadingState === 'function') {
+            window.hideLoadingState('recordFilterTradingAccounts');
+        }
         if (window.NotificationSystem) {
             window.NotificationSystem.showError('שגיאה בטעינת נתונים', 'שגיאה בטעינת חשבונות מסחר');
         }
+        // Error already handled by NotificationSystem above
         if (window.Logger) {
-            window.Logger.error('❌ Error loading trading accounts', { page: 'comparative-analysis-page', error });
+            window.Logger.warn('❌ Error loading trading accounts', { page: 'comparative-analysis-page', error });
         }
         // Mock data fallback
         const select = document.getElementById('recordFilterTradingAccounts');
         if (select) {
-            select.innerHTML = `
-                <option value="1">Account #1</option>
-                <option value="2">Account #2</option>
-                <option value="3">Account #3</option>
-            `;
+            select.textContent = '';
+            [1, 2, 3].forEach(id => {
+                const option = document.createElement('option');
+                option.value = id;
+                option.textContent = `Account #${id}`;
+                select.appendChild(option);
+            });
         }
     }
 }
@@ -2812,9 +3211,13 @@ async function loadTradingMethods() {
             try {
                 const methods = await window.ConditionsCRUDManager.getTradingMethods();
                 if (methods && methods.length > 0) {
-                    select.innerHTML = methods.map(method => 
-                        `<option value="${method.id}">${method.name_he || method.name || `Method #${method.id}`}</option>`
-                    ).join('');
+                    select.textContent = '';
+                    methods.forEach(method => {
+                        const option = document.createElement('option');
+                        option.value = method.id;
+                        option.textContent = method.name_he || method.name || `Method #${method.id}`;
+                        select.appendChild(option);
+                    });
                     if (window.Logger) {
                         window.Logger.info('✅ Trading methods loaded via ConditionsCRUDManager', { page: 'comparative-analysis-page' });
                     }
@@ -2829,14 +3232,21 @@ async function loadTradingMethods() {
         // Mock data fallback (always available for mockup)
         // Note: In a real implementation, you might want to try direct API call here
         // but for mockup purposes, we use mock data directly
-        select.innerHTML = `
-            <option value="1">ממוצעים נעים</option>
-            <option value="2">ניתוח נפח</option>
-            <option value="3">תמיכה והתנגדות</option>
-            <option value="4">קווי מגמה</option>
-            <option value="5">דפוסים טכניים</option>
-            <option value="6">פיבונאצ'י</option>
-        `;
+        select.textContent = '';
+        const methods = [
+            { value: '1', text: 'ממוצעים נעים' },
+            { value: '2', text: 'ניתוח נפח' },
+            { value: '3', text: 'תמיכה והתנגדות' },
+            { value: '4', text: 'קווי מגמה' },
+            { value: '5', text: 'דפוסים טכניים' },
+            { value: '6', text: 'פיבונאצ'י' }
+        ];
+        methods.forEach(method => {
+            const option = document.createElement('option');
+            option.value = method.value;
+            option.textContent = method.text;
+            select.appendChild(option);
+        });
         if (window.Logger) {
             window.Logger.info('✅ Trading methods loaded (mock data)', { page: 'comparative-analysis-page' });
         }
@@ -2844,19 +3254,31 @@ async function loadTradingMethods() {
         // Silent fallback to mock data
         const select = document.getElementById('comparisonTradingMethods');
         if (select) {
-            select.innerHTML = `
-                <option value="1">ממוצעים נעים</option>
-                <option value="2">ניתוח נפח</option>
-                <option value="3">תמיכה והתנגדות</option>
-                <option value="4">קווי מגמה</option>
-                <option value="5">דפוסים טכניים</option>
-                <option value="6">פיבונאצ'י</option>
-            `;
+            select.textContent = '';
+            const methods = [
+                { value: '1', text: 'ממוצעים נעים' },
+                { value: '2', text: 'ניתוח נפח' },
+                { value: '3', text: 'תמיכה והתנגדות' },
+                { value: '4', text: 'קווי מגמה' },
+                { value: '5', text: 'דפוסים טכניים' },
+                { value: '6', text: 'פיבונאצ'י' }
+            ];
+            methods.forEach(method => {
+                const option = document.createElement('option');
+                option.value = method.value;
+                option.textContent = method.text;
+                select.appendChild(option);
+            });
         }
     }
 }
 
 async function loadTickers() {
+    // Show loading state
+    const select = document.getElementById('comparisonTickers');
+    if (select && typeof window.showLoadingState === 'function') {
+        window.showLoadingState('comparisonTickers');
+    }
     try {
         const select = document.getElementById('comparisonTickers');
         if (!select) return;
@@ -2864,9 +3286,13 @@ async function loadTickers() {
         // Try to use tickers-data service
         if (window.tickersData && typeof window.tickersData.loadTickersData === 'function') {
             const tickers = await window.tickersData.loadTickersData();
-            select.innerHTML = tickers.map(ticker => 
-                `<option value="${ticker.id}">${ticker.symbol || `Ticker #${ticker.id}`}</option>`
-            ).join('');
+            select.textContent = '';
+            tickers.forEach(ticker => {
+                const option = document.createElement('option');
+                option.value = ticker.id;
+                option.textContent = ticker.symbol || `Ticker #${ticker.id}`;
+                select.appendChild(option);
+            });
         } else {
             // Fallback: fetch from API with caching
             const cacheKey = window.createCacheKey ? 
@@ -2877,9 +3303,13 @@ async function loadTickers() {
             if (window.UnifiedCacheManager) {
                 const cachedData = await window.UnifiedCacheManager.get(cacheKey, 'memory');
                 if (cachedData) {
-                    select.innerHTML = cachedData.map(ticker => 
-                        `<option value="${ticker.id}">${ticker.symbol || `Ticker #${ticker.id}`}</option>`
-                    ).join('');
+                    select.textContent = '';
+                    cachedData.forEach(ticker => {
+                        const option = document.createElement('option');
+                        option.value = ticker.id;
+                        option.textContent = ticker.symbol || `Ticker #${ticker.id}`;
+                        select.appendChild(option);
+                    });
                     return;
                 }
             }
@@ -2887,9 +3317,13 @@ async function loadTickers() {
             try {
                 const data = await window.safeApiCall('/api/tickers/');
                 const tickers = data.data || data || [];
-                select.innerHTML = tickers.map(ticker => 
-                    `<option value="${ticker.id}">${ticker.symbol || `Ticker #${ticker.id}`}</option>`
-                ).join('');
+                select.textContent = '';
+                tickers.forEach(ticker => {
+                    const option = document.createElement('option');
+                    option.value = ticker.id;
+                    option.textContent = ticker.symbol || `Ticker #${ticker.id}`;
+                    select.appendChild(option);
+                });
                 
                 // Save to cache
                 if (window.UnifiedCacheManager) {
@@ -2897,14 +3331,26 @@ async function loadTickers() {
                 }
             } catch (apiError) {
                 // Error already handled by safeApiCall, fallback to mock data
-                select.innerHTML = `
-                    <option value="1">AAPL</option>
-                    <option value="2">TSLA</option>
-                    <option value="3">MSFT</option>
-                    <option value="4">GOOGL</option>
-                    <option value="5">AMZN</option>
-                `;
+                select.textContent = '';
+                const tickerSymbols = [
+                    { value: '1', text: 'AAPL' },
+                    { value: '2', text: 'TSLA' },
+                    { value: '3', text: 'MSFT' },
+                    { value: '4', text: 'GOOGL' },
+                    { value: '5', text: 'AMZN' }
+                ];
+                tickerSymbols.forEach(ticker => {
+                    const option = document.createElement('option');
+                    option.value = ticker.value;
+                    option.textContent = ticker.text;
+                    select.appendChild(option);
+                });
             }
+        }
+        
+        // Hide loading state
+        if (select && typeof window.hideLoadingState === 'function') {
+            window.hideLoadingState('comparisonTickers');
         }
         
         if (window.Logger) {
@@ -2914,19 +3360,27 @@ async function loadTickers() {
         if (window.NotificationSystem) {
             window.NotificationSystem.showError('שגיאה בטעינת נתונים', 'שגיאה בטעינת טיקרים');
         }
+        // Error already handled by NotificationSystem above
         if (window.Logger) {
-            window.Logger.error('❌ Error loading tickers', { page: 'comparative-analysis-page', error });
+            window.Logger.warn('❌ Error loading tickers', { page: 'comparative-analysis-page', error });
         }
         // Mock data fallback
         const select = document.getElementById('comparisonTickers');
         if (select) {
-            select.innerHTML = `
-                <option value="1">AAPL</option>
-                <option value="2">TSLA</option>
-                <option value="3">MSFT</option>
-                <option value="4">GOOGL</option>
-                <option value="5">AMZN</option>
-            `;
+            select.textContent = '';
+            const tickerSymbols = [
+                { value: '1', text: 'AAPL' },
+                { value: '2', text: 'TSLA' },
+                { value: '3', text: 'MSFT' },
+                { value: '4', text: 'GOOGL' },
+                { value: '5', text: 'AMZN' }
+            ];
+            tickerSymbols.forEach(ticker => {
+                const option = document.createElement('option');
+                option.value = ticker.value;
+                option.textContent = ticker.text;
+                select.appendChild(option);
+            });
         }
     }
 }
@@ -2939,7 +3393,7 @@ async function saveRecordFilterState() {
             await window.PreferencesCore.savePreference(PREF_RECORD_FILTERS, filters);
         } else {
             // Fallback to localStorage
-            localStorage.setItem(PREF_RECORD_FILTERS, JSON.stringify(filters));
+            window.PageStateManager?.setItem(PREF_RECORD_FILTERS, JSON.stringify(filters));
         }
     } catch (error) {
         if (window.Logger) {
@@ -2955,7 +3409,7 @@ async function loadRecordFilterState() {
             filters = await window.PreferencesCore.getPreference(PREF_RECORD_FILTERS);
         } else {
             // Fallback to localStorage
-            const saved = localStorage.getItem(PREF_RECORD_FILTERS);
+            const saved = window.PageStateManager?.getItem(PREF_RECORD_FILTERS);
             if (saved) {
                 filters = JSON.parse(saved);
             }
@@ -2976,21 +3430,32 @@ async function saveComparisonParameterState() {
         const params = getComparisonParameterValues();
         if (window.PreferencesCore && typeof window.PreferencesCore.savePreference === 'function') {
             try {
-                await window.PreferencesCore.savePreference(PREF_COMPARISON_PARAMS, params);
+                const result = await window.PreferencesCore.savePreference(PREF_COMPARISON_PARAMS, params);
+                // Check if save was successful
+                if (!result || (result.success === false)) {
+                    // Save failed, fallback to localStorage
+                    if (window.Logger) {
+                        window.Logger.warn('Preference save failed, using localStorage fallback', { 
+                            page: 'comparative-analysis-page', 
+                            preference: PREF_COMPARISON_PARAMS
+                        });
+                    }
+                    window.PageStateManager?.setItem(PREF_COMPARISON_PARAMS, JSON.stringify(params));
+                }
             } catch (prefError) {
                 // If preference doesn't exist in database, fallback to localStorage
                 if (window.Logger) {
-                    window.Logger.warn('Preference not found in database, using localStorage fallback', { 
+                    window.Logger.warn('Preference save error, using localStorage fallback', { 
                         page: 'comparative-analysis-page', 
                         preference: PREF_COMPARISON_PARAMS,
                         error: prefError 
                     });
                 }
-                localStorage.setItem(PREF_COMPARISON_PARAMS, JSON.stringify(params));
+                window.PageStateManager?.setItem(PREF_COMPARISON_PARAMS, JSON.stringify(params));
             }
         } else {
             // Fallback to localStorage
-            localStorage.setItem(PREF_COMPARISON_PARAMS, JSON.stringify(params));
+            window.PageStateManager?.setItem(PREF_COMPARISON_PARAMS, JSON.stringify(params));
         }
     } catch (error) {
         if (window.Logger) {
@@ -2999,9 +3464,16 @@ async function saveComparisonParameterState() {
         // Final fallback: always try localStorage
         try {
             const params = getComparisonParameterValues();
-            localStorage.setItem(PREF_COMPARISON_PARAMS, JSON.stringify(params));
+            window.PageStateManager?.setItem(PREF_COMPARISON_PARAMS, JSON.stringify(params));
         } catch (e) {
-            // Ignore localStorage errors
+            // Log localStorage errors (non-critical - already attempted fallback)
+            if (window.Logger) {
+                window.Logger.warn('Failed to save preference to localStorage (final fallback failed)', { 
+                    preference: 'comparative-analysis-comparison-params',
+                    error: e,
+                    page: 'comparative-analysis-page' 
+                });
+            }
         }
     }
 }
@@ -3013,7 +3485,7 @@ async function loadComparisonParameterState() {
             params = await window.PreferencesCore.getPreference(PREF_COMPARISON_PARAMS);
         } else {
             // Fallback to localStorage
-            const saved = localStorage.getItem(PREF_COMPARISON_PARAMS);
+            const saved = window.PageStateManager?.getItem(PREF_COMPARISON_PARAMS);
             if (saved) {
                 params = JSON.parse(saved);
             }
@@ -3546,8 +4018,8 @@ async function initializeComparisonTags() {
             savedComparisonParams = await window.PreferencesCore.getPreference(PREF_COMPARISON_PARAMS);
         } else {
             // Fallback to localStorage
-            const savedRecordFiltersStr = localStorage.getItem(PREF_RECORD_FILTERS);
-            const savedComparisonParamsStr = localStorage.getItem(PREF_COMPARISON_PARAMS);
+            const savedRecordFiltersStr = window.PageStateManager?.getItem(PREF_RECORD_FILTERS);
+            const savedComparisonParamsStr = window.PageStateManager?.getItem(PREF_COMPARISON_PARAMS);
             if (savedRecordFiltersStr) {
                 savedRecordFilters = JSON.parse(savedRecordFiltersStr);
             }
@@ -3668,6 +4140,9 @@ async function initializeComparisonTags() {
         // Initialize series controls UI
         initializeSeriesControls();
         
+        // Restore page state (filters, sections, etc.)
+        await restorePageState();
+        
         // Update all visualizations with initial filters
         // This will initialize the chart if needed and update all data
         updateAllVisualizationsInternal();
@@ -3683,7 +4158,11 @@ async function initializeComparisonTags() {
             }
             
         } catch (error) {
-            if (window.Logger) {
+            const errorMsg = error?.message || (typeof error === 'string' ? error : 'שגיאה לא ידועה');
+            if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {
+                window.NotificationSystem.showError('שגיאה באתחול עמוד ניתוח השוואתי', 
+                    `לא ניתן לאתחל את העמוד. ${errorMsg}`);
+            } else if (window.Logger) {
                 window.Logger.error('Error initializing page', { page: 'comparative-analysis-page', error });
             }
         }

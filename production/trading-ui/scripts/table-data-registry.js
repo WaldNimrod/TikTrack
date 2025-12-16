@@ -15,6 +15,33 @@
  * Last Updated: 2025-11-10
  */
 
+
+// ===== FUNCTION INDEX =====
+// === Class Methods ===
+// - TableDataRegistry._cloneFilterContext() -  Clonefiltercontext
+// - TableDataRegistry._ensureEntry() -  Ensureentry
+// - TableDataRegistry._inferTableTypeFromDom() -  Infertabletypefromdom
+// - TableDataRegistry._notifyFilteredChange() -  Notifyfilteredchange
+// - TableDataRegistry.clear() - Clear
+// - TableDataRegistry.clearAll() - Clearall
+// - TableDataRegistry.getActiveFilters() - Getactivefilters
+// - TableDataRegistry.getAllSummaries() - Getallsummaries
+// - TableDataRegistry.getCounts() - Getcounts
+// - TableDataRegistry.getFilteredData() - Getfiltereddata
+// - TableDataRegistry.getFullData() - Getfulldata
+// - TableDataRegistry.getPageData() - Getpagedata
+// - TableDataRegistry.getSummary() - Getsummary
+// - TableDataRegistry.offFilteredDataChange() - Offfiltereddatachange
+// - TableDataRegistry.onFilteredDataChange() - Onfiltereddatachange
+// - TableDataRegistry.registerTable() - Registertable
+// - TableDataRegistry.resolveTableType() - Resolvetabletype
+// - TableDataRegistry.setFilteredData() - Setfiltereddata
+// - TableDataRegistry.setFullData() - Setfulldata
+// - TableDataRegistry.setPageData() - Setpagedata
+
+// === Event Handlers ===
+// - cloneArray() - Clonearray
+
 (function registerTableDataRegistry() {
   if (window.TableDataRegistry) {
     // Registry already loaded

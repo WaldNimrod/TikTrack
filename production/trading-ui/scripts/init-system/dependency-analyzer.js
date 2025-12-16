@@ -19,6 +19,7 @@
  * @lastUpdated January 27, 2025
  */
 
+
 if (window.Logger) {
   window.Logger.info('🔍 Loading Dependency Analyzer...', { page: 'dependency-analyzer' });
 }

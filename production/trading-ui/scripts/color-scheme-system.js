@@ -11,6 +11,79 @@
  * @since 2025-01-09
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Event Handlers ===
+// - eventHandler() - Eventhandler
+
+// === UI Functions ===
+// - updateEntityColors() - Updateentitycolors
+// - updateCSSVariablesFromPreferences() - Updatecssvariablesfrompreferences
+
+// === Data Functions ===
+// - getEntityColor() - Getentitycolor
+// - getEntityBackgroundColor() - Getentitybackgroundcolor
+// - getEntityTextColor() - Getentitytextcolor
+// - getEntityBorderColor() - Getentitybordercolor
+// - getEntityLabel() - Getentitylabel
+// - getStatusColor() - Getstatuscolor
+// - getStatusBackgroundColor() - Getstatusbackgroundcolor
+// - getStatusTextColor() - Getstatustextcolor
+// - getStatusBorderColor() - Getstatusbordercolor
+// - getInvestmentTypeColor() - Getinvestmenttypecolor
+// - getInvestmentTypeBackgroundColor() - Getinvestmenttypebackgroundcolor
+// - getInvestmentTypeTextColor() - Getinvestmenttypetextcolor
+// - getInvestmentTypeBorderColor() - Getinvestmenttypebordercolor
+// - getNumericValueColor() - Getnumericvaluecolor
+// - getNumericValueBackgroundColor() - Getnumericvaluebackgroundcolor
+// - getNumericValueTextColor() - Getnumericvaluetextcolor
+// - getNumericValueBorderColor() - Getnumericvaluebordercolor
+// - getValueType() - Getvaluetype
+// - getNumericValueCSSClass() - Getnumericvaluecssclass
+// - getMainHeaderOpacityHex() - Getmainheaderopacityhex
+// - getSubHeaderOpacityHex() - Getsubheaderopacityhex
+// - loadColorScheme() - Loadcolorscheme
+// - saveColorScheme() - Savecolorscheme
+// - getCurrentColorScheme() - Getcurrentcolorscheme
+// - getAvailableColorSchemes() - Getavailablecolorschemes
+// - loadDynamicColors() - Loaddynamiccolors
+// - getEntityColorFromPreferences() - Getentitycolorfrompreferences
+// - getAllEntityColorVariantsFromPreferences() - Getallentitycolorvariantsfrompreferences
+// - loadEntityColorsFromPreferences() - Loadentitycolorsfrompreferences
+// - loadColorPreferences() - Loadcolorpreferences
+// - getTableColors() - Gettablecolors
+// - getTableColorsWithFallbacks() - Gettablecolorswithfallbacks
+// - getEntityColorPref() - Getentitycolorpref
+
+// === Other ===
+// - hexToRgb() - Hextorgb
+// - darkenColor() - Darkencolor
+// - lightenColor() - Lightencolor
+// - isValidEntityType() - Isvalidentitytype
+// - isPositiveValue() - Ispositivevalue
+// - isNegativeValue() - Isnegativevalue
+// - isZeroValue() - Iszerovalue
+// - generateEntityCSS() - Generateentitycss
+// - applyEntityColorsToHeaders() - Applyentitycolorstoheaders
+// - isWarningModal() - Iswarningmodal
+// - generateStatusCSS() - Generatestatuscss
+// - generateInvestmentTypeCSS() - Generateinvestmenttypecss
+// - generateNumericValueCSS() - Generatenumericvaluecss
+// - applyColorScheme() - Applycolorscheme
+// - applyLightScheme() - Applylightscheme
+// - applyDarkScheme() - Applydarkscheme
+// - applyCustomScheme() - Applycustomscheme
+// - toggleColorScheme() - Togglecolorscheme
+// - setCurrentEntityColorFromPage() - Setcurrententitycolorfrompage
+// - setCurrentEntityColorForEntity() - Setcurrententitycolorforentity
+// - findPageClass() - Findpageclass
+// - generateAndApplyEntityCSS() - Generateandapplyentitycss
+// - setVar() - Setvar
+// - computeVariant() - Computevariant
+// - applyNumericPalette() - Applynumericpalette
+// - applyThemeColor() - Applythemecolor
+
 // ===== ENTITY TYPE DEFINITIONS =====
 // עטיפת כל הקובץ בפונקציה כדי למנוע טעינה כפולה
 (function() {
@@ -53,7 +126,8 @@ const ENTITY_COLORS = {
   research: '#17a2b8',
   preference: '#adb5bd',
   development: BRAND_SECONDARY,
-  position: '#0d6efd'
+  position: '#0d6efd',
+  import_session: '#fd7e14' // שימוש בצבע של cash_flow (תזרימי מזומן)
 };
 
 const ENTITY_BACKGROUND_COLORS = {
@@ -71,7 +145,8 @@ const ENTITY_BACKGROUND_COLORS = {
   research: 'rgba(23, 162, 184, 0.1)',
   preference: 'rgba(173, 181, 189, 0.1)',
   development: BRAND_SECONDARY_BG,
-  position: 'rgba(13, 110, 253, 0.12)'
+  position: 'rgba(13, 110, 253, 0.12)',
+  import_session: 'rgba(253, 126, 20, 0.1)' // שימוש בצבע רקע של cash_flow (תזרימי מזומן)
 };
 
 const ENTITY_TEXT_COLORS = {
@@ -760,7 +835,10 @@ async function setCurrentEntityColorFromPage() {
           }
         }
       } else {
-        if (window.Logger) { window.Logger.warn(`⚠️ No mapping found for page class: ${pageClass}`, { page: "color-scheme" }); }
+        // Don't warn for test pages - they don't need color scheme mapping
+        if (!pageClass.includes('test') && !pageClass.includes('Test') && window.Logger) {
+          window.Logger.warn(`⚠️ No mapping found for page class: ${pageClass}`, { page: "color-scheme" });
+        }
       }
     }
   } catch (error) {
@@ -820,6 +898,7 @@ const PAGE_TO_ENTITY_MAPPING = {
   // עמודי משתמש
   'index-page': 'trade', // Dashboard shows trades overview
   'tickers-page': 'ticker',
+  'ticker-dashboard-page': 'ticker', // Extended ticker dashboard page
   'trading-accounts-page': 'trading_account', // Trading accounts page - חשבונות מסחר
   'accounts-page': 'trading_account', // Alias - חשבונות מסחר
   'trades-page': 'trade',
@@ -830,11 +909,16 @@ const PAGE_TO_ENTITY_MAPPING = {
   'executions-page': 'execution',
   'trade-plans-page': 'trade_plan',
   'planning-page': 'trade_plan', // Alias
+  'trading-journal-page': 'note', // Trading journal page - יומן מסחר
   'preferences-page': 'preference',
   'research-page': 'research',
   'designs-page': 'design',
   'constraints-page': 'constraint',
   'tag-management-page': 'preference', // Tag management page - uses preference colors
+  'ai-analysis-page': 'research', // AI Analysis page - uses research colors
+  'watch-list-page': 'ticker', // Watch List page - uses ticker colors (similar entity type)
+  'watch-lists-page': 'ticker', // Watch Lists page - uses ticker colors (alias for consistency)
+  'trade-history-page': 'trade', // Trade History page - uses trade colors
   'db-display-page': null, // Uses fixed gray color
   'db-extradata-page': null, // Uses fixed gray color
   'extra-data-page': null, // Alias
@@ -1144,11 +1228,14 @@ async function loadColorPreferences() {
           }
         } else {
           if (window.Logger) {
-            window.Logger.warn('⚠️ Preferences event timeout for color scheme - continuing without waiting', {
-              page: 'color-scheme',
-              timeout: `${timeoutMs}ms`,
-              waitTime: `${waitTime.toFixed(2)}ms`,
-            });
+            // Preferences event timeout is expected in some cases - use debug instead of warn
+            if (window.Logger?.debug) {
+              window.Logger.debug('Preferences event timeout for color scheme - continuing without waiting', {
+                page: 'color-scheme',
+                timeout: `${timeoutMs}ms`,
+                waitTime: `${waitTime.toFixed(2)}ms`,
+              });
+            }
           }
         }
         resolve();
@@ -1178,7 +1265,10 @@ async function loadColorPreferences() {
     }
     
     // Last resort: return empty object - NO hardcoded colors!
-    if (window.Logger) { window.Logger.warn('⚠️ No preferences loaded - colors will use CSS fallbacks only', { page: "color-scheme" }); }
+    // No preferences loaded is expected in some cases - use debug instead of warn
+    if (window.Logger?.debug) {
+      window.Logger.debug('No preferences loaded - colors will use CSS fallbacks only', { page: "color-scheme" });
+    }
     return {};
   } catch (error) {
     if (window.Logger) { window.Logger.error('❌ Error loading color preferences:', error, { page: "color-scheme" }); }
@@ -1619,14 +1709,51 @@ window.NUMERIC_VALUE_COLORS = NUMERIC_VALUE_COLORS;
 // Color preferences will be loaded as part of the unified preferences initialization
 // This prevents duplicate API calls and ensures single point of entry
 // 
-// If colors need to be updated after preferences load, use the preferences:updated event:
-// window.addEventListener('preferences:updated', (e) => {
-//   loadColorPreferences().then(preferences => {
-//     if (preferences) {
-//       updateCSSVariablesFromPreferences(preferences);
-//     }
-//   });
-// });
+// Listen for preferences:updated event to update colors when preferences change
+// Only register listener after functions are available
+// CRITICAL: Prevent infinite loop - if preferences are already loaded, just update CSS variables
+if (typeof loadColorPreferences === 'function' && typeof updateCSSVariablesFromPreferences === 'function') {
+  window.addEventListener('preferences:updated', async (e) => {
+    try {
+      // CRITICAL: Prevent infinite loop - if loadUserPreferences is in progress, don't reload
+      // This prevents: loadUserPreferences() → preferences:updated → loadColorPreferences() → loadUserPreferences() → ...
+      if (window.__loadUserPreferencesInflight && window.__loadUserPreferencesInflight.size > 0) {
+        // Preferences are being loaded - just update CSS from currentPreferences
+        if (window.currentPreferences && Object.keys(window.currentPreferences).length > 0) {
+          updateCSSVariablesFromPreferences(window.currentPreferences);
+        }
+        return;
+      }
+      
+      // CRITICAL: Prevent infinite loop - if getPreference is in progress, don't reload
+      if (window.__GET_PREFERENCE_IN_PROGRESS__) {
+        // Preferences are being loaded - just update CSS from currentPreferences
+        if (window.currentPreferences && Object.keys(window.currentPreferences).length > 0) {
+          updateCSSVariablesFromPreferences(window.currentPreferences);
+        }
+        return;
+      }
+      
+      // Only reload if preferences are not already loaded
+      // Use currentPreferences if available to avoid unnecessary API calls
+      if (window.currentPreferences && Object.keys(window.currentPreferences).length > 0) {
+        // Preferences already loaded - just update CSS variables
+        updateCSSVariablesFromPreferences(window.currentPreferences);
+      } else {
+        // Preferences not loaded - reload them
+        const preferences = await loadColorPreferences();
+        if (preferences && Object.keys(preferences).length > 0) {
+          updateCSSVariablesFromPreferences(preferences);
+        }
+      }
+    } catch (error) {
+      // CRITICAL: Do NOT use Logger here to prevent infinite recursion
+      if (window.DEBUG_MODE) {
+        console.error('❌ Error updating color scheme from preferences:', error);
+      }
+    }
+  });
+}
 
 // Only set current entity color from page (doesn't require preferences)
 if (document.readyState === 'loading') {

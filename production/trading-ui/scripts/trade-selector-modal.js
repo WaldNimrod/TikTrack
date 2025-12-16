@@ -16,6 +16,12 @@
  * @updated February 2, 2025
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === UI Functions ===
+// - getRenderer() - Getrenderer
+
 // ===== TRADE SELECTOR MODAL =====
 
 // Global function to open trade selector modal
@@ -193,7 +199,7 @@ class TradeSelectorModal {
             }
 
             // Create and show modal using the centralized system
-            this.modal = window.createAndShowModal(modalHTML, this.modalId, {
+            this.modal = await window.createAndShowModal(modalHTML, this.modalId, {
                 backdrop: false, // Already handled by createAndShowModal, but explicit for clarity
                 keyboard: true,
                 focus: true
@@ -212,21 +218,30 @@ class TradeSelectorModal {
             navigationMetadata.modalId = this.modalId;
             navigationMetadata.modalType = 'selector-modal';
 
-            if (window.ModalNavigationService?.registerModalOpen) {
-                await window.ModalNavigationService.registerModalOpen(modalElement, navigationMetadata);
-            } else if (window.pushModalToNavigation) {
-                await window.pushModalToNavigation(modalElement, navigationMetadata);
-            }
-
-            if (window.modalNavigationManager?.updateModalNavigation) {
-                window.modalNavigationManager.updateModalNavigation(modalElement);
-            }
-
-            modalElement.addEventListener('hidden.bs.modal', () => {
-                if (!window.ModalNavigationService?.registerModalClose && window.registerModalNavigationClose) {
-                    window.registerModalNavigationClose(this.modalId);
+            // Modal Navigation System - רק למודלים מקוננים (nested modals)
+            // בדיקה אם יש stack - רק אז זה מודל מקונן שצריך רישום
+            const hasStack = window.ModalNavigationService?.getStack?.()?.length > 0;
+            
+            if (hasStack) {
+                if (window.ModalNavigationService?.registerModalOpen) {
+                    await window.ModalNavigationService.registerModalOpen(modalElement, navigationMetadata);
+                } else if (window.pushModalToNavigation) {
+                    await window.pushModalToNavigation(modalElement, navigationMetadata);
                 }
-            }, { once: true });
+
+                // עדכון UI (breadcrumb וכפתור חזרה) רק במודלים מקוננים
+                if (window.modalNavigationManager?.updateModalNavigation) {
+                    window.modalNavigationManager.updateModalNavigation(modalElement);
+                }
+
+                modalElement.addEventListener('hidden.bs.modal', () => {
+                    if (window.ModalNavigationService?.registerModalClose) {
+                        window.ModalNavigationService.registerModalClose(this.modalId);
+                    } else if (window.registerModalNavigationClose) {
+                        window.registerModalNavigationClose(this.modalId);
+                    }
+                }, { once: true });
+            }
 
             // Load content AFTER modal is created and registered
             await this.loadContent();
@@ -248,7 +263,14 @@ class TradeSelectorModal {
         if (!contentDiv) return;
 
         // Show loading
-        contentDiv.innerHTML = '<div class="text-center py-4"><div class="spinner-border" role="status"></div></div>';
+        contentDiv.textContent = '';
+        const loadingDiv = document.createElement('div');
+        loadingDiv.className = 'text-center py-4';
+        const spinner = document.createElement('div');
+        spinner.className = 'spinner-border';
+        spinner.setAttribute('role', 'status');
+        loadingDiv.appendChild(spinner);
+        contentDiv.appendChild(loadingDiv);
 
         try {
             // Get filtering parameters from parent modal if available
@@ -318,17 +340,26 @@ class TradeSelectorModal {
             }
 
             // Render content
-            contentDiv.innerHTML = this.renderContent(trades);
+            contentDiv.textContent = '';
+            const contentHTML = this.renderContent(trades);
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(contentHTML, 'text/html');
+            doc.body.childNodes.forEach(node => {
+                contentDiv.appendChild(node.cloneNode(true));
+            });
             
             // Setup sortable headers after rendering
             this.setupSortableHeaders();
         } catch (error) {
             console.error('Error loading trade selector:', error);
-            contentDiv.innerHTML = `
-                <div class="alert alert-danger">
-                    <strong>שגיאה בטעינת נתונים:</strong> ${error.message}
-                </div>
-            `;
+            contentDiv.textContent = '';
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'alert alert-danger';
+            const strong = document.createElement('strong');
+            strong.textContent = 'שגיאה בטעינת נתונים: ';
+            alertDiv.appendChild(strong);
+            alertDiv.appendChild(document.createTextNode(error.message));
+            contentDiv.appendChild(alertDiv);
         }
     }
 
@@ -357,11 +388,14 @@ class TradeSelectorModal {
         const trade = this.selectedItem;
         
         // Helper function to get renderer with fallback
+        // Helper function to get renderer - שימוש ישיר ב-FieldRendererService
+        // המערכת תמיד זמינה דרך BASE package
         const getRenderer = (service, method, ...args) => {
-            if (window.FieldRendererService && window.FieldRendererService[method]) {
+            if (window.FieldRendererService?.[method]) {
                 return window.FieldRendererService[method](...args);
             }
-            return this.getFallbackRenderer(method, ...args);
+            // Fallback מינימלי למקרה נדיר ביותר שהמערכת לא זמינה
+            return '<span class="badge badge-secondary">-</span>';
         };
 
         const tickerDisplay = trade.ticker_symbol || trade.ticker?.symbol || 'טיקר לא ידוע';
@@ -396,20 +430,10 @@ class TradeSelectorModal {
                                 <td class="account-cell">${accountDisplay}</td>
                                 <td class="date-cell">${dateDisplay}</td>
                                 <td class="actions-cell">
-                                    <div class="d-flex gap-1 justify-content-center align-items-center">
-                                        <button type="button" 
-                                                class="btn btn-sm btn-outline-primary" 
-                                                data-onclick="window.tradeSelectorModal.viewTradeDetails(${trade.id})"
-                                                title="פרטים">
-                                            👁️
-                                        </button>
-                                        <button type="button" 
-                                                class="btn btn-sm btn-danger" 
-                                                data-onclick="window.tradeSelectorModal.cancelLink()"
-                                                title="בטל קישור">
-                                            ✕
-                                        </button>
-                                    </div>
+                                    ${window.createActionsMenu ? window.createActionsMenu([
+                                      { type: 'VIEW', onclick: `window.tradeSelectorModal.viewTradeDetails(${trade.id})`, title: 'פרטים' },
+                                      { type: 'CANCEL', onclick: `window.tradeSelectorModal.cancelLink()`, title: 'בטל קישור' }
+                                    ]) : '<!-- Actions menu not available -->'}
                                 </td>
                             </tr>
                         </tbody>
@@ -435,13 +459,14 @@ class TradeSelectorModal {
             return '<div class="alert alert-info">אין טריידים זמינים</div>';
         }
 
-        // Helper function to get renderer with fallback
+        // Helper function to get renderer - שימוש ישיר ב-FieldRendererService
+        // המערכת תמיד זמינה דרך BASE package
         const getRenderer = (service, method, ...args) => {
-            if (window.FieldRendererService && window.FieldRendererService[method]) {
+            if (window.FieldRendererService?.[method]) {
                 return window.FieldRendererService[method](...args);
             }
-            // Fallback rendering
-            return this.getFallbackRenderer(method, ...args);
+            // Fallback מינימלי למקרה נדיר ביותר שהמערכת לא זמינה
+            return '<span class="badge badge-secondary">-</span>';
         };
 
         // Build table HTML
@@ -462,20 +487,10 @@ class TradeSelectorModal {
                     <td class="account-cell">${accountDisplay}</td>
                     <td class="date-cell">${dateDisplay}</td>
                     <td class="actions-cell">
-                        <div class="d-flex gap-1 justify-content-center align-items-center" style="flex-wrap: nowrap;">
-                            <button type="button" 
-                                    class="btn btn-sm btn-outline-primary" 
-                                    data-onclick="window.tradeSelectorModal.viewTradeDetails(${trade.id})"
-                                    title="פרטים">
-                                👁️
-                            </button>
-                            <button type="button" 
-                                    class="btn btn-sm btn-primary" 
-                                    data-onclick="window.tradeSelectorModal.selectTrade(${trade.id})"
-                                    title="בחר">
-                                ✓
-                            </button>
-                        </div>
+                        ${window.createActionsMenu ? window.createActionsMenu([
+                          { type: 'VIEW', onclick: `window.tradeSelectorModal.viewTradeDetails(${trade.id})`, title: 'פרטים' },
+                          { type: 'SELECT', onclick: `window.tradeSelectorModal.selectTrade(${trade.id})`, title: 'בחר' }
+                        ]) : '<!-- Actions menu not available -->'}
                     </td>
                 </tr>
             `;
@@ -540,37 +555,14 @@ class TradeSelectorModal {
      * @param {...any} args - Arguments
      * @returns {string} HTML content
      */
+    /**
+     * Get fallback renderer - משמש רק למקרה נדיר ביותר שהמערכת לא זמינה
+     * @deprecated - המערכת תמיד זמינה דרך BASE package, fallback מיותר
+     * @private
+     */
     getFallbackRenderer(method, ...args) {
-        switch (method) {
-            case 'renderSide':
-                const side = args[0] || 'Long';
-                const sideClass = side === 'Long' ? 'side-long' : 'side-short';
-                const sideText = side === 'Long' ? 'Long' : 'Short';
-                return `<span class="side-badge ${sideClass}">${sideText}</span>`;
-            
-            case 'renderType':
-                const type = args[0] || '';
-                const typeColors = {
-                    'swing': '#26baac',
-                    'investment': '#28a745',
-                    'passive': '#ffc107',
-                    'day': '#dc3545'
-                };
-                const typeColor = typeColors[type] || '#6c757d';
-                return `<span class="investment-type-badge" style="background-color: ${typeColor}; color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.85em; font-weight: 500;">${type || '-'}</span>`;
-            
-            case 'renderStatus':
-                const status = args[0] || 'open';
-                const statusText = {
-                    'open': 'פתוח',
-                    'closed': 'סגור',
-                    'cancelled': 'מבוטל'
-                };
-                return `<span class="status-badge status-${status}">${statusText[status] || status}</span>`;
-            
-            default:
-                return '-';
-        }
+        // Fallback מינימלי - המערכת תמיד זמינה דרך BASE package
+        return '<span class="badge badge-secondary">-</span>';
     }
 
     /**
@@ -708,7 +700,13 @@ class TradeSelectorModal {
         // Re-render table
         const contentDiv = document.getElementById('tradeSelectorContent');
         if (contentDiv) {
-            contentDiv.innerHTML = this.renderTradesTable(sortedTrades);
+            contentDiv.textContent = '';
+            const tableHTML = this.renderTradesTable(sortedTrades);
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(tableHTML, 'text/html');
+            doc.body.childNodes.forEach(node => {
+                contentDiv.appendChild(node.cloneNode(true));
+            });
             this.setupSortableHeaders(); // Re-setup headers after re-render
         }
 
@@ -759,7 +757,12 @@ class TradeSelectorModal {
             // The field ID is determined by the parent modal's entity type
             const tradeField = document.getElementById('trade_id');
             if (tradeField) {
-                tradeField.value = tradeId;
+                // Use DataCollectionService to set value if available
+                if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+                  window.DataCollectionService.setValue(tradeField.id, tradeId, 'int');
+                } else {
+                  tradeField.value = tradeId;
+                }
             }
 
             // Update UI in parent modal
@@ -788,12 +791,14 @@ class TradeSelectorModal {
         const buttonContainer = document.getElementById(buttonId);
         
         if (buttonContainer) {
-            // Helper function to get renderer with fallback
+            // Helper function to get renderer - שימוש ישיר ב-FieldRendererService
+            // המערכת תמיד זמינה דרך BASE package
             const getRenderer = (service, method, ...args) => {
-                if (window.FieldRendererService && window.FieldRendererService[method]) {
+                if (window.FieldRendererService?.[method]) {
                     return window.FieldRendererService[method](...args);
                 }
-                return this.getFallbackRenderer(method, ...args);
+                // Fallback מינימלי למקרה נדיר ביותר שהמערכת לא זמינה
+                return '<span class="badge badge-secondary">-</span>';
             };
 
             const tickerDisplay = trade.ticker_symbol || trade.ticker?.symbol || 'טיקר לא ידוע';
@@ -803,7 +808,8 @@ class TradeSelectorModal {
             const accountDisplay = trade.account_name || trade.trading_account_id || 'לא מוגדר';
             const dateDisplay = trade.created_at ? this.formatTableDate(trade.created_at) : 'לא מוגדר';
 
-            buttonContainer.innerHTML = `
+            buttonContainer.textContent = '';
+            const tableHTML = `
                 <div class="table-responsive" style="margin-top: 0.5rem;">
                     <table class="table table-sm mb-0" style="margin-bottom: 0;">
                         <thead>
@@ -826,26 +832,21 @@ class TradeSelectorModal {
                                 <td class="account-cell">${accountDisplay}</td>
                                 <td class="date-cell">${dateDisplay}</td>
                                 <td class="actions-cell">
-                                    <div class="d-flex gap-1 justify-content-center align-items-center">
-                                        <button type="button" 
-                                                class="btn btn-sm btn-outline-primary" 
-                                                data-onclick="window.tradeSelectorModal.viewTradeDetails(${trade.id})"
-                                                title="פרטים">
-                                            👁️
-                                        </button>
-                                        <button type="button" 
-                                                class="btn btn-sm btn-danger" 
-                                                data-onclick="window.tradeSelectorModal.cancelLinkFromButton('${this.currentFieldId}')"
-                                                title="בטל קישור">
-                                            ✕
-                                        </button>
-                                    </div>
+                                    ${window.createActionsMenu ? window.createActionsMenu([
+                                      { type: 'VIEW', onclick: `window.tradeSelectorModal.viewTradeDetails(${trade.id})`, title: 'פרטים' },
+                                      { type: 'CANCEL', onclick: `window.tradeSelectorModal.cancelLinkFromButton('${this.currentFieldId}')`, title: 'בטל קישור' }
+                                    ]) : '<!-- Actions menu not available -->'}
                                 </td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
             `;
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(tableHTML, 'text/html');
+            doc.body.childNodes.forEach(node => {
+                buttonContainer.appendChild(node.cloneNode(true));
+            });
         }
     }
 
@@ -856,7 +857,12 @@ class TradeSelectorModal {
         // Clear the field
         const tradeField = document.getElementById('trade_id');
         if (tradeField) {
-            tradeField.value = '';
+            // Use DataCollectionService to clear field if available
+            if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+              window.DataCollectionService.setValue(tradeField.id, '', 'text');
+            } else {
+              tradeField.value = '';
+            }
         }
 
         // Reset selection
@@ -876,18 +882,25 @@ class TradeSelectorModal {
         // Clear the hidden field - generic field name: trade_id
         const tradeField = document.getElementById('trade_id');
         if (tradeField) {
-            tradeField.value = '';
+            // Use DataCollectionService to clear field if available
+            if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+              window.DataCollectionService.setValue(tradeField.id, '', 'text');
+            } else {
+              tradeField.value = '';
+            }
         }
 
         // Reset button display
         const buttonId = fieldId + 'Button';
         const buttonContainer = document.getElementById(buttonId);
         if (buttonContainer) {
-            buttonContainer.innerHTML = `
-                <button type="button" class="btn btn-primary" data-onclick="openTradeSelector('${fieldId}')">
-                    קשר לטרייד
-                </button>
-            `;
+            buttonContainer.textContent = '';
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'btn btn-primary';
+            button.setAttribute('data-onclick', `openTradeSelector('${fieldId}')`);
+            button.textContent = 'קשר לטרייד';
+            buttonContainer.appendChild(button);
         }
 
         // Reset selection

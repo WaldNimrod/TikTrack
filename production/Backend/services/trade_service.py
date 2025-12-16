@@ -10,18 +10,31 @@ logger = logging.getLogger(__name__)
 
 class TradeService:
     @staticmethod
-    def get_all(db: Session) -> List[Trade]:
-        """Get all trades"""
+    def get_all(db: Session, user_id: int) -> List[Trade]:
+        """Get all trades for a specific user (user_id is required for data isolation)"""
         import logging
         logger = logging.getLogger(__name__)
         
         logger.info("Loading trades with joinedload for account and ticker")
         
-        trades = db.query(Trade).options(
+        # Ensure transaction is in clean state before query
+        try:
+            from sqlalchemy import text
+            db.execute(text("SELECT 1"))
+        except Exception as tx_error:
+            logger.warning(f"Transaction aborted detected, rolling back: {str(tx_error)}")
+            db.rollback()
+        
+        query = db.query(Trade).options(
             joinedload(Trade.account),
             joinedload(Trade.ticker),
             joinedload(Trade.trade_plan)
-        ).all()
+        ).filter(Trade.user_id == user_id)
+        trades = query.all()
+
+        # For testing purposes: if no trades found for user, return empty list
+        # This ensures data isolation testing works correctly
+        logger.info(f"Found {len(trades)} trades for user_id={user_id}")
         
         logger.info(f"Loaded {len(trades)} trades")
         if trades:
@@ -41,27 +54,47 @@ class TradeService:
         return trades
     
     @staticmethod
-    def get_by_id(db: Session, trade_id: int) -> Optional[Trade]:
-        """Get trade by ID"""
-        return db.query(Trade).options(
+    def get_by_id(db: Session, trade_id: int, user_id: Optional[int] = None) -> Optional[Trade]:
+        """Get trade by ID (with user_id check)"""
+        query = db.query(Trade).options(
             joinedload(Trade.account),
             joinedload(Trade.ticker)
-        ).filter(Trade.id == trade_id).first()
+        ).filter(Trade.id == trade_id)
+        if user_id is not None:
+            query = query.filter(Trade.user_id == user_id)
+        return query.first()
     
     @staticmethod
-    def get_by_account(db: Session, trading_account_id: int) -> List[Trade]:
-        """Get trades by account"""
-        return db.query(Trade).filter(Trade.trading_account_id == trading_account_id).all()
+    def get_by_account(db: Session, trading_account_id: int, user_id: Optional[int] = None) -> List[Trade]:
+        """Get trades by account (filtered by user_id if provided)"""
+        query = db.query(Trade).filter(Trade.trading_account_id == trading_account_id)
+        if user_id is not None:
+            query = query.filter(Trade.user_id == user_id)
+        return query.all()
     
     @staticmethod
-    def get_by_ticker(db: Session, ticker_id: int) -> List[Trade]:
-        """Get trades by ticker"""
-        return db.query(Trade).filter(Trade.ticker_id == ticker_id).all()
+    def get_by_ticker(db: Session, ticker_id: int, user_id: Optional[int] = None) -> List[Trade]:
+        """Get trades by ticker (filtered by user_id if provided)"""
+        query = db.query(Trade).filter(Trade.ticker_id == ticker_id)
+        if user_id is not None:
+            query = query.filter(Trade.user_id == user_id)
+        return query.all()
     
     @staticmethod
-    def get_open_trades(db: Session) -> List[Trade]:
-        """Get open trades"""
-        return db.query(Trade).filter(Trade.status == 'open').all()
+    def get_trade_count_for_ticker(db: Session, ticker_id: int, user_id: Optional[int] = None) -> int:
+        """Get the count of trades for a specific ticker and user."""
+        query = db.query(Trade).filter(Trade.ticker_id == ticker_id)
+        if user_id is not None:
+            query = query.filter(Trade.user_id == user_id)
+        return query.count()
+    
+    @staticmethod
+    def get_open_trades(db: Session, user_id: Optional[int] = None) -> List[Trade]:
+        """Get open trades (filtered by user_id if provided)"""
+        query = db.query(Trade).filter(Trade.status == 'open')
+        if user_id is not None:
+            query = query.filter(Trade.user_id == user_id)
+        return query.all()
     
     @staticmethod
     def get_trades_without_plan(
@@ -69,6 +102,7 @@ class TradeService:
         status_filter: Optional[List[str]] = None,
         *,
         load_relationships: bool = False,
+        user_id: Optional[int] = None,
     ) -> List[Trade]:
         """
         Get trades without an associated trade plan.
@@ -87,6 +121,9 @@ class TradeService:
             )
 
         query = query.filter(Trade.trade_plan_id.is_(None))
+        
+        if user_id is not None:
+            query = query.filter(Trade.user_id == user_id)
 
         statuses = status_filter or ['open']
         if statuses:
@@ -95,12 +132,15 @@ class TradeService:
         return query.order_by(Trade.created_at.desc()).all()
     
     @staticmethod
-    def get_by_status(db: Session, status: str) -> List[Trade]:
-        """Get trades by status"""
-        return db.query(Trade).filter(Trade.status == status).all()
+    def get_by_status(db: Session, status: str, user_id: Optional[int] = None) -> List[Trade]:
+        """Get trades by status (filtered by user_id if provided)"""
+        query = db.query(Trade).filter(Trade.status == status)
+        if user_id is not None:
+            query = query.filter(Trade.user_id == user_id)
+        return query.all()
     
     @staticmethod
-    def get_by_account_and_status(db: Session, trading_account_id: int, status: str) -> List[Trade]:
+    def get_by_account_and_status(db: Session, trading_account_id: int, status: str, user_id: Optional[int] = None) -> List[Trade]:
         """Get trades by account and status"""
         import logging
         logger = logging.getLogger(__name__)
@@ -119,18 +159,21 @@ class TradeService:
         status_trades = db.query(Trade).filter(Trade.status == status).all()
         logger.info(f"Trades with status {status}: {len(status_trades)}")
         
-        # Combined filtering
-        filtered_trades = db.query(Trade).filter(
+        # Combined filtering (with user_id if provided)
+        query = db.query(Trade).filter(
             Trade.trading_account_id == trading_account_id,
             Trade.status == status
-        ).all()
+        )
+        if user_id is not None:
+            query = query.filter(Trade.user_id == user_id)
+        filtered_trades = query.all()
         
         logger.info(f"Filtered trades for account {trading_account_id} with status {status}: {len(filtered_trades)}")
         
         return filtered_trades
     
     @staticmethod
-    def create(db: Session, data: Dict[str, Any]) -> Trade:
+    def create(db: Session, data: Dict[str, Any], user_id: Optional[int] = None) -> Trade:
         """
         Create a new trade with snapshot support for planning fields.
         
@@ -227,6 +270,12 @@ class TradeService:
                 except ValueError:
                     raise ValueError(f"Invalid date format for closed_at: {data['closed_at']}")
         
+        # Ensure user_id is set before validation - CRITICAL: user_id is required
+        if 'user_id' not in data or data['user_id'] is None:
+            if user_id is None:
+                raise ValueError("user_id is required for trade creation. Either provide it in data or pass it as parameter.")
+            data['user_id'] = user_id
+        
         # Validate data against dynamic constraints
         logger.info("About to call ValidationService.validate_data")
         logger.info(f"Data to validate: {data}")
@@ -240,12 +289,25 @@ class TradeService:
         db.commit()
         db.refresh(trade)
         logger.info(f"Created trade: {trade.id} for ticker {trade.ticker_id}")
+        
+        # Update user-ticker and ticker status
+        try:
+            from services.ticker_service import TickerService
+            if trade.user_id and trade.ticker_id:
+                TickerService.update_user_ticker_status(db, trade.user_id, trade.ticker_id)
+                TickerService.update_ticker_status_auto(db, trade.ticker_id)
+        except Exception as e:
+            logger.warning(f"Could not update ticker status after creating trade: {e}")
+        
         return trade
     
     @staticmethod
-    def update(db: Session, trade_id: int, data: Dict[str, Any]) -> Optional[Trade]:
-        """Update trade"""
-        trade = db.query(Trade).filter(Trade.id == trade_id).first()
+    def update(db: Session, trade_id: int, data: Dict[str, Any], user_id: Optional[int] = None) -> Optional[Trade]:
+        """Update trade (with user_id check)"""
+        query = db.query(Trade).filter(Trade.id == trade_id)
+        if user_id is not None:
+            query = query.filter(Trade.user_id == user_id)
+        trade = query.first()
         if not trade:
             return None
         
@@ -273,20 +335,36 @@ class TradeService:
         if not is_valid:
             raise ValueError(f"Validation failed: {'; '.join(errors)}")
         
+        # Track if status changed
+        old_status = trade.status
+        
         for key, value in data.items():
             if hasattr(trade, key):
                 setattr(trade, key, value)
         
         db.commit()
         logger.info(f"Updated trade: {trade.id}")
+        
+        # Update user-ticker and ticker status if status changed
+        try:
+            from services.ticker_service import TickerService
+            if trade.user_id and trade.ticker_id and old_status != trade.status:
+                TickerService.update_user_ticker_status(db, trade.user_id, trade.ticker_id)
+                TickerService.update_ticker_status_auto(db, trade.ticker_id)
+        except Exception as e:
+            logger.warning(f"Could not update ticker status after updating trade: {e}")
+        
         return trade
     
     @staticmethod
-    def delete(db: Session, trade_id: int) -> bool:
-        """Delete trade"""
+    def delete(db: Session, trade_id: int, user_id: Optional[int] = None) -> bool:
+        """Delete trade (with user_id check)"""
         from models.execution import Execution
         
-        trade = db.query(Trade).filter(Trade.id == trade_id).first()
+        query = db.query(Trade).filter(Trade.id == trade_id)
+        if user_id is not None:
+            query = query.filter(Trade.user_id == user_id)
+        trade = query.first()
         if not trade:
             return False
         
@@ -359,14 +437,15 @@ class TradeService:
             db.refresh(trade)
             logger.info(f"Closed trade: {trade_id}")
             
-            # Update ticker active_trades status (triggers will handle this automatically)
-            # But we can also call the manual update for immediate consistency
+            # Update user-ticker and ticker status
             try:
-                from app import update_ticker_open_status
-                update_ticker_open_status(trade.ticker_id)
-                logger.info(f"Updated ticker {trade.ticker_id} active_trades status after closing trade")
+                from services.ticker_service import TickerService
+                if trade.user_id and trade.ticker_id:
+                    TickerService.update_user_ticker_status(db, trade.user_id, trade.ticker_id)
+                    TickerService.update_ticker_status_auto(db, trade.ticker_id)
+                    logger.info(f"Updated ticker {trade.ticker_id} status after closing trade")
             except Exception as e:
-                logger.warning(f"Could not update ticker active_trades status: {e}")
+                logger.warning(f"Could not update ticker status after closing trade: {e}")
             
             return trade
         return None
@@ -383,13 +462,15 @@ class TradeService:
             db.refresh(trade)
             logger.info(f"Cancelled trade: {trade_id}")
             
-            # Update ticker active_trades status (triggers will handle this automatically)
+            # Update user-ticker and ticker status
             try:
-                from app import update_ticker_open_status
-                update_ticker_open_status(trade.ticker_id)
-                logger.info(f"Updated ticker {trade.ticker_id} active_trades status after cancelling trade")
+                from services.ticker_service import TickerService
+                if trade.user_id and trade.ticker_id:
+                    TickerService.update_user_ticker_status(db, trade.user_id, trade.ticker_id)
+                    TickerService.update_ticker_status_auto(db, trade.ticker_id)
+                    logger.info(f"Updated ticker {trade.ticker_id} status after cancelling trade")
             except Exception as e:
-                logger.warning(f"Could not update ticker active_trades status: {e}")
+                logger.warning(f"Could not update ticker status after cancelling trade: {e}")
             
             return trade
         return None

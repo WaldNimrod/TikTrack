@@ -10,7 +10,6 @@ Features:
 - Cache cleanup
 - Log rotation
 - System monitoring
-- Real-time notifications integration
 
 Author: TikTrack Development Team
 Version: 1.1
@@ -41,50 +40,17 @@ logger = logging.getLogger(__name__)
 
 class BackgroundTaskManager:
     """
-    Background task manager for TikTrack with real-time notifications
+    Background task manager for TikTrack
     """
     
-    def __init__(self, realtime_notifications=None):
+    def __init__(self):
         self.tasks: Dict[str, Dict[str, Any]] = {}
         self.task_history: List[Dict[str, Any]] = []
         self.max_history_size = 100
         self.running = False
         self.scheduler_thread = None
-        self.realtime_notifications = realtime_notifications
         
-        logger.info("Background Task Manager initialized with real-time notifications support")
-    
-    def set_realtime_notifications(self, realtime_notifications):
-        """Set real-time notifications service"""
-        self.realtime_notifications = realtime_notifications
-        logger.info("Real-time notifications service connected to Background Task Manager")
-    
-    def _notify_task_event(self, event_type: str, task_name: str, **kwargs):
-        """Send real-time notification about task event"""
-        if self.realtime_notifications:
-            try:
-                if event_type == 'started':
-                    self.realtime_notifications.notify_background_task_started(
-                        task_name=task_name,
-                        task_id=f"{task_name}_{int(time.time())}",
-                        user_id=kwargs.get('user_id')
-                    )
-                elif event_type == 'completed':
-                    self.realtime_notifications.notify_background_task_completed(
-                        task_name=task_name,
-                        task_id=kwargs.get('task_id', f"{task_name}_{int(time.time())}"),
-                        result=kwargs.get('result', {}),
-                        user_id=kwargs.get('user_id')
-                    )
-                elif event_type == 'failed':
-                    self.realtime_notifications.notify_background_task_failed(
-                        task_name=task_name,
-                        task_id=kwargs.get('task_id', f"{task_name}_{int(time.time())}"),
-                        error=kwargs.get('error', 'Unknown error'),
-                        user_id=kwargs.get('user_id')
-                    )
-            except Exception as e:
-                logger.error(f"Error sending real-time notification for {event_type}: {e}")
+        logger.info("Background Task Manager initialized")
     
     def register_task(self, name: str, func: Callable, schedule_interval: str, 
                      description: str = "", enabled: bool = True) -> None:
@@ -113,8 +79,6 @@ class BackgroundTaskManager:
         
         logger.info(f"Registered background task: {name} ({schedule_interval})")
         
-        # Send real-time notification about task registration
-        self._notify_task_event('started', name, user_id=None)
     
     @monitor_performance("cleanup_expired_data")
     def cleanup_expired_data(self) -> Dict[str, Any]:
@@ -508,7 +472,6 @@ class BackgroundTaskManager:
         
         # Notify task started
         task_id = f"{task_name}_{int(time.time())}"
-        self._notify_task_event('started', task_name, task_id=task_id, user_id=user_id)
         
         start_time = time.time()
         task['last_run'] = datetime.now()
@@ -542,8 +505,6 @@ class BackgroundTaskManager:
             
             logger.info(f"Background task '{task_name}' completed successfully in {duration_ms}ms")
             
-            # Notify task completed
-            self._notify_task_event('completed', task_name, task_id=task_id, result=result, user_id=user_id)
             
             return {
                 'success': True,
@@ -573,8 +534,6 @@ class BackgroundTaskManager:
             }
             self._add_to_history(history_entry)
             
-            # Notify task failed
-            self._notify_task_event('failed', task_name, task_id=task_id, error=str(e), user_id=user_id)
             
             return {
                 'success': False,
@@ -614,20 +573,6 @@ class BackgroundTaskManager:
         if len(self.task_history) > self.max_history_size:
             self.task_history.pop(0)
         
-        # Send to frontend for IndexedDB storage
-        try:
-            if self.realtime_notifications:
-                self.realtime_notifications.emit('background_task_log', {
-                    'task_name': entry.get('task_name'),
-                    'timestamp': entry.get('started_at'),
-                    'status': entry.get('status'),
-                    'duration_ms': entry.get('duration_ms'),
-                    'result': entry.get('result'),
-                    'error': entry.get('error'),
-                    'user_id': entry.get('user_id')
-                })
-        except Exception as e:
-            logger.warning(f"Failed to send background task log to frontend: {e}")
     
     def start_scheduler(self) -> None:
         """Start the background task scheduler"""

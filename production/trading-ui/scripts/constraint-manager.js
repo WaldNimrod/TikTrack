@@ -154,7 +154,11 @@ class ConstraintManager {
    */
   populateTableFilter() {
     const select = document.getElementById('table-filter');
-    select.innerHTML = '<option value="">כל הטבלאות</option>';
+    select.textContent = '';
+    const defaultOption = document.createElement('option');
+    defaultOption.value = '';
+    defaultOption.textContent = 'כל הטבלאות';
+    select.appendChild(defaultOption);
 
     this.tables.forEach(table => {
       const option = document.createElement('option');
@@ -173,12 +177,21 @@ class ConstraintManager {
     const container = document.getElementById('constraints-list-container');
 
     if (this.constraints.length === 0) {
-      container.innerHTML = '<div class="text-center text-muted">אין אילוצים להצגה</div>';
+      container.textContent = '';
+      const emptyDiv = document.createElement('div');
+      emptyDiv.className = 'text-center text-muted';
+      emptyDiv.textContent = 'אין אילוצים להצגה';
+      container.appendChild(emptyDiv);
       return;
     }
 
     const html = this.constraints.map(constraint => this.renderConstraintItem(constraint)).join('');
-    container.innerHTML = html;
+    container.textContent = '';
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+    doc.body.childNodes.forEach(node => {
+        container.appendChild(node.cloneNode(true));
+    });
   }
 
   /**
@@ -191,12 +204,21 @@ class ConstraintManager {
     const container = document.getElementById('constraints-list-container');
 
     if (filteredConstraints.length === 0) {
-      container.innerHTML = '<div class="text-center text-muted">לא נמצאו אילוצים התואמים לחיפוש</div>';
+      container.textContent = '';
+      const div = document.createElement('div');
+      div.className = 'text-center text-muted';
+      div.textContent = 'לא נמצאו אילוצים התואמים לחיפוש';
+      container.appendChild(div);
       return;
     }
 
     const html = filteredConstraints.map(constraint => this.renderConstraintItem(constraint)).join('');
-    container.innerHTML = html;
+    container.textContent = '';
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+    doc.body.childNodes.forEach(node => {
+        container.appendChild(node.cloneNode(true));
+    });
   }
 
   /**
@@ -320,7 +342,8 @@ class ConstraintManager {
             `;
     }
 
-    container.innerHTML = `
+    container.textContent = '';
+    const formHTML = `
             <form id="edit-constraint-form">
                 <div class="form-section">
                     <h5>פרטי האילוץ</h5>
@@ -352,6 +375,11 @@ class ConstraintManager {
                 </div>
             </form>
         `;
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(formHTML, 'text/html');
+        doc.body.childNodes.forEach(node => {
+            container.appendChild(node.cloneNode(true));
+        });
   }
 
   /**
@@ -401,12 +429,19 @@ class ConstraintManager {
       if (data.status === 'success') {
         this.showMessage('האילוץ נמחק בהצלחה', 'success');
         await this.loadConstraints();
-        document.getElementById('editor-container').innerHTML = `
-                    <div class="text-center text-muted">
-                        <i class="fas fa-mouse-pointer fa-2x mb-3"></i>
-                        <p>בחר אילוץ מהרשימה כדי לערוך אותו</p>
-                    </div>
-                `;
+        const editorContainer = document.getElementById('editor-container');
+        if (editorContainer) {
+            editorContainer.textContent = '';
+            const div = document.createElement('div');
+            div.className = 'text-center text-muted';
+            const icon = document.createElement('i');
+            icon.className = 'fas fa-mouse-pointer fa-2x mb-3';
+            div.appendChild(icon);
+            const p = document.createElement('p');
+            p.textContent = 'בחר אילוץ מהרשימה כדי לערוך אותו';
+            div.appendChild(p);
+            editorContainer.appendChild(div);
+        }
       } else {
         this.showMessage('שגיאה במחיקת האילוץ', 'error');
       }
@@ -462,13 +497,38 @@ class ConstraintManager {
    * @returns {void}
    */
   handleAddConstraint() {
-    const formData = {
-      table_name: document.getElementById('table-name').value,
-      column_name: document.getElementById('column-name').value,
-      constraint_type: document.getElementById('constraint-type').value,
-      constraint_name: document.getElementById('constraint-name').value,
-      constraint_definition: document.getElementById('constraint-definition').value,
-    };
+    let formData;
+    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.collectFormData) {
+      // Use DataCollectionService to collect form data
+      const fieldMap = {
+        table_name: { id: 'table-name', type: 'text' },
+        column_name: { id: 'column-name', type: 'text' },
+        constraint_type: { id: 'constraint-type', type: 'text' },
+        constraint_name: { id: 'constraint-name', type: 'text' },
+        constraint_definition: { id: 'constraint-definition', type: 'text' }
+      };
+      formData = window.DataCollectionService.collectFormData(fieldMap);
+    } else {
+      // Fallback if DataCollectionService is not available
+      formData = {
+        // Use DataCollectionService to get values if available
+        table_name: (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) 
+          ? window.DataCollectionService.getValue('table-name', 'text', '') 
+          : (document.getElementById('table-name')?.value || ''),
+        column_name: (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) 
+          ? window.DataCollectionService.getValue('column-name', 'text', '') 
+          : (document.getElementById('column-name')?.value || ''),
+        constraint_type: (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) 
+          ? window.DataCollectionService.getValue('constraint-type', 'text', '') 
+          : (document.getElementById('constraint-type')?.value || ''),
+        constraint_name: (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) 
+          ? window.DataCollectionService.getValue('constraint-name', 'text', '') 
+          : (document.getElementById('constraint-name')?.value || ''),
+        constraint_definition: (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) 
+          ? window.DataCollectionService.getValue('constraint-definition', 'text', '') 
+          : (document.getElementById('constraint-definition')?.value || '')
+      };
+    }
 
     // Add enum values if it's an ENUM constraint
     if (formData.constraint_type === 'ENUM') {
@@ -522,13 +582,38 @@ class ConstraintManager {
    * @returns {void}
    */
   handleModalAddConstraint() {
-    const formData = {
-      table_name: document.getElementById('modal-table-name').value,
-      column_name: document.getElementById('modal-column-name').value,
-      constraint_type: document.getElementById('modal-constraint-type').value,
-      constraint_name: document.getElementById('modal-constraint-name').value,
-      constraint_definition: document.getElementById('modal-constraint-definition').value,
-    };
+    let formData;
+    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.collectFormData) {
+      // Use DataCollectionService to collect form data
+      const fieldMap = {
+        table_name: { id: 'modal-table-name', type: 'text' },
+        column_name: { id: 'modal-column-name', type: 'text' },
+        constraint_type: { id: 'modal-constraint-type', type: 'text' },
+        constraint_name: { id: 'modal-constraint-name', type: 'text' },
+        constraint_definition: { id: 'modal-constraint-definition', type: 'text' }
+      };
+      formData = window.DataCollectionService.collectFormData(fieldMap);
+    } else {
+      // Fallback if DataCollectionService is not available
+      formData = {
+        // Use DataCollectionService to get values if available
+        table_name: (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) 
+          ? window.DataCollectionService.getValue('modal-table-name', 'text', '') 
+          : (document.getElementById('modal-table-name')?.value || ''),
+        column_name: (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) 
+          ? window.DataCollectionService.getValue('modal-column-name', 'text', '') 
+          : (document.getElementById('modal-column-name')?.value || ''),
+        constraint_type: (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) 
+          ? window.DataCollectionService.getValue('modal-constraint-type', 'text', '') 
+          : (document.getElementById('modal-constraint-type')?.value || ''),
+        constraint_name: (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) 
+          ? window.DataCollectionService.getValue('modal-constraint-name', 'text', '') 
+          : (document.getElementById('modal-constraint-name')?.value || ''),
+        constraint_definition: (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) 
+          ? window.DataCollectionService.getValue('modal-constraint-definition', 'text', '') 
+          : (document.getElementById('modal-constraint-definition')?.value || '')
+      };
+    }
 
     // Add enum values if it's an ENUM constraint
     if (formData.constraint_type === 'ENUM') {
@@ -556,10 +641,14 @@ class ConstraintManager {
 
     // Close modal
     const modal = document.getElementById('add-constraint-modal');
-    if (modal && typeof bootstrap !== 'undefined' && bootstrap.Modal) {
-      const bootstrapModal = bootstrap.Modal.getInstance(modal);
-      if (bootstrapModal) {
-        bootstrapModal.hide();
+    if (modal) {
+      if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
+        window.ModalManagerV2.hideModal('add-constraint-modal');
+      } else if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+        const bootstrapModal = bootstrap.Modal.getInstance(modal);
+        if (bootstrapModal) {
+          bootstrapModal.hide();
+        }
       }
     }
   }
@@ -614,7 +703,8 @@ function showAddConstraintModal() {
     modal = document.createElement('div');
     modal.id = 'add-constraint-modal';
     modal.className = 'modal fade';
-    modal.innerHTML = `
+    modal.textContent = '';
+    const modalHTML = `
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header linkedItems_modal-header-colored">
@@ -671,7 +761,19 @@ function showAddConstraintModal() {
     document.body.appendChild(modal);
   }
 
-  if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+  // Show modal using ModalManagerV2 first, fallback to Bootstrap
+  if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
+    window.ModalManagerV2.showModal('add-constraint-modal', 'add').catch(error => {
+      window.Logger?.error('Error showing add constraint modal via ModalManagerV2', { error, modalId: 'add-constraint-modal', page: 'constraint-manager' });
+      // Fallback to Bootstrap
+      if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+        const bootstrapModal = new bootstrap.Modal(modal);
+        bootstrapModal.show();
+      } else {
+        modal.style.display = 'block';
+      }
+    });
+  } else if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
     const bootstrapModal = new bootstrap.Modal(modal);
     bootstrapModal.show();
   } else {
@@ -687,12 +789,33 @@ window.addEnumValue = function () {
   if (container) {
     const newItem = document.createElement('div');
     newItem.className = 'enum-value-item';
-    newItem.innerHTML = `
-            <input type="text" class="form-control" placeholder="ערך" name="enum-value">
-            <input type="text" class="form-control" placeholder="שם תצוגה" name="enum-display">
-            <input type="number" class="form-control" placeholder="סדר" name="enum-sort" value="1">
-            <button data-button-type="DELETE" data-variant="small" data-onclick="removeEnumValue(this)" data-text="" title="מחק"></button>
-        `;
+    newItem.textContent = '';
+    const input1 = document.createElement('input');
+    input1.type = 'text';
+    input1.className = 'form-control';
+    input1.placeholder = 'ערך';
+    input1.name = 'enum-value';
+    newItem.appendChild(input1);
+    const input2 = document.createElement('input');
+    input2.type = 'text';
+    input2.className = 'form-control';
+    input2.placeholder = 'שם תצוגה';
+    input2.name = 'enum-display';
+    newItem.appendChild(input2);
+    const input3 = document.createElement('input');
+    input3.type = 'number';
+    input3.className = 'form-control';
+    input3.placeholder = 'סדר';
+    input3.name = 'enum-sort';
+    input3.value = '1';
+    newItem.appendChild(input3);
+    const button = document.createElement('button');
+    button.setAttribute('data-button-type', 'DELETE');
+    button.setAttribute('data-variant', 'small');
+    button.setAttribute('data-onclick', 'removeEnumValue(this)');
+    button.setAttribute('data-text', '');
+    button.title = 'מחק';
+    newItem.appendChild(button);
     container.appendChild(newItem);
   }
 };

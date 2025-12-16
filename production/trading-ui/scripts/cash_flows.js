@@ -5,58 +5,84 @@
  * 
  * This index lists all functions in this file, organized by category.
  * 
- * Total Functions: 35
+ * Total Functions: 61
  * 
- * PAGE INITIALIZATION (3)
+ * PAGE INITIALIZATION (5)
+ * - setupCashFlowTypeFilterDropdown() - * Set active cash flow type filter (buttons and dropdown)
+ * - setupExchangeRowInteractions() - setupExchangeRowInteractions function
  * - initializeCashFlowsPage() - initializeCashFlowsPage function
  * - setupSourceFieldListeners() - setupSourceFieldListeners function
  * - initializeExternalIdFields() - * Setup source field listeners
  * 
- * DATA LOADING (10)
+ * DATA LOADING (11)
  * - loadCashFlowsData() - loadCashFlowsData function
- * - getAccountNameById() - getAccountNameById function
+ * - getCashFlowsPaginationInstance() - * Resolve exchange direction from flow type
+ * - loadCashFlowTypeFilterState() - * Save cash flow type filter state
+ * - getAccountNameById() - * Reapply cash flow type filter
  * - ensureTradingAccountsLoaded() - ensureTradingAccountsLoaded function
- * - loadCashFlows() - * טעינת נתוני חשבונות מסחר אם הם לא נטענו
  * - loadAccountsForCashFlow() - loadAccountsForCashFlow function
  * - loadCurrenciesForCashFlow() - loadCurrenciesForCashFlow function
- * - getCashFlowTypeWithColor() - * Format amount
+ * - getCashFlowTypeWithColor() - getCashFlowTypeWithColor function
  * - getCashFlowTypeText() - getCashFlowTypeText function
- * - loadTradesForCashFlow() - * Edit cash flow
- * - loadTradePlansForCashFlow() - loadTradePlansForCashFlow function
+ * - loadCurrencyExchange() - loadCurrencyExchange function
+ * - getExchangeIdFromCashFlow() - * Check if cash flow is part of currency exchange
  * 
- * DATA MANIPULATION (6)
+ * DATA MANIPULATION (10)
+ * - saveCashFlowTypeFilterState() - * Filter cash flows locally by type
  * - deleteCashFlow() - deleteCashFlow function
- * - updatePageSummaryStats() - Uses InfoSummarySystem from services/statistics-calculator.js
+ * - deleteImportedCashFlows() - deleteImportedCashFlows function
+ * - updatePageSummaryStats() - updatePageSummaryStats function
  * - updateCashFlowsTable() - * Format USD rate
  * - updateCashFlow() - updateCashFlow function
  * - saveCashFlow() - saveCashFlow function
+ * - saveCurrencyExchange() - saveCurrencyExchange function
+ * - deleteCurrencyExchange() - deleteCurrencyExchange function
  * - confirmDeleteCashFlow() - confirmDeleteCashFlow function
  * 
- * EVENT HANDLING (1)
+ * EVENT HANDLING (12)
+ * - resolveExchangeDirectionFromType() - resolveExchangeDirectionFromType function
+ * - setActiveCashFlowTypeButton() - setActiveCashFlowTypeButton function
  * - performCashFlowDeletion() - performCashFlowDeletion function
+ * - syncCashFlowsPagination() - syncCashFlowsPagination function
+ * - groupUnifiedExchanges() - groupUnifiedExchanges function
+ * - renderUnifiedForexExchangesTable() - renderUnifiedForexExchangesTable function
+ * - ensureExchangePairsAdjacency() - ensureExchangePairsAdjacency function
+ * - highlightExchangeGroup() - * Setup exchange row interactions (hover, click handlers)
+ * - clearExchangeHighlight() - * Highlight exchange group
+ * - setCurrencyExchangeSummary() - * Clear exchange highlight
+ * - hydrateCashFlowExchangeDisplay() - hydrateCashFlowExchangeDisplay function
+ * - isCurrencyExchange() - isCurrencyExchange function
  * 
  * UI UPDATES (2)
  * - renderCashFlowsTable() - * טעינת רשימת מטבעות למודולי cash flow
  * - showCashFlowDetails() - * Format USD rate
  * 
- * VALIDATION (2)
+ * VALIDATION (4)
+ * - validateCashFlowAmount() - * Ensure trading accounts data is loaded
+ * - validateCashFlowDate() - * Helper validation function for cash flow amount
  * - validateCashFlowForm() - validateCashFlowForm function
- * - validateEditCashFlowForm() - validateEditCashFlowForm function
+ * - validateEditCashFlowForm() - * Validate cash flow form
  * 
  * UTILITIES (3)
  * - formatAmount() - formatAmount function
- * - formatCashFlowAmount() - * Get cash flow type text
+ * - formatCashFlowAmount() - formatCashFlowAmount function
  * - formatUsdRate() - formatUsdRate function
  * 
- * OTHER (8)
+ * OTHER (14)
+ * - applyFallbackDateSort() - applyFallbackDateSort function
  * - calculateBalance() - calculateBalance function
- * - startAutoRefresh() - * Update cash flows table
+ * - cashFlowMatchesType() - cashFlowMatchesType function
+ * - filterCashFlowsByType() - * Check if cash flow matches type
+ * - filterCashFlowsLocallyByType() - filterCashFlowsLocallyByType function
+ * - reapplyCashFlowTypeFilter() - * Load cash flow type filter state
+ * - resolveCurrencySymbolForCashFlow() - * Get cash flow type text
+ * - startAutoRefresh() - startAutoRefresh function
  * - applyDynamicColors() - * Start auto refresh
  * - applyUserPreferences() - applyUserPreferences function
  * - manageExternalIdField() - * Confirm delete cash flow
  * - editCashFlow() - editCashFlow function
  * - generateDetailedLog() - generateDetailedLog function
- * - generateDetailedLogForCashFlows() - generateDetailedLogForCashFlows function
+ * - restorePageState() - restorePageState function
  * 
  * ==========================================
  */
@@ -78,6 +104,13 @@
  */
 
 // ===== קובץ JavaScript לדף תזרימי מזומנים =====
+
+// Export placeholder immediately (required by page-initialization-configs)
+// This ensures the function is available when requiredGlobals are checked
+window.loadCashFlowsData = window.loadCashFlowsData || function() {
+  console.warn('⚠️ loadCashFlowsData called before implementation loaded');
+  return Promise.resolve([]);
+};
 
 /**
  * Load cash flows data from server (via CashFlowsData service)
@@ -105,8 +138,49 @@ async function loadCashFlowsData(options = {}) {
         'Content-Type': 'application/json',
         'Cache-Control': 'no-cache',
       },
-      signal: loadOptions.signal,
+      signal: loadOptions.signal, // Include cookies for session-based auth
     });
+    
+    // Handle 401/308 authentication errors
+    if (response.status === 401 || response.status === 308) {
+      // Clear any stale auth data using UnifiedCacheManager
+      if (window.UnifiedCacheManager) {
+        try {
+          await window.UnifiedCacheManager.remove('currentUser');
+          await window.UnifiedCacheManager.remove('authToken');
+        } catch (e) {
+          console.warn('Error clearing auth cache:', e);
+          // Fallback to localStorage
+          localStorage.removeItem('currentUser');
+          localStorage.removeItem('authToken');
+        }
+      } else {
+        // Fallback to localStorage if UnifiedCacheManager not available
+        localStorage.removeItem('currentUser');
+        localStorage.removeItem('authToken');
+      }
+      
+      // Show error notification
+      if (window.NotificationSystem) {
+        window.NotificationSystem.showError(
+          'נדרשת התחברות',
+          'עליך להתחבר למערכת כדי לצפות בנתונים. אנא התחבר כדי להמשיך.',
+          'system'
+        );
+      }
+      
+      // Try to show login modal
+      if (typeof window.TikTrackAuth?.showLoginModal === 'function') {
+        window.TikTrackAuth.showLoginModal(() => {
+          window.location.reload();
+        });
+      } else {
+        window.location.href = '/';
+      }
+      
+      throw new Error('Authentication required');
+    }
+    
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -156,7 +230,7 @@ async function loadCashFlowsData(options = {}) {
       applyFallbackDateSort(normalizedCashFlows);
     }
 
-    updatePageSummaryStats();
+    await updatePageSummaryStats();
 
     if (typeof window.registerCashFlowsTables === 'function') {
       window.registerCashFlowsTables();
@@ -189,6 +263,9 @@ async function loadCashFlowsData(options = {}) {
   }
 }
 
+// Update window.loadCashFlowsData with actual implementation (placeholder was set at top of file)
+window.loadCashFlowsData = loadCashFlowsData;
+
 /**
  * Fallback sorting by date (newest first) in case the general system is unavailable
  * @function applyFallbackDateSort
@@ -201,7 +278,17 @@ function applyFallbackDateSort(data) {
 
   try {
     const sortedData = [...data].sort((a, b) => {
-      // Use dateUtils for consistent date comparison
+      const dateA = a && a.date ? a.date : null;
+      const dateB = b && b.date ? b.date : null;
+      
+      // Use TableSortValueAdapter if available
+      if (typeof window.TableSortValueAdapter?.getSortValue === 'function') {
+        const sortValueA = window.TableSortValueAdapter.getSortValue({ value: dateA, type: 'auto' });
+        const sortValueB = window.TableSortValueAdapter.getSortValue({ value: dateB, type: 'auto' });
+        return (sortValueB || 0) - (sortValueA || 0);
+      }
+      
+      // Fallback to dateUtils for consistent date comparison
       const getEpoch = (dateValue) => {
         if (!dateValue) return 0;
         if (window.dateUtils && typeof window.dateUtils.getEpochMilliseconds === 'function') {
@@ -220,8 +307,8 @@ function applyFallbackDateSort(data) {
           return 0;
         }
       };
-      const aEpoch = a && a.date ? getEpoch(a.date) : 0;
-      const bEpoch = b && b.date ? getEpoch(b.date) : 0;
+      const aEpoch = dateA ? getEpoch(dateA) : 0;
+      const bEpoch = dateB ? getEpoch(dateB) : 0;
       return bEpoch - aEpoch;
     });
 
@@ -402,7 +489,7 @@ function getCashFlowsPaginationInstance() {
   // Always return the instance created by syncCashFlowsPagination if it exists
   // This ensures we use the instance with the correct render callback
   if (cashFlowsPaginationInstance) {
-    console.log('✅ [getCashFlowsPaginationInstance] Returning cached instance', {
+    window.Logger?.debug('✅ [getCashFlowsPaginationInstance] Returning cached instance', {
       hasOnAfterRender: typeof cashFlowsPaginationInstance.config?.onAfterRender === 'function',
       tableId: cashFlowsPaginationInstance.config?.tableId
     });
@@ -412,7 +499,7 @@ function getCashFlowsPaginationInstance() {
   if (window.PaginationSystem?.get) {
     const instance = window.PaginationSystem.get(CASH_FLOWS_TABLE_ID);
     if (instance) {
-      console.log('⚠️ [getCashFlowsPaginationInstance] Using PaginationSystem instance (fallback)', {
+      window.Logger?.debug('⚠️ [getCashFlowsPaginationInstance] Using PaginationSystem instance (fallback)', {
         hasOnAfterRender: typeof instance.config?.onAfterRender === 'function',
         tableId: instance.config?.tableId
       });
@@ -423,7 +510,7 @@ function getCashFlowsPaginationInstance() {
   if (typeof window.getPagination === 'function') {
     const instance = window.getPagination(CASH_FLOWS_TABLE_ID);
     if (instance) {
-      console.log('⚠️ [getCashFlowsPaginationInstance] Using getPagination instance (fallback)', {
+      window.Logger?.debug('⚠️ [getCashFlowsPaginationInstance] Using getPagination instance (fallback)', {
         hasOnAfterRender: typeof instance.config?.onAfterRender === 'function',
         tableId: instance.config?.tableId
       });
@@ -431,7 +518,7 @@ function getCashFlowsPaginationInstance() {
       return instance;
     }
   }
-  console.warn('⚠️ [getCashFlowsPaginationInstance] No pagination instance found');
+  window.Logger?.warn('⚠️ [getCashFlowsPaginationInstance] No pagination instance found');
   return null;
 }
 
@@ -444,9 +531,15 @@ function setActiveCashFlowTypeButton(value) {
   const normalizedValue = value || 'all';
   
   // Update dropdown
-  const select = document.getElementById('cashFlowTypeFilter');
-  if (select) {
-    select.value = normalizedValue;
+  const selectId = 'cashFlowTypeFilter';
+  if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+    window.DataCollectionService.setValue(selectId, normalizedValue, 'text');
+  } else {
+    // Fallback if DataCollectionService is not available
+    const select = document.getElementById(selectId);
+    if (select) {
+      select.value = normalizedValue;
+    }
   }
   
   // Buttons removed - only dropdown remains
@@ -465,7 +558,16 @@ function setupCashFlowTypeFilterDropdown() {
   }
 
   // Set initial value
-  select.value = activeCashFlowTypeFilter || 'all';
+  const selectId = 'cashFlowTypeFilter';
+  const initialValue = activeCashFlowTypeFilter || 'all';
+  if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+    window.DataCollectionService.setValue(selectId, initialValue, 'text');
+  } else {
+    // Fallback if DataCollectionService is not available
+    if (select) {
+      select.value = initialValue;
+    }
+  }
   
   // EventHandlerManager will handle the change event automatically via data-onchange attribute
   // No need for manual event listeners - just like buttons with data-onclick!
@@ -491,7 +593,15 @@ function cashFlowMatchesType(item, normalizedType) {
     if (!item) {
       return false;
     }
-    // Exchange rows מזוהים רק אם יש exchange_group_id או external_id בפורמט exchange_
+    // Exchange rows מזוהים לפי:
+    // 1. type הוא currency_exchange_from או currency_exchange_to
+    // 2. exchange_group_id קיים
+    // 3. external_id מתחיל ב-exchange_
+    // 4. isCurrencyExchange מחזיר true
+    const itemType = (item?.type || '').toString().toLowerCase();
+    if (itemType === 'currency_exchange_from' || itemType === 'currency_exchange_to') {
+      return true;
+    }
     return Boolean(item.exchange_group_id || isCurrencyExchange(item));
   }
   const candidate = (item?.type || '').toString().toLowerCase();
@@ -506,10 +616,7 @@ function cashFlowMatchesType(item, normalizedType) {
  * @returns {Promise<void>}
  */
 async function filterCashFlowsByType(flowType, options = {}) {
-  // Export to window for global access (needed for data-onchange)
-  window.filterCashFlowsByType = filterCashFlowsByType;
-  
-  console.log('🔍 [filterCashFlowsByType] Called with:', { flowType, options });
+  window.Logger?.debug('🔍 [filterCashFlowsByType] Called with:', { flowType, options });
   window.Logger?.info('🔍 filterCashFlowsByType called', { 
     flowType, 
     options, 
@@ -570,7 +677,7 @@ async function filterCashFlowsByType(flowType, options = {}) {
 
   // If pagination exists, update it with filtered data
   if (paginationInstance && typeof paginationInstance.setData === 'function') {
-    console.log('📊 [filterCashFlowsByType] Using pagination setData', { 
+    window.Logger?.debug('📊 [filterCashFlowsByType] Using pagination setData', { 
       filteredCount: filteredData.length,
       originalCount: (Array.isArray(window.allCashFlowsData) ? window.allCashFlowsData : window.cashFlowsData || []).length,
       hasPagination: true,
@@ -583,19 +690,36 @@ async function filterCashFlowsByType(flowType, options = {}) {
     });
     // Force update window.filteredCashFlowsData immediately BEFORE setData
     window.filteredCashFlowsData = filteredData;
-    console.log('✅ [filterCashFlowsByType] window.filteredCashFlowsData updated to', filteredData.length, 'items');
+    window.Logger?.debug('✅ [filterCashFlowsByType] window.filteredCashFlowsData updated to', filteredData.length, 'items');
     // Update pagination with filtered data - it will call render callback
     paginationInstance.setData(filteredData);
-    console.log('✅ [filterCashFlowsByType] paginationInstance.setData called with', filteredData.length, 'items');
+    window.Logger?.debug('✅ [filterCashFlowsByType] paginationInstance.setData called with', filteredData.length, 'items');
     
     // Force render table immediately if render callback didn't fire
     // This is a safety net - the render callback should handle this, but if it doesn't, we'll do it here
     setTimeout(async () => {
       const currentPageData = paginationInstance.getCurrentPageData();
-      console.log('🔄 [filterCashFlowsByType] Force render check - currentPageData length:', currentPageData.length);
+      window.Logger?.debug('🔄 [filterCashFlowsByType] Force render check - currentPageData length:', currentPageData.length);
       if (currentPageData.length > 0 || filteredData.length === 0) {
-        console.log('🔄 [filterCashFlowsByType] Force calling updateCashFlowsTable');
+        window.Logger?.debug('🔄 [filterCashFlowsByType] Force calling updateCashFlowsTable');
         await updateCashFlowsTable(currentPageData, { skipDataUpdate: true, skipSummary: true });
+      }
+      
+      // Always update unified forex exchanges table with ALL exchange data (independent of filter)
+      try {
+        const allData = Array.isArray(window.allCashFlowsData) && window.allCashFlowsData.length > 0
+          ? window.allCashFlowsData
+          : (Array.isArray(window.cashFlowsData) && window.cashFlowsData.length > 0
+              ? window.cashFlowsData
+              : []);
+        // Filter only exchange-related cash flows for the unified table
+        const exchangeData = allData.filter(item => {
+          const itemType = (item?.type || '').toString().toLowerCase();
+          return itemType === 'currency_exchange_from' || itemType === 'currency_exchange_to' || isCurrencyExchange(item);
+        });
+        renderUnifiedForexExchangesTable(exchangeData);
+      } catch (e) {
+        window.Logger?.warn('renderUnifiedForexExchangesTable failed in filterCashFlowsByType', { error: e?.message, page: 'cash_flows' });
       }
     }, 100);
     
@@ -629,14 +753,14 @@ async function filterCashFlowsByType(flowType, options = {}) {
   }
 
   // Fallback: update table directly
-  console.log('📊 [filterCashFlowsByType] Using direct table update (no pagination)', { 
+  window.Logger?.debug('📊 [filterCashFlowsByType] Using direct table update (no pagination)', { 
     filteredCount: filteredData.length,
     hasPagination: false,
     page: 'cash_flows' 
   });
   window.Logger?.info('Using direct table update (no pagination)', { page: 'cash_flows' });
   await updateCashFlowsTable(filteredData);
-  console.log('✅ [filterCashFlowsByType] updateCashFlowsTable completed');
+  window.Logger?.debug('✅ [filterCashFlowsByType] updateCashFlowsTable completed');
 }
 
 /**
@@ -1010,7 +1134,7 @@ async function deleteCashFlow(id) {
       );
     } else {
       // Fallback to simple confirm
-      if (!confirm('האם אתה בטוח שברצונך למחוק את תזרים המזומנים?')) {
+      if (!window.showConfirmationDialog('האם אתה בטוח שברצונך למחוק את תזרים המזומנים?')) {
         return;
       }
       await performCashFlowDeletion(id);
@@ -1031,6 +1155,16 @@ async function deleteCashFlow(id) {
  */
 async function performCashFlowDeletion(id) {
   try {
+    // Use UnifiedCRUDService for consistent CRUD operations
+    if (window.UnifiedCRUDService && typeof window.UnifiedCRUDService.deleteEntity === 'function') {
+      await window.UnifiedCRUDService.deleteEntity('cash_flow', id, {
+        successMessage: 'תזרים המזומנים נמחק בהצלחה!',
+        entityName: 'תזרים מזומנים',
+        reloadFn: () => window.loadCashFlowsData({ force: true }),
+        requiresHardReload: false
+      });
+    } else {
+      // Fallback to direct API call with CRUDResponseHandler
     let response;
     if (typeof window.CashFlowsData?.deleteCashFlow === 'function') {
       response = await window.CashFlowsData.deleteCashFlow(id);
@@ -1047,6 +1181,7 @@ async function performCashFlowDeletion(id) {
       reloadFn: () => window.loadCashFlowsData({ force: true }),
       requiresHardReload: false
     });
+    }
   } catch (error) {
     window.Logger.error('performCashFlowDeletion: Error occurred', { page: 'cash_flows', error: error?.message || error });
     CRUDResponseHandler.handleError(error, 'מחיקת תזרים מזומנים');
@@ -1075,9 +1210,9 @@ async function deleteImportedCashFlows() {
             'danger'
           );
         } catch (error) {
-          console.error('Error in showConfirmationDialog:', error);
+          window.Logger?.error('Error in showConfirmationDialog:', error);
           // Fallback to simple confirm
-          const confirmed = window.confirm(confirmationMessage || 'האם אתה בטוח שברצונך למחוק את כל רשומות תזרימי המזומנים מייבוא?');
+          const confirmed = window.window.showConfirmationDialog(confirmationMessage || 'האם אתה בטוח שברצונך למחוק את כל רשומות תזרימי המזומנים מייבוא?');
           resolve(confirmed);
         }
       });
@@ -1087,7 +1222,7 @@ async function deleteImportedCashFlows() {
       }
     } else {
       // Fallback to simple confirm
-      if (!confirm(confirmationMessage || 'האם אתה בטוח שברצונך למחוק את כל רשומות תזרימי המזומנים מייבוא?')) {
+      if (!window.showConfirmationDialog(confirmationMessage || 'האם אתה בטוח שברצונך למחוק את כל רשומות תזרימי המזומנים מייבוא?')) {
         return;
       }
     }
@@ -1116,7 +1251,7 @@ async function deleteImportedCashFlows() {
       if (window.showNotification) {
         window.showNotification(message, 'success', 5000);
       } else {
-        alert(message);
+        window.showErrorNotification(message, "שגיאה");
       }
 
       // Reload cash flows data
@@ -1131,7 +1266,7 @@ async function deleteImportedCashFlows() {
       if (window.showNotification) {
         window.showNotification(errorMessage, 'error', 6000);
       } else {
-        alert(`שגיאה: ${errorMessage}`);
+        window.showErrorNotification(`שגיאה: ${errorMessage}`, "שגיאה");
       }
       
       if (window.Logger) {
@@ -1147,7 +1282,7 @@ async function deleteImportedCashFlows() {
     if (window.showNotification) {
       window.showNotification(errorMessage, 'error', 6000);
     } else {
-      alert(`שגיאה: ${errorMessage}`);
+      window.showErrorNotification(`שגיאה: ${errorMessage}`, "שגיאה");
     }
     
     if (window.Logger) {
@@ -1307,14 +1442,14 @@ async function renderCashFlowsTable() {
   const tbody = document.querySelector('#cashFlowsContainer table tbody');
   if (!tbody) {return;}
 
-  tbody.innerHTML = '';
+  tbody.textContent = '';
 
   // Use filtered data if available, otherwise use cashFlowsData
   const dataToRender = Array.isArray(window.filteredCashFlowsData) && window.filteredCashFlowsData.length > 0
     ? window.filteredCashFlowsData
     : (Array.isArray(cashFlowsData) ? cashFlowsData : []);
   
-  console.log('🎨 [renderCashFlowsTable] Rendering table', {
+  window.Logger?.debug('🎨 [renderCashFlowsTable] Rendering table', {
     filteredDataLength: window.filteredCashFlowsData?.length || 0,
     cashFlowsDataLength: cashFlowsData?.length || 0,
     dataToRenderLength: dataToRender.length
@@ -1357,7 +1492,14 @@ async function renderCashFlowsTable() {
     }
     
     // Show message in table as well
-    tbody.innerHTML = `<tr><td colspan="9" class="text-center">${message}</td></tr>`;
+    tbody.textContent = '';
+    const messageRow = document.createElement('tr');
+    const messageCell = document.createElement('td');
+    messageCell.colSpan = 9;
+    messageCell.className = 'text-center';
+    messageCell.textContent = message;
+    messageRow.appendChild(messageCell);
+    tbody.appendChild(messageRow);
     return;
   }
 
@@ -1484,148 +1626,60 @@ async function renderCashFlowsTable() {
           return `<span class="text-truncate-preview" title="${escape(fallbackPlain)}">${escape(truncated)}</span>`;
         })();
 
-            row.innerHTML = `
-            <td class="trade-cell" data-trade-id="${cashFlow.trade_id || ''}">
-                ${tradeCell}
-            </td>
-            <td class="col-account ticker-cell" data-account="${cashFlow.trading_account_id || accountName || ''}">
-                <div class="table-cell-flex">
-                    <span class="entity-trading_account-badge entity-account-badge entity-badge-base">
-                        ${accountName}
-                    </span>
-                </div>
-            </td>
-            <td class="col-type type-cell" data-type="${cashFlow.type || ''}" dir="rtl">${typeDisplay}</td>
-            <td class="col-amount text-end">
-                ${amountDisplay}
-            </td>
-            <td class="col-date table-cell-center" data-date="${cashFlow.date || ''}">${(() => {
-              const dateValue = cashFlow.date;
-              if (!dateValue) {
-                return '<span class="date-text">-</span>';
-              }
-              // Use FieldRendererService.renderDate for consistent date formatting
-              if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
-                const dateEnvelope = window.dateUtils?.ensureDateEnvelope ? window.dateUtils.ensureDateEnvelope(dateValue) : dateValue;
-                return `<span class="date-text">${window.FieldRendererService.renderDate(dateEnvelope || dateValue, false)}</span>`;
-              }
-              // Fallback to dateUtils or formatDate
-              if (window.dateUtils && typeof window.dateUtils.formatDate === 'function') {
-                const dateEnvelope = window.dateUtils.ensureDateEnvelope ? window.dateUtils.ensureDateEnvelope(dateValue) : dateValue;
-                return `<span class="date-text">${window.dateUtils.formatDate(dateEnvelope || dateValue, { includeTime: false })}</span>`;
-              }
-              // Last fallback
-              try {
-                const dateObj = dateValue instanceof Date ? dateValue : new Date(dateValue);
-                if (!Number.isNaN(dateObj.getTime())) {
-                  const formatted = window.formatDate ? window.formatDate(dateObj, false) : dateObj.toLocaleDateString('he-IL');
-                  return `<span class="date-text">${formatted}</span>`;
-                }
-              } catch (error) {
-                window.Logger?.warn('⚠️ cash_flows date formatting failed', { error, cashFlowId: cashFlow?.id }, { page: 'cash_flows' });
-              }
-              return '<span class="date-text">-</span>';
-            })()}</td>
-            <td class="col-description">${descriptionDisplay}</td>
-            <td class="col-source">${window.translateCashFlowSource ?
-    window.translateCashFlowSource(cashFlow.source) :
-    cashFlow.source}</td>
-            ${(() => {
-              // Prefer FieldRendererService.renderDate for consistent date formatting (same as notes page)
-              const rawDate = cashFlow.updated_at || cashFlow.date || cashFlow.created_at || null;
-              
-              if (!rawDate) {
-                return `<td class="col-updated"><span class="updated-value-empty">לא זמין</span></td>`;
-              }
-
-              // Use FieldRendererService.renderDate for proper date formatting (handles DateEnvelope, Date objects, strings)
-              let dateDisplay = '';
-              let epoch = null;
-
-              if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
-                // Use FieldRendererService to render date with time (same as notes page)
-                dateDisplay = window.FieldRendererService.renderDate(rawDate, true);
-                
-                // Get epoch for sorting
-                if (window.dateUtils && typeof window.dateUtils.getEpochMilliseconds === 'function') {
-                  const envelope = window.dateUtils.ensureDateEnvelope ? window.dateUtils.ensureDateEnvelope(rawDate) : rawDate;
-                  epoch = window.dateUtils.getEpochMilliseconds(envelope || rawDate);
-                } else if (rawDate instanceof Date) {
-                  epoch = rawDate.getTime();
-                } else if (typeof rawDate === 'string') {
-                  const parsed = Date.parse(rawDate);
-                  epoch = Number.isNaN(parsed) ? null : parsed;
-                } else if (rawDate && typeof rawDate === 'object' && rawDate.epochMs) {
-                  epoch = rawDate.epochMs;
-                }
-              } else {
-                // Fallback: work directly with date envelope objects or raw values (same as notes page)
-                const envelope = window.dateUtils && typeof window.dateUtils.ensureDateEnvelope === 'function'
-                  ? window.dateUtils.ensureDateEnvelope(rawDate)
-                  : rawDate && typeof rawDate === 'object' && (rawDate.epochMs || rawDate.utc || rawDate.local)
-                    ? rawDate
-                    : null;
-
-                // Derive epoch milliseconds
-                epoch = (() => {
-                  if (window.dateUtils && typeof window.dateUtils.getEpochMilliseconds === 'function') {
-                    return window.dateUtils.getEpochMilliseconds(envelope || rawDate);
-                  }
-                  if (envelope && typeof envelope.epochMs === 'number') {
-                    return envelope.epochMs;
-                  }
-                  if (rawDate instanceof Date) {
-                    return rawDate.getTime();
-                  }
-                  if (typeof rawDate === 'string') {
-                    const parsed = Date.parse(rawDate);
-                    return Number.isNaN(parsed) ? null : parsed;
-                  }
-                  return null;
-                })();
-
-                if (epoch === null || Number.isNaN(epoch)) {
-                  return `<td class="col-updated"><span class="updated-value-empty">לא זמין</span></td>`;
-                }
-
-                // Build date display using unified date utilities
-                dateDisplay = (() => {
-                  if (window.dateUtils && typeof window.dateUtils.formatDateTime === 'function') {
-                    return window.dateUtils.formatDateTime(envelope || rawDate);
-                  }
-                  if (window.dateUtils && typeof window.dateUtils.formatDate === 'function') {
-                    return window.dateUtils.formatDate(envelope || rawDate, { includeTime: true });
-                  }
-                  try {
-                    const dateObj = new Date(epoch);
-                    return window.formatDate ? window.formatDate(dateObj, true) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(dateObj, { includeTime: true }) : dateObj.toLocaleString('he-IL', {
-                      day: '2-digit',
-                      month: '2-digit',
-                      year: 'numeric',
-                      hour: '2-digit',
-                      minute: '2-digit'
-                    }));
-                  } catch (err) {
-                    window.Logger?.warn('⚠️ cash_flows updated-cell date formatting failed', { err, cashFlowId: cashFlow?.id }, { page: 'cash_flows' });
-                    return 'לא מוגדר';
-                  }
-                })();
-              }
-
-              if (!dateDisplay || dateDisplay === '-') {
-                return `<td class="col-updated"><span class="updated-value-empty">לא זמין</span></td>`;
-              }
-
-              return `<td class="col-updated"${epoch ? ` data-epoch="${epoch}"` : ''} title="${dateDisplay}"><span class="updated-value" dir="ltr">${dateDisplay}</span></td>`;
-            })()}
-            <td class="col-actions actions-cell actions-4-items">
-              ${actionsMenu}
-            </td>
-        `;
+    // Build row HTML with all cells
+    row.textContent = '';
+    const rowHTML = `
+      <td class="trade-cell">${tradeCell}</td>
+      <td class="account-cell">${accountName}</td>
+      <td class="type-cell" dir="rtl">${typeDisplay}</td>
+      <td class="amount-cell" dir="ltr">${amountDisplay}</td>
+      <td class="date-cell" data-date="${cashFlow.date ? (window.dateUtils?.getEpochMilliseconds ? window.dateUtils.getEpochMilliseconds(window.dateUtils?.ensureDateEnvelope ? window.dateUtils.ensureDateEnvelope(cashFlow.date) : cashFlow.date) : '') : ''}">
+        ${cashFlow.date ? (window.FieldRendererService?.renderDate ? window.FieldRendererService.renderDate(cashFlow.date, false) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(cashFlow.date, { includeTime: false }) : cashFlow.date)) : '-'}
+      </td>
+      <td class="description-cell">${descriptionDisplay}</td>
+      <td class="source-cell">${cashFlow.source || '-'}</td>
+      <td class="updated-cell" data-date="${cashFlow.updated_at ? (window.dateUtils?.getEpochMilliseconds ? window.dateUtils.getEpochMilliseconds(window.dateUtils?.ensureDateEnvelope ? window.dateUtils.ensureDateEnvelope(cashFlow.updated_at) : cashFlow.updated_at) : '') : ''}">
+        ${cashFlow.updated_at ? (window.FieldRendererService?.renderDate ? window.FieldRendererService.renderDate(cashFlow.updated_at, true) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(cashFlow.updated_at, { includeTime: true }) : cashFlow.updated_at)) : '-'}
+      </td>
+      <td class="actions-cell" data-entity-id="${cashFlow.id}">${actionsMenu}</td>
+    `;
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(`<table><tbody><tr>${rowHTML}</tr></tbody></table>`, 'text/html');
+    const tempRow = doc.body.querySelector('tr');
+    if (tempRow) {
+        Array.from(tempRow.children).forEach(cell => {
+            row.appendChild(cell.cloneNode(true));
+        });
+    }
     tbody.appendChild(row);
   });
 
+  window.Logger?.info('✅ [renderCashFlowsTable] Rendered rows', {
+    rowsRendered: dataToRender.length,
+    tbodyChildren: tbody.children.length,
+    page: 'cash_flows'
+  });
+
   setupExchangeRowInteractions();
+
+  // Render unified forex exchanges table
+  // IMPORTANT: Always render with ALL exchange data, independent of main table filter
+  // The unified forex table should show all exchanges regardless of the filter applied to the main table
+  try {
+    const allData = Array.isArray(window.allCashFlowsData) && window.allCashFlowsData.length > 0
+      ? window.allCashFlowsData
+      : (Array.isArray(window.cashFlowsData) && window.cashFlowsData.length > 0
+          ? window.cashFlowsData
+          : []);
+    // Filter only exchange-related cash flows for the unified table
+    const exchangeData = allData.filter(item => {
+      const itemType = (item?.type || '').toString().toLowerCase();
+      return itemType === 'currency_exchange_from' || itemType === 'currency_exchange_to' || isCurrencyExchange(item);
+    });
+    renderUnifiedForexExchangesTable(exchangeData);
+  } catch (e) {
+    window.Logger?.warn('renderUnifiedForexExchangesTable failed in renderCashFlowsTable', { error: e?.message, page: 'cash_flows' });
+  }
 
   // עדכון מספר הפריטים - משתמש בפונקציה הגנרית לקבלת סך כל הרשומות
   if (window.updateTableCount) {
@@ -1646,13 +1700,16 @@ async function renderCashFlowsTable() {
     }
   }
 
-  // Clean up and reinitialize Bootstrap tooltips after table update
+  // Clean up and reinitialize tooltips after table update using Button System
   // This prevents "Cannot convert undefined or null to object" errors
-  if (typeof bootstrap !== 'undefined' && bootstrap.Tooltip) {
-    try {
-      // Destroy all existing tooltips in the table container
-      const tableContainer = document.querySelector('#cashFlowsContainer');
-      if (tableContainer) {
+  const tableContainer = document.querySelector('#cashFlowsContainer');
+  if (tableContainer) {
+    // Use Button System to reinitialize tooltips (it handles cleanup automatically)
+    if (window.advancedButtonSystem && typeof window.advancedButtonSystem.initializeTooltips === 'function') {
+      window.advancedButtonSystem.initializeTooltips(tableContainer);
+    } else if (typeof bootstrap !== 'undefined' && bootstrap.Tooltip) {
+      // Fallback to direct Bootstrap cleanup if Button System not available
+      try {
         const existingTooltips = tableContainer.querySelectorAll('[data-bs-toggle="tooltip"], [data-tooltip]');
         existingTooltips.forEach(element => {
           const tooltipInstance = bootstrap.Tooltip.getInstance(element);
@@ -1664,6 +1721,8 @@ async function renderCashFlowsTable() {
             }
           }
         });
+      } catch (e) {
+        // Ignore tooltip disposal errors
       }
       
       // Reinitialize tooltips via button system if available
@@ -1679,14 +1738,19 @@ async function renderCashFlowsTable() {
           }
         }, 100);
       }
-    } catch (tooltipError) {
-      window.Logger?.warn('Tooltip cleanup/reinit failed', { error: tooltipError?.message, page: 'cash_flows' });
     }
   }
 
   // Render unified forex exchanges table
+  // IMPORTANT: Use ALL cash flows data (not filtered/paginated) for unified exchanges table
+  // The second table should show all relevant exchanges regardless of filter or pagination
   try {
-    renderUnifiedForexExchangesTable(Array.isArray(window.filteredCashFlowsData) ? window.filteredCashFlowsData : cashFlowsData);
+    const allData = Array.isArray(window.allCashFlowsData) && window.allCashFlowsData.length > 0
+      ? window.allCashFlowsData
+      : (Array.isArray(window.cashFlowsData) && window.cashFlowsData.length > 0
+          ? window.cashFlowsData
+          : []);
+    renderUnifiedForexExchangesTable(allData);
   } catch (e) {
     window.Logger?.warn('renderUnifiedForexExchangesTable failed', { error: e?.message, page: 'cash_flows' });
   }
@@ -1698,13 +1762,54 @@ async function renderCashFlowsTable() {
  * @returns {void}
  * Uses InfoSummarySystem from services/statistics-calculator.js
  */
-function updatePageSummaryStats() {
+async function updatePageSummaryStats() {
   try {
     const summarySource = Array.isArray(window.filteredCashFlowsData) && window.filteredCashFlowsData.length > 0
       ? window.filteredCashFlowsData
       : (Array.isArray(window.allCashFlowsData) && window.allCashFlowsData.length > 0
           ? window.allCashFlowsData
           : (cashFlowsData || []));
+
+    // Try to enhance summary with EOD cash flow data
+    let enhancedSummarySource = summarySource;
+    if (window.EODIntegrationHelper && window.EODIntegrationHelper.isEODAvailable()) {
+      try {
+        const userId = window.g?.user_id || window.TikTrackAuth?.currentUser?.id;
+        if (userId) {
+          // Load EOD cash flows for current period
+                        const eodResult = await window.EODIntegrationHelper.loadEODCashFlows(
+                            userId,
+                            {
+                                date_from: '2025-01-01', // Could be made dynamic
+                                date_to: new Date().toISOString().split('T')[0]
+                            }
+                        );
+
+          if (eodResult && eodResult.data && Array.isArray(eodResult.data) && eodResult.data.length > 0) {
+            // For now, just log that EOD data is available
+            // In a full implementation, you'd merge EOD cash flow aggregations
+            if (window.Logger) {
+              window.Logger.info('✅ EOD cash flow data available for summary enhancement', {
+                page: 'cash_flows',
+                eodRecords: eodResult.data.length,
+                source: eodResult.source,
+                totalEODCashFlows: eodResult.data.reduce((sum, record) => sum + (record.net_flow || 0), 0)
+              });
+            }
+
+            // Store EOD data for potential use in summary calculations
+            window.eodCashFlowsData = eodResult.data;
+          }
+        }
+      } catch (eodError) {
+        if (window.Logger) {
+          window.Logger.warn('⚠️ EOD cash flow loading failed for summary, proceeding without', {
+            page: 'cash_flows',
+            error: eodError.message
+          });
+        }
+      }
+    }
 
     // Use global InfoSummarySystem if available
     if (window.InfoSummarySystem && window.INFO_SUMMARY_CONFIGS && window.INFO_SUMMARY_CONFIGS.cash_flows) {
@@ -1758,21 +1863,49 @@ function updatePageSummaryStats() {
  */
 async function syncCashFlowsPagination(cashFlows) {
   const safeCashFlows = Array.isArray(cashFlows) ? cashFlows : [];
+  
+  window.Logger?.info('🔄 [syncCashFlowsPagination] Starting pagination sync', {
+    dataLength: safeCashFlows.length,
+    page: 'cash_flows'
+  });
+
+  // Check if table exists in DOM
+  const tableElement = document.getElementById('cashFlowsTable');
+  if (!tableElement) {
+    window.Logger?.warn('⚠️ [syncCashFlowsPagination] Table element not found in DOM', {
+      tableId: 'cashFlowsTable',
+      page: 'cash_flows'
+    });
+    // Fallback: render directly without pagination
+    await updateCashFlowsTable(safeCashFlows);
+    return;
+  }
 
   if (typeof window.updateTableWithPagination === 'function') {
     try {
+      window.Logger?.debug('🔄 [syncCashFlowsPagination] Calling updateTableWithPagination', {
+        tableId: 'cashFlowsTable',
+        dataLength: safeCashFlows.length,
+        tableExists: !!tableElement,
+        page: 'cash_flows'
+      });
+      
       cashFlowsPaginationInstance = await window.updateTableWithPagination({
         tableId: 'cashFlowsTable',
         tableType: 'cash_flows',
         data: safeCashFlows,
         render: async (pageData, context = {}) => {
+          window.Logger?.info('🎨 [syncCashFlowsPagination] Render callback called', {
+            pageDataLength: Array.isArray(pageData) ? pageData.length : 0,
+            page: 'cash_flows'
+          });
           // Handle both signature formats:
           // 1. Old: ({ pageData, pagination: paginationInfo }) - direct from pagination
           // 2. New: (pageData, { pageInfo, ... }) - from updateTableWithPagination
           const actualPageData = Array.isArray(pageData) ? pageData : (pageData?.pageData || []);
           const paginationInfo = context?.pageInfo || pageData?.pagination || {};
           
-          console.log('🔄 [syncCashFlowsPagination] Render callback called', {
+          window.Logger?.debug('🔄 [syncCashFlowsPagination] Render callback called', {
             pageDataLength: actualPageData?.length || 0,
             paginationInfo: paginationInfo,
             currentPage: paginationInfo.currentPage,
@@ -1782,9 +1915,9 @@ async function syncCashFlowsPagination(cashFlows) {
           // to prevent infinite loops - pagination already handles data
           // IMPORTANT: Update window.filteredCashFlowsData so renderCashFlowsTable uses the correct data
           window.filteredCashFlowsData = actualPageData;
-          console.log('🔄 [syncCashFlowsPagination] window.filteredCashFlowsData updated to', window.filteredCashFlowsData.length, 'items');
+          window.Logger?.debug('🔄 [syncCashFlowsPagination] window.filteredCashFlowsData updated to', window.filteredCashFlowsData.length, 'items');
           await updateCashFlowsTable(actualPageData, { skipDataUpdate: true, skipSummary: true });
-          console.log('✅ [syncCashFlowsPagination] updateCashFlowsTable completed');
+          window.Logger?.debug('✅ [syncCashFlowsPagination] updateCashFlowsTable completed');
           if (window.setPageTableData) {
             window.setPageTableData('cash_flows', actualPageData, {
               tableId: 'cashFlowsTable',
@@ -1792,10 +1925,10 @@ async function syncCashFlowsPagination(cashFlows) {
             });
           }
         },
-        onFilteredDataChange: ({ filteredData }) => {
+        onFilteredDataChange: async ({ filteredData }) => {
           window.filteredCashFlowsData = Array.isArray(filteredData) ? filteredData : [];
           if (typeof updatePageSummaryStats === 'function') {
-            updatePageSummaryStats();
+            await updatePageSummaryStats();
           }
           // Update count element with total filtered records (not just current page)
           // Use generic updateTableCount function
@@ -1818,10 +1951,21 @@ async function syncCashFlowsPagination(cashFlows) {
           }
         },
       });
+      window.Logger?.info('✅ [syncCashFlowsPagination] Pagination setup completed', {
+        page: 'cash_flows'
+      });
       return;
     } catch (error) {
-      window.Logger?.warn('syncCashFlowsPagination: falling back to direct render', { error, page: 'cash_flows' });
+      window.Logger?.warn('⚠️ [syncCashFlowsPagination] Pagination failed, falling back to direct render', { 
+        error: error?.message || error,
+        stack: error?.stack,
+        page: 'cash_flows' 
+      });
     }
+  } else {
+    window.Logger?.warn('⚠️ [syncCashFlowsPagination] updateTableWithPagination not available', {
+      page: 'cash_flows'
+    });
   }
 
   if (window.setTableData) {
@@ -1829,6 +1973,10 @@ async function syncCashFlowsPagination(cashFlows) {
     window.setFilteredTableData?.('cash_flows', safeCashFlows, { tableId: CASH_FLOWS_TABLE_ID, skipPageReset: true });
   }
 
+  window.Logger?.info('🔄 [syncCashFlowsPagination] Calling updateCashFlowsTable directly', {
+    dataLength: safeCashFlows.length,
+    page: 'cash_flows'
+  });
   await updateCashFlowsTable(safeCashFlows);
 }
 
@@ -1886,7 +2034,15 @@ function renderUnifiedForexExchangesTable(sourceRows) {
   if (!tableBody) return;
   const groups = groupUnifiedExchanges(sourceRows);
   if (!groups || groups.length === 0) {
-    tableBody.innerHTML = `<tr><td colspan="7" class="text-center">אין המרות מטבע להצגה.</td></tr>`;
+    tableBody.textContent = '';
+        // Convert HTML string to DOM elements safely
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(`<tr><td colspan="7" class="text-center">אין המרות מטבע להצגה.</td></tr>`, 'text/html');
+        const fragment = document.createDocumentFragment();
+        Array.from(doc.body.childNodes).forEach(node => {
+            fragment.appendChild(node.cloneNode(true));
+        });
+        tableBody.appendChild(fragment);
     return;
   }
   const fmtAmt = (amt, curIdOrSymbol) => {
@@ -1938,7 +2094,7 @@ function renderUnifiedForexExchangesTable(sourceRows) {
     if (toId) items.push({ type: 'VIEW', onclick: `showCashFlowDetails(${toId})`, title: 'פתח צד To' });
     return window.createActionsMenu(items) || '';
   };
-  tableBody.innerHTML = '';
+  tableBody.textContent = '';
   groups.forEach(g => {
     const date = g.to?.date || g.from?.date || g.to?.updated_at || g.from?.updated_at || null;
     const fromAmt = g.from?.amount || 0;
@@ -1951,15 +2107,66 @@ function renderUnifiedForexExchangesTable(sourceRows) {
     const idDisplay = g.id || '-';
     const actions = buildActions(g.id, g.from?.id, g.to?.id);
     const row = document.createElement('tr');
-    row.innerHTML = `
-      <td class="table-cell-center">${fmtDate(date)}</td>
-      <td>${accountName}</td>
-      <td dir="ltr">${fmtAmt(fromAmt, fromSym)}</td>
-      <td dir="ltr">${fmtAmt(toAmt, toSym)}</td>
-      <td dir="ltr">${rateDisplay}</td>
-      <td dir="ltr">${idDisplay}</td>
-      <td class="text-center">${actions}</td>
-    `;
+    
+    // Date cell
+    const dateCell = document.createElement('td');
+    dateCell.className = 'table-cell-center';
+    dateCell.textContent = fmtDate(date);
+    row.appendChild(dateCell);
+    
+    // Account cell
+    const accountCell = document.createElement('td');
+    accountCell.textContent = accountName;
+    row.appendChild(accountCell);
+    
+    // From amount cell
+    const fromCell = document.createElement('td');
+    fromCell.setAttribute('dir', 'ltr');
+    fromCell.textContent = '';
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(fmtAmt(fromAmt, fromSym), 'text/html');
+    doc.body.childNodes.forEach(node => {
+        fromCell.appendChild(node.cloneNode(true));
+    });
+    row.appendChild(fromCell);
+    
+    // To amount cell
+    const toCell = document.createElement('td');
+    toCell.setAttribute('dir', 'ltr');
+    toCell.textContent = '';
+    const toParser = new DOMParser();
+    const toDoc = toParser.parseFromString(fmtAmt(toAmt, toSym), 'text/html');
+    toDoc.body.childNodes.forEach(node => {
+        toCell.appendChild(node.cloneNode(true));
+    });
+    row.appendChild(toCell);
+    
+    // Rate cell
+    const rateCell = document.createElement('td');
+    rateCell.setAttribute('dir', 'ltr');
+    rateCell.textContent = rateDisplay;
+    row.appendChild(rateCell);
+    
+    // ID cell
+    const idCell = document.createElement('td');
+    idCell.setAttribute('dir', 'ltr');
+    idCell.textContent = idDisplay;
+    row.appendChild(idCell);
+    
+    // Actions cell
+    const actionsCell = document.createElement('td');
+    actionsCell.className = 'text-center';
+    if (actions) {
+      const parser = new DOMParser();
+      const actionsDoc = parser.parseFromString(actions, 'text/html');
+      const actionsFragment = document.createDocumentFragment();
+      Array.from(actionsDoc.body.childNodes).forEach(node => {
+        actionsFragment.appendChild(node.cloneNode(true));
+      });
+      actionsCell.appendChild(actionsFragment);
+    }
+    row.appendChild(actionsCell);
+    
     tableBody.appendChild(row);
   });
 }
@@ -2093,11 +2300,15 @@ function setCurrencyExchangeSummary(summary) {
   if (!container) return;
 
   if (!summary || !window.FieldRendererService || typeof window.FieldRendererService.renderExchangePairCards !== 'function') {
-    container.innerHTML = '<div class="text-muted small">הצמד יוצג לאחר שמירה.</div>';
+    container.innerHTML.textContent = '';
+        const div = document.createElement('div');
+        div.className = 'text-muted small';
+        div.textContent = 'הצמד יוצג לאחר שמירה.';
+        container.innerHTML.appendChild(div);
     return;
   }
 
-  container.innerHTML = window.FieldRendererService.renderExchangePairCards(summary, {
+  const htmlContent = window.FieldRendererService.renderExchangePairCards(summary, {
     renderAction: (flow) => {
       if (!flow?.id) {
         return '';
@@ -2108,6 +2319,15 @@ function setCurrencyExchangeSummary(summary) {
       return '';
     }
   });
+  
+  if (htmlContent) {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(htmlContent, 'text/html');
+    container.textContent = '';
+    Array.from(doc.body.childNodes).forEach(node => {
+      container.appendChild(node.cloneNode(true));
+    });
+  }
 }
 
 /**
@@ -2120,13 +2340,21 @@ function hydrateCashFlowExchangeDisplay(cashFlowId) {
   if (!container) return;
 
   if (!window.FieldRendererService || typeof window.FieldRendererService.renderExchangePairCards !== 'function') {
-    container.innerHTML = '<div class="text-muted small">הצמד יוצג לאחר שמירה.</div>';
+    container.innerHTML.textContent = '';
+        const div = document.createElement('div');
+        div.className = 'text-muted small';
+        div.textContent = 'הצמד יוצג לאחר שמירה.';
+        container.innerHTML.appendChild(div);
     return;
   }
 
   const numericId = Number(cashFlowId);
   if (!Number.isFinite(numericId)) {
-    container.innerHTML = '<div class="text-muted small">תזרים זה אינו חלק מהמרת מטבע.</div>';
+    container.innerHTML.textContent = '';
+        const div = document.createElement('div');
+        div.className = 'text-muted small';
+        div.textContent = 'תזרים זה אינו חלק מהמרת מטבע.';
+        container.innerHTML.appendChild(div);
     return;
   }
 
@@ -2135,11 +2363,15 @@ function hydrateCashFlowExchangeDisplay(cashFlowId) {
     : null;
 
   if (!record || !record.exchange_pair_summary) {
-    container.innerHTML = '<div class="text-muted small">תזרים זה אינו חלק מהמרת מטבע.</div>';
+    container.innerHTML.textContent = '';
+        const div = document.createElement('div');
+        div.className = 'text-muted small';
+        div.textContent = 'תזרים זה אינו חלק מהמרת מטבע.';
+        container.innerHTML.appendChild(div);
     return;
   }
 
-  container.innerHTML = window.FieldRendererService.renderExchangePairCards(record.exchange_pair_summary, {
+  const htmlContent = window.FieldRendererService.renderExchangePairCards(record.exchange_pair_summary, {
     currentId: record.id,
     renderAction: (flow) => {
       if (!flow?.id) {
@@ -2148,6 +2380,15 @@ function hydrateCashFlowExchangeDisplay(cashFlowId) {
       return `<button class="btn btn-sm btn-outline-primary" data-onclick="showCashFlowDetails(${flow.id})">פתח רשומה</button>`;
     }
   });
+  
+  if (htmlContent) {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(htmlContent, 'text/html');
+    container.textContent = '';
+    Array.from(doc.body.childNodes).forEach(node => {
+      container.appendChild(node.cloneNode(true));
+    });
+  }
 }
 
 // פונקציות הועברו ל-translation-utils.js:
@@ -2155,29 +2396,40 @@ function hydrateCashFlowExchangeDisplay(cashFlowId) {
 // getSourceDisplayName -> translateCashFlowSource
 
 /**
- * Format amount
+ * Format amount - משתמש ב-FieldRendererService המרכזי
+ * @deprecated - השתמש ישירות ב-window.FieldRendererService.renderAmount()
  * @function formatAmount
  * @param {number} amount - Amount to format
- * @returns {string} Formatted amount
+ * @returns {string} Formatted amount HTML
  */
 function formatAmount(amount) {
   try {
-    // שימוש במערכת הפורמט החדשה
-    if (window.formatCurrencyWithCommas) {
-      return window.formatCurrencyWithCommas(amount, 'USD');
+    const numericAmount = Number(amount);
+    if (!Number.isFinite(numericAmount)) {
+      return '<span class="text-muted">לא זמין</span>';
     }
-
-    // גיבוי למערכת הישנה
+    
+    // שימוש ישיר ב-FieldRendererService - המערכת תמיד זמינה דרך BASE package
+    if (window.FieldRendererService?.renderAmount) {
+      return window.FieldRendererService.renderAmount(numericAmount, '$', 2, false);
+    }
+    
+    // Fallback ל-Translation Utilities
+    if (window.formatCurrencyWithCommas && typeof window.formatCurrencyWithCommas === 'function') {
+      return window.formatCurrencyWithCommas(numericAmount, 'USD');
+    }
+    
+    // Fallback למקרה נדיר ביותר שהמערכת לא זמינה
     return new Intl.NumberFormat('he-IL', {
       style: 'currency',
       currency: 'USD',
-    }).format(amount);
+    }).format(numericAmount);
   } catch (error) {
-    window.Logger.error('שגיאה בעיצוב סכום:', error, { page: "cash_flows" });
+    window.Logger?.error('שגיאה בעיצוב סכום:', error, { page: "cash_flows" });
     if (typeof window.showErrorNotification === 'function') {
       window.showErrorNotification('שגיאה בעיצוב סכום', error.message);
     }
-    return amount.toString();
+    return amount?.toString() || '-';
   }
 }
 
@@ -2347,19 +2599,10 @@ function formatCashFlowAmount(amount, type = null, currencySymbol = '$') {
     }
   }
 
-  const baseAmount = window.FieldRendererService && typeof window.FieldRendererService.renderAmount === 'function'
+  // שימוש ישיר ב-FieldRendererService - המערכת תמיד זמינה דרך BASE package
+  const baseAmount = window.FieldRendererService?.renderAmount
     ? window.FieldRendererService.renderAmount(effectiveAmount, currencySymbol || '$', 2, true)
-    : (() => {
-        const absValue = Math.abs(effectiveAmount).toLocaleString('en-US', {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2
-        });
-        const sign = effectiveAmount < 0 ? '-' : (effectiveAmount > 0 ? '+' : '');
-        const colorClass = effectiveAmount > 0 ? 'numeric-value-positive' : (effectiveAmount < 0 ? 'numeric-value-negative' : 'numeric-value-zero');
-        const base = `${currencySymbol || '$'}${absValue}`;
-        const display = sign ? `${sign}${base}` : base;
-        return `<span class="${colorClass}" dir="ltr">${display}</span>`;
-      })();
+    : '<span class="numeric-value-zero">-</span>';
 
   if (window.getTableColors && typeof window.getTableColors === 'function') {
     const colors = window.getTableColors();
@@ -2420,6 +2663,14 @@ async function updateCashFlowsTable(cashFlows, options = {}) {
   const { skipDataUpdate = false, skipSummary = false } = options;
   const prepared = ensureExchangePairsAdjacency(Array.isArray(cashFlows) ? [...cashFlows] : []);
 
+  window.Logger?.info('🔄 [updateCashFlowsTable] Called', {
+    cashFlowsLength: Array.isArray(cashFlows) ? cashFlows.length : 0,
+    preparedLength: prepared.length,
+    skipDataUpdate,
+    skipSummary,
+    page: 'cash_flows'
+  });
+
   // עדכון הנתונים הגלובליים רק אם לא מדלגים
   if (!skipDataUpdate) {
     window.cashFlowsData = prepared;
@@ -2431,12 +2682,19 @@ async function updateCashFlowsTable(cashFlows, options = {}) {
   }
 
   // רינדור הטבלה
+  window.Logger?.info('🎨 [updateCashFlowsTable] Calling renderCashFlowsTable', {
+    page: 'cash_flows'
+  });
   await renderCashFlowsTable();
 
   // עדכון סטטיסטיקות רק אם לא מדלגים
   if (!skipSummary) {
-    updatePageSummaryStats();
+    await updatePageSummaryStats();
   }
+  
+  window.Logger?.info('✅ [updateCashFlowsTable] Completed', {
+    page: 'cash_flows'
+  });
 }
 
 // הגדרת הפונקציות כגלובליות
@@ -2469,7 +2727,7 @@ function startAutoRefresh() {
   //     
   //     // עדכון סטטיסטיקות
   //     if (typeof updatePageSummaryStats === 'function') {
-  //       updatePageSummaryStats();
+  //       await updatePageSummaryStats();
   //     }
   //     
   //     window.Logger.info('Automatic update completed successfully', { page: 'cash_flows' });
@@ -2580,8 +2838,14 @@ function applyUserPreferences(preferences) {
     
     // החלת העדפת מטבע ברירת מחדל
     const defaultCurrency = preferences.default_currency || 'USD';
-    if (document.getElementById('currency')) {
-      document.getElementById('currency').value = defaultCurrency;
+    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+      window.DataCollectionService.setValue('currency', defaultCurrency, 'text');
+    } else {
+      // Fallback אם DataCollectionService לא זמין
+      const currencyElement = document.getElementById('currency');
+      if (currencyElement) {
+        currencyElement.value = defaultCurrency;
+      }
     }
     
     // החלת העדפת תצוגת המרת מטבע
@@ -2617,7 +2881,7 @@ function applyUserPreferences(preferences) {
  * @returns {Promise<void>}
  */
 async function initializeCashFlowsPage() {
-  console.log('🚀 [initializeCashFlowsPage] Starting initialization...');
+  window.Logger?.debug('🚀 [initializeCashFlowsPage] Starting initialization...');
   window.Logger.info('Initializing cash flows page', { page: 'cash_flows' });
 
   try {
@@ -2658,10 +2922,10 @@ async function initializeCashFlowsPage() {
     setupSourceFieldListeners();
 
     // הגדרת event listener לדרופדאון סוג תזרים
-    console.log('🔧 [initializeCashFlowsPage] Setting up cash flow type filter dropdown...');
+    window.Logger?.debug('🔧 [initializeCashFlowsPage] Setting up cash flow type filter dropdown...');
     // Use setTimeout to ensure DOM is ready
     setTimeout(() => {
-      console.log('⏰ [initializeCashFlowsPage] setTimeout callback - calling setupCashFlowTypeFilterDropdown');
+      window.Logger?.debug('⏰ [initializeCashFlowsPage] setTimeout callback - calling setupCashFlowTypeFilterDropdown');
       setupCashFlowTypeFilterDropdown();
     }, 100);
 
@@ -2686,12 +2950,12 @@ async function initializeCashFlowsPage() {
 // הפעלת אתחול כשהדף נטען - סטנדרטי כמו כל העמודים
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', function () {
-    console.log('🚀 [cash_flows.js] DOMContentLoaded - calling initializeCashFlowsPage');
+    window.Logger?.debug('🚀 [cash_flows.js] DOMContentLoaded - calling initializeCashFlowsPage');
     initializeCashFlowsPage();
   });
 } else {
   // DOM already loaded
-  console.log('🚀 [cash_flows.js] DOM already loaded - calling initializeCashFlowsPage immediately');
+  window.Logger?.debug('🚀 [cash_flows.js] DOM already loaded - calling initializeCashFlowsPage immediately');
   initializeCashFlowsPage();
 }
 
@@ -2878,6 +3142,21 @@ async function saveCashFlow() {
         const cashFlowId = form.dataset.cashFlowId;
         window.Logger.debug('saveCashFlow resolved mode', { page: 'cash_flows', isEdit, cashFlowId });
         
+        // Use UnifiedCRUDService for consistent CRUD operations
+        let crudResult = null;
+        if (window.UnifiedCRUDService && typeof window.UnifiedCRUDService.saveEntity === 'function') {
+            if (isEdit && cashFlowId) {
+                dataToSend.id = parseInt(cashFlowId);
+            }
+            crudResult = await window.UnifiedCRUDService.saveEntity('cash_flow', dataToSend, {
+                modalId: 'cashFlowModal',
+                successMessage: isEdit ? 'תזרים מזומן עודכן בהצלחה' : 'תזרים מזומן נוסף בהצלחה',
+                entityName: 'תזרים מזומן',
+                reloadFn: () => window.loadCashFlowsData({ force: true }),
+                requiresHardReload: false  // Prevent reload confirmation dialog
+            });
+        } else {
+            // Fallback to direct API call with CRUDResponseHandler
         let response;
         if (isEdit && typeof window.CashFlowsData?.updateCashFlow === 'function') {
             response = await window.CashFlowsData.updateCashFlow(cashFlowId, dataToSend);
@@ -2907,7 +3186,6 @@ async function saveCashFlow() {
         
         // CRUDResponseHandler handles ALL response processing including errors
         // No need to pre-check or call response.json() here
-        let crudResult = null;
         if (isEdit) {
             window.Logger.debug('saveCashFlow - Calling handleUpdateResponse', { page: 'cash_flows', cashFlowId });
             crudResult = await CRUDResponseHandler.handleUpdateResponse(responseToHandle, {
@@ -2926,6 +3204,7 @@ async function saveCashFlow() {
                 reloadFn: () => window.loadCashFlowsData({ force: true }),
                 requiresHardReload: false  // Prevent reload confirmation dialog
             });
+            }
         }
         
         const resolvedCashFlowId = isEdit
@@ -3036,12 +3315,29 @@ async function saveCurrencyExchange() {
         }
 
         // Ensure calculated to amount is positive
-        const toAmountField = document.getElementById('currencyExchangeToAmount');
-        let calculatedToAmount = toAmountField ? parseFloat(toAmountField.value) : NaN;
+        const toAmountFieldId = 'currencyExchangeToAmount';
+        let calculatedToAmount = NaN;
+        if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) {
+            const currentValue = window.DataCollectionService.getValue(toAmountFieldId, 'number', NaN);
+            calculatedToAmount = currentValue;
+        } else {
+            // Fallback if DataCollectionService is not available
+            const toAmountField = document.getElementById(toAmountFieldId);
+            calculatedToAmount = toAmountField ? parseFloat(toAmountField.value) : NaN;
+        }
+        
         if (isNaN(calculatedToAmount) || calculatedToAmount <= 0) {
             calculatedToAmount = (exchangeData.from_amount || 0) * (exchangeData.exchange_rate || 0);
-            if (toAmountField) {
-                toAmountField.value = calculatedToAmount ? calculatedToAmount.toFixed(6) : '';
+            const formattedValue = calculatedToAmount ? calculatedToAmount.toFixed(6) : '';
+            
+            if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+                window.DataCollectionService.setValue(toAmountFieldId, formattedValue, 'number');
+            } else {
+                // Fallback if DataCollectionService is not available
+                const toAmountField = document.getElementById(toAmountFieldId);
+                if (toAmountField) {
+                    toAmountField.value = formattedValue;
+                }
             }
         }
         if (!calculatedToAmount || calculatedToAmount <= 0) {
@@ -3236,45 +3532,101 @@ async function loadCurrencyExchange(exchangeId) {
         const toFlow = exchangeData.to_flow;
         const feeAmount = exchangeData.fee_amount ?? (fromFlow ? Math.abs(fromFlow.fee_amount || 0) : 0);
         
-        // Populate form fields
-        const accountField = document.getElementById('currencyExchangeAccount');
-        if (accountField) {
-            accountField.value = fromFlow.trading_account_id;
-        }
-        if (document.getElementById('currencyExchangeFromCurrency')) {
-            document.getElementById('currencyExchangeFromCurrency').value = fromFlow.currency_id;
-        }
-        if (document.getElementById('currencyExchangeToCurrency')) {
-            document.getElementById('currencyExchangeToCurrency').value = toFlow.currency_id;
-        }
-        if (document.getElementById('currencyExchangeFromAmount')) {
-            document.getElementById('currencyExchangeFromAmount').value = Math.abs(fromFlow.amount);
-        }
-        if (document.getElementById('currencyExchangeRate')) {
-            document.getElementById('currencyExchangeRate').value = exchangeData.exchange_rate;
-        }
-        if (document.getElementById('currencyExchangeFeeAmount')) {
-            document.getElementById('currencyExchangeFeeAmount').value = feeAmount;
-        }
-        // Note: fee currency is now a label, not a select field - it's updated automatically based on account
-        if (document.getElementById('currencyExchangeSource')) {
-            document.getElementById('currencyExchangeSource').value = fromFlow.source || 'manual';
-        }
-        if (document.getElementById('currencyExchangeExternalId')) {
-            const externalField = document.getElementById('currencyExchangeExternalId');
-            externalField.value = fromFlow.external_id || '0';
+        // Populate form fields using DataCollectionService
+        if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setFormData) {
+            // Field map for currency exchange form
+            const currencyExchangeFieldMap = {
+                trading_account_id: { id: 'currencyExchangeAccount', type: 'int' },
+                from_currency_id: { id: 'currencyExchangeFromCurrency', type: 'int' },
+                to_currency_id: { id: 'currencyExchangeToCurrency', type: 'int' },
+                from_amount: { id: 'currencyExchangeFromAmount', type: 'number' },
+                exchange_rate: { id: 'currencyExchangeRate', type: 'number' },
+                fee_amount: { id: 'currencyExchangeFeeAmount', type: 'number' },
+                source: { id: 'currencyExchangeSource', type: 'text' },
+                external_id: { id: 'currencyExchangeExternalId', type: 'text' },
+                date: { id: 'currencyExchangeDate', type: 'dateOnly' }
+            };
+            
+            // Prepare values for form population
+            const exchangeValues = {
+                trading_account_id: fromFlow.trading_account_id,
+                from_currency_id: fromFlow.currency_id,
+                to_currency_id: toFlow.currency_id,
+                from_amount: Math.abs(fromFlow.amount),
+                exchange_rate: exchangeData.exchange_rate,
+                fee_amount: feeAmount,
+                source: fromFlow.source || 'manual',
+                external_id: fromFlow.external_id || '0',
+                date: fromFlow.date
+            };
+            
+            // Set form data using DataCollectionService
+            window.DataCollectionService.setFormData(currencyExchangeFieldMap, exchangeValues);
+            
+            // Handle external ID field state
             manageExternalIdField((fromFlow.source || 'manual'), 'exchange');
-        }
-        if (document.getElementById('currencyExchangeDate')) {
-            document.getElementById('currencyExchangeDate').value = fromFlow.date;
-        }
-        const descriptionContent = fromFlow.description || '';
-        if (window.RichTextEditorService && typeof window.RichTextEditorService.setContent === 'function') {
-            window.RichTextEditorService.setContent('currencyExchangeDescription', descriptionContent);
+            
+            // Handle rich text description separately (uses RichTextEditorService)
+            const descriptionContent = fromFlow.description || '';
+            if (window.RichTextEditorService && typeof window.RichTextEditorService.setContent === 'function') {
+                window.RichTextEditorService.setContent('currencyExchangeDescription', descriptionContent);
+            }
         } else {
-            const descriptionField = document.getElementById('currencyExchangeDescription');
-            if (descriptionField) {
-                descriptionField.value = descriptionContent;
+            // Fallback if DataCollectionService is not available
+            // Use DataCollectionService to set values if available
+            if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+                window.DataCollectionService.setValue('currencyExchangeAccount', fromFlow.trading_account_id, 'int');
+                window.DataCollectionService.setValue('currencyExchangeFromCurrency', fromFlow.currency_id, 'int');
+                window.DataCollectionService.setValue('currencyExchangeToCurrency', toFlow.currency_id, 'int');
+                window.DataCollectionService.setValue('currencyExchangeFromAmount', Math.abs(fromFlow.amount), 'number');
+                window.DataCollectionService.setValue('currencyExchangeRate', exchangeData.exchange_rate, 'number');
+                window.DataCollectionService.setValue('currencyExchangeFeeAmount', feeAmount, 'number');
+                window.DataCollectionService.setValue('currencyExchangeSource', fromFlow.source || 'manual', 'text');
+                window.DataCollectionService.setValue('currencyExchangeExternalId', fromFlow.external_id || '0', 'text');
+                window.DataCollectionService.setValue('currencyExchangeDate', fromFlow.date, 'date');
+                manageExternalIdField((fromFlow.source || 'manual'), 'exchange');
+            } else {
+                // Fallback if DataCollectionService is not available
+                const accountField = document.getElementById('currencyExchangeAccount');
+                if (accountField) {
+                    accountField.value = fromFlow.trading_account_id;
+                }
+                if (document.getElementById('currencyExchangeFromCurrency')) {
+                    document.getElementById('currencyExchangeFromCurrency').value = fromFlow.currency_id;
+                }
+                if (document.getElementById('currencyExchangeToCurrency')) {
+                    document.getElementById('currencyExchangeToCurrency').value = toFlow.currency_id;
+                }
+                if (document.getElementById('currencyExchangeFromAmount')) {
+                    document.getElementById('currencyExchangeFromAmount').value = Math.abs(fromFlow.amount);
+                }
+                if (document.getElementById('currencyExchangeRate')) {
+                    document.getElementById('currencyExchangeRate').value = exchangeData.exchange_rate;
+                }
+                if (document.getElementById('currencyExchangeFeeAmount')) {
+                    document.getElementById('currencyExchangeFeeAmount').value = feeAmount;
+                }
+                // Note: fee currency is now a label, not a select field - it's updated automatically based on account
+                if (document.getElementById('currencyExchangeSource')) {
+                    document.getElementById('currencyExchangeSource').value = fromFlow.source || 'manual';
+                }
+                if (document.getElementById('currencyExchangeExternalId')) {
+                    const externalField = document.getElementById('currencyExchangeExternalId');
+                    externalField.value = fromFlow.external_id || '0';
+                    manageExternalIdField((fromFlow.source || 'manual'), 'exchange');
+                }
+                if (document.getElementById('currencyExchangeDate')) {
+                    document.getElementById('currencyExchangeDate').value = fromFlow.date;
+                }
+            }
+            const descriptionContent = fromFlow.description || '';
+            if (window.RichTextEditorService && typeof window.RichTextEditorService.setContent === 'function') {
+                window.RichTextEditorService.setContent('currencyExchangeDescription', descriptionContent);
+            } else {
+                const descriptionField = document.getElementById('currencyExchangeDescription');
+                if (descriptionField) {
+                    descriptionField.value = descriptionContent;
+                }
             }
         }
         
@@ -3322,7 +3674,23 @@ async function loadCurrencyExchange(exchangeId) {
  */
 async function deleteCurrencyExchange(exchangeId) {
     try {
-        if (!confirm('האם אתה בטוח שברצונך למחוק את המרת המטבע? פעולה זו תמחק את כל הרשומות המקושרות.')) {
+        let confirmed = false;
+        if (typeof window.showDeleteWarning === 'function') {
+            confirmed = await new Promise(resolve => {
+                window.showDeleteWarning(
+                    'currency_exchange',
+                    exchangeId,
+                    'המרת מטבע',
+                    () => resolve(true),
+                    () => resolve(false),
+                );
+            });
+        } else {
+            // Fallback למקרה שמערכת התראות לא זמינה
+            confirmed = window.showConfirmationDialog('האם אתה בטוח שברצונך למחוק את המרת המטבע? פעולה זו תמחק את כל הרשומות המקושרות.');
+        }
+        
+        if (!confirmed) {
             return;
         }
         
@@ -3477,7 +3845,12 @@ function manageExternalIdField(source, modalType) {
   // אם המקור הוא ידני, השדה לא פעיל
   if (source === 'manual') {
     externalIdField.disabled = true;
-    externalIdField.value = '0'; // ערך ברירת מחדל
+    // Use DataCollectionService if available
+    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+      window.DataCollectionService.setValue(fieldId, '0', 'text');
+    } else {
+      externalIdField.value = '0'; // ערך ברירת מחדל
+    }
     externalIdField.classList.add('form-control-disabled');
   } else {
     // אם המקור אינו ידני, השדה פעיל
@@ -3485,8 +3858,19 @@ function manageExternalIdField(source, modalType) {
     externalIdField.classList.remove('form-control-disabled');
 
     // אם השדה ריק, אפשר למשתמש להזין ערך
-    if (externalIdField.value === '0') {
-      externalIdField.value = '';
+    let currentValue = '';
+    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) {
+      currentValue = window.DataCollectionService.getValue(fieldId, 'text', '0');
+    } else {
+      currentValue = externalIdField.value || '0';
+    }
+    
+    if (currentValue === '0') {
+      if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+        window.DataCollectionService.setValue(fieldId, '', 'text');
+      } else {
+        externalIdField.value = '';
+      }
     }
   }
 }
@@ -3651,6 +4035,8 @@ async function editCashFlow(id) {
 window.manageExternalIdField = manageExternalIdField;
 window.setupSourceFieldListeners = setupSourceFieldListeners;
 window.initializeExternalIdFields = initializeExternalIdFields;
+// Export filterCashFlowsByType to window EARLY for data-onchange handler
+// This must be defined before the page loads so EventHandlerManager can find it
 window.filterCashFlowsByType = filterCashFlowsByType;
 window.reapplyCashFlowTypeFilter = reapplyCashFlowTypeFilter;
 window.deleteCashFlow = deleteCashFlow;
@@ -3661,40 +4047,40 @@ window.initializeCashFlowsPage = initializeCashFlowsPage;
 
 // Export test functions to window for debugging (always available)
 window.testCashFlowFilter = async function(type = 'deposit') {
-  console.log('🧪 [testCashFlowFilter] Testing filter with type:', type);
+  window.Logger?.debug('🧪 [testCashFlowFilter] Testing filter with type:', type);
   if (typeof window.filterCashFlowsByType === 'function') {
     try {
       await window.filterCashFlowsByType(type);
-      console.log('✅ [testCashFlowFilter] Filter test completed');
+      window.Logger?.debug('✅ [testCashFlowFilter] Filter test completed');
     } catch (err) {
-      console.error('❌ [testCashFlowFilter] Filter test failed:', err);
+      window.Logger?.error('❌ [testCashFlowFilter] Filter test failed:', err);
     }
   } else {
-    console.error('❌ [testCashFlowFilter] filterCashFlowsByType function not found');
+    window.Logger?.error('❌ [testCashFlowFilter] filterCashFlowsByType function not found');
   }
 };
 
 window.testDirectChange = function() {
   const select = document.getElementById('cashFlowTypeFilter');
   if (!select) {
-    console.error('❌ [testDirectChange] Select element not found');
+    window.Logger?.error('❌ [testDirectChange] Select element not found');
     return;
   }
-  console.log('🧪 [testDirectChange] Testing direct change event...');
+  window.Logger?.debug('🧪 [testDirectChange] Testing direct change event...');
   const oldValue = select.value;
   select.value = select.value === 'all' ? 'deposit' : 'all';
-  console.log('   Changed value from', oldValue, 'to', select.value);
+  window.Logger?.debug('   Changed value from', oldValue, 'to', select.value);
   
   const event = new Event('change', { bubbles: true, cancelable: true });
   select.dispatchEvent(event);
-  console.log('✅ [testDirectChange] Direct change event dispatched, new value:', select.value);
+  window.Logger?.debug('✅ [testDirectChange] Direct change event dispatched, new value:', select.value);
 };
 // REMOVED: window exports for removed modal wrapper functions
 // Use window.ModalManagerV2.showModal('cashFlowModal', 'add') directly
 // Use window.ModalManagerV2.showEditModal('cashFlowModal', 'cash_flow', cashFlowId) directly
 // window.toggleSection removed - using global version from ui-utils.js
 window.editCashFlow = editCashFlow;
-window.loadCashFlowsData = loadCashFlowsData;
+// window.loadCashFlowsData removed - already exported at line 228
 window.updateCashFlowsTable = updateCashFlowsTable;
 window.updateCashFlow = updateCashFlow;
 window.setCurrencyExchangeSummary = setCurrencyExchangeSummary;
@@ -3932,7 +4318,7 @@ function generateDetailedLog() {
 // השתמש במערכת הכללית error-handlers.js
 
 // ===== GLOBAL EXPORTS =====
-window.loadCashFlowsData = loadCashFlowsData;
+// window.loadCashFlowsData removed - already exported at line 228
 window.calculateBalance = calculateBalance;
 window.getAccountNameById = getAccountNameById;
 // REMOVED: window.toggleCashFlowsSection - use window.toggleSection('main') instead

@@ -4,9 +4,10 @@
  * 
  * Dashboard section for system overview and KPIs
  * Shows health score, uptime, response time, and key metrics
+ * Now integrated into top section with small cards organized by topic
  * 
- * @version 1.0.0
- * @lastUpdated October 19, 2025
+ * @version 1.1.0
+ * @lastUpdated January 30, 2025
  * @author TikTrack Development Team
  */
 
@@ -14,6 +15,70 @@ class SMDashboardSection extends SMBaseSection {
   constructor(sectionId, config) {
     super(sectionId, config);
     this.apiEndpoint = '/api/system/overview';
+    // Dashboard is now part of top section, so we use a different container
+    this.dashboardContainerId = 'sm-dashboard-content';
+  }
+  
+  /**
+   * Initialize the section
+   * אתחול הסקשן
+   */
+  async init() {
+    if (this.isInitialized) {
+      console.warn(`⚠️ Section ${this.sectionId} already initialized`);
+      return;
+    }
+
+    try {
+      console.log(`🚀 Initializing section: ${this.sectionId}`);
+      
+      // Dashboard is now part of top section, so find the dashboard content container
+      this.container = document.getElementById(this.dashboardContainerId);
+      if (!this.container) {
+        // Fallback: try to find in top section
+        const topSection = document.querySelector('.top-section[data-section="top"]');
+        if (topSection) {
+          const sectionBody = topSection.querySelector('.section-body');
+          if (sectionBody) {
+            // Create dashboard container if it doesn't exist
+            const dashboardDiv = document.createElement('div');
+            dashboardDiv.id = this.dashboardContainerId;
+            sectionBody.appendChild(dashboardDiv);
+            this.container = dashboardDiv;
+          }
+        }
+      }
+      
+      if (!this.container) {
+        throw new Error(`Dashboard container ${this.dashboardContainerId} not found`);
+      }
+
+      // Show loading state
+      if (this.config.showLoadingState) {
+        this.showLoadingState();
+      }
+
+      // Load initial data
+      await this.loadData();
+
+      // Setup auto-refresh
+      this.setupAutoRefresh();
+
+      // Setup event listeners
+      this.setupEventListeners();
+
+      this.isInitialized = true;
+      console.log(`✅ Section ${this.sectionId} initialized successfully`);
+      
+    } catch (error) {
+      console.error(`❌ Failed to initialize section ${this.sectionId}:`, error);
+      this.handleError(error, {
+        section: this.sectionId,
+        action: 'init',
+        timestamp: new Date().toISOString()
+      });
+      throw error;
+    }
   }
 
   /**
@@ -25,26 +90,77 @@ class SMDashboardSection extends SMBaseSection {
       this.isLoading = true;
       console.log(`📊 Loading dashboard data from ${this.apiEndpoint}`);
 
-      const response = await fetch(this.apiEndpoint, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
+      // Load both overview and environment data in parallel
+      const [overviewResponse, envResponse] = await Promise.allSettled([
+        this.fetchWithTimeout(this.apiEndpoint, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          }
+        }),
+        this.fetchWithTimeout('/api/system/environment', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          }
+        })
+      ]);
+
+      // Process overview data
+      let overviewData = null;
+      if (overviewResponse.status === 'fulfilled' && overviewResponse.value.ok) {
+        const result = await overviewResponse.value.json();
+        if (result.status === 'success') {
+          overviewData = result.data;
         }
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
 
-      const result = await response.json();
-      
-      if (result.status !== 'success') {
-        throw new Error(result.message || 'Failed to load system overview');
+      // Process environment data
+      let envData = null;
+      if (envResponse.status === 'fulfilled' && envResponse.value.ok) {
+        const result = await envResponse.value.json();
+        if (result.status === 'success') {
+          envData = result.data;
+        }
       }
 
-      this.lastData = result.data;
-      this.render(result.data);
+      // Validate and normalize data
+      let validatedOverview = null;
+      if (overviewData) {
+        const validation = window.SMDataValidators?.validateSystemOverview(overviewData);
+        if (validation && validation.valid) {
+          validatedOverview = validation.data;
+        } else {
+          console.warn('⚠️ System overview validation failed:', validation?.error);
+          validatedOverview = overviewData; // Use original data if validation fails
+        }
+      }
+
+      let validatedEnv = null;
+      if (envData) {
+        const validation = window.SMDataValidators?.validateEnvironmentData(envData);
+        if (validation && validation.valid) {
+          validatedEnv = validation.data;
+        } else {
+          console.warn('⚠️ Environment data validation failed:', validation?.error);
+          validatedEnv = envData; // Use original data if validation fails
+        }
+      }
+
+      // Merge data
+      const mergedData = {
+        ...validatedOverview,
+        environment: validatedEnv
+      };
+
+      if (!mergedData || (!validatedOverview && !validatedEnv)) {
+        throw new Error('Failed to load system data');
+      }
+
+      this.lastData = mergedData;
+      this.render(mergedData);
       this.retryCount = 0; // Reset retry count on success
 
     } catch (error) {
@@ -67,7 +183,12 @@ class SMDashboardSection extends SMBaseSection {
 
     try {
       const dashboardHtml = this.createDashboardHTML(data);
-      this.container.innerHTML = dashboardHtml;
+      this.container.textContent = '';
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(dashboardHtml, 'text/html');
+      doc.body.childNodes.forEach(node => {
+        this.container.appendChild(node.cloneNode(true));
+      });
       
       console.log('✅ Dashboard rendered successfully');
       
@@ -82,8 +203,8 @@ class SMDashboardSection extends SMBaseSection {
   }
 
   /**
-   * Create dashboard HTML
-   * יצירת HTML של dashboard
+   * Create dashboard HTML with standardized stats cards
+   * יצירת HTML של dashboard עם כרטיסי סטטיסטיקות סטנדרטיים
    */
   createDashboardHTML(data) {
     const {
@@ -94,202 +215,170 @@ class SMDashboardSection extends SMBaseSection {
       uptime = 'unknown',
       summary = {},
       health = {},
-      metrics = {}
+      metrics = {},
+      environment = null
     } = data;
 
-    // Calculate health score color
-    const healthScoreColor = this.getHealthScoreColor(system_score);
-    
-    // Format uptime
+    // Format values
     const formattedUptime = this.formatUptime(uptime);
-    
-    // Format response time
     const formattedResponseTime = SMUIComponents.formatDuration(response_time_ms);
+    const healthScoreColor = system_score >= 90 ? 'success' : system_score >= 75 ? 'warning' : system_score >= 50 ? 'info' : 'danger';
 
     return `
       <div class="dashboard-overview">
-        <!-- Health Score Card -->
-        <div class="row mb-4">
-          <div class="col-12">
-            <div class="card health-score-card">
-              <div class="card-body text-center">
-                <div class="health-score-circle" style="border-color: ${healthScoreColor}">
-                  <div class="health-score-value" style="color: ${healthScoreColor}">
-                    ${system_score}%
-                  </div>
-                  <div class="health-score-label">בריאות מערכת</div>
-                </div>
-                <div class="health-status mt-3">
-                  <span class="badge bg-${this.getStatusBadgeColor(overall_status)} fs-6">
-                    ${this.getStatusText(overall_status)}
-                  </span>
-                  <span class="badge bg-${this.getPerformanceBadgeColor(overall_performance)} fs-6 ms-2">
-                    ${this.getPerformanceText(overall_performance)}
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Key Metrics Grid -->
-        <div class="row mb-4">
-          <div class="col-md-3">
-            ${SMUIComponents.createMetricCard(
-              'זמן פעילות',
-              formattedUptime,
-              '',
-              null,
-              'fa-clock'
+        <div class="row g-3">
+          <!-- בריאות מערכת -->
+          <div class="col-md-6 col-lg-4">
+            ${SMUIComponents.createStatsCard(
+              'בריאות מערכת',
+              [
+                {
+                  label: 'סטטוס כללי',
+                  value: this.getStatusText(overall_status),
+                  icon: 'fa-heartbeat',
+                  badge: { text: this.getStatusText(overall_status), variant: this.getStatusBadgeColor(overall_status) }
+                },
+                {
+                  label: 'ביצועים',
+                  value: this.getPerformanceText(overall_performance),
+                  icon: 'fa-tachometer-alt'
+                },
+                {
+                  label: 'ציון בריאות',
+                  value: `${system_score}%`,
+                  icon: 'fa-chart-line',
+                  color: healthScoreColor
+                }
+              ],
+              { icon: 'fa-heartbeat' }
             )}
           </div>
-          <div class="col-md-3">
-            ${SMUIComponents.createMetricCard(
-              'זמן תגובה',
-              formattedResponseTime,
-              '',
-              null,
-              'fa-tachometer-alt'
+
+          <!-- ביצועים וזמנים -->
+          <div class="col-md-6 col-lg-4">
+            ${SMUIComponents.createStatsCard(
+              'ביצועים וזמנים',
+              [
+                {
+                  label: 'זמן תגובה ממוצע',
+                  value: formattedResponseTime,
+                  icon: 'fa-clock',
+                  color: 'success'
+                },
+                {
+                  label: 'זמן פעילות שרת',
+                  value: formattedUptime,
+                  icon: 'fa-history',
+                  color: 'primary'
+                },
+                {
+                  label: 'זמן פעילות מערכת',
+                  value: this.formatUptime(metrics.uptime || uptime),
+                  icon: 'fa-calendar-alt'
+                }
+              ],
+              { icon: 'fa-tachometer-alt' }
             )}
           </div>
-          <div class="col-md-3">
-            ${SMUIComponents.createMetricCard(
-              'זיכרון זמין',
-              this.formatMemoryUsage(summary.memory_usage_percent || 0),
-              '%',
-              null,
-              'fa-memory'
+
+          <!-- משאבי מערכת -->
+          <div class="col-md-6 col-lg-4">
+            ${SMUIComponents.createStatsCard(
+              'משאבי מערכת',
+              [
+                {
+                  label: 'שימוש בזיכרון',
+                  value: `${this.formatMemoryUsage(summary.memory_usage_percent || 0)}%`,
+                  icon: 'fa-memory',
+                  color: summary.memory_usage_percent > 80 ? 'danger' : summary.memory_usage_percent > 60 ? 'warning' : 'info'
+                },
+                {
+                  label: 'עומס מעבד',
+                  value: `${this.formatCPUUsage(summary.cpu_usage_percent || 0)}%`,
+                  icon: 'fa-microchip',
+                  color: summary.cpu_usage_percent > 80 ? 'danger' : summary.cpu_usage_percent > 60 ? 'warning' : 'info'
+                },
+                {
+                  label: 'שימוש בדיסק',
+                  value: `${summary.disk_usage_percent || 0}%`,
+                  icon: 'fa-hdd',
+                  color: summary.disk_usage_percent > 80 ? 'danger' : summary.disk_usage_percent > 60 ? 'warning' : 'warning'
+                }
+              ],
+              { icon: 'fa-server' }
             )}
           </div>
-          <div class="col-md-3">
-            ${SMUIComponents.createMetricCard(
-              'עומס CPU',
-              this.formatCPUUsage(summary.cpu_usage_percent || 0),
-              '%',
-              null,
-              'fa-microchip'
+
+          <!-- סביבה ומידע -->
+          ${environment ? `
+          <div class="col-md-6 col-lg-4">
+            ${SMUIComponents.createStatsCard(
+              'סביבה ומידע',
+              [
+                {
+                  label: 'סביבת עבודה',
+                  value: environment.environment === 'production' ? 'ייצור' : 'פיתוח',
+                  icon: 'fa-globe',
+                  badge: { text: environment.environment === 'production' ? 'ייצור' : 'פיתוח', variant: environment.environment === 'production' ? 'danger' : 'info' }
+                },
+                {
+                  label: 'פורט שרת',
+                  value: environment.port || 'N/A',
+                  icon: 'fa-plug'
+                },
+                {
+                  label: 'בסיס נתונים',
+                  value: environment.database?.name || 'N/A',
+                  icon: 'fa-database'
+                },
+                {
+                  label: 'סוג בסיס נתונים',
+                  value: environment.database?.type || 'PostgreSQL',
+                  icon: 'fa-database'
+                },
+                {
+                  label: 'גרסת מערכת',
+                  value: '2.0.5',
+                  icon: 'fa-code-branch'
+                }
+              ],
+              { icon: 'fa-info-circle' }
             )}
           </div>
-        </div>
+          ` : ''}
 
-        <!-- System Components Status -->
-        <div class="row">
-          <div class="col-12">
-            <div class="card">
-              <div class="card-header">
-                <h5><i class="fas fa-cogs"></i> סטטוס רכיבי מערכת</h5>
-              </div>
-              <div class="card-body">
-                <div class="row">
-                  <div class="col-md-3">
-                    ${SMUIComponents.createStatusCard(
-                      'שרת',
-                      this.getComponentStatus(health.server),
-                      this.getComponentStatusColor(health.server),
-                      'fa-server',
-                      'Backend API'
-                    )}
-                  </div>
-                  <div class="col-md-3">
-                    ${SMUIComponents.createStatusCard(
-                      'בסיס נתונים',
-                      this.getComponentStatus(health.database),
-                      this.getComponentStatusColor(health.database),
-                      'fa-database',
-                      'SQLite Database'
-                    )}
-                  </div>
-                  <div class="col-md-3">
-                    ${SMUIComponents.createStatusCard(
-                      'מטמון',
-                      this.getComponentStatus(health.cache),
-                      this.getComponentStatusColor(health.cache),
-                      'fa-layer-group',
-                      'Multi-layer Cache'
-                    )}
-                  </div>
-                  <div class="col-md-3">
-                    ${SMUIComponents.createStatusCard(
-                      'נתונים חיצוניים',
-                      this.getComponentStatus(health.external_data),
-                      this.getComponentStatusColor(health.external_data),
-                      'fa-globe',
-                      'Yahoo Finance API'
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Performance Indicators -->
-        ${this.createPerformanceIndicators(metrics)}
-      </div>
-    `;
-  }
-
-  /**
-   * Create performance indicators
-   * יצירת אינדיקטורי ביצועים
-   */
-  createPerformanceIndicators(metrics) {
-    if (!metrics || !metrics.performance) {
-      return '';
-    }
-
-    const { performance } = metrics;
-    const { system = {} } = performance;
-
-    return `
-      <div class="row mt-4">
-        <div class="col-12">
-          <div class="card">
-            <div class="card-header">
-              <h5><i class="fas fa-chart-line"></i> מדדי ביצועים</h5>
-            </div>
-            <div class="card-body">
-              <div class="row">
-                <div class="col-md-6">
-                  <h6>זיכרון מערכת</h6>
-                  ${SMUIComponents.createProgressBar(
-                    system.memory_percent || 0,
-                    100,
-                    'זיכרון בשימוש',
-                    this.getProgressColor(system.memory_percent || 0)
-                  )}
-                </div>
-                <div class="col-md-6">
-                  <h6>עומס CPU</h6>
-                  ${SMUIComponents.createProgressBar(
-                    system.cpu_percent || 0,
-                    100,
-                    'עומס מעבד',
-                    this.getProgressColor(system.cpu_percent || 0)
-                  )}
-                </div>
-              </div>
-              <div class="row mt-3">
-                <div class="col-md-6">
-                  <h6>שימוש בדיסק</h6>
-                  ${SMUIComponents.createProgressBar(
-                    system.disk_percent || 0,
-                    100,
-                    'שטח דיסק',
-                    this.getProgressColor(system.disk_percent || 0)
-                  )}
-                </div>
-                <div class="col-md-6">
-                  <h6>חיבורי רשת</h6>
-                  <div class="network-stats">
-                    <div class="stat-item">
-                      <span class="stat-label">חיבורים פעילים:</span>
-                      <span class="stat-value">${system.active_connections || 0}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+          <!-- סטטוס רכיבי מערכת -->
+          <div class="col-md-6 col-lg-4">
+            ${SMUIComponents.createStatsCard(
+              'סטטוס רכיבי מערכת',
+              [
+                {
+                  label: 'שרת',
+                  value: this.getComponentStatus(health.server),
+                  icon: 'fa-server',
+                  badge: { text: this.getComponentStatus(health.server), variant: this.getComponentStatusColor(health.server) }
+                },
+                {
+                  label: 'בסיס נתונים',
+                  value: this.getComponentStatus(health.database),
+                  icon: 'fa-database',
+                  badge: { text: this.getComponentStatus(health.database), variant: this.getComponentStatusColor(health.database) }
+                },
+                {
+                  label: 'מטמון',
+                  value: this.getComponentStatus(health.cache),
+                  icon: 'fa-layer-group',
+                  badge: { text: this.getComponentStatus(health.cache), variant: this.getComponentStatusColor(health.cache) }
+                },
+                {
+                  label: 'נתונים חיצוניים',
+                  value: this.getComponentStatus(health.external_data),
+                  icon: 'fa-globe',
+                  badge: { text: this.getComponentStatus(health.external_data), variant: this.getComponentStatusColor(health.external_data) }
+                }
+              ],
+              { icon: 'fa-cogs' }
+            )}
           </div>
         </div>
       </div>

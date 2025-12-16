@@ -9,6 +9,66 @@
  * - documentation/frontend/DATE_COMPARISON_MODAL_DEVELOPER_GUIDE.md
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - initBarChart() - Initbarchart
+// - initLineChart() - Initlinechart
+// - initializePage() - Initializepage
+
+// === Event Handlers ===
+// - handleDate1Change() - Handledate1Change
+// - handleDate2Change() - Handledate2Change
+// - handleNewDateInput() - Handlenewdateinput
+// - handleDateInputChange() - Handledateinputchange
+// - updateAddButtonState() - Updateaddbuttonstate
+// - generateComparisonDataForMultipleDates() - Generatecomparisondataformultipledates
+// - generateComparisonData() - Generatecomparisondata
+// - updateComparisonTable() - Updatecomparisontable
+// - formatPLChange() - Formatplchange
+// - formatNumberChange() - Formatnumberchange
+// - toggleDateComparisonRangeFilterMenu() - Toggledatecomparisonrangefiltermenu
+// - selectDateComparisonRangeOption() - Selectdatecomparisonrangeoption
+// - getDateRangeFromOption() - Getdaterangefromoption
+// - updateDateComparisonRangeFilterText() - Updatedatecomparisonrangefiltertext
+// - exportComparison() - Exportcomparison
+
+// === UI Functions ===
+// - updateSelectedDates() - Updateselecteddates
+// - renderDateInputs() - Renderdateinputs
+// - updateTableHeaders() - Updatetableheaders
+// - updateBarChart() - Updatebarchart
+// - updateLineChart() - Updatelinechart
+// - updateAlerts() - Updatealerts
+// - updateSummary() - Updatesummary
+
+// === Data Functions ===
+// - getCSSVariableValue() - Getcssvariablevalue
+// - saveSelectedDates() - Saveselecteddates
+// - loadLastSelectedDates() - Loadlastselecteddates
+// - generateDateData() - Generatedatedata
+// - generateBarChartData() - Generatebarchartdata
+// - generateLineChartData() - Generatelinechartdata
+// - savePageState() - Savepagestate
+
+// === Utility Functions ===
+// - formatDate() - Formatdate
+// - validateDates() - Validatedates
+// - formatCurrency() - Formatcurrency
+// - formatDateForInput() - Formatdateforinput
+
+// === Other ===
+// - sortDates() - Sortdates
+// - addDateFromInput() - Adddatefrominput
+// - addDateInput() - Adddateinput
+// - removeDateInput() - Removedateinput
+// - compareDates() - Comparedates
+// - seededRandom() - Seededrandom
+// - waitForTradingViewAdapter() - Waitfortradingviewadapter
+// - calculateAlerts() - Calculatealerts
+// - restorePageState() - Restorepagestate
+
 (function() {
     'use strict';
 
@@ -74,13 +134,35 @@
      * Validate dates
      * @returns {boolean} True if valid
      */
-    function validateDates() {
+    async function validateDates() {
         const validationMessage = document.getElementById('date-validation-message');
 
         // Need at least 2 dates
         if (selectedDates.length < 2) {
             if (validationMessage) {
-                validationMessage.innerHTML = '<div class="alert alert-warning"><img src="../../images/icons/tabler/alert-triangle.svg" width="16" height="16" alt="alert" class="icon"> נדרשים לפחות 2 תאריכים להשוואה</div>';
+                let alertIcon = '<img src="../../images/icons/tabler/alert-triangle.svg" width="16" height="16" alt="alert" class="icon">';
+                if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {
+                    try {
+                        alertIcon = await window.IconSystem.renderIcon('button', 'alert-triangle', { size: '16', alt: 'alert', class: 'icon' });
+                    } catch (error) {
+                        // Fallback already set
+                    }
+                }
+                validationMessage.textContent = '';
+                const alertDiv = document.createElement('div');
+                alertDiv.className = 'alert alert-warning';
+                const tempDiv = document.createElement('div');
+                tempDiv.textContent = '';
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(alertIcon, 'text/html');
+                doc.body.childNodes.forEach(node => {
+                    tempDiv.appendChild(node.cloneNode(true));
+                });
+                while (tempDiv.firstChild) {
+                  alertDiv.appendChild(tempDiv.firstChild);
+                }
+                alertDiv.appendChild(document.createTextNode(' נדרשים לפחות 2 תאריכים להשוואה'));
+                validationMessage.appendChild(alertDiv);
             }
             if (window.showNotification) {
                 window.showNotification('נדרשים לפחות 2 תאריכים להשוואה', 'warning');
@@ -92,7 +174,29 @@
         const uniqueDates = [...new Set(selectedDates)];
         if (uniqueDates.length !== selectedDates.length) {
             if (validationMessage) {
-                validationMessage.innerHTML = '<div class="alert alert-danger"><img src="../../images/icons/tabler/alert-triangle.svg" width="16" height="16" alt="alert" class="icon"> יש תאריכים כפולים ברשימה</div>';
+                let alertIcon2 = '<img src="../../images/icons/tabler/alert-triangle.svg" width="16" height="16" alt="alert" class="icon">';
+                if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {
+                    try {
+                        alertIcon2 = await window.IconSystem.renderIcon('button', 'alert-triangle', { size: '16', alt: 'alert', class: 'icon' });
+                    } catch (error) {
+                        // Fallback already set
+                    }
+                }
+                validationMessage.textContent = '';
+                const alertDiv = document.createElement('div');
+                alertDiv.className = 'alert alert-danger';
+                const tempDiv = document.createElement('div');
+                tempDiv.textContent = '';
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(alertIcon2, 'text/html');
+                doc.body.childNodes.forEach(node => {
+                    tempDiv.appendChild(node.cloneNode(true));
+                });
+                while (tempDiv.firstChild) {
+                  alertDiv.appendChild(tempDiv.firstChild);
+                }
+                alertDiv.appendChild(document.createTextNode(' יש תאריכים כפולים ברשימה'));
+                validationMessage.appendChild(alertDiv);
             }
             if (window.showNotification) {
                 window.showNotification('יש תאריכים כפולים ברשימה', 'error');
@@ -102,7 +206,7 @@
 
         // Dates are already sorted, so we just need to check they're valid
         if (validationMessage) {
-            validationMessage.innerHTML = '';
+            validationMessage.textContent = '';
         }
 
         return true;
@@ -169,7 +273,12 @@
         selectedDates = sortDates(selectedDates);
 
         // Clear input
-        newDateInput.value = '';
+        // Use DataCollectionService to clear field if available
+        if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+            window.DataCollectionService.setValue(newDateInput.id, '', 'dateOnly');
+        } else {
+            newDateInput.value = '';
+        }
         handleNewDateInput();
 
         // Render dates list
@@ -225,7 +334,12 @@
         if (!dateValue) {
             // If date is cleared, restore original or remove if not required
             if (oldDate) {
-                dateInput.value = oldDate;
+                // Use DataCollectionService to set value if available
+        if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+            window.DataCollectionService.setValue(dateInput.id, oldDate, 'dateOnly');
+        } else {
+            dateInput.value = oldDate;
+        }
             }
             return;
         }
@@ -235,7 +349,12 @@
             if (window.showNotification) {
                 window.showNotification('תאריך זה כבר קיים ברשימה', 'warning');
             }
+            // Use DataCollectionService to set value if available
+        if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+            window.DataCollectionService.setValue(dateInput.id, oldDate || '', 'dateOnly');
+        } else {
             dateInput.value = oldDate || '';
+        }
             return;
         }
 
@@ -301,10 +420,14 @@
         const datesList = document.getElementById('dates-list');
         if (!datesList) return;
 
-        datesList.innerHTML = '';
+        datesList.textContent = '';
 
         if (selectedDates.length === 0) {
-            datesList.innerHTML = '<div class="text-muted text-center py-2">אין תאריכים נבחרים. הוסף תאריכים להשוואה.</div>';
+            datesList.innerHTML.textContent = '';
+        const div = document.createElement('div');
+        div.className = 'text-muted text-center py-2';
+        div.textContent = 'אין תאריכים נבחרים. הוסף תאריכים להשוואה.';
+        datesList.innerHTML.appendChild(div);
             return;
         }
 
@@ -316,13 +439,21 @@
             
             const canRemove = selectedDates.length > 2; // Can only remove if more than 2 dates
             
-            dateItem.innerHTML = `
+            dateItem.textContent = '';
+        // Convert HTML string to DOM elements safely
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(`
                 <label class="date-label form-label-small">תאריך ${index + 1} (${formatDate(date)}):</label>
                 <input type="date" class="form-control form-control-sm date-input" id="${dateId}" value="${date}" data-original-date="${date}" data-onchange="handleDateInputChange('${dateId}')">
                 <button type="button" class="remove-date-btn" data-onclick="removeDateInput('${dateId}')" title="${canRemove ? 'הסר תאריך' : 'חייבים להישאר לפחות 2 תאריכים'}" ${!canRemove ? 'disabled' : ''}>
                     <img src="../../images/icons/tabler/x.svg" width="16" height="16" alt="remove">
                 </button>
-            `;
+            `, 'text/html');
+        const fragment = document.createDocumentFragment();
+        Array.from(doc.body.childNodes).forEach(node => {
+            fragment.appendChild(node.cloneNode(true));
+        });
+        dateItem.appendChild(fragment);
             datesList.appendChild(dateItem);
         });
 
@@ -361,7 +492,7 @@
      * Works with multiple dates from selectedDates array
      */
     async function compareDates() {
-        if (!validateDates()) {
+        if (!(await validateDates())) {
             return;
         }
 
@@ -380,6 +511,9 @@
 
             // Save selected dates
             await saveSelectedDates();
+            
+            // Save page state
+            await savePageState();
 
             // Generate cache key from all dates
             const cacheKey = `date-comparison-results-${selectedDates.join('-')}`;
@@ -436,7 +570,11 @@
             }
 
             } catch (error) {
-            if (window.Logger && typeof window.Logger.error === 'function') {
+            const errorMsg = error?.message || (typeof error === 'string' ? error : 'שגיאה לא ידועה');
+            if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {
+                window.NotificationSystem.showError('שגיאה בהשוואת תאריכים', 
+                    `לא ניתן להשוות את התאריכים. ${errorMsg}`);
+            } else if (window.Logger && typeof window.Logger.error === 'function') {
                 window.Logger.error('Error comparing dates', { 
                         page: 'date-comparison-modal', 
                         error 
@@ -648,7 +786,7 @@
     function updateComparisonTable(data) {
         const tbody = document.getElementById('comparison-table-body');
         if (!tbody) {
-            console.error('Comparison table body not found');
+            window.Logger?.error('Comparison table body not found');
             if (window.Logger && typeof window.Logger.warn === 'function') {
                 window.Logger.warn('Comparison table body not found', { page: 'date-comparison-modal' });
             }
@@ -656,16 +794,23 @@
         }
         
         if (!data || !data.datesData || !selectedDates || selectedDates.length < 2) {
-            console.error('Invalid comparison data', data);
+            window.Logger?.error('Invalid comparison data', data);
             if (window.Logger && typeof window.Logger.warn === 'function') {
                 window.Logger.warn('Invalid comparison data', { page: 'date-comparison-modal', data });
             }
             const colCount = selectedDates.length + 2; // dates + metric + change
-            tbody.innerHTML = `<tr><td colspan="${colCount}" class="text-center text-muted">אין נתונים להצגה</td></tr>`;
+            tbody.textContent = '';
+            const row = document.createElement('tr');
+            const cell = document.createElement('td');
+            cell.colSpan = colCount;
+            cell.className = 'text-center text-muted';
+            cell.textContent = 'אין נתונים להצגה';
+            row.appendChild(cell);
+            tbody.appendChild(row);
             return;
         }
         
-        console.log('Updating comparison table with data:', data);
+        window.Logger?.debug('Updating comparison table with data:', data);
 
         const metrics = [
             { key: 'balance', label: 'יתרות', format: 'currency' },
@@ -705,7 +850,7 @@
                         formattedValue = value.toString();
                     }
                 } catch (error) {
-                    console.error(`Error formatting metric ${metric.key} for date ${date}:`, error);
+                    window.Logger?.error(`Error formatting metric ${metric.key} for date ${date}:`, error);
                     formattedValue = '-';
                 }
 
@@ -730,7 +875,7 @@
                             formattedChange = formatNumberChange(changeValue, changePercent);
                         }
                     } catch (error) {
-                        console.error(`Error formatting change for metric ${metric.key}:`, error);
+                        window.Logger?.error(`Error formatting change for metric ${metric.key}:`, error);
                         formattedChange = '-';
                     }
 
@@ -745,10 +890,25 @@
         }).join('');
 
         if (rows) {
-            tbody.innerHTML = rows;
+            tbody.textContent = '';
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(`<table><tbody>${rows}</tbody></table>`, 'text/html');
+            const tempTbody = doc.body.querySelector('tbody');
+            if (tempTbody) {
+                Array.from(tempTbody.children).forEach(row => {
+                    tbody.appendChild(row.cloneNode(true));
+                });
+            }
         } else {
             const colCount = selectedDates.length + 2;
-            tbody.innerHTML = `<tr><td colspan="${colCount}" class="text-center text-muted">אין נתונים להצגה</td></tr>`;
+            tbody.textContent = '';
+            const row = document.createElement('tr');
+            const cell = document.createElement('td');
+            cell.colSpan = colCount;
+            cell.className = 'text-center text-muted';
+            cell.textContent = 'אין נתונים להצגה';
+            row.appendChild(cell);
+            tbody.appendChild(row);
         }
     }
 
@@ -819,7 +979,11 @@
         }
         
         if (typeof window.TradingViewChartAdapter === 'undefined') {
-            if (window.Logger && typeof window.Logger.error === 'function') {
+            const errorMsg = 'TradingViewChartAdapter not loaded';
+            if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {
+                window.NotificationSystem.showError('שגיאה בטעינת גרפים', 
+                    'ספריית TradingView לא נטענה. נא לרענן את העמוד.');
+            } else if (window.Logger && typeof window.Logger.error === 'function') {
                 window.Logger.error('TradingViewChartAdapter not available', { 
                     page: 'date-comparison-modal', 
                     timeout: maxRetries * 50 
@@ -829,7 +993,11 @@
         }
         
         if (typeof window.LightweightCharts === 'undefined' && typeof window.lightweightCharts === 'undefined') {
-            if (window.Logger && typeof window.Logger.error === 'function') {
+            const errorMsg = 'LightweightCharts not loaded';
+            if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {
+                window.NotificationSystem.showError('שגיאה בטעינת גרפים', 
+                    'ספריית LightweightCharts לא נטענה. נא לרענן את העמוד.');
+            } else if (window.Logger && typeof window.Logger.error === 'function') {
                 window.Logger.error('LightweightCharts not available', { 
                     page: 'date-comparison-modal', 
                     timeout: maxRetries * 50 
@@ -994,7 +1162,7 @@
             // Generate bar chart data
             const barData = generateBarChartData(data);
             
-            console.log('Updating bar chart with data:', barData);
+            window.Logger?.debug('Updating bar chart with data:', barData);
 
             // Add series for date1
             const series1 = window.TradingViewChartAdapter.addBarSeries(barChart, {
@@ -1088,7 +1256,7 @@
             });
         });
 
-        console.log('Generated bar chart data:', { date1Data, date2Data });
+        window.Logger?.debug('Generated bar chart data:', { date1Data, date2Data });
 
         return {
             date1Data: date1Data,
@@ -1250,7 +1418,7 @@
             // Generate line chart data
             const lineData = generateLineChartData(data);
             
-            console.log('Updating line chart with data:', lineData);
+            window.Logger?.debug('Updating line chart with data:', lineData);
 
             // Add series for balance
             if (lineData.balanceData && lineData.balanceData.length > 0) {
@@ -1337,7 +1505,7 @@
             plData.push({ time: timeStr, value: pl });
         }
 
-        console.log('Generated line chart data:', { balanceData, portfolioData, plData });
+        window.Logger?.debug('Generated line chart data:', { balanceData, portfolioData, plData });
 
         return {
             balanceData: balanceData,
@@ -1388,16 +1556,27 @@
         const alerts = calculateAlerts(data);
 
         if (alerts.length === 0) {
-            alertsContainer.innerHTML = '';
+            alertsContainer.textContent = '';
             return;
         }
 
-        alertsContainer.innerHTML = alerts.map(alert => `
-            <div class="alert alert-${alert.type}">
-                <img src="../../images/icons/tabler/alert-triangle.svg" width="16" height="16" alt="alert-triangle" class="icon">
-                <strong>שינוי משמעותי:</strong> ${alert.message}
-            </div>
-        `).join('');
+        alertsContainer.textContent = '';
+        alerts.forEach(alert => {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${alert.type}`;
+            const icon = document.createElement('img');
+            icon.src = '../../images/icons/tabler/alert-triangle.svg';
+            icon.width = 16;
+            icon.height = 16;
+            icon.alt = 'alert-triangle';
+            icon.className = 'icon';
+            alertDiv.appendChild(icon);
+            const strong = document.createElement('strong');
+            strong.textContent = 'שינוי משמעותי: ';
+            alertDiv.appendChild(strong);
+            alertDiv.appendChild(document.createTextNode(alert.message));
+            alertsContainer.appendChild(alertDiv);
+        });
     }
 
     // ===== SUMMARY FUNCTIONS =====
@@ -1463,7 +1642,12 @@
                 });
                 
                 html += '</div></div>';
-                summaryContainer.innerHTML = html;
+                summaryContainer.textContent = '';
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                doc.body.childNodes.forEach(node => {
+                    summaryContainer.appendChild(node.cloneNode(true));
+                });
             }
         } catch (error) {
             if (window.Logger && typeof window.Logger.warn === 'function') {
@@ -1511,7 +1695,12 @@
         // Clear new date input
         const newDateInput = document.getElementById('new-date-input');
         if (newDateInput) {
+            // Use DataCollectionService to clear field if available
+        if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+            window.DataCollectionService.setValue(newDateInput.id, '', 'dateOnly');
+        } else {
             newDateInput.value = '';
+        }
         }
         
         // Get date range and update selectedDates
@@ -1675,6 +1864,90 @@
         }
     }
 
+    // ===== PAGE STATE MANAGEMENT =====
+
+    /**
+     * Save page state (selected dates, sections)
+     * @async
+     */
+    async function savePageState() {
+        if (!window.PageStateManager) {
+            return;
+        }
+
+        try {
+            // Get section states
+            const sections = {};
+            const sectionIds = ['date-selection-section', 'date_comparison_modal-טבלת-השוואות',
+                               'date_comparison_modal-גרף-bar-chart---השוואה-בין-ה',
+                               'date_comparison_modal-גרף-line-chart---מגמה-בין-הת'];
+            sectionIds.forEach(sectionId => {
+                const section = document.getElementById(sectionId);
+                if (section) {
+                    const sectionBody = section.querySelector('.section-body');
+                    sections[sectionId] = sectionBody ? sectionBody.style.display === 'none' : false;
+                }
+            });
+
+            const state = {
+                selectedDates: selectedDates,
+                sections: sections
+            };
+
+            await window.PageStateManager.savePageState('date-comparison-modal', state);
+            if (window.Logger) {
+                window.Logger.debug('✅ Saved page state', { page: 'date-comparison-modal' });
+            }
+        } catch (error) {
+            if (window.Logger) {
+                window.Logger.warn('Failed to save page state', { page: 'date-comparison-modal', error });
+            }
+        }
+    }
+
+    /**
+     * Restore page state (selected dates, sections)
+     * @async
+     */
+    async function restorePageState() {
+        if (!window.PageStateManager) {
+            return;
+        }
+
+        try {
+            const savedState = await window.PageStateManager.loadPageState('date-comparison-modal');
+            if (!savedState) {
+                return;
+            }
+
+            // Restore selected dates if available
+            if (savedState.selectedDates && savedState.selectedDates.length > 0) {
+                selectedDates = savedState.selectedDates;
+            }
+
+            // Restore section states if available
+            if (savedState.sections) {
+                Object.keys(savedState.sections).forEach(sectionId => {
+                    const section = document.getElementById(sectionId);
+                    if (section) {
+                        const sectionBody = section.querySelector('.section-body');
+                        if (sectionBody) {
+                            sectionBody.style.display = savedState.sections[sectionId] ? 'none' : 'block';
+                        }
+                    }
+                });
+            }
+
+            if (window.Logger) {
+                window.Logger.debug('✅ Restored page state', { page: 'date-comparison-modal' });
+            }
+        } catch (error) {
+            if (window.Logger) {
+                window.Logger.warn('Failed to restore page state', { page: 'date-comparison-modal', error });
+            }
+        }
+    }
+
     // ===== INITIALIZATION =====
 
     /**
@@ -1686,6 +1959,9 @@
             // The system will auto-initialize, but we wait a bit for it to complete
             await new Promise(resolve => setTimeout(resolve, 1500));
 
+            // Restore page state
+            await restorePageState();
+            
             // Load last selected dates
             await loadLastSelectedDates();
             
@@ -1719,7 +1995,11 @@
             }
 
         } catch (error) {
-            if (window.Logger && typeof window.Logger.error === 'function') {
+            const errorMsg = error?.message || (typeof error === 'string' ? error : 'שגיאה לא ידועה');
+            if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {
+                window.NotificationSystem.showError('שגיאה באתחול מודל השוואת תאריכים', 
+                    `לא ניתן לאתחל את המודל. ${errorMsg}`);
+            } else if (window.Logger && typeof window.Logger.error === 'function') {
                 window.Logger.error('Error initializing date comparison modal', { 
                     page: 'date-comparison-modal', 
                     error 

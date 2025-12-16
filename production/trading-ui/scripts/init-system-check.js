@@ -14,6 +14,15 @@
  * @lastUpdated January 20, 2025
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Event Handlers ===
+// - copyMonitoringResults() - Copymonitoringresults
+
+// === Other ===
+// - waitForNavList() - Waitfornavlist
+
 if (window.Logger) {
   window.Logger.info('🔍 Loading Init System Check...', { page: 'init-check' });
 }
@@ -69,13 +78,19 @@ class InitSystemCheck {
         // יצירת כפתור הבדיקה
         const monitoringButton = document.createElement('li');
         monitoringButton.className = 'tiktrack-nav-item';
-        monitoringButton.innerHTML = `
+        const buttonHTML = `
             <a href="#" class="tiktrack-nav-link" id="initSystemCheckBtn" 
                title="ניטור מערכת איתחול"
                data-onclick="initSystemCheck?.runPageCheck(event)">
                 <span class="nav-text" style="color: #26baac; font-size: 1.2rem;">🔍</span>
             </a>
         `;
+        monitoringButton.textContent = '';
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(buttonHTML, 'text/html');
+        doc.body.childNodes.forEach(node => {
+          monitoringButton.appendChild(node.cloneNode(true));
+        });
 
         // הוספת הכפתור בסוף הרשימה
         navList.appendChild(monitoringButton);
@@ -146,6 +161,32 @@ class InitSystemCheck {
         // Handle tag-management specifically (URL might be /tag-management without .html)
         if (path.includes('tag-management')) {
             pageName = 'tag-management';
+        }
+        
+        // Handle historical pages with specific URL patterns
+        if (path.includes('trade-history')) {
+            pageName = 'trade-history';
+        } else if (path.includes('portfolio-state')) {
+            pageName = 'portfolio-state';
+        } else if (path.includes('trading-journal')) {
+            pageName = 'trading-journal';
+        }
+        
+        // For mockup pages, check if there's a class on html element
+        if (document.documentElement && document.documentElement.className) {
+            const htmlClass = document.documentElement.className;
+            // Check if class matches a known page name pattern (e.g., "trading-journal-page")
+            if (htmlClass && htmlClass.includes('-page') && !htmlClass.includes(' ')) {
+                // Verify it exists in PAGE_CONFIGS
+                if (window.PAGE_CONFIGS && window.PAGE_CONFIGS[htmlClass]) {
+                    return htmlClass;
+                }
+            }
+        }
+        
+        // If pageName exists in PAGE_CONFIGS, use it
+        if (window.PAGE_CONFIGS && window.PAGE_CONFIGS[pageName]) {
+            return pageName;
         }
         
         return pageName || 'index';

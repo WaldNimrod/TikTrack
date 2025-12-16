@@ -9,6 +9,18 @@
  * 4. Any other code that might reset the value
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - setupWatcher() - Setupwatcher
+
+// === Data Functions ===
+// - getSelectState() - Getselectstate
+
+// === Other ===
+// - log() - Log
+
 (function() {
     'use strict';
     

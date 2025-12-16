@@ -13,6 +13,8 @@ logger.info("Trade model loaded - opened_at fix applied")
 class Trade(BaseModel):
     __tablename__ = "trades"
     
+    user_id = Column(Integer, ForeignKey('users.id'), nullable=False, index=True,
+                    comment="User who owns this trade")
     trading_account_id = Column(Integer, ForeignKey('trading_accounts.id'), nullable=False)
     ticker_id = Column(Integer, ForeignKey('tickers.id'), nullable=False)
     trade_plan_id = Column(Integer, ForeignKey('trade_plans.id'), nullable=True)  # Allow NULL for trades without plans
@@ -48,6 +50,7 @@ class Trade(BaseModel):
             # Return all necessary fields for the frontend while leaving datetime objects intact.
             result = {
                 "id": self.id,
+                "user_id": self.user_id,
                 "trading_account_id": self.trading_account_id,
                 "ticker_id": self.ticker_id,
                 "trade_plan_id": self.trade_plan_id,
@@ -183,11 +186,25 @@ def trade_updated(mapper, connection, target):
 def trade_deleted(mapper, connection, target):
     """
     Event listener for when a trade is deleted
-    Updates the active_trades field of the related ticker
+    Updates the active_trades field of the related ticker and removes associated tag links
     """
     try:
         # Update ticker active_trades field using connection directly
         update_ticker_active_trades(connection, target.ticker_id)
+        
+        # Clean up tag links
+        try:
+            from services.tag_service import TagService
+            from sqlalchemy.orm import Session
+            
+            session = Session(bind=connection)
+            TagService.remove_all_tags_for_entity(
+                session, 'trade', target.id
+            )
+            session.close()
+        except Exception as tag_error:
+            logger.error(f"Error cleaning up tags for trade {target.id}: {tag_error}")
+            # Don't raise - allow deletion to proceed even if tag cleanup fails
         
     except Exception as e:
         logger.error(f"Error in trade_deleted event: {e}")

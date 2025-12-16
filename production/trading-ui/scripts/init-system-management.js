@@ -3,6 +3,84 @@
  * עמוד ניהול מערכת האתחול
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - checkDuplicateInitialization() - Checkduplicateinitialization
+
+// === Core Functions ===
+// - runValidator() - Runvalidator
+// - runScriptTests() - Runscripttests
+// - runDependencyTests() - Rundependencytests
+// - runPerformanceTests() - Runperformancetests
+// - runComprehensiveTests() - Runcomprehensivetests
+// - runDetailedPageScan_OLD() - Rundetailedpagescan Old
+
+// === Event Handlers ===
+// - runStandardizationAnalysis() - Runstandardizationanalysis
+// - generateCompleteScriptSection() - Generatecompletescriptsection
+// - loadPagesForScriptGeneration() - Loadpagesforscriptgeneration
+// - onPageSelectedForScriptGen() - Onpageselectedforscriptgen
+// - displayGeneratedContent() - Displaygeneratedcontent
+// - showNotification() - Shownotification
+// - loadAdvancedMonitoring() - Loadadvancedmonitoring
+// - loadValidationTests() - Loadvalidationtests
+// - runValidationTests() - Runvalidationtests
+// - runAdvancedMonitoring() - Runadvancedmonitoring
+// - copyGeneratedContent() - Copygeneratedcontent
+
+// === UI Functions ===
+// - showPerformance() - Showperformance
+// - showPackageStats() - Showpackagestats
+// - showScriptCodeInModal() - Showscriptcodeinmodal
+// - displayTestResults() - Displaytestresults
+// - displayComprehensiveResults() - Displaycomprehensiveresults
+// - showPageDetails() - Showpagedetails
+
+// === Data Functions ===
+// - loadSystemStatus() - Loadsystemstatus
+// - loadPagesMapping() - Loadpagesmapping
+// - loadPackagesList() - Loadpackageslist
+// - loadPerformanceReport() - Loadperformancereport
+// - loadPackagesCheckboxes() - Loadpackagescheckboxes
+// - getSelectedPackages() - Getselectedpackages
+// - generateScriptLoadingCodeForSelectedPage() - Generatescriptloadingcodeforselectedpage
+// - loadScriptTests() - Loadscripttests
+// - loadDependencyTests() - Loaddependencytests
+// - loadPerformanceTests() - Loadperformancetests
+// - checkLoadOrder() - Checkloadorder
+// - waitForPageFullyLoaded() - Waitforpagefullyloaded
+// - getStatusText() - Getstatustext
+// - getDetailedMismatches() - Getdetailedmismatches
+
+// === Utility Functions ===
+// - checkForDuplicates() - Checkforduplicates
+// - checkForMismatches_OLD() - Checkformismatches Old
+// - checkGlobalExists() - Checkglobalexists
+
+// === Other ===
+// - analyzeScripts() - Analyzescripts
+// - copyReportToClipboard() - Copyreporttoclipboard
+// - exportReportAsFile() - Exportreportasfile
+// - generatePage() - Generatepage
+// - generateScriptTagsForPage() - Generatescripttagsforpage
+// - copyGeneratedScriptCode() - Copygeneratedscriptcode
+// - fallbackCopyScriptCode() - Fallbackcopyscriptcode
+// - escapeHtmlForModal() - Escapehtmlformodal
+// - copyToClipboard() - Copytoclipboard
+// - escapeHtml() - Escapehtml
+// - copyDetailedLog() - Copydetailedlog
+// - testSinglePage() - Testsinglepage
+// - waitForScriptsReady() - Waitforscriptsready
+// - exportTestResults() - Exporttestresults
+// - copyAllResults() - Copyallresults
+// - copyComprehensiveResults() - Copycomprehensiveresults
+// - copyDetailedPageResults() - Copydetailedpageresults
+// - copyPackagesList() - Copypackageslist
+// - copyPagesMapping() - Copypagesmapping
+// - copyPerformanceReport() - Copyperformancereport
+
 // Global variables
 let runtimeValidator = null;
 let scriptAnalyzer = null;
@@ -10,7 +88,7 @@ let pageTemplateGenerator = null;
 
 // Initialize page
 document.addEventListener('DOMContentLoaded', async function() {
-    // console.log('🔧 Initializing Init System Management page...');
+    // Logger.info('🔧 Initializing Init System Management page...');
     
     try {
         // Initialize tools
@@ -29,9 +107,9 @@ document.addEventListener('DOMContentLoaded', async function() {
         // Load advanced monitoring
         await loadAdvancedMonitoring();
         
-        // console.log('✅ Init System Management page initialized');
+        // Logger.info('✅ Init System Management page initialized');
     } catch (error) {
-        console.error('❌ Failed to initialize Init System Management page:', error);
+        Logger.error('❌ Failed to initialize Init System Management page:', error);
         showNotification('שגיאה באתחול עמוד ניהול מערכת', 'error');
     }
 });
@@ -74,22 +152,34 @@ async function loadSystemStatus() {
             const isInitialized = status && status.initialized;
             const statusText = isInitialized ? 'פעילה' : 'לא פעילה';
             const statusIcon = isInitialized ? 'fa-check-circle text-success' : 'fa-times-circle text-danger';
-            systemStatusCard.innerHTML = `<i class="fas ${statusIcon}"></i> ${statusText}`;
+            systemStatusCard.textContent = '';
+            const icon = document.createElement('i');
+            icon.className = `fas ${statusIcon}`;
+            systemStatusCard.appendChild(icon);
+            systemStatusCard.appendChild(document.createTextNode(` ${statusText}`));
         }
         
         if (pagesCountCard) {
             const pagesCount = Object.keys(window.PAGE_CONFIGS || {}).length;
-            pagesCountCard.innerHTML = `<i class="fas fa-file-alt"></i> ${pagesCount}`;
+            pagesCountCard.textContent = '';
+            const icon = document.createElement('i');
+            icon.className = 'fas fa-file-alt';
+            pagesCountCard.appendChild(icon);
+            pagesCountCard.appendChild(document.createTextNode(` ${pagesCount}`));
         }
         
         if (packagesCountCard) {
             const packagesCount = Object.keys(window.PACKAGE_MANIFEST || {}).length;
-            packagesCountCard.innerHTML = `<i class="fas fa-boxes"></i> ${packagesCount}`;
+            packagesCountCard.textContent = '';
+            const icon = document.createElement('i');
+            icon.className = 'fas fa-boxes';
+            packagesCountCard.appendChild(icon);
+            packagesCountCard.appendChild(document.createTextNode(` ${packagesCount}`));
         }
         
         
     } catch (error) {
-        console.error('❌ Failed to load system status:', error);
+        Logger.error('❌ Failed to load system status:', error);
     }
 }
 
@@ -103,12 +193,20 @@ async function loadPagesMapping() {
     try {
         if (!window.PAGE_CONFIGS) {
             if (mappingContainer) {
-                mappingContainer.innerHTML = `
+                mappingContainer.textContent = '';
+        // Convert HTML string to DOM elements safely
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(`
                     <div class="alert alert-warning">
                         <i class="fas fa-exclamation-triangle"></i>
                         PAGE_CONFIGS לא זמין
                     </div>
-                `;
+                `, 'text/html');
+        const fragment = document.createDocumentFragment();
+        Array.from(doc.body.childNodes).forEach(node => {
+            fragment.appendChild(node.cloneNode(true));
+        });
+        mappingContainer.appendChild(fragment);
             }
             return;
         }
@@ -121,22 +219,50 @@ async function loadPagesMapping() {
             const pagesWithPackages = pages.filter(([_, config]) => config.packages && config.packages.length > 0).length;
             const pagesWithGlobals = pages.filter(([_, config]) => config.requiredGlobals && config.requiredGlobals.length > 0).length;
             
-            statsContainer.innerHTML = `
-                <div class="stats-grid">
-                    <div class="stat-item">
-                        <div class="stat-number">${totalPages}</div>
-                        <div class="stat-label">סך עמודים</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-number">${pagesWithPackages}</div>
-                        <div class="stat-label">עם חבילות</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-number">${pagesWithGlobals}</div>
-                        <div class="stat-label">עם Globals</div>
-                    </div>
-                </div>
-            `;
+            statsContainer.textContent = '';
+            const statsGrid = document.createElement('div');
+            statsGrid.className = 'stats-grid';
+            
+            // Stat item 1: Total pages
+            const statItem1 = document.createElement('div');
+            statItem1.className = 'stat-item';
+            const statNumber1 = document.createElement('div');
+            statNumber1.className = 'stat-number';
+            statNumber1.textContent = totalPages;
+            const statLabel1 = document.createElement('div');
+            statLabel1.className = 'stat-label';
+            statLabel1.textContent = 'סך עמודים';
+            statItem1.appendChild(statNumber1);
+            statItem1.appendChild(statLabel1);
+            
+            // Stat item 2: Pages with packages
+            const statItem2 = document.createElement('div');
+            statItem2.className = 'stat-item';
+            const statNumber2 = document.createElement('div');
+            statNumber2.className = 'stat-number';
+            statNumber2.textContent = pagesWithPackages;
+            const statLabel2 = document.createElement('div');
+            statLabel2.className = 'stat-label';
+            statLabel2.textContent = 'עם חבילות';
+            statItem2.appendChild(statNumber2);
+            statItem2.appendChild(statLabel2);
+            
+            // Stat item 3: Pages with globals
+            const statItem3 = document.createElement('div');
+            statItem3.className = 'stat-item';
+            const statNumber3 = document.createElement('div');
+            statNumber3.className = 'stat-number';
+            statNumber3.textContent = pagesWithGlobals;
+            const statLabel3 = document.createElement('div');
+            statLabel3.className = 'stat-label';
+            statLabel3.textContent = 'עם Globals';
+            statItem3.appendChild(statNumber3);
+            statItem3.appendChild(statLabel3);
+            
+            statsGrid.appendChild(statItem1);
+            statsGrid.appendChild(statItem2);
+            statsGrid.appendChild(statItem3);
+            statsContainer.appendChild(statsGrid);
         }
         
         let mappingHTML = `
@@ -202,16 +328,26 @@ async function loadPagesMapping() {
             </div>
         `;
         
-        mappingContainer.innerHTML = mappingHTML;
+        // Convert HTML string to DOM elements safely
+        if (mappingHTML) {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(mappingHTML, 'text/html');
+            mappingContainer.textContent = '';
+            Array.from(doc.body.childNodes).forEach(node => {
+                mappingContainer.appendChild(node.cloneNode(true));
+            });
+        }
         
     } catch (error) {
-        console.error('❌ Failed to load pages mapping:', error);
-        mappingContainer.innerHTML = `
-            <div class="alert alert-danger">
-                <i class="fas fa-exclamation-triangle"></i>
-                שגיאה בטעינת מיפוי עמודים: ${error.message}
-            </div>
-        `;
+        Logger.error('❌ Failed to load pages mapping:', error);
+        mappingContainer.textContent = '';
+        const alertDiv = document.createElement('div');
+        alertDiv.className = 'alert alert-danger';
+        const icon = document.createElement('i');
+        icon.className = 'fas fa-exclamation-triangle';
+        alertDiv.appendChild(icon);
+        alertDiv.appendChild(document.createTextNode(` שגיאה בטעינת מיפוי עמודים: ${error.message}`));
+        mappingContainer.appendChild(alertDiv);
     }
 }
 
@@ -223,12 +359,14 @@ async function loadPackagesList() {
     
     try {
         if (!window.PACKAGE_MANIFEST) {
-            packagesContainer.innerHTML = `
-                <div class="alert alert-warning">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    Package Manifest לא זמין
-                </div>
-            `;
+            packagesContainer.textContent = '';
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'alert alert-warning';
+            const icon = document.createElement('i');
+            icon.className = 'fas fa-exclamation-triangle';
+            alertDiv.appendChild(icon);
+            alertDiv.appendChild(document.createTextNode(' Package Manifest לא זמין'));
+            packagesContainer.appendChild(alertDiv);
             return;
         }
         
@@ -279,16 +417,26 @@ async function loadPackagesList() {
             `;
         });
         
-        packagesContainer.innerHTML = packagesHTML;
+        // Convert HTML string to DOM elements safely
+        if (packagesHTML) {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(packagesHTML, 'text/html');
+            packagesContainer.textContent = '';
+            Array.from(doc.body.childNodes).forEach(node => {
+                packagesContainer.appendChild(node.cloneNode(true));
+            });
+        }
         
     } catch (error) {
-        console.error('❌ Failed to load packages list:', error);
-        packagesContainer.innerHTML = `
-            <div class="alert alert-danger">
-                <i class="fas fa-exclamation-triangle"></i>
-                שגיאה בטעינת רשימת חבילות: ${error.message}
-            </div>
-        `;
+        Logger.error('❌ Failed to load packages list:', error);
+        packagesContainer.textContent = '';
+        const alertDiv = document.createElement('div');
+        alertDiv.className = 'alert alert-danger';
+        const icon = document.createElement('i');
+        icon.className = 'fas fa-exclamation-triangle';
+        alertDiv.appendChild(icon);
+        alertDiv.appendChild(document.createTextNode(` שגיאה בטעינת רשימת חבילות: ${error.message}`));
+        packagesContainer.appendChild(alertDiv);
     }
 }
 
@@ -309,33 +457,59 @@ async function loadPerformanceReport() {
             window.unifiedAppInit.getPerformanceReport() : null;
         
         if (performanceCard1) {
-            performanceCard1.innerHTML = report ? 
-                `<i class="fas fa-clock"></i> ${report.averageLoadTime || 'N/A'}ms` : 
-                '<i class="fas fa-spinner fa-spin"></i> טוען...';
+            performanceCard1.textContent = '';
+            const icon1 = document.createElement('i');
+            if (report) {
+                icon1.className = 'fas fa-clock';
+                performanceCard1.appendChild(icon1);
+                performanceCard1.appendChild(document.createTextNode(` ${report.averageLoadTime || 'N/A'}ms`));
+            } else {
+                icon1.className = 'fas fa-spinner fa-spin';
+                performanceCard1.appendChild(icon1);
+                performanceCard1.appendChild(document.createTextNode(' טוען...'));
+            }
         }
         
         if (performanceCard2) {
-            performanceCard2.innerHTML = report ? 
-                `<i class="fas fa-memory"></i> ${report.memoryUsage || 'N/A'}MB` : 
-                '<i class="fas fa-spinner fa-spin"></i> טוען...';
+            performanceCard2.textContent = '';
+            const icon2 = document.createElement('i');
+            if (report) {
+                icon2.className = 'fas fa-memory';
+                performanceCard2.appendChild(icon2);
+                performanceCard2.appendChild(document.createTextNode(` ${report.memoryUsage || 'N/A'}MB`));
+            } else {
+                icon2.className = 'fas fa-spinner fa-spin';
+                performanceCard2.appendChild(icon2);
+                performanceCard2.appendChild(document.createTextNode(' טוען...'));
+            }
         }
         
         if (performanceCard3) {
-            const trendIcon = report && report.trend === 'improving' ? 'fa-arrow-up text-success' : 
-                             report && report.trend === 'degrading' ? 'fa-arrow-down text-danger' : 'fa-minus text-muted';
-            performanceCard3.innerHTML = report ? 
-                `<i class="fas ${trendIcon}"></i> ${report.overallScore || 'N/A'}/100` : 
-                '<i class="fas fa-spinner fa-spin"></i> טוען...';
+            performanceCard3.textContent = '';
+            const icon3 = document.createElement('i');
+            if (report) {
+                const trendIcon = report.trend === 'improving' ? 'fa-arrow-up text-success' : 
+                                 report.trend === 'degrading' ? 'fa-arrow-down text-danger' : 'fa-minus text-muted';
+                icon3.className = `fas ${trendIcon}`;
+                performanceCard3.appendChild(icon3);
+                performanceCard3.appendChild(document.createTextNode(` ${report.overallScore || 'N/A'}/100`));
+            } else {
+                icon3.className = 'fas fa-spinner fa-spin';
+                performanceCard3.appendChild(icon3);
+                performanceCard3.appendChild(document.createTextNode(' טוען...'));
+            }
         }
         
         if (!report) {
             if (reportContainer) {
-                reportContainer.innerHTML = `
-                    <div class="alert alert-info">
-                        <i class="fas fa-info-circle"></i>
-                        אין נתוני ביצועים זמינים
-                    </div>
-                `;
+                reportContainer.textContent = '';
+                const alertDiv = document.createElement('div');
+                alertDiv.className = 'alert alert-info';
+                const icon = document.createElement('i');
+                icon.className = 'fas fa-info-circle';
+                alertDiv.appendChild(icon);
+                alertDiv.appendChild(document.createTextNode(' אין נתוני ביצועים זמינים'));
+                reportContainer.appendChild(alertDiv);
             }
             return;
         }
@@ -400,16 +574,28 @@ async function loadPerformanceReport() {
             </div>
         `;
         
-        reportContainer.innerHTML = reportHTML;
+        // Convert HTML string to DOM elements safely
+        if (reportHTML && reportContainer) {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(reportHTML, 'text/html');
+            reportContainer.textContent = '';
+            Array.from(doc.body.childNodes).forEach(node => {
+                reportContainer.appendChild(node.cloneNode(true));
+            });
+        }
         
     } catch (error) {
-        console.error('❌ Failed to load performance report:', error);
-        reportContainer.innerHTML = `
-            <div class="alert alert-danger">
-                <i class="fas fa-exclamation-triangle"></i>
-                שגיאה בטעינת דוח ביצועים: ${error.message}
-            </div>
-        `;
+        Logger.error('❌ Failed to load performance report:', error);
+        if (reportContainer) {
+            reportContainer.textContent = '';
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'alert alert-danger';
+            const icon = document.createElement('i');
+            icon.className = 'fas fa-exclamation-triangle';
+            alertDiv.appendChild(icon);
+            alertDiv.appendChild(document.createTextNode(` שגיאה בטעינת דוח ביצועים: ${error.message}`));
+            reportContainer.appendChild(alertDiv);
+        }
     }
 }
 
@@ -420,7 +606,11 @@ function loadPackagesCheckboxes() {
     const checkboxesContainer = document.getElementById('packagesCheckboxes');
     
     if (!window.PACKAGE_MANIFEST) {
-        checkboxesContainer.innerHTML = '<div class="alert alert-warning">Package Manifest לא זמין</div>';
+        checkboxesContainer.textContent = '';
+        const alertDiv = document.createElement('div');
+        alertDiv.className = 'alert alert-warning';
+        alertDiv.textContent = 'Package Manifest לא זמין';
+        checkboxesContainer.appendChild(alertDiv);
         return;
     }
     
@@ -445,7 +635,15 @@ function loadPackagesCheckboxes() {
         `;
     });
     
-    checkboxesContainer.innerHTML = checkboxesHTML;
+    // Convert HTML string to DOM elements safely
+    if (checkboxesHTML) {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(checkboxesHTML, 'text/html');
+        checkboxesContainer.textContent = '';
+        Array.from(doc.body.childNodes).forEach(node => {
+            checkboxesContainer.appendChild(node.cloneNode(true));
+        });
+    }
 }
 
 /**
@@ -455,7 +653,14 @@ function runValidator() {
     const resultsContainer = document.getElementById('toolsResults');
     
     try {
-        resultsContainer.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> מריץ בדיקות...</div>';
+        resultsContainer.textContent = '';
+        const loadingDiv = document.createElement('div');
+        loadingDiv.className = 'loading';
+        const spinnerIcon = document.createElement('i');
+        spinnerIcon.className = 'fas fa-spinner fa-spin';
+        loadingDiv.appendChild(spinnerIcon);
+        loadingDiv.appendChild(document.createTextNode(' מריץ בדיקות...'));
+        resultsContainer.appendChild(loadingDiv);
         
         const report = runtimeValidator.runChecks();
         const detailedReport = runtimeValidator.getDetailedReport();
@@ -532,16 +737,27 @@ function runValidator() {
         }
         
         resultsHTML += '</div>';
-        resultsContainer.innerHTML = resultsHTML;
+        
+        // Convert HTML string to DOM elements safely
+        if (resultsHTML) {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(resultsHTML, 'text/html');
+            resultsContainer.textContent = '';
+            Array.from(doc.body.childNodes).forEach(node => {
+                resultsContainer.appendChild(node.cloneNode(true));
+            });
+        }
         
     } catch (error) {
-        console.error('❌ Failed to run validator:', error);
-        resultsContainer.innerHTML = `
-            <div class="alert alert-danger">
-                <i class="fas fa-exclamation-triangle"></i>
-                שגיאה בהרצת בדיקות: ${error.message}
-            </div>
-        `;
+        Logger.error('❌ Failed to run validator:', error);
+        resultsContainer.textContent = '';
+        const alertDiv = document.createElement('div');
+        alertDiv.className = 'alert alert-danger';
+        const icon = document.createElement('i');
+        icon.className = 'fas fa-exclamation-triangle';
+        alertDiv.appendChild(icon);
+        alertDiv.appendChild(document.createTextNode(` שגיאה בהרצת בדיקות: ${error.message}`));
+        resultsContainer.appendChild(alertDiv);
     }
 }
 
@@ -552,7 +768,14 @@ function analyzeScripts() {
     const resultsContainer = document.getElementById('toolsResults');
     
     try {
-        resultsContainer.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> מנתח סקריפטים...</div>';
+        resultsContainer.textContent = '';
+        const loadingDiv = document.createElement('div');
+        loadingDiv.className = 'loading';
+        const spinnerIcon = document.createElement('i');
+        spinnerIcon.className = 'fas fa-spinner fa-spin';
+        loadingDiv.appendChild(spinnerIcon);
+        loadingDiv.appendChild(document.createTextNode(' מנתח סקריפטים...'));
+        resultsContainer.appendChild(loadingDiv);
         
         const report = scriptAnalyzer.analyze();
         const suggestions = scriptAnalyzer.getOptimizationSuggestions();
@@ -610,16 +833,27 @@ function analyzeScripts() {
         }
         
         resultsHTML += '</div>';
-        resultsContainer.innerHTML = resultsHTML;
+        
+        // Convert HTML string to DOM elements safely
+        if (resultsHTML) {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(resultsHTML, 'text/html');
+            resultsContainer.textContent = '';
+            Array.from(doc.body.childNodes).forEach(node => {
+                resultsContainer.appendChild(node.cloneNode(true));
+            });
+        }
         
     } catch (error) {
-        console.error('❌ Failed to analyze scripts:', error);
-        resultsContainer.innerHTML = `
-            <div class="alert alert-danger">
-                <i class="fas fa-exclamation-triangle"></i>
-                שגיאה בניתוח סקריפטים: ${error.message}
-            </div>
-        `;
+        Logger.error('❌ Failed to analyze scripts:', error);
+        resultsContainer.textContent = '';
+        const alertDiv = document.createElement('div');
+        alertDiv.className = 'alert alert-danger';
+        const icon = document.createElement('i');
+        icon.className = 'fas fa-exclamation-triangle';
+        alertDiv.appendChild(icon);
+        alertDiv.appendChild(document.createTextNode(` שגיאה בניתוח סקריפטים: ${error.message}`));
+        resultsContainer.appendChild(alertDiv);
     }
 }
 
@@ -634,16 +868,18 @@ function showPerformance() {
             window.unifiedAppInit.getPerformanceReport() : null;
         
         if (!report) {
-            resultsContainer.innerHTML = `
-                <div class="alert alert-info">
-                    <i class="fas fa-info-circle"></i>
-                    אין נתוני ביצועים זמינים
-                </div>
-            `;
+            resultsContainer.textContent = '';
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'alert alert-info';
+            const icon = document.createElement('i');
+            icon.className = 'fas fa-info-circle';
+            alertDiv.appendChild(icon);
+            alertDiv.appendChild(document.createTextNode(' אין נתוני ביצועים זמינים'));
+            resultsContainer.appendChild(alertDiv);
             return;
         }
         
-        resultsContainer.innerHTML = `
+        const performanceHTML = `
             <div class="performance-results">
                 <h4>📊 דוח ביצועים מפורט</h4>
                 <div class="performance-details">
@@ -663,14 +899,26 @@ function showPerformance() {
             </div>
         `;
         
+        // Convert HTML string to DOM elements safely
+        if (performanceHTML) {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(performanceHTML, 'text/html');
+            resultsContainer.textContent = '';
+            Array.from(doc.body.childNodes).forEach(node => {
+                resultsContainer.appendChild(node.cloneNode(true));
+            });
+        }
+        
     } catch (error) {
-        console.error('❌ Failed to show performance:', error);
-        resultsContainer.innerHTML = `
-            <div class="alert alert-danger">
-                <i class="fas fa-exclamation-triangle"></i>
-                שגיאה בהצגת ביצועים: ${error.message}
-            </div>
-        `;
+        Logger.error('❌ Failed to show performance:', error);
+        resultsContainer.textContent = '';
+        const alertDiv = document.createElement('div');
+        alertDiv.className = 'alert alert-danger';
+        const icon = document.createElement('i');
+        icon.className = 'fas fa-exclamation-triangle';
+        alertDiv.appendChild(icon);
+        alertDiv.appendChild(document.createTextNode(` שגיאה בהצגת ביצועים: ${error.message}`));
+        resultsContainer.appendChild(alertDiv);
     }
 }
 
@@ -682,12 +930,14 @@ function runStandardizationAnalysis() {
     
     try {
         if (!window.PageStandardizer) {
-            resultsContainer.innerHTML = `
-                <div class="alert alert-warning">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    PageStandardizer לא זמין
-                </div>
-            `;
+            resultsContainer.textContent = '';
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'alert alert-warning';
+            const icon = document.createElement('i');
+            icon.className = 'fas fa-exclamation-triangle';
+            alertDiv.appendChild(icon);
+            alertDiv.appendChild(document.createTextNode(' PageStandardizer לא זמין'));
+            resultsContainer.appendChild(alertDiv);
             return;
         }
         
@@ -782,16 +1032,26 @@ function runStandardizationAnalysis() {
             </div>
         `;
         
-        resultsContainer.innerHTML = html;
+        // Convert HTML string to DOM elements safely
+        if (html) {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            resultsContainer.textContent = '';
+            Array.from(doc.body.childNodes).forEach(node => {
+                resultsContainer.appendChild(node.cloneNode(true));
+            });
+        }
         
     } catch (error) {
-        console.error('❌ Failed to run standardization analysis:', error);
-        resultsContainer.innerHTML = `
-            <div class="alert alert-danger">
-                <i class="fas fa-exclamation-triangle"></i>
-                שגיאה בניתוח סטנדרטיזציה: ${error.message}
-            </div>
-        `;
+        Logger.error('❌ Failed to run standardization analysis:', error);
+        resultsContainer.textContent = '';
+        const alertDiv = document.createElement('div');
+        alertDiv.className = 'alert alert-danger';
+        const icon = document.createElement('i');
+        icon.className = 'fas fa-exclamation-triangle';
+        alertDiv.appendChild(icon);
+        alertDiv.appendChild(document.createTextNode(` שגיאה בניתוח סטנדרטיזציה: ${error.message}`));
+        resultsContainer.appendChild(alertDiv);
     }
 }
 
@@ -803,23 +1063,33 @@ async function checkDuplicateInitialization() {
     
     try {
         if (!window.DuplicateInitializationChecker) {
-            resultsContainer.innerHTML = `
-                <div class="alert alert-warning">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    DuplicateInitializationChecker לא זמין
-                </div>
-            `;
+            resultsContainer.textContent = '';
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'alert alert-warning';
+            const icon = document.createElement('i');
+            icon.className = 'fas fa-exclamation-triangle';
+            alertDiv.appendChild(icon);
+            alertDiv.appendChild(document.createTextNode(' DuplicateInitializationChecker לא זמין'));
+            resultsContainer.appendChild(alertDiv);
             return;
         }
         
-        resultsContainer.innerHTML = `
-            <div class="text-center">
-                <div class="spinner-border text-primary" role="status">
-                    <span class="visually-hidden">בודק עמודים...</span>
-                </div>
-                <p class="mt-2">בודק אתחול כפול ונוסף בכל העמודים...</p>
-            </div>
-        `;
+        resultsContainer.textContent = '';
+        const loadingDiv = document.createElement('div');
+        loadingDiv.className = 'text-center';
+        const spinner = document.createElement('div');
+        spinner.className = 'spinner-border text-primary';
+        spinner.setAttribute('role', 'status');
+        const spinnerSpan = document.createElement('span');
+        spinnerSpan.className = 'visually-hidden';
+        spinnerSpan.textContent = 'בודק עמודים...';
+        spinner.appendChild(spinnerSpan);
+        const loadingP = document.createElement('p');
+        loadingP.className = 'mt-2';
+        loadingP.textContent = 'בודק אתחול כפול ונוסף בכל העמודים...';
+        loadingDiv.appendChild(spinner);
+        loadingDiv.appendChild(loadingP);
+        resultsContainer.appendChild(loadingDiv);
         
         const checker = new window.DuplicateInitializationChecker();
         const results = await checker.checkAllPages();
@@ -839,7 +1109,7 @@ async function checkDuplicateInitialization() {
             .replace(/📋/g, '<span class="text-primary">📋</span>')
             .replace(/🎯/g, '<span class="text-success">🎯</span>');
         
-        resultsContainer.innerHTML = `
+        const reportHTML = `
             <div class="duplicate-check-report">
                 <h4><i class="fas fa-exclamation-triangle"></i> דוח בדיקת אתחול כפול</h4>
                 <div class="report-content" style="font-family: monospace; white-space: pre-wrap; background: #f8f9fa; padding: 15px; border-radius: 5px; max-height: 600px; overflow-y: auto;">
@@ -857,17 +1127,29 @@ async function checkDuplicateInitialization() {
             </div>
         `;
         
+        // Convert HTML string to DOM elements safely
+        if (reportHTML) {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(reportHTML, 'text/html');
+            resultsContainer.textContent = '';
+            Array.from(doc.body.childNodes).forEach(node => {
+                resultsContainer.appendChild(node.cloneNode(true));
+            });
+        }
+        
         // Store report for copying/exporting
         window.lastDuplicateCheckReport = report;
         
     } catch (error) {
-        console.error('❌ Failed to check duplicate initialization:', error);
-        resultsContainer.innerHTML = `
-            <div class="alert alert-danger">
-                <i class="fas fa-exclamation-triangle"></i>
-                שגיאה בבדיקת אתחול כפול: ${error.message}
-            </div>
-        `;
+        Logger.error('❌ Failed to check duplicate initialization:', error);
+        resultsContainer.textContent = '';
+        const alertDiv = document.createElement('div');
+        alertDiv.className = 'alert alert-danger';
+        const icon = document.createElement('i');
+        icon.className = 'fas fa-exclamation-triangle';
+        alertDiv.appendChild(icon);
+        alertDiv.appendChild(document.createTextNode(` שגיאה בבדיקת אתחול כפול: ${error.message}`));
+        resultsContainer.appendChild(alertDiv);
     }
 }
 
@@ -881,7 +1163,7 @@ function copyReportToClipboard() {
                 window.NotificationSystem.showNotification('דוח הועתק ללוח', 'success');
             }
         }).catch(err => {
-            console.error('Failed to copy report:', err);
+            Logger.error('Failed to copy report:', err);
         });
     }
 }
@@ -918,16 +1200,18 @@ function showPackageStats() {
             window.PackageManifest.getStats() : null;
         
         if (!stats) {
-            resultsContainer.innerHTML = `
-                <div class="alert alert-info">
-                    <i class="fas fa-info-circle"></i>
-                    אין נתוני חבילות זמינים
-                </div>
-            `;
+            resultsContainer.textContent = '';
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'alert alert-info';
+            const icon = document.createElement('i');
+            icon.className = 'fas fa-info-circle';
+            alertDiv.appendChild(icon);
+            alertDiv.appendChild(document.createTextNode(' אין נתוני חבילות זמינים'));
+            resultsContainer.appendChild(alertDiv);
             return;
         }
         
-        resultsContainer.innerHTML = `
+        const statsHTML = `
             <div class="package-stats-results">
                 <h4>📦 סטטיסטיקות חבילות</h4>
                 <div class="stats-grid">
@@ -951,14 +1235,26 @@ function showPackageStats() {
             </div>
         `;
         
+        // Convert HTML string to DOM elements safely
+        if (statsHTML) {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(statsHTML, 'text/html');
+            resultsContainer.textContent = '';
+            Array.from(doc.body.childNodes).forEach(node => {
+                resultsContainer.appendChild(node.cloneNode(true));
+            });
+        }
+        
     } catch (error) {
-        console.error('❌ Failed to show package stats:', error);
-        resultsContainer.innerHTML = `
-            <div class="alert alert-danger">
-                <i class="fas fa-exclamation-triangle"></i>
-                שגיאה בהצגת סטטיסטיקות חבילות: ${error.message}
-            </div>
-        `;
+        Logger.error('❌ Failed to show package stats:', error);
+        resultsContainer.textContent = '';
+        const alertDiv = document.createElement('div');
+        alertDiv.className = 'alert alert-danger';
+        const icon = document.createElement('i');
+        icon.className = 'fas fa-exclamation-triangle';
+        alertDiv.appendChild(icon);
+        alertDiv.appendChild(document.createTextNode(` שגיאה בהצגת סטטיסטיקות חבילות: ${error.message}`));
+        resultsContainer.appendChild(alertDiv);
     }
 }
 
@@ -966,7 +1262,14 @@ function showPackageStats() {
  * Generate page
  */
 function generatePage() {
-    const pageName = document.getElementById('newPageName').value.trim();
+    // Use DataCollectionService to get value if available
+    let pageName;
+    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) {
+      pageName = window.DataCollectionService.getValue('newPageName', 'text', '').trim();
+    } else {
+      const pageNameEl = document.getElementById('newPageName');
+      pageName = pageNameEl ? pageNameEl.value.trim() : '';
+    }
     const selectedPackages = getSelectedPackages();
     
     if (!pageName) {
@@ -979,7 +1282,7 @@ function generatePage() {
         displayGeneratedContent('HTML', html);
         
     } catch (error) {
-        console.error('❌ Failed to generate page:', error);
+        Logger.error('❌ Failed to generate page:', error);
         showNotification('שגיאה ביצירת עמוד', 'error');
     }
 }
@@ -990,7 +1293,14 @@ function generatePage() {
  * Generate complete script section with correct loading order
  */
 function generateCompleteScriptSection() {
-    const pageName = document.getElementById('newPageName').value.trim();
+    // Use DataCollectionService to get value if available
+    let pageName;
+    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) {
+      pageName = window.DataCollectionService.getValue('newPageName', 'text', '').trim();
+    } else {
+      const pageNameEl = document.getElementById('newPageName');
+      pageName = pageNameEl ? pageNameEl.value.trim() : '';
+    }
     
     if (!pageName) {
         showNotification('אנא הזן שם עמוד', 'warning');
@@ -1002,7 +1312,7 @@ function generateCompleteScriptSection() {
         displayGeneratedContent('Script Section', scriptSection);
         
     } catch (error) {
-        console.error('❌ Failed to generate script section:', error);
+        Logger.error('❌ Failed to generate script section:', error);
         showNotification('שגיאה ביצירת קוד סקריפטים', 'error');
     }
 }
@@ -1011,7 +1321,14 @@ function generateCompleteScriptSection() {
  * Generate script tags for specific page
  */
 function generateScriptTagsForPage() {
-    const pageName = document.getElementById('newPageName').value.trim();
+    // Use DataCollectionService to get value if available
+    let pageName;
+    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) {
+      pageName = window.DataCollectionService.getValue('newPageName', 'text', '').trim();
+    } else {
+      const pageNameEl = document.getElementById('newPageName');
+      pageName = pageNameEl ? pageNameEl.value.trim() : '';
+    }
     
     if (!pageName) {
         showNotification('אנא הזן שם עמוד', 'warning');
@@ -1023,7 +1340,7 @@ function generateScriptTagsForPage() {
         displayGeneratedContent('Script Tags', scriptTags);
         
     } catch (error) {
-        console.error('❌ Failed to generate script tags:', error);
+        Logger.error('❌ Failed to generate script tags:', error);
         showNotification('שגיאה ביצירת תגי סקריפטים', 'error');
     }
 }
@@ -1047,7 +1364,11 @@ function loadPagesForScriptGeneration() {
     }
     
     if (!window.PAGE_CONFIGS) {
-        pageSelect.innerHTML = '<option value="">PAGE_CONFIGS לא זמין</option>';
+        pageSelect.textContent = '';
+        const option = document.createElement('option');
+        option.value = '';
+        option.textContent = 'PAGE_CONFIGS לא זמין';
+        pageSelect.appendChild(option);
         return;
     }
     
@@ -1066,7 +1387,15 @@ function loadPagesForScriptGeneration() {
         optionsHTML += `<option value="${pageId}">${pageName} (${packagesCount} חבילות)</option>`;
     });
     
-    pageSelect.innerHTML = optionsHTML;
+    // Convert HTML string to DOM elements safely
+    if (optionsHTML) {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(optionsHTML, 'text/html');
+        pageSelect.textContent = '';
+        Array.from(doc.body.querySelectorAll('option')).forEach(option => {
+            pageSelect.appendChild(option.cloneNode(true));
+        });
+    }
 }
 
 /**
@@ -1118,7 +1447,11 @@ function generateScriptLoadingCodeForSelectedPage() {
         // Disable button while generating
         if (generateBtn) {
             generateBtn.disabled = true;
-            generateBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> מייצר...';
+            generateBtn.textContent = '';
+            const spinnerIcon = document.createElement('i');
+            spinnerIcon.className = 'fas fa-spinner fa-spin';
+            generateBtn.appendChild(spinnerIcon);
+            generateBtn.appendChild(document.createTextNode(' מייצר...'));
         }
         
         // Check if PageTemplateGenerator is available
@@ -1164,13 +1497,17 @@ function generateScriptLoadingCodeForSelectedPage() {
         showNotification(`✅ קוד טעינה נוצר בהצלחה עבור: ${pageConfig.name || pageName}`, 'success');
         
     } catch (error) {
-        console.error('❌ Failed to generate script loading code:', error);
+        Logger.error('❌ Failed to generate script loading code:', error);
         showNotification(`שגיאה בייצור הקוד: ${error.message}`, 'error');
     } finally {
         // Re-enable button
         if (generateBtn) {
             generateBtn.disabled = false;
-            generateBtn.innerHTML = '<i class="fas fa-magic"></i> ייצר קוד טעינה';
+            generateBtn.textContent = '';
+            const magicIcon = document.createElement('i');
+            magicIcon.className = 'fas fa-magic';
+            generateBtn.appendChild(magicIcon);
+            generateBtn.appendChild(document.createTextNode(' ייצר קוד טעינה'));
         }
     }
 }
@@ -1229,7 +1566,7 @@ function showScriptCodeInModal() {
     } else {
         // Fallback - show in alert
         alert('קוד שנוצר:\n\n' + code.substring(0, 500) + '\n\n... (נראה בקונסולה)');
-        console.log('📝 Generated script loading code:', code);
+        Logger.info('📝 Generated script loading code:', code);
     }
 }
 
@@ -1249,14 +1586,14 @@ function copyGeneratedScriptCode() {
             navigator.clipboard.writeText(code).then(() => {
                 showNotification('✅ הקוד הועתק ללוח בהצלחה!', 'success');
             }).catch(err => {
-                console.error('Clipboard API failed:', err);
+                Logger.error('Clipboard API failed:', err);
                 fallbackCopyScriptCode(code);
             });
         } else {
             fallbackCopyScriptCode(code);
         }
     } catch (error) {
-        console.error('Error copying code:', error);
+        Logger.error('Error copying code:', error);
         fallbackCopyScriptCode(code);
     }
 }
@@ -1276,9 +1613,9 @@ function fallbackCopyScriptCode(text) {
         document.execCommand('copy');
         showNotification('✅ הקוד הועתק ללוח בהצלחה!', 'success');
     } catch (err) {
-        console.error('Fallback copy failed:', err);
+        Logger.error('Fallback copy failed:', err);
         showNotification('❌ שגיאה בהעתקה - נא להעתיק ידנית', 'error');
-        console.log('📝 Code to copy:', text);
+        Logger.info('📝 Code to copy:', text);
     } finally {
         document.body.removeChild(textArea);
     }
@@ -1299,7 +1636,7 @@ function escapeHtmlForModal(text) {
 function displayGeneratedContent(type, content) {
     const container = document.getElementById('generatedContent');
     
-    container.innerHTML = `
+    const generatedHTML = `
         <div class="generated-content">
             <div class="generated-header">
                 <h4>📄 ${type} שנוצר</h4>
@@ -1310,6 +1647,16 @@ function displayGeneratedContent(type, content) {
             <pre class="generated-code"><code>${escapeHtml(content)}</code></pre>
         </div>
     `;
+    
+    // Convert HTML string to DOM elements safely
+    if (generatedHTML) {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(generatedHTML, 'text/html');
+        container.textContent = '';
+        Array.from(doc.body.childNodes).forEach(node => {
+            container.appendChild(node.cloneNode(true));
+        });
+    }
     
     // Store content for copying
     window.generatedContent = {
@@ -1333,7 +1680,7 @@ async function copyToClipboard(type) {
     try {
         await pageTemplateGenerator.copyToClipboard(content);
     } catch (error) {
-        console.error('❌ Failed to copy to clipboard:', error);
+        Logger.error('❌ Failed to copy to clipboard:', error);
         showNotification('שגיאה בהעתקה ללוח', 'error');
     }
 }
@@ -1354,7 +1701,7 @@ function showNotification(message, type = 'info') {
     if (typeof window.NotificationSystem !== 'undefined' && window.NotificationSystem.showNotification) {
         window.NotificationSystem.showNotification(message, type);
     } else {
-        // console.log(`${type.toUpperCase()}: ${message}`);
+        // Logger.info(`${type.toUpperCase()}: ${message}`);
     }
 }
 
@@ -1364,7 +1711,7 @@ function showNotification(message, type = 'info') {
  * Load advanced monitoring data
  */
 async function loadAdvancedMonitoring() {
-    // console.log('🔍 Loading advanced monitoring...');
+    // Logger.info('🔍 Loading advanced monitoring...');
     
     try {
         await Promise.all([
@@ -1374,9 +1721,9 @@ async function loadAdvancedMonitoring() {
             loadValidationTests()
         ]);
         
-        // console.log('✅ Advanced monitoring loaded');
+        // Logger.info('✅ Advanced monitoring loaded');
     } catch (error) {
-        console.error('❌ Failed to load advanced monitoring:', error);
+        Logger.error('❌ Failed to load advanced monitoring:', error);
         showNotification('שגיאה בטעינת ניטור מתקדם', 'error');
     }
 }
@@ -1391,7 +1738,11 @@ async function loadScriptTests() {
         const tests = await runScriptTests();
         displayTestResults(container, 'בדיקות סקריפטים', tests);
     } catch (error) {
-        container.innerHTML = `<div class="error">שגיאה בטעינת בדיקות סקריפטים: ${error.message}</div>`;
+        container.textContent = '';
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'error';
+        errorDiv.textContent = `שגיאה בטעינת בדיקות סקריפטים: ${error.message}`;
+        container.appendChild(errorDiv);
     }
 }
 
@@ -1405,7 +1756,11 @@ async function loadDependencyTests() {
         const tests = await runDependencyTests();
         displayTestResults(container, 'בדיקות תלויות', tests);
     } catch (error) {
-        container.innerHTML = `<div class="error">שגיאה בטעינת בדיקות תלויות: ${error.message}</div>`;
+        container.textContent = '';
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'error';
+        errorDiv.textContent = `שגיאה בטעינת בדיקות תלויות: ${error.message}`;
+        container.appendChild(errorDiv);
     }
 }
 
@@ -1419,7 +1774,11 @@ async function loadPerformanceTests() {
         const tests = await runPerformanceTests();
         displayTestResults(container, 'בדיקות ביצועים', tests);
     } catch (error) {
-        container.innerHTML = `<div class="error">שגיאה בטעינת בדיקות ביצועים: ${error.message}</div>`;
+        container.textContent = '';
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'error';
+        errorDiv.textContent = `שגיאה בטעינת בדיקות ביצועים: ${error.message}`;
+        container.appendChild(errorDiv);
     }
 }
 
@@ -1433,7 +1792,11 @@ async function loadValidationTests() {
         const tests = await runValidationTests();
         displayTestResults(container, 'בדיקות ולידציה', tests);
     } catch (error) {
-        container.innerHTML = `<div class="error">שגיאה בטעינת בדיקות ולידציה: ${error.message}</div>`;
+        container.textContent = '';
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'error';
+        errorDiv.textContent = `שגיאה בטעינת בדיקות ולידציה: ${error.message}`;
+        container.appendChild(errorDiv);
     }
 }
 
@@ -1735,20 +2098,29 @@ function displayTestResults(container, title, tests) {
     });
     
     html += '</div>';
-    container.innerHTML = html;
+    
+    // Convert HTML string to DOM elements safely
+    if (html) {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        container.textContent = '';
+        Array.from(doc.body.childNodes).forEach(node => {
+            container.appendChild(node.cloneNode(true));
+        });
+    }
 }
 
 /**
  * Run advanced monitoring
  */
 async function runAdvancedMonitoring() {
-    // console.log('🔍 Running advanced monitoring...');
+    // Logger.info('🔍 Running advanced monitoring...');
     
     try {
         await loadAdvancedMonitoring();
         showNotification('בדיקות ניטור מתקדמות הושלמו', 'success');
     } catch (error) {
-        console.error('❌ Failed to run advanced monitoring:', error);
+        Logger.error('❌ Failed to run advanced monitoring:', error);
         showNotification('שגיאה בהרצת בדיקות ניטור', 'error');
     }
 }
@@ -1776,27 +2148,27 @@ function copyDetailedLog() {
     };
     
     const logText = `
-=== TikTrack Advanced Monitoring Log ===
+// === TikTrack Advanced Monitoring Log ===
 תאריך: ${logData.timestamp}
 עמוד: ${logData.page}
 דפדפן: ${logData.userAgent}
 
-=== מערכת אתחול ===
+// === מערכת אתחול ===
 סטטוס: ${logData.systemInfo.unifiedAppStatus}
 חבילות זמינות: ${logData.systemInfo.packageManifest.join(', ')}
 קונפיגורציות עמודים: ${logData.systemInfo.pageConfigs.join(', ')}
 
-=== סקריפטים נטענים ===
+// === סקריפטים נטענים ===
 ${logData.systemInfo.loadedScripts.map((script, index) => `${index + 1}. ${script}`).join('\n')}
 
-=== תוצאות בדיקות ===
+// === תוצאות בדיקות ===
 ${JSON.stringify(logData.tests, null, 2)}
     `.trim();
     
     navigator.clipboard.writeText(logText).then(() => {
         showNotification('לוג מפורט הועתק ללוח', 'success');
     }).catch(err => {
-        console.error('Failed to copy log:', err);
+        Logger.error('Failed to copy log:', err);
         showNotification('שגיאה בהעתקת לוג', 'error');
     });
 }
@@ -1805,11 +2177,11 @@ ${JSON.stringify(logData.tests, null, 2)}
  * Run Comprehensive Tests on All Pages
  */
 async function runComprehensiveTests() {
-    // console.log('🔍 runComprehensiveTests: Starting comprehensive tests for all pages...');
+    // Logger.info('🔍 runComprehensiveTests: Starting comprehensive tests for all pages...');
     
     // Get all page configs
     const allPages = Object.keys(window.PAGE_CONFIGS || {});
-    // console.log('🔍 runComprehensiveTests: Found pages:', allPages);
+    // Logger.info('🔍 runComprehensiveTests: Found pages:', allPages);
     const results = [];
     
     // Summary counters
@@ -1819,15 +2191,15 @@ async function runComprehensiveTests() {
     
     // Test each page
     for (const pageName of allPages) {
-            // console.log(`🔍 runComprehensiveTests: Testing page ${pageName}...`);
+            // Logger.info(`🔍 runComprehensiveTests: Testing page ${pageName}...`);
         const pageConfig = window.PAGE_CONFIGS[pageName];
         if (!pageConfig) {
-            console.log(`❌ runComprehensiveTests: No config found for page ${pageName}`);
+            Logger.info(`❌ runComprehensiveTests: No config found for page ${pageName}`);
             continue;
         }
         
         const pageResult = await testSinglePage(pageName, pageConfig);
-        console.log(`🔍 runComprehensiveTests: Page ${pageName} result:`, pageResult);
+        Logger.info(`🔍 runComprehensiveTests: Page ${pageName} result:`, pageResult);
         results.push(pageResult);
         
         // Update counters
@@ -1839,11 +2211,11 @@ async function runComprehensiveTests() {
             healthyPages++;
         }
         
-        console.log(`🔍 runComprehensiveTests: Updated counters - critical: ${criticalErrors}, mismatches: ${mismatches}, healthy: ${healthyPages}`);
+        Logger.info(`🔍 runComprehensiveTests: Updated counters - critical: ${criticalErrors}, mismatches: ${mismatches}, healthy: ${healthyPages}`);
     }
     
     // Update summary cards
-    console.log('🔍 runComprehensiveTests: Updating summary cards...');
+    Logger.info('🔍 runComprehensiveTests: Updating summary cards...');
     const totalPagesElement = document.getElementById('totalPagesCount');
     const criticalErrorsElement = document.getElementById('criticalErrorsCount');
     const mismatchElement = document.getElementById('mismatchCount');
@@ -1854,14 +2226,14 @@ async function runComprehensiveTests() {
     if (mismatchElement) mismatchElement.textContent = mismatches;
     if (healthyPagesElement) healthyPagesElement.textContent = healthyPages;
     
-    console.log('🔍 runComprehensiveTests: Summary cards updated');
+    Logger.info('🔍 runComprehensiveTests: Summary cards updated');
     
     // Display results in table
-    console.log('🔍 runComprehensiveTests: Displaying results...');
+    Logger.info('🔍 runComprehensiveTests: Displaying results...');
     displayComprehensiveResults(results);
     
-    console.log('✅ runComprehensiveTests: Comprehensive tests completed');
-    console.log('🔍 runComprehensiveTests: Final results summary:', {
+    Logger.info('✅ runComprehensiveTests: Comprehensive tests completed');
+    Logger.info('🔍 runComprehensiveTests: Final results summary:', {
         totalPages: allPages.length,
         criticalErrors,
         mismatches,
@@ -1870,19 +2242,19 @@ async function runComprehensiveTests() {
     });
     
     // Show success notification
-    console.log('🔍 runComprehensiveTests: Showing success notification...');
+    Logger.info('🔍 runComprehensiveTests: Showing success notification...');
     showNotification('בדיקות מקיפות הושלמו בהצלחה', 'success');
-    console.log('🔍 runComprehensiveTests: Success notification shown');
+    Logger.info('🔍 runComprehensiveTests: Success notification shown');
     
     // Final log
-    console.log('🎯 runComprehensiveTests: All done! Check the table for results.');
+    Logger.info('🎯 runComprehensiveTests: All done! Check the table for results.');
 }
 
 /**
  * Test Single Page
  */
 async function testSinglePage(pageName, pageConfig) {
-    console.log(`🔍 testSinglePage: Testing page ${pageName}`);
+    Logger.info(`🔍 testSinglePage: Testing page ${pageName}`);
     const result = {
         pageName: pageName,
         displayName: pageConfig.name || pageName,
@@ -1895,24 +2267,24 @@ async function testSinglePage(pageName, pageConfig) {
     };
     
     // Check for duplicates
-    console.log(`🔍 testSinglePage: Checking duplicates for ${pageName}...`);
+    Logger.info(`🔍 testSinglePage: Checking duplicates for ${pageName}...`);
     const duplicates = checkForDuplicates(pageConfig);
     result.duplicates = duplicates;
     result.criticalErrors += duplicates.length;
-    console.log(`🔍 testSinglePage: Found ${duplicates.length} duplicates for ${pageName}`);
+    Logger.info(`🔍 testSinglePage: Found ${duplicates.length} duplicates for ${pageName}`);
     
     // Check load order
-    console.log(`🔍 testSinglePage: Checking load order for ${pageName}...`);
+    Logger.info(`🔍 testSinglePage: Checking load order for ${pageName}...`);
     const loadOrderIssues = checkLoadOrder(pageConfig);
     result.loadOrderIssues = loadOrderIssues;
     result.criticalErrors += loadOrderIssues.length;
-    console.log(`🔍 testSinglePage: Found ${loadOrderIssues.length} load order issues for ${pageName}`);
+    Logger.info(`🔍 testSinglePage: Found ${loadOrderIssues.length} load order issues for ${pageName}`);
     
     // Check for mismatches (documented vs actual)
-    console.log(`🔍 testSinglePage: Checking mismatches for ${pageName}...`);
+    Logger.info(`🔍 testSinglePage: Checking mismatches for ${pageName}...`);
     const mismatches = await checkForMismatches(pageName, pageConfig);
     result.mismatches = mismatches.length;
-    console.log(`🔍 testSinglePage: Found ${mismatches.length} mismatches for ${pageName}`);
+    Logger.info(`🔍 testSinglePage: Found ${mismatches.length} mismatches for ${pageName}`);
     
     // Determine overall status
     if (result.criticalErrors > 0) {
@@ -1923,7 +2295,7 @@ async function testSinglePage(pageName, pageConfig) {
         result.status = 'success';
     }
     
-    console.log(`🔍 testSinglePage: Final result for ${pageName}:`, result);
+    Logger.info(`🔍 testSinglePage: Final result for ${pageName}:`, result);
     return result;
 }
 
@@ -1986,40 +2358,40 @@ function checkLoadOrder(pageConfig) {
  * Wait for Scripts to be Ready
  */
 async function waitForScriptsReady(requiredScripts) {
-    console.log('🔍 waitForScriptsReady: Starting to wait for scripts:', requiredScripts);
+    Logger.info('🔍 waitForScriptsReady: Starting to wait for scripts:', requiredScripts);
     const maxWaitTime = 15000; // 15 seconds max
     const checkInterval = 500; // Check every 500ms
     let elapsed = 0;
     
     while (elapsed < maxWaitTime) {
-        console.log(`🔍 waitForScriptsReady: Checking at ${elapsed}ms...`);
+        Logger.info(`🔍 waitForScriptsReady: Checking at ${elapsed}ms...`);
         
         const allReady = requiredScripts.every(script => {
             let isReady = false;
             switch (script) {
                 case 'color-scheme-system.js':
                     isReady = window.colorSchemeSystemReady === true;
-                    console.log(`🔍 ${script}: ${isReady} (window.colorSchemeSystemReady = ${window.colorSchemeSystemReady})`);
+                    Logger.info(`🔍 ${script}: ${isReady} (window.colorSchemeSystemReady = ${window.colorSchemeSystemReady})`);
                     break;
                 case 'data-utils.js':
                     isReady = window.dataUtilsReady === true;
-                    console.log(`🔍 ${script}: ${isReady} (window.dataUtilsReady = ${window.dataUtilsReady})`);
+                    Logger.info(`🔍 ${script}: ${isReady} (window.dataUtilsReady = ${window.dataUtilsReady})`);
                     break;
                 case 'date-utils.js':
                     isReady = window.dateUtilsReady === true;
-                    console.log(`🔍 ${script}: ${isReady} (window.dateUtilsReady = ${window.dateUtilsReady})`);
+                    Logger.info(`🔍 ${script}: ${isReady} (window.dateUtilsReady = ${window.dateUtilsReady})`);
                     break;
                 default:
                     isReady = true; // Assume ready if no specific check
-                    console.log(`🔍 ${script}: ${isReady} (default - no specific check)`);
+                    Logger.info(`🔍 ${script}: ${isReady} (default - no specific check)`);
             }
             return isReady;
         });
         
-        console.log(`🔍 waitForScriptsReady: All ready = ${allReady}`);
+        Logger.info(`🔍 waitForScriptsReady: All ready = ${allReady}`);
         
         if (allReady) {
-            console.log('✅ waitForScriptsReady: All scripts are ready!');
+            Logger.info('✅ waitForScriptsReady: All scripts are ready!');
             return true;
         }
         
@@ -2027,7 +2399,7 @@ async function waitForScriptsReady(requiredScripts) {
         elapsed += checkInterval;
     }
     
-    console.log('⏰ waitForScriptsReady: Timeout reached, not all scripts ready');
+    Logger.info('⏰ waitForScriptsReady: Timeout reached, not all scripts ready');
     return false; // Timeout
 }
 
@@ -2036,7 +2408,7 @@ async function waitForScriptsReady(requiredScripts) {
  */
 // checkForMismatches - using global function from monitoring-functions.js
 async function checkForMismatches_OLD(pageName, pageConfig) {
-    console.log(`🔍 checkForMismatches: Starting for page ${pageName}`);
+    Logger.info(`🔍 checkForMismatches: Starting for page ${pageName}`);
     const mismatches = [];
     
     // Get actually loaded scripts from the current page
@@ -2044,31 +2416,31 @@ async function checkForMismatches_OLD(pageName, pageConfig) {
         .map(script => script.src.split('/').pop().split('?')[0])
         .filter(script => script.endsWith('.js'));
     
-    console.log(`🔍 checkForMismatches: Actually loaded scripts:`, loadedScripts);
+    Logger.info(`🔍 checkForMismatches: Actually loaded scripts:`, loadedScripts);
     
     // Get required scripts from documentation
     const documentedScripts = [];
     if (pageConfig.packages) {
-        console.log(`🔍 checkForMismatches: Page packages:`, pageConfig.packages);
+        Logger.info(`🔍 checkForMismatches: Page packages:`, pageConfig.packages);
         for (const pkgName of pageConfig.packages) {
             const pkg = window.PACKAGE_MANIFEST?.[pkgName];
-            console.log(`🔍 checkForMismatches: Package ${pkgName}:`, pkg);
+            Logger.info(`🔍 checkForMismatches: Package ${pkgName}:`, pkg);
             if (pkg && pkg.scripts) {
                 for (const script of pkg.scripts) {
                     if (script.required) {
                         documentedScripts.push(script.file);
-                        console.log(`🔍 checkForMismatches: Documented script: ${script.file}`);
+                        Logger.info(`🔍 checkForMismatches: Documented script: ${script.file}`);
                     }
                 }
             }
         }
     }
     
-    console.log(`🔍 checkForMismatches: Documented scripts:`, documentedScripts);
+    Logger.info(`🔍 checkForMismatches: Documented scripts:`, documentedScripts);
     
     // Check for missing scripts (documented but not loaded)
     const missingScripts = documentedScripts.filter(script => !loadedScripts.includes(script));
-    console.log(`🔍 checkForMismatches: Missing scripts:`, missingScripts);
+    Logger.info(`🔍 checkForMismatches: Missing scripts:`, missingScripts);
     
     // Check for extra scripts (loaded but not documented)
     // Only check scripts that are NOT part of the initialization system or external libraries
@@ -2100,7 +2472,7 @@ async function checkForMismatches_OLD(pageName, pageConfig) {
         !initSystemScripts.includes(script) &&
         !externalLibraries.some(lib => script.includes(lib))
     );
-    console.log(`🔍 checkForMismatches: Extra scripts:`, extraScripts);
+    Logger.info(`🔍 checkForMismatches: Extra scripts:`, extraScripts);
     
     // Check for duplicate scripts
     const scriptCounts = {};
@@ -2111,7 +2483,7 @@ async function checkForMismatches_OLD(pageName, pageConfig) {
             duplicateScripts.push(script);
         }
     }
-    console.log(`🔍 checkForMismatches: Duplicate scripts:`, duplicateScripts);
+    Logger.info(`🔍 checkForMismatches: Duplicate scripts:`, duplicateScripts);
     
     // Check loading order - scripts should be loaded in package order
     const loadingOrderIssues = [];
@@ -2140,7 +2512,7 @@ async function checkForMismatches_OLD(pageName, pageConfig) {
             }
         }
     }
-    console.log(`🔍 checkForMismatches: Loading order issues:`, loadingOrderIssues);
+    Logger.info(`🔍 checkForMismatches: Loading order issues:`, loadingOrderIssues);
     
     // Check for required initialization system elements
     const initSystemElements = [
@@ -2189,8 +2561,8 @@ async function checkForMismatches_OLD(pageName, pageConfig) {
         }
     }
     
-    console.log(`🔍 checkForMismatches: Missing init elements:`, missingInitElements);
-    console.log(`🔍 checkForMismatches: Extra init elements:`, extraInitElements);
+    Logger.info(`🔍 checkForMismatches: Missing init elements:`, missingInitElements);
+    Logger.info(`🔍 checkForMismatches: Extra init elements:`, extraInitElements);
     
     // Check initialization order - critical scripts must be in correct order
     const criticalOrder = [
@@ -2221,14 +2593,14 @@ async function checkForMismatches_OLD(pageName, pageConfig) {
         }
     }
     
-    console.log(`🔍 checkForMismatches: Init order issues:`, initOrderIssues);
+    Logger.info(`🔍 checkForMismatches: Init order issues:`, initOrderIssues);
     
     // Wait for documented scripts that are actually loaded
     const requiredScripts = documentedScripts.filter(script => loadedScripts.includes(script));
     
-    console.log(`🔍 checkForMismatches: Required scripts:`, requiredScripts);
+    Logger.info(`🔍 checkForMismatches: Required scripts:`, requiredScripts);
     await waitForScriptsReady(requiredScripts);
-    console.log(`🔍 checkForMismatches: Scripts ready, checking for mismatches...`);
+    Logger.info(`🔍 checkForMismatches: Scripts ready, checking for mismatches...`);
     
     // Add missing scripts to mismatches
     for (const script of missingScripts) {
@@ -2308,7 +2680,7 @@ async function checkForMismatches_OLD(pageName, pageConfig) {
     if (pageConfig.requiredGlobals) {
         for (const global of pageConfig.requiredGlobals) {
             const globalExists = checkGlobalExists(global);
-            console.log(`🔍 checkForMismatches: Required global ${global} = ${globalExists}`);
+            Logger.info(`🔍 checkForMismatches: Required global ${global} = ${globalExists}`);
             if (!globalExists) {
                 mismatches.push({
                     type: 'missing_global',
@@ -2328,7 +2700,7 @@ async function checkForMismatches_OLD(pageName, pageConfig) {
                     if (script.required && script.globalCheck && loadedScripts.includes(script.file)) {
                         // Check if global exists
                         const globalExists = checkGlobalExists(script.globalCheck);
-                        console.log(`🔍 checkForMismatches: ${script.file} - ${script.globalCheck} = ${globalExists}`);
+                        Logger.info(`🔍 checkForMismatches: ${script.file} - ${script.globalCheck} = ${globalExists}`);
                         if (!globalExists) {
                             mismatches.push({
                                 script: script.file,
@@ -2337,7 +2709,7 @@ async function checkForMismatches_OLD(pageName, pageConfig) {
                                 message: `גלובל חסר: ${script.globalCheck} - נדרש על ידי ${script.file} (חבילה: ${pkgName})`,
                                 severity: 'error'
                             });
-                            console.log(`❌ checkForMismatches: Mismatch found for ${script.file}`);
+                            Logger.info(`❌ checkForMismatches: Mismatch found for ${script.file}`);
                         }
                     }
                 }
@@ -2345,7 +2717,7 @@ async function checkForMismatches_OLD(pageName, pageConfig) {
         }
     }
     
-    console.log(`🔍 checkForMismatches: Found ${mismatches.length} mismatches for page ${pageName}`);
+    Logger.info(`🔍 checkForMismatches: Found ${mismatches.length} mismatches for page ${pageName}`);
     return mismatches;
 }
 
@@ -2378,15 +2750,15 @@ function checkGlobalExists(globalPath) {
         let obj = window;
         for (const part of parts) {
             if (obj[part] === undefined) {
-                console.log(`🔍 checkGlobalExists: ${globalPath} - ${part} is undefined`);
+                Logger.info(`🔍 checkGlobalExists: ${globalPath} - ${part} is undefined`);
                 return false;
             }
             obj = obj[part];
         }
-        console.log(`🔍 checkGlobalExists: ${globalPath} exists and is:`, obj);
+        Logger.info(`🔍 checkGlobalExists: ${globalPath} exists and is:`, obj);
         return true;
     } catch (e) {
-        console.log(`🔍 checkGlobalExists: ${globalPath} - Error:`, e);
+        Logger.info(`🔍 checkGlobalExists: ${globalPath} - Error:`, e);
         return false;
     }
 }
@@ -2395,21 +2767,21 @@ function checkGlobalExists(globalPath) {
  * Display Comprehensive Results
  */
 function displayComprehensiveResults(results) {
-    console.log('🔍 displayComprehensiveResults: Starting to display results...');
-    console.log('🔍 displayComprehensiveResults: Results:', results);
+    Logger.info('🔍 displayComprehensiveResults: Starting to display results...');
+    Logger.info('🔍 displayComprehensiveResults: Results:', results);
     
     const tbody = document.getElementById('comprehensiveTestResults');
     if (!tbody) {
-        console.log('❌ displayComprehensiveResults: comprehensiveTestResults element not found!');
+        Logger.info('❌ displayComprehensiveResults: comprehensiveTestResults element not found!');
         return;
     }
     
-    console.log('🔍 displayComprehensiveResults: Clearing table...');
-    tbody.innerHTML = '';
+    Logger.info('🔍 displayComprehensiveResults: Clearing table...');
+    tbody.textContent = '';
     
-    console.log('🔍 displayComprehensiveResults: Processing results...');
+    Logger.info('🔍 displayComprehensiveResults: Processing results...');
     results.forEach((result, index) => {
-        console.log(`🔍 displayComprehensiveResults: Processing result ${index + 1}/${results.length}:`, result);
+        Logger.info(`🔍 displayComprehensiveResults: Processing result ${index + 1}/${results.length}:`, result);
         const row = document.createElement('tr');
         
         // Status icon and color
@@ -2425,7 +2797,7 @@ function displayComprehensiveResults(results) {
             statusColor = 'text-success';
         }
         
-        row.innerHTML = `
+        const rowHTML = `
             <td><strong>${result.displayName}</strong><br><small class="text-muted">${result.pageName}</small></td>
             <td class="${statusColor}">${statusIcon} ${getStatusText(result.status)}</td>
             <td class="text-center">${result.criticalErrors > 0 ? `<span class="badge bg-danger">${result.criticalErrors}</span>` : '-'}</td>
@@ -2439,11 +2811,23 @@ function displayComprehensiveResults(results) {
             </td>
         `;
         
+        // Convert HTML string to DOM elements safely
+        if (rowHTML) {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(`<tr>${rowHTML}</tr>`, 'text/html');
+            const tempRow = doc.body.querySelector('tr');
+            if (tempRow) {
+                Array.from(tempRow.childNodes).forEach(cell => {
+                    row.appendChild(cell.cloneNode(true));
+                });
+            }
+        }
+        
         tbody.appendChild(row);
-        console.log(`🔍 displayComprehensiveResults: Added row for ${result.pageName}`);
+        Logger.info(`🔍 displayComprehensiveResults: Added row for ${result.pageName}`);
     });
     
-    console.log('🔍 displayComprehensiveResults: All rows added to table');
+    Logger.info('🔍 displayComprehensiveResults: All rows added to table');
 }
 
 /**
@@ -2462,23 +2846,23 @@ function getStatusText(status) {
  * Show Page Details Modal - Detailed Scan Results
  */
 async function showPageDetails(pageName) {
-    console.log(`🔍 showPageDetails: Starting for page: ${pageName}`);
+    Logger.info(`🔍 showPageDetails: Starting for page: ${pageName}`);
     const pageConfig = window.PAGE_CONFIGS[pageName];
     
     if (!pageConfig) {
-        console.log(`❌ showPageDetails: No config found for page ${pageName}`);
+        Logger.info(`❌ showPageDetails: No config found for page ${pageName}`);
         showNotification(`לא נמצא קונפיגורציה לעמוד ${pageName}`, 'error');
         return;
     }
     
-    console.log(`🔍 showPageDetails: Found config for page ${pageName}:`, pageConfig);
+    Logger.info(`🔍 showPageDetails: Found config for page ${pageName}:`, pageConfig);
     
     // Run detailed scan for this specific page
-    console.log(`🔍 showPageDetails: Running detailed scan for ${pageName}...`);
+    Logger.info(`🔍 showPageDetails: Running detailed scan for ${pageName}...`);
     const scanResults = await runDetailedPageScan(pageName, pageConfig);
-    console.log(`🔍 showPageDetails: Scan completed for ${pageName}:`, scanResults);
+    Logger.info(`🔍 showPageDetails: Scan completed for ${pageName}:`, scanResults);
     
-    console.log(`🔍 showPageDetails: Building HTML for ${pageName}...`);
+    Logger.info(`🔍 showPageDetails: Building HTML for ${pageName}...`);
     let detailsHtml = `
         <h5>🔍 תוצאות סריקה מפורטת: ${pageConfig.name || pageName}</h5>
         <hr>
@@ -2609,12 +2993,12 @@ async function showPageDetails(pageName) {
         </div>
     `;
     
-    console.log(`🔍 showPageDetails: Showing modal for ${pageName}...`);
+    Logger.info(`🔍 showPageDetails: Showing modal for ${pageName}...`);
     if (typeof window.showDetailsModal === 'function') {
         window.showDetailsModal(`🔍 סריקה מפורטת: ${pageName}`, detailsHtml);
-        console.log(`🔍 showPageDetails: Modal shown for ${pageName}`);
+        Logger.info(`🔍 showPageDetails: Modal shown for ${pageName}`);
     } else {
-        console.log(`❌ showPageDetails: showDetailsModal function not available`);
+        Logger.info(`❌ showPageDetails: showDetailsModal function not available`);
     }
 }
 
@@ -2623,7 +3007,7 @@ async function showPageDetails(pageName) {
  */
 // runDetailedPageScan - using global function from monitoring-functions.js
 async function runDetailedPageScan_OLD(pageName, pageConfig) {
-    console.log(`🔍 runDetailedPageScan: Starting detailed scan for page ${pageName}`);
+    Logger.info(`🔍 runDetailedPageScan: Starting detailed scan for page ${pageName}`);
     const result = {
         pageName: pageName,
         criticalErrors: 0,
@@ -2644,13 +3028,13 @@ async function runDetailedPageScan_OLD(pageName, pageConfig) {
     result.criticalErrors += loadOrderIssues.length;
     
     // Wait for page to be fully loaded before scanning
-    console.log(`🔍 runDetailedPageScan: Waiting for page ${pageName} to be fully loaded...`);
+    Logger.info(`🔍 runDetailedPageScan: Waiting for page ${pageName} to be fully loaded...`);
     
     // Check if we're on the correct page
     const currentPage = window.location.pathname.split('/').pop().replace('.html', '');
     if (currentPage !== pageName) {
-        console.log(`🔍 runDetailedPageScan: Not on target page. Current: ${currentPage}, Target: ${pageName}`);
-        console.log(`🔍 runDetailedPageScan: Skipping detailed scan - need to be on the actual page`);
+        Logger.info(`🔍 runDetailedPageScan: Not on target page. Current: ${currentPage}, Target: ${pageName}`);
+        Logger.info(`🔍 runDetailedPageScan: Skipping detailed scan - need to be on the actual page`);
         
         // Return empty results since we can't scan a different page
         return {
@@ -2669,16 +3053,16 @@ async function runDetailedPageScan_OLD(pageName, pageConfig) {
     
     // Wait for page to be fully loaded
     await waitForPageFullyLoaded();
-    console.log(`🔍 runDetailedPageScan: Page ${pageName} fully loaded, proceeding with scan...`);
+    Logger.info(`🔍 runDetailedPageScan: Page ${pageName} fully loaded, proceeding with scan...`);
     
     // Check for mismatches (documented vs actual)
-    console.log(`🔍 runDetailedPageScan: Checking mismatches for ${pageName}...`);
+    Logger.info(`🔍 runDetailedPageScan: Checking mismatches for ${pageName}...`);
     const mismatches = await checkForMismatches(pageName, pageConfig);
     result.mismatchDetails = mismatches;
     result.mismatches = mismatches.length;
-    console.log(`🔍 runDetailedPageScan: Found ${mismatches.length} mismatches for ${pageName}`);
+    Logger.info(`🔍 runDetailedPageScan: Found ${mismatches.length} mismatches for ${pageName}`);
     
-    console.log(`🔍 runDetailedPageScan: Final result for ${pageName}:`, result);
+    Logger.info(`🔍 runDetailedPageScan: Final result for ${pageName}:`, result);
     return result;
 }
 
@@ -2745,7 +3129,7 @@ function exportTestResults() {
     
     URL.revokeObjectURL(url);
     
-    console.log('✅ Test results exported');
+    Logger.info('✅ Test results exported');
 }
 
 /**
@@ -2762,7 +3146,7 @@ function copyAllResults() {
     navigator.clipboard.writeText(resultsText).then(() => {
         showNotification('תוצאות הועתקו ללוח', 'success');
     }).catch(err => {
-        console.error('Failed to copy results:', err);
+        Logger.error('Failed to copy results:', err);
         showNotification('שגיאה בהעתקת תוצאות', 'error');
     });
 }
@@ -2807,7 +3191,7 @@ function copyComprehensiveResults() {
     navigator.clipboard.writeText(resultsText).then(() => {
         showNotification('תוצאות בדיקות הועתקו ללוח', 'success');
     }).catch(err => {
-        console.error('Failed to copy comprehensive results:', err);
+        Logger.error('Failed to copy comprehensive results:', err);
         showNotification('שגיאה בהעתקת תוצאות בדיקות', 'error');
     });
 }
@@ -2866,7 +3250,7 @@ function copyDetailedPageResults() {
     navigator.clipboard.writeText(copyText).then(() => {
         showNotification('תוצאות הסריקה המפורטת הועתקו ללוח', 'success');
     }).catch(err => {
-        console.error('Failed to copy detailed results:', err);
+        Logger.error('Failed to copy detailed results:', err);
         showNotification('שגיאה בהעתקת התוצאות המפורטות', 'error');
     });
 }
@@ -2905,7 +3289,7 @@ function copyPackagesList() {
     navigator.clipboard.writeText(copyText).then(() => {
         showNotification('רשימת חבילות הועתקה ללוח', 'success');
     }).catch(err => {
-        console.error('Failed to copy packages list:', err);
+        Logger.error('Failed to copy packages list:', err);
         showNotification('שגיאה בהעתקת רשימת חבילות', 'error');
     });
 }
@@ -2930,7 +3314,7 @@ function copyGeneratedContent() {
     navigator.clipboard.writeText(content).then(() => {
         showNotification('תוכן הועתק ללוח', 'success');
     }).catch(err => {
-        console.error('Failed to copy generated content:', err);
+        Logger.error('Failed to copy generated content:', err);
         showNotification('שגיאה בהעתקת תוכן', 'error');
     });
 }
@@ -2973,7 +3357,7 @@ function copyPagesMapping() {
     navigator.clipboard.writeText(copyText).then(() => {
         showNotification('מיפוי עמודים הועתק ללוח', 'success');
     }).catch(err => {
-        console.error('Failed to copy pages mapping:', err);
+        Logger.error('Failed to copy pages mapping:', err);
         showNotification('שגיאה בהעתקת מיפוי עמודים', 'error');
     });
 }
@@ -3020,7 +3404,7 @@ function copyPerformanceReport() {
     navigator.clipboard.writeText(copyText).then(() => {
         showNotification('דוח ביצועים הועתק ללוח', 'success');
     }).catch(err => {
-        console.error('Failed to copy performance report:', err);
+        Logger.error('Failed to copy performance report:', err);
         showNotification('שגיאה בהעתקת דוח ביצועים', 'error');
     });
 }

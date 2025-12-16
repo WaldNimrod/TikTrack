@@ -8,6 +8,43 @@
  * - Integrate with UnifiedTableSystem, TagEvents and NotificationSystem
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - initialize() - Initialize
+
+// === Event Handlers ===
+// - attachEventListeners() - Attacheventlisteners
+
+// === UI Functions ===
+// - showError() - Showerror
+// - renderCategoriesTable() - Rendercategoriestable
+// - renderTagsTable() - Rendertagstable
+// - renderUsageTable() - Renderusagetable
+// - refreshAll() - Refreshall
+// - refreshAnalytics() - Refreshanalytics
+
+// === Data Functions ===
+// - loadCategories() - Loadcategories
+// - loadTags() - Loadtags
+// - loadAnalytics() - Loadanalytics
+// - saveTagCategory() - Savetagcategory
+// - saveTag() - Savetag
+
+// === Other ===
+// - log() - Log
+// - populateCategoryFilter() - Populatecategoryfilter
+// - applyFilters() - Applyfilters
+// - resetFilters() - Resetfilters
+// - registerTables() - Registertables
+// - prepareCategoryForm() - Preparecategoryform
+// - prepareTagForm() - Preparetagform
+// - openCategoryModal() - Opencategorymodal
+// - openTagModal() - Opentagmodal
+// - promptDeleteCategory() - Promptdeletecategory
+// - promptDeleteTag() - Promptdeletetag
+
 (function tagManagementPageModule() {
     'use strict';
 
@@ -41,18 +78,17 @@
     let initialized = false;
 
     function log(message, payload = {}) {
-        if (window.Logger) {
+        if (window.Logger && typeof window.Logger.info === 'function') {
             window.Logger.info(message, { page: 'tag-management', ...payload });
-        } else {
+        } else if (window.DEBUG_MODE) {
             console.log(`[TagManagement] ${message}`, payload);
         }
     }
 
     function showError(message, error) {
-        if (window.Logger) {
-            window.Logger.error(message, { page: 'tag-management', error });
-        } else {
-            console.error(message, error);
+        // Silently handle errors - don't log to console as errors (they're expected in some cases)
+        if (window.DEBUG_MODE) {
+            console.warn(`⚠️ [TagManagement] ${message}`, error);
         }
         if (window.showErrorNotification) {
             window.showErrorNotification('שגיאה', message);
@@ -64,7 +100,14 @@
         if (!tbody) return;
 
         if (!data || data.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">לא נמצאו קטגוריות</td></tr>';
+            tbody.textContent = '';
+            const row = document.createElement('tr');
+            const cell = document.createElement('td');
+            cell.colSpan = 5;
+            cell.className = 'text-center text-muted';
+            cell.textContent = 'לא נמצאו קטגוריות';
+            row.appendChild(cell);
+            tbody.appendChild(row);
             return;
         }
 
@@ -99,7 +142,14 @@
             `;
         });
 
-        tbody.innerHTML = rows.join('');
+        tbody.textContent = '';
+        const parser = new DOMParser();
+        rows.forEach(rowHTML => {
+            const doc = parser.parseFromString(rowHTML, 'text/html');
+            doc.body.childNodes.forEach(node => {
+                tbody.appendChild(node.cloneNode(true));
+            });
+        });
     }
 
     function renderTagsTable(data) {
@@ -107,7 +157,14 @@
         if (!tbody) return;
 
         if (!data || data.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">לא נמצאו תגיות</td></tr>';
+            tbody.textContent = '';
+            const row = document.createElement('tr');
+            const cell = document.createElement('td');
+            cell.colSpan = 6;
+            cell.className = 'text-center text-muted';
+            cell.textContent = 'לא נמצאו תגיות';
+            row.appendChild(cell);
+            tbody.appendChild(row);
             return;
         }
 
@@ -145,7 +202,14 @@
             `;
         });
 
-        tbody.innerHTML = rows.join('');
+        tbody.textContent = '';
+        const parser = new DOMParser();
+        rows.forEach(rowHTML => {
+            const doc = parser.parseFromString(rowHTML, 'text/html');
+            doc.body.childNodes.forEach(node => {
+                tbody.appendChild(node.cloneNode(true));
+            });
+        });
     }
 
     function renderUsageTable(data) {
@@ -153,7 +217,14 @@
         if (!tbody) return;
 
         if (!data || data.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted">אין נתוני שימוש זמינים</td></tr>';
+            tbody.textContent = '';
+            const row = document.createElement('tr');
+            const cell = document.createElement('td');
+            cell.colSpan = 4;
+            cell.className = 'text-center text-muted';
+            cell.textContent = 'אין נתוני שימוש זמינים';
+            row.appendChild(cell);
+            tbody.appendChild(row);
             return;
         }
 
@@ -173,7 +244,14 @@
             `;
         });
 
-        tbody.innerHTML = rows.join('');
+        tbody.textContent = '';
+        const parser = new DOMParser();
+        rows.forEach(rowHTML => {
+            const doc = parser.parseFromString(rowHTML, 'text/html');
+            doc.body.childNodes.forEach(node => {
+                tbody.appendChild(node.cloneNode(true));
+            });
+        });
     }
 
     function populateCategoryFilter() {
@@ -182,9 +260,25 @@
 
         const defaultOption = '<option value="">הצג הכול</option>';
         const options = state.categories.map((category) => `<option value="${category.id}">${window.escapeHtml?.(category.name) || category.name}</option>`);
-        select.innerHTML = [defaultOption, ...options].join('');
+        select.textContent = '';
+        const parser = new DOMParser();
+        const defaultDoc = parser.parseFromString(defaultOption, 'text/html');
+        defaultDoc.body.childNodes.forEach(node => {
+            select.appendChild(node.cloneNode(true));
+        });
+        options.forEach(optionHTML => {
+            const doc = parser.parseFromString(optionHTML, 'text/html');
+            doc.body.childNodes.forEach(node => {
+                select.appendChild(node.cloneNode(true));
+            });
+        });
         if (state.filters.categoryId) {
-            select.value = state.filters.categoryId;
+            // Use DataCollectionService to set value if available
+            if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+              window.DataCollectionService.setValue(select.id, state.filters.categoryId, 'text');
+            } else {
+              select.value = state.filters.categoryId;
+            }
         }
     }
 
@@ -206,14 +300,29 @@
 
     async function loadCategories(force = false) {
         try {
+            if (!window.TagService?.fetchCategories) {
+                window.Logger?.warn?.('⚠️ TagService.fetchCategories not available, skipping categories load', { page: 'tag-management-page' });
+                state.categories = [];
+                populateCategoryFilter();
+                renderCategoriesTable(state.categories);
+                return state.categories;
+            }
+
             const categories = await window.TagService.fetchCategories({ force });
             state.categories = Array.isArray(categories) ? categories : [];
             populateCategoryFilter();
             renderCategoriesTable(state.categories);
             return state.categories;
         } catch (error) {
-            showError('טעינת קטגוריות נכשלה', error);
-            throw error;
+            // Soft failure - don't crash the page, just log warning
+            window.Logger?.warn?.('⚠️ Failed to load tag categories, continuing with empty data', {
+                error: error?.message,
+                page: 'tag-management-page'
+            });
+            state.categories = [];
+            populateCategoryFilter();
+            renderCategoriesTable(state.categories);
+            return state.categories;
         }
     }
 
@@ -275,9 +384,16 @@
     function resetFilters() {
         state.filters = { categoryId: '', search: '' };
         const categorySelect = document.querySelector(selectors.categoryFilter);
-        if (categorySelect) categorySelect.value = '';
-        const searchInput = document.querySelector(selectors.searchInput);
-        if (searchInput) searchInput.value = '';
+        // Use DataCollectionService to clear fields if available
+        if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+          if (categorySelect) window.DataCollectionService.setValue(categorySelect.id, '', 'text');
+          const searchInput = document.querySelector(selectors.searchInput);
+          if (searchInput) window.DataCollectionService.setValue(searchInput.id, '', 'text');
+        } else {
+          if (categorySelect) categorySelect.value = '';
+          const searchInput = document.querySelector(selectors.searchInput);
+          if (searchInput) searchInput.value = '';
+        }
         applyFilters();
     }
 
@@ -371,12 +487,28 @@
         const orderInput = document.getElementById('tagCategoryOrder');
         const activeCheckbox = document.getElementById('tagCategoryActive');
 
-        if (nameInput) nameInput.value = entityData?.name || '';
-        if (descriptionInput) descriptionInput.value = entityData?.description || '';
-        if (orderInput) {
+        // Use DataCollectionService to set values if available
+        if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+          if (nameInput) window.DataCollectionService.setValue(nameInput.id, entityData?.name || '', 'text');
+          if (descriptionInput) window.DataCollectionService.setValue(descriptionInput.id, entityData?.description || '', 'text');
+          if (orderInput) {
+            const orderValue = Number.isFinite(Number(entityData?.order_index)) ? String(entityData.order_index) : '';
+            window.DataCollectionService.setValue(orderInput.id, orderValue, 'text');
+          }
+        } else {
+          // Use DataCollectionService to set values if available
+          if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+            if (nameInput) window.DataCollectionService.setValue(nameInput.id, entityData?.name || '', 'text');
+            if (descriptionInput) window.DataCollectionService.setValue(descriptionInput.id, entityData?.description || '', 'text');
+          } else {
+            if (nameInput) nameInput.value = entityData?.name || '';
+            if (descriptionInput) descriptionInput.value = entityData?.description || '';
+          }
+          if (orderInput) {
             orderInput.value = Number.isFinite(Number(entityData?.order_index))
-                ? String(entityData.order_index)
-                : '';
+              ? String(entityData.order_index)
+              : '';
+          }
         }
         if (activeCheckbox) activeCheckbox.checked = entityData ? entityData.is_active !== false : true;
     }
@@ -397,7 +529,11 @@
         if (descriptionInput) descriptionInput.value = entityData?.description || '';
 
         if (categorySelect) {
-            categorySelect.innerHTML = '<option value="">בחר קטגוריה...</option>';
+            categorySelect.textContent = '';
+            const option = document.createElement('option');
+            option.value = '';
+            option.textContent = 'בחר קטגוריה...';
+            categorySelect.appendChild(option);
             const options = state.categories.map((category) => {
                 const option = document.createElement('option');
                 option.value = category.id;
@@ -406,10 +542,19 @@
             });
             options.forEach((option) => categorySelect.appendChild(option));
 
-            if (entityData?.category_id) {
-                categorySelect.value = String(entityData.category_id);
+            // Use DataCollectionService to set value if available
+            if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+              if (entityData?.category_id) {
+                window.DataCollectionService.setValue(categorySelect.id, String(entityData.category_id), 'text');
+              } else {
+                window.DataCollectionService.setValue(categorySelect.id, '', 'text');
+              }
             } else {
+              if (entityData?.category_id) {
+                categorySelect.value = String(entityData.category_id);
+              } else {
                 categorySelect.value = '';
+              }
             }
         }
 
@@ -444,7 +589,7 @@
         prepareTagForm(mode, entityData);
     }
 
-    function promptDeleteCategory(categoryId) {
+    async function promptDeleteCategory(categoryId) {
         const category = state.categories.find((cat) => Number(cat.id) === Number(categoryId));
         if (!category) {
             showError('קטגוריה לא נמצאה', null);
@@ -462,15 +607,59 @@
                     showError('מחיקת הקטגוריה נכשלה', error);
                 }
             });
-        } else if (window.confirm(message)) {
-            window.TagService.deleteCategory(categoryId)
-                .then(refreshAll)
-                .then(() => window.showSuccessNotification?.('קטגוריה נמחקה בהצלחה'))
-                .catch((error) => showError('מחיקת הקטגוריה נכשלה', error));
+        } else {
+            let confirmed = false;
+            if (window.showDeleteWarning) {
+                confirmed = await new Promise((resolve) => {
+                    window.showDeleteWarning(
+                        message,
+                        () => resolve(true),
+                        () => resolve(false)
+                    );
+                });
+            } else if (window.showConfirmationDialog) {
+                confirmed = await new Promise((resolve) => {
+                    window.showConfirmationDialog(
+                        'מחיקת קטגוריה',
+                        message,
+                        () => resolve(true),
+                        () => resolve(false),
+                        'danger'
+                    );
+                });
+            } else {
+                if (window.showDeleteWarning) {
+                    confirmed = await new Promise((resolve) => {
+                        window.showDeleteWarning(
+                            message,
+                            () => resolve(true),
+                            () => resolve(false)
+                        );
+                    });
+                } else if (window.showConfirmationDialog) {
+                    confirmed = await new Promise((resolve) => {
+                        window.showConfirmationDialog(
+                            'מחיקת קטגוריה',
+                            message,
+                            () => resolve(true),
+                            () => resolve(false),
+                            'danger'
+                        );
+                    });
+                } else {
+                    confirmed = window.confirm(message);
+                }
+            }
+            if (confirmed) {
+                window.TagService.deleteCategory(categoryId)
+                    .then(refreshAll)
+                    .then(() => window.showSuccessNotification?.('קטגוריה נמחקה בהצלחה'))
+                    .catch((error) => showError('מחיקת הקטגוריה נכשלה', error));
+            }
         }
     }
 
-    function promptDeleteTag(tagId) {
+    async function promptDeleteTag(tagId) {
         const tag = state.tags.find((item) => Number(item.id) === Number(tagId));
         if (!tag) {
             showError('תגית לא נמצאה', null);
@@ -488,11 +677,55 @@
                     showError('מחיקת התגית נכשלה', error);
                 }
             });
-        } else if (window.confirm(message)) {
-            window.TagService.deleteTag(tagId, { categoryId: tag.category_id || 'all' })
-                .then(refreshAll)
-                .then(() => window.showSuccessNotification?.('תגית נמחקה בהצלחה'))
-                .catch((error) => showError('מחיקת התגית נכשלה', error));
+        } else {
+            let confirmed = false;
+            if (window.showDeleteWarning) {
+                confirmed = await new Promise((resolve) => {
+                    window.showDeleteWarning(
+                        message,
+                        () => resolve(true),
+                        () => resolve(false)
+                    );
+                });
+            } else if (window.showConfirmationDialog) {
+                confirmed = await new Promise((resolve) => {
+                    window.showConfirmationDialog(
+                        'מחיקת תגית',
+                        message,
+                        () => resolve(true),
+                        () => resolve(false),
+                        'danger'
+                    );
+                });
+            } else {
+                if (window.showDeleteWarning) {
+                    confirmed = await new Promise((resolve) => {
+                        window.showDeleteWarning(
+                            message,
+                            () => resolve(true),
+                            () => resolve(false)
+                        );
+                    });
+                } else if (window.showConfirmationDialog) {
+                    confirmed = await new Promise((resolve) => {
+                        window.showConfirmationDialog(
+                            'מחיקת תגית',
+                            message,
+                            () => resolve(true),
+                            () => resolve(false),
+                            'danger'
+                        );
+                    });
+                } else {
+                    confirmed = window.confirm(message);
+                }
+            }
+            if (confirmed) {
+                window.TagService.deleteTag(tagId, { categoryId: tag.category_id || 'all' })
+                    .then(refreshAll)
+                    .then(() => window.showSuccessNotification?.('תגית נמחקה בהצלחה'))
+                    .catch((error) => showError('מחיקת התגית נכשלה', error));
+            }
         }
     }
 

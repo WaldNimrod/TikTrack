@@ -21,6 +21,35 @@
  * Last Updated: 2025-01-27
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Event Handlers ===
+// - cloneFiltersForStorage() - Clonefiltersforstorage
+// - tableSorterPrepareUpdateFunction() - Tablesorterprepareupdatefunction
+
+// === Data Functions ===
+// - getTableOverride() - Gettableoverride
+// - getTableIdFromSelector() - Gettableidfromselector
+// - getValueByPath() - Getvaluebypath
+// - registryAwareGetter() - Registryawaregetter
+
+// === API Functions ===
+// - safeCall() - Safecall
+
+// === Other ===
+// - toArray() - Toarray
+// - normalizeText() - Normalizetext
+// - flattenValue() - Flattenvalue
+// - toDate() - Todate
+// - resolveChainSource() - Resolvechainsource
+// - release() - Release
+// - releaseSorter() - Releasesorter
+// - fallbackResolver() - Fallbackresolver
+// - finalize() - Finalize
+// - mergedCustom() - Mergedcustom
+// - resolvedSearchFields() - Resolvedsearchfields
+
 // ===== TABLE REGISTRY =====
 
 /**
@@ -1570,20 +1599,35 @@ class TableFilter {
 
   _filterData(tableType, dataset, context, config) {
     const dataArray = Array.isArray(dataset) ? dataset : [];
+    // Fallback: if no active filters, show all data
     if (!context.hasActiveFilters) {
       return [...dataArray];
     }
 
-    const filterConfig = this._resolveFilterConfig(tableType, config);
+    // Fallback: if filtering fails, show all data
+    try {
+      const filterConfig = this._resolveFilterConfig(tableType, config);
 
-    return dataArray.filter(item =>
-      this._matchesStatus(tableType, item, context.normalized, filterConfig) &&
-        this._matchesType(tableType, item, context.normalized, filterConfig) &&
-        this._matchesAccount(item, context.normalized, filterConfig) &&
-        this._matchesDateRange(item, context.normalized, filterConfig) &&
-        this._matchesSearch(item, context.normalized, filterConfig) &&
-        this._matchesCustom(tableType, item, context, config),
-    );
+      return dataArray.filter(item =>
+        this._matchesStatus(tableType, item, context.normalized, filterConfig) &&
+          this._matchesType(tableType, item, context.normalized, filterConfig) &&
+          this._matchesAccount(item, context.normalized, filterConfig) &&
+          this._matchesDateRange(item, context.normalized, filterConfig) &&
+          this._matchesSearch(item, context.normalized, filterConfig) &&
+          this._matchesCustom(tableType, item, context, config),
+      );
+    } catch (error) {
+      if (window.Logger) {
+        window.Logger.warn('TableFilter._filterData: filtering failed, showing all data', {
+          tableType,
+          error: error?.message || error,
+        }, { page: 'unified-table-system' });
+      } else {
+        console.warn('TableFilter._filterData: filtering failed, showing all data', tableType, error);
+      }
+      // Fallback: show all data if filtering fails
+      return [...dataArray];
+    }
   }
 
   _matchesStatus(tableType, item, normalized, filterConfig) {
@@ -1592,8 +1636,9 @@ class TableFilter {
     }
     const fields = filterConfig.statusFields && filterConfig.statusFields.length > 0 ? filterConfig.statusFields : ['status'];
     const candidates = this._extractFieldValues(item, fields);
+    // If table doesn't have status field, ignore this filter (show all)
     if (candidates.length === 0) {
-      return false;
+      return true;
     }
 
     const universe = new Set([...normalized.status.universe, ...candidates.map(value => String(value))]);
@@ -1611,8 +1656,9 @@ class TableFilter {
     }
     const fields = filterConfig.typeFields && filterConfig.typeFields.length > 0 ? filterConfig.typeFields : ['type'];
     const candidates = this._extractFieldValues(item, fields);
+    // If table doesn't have type field, ignore this filter (show all)
     if (candidates.length === 0) {
-      return false;
+      return true;
     }
 
     const universe = new Set([...normalized.type.universe, ...candidates.map(value => String(value))]);
@@ -1630,8 +1676,9 @@ class TableFilter {
     }
     const fields = filterConfig.accountFields && filterConfig.accountFields.length > 0 ? filterConfig.accountFields : ['account_name', 'account'];
     const candidates = this._extractFieldValues(item, fields);
+    // If table doesn't have account field, ignore this filter (show all)
     if (candidates.length === 0) {
-      return false;
+      return true;
     }
     return candidates.some(candidate => normalized.account.set.has(normalizeText(candidate)));
   }
@@ -1643,8 +1690,9 @@ class TableFilter {
     }
     const fields = filterConfig.dateFields && filterConfig.dateFields.length > 0 ? filterConfig.dateFields : ['date', 'created_at'];
     const candidates = this._extractFieldValues(item, fields);
+    // If table doesn't have date field, ignore this filter (show all)
     if (candidates.length === 0) {
-      return false;
+      return true;
     }
     return candidates.some(candidate => {
       const date = toDate(candidate);

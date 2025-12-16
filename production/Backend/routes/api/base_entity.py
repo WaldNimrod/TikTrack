@@ -19,8 +19,9 @@ Date: September 23, 2025
 
 from typing import Dict, List, Any, Optional, Tuple
 from sqlalchemy.orm import Session
-from flask import jsonify, request
+from flask import jsonify, request, g
 import logging
+import inspect
 from datetime import datetime
 
 from services.date_normalization_service import DateNormalizationService
@@ -68,16 +69,41 @@ class BaseEntityAPI:
             normalizer = self._get_date_normalizer()
             self.logger.info(f"Getting all {self.entity_name} records")
             
+            # Get user_id from Flask context (set by auth middleware)
+            user_id = getattr(g, 'user_id', None)
+
             # Get records from service directly (no cache for CRUD tables)
             # This ensures fresh data on every request
             if hasattr(self.service_class, 'get_all'):
-                # Check if service.get_all accepts filters parameter
-                import inspect
+                # Check if service.get_all accepts user_id parameter
                 sig = inspect.signature(self.service_class.get_all)
-                if len(sig.parameters) > 1:
-                    records = self.service_class.get_all(db, filters)
+                params = list(sig.parameters.keys())
+                has_user_id_param = 'user_id' in params
+
+                print(f"DEBUG: user_id={user_id}, entity={self.entity_name}, has_user_id_param={has_user_id_param}")
+                self.logger.info(f"BaseEntityAPI.get_all: user_id from g={user_id}, entity={self.entity_name}")
+                params = list(sig.parameters.keys())
+                self.logger.info(f"Service {self.service_class.__name__}.get_all params: {params}")
+
+                if 'user_id' in params and user_id is not None:
+                    # Service supports user_id filtering
+                    print(f"DEBUG: Calling service with user_id={user_id}")
+                    self.logger.info(f"Calling service with user_id={user_id}")
+                    if len(sig.parameters) > 2 and 'filters' in params:
+                        records = self.service_class.get_all(db, filters, user_id=user_id)
+                    elif len(sig.parameters) > 1:
+                        records = self.service_class.get_all(db, user_id=user_id)
+                    else:
+                        print(f"DEBUG: Service has user_id param but signature doesn't match")
+                        self.logger.warning(f"Service has user_id param but signature doesn't match, calling without user_id")
+                        records = self.service_class.get_all(db)
                 else:
-                    records = self.service_class.get_all(db)
+                    print(f"DEBUG: No user_id filtering - user_id={user_id}, has_param={'user_id' in params}")
+                    self.logger.warning(f"No user_id in service params or user_id is None, calling without filtering")
+                    if len(sig.parameters) > 1 and 'filters' in params:
+                        records = self.service_class.get_all(db, filters)
+                    else:
+                        records = self.service_class.get_all(db)
                 
                 # If service returns enhanced data (dicts), use it directly
                 if records and isinstance(records[0], dict):
@@ -87,7 +113,11 @@ class BaseEntityAPI:
                     data = [record.to_dict() if hasattr(record, 'to_dict') else record for record in records]
             else:
                 # Fallback to direct query if service doesn't have get_all
-                records = db.query(self.service_class.model).all()
+                query = db.query(self.service_class.model)
+                # Add user_id filter if model has user_id and user_id is available
+                if user_id is not None and hasattr(self.service_class.model, 'user_id'):
+                    query = query.filter(self.service_class.model.user_id == user_id)
+                records = query.all()
                 data = [record.to_dict() if hasattr(record, 'to_dict') else record for record in records]
             
             data = normalizer.normalize_output(data)
@@ -113,14 +143,26 @@ class BaseEntityAPI:
             normalizer = self._get_date_normalizer()
             self.logger.info(f"Getting {self.entity_name} record with ID: {entity_id}")
             
+            # Get user_id from Flask context (set by auth middleware)
+            user_id = getattr(g, 'user_id', None)
+            
             # Get record from service
             if hasattr(self.service_class, 'get_by_id'):
-                record = self.service_class.get_by_id(db, entity_id)
+                # Check if service.get_by_id accepts user_id parameter
+
+                sig = inspect.signature(self.service_class.get_by_id)
+                if 'user_id' in sig.parameters:
+                    record = self.service_class.get_by_id(db, entity_id, user_id=user_id)
+                else:
+                    record = self.service_class.get_by_id(db, entity_id)
             else:
-                # Fallback to direct query
-                record = db.query(self.service_class.model).filter(
+                # Fallback to direct query (with user_id filter if model has user_id)
+                query = db.query(self.service_class.model).filter(
                     self.service_class.model.id == entity_id
-                ).first()
+                )
+                if user_id is not None and hasattr(self.service_class.model, 'user_id'):
+                    query = query.filter(self.service_class.model.user_id == user_id)
+                record = query.first()
             
             if not record:
                 return self._error_response(f"{self.entity_name.title()} with ID {entity_id} not found", normalizer), 404
@@ -154,15 +196,29 @@ class BaseEntityAPI:
             if not self._validate_required_fields(data, required_fields):
                 return self._error_response("Missing required fields", normalizer), 400
             
+            # Get user_id from Flask context (set by auth middleware)
+            user_id = getattr(g, 'user_id', None)
+            
             # Sanitize input
             sanitized_data = self._sanitize_input(data)
             normalized_data = normalizer.normalize_input_payload(sanitized_data)
             
             # Create record via service
             if hasattr(self.service_class, 'create'):
-                record = self.service_class.create(db, normalized_data)
+                # Check if service.create accepts user_id parameter
+
+                sig = inspect.signature(self.service_class.create)
+                if 'user_id' in sig.parameters:
+                    record = self.service_class.create(db, normalized_data, user_id=user_id)
+                else:
+                    # If service doesn't accept user_id, add it to data if model has user_id
+                    if user_id is not None and hasattr(self.service_class.model, 'user_id') and 'user_id' not in normalized_data:
+                        normalized_data['user_id'] = user_id
+                    record = self.service_class.create(db, normalized_data)
             else:
                 # Fallback to direct creation
+                if user_id is not None and hasattr(self.service_class.model, 'user_id') and 'user_id' not in normalized_data:
+                    normalized_data['user_id'] = user_id
                 record = self.service_class.model(**normalized_data)
                 db.add(record)
                 db.commit()
@@ -194,13 +250,24 @@ class BaseEntityAPI:
             normalizer = self._get_date_normalizer()
             self.logger.info(f"Updating {self.entity_name} record with ID: {entity_id}")
             
-            # Check if record exists
+            # Get user_id from Flask context (set by auth middleware)
+            user_id = getattr(g, 'user_id', None)
+            
+            # Check if record exists (with user_id check)
             if hasattr(self.service_class, 'get_by_id'):
-                existing_record = self.service_class.get_by_id(db, entity_id)
+
+                sig = inspect.signature(self.service_class.get_by_id)
+                if 'user_id' in sig.parameters:
+                    existing_record = self.service_class.get_by_id(db, entity_id, user_id=user_id)
+                else:
+                    existing_record = self.service_class.get_by_id(db, entity_id)
             else:
-                existing_record = db.query(self.service_class.model).filter(
+                query = db.query(self.service_class.model).filter(
                     self.service_class.model.id == entity_id
-                ).first()
+                )
+                if user_id is not None and hasattr(self.service_class.model, 'user_id'):
+                    query = query.filter(self.service_class.model.user_id == user_id)
+                existing_record = query.first()
             
             if not existing_record:
                 return self._error_response(f"{self.entity_name.title()} with ID {entity_id} not found", normalizer), 404
@@ -211,7 +278,12 @@ class BaseEntityAPI:
             
             # Update record via service
             if hasattr(self.service_class, 'update'):
-                record = self.service_class.update(db, entity_id, normalized_data)
+
+                sig = inspect.signature(self.service_class.update)
+                if 'user_id' in sig.parameters:
+                    record = self.service_class.update(db, entity_id, normalized_data, user_id=user_id)
+                else:
+                    record = self.service_class.update(db, entity_id, normalized_data)
             else:
                 # Fallback to direct update
                 for key, value in normalized_data.items():
@@ -247,20 +319,66 @@ class BaseEntityAPI:
             normalizer = self._get_date_normalizer()
             self.logger.info(f"Deleting {self.entity_name} record with ID: {entity_id}")
             
-            # Check if record exists
+            # Get user_id from Flask context (set by auth middleware)
+            user_id = getattr(g, 'user_id', None)
+            
+            # Check if record exists (with user_id check)
             if hasattr(self.service_class, 'get_by_id'):
-                existing_record = self.service_class.get_by_id(db, entity_id)
+
+                sig = inspect.signature(self.service_class.get_by_id)
+                if 'user_id' in sig.parameters:
+                    existing_record = self.service_class.get_by_id(db, entity_id, user_id=user_id)
+                else:
+                    existing_record = self.service_class.get_by_id(db, entity_id)
             else:
-                existing_record = db.query(self.service_class.model).filter(
+                query = db.query(self.service_class.model).filter(
                     self.service_class.model.id == entity_id
-                ).first()
+                )
+                if user_id is not None and hasattr(self.service_class.model, 'user_id'):
+                    query = query.filter(self.service_class.model.user_id == user_id)
+                existing_record = query.first()
             
             if not existing_record:
                 return self._error_response(f"{self.entity_name.title()} with ID {entity_id} not found", normalizer), 404
             
+            # Remove tag associations before deleting the entity
+            # Note: Event listeners will also handle this automatically, but this ensures cleanup
+            # even if event listeners fail or are not triggered
+            try:
+                from services.tag_service import TagService
+                
+                # Map entity_name to entity_type
+                entity_type_map = {
+                    'cash_flows': 'cash_flow',
+                    'trades': 'trade',
+                    'trade_plans': 'trade_plan',
+                    'executions': 'execution',
+                    'trading_accounts': 'trading_account',
+                    'tickers': 'ticker',
+                    'alerts': 'alert',
+                    'notes': 'note',
+                }
+                
+                entity_type = entity_type_map.get(self.entity_name)
+                if entity_type:
+                    TagService.remove_all_tags_for_entity(
+                        db, entity_type, entity_id
+                    )
+            except Exception as tag_error:
+                self.logger.warning(
+                    "Failed to remove tags for %s %s before deletion: %s",
+                    self.entity_name, entity_id, tag_error
+                )
+                # Continue with deletion even if tag cleanup fails
+            
             # Delete record via service
             if hasattr(self.service_class, 'delete'):
-                self.service_class.delete(db, entity_id)
+
+                sig = inspect.signature(self.service_class.delete)
+                if 'user_id' in sig.parameters:
+                    self.service_class.delete(db, entity_id, user_id=user_id)
+                else:
+                    self.service_class.delete(db, entity_id)
             else:
                 # Fallback to direct deletion
                 db.delete(existing_record)

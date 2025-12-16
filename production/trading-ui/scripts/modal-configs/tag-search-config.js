@@ -5,6 +5,12 @@
  * Lightweight drawer rendered via ModalManagerV2 for displaying quick tag search results.
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - initializeTagSearchDrawer() - Initializetagsearchdrawer
+
 const tagSearchDrawerConfig = {
     id: 'tagSearchDrawer',
     entityType: 'tag_search',
@@ -27,13 +33,13 @@ const tagSearchDrawerConfig = {
                         <div class="d-flex flex-wrap gap-2">
                             <button data-button-type="REFRESH"
                                     data-variant="small"
-                                    data-icon="⟳"
+                                    data-icon="refresh"
                                     data-text=""
                                     data-onclick="TagSearchController?.refreshLastSearch({ force: true })"
                                     title="רענון תוצאות"></button>
                             <button data-button-type="LINK"
                                     data-variant="full"
-                                    data-icon="🏠"
+                                    data-icon="home"
                                     data-text="ניהול תגיות"
                                     data-onclick="TagSearchController?.navigateToTagManagement()"
                                     title="פתח עמוד ניהול תגיות"></button>
@@ -68,7 +74,7 @@ const tagSearchDrawerConfig = {
                             <button type="button"
                                     data-button-type="SECONDARY"
                                     data-variant="full"
-                                    data-icon="➕"
+                                    data-icon="plus"
                                     data-text="טען עוד"
                                     data-onclick="TagSearchController?.loadMoreResults()"
                                     id="tagSearchLoadMoreBtn"></button>

@@ -171,7 +171,13 @@ const CACHE_DEPENDENCIES = {
         'accounts-data',
         'cash-flows-data'
     ],
-    'statistics-data': ['trades-data', 'executions-data']
+    'statistics-data': ['trades-data', 'executions-data'],
+    
+    // Historical Data Level
+    'trade-history-data': ['trades', 'executions', 'trade-plans'],
+    'portfolio-state-snapshot-*': ['executions', 'market_data_quotes', 'trades'],
+    'portfolio-state-series-*': ['executions', 'market_data_quotes', 'trades'],
+    'trading-journal-*': ['notes', 'trades', 'executions']
 };
 
 // TTL Policies Configuration
@@ -179,6 +185,7 @@ const TTL_POLICIES = {
     'user-preferences': 'long',      // 24 hours
     'preference-data': 'medium',
     'preference-single': 'medium',
+    'ai-analysis-response': 'short', // 2 hours - AI analysis responses
     'preference-group': 'medium',
     'preference-multiple': 'medium',
     'preference-groups': 'long',
@@ -220,6 +227,7 @@ class UnifiedCacheManager {
         this.cache = new Map();
         this.db = null;
         this.hits = 0;
+        this.misses = 0;
         this.responseTimes = [];
         this.stats = {
             operations: {
@@ -256,12 +264,23 @@ class UnifiedCacheManager {
             'ui-state': { layer: 'localStorage', ttl: 3600000, compress: false },
             'filter-state': { layer: 'localStorage', ttl: 3600000, compress: false },
             'notifications-history': { layer: 'indexedDB', ttl: 86400000, compress: true },
+            'ai-analysis-response-*': { layer: 'indexedDB', ttl: 7200000, compress: true }, // 2 hours - AI responses (large data)
             'file-mappings': { layer: 'indexedDB', ttl: null, compress: true },
             'linter-results': { layer: 'indexedDB', ttl: 86400000, compress: true },
             'js-analysis': { layer: 'indexedDB', ttl: 86400000, compress: true },
             'market-data': { layer: 'backend', ttl: 30000, compress: false },
             'alerts-data': { layer: 'memory', ttl: 60000, compress: false, dependencies: ['accounts-data'] },
             'alert-{id}': { layer: 'memory', ttl: 60000, compress: false, dependencies: ['alerts-data'] },
+            // Historical Data Services
+            'trade-history-data': { layer: 'backend', ttl: 300000, compress: false, dependencies: ['trades', 'executions', 'trade-plans'] },
+            'trade-history-statistics-*': { layer: 'backend', ttl: 300000, compress: false },
+            'trade-history-aggregated-*': { layer: 'backend', ttl: 300000, compress: false },
+            'trade-history-plan-vs-execution-*': { layer: 'backend', ttl: 300000, compress: false },
+            'portfolio-state-snapshot-*': { layer: 'backend', ttl: 600000, compress: false, dependencies: ['executions', 'market_data_quotes', 'trades'] },
+            'portfolio-state-series-*': { layer: 'backend', ttl: 600000, compress: false },
+            'portfolio-state-performance-*': { layer: 'backend', ttl: 600000, compress: false },
+            'portfolio-state-comparison-*': { layer: 'backend', ttl: 600000, compress: false },
+            'trading-journal-*': { layer: 'backend', ttl: 180000, compress: false, dependencies: ['notes', 'trades', 'executions'] },
             'trading-accounts-data': { layer: 'memory', ttl: 60000, compress: false, dependencies: ['user-preferences'] },
             'trading-account-{id}': { layer: 'memory', ttl: 60000, compress: false, dependencies: ['trading-accounts-data'] },
             'executions-data': { layer: 'memory', ttl: 45000, compress: false, dependencies: ['accounts-data'] },
@@ -274,7 +293,46 @@ class UnifiedCacheManager {
             'account-balance-*': { layer: 'backend', ttl: 60000, compress: false, dependencies: ['accounts-data', 'cash-flows-data', 'executions-data'] },
             'positions-account-*': { layer: 'backend', ttl: 300000, compress: false, dependencies: ['executions', 'market_data_quotes'] },
             'portfolio-*': { layer: 'backend', ttl: 300000, compress: false, dependencies: ['executions', 'market_data_quotes'] },
-            'portfolio-summary-*': { layer: 'backend', ttl: 300000, compress: false, dependencies: ['executions', 'market_data_quotes'] }
+            'portfolio-summary-*': { layer: 'backend', ttl: 300000, compress: false, dependencies: ['executions', 'market_data_quotes'] },
+            // Trade History - Timeline and Chart Data (IndexedDB, 2 days for historical data)
+            'trade-history-timeline-*': { 
+                layer: 'indexedDB', 
+                ttl: 172800000, // 2 days (prod) / 86400000 (dev - 1 day)
+                compress: true, 
+                dependencies: ['trades', 'executions', 'trade-plans', 'notes', 'alerts', 'cash-flows'] 
+            },
+            'trade-history-chart-data-*': { 
+                layer: 'indexedDB', 
+                ttl: 172800000, // 2 days (prod) / 86400000 (dev - 1 day)
+                compress: true, 
+                dependencies: ['trades', 'executions', 'market_data_quotes'] 
+            },
+            'trade-history-position-data-*': { 
+                layer: 'indexedDB', 
+                ttl: 172800000, // 2 days
+                compress: true, 
+                dependencies: ['trades', 'executions'] 
+            },
+            'trade-history-pl-data-*': { 
+                layer: 'indexedDB', 
+                ttl: 172800000, // 2 days
+                compress: true, 
+                dependencies: ['trades', 'executions', 'market_data_quotes'] 
+            },
+            // Trade History - Statistics (Backend cache, shorter TTL for dynamic data)
+            'trade-history-statistics-*': { 
+                layer: 'backend', 
+                ttl: 300000, // 5 minutes (dev) / 600000 (prod - 10 minutes)
+                compress: false, 
+                dependencies: ['trades', 'executions'] 
+            },
+            // Trade History - Full Analysis (IndexedDB, 2 days - unified endpoint)
+            'trade-history-full-analysis-*': { 
+                layer: 'indexedDB', 
+                ttl: 172800000, // 2 days (prod) / 86400000 (dev - 1 day)
+                compress: true, 
+                dependencies: ['trades', 'executions', 'trade-plans', 'notes', 'alerts', 'cash-flows', 'market_data_quotes'] 
+            }
         };
         
         // ממשקי שכבות מטמון
@@ -284,6 +342,38 @@ class UnifiedCacheManager {
             indexedDB: null, // יאותחל מאוחר יותר
             backend: new BackendCacheLayer()
         };
+    }
+
+    /**
+     * Build cache key with user_id for multi-user support
+     * @param {string} key - Base cache key
+     * @param {number|null} userId - User ID (optional, will try to get from current user)
+     * @returns {string} - Cache key with user_id prefix
+     */
+    buildUserCacheKey(key, userId = null) {
+        // Get user_id if not provided
+        if (userId === null) {
+            try {
+                const currentUser = (typeof window !== 'undefined' && window.getCurrentUser && typeof window.getCurrentUser === 'function')
+                    ? window.getCurrentUser()
+                    : (typeof getCurrentUser === 'function' 
+                        ? getCurrentUser() 
+                        : (typeof window !== 'undefined' && window.TikTrackAuth && typeof window.TikTrackAuth.getCurrentUser === 'function'
+                            ? window.TikTrackAuth.getCurrentUser()
+                            : null));
+                userId = currentUser?.id || currentUser?.user_id || 1; // Default to 1 if no user
+            } catch (e) {
+                userId = 1; // Fallback to default user
+            }
+        }
+        
+        // If key already contains user_id, return as-is
+        if (key.includes(`:u${userId}:`) || key.startsWith(`u${userId}:`)) {
+            return key;
+        }
+        
+        // Add user_id prefix: u{userId}:{original_key}
+        return `u${userId}:${key}`;
     }
 
     /**
@@ -313,18 +403,23 @@ class UnifiedCacheManager {
      */
     async initialize() {
         try {
-            // window.Logger.info('🔄 Initializing Unified Cache Manager...', { page: "unified-cache-manager" });
+            window.Logger.info('🔄 Initializing Unified Cache Manager...', { page: "unified-cache-manager" });
             
             // אתחול IndexedDB
             if (window.indexedDB) {
-                this.layers.indexedDB = new IndexedDBLayer();
-                await this.layers.indexedDB.initialize();
-            } else {
-                if (typeof window.Logger !== 'undefined' && window.Logger.warn) {
-                    window.Logger.warn('⚠️ IndexedDB not available, using localStorage fallback', { page: "unified-cache-manager" });
-                } else {
-                    console.warn('⚠️ IndexedDB not available, using localStorage fallback');
+                try {
+                    this.layers.indexedDB = new IndexedDBLayer();
+                    const indexedDBResult = await this.layers.indexedDB.initialize();
+                    if (!indexedDBResult) {
+                        window.Logger.warn('⚠️ IndexedDB initialization returned false, using localStorage fallback', { page: "unified-cache-manager" });
+                        this.layers.indexedDB = new LocalStorageLayer();
+                    }
+                } catch (indexedDBError) {
+                    window.Logger.error('❌ IndexedDB initialization failed, using localStorage fallback', indexedDBError, { page: "unified-cache-manager" });
+                    this.layers.indexedDB = new LocalStorageLayer();
                 }
+            } else {
+                window.Logger.warn('⚠️ IndexedDB not available, using localStorage fallback', { page: "unified-cache-manager" });
                 this.layers.indexedDB = new LocalStorageLayer();
             }
             
@@ -337,28 +432,28 @@ class UnifiedCacheManager {
             await this.updateStats();
             
             this.initialized = true;
-            // window.Logger.info('✅ Unified Cache Manager initialized successfully', { page: "unified-cache-manager" });
-            
-            // הודעת הצלחה - מועברת להודעה סופית
-            // if (window.notificationSystem) {
-            //     window.notificationSystem.showNotification(
-            //         'מערכת מטמון מאוחדת אותחלה בהצלחה',
-            //         'success'
-            //     );
-            // }
+            window.Logger.info('✅ Unified Cache Manager initialized successfully', { page: "unified-cache-manager" });
             
             return true;
         } catch (error) {
-            window.Logger.error('❌ Failed to initialize Unified Cache Manager:', error, { page: "unified-cache-manager" });
+            window.Logger.error('❌ Failed to initialize Unified Cache Manager:', error, { 
+                page: "unified-cache-manager",
+                errorMessage: error.message,
+                errorStack: error.stack
+            });
             
-            // הודעת שגיאה
-            if (window.notificationSystem) {
-                window.notificationSystem.showNotification(
-                    'שגיאה באתחול מערכת מטמון מאוחדת',
-                    'error'
-                );
+            // הודעת שגיאה (Fallback למערכת ההתראות הכללית)
+            const notifyError =
+                window.NotificationSystem?.showError
+                || window.NotificationSystem?.showNotification
+                || window.showErrorNotification
+                || window.notificationSystem?.showNotification;
+            if (typeof notifyError === 'function') {
+                notifyError('שגיאה באתחול מערכת מטמון מאוחדת', 'error');
             }
             
+            // Don't throw - let the system continue with localStorage fallback
+            this.initialized = false;
             return false;
         }
     }
@@ -372,8 +467,13 @@ class UnifiedCacheManager {
      */
     async save(key, data, options = {}) {
         if (!this.initialized) {
-            window.Logger.warn('⚠️ Unified Cache Manager not initialized', { page: "unified-cache-manager" });
-            return false;
+            window.Logger.error('❌ Unified Cache Manager not initialized - cannot save', { page: "unified-cache-manager", key });
+            throw new Error('UnifiedCacheManager not initialized');
+        }
+        
+        // Add user_id to cache key for multi-user support (unless explicitly disabled)
+        if (options.includeUserId !== false) {
+            key = this.buildUserCacheKey(key, options.userId);
         }
 
         const startTime = performance.now();
@@ -428,8 +528,13 @@ class UnifiedCacheManager {
      */
     async get(key, options = {}) {
         if (!this.initialized) {
-            window.Logger.warn('⚠️ Unified Cache Manager not initialized', { page: "unified-cache-manager" });
-            return options.fallback ? await options.fallback() : null;
+            window.Logger.error('❌ Unified Cache Manager not initialized - cannot get', { page: "unified-cache-manager", key });
+            throw new Error('UnifiedCacheManager not initialized');
+        }
+        
+        // Add user_id to cache key for multi-user support (unless explicitly disabled)
+        if (options.includeUserId !== false) {
+            key = this.buildUserCacheKey(key, options.userId);
         }
 
         const startTime = performance.now();
@@ -447,8 +552,9 @@ class UnifiedCacheManager {
                         this.stats.layers[layer].entries++;
                         
                         const responseTime = performance.now() - startTime;
+                        this.hits++; // Increment hit counter
                         this.updatePerformanceStats(responseTime, true);
-                        
+
                         // window.Logger.info(`✅ Retrieved ${key} from ${layer} layer (${responseTime.toFixed(2, { page: "unified-cache-manager" })}ms)`);
                         return data;
                     }
@@ -469,8 +575,9 @@ class UnifiedCacheManager {
             }
             
             const responseTime = performance.now() - startTime;
+            this.misses++; // Increment miss counter
             this.updatePerformanceStats(responseTime, false);
-            
+
             window.Logger.debug(`❌ Key ${key} not found in any layer`, { page: "unified-cache-manager" });
             return null;
             
@@ -581,11 +688,11 @@ class UnifiedCacheManager {
                     avgResponseTime: this.responseTimes.length > 0 
                         ? this.responseTimes.reduce((a, b) => a + b, 0) / this.responseTimes.length 
                         : 0,
-                    hitRate: this.stats.operations.get > 0 
-                        ? (this.hits / this.stats.operations.get * 100).toFixed(2) 
+                    hitRate: (this.hits + this.misses) > 0
+                        ? (this.hits / (this.hits + this.misses) * 100).toFixed(2)
                         : 0,
-                    missRate: this.stats.operations.get > 0 
-                        ? ((this.stats.operations.get - this.hits) / this.stats.operations.get * 100).toFixed(2) 
+                    missRate: (this.hits + this.misses) > 0
+                        ? (this.misses / (this.hits + this.misses) * 100).toFixed(2)
                         : 0
                 }
             };
@@ -612,8 +719,13 @@ class UnifiedCacheManager {
      */
     async remove(key, options = {}) {
         if (!this.initialized) {
-            window.Logger.warn('⚠️ Unified Cache Manager not initialized', { page: "unified-cache-manager" });
-            return false;
+            window.Logger.error('❌ Unified Cache Manager not initialized - cannot remove', { page: "unified-cache-manager", key });
+            throw new Error('UnifiedCacheManager not initialized');
+        }
+
+        // Add user_id to cache key for multi-user support (unless explicitly disabled)
+        if (options.includeUserId !== false) {
+            key = this.buildUserCacheKey(key, options.userId);
         }
 
         try {
@@ -773,8 +885,8 @@ class UnifiedCacheManager {
      */
     async clear(type = 'all', options = {}) {
         if (!this.initialized) {
-            window.Logger.warn('⚠️ Unified Cache Manager not initialized', { page: "unified-cache-manager" });
-            return false;
+            window.Logger.error('❌ Unified Cache Manager not initialized - cannot clear', { page: "unified-cache-manager", type });
+            throw new Error('UnifiedCacheManager not initialized');
         }
 
         try {
@@ -807,12 +919,14 @@ class UnifiedCacheManager {
             if (cleared) {
                 window.Logger.info(`✅ Cleared ${type} cache`, { page: "unified-cache-manager" });
                 
-                // הודעת הצלחה
-                if (window.notificationSystem) {
-                    window.notificationSystem.showNotification(
-                        `מטמון ${type} נוקה בהצלחה`,
-                        'success'
-                    );
+                // הודעת הצלחה (Fallback למערכת ההתראות הכללית)
+                const notifySuccess =
+                    window.NotificationSystem?.showSuccess
+                    || window.NotificationSystem?.showNotification
+                    || window.showNotification
+                    || window.notificationSystem?.showNotification;
+                if (typeof notifySuccess === 'function') {
+                    notifySuccess(`מטמון ${type} נוקה בהצלחה`, 'success');
                 }
             }
             
@@ -1229,34 +1343,51 @@ class IndexedDBLayer {
     }
 
     async initialize() {
-        if (window.indexedDB) {
-            // Create database instance
-            return new Promise((resolve, reject) => {
-                const request = window.indexedDB.open('UnifiedCacheDB', 2);
-                
-                request.onerror = () => {
-                    window.Logger.error('❌ IndexedDB open failed', { page: "unified-cache-manager" });
-                    reject(request.error);
-                };
-                
-                request.onsuccess = () => {
-                    this.db = request.result;
-                    // window.Logger.info('✅ IndexedDB Layer initialized', { page: "unified-cache-manager" });
-                    resolve(true);
-                };
-                
-                request.onupgradeneeded = (event) => {
-                    const db = event.target.result;
-                    if (!db.objectStoreNames.contains('unified-cache')) {
-                        const store = db.createObjectStore('unified-cache', { keyPath: 'key' });
-                        store.createIndex('timestamp', 'timestamp', { unique: false });
-                        window.Logger.info('✅ IndexedDB object store created', { page: "unified-cache-manager" });
-                    }
-                };
-            });
+        if (!window.indexedDB) {
+            window.Logger.warn('⚠️ IndexedDB not available', { page: "unified-cache-manager" });
+            return false;
         }
-        window.Logger.warn('⚠️ IndexedDB not available', { page: "unified-cache-manager" });
-        return false;
+        
+        // Create database instance with timeout
+        return new Promise((resolve, reject) => {
+            const timeout = setTimeout(() => {
+                reject(new Error('IndexedDB initialization timeout after 5 seconds'));
+            }, 5000);
+            
+            const request = window.indexedDB.open('UnifiedCacheDB', 2);
+            
+            request.onerror = () => {
+                clearTimeout(timeout);
+                const error = request.error || new Error('IndexedDB open failed');
+                window.Logger.error('❌ IndexedDB open failed', { 
+                    page: "unified-cache-manager",
+                    error: error.message,
+                    code: error.code,
+                    name: error.name
+                });
+                reject(error);
+            };
+            
+            request.onsuccess = () => {
+                clearTimeout(timeout);
+                this.db = request.result;
+                window.Logger.info('✅ IndexedDB Layer initialized', { page: "unified-cache-manager" });
+                resolve(true);
+            };
+            
+            request.onupgradeneeded = (event) => {
+                const db = event.target.result;
+                if (!db.objectStoreNames.contains('unified-cache')) {
+                    const store = db.createObjectStore('unified-cache', { keyPath: 'key' });
+                    store.createIndex('timestamp', 'timestamp', { unique: false });
+                    window.Logger.info('✅ IndexedDB object store created', { page: "unified-cache-manager" });
+                }
+            };
+            
+            request.onblocked = () => {
+                window.Logger.warn('⚠️ IndexedDB blocked - waiting for other connections', { page: "unified-cache-manager" });
+            };
+        });
     }
 
     async save(key, data, policy) {
@@ -2119,6 +2250,46 @@ UnifiedCacheManager.prototype.clearAllCache = async function(options = {}) {
                 /ModalConfig$/    // e.g., tradePlansModalConfig
             ];
             
+            // Critical services that should NEVER be deleted (they are not cache, they are system services)
+            const protectedServices = [
+                'PreferencesData',      // Preferences data service (API layer)
+                'PreferencesCore',      // Preferences core system
+                'PreferencesManager',   // Preferences manager
+                'PreferencesCache',     // Preferences cache manager
+                'PreferencesEvents',    // Preferences event system
+                'PreferencesUI',       // Preferences UI system
+                'PreferencesUIV4',      // Preferences UI V4
+                'LazyLoader',           // Lazy loader system
+                'UnifiedCacheManager',  // Cache manager itself
+                'Logger',              // Logger service
+                'NotificationSystem',   // Notification system
+                'ModalManagerV2',      // Modal manager
+                'HeaderSystem',        // Header system
+                'ButtonSystem',        // Button system
+                'IconSystem',          // Icon system
+                'FieldRendererService', // Field renderer service
+                'InfoSummarySystem',   // Info summary system
+                'TableDataRegistry',   // Table data registry
+                'UnifiedTableSystem',  // Unified table system
+                'EntityDetailsAPI',    // Entity details API
+                'EntityDetailsRenderer', // Entity details renderer
+                'EntityDetailsModal',  // Entity details modal
+                'ColorSchemeSystem',   // Color scheme system
+                'ColorManager',        // Color manager
+                'ExternalDataService', // External data service
+                'YahooFinanceService', // Yahoo Finance service
+                'TickerService',       // Ticker service
+                'AccountService',      // Account service
+                'AlertService',        // Alert service
+                'TradePlanService',    // Trade plan service
+                'LinkedItemsService',  // Linked items service
+                'PaginationSystem',    // Pagination system
+                'EventHandlerManager', // Event handler manager
+                'PageStateManager',    // Page state manager
+                'CacheSyncManager',    // Cache sync manager
+                'CacheTTLGuard',      // Cache TTL guard
+            ];
+            
             let dynamicCleared = 0;
             for (const key in window) {
                 // Skip standard window properties and functions
@@ -2128,6 +2299,11 @@ UnifiedCacheManager.prototype.clearAllCache = async function(options = {}) {
                     key === 'indexedDB' || key === 'document' || key === 'navigator' ||
                     typeof window[key] === 'function' || key.startsWith('on') ||
                     key === 'location' || key === 'history' || key === 'screen') {
+                    continue;
+                }
+                
+                // NEVER delete critical system services
+                if (protectedServices.includes(key)) {
                     continue;
                 }
                 
@@ -3098,7 +3274,8 @@ UnifiedCacheManager.prototype.getKeyPolicy = function(key) {
  */
 UnifiedCacheManager.prototype.refreshUserPreferences = async function(targetProfileId = null, groupName = null, options = {}) {
     const opts = (Array.isArray(options) ? { preferenceNames: options } : (options || {}));
-    console.log('🔍 DEBUG: refreshUserPreferences() called with targetProfileId:', targetProfileId, 'groupName:', groupName, 'options:', opts);
+    // Removed verbose DEBUG log - use Logger.debug with verbose mode if needed
+    // console.log('🔍 DEBUG: refreshUserPreferences() called with targetProfileId:', targetProfileId, 'groupName:', groupName, 'options:', opts);
     
     try {
         const userId =
@@ -3137,7 +3314,8 @@ UnifiedCacheManager.prototype.refreshUserPreferences = async function(targetProf
         const profileIdList = Array.from(profileIds);
         const preferenceNames = Array.isArray(opts.preferenceNames) ? opts.preferenceNames : [];
         
-        console.log('🔍 DEBUG: refreshUserPreferences resolved userId:', userId, 'profileIdList:', profileIdList);
+        // Removed verbose DEBUG log - use Logger.debug with verbose mode if needed
+        // console.log('🔍 DEBUG: refreshUserPreferences resolved userId:', userId, 'profileIdList:', profileIdList);
         
         const normalizeKey = (key) =>
             key.startsWith('tiktrack_') ? key.substring('tiktrack_'.length) : key;
@@ -3189,13 +3367,14 @@ UnifiedCacheManager.prototype.refreshUserPreferences = async function(targetProf
             matchesPreferenceName(normalizedKey) &&
             matchesProfile(normalizedKey);
         
-        console.log('🔍 DEBUG: Getting all keys from UnifiedCacheManager...');
+        // Removed verbose DEBUG logs - use Logger.debug with verbose mode if needed
+        // console.log('🔍 DEBUG: Getting all keys from UnifiedCacheManager...');
         const keys = await this.getAllKeys();
-        console.log('🔍 DEBUG: getAllKeys() returned:', keys.length, 'keys');
+        // console.log('🔍 DEBUG: getAllKeys() returned:', keys.length, 'keys');
         
-        console.log('🔍 DEBUG: Getting keys directly from localStorage...');
+        // console.log('🔍 DEBUG: Getting keys directly from localStorage...');
         const localStorageKeys = Object.keys(localStorage);
-        console.log('🔍 DEBUG: localStorage has', localStorageKeys.length, 'total keys');
+        // console.log('🔍 DEBUG: localStorage has', localStorageKeys.length, 'total keys');
         
         const keysToRemove = new Set();
         
@@ -3228,34 +3407,53 @@ UnifiedCacheManager.prototype.refreshUserPreferences = async function(targetProf
         let removedCount = 0;
         for (const normalizedKey of keysToRemove) {
             try {
-                console.log(`🗑️ DEBUG: Processing normalized key: ${normalizedKey}`);
+                // Removed verbose DEBUG logs - use Logger.debug with verbose mode if needed
+                // console.log(`🗑️ DEBUG: Processing normalized key: ${normalizedKey}`);
                 
                 const prefixedKey = `tiktrack_${normalizedKey}`;
                 
+                // CRITICAL: Remove from ALL layers using UnifiedCacheManager.remove()
+                // This ensures memory, localStorage, and IndexedDB are all cleared
+                // console.log(`🗑️ DEBUG: Removing ${normalizedKey} from all cache layers`);
+                const removed1 = await this.remove(normalizedKey);
+                if (removed1) removedCount++;
+                
+                // Also remove prefixed version
+                // console.log(`🗑️ DEBUG: Removing ${prefixedKey} from all cache layers`);
+                const removed2 = await this.remove(prefixedKey);
+                if (removed2) removedCount++;
+                
+                // Fallback: Direct localStorage cleanup (in case UnifiedCacheManager missed it)
                 if (localStorage.getItem(normalizedKey) !== null) {
                     localStorage.removeItem(normalizedKey);
                     removedCount++;
-                    console.log(`✅ DEBUG: Removed ${normalizedKey} from localStorage`);
-                    window.Logger.debug(`🗑️ Removed ${normalizedKey} from localStorage`, { page: "unified-cache-manager" });
+                    // console.log(`✅ DEBUG: Fallback removed ${normalizedKey} from localStorage`);
                 }
                 
                 if (localStorage.getItem(prefixedKey) !== null) {
                     localStorage.removeItem(prefixedKey);
                     removedCount++;
-                    console.log(`✅ DEBUG: Removed ${prefixedKey} from localStorage`);
-                    window.Logger.debug(`🗑️ Removed ${prefixedKey} from localStorage`, { page: "unified-cache-manager" });
+                    // console.log(`✅ DEBUG: Fallback removed ${prefixedKey} from localStorage`);
                 }
                 
-                console.log(`🗑️ DEBUG: Trying UnifiedCacheManager.remove("${normalizedKey}")`);
-                await this.remove(normalizedKey);
+                // console.log(`✅ DEBUG: Removed ${normalizedKey} from all cache layers`);
             } catch (removeError) {
                 console.error(`❌ DEBUG: Failed to remove key ${normalizedKey}:`, removeError);
                 window.Logger.warn(`⚠️ Failed to remove key ${normalizedKey}:`, removeError, { page: "unified-cache-manager" });
             }
         }
         
-        console.log(`✅ DEBUG: Successfully removed ${removedCount} key entries from localStorage`);
-        console.log('✅ DEBUG: Cache cleared successfully - preferences will be reloaded by caller');
+        // Removed verbose DEBUG log - use Logger.debug with verbose mode if needed
+        // console.log(`✅ DEBUG: Successfully removed ${removedCount} key entries from localStorage`);
+        
+        // OPTIMIZED: Don't reload after cache clear - only clear cache
+        // Reloading should be done explicitly when needed, not automatically
+        // This prevents unnecessary API calls after save operations
+        window.Logger?.info?.('✅ Cache cleared - no automatic reload (use PreferencesManager.refreshGroup() if needed)', {
+            page: "unified-cache-manager",
+            groupName,
+            preferenceNames: preferenceNames.length,
+        });
         
     } catch (error) {
         console.error('❌ DEBUG: Error in refreshUserPreferences:', error);

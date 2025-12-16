@@ -69,6 +69,7 @@ from config.settings import (
     HOST,
     PORT,
     IS_PRODUCTION,
+    IS_TESTING,
     ENVIRONMENT,
     UI_DIR
 )
@@ -2832,7 +2833,12 @@ if __name__ == "__main__":
     # - Notification system works without WebSockets
     
     # Display server startup information
-    env_name = "PRODUCTION" if IS_PRODUCTION else "DEVELOPMENT"
+    if IS_PRODUCTION:
+        env_name = "PRODUCTION"
+    elif IS_TESTING:
+        env_name = "TESTING"
+    else:
+        env_name = "DEVELOPMENT"
     print("🚀 Starting TikTrack Server...")
     print(f"🌍 Environment: {env_name}")
     print(f"📡 Server running on port {PORT}")

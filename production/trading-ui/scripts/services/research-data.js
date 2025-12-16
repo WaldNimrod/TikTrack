@@ -6,6 +6,22 @@
  * without touching page logic.
  */
 (function researchDataService() {
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - buildUrl() - Buildurl
+
+// === Data Functions ===
+// - fetchResearchDataFromApi() - Fetchresearchdatafromapi
+// - loadResearchData() - Loadresearchdata
+
+// === Utility Functions ===
+// - invalidateCache() - Invalidatecache
+
+// === Other ===
+// - resolveBaseUrl() - Resolvebaseurl
+
   const CACHE_KEY = 'research-data';
   const DEFAULT_TTL = 2 * 60 * 1000; // 2 minutes – dashboard style
   const PAGE_LOG_CONTEXT = { page: 'research-data' };
@@ -44,8 +60,13 @@
           Accept: 'application/json',
           'Cache-Control': 'no-cache',
         },
-        signal: options.signal,
+        signal: options.signal, // Include cookies for session-based auth
       });
+      
+      // Handle 401/308 authentication errors
+      if (window.checkAndHandleAuthError && window.checkAndHandleAuthError(response, endpoint)) {
+        throw new Error('Authentication required');
+      }
 
       if (!response.ok) {
         throw new Error(`Research API unavailable (${response.status})`);

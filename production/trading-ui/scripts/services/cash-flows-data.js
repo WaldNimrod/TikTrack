@@ -5,6 +5,45 @@
  * Ensures every operation uses UnifiedCacheManager + CacheTTLGuard policies.
  */
 (function cashFlowsDataService() {
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - buildUrl() - Buildurl
+// - buildUrlWithParams() - Buildurlwithparams
+// - createCashFlow() - Createcashflow
+// - createCurrencyExchange() - Createcurrencyexchange
+
+// === Event Handlers ===
+// - sendCashFlowMutation() - Sendcashflowmutation
+// - sendExchangeMutation() - Sendexchangemutation
+// - updateCurrencyExchange() - Updatecurrencyexchange
+// - deleteCurrencyExchange() - Deletecurrencyexchange
+// - fetchCurrencyExchange() - Fetchcurrencyexchange
+// - calculateCurrencyConversion() - Calculatecurrencyconversion
+
+// === UI Functions ===
+// - updateCashFlow() - Updatecashflow
+
+// === Data Functions ===
+// - normalizeCashFlowsPayload() - Normalizecashflowspayload
+// - saveCache() - Savecache
+// - notifyLoadError() - Notifyloaderror
+// - fetchCashFlowsFromApi() - Fetchcashflowsfromapi
+// - loadCashFlowsData() - Loadcashflowsdata
+// - fetchCashFlowDetails() - Fetchcashflowdetails
+
+// === Utility Functions ===
+// - invalidateCache() - Invalidatecache
+// - validateCashFlow() - Validatecashflow
+
+// === Other ===
+// - resolveBaseUrl() - Resolvebaseurl
+// - normalizeCashFlowRecord() - Normalizecashflowrecord
+// - clearCachePattern() - Clearcachepattern
+// - deleteCashFlow() - Deletecashflow
+// - calculateCashFlowBalance() - Calculatecashflowbalance
+
   const CACHE_KEY = 'cash-flows-data';
   const DEFAULT_TTL = 60 * 1000; // 60 seconds
   const PAGE_LOG_CONTEXT = { page: 'cash-flows-data' };
@@ -162,8 +201,41 @@
     const response = await fetch(url, {
       method: 'GET',
       headers: DEFAULT_HEADERS,
-      signal,
+      signal, // Include cookies for session-based auth
     });
+
+    // Handle 401/308 authentication errors
+    if (response.status === 401 || response.status === 308) {
+      // Clear any stale auth data using UnifiedCacheManager
+      if (window.UnifiedCacheManager) {
+        try {
+          await window.UnifiedCacheManager.remove('currentUser', { includeUserId: false });
+          await window.UnifiedCacheManager.remove('authToken', { includeUserId: false });
+        } catch (e) {
+          console.warn('Error clearing auth cache:', e);
+        }
+      }
+      
+      // Show error notification
+      if (window.NotificationSystem) {
+        window.NotificationSystem.showError(
+          'נדרשת התחברות',
+          'עליך להתחבר למערכת כדי לצפות בנתונים. אנא התחבר כדי להמשיך.',
+          'system'
+        );
+      }
+      
+      // Try to show login modal
+      if (typeof window.TikTrackAuth?.showLoginModal === 'function') {
+        window.TikTrackAuth.showLoginModal(() => {
+          window.location.reload();
+        });
+      } else {
+        window.location.href = '/';
+      }
+      
+      throw new Error('Authentication required');
+    }
 
     if (!response.ok) {
       const error = new Error(`טעינת תזרימים נכשלה (${response.status})`);

@@ -11,6 +11,12 @@
  * והמערכת החדשה משתמשת ב-data-attributes
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Event Handlers ===
+// - getButtonClass() - Getbuttonclass
+
 // Button Icons - Using Tabler Icons via IconSystem
 // Fallback to Emojis if IconSystem not available
 const BUTTON_ICONS = {
@@ -22,6 +28,7 @@ const BUTTON_ICONS = {
   SAVE: '/trading-ui/images/icons/tabler/device-floppy.svg',
   CLOSE: '/trading-ui/images/icons/tabler/x.svg',
   REFRESH: '/trading-ui/images/icons/tabler/refresh.svg',
+  RERUN: '/trading-ui/images/icons/tabler/refresh.svg', // Re-run action - uses refresh icon
   EXPORT: '/trading-ui/images/icons/tabler/download.svg',
   IMPORT: '/trading-ui/images/icons/tabler/upload.svg',
   WARNING: '/trading-ui/images/icons/tabler/alert-triangle.svg',
@@ -43,7 +50,8 @@ const BUTTON_ICONS = {
   SORT: '/trading-ui/images/icons/tabler/arrows-sort.svg',
   COPY: '/trading-ui/images/icons/tabler/copy.svg',
   MENU: '/trading-ui/images/icons/tabler/settings.svg',
-  BACK: '/trading-ui/images/icons/tabler/arrow-right.svg' // RTL - חץ ימינה
+  BACK: '/trading-ui/images/icons/tabler/arrow-right.svg', // RTL - חץ ימינה
+  DASHBOARD: '/trading-ui/images/icons/tabler/gauge.svg'
 };
 
 const BUTTON_TEXTS = {
@@ -55,6 +63,7 @@ const BUTTON_TEXTS = {
   SAVE: 'שמור',
   CLOSE: 'סגור',
   REFRESH: 'רענן',
+  RERUN: 'הרץ מחדש',
   EXPORT: 'ייצא',
   IMPORT: 'ייבא',
   WARNING: 'אזהרה',
@@ -76,7 +85,8 @@ const BUTTON_TEXTS = {
   SORT: 'מיון',
   COPY: 'העתק',
   MENU: 'תפריט',
-  BACK: 'חזור'
+  BACK: 'חזור',
+  DASHBOARD: 'דשבורד'
 };
 
 /**
@@ -94,6 +104,7 @@ function getButtonClass(type) {
     SAVE: 'btn',
     CLOSE: 'btn',
     REFRESH: 'btn',
+    RERUN: 'btn',
     EXPORT: 'btn',
     IMPORT: 'btn',
     SEARCH: 'btn',
@@ -141,5 +152,3 @@ window.BUTTON_STYLES = {
 window.BUTTON_ICONS = BUTTON_ICONS;
 window.BUTTON_TEXTS = BUTTON_TEXTS;
 window.getButtonClass = getButtonClass;
-
-console.log('🔘 Button Icons Core loaded successfully');

@@ -66,6 +66,21 @@ class MarketDataQuote(BaseModel):
     change_pct_day = Column(Float, nullable=True)                   # Daily change percentage
     change_amount_day = Column(Float, nullable=True)                # Daily change amount
     volume = Column(Integer, nullable=True)                         # Trading volume
+    market_cap = Column(Float, nullable=True)                      # Market capitalization in base currency
+    
+    # Open price data (from market open)
+    open_price = Column(Float, nullable=True)                      # Daily open price
+    change_pct_from_open = Column(Float, nullable=True)             # Change percentage from open
+    change_amount_from_open = Column(Float, nullable=True)         # Change amount from open
+    
+    # Daily OHLC data (for ATR calculation and historical analysis)
+    high_price = Column(Float, nullable=True)                      # Daily high price
+    low_price = Column(Float, nullable=True)                       # Daily low price
+    close_price = Column(Float, nullable=True)                    # Daily close price (previous day's close)
+    
+    # Technical indicators
+    atr = Column(Float, nullable=True)                             # Average True Range (ATR)
+    atr_period = Column(Integer, default=14)                       # ATR calculation period (default 14 days)
     
     # Additional data
     currency = Column(String(10), nullable=False, default='USD')    # Currency code

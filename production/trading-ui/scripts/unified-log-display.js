@@ -57,6 +57,11 @@ class UnifiedLogDisplay {
         this.paginationInstance = null;
         this.autoRefreshInterval = null;
         
+        // Store instance reference on container for event handlers
+        if (this.container) {
+            this.container._logDisplayInstance = this;
+        }
+        
         // Initialize if container exists
         if (this.container) {
             this.initialize();
@@ -133,7 +138,8 @@ class UnifiedLogDisplay {
     render() {
         if (!this.container) return;
 
-        this.container.innerHTML = `
+        this.container.textContent = '';
+        const containerHTML = `
             <div class="unified-log-display" data-log-type="${this.options.logType || ''}">
                 <!-- Header -->
                 <div class="log-display-header d-flex justify-content-between align-items-center">
@@ -307,6 +313,11 @@ class UnifiedLogDisplay {
                 </div>
             </div>
         `;
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(containerHTML, 'text/html');
+        doc.body.childNodes.forEach(node => {
+            this.container.appendChild(node.cloneNode(true));
+        });
 
         // Attach event listeners
         this.attachEventListeners();
@@ -522,7 +533,8 @@ class UnifiedLogDisplay {
             pageDisplay = '-';
         }
 
-        row.innerHTML = `
+        row.textContent = '';
+        const rowHTML = `
             <td class="timestamp-cell">${timestamp}</td>
             <td class="type-cell">${typeDisplay}</td>
             <td class="title-cell">${title}</td>
@@ -530,12 +542,36 @@ class UnifiedLogDisplay {
             <td class="category-cell">${categoryDisplay}</td>
             <td class="page-cell">${pageDisplay}</td>
             <td class="actions-cell">
-                <button data-button-type="VIEW" data-variant="small" data-text="" title="פרטים"></button>
-                <button data-button-type="COPY" data-variant="small" data-text="" title="העתקה"></button>
+                ${(() => {
+                  if (!window.createActionsMenu) return '<!-- Actions menu not available -->';
+                  const containerId = this.containerId;
+                  const logMessage = message || '';
+                  const itemData = JSON.stringify(item);
+                  return window.createActionsMenu([
+                    { 
+                      type: 'VIEW', 
+                      onclick: `(function() { const container = document.getElementById('${containerId}'); if (container && container._logDisplayInstance && container._logDisplayInstance.showItemDetails) { const item = ${itemData}; container._logDisplayInstance.showItemDetails(item); } else { window.showInfoNotification?.('פרטי לוג', ${JSON.stringify(logMessage)}); } })()`, 
+                      title: 'פרטים' 
+                    },
+                    { 
+                      type: 'COPY', 
+                      onclick: `(function() { const message = ${JSON.stringify(logMessage)}; if (navigator.clipboard) { navigator.clipboard.writeText(message).then(() => window.showSuccessNotification?.('הועתק ללוח')).catch(() => console.error('Failed to copy')); } })()`, 
+                      title: 'העתקה' 
+                    }
+                  ]) || '';
+                })()}
             </td>
         `;
-
-        // Add event listeners for action buttons
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(`<table><tbody><tr>${rowHTML}</tr></tbody></table>`, 'text/html');
+        const tempRow = doc.body.querySelector('tr');
+        if (tempRow) {
+            Array.from(tempRow.children).forEach(cell => {
+                row.appendChild(cell.cloneNode(true));
+            });
+        }
+        
+        // Add event listeners for action buttons (if needed for fallback)
         const viewBtn = row.querySelector('.view-details-btn');
         const copyBtn = row.querySelector('.copy-btn');
         
@@ -593,7 +629,15 @@ class UnifiedLogDisplay {
             // Check for CSS conflicts
             const testBtn = document.createElement('button');
             testBtn.className = 'btn btn-action';
-            testBtn.innerHTML = '<img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="info" class="icon">';
+            // Use sync fallback for icon (debug code doesn't need async)
+            testBtn.textContent = '';
+            const img = document.createElement('img');
+            img.src = '/trading-ui/images/icons/tabler/info-circle.svg';
+            img.width = 16;
+            img.height = 16;
+            img.alt = 'info';
+            img.className = 'icon';
+            testBtn.appendChild(img);
             testBtn.style.position = 'absolute';
             testBtn.style.top = '-1000px';
             testBtn.style.left = '-1000px';
@@ -729,10 +773,31 @@ class UnifiedLogDisplay {
         // Get page icon based on page type (async)
         const pageIcon = await this.getPageIcon(pageName);
         
-        // Check if pageIcon is a path (starts with /) or emoji
-        const iconHTML = pageIcon.startsWith('/') 
-            ? `<img src="${pageIcon}" width="16" height="16" alt="${pageName}" class="icon">`
-            : pageIcon;
+        // Render icon using IconSystem if it's a path
+        let iconHTML = '';
+        if (pageIcon.startsWith('/')) {
+          // Use IconSystem to render icon
+          if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {
+            try {
+              // Extract icon name from path (e.g., '/trading-ui/images/icons/tabler/home.svg' -> 'home')
+              const iconName = pageIcon.split('/').pop().replace('.svg', '');
+              iconHTML = await window.IconSystem.renderIcon('page', iconName, {
+                size: '16',
+                alt: pageName,
+                class: 'icon'
+              });
+            } catch (error) {
+              // Fallback to img tag
+              iconHTML = `<img src="${pageIcon}" width="16" height="16" alt="${pageName}" class="icon">`;
+            }
+          } else {
+            // Fallback if IconSystem not available
+            iconHTML = `<img src="${pageIcon}" width="16" height="16" alt="${pageName}" class="icon">`;
+          }
+        } else {
+          // Already HTML or emoji
+          iconHTML = pageIcon;
+        }
         
         return `
             <span class="page-display" title="${page}">
@@ -748,7 +813,8 @@ class UnifiedLogDisplay {
         // Use IconSystem if available
         if (typeof window.IconSystem !== 'undefined' && window.IconSystem.getPageIcon) {
             try {
-                return await window.IconSystem.getPageIcon(pageName);
+                const iconPath = await window.IconSystem.getPageIcon(pageName);
+                if (iconPath) return iconPath;
             } catch (error) {
                 if (typeof window.Logger !== 'undefined') {
                     window.Logger.warn('⚠️ Error getting page icon from IconSystem, using fallback', { pageName, error, page: 'unified-log-display' });
@@ -774,7 +840,6 @@ class UnifiedLogDisplay {
             'db_display.html': '/trading-ui/images/icons/tabler/database.svg',
             'db_extradata.html': '/trading-ui/images/icons/tabler/database.svg',
             'cache-management.html': '/trading-ui/images/icons/tabler/database.svg',
-            'linter-realtime-monitor.html': '/trading-ui/images/icons/tabler/search.svg',
             'crud-testing-dashboard.html': '/trading-ui/images/icons/tabler/flask.svg',
             'external-data-dashboard.html': '/trading-ui/images/icons/tabler/world.svg',
             'server-monitor.html': '/trading-ui/images/icons/tabler/server.svg',
@@ -1242,16 +1307,20 @@ ${message}`;
         const tbody = this.container.querySelector('.log-table-body');
         if (!tbody) return;
         
-        tbody.innerHTML = '';
+        tbody.textContent = '';
         
         if (!data || data.length === 0) {
-            tbody.innerHTML = `
-                <tr>
-                    <td colspan="7" class="text-center text-muted">
-                        <i class="fas fa-info-circle"></i> אין נתונים להצגה
-                    </td>
-                </tr>
-            `;
+            tbody.textContent = '';
+            const emptyRow = document.createElement('tr');
+            const emptyCell = document.createElement('td');
+            emptyCell.colSpan = 7;
+            emptyCell.className = 'text-center text-muted';
+            const icon = document.createElement('i');
+            icon.className = 'fas fa-info-circle';
+            emptyCell.appendChild(icon);
+            emptyCell.appendChild(document.createTextNode(' אין נתונים להצגה'));
+            emptyRow.appendChild(emptyCell);
+            tbody.appendChild(emptyRow);
             return;
         }
         
@@ -1275,7 +1344,7 @@ ${message}`;
         }
         
         if (this.container) {
-            this.container.innerHTML = '';
+            this.container.textContent = '';
         }
     }
 }
@@ -1370,7 +1439,10 @@ window.debugActionButtons = function() {
     console.log('🎨 Checking CSS conflicts...');
     const testBtn = document.createElement('button');
     testBtn.className = 'btn btn-action';
-    testBtn.innerHTML = '<i class="fas fa-info"></i>';
+    testBtn.textContent = '';
+    const icon = document.createElement('i');
+    icon.className = 'fas fa-info';
+    testBtn.appendChild(icon);
     testBtn.style.position = 'absolute';
     testBtn.style.top = '-1000px';
     testBtn.style.left = '-1000px';

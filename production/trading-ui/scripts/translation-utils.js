@@ -13,6 +13,53 @@
  * Last Updated: August 26, 2025
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - initializeLanguageSystem() - Initializelanguagesystem
+
+// === Event Handlers ===
+// - translateAlertCondition() - Translatealertcondition
+// - translateExecutionAction() - Translateexecutionaction
+// - getCurrencyIcon() - Getcurrencyicon
+// - translateConditionFields() - Translateconditionfields
+// - translateLegacyCondition() - Translatelegacycondition
+// - getConditionAttributeOptions() - Getconditionattributeoptions
+// - getConditionOperatorOptions() - Getconditionoperatoroptions
+
+// === UI Functions ===
+// - updateLanguageDependentElements() - Updatelanguagedependentelements
+// - getTickerCurrencyDisplay() - Gettickercurrencydisplay
+// - getCashFlowCurrencyDisplay() - Getcashflowcurrencydisplay
+
+// === Data Functions ===
+// - getCurrentLanguage() - Getcurrentlanguage
+// - getTickerCurrencySymbol() - Gettickercurrencysymbol
+
+// === Utility Functions ===
+// - formatNumberWithCommas() - Formatnumberwithcommas
+// - formatCurrencyWithCommas() - Formatcurrencywithcommas
+
+// === Other ===
+// - translateAccountStatus() - Translateaccountstatus
+// - translateTickerStatus() - Translatetickerstatus
+// - translateNoteStatus() - Translatenotestatus
+// - translateAlertStatus() - Translatealertstatus
+// - translateAlertType() - Translatealerttype
+// - translateTradePlanStatus() - Translatetradeplanstatus
+// - translateIsTriggered() - Translateistriggered
+// - translateTradeType() - Translatetradetype
+// - translateTradeStatus() - Translatetradestatus
+// - translateTradePlanType() - Translatetradeplantype
+// - translateCashFlowType() - Translatecashflowtype
+// - translateCashFlowSource() - Translatecashflowsource
+// - translateTickerType() - Translatetickertype
+// - translateEntityType() - Translateentitytype
+// - setLanguage() - Setlanguage
+// - colorAmountByValue() - Coloramountbyvalue
+// - findAlertById() - Findalertbyid
+
 // ===== תרגום סטטוסים =====
 
 /**
@@ -155,7 +202,7 @@ function translateTradeType(type) {
   const typeMap = {
     'swing': 'ספין',
     'investment': 'השקעה',
-    'passive': 'פסיבי',
+    'passive': 'פאסיבי',
     'crypto': 'קריפטו',
     'other': 'אחר',
   };
@@ -241,6 +288,39 @@ function translateCashFlowSource(source) {
     'IBKR-api': 'ייבוא ישיר IBKR',
   };
   return sourceNames[source] || source;
+}
+
+/**
+ * תרגום סוג טיקר לעברית
+ * @param {string} type - סוג הטיקר באנגלית
+ * @returns {string} סוג הטיקר בעברית
+ */
+function translateTickerType(type) {
+  const typeMap = {
+    'stock': 'מניות',
+    'etf': 'ETF',
+    'bond': 'אג"ח',
+    'crypto': 'קריפטו',
+    'forex': 'מטבע חוץ',
+    'commodity': 'סחורה',
+    'other': 'אחר'
+  };
+  return typeMap[type] || type;
+}
+
+/**
+ * תרגום סוג ישות לעברית (להערות)
+ * @param {string} type - סוג הישות באנגלית
+ * @returns {string} סוג הישות בעברית
+ */
+function translateEntityType(type) {
+  const typeMap = {
+    'account': 'חשבונות',
+    'trade': 'טריידים',
+    'trade_plan': 'תוכניות',
+    'ticker': 'טיקרים'
+  };
+  return typeMap[type] || type;
 }
 
 // ===== תרגום קטגוריות =====
@@ -455,6 +535,8 @@ window.translateTradeType = translateTradeType;
 window.translateTradeStatus = translateTradeStatus;
 window.translateCashFlowType = translateCashFlowType;
 window.translateCashFlowSource = translateCashFlowSource;
+window.translateTickerType = translateTickerType;
+window.translateEntityType = translateEntityType;
 window.convertExecutionActionToHebrew = translateExecutionAction; // Backward compatibility
 
 // פונקציות מטבעות
@@ -470,8 +552,15 @@ window.convertNoteStatusToHebrew = translateNoteStatus;
 window.convertAlertStatusToHebrew = translateAlertStatus;
 window.convertIsTriggeredToHebrew = translateIsTriggered;
 window.getTypeDisplay = translateTradeType; // trades.js
-window.getTypeDisplayName = translateCashFlowType; // cash_flows.js
+window.getTypeDisplayName = translateCashFlowType; // cash_flows.js (default)
 // window.getCategoryDisplayName - removed: translateTestCategory not used
+
+// Aliases for specific pages
+// Note: getTypeDisplayName is used by multiple pages with different meanings
+// - cash_flows.js uses it for translateCashFlowType (already set above)
+// - notes.js uses it for translateEntityType
+// - tickers.js uses it for translateTickerType
+// We'll handle this in the page-specific files by using the correct function directly
 
 // ===== פונקציות פורמט מספרים =====
 
@@ -601,6 +690,8 @@ window.translationUtils = {
   translateTradePlanType,
   translateCashFlowType,
   translateCashFlowSource,
+  translateTickerType,
+  translateEntityType,
   // translateTestCategory - removed: not used
   translateExecutionAction,
   // Formatting functions

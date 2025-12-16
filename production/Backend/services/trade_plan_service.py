@@ -9,44 +9,111 @@ logger = logging.getLogger(__name__)
 
 class TradePlanService:
     @staticmethod
-    def get_all(db: Session) -> List[TradePlan]:
+    def get_all(db: Session, user_id: Optional[int] = None) -> List[TradePlan]:
         """Get all trade plans"""
         logger.info("Loading trade plans with joinedload for ticker and account")
-        plans = db.query(TradePlan).options(
+        
+        # CRITICAL: Ensure clean transaction state - rollback any aborted transactions
+        try:
+            from sqlalchemy import text
+            # Test query to check transaction state
+            db.execute(text("SELECT 1"))
+        except Exception as tx_error:
+            error_msg = str(tx_error)
+            if "aborted" in error_msg.lower() or "InFailedSqlTransaction" in error_msg:
+                logger.warning(f"Transaction aborted detected in get_all(), rolling back: {error_msg}")
+                try:
+                    db.rollback()
+                    logger.info("Rollback successful, transaction is now clean")
+                except Exception as rollback_error:
+                    logger.error(f"Rollback failed: {str(rollback_error)}")
+                    # Force new connection by closing and reopening
+                    db.close()
+                    db = db.session_factory() if hasattr(db, 'session_factory') else db
+        
+        # Clear any stale data in session
+        db.expire_all()
+        
+        # Main query with joinedload - use fresh query
+        # First do a direct SQL count to verify data exists
+        from sqlalchemy import text
+        try:
+            sql_count = db.execute(text("SELECT COUNT(*) FROM trade_plans")).scalar()
+            logger.info(f"Direct SQL COUNT: {sql_count} plans in database")
+        except Exception as sql_error:
+            logger.error(f"Direct SQL count failed: {str(sql_error)}")
+            sql_count = None
+        
+        # Now use ORM query (filtered by user_id if provided)
+        query = db.query(TradePlan).options(
             joinedload(TradePlan.ticker),
             joinedload(TradePlan.account)
-        ).all()
-        logger.info(f"Loaded {len(plans)} trade plans")
+        )
+        if user_id is not None:
+            query = query.filter(TradePlan.user_id == user_id)
+            logger.info(f"Applied user_id filter: {user_id}")
+        plans = query.all()
+        logger.info(f"Loaded {len(plans)} trade plans with joinedload (user_id={user_id})")
+        
+        # Verify count matches expected (filtered count if user_id provided)
+        expected_count = sql_count if user_id is None else None  # We don't have filtered SQL count
+        if user_id is not None:
+            # For filtered queries, we can't easily verify against SQL count
+            # Just trust the ORM result
+            pass
+        elif sql_count is not None and len(plans) != sql_count:
+            logger.warning(f"⚠️ Mismatch: SQL count={sql_count}, ORM count={len(plans)}")
+            # Force reload without joinedload as fallback
+            db.expire_all()
+            plans_fallback = db.query(TradePlan).all()
+            logger.info(f"Reloaded {len(plans_fallback)} trade plans without joinedload")
+            if len(plans_fallback) == sql_count:
+                # Use fallback result
+                plans = plans_fallback
+                logger.info(f"Using fallback result with {len(plans)} plans")
         if plans:
             logger.info(f"First plan ticker: {plans[0].ticker}")
             logger.info(f"First plan account: {plans[0].account}")
         return plans
     
     @staticmethod
-    def get_by_id(db: Session, plan_id: int) -> Optional[TradePlan]:
-        """Get trade plan by ID"""
-        return db.query(TradePlan).options(
+    def get_by_id(db: Session, plan_id: int, user_id: Optional[int] = None) -> Optional[TradePlan]:
+        """Get trade plan by ID (with user_id check)"""
+        query = db.query(TradePlan).options(
             joinedload(TradePlan.ticker),
             joinedload(TradePlan.account)
-        ).filter(TradePlan.id == plan_id).first()
+        ).filter(TradePlan.id == plan_id)
+        if user_id is not None:
+            query = query.filter(TradePlan.user_id == user_id)
+        return query.first()
     
     @staticmethod
-    def get_by_account(db: Session, trading_account_id: int) -> List[TradePlan]:
-        """Get trade plans by account"""
-        return db.query(TradePlan).filter(TradePlan.trading_trading_account_id == trading_account_id).all()
+    def get_by_account(db: Session, trading_account_id: int, user_id: int) -> List[TradePlan]:
+        """Get trade plans by account for a specific user (user_id is required for data isolation)"""
+        query = db.query(TradePlan).filter(
+            TradePlan.trading_account_id == trading_account_id,
+            TradePlan.user_id == user_id
+        )
+        return query.all()
     
     @staticmethod
-    def get_by_ticker(db: Session, ticker_id: int) -> List[TradePlan]:
-        """Get trade plans by ticker"""
-        return db.query(TradePlan).filter(TradePlan.ticker_id == ticker_id).all()
+    def get_by_ticker(db: Session, ticker_id: int, user_id: Optional[int] = None) -> List[TradePlan]:
+        """Get trade plans by ticker (filtered by user_id if provided)"""
+        query = db.query(TradePlan).filter(TradePlan.ticker_id == ticker_id)
+        if user_id is not None:
+            query = query.filter(TradePlan.user_id == user_id)
+        return query.all()
     
     @staticmethod
-    def get_open_plans(db: Session) -> List[TradePlan]:
-        """Get open trade plans"""
-        return db.query(TradePlan).filter(TradePlan.status == 'open').all()
+    def get_open_plans(db: Session, user_id: Optional[int] = None) -> List[TradePlan]:
+        """Get open trade plans (filtered by user_id if provided)"""
+        query = db.query(TradePlan).filter(TradePlan.status == 'open')
+        if user_id is not None:
+            query = query.filter(TradePlan.user_id == user_id)
+        return query.all()
     
     @staticmethod
-    def create(db: Session, data: Dict[str, Any]) -> TradePlan:
+    def create(db: Session, data: Dict[str, Any], user_id: Optional[int] = None) -> TradePlan:
         """
         Create a new trade plan with snapshot support from existing trade.
         
@@ -141,6 +208,10 @@ class TradePlanService:
                     data.setdefault('entry_price', trade_entry_price)
                     logger.info(f"Snapshotted planning fields from trade {trade_id}: planned_amount={trade_amount}, entry_price={trade_entry_price}")
 
+            # Set user_id if provided and not in data
+            if user_id is not None and 'user_id' not in data:
+                data['user_id'] = user_id
+            
             # Validate data against constraints
             logger.info("Validating trade plan data before creation")
             is_valid, errors = ValidationService.validate_data(db, 'trade_plans', data)
@@ -154,6 +225,16 @@ class TradePlanService:
             db.commit()
             db.refresh(plan)
             logger.info(f"Created trade plan: {plan.id} for ticker {plan.ticker_id}")
+            
+            # Update user-ticker and ticker status
+            try:
+                from services.ticker_service import TickerService
+                if plan.user_id and plan.ticker_id:
+                    TickerService.update_user_ticker_status(db, plan.user_id, plan.ticker_id)
+                    TickerService.update_ticker_status_auto(db, plan.ticker_id)
+            except Exception as e:
+                logger.warning(f"Could not update ticker status after creating trade plan: {e}")
+            
             return plan
         except Exception as e:
             db.rollback()
@@ -161,10 +242,13 @@ class TradePlanService:
             raise
     
     @staticmethod
-    def update(db: Session, plan_id: int, data: Dict[str, Any]) -> Optional[TradePlan]:
-        """Update trade plan"""
+    def update(db: Session, plan_id: int, data: Dict[str, Any], user_id: Optional[int] = None) -> Optional[TradePlan]:
+        """Update trade plan (with user_id check)"""
         try:
-            plan = db.query(TradePlan).filter(TradePlan.id == plan_id).first()
+            query = db.query(TradePlan).filter(TradePlan.id == plan_id)
+            if user_id is not None:
+                query = query.filter(TradePlan.user_id == user_id)
+            plan = query.first()
             if not plan:
                 logger.warning(f"Trade plan {plan_id} not found for update")
                 return None
@@ -217,12 +301,25 @@ class TradePlanService:
                 logger.error(f"Trade plan validation failed: {error_message}")
                 raise ValueError(f"Trade plan validation failed: {error_message}")
             
+            # Track if status changed
+            old_status = plan.status
+            
             for key, value in data.items():
                 if hasattr(plan, key):
                     setattr(plan, key, value)
             db.commit()
             db.refresh(plan)
             logger.info(f"Updated trade plan: {plan.id}")
+            
+            # Update user-ticker and ticker status if status changed
+            try:
+                from services.ticker_service import TickerService
+                if plan.user_id and plan.ticker_id and old_status != plan.status:
+                    TickerService.update_user_ticker_status(db, plan.user_id, plan.ticker_id)
+                    TickerService.update_ticker_status_auto(db, plan.ticker_id)
+            except Exception as e:
+                logger.warning(f"Could not update ticker status after updating trade plan: {e}")
+            
             return plan
         except Exception as e:
             db.rollback()
@@ -230,11 +327,14 @@ class TradePlanService:
             raise
     
     @staticmethod
-    def delete(db: Session, plan_id: int) -> bool:
-        """Delete trade plan"""
+    def delete(db: Session, plan_id: int, user_id: Optional[int] = None) -> bool:
+        """Delete trade plan (with user_id check)"""
         from models.trade import Trade
         
-        plan = db.query(TradePlan).filter(TradePlan.id == plan_id).first()
+        query = db.query(TradePlan).filter(TradePlan.id == plan_id)
+        if user_id is not None:
+            query = query.filter(TradePlan.user_id == user_id)
+        plan = query.first()
         if not plan:
             return False
         
@@ -281,13 +381,15 @@ class TradePlanService:
             plan.cancelled_at,
         )
         
-        # Update ticker active_trades status (triggers will handle this automatically)
+        # Update user-ticker and ticker status
         try:
-            from app import update_ticker_open_status
-            update_ticker_open_status(plan.ticker_id)
-            logger.info(f"Updated ticker {plan.ticker_id} active_trades status after cancelling plan")
+            from services.ticker_service import TickerService
+            if plan.user_id and plan.ticker_id:
+                TickerService.update_user_ticker_status(db, plan.user_id, plan.ticker_id)
+                TickerService.update_ticker_status_auto(db, plan.ticker_id)
+                logger.info(f"Updated ticker {plan.ticker_id} status after cancelling plan")
         except Exception as e:
-            logger.warning(f"Could not update ticker active_trades status: {e}")
+            logger.warning(f"Could not update ticker status after cancelling plan: {e}")
         
         return plan
     
@@ -298,8 +400,18 @@ class TradePlanService:
         if plan and plan.cancelled_at is not None:
             plan.cancelled_at = None
             plan.cancel_reason = None
+            plan.status = 'open'  # Ensure status is open when activating
             db.commit()
             db.refresh(plan)
+            
+            # Update user-ticker and ticker status
+            try:
+                from services.ticker_service import TickerService
+                if plan.user_id and plan.ticker_id:
+                    TickerService.update_user_ticker_status(db, plan.user_id, plan.ticker_id)
+                    TickerService.update_ticker_status_auto(db, plan.ticker_id)
+            except Exception as e:
+                logger.warning(f"Could not update ticker status after activating plan: {e}")
             logger.info(f"Activated trade plan: {plan_id}")
             return plan
         return None
@@ -309,7 +421,7 @@ class TradePlanService:
         """Get trade plan summary"""
         query = db.query(TradePlan)
         if trading_account_id:
-            query = query.filter(TradePlan.trading_trading_account_id == trading_account_id)
+            query = query.filter(TradePlan.trading_account_id == trading_account_id)
         
         plans = query.all()
         
@@ -343,7 +455,7 @@ class TradePlanService:
         query = db.query(TradePlan)
         
         if 'trading_account_id' in conditions:
-            query = query.filter(TradePlan.trading_trading_account_id == conditions['trading_account_id'])
+            query = query.filter(TradePlan.trading_account_id == conditions['trading_account_id'])
         
         if 'ticker_id' in conditions:
             query = query.filter(TradePlan.ticker_id == conditions['ticker_id'])

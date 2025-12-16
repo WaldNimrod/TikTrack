@@ -68,7 +68,11 @@ class PositionPortfolioService:
                 'fetched_at': quote.fetched_at,
                 'asof_utc': quote.asof_utc,
                 'change_pct_day': quote.change_pct_day,
-                'change_amount_day': quote.change_amount_day
+                'change_amount_day': quote.change_amount_day,
+                # Open price data
+                'open_price': quote.open_price,
+                'change_pct_from_open': quote.change_pct_from_open,
+                'change_amount_from_open': quote.change_amount_from_open
             }
         except Exception as e:
             logger.error(f"Error getting market price for ticker {ticker_id}: {str(e)}")
@@ -371,6 +375,7 @@ class PositionPortfolioService:
     @staticmethod
     def calculate_portfolio_summary(
         db: Session,
+        user_id: Optional[int] = None,
         account_id_filter: Optional[int] = None,
         include_closed: bool = False,
         unify_accounts: bool = False,
@@ -381,6 +386,7 @@ class PositionPortfolioService:
         
         Args:
             db: Database session
+            user_id: Optional filter by user ID (None = all users, but should be set for security)
             account_id_filter: Optional filter by specific account ID (None = all accounts)
             include_closed: Whether to include closed positions
             unify_accounts: If True, merge positions with same ticker across accounts
@@ -390,11 +396,13 @@ class PositionPortfolioService:
             Dict with portfolio summary and positions list
         """
         try:
-            # Get accounts (filtered or all)
+            # Get accounts (filtered by user_id and/or account_id)
+            query = db.query(TradingAccount)
+            if user_id is not None:
+                query = query.filter(TradingAccount.user_id == user_id)
             if account_id_filter:
-                accounts = db.query(TradingAccount).filter(TradingAccount.id == account_id_filter).all()
-            else:
-                accounts = db.query(TradingAccount).all()
+                query = query.filter(TradingAccount.id == account_id_filter)
+            accounts = query.all()
             
             all_positions = []
             positions_by_key = {} if unify_accounts else None

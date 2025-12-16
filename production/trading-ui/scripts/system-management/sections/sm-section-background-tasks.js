@@ -16,7 +16,7 @@ class SMBackgroundTasksSection extends SMBaseSection {
     this.apiEndpoints = {
       tasks: '/api/background-tasks/',
       history: '/api/background-tasks/history',
-      status: '/api/background-tasks/status'
+      status: '/api/background-tasks/' // Use main endpoint for status
     };
   }
 
@@ -62,7 +62,7 @@ class SMBackgroundTasksSection extends SMBaseSection {
    */
   async fetchBackgroundTasks() {
     try {
-      const response = await fetch(this.apiEndpoints.tasks, {
+      const response = await this.fetchWithTimeout(this.apiEndpoints.tasks, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -75,10 +75,14 @@ class SMBackgroundTasksSection extends SMBaseSection {
       }
 
       const result = await response.json();
-      return result.status === 'success' ? result.data : null;
+      // Handle different response formats
+      if (result.status === 'success') {
+        return Array.isArray(result.data) ? result.data : (result.data?.tasks || result.data || []);
+      }
+      return Array.isArray(result) ? result : [];
     } catch (error) {
       console.warn('⚠️ Failed to fetch background tasks:', error);
-      return null;
+      return [];
     }
   }
 
@@ -88,7 +92,7 @@ class SMBackgroundTasksSection extends SMBaseSection {
    */
   async fetchBackgroundTasksHistory() {
     try {
-      const response = await fetch(this.apiEndpoints.history, {
+      const response = await this.fetchWithTimeout(this.apiEndpoints.history, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -101,10 +105,14 @@ class SMBackgroundTasksSection extends SMBaseSection {
       }
 
       const result = await response.json();
-      return result.status === 'success' ? result.data : null;
+      // Handle different response formats
+      if (result.status === 'success') {
+        return Array.isArray(result.data) ? result.data : (result.data?.history || result.data || []);
+      }
+      return Array.isArray(result) ? result : [];
     } catch (error) {
       console.warn('⚠️ Failed to fetch background tasks history:', error);
-      return null;
+      return [];
     }
   }
 
@@ -114,7 +122,7 @@ class SMBackgroundTasksSection extends SMBaseSection {
    */
   async fetchBackgroundTasksStatus() {
     try {
-      const response = await fetch(this.apiEndpoints.status, {
+      const response = await this.fetchWithTimeout(this.apiEndpoints.status, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -127,10 +135,10 @@ class SMBackgroundTasksSection extends SMBaseSection {
       }
 
       const result = await response.json();
-      return result.status === 'success' ? result.data : null;
+      return result.status === 'success' ? result.data : (result.data || result || {});
     } catch (error) {
       console.warn('⚠️ Failed to fetch background tasks status:', error);
-      return null;
+      return {};
     }
   }
 
@@ -139,14 +147,21 @@ class SMBackgroundTasksSection extends SMBaseSection {
    * הצגת נתוני משימות רקע
    */
   render(data) {
-    if (!data || (!data.tasks && !data.history && !data.status)) {
+    // Handle case where data might be empty or have empty arrays
+    // Always show the section, even if there are no tasks
+    if (!data) {
       this.showEmptyState('אין נתוני משימות רקע זמינים');
       return;
     }
 
     try {
       const backgroundTasksHtml = this.createBackgroundTasksHTML(data);
-      this.container.innerHTML = backgroundTasksHtml;
+      this.container.textContent = '';
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(backgroundTasksHtml, 'text/html');
+      doc.body.childNodes.forEach(node => {
+        this.container.appendChild(node.cloneNode(true));
+      });
       
       console.log('✅ Background tasks section rendered successfully');
       
@@ -243,6 +258,20 @@ class SMBackgroundTasksSection extends SMBaseSection {
    * יצירת כרטיס משימות פעילות
    */
   createActiveTasksCard(tasks) {
+    if (!tasks || !Array.isArray(tasks) || tasks.length === 0) {
+      return `
+        <div class="card active-tasks-card">
+          <div class="card-body text-center">
+            <h5><i class="fas fa-play"></i> משימות פעילות</h5>
+            <div class="alert alert-info mt-3">
+              <i class="fas fa-info-circle"></i>
+              אין משימות פעילות כרגע
+            </div>
+          </div>
+        </div>
+      `;
+    }
+    
     const activeTasksCount = this.getActiveTasksCount(tasks);
     const runningTasksCount = this.getRunningTasksCount(tasks);
 
@@ -265,7 +294,7 @@ class SMBackgroundTasksSection extends SMBaseSection {
             </div>
             <div class="detail-item">
               <span class="detail-label">ממתינות:</span>
-              <span class="detail-value">${activeTasksCount - runningTasksCount}</span>
+              <span class="detail-value">${Math.max(0, activeTasksCount - runningTasksCount)}</span>
             </div>
           </div>
         </div>
@@ -812,7 +841,11 @@ class SMBackgroundTasksSection extends SMBaseSection {
    */
   static viewTaskLogs() {
     console.log('📋 Viewing task logs');
-    alert('פתיחת לוגי משימות רקע');
+    if (window.showInfoNotification) {
+      window.showInfoNotification('פתיחת לוגי משימות רקע', 'info');
+    } else {
+      alert('פתיחת לוגי משימות רקע');
+    }
   }
 
   /**
@@ -915,7 +948,11 @@ class SMBackgroundTasksSection extends SMBaseSection {
    */
   static viewTaskDetails(taskId) {
     console.log(`📋 Viewing task details for ${taskId}`);
-    alert(`פתיחת פרטי משימה: ${taskId}`);
+    if (window.showInfoNotification) {
+      window.showInfoNotification(`פתיחת פרטי משימה: ${taskId}`, 'info');
+    } else {
+      alert(`פתיחת פרטי משימה: ${taskId}`);
+    }
   }
 
   /**
@@ -924,7 +961,11 @@ class SMBackgroundTasksSection extends SMBaseSection {
    */
   static showAllHistory() {
     console.log('📋 Showing all tasks history');
-    alert('פתיחת כל היסטוריית המשימות');
+    if (window.showInfoNotification) {
+      window.showInfoNotification('פתיחת כל היסטוריית המשימות', 'info');
+    } else {
+      alert('פתיחת כל היסטוריית המשימות');
+    }
   }
 }
 

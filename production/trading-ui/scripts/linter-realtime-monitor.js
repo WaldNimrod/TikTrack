@@ -704,7 +704,7 @@ function loadScanningResultsFromLocalStorage() {
             console.log('✅ Updated window.scanningResults:', window.scanningResults);
             
             // Update UI with loaded data
-            updateRealtimeProgress();
+            await updateRealtimeProgress();
             updateFileTypeStatistics(window.scanningResults.errors.concat(window.scanningResults.warnings));
             updateFileTypeCardsProgress();
             updateProblemFilesTable();
@@ -1103,7 +1103,21 @@ async function startFileScan() {
     const scanButton = document.getElementById('startScan');
     if (scanButton) {
         scanButton.disabled = true;
-        scanButton.innerHTML = '<img src="/trading-ui/images/icons/tabler/loader.svg" width="16" height="16" alt="loading" class="icon fa-spin"> סורק... 0%';
+        let loaderIcon = '<img src="/trading-ui/images/icons/tabler/loader.svg" width="16" height="16" alt="loading" class="icon fa-spin">';
+        if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {
+            try {
+                loaderIcon = await window.IconSystem.renderIcon('button', 'loader', { size: '16', alt: 'loading', class: 'icon fa-spin' });
+            } catch (error) {
+                // Fallback already set
+            }
+        }
+        scanButton.textContent = '';
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(loaderIcon, 'text/html');
+        doc.body.childNodes.forEach(node => {
+            scanButton.appendChild(node.cloneNode(true));
+        });
+        scanButton.appendChild(document.createTextNode(' סורק... 0%'));
     }
     
     // Reset all counters to 0
@@ -1262,7 +1276,21 @@ async function performScan() {
         const scanButton = document.getElementById('startScan');
         if (scanButton) {
             scanButton.disabled = false;
-            scanButton.innerHTML = '<img src="/trading-ui/images/icons/tabler/search.svg" width="16" height="16" alt="search" class="icon me-1"> סרוק קבצים';
+            let searchIcon = '<img src="/trading-ui/images/icons/tabler/search.svg" width="16" height="16" alt="search" class="icon me-1">';
+            if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {
+                try {
+                    searchIcon = await window.IconSystem.renderIcon('button', 'search', { size: '16', alt: 'search', class: 'icon me-1' });
+                } catch (error) {
+                    // Fallback already set
+                }
+            }
+            scanButton.textContent = '';
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(searchIcon, 'text/html');
+            doc.body.childNodes.forEach(node => {
+                scanButton.appendChild(node.cloneNode(true));
+            });
+            scanButton.appendChild(document.createTextNode(' סרוק קבצים'));
         }
         
         return; // Stop the scanning process
@@ -1286,7 +1314,7 @@ async function performScan() {
             
             // Count as scanned to avoid infinite loops
             window.scanningResults.scannedFiles++;
-            updateRealtimeProgress();
+            await updateRealtimeProgress();
         }
         
         // Small delay to prevent overwhelming the system
@@ -1471,17 +1499,17 @@ async function scanSingleFile(fileName) {
         }
         
         // Update UI with real-time progress
-        updateRealtimeProgress();
+        await updateRealtimeProgress();
         
     } catch (error) {
-        if (error.message.includes('404')) {
+        if (error?.message && typeof error.message === 'string' && error.message.includes('404')) {
         } else {
         }
         // Count as scanned to avoid infinite loops
         window.scanningResults.scannedFiles++;
         
         // Update UI with real-time progress
-        updateRealtimeProgress();
+        await updateRealtimeProgress();
     }
 }
 
@@ -1489,7 +1517,7 @@ async function scanSingleFile(fileName) {
 // Real-time Progress Updates
 // ========================================
 
-function updateRealtimeProgress() {
+async function updateRealtimeProgress() {
     try {
         console.log('🔄 updateRealtimeProgress called');
         console.log('📊 Current scanning results:', {
@@ -1557,7 +1585,22 @@ function updateRealtimeProgress() {
         // Update scan button text with progress
         const scanButton = document.getElementById('startScan');
         if (scanButton) {
-            scanButton.innerHTML = `<img src="/trading-ui/images/icons/tabler/loader.svg" width="16" height="16" alt="loading" class="icon fa-spin"> סורק... ${progress}%`;
+            // Render icon using IconSystem
+            let loaderIcon = `<img src="/trading-ui/images/icons/tabler/loader.svg" width="16" height="16" alt="loading" class="icon fa-spin">`;
+            if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {
+                try {
+                    loaderIcon = await window.IconSystem.renderIcon('button', 'loader', { size: '16', alt: 'loading', class: 'icon fa-spin' });
+                } catch (error) {
+                    // Fallback already set
+                }
+            }
+            scanButton.textContent = '';
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(loaderIcon, 'text/html');
+            doc.body.childNodes.forEach(node => {
+                scanButton.appendChild(node.cloneNode(true));
+            });
+            scanButton.appendChild(document.createTextNode(` סורק... ${progress}%`));
         }
         
         // Add progress log entry every 10 files or at completion
@@ -1606,7 +1649,11 @@ async function finishScan() {
     const scanButton = document.getElementById('startScan');
     if (scanButton) {
         scanButton.disabled = false;
-        scanButton.innerHTML = '<i class="fas fa-search"></i> סרוק קבצים';
+        scanButton.textContent = '';
+        const icon = document.createElement('i');
+        icon.className = 'fas fa-search';
+        scanButton.appendChild(icon);
+        scanButton.appendChild(document.createTextNode(' סרוק קבצים'));
     }
     
     // Update overall status
@@ -1990,7 +2037,8 @@ function updateLogDisplay() {
     const logs = getAllLogEntries();
     const recentLogs = logs.slice(-50); // Show last 50 entries
     
-    logContainer.innerHTML = recentLogs.map(entry => {
+    logContainer.textContent = '';
+    const logsHTML = recentLogs.map(entry => {
         const time = new Date(entry.timestamp).toLocaleTimeString('he-IL');
         const levelClass = entry.level.toLowerCase();
         
@@ -2000,8 +2048,13 @@ function updateLogDisplay() {
                 <span class="log-level">[${entry.level}]</span>
                 <span class="log-message">${entry.message}</span>
         </div>
-    `;
+        `;
     }).join('');
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(logsHTML, 'text/html');
+    doc.body.childNodes.forEach(node => {
+        logContainer.appendChild(node.cloneNode(true));
+    });
     
     // Scroll to bottom
     logContainer.scrollTop = logContainer.scrollHeight;
@@ -2347,7 +2400,8 @@ function updateFileTypeBreakdown() {
     
     const fileTypes = ['js', 'html', 'css', 'python', 'other'];
     
-    tbody.innerHTML = fileTypes.map(type => {
+    tbody.textContent = '';
+    const rowsHTML = fileTypes.map(type => {
         const discovered = fileScanningState.discovered.byType[type] || 0;
         const selected = fileScanningState.selected.byType[type] || 0;
         const scanned = fileScanningState.scanned.byType[type] || 0;
@@ -2388,6 +2442,11 @@ function updateFileTypeBreakdown() {
             </tr>
         `;
     }).join('');
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(rowsHTML, 'text/html');
+    doc.body.childNodes.forEach(node => {
+        tbody.appendChild(node.cloneNode(true));
+    });
 }
 
 // ========================================
@@ -2444,7 +2503,8 @@ function updateFixDetailsTable(data = null) {
     
     const displayData = data || fixData.fixDetails;
     
-    tbody.innerHTML = displayData.map(fix => {
+    tbody.textContent = '';
+    const rowsHTML = displayData.map(fix => {
         const statusBadge = getFixStatusBadge(fix.status);
         const duration = fix.endTime ? ((fix.endTime - fix.startTime) / 1000).toFixed(1) + 's' : '-';
         
@@ -2463,6 +2523,11 @@ function updateFixDetailsTable(data = null) {
             </tr>
         `;
     }).join('');
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(rowsHTML, 'text/html');
+    doc.body.childNodes.forEach(node => {
+        tbody.appendChild(node.cloneNode(true));
+    });
 }
 
 // Update progress details table with paginated data
@@ -2472,7 +2537,8 @@ function updateProgressDetailsTable(data = null) {
     
     const displayData = data || progressData.entries;
     
-    tbody.innerHTML = displayData.map(entry => {
+    tbody.textContent = '';
+    const rowsHTML = displayData.map(entry => {
         const statusIcon = getStatusIcon(entry.status);
         const statusBadge = getStatusBadge(entry.status);
         const duration = entry.endTime ? ((entry.endTime - entry.startTime) / 1000).toFixed(1) + 's' : '-';
@@ -2488,6 +2554,11 @@ function updateProgressDetailsTable(data = null) {
             </tr>
         `;
     }).join('');
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(rowsHTML, 'text/html');
+    doc.body.childNodes.forEach(node => {
+        tbody.appendChild(node.cloneNode(true));
+    });
 }
 
 // Update problem files table with paginated data
@@ -2497,7 +2568,8 @@ function updateProblemFilesTable(data = null) {
     
     const displayData = data || getProblemFilesData();
     
-    tbody.innerHTML = displayData.map(file => {
+    tbody.textContent = '';
+    const rowsHTML = displayData.map(file => {
         const errorCount = file.errors || 0;
         const warningCount = file.warnings || 0;
         const totalIssues = errorCount + warningCount;
@@ -2521,6 +2593,11 @@ function updateProblemFilesTable(data = null) {
             </tr>
         `;
     }).join('');
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(rowsHTML, 'text/html');
+    doc.body.childNodes.forEach(node => {
+        tbody.appendChild(node.cloneNode(true));
+    });
 }
 
 // Get problem files data
@@ -2685,7 +2762,8 @@ function updateFixDetailsTablePagination() {
         const tbody = document.getElementById('fixDetailsBody');
         if (!tbody) return;
         
-        tbody.innerHTML = fixData.fixDetails.map(fix => {
+        tbody.textContent = '';
+        const rowsHTML = fixData.fixDetails.map(fix => {
             const statusBadge = getFixStatusBadge(fix.status);
             const duration = fix.endTime ? ((fix.endTime - fix.startTime) / 1000).toFixed(1) + 's' : '-';
             
@@ -2883,7 +2961,8 @@ function updateProgressTimeline() {
     // Sort timeline by timestamp (newest first)
     const sortedTimeline = [...progressData.timeline].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
     
-    timelineContainer.innerHTML = sortedTimeline.slice(0, 10).map(entry => {
+    timelineContainer.textContent = '';
+    const timelineHTML = sortedTimeline.slice(0, 10).map(entry => {
         const statusIcon = getStatusIcon(entry.status);
         const statusColor = getStatusColor(entry.status);
         
@@ -2914,7 +2993,8 @@ function updateProgressDetailsTableLegacy() {
     const allEntries = [...progressData.completed, ...progressData.inProgress, ...progressData.open]
         .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
     
-    tbody.innerHTML = allEntries.map(entry => {
+    tbody.textContent = '';
+    const rowsHTML = allEntries.map(entry => {
         const statusBadge = getStatusBadge(entry.status);
         
         return `
@@ -2931,6 +3011,11 @@ function updateProgressDetailsTableLegacy() {
             </tr>
         `;
     }).join('');
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(rowsHTML, 'text/html');
+    doc.body.childNodes.forEach(node => {
+        tbody.appendChild(node.cloneNode(true));
+    });
 }
 
 // Helper functions
@@ -3048,7 +3133,7 @@ window.viewProgressDetails = function(entryId) {
 // Global Functions (Exposed to window)
 // ========================================
 
-function startMonitoring() {
+async function startMonitoring() {
     isMonitoring = true;
     startAutoRefresh();
     
@@ -3057,21 +3142,51 @@ function startMonitoring() {
     const stopBtn = document.getElementById('stopMonitoringBtn');
     
     if (startBtn) {
-            startBtn.disabled = true;
-        startBtn.innerHTML = '<img src="/trading-ui/images/icons/tabler/player-play.svg" width="16" height="16" alt="play" class="icon me-1"> פועל...';
+        startBtn.disabled = true;
+        // Render icon using IconSystem
+        let playIcon = '<img src="/trading-ui/images/icons/tabler/player-play.svg" width="16" height="16" alt="play" class="icon me-1">';
+        if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {
+            try {
+                playIcon = await window.IconSystem.renderIcon('button', 'player-play', { size: '16', alt: 'play', class: 'icon me-1' });
+            } catch (error) {
+                // Fallback already set
+            }
+        }
+        startBtn.textContent = '';
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(playIcon, 'text/html');
+        doc.body.childNodes.forEach(node => {
+            startBtn.appendChild(node.cloneNode(true));
+        });
+        startBtn.appendChild(document.createTextNode(' פועל...'));
         startBtn.className = 'btn btn-success btn-sm';
     }
     
     if (stopBtn) {
         stopBtn.disabled = false;
-        stopBtn.innerHTML = '<img src="/trading-ui/images/icons/tabler/player-stop.svg" width="16" height="16" alt="stop" class="icon me-1"> עצור';
+        // Render icon using IconSystem
+        let stopIcon = '<img src="/trading-ui/images/icons/tabler/player-stop.svg" width="16" height="16" alt="stop" class="icon me-1">';
+        if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {
+            try {
+                stopIcon = await window.IconSystem.renderIcon('button', 'player-stop', { size: '16', alt: 'stop', class: 'icon me-1' });
+            } catch (error) {
+                // Fallback already set
+            }
+        }
+        stopBtn.textContent = '';
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(stopIcon, 'text/html');
+        doc.body.childNodes.forEach(node => {
+            stopBtn.appendChild(node.cloneNode(true));
+        });
+        stopBtn.appendChild(document.createTextNode(' עצור'));
         stopBtn.className = 'btn btn-danger btn-sm';
     }
     
     // ניטור הופעל - המערכת תסרוק קבצים אוטומטית
 }
 
-function stopMonitoring() {
+async function stopMonitoring() {
     isMonitoring = false;
     if (autoRefreshInterval) {
         clearInterval(autoRefreshInterval);
@@ -3084,13 +3199,43 @@ function stopMonitoring() {
     
     if (startBtn) {
         startBtn.disabled = false;
-        startBtn.innerHTML = '<img src="/trading-ui/images/icons/tabler/player-play.svg" width="16" height="16" alt="play" class="icon me-1"> התחל';
+        // Render icon using IconSystem
+        let playIcon = '<img src="/trading-ui/images/icons/tabler/player-play.svg" width="16" height="16" alt="play" class="icon me-1">';
+        if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {
+            try {
+                playIcon = await window.IconSystem.renderIcon('button', 'player-play', { size: '16', alt: 'play', class: 'icon me-1' });
+            } catch (error) {
+                // Fallback already set
+            }
+        }
+        startBtn.textContent = '';
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(playIcon, 'text/html');
+        doc.body.childNodes.forEach(node => {
+            startBtn.appendChild(node.cloneNode(true));
+        });
+        startBtn.appendChild(document.createTextNode(' התחל'));
         startBtn.className = 'btn btn-success btn-sm';
     }
     
     if (stopBtn) {
-            stopBtn.disabled = true;
-        stopBtn.innerHTML = '<img src="/trading-ui/images/icons/tabler/player-stop.svg" width="16" height="16" alt="stop" class="icon me-1"> עצור';
+        stopBtn.disabled = true;
+        // Render icon using IconSystem
+        let stopIcon = '<img src="/trading-ui/images/icons/tabler/player-stop.svg" width="16" height="16" alt="stop" class="icon me-1">';
+        if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {
+            try {
+                stopIcon = await window.IconSystem.renderIcon('button', 'player-stop', { size: '16', alt: 'stop', class: 'icon me-1' });
+            } catch (error) {
+                // Fallback already set
+            }
+        }
+        stopBtn.textContent = '';
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(stopIcon, 'text/html');
+        doc.body.childNodes.forEach(node => {
+            stopBtn.appendChild(node.cloneNode(true));
+        });
+        stopBtn.appendChild(document.createTextNode(' עצור'));
         stopBtn.className = 'btn btn-secondary btn-sm';
     }
     
@@ -3193,7 +3338,8 @@ function updateFixProgressDisplay() {
     const percentage = progress.totalIssues > 0 ? Math.round((progress.fixedIssues / progress.totalIssues) * 100) : 0;
     const elapsed = progress.startTime ? Math.round((Date.now() - progress.startTime) / 1000) : 0;
     
-    progressElement.innerHTML = `
+    progressElement.textContent = '';
+    const progressHTML = `
         <div class="fix-progress-container">
             <div class="fix-progress-header">
                 <h4>תיקון אוטומטי - התקדמות</h4>
@@ -3222,6 +3368,11 @@ function updateFixProgressDisplay() {
             </div>
                     </div>
                 `;
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(progressHTML, 'text/html');
+    doc.body.childNodes.forEach(node => {
+        progressElement.appendChild(node.cloneNode(true));
+    });
 }
 
 // Function to show final results
@@ -3233,7 +3384,8 @@ function showFixResults() {
     const successRate = progress.totalIssues > 0 ? Math.round((progress.fixedIssues / progress.totalIssues) * 100) : 0;
     const elapsed = progress.startTime ? Math.round((Date.now() - progress.startTime) / 1000) : 0;
     
-    progressElement.innerHTML = `
+    progressElement.textContent = '';
+    const resultsHTML = `
         <div class="fix-results-container">
             <div class="fix-results-header">
                 <h4>תיקון הושלם!</h4>
@@ -3259,6 +3411,11 @@ function showFixResults() {
             </div>
                     </div>
                 `;
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(resultsHTML, 'text/html');
+    doc.body.childNodes.forEach(node => {
+        progressElement.appendChild(node.cloneNode(true));
+    });
 }
 
 // Function to reset fix progress
@@ -3388,7 +3545,7 @@ async function fixAllIssues() {
     window.fixProgress.currentFile = 'הושלם';
     
     // Update UI
-    updateRealtimeProgress();
+    await updateRealtimeProgress();
     updateProblemFilesTable();
     
     // Show final results
@@ -3468,7 +3625,7 @@ async function fixAllErrors() {
     }
     
     // Update UI
-    updateRealtimeProgress();
+    await updateRealtimeProgress();
     updateProblemFilesTable();
     
     const successRate = window.scanningResults.errors.length + fixedCount > 0 ? 
@@ -3545,7 +3702,7 @@ async function fixAllWarnings() {
     }
     
     // Update UI
-    updateRealtimeProgress();
+    await updateRealtimeProgress();
     updateProblemFilesTable();
     
     const successRate = window.scanningResults.warnings.length + fixedCount > 0 ? 

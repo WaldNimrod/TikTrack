@@ -182,10 +182,13 @@ class AdvancedButtonSystem {
         this.performance.startTime = performance.now();
         this.logger.info('Starting system initialization...');
 
+        // Bind initializeButtons to ensure correct 'this' context
+        const boundInitializeButtons = this.initializeButtons.bind(this);
+        
         if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', () => this.initializeButtons());
+            document.addEventListener('DOMContentLoaded', () => boundInitializeButtons());
         } else {
-            this.initializeButtons();
+            boundInitializeButtons();
         }
 
         this.setupMutationObserver();
@@ -223,13 +226,41 @@ class AdvancedButtonSystem {
             }
         });
 
-        observer.observe(document.body, {
-            childList: true,
-            subtree: true
-        });
-
-        this.observers.push(observer);
-        this.logger.debug('MutationObserver setup completed');
+        // Wait for document.body to be available
+        if (document.body) {
+            observer.observe(document.body, {
+                childList: true,
+                subtree: true
+            });
+            this.observers.push(observer);
+            this.logger.debug('MutationObserver setup completed');
+        } else {
+            // Retry after DOM is ready
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', () => {
+                    if (document.body) {
+                        observer.observe(document.body, {
+                            childList: true,
+                            subtree: true
+                        });
+                        this.observers.push(observer);
+                        this.logger.debug('MutationObserver setup completed (after DOMContentLoaded)');
+                    }
+                });
+            } else {
+                // DOM already loaded but body not available - retry after delay
+                setTimeout(() => {
+                    if (document.body) {
+                        observer.observe(document.body, {
+                            childList: true,
+                            subtree: true
+                        });
+                        this.observers.push(observer);
+                        this.logger.debug('MutationObserver setup completed (after delay)');
+                    }
+                }, 100);
+            }
+        }
     }
 
     setupEntityObserver() {
@@ -254,22 +285,54 @@ class AdvancedButtonSystem {
             });
         });
 
-        observer.observe(document.body, {
-            attributes: true,
-            subtree: true,
-            attributeFilter: ['data-entity-type']
-        });
-
-        this.observers.push(observer);
-        this.logger.debug('Entity observer setup completed');
+        // Wait for document.body to be available
+        if (document.body) {
+            observer.observe(document.body, {
+                attributes: true,
+                subtree: true,
+                attributeFilter: ['data-entity-type']
+            });
+            this.observers.push(observer);
+            this.logger.debug('Entity observer setup completed');
+        } else {
+            // Retry after DOM is ready
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', () => {
+                    if (document.body) {
+                        observer.observe(document.body, {
+                            attributes: true,
+                            subtree: true,
+                            attributeFilter: ['data-entity-type']
+                        });
+                        this.observers.push(observer);
+                        this.logger.debug('Entity observer setup completed (after DOMContentLoaded)');
+                    }
+                });
+            } else {
+                // DOM already loaded but body not available - retry after delay
+                setTimeout(() => {
+                    if (document.body) {
+                        observer.observe(document.body, {
+                            attributes: true,
+                            subtree: true,
+                            attributeFilter: ['data-entity-type']
+                        });
+                        this.observers.push(observer);
+                        this.logger.debug('Entity observer setup completed (after delay)');
+                    }
+                }, 100);
+            }
+        }
     }
 
     debouncedProcessButtons() {
         if (this.debounceTimer) {
             clearTimeout(this.debounceTimer);
         }
+        // Bind initializeButtons to ensure correct 'this' context
+        const boundInitializeButtons = this.initializeButtons.bind(this);
         this.debounceTimer = setTimeout(async () => {
-            await this.initializeButtons();
+            await boundInitializeButtons();
         }, this.config.performance.debounceDelay);
     }
 
@@ -286,6 +349,9 @@ class AdvancedButtonSystem {
 
         // Wait for button icons to be loaded
         await this.waitForButtonIcons();
+        
+        // Wait for Bootstrap to be available before processing buttons (to avoid tooltip warnings)
+        await this.waitForBootstrap();
         
         this.processButtonsInBatches(buttonElements);
 
@@ -439,6 +505,34 @@ class AdvancedButtonSystem {
         return false;
     }
 
+    /**
+     * Wait for Bootstrap to be available before processing buttons
+     * This prevents tooltip initialization errors
+     * @returns {Promise<boolean>} True if Bootstrap is available, false if timeout
+     */
+    async waitForBootstrap() {
+        const maxWaitTime = 10000; // 10 seconds max (increased from 5)
+        const checkInterval = 100; // Check every 100ms
+        let elapsed = 0;
+        
+        while (elapsed < maxWaitTime) {
+            // Check if Bootstrap is available (either from CDN or fallback)
+            // Only check window.bootstrap to avoid TDZ (Temporal Dead Zone) errors
+            const bootstrap = window.bootstrap;
+            if (bootstrap && bootstrap.Tooltip) {
+                this.logger.debug('Bootstrap loaded successfully');
+                return true;
+            }
+            
+            await new Promise(resolve => setTimeout(resolve, checkInterval));
+            elapsed += checkInterval;
+        }
+        
+        // If Bootstrap not available, log warning but continue (fallback will be used)
+        this.logger.warn('Bootstrap not loaded within timeout, using fallback tooltips');
+        return false;
+    }
+
     processButtonsInBatches(buttonElements) {
         const batchSize = this.config.performance.batchSize;
         const totalButtons = buttonElements.length;
@@ -480,11 +574,26 @@ class AdvancedButtonSystem {
             return;
         }
 
+        // Check if element is attached to DOM - if not, schedule retry
         if (!element.parentNode) {
-            this.logger.warn('Skipping button without parent node', {
-                elementId: element.id || `anonymous-${index}`,
-                buttonType
-            });
+            // Element is not yet attached to DOM - schedule retry after a short delay
+            // This handles cases where buttons are created but not yet inserted into DOM
+            setTimeout(() => {
+                // Check again if element is now in DOM and not yet processed
+                if (element.parentNode && !element.hasAttribute('data-button-processed')) {
+                    this.logger.debug('Retrying button processing after DOM attachment', {
+                        elementId: element.id || `anonymous-${index}`,
+                        buttonType
+                    });
+                    this.processButtonElement(element, index);
+                } else if (!element.parentNode) {
+                    // Still not in DOM after retry - log as debug (not warning) since this might be intentional
+                    this.logger.debug('Button not yet attached to DOM, skipping', {
+                        elementId: element.id || `anonymous-${index}`,
+                        buttonType
+                    });
+                }
+            }, 100); // Retry after 100ms
             return;
         }
         
@@ -498,6 +607,7 @@ class AdvancedButtonSystem {
         let attributes = element.getAttribute('data-attributes') || '';
         const text = element.getAttribute('data-text') || '';
         const icon = element.getAttribute('data-icon') || '';
+        const iconPath = element.getAttribute('data-icon-path') || '';
         // CRITICAL: Generate unique ID to prevent conflicts
         // If data-id is provided, use it; otherwise create unique ID based on button type and index
         let id = element.getAttribute('data-id');
@@ -512,8 +622,10 @@ class AdvancedButtonSystem {
         // CRITICAL: If ID already exists, make it unique by appending timestamp
         if (document.getElementById(id)) {
             const timestamp = Date.now().toString(36);
+            const originalId = element.getAttribute('data-id') || id;
             id = `${id}-${timestamp.slice(-6)}`;
-            this.logger.warn('ID conflict detected, using unique ID', { originalId: element.getAttribute('data-id'), newId: id });
+            // Conflict resolved automatically - log as info for tracking
+            this.logger.info('ID conflict detected and resolved', { originalId, newId: id, element: element.tagName });
         }
 
         // CRITICAL: Read tooltip configuration from data attributes BEFORE processing
@@ -565,7 +677,7 @@ class AdvancedButtonSystem {
 
         const newButton = this.createButtonFromData(
             buttonType, onClick, classes, attributes, text, id,
-            entityType, size, style, variant, icon, tooltipConfig
+            entityType, size, style, variant, icon, tooltipConfig, iconPath
         );
 
         if (newButton) {
@@ -658,9 +770,9 @@ class AdvancedButtonSystem {
                 // Check if we got inline SVG (not img tag)
                 if (inlineSVG && inlineSVG.includes('<svg')) {
                     // Replace img with inline SVG
-                    const tempDiv = document.createElement('div');
-                    tempDiv.innerHTML = inlineSVG;
-                    const svgElement = tempDiv.firstElementChild;
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(inlineSVG, 'image/svg+xml');
+                    const svgElement = doc.documentElement;
                     
                     if (svgElement && svgElement.tagName === 'svg') {
                         img.replaceWith(svgElement);
@@ -676,14 +788,32 @@ class AdvancedButtonSystem {
     }
 
     createButtonFromData(type, onClick, classes, attributes, text, id,
-                         entityType, size, style, variant, iconOverride = '', tooltipConfig = null) {
+                         entityType, size, style, variant, iconOverride = '', tooltipConfig = null, iconPathFromElement = '') {
         if (window.BUTTON_ICONS && window.BUTTON_TEXTS && window.getButtonClass) {
             // Handle null/undefined type (for custom buttons without data-button-type)
             const typeUpper = type ? type.toUpperCase() : '';
-            // Get icon path - Use iconOverride if provided, otherwise try BUTTON_ICONS
-            let iconPath = (iconOverride !== undefined && iconOverride !== null && iconOverride !== '') 
-                ? iconOverride 
-                : (typeUpper && window.BUTTON_ICONS[typeUpper] ? window.BUTTON_ICONS[typeUpper] : '');
+            // Get icon path - Check iconPathFromElement first, then iconOverride, then BUTTON_ICONS
+            let iconPath = '';
+            if (iconPathFromElement && iconPathFromElement !== '') {
+                iconPath = iconPathFromElement;
+            } else if (iconOverride !== undefined && iconOverride !== null && iconOverride !== '') {
+                iconPath = iconOverride;
+            } else if (typeUpper && window.BUTTON_ICONS && window.BUTTON_ICONS[typeUpper]) {
+                iconPath = window.BUTTON_ICONS[typeUpper];
+            }
+            
+            // If iconPath is just a name (not a path), construct Tabler icon path
+            // BUT: Skip if it's an emoji (contains Unicode characters)
+            if (iconPath && !iconPath.includes('/') && !iconPath.startsWith('http') && !iconPath.startsWith('<') && !iconPath.includes('.')) {
+                // Check if it's an emoji or Unicode symbol (not ASCII)
+                // This includes emojis, arrows, and other Unicode symbols
+                const isEmojiOrUnicode = /[^\x00-\x7F]/.test(iconPath) || 
+                                         /[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]|[\u{1F600}-\u{1F64F}]|[\u{1F680}-\u{1F6FF}]|[\u{1F900}-\u{1F9FF}]|[\u{1FA00}-\u{1FA6F}]|[\u{1FA70}-\u{1FAFF}]|[\u{2190}-\u{21FF}]|[\u{2300}-\u{23FF}]|[\u{2B00}-\u{2BFF}]|[\u{FE00}-\u{FE0F}]/u.test(iconPath);
+                if (!isEmojiOrUnicode) {
+                    // It's likely an icon name - construct Tabler icon path
+                    iconPath = `/trading-ui/images/icons/tabler/${iconPath}.svg`;
+                }
+            }
             
             // Convert icon path to HTML - use img tag initially, enhance to inline SVG later for Tabler icons
             let icon = '';
@@ -760,7 +890,13 @@ class AdvancedButtonSystem {
             let content = '';
             if (variant === 'small') {
                 // For small variant, prefer icon, but fallback to text if icon is empty
-                content = icon || buttonText;
+                // CRITICAL: For TOGGLE buttons, always ensure there's content (icon or fallback emoji)
+                if (typeUpper === 'TOGGLE') {
+                    // For TOGGLE buttons, use icon if available, otherwise use chevron emoji as fallback
+                    content = icon || '▼';
+                } else {
+                    content = icon || buttonText;
+                }
             } else if (variant === 'normal') {
                 content = buttonText;
             } else if (variant === 'full') {
@@ -773,7 +909,14 @@ class AdvancedButtonSystem {
             return `<button class='btn ${buttonClass}${classes}' data-button-type='${type}' data-button-processed='true'${idAttr}${dataOnclickAttr}${tooltipAttrs}${allAttributes}>${content}</button>`;
         } else {
             this.logger.warn('Button system dependencies not found, using fallback');
-            return this.createFallbackButton(type, onClick, classes, attributes, text, id);
+            // CRITICAL: For TOGGLE buttons, ensure fallback has content
+            const fallbackButton = this.createFallbackButton(type, onClick, classes, attributes, text, id);
+            // If it's a TOGGLE button with small variant and no content, add chevron emoji
+            if (type && type.toUpperCase() === 'TOGGLE' && variant === 'small' && !fallbackButton.includes('>') || fallbackButton.match(/>\s*</)) {
+                // Replace empty content with chevron emoji
+                return fallbackButton.replace(/>\s*</, '>▼<');
+            }
+            return fallbackButton;
         }
     }
 
@@ -894,9 +1037,14 @@ class AdvancedButtonSystem {
         const buttonId = button.id || 'unknown';
         
         // Check if Bootstrap is available
-        if (typeof bootstrap === 'undefined' || !bootstrap.Tooltip) {
-            this.logger.debug('Bootstrap Tooltip not available, using native title attribute');
-            this.logger.warn(`Bootstrap Tooltip not available for button ${buttonId}`);
+        // Note: We should have waited for Bootstrap in initializeButtons(), but double-check here
+        if (typeof bootstrap === 'undefined' || !bootstrap || !bootstrap.Tooltip) {
+            // Don't log warning for each button - we already logged it in waitForBootstrap()
+            // Just use native title attribute silently
+            if (config && config.title) {
+                button.setAttribute('title', config.title);
+                button.setAttribute('aria-label', config.title);
+            }
             return;
         }
 
@@ -1011,11 +1159,8 @@ class AdvancedButtonSystem {
         
         // CRITICAL: Check if button has static tooltip - these cannot be changed
         if (buttonElement.hasAttribute('data-tooltip-static')) {
-            this.logger.warn('updateTooltip: Cannot update static tooltip', {
-                buttonId,
-                currentTooltip: buttonElement.getAttribute('data-tooltip'),
-                requestedTooltip: newText
-            });
+            // Expected behavior - static tooltips cannot be updated
+            // No log needed - this is normal behavior
             return false;
         }
         
@@ -1123,7 +1268,7 @@ class AdvancedButtonSystem {
     }
 
     addButton(container, type, onClick, classes = '', attributes = '', text = '', id = '', variant = 'normal', icon = '') {
-        const buttonHtml = this.createButtonFromData(type, onClick, classes, attributes, text, id, '', '', variant, icon);
+        const buttonHtml = this.createButtonFromData(type, onClick, classes, attributes, text, id, '', '', variant, icon, null, '');
         container.insertAdjacentHTML('beforeend', buttonHtml);
         this.logger.debug(`Added dynamic button: ${type}`);
     }
@@ -1131,7 +1276,8 @@ class AdvancedButtonSystem {
     updateButton(buttonId, type, onClick, classes = '', attributes = '', text = '', variant = 'normal', icon = '') {
         const element = document.getElementById(buttonId);
         if (element) {
-            const newButton = this.createButtonFromData(type, onClick, classes, attributes, text, buttonId, '', '', variant, icon);
+            const iconPath = element.getAttribute('data-icon-path') || '';
+            const newButton = this.createButtonFromData(type, onClick, classes, attributes, text, buttonId, '', '', variant, icon, null, iconPath);
             element.outerHTML = newButton;
             this.logger.debug(`Updated button: ${buttonId}`);
         } else {

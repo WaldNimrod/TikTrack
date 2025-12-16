@@ -1,4 +1,5 @@
 """
+# pyright: reportGeneralTypeIssues=false
 Date Normalization Service
 ==========================
 
@@ -130,16 +131,15 @@ class DateNormalizationService:
         if timezone_value:
             return cls._safe_validate_timezone(timezone_value)
 
+        # Resolve user_id from Flask context (auth middleware) or explicit fallback
         user_id = None
         try:
-            user_id = flask_request.args.get("user_id", type=int)
+            from flask import g  # Local import to avoid circular dependency
+            user_id = getattr(g, "user_id", None)
         except Exception:
             user_id = None
-        if not user_id and flask_request.is_json:
-            body = flask_request.get_json(silent=True) or {}
-            user_id = body.get("user_id")
         if not user_id:
-            user_id = fallback_user_id or 1
+            user_id = fallback_user_id
 
         if preferences_service is None:
             try:

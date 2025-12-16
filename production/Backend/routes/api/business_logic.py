@@ -9,7 +9,7 @@ Documentation:
 - documentation/02-ARCHITECTURE/BACKEND/BUSINESS_LOGIC_LAYER.md
 """
 
-from flask import Blueprint, jsonify, request, g
+from flask import Blueprint, jsonify, request, g, session
 from typing import Dict, Any
 from sqlalchemy.orm import Session
 import logging
@@ -28,7 +28,8 @@ from services.business_logic import (
     TickerBusinessService,
     CurrencyBusinessService,
     TagBusinessService,
-    PreferencesBusinessService
+    PreferencesBusinessService,
+    AIAnalysisBusinessService
 )
 
 logger = logging.getLogger(__name__)
@@ -48,6 +49,7 @@ trade_plan_service = TradePlanBusinessService()
 ticker_service = TickerBusinessService()
 currency_service = CurrencyBusinessService()
 tag_service = TagBusinessService()
+ai_analysis_business_service = AIAnalysisBusinessService()
 
 
 # ============================================================================
@@ -515,6 +517,15 @@ def validate_condition_value():
         
         condition_attribute = data.get('condition_attribute')
         condition_number = data.get('condition_number')
+        
+        # Validate that condition_attribute is provided and is a string
+        if not condition_attribute or not isinstance(condition_attribute, str):
+            return jsonify({
+                'status': 'error',
+                'error': {
+                    'message': 'condition_attribute is required and must be a string'
+                }
+            }), 400
         
         if condition_number is not None:
             try:
@@ -1346,6 +1357,104 @@ def validate_tag_category():
             
     except Exception as e:
         logger.error(f"Error validating tag category: {str(e)}")
+        return jsonify({
+            'status': 'error',
+            'error': {
+                'message': 'Internal server error'
+            }
+        }), 500
+
+
+# ============================================================================
+# AI Analysis Business Logic Endpoints
+# ============================================================================
+
+@business_logic_bp.route('/ai-analysis/validate', methods=['POST'])
+@monitor_performance(log_slow_queries=True, slow_query_threshold=0.2)
+@handle_database_session(auto_commit=False, auto_close=True)
+def validate_ai_analysis():
+    """Validate AI analysis request data."""
+    try:
+        data = request.get_json() or {}
+        
+        # Log incoming data for debugging
+        logger.debug(f"🔍 validate_ai_analysis: received data: {data}")
+        logger.debug(f"🔍 validate_ai_analysis: template_id type: {type(data.get('template_id'))}, value: {data.get('template_id')}")
+        
+        # Validate template_id is not a dict (bug fix)
+        if isinstance(data.get('template_id'), dict):
+            logger.warning(f"⚠️ validate_ai_analysis: template_id is a dict! Original: {data.get('template_id')}")
+            # Try to extract actual template_id from nested dict
+            if 'template_id' in data.get('template_id', {}):
+                data['template_id'] = data['template_id']['template_id']
+                logger.info(f"✅ Extracted template_id from nested dict: {data['template_id']}")
+            else:
+                logger.error(f"❌ Cannot extract template_id from dict: {data.get('template_id')}")
+        
+        # Get user_id from session/g and add to data for validation
+        user_id = session.get('user_id') or getattr(g, 'user_id', None) or 1
+        data['user_id'] = user_id
+        
+        logger.debug(f"🔍 validate_ai_analysis: after processing - template_id: {data.get('template_id')}, type: {type(data.get('template_id'))}")
+        
+        # Set db_session for business service
+        ai_analysis_business_service.db_session = g.db
+        
+        result = ai_analysis_business_service.validate(data)
+        
+        if result['is_valid']:
+            return jsonify({
+                'status': 'success',
+                'data': {
+                    'is_valid': True
+                }
+            }), 200
+        else:
+            return jsonify({
+                'status': 'error',
+                'error': {
+                    'message': 'Validation failed',
+                    'errors': result['errors']
+                }
+            }), 400
+            
+    except Exception as e:
+        logger.error(f"Error validating AI analysis: {str(e)}")
+        return jsonify({
+            'status': 'error',
+            'error': {
+                'message': 'Internal server error'
+            }
+        }), 500
+
+
+@business_logic_bp.route('/ai-analysis/validate-variables', methods=['POST'])
+def validate_ai_analysis_variables():
+    """Validate AI analysis variables dictionary."""
+    try:
+        data = request.get_json() or {}
+        variables = data.get('variables', {})
+        
+        result = ai_analysis_business_service.validate_variables(variables)
+        
+        if result['is_valid']:
+            return jsonify({
+                'status': 'success',
+                'data': {
+                    'is_valid': True
+                }
+            }), 200
+        else:
+            return jsonify({
+                'status': 'error',
+                'error': {
+                    'message': 'Variables validation failed',
+                    'errors': result['errors']
+                }
+            }), 400
+            
+    except Exception as e:
+        logger.error(f"Error validating AI analysis variables: {str(e)}")
         return jsonify({
             'status': 'error',
             'error': {

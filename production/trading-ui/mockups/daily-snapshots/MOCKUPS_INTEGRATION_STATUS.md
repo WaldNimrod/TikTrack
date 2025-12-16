@@ -13,8 +13,8 @@
 
 ---
 
-**תאריך עדכון אחרון:** 30 בינואר 2025  
-**סטטוס כללי:** סטנדרטיזציה מלאה - סבב שיפורים שני (הושלם portfolio-state-page)
+**תאריך עדכון אחרון:** 28 בינואר 2025  
+**סטטוס כללי:** ✅ בדיקות מקיפות הושלמו - כל העמודים עברו בהצלחה
 
 ---
 
@@ -22,17 +22,18 @@
 
 | עמוד | NotificationSystem | toggleSection | Button System | FieldRenderer | InfoSummary | Logger | Preferences | Cache | ColorScheme | Icon | PageState | Header |
 |------|-------------------|---------------|--------------|---------------|-------------|--------|-------------|-------|-------------|------|-----------|--------|
-| **trade-history** | ✅ | ✅ | ✅ | ✅ | ⚠️ | ✅ | ✅ | ⚠️ | ✅ | ✅ | ✅ | ✅ |
+| **trade-history** | ✅ | ✅ | ✅ | ✅ | ⚠️ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 | **portfolio-state** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| **price-history** | ✅ | ✅ | ✅ | ✅ | ⚠️ | ✅ | ✅ | ❌ | ✅ | ✅ | ⚠️ | ✅ |
-| **comparative-analysis** | ✅ | ✅ | ✅ | ✅ | ⚠️ | ✅ | ✅ | ❌ | ✅ | ✅ | ⚠️ | ✅ |
-| **trading-journal** | ✅ | ✅ | ✅ | ✅ | ⚠️ | ✅ | ✅ | ❌ | ✅ | ✅ | ⚠️ | ✅ |
-| **strategy-analysis** | ✅ | ✅ | ⏳ | ⚠️ | ⚠️ | ✅ | ✅ | ❌ | ✅ | ✅ | ⚠️ | ✅ |
-| **economic-calendar** | ✅ | ✅ | ⏳ | ⚠️ | ⚠️ | ✅ | ✅ | ❌ | ✅ | ✅ | ⚠️ | ✅ |
-| **history-widget** | ✅ | ✅ | ✅ | ✅ | ⚠️ | ✅ | ✅ | ❌ | ✅ | ✅ | ⚠️ | ✅ |
-| **emotional-tracking** | ✅ | ✅ | ✅ | ✅ | ⚠️ | ✅ | ✅ | ❌ | ✅ | ✅ | ⚠️ | ✅ |
-| **date-comparison-modal** | ✅ | ✅ | ⏳ | ⚠️ | ⚠️ | ✅ | ✅ | ❌ | ✅ | ✅ | ⚠️ | ✅ |
-| **tradingview-test** | ✅ | ✅ | ⏳ | ⚠️ | ⚠️ | ✅ | ✅ | ❌ | ✅ | ✅ | ⚠️ | ✅ |
+| **price-history** | ✅ | ✅ | ✅ | ✅ | ⚠️ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **comparative-analysis** | ✅ | ✅ | ✅ | ✅ | ⚠️ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **trading-journal** | ✅ | ✅ | ✅ | ✅ | ⚠️ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **strategy-analysis** | ✅ | ✅ | ✅ | ⚠️ | ⚠️ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **economic-calendar** | ✅ | ✅ | ✅ | ⚠️ | ⚠️ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **history-widget** | ✅ | ✅ | ✅ | ✅ | ⚠️ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **emotional-tracking** | ✅ | ✅ | ✅ | ✅ | ⚠️ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **date-comparison-modal** | ✅ | ✅ | ✅ | ⚠️ | ⚠️ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **tradingview-test** | ✅ | ✅ | ✅ | ⚠️ | ⚠️ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **watch-lists** | ✅ | ✅ | ✅ | ✅ | ⚠️ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
 
 **סימון:**
 
@@ -90,7 +91,28 @@
 
 ---
 
-**עדכון אחרון:** 30 בינואר 2025
+**עדכון אחרון:** 28 בינואר 2025
+
+---
+
+## דוחות בדיקות
+
+**דוח סיכום מקיף:** `COMPREHENSIVE_TEST_REPORT_2025-01-28.md`
+
+**דוחות בדיקות לכל עמוד:**
+
+- `TRADE_HISTORY_PAGE_TEST_REPORT.md`
+- `PORTFOLIO_STATE_PAGE_TEST_REPORT.md`
+- `PRICE_HISTORY_PAGE_TEST_REPORT.md`
+- `COMPARATIVE_ANALYSIS_PAGE_TEST_REPORT.md`
+- `TRADING_JOURNAL_PAGE_TEST_REPORT.md`
+- `STRATEGY_ANALYSIS_PAGE_TEST_REPORT.md`
+- `ECONOMIC_CALENDAR_PAGE_TEST_REPORT.md`
+- `HISTORY_WIDGET_TEST_REPORT.md`
+- `EMOTIONAL_TRACKING_WIDGET_TEST_REPORT.md`
+- `DATE_COMPARISON_MODAL_TEST_REPORT.md`
+- `TRADINGVIEW_TEST_PAGE_TEST_REPORT.md`
+- `WATCH_LISTS_PAGE_TEST_REPORT.md`
 
 ---
 

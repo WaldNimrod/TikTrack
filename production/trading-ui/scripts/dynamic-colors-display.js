@@ -3,8 +3,24 @@
  * Handles content injection into locked template sections
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - initializeSectionToggles() - Initializesectiontoggles
+
+// === Event Handlers ===
+// - injectSection1Content() - Injectsection1Content
+// - injectSection2Content() - Injectsection2Content
+// - injectSection3Content() - Injectsection3Content
+// - injectSection4Content() - Injectsection4Content
+
+// === Other ===
+// - generateDetailedLog() - Generatedetailedlog
+// - copyDetailedLogLocal() - Copydetailedloglocal
+
 // document.addEventListener('DOMContentLoaded', function() {
-//     console.log('=== Dynamic Colors Display Page Loaded ===');
+//     Logger.info('=== Dynamic Colors Display Page Loaded ===');
 
     // Initialize color scheme system
     if (window.generateNumericValueCSS) {
@@ -156,7 +172,12 @@ function injectSection1Content() {
 
     const sectionElement = document.getElementById('section1-content');
     if (sectionElement) {
-        sectionElement.innerHTML = sectionContent;
+        sectionElement.textContent = '';
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(sectionContent, 'text/html');
+        doc.body.childNodes.forEach(node => {
+            sectionElement.appendChild(node.cloneNode(true));
+        });
     }
 }
 
@@ -260,7 +281,12 @@ function injectSection2Content() {
 
     const sectionElement = document.getElementById('section2-content');
     if (sectionElement) {
-        sectionElement.innerHTML = sectionContent;
+        sectionElement.textContent = '';
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(sectionContent, 'text/html');
+        doc.body.childNodes.forEach(node => {
+            sectionElement.appendChild(node.cloneNode(true));
+        });
     }
 }
 
@@ -420,7 +446,12 @@ function injectSection3Content() {
 
     const sectionElement = document.getElementById('section3-content');
     if (sectionElement) {
-        sectionElement.innerHTML = sectionContent;
+        sectionElement.textContent = '';
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(sectionContent, 'text/html');
+        doc.body.childNodes.forEach(node => {
+            sectionElement.appendChild(node.cloneNode(true));
+        });
     }
 }
 
@@ -603,7 +634,12 @@ element.classList.add('entity-' + entityType);</pre>
 
     const sectionElement = document.getElementById('section4-content');
     if (sectionElement) {
-        sectionElement.innerHTML = sectionContent;
+        sectionElement.textContent = '';
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(sectionContent, 'text/html');
+        doc.body.childNodes.forEach(node => {
+            sectionElement.appendChild(node.cloneNode(true));
+        });
     }
 }
 
@@ -738,21 +774,21 @@ async function copyDetailedLogLocal() {
             if (window.showSuccessNotification) {
                 window.showSuccessNotification('לוג מפורט הועתק ללוח');
             } else {
-                alert('לוג מפורט הועתק ללוח!');
+                window.showErrorNotification('לוג מפורט הועתק ללוח!', "שגיאה");
             }
         } else {
             if (window.showWarningNotification) {
                 window.showWarningNotification('אין לוג להעתקה');
             } else {
-                alert('אין לוג להעתקה');
+                window.showErrorNotification('אין לוג להעתקה', "שגיאה");
             }
         }
     } catch (err) {
-        console.error('שגיאה בהעתקה:', err);
+        window.Logger?.error('שגיאה בהעתקה:', err);
         if (window.showErrorNotification) {
             window.showErrorNotification('שגיאה בהעתקת הלוג');
         } else {
-            alert('שגיאה בהעתקת הלוג');
+            window.showErrorNotification('שגיאה בהעתקת הלוג', "שגיאה");
         }
     }
 }

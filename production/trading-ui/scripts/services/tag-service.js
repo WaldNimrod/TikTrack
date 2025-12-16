@@ -22,7 +22,8 @@
         categories: 'tags:categories',
         tags: (categoryId = 'all') => `tags:list:${categoryId}`,
         entity: (entityType, entityId) => `tags:entity:${entityType}:${entityId}`,
-        suggestions: (entityType = 'all') => `tags:suggestions:${entityType}`
+        suggestions: (entityType = 'all') => `tags:suggestions:${entityType}`,
+        cloud: 'tags:cloud'
     };
 
     /**
@@ -291,6 +292,60 @@
         return analytics;
     }
 
+    async function getTagCloudData({ force = false, limit = 50 } = {}) {
+        const cacheKey = 'tags:cloud';
+        if (!force) {
+            const cached = await getCached(cacheKey);
+            if (cached) {
+                return cached;
+            }
+        }
+
+        const params = new URLSearchParams();
+        if (limit) {
+            params.set('limit', String(limit));
+        }
+
+        const cloud = await requestJSON(`${API_BASE}/cloud?${params.toString()}`);
+        await setCached(cacheKey, cloud);
+        return cloud;
+    }
+
+    /**
+     * Search tags by query string with optional entity type filter.
+     * @param {{ query: string, entityType?: string|null, limit?: number, includeInactive?: boolean, force?: boolean }} options
+     * @returns {Promise<Array>} Array of tag objects with assignments
+     */
+    async function searchTags({ query, entityType = null, limit = 25, includeInactive = false, force = false } = {}) {
+        if (!query || query.trim().length < 2) {
+            throw new Error('Query must be at least 2 characters long');
+        }
+
+        const cacheKey = `tags:search:${query}:${entityType || 'all'}:${limit}`;
+        if (!force) {
+            const cached = await getCached(cacheKey);
+            if (cached) {
+                return cached;
+            }
+        }
+
+        const params = new URLSearchParams();
+        params.set('query', query.trim());
+        if (entityType) {
+            params.set('entity_type', entityType);
+        }
+        if (limit) {
+            params.set('limit', String(limit));
+        }
+        if (includeInactive) {
+            params.set('include_inactive', 'true');
+        }
+
+        const results = await requestJSON(`${API_BASE}/search?${params.toString()}`);
+        await setCached(cacheKey, results);
+        return results;
+    }
+
     // ========================================================================
     // Business Logic API Wrappers
     // ========================================================================
@@ -427,12 +482,14 @@
         await removeCached(CACHE_KEYS.suggestions('all'));
         await removeCached(CACHE_KEYS.suggestions(entityType));
         await removeCached(CACHE_KEYS.analytics);
+        await removeCached(CACHE_KEYS.cloud);
     }
 
     async function clearCache() {
         await removeCached(CACHE_KEYS.categories);
         await removeCached(CACHE_KEYS.tags('all'));
         await removeCached(CACHE_KEYS.analytics);
+        await removeCached(CACHE_KEYS.cloud);
     }
 
     window.TagService = {
@@ -449,6 +506,8 @@
         removeTagFromEntity,
         getSuggestions,
         getAnalytics,
+        getTagCloudData,
+        searchTags,
         invalidateEntity,
         clearCache,
         validateTagViaAPI,

@@ -11,6 +11,19 @@
  *   });
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - buildDedupeKey() - Builddedupekey
+
+// === Data Functions ===
+// - deduplicateRequest() - Deduplicaterequest
+// - clearAllInflightRequests() - Clearallinflightrequests
+// - getInflightRequestCount() - Getinflightrequestcount
+// - isRequestInflight() - Isrequestinflight
+// - requestPromise() - Requestpromise
+
 (function() {
   'use strict';
 

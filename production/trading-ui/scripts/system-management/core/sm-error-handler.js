@@ -31,7 +31,12 @@ class SMErrorHandler {
     const errorCard = this.createErrorCard(error, context, severity, errorId);
     
     // Insert error card into container
-    container.innerHTML = errorCard;
+    container.textContent = '';
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(errorCard, 'text/html');
+    doc.body.childNodes.forEach(node => {
+      container.appendChild(node.cloneNode(true));
+    });
     
     // Setup error card event listeners
     this.setupErrorCardListeners(errorId);
@@ -146,15 +151,21 @@ class SMErrorHandler {
         
         <div class="error-footer">
           <div class="error-actions">
-            <button class="btn btn-primary btn-sm" onclick="SMErrorHandler.retrySection('${context.section}')">
+            <button class="btn btn-primary btn-sm" onclick="SMErrorHandler.retrySection('${context.section}')" title="נסה לטעון שוב">
               <i class="fas fa-redo"></i> נסה שוב
             </button>
-            <button class="btn btn-secondary btn-sm" onclick="SMErrorHandler.showErrorDetails('${errorId}')">
+            <button class="btn btn-info btn-sm" onclick="SMErrorHandler.toggleDetails('${errorId}')" title="הצג/הסתר פרטים">
               <i class="fas fa-info-circle"></i> פרטים נוספים
             </button>
-            <button class="btn btn-warning btn-sm" onclick="location.reload()">
-              <i class="fas fa-refresh"></i> רענן עמוד
+            <button class="btn btn-outline-secondary btn-sm" onclick="location.reload()" title="רענן את העמוד">
+              <i class="fas fa-sync-alt"></i> רענן עמוד
             </button>
+          </div>
+        </div>
+        <div class="error-details-expanded" id="error-details-${errorId}" style="display: none;">
+          <div class="error-stack mt-3">
+            <strong>Stack Trace:</strong>
+            <pre class="bg-dark text-light p-2 rounded mt-2" style="max-height: 200px; overflow: auto;">${this.escapeHtml(error.stack || 'לא זמין')}</pre>
           </div>
         </div>
       </div>
@@ -284,13 +295,23 @@ class SMErrorHandler {
   }
 
   /**
+   * Toggle detailed error information
+   * החלפת הצגת פרטי שגיאה מפורטים
+   */
+  static toggleDetails(errorId) {
+    const detailsElement = document.getElementById(`error-details-${errorId}`);
+    if (detailsElement) {
+      const isVisible = detailsElement.style.display !== 'none';
+      detailsElement.style.display = isVisible ? 'none' : 'block';
+    }
+  }
+
+  /**
    * Show detailed error information
    * הצגת פרטי שגיאה מפורטים
    */
   static showErrorDetails(errorId) {
-    // This could open a modal with full error details
-    console.log(`📋 Showing detailed error info for: ${errorId}`);
-    alert(`פרטי שגיאה מפורטים עבור מזהה: ${errorId}`);
+    this.toggleDetails(errorId);
   }
 
   /**

@@ -18,6 +18,10 @@
  * - תמיכה ב-FormData למקרים מתקדמים
  */
 
+// ===== FUNCTION INDEX =====
+// === Event Handlers ===
+// - DataCollectionService.switch() - Switch
+
 // ===== DATA COLLECTION SERVICE =====
 
 class DataCollectionService {
@@ -67,15 +71,32 @@ class DataCollectionService {
             if (config.type === 'rich-text') {
                 if (window.RichTextEditorService) {
                     const htmlContent = window.RichTextEditorService.getContent(config.id);
+                    window.Logger?.debug(`📝 [DataCollectionService] Rich-text content for ${config.id}`, {
+                        htmlContentLength: htmlContent?.length || 0,
+                        hasContent: !!htmlContent,
+                        page: 'data-collection'
+                    });
+                    
                     // בדיקה אם התוכן ריק (אחרי הסרת תגי HTML)
                     const textContent = htmlContent.replace(/<[^>]*>/g, '').trim();
                     if (!textContent) {
+                        window.Logger?.warn(`⚠️ [DataCollectionService] Empty rich-text content for ${config.id}`, {
+                            htmlContentLength: htmlContent?.length || 0,
+                            page: 'data-collection'
+                        });
                         data[key] = config.hasOwnProperty('default') ? config.default : '';
                     } else {
                         data[key] = htmlContent;
+                        window.Logger?.debug(`✅ [DataCollectionService] Rich-text content collected for ${config.id}`, {
+                            htmlContentLength: htmlContent?.length || 0,
+                            textContentLength: textContent?.length || 0,
+                            page: 'data-collection'
+                        });
                     }
                 } else {
-                    console.warn(`⚠️ RichTextEditorService not available for field ${config.id}`);
+                    window.Logger?.warn(`⚠️ RichTextEditorService not available for field ${config.id}`, {
+                        page: 'data-collection'
+                    });
                     data[key] = config.hasOwnProperty('default') ? config.default : '';
                 }
                 continue;
@@ -308,7 +329,7 @@ class DataCollectionService {
     static getValue(fieldId, type = 'text', defaultValue = null) {
         const element = document.getElementById(fieldId);
         if (!element) {
-            console.warn(`⚠️ שדה ${fieldId} לא נמצא`);
+            // Silent return - it's normal for fields to not exist on some pages
             return defaultValue;
         }
         

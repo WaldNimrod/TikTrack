@@ -62,13 +62,13 @@ class SMPerformanceSection extends SMBaseSection {
    */
   async fetchSystemOverview() {
     try {
-      const response = await fetch(this.apiEndpoints.overview, {
+      const response = await this.fetchWithTimeout(this.apiEndpoints.overview, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json'
         }
-      });
+      }, 10000);
 
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -88,13 +88,13 @@ class SMPerformanceSection extends SMBaseSection {
    */
   async fetchSystemMetrics() {
     try {
-      const response = await fetch(this.apiEndpoints.metrics, {
+      const response = await this.fetchWithTimeout(this.apiEndpoints.metrics, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json'
         }
-      });
+      }, 10000);
 
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -114,13 +114,13 @@ class SMPerformanceSection extends SMBaseSection {
    */
   async fetchSystemPerformance() {
     try {
-      const response = await fetch(this.apiEndpoints.performance, {
+      const response = await this.fetchWithTimeout(this.apiEndpoints.performance, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json'
         }
-      });
+      }, 10000);
 
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -129,7 +129,10 @@ class SMPerformanceSection extends SMBaseSection {
       const result = await response.json();
       return result.status === 'success' ? result.data : null;
     } catch (error) {
-      console.warn('⚠️ Failed to fetch system performance:', error);
+      // Backend endpoint may not be available - this is expected in some environments
+      if (window.Logger?.debug) {
+        window.Logger.debug('System performance endpoint not available', { error: error.message }, { page: 'system-management' });
+      }
       return null;
     }
   }
@@ -139,14 +142,30 @@ class SMPerformanceSection extends SMBaseSection {
    * הצגת נתוני ביצועים
    */
   render(data) {
-    if (!data || (!data.overview && !data.metrics && !data.performance)) {
+    // Provide fallback data if no data available
+    const fallbackData = {
+      overview: null,
+      metrics: null,
+      performance: null,
+      timestamp: new Date().toISOString()
+    };
+
+    const renderData = data || fallbackData;
+
+    // If no data at all, show empty state
+    if (!renderData.overview && !renderData.metrics && !renderData.performance) {
       this.showEmptyState('אין נתוני ביצועים זמינים');
       return;
     }
 
     try {
-      const performanceHtml = this.createPerformanceHTML(data);
-      this.container.innerHTML = performanceHtml;
+      const performanceHtml = this.createPerformanceHTML(renderData);
+      this.container.textContent = '';
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(performanceHtml, 'text/html');
+      doc.body.childNodes.forEach(node => {
+        this.container.appendChild(node.cloneNode(true));
+      });
       
       console.log('✅ Performance section rendered successfully');
       
@@ -300,6 +319,9 @@ class SMPerformanceSection extends SMBaseSection {
   createResponseTimeCard(overview, metrics, performance) {
     const responseTime = this.getResponseTime(overview, metrics, performance);
     const responseTrend = this.getResponseTrend(overview, metrics, performance);
+    
+    // Ensure responseTime is a number
+    const responseTimeNum = typeof responseTime === 'number' ? responseTime : parseFloat(responseTime) || 0;
 
     return `
       <div class="card response-time-card">
@@ -307,8 +329,8 @@ class SMPerformanceSection extends SMBaseSection {
           <h5><i class="fas fa-tachometer-alt"></i> זמן תגובה</h5>
           
           <div class="response-metric">
-            <div class="metric-value text-${this.getResponseTimeColor(responseTime)}">
-              ${responseTime.toFixed(0)}ms
+            <div class="metric-value text-${this.getResponseTimeColor(responseTimeNum)}">
+              ${responseTimeNum.toFixed(0)}ms
             </div>
             <div class="metric-label">זמן תגובה ממוצע</div>
           </div>
@@ -346,7 +368,7 @@ class SMPerformanceSection extends SMBaseSection {
           
           <div class="db-metric">
             <div class="metric-value text-${this.getDatabasePerformanceColor(dbPerformance)}">
-              ${dbPerformance.toFixed(0)}ms
+              ${(typeof dbPerformance === 'number' ? dbPerformance : parseFloat(dbPerformance) || 0).toFixed(0)}ms
             </div>
             <div class="metric-label">זמן שאילתה ממוצע</div>
           </div>
@@ -456,7 +478,7 @@ class SMPerformanceSection extends SMBaseSection {
                 <tbody>
                   <tr>
                     <td><strong>זמן פעילות:</strong></td>
-                    <td>${this.getSystemUptime(overview, metrics, performance)}</td>
+                    <td>${this.formatUptime(this.getSystemUptime(overview, metrics, performance))}</td>
                   </tr>
                   <tr>
                     <td><strong>עומס מערכת:</strong></td>
@@ -480,7 +502,7 @@ class SMPerformanceSection extends SMBaseSection {
                 <tbody>
                   <tr>
                     <td><strong>זמן תגובה ממוצע:</strong></td>
-                    <td>${this.getResponseTime(overview, metrics, performance).toFixed(0)}ms</td>
+                    <td>${(this.getResponseTime(overview, metrics, performance) || 0).toFixed(0)}ms</td>
                   </tr>
                   <tr>
                     <td><strong>בקשות/דקה:</strong></td>
@@ -650,19 +672,19 @@ class SMPerformanceSection extends SMBaseSection {
    * קבלת זמן תגובה
    */
   getResponseTime(overview, metrics, performance) {
+    let responseTime = 0;
+    
     if (performance && performance.response_time) {
-      return performance.response_time;
+      responseTime = performance.response_time;
+    } else if (metrics && metrics.avg_response_time) {
+      responseTime = metrics.avg_response_time;
+    } else if (overview && overview.response_time_ms) {
+      responseTime = overview.response_time_ms;
     }
     
-    if (metrics && metrics.avg_response_time) {
-      return metrics.avg_response_time;
-    }
-    
-    if (overview && overview.response_time_ms) {
-      return overview.response_time_ms;
-    }
-    
-    return 0;
+    // Ensure we return a number
+    const num = typeof responseTime === 'number' ? responseTime : parseFloat(responseTime);
+    return isNaN(num) ? 0 : num;
   }
 
   /**
@@ -906,6 +928,57 @@ class SMPerformanceSection extends SMBaseSection {
     
     if (overview && overview.summary && overview.summary.uptime) {
       return overview.summary.uptime;
+    }
+    
+    return null;
+  }
+
+  /**
+   * Format uptime for display
+   * עיצוב זמן פעילות לתצוגה
+   */
+  formatUptime(uptime) {
+    if (!uptime) return 'לא זמין';
+    
+    // If it's already a string, return it
+    if (typeof uptime === 'string') {
+      return uptime;
+    }
+    
+    // If it's a number (seconds), format it
+    if (typeof uptime === 'number') {
+      const days = Math.floor(uptime / 86400);
+      const hours = Math.floor((uptime % 86400) / 3600);
+      const minutes = Math.floor((uptime % 3600) / 60);
+      const seconds = uptime % 60;
+      
+      if (days > 0) {
+        return `${days} ימים, ${hours} שעות`;
+      } else if (hours > 0) {
+        return `${hours} שעות, ${minutes} דקות`;
+      } else if (minutes > 0) {
+        return `${minutes} דקות, ${seconds} שניות`;
+      } else {
+        return `${seconds} שניות`;
+      }
+    }
+    
+    // If it's an object, try to extract meaningful info
+    if (typeof uptime === 'object' && uptime !== null) {
+      if (uptime.days !== undefined || uptime.hours !== undefined) {
+        const d = uptime.days || 0;
+        const h = uptime.hours || 0;
+        const m = uptime.minutes || 0;
+        if (d > 0) {
+          return `${d} ימים, ${h} שעות`;
+        } else if (h > 0) {
+          return `${h} שעות, ${m} דקות`;
+        } else {
+          return `${m} דקות`;
+        }
+      }
+      // Fallback: stringify
+      return JSON.stringify(uptime);
     }
     
     return 'לא זמין';

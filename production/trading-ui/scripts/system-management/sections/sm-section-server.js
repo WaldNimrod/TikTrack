@@ -15,8 +15,8 @@ class SMServerSection extends SMBaseSection {
     super(sectionId, config);
     this.apiEndpoints = {
       status: '/api/server/status',
-      resources: '/api/system/resources',
-      overview: '/api/system/overview'
+      overview: '/api/system/overview',
+      systemInfo: '/api/system/info' // System information endpoint
     };
   }
 
@@ -30,17 +30,17 @@ class SMServerSection extends SMBaseSection {
       console.log(`🖥️ Loading server data from multiple endpoints`);
 
       // Load data from multiple endpoints in parallel
-      const [statusData, resourcesData, overviewData] = await Promise.allSettled([
+      const [statusData, overviewData, systemInfoData] = await Promise.allSettled([
         this.fetchServerStatus(),
-        this.fetchSystemResources(),
-        this.fetchSystemOverview()
+        this.fetchSystemOverview(),
+        this.fetchSystemInfo()
       ]);
 
       // Combine data from all sources
       const combinedData = {
         status: statusData.status === 'fulfilled' ? statusData.value : null,
-        resources: resourcesData.status === 'fulfilled' ? resourcesData.value : null,
         overview: overviewData.status === 'fulfilled' ? overviewData.value : null,
+        systemInfo: systemInfoData.status === 'fulfilled' ? systemInfoData.value : null,
         timestamp: new Date().toISOString()
       };
 
@@ -83,38 +83,12 @@ class SMServerSection extends SMBaseSection {
   }
 
   /**
-   * Fetch system resources
-   * קבלת משאבי מערכת
-   */
-  async fetchSystemResources() {
-    try {
-      const response = await fetch(this.apiEndpoints.resources, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        }
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-
-      const result = await response.json();
-      return result.status === 'success' ? result.data : null;
-    } catch (error) {
-      console.warn('⚠️ Failed to fetch system resources:', error);
-      return null;
-    }
-  }
-
-  /**
    * Fetch system overview
    * קבלת סקירת מערכת
    */
   async fetchSystemOverview() {
     try {
-      const response = await fetch(this.apiEndpoints.overview, {
+      const response = await this.fetchWithTimeout(this.apiEndpoints.overview, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -135,6 +109,32 @@ class SMServerSection extends SMBaseSection {
   }
 
   /**
+   * Fetch system information
+   * קבלת מידע מערכת
+   */
+  async fetchSystemInfo() {
+    try {
+      const response = await this.fetchWithTimeout(this.apiEndpoints.systemInfo, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+
+      const result = await response.json();
+      return result.status === 'success' ? result.data : null;
+    } catch (error) {
+      console.warn('⚠️ Failed to fetch system info:', error);
+      return null;
+    }
+  }
+
+  /**
    * Render server data
    * הצגת נתוני שרת
    */
@@ -146,7 +146,12 @@ class SMServerSection extends SMBaseSection {
 
     try {
       const serverHtml = this.createServerHTML(data);
-      this.container.innerHTML = serverHtml;
+      this.container.textContent = '';
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(serverHtml, 'text/html');
+      doc.body.childNodes.forEach(node => {
+        this.container.appendChild(node.cloneNode(true));
+      });
       
       console.log('✅ Server section rendered successfully');
       
@@ -165,10 +170,21 @@ class SMServerSection extends SMBaseSection {
    * יצירת HTML של שרת
    */
   createServerHTML(data) {
-    const { status, resources, overview } = data;
+    const { status, resources, overview, systemInfo } = data;
 
     return `
       <div class="server-overview">
+        <!-- Quick Link -->
+        <div class="row mb-3">
+          <div class="col-12">
+            <div class="d-flex justify-content-end">
+              <a href="/server-monitor" class="btn btn-sm btn-outline-primary">
+                <i class="fas fa-external-link-alt me-1"></i> ניטור שרת מלא
+              </a>
+            </div>
+          </div>
+        </div>
+
         <!-- Server Status Card -->
         <div class="row mb-4">
           <div class="col-12">
@@ -200,7 +216,7 @@ class SMServerSection extends SMBaseSection {
         <!-- System Information -->
         <div class="row">
           <div class="col-12">
-            ${this.createSystemInfoCard(status, resources, overview)}
+            ${this.createSystemInfoCard(status, resources, overview, data.systemInfo)}
           </div>
         </div>
       </div>
@@ -344,64 +360,55 @@ class SMServerSection extends SMBaseSection {
    * Create system information card
    * יצירת כרטיס מידע מערכת
    */
-  createSystemInfoCard(status, resources, overview) {
-    const systemInfo = this.extractSystemInfo(status, resources, overview);
+  createSystemInfoCard(status, resources, overview, systemInfoData) {
+    const systemInfo = this.extractSystemInfo(status, resources, overview, systemInfoData);
 
-    return `
-      <div class="card">
-        <div class="card-header">
-          <h5><i class="fas fa-info-circle"></i> מידע מערכת</h5>
-        </div>
-        <div class="card-body">
-          <div class="row">
-            <div class="col-md-6">
-              <table class="table table-sm">
-                <tbody>
-                  <tr>
-                    <td><strong>מערכת הפעלה:</strong></td>
-                    <td>${systemInfo.os}</td>
-                  </tr>
-                  <tr>
-                    <td><strong>גרסת Python:</strong></td>
-                    <td>${systemInfo.pythonVersion}</td>
-                  </tr>
-                  <tr>
-                    <td><strong>גרסת Flask:</strong></td>
-                    <td>${systemInfo.flaskVersion}</td>
-                  </tr>
-                  <tr>
-                    <td><strong>ארכיטקטורה:</strong></td>
-                    <td>${systemInfo.architecture}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            <div class="col-md-6">
-              <table class="table table-sm">
-                <tbody>
-                  <tr>
-                    <td><strong>זיכרון זמין:</strong></td>
-                    <td>${systemInfo.totalMemory}</td>
-                  </tr>
-                  <tr>
-                    <td><strong>שטח דיסק זמין:</strong></td>
-                    <td>${systemInfo.totalDisk}</td>
-                  </tr>
-                  <tr>
-                    <td><strong>מעבדים:</strong></td>
-                    <td>${systemInfo.cpuCount}</td>
-                  </tr>
-                  <tr>
-                    <td><strong>זמן הפעלה:</strong></td>
-                    <td>${systemInfo.uptime}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
-    `;
+    return SMUIComponents.createStatsCard(
+      'מידע מערכת',
+      [
+        {
+          label: 'מערכת הפעלה',
+          value: systemInfo.os,
+          icon: 'fa-desktop'
+        },
+        {
+          label: 'גרסת Python',
+          value: systemInfo.pythonVersion,
+          icon: 'fa-code'
+        },
+        {
+          label: 'גרסת Flask',
+          value: systemInfo.flaskVersion,
+          icon: 'fa-flask'
+        },
+        {
+          label: 'ארכיטקטורה',
+          value: systemInfo.architecture,
+          icon: 'fa-microchip'
+        },
+        {
+          label: 'זיכרון זמין',
+          value: systemInfo.totalMemory,
+          icon: 'fa-memory'
+        },
+        {
+          label: 'שטח דיסק זמין',
+          value: systemInfo.totalDisk,
+          icon: 'fa-hdd'
+        },
+        {
+          label: 'מעבדים',
+          value: systemInfo.cpuCount,
+          icon: 'fa-microchip'
+        },
+        {
+          label: 'זמן הפעלה',
+          value: systemInfo.uptime,
+          icon: 'fa-clock'
+        }
+      ],
+      { icon: 'fa-info-circle' }
+    );
   }
 
   /**
@@ -492,15 +499,34 @@ class SMServerSection extends SMBaseSection {
    * Extract system info
    * חילוץ מידע מערכת
    */
-  extractSystemInfo(status, resources, overview) {
+  extractSystemInfo(status, resources, overview, systemInfoData) {
+    // Try to get from systemInfoData first (most reliable)
+    if (systemInfoData) {
+      const osInfo = systemInfoData.os || {};
+      const pythonInfo = systemInfoData.python || {};
+      const serverInfo = systemInfoData.server || {};
+      
+      return {
+        os: osInfo.system ? `${osInfo.system} ${osInfo.release || ''}`.trim() : 'לא ידוע',
+        pythonVersion: pythonInfo.version ? pythonInfo.version.split('\n')[0] : 'לא ידוע',
+        flaskVersion: serverInfo.flask_version || 'לא ידוע',
+        architecture: osInfo.architecture || 'לא ידוע',
+        totalMemory: resources?.total_memory ? SMUIComponents.formatBytes(resources.total_memory) : 'לא זמין',
+        totalDisk: resources?.total_disk ? SMUIComponents.formatBytes(resources.total_disk) : 'לא זמין',
+        cpuCount: resources?.cpu_count || 'לא זמין',
+        uptime: overview?.summary?.uptime || status?.uptime || 'לא ידוע'
+      };
+    }
+    
+    // Fallback to other sources
     return {
-      os: status?.os_info || resources?.os_name || 'לא ידוע',
-      pythonVersion: status?.python_version || resources?.python_version || 'לא ידוע',
-      flaskVersion: status?.flask_version || resources?.flask_version || 'לא ידוע',
-      architecture: resources?.architecture || 'לא ידוע',
-      totalMemory: resources?.total_memory ? SMUIComponents.formatBytes(resources.total_memory) : 'לא ידוע',
-      totalDisk: resources?.total_disk ? SMUIComponents.formatBytes(resources.total_disk) : 'לא ידוע',
-      cpuCount: resources?.cpu_count || status?.cpu_count || 'לא ידוע',
+      os: status?.os_info || resources?.os_name || overview?.system_info?.os?.system || 'לא ידוע',
+      pythonVersion: status?.python_version || resources?.python_version || overview?.system_info?.python?.version?.split('\n')[0] || 'לא ידוע',
+      flaskVersion: status?.flask_version || resources?.flask_version || overview?.system_info?.server?.flask_version || 'לא ידוע',
+      architecture: resources?.architecture || overview?.system_info?.os?.architecture || 'לא ידוע',
+      totalMemory: resources?.total_memory ? SMUIComponents.formatBytes(resources.total_memory) : 'לא זמין',
+      totalDisk: resources?.total_disk ? SMUIComponents.formatBytes(resources.total_disk) : 'לא זמין',
+      cpuCount: resources?.cpu_count || status?.cpu_count || 'לא זמין',
       uptime: overview?.summary?.uptime || status?.uptime || 'לא ידוע'
     };
   }

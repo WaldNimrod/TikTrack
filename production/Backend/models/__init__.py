@@ -10,6 +10,7 @@ from .note_relation_type import NoteRelationType
 from .execution import Execution
 from .currency import Currency
 from .user import User
+from .user_ticker import UserTicker
 from .preferences import PreferenceGroup, PreferenceType, PreferenceProfile, UserPreference
 from .external_data import ExternalDataProvider, MarketDataQuote, DataRefreshLog, IntradayDataSlot
 from .trading_method import TradingMethod, MethodParameter
@@ -21,11 +22,15 @@ from .tag_category import TagCategory
 from .tag import Tag
 from .tag_link import TagLink
 from .quotes_last import QuotesLast
+from .password_reset_token import PasswordResetToken
+from .email_log import EmailLog
+from .ai_analysis import AIPromptTemplate, AIAnalysisRequest, UserLLMProvider
+from .watch_list import WatchList, WatchListItem
 
 __all__ = [
     'BaseModel',
     'Ticker',
-    'TradingAccount', 
+    'TradingAccount',
     'TradePlan',
     'Trade',
     'Alert',
@@ -35,6 +40,7 @@ __all__ = [
     'Execution',
     'Currency',
     'User',
+    'UserTicker',
     'PreferenceGroup',
     'PreferenceType',
     'PreferenceProfile',
@@ -55,5 +61,12 @@ __all__ = [
     'TagCategory',
     'Tag',
     'TagLink',
-    'QuotesLast'
+    'QuotesLast',
+    'PasswordResetToken',
+    'EmailLog',
+    'AIPromptTemplate',
+    'AIAnalysisRequest',
+    'UserLLMProvider',
+    'WatchList',
+    'WatchListItem'
 ]

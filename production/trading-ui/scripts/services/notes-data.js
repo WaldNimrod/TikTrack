@@ -5,6 +5,42 @@
  * Ensures cache policies via UnifiedCacheManager + CacheTTLGuard.
  */
 (function notesDataService() {
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - buildUrl() - Buildurl
+// - buildMutationRequest() - Buildmutationrequest
+// - createNote() - Createnote
+
+// === Event Handlers ===
+// - sendNoteMutation() - Sendnotemutation
+// - validateNoteRelation() - Validatenoterelation
+
+// === UI Functions ===
+// - updateNote() - Updatenote
+
+// === Data Functions ===
+// - normalizeNotesPayload() - Normalizenotespayload
+// - saveNotesCache() - Savenotescache
+// - notifyLoadError() - Notifyloaderror
+// - fetchNotesFromApi() - Fetchnotesfromapi
+// - loadNotesData() - Loadnotesdata
+// - isFormDataPayload() - Isformdatapayload
+// - fetchNoteDetails() - Fetchnotedetails
+// - getCachedNotes() - Getcachednotes
+
+// === Utility Functions ===
+// - invalidateNotesCache() - Invalidatenotescache
+// - validateNote() - Validatenote
+
+// === Other ===
+// - resolveBaseUrl() - Resolvebaseurl
+// - normalizeNoteRecord() - Normalizenoterecord
+// - clearNotesCachePattern() - Clearnotescachepattern
+// - deleteNote() - Deletenote
+// - setCachedNotes() - Setcachednotes
+
   const CACHE_KEY = 'notes-data';
   const DEFAULT_TTL = 90 * 1000; // 90 שניות
   const PAGE_LOG_CONTEXT = { page: 'notes-data' };
@@ -158,8 +194,13 @@
     const response = await fetch(url.toString(), {
       method: 'GET',
       headers: DEFAULT_HEADERS,
-      signal,
+      signal, // Include cookies for session-based auth
     });
+    
+    // Handle 401/308 authentication errors
+    if (window.checkAndHandleAuthError && window.checkAndHandleAuthError(response, url.toString())) {
+      throw new Error('Authentication required');
+    }
 
     if (!response.ok) {
       const error = new Error(`טעינת הערות נכשלה (${response.status})`);
@@ -246,9 +287,31 @@
     if (payload !== undefined && payload !== null) {
       if (isFormDataPayload(payload)) {
         requestOptions.body = payload;
+        // Log FormData contents for debugging
+        if (window.Logger && payload.get) {
+          const content = payload.get('content');
+          window.Logger.debug('📤 [buildMutationRequest] FormData payload', {
+            hasContent: !!content,
+            contentLength: content?.length || 0,
+            hasAttachment: !!payload.get('attachment'),
+            ...PAGE_LOG_CONTEXT
+          });
+        }
       } else if (typeof payload === 'object') {
         requestOptions.headers = { ...DEFAULT_HEADERS, ...headers };
         requestOptions.body = JSON.stringify(payload);
+        // Log JSON payload contents for debugging
+        if (window.Logger) {
+          window.Logger.debug('📤 [buildMutationRequest] JSON payload', {
+            hasContent: !!payload.content,
+            contentLength: payload.content?.length || 0,
+            contentType: typeof payload.content,
+            related_type_id: payload.related_type_id,
+            related_id: payload.related_id,
+            payloadKeys: Object.keys(payload),
+            ...PAGE_LOG_CONTEXT
+          });
+        }
       } else {
         requestOptions.body = payload;
       }

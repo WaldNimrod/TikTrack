@@ -8,6 +8,20 @@
  * @created 2025-09-22
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Event Handlers ===
+// - setGlobalFavicon() - Setglobalfavicon
+// - setPageSpecificFavicon() - Setpagespecificfavicon
+// - autoSetFavicon() - Autosetfavicon
+// - setFavicon() - Setfavicon
+// - updateFaviconBasedOnStatus() - Updatefaviconbasedonstatus
+// - restoreFaviconFromStatus() - Restorefaviconfromstatus
+
+// === Data Functions ===
+// - getCurrentAppStatus() - Getcurrentappstatus
+
 /**
  * Set favicon for the current page
  * מגדיר favicon לעמוד הנוכחי
@@ -76,7 +90,6 @@ function autoSetFavicon() {
     // Map filename to page type
     const pageTypeMap = {
         'index': 'home',
-        'linter-realtime-monitor': 'linter',
         'trading_accounts': 'trading_accounts',
         'accounts': 'trading_accounts', // Legacy support for old URLs
         'alerts': 'alerts',

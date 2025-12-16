@@ -1,0 +1,720 @@
+/**
+ * Watch Lists - רשימות צפייה
+ * 
+ * קובץ זה מכיל את הסגנונות של מערכת Watch Lists
+ * כולל כרטיסי רשימות, פריטים, דגלים ותצוגות שונות
+ * 
+ * @version 1.0.0
+ * @created 26 בנובמבר 2025
+ */
+
+/* ===== Hide watch-lists-section (removed from HTML) ===== */
+#watch-lists-section {
+    display: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    overflow: hidden !important;
+}
+
+/* ===== Watch List Card ===== */
+.watch-list-card {
+    border: 1px solid var(--border-color, #dee2e6);
+    border-radius: 8px;
+    transition: all 0.2s;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.watch-list-card:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
+
+.watch-list-card-header {
+    padding: 1rem;
+    border-bottom: 1px solid var(--border-color, #dee2e6);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 8px 8px 0 0;
+    /* Background color will be set dynamically via inline style or data attribute */
+}
+
+.watch-list-card-icon {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.watch-list-card-body {
+    padding: 1rem;
+    flex-grow: 1;
+}
+
+.watch-list-card-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.watch-list-card-stats {
+    font-size: 0.9rem;
+    color: var(--text-muted, #6c757d);
+}
+
+.watch-list-card-footer {
+    padding: 1rem;
+    border-top: 1px solid var(--border-color, #dee2e6);
+}
+
+/* ===== Stat Item ===== */
+.stat-item {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.stat-icon {
+    width: 14px;
+    height: 14px;
+}
+
+/* ===== Drag Handle ===== */
+.drag-handle {
+    cursor: move;
+    color: var(--text-muted, #6c757d);
+    font-size: 1.2rem;
+    padding: 0.25rem;
+}
+
+.drag-handle:hover {
+    color: var(--text-color, #495057);
+}
+
+.drag-handle-column {
+    width: 40px;
+}
+
+.flag-column {
+    width: 80px;
+}
+
+.actions-column {
+    width: 140px;
+    white-space: nowrap;
+}
+
+/* Ensure button groups in watch lists table display inline */
+#watchListItemsTable .btn-group {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    gap: 2px;
+    align-items: center;
+}
+
+#watchListItemsTable .btn-group button {
+    flex-shrink: 0;
+    margin: 0;
+}
+
+/* ===== Flag Palette Popup ===== */
+.flag-palette-popup {
+    position: fixed; /* Changed from absolute to fixed for better positioning */
+    background: white;
+    border: 1px solid var(--border-color, #dee2e6);
+    border-radius: 8px;
+    padding: 1rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 1050;
+    display: none; /* Hidden by default, shown via JavaScript */
+}
+
+.flag-palette-header {
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    font-size: 0.9rem;
+}
+
+.flag-palette-colors {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.flag-color-btn {
+    width: 40px;
+    height: 40px;
+    border: 2px solid var(--border-color, #dee2e6);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.flag-color-btn:hover {
+    transform: scale(1.1);
+    border-color: var(--text-color, #495057);
+}
+
+/* ===== View Container ===== */
+.view-container {
+    min-height: 200px;
+}
+
+.view-container[style*="display: none"] {
+    display: none !important;
+}
+
+/* ===== View Mode Buttons ===== */
+/* Note: filter-icon-btn background is defined in _chart-management.css */
+.btn-view-mode {
+    background-color: white !important;
+}
+
+.btn-view-mode.active,
+.btn-view-mode.active.filter-icon-btn {
+    background-color: var(--apple-blue, #007AFF) !important;
+    color: white !important;
+    border-color: var(--apple-blue, #007AFF) !important;
+}
+
+/* ===== Watch List Item Card ===== */
+.watch-list-item-card {
+    border: 1px solid var(--border-color, #dee2e6);
+    border-radius: 8px;
+    padding: 0.25rem; /* Reduced padding (from 1rem to 0.25rem) - uniform from all sides */
+    transition: all 0.2s;
+}
+
+.watch-list-item-card:hover {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* ===== Compact List Item ===== */
+.compact-list-item {
+    padding: 0.75rem;
+    border-bottom: 1px solid var(--border-light, #f0f0f0);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.compact-list-item:hover {
+    background-color: var(--background-light, #f8f9fa);
+}
+
+/* ===== List Management Buttons (Add/Delete) ===== */
+/* כפתורי הוספה ומחיקה אחרי הסלקטור - רקע לבן עם צבעים נכונים */
+.table-title .btn[data-button-type="ADD"],
+.table-title .btn[data-button-type="DELETE"] {
+    background-color: white !important;
+    border: 1px solid #dee2e6 !important;
+    color: var(--text-color, #495057) !important;
+    padding: 0.375rem 0.5rem !important;
+    min-width: 32px !important;
+    height: 32px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 4px !important;
+    transition: all 0.2s ease !important;
+}
+
+.table-title .btn[data-button-type="ADD"] {
+    color: var(--color-action-add, var(--primary-color, #26baac)) !important;
+    border-color: var(--color-action-add, var(--primary-color, #26baac)) !important;
+}
+
+.table-title .btn[data-button-type="ADD"]:hover {
+    background-color: var(--color-action-add, var(--primary-color, #26baac)) !important;
+    color: white !important;
+    border-color: var(--color-action-add, var(--primary-color, #26baac)) !important;
+}
+
+.table-title .btn[data-button-type="DELETE"] {
+    color: var(--color-action-delete, #dc3545) !important;
+    border-color: var(--color-action-delete, #dc3545) !important;
+}
+
+.table-title .btn[data-button-type="DELETE"]:hover {
+    background-color: var(--color-action-delete, #dc3545) !important;
+    color: white !important;
+    border-color: var(--color-action-delete, #dc3545) !important;
+}
+
+/* ===== Select Styled as Title ===== */
+/* עיצוב הסלקטור כך שיראה כמו כותרת - צבע כהה שנשמר גם אחרי שינוי */
+.table-title .form-select-title,
+.table-title #activeListSelect.form-select-title,
+.table-title select.form-select-title {
+    border: none !important;
+    background: transparent !important;
+    font-size: 1.1rem !important;
+    font-weight: 600 !important;
+    color: var(--color-text-primary-dark, var(--text-color, var(--apple-text-primary, #212529))) !important;
+    padding: 0.25rem 0.5rem !important;
+    padding-inline-end: 1.5rem !important;
+    cursor: pointer !important;
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 9L1 4h10z'/%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat !important;
+    background-position: left 0.5rem center !important;
+    background-size: 12px 12px !important;
+    min-width: 200px !important;
+    transition: all 0.2s ease !important;
+}
+
+/* וודא שהצבע נשמר גם אחרי שינוי הערך */
+.table-title .form-select-title option,
+.table-title #activeListSelect.form-select-title option,
+.table-title select.form-select-title option {
+    color: var(--color-text-primary-dark, var(--text-color, var(--apple-text-primary, #212529))) !important;
+    background-color: var(--apple-bg-primary, #FFFFFF) !important;
+}
+
+/* Hover - שומר על צבע כהה עם רקע עדין */
+.table-title .form-select-title:hover,
+.table-title #activeListSelect.form-select-title:hover,
+.table-title select.form-select-title:hover {
+    color: var(--color-text-primary-dark, var(--text-color, var(--apple-text-primary, #212529))) !important;
+    background-color: rgba(0, 0, 0, 0.03) !important;
+    border-radius: 4px !important;
+}
+
+/* Focus - שומר על צבע כהה עם הדגשה */
+.table-title .form-select-title:focus,
+.table-title #activeListSelect.form-select-title:focus,
+.table-title select.form-select-title:focus {
+    outline: none !important;
+    color: var(--color-text-primary-dark, var(--text-color, var(--apple-text-primary, #212529))) !important;
+    background-color: rgba(0, 0, 0, 0.05) !important;
+    border-radius: 4px !important;
+    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Active/Selected - וודא שהצבע נשמר */
+.table-title .form-select-title:active,
+.table-title #activeListSelect.form-select-title:active,
+.table-title select.form-select-title:active {
+    color: var(--color-text-primary-dark, var(--text-color, var(--apple-text-primary, #212529))) !important;
+}
+
+/* ===== Flag Button ===== */
+.btn-flag {
+    border: none;
+    background: none;
+    padding: 0.25rem;
+}
+
+.btn-flag:hover {
+    opacity: 0.8;
+}
+
+/* ===== Search Result Item ===== */
+.search-result-item {
+    padding: 0.75rem;
+    border: 1px solid var(--border-color, #dee2e6);
+    border-radius: 4px;
+    margin-bottom: 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.search-result-item:hover {
+    background-color: var(--background-light, #f8f9fa);
+    border-color: var(--primary-color, #26baac);
+}
+
+.search-result-item.selected {
+    background-color: var(--primary-light, #e7f5f3);
+    border-color: var(--primary-color, #26baac);
+}
+
+/* ===== Badge Small ===== */
+.badge-sm {
+    font-size: 0.7rem;
+}
+
+/* ===== Form Control Color Small ===== */
+.form-control-color-sm {
+    width: 60px;
+    height: 40px;
+}
+
+/* ===== Flag Color Buttons (for filter and palette) ===== */
+.btn-flag-filter {
+    border: none;
+    color: white;
+}
+
+.flag-color-btn-lg {
+    width: 48px;
+    height: 48px;
+}
+
+.flag-color-btn[data-bg-color] {
+    background-color: var(--bg-color);
+}
+
+/* Apply background color from data attribute */
+.flag-color-btn[data-bg-color="#26baac"] { background-color: #26baac; }
+.flag-color-btn[data-bg-color="#0056b3"] { background-color: #0056b3; }
+.flag-color-btn[data-bg-color="#28a745"] { background-color: #28a745; }
+.flag-color-btn[data-bg-color="#20c997"] { background-color: #20c997; }
+.flag-color-btn[data-bg-color="#dc3545"] { background-color: #dc3545; }
+.flag-color-btn[data-bg-color="#fc5a06"] { background-color: #fc5a06; }
+.flag-color-btn[data-bg-color="#6f42c1"] { background-color: #6f42c1; }
+.flag-color-btn[data-bg-color="#17a2b8"] { background-color: #17a2b8; }
+
+.btn-flag-filter[data-flag-color="#26baac"] {
+    background-color: #26baac;
+    border-color: #26baac;
+}
+
+.btn-flag-filter[data-flag-color="#fc5a06"] {
+    background-color: #fc5a06;
+    border-color: #fc5a06;
+}
+
+.btn-flag-filter[data-flag-color="#28a745"] {
+    background-color: #28a745;
+    border-color: #28a745;
+}
+
+.btn-flag-filter[data-flag-color="#20c997"] {
+    background-color: #20c997;
+    border-color: #20c997;
+}
+
+.btn-flag-filter[data-flag-color="#dc3545"] {
+    background-color: #dc3545;
+    border-color: #dc3545;
+}
+
+.btn-flag-filter[data-flag-color="#6f42c1"] {
+    background-color: #6f42c1;
+    border-color: #6f42c1;
+}
+
+.btn-flag-filter[data-flag-color="#17a2b8"] {
+    background-color: #17a2b8;
+    border-color: #17a2b8;
+}
+
+.btn-flag-filter[data-flag-color="#0056b3"] {
+    background-color: #0056b3;
+    border-color: #0056b3;
+}
+
+/* ===== Icon Selector Wrapper ===== */
+.icon-selector-wrapper {
+    position: relative;
+}
+
+.icon-selector-trigger {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 0.75rem;
+}
+
+.selected-icon-preview {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.icon-preview-placeholder {
+    color: var(--text-muted, #6c757d);
+    font-size: 0.9rem;
+}
+
+/* ===== Icon Selector Dropdown ===== */
+.icon-selector-dropdown {
+    min-width: 400px;
+    max-width: 500px;
+    padding: 0;
+    margin-top: 0.25rem;
+    border: 1px solid var(--border-color, #dee2e6);
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* ===== Icon Library Tabs ===== */
+.icon-library-tabs {
+    border-bottom: 1px solid var(--border-color, #dee2e6);
+    margin: 0;
+    padding: 0.5rem 0.5rem 0 0.5rem;
+}
+
+.icon-library-tabs .nav-link {
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: var(--text-muted, #6c757d);
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+}
+
+.icon-library-tabs .nav-link:hover {
+    color: var(--primary-color, #26baac);
+    border-bottom-color: var(--primary-color, #26baac);
+}
+
+.icon-library-tabs .nav-link.active {
+    color: var(--primary-color, #26baac);
+    border-bottom-color: var(--primary-color, #26baac);
+    background-color: transparent;
+}
+
+/* ===== Icon Library Content ===== */
+.icon-library-content {
+    padding: 0.5rem;
+}
+
+.icon-library-content .tab-pane {
+    min-height: 200px;
+}
+
+/* ===== Icon Selector Grid ===== */
+.icon-selector-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
+    gap: 0.5rem;
+    padding: 0.5rem;
+    max-height: 350px;
+    overflow-y: auto;
+}
+
+.icon-selector-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem;
+    border: 2px solid transparent;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    background-color: white;
+    aspect-ratio: 1;
+}
+
+.icon-selector-item:hover {
+    border-color: var(--primary-color, #26baac);
+    background-color: var(--primary-light, #e7f5f3);
+    transform: scale(1.1);
+    box-shadow: 0 2px 8px rgba(38, 186, 172, 0.3);
+    z-index: 1;
+}
+
+.icon-selector-item.active {
+    border-color: var(--primary-color, #26baac);
+    background-color: var(--primary-light, #e7f5f3);
+    box-shadow: 0 0 0 3px rgba(38, 186, 172, 0.2);
+}
+
+.icon-preview {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.icon-preview.no-icon {
+    border: 1px dashed var(--border-color, #dee2e6);
+    border-radius: 4px;
+    color: var(--text-muted, #6c757d);
+    font-size: 0.7rem;
+    width: 100%;
+    height: 100%;
+}
+
+.icon-preview-icon {
+    width: 24px;
+    height: 24px;
+    color: var(--text-color, #212529);
+}
+
+.icon-preview i {
+    color: var(--text-color, #212529);
+}
+
+/* Remove labels - icons only */
+.icon-label {
+    display: none;
+}
+
+/* ===== View Mode Selector ===== */
+.view-mode-selector {
+    display: flex;
+    justify-content: center;
+}
+
+.view-mode-radio {
+    display: flex;
+    gap: 0.25rem;
+}
+
+.view-mode-radio .btn {
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    font-size: 1.2rem;
+}
+
+.view-mode-radio .btn-check:checked + .btn {
+    background-color: var(--primary-color, #26baac);
+    border-color: var(--primary-color, #26baac);
+    color: white;
+}
+
+/* ===== Flag Color Palette ===== */
+.flag-color-palette {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.5rem;
+    padding: 0.5rem;
+    border: 1px solid var(--border-color, #dee2e6);
+    border-radius: 4px;
+    background-color: var(--background-light, #f8f9fa);
+    max-width: 300px;
+}
+
+.flag-color-palette .flag-color-btn {
+    width: 48px;
+    height: 48px;
+    border: 2px solid transparent;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+}
+
+.flag-color-palette .flag-color-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+}
+
+.flag-color-palette .flag-color-btn.active {
+    border-color: var(--text-color, #212529);
+    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1), 0 0 0 2px var(--text-color, #212529);
+    transform: scale(1.05);
+}
+
+.flag-color-palette .flag-color-btn.active::after {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 1.2rem;
+    font-weight: bold;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* ===== Compact View Overlay ===== */
+/* Base overlay styles are in _widget-overlay.css */
+/* Watch List specific styles below */
+.watch-list-compact-item {
+    position: relative;
+    overflow: visible;
+    z-index: 1;
+}
+
+.watch-list-compact-item.is-hovered {
+    z-index: 10;
+}
+
+.watch-list-compact-overlay {
+    /* Inherits base styles from _widget-overlay.css [data-overlay="true"] */
+    /* Additional watch-list specific styles can be added here if needed */
+}
+
+.watch-list-compact-overlay-content {
+    /* Inherits from _widget-overlay.css .widget-item-details-content */
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.watch-list-compact-overlay-row {
+    /* Inherits from _widget-overlay.css .widget-item-details-row */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding-block: 0.25rem;
+    font-size: 0.85rem;
+}
+
+.watch-list-compact-overlay-row + .watch-list-compact-overlay-row {
+    border-top: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.watch-list-compact-overlay-label {
+    /* Inherits from _widget-overlay.css .widget-item-details-label */
+    font-weight: 500;
+    color: var(--text-muted, #6c757d);
+    flex-shrink: 0;
+}
+
+.watch-list-compact-overlay-value {
+    /* Inherits from _widget-overlay.css .widget-item-details-value */
+    text-align: end;
+    flex: 1;
+    min-width: 0;
+    word-break: break-word;
+}
+
+/* RTL Support */
+[dir="rtl"] .watch-list-compact-overlay-value {
+    text-align: start;
+}
+
+/* ===== Cards View Mini Chart ===== */
+.watch-list-item-card [id^="watch-list-chart-"] {
+    min-height: 150px;
+    border-radius: 4px;
+    overflow: hidden;
+    background-color: var(--background-light, #f8f9fa);
+}
+
+/* Ensure TradingView widget container fits properly */
+.watch-list-item-card [id^="watch-list-chart-"] iframe {
+    border: none;
+    width: 100%;
+    height: 100%;
+}
+
+/* Cards view - reduced padding for compact cards */
+#watchListItemsCards .card-body {
+    padding: 0.25rem !important; /* Uniform padding from all sides */
+}
+
+#watchListItemsCards .card {
+    margin-bottom: 0.25rem; /* Reduced margin between cards */
+}
+
+/* Cards view info row styling */
+.watch-list-item-card .d-flex.flex-wrap.gap-2,
+.watch-list-item-card .d-flex.flex-wrap.gap-1 {
+    font-size: 0.85rem;
+    line-height: 1.4;
+}
+
+.watch-list-item-card .d-flex.flex-wrap.gap-2 > span,
+.watch-list-item-card .d-flex.flex-wrap.gap-1 > span {
+    white-space: nowrap;
+}
+

@@ -13,6 +13,9 @@
     <link rel="preconnect" href="https://cdn.jsdelivr.net">
     <link rel="preconnect" href="https://cdnjs.cloudflare.com">
     
+    <!-- Bootstrap CSS (חובה ראשון) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css?v=0da3519a_20251102_104906" rel="stylesheet">
+    
     <!-- TikTrack ITCSS Master Styles -->
     <link rel="stylesheet" href="../../styles-new/master.css">
     
@@ -24,86 +27,137 @@
     <!-- Header Styles -->
     <link rel="stylesheet" href="../../styles-new/header-styles.css">
     
-    <!-- Header System -->
-    <script src="../../scripts/header-system.js" defer></script>
+    <!-- Error Handlers (Must load first) -->
+    <script src="../../scripts/error-handlers.js?v=1.0.0"></script>
+    <!-- API Config -->
+    <script src="../../scripts/api-config.js?v=1.0.0"></script>
+    <!-- Logger Service (Load first before other systems) -->
+    <script src="../../scripts/logger-service.js?v=1.0.0"></script>
     
+    <!-- Header System (Must load early) -->
+    <script src="../../scripts/header-system.js?v=1.0.0" defer></script>
+    <script>
+        // Auto-initialize HeaderSystem when DOM is ready
+        (function() {
+            function initHeader() {
+                if (typeof window.HeaderSystem !== 'undefined' && typeof window.HeaderSystem.initialize === 'function') {
+                    try {
+                        window.HeaderSystem.initialize();
+                    } catch (error) {
+                        if (window.Logger?.error) {
+                            window.Logger.error('Error initializing HeaderSystem', error, { page: 'economic-calendar-page' });
+                        }
+                    }
+                } else {
+                    setTimeout(initHeader, 100);
+                }
+            }
+            
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initHeader);
+            } else {
+                setTimeout(initHeader, 100);
+            }
+        })();
+    </script>
+    <script>
+        // Auto-initialize HeaderSystem when DOM is ready
+        (function() {
+            function initHeader() {
+                if (typeof window.HeaderSystem !== 'undefined' && typeof window.HeaderSystem.initialize === 'function') {
+                    try {
+                        window.HeaderSystem.initialize();
+                    } catch (error) {
+                        if (window.Logger?.error) {
+                            window.Logger.error('Error initializing HeaderSystem', error, { page: 'economic-calendar-page' });
+                        }
+                    }
+                } else {
+                    setTimeout(initHeader, 100);
+                }
+            }
+            
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initHeader);
+            } else {
+                setTimeout(initHeader, 100);
+            }
+        })();
+    </script>
+    
+    <!-- [8] Load Order: 8 -->
+    <script src="../../scripts/unified-cache-manager.js?v=1.0.0"></script> <!-- Unified cache manager -->
     <!-- Icon System -->
     <script src="../../scripts/icon-mappings.js?v=1.0.0"></script>
     <script src="../../scripts/icon-system.js?v=1.0.0"></script>
+    <script src="../../scripts/icon-replacement-helper.js?v=1.0.0"></script> <!-- Icon replacement helper -->
     <script src="../../scripts/mockups-icon-initializer.js?v=1.0.0"></script>
     
     <!-- Logger Service -->
-    <script src="../../scripts/logger-service.js" defer></script>
+    <!-- Error Handlers (Must load first) -->
+    
+    <!-- API Config -->
+    
+    
     
     <!-- Notification System -->
-    <script src="../../scripts/notification-system.js" defer></script>
+    <script src="../../scripts/notification-system.js?v=1.0.0" defer></script>
     
     <!-- Field Renderer Service -->
-    <script src="../../scripts/services/field-renderer-service.js" defer></script>
+    <script src="../../scripts/services/field-renderer-service.js?v=1.0.0" defer></script>
+    
+    <!-- Actions Menu System (required for createActionsMenu) -->
+    <script src="../../scripts/modules/actions-menu-system.js?v=1.0.0"></script>
     
     <!-- Info Summary System -->
-    <script src="../../scripts/info-summary-configs.js" defer></script>
-    <script src="../../scripts/info-summary-system.js" defer></script>
+    <script src="../../scripts/info-summary-configs.js?v=1.0.0" defer></script>
+    <script src="../../scripts/info-summary-system.js?v=1.0.0" defer></script>
     
     <!-- Preferences System -->
-    <script src="../../scripts/services/preferences-data.js" defer></script>
-    <script src="../../scripts/preferences-core-new.js" defer></script>
-    <script src="../../scripts/preferences-lazy-loader.js" defer></script>
+    <script src="../../scripts/services/preferences-data.js?v=1.0.0" defer></script>
+    <script src="../../scripts/preferences-core-new.js?v=1.0.0" defer></script>
+    <script src="../../scripts/preferences-lazy-loader.js?v=1.0.0" defer></script>
     
     <!-- Dynamic Colors System -->
-    <script src="../../scripts/color-scheme-system-clean.js" defer></script>
+    <script src="../../scripts/color-scheme-system-clean.js?v=1.0.0" defer></script>
     
     <!-- UI Utils (includes toggleSection) -->
     <script src="../../scripts/ui-utils.js?v=1.0.0"></script>
     
     <!-- TradingView Widgets System -->
-    <script src="../../scripts/tradingview-widgets/tradingview-widgets-config.js" defer></script>
-    <script src="../../scripts/tradingview-widgets/tradingview-widgets-colors.js" defer></script>
-    <script src="../../scripts/tradingview-widgets/tradingview-widgets-factory.js" defer></script>
-    <script src="../../scripts/tradingview-widgets/tradingview-widgets-core.js" defer></script>
+    <script src="../../scripts/tradingview-widgets/tradingview-widgets-config.js?v=1.0.0" defer></script>
+    <script src="../../scripts/tradingview-widgets/tradingview-widgets-colors.js?v=1.0.0" defer></script>
+    <script src="../../scripts/tradingview-widgets/tradingview-widgets-factory.js?v=1.0.0" defer></script>
+    <script src="../../scripts/tradingview-widgets/tradingview-widgets-core.js?v=1.0.0" defer></script>
     
     <!-- Mock Data -->
-    <script src="../../scripts/mock-data/economic-events-mock-data.js" defer></script>
+    <script src="../../scripts/mock-data/economic-events-mock-data.js?v=1.0.0" defer></script>
 </head>
 <body class="economic-calendar-page">
-    <!-- Header System -->
-    <div id="unified-header"></div>
+    <!-- Notification container -->
+    <div class="notification-container" id="notificationContainer"></div>
     
-    <!-- Mockups Navigation -->
-    <div class="mockups-navigation">
-        <div class="container-fluid">
-            <div class="row align-items-center">
-                <div class="col-md-12">
-                    <div class="mockups-navigation-content">
-                        <span class="mockups-navigation-label">
-                            <span class="icon-placeholder" data-icon="link" data-size="16"></span> ניווט מוקאפים:
-                        </span>
-                        <a href="trade-history-page.html" class="mockups-navigation-link">היסטוריית טרייד</a>
-                        <a href="portfolio-state-page.html" class="mockups-navigation-link">מצב תיק היסטורי</a>
-                        <a href="price-history-page.html" class="mockups-navigation-link">היסטוריית מחירים</a>
-                        <a href="comparative-analysis-page.html" class="mockups-navigation-link">ניתוח השוואתי</a>
-                        <a href="trading-journal-page.html" class="mockups-navigation-link">יומן מסחר</a>
-                        <a href="strategy-analysis-page.html" class="mockups-navigation-link">ניתוח אסטרטגיות</a>
-                        <a href="economic-calendar-page.html" class="mockups-navigation-link active">לוח כלכלי</a>
-                        <a href="history-widget.html" class="mockups-navigation-link">ווידג'ט היסטוריה</a>
-                        <a href="emotional-tracking-widget.html" class="mockups-navigation-link">תיעוד רגשי</a>
-                        <a href="date-comparison-modal.html" class="mockups-navigation-link">השוואת תאריכים</a>
-                    </div>
-                </div>
-            </div>
-        </div>
+
+    <!-- Header System -->
+    </div>
     </div>
     
     <!-- Page Content -->
-    <div class="background-wrapper">
+        <!-- ===== TEMPLATE ZONE 1: BACKGROUND WRAPPER (LOCKED) ===== -->
+<div class="background-wrapper">
+        <!-- ===== TEMPLATE ZONE 2: HEADER SYSTEM (LOCKED - DO NOT TOUCH) ===== -->
+        <div id="unified-header"></div>
+
+        <!-- ===== TEMPLATE ZONE 3: PAGE BODY (LOCKED) ===== -->
         <div class="page-body">
+            <!-- ===== TEMPLATE ZONE 4: MAIN CONTENT (EDITABLE) ===== -->
             <div class="main-content">
                 <!-- Header Section -->
                 <div class="content-section"  data-section="economic_calendar_page-פילטרים">
                     <div class="section-header">
                         <h2><span class="icon-placeholder" data-icon="info-circle" data-size="16"></span> פילטרים</h2>
                         <div class="header-actions">
-                            <button class="filter-toggle-btn" data-onclick="toggleSection('economic_calendar_page-פילטרים')" title="הצג/הסתר סקשן">
+                            <button class="filter-toggle-btn" data-onclick="toggleSection('economic_calendar_page-פילטרים')" title="הצג/הסתר סקשן" data-button-type="FILTER">
                                 <span class="section-toggle-icon">▼</span>
                             </button>
                         </div>
@@ -146,15 +200,15 @@
                     <div class="section-header">
                         <h2><span class="icon-placeholder" data-icon="info-circle" data-size="16"></span> אירועים כלכליים</h2>
                         <div class="header-actions">
-                            <button class="filter-toggle-btn" data-onclick="toggleSection('economic_calendar_page-אירועים-כלכליים')" title="הצג/הסתר סקשן">
+                            <button class="filter-toggle-btn" data-onclick="toggleSection('economic_calendar_page-אירועים-כלכליים')" title="הצג/הסתר סקשן" data-button-type="FILTER">
                                 <span class="section-toggle-icon">▼</span>
                             </button>
                         </div>
                     </div>
                     <div class="section-body">
                         <!-- Save Event Button (shown after widget loads) -->
-                        <div id="save-event-controls" class="mb-3" style="display: none;">
-                            <button id="save-event-from-widget-btn" class="btn btn-primary btn-sm">
+                        <div id="save-event-controls" class="mb-3 mockup-hidden">
+                            <button id="save-event-from-widget-btn" class="btn btn-primary btn-sm" data-button-type="SAVE">
                                 <span class="icon-placeholder" data-icon="bookmark" data-size="16"></span>
                                 שמור אירוע נבחר
                             </button>
@@ -186,7 +240,7 @@
                     <div class="section-header">
                         <h2><span class="icon-placeholder" data-icon="bookmark" data-size="16"></span> אירועים שמורים</h2>
                         <div class="header-actions">
-                            <button class="filter-toggle-btn" data-onclick="toggleSection('economic_calendar_page-אירועים-שמורים')" title="הצג/הסתר סקשן">
+                            <button class="filter-toggle-btn" data-onclick="toggleSection('economic_calendar_page-אירועים-שמורים')" title="הצג/הסתר סקשן" data-button-type="SAVE">
                                 <span class="section-toggle-icon">▼</span>
                             </button>
                         </div>
@@ -206,7 +260,7 @@
                     <div class="section-header">
                         <h2><span class="icon-placeholder" data-icon="chart-bar" data-size="16"></span> סטטיסטיקות</h2>
                         <div class="header-actions">
-                            <button class="filter-toggle-btn" data-onclick="toggleSection('economic_calendar_page-סטטיסטיקות')" title="הצג/הסתר סקשן">
+                            <button class="filter-toggle-btn" data-onclick="toggleSection('economic_calendar_page-סטטיסטיקות')" title="הצג/הסתר סקשן" data-button-type="FILTER">
                                 <span class="section-toggle-icon">▼</span>
                             </button>
                         </div>
@@ -227,10 +281,16 @@
     <!-- Page Bottom Spacing -->
     <div class="page-bottom-spacing"></div>
     <!-- Page-specific script -->
-    <script src="../../scripts/economic-calendar-page.js" defer></script>
+    <script src="../../scripts/economic-calendar-page.js?v=1.0.0" defer></script>
     
     <!-- Notification System Containers -->
     <div class="notification-container" id="notification-container"></div>
     <div id="toast-container"></div>
+
+    <!-- Entity Details System -->
+    <script src="../../scripts/entity-details-api.js?v=1.0.0" defer></script>
+    <script src="../../scripts/entity-details-renderer.js?v=1.0.0" defer></script>
+    <script src="../../scripts/entity-details-modal.js?v=1.0.0" defer></script>
+    
 </body>
 </html>

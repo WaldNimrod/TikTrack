@@ -14,9 +14,7 @@ class SMAlertsSection extends SMBaseSection {
   constructor(sectionId, config) {
     super(sectionId, config);
     this.apiEndpoints = {
-      summary: '/api/notifications/summary',
-      alerts: '/api/alerts/active',
-      history: '/api/notifications/history'
+      alerts: '/api/alerts/' // Use main alerts endpoint
     };
   }
 
@@ -29,18 +27,14 @@ class SMAlertsSection extends SMBaseSection {
       this.isLoading = true;
       console.log(`🔔 Loading alerts data from multiple endpoints`);
 
-      // Load data from multiple endpoints in parallel
-      const [summaryData, alertsData, historyData] = await Promise.allSettled([
-        this.fetchNotificationsSummary(),
-        this.fetchActiveAlerts(),
-        this.fetchNotificationsHistory()
+      // Load data from alerts endpoint
+      const alertsData = await Promise.allSettled([
+        this.fetchActiveAlerts()
       ]);
 
       // Combine data from all sources
       const combinedData = {
-        summary: summaryData.status === 'fulfilled' ? summaryData.value : null,
-        alerts: alertsData.status === 'fulfilled' ? alertsData.value : null,
-        history: historyData.status === 'fulfilled' ? historyData.value : null,
+        alerts: alertsData[0].status === 'fulfilled' ? alertsData[0].value : null,
         timestamp: new Date().toISOString()
       };
 
@@ -57,38 +51,12 @@ class SMAlertsSection extends SMBaseSection {
   }
 
   /**
-   * Fetch notifications summary
-   * קבלת סיכום התראות
-   */
-  async fetchNotificationsSummary() {
-    try {
-      const response = await fetch(this.apiEndpoints.summary, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        }
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-
-      const result = await response.json();
-      return result.status === 'success' ? result.data : null;
-    } catch (error) {
-      console.warn('⚠️ Failed to fetch notifications summary:', error);
-      return null;
-    }
-  }
-
-  /**
    * Fetch active alerts
    * קבלת התראות פעילות
    */
   async fetchActiveAlerts() {
     try {
-      const response = await fetch(this.apiEndpoints.alerts, {
+      const response = await this.fetchWithTimeout(this.apiEndpoints.alerts, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -101,36 +69,14 @@ class SMAlertsSection extends SMBaseSection {
       }
 
       const result = await response.json();
-      return result.status === 'success' ? result.data : null;
+      // Handle different response formats
+      if (result.status === 'success') {
+        return Array.isArray(result.data) ? result.data : (result.data?.alerts || result.data || []);
+      }
+      return Array.isArray(result) ? result : [];
     } catch (error) {
       console.warn('⚠️ Failed to fetch active alerts:', error);
-      return null;
-    }
-  }
-
-  /**
-   * Fetch notifications history
-   * קבלת היסטוריית התראות
-   */
-  async fetchNotificationsHistory() {
-    try {
-      const response = await fetch(this.apiEndpoints.history, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        }
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-
-      const result = await response.json();
-      return result.status === 'success' ? result.data : null;
-    } catch (error) {
-      console.warn('⚠️ Failed to fetch notifications history:', error);
-      return null;
+      return [];
     }
   }
 
@@ -139,14 +85,22 @@ class SMAlertsSection extends SMBaseSection {
    * הצגת נתוני התראות
    */
   render(data) {
-    if (!data || (!data.summary && !data.alerts && !data.history)) {
+    // Handle case where data.alerts is an array directly
+    const alerts = data?.alerts || (Array.isArray(data) ? data : []);
+    
+    if (!data || (!alerts || alerts.length === 0)) {
       this.showEmptyState('אין נתוני התראות זמינים');
       return;
     }
 
     try {
-      const alertsHtml = this.createAlertsHTML(data);
-      this.container.innerHTML = alertsHtml;
+      const alertsHtml = this.createAlertsHTML({ alerts, summary: null, history: null });
+      this.container.textContent = '';
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(alertsHtml, 'text/html');
+      doc.body.childNodes.forEach(node => {
+        this.container.appendChild(node.cloneNode(true));
+      });
       
       console.log('✅ Alerts section rendered successfully');
       
@@ -355,11 +309,11 @@ class SMAlertsSection extends SMBaseSection {
   }
 
   /**
-   * Create active alerts list card
-   * יצירת כרטיס רשימת התראות פעילות
+   * Create active alerts list card with table
+   * יצירת כרטיס רשימת התראות פעילות עם טבלה
    */
   createActiveAlertsListCard(alerts) {
-    if (!alerts || !Array.isArray(alerts)) {
+    if (!alerts || !Array.isArray(alerts) || alerts.length === 0) {
       return `
         <div class="card">
           <div class="card-header">
@@ -377,48 +331,60 @@ class SMAlertsSection extends SMBaseSection {
 
     return `
       <div class="card">
-        <div class="card-header">
-          <h5><i class="fas fa-bell"></i> התראות פעילות (${alerts.length})</h5>
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h5 class="mb-0"><i class="fas fa-bell"></i> התראות פעילות (${alerts.length})</h5>
+          <div>
+            <button class="btn btn-sm btn-outline-primary" onclick="SMAlertsSection.refreshAlerts()" title="רענן התראות">
+              <i class="fas fa-sync-alt"></i>
+            </button>
+            <button class="btn btn-sm btn-outline-warning" onclick="SMAlertsSection.markAllAsRead()" title="סמן הכל כנקרא">
+              <i class="fas fa-check"></i>
+            </button>
+            <button class="btn btn-sm btn-outline-danger" onclick="SMAlertsSection.clearAllAlerts()" title="נקה כל ההתראות">
+              <i class="fas fa-trash-alt"></i>
+            </button>
+          </div>
         </div>
-        <div class="card-body">
-          <div class="alerts-list">
-            ${alerts.slice(0, 10).map(alert => `
-              <div class="alert-item alert-${alert.severity || 'info'}">
-                <div class="alert-header">
-                  <div class="alert-icon">
-                    <i class="fas ${this.getAlertIcon(alert.severity)}"></i>
-                  </div>
-                  <div class="alert-info">
-                    <h6 class="alert-title">${alert.title || 'התראה'}</h6>
-                    <span class="alert-time">${alert.created_at || 'לא זמין'}</span>
-                  </div>
-                  <div class="alert-actions">
-                    <button class="btn btn-sm btn-outline-primary" onclick="SMAlertsSection.markAsRead('${alert.id}')">
-                      <i class="fas fa-check"></i>
-                    </button>
-                    <button class="btn btn-sm btn-outline-danger" onclick="SMAlertsSection.dismissAlert('${alert.id}')">
-                      <i class="fas fa-times"></i>
-                    </button>
-                  </div>
-                </div>
-                <div class="alert-body">
-                  <p class="alert-message">${alert.message || 'אין הודעה'}</p>
-                  ${alert.source ? `
-                    <div class="alert-source">
-                      <small class="text-muted">מקור: ${alert.source}</small>
-                    </div>
-                  ` : ''}
-                </div>
-              </div>
-            `).join('')}
-            
-            ${alerts.length > 10 ? `
-              <div class="text-center mt-3">
-                <button class="btn btn-outline-primary btn-sm" onclick="SMAlertsSection.showAllAlerts()">
-                  <i class="fas fa-list"></i> הצג כל ההתראות
-                </button>
-              </div>
-            ` : ''}
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover table-sm mb-0">
+              <thead>
+                <tr>
+                  <th style="width: 50px;">חומרה</th>
+                  <th>כותרת</th>
+                  <th>הודעה</th>
+                  <th>מקור</th>
+                  <th>תאריך</th>
+                  <th style="width: 120px;">פעולות</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${alerts.map(alert => `
+                  <tr class="alert-row alert-${alert.severity || 'info'}">
+                    <td>
+                      <span class="badge bg-${this.getSeverityBadgeColor(alert.severity)}">
+                        <i class="fas ${this.getAlertIcon(alert.severity)}"></i>
+                        ${this.getSeverityText(alert.severity)}
+                      </span>
+                    </td>
+                    <td><strong>${alert.title || 'התראה'}</strong></td>
+                    <td>${alert.message || 'אין הודעה'}</td>
+                    <td><small class="text-muted">${alert.source || 'לא זמין'}</small></td>
+                    <td><small>${this.formatDate(alert.created_at || alert.timestamp)}</small></td>
+                    <td>
+                      <div class="btn-group btn-group-sm" role="group">
+                        <button class="btn btn-outline-primary" onclick="SMAlertsSection.markAsRead('${alert.id || alert.alert_id}')" title="סמן כנקרא">
+                          <i class="fas fa-check"></i>
+                        </button>
+                        <button class="btn btn-outline-danger" onclick="SMAlertsSection.dismissAlert('${alert.id || alert.alert_id}')" title="הסר">
+                          <i class="fas fa-times"></i>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
@@ -589,6 +555,82 @@ class SMAlertsSection extends SMBaseSection {
       'default': 'fa-bell'
     };
     return icons[severity] || icons.default;
+  }
+
+  /**
+   * Get severity badge color
+   * קבלת צבע תג חומרה
+   */
+  getSeverityBadgeColor(severity) {
+    const colors = {
+      'error': 'danger',
+      'warning': 'warning',
+      'info': 'info',
+      'success': 'success',
+      'default': 'secondary'
+    };
+    return colors[severity] || colors.default;
+  }
+
+  /**
+   * Get severity text in Hebrew
+   * קבלת טקסט חומרה בעברית
+   */
+  getSeverityText(severity) {
+    const texts = {
+      'error': 'שגיאה',
+      'warning': 'אזהרה',
+      'info': 'מידע',
+      'success': 'הצלחה',
+      'default': 'לא ידוע'
+    };
+    return texts[severity] || texts.default;
+  }
+
+  /**
+   * Format date
+   * עיצוב תאריך
+   */
+  formatDate(dateInput) {
+    if (!dateInput) return 'לא זמין';
+    
+    try {
+      // Handle Date objects, strings, or timestamps
+      let date;
+      if (dateInput instanceof Date) {
+        date = dateInput;
+      } else if (typeof dateInput === 'object' && dateInput !== null) {
+        // If it's an object, try to extract a date value
+        if (dateInput.timestamp) {
+          date = new Date(dateInput.timestamp);
+        } else if (dateInput.created_at) {
+          date = new Date(dateInput.created_at);
+        } else if (dateInput.date) {
+          date = new Date(dateInput.date);
+        } else {
+          // Try to stringify and parse
+          const dateStr = JSON.stringify(dateInput);
+          date = new Date(dateStr);
+        }
+      } else {
+        date = new Date(dateInput);
+      }
+      
+      if (isNaN(date.getTime())) {
+        // If still invalid, return a safe string representation
+        return typeof dateInput === 'string' ? dateInput : 'לא זמין';
+      }
+      
+      return date.toLocaleString('he-IL', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    } catch (error) {
+      return dateString;
+    }
   }
 
   /**
@@ -848,7 +890,11 @@ class SMAlertsSection extends SMBaseSection {
    */
   static showAllAlerts() {
     console.log('📋 Showing all alerts');
-    alert('פתיחת כל ההתראות');
+    if (window.showInfoNotification) {
+      window.showInfoNotification('פתיחת כל ההתראות', 'info');
+    } else {
+      alert('פתיחת כל ההתראות');
+    }
   }
 
   /**
@@ -857,7 +903,11 @@ class SMAlertsSection extends SMBaseSection {
    */
   static showAllHistory() {
     console.log('📋 Showing all alerts history');
-    alert('פתיחת כל היסטוריית ההתראות');
+    if (window.showInfoNotification) {
+      window.showInfoNotification('פתיחת כל היסטוריית ההתראות', 'info');
+    } else {
+      alert('פתיחת כל היסטוריית ההתראות');
+    }
   }
 }
 

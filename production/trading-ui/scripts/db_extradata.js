@@ -11,6 +11,34 @@
  * @since 2025-10-30
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - initDatabaseExtraData() - Initdatabaseextradata
+// - createTableHeaders() - Createtableheaders
+// - createTableRows() - Createtablerows
+
+// === Event Handlers ===
+// - getSectionId() - Getsectionid
+// - getContainerId() - Getcontainerid
+
+// === UI Functions ===
+// - showLoadingState() - Showloadingstate
+// - showErrorState() - Showerrorstate
+// - updateTableDisplay() - Updatetabledisplay
+// - updateTableInfo() - Updatetableinfo
+// - updateSummaryStats() - Updatesummarystats
+
+// === Data Functions ===
+// - loadAllTables() - Loadalltables
+// - loadTableDataLocal() - Loadtabledatalocal
+// - getCountElementId() - Getcountelementid
+// - getTableId() - Gettableid
+
+// === Utility Functions ===
+// - formatCellValue() - Formatcellvalue
+
 // ===== GLOBAL VARIABLES =====
 let totalRecords = 0;
 let tableData = {};
@@ -52,7 +80,7 @@ async function loadAllTables() {
   for (const table of tables) {
     try {
       window.Logger?.debug('Loading table', { page: 'db_extradata', type: table.type, apiSlug: table.apiSlug });
-      await loadTableData(table.type, table.apiSlug, table.container);
+      await loadTableDataLocal(table.type, table.apiSlug, table.container);
     } catch (error) {
       const identifier = table.apiSlug || table.type;
       window.Logger?.error('Error loading table', { page: 'db_extradata', identifier, error: error?.message || error });
@@ -68,66 +96,91 @@ async function loadAllTables() {
 
 /**
  * Load data for a specific table type
+ * Uses centralized loadTableData from services package
  * @param {string} tableType - The table type to load
+ * @param {string} apiSlug - The API slug (with dashes) for fetching
  * @param {string} containerId - The container ID for the table
  */
-async function loadTableData(tableType, apiSlug, containerId) {
+async function loadTableDataLocal(tableType, apiSlug, containerId) {
+  // Normalize table type once at the beginning - used throughout the function
+  const tableTypeNormalized = tableType.replace(/-/g, '_');
+  
   try {
     window.Logger?.debug('Loading data for table type', { page: 'db_extradata', tableType });
 
     // Show loading state
     showLoadingState(tableType);
 
-    // Fetch data from server
-    const data = await fetchTableData(apiSlug);
+    // Use centralized loadTableData function from services package
+    // Try to use tableType normalized, fallback to direct API call if not in mapping
+    let data;
+    
+    // Try centralized function first
+    if (typeof window.loadTableData === 'function') {
+      try {
+        data = await window.loadTableData(tableTypeNormalized, null, {
+          tableId: getTableId(tableType),
+          entityName: tableType,
+          columns: 10
+        });
+      } catch (err) {
+        // If centralized function doesn't support this table type, fetch directly
+        window.Logger?.debug('Centralized loadTableData not available for this table type, fetching directly', { 
+          page: 'db_extradata', 
+          tableType, 
+          error: err?.message 
+        });
+        const response = await fetch(`/api/${apiSlug}/`);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const result = await response.json();
+        data = (result.data && Array.isArray(result.data)) ? result.data : [];
+      }
+    } else {
+      // Fallback to direct fetch if centralized function not available
+      const response = await fetch(`/api/${apiSlug}/`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const result = await response.json();
+      data = (result.data && Array.isArray(result.data)) ? result.data : [];
+    }
 
     // Store data
-    tableData[tableType] = data;
+    tableData[tableType] = Array.isArray(data) ? data : [];
 
-    // Update table display
-    updateTableDisplay(data, tableType, containerId);
+    // Update table display using centralized system
+    if (typeof window.updateTable === 'function') {
+      window.updateTable(tableTypeNormalized, tableData[tableType]);
+    } else {
+      // Fallback to local function if centralized system not available
+      updateTableDisplay(tableData[tableType], tableType, containerId);
+    }
 
     // Update table info
-    updateTableInfo(tableType, data.length);
+    updateTableInfo(tableType, tableData[tableType].length);
 
     // Add to total records
-    totalRecords += data.length;
+    totalRecords += tableData[tableType].length;
 
-    window.Logger?.debug('Data loaded for table type', { page: 'db_extradata', tableType, recordCount: data.length });
+    window.Logger?.debug('Data loaded for table type', { page: 'db_extradata', tableType, recordCount: tableData[tableType].length });
 
   } catch (error) {
     const identifier = apiSlug || tableType;
     window.Logger?.error('Error loading table data', { page: 'db_extradata', identifier, error: error?.message || error });
     // Show error state
-    updateTableDisplay([], tableType, containerId);
+    if (typeof window.updateTable === 'function') {
+      window.updateTable(tableTypeNormalized, []);
+    } else {
+      // Fallback to local function if centralized system not available
+      updateTableDisplay([], tableType, containerId);
+    }
     updateTableInfo(tableType, 0);
   }
 }
 
-/**
- * Fetch table data from server
- * @param {string} tableType - The table type to fetch
- * @returns {Array} The table data
- */
-async function fetchTableData(apiSlug) {
-  window.Logger?.debug('Fetching data from API', { page: 'db_extradata', apiSlug, url: `/api/${apiSlug}/` });
-  
-  const response = await fetch(`/api/${apiSlug}/`);
-  
-  if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
-  }
-  
-  const result = await response.json();
-  window.Logger?.debug('Received response', { page: 'db_extradata', apiSlug, result });
-  
-  if (result.data && Array.isArray(result.data)) {
-    return result.data;
-  } else {
-    window.Logger?.warn('No data array found in response', { page: 'db_extradata', apiSlug });
-    return [];
-  }
-}
+// REMOVED: fetchTableData - Use centralized window.loadTableData from services package instead
 
 /**
  * Show loading state for a table
@@ -139,7 +192,14 @@ function showLoadingState(tableType) {
   if (tableContainer) {
     const tbody = tableContainer.querySelector('tbody');
     if (tbody) {
-      tbody.innerHTML = '<tr><td colspan="100" class="text-center text-muted">Loading data...</td></tr>';
+      tbody.textContent = '';
+      const row = document.createElement('tr');
+      const cell = document.createElement('td');
+      cell.colSpan = 100;
+      cell.className = 'text-center text-muted';
+      cell.textContent = 'Loading data...';
+      row.appendChild(cell);
+      tbody.appendChild(row);
     }
   }
 }
@@ -155,7 +215,15 @@ function showErrorState(tableType, errorMessage) {
   if (tableContainer) {
     const tbody = tableContainer.querySelector('tbody');
     if (tbody) {
-      tbody.innerHTML = `<tr><td colspan="100" class="text-center text-danger">Error: ${errorMessage}</td></tr>`;
+      tbody.textContent = '';
+        // Convert HTML string to DOM elements safely
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(`<tr><td colspan="100" class="text-center text-danger">Error: ${errorMessage}</td></tr>`, 'text/html');
+        const fragment = document.createDocumentFragment();
+        Array.from(doc.body.childNodes).forEach(node => {
+            fragment.appendChild(node.cloneNode(true));
+        });
+        tbody.appendChild(fragment);
     }
   }
 }
@@ -163,7 +231,8 @@ function showErrorState(tableType, errorMessage) {
 // ===== TABLE DISPLAY =====
 
 /**
- * Update table display with data
+ * Update table display with data (FALLBACK - Use window.updateTable() instead)
+ * @deprecated Use window.updateTable() from unified-table-system.js
  * @param {Array} data - The data to display
  * @param {string} tableType - The table type
  * @param {string} containerId - The container ID for the table
@@ -197,19 +266,36 @@ function updateTableDisplay(data, tableType, containerId) {
   const thead = table.querySelector('thead');
   if (thead && data.length > 0) {
     const headers = createTableHeaders(data);
-    thead.innerHTML = headers;
+    thead.textContent = '';
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(`<table><thead>${headers}</thead></table>`, 'text/html');
+    const tempThead = doc.body.querySelector('thead');
+    if (tempThead) {
+        Array.from(tempThead.children).forEach(child => {
+            thead.appendChild(child.cloneNode(true));
+        });
+    }
   }
 
   // Create table rows
   const rows = createTableRows(data);
-  tbody.innerHTML = rows;
+  tbody.textContent = '';
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(`<table><tbody>${rows}</tbody></table>`, 'text/html');
+  const tempTbody = doc.body.querySelector('tbody');
+  if (tempTbody) {
+      Array.from(tempTbody.children).forEach(child => {
+          tbody.appendChild(child.cloneNode(true));
+      });
+  }
 
   // Update table count
   // Count indicator handled by updateTableInfo()
 }
 
 /**
- * Create table headers from data
+ * Create table headers from data (FALLBACK - Use UnifiedTableSystem instead)
+ * @deprecated Use window.UnifiedTableSystem.renderer.render() instead
  * @param {Array} data - The table data
  * @returns {string} HTML for table headers
  */
@@ -227,7 +313,8 @@ function createTableHeaders(data) {
 }
 
 /**
- * Create table rows from data
+ * Create table rows from data (FALLBACK - Use UnifiedTableSystem instead)
+ * @deprecated Use window.UnifiedTableSystem.renderer.render() instead
  * @param {Array} data - The table data
  * @returns {string} HTML for table rows
  */

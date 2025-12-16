@@ -8,6 +8,12 @@
  * Usage: Add this script to mockup pages after IconSystem is loaded
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - initializeIcons() - Initializeicons
+
 (function() {
     'use strict';
 
@@ -18,14 +24,35 @@
     async function initializeIcons() {
         // Wait for IconSystem to be available
         if (typeof window.IconSystem === 'undefined') {
-            // Retry after a short delay
+            // Retry after a short delay (max 10 retries = 1 second)
+            if (typeof window._iconInitRetries === 'undefined') {
+                window._iconInitRetries = 0;
+            }
+            if (window._iconInitRetries < 10) {
+                window._iconInitRetries++;
             setTimeout(initializeIcons, 100);
+            }
             return;
         }
 
         // Wait for IconSystem to be initialized
         if (!window.IconSystem.initialized) {
+            try {
             await window.IconSystem.initialize();
+            } catch (error) {
+                if (typeof window.Logger !== 'undefined') {
+                    window.Logger.warn('Failed to initialize IconSystem', {
+                        error: error?.message || error,
+                        page: window.location.pathname.split('/').pop()
+                    });
+                }
+                return; // Don't continue if initialization failed
+            }
+        }
+
+        // Verify IconSystem is ready
+        if (!window.IconSystem || !window.IconSystem.initialized) {
+            return;
         }
 
         // Find all icon placeholders
@@ -54,8 +81,11 @@
             try {
                 // Determine icon type (default to 'button' for Tabler icons)
                 // If icon name contains entity types, use 'entity'
+                // Special cases: Tabler icons that contain entity type names but are not entity icons
+                const tablerIconExceptions = ['notebook', 'alert-circle', 'alert-triangle', 'alert-circle-filled', 'alert-triangle-filled'];
                 const entityTypes = ['trade', 'execution', 'ticker', 'account', 'note', 'cash_flow', 'trade_plan', 'alert'];
-                const iconType = entityTypes.some(type => iconName.includes(type)) ? 'entity' : 'button';
+                const isEntityIcon = entityTypes.some(type => iconName.includes(type)) && !tablerIconExceptions.includes(iconName);
+                const iconType = isEntityIcon ? 'entity' : 'button';
 
                 // Render icon using IconSystem
                 const iconHTML = await window.IconSystem.renderIcon(iconType, iconName, {
@@ -64,22 +94,32 @@
                     class: className
                 });
 
+                // Validate iconHTML before replacing
+                if (!iconHTML || typeof iconHTML !== 'string' || iconHTML.trim() === '') {
+                    throw new Error('Invalid icon HTML returned');
+                }
+
+                // Check for parser errors in the HTML
+                if (iconHTML.includes('parsererror')) {
+                    throw new Error('Parser error in icon HTML');
+                }
+
                 // Replace placeholder with rendered icon
                 if (placeholder.parentNode && document.contains(placeholder)) {
                     placeholder.outerHTML = iconHTML;
                 }
             } catch (error) {
-                // Fallback: try to use img tag with path
+                // Fallback: use img tag with absolute path
                 if (placeholder.parentNode && document.contains(placeholder)) {
-                    const fallbackPath = `../../images/icons/tabler/${iconName}.svg`;
+                    const fallbackPath = `/trading-ui/images/icons/tabler/${iconName}.svg`;
                     placeholder.outerHTML = `<img src="${fallbackPath}" width="${size}" height="${size}" alt="${alt}" class="${className}" onerror="this.style.display='none'">`;
                 }
 
                 // Log error if Logger is available
                 if (typeof window.Logger !== 'undefined') {
-                    window.Logger.warn('Failed to render icon', {
+                    window.Logger.warn('Failed to render icon, using fallback', {
                         icon: iconName,
-                        error: error.message,
+                        error: error?.message || error,
                         page: window.location.pathname.split('/').pop()
                     });
                 }
@@ -89,13 +129,22 @@
 
     // Initialize when DOM is ready
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initializeIcons);
+        document.addEventListener('DOMContentLoaded', () => {
+            // Wait for IconSystem to be ready
+            setTimeout(initializeIcons, 100);
+        });
     } else {
-        // DOM already loaded, initialize immediately
-        initializeIcons();
+        // DOM already loaded, wait a bit for IconSystem
+        setTimeout(initializeIcons, 100);
     }
 
-    // Also initialize after a short delay to catch dynamically added icons
+    // Also initialize after delays to catch dynamically added icons
     setTimeout(initializeIcons, 500);
+    setTimeout(initializeIcons, 1000);
+    setTimeout(initializeIcons, 2000);
+
+    // Export function for manual initialization
+    window.initializeIcons = initializeIcons;
 })();
+
 

@@ -63,10 +63,9 @@ function updatePage(pageName) {
         fs.copyFileSync(htmlPath, backupPath);
         
         // Generate new script loading code
-        const newScripts = execSync(
-            `node "${GENERATE_SCRIPT}" ${pageName} --mode=production --use-bundles`,
-            { encoding: 'utf8', cwd: path.dirname(GENERATE_SCRIPT) }
-        );
+        const cmd = `node "${GENERATE_SCRIPT}" ${pageName} --mode=production --use-bundles`;
+        console.log(`Running: ${cmd} in ${path.dirname(GENERATE_SCRIPT)}`);
+        const newScripts = execSync(cmd, { encoding: 'utf8', cwd: path.dirname(GENERATE_SCRIPT) });
         
         // Read original HTML
         const htmlContent = fs.readFileSync(htmlPath, 'utf8');

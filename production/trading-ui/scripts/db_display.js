@@ -15,6 +15,34 @@
  * Last Updated: January 22, 2025
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - initDatabaseDisplay() - Initdatabasedisplay
+// - createTableHeaders() - Createtableheaders
+// - createTableBodyHTML() - Createtablebodyhtml
+
+// === Event Handlers ===
+// - getSectionId() - Getsectionid
+// - getContainerId() - Getcontainerid
+
+// === UI Functions ===
+// - updateTableDisplay() - Updatetabledisplay
+// - showLoadingState() - Showloadingstate
+// - showErrorState() - Showerrorstate
+// - updateTableInfo() - Updatetableinfo
+// - updateSummaryStats() - Updatesummarystats
+
+// === Data Functions ===
+// - loadAllTables() - Loadalltables
+// - loadTableDataLocal() - Loadtabledatalocal
+// - getTableId() - Gettableid
+// - getCountElementId() - Getcountelementid
+
+// === EOD Integration Functions ===
+// - loadEODTableData() - Handle EOD table loading
+
 // ===== GLOBAL VARIABLES =====
 const tableData = {};
 let totalRecords = 0;
@@ -48,17 +76,26 @@ async function loadAllTables() {
     { api: 'executions', container: 'executionsContainer' },
     { api: 'alerts', container: 'alertsContainer' },
     { api: 'notes', container: 'notesContainer' },
-    { api: 'cash-flows', container: 'cashFlowsContainer' }
+    { api: 'cash-flows', container: 'cashFlowsContainer' },
+
+    // === EOD INTEGRATION: Add EOD tables ===
+    { api: 'eod/daily-portfolio-metrics', container: 'eodPortfolioMetricsContainer', isEOD: true },
+    { api: 'eod/daily-ticker-positions', container: 'eodTickerPositionsContainer', isEOD: true },
+    { api: 'eod/daily-cash-flow-agg', container: 'eodCashFlowAggContainer', isEOD: true }
   ];
   
   totalRecords = 0;
   
   for (const table of tables) {
     try {
-      window.Logger?.debug('Loading table', { page: 'db_display', api: table.api });
-      await loadTableData(table.api, table.container);
+      // Reduced logging - only log errors, not debug info for each table
+      await loadTableDataLocal(table.api, table.container, table.isEOD);
     } catch (error) {
-      window.Logger?.error('Error loading table', { page: 'db_display', api: table.api, error: error?.message || error });
+      // Log only actual errors, not missing data warnings
+      if (error?.message?.includes('HTTP error') || error?.message?.includes('Failed to load')) {
+        window.Logger?.warn('Table load failed', { page: 'db_display', api: table.api, error: error?.message });
+      }
+      // Continue silently for other tables
     }
   }
   
@@ -71,32 +108,104 @@ async function loadAllTables() {
 
 /**
  * Load data for a specific table type
+ * Uses centralized loadTableData from services package
  * @param {string} tableType - The table type to load (with dashes)
  * @param {string} containerId - The container ID for the table
  */
-async function loadTableData(tableType, containerId) {
+async function loadTableDataLocal(tableType, containerId, isEOD = false) {
   try {
-    window.Logger?.debug('Loading data for table type', { page: 'db_display', tableType });
+    // Removed debug logging to reduce console noise
 
     // Show loading state
     showLoadingState(tableType);
 
-    // Fetch data from server
-    const data = await fetchTableData(tableType);
+    // Use centralized loadTableData function from services package if available
+    // Otherwise fallback to direct fetch
+    let data = [];
+
+    // === EOD INTEGRATION: Handle EOD tables ===
+    if (isEOD) {
+      try {
+        window.Logger?.debug('Loading EOD table data', { page: 'db_display', tableType });
+
+        // Map EOD table types to EODIntegrationHelper functions
+        const eodTableMap = {
+          'eod/daily-portfolio-metrics': 'loadEODPortfolioMetrics',
+          'eod/daily-ticker-positions': 'loadEODTickerPositions',
+          'eod/daily-cash-flow-agg': 'loadEODCashFlows'
+        };
+
+        const helperFunction = eodTableMap[tableType];
+        if (helperFunction && window.EODIntegrationHelper && typeof window.EODIntegrationHelper[helperFunction] === 'function') {
+          const result = await window.EODIntegrationHelper[helperFunction]({
+            limit: 100, // Limit for display purposes
+            date_from: '2024-01-01', // Show recent data
+            date_to: new Date().toISOString().split('T')[0]
+          });
+
+          data = result && result.data ? result.data : [];
+          window.Logger?.debug('Loaded EOD table data', { page: 'db_display', tableType, recordCount: data.length });
+        } else {
+          throw new Error(`EOD helper function not available: ${helperFunction}`);
+        }
+      } catch (eodError) {
+        window.Logger?.error('Failed to load EOD table data', { page: 'db_display', tableType, error: eodError?.message });
+        // Continue with empty data for EOD tables (no fallback data)
+        data = [];
+      }
+    } else if (typeof window.loadTableData === 'function') {
+      // Convert table type with dashes to table type without dashes for mapping
+      const tableTypeNormalized = tableType.replace(/-/g, '_');
+      try {
+        data = await window.loadTableData(tableTypeNormalized, null, {
+          tableId: getTableId(tableType),
+          entityName: tableType,
+          columns: 10 // Default column count for error display
+        });
+      } catch (err) {
+        // If centralized function doesn't support this table type, fetch directly
+        window.Logger?.debug('Centralized loadTableData failed, fetching directly', { 
+          page: 'db_display', 
+          tableType, 
+          error: err?.message 
+        });
+        const response = await fetch(`/api/${tableType}/`);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const result = await response.json();
+        data = (result.status === 'success' && result.data) ? result.data : [];
+      }
+    } else {
+      // Fallback to direct fetch if centralized function not available
+      window.Logger?.warn('window.loadTableData not available, using direct fetch', { page: 'db_display', tableType });
+      const response = await fetch(`/api/${tableType}/`);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const result = await response.json();
+      data = (result.status === 'success' && result.data) ? result.data : [];
+    }
 
     // Store data
-    tableData[tableType] = data;
+    tableData[tableType] = Array.isArray(data) ? data : [];
 
-    // Update table display
-    updateTableDisplay(data, tableType, containerId);
+    // Update table display using centralized system
+    const tableTypeNormalized = tableType.replace(/-/g, '_');
+    if (typeof window.updateTable === 'function') {
+      window.updateTable(tableTypeNormalized, tableData[tableType]);
+    } else {
+      // Fallback to local function if centralized system not available
+      updateTableDisplay(tableData[tableType], tableType, containerId);
+    }
 
     // Update table info
-    updateTableInfo(tableType, data.length);
+    updateTableInfo(tableType, tableData[tableType].length);
 
     // Add to total records
-    totalRecords += data.length;
+    totalRecords += tableData[tableType].length;
 
-    window.Logger?.debug('Data loaded for table type', { page: 'db_display', tableType, recordCount: data.length });
+    window.Logger?.debug('Data loaded for table type', { page: 'db_display', tableType, recordCount: tableData[tableType].length });
 
   } catch (error) {
     window.Logger?.error('Error loading data for table type', { page: 'db_display', tableType, error: error?.message || error });
@@ -104,38 +213,13 @@ async function loadTableData(tableType, containerId) {
   }
 }
 
-/**
- * Fetch table data from server
- * @param {string} tableType - The table type to fetch (with dashes)
- * @returns {Promise<Array>} The fetched data
- */
-async function fetchTableData(tableType) {
-  try {
-    window.Logger?.debug('Fetching data from API', { page: 'db_display', tableType, url: `/api/${tableType}/` });
-    const response = await fetch(`/api/${tableType}/`);
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const result = await response.json();
-    window.Logger?.debug('Received response', { page: 'db_display', tableType, result });
-
-    if (result.status === 'success') {
-      return result.data || [];
-    } else {
-      throw new Error(result.error?.message || `Error fetching ${tableType} data`);
-    }
-  } catch (error) {
-    window.Logger?.error('Error fetching data', { page: 'db_display', tableType, error: error?.message || error });
-    // Return empty array on error
-    return [];
-  }
-}
+// REMOVED: fetchTableData - Use centralized window.loadTableData from services package instead
 
 // ===== TABLE DISPLAY =====
 
 /**
- * Update table display with data
+ * Update table display with data (FALLBACK - Use window.updateTable() instead)
+ * @deprecated Use window.updateTable() from unified-table-system.js
  * @param {Array} data - The data to display
  * @param {string} tableType - The table type (with dashes)
  * @param {string} containerId - The container ID for the table
@@ -163,19 +247,41 @@ function updateTableDisplay(data, tableType, containerId) {
     return;
   }
 
-  window.Logger?.debug('Updating table display', { page: 'db_display', tableType, recordCount: data.length });
+  window.Logger?.debug('Updating table display (fallback)', { page: 'db_display', tableType, recordCount: data.length });
 
   // Create table headers from first data row
   const thead = table.querySelector('thead');
   if (thead && data.length > 0) {
-    thead.innerHTML = createTableHeaders(data);
+    const headersHTML = createTableHeaders(data);
+    thead.textContent = '';
+    const tempDiv = document.createElement('div');
+    tempDiv.textContent = '';
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(`<table><thead>${headersHTML}</thead></table>`, 'text/html');
+    const tempThead = doc.body.querySelector('thead');
+    if (tempThead) {
+        Array.from(tempThead.children).forEach(child => {
+            thead.appendChild(child.cloneNode(true));
+        });
+    }
+    while (tempDiv.firstChild) {
+      thead.appendChild(tempDiv.firstChild);
+    }
   }
 
   // Create table body HTML
   const tbodyHTML = createTableBodyHTML(data, tableType);
 
   // Update table body
-  tbody.innerHTML = tbodyHTML;
+  tbody.textContent = '';
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(`<table><tbody>${tbodyHTML}</tbody></table>`, 'text/html');
+  const tempTbody = doc.body.querySelector('tbody');
+  if (tempTbody) {
+      Array.from(tempTbody.children).forEach(child => {
+          tbody.appendChild(child.cloneNode(true));
+      });
+  }
 }
 
 /**
@@ -237,7 +343,8 @@ function getTableId(tableType) {
 
 
 /**
- * Create table headers from data
+ * Create table headers from data (FALLBACK - Use UnifiedTableSystem instead)
+ * @deprecated Use window.UnifiedTableSystem.renderer.render() instead
  * @param {Array} data - The table data
  * @returns {string} The table headers HTML
  */
@@ -248,7 +355,8 @@ function createTableHeaders(data) {
 }
 
 /**
- * Create table body HTML from data
+ * Create table body HTML from data (FALLBACK - Use UnifiedTableSystem instead)
+ * @deprecated Use window.UnifiedTableSystem.renderer.render() instead
  * @param {Array} data - The table data
  * @param {string} tableType - The table type
  * @returns {string} The table body HTML
@@ -285,7 +393,14 @@ function showLoadingState(tableType) {
   if (tableContainer) {
     const tbody = tableContainer.querySelector('tbody');
     if (tbody) {
-      tbody.innerHTML = '<tr><td colspan="100" class="text-center">Loading data...</td></tr>';
+      tbody.textContent = '';
+      const row = document.createElement('tr');
+      const cell = document.createElement('td');
+      cell.colSpan = 100;
+      cell.className = 'text-center';
+      cell.textContent = 'Loading data...';
+      row.appendChild(cell);
+      tbody.appendChild(row);
     }
   }
 }
@@ -301,7 +416,15 @@ function showErrorState(tableType, errorMessage) {
   if (tableContainer) {
     const tbody = tableContainer.querySelector('tbody');
     if (tbody) {
-      tbody.innerHTML = `<tr><td colspan="100" class="text-center text-danger">Error: ${errorMessage}</td></tr>`;
+      tbody.textContent = '';
+        // Convert HTML string to DOM elements safely
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(`<tr><td colspan="100" class="text-center text-danger">Error: ${errorMessage}</td></tr>`, 'text/html');
+        const fragment = document.createDocumentFragment();
+        Array.from(doc.body.childNodes).forEach(node => {
+            fragment.appendChild(node.cloneNode(true));
+        });
+        tbody.appendChild(fragment);
     }
   }
 }
@@ -366,7 +489,8 @@ function updateSummaryStats() {
 
 // Export functions to global scope
 window.initDatabaseDisplay = initDatabaseDisplay;
-window.loadTableData = loadTableData;
+// REMOVED: window.loadTableData - conflicts with centralized loadTableData from services package
+// Use loadTableDataLocal internally, or window.loadTableData directly if needed
 window.loadDatabaseInfo = async function loadDatabaseInfo() {
   await loadAllTables();
 };

@@ -38,6 +38,33 @@
  * @lastUpdated January 15, 2025
  */
 
+
+// ===== FUNCTION INDEX =====
+// === Object Methods ===
+// - __headerSystemMouseMoveHandler() -   Headersystemmousemovehandler
+// - __headerSystemMouseMoveHandler() -   Headersystemmousemovehandler
+
+// === Initialization ===
+// - setupHoverBehavior() - Setuphoverbehavior
+// - ensureHeaderInitialization() - Ensureheaderinitialization
+
+// === Event Handlers ===
+// - positionPortal() - Positionportal
+// - updateFilterSelections() - Updatefilterselections
+// - addPortalEventListeners() - Addportaleventlisteners
+// - updatePortalSelections() - Updateportalselections
+// - eventHandler() - Eventhandler
+// - clickHandler() - Clickhandler
+// - mouseenterHandler() - Mouseenterhandler
+// - mouseleaveHandler() - Mouseleavehandler
+
+// === Other ===
+// - logFilterMenuDiagnostics() - Logfiltermenudiagnostics
+// - trackMenuOpen() - Trackmenuopen
+// - openFilterMenuPortal() - Openfiltermenuportal
+// - closeFilterMenuPortal() - Closefiltermenuportal
+// - closeAllFilterMenus() - Closeallfiltermenus
+
 // Removed debug log - file loading is tracked internally
 if (window.Logger) {
   window.Logger.info('🚀 Loading Header System v6.0.0...', { page: 'header-system' });
@@ -559,7 +586,12 @@ class HeaderSystem {
         page: 'header-system',
         htmlLength: headerHTML.length,
       });
-      headerElement.innerHTML = headerHTML;
+      headerElement.textContent = '';
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(headerHTML, 'text/html');
+      doc.body.childNodes.forEach(node => {
+          headerElement.appendChild(node.cloneNode(true));
+      });
 
       // בדיקות אחרי יצירה
       const createdElements = {
@@ -859,8 +891,8 @@ class HeaderSystem {
                   <div class="type-filter-item" data-value="השקעה" onclick="selectTypeOption('השקעה')">
                     <span class="option-text">השקעה</span>
                   </div>
-                  <div class="type-filter-item" data-value="פסיבי" onclick="selectTypeOption('פסיבי')">
-                    <span class="option-text">פסיבי</span>
+                  <div class="type-filter-item" data-value="פאסיבי" onclick="selectTypeOption('פאסיבי')">
+                    <span class="option-text">פאסיבי</span>
                   </div>
                 </div>
               </div>
@@ -1943,7 +1975,10 @@ class HeaderSystem {
           // שימוש ב-ID במקום שם - כפי ששמור בהעדפות (default_trading_account)
           accountItem.setAttribute('data-value', account.id);
           accountItem.onclick = () => selectAccountOption(account.id);
-          accountItem.innerHTML = `<span class="option-text">${account.name}</span>`;
+          const span = document.createElement('span');
+          span.className = 'option-text';
+          span.textContent = account.name;
+          accountItem.appendChild(span);
           accountMenu.appendChild(accountItem);
           // window.Logger.info('🔧 הוספתי חשבון מסחר:', account.name, { page: "header-system" });
         });
@@ -3157,8 +3192,8 @@ function updateFilterSelections(filters) {
     Swing: 'סווינג',
     investment: 'השקעה',
     Investment: 'השקעה',
-    passive: 'פסיבי',
-    Passive: 'פסיבי',
+    passive: 'פאסיבי',
+    Passive: 'פאסיבי',
     // date ranges
     all_time: 'כל הזמן',
     any: 'כל הזמן',
@@ -4523,7 +4558,14 @@ window.clearAllFilters = function () {
 
     // איפוס UI
     const searchInput = document.getElementById('searchFilterInput');
-    if (searchInput) searchInput.value = '';
+    if (searchInput) {
+      // Use DataCollectionService to clear field if available
+      if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+        window.DataCollectionService.setValue('searchFilterInput', '', 'text');
+      } else {
+        searchInput.value = '';
+      }
+    }
 
     // איפוס בחירות בפילטרים
     const allFilterItems = document.querySelectorAll(
@@ -4588,7 +4630,12 @@ window.updateFilterUI = function (filters) {
   // עדכון שדה החיפוש
   const searchInput = document.getElementById('searchFilterInput');
   if (searchInput) {
-    searchInput.value = filters.search || '';
+    // Use DataCollectionService to set value if available
+    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+      window.DataCollectionService.setValue('searchFilterInput', filters.search || '', 'text');
+    } else {
+      searchInput.value = filters.search || '';
+    }
   }
 
   // עדכון פילטר סטטוס
@@ -4877,7 +4924,12 @@ window.resetAllFilters = async function () {
       // עדכון שדה החיפוש
       const searchInput = document.getElementById('searchFilterInput');
       if (searchInput) {
-        searchInput.value = defaultFilters.search || '';
+        // Use DataCollectionService to set value if available
+        if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+          window.DataCollectionService.setValue('searchFilterInput', defaultFilters.search || '', 'text');
+        } else {
+          searchInput.value = defaultFilters.search || '';
+        }
       }
 
       // עדכון בחירות בתפריטים

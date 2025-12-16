@@ -153,7 +153,6 @@
       body = null,
       headers = {},
       signal,
-      credentials = 'same-origin',
       // advanced options
       timeoutMs = 15000,
       dedupe = true,
@@ -190,7 +189,6 @@
           },
           body: body ? JSON.stringify(body) : undefined,
           signal: signal || controller.signal,
-          credentials,
         };
         // Send If-None-Match ETag when available
         const etag = etags.get(url);
@@ -200,8 +198,7 @@
         const resp = await fetch(url, {
           ...hdrs,
           body: body ? JSON.stringify(body) : undefined,
-          signal: signal || controller.signal,
-          credentials,
+          signal: signal || controller.signal
         });
         return resp;
       } catch (e) {
@@ -294,41 +291,41 @@
         payload?.error ||
         payload?.message ||
         `HTTP ${response.status}: ${response.statusText}`;
-      const error = new Error(errorMessage);
-      error.payload = payload;
-      // Authentication handling: mark error for callers, but avoid using the
-      // notification system here (it itself relies on preferences and can
-      // create recursive errors if preferences endpoints return 401).
+      // Authentication handling: להחזיר אובייקט שגיאה רך במקום להפיל את העמוד
       if (response.status === 401 || response.status === 403) {
-        error.isAuthError = true;
-        error.status = response.status;
         try {
-          window.Logger?.warn?.('⚠️ Preferences request failed with authentication error', {
+          window.Logger?.debug?.('⚠️ Preferences request skipped (auth required)', {
             ...PAGE_LOG_CONTEXT,
             url,
             status: response.status,
             message: errorMessage,
           });
         } catch (_) { /* noop */ }
+        return { status: 'error', error_code: 'AUTH_REQUIRED', message: errorMessage };
       } else if (response.status === 429) {
         // Respect Retry-After header if present, then retry transparently
         const retryAfter = Number(response.headers?.get?.('Retry-After')) || 1;
-        // Jitter to avoid herd effects
         const jitter = Math.floor(Math.random() * 250);
-        // Trip short-lived circuit breaker
         rateLimitedUntil = Date.now() + Math.min(retryAfter * 1000 + jitter, 5000);
         if ((options.maxRetries ?? 2) > 0) {
           await new Promise(r => setTimeout(r, Math.min(retryAfter * 1000 + jitter, 5000)));
-          // Retry once with reduced maxRetries to avoid infinite loop
           return await fetchJson(path, {
             ...options,
             maxRetries: (options.maxRetries ?? 2) - 1,
           });
         }
-        error.status = 429;
-        error.isRateLimited = true;
+        return { status: 'error', error_code: 'RATE_LIMIT_EXCEEDED', message: errorMessage };
       }
-      throw error;
+      try {
+        window.Logger?.error?.('❌ Preferences request failed', {
+          ...PAGE_LOG_CONTEXT,
+          url,
+          status: response.status,
+          message: errorMessage,
+          payload,
+        });
+      } catch (_) { /* noop */ }
+      return { status: 'error', error_code: 'REQUEST_FAILED', message: errorMessage };
     }
 
     // Store latest ETag if present
@@ -497,9 +494,35 @@
         profileContext?.requested_profile_id ??
         data.requested_profile_id ??
         null,
-      userId: profileContext?.user?.id ?? data.user_id ?? fallback.userId ?? 1,
+      userId: profileContext?.user?.id ?? data.user_id ?? fallback.userId ?? null,
       raw: payload,
     };
+  }
+
+  /**
+   * Get current user ID from authentication system
+   * Falls back to 1 if no user is authenticated
+   */
+  function getCurrentUserId() {
+    try {
+      if (typeof window.getCurrentUser === 'function') {
+        const user = window.getCurrentUser();
+        if (user && user.id) {
+          return user.id;
+        }
+      }
+      if (typeof window.TikTrackAuth?.getCurrentUser === 'function') {
+        const user = window.TikTrackAuth.getCurrentUser();
+        if (user && user.id) {
+          return user.id;
+        }
+      }
+      // Not authenticated
+      return null;
+    } catch (e) {
+      // Silent fallback
+    }
+    return null; // Default: no user until authenticated
   }
 
   function normalizeProfilesPayload(payload = {}, userId = 1) {
@@ -553,7 +576,15 @@
     };
   }
 
-  async function loadPreference({ preferenceName, userId = 1, profileId = null, force = false, ttl = DEFAULT_TTL.single } = {}) {
+  async function loadPreference({ preferenceName, userId = null, profileId = null, force = false, ttl = DEFAULT_TTL.single } = {}) {
+    // Auto-resolve userId if not provided
+    if (userId === null || userId === undefined) {
+      userId = getCurrentUserId();
+    }
+    if (!userId) {
+      window.Logger?.debug?.('⚠️ Preferences request skipped - user not authenticated', PAGE_LOG_CONTEXT);
+      return { value: null };
+    }
     if (!preferenceName) {
       return { value: null };
     }
@@ -604,7 +635,15 @@
     };
   }
 
-  async function loadPreferenceGroup({ groupName, userId = 1, profileId = null, force = false, ttl = DEFAULT_TTL.group } = {}) {
+  async function loadPreferenceGroup({ groupName, userId = null, profileId = null, force = false, ttl = DEFAULT_TTL.group } = {}) {
+    // Auto-resolve userId if not provided
+    if (userId === null || userId === undefined) {
+      userId = getCurrentUserId();
+    }
+    if (!userId) {
+      window.Logger?.debug?.('⚠️ Preferences group request skipped - user not authenticated', PAGE_LOG_CONTEXT);
+      return { preferences: {} };
+    }
     if (!groupName) {
       return { preferences: {} };
     }
@@ -648,7 +687,15 @@
     return normalized;
   }
 
-  async function loadPreferencesByNames({ names = [], userId = 1, profileId = null, force = false, ttl = DEFAULT_TTL.multiple } = {}) {
+  async function loadPreferencesByNames({ names = [], userId = null, profileId = null, force = false, ttl = DEFAULT_TTL.multiple } = {}) {
+    // Auto-resolve userId if not provided
+    if (userId === null || userId === undefined) {
+      userId = getCurrentUserId();
+    }
+    if (!userId) {
+      window.Logger?.debug?.('⚠️ Preferences by names skipped - user not authenticated', PAGE_LOG_CONTEXT);
+      return {};
+    }
     if (!Array.isArray(names) || names.length === 0) {
       return {};
     }
@@ -688,7 +735,25 @@
     return normalizedMap;
   }
 
-  async function loadAllPreferencesRaw({ userId = 1, profileId = null, force = false, ttl = DEFAULT_TTL.all } = {}) {
+  async function loadAllPreferencesRaw({ userId = null, profileId = null, force = false, ttl = DEFAULT_TTL.all } = {}) {
+    // Auto-resolve userId if not provided
+    if (userId === null || userId === undefined) {
+      userId = getCurrentUserId();
+    }
+    if (!userId) {
+      window.Logger?.debug?.('⚠️ Preferences load skipped - user not authenticated', PAGE_LOG_CONTEXT);
+      // Return empty payload with default colors fallback
+      const defaults = await loadDefaultPreferences({ force: false });
+      return {
+        preferences: defaults || {},
+        preferencesMetadata: [],
+        profileContext: null,
+        resolvedProfileId: null,
+        requestedProfileId: profileId,
+        userId: null,
+        raw: { fallback: true, reason: 'not_authenticated' },
+      };
+    }
     // High-level deduplication: prevent duplicate calls to this function with same params
     const dedupeKey = buildFunctionDedupeKey('loadAllPreferencesRaw', { userId, profileId, force });
     if (functionInflight.has(dedupeKey)) {
@@ -862,51 +927,117 @@
     return await loadPromise;
   }
 
-  async function savePreference({ preferenceName, value, userId = 1, profileId = null }) {
+  async function savePreference({ preferenceName, value, userId = null, profileId = null }) {
+    // Auto-resolve userId if not provided
+    if (userId === null || userId === undefined) {
+      userId = getCurrentUserId();
+    }
     if (!preferenceName) {
       throw new Error('Preference name is required');
     }
 
-    const payload = await fetchJson('/api/preferences/user/single', {
+    // Use CRUDResponseHandler for consistent response handling
+    const url = buildUrlWithParams('/api/preferences/user/single', {});
+    const response = await fetch(url, {
       method: 'POST',
-      body: {
+      headers: DEFAULT_HEADERS,
+      body: JSON.stringify({
         preference_name: preferenceName,
         value,
         user_id: userId,
         profile_id: profileId,
-      },
+      }),
     });
 
-    // Cache invalidation via CacheSyncManager (preferred method)
-    if (window.CacheSyncManager?.invalidateByAction) {
-      try {
-        await window.CacheSyncManager.invalidateByAction('preference-updated');
-      } catch (error) {
-        window.Logger?.warn?.('⚠️ CacheSyncManager.invalidateByAction failed, falling back', {
-          ...PAGE_LOG_CONTEXT,
-          error: error?.message,
-        });
-        // Fallback to direct cache clearing
+    // Use CRUDResponseHandler for consistent response handling
+    if (window.CRUDResponseHandler && typeof window.CRUDResponseHandler.handleSaveResponse === 'function') {
+      const crudResult = await window.CRUDResponseHandler.handleSaveResponse(response, {
+        successMessage: `העדפה ${preferenceName} נשמרה בהצלחה`,
+        entityName: 'העדפה',
+        requiresHardReload: false,
+        // Note: preferences don't use modals or tables, so modalId and reloadFn are not needed
+      });
+      
+      // Cache invalidation via CacheSyncManager (preferred method)
+      if (window.CacheSyncManager?.invalidateByAction) {
+        try {
+          await window.CacheSyncManager.invalidateByAction('preference-updated');
+        } catch (error) {
+          // Silent fallback - CacheSyncManager errors are handled gracefully
+          // window.Logger?.debug?.('CacheSyncManager.invalidateByAction failed, falling back', {
+          //   ...PAGE_LOG_CONTEXT,
+          //   error: error?.message,
+          // });
+          // Fallback to direct cache clearing
+          await clearCachePattern(KEY_PREFIXES.single);
+          await clearCachePattern(KEY_PREFIXES.all);
+        }
+      } else {
+        // Fallback to direct cache clearing if CacheSyncManager not available
         await clearCachePattern(KEY_PREFIXES.single);
         await clearCachePattern(KEY_PREFIXES.all);
       }
+      
+      // Unified cache refresh: request profile refresh when available
+      if (window.UnifiedCacheManager?.refreshUserPreferences) {
+        try {
+          await window.UnifiedCacheManager.refreshUserPreferences(
+            profileId ?? 'active',
+            null,
+            { userId, preferenceNames: [preferenceName] },
+          );
+        } catch (_) { /* best-effort */ }
+      }
+      
+      return crudResult;
     } else {
-      // Fallback to direct cache clearing if CacheSyncManager not available
-      await clearCachePattern(KEY_PREFIXES.single);
-      await clearCachePattern(KEY_PREFIXES.all);
+      // Fallback to original fetchJson if CRUDResponseHandler not available
+      // Silent fallback - CRUDResponseHandler is optional, not critical
+      // window.Logger?.debug?.('CRUDResponseHandler not available, using fallback', {
+      //   ...PAGE_LOG_CONTEXT,
+      // });
+      const payload = await fetchJson('/api/preferences/user/single', {
+        method: 'POST',
+        body: {
+          preference_name: preferenceName,
+          value,
+          user_id: userId,
+          profile_id: profileId,
+        },
+      });
+
+      // Cache invalidation via CacheSyncManager (preferred method)
+      if (window.CacheSyncManager?.invalidateByAction) {
+        try {
+          await window.CacheSyncManager.invalidateByAction('preference-updated');
+        } catch (error) {
+          // Silent fallback - CacheSyncManager errors are handled gracefully
+          // window.Logger?.debug?.('CacheSyncManager.invalidateByAction failed, falling back', {
+          //   ...PAGE_LOG_CONTEXT,
+          //   error: error?.message,
+          // });
+          // Fallback to direct cache clearing
+          await clearCachePattern(KEY_PREFIXES.single);
+          await clearCachePattern(KEY_PREFIXES.all);
+        }
+      } else {
+        // Fallback to direct cache clearing if CacheSyncManager not available
+        await clearCachePattern(KEY_PREFIXES.single);
+        await clearCachePattern(KEY_PREFIXES.all);
+      }
+      
+      // Unified cache refresh: request profile refresh when available
+      if (window.UnifiedCacheManager?.refreshUserPreferences) {
+        try {
+          await window.UnifiedCacheManager.refreshUserPreferences(
+            profileId ?? 'active',
+            null,
+            { userId, preferenceNames: [preferenceName] },
+          );
+        } catch (_) { /* best-effort */ }
+      }
+      return payload;
     }
-    
-    // Unified cache refresh: request profile refresh when available
-    if (window.UnifiedCacheManager?.refreshUserPreferences) {
-      try {
-        await window.UnifiedCacheManager.refreshUserPreferences(
-          profileId ?? 'active',
-          null,
-          { userId, preferenceNames: [preferenceName] },
-        );
-      } catch (_) { /* best-effort */ }
-    }
-    return payload;
   }
 
   /**
@@ -929,53 +1060,126 @@
    * Related Documentation:
    * - documentation/04-FEATURES/CORE/CACHE_SYNC_SPECIFICATION.md
    */
-  async function savePreferences({ preferences = {}, userId = 1, profileId = null }) {
+  async function savePreferences({ preferences = {}, userId = null, profileId = null }) {
+    // Auto-resolve userId if not provided
+    if (userId === null || userId === undefined) {
+      userId = getCurrentUserId();
+    }
     if (!preferences || typeof preferences !== 'object' || Object.keys(preferences).length === 0) {
       return { success: false, message: 'No preferences provided' };
     }
 
-    const payload = await fetchJson('/api/preferences/user', {
+    // Use CRUDResponseHandler for consistent response handling
+    const url = buildUrlWithParams('/api/preferences/user', {});
+    const response = await fetch(url, {
       method: 'POST',
-      body: {
+      headers: DEFAULT_HEADERS,
+      body: JSON.stringify({
         preferences,
         user_id: userId,
         profile_id: profileId,
-      },
+      }),
     });
 
-    // Cache invalidation via CacheSyncManager (preferred method)
-    if (window.CacheSyncManager?.invalidateByAction) {
-      try {
-        await window.CacheSyncManager.invalidateByAction('preference-updated');
-      } catch (error) {
-        window.Logger?.warn?.('⚠️ CacheSyncManager.invalidateByAction failed, falling back', {
-          ...PAGE_LOG_CONTEXT,
-          error: error?.message,
-        });
-        // Fallback to direct cache clearing
+    // Use CRUDResponseHandler for consistent response handling
+    if (window.CRUDResponseHandler && typeof window.CRUDResponseHandler.handleSaveResponse === 'function') {
+      const crudResult = await window.CRUDResponseHandler.handleSaveResponse(response, {
+        successMessage: `${Object.keys(preferences).length} העדפות נשמרו בהצלחה`,
+        entityName: 'העדפות',
+        requiresHardReload: false,
+        // Note: preferences don't use modals or tables, so modalId and reloadFn are not needed
+      });
+      
+      // Cache invalidation via CacheSyncManager (preferred method)
+      if (window.CacheSyncManager?.invalidateByAction) {
+        try {
+          await window.CacheSyncManager.invalidateByAction('preference-updated');
+        } catch (error) {
+          // Silent fallback - CacheSyncManager errors are handled gracefully
+          // window.Logger?.debug?.('CacheSyncManager.invalidateByAction failed, falling back', {
+          //   ...PAGE_LOG_CONTEXT,
+          //   error: error?.message,
+          // });
+          // Fallback to direct cache clearing
+          await clearCachePattern(KEY_PREFIXES.single);
+          await clearCachePattern(KEY_PREFIXES.all);
+        }
+      } else {
+        // Fallback to direct cache clearing if CacheSyncManager not available
         await clearCachePattern(KEY_PREFIXES.single);
         await clearCachePattern(KEY_PREFIXES.all);
       }
+      
+      // Unified cache refresh: request profile refresh when available
+      if (window.UnifiedCacheManager?.refreshUserPreferences) {
+        try {
+          await window.UnifiedCacheManager.refreshUserPreferences(
+            profileId ?? 'active',
+            null,
+            { userId, preferenceNames: Object.keys(preferences) },
+          );
+        } catch (_) { /* best-effort */ }
+      }
+      
+      return crudResult;
     } else {
-      // Fallback to direct cache clearing if CacheSyncManager not available
-      await clearCachePattern(KEY_PREFIXES.single);
-      await clearCachePattern(KEY_PREFIXES.all);
+      // Fallback to original fetchJson if CRUDResponseHandler not available
+      // Silent fallback - CRUDResponseHandler is optional, not critical
+      // window.Logger?.debug?.('CRUDResponseHandler not available, using fallback', {
+      //   ...PAGE_LOG_CONTEXT,
+      // });
+      const payload = await fetchJson('/api/preferences/user', {
+        method: 'POST',
+        body: {
+          preferences,
+          user_id: userId,
+          profile_id: profileId,
+        },
+      });
+
+      // Cache invalidation via CacheSyncManager (preferred method)
+      if (window.CacheSyncManager?.invalidateByAction) {
+        try {
+          await window.CacheSyncManager.invalidateByAction('preference-updated');
+        } catch (error) {
+          // Silent fallback - CacheSyncManager errors are handled gracefully
+          // window.Logger?.debug?.('CacheSyncManager.invalidateByAction failed, falling back', {
+          //   ...PAGE_LOG_CONTEXT,
+          //   error: error?.message,
+          // });
+          // Fallback to direct cache clearing
+          await clearCachePattern(KEY_PREFIXES.single);
+          await clearCachePattern(KEY_PREFIXES.all);
+        }
+      } else {
+        // Fallback to direct cache clearing if CacheSyncManager not available
+        await clearCachePattern(KEY_PREFIXES.single);
+        await clearCachePattern(KEY_PREFIXES.all);
+      }
+      
+      // Unified cache refresh: request profile refresh when available
+      if (window.UnifiedCacheManager?.refreshUserPreferences) {
+        try {
+          await window.UnifiedCacheManager.refreshUserPreferences(
+            profileId ?? 'active',
+            null,
+            { userId, preferenceNames: Object.keys(preferences) },
+          );
+        } catch (_) { /* best-effort */ }
+      }
+      return payload;
     }
-    
-    // Unified cache refresh: request profile refresh when available
-    if (window.UnifiedCacheManager?.refreshUserPreferences) {
-      try {
-        await window.UnifiedCacheManager.refreshUserPreferences(
-          profileId ?? 'active',
-          null,
-          { userId, preferenceNames: Object.keys(preferences) },
-        );
-      } catch (_) { /* best-effort */ }
-    }
-    return payload;
   }
 
-  async function loadProfiles({ userId = 1, force = false, ttl = DEFAULT_TTL.profiles } = {}) {
+  async function loadProfiles({ userId = null, force = false, ttl = DEFAULT_TTL.profiles } = {}) {
+    // Auto-resolve userId if not provided
+    if (userId === null || userId === undefined) {
+      userId = getCurrentUserId();
+    }
+    if (!userId) {
+      window.Logger?.debug?.('⚠️ Preferences profiles request skipped - user not authenticated', PAGE_LOG_CONTEXT);
+      return { profiles: [], userId: null };
+    }
     // High-level deduplication: prevent duplicate calls to this function with same params
     const dedupeKey = buildFunctionDedupeKey('loadProfiles', { userId, force });
     if (functionInflight.has(dedupeKey)) {
@@ -1033,7 +1237,11 @@
    * Related Documentation:
    * - documentation/04-FEATURES/CORE/CACHE_SYNC_SPECIFICATION.md
    */
-  async function createProfile({ name, description = '', userId = 1 }) {
+  async function createProfile({ name, description = '', userId = null }) {
+    // Auto-resolve userId if not provided
+    if (userId === null || userId === undefined) {
+      userId = getCurrentUserId();
+    }
     if (!name) {
       throw new Error('Profile name is required');
     }
@@ -1087,7 +1295,11 @@
    * Related Documentation:
    * - documentation/04-FEATURES/CORE/CACHE_SYNC_SPECIFICATION.md
    */
-  async function activateProfile({ profileId, userId = 1 }) {
+  async function activateProfile({ profileId, userId = null }) {
+    // Auto-resolve userId if not provided
+    if (userId === null || userId === undefined) {
+      userId = getCurrentUserId();
+    }
     if (profileId === 0) {
       return { success: true, message: 'Default profile selected (no API call)' };
     }
@@ -1140,7 +1352,11 @@
    * Related Documentation:
    * - documentation/04-FEATURES/CORE/CACHE_SYNC_SPECIFICATION.md
    */
-  async function deleteProfile({ profileId, userId = 1 }) {
+  async function deleteProfile({ profileId, userId = null }) {
+    // Auto-resolve userId if not provided
+    if (userId === null || userId === undefined) {
+      userId = getCurrentUserId();
+    }
     const payload = await fetchJson(`/api/preferences/profiles/${profileId}`, {
       method: 'DELETE',
       params: { user_id: userId },
@@ -1217,7 +1433,11 @@
     return normalized;
   }
 
-  async function loadDefaultPreference(preferenceName, { userId = 1, profileId = null, force = false, ttl = DEFAULT_TTL.defaults } = {}) {
+  async function loadDefaultPreference(preferenceName, { userId = null, profileId = null, force = false, ttl = DEFAULT_TTL.defaults } = {}) {
+    // Auto-resolve userId if not provided
+    if (userId === null || userId === undefined) {
+      userId = getCurrentUserId();
+    }
     if (!preferenceName) {
       throw new Error('preferenceName is required');
     }
@@ -1251,6 +1471,82 @@
 
     await saveCache(cacheKey, value, { ttl, layer: 'localStorage' });
     return value;
+  }
+
+  /**
+   * Load default preferences from server when user preferences are not available
+   */
+  async function loadDefaultPreferences({ force = false, ttl = DEFAULT_TTL.all } = {}) {
+    const cacheKey = 'default-preferences-cache';
+
+    if (!force) {
+      const cached = await readCache(cacheKey, { ttl });
+      if (cached && typeof cached === 'object') {
+        window.Logger?.debug?.('✅ Loaded default preferences from cache', PAGE_LOG_CONTEXT);
+        return cached;
+      }
+    }
+
+    window.Logger?.info?.('📡 Loading default preferences from server', PAGE_LOG_CONTEXT);
+
+    try {
+      // Try to get some key default preferences from the API
+      const defaultPrefs = {};
+
+      // Load key color preferences that the UI needs
+      const colorPrefs = ['primary_color', 'secondary_color', 'chartSecondaryColor'];
+      for (const prefName of colorPrefs) {
+        try {
+          const value = await loadDefaultPreference(prefName, { force: true });
+          if (value !== null) {
+            defaultPrefs[prefName] = value;
+          }
+        } catch (e) {
+          window.Logger?.warn?.(`⚠️ Failed to load default ${prefName}`, {
+            ...PAGE_LOG_CONTEXT,
+            error: e?.message
+          });
+        }
+      }
+
+      // Add some basic UI preferences with hardcoded defaults if API fails
+      if (Object.keys(defaultPrefs).length === 0) {
+        window.Logger?.warn?.('⚠️ No default preferences loaded from API, using hardcoded defaults', PAGE_LOG_CONTEXT);
+        // TikTrack logo colors as fallback
+        defaultPrefs.primary_color = '#26baac';
+        defaultPrefs.secondary_color = '#fc5a06';
+        defaultPrefs.chartSecondaryColor = '#26baac';
+      }
+
+      await saveCache(cacheKey, defaultPrefs, { ttl, layer: 'localStorage' });
+
+      window.Logger?.info?.('✅ Default preferences loaded', {
+        ...PAGE_LOG_CONTEXT,
+        count: Object.keys(defaultPrefs).length
+      });
+
+      return defaultPrefs;
+
+    } catch (error) {
+      window.Logger?.error?.('❌ Failed to load default preferences', {
+        ...PAGE_LOG_CONTEXT,
+        error: error?.message
+      });
+
+      // Ultimate fallback - TikTrack logo colors
+      const fallbackPrefs = {
+        primary_color: '#26baac',
+        secondary_color: '#fc5a06',
+        chartSecondaryColor: '#26baac'
+      };
+
+      window.Logger?.warn?.('⚠️ Using hardcoded fallback preferences', {
+        ...PAGE_LOG_CONTEXT,
+        fallbackPrefs
+      });
+
+      return fallbackPrefs;
+    }
   }
 
   async function loadPreferenceInfo(preferenceName) {

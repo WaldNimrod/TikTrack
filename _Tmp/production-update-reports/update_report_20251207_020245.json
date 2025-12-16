@@ -1,0 +1,113 @@
+{
+  "start_time": "2025-12-07T02:02:40.400066",
+  "steps": [
+    {
+      "number": 1,
+      "name": "collect_changes",
+      "success": true,
+      "duration_seconds": 2.324313163757324,
+      "timestamp": "2025-12-07T02:02:42.733600",
+      "details": {
+        "success": true,
+        "commits_count": 15,
+        "output_file": "/Users/nimrod/Documents/TikTrack/TikTrackApp-Production/_Tmp/release_notes_main_20251207_020240.log",
+        "commits": [
+          "1d0ac97a8 יצירת בסיס נתונים פרודקשן עם מפתחות מסודרים ונתוני דוגמה מלאים",
+          "e681f2eca שילוב 3 עמודי מוקאפים במערכת - היסטוריית טרייד, מצב תיק היסטורי, יומן מסחר",
+          "a793ffce0 chore: Add backup file patterns to .gitignore",
+          "b703d5d01 feat: Complete bundles environment-aware setup and development environment fixes",
+          "815776016 Update AI Analysis documentation to v2.0"
+        ]
+      }
+    },
+    {
+      "number": 2,
+      "name": "check_server",
+      "success": true,
+      "duration_seconds": 0.039791107177734375,
+      "timestamp": "2025-12-07T02:02:42.774036",
+      "details": {
+        "success": true,
+        "running": false,
+        "port": 5001,
+        "pid": null,
+        "health": "not_running"
+      }
+    },
+    {
+      "number": 4,
+      "name": "update_main",
+      "success": true,
+      "duration_seconds": 2.2035372257232666,
+      "timestamp": "2025-12-07T02:02:44.978353",
+      "details": {
+        "success": true,
+        "commits_count": 15,
+        "output_file": "/Users/nimrod/Documents/TikTrack/TikTrackApp-Production/_Tmp/release_notes_main_20251207_020242.log",
+        "commits": [
+          "1d0ac97a8 יצירת בסיס נתונים פרודקשן עם מפתחות מסודרים ונתוני דוגמה מלאים",
+          "e681f2eca שילוב 3 עמודי מוקאפים במערכת - היסטוריית טרייד, מצב תיק היסטורי, יומן מסחר",
+          "a793ffce0 chore: Add backup file patterns to .gitignore",
+          "b703d5d01 feat: Complete bundles environment-aware setup and development environment fixes",
+          "815776016 Update AI Analysis documentation to v2.0"
+        ]
+      }
+    },
+    {
+      "number": 5,
+      "name": "merge_main",
+      "success": false,
+      "duration_seconds": 0.02032160758972168,
+      "timestamp": "2025-12-07T02:02:44.999337",
+      "details": {
+        "success": false,
+        "error": "Command '['git', 'pull', 'origin', 'production']' returned non-zero exit status 128."
+      }
+    }
+  ],
+  "files_updated": [],
+  "files_new": [
+    {
+      "path": "/Users/nimrod/Documents/TikTrack/TikTrackApp-Production/_Tmp/release_notes_main_20251207_020240.log",
+      "timestamp": "2025-12-07T02:02:42.733585",
+      "details": {
+        "type": "release_notes",
+        "commits_count": 15
+      }
+    },
+    {
+      "path": "/Users/nimrod/Documents/TikTrack/TikTrackApp-Production/_Tmp/release_notes_main_20251207_020242.log",
+      "timestamp": "2025-12-07T02:02:44.978338",
+      "details": {
+        "type": "release_notes",
+        "commits_count": 15
+      }
+    }
+  ],
+  "files_deleted": [],
+  "warnings": [],
+  "errors": [
+    {
+      "message": "Merge failed: Command '['git', 'pull', 'origin', 'production']' returned non-zero exit status 128.",
+      "step": "merge_main",
+      "timestamp": "2025-12-07T02:02:44.999276"
+    },
+    {
+      "message": "Step 5 (merge_main) failed",
+      "step": "merge_main",
+      "timestamp": "2025-12-07T02:02:44.999339"
+    }
+  ],
+  "summary": {
+    "total_duration_seconds": 4.600332,
+    "steps_completed": 3,
+    "steps_failed": 1,
+    "files_updated_count": 0,
+    "files_new_count": 2,
+    "files_deleted_count": 0,
+    "warnings_count": 0,
+    "errors_count": 2
+  },
+  "end_time": "2025-12-07T02:02:45.000398",
+  "success": false
+}

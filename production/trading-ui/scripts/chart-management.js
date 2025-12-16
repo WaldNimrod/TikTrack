@@ -85,9 +85,28 @@
         await window.chartLoader.load();
       }
 
+      // אם המערכת לא זמינה עדיין, לנסות לטעון סקריפט Chart System באופן דינמי
+      if (!window.ChartSystem && typeof window.loadScriptOnce === 'function') {
+        try {
+          await window.loadScriptOnce('/scripts/charts/chart-system.js');
+        } catch (e) {
+          window.Logger?.warn?.('ChartSystem script load failed', { page: 'chart-management', error: e?.message });
+        }
+      }
+
       if (!this.chartSystem || typeof this.chartSystem.create !== 'function') {
-        this.chartSystem = window.ChartSystem instanceof ChartSystem ? window.ChartSystem : new ChartSystem();
-        window.ChartSystem = this.chartSystem;
+        // window.ChartSystem is already an instance (from chart-system.js), not a class
+        if (window.ChartSystem && typeof window.ChartSystem.create === 'function') {
+          this.chartSystem = window.ChartSystem;
+        } else {
+          // Fallback: create new instance if ChartSystem class is available
+          if (typeof ChartSystem !== 'undefined') {
+            this.chartSystem = new ChartSystem();
+            window.ChartSystem = this.chartSystem;
+          } else {
+            window.Logger?.error?.('ChartSystem not available', { page: 'chart-management' });
+          }
+        }
       }
     }
 
@@ -167,7 +186,8 @@
       const card = document.createElement('div');
       card.className = 'card mb-3';
       card.dataset.chartCard = chartId;
-      card.innerHTML = `
+      // Build card HTML and insert using tempDiv
+      const cardHTML = `
         <div class="card-header d-flex justify-content-between align-items-center">
             <h6 class="mb-0">${title}</h6>
             <button class="btn btn-sm btn-outline-danger" data-chart-remove="${chartId}">
@@ -178,6 +198,11 @@
             <canvas id="${canvasId}" height="320"></canvas>
         </div>
       `;
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(cardHTML, 'text/html');
+      doc.body.childNodes.forEach(node => {
+        card.appendChild(node.cloneNode(true));
+      });
       this.elements.chartsList.appendChild(card);
 
       const removeBtn = card.querySelector('[data-chart-remove]');
@@ -407,8 +432,11 @@
       this.chartSystem.destroyAll();
       this.chartRegistry.clear();
       if (this.elements.chartsList) {
-        this.elements.chartsList.innerHTML =
-          '<p class="text-muted" data-empty-state>אין גרפים פעילים כרגע</p>';
+        this.elements.chartsList.innerHTML.textContent = '';
+        const div = document.createElement('div');
+        div.className = 'text-muted';
+        div.textContent = 'אין גרפים פעילים כרגע';
+        chartsList.innerHTML.appendChild(div);
       }
       this.refreshChartsStatus();
     }

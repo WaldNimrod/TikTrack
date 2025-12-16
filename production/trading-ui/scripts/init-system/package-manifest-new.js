@@ -82,6 +82,15 @@
  * @author TikTrack Development Team
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Data Functions ===
+// - PackageManifest.getAllPackages() - Getallpackages
+
+// === Other ===
+// - collectDeps() - Collectdeps
+
 const PACKAGE_MANIFEST = {
   // 1. BASE PACKAGE - חובה לכל עמוד
   base: {

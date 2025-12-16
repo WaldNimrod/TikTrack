@@ -4,6 +4,28 @@
  * סקריפט לבדיקת צבעי כפתורים ווריאנטים
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - createDiagnosticsSection() - Creatediagnosticssection
+
+// === Event Handlers ===
+// - getDiagnosticsContainer() - Getdiagnosticscontainer
+// - checkButtonColors() - Checkbuttoncolors
+// - fixButtonColors() - Fixbuttoncolors
+
+// === UI Functions ===
+// - renderDiagnostics() - Renderdiagnostics
+// - updateDiagnosticsState() - Updatediagnosticsstate
+
+// === Data Functions ===
+// - loadDiagnosticsState() - Loaddiagnosticsstate
+// - getExpectedColor() - Getexpectedcolor
+
+// === Other ===
+// - persistDiagnosticsState() - Persistdiagnosticsstate
+
 const DESIGNS_DIAGNOSTICS_STORAGE_KEY = 'designs:diagnostics';
 const DESIGNS_PAGE_STATE_KEY = 'designs';
 
@@ -90,7 +112,7 @@ function renderDiagnostics() {
         return;
     }
 
-    container.innerHTML = '';
+    container.textContent = '';
 
     const cardBody = document.createElement('div');
     cardBody.className = 'card-body';
@@ -114,11 +136,17 @@ function renderDiagnostics() {
             issuesPreview.forEach((issue) => {
                 const issueRow = document.createElement('div');
                 issueRow.className = 'border rounded p-2 mb-2 bg-light small';
-                issueRow.innerHTML = `
+                const issueRowHTML = `
                     <div><strong>${issue.button?.buttonType || 'כפתור'}</strong> (${issue.button?.variant || 'full'})</div>
                     <div>בעיה: ${issue.message}</div>
                     <div class="text-muted">צבע: ${issue.button?.color || 'לא זמין'}</div>
                 `;
+                issueRow.textContent = '';
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(issueRowHTML, 'text/html');
+                doc.body.childNodes.forEach(node => {
+                  issueRow.appendChild(node.cloneNode(true));
+                });
                 issuesList.appendChild(issueRow);
             });
 

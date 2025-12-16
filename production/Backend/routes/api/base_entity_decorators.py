@@ -42,6 +42,7 @@ def api_endpoint(cache_ttl: int = 60, dependencies: List[str] = None,
         validate_request: Whether to validate request data
     """
     def decorator(func: Callable) -> Callable:
+        # Use wraps to preserve original function name and metadata
         @wraps(func)
         def wrapper(*args, **kwargs):
             # Apply rate limiting
@@ -150,6 +151,23 @@ def handle_database_session(auto_commit: bool = True, auto_close: bool = True):
                 db = next(get_db())
                 g.db = db  # Store in Flask g for access in function
                 logging.info(f"✅ HANDLE_DB_SESSION: Got database session")
+                
+                # CRITICAL: Always start with a clean transaction state
+                # Rollback any existing aborted transaction from previous operations
+                try:
+                    from sqlalchemy import text
+                    db.execute(text("SELECT 1"))
+                except Exception as tx_check_error:
+                    # Transaction is aborted, rollback to start fresh
+                    logging.warning(f"⚠️ HANDLE_DB_SESSION: Transaction aborted detected, rolling back: {str(tx_check_error)}")
+                    try:
+                        db.rollback()
+                        logging.info(f"✅ HANDLE_DB_SESSION: Rollback successful, starting fresh transaction")
+                    except Exception as rollback_error:
+                        logging.error(f"❌ HANDLE_DB_SESSION: Rollback failed: {str(rollback_error)}")
+                else:
+                    # Transaction is OK, but clear any stale state
+                    db.expire_all()
                 
                 # Call the function
                 logging.info(f"🟢 HANDLE_DB_SESSION: Calling {func.__name__}")
@@ -278,41 +296,17 @@ def monitor_performance(log_slow_queries: bool = True, slow_query_threshold: flo
 def require_authentication(roles: List[str] = None):
     """
     Decorator for authentication and authorization.
-    Currently uses a default user fallback when no authenticated user
-    is attached to the request context.
+    
+    Primary source: g.user_id set by auth middleware from session
     
     Args:
-        roles: List of required roles (optional)
+        roles: List of required roles (optional - not implemented yet)
     """
     def decorator(func: Callable) -> Callable:
         @wraps(func)
         def wrapper(*args, **kwargs):
             # 1) Primary source: middleware / real authentication layer
             user_id = getattr(g, 'user_id', None)
-
-            # 2) Fallback: explicit user_id passed in request (query/body)
-            #    This keeps the system working in single-user mode and in
-            #    automated tools, while still allowing a future real auth
-            #    layer to override it by setting g.user_id.
-            if user_id is None:
-                try:
-                    candidate = None
-                    if request.method in ('GET', 'DELETE'):
-                        candidate = request.args.get('user_id', type=int)
-                    else:
-                        payload = request.get_json(silent=True) or {}
-                        candidate = payload.get('user_id')
-                        try:
-                            candidate = int(candidate) if candidate is not None else None
-                        except (TypeError, ValueError):
-                            candidate = None
-                    if candidate is not None:
-                        g.user_id = candidate
-                        user_id = candidate
-                except Exception as e:
-                    logging.getLogger(__name__).warning(
-                        "Auth fallback failed to resolve user_id from request: %s", e
-                    )
 
             # If we still have no user_id, enforce authentication error
             if not user_id:
@@ -322,7 +316,7 @@ def require_authentication(roles: List[str] = None):
                     "timestamp": datetime.now().isoformat()
                 }), 401
             
-            # Check roles if specified
+            # Check roles if specified (not implemented yet - for future use)
             if roles:
                 user_roles = getattr(g, 'user_roles', [])
                 if not any(role in user_roles for role in roles):

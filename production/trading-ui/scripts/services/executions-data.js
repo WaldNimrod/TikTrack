@@ -149,16 +149,77 @@
     const base = resolveBaseUrl();
     const separator = base.endsWith('/') ? '' : '/';
     const url = `${base}${separator}api/executions/?_ts=${Date.now()}`;
-    const response = await fetch(url, { method: 'GET', headers: DEFAULT_HEADERS, signal });
-    if (!response.ok) {
-      const error = new Error(`Execution load failed (${response.status})`);
-      notifyLoadError(error.message, error);
+    
+    window.Logger?.debug?.('🔄 Fetching executions from API', {
+      ...PAGE_LOG_CONTEXT,
+      url,
+      base,
+      signalAborted: signal?.aborted
+    });
+    
+    try {
+      const response = await fetch(url, { 
+        method: 'GET',
+        // Authorization injected by api-fetch-wrapper
+        signal
+      });
+      
+      // Handle 401/308 authentication errors
+      if (window.checkAndHandleAuthError && window.checkAndHandleAuthError(response, url)) {
+        throw new Error('Authentication required');
+      }
+      
+      window.Logger?.debug?.('📡 API response received', {
+        ...PAGE_LOG_CONTEXT,
+        status: response.status,
+        statusText: response.statusText,
+        ok: response.ok,
+        headers: Object.fromEntries(response.headers.entries())
+      });
+      
+      if (!response.ok) {
+        const errorText = await response.text().catch(() => 'Unable to read error response');
+        const error = new Error(`Execution load failed (${response.status}): ${errorText.substring(0, 200)}`);
+        window.Logger?.error?.('❌ API response not OK', {
+          ...PAGE_LOG_CONTEXT,
+          status: response.status,
+          statusText: response.statusText,
+          errorText: errorText.substring(0, 500),
+          url
+        });
+        notifyLoadError(error.message, error);
+        throw error;
+      }
+      
+      const payload = await response.json();
+      window.Logger?.debug?.('📦 Payload received', {
+        ...PAGE_LOG_CONTEXT,
+        status: payload?.status,
+        dataType: Array.isArray(payload?.data) ? 'array' : typeof payload?.data,
+        dataLength: Array.isArray(payload?.data) ? payload.data.length : 'N/A'
+      });
+      
+      const normalized = normalizeExecutionsPayload(payload);
+      window.Logger?.debug?.('✅ Payload normalized', {
+        ...PAGE_LOG_CONTEXT,
+        normalizedCount: normalized.length
+      });
+      
+      await saveExecutionsCache(normalized);
+      return normalized;
+    } catch (error) {
+      if (error.name === 'AbortError') {
+        window.Logger?.warn?.('⚠️ Request aborted', { ...PAGE_LOG_CONTEXT, url });
+        throw error;
+      }
+      window.Logger?.error?.('❌ Fetch error in fetchExecutionsFromApi', {
+        ...PAGE_LOG_CONTEXT,
+        error: error?.message || String(error),
+        errorName: error?.name,
+        url
+      });
       throw error;
     }
-    const payload = await response.json();
-    const normalized = normalizeExecutionsPayload(payload);
-    await saveExecutionsCache(normalized);
-    return normalized;
   }
 
   async function loadExecutionsData(options = {}) {
@@ -201,6 +262,19 @@
 
       return await loader();
     } catch (error) {
+      window.Logger?.error?.('❌ Error in loadExecutionsData (executions-data.js)', {
+        ...PAGE_LOG_CONTEXT,
+        error: error?.message || String(error),
+        errorName: error?.name,
+        errorStack: error?.stack?.split('\n').slice(0, 5).join('\n'),
+        errorType: typeof error,
+        force,
+        ttl,
+        CacheTTLGuardAvailable: !!window.CacheTTLGuard,
+        UnifiedCacheManagerAvailable: !!window.UnifiedCacheManager,
+        timestamp: new Date().toISOString(),
+        url: window.location?.href
+      });
       notifyLoadError('שגיאה בטעינת ביצועים', error);
       throw error;
     }

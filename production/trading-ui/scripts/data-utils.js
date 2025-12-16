@@ -42,19 +42,9 @@ window.isNumeric = isNumeric;
  */
 async function loadCurrenciesFromServer() {
   try {
-    const token = localStorage.getItem('authToken');
-    const headers = {
-      'Content-Type': 'application/json',
-    };
-
-    if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
-    }
-
-    // Use relative URL to work with both development (8080) and production (5001)
+    // Use relative URL; api-fetch-wrapper injects Authorization automatically
     const response = await fetch('/api/currencies/', {
-      method: 'GET',
-      headers,
+      method: 'GET'
     });
 
     if (response.ok) {
@@ -164,19 +154,13 @@ function generateCurrencyOptions(account = null) {
  * @returns {Promise<Object>} API response
  */
 async function apiCall(url, options = {}) {
-  const token = localStorage.getItem('authToken');
-  const headers = {
-    'Content-Type': 'application/json',
-    ...options.headers,
-  };
-
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
-  }
-
+  // Rely on global fetch wrapper to inject Authorization automatically
   const response = await fetch(url, {
     ...options,
-    headers,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    }
   });
 
   if (!response.ok) {

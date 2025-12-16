@@ -16,8 +16,179 @@
  * @since 2025-01-09
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - createEntityLegend() - Createentitylegend
+// - createInvestmentTypeLegend() - Createinvestmenttypelegend
+
+// === Event Handlers ===
+// - getContrastColor() - Getcontrastcolor
+
+// === UI Functions ===
+// - updateEntityColor() - Updateentitycolor
+// - updateEntityColorFromHex() - Updateentitycolorfromhex
+// - updateCSSVariablesFromPreferences() - Updatecssvariablesfrompreferences
+// - updateEntityColors() - Updateentitycolors
+
+// === Data Functions ===
+// - loadAllColorsFromPreferences() - Loadallcolorsfrompreferences
+// - getEntityColor() - Getentitycolor
+// - getStatusColor() - Getstatuscolor
+// - getStatusBackgroundColor() - Getstatusbackgroundcolor
+// - getStatusTextColor() - Getstatustextcolor
+// - getStatusBorderColor() - Getstatusbordercolor
+// - _getOriginalGetEntityBackgroundColor() -  Getoriginalgetentitybackgroundcolor
+// - getEntityBackgroundColor() - Getentitybackgroundcolor
+// - getEntityTextColor() - Getentitytextcolor
+// - getEntityBorderColor() - Getentitybordercolor
+// - getEntityLabel() - Getentitylabel
+// - getInvestmentTypeColor() - Getinvestmenttypecolor
+// - getInvestmentTypeBackgroundColorWrapper3() - Getinvestmenttypebackgroundcolorwrapper3
+// - getInvestmentTypeTextColor() - Getinvestmenttypetextcolor
+// - getInvestmentTypeBorderColor() - Getinvestmenttypebordercolor
+// - getInvestmentTypeEntityType() - Getinvestmenttypeentitytype
+// - getNumericValueColor() - Getnumericvaluecolor
+// - getNumericValueBackgroundColor() - Getnumericvaluebackgroundcolor
+// - getNumericValueTextColor() - Getnumericvaluetextcolor
+// - getNumericValueBorderColor() - Getnumericvaluebordercolor
+// - getValueType() - Getvaluetype
+// - getNumericValueCSSClass() - Getnumericvaluecssclass
+// - getTableColors() - Gettablecolors
+// - getTableColorsWithFallbacks() - Gettablecolorswithfallbacks
+// - getColorPreferences() - Getcolorpreferences
+// - loadColorPreferences() - Loadcolorpreferences
+// - loadColorScheme() - Loadcolorscheme
+// - saveColorScheme() - Savecolorscheme
+// - getCurrentColorScheme() - Getcurrentcolorscheme
+// - getAvailableColorSchemes() - Getavailablecolorschemes
+// - loadDynamicColors() - Loaddynamiccolors
+// - loadPromise() - Loadpromise
+// - getEntityColorFromPrefs() - Getentitycolorfromprefs
+
+// === Other ===
+// - generateAndApplyStatusCSS() - Generateandapplystatuscss
+// - hexToRgb() - Hextorgb
+// - isValidEntityType() - Isvalidentitytype
+// - generateEntityCSS() - Generateentitycss
+// - generateStatusCSS() - Generatestatuscss
+// - generateInvestmentTypeCSS() - Generateinvestmenttypecss
+// - darkenColor() - Darkencolor
+// - isPositiveValue() - Ispositivevalue
+// - isNegativeValue() - Isnegativevalue
+// - isZeroValue() - Iszerovalue
+// - generateNumericValueCSS() - Generatenumericvaluecss
+// - resetEntityColors() - Resetentitycolors
+// - applyColorScheme() - Applycolorscheme
+// - toggleColorScheme() - Togglecolorscheme
+// - applyLightScheme() - Applylightscheme
+// - applyDarkScheme() - Applydarkscheme
+// - applyCustomScheme() - Applycustomscheme
+// - toHex() - Tohex
+// - ensureVar() - Ensurevar
+
 // ===== ENTITY TYPE DEFINITIONS =====
 // הגדרות סוגי ישויות במערכת
+
+// Save original getStatusColor from color-scheme-system.js before defining local function
+// This prevents circular reference when local function checks window.getStatusColor
+// IMPORTANT: Save these BEFORE color-scheme-system.js loads, or immediately after it loads
+let _originalGetStatusColor = null;
+let _originalGetStatusBackgroundColor = null;
+let _originalGetStatusTextColor = null;
+let _originalGetStatusBorderColor = null;
+
+// Flag to skip heavy logic on the demo page to avoid recursion/RangeError
+const UI_ADVANCED_SKIP_PAGE = (() => {
+  try {
+    if (typeof window !== 'undefined' && window.location && window.location.pathname) {
+      const path = window.location.pathname || '';
+      return path.includes('dynamic-colors-display');
+    }
+  } catch (_) {}
+  return false;
+})();
+
+if (UI_ADVANCED_SKIP_PAGE) {
+  // Skip heavy logic on the demo page; provide safe stubs to avoid errors
+  window.Logger?.debug?.('⏭️ Skipping ui-advanced on dynamic-colors-display page', { page: 'ui-advanced' });
+  window.__UI_ADVANCED_INITIALIZED__ = true;
+  window.UI_ADVANCED_DISABLED = true;
+  window.getStatusColor = () => '';
+  window.getStatusBackgroundColor = () => '';
+  window.getStatusTextColor = () => '';
+  window.getStatusBorderColor = () => '';
+  window.getTableColors = () => ({});
+  window.getTableColorsWithFallbacks = () => ({});
+  window.getColorPreferences = () => ({});
+  window.loadColorScheme = async () => {};
+  window.applyColorScheme = () => {};
+  window.loadDynamicColors = async () => true;
+} else {
+
+// Save original functions from color-scheme-system.js if they exist
+// This must run immediately when this script loads (color-scheme-system.js loads before this)
+// CRITICAL: Save the original functions BEFORE they get overwritten by this script's local functions
+(function() {
+  // Guard: prevent double initialization recursion
+  if (window.__UI_ADVANCED_INITIALIZED__) {
+    return;
+  }
+  window.__UI_ADVANCED_INITIALIZED__ = true;
+
+  // Skip heavy init on dynamic-colors-display and trading-journal pages to avoid recursion issues
+  // CRITICAL: Check pathname safely to prevent RangeError
+  try {
+    if (typeof window !== 'undefined' && window.location && window.location.pathname) {
+      const path = window.location.pathname;
+      if (path && (path.includes('dynamic-colors-display') || path.includes('trading-journal'))) {
+        // Silent skip - no logging to prevent recursion
+        return;
+      }
+    }
+  } catch (_) {
+    // Silent catch - if we can't check pathname, continue with init
+  }
+
+  if (typeof window.getStatusColor === 'function') {
+    const fnStr = window.getStatusColor.toString();
+    // Only save if it's from color-scheme-system.js
+    // The function from color-scheme-system.js is simple: return STATUS_COLORS[status] || STATUS_COLORS.active;
+    // It does NOT contain 'window.getStatusColor' check or '_originalGetStatusColor'
+    if (fnStr.includes('STATUS_COLORS[status]') && 
+        !fnStr.includes('window.getStatusColor') && 
+        !fnStr.includes('_originalGetStatusColor') &&
+        fnStr.length < 100) { // Simple function, not a wrapper
+      _originalGetStatusColor = window.getStatusColor;
+    }
+  }
+  if (typeof window.getStatusBackgroundColor === 'function') {
+    const fnStr = window.getStatusBackgroundColor.toString();
+    // color-scheme-system.js version is simple and uses getStatusColor
+    if (fnStr.includes('getStatusColor') && 
+        !fnStr.includes('window.getStatusBackgroundColor') && 
+        !fnStr.includes('_originalGetStatusBackgroundColor')) {
+      _originalGetStatusBackgroundColor = window.getStatusBackgroundColor;
+    }
+  }
+  if (typeof window.getStatusTextColor === 'function') {
+    const fnStr = window.getStatusTextColor.toString();
+    if (fnStr.includes('getStatusColor') && 
+        !fnStr.includes('window.getStatusTextColor') && 
+        !fnStr.includes('_originalGetStatusTextColor')) {
+      _originalGetStatusTextColor = window.getStatusTextColor;
+    }
+  }
+  if (typeof window.getStatusBorderColor === 'function') {
+    const fnStr = window.getStatusBorderColor.toString();
+    if (fnStr.includes('getStatusColor') && 
+        !fnStr.includes('window.getStatusBorderColor') && 
+        !fnStr.includes('_originalGetStatusBorderColor')) {
+      _originalGetStatusBorderColor = window.getStatusBorderColor;
+    }
+  }
+})();
 
 /**
  * סוגי ישויות תקפים במערכת
@@ -69,6 +240,7 @@ let ENTITY_COLORS = {
   'design': '#495057',
   'research': '#343a40',
   'preference': '#adb5bd',
+  'import_session': '#d4a574', // שימוש בצבע של cash_flow (תזרימי מזומן)
 };
 
 /**
@@ -89,6 +261,7 @@ let ENTITY_BACKGROUND_COLORS = {
   'design': 'rgba(73, 80, 87, 0.1)',
   'research': 'rgba(52, 58, 64, 0.1)',
   'preference': 'rgba(173, 181, 189, 0.1)',
+  'import_session': 'rgba(32, 201, 151, 0.1)', // שימוש בצבע רקע של cash_flow (תזרימי מזומן)
 };
 
 /**
@@ -384,15 +557,29 @@ function getEntityColor(entityType) {
  * @param {string} status - סטטוס
  * @param {string} intensity - עוצמה (light, medium, dark, border)
  * @returns {string} - קוד צבע
+ * 
+ * NOTE: This function is DEPRECATED - use window.getStatusColor from color-scheme-system.js directly
+ * This wrapper uses the saved original function to avoid circular reference
  */
 function getStatusColor(status, intensity = 'medium') {
+  // Use saved original function from color-scheme-system.js (saved before this script loads)
+  if (_originalGetStatusColor && typeof _originalGetStatusColor === 'function') {
+    return _originalGetStatusColor(status, intensity);
+  }
+  // Fallback: use window.getStatusColor if it exists and is NOT this function
+  if (typeof window.getStatusColor === 'function') {
+    // Check if window.getStatusColor is the original from color-scheme-system.js
+    // (it should contain STATUS_COLORS[status] but NOT window.getStatusColor check)
+    const fnStr = window.getStatusColor.toString();
+    if (fnStr.includes('STATUS_COLORS[status]') && !fnStr.includes('_originalGetStatusColor')) {
+      return window.getStatusColor(status, intensity);
+    }
+  }
+  // Final fallback to local implementation (should not happen in production)
   if (!status) {
-    // רק מהעדפות - בלי fallbacks קבועים!
     return STATUS_COLORS['closed']?.[intensity] || '';
   }
-
   const normalizedStatus = status.toLowerCase().trim();
-  // רק מהעדפות - בלי fallbacks קבועים!
   return STATUS_COLORS[normalizedStatus]?.[intensity] || STATUS_COLORS['closed']?.[intensity] || '';
 }
 
@@ -404,6 +591,12 @@ function getStatusColor(status, intensity = 'medium') {
  * @returns {string} - קוד צבע רקע
  */
 function getStatusBackgroundColor(status) {
+  // Use centralized Color Scheme System if available
+  // IMPORTANT: Use saved original function to avoid circular reference
+  if (_originalGetStatusBackgroundColor) {
+    return _originalGetStatusBackgroundColor(status);
+  }
+  // Fallback to local implementation (should not happen in production)
   return getStatusColor(status, 'light');
 }
 
@@ -415,6 +608,12 @@ function getStatusBackgroundColor(status) {
  * @returns {string} - קוד צבע טקסט
  */
 function getStatusTextColor(status) {
+  // Use centralized Color Scheme System if available
+  // IMPORTANT: Use saved original function to avoid circular reference
+  if (_originalGetStatusTextColor) {
+    return _originalGetStatusTextColor(status);
+  }
+  // Fallback to local implementation (should not happen in production)
   return getStatusColor(status, 'medium');
 }
 
@@ -426,6 +625,12 @@ function getStatusTextColor(status) {
  * @returns {string} - קוד צבע גבול
  */
 function getStatusBorderColor(status) {
+  // Use centralized Color Scheme System if available
+  // IMPORTANT: Use saved original function to avoid circular reference
+  if (_originalGetStatusBorderColor) {
+    return _originalGetStatusBorderColor(status);
+  }
+  // Fallback to local implementation (should not happen in production)
   return getStatusColor(status, 'border');
 }
 
@@ -436,14 +641,35 @@ function getStatusBorderColor(status) {
  * @param {string} entityType - סוג הישות
  * @returns {string} קוד הצבע
  */
+// Save reference to centralized function before defining local function
+// IMPORTANT: Save the reference immediately to avoid circular dependency
+// If window.getEntityBackgroundColor is not yet defined, we'll check it at call time
+let _originalGetEntityBackgroundColor = null;
+
+// Initialize the reference - use a getter function to check at call time, not definition time
+function _getOriginalGetEntityBackgroundColor() {
+  if (!_originalGetEntityBackgroundColor && typeof window.getEntityBackgroundColor === 'function') {
+    // Store the reference only once to avoid recursion
+    const original = window.getEntityBackgroundColor;
+    // Verify it's not pointing to this function to prevent infinite recursion
+    if (original !== getEntityBackgroundColor) {
+      _originalGetEntityBackgroundColor = original;
+    }
+  }
+  return _originalGetEntityBackgroundColor;
+}
+
 function getEntityBackgroundColor(entityType) {
+  // Use centralized Color Scheme System if available (use saved reference to avoid recursion)
+  const originalFn = _getOriginalGetEntityBackgroundColor();
+  if (originalFn) {
+    return originalFn(entityType);
+  }
+  // Fallback to local implementation (should not happen in production)
   if (!entityType) {
-    // רק מהעדפות - בלי fallbacks קבועים!
     return '';
   }
-
   const normalizedType = entityType.toLowerCase().trim();
-  // רק מהעדפות - בלי fallbacks קבועים!
   return ENTITY_BACKGROUND_COLORS[normalizedType] || '';
 }
 
@@ -454,14 +680,21 @@ function getEntityBackgroundColor(entityType) {
  * @param {string} entityType - סוג הישות
  * @returns {string} קוד הצבע
  */
+// Save reference to centralized function before defining local function
+const _originalGetEntityTextColor = typeof window.getEntityTextColor === 'function' 
+  ? window.getEntityTextColor 
+  : null;
+
 function getEntityTextColor(entityType) {
+  // Use centralized Color Scheme System if available (use saved reference to avoid recursion)
+  if (_originalGetEntityTextColor) {
+    return _originalGetEntityTextColor(entityType);
+  }
+  // Fallback to local implementation (should not happen in production)
   if (!entityType) {
-    // רק מהעדפות - בלי fallbacks קבועים!
     return '';
   }
-
   const normalizedType = entityType.toLowerCase().trim();
-  // רק מהעדפות - בלי fallbacks קבועים!
   return ENTITY_TEXT_COLORS[normalizedType] || '';
 }
 
@@ -633,11 +866,25 @@ function getInvestmentTypeEntityType(investmentType) {
 function generateEntityCSS() {
   let css = '';
 
-  VALID_ENTITY_TYPES.forEach(type => {
-    const color = ENTITY_COLORS[type];
-    const bgColor = ENTITY_BACKGROUND_COLORS[type];
-    const borderColor = ENTITY_BORDER_COLORS[type];
-    const textColor = ENTITY_TEXT_COLORS[type];
+  // Use centralized Color Scheme System instead of local constants
+  const getEntityColorFn = (typeof window.getEntityColor === 'function') ? window.getEntityColor : null;
+  const getEntityBackgroundColorFn = (typeof window.getEntityBackgroundColor === 'function') ? window.getEntityBackgroundColor : null;
+  const getEntityBorderColorFn = (typeof window.getEntityBorderColor === 'function') ? window.getEntityBorderColor : null;
+  const getEntityTextColorFn = (typeof window.getEntityTextColor === 'function') ? window.getEntityTextColor : null;
+  const getMainHeaderOpacityHexFn = (typeof window.getMainHeaderOpacityHex === 'function') ? window.getMainHeaderOpacityHex : () => 'FF';
+  const getSubHeaderOpacityHexFn = (typeof window.getSubHeaderOpacityHex === 'function') ? window.getSubHeaderOpacityHex : () => '4D';
+  const validEntityTypes = (typeof window.VALID_ENTITY_TYPES !== 'undefined') ? window.VALID_ENTITY_TYPES : [];
+
+  if (!getEntityColorFn || validEntityTypes.length === 0) {
+    // System not available - return empty CSS
+    return '';
+  }
+
+  validEntityTypes.forEach(type => {
+    const color = getEntityColorFn(type) || '';
+    const bgColor = getEntityBackgroundColorFn ? getEntityBackgroundColorFn(type) : '';
+    const borderColor = getEntityBorderColorFn ? getEntityBorderColorFn(type) : '';
+    const textColor = getEntityTextColorFn ? getEntityTextColorFn(type) : '';
 
     css += `
 .entity-${type} {
@@ -667,24 +914,25 @@ function generateEntityCSS() {
 }
 
 .entity-${type}-main-header {
-  background-color: ${color}${getMainHeaderOpacityHex()};
+  background-color: ${color}${getMainHeaderOpacityHexFn()};
   border-left: 4px solid ${color};
 }
 
 .entity-${type}-sub-header {
-  background-color: ${color}${getSubHeaderOpacityHex()};
+  background-color: ${color}${getSubHeaderOpacityHexFn()};
   border-left: 3px solid ${color};
 }
 `;
   });
 
   // מחלקות לסוגי השקעה (תאימות לאחור)
-  VALID_INVESTMENT_TYPES.forEach(type => {
+  const validInvestmentTypes = (typeof window.VALID_INVESTMENT_TYPES !== 'undefined') ? window.VALID_INVESTMENT_TYPES : [];
+  validInvestmentTypes.forEach(type => {
     const entityType = getInvestmentTypeEntityType(type);
-    const color = ENTITY_COLORS[entityType];
-    const bgColor = ENTITY_BACKGROUND_COLORS[entityType];
-    const borderColor = ENTITY_BORDER_COLORS[entityType];
-    const textColor = ENTITY_TEXT_COLORS[entityType];
+    const color = getEntityColorFn ? getEntityColorFn(entityType) : '';
+    const bgColor = getEntityBackgroundColorFn ? getEntityBackgroundColorFn(entityType) : '';
+    const borderColor = getEntityBorderColorFn ? getEntityBorderColorFn(entityType) : '';
+    const textColor = getEntityTextColorFn ? getEntityTextColorFn(entityType) : '';
 
     css += `
 .investment-type-${type} {
@@ -721,8 +969,23 @@ function generateEntityCSS() {
 function generateStatusCSS() {
   let css = '';
 
-  Object.keys(STATUS_COLORS).forEach(status => {
-    const colors = STATUS_COLORS[status];
+  // Use centralized Color Scheme System instead of local STATUS_COLORS
+  const getStatusColorFn = (typeof window.getStatusColor === 'function') ? window.getStatusColor : null;
+  const validStatuses = ['open', 'closed', 'cancelled']; // Common statuses
+  
+  if (!getStatusColorFn) {
+    // System not available - return empty CSS
+    return '';
+  }
+
+  validStatuses.forEach(status => {
+    const light = getStatusColorFn(status, 'light') || '';
+    const medium = getStatusColorFn(status, 'medium') || '';
+    const border = getStatusColorFn(status, 'border') || '';
+    
+    if (!light || !medium || !border) return; // Skip if no color available
+    
+    const colors = { light, medium, border };
 
     css += `
 .status-${status} {
@@ -978,8 +1241,13 @@ function createEntityLegend(options = {}) {
   `;
 
   entityTypes.forEach(type => {
-    const color = ENTITY_COLORS[type];
-    const label = getEntityLabel(type);
+    // Use centralized Color Scheme System instead of local ENTITY_COLORS
+    const color = (typeof window.getEntityColor === 'function') 
+      ? window.getEntityColor(type) 
+      : '';
+    const label = (typeof window.getEntityLabel === 'function')
+      ? window.getEntityLabel(type)
+      : type;
 
     const legendItem = document.createElement('span');
     legendItem.style.cssText = `
@@ -1157,62 +1425,84 @@ function getNumericValueCSSClass(value) {
  * @returns {string} CSS דינמי
  */
 function generateNumericValueCSS() {
+  // Use centralized Color Scheme System instead of local NUMERIC_VALUE_COLORS
+  const getNumericValueColorFn = (typeof window.getNumericValueColor === 'function') ? window.getNumericValueColor : null;
+  const getNumericValueBackgroundColorFn = (typeof window.getNumericValueBackgroundColor === 'function') ? window.getNumericValueBackgroundColor : null;
+  const getNumericValueBorderColorFn = (typeof window.getNumericValueBorderColor === 'function') ? window.getNumericValueBorderColor : null;
+  
+  if (!getNumericValueColorFn) {
+    // System not available - return empty CSS
+    return '';
+  }
+
+  const positiveMedium = getNumericValueColorFn(1, 'medium') || '';
+  const positiveLight = getNumericValueBackgroundColorFn ? getNumericValueBackgroundColorFn(1) : '';
+  const positiveBorder = getNumericValueBorderColorFn ? getNumericValueBorderColorFn(1) : '';
+  
+  const negativeMedium = getNumericValueColorFn(-1, 'medium') || '';
+  const negativeLight = getNumericValueBackgroundColorFn ? getNumericValueBackgroundColorFn(-1) : '';
+  const negativeBorder = getNumericValueBorderColorFn ? getNumericValueBorderColorFn(-1) : '';
+  
+  const zeroMedium = getNumericValueColorFn(0, 'medium') || '';
+  const zeroLight = getNumericValueBackgroundColorFn ? getNumericValueBackgroundColorFn(0) : '';
+  const zeroBorder = getNumericValueBorderColorFn ? getNumericValueBorderColorFn(0) : '';
+
   const css = `
         /* ערכים חיוביים */
         .numeric-value-positive {
-            color: ${NUMERIC_VALUE_COLORS.positive.medium};
-            background-color: ${NUMERIC_VALUE_COLORS.positive.light};
-            border-color: ${NUMERIC_VALUE_COLORS.positive.border};
+            color: ${positiveMedium};
+            background-color: ${positiveLight};
+            border-color: ${positiveBorder};
         }
         
         .numeric-value-positive.text-only {
-            color: ${NUMERIC_VALUE_COLORS.positive.medium};
+            color: ${positiveMedium};
         }
         
         .numeric-value-positive.background-only {
-            background-color: ${NUMERIC_VALUE_COLORS.positive.light};
+            background-color: ${positiveLight};
         }
         
         .numeric-value-positive.border-only {
-            border-color: ${NUMERIC_VALUE_COLORS.positive.border};
+            border-color: ${positiveBorder};
         }
         
         /* ערכים שליליים */
         .numeric-value-negative {
-            color: ${NUMERIC_VALUE_COLORS.negative.medium};
-            background-color: ${NUMERIC_VALUE_COLORS.negative.light};
-            border-color: ${NUMERIC_VALUE_COLORS.negative.border};
+            color: ${negativeMedium};
+            background-color: ${negativeLight};
+            border-color: ${negativeBorder};
         }
         
         .numeric-value-negative.text-only {
-            color: ${NUMERIC_VALUE_COLORS.negative.medium};
+            color: ${negativeMedium};
         }
         
         .numeric-value-negative.background-only {
-            background-color: ${NUMERIC_VALUE_COLORS.negative.light};
+            background-color: ${negativeLight};
         }
         
         .numeric-value-negative.border-only {
-            border-color: ${NUMERIC_VALUE_COLORS.negative.border};
+            border-color: ${negativeBorder};
         }
         
         /* ערך אפס */
         .numeric-value-zero {
-            color: ${NUMERIC_VALUE_COLORS.zero.medium};
-            background-color: ${NUMERIC_VALUE_COLORS.zero.light};
-            border-color: ${NUMERIC_VALUE_COLORS.zero.border};
+            color: ${zeroMedium};
+            background-color: ${zeroLight};
+            border-color: ${zeroBorder};
         }
         
         .numeric-value-zero.text-only {
-            color: ${NUMERIC_VALUE_COLORS.zero.medium};
+            color: ${zeroMedium};
         }
         
         .numeric-value-zero.background-only {
-            background-color: ${NUMERIC_VALUE_COLORS.zero.light};
+            background-color: ${zeroLight};
         }
         
         .numeric-value-zero.border-only {
-            border-color: ${NUMERIC_VALUE_COLORS.zero.border};
+            border-color: ${zeroBorder};
         }
     `;
 
@@ -1391,14 +1681,22 @@ function getContrastColor(hexColor) {
  * @returns {Object} אובייקט עם צבעים מוכנים לשימוש
  */
 function getTableColors() {
+  // Use centralized Color Scheme System instead of local functions
+  const getNumericColor = (typeof window.getNumericValueColor === 'function') 
+    ? window.getNumericValueColor 
+    : null;
+  const getEntityColorFn = (typeof window.getEntityColor === 'function') 
+    ? window.getEntityColor 
+    : null;
+  
   return {
-    positive: getNumericValueColor(1, 'medium'),
-    negative: getNumericValueColor(-1, 'medium'),
-    secondary: getEntityColor('preference'),
-    success: getEntityColor('account'),
-    warning: getEntityColor('alert'),
-    info: getEntityColor('execution'),
-    primary: getEntityColor('trade'),
+    positive: getNumericColor ? getNumericColor(1, 'medium') : '',
+    negative: getNumericColor ? getNumericColor(-1, 'medium') : '',
+    secondary: getEntityColorFn ? getEntityColorFn('preference') : '',
+    success: getEntityColorFn ? getEntityColorFn('account') : '',
+    warning: getEntityColorFn ? getEntityColorFn('alert') : '',
+    info: getEntityColorFn ? getEntityColorFn('execution') : '',
+    primary: getEntityColorFn ? getEntityColorFn('trade') : '',
   };
 }
 
@@ -1410,15 +1708,16 @@ function getTableColors() {
 function getTableColorsWithFallbacks() {
   const colors = getTableColors();
 
-  // הוספת ברירות מחדל במקרה שהפונקציות לא עובדות
+  // NO hardcoded fallbacks - return empty strings if system unavailable
+  // The centralized Color Scheme System will handle colors from preferences
   return {
-    positive: colors.positive || '#28a745',
-    negative: colors.negative || '#dc3545',
-    secondary: colors.secondary || '#6c757d',
-    success: colors.success || '#28a745',
-    warning: colors.warning || '#ffc107',
-    info: colors.info || '#17a2b8',
-    primary: colors.primary || '#26baac',
+    positive: colors.positive || '',
+    negative: colors.negative || '',
+    secondary: colors.secondary || '',
+    success: colors.success || '',
+    warning: colors.warning || '',
+    info: colors.info || '',
+    primary: colors.primary || '',
   };
 }
 
@@ -1960,113 +2259,85 @@ function updateCSSVariablesFromPreferences(preferences) {
  */
 async function loadColorPreferences() {
   try {
-    // מניעת כפילויות בוטלה כדי לאפשר טעינה מחודשת לפי צורך (ובבדיקות)
-    
-
-    // נסה ראשית מערכת העדפות
-    try {
-      if (window.PreferencesData && typeof window.PreferencesData.loadAllPreferencesRaw === 'function') {
-        const prefPayload = await window.PreferencesData.loadAllPreferencesRaw({ force: false });
-        if (prefPayload && prefPayload.preferences) {
-          const prefs = prefPayload.preferences;
-          
-          // עדכון מערכת הצבעים מהעדפות
-          if (prefs.colorScheme) {
-            if (prefs.colorScheme.numericValues) {
-              Object.assign(NUMERIC_VALUE_COLORS, prefs.colorScheme.numericValues);
-            }
-            if (prefs.colorScheme.entities) {
-              Object.assign(ENTITY_COLORS, prefs.colorScheme.entities);
-            }
-            if (prefs.colorScheme.status) {
-              Object.assign(STATUS_COLORS, prefs.colorScheme.status);
-            }
-          }
-          
-    // עדכון CSS Variables (only if prefs not empty)
-    if (Object.keys(prefs).length > 0) {
-      updateCSSVariablesFromPreferences(prefs);
-    }
-          
-          // עדכון כותרות עם הצבעים החדשים
-          const bodyClass = document.body.className;
-          if (bodyClass) {
-            const entityType = bodyClass.split(' ').find(cls => 
-              ['tickers-page', 'trades-page', 'accounts-page', 'trading-accounts-page', 'alerts-page', 'cash-flows-page', 'notes-page', 'executions-page', 'trade-plans-page', 'preferences-page'].includes(cls)
-            );
-            
-            if (entityType) {
-              let entity = entityType.replace('-page', '').replace('tickers', 'ticker');
-              // תיקון שמות ישויות לפורמט יחיד
-              if (entity === 'preferences') entity = 'preference';
-              else if (entity === 'cash-flows') entity = 'cash_flow';
-              else if (entity === 'trade-plans') entity = 'trade_plan';
-              else if (entity === 'trading-accounts' || entity === 'accounts') entity = 'trading_account';
-              if (ENTITY_COLORS[entity]) {
-                applyEntityColorsToHeaders(entity);
-              }
-            }
-          }
-          
-          window.colorPreferencesLoaded = true;
-          return true;
-        }
+    // CRITICAL: Prevent infinite recursion - if preferences are already being loaded, use currentPreferences
+    if (window.__loadUserPreferencesInflight && window.__loadUserPreferencesInflight.size > 0) {
+      // Preferences are being loaded - use currentPreferences if available
+      if (window.currentPreferences && Object.keys(window.currentPreferences).length > 0) {
+        updateCSSVariablesFromPreferences(window.currentPreferences);
+        return window.currentPreferences;
       }
-    } catch (newError) {
-      // preferences not available (likely database tables not created yet)
+      return {};
+    }
+    
+    // CRITICAL: Prevent infinite recursion - if getPreference is in progress, use currentPreferences
+    if (window.__GET_PREFERENCE_IN_PROGRESS__) {
+      if (window.currentPreferences && Object.keys(window.currentPreferences).length > 0) {
+        updateCSSVariablesFromPreferences(window.currentPreferences);
+        return window.currentPreferences;
+      }
+      return {};
     }
 
-    // Fallback ל-legacy
+    // Use currentPreferences if available to avoid unnecessary API calls
+    if (window.currentPreferences && Object.keys(window.currentPreferences).length > 0) {
+      updateCSSVariablesFromPreferences(window.currentPreferences);
+      return window.currentPreferences;
+    }
+
+    // Load from API only if not already loaded
     if (window.PreferencesData && typeof window.PreferencesData.loadAllPreferencesRaw === 'function') {
       const prefPayload = await window.PreferencesData.loadAllPreferencesRaw({ force: false });
-      const preferences = prefPayload?.preferences || {};
+      if (prefPayload && prefPayload.preferences) {
+        const prefs = prefPayload.preferences;
 
-      // עדכון מערכת הצבעים
-      // הסרנו את preferences.numericValueColors כי הוא לא קיים במערכת ההעדפות
-      // במקום זה משתמשים במשתנים ספציפיים: valuePositiveColor, valueNegativeColor וכו'
-
-      // הסרנו את preferences.entityColors כי הוא לא קיים במערכת ההעדפות
-      // במקום זה משתמשים במשתנים ספציפיים: entityTradeColor, entityTradingAccountColor וכו'
-
-      // עדכון CSS Variables (only if prefs not empty)
-      if (Object.keys(preferences).length > 0) {
-        updateCSSVariablesFromPreferences(preferences);
-      }
-
-      // עדכון כותרות עם הצבעים החדשים
-      const bodyClass = document.body.className;
-      if (bodyClass) {
-        const entityType = bodyClass.split(' ').find(cls => 
-          ['tickers-page', 'trades-page', 'accounts-page', 'trading-accounts-page', 'alerts-page', 'cash-flows-page', 'notes-page', 'executions-page', 'trade-plans-page', 'preferences-page'].includes(cls)
-        );
+        // DEBUG: Log what colors were loaded
+        if (window.DEBUG_MODE) {
+          console.log('🎨 Color preferences loaded:', {
+            primary: prefs.primary_color,
+            secondary: prefs.secondary_color,
+            chartSecondary: prefs.chartSecondaryColor,
+            allPrefs: Object.keys(prefs).filter(k => k.includes('color'))
+          });
+        }
         
-        if (entityType) {
-          let type = entityType.replace('-page', '');
-          // תיקון שמות ישויות לפורמט יחיד
-          if (type === 'tickers') type = 'ticker';
-          else if (type === 'trades') type = 'trade';
-          else if (type === 'accounts' || type === 'trading-accounts') type = 'trading_account';
-          else if (type === 'alerts') type = 'alert';
-          else if (type === 'cash-flows') type = 'cash_flow';
-          else if (type === 'notes') type = 'note';
-          else if (type === 'trade-plans') type = 'trade_plan';
-          else if (type === 'executions') type = 'execution';
-          else if (type === 'preferences') type = 'preference';
+        // עדכון CSS Variables (only if prefs not empty)
+        if (Object.keys(prefs).length > 0) {
+          updateCSSVariablesFromPreferences(prefs);
+        }
+        
+        // עדכון כותרות עם הצבעים החדשים
+        const bodyClass = document.body.className;
+        if (bodyClass) {
+          const entityType = bodyClass.split(' ').find(cls => 
+            ['tickers-page', 'trades-page', 'accounts-page', 'trading-accounts-page', 'alerts-page', 'cash-flows-page', 'notes-page', 'executions-page', 'trade-plans-page', 'preferences-page'].includes(cls)
+          );
           
-          if (window.applyEntityColorsToHeaders) {
-            setTimeout(() => {
-              window.applyEntityColorsToHeaders(type);
-            }, 100);
+          if (entityType) {
+            let entity = entityType.replace('-page', '').replace('tickers', 'ticker');
+            // תיקון שמות ישויות לפורמט יחיד
+            if (entity === 'preferences') entity = 'preference';
+            else if (entity === 'cash-flows') entity = 'cash_flow';
+            else if (entity === 'trade-plans') entity = 'trade_plan';
+            else if (entity === 'trading-accounts' || entity === 'accounts') entity = 'trading_account';
+            if (ENTITY_COLORS[entity] && typeof window.applyEntityColorsToHeaders === 'function') {
+              window.applyEntityColorsToHeaders(entity);
+            }
           }
         }
+        
+        window.colorPreferencesLoaded = true;
+        return prefs;
       }
-
-      window.colorPreferencesLoaded = true;
-    } else {
-      console.log('❌ Response not ok:', response.status);
     }
+    
+    // Return empty object if no preferences loaded
+    return {};
   } catch (error) {
-    console.error('❌ שגיאה בטעינת הגדרות צבע:', error);
+    // CRITICAL: Do NOT use Logger here to prevent infinite recursion
+    if (window.DEBUG_MODE) {
+      console.error('❌ שגיאה בטעינת הגדרות צבע:', error);
+    }
+    return {};
   }
 }
 
@@ -2254,11 +2525,15 @@ window.loadUserPreferences = async function loadUserPreferences(options = {}) {
       try { if (typeof window.onPreferencesReload === 'function') window.onPreferencesReload(prefs); } catch {}
 
       // event for components to re-apply non-CSS prefs (toggles/flags)
-      try {
-        window.dispatchEvent(new CustomEvent('preferences:updated', {
-          detail: { source, prefs }
-        }));
-      } catch {}
+      // CRITICAL: Only dispatch event if not already in progress to prevent infinite loops
+      // This prevents: loadUserPreferences() → preferences:updated → loadColorPreferences() → loadUserPreferences() → ...
+      if (!window.__loadUserPreferencesInflight || window.__loadUserPreferencesInflight.size === 0) {
+        try {
+          window.dispatchEvent(new CustomEvent('preferences:updated', {
+            detail: { source, prefs }
+          }));
+        } catch {}
+      }
 
       // Debug: log applied primary/secondary
       console.log('✅ loadUserPreferences complete:', {
@@ -2482,13 +2757,11 @@ function getAvailableColorSchemes() {
 // ===== EXPORTS =====
 // ייצוא הפונקציות
 
-// Export color scheme management functions
-window.applyColorScheme = applyColorScheme;
-window.toggleColorScheme = toggleColorScheme;
-window.loadColorScheme = loadColorScheme;
-window.saveColorScheme = saveColorScheme;
-window.getCurrentColorScheme = getCurrentColorScheme;
-window.getAvailableColorSchemes = getAvailableColorSchemes;
+// ⚠️ REMOVED: These color scheme management functions are exported by color-scheme-system.js
+// Do NOT export them here to avoid conflicts with the centralized system
+// - applyColorScheme, toggleColorScheme, loadColorScheme, saveColorScheme
+// - getCurrentColorScheme, getAvailableColorSchemes
+// Use the exports from color-scheme-system.js instead
 
 // Export to global scope for backward compatibility
 window.getInvestmentTypeColor = getInvestmentTypeColor;
@@ -2497,34 +2770,22 @@ window.getInvestmentTypeTextColor = getInvestmentTypeTextColor;
 window.getInvestmentTypeBorderColor = getInvestmentTypeBorderColor;
 window.createInvestmentTypeLegend = createInvestmentTypeLegend;
 
-// Export new unified functions
-window.getEntityColor = getEntityColor;
-window.getEntityBackgroundColor = getEntityBackgroundColor;
-window.getEntityTextColor = getEntityTextColor;
-window.getEntityBorderColor = getEntityBorderColor;
-window.isValidEntityType = isValidEntityType;
-window.getEntityLabel = getEntityLabel;
+// ⚠️ REMOVED: These functions are exported by color-scheme-system.js
+// Do NOT export them here to avoid conflicts with the centralized system
+// Use window.getEntityColor, window.getStatusColor, etc. from color-scheme-system.js instead
+
+// Export only unique functions that don't exist in color-scheme-system.js
 window.createEntityLegend = createEntityLegend;
 window.generateEntityCSS = generateEntityCSS;
 window.generateStatusCSS = generateStatusCSS;
 window.generateInvestmentTypeCSS = generateInvestmentTypeCSS;
 window.generateAndApplyStatusCSS = generateAndApplyStatusCSS;
 
-// Export status color functions
-window.getStatusColor = getStatusColor;
-window.getStatusBackgroundColor = getStatusBackgroundColor;
-window.getStatusTextColor = getStatusTextColor;
-window.getStatusBorderColor = getStatusBorderColor;
-
-// Export entity color management functions
-window.updateEntityColor = updateEntityColor;
-window.updateEntityColorFromHex = updateEntityColorFromHex;
-window.resetEntityColors = resetEntityColors;
-
-// Export preference integration functions
-window.updateCSSVariablesFromPreferences = updateCSSVariablesFromPreferences;
-window.loadColorPreferences = loadColorPreferences;
-window.updateEntityColors = updateEntityColors;
+// ⚠️ REMOVED: These functions are exported by color-scheme-system.js
+// Do NOT export them here to avoid conflicts with the centralized system
+// - updateEntityColor, updateEntityColorFromHex, resetEntityColors
+// - updateCSSVariablesFromPreferences, loadColorPreferences, updateEntityColors
+// Use the exports from color-scheme-system.js instead
 
 // Export new utility functions
 window.getTableColors = getTableColors;
@@ -2535,102 +2796,18 @@ window.getColorPreferences = getColorPreferences;
 // ⚠️ NOTICE: These functions have been moved to color-scheme-system.js
 // Use the exports from color-scheme-system.js instead
 
-// Export constants
+// ⚠️ REMOVED: These constants are exported by color-scheme-system.js
+// Do NOT export them here to avoid conflicts with the centralized system
+// Use window.VALID_ENTITY_TYPES, window.ENTITY_COLORS, etc. from color-scheme-system.js instead
+
+// Export only constants that are unique to ui-advanced.js
 window.VALID_INVESTMENT_TYPES = VALID_INVESTMENT_TYPES;
 window.INVESTMENT_TYPE_LABELS = INVESTMENT_TYPE_LABELS;
 window.INVESTMENT_TYPE_DESCRIPTIONS = INVESTMENT_TYPE_DESCRIPTIONS;
-window.INVESTMENT_TYPE_COLORS = INVESTMENT_TYPE_COLORS;
 
-window.VALID_ENTITY_TYPES = VALID_ENTITY_TYPES;
-window.ENTITY_COLORS = ENTITY_COLORS;
-window.ENTITY_BACKGROUND_COLORS = ENTITY_BACKGROUND_COLORS;
-window.ENTITY_TEXT_COLORS = ENTITY_TEXT_COLORS;
-window.ENTITY_BORDER_COLORS = ENTITY_BORDER_COLORS;
-window.ENTITY_LIGHT_COLORS = ENTITY_LIGHT_COLORS;
-window.ENTITY_DARK_COLORS = ENTITY_DARK_COLORS;
-window.STATUS_COLORS = STATUS_COLORS;
-window.INVESTMENT_TYPE_COLORS = INVESTMENT_TYPE_COLORS;
-
-// Export as module object
-window.colorSchemeSystem = {
-  // Entity functions
-  getColor: getEntityColor,
-  getBackgroundColor: getEntityBackgroundColor,
-  getTextColor: getEntityTextColor,
-  getBorderColor: getEntityBorderColor,
-  isValid: isValidEntityType,
-  getLabel: getEntityLabel,
-  createLegend: createEntityLegend,
-  generateCSS: generateEntityCSS,
-
-  // Investment type functions (backward compatibility)
-  getInvestmentTypeColor,
-  getInvestmentTypeBackgroundColor,
-  getInvestmentTypeTextColor,
-  getInvestmentTypeBorderColor,
-  createInvestmentTypeLegend,
-
-  // Numeric value functions
-  getNumericValueColor,
-  getNumericValueBackgroundColor,
-  getNumericValueTextColor,
-  getNumericValueBorderColor,
-  isPositiveValue,
-  isNegativeValue,
-  isZeroValue,
-  getValueType,
-  getNumericValueCSSClass,
-  generateNumericValueCSS,
-
-  // Status color functions
-  getStatusColor,
-  getStatusBackgroundColor,
-  getStatusTextColor,
-  getStatusBorderColor,
-  generateStatusCSS,
-
-  // Investment type color functions
-  getInvestmentTypeColor,
-  getInvestmentTypeBackgroundColor,
-  getInvestmentTypeTextColor,
-  getInvestmentTypeBorderColor,
-  generateInvestmentTypeCSS,
-
-  // Header styling functions - MOVED TO color-scheme-system.js
-  // applyEntityColorsToHeaders,
-  // isWarningModal,
-  // getMainHeaderOpacityHex,
-  // getSubHeaderOpacityHex,
-  // updateNumericValueColors - REMOVED: not used
-
-  // Dynamic color loading functions - MOVED TO color-scheme-system.js
-  // loadEntityColorsFromPreferences,
-  // loadStatusColorsFromPreferences - REMOVED: DEPRECATED
-  // loadInvestmentTypeColorsFromPreferences - REMOVED: DEPRECATED
-  // loadAllColorsFromPreferences,
-  // generateAndApplyEntityCSS,
-  // updateCSSVariablesFromPreferences,
-  hexToRgb,
-  darkenColor,
-
-  // Constants
-  VALID_ENTITY_TYPES,
-  ENTITY_COLORS,
-  ENTITY_BACKGROUND_COLORS,
-  ENTITY_TEXT_COLORS,
-  ENTITY_BORDER_COLORS,
-  ENTITY_LIGHT_COLORS,
-  ENTITY_DARK_COLORS,
-  STATUS_COLORS,
-  INVESTMENT_TYPE_COLORS,
-
-  VALID_INVESTMENT_TYPES,
-  INVESTMENT_TYPE_LABELS,
-  INVESTMENT_TYPE_DESCRIPTIONS,
-  INVESTMENT_TYPE_COLORS,
-
-  NUMERIC_VALUE_COLORS,
-};
+// ⚠️ REMOVED: window.colorSchemeSystem is exported by color-scheme-system.js
+// Do NOT export it here to avoid conflicts with the centralized system
+// Use window.colorSchemeSystem from color-scheme-system.js instead
 
 // ===== DYNAMIC COLORS LOADER =====
 /**
@@ -2638,6 +2815,11 @@ window.colorSchemeSystem = {
  * טען צבעים דינמיים מהעדפות
  */
 async function loadDynamicColors() {
+  if (UI_ADVANCED_SKIP_PAGE) {
+    // On the demo page we avoid applying schemes to prevent recursion/RangeError
+    window.Logger?.debug?.('⏭️ Skipping loadDynamicColors on dynamic-colors-display page', { page: 'ui-advanced' });
+    return true;
+  }
   try {
     // Load color scheme from preferences
     if (typeof window.loadColorScheme === 'function') {
@@ -2662,6 +2844,6 @@ window.loadDynamicColors = loadDynamicColors;
 // Auto-load on DOM ready
 // הוסר DOMContentLoaded listener כדי למנוע כפילות עם core-systems.js
 // loadDynamicColors נקרא דרך מערכת האתחול המאוחדת
-
 // Color Scheme System loaded successfully
 
+} // end !UI_ADVANCED_SKIP_PAGE

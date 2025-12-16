@@ -84,7 +84,12 @@ class SMOperationsSection extends SMBaseSection {
 
     try {
       const operationsHtml = this.createOperationsHTML(data);
-      this.container.innerHTML = operationsHtml;
+      this.container.textContent = '';
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(operationsHtml, 'text/html');
+      doc.body.childNodes.forEach(node => {
+        this.container.appendChild(node.cloneNode(true));
+      });
       
       console.log('✅ Operations section rendered successfully');
       
@@ -549,7 +554,11 @@ class SMOperationsSection extends SMBaseSection {
    */
   static exportServerConfig() {
     console.log('📤 Exporting server config');
-    alert('ייצוא הגדרות שרת');
+    if (window.showInfoNotification) {
+      window.showInfoNotification('ייצוא הגדרות שרת', 'info');
+    } else {
+      alert('ייצוא הגדרות שרת');
+    }
   }
 
   /**
@@ -674,7 +683,11 @@ class SMOperationsSection extends SMBaseSection {
    */
   static exportCacheData() {
     console.log('📤 Exporting cache data');
-    alert('ייצוא נתוני מטמון');
+    if (window.showInfoNotification) {
+      window.showInfoNotification('ייצוא נתוני מטמון', 'info');
+    } else {
+      alert('ייצוא נתוני מטמון');
+    }
   }
 
   /**

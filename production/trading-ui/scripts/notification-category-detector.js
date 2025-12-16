@@ -9,6 +9,31 @@
  * @since September 2025
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - isUserInitiatedAction() - Isuserinitiatedaction
+
+// === Event Handlers ===
+// - isDevelopmentContext() - Isdevelopmentcontext
+// - isSystemContext() - Issystemcontext
+// - isBusinessContext() - Isbusinesscontext
+// - isPerformanceContext() - Isperformancecontext
+// - isUIContext() - Isuicontext
+// - getCurrentFunctionName() - Getcurrentfunctionname
+// - getCategoryIcon() - Getcategoryicon
+// - getAllCategoryIcons() - Getallcategoryicons
+
+// === Data Functions ===
+// - getDefaultCategoryByType() - Getdefaultcategorybytype
+// - getCurrentFileName() - Getcurrentfilename
+// - getCategoryColor() - Getcategorycolor
+// - getCategoryTitle() - Getcategorytitle
+
+// === Utility Functions ===
+// - checkKeywords() - Checkkeywords
+
 // ===== PRESERVE ORIGINAL FUNCTIONS =====
 // שמירת הפניות המקוריות למניעת לולאות אין סופיות
 // נשמור את הפונקציות אחרי שהן מוגדרות

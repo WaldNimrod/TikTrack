@@ -43,6 +43,26 @@ def get_account_activity(account_id: int):
     try:
         db: Session = g.db
         
+        # Get user_id from Flask context (set by auth middleware)
+        user_id = getattr(g, 'user_id', None)
+        
+        # Verify account belongs to user
+        from models.trading_account import TradingAccount
+        account = db.query(TradingAccount).filter(TradingAccount.id == account_id).first()
+        if not account:
+            return jsonify({
+                "status": "error",
+                "error": {"message": f"Trading account {account_id} not found"},
+                "version": "1.0"
+            }), 404
+        
+        if user_id is not None and account.user_id != user_id:
+            return jsonify({
+                "status": "error",
+                "error": {"message": "Access denied: Account does not belong to current user"},
+                "version": "1.0"
+            }), 403
+        
         # Parse optional date filters
         start_date = None
         end_date = None
@@ -122,6 +142,26 @@ def get_balance_by_currency(account_id: int, currency_id: int):
     try:
         db: Session = g.db
         
+        # Get user_id from Flask context (set by auth middleware)
+        user_id = getattr(g, 'user_id', None)
+        
+        # Verify account belongs to user
+        from models.trading_account import TradingAccount
+        account = db.query(TradingAccount).filter(TradingAccount.id == account_id).first()
+        if not account:
+            return jsonify({
+                "status": "error",
+                "error": {"message": f"Trading account {account_id} not found"},
+                "version": "1.0"
+            }), 404
+        
+        if user_id is not None and account.user_id != user_id:
+            return jsonify({
+                "status": "error",
+                "error": {"message": "Access denied: Account does not belong to current user"},
+                "version": "1.0"
+            }), 403
+        
         balance = AccountActivityService.calculate_balance_by_currency(
             db=db,
             account_id=account_id,
@@ -164,6 +204,26 @@ def get_account_balances(account_id: int):
     """
     try:
         db: Session = g.db
+        
+        # Get user_id from Flask context (set by auth middleware)
+        user_id = getattr(g, 'user_id', None)
+        
+        # Verify account belongs to user
+        from models.trading_account import TradingAccount
+        account = db.query(TradingAccount).filter(TradingAccount.id == account_id).first()
+        if not account:
+            return jsonify({
+                "status": "error",
+                "error": {"message": f"Trading account {account_id} not found"},
+                "version": "1.0"
+            }), 404
+        
+        if user_id is not None and account.user_id != user_id:
+            return jsonify({
+                "status": "error",
+                "error": {"message": "Access denied: Account does not belong to current user"},
+                "version": "1.0"
+            }), 403
         
         # Get account activity using existing service (reuses existing code)
         activity_data = AccountActivityService.get_account_activity(
@@ -231,6 +291,26 @@ def get_movements_timeline(account_id: int):
     """
     try:
         db: Session = g.db
+        
+        # Get user_id from Flask context (set by auth middleware)
+        user_id = getattr(g, 'user_id', None)
+        
+        # Verify account belongs to user
+        from models.trading_account import TradingAccount
+        account = db.query(TradingAccount).filter(TradingAccount.id == account_id).first()
+        if not account:
+            return jsonify({
+                "status": "error",
+                "error": {"message": f"Trading account {account_id} not found"},
+                "version": "1.0"
+            }), 404
+        
+        if user_id is not None and account.user_id != user_id:
+            return jsonify({
+                "status": "error",
+                "error": {"message": "Access denied: Account does not belong to current user"},
+                "version": "1.0"
+            }), 403
         
         # Parse optional date filters
         start_date = None

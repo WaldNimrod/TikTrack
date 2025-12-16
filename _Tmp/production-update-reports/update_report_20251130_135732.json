@@ -1,0 +1,437 @@
+{
+  "start_time": "2025-11-30T13:55:14.648356",
+  "steps": [
+    {
+      "number": 1,
+      "name": "collect_changes",
+      "success": true,
+      "duration_seconds": 1.760439157485962,
+      "timestamp": "2025-11-30T13:55:16.429544",
+      "details": {
+        "success": true,
+        "commits_count": 15,
+        "output_file": "/Users/nimrod/Documents/TikTrack/TikTrackApp-Production/_Tmp/release_notes_main_20251130_135514.log",
+        "commits": [
+          "da66b8fe1 fix: Final sm-section-server fix - Bump version to 1.3.14.5",
+          "f7825f199 fix: Final sm-section-server improvements - Bump version to 1.3.14.4",
+          "0d9d22ce8 fix: Additional fixes - ai-analysis-manager, info-summary-system, pagination-system",
+          "32f799344 fix: Final updates - ai-analysis-manager, info-summary-system, sm-section-server",
+          "f5a67b43b fix: Additional updates - tag service, preferences loader, system management"
+        ]
+      }
+    },
+    {
+      "number": 2,
+      "name": "check_server",
+      "success": true,
+      "duration_seconds": 0.09695100784301758,
+      "timestamp": "2025-11-30T13:55:16.527400",
+      "details": {
+        "success": true,
+        "running": false,
+        "port": 5001,
+        "pid": null,
+        "health": "not_running"
+      }
+    },
+    {
+      "number": 4,
+      "name": "update_main",
+      "success": true,
+      "duration_seconds": 1.68147611618042,
+      "timestamp": "2025-11-30T13:55:18.209534",
+      "details": {
+        "success": true,
+        "commits_count": 15,
+        "output_file": "/Users/nimrod/Documents/TikTrack/TikTrackApp-Production/_Tmp/release_notes_main_20251130_135516.log",
+        "commits": [
+          "da66b8fe1 fix: Final sm-section-server fix - Bump version to 1.3.14.5",
+          "f7825f199 fix: Final sm-section-server improvements - Bump version to 1.3.14.4",
+          "0d9d22ce8 fix: Additional fixes - ai-analysis-manager, info-summary-system, pagination-system",
+          "32f799344 fix: Final updates - ai-analysis-manager, info-summary-system, sm-section-server",
+          "f5a67b43b fix: Additional updates - tag service, preferences loader, system management"
+        ]
+      }
+    },
+    {
+      "number": 5,
+      "name": "merge_main",
+      "success": true,
+      "duration_seconds": 4.18990683555603,
+      "timestamp": "2025-11-30T13:55:22.400263",
+      "details": {
+        "success": true,
+        "conflicts_resolved": 2,
+        "conflicts_unresolved": 0
+      }
+    },
+    {
+      "number": 6,
+      "name": "sync_code",
+      "success": true,
+      "duration_seconds": 1.981949806213379,
+      "timestamp": "2025-11-30T13:55:24.383591",
+      "details": {
+        "success": true
+      }
+    },
+    {
+      "number": 7,
+      "name": "stop_server",
+      "success": true,
+      "duration_seconds": 0.00045228004455566406,
+      "timestamp": "2025-11-30T13:55:24.385725",
+      "details": {
+        "success": true,
+        "stopped": false,
+        "reason": "not_running"
+      }
+    },
+    {
+      "number": 9,
+      "name": "fix_config",
+      "success": true,
+      "duration_seconds": 0.007405757904052734,
+      "timestamp": "2025-11-30T13:55:24.395756",
+      "details": {
+        "success": true,
+        "verified": false,
+        "warning": "DATABASE_URL is not configured. POSTGRES_HOST environment variable is required. SQLite is no longer supported. Please set PostgreSQL environment variables or use start_server.sh which sets them automatically."
+      }
+    },
+    {
+      "number": 10,
+      "name": "check_server_updates",
+      "success": true,
+      "duration_seconds": 9.418313980102539,
+      "timestamp": "2025-11-30T13:55:33.814700",
+      "details": {
+        "success": true,
+        "needs_update": false,
+        "report": {
+          "dependencies": {
+            "needs_update": false,
+            "missing_file": false,
+            "packages": [
+              "Flask",
+              "Flask-CORS",
+              "Werkzeug",
+              "SQLAlchemy",
+              "psycopg2-binary",
+              "Flask-SocketIO",
+              "python-socketio",
+              "python-engineio",
+              "gunicorn",
+              "waitress",
+              "requests",
+              "urllib3",
+              "pytest",
+              "pytest-cov",
+              "pytest-html",
+              "pytest-xdist",
+              "psutil",
+              "schedule",
+              "pytz",
+              "yfinance",
+              "bleach",
+              "cryptography",
+              "bcrypt",
+              "httpx",
+              "google-generativeai"
+            ],
+            "missing_packages": [],
+            "outdated_packages": []
+          },
+          "critical_files": {
+            "app.py": true,
+            "settings.py": true,
+            "requirements.txt": true
+          },
+          "database_structure": {
+            "ready": false,
+            "error": "DATABASE_URL is not configured. POSTGRES_HOST environment variable is required. SQLite is no longer supported. Please set PostgreSQL environment variables or use start_server.sh which sets them automatically."
+          },
+          "ui_files": {
+            "ready": true,
+            "missing_files": []
+          },
+          "warnings": [],
+          "needs_update": false
+        }
+      }
+    },
+    {
+      "number": 11,
+      "name": "update_server",
+      "success": true,
+      "duration_seconds": 0.00013518333435058594,
+      "timestamp": "2025-11-30T13:55:33.815311",
+      "details": {
+        "success": true,
+        "updated": false,
+        "reason": "no_updates_needed"
+      }
+    },
+    {
+      "number": 12,
+      "name": "validate",
+      "success": true,
+      "duration_seconds": 1.195188045501709,
+      "timestamp": "2025-11-30T13:55:35.010897",
+      "details": {
+        "success": true,
+        "results": {
+          "isolation": false,
+          "structure": false,
+          "post_validation": false,
+          "ui_tests": true
+        }
+      }
+    },
+    {
+      "number": 13,
+      "name": "start_server",
+      "success": true,
+      "duration_seconds": 30.18958592414856,
+      "timestamp": "2025-11-30T13:56:05.200943",
+      "details": {
+        "success": true,
+        "pid": 11864,
+        "port": 5001,
+        "background": true,
+        "health_check": "failed",
+        "health_error": "Health check did not pass within 30 seconds (elapsed: 30.1s)"
+      }
+    },
+    {
+      "number": 14,
+      "name": "verify_stability",
+      "success": true,
+      "duration_seconds": 55.032285928726196,
+      "timestamp": "2025-11-30T13:57:00.233999",
+      "details": {
+        "success": true,
+        "stable": false,
+        "report": {
+          "stable": false,
+          "summary": [],
+          "warnings": [
+            "6 health check(s) failed"
+          ],
+          "errors": [
+            "Process not alive: Process not found",
+            "\u001b[0;31m[13:55:36] ERROR:\u001b[0m Server process exited immediately. See /Users/nimrod/Documents/TikTrack/TikTrackApp-Production/production/Backend/server_output.log",
+            "\u001b[0;31m[13:55:36] ERROR:\u001b[0m Server process exited immediately. See /Users/nimrod/Documents/TikTrack/TikTrackApp-Production/production/Backend/server_output.log",
+            "Traceback (most recent call last):"
+          ]
+        },
+        "stability_result": {
+          "stable": false,
+          "health_checks": {
+            "passed": 0,
+            "failed": 6,
+            "total": 6,
+            "results": [
+              [
+                false,
+                "<urlopen error [Errno 61] Connection refused>"
+              ],
+              [
+                false,
+                "<urlopen error [Errno 61] Connection refused>"
+              ],
+              [
+                false,
+                "<urlopen error [Errno 61] Connection refused>"
+              ],
+              [
+                false,
+                "<urlopen error [Errno 61] Connection refused>"
+              ],
+              [
+                false,
+                "<urlopen error [Errno 61] Connection refused>"
+              ],
+              [
+                false,
+                "<urlopen error [Errno 61] Connection refused>"
+              ]
+            ]
+          },
+          "process_alive": false,
+          "process_error": "Process not found",
+          "log_errors": [
+            "\u001b[0;31m[13:55:36] ERROR:\u001b[0m Server process exited immediately. See /Users/nimrod/Documents/TikTrack/TikTrackApp-Production/production/Backend/server_output.log",
+            "\u001b[0;31m[13:55:36] ERROR:\u001b[0m Server process exited immediately. See /Users/nimrod/Documents/TikTrack/TikTrackApp-Production/production/Backend/server_output.log",
+            "Traceback (most recent call last):"
+          ],
+          "log_errors_count": 3
+        }
+      }
+    },
+    {
+      "number": 15,
+      "name": "bump_version",
+      "success": true,
+      "duration_seconds": 0.06600117683410645,
+      "timestamp": "2025-11-30T13:57:00.302138",
+      "details": {
+        "success": true,
+        "new_version": "1.2.10.0"
+      }
+    },
+    {
+      "number": 16,
+      "name": "commit_push",
+      "success": true,
+      "duration_seconds": 2.492650032043457,
+      "timestamp": "2025-11-30T13:57:02.795342",
+      "details": {
+        "success": true,
+        "commit_message": "chore: production update from main - 2025-11-30"
+      }
+    },
+    {
+      "number": 17,
+      "name": "e2e_tests",
+      "success": false,
+      "duration_seconds": 30.129847049713135,
+      "timestamp": "2025-11-30T13:57:32.925974",
+      "details": {
+        "success": false,
+        "tests_run": 0,
+        "tests_passed": 0,
+        "tests_failed": 0,
+        "errors": []
+      }
+    }
+  ],
+  "files_updated": [
+    {
+      "path": "documentation/version-manifest.json",
+      "timestamp": "2025-11-30T13:55:22.265221",
+      "details": {
+        "action": "conflict_resolved"
+      }
+    },
+    {
+      "path": "documentation/production/VERSION_HISTORY.md",
+      "timestamp": "2025-11-30T13:55:22.323220",
+      "details": {
+        "action": "conflict_resolved"
+      }
+    },
+    {
+      "path": "production/Backend/*",
+      "timestamp": "2025-11-30T13:55:23.671275",
+      "details": {
+        "action": "sync",
+        "details": "  ✅ Copied: connectors/user_data_import/test_files/demo_sample.csv"
+      }
+    },
+    {
+      "path": "production/Backend/*",
+      "timestamp": "2025-11-30T13:55:23.671283",
+      "details": {
+        "action": "sync",
+        "details": "  ✅ Copied: connectors/user_data_import/test_files/ibkr_sample.csv"
+      }
+    },
+    {
+      "path": "production/Backend/*",
+      "timestamp": "2025-11-30T13:55:23.671291",
+      "details": {
+        "action": "sync",
+        "details": "  ✅ Copied: scripts/map_active_files.py"
+      }
+    },
+    {
+      "path": "production/Backend/*",
+      "timestamp": "2025-11-30T13:55:23.671305",
+      "details": {
+        "action": "sync",
+        "details": "✅ Copied: 217 files"
+      }
+    },
+    {
+      "path": "production/trading-ui/*",
+      "timestamp": "2025-11-30T13:55:24.383452",
+      "details": {
+        "action": "sync",
+        "details": "✅ Successfully copied 887 files"
+      }
+    },
+    {
+      "path": "documentation/version-manifest.json",
+      "timestamp": "2025-11-30T13:57:00.302119",
+      "details": {
+        "new_version": "1.2.10.0"
+      }
+    }
+  ],
+  "files_new": [
+    {
+      "path": "/Users/nimrod/Documents/TikTrack/TikTrackApp-Production/_Tmp/release_notes_main_20251130_135514.log",
+      "timestamp": "2025-11-30T13:55:16.429520",
+      "details": {
+        "type": "release_notes",
+        "commits_count": 15
+      }
+    },
+    {
+      "path": "/Users/nimrod/Documents/TikTrack/TikTrackApp-Production/_Tmp/release_notes_main_20251130_135516.log",
+      "timestamp": "2025-11-30T13:55:18.209513",
+      "details": {
+        "type": "release_notes",
+        "commits_count": 15
+      }
+    }
+  ],
+  "files_deleted": [],
+  "warnings": [
+    {
+      "message": "Production settings may need verification",
+      "step": "fix_config",
+      "timestamp": "2025-11-30T13:55:24.389046"
+    },
+    {
+      "message": "Isolation verification had issues",
+      "step": "validate",
+      "timestamp": "2025-11-30T13:55:34.935767"
+    },
+    {
+      "message": "Structure verification had issues",
+      "step": "validate",
+      "timestamp": "2025-11-30T13:55:34.941415"
+    },
+    {
+      "message": "Post-update validation had issues",
+      "step": "validate",
+      "timestamp": "2025-11-30T13:55:35.006818"
+    },
+    {
+      "message": "Server stability issues detected",
+      "step": "verify_stability",
+      "timestamp": "2025-11-30T13:57:00.233873"
+    }
+  ],
+  "errors": [
+    {
+      "message": "Step 17 (e2e_tests) failed",
+      "step": "e2e_tests",
+      "timestamp": "2025-11-30T13:57:32.926028"
+    }
+  ],
+  "summary": {
+    "total_duration_seconds": 138.281794,
+    "steps_completed": 14,
+    "steps_failed": 1,
+    "files_updated_count": 8,
+    "files_new_count": 2,
+    "files_deleted_count": 0,
+    "warnings_count": 5,
+    "errors_count": 1
+  },
+  "end_time": "2025-11-30T13:57:32.930150",
+  "success": false
+}

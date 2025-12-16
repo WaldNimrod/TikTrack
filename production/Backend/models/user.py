@@ -3,6 +3,7 @@ from sqlalchemy.orm import relationship
 from .base import BaseModel
 from typing import Dict, Any, Optional
 from datetime import datetime
+import bcrypt
 
 class User(BaseModel):
     """
@@ -51,6 +52,8 @@ class User(BaseModel):
                       comment="Whether user is active")
     is_default = Column(Boolean, default=False, nullable=False,
                        comment="Whether this is the default user")
+    password_hash = Column(String(255), nullable=True,
+                          comment="Bcrypt hashed password")
     # Legacy preferences field (deprecated - kept for backward compatibility)
     preferences_json = Column(Text, nullable=True,
                         comment="JSON string with user preferences (deprecated)")
@@ -64,6 +67,7 @@ class User(BaseModel):
     # notes = relationship("Note", back_populates="user")
     # user_preferences = relationship("UserPreferences", back_populates="user", uselist=False)  # Removed - using new preferences system
     # preference_profiles = relationship("PreferenceProfile", foreign_keys="[PreferenceProfile.user_id]", back_populates="user", uselist=True)  # Disabled - causing mapper issues
+    watch_lists = relationship("WatchList", back_populates="user", cascade="all, delete-orphan")
     
     def __repr__(self) -> str:
         """String representation of the user"""
@@ -159,5 +163,51 @@ class User(BaseModel):
         import json
         self.preferences_json = json.dumps(preferences, ensure_ascii=False)
         self.updated_at = datetime.utcnow()
+    
+    def set_password(self, password: str) -> None:
+        """
+        Hash and set password for the user
+        
+        Args:
+            password (str): Plain text password
+            
+        Example:
+            >>> user = User(username="test")
+            >>> user.set_password("mypassword")
+        """
+        if not password:
+            raise ValueError("Password cannot be empty")
+        # Generate salt and hash password
+        salt = bcrypt.gensalt()
+        self.password_hash = bcrypt.hashpw(password.encode('utf-8'), salt).decode('utf-8')
+        self.updated_at = datetime.utcnow()
+    
+    def check_password(self, password: str) -> bool:
+        """
+        Verify password against stored hash
+        
+        Args:
+            password (str): Plain text password to verify
+            
+        Returns:
+            bool: True if password matches, False otherwise
+            
+        Example:
+            >>> user = User(username="test")
+            >>> user.set_password("mypassword")
+            >>> user.check_password("mypassword")
+            True
+            >>> user.check_password("wrongpassword")
+            False
+        """
+        if not self.password_hash:
+            return False
+        if not password:
+            return False
+        try:
+            # Check if password matches hash
+            return bcrypt.checkpw(password.encode('utf-8'), self.password_hash.encode('utf-8'))
+        except Exception:
+            return False
     
 

@@ -25,21 +25,27 @@ class ExecutionService:
     def __init__(self):
         self.model = Execution
     
-    def get_all(self, db: Session, filters=None):
-        return db.query(Execution).options(
+    def get_all(self, db: Session, filters=None, user_id=None):
+        query = db.query(Execution).options(
             joinedload(Execution.trading_account),
             joinedload(Execution.ticker)
             # Removed joinedload(Execution.trade) - may cause errors when Trade model has columns not in DB
             # Trade data will be loaded lazily if needed, or trade_id will be used from to_dict()
-        ).all()
+        )
+        if user_id is not None:
+            query = query.filter(Execution.user_id == user_id)
+        return query.all()
     
-    def get_by_id(self, db: Session, execution_id: int):
-        return db.query(Execution).options(
+    def get_by_id(self, db: Session, execution_id: int, user_id=None):
+        query = db.query(Execution).options(
             joinedload(Execution.trading_account),
             joinedload(Execution.ticker)
             # Removed joinedload(Execution.trade) - may cause errors when Trade model has columns not in DB
             # Trade data will be loaded lazily if needed, or trade_id will be used from to_dict()
-        ).filter(Execution.id == execution_id).first()
+        ).filter(Execution.id == execution_id)
+        if user_id is not None:
+            query = query.filter(Execution.user_id == user_id)
+        return query.first()
 
 # Initialize base API
 execution_service = ExecutionService()
@@ -55,12 +61,70 @@ def _get_date_normalizer():
     return DateNormalizationService(timezone_name)
 
 @executions_bp.route('/', methods=['GET'])
+@cache_with_deps(ttl=60, dependencies=['executions', 'trades'])
 @handle_database_session()
 def get_executions():
-    """Get all executions using base API with rate limiting"""
+    """Get all executions with pagination and optimization"""
     db: Session = g.db
-    response, status_code = base_api.get_all(db)
-    return jsonify(response), status_code
+    
+    # Get user_id from Flask context (set by auth middleware)
+    user_id = getattr(g, 'user_id', None)
+    
+    # Pagination parameters
+    page = request.args.get('page', type=int, default=1)
+    per_page = request.args.get('per_page', type=int, default=100)
+    per_page = min(per_page, 500)  # Max 500 per page
+    
+    try:
+        normalizer = _get_date_normalizer()
+        
+        # Get executions with joinedload for relationships (optimize N+1)
+        from models.execution import Execution
+        from sqlalchemy.orm import joinedload
+        
+        query = db.query(Execution).options(
+            joinedload(Execution.ticker),
+            joinedload(Execution.trading_account),
+            joinedload(Execution.trade)
+        )
+        
+        if user_id is not None:
+            query = query.filter(Execution.user_id == user_id)
+        
+        # Get total count before pagination
+        total_count = query.count()
+        
+        # Apply pagination
+        executions = query.order_by(Execution.date.desc(), Execution.created_at.desc()).offset((page - 1) * per_page).limit(per_page).all()
+        
+        # Convert to dict
+        data = [execution.to_dict() if hasattr(execution, 'to_dict') else execution for execution in executions]
+        data = normalizer.normalize_output(data)
+        
+        response = {
+            "status": "success",
+            "data": data,
+            "pagination": {
+                "page": page,
+                "per_page": per_page,
+                "total": total_count,
+                "pages": (total_count + per_page - 1) // per_page
+            },
+            "timestamp": normalizer.now_envelope(),
+            "version": "1.0"
+        }
+        
+        return jsonify(response), 200
+        
+    except Exception as e:
+        logger.error(f"Error getting executions: {str(e)}")
+        normalizer = _get_date_normalizer()
+        return jsonify({
+            "status": "error",
+            "error": {"message": f"Failed to retrieve executions: {str(e)}"},
+            "timestamp": normalizer.now_envelope(),
+            "version": "1.0"
+        }), 500
 
 @executions_bp.route('/<int:execution_id>', methods=['GET'])
 @handle_database_session()
@@ -76,20 +140,52 @@ def get_execution(execution_id: int):
 def create_execution():
     """Create new execution"""
     try:
+        # Get user_id from Flask context (set by auth middleware)
+        user_id = getattr(g, 'user_id', None)
+        
         data = request.get_json()
         logger.info(f"Received execution data: {data}")
         normalizer = _get_date_normalizer()
         db: Session = g.db
+        
+        # Set user_id if authenticated
+        if user_id is not None and 'user_id' not in data:
+            data['user_id'] = user_id
         
         # Validate data against constraints
         logger.info("Validating execution data before creation")
         # Auto-fill ticker_id from trade if not provided but trade_id exists
         if not data.get('ticker_id') and data.get('trade_id'):
             from models.trade import Trade
-            trade = db.query(Trade).filter(Trade.id == data['trade_id']).first()
+            query = db.query(Trade).filter(Trade.id == data['trade_id'])
+            if user_id is not None:
+                query = query.filter(Trade.user_id == user_id)
+            trade = query.first()
+            if not trade:
+                return jsonify({
+                    "status": "error",
+                    "error": {"message": "Trade not found or does not belong to user"},
+                    "timestamp": normalizer.now_envelope(),
+                    "version": "1.0"
+                }), 404
             if trade and trade.ticker_id:
                 data['ticker_id'] = trade.ticker_id
                 logger.info(f"Auto-filled ticker_id {trade.ticker_id} from trade {data['trade_id']}")
+        
+        # Verify trading_account belongs to user if provided
+        if 'trading_account_id' in data and user_id is not None:
+            from models.trading_account import TradingAccount
+            account = db.query(TradingAccount).filter(
+                TradingAccount.id == data['trading_account_id'],
+                TradingAccount.user_id == user_id
+            ).first()
+            if not account:
+                return jsonify({
+                    "status": "error",
+                    "error": {"message": "Trading account not found or does not belong to user"},
+                    "timestamp": normalizer.now_envelope(),
+                    "version": "1.0"
+                }), 404
         
         # Sanitize HTML content for notes field
         if 'notes' in data and data['notes']:
@@ -137,10 +233,15 @@ def create_execution():
 def update_execution(execution_id: int):
     """Update execution"""
     try:
+        # Get user_id from Flask context (set by auth middleware)
+        user_id = getattr(g, 'user_id', None)
+        
         data = request.get_json()
         normalizer = _get_date_normalizer()
         db: Session = g.db
-        execution = db.query(Execution).filter(Execution.id == execution_id).first()
+        
+        # Verify execution belongs to user
+        execution = execution_service.get_by_id(db, execution_id, user_id=user_id)
         if execution:
             # Validate data against constraints
             logger.info("Validating execution data before update")
@@ -200,17 +301,15 @@ def update_execution(execution_id: int):
 def delete_execution(execution_id: int):
     """Delete execution"""
     try:
+        # Get user_id from Flask context (set by auth middleware)
+        user_id = getattr(g, 'user_id', None)
+        
         db: Session = g.db
-        execution = db.query(Execution).filter(Execution.id == execution_id).first()
+        
+        # Verify execution belongs to user
+        execution = execution_service.get_by_id(db, execution_id, user_id=user_id)
         if execution:
-            try:
-                TagService.remove_all_tags_for_entity(db, 'execution', execution_id)
-            except ValueError as tag_error:
-                logger.warning(
-                    "Failed to remove tags for execution %s before deletion: %s",
-                    execution_id,
-                    tag_error,
-                )
+            # Tag cleanup is handled automatically by SQLAlchemy event listeners
             db.delete(execution)
             db.commit()
             normalizer = _get_date_normalizer()
@@ -303,6 +402,8 @@ def get_pending_assignment_trade_creation_clusters():
     normalizer = None
     try:
         db: Session = g.db
+        # Get user_id from Flask context (set by auth middleware)
+        user_id = getattr(g, 'user_id', None)
         normalizer = _get_date_normalizer()
 
         items_limit = request.args.get('limit', default=None, type=int)
@@ -310,6 +411,7 @@ def get_pending_assignment_trade_creation_clusters():
 
         clusters = ExecutionClusteringService.get_execution_trade_creation_clusters(
             db,
+            user_id=user_id,
             max_items=items_limit,
             limit_executions=executions_limit
         )
@@ -331,10 +433,15 @@ def suggest_trades_for_execution(execution_id: int):
     """Get trade suggestions for a specific execution"""
     normalizer = None
     try:
+        # Get user_id from Flask context (set by auth middleware)
+        user_id = getattr(g, 'user_id', None)
+        
         db: Session = g.db
         preferences_service = PreferencesService()
         normalizer = BaseEntityUtils.get_request_normalizer(request, preferences_service=preferences_service)
-        execution = db.query(Execution).filter(Execution.id == execution_id).first()
+        
+        # Verify execution belongs to user
+        execution = execution_service.get_by_id(db, execution_id, user_id=user_id)
         
         if not execution:
             error_payload = BaseEntityUtils.create_error_payload(normalizer, "Execution not found")
@@ -365,6 +472,17 @@ def suggest_trades_for_execution(execution_id: int):
 def batch_assign_executions():
     """Batch assign executions to trades with validation and rollback support"""
     db: Session = g.db
+    
+    # Get user_id from Flask context (set by auth middleware)
+    user_id = getattr(g, 'user_id', None)
+    
+    if user_id is None:
+        return jsonify({
+            "status": "error",
+            "error": {"message": "User authentication required"},
+            "version": "1.0"
+        }), 401
+    
     try:
         # Get JSON data - handle None case when content-type is not application/json
         data = request.get_json() or {}
@@ -395,18 +513,24 @@ def batch_assign_executions():
                 })
                 continue
             
-            execution = db.query(Execution).filter(Execution.id == execution_id).first()
+            execution = db.query(Execution).filter(
+                Execution.id == execution_id,
+                Execution.user_id == user_id
+            ).first()
             if not execution:
                 validation_errors.append({
                     "execution_id": execution_id,
                     "trade_id": trade_id,
-                    "error": "Execution not found"
+                    "error": "Execution not found or access denied"
                 })
                 continue
             
-            # Verify trade exists
+            # Verify trade exists and belongs to user
             from models.trade import Trade
-            trade = db.query(Trade).filter(Trade.id == trade_id).first()
+            trade = db.query(Trade).filter(
+                Trade.id == trade_id,
+                Trade.user_id == user_id
+            ).first()
             if not trade:
                 validation_errors.append({
                     "execution_id": execution_id,

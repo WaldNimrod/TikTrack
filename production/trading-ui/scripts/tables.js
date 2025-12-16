@@ -958,9 +958,17 @@ window.applyDefaultSort = async function (tableType, data, updateFunction) {
 window.closeModal = function (modalId) {
   const modal = document.getElementById(modalId);
   if (modal) {
-    const bootstrapModal = bootstrap.Modal.getInstance(modal);
-    if (bootstrapModal) {
-      bootstrapModal.hide();
+    if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
+      window.ModalManagerV2.hideModal(modalId);
+    } else if (bootstrap?.Modal) {
+      const bootstrapModal = bootstrap.Modal.getInstance(modal);
+      if (bootstrapModal) {
+        bootstrapModal.hide();
+      } else {
+        // Fallback: hide modal manually
+        modal.classList.remove('show');
+        modal.style.display = 'none';
+      }
     } else {
       // Fallback: hide modal manually
       modal.classList.remove('show');
@@ -1057,7 +1065,9 @@ window.loadTableData = async function(tableType, updateFunction) {
     // Fetch data from server
     const response = await fetch(`/api/data/${tableType}`);
     if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      // החזר אזהרה ודאטה ריק במקום לזרוק חריגות שמפיל עמודי ניטור
+      console.warn(`⚠️ Table ${tableType} returned HTTP ${response.status}: ${response.statusText}`);
+      return [];
     }
     
     const data = await response.json();
@@ -1331,6 +1341,32 @@ window.updateTableWithPagination = async function({
 
   if (typeof render !== 'function') {
     throw new Error('updateTableWithPagination requires render callback');
+  }
+
+  // Check if table is in a modal - skip pagination if so
+  if (typeof document !== 'undefined') {
+    const table = document.getElementById(tableId);
+    if (table) {
+      const isInModal = table.closest('.modal, [class*="modal"]');
+      if (isInModal) {
+        // Expected behavior - pagination is not needed for tables inside modals
+        // No log needed - this is normal behavior
+        // Render full dataset without pagination
+        await render(data, {
+          skipPagination: true,
+          pageInfo: {
+            currentPage: 1,
+            totalPages: 1,
+            pageSize: data.length,
+            totalItems: data.length,
+            filteredItems: data.length,
+          },
+          tableId,
+          tableType: tableType || window.TableDataRegistry?.resolveTableType?.(tableId) || null,
+        });
+        return null;
+      }
+    }
   }
 
   const safeData = Array.isArray(data) ? data : [];

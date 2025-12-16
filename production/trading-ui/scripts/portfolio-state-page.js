@@ -1,20 +1,114 @@
 /**
  * Portfolio State Page - Portfolio state and performance charts
  * 
- * This file handles the portfolio state page functionality for the mockup.
+ * This file handles the portfolio state page functionality.
  * 
  * Documentation: See documentation/frontend/JAVASCRIPT_ARCHITECTURE.md
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - initPortfolioPerformanceChart() - Initportfolioperformancechart
+// - initPortfolioValueChart() - Initportfoliovaluechart
+// - initPLTrendChart() - Initpltrendchart
+// - setupChartSynchronization() - Setupchartsynchronization
+// - setupChartControls() - Setupchartcontrols
+// - initializeHeader() - Initializeheader
+// - initializePage() - Initializepage
+
+// === Event Handlers ===
+// - convertDateToChartFormat() - Convertdatetochartformat
+// - selectDateRangeOption() - Selectdaterangeoption
+// - handleCustomDateFromChange() - Handlecustomdatefromchange
+// - handleCustomDateToChange() - Handlecustomdatetochange
+// - selectAccountOption() - Selectaccountoption
+// - loadTradesForMonthYear() - Loadtradesformonthyear
+// - removeComparisonDate() - Removecomparisondate
+
+// === UI Functions ===
+// - updateDateRangeFilterText() - Updatedaterangefiltertext
+// - updateAccountFilterText() - Updateaccountfiltertext
+// - renderNumericValue() - Rendernumericvalue
+// - showLoadingState() - Showloadingstate
+// - hideLoadingState() - Hideloadingstate
+// - renderTradeRow() - Rendertraderow
+// - updateTradesTable() - Updatetradestable
+// - updateTradesSummary() - Updatetradessummary
+// - updateSummaryCards() - Updatesummarycards
+// - renderAmount() - Renderamount
+
+// === Data Functions ===
+// - getCSSVariableValue() - Getcssvariablevalue
+// - loadTradingAccounts() - Loadtradingaccounts
+// - loadInvestmentTypes() - Loadinvestmenttypes
+// - getDateRange() - Getdaterange
+// - getSelectedAccounts() - Getselectedaccounts
+// - loadChartDefaultPeriod() - Loadchartdefaultperiod
+// - checkPortfolioDataCompleteness() - Checkportfoliodatacompleteness
+// - ensurePortfolioHistoricalData() - Ensureportfoliohistoricaldata (EOD integrated)
+// - loadPortfolioState() - Loadportfoliostate
+// - loadTrades() - Loadtrades
+// - calculateSummaryFromTrades() - Calculatesummaryfromtrades (EOD integrated)
+// - getLighterColor() - Getlightercolor
+// - syncRangeToOtherCharts() - Syncrangetoothercharts
+// - getTimeDiff() - Gettimediff
+// - loadUserPreferences() - Loaduserpreferences
+// - savePageState() - Savepagestate
+// - getColumns() - Getcolumns
+
+// === Utility Functions ===
+// - formatCurrency() - Formatcurrency
+// - formatDate() - Formatdate
+
+// === Other ===
+// - toggleCardDetails() - Togglecarddetails
+// - populateAccountFilterMenu() - Populateaccountfiltermenu
+// - toggleAccountFilterMenu() - Toggleaccountfiltermenu
+// - toggleDateRangeFilterMenu() - Toggledaterangefiltermenu
+// - applyCustomDateRange() - Applycustomdaterange
+// - isDateInRange() - Isdateinrange
+// - debounce() - Debounce
+// - applyFilters() - Applyfilters
+// - applyFiltersInternal() - Applyfiltersinternal
+// - filterTrades() - Filtertrades
+// - clearFilters() - Clearfilters
+// - populateYearSelect() - Populateyearselect
+// - calculateSummaryFromTrades() - Calculatesummaryfromtrades
+// - setChartPeriod() - Setchartperiod
+// - timeRangesEqual() - Timerangesequal
+// - addTime() - Addtime
+// - applyToAllCharts() - Applytoallcharts
+// - compareDates() - Comparedates
+// - waitForScripts() - Waitforscripts
+// - registerPortfolioTradesTable() - Registerportfoliotradestable
+// - restorePageState() - Restorepagestate
+// - restoreSelectedAccounts() - Restoreselectedaccounts
+// - INVESTMENT_TYPES() - Investment Types
+// - later() - Later
+
 (function() {
     'use strict';
 
-// Investment types from system constraints (same as database)
-const INVESTMENT_TYPES = [
-    { value: 'swing', label: 'סווינג' },
-    { value: 'investment', label: 'השקעה' },
-    { value: 'passive', label: 'פאסיבי' }
-];
+// Investment types - use system-wide constants if available, otherwise fallback
+// Use window.VALID_INVESTMENT_TYPES for consistency across the system
+const INVESTMENT_TYPES = (() => {
+    if (window.VALID_INVESTMENT_TYPES && Array.isArray(window.VALID_INVESTMENT_TYPES)) {
+        // Use system-wide investment types with labels
+        const labels = window.INVESTMENT_TYPE_LABELS || {};
+        return window.VALID_INVESTMENT_TYPES.map(type => ({
+            value: type,
+            label: labels[type] || type
+        }));
+    }
+    // Fallback to standard values (same as database constraints)
+    return [
+        { value: 'swing', label: 'סווינג' },
+        { value: 'investment', label: 'השקעה' },
+        { value: 'passive', label: 'פאסיבי' }
+    ];
+})();
 
 let allTradingAccounts = [];
 let portfolioPerformanceChart = null;
@@ -33,6 +127,7 @@ const MAX_SYNC_SETUP_ATTEMPTS = 50;
 // Trades data
 let allTrades = [];
 let filteredTrades = [];
+let currentSnapshot = null; // Store current snapshot for cash balance calculations
 
 // Helper function to get CSS variable value
 function getCSSVariableValue(variableName, fallback) {
@@ -54,15 +149,62 @@ function getCSSVariableValue(variableName, fallback) {
     return fallback;
 }
 
+// Helper function to convert date to yyyy-mm-dd format for charts
+function convertDateToChartFormat(dateValue) {
+    if (!dateValue) return null;
+    
+    // DateEnvelope format - use UTC
+    if (typeof dateValue === 'object' && dateValue.utc) {
+        return dateValue.utc.split('T')[0];
+    }
+    
+    // String format
+    if (typeof dateValue === 'string') {
+        // Check if it's in dd.mm.yyyy format
+        if (/^\d{2}\.\d{2}\.\d{4}/.test(dateValue)) {
+            const [day, month, year] = dateValue.split('.');
+            return `${year}-${month}-${day}`;
+        } else if (dateValue.includes('T')) {
+            // ISO format - extract date part
+            return dateValue.split('T')[0];
+        } else {
+            // Assume it's already in yyyy-mm-dd format
+            return dateValue;
+        }
+    }
+    
+    return dateValue;
+}
+
 // Toggle card details
-function toggleCardDetails(cardId) {
+async function toggleCardDetails(cardId) {
     const details = document.getElementById(cardId);
     const chevron = document.getElementById(cardId.replace('-details', '-chevron'));
     if (details) {
         const isVisible = details.style.display !== 'none';
         details.style.display = isVisible ? 'none' : 'block';
-        if (chevron) {
-            // Update icon source instead of className
+        if (chevron && typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {
+            // Use IconSystem to update icon
+            const iconName = isVisible ? 'chevron-down' : 'chevron-up';
+            try {
+                const iconHTML = await window.IconSystem.renderIcon('button', iconName, {
+                    size: chevron.getAttribute('width') || '16',
+                    alt: chevron.getAttribute('alt') || 'toggle',
+                    class: chevron.getAttribute('class') || 'icon'
+                });
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(iconHTML, 'text/html');
+                const newIcon = doc.body.firstElementChild;
+                if (newIcon) {
+                    chevron.parentNode.replaceChild(newIcon, chevron);
+                }
+            } catch (error) {
+                // Fallback to direct path update
+                const iconPath = isVisible ? '/trading-ui/images/icons/tabler/chevron-down.svg' : '/trading-ui/images/icons/tabler/chevron-up.svg';
+                chevron.src = iconPath;
+            }
+        } else if (chevron) {
+            // Fallback: Update icon source directly
             const iconPath = isVisible ? '/trading-ui/images/icons/tabler/chevron-down.svg' : '/trading-ui/images/icons/tabler/chevron-up.svg';
             chevron.src = iconPath;
         }
@@ -90,7 +232,7 @@ async function loadTradingAccounts() {
                     id: acc.id,
                     name: acc.name || acc.account_name || `Account #${acc.id}`
                 })).sort((a, b) => a.name.localeCompare(b.name));
-                populateAccountFilterMenu();
+                await populateAccountFilterMenu();
                 return;
             }
         }
@@ -127,22 +269,42 @@ async function loadTradingAccounts() {
             }
         }
         
-        // Priority 3: Direct API call (only if no other method worked)
+        // Priority 3: Use TradingAccountsData service (same as header-system)
+        if ((!accounts || accounts.length === 0) && window.TradingAccountsData && typeof window.TradingAccountsData.getAll === 'function') {
+            try {
+                accounts = await window.TradingAccountsData.getAll();
+                if (window.Logger) {
+                    window.Logger.info(`📊 Loaded ${accounts.length} accounts via TradingAccountsData`, { page: 'portfolio-state-page' });
+                }
+            } catch (error) {
+                if (window.Logger) {
+                    window.Logger.warn('⚠️ Failed to load accounts via TradingAccountsData, trying fallback', { page: 'portfolio-state-page', error });
+                }
+            }
+        }
+        
+        // Priority 4: Direct API call (only if no other method worked)
         if (!accounts || accounts.length === 0) {
-            const response = await fetch('/api/trading-accounts/');
-            if (response.ok) {
-                const data = await response.json();
-                accounts = Array.isArray(data?.data) ? data.data : (Array.isArray(data) ? data : []);
-                if (window.Logger) {
-                    window.Logger.info(`📊 Loaded ${accounts.length} accounts via direct API call`, { page: 'portfolio-state-page' });
+            try {
+                const response = await fetch('/api/trading-accounts/');
+                if (response.ok) {
+                    const data = await response.json();
+                    accounts = Array.isArray(data?.data) ? data.data : (Array.isArray(data) ? data : []);
+                    if (window.Logger) {
+                        window.Logger.info(`📊 Loaded ${accounts.length} accounts via direct API call`, { page: 'portfolio-state-page' });
+                    }
+                } else {
+                    const errorMsg = `שגיאה בטעינת חשבונות מסחר: ${response.status} ${response.statusText}`;
+                    if (window.NotificationSystem) {
+                        window.NotificationSystem.showError('שגיאה בטעינת נתונים', errorMsg);
+                    }
+                    if (window.Logger) {
+                        window.Logger.error('❌ Failed to load trading accounts', { page: 'portfolio-state-page', status: response.status, statusText: response.statusText });
+                    }
                 }
-            } else {
-                const errorMsg = `שגיאה בטעינת חשבונות מסחר: ${response.status} ${response.statusText}`;
-                if (window.NotificationSystem) {
-                    window.NotificationSystem.showError('שגיאה בטעינת נתונים', errorMsg);
-                }
+            } catch (error) {
                 if (window.Logger) {
-                    window.Logger.error('❌ Failed to load trading accounts', { page: 'portfolio-state-page', status: response.status, statusText: response.statusText });
+                    window.Logger.error('❌ Error in direct API call for trading accounts', { page: 'portfolio-state-page', error });
                 }
             }
         }
@@ -172,7 +334,7 @@ async function loadTradingAccounts() {
         }
         
         // Populate account filter menu
-        populateAccountFilterMenu();
+        await populateAccountFilterMenu();
     } catch (error) {
         if (window.Logger) {
             window.Logger.error('❌ Error loading trading accounts', { page: 'portfolio-state-page', error });
@@ -181,8 +343,9 @@ async function loadTradingAccounts() {
 }
 
 // Populate account filter menu (extracted for reuse)
-function populateAccountFilterMenu() {
-    const accountMenu = document.getElementById('accountFilterMenu');
+async function populateAccountFilterMenu() {
+    try {
+        const accountMenu = document.getElementById('accountFilterMenu');
         if (accountMenu) {
             // Remove all items except "הכול"
             const existingItems = accountMenu.querySelectorAll('.account-filter-item:not([data-value="הכול"])');
@@ -198,7 +361,10 @@ function populateAccountFilterMenu() {
                 // Use account ID as data-value (same as header system)
                 accountItem.setAttribute('data-value', account.id.toString());
                 accountItem.setAttribute('data-onclick', `window.portfolioStatePage.selectAccountOption('${account.id.toString()}')`);
-                accountItem.innerHTML = `<span class="option-text">${account.name}</span>`;
+                const optionText = document.createElement('span');
+                optionText.className = 'option-text';
+                optionText.textContent = account.name;
+                accountItem.appendChild(optionText);
                 accountMenu.appendChild(accountItem);
                 if (window.Logger) {
                     window.Logger.info(`✅ Added account to menu: ${account.name} (ID: ${account.id})`, { page: 'portfolio-state-page' });
@@ -211,10 +377,81 @@ function populateAccountFilterMenu() {
                 window.Logger.info(`📋 Total items in menu: ${allItems.length} (should be ${allTradingAccounts.length + 1} including "הכול")`, { page: 'portfolio-state-page' });
             }
             
-            // Select all accounts by default (select "הכול")
-            const allItem = accountMenu.querySelector('.account-filter-item[data-value="הכול"]');
-            if (allItem) {
-                allItem.classList.add('selected');
+            // Set default account from preferences (same as other pages)
+            try {
+                let defaultAccountId = null;
+                
+                // Get default account from PreferencesCore (single source of truth)
+                if (window.PreferencesCore && typeof window.PreferencesCore.getPreference === 'function') {
+                    try {
+                        const prefValue = await window.PreferencesCore.getPreference('default_trading_account');
+                        if (prefValue) {
+                            // Handle different value types
+                            let accountId = null;
+                            if (typeof prefValue === 'object' && prefValue !== null) {
+                                accountId = prefValue.id || prefValue.value || null;
+                            } else {
+                                const parsed = parseInt(prefValue);
+                                if (!isNaN(parsed)) {
+                                    accountId = parsed;
+                                }
+                            }
+                            
+                            if (accountId) {
+                                defaultAccountId = accountId;
+                                if (window.Logger) {
+                                    window.Logger.info(`✅ Got default account from preferences: ${defaultAccountId}`, { page: 'portfolio-state-page' });
+                                }
+                            }
+                        }
+                    } catch (e) {
+                        if (window.Logger) {
+                            window.Logger.warn('⚠️ Error getting default account from PreferencesCore', { page: 'portfolio-state-page', error: e });
+                        }
+                    }
+                }
+                
+                // Select default account if found and exists in menu
+                if (defaultAccountId) {
+                    const defaultItem = accountMenu.querySelector(`.account-filter-item[data-value="${defaultAccountId}"]`);
+                    if (defaultItem) {
+                        // Remove selected from "הכול"
+                        const allItem = accountMenu.querySelector('.account-filter-item[data-value="הכול"]');
+                        if (allItem) {
+                            allItem.classList.remove('selected');
+                        }
+                        // Select default account
+                        defaultItem.classList.add('selected');
+                        if (window.Logger) {
+                            window.Logger.info(`✅ Selected default account from preferences (ID: ${defaultAccountId})`, { page: 'portfolio-state-page' });
+                        }
+                    } else {
+                        // Default account not in list, select "הכול"
+                        const allItem = accountMenu.querySelector('.account-filter-item[data-value="הכול"]');
+                        if (allItem) {
+                            allItem.classList.add('selected');
+                        }
+                        // Don't show warning - this is expected behavior when account doesn't exist in menu
+                        if (window.Logger) {
+                            window.Logger.debug(`Default account ${defaultAccountId} not found in menu, selecting "הכול"`, { page: 'portfolio-state-page' });
+                        }
+                    }
+                } else {
+                    // No default preference, select "הכול" by default
+                    const allItem = accountMenu.querySelector('.account-filter-item[data-value="הכול"]');
+                    if (allItem) {
+                        allItem.classList.add('selected');
+                    }
+                }
+            } catch (error) {
+                if (window.Logger) {
+                    window.Logger.warn('⚠️ Error setting default account', { page: 'portfolio-state-page', error });
+                }
+                // Fallback: select "הכול"
+                const allItem = accountMenu.querySelector('.account-filter-item[data-value="הכול"]');
+                if (allItem) {
+                    allItem.classList.add('selected');
+                }
             }
             
             // Update filter text
@@ -239,7 +476,11 @@ function populateAccountFilterMenu() {
 function loadInvestmentTypes() {
     const investmentSelect = document.getElementById('filterInvestmentType');
     if (investmentSelect) {
-        investmentSelect.innerHTML = '<option value="">הכל</option>';
+        investmentSelect.textContent = '';
+        const defaultOption = document.createElement('option');
+        defaultOption.value = '';
+        defaultOption.textContent = 'הכל';
+        investmentSelect.appendChild(defaultOption);
         INVESTMENT_TYPES.forEach(type => {
             const option = document.createElement('option');
             option.value = type.value;
@@ -250,54 +491,39 @@ function loadInvestmentTypes() {
 }
 
 // Toggle account filter menu (same as header system)
+// Use FilterManager from header-system instead of local implementation
 function toggleAccountFilterMenu() {
+    if (window.headerSystem && window.headerSystem.filterManager) {
+        window.headerSystem.filterManager.toggleFilter('accountFilterMenu');
+    } else {
+        // Fallback if FilterManager not available
     const menu = document.getElementById('accountFilterMenu');
     if (menu) {
-        const isCurrentlyOpen = menu.classList.contains('show');
-        if (isCurrentlyOpen) {
-            menu.classList.remove('show');
-        } else {
-            // Close date range menu if open
-            const dateMenu = document.getElementById('dateRangeFilterMenu');
-            if (dateMenu) {
-                dateMenu.classList.remove('show');
-            }
-            menu.classList.add('show');
+            menu.classList.toggle('show');
         }
     }
 }
 
-// Toggle date range filter menu (same as header system)
+// Use FilterManager from header-system instead of local implementation
 function toggleDateRangeFilterMenu() {
+    if (window.headerSystem && window.headerSystem.filterManager) {
+        window.headerSystem.filterManager.toggleFilter('dateRangeFilterMenu');
+    } else {
+        // Fallback if FilterManager not available
     const menu = document.getElementById('dateRangeFilterMenu');
     if (menu) {
-        const isCurrentlyOpen = menu.classList.contains('show');
-        if (isCurrentlyOpen) {
-            menu.classList.remove('show');
-        } else {
-            // Close account menu if open
-            const accountMenu = document.getElementById('accountFilterMenu');
-            if (accountMenu) {
-                accountMenu.classList.remove('show');
-            }
-            menu.classList.add('show');
+            menu.classList.toggle('show');
         }
     }
 }
 
-// Select date range option (same as header system)
+// Use FilterManager from header-system instead of local implementation
 function selectDateRangeOption(dateRange) {
-    const dateRangeItems = document.querySelectorAll('#dateRangeFilterMenu .date-range-filter-item');
-    dateRangeItems.forEach(item => item.classList.remove('selected'));
-    
-    const clickedItem = Array.from(dateRangeItems).find(
-        item => item.getAttribute('data-value') === dateRange
-    );
-    if (clickedItem) {
-        clickedItem.classList.add('selected');
-    }
-    
-    // Show/hide custom date range inputs
+    // Use global FilterManager function if available
+    if (window.selectDateRangeOption && typeof window.selectDateRangeOption === 'function') {
+        window.selectDateRangeOption(dateRange);
+        
+        // Handle custom date range inputs (page-specific)
     const customInputs = document.getElementById('customDateRangeInputs');
     if (dateRange === 'מותאם אישית') {
         if (customInputs) {
@@ -310,10 +536,24 @@ function selectDateRangeOption(dateRange) {
             const fromInput = document.getElementById('customDateFrom');
             const toInput = document.getElementById('customDateTo');
             if (fromInput && !fromInput.value) {
-                fromInput.value = weekAgo.toISOString().split('T')[0];
+                const weekAgoStr = weekAgo.toISOString().split('T')[0];
+                if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+                  window.DataCollectionService.setValue(fromInput.id, weekAgoStr, 'dateOnly');
+                } else {
+                  fromInput.value = weekAgoStr;
+                }
             }
             if (toInput && !toInput.value) {
-                toInput.value = today.toISOString().split('T')[0];
+                if (window.DefaultValueSetter && typeof window.DefaultValueSetter.setCurrentDate === 'function') {
+                    window.DefaultValueSetter.setCurrentDate(toInput.id);
+                } else {
+                    const todayStr = today.toISOString().split('T')[0];
+                    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+                        window.DataCollectionService.setValue(toInput.id, todayStr, 'dateOnly');
+                    } else {
+                        toInput.value = todayStr;
+                    }
+                }
             }
         }
     } else {
@@ -322,24 +562,42 @@ function selectDateRangeOption(dateRange) {
         }
     }
     
-    updateDateRangeFilterText();
-    
-    // Close menu
-    const dateMenu = document.getElementById('dateRangeFilterMenu');
-    if (dateMenu) {
-        dateMenu.classList.remove('show');
-    }
-    
-    // Apply filters (only if not custom range - custom range applies on input change)
+        // Apply filters (only if not custom range - custom range applies on input change)
+        if (dateRange !== 'מותאם אישית') {
+            applyFilters();
+        }
+    } else {
+        // Fallback to local implementation if FilterManager not available
+        const dateRangeItems = document.querySelectorAll('#dateRangeFilterMenu .date-range-filter-item');
+        dateRangeItems.forEach(item => item.classList.remove('selected'));
+        
+        const clickedItem = Array.from(dateRangeItems).find(
+            item => item.getAttribute('data-value') === dateRange
+        );
+        if (clickedItem) {
+            clickedItem.classList.add('selected');
+        }
+        
+        updateDateRangeFilterText();
     if (dateRange !== 'מותאם אישית') {
         applyFilters();
+        }
     }
 }
 
 // Handle custom date from change
 function handleCustomDateFromChange() {
-    const fromDate = document.getElementById('customDateFrom')?.value;
-    const toDate = document.getElementById('customDateTo')?.value;
+    // Use DataCollectionService to get values if available
+    let fromDate, toDate;
+    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) {
+      fromDate = window.DataCollectionService.getValue('customDateFrom', 'dateOnly', '');
+      toDate = window.DataCollectionService.getValue('customDateTo', 'dateOnly', '');
+    } else {
+      const fromDateEl = document.getElementById('customDateFrom');
+      const toDateEl = document.getElementById('customDateTo');
+      fromDate = fromDateEl ? fromDateEl.value : '';
+      toDate = toDateEl ? toDateEl.value : '';
+    }
     
     // Only apply if both dates are set
     if (fromDate && toDate) {
@@ -349,8 +607,17 @@ function handleCustomDateFromChange() {
 
 // Handle custom date to change
 function handleCustomDateToChange() {
-    const fromDate = document.getElementById('customDateFrom')?.value;
-    const toDate = document.getElementById('customDateTo')?.value;
+    // Use DataCollectionService to get values if available
+    let fromDate, toDate;
+    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) {
+      fromDate = window.DataCollectionService.getValue('customDateFrom', 'dateOnly', '');
+      toDate = window.DataCollectionService.getValue('customDateTo', 'dateOnly', '');
+    } else {
+      const fromDateEl = document.getElementById('customDateFrom');
+      const toDateEl = document.getElementById('customDateTo');
+      fromDate = fromDateEl ? fromDateEl.value : '';
+      toDate = toDateEl ? toDateEl.value : '';
+    }
     
     // Only apply if both dates are set
     if (fromDate && toDate) {
@@ -360,8 +627,17 @@ function handleCustomDateToChange() {
 
 // Apply custom date range
 function applyCustomDateRange() {
-    const fromDate = document.getElementById('customDateFrom')?.value;
-    const toDate = document.getElementById('customDateTo')?.value;
+    // Use DataCollectionService to get values if available
+    let fromDate, toDate;
+    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) {
+      fromDate = window.DataCollectionService.getValue('customDateFrom', 'dateOnly', '');
+      toDate = window.DataCollectionService.getValue('customDateTo', 'dateOnly', '');
+    } else {
+      const fromDateEl = document.getElementById('customDateFrom');
+      const toDateEl = document.getElementById('customDateTo');
+      fromDate = fromDateEl ? fromDateEl.value : '';
+      toDate = toDateEl ? toDateEl.value : '';
+    }
     
     if (fromDate && toDate) {
         // Update filter text
@@ -380,18 +656,43 @@ function applyCustomDateRange() {
 }
 
 // Update date range filter text (same as header system)
+// Use FilterManager from header-system instead of local implementation
 function updateDateRangeFilterText() {
+    // Use global FilterManager function if available
+    if (window.updateDateRangeFilterText && typeof window.updateDateRangeFilterText === 'function') {
+        window.updateDateRangeFilterText();
+        
+        // Handle custom date range display (page-specific)
     const selectedItem = document.querySelector('#dateRangeFilterMenu .date-range-filter-item.selected');
     const dateElement = document.getElementById('selectedDateRange');
     
     if (dateElement && selectedItem) {
         const range = selectedItem.getAttribute('data-value');
-        
-        // Handle custom date range
         if (range === 'מותאם אישית') {
             const fromDate = document.getElementById('customDateFrom')?.value;
             const toDate = document.getElementById('customDateTo')?.value;
             
+            if (fromDate && toDate) {
+                const formatDate = (dateStr) => {
+                    const date = new Date(dateStr);
+                    return date.toLocaleDateString('he-IL', { year: 'numeric', month: '2-digit', day: '2-digit' });
+                };
+                dateElement.textContent = `${formatDate(fromDate)} - ${formatDate(toDate)}`;
+            } else {
+                dateElement.textContent = 'מותאם אישית';
+            }
+            }
+        }
+    } else {
+        // Fallback to local implementation if FilterManager not available
+        const selectedItem = document.querySelector('#dateRangeFilterMenu .date-range-filter-item.selected');
+        const dateElement = document.getElementById('selectedDateRange');
+        
+        if (dateElement && selectedItem) {
+            const range = selectedItem.getAttribute('data-value');
+            if (range === 'מותאם אישית') {
+                const fromDate = document.getElementById('customDateFrom')?.value;
+                const toDate = document.getElementById('customDateTo')?.value;
             if (fromDate && toDate) {
                 const formatDate = (dateStr) => {
                     const date = new Date(dateStr);
@@ -408,10 +709,12 @@ function updateDateRangeFilterText() {
         }
     } else if (dateElement) {
         dateElement.textContent = 'היום'; // Default
+        }
     }
 }
 
 // Get date range (returns start and end dates based on selected range)
+// Use translateDateRangeToDates or DateRangePickerService instead of local implementation
 function getDateRange() {
     const selectedItem = document.querySelector('#dateRangeFilterMenu .date-range-filter-item.selected');
     if (!selectedItem) {
@@ -432,13 +735,43 @@ function getDateRange() {
             end.setHours(23, 59, 59, 999);
             return { start, end, range: 'מותאם אישית' };
         } else {
-            // If custom range not set, default to today
             const today = new Date();
             today.setHours(0, 0, 0, 0);
             return { start: today, end: today, range: 'מותאם אישית' };
         }
     }
     
+    // Use translateDateRangeToDates if available (general system)
+    if (window.translateDateRangeToDates && typeof window.translateDateRangeToDates === 'function') {
+        try {
+            const dateRange = window.translateDateRangeToDates(range);
+            if (dateRange && dateRange.startDate && dateRange.endDate) {
+                let start = null;
+                let end = null;
+                
+                // Handle DateEnvelope objects
+                if (typeof dateRange.startDate === 'object' && (dateRange.startDate.epochMs || dateRange.startDate.utc)) {
+                    start = dateRange.startDate.epochMs ? new Date(dateRange.startDate.epochMs) : new Date(dateRange.startDate.utc);
+                } else {
+                    start = new Date(dateRange.startDate);
+                }
+                start.setHours(0, 0, 0, 0);
+                
+                if (typeof dateRange.endDate === 'object' && (dateRange.endDate.epochMs || dateRange.endDate.utc)) {
+                    end = dateRange.endDate.epochMs ? new Date(dateRange.endDate.epochMs) : new Date(dateRange.endDate.utc);
+                } else {
+                    end = new Date(dateRange.endDate);
+                }
+                end.setHours(23, 59, 59, 999);
+                
+                return { start, end, range };
+            }
+        } catch (error) {
+            window.Logger?.warn('Error using translateDateRangeToDates, falling back to local implementation', { error, page: 'portfolio-state-page' });
+        }
+    }
+    
+    // Fallback to local implementation if general system not available
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     
@@ -448,29 +781,24 @@ function getDateRange() {
     switch (range) {
         case 'כל זמן':
             return { start: null, end: null, range };
-            
         case 'היום':
             start = new Date(today);
             break;
-            
         case 'אתמול':
             start = new Date(today);
             start.setDate(today.getDate() - 1);
             end = new Date(start);
             break;
-            
         case 'השבוע': {
-            const dayOfWeek = today.getDay(); // 0 = Sunday, 6 = Saturday
+            const dayOfWeek = today.getDay();
             start = new Date(today);
             start.setDate(today.getDate() - dayOfWeek);
             break;
         }
-        
         case 'שבוע':
             start = new Date(today);
             start.setDate(today.getDate() - 7);
             break;
-            
         case 'שבוע קודם': {
             const dayOfWeek = today.getDay();
             const lastWeekEnd = new Date(today);
@@ -482,17 +810,14 @@ function getDateRange() {
             start.setHours(0, 0, 0, 0);
             break;
         }
-        
         case 'החודש': {
             start = new Date(today.getFullYear(), today.getMonth(), 1);
             break;
         }
-        
         case 'חודש':
             start = new Date(today);
             start.setDate(today.getDate() - 30);
             break;
-            
         case 'חודש קודם': {
             const lastMonthStart = new Date(today.getFullYear(), today.getMonth() - 1, 1);
             const lastMonthEnd = new Date(today.getFullYear(), today.getMonth(), 0);
@@ -501,17 +826,14 @@ function getDateRange() {
             end.setHours(23, 59, 59, 999);
             break;
         }
-        
         case 'השנה': {
             start = new Date(today.getFullYear(), 0, 1);
             break;
         }
-        
         case 'שנה':
             start = new Date(today);
             start.setDate(today.getDate() - 365);
             break;
-            
         case 'שנה קודמת': {
             const lastYearStart = new Date(today.getFullYear() - 1, 0, 1);
             const lastYearEnd = new Date(today.getFullYear() - 1, 11, 31);
@@ -532,7 +854,7 @@ function getDateRange() {
     return { start, end, range };
 }
 
-// Check if date is in range
+// Use getDateRange() which now uses translateDateRangeToDates
 function isDateInRange(dateString, dateRange) {
     if (!dateString || !dateRange || dateRange === 'כל זמן') {
         return true;
@@ -558,8 +880,15 @@ function isDateInRange(dateString, dateRange) {
     return true;
 }
 
-// Select account option (same as header system)
+// Use FilterManager from header-system instead of local implementation
 function selectAccountOption(account) {
+    // Use global FilterManager function if available
+    if (window.selectAccountOption && typeof window.selectAccountOption === 'function') {
+        window.selectAccountOption(account);
+        // Apply page-specific filters
+        applyFilters();
+    } else {
+        // Fallback to local implementation if FilterManager not available
     const accountStr = account.toString();
     const accountItems = document.querySelectorAll('#accountFilterMenu .account-filter-item');
     const clickedItem = Array.from(accountItems).find(
@@ -591,19 +920,21 @@ function selectAccountOption(account) {
     }
     
     updateAccountFilterText();
-    
-    // Close menu
     const accountMenu = document.getElementById('accountFilterMenu');
     if (accountMenu) {
         accountMenu.classList.remove('show');
     }
-    
-    // Apply filters
     applyFilters();
+    }
 }
 
-// Update account filter text (same as header system)
+// Use FilterManager from header-system instead of local implementation
 function updateAccountFilterText() {
+    // Use global FilterManager function if available
+    if (window.updateAccountFilterText && typeof window.updateAccountFilterText === 'function') {
+        window.updateAccountFilterText();
+    } else {
+        // Fallback to local implementation if FilterManager not available
     const selectedItems = document.querySelectorAll('#accountFilterMenu .account-filter-item.selected');
     const accountElement = document.getElementById('selectedAccount');
     
@@ -617,6 +948,7 @@ function updateAccountFilterText() {
             accountElement.textContent = displayText;
         } else {
             accountElement.textContent = `${selectedItems.length} חשבונות`;
+            }
         }
     }
 }
@@ -741,9 +1073,30 @@ function filterTrades(dateRange, selectedAccounts, investmentType) {
     updateTradesTable();
 }
 
-// Clear filters
+// Clear filters - use FilterManager if available
 function clearFilters() {
-    // Reset date range to "היום" (today) - same as header system
+    // Use FilterManager from header-system if available
+    if (window.headerSystem && window.headerSystem.filterManager) {
+        // Reset date range to "היום" (today)
+        window.headerSystem.filterManager.currentFilters.dateRange = 'היום';
+        window.headerSystem.filterManager.selectDateRangeOption('היום');
+        
+        // Select "הכול" (all accounts)
+        window.headerSystem.filterManager.currentFilters.account = [];
+        window.headerSystem.filterManager.selectAccountOption('הכול');
+        
+        // Reset investment type (page-specific filter)
+        if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+            window.DataCollectionService.setValue('filterInvestmentType', '', 'text');
+        } else {
+            const filterEl = document.getElementById('filterInvestmentType');
+            if (filterEl) filterEl.value = '';
+        }
+        
+        // Apply filters to reload data
+        applyFilters();
+    } else {
+        // Fallback to local implementation if FilterManager not available
     const dateRangeItems = document.querySelectorAll('#dateRangeFilterMenu .date-range-filter-item');
     dateRangeItems.forEach(item => item.classList.remove('selected'));
     const todayItem = document.querySelector('#dateRangeFilterMenu .date-range-filter-item[data-value="היום"]');
@@ -752,7 +1105,6 @@ function clearFilters() {
     }
     updateDateRangeFilterText();
     
-    // Select "הכול" (all accounts) - same as header system
     const accountItems = document.querySelectorAll('#accountFilterMenu .account-filter-item');
     accountItems.forEach(item => item.classList.remove('selected'));
     const allItem = document.querySelector('#accountFilterMenu .account-filter-item[data-value="הכול"]');
@@ -760,24 +1112,33 @@ function clearFilters() {
         allItem.classList.add('selected');
     }
     
-    // Reset investment type
-    document.getElementById('filterInvestmentType').value = '';
+    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+      window.DataCollectionService.setValue('filterInvestmentType', '', 'text');
+    } else {
+      const filterEl = document.getElementById('filterInvestmentType');
+      if (filterEl) filterEl.value = '';
+    }
     
-    // Update filter texts
     updateAccountFilterText();
-    
-    // Apply filters to reload data
     applyFilters();
+    }
 }
 
-// Helper function to render numeric value (fallback)
+/**
+ * Helper function to render numeric value - משתמש ב-FieldRendererService המרכזי
+ * @deprecated - השתמש ישירות ב-window.FieldRendererService.renderNumericValue()
+ * @param {*} value - ערך מספרי
+ * @param {string} suffix - סיומת (%, $, וכו')
+ * @param {boolean} showSign - להציג + לחיובי
+ * @returns {string} HTML מעוצב
+ */
 function renderNumericValue(value, suffix = '%', showSign = true) {
+    // שימוש ישיר ב-FieldRendererService - המערכת תמיד זמינה דרך BASE package
     if (window.FieldRendererService?.renderNumericValue) {
         return window.FieldRendererService.renderNumericValue(value, suffix, showSign);
     }
-    const sign = showSign && value >= 0 ? '+' : '';
-    const colorClass = value >= 0 ? 'text-success' : value < 0 ? 'text-danger' : 'text-muted';
-    return `<span class="${colorClass}">${sign}${value.toFixed(2)}${suffix}</span>`;
+    // Fallback מינימלי למקרה נדיר ביותר שהמערכת לא זמינה
+    return '<span class="numeric-value-zero">-</span>';
 }
 
 // Load chart default period from preferences
@@ -866,7 +1227,14 @@ function showLoadingState(componentId) {
         if (!component.querySelector('.loading-spinner')) {
             const spinner = document.createElement('div');
             spinner.className = 'loading-spinner';
-            spinner.innerHTML = '<div class="spinner-border spinner-border-sm" role="status"><span class="visually-hidden">טוען...</span></div>';
+            const spinnerInner = document.createElement('div');
+            spinnerInner.className = 'spinner-border spinner-border-sm';
+            spinnerInner.setAttribute('role', 'status');
+            const spinnerText = document.createElement('span');
+            spinnerText.className = 'visually-hidden';
+            spinnerText.textContent = 'טוען...';
+            spinnerInner.appendChild(spinnerText);
+            spinner.appendChild(spinnerInner);
             component.appendChild(spinner);
         }
     }
@@ -885,11 +1253,304 @@ function hideLoadingState(componentId) {
 }
 
 // Load portfolio state
+/**
+ * Check if portfolio state data is complete (historical prices for all tickers)
+ * Similar to checkTickerDataCompleteness in ticker-dashboard
+ * @param {Array} positions - Array of positions from portfolio state
+ * @returns {Promise<Object>} Completeness check result
+ */
+async function checkPortfolioDataCompleteness(positions) {
+    if (!Array.isArray(positions) || positions.length === 0) {
+        return {
+            complete: true,
+            totalPositions: 0,
+            positionsWithData: 0,
+            positionsNeedingData: [],
+            missingTickers: []
+        };
+    }
+
+    const result = {
+        complete: true,
+        totalPositions: positions.length,
+        positionsWithData: 0,
+        positionsNeedingData: [],
+        missingTickers: []
+    };
+
+    // Check each position for market price availability
+    for (const position of positions) {
+        const tickerId = position.ticker_id;
+        const tickerSymbol = position.ticker_symbol;
+        
+        // Check if market price is available
+        const hasMarketPrice = position.market_price !== null && position.market_price !== undefined;
+        
+        if (!hasMarketPrice) {
+            result.complete = false;
+            result.positionsNeedingData.push({
+                tickerId,
+                tickerSymbol,
+                accountId: position.trading_account_id,
+                reason: 'missing_market_price'
+            });
+            result.missingTickers.push(tickerId);
+        } else {
+            result.positionsWithData++;
+        }
+    }
+
+    return result;
+}
+
+/**
+ * Ensure historical data is available for portfolio state calculations
+ * Similar to ensureHistoricalDataForTickers in tickers.js and fetchDataFromProvider in ticker-dashboard
+ * Follows the same pattern: check missing data → show UI → load only missing → save to DB/cache → re-check → render
+ * @param {Array} positions - Array of positions from portfolio state
+ * @param {Object} options - Options (silent, showProgress)
+ * @returns {Promise<Array>} Array of positions with data
+ */
+async function ensurePortfolioHistoricalData(positions, options = {}) {
+    const { silent = false, showProgress = true } = options;
+
+    if (!Array.isArray(positions) || positions.length === 0) {
+        return positions;
+    }
+
+    // === EOD INTEGRATION: Try EOD first ===
+    const selectedItem = document.querySelector('#dateRangeFilterMenu .date-range-filter-item.selected');
+    const dateRange = selectedItem ? selectedItem.getAttribute('data-value') : 'היום';
+    const dateRangeObj = getDateRange(dateRange);
+
+    if (dateRangeObj && dateRangeObj.start && dateRangeObj.end) {
+        try {
+            // Load EOD positions data for the date range
+            const eodResult = await window.EODIntegrationHelper.loadEODPositions(
+                null, // global user
+                {
+                    date_from: dateRangeObj.start.toISOString().split('T')[0],
+                    date_to: dateRangeObj.end.toISOString().split('T')[0]
+                }
+            );
+
+            if (eodResult && eodResult.data && Array.isArray(eodResult.data) && eodResult.data.length > 0) {
+                if (window.Logger) {
+                    window.Logger.info('✅ Using EOD data for positions', {
+                        page: 'portfolio-state-page',
+                        recordCount: eodResult.data.length
+                    });
+                }
+
+                // Transform EOD data to expected format for charts
+                const enrichedPositions = positions.map(position => {
+                    // Find matching EOD record
+                    const eodRecord = eodResult.data.find(eod =>
+                        eod.ticker_id === position.ticker_id &&
+                        eod.date_utc === dateRangeObj.end.toISOString().split('T')[0]
+                    );
+
+                    if (eodRecord) {
+                        return {
+                            ...position,
+                            // Use EOD data
+                            market_value: eodRecord.market_value,
+                            unrealized_pl_amount: eodRecord.unrealized_pl_amount,
+                            unrealized_pl_percent: eodRecord.unrealized_pl_percent,
+                            close_price: eodRecord.close_price,
+                            price_source: eodRecord.price_source
+                        };
+                    }
+                    return position;
+                });
+
+                return enrichedPositions;
+            }
+        } catch (eodError) {
+            if (window.Logger) {
+                window.Logger.warn('⚠️ EOD positions data not available, falling back to external data', {
+                    page: 'portfolio-state-page',
+                    error: eodError.message
+                });
+            }
+            // Continue with external data service - no fallback mock data
+        }
+    }
+
+    // === FALLBACK: Use ExternalDataService (only if EOD fails) ===
+    if (!window.ExternalDataService) {
+        window.Logger?.warn?.('ExternalDataService not available, skipping historical data loading', { page: 'portfolio-state-page' });
+        return positions;
+    }
+
+    // Step 0: Check what data is missing before loading (like ticker-dashboard)
+    if (window.Logger) {
+        window.Logger.info('🔍 Step 0: Checking what data is missing...', { page: 'portfolio-state-page' });
+    }
+    
+    let missingDataInfo = null;
+    try {
+        // Check missing data via API endpoint (same as ticker-dashboard)
+        const missingDataResponse = await fetch(`/api/external-data/status/tickers/missing-data`);
+        if (missingDataResponse.ok) {
+            const missingDataResult = await missingDataResponse.json();
+            const allMissingTickers = [
+                ...(missingDataResult?.data?.tickers_missing_current || []),
+                ...(missingDataResult?.data?.tickers_missing_historical || []),
+                ...(missingDataResult?.data?.tickers_missing_indicators || [])
+            ];
+            
+            // Get unique ticker IDs from positions
+            const positionTickerIds = [...new Set(positions.map(p => p.ticker_id).filter(id => id))];
+            missingDataInfo = allMissingTickers.filter(t => positionTickerIds.includes(t.id));
+            
+            if (window.Logger) {
+                window.Logger.info('📊 Missing data check completed', { 
+                    totalPositions: positions.length,
+                    needsRefresh: missingDataInfo.length > 0,
+                    missingTickersCount: missingDataInfo.length,
+                    page: 'portfolio-state-page' 
+                });
+            }
+        }
+    } catch (checkError) {
+        if (window.Logger) {
+            window.Logger.warn('⚠️ Could not check missing data, will refresh all data', { 
+                error: checkError.message, 
+                page: 'portfolio-state-page' 
+            });
+        }
+        // Continue with full refresh if check fails
+    }
+    
+    // Also check completeness locally
+    const completeness = await checkPortfolioDataCompleteness(positions);
+    
+    // If all data is fresh, skip refresh
+    if (completeness.complete && (!missingDataInfo || missingDataInfo.length === 0)) {
+        if (!silent) {
+            window.Logger?.info?.('✅ All portfolio positions have market data', { 
+                count: positions.length, 
+                page: 'portfolio-state-page' 
+            });
+        }
+        return positions;
+    }
+
+    const overlayId = 'portfolio-state-ensure-historical';
+    const uniqueTickerIds = [...new Set(completeness.missingTickers)];
+    const totalSteps = uniqueTickerIds.length;
+    let progressStep = 0;
+
+    if (showProgress && window.UnifiedProgressManager) {
+        // Create overlay with proper steps (like ticker-dashboard)
+        const steps = [];
+        const descriptions = [];
+        
+        // Determine what needs to be loaded based on missing data check
+        const needsQuote = missingDataInfo?.some(t => t.reason === 'missing_current_quote' || t.reason === 'insufficient_historical_data') || completeness.positionsNeedingData.length > 0;
+        const needsHistorical = missingDataInfo?.some(t => t.reason === 'insufficient_historical_data') || false;
+        
+        if (needsQuote) {
+            steps.push('טוען מחיר נוכחי');
+            descriptions.push('מתחבר לספק הנתונים החיצוני, טוען מחיר נוכחי...');
+        }
+        if (needsHistorical) {
+            steps.push('טוען נתונים היסטוריים');
+            descriptions.push('טוען 150 ימים של נתונים היסטוריים...');
+        }
+        steps.push('מסיים טעינה');
+        descriptions.push('מסיים את התהליך...');
+        
+        window.UnifiedProgressManager.createOverlay(overlayId, {
+            title: 'טוען נתוני שוק עבור תיק',
+            totalSteps: steps.length,
+            stepLabels: steps,
+            stepDescriptions: descriptions
+        });
+        window.UnifiedProgressManager.showProgress(overlayId, 1, 'בודק נתונים', `בודק ${totalSteps} טיקרים...`);
+    }
+
+    // Step 1: Load market data for tickers that need it (optimized - only missing data)
+    if (window.Logger) {
+        window.Logger.info('📊 Step 1: Refreshing only missing ticker data using ExternalDataService...', { 
+            totalTickers: uniqueTickerIds.length,
+            page: 'portfolio-state-page' 
+        });
+    }
+    
+    if (showProgress && window.UnifiedProgressManager) {
+        window.UnifiedProgressManager.showProgress(
+            overlayId,
+            1,
+            `טוען נתונים עבור ${uniqueTickerIds.length} טיקרים...`,
+            'מתחבר לספק הנתונים החיצוני...'
+        );
+    }
+
+    const positionsWithData = [...positions];
+
+    for (let i = 0; i < uniqueTickerIds.length; i++) {
+        const tickerId = uniqueTickerIds[i];
+        progressStep++;
+
+        // Find ticker info from missing data check
+        const tickerInfo = missingDataInfo?.find(t => t.id === tickerId);
+        const needsQuote = tickerInfo?.reason === 'missing_current_quote' || tickerInfo?.reason === 'insufficient_historical_data' || !tickerInfo;
+        const needsHistorical = tickerInfo?.reason === 'insufficient_historical_data' || false;
+
+        if (showProgress && window.UnifiedProgressManager) {
+            const percentage = Math.round((progressStep / totalSteps) * 100);
+            window.UnifiedProgressManager.updateProgress(overlayId, percentage, `טוען נתוני שוק עבור טיקר ${progressStep}/${totalSteps}`);
+        }
+
+        try {
+            // Use ExternalDataService.refreshTickerData() - optimized to load only missing data
+            // Backend will check what's missing and load only what's needed (like ticker-dashboard)
+            const refreshedData = await window.ExternalDataService.refreshTickerData(tickerId, {
+                forceRefresh: false, // Let backend decide what to load
+                includeHistorical: needsHistorical ? true : undefined, // Only if needed
+                daysBack: needsHistorical ? 150 : undefined // Only if needed
+            });
+
+            if (window.Logger) {
+                window.Logger.info('✅ Ticker data refreshed successfully (optimized)', { 
+                    tickerId, 
+                    hasPrice: !!refreshedData?.price,
+                    hasHistorical: !!refreshedData?.historical_quotes_count,
+                    page: 'portfolio-state-page' 
+                });
+            }
+        } catch (error) {
+            window.Logger?.warn?.('Failed to load market data for ticker', {
+                tickerId,
+                error: error.message,
+                page: 'portfolio-state-page'
+            });
+        }
+    }
+
+    if (showProgress && window.UnifiedProgressManager) {
+        window.UnifiedProgressManager.hideProgress(overlayId);
+    }
+
+    // Step 2: Data is saved to DB and cache by ExternalDataService
+    // Step 3: Re-check and render will be done by caller (loadTrades)
+    return positionsWithData;
+}
+
 async function loadPortfolioState() {
     const selectedItem = document.querySelector('#dateRangeFilterMenu .date-range-filter-item.selected');
     const dateRange = selectedItem ? selectedItem.getAttribute('data-value') : 'היום';
     const selectedAccounts = getSelectedAccounts();
-    const investmentType = document.getElementById('filterInvestmentType').value;
+    // Use DataCollectionService to get value if available
+    let investmentType;
+    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) {
+      investmentType = window.DataCollectionService.getValue('filterInvestmentType', 'text', '');
+    } else {
+      const investmentTypeEl = document.getElementById('filterInvestmentType');
+      investmentType = investmentTypeEl ? investmentTypeEl.value : '';
+    }
     
     // Show loading states
     showLoadingState('trades-table-section');
@@ -928,7 +1589,7 @@ async function loadPortfolioState() {
                 }
             }
         }
-        updateSummaryCards(summary);
+        await updateSummaryCards(summary);
         
         // Reload charts with filtered data (all three together in parallel)
         await Promise.all([
@@ -966,84 +1627,146 @@ async function loadTrades(dateRange, selectedAccounts, investmentType) {
             }
         }
         
-        // TODO (Stage 3.3 - Backend): Load from API endpoint /api/daily-snapshots/{date}/trades
-        // For now, using mock data
-        // In production, this should fetch from: /api/daily-snapshots/{date}/trades?account_id={accountId}&investment_type={investmentType}
-        // This requires:
-        // 1. Creating DailySnapshot model in Backend
-        // 2. Creating API endpoint /api/daily-snapshots/{date}/trades
-        // 3. Background job to create daily snapshots automatically
-        // 4. Replacing mock data with API call using safeApiCall()
-        allTrades = [
-            {
-                id: 1,
-                ticker_symbol: 'AAPL',
-                ticker_id: 1,
-                trading_account_id: 1,
-                account_name: 'Account #1',
-                current_price: 150.50,
-                daily_change: 2.5,
-                position_quantity: 100,
-                position_pl_percent: 6.67,
-                position_pl_value: 1000,
-                status: 'open',
-                investment_type: 'swing',
-                side: 'Long',
-                created_at: '2025-01-10',
-                closed_at: null
-            },
-            {
-                id: 2,
-                ticker_symbol: 'TSLA',
-                ticker_id: 2,
-                trading_account_id: 1,
-                account_name: 'Account #1',
-                current_price: 250.00,
-                daily_change: -1.2,
-                position_quantity: 50,
-                position_pl_percent: 4.00,
-                position_pl_value: 500,
-                status: 'open',
-                investment_type: 'day',
-                side: 'Long',
-                created_at: '2025-01-12',
-                closed_at: null
-            },
-            {
-                id: 3,
-                ticker_symbol: 'MSFT',
-                ticker_id: 3,
-                trading_account_id: 2,
-                account_name: 'Account #2',
-                current_price: 300.00,
-                daily_change: 0.5,
-                position_quantity: 200,
-                position_pl_percent: -3.33,
-                position_pl_value: -2000,
-                status: 'open',
-                investment_type: 'investment',
-                side: 'Short',
-                created_at: '2025-01-08',
-                closed_at: null
-            },
-            {
-                id: 4,
-                ticker_symbol: 'GOOGL',
-                ticker_id: 4,
-                trading_account_id: 2,
-                account_name: 'Account #2',
-                current_price: 140.00,
-                daily_change: 1.5,
-                position_quantity: 75,
-                position_pl_percent: 5.00,
-                position_pl_value: 525,
-                status: 'open',
-                investment_type: 'swing',
-                side: 'Long',
-                created_at: '2025-01-05',
-                closed_at: null
+        // Load portfolio state using PortfolioStateData service
+        // Wait for PortfolioStateData to be available (it's loaded in entity-services package)
+        if (!window.PortfolioStateData) {
+            if (window.Logger) {
+                window.Logger.info('⏳ Waiting for PortfolioStateData service to load...', { page: 'portfolio-state-page' });
             }
-        ];
+            await new Promise((resolve) => {
+                const checkInterval = setInterval(() => {
+                    if (window.PortfolioStateData) {
+                        clearInterval(checkInterval);
+                        if (window.Logger) {
+                            window.Logger.info('✅ PortfolioStateData service loaded', { page: 'portfolio-state-page' });
+                        }
+                        resolve();
+                    }
+                }, 100);
+                setTimeout(() => {
+                    clearInterval(checkInterval);
+                    if (window.Logger) {
+                        window.Logger.warn('⚠️ PortfolioStateData service not available after 5 seconds timeout', { page: 'portfolio-state-page' });
+                    }
+                    resolve();
+                }, 5000); // Timeout after 5 seconds
+            });
+        }
+
+        if (!window.PortfolioStateData || typeof window.PortfolioStateData.loadSnapshot !== 'function') {
+            const errorMsg = 'PortfolioStateData service not available. Please ensure portfolio-state-data.js is loaded.';
+            if (window.Logger) {
+                window.Logger.error(errorMsg, { 
+                    page: 'portfolio-state-page',
+                    PortfolioStateDataAvailable: !!window.PortfolioStateData,
+                    hasLoadSnapshot: typeof window.PortfolioStateData?.loadSnapshot === 'function'
+                });
+            }
+            if (window.NotificationSystem) {
+                window.NotificationSystem.showError('שגיאת טעינה', 'שירות נתוני מצב תיק לא זמין. נא לרענן את הדף.');
+            }
+            throw new Error(errorMsg);
+        }
+
+        // Get current date for snapshot
+        const today = new Date().toISOString().split('T')[0];
+        const accountId = Array.isArray(selectedAccounts) && selectedAccounts.length === 1 ? selectedAccounts[0] : null;
+        
+        // Load portfolio snapshot
+        const snapshot = await window.PortfolioStateData.loadSnapshot(accountId, today, {
+            include_closed: false
+        });
+
+        // Check and ensure historical data is available for all positions
+        // IMPORTANT: We try to load missing data from external provider BEFORE showing "לא זמין"
+        if (Array.isArray(snapshot?.positions) && snapshot.positions.length > 0) {
+            const completeness = await checkPortfolioDataCompleteness(snapshot.positions);
+            
+            if (!completeness.complete && completeness.positionsNeedingData.length > 0) {
+                if (window.Logger) {
+                    window.Logger.info('📊 Some positions missing market data, attempting to load from external provider...', {
+                        total: completeness.totalPositions,
+                        needingData: completeness.positionsNeedingData.length,
+                        missingTickers: completeness.missingTickers,
+                        page: 'portfolio-state-page'
+                    });
+                }
+                
+                // Show notification that we're trying to load data
+                if (window.NotificationSystem) {
+                    window.NotificationSystem.showInfo(
+                        'טוען נתונים',
+                        `מנסה לטעון נתוני שוק עבור ${completeness.positionsNeedingData.length} פוזיציות מהספק החיצוני...`
+                    );
+                }
+                
+                // Ensure historical data is loaded from external provider
+                await ensurePortfolioHistoricalData(snapshot.positions, {
+                    silent: false,
+                    showProgress: true
+                });
+                
+                // Reload snapshot after data refresh to get updated market prices
+                const refreshedSnapshot = await window.PortfolioStateData.loadSnapshot(accountId, today, {
+                    include_closed: false,
+                    force: true // Force refresh to get updated market prices
+                });
+                
+                if (refreshedSnapshot && Array.isArray(refreshedSnapshot.positions)) {
+                    snapshot.positions = refreshedSnapshot.positions;
+                    
+                    // Check again after refresh
+                    const finalCompleteness = await checkPortfolioDataCompleteness(refreshedSnapshot.positions);
+                    if (!finalCompleteness.complete) {
+                        if (window.NotificationSystem) {
+                            window.NotificationSystem.showWarning(
+                                'נתונים חלקיים',
+                                `לא הצלחנו לטעון נתוני שוק עבור ${finalCompleteness.positionsNeedingData.length} פוזיציות. חלק מהנתונים יוצגו כ"לא זמין".`
+                            );
+                        }
+                    } else {
+                        if (window.NotificationSystem) {
+                            window.NotificationSystem.showSuccess(
+                                'נתונים נטענו בהצלחה',
+                                'כל נתוני השוק נטענו מהספק החיצוני בהצלחה.'
+                            );
+                        }
+                    }
+                }
+            } else if (completeness.complete) {
+                if (window.Logger) {
+                    window.Logger.info('✅ All portfolio positions have market data', {
+                        total: completeness.totalPositions,
+                        page: 'portfolio-state-page'
+                    });
+                }
+            }
+        }
+
+        // Store snapshot for cash balance calculations
+        currentSnapshot = snapshot;
+
+        // Extract trades from snapshot positions
+        allTrades = Array.isArray(snapshot?.positions) ? snapshot.positions.map(position => ({
+            id: position.trade_id || position.id,
+            ticker_symbol: position.ticker_symbol || position.ticker?.symbol || '',
+            ticker_id: position.ticker_id || position.ticker?.id,
+            trading_account_id: position.account_id || position.trading_account_id,
+            account_name: position.account_name || `Account #${position.account_id || position.trading_account_id}`,
+            // No fallback values - use null if data not available
+            current_price: position.current_price !== null && position.current_price !== undefined 
+                ? position.current_price 
+                : (position.price !== null && position.price !== undefined ? position.price : null),
+            daily_change: position.daily_change !== null && position.daily_change !== undefined ? position.daily_change : null,
+            position_quantity: position.quantity !== null && position.quantity !== undefined ? position.quantity : null,
+            position_pl_percent: position.pl_percent !== null && position.pl_percent !== undefined ? position.pl_percent : null,
+            position_pl_value: position.pl_value !== null && position.pl_value !== undefined ? position.pl_value : null,
+            status: position.status || 'open',
+            investment_type: position.investment_type || '',
+            side: position.side || '',
+            created_at: position.created_at || '',
+            closed_at: position.closed_at || null
+        })) : [];
         
         // Save to cache
         if (allTrades && allTrades.length >= 0 && window.UnifiedCacheManager) {
@@ -1064,31 +1787,277 @@ async function loadTrades(dateRange, selectedAccounts, investmentType) {
     }
 }
 
+// Load trades for specific month and year
+async function loadTradesForMonthYear() {
+    const monthSelect = document.getElementById('tradesMonthSelect');
+    const yearSelect = document.getElementById('tradesYearSelect');
+    
+    if (!monthSelect || !yearSelect) {
+        if (window.NotificationSystem) {
+            window.NotificationSystem.showError('שגיאה', 'לא ניתן לטעון טריידים - שדות חודש ושנה לא נמצאו');
+        }
+        return;
+    }
+    
+    const month = parseInt(monthSelect.value);
+    const year = parseInt(yearSelect.value);
+    
+    if (!month || !year) {
+        if (window.NotificationSystem) {
+            window.NotificationSystem.showError('שגיאה', 'נא לבחור חודש ושנה');
+        }
+        return;
+    }
+    
+    // Calculate date range for the month
+    const startDate = new Date(year, month - 1, 1);
+    const endDate = new Date(year, month, 0); // Last day of the month
+    
+    const startDateStr = startDate.toISOString().split('T')[0];
+    const endDateStr = endDate.toISOString().split('T')[0];
+    
+    if (window.Logger) {
+        window.Logger.info('Loading trades for month/year', { month, year, startDate: startDateStr, endDate: endDateStr, page: 'portfolio-state-page' });
+    }
+    
+    try {
+        // Show loading state
+        showLoadingState('trades-table-section');
+        
+        // Load trades from API using date range
+        const selectedAccounts = getSelectedAccounts();
+        const accountId = Array.isArray(selectedAccounts) && selectedAccounts.length === 1 ? selectedAccounts[0] : null;
+        
+        // Use TradeHistoryData or direct API call
+        if (window.TradeHistoryData && typeof window.TradeHistoryData.loadTradeHistory === 'function') {
+            const filters = {
+                account_id: accountId,
+                start_date: startDateStr,
+                end_date: endDateStr
+            };
+            
+            const data = await window.TradeHistoryData.loadTradeHistory(filters);
+            allTrades = data.trades || [];
+        } else {
+            // Fallback to direct API call
+            const response = await fetch(`/api/trade-history/?account_id=${accountId || ''}&start_date=${startDateStr}&end_date=${endDateStr}`);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const result = await response.json();
+            allTrades = result.data?.trades || [];
+        }
+        
+        // Filter and render
+        filteredTrades = allTrades;
+        updateTradesTable();
+        updateTradesSummary(filteredTrades);
+        
+        if (window.NotificationSystem) {
+            window.NotificationSystem.showSuccess('טעינה הושלמה', `נטענו ${filteredTrades.length} טריידים לחודש ${month}/${year}`);
+        }
+    } catch (error) {
+        const errorMsg = `שגיאה בטעינת טריידים: ${error.message || 'שגיאה לא ידועה'}`;
+        if (window.NotificationSystem) {
+            window.NotificationSystem.showError('שגיאה בטעינת נתונים', errorMsg);
+        }
+        if (window.Logger) {
+            window.Logger.error('Error loading trades for month/year', { month, year, error, page: 'portfolio-state-page' });
+        }
+        allTrades = [];
+        filteredTrades = [];
+        updateTradesTable();
+    } finally {
+        hideLoadingState('trades-table-section');
+    }
+}
+
+// Populate year select with years (current year and previous 5 years)
+function populateYearSelect() {
+    const yearSelect = document.getElementById('tradesYearSelect');
+    if (!yearSelect) return;
+    
+    const currentYear = new Date().getFullYear();
+    yearSelect.innerHTML = '';
+    
+    // Add current year and previous 5 years
+    for (let i = 0; i < 6; i++) {
+        const year = currentYear - i;
+        const option = document.createElement('option');
+        option.value = year;
+        option.textContent = year;
+        if (i === 1) { // Default to previous year
+            option.selected = true;
+        }
+        yearSelect.appendChild(option);
+    }
+}
+
 // Calculate summary from trades (using InfoSummarySystem if available)
 async function calculateSummaryFromTrades(trades) {
-    // Use InfoSummarySystem if available
-    if (window.InfoSummarySystem && window.INFO_SUMMARY_CONFIGS?.['portfolio-state-page']) {
+    // === EOD INTEGRATION: Try to load EOD data first ===
+    const selectedItem = document.querySelector('#dateRangeFilterMenu .date-range-filter-item.selected');
+    const dateRange = selectedItem ? selectedItem.getAttribute('data-value') : 'היום';
+    const selectedAccounts = getSelectedAccounts();
+
+    // Validate EOD data availability and show errors if needed
+    if (window.EODValidationService) {
         try {
-            const config = window.INFO_SUMMARY_CONFIGS['portfolio-state-page'];
-            const stats = await window.InfoSummarySystem.calculateStatsFromData(trades, config.stats);
-            
-            // Calculate additional data needed for cards
+            const validationResult = await window.EODValidationService.validatePortfolioMetrics({
+                dateRange,
+                selectedAccounts,
+                page: 'portfolio-state-page'
+            });
+
+            // Handle validation errors
+            if (window.EODIntegrationHelper) {
+                await window.EODIntegrationHelper.handleEODValidationErrors(validationResult, 'portfolio-metrics', {
+                    date_from: dateRange === 'היום' ? new Date().toISOString().split('T')[0] : undefined,
+                    account_ids: selectedAccounts
+                });
+            }
+
+            // If critical errors found, show notification but continue with fallback
+            if (validationResult.errors && validationResult.errors.length > 0) {
+                const criticalErrors = validationResult.errors.filter(e => e.severity === 'high');
+                if (criticalErrors.length > 0 && window.Logger) {
+                    window.Logger.warn('Critical EOD data errors found, will use fallback calculation', {
+                        page: 'portfolio-state-page',
+                        criticalErrors: criticalErrors.length
+                    });
+                }
+            }
+        } catch (validationError) {
+            if (window.Logger) {
+                window.Logger.warn('EOD validation failed, continuing with fallback', {
+                    page: 'portfolio-state-page',
+                    error: validationError.message
+                });
+            }
+        }
+    }
+
+    // Convert date range to actual dates for EOD API
+    const dateRangeObj = getDateRange(dateRange);
+    if (dateRangeObj && dateRangeObj.start && dateRangeObj.end) {
+        try {
+            // Load EOD portfolio metrics for the date range
+            const eodResult = await window.EODIntegrationHelper.loadEODPortfolioMetrics(
+                null, // global user
+                {
+                    date_from: dateRangeObj.start.toISOString().split('T')[0],
+                    date_to: dateRangeObj.end.toISOString().split('T')[0],
+                    account_id: selectedAccounts && selectedAccounts.length === 1 ? selectedAccounts[0] : undefined
+                }
+            );
+
+            if (eodResult && eodResult.data && Array.isArray(eodResult.data) && eodResult.data.length > 0) {
+                // Use EOD data - get the most recent record
+                const latestRecord = eodResult.data[eodResult.data.length - 1];
+
+                if (window.Logger) {
+                    window.Logger.info('✅ Using EOD data for portfolio summary', {
+                        page: 'portfolio-state-page',
+                        recordCount: eodResult.data.length,
+                        latestDate: latestRecord.date_utc
+                    });
+                }
+
+                // Return EOD data in expected format
+                return {
+                    total_cash_balance: latestRecord.cash_total || 0,
+                    cash_balance_by_account: [], // TODO: Implement account-level EOD data
+                    total_portfolio_value: latestRecord.nav_total || null,
+                    total_realized_pl: latestRecord.realized_pl_amount || 0,
+                    total_unrealized_pl: latestRecord.unrealized_pl_amount || 0,
+                    total_pl: (latestRecord.realized_pl_amount || 0) + (latestRecord.unrealized_pl_amount || 0),
+                    open_positions_count: latestRecord.positions_count_open || 0,
+                    positions_count_by_account: [], // TODO: Implement account-level positions
+                    // Additional EOD fields
+                    twr_daily: latestRecord.twr_daily,
+                    twr_mtd: latestRecord.twr_mtd,
+                    twr_ytd: latestRecord.twr_ytd,
+                    max_drawdown_to_date: latestRecord.max_drawdown_to_date,
+                    data_quality_status: latestRecord.data_quality_status
+                };
+            }
+        } catch (eodError) {
+            if (window.Logger) {
+                window.Logger.warn('⚠️ EOD data not available, falling back to calculated data', {
+                    page: 'portfolio-state-page',
+                    error: eodError.message
+                });
+            }
+            // Continue with regular calculation - no fallback mock data
+        }
+    }
+
+    // === FALLBACK: Calculate from trades (only if EOD fails) ===
+    // Get cash balance from snapshot (same as trading_accounts page uses AccountActivityService)
+    let totalCashBalance = null;
             const cashBalanceByAccount = {};
             const positionsCountByAccount = {};
-            let totalCashBalance = 0;
-            
+    
+    // Get unique account IDs from trades
+    const uniqueAccountIds = [...new Set(trades.map(t => t.trading_account_id).filter(id => id))];
+    
+    // Load cash balances from AccountActivityService (same as trading_accounts page)
+    if (currentSnapshot && currentSnapshot.cash_balance !== null && currentSnapshot.cash_balance !== undefined) {
+        // Use snapshot cash_balance as total
+        totalCashBalance = currentSnapshot.cash_balance;
+        
+        // Load balances by account from AccountActivityService API (same as trading_accounts page)
+        if (uniqueAccountIds.length > 0) {
+            try {
+                const balancePromises = uniqueAccountIds.map(async (accountId) => {
+                    try {
+                        const response = await fetch(`/api/account-activity/${accountId}/balances`);
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        const result = await response.json();
+                        if (result.status === 'success') {
+                            return {
+                                account_id: accountId,
+                                account_name: trades.find(t => t.trading_account_id === accountId)?.account_name || `Account #${accountId}`,
+                                balance: result.data?.base_currency_total || 0
+                            };
+                        }
+                        return null;
+                    } catch (error) {
+                        if (window.Logger) {
+                            window.Logger.warn(`Failed to load balance for account ${accountId}`, { page: 'portfolio-state-page', error: error.message });
+                        }
+                        return null;
+                    }
+                });
+                
+                const accountBalances = await Promise.all(balancePromises);
+                accountBalances.forEach(acc => {
+                    if (acc) {
+                        cashBalanceByAccount[acc.account_id] = acc;
+                    }
+                });
+            } catch (error) {
+                if (window.Logger) {
+                    window.Logger.warn('Failed to load account balances', { page: 'portfolio-state-page', error: error.message });
+                }
+            }
+        }
+    }
+    
+    // Calculate positions count by account
             trades.forEach(trade => {
                 const accountId = trade.trading_account_id;
                 const accountName = trade.account_name || `Account #${accountId}`;
                 
-                // Cash balance (mock - should come from snapshot)
+        // Initialize cash balance entry if not already loaded
                 if (!cashBalanceByAccount[accountId]) {
                     cashBalanceByAccount[accountId] = {
                         account_id: accountId,
                         account_name: accountName,
-                        balance: 20000 // Mock
+                balance: null // Will remain null if not available
                     };
-                    totalCashBalance += 20000;
                 }
                 
                 // Positions count
@@ -1100,160 +2069,236 @@ async function calculateSummaryFromTrades(trades) {
                 }
                 positionsCountByAccount[accountId].count++;
             });
+    
+    // Use InfoSummarySystem if available
+    if (window.InfoSummarySystem && window.INFO_SUMMARY_CONFIGS?.['portfolio-state-page']) {
+        try {
+            const config = window.INFO_SUMMARY_CONFIGS['portfolio-state-page'];
+            const stats = await window.InfoSummarySystem.calculateStatsFromData(trades, config.stats);
+            
+            // Override cash balance with snapshot data
+            const finalCashBalance = totalCashBalance !== null ? totalCashBalance : (stats.total_cash_balance !== null && stats.total_cash_balance !== undefined ? stats.total_cash_balance : null);
+            
+            // Validate that we have real data - no fallback values
+            // NOTE: "לא זמין" means we tried to load from external provider and failed
+            // or the data doesn't exist in our system at all
+            if (finalCashBalance === null || finalCashBalance === undefined) {
+                // Don't show error here - it's already handled in loadTrades after trying external provider
+                if (window.Logger) {
+                    window.Logger.warn('Cash balance not available after trying external provider', { page: 'portfolio-state-page' });
+                }
+            }
+            if (stats.total_portfolio_value === null || stats.total_portfolio_value === undefined) {
+                // Don't show error here - it's already handled in loadTrades after trying external provider
+                if (window.Logger) {
+                    window.Logger.warn('Portfolio value not available after trying external provider', { page: 'portfolio-state-page' });
+                }
+            }
+            
+            // Override with snapshot data if available (more accurate)
+            let finalRealizedPL = stats.total_realized_pl;
+            let finalUnrealizedPL = stats.total_unrealized_pl;
+            let finalTotalPL = stats.total_pl;
+            let finalPortfolioValue = stats.total_portfolio_value;
+            
+            if (currentSnapshot) {
+                // Use snapshot data for accurate P/L calculations
+                if (currentSnapshot.total_realized_pl !== null && currentSnapshot.total_realized_pl !== undefined) {
+                    finalRealizedPL = currentSnapshot.total_realized_pl;
+                }
+                if (currentSnapshot.total_unrealized_pl !== null && currentSnapshot.total_unrealized_pl !== undefined) {
+                    finalUnrealizedPL = currentSnapshot.total_unrealized_pl;
+                }
+                if (currentSnapshot.total_value !== null && currentSnapshot.total_value !== undefined) {
+                    finalPortfolioValue = currentSnapshot.total_value;
+                }
+                // Calculate total P/L from snapshot data
+                if (finalRealizedPL !== null && finalUnrealizedPL !== null) {
+                    finalTotalPL = finalRealizedPL + finalUnrealizedPL;
+                } else if (finalRealizedPL !== null) {
+                    finalTotalPL = finalRealizedPL;
+                } else if (finalUnrealizedPL !== null) {
+                    finalTotalPL = finalUnrealizedPL;
+                }
+            }
             
             return {
                 ...stats,
-                total_cash_balance: stats.total_cash_balance || totalCashBalance,
+                total_cash_balance: finalCashBalance,
                 cash_balance_by_account: Object.values(cashBalanceByAccount),
-                total_portfolio_value: stats.total_portfolio_value || (totalCashBalance + (stats.total_unrealized_pl || 0)),
-                total_realized_pl: 0, // Should come from closed trades
-                total_unrealized_pl: stats.total_unrealized_pl || 0,
-                total_pl: stats.total_pl || 0,
-                open_positions_count: stats.open_positions_count || trades.length,
+                total_portfolio_value: finalPortfolioValue !== null && finalPortfolioValue !== undefined ? finalPortfolioValue : null,
+                total_realized_pl: finalRealizedPL, // Can be 0, null, or a number - all are valid
+                total_unrealized_pl: finalUnrealizedPL, // Can be 0, null, or a number - all are valid
+                total_pl: finalTotalPL, // Can be 0, null, or a number - all are valid
+                open_positions_count: stats.open_positions_count !== null && stats.open_positions_count !== undefined ? stats.open_positions_count : null,
                 positions_count_by_account: Object.values(positionsCountByAccount)
             };
         } catch (error) {
             if (window.Logger) {
-                window.Logger.warn('Failed to calculate summary using InfoSummarySystem, using fallback', { error, page: 'portfolio-state-page' });
+                window.Logger.error('Failed to calculate summary using InfoSummarySystem', { error, page: 'portfolio-state-page' });
             }
+            if (window.NotificationSystem) {
+                window.NotificationSystem.showError(
+                    'שגיאה בחישוב סיכום',
+                    'שגיאה בחישוב סיכום נתוני תיק. נא לנסות שוב או ליצור קשר עם התמיכה.'
+                );
+            }
+            // Return null to indicate no data available
+            return null;
         }
     }
     
-    // Fallback to manual calculation
-    const cashBalanceByAccount = {};
-    let totalCashBalance = 0;
+    // Manual calculation - only if InfoSummarySystem not available
     let totalPortfolioValue = 0;
     let totalRealizedPL = 0;
     let totalUnrealizedPL = 0;
-    const positionsCountByAccount = {};
     
     trades.forEach(trade => {
-        const accountId = trade.trading_account_id;
-        const accountName = trade.account_name || `Account #${accountId}`;
-        
-        // Cash balance (mock - should come from snapshot)
-        if (!cashBalanceByAccount[accountId]) {
-            cashBalanceByAccount[accountId] = {
-                account_id: accountId,
-                account_name: accountName,
-                balance: 20000 // Mock
-            };
-            totalCashBalance += 20000;
-        }
-        
         // Portfolio value (from position)
         if (trade.position_pl_value) {
             totalUnrealizedPL += trade.position_pl_value;
         }
-        
-        // Positions count
-        if (!positionsCountByAccount[accountId]) {
-            positionsCountByAccount[accountId] = {
-                account_id: accountId,
-                count: 0
-            };
-        }
-        positionsCountByAccount[accountId].count++;
     });
     
-    totalPortfolioValue = totalCashBalance + totalUnrealizedPL;
-    totalRealizedPL = 0; // Should come from closed trades
-    const totalPL = totalRealizedPL + totalUnrealizedPL;
+    // Calculate values only from actual data - no fallback values
+    // Use snapshot data if available (snapshot has accurate realized/unrealized P/L)
+    if (currentSnapshot) {
+        // Use snapshot data for accurate P/L calculations
+        totalRealizedPL = currentSnapshot.total_realized_pl !== null && currentSnapshot.total_realized_pl !== undefined 
+            ? currentSnapshot.total_realized_pl 
+            : null;
+        totalUnrealizedPL = currentSnapshot.total_unrealized_pl !== null && currentSnapshot.total_unrealized_pl !== undefined 
+            ? currentSnapshot.total_unrealized_pl 
+            : null;
+        // Portfolio value = cash + market value (which includes unrealized P/L in the calculation)
+        // But snapshot already has total_value calculated correctly
+        totalPortfolioValue = currentSnapshot.total_value !== null && currentSnapshot.total_value !== undefined 
+            ? currentSnapshot.total_value 
+            : ((totalCashBalance || 0) + (totalUnrealizedPL || 0));
+    } else {
+        // Fallback: calculate from trades (less accurate, but better than nothing)
+        totalPortfolioValue = (totalCashBalance || 0) + (totalUnrealizedPL || 0);
+        totalRealizedPL = null; // Cannot calculate from open positions alone
+    }
+    
+    // Calculate total P/L
+    let totalPL = null;
+    if (totalRealizedPL !== null && totalUnrealizedPL !== null) {
+        totalPL = totalRealizedPL + totalUnrealizedPL;
+    } else if (totalRealizedPL !== null) {
+        totalPL = totalRealizedPL;
+    } else if (totalUnrealizedPL !== null) {
+        totalPL = totalUnrealizedPL;
+    }
+    
+    // Validate that we have real data
+    // NOTE: "לא זמין" means we tried to load from external provider and failed
+    // or the data doesn't exist in our system at all
+    if (totalCashBalance === null && trades.length === 0) {
+        // Don't show error here - it's already handled in loadTrades after trying external provider
+        if (window.Logger) {
+            window.Logger.warn('No portfolio data available after trying external provider', { page: 'portfolio-state-page' });
+        }
+    }
     
     return {
-        total_cash_balance: totalCashBalance,
+        total_cash_balance: totalCashBalance !== null ? totalCashBalance : null,
         cash_balance_by_account: Object.values(cashBalanceByAccount),
-        total_portfolio_value: totalPortfolioValue,
-        total_realized_pl: totalRealizedPL,
-        total_unrealized_pl: totalUnrealizedPL,
-        total_pl: totalPL,
-        open_positions_count: trades.length,
+        total_portfolio_value: totalPortfolioValue !== null && totalPortfolioValue !== undefined && totalPortfolioValue > 0 ? totalPortfolioValue : null,
+        total_realized_pl: totalRealizedPL, // Can be 0, null, or a number - all are valid
+        total_unrealized_pl: totalUnrealizedPL, // Can be 0, null, or a number - all are valid
+        total_pl: totalPL, // Can be 0, null, or a number - all are valid
+        open_positions_count: trades.length > 0 ? trades.length : null,
         positions_count_by_account: Object.values(positionsCountByAccount)
     };
 }
 
 // Render trades table row (for UnifiedTableSystem)
 function renderTradeRow(trade) {
-        // Use FieldRendererService if available
-        // במערכת יש רק שלושה סטטוסים: open, closed, cancelled
-        const renderStatus = window.FieldRendererService?.renderStatus 
-            ? window.FieldRendererService.renderStatus(trade.status, 'trade')
-            : (() => {
-                const statusLower = (trade.status || '').toLowerCase();
-                if (statusLower === 'open') {
-                    return '<span class="badge bg-success">פתוח</span>';
-                } else if (statusLower === 'closed') {
-                    return '<span class="badge bg-secondary">סגור</span>';
-                } else if (statusLower === 'cancelled' || statusLower === 'canceled') {
-                    return '<span class="badge bg-danger">מבוטל</span>';
-                }
-                return `<span class="badge bg-secondary">${trade.status || '-'}</span>`;
-            })();
-        
-        const renderType = window.FieldRendererService?.renderType
-            ? window.FieldRendererService.renderType(trade.investment_type)
-            : `<span class="badge">${INVESTMENT_TYPES.find(t => t.value === trade.investment_type)?.label || trade.investment_type}</span>`;
-        
-        const renderSide = window.FieldRendererService?.renderSide
-            ? window.FieldRendererService.renderSide(trade.side)
-            : `<span class="badge bg-${trade.side === 'Long' ? 'success' : 'danger'}">${trade.side}</span>`;
+        // שימוש ישיר ב-FieldRendererService - המערכת תמיד זמינה דרך SERVICES package
+        const renderStatus = window.FieldRendererService.renderStatus(trade.status, 'trade');
+        const renderType = window.FieldRendererService.renderType(trade.investment_type);
+        const renderSide = window.FieldRendererService.renderSide(trade.side);
         
         const renderAmount = (value, currency = '$') => {
-            if (window.FieldRendererService?.renderAmount) {
-                return window.FieldRendererService.renderAmount(value, currency, 2);
-            }
-            return `${currency}${value.toFixed(2)}`;
+            return window.FieldRendererService.renderAmount(value, currency, 2, true);
         };
         
         const renderNumericValue = (value, suffix = '%', showSign = true) => {
-            if (window.FieldRendererService?.renderNumericValue) {
-                return window.FieldRendererService.renderNumericValue(value, suffix, showSign);
-            }
-            const sign = showSign && value >= 0 ? '+' : '';
-            const colorClass = value >= 0 ? 'text-success' : value < 0 ? 'text-danger' : 'text-muted';
-            return `<span class="${colorClass}">${sign}${value.toFixed(2)}${suffix}</span>`;
+            return window.FieldRendererService.renderNumericValue(value, suffix, showSign);
         };
         
         const formatDate = (dateStr) => {
             if (!dateStr) return '-';
-            if (window.FieldRendererService?.renderDate) {
-                return window.FieldRendererService.renderDate(dateStr, false);
-            }
-            if (window.dateUtils?.formatDate) {
-                return window.dateUtils.formatDate(dateStr, { includeTime: false });
-            }
-            try {
-                const date = new Date(dateStr);
-                return date.toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: 'numeric' });
-            } catch {
-                return dateStr;
-            }
+            return window.FieldRendererService.renderDate(dateStr, false);
         };
         
     return `
         <tr>
             <td><strong>${trade.ticker_symbol || 'טיקר לא ידוע'}</strong></td>
-            <td>${renderAmount(trade.current_price || 0)}</td>
-            <td>${renderNumericValue(trade.daily_change || 0, '%')}</td>
-            <td>${trade.position_quantity || 0}</td>
-            <td>${renderNumericValue(trade.position_pl_percent || 0, '%')}</td>
-            <td>${renderNumericValue(trade.position_pl_value || 0, '$')}</td>
+            <!-- 
+                "לא זמין" מוצג רק אחרי שניסינו לטעון מהספק החיצוני ונכשלנו.
+                אם הנתונים עדיין לא נטענו, זה אומר שהטעינה מהספק החיצוני נכשלה
+                או שהטיקר לא קיים במערכת החיצונית.
+            -->
+            <td>${trade.current_price !== null && trade.current_price !== undefined 
+                ? renderAmount(trade.current_price) 
+                : '<span class="text-muted" title="נתוני מחיר לא זמינים - ניסינו לטעון מהספק החיצוני ונכשלנו">לא זמין</span>'}</td>
+            <td>${trade.daily_change !== null && trade.daily_change !== undefined 
+                ? renderNumericValue(trade.daily_change, '%') 
+                : '<span class="text-muted" title="נתוני שינוי יומי לא זמינים - ניסינו לטעון מהספק החיצוני ונכשלנו">לא זמין</span>'}</td>
+            <td>${trade.position_quantity !== null && trade.position_quantity !== undefined 
+                ? trade.position_quantity 
+                : '<span class="text-muted" title="נתוני כמות לא זמינים">לא זמין</span>'}</td>
+            <td>${trade.position_pl_percent !== null && trade.position_pl_percent !== undefined 
+                ? renderNumericValue(trade.position_pl_percent, '%') 
+                : '<span class="text-muted" title="נתוני P/L באחוזים לא זמינים - ניסינו לטעון מהספק החיצוני ונכשלנו">לא זמין</span>'}</td>
+            <td>${trade.position_pl_value !== null && trade.position_pl_value !== undefined 
+                ? renderNumericValue(trade.position_pl_value, '$') 
+                : '<span class="text-muted" title="נתוני P/L בערך לא זמינים - ניסינו לטעון מהספק החיצוני ונכשלנו">לא זמין</span>'}</td>
             <td>${renderStatus}</td>
             <td>${renderType}</td>
             <td>${renderSide}</td>
             <td>${trade.account_name || `Account #${trade.trading_account_id}`}</td>
             <td>${formatDate(trade.created_at)}</td>
             <td>${formatDate(trade.closed_at)}</td>
-            <td class="col-actions actions-cell" data-entity-id="${trade.id}" data-entity-type="trade" data-status="${trade.status || 'open'}"></td>
+            <td class="col-actions actions-cell" data-entity-id="${trade.id}" data-entity-type="trade" data-status="${trade.status || 'open'}">
+                ${(() => {
+                  if (!window.createActionsMenu) return '<!-- Actions menu not available -->';
+                  const buttons = [];
+                  buttons.push({ type: 'VIEW', onclick: `window.showEntityDetails('trade', ${trade.id}, { mode: 'view' })`, title: 'צפה בפרטים' });
+                  buttons.push({ type: 'LINK', onclick: `viewLinkedItemsForTrade(${trade.id})`, title: 'אובייקטים מקושרים' });
+                  buttons.push({ type: 'EDIT', onclick: `editTradeRecord('${trade.id}')`, title: 'ערוך' });
+                  if (trade.status === 'closed' || trade.status === 'cancelled') {
+                    buttons.push({ type: 'REACTIVATE', onclick: `restoreTrade('${trade.id}')`, title: 'שיחזר' });
+                  } else {
+                    buttons.push({ type: 'CANCEL', onclick: `cancelTradeRecord('${trade.id}')`, title: 'בטל' });
+                  }
+                  // Note: showDelete: false - so no delete button
+                  return window.createActionsMenu(buttons) || '';
+                })()}
+            </td>
         </tr>
     `;
 }
 
 // Update trades table (using UnifiedTableSystem if available, fallback to manual rendering)
 function updateTradesTable() {
-    // Use UnifiedTableSystem if available
+    // Use UnifiedTableSystem if available and registered
+    if (window.UnifiedTableSystem && window.UnifiedTableSystem.registry) {
+        const tableConfig = window.UnifiedTableSystem.registry.getConfig('portfolio-trades');
+        if (tableConfig && tableConfig.updateFunction) {
+            // Call the registered updateFunction directly
+            tableConfig.updateFunction(filteredTrades);
+            return;
+        }
+    }
+    
+    // Use UnifiedTableSystem.renderer if available (preferred method)
     if (window.UnifiedTableSystem && window.UnifiedTableSystem.renderer) {
         window.UnifiedTableSystem.renderer.render('portfolio-trades', filteredTrades);
+        // Update summary after rendering
+        updateTradesSummary(filteredTrades);
         return;
     }
     
@@ -1262,167 +2307,529 @@ function updateTradesTable() {
     if (!tbody) return;
     
     if (filteredTrades.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="13" class="text-center text-muted">אין טריידים להצגה</td></tr>';
-        document.getElementById('trades-summary').textContent = 'אין טריידים';
+        tbody.textContent = '';
+        const emptyRow = document.createElement('tr');
+        const emptyCell = document.createElement('td');
+        emptyCell.colSpan = 13;
+        emptyCell.className = 'text-center text-muted';
+        emptyCell.textContent = 'אין טריידים להצגה';
+        emptyRow.appendChild(emptyCell);
+        tbody.appendChild(emptyRow);
+        const summaryElement = document.getElementById('trades-summary');
+        if (summaryElement) {
+            summaryElement.textContent = 'אין טריידים';
+        }
         return;
     }
     
-    tbody.innerHTML = filteredTrades.map(trade => renderTradeRow(trade)).join('');
+    tbody.textContent = '';
+    const parser = new DOMParser();
+    filteredTrades.forEach(trade => {
+        const rowHTML = renderTradeRow(trade);
+        const doc = parser.parseFromString(rowHTML, 'text/html');
+        const row = doc.body.querySelector('tr');
+        if (row) {
+            tbody.appendChild(row);
+        }
+    });
     
-    // Update summary
-    const totalPL = filteredTrades.reduce((sum, t) => sum + (t.position_pl_value || 0), 0);
-    const summaryElement = document.getElementById('trades-summary');
-    if (summaryElement) {
-        const renderNumericValue = (value, suffix = '%', showSign = true) => {
-            if (window.FieldRendererService?.renderNumericValue) {
-                return window.FieldRendererService.renderNumericValue(value, suffix, showSign);
-            }
-            const sign = showSign && value >= 0 ? '+' : '';
-            const colorClass = value >= 0 ? 'text-success' : value < 0 ? 'text-danger' : 'text-muted';
-            return `<span class="${colorClass}">${sign}${value.toFixed(2)}${suffix}</span>`;
-        };
-        summaryElement.innerHTML = `
-            <strong>סה"כ טריידים: ${filteredTrades.length}</strong> | 
-            <strong>סה"כ P/L: ${renderNumericValue(totalPL, '$')}</strong>
-        `;
+                // Update summary using InfoSummarySystem (only if container exists)
+                if (window.InfoSummarySystem && window.INFO_SUMMARY_CONFIGS && window.INFO_SUMMARY_CONFIGS['portfolio-state-page']) {
+                    const config = window.INFO_SUMMARY_CONFIGS['portfolio-state-page'];
+                    const container = document.getElementById(config.containerId);
+                    if (container) {
+                        window.InfoSummarySystem.calculateAndRender(filteredTrades, config).catch(err => {
+                            window.Logger?.warn('Failed to update portfolio state summary via InfoSummarySystem', { error: err, page: 'portfolio-state-page' });
+                        });
+                    }
+                }
+                
+                // Update trades summary using extracted function
+                updateTradesSummary(filteredTrades);
+    
+    // Note: Action buttons are now created directly in renderTradeRow() using createActionsMenu()
+    // No need for loadTableActionButtons() anymore
+}
+
+// Update trades summary (extracted for reuse)
+function updateTradesSummary(trades) {
+    if (!trades || trades.length === 0) {
+                const summaryElement = document.getElementById('trades-summary');
+                if (summaryElement) {
+            summaryElement.textContent = 'אין טריידים';
+        }
+        return;
     }
     
-    // Load action buttons
-    if (window.loadTableActionButtons) {
-        window.loadTableActionButtons('tradesTable', 'trade', {
-            showDetails: true,
-            showLinked: true,
-            showEdit: true,
-            showDelete: false // Trades shouldn't be deleted from this page
-        });
+    // Always update trades-summary element - no fallback values
+    const totalPL = trades.reduce((sum, t) => {
+        const plValue = t.position_pl_value !== null && t.position_pl_value !== undefined ? t.position_pl_value : 0;
+        return sum + plValue;
+    }, 0);
+    const summaryElement = document.getElementById('trades-summary');
+    if (summaryElement) {
+        summaryElement.innerHTML = '';
+        const strong1 = document.createElement('strong');
+        strong1.textContent = `סה"כ טריידים: ${trades.length}`;
+        summaryElement.appendChild(strong1);
+        
+        if (totalPL !== 0) {
+            const separator = document.createTextNode(' | ');
+            summaryElement.appendChild(separator);
+            const strong2 = document.createElement('strong');
+            strong2.textContent = 'סה"כ P/L: ';
+            summaryElement.appendChild(strong2);
+            const plSpan = document.createElement('span');
+            if (window.FieldRendererService?.renderAmount) {
+                plSpan.innerHTML = window.FieldRendererService.renderAmount(totalPL, '$', 0, true);
+            } else {
+                plSpan.className = totalPL >= 0 ? 'text-success' : totalPL < 0 ? 'text-danger' : 'text-muted';
+                plSpan.textContent = `${totalPL >= 0 ? '+' : ''}${totalPL.toFixed(2)}$`;
+            }
+            strong2.appendChild(plSpan);
+        }
     }
 }
 
 // Update summary cards
-function updateSummaryCards(data) {
+async function updateSummaryCards(data) {
+    // Validate data exists - no fallback values
+    if (!data) {
+        if (window.NotificationSystem) {
+            window.NotificationSystem.showError(
+                'נתונים לא זמינים',
+                'נתוני סיכום תיק לא זמינים. נא לבדוק שיש נתונים במערכת.'
+            );
+        }
+        // Show "לא זמין" in all cards
+        const allCards = ['total-cash-balance', 'cash-balance-total', 'total-portfolio-value', 'total-pl', 'total-pl-detail', 'total-positions-count', 'positions-total'];
+        allCards.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = 'לא זמין';
+        });
+        return;
+    }
+    
     // Cash balance - using FieldRendererService
     if (window.FieldRendererService) {
         const totalCashEl = document.getElementById('total-cash-balance');
         const cashBalanceTotalEl = document.getElementById('cash-balance-total');
         if (totalCashEl) {
+            if (data.total_cash_balance !== null && data.total_cash_balance !== undefined) {
             totalCashEl.innerHTML = window.FieldRendererService.renderAmount(data.total_cash_balance, '$', 0, false);
+            } else {
+                totalCashEl.textContent = 'לא זמין';
+                if (window.NotificationSystem) {
+                    window.NotificationSystem.showError(
+                        'נתונים לא זמינים',
+                        'נתוני יתרות מזומן לא זמינים. נא לבדוק שיש נתונים במערכת.'
+                    );
+                }
+            }
         }
         if (cashBalanceTotalEl) {
+            if (data.total_cash_balance !== null && data.total_cash_balance !== undefined) {
             cashBalanceTotalEl.innerHTML = window.FieldRendererService.renderAmount(data.total_cash_balance, '$', 0, false);
+            } else {
+                cashBalanceTotalEl.textContent = 'לא זמין';
+            }
         }
     } else {
-        // Fallback
-    document.getElementById('total-cash-balance').textContent = formatCurrency(data.total_cash_balance);
-    document.getElementById('cash-balance-total').textContent = formatCurrency(data.total_cash_balance);
+        // Fallback if FieldRendererService not available
+        const totalCashBalanceEl = document.getElementById('total-cash-balance');
+        const cashBalanceTotalEl2 = document.getElementById('cash-balance-total');
+        if (totalCashBalanceEl) {
+            if (data.total_cash_balance !== null && data.total_cash_balance !== undefined) {
+                totalCashBalanceEl.textContent = formatCurrency(data.total_cash_balance);
+            } else {
+                totalCashBalanceEl.textContent = 'לא זמין';
+            }
+        }
+        if (cashBalanceTotalEl2) {
+            if (data.total_cash_balance !== null && data.total_cash_balance !== undefined) {
+                cashBalanceTotalEl2.textContent = formatCurrency(data.total_cash_balance);
+            } else {
+                cashBalanceTotalEl2.textContent = 'לא זמין';
+            }
+        }
     }
     
-    // Cash balance by account
+    // Cash balance by account - group by account name to avoid duplicates
     const cashByAccount = document.getElementById('cash-balance-by-account');
     if (cashByAccount && data.cash_balance_by_account) {
-        if (window.FieldRendererService) {
-        cashByAccount.innerHTML = data.cash_balance_by_account.map(acc => `
-                <div class="d-flex justify-content-between mb-1 text-small">
-                    <span>${acc.account_name}:</span>
-                    <span>${window.FieldRendererService.renderAmount(acc.balance, '$', 0, false)}</span>
-                </div>
-            `).join('');
-        } else {
-            // Fallback
-            cashByAccount.innerHTML = data.cash_balance_by_account.map(acc => `
-                <div class="d-flex justify-content-between mb-1 text-small">
-                <span>${acc.account_name}:</span>
-                <span>${formatCurrency(acc.balance)}</span>
-            </div>
-        `).join('');
-    }
+        cashByAccount.textContent = '';
+        // Group accounts by name (sum balances for accounts with same name)
+        const accountsByName = {};
+        data.cash_balance_by_account.forEach(acc => {
+            const accountName = acc.account_name || `Account #${acc.account_id}`;
+            if (!accountsByName[accountName]) {
+                accountsByName[accountName] = {
+                    account_name: accountName,
+                    balance: 0,
+                    account_ids: []
+                };
+            }
+            accountsByName[accountName].balance += (acc.balance || 0);
+            accountsByName[accountName].account_ids.push(acc.account_id);
+        });
+        
+        // Display grouped accounts
+        Object.values(accountsByName).forEach(acc => {
+            const div = document.createElement('div');
+            div.className = 'd-flex justify-content-between mb-1 text-small';
+            const span1 = document.createElement('span');
+            // Show account name with ID count if multiple accounts with same name
+            const displayName = acc.account_ids.length > 1 
+                ? `${acc.account_name} (${acc.account_ids.length})`
+                : acc.account_name;
+            span1.textContent = `${displayName}:`;
+            const span2 = document.createElement('span');
+            span2.innerHTML = window.FieldRendererService.renderAmount(acc.balance, '$', 0, false);
+            div.appendChild(span1);
+            div.appendChild(span2);
+            cashByAccount.appendChild(div);
+        });
     }
     
     // Portfolio value - using FieldRendererService
     const portfolioValueEl = document.getElementById('total-portfolio-value');
     if (portfolioValueEl) {
-        if (window.FieldRendererService) {
-            portfolioValueEl.innerHTML = window.FieldRendererService.renderAmount(data.total_portfolio_value, '$', 0, false);
+        if (data.total_portfolio_value !== null && data.total_portfolio_value !== undefined) {
+        portfolioValueEl.innerHTML = window.FieldRendererService.renderAmount(data.total_portfolio_value, '$', 0, false);
         } else {
-            // Fallback
-            portfolioValueEl.textContent = formatCurrency(data.total_portfolio_value);
+            portfolioValueEl.textContent = 'לא זמין';
+            if (window.NotificationSystem) {
+                window.NotificationSystem.showError(
+                    'נתונים לא זמינים',
+                    'נתוני שווי תיק לא זמינים. נא לבדוק שיש נתונים במערכת.'
+                );
+            }
         }
     }
     
     // P/L - using FieldRendererService
-    if (window.FieldRendererService) {
-        const totalPlEl = document.getElementById('total-pl');
-        const totalPlDetailEl = document.getElementById('total-pl-detail');
-        const realizedPlEl = document.getElementById('realized-pl');
-        const unrealizedPlEl = document.getElementById('unrealized-pl');
-        
-        if (totalPlEl) {
-            totalPlEl.innerHTML = window.FieldRendererService.renderAmount(data.total_pl, '$', 0, true);
+    const totalPlEl = document.getElementById('total-pl');
+    const totalPlDetailEl = document.getElementById('total-pl-detail');
+    const realizedPlEl = document.getElementById('realized-pl');
+    const unrealizedPlEl = document.getElementById('unrealized-pl');
+    
+    if (totalPlEl) {
+        if (data.total_pl !== null && data.total_pl !== undefined) {
+        totalPlEl.innerHTML = window.FieldRendererService.renderAmount(data.total_pl, '$', 0, true);
+        } else {
+            totalPlEl.textContent = 'לא זמין';
         }
-        if (totalPlDetailEl) {
-            totalPlDetailEl.innerHTML = window.FieldRendererService.renderAmount(data.total_pl, '$', 0, true);
+    }
+    if (totalPlDetailEl) {
+        if (data.total_pl !== null && data.total_pl !== undefined) {
+        totalPlDetailEl.innerHTML = window.FieldRendererService.renderAmount(data.total_pl, '$', 0, true);
+        } else {
+            totalPlDetailEl.textContent = 'לא זמין';
         }
-        if (realizedPlEl) {
-            realizedPlEl.innerHTML = window.FieldRendererService.renderAmount(data.total_realized_pl, '$', 0, true);
+    }
+    if (realizedPlEl) {
+        if (data.total_realized_pl !== null && data.total_realized_pl !== undefined) {
+        realizedPlEl.innerHTML = window.FieldRendererService.renderAmount(data.total_realized_pl, '$', 0, true);
+        } else {
+            realizedPlEl.textContent = 'לא זמין';
         }
-        if (unrealizedPlEl) {
-            unrealizedPlEl.innerHTML = window.FieldRendererService.renderAmount(data.total_unrealized_pl, '$', 0, true);
+    }
+    if (unrealizedPlEl) {
+        if (data.total_unrealized_pl !== null && data.total_unrealized_pl !== undefined) {
+        unrealizedPlEl.innerHTML = window.FieldRendererService.renderAmount(data.total_unrealized_pl, '$', 0, true);
+        } else {
+            unrealizedPlEl.textContent = 'לא זמין';
         }
-    } else {
-        // Fallback
-    document.getElementById('total-pl').textContent = formatCurrency(data.total_pl);
-    document.getElementById('total-pl-detail').textContent = formatCurrency(data.total_pl);
-    document.getElementById('realized-pl').textContent = formatCurrency(data.total_realized_pl);
-    document.getElementById('unrealized-pl').textContent = formatCurrency(data.total_unrealized_pl);
     }
     
     // Calculate P/L percentage with zero-division check
+    // No fallback values - show error if data not available
+    let plPercent = null;
+    if (data.total_portfolio_value !== null && data.total_portfolio_value !== undefined && 
+        data.total_pl !== null && data.total_pl !== undefined) {
     const denominator = data.total_portfolio_value - data.total_pl;
-    let plPercent;
     if (denominator === 0 || !denominator || isNaN(denominator)) {
-        // Fallback: if denominator is zero, show 0% or '-' if total_pl is also zero
-        plPercent = data.total_pl === 0 || !data.total_pl ? '-' : '0.0';
+            // If denominator is zero and total_pl is also zero, show null (not available)
+            plPercent = null;
     } else {
         plPercent = ((data.total_pl / denominator) * 100).toFixed(1);
+        }
     }
     
     // Display P/L percentage using FieldRendererService
     const plPercentEl = document.getElementById('pl-percentage');
     if (plPercentEl) {
-    if (plPercent === '-') {
-            plPercentEl.innerHTML = '<span class="numeric-value-zero">(-)</span>';
+        if (plPercent === null || plPercent === undefined) {
+            // No data available - show "לא זמין"
+            plPercentEl.innerHTML = '';
+            const div = document.createElement('div');
+            div.className = 'numeric-value-zero';
+            div.textContent = 'לא זמין';
+            plPercentEl.appendChild(div);
     } else {
         const plPercentNum = parseFloat(plPercent);
             if (window.FieldRendererService) {
-                plPercentEl.innerHTML = `(${window.FieldRendererService.renderNumericValue(plPercentNum, '%', true)})`;
+                const renderedValue = window.FieldRendererService.renderNumericValue(plPercentNum, '%', true);
+                plPercentEl.innerHTML = `(${renderedValue})`;
             } else {
-                // Fallback
+                // Fallback if FieldRendererService not available
                 plPercentEl.textContent = `(${plPercentNum >= 0 ? '+' : ''}${plPercent}%)`;
-                plPercentEl.style.color = plPercentNum >= 0 ? '#28a745' : '#dc3545';
+                // שימוש במערכת המרכזית לצבעים מספריים
+                const getNumericColorFn = (typeof window.getNumericValueColor === 'function') ? window.getNumericValueColor : null;
+                const numericColor = getNumericColorFn ? getNumericColorFn(plPercentNum, 'medium') : '';
+                if (numericColor) {
+                    plPercentEl.style.color = numericColor;
+                }
             }
         }
     }
     
-    // Positions count
-    document.getElementById('total-positions-count').textContent = data.open_positions_count;
-    document.getElementById('positions-total').textContent = data.open_positions_count;
+    // Positions count - no fallback values
+    const positionsCountEl = document.getElementById('total-positions-count');
+    const positionsTotalEl = document.getElementById('positions-total');
+    if (positionsCountEl) {
+        if (data.open_positions_count !== null && data.open_positions_count !== undefined) {
+            positionsCountEl.textContent = data.open_positions_count;
+        } else {
+            positionsCountEl.textContent = 'לא זמין';
+        }
+    }
+    if (positionsTotalEl) {
+        if (data.open_positions_count !== null && data.open_positions_count !== undefined) {
+            positionsTotalEl.textContent = data.open_positions_count;
+        } else {
+            positionsTotalEl.textContent = 'לא זמין';
+        }
+    }
     
     // Positions by account
     const positionsByAccount = document.getElementById('positions-by-account');
     if (positionsByAccount && data.positions_count_by_account) {
-        positionsByAccount.innerHTML = data.positions_count_by_account.map(acc => {
+        positionsByAccount.textContent = '';
+        // Group positions by account name to avoid duplicates
+        const positionsByName = {};
+        data.positions_count_by_account.forEach(acc => {
             const accountName = allTradingAccounts.find(a => a.id === acc.account_id)?.name || `Account #${acc.account_id}`;
-            return `
-                <div class="d-flex justify-content-between mb-1 text-small">
-                    <span>${accountName}:</span>
-                    <span>${acc.count}</span>
-                </div>
-            `;
-        }).join('');
+            if (!positionsByName[accountName]) {
+                positionsByName[accountName] = {
+                    account_name: accountName,
+                    count: 0,
+                    account_ids: []
+                };
+            }
+            positionsByName[accountName].count += acc.count;
+            positionsByName[accountName].account_ids.push(acc.account_id);
+        });
+        
+        // Display grouped positions
+        Object.values(positionsByName).forEach(acc => {
+            const div = document.createElement('div');
+            div.className = 'd-flex justify-content-between mb-1 text-small';
+            const span1 = document.createElement('span');
+            // Show account name with ID count if multiple accounts with same name
+            const displayName = acc.account_ids.length > 1 
+                ? `${acc.account_name} (${acc.account_ids.length})`
+                : acc.account_name;
+            span1.textContent = `${displayName}:`;
+            const span2 = document.createElement('span');
+            span2.textContent = acc.count;
+            div.appendChild(span1);
+            div.appendChild(span2);
+            positionsByAccount.appendChild(div);
+        });
+    }
+    
+    // Accounts Summary Table (in expanded view)
+    const accountsTableBody = document.getElementById('accounts-summary-table-body');
+    if (accountsTableBody && currentSnapshot && currentSnapshot.positions) {
+        accountsTableBody.textContent = '';
+        
+        // Group positions by account and calculate totals
+        // CRITICAL: Use trading_account_id as primary key to ensure unique accounts
+        // account_id might be null/undefined, but trading_account_id should always exist
+        const accountsData = {};
+        
+        currentSnapshot.positions.forEach(position => {
+            // Use trading_account_id as primary key (always exists from Backend)
+            const accountId = position.trading_account_id || position.account_id;
+            
+            // Skip if accountId is invalid
+            if (!accountId || accountId === null || accountId === undefined) {
+                if (window.Logger) {
+                    window.Logger.warn('Position missing account_id and trading_account_id', { 
+                        position, 
+                        page: 'portfolio-state-page' 
+                    });
+                }
+                return;
+            }
+            
+            // Initialize account data if not exists
+            if (!accountsData[accountId]) {
+                // Get account name from position or lookup
+                const accountName = position.account_name || 
+                                  allTradingAccounts.find(a => a.id === accountId)?.name || 
+                                  `Account #${accountId}`;
+                
+                accountsData[accountId] = {
+                    account_id: accountId,
+                    account_name: accountName,
+                    cash_balance: null,
+                    realized_pl: 0,
+                    unrealized_pl: 0,
+                    positions_count: 0
+                };
+            }
+            
+            // Sum P/L values for this position
+            if (position.realized_pl !== null && position.realized_pl !== undefined) {
+                accountsData[accountId].realized_pl += position.realized_pl;
+            }
+            if (position.unrealized_pl !== null && position.unrealized_pl !== undefined) {
+                accountsData[accountId].unrealized_pl += position.unrealized_pl;
+            }
+            accountsData[accountId].positions_count++;
+        });
+        
+        // Get cash balances for each account
+        const accountIds = Object.keys(accountsData).map(id => parseInt(id));
+        if (accountIds.length > 0) {
+            const balancePromises = accountIds.map(async (accountId) => {
+                try {
+                    const response = await fetch(`/api/account-activity/${accountId}/balances`);
+                    if (response.ok) {
+                        const result = await response.json();
+                        if (result.status === 'success' && result.data?.base_currency_total !== null && result.data?.base_currency_total !== undefined) {
+                            accountsData[accountId].cash_balance = result.data.base_currency_total;
+                        }
+                    }
+                } catch (error) {
+                    if (window.Logger) {
+                        window.Logger.warn(`Failed to load balance for account ${accountId}`, { page: 'portfolio-state-page', error: error.message });
+                    }
+                }
+            });
+            await Promise.all(balancePromises);
+        }
+        
+        // Calculate totals
+        let totalCash = 0;
+        let totalRealizedPL = 0;
+        let totalUnrealizedPL = 0;
+        let totalPositions = 0;
+        
+        // Render table rows
+        Object.values(accountsData).forEach(acc => {
+            const row = document.createElement('tr');
+            
+            // Account name
+            const nameCell = document.createElement('td');
+            nameCell.textContent = acc.account_name;
+            row.appendChild(nameCell);
+            
+            // Cash balance
+            const cashCell = document.createElement('td');
+            cashCell.className = 'text-end';
+            if (acc.cash_balance !== null && acc.cash_balance !== undefined) {
+                cashCell.innerHTML = window.FieldRendererService?.renderAmount(acc.cash_balance, '$', 0, false) || `$${acc.cash_balance.toFixed(2)}`;
+                totalCash += acc.cash_balance;
+            } else {
+                cashCell.textContent = 'לא זמין';
+            }
+            row.appendChild(cashCell);
+            
+            // Realized P/L
+            const realizedCell = document.createElement('td');
+            realizedCell.className = 'text-end';
+            if (acc.realized_pl !== 0) {
+                realizedCell.innerHTML = window.FieldRendererService?.renderAmount(acc.realized_pl, '$', 0, true) || `$${acc.realized_pl.toFixed(2)}`;
+                totalRealizedPL += acc.realized_pl;
+            } else {
+                realizedCell.textContent = '-';
+            }
+            row.appendChild(realizedCell);
+            
+            // Unrealized P/L
+            const unrealizedCell = document.createElement('td');
+            unrealizedCell.className = 'text-end';
+            if (acc.unrealized_pl !== 0) {
+                unrealizedCell.innerHTML = window.FieldRendererService?.renderAmount(acc.unrealized_pl, '$', 0, true) || `$${acc.unrealized_pl.toFixed(2)}`;
+                totalUnrealizedPL += acc.unrealized_pl;
+            } else {
+                unrealizedCell.textContent = '-';
+            }
+            row.appendChild(unrealizedCell);
+            
+            // Total P/L
+            const totalPLCell = document.createElement('td');
+            totalPLCell.className = 'text-end';
+            const totalPL = acc.realized_pl + acc.unrealized_pl;
+            if (totalPL !== 0) {
+                totalPLCell.innerHTML = window.FieldRendererService?.renderAmount(totalPL, '$', 0, true) || `$${totalPL.toFixed(2)}`;
+            } else {
+                totalPLCell.textContent = '-';
+            }
+            row.appendChild(totalPLCell);
+            
+            // Positions count
+            const positionsCell = document.createElement('td');
+            positionsCell.className = 'text-end';
+            positionsCell.textContent = acc.positions_count;
+            totalPositions += acc.positions_count;
+            row.appendChild(positionsCell);
+            
+            accountsTableBody.appendChild(row);
+        });
+        
+        // Update totals row
+        const totalCashEl = document.getElementById('accounts-total-cash');
+        const totalRealizedPLEl = document.getElementById('accounts-total-realized-pl');
+        const totalUnrealizedPLEl = document.getElementById('accounts-total-unrealized-pl');
+        const totalPLEl = document.getElementById('accounts-total-pl');
+        const totalPositionsEl = document.getElementById('accounts-total-positions');
+        
+        if (totalCashEl) {
+            if (totalCash !== 0) {
+                totalCashEl.innerHTML = window.FieldRendererService?.renderAmount(totalCash, '$', 0, false) || `$${totalCash.toFixed(2)}`;
+            } else {
+                totalCashEl.textContent = '-';
+            }
+        }
+        if (totalRealizedPLEl) {
+            if (totalRealizedPL !== 0) {
+                totalRealizedPLEl.innerHTML = window.FieldRendererService?.renderAmount(totalRealizedPL, '$', 0, true) || `$${totalRealizedPL.toFixed(2)}`;
+            } else {
+                totalRealizedPLEl.textContent = '-';
+            }
+        }
+        if (totalUnrealizedPLEl) {
+            if (totalUnrealizedPL !== 0) {
+                totalUnrealizedPLEl.innerHTML = window.FieldRendererService?.renderAmount(totalUnrealizedPL, '$', 0, true) || `$${totalUnrealizedPL.toFixed(2)}`;
+            } else {
+                totalUnrealizedPLEl.textContent = '-';
+            }
+        }
+        if (totalPLEl) {
+            const totalPL = totalRealizedPL + totalUnrealizedPL;
+            if (totalPL !== 0) {
+                totalPLEl.innerHTML = window.FieldRendererService?.renderAmount(totalPL, '$', 0, true) || `$${totalPL.toFixed(2)}`;
+            } else {
+                totalPLEl.textContent = '-';
+            }
+        }
+        if (totalPositionsEl) {
+            totalPositionsEl.textContent = totalPositions;
+        }
     }
 }
 
-// Format currency
+// Format currency - use FieldRendererService instead
 function formatCurrency(value) {
+    // Use FieldRendererService if available (general system)
+    if (window.FieldRendererService && typeof window.FieldRendererService.renderAmount === 'function') {
+        return window.FieldRendererService.renderAmount(value, '$', 0, false);
+    }
+    // Fallback to local implementation
     return new Intl.NumberFormat('en-US', {
         style: 'currency',
         currency: 'USD',
@@ -1545,7 +2952,11 @@ async function initPortfolioPerformanceChart() {
     
     try {
         // Use secondary color (orange-red) for performance chart
-        const secondaryColor = getCSSVariableValue('--secondary-color', '#fc5a06');
+        // שימוש במערכת המרכזית לצבע משני
+        const secondaryColor = getCSSVariableValue('--secondary-color', 
+            (typeof window.getEntityColor === 'function' ? window.getEntityColor('development') : '') || 
+            (typeof window.colorSchemeSystem !== 'undefined' && window.colorSchemeSystem.BRAND_SECONDARY ? window.colorSchemeSystem.BRAND_SECONDARY : '')
+        );
         
         // Get wrapper for width calculation (if exists)
         const wrapper = container.closest('.chart-container-wrapper') || container.parentElement;
@@ -1585,16 +2996,24 @@ async function initPortfolioPerformanceChart() {
             crosshair: {
                 mode: 1, // Normal mode - shows crosshair with tooltip
                 vertLine: {
-                    color: '#6A5ACD',
+                    // Use centralized Color Scheme System - no hardcoded colors
+                    color: (typeof window.getEntityColor === 'function' ? window.getEntityColor('development') : '') || 
+                           (typeof window.colorSchemeSystem !== 'undefined' && window.colorSchemeSystem.BRAND_SECONDARY ? window.colorSchemeSystem.BRAND_SECONDARY : ''),
                     width: 1,
                     style: 0,
-                    labelBackgroundColor: '#6A5ACD'
+                    // Use centralized Color Scheme System - no hardcoded colors
+                    labelBackgroundColor: (typeof window.getEntityColor === 'function' ? window.getEntityColor('development') : '') || 
+                                         (typeof window.colorSchemeSystem !== 'undefined' && window.colorSchemeSystem.BRAND_SECONDARY ? window.colorSchemeSystem.BRAND_SECONDARY : '')
                 },
                 horzLine: {
-                    color: '#6A5ACD',
+                    // Use centralized Color Scheme System - no hardcoded colors
+                    color: (typeof window.getEntityColor === 'function' ? window.getEntityColor('development') : '') || 
+                           (typeof window.colorSchemeSystem !== 'undefined' && window.colorSchemeSystem.BRAND_SECONDARY ? window.colorSchemeSystem.BRAND_SECONDARY : ''),
                     width: 1,
                     style: 0,
-                    labelBackgroundColor: '#6A5ACD'
+                    // Use centralized Color Scheme System - no hardcoded colors
+                    labelBackgroundColor: (typeof window.getEntityColor === 'function' ? window.getEntityColor('development') : '') || 
+                                         (typeof window.colorSchemeSystem !== 'undefined' && window.colorSchemeSystem.BRAND_SECONDARY ? window.colorSchemeSystem.BRAND_SECONDARY : '')
                 }
             }
         });
@@ -1616,42 +3035,118 @@ async function initPortfolioPerformanceChart() {
             }
         });
         
-        // Generate performance data (percentage change from start)
-        const mockData = generateMockPortfolioPerformanceData(currentPeriod['both'] || 'month');
-        portfolioPerformanceSeries.setData(mockData.performance);
+        // Load performance data using PortfolioStateData service
+        let performanceData = [];
+        try {
+            if (window.PortfolioStateData && typeof window.PortfolioStateData.loadSeries === 'function') {
+                const period = currentPeriod['both'] || 'month';
+                const endDate = new Date().toISOString().split('T')[0];
+                const startDate = new Date();
+                const days = period === 'week' ? 7 : period === 'month' ? 30 : period === '3months' ? 90 : period === 'year' ? 365 : 30;
+                startDate.setDate(startDate.getDate() - days);
+                const startDateStr = startDate.toISOString().split('T')[0];
+                
+                const accountId = getSelectedAccounts().length === 1 ? getSelectedAccounts()[0] : null;
+                const series = await window.PortfolioStateData.loadSeries(accountId, startDateStr, endDate, {
+                    interval: 'day'
+                });
+                
+                // Transform series data to chart format
+                performanceData = Array.isArray(series?.snapshots) ? series.snapshots.map((snapshot, index) => {
+                    const baseValue = index === 0 ? snapshot.total_value : series.snapshots[0].total_value;
+                    const percent = baseValue > 0 ? ((snapshot.total_value - baseValue) / baseValue) * 100 : 0;
+                    // Convert date to yyyy-mm-dd format for charts
+                    const dateValue = snapshot.snapshot_date || snapshot.date;
+                    const chartDate = convertDateToChartFormat(dateValue);
+                    return {
+                        time: chartDate,
+                        value: percent
+                    };
+                }) : [];
+            }
+        } catch (error) {
+            if (window.Logger) {
+                window.Logger.error('Error loading performance data', { page: 'portfolio-state-page', error });
+            }
+            if (window.NotificationSystem) {
+                window.NotificationSystem.showError(
+                    'שגיאה בטעינת נתונים',
+                    'שגיאה בטעינת נתוני ביצועי תיק. נא לנסות שוב או ליצור קשר עם התמיכה.'
+                );
+            }
+        }
         
-        // Add markers for multiple min/max points
+        // Check if chart still exists before updating data
+        if (!portfolioPerformanceChart || !portfolioPerformanceSeries) {
+            if (window.Logger) {
+                window.Logger.warn('Portfolio performance chart or series not available, skipping data update', { page: 'portfolio-state-page' });
+            }
+            return;
+        }
+        
+        // No fallback data - show error if no data available
+        if (performanceData.length === 0) {
+            if (window.NotificationSystem) {
+                window.NotificationSystem.showError(
+                    'נתונים לא זמינים',
+                    'לא נמצאו נתוני ביצועי תיק עבור התקופה שנבחרה. נא לבדוק שיש נתונים במערכת.'
+                );
+            }
+            // Show empty chart with message
+            try {
+                portfolioPerformanceSeries.setData([]);
+            } catch (error) {
+                if (window.Logger) {
+                    window.Logger.warn('Error setting empty data to performance chart (chart may be disposed)', { page: 'portfolio-state-page', error: error.message });
+                }
+            }
+        } else {
+            try {
+        portfolioPerformanceSeries.setData(performanceData);
+            } catch (error) {
+                if (window.Logger) {
+                    window.Logger.error('Error setting data to performance chart (chart may be disposed)', { page: 'portfolio-state-page', error: error.message });
+                }
+                // Reset chart variable if it's disposed
+                if (error.message && error.message.includes('disposed')) {
+                    portfolioPerformanceChart = null;
+                }
+            }
+        }
+        
+        // Add markers for min/max points if data available
         const lightweightCharts = window.LightweightCharts || window.lightweightCharts;
-        if (mockData.minIndices && mockData.maxIndices && lightweightCharts) {
+        if (performanceData.length > 0 && lightweightCharts) {
             const markers = [];
+            const values = performanceData.map(d => d.value);
+            const minValue = Math.min(...values);
+            const maxValue = Math.max(...values);
+            const minIndex = values.indexOf(minValue);
+            const maxIndex = values.indexOf(maxValue);
             
-            // Add markers for all min points
-            mockData.minIndices.forEach((minIdx, idx) => {
-                if (minIdx >= 0 && minIdx < mockData.performance.length) {
-                    markers.push({
-                        time: mockData.performance[minIdx].time,
-                        position: 'belowBar',
-                        color: '#dc3545',
-                        shape: 'arrowUp',
-                        text: `${mockData.performance[minIdx].value.toFixed(2)}%`,
-                        size: 1
-                    });
-                }
-            });
+            // Add marker for min point
+            if (minIndex >= 0 && minIndex < performanceData.length) {
+                markers.push({
+                    time: performanceData[minIndex].time,
+                    position: 'belowBar',
+                    color: (typeof window.getNumericValueColor === 'function' ? window.getNumericValueColor(-1, 'medium') : '') || '',
+                    shape: 'arrowUp',
+                    text: `${performanceData[minIndex].value.toFixed(2)}%`,
+                    size: 1
+                });
+            }
             
-            // Add markers for all max points
-            mockData.maxIndices.forEach((maxIdx, idx) => {
-                if (maxIdx >= 0 && maxIdx < mockData.performance.length) {
-                    markers.push({
-                        time: mockData.performance[maxIdx].time,
-                        position: 'aboveBar',
-                        color: '#28a745',
-                        shape: 'arrowDown',
-                        text: `${mockData.performance[maxIdx].value.toFixed(2)}%`,
-                        size: 1
-                    });
-                }
-            });
+            // Add marker for max point
+            if (maxIndex >= 0 && maxIndex < performanceData.length && maxIndex !== minIndex) {
+                markers.push({
+                    time: performanceData[maxIndex].time,
+                    position: 'aboveBar',
+                    color: (typeof window.getNumericValueColor === 'function' ? window.getNumericValueColor(1, 'medium') : '') || '',
+                    shape: 'arrowDown',
+                    text: `${performanceData[maxIndex].value.toFixed(2)}%`,
+                    size: 1
+                });
+            }
             
             // Try to use createSeriesMarkers if available
             if (typeof lightweightCharts.createSeriesMarkers === 'function') {
@@ -1746,7 +3241,11 @@ async function initPortfolioValueChart() {
     }
     
     try {
-        const primaryColor = getCSSVariableValue('--primary-color', '#26baac');
+        // שימוש במערכת המרכזית לצבע ראשי
+        const primaryColor = getCSSVariableValue('--primary-color', 
+            (typeof window.getEntityColor === 'function' ? window.getEntityColor('trade') : '') || 
+            (typeof window.colorSchemeSystem !== 'undefined' && window.colorSchemeSystem.BRAND_PRIMARY ? window.colorSchemeSystem.BRAND_PRIMARY : '')
+        );
         
         // Get wrapper for width calculation (if exists)
         const wrapper = container.closest('.chart-container-wrapper') || container.parentElement;
@@ -1793,16 +3292,24 @@ async function initPortfolioValueChart() {
             crosshair: {
                 mode: 1, // Normal mode - shows crosshair with tooltip
                 vertLine: {
-                    color: '#6A5ACD',
+                    // Use centralized Color Scheme System - no hardcoded colors
+                    color: (typeof window.getEntityColor === 'function' ? window.getEntityColor('development') : '') || 
+                           (typeof window.colorSchemeSystem !== 'undefined' && window.colorSchemeSystem.BRAND_SECONDARY ? window.colorSchemeSystem.BRAND_SECONDARY : ''),
                     width: 1,
                     style: 0,
-                    labelBackgroundColor: '#6A5ACD'
+                    // Use centralized Color Scheme System - no hardcoded colors
+                    labelBackgroundColor: (typeof window.getEntityColor === 'function' ? window.getEntityColor('development') : '') || 
+                                         (typeof window.colorSchemeSystem !== 'undefined' && window.colorSchemeSystem.BRAND_SECONDARY ? window.colorSchemeSystem.BRAND_SECONDARY : '')
                 },
                 horzLine: {
-                    color: '#6A5ACD',
+                    // Use centralized Color Scheme System - no hardcoded colors
+                    color: (typeof window.getEntityColor === 'function' ? window.getEntityColor('development') : '') || 
+                           (typeof window.colorSchemeSystem !== 'undefined' && window.colorSchemeSystem.BRAND_SECONDARY ? window.colorSchemeSystem.BRAND_SECONDARY : ''),
                     width: 1,
                     style: 0,
-                    labelBackgroundColor: '#6A5ACD'
+                    // Use centralized Color Scheme System - no hardcoded colors
+                    labelBackgroundColor: (typeof window.getEntityColor === 'function' ? window.getEntityColor('development') : '') || 
+                                         (typeof window.colorSchemeSystem !== 'undefined' && window.colorSchemeSystem.BRAND_SECONDARY ? window.colorSchemeSystem.BRAND_SECONDARY : '')
                 }
             }
         });
@@ -1841,43 +3348,144 @@ async function initPortfolioValueChart() {
             }
         });
         
-        // Generate data based on filtered trades - TODO: Load from API
-        const mockData = generateMockPortfolioValueData(currentPeriod['both'] || 'month');
-        portfolioValueSeries.setData(mockData.values);
-        portfolioValuePercentSeries.setData(mockData.percentages);
+        // Load portfolio value data using PortfolioStateData service
+        let valueData = {
+            values: [],
+            percentages: []
+        };
+        try {
+            if (window.PortfolioStateData && typeof window.PortfolioStateData.loadSeries === 'function') {
+                const period = currentPeriod['both'] || 'month';
+                const endDate = new Date().toISOString().split('T')[0];
+                const startDate = new Date();
+                const days = period === 'week' ? 7 : period === 'month' ? 30 : period === '3months' ? 90 : period === 'year' ? 365 : 30;
+                startDate.setDate(startDate.getDate() - days);
+                const startDateStr = startDate.toISOString().split('T')[0];
+                
+                const accountId = getSelectedAccounts().length === 1 ? getSelectedAccounts()[0] : null;
+                const series = await window.PortfolioStateData.loadSeries(accountId, startDateStr, endDate, {
+                    interval: 'day'
+                });
+                
+                // Transform series data to chart format
+                if (Array.isArray(series?.snapshots) && series.snapshots.length > 0) {
+                    const baseValue = series.snapshots[0]?.total_value;
+                    if (baseValue !== null && baseValue !== undefined && baseValue > 0) {
+                        valueData.values = series.snapshots.map(snapshot => {
+                            const dateValue = snapshot.snapshot_date || snapshot.date;
+                            const chartDate = convertDateToChartFormat(dateValue);
+                            return {
+                                time: chartDate,
+                                value: snapshot.total_value !== null && snapshot.total_value !== undefined ? snapshot.total_value : null
+                            };
+                        }).filter(item => item.value !== null); // Filter out null values
+                        valueData.percentages = series.snapshots.map(snapshot => {
+                            const snapshotValue = snapshot.total_value !== null && snapshot.total_value !== undefined ? snapshot.total_value : null;
+                            if (snapshotValue === null) return null;
+                            const percent = ((snapshotValue - baseValue) / baseValue) * 100;
+                            const dateValue = snapshot.snapshot_date || snapshot.date;
+                            const chartDate = convertDateToChartFormat(dateValue);
+                            return {
+                                time: chartDate,
+                                value: percent
+                            };
+                        }).filter(item => item !== null); // Filter out null values
+                    } else {
+                        // No valid base value - show error
+                        if (window.NotificationSystem) {
+                            window.NotificationSystem.showError(
+                                'נתונים לא זמינים',
+                                'לא נמצאו נתוני שווי תיק תקינים. נא לבדוק שיש נתונים במערכת.'
+                            );
+                        }
+                    }
+                }
+            }
+        } catch (error) {
+            if (window.Logger) {
+                window.Logger.error('Error loading portfolio value data', { page: 'portfolio-state-page', error });
+            }
+            if (window.NotificationSystem) {
+                window.NotificationSystem.showError(
+                    'שגיאה בטעינת נתונים',
+                    'שגיאה בטעינת נתוני שווי תיק. נא לנסות שוב או ליצור קשר עם התמיכה.'
+                );
+            }
+        }
         
-        // Add markers for multiple min/max points
+        // Check if chart still exists before updating data
+        if (!portfolioValueChart || !portfolioValueSeries || !portfolioValuePercentSeries) {
+            if (window.Logger) {
+                window.Logger.warn('Portfolio value chart or series not available, skipping data update', { page: 'portfolio-state-page' });
+            }
+            return;
+        }
+        
+        // No fallback data - show error if no data available
+        if (valueData.values.length === 0) {
+            if (window.NotificationSystem) {
+                window.NotificationSystem.showError(
+                    'נתונים לא זמינים',
+                    'לא נמצאו נתוני שווי תיק עבור התקופה שנבחרה. נא לבדוק שיש נתונים במערכת.'
+                );
+            }
+            // Show empty chart with message
+            try {
+                portfolioValueSeries.setData([]);
+                portfolioValuePercentSeries.setData([]);
+            } catch (error) {
+                if (window.Logger) {
+                    window.Logger.warn('Error setting empty data to value chart (chart may be disposed)', { page: 'portfolio-state-page', error: error.message });
+                }
+            }
+        } else {
+            try {
+                portfolioValueSeries.setData(valueData.values);
+                portfolioValuePercentSeries.setData(valueData.percentages);
+            } catch (error) {
+                if (window.Logger) {
+                    window.Logger.error('Error setting data to value chart (chart may be disposed)', { page: 'portfolio-state-page', error: error.message });
+                }
+                // Reset chart variable if it's disposed
+                if (error.message && error.message.includes('disposed')) {
+                    portfolioValueChart = null;
+                }
+            }
+        }
+        
+        // Add markers for min/max points if data available
         const lightweightCharts = window.LightweightCharts || window.lightweightCharts;
-        if (mockData.minIndices && mockData.maxIndices && lightweightCharts) {
+        if (valueData.values.length > 0 && lightweightCharts) {
             const markers = [];
+            const values = valueData.values.map(d => d.value);
+            const minValue = Math.min(...values);
+            const maxValue = Math.max(...values);
+            const minIndex = values.indexOf(minValue);
+            const maxIndex = values.indexOf(maxValue);
             
-            // Add markers for all min points
-            mockData.minIndices.forEach((minIdx, idx) => {
-                if (minIdx >= 0 && minIdx < mockData.values.length) {
-                    markers.push({
-                        time: mockData.values[minIdx].time,
-                        position: 'belowBar',
-                        color: '#dc3545',
-                        shape: 'arrowUp',
-                        text: `$${mockData.values[minIdx].value.toLocaleString()}`,
-                        size: 1
-                    });
-                }
-            });
+            // Add marker for min point
+            if (minIndex >= 0 && minIndex < valueData.values.length) {
+                markers.push({
+                    time: valueData.values[minIndex].time,
+                    position: 'belowBar',
+                    color: (typeof window.getNumericValueColor === 'function' ? window.getNumericValueColor(-1, 'medium') : '') || '',
+                    shape: 'arrowUp',
+                    text: `$${valueData.values[minIndex].value.toLocaleString()}`,
+                    size: 1
+                });
+            }
             
-            // Add markers for all max points
-            mockData.maxIndices.forEach((maxIdx, idx) => {
-                if (maxIdx >= 0 && maxIdx < mockData.values.length) {
-                    markers.push({
-                        time: mockData.values[maxIdx].time,
-                        position: 'aboveBar',
-                        color: '#28a745',
-                        shape: 'arrowDown',
-                        text: `$${mockData.values[maxIdx].value.toLocaleString()}`,
-                        size: 1
-                    });
-                }
-            });
+            // Add marker for max point
+            if (maxIndex >= 0 && maxIndex < valueData.values.length && maxIndex !== minIndex) {
+                markers.push({
+                    time: valueData.values[maxIndex].time,
+                    position: 'aboveBar',
+                    color: (typeof window.getNumericValueColor === 'function' ? window.getNumericValueColor(1, 'medium') : '') || '',
+                    shape: 'arrowDown',
+                    text: `$${valueData.values[maxIndex].value.toLocaleString()}`,
+                    size: 1
+                });
+            }
             
             // Try to use createSeriesMarkers if available
             if (typeof lightweightCharts.createSeriesMarkers === 'function') {
@@ -1904,18 +3512,12 @@ async function initPortfolioValueChart() {
         setupChartSynchronization();
         
     } catch (error) {
+        const errorMsg = `שגיאה ביצירת גרף שווי תיק: ${error.message || 'שגיאה לא ידועה'}`;
+        if (window.NotificationSystem) {
+            window.NotificationSystem.showError('שגיאה ביצירת גרף', errorMsg);
+        }
         if (window.Logger) {
-            const errorMsg = `שגיאה ביצירת גרף שווי תיק: ${error.message || 'שגיאה לא ידועה'}`;
-            if (window.NotificationSystem) {
-                window.NotificationSystem.showError('שגיאה ביצירת גרף', errorMsg);
-            }
-            const errorMsg = `שגיאה ביצירת גרף שווי תיק: ${error.message || 'שגיאה לא ידועה'}`;
-            if (window.NotificationSystem) {
-                window.NotificationSystem.showError('שגיאה ביצירת גרף', errorMsg);
-            }
-            if (window.Logger) {
-                window.Logger.error('Error creating portfolio value chart', { page: 'portfolio-state-page', error });
-            }
+            window.Logger.error('Error creating portfolio value chart', { page: 'portfolio-state-page', error });
         }
         portfolioValueChart = null;
     }
@@ -1981,9 +3583,16 @@ async function initPLTrendChart() {
     }
     
     try {
-        const successColor = getCSSVariableValue('--success-color', '#28a745');
-        const warningColor = getCSSVariableValue('--warning-color', '#ffc107');
-        const primaryColor = getCSSVariableValue('--primary-color', '#007bff');
+        // שימוש במערכת המרכזית לצבעים
+        const successColor = getCSSVariableValue('--success-color', 
+            (typeof window.getNumericValueColor === 'function' ? window.getNumericValueColor(1, 'medium') : '') || ''
+        );
+        const warningColor = getCSSVariableValue('--warning-color', 
+            (typeof window.getStatusColor === 'function' ? window.getStatusColor('warning', 'medium') : '') || ''
+        );
+        const primaryColor = getCSSVariableValue('--primary-color', 
+            (typeof window.getEntityColor === 'function' ? window.getEntityColor('trade') : '') || ''
+        );
         
         // Get wrapper for width calculation (if exists)
         const wrapper = container.closest('.chart-container-wrapper') || container.parentElement;
@@ -2030,16 +3639,24 @@ async function initPLTrendChart() {
             crosshair: {
                 mode: 1, // Normal mode - shows crosshair with tooltip
                 vertLine: {
-                    color: '#6A5ACD',
+                    // Use centralized Color Scheme System - no hardcoded colors
+                    color: (typeof window.getEntityColor === 'function' ? window.getEntityColor('development') : '') || 
+                           (typeof window.colorSchemeSystem !== 'undefined' && window.colorSchemeSystem.BRAND_SECONDARY ? window.colorSchemeSystem.BRAND_SECONDARY : ''),
                     width: 1,
                     style: 0,
-                    labelBackgroundColor: '#6A5ACD'
+                    // Use centralized Color Scheme System - no hardcoded colors
+                    labelBackgroundColor: (typeof window.getEntityColor === 'function' ? window.getEntityColor('development') : '') || 
+                                         (typeof window.colorSchemeSystem !== 'undefined' && window.colorSchemeSystem.BRAND_SECONDARY ? window.colorSchemeSystem.BRAND_SECONDARY : '')
                 },
                 horzLine: {
-                    color: '#6A5ACD',
+                    // Use centralized Color Scheme System - no hardcoded colors
+                    color: (typeof window.getEntityColor === 'function' ? window.getEntityColor('development') : '') || 
+                           (typeof window.colorSchemeSystem !== 'undefined' && window.colorSchemeSystem.BRAND_SECONDARY ? window.colorSchemeSystem.BRAND_SECONDARY : ''),
                     width: 1,
                     style: 0,
-                    labelBackgroundColor: '#6A5ACD'
+                    // Use centralized Color Scheme System - no hardcoded colors
+                    labelBackgroundColor: (typeof window.getEntityColor === 'function' ? window.getEntityColor('development') : '') || 
+                                         (typeof window.colorSchemeSystem !== 'undefined' && window.colorSchemeSystem.BRAND_SECONDARY ? window.colorSchemeSystem.BRAND_SECONDARY : '')
                 }
             }
         });
@@ -2131,46 +3748,146 @@ async function initPLTrendChart() {
         });
         
         // Generate data based on filtered trades - TODO: Load from API
-        const mockData = generateMockPLData(currentPeriod['both'] || 'month');
-        realizedPLSeries.setData(mockData.realized);
-        unrealizedPLSeries.setData(mockData.unrealized);
-        totalPLSeries.setData(mockData.total);
-        realizedPLPercentSeries.setData(mockData.realizedPercent);
-        unrealizedPLPercentSeries.setData(mockData.unrealizedPercent);
-        totalPLPercentSeries.setData(mockData.totalPercent);
+        // Load P/L data using PortfolioStateData service
+        let plData = {
+            realized: [],
+            unrealized: [],
+            total: [],
+            realizedPercent: [],
+            unrealizedPercent: [],
+            totalPercent: []
+        };
+        try {
+            if (window.PortfolioStateData && typeof window.PortfolioStateData.loadSeries === 'function') {
+                const period = currentPeriod['both'] || 'month';
+                const endDate = new Date().toISOString().split('T')[0];
+                const startDate = new Date();
+                const days = period === 'week' ? 7 : period === 'month' ? 30 : period === '3months' ? 90 : period === 'year' ? 365 : 30;
+                startDate.setDate(startDate.getDate() - days);
+                const startDateStr = startDate.toISOString().split('T')[0];
+                
+                const accountId = getSelectedAccounts().length === 1 ? getSelectedAccounts()[0] : null;
+                const series = await window.PortfolioStateData.loadSeries(accountId, startDateStr, endDate, {
+                    interval: 'day'
+                });
+                
+                // Transform series data to chart format
+                if (Array.isArray(series?.snapshots)) {
+                    series.snapshots.forEach(snapshot => {
+                        const dateValue = snapshot.snapshot_date || snapshot.date;
+                        const time = convertDateToChartFormat(dateValue);
+                        // No fallback values - use null if data not available
+                        const realized = snapshot.total_realized_pl !== null && snapshot.total_realized_pl !== undefined ? snapshot.total_realized_pl : null;
+                        const unrealized = snapshot.total_unrealized_pl !== null && snapshot.total_unrealized_pl !== undefined ? snapshot.total_unrealized_pl : null;
+                        const total = (realized !== null && unrealized !== null) ? realized + unrealized : null;
+                        const baseValue = series.snapshots[0]?.total_value;
+                        const realizedPercent = (baseValue && baseValue > 0 && realized !== null) ? (realized / baseValue) * 100 : null;
+                        const unrealizedPercent = (baseValue && baseValue > 0 && unrealized !== null) ? (unrealized / baseValue) * 100 : null;
+                        const totalPercent = (baseValue && baseValue > 0 && total !== null) ? (total / baseValue) * 100 : null;
+                        
+                        // Only add data if values are not null
+                        if (realized !== null) plData.realized.push({ time, value: realized });
+                        if (unrealized !== null) plData.unrealized.push({ time, value: unrealized });
+                        if (total !== null) plData.total.push({ time, value: total });
+                        if (realizedPercent !== null) plData.realizedPercent.push({ time, value: realizedPercent });
+                        if (unrealizedPercent !== null) plData.unrealizedPercent.push({ time, value: unrealizedPercent });
+                        if (totalPercent !== null) plData.totalPercent.push({ time, value: totalPercent });
+                    });
+                }
+            }
+        } catch (error) {
+            if (window.Logger) {
+                window.Logger.error('Error loading P/L data', { page: 'portfolio-state-page', error });
+            }
+            if (window.NotificationSystem) {
+                window.NotificationSystem.showError(
+                    'שגיאה בטעינת נתונים',
+                    'שגיאה בטעינת נתוני P/L. נא לנסות שוב או ליצור קשר עם התמיכה.'
+                );
+            }
+        }
         
-        // Add markers for multiple min/max points on total PL
+        // Check if chart still exists before updating data
+        if (!plTrendChart || !realizedPLSeries || !unrealizedPLSeries || !totalPLSeries) {
+            if (window.Logger) {
+                window.Logger.warn('P/L trend chart or series not available, skipping data update', { page: 'portfolio-state-page' });
+            }
+            return;
+        }
+        
+        // No fallback data - show error if no data available
+        if (plData.total.length === 0) {
+            if (window.NotificationSystem) {
+                window.NotificationSystem.showError(
+                    'נתונים לא זמינים',
+                    'לא נמצאו נתוני P/L עבור התקופה שנבחרה. נא לבדוק שיש נתונים במערכת.'
+                );
+            }
+            // Show empty charts with message
+            try {
+                realizedPLSeries.setData([]);
+                unrealizedPLSeries.setData([]);
+                totalPLSeries.setData([]);
+                realizedPLPercentSeries.setData([]);
+                unrealizedPLPercentSeries.setData([]);
+                totalPLPercentSeries.setData([]);
+            } catch (error) {
+                if (window.Logger) {
+                    window.Logger.warn('Error setting empty data to P/L chart (chart may be disposed)', { page: 'portfolio-state-page', error: error.message });
+                }
+            }
+        } else {
+            try {
+        realizedPLSeries.setData(plData.realized);
+        unrealizedPLSeries.setData(plData.unrealized);
+        totalPLSeries.setData(plData.total);
+        realizedPLPercentSeries.setData(plData.realizedPercent);
+        unrealizedPLPercentSeries.setData(plData.unrealizedPercent);
+        totalPLPercentSeries.setData(plData.totalPercent);
+            } catch (error) {
+                if (window.Logger) {
+                    window.Logger.error('Error setting data to P/L chart (chart may be disposed)', { page: 'portfolio-state-page', error: error.message });
+                }
+                // Reset chart variable if it's disposed
+                if (error.message && error.message.includes('disposed')) {
+                    plTrendChart = null;
+                }
+            }
+        }
+        
+        // Add markers for min/max points on total PL if data available
         const lightweightChartsPL = window.LightweightCharts || window.lightweightCharts;
-        if (mockData.minIndices && mockData.maxIndices && lightweightChartsPL) {
+        if (plData.total.length > 0 && lightweightChartsPL) {
             const markers = [];
+            const values = plData.total.map(d => d.value);
+            const minValue = Math.min(...values);
+            const maxValue = Math.max(...values);
+            const minIndex = values.indexOf(minValue);
+            const maxIndex = values.indexOf(maxValue);
             
-            // Add markers for all min points
-            mockData.minIndices.forEach((minIdx, idx) => {
-                if (minIdx >= 0 && minIdx < mockData.total.length) {
-                    markers.push({
-                        time: mockData.total[minIdx].time,
-                        position: 'belowBar',
-                        color: '#dc3545',
-                        shape: 'arrowUp',
-                        text: `$${mockData.total[minIdx].value.toLocaleString()}`,
-                        size: 1
-                    });
-                }
-            });
+            // Add marker for min point
+            if (minIndex >= 0 && minIndex < plData.total.length) {
+                markers.push({
+                    time: plData.total[minIndex].time,
+                    position: 'belowBar',
+                    color: (typeof window.getNumericValueColor === 'function' ? window.getNumericValueColor(-1, 'medium') : '') || '',
+                    shape: 'arrowUp',
+                    text: `$${plData.total[minIndex].value.toLocaleString()}`,
+                    size: 1
+                });
+            }
             
-            // Add markers for all max points
-            mockData.maxIndices.forEach((maxIdx, idx) => {
-                if (maxIdx >= 0 && maxIdx < mockData.total.length) {
-                    markers.push({
-                        time: mockData.total[maxIdx].time,
-                        position: 'aboveBar',
-                        color: '#28a745',
-                        shape: 'arrowDown',
-                        text: `$${mockData.total[maxIdx].value.toLocaleString()}`,
-                        size: 1
-                    });
-                }
-            });
+            // Add marker for max point
+            if (maxIndex >= 0 && maxIndex < plData.total.length && maxIndex !== minIndex) {
+                markers.push({
+                    time: plData.total[maxIndex].time,
+                    position: 'aboveBar',
+                    color: (typeof window.getNumericValueColor === 'function' ? window.getNumericValueColor(1, 'medium') : '') || '',
+                    shape: 'arrowDown',
+                    text: `$${plData.total[maxIndex].value.toLocaleString()}`,
+                    size: 1
+                });
+            }
             
             // Try to use createSeriesMarkers if available
             if (typeof lightweightChartsPL.createSeriesMarkers === 'function') {
@@ -2247,11 +3964,62 @@ function setupChartSynchronization() {
         if (isSyncingCharts) return;
         if (!sourceRange || !sourceRange.from || !sourceRange.to) return;
         
+        // Validate source range values
+        if (sourceRange.from === null || sourceRange.to === null) {
+            if (window.Logger) {
+                window.Logger.debug('Skipping sync - source range has null values', { 
+                    page: 'portfolio-state-page', 
+                    direction,
+                    from: sourceRange.from,
+                    to: sourceRange.to
+                });
+            }
+            return;
+        }
+        
         // Sync to all other charts
         [performanceTimeScale, portfolioTimeScale, plTimeScale].forEach((targetTimeScale, index) => {
             if (targetTimeScale === sourceTimeScale) return;
             
-            const currentTargetRange = targetTimeScale.getVisibleRange();
+            // Check if target timeScale is valid
+            if (!targetTimeScale || typeof targetTimeScale.getVisibleRange !== 'function') {
+                if (window.Logger) {
+                    window.Logger.debug('Skipping sync - target timeScale not available', { 
+                        page: 'portfolio-state-page', 
+                        direction,
+                        index
+                    });
+                }
+                return;
+            }
+            
+            let currentTargetRange = null;
+            try {
+                currentTargetRange = targetTimeScale.getVisibleRange();
+            } catch (error) {
+                // Chart may not be ready yet
+                if (window.Logger) {
+                    window.Logger.debug('Cannot get visible range from target chart (may not be ready)', { 
+                        page: 'portfolio-state-page', 
+                        direction,
+                        error: error.message
+                    });
+                }
+                return;
+            }
+            
+            // Check if current range is valid
+            if (!currentTargetRange || currentTargetRange.from === null || currentTargetRange.to === null) {
+                // Chart is not ready yet, skip sync
+                if (window.Logger) {
+                    window.Logger.debug('Skipping sync - target chart range not ready', { 
+                        page: 'portfolio-state-page', 
+                        direction
+                    });
+                }
+                return;
+            }
+            
             if (timeRangesEqual(sourceRange, currentTargetRange)) return;
             
             isSyncingCharts = true;
@@ -2261,8 +4029,11 @@ function setupChartSynchronization() {
                     to: sourceRange.to
                 });
             } catch (error) {
+                // Only log if it's not a "disposed" or "null" error (these are expected during initialization)
+                if (error.message && !error.message.includes('disposed') && !error.message.includes('null')) {
                 if (window.Logger) {
                     window.Logger.error(`Sync error (${direction})`, { page: 'portfolio-state-page', error });
+                    }
                 }
             } finally {
                 setTimeout(() => { isSyncingCharts = false; }, 50);
@@ -2402,406 +4173,20 @@ function setupChartControls() {
     }
 }
 
-// Generate mock portfolio value data (filtered by date/account/investment type)
-function generateMockPortfolioValueData(period) {
-    const data = [];
-    const dataPercent = [];
-    const days = period === 'week' ? 7 : period === 'month' ? 30 : period === '3months' ? 90 : period === 'year' ? 365 : 365;
-    
-    // Calculate base value from filtered trades
-    const baseValue = filteredTrades.reduce((sum, trade) => {
-        // Mock calculation - should use actual position values
-        return sum + (trade.position_pl_value || 0);
-    }, 50000);
-    
-    const startValue = baseValue;
-    const values = []; // Store all values first to find local extremes
-    
-    for (let i = days; i >= 0; i--) {
-        const date = new Date();
-        date.setDate(date.getDate() - i);
-        const value = startValue + (days - i) * 50 + Math.random() * 1000;
-        const roundedValue = Math.round(value);
-        
-        // Calculate percentage change from start
-        const percentChange = ((roundedValue - startValue) / startValue) * 100;
-        
-        values.push(roundedValue);
-        
-        data.push({
-            time: date.toISOString().split('T')[0],
-            value: roundedValue
-        });
-        
-        dataPercent.push({
-            time: date.toISOString().split('T')[0],
-            value: percentChange
-        });
-    }
-    
-    // Find local minima and maxima distributed across the entire period
-    const windowSize = Math.max(3, Math.floor(days / 10)); // Window size for local extremes
-    const numPoints = Math.min(5, Math.max(3, Math.floor(days / 15))); // 3-5 points based on period length
-    
-    const localMinima = [];
-    const localMaxima = [];
-    
-    // Find local extremes
-    for (let i = windowSize; i < values.length - windowSize; i++) {
-        const currentValue = values[i];
-        
-        // Check if it's a local minimum (lower than neighbors)
-        let isLocalMin = true;
-        for (let j = i - windowSize; j <= i + windowSize; j++) {
-            if (j !== i && values[j] <= currentValue) {
-                isLocalMin = false;
-                break;
-            }
-        }
-        
-        if (isLocalMin) {
-            localMinima.push({index: i, value: currentValue});
-        }
-        
-        // Check if it's a local maximum (higher than neighbors)
-        let isLocalMax = true;
-        for (let j = i - windowSize; j <= i + windowSize; j++) {
-            if (j !== i && values[j] >= currentValue) {
-                isLocalMax = false;
-                break;
-            }
-        }
-        
-        if (isLocalMax) {
-            localMaxima.push({index: i, value: currentValue});
-        }
-    }
-    
-    // Select distributed points across the entire period
-    const selectDistributed = (candidates, numToSelect) => {
-        // Create a copy to avoid mutating the input array
-        const candidatesCopy = candidates.slice();
-        
-        if (candidatesCopy.length <= numToSelect) {
-            return candidatesCopy.map(p => p.index);
-        }
-        
-        // Sort by index to ensure distribution
-        candidatesCopy.sort((a, b) => a.index - b.index);
-        
-        // Select points distributed across the time range
-        const selected = [];
-        const step = Math.floor(candidatesCopy.length / numToSelect);
-        
-        for (let i = 0; i < candidatesCopy.length && selected.length < numToSelect; i += step) {
-            selected.push(candidatesCopy[i].index);
-        }
-        
-        // Fill remaining slots with best candidates
-        while (selected.length < numToSelect && candidatesCopy.length > 0) {
-            const best = candidatesCopy.reduce((best, current) => {
-                // Choose point that's furthest from already selected points
-                const minDistance = selected.length === 0 ? Infinity : 
-                    Math.min(...selected.map(s => Math.abs(current.index - s)));
-                const bestMinDistance = selected.length === 0 ? Infinity :
-                    Math.min(...selected.map(s => Math.abs(best.index - s)));
-                return minDistance > bestMinDistance ? current : best;
-            }, candidatesCopy[0]);
-            
-            selected.push(best.index);
-            // Remove selected candidate from copy (doesn't affect original)
-            const indexToRemove = candidatesCopy.findIndex(c => c.index === best.index);
-            if (indexToRemove !== -1) {
-                candidatesCopy.splice(indexToRemove, 1);
-            }
-        }
-        
-        return selected.sort((a, b) => a - b);
-    };
-    
-    return {
-        values: data,
-        percentages: dataPercent,
-        minIndices: selectDistributed(localMinima, numPoints),
-        maxIndices: selectDistributed(localMaxima, numPoints),
-        startValue: startValue
-    };
-}
+// REMOVED: generateMockPortfolioValueData - No mock data allowed
+// This function was removed - use PortfolioStateData.loadSeries() instead
+// If data is not available, show clear error message to user via NotificationSystem
 
-// Generate mock portfolio performance data (percentage return from start, excluding deposits/withdrawals)
-// Performance = (Current Value - Deposits/Withdrawals - Start Value) / Start Value * 100
-function generateMockPortfolioPerformanceData(period) {
-    const data = [];
-    const days = period === 'week' ? 7 : period === 'month' ? 30 : period === '3months' ? 90 : period === 'year' ? 365 : 365;
-    
-    // Calculate base value from filtered trades (same as portfolio value)
-    const baseValue = filteredTrades.reduce((sum, trade) => {
-        // Mock calculation - should use actual position values
-        return sum + (trade.position_pl_value || 0);
-    }, 50000);
-    
-    const startValue = baseValue;
-    
-    // Mock cumulative deposits/withdrawals over time
-    // In real implementation, this should come from account transactions API
-    const totalDeposits = days * 20; // Mock: cumulative deposits over period
-    const totalWithdrawals = days * 5; // Mock: cumulative withdrawals over period
-    const values = []; // Store all values first to find local extremes
-    
-    for (let i = days; i >= 0; i--) {
-        const date = new Date();
-        date.setDate(date.getDate() - i);
-        
-        // Calculate current total portfolio value (same as portfolio value chart)
-        // This includes deposits/withdrawals
-        const currentTotalValue = startValue + (days - i) * 50 + Math.random() * 1000;
-        const roundedTotalValue = Math.round(currentTotalValue);
-        
-        // Calculate cumulative deposits/withdrawals up to this point
-        // Mock: linear distribution over time
-        const progress = (days - i) / days;
-        const cumulativeDeposits = totalDeposits * progress;
-        const cumulativeWithdrawals = totalWithdrawals * progress;
-        const cumulativeNetCashFlow = cumulativeDeposits - cumulativeWithdrawals;
-        
-        // Performance = (Current Total Value - Cumulative Cash Flow - Start Value) / Start Value * 100
-        // This gives us the pure performance without deposits/withdrawals
-        const performanceValue = roundedTotalValue - cumulativeNetCashFlow;
-        const performancePercent = ((performanceValue - startValue) / startValue) * 100;
-        
-        values.push(performancePercent);
-        
-        data.push({
-            time: date.toISOString().split('T')[0],
-            value: performancePercent
-        });
-    }
-    
-    // Find local minima and maxima distributed across the entire period
-    const windowSize = Math.max(3, Math.floor(days / 10)); // Window size for local extremes
-    const numPoints = Math.min(5, Math.max(3, Math.floor(days / 15))); // 3-5 points based on period length
-    
-    const localMinima = [];
-    const localMaxima = [];
-    
-    // Find local extremes
-    for (let i = windowSize; i < values.length - windowSize; i++) {
-        const currentValue = values[i];
-        
-        // Check if it's a local minimum (lower than neighbors)
-        let isLocalMin = true;
-        for (let j = i - windowSize; j <= i + windowSize; j++) {
-            if (j !== i && values[j] <= currentValue) {
-                isLocalMin = false;
-                break;
-            }
-        }
-        
-        if (isLocalMin) {
-            localMinima.push({index: i, value: currentValue});
-        }
-        
-        // Check if it's a local maximum (higher than neighbors)
-        let isLocalMax = true;
-        for (let j = i - windowSize; j <= i + windowSize; j++) {
-            if (j !== i && values[j] >= currentValue) {
-                isLocalMax = false;
-                break;
-            }
-        }
-        
-        if (isLocalMax) {
-            localMaxima.push({index: i, value: currentValue});
-        }
-    }
-    
-    // Select distributed points across the entire period
-    const selectDistributed = (candidates, numToSelect) => {
-        // Create a copy to avoid mutating the input array
-        const candidatesCopy = candidates.slice();
-        
-        if (candidatesCopy.length <= numToSelect) {
-            return candidatesCopy.map(p => p.index);
-        }
-        
-        // Sort by index to ensure distribution
-        candidatesCopy.sort((a, b) => a.index - b.index);
-        
-        // Select points distributed across the time range
-        const selected = [];
-        const step = Math.floor(candidatesCopy.length / numToSelect);
-        
-        for (let i = 0; i < candidatesCopy.length && selected.length < numToSelect; i += step) {
-            selected.push(candidatesCopy[i].index);
-        }
-        
-        // Fill remaining slots with best candidates
-        while (selected.length < numToSelect && candidatesCopy.length > 0) {
-            const best = candidatesCopy.reduce((best, current) => {
-                // Choose point that's furthest from already selected points
-                const minDistance = selected.length === 0 ? Infinity : 
-                    Math.min(...selected.map(s => Math.abs(current.index - s)));
-                const bestMinDistance = selected.length === 0 ? Infinity :
-                    Math.min(...selected.map(s => Math.abs(best.index - s)));
-                return minDistance > bestMinDistance ? current : best;
-            }, candidatesCopy[0]);
-            
-            selected.push(best.index);
-            // Remove selected candidate from copy (doesn't affect original)
-            const indexToRemove = candidatesCopy.findIndex(c => c.index === best.index);
-            if (indexToRemove !== -1) {
-                candidatesCopy.splice(indexToRemove, 1);
-            }
-        }
-        
-        return selected.sort((a, b) => a - b);
-    };
-    
-    return {
-        performance: data,
-        minIndices: selectDistributed(localMinima, numPoints),
-        maxIndices: selectDistributed(localMaxima, numPoints),
-        startValue: startValue
-    };
-}
+// REMOVED: generateMockPortfolioPerformanceData_DEPRECATED - No mock data allowed
+// This function was removed - use PortfolioStateData.loadSeries() instead
+// If data is not available, show clear error message to user via NotificationSystem
 
-// Generate mock P/L data (filtered by date/account/investment type)
-function generateMockPLData(period) {
-    const days = period === 'week' ? 7 : period === 'month' ? 30 : period === '3months' ? 90 : period === 'year' ? 365 : 365;
-    const realized = [];
-    const unrealized = [];
-    const total = [];
-    const realizedPercent = [];
-    const unrealizedPercent = [];
-    const totalPercent = [];
-    
-    // Calculate base values from filtered trades
-    const baseUnrealizedPL = filteredTrades.reduce((sum, trade) => sum + (trade.position_pl_value || 0), 0);
-    const baseRealizedPL = 10000; // Mock - should come from closed trades
-    const baseTotalPL = baseRealizedPL + baseUnrealizedPL;
-    
-    const totalValues = []; // Store all total values first to find local extremes
-    
-    for (let i = days; i >= 0; i--) {
-        const date = new Date();
-        date.setDate(date.getDate() - i);
-        const realizedValue = baseRealizedPL + (days - i) * 20 + Math.random() * 500;
-        const unrealizedValue = baseUnrealizedPL + (days - i) * 30 + Math.random() * 800;
-        const totalValue = realizedValue + unrealizedValue;
-        
-        const roundedRealized = Math.round(realizedValue);
-        const roundedUnrealized = Math.round(unrealizedValue);
-        const roundedTotal = Math.round(totalValue);
-        
-        totalValues.push(roundedTotal);
-        
-        // Calculate percentages
-        const realizedPercentValue = baseRealizedPL > 0 ? ((roundedRealized - baseRealizedPL) / baseRealizedPL) * 100 : 0;
-        const unrealizedPercentValue = baseUnrealizedPL > 0 ? ((roundedUnrealized - baseUnrealizedPL) / baseUnrealizedPL) * 100 : 0;
-        const totalPercentValue = baseTotalPL > 0 ? ((roundedTotal - baseTotalPL) / baseTotalPL) * 100 : 0;
-        
-        const timeStr = date.toISOString().split('T')[0];
-        
-        realized.push({ time: timeStr, value: roundedRealized });
-        unrealized.push({ time: timeStr, value: roundedUnrealized });
-        total.push({ time: timeStr, value: roundedTotal });
-        
-        realizedPercent.push({ time: timeStr, value: realizedPercentValue });
-        unrealizedPercent.push({ time: timeStr, value: unrealizedPercentValue });
-        totalPercent.push({ time: timeStr, value: totalPercentValue });
-    }
-    
-    // Find local minima and maxima distributed across the entire period
-    const windowSize = Math.max(3, Math.floor(days / 10)); // Window size for local extremes
-    const numPoints = Math.min(5, Math.max(3, Math.floor(days / 15))); // 3-5 points based on period length
-    
-    const localMinima = [];
-    const localMaxima = [];
-    
-    // Find local extremes
-    for (let i = windowSize; i < totalValues.length - windowSize; i++) {
-        const currentValue = totalValues[i];
-        
-        // Check if it's a local minimum (lower than neighbors)
-        let isLocalMin = true;
-        for (let j = i - windowSize; j <= i + windowSize; j++) {
-            if (j !== i && totalValues[j] <= currentValue) {
-                isLocalMin = false;
-                break;
-            }
-        }
-        
-        if (isLocalMin) {
-            localMinima.push({index: i, value: currentValue});
-        }
-        
-        // Check if it's a local maximum (higher than neighbors)
-        let isLocalMax = true;
-        for (let j = i - windowSize; j <= i + windowSize; j++) {
-            if (j !== i && totalValues[j] >= currentValue) {
-                isLocalMax = false;
-                break;
-            }
-        }
-        
-        if (isLocalMax) {
-            localMaxima.push({index: i, value: currentValue});
-        }
-    }
-    
-    // Select distributed points across the entire period
-    const selectDistributed = (candidates, numToSelect) => {
-        // Create a copy to avoid mutating the input array
-        const candidatesCopy = candidates.slice();
-        
-        if (candidatesCopy.length <= numToSelect) {
-            return candidatesCopy.map(p => p.index);
-        }
-        
-        // Sort by index to ensure distribution
-        candidatesCopy.sort((a, b) => a.index - b.index);
-        
-        // Select points distributed across the time range
-        const selected = [];
-        const step = Math.floor(candidatesCopy.length / numToSelect);
-        
-        for (let i = 0; i < candidatesCopy.length && selected.length < numToSelect; i += step) {
-            selected.push(candidatesCopy[i].index);
-        }
-        
-        // Fill remaining slots with best candidates
-        while (selected.length < numToSelect && candidatesCopy.length > 0) {
-            const best = candidatesCopy.reduce((best, current) => {
-                // Choose point that's furthest from already selected points
-                const minDistance = selected.length === 0 ? Infinity : 
-                    Math.min(...selected.map(s => Math.abs(current.index - s)));
-                const bestMinDistance = selected.length === 0 ? Infinity :
-                    Math.min(...selected.map(s => Math.abs(best.index - s)));
-                return minDistance > bestMinDistance ? current : best;
-            }, candidatesCopy[0]);
-            
-            selected.push(best.index);
-            // Remove selected candidate from copy (doesn't affect original)
-            const indexToRemove = candidatesCopy.findIndex(c => c.index === best.index);
-            if (indexToRemove !== -1) {
-                candidatesCopy.splice(indexToRemove, 1);
-            }
-        }
-        
-        return selected.sort((a, b) => a - b);
-    };
-    
-    return { 
-        realized, unrealized, total,
-        realizedPercent, unrealizedPercent, totalPercent,
-        minIndices: selectDistributed(localMinima, numPoints),
-        maxIndices: selectDistributed(localMaxima, numPoints),
-        baseRealizedPL, baseUnrealizedPL, baseTotalPL
-    };
-}
+// REMOVED: generateMockPLData_DEPRECATED - No mock data allowed
+// This function was removed - use PortfolioStateData.loadSeries() instead
+// If data is not available, show clear error message to user via NotificationSystem
 
 // Compare dates
-function compareDates() {
+async function compareDates() {
     // Get selected date range
     const selectedItem = document.querySelector('#dateRangeFilterMenu .date-range-filter-item.selected');
     const dateRange1 = selectedItem ? selectedItem.getAttribute('data-value') : 'היום';
@@ -2809,79 +4194,328 @@ function compareDates() {
     
     // For comparison, use the end date (or today if no end)
     const date1 = end1 ? end1.toISOString().split('T')[0] : new Date().toISOString().split('T')[0];
-    const date2 = document.getElementById('datePicker2').value;
+    // Use DataCollectionService to get value if available
+    let date2;
+    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) {
+      date2 = window.DataCollectionService.getValue('datePicker2', 'dateOnly', '');
+    } else {
+      const date2El = document.getElementById('datePicker2');
+      date2 = date2El ? date2El.value : '';
+    }
     
     if (!date1 || !date2) {
-        alert('נא לבחור שני תאריכים להשוואה');
+        // Use NotificationSystem instead of alert
+        if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {
+            window.NotificationSystem.showError('שגיאה', 'נא לבחור שני תאריכים להשוואה');
+        } else if (window.Logger) {
+            window.Logger.warn('Please select two dates for comparison', { page: 'portfolio-state-page' });
+        }
         return;
     }
     
-    // Format dates for display
+    // Format dates for display using FieldRendererService
     const formatDate = (dateStr) => {
-        const date = new Date(dateStr);
-        return date.toLocaleDateString('he-IL', { year: 'numeric', month: '2-digit', day: '2-digit' });
+        return window.FieldRendererService.renderDate(dateStr, false);
     };
     
     // Update headers
-    document.getElementById('comparison-date1-header').textContent = formatDate(date1);
-    document.getElementById('comparison-date2-header').textContent = formatDate(date2);
+    const date1Header = document.getElementById('comparison-date1-header');
+    const date2Header = document.getElementById('comparison-date2-header');
+    if (date1Header) {
+        date1Header.textContent = formatDate(date1);
+    }
+    if (date2Header) {
+        date2Header.textContent = formatDate(date2);
+    }
     
-    // Show comparison table and hide placeholder
-    document.getElementById('comparison-table-wrapper').style.display = 'block';
-    document.getElementById('comparison-placeholder').style.display = 'none';
-    document.getElementById('removeComparisonDate').style.display = 'inline-block';
+    // Show comparison table and hide placeholder (with null checks to prevent errors)
+    const comparisonTableWrapper = document.getElementById('comparison-table-wrapper');
+    const comparisonPlaceholder = document.getElementById('comparison-placeholder');
+    const removeComparisonDateBtn = document.getElementById('removeComparisonDate');
     
-    // TODO: Load comparison data from API
-    // For now, using mock data
-    const comparisonData = [
-        { metric: 'יתרות', value1: 50000, value2: 48000 },
-        { metric: 'שווי תיק', value1: 75000, value2: 70000 },
-        { metric: 'P/L כולל', value1: 25000, value2: 22000 },
-        { metric: 'פוזיציות', value1: 5, value2: 4 }
-    ];
+    if (comparisonTableWrapper) {
+        comparisonTableWrapper.style.display = 'block';
+    }
+    if (comparisonPlaceholder) {
+        comparisonPlaceholder.style.display = 'none';
+    }
+    if (removeComparisonDateBtn) {
+        removeComparisonDateBtn.style.display = 'inline-block';
+        removeComparisonDateBtn.classList.remove('hidden');
+    }
+    
+    // Load comparison data from EOD API
+    let comparisonData = [];
+    try {
+        // === EOD INTEGRATION: Load comparison data from EOD ===
+        const selectedAccounts = getSelectedAccounts();
+
+        // Load EOD data for date1
+        const eodResult1 = await window.EODIntegrationHelper.loadEODPortfolioMetrics(
+            null, // global user
+            {
+                date_from: date1,
+                date_to: date1,
+                account_id: selectedAccounts && selectedAccounts.length === 1 ? selectedAccounts[0] : undefined
+            }
+        );
+
+        // Load EOD data for date2
+        const eodResult2 = await window.EODIntegrationHelper.loadEODPortfolioMetrics(
+            null, // global user
+            {
+                date_from: date2,
+                date_to: date2,
+                account_id: selectedAccounts && selectedAccounts.length === 1 ? selectedAccounts[0] : undefined
+            }
+        );
+
+        if (eodResult1 && eodResult1.data && eodResult2 && eodResult2.data) {
+            // Get latest records for each date
+            const record1 = eodResult1.data.find(r => r.date_utc === date1) || eodResult1.data[eodResult1.data.length - 1];
+            const record2 = eodResult2.data.find(r => r.date_utc === date2) || eodResult2.data[eodResult2.data.length - 1];
+
+            if (record1 && record2) {
+                if (window.Logger) {
+                    window.Logger.info('✅ Using EOD data for date comparison', {
+                        page: 'portfolio-state-page',
+                        date1,
+                        date2
+                    });
+                }
+
+                comparisonData = [
+                    {
+                        metric: 'יתרות',
+                        value1: record1.cash_total !== null && record1.cash_total !== undefined ? record1.cash_total : null,
+                        value2: record2.cash_total !== null && record2.cash_total !== undefined ? record2.cash_total : null
+                    },
+                    {
+                        metric: 'שווי תיק',
+                        value1: record1.nav_total !== null && record1.nav_total !== undefined ? record1.nav_total : null,
+                        value2: record2.nav_total !== null && record2.nav_total !== undefined ? record2.nav_total : null
+                    },
+                    {
+                        metric: 'P/L כולל',
+                        value1: (record1.realized_pl_amount || 0) + (record1.unrealized_pl_amount || 0),
+                        value2: (record2.realized_pl_amount || 0) + (record2.unrealized_pl_amount || 0)
+                    },
+                    {
+                        metric: 'פוזיציות',
+                        value1: record1.positions_count_open !== null && record1.positions_count_open !== undefined ? record1.positions_count_open : null,
+                        value2: record2.positions_count_open !== null && record2.positions_count_open !== undefined ? record2.positions_count_open : null
+                    },
+                    {
+                        metric: 'TWR יומי',
+                        value1: record1.twr_daily !== null && record1.twr_daily !== undefined ? record1.twr_daily : null,
+                        value2: record2.twr_daily !== null && record2.twr_daily !== undefined ? record2.twr_daily : null
+                    }
+                ];
+            }
+        }
+
+        // === FALLBACK: Use PortfolioStateData (only if EOD fails) ===
+        if (comparisonData.length === 0 && window.PortfolioStateData && typeof window.PortfolioStateData.loadComparison === 'function') {
+            const comparison = await window.PortfolioStateData.loadComparison(
+                getSelectedAccounts().length === 1 ? getSelectedAccounts()[0] : null,
+                date1,
+                date2
+            );
+
+            if (comparison && comparison.is_valid) {
+                const comp = comparison.comparison || {};
+                const state1 = comparison.date1_state || {};
+                const state2 = comparison.date2_state || {};
+
+                // Only use real data - no fallback values
+                comparisonData = [
+                    {
+                        metric: 'יתרות',
+                        value1: state1.cash_balance !== null && state1.cash_balance !== undefined ? state1.cash_balance : null,
+                        value2: state2.cash_balance !== null && state2.cash_balance !== undefined ? state2.cash_balance : null
+                    },
+                    {
+                        metric: 'שווי תיק',
+                        value1: state1.portfolio_value !== null && state1.portfolio_value !== undefined ? state1.portfolio_value : null,
+                        value2: state2.portfolio_value !== null && state2.portfolio_value !== undefined ? state2.portfolio_value : null
+                    },
+                    {
+                        metric: 'P/L כולל',
+                        value1: state1.total_pl !== null && state1.total_pl !== undefined ? state1.total_pl : null,
+                        value2: state2.total_pl !== null && state2.total_pl !== undefined ? state2.total_pl : null
+                    },
+                    {
+                        metric: 'פוזיציות',
+                        value1: state1.positions_count !== null && state1.positions_count !== undefined ? state1.positions_count : null,
+                        value2: state2.positions_count !== null && state2.positions_count !== undefined ? state2.positions_count : null
+                    }
+                ];
+            }
+        }
+    } catch (error) {
+        if (window.Logger) {
+            window.Logger.warn('Error loading comparison data', { page: 'portfolio-state-page', error });
+        }
+        if (window.NotificationSystem) {
+            window.NotificationSystem.showError('שגיאה', 'שגיאה בטעינת נתוני השוואה');
+        }
+    }
+    
+    // No fallback data - show error if no data available
+    if (comparisonData.length === 0) {
+        if (window.NotificationSystem) {
+            window.NotificationSystem.showError(
+                'נתונים לא זמינים',
+                'לא נמצאו נתוני השוואה עבור התאריכים שנבחרו. נא לבדוק שהתאריכים תקינים ויש נתונים במערכת.'
+            );
+        }
+        // Hide comparison table and show placeholder
+        document.getElementById('comparison-table-wrapper').style.display = 'none';
+        document.getElementById('comparison-placeholder').style.display = 'block';
+        document.getElementById('removeComparisonDate').style.display = 'none';
+        return;
+    }
     
     const tbody = document.getElementById('comparison-table-body');
-    tbody.innerHTML = comparisonData.map(item => {
-        const change = item.value1 - item.value2;
-        const changePercent = ((change / item.value2) * 100).toFixed(1);
+    tbody.textContent = '';
+    const parser = new DOMParser();
+    comparisonData.forEach(item => {
+        // No fallback values - show error if data not available
+        if (item.value1 === null || item.value1 === undefined || item.value2 === null || item.value2 === undefined) {
+            // Show "לא זמין" in table for this metric
+            const change = null;
+            const changePercent = null;
+            const value1Display = 'לא זמין';
+            const value2Display = 'לא זמין';
+            const changeDisplay = 'לא זמין';
+            
+            const row = document.createElement('tr');
+            const metricCell = document.createElement('td');
+            metricCell.textContent = item.metric;
+            row.appendChild(metricCell);
+            
+            const value1Cell = document.createElement('td');
+            value1Cell.textContent = value1Display;
+            value1Cell.className = 'text-muted';
+            row.appendChild(value1Cell);
+            
+            const value2Cell = document.createElement('td');
+            value2Cell.textContent = value2Display;
+            value2Cell.className = 'text-muted';
+            row.appendChild(value2Cell);
+            
+            const changeCell = document.createElement('td');
+            changeCell.textContent = changeDisplay;
+            changeCell.className = 'text-muted';
+            row.appendChild(changeCell);
+            
+            tbody.appendChild(row);
+            return; // Skip to next item
+        }
         
-        // Use FieldRendererService if available
+        const change = item.value1 - item.value2;
+        const changePercent = item.value2 !== 0 ? ((change / item.value2) * 100).toFixed(1) : null;
+        
+        // Use FieldRendererService if available - no fallback values
         let changeDisplay, value1Display, value2Display;
         if (window.FieldRendererService) {
             value1Display = window.FieldRendererService.renderAmount(item.value1, '$', 0, false);
             value2Display = window.FieldRendererService.renderAmount(item.value2, '$', 0, false);
+            if (changePercent !== null) {
             const changeAmount = window.FieldRendererService.renderAmount(change, '$', 0, true);
             const changePercentHtml = window.FieldRendererService.renderNumericValue(parseFloat(changePercent), '%', true);
             changeDisplay = `${changeAmount} (${changePercentHtml})`;
         } else {
-            // Fallback
-        const isPositive = change >= 0;
-        const changeClass = isPositive ? 'text-success' : 'text-danger';
-        const changeSign = isPositive ? '+' : '';
+                changeDisplay = 'לא זמין';
+            }
+        } else {
+            // Fallback if FieldRendererService not available
             value1Display = formatCurrency(item.value1);
             value2Display = formatCurrency(item.value2);
-            changeDisplay = `<span class="${changeClass}">${changeSign}${formatCurrency(change)} (${changeSign}${changePercent}%)</span>`;
+            if (changePercent !== null) {
+            const isPositive = change >= 0;
+            const changeClass = isPositive ? 'text-success' : 'text-danger';
+            const changeSign = isPositive ? '+' : '';
+            const changeSpan = document.createElement('span');
+            changeSpan.className = changeClass;
+            changeSpan.textContent = `${changeSign}${formatCurrency(change)} (${changeSign}${changePercent}%)`;
+            changeDisplay = changeSpan.outerHTML;
+            } else {
+                changeDisplay = 'לא זמין';
+            }
         }
         
-        return `
-            <tr>
-                <td>${item.metric}</td>
-                <td>${value1Display}</td>
-                <td>${value2Display}</td>
-                <td>${changeDisplay}</td>
-            </tr>
-        `;
-    }).join('');
+        const row = document.createElement('tr');
+        const metricCell = document.createElement('td');
+        metricCell.textContent = item.metric;
+        row.appendChild(metricCell);
+        
+        const value1Cell = document.createElement('td');
+        if (window.FieldRendererService) {
+            value1Cell.textContent = value1Display;
+        } else {
+            value1Cell.textContent = value1Display;
+        }
+        row.appendChild(value1Cell);
+        
+        const value2Cell = document.createElement('td');
+        if (window.FieldRendererService) {
+            value2Cell.textContent = value2Display;
+        } else {
+            value2Cell.textContent = value2Display;
+        }
+        row.appendChild(value2Cell);
+        
+        const changeCell = document.createElement('td');
+        if (window.FieldRendererService) {
+            changeCell.textContent = changeDisplay;
+        } else {
+            const doc = parser.parseFromString(changeDisplay, 'text/html');
+            const span = doc.body.querySelector('span');
+            if (span) {
+                changeCell.appendChild(span);
+            } else {
+                changeCell.textContent = changeDisplay;
+            }
+        }
+        row.appendChild(changeCell);
+        
+        tbody.appendChild(row);
+    });
 }
 
 // Remove comparison date
 function removeComparisonDate() {
-    document.getElementById('datePicker2').value = '';
-    document.getElementById('comparison-table-wrapper').style.display = 'none';
-    document.getElementById('comparison-placeholder').style.display = 'block';
-    document.getElementById('removeComparisonDate').style.display = 'none';
-    document.getElementById('comparison-date1-header').textContent = '-';
-    document.getElementById('comparison-date2-header').textContent = '-';
+    // Use DataCollectionService to clear field if available
+    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+      window.DataCollectionService.setValue('datePicker2', '', 'dateOnly');
+    } else {
+      const datePicker2El = document.getElementById('datePicker2');
+      if (datePicker2El) datePicker2El.value = '';
+    }
+    // Hide comparison table (with null checks to prevent errors)
+    const comparisonTableWrapper = document.getElementById('comparison-table-wrapper');
+    const comparisonPlaceholder = document.getElementById('comparison-placeholder');
+    const removeComparisonDateBtn = document.getElementById('removeComparisonDate');
+    const date1Header = document.getElementById('comparison-date1-header');
+    const date2Header = document.getElementById('comparison-date2-header');
+    
+    if (comparisonTableWrapper) {
+        comparisonTableWrapper.style.display = 'none';
+    }
+    if (comparisonPlaceholder) {
+        comparisonPlaceholder.style.display = 'block';
+    }
+    if (removeComparisonDateBtn) {
+        removeComparisonDateBtn.style.display = 'none';
+        removeComparisonDateBtn.classList.add('hidden');
+    }
+    if (date1Header) {
+        date1Header.textContent = '-';
+    }
+    if (date2Header) {
+        date2Header.textContent = '-';
+    }
 }
 
 // Toggle section
@@ -2981,6 +4615,14 @@ async function waitForScripts() {
      * Initialize Header System
      */
     async function initializeHeader() {
+        // Check if HeaderSystem is already initialized to prevent duplicate initialization
+        if (window.headerSystem && window.headerSystem.isInitialized) {
+            if (window.Logger) {
+                window.Logger.info('✅ Header System already initialized, skipping', { page: 'portfolio-state-page' });
+            }
+            return;
+        }
+        
         // Wait for HeaderSystem to be available
         if (typeof window.HeaderSystem !== 'undefined' && typeof window.HeaderSystem.initialize === 'function') {
             try {
@@ -2999,6 +4641,14 @@ async function waitForScripts() {
         } else {
             // Retry after a short delay if HeaderSystem not loaded yet
             setTimeout(() => {
+                // Check again if already initialized
+                if (window.headerSystem && window.headerSystem.isInitialized) {
+                    if (window.Logger) {
+                        window.Logger.info('✅ Header System already initialized (retry check), skipping', { page: 'portfolio-state-page' });
+                    }
+                    return;
+                }
+                
                 if (typeof window.HeaderSystem !== 'undefined' && typeof window.HeaderSystem.initialize === 'function') {
                     window.HeaderSystem.initialize().catch((error) => {
                         if (window.Logger) {
@@ -3045,7 +4695,14 @@ async function waitForScripts() {
                 if (!tbody) return;
                 
                 if (filteredTrades.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="13" class="text-center text-muted">אין טריידים להצגה</td></tr>';
+                    tbody.textContent = '';
+                    const emptyRow = document.createElement('tr');
+                    const emptyCell = document.createElement('td');
+                    emptyCell.colSpan = 13;
+                    emptyCell.className = 'text-center text-muted';
+                    emptyCell.textContent = 'אין טריידים להצגה';
+                    emptyRow.appendChild(emptyCell);
+                    tbody.appendChild(emptyRow);
                     const summaryElement = document.getElementById('trades-summary');
                     if (summaryElement) {
                         summaryElement.textContent = 'אין טריידים';
@@ -3053,35 +4710,62 @@ async function waitForScripts() {
                     return;
                 }
                 
-                tbody.innerHTML = filteredTrades.map(trade => renderTradeRow(trade)).join('');
+                tbody.textContent = '';
+                const parser = new DOMParser();
+                filteredTrades.forEach(trade => {
+                    const rowHTML = renderTradeRow(trade);
+                    const doc = parser.parseFromString(rowHTML, 'text/html');
+                    const row = doc.body.querySelector('tr');
+                    if (row) {
+                        tbody.appendChild(row);
+                    }
+                });
                 
-                // Update summary
-                const totalPL = filteredTrades.reduce((sum, t) => sum + (t.position_pl_value || 0), 0);
+                // Update summary using InfoSummarySystem (only if container exists)
+                if (window.InfoSummarySystem && window.INFO_SUMMARY_CONFIGS && window.INFO_SUMMARY_CONFIGS['portfolio-state-page']) {
+                    const config = window.INFO_SUMMARY_CONFIGS['portfolio-state-page'];
+                    const container = document.getElementById(config.containerId);
+                    if (container) {
+                        window.InfoSummarySystem.calculateAndRender(filteredTrades, config).catch(err => {
+                            window.Logger?.warn('Failed to update portfolio state summary via InfoSummarySystem', { error: err, page: 'portfolio-state-page' });
+                        });
+                    }
+                }
+                
+                // Always update trades-summary element - no fallback values
+                const totalPL = filteredTrades.reduce((sum, t) => {
+                    const plValue = t.position_pl_value !== null && t.position_pl_value !== undefined ? t.position_pl_value : 0;
+                    return sum + plValue;
+                }, 0);
                 const summaryElement = document.getElementById('trades-summary');
                 if (summaryElement) {
-                    const renderNumericValue = (value, suffix = '%', showSign = true) => {
-                        if (window.FieldRendererService?.renderNumericValue) {
-                            return window.FieldRendererService.renderNumericValue(value, suffix, showSign);
-                        }
-                        const sign = showSign && value >= 0 ? '+' : '';
-                        const colorClass = value >= 0 ? 'text-success' : value < 0 ? 'text-danger' : 'text-muted';
-                        return `<span class="${colorClass}">${sign}${value.toFixed(2)}${suffix}</span>`;
-                    };
-                    summaryElement.innerHTML = `
-                        <strong>סה"כ טריידים: ${filteredTrades.length}</strong> | 
-                        <strong>סה"כ P/L: ${renderNumericValue(totalPL, '$')}</strong>
-                    `;
+                    summaryElement.textContent = '';
+                    const strong1 = document.createElement('strong');
+                    strong1.textContent = `סה"כ טריידים: ${filteredTrades.length}`;
+                    summaryElement.appendChild(strong1);
+                    
+                    const separator = document.createTextNode(' | ');
+                    summaryElement.appendChild(separator);
+                    
+                    const strong2 = document.createElement('strong');
+                    strong2.textContent = 'סה"כ P/L: ';
+                    summaryElement.appendChild(strong2);
+                    
+                    const plValue = window.FieldRendererService?.renderNumericValue 
+                        ? window.FieldRendererService.renderNumericValue(totalPL, '$', true)
+                        : `${totalPL >= 0 ? '+' : ''}${totalPL.toFixed(2)}$`;
+                    const plSpan = document.createElement('span');
+                    if (window.FieldRendererService) {
+                        plSpan.textContent = plValue;
+                    } else {
+                        plSpan.className = totalPL >= 0 ? 'text-success' : totalPL < 0 ? 'text-danger' : 'text-muted';
+                        plSpan.textContent = plValue;
+                    }
+                    strong2.appendChild(plSpan);
                 }
                 
-                // Load action buttons
-                if (window.loadTableActionButtons) {
-                    window.loadTableActionButtons('tradesTable', 'trade', {
-                        showDetails: true,
-                        showLinked: true,
-                        showEdit: true,
-                        showDelete: false // Trades shouldn't be deleted from this page
-                    });
-                }
+                // Note: Action buttons are now created directly in renderTradeRow() using createActionsMenu()
+                // No need for loadTableActionButtons() anymore
             },
             tableSelector: '#tradesTable',
             columns: getColumns(),
@@ -3184,7 +4868,12 @@ async function waitForScripts() {
                 if (state.filters.investmentType) {
                     const investmentSelect = document.getElementById('filterInvestmentType');
                     if (investmentSelect) {
-                        investmentSelect.value = state.filters.investmentType;
+                        // Use DataCollectionService to set value if available
+                        if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+                          window.DataCollectionService.setValue(investmentSelect.id, state.filters.investmentType, 'text');
+                        } else {
+                          investmentSelect.value = state.filters.investmentType;
+                        }
                     }
                 }
 
@@ -3297,11 +4986,24 @@ async function waitForScripts() {
             updateDateRangeFilterText();
         }
         
+        // Load trading accounts first - this populates the account filter menu
         await loadTradingAccounts();
+        
         // Restore selected accounts after accounts are loaded
         restoreSelectedAccounts();
         
+        // Load investment types (uses system-wide VALID_INVESTMENT_TYPES for consistency)
         loadInvestmentTypes();
+        
+        // Populate year select and set default to previous month
+        populateYearSelect();
+        const monthSelect = document.getElementById('tradesMonthSelect');
+        if (monthSelect) {
+            const previousMonth = new Date();
+            previousMonth.setMonth(previousMonth.getMonth() - 1);
+            monthSelect.value = previousMonth.getMonth() + 1; // Months are 1-12
+        }
+        
         await loadPortfolioState();
         
         // Load chart default period from preferences (only if not restored from state)
@@ -3331,22 +5033,115 @@ async function waitForScripts() {
         }
     }
 
-    // Initialize when DOM is ready
+    // Initialize via UnifiedAppInitializer (preferred) or fallback to DOMContentLoaded
+    // Check if UnifiedAppInitializer is available and will handle initialization
+    const initializePageFallback = async () => {
+        // Wait a bit for all scripts to load
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initializePage);
+            document.addEventListener('DOMContentLoaded', async () => {
+                // Wait for critical dependencies
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+                // Check if already initialized by UnifiedAppInitializer
+                if (window.globalInitializationState?.unifiedAppInitialized) {
+                    if (window.Logger) {
+                        window.Logger.debug('Portfolio State Page already initialized by UnifiedAppInitializer', { page: 'portfolio-state-page' });
+                    }
+                    return;
+                }
+                
+                // Check if UnifiedAppInitializer exists and is initializing
+                if (window.unifiedAppInit && window.unifiedAppInit.initializationInProgress) {
+                    if (window.Logger) {
+                        window.Logger.debug('Waiting for UnifiedAppInitializer to complete', { page: 'portfolio-state-page' });
+                    }
+                    // Wait up to 5 seconds for UnifiedAppInitializer
+                    let waitCount = 0;
+                    while (waitCount < 50 && window.unifiedAppInit.initializationInProgress) {
+                        await new Promise(resolve => setTimeout(resolve, 100));
+                        waitCount++;
+                    }
+                    
+                    // If UnifiedAppInitializer completed, don't initialize again
+                    if (window.globalInitializationState?.unifiedAppInitialized) {
+                        if (window.Logger) {
+                            window.Logger.debug('UnifiedAppInitializer completed, skipping fallback', { page: 'portfolio-state-page' });
+                        }
+                        return;
+                    }
+                }
+                
+                // Fallback: Initialize directly if UnifiedAppInitializer is not available or failed
+                if (window.Logger) {
+                    window.Logger.info('Initializing Portfolio State Page via fallback (UnifiedAppInitializer not available)', { page: 'portfolio-state-page' });
+                }
+                await initializePage();
+            });
     } else {
         // DOM already loaded
-        initializePage();
+            // Wait for critical dependencies
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            // Check if already initialized by UnifiedAppInitializer
+            if (window.globalInitializationState?.unifiedAppInitialized) {
+                if (window.Logger) {
+                    window.Logger.debug('Portfolio State Page already initialized by UnifiedAppInitializer', { page: 'portfolio-state-page' });
+                }
+                return;
+            }
+            
+            // Check if UnifiedAppInitializer exists and is initializing
+            if (window.unifiedAppInit && window.unifiedAppInit.initializationInProgress) {
+                if (window.Logger) {
+                    window.Logger.debug('Waiting for UnifiedAppInitializer to complete', { page: 'portfolio-state-page' });
+                }
+                // Wait up to 5 seconds for UnifiedAppInitializer
+                let waitCount = 0;
+                while (waitCount < 50 && window.unifiedAppInit.initializationInProgress) {
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    waitCount++;
+                }
+                
+                // If UnifiedAppInitializer completed, don't initialize again
+                if (window.globalInitializationState?.unifiedAppInitialized) {
+                    if (window.Logger) {
+                        window.Logger.debug('UnifiedAppInitializer completed, skipping fallback', { page: 'portfolio-state-page' });
+                    }
+                    return;
+                }
+            }
+            
+            // Fallback: Initialize directly if UnifiedAppInitializer is not available or failed
+            if (window.Logger) {
+                window.Logger.info('Initializing Portfolio State Page via fallback (UnifiedAppInitializer not available)', { page: 'portfolio-state-page' });
+            }
+            await initializePage();
+        }
+    };
+    
+    // Only set up fallback if UnifiedAppInitializer is not available
+    // UnifiedAppInitializer will call initializePage() via customInitializers
+    if (!window.UnifiedAppInitializer && !window.PAGE_CONFIGS) {
+        // UnifiedAppInitializer not available, use fallback
+        initializePageFallback();
+    } else {
+        // UnifiedAppInitializer is available, it will handle initialization
+        if (window.Logger) {
+            window.Logger.debug('Portfolio State Page will be initialized by UnifiedAppInitializer', { page: 'portfolio-state-page' });
+        }
     }
 
     // Export functions to window for debugging
     window.portfolioStatePage = {
+        initializePage, // Export for UnifiedAppInitializer
         toggleCardDetails,
         compareDates,
         removeComparisonDate,
         getCSSVariableValue,
         loadTradingAccounts,
         loadPortfolioState,
+        loadTradesForMonthYear, // Export for month/year selection
+        populateYearSelect, // Export for year select population
         applyFilters,
         clearFilters,
         toggleDateRangeFilterMenu,
@@ -3355,26 +5150,8 @@ async function waitForScripts() {
         handleCustomDateToChange,
         applyCustomDateRange,
         toggleAccountFilterMenu,
-        selectAccountOption
-    };
-
-    // Export functions to window for debugging
-    window.portfolioStatePage = {
-        toggleCardDetails,
-        compareDates,
-        removeComparisonDate,
-        getCSSVariableValue,
-        loadTradingAccounts,
-        loadPortfolioState,
-        applyFilters,
-        clearFilters,
-        toggleDateRangeFilterMenu,
-        selectDateRangeOption,
-        handleCustomDateFromChange,
-        handleCustomDateToChange,
-        applyCustomDateRange,
-        toggleAccountFilterMenu,
-        selectAccountOption
+        selectAccountOption,
+        populateAccountFilterMenu
     };
 
 })();

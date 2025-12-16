@@ -12,6 +12,35 @@
  * Documentation: See documentation/02-ARCHITECTURE/FRONTEND/TRADINGVIEW_LIGHTWEIGHT_CHARTS/
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Class Methods ===
+// - TradingViewChartAdapter.addLineSeries() - Addlineseries
+// - TradingViewChartAdapter.addAreaSeries() - Addareaseries
+// - TradingViewChartAdapter.addCandlestickSeries() - Addcandlestickseries
+// - TradingViewChartAdapter.addHistogramSeries() - Addhistogramseries
+// - TradingViewChartAdapter.addBarSeries() - Addbarseries
+// - TradingViewChartAdapter.destroyChart() - Destroychart
+// - TradingViewChartAdapter.applyTheme() - Applytheme
+// - TradingViewChartAdapter.setVisibleRange() - Setvisiblerange
+// - TradingViewChartAdapter.resetTimeScale() - Resettimescale
+
+// === Initialization ===
+// - TradingViewChartAdapter.init() - Init
+// - TradingViewChartAdapter.createChart() - Createchart
+
+// === UI Functions ===
+// - TradingViewChartAdapter.updateData() - Updatedata
+
+// === Data Functions ===
+// - TradingViewChartAdapter.getChart() - Getchart
+// - TradingViewChartAdapter.getAllCharts() - Getallcharts
+// - TradingViewChartAdapter.getVisibleRange() - Getvisiblerange
+
+// === Event Handlers ===
+// - TradingViewChartAdapter.scrollToPosition() - Scrolltoposition
+
 (function() {
     'use strict';
 

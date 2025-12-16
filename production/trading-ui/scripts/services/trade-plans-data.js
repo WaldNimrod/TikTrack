@@ -20,6 +20,32 @@
  * @author TikTrack Development Team
  */
 (function tradePlansDataService() {
+
+// ===== FUNCTION INDEX =====
+
+// === Core Functions ===
+// - executeTradePlan() - Executetradeplan
+
+// === UI Functions ===
+// - updateTradePlan() - Updatetradeplan
+
+// === Data Functions ===
+// - loadTradePlansData() - Loadtradeplansdata
+// - saveTradePlan() - Savetradeplan
+// - fetchTradePlanDetails() - Fetchtradeplandetails
+// - getCachedTradePlans() - Getcachedtradeplans
+
+// === Utility Functions ===
+// - invalidateTradePlansCache() - Invalidatetradeplanscache
+// - validateTradePlan() - Validatetradeplan
+
+// === Other ===
+// - deleteTradePlan() - Deletetradeplan
+// - cancelTradePlan() - Canceltradeplan
+// - copyTradePlan() - Copytradeplan
+// - setCachedTradePlans() - Setcachedtradeplans
+// - clearTradePlansCache() - Cleartradeplanscache
+
   const TRADE_PLANS_DATA_KEY = 'trade-plans-data';
   const TRADE_PLANS_TTL = 45 * 1000; // 45 seconds per audit plan
   const PAGE_LOG_CONTEXT = { page: 'trade-plans-data' };
@@ -29,14 +55,31 @@
     'Content-Type': 'application/json',
     'Cache-Control': 'no-cache',
   };
+  const IS_TRADES_FORMATTED_PAGE = (() => {
+    try {
+      return typeof window !== 'undefined' && window.location?.pathname?.includes('trades_formatted');
+    } catch (_) {
+      return false;
+    }
+  })();
 
   async function loadTradePlansData(options = {}) {
     const { force = false, ttl = TRADE_PLANS_TTL, signal } = options;
+    if (IS_TRADES_FORMATTED_PAGE && !force) {
+      // On the heavy formatted view, avoid hammering the API to prevent 429s
+      window.Logger?.debug?.('⏭️ Skipping trade plans API on trades_formatted page (returning empty)', PAGE_LOG_CONTEXT);
+      return [];
+    }
     const loader = async () => {
       window.Logger?.debug?.('🔄 Loading trade plans data directly from API...', PAGE_LOG_CONTEXT);
       const response = await fetch('/api/trade-plans/', { signal });
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        if (response.status === 429) {
+          window.Logger?.warn?.('⚠️ Trade plans rate limited, returning empty', { ...PAGE_LOG_CONTEXT, status: response.status });
+          return [];
+        }
+        window.Logger?.warn?.('⚠️ Trade plans load failed, returning empty', { ...PAGE_LOG_CONTEXT, status: response.status });
+        return [];
       }
 
       const data = await response.json();

@@ -17,31 +17,39 @@ class AlertService:
         self.db = db
     
     @staticmethod
-    def get_all(db: Session) -> List[Alert]:
-        """Get all alerts"""
+    def get_all(db: Session, user_id: int) -> List[Alert]:
+        """Get all alerts for a specific user (user_id is required for data isolation)"""
         try:
-            alerts = db.query(Alert).all()
-            logger.info(f"נטענו {len(alerts)} התראות")
+            query = db.query(Alert).filter(Alert.user_id == user_id)
+            alerts = query.all()
+            logger.info(f"Found {len(alerts)} alerts for user_id={user_id}")
             return alerts
         except Exception as e:
-            logger.error(f"שגיאה בטעינת התראות: {e}")
+            logger.error(f"שגיאה בטעינת התראות עבור משתמש {user_id}: {e}")
             raise
     
     @staticmethod
-    def get_by_id(db: Session, alert_id: int) -> Optional[Alert]:
-        """Get alert by ID"""
+    def get_by_id(db: Session, alert_id: int, user_id: int) -> Optional[Alert]:
+        """Get alert by ID for a specific user (user_id is required for data isolation)"""
         try:
-            alert = db.query(Alert).filter(Alert.id == alert_id).first()
+            query = db.query(Alert).filter(
+                Alert.id == alert_id,
+                Alert.user_id == user_id
+            )
+            alert = query.first()
             return alert
         except Exception as e:
-            logger.error(f"שגיאה בטעינת התראה {alert_id}: {e}")
+            logger.error(f"שגיאה בטעינת התראה {alert_id} עבור משתמש {user_id}: {e}")
             raise
     
     @staticmethod
-    def get_unread_alerts(db: Session) -> List[Alert]:
-        """Get unread alerts (is_triggered = 'new')"""
+    def get_unread_alerts(db: Session, user_id: Optional[int] = None) -> List[Alert]:
+        """Get unread alerts (is_triggered = 'new') (filtered by user_id if provided)"""
         try:
-            alerts = db.query(Alert).filter(Alert.is_triggered == 'new').all()
+            query = db.query(Alert).filter(Alert.is_triggered == 'new')
+            if user_id is not None:
+                query = query.filter(Alert.user_id == user_id)
+            alerts = query.all()
             logger.info(f"נטענו {len(alerts)} התראות שלא נקראו")
             return alerts
         except Exception as e:
@@ -49,12 +57,16 @@ class AlertService:
             raise
     
     @staticmethod
-    def create(db: Session, alert_data: Dict[str, Any]) -> Alert:
-        """Create a new alert"""
+    def create(db: Session, alert_data: Dict[str, Any], user_id: Optional[int] = None) -> Alert:
+        """Create a new alert (with user_id if provided)"""
         try:
             logger.info(f"AlertService.create called with data: {alert_data}")
             logger.info(f"condition_attribute in data: {'condition_attribute' in alert_data}")
             logger.info(f"condition_attribute value: {alert_data.get('condition_attribute')}")
+            
+            # Set user_id if provided and not in data
+            if user_id is not None and 'user_id' not in alert_data:
+                alert_data['user_id'] = user_id
             
             # Set default value for is_triggered
             if 'is_triggered' not in alert_data:
@@ -105,10 +117,13 @@ class AlertService:
         return self.create(self.db, alert_data)
     
     @staticmethod
-    def update(db: Session, alert_id: int, alert_data: Dict[str, Any]) -> Alert:
-        """Update an existing alert"""
+    def update(db: Session, alert_id: int, alert_data: Dict[str, Any], user_id: Optional[int] = None) -> Alert:
+        """Update an existing alert (with user_id check)"""
         try:
-            alert = db.query(Alert).filter(Alert.id == alert_id).first()
+            query = db.query(Alert).filter(Alert.id == alert_id)
+            if user_id is not None:
+                query = query.filter(Alert.user_id == user_id)
+            alert = query.first()
             if not alert:
                 raise ValueError(f"Alert {alert_id} not found")
             
@@ -161,11 +176,14 @@ class AlertService:
             raise
     
     @staticmethod
-    def delete(db: Session, alert_id: int) -> bool:
-        """Delete an alert"""
+    def delete(db: Session, alert_id: int, user_id: Optional[int] = None) -> bool:
+        """Delete an alert (with user_id check)"""
         try:
-            # Check that the alert exists
-            alert = db.query(Alert).filter(Alert.id == alert_id).first()
+            # Check that the alert exists (with user_id check)
+            query = db.query(Alert).filter(Alert.id == alert_id)
+            if user_id is not None:
+                query = query.filter(Alert.user_id == user_id)
+            alert = query.first()
             if not alert:
                 raise ValueError(f"Alert {alert_id} not found")
             
@@ -244,13 +262,16 @@ class AlertService:
             raise
     
     @staticmethod
-    def get_unread_alerts_with_symbols(db: Session) -> List[Dict[str, Any]]:
-        """Get unread alerts with ticker symbols"""
+    def get_unread_alerts_with_symbols(db: Session, user_id: Optional[int] = None) -> List[Dict[str, Any]]:
+        """Get unread alerts with ticker symbols (filtered by user_id if provided)"""
         try:
             from models.ticker import Ticker
             
-            # Get all new alerts
-            alerts = db.query(Alert).filter(Alert.is_triggered == 'new').all()
+            # Get all new alerts (filtered by user_id if provided)
+            query = db.query(Alert).filter(Alert.is_triggered == 'new')
+            if user_id is not None:
+                query = query.filter(Alert.user_id == user_id)
+            alerts = query.all()
             
             # Create list of dictionaries
             alerts_with_symbols: List[Dict[str, Any]] = []
@@ -269,7 +290,7 @@ class AlertService:
                 
                 alerts_with_symbols.append(alert_dict)
             
-            logger.info(f"Found {len(alerts_with_symbols)} unread alerts")
+            logger.info(f"Found {len(alerts_with_symbols)} unread alerts" + (f" for user {user_id}" if user_id else ""))
             return alerts_with_symbols
         except Exception as e:
             logger.error(f"Error loading unread alerts with symbols: {e}")
@@ -278,16 +299,22 @@ class AlertService:
 
     
     @staticmethod
-    def get_alerts_by_entity(db: Session, entity_type: str, entity_id: int) -> List[Alert]:
-        """Get alerts by entity type and ID"""
+    def get_alerts_by_entity(db: Session, entity_type: str, entity_id: int, user_id: Optional[int] = None) -> List[Alert]:
+        """Get alerts by entity type and ID (filtered by user_id if provided)"""
         try:
             related_type_id = AlertService._get_relation_type_id(db, entity_type)
-            alerts = db.query(Alert).filter(
+            query = db.query(Alert).filter(
                 Alert.related_type_id == related_type_id,
                 Alert.related_id == entity_id
-            ).all()
+            )
             
-            logger.info(f"Found {len(alerts)} alerts for entity {entity_type} {entity_id}")
+            # Filter by user_id if provided
+            if user_id is not None:
+                query = query.filter(Alert.user_id == user_id)
+            
+            alerts = query.all()
+            
+            logger.info(f"Found {len(alerts)} alerts for entity {entity_type} {entity_id} (user_id={user_id})")
             return alerts
         except Exception as e:
             logger.error(f"Error loading alerts for entity {entity_type} {entity_id}: {e}")

@@ -1,0 +1,1085 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>דף הבית - TikTrack</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap CSS - חייב להיות קודם -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css?v=0da3519a_20251102_104906" rel="stylesheet">
+    
+    <!-- Header Styles - חייב להיות לפני master.css -->
+    <link rel="stylesheet" href="styles-new/header-styles.css?v=0da3519a_20251102_104906">
+    
+    <!-- TikTrack ITCSS Master Styles -->
+    <link rel="stylesheet" href="styles-new/master.css?v=0da3519a_20251102_104906">
+    
+    <!-- External Libraries -->
+    <!-- Bootstrap Icons and FontAwesome removed - using Tabler Icons via IconSystem -->
+    
+    <!-- Dashboard Widgets - Equal Height Styles -->
+    <!-- Note: Equal height is handled by JavaScript (equalizeWidgetHeights function in index.js) -->
+    <!-- Styles moved to _index.css for ITCSS compliance -->
+</head><body class="index-page"><div id="unified-header"></div><div class="background-wrapper"><div class="page-body"><div class="top-section" data-section="top"><div class="section-header"><div class="table-title"><img src="/trading-ui/images/icons/entities/home.svg" alt="דף הבית" class="section-icon"> דף הבית - TikTrack </div><div class="table-actions"><button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('top')" data-text="הצג/הסתר" title="הצג/הסתר סקשן"></button></div></div><div class="section-body"><active-alerts></active-alerts><div class="info-summary" id="summaryStats"><div>סה"כ טריידים: <strong id="totalTrades">0</strong></div><div>סה"כ התראות: <strong id="totalAlerts">0</strong></div><div>יתרה נוכחית: <strong id="currentBalance">$0</strong></div><div>רווח/הפסד: <strong id="totalPnL">$0</strong></div></div><div class="info-summary portfolio-summary-card d-flex align-items-center justify-content-between gap-3 flex-nowrap" id="portfolioSummaryContent"><div id="portfolioSummaryStats" class="flex-grow-1"><div>טוען סיכום...</div></div><button data-button-type="VIEW" data-variant="small" data-onclick="togglePortfolioSummarySize()" data-id="portfolioSummaryToggleSize" data-tooltip="הצג סיכום מלא" data-tooltip-placement="bottom" aria-label="הצג סיכום מלא" class="flex-shrink-0 ms-2"></button></div></div></div><div class="main-content"><div class="content-section" id="main"><div class="section-header"><div class="table-title"><img src="images/icons/entities/home.svg" alt="לוח בקרה" class="section-icon"> לוח בקרה </div><div class="table-count" id="dashboardCount">טוען...</div><div class="table-actions"><button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('main')" data-text="הצג/הסתר" title="הצג/הסתר סקשן"></button></div></div><div class="section-body">
+        <!-- שורה ראשונה: טריידים אחרונים + פעולות ממתינות (שיוך ויצירה) -->
+        <div class="row g-3 mb-3">
+            <div class="col-md-6">
+                <div class="card h-100" id="recentItemsWidgetContainer">
+                    <div class="card-header">
+                        <ul class="nav nav-tabs mb-0" id="recentItemsTabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" 
+                                        id="recentItemsTradesTab" 
+                                        data-bs-toggle="tab" 
+                                        data-bs-target="#recentItemsWidgetTradesPane" 
+                                        type="button" 
+                                        role="tab" 
+                                        aria-controls="recentItemsWidgetTradesPane" 
+                                        aria-selected="true">
+                                    טריידים אחרונים
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" 
+                                        id="recentItemsPlansTab" 
+                                        data-bs-toggle="tab" 
+                                        data-bs-target="#recentItemsWidgetPlansPane" 
+                                        type="button" 
+                                        role="tab" 
+                                        aria-controls="recentItemsWidgetPlansPane" 
+                                        aria-selected="false">
+                                    תוכניות אחרונות
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="card-body">
+                        <!-- Tab Content -->
+                        <div class="tab-content" id="recentItemsWidgetTabContent">
+                            <!-- Trades Tab Pane -->
+                            <div class="tab-pane fade show active" 
+                                 id="recentItemsWidgetTradesPane" 
+                                 role="tabpanel" 
+                                 aria-labelledby="recentItemsTradesTab">
+                                <div class="d-flex flex-column gap-0 position-relative recent-items-tab-content-wrapper">
+                                    <div id="recentItemsWidgetTradesLoading" class="recent-items-widget-loading d-none d-flex align-items-center justify-content-center text-muted small">
+                                        <div class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></div>
+                                        <span>טוען טריידים...</span>
+                                    </div>
+                                    <div id="recentItemsWidgetTradesError" class="recent-items-widget-error alert alert-danger d-none" role="alert"></div>
+                                    <div id="recentItemsWidgetTradesEmpty" class="recent-items-widget-empty d-none">
+                                        <div class="text-muted small">אין טריידים זמינים</div>
+                                    </div>
+                                    <ul id="recentItemsWidgetTradesList" class="list-group list-group-flush"></ul>
+                                </div>
+                            </div>
+                            
+                            <!-- Plans Tab Pane -->
+                            <div class="tab-pane fade" 
+                                 id="recentItemsWidgetPlansPane" 
+                                 role="tabpanel" 
+                                 aria-labelledby="recentItemsPlansTab">
+                                <div class="d-flex flex-column gap-0 position-relative recent-items-tab-content-wrapper">
+                                    <div id="recentItemsWidgetPlansLoading" class="recent-items-widget-loading d-none d-flex align-items-center justify-content-center text-muted small">
+                                        <div class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></div>
+                                        <span>טוען תוכניות...</span>
+                                    </div>
+                                    <div id="recentItemsWidgetPlansError" class="recent-items-widget-error alert alert-danger d-none" role="alert"></div>
+                                    <div id="recentItemsWidgetPlansEmpty" class="recent-items-widget-empty d-none">
+                                        <div class="text-muted small">אין תוכניות זמינות</div>
+                                    </div>
+                                    <ul id="recentItemsWidgetPlansList" class="list-group list-group-flush"></ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card h-100" id="unifiedPendingActionsWidgetContainer">
+                    <div class="card-header d-flex align-items-center justify-content-between gap-2">
+                        <h5 class="mb-0" id="unifiedPendingActionsWidgetTitle">
+                            <span class="d-inline-flex align-items-center gap-2">
+                                <img src="images/icons/entities/trades.svg" alt="פעולות ממתינות" width="20" height="20">
+                                <span>פעולות ממתינות</span>
+                            </span>
+                        </h5>
+                        <div class="d-flex align-items-center gap-2">
+                            <!-- Count display in header for each combination -->
+                            <span class="badge bg-body-secondary text-body" id="assignPlansCountHeader">0</span>
+                            <span class="badge bg-body-secondary text-body" id="assignTradesCountHeader">0</span>
+                            <span class="badge bg-body-secondary text-body" id="createPlansCountHeader">0</span>
+                            <span class="badge bg-body-secondary text-body" id="createTradesCountHeader">0</span>
+                            <span class="badge entity-trade" id="unifiedPendingActionsWidgetBadge">0</span>
+                        </div>
+                    </div>
+                    <div class="card-header">
+                        <!-- All Tabs in Single Row: [טרייד][תוכנית] | [שיוך] [יצירת חדש] -->
+                        <ul class="nav nav-tabs d-flex align-items-center gap-2" id="unifiedPendingActionsAllTabs" role="tablist">
+                            <!-- Entity Tabs (Primary Color) -->
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active unified-pending-entity-tab" 
+                                        id="entityTabTrades" 
+                                        type="button">
+                                    טריידים
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link unified-pending-entity-tab" 
+                                        id="entityTabPlans" 
+                                        type="button">
+                                    תוכניות
+                                </button>
+                            </li>
+                            <!-- Separator -->
+                            <li class="nav-item-separator">|</li>
+                            <!-- Action Tabs (Secondary Color) -->
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active unified-pending-action-tab" 
+                                        id="actionTabAssign" 
+                                        type="button">
+                                    שיוך
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link unified-pending-action-tab" 
+                                        id="actionTabCreate" 
+                                        type="button">
+                                    יצירת חדש
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="card-body d-flex flex-column gap-3">
+                        <!-- Tab Content Panes -->
+                        <div class="tab-content" id="unifiedPendingActionsTabContent">
+                            <!-- Assign Plans Pane -->
+                            <div class="tab-pane fade show active" 
+                                 id="paneAssignPlans" 
+                                 role="tabpanel">
+                                <div id="assignPlansLoading" class="d-flex align-items-center justify-content-center text-muted small unified-pending-loading">
+                                    <div class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></div>
+                                    <span>טוען הצעות שיוך תוכניות...</span>
+                                </div>
+                                <div id="assignPlansError" class="alert alert-danger d-none unified-pending-error" role="alert"></div>
+                                <div id="assignPlansEmpty" class="alert alert-success d-none unified-pending-empty" role="status">
+                                    כל הטריידים מלווים בתוכנית מתאימה. עבודה מצוינת!
+                                </div>
+                                <ul class="unified-pending-list flex-grow-1" id="assignPlansList"></ul>
+                            </div>
+                            
+                            <!-- Assign Trades Pane -->
+                            <div class="tab-pane fade" 
+                                 id="paneAssignTrades" 
+                                 role="tabpanel">
+                                <div id="assignTradesLoading" class="d-flex align-items-center justify-content-center text-muted small unified-pending-loading">
+                                    <div class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></div>
+                                    <span>טוען המלצות שיוך ביצועים...</span>
+                                </div>
+                                <div id="assignTradesError" class="alert alert-danger d-none unified-pending-error" role="alert"></div>
+                                <div id="assignTradesEmpty" class="alert alert-success d-none unified-pending-empty" role="status">
+                                    אין כרגע ביצועים שממתינים לשיוך. המשך עבודה מצוינת!
+                                </div>
+                                <ul class="unified-pending-list flex-grow-1" id="assignTradesList"></ul>
+                            </div>
+                            
+                            <!-- Create Plans Pane -->
+                            <div class="tab-pane fade" 
+                                 id="paneCreatePlans" 
+                                 role="tabpanel">
+                                <div id="createPlansLoading" class="d-flex align-items-center justify-content-center text-muted small unified-pending-loading">
+                                    <div class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></div>
+                                    <span>טוען הצעות יצירת תוכניות...</span>
+                                </div>
+                                <div id="createPlansError" class="alert alert-danger d-none unified-pending-error" role="alert"></div>
+                                <div id="createPlansEmpty" class="alert alert-success d-none unified-pending-empty" role="status">
+                                    כל הטריידים מלווים בתוכנית מתאימה. עבודה מצוינת!
+                                </div>
+                                <ul class="unified-pending-list flex-grow-1" id="createPlansList"></ul>
+                            </div>
+                            
+                            <!-- Create Trades Pane -->
+                            <div class="tab-pane fade" 
+                                 id="paneCreateTrades" 
+                                 role="tabpanel">
+                                <div id="createTradesLoading" class="d-flex align-items-center justify-content-center text-muted small unified-pending-loading">
+                                    <div class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></div>
+                                    <span>טוען אשכולות ליצירת טרייד...</span>
+                                </div>
+                                <div id="createTradesError" class="alert alert-danger d-none unified-pending-error" role="alert"></div>
+                                <div id="createTradesEmpty" class="alert alert-success d-none unified-pending-empty" role="status">
+                                    אין כרגע אשכולות זמינים ליצירת טרייד חדש.
+                                </div>
+                                <ul class="unified-pending-list flex-grow-1" id="createTradesList"></ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- שורה שנייה: תגיות + כרטיס ריק לוויג'ט עתידי -->
+        <div class="row g-3 mb-3">
+            <div class="col-md-6">
+                <div class="card h-100" id="tagWidgetContainer">
+                    <div class="card-header d-flex align-items-center justify-content-between gap-2">
+                        <h5 class="mb-0 d-flex align-items-center gap-2">
+                            <img src="images/icons/entities/home.svg" alt="תגיות" class="section-icon">
+                            <span>תגיות</span>
+                        </h5>
+                        <!-- Search in Header - מימין (סוף השורה ב-RTL) -->
+                        <form id="tagWidgetSearchForm" class="d-flex flex-wrap gap-2 align-items-center">
+                            <label for="tagWidgetSearchInput" class="visually-hidden">חיפוש תגית</label>
+                            <input id="tagWidgetSearchInput"
+                                   type="search"
+                                   class="form-control"
+                                   placeholder="חיפוש תגית..."
+                                   minlength="2"
+                                   autocomplete="off">
+                            <select id="tagWidgetSearchEntityFilter" class="form-select">
+                                <option value="">כל היישויות</option>
+                                <option value="trade">טריידים</option>
+                                <option value="trade_plan">תכניות</option>
+                                <option value="execution">ביצועים</option>
+                                <option value="trading_account">חשבונות</option>
+                                <option value="alert">התראות</option>
+                                <option value="ticker">טיקרים</option>
+                                <option value="cash_flow">תזרימי מזומנים</option>
+                                <option value="note">הערות</option>
+                            </select>
+                            <button type="submit"
+                                    data-button-type="PRIMARY"
+                                    data-variant="small"
+                                    data-icon="search"
+                                    data-text="חפש"
+                                    title="הפעל חיפוש תגיות"></button>
+                        </form>
+                    </div>
+                    <div class="card-body">
+                        <!-- Tag Cloud - Always Visible -->
+                        <div class="d-flex flex-column gap-0 position-relative">
+                            <div id="tagWidgetCloudLoading" class="d-flex align-items-center justify-content-center text-muted small">
+                                <div class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></div>
+                                <span>טוען נתוני תגיות...</span>
+                            </div>
+                            <div id="tagWidgetCloudError" class="alert alert-danger d-none" role="alert"></div>
+                            <div id="tagWidgetCloudEmpty" class="alert alert-info d-none" role="status">
+                                אין עדיין נתונים להצגה. צרף תגיות לטרנזקציות כדי לראות תובנות כאן.
+                            </div>
+                            <div id="tagWidgetCloudContainer" class="d-flex flex-wrap align-items-center"></div>
+                        </div>
+                        <!-- Search Status -->
+                        <div id="tagWidgetSearchStatus" class="small text-muted mt-2"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card h-100" id="tickerListWidgetContainer">
+                    <div class="card-header d-flex align-items-center justify-content-between gap-2">
+                        <h5 class="mb-0 d-flex align-items-center gap-2">
+                            <img src="images/icons/entities/tickers.svg" alt="דשבורד טיקרים" class="section-icon">
+                            <span>דשבורד טיקרים</span>
+                        </h5>
+                        <button data-button-type="REFRESH" 
+                                data-variant="small"
+                                data-onclick="window.TickerListWidget?.refresh()"
+                                title="רענן נתונים">
+                        </button>
+                    </div>
+                    <div class="card-header">
+                        <!-- Bootstrap Tabs -->
+                        <ul class="nav nav-tabs mb-0" id="tickerListWidgetTabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" 
+                                        id="tickerListWidgetActiveTab" 
+                                        data-bs-toggle="tab" 
+                                        data-bs-target="#tickerListWidgetActivePane" 
+                                        type="button" 
+                                        role="tab" 
+                                        aria-controls="tickerListWidgetActivePane" 
+                                        aria-selected="true">
+                                    טיקרים פעילים
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" 
+                                        id="tickerListWidgetWatchlistTab" 
+                                        data-bs-toggle="tab" 
+                                        data-bs-target="#tickerListWidgetWatchlistPane" 
+                                        type="button" 
+                                        role="tab" 
+                                        aria-controls="tickerListWidgetWatchlistPane" 
+                                        aria-selected="false">
+                                    רשימת צפיה
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" 
+                                        id="tickerListWidgetAllTab" 
+                                        data-bs-toggle="tab" 
+                                        data-bs-target="#tickerListWidgetAllPane" 
+                                        type="button" 
+                                        role="tab" 
+                                        aria-controls="tickerListWidgetAllPane" 
+                                        aria-selected="false">
+                                    כל הטיקרים
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="card-body">
+                        <!-- Tab Content -->
+                        <div class="tab-content" id="tickerListWidgetTabContent">
+                            <!-- Active Tickers Pane -->
+                            <div class="tab-pane fade show active" 
+                                 id="tickerListWidgetActivePane" 
+                                 role="tabpanel" 
+                                 aria-labelledby="tickerListWidgetActiveTab">
+                                <div class="d-flex flex-column gap-0 position-relative">
+                                    <div id="tickerListWidgetActiveLoading" class="ticker-list-widget-loading d-flex align-items-center justify-content-center text-muted small">
+                                        <div class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></div>
+                                        <span>טוען טיקרים פעילים...</span>
+                                    </div>
+                                    <div id="tickerListWidgetActiveError" class="ticker-list-widget-error alert alert-danger d-none" role="alert"></div>
+                                    <div id="tickerListWidgetActiveEmpty" class="ticker-list-widget-empty alert alert-info d-none" role="status">
+                                        <div class="text-muted small">אין טיקרים פעילים להצגה</div>
+                                    </div>
+                                    <div id="tickerListWidgetActiveList" class="ticker-list-widget-list"></div>
+                                </div>
+                            </div>
+                            
+                            <!-- Watchlist Pane -->
+                            <div class="tab-pane fade" 
+                                 id="tickerListWidgetWatchlistPane" 
+                                 role="tabpanel" 
+                                 aria-labelledby="tickerListWidgetWatchlistTab">
+                                <div class="d-flex flex-column gap-0 position-relative">
+                                    <div id="tickerListWidgetWatchlistLoading" class="ticker-list-widget-loading d-flex align-items-center justify-content-center text-muted small">
+                                        <div class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></div>
+                                        <span>טוען רשימת צפיה...</span>
+                                    </div>
+                                    <div id="tickerListWidgetWatchlistError" class="ticker-list-widget-error alert alert-danger d-none" role="alert"></div>
+                                    <div id="tickerListWidgetWatchlistEmpty" class="ticker-list-widget-empty alert alert-info d-none" role="status">
+                                        <div class="text-muted small">אין טיקרים ברשימת צפיה</div>
+                                    </div>
+                                    <div id="tickerListWidgetWatchlistList" class="ticker-list-widget-list"></div>
+                                </div>
+                            </div>
+                            
+                            <!-- All Tickers Pane -->
+                            <div class="tab-pane fade" 
+                                 id="tickerListWidgetAllPane" 
+                                 role="tabpanel" 
+                                 aria-labelledby="tickerListWidgetAllTab">
+                                <div class="d-flex flex-column gap-0 position-relative">
+                                    <div id="tickerListWidgetAllLoading" class="ticker-list-widget-loading d-flex align-items-center justify-content-center text-muted small">
+                                        <div class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></div>
+                                        <span>טוען כל הטיקרים...</span>
+                                    </div>
+                                    <div id="tickerListWidgetAllError" class="ticker-list-widget-error alert alert-danger d-none" role="alert"></div>
+                                    <div id="tickerListWidgetAllEmpty" class="ticker-list-widget-empty alert alert-info d-none" role="status">
+                                        <div class="text-muted small">אין טיקרים להצגה</div>
+                                    </div>
+                                    <div id="tickerListWidgetAllList" class="ticker-list-widget-list"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- שורה שלישית: וויגיט גרפים -->
+        <div class="row g-3 mb-3">
+            <div class="col-12">
+                <div class="card h-100" id="tickerChartWidgetContainer">
+                    <div class="card-header d-flex align-items-center justify-content-between gap-2">
+                        <h5 class="mb-0 d-flex align-items-center gap-2">
+                            <img src="images/icons/entities/tickers.svg" alt="גרפים מהירים" class="section-icon">
+                            <span>גרפים מהירים</span>
+                        </h5>
+                        <button data-button-type="REFRESH" 
+                                data-variant="small"
+                                data-onclick="window.TickerChartWidget?.refresh()"
+                                title="רענן נתונים">
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div id="tickerChartWidgetLoading" class="ticker-chart-widget-loading d-flex align-items-center justify-content-center text-muted small">
+                            <div class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></div>
+                            <span>טוען טיקרים...</span>
+                        </div>
+                        <div id="tickerChartWidgetError" class="ticker-chart-widget-error alert alert-danger d-none" role="alert"></div>
+                        <div id="tickerChartWidgetEmpty" class="ticker-chart-widget-empty alert alert-info d-none" role="status">
+                            <div class="text-muted small">אין טיקרים להצגה</div>
+                        </div>
+                        <div class="row g-3" id="tickerChartWidgetCharts">
+                            <!-- Mini Charts will be rendered here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+            
+            <div class="content-section" data-section="full-portfolio">
+                
+                <!-- Portfolio header -->
+                <div class="section-header">
+                    <div class="table-title">
+                        <img src="/trading-ui/images/icons/entities/trading_accounts.svg" alt="פורטפוליו" class="section-icon">
+                        פורטפוליו
+                    </div>
+                    <div class="table-count" id="portfolioCount">טוען...</div>
+                    <div class="table-actions">
+                        <!-- Filters -->
+                        <select id="portfolioAccountFilter" class="form-select form-select-sm">
+                            <option value="">כל חשבונות המסחר</option>
+                        </select>
+                        <!-- Side filter buttons -->
+                        <div class="btn-group btn-group-sm" role="group" id="portfolioSideFilterGroup">
+                            <button data-button-type="FILTER" data-variant="small" data-icon="↕" data-classes="portfolio-side-filter-btn" data-onclick="handlePortfolioSideFilter('')" data-side="" title="הכל" aria-pressed="false" type="button"></button>
+                            <button data-button-type="FILTER" data-variant="small" data-icon="↑" data-classes="portfolio-side-filter-btn portfolio-side-filter-long" data-onclick="handlePortfolioSideFilter('long')" data-side="long" title="Long" aria-pressed="false" type="button"></button>
+                            <button data-button-type="FILTER" data-variant="small" data-icon="↓" data-classes="portfolio-side-filter-btn portfolio-side-filter-short" data-onclick="handlePortfolioSideFilter('short')" data-side="short" title="Short" aria-pressed="false" type="button"></button>
+                        </div>
+                        <!-- Checkboxes - stacked vertically with smaller font -->
+                        <div class="portfolio-checkboxes-container">
+                            <label class="form-check-label portfolio-checkbox-label">
+                                <input type="checkbox" id="portfolioIncludeClosed" class="form-check-input portfolio-checkbox-input">
+                                הצג פוזיציות סגורות
+                            </label>
+                            <label class="form-check-label portfolio-checkbox-label">
+                                <input type="checkbox" id="portfolioUnifyAccounts" class="form-check-input portfolio-checkbox-input">
+                                אחד פוזיציות בין חשבונות מסחר
+                            </label>
+                        </div>
+                        <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('full-portfolio')" data-text="הצג/הסתר" class="portfolio-toggle-btn"></button>
+                    </div>
+                </div>
+
+                <!-- Portfolio body -->
+                <div class="section-body d-none">
+                    <div class="table-responsive" id="portfolioContainer">
+                        <table class="table table-hover" id="portfolioTable" data-table-type="portfolio">
+                            <thead>
+                                <tr>
+                                    <th class="col-side">
+                                        <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="צד" data-classes="btn-link sortable-header" data-onclick="window.sortTable('portfolio', 0)" ></button>
+                                    </th>
+                                    <th class="col-symbol">
+                                        <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="סימבול" data-classes="btn-link sortable-header" data-onclick="window.sortTable('portfolio', 1)" ></button>
+                                    </th>
+                                    <th class="col-ticker">
+                                        <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="נוכחי" data-classes="btn-link sortable-header" data-onclick="window.sortTable('portfolio', 2)" ></button>
+                                    </th>
+                                    <th class="col-quantity">
+                                        <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="כמות" data-classes="btn-link sortable-header" data-onclick="window.sortTable('portfolio', 3)" ></button>
+                                    </th>
+                                    <th class="col-avg-price">
+                                        <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="מחיר ממוצע" data-classes="btn-link sortable-header" data-onclick="window.sortTable('portfolio', 4)" ></button>
+                                    </th>
+                                    <th class="col-market-value">
+                                        <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="שווי שוק" data-classes="btn-link sortable-header" data-onclick="window.sortTable('portfolio', 5)" ></button>
+                                    </th>
+                                    <th class="col-unrealized-pl">
+                                        <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="P/L" data-classes="btn-link sortable-header" data-onclick="window.sortTable('portfolio', 6)" ></button>
+                                    </th>
+                                    <th class="col-account">
+                                        <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="חשבון" data-classes="btn-link sortable-header" data-onclick="window.sortTable('portfolio', 7)" ></button>
+                                    </th>
+                                    <th class="col-percent-portfolio">
+                                        <button data-button-type="SORT" data-variant="full" data-icon="↕️" data-text="% פורטפוליו" data-classes="btn-link sortable-header" data-onclick="window.sortTable('portfolio', 8)" ></button>
+                                    </th>
+                                    <th class="col-actions actions-cell actions-1-item">פעולות</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="10" class="loading">טוען פורטפוליו...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div> <!-- End portfolio section -->
+            
+        </div></div><div class="bottom-spacer"></div><div class="notification-container" id="notificationContainer"></div><div id="toastContainer" class="toast-container position-fixed top-0 end-0 p-3"></div></div>
+            <!-- =============================================================== -->
+        <!-- =============================================================== -->
+        <!-- =============================================================== -->
+        <!-- =============================================================== -->
+        <!-- =============================================================== -->
+        <!-- =============================================================== -->
+        <!-- =============================================================== -->
+        <!-- =============================================================== -->
+        <!-- =============================================================== -->
+        <!-- =============================================================== -->
+        <!-- =============================================================== -->
+        <!-- =============================================================== -->
+        <!-- =============================================================== -->
+        <!-- =============================================================== -->
+        <!-- =============================================================== -->
+        <!-- =============================================================== -->
+        <!-- =============================================================== -->
+    <!-- =============================================================== -->
+    <!-- =============================================================== -->
+    <!-- =============================================================== -->
+    <!-- ===== START SCRIPT LOADING ORDER ===== -->
+    <!-- =============================================================== -->
+    <!-- ⚠️ DO NOT MODIFY MANUALLY - Generated by generate-script-loading-code.js -->
+    <!-- 📋 Loading Order: BASE → SERVICES → MODULES → UI-ADVANCED → CRUD → PREFERENCES → INIT-SYSTEM -->
+    <!-- 🎯 Page: index | Generated: 2025-12-11T23:59:09.034Z -->
+    <!-- 📦 Packages: base, core-ui, header, auth, core-init, services, ui-advanced, modules, crud, preferences, entity-services, entity-details, info-summary, dashboard-widgets, tradingview-widgets, conditions, init-system -->
+    <!-- 🔧 Mode: production | Use Bundles: true -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 1/17: BASE PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 1 | Description: Core systems required for all pages -->
+    <!-- Dependencies:  -->
+    <!-- Critical: YES | Version: 1.5.0 -->
+
+    <!-- [1] Package Bundle: base.bundle.js | Strategy: async -->
+    <script src="scripts/bundles/base.bundle.js?v=1.0.0" async></script> <!-- Base Package bundle -->
+    <!-- [2] External Script: https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js | Strategy: async -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" async></script> <!-- Bootstrap JS Bundle (Tooltips & Modals) -->
+    <!-- [3] External Script: https://cdn.jsdelivr.net/npm/@floating-ui/dom@1.6.0/dist/floating-ui.dom.min.js | Strategy: async -->
+    <script src="https://cdn.jsdelivr.net/npm/@floating-ui/dom@1.6.0/dist/floating-ui.dom.min.js" async></script> <!-- Floating UI DOM - Smart positioning library (for overlay/tooltip positioning) -->
+    <!-- [4] External Script: https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js | Strategy: async -->
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js" async></script> <!-- GSAP - GreenSock Animation Platform (for smooth animations) -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 2/17: CORE UI PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 1.1 | Description: Core UI systems loaded separately to avoid bundle conflicts -->
+    <!-- Dependencies: base -->
+    <!-- Critical: YES | Version: 1.5.0 -->
+
+    <!-- [5] Package Bundle: core-ui.bundle.js | Strategy: defer -->
+    <script src="scripts/bundles/core-ui.bundle.js?v=1.0.0" defer></script> <!-- Core UI Package bundle -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 3/17: HEADER PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 1.2 | Description: Header and filter systems loaded separately to avoid bundle conflicts -->
+    <!-- Dependencies: base -->
+    <!-- Critical: YES | Version: 1.5.0 -->
+
+    <!-- [6] Package Bundle: header.bundle.js | Strategy: defer -->
+    <script src="scripts/bundles/header.bundle.js?v=1.0.0" defer></script> <!-- Header Package bundle -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 4/17: AUTHENTICATION PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 1.5 | Description: Authentication systems loaded separately to avoid bundle conflicts -->
+    <!-- Dependencies: base -->
+    <!-- Critical: YES | Version: 1.5.0 -->
+
+    <!-- [7] Package Bundle: auth.bundle.js | Strategy: defer -->
+    <script src="scripts/bundles/auth.bundle.js?v=1.0.0" defer></script> <!-- Authentication Package bundle -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 5/17: SERVICES PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 2 | Description: General services -->
+    <!-- Dependencies: base -->
+    <!-- Critical: NO | Version: 1.5.0 -->
+
+    <!-- [8] Package Bundle: services.bundle.js | Strategy: defer -->
+    <script src="scripts/bundles/services.bundle.js?v=1.0.0" defer></script> <!-- Services Package bundle -->
+    <!-- [9] External Script: https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js | Strategy: defer -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script> <!-- jsPDF library (for AI analysis PDF export) -->
+    <!-- [10] External Script: https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.min.js | Strategy: defer -->
+    <script src="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.min.js" defer></script> <!-- Quill.js - Rich Text Editor Library -->
+    <!-- [11] External Script: https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js | Strategy: defer -->
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js" defer></script> <!-- DOMPurify - HTML Sanitizer -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 6/17: MODULES PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 2.5 | Description: General modules -->
+    <!-- Dependencies: base, services -->
+    <!-- Critical: NO | Version: 1.5.0 -->
+
+    <!-- [12] Package Bundle: modules.bundle.js | Strategy: defer -->
+    <script src="scripts/bundles/modules.bundle.js?v=1.0.0" defer></script> <!-- Modules Package bundle -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 7/17: UI ADVANCED PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 3 | Description: Advanced user interface -->
+    <!-- Dependencies: base, services, modules -->
+    <!-- Critical: NO | Version: 1.5.0 -->
+
+    <!-- [13] Package Bundle: ui-advanced.bundle.js | Strategy: defer -->
+    <script src="scripts/bundles/ui-advanced.bundle.js?v=1.0.0" defer></script> <!-- UI Advanced Package bundle -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 8/17: CRUD OPERATIONS PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 4 | Description: Data and table management systems -->
+    <!-- Dependencies: base, services -->
+    <!-- Critical: NO | Version: 1.5.0 -->
+
+    <!-- [14] Package Bundle: crud.bundle.js | Strategy: defer -->
+    <script src="scripts/bundles/crud.bundle.js?v=1.0.0" defer></script> <!-- CRUD Operations Package bundle -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 9/17: PREFERENCES PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 5 | Description: User preferences system v2.0 (10 files) -->
+    <!-- Dependencies: base, services -->
+    <!-- Critical: NO | Version: 1.5.0 -->
+
+    <!-- [15] Package Bundle: preferences.bundle.js | Strategy: defer -->
+    <script src="scripts/bundles/preferences.bundle.js?v=1.0.0" defer></script> <!-- Preferences Package bundle -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 10/17: CONDITIONS PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 6.5 | Description: Condition systems -->
+    <!-- Dependencies: base, validation -->
+    <!-- Critical: NO | Version: 1.5.0 -->
+
+    <!-- [16] Package Bundle: conditions.bundle.js | Strategy: defer -->
+    <script src="scripts/bundles/conditions.bundle.js?v=1.0.0" defer></script> <!-- Conditions Package bundle -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 11/17: ENTITY SERVICES PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 8 | Description: Entity services -->
+    <!-- Dependencies: base, services -->
+    <!-- Critical: NO | Version: 1.5.0 -->
+
+    <!-- [17] Package Bundle: entity-services.bundle.js | Strategy: defer -->
+    <script src="scripts/bundles/entity-services.bundle.js?v=1.0.0" defer></script> <!-- Entity Services Package bundle -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 12/17: ENTITY DETAILS PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 17 | Description: Entity details systems -->
+    <!-- Dependencies: base, services, ui-advanced, crud, preferences, entity-services -->
+    <!-- Critical: NO | Version: 1.5.0 -->
+
+    <!-- [18] Package Bundle: entity-details.bundle.js | Strategy: defer -->
+    <script src="scripts/bundles/entity-details.bundle.js?v=1.0.0" defer></script> <!-- Entity Details Package bundle -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 13/17: INFO SUMMARY PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 17.5 | Description: Unified data summary system for all pages -->
+    <!-- Dependencies: base, services -->
+    <!-- Critical: NO | Version: 1.0.0 -->
+
+    <!-- [19] Package Bundle: info-summary.bundle.js | Strategy: defer -->
+    <script src="scripts/bundles/info-summary.bundle.js?v=1.0.0" defer></script> <!-- Info Summary Package bundle -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 14/17: CORE INITIALIZATION PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 20.5 | Description: Core initialization and monitoring systems loaded separately -->
+    <!-- Dependencies: base -->
+    <!-- Critical: YES | Version: 1.5.0 -->
+
+    <!-- [20] Package Bundle: core-init.bundle.js | Strategy: defer -->
+    <script src="scripts/bundles/core-init.bundle.js?v=1.0.0" defer></script> <!-- Core Initialization Package bundle -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 15/17: DASHBOARD WIDGETS ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 20.6 | Description: Widgets and dashboard interfaces (Pending Executions, Trade Creation) -->
+    <!-- Dependencies: base, services, ui-advanced, entity-services, modules, entity-details, watch-lists -->
+    <!-- Critical: NO | Version: 1.0.0 -->
+
+    <!-- [21] Package Bundle: dashboard-widgets.bundle.js | Strategy: defer -->
+    <script src="scripts/bundles/dashboard-widgets.bundle.js?v=1.0.0" defer></script> <!-- Dashboard Widgets bundle -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 16/17: TRADINGVIEW WIDGETS PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 21 | Description: Central system for managing TradingView widgets -->
+    <!-- Dependencies: base, preferences -->
+    <!-- Critical: NO | Version: 1.0.0 -->
+
+    <!-- [22] Package Bundle: tradingview-widgets.bundle.js | Strategy: async -->
+    <script src="scripts/bundles/tradingview-widgets.bundle.js?v=1.0.0" async></script> <!-- TradingView Widgets Package bundle -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 17/17: INITIALIZATION PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 22 | Description: Initialization and monitoring systems -->
+    <!-- Dependencies: base -->
+    <!-- Critical: NO | Version: 1.5.0 -->
+
+    <!-- [23] Package Bundle: init-system.bundle.js | Strategy: defer -->
+    <script src="scripts/bundles/init-system.bundle.js?v=1.0.0" defer></script> <!-- Initialization Package bundle -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PAGE-SPECIFIC SCRIPTS ===== -->
+    <!-- =============================================================== -->
+
+    <!-- =============================================================== -->
+    <!-- ===== FINAL SUMMARY ===== -->
+    <!-- =============================================================== -->
+    <!-- 📊 Total Scripts Processed: 23 | Unique Scripts Loaded: 23 -->
+    <!-- 🔧 For maintenance: Use generate-script-loading-code.js -->
+
+    <!-- =============================================================== -->
+    <!-- ⚠️ DO NOT MODIFY MANUALLY - Generated by generate-script-loading-code.js -->
+    <!-- 📋 Loading Order: BASE → SERVICES → MODULES → UI-ADVANCED → CRUD → PREFERENCES → INIT-SYSTEM -->
+    <!-- 🎯 Page: index | Generated: 2025-12-11T23:55:25.597Z -->
+    <!-- 📦 Packages: base, core-ui, header, auth, core-init, services, ui-advanced, modules, crud, preferences, entity-services, entity-details, info-summary, dashboard-widgets, tradingview-widgets, conditions, init-system -->
+    <!-- 🔧 Mode: production | Use Bundles: true -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 1/17: BASE PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 1 | Description: Core systems required for all pages -->
+    <!-- Dependencies:  -->
+    <!-- Critical: YES | Version: 1.5.0 -->
+
+    <!-- [1] Package Bundle: base.bundle.js | Strategy: async -->
+    <script src="scripts/bundles/base.bundle.js?v=1.0.0" async></script> <!-- Base Package bundle -->
+    <!-- [2] External Script: https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js | Strategy: async -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" async></script> <!-- Bootstrap JS Bundle (Tooltips & Modals) -->
+    <!-- [3] External Script: https://cdn.jsdelivr.net/npm/@floating-ui/dom@1.6.0/dist/floating-ui.dom.min.js | Strategy: async -->
+    <script src="https://cdn.jsdelivr.net/npm/@floating-ui/dom@1.6.0/dist/floating-ui.dom.min.js" async></script> <!-- Floating UI DOM - Smart positioning library (for overlay/tooltip positioning) -->
+    <!-- [4] External Script: https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js | Strategy: async -->
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js" async></script> <!-- GSAP - GreenSock Animation Platform (for smooth animations) -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 2/17: CORE UI PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 1.1 | Description: Core UI systems loaded separately to avoid bundle conflicts -->
+    <!-- Dependencies: base -->
+    <!-- Critical: YES | Version: 1.5.0 -->
+
+    <!-- [5] Package Bundle: core-ui.bundle.js | Strategy: bundle -->
+    <script src="scripts/bundles/core-ui.bundle.js?v=1.0.0" bundle></script> <!-- Core UI Package bundle -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 3/17: HEADER PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 1.2 | Description: Header and filter systems loaded separately to avoid bundle conflicts -->
+    <!-- Dependencies: base -->
+    <!-- Critical: YES | Version: 1.5.0 -->
+
+    <!-- [6] Package Bundle: header.bundle.js | Strategy: bundle -->
+    <script src="scripts/bundles/header.bundle.js?v=1.0.0" bundle></script> <!-- Header Package bundle -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 4/17: AUTHENTICATION PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 1.5 | Description: Authentication systems loaded separately to avoid bundle conflicts -->
+    <!-- Dependencies: base -->
+    <!-- Critical: YES | Version: 1.5.0 -->
+
+    <!-- [7] Package Bundle: auth.bundle.js | Strategy: bundle -->
+    <script src="scripts/bundles/auth.bundle.js?v=1.0.0" bundle></script> <!-- Authentication Package bundle -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 5/17: SERVICES PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 2 | Description: General services -->
+    <!-- Dependencies: base -->
+    <!-- Critical: NO | Version: 1.5.0 -->
+
+    <!-- [8] Package Bundle: services.bundle.js | Strategy: bundle -->
+    <script src="scripts/bundles/services.bundle.js?v=1.0.0" bundle></script> <!-- Services Package bundle -->
+    <!-- [9] External Script: https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js | Strategy: bundle -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" bundle></script> <!-- jsPDF library (for AI analysis PDF export) -->
+    <!-- [10] External Script: https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.min.js | Strategy: bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.min.js" bundle></script> <!-- Quill.js - Rich Text Editor Library -->
+    <!-- [11] External Script: https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js | Strategy: bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js" bundle></script> <!-- DOMPurify - HTML Sanitizer -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 6/17: MODULES PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 2.5 | Description: General modules -->
+    <!-- Dependencies: base, services -->
+    <!-- Critical: NO | Version: 1.5.0 -->
+
+    <!-- [12] Package Bundle: modules.bundle.js | Strategy: bundle -->
+    <script src="scripts/bundles/modules.bundle.js?v=1.0.0" bundle></script> <!-- Modules Package bundle -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 7/17: UI ADVANCED PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 3 | Description: Advanced user interface -->
+    <!-- Dependencies: base, services, modules -->
+    <!-- Critical: NO | Version: 1.5.0 -->
+
+    <!-- [13] Package Bundle: ui-advanced.bundle.js | Strategy: bundle -->
+    <script src="scripts/bundles/ui-advanced.bundle.js?v=1.0.0" bundle></script> <!-- UI Advanced Package bundle -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 8/17: CRUD OPERATIONS PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 4 | Description: Data and table management systems -->
+    <!-- Dependencies: base, services -->
+    <!-- Critical: NO | Version: 1.5.0 -->
+
+    <!-- [14] Package Bundle: crud.bundle.js | Strategy: bundle -->
+    <script src="scripts/bundles/crud.bundle.js?v=1.0.0" bundle></script> <!-- CRUD Operations Package bundle -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 9/17: PREFERENCES PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 5 | Description: User preferences system v2.0 (10 files) -->
+    <!-- Dependencies: base, services -->
+    <!-- Critical: NO | Version: 1.5.0 -->
+
+    <!-- [15] Package Bundle: preferences.bundle.js | Strategy: bundle -->
+    <script src="scripts/bundles/preferences.bundle.js?v=1.0.0" bundle></script> <!-- Preferences Package bundle -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 10/17: CONDITIONS PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 6.5 | Description: Condition systems -->
+    <!-- Dependencies: base, validation -->
+    <!-- Critical: NO | Version: 1.5.0 -->
+
+    <!-- [16] Package Bundle: conditions.bundle.js | Strategy: bundle -->
+    <script src="scripts/bundles/conditions.bundle.js?v=1.0.0" bundle></script> <!-- Conditions Package bundle -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 11/17: ENTITY SERVICES PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 8 | Description: Entity services -->
+    <!-- Dependencies: base, services -->
+    <!-- Critical: NO | Version: 1.5.0 -->
+
+    <!-- [17] Package Bundle: entity-services.bundle.js | Strategy: bundle -->
+    <script src="scripts/bundles/entity-services.bundle.js?v=1.0.0" bundle></script> <!-- Entity Services Package bundle -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 12/17: ENTITY DETAILS PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 17 | Description: Entity details systems -->
+    <!-- Dependencies: base, services, ui-advanced, crud, preferences, entity-services -->
+    <!-- Critical: NO | Version: 1.5.0 -->
+
+    <!-- [18] Package Bundle: entity-details.bundle.js | Strategy: bundle -->
+    <script src="scripts/bundles/entity-details.bundle.js?v=1.0.0" bundle></script> <!-- Entity Details Package bundle -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 13/17: INFO SUMMARY PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 17.5 | Description: Unified data summary system for all pages -->
+    <!-- Dependencies: base, services -->
+    <!-- Critical: NO | Version: 1.0.0 -->
+
+    <!-- [19] Package Bundle: info-summary.bundle.js | Strategy: bundle -->
+    <script src="scripts/bundles/info-summary.bundle.js?v=1.0.0" bundle></script> <!-- Info Summary Package bundle -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 14/17: CORE INITIALIZATION PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 20.5 | Description: Core initialization and monitoring systems loaded separately -->
+    <!-- Dependencies: base -->
+    <!-- Critical: YES | Version: 1.5.0 -->
+
+    <!-- [20] Package Bundle: core-init.bundle.js | Strategy: bundle -->
+    <script src="scripts/bundles/core-init.bundle.js?v=1.0.0" bundle></script> <!-- Core Initialization Package bundle -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 15/17: DASHBOARD WIDGETS ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 20.6 | Description: Widgets and dashboard interfaces (Pending Executions, Trade Creation) -->
+    <!-- Dependencies: base, services, ui-advanced, entity-services, modules, entity-details, watch-lists -->
+    <!-- Critical: NO | Version: 1.0.0 -->
+
+    <!-- [21] Package Bundle: dashboard-widgets.bundle.js | Strategy: bundle -->
+    <script src="scripts/bundles/dashboard-widgets.bundle.js?v=1.0.0" bundle></script> <!-- Dashboard Widgets bundle -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 16/17: TRADINGVIEW WIDGETS PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 21 | Description: Central system for managing TradingView widgets -->
+    <!-- Dependencies: base, preferences -->
+    <!-- Critical: NO | Version: 1.0.0 -->
+
+    <!-- [22] Package Bundle: tradingview-widgets.bundle.js | Strategy: async -->
+    <script src="scripts/bundles/tradingview-widgets.bundle.js?v=1.0.0" async></script> <!-- TradingView Widgets Package bundle -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 17/17: INITIALIZATION PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 22 | Description: Initialization and monitoring systems -->
+    <!-- Dependencies: base -->
+    <!-- Critical: NO | Version: 1.5.0 -->
+
+    <!-- [23] Package Bundle: init-system.bundle.js | Strategy: bundle -->
+    <script src="scripts/bundles/init-system.bundle.js?v=1.0.0" bundle></script> <!-- Initialization Package bundle -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PAGE-SPECIFIC SCRIPTS ===== -->
+    <!-- =============================================================== -->
+
+    <!-- =============================================================== -->
+    <!-- ===== FINAL SUMMARY ===== -->
+    <!-- =============================================================== -->
+    <!-- 📊 Total Scripts Processed: 23 | Unique Scripts Loaded: 23 -->
+    <!-- 🔧 For maintenance: Use generate-script-loading-code.js -->
+
+    <!-- =============================================================== -->
+    <!-- ⚠️ DO NOT MODIFY MANUALLY - Generated by generate-script-loading-code.js -->
+    <!-- 📋 Loading Order: BASE → SERVICES → MODULES → UI-ADVANCED → CRUD → PREFERENCES → INIT-SYSTEM -->
+    <!-- 🎯 Page: index | Generated: 2025-12-06T19:52:15.103Z -->
+    <!-- 📦 Packages: base, services, ui-advanced, modules, crud, preferences, entity-services, entity-details, info-summary, dashboard-widgets, tradingview-widgets, conditions, init-system -->
+    <!-- 🔧 Mode: production | Use Bundles: true -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 1/13: BASE PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 1 | Description: Core systems required for all pages -->
+    <!-- Dependencies:  -->
+    <!-- Critical: YES | Version: 1.5.0 -->
+
+    <!-- [1] Package Bundle: base.bundle.js | Strategy: defer -->
+    <script src="scripts/bundles/base.bundle.js?v=1.0.0" defer></script> <!-- Base Package bundle -->
+    <!-- [2] External Script: https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js | Strategy: defer -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script> <!-- Bootstrap JS Bundle (Tooltips & Modals) -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 2/13: SERVICES PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 2 | Description: General services -->
+    <!-- Dependencies: base -->
+    <!-- Critical: NO | Version: 1.5.0 -->
+
+    <!-- [3] Package Bundle: services.bundle.js | Strategy: defer -->
+    <script src="scripts/bundles/services.bundle.js?v=1.0.0" defer></script> <!-- Services Package bundle -->
+    <!-- [4] External Script: https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js | Strategy: defer -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script> <!-- jsPDF library (for AI analysis PDF export) -->
+    <!-- [5] External Script: https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.min.js | Strategy: defer -->
+    <script src="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.min.js" defer></script> <!-- Quill.js - Rich Text Editor Library -->
+    <!-- [6] External Script: https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js | Strategy: defer -->
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js" defer></script> <!-- DOMPurify - HTML Sanitizer -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 3/13: MODULES PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 2.5 | Description: General modules -->
+    <!-- Dependencies: base, services -->
+    <!-- Critical: NO | Version: 1.5.0 -->
+
+    <!-- [3] Package Bundle: modules.bundle.js | Strategy: defer -->
+    <script src="scripts/bundles/modules.bundle.js?v=1.0.0" defer></script> <!-- Modules Package bundle -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 4/13: UI ADVANCED PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 3 | Description: Advanced user interface -->
+    <!-- Dependencies: base, services, modules -->
+    <!-- Critical: NO | Version: 1.5.0 -->
+
+    <!-- [4] Package Bundle: ui-advanced.bundle.js | Strategy: defer -->
+    <script src="scripts/bundles/ui-advanced.bundle.js?v=1.0.0" defer></script> <!-- UI Advanced Package bundle -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 5/13: CRUD OPERATIONS PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 4 | Description: Data and table management systems -->
+    <!-- Dependencies: base, services -->
+    <!-- Critical: NO | Version: 1.5.0 -->
+
+    <!-- [5] Package Bundle: crud.bundle.js | Strategy: defer -->
+    <script src="scripts/bundles/crud.bundle.js?v=1.0.0" defer></script> <!-- CRUD Operations Package bundle -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 6/13: PREFERENCES PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 5 | Description: User preferences system v2.0 (10 files) -->
+    <!-- Dependencies: base, services -->
+    <!-- Critical: NO | Version: 1.5.0 -->
+
+    <!-- [6] Package Bundle: preferences.bundle.js | Strategy: defer -->
+    <script src="scripts/bundles/preferences.bundle.js?v=1.0.0" defer></script> <!-- Preferences Package bundle -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 7/13: CONDITIONS PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 6.5 | Description: Condition systems -->
+    <!-- Dependencies: base, validation -->
+    <!-- Critical: NO | Version: 1.5.0 -->
+
+    <!-- [11] Package Bundle: conditions.bundle.js | Strategy: defer -->
+    <script src="scripts/bundles/conditions.bundle.js?v=1.0.0" defer></script> <!-- Conditions Package bundle -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 8/13: ENTITY SERVICES PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 10 | Description: Entity services -->
+    <!-- Dependencies: base, services -->
+    <!-- Critical: NO | Version: 1.5.0 -->
+
+    <!-- [12] Package Bundle: entity-services.bundle.js | Strategy: defer -->
+    <script src="scripts/bundles/entity-services.bundle.js?v=1.0.0" defer></script> <!-- Entity Services Package bundle -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 9/13: ENTITY DETAILS PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 17 | Description: Entity details systems -->
+    <!-- Dependencies: base, services, ui-advanced, crud, preferences, entity-services -->
+    <!-- Critical: NO | Version: 1.5.0 -->
+
+    <!-- [13] Package Bundle: entity-details.bundle.js | Strategy: defer -->
+    <script src="scripts/bundles/entity-details.bundle.js?v=1.0.0" defer></script> <!-- Entity Details Package bundle -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 10/13: INFO SUMMARY PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 18 | Description: Unified data summary system for all pages -->
+    <!-- Dependencies: base, services -->
+    <!-- Critical: NO | Version: 1.0.0 -->
+
+    <!-- [14] Package Bundle: info-summary.bundle.js | Strategy: defer -->
+    <script src="scripts/bundles/info-summary.bundle.js?v=1.0.0" defer></script> <!-- Info Summary Package bundle -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 11/13: DASHBOARD WIDGETS ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 19.5 | Description: Widgets and dashboard interfaces (Pending Executions, Trade Creation) -->
+    <!-- Dependencies: base, services, ui-advanced, entity-services, modules, entity-details -->
+    <!-- Critical: NO | Version: 1.0.0 -->
+
+    <!-- [15] Package Bundle: dashboard-widgets.bundle.js | Strategy: defer -->
+    <script src="scripts/bundles/dashboard-widgets.bundle.js?v=1.0.0" defer></script> <!-- Dashboard Widgets bundle -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 12/13: TRADINGVIEW WIDGETS PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 21 | Description: Central system for managing TradingView widgets -->
+    <!-- Dependencies: base, preferences -->
+    <!-- Critical: NO | Version: 1.0.0 -->
+
+    <!-- [16] Package Bundle: tradingview-widgets.bundle.js | Strategy: async -->
+    <script src="scripts/bundles/tradingview-widgets.bundle.js?v=1.0.0" async></script> <!-- TradingView Widgets Package bundle -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 13/13: INITIALIZATION PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 22 | Description: Initialization and monitoring systems -->
+    <!-- Dependencies: base -->
+    <!-- Critical: NO | Version: 1.5.0 -->
+
+    <!-- [17] Package Bundle: init-system.bundle.js | Strategy: defer -->
+    <script src="scripts/bundles/init-system.bundle.js?v=1.0.0" defer></script> <!-- Initialization Package bundle -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PAGE-SPECIFIC SCRIPTS ===== -->
+    <!-- =============================================================== -->
+
+    <!-- =============================================================== -->
+    <!-- ===== FINAL SUMMARY ===== -->
+    <!-- =============================================================== -->
+    <!-- 📊 Total Scripts Processed: 17 | Unique Scripts Loaded: 17 -->
+    <!-- 🔧 For maintenance: Use generate-script-loading-code.js -->
+</body>
+</html>

@@ -25,6 +25,7 @@
     display: flex;
     flex-direction: column;
     position: relative;
+    overflow: visible; /* מאפשר לכפתור להיות מחוץ לגבולות */
 }
 
 #unified-header .header-top {
@@ -70,6 +71,7 @@
     gap: 1rem;
     text-decoration: none;
     color: inherit;
+    cursor: pointer;
 }
 
 #unified-header .logo:hover {
@@ -222,12 +224,125 @@
     margin: 0.5rem 0;
 }
 
+/* ===== Dropdown Submenu (Level 3) ===== */
+#unified-header .dropdown-submenu {
+    position: relative;
+}
+
+#unified-header .dropdown-submenu > .tiktrack-dropdown-item {
+    padding-right: 0.5rem;
+}
+
+/* יצירת "גשר" בין תפריט רמה 2 לתפריט רמה 3 - מונע סגירה במעבר */
+#unified-header .dropdown-submenu::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: -5px; /* מכסה אזור קטן - התפריטים צמודים */
+    width: 10px;
+    height: 100%;
+    background: transparent;
+    z-index: 953; /* מעל תפריט רמה 2, מתחת לתפריט רמה 3 */
+    pointer-events: auto;
+}
+
+/* גשר גם בתפריט רמה 3 - מונע סגירה כשחוזרים */
+#unified-header .level3-submenu::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -5px; /* ב-RTL - מצד שמאל (ימין במסך) */
+    width: 10px;
+    height: 100%;
+    background: transparent;
+    z-index: -1;
+    pointer-events: auto;
+}
+
+/* Level 3 Submenu - רמה 3 של התפריט */
+#unified-header .level3-submenu {
+    position: absolute;
+    top: 0;
+    right: 100%; /* ב-RTL התפריט מופיע משמאל (ימין במסך) - צמוד ללא רווח */
+    left: auto;
+    bottom: auto;
+    background: white;
+    border: 1px solid #e5e5e5;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    min-width: 180px;
+    max-height: calc(100vh - 20px); /* מקסימום גובה - לא יותר מגובה המסך */
+    padding: 0.5rem 0;
+    display: none;
+    z-index: 952; /* מעל תפריט רמה 2 */
+    list-style: none;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(10px); /* ב-RTL תזוזה שמאלה (ימינה במסך) */
+    transition: all 0.3s ease;
+    overflow-y: auto; /* גלילה אם התוכן ארוך */
+    overflow-x: hidden;
+}
+
+/* אם התפריט מתחיל נמוך מדי - ממקמים אותו מלמטה */
+#unified-header .level3-submenu.bottom-aligned {
+    top: auto;
+    bottom: 0;
+}
+
+#unified-header .dropdown-submenu:hover .level3-submenu {
+    display: block;
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(0);
+}
+
+#unified-header .level3-submenu li {
+    list-style: none;
+}
+
+#unified-header .level3-submenu .tiktrack-dropdown-item {
+    padding: 0.5rem 1rem;
+}
+
+#unified-header .level3-submenu .separator {
+    margin: 0.5rem 0;
+}
+
 /* ===== Filter Toggle Button ===== */
 #unified-header .filter-toggle-section {
     display: flex;
     align-items: center;
 }
 
+/* כפתור ראשי - במרכז העמוד על הקו של סוף הפילטר למטה */
+/* הכפתור נמצא מחוץ ל-header-filters כך שהוא נשאר גלוי גם כשהפילטר סגור */
+#unified-header .filter-toggle-main {
+    position: absolute;
+    top: 149px; /* מיקום כשהפילטר פתוח */
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    justify-content: center;
+    align-items: center;
+    z-index: 952;
+    width: 100%;
+    pointer-events: none;
+}
+
+/* כשהפילטר סגור, הכפתור צריך להיות גבוה יותר */
+#unified-header .header-content:has(.header-filters[style*="display: none"]) .filter-toggle-main,
+#unified-header .header-content:has(.header-filters[style*="display:none"]) .filter-toggle-main {
+    top: 75px; /* מיקום כשהפילטר סגור */
+}
+
+#unified-header .filter-toggle-main .header-filter-toggle-btn {
+    pointer-events: all;
+}
+
+/* כפתור משני - בתוך הפילטר, במרכז */
 #unified-header .filter-toggle-secondary {
     position: absolute;
     bottom: -16px;
@@ -252,26 +367,43 @@
 }
 
 #unified-header .header-filter-toggle-btn {
-    background: var(--apple-bg-secondary, #f5f5f7);
+    background: white;
     border: 1px solid var(--apple-border-light, #e5e5e5);
     border-radius: 50%;
     cursor: pointer;
     padding: 0;
     color: var(--apple-text-secondary, #6c757d);
-    font-size: 0.6rem;
-    width: 24px;
-    height: 24px;
+    font-size: 0.6rem; /* גודל חץ תקין */
+    width: 20px; /* קוטר קטן יותר */
+    height: 20px; /* קוטר קטן יותר */
+    min-width: 20px; /* מונע דריסה */
+    min-height: 20px; /* מונע דריסה */
+    max-width: 20px; /* מונע דריסה */
+    max-height: 20px; /* מונע דריסה */
     display: flex;
     align-items: center;
     justify-content: center;
     transition: all 0.2s ease;
     line-height: 1;
+    box-sizing: border-box; /* מונע דריסה */
+    box-shadow: none !important; /* הסרת כל צל/הילה */
+    filter: none !important; /* הסרת כל אפקטים */
+    text-shadow: none !important; /* הסרת צל טקסט */
 }
 
 #unified-header .header-filter-toggle-btn:hover {
     background: var(--apple-bg-tertiary, #e5e5e5);
     color: var(--apple-text-primary, #1d1d1f);
     border-color: var(--apple-border-medium, #d1d1d1);
+    box-shadow: none !important; /* הסרת כל צל/הילה גם ב-hover */
+    filter: none !important; /* הסרת כל אפקטים */
+    text-shadow: none !important; /* הסרת צל טקסט */
+}
+
+#unified-header .header-filter-toggle-btn .header-filter-arrow {
+    font-size: 0.6rem; /* גודל חץ תקין */
+    line-height: 1;
+    display: inline-block;
 }
 
 #unified-header .header-filter-toggle-btn.collapsed .header-filter-arrow {
@@ -299,6 +431,8 @@
     padding: 0 20px;
     box-sizing: border-box;
     overflow: visible;
+    direction: rtl; /* RTL for Hebrew - filters start from right */
+    justify-content: flex-start; /* Filters aligned to right (start in RTL) */
 }
 
 #unified-header .filter-group {
@@ -479,6 +613,66 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
+}
+
+/* ===== Filter User Section ===== */
+#unified-header .filter-user-section {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-right: auto; /* Push to left (end of row in RTL) */
+}
+
+#unified-header .user-avatar-badge {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #26baac;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+#unified-header .user-avatar-badge:hover {
+    background: #1fa89a;
+    transform: scale(1.05);
+}
+
+#unified-header .auth-toggle-btn {
+    width: 36px;
+    height: 36px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+#unified-header .auth-toggle-btn:hover {
+    opacity: 1;
+}
+
+#unified-header .auth-toggle-btn img {
+    width: 24px;
+    height: 24px;
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
+}
+
+#unified-header .auth-toggle-btn:hover img {
+    opacity: 1;
+}
+
+#unified-header .user-profile-link {
+    text-decoration: none;
 }
 
 #unified-header .reset-btn,

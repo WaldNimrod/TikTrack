@@ -55,12 +55,19 @@ def get_alert(alert_id: int):
 def create_alert():
     """Create new alert"""
     try:
+        # Get user_id from Flask context (set by auth middleware)
+        user_id = getattr(g, 'user_id', None)
+        
         # Get raw request data for debugging
         raw_data = request.get_data(as_text=True)
         logger.info(f"🔍 [create_alert] Raw request data: {raw_data[:500]}")
         
         data = request.get_json()
         logger.info(f"🔍 [create_alert] Received data: {data}")
+        
+        # Set user_id if authenticated
+        if user_id is not None and 'user_id' not in data:
+            data['user_id'] = user_id
         logger.info(f"🔍 [create_alert] condition_attribute in data: {'condition_attribute' in data if data else False}")
         logger.info(f"🔍 [create_alert] condition_attribute value: {data.get('condition_attribute') if data else 'N/A'}")
         logger.info(f"🔍 [create_alert] condition_attribute type: {type(data.get('condition_attribute')) if data else 'N/A'}")
@@ -125,7 +132,7 @@ def create_alert():
             data['expiry_date'] = None
         
         db: Session = g.db
-        alert = AlertService.create(db, data)
+        alert = AlertService.create(db, data, user_id=user_id)
         normalizer = _get_date_normalizer()
         alert_payload = normalizer.normalize_output(alert.to_dict())
         return jsonify({
@@ -151,6 +158,9 @@ def create_alert():
 def update_alert(alert_id: int):
     """Update alert"""
     try:
+        # Get user_id from Flask context (set by auth middleware)
+        user_id = getattr(g, 'user_id', None)
+        
         data = request.get_json()
         # Sanitize HTML content for message field
         if 'message' in data and data['message']:
@@ -197,6 +207,19 @@ def update_alert(alert_id: int):
             data['expiry_date'] = None
         
         db: Session = g.db
+        
+        # Verify alert belongs to user before updating
+        if user_id is not None:
+            existing_alert = AlertService.get_by_id(db, alert_id, user_id=user_id)
+            if not existing_alert:
+                normalizer = _get_date_normalizer()
+                return jsonify({
+                    "status": "error",
+                    "error": {"message": "Alert not found or does not belong to user"},
+                    "timestamp": normalizer.now_envelope(),
+                    "version": "1.0"
+                }), 404
+        
         alert = AlertService.update(db, alert_id, data)
         normalizer = _get_date_normalizer()
         alert_payload = normalizer.normalize_output(alert.to_dict())
@@ -232,7 +255,23 @@ def update_alert(alert_id: int):
 def delete_alert(alert_id: int):
     """Delete alert"""
     try:
+        # Get user_id from Flask context (set by auth middleware)
+        user_id = getattr(g, 'user_id', None)
+        
         db: Session = g.db
+        
+        # Verify alert belongs to user before deleting
+        if user_id is not None:
+            existing_alert = AlertService.get_by_id(db, alert_id, user_id=user_id)
+            if not existing_alert:
+                normalizer = _get_date_normalizer()
+                return jsonify({
+                    "status": "error",
+                    "error": {"message": "Alert not found or does not belong to user"},
+                    "timestamp": normalizer.now_envelope(),
+                    "version": "1.0"
+                }), 404
+        
         try:
             TagService.remove_all_tags_for_entity(db, 'alert', alert_id)
         except ValueError as tag_error:
@@ -275,7 +314,24 @@ def delete_alert(alert_id: int):
 def mark_as_triggered(alert_id: int):
     """Activate alert (change to new)"""
     try:
+        # Get user_id from Flask context (set by auth middleware)
+        from flask import g
+        user_id = getattr(g, 'user_id', None)
+        
         db: Session = next(get_db())
+        
+        # Verify alert belongs to user
+        if user_id is not None:
+            existing_alert = AlertService.get_by_id(db, alert_id, user_id=user_id)
+            if not existing_alert:
+                normalizer = _get_date_normalizer()
+                return jsonify({
+                    "status": "error",
+                    "error": {"message": "Alert not found or does not belong to user"},
+                    "timestamp": normalizer.now_envelope(),
+                    "version": "1.0"
+                }), 404
+        
         alert = AlertService.mark_as_triggered(db, alert_id)
         normalizer = _get_date_normalizer()
         return jsonify({
@@ -308,10 +364,12 @@ def mark_as_triggered(alert_id: int):
 
 @alerts_bp.route('/unread', methods=['GET'])
 def get_unread_alerts():
-    """Get unread alerts (new)"""
+    """Get unread alerts (new) - filtered by user_id if available"""
     try:
         db: Session = next(get_db())
-        alerts = AlertService.get_unread_alerts_with_symbols(db)
+        # Get user_id from Flask context (set by auth middleware)
+        user_id = getattr(g, 'user_id', None)
+        alerts = AlertService.get_unread_alerts_with_symbols(db, user_id=user_id)
         normalizer = _get_date_normalizer()
         return jsonify({
             "status": "success",
@@ -338,7 +396,24 @@ def get_unread_alerts():
 def mark_read(alert_id: int):
     """Mark alert as read (true)"""
     try:
+        # Get user_id from Flask context (set by auth middleware)
+        from flask import g
+        user_id = getattr(g, 'user_id', None)
+        
         db: Session = next(get_db())
+        
+        # Verify alert belongs to user
+        if user_id is not None:
+            existing_alert = AlertService.get_by_id(db, alert_id, user_id=user_id)
+            if not existing_alert:
+                normalizer = _get_date_normalizer()
+                return jsonify({
+                    "status": "error",
+                    "error": {"message": "Alert not found or does not belong to user"},
+                    "timestamp": normalizer.now_envelope(),
+                    "version": "1.0"
+                }), 404
+        
         alert = AlertService.mark_as_read(db, alert_id)
         normalizer = _get_date_normalizer()
         return jsonify({
@@ -373,7 +448,24 @@ def mark_read(alert_id: int):
 def reactivate_alert(alert_id: int):
     """Return alert to active state"""
     try:
+        # Get user_id from Flask context (set by auth middleware)
+        from flask import g
+        user_id = getattr(g, 'user_id', None)
+        
         db: Session = next(get_db())
+        
+        # Verify alert belongs to user
+        if user_id is not None:
+            existing_alert = AlertService.get_by_id(db, alert_id, user_id=user_id)
+            if not existing_alert:
+                normalizer = _get_date_normalizer()
+                return jsonify({
+                    "status": "error",
+                    "error": {"message": "Alert not found or does not belong to user"},
+                    "timestamp": normalizer.now_envelope(),
+                    "version": "1.0"
+                }), 404
+        
         alert = AlertService.reactivate(db, alert_id)
         normalizer = _get_date_normalizer()
         return jsonify({
@@ -408,7 +500,24 @@ def reactivate_alert(alert_id: int):
 def cancel_alert(alert_id: int):
     """Cancel alert"""
     try:
+        # Get user_id from Flask context (set by auth middleware)
+        from flask import g
+        user_id = getattr(g, 'user_id', None)
+        
         db: Session = next(get_db())
+        
+        # Verify alert belongs to user
+        if user_id is not None:
+            existing_alert = AlertService.get_by_id(db, alert_id, user_id=user_id)
+            if not existing_alert:
+                normalizer = _get_date_normalizer()
+                return jsonify({
+                    "status": "error",
+                    "error": {"message": "Alert not found or does not belong to user"},
+                    "timestamp": normalizer.now_envelope(),
+                    "version": "1.0"
+                }), 404
+        
         alert = AlertService.cancel(db, alert_id)
         normalizer = _get_date_normalizer()
         return jsonify({
@@ -441,11 +550,25 @@ def cancel_alert(alert_id: int):
 
 # New endpoints for getting alerts by entity
 @alerts_bp.route('/entity/<entity_type>/<int:entity_id>', methods=['GET'])
+@handle_database_session()
 def get_alerts_by_entity(entity_type: str, entity_id: int):
-    """Get alerts by entity type and ID"""
+    """Get alerts by entity type and ID (filtered by user_id)"""
     try:
-        db: Session = next(get_db())
-        alerts = AlertService.get_alerts_by_entity(db, entity_type, entity_id)
+        # Get user_id from Flask context (set by auth middleware)
+        user_id = getattr(g, 'user_id', None)
+        
+        if user_id is None:
+            normalizer = _get_date_normalizer()
+            return jsonify({
+                "status": "error",
+                "error": {"message": "User authentication required"},
+                "timestamp": normalizer.now_envelope(),
+                "version": "1.0"
+            }), 401
+        
+        db: Session = g.db
+        # Pass user_id to service for proper filtering
+        alerts = AlertService.get_alerts_by_entity(db, entity_type, entity_id, user_id=user_id)
         normalizer = _get_date_normalizer()
         return jsonify({
             "status": "success",
@@ -472,7 +595,5 @@ def get_alerts_by_entity(entity_type: str, entity_id: int):
             "timestamp": normalizer.now_envelope(),
             "version": "1.0"
         }), 500
-    finally:
-        db.close()
 
 

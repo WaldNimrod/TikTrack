@@ -9,6 +9,25 @@
  * @created January 27, 2025
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Class Methods ===
+// - FieldMappingValidator.shouldIgnoreField() - Shouldignorefield
+// - FieldMappingValidator.isSpecialField() - Isspecialfield
+// - FieldMappingValidator.generateReport() - Generatereport
+
+// === Event Handlers ===
+// - FieldMappingValidator.getFieldIdsFromConfig() - Getfieldidsfromconfig
+
+// === Data Functions ===
+// - FieldMappingValidator.getFieldMappings() - Getfieldmappings
+// - FieldMappingValidator.getReverseMappings() - Getreversemappings
+
+// === Utility Functions ===
+// - FieldMappingValidator.validateEntityType() - Validateentitytype
+// - FieldMappingValidator.validateAll() - Validateall
+
 (function() {
     'use strict';
 

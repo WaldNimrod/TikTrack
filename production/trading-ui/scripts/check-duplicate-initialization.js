@@ -13,7 +13,7 @@ class DuplicateInitializationChecker {
             'index', 'preferences', 'trades', 'executions', 'trade_plans', 
             'alerts', 'trading_accounts', 'cash_flows', 'tickers', 'notes',
             'research', 'db_display', 'system-management', 'server-monitor',
-            'linter-realtime-monitor', 'notifications-center',
+            'notifications-center',
             'external-data-dashboard', 'crud-testing-dashboard',
             'conditions-test', 'db_extradata', 'constraints', 'background-tasks',
             'css-management', 'dynamic-colors-display',

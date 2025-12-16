@@ -8,6 +8,25 @@
  * - NotificationSystem (optional) for error messaging.
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === UI Functions ===
+// - renderEmpty() - Renderempty
+// - renderList() - Renderlist
+
+// === Data Functions ===
+// - getEpoch() - Getepoch
+
+// === Utility Functions ===
+// - formatDate() - Formatdate
+// - formatAmount() - Formatamount
+// - formatSide() - Formatside
+
+// === Other ===
+// - resolveDateValue() - Resolvedatevalue
+// - normalizeTrades() - Normalizetrades
+
 ;(function () {
   const MAX_ITEMS = 5;
   const CONTAINER_ID = 'recentTrades';
@@ -25,67 +44,74 @@
     return null;
   }
 
+  /**
+   * Format date - משתמש ב-FieldRendererService המרכזי
+   * @deprecated - השתמש ישירות ב-window.FieldRendererService.renderDate() או renderDateShort()
+   * @param {*} value - תאריך לעיצוב
+   * @returns {string} תאריך מעוצב
+   */
   function formatDate(value) {
     const resolved = resolveDateValue(value);
     if (!resolved) {
       return '';
     }
+    
+    // שימוש ישיר ב-FieldRendererService - המערכת תמיד זמינה דרך BASE package
     if (window.FieldRendererService?.renderDateShort) {
-      try {
-        return window.FieldRendererService.renderDateShort(resolved) || '';
-      } catch (error) {
-        window.Logger?.warn('RecentTradesWidget: renderDateShort failed', { error: error?.message });
-      }
-    }
-    // Use dateUtils for consistent date parsing
-    let dateObj;
-    if (window.dateUtils && typeof window.dateUtils.ensureDateEnvelope === 'function') {
-      const envelope = window.dateUtils.ensureDateEnvelope(resolved);
-      if (envelope && envelope.epochMs) {
-        dateObj = new Date(envelope.epochMs);
-      } else {
-        dateObj = new Date(resolved);
-      }
-    } else if (resolved && typeof resolved === 'object' && typeof resolved.epochMs === 'number') {
-      dateObj = new Date(resolved.epochMs);
-    } else {
-      dateObj = new Date(resolved);
+      return window.FieldRendererService.renderDateShort(resolved) || '';
     }
     
-    if (Number.isNaN(dateObj.getTime())) {
-      return '';
+    if (window.FieldRendererService?.renderDate) {
+      return window.FieldRendererService.renderDate(resolved, false);
     }
     
-    // Use FieldRendererService or dateUtils for date formatting
-    if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
-      return window.FieldRendererService.renderDate(dateObj, false);
-    } else if (window.dateUtils && typeof window.dateUtils.formatDate === 'function') {
-      return window.dateUtils.formatDate(dateObj, { includeTime: false });
+    // Fallback למקרה נדיר ביותר שהמערכת לא זמינה
+    try {
+      const dateObj = new Date(resolved);
+      if (!Number.isNaN(dateObj.getTime())) {
+        return dateObj.toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: '2-digit' });
+      }
+    } catch (error) {
+      window.Logger?.warn('RecentTradesWidget: formatDate failed', { error: error?.message });
     }
-    // Last resort: use toLocaleDateString
-    return dateObj.toLocaleDateString('he-IL', { day: '2-digit', month: '2-digit', year: '2-digit' });
+    
+    return '';
   }
 
+  /**
+   * Format amount - משתמש ב-FieldRendererService המרכזי
+   * @deprecated - השתמש ישירות ב-window.FieldRendererService.renderAmount()
+   * @param {*} value - סכום לעיצוב
+   * @param {string} currencySymbol - סמל מטבע
+   * @returns {string} HTML של סכום מעוצב
+   */
   function formatAmount(value, currencySymbol = '$') {
     const numeric = Number(value) || 0;
+    
+    // שימוש ישיר ב-FieldRendererService - המערכת תמיד זמינה דרך BASE package
     if (window.FieldRendererService?.renderAmount) {
-      try {
-        return window.FieldRendererService.renderAmount(numeric, currencySymbol, 2, true);
-      } catch (error) {
-        window.Logger?.warn('RecentTradesWidget: renderAmount failed', { error: error?.message });
-      }
+      return window.FieldRendererService.renderAmount(numeric, currencySymbol, 2, true);
     }
+    
+    // Fallback למקרה נדיר ביותר שהמערכת לא זמינה
     return `${currencySymbol}${numeric.toLocaleString('he-IL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
   }
 
+  /**
+   * Format side - משתמש ב-FieldRendererService המרכזי
+   * @deprecated - השתמש ישירות ב-window.FieldRendererService.renderSide()
+   * @param {string} value - Side value (Long/Short)
+   * @returns {string} HTML של side badge
+   */
   function formatSide(value) {
-    if (window.FieldRendererService?.renderTradeSide) {
-      try {
-        return window.FieldRendererService.renderTradeSide(value);
-      } catch (error) {
-        window.Logger?.warn('RecentTradesWidget: renderTradeSide failed', { error: error?.message });
-      }
+    if (!value) {
+      return '';
     }
+    // שימוש ישיר ב-FieldRendererService - המערכת תמיד זמינה דרך BASE package
+    if (window.FieldRendererService?.renderSide) {
+      return window.FieldRendererService.renderSide(value);
+    }
+    // Fallback למקרה נדיר ביותר שהמערכת לא זמינה
     return value || '';
   }
 
@@ -100,7 +126,17 @@
         date: trade?.created_at || trade?.opened_at || trade?.entry_date || trade?.executed_at,
       }))
       .sort((a, b) => {
-        // Use dateUtils for consistent date comparison
+        const dateA = resolveDateValue(a.date);
+        const dateB = resolveDateValue(b.date);
+        
+        // Use TableSortValueAdapter if available
+        if (typeof window.TableSortValueAdapter?.getSortValue === 'function') {
+          const sortValueA = window.TableSortValueAdapter.getSortValue({ value: dateA, type: 'auto' });
+          const sortValueB = window.TableSortValueAdapter.getSortValue({ value: dateB, type: 'auto' });
+          return (sortValueB || 0) - (sortValueA || 0);
+        }
+        
+        // Fallback to dateUtils for consistent date comparison
         const getEpoch = (dateValue) => {
           if (!dateValue) return 0;
           if (window.dateUtils && typeof window.dateUtils.getEpochMilliseconds === 'function') {
@@ -119,15 +155,19 @@
             return 0;
           }
         };
-        const timeA = getEpoch(resolveDateValue(a.date));
-        const timeB = getEpoch(resolveDateValue(b.date));
+        const timeA = getEpoch(dateA);
+        const timeB = getEpoch(dateB);
         return timeB - timeA;
       })
       .slice(0, MAX_ITEMS);
   }
 
   function renderEmpty(container) {
-    container.innerHTML = '<div class="text-muted small">אין טריידים זמינים</div>';
+    container.textContent = '';
+    const div = document.createElement('div');
+    div.className = 'text-muted small';
+    div.textContent = 'אין טריידים זמינים';
+    container.appendChild(div);
   }
 
   function renderList(trades, container, currencySymbol) {
@@ -153,7 +193,12 @@
       if (sideValue) {
         const sideSpan = document.createElement('span');
         if (typeof sideValue === 'string' && sideValue.includes('<')) {
-          sideSpan.innerHTML = sideValue;
+          sideSpan.textContent = '';
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(sideValue, 'text/html');
+          doc.body.childNodes.forEach(node => {
+            sideSpan.appendChild(node.cloneNode(true));
+          });
         } else {
           sideSpan.textContent = sideValue;
         }
@@ -178,13 +223,19 @@
 
       const amountWrap = document.createElement('div');
       amountWrap.className = 'text-end fw-semibold';
-      amountWrap.innerHTML = formatAmount(trade.amount, currencySymbol);
+      const amountHTML = formatAmount(trade.amount, currencySymbol);
+      amountWrap.textContent = '';
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(amountHTML, 'text/html');
+      doc.body.childNodes.forEach(node => {
+        amountWrap.appendChild(node.cloneNode(true));
+      });
       item.appendChild(amountWrap);
 
       list.appendChild(item);
     });
 
-    container.innerHTML = '';
+    container.textContent = '';
     container.appendChild(list);
   }
 

@@ -1,3 +1,69 @@
+
+
+// ===== FUNCTION INDEX =====
+// === Functions ===
+// - checkLinkedItemsBeforeDelete() - Checklinkeditemsbeforedelete
+// - confirmDeleteCurrency() - Confirmdeletecurrency
+// - deleteCurrency() - Deletecurrency
+// - editCurrency() - Editcurrency
+// - initializeCurrenciesPage() - Initializecurrenciespage
+// - loadCurrencies() - Loadcurrencies
+// - openCurrencyDetails() - Opencurrencydetails
+// - renderCurrenciesTable() - Rendercurrenciestable
+// - showDeleteCurrencyModal() - Showdeletecurrencymodal
+// - showEditCurrencyModal() - Showeditcurrencymodal
+// - updateCurrenciesPageSummaryStats() - Updatecurrenciespagesummarystats
+
+// === Initialization ===
+/**
+ * initializeCurrenciesPage - Initializecurrenciespage
+ *
+ * @returns {{*}} Return description
+ */
+// - initializeCurrenciesPage() - Initializecurrenciespage
+
+// === Event Handlers ===
+/**
+ * confirmDeleteCurrency - Confirmdeletecurrency
+ *
+ * @returns {{*}} Return description
+ */
+// - confirmDeleteCurrency() - Confirmdeletecurrency
+
+// === UI Functions ===
+/**
+ * showEditCurrencyModal - Showeditcurrencymodal
+ *
+ * @param {*} id - Parameter description
+ * @returns {{*}} Return description
+ */
+// - showEditCurrencyModal() - Showeditcurrencymodal
+/**
+ * showDeleteCurrencyModal - Showdeletecurrencymodal
+ *
+ * @param {*} id - Parameter description
+ * @returns {{*}} Return description
+ */
+// - showDeleteCurrencyModal() - Showdeletecurrencymodal
+/**
+ * renderCurrenciesTable - Rendercurrenciestable
+ *
+ * @returns {{*}} Return description
+ */
+// - renderCurrenciesTable() - Rendercurrenciestable
+// - updateCurrenciesPageSummaryStats() - Updatecurrenciespagesummarystats
+
+// === Data Functions ===
+// - loadCurrencies() - Loadcurrencies
+
+// === Utility Functions ===
+// - checkLinkedItemsBeforeDelete() - Checklinkeditemsbeforedelete
+
+// === Other ===
+// - openCurrencyDetails() - Opencurrencydetails
+// - editCurrency() - Editcurrency
+// - deleteCurrency() - Deletecurrency
+
 // ===== קובץ JavaScript לדף מטבעות =====
 /*
  * Currencies.js - Currencies Page Management
@@ -53,15 +119,55 @@ function showEditCurrencyModal(id) {
     return;
   }
 
-  // מילוי הטופס
-  document.getElementById('editCurrencyId').value = currency.id;
-  document.getElementById('editCurrencySymbol').value = currency.symbol;
-  document.getElementById('editCurrencyName').value = currency.name;
-  document.getElementById('editCurrencyUsdRate').value = currency.usd_rate;
+  // מילוי הטופס באמצעות DataCollectionService
+  if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setFormData) {
+    const fieldMap = {
+      id: { id: 'editCurrencyId', type: 'int' },
+      symbol: { id: 'editCurrencySymbol', type: 'text' },
+      name: { id: 'editCurrencyName', type: 'text' },
+      usd_rate: { id: 'editCurrencyUsdRate', type: 'number' }
+    };
+    const values = {
+      id: currency.id,
+      symbol: currency.symbol,
+      name: currency.name,
+      usd_rate: currency.usd_rate
+    };
+    window.DataCollectionService.setFormData(fieldMap, values);
+  } else {
+    // Fallback if DataCollectionService is not available
+    // Use DataCollectionService to set values if available
+    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+        window.DataCollectionService.setValue('editCurrencyId', currency.id, 'int');
+        window.DataCollectionService.setValue('editCurrencySymbol', currency.symbol, 'text');
+        window.DataCollectionService.setValue('editCurrencyName', currency.name, 'text');
+        window.DataCollectionService.setValue('editCurrencyUsdRate', currency.usd_rate, 'number');
+    } else {
+        const editIdEl = document.getElementById('editCurrencyId');
+        const editSymbolEl = document.getElementById('editCurrencySymbol');
+        const editNameEl = document.getElementById('editCurrencyName');
+        const editRateEl = document.getElementById('editCurrencyUsdRate');
+        if (editIdEl) editIdEl.value = currency.id;
+        if (editSymbolEl) editSymbolEl.value = currency.symbol;
+        if (editNameEl) editNameEl.value = currency.name;
+        if (editRateEl) editRateEl.value = currency.usd_rate;
+    }
+  }
 
   // הצגת המודל
-  const modal = new bootstrap.Modal(document.getElementById('editCurrencyModal'));
-  modal.show();
+  if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
+    window.ModalManagerV2.showModal('editCurrencyModal', 'edit', currency).catch(error => {
+      window.Logger?.error('Error showing edit currency modal via ModalManagerV2', { error, modalId: 'editCurrencyModal', page: 'currencies' });
+      // Fallback to bootstrap if ModalManagerV2 fails
+      if (bootstrap?.Modal) {
+        const modal = new bootstrap.Modal(document.getElementById('editCurrencyModal'));
+        modal.show();
+      }
+    });
+  } else if (bootstrap?.Modal) {
+    const modal = new bootstrap.Modal(document.getElementById('editCurrencyModal'));
+    modal.show();
+  }
 }
 
 /**
@@ -76,12 +182,34 @@ function showDeleteCurrencyModal(id) {
   }
 
   // מילוי פרטי המחיקה
-  document.getElementById('deleteCurrencyId').value = currency.id;
+  if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+    window.DataCollectionService.setValue('deleteCurrencyId', currency.id, 'int');
+  } else {
+    // Fallback if DataCollectionService is not available
+    // Use DataCollectionService to set value if available
+    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+        window.DataCollectionService.setValue('deleteCurrencyId', currency.id, 'int');
+    } else {
+        const deleteIdEl = document.getElementById('deleteCurrencyId');
+        if (deleteIdEl) deleteIdEl.value = currency.id;
+    }
+  }
   document.getElementById('deleteCurrencyName').textContent = `${currency.symbol} - ${currency.name}`;
 
   // הצגת המודל
-  const modal = new bootstrap.Modal(document.getElementById('deleteCurrencyModal'));
-  modal.show();
+  if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
+    window.ModalManagerV2.showModal('deleteCurrencyModal', 'delete', currency).catch(error => {
+      window.Logger?.error('Error showing delete currency modal via ModalManagerV2', { error, modalId: 'deleteCurrencyModal', page: 'currencies' });
+      // Fallback to bootstrap if ModalManagerV2 fails
+      if (bootstrap?.Modal) {
+        const modal = new bootstrap.Modal(document.getElementById('deleteCurrencyModal'));
+        modal.show();
+      }
+    });
+  } else if (bootstrap?.Modal) {
+    const modal = new bootstrap.Modal(document.getElementById('deleteCurrencyModal'));
+    modal.show();
+  }
 }
 
 // ========================================
@@ -107,13 +235,20 @@ async function loadCurrencies() {
       currenciesData = result.data;
 
       renderCurrenciesTable();
-      updatePageSummaryStats();
+      updateCurrenciesPageSummaryStats();
     } else {
       handleApiError(new Error(result.error), 'טעינת מטבעות');
       // הצגת שגיאה למשתמש
       const tbody = document.querySelector('#currenciesTable tbody');
       if (tbody) {
-        tbody.innerHTML = '<tr><td colspan="6" class="text-center text-danger">שגיאה בטעינת נתונים: ' + result.error + '</td></tr>';
+        tbody.textContent = '';
+        const errorRow = document.createElement('tr');
+        const errorCell = document.createElement('td');
+        errorCell.colSpan = 6;
+        errorCell.className = 'text-center text-danger';
+        errorCell.textContent = 'שגיאה בטעינת נתונים: ' + result.error;
+        errorRow.appendChild(errorCell);
+        tbody.appendChild(errorRow);
       }
     }
   } catch (error) {
@@ -121,7 +256,14 @@ async function loadCurrencies() {
     // הצגת שגיאה למשתמש
     const tbody = document.querySelector('#currenciesTable tbody');
     if (tbody) {
-      tbody.innerHTML = '<tr><td colspan="6" class="text-center text-danger">שגיאה בטעינת נתונים: ' + error.message + '</td></tr>';
+      tbody.textContent = '';
+      const row = document.createElement('tr');
+      const cell = document.createElement('td');
+      cell.colSpan = 6;
+      cell.className = 'text-center text-danger';
+      cell.textContent = 'שגיאה בטעינת נתונים: ' + error.message;
+      row.appendChild(cell);
+      tbody.appendChild(row);
     }
   }
 }
@@ -135,7 +277,14 @@ async function loadCurrencies() {
  */
 async function confirmDeleteCurrency() {
   try {
-    const id = parseInt(document.getElementById('deleteCurrencyId').value);
+    // Use DataCollectionService to get value if available
+    let id;
+    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) {
+        id = parseInt(window.DataCollectionService.getValue('deleteCurrencyId', 'int', 0));
+    } else {
+        const deleteIdEl = document.getElementById('deleteCurrencyId');
+        id = deleteIdEl ? parseInt(deleteIdEl.value) : 0;
+    }
 
     // בדיקת פריטים מקושרים לפני מחיקה
     if (typeof window.checkLinkedItemsBeforeDelete === 'function') {
@@ -155,8 +304,14 @@ async function confirmDeleteCurrency() {
     if (result.status === 'success') {
 
       // סגירת המודל
-      const modal = bootstrap.Modal.getInstance(document.getElementById('deleteCurrencyModal'));
-      modal.hide();
+      if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
+        window.ModalManagerV2.hideModal('deleteCurrencyModal');
+      } else if (bootstrap?.Modal) {
+        const modal = bootstrap.Modal.getInstance(document.getElementById('deleteCurrencyModal'));
+        if (modal) {
+          modal.hide();
+        }
+      }
 
       // טעינה מחדש של הנתונים
       await loadCurrencies();
@@ -218,11 +373,11 @@ function renderCurrenciesTable() {
   const tbody = document.querySelector('#currenciesTable tbody');
   if (!tbody) {return;}
 
-  tbody.innerHTML = '';
+  tbody.textContent = '';
 
   currenciesData.forEach(currency => {
     const row = document.createElement('tr');
-    row.innerHTML = `
+    const rowHTML = `
             <td>${currency.id}</td>
             <td><strong>${currency.symbol}</strong></td>
             <td>${currency.name}</td>
@@ -233,6 +388,15 @@ function renderCurrenciesTable() {
                 <button data-button-type="DELETE" data-onclick="deleteCurrency(${currency.id})"></button>
             </td>
         `;
+    row.textContent = '';
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(`<table><tbody><tr>${rowHTML}</tr></tbody></table>`, 'text/html');
+    const tempRow = doc.body.querySelector('tr');
+    if (tempRow) {
+        Array.from(tempRow.children).forEach(cell => {
+            row.appendChild(cell.cloneNode(true));
+        });
+    }
     tbody.appendChild(row);
   });
 
@@ -251,16 +415,21 @@ function renderCurrenciesTable() {
 /**
  * עדכון סטטיסטיקות סיכום
  */
-function updatePageSummaryStats() {
+function updateCurrenciesPageSummaryStats() {
   const totalCurrencies = currenciesData.length;
   const rates = currenciesData.map(c => parseFloat(c.usd_rate));
   const maxRate = rates.length > 0 ? Math.max(...rates) : 1.0;
   const minRate = rates.length > 0 ? Math.min(...rates) : 1.0;
 
-  document.getElementById('totalCurrencies').textContent = totalCurrencies;
-  document.getElementById('baseCurrency').textContent = 'USD';
-  document.getElementById('maxRate').textContent = maxRate.toFixed(6);
-  document.getElementById('minRate').textContent = minRate.toFixed(6);
+  const totalCurrenciesEl = document.getElementById('totalCurrencies');
+  const baseCurrencyEl = document.getElementById('baseCurrency');
+  const maxRateEl = document.getElementById('maxRate');
+  const minRateEl = document.getElementById('minRate');
+  
+  if (totalCurrenciesEl) totalCurrenciesEl.textContent = totalCurrencies;
+  if (baseCurrencyEl) baseCurrencyEl.textContent = 'USD';
+  if (maxRateEl) maxRateEl.textContent = maxRate.toFixed(6);
+  if (minRateEl) minRateEl.textContent = minRate.toFixed(6);
 }
 
 /**
@@ -281,7 +450,12 @@ async function initializeCurrenciesPage() {
   await loadCurrencies();
 
   // שחזור מצב הסגירה
-  restoreCurrenciesSectionState();
+  if (typeof restoreCurrenciesSectionState === 'function') {
+    restoreCurrenciesSectionState();
+  } else if (typeof window.restoreCurrenciesSectionState === 'function') {
+    window.restoreCurrenciesSectionState();
+  }
+  // If function doesn't exist, silently skip - not critical
 
 }
 
@@ -296,15 +470,21 @@ async function initializeCurrenciesPage() {
   // שחזור מצב הסקשנים
   if (typeof window.restoreCurrenciesSectionState === 'function') {
     window.restoreCurrenciesSectionState();
-  } else {
+  } else if (typeof handleFunctionNotFound === 'function') {
     handleFunctionNotFound('restoreCurrenciesSectionState', 'פונקציית שחזור מצב מטבעות לא נמצאה');
+  } else {
+    // Silent fallback if handleFunctionNotFound is not available
+    window.Logger?.warn?.('⚠️ restoreCurrenciesSectionState function not available', { page: 'currencies' });
   }
 
   // טעינת נתונים
   if (typeof window.loadCurrenciesData === 'function') {
     window.loadCurrenciesData();
-  } else {
+  } else if (typeof handleFunctionNotFound === 'function') {
     handleFunctionNotFound('loadCurrenciesData', 'פונקציית טעינת נתוני מטבעות לא נמצאה');
+  } else {
+    // Silent fallback if handleFunctionNotFound is not available
+    window.Logger?.warn?.('⚠️ loadCurrenciesData function not available', { page: 'currencies' });
   }
 
 //   // Currencies page initialization completed
@@ -328,7 +508,15 @@ window.toggleCurrenciesSection = function() {
         }
     }
 };
-window.restoreCurrenciesSectionState = restoreCurrenciesSectionState;
+// restoreCurrenciesSectionState - function is provided by restoreAnyTableSort or similar system
+window.restoreCurrenciesSectionState = function() {
+    // Use general restore function if available
+    if (typeof window.restoreAnyTableSort === 'function') {
+        window.restoreAnyTableSort('currencies');
+    } else if (typeof window.Logger?.debug === 'function') {
+        window.Logger.debug('restoreCurrenciesSectionState: restoreAnyTableSort not available', { page: 'currencies' });
+    }
+};
 window.renderCurrenciesTable = renderCurrenciesTable;
-window.updatePageSummaryStats = updatePageSummaryStats;
+window.updateCurrenciesPageSummaryStats = updateCurrenciesPageSummaryStats;
 window.initializeCurrenciesPage = initializeCurrenciesPage;

@@ -11,6 +11,55 @@
  * Added: Section toggle functions for opening/closing sections
  */
 
+
+// ===== FUNCTION INDEX =====
+// === Object Methods ===
+// - input._validationHandler() -  Validationhandler
+
+// === Initialization ===
+// - initializeModalBackdrop() - Initializemodalbackdrop
+// - setupFieldValidation() - Setupfieldvalidation
+// - initializeValidation() - Initializevalidation
+
+// === Event Handlers ===
+// - performItemCancellation() - Performitemcancellation
+// - getPageDataFunctions() - Getpagedatafunctions
+// - updateChevronIcon() - Updatechevronicon
+// - generateActionButtons() - Generateactionbuttons
+// - loadTableActionButtons() - Loadtableactionbuttons
+// - loadSectionStates() - Loadsectionstates
+// - isValidPhone() - Isvalidphone
+// - clearFieldValidation() - Clearfieldvalidation
+// - clearValidationErrors() - Clearvalidationerrors
+// - clearValidation() - Clearvalidation
+
+// === UI Functions ===
+// - updatePricesFromPercentages() - Updatepricesfrompercentages
+// - updatePercentagesFromPrices() - Updatepercentagesfromprices
+// - autoRefreshCurrentPage() - Autorefreshcurrentpage
+
+// === Data Functions ===
+// - calculateTargetPrice() - Calculatetargetprice
+// - getCurrentPageName() - Getcurrentpagename
+// - getFieldLabel() - Getfieldlabel
+
+// === Utility Functions ===
+// - formatPercentage() - Formatpercentage
+// - formatPrice() - Formatprice
+
+// === Other ===
+// - calculateStopPrice() - Calculatestopprice
+// - calculatePercentageFromPrice() - Calculatepercentagefromprice
+// - cancelItem() - Cancelitem
+// - viewTickerDetails() - Viewtickerdetails
+// - editTicker() - Editticker
+// - cancelTicker() - Cancelticker
+// - restoreTicker() - Restoreticker
+// - deleteTicker() - Deleteticker
+// - isValidDate() - Isvaliddate
+// - isValidEmail() - Isvalidemail
+// - clearFieldError() - Clearfielderror
+
 // ===== PRICE CALCULATION FUNCTIONS =====
 // These functions are used across multiple pages (trade plans, trades, tickers)
 
@@ -138,9 +187,14 @@ function updatePricesFromPercentages(formId, currentPrice) {
   const newStopPrice = calculateStopPrice(currentPrice, stopPercentage, side);
   const newTargetPrice = calculateTargetPrice(currentPrice, targetPercentage, side);
 
-  // Update form fields
-  stopPriceElement.value = newStopPrice.toFixed(2);
-  targetPriceElement.value = newTargetPrice.toFixed(2);
+  // Update form fields using DataCollectionService if available
+  if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+    window.DataCollectionService.setValue(stopPriceElement.id, newStopPrice.toFixed(2), 'number');
+    window.DataCollectionService.setValue(targetPriceElement.id, newTargetPrice.toFixed(2), 'number');
+  } else {
+    stopPriceElement.value = newStopPrice.toFixed(2);
+    targetPriceElement.value = newTargetPrice.toFixed(2);
+  }
 
   // Updated prices from percentages
   // console.log('Updated prices from percentages:', {
@@ -185,9 +239,14 @@ function updatePercentagesFromPrices(formId, currentPrice) {
   const newStopPercentage = calculatePercentageFromPrice(currentPrice, stopPrice, side);
   const newTargetPercentage = calculatePercentageFromPrice(currentPrice, targetPrice, side);
 
-  // Update form fields
-  stopPercentageElement.value = newStopPercentage.toFixed(2);
-  targetPercentageElement.value = newTargetPercentage.toFixed(2);
+  // Update form fields using DataCollectionService if available
+  if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+    window.DataCollectionService.setValue(stopPercentageElement.id, newStopPercentage.toFixed(2), 'number');
+    window.DataCollectionService.setValue(targetPercentageElement.id, newTargetPercentage.toFixed(2), 'number');
+  } else {
+    stopPercentageElement.value = newStopPercentage.toFixed(2);
+    targetPercentageElement.value = newTargetPercentage.toFixed(2);
+  }
 
   // Updated percentages from prices
   // console.log('Updated percentages from prices:', {
@@ -610,9 +669,16 @@ function initializeModalBackdrop() {
     // הוספת event listener לסגירה בלחיצה על הרקע
     modal.addEventListener('click', event => {
       if (event.target === modal) {
-        const modalInstance = bootstrap.Modal.getInstance(modal);
-        if (modalInstance) {
-          modalInstance.hide();
+        if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
+          const modalId = modal.id;
+          if (modalId) {
+            window.ModalManagerV2.hideModal(modalId);
+          }
+        } else if (bootstrap?.Modal) {
+          const modalInstance = bootstrap.Modal.getInstance(modal);
+          if (modalInstance) {
+            modalInstance.hide();
+          }
         }
       }
     });
@@ -651,37 +717,38 @@ function initializeModalBackdrop() {
 function getPageDataFunctions() {
   const currentPage = window.location.pathname.split('/').pop().replace('.html', '') || 'index';
   
+  // Define function mappings - check at call time, not definition time
   const pageFunctions = {
     'tickers': {
-      loadData: window.loadTickersData,
-      updateActive: window.updateActiveTradesField
+      get loadData() { return typeof window.loadTickersData === 'function' ? window.loadTickersData : null; },
+      get updateActive() { return typeof window.updateActiveTradesField === 'function' ? window.updateActiveTradesField : null; }
     },
     'trades': {
-      loadData: window.loadTradesData,
-      updateActive: window.updateActiveTradesField
+      get loadData() { return typeof window.loadTradesData === 'function' ? window.loadTradesData : null; },
+      get updateActive() { return typeof window.updateActiveTradesField === 'function' ? window.updateActiveTradesField : null; }
     },
     'trading_accounts': {
-      loadData: window.loadTradingAccountsDataForTradingAccountsPage,
+      get loadData() { return typeof window.loadTradingAccountsDataForTradingAccountsPage === 'function' ? window.loadTradingAccountsDataForTradingAccountsPage : null; },
       updateActive: null
     },
     'alerts': {
-      loadData: window.loadAlertsData,
+      get loadData() { return typeof window.loadAlertsData === 'function' ? window.loadAlertsData : null; },
       updateActive: null
     },
     'trade_plans': {
-      loadData: window.loadTradePlansData,
+      get loadData() { return typeof window.loadTradePlansData === 'function' ? window.loadTradePlansData : null; },
       updateActive: null
     },
     'executions': {
-      loadData: window.loadExecutionsData,
+      get loadData() { return typeof window.loadExecutionsData === 'function' ? window.loadExecutionsData : null; },
       updateActive: null
     },
     'cash_flows': {
-      loadData: window.loadCashFlowsData,
+      get loadData() { return typeof window.loadCashFlowsData === 'function' ? window.loadCashFlowsData : null; },
       updateActive: null
     },
     'notes': {
-      loadData: window.loadNotesData,
+      get loadData() { return typeof window.loadNotesData === 'function' ? window.loadNotesData : null; },
       updateActive: null
     }
   };
@@ -752,13 +819,13 @@ window.toggleSection = async function (sectionId) {
       if (accordionMode) {
         // Close all other sections first
         const allContentSections = document.querySelectorAll('.content-section');
-        allContentSections.forEach(otherSection => {
+        for (const otherSection of allContentSections) {
           if (otherSection !== section) {
             const otherSectionBody = otherSection.querySelector('.section-body');
             const otherIcon = otherSection.querySelector('.section-toggle-icon');
             if (otherSectionBody && (otherSectionBody.style.display !== 'none')) {
               otherSectionBody.style.display = 'none';
-              if (otherIcon) updateChevronIcon(otherIcon, true);
+              if (otherIcon) await updateChevronIcon(otherIcon, true);
               // Save state for other sections too using UnifiedCacheManager
               const otherSectionId = otherSection.getAttribute('data-section') || otherSection.id;
               if (otherSectionId) {
@@ -773,7 +840,7 @@ window.toggleSection = async function (sectionId) {
               }
             }
           }
-        });
+        }
       }
       
       // Remove d-flex/d-block classes that might interfere and set display
@@ -819,8 +886,18 @@ window.toggleSection = async function (sectionId) {
           existingImg.style.transform = isCollapsed ? '' : 'rotate(180deg)';
         }
       } else {
-        // Replace text content with img tag
-        icon.innerHTML = newIconHTML;
+        // Replace text content with img tag using tempDiv
+        icon.textContent = '';
+        const tempDiv = document.createElement('div');
+        tempDiv.textContent = '';
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(newIconHTML, 'text/html');
+        doc.body.childNodes.forEach(node => {
+            tempDiv.appendChild(node.cloneNode(true));
+        });
+        while (tempDiv.firstChild) {
+          icon.appendChild(tempDiv.firstChild);
+        }
       }
     }
     
@@ -880,24 +957,77 @@ window.toggleSection = async function (sectionId) {
      * @param {HTMLElement} iconElement - The icon element to update
      * @param {boolean} isCollapsed - Whether the section is collapsed
      */
-    function updateChevronIcon(iconElement, isCollapsed) {
+    async function updateChevronIcon(iconElement, isCollapsed) {
         if (!iconElement) return;
         
-        const toggleIconPath = window.BUTTON_ICONS && window.BUTTON_ICONS.TOGGLE 
-            ? window.BUTTON_ICONS.TOGGLE 
-            : '/trading-ui/images/icons/tabler/chevron-down.svg';
-        
-        if (iconElement.tagName === 'IMG') {
+        // Use IconSystem if available - use 'toggle' which maps to 'chevron-down'
+        if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized && iconElement.tagName === 'IMG') {
+            try {
+                // Use 'toggle' which maps to 'chevron-down' in icon-mappings.js
+                // Add timeout to prevent hanging
+                const iconHTML = await Promise.race([
+                    window.IconSystem.renderIcon('button', 'toggle', {
+                        size: iconElement.getAttribute('width') || '16',
+                        alt: iconElement.getAttribute('alt') || (isCollapsed ? 'הצג' : 'הסתר'),
+                        class: iconElement.getAttribute('class') || 'icon'
+                    }),
+                    new Promise((_, reject) => setTimeout(() => reject(new Error('IconSystem.renderIcon timeout')), 1000))
+                ]);
+                const tempDiv = document.createElement('div');
+                tempDiv.textContent = '';
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(iconHTML, 'text/html');
+                doc.body.childNodes.forEach(node => {
+                    tempDiv.appendChild(node.cloneNode(true));
+                });
+                const newIcon = tempDiv.firstElementChild;
+                if (newIcon) {
+                    // Apply rotation transform for expanded state
+                    if (!isCollapsed && newIcon.tagName === 'svg') {
+                        newIcon.style.transform = 'rotate(180deg)';
+                    } else if (!isCollapsed && newIcon.tagName === 'IMG') {
+                        newIcon.style.transform = 'rotate(180deg)';
+                    }
+                    iconElement.parentNode.replaceChild(newIcon, iconElement);
+                }
+            } catch (error) {
+                // Fallback to direct path - use chevron-down
+                const toggleIconPath = window.BUTTON_ICONS && window.BUTTON_ICONS.TOGGLE 
+                    ? window.BUTTON_ICONS.TOGGLE 
+                    : '/trading-ui/images/icons/tabler/chevron-down.svg';
+                iconElement.src = toggleIconPath;
+                iconElement.style.transform = isCollapsed ? '' : 'rotate(180deg)';
+            }
+        } else if (iconElement.tagName === 'IMG') {
+            const toggleIconPath = window.BUTTON_ICONS && window.BUTTON_ICONS.TOGGLE 
+                ? window.BUTTON_ICONS.TOGGLE 
+                : '/trading-ui/images/icons/tabler/chevron-down.svg';
             iconElement.src = toggleIconPath;
             iconElement.style.transform = isCollapsed ? '' : 'rotate(180deg)';
         } else if (iconElement.querySelector('img')) {
             const img = iconElement.querySelector('img');
+            const toggleIconPath = window.BUTTON_ICONS && window.BUTTON_ICONS.TOGGLE 
+                ? window.BUTTON_ICONS.TOGGLE 
+                : '/trading-ui/images/icons/tabler/chevron-down.svg';
             img.src = toggleIconPath;
             img.style.transform = isCollapsed ? '' : 'rotate(180deg)';
         } else {
             // Replace text content with img tag
+            const toggleIconPath = window.BUTTON_ICONS && window.BUTTON_ICONS.TOGGLE 
+                ? window.BUTTON_ICONS.TOGGLE 
+                : '/trading-ui/images/icons/tabler/chevron-down.svg';
             const transformStyle = isCollapsed ? '' : ' style="transform: rotate(180deg);"';
-            iconElement.innerHTML = `<img src="${toggleIconPath}" width="16" height="16" alt="${isCollapsed ? 'הצג' : 'הסתר'}" class="icon"${transformStyle}>`;
+            iconElement.textContent = '';
+            const img = document.createElement('img');
+            img.src = toggleIconPath;
+            img.width = 16;
+            img.height = 16;
+            img.alt = isCollapsed ? 'הצג' : 'הסתר';
+            img.className = 'icon';
+            if (transformStyle) {
+                img.setAttribute('style', transformStyle);
+            }
+            iconElement.appendChild(img);
         }
     }
 
@@ -907,8 +1037,29 @@ window.restoreAllSectionStates = async function () {
   
   // מניעת כפילויות
   if (window.sectionStatesRestored && window.sectionStatesRestored[pageName]) {
-    return;
+    if (window.sectionStatesRestored[pageName] === 'in-progress') {
+      console.warn(`⚠️ restoreAllSectionStates already in progress for "${pageName}", waiting...`);
+      // Wait for completion (max 5 seconds)
+      let waitCount = 0;
+      while (window.sectionStatesRestored[pageName] === 'in-progress' && waitCount < 50) {
+        await new Promise(resolve => setTimeout(resolve, 100));
+        waitCount++;
+      }
+      if (window.sectionStatesRestored[pageName] === 'completed') {
+        console.log(`✅ restoreAllSectionStates completed (waited for previous call)`);
+        return;
+      }
+    } else if (window.sectionStatesRestored[pageName] === 'completed') {
+      console.log(`✅ restoreAllSectionStates already completed for "${pageName}", skipping`);
+      return;
+    }
   }
+  
+  // Mark as in progress to prevent duplicate calls
+  if (!window.sectionStatesRestored) {
+    window.sectionStatesRestored = {};
+  }
+  window.sectionStatesRestored[pageName] = 'in-progress';
   
   // Check for accordion mode (only one section open at a time)
   const pageConfig = typeof window.pageInitializationConfigs !== 'undefined' && 
@@ -987,25 +1138,65 @@ window.restoreAllSectionStates = async function () {
             if (openSectionId) {
               // Already have an open section, close this one
               sectionBody.style.display = 'none';
-              if (icon) { updateChevronIcon(icon, true); }
+              if (icon) { 
+                try {
+                  await Promise.race([
+                    updateChevronIcon(icon, true),
+                    new Promise((_, reject) => setTimeout(() => reject(new Error('updateChevronIcon timeout')), 1000))
+                  ]);
+                } catch (e) {
+                  // Fallback: just set display, icon will update later
+                  console.warn(`⚠️ updateChevronIcon timeout for "${sectionId}", continuing...`);
+                }
+              }
               console.log(`✅ Section "${sectionId}" closed (accordion mode - another section is open)`);
             } else {
               // This is the first open section
               openSectionId = sectionId;
               sectionBody.style.display = 'block';
-              if (icon) { updateChevronIcon(icon, false); }
+              if (icon) { 
+                try {
+                  await Promise.race([
+                    updateChevronIcon(icon, false),
+                    new Promise((_, reject) => setTimeout(() => reject(new Error('updateChevronIcon timeout')), 1000))
+                  ]);
+                } catch (e) {
+                  // Fallback: just set display, icon will update later
+                  console.warn(`⚠️ updateChevronIcon timeout for "${sectionId}", continuing...`);
+                }
+              }
               console.log(`✅ Section "${sectionId}" opened (accordion mode)`);
             }
           } else {
             // This section should be closed
             sectionBody.style.display = 'none';
-            if (icon) { updateChevronIcon(icon, true); }
+            if (icon) { 
+              try {
+                await Promise.race([
+                  updateChevronIcon(icon, true),
+                  new Promise((_, reject) => setTimeout(() => reject(new Error('updateChevronIcon timeout')), 1000))
+                ]);
+              } catch (e) {
+                // Fallback: just set display, icon will update later
+                console.warn(`⚠️ updateChevronIcon timeout for "${sectionId}", continuing...`);
+              }
+            }
             console.log(`✅ Section "${sectionId}" closed (accordion mode)`);
           }
         } else {
           // No saved state - in accordion mode, always closed
           sectionBody.style.display = 'none';
-          if (icon) { updateChevronIcon(icon, true); }
+          if (icon) { 
+            try {
+              await Promise.race([
+                updateChevronIcon(icon, true),
+                new Promise((_, reject) => setTimeout(() => reject(new Error('updateChevronIcon timeout')), 1000))
+              ]);
+            } catch (e) {
+              // Fallback: just set display, icon will update later
+              console.warn(`⚠️ updateChevronIcon timeout for "${sectionId}", continuing...`);
+            }
+          }
           console.log(`⏭️ Section "${sectionId}" has no saved state - accordion mode default (closed)`);
         }
       } else {
@@ -1017,28 +1208,69 @@ window.restoreAllSectionStates = async function () {
           if (isHidden) {
             // Restore collapsed state
             sectionBody.style.display = 'none';
-            if (icon) { updateChevronIcon(icon, true); }
+            if (icon) { 
+              try {
+                await Promise.race([
+                  updateChevronIcon(icon, true),
+                  new Promise((_, reject) => setTimeout(() => reject(new Error('updateChevronIcon timeout')), 1000))
+                ]);
+              } catch (e) {
+                // Fallback: just set display, icon will update later
+                console.warn(`⚠️ updateChevronIcon timeout for "${sectionId}", continuing...`);
+              }
+            }
             console.log(`✅ Section "${sectionId}" RESTORED to COLLAPSED`);
           } else {
             // Restore expanded state
             sectionBody.style.display = 'block';
-            if (icon) { updateChevronIcon(icon, false); }
+            if (icon) { 
+              try {
+                await Promise.race([
+                  updateChevronIcon(icon, false),
+                  new Promise((_, reject) => setTimeout(() => reject(new Error('updateChevronIcon timeout')), 1000))
+                ]);
+              } catch (e) {
+                // Fallback: just set display, icon will update later
+                console.warn(`⚠️ updateChevronIcon timeout for "${sectionId}", continuing...`);
+              }
+            }
             console.log(`✅ Section "${sectionId}" RESTORED to EXPANDED`);
           }
         } else {
           // No saved state - apply default state from page config
-          // Special case: trade-creation section should be closed by default (lazy loading)
-          const shouldBeClosed = sectionId === 'trade-creation';
-          const finalState = shouldBeClosed ? 'closed' : defaultState;
+          // Check sectionDefaultStates first, then fallback to sectionsDefaultState
+          const sectionSpecificDefault = pageConfig?.sectionDefaultStates?.[sectionId];
+          const finalDefaultState = sectionSpecificDefault || defaultState;
+          const finalState = finalDefaultState === 'closed' ? 'closed' : 'open';
           
           if (finalState === 'open') {
             sectionBody.style.display = 'block';
-            if (icon) { updateChevronIcon(icon, false); }
-            console.log(`✅ Section "${sectionId}" default state OPEN (no cache)`);
+            if (icon) { 
+              try {
+                await Promise.race([
+                  updateChevronIcon(icon, false),
+                  new Promise((_, reject) => setTimeout(() => reject(new Error('updateChevronIcon timeout')), 1000))
+                ]);
+              } catch (e) {
+                // Fallback: just set display, icon will update later
+                console.warn(`⚠️ updateChevronIcon timeout for "${sectionId}", continuing...`);
+              }
+            }
+            console.log(`✅ Section "${sectionId}" default state OPEN (no cache)`, { sectionSpecificDefault, finalDefaultState });
           } else {
             sectionBody.style.display = 'none';
-            if (icon) { updateChevronIcon(icon, true); }
-            console.log(`✅ Section "${sectionId}" default state CLOSED (no cache)`);
+            if (icon) { 
+              try {
+                await Promise.race([
+                  updateChevronIcon(icon, true),
+                  new Promise((_, reject) => setTimeout(() => reject(new Error('updateChevronIcon timeout')), 1000))
+                ]);
+              } catch (e) {
+                // Fallback: just set display, icon will update later
+                console.warn(`⚠️ updateChevronIcon timeout for "${sectionId}", continuing...`);
+              }
+            }
+            console.log(`✅ Section "${sectionId}" default state CLOSED (no cache)`, { sectionSpecificDefault, finalDefaultState });
           }
         }
       }
@@ -1058,7 +1290,7 @@ window.restoreAllSectionStates = async function () {
   if (!window.sectionStatesRestored) {
     window.sectionStatesRestored = {};
   }
-  window.sectionStatesRestored[pageName] = true;
+  window.sectionStatesRestored[pageName] = 'completed';
   
   return restoredCount;
 };
@@ -1093,12 +1325,12 @@ window.restoreSectionStates = async function () {
   if (topSection && topSectionHidden) {
     topSection.classList.add('collapsed');
     topSection.style.display = 'none';
-    if (topIcon) { updateChevronIcon(topIcon, true); }
+    if (topIcon) { await updateChevronIcon(topIcon, true); }
     // console.log(`✅ Top section RESTORED to COLLAPSED`);
   } else if (topSection) {
     topSection.classList.remove('collapsed');
     topSection.style.display = 'block';
-    if (topIcon) { updateChevronIcon(topIcon, false); }
+    if (topIcon) { await updateChevronIcon(topIcon, false); }
     // console.log(`✅ Top section RESTORED to EXPANDED`);
   }
 
@@ -1132,14 +1364,14 @@ window.restoreSectionStates = async function () {
         sectionBody.classList.add('collapsed');
         section.classList.add('collapsed');
         sectionBody.style.display = 'none';
-        if (icon) { updateChevronIcon(icon, true); }
+        if (icon) { await updateChevronIcon(icon, true); }
         // console.log(`✅ Section "${sectionId}" RESTORED to COLLAPSED`);
         restoredCount++;
       } else if (sectionBody) {
         sectionBody.classList.remove('collapsed');
         section.classList.remove('collapsed');
         sectionBody.style.display = 'block';
-        if (icon) { updateChevronIcon(icon, false); }
+        if (icon) { await updateChevronIcon(icon, false); }
         // console.log(`✅ Section "${sectionId}" RESTORED to EXPANDED`);
         restoredCount++;
       }
@@ -1150,9 +1382,12 @@ window.restoreSectionStates = async function () {
 };
 
 // ===== ACTION BUTTONS SYSTEM =====
+// ⚠️ DEPRECATED: This function is deprecated. Use window.createActionsMenu() from actions-menu-system.js instead.
+// This function is kept for backward compatibility only and should not be used in new code.
 
 /**
  * Generate action buttons HTML for table rows
+ * @deprecated Use window.createActionsMenu() from actions-menu-system.js instead
  * @param {string} entityId - Entity ID for the row
  * @param {string} entityType - Entity type (e.g., 'ticker', 'trade', 'account')
  * @param {string} status - Current status (for cancel/restore logic)
@@ -1273,6 +1508,7 @@ window.generateActionButtons = generateActionButtons;
 
 /**
  * פונקציה לטעינת כפתורי פעולות לכל הטבלה
+ * @deprecated Use window.createActionsMenu() directly in table rendering instead
  * @param {string} tableId - מזהה הטבלה
  * @param {string} entityType - סוג הישות (ticker, trade, etc.)
  * @param {Object} config - הגדרות הכפתורים
@@ -1315,23 +1551,74 @@ function loadTableActionButtons(tableId, entityType, config = {}) {
     // מיזוג עם הגדרות מותאמות אישית
     const finalConfig = { ...defaultConfig, ...config };
 
-    // יצירת הכפתורים
-    const buttonsHtml = generateActionButtons(
-      entityId,
-      entityType,
-      status,
-      finalConfig.detailsFunction,
-      finalConfig.linkedFunction,
-      finalConfig.editFunction,
-      finalConfig.cancelFunction,
-      finalConfig.restoreFunction,
-      finalConfig.deleteFunction,
-      finalConfig.showDetails,
-      finalConfig.showLinked,
-      finalConfig.showEdit,
-      finalConfig.showCancel,
-      finalConfig.showDelete
-    );
+    // יצירת הכפתורים באמצעות Actions Menu Toolkit המרכזי
+    const buttons = [];
+    
+    if (finalConfig.showDetails) {
+      buttons.push({
+        type: 'VIEW',
+        onclick: `${finalConfig.detailsFunction}('${entityType}', ${entityId})`,
+        title: 'פרטים'
+      });
+    }
+    
+    if (finalConfig.showLinked) {
+      buttons.push({
+        type: 'LINK',
+        onclick: `${finalConfig.linkedFunction}('${entityType}', ${entityId})`,
+        title: 'אובייקטים מקושרים'
+      });
+    }
+    
+    if (finalConfig.showEdit) {
+      buttons.push({
+        type: 'EDIT',
+        onclick: `${finalConfig.editFunction}('${entityType}', ${entityId})`,
+        title: 'ערוך'
+      });
+    }
+    
+    if (finalConfig.showCancel) {
+      const isCancelled = status === 'בוטל' || status === 'סגור';
+      buttons.push({
+        type: isCancelled ? 'REACTIVATE' : 'CANCEL',
+        onclick: `${isCancelled ? finalConfig.restoreFunction : finalConfig.cancelFunction}('${entityType}', ${entityId})`,
+        title: isCancelled ? 'שיחזר' : 'בטל'
+      });
+    }
+    
+    if (finalConfig.showDelete) {
+      buttons.push({
+        type: 'DELETE',
+        onclick: `${finalConfig.deleteFunction}('${entityType}', ${entityId})`,
+        title: 'מחק'
+      });
+    }
+    
+    // Use centralized Actions Menu Toolkit
+    let buttonsHtml = '';
+    if (typeof window.createActionsMenu === 'function') {
+      buttonsHtml = window.createActionsMenu(buttons);
+    } else {
+      // Fallback to deprecated generateActionButtons if createActionsMenu is not available
+      console.warn('⚠️ [loadTableActionButtons] window.createActionsMenu not available, using deprecated generateActionButtons');
+      buttonsHtml = generateActionButtons(
+        entityId,
+        entityType,
+        status,
+        finalConfig.detailsFunction,
+        finalConfig.linkedFunction,
+        finalConfig.editFunction,
+        finalConfig.cancelFunction,
+        finalConfig.restoreFunction,
+        finalConfig.deleteFunction,
+        finalConfig.showDetails,
+        finalConfig.showLinked,
+        finalConfig.showEdit,
+        finalConfig.showCancel,
+        finalConfig.showDelete
+      );
+    }
 
     // בדיקה אם כבר יש כפתורים - למנוע כפילות
     if (actionsCell.querySelector('.actions-menu-wrapper')) {
@@ -1339,7 +1626,12 @@ function loadTableActionButtons(tableId, entityType, config = {}) {
       return;
     }
     
-    actionsCell.innerHTML = buttonsHtml;
+    actionsCell.textContent = '';
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(buttonsHtml, 'text/html');
+    doc.body.childNodes.forEach(node => {
+        actionsCell.appendChild(node.cloneNode(true));
+    });
   });
 
 }
@@ -1480,7 +1772,7 @@ async function loadSectionStates() {
       sectionBody.style.display = 'block';
       section.classList.remove('collapsed');
       section.classList.add('expanded');
-      if (toggleIcon) updateChevronIcon(toggleIcon, true);
+      if (toggleIcon) await updateChevronIcon(toggleIcon, true);
       restoredCount++;
     }
   }
@@ -1692,7 +1984,7 @@ function setupFieldValidation(input, rules = {}) {
   }
 
   // יצירת פונקציית ולידציה
-  input._validationHandler = () => validateField(input, rules);
+  input._validationHandler = () => (window.validateField || validateField)(input, rules);
 
   // הוספת event listeners
   input.addEventListener('input', input._validationHandler);
@@ -1749,24 +2041,24 @@ function initializeValidation(formId, validationRules = {}) {
       case 'email':
       case 'tel':
       case 'url':
-        isValid = validateTextField(input, fieldRules);
+        isValid = window.validateTextField ? window.validateTextField(input, fieldRules) : true;
         break;
 
       case 'number':
-        isValid = validateNumberField(input, fieldRules);
+        isValid = window.validateNumberField ? window.validateNumberField(input, fieldRules) : true;
         break;
 
       case 'date':
-        isValid = validateDateField(input, fieldRules);
+        isValid = window.validateDateField ? window.validateDateField(input, fieldRules) : true;
         break;
 
       default:
         if (input.tagName === 'SELECT') {
-          isValid = validateSelectField(input, fieldRules);
+          isValid = window.validateSelectField ? window.validateSelectField(input, fieldRules) : true;
         } else if (input.tagName === 'TEXTAREA') {
-          isValid = validateTextField(input, fieldRules);
+          isValid = window.validateTextField ? window.validateTextField(input, fieldRules) : true;
         } else {
-          isValid = validateField(input, fieldRules);
+          isValid = window.validateField ? window.validateField(input, fieldRules) : true;
         }
         break;
       }

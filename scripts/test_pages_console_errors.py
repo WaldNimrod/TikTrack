@@ -15,22 +15,21 @@ import requests
 
 try:
     from selenium import webdriver
-    from selenium.webdriver.firefox.service import Service
-    from selenium.webdriver.firefox.options import Options
-    from selenium.webdriver.chrome.service import Service as ChromeService
+    from selenium.webdriver.chrome.service import Service
+    from selenium.webdriver.chrome.options import Options
+    from selenium.webdriver.chrome.service import Service as FirefoxService
     from selenium.webdriver.chrome.options import Options as ChromeOptions
     from selenium.webdriver.common.by import By
     from selenium.webdriver.support.ui import WebDriverWait
     from selenium.webdriver.support import expected_conditions as EC
     from selenium.common.exceptions import TimeoutException, WebDriverException
     from webdriver_manager.firefox import GeckoDriverManager
-    from webdriver_manager.chrome import ChromeDriverManager
 except ImportError:
     print("❌ Error: selenium or webdriver-manager not installed.")
     print("   Install with: pip install selenium webdriver-manager")
     exit(1)
 
-BASE_URL = "http://localhost:8080"
+BASE_URL = "http://localhost:5001"
 
 # Test credentials (admin) - CRITICAL: Always use admin/admin123 for tests
 TEST_USERNAME = "admin"
@@ -201,19 +200,19 @@ def setup_driver(prefer_chrome: bool = False):
     """
     last_error = None
 
-    def create_firefox():
-        firefox_options = Options()
-        # firefox_options.add_argument('--headless')  # intentionally visible for debugging
-        firefox_options.set_preference('devtools.console.stdout.content', True)
-        firefox_options.add_argument('--no-sandbox')
-        firefox_options.add_argument('--disable-dev-shm-usage')
-        firefox_options.add_argument('--width=1920')
-        firefox_options.add_argument('--height=1080')
-        dev_edition_path = "/Applications/Firefox Developer Edition.app/Contents/MacOS/firefox"
+    def create_chrome():
+        chrome_options = Options()
+        # chrome_options.add_argument('--headless')  # intentionally visible for debugging
+        chrome_options.set_preference('devtools.console.stdout.content', True)
+        chrome_options.add_argument('--no-sandbox')
+        chrome_options.add_argument('--disable-dev-shm-usage')
+        chrome_options.add_argument('--width=1920')
+        chrome_options.add_argument('--height=1080')
+        dev_edition_path = "/Applications/Firefox Developer Edition.app/Contents/MacOS/chrome"
         if Path(dev_edition_path).exists():
-            firefox_options.binary_location = dev_edition_path
+            chrome_options.binary_location = dev_edition_path
         service = Service(GeckoDriverManager().install())
-        driver = webdriver.Firefox(service=service, options=firefox_options)
+        driver = webdriver.Firefox(service=service, options=chrome_options)
         driver.set_script_timeout(60)
         return driver
 
@@ -223,8 +222,8 @@ def setup_driver(prefer_chrome: bool = False):
         chrome_options.add_argument('--disable-dev-shm-usage')
         chrome_options.add_argument('--disable-gpu')
         chrome_options.add_argument('--window-size=1920,1080')
-        service = ChromeService(ChromeDriverManager().install())
-        driver = webdriver.Chrome(service=service, options=chrome_options)
+        service = FirefoxService(GeckoDriverManager().install())
+        driver = webdriver.Firefox(service=service, options=chrome_options)
         driver.set_script_timeout(60)
         return driver
 
@@ -232,7 +231,7 @@ def setup_driver(prefer_chrome: bool = False):
         if prefer_chrome:
             return create_chrome()
         # Try Firefox first
-        return create_firefox()
+        return create_chrome()
     except Exception as e1:
         last_error = e1
         print(f"⚠️ Firefox driver failed: {e1}")

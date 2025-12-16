@@ -7,6 +7,28 @@
  * the appropriate context, and ensures the modal footer is hidden.
  */
 (function () {
+
+// ===== FUNCTION INDEX =====
+// === Class Methods ===
+// - ConditionsModalController.activateReloadBypass() - Activatereloadbypass
+// - ConditionsModalController.buildModalTitle() - Buildmodaltitle
+// - ConditionsModalController.configureModalUI() - Configuremodalui
+// - ConditionsModalController.deactivateReloadBypass() - Deactivatereloadbypass
+// - ConditionsModalController.ensureModalPosition() - Ensuremodalposition
+// - ConditionsModalController.goBackToParent() - Gobacktoparent
+// - ConditionsModalController.initialize() - Initialize
+// - ConditionsModalController.onModalHidden() - Onmodalhidden
+// - ConditionsModalController.restoreParentModal() - Restoreparentmodal
+// - ConditionsModalController.setupModal() - Setupmodal
+
+// === Object Methods ===
+// - backButton.onclick() - Onclick
+// - conditionsModalNoop() - Conditionsmodalnoop
+// - conditionsModalNoop() - Conditionsmodalnoop
+
+// === Data Functions ===
+// - reloadBypassState() - Reloadbypassstate
+
     const reloadBypassState = (() => {
         const stateKey = '__conditionsReloadBypassState';
         if (window[stateKey]) {
@@ -28,23 +50,16 @@
             lastEnabledAt: null
         };
 
-        window.location.reload = function patchedReload(forceReload) {
-            if (state.enabled) {
-                const attempt = {
-                    forceReload: Boolean(forceReload),
-                    timestamp: Date.now(),
-                    reason: state.reason,
-                    stack: new Error().stack
-                };
-                state.blockCount += 1;
-                state.lastAttempt = attempt;
-                window.Logger?.warn('[ConditionsReloadBypass] Prevented reload attempt', attempt, { page: 'conditions-modal-controller' });
-                if (typeof window.showNotification === 'function') {
-                    window.showNotification('חוסם ריענון אוטומטי לזמן דיבוג תנאים', 'info');
-                }
-                return;
-            }
-            return originalReload(forceReload);
+        // Note: window.location.reload is read-only and cannot be overridden in modern browsers
+        // This is a security feature. We'll skip the patching and just return a no-op state.
+        // The reload bypass functionality is not critical - it's only for debugging.
+        window.Logger?.debug('[ConditionsModalController] Skipping location.reload override (read-only property)', { page: 'conditions-modal-controller' });
+        
+        // Return state with enabled always false (no bypass functionality)
+        return {
+            ...state,
+            enabled: false,
+            bypassDisabled: true
         };
 
         window.ConditionsReloadBypass = {
@@ -89,6 +104,7 @@
             this.navigationInstanceId = null;
             this.parentNavigationInstanceId = null;
             this.reloadBypassActive = false;
+            this.loggedMissingModal = false; // prevent repeated warnings
 
             this.initialize();
         }
@@ -102,6 +118,8 @@
         }
 
         setupModal() {
+            // No dedicated auth pages; always allow modal setup
+            
             this.modalElement = document.getElementById(MODAL_ID);
             if (!this.modalElement) {
                 if (window.ModalManagerV2 && window.conditionsModalConfig) {
@@ -115,8 +133,27 @@
             }
 
             if (!this.modalElement) {
-                window.Logger?.warn('[ConditionsModalController] Modal element not found', { page: 'conditions-modal-controller' });
-                return;
+                // Try to create the modal if it doesn't exist
+                if (window.ModalManagerV2 && window.conditionsModalConfig) {
+                    try {
+                        window.ModalManagerV2.createCRUDModal(window.conditionsModalConfig);
+                        this.modalElement = document.getElementById(MODAL_ID);
+                        if (this.modalElement) {
+                            window.Logger?.info('[ConditionsModalController] Modal created successfully', { page: 'conditions-modal-controller' });
+                        }
+                    } catch (error) {
+                        window.Logger?.error('[ConditionsModalController] Failed to create modal', { error: error?.message, stack: error?.stack }, { page: 'conditions-modal-controller' });
+                    }
+                }
+                
+                if (!this.modalElement) {
+                    // Only warn if we're not on an auth page and modal creation failed
+                    if (!this.loggedMissingModal) {
+                        window.Logger?.info?.('[ConditionsModalController] Modal element not found and could not be created (once)', { page: 'conditions-modal-controller' });
+                        this.loggedMissingModal = true;
+                    }
+                    return;
+                }
             }
 
             try {
@@ -128,10 +165,19 @@
 
             this.modalElement.classList.add('modal-nested');
 
-            this.bootstrapModal = bootstrap.Modal.getOrCreateInstance(this.modalElement, {
-                backdrop: false,
-                keyboard: true
-            });
+            // Use ModalManagerV2 if available, fallback to Bootstrap
+            if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
+                // ModalManagerV2 will handle the modal, but we still need Bootstrap instance for events
+                this.bootstrapModal = bootstrap.Modal.getOrCreateInstance(this.modalElement, {
+                    backdrop: false,
+                    keyboard: true
+                });
+            } else if (bootstrap?.Modal) {
+                this.bootstrapModal = bootstrap.Modal.getOrCreateInstance(this.modalElement, {
+                    backdrop: false,
+                    keyboard: true
+                });
+            }
             this.modalElement.addEventListener('shown.bs.modal', () => this.onModalShown());
             this.modalElement.addEventListener('hidden.bs.modal', () => this.onModalHidden());
 
@@ -194,7 +240,10 @@
                 }
             }
 
-            const navigationAvailable = Boolean(window.ModalNavigationService?.registerModalOpen);
+            // Modal Navigation System - רק למודלים מקוננים (nested modals)
+            // בדיקה אם יש stack - רק אז זה מודל מקונן שצריך רישום
+            const hasStack = window.ModalNavigationService?.getStack?.()?.length > 0;
+            const navigationAvailable = Boolean(window.ModalNavigationService?.registerModalOpen) && hasStack;
             let parentEntry = null;
 
             if (navigationAvailable && typeof window.ModalNavigationService.getActiveEntry === 'function') {
@@ -237,6 +286,11 @@
                 } catch (error) {
                     window.Logger?.warn('[ConditionsModalController] Failed to register modal in navigation service', { error: error?.message, stack: error?.stack }, { page: 'conditions-modal-controller' });
                     this.navigationInstanceId = null;
+                }
+
+                // עדכון UI (breadcrumb וכפתור חזרה) רק במודלים מקוננים
+                if (window.modalNavigationManager?.updateModalNavigation) {
+                    window.modalNavigationManager.updateModalNavigation(this.modalElement);
                 }
             } else if (this.parentModalId) {
                 const parentElement = document.getElementById(this.parentModalId);
@@ -322,6 +376,22 @@
 
         onModalHidden() {
             window.Logger?.info('[ConditionsModalController] onModalHidden triggered', {}, { page: 'conditions-modal-controller' });
+            
+            // רישום סגירה במערכת Modal Navigation (אם היה רשום)
+            if (this.navigationInstanceId && window.ModalNavigationService?.registerModalClose) {
+                try {
+                    window.ModalNavigationService.registerModalClose(MODAL_ID, { instanceId: this.navigationInstanceId });
+                } catch (error) {
+                    window.Logger?.warn('[ConditionsModalController] Failed to register modal close in navigation service', { error: error?.message, stack: error?.stack }, { page: 'conditions-modal-controller' });
+                }
+            } else if (window.registerModalNavigationClose) {
+                try {
+                    window.registerModalNavigationClose(MODAL_ID);
+                } catch (error) {
+                    window.Logger?.warn('[ConditionsModalController] Failed to register modal close (fallback)', { error: error?.message }, { page: 'conditions-modal-controller' });
+                }
+            }
+            
             if (!window.ModalNavigationService?.registerModalOpen) {
                 this.restoreParentModal();
             } else {

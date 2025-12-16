@@ -292,9 +292,10 @@ class EntityDetailsModal {
                 }
             }
             
-            // בדיקה אם המודל נפתח כמודל מקונן (יש מודל אחר פתוח)
-            const isNested = options.source?.sourceModal === 'linked-items' || 
-                           (window.ModalNavigationService && window.ModalNavigationService.getStack().length > 0);
+            // Modal Navigation System - רק למודלים מקוננים (nested modals)
+            // בדיקה אם יש stack - רק אז זה מודל מקונן שצריך רישום
+            const hasStack = window.ModalNavigationService?.getStack?.()?.length > 0;
+            const isNested = options.source?.sourceModal === 'linked-items' || hasStack;
             
             // הוספת modal-nested class אם נפתח כמודל מקונן
             if (isNested && this.modal) {
@@ -310,25 +311,95 @@ class EntityDetailsModal {
             // הצגת מצב טעינה
             this.showLoadingState();
 
-            const initialNavigationMetadata = {
-                modalId: this.modalId,
-                modalType: 'entity-details',
-                                entityType,
-                                entityId,
-                title: navigationTitle,
-                allowDuplicateEntries: true
-            };
+            // רישום במערכת רק אם זה מודל מקונן
+            if (hasStack) {
+                const initialNavigationMetadata = {
+                    modalId: this.modalId,
+                    modalType: 'entity-details',
+                    entityType,
+                    entityId,
+                    title: navigationTitle,
+                    allowDuplicateEntries: true
+                };
 
-            if (window.ModalNavigationService?.registerModalOpen) {
-                const navigationEntry = await window.ModalNavigationService.registerModalOpen(this.modal, initialNavigationMetadata);
-                this.navigationInstanceId = navigationEntry?.instanceId || null;
-            } else if (window.pushModalToNavigation) {
-                await window.pushModalToNavigation(this.modal, initialNavigationMetadata);
+                if (window.ModalNavigationService?.registerModalOpen) {
+                    const navigationEntry = await window.ModalNavigationService.registerModalOpen(this.modal, initialNavigationMetadata);
+                    this.navigationInstanceId = navigationEntry?.instanceId || null;
+                } else if (window.pushModalToNavigation) {
+                    await window.pushModalToNavigation(this.modal, initialNavigationMetadata);
+                    this.navigationInstanceId = null;
+                }
+
+                // עדכון UI (breadcrumb וכפתור חזרה) רק במודלים מקוננים
+                if (window.modalNavigationManager?.updateModalNavigation) {
+                    window.modalNavigationManager.updateModalNavigation(this.modal);
+                }
+            } else {
                 this.navigationInstanceId = null;
             }
 
-                // הצגת המודל
-                await this.showModal();
+            // הצגת המודל (ממתין ל-shown.bs.modal event)
+            await this.showModal();
+            
+            // ניטור z-index לפני עדכון
+            const stackBefore = window.ModalNavigationService?.getStack?.() || [];
+            const currentZIndex = this.modal ? (this.modal.style.zIndex || getComputedStyle(this.modal).zIndex) : 'none';
+            const dialogZIndex = this.modal?.querySelector('.modal-dialog') ? (getComputedStyle(this.modal.querySelector('.modal-dialog')).zIndex) : 'none';
+            const contentZIndex = this.modal?.querySelector('.modal-content') ? (getComputedStyle(this.modal.querySelector('.modal-content')).zIndex) : 'none';
+            
+            window.Logger?.info('🔍 [Z-INDEX] EntityDetailsModal: Before z-index update', {
+                modalId: this.modalId,
+                entityType,
+                entityId,
+                stackLength: stackBefore.length,
+                currentZIndex,
+                dialogZIndex,
+                contentZIndex,
+                hasModalZIndexManager: !!window.ModalZIndexManager,
+                page: 'entity-details-modal'
+            });
+            
+            // עדכון z-index דרך ModalZIndexManager
+            // ModalNavigationService אמור לעדכן אוטומטית דרך subscription,
+            // אבל נוסיף עדכון כפוי אחרי שהמודול פתוח לחלוטין
+            // (העדכון הראשוני קורה כבר ב-showModal() דרך shown.bs.modal event)
+            if (window.ModalZIndexManager && typeof window.ModalZIndexManager.forceUpdate === 'function') {
+                // עדכון נוסף לאחר שהמודול פתוח לחלוטין
+                setTimeout(() => {
+                    // עדכון כל המודולים כדי לוודא שה-hierarchy נכון
+                    window.Logger?.info('🔍 [Z-INDEX] EntityDetailsModal: Calling forceUpdate()', {
+                        modalId: this.modalId,
+                        entityType,
+                        entityId,
+                        page: 'entity-details-modal'
+                    });
+                    
+                    window.ModalZIndexManager.forceUpdate();
+                    
+                    // ניטור z-index אחרי עדכון
+                    setTimeout(() => {
+                        const stackAfter = window.ModalNavigationService?.getStack?.() || [];
+                        const newZIndex = this.modal ? (this.modal.style.zIndex || getComputedStyle(this.modal).zIndex) : 'none';
+                        const newDialogZIndex = this.modal?.querySelector('.modal-dialog') ? (getComputedStyle(this.modal.querySelector('.modal-dialog')).zIndex) : 'none';
+                        const newContentZIndex = this.modal?.querySelector('.modal-content') ? (getComputedStyle(this.modal.querySelector('.modal-content')).zIndex) : 'none';
+                        
+                        window.Logger?.info('🔍 [Z-INDEX] EntityDetailsModal: After z-index update', {
+                            modalId: this.modalId,
+                            entityType,
+                            entityId,
+                            stackLength: stackAfter.length,
+                            previousZIndex: currentZIndex,
+                            newZIndex,
+                            previousDialogZIndex: dialogZIndex,
+                            newDialogZIndex,
+                            previousContentZIndex: contentZIndex,
+                            newContentZIndex,
+                            zIndexChanged: currentZIndex !== newZIndex,
+                            page: 'entity-details-modal'
+                        });
+                    }, 50);
+                }, 100);
+            }
 
                 // טעינת הנתונים
                 await this.loadEntityData(entityType, entityId, options);
@@ -355,10 +426,17 @@ class EntityDetailsModal {
                     // יש מודל מקונן - חזור למודל הקודם
                     window.ModalNavigationService.goBack().catch((error) => {
                         window.Logger?.warn('Failed to go back via navigation service, using fallback', { error: error?.message }, { page: "entity-details-modal" });
-                        // fallback - סגירה רגילה
-                        const bsModal = bootstrap.Modal.getInstance(this.modal);
-                        if (bsModal) {
-                            bsModal.hide();
+                        // fallback - סגירה רגילה דרך ModalManagerV2 או Bootstrap
+                        if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
+                            window.ModalManagerV2.hideModal(this.modal.id);
+                        } else if (bootstrap?.Modal) {
+                            const bsModal = bootstrap.Modal.getInstance(this.modal);
+                            if (bsModal) {
+                                bsModal.hide();
+                            } else {
+                                this.modal.style.display = 'none';
+                                this.modal.classList.remove('show');
+                            }
                         } else {
                             this.modal.style.display = 'none';
                             this.modal.classList.remove('show');
@@ -367,10 +445,18 @@ class EntityDetailsModal {
                     return;
                 }
                 
-                // אין מודל מקונן - סגירה רגילה
-                const bsModal = bootstrap.Modal.getInstance(this.modal);
-                if (bsModal) {
-                    bsModal.hide();
+                // אין מודל מקונן - סגירה רגילה דרך ModalManagerV2 או Bootstrap
+                if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
+                    window.ModalManagerV2.hideModal(this.modal.id);
+                } else if (bootstrap?.Modal) {
+                    const bsModal = bootstrap.Modal.getInstance(this.modal);
+                    if (bsModal) {
+                        bsModal.hide();
+                    } else {
+                        // fallback
+                        this.modal.style.display = 'none';
+                        this.modal.classList.remove('show');
+                    }
                 } else {
                     // fallback
                     this.modal.style.display = 'none';
@@ -511,14 +597,22 @@ class EntityDetailsModal {
         const contentElement = document.getElementById('entityDetailsContent');
         if (!contentElement) return;
 
-        contentElement.innerHTML = `
-            <div class="entity-details-loading d-flex flex-column align-items-center justify-content-center">
-                <div class="spinner-border text-primary" role="status">
-                    <span class="visually-hidden">טוען...</span>
-                </div>
-                <p class="mt-3 text-muted">טוען פרטי ישות...</p>
-            </div>
-        `;
+        contentElement.textContent = '';
+        const loadingDiv = document.createElement('div');
+        loadingDiv.className = 'entity-details-loading d-flex flex-column align-items-center justify-content-center';
+        const spinner = document.createElement('div');
+        spinner.className = 'spinner-border text-primary';
+        spinner.setAttribute('role', 'status');
+        const spinnerText = document.createElement('span');
+        spinnerText.className = 'visually-hidden';
+        spinnerText.textContent = 'טוען...';
+        spinner.appendChild(spinnerText);
+        loadingDiv.appendChild(spinner);
+        const p = document.createElement('p');
+        p.className = 'mt-3 text-muted';
+        p.textContent = 'טוען פרטי ישות...';
+        loadingDiv.appendChild(p);
+        contentElement.appendChild(loadingDiv);
     }
 
     /**
@@ -925,7 +1019,12 @@ class EntityDetailsModal {
                 </span>
             `;
             
-            titleElement.innerHTML = titleHTML;
+            titleElement.textContent = '';
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(titleHTML, 'text/html');
+            doc.body.childNodes.forEach(node => {
+                titleElement.appendChild(node.cloneNode(true));
+            });
             
             if (window.Logger) {
                 window.Logger.info('🎯 Nested modal - simple title set', { entityLabel, iconPath, finalEntityType, titleText }, { page: "entity-details-modal" });
@@ -945,9 +1044,13 @@ class EntityDetailsModal {
             }
             
             // טיפול מיוחד עבור account/trading_account - הצגת שם החשבון במקום מספר
+            // טיפול מיוחד עבור ticker - הצגת symbol במקום מזהה
             let titleText = '';
             if (finalEntityType === 'trading_account' && entityData && entityData.name) {
                 titleText = `פרטי חשבון מסחר: ${entityData.name}`;
+            } else if (finalEntityType === 'ticker' && entityData && entityData.symbol) {
+                // עבור ticker - הצגת symbol בכותרת
+                titleText = `פרטי טיקר: ${entityData.symbol}`;
             } else {
                 // יצירת כותרת חדשה: [איקון] פרטי [סוג ישות] מספר [מזהה]
                 titleText = `פרטי ${entityLabel}${finalEntityId ? ` מספר ${finalEntityId}` : ''}`;
@@ -975,7 +1078,12 @@ class EntityDetailsModal {
             });
             
             window.Logger.info('🎯 Setting title to:', { entityLabel, entityId: finalEntityId, iconPath, finalEntityType, titleText }, { page: "entity-details-modal" });
-            titleElement.innerHTML = titleHTML;
+            titleElement.textContent = '';
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(titleHTML, 'text/html');
+            doc.body.childNodes.forEach(node => {
+                titleElement.appendChild(node.cloneNode(true));
+            });
             
             console.log('🔍🔍🔍 [updateModalTitle] After setting titleHTML', {
                 titleElementAfter: titleElement?.innerHTML?.substring(0, 100),
@@ -1095,12 +1203,52 @@ class EntityDetailsModal {
 
         let buttonsHtml = '';
         
-        // עבור ticker - לא מציגים כפתורי פעולות מהירות
+        // עבור ticker - מציגים כפתור ישיר "דשבורד מלא" (לא תפריט)
         if (entityType === 'ticker') {
-            buttonsHtml = ''; // ריק - לא מציגים כפתורים
+            const tickerId = this.currentEntityId || entityData?.id;
+            if (tickerId) {
+                // כפתור ישיר עם איקון בלבד - כמו בתפריט פעולות
+                // Get icon based on button type - use BUTTON_ICONS if available
+                let icon = '';
+                if (window.BUTTON_ICONS && window.BUTTON_ICONS.DASHBOARD) {
+                    const iconPath = window.BUTTON_ICONS.DASHBOARD;
+                    if (iconPath.startsWith('/') || iconPath.startsWith('http')) {
+                        // It's a path, convert to img tag
+                        icon = `<img src="${iconPath}" width="16" height="16" alt="דשבורד" class="icon">`;
+                    } else {
+                        // It's already HTML or emoji
+                        icon = iconPath;
+                    }
+                } else {
+                    // Fallback to emoji if BUTTON_ICONS not available
+                    icon = '📊';
+                }
+                
+                // Escape onclick for HTML attribute
+                const escapedOnclick = `window.location.href='/ticker-dashboard.html?tickerId=${tickerId}'`.replace(/'/g, '&#39;');
+                
+                buttonsHtml = `
+                    <button type="button" 
+                            class="btn actions-menu-item" 
+                            data-variant="small" 
+                            data-button-type="DASHBOARD"
+                            data-onclick='${escapedOnclick}'
+                            data-tooltip="דשבורד מלא"
+                            data-tooltip-placement="top"
+                            data-tooltip-trigger="hover"
+                            style="margin-right: 4px;">
+                        ${icon}
+                    </button>
+                `;
+            }
         }
         
-        buttonsContainer.innerHTML = buttonsHtml;
+        buttonsContainer.textContent = '';
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(buttonsHtml, 'text/html');
+        doc.body.childNodes.forEach(node => {
+            buttonsContainer.appendChild(node.cloneNode(true));
+        });
         
         // עבור ticker - מסתירים גם את כפתור החזרה
         const backButton = document.getElementById('entityDetailsBackBtn');
@@ -1133,7 +1281,18 @@ class EntityDetailsModal {
             contentElementExists: !!contentElement
         });
 
-        contentElement.innerHTML = renderedContent;
+        // Insert rendered content using tempDiv
+        contentElement.textContent = '';
+        const tempDiv = document.createElement('div');
+        tempDiv.textContent = '';
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(renderedContent, 'text/html');
+        doc.body.childNodes.forEach(node => {
+            tempDiv.appendChild(node.cloneNode(true));
+        });
+        while (tempDiv.firstChild) {
+          contentElement.appendChild(tempDiv.firstChild);
+        }
         
         // Debug: Check if linked items table exists after insertion
         setTimeout(() => {
@@ -1225,18 +1384,29 @@ class EntityDetailsModal {
         const contentElement = document.getElementById('entityDetailsContent');
         if (!contentElement) return;
 
-        contentElement.innerHTML = `
-            <div class="entity-details-error d-flex flex-column align-items-center justify-content-center">
-                <div class="alert alert-danger text-center">
-                    <i class="fas fa-exclamation-triangle fa-2x mb-3"></i>
-                    <h6>שגיאה בטעינת פרטי הישות</h6>
-                    <p class="mb-0">${errorMessage}</p>
-                </div>
-                <button type="button" class="btn" data-onclick="window.entityDetailsModal.retry()">
-                    נסה שוב
-                </button>
-            </div>
-        `;
+        contentElement.textContent = '';
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'entity-details-error d-flex flex-column align-items-center justify-content-center';
+        const alertDiv = document.createElement('div');
+        alertDiv.className = 'alert alert-danger text-center';
+        const icon = document.createElement('i');
+        icon.className = 'fas fa-exclamation-triangle fa-2x mb-3';
+        alertDiv.appendChild(icon);
+        const h6 = document.createElement('h6');
+        h6.textContent = 'שגיאה בטעינת פרטי הישות';
+        alertDiv.appendChild(h6);
+        const p = document.createElement('p');
+        p.className = 'mb-0';
+        p.textContent = errorMessage;
+        alertDiv.appendChild(p);
+        errorDiv.appendChild(alertDiv);
+        const retryBtn = document.createElement('button');
+        retryBtn.type = 'button';
+        retryBtn.className = 'btn';
+        retryBtn.setAttribute('data-onclick', 'window.entityDetailsModal.retry()');
+        retryBtn.textContent = 'נסה שוב';
+        errorDiv.appendChild(retryBtn);
+        contentElement.appendChild(errorDiv);
     }
 
     /**
@@ -1248,31 +1418,90 @@ class EntityDetailsModal {
     async showModal() {
         if (!this.modal) return;
 
-        try {
-            // יצירת Bootstrap modal instance ללא backdrop (ננהל אותו באופן מרכזי)
-            const bsModal = new bootstrap.Modal(this.modal, {
-                backdrop: false, // ננהל backdrop מרכזית
-                keyboard: true
-            });
-            
-            console.log('🟡 [showModal] About to call bsModal.show()', {
-                modalId: this.modal?.id,
-                hasModalNavigationService: !!window.ModalNavigationService,
-                timestamp: new Date().toISOString()
-            });
-            
-            bsModal.show();
-            
-            console.log('🟡 [showModal] bsModal.show() called - waiting for shown.bs.modal event', {
-                modalId: this.modal?.id,
-                timestamp: new Date().toISOString()
-            });
-        } catch (error) {
-            window.Logger.error('Error showing modal with Bootstrap:', error, { page: "entity-details-modal" });
-            // fallback להצגה ישירה
-            this.modal.style.display = 'block';
-            this.modal.classList.add('show');
-        }
+        return new Promise((resolve, reject) => {
+            try {
+                // פתיחה דרך ModalManagerV2 או Bootstrap fallback
+                if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
+                    window.ModalManagerV2.showModal(this.modal.id, 'view').then(() => {
+                        resolve();
+                    }).catch(error => {
+                        window.Logger?.error('Error showing entity details modal via ModalManagerV2', { error, modalId: this.modal.id, page: 'entity-details-modal' });
+                        // Fallback to Bootstrap
+                        if (bootstrap?.Modal) {
+                            const bsModal = new bootstrap.Modal(this.modal, {
+                                backdrop: false, // ננהל backdrop מרכזית
+                                keyboard: true
+                            });
+                            bsModal.show();
+                            resolve();
+                        } else {
+                            reject(error);
+                        }
+                    });
+                    return;
+                }
+                
+                // Fallback to Bootstrap
+                const bsModal = new bootstrap.Modal(this.modal, {
+                    backdrop: false, // ננהל backdrop מרכזית
+                    keyboard: true
+                });
+                
+                window.Logger?.debug('🟡 [showModal] About to call bsModal.show()', {
+                    modalId: this.modal?.id,
+                    hasModalNavigationService: !!window.ModalNavigationService,
+                    timestamp: new Date().toISOString(),
+                    page: 'entity-details-modal'
+                });
+                
+                // המתינה ל-`shown.bs.modal` event לפני resolve
+                this.modal.addEventListener('shown.bs.modal', () => {
+                    // ניטור z-index ב-shown event
+                    const stackAtShown = window.ModalNavigationService?.getStack?.() || [];
+                    const zIndexAtShown = this.modal ? (this.modal.style.zIndex || getComputedStyle(this.modal).zIndex) : 'none';
+                    const globalBackdropAtShown = document.getElementById('globalModalBackdrop');
+                    
+                    window.Logger?.info('🔍 [Z-INDEX] EntityDetailsModal: shown.bs.modal event fired', {
+                        modalId: this.modal?.id,
+                        timestamp: new Date().toISOString(),
+                        stackLength: stackAtShown.length,
+                        zIndex: zIndexAtShown,
+                        backdrop: {
+                            exists: !!globalBackdropAtShown,
+                            zIndex: globalBackdropAtShown ? (globalBackdropAtShown.style.zIndex || getComputedStyle(globalBackdropAtShown).zIndex) : 'none'
+                        },
+                        page: 'entity-details-modal'
+                    });
+                    
+                    // עדכון z-index אחרי שהמודול פתוח לחלוטין
+                    if (window.ModalZIndexManager && typeof window.ModalZIndexManager.forceUpdate === 'function') {
+                        setTimeout(() => {
+                            window.Logger?.info('🔍 [Z-INDEX] EntityDetailsModal: Updating z-index from shown.bs.modal', {
+                                modalId: this.modal?.id,
+                                page: 'entity-details-modal'
+                            });
+                            window.ModalZIndexManager.forceUpdate();
+                        }, 50);
+                    }
+                    
+                    resolve();
+                }, { once: true });
+                
+                bsModal.show();
+                
+                window.Logger?.debug('🟡 [showModal] bsModal.show() called - waiting for shown.bs.modal event', {
+                    modalId: this.modal?.id,
+                    timestamp: new Date().toISOString(),
+                    page: 'entity-details-modal'
+                });
+            } catch (error) {
+                window.Logger.error('Error showing modal with Bootstrap:', error, { page: "entity-details-modal" });
+                // fallback להצגה ישירה
+                this.modal.style.display = 'block';
+                this.modal.classList.add('show');
+                reject(error);
+            }
+        });
     }
 
     /**
@@ -1313,7 +1542,7 @@ class EntityDetailsModal {
 
         const contentElement = document.getElementById('entityDetailsContent');
         if (contentElement) {
-            contentElement.innerHTML = '';
+            contentElement.textContent = '';
             if (window.Logger) {
                 window.Logger.debug('✅ Cleared modal content after hide', {
                     modalId: this.modal?.id,
@@ -1826,13 +2055,16 @@ function hideEntityDetails() {
 /**
  * Show linked items - פונקציה גלובלית להצגת פריטים מקושרים
  * 
+ * Wrapper function that uses the centralized Linked Items Service (linked-items.js)
+ * This function is kept for backward compatibility and entity-details-modal integration
+ * 
  * @param {string} entityType - סוג הישות
  * @param {number|string} entityId - מזהה הישות
  * @global
  */
 function showLinkedItems(entityType, entityId) {
     try {
-        // שימוש במנגנון המקושרים הקיים
+        // שימוש במנגנון המקושרים הקיים (Linked Items Service)
         if (window.loadLinkedItemsData && window.showLinkedItemsModal) {
             // טעינת נתונים מקושרים באמצעות המנגנון הקיים
             window.loadLinkedItemsData(entityType, entityId)
@@ -1968,6 +2200,13 @@ if (typeof document !== 'undefined') {
  * אתחול אוטומטי:
  * - DOMContentLoaded listener - אתחול כשה-DOM מוכן
  */
+// === Arrow Functions ===
+// - initModal() - Initmodal
+// - initializeTooltips() - Initializetooltips
+
+// === Functions ===
+// - editTicker() - Editticker
+// - showLinkedItems() - Showlinkeditems
 
 // ===== GLOBAL FUNCTION EXPORTS =====
 

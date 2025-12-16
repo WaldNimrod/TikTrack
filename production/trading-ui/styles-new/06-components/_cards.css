@@ -24,15 +24,15 @@
   align-items: center;
   gap: 10px;
   padding: 15px;
-  background: #f8f9fa;
+  background: var(--card-background, var(--background-color-light));
   border-radius: 8px;
-  border: 1px solid #e9ecef;
+  border: 1px solid var(--border-color, var(--color-border));
   transition: all 0.2s ease;
 }
 
 .small-row-card:hover {
-  background: #e9ecef;
-  border-color: var(--primary-color, #26baac);
+  background: var(--border-color, var(--color-border));
+  border-color: var(--primary-color, var(--entity-trade-color, var(--brand-primary-color)));
 }
 
 .small-row-card-icon {
@@ -42,14 +42,14 @@
 .small-row-card-label {
   flex: 1;
   font-size: 0.9rem;
-  color: #495057;
+  color: var(--text-color, var(--color-text-primary));
   font-weight: 500;
 }
 
 .small-row-card-value {
   font-size: 1.2rem;
   font-weight: 700;
-  color: var(--primary-color, #26baac);
+  color: var(--primary-color, var(--entity-trade-color, var(--brand-primary-color)));
   min-width: 30px;
   text-align: center;
 }
@@ -60,15 +60,15 @@
   align-items: center;
   gap: 10px;
   padding: 15px;
-  background: #f8f9fa;
+  background: var(--card-background, var(--background-color-light));
   border-radius: 8px;
-  border: 1px solid #e9ecef;
+  border: 1px solid var(--border-color, var(--color-border));
   transition: all 0.2s ease;
 }
 
 .stat-item:hover {
-  background: #e9ecef;
-  border-color: var(--primary-color, #26baac);
+  background: var(--border-color, var(--color-border));
+  border-color: var(--primary-color, var(--entity-trade-color, var(--brand-primary-color)));
 }
 
 .stat-icon {
@@ -78,14 +78,14 @@
 .stat-label {
   flex: 1;
   font-size: 0.9rem;
-  color: #495057;
+  color: var(--text-color, var(--color-text-primary));
   font-weight: 500;
 }
 
 .stat-value {
   font-size: 1.2rem;
   font-weight: 700;
-  color: var(--primary-color, #26baac);
+  color: var(--primary-color, var(--entity-trade-color, var(--brand-primary-color)));
   min-width: 30px;
   text-align: center;
 }
@@ -98,9 +98,9 @@
 .mapping-summary {
   margin-bottom: 20px;
   padding: 15px;
-  background: #f8f9fa;
+  background: var(--card-background, var(--background-color-light));
   border-radius: 8px;
-  border: 1px solid #e9ecef;
+  border: 1px solid var(--border-color, var(--color-border));
 }
 
 .summary-stats {
@@ -114,19 +114,19 @@
   align-items: center;
   gap: 8px;
   padding: 8px 12px;
-  background: white;
+  background: var(--card-background, var(--background-color, white));
   border-radius: 6px;
-  border: 1px solid #dee2e6;
+  border: 1px solid var(--border-color, var(--color-border));
   font-size: 0.9rem;
 }
 
 .summary-stats .stat-item i {
-  color: var(--primary-color, #26baac);
+  color: var(--primary-color, var(--entity-trade-color, var(--brand-primary-color)));
   font-size: 1rem;
 }
 
 .summary-stats .stat-item strong {
-  color: #495057;
+  color: var(--text-color, var(--color-text-primary));
   font-weight: 600;
 }
 
@@ -138,15 +138,15 @@
 
 .mapping-item {
   padding: 15px;
-  background: white;
+  background: var(--card-background, var(--background-color, white));
   border-radius: 8px;
-  border: 1px solid #e9ecef;
+  border: 1px solid var(--border-color, var(--color-border));
   transition: all 0.2s ease;
 }
 
 .mapping-item:hover {
-  border-color: var(--primary-color, #26baac);
-  box-shadow: 0 2px 8px rgba(38, 186, 172, 0.12);
+  border-color: var(--primary-color, var(--entity-trade-color, var(--brand-primary-color)));
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--primary-color, var(--entity-trade-color, var(--brand-primary-color))) 12%, transparent);
 }
 
 .page-info {
@@ -161,17 +161,17 @@
   gap: 8px;
   font-size: 1rem;
   font-weight: 600;
-  color: #495057;
+  color: var(--text-color, var(--color-text-primary));
 }
 
 .page-name i {
-  color: var(--primary-color, #26baac);
+  color: var(--primary-color, var(--entity-trade-color, var(--brand-primary-color)));
   font-size: 1.1rem;
 }
 
 .script-count {
   font-size: 0.8rem;
-  color: #6c757d;
+  color: var(--text-muted, var(--color-text-secondary));
   font-weight: 400;
   margin-right: 5px;
 }
@@ -185,22 +185,22 @@
 .script-tag {
   display: inline-block;
   padding: 4px 8px;
-  background: #e3f2fd;
-  color: #1976d2;
+  background: var(--entity-ticker-color-light, var(--color-info-light));
+  color: var(--entity-ticker-color, var(--color-info));
   border-radius: 4px;
   font-size: 0.8rem;
   font-weight: 500;
-  border: 1px solid #bbdefb;
+  border: 1px solid var(--entity-ticker-color-light, var(--color-info-light));
   transition: all 0.2s ease;
 }
 
 .script-tag:hover {
-  background: #bbdefb;
-  border-color: #90caf9;
+  background: var(--entity-ticker-color-light, var(--color-info-light));
+  border-color: var(--entity-ticker-color, var(--color-info));
 }
 
 .no-scripts {
-  color: #6c757d;
+  color: var(--text-muted, var(--color-text-secondary));
   font-style: italic;
   font-size: 0.9rem;
 }
@@ -208,17 +208,17 @@
 .no-data {
   text-align: center;
   padding: 40px;
-  color: #6c757d;
+  color: var(--text-muted, var(--color-text-secondary));
   font-size: 1.1rem;
-  background: #f8f9fa;
+  background: var(--card-background, var(--background-color-light));
   border-radius: 8px;
-  border: 1px solid #e9ecef;
+  border: 1px solid var(--border-color, var(--color-border));
 }
 
 /* כרטיסי התראות - מבוסס על index.css */
 .alert-card {
-  background: #ffffff;
-  border: 1px solid #ffc107;
+  background: var(--card-background, var(--background-color, white));
+  border: 1px solid var(--status-warning-color, var(--color-warning));
   padding: 1rem;
   border-radius: var(--apple-radius-small);
   margin-bottom: 1rem;
@@ -262,7 +262,7 @@
 
 /* כרטיסי סטטוס - מבוסס על cache-test */
 .status-card {
-  background: white;
+  background: var(--card-background, var(--background-color, white));
   border-radius: 15px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
   overflow: hidden;
@@ -279,7 +279,7 @@
   display: flex;
   align-items: center;
   padding: 1.5rem;
-  background: #ffffff;
+  background: var(--card-background, var(--background-color, white));
   border-radius: var(--apple-radius-medium);
   border: 1px solid var(--apple-border-light);
   transition: all 0.3s ease;
@@ -291,23 +291,23 @@
 }
 
 .overview-card.primary {
-  background: #ffffff;
-  border-color: rgba(255, 156, 5, 0.3);
+  background: var(--card-background, var(--background-color, white));
+  border-color: color-mix(in srgb, var(--status-warning-color, var(--color-warning)) 30%, transparent);
 }
 
 .overview-card.success {
-  background: #ffffff;
-  border-color: rgba(40, 167, 69, 0.3);
+  background: var(--card-background, var(--background-color, white));
+  border-color: color-mix(in srgb, var(--numeric-positive-medium, var(--color-success)) 30%, transparent);
 }
 
 .overview-card.info {
-  background: #ffffff;
-  border-color: rgba(0, 123, 255, 0.3);
+  background: var(--card-background, var(--background-color, white));
+  border-color: color-mix(in srgb, var(--entity-ticker-color, var(--color-info)) 30%, transparent);
 }
 
 .overview-card.warning {
-  background: #ffffff;
-  border-color: rgba(255, 193, 7, 0.3);
+  background: var(--card-background, var(--background-color, white));
+  border-color: color-mix(in srgb, var(--status-warning-color, var(--color-warning)) 30%, transparent);
 }
 
 .overview-card-icon {
@@ -389,7 +389,7 @@
 
 /* כרטיסי גרף */
 .chart-card {
-  background: #ffffff;
+  background: var(--card-background, var(--background-color, white));
   padding: 1.5rem;
   border-radius: var(--apple-radius-medium);
   border: 1px solid var(--apple-border-light);
@@ -401,6 +401,8 @@
   color: var(--apple-text-primary);
   margin-bottom: 1rem;
   display: flex;
+  justify-content: center;
+  text-align: center;
   align-items: center;
   gap: 0.5rem;
 }
@@ -413,7 +415,7 @@
 
 /* כרטיסי סטטוס נוספים */
 .stat-card {
-  background: #ffffff;
+  background: var(--card-background, var(--background-color, white));
   padding: 1.5rem;
   border-radius: var(--apple-radius-medium);
   border: 1px solid var(--apple-border-light);
@@ -457,9 +459,9 @@
   align-items: center;
   margin: 1.5rem auto; /* מרווח אוטומטי למרכז */
   padding: 1.5rem;
-  background: #f8f9fa; /* אפון בהיר */
+  background: var(--card-background, var(--background-color-light)); /* אפון בהיר */
   border-radius: 12px; /* פינות מעוגלות */
-  border: 1px solid #e9ecef;
+  border: 1px solid var(--border-color, var(--color-border));
   width: 90%; /* 90% מהקונטיינר שלו */
   max-width: 100%; /* לא יותר מהקונטיינר */
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
@@ -467,7 +469,7 @@
 
 .info-summary div {
   font-size: 14px;
-  color: #6c757d; /* טקסט אפון */
+  color: var(--text-muted, var(--color-text-secondary)); /* טקסט אפון */
   text-align: center; /* יישור למרכז */
   flex: 1;
   display: flex;
@@ -478,7 +480,7 @@
 }
 
 .info-summary strong {
-  color: #495057; /* טקסט כהה יותר */
+  color: var(--text-color, var(--color-text-primary)); /* טקסט כהה יותר */
   font-weight: 600;
 }
 
@@ -497,7 +499,7 @@
 
 /* כרטיסים בתוך info-summary */
 .info-summary .card {
-  border: 1px solid #e9ecef;
+  border: 1px solid var(--border-color, var(--color-border));
   border-radius: 8px;
   transition: all 0.2s ease;
 }

@@ -17,6 +17,20 @@
  * - cache של נתונים
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Event Handlers ===
+// - handleRelationTypeChange() - Handlerelationtypechange
+// - handleTickerChange() - Handletickerchange
+
+// === Data Functions ===
+// - getFilteredTickers() - Getfilteredtickers
+
+// === Other ===
+// - populateSelect() - Populateselect
+// - populateRelatedObjects() - Populaterelatedobjects
+
 // ===== SELECT POPULATOR SERVICE =====
 
 class SelectPopulatorService {
@@ -213,15 +227,55 @@ class SelectPopulatorService {
         });
         
         try {
-            // טעינת טיקרים מ-API
-            console.log(`🔍 [SelectPopulatorService] Fetching tickers from /api/tickers/...`);
-            const response = await fetch('/api/tickers/');
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+            // טעינת טיקרים מ-API - רק טיקרים של המשתמש
+            console.log(`🔍 [SelectPopulatorService] Fetching user tickers from /api/tickers/my...`);
+
+            // Add authentication headers
+            let token = null;
+            if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
+                token = await window.UnifiedCacheManager.get('authToken');
+            } else {
+                token = localStorage.getItem('authToken');
             }
-            
-            const responseData = await response.json();
-            let tickers = responseData.data || responseData || [];
+            const headers = { 'Content-Type': 'application/json' };
+            if (token) { headers['Authorization'] = `Bearer ${token}`; }
+
+            const response = await fetch('/api/tickers/my', { headers });
+            if (!response.ok) {
+                if (response.status === 401 || response.status === 403) {
+                    console.warn(`⚠️ [SelectPopulatorService] /api/tickers/my unauthorized, returning empty list`);
+                    var tickers = [];
+                    return this._populateSelect(select, tickers, {
+                        valueField: 'id',
+                        textField: 'display_text',
+                        includeEmpty: options.includeEmpty !== false,
+                        emptyText: options.emptyText || 'בחר טיקר...',
+                        defaultValue: options.defaultValue
+                    });
+                }
+                // Fallback to /api/tickers/ if /my fails
+                console.warn(`⚠️ [SelectPopulatorService] /api/tickers/my failed, trying /api/tickers/...`);
+                const fallbackResponse = await fetch('/api/tickers/', { headers });
+                if (!fallbackResponse.ok) {
+                    if (fallbackResponse.status === 401 || fallbackResponse.status === 403) {
+                        console.warn(`⚠️ [SelectPopulatorService] /api/tickers/ unauthorized, returning empty list`);
+                        var tickers = [];
+                        return this._populateSelect(select, tickers, {
+                            valueField: 'id',
+                            textField: 'display_text',
+                            includeEmpty: options.includeEmpty !== false,
+                            emptyText: options.emptyText || 'בחר טיקר...',
+                            defaultValue: options.defaultValue
+                        });
+                    }
+                    throw new Error(`HTTP error! status: ${fallbackResponse.status}`);
+                }
+                const fallbackData = await fallbackResponse.json();
+                var tickers = fallbackData.data || fallbackData || [];
+            } else {
+                const responseData = await response.json();
+                var tickers = responseData.data || responseData || [];
+            }
             console.log(`🔍 [SelectPopulatorService] Got ${tickers.length} tickers from API`);
             
             // סינון אם נדרש
@@ -231,11 +285,37 @@ class SelectPopulatorService {
                 console.log(`🔍 [SelectPopulatorService] Filtered ${beforeFilter} → ${tickers.length} tickers`);
             }
             
-            // מילוי ה-select
+            // Sort tickers alphabetically using centralized business logic
+            if (window.tickersData && typeof window.tickersData.sortTickersAlphabetically === 'function') {
+                tickers = window.tickersData.sortTickersAlphabetically(tickers);
+            } else {
+                // Fallback sorting if service not available
+                tickers.sort((a, b) => {
+                    const symbolA = (a.symbol || a.ticker_symbol || '').toUpperCase();
+                    const symbolB = (b.symbol || b.ticker_symbol || '').toUpperCase();
+                    const symbolCompare = symbolA.localeCompare(symbolB, 'he', { numeric: true, sensitivity: 'base' });
+                    if (symbolCompare !== 0) return symbolCompare;
+                    const nameA = (a.name || '').toUpperCase();
+                    const nameB = (b.name || '').toUpperCase();
+                    return nameA.localeCompare(nameB, 'he', { numeric: true, sensitivity: 'base' });
+                });
+            }
+            
+            // מילוי ה-select - הצג טיקר + שם חברה
             console.log(`🔍 [SelectPopulatorService] Calling _populateSelect with ${tickers.length} tickers...`);
-            this._populateSelect(select, tickers, {
+            
+            // Format tickers to show symbol + company name (use custom name if available)
+            const formattedTickers = tickers.map(ticker => {
+                const displayName = ticker.name_custom || ticker.name || ticker.symbol;
+                return {
+                    ...ticker,
+                    display_text: displayName ? `${ticker.symbol} - ${displayName}` : ticker.symbol
+                };
+            });
+            
+            this._populateSelect(select, formattedTickers, {
                 valueField: 'id',
-                textField: 'symbol',
+                textField: 'display_text',
                 includeEmpty: options.includeEmpty !== false,
                 emptyText: options.emptyText || 'בחר טיקר...',
                 defaultValue: options.defaultValue
@@ -359,7 +439,17 @@ class SelectPopulatorService {
         
         try {
             // טעינת מטבעות מ-API
-            const response = await fetch('/api/currencies/');
+            // Add authentication headers
+            let token = null;
+            if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
+                token = await window.UnifiedCacheManager.get('authToken');
+            } else {
+                token = localStorage.getItem('authToken');
+            }
+            const headers = { 'Content-Type': 'application/json' };
+            if (token) { headers['Authorization'] = `Bearer ${token}`; }
+
+            const response = await fetch('/api/currencies/', { headers });
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
@@ -469,7 +559,17 @@ class SelectPopulatorService {
         
         try {
             // טעינת טריידים מ-API
-            const response = await fetch('/api/trades/');
+            // Add authentication headers
+            let token = null;
+            if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
+                token = await window.UnifiedCacheManager.get('authToken');
+            } else {
+                token = localStorage.getItem('authToken');
+            }
+            const headers = { 'Content-Type': 'application/json' };
+            if (token) { headers['Authorization'] = `Bearer ${token}`; }
+
+            const response = await fetch('/api/trades/', { headers });
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
@@ -528,7 +628,17 @@ class SelectPopulatorService {
         
         try {
             // טעינת תוכניות מ-API
-            const response = await fetch('/api/trade-plans/');
+            // Add authentication headers
+            let token = null;
+            if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
+                token = await window.UnifiedCacheManager.get('authToken');
+            } else {
+                token = localStorage.getItem('authToken');
+            }
+            const headers = { 'Content-Type': 'application/json' };
+            if (token) { headers['Authorization'] = `Bearer ${token}`; }
+
+            const response = await fetch('/api/trade-plans/', { headers });
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
@@ -610,6 +720,41 @@ class SelectPopulatorService {
         }
     }
 
+    /**
+     * מילוי select box עם נתונים קיימים (לא מ-API)
+     * פונקציה ציבורית למילוי select עם נתונים שכבר נטענו
+     * 
+     * @param {string|HTMLElement} selectIdOrElement - ID של ה-select element או האלמנט עצמו
+     * @param {Array} items - מערך של אובייקטים
+     * @param {Object} config - הגדרות: { valueField, textField, includeEmpty, emptyText, defaultValue }
+     * @returns {void}
+     * 
+     * @example
+     * SelectPopulatorService.populateSelectWithData('mySelect', dataArray, {
+     *   valueField: 'id',
+     *   textField: 'name',
+     *   includeEmpty: true,
+     *   emptyText: 'בחר...'
+     * });
+     */
+    static populateSelectWithData(selectIdOrElement, items, config = {}) {
+        const select = typeof selectIdOrElement === 'string' 
+            ? document.getElementById(selectIdOrElement)
+            : selectIdOrElement;
+        if (!select) {
+            console.warn(`⚠️ Select ${selectIdOrElement} לא נמצא`);
+            return;
+        }
+        
+        this._populateSelect(select, items, {
+            valueField: config.valueField || 'id',
+            textField: config.textField || 'name',
+            includeEmpty: config.includeEmpty !== false,
+            emptyText: config.emptyText || 'בחר...',
+            defaultValue: config.defaultValue
+        });
+    }
+
     // ===== PRIVATE HELPER METHOD =====
 
     /**
@@ -626,7 +771,7 @@ class SelectPopulatorService {
         });
         
         // ניקוי האופציות הקיימות
-        select.innerHTML = '';
+        select.textContent = '';
         console.log(`🔍 [SelectPopulatorService._populateSelect] Cleared innerHTML for ${selectId}`);
         
         // הוספת אופציה ריקה אם נדרש
@@ -704,7 +849,11 @@ function populateSelect(selectId, data, field, prefix = '') {
     return;
   }
 
-  select.innerHTML = '<option value="">בחר אובייקט לשיוך...</option>';
+  select.textContent = '';
+  const option = document.createElement('option');
+  option.value = '';
+  option.textContent = 'בחר אובייקט לשיוך...';
+  select.appendChild(option);
 
   if (!data || data.length === 0) {
     const option = document.createElement('option');
@@ -800,7 +949,11 @@ function populateRelatedObjects(relationTypeId, selectedTicker = null, selectEle
   if (!selectElement) {return;}
 
   // ניקוי הרשימה
-  selectElement.innerHTML = '<option value="">בחר אובייקט לשיוך...</option>';
+  selectElement.textContent = '';
+  const option = document.createElement('option');
+  option.value = '';
+  option.textContent = 'בחר אובייקט לשיוך...';
+  selectElement.appendChild(option);
 
   // מילוי לפי סוג השיוך עם סינון לפי טיקר
   switch (relationTypeId) {
@@ -855,7 +1008,11 @@ function populateRelatedObjects(relationTypeId, selectedTicker = null, selectEle
 
   case 4: // טיקר
     // עבור טיקר - הטיקר הוא הבחירה עצמה, לא נמלא את אלמנט הקישור
-    selectElement.innerHTML = '<option value="">לא רלוונטי עבור טיקר</option>';
+    selectElement.textContent = '';
+    const option = document.createElement('option');
+    option.value = '';
+    option.textContent = 'לא רלוונטי עבור טיקר';
+    selectElement.appendChild(option);
     break;
   }
 }
@@ -890,7 +1047,11 @@ function handleRelationTypeChange(selectElement, config) {
         relatedObjectSelect.disabled = true;
         relatedObjectSelect.classList.add('disabled-field');
         relatedObjectSelect.required = false;
-        relatedObjectSelect.innerHTML = '<option value="">לא רלוונטי עבור טיקר</option>';
+        relatedObjectSelect.textContent = '';
+        const option = document.createElement('option');
+        option.value = '';
+        option.textContent = 'לא רלוונטי עבור טיקר';
+        relatedObjectSelect.appendChild(option);
       }
     } else if (relationType === 3 || relationType === 2) {
       // עבור תוכנית/טרייד - הטיקר משמש כפילטר
@@ -933,7 +1094,11 @@ function handleRelationTypeChange(selectElement, config) {
         relatedObjectSelect.disabled = true;
         relatedObjectSelect.classList.add('disabled-field');
         relatedObjectSelect.required = false;
-        relatedObjectSelect.innerHTML = '<option value="">בחר קודם סוג התראה</option>';
+        relatedObjectSelect.textContent = '';
+        const option = document.createElement('option');
+        option.value = '';
+        option.textContent = 'בחר קודם סוג התראה';
+        relatedObjectSelect.appendChild(option);
       }
     }
   }
@@ -1000,7 +1165,11 @@ class AlertConditionPopulator {
         const select = document.getElementById(selectId);
         if (!select) return;
         
-        select.innerHTML = '<option value="">בחר מאפיין</option>';
+        select.textContent = '';
+        const option = document.createElement('option');
+        option.value = '';
+        option.textContent = 'בחר מאפיין';
+        select.appendChild(option);
         
         const attributes = [
             { value: 'price', label: 'מחיר' },
@@ -1022,7 +1191,11 @@ class AlertConditionPopulator {
         const select = document.getElementById(selectId);
         if (!select) return;
         
-        select.innerHTML = '<option value="">בחר אופרטור</option>';
+        select.textContent = '';
+        const option = document.createElement('option');
+        option.value = '';
+        option.textContent = 'בחר אופרטור';
+        select.appendChild(option);
         
         const operators = [
             { value: 'more_than', label: 'יותר מ' },

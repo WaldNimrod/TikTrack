@@ -463,10 +463,21 @@ function generateEntityTypeFilterButton(entityType, options = {}) {
     getOnclickExpression = null,
   } = options;
 
-  // Get icon path from LinkedItemsService or fallback
-  const iconPath = (window.LinkedItemsService && window.LinkedItemsService.getLinkedItemIcon)
-    ? window.LinkedItemsService.getLinkedItemIcon(entityType)
-    : '/trading-ui/images/icons/entities/home.svg';
+  // Get icon path synchronously (use sync fallback - IconSystem is async)
+  // Use sync mapping instead of async getLinkedItemIcon to avoid Promise in template string
+  const iconMappings = {
+    ticker: '/trading-ui/images/icons/entities/tickers.svg',
+    trade: '/trading-ui/images/icons/entities/trades.svg',
+    trade_plan: '/trading-ui/images/icons/entities/trade_plans.svg',
+    execution: '/trading-ui/images/icons/entities/executions.svg',
+    trading_account: '/trading-ui/images/icons/entities/trading_accounts.svg',
+    account: '/trading-ui/images/icons/entities/trading_accounts.svg',
+    alert: '/trading-ui/images/icons/entities/alerts.svg',
+    cash_flow: '/trading-ui/images/icons/entities/cash_flows.svg',
+    note: '/trading-ui/images/icons/entities/notes.svg',
+    position: '/trading-ui/images/icons/entities/trades.svg'
+  };
+  const iconPath = iconMappings[entityType] || '/trading-ui/images/icons/entities/home.svg';
   
   // Get entity label from LinkedItemsService or fallback
   const entityLabel = (window.LinkedItemsService && window.LinkedItemsService.getEntityLabel)

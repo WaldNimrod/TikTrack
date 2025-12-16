@@ -21,8 +21,6 @@ class LocalStorageSync {
         this.eventKey = 'tiktrack_cache_invalidation';
         this.eventCount = 0;
         this.setupListener();
-        
-        console.log('📡 LocalStorage Sync initialized');
     }
 
     /**
@@ -38,11 +36,6 @@ class LocalStorageSync {
                     const data = JSON.parse(event.newValue || '{}');
                     const { keys, timestamp, source } = data;
                     
-                    console.log('📡 LocalStorage: Received cache invalidation from another tab');
-                    console.log(`   Keys: ${keys.join(', ')}`);
-                    console.log(`   Source: ${source || 'unknown'}`);
-                    console.log(`   Time: ${timestamp}`);
-                    
                     // Invalidate cache in this tab
                     await this.handleCacheInvalidation(keys);
                     
@@ -54,7 +47,6 @@ class LocalStorageSync {
             }
         });
         
-        console.log('✅ LocalStorage sync listener active (multi-tab support enabled)');
     }
 
     /**
@@ -63,13 +55,10 @@ class LocalStorageSync {
      */
     async handleCacheInvalidation(keys) {
         try {
-            console.log(`🧹 Invalidating ${keys.length} cache keys from another tab...`);
-            
             // Remove from UnifiedCacheManager
             if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
                 for (const key of keys) {
                     await window.UnifiedCacheManager.remove(key);
-                    console.log(`   ✅ Removed: ${key}`);
                 }
             } else {
                 console.warn('⚠️ UnifiedCacheManager not available');
@@ -108,8 +97,6 @@ class LocalStorageSync {
                 source: source
             };
             
-            console.log(`📡 Broadcasting cache invalidation to other tabs:`, keys);
-            
             // Set in localStorage (triggers 'storage' event in OTHER tabs)
             localStorage.setItem('tiktrack_cache_invalidation', JSON.stringify(eventData));
             
@@ -117,8 +104,6 @@ class LocalStorageSync {
             setTimeout(() => {
                 localStorage.removeItem('tiktrack_cache_invalidation');
             }, 100);
-            
-            console.log('✅ Broadcast complete');
             
         } catch (error) {
             console.error('❌ Error broadcasting to other tabs:', error);
@@ -140,6 +125,4 @@ class LocalStorageSync {
 
 // Global instance
 window.LocalStorageSync = new LocalStorageSync();
-
-console.log('✅ LocalStorage Sync module loaded');
 

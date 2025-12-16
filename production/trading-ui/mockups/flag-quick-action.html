@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flag Quick Action - TikTrack Mockup</title>
+
+    <!-- Bootstrap CSS (חובה ראשון) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css?v=0da3519a_20251102_104906">
+
+    <!-- TikTrack ITCSS Master Styles -->
+    <link rel="stylesheet" href="../styles-new/master.css?v=1.0.0">
+</head>
+<body>
+    <!-- Notification container -->
+    <div class="notification-container" id="notificationContainer"></div>
+    
+
+    <!-- Mockups Navigation -->
+    <div class="mockups-navigation">
+        <div class="mockups-navigation-content">
+            <span class="mockups-navigation-label">📋 ניווט מוקאפים:</span>
+            <a href="watch-lists-page.html" class="mockups-navigation-link">רשימות צפייה</a>
+            <a href="watch-list-modal.html" class="mockups-navigation-link">מודל רשימה</a>
+            <a href="add-ticker-modal.html" class="mockups-navigation-link">הוספת טיקר</a>
+            <a href="flag-quick-action.html" class="mockups-navigation-link active">דגלים</a>
+        </div>
+    </div>
+    <!-- Flag Palette Quick Action -->
+    <div class="flag-palette-popup flag-palette-demo">
+        <div class="flag-palette-header">בחר צבע דגל</div>
+        <div class="flag-palette-colors">
+            <button type="button"
+                    class="flag-color-btn flag-color-btn-lg"
+                    data-color="#26baac"
+                    data-bg-color="#26baac"
+                    title="Trade"
+                    data-onclick="window.WatchListsPage?.setFlag(1, '#26baac')">
+            </button>
+            <button type="button"
+                    class="flag-color-btn"
+                    data-color="#0056b3"
+                    data-bg-color="#0056b3"
+                    title="Trade Plan"
+                    data-onclick="window.WatchListsPage?.setFlag(1, '#0056b3')">
+            </button>
+            <button type="button"
+                    class="flag-color-btn"
+                    data-color="#28a745"
+                    data-bg-color="#28a745"
+                    title="Account"
+                    data-onclick="window.WatchListsPage?.setFlag(1, '#28a745')">
+            </button>
+            <button type="button"
+                    class="flag-color-btn"
+                    data-color="#20c997"
+                    data-bg-color="#20c997"
+                    title="Cash Flow"
+                    data-onclick="window.WatchListsPage?.setFlag(1, '#20c997')">
+            </button>
+            <button type="button"
+                    class="flag-color-btn"
+                    data-color="#dc3545"
+                    data-bg-color="#dc3545"
+                    title="Ticker"
+                    data-onclick="window.WatchListsPage?.setFlag(1, '#dc3545')">
+            </button>
+            <button type="button"
+                    class="flag-color-btn active"
+                    data-color="#fc5a06"
+                    data-bg-color="#fc5a06"
+                    title="Alert"
+                    data-onclick="window.WatchListsPage?.setFlag(1, '#fc5a06')">
+            </button>
+            <button type="button"
+                    class="flag-color-btn"
+                    data-color="#6f42c1"
+                    data-bg-color="#6f42c1"
+                    title="Note"
+                    data-onclick="window.WatchListsPage?.setFlag(1, '#6f42c1')">
+            </button>
+            <button type="button"
+                    class="flag-color-btn"
+                    data-color="#17a2b8"
+                    data-bg-color="#17a2b8"
+                    title="Execution"
+                    data-onclick="window.WatchListsPage?.setFlag(1, '#17a2b8')">
+            </button>
+        </div>
+        <div class="flag-palette-footer">
+            <button type="button"
+                    class="btn btn-sm btn-secondary w-100"
+                    data-onclick="window.WatchListsPage?.removeFlag(1)">
+                הסר דגל
+            </button>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Core Systems (Must load first) -->
+    <script src="../scripts/logger-service.js?v=1.0.0"></script>
+    <script src="../scripts/button-icons.js?v=1.0.0"></script>
+
+    <!-- Package Manifest & Configs -->
+    <script src="../scripts/init-system/package-manifest.js?v=1.0.0"></script>
+    <script src="../scripts/page-initialization-configs.js?v=1.0.0"></script>
+
+    <!-- Cache System -->
+    <script src="../scripts/unified-cache-manager.js?v=1.0.0"></script>
+
+    <!-- Icon System -->
+    <script src="../scripts/icon-mappings.js?v=1.0.0"></script>
+    <script src="../scripts/icon-system.js?v=1.0.0"></script>
+
+    <!-- Notification System -->
+    <script src="../scripts/notification-system.js?v=1.0.0"></script>
+
+    <!-- Watch Lists Services -->
+    <script src="../scripts/services/watch-lists-data.js?v=1.0.0"></script>
+    <script src="../scripts/services/watch-lists-ui-service.js?v=1.0.0"></script>
+
+    <!-- Page-specific script -->
+    <script src="../scripts/flag-quick-action.js?v=1.0.0" defer></script>
+</body>
+</html>
+

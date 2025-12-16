@@ -7,6 +7,93 @@
  * Documentation: See documentation/frontend/JAVASCRIPT_ARCHITECTURE.md
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - initializeSeriesControls() - Initializeseriescontrols
+// - initializeHeader() - Initializeheader
+// - createStrategyCategories() - Createstrategycategories
+// - initStrategyPerformanceChart() - Initstrategyperformancechart
+// - initializeRecordFilterTags() - Initializerecordfiltertags
+// - initializeComparisonTags() - Initializecomparisontags
+// - initializePage() - Initializepage
+// - setupEventListeners() - Setupeventlisteners
+
+// === Event Handlers ===
+// - getComparisonParameterValues() - Getcomparisonparametervalues
+// - selectDateRangeOption() - Selectdaterangeoption
+// - handleCustomDateFromChange() - Handlecustomdatefromchange
+// - handleCustomDateToChange() - Handlecustomdatetochange
+// - selectStatusOption() - Selectstatusoption
+// - toggleComparisonParameter() - Togglecomparisonparameter
+// - applyComparisonParameters() - Applycomparisonparameters
+// - resetComparisonParameters() - Resetcomparisonparameters
+// - resetComparisonParametersToDefaults() - Resetcomparisonparameterstodefaults
+// - selectAllOptions() - Selectalloptions
+// - clearAllOptions() - Clearalloptions
+// - generateMockStrategyComparisonTableData() - Generatemockstrategycomparisontabledata
+// - formatComparisonInfo() - Formatcomparisoninfo
+// - updateStrategyComparisonTable() - Updatestrategycomparisontable
+// - updateAllVisualizations() - Updateallvisualizations
+// - saveComparisonParameterState() - Savecomparisonparameterstate
+// - loadComparisonParameterState() - Loadcomparisonparameterstate
+// - replaceStrategyActionButtons() - Replacestrategyactionbuttons
+
+// === UI Functions ===
+// - updateDateRangeFilterText() - Updatedaterangefiltertext
+// - updateStatusFilterText() - Updatestatusfiltertext
+// - renderTagsBadges() - Rendertagsbadges
+// - updateStrategyListTable() - Updatestrategylisttable
+// - updateHeatmap() - Updateheatmap
+// - updateVisualHeatmap() - Updatevisualheatmap
+// - updateChartLegend() - Updatechartlegend
+// - updateStrategyPerformanceChart() - Updatestrategyperformancechart
+// - updateStrategyInsights() - Updatestrategyinsights
+
+// === Data Functions ===
+// - getCSSVariableValue() - Getcssvariablevalue
+// - saveSeriesVisibilityState() - Saveseriesvisibilitystate
+// - loadSeriesVisibilityState() - Loadseriesvisibilitystate
+// - getRecordFilterValues() - Getrecordfiltervalues
+// - getFilterValues() - Getfiltervalues
+// - getDateRange() - Getdaterange
+// - generateMockSeriesData() - Generatemockseriesdata
+// - generateMockHeatmapData() - Generatemockheatmapdata
+// - getColorClass() - Getcolorclass
+// - getColorStyle() - Getcolorstyle
+// - saveRecordFilterState() - Saverecordfilterstate
+// - savePageState() - Savepagestate
+// - loadRecordFilterState() - Loadrecordfilterstate
+// - loadTradingAccounts() - Loadtradingaccounts
+// - loadTradingMethods() - Loadtradingmethods
+// - loadTickers() - Loadtickers
+// - getPercentile() - Getpercentile
+// - getPLPercentile() - Getplpercentile
+// - getAvgPLPercentile() - Getavgplpercentile
+// - getValuePercentile() - Getvaluepercentile
+
+// === Utility Functions ===
+// - formatCurrency() - Formatcurrency
+// - formatPLWithPercent() - Formatplwithpercent
+// - formatInvestmentWithPercent() - Formatinvestmentwithpercent
+// - formatFilterInfo() - Formatfilterinfo
+// - formatDate() - Formatdate
+
+// === Other ===
+// - toggleSeries() - Toggleseries
+// - ensureUnifiedCacheManagerReady() - Ensureunifiedcachemanagerready
+// - waitForTradingViewAdapter() - Waitfortradingviewadapter
+// - toggleDateRangeFilterMenu() - Toggledaterangefiltermenu
+// - toggleStatusFilterMenu() - Togglestatusfiltermenu
+// - applyRecordFilters() - Applyrecordfilters
+// - resetRecordFilters() - Resetrecordfilters
+// - resetRecordFiltersToDefaults() - Resetrecordfilterstodefaults
+// - generateMockTagsForCategory() - Generatemocktagsforcategory
+// - cartesianProduct() - Cartesianproduct
+// - seededRandom() - Seededrandom
+// - restorePageState() - Restorepagestate
+
 (function() {
     'use strict';
 
@@ -20,48 +107,21 @@ function getCSSVariableValue(variableName, fallback) {
     }
 }
 
-// Get entity color dynamically from system
-function getEntityColor(entityType) {
-    // Try to use color-scheme-system if available
-    if (window.getEntityColor && typeof window.getEntityColor === 'function') {
-        const color = window.getEntityColor(entityType);
-        if (color) return color;
-    }
-    
-    // Try CSS variable
-    const cssVar = getCSSVariableValue(`--entity-${entityType.replace('_', '-')}-color`, '');
-    if (cssVar) return cssVar;
-    
-    // Fallback to default entity colors from color-scheme-system
-    const defaultColors = {
-        'trade': '#26baac',
-        'trade_plan': '#28a745',
-        'execution': '#17a2b8',
-        'account': '#6f42c1',
-        'trading_account': '#28a745',
-        'cash_flow': '#fd7e14',
-        'ticker': '#20c997',
-        'alert': '#dc3545',
-        'note': '#6c757d',
-        'constraint': '#e83e8c',
-        'design': '#6f42c1',
-        'research': '#17a2b8',
-        'preference': '#adb5bd',
-        'development': '#fc5a06',
-        'position': '#0d6efd',
-        'strategy': '#6f42c1'
-    };
-    
-    return defaultColors[entityType] || getCSSVariableValue('--primary-color', '#26baac');
-}
+// ⚠️ REMOVED: Local getEntityColor() function - use centralized Color Scheme System
+// Use window.getEntityColor() directly instead
+// All hardcoded fallbacks removed - system must load colors from preferences
 
 // Initialize series checkboxes UI
 function initializeSeriesControls() {
     const container = document.getElementById('series-checkboxes-container');
     if (!container) return;
     
-    container.innerHTML = AVAILABLE_SERIES.map(series => {
-        const color = getEntityColor(series.entityType);
+    // Build checkboxes HTML and insert using tempDiv
+    const checkboxesHTML = AVAILABLE_SERIES.map(series => {
+        // Use centralized Color Scheme System directly - no local function
+        const color = (typeof window.getEntityColor === 'function') 
+            ? window.getEntityColor(series.entityType) 
+            : '';
         const isChecked = seriesVisibility[series.key] !== false; // Default true
         return `
             <div class="series-checkbox-container">
@@ -74,9 +134,19 @@ function initializeSeriesControls() {
                     <div class="series-color-indicator" style="background-color: ${color};"></div>
                     <span class="form-label-small">${series.label}</span>
                 </label>
-            </div>
-        `;
+                </div>
+            `;
     }).join('');
+    
+    // Insert using DOMParser
+    container.textContent = '';
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(checkboxesHTML, 'text/html');
+    const fragment = document.createDocumentFragment();
+    doc.body.querySelectorAll('.series-checkbox-container').forEach(checkbox => {
+        fragment.appendChild(checkbox);
+    });
+    container.appendChild(fragment);
 }
 
 // Toggle series visibility
@@ -86,9 +156,40 @@ function toggleSeries(seriesKey, visible) {
     updateStrategyPerformanceChart(getFilterValues());
 }
 
+// Helper: ensure UnifiedCacheManager זמין ו מאותחל
+async function ensureUnifiedCacheManagerReady() {
+    // אם כבר מאותחל - לצאת מהר
+    if (window.UnifiedCacheManager?.initialized || window.UnifiedCacheManager?.isInitialized?.()) {
+        return true;
+    }
+    // נסיון לאתחל אם יש initialize
+    if (typeof window.UnifiedCacheManager?.initialize === 'function') {
+        try {
+            await window.UnifiedCacheManager.initialize();
+            return window.UnifiedCacheManager.initialized === true;
+        } catch (e) {
+            if (window.Logger) {
+                window.Logger.warn('UnifiedCacheManager initialize failed (strategy-analysis), continuing without cache', { error: e });
+            }
+        }
+    }
+    // נסיון טעינת סקריפט אם לא נטען
+    if (!window.UnifiedCacheManager && typeof window.loadScriptOnce === 'function') {
+        try {
+            await window.loadScriptOnce('/scripts/unified-cache-manager.js');
+        } catch (e) {
+            if (window.Logger) {
+                window.Logger.warn('UnifiedCacheManager script load failed (strategy-analysis)', { error: e });
+            }
+        }
+    }
+    return !!window.UnifiedCacheManager;
+}
+
 // Save series visibility state using UnifiedCacheManager
 async function saveSeriesVisibilityState() {
     try {
+        await ensureUnifiedCacheManagerReady();
         if (window.UnifiedCacheManager && (window.UnifiedCacheManager.initialized || window.UnifiedCacheManager.isInitialized?.())) {
             await window.UnifiedCacheManager.save(CACHE_KEY_SERIES_VISIBILITY, seriesVisibility, {
                 layer: 'localStorage',
@@ -110,6 +211,7 @@ async function saveSeriesVisibilityState() {
 // Load series visibility state using UnifiedCacheManager
 async function loadSeriesVisibilityState() {
     try {
+        await ensureUnifiedCacheManagerReady();
         if (window.UnifiedCacheManager && (window.UnifiedCacheManager.initialized || window.UnifiedCacheManager.isInitialized?.())) {
             const savedState = await window.UnifiedCacheManager.get(CACHE_KEY_SERIES_VISIBILITY);
             if (savedState && typeof savedState === 'object') {
@@ -177,17 +279,25 @@ async function waitForTradingViewAdapter() {
     }
     
     if (typeof window.TradingViewChartAdapter === 'undefined') {
-        if (window.Logger) {
+        const errorMsg = 'TradingViewChartAdapter not loaded';
+        if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {
+            window.NotificationSystem.showError('שגיאה בטעינת גרפים', 
+                'ספריית TradingView לא נטענה. נא לרענן את העמוד.');
+        } else if (window.Logger) {
             window.Logger.error('❌ TradingViewChartAdapter not available', { page: 'strategy-analysis-page', timeout: maxRetries * 50 });
         }
-        throw new Error('TradingViewChartAdapter not loaded');
+        throw new Error(errorMsg);
     }
     
     if (typeof window.LightweightCharts === 'undefined' && typeof window.lightweightCharts === 'undefined') {
-        if (window.Logger) {
+        const errorMsg = 'LightweightCharts not loaded';
+        if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {
+            window.NotificationSystem.showError('שגיאה בטעינת גרפים', 
+                'ספריית LightweightCharts לא נטענה. נא לרענן את העמוד.');
+        } else if (window.Logger) {
             window.Logger.error('❌ LightweightCharts not available', { page: 'strategy-analysis-page', timeout: maxRetries * 50 });
         }
-        throw new Error('LightweightCharts not loaded');
+        throw new Error(errorMsg);
     }
     
     if (window.Logger) {
@@ -476,11 +586,13 @@ function selectDateRangeOption(dateRange) {
     // Clear custom date inputs when preset is selected
     const fromInput = document.getElementById('customDateFrom');
     const toInput = document.getElementById('customDateTo');
-    if (fromInput) {
-        fromInput.value = '';
-    }
-    if (toInput) {
-        toInput.value = '';
+    // Use DataCollectionService to clear fields if available
+    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+      if (fromInput) window.DataCollectionService.setValue(fromInput.id, '', 'dateOnly');
+      if (toInput) window.DataCollectionService.setValue(toInput.id, '', 'dateOnly');
+    } else {
+      if (fromInput) fromInput.value = '';
+      if (toInput) toInput.value = '';
     }
     
     updateDateRangeFilterText();
@@ -682,12 +794,9 @@ async function resetRecordFiltersToDefaults() {
                 }
             } else if (window.currentPreferences?.default_trading_account) {
                 defaultAccountId = parseInt(window.currentPreferences.default_trading_account);
-            } else if (typeof window.getPreference === 'function') {
-                const prefValue = await window.getPreference('default_trading_account');
-                if (prefValue) {
-                    defaultAccountId = parseInt(prefValue);
-                }
             }
+            // NOTE: Removed fallback to window.getPreference to prevent recursion
+            // window.getPreference just calls PreferencesCore.getPreference again, causing recursion
         } catch (error) {
             if (window.Logger) {
                 window.Logger.warn('Failed to get default trading account from preferences, using first account', { page: 'strategy-analysis-page', error });
@@ -761,7 +870,12 @@ function toggleComparisonParameter(paramType) {
             if (select.multiple) {
                 Array.from(select.options).forEach(opt => opt.selected = false);
             } else {
-                select.value = '';
+                // Use DataCollectionService to clear field if available
+                if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+                  window.DataCollectionService.setValue(select.id, '', 'text');
+                } else {
+                  select.value = '';
+                }
             }
         }
         
@@ -1527,7 +1641,14 @@ function updateStrategyComparisonTable(filters) {
         '<th class="text-end">מקס בנקודה</th>' +
         '<th class="text-end">סה"כ קניות</th>';
     
-    thead.innerHTML = headerHTML;
+    // Insert header using DOMParser
+    thead.textContent = '';
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(headerHTML, 'text/html');
+    const row = doc.body.querySelector('tr');
+    if (row) {
+        thead.appendChild(row);
+    }
     
     // Calculate colspan for summary and info rows
     const summaryColspan = paramHeaders.length + 6; // param columns + 6 data columns
@@ -1637,7 +1758,13 @@ function updateStrategyComparisonTable(filters) {
             </tr>
         `;
         
-        tbody.innerHTML = dataRows + summaryRow;
+        // Insert rows using DOMParser
+        tbody.textContent = '';
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(dataRows + summaryRow, 'text/html');
+        doc.body.querySelectorAll('tr').forEach(row => {
+            tbody.appendChild(row);
+        });
         
         // Fade in
         tbody.style.opacity = '1';
@@ -1652,12 +1779,22 @@ function updateStrategyComparisonTable(filters) {
         summary.style.transition = 'opacity 0.3s';
         summary.style.opacity = '0';
         setTimeout(() => {
-            summary.innerHTML = `
+            // Note: This is a mockup page summary display, not a standard summary element
+            // Consider using InfoSummarySystem if this page becomes production-ready
+            summary.textContent = '';
+        // Convert HTML string to DOM elements safely
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(`
                 <strong>סיכום:</strong>
                 סה"כ קטגוריות: ${totalCategories} |
                 סה"כ טריידים: ${totalTrades} |
                 P/L כולל: ${formatCurrency(totalPL)}
-            `;
+            `, 'text/html');
+        const fragment = document.createDocumentFragment();
+        Array.from(doc.body.childNodes).forEach(node => {
+            fragment.appendChild(node.cloneNode(true));
+        });
+        summary.appendChild(fragment);
             summary.style.opacity = '1';
         }, 150);
     }
@@ -1668,7 +1805,11 @@ function updateStrategyComparisonTable(filters) {
         filterInfo.style.opacity = '0';
         setTimeout(() => {
             const filterText = formatFilterInfo(filters.recordFilters);
-            filterInfo.innerHTML = `<strong>פרמטרי סינון:</strong> ${filterText}`;
+            filterInfo.textContent = '';
+            const strong = document.createElement('strong');
+            strong.textContent = 'פרמטרי סינון: ';
+            filterInfo.appendChild(strong);
+            filterInfo.appendChild(document.createTextNode(filterText));
             filterInfo.style.opacity = '1';
         }, 150);
     }
@@ -1679,10 +1820,62 @@ function updateStrategyComparisonTable(filters) {
         comparisonInfo.style.opacity = '0';
         setTimeout(() => {
             const comparisonText = formatComparisonInfo(filters.comparisonParameters);
-            comparisonInfo.innerHTML = `<strong>פרמטרי השוואה:</strong> ${comparisonText}`;
+            comparisonInfo.textContent = '';
+            const strong = document.createElement('strong');
+            strong.textContent = 'פרמטרי השוואה: ';
+            comparisonInfo.appendChild(strong);
+            comparisonInfo.appendChild(document.createTextNode(comparisonText));
             comparisonInfo.style.opacity = '1';
         }, 150);
     }
+}
+
+// Update strategy list table
+function updateStrategyListTable(strategyData) {
+    const tbody = document.getElementById('strategy-list-table-body');
+    if (!tbody) return;
+    
+    if (!strategyData || strategyData.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">אין נתונים להצגה</td></tr>';
+        return;
+    }
+    
+    // Build table rows using FieldRendererService
+    const rowsHTML = strategyData.map(strategy => {
+        // Use FieldRendererService for P/L
+        const totalPLDisplay = window.FieldRendererService && typeof window.FieldRendererService.renderAmount === 'function'
+            ? window.FieldRendererService.renderAmount(strategy.totalPL || 0, '$', 0, true)
+            : `<span class="${strategy.totalPL >= 0 ? 'text-success' : 'text-danger'}">$${Math.abs(strategy.totalPL || 0).toLocaleString()}</span>`;
+        
+        // Build strategy name from paramValues if available
+        const strategyName = strategy.name || Object.values(strategy.paramValues || {}).join(' + ') || 'אסטרטגיה ללא שם';
+        const strategyDescription = strategy.description || 'אין תיאור';
+        
+        // Actions menu
+        const actionsMenu = window.createActionsMenu && typeof window.createActionsMenu === 'function'
+            ? window.createActionsMenu([
+                { type: 'EDIT', onclick: `window.editStrategy && window.editStrategy('${strategyName.replace(/'/g, "\\'")}')`, title: `ערוך אסטרטגיה: ${strategyName}` },
+                { type: 'DELETE', onclick: `window.deleteStrategy && window.deleteStrategy('${strategyName.replace(/'/g, "\\'")}')`, title: `מחק אסטרטגיה: ${strategyName}` }
+            ])
+            : `<button class="btn btn-sm btn-outline-primary" data-button-type="EDIT" title="ערוך אסטרטגיה: ${strategyName}">ערוך</button> <button class="btn btn-sm btn-outline-danger" data-button-type="DELETE" title="מחק אסטרטגיה: ${strategyName}">מחק</button>`;
+        
+        return `
+            <tr>
+                <td><strong>${strategyName}</strong></td>
+                <td>${strategyDescription}</td>
+                <td>${strategy.trades || 0}</td>
+                <td>${totalPLDisplay}</td>
+                <td>${strategy.successRate || 0}%</td>
+                <td class="actions-cell" data-strategy-name="${strategyName.replace(/"/g, '&quot;')}">${actionsMenu}</td>
+            </tr>
+        `;
+    }).join('');
+    
+    // Update table body
+    tbody.innerHTML = rowsHTML;
+    
+    // Replace action buttons with actions menu if needed
+    replaceStrategyActionButtons();
 }
 
 // Update heatmap
@@ -1692,7 +1885,9 @@ function updateHeatmap(filters) {
     
     if (!tbody) return;
     
-    tbody.innerHTML = data.map((item, index) => {
+    tbody.textContent = '';
+    const parser = new DOMParser();
+    data.forEach((item, index) => {
         // Calculate percentages for investment values
         const totalMaxInvestment = data.reduce((sum, it) => sum + (it.maxInvestmentAtPoint || 0), 0);
         const totalTotalPurchases = data.reduce((sum, it) => sum + (it.totalPurchases || 0), 0);
@@ -1708,7 +1903,7 @@ function updateHeatmap(filters) {
             ? ((item.totalPL / item.totalInvestment) * 100) 
             : null;
         
-        return `
+        const rowHTML = `
         <tr class="heatmap-row" data-category="${item.category}" data-index="${index}">
             <td><strong>${item.category}</strong></td>
             <td style="${getColorStyle(item.tradesPercentile, item.trades)}" data-value="${item.trades}">${item.trades}</td>
@@ -1719,7 +1914,12 @@ function updateHeatmap(filters) {
             <td class="text-end" style="${getColorStyle(item.totalPurchasesPercentile, item.totalPurchases || 0)}" data-value="${item.totalPurchases || 0}">${formatInvestmentWithPercent(item.totalPurchases || 0, totalPurchasesPercent)}</td>
         </tr>
     `;
-    }).join('');
+        const doc = parser.parseFromString(rowHTML, 'text/html');
+        const row = doc.body.querySelector('tr');
+        if (row) {
+            tbody.appendChild(row);
+        }
+    });
     
     // Add hover effects
     tbody.querySelectorAll('.heatmap-row').forEach(row => {
@@ -1788,7 +1988,7 @@ function updateVisualHeatmap(filters) {
     }
     
     // Clear grid
-    grid.innerHTML = '';
+    grid.textContent = '';
     
     // Create cells
     sortedData.forEach((item, index) => {
@@ -1829,11 +2029,22 @@ function updateVisualHeatmap(filters) {
             formattedValue = value.toString();
         }
         
-        cell.innerHTML = `
-            <div class="heatmap-cell-label">${item.category}</div>
-            <div class="heatmap-cell-value">${formattedValue}</div>
-            ${currentSortBy === 'totalPL' ? `<div class="heatmap-cell-percent">${item.successRate}% הצלחה</div>` : ''}
-        `;
+        const labelDiv = document.createElement('div');
+        labelDiv.className = 'heatmap-cell-label';
+        labelDiv.textContent = item.category;
+        cell.appendChild(labelDiv);
+        
+        const valueDiv = document.createElement('div');
+        valueDiv.className = 'heatmap-cell-value';
+        valueDiv.textContent = formattedValue;
+        cell.appendChild(valueDiv);
+        
+        if (currentSortBy === 'totalPL') {
+            const percentDiv = document.createElement('div');
+            percentDiv.className = 'heatmap-cell-percent';
+            percentDiv.textContent = `${item.successRate}% הצלחה`;
+            cell.appendChild(percentDiv);
+        }
         
         grid.appendChild(cell);
     });
@@ -1854,15 +2065,25 @@ async function initStrategyPerformanceChart() {
         
         const container = document.getElementById('strategy-performance-chart-container');
         if (!container) {
+            // Silent error - container might not exist in some views
             if (window.Logger) {
-                window.Logger.error('Strategy performance chart container not found', { page: 'strategy-analysis-page' });
+                window.Logger.warn('Strategy performance chart container not found', { page: 'strategy-analysis-page' });
             }
             return;
         }
         
         // Get wrapper for width calculation (if exists)
         const wrapper = container.closest('.chart-container-wrapper') || container.parentElement;
-        const containerWidth = wrapper ? wrapper.clientWidth : container.clientWidth;
+        const containerWidth = wrapper ? wrapper.clientWidth : (container.clientWidth || container.offsetWidth || 800);
+        const containerHeight = container.clientHeight || container.offsetHeight || window.innerHeight * 0.5;
+        
+        if (containerWidth === 0 || containerHeight === 0) {
+            if (window.Logger) {
+                window.Logger.warn('Strategy performance chart container has zero dimensions, waiting...', { page: 'strategy-analysis-page' });
+            }
+            setTimeout(() => initStrategyPerformanceChart(), 100);
+            return;
+        }
         
         // Remove loading indicator
         const loading = container.querySelector('.chart-loading');
@@ -1896,7 +2117,7 @@ async function initStrategyPerformanceChart() {
                 horzLines: { visible: true, color: getCSSVariableValue('--border-color', '#e0e0e0') }
             },
             width: containerWidth,
-            height: 300,
+            height: containerHeight,
             timeScale: {
                 visible: true,
                 timeVisible: true,
@@ -1932,9 +2153,10 @@ async function initStrategyPerformanceChart() {
                 } catch (e) {
                     // Silently ignore errors when removing series (series might already be removed)
                     // Only log if it's not a common "series not found" error
-                    if (e.message && !e.message.includes('undefined') && !e.message.includes('not found')) {
+                    const errorMessage = e?.message || (typeof e === 'string' ? e : String(e));
+                    if (errorMessage && typeof errorMessage === 'string' && !errorMessage.includes('undefined') && !errorMessage.includes('not found')) {
                         if (window.Logger) {
-                            window.Logger.warn('Error removing series', { page: 'strategy-analysis-page', error: e.message });
+                            window.Logger.warn('Error removing series', { page: 'strategy-analysis-page', error: errorMessage });
                         }
                     }
                 }
@@ -1955,7 +2177,10 @@ async function initStrategyPerformanceChart() {
                         categories = seriesData.categories;
                     }
                     
-                    const color = getEntityColor(seriesConfig.entityType);
+                    // Use centralized Color Scheme System directly - no local function
+                    const color = (typeof window.getEntityColor === 'function') 
+                        ? window.getEntityColor(seriesConfig.entityType) 
+                        : '';
                     const series = strategyPerformanceChart.addSeries(lightweightCharts.HistogramSeries, {
                         color: color,
                         priceFormat: {
@@ -1980,7 +2205,10 @@ async function initStrategyPerformanceChart() {
                         categories = seriesData.categories;
                     }
                     
-                    const color = getEntityColor(seriesConfig.entityType);
+                    // Use centralized Color Scheme System directly - no local function
+                    const color = (typeof window.getEntityColor === 'function') 
+                        ? window.getEntityColor(seriesConfig.entityType) 
+                        : '';
                     const series = window.TradingViewChartAdapter.addAreaSeries(strategyPerformanceChart, {
                         lineColor: color,
                         topColor: color,
@@ -2043,14 +2271,39 @@ async function initStrategyPerformanceChart() {
         }
         
     } catch (error) {
-        if (window.Logger) {
+        const errorMsg = error?.message || (typeof error === 'string' ? error : String(error));
+        if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {
+            window.NotificationSystem.showError('שגיאה בטעינת גרף ביצועי אסטרטגיות', 
+                `לא ניתן לטעון את הגרף. ${errorMsg}`);
+        } else if (window.Logger) {
             window.Logger.error('Error initializing strategy performance chart', { page: 'strategy-analysis-page', error });
         }
         const container = document.getElementById('strategy-performance-chart-container');
         if (container) {
             const loading = container.querySelector('.chart-loading');
             if (loading) {
-                loading.innerHTML = '<img src="../../images/icons/tabler/alert-triangle.svg" width="16" height="16" alt="alert-triangle" class="icon"> שגיאה בטעינת גרף';
+                // Use IconSystem if available
+                let alertIcon = '';
+                if (window.IconSystem && typeof window.IconSystem.renderIcon === 'function') {
+                  alertIcon = await window.IconSystem.renderIcon('tabler', 'alert-triangle', { size: '16', alt: 'alert-triangle', class: 'icon' });
+                } else {
+                  alertIcon = '<img src="../../images/icons/tabler/alert-triangle.svg" width="16" height="16" alt="alert-triangle" class="icon">';
+                }
+                if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {
+                    try {
+                        alertIcon = await window.IconSystem.renderIcon('button', 'alert-triangle', { size: '16', alt: 'alert-triangle', class: 'icon' });
+                    } catch (error) {
+                        // Fallback already set
+                    }
+                }
+                loading.textContent = '';
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(alertIcon, 'text/html');
+                const iconElement = doc.body.firstElementChild;
+                if (iconElement) {
+                    loading.appendChild(iconElement);
+                }
+                loading.appendChild(document.createTextNode(' שגיאה בטעינת גרף'));
                 loading.style.color = '#dc3545';
             }
         }
@@ -2067,7 +2320,10 @@ function updateChartLegend() {
     // Add legend item for each visible series
     AVAILABLE_SERIES.forEach(seriesConfig => {
         if (seriesVisibility[seriesConfig.key] !== false && chartSeries[seriesConfig.key]) {
-            const color = getEntityColor(seriesConfig.entityType);
+            // Use centralized Color Scheme System directly - no local function
+            const color = (typeof window.getEntityColor === 'function') 
+                ? window.getEntityColor(seriesConfig.entityType) 
+                : '';
             legendItems.push(`
                 <div class="series-checkbox-container">
                     <div class="series-legend-color" style="background-color: ${color};"></div>
@@ -2077,7 +2333,15 @@ function updateChartLegend() {
         }
     });
     
-    legend.innerHTML = legendItems.join('');
+    legend.textContent = '';
+    const parser = new DOMParser();
+    legendItems.forEach(itemHTML => {
+        const doc = parser.parseFromString(itemHTML, 'text/html');
+        const item = doc.body.firstElementChild;
+        if (item) {
+            legend.appendChild(item);
+        }
+    });
 }
 
 // Update Strategy Performance Chart
@@ -2105,9 +2369,10 @@ async function updateStrategyPerformanceChart(filters) {
                 } catch (e) {
                     // Silently ignore errors when removing series (series might already be removed)
                     // Only log if it's not a common "series not found" error
-                    if (e.message && !e.message.includes('undefined') && !e.message.includes('not found')) {
+                    const errorMessage = e?.message || (typeof e === 'string' ? e : String(e));
+                    if (errorMessage && typeof errorMessage === 'string' && !errorMessage.includes('undefined') && !errorMessage.includes('not found')) {
                         if (window.Logger) {
-                            window.Logger.warn('Error removing series', { page: 'strategy-analysis-page', error: e.message });
+                            window.Logger.warn('Error removing series', { page: 'strategy-analysis-page', error: errorMessage });
                         }
                     }
                 }
@@ -2128,7 +2393,10 @@ async function updateStrategyPerformanceChart(filters) {
                         categories = seriesData.categories;
                     }
                     
-                    const color = getEntityColor(seriesConfig.entityType);
+                    // Use centralized Color Scheme System directly - no local function
+                    const color = (typeof window.getEntityColor === 'function') 
+                        ? window.getEntityColor(seriesConfig.entityType) 
+                        : '';
                     const series = strategyPerformanceChart.addSeries(lightweightCharts.HistogramSeries, {
                         color: color,
                         priceFormat: {
@@ -2153,7 +2421,10 @@ async function updateStrategyPerformanceChart(filters) {
                         categories = seriesData.categories;
                     }
                     
-                    const color = getEntityColor(seriesConfig.entityType);
+                    // Use centralized Color Scheme System directly - no local function
+                    const color = (typeof window.getEntityColor === 'function') 
+                        ? window.getEntityColor(seriesConfig.entityType) 
+                        : '';
                     const series = window.TradingViewChartAdapter.addAreaSeries(strategyPerformanceChart, {
                         lineColor: color,
                         topColor: color,
@@ -2205,7 +2476,11 @@ async function updateStrategyPerformanceChart(filters) {
         strategyPerformanceChart.timeScale().fitContent();
         
     } catch (error) {
-        if (window.Logger) {
+        const errorMsg = error?.message || (typeof error === 'string' ? error : 'שגיאה לא ידועה');
+        if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {
+            window.NotificationSystem.showError('שגיאה בעדכון גרף ביצועי אסטרטגיות', 
+                `לא ניתן לעדכן את הגרף. ${errorMsg}`);
+        } else if (window.Logger) {
             window.Logger.error('Error updating strategy performance chart', { page: 'strategy-analysis-page', error });
         }
     }
@@ -2214,6 +2489,20 @@ async function updateStrategyPerformanceChart(filters) {
 // Update all visualizations
 async function updateAllVisualizations() {
     const filters = getFilterValues();
+    
+    // Get strategy data for InfoSummarySystem
+    const strategyData = generateMockStrategyComparisonTableData(filters).data;
+    
+    // Update InfoSummarySystem if available
+    if (window.InfoSummarySystem && window.INFO_SUMMARY_CONFIGS && window.INFO_SUMMARY_CONFIGS['strategy-analysis']) {
+        try {
+            await window.InfoSummarySystem.calculateAndRender(strategyData, window.INFO_SUMMARY_CONFIGS['strategy-analysis']);
+        } catch (error) {
+            if (window.Logger) {
+                window.Logger.warn('Error updating InfoSummarySystem', { error, page: 'strategy-analysis-page' });
+            }
+        }
+    }
     
     // Update table
     updateStrategyComparisonTable(filters);
@@ -2228,11 +2517,14 @@ async function updateAllVisualizations() {
     await updateStrategyPerformanceChart(filters);
     
     // Update insights
-    updateStrategyInsights(filters);
+    await updateStrategyInsights(filters);
+    
+    // Update strategy list table
+    updateStrategyListTable(strategyData);
 }
 
 // Update strategy insights
-function updateStrategyInsights(filters) {
+async function updateStrategyInsights(filters) {
     const data = generateMockStrategyComparisonTableData(filters).data;
     
     if (data.length === 0) {
@@ -2240,9 +2532,55 @@ function updateStrategyInsights(filters) {
         const bestSuccessRate = document.getElementById('best-success-rate-insight');
         const recommendation = document.getElementById('recommendation-insight');
         
-        if (bestStrategy) bestStrategy.innerHTML = '<img src="../../images/icons/tabler/note.svg" width="16" height="16" alt="icon" class="icon"><strong>אסטרטגיה הטובה ביותר:</strong> אין נתונים';
-        if (bestSuccessRate) bestSuccessRate.innerHTML = '<img src="../../images/icons/tabler/note.svg" width="16" height="16" alt="info-circle" class="icon"><strong>אחוז הצלחה הגבוה ביותר:</strong> אין נתונים';
-        if (recommendation) recommendation.innerHTML = '<img src="../../images/icons/tabler/alert-triangle.svg" width="16" height="16" alt="alert-triangle" class="icon"><strong>המלצה:</strong> אין נתונים להצגה';
+        // Use IconSystem if available
+        let noteIcon = '';
+        if (window.IconSystem && typeof window.IconSystem.renderIcon === 'function') {
+          noteIcon = await window.IconSystem.renderIcon('tabler', 'note', { size: '16', alt: 'icon', class: 'icon' });
+        } else {
+          noteIcon = '<img src="../../images/icons/tabler/note.svg" width="16" height="16" alt="icon" class="icon">';
+        }
+        let alertIcon = '<img src="../../images/icons/tabler/alert-triangle.svg" width="16" height="16" alt="alert-triangle" class="icon">';
+        if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {
+            try {
+                noteIcon = await window.IconSystem.renderIcon('button', 'note', { size: '16', alt: 'icon', class: 'icon' });
+                alertIcon = await window.IconSystem.renderIcon('button', 'alert-triangle', { size: '16', alt: 'alert-triangle', class: 'icon' });
+            } catch (error) {
+                // Fallback already set
+            }
+        }
+        if (bestStrategy) {
+            bestStrategy.textContent = '';
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(noteIcon, 'text/html');
+            const iconElement = doc.body.firstElementChild;
+            if (iconElement) bestStrategy.appendChild(iconElement);
+            const strong = document.createElement('strong');
+            strong.textContent = 'אסטרטגיה הטובה ביותר: ';
+            bestStrategy.appendChild(strong);
+            bestStrategy.appendChild(document.createTextNode('אין נתונים'));
+        }
+        if (bestSuccessRate) {
+            bestSuccessRate.textContent = '';
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(noteIcon, 'text/html');
+            const iconElement = doc.body.firstElementChild;
+            if (iconElement) bestSuccessRate.appendChild(iconElement);
+            const strong = document.createElement('strong');
+            strong.textContent = 'אחוז הצלחה הגבוה ביותר: ';
+            bestSuccessRate.appendChild(strong);
+            bestSuccessRate.appendChild(document.createTextNode('אין נתונים'));
+        }
+        if (recommendation) {
+            recommendation.textContent = '';
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(alertIcon, 'text/html');
+            const iconElement = doc.body.firstElementChild;
+            if (iconElement) recommendation.appendChild(iconElement);
+            const strong = document.createElement('strong');
+            strong.textContent = 'המלצה: ';
+            recommendation.appendChild(strong);
+            recommendation.appendChild(document.createTextNode('אין נתונים להצגה'));
+        }
         return;
     }
     
@@ -2266,27 +2604,66 @@ function updateStrategyInsights(filters) {
     const recommendationEl = document.getElementById('recommendation-insight');
     
     if (bestStrategyEl) {
-        bestStrategyEl.innerHTML = `
-            <img src="../../images/icons/tabler/note.svg" width="16" height="16" alt="icon" class="icon">
-            <strong>אסטרטגיה הטובה ביותר:</strong> ${bestStrategy.name || 'לא זמין'} עם P/L כולל של ${formatCurrency(bestStrategy.totalPL)}
-        `;
+        bestStrategyEl.textContent = '';
+        let iconHTML = '';
+        if (window.IconSystem && typeof window.IconSystem.renderIcon === 'function') {
+            iconHTML = await window.IconSystem.renderIcon('tabler', 'note', { size: '16', alt: 'icon', class: 'icon' });
+        } else {
+            iconHTML = '<img src="../../images/icons/tabler/note.svg" width="16" height="16" alt="icon" class="icon">';
+        }
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(iconHTML, 'text/html');
+        const iconElement = doc.body.firstElementChild;
+        if (iconElement) {
+            bestStrategyEl.appendChild(iconElement);
+        }
+        const strong = document.createElement('strong');
+        strong.textContent = 'אסטרטגיה הטובה ביותר: ';
+        bestStrategyEl.appendChild(strong);
+        bestStrategyEl.appendChild(document.createTextNode(`${bestStrategy.name || 'לא זמין'} עם P/L כולל של ${formatCurrency(bestStrategy.totalPL)}`));
     }
     
     if (bestSuccessRateEl) {
-        bestSuccessRateEl.innerHTML = `
-            <img src="../../images/icons/tabler/note.svg" width="16" height="16" alt="info-circle" class="icon">
-            <strong>אחוז הצלחה הגבוה ביותר:</strong> ${bestSuccessRateStrategy.name || 'לא זמין'} עם ${bestSuccessRateStrategy.successRate}%
-        `;
+        bestSuccessRateEl.textContent = '';
+        let iconHTML = '';
+        if (window.IconSystem && typeof window.IconSystem.renderIcon === 'function') {
+            iconHTML = await window.IconSystem.renderIcon('tabler', 'info-circle', { size: '16', alt: 'info-circle', class: 'icon' });
+        } else {
+            iconHTML = '<img src="../../images/icons/tabler/info-circle.svg" width="16" height="16" alt="info-circle" class="icon">';
+        }
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(iconHTML, 'text/html');
+        const iconElement = doc.body.firstElementChild;
+        if (iconElement) {
+            bestSuccessRateEl.appendChild(iconElement);
+        }
+        const strong = document.createElement('strong');
+        strong.textContent = 'אחוז הצלחה הגבוה ביותר: ';
+        bestSuccessRateEl.appendChild(strong);
+        bestSuccessRateEl.appendChild(document.createTextNode(`${bestSuccessRateStrategy.name || 'לא זמין'} עם ${bestSuccessRateStrategy.successRate}%`));
     }
     
     if (recommendationEl) {
         const recommendationText = bestStrategy.totalPL > 0
             ? `שקול להגדיל את השימוש ב-${bestStrategy.name || 'אסטרטגיה זו'} בגלל ה-P/L הגבוה (${formatCurrency(bestStrategy.totalPL)})`
             : 'אין המלצות זמינות כרגע';
-        recommendationEl.innerHTML = `
-            <img src="../../images/icons/tabler/alert-triangle.svg" width="16" height="16" alt="alert-triangle" class="icon">
-            <strong>המלצה:</strong> ${recommendationText}
-        `;
+        recommendationEl.textContent = '';
+        let iconHTML = '';
+        if (window.IconSystem && typeof window.IconSystem.renderIcon === 'function') {
+            iconHTML = await window.IconSystem.renderIcon('tabler', 'alert-triangle', { size: '16', alt: 'alert-triangle', class: 'icon' });
+        } else {
+            iconHTML = '<img src="../../images/icons/tabler/alert-triangle.svg" width="16" height="16" alt="alert-triangle" class="icon">';
+        }
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(iconHTML, 'text/html');
+        const iconElement = doc.body.firstElementChild;
+        if (iconElement) {
+            recommendationEl.appendChild(iconElement);
+        }
+        const strong = document.createElement('strong');
+        strong.textContent = 'המלצה: ';
+        recommendationEl.appendChild(strong);
+        recommendationEl.appendChild(document.createTextNode(recommendationText));
     }
 }
 
@@ -2314,6 +2691,101 @@ async function saveRecordFilterState() {
     }
 }
 
+// Save page state (filters, sections, charts)
+async function savePageState() {
+    if (!window.PageStateManager) {
+        // Fallback to existing save functions
+        await saveRecordFilterState();
+        await saveComparisonParameterState();
+        await saveSeriesVisibilityState();
+        return;
+    }
+
+    try {
+        const recordFilters = getRecordFilterValues();
+        const comparisonParams = getComparisonParameterValues();
+
+        // Get section states
+        const sections = {};
+        const sectionIds = ['strategy-performance-section', 'strategy-insights-section'];
+        sectionIds.forEach(sectionId => {
+            const section = document.getElementById(sectionId);
+            if (section) {
+                const sectionBody = section.querySelector('.section-body');
+                sections[sectionId] = sectionBody ? sectionBody.style.display === 'none' : false;
+            }
+        });
+
+        const state = {
+            filters: {
+                recordFilters: recordFilters,
+                comparisonParams: comparisonParams
+            },
+            sections: sections
+        };
+
+        await window.PageStateManager.savePageState('strategy-analysis', state);
+        if (window.Logger) {
+            window.Logger.debug('✅ Saved page state', { page: 'strategy-analysis-page' });
+        }
+    } catch (error) {
+        if (window.Logger) {
+            window.Logger.warn('Failed to save page state', { error, page: 'strategy-analysis-page' });
+        }
+        // Fallback to existing save functions
+        await saveRecordFilterState();
+        await saveComparisonParameterState();
+        await saveSeriesVisibilityState();
+    }
+}
+
+// Restore page state (filters, sections, charts)
+async function restorePageState() {
+    if (!window.PageStateManager) {
+        // Fallback to existing load functions
+        await loadRecordFilterState();
+        await loadComparisonParameterState();
+        await loadSeriesVisibilityState();
+        return;
+    }
+
+    try {
+        const state = await window.PageStateManager.loadPageState('strategy-analysis');
+        if (!state || !state.filters) {
+            // Fallback to existing load functions
+            await loadRecordFilterState();
+            await loadComparisonParameterState();
+            await loadSeriesVisibilityState();
+            return;
+        }
+
+        // Restore section states if available
+        if (state.sections) {
+            Object.keys(state.sections).forEach(sectionId => {
+                const section = document.getElementById(sectionId);
+                if (section) {
+                    const sectionBody = section.querySelector('.section-body');
+                    if (sectionBody) {
+                        sectionBody.style.display = state.sections[sectionId] ? 'none' : 'block';
+                    }
+                }
+            });
+        }
+
+        if (window.Logger) {
+            window.Logger.debug('✅ Restored page state', { page: 'strategy-analysis-page' });
+        }
+    } catch (error) {
+        if (window.Logger) {
+            window.Logger.warn('Failed to restore page state, using fallback', { error, page: 'strategy-analysis-page' });
+        }
+        // Fallback to existing load functions
+        await loadRecordFilterState();
+        await loadComparisonParameterState();
+        await loadSeriesVisibilityState();
+    }
+}
+
 // Load record filter state using UnifiedCacheManager
 async function loadRecordFilterState() {
     try {
@@ -2336,11 +2808,25 @@ async function loadRecordFilterState() {
             // Restore custom dates
             if (savedState.dateRangeStart) {
                 const fromInput = document.getElementById('customDateFrom');
-                if (fromInput) fromInput.value = savedState.dateRangeStart;
+                // Use DataCollectionService to set value if available
+        if (fromInput) {
+          if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+            window.DataCollectionService.setValue(fromInput.id, savedState.dateRangeStart, 'dateOnly');
+          } else {
+            fromInput.value = savedState.dateRangeStart;
+          }
+        }
             }
             if (savedState.dateRangeEnd) {
                 const toInput = document.getElementById('customDateTo');
-                if (toInput) toInput.value = savedState.dateRangeEnd;
+                // Use DataCollectionService to set value if available
+        if (toInput) {
+          if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+            window.DataCollectionService.setValue(toInput.id, savedState.dateRangeEnd, 'dateOnly');
+          } else {
+            toInput.value = savedState.dateRangeEnd;
+          }
+        }
             }
             updateDateRangeFilterText();
             
@@ -2511,7 +2997,7 @@ async function loadTradingAccounts() {
     if (select) {
         // Clear existing options (except first empty option if exists)
         const firstOption = select.options[0];
-        select.innerHTML = '';
+        select.textContent = '';
         if (firstOption && firstOption.value === '') {
             select.appendChild(firstOption);
         }
@@ -2534,12 +3020,9 @@ async function loadTradingAccounts() {
                 }
             } else if (window.currentPreferences?.default_trading_account) {
                 defaultAccountId = parseInt(window.currentPreferences.default_trading_account);
-            } else if (typeof window.getPreference === 'function') {
-                const prefValue = await window.getPreference('default_trading_account');
-                if (prefValue) {
-                    defaultAccountId = parseInt(prefValue);
-                }
             }
+            // NOTE: Removed fallback to window.getPreference to prevent recursion
+            // window.getPreference just calls PreferencesCore.getPreference again, causing recursion
             
             // Select default account if found
             if (defaultAccountId && select.options.length > 0) {
@@ -2578,7 +3061,7 @@ async function loadTradingMethods() {
     
     const select = document.getElementById('comparisonTradingMethods');
     if (select) {
-        select.innerHTML = '';
+        select.textContent = '';
         mockMethods.forEach(method => {
             const option = document.createElement('option');
             option.value = method.id;
@@ -2601,7 +3084,7 @@ async function loadTickers() {
     
     const select = document.getElementById('comparisonTickers');
     if (select) {
-        select.innerHTML = '';
+        select.textContent = '';
         mockTickers.forEach(ticker => {
             const option = document.createElement('option');
             option.value = ticker.id;
@@ -2630,7 +3113,7 @@ async function initializeRecordFilterTags() {
         await window.TagUIManager.initialize(tagsSelect, mockTags);
     } else {
         // Fallback: create options manually
-        tagsSelect.innerHTML = '';
+        tagsSelect.textContent = '';
         mockTags.forEach(tag => {
             const option = document.createElement('option');
             option.value = tag.id;
@@ -2659,7 +3142,7 @@ async function initializeComparisonTags() {
         await window.TagUIManager.initialize(tagsSelect, mockTags);
     } else {
         // Fallback: create options manually
-        tagsSelect.innerHTML = '';
+        tagsSelect.textContent = '';
         mockTags.forEach(tag => {
             const option = document.createElement('option');
             option.value = tag.id;
@@ -2672,10 +3155,53 @@ async function initializeComparisonTags() {
 // ===== Initialize Page =====
 
 // Initialize page
+/**
+ * Replace direct action buttons with Actions Menu
+ */
+function replaceStrategyActionButtons() {
+    if (!window.createActionsMenu || typeof window.createActionsMenu !== 'function') {
+        if (window.Logger) {
+            window.Logger.warn('createActionsMenu not available, cannot replace action buttons', { page: 'strategy-analysis-page' });
+        }
+        return;
+    }
+
+    const table = document.querySelector('table[data-table-type="strategy-list"]');
+    if (!table) return;
+
+    const actionCells = table.querySelectorAll('td.actions-cell[data-strategy-name]');
+    actionCells.forEach(cell => {
+        const strategyName = cell.getAttribute('data-strategy-name');
+        if (!strategyName) return;
+
+        // Skip if already replaced
+        if (cell.querySelector('.actions-menu-wrapper')) return;
+
+        // Replace buttons with Actions Menu
+        const actionsMenuHtml = window.createActionsMenu([
+            { type: 'EDIT', onclick: `window.editStrategy && window.editStrategy('${strategyName.replace(/'/g, "\\'")}')`, title: `ערוך אסטרטגיה: ${strategyName}` },
+            { type: 'DELETE', onclick: `window.deleteStrategy && window.deleteStrategy('${strategyName.replace(/'/g, "\\'")}')`, title: `מחק אסטרטגיה: ${strategyName}` }
+        ]);
+
+        if (actionsMenuHtml) {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(actionsMenuHtml, 'text/html');
+            const menuElement = doc.body.firstElementChild;
+            if (menuElement) {
+                cell.textContent = '';
+                cell.appendChild(menuElement);
+            }
+        }
+    });
+}
+
 async function initializePage() {
     try {
         // Initialize Header System first
         await initializeHeader();
+        
+        // Replace direct action buttons with Actions Menu
+        replaceStrategyActionButtons();
         
         // Wait for Preferences to be loaded (needed for default_trading_account)
         if (window.PreferencesCore && typeof window.PreferencesCore.initializeWithLazyLoading === 'function') {
@@ -2689,7 +3215,10 @@ async function initializePage() {
         await initializeRecordFilterTags();
         await initializeComparisonTags();
         
-        // Load saved state or set defaults
+        // Restore page state (filters, sections, etc.)
+        await restorePageState();
+        
+        // Load saved state or set defaults (fallback if PageStateManager not available)
         await loadRecordFilterState();
         await loadComparisonParameterState();
         await loadSeriesVisibilityState();
@@ -2717,11 +3246,15 @@ async function initializePage() {
             window.Logger.info('✅ Strategy analysis page initialized', { page: 'strategy-analysis-page' });
         }
         
-    } catch (error) {
-        if (window.Logger) {
-            window.Logger.error('Error initializing strategy analysis page', { page: 'strategy-analysis-page', error });
+        } catch (error) {
+            const errorMsg = error?.message || (typeof error === 'string' ? error : 'שגיאה לא ידועה');
+            if (window.NotificationSystem && typeof window.NotificationSystem.showError === 'function') {
+                window.NotificationSystem.showError('שגיאה באתחול עמוד ניתוח אסטרטגיות', 
+                    `לא ניתן לאתחל את העמוד. ${errorMsg}`);
+            } else if (window.Logger) {
+                window.Logger.error('Error initializing strategy analysis page', { page: 'strategy-analysis-page', error });
+            }
         }
-    }
 }
 
 // Set up event listeners

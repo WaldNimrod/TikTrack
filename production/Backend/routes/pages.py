@@ -1,6 +1,7 @@
 from flask import Blueprint, send_from_directory, request, make_response, send_file
 from config.settings import UI_DIR
 import os
+import mimetypes
 from typing import Any
 
 # Create Blueprint
@@ -31,6 +32,11 @@ def trades() -> Any:
 def tracking() -> Any:
     """Tracking page - redirect to trades"""
     return send_from_directory(UI_DIR, "trades.html")
+
+@pages_bp.route('/watch-list')
+def watch_list() -> Any:
+    """Watch list management page"""
+    return send_from_directory(UI_DIR, "watch-list.html")
 
 
 
@@ -63,6 +69,11 @@ def executions() -> Any:
 def research() -> Any:
     """Research page"""
     return send_from_directory(UI_DIR, "research.html")
+
+@pages_bp.route('/strategy-analysis')
+def strategy_analysis() -> Any:
+    """Strategy Analysis page"""
+    return send_from_directory(UI_DIR, "strategy-analysis.html")
 
 
 
@@ -98,6 +109,23 @@ def preferences() -> Any:
     """Preferences page"""
     return send_from_directory(UI_DIR, "preferences.html")
 
+@pages_bp.route('/user-profile')
+@pages_bp.route('/user-profile.html')
+def user_profile() -> Any:
+    """User profile management page"""
+    return send_from_directory(UI_DIR, "user-profile.html")
+
+@pages_bp.route('/ai-analysis')
+def ai_analysis() -> Any:
+    """AI Analysis page"""
+    return send_from_directory(UI_DIR, "ai-analysis.html")
+
+@pages_bp.route('/trading-ui/ai-analysis.html')
+def ai_analysis_old() -> Any:
+    """AI Analysis page - redirect from old URL"""
+    from flask import redirect
+    return redirect('/ai-analysis', code=301)
+
 @pages_bp.route('/tag-management')
 def tag_management() -> Any:
     """Tag management page"""
@@ -123,15 +151,25 @@ def test_header_only() -> Any:
     """Test header only page"""
     return send_from_directory(UI_DIR, "test-header-only.html")
 
-@pages_bp.route('/linter-realtime-monitor')
-def linter_realtime_monitor() -> Any:
-    """Linter realtime monitor page"""
-    return send_from_directory(UI_DIR, "linter-realtime-monitor.html")
-
 @pages_bp.route('/chart-management')
 def chart_management() -> Any:
     """Chart management page"""
     return send_from_directory(UI_DIR, "chart-management.html")
+
+@pages_bp.route('/trade-history')
+def trade_history() -> Any:
+    """Trade history page"""
+    return send_from_directory(UI_DIR, "trade-history.html")
+
+@pages_bp.route('/portfolio-state')
+def portfolio_state() -> Any:
+    """Portfolio state page"""
+    return send_from_directory(UI_DIR, "portfolio-state.html")
+
+@pages_bp.route('/trading-journal')
+def trading_journal() -> Any:
+    """Trading journal page"""
+    return send_from_directory(UI_DIR, "trading-journal.html")
 
 
 
@@ -212,8 +250,18 @@ def static_files(filename: str) -> Any:
         if html_path.exists():
             return send_from_directory(UI_DIR, html_file)
     
-    # Otherwise, return the file as is
-    return send_from_directory(UI_DIR, filename)
+    # Otherwise, return the file as is with correct MIME type
+    full_path = UI_DIR / filename
+    if not full_path.exists():
+        from flask import abort
+        abort(404)
+    
+    # Guess and set MIME type explicitly to avoid JSON default
+    guessed_mime, _ = mimetypes.guess_type(str(full_path))
+    response = send_from_directory(UI_DIR, filename)
+    if guessed_mime:
+        response.mimetype = guessed_mime
+    return response
 
 # NOTE: Cache headers are now handled by ResponseOptimizer in app.py
 # This removes duplication and ensures consistent cache control headers

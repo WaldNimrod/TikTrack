@@ -36,7 +36,9 @@ class SystemManagementMain {
       'sm-dashboard': {
         autoRefresh: true,
         refreshInterval: 30000,
-        priority: 1
+        priority: 1,
+        // Dashboard is now part of top section, so use special container
+        containerId: 'sm-dashboard-content'
       },
       'sm-server': {
         autoRefresh: true,
@@ -78,16 +80,11 @@ class SystemManagementMain {
         refreshInterval: 0,
         priority: 9
       },
-      'sm-security': {
-        autoRefresh: true,
-        refreshInterval: 180000,
-        priority: 10
-      },
-      'sm-logs': {
+      'sm-system-settings': {
         autoRefresh: false,
         refreshInterval: 0,
-        priority: 11
-      }
+        priority: 10
+      },
     };
   }
 
@@ -109,6 +106,9 @@ class SystemManagementMain {
 
       // Show global loading state
       this.showGlobalLoadingState();
+
+      // Wait for all section classes to load
+      await this.waitForScriptsToLoad();
 
       // Initialize sections by priority
       await this.initializeSectionsByPriority();
@@ -174,25 +174,45 @@ class SystemManagementMain {
    * @function initializeSection
    * @async
    * @param {string} sectionId - Section ID
+   * @param {number} retryCount - Current retry count
    * @returns {Promise<void>}
    */
-  async initializeSection(sectionId) {
+  async initializeSection(sectionId, retryCount = 0) {
+    const maxRetries = 3;
+    const retryDelay = 500;
+    
     console.log(`🔧 Initializing section: ${sectionId}`);
     
     // Check if section exists in DOM
-    const sectionElement = document.getElementById(sectionId);
+    // Special handling for sm-dashboard which is in the top section
+    let sectionElement = document.getElementById(sectionId);
+    if (!sectionElement && sectionId === 'sm-dashboard') {
+      // Try to find the dashboard container in the top section
+      sectionElement = document.getElementById('sm-dashboard-content') || 
+                      document.querySelector('.top-section[data-section="top"]');
+    }
     if (!sectionElement) {
-      console.warn(`⚠️ Section element ${sectionId} not found in DOM`);
-      return;
+      // For sm-dashboard, this is expected - it's rendered into the top section
+      if (sectionId !== 'sm-dashboard') {
+        console.warn(`⚠️ Section element ${sectionId} not found in DOM`);
+        return;
+      }
+      // Don't return for sm-dashboard - it will be handled by the section class
     }
 
     // Get section class name from data attribute or convention
     const sectionClassName = this.getSectionClassName(sectionId);
     
-    // Check if section class exists
+    // Check if section class exists with retry logic
     if (!window[sectionClassName]) {
-      console.warn(`⚠️ Section class ${sectionClassName} not found`);
-      return;
+      if (retryCount < maxRetries) {
+        console.warn(`⚠️ Section class ${sectionClassName} not found, retrying... (${retryCount + 1}/${maxRetries})`);
+        await new Promise(resolve => setTimeout(resolve, retryDelay));
+        return this.initializeSection(sectionId, retryCount + 1);
+      } else {
+        console.error(`❌ Section class ${sectionClassName} not found after ${maxRetries} retries`);
+        return;
+      }
     }
 
     try {
@@ -215,6 +235,49 @@ class SystemManagementMain {
   }
 
   /**
+   * Wait for all required section classes to load
+   * @function waitForScriptsToLoad
+   * @async
+   * @returns {Promise<boolean>} True if all classes loaded, false otherwise
+   */
+  async waitForScriptsToLoad() {
+    const requiredClasses = [
+      'SMDashboardSection',
+      'SMServerSection',
+      'SMCacheSection',
+      'SMPerformanceSection',
+      'SMExternalDataSection',
+      'SMAlertsSection',
+      'SMDatabaseSection',
+      'SMBackgroundTasksSection',
+      'SMOperationsSection',
+      'SMSystemSettingsSection'
+    ];
+    
+    const maxWait = 5000; // 5 seconds
+    const checkInterval = 100;
+    let elapsed = 0;
+    
+    console.log('⏳ Waiting for section classes to load...');
+    
+    while (elapsed < maxWait) {
+      const missing = requiredClasses.filter(cls => !window[cls]);
+      if (missing.length === 0) {
+        console.log('✅ All section classes loaded');
+        return true;
+      }
+      await new Promise(resolve => setTimeout(resolve, checkInterval));
+      elapsed += checkInterval;
+    }
+    
+    const stillMissing = requiredClasses.filter(cls => !window[cls]);
+    if (stillMissing.length > 0) {
+      console.warn(`⚠️ Some section classes still not loaded: ${stillMissing.join(', ')}`);
+    }
+    return stillMissing.length === 0;
+  }
+
+  /**
    * Get section class name
    * @function getSectionClassName
    * @param {string} sectionId - Section ID
@@ -222,8 +285,10 @@ class SystemManagementMain {
    */
   getSectionClassName(sectionId) {
     // Convert sm-dashboard to SMDashboardSection
+    // Convert sm-system-settings to SMSystemSettingsSection
     const parts = sectionId.split('-');
-    const className = parts.map(part => 
+    // First part should be 'SM' (uppercase), rest should be capitalized
+    const className = 'SM' + parts.slice(1).map(part => 
       part.charAt(0).toUpperCase() + part.slice(1)
     ).join('') + 'Section';
     
@@ -266,6 +331,63 @@ class SystemManagementMain {
       this.cleanup();
     });
 
+    // Quick restart button
+    const quickRestartBtn = document.getElementById('quickRestartSystemBtn');
+    if (quickRestartBtn) {
+      quickRestartBtn.addEventListener('click', async () => {
+        try {
+          if (window.NotificationSystem) {
+            window.NotificationSystem.showInfo('מתחיל איתחול מהיר של השרת...', 'system');
+          }
+          const response = await fetch('/api/server/restart', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ restart_type: 'quick' })
+          });
+          const result = await response.json();
+          if (result.status === 'success') {
+            if (window.NotificationSystem) {
+              window.NotificationSystem.showSuccess('השרת מתחיל מחדש...', 'system');
+            }
+          } else {
+            throw new Error(result.message || 'Restart failed');
+          }
+        } catch (error) {
+          console.error('❌ Restart failed:', error);
+          if (window.NotificationSystem) {
+            window.NotificationSystem.showError(`שגיאה באיתחול: ${error.message}`, 'system');
+          }
+        }
+      });
+    }
+
+    // Change cache mode button
+    const changeModeBtn = document.getElementById('changeModeSystemBtn');
+    if (changeModeBtn) {
+      changeModeBtn.addEventListener('click', () => {
+        // Open cache management page for mode change
+        window.location.href = '/cache-management';
+      });
+    }
+
+    // Open server monitor button
+    const openServerMonitorBtn = document.getElementById('openServerMonitorBtn');
+    if (openServerMonitorBtn) {
+      openServerMonitorBtn.addEventListener('click', () => {
+        window.location.href = '/server-monitor';
+      });
+    }
+
+    // Refresh system data button
+    const refreshSystemDataBtn = document.getElementById('refreshSystemDataBtn');
+    if (refreshSystemDataBtn) {
+      refreshSystemDataBtn.addEventListener('click', () => {
+        if (window.systemManagementMain) {
+          window.systemManagementMain.refreshAllSections();
+        }
+      });
+    }
+
     console.log('✅ Global event listeners setup complete');
   }
 
@@ -281,7 +403,11 @@ class SystemManagementMain {
       const refreshBtn = document.createElement('button');
       refreshBtn.id = 'global-refresh-btn';
       refreshBtn.className = 'btn btn-sm btn-outline-primary';
-      refreshBtn.innerHTML = '<i class="fas fa-sync-alt"></i> רענן הכל';
+      refreshBtn.textContent = '';
+      const icon = document.createElement('i');
+      icon.className = 'fas fa-sync-alt';
+      refreshBtn.appendChild(icon);
+      refreshBtn.appendChild(document.createTextNode(' רענן הכל'));
       refreshBtn.title = 'רענן את כל הסקשנים';
       headerActions.appendChild(refreshBtn);
     }
@@ -299,7 +425,11 @@ class SystemManagementMain {
       const toggleBtn = document.createElement('button');
       toggleBtn.id = 'global-toggle-btn';
       toggleBtn.className = 'btn btn-sm btn-outline-secondary';
-      toggleBtn.innerHTML = '<i class="fas fa-eye"></i> הצג/הסתר הכל';
+      toggleBtn.textContent = '';
+      const icon = document.createElement('i');
+      icon.className = 'fas fa-eye';
+      toggleBtn.appendChild(icon);
+      toggleBtn.appendChild(document.createTextNode(' הצג/הסתר הכל'));
       toggleBtn.title = 'הצג/הסתר את כל הסקשנים';
       headerActions.appendChild(toggleBtn);
     }
@@ -334,27 +464,41 @@ class SystemManagementMain {
    * @returns {void}
    */
   toggleAllSections() {
-    const toggleBtn = document.getElementById('global-toggle-btn');
-    const sections = document.querySelectorAll('.sm-section-body');
+    // Use the standard section toggle system
+    const sections = document.querySelectorAll('.content-section[data-section]');
     
     if (sections.length === 0) return;
     
-    // Check if any section is visible
-    const anyVisible = Array.from(sections).some(section => 
-      section.style.display !== 'none'
-    );
-    
-    // Toggle all sections
-    sections.forEach(section => {
-      section.style.display = anyVisible ? 'none' : 'block';
+    // Check if any section is visible (expanded)
+    const anyExpanded = Array.from(sections).some(section => {
+      const sectionBody = section.querySelector('.section-body');
+      return sectionBody && sectionBody.style.display !== 'none';
     });
     
-    // Update toggle button text
-    if (toggleBtn) {
-      toggleBtn.innerHTML = anyVisible ? 
-        '<i class="fas fa-eye-slash"></i> הצג הכל' : 
-        '<i class="fas fa-eye"></i> הסתר הכל';
-    }
+    // Toggle all sections using the standard toggleSection function
+    sections.forEach(section => {
+      const sectionId = section.getAttribute('data-section');
+      if (sectionId && typeof window.toggleSection === 'function') {
+        // If any are expanded, collapse all; otherwise expand all
+        if (anyExpanded) {
+          // Collapse all
+          const sectionBody = section.querySelector('.section-body');
+          if (sectionBody) {
+            sectionBody.style.display = 'none';
+            section.classList.remove('expanded');
+            section.classList.add('collapsed');
+          }
+        } else {
+          // Expand all
+          const sectionBody = section.querySelector('.section-body');
+          if (sectionBody) {
+            sectionBody.style.display = 'block';
+            section.classList.remove('collapsed');
+            section.classList.add('expanded');
+          }
+        }
+      }
+    });
   }
 
   /**
@@ -488,8 +632,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   try {
     console.log('🚀 Starting System Management initialization...');
     
-    // Wait a bit for all scripts to load
-    await new Promise(resolve => setTimeout(resolve, 500));
+    // Wait a bit for all scripts to load (reduced since we have waitForScriptsToLoad)
+    await new Promise(resolve => setTimeout(resolve, 200));
     
     // Create and initialize main orchestrator
     window.systemManagementMain = new SystemManagementMain();
@@ -504,3 +648,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 // Export for global access
 window.SystemManagementMain = SystemManagementMain;
+
+// Export toggleAllSections as global function for HTML onclick
+window.toggleAllSections = function() {
+  if (window.systemManagementMain) {
+    window.systemManagementMain.toggleAllSections();
+  } else {
+    console.warn('⚠️ SystemManagementMain not initialized yet');
+  }
+};

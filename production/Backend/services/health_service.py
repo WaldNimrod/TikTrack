@@ -43,6 +43,7 @@ class HealthService:
     def check_database_health(self) -> Dict[str, Any]:
         """
         Check database connectivity and performance
+        SIMPLIFIED FOR PERFORMANCE - Fast, non-blocking check
         
         Returns:
             Dict[str, Any]: Database health status
@@ -57,51 +58,31 @@ class HealthService:
         }
         
         try:
-            # Test database connection
+            # FAST: Test database connection with simple query only
             db: Session = next(get_db())
             
-            # Test basic query
+            # FAST: Simple connectivity test (fastest possible)
             result = db.execute(text('SELECT 1 as test'))
             result.fetchone()
             
-            # Test table access
-            result = db.execute(text('SELECT COUNT(*) as count FROM tickers'))
-            ticker_count = result.fetchone()[0]
-            
-            # Test performance with complex query
-            start_perf = time.time()
-            result = db.execute(text('''
-                SELECT t.symbol, COUNT(tr.id) as trade_count 
-                FROM tickers t 
-                LEFT JOIN trades tr ON t.id = tr.ticker_id 
-                GROUP BY t.id 
-                LIMIT 10
-            '''))
-            result.fetchall()
-            query_time = time.time() - start_perf
-            
-            # Check database size (PostgreSQL or SQLite)
-            from config.settings import USING_SQLITE
+            # FAST: Quick table access check (optional, but fast)
             try:
-                if USING_SQLITE:
-                    result = db.execute(text("SELECT page_count * page_size as size FROM pragma_page_count(), pragma_page_size()"))
-                    db_size = result.fetchone()[0]
-                else:
-                    # PostgreSQL: Get database size in bytes
-                    result = db.execute(text("SELECT pg_database_size(current_database()) as size"))
-                    db_size = result.fetchone()[0]
-            except Exception as size_error:
-                logger.warning(f"Could not get database size: {size_error}")
-                db_size = 0  # Default to 0 if size check fails
+                result = db.execute(text('SELECT COUNT(*) as count FROM tickers'))
+                ticker_count = result.fetchone()[0]
+            except Exception:
+                ticker_count = 0
             
             db.close()
             
-            # Determine performance status
-            if query_time < 0.1:
+            # Calculate response time
+            response_time_ms = round((time.time() - start_time) * 1000, 2)
+            
+            # Determine performance status based on response time
+            if response_time_ms < 100:
                 performance_status = 'excellent'
-            elif query_time < 0.5:
+            elif response_time_ms < 500:
                 performance_status = 'good'
-            elif query_time < 1.0:
+            elif response_time_ms < 1000:
                 performance_status = 'fair'
             else:
                 performance_status = 'poor'
@@ -112,9 +93,7 @@ class HealthService:
                 'performance': performance_status,
                 'details': {
                     'ticker_count': ticker_count,
-                    'query_time_ms': round(query_time * 1000, 2),
-                    'database_size_mb': round(db_size / (1024 * 1024), 2),
-                    'response_time_ms': round((time.time() - start_time) * 1000, 2)
+                    'response_time_ms': response_time_ms
                 }
             })
             

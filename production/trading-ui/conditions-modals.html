@@ -1,312 +1,575 @@
-<!-- Conditions System Modals -->
-<!-- Modal for method selection -->
-<div class="modal fade" id="methodSelectorModal" tabindex="-1" aria-labelledby="methodSelectorModalLabel" aria-hidden="true"
-     data-bs-backdrop="true" data-bs-keyboard="true">
-    <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-            <div class="modal-header modal-header-colored">
-                <h5 class="modal-title" id="methodSelectorModalLabel">
-                    <i class="fa fa-chart-line me-2"></i>בחירת שיטת מסחר
-                </h5>
-                <button data-button-type="CLOSE" data-size="large" data-variant="small" data-onclick="data-bs-dismiss='modal'" data-text="" title="סגור מודל" aria-label="סגור"></button>
-            </div>
-            <div class="modal-body">
-                <div id="methodSelectorBody">
-                    <!-- Method categories and methods will be loaded here -->
-                    <div class="text-center py-4">
-                        <div class="spinner-border text-primary" role="status">
-                            <span class="visually-hidden">טוען...</span>
-                        </div>
-                        <p class="mt-2 text-muted">טוען שיטות מסחר...</p>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                    <i class="fa fa-times me-2"></i>ביטול
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Modal for condition details -->
-<div class="modal fade" id="conditionDetailsModal" tabindex="-1" aria-labelledby="conditionDetailsModalLabel" aria-hidden="true"
-     data-bs-backdrop="true" data-bs-keyboard="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header modal-header-colored">
-                <h5 class="modal-title" id="conditionDetailsModalLabel">
-                    <i class="fa fa-info-circle me-2"></i>פרטי תנאי
-                </h5>
-                <button data-button-type="CLOSE" data-size="large" data-variant="small" data-onclick="data-bs-dismiss='modal'" data-text="" title="סגור מודל" aria-label="סגור"></button>
-            </div>
-            <div class="modal-body">
-                <div id="conditionDetailsBody">
-                    <!-- Condition details will be loaded here -->
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-primary" id="editConditionBtn">
-                    <i class="fa fa-edit me-2"></i>ערוך
-                </button>
-                <button type="button" class="btn btn-success" id="createAlertFromConditionBtn">
-                    <i class="fa fa-bell me-2"></i>צור התראה
-                </button>
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                    <i class="fa fa-times me-2"></i>סגור
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Modal for alert creation from condition -->
-<div class="modal fade" id="createAlertFromConditionModal" tabindex="-1" aria-labelledby="createAlertFromConditionModalLabel" aria-hidden="true"
-     data-bs-backdrop="true" data-bs-keyboard="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header modal-header-colored">
-                <h5 class="modal-title" id="createAlertFromConditionModalLabel">
-                    <i class="fa fa-bell me-2"></i>יצירת התראה מתנאי
-                </h5>
-                <button data-button-type="CLOSE" data-size="large" data-variant="small" data-onclick="data-bs-dismiss='modal'" data-text="" title="סגור מודל" aria-label="סגור"></button>
-            </div>
-            <div class="modal-body">
-                <form id="createAlertFromConditionForm">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label class="form-label">שם ההתראה</label>
-                                <input type="text" name="alert_name" class="form-control" required>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label class="form-label">סוג ההתראה</label>
-                                <select name="alert_type" class="form-select" required>
-                                    <option value="price_condition">תנאי מחיר</option>
-                                    <option value="volume_condition">תנאי נפח</option>
-                                    <option value="technical_condition">תנאי טכני</option>
-                                    <option value="custom_condition">מותאם אישית</option>
-                                </select>
-                            </div>
+<!DOCTYPE html>
+<html lang="he" dir="rtl" class="conditions-modals-page">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Favicon will be set by global-favicon.js -->
+    <title>מודלי תנאים - TikTrack</title>
+    
+    <!-- 
+    ===== CONDITIONS MODALS PAGE =====
+    
+    This page follows the proper TikTrack architecture:
+    1. Complete ITCSS implementation
+    2. All base package systems included
+    3. Correct loading order
+    4. Unified initialization system
+    5. Standard page structure
+    
+    ======================================
+    -->
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap CSS - Must load first -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css?v=0da3519a_20251102_104906" rel="stylesheet">
+    <!-- Header Styles - חייב להיות לפני master.css -->
+    <link rel="stylesheet" href="styles-new/header-styles.css?v=0da3519a_20251102_104906">
+    <!-- TikTrack ITCSS Master Styles -->
+    <link rel="stylesheet" href="styles-new/master.css?v=0da3519a_20251102_104906">
+</head>
+<body class="conditions-modals-page">
+    <!-- Header System - Created automatically by header-system.js -->
+    <div id="unified-header"></div>
+    
+    <!-- Page Content -->
+    <div class="background-wrapper">
+        <div class="page-body">
+            <!-- Main content -->
+            <div class="main-content">
+                <!-- Conditions Modals area - top-Section -->
+                <div class="top-section" data-section="top">
+                    <!-- Main header -->
+                    <div class="section-header">
+                        <div class="table-title">
+                            <img src="images/icons/entities/conditions.svg" alt="מודלי תנאים" class="section-icon">
+                            מודלי תנאים
                         </div>
                     </div>
-                    
-                    <div class="mb-3">
-                        <label class="form-label">תיאור ההתראה</label>
-                        <textarea name="alert_description" class="form-control" rows="3"></textarea>
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-md-4">
-                            <div class="mb-3">
-                                <label class="form-label">תכונה</label>
-                                <select name="condition_attribute" class="form-select" required>
-                                    <option value="price">מחיר</option>
-                                    <option value="volume">נפח</option>
-                                    <option value="change">שינוי</option>
-                                    <option value="ma">ממוצע נע</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="mb-3">
-                                <label class="form-label">אופרטור</label>
-                                <select name="condition_operator" class="form-select" required>
-                                    <option value="above">מעל</option>
-                                    <option value="below">מתחת</option>
-                                    <option value="equals">שווה ל</option>
-                                    <option value="cross">חוצה</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="mb-3">
-                                <label class="form-label">ערך</label>
-                                <input type="number" name="condition_number" class="form-control" step="0.01" required>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <div class="form-check">
-                            <input type="checkbox" name="auto_create" class="form-check-input" id="autoCreateCheck" checked>
-                            <label class="form-check-label" for="autoCreateCheck">
-                                צור התראה אוטומטית בעתיד
-                            </label>
-                        </div>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-primary" id="saveAlertFromConditionBtn">
-                    <i class="fa fa-save me-2"></i>צור התראה
-                </button>
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                    <i class="fa fa-times me-2"></i>ביטול
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Modal for condition testing -->
-<div class="modal fade" id="testConditionModal" tabindex="-1" aria-labelledby="testConditionModalLabel" aria-hidden="true"
-     data-bs-backdrop="true" data-bs-keyboard="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header modal-header-colored">
-                <h5 class="modal-title" id="testConditionModalLabel">
-                    <i class="fa fa-flask me-2"></i>בדיקת תנאי
-                </h5>
-                <button data-button-type="CLOSE" data-size="large" data-variant="small" data-onclick="data-bs-dismiss='modal'" data-text="" title="סגור מודל" aria-label="סגור"></button>
-            </div>
-            <div class="modal-body">
-                <div id="testConditionBody">
-                    <!-- Test results will be loaded here -->
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-primary" id="runTestBtn">
-                    <i class="fa fa-play me-2"></i>הרץ בדיקה
-                </button>
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                    <i class="fa fa-times me-2"></i>סגור
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Modal for bulk condition operations -->
-<div class="modal fade" id="bulkConditionsModal" tabindex="-1" aria-labelledby="bulkConditionsModalLabel" aria-hidden="true"
-     data-bs-backdrop="true" data-bs-keyboard="true">
-    <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-            <div class="modal-header modal-header-colored">
-                <h5 class="modal-title" id="bulkConditionsModalLabel">
-                    <i class="fa fa-tasks me-2"></i>פעולות מרובות על תנאים
-                </h5>
-                <button data-button-type="CLOSE" data-size="large" data-variant="small" data-onclick="data-bs-dismiss='modal'" data-text="" title="סגור מודל" aria-label="סגור"></button>
-            </div>
-            <div class="modal-body">
-                <div class="row">
-                    <div class="col-md-6">
-                        <h6>פעולות זמינות</h6>
-                        <div class="list-group">
-                            <button type="button" class="list-group-item list-group-item-action" id="bulkActivateBtn">
-                                <i class="fa fa-check-circle me-2"></i>הפעל כל התנאים
-                            </button>
-                            <button type="button" class="list-group-item list-group-item-action" id="bulkDeactivateBtn">
-                                <i class="fa fa-times-circle me-2"></i>השבת כל התנאים
-                            </button>
-                            <button type="button" class="list-group-item list-group-item-action" id="bulkDeleteBtn">
-                                <i class="fa fa-trash me-2"></i>מחק תנאים נבחרים
-                            </button>
-                            <button type="button" class="list-group-item list-group-item-action" id="bulkCreateAlertsBtn">
-                                <i class="fa fa-bell me-2"></i>צור התראות לכל התנאים
-                            </button>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <h6>תנאים נבחרים</h6>
-                        <div id="selectedConditionsList" class="border rounded p-3" style="min-height: 200px;">
-                            <p class="text-muted text-center">אין תנאים נבחרים</p>
+                    <div class="section-body">
+                        <div class="info-summary">
+                            <p>דף זה מכיל את כל המודלים של מערכת התנאים (Conditions System)</p>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-primary" id="executeBulkOperationBtn" disabled>
-                    <i class="fa fa-play me-2"></i>בצע פעולה
-                </button>
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                    <i class="fa fa-times me-2"></i>סגור
-                </button>
+        </div>
+    </div>
+
+    <!-- Conditions System Modals -->
+    <!-- Modal for method selection -->
+    <div class="modal fade" id="methodSelectorModal" tabindex="-1" aria-labelledby="methodSelectorModalLabel" aria-hidden="true"
+         data-bs-backdrop="true" data-bs-keyboard="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header modal-header-colored">
+                    <h5 class="modal-title" id="methodSelectorModalLabel">
+                        <i class="fa fa-chart-line me-2"></i>בחירת שיטת מסחר
+                    </h5>
+                    <button data-button-type="CLOSE" data-size="large" data-variant="small" data-onclick="data-bs-dismiss='modal'" data-text="" title="סגור מודל" aria-label="סגור"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="methodSelectorBody">
+                        <!-- Method categories and methods will be loaded here -->
+                        <div class="text-center py-4">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">טוען...</span>
+                            </div>
+                            <p class="mt-2 text-muted">טוען שיטות מסחר...</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fa fa-times me-2"></i>ביטול
+                    </button>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- Modal for condition import/export -->
-<div class="modal fade" id="conditionImportExportModal" tabindex="-1" aria-labelledby="conditionImportExportModalLabel" aria-hidden="true"
-     data-bs-backdrop="true" data-bs-keyboard="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header modal-header-colored">
-                <h5 class="modal-title" id="conditionImportExportModalLabel">
-                    <i class="fa fa-exchange-alt me-2"></i>ייבוא/ייצוא תנאים
-                </h5>
-                <button data-button-type="CLOSE" data-size="large" data-variant="small" data-onclick="data-bs-dismiss='modal'" data-text="" title="סגור מודל" aria-label="סגור"></button>
+    <!-- Modal for condition details -->
+    <div class="modal fade" id="conditionDetailsModal" tabindex="-1" aria-labelledby="conditionDetailsModalLabel" aria-hidden="true"
+         data-bs-backdrop="true" data-bs-keyboard="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header modal-header-colored">
+                    <h5 class="modal-title" id="conditionDetailsModalLabel">
+                        <i class="fa fa-info-circle me-2"></i>פרטי תנאי
+                    </h5>
+                    <button data-button-type="CLOSE" data-size="large" data-variant="small" data-onclick="data-bs-dismiss='modal'" data-text="" title="סגור מודל" aria-label="סגור"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="conditionDetailsBody">
+                        <!-- Condition details will be loaded here -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="editConditionBtn">
+                        <i class="fa fa-edit me-2"></i>ערוך
+                    </button>
+                    <button type="button" class="btn btn-success" id="createAlertFromConditionBtn">
+                        <i class="fa fa-bell me-2"></i>צור התראה
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fa fa-times me-2"></i>סגור
+                    </button>
+                </div>
             </div>
-            <div class="modal-body">
-                <ul class="nav nav-tabs" id="importExportTabs" role="tablist">
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link active" id="export-tab" data-bs-toggle="tab" data-bs-target="#export-pane" type="button" role="tab">
-                            <i class="fa fa-download me-2"></i>ייצוא
-                        </button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="import-tab" data-bs-toggle="tab" data-bs-target="#import-pane" type="button" role="tab">
-                            <i class="fa fa-upload me-2"></i>ייבוא
-                        </button>
-                    </li>
-                </ul>
-                
-                <div class="tab-content" id="importExportTabContent">
-                    <div class="tab-pane fade show active" id="export-pane" role="tabpanel">
-                        <div class="p-3">
-                            <h6>ייצוא תנאים</h6>
-                            <p class="text-muted">ייצא את כל התנאים של הישות הנוכחית לקובץ JSON</p>
-                            
-                            <div class="mb-3">
-                                <div class="form-check">
-                                    <input type="checkbox" class="form-check-input" id="includeParametersCheck" checked>
-                                    <label class="form-check-label" for="includeParametersCheck">
-                                        כלול פרמטרים
-                                    </label>
+        </div>
+    </div>
+
+    <!-- Modal for alert creation from condition -->
+    <div class="modal fade" id="createAlertFromConditionModal" tabindex="-1" aria-labelledby="createAlertFromConditionModalLabel" aria-hidden="true"
+         data-bs-backdrop="true" data-bs-keyboard="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header modal-header-colored">
+                    <h5 class="modal-title" id="createAlertFromConditionModalLabel">
+                        <i class="fa fa-bell me-2"></i>יצירת התראה מתנאי
+                    </h5>
+                    <button data-button-type="CLOSE" data-size="large" data-variant="small" data-onclick="data-bs-dismiss='modal'" data-text="" title="סגור מודל" aria-label="סגור"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="createAlertFromConditionForm">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">שם ההתראה</label>
+                                    <input type="text" name="alert_name" class="form-control" required>
                                 </div>
                             </div>
-                            
-                            <button type="button" class="btn btn-primary" id="exportConditionsBtn">
-                                <i class="fa fa-download me-2"></i>ייצא תנאים
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div class="tab-pane fade" id="import-pane" role="tabpanel">
-                        <div class="p-3">
-                            <h6>ייבוא תנאים</h6>
-                            <p class="text-muted">ייבא תנאים מקובץ JSON</p>
-                            
-                            <div class="mb-3">
-                                <label class="form-label">קובץ JSON</label>
-                                <input type="file" class="form-control" id="importConditionsFile" accept=".json">
-                            </div>
-                            
-                            <div class="mb-3">
-                                <div class="form-check">
-                                    <input type="checkbox" class="form-check-input" id="overwriteExistingCheck">
-                                    <label class="form-check-label" for="overwriteExistingCheck">
-                                        החלף תנאים קיימים
-                                    </label>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">סוג ההתראה</label>
+                                    <select name="alert_type" class="form-select" required>
+                                        <option value="price_condition">תנאי מחיר</option>
+                                        <option value="volume_condition">תנאי נפח</option>
+                                        <option value="technical_condition">תנאי טכני</option>
+                                        <option value="custom_condition">מותאם אישית</option>
+                                    </select>
                                 </div>
                             </div>
-                            
-                            <button type="button" class="btn btn-primary" id="importConditionsBtn" disabled>
-                                <i class="fa fa-upload me-2"></i>ייבא תנאים
-                            </button>
                         </div>
-                    </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">תיאור ההתראה</label>
+                            <textarea name="alert_description" class="form-control" rows="3"></textarea>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label">תכונה</label>
+                                    <select name="condition_attribute" class="form-select" required>
+                                        <option value="price">מחיר</option>
+                                        <option value="volume">נפח</option>
+                                        <option value="change">שינוי</option>
+                                        <option value="ma">ממוצע נע</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label">אופרטור</label>
+                                    <select name="condition_operator" class="form-select" required>
+                                        <option value="above">מעל</option>
+                                        <option value="below">מתחת</option>
+                                        <option value="equals">שווה ל</option>
+                                        <option value="cross">חוצה</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label class="form-label">ערך</label>
+                                    <input type="number" name="condition_number" class="form-control" step="0.01" required>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input type="checkbox" name="auto_create" class="form-check-input" id="autoCreateCheck" checked>
+                                <label class="form-check-label" for="autoCreateCheck">
+                                    צור התראה אוטומטית בעתיד
+                                </label>
+                            </div>
+                        </div>
+                    </form>
                 </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                    <i class="fa fa-times me-2"></i>סגור
-                </button>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="saveAlertFromConditionBtn">
+                        <i class="fa fa-save me-2"></i>צור התראה
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fa fa-times me-2"></i>ביטול
+                    </button>
+                </div>
             </div>
         </div>
     </div>
-</div>
+
+    <!-- Modal for condition testing -->
+    <div class="modal fade" id="testConditionModal" tabindex="-1" aria-labelledby="testConditionModalLabel" aria-hidden="true"
+         data-bs-backdrop="true" data-bs-keyboard="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header modal-header-colored">
+                    <h5 class="modal-title" id="testConditionModalLabel">
+                        <i class="fa fa-flask me-2"></i>בדיקת תנאי
+                    </h5>
+                    <button data-button-type="CLOSE" data-size="large" data-variant="small" data-onclick="data-bs-dismiss='modal'" data-text="" title="סגור מודל" aria-label="סגור"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="testConditionBody">
+                        <!-- Test results will be loaded here -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="runTestBtn">
+                        <i class="fa fa-play me-2"></i>הרץ בדיקה
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fa fa-times me-2"></i>סגור
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for bulk condition operations -->
+    <div class="modal fade" id="bulkConditionsModal" tabindex="-1" aria-labelledby="bulkConditionsModalLabel" aria-hidden="true"
+         data-bs-backdrop="true" data-bs-keyboard="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header modal-header-colored">
+                    <h5 class="modal-title" id="bulkConditionsModalLabel">
+                        <i class="fa fa-tasks me-2"></i>פעולות מרובות על תנאים
+                    </h5>
+                    <button data-button-type="CLOSE" data-size="large" data-variant="small" data-onclick="data-bs-dismiss='modal'" data-text="" title="סגור מודל" aria-label="סגור"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>פעולות זמינות</h6>
+                            <div class="list-group">
+                                <button type="button" class="list-group-item list-group-item-action" id="bulkActivateBtn">
+                                    <i class="fa fa-check-circle me-2"></i>הפעל כל התנאים
+                                </button>
+                                <button type="button" class="list-group-item list-group-item-action" id="bulkDeactivateBtn">
+                                    <i class="fa fa-times-circle me-2"></i>השבת כל התנאים
+                                </button>
+                                <button type="button" class="list-group-item list-group-item-action" id="bulkDeleteBtn">
+                                    <i class="fa fa-trash me-2"></i>מחק תנאים נבחרים
+                                </button>
+                                <button type="button" class="list-group-item list-group-item-action" id="bulkCreateAlertsBtn">
+                                    <i class="fa fa-bell me-2"></i>צור התראות לכל התנאים
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>תנאים נבחרים</h6>
+                            <div id="selectedConditionsList" class="border rounded p-3" style="min-height: 200px;">
+                                <p class="text-muted text-center">אין תנאים נבחרים</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="executeBulkOperationBtn" disabled>
+                        <i class="fa fa-play me-2"></i>בצע פעולה
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fa fa-times me-2"></i>סגור
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for condition import/export -->
+    <div class="modal fade" id="conditionImportExportModal" tabindex="-1" aria-labelledby="conditionImportExportModalLabel" aria-hidden="true"
+         data-bs-backdrop="true" data-bs-keyboard="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header modal-header-colored">
+                    <h5 class="modal-title" id="conditionImportExportModalLabel">
+                        <i class="fa fa-exchange-alt me-2"></i>ייבוא/ייצוא תנאים
+                    </h5>
+                    <button data-button-type="CLOSE" data-size="large" data-variant="small" data-onclick="data-bs-dismiss='modal'" data-text="" title="סגור מודל" aria-label="סגור"></button>
+                </div>
+                <div class="modal-body">
+                    <ul class="nav nav-tabs" id="importExportTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="export-tab" data-bs-toggle="tab" data-bs-target="#export-pane" type="button" role="tab">
+                                <i class="fa fa-download me-2"></i>ייצוא
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="import-tab" data-bs-toggle="tab" data-bs-target="#import-pane" type="button" role="tab">
+                                <i class="fa fa-upload me-2"></i>ייבוא
+                            </button>
+                        </li>
+                    </ul>
+                    
+                    <div class="tab-content" id="importExportTabContent">
+                        <div class="tab-pane fade show active" id="export-pane" role="tabpanel">
+                            <div class="p-3">
+                                <h6>ייצוא תנאים</h6>
+                                <p class="text-muted">ייצא את כל התנאים של הישות הנוכחית לקובץ JSON</p>
+                                
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" id="includeParametersCheck" checked>
+                                        <label class="form-check-label" for="includeParametersCheck">
+                                            כלול פרמטרים
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <button type="button" class="btn btn-primary" id="exportConditionsBtn">
+                                    <i class="fa fa-download me-2"></i>ייצא תנאים
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="tab-pane fade" id="import-pane" role="tabpanel">
+                            <div class="p-3">
+                                <h6>ייבוא תנאים</h6>
+                                <p class="text-muted">ייבא תנאים מקובץ JSON</p>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label">קובץ JSON</label>
+                                    <input type="file" class="form-control" id="importConditionsFile" accept=".json">
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" id="overwriteExistingCheck">
+                                        <label class="form-check-label" for="overwriteExistingCheck">
+                                            החלף תנאים קיימים
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <button type="button" class="btn btn-primary" id="importConditionsBtn" disabled>
+                                    <i class="fa fa-upload me-2"></i>ייבא תנאים
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fa fa-times me-2"></i>סגור
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- =============================================================== -->
+    <!-- ===== SCRIPTS ===== -->
+    <!-- =============================================================== -->
+    <!-- 📋 Loading Order: BASE → INIT-SYSTEM -->
+    <!-- 📦 Packages: base, init-system -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 1/2: BASE PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 1 | Description: Base systems required for all pages -->
+    <!-- Dependencies: none -->
+    <!-- Critical: YES | Version: 2.0.0 -->
+
+        <!-- =============================================================== -->
+        <!-- =============================================================== -->
+        <!-- =============================================================== -->
+        <!-- =============================================================== -->
+    <!-- ===== START SCRIPT LOADING ORDER ===== -->
+    <!-- =============================================================== -->
+    <!-- ⚠️ DO NOT MODIFY MANUALLY - Generated by generate-script-loading-code.js -->
+    <!-- 📋 Loading Order: BASE → SERVICES → MODULES → UI-ADVANCED → CRUD → PREFERENCES → INIT-SYSTEM -->
+    <!-- =============================================================== -->
+    <!-- ===== START SCRIPT LOADING ORDER ===== -->
+    <!-- =============================================================== -->
+    <!-- ⚠️ DO NOT MODIFY MANUALLY - Generated by generate-script-loading-code.js -->
+    <!-- 📋 Loading Order: BASE → SERVICES → MODULES → UI-ADVANCED → CRUD → PREFERENCES → INIT-SYSTEM -->
+    <!-- =============================================================== -->
+    <!-- ===== START SCRIPT LOADING ORDER ===== -->
+    <!-- =============================================================== -->
+    <!-- ⚠️ DO NOT MODIFY MANUALLY - Generated by generate-script-loading-code.js -->
+    <!-- 📋 Loading Order: BASE → SERVICES → MODULES → UI-ADVANCED → CRUD → PREFERENCES → INIT-SYSTEM -->
+    <!-- 🎯 Page: conditions-modals | Generated: 2025-12-07T01:43:45.624Z -->
+    <!-- 📦 Packages: base, services, ui-advanced, conditions, init-system -->
+    <!-- 🔧 Mode: development | Use Bundles: false -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 1/5: BASE PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 1 | Description: Core systems required for all pages -->
+    <!-- Dependencies:  -->
+    <!-- Critical: YES | Version: 1.5.0 -->
+
+    <!-- [1] Load Order: 1 | Strategy: defer -->
+    <script src="scripts/api-config.js?v=1.0.0" defer></script> <!-- Central API configuration -->
+    <!-- [2] Load Order: 2 | Strategy: defer -->
+    <script src="scripts/global-favicon.js?v=1.0.0" defer></script> <!-- Favicon management -->
+    <!-- [3] Load Order: 3 | Strategy: defer -->
+    <script src="scripts/notification-system.js?v=1.0.0" defer></script> <!-- Notification system -->
+    <!-- [4] Load Order: 4 | Strategy: defer -->
+    <script src="scripts/cache-sync-manager.js?v=1.0.0" defer></script> <!-- Cache synchronization manager -->
+    <!-- [5] Load Order: 5 | Strategy: defer -->
+    <script src="scripts/ui-utils.js?v=1.0.0" defer></script> <!-- UI utilities -->
+    <!-- [6] Load Order: 6 | Strategy: defer -->
+    <script src="scripts/warning-system.js?v=1.0.0" defer></script> <!-- Warning system -->
+    <!-- [7] Load Order: 7 | Strategy: defer -->
+    <script src="scripts/error-handlers.js?v=1.0.0" defer></script> <!-- Error handling system -->
+    <!-- [8] Load Order: 8 | Strategy: defer -->
+    <script src="scripts/unified-cache-manager.js?v=1.0.0" defer></script> <!-- Unified cache manager -->
+    <!-- [9] Load Order: 9 | Strategy: defer -->
+    <script src="scripts/icon-mappings.js?v=1.0.0" defer></script> <!-- Central icon mappings -->
+    <!-- [10] Load Order: 10 | Strategy: defer -->
+    <script src="scripts/icon-system.js?v=1.0.0" defer></script> <!-- Central icon system -->
+    <!-- [11] Load Order: 11 | Strategy: defer -->
+    <script src="scripts/icon-replacement-helper.js?v=1.0.0" defer></script> <!-- Icon replacement helper for standardizing icon usage -->
+    <!-- [12] Load Order: 12 | Strategy: defer -->
+    <script src="scripts/cache-clear-menu.js?v=1.0.0" defer></script> <!-- Cache clearing control (Stage B-Lite) -->
+    <!-- [13] Load Order: 13 | Strategy: defer -->
+    <script src="scripts/cache-ttl-guard.js?v=1.0.0" defer></script> <!-- TTL guard for entity loaders -->
+    <!-- [14] Load Order: 14 | Strategy: defer -->
+    <script src="scripts/auth.js?v=1.0.0" defer></script> <!-- Authentication system -->
+    <!-- [15] Load Order: 15 | Strategy: defer -->
+    <script src="scripts/auth-guard.js?v=1.0.0" defer></script> <!-- Page protection - authentication guard -->
+    <!-- [16] Load Order: 16 | Strategy: defer -->
+    <script src="scripts/logger-service.js?v=1.0.0" defer></script> <!-- Advanced logging service -->
+    <!-- [17] Load Order: 17 | Strategy: defer -->
+    <script src="scripts/header-system.js?v=1.0.0" defer></script> <!-- Header system -->
+    <!-- [18] Load Order: 18 | Strategy: defer -->
+    <script src="scripts/page-state-manager.js?v=1.0.0" defer></script> <!-- Unified page state manager -->
+    <!-- [19] Load Order: 19 | Strategy: defer -->
+    <script src="scripts/page-utils.js?v=1.0.0" defer></script> <!-- Page utilities -->
+    <!-- [20] Load Order: 20 | Strategy: defer -->
+    <script src="scripts/translation-utils.js?v=1.0.0" defer></script> <!-- Translations -->
+    <!-- [21] Load Order: 21 | Strategy: defer -->
+    <script src="scripts/button-icons.js?v=1.0.0" defer></script> <!-- Icon and button system -->
+    <!-- [22] Load Order: 22 | Strategy: defer -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script> <!-- Bootstrap JS Bundle (Tooltips & Modals) -->
+    <!-- [23] Load Order: 23 | Strategy: defer -->
+    <script src="scripts/event-handler-manager.js?v=1.0.0" defer></script> <!-- Central event management system -->
+    <!-- [24] Load Order: 24 | Strategy: defer -->
+    <script src="scripts/button-system-init.js?v=1.0.0" defer></script> <!-- Button system -->
+    <!-- [25] Load Order: 25 | Strategy: defer -->
+    <script src="scripts/color-scheme-system.js?v=1.0.0" defer></script> <!-- Dynamic color system -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 2/5: SERVICES PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 2 | Description: General services -->
+    <!-- Dependencies: base -->
+    <!-- Critical: NO | Version: 1.5.0 -->
+
+    <!-- [26] Load Order: 26 | Strategy: defer -->
+    <script src="scripts/services/data-collection-service.js?v=1.0.0" defer></script> <!-- Data collection service -->
+    <!-- [27] Load Order: 27 | Strategy: defer -->
+    <script src="scripts/services/field-renderer-service.js?v=1.0.0" defer></script> <!-- Field rendering service -->
+    <!-- [28] Load Order: 28 | Strategy: defer -->
+    <script src="scripts/services/select-populator-service.js?v=1.0.0" defer></script> <!-- Select box population service -->
+    <!-- [29] Load Order: 29 | Strategy: defer -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script> <!-- jsPDF library (for AI analysis PDF export) -->
+    <!-- [30] Load Order: 30 | Strategy: defer -->
+    <script src="scripts/services/ai-analysis-data.js?v=1.0.0" defer></script> <!-- AI Analysis data service -->
+    <!-- [31] Load Order: 31 | Strategy: defer -->
+    <script src="scripts/services/statistics-calculator.js?v=1.0.0" defer></script> <!-- Statistics calculator -->
+    <!-- [32] Load Order: 32 | Strategy: defer -->
+    <script src="scripts/services/default-value-setter.js?v=1.0.0" defer></script> <!-- Default value service -->
+    <!-- [33] Load Order: 33 | Strategy: defer -->
+    <script src="scripts/services/preferences-data.js?v=1.0.0" defer></script> <!-- Preferences data service (API + Cache) -->
+    <!-- [34] Load Order: 34 | Strategy: defer -->
+    <script src="scripts/services/unified-progress-manager.js?v=1.0.0" defer></script> <!-- Unified progress manager for process tracking -->
+    <!-- [35] Load Order: 35 | Strategy: defer -->
+    <script src="scripts/services/crud-response-handler.js?v=1.0.0" defer></script> <!-- CRUD response handler -->
+    <!-- [36] Load Order: 36 | Strategy: defer -->
+    <script src="scripts/services/unified-crud-service.js?v=1.0.0" defer></script> <!-- Unified CRUD service for all entities -->
+    <!-- [37] Load Order: 37 | Strategy: defer -->
+    <script src="scripts/services/investment-calculation-service.js?v=1.0.0" defer></script> <!-- Investment form amount ↔ quantity calculations -->
+    <!-- [38] Load Order: 38 | Strategy: defer -->
+    <script src="scripts/services/tag-service.js?v=1.0.0" defer></script> <!-- Central tag service (tag management and retrieval) -->
+    <!-- [39] Load Order: 39 | Strategy: defer -->
+    <script src="scripts/services/table-sort-value-adapter.js?v=1.0.0" defer></script> <!-- Adapter for unified sort values (DateEnvelope, legacy) -->
+    <!-- [40] Load Order: 40 | Strategy: defer -->
+    <script src="scripts/services/lint-status-service.js?v=1.0.0" defer></script> <!-- Unified linter status service (API reading and data conversion) -->
+    <!-- [41] Load Order: 41 | Strategy: defer -->
+    <script src="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.min.js" defer></script> <!-- Quill.js - Rich Text Editor Library -->
+    <!-- [42] Load Order: 42 | Strategy: defer -->
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js" defer></script> <!-- DOMPurify - HTML Sanitizer -->
+    <!-- [43] Load Order: 43 | Strategy: defer -->
+    <script src="scripts/services/rich-text-editor-service.js?v=1.0.0" defer></script> <!-- Rich text editor service -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 3/5: UI ADVANCED PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 3 | Description: Advanced user interface -->
+    <!-- Dependencies: base, services, modules -->
+    <!-- Critical: NO | Version: 1.5.0 -->
+
+    <!-- [44] Load Order: 44 | Strategy: defer -->
+    <script src="scripts/tables.js?v=1.0.0" defer></script> <!-- Table system -->
+    <!-- [45] Load Order: 45 | Strategy: defer -->
+    <script src="scripts/table-data-registry.js?v=1.0.0" defer></script> <!-- Table data registry -->
+    <!-- [46] Load Order: 46 | Strategy: defer -->
+    <script src="scripts/pagination-system.js?v=1.0.0" defer></script> <!-- Pagination system -->
+    <!-- [47] Load Order: 47 | Strategy: defer -->
+    <script src="scripts/modules/actions-menu-system.js?v=1.0.0" defer></script> <!-- Actions menu system -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 4/5: CONDITIONS PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 6.5 | Description: Condition systems -->
+    <!-- Dependencies: base, validation -->
+    <!-- Critical: NO | Version: 1.5.0 -->
+
+    <!-- [48] Load Order: 48 | Strategy: defer -->
+    <script src="scripts/conditions/conditions-translations.js?v=1.0.0" defer></script> <!-- Condition translations -->
+    <!-- [49] Load Order: 49 | Strategy: defer -->
+    <script src="scripts/conditions/conditions-validator.js?v=1.0.0" defer></script> <!-- Condition validator -->
+    <!-- [50] Load Order: 50 | Strategy: defer -->
+    <script src="scripts/conditions/conditions-form-generator.js?v=1.0.0" defer></script> <!-- Condition form generator -->
+    <!-- [51] Load Order: 51 | Strategy: defer -->
+    <script src="scripts/conditions/conditions-crud-manager.js?v=1.0.0" defer></script> <!-- Condition CRUD manager -->
+    <!-- [52] Load Order: 52 | Strategy: defer -->
+    <script src="scripts/conditions/conditions-initializer.js?v=1.0.0" defer></script> <!-- Condition initializer -->
+    <!-- [53] Load Order: 53 | Strategy: defer -->
+    <script src="scripts/conditions/conditions-ui-manager.js?v=1.0.0" defer></script> <!-- Condition UI manager -->
+    <!-- [54] Load Order: 54 | Strategy: defer -->
+    <script src="scripts/conditions/conditions-modal-controller.js?v=1.0.0" defer></script> <!-- Condition modal controller -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 5/5: INITIALIZATION PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 22 | Description: Initialization and monitoring systems -->
+    <!-- Dependencies: base -->
+    <!-- Critical: NO | Version: 1.5.0 -->
+
+    <!-- [55] Load Order: 55 | Strategy: defer -->
+    <script src="scripts/init-system/package-manifest.js?v=1.0.0" defer></script> <!-- Package manifest -->
+    <!-- [56] Load Order: 56 | Strategy: defer -->
+    <script src="scripts/page-initialization-configs.js?v=1.0.0" defer></script> <!-- Page initialization configurations -->
+    <!-- [57] Load Order: 57 | Strategy: defer -->
+    <script src="scripts/init-system-check.js?v=1.0.0" defer></script> <!-- Initialization system check -->
+    <!-- [58] Load Order: 58 | Strategy: defer -->
+    <script src="scripts/monitoring-functions.js?v=1.0.0" defer></script> <!-- Page monitoring functions -->
+    <!-- [59] Load Order: 59 | Strategy: defer -->
+    <script src="scripts/modules/core-systems.js?v=1.0.0" defer></script> <!-- Unified initialization system - single entry point (required for all pages) -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PAGE-SPECIFIC SCRIPTS ===== -->
+    <!-- =============================================================== -->
+
+    <!-- =============================================================== -->
+    <!-- ===== FINAL SUMMARY ===== -->
+    <!-- =============================================================== -->
+    <!-- 📊 Total Scripts Processed: 59 | Unique Scripts Loaded: 59 -->
+    <!-- 🔧 For maintenance: Use generate-script-loading-code.js --></body>
+</html>

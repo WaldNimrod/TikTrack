@@ -1,6 +1,9 @@
-from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy import Column, Integer, String, ForeignKey, event
 from .base import BaseModel
 from typing import Dict, Any, Optional
+import logging
+
+logger = logging.getLogger(__name__)
 
 class Note(BaseModel):
     """
@@ -19,6 +22,8 @@ class Note(BaseModel):
     """
     __tablename__ = "notes"
     
+    user_id = Column(Integer, ForeignKey('users.id'), nullable=False, index=True,
+                    comment="User who owns this note")
     content = Column(String(10000), nullable=False)
     attachment = Column(String(500), nullable=True)  # path to file
     related_type_id = Column(Integer, ForeignKey('note_relation_types.id'), nullable=False)
@@ -47,3 +52,27 @@ class Note(BaseModel):
         # No backward compatibility needed - using only related_type_id and related_id
         
         return result
+
+
+# ========================================
+# SQLAlchemy Event Listeners for Tag Links Cleanup
+# ========================================
+
+@event.listens_for(Note, 'after_delete')
+def note_deleted(mapper, connection, target):
+    """
+    Event listener for when a note is deleted.
+    Automatically removes all associated tag links.
+    """
+    try:
+        from services.tag_service import TagService
+        from sqlalchemy.orm import Session
+        
+        session = Session(bind=connection)
+        TagService.remove_all_tags_for_entity(
+            session, 'note', target.id
+        )
+        session.close()
+    except Exception as e:
+        logger.error(f"Error cleaning up tags for note {target.id}: {e}")
+        # Don't raise - allow deletion to proceed even if tag cleanup fails

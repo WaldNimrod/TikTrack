@@ -11,6 +11,65 @@
  * @since 2025-01-09
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === UI Functions ===
+// - updateEntityColors() - Updateentitycolors
+// - updateCSSVariablesFromPreferences() - Updatecssvariablesfrompreferences
+
+// === Data Functions ===
+// - getEntityColor() - Getentitycolor
+// - getEntityBackgroundColor() - Getentitybackgroundcolor
+// - getEntityTextColor() - Getentitytextcolor
+// - getEntityBorderColor() - Getentitybordercolor
+// - getEntityLabel() - Getentitylabel
+// - getStatusColor() - Getstatuscolor
+// - getStatusBackgroundColor() - Getstatusbackgroundcolor
+// - getStatusTextColor() - Getstatustextcolor
+// - getStatusBorderColor() - Getstatusbordercolor
+// - getInvestmentTypeColor() - Getinvestmenttypecolor
+// - getInvestmentTypeBackgroundColor() - Getinvestmenttypebackgroundcolor
+// - getInvestmentTypeTextColor() - Getinvestmenttypetextcolor
+// - getInvestmentTypeBorderColor() - Getinvestmenttypebordercolor
+// - getNumericValueColor() - Getnumericvaluecolor
+// - getNumericValueBackgroundColor() - Getnumericvaluebackgroundcolor
+// - getNumericValueTextColor() - Getnumericvaluetextcolor
+// - getNumericValueBorderColor() - Getnumericvaluebordercolor
+// - getValueType() - Getvaluetype
+// - getNumericValueCSSClass() - Getnumericvaluecssclass
+// - loadColorScheme() - Loadcolorscheme
+// - saveColorScheme() - Savecolorscheme
+// - getCurrentColorScheme() - Getcurrentcolorscheme
+// - getAvailableColorSchemes() - Getavailablecolorschemes
+// - loadDynamicColors() - Loaddynamiccolors
+// - getEntityColorFromPreferences() - Getentitycolorfrompreferences
+// - getAllEntityColorVariantsFromPreferences() - Getallentitycolorvariantsfrompreferences
+// - loadColorPreferences() - Loadcolorpreferences
+
+// === Other ===
+// - hexToRgb() - Hextorgb
+// - darkenColor() - Darkencolor
+// - isValidEntityType() - Isvalidentitytype
+// - isPositiveValue() - Ispositivevalue
+// - isNegativeValue() - Isnegativevalue
+// - isZeroValue() - Iszerovalue
+// - generateEntityCSS() - Generateentitycss
+// - generateStatusCSS() - Generatestatuscss
+// - generateInvestmentTypeCSS() - Generateinvestmenttypecss
+// - generateNumericValueCSS() - Generatenumericvaluecss
+// - applyColorScheme() - Applycolorscheme
+// - applyLightScheme() - Applylightscheme
+// - applyDarkScheme() - Applydarkscheme
+// - applyCustomScheme() - Applycustomscheme
+// - toggleColorScheme() - Togglecolorscheme
+// - setCurrentEntityColorFromPage() - Setcurrententitycolorfrompage
+// - findPageClass() - Findpageclass
+// - setVar() - Setvar
+// - computeVariant() - Computevariant
+// - applyNumericPalette() - Applynumericpalette
+// - applyThemeColor() - Applythemecolor
+
 // ===== ENTITY TYPE DEFINITIONS =====
 const VALID_ENTITY_TYPES = [
   'trade', 'trade_plan', 'execution', 'account', 'cash_flow',

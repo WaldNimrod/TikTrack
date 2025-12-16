@@ -22,10 +22,10 @@
 
 .pagination-wrapper {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start;
     align-items: center;
     flex-wrap: wrap;
-    gap: 15px;
+    gap: 10px;
 }
 
 /* ===== PAGINATION INFO ===== */
@@ -35,6 +35,7 @@
     align-items: center;
     gap: 15px;
     flex-wrap: wrap;
+    padding: 0; /* הסרת padding מהקונטיינר של הדרופדאון */
 }
 
 .items-info {
@@ -44,24 +45,24 @@
 }
 
 .page-size-selector {
-    padding: 6px 12px;
-    border: 1px solid #ced4da;
-    border-radius: 6px;
+    padding: 4px 8px; /* padding מינימלי רק לפנים */
+    border: none; /* הסרת border */
+    border-radius: 4px;
     background: white;
     color: #495057;
-    font-size: 14px;
+    font-size: 11px; /* קטן 25% מ-14px (14 * 0.75 = 10.5, מעוגל ל-11) */
     cursor: pointer;
     transition: all 0.2s ease;
 }
 
 .page-size-selector:hover {
-    border-color: var(--primary-color, #26baac);
+    background: #f8f9fa;
     box-shadow: 0 0 0 2px rgba(38, 186, 172, 0.1);
 }
 
 .page-size-selector:focus {
     outline: none;
-    border-color: var(--primary-color, #26baac);
+    background: #f8f9fa;
     box-shadow: 0 0 0 2px rgba(38, 186, 172, 0.25);
 }
 
@@ -86,6 +87,18 @@
     display: flex;
     align-items: center;
     gap: 6px;
+}
+
+/* כפתור עם איקון בלבד (קטן) */
+.pagination-btn-icon-only {
+    padding: 6px 8px;
+    min-width: 32px;
+    justify-content: center;
+    gap: 0;
+}
+
+.pagination-btn-icon-only i {
+    font-size: 14px;
 }
 
 .pagination-btn:hover:not(:disabled) {
@@ -117,24 +130,20 @@
 @media (max-width: 768px) {
     .pagination-wrapper {
         flex-direction: column;
-        align-items: stretch;
+        align-items: center;
         gap: 10px;
     }
     
-    .pagination-info {
-        justify-content: center;
-        order: 2;
-    }
-    
-    .pagination-navigation {
-        justify-content: center;
-        order: 1;
-    }
-    
-    .pagination-btn {
+    .pagination-btn,
+    .pagination-btn-icon-only {
         flex: 1;
         justify-content: center;
-        min-width: 120px;
+        min-width: 100px;
+    }
+    
+    .page-info,
+    .items-info {
+        text-align: center;
     }
 }
 
@@ -203,10 +212,35 @@
     outline-offset: 2px;
 }
 
+/* ===== COMPACT PAGINATION (ABOVE TABLE) ===== */
+
+.pagination-container-compact {
+    margin-bottom: 10px;
+    padding: 8px;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+}
+
+.pagination-compact-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.page-info-compact {
+    color: #495057;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 0 8px;
+}
+
 /* ===== PRINT STYLES ===== */
 
 @media print {
-    .pagination-container {
+    .pagination-container,
+    .pagination-container-compact {
         display: none;
     }
 }

@@ -18,6 +18,15 @@
  * - חישוב group by (קיבוץ)
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Data Functions ===
+// - calculateStatisticsViaAPI() - Calculatestatisticsviaapi
+// - calculateSumViaAPI() - Calculatesumviaapi
+// - calculateAverageViaAPI() - Calculateaverageviaapi
+// - countRecordsViaAPI() - Countrecordsviaapi
+
 // ===== STATISTICS CALCULATOR =====
 
 class StatisticsCalculator {

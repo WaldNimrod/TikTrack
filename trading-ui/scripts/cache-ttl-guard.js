@@ -40,7 +40,23 @@
     'business:calculate-percentage-from-price': { ttl: 60 * 1000 }, // Increased from 30s
     'business:calculate-execution-values': { ttl: 60 * 1000 }, // Increased from 30s - complex calculation
     'business:calculate-average-price': { ttl: 60 * 1000 }, // Increased from 30s
-    'business:validate-execution': { ttl: 120 * 1000 }, // Increased from 60s - validation results are stable
+    'business:validate-execution': { ttl: 120 * 1000 },
+    // Historical Data Services - Optimized TTL
+    'trade-history-data': { ttl: 5 * 60 * 1000 }, // 5 minutes
+    'trade-history-data-*': { ttl: 5 * 60 * 1000 },
+    'trade-history-statistics-*': { ttl: 5 * 60 * 1000 },
+    'trade-history-aggregated-*': { ttl: 5 * 60 * 1000 },
+    'trade-history-plan-vs-execution-*': { ttl: 5 * 60 * 1000 },
+    'portfolio-state-data': { ttl: 10 * 60 * 1000 }, // 10 minutes - historical data changes less
+    'portfolio-state-snapshot-*': { ttl: 10 * 60 * 1000 },
+    'portfolio-state-series-*': { ttl: 10 * 60 * 1000 },
+    'portfolio-state-performance-*': { ttl: 10 * 60 * 1000 },
+    'portfolio-state-comparison-*': { ttl: 10 * 60 * 1000 },
+    'trading-journal-data': { ttl: 3 * 60 * 1000 }, // 3 minutes - changes more frequently
+    'trading-journal-data-*': { ttl: 3 * 60 * 1000 },
+    'trading-journal-statistics-*': { ttl: 3 * 60 * 1000 },
+    'trading-journal-calendar-*': { ttl: 3 * 60 * 1000 },
+    'trading-journal-by-entity-*': { ttl: 3 * 60 * 1000 }, // Increased from 60s - validation results are stable
     'business:validate-condition-value': { ttl: 120 * 1000 }, // Increased from 60s
     'business:validate-alert': { ttl: 120 * 1000 }, // Increased from 60s
     // New Business Logic API cache configs

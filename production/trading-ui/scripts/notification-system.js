@@ -303,9 +303,40 @@ async function updateNotificationHistory(action, data) {
  * @param {Object} alertData - Updated alert data
  * @returns {Promise} Promise that resolves when alert is updated
  */
-function updateAlert(_alertId, _alertData) {
-  // Implementation for updating business alerts
-  // TODO: Implement alert update logic
+async function updateAlert(alertId, alertData) {
+  try {
+    if (!alertId) {
+      throw new Error('Alert ID is required');
+    }
+
+    window.Logger?.info?.('Updating alert', { alertId, page: 'notification-system' });
+
+    const response = await fetch(`/api/alerts/${alertId}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(alertData)
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error?.message || `Failed to update alert: ${response.status}`);
+    }
+
+    const result = await response.json();
+    window.Logger?.info?.('Alert updated successfully', { alertId, page: 'notification-system' });
+
+    // Refresh alerts if needed
+    if (window.ActiveAlertsComponent && typeof window.ActiveAlertsComponent.refresh === 'function') {
+      window.ActiveAlertsComponent.refresh();
+    }
+
+    return result.data;
+  } catch (error) {
+    window.Logger?.error?.('Error updating alert', { alertId, error: error?.message, page: 'notification-system' });
+    throw error;
+  }
 }
 
 /**
@@ -315,9 +346,39 @@ function updateAlert(_alertId, _alertData) {
  * @param {number} alertId - ID of alert to mark as triggered
  * @returns {Promise} Promise that resolves when alert is marked
  */
-function markAlertAsTriggered(_alertId) {
-  // Implementation for marking alerts as triggered
-  // TODO: Implement alert trigger logic
+async function markAlertAsTriggered(alertId) {
+  try {
+    if (!alertId) {
+      throw new Error('Alert ID is required');
+    }
+
+    window.Logger?.info?.('Marking alert as triggered', { alertId, page: 'notification-system' });
+
+    const response = await fetch(`/api/alerts/${alertId}/trigger`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error?.message || `Failed to trigger alert: ${response.status}`);
+    }
+
+    const result = await response.json();
+    window.Logger?.info?.('Alert marked as triggered successfully', { alertId, page: 'notification-system' });
+
+    // Refresh alerts if needed
+    if (window.ActiveAlertsComponent && typeof window.ActiveAlertsComponent.refresh === 'function') {
+      window.ActiveAlertsComponent.refresh();
+    }
+
+    return result.data;
+  } catch (error) {
+    window.Logger?.error?.('Error marking alert as triggered', { alertId, error: error?.message, page: 'notification-system' });
+    throw error;
+  }
 }
 
 /**
@@ -327,9 +388,39 @@ function markAlertAsTriggered(_alertId) {
  * @param {number} alertId - ID of alert to mark as read
  * @returns {Promise} Promise that resolves when alert is marked
  */
-function markAlertAsRead(_alertId) {
-  // Implementation for marking alerts as triggered
-  // TODO: Implement alert read logic
+async function markAlertAsRead(alertId) {
+  try {
+    if (!alertId) {
+      throw new Error('Alert ID is required');
+    }
+
+    window.Logger?.info?.('Marking alert as read', { alertId, page: 'notification-system' });
+
+    const response = await fetch(`/api/alerts/${alertId}/mark-read`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error?.message || `Failed to mark alert as read: ${response.status}`);
+    }
+
+    const result = await response.json();
+    window.Logger?.info?.('Alert marked as read successfully', { alertId, page: 'notification-system' });
+
+    // Refresh alerts if needed
+    if (window.ActiveAlertsComponent && typeof window.ActiveAlertsComponent.refresh === 'function') {
+      window.ActiveAlertsComponent.refresh();
+    }
+
+    return result.data;
+  } catch (error) {
+    window.Logger?.error?.('Error marking alert as read', { alertId, error: error?.message, page: 'notification-system' });
+    throw error;
+  }
 }
 
 
@@ -423,14 +514,20 @@ async function shouldShowNotification(category, type = 'info', userInitiated = f
       if (cached && cached.notification_mode !== undefined) {
         notificationMode = cached.notification_mode;
       } else {
-        // אם לא במטמון, קרא מהשרת ועדכן מטמון
-        notificationMode = await window.getPreference('notification_mode', 1, null);
+        // CRITICAL: Prevent infinite recursion - if getPreference is currently being called, use default
+        if (!window.__GET_PREFERENCE_IN_PROGRESS__) {
+          // אם לא במטמון, קרא מהשרת ועדכן מטמון
+          notificationMode = await window.getPreference('notification_mode', 1, null);
+        } else {
+          notificationMode = 'work'; // Default during preferences loading
+        }
       }
       
       const mode = notificationMode || 'work'; // ברירת מחדל: מצב עבודה
       
+      // CRITICAL: Do NOT use Logger here to prevent infinite recursion
       if (window.DEBUG_MODE) {
-        window.Logger.info(`🔍 Notification mode: ${mode}, category: ${category}, type: ${type}, userInitiated: ${userInitiated}`, { page: "notification-system" });
+        console.log(`🔍 Notification mode: ${mode}, category: ${category}, type: ${type}, userInitiated: ${userInitiated}`);
       }
       
       // בדוק אם ההודעה צריכה להיות מוצגת במצב הנוכחי
@@ -438,7 +535,7 @@ async function shouldShowNotification(category, type = 'info', userInitiated = f
       
       if (!shouldShow) {
         if (window.DEBUG_MODE) {
-          // window.Logger.info(`🔍 Notification filtered out by mode ${mode}: category=${category}, type=${type}, userInitiated=${userInitiated}`, { page: "notification-system" });
+          console.log(`🔍 Notification filtered out by mode ${mode}: category=${category}, type=${type}, userInitiated=${userInitiated}`);
         }
         return false;
       }
@@ -446,16 +543,23 @@ async function shouldShowNotification(category, type = 'info', userInitiated = f
     
     // בדוק את ההגדרות הישנות (תאימות לאחור)
     const preferenceName = `notifications_${category}_enabled`;
-    // window.Logger.info(`🔍 Checking preference: ${preferenceName}`, { page: "notification-system" });
+    
+    // CRITICAL: Prevent infinite recursion - if getPreference is currently being called, return default
+    if (window.__GET_PREFERENCE_IN_PROGRESS__) {
+      return true; // Default: show notification during preferences loading
+    }
     
     if (typeof window.getPreference !== 'function') {
-      window.Logger.warn('getPreference function not available, showing notification by default', { page: "notification-system" });
+      // CRITICAL: Do NOT use Logger here to prevent infinite recursion
+      if (window.DEBUG_MODE) {
+        console.warn('getPreference function not available, showing notification by default');
+      }
       return true;
     }
     
     const isEnabled = await window.getPreference(preferenceName);
     if (window.DEBUG_MODE) {
-      // window.Logger.info(`🔍 Preference ${preferenceName} value:`, isEnabled, typeof isEnabled, { page: "notification-system" });
+      console.log(`🔍 Preference ${preferenceName} value:`, isEnabled, typeof isEnabled);
     }
     
     // If preference is not found (null), show notifications by default for critical categories
@@ -463,30 +567,32 @@ async function shouldShowNotification(category, type = 'info', userInitiated = f
     if (isEnabled === null) {
       // For import-user-data category, always show errors and warnings
       if (category === 'import-user-data') {
-        window.Logger?.info?.(`⚠️ Preference ${preferenceName} not found - showing notification by default for import-user-data`, { page: "notification-system" });
+        if (window.DEBUG_MODE) {
+          console.log(`⚠️ Preference ${preferenceName} not found - showing notification by default for import-user-data`);
+        }
         return true;
       }
-      // window.Logger.info(`⚠️ Preference ${preferenceName} not found - notification disabled`, { page: "notification-system" });
+      if (window.DEBUG_MODE) {
+        console.log(`⚠️ Preference ${preferenceName} not found - notification disabled`);
+      }
       return false;
     }
     
     const result = isEnabled === 'true' || isEnabled === true;
     if (window.DEBUG_MODE) {
-      // window.Logger.info(`🔍 Should show notification for ${category}:`, result, { page: "notification-system" });
+      console.log(`🔍 Should show notification for ${category}:`, result);
     }
     return result;
   } catch (error) {
+    // CRITICAL: Do NOT use Logger here to prevent infinite recursion
     if (window.DEBUG_MODE) {
-      window.Logger.warn('Failed to check notification preference, showing by default:', error, { page: "notification-system" });
+      console.warn('Failed to check notification preference, showing by default:', error);
     }
     // For general category, map to system category; for others, show by default
     if (error && error.isAuthError) {
       __NOTIFICATION_PREFS_AUTH_FAILED__ = true;
       if (window.DEBUG_MODE) {
-        window.Logger?.warn?.('⚠️ Notification preferences disabled due to authentication error; falling back to defaults', {
-          page: 'notification-system',
-          error: error?.message,
-        });
+        console.warn('⚠️ Notification preferences disabled due to authentication error; falling back to defaults', error?.message);
       }
       // When auth is missing, do not spam errors; just allow notifications to show.
       return true;
@@ -508,11 +614,19 @@ async function shouldShowNotification(category, type = 'info', userInitiated = f
  */
 async function shouldLogToConsole(category) {
   try {
+    // CRITICAL: Prevent infinite recursion - if getPreference is currently being called, return default
+    if (window.__GET_PREFERENCE_IN_PROGRESS__) {
+      return true; // Default: write to console during preferences loading
+    }
+    
     const preferenceName = `console_logs_${category}_enabled`;
     const isEnabled = await window.getPreference(preferenceName);
     return isEnabled === 'true' || isEnabled === true;
   } catch (error) {
-    window.Logger.warn('Failed to check console log preference, logging by default:', error, { page: "notification-system" });
+    // CRITICAL: Do NOT use Logger here to prevent infinite recursion
+    if (window.DEBUG_MODE) {
+      console.warn('Failed to check console log preference, logging by default:', error);
+    }
     return true; // Default: write to console
   }
 }
@@ -562,8 +676,20 @@ function getLogEmoji(level) {
  * @param {string} category - Category of notification (development, system, business, performance, ui)
  */
 async function showNotification(message, type = 'info', title = 'מערכת', duration = 5000, category = null, options = {}) {
-  // Auto-detect category if not provided
-  if (!category && typeof window.detectNotificationCategory === 'function') {
+  // CRITICAL: Prevent infinite recursion - if showNotification is already running, skip
+  if (window.__SHOW_NOTIFICATION_IN_PROGRESS__) {
+    if (window.DEBUG_MODE) {
+      console.warn('⚠️ showNotification called while already in progress - preventing recursion');
+    }
+    return;
+  }
+  
+  // Set flag to prevent recursion
+  window.__SHOW_NOTIFICATION_IN_PROGRESS__ = true;
+  
+  try {
+    // Auto-detect category if not provided
+    if (!category && typeof window.detectNotificationCategory === 'function') {
     try {
       const context = {
         fileName: window.location.pathname,
@@ -600,7 +726,10 @@ async function showNotification(message, type = 'info', title = 'מערכת', du
   }
   
   // Check if notification should be shown based on category preferences and notification mode
-  window.Logger.info(`🔔 showNotification called: "${message}", type: ${type}, category: ${category}, options:`, options, { page: "notification-system" });
+  // CRITICAL: Do NOT use Logger here to prevent infinite recursion (Logger calls getPreference which may call showNotification)
+  if (window.DEBUG_MODE) {
+    console.log(`🔔 showNotification called: "${message}", type: ${type}, category: ${category}`, options);
+  }
   
   if (category) {
     try {
@@ -613,18 +742,25 @@ async function showNotification(message, type = 'info', title = 'מערכת', du
         options.functionName || 'showNotification'
       );
       if (window.DEBUG_MODE) {
-        window.Logger.info(`🔍 Category ${category} enabled:`, shouldShow, { page: "notification-system" });
+        console.log(`🔍 Category ${category} enabled:`, shouldShow);
       }
       if (!shouldShow) {
-        window.Logger.info(`❌ Notification blocked for category: ${category}`, { page: "notification-system" });
+        if (window.DEBUG_MODE) {
+          console.log(`❌ Notification blocked for category: ${category}`);
+        }
         return; // Don't show notification if category is disabled
       }
     } catch (error) {
-      window.Logger.warn('Failed to check notification category, showing anyway:', error, { page: "notification-system" });
+      // CRITICAL: Do NOT use Logger here to prevent infinite recursion
+      if (window.DEBUG_MODE) {
+        console.warn('Failed to check notification category, showing anyway:', error);
+      }
       // Continue to show notification if category check fails
     }
   } else {
-    window.Logger.info(`✅ Showing notification (category: ${category}, { page: "notification-system" })`);
+    if (window.DEBUG_MODE) {
+      console.log(`✅ Showing notification (category: ${category})`);
+    }
   }
   
   const notificationColor = getNotificationColor(type);
@@ -637,18 +773,39 @@ async function showNotification(message, type = 'info', title = 'מערכת', du
   const notification = document.createElement('div');
   notification.className = `notification notification-${type}`;
   notification.style.borderLeft = `4px solid ${notificationColor}`;
-  notification.innerHTML = `
-    <div class="notification-icon" style="color: ${notificationColor}">
-      <i class="fas ${getNotificationIcon(type)}"></i>
-    </div>
-    <div class="notification-content">
-      <div class="notification-title">${title}</div>
-      <div class="notification-message">${message}</div>
-    </div>
-    <button class="notification-close" onclick="this.parentElement.remove()">
-      <i class="fas fa-times"></i>
-    </button>
-  `;
+  // Build notification structure
+  const iconDiv = document.createElement('div');
+  iconDiv.className = 'notification-icon';
+  iconDiv.style.color = notificationColor;
+  const icon = document.createElement('i');
+  icon.className = `fas ${getNotificationIcon(type)}`;
+  iconDiv.appendChild(icon);
+  notification.appendChild(iconDiv);
+  const contentDiv = document.createElement('div');
+  contentDiv.className = 'notification-content';
+  const titleDiv = document.createElement('div');
+  titleDiv.className = 'notification-title';
+  titleDiv.textContent = title;
+  contentDiv.appendChild(titleDiv);
+  const messageDiv = document.createElement('div');
+  messageDiv.className = 'notification-message';
+  messageDiv.textContent = message || '';
+  // Check if message is in English - if so, apply LTR direction
+  const messageStr = (message || '').toString();
+  const isEnglish = messageStr && (/^[a-zA-Z]/.test(messageStr.trim()) || /[a-zA-Z]{3,}/.test(messageStr));
+  if (isEnglish) {
+    messageDiv.style.direction = 'ltr';
+    messageDiv.style.textAlign = 'left';
+  }
+  contentDiv.appendChild(messageDiv);
+  notification.appendChild(contentDiv);
+  const closeBtn = document.createElement('button');
+  closeBtn.className = 'notification-close';
+  closeBtn.onclick = function() { this.parentElement.remove(); };
+  const closeIcon = document.createElement('i');
+  closeIcon.className = 'fas fa-times';
+  closeBtn.appendChild(closeIcon);
+  notification.appendChild(closeBtn);
 
   // Debug: Log notification element details
   // window.Logger.info('🔍 DEBUG: Notification element created:', {
@@ -845,11 +1002,20 @@ async function showNotification(message, type = 'info', title = 'מערכת', du
 
   // Save to global history
   saveNotificationToGlobalHistory(type, title, message, category).catch(error => {
-    window.Logger.warn('Failed to save notification to global history:', error, { page: "notification-system" });
+    // CRITICAL: Do NOT use Logger here to prevent infinite recursion
+    if (window.DEBUG_MODE) {
+      console.warn('Failed to save notification to global history:', error);
+    }
   });
 
-  // Console log for debugging
-  window.Logger.info(`🔔 ${type.toUpperCase()}: ${title} - ${message}`, { page: "notification-system" });
+  // Console log for debugging (only in DEBUG_MODE to prevent recursion)
+  if (window.DEBUG_MODE) {
+    console.log(`🔔 ${type.toUpperCase()}: ${title} - ${message}`);
+  }
+  } finally {
+    // CRITICAL: Always clear the flag to allow future notifications
+    window.__SHOW_NOTIFICATION_IN_PROGRESS__ = false;
+  }
 }
 
 /**
@@ -1084,19 +1250,89 @@ async function showDetailsModal(title, content, options = {}) {
   // Ensure content is properly rendered as HTML
   const detailsContent = modal.querySelector('.details-content');
   if (detailsContent) {
-    detailsContent.innerHTML = content;
+    detailsContent.textContent = '';
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(content, 'text/html');
+    doc.body.childNodes.forEach(node => {
+        detailsContent.appendChild(node.cloneNode(true));
+    });
   }
   
-  // Show modal using simple system (no Bootstrap dependency)
-  modal.style.display = 'block';
-  modal.classList.add('show');
-  
-  // Backdrop handled by Bootstrap
+  // Show modal using ModalManagerV2 (with proper z-index and backdrop management)
+  if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
+    // ניקוי backdrops לפני פתיחה
+    if (window.ModalManagerV2._cleanupBootstrapBackdrops) {
+      window.ModalManagerV2._cleanupBootstrapBackdrops();
+    }
+    
+    window.ModalManagerV2.showModal(modalId, 'view').then(() => {
+      // עדכון z-index דרך ModalZIndexManager
+      if (window.ModalZIndexManager && typeof window.ModalZIndexManager.forceUpdate === 'function') {
+        requestAnimationFrame(() => {
+          window.ModalZIndexManager.forceUpdate(modal);
+        });
+      }
+    }).catch(error => {
+      window.Logger?.error('Error showing details modal via ModalManagerV2', { error, modalId, page: 'notification-system' });
+      // Fallback to Bootstrap
+      if (bootstrap?.Modal) {
+        // ניקוי backdrops לפני פתיחה
+        if (window.ModalManagerV2?._cleanupBootstrapBackdrops) {
+          window.ModalManagerV2._cleanupBootstrapBackdrops();
+        }
+        const bootstrapModal = new bootstrap.Modal(modal, { backdrop: false });
+        bootstrapModal.show();
+        // ניקוי backdrops אחרי פתיחה
+        if (window.ModalManagerV2?._cleanupBootstrapBackdrops) {
+          setTimeout(() => {
+            window.ModalManagerV2._cleanupBootstrapBackdrops();
+          }, 50);
+        }
+        // עדכון z-index
+        if (window.ModalZIndexManager?.forceUpdate) {
+          setTimeout(() => {
+            window.ModalZIndexManager.forceUpdate(modal);
+          }, 50);
+        }
+      } else {
+        // Fallback: Show modal using simple system (no Bootstrap dependency)
+        modal.style.display = 'block';
+        modal.classList.add('show');
+      }
+    });
+  } else if (bootstrap?.Modal) {
+    // ניקוי backdrops לפני פתיחה
+    if (window.ModalManagerV2?._cleanupBootstrapBackdrops) {
+      window.ModalManagerV2._cleanupBootstrapBackdrops();
+    }
+    const bootstrapModal = new bootstrap.Modal(modal, { backdrop: false });
+    bootstrapModal.show();
+    // ניקוי backdrops אחרי פתיחה
+    if (window.ModalManagerV2?._cleanupBootstrapBackdrops) {
+      setTimeout(() => {
+        window.ModalManagerV2._cleanupBootstrapBackdrops();
+      }, 50);
+    }
+    // עדכון z-index
+    if (window.ModalZIndexManager?.forceUpdate) {
+      setTimeout(() => {
+        window.ModalZIndexManager.forceUpdate(modal);
+      }, 50);
+    }
+  } else {
+    // Fallback: Show modal using simple system (no Bootstrap dependency)
+    modal.style.display = 'block';
+    modal.classList.add('show');
+  }
   
   // סגירה בלחיצה על הרקע
   modal.addEventListener('click', (e) => {
     if (e.target === modal) {
-      hideModal(modalId);
+      if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
+        window.ModalManagerV2.hideModal(modalId);
+      } else {
+        hideModal(modalId);
+      }
     }
   });
   
@@ -1148,7 +1384,11 @@ async function showDetailsModal(title, content, options = {}) {
   const headerCloseButton = modal.querySelector(`#${modalId}-close-btn`);
   if (headerCloseButton) {
     headerCloseButton.addEventListener('click', () => {
-      hideModal(modalId);
+      if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
+        window.ModalManagerV2.hideModal(modalId);
+      } else {
+        hideModal(modalId);
+      }
     });
   }
   
@@ -1156,7 +1396,11 @@ async function showDetailsModal(title, content, options = {}) {
   const footerCloseBtn = modal.querySelector(`#${modalId}-footer-close`);
   if (footerCloseBtn) {
     footerCloseBtn.addEventListener('click', () => {
-      hideModal(modalId);
+      if (window.ModalManagerV2 && typeof window.ModalManagerV2.hideModal === 'function') {
+        window.ModalManagerV2.hideModal(modalId);
+      } else {
+        hideModal(modalId);
+      }
     });
   }
   
@@ -1197,12 +1441,12 @@ function closeAllDetailsModals() {
 
 // Helper function to extract text content from HTML
 function extractTextFromHTML(htmlContent) {
-  // Create temporary div to parse HTML
-  const tempDiv = document.createElement('div');
-  tempDiv.innerHTML = htmlContent;
+  // Parse HTML using DOMParser
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(htmlContent, 'text/html');
   
   // Extract text content
-  let textContent = tempDiv.textContent || tempDiv.innerText || '';
+  let textContent = doc.body.textContent || doc.body.innerText || '';
   
   // Clean up the text
   textContent = textContent
@@ -1313,7 +1557,7 @@ async function saveNotificationToGlobalHistory(type, title, message, category = 
       }
     } else {
       // מערכת מטמון לא מאותחלת - מדלג על שמירה
-      window.Logger.info('⚠️ Cache system not initialized - skipping notification history save', { page: "notification-system" });
+      window.Logger?.debug?.('ℹ️ Cache system not initialized - skipping notification history save', { page: "notification-system" });
     }
 
     // Fallback ל-localStorage במקרה של בעיה
@@ -1363,7 +1607,7 @@ async function updateGlobalNotificationStats() {
       }
     } else {
       // מערכת מטמון לא מאותחלת - מדלג על טעינה
-      window.Logger.info('⚠️ Cache system not initialized - skipping notification history load', { page: "notification-system" });
+      window.Logger?.debug?.('ℹ️ Cache system not initialized - skipping notification history load', { page: "notification-system" });
       history = [];
     }
     
@@ -1406,7 +1650,7 @@ async function updateGlobalNotificationStats() {
       }
     } else {
       // מערכת מטמון לא מאותחלת - מדלג על שמירת סטטיסטיקות
-      window.Logger.info('⚠️ Cache system not initialized - skipping notification stats save', { page: "notification-system" });
+      window.Logger?.debug?.('ℹ️ Cache system not initialized - skipping notification stats save', { page: "notification-system" });
     }
 
     // Fallback ל-localStorage
@@ -1587,73 +1831,47 @@ window.NotificationSystem = {
     }
 };
 
-// פונקציה להצגת הודעה מפורטת בחלון
+// פונקציה להצגת הודעה מפורטת בפינה (לא מודול!)
+// NOTIFICATION SYSTEM - Shows detailed notification in corner with option to expand to modal
 window.showDetailedNotification = async function(title, message, type = 'info', duration = 8000, category = null) {
   try {
-    // יצירת modal עם התוכן המפורט
-    const modalId = `detailed-notification-${Date.now()}`;
-    const modalHtml = `
-      <div class="modal fade" id="${modalId}" tabindex="-1" aria-labelledby="${modalId}Label" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-          <div class="modal-content">
-            <div class="modal-header bg-${type === 'error' ? 'danger' : type === 'warning' ? 'warning' : type === 'success' ? 'success' : 'info'} text-white">
-              <h5 class="modal-title" id="${modalId}Label">${title}</h5>
-              <button data-button-type="CLOSE" data-size="large" data-variant="small" data-onclick="data-bs-dismiss='modal'" data-text="" title="סגור מודל" aria-label="סגור"></button>
-            </div>
-            <div class="modal-body">
-              <div style="white-space: pre-line; font-family: monospace; font-size: 0.9em;">${message}</div>
-            </div>
-            <div class="modal-footer">
-              <button data-button-type="CANCEL" data-onclick="data-bs-dismiss='modal'" data-text="ביטול" title="ביטול"></button>
-              <button data-button-type="COPY" data-copy-text="${message.replace(/"/g, '&quot;').replace(/'/g, '&#39;')}" data-text="העתק" title="העתק ללוח" id="${modalId}-copy-btn"></button>
-            </div>
-          </div>
-        </div>
-      </div>
-    `;
+    // Truncate message for corner notification (show first 200 chars)
+    const truncatedMessage = message.length > 200 ? message.substring(0, 200) + '...' : message;
     
-    // הוספת ה-modal ל-DOM
-    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    // Show corner notification first
+    await window.showNotification(truncatedMessage, type, title, duration, category);
     
-    // הצגת ה-modal
-    const modalElement = document.getElementById(modalId);
-    const modal = new bootstrap.Modal(modalElement);
-    modal.show();
-    
-    // הוספת event listener לכפתור העתקה (למניעת בעיות escape)
-    const copyBtn = document.getElementById(`${modalId}-copy-btn`);
-    if (copyBtn) {
-      copyBtn.addEventListener('click', () => {
-        const textToCopy = copyBtn.getAttribute('data-copy-text') || message;
-        if (typeof window.copyToClipboard === 'function') {
-          window.copyToClipboard(textToCopy, title);
-        } else if (typeof copyToClipboard === 'function') {
-          copyToClipboard(textToCopy, title);
-        } else {
-          // Fallback: use navigator.clipboard directly
-          navigator.clipboard.writeText(textToCopy).then(() => {
-            if (typeof window.showSuccessNotification === 'function') {
-              window.showSuccessNotification('התוכן הועתק ללוח', 'העתקה');
-            }
-          }).catch(err => {
-            window.Logger?.error('[NotificationSystem] Failed to copy:', err, { page: 'notification-system' });
-          });
-        }
-      });
-    }
-    
-    // הסרת ה-modal אחרי סגירה
-    modalElement.addEventListener('hidden.bs.modal', () => {
-      modalElement.remove();
-    });
-    
-    // סגירה אוטומטית אחרי הזמן שצוין
-    if (duration > 0) {
+    // If message is long, add a "Show Details" button that opens modal
+    if (message.length > 200) {
+      // Wait a bit for notification to appear
       setTimeout(() => {
-        if (modalElement && document.contains(modalElement)) {
-          modal.hide();
+        const notifications = document.querySelectorAll('.notification');
+        const lastNotification = notifications[notifications.length - 1];
+        
+        if (lastNotification) {
+          // Create "Show Details" button
+          const detailsBtn = document.createElement('button');
+          detailsBtn.className = 'btn btn-sm btn-link notification-details-btn';
+          detailsBtn.style.cssText = 'padding: 2px 8px; margin-top: 4px; font-size: 0.85em; text-decoration: underline;';
+          detailsBtn.textContent = 'הצג פרטים';
+          detailsBtn.onclick = () => {
+            // Open modal with full details using showDetailsModal
+            if (typeof window.showDetailsModal === 'function') {
+              window.showDetailsModal(title, `<div style="white-space: pre-line; font-family: monospace; font-size: 0.9em;">${message}</div>`, {
+                includeCopyButton: true
+              });
+            }
+            // Close the corner notification
+            lastNotification.remove();
+          };
+          
+          // Add button to notification content
+          const contentDiv = lastNotification.querySelector('.notification-content');
+          if (contentDiv) {
+            contentDiv.appendChild(detailsBtn);
+          }
         }
-      }, duration);
+      }, 100);
     }
     
     return true;

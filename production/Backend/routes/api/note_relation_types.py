@@ -21,9 +21,21 @@ note_relation_types_bp = Blueprint('note_relation_types', __name__, url_prefix='
 @handle_database_session()
 @cache_for(ttl=600)  # Cache for 10 minutes - note relation types don't change
 def get_note_relation_types():
-    """Get all note relation types using SQLAlchemy"""
-    db: Session = next(get_db())
+    """Get all note relation types using SQLAlchemy (requires authentication)"""
+    db: Session = g.db
+    
+    # Get user_id from Flask context (set by auth middleware)
+    user_id = getattr(g, 'user_id', None)
+    
+    if user_id is None:
+        return jsonify({
+            "status": "error",
+            "error": {"message": "User authentication required"},
+            "version": "1.0"
+        }), 401
+    
     try:
+        # Note relation types are system-wide (shared), but require authentication
         note_relation_types = db.query(NoteRelationType).order_by(NoteRelationType.id).all()
         
         result = [note_type.to_dict() for note_type in note_relation_types]
@@ -41,15 +53,26 @@ def get_note_relation_types():
             "error": {"message": "שגיאה בטעינת רשימת סוגי הקישור"},
             "version": "1.0"
         }), 500
-    finally:
-        db.close()
 
 @note_relation_types_bp.route('/<int:type_id>', methods=['GET'])
+@handle_database_session()
 @cache_for(ttl=600)
 def get_note_relation_type(type_id: int):
-    """Get note relation type by ID using SQLAlchemy"""
-    db: Session = next(get_db())
+    """Get note relation type by ID using SQLAlchemy (requires authentication)"""
+    db: Session = g.db
+    
+    # Get user_id from Flask context (set by auth middleware)
+    user_id = getattr(g, 'user_id', None)
+    
+    if user_id is None:
+        return jsonify({
+            "status": "error",
+            "error": {"message": "User authentication required"},
+            "version": "1.0"
+        }), 401
+    
     try:
+        # Note relation types are system-wide (shared), but require authentication
         note_type = db.query(NoteRelationType).filter(NoteRelationType.id == type_id).first()
         
         if not note_type:
@@ -72,14 +95,23 @@ def get_note_relation_type(type_id: int):
             "error": {"message": "שגיאה בטעינת פרטי סוג הקישור"},
             "version": "1.0"
         }), 500
-    finally:
-        db.close()
 
 @note_relation_types_bp.route('/', methods=['POST'])
+@handle_database_session()
 @invalidate_cache('note_relation_types')
 def create_note_relation_type():
-    """Create new note relation type using SQLAlchemy"""
-    db: Session = next(get_db())
+    """Create new note relation type using SQLAlchemy (requires authentication)"""
+    db: Session = g.db
+    
+    # Get user_id from Flask context (set by auth middleware)
+    user_id = getattr(g, 'user_id', None)
+    
+    if user_id is None:
+        return jsonify({
+            "status": "error",
+            "error": {"message": "User authentication required"},
+            "version": "1.0"
+        }), 401
     try:
         data = request.get_json()
         note_relation_type = data.get('note_relation_type', '').strip()
@@ -136,14 +168,23 @@ def create_note_relation_type():
             "error": {"message": str(e)},
             "version": "1.0"
         }), 400
-    finally:
-        db.close()
 
 @note_relation_types_bp.route('/<int:type_id>', methods=['PUT'])
+@handle_database_session()
 @invalidate_cache('note_relation_types')
 def update_note_relation_type(type_id: int):
-    """Update note relation type using SQLAlchemy"""
-    db: Session = next(get_db())
+    """Update note relation type using SQLAlchemy (requires authentication)"""
+    db: Session = g.db
+    
+    # Get user_id from Flask context (set by auth middleware)
+    user_id = getattr(g, 'user_id', None)
+    
+    if user_id is None:
+        return jsonify({
+            "status": "error",
+            "error": {"message": "User authentication required"},
+            "version": "1.0"
+        }), 401
     try:
         data = request.get_json()
         note_relation_type = data.get('note_relation_type', '').strip()
@@ -209,14 +250,23 @@ def update_note_relation_type(type_id: int):
             "error": {"message": "שגיאה בעדכון סוג קישור"},
             "version": "1.0"
         }), 500
-    finally:
-        db.close()
 
 @note_relation_types_bp.route('/<int:type_id>', methods=['DELETE'])
+@handle_database_session()
 @invalidate_cache('note_relation_types')
 def delete_note_relation_type(type_id: int):
-    """Delete note relation type using SQLAlchemy"""
-    db: Session = next(get_db())
+    """Delete note relation type using SQLAlchemy (requires authentication)"""
+    db: Session = g.db
+    
+    # Get user_id from Flask context (set by auth middleware)
+    user_id = getattr(g, 'user_id', None)
+    
+    if user_id is None:
+        return jsonify({
+            "status": "error",
+            "error": {"message": "User authentication required"},
+            "version": "1.0"
+        }), 401
     try:
         note_type = db.query(NoteRelationType).filter(NoteRelationType.id == type_id).first()
         
@@ -243,5 +293,3 @@ def delete_note_relation_type(type_id: int):
             "error": {"message": "שגיאה במחיקת סוג קישור"},
             "version": "1.0"
         }), 500
-    finally:
-        db.close()

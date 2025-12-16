@@ -8,6 +8,21 @@
  * @created 2025-01-06
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Event Handlers ===
+// - getModuleConfig() - Getmoduleconfig
+
+// === Data Functions ===
+// - getPageRequirements() - Getpagerequirements
+// - getAllModules() - Getallmodules
+// - getModulesByCategory() - Getmodulesbycategory
+// - getRecommendedStrategy() - Getrecommendedstrategy
+
+// === Other ===
+// - calculateTotalSize() - Calculatetotalsize
+
 // ============================================================================
 // DYNAMIC LOADER CONFIGURATION - תצורת טעינה דינמית
 // ============================================================================
@@ -166,10 +181,6 @@ const PAGE_REQUIREMENTS = {
         modules: ['core-systems', 'cache-module', 'ui-basic'],
         description: 'ניהול מטמון - דורש מערכת מטמון'
     },
-    'linter-realtime-monitor': {
-        modules: ['core-systems', 'ui-basic', 'data-advanced', 'communication-module'],
-        description: 'ניטור Linter - דורש מערכות תקשורת ונתונים מתקדמות'
-    },
     'chart-management': {
         modules: ['core-systems', 'ui-basic', 'ui-advanced', 'data-basic'],
         description: 'ניהול גרפים - דורש מערכות UI מתקדמות'
@@ -324,6 +335,4 @@ if (typeof module !== 'undefined' && module.exports) {
         getRecommendedStrategy
     };
 }
-
-console.log('✅ Dynamic Loader Configuration loaded successfully');
 

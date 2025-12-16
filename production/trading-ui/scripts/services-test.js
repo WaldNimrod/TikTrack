@@ -8,6 +8,29 @@
  * @created January 2025
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Event Handlers ===
+// - testDataCollection() - Testdatacollection
+// - testCRUDValidation() - Testcrudvalidation
+
+// === UI Functions ===
+// - testFieldRenderer() - Testfieldrenderer
+// - updateSummary() - Updatesummary
+
+// === Data Functions ===
+// - testSetFormData() - Testsetformdata
+
+// === Other ===
+// - testResetForm() - Testresetform
+// - testSelectPopulator() - Testselectpopulator
+// - testCRUDSuccess() - Testcrudsuccess
+// - testCRUDServerError() - Testcrudservererror
+// - testDefaultValues() - Testdefaultvalues
+// - testPreferenceValues() - Testpreferencevalues
+// - testStatistics() - Teststatistics
+
 // ===== GLOBAL TEST DATA =====
 
 const testResults = {
@@ -37,10 +60,16 @@ function testDataCollection() {
         // הצגת תוצאות
         const result = document.getElementById('result1');
         result.style.display = 'block';
-        result.innerHTML = `
+        result.textContent = '';
+        const resultHTML = `
             <h5>נתונים שנאספו:</h5>
             <pre>${JSON.stringify(data, null, 2)}</pre>
         `;
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(resultHTML, 'text/html');
+        doc.body.childNodes.forEach(node => {
+            result.appendChild(node.cloneNode(true));
+        });
         
         testResults.dataCollection = true;
         updateSummary();
@@ -100,14 +129,30 @@ function testFieldRenderer() {
             window.FieldRendererService.renderStatus('pending', 'note'),
             window.FieldRendererService.renderStatus('cancelled', 'trade')
         ];
-        document.getElementById('statusBadges').innerHTML = statusBadges.join(' ');
+        const statusBadgesEl = document.getElementById('statusBadges');
+        statusBadgesEl.textContent = '';
+        const parser = new DOMParser();
+        statusBadges.forEach(badge => {
+            const doc = parser.parseFromString(badge, 'text/html');
+            doc.body.childNodes.forEach(node => {
+                statusBadgesEl.appendChild(node.cloneNode(true));
+            });
+        });
         
         // בדיקת side badges
         const sideBadges = [
             window.FieldRendererService.renderSide('Long'),
             window.FieldRendererService.renderSide('Short')
         ];
-        document.getElementById('sideBadges').innerHTML = sideBadges.join(' ');
+        const sideBadgesEl = document.getElementById('sideBadges');
+        sideBadgesEl.textContent = '';
+        const parser = new DOMParser();
+        sideBadges.forEach(badge => {
+            const doc = parser.parseFromString(badge, 'text/html');
+            doc.body.childNodes.forEach(node => {
+                sideBadgesEl.appendChild(node.cloneNode(true));
+            });
+        });
         
         // בדיקת PnL badges
         const pnlBadges = [
@@ -115,7 +160,15 @@ function testFieldRenderer() {
             window.FieldRendererService.renderPnL(-350.75, '$'),
             window.FieldRendererService.renderPnL(0, '$')
         ];
-        document.getElementById('pnlBadges').innerHTML = pnlBadges.join(' ');
+        const pnlBadgesEl = document.getElementById('pnlBadges');
+        pnlBadgesEl.textContent = '';
+        const parser = new DOMParser();
+        pnlBadges.forEach(badge => {
+            const doc = parser.parseFromString(badge, 'text/html');
+            doc.body.childNodes.forEach(node => {
+                pnlBadgesEl.appendChild(node.cloneNode(true));
+            });
+        });
         
         // בדיקת type badges
         const typeBadges = [
@@ -123,14 +176,30 @@ function testFieldRenderer() {
             window.FieldRendererService.renderType('investment'),
             window.FieldRendererService.renderType('passive')
         ];
-        document.getElementById('typeBadges').innerHTML = typeBadges.join(' ');
+        const typeBadgesEl = document.getElementById('typeBadges');
+        typeBadgesEl.textContent = '';
+        const parser = new DOMParser();
+        typeBadges.forEach(badge => {
+            const doc = parser.parseFromString(badge, 'text/html');
+            doc.body.childNodes.forEach(node => {
+                typeBadgesEl.appendChild(node.cloneNode(true));
+            });
+        });
         
         // בדיקת action badges
         const actionBadges = [
             window.FieldRendererService.renderAction('buy'),
             window.FieldRendererService.renderAction('sell')
         ];
-        document.getElementById('actionBadges').innerHTML = actionBadges.join(' ');
+        const actionBadgesEl = document.getElementById('actionBadges');
+        actionBadgesEl.textContent = '';
+        const parser = new DOMParser();
+        actionBadges.forEach(badge => {
+            const doc = parser.parseFromString(badge, 'text/html');
+            doc.body.childNodes.forEach(node => {
+                actionBadgesEl.appendChild(node.cloneNode(true));
+            });
+        });
         
         // בדיקת priority badges
         const priorityBadges = [
@@ -138,7 +207,15 @@ function testFieldRenderer() {
             window.FieldRendererService.renderPriority('medium'),
             window.FieldRendererService.renderPriority('low')
         ];
-        document.getElementById('priorityBadges').innerHTML = priorityBadges.join(' ');
+        const priorityBadgesEl = document.getElementById('priorityBadges');
+        priorityBadgesEl.textContent = '';
+        const parser = new DOMParser();
+        priorityBadges.forEach(badge => {
+            const doc = parser.parseFromString(badge, 'text/html');
+            doc.body.childNodes.forEach(node => {
+                priorityBadgesEl.appendChild(node.cloneNode(true));
+            });
+        });
         
         console.log('✅ All badges rendered successfully');
         testResults.fieldRenderer = true;
@@ -159,7 +236,7 @@ async function testSelectPopulator() {
         
         const result = document.getElementById('result3');
         result.style.display = 'block';
-        result.innerHTML = '⏳ טוען נתונים...';
+        result.textContent = '⏳ טוען נתונים...';
         
         // טעינת כל ה-selects
         await Promise.all([
@@ -169,10 +246,16 @@ async function testSelectPopulator() {
             window.SelectPopulatorService.populateTradePlansSelect('testPlanSelect')
         ]);
         
-        result.innerHTML = `
+        result.textContent = '';
+        const resultHTML = `
             <h5>✅ כל ה-Select Boxes נטענו בהצלחה!</h5>
             <p>בדוק את התפריטים הנפתחים למעלה.</p>
         `;
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(resultHTML, 'text/html');
+        doc.body.childNodes.forEach(node => {
+            result.appendChild(node.cloneNode(true));
+        });
         
         console.log('✅ All selects populated successfully');
         testResults.selectPopulator = true;
@@ -181,7 +264,13 @@ async function testSelectPopulator() {
     } catch (error) {
         console.error('❌ Test failed:', error);
         const result = document.getElementById('result3');
-        result.innerHTML = `<h5 class="text-danger">❌ שגיאה: ${error.message}</h5>`;
+        result.textContent = '';
+        const errorHTML = `<h5 class="text-danger">❌ שגיאה: ${error.message}</h5>`;
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(errorHTML, 'text/html');
+        doc.body.childNodes.forEach(node => {
+            result.appendChild(node.cloneNode(true));
+        });
         testResults.selectPopulator = false;
         updateSummary();
     }
@@ -252,12 +341,18 @@ async function testDefaultValues() {
         
         const result = document.getElementById('result5');
         result.style.display = 'block';
-        result.innerHTML = `
+        result.textContent = '';
+        const resultHTML = `
             <h5>✅ ברירות מחדל הוגדרו בהצלחה!</h5>
             <p>תאריך: ${document.getElementById('testDefaultDate').value}</p>
             <p>תאריך + שעה: ${document.getElementById('testDefaultDateTime').value}</p>
             <p>סטטוס: ${document.getElementById('testDefaultStatus').value}</p>
         `;
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(resultHTML, 'text/html');
+        doc.body.childNodes.forEach(node => {
+            result.appendChild(node.cloneNode(true));
+        });
         
         console.log('✅ Default values set successfully');
         testResults.defaultValues = true;
@@ -310,7 +405,8 @@ function testStatistics() {
         
         // הצגת תוצאות
         const result = document.getElementById('result6');
-        result.innerHTML = `
+        result.textContent = '';
+        const resultHTML = `
             <div class="alert alert-success">
                 <h5>✅ חישובים הושלמו בהצלחה!</h5>
                 <ul>
@@ -324,6 +420,11 @@ function testStatistics() {
                 </ul>
             </div>
         `;
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(resultHTML, 'text/html');
+        doc.body.childNodes.forEach(node => {
+            result.appendChild(node.cloneNode(true));
+        });
         
         console.log('✅ Statistics calculated successfully');
         testResults.statistics = true;
@@ -389,7 +490,12 @@ function updateSummary() {
         </div>
     `;
     
-    summary.innerHTML = html;
+    summary.textContent = '';
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+    doc.body.childNodes.forEach(node => {
+        summary.appendChild(node.cloneNode(true));
+    });
 }
 
 // ===== INITIALIZATION =====

@@ -9,6 +9,17 @@
  * @created January 27, 2025
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Class Methods ===
+// - EditModalTestSuite.shouldIgnoreField() - Shouldignorefield
+
+// === Data Functions ===
+// - EditModalTestSuite.getFirstId() - Getfirstid
+// - EditModalTestSuite.getFieldIds() - Getfieldids
+// - EditModalTestSuite.getFieldValue() - Getfieldvalue
+
 (function() {
     'use strict';
 

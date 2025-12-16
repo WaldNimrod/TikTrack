@@ -29,6 +29,12 @@
  * @author TikTrack Development Team
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Event Handlers ===
+// - request.onsuccess() - Onsuccess
+
 // ===== UNIFIED LOG MANAGER =====
 
 class UnifiedLogManager {
@@ -440,10 +446,12 @@ class UnifiedLogManager {
             
             // Check if UnifiedCacheManager is available and initialize if needed
             if (!window.UnifiedCacheManager) {
-                console.warn('⚠️ UnifiedCacheManager not available, using fallback');
+                // Fallback is used until cache is ready - this is expected during initialization
+                // No log needed - this is normal during page load
                 this.useFallback = true;
             } else if (!window.cacheSystemReady) {
-                console.warn('⚠️ Cache system not ready yet, using fallback');
+                // Fallback is used until cache is ready - this is expected during initialization
+                // No log needed - this is normal during page load
                 this.useFallback = true;
             } else {
                 // Try to initialize cache system if not already initialized
@@ -517,7 +525,10 @@ class UnifiedLogManager {
                 timestamp: new Date().toISOString()
             };
         } catch (error) {
-            console.error(`❌ Failed to get log data for ${logType}:`, error);
+            // Silently handle errors - don't log to console as errors (they're expected in some cases)
+            if (window.DEBUG_MODE) {
+                console.warn(`⚠️ Failed to get log data for ${logType}:`, error);
+            }
             // Return empty data instead of throwing error
             return {
                 data: [],

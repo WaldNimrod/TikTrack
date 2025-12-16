@@ -16,6 +16,49 @@
  * Date: November 2025
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - setupSectionOpenListeners() - Setupsectionopenlisteners
+// - setupStatisticsFilterHook() - Setupstatisticsfilterhook
+
+// === Event Handlers ===
+// - handleAccountSelection() - Handleaccountselection
+// - syncAccountActivityPagination() - Syncaccountactivitypagination
+// - splitExecutionsByAction() - Splitexecutionsbyaction
+
+// === UI Functions ===
+// - renderMovementRow() - Rendermovementrow
+// - renderAccountActivityRows() - Renderaccountactivityrows
+// - updateActivitySummary() - Updateactivitysummary
+// - updateCurrencyBalancesFooter() - Updatecurrencybalancesfooter
+// - showErrorInTable() - Showerrorintable
+// - getSubtypeDisplay() - Getsubtypedisplay
+// - updateActivityStatistics() - Updateactivitystatistics
+// - renderStatisticsColumn() - Renderstatisticscolumn
+// - renderStatisticsSummaryColumn1() - Renderstatisticssummarycolumn1
+// - renderStatisticsSummaryColumn2() - Renderstatisticssummarycolumn2
+// - renderBreakdownBySubtype() - Renderbreakdownbysubtype
+
+// === Data Functions ===
+// - loadAccountActivity() - Loadaccountactivity
+
+// === Utility Functions ===
+// - formatDate() - Formatdate
+// - formatAmount() - Formatamount
+
+// === Other ===
+// - populateAccountSelector() - Populateaccountselector
+// - populateAccountActivityTable() - Populateaccountactivitytable
+// - openMovementDetails() - Openmovementdetails
+// - clearActivityTable() - Clearactivitytable
+// - normalizeAmountBySubtype() - Normalizeamountbysubtype
+// - calculateActivityStatistics() - Calculateactivitystatistics
+// - combineStatistics() - Combinestatistics
+// - splitCashFlowsByColumn() - Splitcashflowsbycolumn
+// - calculateStatsForType() - Calculatestatsfortype
+
 /* ===== ACCOUNT ACTIVITY SYSTEM ===== */
 window.Logger.info('📁 account-activity.js נטען', { page: 'trading_accounts' });
 
@@ -35,25 +78,158 @@ let accountActivityPaginationInstance = null;
 window.initAccountActivity = function(autoSelectDefault = false) {
   window.Logger.info('🔧 אתחול מערכת תנועות חשבון', { page: 'trading_accounts' });
 
-  // Populate account selector when accounts are loaded
-  if (window.trading_accountsData && Array.isArray(window.trading_accountsData)) {
-    populateAccountSelector(autoSelectDefault);
-  }
-
-  // Setup event listeners
+  // Setup event listeners FIRST (before populating selector)
   const selector = document.getElementById('accountActivitySelector');
   if (selector) {
-    selector.addEventListener('change', handleAccountSelection);
+    // Remove existing listeners to prevent duplicates
+    const newSelector = selector.cloneNode(true);
+    selector.parentNode.replaceChild(newSelector, selector);
+    // Re-attach listener to new element
+    const newSelectorElement = document.getElementById('accountActivitySelector');
+    if (newSelectorElement) {
+      newSelectorElement.addEventListener('change', handleAccountSelection);
+    }
   }
 
-  // Listen for account data updates
+  // Listen for account data updates (only once)
   if (window.addEventListener) {
-    window.addEventListener('accountsLoaded', async () => {
-      // On accounts loaded event, auto-select default account from preferences
-      await populateAccountSelector(true);
+    // Remove existing listener if any
+    window.removeEventListener('accountsLoaded', window._accountActivityAccountsLoadedHandler);
+    // Create new handler
+    window._accountActivityAccountsLoadedHandler = async () => {
+      // On accounts loaded event, populate selector only if not already populated
+      const currentSelector = document.getElementById('accountActivitySelector');
+      if (currentSelector && currentSelector.options.length <= 1) {
+        await populateAccountSelector(autoSelectDefault);
+      }
+    };
+    window.addEventListener('accountsLoaded', window._accountActivityAccountsLoadedHandler);
+
+    // Populate account selector when accounts are already loaded
+    if (window.trading_accountsData && Array.isArray(window.trading_accountsData) && window.trading_accountsData.length > 0) {
+      populateAccountSelector(autoSelectDefault);
+    }
+
+    // Listen for filter date range changes to update date range display
+    window.addEventListener('filterDateRangeChanged', (event) => {
+      const dateRange = event.detail?.dateRange || window.selectedDateRangeForFilter;
+      if (dateRange && window.accountActivityState.activityData) {
+        // Update date range display when filter changes
+        updateActivitySummary(window.accountActivityState.activityData);
+      }
     });
+
+    // Listen for filter updates from header system - removed setInterval to prevent infinite loop
+    // Filter updates are handled via event listeners above
+  }
+
+  // Setup section open listeners after DOM is ready
+  // Use setTimeout to ensure DOM elements exist
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+      setTimeout(() => setupSectionOpenListeners(), 500);
+    });
+  } else {
+    setTimeout(() => setupSectionOpenListeners(), 500);
   }
 };
+
+/**
+ * Setup event listeners for section opening - ensures data is loaded when section opens
+ */
+function setupSectionOpenListeners() {
+  // Listen for account-activity-summary section opening
+  const accountActivitySummarySection = document.querySelector('[data-section="account-activity-summary"]');
+  if (accountActivitySummarySection) {
+    // Use MutationObserver to watch for section body display changes
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.type === 'attributes' && (mutation.attributeName === 'class' || mutation.attributeName === 'style')) {
+          const sectionBody = accountActivitySummarySection.querySelector('.section-body');
+          if (sectionBody) {
+            const isVisible = !sectionBody.classList.contains('d-none') && 
+                             window.getComputedStyle(sectionBody).display !== 'none';
+            if (isVisible) {
+              window.Logger.info('📂 account-activity-summary section opened', { page: 'trading_accounts' });
+              // Check if selector is populated and account is selected
+              const selector = document.getElementById('accountActivitySelector');
+              if (selector && selector.value) {
+                const accountId = parseInt(selector.value);
+                if (accountId && !isNaN(accountId)) {
+                  // Ensure activity data is loaded
+                  if (!window.accountActivityState.activityData) {
+                    window.Logger.info(`🔄 Loading account activity data on section open for account ${accountId}`, { page: 'trading_accounts' });
+                    window.loadAccountActivity(accountId).catch(error => {
+                      window.Logger.error('❌ Error loading account activity on section open:', error, { page: 'trading_accounts' });
+                    });
+                  }
+                }
+              } else {
+                // Selector not populated yet - wait a bit and try again
+                setTimeout(() => {
+                  const selector2 = document.getElementById('accountActivitySelector');
+                  if (selector2 && selector2.options.length > 1 && !selector2.value) {
+                    // Auto-select first account if no account selected
+                    selector2.value = selector2.options[1].value;
+                    handleAccountSelection({ target: selector2 });
+                  }
+                }, 500);
+              }
+            }
+          }
+        }
+      });
+    });
+
+    // Observe section body for style changes
+    const sectionBody = accountActivitySummarySection.querySelector('.section-body');
+    if (sectionBody) {
+      observer.observe(sectionBody, { attributes: true, attributeFilter: ['style'] });
+    }
+  }
+
+  // Listen for account-activity-table section opening
+  const accountActivityTableSection = document.querySelector('[data-section="account-activity-table"]');
+  if (accountActivityTableSection) {
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.type === 'attributes' && (mutation.attributeName === 'class' || mutation.attributeName === 'style')) {
+          const sectionBody = accountActivityTableSection.querySelector('.section-body');
+          if (sectionBody) {
+            const isVisible = !sectionBody.classList.contains('d-none') && 
+                             window.getComputedStyle(sectionBody).display !== 'none';
+            if (isVisible) {
+              window.Logger.info('📂 account-activity-table section opened', { page: 'trading_accounts' });
+              // Update date range display
+              const selector = document.getElementById('accountActivitySelector');
+              if (selector && selector.value) {
+                const accountId = parseInt(selector.value);
+                if (accountId && !isNaN(accountId)) {
+                  // Ensure activity data is loaded and date range is updated
+                  if (!window.accountActivityState.activityData) {
+                    window.loadAccountActivity(accountId).catch(error => {
+                      window.Logger.error('❌ Error loading account activity on table section open:', error, { page: 'trading_accounts' });
+                    });
+                  } else {
+                    // Just update date range display
+                    if (typeof updateActivitySummary === 'function') {
+                      updateActivitySummary(window.accountActivityState.activityData);
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      });
+    });
+
+    const sectionBody = accountActivityTableSection.querySelector('.section-body');
+    if (sectionBody) {
+      observer.observe(sectionBody, { attributes: true, attributeFilter: ['style'] });
+    }
+  }
+}
 
 /**
  * Populate account selector dropdown
@@ -85,37 +261,66 @@ async function populateAccountSelector(autoSelectDefault = false) {
     const currentValue = selector.value;
     if (!currentValue || currentValue === '') {
       try {
-        // Get default account from preferences
+        // Get default account from preferences - use PreferencesCore first, then fallback
         let defaultAccountId = null;
 
-        if (typeof window.getPreference === 'function') {
-          const prefValue = await window.getPreference('default_trading_account');
-
-          if (prefValue) {
-            // Try to parse as integer ID first
-            const parsed = parseInt(prefValue);
-            if (!isNaN(parsed)) {
-              defaultAccountId = parsed;
-            } else {
-              // Try to find account by name
-              const account = window.trading_accountsData.find(acc => acc.name === prefValue);
-              if (account) {
-                defaultAccountId = account.id;
+        // Get default account from PreferencesCore (single source of truth)
+        // NOTE: Removed fallback to window.getPreference to prevent recursion
+        // window.getPreference just calls PreferencesCore.getPreference again, causing recursion
+        if (window.PreferencesCore && typeof window.PreferencesCore.getPreference === 'function') {
+          try {
+            const prefValue = await window.PreferencesCore.getPreference('default_trading_account');
+            if (prefValue) {
+              // Handle different value types
+              let accountId = null;
+              if (typeof prefValue === 'object' && prefValue !== null) {
+                // If it's an object, try to get id or value property
+                accountId = prefValue.id || prefValue.value || null;
+              } else {
+                // Try to parse as integer ID first
+                const parsed = parseInt(prefValue);
+                if (!isNaN(parsed)) {
+                  accountId = parsed;
+                } else {
+                  // Try to find account by name
+                  const account = window.trading_accountsData?.find(acc => acc.name === prefValue);
+                  if (account) {
+                    accountId = account.id;
+                  }
+                }
+              }
+              
+              if (accountId) {
+                defaultAccountId = accountId;
+                window.Logger.debug(`✅ Got default account from PreferencesCore: ${defaultAccountId}`, { page: 'trading_accounts' });
               }
             }
+          } catch (e) {
+            window.Logger.warn('⚠️ Error getting default account from PreferencesCore:', e, { page: 'trading_accounts' });
           }
         }
 
-        // If no preference found or invalid, fallback to first account
-        if (!defaultAccountId || !selector.querySelector(`option[value="${defaultAccountId}"]`)) {
-          defaultAccountId = selector.options[1].value;
-          window.Logger.info(`ℹ️ No valid default account in preferences, using first account (ID: ${defaultAccountId})`, { page: 'trading_accounts' });
+        // Verify that the default account exists in the selector options
+        const defaultOption = selector.querySelector(`option[value="${defaultAccountId}"]`);
+        if (!defaultAccountId || !defaultOption) {
+          // Fallback to first available account (skip the empty "בחר חשבון..." option)
+          if (selector.options.length > 1) {
+            defaultAccountId = selector.options[1].value;
+            window.Logger.info(`ℹ️ No valid default account in preferences, using first account (ID: ${defaultAccountId})`, { page: 'trading_accounts' });
+          } else {
+            window.Logger.warn('⚠️ No accounts available to select', { page: 'trading_accounts' });
+            return; // No accounts to select
+          }
         } else {
           window.Logger.info(`🔄 Auto-selecting default account from preferences (ID: ${defaultAccountId})`, { page: 'trading_accounts' });
         }
 
-        // Select the account
-        selector.value = defaultAccountId;
+        // Select the account using DataCollectionService if available
+        if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+          window.DataCollectionService.setValue(selector.id, defaultAccountId, 'int');
+        } else {
+          selector.value = defaultAccountId;
+        }
 
         // Trigger selection change to load activity data
         handleAccountSelection({ target: selector });
@@ -123,7 +328,11 @@ async function populateAccountSelector(autoSelectDefault = false) {
         window.Logger.error('❌ Error getting default account from preferences:', error, { page: 'trading_accounts' });
         // Fallback to first account
         const firstAccountId = selector.options[1].value;
-        selector.value = firstAccountId;
+        if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+          window.DataCollectionService.setValue(selector.id, firstAccountId, 'int');
+        } else {
+          selector.value = firstAccountId;
+        }
         handleAccountSelection({ target: selector });
       }
     } else {
@@ -145,17 +354,22 @@ async function handleAccountSelection(event) {
 
   window.accountActivityState.selectedAccountId = accountId;
 
-  // Show section bodies
+  // Show section bodies and ensure they're visible
   const summaryBody = document.querySelector('[data-section="account-activity-summary"] .section-body');
   if (summaryBody) {
-    summaryBody.style.display = 'block';
+    summaryBody.classList.remove('d-none');
+    // Ensure statistics card is visible
+    const statsCard = document.getElementById('accountActivityStatisticsCard');
+    if (statsCard) {
+      statsCard.classList.remove('d-none');
+    }
     setTimeout(() => {
       setupStatisticsFilterHook();
     }, 500);
   }
   const tableBody = document.querySelector('[data-section="account-activity-table"] .section-body');
   if (tableBody) {
-    tableBody.style.display = 'block';
+    tableBody.classList.remove('d-none');
   }
 
   // Load activity data
@@ -176,14 +390,12 @@ async function loadAccountActivity(accountId) {
   try {
     window.Logger.info(`📡 טעינת תנועות חשבון ${accountId}`, { page: 'trading_accounts' });
 
-    // Check cache first - BUT bypass cache to ensure fresh data with executions
+    // Check cache first using UnifiedCacheManager (following cache strategy from unified-cache-manager.js)
     const cacheKey = `account-activity-${accountId}`;
-    // TEMPORARY: Bypass cache to ensure executions are loaded
-    // TODO: Remove this after confirming executions are loaded correctly
-    const BYPASS_CACHE = true;
-
-    if (window.UnifiedCacheManager && !BYPASS_CACHE) {
-      const cached = await window.UnifiedCacheManager.get(cacheKey);
+    
+    // Use UnifiedCacheManager with proper TTL (60 seconds as defined in cache config: 'account-activity-*')
+    if (window.UnifiedCacheManager) {
+      const cached = await window.UnifiedCacheManager.get(cacheKey, { ttl: 60000 });
       if (cached) {
         window.Logger.info('✅ נתונים מהמטמון', { page: 'trading_accounts' });
         window.accountActivityState.activityData = cached;
@@ -192,22 +404,25 @@ async function loadAccountActivity(accountId) {
         window.accountActivityState.isLoading = false;
         return;
       }
-    } else if (BYPASS_CACHE) {
-      window.Logger.info('🔄 Bypassing cache - loading fresh data from API', { page: 'trading_accounts' });
-      // Clear cache for this account to ensure fresh data
-      if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.remove === 'function') {
-        await window.UnifiedCacheManager.remove(cacheKey);
-      }
     }
 
     // Fetch from API
     const response = await fetch(`/api/account-activity/${accountId}`);
 
+    let result;
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      if ([401, 403, 404].includes(response.status)) {
+        // User not authenticated or no account activity - return empty data
+        if (window.Logger && typeof window.Logger.debug === 'function') {
+          window.Logger.debug(`⚠️ Account activity API returned ${response.status}, returning empty data`, { accountId, page: 'trading_accounts' });
+        }
+        result = { status: 'success', data: { currencies: [] } };
+      } else {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+    } else {
+      result = await response.json();
     }
-
-    const result = await response.json();
 
     if (result.status === 'success' && result.data) {
       window.accountActivityState.activityData = result.data;
@@ -296,10 +511,16 @@ function populateAccountActivityTable(data) {
   const tbody = document.querySelector('#accountActivityTable tbody');
   if (!tbody) {return;}
 
-  tbody.innerHTML = '';
+  tbody.textContent = '';
 
   if (!data.currencies || data.currencies.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="8" class="text-center">אין תנועות לחשבון זה</td></tr>';
+    const emptyRow = document.createElement('tr');
+    const emptyCell = document.createElement('td');
+    emptyCell.colSpan = 8;
+    emptyCell.className = 'text-center';
+    emptyCell.textContent = 'אין תנועות לחשבון זה';
+    emptyRow.appendChild(emptyCell);
+    tbody.appendChild(emptyRow);
     syncAccountActivityPagination([]);
     updateCurrencyBalancesFooter(data);
     updateActivityStatistics();
@@ -408,13 +629,30 @@ function populateAccountActivityTable(data) {
   });
 
   // Render rows with pagination
-  syncAccountActivityPagination(allMovements);
+  const paginationPromise = syncAccountActivityPagination(allMovements);
 
   // Update footer with currency balances
   updateCurrencyBalancesFooter(data);
 
-  // Update statistics card
-  updateActivityStatistics();
+  // Update statistics card - wait for pagination to complete if it returns a promise
+  if (paginationPromise && typeof paginationPromise.then === 'function') {
+    paginationPromise.then(() => {
+      // Wait a bit more for DOM to be fully updated
+      setTimeout(() => {
+        updateActivityStatistics();
+      }, 100);
+    }).catch(() => {
+      // Fallback - update immediately even if pagination fails
+      setTimeout(() => {
+        updateActivityStatistics();
+      }, 100);
+    });
+  } else {
+    // No promise - update immediately with a small delay to ensure DOM is ready
+    setTimeout(() => {
+      updateActivityStatistics();
+    }, 100);
+  }
 
   window.Logger.info(`✅ טבלה עודכנה עם ${allMovements.length} תנועות`, { page: 'trading_accounts', keepInfo: true });
 }
@@ -437,34 +675,58 @@ function renderMovementRow(movement, runningBalance) {
   );
   row.setAttribute('data-movement-amount', amountForStats.toString());
 
-  const movementDateEnvelope = window.dateUtils?.ensureDateEnvelope ? window.dateUtils.ensureDateEnvelope(movement.date) : null;
+  // Ensure date envelope for consistent date handling
+  const movementDateEnvelope = window.dateUtils?.ensureDateEnvelope 
+    ? window.dateUtils.ensureDateEnvelope(movement.date) 
+    : (movement.date && typeof movement.date === 'object' && (movement.date.epochMs || movement.date.utc || movement.date.local))
+      ? movement.date
+      : null;
+  
   const movementDateValue = movementDateEnvelope?.utc || movementDateEnvelope?.local || movement.date || '';
   row.setAttribute('data-movement-date', movementDateValue);
   row.setAttribute('data-movement-id', movement.id || '');
   row.setAttribute('data-currency-symbol', movement.currency_symbol || 'USD');
 
-  // Date - using FieldRendererService.renderDate
+  // Date - using FieldRendererService.renderDate (following standard pattern from trades.js, trade_plans.js, etc.)
   const dateCell = document.createElement('td');
   dateCell.className = 'col-date';
   dateCell.setAttribute('data-date', movementDateValue);
-  if (window.FieldRendererService && window.FieldRendererService.renderDate) {
-    dateCell.innerHTML = window.FieldRendererService.renderDate(movementDateEnvelope || movement.date);
+  
+  // Use FieldRendererService.renderDate - prefer envelope if available, otherwise use raw date
+  // Following the pattern from trades.js line 1084: FieldRendererService.renderDate(rawDate, false)
+  if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
+    // Prefer envelope if available (it's already normalized), otherwise use raw date
+    // renderDate returns a string (not HTML), so we set it directly as textContent
+    const dateToRender = movementDateEnvelope || movement.date;
+    let dateDisplay = window.FieldRendererService.renderDate(dateToRender, false);
+    // Check for "Invalid Date" string and handle it
+    if (dateDisplay && typeof dateDisplay === 'string' && dateDisplay.toLowerCase().includes('invalid')) {
+      // Fallback to envelope display property or raw date
+      if (movementDateEnvelope && movementDateEnvelope.display) {
+        dateDisplay = movementDateEnvelope.display;
+      } else if (movement.date && typeof movement.date === 'object' && movement.date.display) {
+        dateDisplay = movement.date.display;
+      } else {
+        dateDisplay = '-';
+      }
+    }
+    dateCell.textContent = dateDisplay || '-';
   } else {
+    // Fallback: use dateUtils for consistent date formatting
     if (movementDateEnvelope && window.dateUtils?.formatDate) {
-      dateCell.textContent = window.dateUtils.formatDate(movementDateEnvelope);
-    } else {
-      // Use dateUtils for consistent date parsing
-      if (movementDateValue) {
-        let dateObj;
-        if (window.dateUtils && typeof window.dateUtils.toDateObject === 'function') {
-          dateObj = window.dateUtils.toDateObject(movementDateValue);
-        } else {
-          dateObj = new Date(movementDateValue);
-        }
-        // Use FieldRendererService or dateUtils for consistent date formatting
-        if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
-          dateCell.textContent = window.FieldRendererService.renderDate(dateObj, false);
-        } else if (window.dateUtils?.formatDate) {
+      dateCell.textContent = window.dateUtils.formatDate(movementDateEnvelope, { includeTime: false });
+    } else if (movementDateValue && window.dateUtils?.formatDate) {
+      dateCell.textContent = window.dateUtils.formatDate(movementDateValue, { includeTime: false });
+    } else if (movementDateValue) {
+      // Last resort: use dateUtils.toDateObject for parsing
+      let dateObj;
+      if (window.dateUtils && typeof window.dateUtils.toDateObject === 'function') {
+        dateObj = window.dateUtils.toDateObject(movementDateValue);
+      } else {
+        dateObj = new Date(movementDateValue);
+      }
+      if (dateObj && !Number.isNaN(dateObj.getTime())) {
+        if (window.dateUtils?.formatDate) {
           dateCell.textContent = window.dateUtils.formatDate(dateObj, { includeTime: false });
         } else {
           dateCell.textContent = dateObj.toLocaleDateString('he-IL');
@@ -472,6 +734,8 @@ function renderMovementRow(movement, runningBalance) {
       } else {
         dateCell.textContent = '-';
       }
+    } else {
+      dateCell.textContent = '-';
     }
   }
   row.appendChild(dateCell);
@@ -509,17 +773,27 @@ function renderMovementRow(movement, runningBalance) {
   if (movement.type === 'cash_flow') {
     // Use renderType for cash flow subtypes (deposit, withdrawal, fee, etc.)
     if (window.FieldRendererService && window.FieldRendererService.renderType) {
-      subtypeCell.innerHTML = window.FieldRendererService.renderType(subTypeValue, normalizedAmountForColor);
+      const typeHTML = window.FieldRendererService.renderType(subTypeValue, normalizedAmountForColor);
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(typeHTML, 'text/html');
+      doc.body.childNodes.forEach(node => {
+        subtypeCell.appendChild(node.cloneNode(true));
+      });
     } else {
       subtypeCell.textContent = getSubtypeDisplay(movement.sub_type || movement.subtype);
     }
   } else {
     // Use renderAction for execution actions (buy/sell) - with amount for color
     if (window.FieldRendererService && window.FieldRendererService.renderAction) {
-      subtypeCell.innerHTML = window.FieldRendererService.renderAction(
+      const actionHTML = window.FieldRendererService.renderAction(
         movement.sub_type || movement.subtype || movement.action,
         movement.amount, // Pass amount for color determination
       );
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(actionHTML, 'text/html');
+      doc.body.childNodes.forEach(node => {
+        subtypeCell.appendChild(node.cloneNode(true));
+      });
     } else {
       subtypeCell.textContent = getSubtypeDisplay(movement.sub_type || movement.subtype || movement.action);
     }
@@ -534,7 +808,17 @@ function renderMovementRow(movement, runningBalance) {
     // Show only the ticker symbol (clickable link to details)
     const symbol = movement.ticker_symbol.trim();
     if (symbol && window.showEntityDetails && movement.ticker_id) {
-      tickerCell.innerHTML = `<span style="cursor: pointer; color: var(--primary-color, #26baac); text-decoration: underline;" onclick="if (window.showEntityDetails) { window.showEntityDetails('ticker', ${movement.ticker_id}); return false; }" title="לחץ לצפייה בפרטי הטיקר">${symbol}</span>`;
+      const span = document.createElement('span');
+      span.className = 'ticker-link-clickable';
+      span.onclick = function() {
+        if (window.showEntityDetails) {
+          window.showEntityDetails('ticker', movement.ticker_id);
+          return false;
+        }
+      };
+      span.title = 'לחץ לצפייה בפרטי הטיקר';
+      span.textContent = symbol;
+      tickerCell.appendChild(span);
     } else {
       tickerCell.textContent = symbol;
     }
@@ -563,7 +847,12 @@ function renderMovementRow(movement, runningBalance) {
   const displayAmount = normalizedAmountForColor;
 
   if (window.FieldRendererService && window.FieldRendererService.renderAmount) {
-    amountCell.innerHTML = window.FieldRendererService.renderAmount(displayAmount, currencySymbol, 0);
+    const amountHTML = window.FieldRendererService.renderAmount(displayAmount, currencySymbol, 0);
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(amountHTML, 'text/html');
+    doc.body.childNodes.forEach(node => {
+      amountCell.appendChild(node.cloneNode(true));
+    });
   } else {
     amountCell.textContent = formatAmount(displayAmount);
     if (displayAmount < 0) {
@@ -584,7 +873,12 @@ function renderMovementRow(movement, runningBalance) {
   const balanceCell = document.createElement('td');
   balanceCell.className = 'col-balance';
   if (window.FieldRendererService && window.FieldRendererService.renderAmount) {
-    balanceCell.innerHTML = window.FieldRendererService.renderAmount(runningBalance || 0, currencySymbol, 0);
+    const balanceHTML = window.FieldRendererService.renderAmount(runningBalance || 0, currencySymbol, 0);
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(balanceHTML, 'text/html');
+    doc.body.childNodes.forEach(node => {
+      balanceCell.appendChild(node.cloneNode(true));
+    });
   } else {
     balanceCell.textContent = formatAmount(runningBalance || 0);
     balanceCell.textContent += ' ' + currencySymbol;
@@ -595,13 +889,17 @@ function renderMovementRow(movement, runningBalance) {
   const actionsCell = document.createElement('td');
   actionsCell.className = 'col-actions actions-cell';
   if (isOpeningBalance) {
-    actionsCell.innerHTML = '<span class="text-muted">-</span>';
+    const span = document.createElement('span');
+    span.className = 'text-muted';
+    span.textContent = '-';
+    actionsCell.appendChild(span);
   } else {
-    actionsCell.innerHTML = `
-        <button class="btn btn-sm" onclick="openMovementDetails(${movement.id}, '${movement.type}')" title="פרטים" style="width: 2.5em; height: 2.5em; padding: 0; display: inline-flex; align-items: center; justify-content: center;">
-            👁️
-        </button>
-    `;
+    const button = document.createElement('button');
+    button.className = 'btn btn-sm btn-view-details';
+    button.onclick = function() { openMovementDetails(movement.id, movement.type); };
+    button.title = 'פרטים';
+    button.textContent = '👁️';
+    actionsCell.appendChild(button);
   }
   row.appendChild(actionsCell);
 
@@ -615,7 +913,14 @@ function renderAccountActivityRows(movements) {
   const safeMovements = Array.isArray(movements) ? movements : [];
 
   if (!safeMovements.length) {
-    tbody.innerHTML = '<tr><td colspan="8" class="text-center">אין תנועות לחשבון זה</td></tr>';
+    tbody.textContent = '';
+    const emptyRow = document.createElement('tr');
+    const emptyCell = document.createElement('td');
+    emptyCell.colSpan = 8;
+    emptyCell.className = 'text-center';
+    emptyCell.textContent = 'אין תנועות לחשבון זה';
+    emptyRow.appendChild(emptyCell);
+    tbody.appendChild(emptyRow);
     return;
   }
 
@@ -625,7 +930,7 @@ function renderAccountActivityRows(movements) {
     fragment.appendChild(row);
   });
 
-  tbody.innerHTML = '';
+  tbody.textContent = '';
   tbody.appendChild(fragment);
 }
 
@@ -642,25 +947,28 @@ function syncAccountActivityPagination(movements) {
       });
 
       if (paginationPromise && typeof paginationPromise.then === 'function') {
-        paginationPromise
+        return paginationPromise
           .then(instance => {
             accountActivityPaginationInstance = instance;
+            return instance;
           })
           .catch(error => {
             window.Logger?.warn('syncAccountActivityPagination: falling back to direct render', { error, page: 'trading_accounts' });
             renderAccountActivityRows(safeMovements);
+            return null;
           });
       } else if (!paginationPromise) {
         renderAccountActivityRows(safeMovements);
       }
 
-      return;
+      return paginationPromise || Promise.resolve();
     } catch (error) {
       window.Logger?.warn('syncAccountActivityPagination: pagination system error', { error, page: 'trading_accounts' });
     }
   }
 
   renderAccountActivityRows(safeMovements);
+  return Promise.resolve();
 }
 
 window.syncAccountActivityPagination = syncAccountActivityPagination;
@@ -670,10 +978,20 @@ window.syncAccountActivityPagination = syncAccountActivityPagination;
  */
 function updateActivitySummary(data) {
   // Always update date range in title first (works even if data is null)
+  // Note: summaryDateRange might be inside a closed section, so we try to find it
   const tableTitleDateRange = document.getElementById('accountActivityDateRange');
-  const summaryDateRange = document.getElementById('accountActivitySelectedRange');
+  let summaryDateRange = document.getElementById('accountActivitySelectedRange');
+  
+  // If summaryDateRange not found, it might be in a closed section - try querySelector
+  if (!summaryDateRange) {
+    summaryDateRange = document.querySelector('#accountActivitySelectedRange');
+  }
+  
   if (tableTitleDateRange || summaryDateRange) {
-    const dateRange = window.selectedDateRangeForFilter || 'כל זמן';
+    // Use filterSystem.currentFilters.dateRange (standard way to get date range)
+    const dateRange = (window.filterSystem && window.filterSystem.currentFilters && window.filterSystem.currentFilters.dateRange) 
+      || window.selectedDateRangeForFilter 
+      || 'כל זמן';
     let startDate = null;
     // Use dateUtils for consistent date handling
     let endDate;
@@ -688,8 +1006,17 @@ function updateActivitySummary(data) {
     if (window.accountActivityState && window.accountActivityState.selectedAccountId && window.trading_accountsData) {
       const account = window.trading_accountsData.find(acc => acc.id === window.accountActivityState.selectedAccountId);
       if (account && account.created_at) {
-        const parsed = window.dateUtils?.toDateObject ? window.dateUtils.toDateObject(account.created_at) : new Date(account.created_at);
-        if (parsed && !Number.isNaN(parsed.getTime())) {
+        // Handle DateEnvelope objects (server always returns DateEnvelope, not string)
+        let parsed = null;
+        if (account.created_at && typeof account.created_at === 'object' && (account.created_at.epochMs || account.created_at.utc || account.created_at.local)) {
+          // It's already a DateEnvelope
+          parsed = account.created_at;
+        } else if (window.dateUtils?.toDateObject) {
+          parsed = window.dateUtils.toDateObject(account.created_at);
+        } else {
+          parsed = new Date(account.created_at);
+        }
+        if (parsed && (parsed instanceof Date ? !Number.isNaN(parsed.getTime()) : true)) {
           accountOpeningDate = parsed;
         }
       }
@@ -698,43 +1025,75 @@ function updateActivitySummary(data) {
     if (dateRange !== 'כל זמן' && typeof window.translateDateRangeToDates === 'function') {
       const range = window.translateDateRangeToDates(dateRange);
       if (range) {
-        startDate = range.startDate ? new Date(range.startDate) : null;
-        endDate = range.endDate ? new Date(range.endDate) : new Date();
+        // Handle DateEnvelope objects from translateDateRangeToDates
+        if (range.startDate) {
+          if (range.startDate && typeof range.startDate === 'object' && (range.startDate.epochMs || range.startDate.utc || range.startDate.local)) {
+            startDate = range.startDate;
+          } else {
+            startDate = new Date(range.startDate);
+          }
+        }
+        if (range.endDate) {
+          if (range.endDate && typeof range.endDate === 'object' && (range.endDate.epochMs || range.endDate.utc || range.endDate.local)) {
+            endDate = range.endDate;
+          } else {
+            endDate = new Date(range.endDate);
+          }
+        } else {
+          endDate = window.dateUtils?.getToday ? window.dateUtils.getToday() : new Date();
+        }
       }
     } else if (dateRange === 'כל זמן' && accountOpeningDate) {
       startDate = accountOpeningDate;
     }
 
-    // Format date range for title
+    // Format date range for title using FieldRendererService.renderDate (standard date rendering)
+    // FieldRendererService.renderDate handles DateEnvelope objects automatically
+    window.Logger.info('🔵 [updateActivitySummary] Formatting dates', { 
+      startDateType: startDate ? (typeof startDate) : 'null',
+      endDateType: endDate ? (typeof endDate) : 'null',
+      startDateIsEnvelope: startDate && typeof startDate === 'object' && (startDate.epochMs || startDate.utc || startDate.local),
+      endDateIsEnvelope: endDate && typeof endDate === 'object' && (endDate.epochMs || endDate.utc || endDate.local),
+      hasFieldRenderer: !!(window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function'),
+      page: 'trading_accounts' 
+    });
     let dateRangeDisplay = '';
     if (startDate && endDate) {
-      const formatDateFn = window.dateUtils?.formatDate || window.formatDate;
-      const startDateFormatted = typeof formatDateFn === 'function'
-        ? formatDateFn(startDate)
-        : startDate.toLocaleDateString('he-IL', {
-          year: 'numeric',
-          month: '2-digit',
-          day: '2-digit',
+      // Use FieldRendererService.renderDate for consistent date formatting (handles DateEnvelope automatically)
+      let startDateFormatted, endDateFormatted;
+      if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
+        startDateFormatted = window.FieldRendererService.renderDate(startDate, false);
+        endDateFormatted = window.FieldRendererService.renderDate(endDate, false);
+        window.Logger.info('🔵 [updateActivitySummary] Dates formatted via FieldRendererService', { 
+          startDateFormatted, 
+          endDateFormatted, 
+          page: 'trading_accounts' 
         });
-      const endDateFormatted = typeof formatDateFn === 'function'
-        ? formatDateFn(endDate)
-        : endDate.toLocaleDateString('he-IL', {
-          year: 'numeric',
-          month: '2-digit',
-          day: '2-digit',
-        }) === new Date().toLocaleDateString('he-IL', {
-          year: 'numeric',
-          month: '2-digit',
-          day: '2-digit',
-        })
-          ? 'היום'
-          : typeof formatDateFn === 'function'
-            ? formatDateFn(endDate)
+      } else {
+        const formatDateFn = window.dateUtils?.formatDate || window.formatDate;
+        startDateFormatted = typeof formatDateFn === 'function'
+          ? formatDateFn(startDate, { includeTime: false })
+          : startDate.toLocaleDateString('he-IL', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+          });
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const endDateOnly = new Date(endDate);
+        endDateOnly.setHours(0, 0, 0, 0);
+        if (endDateOnly.getTime() === today.getTime()) {
+          endDateFormatted = 'היום';
+        } else {
+          endDateFormatted = typeof formatDateFn === 'function'
+            ? formatDateFn(endDate, { includeTime: false })
             : endDate.toLocaleDateString('he-IL', {
               year: 'numeric',
               month: '2-digit',
               day: '2-digit',
             });
+        }
+      }
 
       dateRangeDisplay = `${startDateFormatted} - ${endDateFormatted}`;
     } else if (dateRange !== 'כל זמן') {
@@ -743,13 +1102,36 @@ function updateActivitySummary(data) {
       dateRangeDisplay = 'כל הזמנים';
     }
 
+    window.Logger.info('🔵 [updateActivitySummary] Setting date range display', { 
+      dateRangeDisplay, 
+      hasTableTitleDateRange: !!tableTitleDateRange,
+      hasSummaryDateRange: !!summaryDateRange,
+      page: 'trading_accounts' 
+    });
+
     if (tableTitleDateRange) {
       tableTitleDateRange.textContent = dateRangeDisplay;
+      window.Logger.info('🔵 [updateActivitySummary] Updated tableTitleDateRange', { 
+        elementId: tableTitleDateRange.id,
+        textContent: dateRangeDisplay,
+        page: 'trading_accounts' 
+      });
+    } else {
+      window.Logger.warn('⚠️ [updateActivitySummary] tableTitleDateRange element not found', { 
+        searchedId: 'accountActivityDateRange',
+        page: 'trading_accounts' 
+      });
     }
 
     if (summaryDateRange) {
       summaryDateRange.textContent = dateRangeDisplay;
+      window.Logger.info('🔵 [updateActivitySummary] Updated summaryDateRange', { 
+        elementId: summaryDateRange.id,
+        textContent: dateRangeDisplay,
+        page: 'trading_accounts' 
+      });
     }
+    // Element might not exist if section is closed - this is OK, no warning needed
   }
 
   // Update table count (always update, even if no data - show 0)
@@ -763,8 +1145,11 @@ function updateActivitySummary(data) {
     const currencies = data && data.currencies ? data.currencies.length : 0;
 
     // Get date range information (always calculate, even if no data)
+    // Use filterSystem.currentFilters.dateRange (standard way to get date range)
     let dateRangeText = '';
-    const dateRange = window.selectedDateRangeForFilter || 'כל זמן';
+    const dateRange = (window.filterSystem && window.filterSystem.currentFilters && window.filterSystem.currentFilters.dateRange) 
+      || window.selectedDateRangeForFilter 
+      || 'כל זמן';
     let startDate = null;
     // Use dateUtils for consistent date handling
     let endDate;
@@ -796,16 +1181,23 @@ function updateActivitySummary(data) {
       startDate = accountOpeningDate;
     }
 
-    // Format dates and calculate days
+    // Format dates and calculate days using FieldRendererService.renderDate (standard date rendering)
     if (startDate && endDate) {
       const daysDiff = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
-      const formatDateFn = window.dateUtils?.formatDate || window.formatDate;
-      const startDateFormatted = typeof formatDateFn === 'function'
-        ? formatDateFn(startDate)
-        : startDate.toLocaleDateString('he-IL');
-      const endDateFormatted = typeof formatDateFn === 'function'
-        ? formatDateFn(endDate)
-        : endDate.toLocaleDateString('he-IL');
+      // Use FieldRendererService.renderDate for consistent date formatting
+      let startDateFormatted, endDateFormatted;
+      if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
+        startDateFormatted = window.FieldRendererService.renderDate(startDate, false);
+        endDateFormatted = window.FieldRendererService.renderDate(endDate, false);
+      } else {
+        const formatDateFn = window.dateUtils?.formatDate || window.formatDate;
+        startDateFormatted = typeof formatDateFn === 'function'
+          ? formatDateFn(startDate, { includeTime: false })
+          : startDate.toLocaleDateString('he-IL');
+        endDateFormatted = typeof formatDateFn === 'function'
+          ? formatDateFn(endDate, { includeTime: false })
+          : endDate.toLocaleDateString('he-IL');
+      }
 
       dateRangeText = ` | ${startDateFormatted} - ${endDateFormatted} (${daysDiff} ימים)`;
     } else if (dateRange !== 'כל זמן') {
@@ -851,14 +1243,28 @@ function updateCurrencyBalancesFooter(data) {
       summaryHTML += `<div><strong>${symbol}:</strong> ${formatAmount(balance)}</div>`;
     }
   });
-  summaryCell.innerHTML = summaryHTML;
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(summaryHTML, 'text/html');
+  summaryCell.textContent = '';
+  doc.body.childNodes.forEach(node => {
+    summaryCell.appendChild(node.cloneNode(true));
+  });
 
   // Base currency total using FieldRendererService
   const baseSymbol = getCurrencySymbol(data.base_currency || 'USD');
   if (window.FieldRendererService && window.FieldRendererService.renderAmount) {
-    baseTotalCell.innerHTML = `<strong>${window.FieldRendererService.renderAmount(data.base_currency_total || 0, baseSymbol, 0)}</strong>`;
+    const amountHTML = window.FieldRendererService.renderAmount(data.base_currency_total || 0, baseSymbol, 0);
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(`<strong>${amountHTML}</strong>`, 'text/html');
+    baseTotalCell.textContent = '';
+    doc.body.childNodes.forEach(node => {
+      baseTotalCell.appendChild(node.cloneNode(true));
+    });
   } else {
-    baseTotalCell.innerHTML = `<strong>${formatAmount(data.base_currency_total || 0)} ${baseSymbol}</strong>`;
+    baseTotalCell.textContent = '';
+    const strong = document.createElement('strong');
+    strong.textContent = `${formatAmount(data.base_currency_total || 0)} ${baseSymbol}`;
+    baseTotalCell.appendChild(strong);
   }
 
   // Show rates used if available
@@ -871,7 +1277,7 @@ function updateCurrencyBalancesFooter(data) {
     baseTotalCell.innerHTML += ratesText;
   }
 
-  footer.style.display = 'table-row-group';
+  footer.classList.remove('d-none');
 }
 
 /**
@@ -882,20 +1288,19 @@ function openMovementDetails(movementId, movementType) {
     window.Logger.debug('Skipping details for opening balance movement', { movementId, movementType, page: 'trading_accounts' });
     return;
   }
-  if (!window.EntityDetailsModal) {
-    window.Logger.warn('⚠️ EntityDetailsModal not available', { page: 'trading_accounts' });
-    if (window.showNotification) {
-      window.showNotification('מערכת פרטי ישויות לא זמינה', 'warning');
-    }
-    return;
-  }
 
   // Map movement type to entity type
   const entityType = movementType === 'cash_flow' ? 'cash_flow' : 'execution';
 
-  window.Logger.info(`🔍 פתיחת פרטי ${entityType} ${movementId}`, { page: 'trading_accounts' });
-
-  window.EntityDetailsModal.show(entityType, movementId);
+  // שימוש במערכת המרכזית Entity Details Modal
+  if (typeof window.showEntityDetails === 'function') {
+    window.showEntityDetails(entityType, movementId, { mode: 'view' });
+  } else {
+    window.Logger?.error('showEntityDetails לא זמין', { page: 'trading_accounts' });
+    if (window.showErrorNotification) {
+      window.showErrorNotification('שגיאה', 'מערכת פרטי ישויות לא זמינה');
+    }
+  }
 }
 
 /**
@@ -904,12 +1309,19 @@ function openMovementDetails(movementId, movementType) {
 function clearActivityTable() {
   const tbody = document.querySelector('#accountActivityTable tbody');
   if (tbody) {
-    tbody.innerHTML = '<tr><td colspan="8" class="loading">בחר חשבון מסחר להצגת תנועות...</td></tr>';
+    tbody.textContent = '';
+    const row = document.createElement('tr');
+    const cell = document.createElement('td');
+    cell.colSpan = 8;
+    cell.className = 'loading';
+    cell.textContent = 'בחר חשבון מסחר להצגת תנועות...';
+    row.appendChild(cell);
+    tbody.appendChild(row);
   }
 
   const footer = document.getElementById('accountActivityFooter');
   if (footer) {
-    footer.style.display = 'none';
+    footer.classList.add('d-none');
   }
 
   const tableCount = document.getElementById('accountActivityCount');
@@ -924,7 +1336,14 @@ function clearActivityTable() {
 function showErrorInTable(message) {
   const tbody = document.querySelector('#accountActivityTable tbody');
   if (tbody) {
-    tbody.innerHTML = `<tr><td colspan="8" class="text-center text-danger">${message}</td></tr>`;
+    tbody.textContent = '';
+    const row = document.createElement('tr');
+    const cell = document.createElement('td');
+    cell.colSpan = 8;
+    cell.className = 'text-center text-danger';
+    cell.textContent = message;
+    row.appendChild(cell);
+    tbody.appendChild(row);
   }
 }
 
@@ -972,6 +1391,7 @@ function getSubtypeDisplay(subtype) {
     'dividend': 'דיבידנד',
     'interest': 'ריבית',
     'syep_interest': 'ריבית SYEP',
+    'interest_all': 'ריבית',  // Unified interest (interest + syep_interest)
     'transfer_in': 'העברה פנימה',
     'transfer_out': 'העברה החוצה',
     'currency_exchange_from': 'המרת מט״ח - יציאה',
@@ -982,6 +1402,8 @@ function getSubtypeDisplay(subtype) {
     // Execution subtypes
     'buy': 'קנייה',
     'sell': 'מכירה',
+    'short': 'קנייה בחסר',
+    'cover': 'כיסוי',
   };
 
   return translations[subtype] || subtype || '-';
@@ -1034,9 +1456,11 @@ function normalizeAmountBySubtype(amount, type, subtype) {
     }
 
     // Interest can be positive or negative - keep original sign
+    // Also handle unified 'interest_all' (interest + syep_interest)
     if (
       subTypeValue === 'interest' ||
       subTypeValue === 'syep_interest' ||
+      subTypeValue === 'interest_all' ||
       subTypeValue === 'ריבית' ||
       subTypeValue === 'ריבית syep'
     ) {
@@ -1074,40 +1498,23 @@ function normalizeAmountBySubtype(amount, type, subtype) {
 }
 
 /**
- * Calculate activity statistics from visible rows
+ * Calculate activity statistics from processed movements
  * @returns {Object} Statistics object with cash flows and executions data
  */
 function calculateActivityStatistics() {
-  const tbody = document.querySelector('#accountActivityTable tbody');
-  if (!tbody) {
-    return { cashFlows: {}, executions: {} };
-  }
-
-  // Get all visible rows (not loading, not empty, not hidden by filter)
-  const rows = Array.from(tbody.querySelectorAll('tr')).filter(row => {
-    // Exclude loading/empty rows
-    if (row.classList.contains('loading') ||
-            row.querySelector('td.loading') ||
-            row.style.display === 'none' ||
-            row.getAttribute('style')?.includes('display: none')) {
-      return false;
-    }
-    // Must have movement data
-    return row.getAttribute('data-movement-type');
-  });
-
-  if (rows.length === 0) {
-    return { cashFlows: {}, executions: {} };
-  }
-
-  // Get filter date range
-  const dateRange = window.selectedDateRangeForFilter || 'כל זמן';
+  // Use processedMovements as the source of truth (all movements, not just visible ones)
+  const allMovements = window.accountActivityState?.processedMovements || [];
+  
+  // Get filter date range - use filterSystem.currentFilters.dateRange (standard way)
+  const dateRange = (window.filterSystem && window.filterSystem.currentFilters && window.filterSystem.currentFilters.dateRange)
+    || window.selectedDateRangeForFilter
+    || 'כל זמן';
   let startDate = null;
   let endDate = new Date(); // Today
 
   // Get account opening date for "כל זמן" case
   let accountOpeningDate = null;
-  if (window.accountActivityState.selectedAccountId && window.trading_accountsData) {
+  if (window.accountActivityState?.selectedAccountId && window.trading_accountsData) {
     const account = window.trading_accountsData.find(acc => acc.id === window.accountActivityState.selectedAccountId);
     if (account && account.created_at) {
       const parsed = window.dateUtils?.toDateObject ? window.dateUtils.toDateObject(account.created_at) : new Date(account.created_at);
@@ -1130,6 +1537,34 @@ function calculateActivityStatistics() {
     startDate = accountOpeningDate;
   }
 
+  // Create empty stats structure with all required fields
+  const emptyStats = {
+    totalCount: 0,
+    totalAmount: 0,
+    positiveAmount: 0,
+    negativeAmount: 0,
+    positiveCount: 0,
+    negativeCount: 0,
+    bySubtype: {},
+    firstRecord: null,
+    lastRecord: null,
+    dateRange: { start: startDate, end: endDate },
+    overallPercentageChange: 0,
+    overallAmountChange: 0,
+    overallAnnualizedChange: 0,
+    currency: 'USD',
+  };
+
+  if (!allMovements || allMovements.length === 0) {
+    window.Logger.info('📊 אין תנועות מחושבות לחישוב סטטיסטיקות', { 
+      processedMovementsLength: window.accountActivityState?.processedMovements?.length || 0,
+      page: 'trading_accounts' 
+    });
+    return { cashFlows: emptyStats, executions: emptyStats };
+  }
+
+  window.Logger.info(`📊 חישוב סטטיסטיקות מ-${allMovements.length} תנועות מחושבות`, { page: 'trading_accounts' });
+
   // Log date range for debugging
   window.Logger.info('📅 טווח זמן לחישוב סטטיסטיקות:', { page: 'trading_accounts' });
   window.Logger.info(`  - פילטר נבחר: ${dateRange}`, { page: 'trading_accounts' });
@@ -1141,26 +1576,62 @@ function calculateActivityStatistics() {
   }
   window.Logger.info(`  - תאריך פתיחת חשבון: ${accountOpeningDate ? accountOpeningDate.toISOString().split('T')[0] : 'null'}`, { page: 'trading_accounts' });
 
-  // Separate rows by type
-  const cashFlowRows = rows.filter(row => row.getAttribute('data-movement-type') === 'cash_flow');
-  const executionRows = rows.filter(row => row.getAttribute('data-movement-type') === 'execution');
+  // Separate movements by type
+  const cashFlowMovements = allMovements.filter(m => m.type === 'cash_flow');
+  const executionMovements = allMovements.filter(m => m.type === 'execution');
 
-  // Filter by date range
-  const filterByDateRange = (rowsList, start, end) => rowsList.filter(row => {
-    const rowDateStr = row.getAttribute('data-movement-date');
-    if (!rowDateStr) {return false;}
-    const rowDate = new Date(rowDateStr);
-    if (start && rowDate < start) {return false;}
-    if (end && rowDate > end) {return false;}
+  // Filter by date range - only filter if we have explicit date range from filter (not default "כל זמן")
+  const filterByDateRange = (movementsList, start, end) => movementsList.filter(movement => {
+    if (!movement.date) {return false;}
+    
+    // Use dateUtils for consistent date parsing
+    let rowDate;
+    if (window.dateUtils && typeof window.dateUtils.toDateObject === 'function') {
+      rowDate = window.dateUtils.toDateObject(movement.date);
+    } else {
+      rowDate = new Date(movement.date);
+    }
+    
+    if (!rowDate || Number.isNaN(rowDate.getTime())) {return false;}
+    
+    // Only filter if we have explicit start date (meaning user selected a date range, not "כל זמן")
+    if (start) {
+      // Set start of day for comparison
+      const rowDateOnly = new Date(rowDate.getFullYear(), rowDate.getMonth(), rowDate.getDate());
+      const startDateOnly = new Date(start.getFullYear(), start.getMonth(), start.getDate());
+      if (rowDateOnly < startDateOnly) {return false;}
+    }
+    
+    // Only filter by end date if we have explicit end date (not today by default for "כל זמן")
+    if (end && dateRange !== 'כל זמן') {
+      // Set end of day for comparison
+      const rowDateOnly = new Date(rowDate.getFullYear(), rowDate.getMonth(), rowDate.getDate());
+      const endDateOnly = new Date(end.getFullYear(), end.getMonth(), end.getDate());
+      if (rowDateOnly > endDateOnly) {return false;}
+    }
+    
     return true;
   });
 
-  const filteredCashFlowRows = startDate || endDate ? filterByDateRange(cashFlowRows, startDate, endDate) : cashFlowRows;
-  const filteredExecutionRows = startDate || endDate ? filterByDateRange(executionRows, startDate, endDate) : executionRows;
+  // Only apply date filter if user selected a specific date range (not "כל זמן")
+  const shouldFilterByDate = dateRange !== 'כל זמן' && (startDate || (endDate && dateRange !== 'כל זמן'));
+  const filteredCashFlowMovements = shouldFilterByDate ? filterByDateRange(cashFlowMovements, startDate, endDate) : cashFlowMovements;
+  const filteredExecutionMovements = shouldFilterByDate ? filterByDateRange(executionMovements, startDate, endDate) : executionMovements;
+  
+  window.Logger.info(`📊 תנועות מסננות: ${filteredCashFlowMovements.length} cash flows, ${filteredExecutionMovements.length} executions`, { page: 'trading_accounts' });
 
   // Helper to calculate statistics for a type
-  const calculateStatsForType = (filteredRows, typeName) => {
-    if (filteredRows.length === 0) {
+  const calculateStatsForType = (filteredMovements, typeName) => {
+    if (!filteredMovements || filteredMovements.length === 0) {
+      window.Logger.info(`📊 ${typeName} - אין תנועות מסוננות`, { page: 'trading_accounts' });
+      // Get currency from account or default to USD
+      let defaultCurrency = 'USD';
+      if (window.accountActivityState?.selectedAccountId && window.trading_accountsData) {
+        const account = window.trading_accountsData.find(acc => acc.id === window.accountActivityState.selectedAccountId);
+        if (account && account.currency) {
+          defaultCurrency = account.currency;
+        }
+      }
       return {
         totalCount: 0,
         totalAmount: 0,
@@ -1172,20 +1643,24 @@ function calculateActivityStatistics() {
         firstRecord: null,
         lastRecord: null,
         dateRange: { start: startDate, end: endDate },
+        overallPercentageChange: 0,
+        overallAmountChange: 0,
+        overallAnnualizedChange: 0,
+        currency: defaultCurrency,
       };
     }
 
     // Log dateRange for debugging
     window.Logger.info(`  - stats.dateRange: start=${startDate ? new Date(startDate).toISOString().split('T')[0] : 'null'}, end=${endDate ? new Date(endDate).toISOString().split('T')[0] : 'null'}`, { page: 'trading_accounts' });
 
-    // Get amounts and dates
-    const movements = filteredRows.map(row => ({
-      id: row.getAttribute('data-movement-id'),
-      type: row.getAttribute('data-movement-type'),
-      subtype: row.getAttribute('data-movement-subtype'),
-      amount: parseFloat(row.getAttribute('data-movement-amount') || '0'),
-      date: row.getAttribute('data-movement-date'),
-      currency: row.getAttribute('data-currency-symbol') || 'USD',
+    // Map movements to format needed for statistics (already have the data, just normalize it)
+    const movements = filteredMovements.map(m => ({
+      id: m.id,
+      type: m.type,
+      subtype: m.sub_type || m.subtype || m.action || '',
+      amount: parseFloat(m.amount || '0'),
+      date: m.date,
+      currency: m.currency_symbol || m.currency || 'USD',
     }));
 
     // Sort by date (oldest first)
@@ -1221,13 +1696,48 @@ function calculateActivityStatistics() {
     // Group by subtype
     // IMPORTANT: Merge related subtypes into single groups:
     // - 'deposit' and 'withdrawal' into 'deposits_withdrawals'
+    // - For executions: use 'action' field (buy/sell/short/cover) as subtype
     const bySubtype = {};
     movements.forEach(m => {
-      let subtype = (m.subtype || (m.amount >= 0 ? 'other_positive' : 'other_negative')).toLowerCase();
+      // Get subtype from movement - check multiple possible fields
+      // CRITICAL: For executions, use 'action' field (buy/sell/short/cover)
+      // For cash flows, use 'subtype' or 'sub_type'
+      let subtype = null;
+      
+      if (m.type === 'execution') {
+        // For executions, use 'action' field (buy/sell/short/cover)
+        subtype = (m.action || m.subtype || m.sub_type || (m.amount >= 0 ? 'sell' : 'buy')).toLowerCase();
+        
+        // Normalize execution actions:
+        // - 'sell', 'short', 'cover' should all be grouped as 'sell' for statistics
+        // - 'buy' stays as 'buy'
+        if (subtype === 'sell' || subtype === 'short' || subtype === 'cover' || subtype === 'מכירה') {
+          subtype = 'sell';
+        } else if (subtype === 'buy' || subtype === 'קנייה') {
+          subtype = 'buy';
+        }
+      } else {
+        // For cash flows, use subtype/sub_type
+        subtype = (m.subtype || m.sub_type || (m.amount >= 0 ? 'other_positive' : 'other_negative')).toLowerCase();
 
-      // Merge 'deposit' and 'withdrawal' into 'deposits_withdrawals'
-      if (subtype === 'deposit' || subtype === 'withdrawal') {
-        subtype = 'deposits_withdrawals';
+        // Merge 'deposit' and 'withdrawal' into 'deposits_withdrawals'
+        if (subtype === 'deposit' || subtype === 'withdrawal' || subtype === 'הפקדה' || subtype === 'משיכה') {
+          subtype = 'deposits_withdrawals';
+        }
+        
+        // Map other common subtypes
+        if (subtype === 'fee' || subtype === 'עמלה') {
+          subtype = 'fee';
+        } else if (subtype === 'dividend' || subtype === 'דיבידנד') {
+          subtype = 'dividend';
+        } else if (subtype === 'transfer' || subtype === 'transfer_in' || subtype === 'transfer_out' || subtype === 'העברה') {
+          subtype = 'transfer';
+        } else if (subtype === 'interest' || subtype === 'syep_interest' || subtype === 'ריבית' || subtype === 'ריבית syep') {
+          // Merge 'interest' and 'syep_interest' into 'interest_all' (like deposits_withdrawals)
+          subtype = 'interest_all';
+        } else if (subtype === 'other' || subtype === 'other_positive' || subtype === 'other_negative' || subtype === 'אחר') {
+          subtype = 'other';
+        }
       }
 
       if (!bySubtype[subtype]) {
@@ -1337,7 +1847,7 @@ function calculateActivityStatistics() {
     }
 
     return {
-      totalCount: filteredRows.length,
+      totalCount: filteredMovements.length,
       totalAmount,
       positiveAmount: positiveAmounts,
       negativeAmount: negativeAmounts,
@@ -1354,8 +1864,8 @@ function calculateActivityStatistics() {
     };
   };
 
-  const cashFlowsStats = calculateStatsForType(filteredCashFlowRows, 'cash_flow');
-  const executionsStats = calculateStatsForType(filteredExecutionRows, 'execution');
+  const cashFlowsStats = calculateStatsForType(filteredCashFlowMovements, 'cash_flow');
+  const executionsStats = calculateStatsForType(filteredExecutionMovements, 'execution');
 
   return {
     cashFlows: cashFlowsStats,
@@ -1367,6 +1877,7 @@ function calculateActivityStatistics() {
  * Update activity statistics display
  */
 function updateActivityStatistics() {
+  window.Logger.info('🔵 [updateActivityStatistics] START', { page: 'trading_accounts' });
   const statsCard = document.getElementById('accountActivityStatisticsCard');
   if (!statsCard) {
     window.Logger.warn('⚠️ Statistics card not found', { page: 'trading_accounts' });
@@ -1374,14 +1885,15 @@ function updateActivityStatistics() {
   }
 
   const stats = calculateActivityStatistics();
+  window.Logger.info('🔵 [updateActivityStatistics] stats calculated', { 
+    cashFlowsCount: stats.cashFlows?.totalCount || 0,
+    executionsCount: stats.executions?.totalCount || 0,
+    cashFlowsBySubtype: stats.cashFlows?.bySubtype ? Object.keys(stats.cashFlows.bySubtype) : [],
+    page: 'trading_accounts' 
+  });
 
-  // Show card if we have data
-  if (stats.cashFlows.totalCount === 0 && stats.executions.totalCount === 0) {
-    statsCard.style.display = 'none';
-    return;
-  }
-
-  statsCard.style.display = 'block';
+  // Always show card, even if no data (will show "אין נתונים להצגה")
+  statsCard.classList.remove('d-none');
 
   // Calculate overall statistics (combining cash flows + executions)
   const overallStats = combineStatistics(stats.cashFlows, stats.executions);
@@ -1391,12 +1903,24 @@ function updateActivityStatistics() {
   // Column 2: ממוצע לפעולה + שנתי משוער (for all records with breakdown)
   const overallContent = document.getElementById('overallStatisticsContent');
   if (overallContent) {
-    overallContent.innerHTML = renderStatisticsSummaryColumn1(overallStats, 'סיכום כללי');
+    const html1 = renderStatisticsSummaryColumn1(overallStats, 'סיכום כללי');
+    const parser = new DOMParser();
+    const doc1 = parser.parseFromString(html1, 'text/html');
+    overallContent.textContent = '';
+    doc1.body.childNodes.forEach(node => {
+      overallContent.appendChild(node.cloneNode(true));
+    });
   }
 
   const overallContent2 = document.getElementById('overallStatisticsContent2');
   if (overallContent2) {
-    overallContent2.innerHTML = renderStatisticsSummaryColumn2(overallStats, 'סיכום כללי');
+    const html2 = renderStatisticsSummaryColumn2(overallStats, 'סיכום כללי');
+    const parser2 = new DOMParser();
+    const doc2 = parser2.parseFromString(html2, 'text/html');
+    overallContent2.textContent = '';
+    doc2.body.childNodes.forEach(node => {
+      overallContent2.appendChild(node.cloneNode(true));
+    });
   }
 
   // Render cash flows: main summary - TWO cards, split content
@@ -1405,26 +1929,63 @@ function updateActivityStatistics() {
   const cashFlowsContent = document.getElementById('cashFlowsStatisticsContent');
   if (cashFlowsContent) {
     // Column 1: מספר רשומות + סה"כ סכום
-    cashFlowsContent.innerHTML = renderStatisticsSummaryColumn1(stats.cashFlows, 'תזרימי מזומנים');
+    const html3 = renderStatisticsSummaryColumn1(stats.cashFlows, 'תזרימי מזומנים');
+    const parser3 = new DOMParser();
+    const doc3 = parser3.parseFromString(html3, 'text/html');
+    cashFlowsContent.textContent = '';
+    doc3.body.childNodes.forEach(node => {
+      cashFlowsContent.appendChild(node.cloneNode(true));
+    });
   }
 
   const cashFlowsContent2 = document.getElementById('cashFlowsStatisticsContent2');
   if (cashFlowsContent2) {
     // Column 2: ממוצע לפעולה + שנתי משוער
-    cashFlowsContent2.innerHTML = renderStatisticsSummaryColumn2(stats.cashFlows, 'תזרימי מזומנים');
+    const html4 = renderStatisticsSummaryColumn2(stats.cashFlows, 'תזרימי מזומנים');
+    const parser4 = new DOMParser();
+    const doc4 = parser4.parseFromString(html4, 'text/html');
+    cashFlowsContent2.textContent = '';
+    doc4.body.childNodes.forEach(node => {
+      cashFlowsContent2.appendChild(node.cloneNode(true));
+    });
   }
 
   // Render cash flows breakdown by subtype in two columns
   const cashFlowsBreakdown1 = document.getElementById('cashFlowsBreakdownContent1');
   if (cashFlowsBreakdown1) {
     const cashFlowsColumn1 = splitCashFlowsByColumn(stats.cashFlows, 1);
-    cashFlowsBreakdown1.innerHTML = renderBreakdownBySubtype(cashFlowsColumn1, 'תזרימי מזומנים', 1);
+    const html5 = renderBreakdownBySubtype(cashFlowsColumn1, 'תזרימי מזומנים', 1);
+    const parser5 = new DOMParser();
+    const doc5 = parser5.parseFromString(html5, 'text/html');
+    cashFlowsBreakdown1.textContent = '';
+    doc5.body.childNodes.forEach(node => {
+      cashFlowsBreakdown1.appendChild(node.cloneNode(true));
+    });
   }
 
   const cashFlowsBreakdown2 = document.getElementById('cashFlowsBreakdownContent2');
   if (cashFlowsBreakdown2) {
+    window.Logger.info('🔵 [updateActivityStatistics] Rendering cashFlowsBreakdownContent2', { page: 'trading_accounts' });
     const cashFlowsColumn2 = splitCashFlowsByColumn(stats.cashFlows, 2);
-    cashFlowsBreakdown2.innerHTML = renderBreakdownBySubtype(cashFlowsColumn2, 'תזרימי מזומנים', 2);
+    window.Logger.info('🔵 [updateActivityStatistics] cashFlowsColumn2', { 
+      totalCount: cashFlowsColumn2?.totalCount || 0,
+      bySubtype: cashFlowsColumn2?.bySubtype ? Object.keys(cashFlowsColumn2.bySubtype) : [],
+      page: 'trading_accounts' 
+    });
+    const html6 = renderBreakdownBySubtype(cashFlowsColumn2, 'תזרימי מזומנים', 2);
+    window.Logger.info('🔵 [updateActivityStatistics] html6 length', { htmlLength: html6?.length || 0, page: 'trading_accounts' });
+    const parser6 = new DOMParser();
+    const doc6 = parser6.parseFromString(html6, 'text/html');
+    cashFlowsBreakdown2.textContent = '';
+    doc6.body.childNodes.forEach(node => {
+      cashFlowsBreakdown2.appendChild(node.cloneNode(true));
+    });
+    window.Logger.info('🔵 [updateActivityStatistics] cashFlowsBreakdownContent2 rendered', { 
+      childNodesCount: cashFlowsBreakdown2.childNodes.length,
+      page: 'trading_accounts' 
+    });
+  } else {
+    window.Logger.warn('⚠️ [updateActivityStatistics] cashFlowsBreakdownContent2 element not found', { page: 'trading_accounts' });
   }
 
   // Render executions: main summary - TWO cards, split content (same structure as cash flows)
@@ -1433,26 +1994,76 @@ function updateActivityStatistics() {
   const executionsContentBuy = document.getElementById('executionsStatisticsContentBuy');
   if (executionsContentBuy) {
     // Column 1: מספר רשומות + סה"כ סכום (full stats)
-    executionsContentBuy.innerHTML = renderStatisticsSummaryColumn1(stats.executions, 'ביצועים');
+    const html7 = renderStatisticsSummaryColumn1(stats.executions, 'ביצועים');
+    const parser7 = new DOMParser();
+    const doc7 = parser7.parseFromString(html7, 'text/html');
+    executionsContentBuy.textContent = '';
+    doc7.body.childNodes.forEach(node => {
+      executionsContentBuy.appendChild(node.cloneNode(true));
+    });
   }
 
   const executionsContentSell = document.getElementById('executionsStatisticsContentSell');
   if (executionsContentSell) {
     // Column 2: ממוצע לפעולה + שנתי משוער (full stats with breakdown)
-    executionsContentSell.innerHTML = renderStatisticsSummaryColumn2(stats.executions, 'ביצועים');
+    const html8 = renderStatisticsSummaryColumn2(stats.executions, 'ביצועים');
+    const parser8 = new DOMParser();
+    const doc8 = parser8.parseFromString(html8, 'text/html');
+    executionsContentSell.textContent = '';
+    doc8.body.childNodes.forEach(node => {
+      executionsContentSell.appendChild(node.cloneNode(true));
+    });
   }
 
   // Render executions breakdown by subtype (buy/sell)
   const executionsBreakdown1 = document.getElementById('executionsBreakdownContent1');
   if (executionsBreakdown1) {
     const executionsBuy = splitExecutionsByAction(stats.executions, 'buy');
-    executionsBreakdown1.innerHTML = renderBreakdownBySubtype(executionsBuy, 'ביצועים', 'buy');
+    const html9 = renderBreakdownBySubtype(executionsBuy, 'ביצועים', 'buy');
+    const parser9 = new DOMParser();
+    const doc9 = parser9.parseFromString(html9, 'text/html');
+    executionsBreakdown1.textContent = '';
+    doc9.body.childNodes.forEach(node => {
+      executionsBreakdown1.appendChild(node.cloneNode(true));
+    });
   }
 
   const executionsBreakdown2 = document.getElementById('executionsBreakdownContent2');
   if (executionsBreakdown2) {
     const executionsSell = splitExecutionsByAction(stats.executions, 'sell');
-    executionsBreakdown2.innerHTML = renderBreakdownBySubtype(executionsSell, 'ביצועים', 'sell');
+    const html10 = renderBreakdownBySubtype(executionsSell, 'ביצועים', 'sell');
+    const parser10 = new DOMParser();
+    const doc10 = parser10.parseFromString(html10, 'text/html');
+    executionsBreakdown2.textContent = '';
+    doc10.body.childNodes.forEach(node => {
+      executionsBreakdown2.appendChild(node.cloneNode(true));
+    });
+  }
+
+  // Render executions breakdown for short positions
+  const executionsBreakdown3 = document.getElementById('executionsBreakdownContent3');
+  if (executionsBreakdown3) {
+    const executionsShort = splitExecutionsByAction(stats.executions, 'short');
+    const html11 = renderBreakdownBySubtype(executionsShort, 'ביצועים', 'short');
+    const parser11 = new DOMParser();
+    const doc11 = parser11.parseFromString(html11, 'text/html');
+    executionsBreakdown3.textContent = '';
+    doc11.body.childNodes.forEach(node => {
+      executionsBreakdown3.appendChild(node.cloneNode(true));
+    });
+  }
+
+  // Render executions breakdown for cover positions
+  const executionsBreakdown4 = document.getElementById('executionsBreakdownContent4');
+  if (executionsBreakdown4) {
+    const executionsCover = splitExecutionsByAction(stats.executions, 'cover');
+    const html12 = renderBreakdownBySubtype(executionsCover, 'ביצועים', 'cover');
+    const parser12 = new DOMParser();
+    const doc12 = parser12.parseFromString(html12, 'text/html');
+    executionsBreakdown4.textContent = '';
+    doc12.body.childNodes.forEach(node => {
+      executionsBreakdown4.appendChild(node.cloneNode(true));
+    });
   }
 
   // Update activity summary header (with date range)
@@ -1539,23 +2150,37 @@ function combineStatistics(cashFlowsStats, executionsStats) {
 
 /**
  * Split cash flows statistics by column
- * Column 1: deposits_withdrawals, fee, dividend
- * Column 2: interest/SYEP interest, transfer, other
+ * NEW ORDER (by rows):
+ * Row 3: Col1 = deposits_withdrawals, Col2 = dividend
+ * Row 4: Col1 = fee, Col2 = interest + syep_interest
+ * Row 5: Col1 = transfer, Col2 = other
  * @param {Object} stats - Full cash flows statistics
  * @param {number} column - Column number (1 or 2)
  * @returns {Object} Filtered statistics object for the column
  */
 function splitCashFlowsByColumn(stats, column) {
+  window.Logger.info('🔵 [splitCashFlowsByColumn] START', { column, hasStats: !!stats, hasBySubtype: !!(stats?.bySubtype), page: 'trading_accounts' });
   if (!stats || !stats.bySubtype) {
+    window.Logger.warn('⚠️ [splitCashFlowsByColumn] No stats or bySubtype', { page: 'trading_accounts' });
     return stats;
   }
 
-  const column1Subtypes = ['deposits_withdrawals', 'fee', 'dividend'];
-  const column2Subtypes = ['transfer', 'interest', 'syep_interest', 'other'];
+  // NEW ORDER (by rows):
+  // Row 3: Col1 = deposits_withdrawals, Col2 = dividend
+  // Row 4: Col1 = fee, Col2 = interest_all (unified interest + syep_interest)
+  // Row 5: Col1 = transfer, Col2 = other
+  const column1Subtypes = ['deposits_withdrawals', 'fee', 'transfer'];
+  const column2Subtypes = ['dividend', 'interest_all', 'other'];
+  window.Logger.info('🔵 [splitCashFlowsByColumn] Available subtypes', { 
+    allSubtypes: Object.keys(stats.bySubtype),
+    targetSubtypes: column === 1 ? column1Subtypes : column2Subtypes,
+    page: 'trading_accounts' 
+  });
 
   const targetSubtypes = column === 1 ? column1Subtypes : column2Subtypes;
 
   // Filter bySubtype to only include subtypes for this column
+  // IMPORTANT: Always create entries for all target subtypes, even if empty, so cards always display
   const filteredBySubtype = {};
   let totalCount = 0;
   let totalAmount = 0;
@@ -1566,6 +2191,7 @@ function splitCashFlowsByColumn(stats, column) {
 
   targetSubtypes.forEach(subtype => {
     if (stats.bySubtype[subtype]) {
+      // Subtype exists - use actual data
       filteredBySubtype[subtype] = stats.bySubtype[subtype];
       totalCount += stats.bySubtype[subtype].count || 0;
       totalAmount += stats.bySubtype[subtype].totalAmount || 0;
@@ -1573,7 +2199,32 @@ function splitCashFlowsByColumn(stats, column) {
       negativeAmount += stats.bySubtype[subtype].negativeAmount || 0;
       positiveCount += stats.bySubtype[subtype].positiveCount || 0;
       negativeCount += stats.bySubtype[subtype].negativeCount || 0;
+      window.Logger.info('🔵 [splitCashFlowsByColumn] Added subtype', { subtype, count: stats.bySubtype[subtype].count || 0, page: 'trading_accounts' });
+    } else {
+      // Subtype doesn't exist - create empty entry so card always displays
+      filteredBySubtype[subtype] = {
+        count: 0,
+        totalAmount: 0,
+        movements: [],
+        positiveAmount: 0,
+        negativeAmount: 0,
+        positiveCount: 0,
+        negativeCount: 0,
+        firstAmount: 0,
+        lastAmount: 0,
+        percentageChange: 0,
+        amountChange: 0,
+        annualizedChange: 0,
+        daysInRange: 0
+      };
+      window.Logger.info('🔵 [splitCashFlowsByColumn] Created empty subtype entry', { subtype, page: 'trading_accounts' });
     }
+  });
+  window.Logger.info('🔵 [splitCashFlowsByColumn] RESULT', { 
+    column, 
+    totalCount, 
+    filteredSubtypes: Object.keys(filteredBySubtype),
+    page: 'trading_accounts' 
   });
 
   return {
@@ -1599,13 +2250,23 @@ function splitExecutionsByAction(stats, action) {
     return stats;
   }
 
+  // Normalize action: 'sell', 'short', 'cover' should all map to 'sell' for statistics grouping
+  // BUT: preserve the original action name for display purposes
+  const normalizedAction = (action || '').toLowerCase();
+  const targetAction = (normalizedAction === 'sell' || normalizedAction === 'short' || normalizedAction === 'cover' || normalizedAction === 'מכירה') 
+    ? 'sell' 
+    : (normalizedAction === 'buy' || normalizedAction === 'קנייה' ? 'buy' : normalizedAction);
+
   // Filter bySubtype to only include the requested action
+  // For short/cover: use 'sell' to get the data, but rename the key to the original action for display
   const filteredBySubtype = {};
-  if (stats.bySubtype[action]) {
-    filteredBySubtype[action] = stats.bySubtype[action];
+  if (stats.bySubtype[targetAction]) {
+    // If requesting 'short' or 'cover', rename the key to preserve the action name for display
+    const displayKey = (normalizedAction === 'short' || normalizedAction === 'cover') ? normalizedAction : targetAction;
+    filteredBySubtype[displayKey] = stats.bySubtype[targetAction];
   }
 
-  const subtypeStats = stats.bySubtype[action];
+  const subtypeStats = stats.bySubtype[targetAction];
   if (!subtypeStats) {
     // Return empty stats structure
     return {
@@ -1759,7 +2420,7 @@ function renderStatisticsColumn(stats, typeName) {
       window.Logger.info(`  - Fallback: Using period between records for annualization: ${daysForAnnual} days`, { page: 'trading_accounts' });
     }
     // For executions: estimate annual based on total amount in period (not change)
-    const annualAmountChange = stats.totalAmount / daysForAnnual * 365;
+    const annualAmountChange = totalAmount / daysForAnnual * 365;
     const annualAmountChangeHtml = window.FieldRendererService && window.FieldRendererService.renderAmount
       ? window.FieldRendererService.renderAmount(annualAmountChange, currencySymbol, 0, true)
       : `<span>${annualAmountChange >= 0 ? '+' : ''}${annualAmountChange.toFixed(0)}${currencySymbol}</span>`;
@@ -1844,7 +2505,7 @@ function renderStatisticsColumn(stats, typeName) {
       window.Logger.info(`  - Fallback: Using period between records for annualization: ${daysForAnnual} days`, { page: 'trading_accounts' });
     }
     // Use totalAmount (already normalized) instead of overallAmountChange
-    const annualAmountChange = stats.totalAmount / daysForAnnual * 365;
+    const annualAmountChange = totalAmount / daysForAnnual * 365;
 
     // Log calculation details
     window.Logger.info(`📈 חישוב שנתי משוער (${typeName}):`, { page: 'trading_accounts' });
@@ -1918,9 +2579,19 @@ function renderStatisticsColumn(stats, typeName) {
  * @returns {string} HTML string
  */
 function renderStatisticsSummaryColumn1(stats, typeName) {
-  if (!stats || stats.totalCount === 0) {
-    return '<div class="statistics-empty">אין נתונים להצגה</div>';
+  // Always render the card structure, even if no data
+  // Check if stats is completely missing or invalid
+  if (!stats || typeof stats !== 'object' || Object.keys(stats).length === 0) {
+    return '<div class="statistics-summary"><div class="statistics-card-item"><div class="statistics-card-content statistics-card-two-columns"><div class="statistics-card-col">מספר רשומות: <strong>0</strong></div><div class="statistics-card-col statistics-card-col-end">סה"כ סכום: <strong>0</strong></div></div></div></div>';
   }
+
+  // If totalCount is 0 or undefined, still show the card with 0 values
+  const totalCount = stats.totalCount || 0;
+  const totalAmount = stats.totalAmount || 0;
+  const negativeCount = stats.negativeCount || 0;
+  const positiveCount = stats.positiveCount || 0;
+  const negativeAmount = stats.negativeAmount || 0;
+  const positiveAmount = stats.positiveAmount || 0;
 
   const currency = stats.currency || 'USD';
   let currencySymbol = currency;
@@ -1940,22 +2611,20 @@ function renderStatisticsSummaryColumn1(stats, typeName) {
   // Card: מספר רשומות + סה"כ סכום
   html += '<div class="statistics-card-item">';
   const totalAmountHtml = window.FieldRendererService && window.FieldRendererService.renderAmount
-    ? window.FieldRendererService.renderAmount(stats.totalAmount, currencySymbol, 0, true)
-    : `<span>${stats.totalAmount < 0 ? '-' : ''}${Math.abs(stats.totalAmount).toFixed(0)}${currencySymbol}</span>`;
+    ? window.FieldRendererService.renderAmount(totalAmount, currencySymbol, 0, true)
+    : `<span>${totalAmount < 0 ? '-' : ''}${Math.abs(totalAmount).toFixed(0)}${currencySymbol}</span>`;
 
   // Format records count with breakdown
-  let recordsCountHtml = `${stats.totalCount}`;
-  if (stats.negativeCount > 0 || stats.positiveCount > 0) {
-    const negativeCountClass = (stats.negativeCount || 0) === 0 ? '' : 'text-danger';
-    const positiveCountClass = (stats.positiveCount || 0) === 0 ? '' : 'text-success';
-    recordsCountHtml = `${stats.totalCount} (<span class="${negativeCountClass}">${stats.negativeCount || 0}</span>/<span class="${positiveCountClass}">${stats.positiveCount || 0}</span>)`;
+  let recordsCountHtml = `${totalCount}`;
+  if (negativeCount > 0 || positiveCount > 0) {
+    const negativeCountClass = negativeCount === 0 ? '' : 'text-danger';
+    const positiveCountClass = positiveCount === 0 ? '' : 'text-success';
+    recordsCountHtml = `${totalCount} (<span class="${negativeCountClass}">${negativeCount}</span>/<span class="${positiveCountClass}">${positiveCount}</span>)`;
   }
 
   // Format total amount with breakdown
   let totalAmountWithBreakdown = totalAmountHtml;
-  if (stats.negativeAmount !== 0 || stats.positiveAmount !== 0) {
-    const negativeAmount = stats.negativeAmount || 0;
-    const positiveAmount = stats.positiveAmount || 0;
+  if (negativeAmount !== 0 || positiveAmount !== 0) {
 
     let negativeAmountHtml;
     if (negativeAmount === 0) {
@@ -1995,9 +2664,19 @@ function renderStatisticsSummaryColumn1(stats, typeName) {
  * @returns {string} HTML string
  */
 function renderStatisticsSummaryColumn2(stats, typeName) {
-  if (!stats || stats.totalCount === 0) {
-    return '<div class="statistics-empty">אין נתונים להצגה</div>';
+  // Always render the card structure, even if no data
+  // Check if stats is completely missing or invalid
+  if (!stats || typeof stats !== 'object' || Object.keys(stats).length === 0) {
+    return '<div class="statistics-summary"><div class="statistics-card-item"><div class="statistics-card-content statistics-card-two-columns"><div class="statistics-card-col">ממוצע לפעולה: <strong>0</strong></div><div class="statistics-card-col statistics-card-col-end">שנתי משוער: <strong>0%</strong></div></div></div></div>';
   }
+
+  // If totalCount is 0 or undefined, still show the card with 0 values
+  const totalCount = stats.totalCount || 0;
+  const totalAmount = stats.totalAmount || 0;
+  const negativeAmount = stats.negativeAmount || 0;
+  const positiveAmount = stats.positiveAmount || 0;
+  const negativeCount = stats.negativeCount || 0;
+  const positiveCount = stats.positiveCount || 0;
 
   const currency = stats.currency || 'USD';
   let currencySymbol = currency;
@@ -2019,7 +2698,7 @@ function renderStatisticsSummaryColumn2(stats, typeName) {
   // Card: ממוצע לפעולה + שנתי משוער
   html += '<div class="statistics-card-item">';
 
-  if (isExecution && stats.totalCount > 0) {
+  if (isExecution) {
     // Executions: Calculate average using absolute values
     let absoluteTotal = 0;
     if (stats.bySubtype && Object.keys(stats.bySubtype).length > 0) {
@@ -2033,23 +2712,19 @@ function renderStatisticsSummaryColumn2(stats, typeName) {
     }
 
     if (absoluteTotal === 0) {
-      absoluteTotal = Math.abs(stats.positiveAmount || 0) + Math.abs(stats.negativeAmount || 0);
+      absoluteTotal = Math.abs(positiveAmount || 0) + Math.abs(negativeAmount || 0);
     }
 
-    const averagePerAction = stats.totalCount > 0 ? absoluteTotal / stats.totalCount : 0;
+    const averagePerAction = totalCount > 0 ? absoluteTotal / totalCount : 0;
     const formatted = Math.abs(averagePerAction).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
     let averageHtml = `<span>${formatted}${currencySymbol}</span>`;
 
     // Check if we need to show breakdown by sides (both positive and negative exist)
-    const negativeAmount = stats.negativeAmount || 0;
-    const positiveAmount = stats.positiveAmount || 0;
     const hasBothSides = negativeAmount !== 0 && positiveAmount !== 0;
 
     // If both sides exist, calculate and show breakdown for average per action
     // Breakdown should be on a new line after the total
     if (hasBothSides) {
-      const positiveCount = stats.positiveCount || 0;
-      const negativeCount = stats.negativeCount || 0;
 
       const positiveAverage = positiveCount > 0 ? Math.abs(positiveAmount) / positiveCount : 0;
       const negativeAverage = negativeCount > 0 ? Math.abs(negativeAmount) / negativeCount : 0;
@@ -2078,7 +2753,7 @@ function renderStatisticsSummaryColumn2(stats, typeName) {
       daysForAnnual = Math.max(1, Math.ceil((new Date(stats.lastRecord.date) - new Date(stats.firstRecord.date)) / (1000 * 60 * 60 * 24)));
     }
 
-    const annualAmountChange = stats.totalAmount / daysForAnnual * 365;
+    const annualAmountChange = totalAmount / daysForAnnual * 365;
     let annualAmountChangeHtml = window.FieldRendererService && window.FieldRendererService.renderAmount
       ? window.FieldRendererService.renderAmount(annualAmountChange, currencySymbol, 0, true)
       : `<span>${annualAmountChange >= 0 ? '+' : ''}${annualAmountChange.toFixed(0)}${currencySymbol}</span>`;
@@ -2112,7 +2787,7 @@ function renderStatisticsSummaryColumn2(stats, typeName) {
     let annualPctClass = '';
 
     if (accountBalance > 0) {
-      const percentageChange = stats.totalAmount / Math.abs(accountBalance) * 100;
+      const percentageChange = totalAmount / Math.abs(accountBalance) * 100;
       const annualPercentageChange = annualAmountChange / Math.abs(accountBalance) * 100;
 
       const pctNumber = Math.abs(percentageChange).toFixed(2);
@@ -2135,24 +2810,20 @@ function renderStatisticsSummaryColumn2(stats, typeName) {
     html += `<div class="statistics-card-col statistics-card-col-end">שנתי משוער: <strong>${annualAmountChangeHtml}</strong> | <strong class="${annualPctClass}">${annualPercentageDisplay}</strong></div>`;
     html += '</div>';
     html += '</div>';
-  } else if (!isExecution && stats.totalCount > 0) {
+  } else if (!isExecution) {
     // Cash flows: Calculate average using absolute values
-    const absoluteTotal = Math.abs(stats.positiveAmount || 0) + Math.abs(stats.negativeAmount || 0);
-    const averagePerAction = stats.totalCount > 0 ? absoluteTotal / stats.totalCount : 0;
+    const absoluteTotal = Math.abs(positiveAmount || 0) + Math.abs(negativeAmount || 0);
+    const averagePerAction = totalCount > 0 ? absoluteTotal / totalCount : 0;
 
     const formatted = Math.abs(averagePerAction).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
     let averageHtml = `<span>${formatted}${currencySymbol}</span>`;
 
     // Check if we need to show breakdown by sides (both positive and negative exist)
-    const negativeAmount = stats.negativeAmount || 0;
-    const positiveAmount = stats.positiveAmount || 0;
     const hasBothSides = negativeAmount !== 0 && positiveAmount !== 0;
 
     // If both sides exist, calculate and show breakdown for average per action
     // Breakdown should be on a new line after the total
     if (hasBothSides) {
-      const positiveCount = stats.positiveCount || 0;
-      const negativeCount = stats.negativeCount || 0;
 
       const positiveAverage = positiveCount > 0 ? Math.abs(positiveAmount) / positiveCount : 0;
       const negativeAverage = negativeCount > 0 ? Math.abs(negativeAmount) / negativeCount : 0;
@@ -2181,7 +2852,7 @@ function renderStatisticsSummaryColumn2(stats, typeName) {
       daysForAnnual = Math.max(1, Math.ceil((new Date(stats.lastRecord.date) - new Date(stats.firstRecord.date)) / (1000 * 60 * 60 * 24)));
     }
 
-    const annualAmountChange = stats.totalAmount / daysForAnnual * 365;
+    const annualAmountChange = totalAmount / daysForAnnual * 365;
     let annualAmountChangeHtml = window.FieldRendererService && window.FieldRendererService.renderAmount
       ? window.FieldRendererService.renderAmount(annualAmountChange, currencySymbol, 0, true)
       : `<span>${annualAmountChange >= 0 ? '+' : ''}${annualAmountChange.toFixed(0)}${currencySymbol}</span>`;
@@ -2253,8 +2924,29 @@ function renderStatisticsSummaryColumn2(stats, typeName) {
  * @returns {string} HTML string
  */
 function renderBreakdownBySubtype(stats, typeName, column) {
-  if (!stats || !stats.bySubtype || Object.keys(stats.bySubtype).length === 0) {
-    return '';
+  window.Logger.info('🔵 [renderBreakdownBySubtype] START', { 
+    typeName, 
+    column, 
+    hasStats: !!stats, 
+    hasBySubtype: !!(stats?.bySubtype),
+    bySubtypeKeys: stats?.bySubtype ? Object.keys(stats.bySubtype) : [],
+    page: 'trading_accounts' 
+  });
+  // Always render breakdown section, even if empty (will show empty state)
+  // BUT: If stats exists but has no bySubtype or empty bySubtype, still show structure with empty message
+  if (!stats) {
+    window.Logger.warn('⚠️ [renderBreakdownBySubtype] No stats at all, returning empty', { page: 'trading_accounts' });
+    return '<div class="statistics-breakdown"><div class="statistics-empty">אין נתונים להצגה</div></div>';
+  }
+  
+  // If stats exists but no bySubtype or empty, still render structure
+  if (!stats.bySubtype || Object.keys(stats.bySubtype).length === 0) {
+    window.Logger.info('🔵 [renderBreakdownBySubtype] Stats exists but no bySubtype, rendering empty structure', { 
+      totalCount: stats.totalCount || 0,
+      page: 'trading_accounts' 
+    });
+    // Return empty structure instead of just "אין נתונים להצגה"
+    return '<div class="statistics-breakdown"><div class="statistics-empty">אין נתונים להצגה</div></div>';
   }
 
   const currency = stats.currency || 'USD';
@@ -2278,26 +2970,30 @@ function renderBreakdownBySubtype(stats, typeName, column) {
     html += '<div class="statistics-breakdown">';
 
     // Sort subtypes in specific order for cash flows:
-    // 1. deposits_withdrawals (הפקדה ומשיכה)
-    // 2. fee (עמלה)
-    // 3. dividend (דיבידנד)
-    // 4. transfer (העברה)
-    // 5. interest (ריבית) + syep_interest
-    // 6. other (אחר)
+    // NEW ORDER (by rows):
+    // Row 3: Col1 = deposits_withdrawals, Col2 = dividend
+    // Row 4: Col1 = fee, Col2 = interest + syep_interest
+    // Row 5: Col1 = transfer, Col2 = other
+    // Column 1 order: deposits_withdrawals, fee, transfer
+    // Column 2 order: dividend, interest, syep_interest, other
     // For executions: keep alphabetical order (buy/sell)
-    const subtypeOrder = [
-        'deposits_withdrawals',
-        'fee',
-        'dividend',
-        'transfer_in',
-        'transfer_out',
-        'currency_exchange_from',
-        'currency_exchange_to',
-        'interest',
-        'syep_interest',
-        'other_positive',
-        'other_negative'
-    ];
+    const subtypeOrder = column === 1 
+      ? [
+          'deposits_withdrawals',  // Row 3, Col 1
+          'fee',                   // Row 4, Col 1
+          'transfer',              // Row 5, Col 1
+          'transfer_in',
+          'transfer_out'
+        ]
+      : [
+          'dividend',              // Row 3, Col 2
+          'interest_all',          // Row 4, Col 2 (unified interest + syep_interest)
+          'other',                 // Row 5, Col 2
+          'other_positive',
+          'other_negative',
+          'currency_exchange_from',
+          'currency_exchange_to'
+        ];
     const subtypes = Object.keys(stats.bySubtype).sort((a, b) => {
       if (isExecution) {
         // For executions: alphabetical order
@@ -2385,11 +3081,12 @@ function renderBreakdownBySubtype(stats, typeName, column) {
       // Card 2: שינוי או ממוצע (unified - all three metrics in one card)
       // For executions: show average per action instead of change
       // For cash flows: show change as before
-      if (isExecution && subtypeStats.count > 0) {
+      // IMPORTANT: Always show Card 2, even if count is 0 (will show 0 values)
+      if (isExecution) {
         // Executions: Show average per action
         html += '<div class="statistics-card-item">';
 
-        const subtypeAveragePerAction = subtypeStats.totalAmount / subtypeStats.count;
+        const subtypeAveragePerAction = subtypeStats.count > 0 ? subtypeStats.totalAmount / subtypeStats.count : 0;
         const subtypeAverageHtml = window.FieldRendererService && window.FieldRendererService.renderAmount
           ? window.FieldRendererService.renderAmount(subtypeAveragePerAction, currencySymbol, 0, true)
           : `<span>${subtypeAveragePerAction >= 0 ? '+' : ''}${subtypeAveragePerAction.toFixed(0)}${currencySymbol}</span>`;
@@ -2451,7 +3148,8 @@ function renderBreakdownBySubtype(stats, typeName, column) {
         html += `<div class="statistics-card-col statistics-card-col-end">שנתי משוער: <strong>${subtypeAnnualAmountChangeHtml}</strong> | <strong class="${subtypeAnnualPctClass}">${subtypeAnnualPercentageDisplay}</strong></div>`;
         html += '</div>';
         html += '</div>';
-      } else if (!isExecution && subtypeStats.count > 0) {
+      } else if (!isExecution) {
+        // Cash flows: Always show Card 2, even if count is 0 (will show 0 values)
         // Cash flows: Show average per action (same as executions)
         html += '<div class="statistics-card-item">';
 
@@ -2600,31 +3298,45 @@ function setupStatisticsFilterHook() {
   const table = document.getElementById('accountActivityTable');
   if (!table) {return;}
 
+  // Track last update to prevent unnecessary calls
+  let lastUpdateTime = 0;
+  const MIN_UPDATE_INTERVAL = 1000; // Minimum 1 second between updates
+
   // Create observer to watch for row visibility changes
   const observer = new MutationObserver(() => {
+    const now = Date.now();
+    // Skip if updated recently to prevent excessive updates
+    if (now - lastUpdateTime < MIN_UPDATE_INTERVAL) {
+      return;
+    }
+
     // Debounce to avoid excessive updates
     clearTimeout(window.accountActivityState.statsUpdateTimeout);
     window.accountActivityState.statsUpdateTimeout = setTimeout(() => {
+      const now2 = Date.now();
+      // Double-check to prevent race conditions
+      if (now2 - lastUpdateTime < MIN_UPDATE_INTERVAL) {
+        return;
+      }
+      lastUpdateTime = now2;
+
       if (window.updateActivityStatistics) {
         window.updateActivityStatistics();
       }
-      // Also update activity summary to refresh date range in title
+      // Only update activity summary if data exists - don't call with null unnecessarily
       if (window.accountActivityState && window.accountActivityState.activityData) {
         updateActivitySummary(window.accountActivityState.activityData);
-      } else {
-        updateActivitySummary(null);
       }
     }, 300);
   });
 
-  // Observe changes in tbody
+  // Observe changes in tbody - only childList to prevent infinite loops from style changes
   const tbody = table.querySelector('tbody');
   if (tbody) {
     observer.observe(tbody, {
       childList: true,
       subtree: true,
-      attributes: true,
-      attributeFilter: ['style', 'data-movement-type'],
+      // Removed attributes: true to prevent infinite loops from style/attribute changes
     });
   }
 
@@ -2654,22 +3366,8 @@ function setupStatisticsFilterHook() {
   }
 }
 
-// Initialize when DOM is ready
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => {
-    setTimeout(() => {
-      if (typeof window.initAccountActivity === 'function') {
-        window.initAccountActivity();
-      }
-    }, 1000);
-  });
-} else {
-  setTimeout(() => {
-    if (typeof window.initAccountActivity === 'function') {
-      window.initAccountActivity();
-    }
-  }, 1000);
-}
+// NOTE: initAccountActivity is now called by page-initialization-configs.js
+// Do not auto-initialize here to avoid duplicate calls
 
 // Export functions globally
 window.loadAccountActivity = loadAccountActivity;

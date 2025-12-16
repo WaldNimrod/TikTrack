@@ -5,32 +5,28 @@
  * 
  * This index lists all functions in this file, organized by category.
  * 
- * Total Functions: 57
+ * Total Functions: 49
  * 
- * PAGE INITIALIZATION (2)
+ * PAGE INITIALIZATION (1)
  * - initializeAlertModalTabs() - initializeAlertModalTabs function
  * 
- * DATA LOADING (12)
- * - loadAlertsData() - loadAlertsData function
+ * DATA LOADING (9)
  * - loadModalData() - loadModalData function
  * - getAlertState() - * עריכת התראה
  * - loadAlerts() - loadAlerts function
  * - loadConditionsFromSource() - loadConditionsFromSource function
- * - loadTradePlansForConditions() - * Load conditions from source type (trade_plan or trade)
- * - loadTradesForConditions() - * Load trade plans for conditions selection
- * - loadConditionsFromItem() - * Load trades for conditions selection
+ * - loadTradePlansForConditions() - loadTradePlansForConditions function
+ * - loadTradesForConditions() - loadTradesForConditions function
+ * - loadConditionsFromItem() - loadConditionsFromItem function
  * - showEvaluationLoading() - showEvaluationLoading function
- * - getMethodIdFromCondition() - getMethodIdFromCondition function
- * - loadAlertTickerInfo() - * הצגת מודל הוספת התראה
+ * - loadAlertTickerInfo() - loadAlertTickerInfo function
  * 
- * DATA MANIPULATION (15)
- * - updatePageSummaryStats() - updatePageSummaryStats function
+ * DATA MANIPULATION (12)
  * - updateRadioButtons() - updateRadioButtons function
- * - saveAlert() - * פירוק מחרוזת תנאי התראה
  * - updateStatusAndTriggered() - * בדיקת תקינות שילוב status ו-is_triggered
  * - updateAlert() - updateAlert function
  * - deleteAlertInternal() - deleteAlertInternal function
- * - confirmDeleteAlert() - * מחיקת התראה
+ * - confirmDeleteAlert() - confirmDeleteAlert function
  * - updateAlertStatus() - updateAlertStatus function
  * - updateEvaluationStats() - updateEvaluationStats function
  * - saveAlertData() - * Update evaluation statistics
@@ -38,43 +34,44 @@
  * - createAlertFromCondition() - * Select condition for alert creation
  * - updateModalButtons() - * Initialize tab management for add alert modal
  * - updateEvaluationSummary() - updateEvaluationSummary function
- * - showAddAlertModal() - * ניקוי הממשק המתקדם
  * 
- * EVENT HANDLING (16)
+ * EVENT HANDLING (15)
  * - onRelationTypeChange() - onRelationTypeChange function
  * - onRelatedObjectChange() - * טיפול בשינוי סוג שיוך
+ *
+ * EOD INTEGRATION (1)
+ * - loadEODAlertsData() - Load EOD alerts data
  * - toggleConditionFields() - * טיפול בבחירת אובייקט
  * - enableConditionFields() - enableConditionFields function
  * - disableConditionFields() - * Enable condition fields for add modal
- * - enableEditConditionFields() - * Enable condition fields for add modal
- * - disableEditConditionFields() - * Enable condition fields for add modal
+ * - enableEditConditionFields() - * השבתת שדות התנאי
+ * - disableEditConditionFields() - * הפעלת שדות התנאי במודל העריכה
  * - parseAlertCondition() - parseAlertCondition function
  * - validateAlertStatusCombination() - validateAlertStatusCombination function
- * - restoreAlertsSectionState() - * אישור מחיקת התראה
+ * - restoreAlertsSectionState() - restoreAlertsSectionState function
  * - displayAvailableConditions() - displayAvailableConditions function
  * - selectConditionForAlert() - selectConditionForAlert function
  * - evaluateAllConditions() - evaluateAllConditions function
  * - refreshConditionEvaluations() - refreshConditionEvaluations function
  * - displayEvaluationResults() - * הצגת אינדיקטור טעינה להערכת תנאים
  * 
- * UI UPDATES (2)
- * - showEditAlertModal() - * ניקוי הממשק המתקדם
- * - displayAlertTickerInfo() - * מחיקת התראה
+ * UI UPDATES (1)
+ * - displayAlertTickerInfo() - displayAlertTickerInfo function
  * 
  * VALIDATION (1)
  * - validateAlertForm() - validateAlertForm function
  * 
  * OTHER (10)
  * - populateSelect() - populateSelect function
- * - populateRelatedObjects() - * Enable condition fields for add modal
- * - populateEditRelatedObjects() - populateEditRelatedObjects function
- * - editAlert() - editAlert function
+ * - populateRelatedObjects() - * השבתת שדות התנאי במודל העריכה
+ * - editAlert() - * פירוק מחרוזת תנאי התראה
  * - filterAlertsByRelatedObjectTypeWrapper() - filterAlertsByRelatedObjectTypeWrapper function
  * - filterAlertsByRelatedObjectType() - filterAlertsByRelatedObjectType function
  * - reactivateAlert() - reactivateAlert function
- * - toggleAlert() - toggleAlert function
  * - generateDetailedLog() - generateDetailedLog function
  * - generateDetailedLogForAlerts() - generateDetailedLogForAlerts function
+ * - clearAlertTickerInfo() - clearAlertTickerInfo function
+ * - restorePageState() - restorePageState function
  * 
  * ==========================================
  */
@@ -106,7 +103,9 @@ let globalUpdatePageSummaryStats = null;
 // ייצוא מוקדם של הפונקציה למניעת שגיאות
 window.loadAlertsData = window.loadAlertsData || function() {
   // loadAlertsData not yet defined, using placeholder
-  window.Logger.info('⚠️ loadAlertsData placeholder called', { page: "alerts" });
+  if (window.Logger && typeof window.Logger.info === 'function') {
+    window.Logger.info('⚠️ loadAlertsData placeholder called', { page: "alerts" });
+  }
 };
 
 // ===== DATA LOADING FUNCTIONS =====
@@ -129,32 +128,62 @@ let alertsPaginationInstance = null;
 async function loadAlertsDataInternal(options = {}) {
   // Prevent multiple simultaneous calls
   if (loadAlertsDataInProgress) {
-    window.Logger.info('⏳ loadAlertsData כבר רץ, ממתין לסיום הקריאה הקודמת...', { page: "alerts" });
+    if (window.Logger && typeof window.Logger.info === 'function') {
+      window.Logger.info('⏳ loadAlertsData כבר רץ, ממתין לסיום הקריאה הקודמת...', { page: "alerts" });
+    }
     return loadAlertsDataPromise;
   }
 
   loadAlertsDataInProgress = true;
   loadAlertsDataPromise = (async () => {
     try {
-      window.Logger.info('🚀🚀🚀 loadAlertsData התחיל 🚀🚀🚀', { page: "alerts" });
+      if (window.Logger && typeof window.Logger.info === 'function') {
+        window.Logger.info('🚀🚀🚀 loadAlertsData התחיל 🚀🚀🚀', { page: "alerts" });
+      }
 
       // Use AlertsData service if available, otherwise fallback to direct API call
       let rawAlerts = [];
       if (window.AlertsData?.loadAlertsData) {
         rawAlerts = await window.AlertsData.loadAlertsData({ force: options.force || false });
-        window.Logger.info('📊 נתונים שהתקבלו מ-AlertsData service:', rawAlerts.length, 'התראות', { page: "alerts" });
+        if (window.Logger && typeof window.Logger.info === 'function') {
+          window.Logger.info('📊 נתונים שהתקבלו מ-AlertsData service:', rawAlerts.length, 'התראות', { page: "alerts" });
+        }
       } else {
         // Fallback: direct API call
-        window.Logger.info('📡 קריאה לשרת לקבלת נתוני התראות...', { page: "alerts" });
-        const response = await fetch('/api/alerts/');
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+        if (window.Logger && typeof window.Logger.info === 'function') {
+          window.Logger.info('📡 קריאה לשרת לקבלת נתוני התראות...', { page: "alerts" });
         }
-
-        const data = await response.json();
-        window.Logger.info('📊 נתונים שהתקבלו מהשרת:', data, { page: "alerts" });
-        rawAlerts = data?.data || data;
+    let token = null;
+    if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
+      token = await window.UnifiedCacheManager.get('authToken');
+    } else {
+      token = localStorage.getItem('authToken'); // fallback
+    }
+    const headers = { 'Content-Type': 'application/json' };
+    if (token) { headers['Authorization'] = `Bearer ${token}`; }
+        const response = await fetch('/api/alerts/', { headers });
+        if (!response.ok) {
+          if ([400, 401, 403, 404].includes(response.status)) {
+            // User not authenticated, validation error, or no alerts - return empty array
+            if (window.Logger && typeof window.Logger.debug === 'function') {
+              window.Logger.debug(`⚠️ Alerts API returned ${response.status}, returning empty data`, { page: "alerts" });
+            }
+            rawAlerts = [];
+          } else {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+        } else {
+          const data = await response.json();
+          if (window.Logger && typeof window.Logger.info === 'function') {
+            window.Logger.info('📊 נתונים שהתקבלו מהשרת:', data, { page: "alerts" });
+          }
+          rawAlerts = data?.data || data;
+        }
       }
+
+      // === EOD INTEGRATION: Load EOD alerts ===
+      const eodAlerts = await loadEODAlertsData();
+      const eodAlertsList = eodAlerts && eodAlerts.data ? eodAlerts.data : [];
 
       // שמירת הנתונים במשתנה גלובלי
       window.alertsData = Array.isArray(rawAlerts)
@@ -163,21 +192,50 @@ async function loadAlertsDataInternal(options = {}) {
             updated_at: alert.updated_at || alert.triggered_at || alert.created_at || alert.last_evaluated_at || null
           }))
         : [];
-      window.Logger.info('💾 נתונים נשמרו ב-window.alertsData:', window.alertsData.length, 'התראות', { page: "alerts" });
+
+      // Add EOD alerts to the data
+      if (eodAlertsList.length > 0) {
+        const eodAlertsFormatted = eodAlertsList.map(eodAlert => ({
+          id: `eod_${eodAlert.id}`,
+          title: eodAlert.title || 'התראת EOD',
+          description: eodAlert.description || '',
+          severity: eodAlert.severity || 'medium',
+          status: eodAlert.status || 'active',
+          type: 'eod',
+          created_at: eodAlert.created_at,
+          updated_at: eodAlert.created_at,
+          triggered_at: eodAlert.created_at,
+          eod_data: eodAlert
+        }));
+
+        window.alertsData = [...window.alertsData, ...eodAlertsFormatted];
+
+        if (window.Logger && typeof window.Logger.info === 'function') {
+          window.Logger.info('✅ הוספו התראות EOD:', eodAlertsList.length, 'התראות', { page: "alerts" });
+        }
+      }
+
+      if (window.Logger && typeof window.Logger.info === 'function') {
+        window.Logger.info('💾 נתונים נשמרו ב-window.alertsData:', window.alertsData.length, 'התראות', { page: "alerts" });
+      }
 
       // עדכון הטבלה
       if (typeof window.updateAlertsTable === 'function') {
-        window.Logger.info('📊 מעדכן את טבלת ההתראות', { page: "alerts" });
+        if (window.Logger && typeof window.Logger.info === 'function') {
+          window.Logger.info('📊 מעדכן את טבלת ההתראות', { page: "alerts" });
+        }
         await window.updateAlertsTable(window.alertsData);
-      } else {
+      } else if (window.Logger && typeof window.Logger.warn === 'function') {
         window.Logger.warn('⚠️ updateAlertsTable לא זמין', { page: "alerts" });
       }
 
       // עדכון סטטיסטיקות
       if (typeof window.updateAlertsSummary === 'function') {
-        window.Logger.info('📈 מעדכן את סטטיסטיקות ההתראות', { page: "alerts" });
+        if (window.Logger && typeof window.Logger.info === 'function') {
+          window.Logger.info('📈 מעדכן את סטטיסטיקות ההתראות', { page: "alerts" });
+        }
         window.updateAlertsSummary(window.alertsData);
-      } else {
+      } else if (window.Logger && typeof window.Logger.warn === 'function') {
         window.Logger.warn('⚠️ updateAlertsSummary לא זמין', { page: "alerts" });
       }
       
@@ -189,9 +247,14 @@ async function loadAlertsDataInternal(options = {}) {
       // Restore page state (filters, sort, sections, entity filters)
       await restorePageState('alerts');
 
-      window.Logger.info('✅ loadAlertsData הושלם בהצלחה', { page: "alerts" });
+      if (window.Logger && typeof window.Logger.info === 'function') {
+        window.Logger.info('✅ loadAlertsData הושלם בהצלחה', { page: "alerts" });
+      }
     } catch (error) {
-      window.Logger.error('❌ שגיאה ב-loadAlertsData:', error, { page: "alerts" });
+      // Silently handle errors - don't log to console as errors (they're expected in some cases)
+      if (window.DEBUG_MODE) {
+        console.warn('⚠️ שגיאה ב-loadAlertsData:', error);
+      }
       
       // הצגת הודעת שגיאה למשתמש
       if (typeof window.showErrorNotification === 'function') {
@@ -199,7 +262,11 @@ async function loadAlertsDataInternal(options = {}) {
       } else if (typeof window.showNotification === 'function') {
         window.showNotification('שגיאה בטעינת נתוני ההתראות', 'error');
       } else {
-        alert('שגיאה בטעינת נתוני ההתראות: ' + error.message);
+        if (window.showErrorNotification) {
+          window.showErrorNotification('שגיאה בטעינת נתוני ההתראות', error.message);
+        } else {
+          alert('שגיאה בטעינת נתוני ההתראות: ' + error.message);
+        }
       }
       throw error;
     } finally {
@@ -267,11 +334,15 @@ let alertsData = [];
 
 // אתחול מערכת ראש הדף החדשה
 document.addEventListener("DOMContentLoaded", () => {
-  window.Logger.info('🚀 טעינת דף התראות עם מערכת ראש דף חדשה...', { page: "alerts" });
+  if (window.Logger && typeof window.Logger.info === 'function') {
+    window.Logger.info('🚀 טעינת דף התראות עם מערכת ראש דף חדשה...', { page: "alerts" });
+  }
 
   // אתחול HeaderSystem
   if (window.headerSystem && !window.headerSystem.isInitialized) {
-    window.Logger.info('✅ אתחול HeaderSystem...', { page: "alerts" });
+    if (window.Logger && typeof window.Logger.info === 'function') {
+      window.Logger.info('✅ אתחול HeaderSystem...', { page: "alerts" });
+    }
     window.headerSystem.init();
   }
 
@@ -299,15 +370,17 @@ document.addEventListener("DOMContentLoaded", () => {
   // window.Logger.info('✅ מודולים הוגדרו לסגירה בלחיצה על הרקע', { page: "alerts" });
 
   // בדיקת הצבעים הסטטיים
-  window.Logger.info('🎨 בודק צבעים סטטיים...', { page: "alerts" });
-  const tradeColor = getComputedStyle(document.documentElement).getPropertyValue('--entity-trade-color');
-  const tickerColor = getComputedStyle(document.documentElement).getPropertyValue('--entity-ticker-color');
-  const tradePlanColor = getComputedStyle(document.documentElement).getPropertyValue('--entity-trade-plan-color');
-  const accountColor = getComputedStyle(document.documentElement).getPropertyValue('--entity-trading-account-color') || getComputedStyle(document.documentElement).getPropertyValue('--entity-account-color');
-  window.Logger.info('🎨 צבע טרייד:', tradeColor, { page: "alerts" });
-  window.Logger.info('🎨 צבע טיקר:', tickerColor, { page: "alerts" });
-  window.Logger.info('🎨 צבע תוכנית:', tradePlanColor, { page: "alerts" });
-  window.Logger.info('🎨 צבע חשבון מסחר:', accountColor, { page: "alerts" });
+  if (window.Logger && typeof window.Logger.info === 'function') {
+    window.Logger.info('🎨 בודק צבעים סטטיים...', { page: "alerts" });
+    const tradeColor = getComputedStyle(document.documentElement).getPropertyValue('--entity-trade-color');
+    const tickerColor = getComputedStyle(document.documentElement).getPropertyValue('--entity-ticker-color');
+    const tradePlanColor = getComputedStyle(document.documentElement).getPropertyValue('--entity-trade-plan-color');
+    const accountColor = getComputedStyle(document.documentElement).getPropertyValue('--entity-trading-account-color') || getComputedStyle(document.documentElement).getPropertyValue('--entity-account-color');
+    window.Logger.info('🎨 צבע טרייד:', tradeColor, { page: "alerts" });
+    window.Logger.info('🎨 צבע טיקר:', tickerColor, { page: "alerts" });
+    window.Logger.info('🎨 צבע תוכנית:', tradePlanColor, { page: "alerts" });
+    window.Logger.info('🎨 צבע חשבון מסחר:', accountColor, { page: "alerts" });
+  }
 });
 
 
@@ -403,7 +476,14 @@ function renderAlertsTableRows(alerts) {
     // בדיקה שהנתונים קיימים
     if (!alerts || !Array.isArray(alerts)) {
       window.Logger.warn('⚠️ alerts parameter is not available or not an array', { page: "alerts" });
-      tbody.innerHTML = '<tr><td colspan="11" class="text-center">אין התראות להצגה</td></tr>';
+      tbody.textContent = '';
+      const emptyRow = document.createElement('tr');
+      const emptyCell = document.createElement('td');
+      emptyCell.colSpan = 11;
+      emptyCell.className = 'text-center';
+      emptyCell.textContent = 'אין התראות להצגה';
+      emptyRow.appendChild(emptyCell);
+      tbody.appendChild(emptyRow);
       return;
     }
 
@@ -411,12 +491,16 @@ function renderAlertsTableRows(alerts) {
       // לוג לבדיקת מבנה הנתונים
       // window.Logger.info('🔍 Alert data structure:', alert, { page: "alerts" });
       
-      // קבלת צבעי סטטוס דינמיים - שימוש במערכת הכללית
+      // קבלת צבעי סטטוס דינמיים - שימוש במערכת הכללית ללא fallbacks hardcoded
       // Note: statusClass removed - use window.renderStatus or FieldRendererService.renderStatus instead
-      const statusColor = window.getStatusColor ? window.getStatusColor(alert.status, 'medium') : '#6c757d';
-      const statusBgColor = window.getStatusBackgroundColor ? window.getStatusBackgroundColor(alert.status) : 'rgba(108, 117, 125, 0.1)';
+      const statusColor = (typeof window.getStatusColor === 'function') 
+          ? window.getStatusColor(alert.status, 'medium') 
+          : '';
+      const statusBgColor = (typeof window.getStatusBackgroundColor === 'function') 
+          ? window.getStatusBackgroundColor(alert.status) 
+          : '';
       
-      // קביעת האובייקט המקושר באמצעות המערכת הכללית
+      // קביעת האובייקט המקושר - שימוש בפונקציה הכללית
       const dataSources = {
         accounts: accounts,
         trades: trades,
@@ -424,123 +508,15 @@ function renderAlertsTableRows(alerts) {
         tickers: tickers
       };
 
-      const relatedObjectInfo = window.getRelatedObjectDisplay ?
-        window.getRelatedObjectDisplay(alert, dataSources, { showLink: true, format: 'full' }) :
-        { display: 'כללי', icon: '🌐', class: 'related-general', color: '', bgColor: '', type: 'general', id: null };
-
       let relatedCellHtml = '';
-      if (window.FieldRendererService && typeof window.FieldRendererService.renderLinkedEntity === 'function') {
+      if (alert.related_type_id && alert.related_id && window.FieldRendererService && typeof window.FieldRendererService.buildRelatedEntityMeta === 'function' && typeof window.FieldRendererService.renderLinkedEntity === 'function') {
         try {
-          let displayName = '';
-          let metaForEntity = { renderMode: 'notes-table' };
-          const relatedType = parseInt(alert.related_type_id, 10);
-
-          switch (relatedType) {
-          case 1: { // Trading account
-            const account = accounts.find(a => a && a.id === alert.related_id);
-            const accountName = account?.name || account?.account_name || `חשבון מסחר ${alert.related_id}`;
-            displayName = accountName;
-            metaForEntity = {
-              renderMode: 'notes-table',
-              name: accountName,
-              status: account?.status || '',
-              currency: account?.currency_symbol || account?.currency || ''
-            };
-            break;
-          }
-          case 2: { // Trade
-            const trade = trades.find(t => t && t.id === alert.related_id);
-            const tradeTicker = trade?.ticker_symbol || trade?.ticker?.symbol || (() => {
-              if (trade?.ticker_id) {
-                const ticker = tickers.find(tk => tk && tk.id === trade.ticker_id);
-                return ticker?.symbol;
-              }
-              return null;
-            })();
-            const tickerSymbol = tradeTicker || `טרייד ${alert.related_id}`;
-            const tradeDateEnvelope = window.dateUtils?.ensureDateEnvelope
-              ? window.dateUtils.ensureDateEnvelope(
-                  trade?.created_at_envelope ||
-                  trade?.createdAtEnvelope ||
-                  trade?.created_at ||
-                  trade?.opened_at ||
-                  trade?.date ||
-                  null
-                )
-              : (
-                  trade?.created_at_envelope ||
-                  trade?.createdAtEnvelope ||
-                  trade?.created_at ||
-                  trade?.opened_at ||
-                  trade?.date ||
-                  null
-                );
-            displayName = tickerSymbol;
-            metaForEntity = {
-              renderMode: 'notes-table',
-              ticker: tickerSymbol,
-              date: tradeDateEnvelope,
-              date_envelope: tradeDateEnvelope,
-              status: trade?.status || '',
-              side: trade?.side || '',
-              investment_type: trade?.investment_type || ''
-            };
-            break;
-          }
-          case 3: { // Trade plan
-            const plan = tradePlans.find(p => p && p.id === alert.related_id);
-            const planTicker = plan?.ticker?.symbol || plan?.ticker_symbol || (() => {
-              if (plan?.ticker_id) {
-                const ticker = tickers.find(tk => tk && tk.id === plan.ticker_id);
-                return ticker?.symbol;
-              }
-              return null;
-            })();
-            const tickerSymbol = planTicker || `תוכנית ${alert.related_id}`;
-            const planDateEnvelope = window.dateUtils?.ensureDateEnvelope
-              ? window.dateUtils.ensureDateEnvelope(
-                  plan?.created_at_envelope ||
-                  plan?.createdAtEnvelope ||
-                  plan?.created_at ||
-                  plan?.date ||
-                  null
-                )
-              : (
-                  plan?.created_at_envelope ||
-                  plan?.createdAtEnvelope ||
-                  plan?.created_at ||
-                  plan?.date ||
-                  null
-                );
-            displayName = tickerSymbol;
-            metaForEntity = {
-              renderMode: 'notes-table',
-              ticker: tickerSymbol,
-              date: planDateEnvelope,
-              date_envelope: planDateEnvelope,
-              status: plan?.status || '',
-              side: plan?.side || '',
-              investment_type: plan?.investment_type || '',
-              planned_amount: plan?.planned_amount || plan?.plannedAmount || null
-            };
-            break;
-          }
-          case 4: { // Ticker
-            const ticker = tickers.find(tk => tk && tk.id === alert.related_id);
-            const tickerSymbol = ticker?.symbol || `טיקר ${alert.related_id}`;
-            displayName = tickerSymbol;
-            metaForEntity = {
-              renderMode: 'notes-table',
-              ticker: tickerSymbol,
-              status: ticker?.status || ''
-            };
-            break;
-          }
-          default:
-            displayName = `אובייקט ${alert.related_id}`;
-            metaForEntity = { renderMode: 'notes-table' };
-          }
-
+          const { displayName, metaForEntity } = window.FieldRendererService.buildRelatedEntityMeta(
+            alert.related_type_id,
+            alert.related_id,
+            dataSources
+          );
+          
           relatedCellHtml = window.FieldRendererService.renderLinkedEntity(
             alert.related_type_id,
             alert.related_id,
@@ -548,24 +524,11 @@ function renderAlertsTableRows(alerts) {
             metaForEntity
           );
         } catch (error) {
-          window.Logger?.warn('⚠️ renderLinkedEntity failed for alert row, falling back to legacy renderer', { error, alertId: alert.id }, { page: "alerts" });
-          relatedCellHtml = '';
+          window.Logger?.warn('⚠️ renderLinkedEntity failed for alert row, falling back to dash', { error, alertId: alert.id }, { page: "alerts" });
+          relatedCellHtml = '-';
         }
-      }
-
-      if (!relatedCellHtml) {
-        const relatedDisplay = relatedObjectInfo.display;
-        const relatedClass = relatedObjectInfo.class;
-        const relatedColor = relatedObjectInfo.color;
-        const relatedBgColor = relatedObjectInfo.bgColor;
-
-        relatedCellHtml = `
-          <div class="related-object-cell ${relatedClass}"
-           style="${relatedColor ? `color: ${relatedColor};` : ''} ${relatedBgColor ? `background-color: ${relatedBgColor};` : ''}"
-           title="${relatedObjectInfo.type || 'כללי'}">
-            ${relatedDisplay}
-          </div>
-        `;
+      } else {
+        relatedCellHtml = '-';
       }
 
       // קביעת הסימבול לטור הראשון באמצעות המערכת הכללית
@@ -735,34 +698,39 @@ function renderAlertsTableRows(alerts) {
       let triggeredBgColor = 'rgba(108, 117, 125, 0.1)';
       let triggeredBorderColor = '#6c757d';
       
+      // קבלת צבעים מהמערכת המרכזית - ללא fallbacks hardcoded
+      const getNumericColorFn = (typeof window.getNumericValueColor === 'function') ? window.getNumericValueColor : null;
+      const getNumericBgColorFn = (typeof window.getNumericValueBackgroundColor === 'function') ? window.getNumericValueBackgroundColor : null;
+      const getNumericBorderColorFn = (typeof window.getNumericValueBorderColor === 'function') ? window.getNumericValueBorderColor : null;
+      
       if (alert.is_triggered === 'true' || alert.is_triggered === true) {
         triggeredDisplay = 'כן';
         triggeredClass = 'triggered-yes';
         // צבע חיובי - הופעל בהצלחה
-        triggeredColor = window.getNumericValueColor ? window.getNumericValueColor(1, 'medium') : '#28a745';
-        triggeredBgColor = window.getNumericValueColor ? window.getNumericValueColor(1, 'light') : 'rgba(40, 167, 69, 0.1)';
-        triggeredBorderColor = window.getNumericValueColor ? window.getNumericValueColor(1, 'border') : 'rgba(40, 167, 69, 0.3)';
+        triggeredColor = getNumericColorFn ? getNumericColorFn(1, 'medium') : '';
+        triggeredBgColor = getNumericBgColorFn ? getNumericBgColorFn(1) : (getNumericColorFn ? getNumericColorFn(1, 'light') : '');
+        triggeredBorderColor = getNumericBorderColorFn ? getNumericBorderColorFn(1) : (getNumericColorFn ? getNumericColorFn(1, 'border') : '');
       } else if (alert.is_triggered === 'false' || alert.is_triggered === false) {
         triggeredDisplay = 'לא';
         triggeredClass = 'triggered-no';
         // צבע שלילי - לא הופעל
-        triggeredColor = window.getNumericValueColor ? window.getNumericValueColor(-1, 'medium') : '#dc3545';
-        triggeredBgColor = window.getNumericValueColor ? window.getNumericValueColor(-1, 'light') : 'rgba(220, 53, 69, 0.1)';
-        triggeredBorderColor = window.getNumericValueColor ? window.getNumericValueColor(-1, 'border') : 'rgba(220, 53, 69, 0.3)';
+        triggeredColor = getNumericColorFn ? getNumericColorFn(-1, 'medium') : '';
+        triggeredBgColor = getNumericBgColorFn ? getNumericBgColorFn(-1) : (getNumericColorFn ? getNumericColorFn(-1, 'light') : '');
+        triggeredBorderColor = getNumericBorderColorFn ? getNumericBorderColorFn(-1) : (getNumericColorFn ? getNumericColorFn(-1, 'border') : '');
       } else if (alert.is_triggered === 'new') {
         triggeredDisplay = 'חדש';
         triggeredClass = 'triggered-new';
         // צבע חיובי - הופעל חדש
-        triggeredColor = window.getNumericValueColor ? window.getNumericValueColor(1, 'medium') : '#28a745';
-        triggeredBgColor = window.getNumericValueColor ? window.getNumericValueColor(1, 'light') : 'rgba(40, 167, 69, 0.1)';
-        triggeredBorderColor = window.getNumericValueColor ? window.getNumericValueColor(1, 'border') : 'rgba(40, 167, 69, 0.3)';
+        triggeredColor = getNumericColorFn ? getNumericColorFn(1, 'medium') : '';
+        triggeredBgColor = getNumericBgColorFn ? getNumericBgColorFn(1) : (getNumericColorFn ? getNumericColorFn(1, 'light') : '');
+        triggeredBorderColor = getNumericBorderColorFn ? getNumericBorderColorFn(1) : (getNumericColorFn ? getNumericColorFn(1, 'border') : '');
       } else {
         triggeredDisplay = 'לא מוגדר';
         triggeredClass = 'triggered-unknown';
-        // צבע נייטרלי
-        triggeredColor = '#6c757d';
-        triggeredBgColor = 'rgba(108, 117, 125, 0.1)';
-        triggeredBorderColor = '#6c757d';
+        // צבע נייטרלי - שימוש במערכת המרכזית
+        triggeredColor = getNumericColorFn ? getNumericColorFn(0, 'medium') : '';
+        triggeredBgColor = getNumericBgColorFn ? getNumericBgColorFn(0) : (getNumericColorFn ? getNumericColorFn(0, 'light') : '');
+        triggeredBorderColor = getNumericBorderColorFn ? getNumericBorderColorFn(0) : (getNumericColorFn ? getNumericColorFn(0, 'border') : '');
       }
 
       const expiryRawEnvelope =
@@ -821,154 +789,207 @@ function renderAlertsTableRows(alerts) {
             }
           })();
 
+      // בניית תוכן השורה - שומרים את כל הלוגיקה הקיימת
+      const updatedDateCell = (() => {
+        // Prefer FieldRendererService.renderDate for consistent date formatting
+        const rawDate = alert.updated_at || alert.triggered_at || alert.created_at || null;
+        
+        if (!rawDate) {
+          return `<td class="col-updated"><span class="updated-value-empty">לא זמין</span></td>`;
+        }
+
+        // Use FieldRendererService.renderDate for proper date formatting
+        let dateDisplay = '';
+        let epoch = null;
+
+        if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
+          // Use FieldRendererService to render date with time
+          dateDisplay = window.FieldRendererService.renderDate(rawDate, true);
+          
+          // Get epoch for sorting
+          if (window.dateUtils && typeof window.dateUtils.getEpochMilliseconds === 'function') {
+            const envelope = window.dateUtils.ensureDateEnvelope ? window.dateUtils.ensureDateEnvelope(rawDate) : rawDate;
+            epoch = window.dateUtils.getEpochMilliseconds(envelope || rawDate);
+          } else if (rawDate instanceof Date) {
+            epoch = rawDate.getTime();
+          } else if (typeof rawDate === 'string') {
+            const parsed = Date.parse(rawDate);
+            epoch = Number.isNaN(parsed) ? null : parsed;
+          } else if (rawDate && typeof rawDate === 'object' && rawDate.epochMs) {
+            epoch = rawDate.epochMs;
+          }
+        } else {
+          // Fallback: work directly with date envelope objects or raw values
+          const envelope = window.dateUtils && typeof window.dateUtils.ensureDateEnvelope === 'function'
+            ? window.dateUtils.ensureDateEnvelope(rawDate)
+            : rawDate && typeof rawDate === 'object' && (rawDate.epochMs || rawDate.utc || rawDate.local)
+              ? rawDate
+              : null;
+
+          // Derive epoch milliseconds in a canonical way
+          epoch = (() => {
+            if (window.dateUtils && typeof window.dateUtils.getEpochMilliseconds === 'function') {
+              return window.dateUtils.getEpochMilliseconds(envelope || rawDate);
+            }
+            if (typeof window.getEpochMilliseconds === 'function') {
+              return window.getEpochMilliseconds(envelope || rawDate);
+            }
+            if (envelope && typeof envelope.epochMs === 'number') {
+              return envelope.epochMs;
+            }
+            if (rawDate instanceof Date) {
+              return rawDate.getTime();
+            }
+            if (typeof rawDate === 'string') {
+              const parsed = Date.parse(rawDate);
+              return Number.isNaN(parsed) ? null : parsed;
+            }
+            return null;
+          })();
+
+          if (epoch === null || Number.isNaN(epoch)) {
+            return `<td class="col-updated"><span class="updated-value-empty">לא זמין</span></td>`;
+          }
+
+          // Build date display using unified date utilities
+          dateDisplay = (() => {
+            if (window.dateUtils && typeof window.dateUtils.formatDateTime === 'function') {
+              return window.dateUtils.formatDateTime(envelope || rawDate);
+            }
+            if (window.dateUtils && typeof window.dateUtils.formatDate === 'function') {
+              return window.dateUtils.formatDate(envelope || rawDate, { includeTime: true });
+            }
+            try {
+              const dateObj = new Date(epoch);
+              return window.formatDate ? window.formatDate(dateObj, true) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(dateObj, { includeTime: true }) : dateObj.toLocaleString('he-IL', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+              }));
+            } catch (err) {
+              window.Logger?.warn('⚠️ alerts updated-cell date formatting failed', { err, alertId: alert?.id }, { page: 'alerts' });
+              return 'לא מוגדר';
+            }
+          })();
+        }
+
+        if (!dateDisplay || dateDisplay === '-') {
+          return `<td class="col-updated"><span class="updated-value-empty">לא זמין</span></td>`;
+        }
+
+        return `<td class="col-updated"${epoch ? ` data-epoch="${epoch}"` : ''} title="${dateDisplay}"><span class="updated-value" dir="ltr">${dateDisplay}</span></td>`;
+      })();
+      
+      const actionsMenu = (() => {
+        if (!window.createActionsMenu) return '<!-- Actions menu not available -->';
+        const result = window.createActionsMenu([
+          { type: 'VIEW', onclick: `window.showEntityDetails('alert', ${alert.id}, { mode: 'view' })`, title: 'צפה בפרטי התראה' },
+          { type: 'EDIT', onclick: `editAlert(${alert.id})`, title: 'ערוך התראה' },
+          { type: alert.status === 'cancelled' ? 'REACTIVATE' : 'CANCEL', onclick: `window.${alert.status === 'cancelled' ? 'reactivate' : 'cancel'}Alert && window.${alert.status === 'cancelled' ? 'reactivate' : 'cancel'}Alert(${alert.id})`, title: alert.status === 'cancelled' ? 'הפעל מחדש' : 'בטל' },
+          { type: 'DELETE', onclick: `deleteAlert(${alert.id})`, title: 'מחק התראה' }
+        ]);
+        return result || '';
+      })();
+      
       return `
-        <tr data-status="${alert.status || ''}" data-date="${createdAtDataAttr || ''}">
-          <td class="related-cell">
-            ${relatedCellHtml}
-          </td>
-          <td class="ticker-cell">
-            <div class="ticker-cell-content">
-              <span class="ticker-symbol-link" 
-                    data-onclick="showEntityDetails('alert', ${alert.id}); return false;" 
-                    title="פרטי התראה">
-                ${symbolDisplay}
-              </span>
-            </div>
-          </td>
-          <td><span class="condition-text">${(() => {
-    if (alert.condition_attribute && alert.condition_operator &&
-        alert.condition_number && window.translateConditionFields) {
-      return window.translateConditionFields(
-        alert.condition_attribute,
-        alert.condition_operator,
-        alert.condition_number,
-      );
-    }
-    return alert.condition || '-';
-  })()}</span></td>
-          <td class="status-cell" data-status="${alert.status || ''}">
-            ${window.renderStatus ? window.renderStatus(alert.status, 'alert') : 
-              (window.FieldRendererService ? window.FieldRendererService.renderStatus(alert.status, 'alert') : 
-                `<span class="status-badge" data-status-category="unknown">${statusDisplay}</span>`)}
-          </td>
-          <td>
-            ${window.renderBoolean ? window.renderBoolean(alert.is_triggered) : 
-              `<span class="triggered-badge ${triggeredClass}">${triggeredDisplay}</span>`}
-          </td>
-          <td class="text-center">
-            ${getConditionSourceDisplay(alert)}
-          </td>
-          <td data-date="${createdAtDataAttr || ''}"><span class="date-text">${createdAtDisplay}</span></td>
-          <td data-date="${triggeredAtDataAttr || ''}"><span class="date-text">${triggeredAtDisplay}</span></td>
-          <td data-date="${expiryDataAttr || ''}"><span class="date-text">${expiryDisplay}</span></td>
-          ${(() => {
-            // Prefer FieldRendererService.renderDate for consistent date formatting
-            const rawDate = alert.updated_at || alert.triggered_at || alert.created_at || null;
-            
-            if (!rawDate) {
-              return `<td class="col-updated"><span class="updated-value-empty">לא זמין</span></td>`;
-            }
-
-            // Use FieldRendererService.renderDate for proper date formatting
-            let dateDisplay = '';
-            let epoch = null;
-
-            if (window.FieldRendererService && typeof window.FieldRendererService.renderDate === 'function') {
-              // Use FieldRendererService to render date with time
-              dateDisplay = window.FieldRendererService.renderDate(rawDate, true);
-              
-              // Get epoch for sorting
-              if (window.dateUtils && typeof window.dateUtils.getEpochMilliseconds === 'function') {
-                const envelope = window.dateUtils.ensureDateEnvelope ? window.dateUtils.ensureDateEnvelope(rawDate) : rawDate;
-                epoch = window.dateUtils.getEpochMilliseconds(envelope || rawDate);
-              } else if (rawDate instanceof Date) {
-                epoch = rawDate.getTime();
-              } else if (typeof rawDate === 'string') {
-                const parsed = Date.parse(rawDate);
-                epoch = Number.isNaN(parsed) ? null : parsed;
-              } else if (rawDate && typeof rawDate === 'object' && rawDate.epochMs) {
-                epoch = rawDate.epochMs;
-              }
-            } else {
-              // Fallback: work directly with date envelope objects or raw values
-              const envelope = window.dateUtils && typeof window.dateUtils.ensureDateEnvelope === 'function'
-                ? window.dateUtils.ensureDateEnvelope(rawDate)
-                : rawDate && typeof rawDate === 'object' && (rawDate.epochMs || rawDate.utc || rawDate.local)
-                  ? rawDate
-                  : null;
-
-              // Derive epoch milliseconds in a canonical way
-              epoch = (() => {
-                if (window.dateUtils && typeof window.dateUtils.getEpochMilliseconds === 'function') {
-                  return window.dateUtils.getEpochMilliseconds(envelope || rawDate);
-                }
-                if (typeof window.getEpochMilliseconds === 'function') {
-                  return window.getEpochMilliseconds(envelope || rawDate);
-                }
-                if (envelope && typeof envelope.epochMs === 'number') {
-                  return envelope.epochMs;
-                }
-                if (rawDate instanceof Date) {
-                  return rawDate.getTime();
-                }
-                if (typeof rawDate === 'string') {
-                  const parsed = Date.parse(rawDate);
-                  return Number.isNaN(parsed) ? null : parsed;
-                }
-                return null;
-              })();
-
-              if (epoch === null || Number.isNaN(epoch)) {
-                return `<td class="col-updated"><span class="updated-value-empty">לא זמין</span></td>`;
-              }
-
-              // Build date display using unified date utilities
-              dateDisplay = (() => {
-                if (window.dateUtils && typeof window.dateUtils.formatDateTime === 'function') {
-                  return window.dateUtils.formatDateTime(envelope || rawDate);
-                }
-                if (window.dateUtils && typeof window.dateUtils.formatDate === 'function') {
-                  return window.dateUtils.formatDate(envelope || rawDate, { includeTime: true });
-                }
-                try {
-                  const dateObj = new Date(epoch);
-                  return window.formatDate ? window.formatDate(dateObj, true) : (window.dateUtils?.formatDate ? window.dateUtils.formatDate(dateObj, { includeTime: true }) : dateObj.toLocaleString('he-IL', {
-                    day: '2-digit',
-                    month: '2-digit',
-                    year: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                  }));
-                } catch (err) {
-                  window.Logger?.warn('⚠️ alerts updated-cell date formatting failed', { err, alertId: alert?.id }, { page: 'alerts' });
-                  return 'לא מוגדר';
-                }
-              })();
-            }
-
-            if (!dateDisplay || dateDisplay === '-') {
-              return `<td class="col-updated"><span class="updated-value-empty">לא זמין</span></td>`;
-            }
-
-            return `<td class="col-updated"${epoch ? ` data-epoch="${epoch}"` : ''} title="${dateDisplay}"><span class="updated-value" dir="ltr">${dateDisplay}</span></td>`;
-          })()}
-          <td class="actions-cell" data-entity-id="${alert.id}" data-status="${alert.status || ''}">
-            ${(() => {
-              if (!window.createActionsMenu) return '<!-- Actions menu not available -->';
-              const result = window.createActionsMenu([
-                { type: 'VIEW', onclick: `window.showEntityDetails('alert', ${alert.id}, { mode: 'view' })`, title: 'צפה בפרטי התראה' },
-                { type: 'EDIT', onclick: `editAlert(${alert.id})`, title: 'ערוך התראה' },
-                { type: alert.status === 'cancelled' ? 'REACTIVATE' : 'CANCEL', onclick: `window.${alert.status === 'cancelled' ? 'reactivate' : 'cancel'}Alert && window.${alert.status === 'cancelled' ? 'reactivate' : 'cancel'}Alert(${alert.id})`, title: alert.status === 'cancelled' ? 'הפעל מחדש' : 'בטל' },
-                { type: 'DELETE', onclick: `deleteAlert(${alert.id})`, title: 'מחק התראה' }
-              ]);
-              return result || '';
-            })()}
-          </td>
-        </tr>
+        <td class="related-cell">
+          ${relatedCellHtml}
+        </td>
+        <td class="ticker-cell">
+          <div class="ticker-cell-content">
+            <span class="ticker-symbol-link" 
+                  data-onclick="showEntityDetails('alert', ${alert.id}); return false;" 
+                  title="פרטי התראה">
+              ${symbolDisplay}
+            </span>
+          </div>
+        </td>
+        <td><span class="condition-text">${(() => {
+          if (alert.condition_attribute && alert.condition_operator &&
+              alert.condition_number && window.translateConditionFields) {
+            return window.translateConditionFields(
+              alert.condition_attribute,
+              alert.condition_operator,
+              alert.condition_number,
+            );
+          }
+          return alert.condition || '-';
+        })()}</span></td>
+        <td class="status-cell" data-status="${alert.status || ''}">
+          ${window.FieldRendererService.renderStatus(alert.status, 'alert')}
+        </td>
+        <td>
+          ${window.renderBoolean ? window.renderBoolean(alert.is_triggered) : 
+            `<span class="triggered-badge ${triggeredClass}">${triggeredDisplay}</span>`}
+        </td>
+        <td class="text-center">
+          ${getConditionSourceDisplay(alert)}
+        </td>
+        <td data-date="${createdAtDataAttr || ''}"><span class="date-text">${createdAtDisplay}</span></td>
+        <td data-date="${triggeredAtDataAttr || ''}"><span class="date-text">${triggeredAtDisplay}</span></td>
+        <td data-date="${expiryDataAttr || ''}"><span class="date-text">${expiryDisplay}</span></td>
+        ${updatedDateCell}
+        <td class="actions-cell" data-entity-id="${alert.id}" data-status="${alert.status || ''}">
+          ${actionsMenu}
+        </td>
       `;
-    }).join('');
-
-    tbody.innerHTML = tableHTML;
+    });
+    
+    // בניית שורות הטבלה - כמו ב-notes.js: יוצרים row וממלאים עם innerHTML
+    tbody.textContent = '';
+    alerts.forEach((alert, index) => {
+      const row = document.createElement('tr');
+      row.setAttribute('data-status', alert.status || '');
+      // חישוב createdAtDataAttr - צריך לחשב מחדש כי זה בתוך הלולאה
+      const createdRawEnvelope =
+        alert.created_at_envelope ||
+        alert.createdAtEnvelope ||
+        alert.created_atEnvelope ||
+        alert.createdAt_envelope ||
+        null;
+      const createdSource =
+        createdRawEnvelope ||
+        alert.created_at ||
+        alert.createdAt ||
+        alert.created_at_utc ||
+        alert.createdAtUtc ||
+        alert.created_at_iso ||
+        alert.createdAtIso ||
+        alert.created_at_local ||
+        alert.createdAtLocal ||
+        null;
+      const createdEnvelope = window.dateUtils?.ensureDateEnvelope
+        ? window.dateUtils.ensureDateEnvelope(createdSource)
+        : createdSource;
+      const createdDateObj = window.dateUtils?.toDateObject
+        ? window.dateUtils.toDateObject(createdEnvelope || null)
+        : (createdEnvelope && typeof createdEnvelope === 'object' && typeof createdEnvelope.epochMs === 'number'
+          ? new Date(createdEnvelope.epochMs)
+          : (createdEnvelope ? new Date(createdEnvelope) : null));
+      const createdAtDataAttr = window.dateUtils?.getEpochMilliseconds
+        ? window.dateUtils.getEpochMilliseconds(createdEnvelope)
+        : (() => {
+            if (!createdDateObj || Number.isNaN(createdDateObj.getTime())) {return '';}
+            try {
+              return createdDateObj.getTime();
+            } catch {
+              return '';
+            }
+          })();
+      row.setAttribute('data-date', createdAtDataAttr || '');
+      row.textContent = '';
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(`<table><tbody><tr>${tableHTML[index]}</tr></tbody></table>`, 'text/html');
+      const tempRow = doc.body.querySelector('tr');
+      if (tempRow) {
+        Array.from(tempRow.children).forEach(cell => {
+          row.appendChild(cell.cloneNode(true));
+        });
+      }
+      tbody.appendChild(row);
+    });
 
     // עדכון ספירת רשומות - משתמש בפונקציה הגנרית לקבלת סך כל הרשומות
     if (window.updateTableCount) {
@@ -1235,20 +1256,59 @@ function updateRadioButtons(accounts, trades, tradePlans, tickers) {
 /**
  * מילוי select עם נתונים
  */
+/**
+ * Populate select element with data
+ * Uses global populateSelect from select-populator-service.js if available and prefix is empty
+ * Falls back to local implementation for custom formatting (with prefix)
+ * @param {string} selectId - ID of the select element
+ * @param {Array} data - Array of data objects
+ * @param {string} field - Field name to use as value
+ * @param {string} prefix - Optional prefix for option text (triggers custom formatting)
+ * @returns {void}
+ */
+/**
+ * Populate select element with data
+ * Uses SelectPopulatorService.populateSelectWithData if available (for existing data)
+ * Falls back to local implementation if service not available
+ * 
+ * @function populateSelect
+ * @param {string} selectId - ID of the select element
+ * @param {Array} data - Array of data objects
+ * @param {string} field - Field name to use as value
+ * @param {string} prefix - Optional prefix for option text
+ * @returns {void}
+ */
 function populateSelect(selectId, data, field, prefix = '') {
   try {
-    // window.Logger.info('🔧 populateSelect called:', { selectId, dataLength: data?.length, field, prefix }, { page: "alerts" });
-
-    const select = document.getElementById(selectId);
-    if (!select) {
-      // window.Logger.error('🔧 Select element not found:', selectId, { page: "alerts" });
+    // Use SelectPopulatorService.populateSelectWithData if available (for existing data, not from API)
+    if (window.SelectPopulatorService && typeof window.SelectPopulatorService.populateSelectWithData === 'function') {
+      window.SelectPopulatorService.populateSelectWithData(selectId, data, {
+        valueField: field,
+        textField: (item) => {
+          const value = item[field] || item.id || item.name || '';
+          return prefix ? `${prefix}: ${value}` : value;
+        },
+        includeEmpty: true,
+        emptyText: 'בחר אובייקט לשיוך...'
+      });
       return;
     }
 
-  select.innerHTML = '<option value="">בחר אובייקט לשיוך...</option>';
+    // Fallback to local implementation
+    const select = document.getElementById(selectId);
+    if (!select) {
+      window.Logger?.debug('Select element not found', { selectId, page: "alerts" });
+      return;
+    }
+
+  select.textContent = '';
+  const defaultOption = document.createElement('option');
+  defaultOption.value = '';
+  defaultOption.textContent = 'בחר אובייקט לשיוך...';
+  select.appendChild(defaultOption);
 
   if (!data || data.length === 0) {
-    // window.Logger.info('🔧 No data available for:', selectId, { page: "alerts" });
+    window.Logger?.debug('No data available for select', { selectId, page: "alerts" });
     const option = document.createElement('option');
     option.value = '';
     option.textContent = 'אין רשומות זמינות';
@@ -1431,7 +1491,13 @@ function toggleConditionFields(enable, mode = 'add') {
           field.classList.remove('disabled-field');
         } else {
           field.classList.add('disabled-field');
-          field.value = '';
+          // Use DataCollectionService if available
+          if (window.DataCollectionService && typeof window.DataCollectionService.setValue === 'function') {
+            window.DataCollectionService.setValue(field.id, '', 'text');
+          } else {
+            // Fallback to direct assignment
+            field.value = '';
+          }
         }
       }
     });
@@ -1452,67 +1518,111 @@ function toggleConditionFields(enable, mode = 'add') {
 /**
  * Enable condition fields for add modal
  * Activates condition fields after relation type selection
- * @deprecated Use toggleConditionFields(true, 'add') instead
+ * @deprecated Use Conditions System (ConditionsFormGenerator or ConditionsUIManager) instead
+ * This function is kept for backward compatibility but should use the centralized Conditions System
  * 
  * @function enableConditionFields
  * @returns {void}
  */
 function enableConditionFields() {
+  // Use Conditions System if available
+  if (window.conditionsFormGenerator || window.ConditionsUIManager) {
+    window.Logger?.info('Using Conditions System for field management', { page: 'alerts' });
+    // Conditions System handles field enabling/disabling automatically
+    return;
+  }
   toggleConditionFields(true, 'add');
 }
 
 /**
  * השבתת שדות התנאי
- * @deprecated Use toggleConditionFields(false, 'add') instead
+ * @deprecated Use Conditions System (ConditionsFormGenerator or ConditionsUIManager) instead
+ * This function is kept for backward compatibility but should use the centralized Conditions System
  */
 function disableConditionFields() {
+  // Use Conditions System if available
+  if (window.conditionsFormGenerator || window.ConditionsUIManager) {
+    window.Logger?.info('Using Conditions System for field management', { page: 'alerts' });
+    // Conditions System handles field enabling/disabling automatically
+    return;
+  }
   toggleConditionFields(false, 'add');
 }
 
 /**
  * הפעלת שדות התנאי במודל העריכה
- * @deprecated Use toggleConditionFields(true, 'edit') instead
+ * @deprecated Use Conditions System (ConditionsFormGenerator or ConditionsUIManager) instead
+ * This function is kept for backward compatibility but should use the centralized Conditions System
  */
 function enableEditConditionFields() {
+  // Use Conditions System if available
+  if (window.conditionsFormGenerator || window.ConditionsUIManager) {
+    window.Logger?.info('Using Conditions System for field management', { page: 'alerts' });
+    // Conditions System handles field enabling/disabling automatically
+    return;
+  }
   toggleConditionFields(true, 'edit');
 }
 
 /**
  * השבתת שדות התנאי במודל העריכה
- * @deprecated Use toggleConditionFields(false, 'edit') instead
+ * @deprecated Use Conditions System (ConditionsFormGenerator or ConditionsUIManager) instead
+ * This function is kept for backward compatibility but should use the centralized Conditions System
  */
 function disableEditConditionFields() {
+  // Use Conditions System if available
+  if (window.conditionsFormGenerator || window.ConditionsUIManager) {
+    window.Logger?.info('Using Conditions System for field management', { page: 'alerts' });
+    // Conditions System handles field enabling/disabling automatically
+    return;
+  }
   toggleConditionFields(false, 'edit');
 }
 
 /**
  * מילוי רשימת אובייקטים לפי סוג השיוך
+ * Uses global populateRelatedObjects from select-populator-service.js if available
+ * Falls back to local implementation if service not available
  * @param {number} relationTypeId - מזהה סוג השיוך
  */
 function populateRelatedObjects(relationTypeId) {
   try {
-    const selectElement = document.getElementById('alertRelatedObjectSelect');
+    const selectId = 'alertRelatedObjectSelect';
+    
+    // Use global populateRelatedObjects from select-populator-service.js if available
+    if (window.populateRelatedObjects && typeof window.populateRelatedObjects === 'function' && 
+        window.populateRelatedObjects.toString().includes('select-populator-service')) {
+      window.populateRelatedObjects(parseInt(relationTypeId), null, selectId);
+      return;
+    }
+
+    // Fallback to local implementation
+    const selectElement = document.getElementById(selectId);
     if (!selectElement) {return;}
 
     // ניקוי הרשימה
-    selectElement.innerHTML = '<option value="">בחר אובייקט לשיוך...</option>';
+    selectElement.textContent = '';
+    const defaultOption = document.createElement('option');
+    defaultOption.value = '';
+    defaultOption.textContent = 'בחר אובייקט לשיוך...';
+    selectElement.appendChild(defaultOption);
 
   // מילוי לפי סוג השיוך
-  switch (relationTypeId) {
+  switch (parseInt(relationTypeId)) {
   case 1: // חשבון מסחר
-    populateSelect('alertRelatedObjectSelect', window.accountsData || [], 'name', 'חשבון מסחר');
+    populateSelect(selectId, window.accountsData || [], 'name', 'חשבון מסחר');
     break;
 
   case 2: // טרייד
-    populateSelect('alertRelatedObjectSelect', window.tradesData || [], 'id', 'טרייד');
+    populateSelect(selectId, window.tradesData || [], 'id', 'טרייד');
     break;
 
   case 3: // תכנון טרייד
-    populateSelect('alertRelatedObjectSelect', window.tradePlansData || [], 'id', 'תכנון');
+    populateSelect(selectId, window.tradePlansData || [], 'id', 'תכנון');
     break;
 
   case 4: // טיקר
-    populateSelect('alertRelatedObjectSelect', window.tickersData || [], 'symbol', '');
+    populateSelect(selectId, window.tickersData || [], 'symbol', '');
     break;
   }
   
@@ -1723,7 +1833,14 @@ window.debugAlertForm = function() {
   
   // Test field collection exactly as saveAlert does
   console.group('🧪 Test Collection (as in saveAlert)');
-  const testCollection = {
+  // Use DataCollectionService if available for test collection
+  const testCollection = window.DataCollectionService ? {
+    relatedType: window.DataCollectionService.getValue('alertRelatedType', 'text', '') || '',
+    relatedId: window.DataCollectionService.getValue('alertRelatedObject', 'text', '') || '',
+    conditionAttribute: window.DataCollectionService.getValue('alertType', 'text', '') || '',
+    conditionOperator: window.DataCollectionService.getValue('alertCondition', 'text', '') || '',
+    conditionNumber: window.DataCollectionService.getValue('alertValue', 'text', '') || ''
+  } : {
     relatedType: form.querySelector('#alertRelatedType')?.value || '',
     relatedId: form.querySelector('#alertRelatedObject')?.value || '',
     conditionAttribute: form.querySelector('#alertType')?.value || '',
@@ -1812,8 +1929,18 @@ window.testAlertPayload = async function() {
   }
   
   // Collect data exactly as saveAlert does
-  const relatedType = form.querySelector('#alertRelatedType')?.value || '';
-  const relatedId = form.querySelector('#alertRelatedObject')?.value || '';
+  // Use DataCollectionService if available
+  let relatedType, relatedId;
+  if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) {
+    relatedType = window.DataCollectionService.getValue('alertRelatedType', 'text', '');
+    relatedId = window.DataCollectionService.getValue('alertRelatedObject', 'text', '');
+  } else {
+    // Fallback if DataCollectionService is not available - use direct querySelector
+    const relatedTypeEl = form.querySelector('#alertRelatedType');
+    const relatedIdEl = form.querySelector('#alertRelatedObject');
+    relatedType = relatedTypeEl?.value || '';
+    relatedId = relatedIdEl?.value || '';
+  }
   
   const alertTypeField = form.querySelector('#alertType');
   const alertConditionField = form.querySelector('#alertCondition');
@@ -1844,19 +1971,31 @@ window.testAlertPayload = async function() {
   if (window.RichTextEditorService && typeof window.RichTextEditorService.getContent === 'function') {
     message = window.RichTextEditorService.getContent('alertName') || '';
   } else {
-    message = form.querySelector('#alertName')?.value || '';
+    const alertNameEl = form.querySelector('#alertName');
+    message = alertNameEl?.value || '';
   }
   
-  // Get status
-  const statusCombined = form.querySelector('#alertStatusCombined')?.value || 'new';
-  const statusHidden = form.querySelector('#alertStatus_hidden')?.value || 'open';
-  const isTriggeredHidden = form.querySelector('#alertIsTriggered_hidden')?.value || 'false';
+  // Get status - Use DataCollectionService if available
+  let statusCombined, statusHidden, isTriggeredHidden, expiryDate;
+  if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) {
+    statusCombined = window.DataCollectionService.getValue('alertStatusCombined', 'text', 'new');
+    statusHidden = window.DataCollectionService.getValue('alertStatus_hidden', 'text', 'open');
+    isTriggeredHidden = window.DataCollectionService.getValue('alertIsTriggered_hidden', 'text', 'false');
+    expiryDate = window.DataCollectionService.getValue('alertExpiryDate', 'dateOnly', null);
+  } else {
+    // Fallback if DataCollectionService is not available - use direct querySelector
+    const statusCombinedEl = form.querySelector('#alertStatusCombined');
+    const statusHiddenEl = form.querySelector('#alertStatus_hidden');
+    const isTriggeredHiddenEl = form.querySelector('#alertIsTriggered_hidden');
+    const expiryDateEl = form.querySelector('#alertExpiryDate');
+    statusCombined = statusCombinedEl?.value || 'new';
+    statusHidden = statusHiddenEl?.value || 'open';
+    isTriggeredHidden = isTriggeredHiddenEl?.value || 'false';
+    expiryDate = expiryDateEl?.value || null;
+  }
   
   const status = statusHidden;
   const isTriggered = isTriggeredHidden;
-  
-  // Get expiry_date
-  const expiryDate = form.querySelector('#alertExpiryDate')?.value || null;
   
   // Build payload exactly as saveAlert does
   const finalConditionAttribute = (conditionAttribute && conditionAttribute.trim() !== '') ? conditionAttribute : 'price';
@@ -1969,9 +2108,16 @@ async function saveAlert() {
   let tagIds = [];
 
   if (isNewForm) {
-    // New form structure (ModalManagerV2)
-    relatedType = form.querySelector('#alertRelatedType')?.value || '';
-    relatedId = form.querySelector('#alertRelatedObject')?.value || '';
+    // New form structure (ModalManagerV2) - use DataCollectionService if available
+    if (window.DataCollectionService) {
+      relatedType = window.DataCollectionService.getValue('alertRelatedType', 'text', '') || '';
+      relatedId = window.DataCollectionService.getValue('alertRelatedObject', 'text', '') || '';
+    } else {
+      const relatedTypeEl = form.querySelector('#alertRelatedType');
+      const relatedIdEl = form.querySelector('#alertRelatedObject');
+      relatedType = relatedTypeEl?.value || '';
+      relatedId = relatedIdEl?.value || '';
+    }
     
     // Get condition fields - ensure they are not null/undefined
     const alertTypeField = form.querySelector('#alertType');
@@ -2040,19 +2186,27 @@ async function saveAlert() {
     if (window.RichTextEditorService && typeof window.RichTextEditorService.getContent === 'function') {
       message = window.RichTextEditorService.getContent('alertName') || '';
     } else {
-      message = form.querySelector('#alertName')?.value || '';
+      const alertNameEl = form.querySelector('#alertName');
+      message = alertNameEl?.value || '';
     }
     
-    // Get combined status and parse to status + is_triggered
-    const statusCombined = form.querySelector('#alertStatusCombined')?.value || 'new';
-    const statusHidden = form.querySelector('#alertStatus_hidden')?.value || 'open';
-    const isTriggeredHidden = form.querySelector('#alertIsTriggered_hidden')?.value || 'false';
+    // Get combined status and parse to status + is_triggered - Use DataCollectionService if available
+    let statusCombined, statusHidden, isTriggeredHidden;
+    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) {
+      statusCombined = window.DataCollectionService.getValue('alertStatusCombined', 'text', 'new');
+      statusHidden = window.DataCollectionService.getValue('alertStatus_hidden', 'text', 'open');
+      isTriggeredHidden = window.DataCollectionService.getValue('alertIsTriggered_hidden', 'text', 'false');
+      expiryDate = window.DataCollectionService.getValue('alertExpiryDate', 'dateOnly', null);
+    } else {
+      // Fallback if DataCollectionService is not available
+      statusCombined = form.querySelector('#alertStatusCombined')?.value || 'new';
+      statusHidden = form.querySelector('#alertStatus_hidden')?.value || 'open';
+      isTriggeredHidden = form.querySelector('#alertIsTriggered_hidden')?.value || 'false';
+      expiryDate = form.querySelector('#alertExpiryDate')?.value || null;
+    }
     
     status = statusHidden;
     isTriggered = isTriggeredHidden;
-    
-    // Get expiry_date
-    expiryDate = form.querySelector('#alertExpiryDate')?.value || null;
     if (expiryDate === '') expiryDate = null;
 
     const tagsSelect = form.querySelector('#alertTags');
@@ -2207,10 +2361,19 @@ async function saveAlert() {
     return;
   }
 
-  // Check if editing (form has alert ID)
-  const alertId = form.querySelector('input[name="id"]')?.value || 
-                  form.querySelector('[data-alert-id]')?.getAttribute('data-alert-id') ||
-                  form.closest('.modal')?.querySelector('[data-alert-id]')?.getAttribute('data-alert-id');
+  // Check if editing (form has alert ID) - try DataCollectionService first, then querySelector
+  let alertId = null;
+  const idInput = form.querySelector('input[name="id"]');
+  if (idInput && idInput.id && window.DataCollectionService) {
+    alertId = window.DataCollectionService.getValue(idInput.id, 'int', null);
+  } else if (idInput) {
+    alertId = idInput.value || null;
+  }
+  if (!alertId) {
+    const dataAlertId = form.querySelector('[data-alert-id]')?.getAttribute('data-alert-id') ||
+                        form.closest('.modal')?.querySelector('[data-alert-id]')?.getAttribute('data-alert-id');
+    alertId = dataAlertId || null;
+  }
   
   const isEdit = !!alertId;
   
@@ -2352,8 +2515,22 @@ async function saveAlert() {
       });
     }
 
-    // שימוש ב-CRUDResponseHandler עם רענון אוטומטי
-    const crudResult = await CRUDResponseHandler.handleSaveResponse(response, {
+    // Use UnifiedCRUDService for consistent CRUD operations
+    let crudResult;
+    if (window.UnifiedCRUDService && typeof window.UnifiedCRUDService.saveEntity === 'function') {
+      if (isEdit && alertId) {
+        alertPayload.id = alertId;
+      }
+      crudResult = await window.UnifiedCRUDService.saveEntity('alert', alertPayload, {
+        modalId: modalId,
+        successMessage: isEdit ? 'התראה עודכנה בהצלחה!' : 'התראה נשמרה בהצלחה!',
+        entityName: 'התראה',
+        reloadFn: window.loadAlertsData,
+        requiresHardReload: false
+      });
+    } else {
+      // Fallback to direct API call with CRUDResponseHandler
+      crudResult = await CRUDResponseHandler.handleSaveResponse(response, {
       modalId: modalId,
       successMessage: isEdit ? 'התראה עודכנה בהצלחה!' : 'התראה נשמרה בהצלחה!',
       apiUrl: '/api/alerts/',
@@ -2361,6 +2538,7 @@ async function saveAlert() {
       reloadFn: window.loadAlertsData,
       requiresHardReload: false
     });
+    }
     const alertRecordId = isEdit ? Number(alertId) : Number(crudResult?.data?.id || crudResult?.id);
     if (Number.isFinite(alertRecordId) && window.TagService) {
       try {
@@ -2494,34 +2672,42 @@ function updateStatusAndTriggered() {
   if (!stateSelect || !statusHidden || !triggeredHidden) {return;}
 
   const state = stateSelect.value;
-  const currentTriggered = triggeredHidden.value; // שמירת הערך הנוכחי
+  // Get current triggered value using DataCollectionService if available
+  let currentTriggered = 'false';
+  if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) {
+    const triggeredHiddenId = triggeredHidden.id;
+    currentTriggered = window.DataCollectionService.getValue(triggeredHiddenId, 'text', 'false');
+  } else {
+    // Fallback if DataCollectionService is not available
+    currentTriggered = triggeredHidden.value || 'false';
+  }
 
   // מיפוי המצב לערכי status ו-is_triggered
-  switch (state) {
-  case 'new':
-    statusHidden.value = 'open';
-    triggeredHidden.value = 'false';
-    break;
-  case 'active':
-    statusHidden.value = 'open';
-    // שמירה על הערך הנוכחי של is_triggered
-    triggeredHidden.value = currentTriggered;
-    break;
-  case 'unread':
-    statusHidden.value = 'closed';
-    triggeredHidden.value = 'new';
-    break;
-  case 'read':
-    statusHidden.value = 'closed';
-    triggeredHidden.value = 'true';
-    break;
-  case 'cancelled':
-    statusHidden.value = 'cancelled';
-    triggeredHidden.value = 'false';
-    break;
-  default:
-    statusHidden.value = 'open';
-    triggeredHidden.value = 'false';
+  const statusValues = {
+    'new': { status: 'open', triggered: 'false' },
+    'active': { status: 'open', triggered: currentTriggered },
+    'unread': { status: 'closed', triggered: 'new' },
+    'read': { status: 'closed', triggered: 'true' },
+    'cancelled': { status: 'cancelled', triggered: 'false' }
+  };
+  
+  const mappedValues = statusValues[state] || { status: 'open', triggered: 'false' };
+  
+  // Set values using DataCollectionService if available
+  if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+    window.DataCollectionService.setValue(statusHidden.id, mappedValues.status, 'text');
+    window.DataCollectionService.setValue(triggeredHidden.id, mappedValues.triggered, 'text');
+  } else {
+    // Fallback if DataCollectionService is not available
+    // Use DataCollectionService if available
+    if (window.DataCollectionService && typeof window.DataCollectionService.setValue === 'function') {
+      window.DataCollectionService.setValue('editAlertStatus', mappedValues.status, 'text');
+      window.DataCollectionService.setValue('editAlertTriggered', mappedValues.triggered, 'text');
+    } else {
+      // Fallback to direct assignment
+      statusHidden.value = mappedValues.status;
+      triggeredHidden.value = mappedValues.triggered;
+    }
   }
 }
 
@@ -2662,7 +2848,14 @@ async function updateAlert() {
     return;
   }
 
-  const alertId = document.getElementById('editAlertId').value;
+  let alertId;
+  if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) {
+    alertId = window.DataCollectionService.getValue('editAlertId', 'text', '');
+  } else {
+    // Fallback if DataCollectionService is not available
+    const alertIdElement = document.getElementById('editAlertId');
+    alertId = alertIdElement ? alertIdElement.value : '';
+  }
   const tagsSelect = document.getElementById('editAlertTags');
   let tagIds = [];
   if (tagsSelect) {
@@ -2766,7 +2959,48 @@ async function deleteAlertInternal(alertId) {
       );
     } else {
       // fallback אחרון - confirm רגיל (אם מערכת התראות לא זמינה)
-      const confirmed = window.confirm('האם אתה בטוח שברצונך למחוק התראה זו?');
+      let confirmed = false;
+      if (window.showDeleteWarning) {
+        confirmed = await new Promise((resolve) => {
+          window.showDeleteWarning(
+            'האם אתה בטוח שברצונך למחוק התראה זו?',
+            () => resolve(true),
+            () => resolve(false)
+          );
+        });
+      } else if (window.showConfirmationDialog) {
+        confirmed = await new Promise((resolve) => {
+          window.showConfirmationDialog(
+            'מחיקת התראה',
+            'האם אתה בטוח שברצונך למחוק התראה זו?',
+            () => resolve(true),
+            () => resolve(false),
+            'danger'
+          );
+        });
+      } else {
+        if (window.showDeleteWarning) {
+          confirmed = await new Promise((resolve) => {
+            window.showDeleteWarning(
+              'האם אתה בטוח שברצונך למחוק התראה זו?',
+              () => resolve(true),
+              () => resolve(false)
+            );
+          });
+        } else if (window.showConfirmationDialog) {
+          confirmed = await new Promise((resolve) => {
+            window.showConfirmationDialog(
+              'מחיקת התראה',
+              'האם אתה בטוח שברצונך למחוק התראה זו?',
+              () => resolve(true),
+              () => resolve(false),
+              'danger'
+            );
+          });
+        } else {
+          confirmed = window.confirm('האם אתה בטוח שברצונך למחוק התראה זו?');
+        }
+      }
       if (confirmed) {
         await confirmDeleteAlert(alertId);
       }
@@ -2782,18 +3016,35 @@ async function confirmDeleteAlert(alertId) {
   // window.Logger.info('🔄 confirmDeleteAlert נקראה עבור ID:', alertId, { page: "alerts" });
 
   try {
+    // Use UnifiedCRUDService for consistent CRUD operations
+    if (window.UnifiedCRUDService && typeof window.UnifiedCRUDService.deleteEntity === 'function') {
+      await window.UnifiedCRUDService.deleteEntity('alert', alertId, {
+        successMessage: 'התראה נמחקה בהצלחה!',
+        entityName: 'התראה',
+        reloadFn: window.loadAlertsData,
+        requiresHardReload: false
+      });
+    } else if (window.performAlertDeletion) {
     // Use performAlertDeletion which handles cache clearing
-    if (window.performAlertDeletion) {
       await window.performAlertDeletion(alertId);
     } else {
-      // שימוש בשירות הנתונים החדש
+      // Fallback to direct API call with CRUDResponseHandler
       let response;
       if (window.AlertsData && window.AlertsData.deleteAlert) {
         response = await window.AlertsData.deleteAlert(alertId);
       } else {
         // Fallback ל-direct fetch אם השירות לא זמין
+    let token = null;
+    if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
+      token = await window.UnifiedCacheManager.get('authToken');
+    } else {
+      token = localStorage.getItem('authToken'); // fallback
+    }
+    const headers = { 'Content-Type': 'application/json' };
+    if (token) { headers['Authorization'] = `Bearer ${token}`; }
         response = await fetch(`/api/alerts/${alertId}`, {
-          method: 'DELETE',
+          headers,
+          method: 'DELETE'
         });
       }
 
@@ -3095,7 +3346,33 @@ async function reactivateAlert(alertId) {
     if (!confirmed) {return;}
   } else {
     // Fallback למקרה שמערכת התראות לא זמינה
-    if (!window.confirm('האם אתה בטוח שברצונך להפעיל מחדש את ההתראה?')) {
+    let confirmed = false;
+    if (window.showConfirmationDialog) {
+      confirmed = await new Promise((resolve) => {
+        window.showConfirmationDialog(
+          'הפעלה מחדש',
+          'האם אתה בטוח שברצונך להפעיל מחדש את ההתראה?',
+          () => resolve(true),
+          () => resolve(false),
+          'info'
+        );
+      });
+    } else {
+      if (window.showConfirmationDialog) {
+        confirmed = await new Promise((resolve) => {
+          window.showConfirmationDialog(
+            'הפעלה מחדש',
+            'האם אתה בטוח שברצונך להפעיל מחדש את ההתראה?',
+            () => resolve(true),
+            () => resolve(false),
+            'info'
+          );
+        });
+      } else {
+        confirmed = window.confirm('האם אתה בטוח שברצונך להפעיל מחדש את ההתראה?');
+      }
+    }
+    if (!confirmed) {
       return;
     }
   }
@@ -3376,6 +3653,7 @@ window.updateAlertsSummary = updateAlertsSummary;
 
 /**
  * עדכון סטטיסטיקות ההתראות
+ * משתמש ב-InfoSummarySystem עבור סטטיסטיקות בסיסיות
  * @param {Array} alerts - מערך התראות
  */
 function updateAlertsSummary(alerts) {
@@ -3390,9 +3668,16 @@ function updateAlertsSummary(alerts) {
     return;
   }
 
-  // חישוב סטטיסטיקות
-  const totalAlerts = alertsArray.length;
-  const activeAlerts = alertsArray.filter(alert => alert.status === 'open').length;
+  // שימוש ב-InfoSummarySystem עבור סטטיסטיקות בסיסיות
+  if (window.updatePageSummaryStats && typeof window.updatePageSummaryStats === 'function') {
+    window.updatePageSummaryStats('alerts', alertsArray);
+  } else if (window.InfoSummarySystem && window.INFO_SUMMARY_CONFIGS && window.INFO_SUMMARY_CONFIGS.alerts) {
+    window.InfoSummarySystem.calculateAndRender(alertsArray, window.INFO_SUMMARY_CONFIGS.alerts);
+  } else {
+    window.Logger.warn('⚠️ InfoSummarySystem not available, using fallback', { page: "alerts" });
+  }
+
+  // חישוב סטטיסטיקות נוספות שלא מוגדרות ב-config (newAlerts, todayAlerts, weekAlerts)
   const newAlerts = alertsArray.filter(alert => alert.is_triggered === 'new').length;
   
   // התראות היום
@@ -3455,22 +3740,16 @@ function updateAlertsSummary(alerts) {
     return createdDate >= weekAgo;
   }).length;
 
-  // עדכון האלמנטים
-  const totalElement = document.getElementById('totalAlerts');
-  const activeElement = document.getElementById('activeAlerts');
+  // עדכון האלמנטים הנוספים (שאינם ב-config)
   const newElement = document.getElementById('newAlerts');
   const todayElement = document.getElementById('todayAlerts');
   const weekElement = document.getElementById('weekAlerts');
 
-  if (totalElement) totalElement.textContent = totalAlerts;
-  if (activeElement) activeElement.textContent = activeAlerts;
   if (newElement) newElement.textContent = newAlerts;
   if (todayElement) todayElement.textContent = todayAlerts;
   if (weekElement) weekElement.textContent = weekAlerts;
 
   window.Logger.info('✅ סטטיסטיקות התראות עודכנו:', {
-    total: totalAlerts,
-    active: activeAlerts,
     new: newAlerts,
     today: todayAlerts,
     week: weekAlerts
@@ -3490,12 +3769,16 @@ async function generateDetailedLogForAlerts() {
             await navigator.clipboard.writeText(detailedLog);
             if (window.showSuccessNotification) {
                 window.showSuccessNotification('לוג מפורט הועתק ללוח');
+            } else if (window.showInfoNotification) {
+                window.showInfoNotification('לוג מפורט הועתק ללוח!', 'info');
             } else {
                 alert('לוג מפורט הועתק ללוח!');
             }
         } else {
             if (window.showWarningNotification) {
                 window.showWarningNotification('אין לוג להעתקה');
+            } else if (window.showInfoNotification) {
+                window.showInfoNotification('אין לוג להעתקה', 'warning');
             } else {
                 alert('אין לוג להעתקה');
             }
@@ -3504,6 +3787,8 @@ async function generateDetailedLogForAlerts() {
         window.Logger.error('שגיאה בהעתקה:', err, { page: "alerts" });
         if (window.showErrorNotification) {
             window.showErrorNotification('שגיאה בהעתקת הלוג');
+        } else if (window.showInfoNotification) {
+            window.showInfoNotification('שגיאה בהעתקת הלוג', 'error');
         } else {
             alert('שגיאה בהעתקת הלוג');
         }
@@ -3516,12 +3801,23 @@ async function generateDetailedLogForAlerts() {
  * Load conditions from source type (trade_plan or trade)
  */
 function loadConditionsFromSource() {
-    const sourceType = document.getElementById('conditionSourceType').value;
+    let sourceType;
+    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) {
+        sourceType = window.DataCollectionService.getValue('conditionSourceType', 'text', '');
+    } else {
+        // Fallback if DataCollectionService is not available
+        const sourceTypeElement = document.getElementById('conditionSourceType');
+        sourceType = sourceTypeElement ? sourceTypeElement.value : '';
+    }
     const sourceIdSelect = document.getElementById('conditionSourceId');
     
     if (!sourceType) {
         sourceIdSelect.disabled = true;
-        sourceIdSelect.innerHTML = '<option value="">בחר קודם מקור</option>';
+        sourceIdSelect.textContent = '';
+        const defaultOption = document.createElement('option');
+        defaultOption.value = '';
+        defaultOption.textContent = 'בחר קודם מקור';
+        sourceIdSelect.appendChild(defaultOption);
         return;
     }
     
@@ -3535,55 +3831,122 @@ function loadConditionsFromSource() {
 
 /**
  * Load trade plans for conditions selection
+ * Uses SelectPopulatorService for consistent select population
  */
 async function loadTradePlansForConditions() {
     try {
-        const response = await fetch('/api/trade-plans');
-        if (!response.ok) throw new Error('Failed to load trade plans');
-        
-        const tradePlans = await response.json();
         const sourceIdSelect = document.getElementById('conditionSourceId');
-        
-        sourceIdSelect.innerHTML = '<option value="">בחר תכנית מסחר</option>';
-        tradePlans.forEach(plan => {
-            const option = document.createElement('option');
-            option.value = plan.id;
-            option.textContent = `${plan.name} (${plan.ticker})`;
-            sourceIdSelect.appendChild(option);
-        });
-        
-        sourceIdSelect.disabled = false;
+        if (!sourceIdSelect) {
+            window.Logger?.warn('⚠️ conditionSourceId not found', { page: 'alerts' });
+            return;
+        }
+
+        // Check if SelectPopulatorService is available
+        if (window.SelectPopulatorService && typeof window.SelectPopulatorService.populateTradePlansSelect === 'function') {
+            await window.SelectPopulatorService.populateTradePlansSelect(sourceIdSelect, {
+                includeEmpty: true,
+                emptyText: 'בחר תכנית מסחר'
+            });
+            sourceIdSelect.disabled = false;
+        } else {
+            // Fallback to direct API call if service not available
+            window.Logger?.warn('⚠️ SelectPopulatorService not available - using fallback', { page: 'alerts' });
+    let token = null;
+    if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
+      token = await window.UnifiedCacheManager.get('authToken');
+    } else {
+      token = localStorage.getItem('authToken'); // fallback
+    }
+    const headers = { 'Content-Type': 'application/json' };
+    if (token) { headers['Authorization'] = `Bearer ${token}`; }
+            const response = await fetch('/api/trade-plans', { headers });
+            if (!response.ok) throw new Error('Failed to load trade plans');
+            
+            const tradePlansData = await response.json();
+            const tradePlans = Array.isArray(tradePlansData?.data) ? tradePlansData.data : (Array.isArray(tradePlansData) ? tradePlansData : []);
+            
+            sourceIdSelect.textContent = '';
+            const defaultOption = document.createElement('option');
+            defaultOption.value = '';
+            defaultOption.textContent = 'בחר תכנית מסחר';
+            sourceIdSelect.appendChild(defaultOption);
+            tradePlans.forEach(plan => {
+                const option = document.createElement('option');
+                option.value = plan.id;
+                option.textContent = `${plan.name || plan.ticker?.symbol || 'N/A'} (${plan.ticker?.symbol || plan.ticker || 'N/A'})`;
+                sourceIdSelect.appendChild(option);
+            });
+            
+            sourceIdSelect.disabled = false;
+        }
         
     } catch (error) {
         window.Logger.error('Error loading trade plans:', error, { page: "alerts" });
-        showErrorNotification('שגיאה בטעינת תכניות מסחר');
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה בטעינת תכניות מסחר', error.message);
+        }
     }
 }
 
 /**
  * Load trades for conditions selection
+ * Uses SelectPopulatorService for consistent select population
  */
 async function loadTradesForConditions() {
     try {
-        const response = await fetch('/api/trades');
-        if (!response.ok) throw new Error('Failed to load trades');
-        
-        const trades = await response.json();
         const sourceIdSelect = document.getElementById('conditionSourceId');
-        
-        sourceIdSelect.innerHTML = '<option value="">בחר טרייד</option>';
-        trades.forEach(trade => {
-            const option = document.createElement('option');
-            option.value = trade.id;
-            option.textContent = `${trade.ticker} - ${trade.type} (${trade.status})`;
-            sourceIdSelect.appendChild(option);
-        });
-        
-        sourceIdSelect.disabled = false;
+        if (!sourceIdSelect) {
+            window.Logger?.warn('⚠️ conditionSourceId not found', { page: 'alerts' });
+            return;
+        }
+
+        // Check if SelectPopulatorService is available
+        if (window.SelectPopulatorService && typeof window.SelectPopulatorService.populateTradesSelect === 'function') {
+            await window.SelectPopulatorService.populateTradesSelect(sourceIdSelect, {
+                includeEmpty: true,
+                emptyText: 'בחר טרייד'
+            });
+            sourceIdSelect.disabled = false;
+        } else {
+            // Fallback to direct API call if service not available
+            window.Logger?.warn('⚠️ SelectPopulatorService not available - using fallback', { page: 'alerts' });
+    let token = null;
+    if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
+      token = await window.UnifiedCacheManager.get('authToken');
+    } else {
+      token = localStorage.getItem('authToken'); // fallback
+    }
+    const headers = { 'Content-Type': 'application/json' };
+    if (token) { headers['Authorization'] = `Bearer ${token}`; }
+            const response = await fetch('/api/trades', { headers });
+            if (!response.ok) throw new Error('Failed to load trades');
+            
+            const tradesData = await response.json();
+            const trades = Array.isArray(tradesData?.data) ? tradesData.data : (Array.isArray(tradesData) ? tradesData : []);
+            
+            sourceIdSelect.textContent = '';
+            const defaultOption = document.createElement('option');
+            defaultOption.value = '';
+            defaultOption.textContent = 'בחר טרייד';
+            sourceIdSelect.appendChild(defaultOption);
+            trades.forEach(trade => {
+                const option = document.createElement('option');
+                option.value = trade.id;
+                const symbol = trade.ticker?.symbol || trade.ticker_symbol || trade.ticker || 'N/A';
+                const side = trade.side || trade.type || 'N/A';
+                const status = trade.status || 'N/A';
+                option.textContent = `${symbol} - ${side} (${status})`;
+                sourceIdSelect.appendChild(option);
+            });
+            
+            sourceIdSelect.disabled = false;
+        }
         
     } catch (error) {
         window.Logger.error('Error loading trades:', error, { page: "alerts" });
-        showErrorNotification('שגיאה בטעינת טריידים');
+        if (typeof window.showErrorNotification === 'function') {
+            window.showErrorNotification('שגיאה בטעינת טריידים', error.message);
+        }
     }
 }
 
@@ -3591,12 +3954,28 @@ async function loadTradesForConditions() {
  * Load conditions from selected item
  */
 async function loadConditionsFromItem() {
-    const sourceType = document.getElementById('conditionSourceType').value;
-    const sourceId = document.getElementById('conditionSourceId').value;
+    // Use DataCollectionService to get values
+    let sourceType, sourceId;
+    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) {
+        sourceType = window.DataCollectionService.getValue('conditionSourceType', 'text', '');
+        sourceId = window.DataCollectionService.getValue('conditionSourceId', 'text', '');
+    } else {
+        // Fallback if DataCollectionService is not available
+        const sourceTypeEl = document.getElementById('conditionSourceType');
+        const sourceIdEl = document.getElementById('conditionSourceId');
+        sourceType = sourceTypeEl ? sourceTypeEl.value : '';
+        sourceId = sourceIdEl ? sourceIdEl.value : '';
+    }
     
     if (!sourceType || !sourceId) {
-        document.getElementById('availableConditionsList').innerHTML = 
-            '<div class="text-muted text-center py-3">בחר מקור ופריט כדי לראות תנאים זמינים</div>';
+        const conditionsList = document.getElementById('availableConditionsList');
+        if (conditionsList) {
+          conditionsList.textContent = '';
+          const div = document.createElement('div');
+          div.className = 'text-muted text-center py-3';
+          div.textContent = 'בחר מקור ופריט כדי לראות תנאים זמינים';
+          conditionsList.appendChild(div);
+        }
         return;
     }
     
@@ -3608,7 +3987,15 @@ async function loadConditionsFromItem() {
             endpoint = `/api/trade-conditions?trade_id=${sourceId}`;
         }
         
-        const response = await fetch(endpoint);
+    let token = null;
+    if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
+      token = await window.UnifiedCacheManager.get('authToken');
+    } else {
+      token = localStorage.getItem('authToken'); // fallback
+    }
+    const headers = { 'Content-Type': 'application/json' };
+    if (token) { headers['Authorization'] = `Bearer ${token}`; }
+        const response = await fetch(endpoint, { headers });
         if (!response.ok) throw new Error('Failed to load conditions');
         
         const conditions = await response.json();
@@ -3627,7 +4014,11 @@ function displayAvailableConditions(conditions, sourceType) {
     const container = document.getElementById('availableConditionsList');
     
     if (!conditions || conditions.length === 0) {
-        container.innerHTML = '<div class="text-muted text-center py-3">אין תנאים זמינים לפריט זה</div>';
+        container.textContent = '';
+        const div = document.createElement('div');
+        div.className = 'text-muted text-center py-3';
+        div.textContent = 'אין תנאים זמינים לפריט זה';
+        container.appendChild(div);
         return;
     }
     
@@ -3647,7 +4038,12 @@ function displayAvailableConditions(conditions, sourceType) {
     });
     html += '</div>';
     
-    container.innerHTML = html;
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+    container.textContent = '';
+    doc.body.childNodes.forEach(node => {
+      container.appendChild(node.cloneNode(true));
+    });
 }
 
 /**
@@ -3684,8 +4080,18 @@ async function createAlertFromCondition() {
         return;
     }
     
-    const message = document.getElementById('alertMessageFromCondition').value;
-    const state = document.getElementById('alertStateFromCondition').value;
+    // Use DataCollectionService to get values
+    let message, state;
+    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.getValue) {
+        message = window.DataCollectionService.getValue('alertMessageFromCondition', 'text', '');
+        state = window.DataCollectionService.getValue('alertStateFromCondition', 'text', '');
+    } else {
+        // Fallback if DataCollectionService is not available
+        const messageEl = document.getElementById('alertMessageFromCondition');
+        const stateEl = document.getElementById('alertStateFromCondition');
+        message = messageEl ? messageEl.value : '';
+        state = stateEl ? stateEl.value : '';
+    }
     
     if (!message) {
         showErrorNotification('אנא הזן הודעת התראה');
@@ -3805,7 +4211,10 @@ async function evaluateAllConditions() {
         // הצגת אינדיקטור טעינה
         showEvaluationLoading();
         
-        // קריאה לשרת להערכת כל התנאים
+        // Use ConditionsCRUDManager if available for consistency
+        // Note: evaluate-all is a special endpoint that evaluates all conditions system-wide
+        // This is not a standard CRUD operation, so we keep the direct API call
+        // but add a comment noting it should be centralized if Conditions System adds this feature
         const response = await fetch('/api/plan-conditions/evaluate-all', {
             method: 'POST',
             headers: {
@@ -3845,12 +4254,29 @@ async function refreshConditionEvaluations() {
         showEvaluationLoading();
         
         // קריאה לשרת לקבלת התראות חדשות
-        const response = await fetch('/api/alerts/');
+    let token = null;
+    if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
+      token = await window.UnifiedCacheManager.get('authToken');
+    } else {
+      token = localStorage.getItem('authToken'); // fallback
+    }
+    const headers = { 'Content-Type': 'application/json' };
+    if (token) { headers['Authorization'] = `Bearer ${token}`; }
+        const response = await fetch('/api/alerts/', { headers });
+        let data;
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            if ([401, 403, 404].includes(response.status)) {
+                // User not authenticated or no alerts - return empty array
+                if (window.Logger && typeof window.Logger.debug === 'function') {
+                  window.Logger.debug(`⚠️ Alerts API returned ${response.status} in refreshConditionEvaluations, returning empty data`, { page: "alerts" });
+                }
+                data = { data: [] };
+            } else {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+        } else {
+            data = await response.json();
         }
-        
-        const data = await response.json();
         window.Logger.info('📊 התראות מעודכנות:', data, { page: "alerts" });
         
         // עדכון טבלת ההתראות
@@ -3878,7 +4304,9 @@ function showEvaluationLoading() {
     const resultsDiv = document.getElementById('conditionEvaluationResults');
     if (resultsDiv) {
         resultsDiv.style.display = 'block';
-        resultsDiv.innerHTML = `
+        resultsDiv.textContent = '';
+        const parser = new DOMParser();
+        const loadingHTML = `
             <div class="alert alert-info">
                 <h5>📊 הערכת תנאים</h5>
                 <div class="d-flex align-items-center">
@@ -3889,6 +4317,10 @@ function showEvaluationLoading() {
                 </div>
             </div>
         `;
+        const doc = parser.parseFromString(loadingHTML, 'text/html');
+        doc.body.childNodes.forEach(node => {
+            resultsDiv.appendChild(node.cloneNode(true));
+        });
     }
 }
 
@@ -3903,18 +4335,53 @@ function displayEvaluationResults(data) {
         const results = data.data || data;
         const metCount = results.filter(r => r.met).length;
         const notMetCount = results.length - metCount;
+        const evaluationTime = window.formatTimeOnly ? window.formatTimeOnly(new Date()) : (window.dateUtils?.formatTimeOnly ? window.dateUtils.formatTimeOnly(new Date()) : new Date().toLocaleTimeString('he-IL'));
         
-        resultsDiv.innerHTML = `
-            <div class="alert alert-info">
-                <h5>📊 תוצאות הערכת תנאים</h5>
-                <div id="evaluationSummary">
-                    <div>סה"כ תנאים: <strong>${results.length}</strong></div>
-                    <div>תנאים שהתקיימו: <strong class="text-success">${metCount}</strong></div>
-                    <div>תנאים שלא התקיימו: <strong class="text-danger">${notMetCount}</strong></div>
-                    <div>זמן הערכה: <strong>${window.formatTimeOnly ? window.formatTimeOnly(new Date()) : (window.dateUtils?.formatTimeOnly ? window.dateUtils.formatTimeOnly(new Date()) : new Date().toLocaleTimeString('he-IL'))}</strong></div>
-                </div>
-            </div>
-        `;
+        // Use createElement instead of innerHTML for better security
+        resultsDiv.textContent = ''; // Clear first
+        
+        const alertDiv = document.createElement('div');
+        alertDiv.className = 'alert alert-info';
+        
+        const title = document.createElement('h5');
+        title.textContent = '📊 תוצאות הערכת תנאים';
+        alertDiv.appendChild(title);
+        
+        const summaryDiv = document.createElement('div');
+        summaryDiv.id = 'evaluationSummary';
+        
+        const totalDiv = document.createElement('div');
+        const totalStrong = document.createElement('strong');
+        totalStrong.textContent = results.length;
+        totalDiv.appendChild(document.createTextNode('סה"כ תנאים: '));
+        totalDiv.appendChild(totalStrong);
+        summaryDiv.appendChild(totalDiv);
+        
+        const metDiv = document.createElement('div');
+        const metStrong = document.createElement('strong');
+        metStrong.className = 'text-success';
+        metStrong.textContent = metCount;
+        metDiv.appendChild(document.createTextNode('תנאים שהתקיימו: '));
+        metDiv.appendChild(metStrong);
+        summaryDiv.appendChild(metDiv);
+        
+        const notMetDiv = document.createElement('div');
+        const notMetStrong = document.createElement('strong');
+        notMetStrong.className = 'text-danger';
+        notMetStrong.textContent = notMetCount;
+        notMetDiv.appendChild(document.createTextNode('תנאים שלא התקיימו: '));
+        notMetDiv.appendChild(notMetStrong);
+        summaryDiv.appendChild(notMetDiv);
+        
+        const timeDiv = document.createElement('div');
+        const timeStrong = document.createElement('strong');
+        timeStrong.textContent = evaluationTime;
+        timeDiv.appendChild(document.createTextNode('זמן הערכה: '));
+        timeDiv.appendChild(timeStrong);
+        summaryDiv.appendChild(timeDiv);
+        
+        alertDiv.appendChild(summaryDiv);
+        resultsDiv.appendChild(alertDiv);
     }
 }
 
@@ -3972,12 +4439,29 @@ async function loadAlertTickerInfo(tickerId) {
     window.Logger?.info?.('🔄 [loadAlertTickerInfo] Loading ticker info', { tickerId }, { page: "alerts" });
     
     // Get ticker data from API
-    const response = await fetch(`/api/tickers/`);
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+    let token = null;
+    if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
+      token = await window.UnifiedCacheManager.get('authToken');
+    } else {
+      token = localStorage.getItem('authToken'); // fallback
     }
-    
-    const data = await response.json();
+    const headers = { 'Content-Type': 'application/json' };
+    if (token) { headers['Authorization'] = `Bearer ${token}`; }
+    const response = await fetch(`/api/tickers/`, { headers });
+    let data;
+    if (!response.ok) {
+      if ([401, 403, 404].includes(response.status)) {
+        // User not authenticated or no tickers - return empty array
+        if (window.Logger && typeof window.Logger.debug === 'function') {
+          window.Logger.debug(`⚠️ Tickers API returned ${response.status} in loadAlertTickerInfo, returning empty data`, { page: "alerts" });
+        }
+        data = { data: [] };
+      } else {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+    } else {
+      data = await response.json();
+    }
     const tickers = data.data || data;
     
     // Find the specific ticker
@@ -3987,7 +4471,7 @@ async function loadAlertTickerInfo(tickerId) {
     }
     
     // Display ticker info
-    displayAlertTickerInfo(ticker);
+    await displayAlertTickerInfo(ticker);
     window.Logger?.info?.('✅ [loadAlertTickerInfo] Ticker loaded', {
       tickerId,
       symbol: ticker?.symbol
@@ -4001,7 +4485,7 @@ async function loadAlertTickerInfo(tickerId) {
 /**
  * הצגת מידע על הטיקר (למודל החדש)
  */
-function displayAlertTickerInfo(ticker) {
+async function displayAlertTickerInfo(ticker) {
   window.Logger?.info?.('🖥️ [displayAlertTickerInfo] Rendering ticker', {
     tickerId: ticker?.id,
     symbol: ticker?.symbol
@@ -4021,12 +4505,14 @@ function displayAlertTickerInfo(ticker) {
     }
     
     if (tickerInfoDiv) {
+      tickerInfoDiv.textContent = '';
+      let tickerInfoHtml = '';
       if (window.FieldRendererService && window.FieldRendererService.renderTickerInfo) {
-        tickerInfoDiv.innerHTML = window.FieldRendererService.renderTickerInfo(ticker);
+        tickerInfoHtml = await window.FieldRendererService.renderTickerInfo(ticker);
       } else if (window.renderTickerInfo) {
-        tickerInfoDiv.innerHTML = window.renderTickerInfo(ticker, 'ticker-info-display');
+        tickerInfoHtml = await window.renderTickerInfo(ticker, 'ticker-info-display');
       } else {
-        tickerInfoDiv.innerHTML = `
+        tickerInfoHtml = `
           <div class="ticker-info-display">
             <div class="d-flex flex-wrap align-items-center gap-2">
               <strong>${(ticker.currency_symbol || '$')}${(ticker.current_price || 0).toFixed(2)}</strong>
@@ -4039,6 +4525,13 @@ function displayAlertTickerInfo(ticker) {
             </div>
           </div>
         `;
+      }
+      if (tickerInfoHtml) {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(tickerInfoHtml, 'text/html');
+        doc.body.childNodes.forEach(node => {
+          tickerInfoDiv.appendChild(node.cloneNode(true));
+        });
       }
     }
     window.Logger?.info?.('✅ [displayAlertTickerInfo] Ticker rendered (primary containers)', {
@@ -4074,12 +4567,21 @@ function displayAlertTickerInfo(ticker) {
     }
   }
   
+  legacyTickerInfoDiv.textContent = '';
+  let tickerInfoHtml = '';
   if (window.FieldRendererService && window.FieldRendererService.renderTickerInfo) {
-    legacyTickerInfoDiv.innerHTML = window.FieldRendererService.renderTickerInfo(ticker);
+    tickerInfoHtml = await window.FieldRendererService.renderTickerInfo(ticker);
   } else {
-    legacyTickerInfoDiv.innerHTML = window.renderTickerInfo
-      ? window.renderTickerInfo(ticker, 'ticker-info-display')
+    tickerInfoHtml = window.renderTickerInfo
+      ? await window.renderTickerInfo(ticker, 'ticker-info-display')
       : `<strong>${ticker.symbol || 'N/A'}</strong>`;
+  }
+  if (tickerInfoHtml) {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(tickerInfoHtml, 'text/html');
+    doc.body.childNodes.forEach(node => {
+      legacyTickerInfoDiv.appendChild(node.cloneNode(true));
+    });
   }
   window.Logger?.info?.('✅ [displayAlertTickerInfo] Ticker rendered (legacy)', {}, { page: "alerts" });
 }
@@ -4104,7 +4606,7 @@ function clearAlertTickerInfo() {
   }
   
   if (tickerInfoDiv) {
-    tickerInfoDiv.innerHTML = '';
+    tickerInfoDiv.textContent = '';
   }
   
   if (legacyTickerInfoDiv) {
@@ -4219,5 +4721,31 @@ window.registerAlertsTables = function() {
         defaultSort: { columnIndex: 6, direction: 'desc', key: 'created_at' }
     });
 };
+
+// === EOD INTEGRATION: Load EOD alerts data ===
+async function loadEODAlertsData() {
+    try {
+        window.Logger?.debug('🔍 Alerts Page - טוען התראות EOD');
+
+        // Load EOD alerts from the API
+        const eodAlerts = await window.EODIntegrationHelper.loadEODAlerts({
+            limit: 50,
+            date_from: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] // Last 30 days
+        });
+
+        if (window.Logger && eodAlerts && eodAlerts.data && eodAlerts.data.length > 0) {
+            window.Logger.info(`✅ Loaded EOD alerts: ${eodAlerts.data.length} alerts`, {
+                page: 'alerts'
+            });
+        }
+
+        return eodAlerts;
+
+    } catch (error) {
+        window.Logger?.error('❌ Failed to load EOD alerts data:', error);
+        return { data: [], status: 'error', message: error.message };
+    }
+}
+
 window.clearAlertTickerInfo = clearAlertTickerInfo;
 // Note: saveAlert and deleteAlert removed - using ModalManagerV2 and confirmDeleteAlert instead

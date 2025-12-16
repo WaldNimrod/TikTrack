@@ -10,6 +10,75 @@
  * @author TikTrack
  */
 (function () {
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - createContext() - Createcontext
+
+// === Event Handlers ===
+// - getSelectedOptionText() - Getselectedoptiontext
+// - getPriceFromContext() - Getpricefromcontext
+// - handler() - Handler
+// - handleQuantityCommit() - Handlequantitycommit
+// - handleStopPercentCommit() - Handlestoppercentcommit
+// - handleTargetPercentCommit() - Handletargetpercentcommit
+// - handleAmountCommit() - Handleamountcommit
+// - handleSideChange() - Handlesidechange
+// - handleTickerChange() - Handletickerchange
+
+// === UI Functions ===
+// - parseDisplayValue() - Parsedisplayvalue
+// - formatQuantityDisplay() - Formatquantitydisplay
+// - formatCurrencyDisplay() - Formatcurrencydisplay
+// - formatRatioDisplay() - Formatratiodisplay
+// - renderAmountWithVariant() - Renderamountwithvariant
+// - updatePercentFromPrices() - Updatepercentfromprices
+// - updatePriceFromPercent() - Updatepricefrompercent
+// - renderSideDisplay() - Rendersidedisplay
+// - renderSummaryCard() - Rendersummarycard
+// - updateSummary() - Updatesummary
+// - updateFromAmount() - Updatefromamount
+// - updateFromQuantity() - Updatefromquantity
+
+// === Data Functions ===
+// - computeTargetPercent() - Computetargetpercent
+// - computeSummaryData() - Computesummarydata
+// - getRiskCacheKey() - Getriskcachekey
+// - loadDefaultRiskPercents() - Loaddefaultriskpercents
+// - markTargetPercentModified() - Marktargetpercentmodified
+// - syncTargetPercent() - Synctargetpercent
+
+// === Utility Functions ===
+// - parseNumericString() - Parsenumericstring
+// - parseInputValue() - Parseinputvalue
+// - formatPercent() - Formatpercent
+// - formatAmount() - Formatamount
+// - formatQuantity() - Formatquantity
+
+// === Other ===
+// - resolveElement() - Resolveelement
+// - isPositiveNumber() - Ispositivenumber
+// - computeStopPercent() - Computestoppercent
+// - computePriceFromPercent() - Computepricefrompercent
+// - normalizeSide() - Normalizeside
+// - escapeHtmlText() - Escapehtmltext
+// - computeQuantityFromInvestment() - Computequantityfrominvestment
+// - computeInvestmentFromQuantity() - Computeinvestmentfromquantity
+// - markFieldAsUserModified() - Markfieldasusermodified
+// - markFieldAsSystemGenerated() - Markfieldassystemgenerated
+// - attachRiskListeners() - Attachrisklisteners
+// - applyDefaultRiskLevels() - Applydefaultrisklevels
+// - withLock() - Withlock
+// - syncValues() - Syncvalues
+// - attachListeners() - Attachlisteners
+// - applyValue() - Applyvalue
+// - promise() - Promise
+// - markQuantityModified() - Markquantitymodified
+// - markStopPercentModified() - Markstoppercentmodified
+// - syncStopPercent() - Syncstoppercent
+// - markAmountModified() - Markamountmodified
+
     'use strict';
 
     const DEFAULT_OPTIONS = {
@@ -353,7 +422,17 @@
             }
 
             if (percentValue === null || !Number.isFinite(percentValue)) {
-                input.value = '';
+                // Use DataCollectionService to clear field if available
+                if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+                  window.DataCollectionService.setValue(input.id, '', 'text');
+                } else {
+                  // Use DataCollectionService to clear field if available
+                  if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+                    window.DataCollectionService.setValue(input.id, '', 'text');
+                  } else {
+                    input.value = '';
+                  }
+                }
                 if (systemGenerated) {
                     delete input.dataset.userModified;
                     delete input.dataset.systemGenerated;
@@ -361,7 +440,12 @@
                 return;
             }
 
-            input.value = formatPercent(percentValue, context.options);
+            // Use DataCollectionService to set value if available
+            if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+              window.DataCollectionService.setValue(input.id, formatPercent(percentValue, context.options), 'text');
+            } else {
+              input.value = formatPercent(percentValue, context.options);
+            }
 
             if (systemGenerated) {
                 input.dataset.systemGenerated = 'true';
@@ -399,7 +483,17 @@
 
         const rawValue = typeof percentInput.value === 'string' ? percentInput.value.trim() : '';
         if (rawValue === '') {
-            priceInput.value = '';
+            // Use DataCollectionService to clear field if available
+            if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+              window.DataCollectionService.setValue(priceInput.id, '', 'text');
+            } else {
+              // Use DataCollectionService to clear field if available
+              if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+                window.DataCollectionService.setValue(priceInput.id, '', 'text');
+              } else {
+                priceInput.value = '';
+              }
+            }
             delete priceInput.dataset.systemGenerated;
             return true;
         }
@@ -412,7 +506,12 @@
             return false;
         }
 
-        priceInput.value = computedPrice.toFixed(context.options.amountDecimals ?? DEFAULT_OPTIONS.amountDecimals);
+        // Use DataCollectionService to set value if available
+        if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+          window.DataCollectionService.setValue(priceInput.id, computedPrice.toFixed(context.options.amountDecimals ?? DEFAULT_OPTIONS.amountDecimals), 'number');
+        } else {
+          priceInput.value = computedPrice.toFixed(context.options.amountDecimals ?? DEFAULT_OPTIONS.amountDecimals);
+        }
         markFieldAsSystemGenerated(priceInput);
         return true;
     }
@@ -582,7 +681,7 @@
             }
         ];
 
-        context.summaryElement.innerHTML = '';
+        context.summaryElement.textContent = '';
 
         const container = document.createElement('div');
         container.classList.add('risk-summary-card', 'summary-card');
@@ -639,17 +738,24 @@
 
             switch (field.valueType) {
                 case 'html':
-                    td.innerHTML = field.value || '-';
+                    td.textContent = field.value || '-';
                     break;
                 case 'amount':
-                    td.innerHTML = renderAmountWithVariant(field.value, { currencySymbol, amountDecimals }, 'neutral');
+                    td.textContent = '';
+                    const amountHTML = renderAmountWithVariant(field.value, { currencySymbol, amountDecimals }, 'neutral');
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(amountHTML, 'text/html');
+                    doc.body.childNodes.forEach(node => {
+                        td.appendChild(node.cloneNode(true));
+                    });
                     break;
                 case 'riskRewardSummary': {
                     const riskHtml = renderAmountWithVariant(summaryData.riskAmount, { currencySymbol, amountDecimals }, 'negative');
                     const rewardHtml = renderAmountWithVariant(summaryData.rewardAmount, { currencySymbol, amountDecimals }, 'positive');
                     const ratioHtml = escapeHtmlText(ratioText);
 
-                    td.innerHTML = `
+                    td.textContent = '';
+                    const riskRewardHTML = `
                         <div class="risk-summary-card__risk-reward" style="display: flex; flex-direction: column; gap: 6px; align-items: center;">
                             <div class="risk-summary-card__risk-reward-row" style="display: flex; gap: 12px; align-items: center; justify-content: center;">
                                 <span>${riskHtml}</span>
@@ -661,6 +767,11 @@
                             </div>
                         </div>
                     `;
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(riskRewardHTML, 'text/html');
+                    doc.body.childNodes.forEach(node => {
+                        td.appendChild(node.cloneNode(true));
+                    });
                     break;
                 }
                 case 'text': {
@@ -668,7 +779,11 @@
                         ? '-'
                         : field.value;
                     if (field.direction === 'ltr') {
-                        td.innerHTML = `<span dir="ltr">${escapeHtmlText(safeValue)}</span>`;
+                        td.textContent = '';
+                        const span = document.createElement('span');
+                        span.setAttribute('dir', 'ltr');
+                        span.textContent = escapeHtmlText(safeValue);
+                        td.appendChild(span);
                     } else {
                         td.textContent = safeValue;
                     }
@@ -792,7 +907,12 @@
                 if (force || !stopInput.dataset.userModified) {
                     const stopPrice = price * (1 - stopPercent / 100);
                     if (isPositiveNumber(stopPrice)) {
-                        stopInput.value = stopPrice.toFixed(2);
+                        // Use DataCollectionService to set value if available
+                        if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+                          window.DataCollectionService.setValue(stopInput.id, stopPrice.toFixed(2), 'number');
+                        } else {
+                          stopInput.value = stopPrice.toFixed(2);
+                        }
                         stopInput.dataset.systemGenerated = 'true';
                         if (force && options.resetUserModified !== false) {
                             delete stopInput.dataset.userModified;
@@ -805,7 +925,12 @@
                 if (force || !targetInput.dataset.userModified) {
                     const targetPrice = price * (1 + targetPercent / 100);
                     if (isPositiveNumber(targetPrice)) {
-                        targetInput.value = targetPrice.toFixed(2);
+                        // Use DataCollectionService to set value if available
+                        if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+                          window.DataCollectionService.setValue(targetInput.id, targetPrice.toFixed(2), 'number');
+                        } else {
+                          targetInput.value = targetPrice.toFixed(2);
+                        }
                         targetInput.dataset.systemGenerated = 'true';
                         if (force && options.resetUserModified !== false) {
                             delete targetInput.dataset.userModified;
@@ -850,7 +975,12 @@
 
         if (!isPositiveNumber(amountValue)) {
             if (context.quantityInput) {
-                context.quantityInput.value = '';
+                // Use DataCollectionService to clear field if available
+                if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+                  window.DataCollectionService.setValue(context.quantityInput.id, '', 'text');
+                } else {
+                  context.quantityInput.value = '';
+                }
             }
             updateSummary(context);
             return;
@@ -882,7 +1012,12 @@
 
         if (!isPositiveNumber(quantityValue)) {
             if (context.amountInput) {
-                context.amountInput.value = '';
+                // Use DataCollectionService to clear field if available
+                if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+                  window.DataCollectionService.setValue(context.amountInput.id, '', 'text');
+                } else {
+                  context.amountInput.value = '';
+                }
             }
             updateSummary(context);
             return;
@@ -896,7 +1031,12 @@
                 context.amountInput.value = formatAmount(amount, context.options);
                 markFieldAsSystemGenerated(context.amountInput);
             } else {
-                context.amountInput.value = '';
+                // Use DataCollectionService to clear field if available
+                if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+                  window.DataCollectionService.setValue(context.amountInput.id, '', 'text');
+                } else {
+                  context.amountInput.value = '';
+                }
                 delete context.amountInput.dataset.systemGenerated;
             }
         }

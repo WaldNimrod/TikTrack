@@ -5,6 +5,7 @@ from services.validation_service import ValidationService
 from services.advanced_cache_service import cache_for, invalidate_cache
 from services.date_normalization_service import DateNormalizationService
 from services.preferences_service import PreferencesService
+from services.business_logic import NoteBusinessService
 import logging
 import os
 import uuid
@@ -131,16 +132,26 @@ def _get_notes_normalizer() -> DateNormalizationService:
     return DateNormalizationService(timezone_name)
 
 @notes_bp.route('/', methods=['GET'])
+@handle_database_session()
 def get_notes():
-    """Get all notes"""
+    """Get all notes (filtered by user_id if authenticated)"""
     try:
         logger.info("🔄 Starting get_notes function")
-        db = next(get_db())
+        db: Session = g.db
         logger.info("✅ Database connection established")
+        
+        # Get user_id from Flask context (set by auth middleware)
+        user_id = getattr(g, 'user_id', None)
+        logger.info(f"🔍 User ID from context: {user_id}")
         
         # Use SQLAlchemy ORM to ensure correct column mapping
         try:
-            notes = db.query(Note).order_by(Note.created_at.desc()).all()
+            query = db.query(Note).order_by(Note.created_at.desc())
+            # Filter by user_id if authenticated
+            if user_id is not None:
+                query = query.filter(Note.user_id == user_id)
+                logger.info(f"✅ Filtering notes by user_id: {user_id}")
+            notes = query.all()
             logger.info(f"✅ Successfully retrieved {len(notes)} notes using ORM")
             
             # Convert to dictionaries using to_dict() which handles column mapping correctly
@@ -189,16 +200,22 @@ def get_notes():
             "error": {"message": f"Failed to retrieve notes: {str(e)}"},
             "version": "1.0"
         }), 500
-    finally:
-        if 'db' in locals():
-            db.close()
+    # Don't close db here - handle_database_session decorator will do it
 
 @notes_bp.route('/<int:note_id>', methods=['GET'])
+@handle_database_session()
 def get_note(note_id: int):
-    """Get note by ID"""
+    """Get note by ID (filtered by user_id if authenticated)"""
     try:
-        db = next(get_db())
-        note = db.query(Note).filter(Note.id == note_id).first()
+        db: Session = g.db
+        # Get user_id from Flask context (set by auth middleware)
+        user_id = getattr(g, 'user_id', None)
+        
+        query = db.query(Note).filter(Note.id == note_id)
+        # Filter by user_id if authenticated
+        if user_id is not None:
+            query = query.filter(Note.user_id == user_id)
+        note = query.first()
         if note:
             normalizer = _get_notes_normalizer()
             payload = normalizer.normalize_output(note.to_dict())
@@ -221,8 +238,7 @@ def get_note(note_id: int):
             "error": {"message": "Failed to retrieve note"},
             "version": "1.0"
         }), 500
-    finally:
-        db.close()
+    # Don't close db here - handle_database_session decorator will do it
 
 @notes_bp.route('/', methods=['POST'])
 @handle_database_session(auto_commit=True, auto_close=True)
@@ -230,6 +246,12 @@ def get_note(note_id: int):
 def create_note():
     """Create new note"""
     try:
+        # Log initial request details
+        logger.info(f"🔄 Creating note - Request method: {request.method}, Content-Type: {request.content_type}")
+        logger.debug(f"📋 Request JSON: {request.get_json() if request.is_json else 'Not JSON'}")
+        logger.debug(f"📋 Request form: {dict(request.form) if request.form else 'No form data'}")
+        logger.debug(f"📋 Request files: {list(request.files.keys()) if request.files else 'No files'}")
+        
         # Use the session from the decorator (in g.db)
         db: Session = g.db
         
@@ -242,6 +264,7 @@ def create_note():
             if file and file.filename:
                 # Check file size
                 if file.content_length and file.content_length > MAX_FILE_SIZE:
+                    logger.warning(f"⚠️ File too large: {file.content_length} bytes")
                     return jsonify({
                         "status": "error",
                         "error": {"message": "File too large. Maximum size is 512KB"},
@@ -250,30 +273,130 @@ def create_note():
                 
                 attachment_filename = save_uploaded_file(file)
                 if not attachment_filename:
+                    logger.warning(f"⚠️ Invalid file type: {file.filename}")
                     return jsonify({
                         "status": "error",
                         "error": {"message": "Invalid file type. Allowed: JPG, PNG, GIF, PDF"},
                         "version": "1.0"
                     }), 400
+                logger.info(f"📎 Attachment saved: {attachment_filename}")
             
             # Get data from form data
             content = request.form.get('content', '')
+            logger.debug(f"🔍 DEBUG: Content from form - type: {type(content)}, length: {len(content) if content else 0}")
+            logger.debug(f"🔍 DEBUG: Content preview: {content[:100] if content else 'None'}...")
+            
+            # Check content before sanitization
+            if not content or len(content.strip()) == 0:
+                logger.warning(f"⚠️ Empty content received from form. Request form keys: {list(request.form.keys())}")
+                return jsonify({
+                    "status": "error",
+                    "error": {"message": "Note content is required"},
+                    "version": "1.0"
+                }), 400
+            
             # Sanitize HTML content
-            content = BaseEntityUtils.sanitize_rich_text(content)
+            if content:
+                original_length = len(content)
+                content = BaseEntityUtils.sanitize_rich_text(content)
+                if content and len(content) != original_length:
+                    logger.warning(f"⚠️ Content length changed after sanitization: {original_length} -> {len(content)}")
+                logger.info(f"📝 Content extracted from form: length={len(content) if content else 0}, has_content={bool(content)}")
+            else:
+                logger.error(f"❌ Content is None from form - cannot sanitize. Request form keys: {list(request.form.keys())}")
+                content = None
+            
             related_type_id = request.form.get('related_type_id')
             related_id = request.form.get('related_id')
         else:
-            # Get data from JSON
-            data = request.get_json()
-            content = data.get('content', '')
-            # Sanitize HTML content
-            content = BaseEntityUtils.sanitize_rich_text(content)
-            related_type_id = data.get('related_type_id')
-            related_id = data.get('related_id')
-            attachment_filename = data.get('attachment')
+            # Get data from JSON - try multiple methods
+            # IMPORTANT: Use get_data() directly to bypass normalization that might affect content
+            data = None
+            try:
+                # First try: get raw data and parse manually (bypasses _normalized_get_json)
+                raw_data = request.get_data(as_text=True)
+                if raw_data:
+                    import json
+                    data = json.loads(raw_data)
+                    logger.info(f"🔍 DEBUG: Manual JSON parse from get_data() returned: {data}")
+                else:
+                    logger.warning(f"⚠️ get_data() returned empty, trying get_json()")
+                    # Fallback: try get_json (with normalization)
+                    data = request.get_json(force=True, silent=True)
+                    logger.info(f"🔍 DEBUG: get_json(force=True, silent=True) returned: {data}")
+            except Exception as e:
+                logger.warning(f"⚠️ Manual JSON parse failed: {e}, trying get_json()")
+                # Final fallback: try get_json
+                try:
+                    data = request.get_json(force=True, silent=True)
+                    logger.info(f"🔍 DEBUG: get_json fallback returned: {data}")
+                except Exception as e2:
+                    logger.error(f"❌ get_json also failed: {e2}")
+                    data = None
+            
+            logger.info(f"🔍 DEBUG: Final data: {data}")
+            logger.info(f"🔍 DEBUG: Request content-type: {request.content_type}")
+            logger.info(f"🔍 DEBUG: Request is_json: {request.is_json}")
+            
+            # Extract content - handle both 'content' and potential other field names
+            content = None
+            if data:
+                content = data.get('content') or data.get('note') or data.get('text') or ''
+                # Convert to string if not already
+                if content is not None:
+                    content = str(content).strip()
+                else:
+                    content = ''
+            else:
+                logger.error(f"❌ No data received from request!")
+                content = ''
+            
+            logger.info(f"🔍 DEBUG: Content from JSON - type: {type(content)}, length: {len(content) if content else 0}")
+            logger.info(f"🔍 DEBUG: Content value: {content[:100] if content else 'None'}...")
+            
+            # Check content before sanitization
+            if not content or len(content.strip()) == 0:
+                logger.warning(f"⚠️ Empty content received from JSON. Request data keys: {list(data.keys()) if data else 'None'}")
+                logger.debug(f"🔍 DEBUG: Full request data: {data}")
+                return jsonify({
+                    "status": "error",
+                    "error": {"message": "Note content is required"},
+                    "version": "1.0"
+                }), 400
+            
+            # Sanitize HTML content - but preserve original if sanitization fails
+            if content:
+                original_content = content
+                original_length = len(content)
+                sanitized_content = BaseEntityUtils.sanitize_rich_text(content)
+                # Check if sanitization removed all content
+                if sanitized_content and len(sanitized_content.strip()) > 0:
+                    content = sanitized_content
+                    if len(content) != original_length:
+                        logger.warning(f"⚠️ Content length changed after sanitization: {original_length} -> {len(content)}")
+                    logger.info(f"📝 Content extracted from JSON: length={len(content) if content else 0}, has_content={bool(content)}")
+                else:
+                    # Sanitization removed all content - use original if it was valid
+                    logger.warning(f"⚠️ Sanitization removed all content, using original")
+                    content = original_content.strip() if original_content else ''
+                    if not content or len(content.strip()) == 0:
+                        logger.error(f"❌ Content is empty after sanitization. Original: {original_content[:50]}")
+                        return jsonify({
+                            "status": "error",
+                            "error": {"message": "Note content is required and cannot be empty"},
+                            "version": "1.0"
+                        }), 400
+            else:
+                logger.error(f"❌ Content is None - cannot sanitize. Request data: {data}")
+                content = ''
+            
+            related_type_id = data.get('related_type_id') if data else None
+            related_id = data.get('related_id') if data else None
+            attachment_filename = data.get('attachment') if data else None
         
         # Determine relation using related_type_id and related_id
         if not related_type_id or not related_id:
+            logger.warning(f"⚠️ Missing relation data - related_type_id: {related_type_id}, related_id: {related_id}")
             return jsonify({
                 "status": "error",
                 "error": {"message": "Note must have related_type_id and related_id"},
@@ -283,26 +406,55 @@ def create_note():
         # Validate related_type_id
         valid_types = [1, 2, 3, 4]  # account, trade, trade_plan, ticker
         if int(related_type_id) not in valid_types:
+            logger.warning(f"⚠️ Invalid related_type_id: {related_type_id}")
             return jsonify({
                 "status": "error",
                 "error": {"message": "Invalid related_type_id. Must be: 1 (account), 2 (trade), 3 (trade_plan), or 4 (ticker)"},
                 "version": "1.0"
             }), 400
         
+        # Get user_id from Flask context (set by auth middleware)
+        user_id = getattr(g, 'user_id', None)
+        logger.debug(f"🔍 DEBUG: User ID from context: {user_id}, Type: {type(user_id)}")
+        if not user_id:
+            logger.error("❌ User ID not found in Flask context - user not authenticated")
+            return jsonify({
+                "status": "error",
+                "error": {"message": "User authentication required"},
+                "version": "1.0"
+            }), 401
+        logger.info(f"✅ User ID verified: {user_id}")
+        
+        # Validate content exists before creating note_data
+        if not content or (isinstance(content, str) and len(content.strip()) == 0):
+            logger.error(f"❌ Content is empty or None - cannot create note. Content type: {type(content)}, Content value: {content[:100] if content else 'None'}")
+            return jsonify({
+                "status": "error",
+                "error": {"message": "Note content is required and cannot be empty"},
+                "version": "1.0"
+            }), 400
+        
         # Create note with new structure
         note_data = {
+            'user_id': user_id,
             'content': content,
             'attachment': attachment_filename,
             'related_type_id': related_type_id,
             'related_id': related_id
         }
+        content_length = len(content) if content else 0
+        logger.debug(f"📋 Note data prepared: user_id={note_data['user_id']}, content_length={content_length}, related_type_id={note_data['related_type_id']}, related_id={note_data['related_id']}")
+        logger.info(f"✅ Note data prepared with: content_length={content_length}, related_type_id={related_type_id}, related_id={related_id}, user_id={user_id}")
         
-        # Validate data against constraints
-        logger.info("Validating note data before creation")
-        is_valid, errors = ValidationService.validate_data(db, 'notes', note_data)
-        if not is_valid:
-            error_message = "; ".join(errors)
-            logger.error(f"Note validation failed: {error_message}")
+        # Initialize Business Logic Service and validate
+        logger.info("🔄 Validating note data using Business Logic Layer")
+        note_service = NoteBusinessService(db_session=db)
+        validation_result = note_service.validate(note_data)
+        
+        if not validation_result['is_valid']:
+            error_message = "; ".join(validation_result['errors'])
+            logger.error(f"❌ Note business validation failed: {error_message}")
+            logger.debug(f"🔍 DEBUG: Validation result: {validation_result}")
             # Delete file if validation failed
             if attachment_filename:
                 delete_uploaded_file(attachment_filename)
@@ -312,10 +464,17 @@ def create_note():
                 "version": "1.0"
             }), 400
         
+        logger.info(f"✅ Validation passed: {validation_result['is_valid']}")
+        logger.debug(f"🔍 DEBUG: Validation result: {validation_result}")
+        
+        # Create note in database
+        logger.info("💾 Creating note in database...")
         note = Note(**note_data)
         db.add(note)
         db.commit()
         db.refresh(note)
+        
+        logger.info(f"✅ Note created successfully: id={note.id}")
         normalizer = _get_notes_normalizer()
         payload = normalizer.normalize_output(note.to_dict())
         return jsonify({
@@ -326,7 +485,7 @@ def create_note():
             "version": "1.0"
         }), 201
     except Exception as e:
-        logger.error(f"Error creating note: {str(e)}")
+        logger.error(f"❌ Error creating note: {str(e)}", exc_info=True)
         # Delete file if there was an error creating the note
         if 'attachment_filename' in locals() and attachment_filename:
             delete_uploaded_file(attachment_filename)
@@ -350,9 +509,19 @@ def update_note(note_id: int):
         logger.info(f"📋 Request form: {dict(request.form) if request.form else 'No form data'}")
         logger.info(f"📋 Request JSON: {request.get_json() if request.is_json else 'Not JSON'}")
         
+        # Get user_id from Flask context (set by auth middleware)
+        user_id = getattr(g, 'user_id', None)
+        
+        if user_id is None:
+            return jsonify({
+                "status": "error",
+                "error": {"message": "User authentication required"},
+                "version": "1.0"
+            }), 401
+        
         # Use the session from the decorator (in g.db)
         db: Session = g.db
-        note = db.query(Note).filter(Note.id == note_id).first()
+        note = db.query(Note).filter(Note.id == note_id, Note.user_id == user_id).first()
         if note:
             logger.info(f"✅ Found note: {note.id}")
             
@@ -526,9 +695,19 @@ def update_note(note_id: int):
 def delete_note(note_id: int):
     """Delete note"""
     try:
+        # Get user_id from Flask context (set by auth middleware)
+        user_id = getattr(g, 'user_id', None)
+        
+        if user_id is None:
+            return jsonify({
+                "status": "error",
+                "error": {"message": "User authentication required"},
+                "version": "1.0"
+            }), 401
+        
         # Use the session from the decorator (in g.db)
         db: Session = g.db
-        note = db.query(Note).filter(Note.id == note_id).first()
+        note = db.query(Note).filter(Note.id == note_id, Note.user_id == user_id).first()
         if note:
             # Delete attached file if exists
             if note.attachment:

@@ -9,6 +9,32 @@
  * @lastUpdated September 4, 2025
  */
 
+// ===== FUNCTION INDEX =====
+
+// === Object Methods ===
+// - init() - Initialize system management
+// - loadSystemData() - Load system data
+// - updateDashboard() - Update dashboard with data
+// - loadEODJobManagementData() - Load EOD job management data
+// - updateEODJobHistory() - Update EOD job history
+// - updateEODJobStatus() - Update EOD job status
+// - updateEODAlertsManagement() - Update EOD alerts management
+// - triggerEODJob() - Trigger EOD job
+
+// === Static Methods ===
+// - initializeDashboard() - Initialize dashboard
+// - setupEventListeners() - Setup event listeners
+// - refreshSystemData() - Refresh system data
+// - showNotification() - Show notification
+
+// === Global Functions ===
+// - copyDetailedLog() - Copy detailed log
+// - viewEODJobDetails() - View EOD job details
+// - cancelEODJob() - Cancel EOD job
+// - viewEODAlertDetails() - View EOD alert details
+// - resolveEODAlert() - Resolve EOD alert
+// - triggerEODRecalculation() - Trigger EOD recalculation
+
 class SystemManagement {
   constructor() {
     this.isInitialized = false;
@@ -36,7 +62,7 @@ class SystemManagement {
     SystemManagement.setupEventListeners();
 
     this.isInitialized = true;
-    console.log('✅ System Management - Initialized successfully');
+    window.Logger?.debug('✅ System Management - Initialized successfully');
   }
 
   /**
@@ -44,7 +70,7 @@ class SystemManagement {
    * רענון נתוני מערכת
    */
   static refreshSystemData() {
-    console.log('🔄 Refreshing system data...');
+    window.Logger?.debug('🔄 Refreshing system data...');
     const systemManagement = new SystemManagement();
     systemManagement.loadSystemData();
   }
@@ -54,7 +80,7 @@ class SystemManagement {
    * הרצת בדיקת מערכת
    */
   static async runSystemCheck() {
-    console.log('🔍 Running comprehensive system check...');
+    window.Logger?.debug('🔍 Running comprehensive system check...');
 
     try {
       // Show loading notification only for long process start
@@ -406,13 +432,13 @@ class SystemManagement {
       SystemManagement.showNotification(overallMessage, overallStatus);
 
       // Log detailed results
-      console.log('📊 System Check Results:', checkResults);
+      window.Logger?.debug('📊 System Check Results:', checkResults);
 
       // Update results display in the page
       SystemManagement.updateCheckResultsDisplay(resultsContainer, checkResults);
 
     } catch (error) {
-      console.error('❌ System check failed:', error);
+      window.Logger?.error('❌ System check failed:', error);
       SystemManagement.showNotification(`שגיאה בבדיקת מערכת: ${error.message}`, 'error');
     }
   }
@@ -422,7 +448,7 @@ class SystemManagement {
    * ניקוי מטמון
    */
   static clearCache() {
-    console.log('🗑️ Clearing cache...');
+    window.Logger?.debug('🗑️ Clearing cache...');
     // Use global cache clearing function
     if (typeof window.clearAllCache === 'function') {
       window.clearAllCache();
@@ -437,7 +463,7 @@ class SystemManagement {
    * הפעלת גיבוי מערכת
    */
   static async runBackup() {
-    console.log('💾 Starting system backup...');
+    window.Logger?.debug('💾 Starting system backup...');
 
     try {
     // Show loading notification
@@ -459,7 +485,7 @@ class SystemManagement {
           `גיבוי הושלם בהצלחה! קובץ: ${backupData.backup_filename} (${backupData.backup_size_mb} MB)`,
           'success',
         );
-        console.log('✅ System backup completed successfully:', backupData);
+        window.Logger?.debug('✅ System backup completed successfully:', backupData);
 
         // Refresh system data to show updated backup info
         if (window.systemManagement) {
@@ -470,7 +496,7 @@ class SystemManagement {
       }
 
     } catch (error) {
-      console.error('❌ Backup failed:', error);
+      window.Logger?.error('❌ Backup failed:', error);
       SystemManagement.showNotification(`שגיאה בגיבוי: ${error.message}`, 'error');
     }
   }
@@ -480,7 +506,7 @@ class SystemManagement {
    * שחזור מגיבוי
    */
   static async restoreFromBackup() {
-    console.log('🔄 Starting restore from backup...');
+    window.Logger?.debug('🔄 Starting restore from backup...');
 
     try {
       // Get list of available backups
@@ -512,7 +538,23 @@ class SystemManagement {
       האם אתה בטוח שברצונך להמשיך?
     `;
 
-      if (confirm(confirmMessage)) {
+      let confirmed = false;
+      if (typeof window.showConfirmationDialog === 'function') {
+        confirmed = await new Promise(resolve => {
+          window.showConfirmationDialog(
+            'שחזור מגיבוי',
+            confirmMessage,
+            () => resolve(true),
+            () => resolve(false),
+            'danger'
+          );
+        });
+      } else {
+        // Fallback למקרה שמערכת התראות לא זמינה
+        confirmed = window.showConfirmationDialog(confirmMessage);
+      }
+
+      if (confirmed) {
       // Show loading notification
         SystemManagement.showNotification('מתחיל שחזור מגיבוי...', 'warning');
 
@@ -531,7 +573,7 @@ class SystemManagement {
 
         if (result.status === 'success') {
           SystemManagement.showNotification('שחזור הושלם בהצלחה! המערכת תפעיל מחדש...', 'success');
-          console.log('✅ System restore completed successfully:', result.data);
+          window.Logger?.debug('✅ System restore completed successfully:', result.data);
 
           // Refresh page after successful restore
           setTimeout(() => {
@@ -542,11 +584,11 @@ class SystemManagement {
         }
       } else {
         SystemManagement.showNotification('שחזור בוטל על ידי המשתמש', 'info');
-        console.log('❌ System restore cancelled by user');
+        window.Logger?.debug('❌ System restore cancelled by user');
       }
 
     } catch (error) {
-      console.error('❌ Restore failed:', error);
+      window.Logger?.error('❌ Restore failed:', error);
       SystemManagement.showNotification(`שגיאה בשחזור: ${error.message}`, 'error');
     }
   }
@@ -559,7 +601,7 @@ class SystemManagement {
     if (typeof window.showNotification === 'function') {
       window.showNotification(message, type);
     } else {
-      console.log(`📢 ${type.toUpperCase()}: ${message}`);
+      window.Logger?.debug(`📢 ${type.toUpperCase()}: ${message}`);
     }
   }
 
@@ -578,7 +620,8 @@ class SystemManagement {
     const container = document.createElement('div');
     container.id = 'system-check-results';
     container.className = 'system-check-results-container';
-    container.innerHTML = `
+    // Build container HTML and insert using tempDiv
+    const containerHTML = `
       <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
           <h5 class="mb-0">
@@ -607,6 +650,11 @@ class SystemManagement {
         </div>
       </div>
     `;
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(containerHTML, 'text/html');
+    doc.body.childNodes.forEach(node => {
+      container.appendChild(node.cloneNode(true));
+    });
 
     // Insert after the Quick Actions section (in the top section)
     const quickActions = document.querySelector('.quick-actions');
@@ -636,6 +684,8 @@ class SystemManagement {
     resultsContent.style.display = 'block';
 
     // Calculate summary
+    // Note: This is a system check results display, not a standard summary element
+    // Using filter for counting is acceptable here as it's specific to check results structure
     const successCount = checkResults.checks.filter(c => c.status === 'success').length;
     const warningCount = checkResults.checks.filter(c => c.status === 'warning').length;
     const errorCount = checkResults.checks.filter(c => c.status === 'error').length;
@@ -662,7 +712,9 @@ class SystemManagement {
     };
 
     // Build results content
-    resultsContent.innerHTML = `
+    // Note: This innerHTML is for system check results display (cards + accordion), not a standard summary element
+    // Using tempDiv for complex HTML structure
+    const resultsHTML = `
       <!-- Summary Cards -->
       <div class="row mb-4">
         <div class="col-md-3">
@@ -743,6 +795,13 @@ class SystemManagement {
         <small>זמן בדיקה: ${new Date(checkResults.timestamp).toLocaleString('he-IL')}</small>
       </div>
     `;
+    // Insert using tempDiv
+    resultsContent.textContent = '';
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(resultsHTML, 'text/html');
+    doc.body.childNodes.forEach(node => {
+      resultsContent.appendChild(node.cloneNode(true));
+    });
 
     // Store results globally for copying
     window.lastCheckResults = checkResults;
@@ -755,7 +814,7 @@ class SystemManagement {
    * Show detailed check results
    * הצגת תוצאות בדיקה מפורטות
    */
-  static showDetailedCheckResults(checkResults) {
+  static async showDetailedCheckResults(checkResults) {
     // Create modal for detailed results
     const modalId = 'system-check-results-modal';
     let modal = document.getElementById(modalId);
@@ -769,6 +828,8 @@ class SystemManagement {
     }
 
     // Calculate summary
+    // Note: This is a system check results display, not a standard summary element
+    // Using filter for counting is acceptable here as it's specific to check results structure
     const successCount = checkResults.checks.filter(c => c.status === 'success').length;
     const warningCount = checkResults.checks.filter(c => c.status === 'warning').length;
     const errorCount = checkResults.checks.filter(c => c.status === 'error').length;
@@ -795,7 +856,10 @@ class SystemManagement {
     };
 
     // Build modal content
-    modal.innerHTML = `
+    // Note: This innerHTML is for system check results modal display, not a standard summary element
+    // Consider refactoring to use createElement for better security if this becomes a security concern
+    modal.textContent = '';
+    const modalHTML = `
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
           <div class="modal-header">
@@ -895,10 +959,58 @@ class SystemManagement {
       </div>
     `;
 
-    // Show modal
-    const bsModal = new bootstrap.Modal(modal);
-    bsModal.show();
-
+    // Show modal via ModalManagerV2 (supports dynamic modals)
+    if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
+        try {
+            await window.ModalManagerV2.showModal(modalId, 'view');
+        } catch (error) {
+            // Fallback to Bootstrap if ModalManagerV2 fails - עם backdrop: false וניקוי
+            window.Logger?.warn('checkResultsModal not available in ModalManagerV2, using Bootstrap fallback', { page: 'system-management' });
+            if (bootstrap?.Modal) {
+                // ניקוי backdrops לפני פתיחה
+                if (window.ModalManagerV2?._cleanupBootstrapBackdrops) {
+                    window.ModalManagerV2._cleanupBootstrapBackdrops();
+                }
+                const bsModal = new bootstrap.Modal(modal, { backdrop: false });
+                bsModal.show();
+                // ניקוי backdrops אחרי פתיחה
+                if (window.ModalManagerV2?._cleanupBootstrapBackdrops) {
+                    setTimeout(() => {
+                        window.ModalManagerV2._cleanupBootstrapBackdrops();
+                    }, 50);
+                }
+                // עדכון z-index
+                if (window.ModalZIndexManager?.forceUpdate) {
+                    setTimeout(() => {
+                        window.ModalZIndexManager.forceUpdate(modal);
+                    }, 50);
+                }
+            }
+        }
+    } else {
+        // Fallback to Bootstrap modal - עם backdrop: false וניקוי
+        if (bootstrap?.Modal) {
+            // ניקוי backdrops לפני פתיחה
+            if (window.ModalManagerV2?._cleanupBootstrapBackdrops) {
+                window.ModalManagerV2._cleanupBootstrapBackdrops();
+            }
+            const bsModal = new bootstrap.Modal(modal, { backdrop: false });
+            bsModal.show();
+            // ניקוי backdrops אחרי פתיחה
+            if (window.ModalManagerV2?._cleanupBootstrapBackdrops) {
+                setTimeout(() => {
+                    window.ModalManagerV2._cleanupBootstrapBackdrops();
+                }, 50);
+            }
+            // עדכון z-index
+            if (window.ModalZIndexManager?.forceUpdate) {
+                setTimeout(() => {
+                    window.ModalZIndexManager.forceUpdate(modal);
+                }, 50);
+            }
+        }
+    }
+    
     // Store results globally for copying
     window.lastCheckResults = checkResults;
   }
@@ -914,6 +1026,8 @@ class SystemManagement {
     }
 
     const results = window.lastCheckResults;
+    // Note: This is a system check results report generation, not a standard summary element
+    // Using filter for counting is acceptable here as it's specific to check results structure
     const successCount = results.checks.filter(c => c.status === 'success').length;
     const warningCount = results.checks.filter(c => c.status === 'warning').length;
     const errorCount = results.checks.filter(c => c.status === 'error').length;
@@ -945,7 +1059,7 @@ class SystemManagement {
     navigator.clipboard.writeText(report).then(() => {
       SystemManagement.showNotification('תוצאות בדיקה הועתקו ללוח בהצלחה', 'success');
     }).catch(error => {
-      console.error('Failed to copy to clipboard:', error);
+      window.Logger?.error('Failed to copy to clipboard:', error);
       SystemManagement.showNotification('שגיאה בהעתקת התוצאות ללוח', 'error');
     });
   }
@@ -967,25 +1081,29 @@ class SystemManagement {
     this.showLoadingState();
 
     try {
-      console.log('📊 Loading system data...');
+      window.Logger?.debug('📊 Loading system data...');
 
       // Load primary data provider
       await SystemManagement.loadPrimaryDataProvider();
 
-      // Load system overview
-      const overviewResponse = await fetch('/api/system/overview');
-      const overviewData = await overviewResponse.json();
+    // Load system overview
+    const overviewResponse = await fetch('/api/system/overview');
+    const overviewData = await overviewResponse.json();
 
-      if (overviewData.status === 'success') {
-        this.currentData = overviewData.data;
-        this.updateDashboard(overviewData.data);
-        console.log('✅ System data loaded successfully');
-      } else {
-        throw new Error(overviewData.message || 'Failed to load system data');
-      }
+    if (overviewData.status === 'success') {
+      this.currentData = overviewData.data;
+
+      // === EOD INTEGRATION: Load EOD job management data ===
+      await this.loadEODJobManagementData();
+
+      this.updateDashboard(overviewData.data);
+      window.Logger?.debug('✅ System data loaded successfully');
+    } else {
+      throw new Error(overviewData.message || 'Failed to load system data');
+    }
 
     } catch (error) {
-      console.error('❌ Error loading system data:', error);
+      window.Logger?.error('❌ Error loading system data:', error);
       this.handleLoadError(error);
     } finally {
       this.isLoading = false;
@@ -1171,7 +1289,12 @@ class SystemManagement {
         const scoreDetails = this.getScoreDetails(data);
         const detailsElement = document.querySelector('.score-details');
         if (detailsElement) {
-          detailsElement.innerHTML = scoreDetails;
+          detailsElement.textContent = '';
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(scoreDetails, 'text/html');
+          doc.body.childNodes.forEach(node => {
+            detailsElement.appendChild(node.cloneNode(true));
+          });
         }
       }
     }
@@ -1314,7 +1437,8 @@ class SystemManagement {
     const providerListElement = document.getElementById('providerList');
     if (!providerListElement || !providers.length) {return;}
 
-    providerListElement.innerHTML = providers.map(provider => `
+    providerListElement.textContent = '';
+    const providersHTML = providers.map(provider => `
       <div class="provider-item ${provider.status === 'active' ? 'active' : 'inactive'}">
         <div class="provider-info">
           <span class="provider-name">${provider.name || 'Unknown Provider'}</span>
@@ -1329,6 +1453,11 @@ class SystemManagement {
         </div>
       </div>
     `).join('');
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(providersHTML, 'text/html');
+    doc.body.childNodes.forEach(node => {
+      providerListElement.appendChild(node.cloneNode(true));
+    });
   }
 
   updateLogs(data) {
@@ -1336,16 +1465,24 @@ class SystemManagement {
     if (!logContent) {return;}
 
     // Clear existing logs
-    logContent.innerHTML = '';
+    logContent.textContent = '';
 
     // Add system status log
     const statusLog = document.createElement('div');
     statusLog.className = 'log-entry log-info';
-    statusLog.innerHTML = `
+    statusLog.textContent = '';
+        // Convert HTML string to DOM elements safely
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(`
       <div class="log-timestamp">${window.formatTimeOnly ? window.formatTimeOnly(new Date()) : (window.dateUtils?.formatTimeOnly ? window.dateUtils.formatTimeOnly(new Date()) : new Date().toLocaleTimeString('he-IL'))}</div>
       <div class="log-level">INFO</div>
       <div class="log-message">מערכת ניהול מערכת נטענה בהצלחה - ציון מערכת: ${data.system_score || 0}/100</div>
-    `;
+    `, 'text/html');
+        const fragment = document.createDocumentFragment();
+        Array.from(doc.body.childNodes).forEach(node => {
+            fragment.appendChild(node.cloneNode(true));
+        });
+        statusLog.appendChild(fragment);
     logContent.appendChild(statusLog);
 
     // Add health status logs
@@ -1356,11 +1493,19 @@ class SystemManagement {
       const levelText = status.status === 'healthy' ? 'INFO' : status.status === 'warning' ? 'WARNING' : 'ERROR';
 
       logEntry.className = `log-entry ${logLevel}`;
-      logEntry.innerHTML = `
-        <div class="log-timestamp">${window.formatTimeOnly ? window.formatTimeOnly(new Date()) : (window.dateUtils?.formatTimeOnly ? window.dateUtils.formatTimeOnly(new Date()) : new Date().toLocaleTimeString('he-IL'))}</div>
-        <div class="log-level">${levelText}</div>
-        <div class="log-message">${component}: ${status.status} - ביצועים: ${status.performance || 'unknown'}</div>
-      `;
+      logEntry.textContent = '';
+      const timestampDiv = document.createElement('div');
+      timestampDiv.className = 'log-timestamp';
+      timestampDiv.textContent = window.formatTimeOnly ? window.formatTimeOnly(new Date()) : (window.dateUtils?.formatTimeOnly ? window.dateUtils.formatTimeOnly(new Date()) : new Date().toLocaleTimeString('he-IL'));
+      logEntry.appendChild(timestampDiv);
+      const levelDiv = document.createElement('div');
+      levelDiv.className = 'log-level';
+      levelDiv.textContent = levelText;
+      logEntry.appendChild(levelDiv);
+      const messageDiv = document.createElement('div');
+      messageDiv.className = 'log-message';
+      messageDiv.textContent = `${component}: ${status.status} - ביצועים: ${status.performance || 'unknown'}`;
+      logEntry.appendChild(messageDiv);
       logContent.appendChild(logEntry);
     });
   }
@@ -1438,18 +1583,30 @@ class SystemManagement {
 
         if (backupStatusElement) {
           if (isRecentBackup) {
-            backupStatusElement.innerHTML = '<span class="text-success">✅ גיבוי עדכני</span>';
+            backupStatusElement.innerHTML.textContent = '';
+        const div = document.createElement('div');
+        div.className = 'text-success';
+        div.textContent = '✅ גיבוי עדכני';
+        backupStatusElement.innerHTML.appendChild(div);
           } else {
-            backupStatusElement.innerHTML = '<span class="text-warning">⚠️ גיבוי ישן</span>';
+            backupStatusElement.innerHTML.textContent = '';
+        const div = document.createElement('div');
+        div.className = 'text-warning';
+        div.textContent = '⚠️ גיבוי ישן';
+        backupStatusElement.innerHTML.appendChild(div);
           }
         }
 
-        console.log('✅ Backup status updated successfully');
+        window.Logger?.debug('✅ Backup status updated successfully');
       } else {
         // No backups found
         const backupStatusElement = document.getElementById('backupStatus');
         if (backupStatusElement) {
-          backupStatusElement.innerHTML = '<span class="text-danger">❌ אין גיבויים</span>';
+          backupStatusElement.innerHTML.textContent = '';
+        const div = document.createElement('div');
+        div.className = 'text-danger';
+        div.textContent = '❌ אין גיבויים';
+        backupStatusElement.innerHTML.appendChild(div);
         }
 
         const lastBackupDateElement = document.getElementById('lastBackupDate');
@@ -1457,13 +1614,17 @@ class SystemManagement {
           lastBackupDateElement.textContent = 'לא נמצא';
         }
 
-        console.log('⚠️ No backups found');
+        window.Logger?.debug('⚠️ No backups found');
       }
     } catch (error) {
-      console.error('❌ Error updating backup status:', error);
+      window.Logger?.error('❌ Error updating backup status:', error);
       const backupStatusElement = document.getElementById('backupStatus');
       if (backupStatusElement) {
-        backupStatusElement.innerHTML = '<span class="text-danger">❌ שגיאה בבדיקה</span>';
+        backupStatusElement.innerHTML.textContent = '';
+        const div = document.createElement('div');
+        div.className = 'text-danger';
+        div.textContent = '❌ שגיאה בבדיקה';
+        backupStatusElement.innerHTML.appendChild(div);
       }
     }
   }
@@ -1480,17 +1641,28 @@ class SystemManagement {
       warningBanner.className = 'alert alert-danger fallback-warning';
     }
 
-    warningBanner.innerHTML = `
-      <div class="d-flex align-items-center">
-        <i class="fas fa-times-circle me-2"></i>
-        <div>
-          <strong>נתוני מערכת לא זמינים</strong>
-          <br>
-          <small>${errorMessage}</small>
-        </div>
-        <button type="button" class="btn-close ms-auto" onclick="this.parentElement.parentElement.remove()"></button>
-      </div>
-    `;
+    warningBanner.textContent = '';
+    const flexDiv = document.createElement('div');
+    flexDiv.className = 'd-flex align-items-center';
+    const icon = document.createElement('i');
+    icon.className = 'fas fa-times-circle me-2';
+    flexDiv.appendChild(icon);
+    const contentDiv = document.createElement('div');
+    const strong = document.createElement('strong');
+    strong.textContent = 'נתוני מערכת לא זמינים';
+    contentDiv.appendChild(strong);
+    const br = document.createElement('br');
+    contentDiv.appendChild(br);
+    const small = document.createElement('small');
+    small.textContent = errorMessage;
+    contentDiv.appendChild(small);
+    flexDiv.appendChild(contentDiv);
+    const closeBtn = document.createElement('button');
+    closeBtn.type = 'button';
+    closeBtn.className = 'btn-close ms-auto';
+    closeBtn.onclick = function() { this.parentElement.parentElement.remove(); };
+    flexDiv.appendChild(closeBtn);
+    warningBanner.appendChild(flexDiv);
 
     const mainContent = document.querySelector('.main-content');
     if (mainContent) {
@@ -1550,7 +1722,7 @@ class SystemManagement {
         }
       }
     } catch (error) {
-      console.error('Error updating external data:', error);
+      window.Logger?.error('Error updating external data:', error);
     }
   }
 
@@ -1574,7 +1746,7 @@ class SystemManagement {
         // Update alerts list
         const alertsListElement = document.getElementById('alerts-list');
         if (alertsListElement) {
-          alertsListElement.innerHTML = '';
+          alertsListElement.textContent = '';
 
           if (alerts.alerts && alerts.alerts.length > 0) {
             alerts.alerts.forEach(alert => {
@@ -1583,28 +1755,44 @@ class SystemManagement {
 
               const timestamp = window.formatTimeOnly ? window.formatTimeOnly(new Date(alert.timestamp)) : (window.dateUtils?.formatTimeOnly ? window.dateUtils.formatTimeOnly(new Date(alert.timestamp)) : new Date(alert.timestamp).toLocaleTimeString('he-IL'));
 
-              alertItem.innerHTML = `
-                <div class="alert-timestamp">${timestamp}</div>
-                <div class="alert-level">${alert.level.toUpperCase()}</div>
-                <div class="alert-message">${alert.message}</div>
-              `;
+              alertItem.textContent = '';
+              const timestampDiv = document.createElement('div');
+              timestampDiv.className = 'alert-timestamp';
+              timestampDiv.textContent = timestamp;
+              alertItem.appendChild(timestampDiv);
+              const levelDiv = document.createElement('div');
+              levelDiv.className = 'alert-level';
+              levelDiv.textContent = alert.level.toUpperCase();
+              alertItem.appendChild(levelDiv);
+              const messageDiv = document.createElement('div');
+              messageDiv.className = 'alert-message';
+              messageDiv.textContent = alert.message;
+              alertItem.appendChild(messageDiv);
 
               alertsListElement.appendChild(alertItem);
             });
           } else {
             const noAlertsItem = document.createElement('div');
             noAlertsItem.className = 'alert-item info';
-            noAlertsItem.innerHTML = `
-              <div class="alert-timestamp">${window.formatTimeOnly ? window.formatTimeOnly(new Date()) : (window.dateUtils?.formatTimeOnly ? window.dateUtils.formatTimeOnly(new Date()) : new Date().toLocaleTimeString('he-IL'))}</div>
-              <div class="alert-level">INFO</div>
-              <div class="alert-message">אין התראות פעילות</div>
-            `;
+            noAlertsItem.textContent = '';
+            const timestampDiv = document.createElement('div');
+            timestampDiv.className = 'alert-timestamp';
+            timestampDiv.textContent = window.formatTimeOnly ? window.formatTimeOnly(new Date()) : (window.dateUtils?.formatTimeOnly ? window.dateUtils.formatTimeOnly(new Date()) : new Date().toLocaleTimeString('he-IL'));
+            noAlertsItem.appendChild(timestampDiv);
+            const levelDiv = document.createElement('div');
+            levelDiv.className = 'alert-level';
+            levelDiv.textContent = 'INFO';
+            noAlertsItem.appendChild(levelDiv);
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'alert-message';
+            messageDiv.textContent = 'אין התראות פעילות';
+            noAlertsItem.appendChild(messageDiv);
             alertsListElement.appendChild(noAlertsItem);
           }
         }
       }
     } catch (error) {
-      console.error('Error updating alerts:', error);
+      window.Logger?.error('Error updating alerts:', error);
       SystemManagement.showNotification(
         `❌ שגיאה בטעינת התראות: ${error?.message || 'השרת לא החזיר נתונים'}`,
         'error',
@@ -1620,11 +1808,14 @@ class SystemManagement {
 
       const alertsListElement = document.getElementById('alerts-list');
       if (alertsListElement) {
-        alertsListElement.innerHTML = `
-          <div class="alert-item error">
-            <div class="alert-message">לא ניתן לטעון התראות כרגע. בדוק את החיבור לשרת ונסה שוב.</div>
-          </div>
-        `;
+        alertsListElement.textContent = '';
+        const alertItem = document.createElement('div');
+        alertItem.className = 'alert-item error';
+        const messageDiv = document.createElement('div');
+        messageDiv.className = 'alert-message';
+        messageDiv.textContent = 'לא ניתן לטעון התראות כרגע. בדוק את החיבור לשרת ונסה שוב.';
+        alertItem.appendChild(messageDiv);
+        alertsListElement.appendChild(alertItem);
       }
     }
   }
@@ -1712,12 +1903,12 @@ class SystemManagement {
    */
   static async savePrimaryDataProvider(provider) {
     try {
-      console.log(`💾 Saving primary data provider: ${provider}`);
+      window.Logger?.debug(`💾 Saving primary data provider: ${provider}`);
 
       if (window.PreferencesCore && typeof window.PreferencesCore.savePreference === 'function') {
         const success = await window.PreferencesCore.savePreference('primaryDataProvider', provider);
         if (success) {
-          console.log('✅ Primary data provider saved successfully via PreferencesCore');
+          window.Logger?.debug('✅ Primary data provider saved successfully via PreferencesCore');
           if (typeof window.showSuccessNotification === 'function') {
             window.showSuccessNotification('הצלחה', `ספק נתונים ראשי נשמר: ${provider}`);
           }
@@ -1728,7 +1919,7 @@ class SystemManagement {
         throw new Error('PreferencesCore.savePreference not available');
       }
     } catch (error) {
-      console.error('❌ Error saving primary data provider:', error);
+      window.Logger?.error('❌ Error saving primary data provider:', error);
       if (typeof window.showErrorNotification === 'function') {
         window.showErrorNotification('שגיאה', 'שגיאה בשמירת ספק נתונים ראשי: ' + error.message);
       }
@@ -1741,18 +1932,23 @@ class SystemManagement {
    */
   static async loadPrimaryDataProvider() {
     try {
-      console.log('📡 Loading primary data provider...');
+      window.Logger?.debug('📡 Loading primary data provider...');
 
       if (window.PreferencesCore && typeof window.PreferencesCore.getPreference === 'function') {
         const provider = await window.PreferencesCore.getPreference('primaryDataProvider');
         const select = document.getElementById('primaryDataProvider');
         if (select && provider !== undefined && provider !== null) {
-          select.value = provider;
-          console.log(`✅ Primary data provider loaded: ${provider}`);
+          // Use DataCollectionService to set value if available
+          if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+            window.DataCollectionService.setValue(select.id, provider, 'text');
+          } else {
+            select.value = provider;
+          }
+          window.Logger?.debug(`✅ Primary data provider loaded: ${provider}`);
         }
       }
     } catch (error) {
-      console.error('❌ Error loading primary data provider:', error);
+      window.Logger?.error('❌ Error loading primary data provider:', error);
     }
   }
 
@@ -1769,7 +1965,7 @@ class SystemManagement {
    */
   static async copyDetailedLog() {
     try {
-      console.log('📋 Generating detailed log...');
+      window.Logger?.debug('📋 Generating detailed log...');
 
       // Show loading state
       const copyBtn = document.querySelector('.copy-log-btn');
@@ -1797,17 +1993,17 @@ class SystemManagement {
           if (typeof window.showNotification === 'function') {
             window.showNotification(logInfo, 'success');
           } else {
-            alert(logInfo);
+            window.showErrorNotification(logInfo, "שגיאה");
           }
         }
 
-        console.log('✅ Detailed log copied to clipboard');
+        window.Logger?.debug('✅ Detailed log copied to clipboard');
       } else {
         throw new Error(data.message || 'Failed to generate detailed log');
       }
 
     } catch (error) {
-      console.error('❌ Error copying detailed log:', error);
+      window.Logger?.error('❌ Error copying detailed log:', error);
 
       const errorMsg = `שגיאה בהעתקת לוג: ${error.message}\n\n🔧 פתרונות אפשריים:\n• בדוק את החיבור לשרת\n• נסה לרענן את הדף\n• פנה לתמיכה טכנית`;
 
@@ -1816,7 +2012,7 @@ class SystemManagement {
       } else if (typeof window.showNotification === 'function') {
         window.showNotification(errorMsg, 'error');
       } else {
-        alert(errorMsg);
+        window.showErrorNotification(errorMsg, "שגיאה");
       }
     } finally {
     // Reset button
@@ -1827,7 +2023,214 @@ class SystemManagement {
       }
     }
   }
-}// Initialize dashboard when DOM is ready
+
+  // === EOD INTEGRATION: Load EOD job management data ===
+  async loadEODJobManagementData() {
+    try {
+      window.Logger?.debug('🔍 SystemManagement - טוען נתוני ניהול EOD jobs');
+
+      // Load EOD job history
+      const jobHistory = await window.EODIntegrationHelper.loadEODJobHistory({ limit: 20 });
+      if (jobHistory && Array.isArray(jobHistory.data)) {
+        this.updateEODJobHistory(jobHistory.data);
+      }
+
+      // Load EOD job status
+      const jobStatus = await window.EODIntegrationHelper.loadEODJobStatus();
+      if (jobStatus) {
+        this.updateEODJobStatus(jobStatus);
+      }
+
+      // Load EOD alerts for management
+      const alerts = await window.EODIntegrationHelper.loadEODAlerts({ limit: 10 });
+      if (alerts && Array.isArray(alerts.data)) {
+        this.updateEODAlertsManagement(alerts.data);
+      }
+
+    } catch (error) {
+      window.Logger?.error('❌ שגיאה בטעינת נתוני ניהול EOD jobs:', error);
+    }
+  }
+
+  // === EOD INTEGRATION: Update UI with EOD job history ===
+  updateEODJobHistory(jobHistory) {
+    if (!Array.isArray(jobHistory)) return;
+
+    const jobHistoryContainer = document.getElementById('eodJobHistory');
+    if (!jobHistoryContainer) return;
+
+    // Clear existing content
+    jobHistoryContainer.innerHTML = '';
+
+    if (jobHistory.length === 0) {
+      jobHistoryContainer.innerHTML = '<div class="text-muted">אין היסטוריית jobs</div>';
+      return;
+    }
+
+    // Create job history table
+    const table = document.createElement('table');
+    table.className = 'table table-sm table-striped';
+
+    const thead = document.createElement('thead');
+    thead.innerHTML = `
+      <tr>
+        <th>סוג Job</th>
+        <th>סטטוס</th>
+        <th>התחלה</th>
+        <th>סיום</th>
+        <th>משך</th>
+        <th>פעולות</th>
+      </tr>
+    `;
+    table.appendChild(thead);
+
+    const tbody = document.createElement('tbody');
+
+    jobHistory.forEach(job => {
+      const row = document.createElement('tr');
+
+      const statusIcon = job.status === 'success' ? '✅' : job.status === 'running' ? '🔄' : job.status === 'failed' ? '❌' : '⏳';
+      const statusText = job.status === 'success' ? 'הצליח' : job.status === 'running' ? 'רץ' : job.status === 'failed' ? 'נכשל' : 'ממתין';
+
+      const startTime = job.created_at ? new Date(job.created_at).toLocaleString('he-IL') : 'לא ידוע';
+      const endTime = job.updated_at ? new Date(job.updated_at).toLocaleString('he-IL') : '-';
+
+      const duration = job.created_at && job.updated_at ?
+        Math.round((new Date(job.updated_at) - new Date(job.created_at)) / 1000) + ' שניות' : '-';
+
+      row.innerHTML = `
+        <td>${job.job_type || 'לא ידוע'}</td>
+        <td><span class="status-${job.status}">${statusIcon} ${statusText}</span></td>
+        <td>${startTime}</td>
+        <td>${endTime}</td>
+        <td>${duration}</td>
+        <td>
+          <button class="btn btn-sm btn-outline-primary" onclick="viewEODJobDetails('${job.id}')">פרטים</button>
+          ${job.status === 'running' ? `<button class="btn btn-sm btn-outline-warning" onclick="cancelEODJob('${job.id}')">ביטול</button>` : ''}
+        </td>
+      `;
+
+      tbody.appendChild(row);
+    });
+
+    table.appendChild(tbody);
+    jobHistoryContainer.appendChild(table);
+  }
+
+  // === EOD INTEGRATION: Update UI with EOD job status ===
+  updateEODJobStatus(jobStatus) {
+    if (!jobStatus) return;
+
+    // Update EOD job status indicators
+    const eodStatusEl = document.getElementById('eodJobStatus');
+    if (eodStatusEl) {
+      const statusText = jobStatus.status === 'idle' ? 'לא פעיל' :
+                        jobStatus.status === 'running' ? 'רץ' : 'לא ידוע';
+      const statusClass = jobStatus.status === 'idle' ? 'success' :
+                         jobStatus.status === 'running' ? 'warning' : 'secondary';
+
+      eodStatusEl.textContent = statusText;
+      eodStatusEl.className = `status-value ${statusClass}`;
+    }
+
+    const currentJobEl = document.getElementById('currentEODJob');
+    if (currentJobEl) {
+      currentJobEl.textContent = jobStatus.current_job || 'אין job פעיל';
+    }
+  }
+
+  // === EOD INTEGRATION: Update UI with EOD alerts for management ===
+  updateEODAlertsManagement(alerts) {
+    if (!Array.isArray(alerts)) return;
+
+    const alertsContainer = document.getElementById('eodAlertsManagement');
+    if (!alertsContainer) return;
+
+    // Clear existing content
+    alertsContainer.innerHTML = '';
+
+    const activeAlerts = alerts.filter(alert => alert.status === 'active');
+
+    if (activeAlerts.length === 0) {
+      alertsContainer.innerHTML = '<div class="text-success">אין התראות פעילות</div>';
+      return;
+    }
+
+    // Create alerts management table
+    const table = document.createElement('table');
+    table.className = 'table table-sm';
+
+    const thead = document.createElement('thead');
+    thead.innerHTML = `
+      <tr>
+        <th>חומרה</th>
+        <th>כותרת</th>
+        <th>זמן</th>
+        <th>פעולות</th>
+      </tr>
+    `;
+    table.appendChild(thead);
+
+    const tbody = document.createElement('tbody');
+
+    activeAlerts.forEach(alert => {
+      const row = document.createElement('tr');
+
+      const severityIcon = alert.severity === 'high' ? '🚨' : alert.severity === 'medium' ? '⚠️' : 'ℹ️';
+      const severityText = alert.severity === 'high' ? 'גבוהה' : alert.severity === 'medium' ? 'בינונית' : 'נמוכה';
+
+      const createdAt = alert.created_at ? new Date(alert.created_at).toLocaleString('he-IL') : 'לא ידוע';
+
+      row.innerHTML = `
+        <td><span class="severity-${alert.severity}">${severityIcon} ${severityText}</span></td>
+        <td>${alert.title || 'התראה'}</td>
+        <td>${createdAt}</td>
+        <td>
+          <button class="btn btn-sm btn-outline-info" onclick="viewEODAlertDetails('${alert.id}')">פרטים</button>
+          <button class="btn btn-sm btn-outline-success" onclick="resolveEODAlert('${alert.id}')">פתור</button>
+        </td>
+      `;
+
+      tbody.appendChild(row);
+    });
+
+    table.appendChild(tbody);
+    alertsContainer.appendChild(table);
+  }
+
+  // === EOD INTEGRATION: Manual EOD job trigger ===
+  async triggerEODJob(jobType, params = {}) {
+    try {
+      window.Logger?.info(`🔄 Triggering EOD job: ${jobType}`, { params });
+
+      const response = await fetch('/api/eod/jobs/trigger', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          job_type: jobType,
+          ...params
+        })
+      });
+
+      const result = await response.json();
+
+      if (result.status === 'success') {
+        SystemManagement.showNotification('✅ Job EOD הופעל בהצלחה', 'success');
+        // Reload data to show new job
+        await this.loadEODJobManagementData();
+      } else {
+        throw new Error(result.message || 'Failed to trigger EOD job');
+      }
+
+    } catch (error) {
+      window.Logger?.error('❌ Failed to trigger EOD job:', error);
+      SystemManagement.showNotification(`❌ שגיאה בהפעלת job EOD: ${error.message}`, 'error');
+    }
+  }
+};
+
 document.addEventListener('DOMContentLoaded', () => {
   window.systemManagement = new SystemManagement();
   window.systemManagement.init();
@@ -1840,6 +2243,140 @@ document.addEventListener('DOMContentLoaded', () => {
   window.runBackup = SystemManagement.runBackup;
   window.restoreFromBackup = SystemManagement.restoreFromBackup;
   window.copyCheckResultsToClipboard = SystemManagement.copyCheckResultsToClipboard;
+
+  // EOD INTEGRATION: Make EOD functions globally available
+  window.viewEODJobDetails = async function(jobId) {
+    try {
+      const response = await fetch(`/api/eod/jobs/${jobId}`);
+      const result = await response.json();
+
+      if (result.status === 'success') {
+        const job = result.data;
+        const details = `
+          Job ID: ${job.id}
+          סוג: ${job.job_type}
+          סטטוס: ${job.status}
+          התחלה: ${job.created_at ? new Date(job.created_at).toLocaleString('he-IL') : 'לא ידוע'}
+          סיום: ${job.updated_at ? new Date(job.updated_at).toLocaleString('he-IL') : 'לא ידוע'}
+          הודעה: ${job.message || 'אין'}
+          פרטים: ${JSON.stringify(job.details || {}, null, 2)}
+        `;
+
+        alert(details); // Simple alert for now - can be enhanced with modal
+      } else {
+        SystemManagement.showNotification('❌ שגיאה בטעינת פרטי job', 'error');
+      }
+    } catch (error) {
+      window.Logger?.error('Failed to load EOD job details:', error);
+      SystemManagement.showNotification('❌ שגיאה בטעינת פרטי job', 'error');
+    }
+  };
+
+  window.cancelEODJob = async function(jobId) {
+    if (!confirm('האם אתה בטוח שברצונך לבטל את ה-job?')) return;
+
+    try {
+      const response = await fetch(`/api/eod/jobs/${jobId}/cancel`, {
+        method: 'POST'
+      });
+
+      const result = await response.json();
+
+      if (result.status === 'success') {
+        SystemManagement.showNotification('✅ Job EOD בוטל בהצלחה', 'success');
+        // Reload data
+        if (window.systemManagement) {
+          await window.systemManagement.loadEODJobManagementData();
+        }
+      } else {
+        throw new Error(result.message || 'Failed to cancel EOD job');
+      }
+    } catch (error) {
+      window.Logger?.error('Failed to cancel EOD job:', error);
+      SystemManagement.showNotification(`❌ שגיאה בביטול job: ${error.message}`, 'error');
+    }
+  };
+
+  window.viewEODAlertDetails = async function(alertId) {
+    try {
+      const response = await fetch(`/api/eod/alerts/${alertId}`);
+      const result = await response.json();
+
+      if (result.status === 'success') {
+        const alert = result.data;
+        const details = `
+          Alert ID: ${alert.id}
+          כותרת: ${alert.title}
+          תיאור: ${alert.description}
+          חומרה: ${alert.severity}
+          סטטוס: ${alert.status}
+          זמן יצירה: ${alert.created_at ? new Date(alert.created_at).toLocaleString('he-IL') : 'לא ידוע'}
+          פרטים: ${JSON.stringify(alert.details || {}, null, 2)}
+        `;
+
+        alert(details); // Simple alert for now - can be enhanced with modal
+      } else {
+        SystemManagement.showNotification('❌ שגיאה בטעינת פרטי התראה', 'error');
+      }
+    } catch (error) {
+      window.Logger?.error('Failed to load EOD alert details:', error);
+      SystemManagement.showNotification('❌ שגיאה בטעינת פרטי התראה', 'error');
+    }
+  };
+
+  window.resolveEODAlert = async function(alertId) {
+    try {
+      const response = await fetch(`/api/eod/alerts/${alertId}/resolve`, {
+        method: 'POST'
+      });
+
+      const result = await response.json();
+
+      if (result.status === 'success') {
+        SystemManagement.showNotification('✅ התראה EOD נפתרה בהצלחה', 'success');
+        // Reload data
+        if (window.systemManagement) {
+          await window.systemManagement.loadEODJobManagementData();
+        }
+      } else {
+        throw new Error(result.message || 'Failed to resolve EOD alert');
+      }
+    } catch (error) {
+      window.Logger?.error('Failed to resolve EOD alert:', error);
+      SystemManagement.showNotification(`❌ שגיאה בפתרון התראה: ${error.message}`, 'error');
+    }
+  };
+
+  window.triggerEODRecalculation = async function(dateFrom, dateTo, userId = null) {
+    try {
+      const response = await fetch('/api/eod/recompute', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          date_from: dateFrom,
+          date_to: dateTo,
+          user_id: userId
+        })
+      });
+
+      const result = await response.json();
+
+      if (result.status === 'success') {
+        SystemManagement.showNotification('✅ חישוב מחדש של EOD הופעל בהצלחה', 'success');
+        // Reload data
+        if (window.systemManagement) {
+          await window.systemManagement.loadEODJobManagementData();
+        }
+      } else {
+        throw new Error(result.message || 'Failed to trigger EOD recalculation');
+      }
+    } catch (error) {
+      window.Logger?.error('Failed to trigger EOD recalculation:', error);
+      SystemManagement.showNotification(`❌ שגיאה בחישוב מחדש: ${error.message}`, 'error');
+    }
+  };
 });
 
 // Cleanup on page unload

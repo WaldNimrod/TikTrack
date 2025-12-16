@@ -33,6 +33,10 @@ from .account_activity import account_activity_bp
 from .positions import positions_bp, portfolio_bp
 from .tags import tags_bp
 from .business_logic import business_logic_bp
+from .watch_lists import watch_lists_bp
+from .trade_history import trade_history_bp
+from .portfolio_state import portfolio_state_bp
+from .trading_journal import trading_journal_bp
 
 # Base classes for unified API
 from .base_entity import BaseEntityAPI
@@ -81,6 +85,10 @@ __all__ = [
     'portfolio_bp',
     'tags_bp',
     'business_logic_bp',
+    'watch_lists_bp',
+    'trade_history_bp',
+    'portfolio_state_bp',
+    'trading_journal_bp',
     
     # Base classes
     'BaseEntityAPI',

@@ -112,7 +112,8 @@ class ActiveAlertsComponent extends HTMLElement {
   }
 
   render() {
-    this.innerHTML = `
+    this.textContent = '';
+    const componentHTML = `
       <div class="active-alerts" data-role="container">
         <div class="active-alerts__header">
           <div class="active-alerts__title-group">
@@ -142,6 +143,11 @@ class ActiveAlertsComponent extends HTMLElement {
         </div>
       </div>
     `;
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(componentHTML, 'text/html');
+    doc.body.childNodes.forEach(node => {
+        this.appendChild(node.cloneNode(true));
+    });
 
     this.cacheElements();
     this.initializeFilters();
@@ -200,12 +206,18 @@ class ActiveAlertsComponent extends HTMLElement {
       iconClassName: 'active-alerts__filter-icon',
     });
 
-    container.innerHTML = `
+    container.textContent = '';
+    const filtersHTML = `
       <div class="active-alerts__filters-inner">
         ${allButtonHtml}
         ${entityButtonsHtml}
       </div>
     `;
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(filtersHTML, 'text/html');
+    doc.body.childNodes.forEach(node => {
+        container.appendChild(node.cloneNode(true));
+    });
 
     const buttons = container.querySelectorAll('button[data-type]');
     buttons.forEach(button => {
@@ -259,7 +271,7 @@ class ActiveAlertsComponent extends HTMLElement {
     return Object.prototype.hasOwnProperty.call(mapping, type) ? mapping[type] : null;
   }
 
-  applyFilter(type) {
+  async applyFilter(type) {
     const normalized = this.normalizeFilterType(type);
     if (normalized === this.activeFilterType) {
       return true;
@@ -268,7 +280,7 @@ class ActiveAlertsComponent extends HTMLElement {
     this.activeFilterType = normalized;
     this.resetFilteredAlertsCache();
     this.updateFilterButtons();
-    this.renderAlerts();
+    await this.renderAlerts();
     return true;
   }
 
@@ -418,17 +430,58 @@ class ActiveAlertsComponent extends HTMLElement {
     return Array.isArray(apiData?.data) ? apiData.data : [];
   }
 
-  applyAlertsState(alerts) {
+  async applyAlertsState(alerts) {
     this.alerts = Array.isArray(alerts) ? alerts : [];
     this.resetFilteredAlertsCache();
-    this.renderAlerts();
+    await this.renderAlerts();
     this.updateHeaderState();
     this.updateSectionHeaderAlertIcon();
   }
 
   async loadActiveAlerts(options = {}) {
     const { force = false } = options;
+    
+    // CRITICAL: Track call stack to detect recursion
+    if (!window.__LOAD_ACTIVE_ALERTS_CALL_STACK__) {
+      window.__LOAD_ACTIVE_ALERTS_CALL_STACK__ = [];
+    }
+    
+    const callInfo = {
+      timestamp: Date.now(),
+      stack: new Error().stack,
+      force
+    };
+    
+    // Check for recursion - if called again within 100ms
+    const recentCall = window.__LOAD_ACTIVE_ALERTS_CALL_STACK__.find(c => 
+      Date.now() - c.timestamp < 100
+    );
+    
+    if (recentCall && this.isLoading) {
+      console.error('🚨 RECURSION DETECTED in loadActiveAlerts:', {
+        callStack: window.__LOAD_ACTIVE_ALERTS_CALL_STACK__.map(c => ({
+          timestamp: c.timestamp,
+          force: c.force
+        })),
+        recentCall: recentCall.stack
+      });
+      return; // Break recursion
+    }
+    
+    window.__LOAD_ACTIVE_ALERTS_CALL_STACK__.push(callInfo);
+    // Keep only last 10 calls
+    if (window.__LOAD_ACTIVE_ALERTS_CALL_STACK__.length > 10) {
+      window.__LOAD_ACTIVE_ALERTS_CALL_STACK__.shift();
+    }
+    
     if (this.isLoading) {
+      // Remove from call stack if already loading
+      const index = window.__LOAD_ACTIVE_ALERTS_CALL_STACK__.findIndex(c => 
+        Math.abs(c.timestamp - callInfo.timestamp) < 10
+      );
+      if (index !== -1) {
+        window.__LOAD_ACTIVE_ALERTS_CALL_STACK__.splice(index, 1);
+      }
       return;
     }
 
@@ -439,10 +492,20 @@ class ActiveAlertsComponent extends HTMLElement {
     const cacheEnabled = !force && this.shouldUseCache();
 
     const finalize = async (alerts, source) => {
-      const normalizedAlerts = Array.isArray(alerts) ? alerts : [];
-      await this.ensureRelatedData();
-      this.applyAlertsState(normalizedAlerts);
-      this.log('info', 'Active alerts loaded', { source, count: this.alerts.length });
+      try {
+        const normalizedAlerts = Array.isArray(alerts) ? alerts : [];
+        await this.ensureRelatedData();
+        await this.applyAlertsState(normalizedAlerts);
+        this.log('info', 'Active alerts loaded', { source, count: this.alerts.length });
+      } finally {
+        // Remove from call stack
+        const index = window.__LOAD_ACTIVE_ALERTS_CALL_STACK__.findIndex(c => 
+          Math.abs(c.timestamp - callInfo.timestamp) < 10
+        );
+        if (index !== -1) {
+          window.__LOAD_ACTIVE_ALERTS_CALL_STACK__.splice(index, 1);
+        }
+      }
     };
 
     try {
@@ -491,7 +554,7 @@ class ActiveAlertsComponent extends HTMLElement {
     } catch (error) {
       this.alerts = [];
       this.resetFilteredAlertsCache();
-      this.renderAlerts();
+      await this.renderAlerts();
       this.updateHeaderState();
       this.updateSectionHeaderAlertIcon();
       this.handleLoadError(error);
@@ -499,6 +562,14 @@ class ActiveAlertsComponent extends HTMLElement {
       this.isLoading = false;
       this.setLoadingState(false);
       this.updateHeaderState();
+      
+      // Remove from call stack
+      const index = window.__LOAD_ACTIVE_ALERTS_CALL_STACK__.findIndex(c => 
+        Math.abs(c.timestamp - callInfo.timestamp) < 10
+      );
+      if (index !== -1) {
+        window.__LOAD_ACTIVE_ALERTS_CALL_STACK__.splice(index, 1);
+      }
     }
   }
 
@@ -550,13 +621,13 @@ class ActiveAlertsComponent extends HTMLElement {
     this.updateFilterButtons();
   }
 
-  renderAlerts() {
+  async renderAlerts() {
     const listContainer = this._elements?.list;
     if (!listContainer) {
       return;
     }
 
-    listContainer.innerHTML = '';
+    listContainer.textContent = '';
 
     const filteredAlerts = this.getFilteredAlerts(true);
     if (!filteredAlerts.length) {
@@ -572,8 +643,11 @@ class ActiveAlertsComponent extends HTMLElement {
 
     const fragment = document.createDocumentFragment();
 
-    sortedAlerts.forEach(alert => {
-      const card = this.createAlertCardElement(alert);
+    // Use Promise.all to create all cards in parallel (createAlertCardElement is now async)
+    const cardPromises = sortedAlerts.map(alert => this.createAlertCardElement(alert));
+    const cards = await Promise.all(cardPromises);
+    
+    cards.forEach(card => {
       if (card) {
         fragment.appendChild(card);
       }
@@ -583,7 +657,7 @@ class ActiveAlertsComponent extends HTMLElement {
     this.updateHeaderState();
   }
 
-  createAlertCardElement(alert) {
+  async createAlertCardElement(alert) {
     if (!alert || typeof alert !== 'object') {
       this.log('warn', 'Skipping invalid alert entry', { alert });
       return null;
@@ -612,7 +686,9 @@ class ActiveAlertsComponent extends HTMLElement {
     const header = document.createElement('div');
     header.className = 'active-alerts__card-header';
 
-    header.appendChild(this.createHeaderContent(alert, relatedType, relatedMeta, displayName, symbol));
+    // createHeaderContent is now async, so we need to await it
+    const headerContent = await this.createHeaderContent(alert, relatedType, relatedMeta, displayName, symbol);
+    header.appendChild(headerContent);
     header.appendChild(this.createDetailsButton(alert));
 
     const body = document.createElement('div');
@@ -784,7 +860,7 @@ class ActiveAlertsComponent extends HTMLElement {
     return normalized;
   }
 
-  createHeaderContent(alert, relatedType, relatedMeta, displayName, symbol) {
+  async createHeaderContent(alert, relatedType, relatedMeta, displayName, symbol) {
     const container = document.createElement('div');
     container.className = 'active-alerts__header-linked';
 
@@ -797,7 +873,12 @@ class ActiveAlertsComponent extends HTMLElement {
           relatedMeta,
         );
         if (html) {
-          container.innerHTML = html;
+          container.textContent = '';
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(html, 'text/html');
+          doc.body.childNodes.forEach(node => {
+              container.appendChild(node.cloneNode(true));
+          });
           const linkedElement = container.firstElementChild;
           if (linkedElement) {
             linkedElement.classList.add('active-alerts__linked-entity');
@@ -821,17 +902,67 @@ class ActiveAlertsComponent extends HTMLElement {
     const headerLine = document.createElement('div');
     headerLine.className = 'active-alerts__fallback-primary';
 
-    const iconPath = this.getIconPath(relatedType);
     const entityLabel = this.getEntityLabel(relatedType);
 
-    if (iconPath) {
-      const icon = document.createElement('img');
-      icon.className = 'active-alerts__symbol-icon';
-      icon.src = iconPath;
-      icon.alt = entityLabel;
-      icon.width = 20;
-      icon.height = 20;
-      headerLine.appendChild(icon);
+    // Use IconSystem directly (new icon system)
+    if (typeof window.IconSystem !== 'undefined' && window.IconSystem.initialized) {
+      try {
+        // Normalize entity type for IconSystem
+        const entityTypeMap = {
+          'trading_account': 'account',
+          'trading_accounts': 'account',
+          'trade': 'trade',
+          'trades': 'trade',
+          'trade_plan': 'trade_plan',
+          'trade_plans': 'trade_plan',
+          'ticker': 'ticker',
+          'tickers': 'ticker',
+          'alert': 'alert',
+          'alerts': 'alert',
+          'execution': 'execution',
+          'executions': 'execution',
+          'cash_flow': 'cash_flow',
+          'cash_flows': 'cash_flow',
+          'note': 'note',
+          'notes': 'note'
+        };
+        const normalizedEntityType = entityTypeMap[relatedType] || relatedType;
+        
+        const iconHTML = await window.IconSystem.renderIcon('entity', normalizedEntityType, {
+          size: '20',
+          alt: entityLabel,
+          class: 'active-alerts__symbol-icon'
+        });
+        
+        const tempDiv = document.createElement('div');
+        tempDiv.textContent = '';
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(iconHTML, 'text/html');
+        doc.body.childNodes.forEach(node => {
+            tempDiv.appendChild(node.cloneNode(true));
+        });
+        const icon = tempDiv.firstElementChild;
+        if (icon) {
+          headerLine.appendChild(icon);
+        } else {
+          // Fallback to basic icon if renderIcon returns empty
+          this.log('warn', 'IconSystem.renderIcon returned empty HTML', { relatedType, normalizedEntityType });
+        }
+      } catch (error) {
+        this.log('warn', 'Failed to render icon via IconSystem', { relatedType, error: error?.message });
+      }
+    } else {
+      // Fallback if IconSystem not available - use old method
+      const iconPath = this.getIconPathSync(relatedType);
+      if (iconPath) {
+        const icon = document.createElement('img');
+        icon.className = 'active-alerts__symbol-icon';
+        icon.src = iconPath;
+        icon.alt = entityLabel;
+        icon.width = 20;
+        icon.height = 20;
+        headerLine.appendChild(icon);
+      }
     }
 
     const primaryText = document.createElement('span');
@@ -942,7 +1073,9 @@ class ActiveAlertsComponent extends HTMLElement {
         window.showSuccessNotification('התראה עודכנה', 'התראה סומנה כנקראה');
       }
 
-      await this.loadActiveAlerts({ force: true });
+      // CRITICAL: Prevent infinite recursion - don't reload if already loading
+      // The state is already updated above, so we don't need to reload
+      // await this.loadActiveAlerts({ force: true });
       this.log('info', 'Alert marked as read', { alertId });
     } catch (error) {
       this.log('error', 'Failed to mark alert as read', { alertId, error: error?.message });
@@ -1118,21 +1251,28 @@ class ActiveAlertsComponent extends HTMLElement {
     return fallback[relatedType] || 'פריט';
   }
 
-  getIconPath(relatedType) {
-    if (window.LinkedItemsService && typeof window.LinkedItemsService.getLinkedItemIcon === 'function') {
-      try {
-        return window.LinkedItemsService.getLinkedItemIcon(relatedType);
-      } catch (error) {
-        this.log('warn', 'Failed to resolve icon via LinkedItemsService', { relatedType, error: error?.message });
-      }
-    }
-
+  /**
+   * Get icon path synchronously (fallback only - use IconSystem instead)
+   * @deprecated Use IconSystem.renderIcon() instead
+   */
+  getIconPathSync(relatedType) {
     const iconMap = {
       trading_account: 'images/icons/trading_accounts.svg',
+      trading_accounts: 'images/icons/trading_accounts.svg',
       trade: 'images/icons/trades.svg',
+      trades: 'images/icons/trades.svg',
       trade_plan: 'images/icons/trade_plans.svg',
+      trade_plans: 'images/icons/trade_plans.svg',
       ticker: 'images/icons/tickers.svg',
+      tickers: 'images/icons/tickers.svg',
       alert: 'images/icons/alerts.svg',
+      alerts: 'images/icons/alerts.svg',
+      execution: 'images/icons/executions.svg',
+      executions: 'images/icons/executions.svg',
+      cash_flow: 'images/icons/cash_flows.svg',
+      cash_flows: 'images/icons/cash_flows.svg',
+      note: 'images/icons/notes.svg',
+      notes: 'images/icons/notes.svg',
       default: 'images/icons/alerts.svg',
     };
 
@@ -1184,34 +1324,63 @@ class ActiveAlertsComponent extends HTMLElement {
     return date.toLocaleDateString('he-IL');
   }
 
+  /**
+   * Create status badge - משתמש ב-FieldRendererService המרכזי
+   * @deprecated - השתמש ישירות ב-window.FieldRendererService.renderStatus() (מחזיר HTML string)
+   * @param {string} status - סטטוס
+   * @param {string} relatedType - סוג ישות
+   * @returns {HTMLElement|null} DOM element או null
+   */
   createStatusBadge(status, relatedType) {
     if (!status) {
       return null;
     }
 
-    if (window.FieldRendererService && typeof window.FieldRendererService.renderStatus === 'function') {
+    // שימוש ישיר ב-FieldRendererService - המערכת תמיד זמינה דרך BASE package
+    if (window.FieldRendererService?.renderStatus) {
       const wrapper = document.createElement('span');
-      wrapper.innerHTML = window.FieldRendererService.renderStatus(status, relatedType);
+      wrapper.textContent = '';
+      const statusHTML = window.FieldRendererService.renderStatus(status, relatedType);
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(statusHTML, 'text/html');
+      doc.body.childNodes.forEach(node => {
+          wrapper.appendChild(node.cloneNode(true));
+      });
       return wrapper.firstElementChild;
     }
 
+    // Fallback למקרה נדיר ביותר שהמערכת לא זמינה
     const badge = document.createElement('span');
     badge.className = 'active-alerts__fallback-badge';
     badge.textContent = status;
     return badge;
   }
 
+  /**
+   * Create side badge - משתמש ב-FieldRendererService המרכזי
+   * @deprecated - השתמש ישירות ב-window.FieldRendererService.renderSide() (מחזיר HTML string)
+   * @param {string} side - צד (Long/Short)
+   * @returns {HTMLElement|null} DOM element או null
+   */
   createSideBadge(side) {
     if (!side) {
       return null;
     }
 
-    if (window.FieldRendererService && typeof window.FieldRendererService.renderSide === 'function') {
+    // שימוש ישיר ב-FieldRendererService - המערכת תמיד זמינה דרך BASE package
+    if (window.FieldRendererService?.renderSide) {
       const wrapper = document.createElement('span');
-      wrapper.innerHTML = window.FieldRendererService.renderSide(side);
+      wrapper.textContent = '';
+      const sideHTML = window.FieldRendererService.renderSide(side);
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(sideHTML, 'text/html');
+      doc.body.childNodes.forEach(node => {
+          wrapper.appendChild(node.cloneNode(true));
+      });
       return wrapper.firstElementChild;
     }
 
+    // Fallback למקרה נדיר ביותר שהמערכת לא זמינה
     const badge = document.createElement('span');
     badge.className = 'active-alerts__fallback-badge';
     badge.textContent = side;
@@ -1225,7 +1394,13 @@ class ActiveAlertsComponent extends HTMLElement {
 
     if (window.FieldRendererService && typeof window.FieldRendererService.renderType === 'function') {
       const wrapper = document.createElement('span');
-      wrapper.innerHTML = window.FieldRendererService.renderType(investmentType);
+      wrapper.textContent = '';
+      const typeHTML = window.FieldRendererService.renderType(investmentType);
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(typeHTML, 'text/html');
+      doc.body.childNodes.forEach(node => {
+          wrapper.appendChild(node.cloneNode(true));
+      });
       return wrapper.firstElementChild;
     }
 
@@ -1365,15 +1540,53 @@ class ActiveAlertsComponent extends HTMLElement {
   }
 
   handleLoadError(error) {
+    // CRITICAL: Prevent recursion - don't use Logger or showNotification if loadActiveAlerts is in progress
+    // or if getPreference is in progress (to avoid Logger -> getPreference -> Logger loop)
+    if (this.isLoading || window.__GET_PREFERENCE_IN_PROGRESS__) {
+      // Use console directly during loading to avoid recursion
+      if (window.DEBUG_MODE) {
+        console.error('[ActiveAlertsComponent] Failed to load active alerts', { error: error?.message });
+      }
+      return;
+    }
+    
     this.log('error', 'Failed to load active alerts', { error: error?.message });
-    if (typeof window.showErrorNotification === 'function') {
-      window.showErrorNotification('שגיאה בטעינת התראות פעילות', error?.message || 'אירעה שגיאה בעת טעינת ההתראות');
+    
+    // CRITICAL: Only show notification if not currently loading preferences to avoid recursion
+    if (!window.__GET_PREFERENCE_IN_PROGRESS__ && typeof window.showErrorNotification === 'function') {
+      try {
+        window.showErrorNotification('שגיאה בטעינת התראות פעילות', error?.message || 'אירעה שגיאה בעת טעינת ההתראות');
+      } catch (notifError) {
+        // Fallback to console if notification fails
+        if (window.DEBUG_MODE) {
+          console.error('[ActiveAlertsComponent] Failed to show error notification', notifError);
+        }
+      }
     }
   }
 
   log(level, message, extra = {}) {
+    // CRITICAL: Prevent recursion - don't use Logger if loadActiveAlerts is in progress
+    // or if getPreference is in progress (to avoid Logger -> getPreference -> Logger loop)
+    if (this.isLoading || window.__GET_PREFERENCE_IN_PROGRESS__) {
+      // Use console directly during loading to avoid recursion
+      if (window.DEBUG_MODE) {
+        const consoleMethod = level === 'error' ? console.error : level === 'warn' ? console.warn : console.log;
+        consoleMethod(`[ActiveAlertsComponent] ${message}`, extra);
+      }
+      return;
+    }
+    
     if (window.Logger && typeof window.Logger[level] === 'function') {
-      window.Logger[level](message, { component: 'ActiveAlertsComponent', ...extra });
+      try {
+        window.Logger[level](message, { component: 'ActiveAlertsComponent', ...extra });
+      } catch (error) {
+        // Fallback to console if Logger fails
+        if (window.DEBUG_MODE) {
+          const consoleMethod = level === 'error' ? console.error : level === 'warn' ? console.warn : console.log;
+          consoleMethod(`[ActiveAlertsComponent] ${message}`, extra);
+        }
+      }
     }
   }
 

@@ -74,6 +74,35 @@
     }));
   }
 
+  /**
+   * Sort tickers alphabetically by symbol, then by name
+   * This is the standard business logic for ticker ordering across the system
+   * @param {Array} tickers - Array of ticker objects
+   * @returns {Array} Sorted array of tickers
+   */
+  function sortTickersAlphabetically(tickers) {
+    if (!Array.isArray(tickers)) {
+      return [];
+    }
+    
+    return [...tickers].sort((a, b) => {
+      // Get symbol (fallback to empty string)
+      const symbolA = (a.symbol || a.ticker_symbol || '').toUpperCase();
+      const symbolB = (b.symbol || b.ticker_symbol || '').toUpperCase();
+      
+      // First compare by symbol
+      const symbolCompare = symbolA.localeCompare(symbolB, 'he', { numeric: true, sensitivity: 'base' });
+      if (symbolCompare !== 0) {
+        return symbolCompare;
+      }
+      
+      // If symbols are equal, compare by name
+      const nameA = (a.name || '').toUpperCase();
+      const nameB = (b.name || '').toUpperCase();
+      return nameA.localeCompare(nameB, 'he', { numeric: true, sensitivity: 'base' });
+    });
+  }
+
   async function saveTickersCache(data, options = {}) {
     if (!window.UnifiedCacheManager?.save) {
       return;
@@ -147,11 +176,37 @@
   }
 
   async function fetchTickersFromApi({ signal } = {}) {
+    // Guard: avoid hitting API before authentication to prevent 401 spam
+    if (typeof window.TikTrackAuth?.getCurrentUser === 'function') {
+      const user = window.TikTrackAuth.getCurrentUser();
+      if (!user || !user.id) {
+        window.Logger?.debug?.('⚠️ Skipping tickers load - user not authenticated yet', PAGE_LOG_CONTEXT);
+        return [];
+      }
+    }
+
     const base = resolveBaseUrl();
     const separator = base.endsWith('/') ? '' : '/';
-    const url = `${base}${separator}api/tickers/?_ts=${Date.now()}`;
-    const response = await fetch(url, { method: 'GET', headers: DEFAULT_HEADERS, signal });
+    // Use /api/tickers/my to get only user's tickers
+    const url = `${base}${separator}api/tickers/my?_ts=${Date.now()}`;
+    const response = await fetch(url, { 
+      method: 'GET',
+      // Authorization injected by api-fetch-wrapper
+      signal
+    });
+
     if (!response.ok) {
+      // Soft-fail on auth issues to avoid noisy 401s
+      if (response.status === 401 || response.status === 403) {
+        window.Logger?.debug?.('⚠️ Tickers load blocked - unauthorized', { ...PAGE_LOG_CONTEXT, status: response.status });
+        return [];
+      }
+      // Soft-fail on missing resource
+      if (response.status === 404) {
+        window.Logger?.warn?.('⚠️ Tickers endpoint returned 404', { ...PAGE_LOG_CONTEXT, status: response.status });
+        return [];
+      }
+
       const error = new Error(`Ticker load failed (${response.status})`);
       notifyLoadError(error.message, error);
       throw error;
@@ -434,6 +489,146 @@
     }
   }
 
+  /**
+   * Get all tickers (for search/adding to user list)
+   * All tickers are shared across users
+   */
+  async function getAllTickers(options = {}) {
+    // Note: This now returns user's tickers only (via /api/tickers/my)
+    // For backward compatibility, it uses the same endpoint as getUserTickers
+    const { force = false, signal } = options;
+    return await loadTickersData({ force, signal });
+  }
+
+  /**
+   * Get tickers for the current authenticated user
+   */
+  async function getUserTickers(options = {}) {
+    const { force = false, signal } = options;
+    const USER_TICKERS_KEY = 'user-tickers-data';
+    const ttl = options.ttl ?? TICKERS_TTL;
+
+    try {
+      if (force) {
+        await clearTickersCache(true);
+      }
+
+      // Check cache first
+      if (!force && window.UnifiedCacheManager?.get) {
+        const cached = await window.UnifiedCacheManager.get(USER_TICKERS_KEY, { ttl });
+        if (cached && Array.isArray(cached)) {
+          window.Logger?.debug?.('User tickers served from cache', { ...PAGE_LOG_CONTEXT, count: cached.length });
+          return cached;
+        }
+      }
+
+      // Fetch from API
+      const base = resolveBaseUrl();
+      const separator = base.endsWith('/') ? '' : '/';
+      const url = `${base}${separator}api/tickers/my?_ts=${Date.now()}`;
+      
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: DEFAULT_HEADERS, // Include session cookie
+        signal
+      });
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error('Authentication required');
+        }
+        const error = new Error(`Failed to load user tickers (${response.status})`);
+        notifyLoadError(error.message, error);
+        throw error;
+      }
+
+      const payload = await response.json();
+      const normalized = normalizeTickersPayload(payload);
+      
+      // Save to cache
+      if (window.UnifiedCacheManager?.save) {
+        await window.UnifiedCacheManager.save(USER_TICKERS_KEY, normalized, { ttl });
+      }
+      
+      return normalized;
+    } catch (error) {
+      notifyLoadError('שגיאה בטעינת טיקרים של המשתמש', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Add a ticker to the current user's list
+   */
+  async function addTickerToUser(tickerId, options = {}) {
+    const { signal } = options;
+    
+    try {
+      const base = resolveBaseUrl();
+      const separator = base.endsWith('/') ? '' : '/';
+      const url = `${base}${separator}api/tickers/${tickerId}/add-to-user`;
+      
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: DEFAULT_HEADERS, signal
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error?.message || `Failed to add ticker to user list (${response.status})`);
+      }
+
+      // Invalidate user tickers cache
+      if (window.UnifiedCacheManager?.invalidate) {
+        await window.UnifiedCacheManager.invalidate('user-tickers-data').catch(() => {});
+      }
+      await invalidateTickersCache();
+
+      const result = await response.json();
+      window.Logger?.info?.('✅ Ticker added to user list', { ...PAGE_LOG_CONTEXT, tickerId });
+      return result;
+    } catch (error) {
+      window.Logger?.error?.('❌ Error adding ticker to user list', { ...PAGE_LOG_CONTEXT, error: error?.message || error });
+      throw error;
+    }
+  }
+
+  /**
+   * Remove a ticker from the current user's list
+   */
+  async function removeTickerFromUser(tickerId, options = {}) {
+    const { signal } = options;
+    
+    try {
+      const base = resolveBaseUrl();
+      const separator = base.endsWith('/') ? '' : '/';
+      const url = `${base}${separator}api/tickers/${tickerId}/remove-from-user`;
+      
+      const response = await fetch(url, {
+        method: 'DELETE',
+        headers: DEFAULT_HEADERS, signal
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error?.message || `Failed to remove ticker from user list (${response.status})`);
+      }
+
+      // Invalidate user tickers cache
+      if (window.UnifiedCacheManager?.invalidate) {
+        await window.UnifiedCacheManager.invalidate('user-tickers-data').catch(() => {});
+      }
+      await invalidateTickersCache();
+
+      const result = await response.json();
+      window.Logger?.info?.('✅ Ticker removed from user list', { ...PAGE_LOG_CONTEXT, tickerId });
+      return result;
+    } catch (error) {
+      window.Logger?.error?.('❌ Error removing ticker from user list', { ...PAGE_LOG_CONTEXT, error: error?.message || error });
+      throw error;
+    }
+  }
+
   window.TickersData = {
     KEY: TICKERS_DATA_KEY,
     TTL: TICKERS_TTL,
@@ -448,6 +643,13 @@
     fetchTickerDetails,
     validateTicker,
     validateTickerSymbol,
+    // Multi-user functions
+    getAllTickers,
+    getUserTickers,
+    addTickerToUser,
+    removeTickerFromUser,
+    // Utility functions
+    sortTickersAlphabetically,
   };
 
   window.Logger?.info?.('✅ Tickers Data Service initialized', PAGE_LOG_CONTEXT);

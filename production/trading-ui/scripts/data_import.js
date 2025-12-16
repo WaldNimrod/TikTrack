@@ -133,8 +133,16 @@
             return value;
         }
 
-        const parsed = Date.parse(value);
-        if (!Number.isNaN(parsed)) {
+        // Use TableSortValueAdapter if available for consistent date parsing
+        let parsed = null;
+        if (typeof window.TableSortValueAdapter?.getSortValue === 'function') {
+            const sortValue = window.TableSortValueAdapter.getSortValue({ value: value, type: 'date' });
+            parsed = typeof sortValue === 'number' && !Number.isNaN(sortValue) ? sortValue : Date.parse(value);
+        } else {
+            parsed = Date.parse(value);
+        }
+        
+        if (parsed !== null && !Number.isNaN(parsed)) {
             // Use dateUtils for consistent date handling
             let dateObj;
             if (window.dateUtils && typeof window.dateUtils.toDateObject === 'function') {
@@ -179,10 +187,25 @@
             return envelope;
         }
 
+        // Use TableSortValueAdapter if available for consistent date parsing
+        if (typeof window.TableSortValueAdapter?.getSortValue === 'function') {
+            const sortValue = window.TableSortValueAdapter.getSortValue({ value: envelope, type: 'auto' });
+            if (typeof sortValue === 'number' && Number.isFinite(sortValue)) {
+                return sortValue;
+            }
+        }
+
+        // Fallback to manual extraction
         const candidate = envelope.epochMs
-            ?? (envelope.utc ? Date.parse(envelope.utc) : null)
-            ?? (envelope.local ? Date.parse(envelope.local) : null)
-            ?? (typeof envelope === 'string' ? Date.parse(envelope) : null);
+            ?? (envelope.utc ? (typeof window.TableSortValueAdapter?.getSortValue === 'function' 
+                ? window.TableSortValueAdapter.getSortValue({ value: envelope.utc, type: 'date' }) 
+                : Date.parse(envelope.utc)) : null)
+            ?? (envelope.local ? (typeof window.TableSortValueAdapter?.getSortValue === 'function' 
+                ? window.TableSortValueAdapter.getSortValue({ value: envelope.local, type: 'date' }) 
+                : Date.parse(envelope.local)) : null)
+            ?? (typeof envelope === 'string' ? (typeof window.TableSortValueAdapter?.getSortValue === 'function' 
+                ? window.TableSortValueAdapter.getSortValue({ value: envelope, type: 'date' }) 
+                : Date.parse(envelope)) : null);
 
         return Number.isFinite(candidate) ? candidate : 0;
     }
@@ -259,7 +282,7 @@
             // Use sessions directly - same as executions.js, no normalization needed
             const sessions = historyResults.flat();
             
-            // Sort by created_at (same logic as executions)
+            // Sort by created_at using TableSortValueAdapter
             sessions.sort((a, b) => {
                 const dateA = a.created_at || a.completed_at || null;
                 const dateB = b.created_at || b.completed_at || null;
@@ -267,7 +290,14 @@
                 if (!dateA) return 1;
                 if (!dateB) return -1;
                 
-                // Get epoch for comparison
+                // Use TableSortValueAdapter if available
+                if (typeof window.TableSortValueAdapter?.getSortValue === 'function') {
+                    const sortValueA = window.TableSortValueAdapter.getSortValue({ value: dateA, type: 'auto' });
+                    const sortValueB = window.TableSortValueAdapter.getSortValue({ value: dateB, type: 'auto' });
+                    return (sortValueB || 0) - (sortValueA || 0);
+                }
+                
+                // Fallback to manual date comparison using dateUtils or direct epoch extraction
                 let epochA = null;
                 let epochB = null;
                 
@@ -279,7 +309,13 @@
                 } else if (dateA instanceof Date) {
                     epochA = dateA.getTime();
                 } else if (typeof dateA === 'string') {
-                    epochA = Date.parse(dateA);
+                    // Use TableSortValueAdapter for date parsing if available, otherwise Date.parse
+                    if (typeof window.TableSortValueAdapter?.getSortValue === 'function') {
+                        const sortValue = window.TableSortValueAdapter.getSortValue({ value: dateA, type: 'date' });
+                        epochA = typeof sortValue === 'number' ? sortValue : Date.parse(dateA);
+                    } else {
+                        epochA = Date.parse(dateA);
+                    }
                 }
                 
                 if (dateB && typeof dateB === 'object' && dateB.epochMs) {
@@ -287,7 +323,13 @@
                 } else if (dateB instanceof Date) {
                     epochB = dateB.getTime();
                 } else if (typeof dateB === 'string') {
-                    epochB = Date.parse(dateB);
+                    // Use TableSortValueAdapter for date parsing if available, otherwise Date.parse
+                    if (typeof window.TableSortValueAdapter?.getSortValue === 'function') {
+                        const sortValue = window.TableSortValueAdapter.getSortValue({ value: dateB, type: 'date' });
+                        epochB = typeof sortValue === 'number' ? sortValue : Date.parse(dateB);
+                    } else {
+                        epochB = Date.parse(dateB);
+                    }
                 }
                 
                 return (epochB || 0) - (epochA || 0);
@@ -403,11 +445,19 @@
                 }
 
                 if (!response.ok) {
-                    throw new Error(`קוד שגיאה ${response.status} בהבאת היסטוריה לחשבון ${account.id}`);
+                    if ([401, 403, 404].includes(response.status)) {
+                        // User not authenticated or no import history - return empty array
+                        if (window.Logger && typeof window.Logger.debug === 'function') {
+                            window.Logger.debug(`⚠️ Import history API returned ${response.status}, returning empty data`, { accountId: account.id, page: PAGE_NAME });
+                        }
+                        sessions = [];
+                    } else {
+                        throw new Error(`קוד שגיאה ${response.status} בהבאת היסטוריה לחשבון ${account.id}`);
+                    }
+                } else {
+                    const payload = await response.json();
+                    sessions = payload.sessions || payload.data || [];
                 }
-
-                const payload = await response.json();
-                sessions = payload.sessions || payload.data || [];
                 
                 // Debug: Log API response
                 if (window.Logger && Logger.DEBUG_MODE && Array.isArray(sessions) && sessions.length > 0) {
@@ -750,7 +800,16 @@
             const activeSession = state.sessions.find(session => ACTIVE_STATUSES.has(session.status));
             if (activeSession) {
                 const statusHtml = renderStatus(activeSession.status);
-                activeStatusElement.innerHTML = `${statusHtml} <span class="session-meta">(#${activeSession.id})</span>`;
+                activeStatusElement.textContent = '';
+                const parser = new DOMParser();
+                const statusDoc = parser.parseFromString(statusHtml, 'text/html');
+                statusDoc.body.childNodes.forEach(node => {
+                    activeStatusElement.appendChild(node.cloneNode(true));
+                });
+                const span = document.createElement('span');
+                span.className = 'session-meta';
+                span.textContent = `(#${activeSession.id})`;
+                activeStatusElement.appendChild(span);
             } else {
                 activeStatusElement.textContent = 'אין סשנים פעילים';
             }
@@ -768,7 +827,7 @@
             return;
         }
 
-        tableBody.innerHTML = '';
+        tableBody.textContent = '';
 
         const effectiveData = Array.isArray(tableData) ? tableData : state.sessions;
 
@@ -839,15 +898,24 @@
                 // Use FieldRendererService to render date with time
                 dateDisplay = window.FieldRendererService.renderDate(rawDate, true);
                 
-                // Get epoch for sorting
-                if (window.dateUtils && typeof window.dateUtils.getEpochMilliseconds === 'function') {
+                // Get epoch for sorting using TableSortValueAdapter if available
+                if (typeof window.TableSortValueAdapter?.getSortValue === 'function') {
+                    const sortValue = window.TableSortValueAdapter.getSortValue({ value: rawDate, type: 'auto' });
+                    epoch = typeof sortValue === 'number' && !Number.isNaN(sortValue) ? sortValue : null;
+                } else if (window.dateUtils && typeof window.dateUtils.getEpochMilliseconds === 'function') {
                     const envelope = window.dateUtils.ensureDateEnvelope ? window.dateUtils.ensureDateEnvelope(rawDate) : rawDate;
                     epoch = window.dateUtils.getEpochMilliseconds(envelope || rawDate);
                 } else if (rawDate instanceof Date) {
                     epoch = rawDate.getTime();
                 } else if (typeof rawDate === 'string') {
-                    const parsed = Date.parse(rawDate);
-                    epoch = Number.isNaN(parsed) ? null : parsed;
+                    // Use TableSortValueAdapter if available for date parsing
+                    if (typeof window.TableSortValueAdapter?.getSortValue === 'function') {
+                        const sortValue = window.TableSortValueAdapter.getSortValue({ value: rawDate, type: 'date' });
+                        epoch = typeof sortValue === 'number' && !Number.isNaN(sortValue) ? sortValue : null;
+                    } else {
+                        const parsed = Date.parse(rawDate);
+                        epoch = Number.isNaN(parsed) ? null : parsed;
+                    }
                 } else if (rawDate && typeof rawDate === 'object' && rawDate.epochMs) {
                     epoch = rawDate.epochMs;
                 }
@@ -861,13 +929,32 @@
                     dateDisplay = rawDate.toLocaleString('he-IL');
                     epoch = rawDate.getTime();
                 } else if (typeof rawDate === 'string') {
-                    const parsed = Date.parse(rawDate);
-                    if (!Number.isNaN(parsed)) {
-                        const date = new Date(parsed);
-                        dateDisplay = date.toLocaleString('he-IL');
-                        epoch = parsed;
+                    // Use TableSortValueAdapter if available for date parsing
+                    if (typeof window.TableSortValueAdapter?.getSortValue === 'function') {
+                        const sortValue = window.TableSortValueAdapter.getSortValue({ value: rawDate, type: 'date' });
+                        if (typeof sortValue === 'number' && !Number.isNaN(sortValue)) {
+                            const date = new Date(sortValue);
+                            dateDisplay = date.toLocaleString('he-IL');
+                            epoch = sortValue;
+                        } else {
+                            const parsed = Date.parse(rawDate);
+                            if (!Number.isNaN(parsed)) {
+                                const date = new Date(parsed);
+                                dateDisplay = date.toLocaleString('he-IL');
+                                epoch = parsed;
+                            } else {
+                                dateDisplay = rawDate;
+                            }
+                        }
                     } else {
-                        dateDisplay = rawDate;
+                        const parsed = Date.parse(rawDate);
+                        if (!Number.isNaN(parsed)) {
+                            const date = new Date(parsed);
+                            dateDisplay = date.toLocaleString('he-IL');
+                            epoch = parsed;
+                        } else {
+                            dateDisplay = rawDate;
+                        }
                     }
                 } else {
                     dateDisplay = String(rawDate);
@@ -893,15 +980,24 @@
                 // Use FieldRendererService to render date with time
                 dateDisplay = window.FieldRendererService.renderDate(rawDate, true);
                 
-                // Get epoch for sorting
-                if (window.dateUtils && typeof window.dateUtils.getEpochMilliseconds === 'function') {
+                // Get epoch for sorting using TableSortValueAdapter if available
+                if (typeof window.TableSortValueAdapter?.getSortValue === 'function') {
+                    const sortValue = window.TableSortValueAdapter.getSortValue({ value: rawDate, type: 'auto' });
+                    epoch = typeof sortValue === 'number' && !Number.isNaN(sortValue) ? sortValue : null;
+                } else if (window.dateUtils && typeof window.dateUtils.getEpochMilliseconds === 'function') {
                     const envelope = window.dateUtils.ensureDateEnvelope ? window.dateUtils.ensureDateEnvelope(rawDate) : rawDate;
                     epoch = window.dateUtils.getEpochMilliseconds(envelope || rawDate);
                 } else if (rawDate instanceof Date) {
                     epoch = rawDate.getTime();
                 } else if (typeof rawDate === 'string') {
-                    const parsed = Date.parse(rawDate);
-                    epoch = Number.isNaN(parsed) ? null : parsed;
+                    // Use TableSortValueAdapter if available for date parsing
+                    if (typeof window.TableSortValueAdapter?.getSortValue === 'function') {
+                        const sortValue = window.TableSortValueAdapter.getSortValue({ value: rawDate, type: 'date' });
+                        epoch = typeof sortValue === 'number' && !Number.isNaN(sortValue) ? sortValue : null;
+                    } else {
+                        const parsed = Date.parse(rawDate);
+                        epoch = Number.isNaN(parsed) ? null : parsed;
+                    }
                 } else if (rawDate && typeof rawDate === 'object' && rawDate.epochMs) {
                     epoch = rawDate.epochMs;
                 }
@@ -915,13 +1011,32 @@
                     dateDisplay = rawDate.toLocaleString('he-IL');
                     epoch = rawDate.getTime();
                 } else if (typeof rawDate === 'string') {
-                    const parsed = Date.parse(rawDate);
-                    if (!Number.isNaN(parsed)) {
-                        const date = new Date(parsed);
-                        dateDisplay = date.toLocaleString('he-IL');
-                        epoch = parsed;
+                    // Use TableSortValueAdapter if available for date parsing
+                    if (typeof window.TableSortValueAdapter?.getSortValue === 'function') {
+                        const sortValue = window.TableSortValueAdapter.getSortValue({ value: rawDate, type: 'date' });
+                        if (typeof sortValue === 'number' && !Number.isNaN(sortValue)) {
+                            const date = new Date(sortValue);
+                            dateDisplay = date.toLocaleString('he-IL');
+                            epoch = sortValue;
+                        } else {
+                            const parsed = Date.parse(rawDate);
+                            if (!Number.isNaN(parsed)) {
+                                const date = new Date(parsed);
+                                dateDisplay = date.toLocaleString('he-IL');
+                                epoch = parsed;
+                            } else {
+                                dateDisplay = rawDate;
+                            }
+                        }
                     } else {
-                        dateDisplay = rawDate;
+                        const parsed = Date.parse(rawDate);
+                        if (!Number.isNaN(parsed)) {
+                            const date = new Date(parsed);
+                            dateDisplay = date.toLocaleString('he-IL');
+                            epoch = parsed;
+                        } else {
+                            dateDisplay = rawDate;
+                        }
                     }
                 } else {
                     dateDisplay = String(rawDate);
@@ -940,7 +1055,7 @@
                     data-tooltip="מחק סשן ייבוא"></button>
         `;
         
-        row.innerHTML = [
+        const rowHTML = [
             `<td class="col-session-id">#${session.id}</td>`,
             `<td class="col-account">${session.trading_account_name || (session.trading_account_id ? `חשבון #${session.trading_account_id}` : 'לא ידוע')}</td>`,
             `<td class="col-provider">${session.provider || 'לא צויין'}</td>`,
@@ -955,6 +1070,15 @@
                 ${deleteButton}
             </td>`
         ].join('');
+        row.textContent = '';
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(`<table><tbody><tr>${rowHTML}</tr></tbody></table>`, 'text/html');
+        const tempRow = doc.body.querySelector('tr');
+        if (tempRow) {
+            Array.from(tempRow.children).forEach(cell => {
+                row.appendChild(cell.cloneNode(true));
+            });
+        }
 
         return row;
     }

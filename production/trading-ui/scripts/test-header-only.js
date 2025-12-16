@@ -7,6 +7,63 @@
  * @author TikTrack Development Team
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - initializeTestingSystem() - Initializetestingsystem
+// - runInitialTests() - Runinitialtests
+
+// === Core Functions ===
+// - runUnitTests() - Rununittests
+// - runPerformanceTests() - Runperformancetests
+// - runAllTests() - Runalltests
+
+// === Event Handlers ===
+// - testComponents() - Testcomponents
+// - testIntegration() - Testintegration
+// - runIntegrationTests() - Runintegrationtests
+// - showActiveContainer() - Showactivecontainer
+// - loadActionButtons() - Loadactionbuttons
+// - loadExecutionsTableData() - Loadexecutionstabledata
+// - updateExecutionsTableDisplay() - Updateexecutionstabledisplay
+// - toggleTickersSection() - Toggletickerssection
+// - toggleTopSection() - Toggletopsection
+// - translateAction() - Translateaction
+
+// === UI Functions ===
+// - updateSystemStats() - Updatesystemstats
+// - updatePerformanceMetrics() - Updateperformancemetrics
+// - updateStatus() - Updatestatus
+// - updateAllStatuses() - Updateallstatuses
+// - updateCurrentFilterStatus() - Updatecurrentfilterstatus
+// - updateDateRangeInfo() - Updatedaterangeinfo
+// - updateTableStats() - Updatetablestats
+// - updateQuickStats() - Updatequickstats
+// - updateTradePlansTableDisplay() - Updatetradeplanstabledisplay
+
+// === Data Functions ===
+// - loadRealData() - Loadrealdata
+// - loadTradePlansTableData() - Loadtradeplanstabledata
+
+// === API Functions ===
+// - testServices() - Testservices
+
+// === Other ===
+// - log() - Log
+// - registerTablesWithFilterSystem() - Registertableswithfiltersystem
+// - resetSystem() - Resetsystem
+// - testStatusFilter() - Teststatusfilter
+// - testTypeFilter() - Testtypefilter
+// - testAccountFilter() - Testaccountfilter
+// - testDateFilter() - Testdatefilter
+// - testSearchFilter() - Testsearchfilter
+// - filterTickersByType() - Filtertickersbytype
+// - generateDetailedLog() - Generatedetailedlog
+// - copyDetailedLog() - Copydetailedlog
+// - copyDetailedLogAlt() - Copydetailedlogalt
+// - translateStatus() - Translatestatus
+
 console.log('🔧 test-header-only.js v6.0.0 loaded successfully!');
 
 // ===== UTILITY FUNCTIONS =====

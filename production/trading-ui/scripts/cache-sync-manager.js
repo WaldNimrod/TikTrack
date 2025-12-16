@@ -124,6 +124,9 @@ class CacheSyncManager {
       'alert-created': ['alerts-data', 'dashboard-data'],
       'alert-updated': ['alerts-data', 'dashboard-data', 'business:validate-condition-value*', 'business:validate-alert*'],
       'alert-deleted': ['alerts-data', 'dashboard-data'],
+      'watch-list-updated': ['watch-lists-data', 'watch-list-*'],
+      'watch-list-created': ['watch-lists-data', 'watch-list-*'],
+      'watch-list-deleted': ['watch-lists-data', 'watch-list-*'],
       'import-session-deleted': ['data-import-data', 'data-import-accounts'],
     };
   }
@@ -146,8 +149,13 @@ class CacheSyncManager {
       this.startQueueProcessing();
       this.initialized = true;
 
-      if (window.notificationSystem) {
-        window.notificationSystem.showNotification('מערכת סינכרון מטמון אותחלה בהצלחה', 'success');
+      const notifySuccess =
+        window.NotificationSystem?.showSuccess
+        || window.NotificationSystem?.showNotification
+        || window.showNotification
+        || window.notificationSystem?.showNotification;
+      if (typeof notifySuccess === 'function') {
+        notifySuccess('מערכת סינכרון מטמון אותחלה בהצלחה', 'success');
       }
 
       return true;
@@ -156,8 +164,13 @@ class CacheSyncManager {
         window.Logger.error('❌ Failed to initialize Cache Sync Manager:', error, { page: 'cache' });
       }
 
-      if (window.notificationSystem) {
-        window.notificationSystem.showNotification('שגיאה באתחול מערכת סינכרון מטמון', 'error');
+      const notifyError =
+        window.NotificationSystem?.showError
+        || window.NotificationSystem?.showNotification
+        || window.showErrorNotification
+        || window.notificationSystem?.showNotification;
+      if (typeof notifyError === 'function') {
+        notifyError('שגיאה באתחול מערכת סינכרון מטמון', 'error');
       }
 
       return false;
@@ -269,7 +282,8 @@ class CacheSyncManager {
      */
   async invalidateBackend(dependencies = []) {
     if (!this.initialized) {
-      if (window.Logger) { window.Logger.warn('⚠️ Cache Sync Manager not initialized', { page: 'cache' }); }
+      // Silent fallback - CacheSyncManager initialization is optional, not critical
+      // if (window.Logger) { window.Logger.debug('Cache Sync Manager not initialized, skipping backend invalidation', { page: 'cache' }); }
       return false;
     }
 
@@ -306,6 +320,42 @@ class CacheSyncManager {
   }
 
   /**
+   * Get current user ID from authentication system
+   * Falls back to 1 if no user is authenticated
+   */
+  getCurrentUserId() {
+    try {
+      if (typeof window.getCurrentUser === 'function') {
+        const user = window.getCurrentUser();
+        if (user && user.id) {
+          return user.id;
+        }
+      }
+      if (typeof window.TikTrackAuth?.getCurrentUser === 'function') {
+        const user = window.TikTrackAuth.getCurrentUser();
+        if (user && user.id) {
+          return user.id;
+        }
+      }
+      // Fallback to localStorage
+      const storedUser = localStorage.getItem('currentUser');
+      if (storedUser) {
+        try {
+          const user = JSON.parse(storedUser);
+          if (user && user.id) {
+            return user.id;
+          }
+        } catch (e) {
+          // Ignore parse errors
+        }
+      }
+    } catch (e) {
+      // Silent fallback
+    }
+    return 1; // Default fallback
+  }
+
+  /**
      * ביטול מטמון לפי פעולה
      * @param {string} action - שם הפעולה
      * @returns {Promise<boolean>} הצלחת הביטול
@@ -316,6 +366,9 @@ class CacheSyncManager {
       if (window.Logger) { window.Logger.warn(`⚠️ No invalidation patterns found for action: ${action}`, { page: 'cache' }); }
       return false;
     }
+
+    // Get current user ID for user-specific cache invalidation
+    const userId = this.getCurrentUserId();
 
     // Separate frontend-only patterns (business logic) from backend patterns
     const frontendOnlyPatterns = [];
@@ -329,14 +382,20 @@ class CacheSyncManager {
       }
     }
 
-    // Clear frontend cache for Business Logic patterns
+    // Clear frontend cache for Business Logic patterns (with user_id)
     if (window.UnifiedCacheManager && frontendOnlyPatterns.length > 0) {
       for (const pattern of frontendOnlyPatterns) {
         try {
+          // Build user-specific cache key
+          const userPattern = `u${userId}:${pattern}`;
           // Clear all cache keys that start with this pattern
           if (typeof window.UnifiedCacheManager.invalidate === 'function') {
+            await window.UnifiedCacheManager.invalidate(userPattern);
+            // Also clear without user prefix for backward compatibility
             await window.UnifiedCacheManager.invalidate(pattern);
           } else if (typeof window.UnifiedCacheManager.clearByPattern === 'function') {
+            await window.UnifiedCacheManager.clearByPattern(userPattern);
+            // Also clear without user prefix for backward compatibility
             await window.UnifiedCacheManager.clearByPattern(pattern);
           }
         } catch (error) {
@@ -349,6 +408,7 @@ class CacheSyncManager {
 
     // Only send backend patterns to backend invalidation endpoint
     // Business logic patterns are frontend-only and should not be sent
+    // Backend will automatically filter by user_id from session
     return await this.invalidateBackend(backendPatterns);
   }
 
@@ -451,12 +511,14 @@ class CacheSyncManager {
         // window.Logger.debug(`🔄 Invalidating backend cache with dependencies: ${JSON.stringify(dependencies)}`, { page: "cache" });
       }
 
+      // Include user_id in request for user-specific cache invalidation
+      const userId = this.getCurrentUserId();
       const response = await fetch('/api/cache-sync/invalidate', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ dependencies }),
+        }, // Include session cookie
+        body: JSON.stringify({ dependencies, user_id: userId }),
       });
 
       if (!response.ok) {

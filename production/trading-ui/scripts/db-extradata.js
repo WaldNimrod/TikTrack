@@ -1,3 +1,42 @@
+
+
+// ===== FUNCTION INDEX =====
+// === Functions ===
+// - copyDetailedLogLocal() - Copydetailedloglocal
+// - generateDetailedLog() - Generatedetailedlog
+// - showTriggerDetails() - Showtriggerdetails
+// - testTrigger() - Testtrigger
+
+// === UI Functions ===
+/**
+ * showTriggerDetails - Showtriggerdetails
+ *
+ * @param {*} triggerId - Parameter description
+ * @returns {{*}} Return description
+ */
+// - showTriggerDetails() - Showtriggerdetails
+
+// === Other ===
+/**
+ * testTrigger - Testtrigger
+ *
+ * @param {*} triggerId - Parameter description
+ * @returns {{*}} Return description
+ */
+// - testTrigger() - Testtrigger
+/**
+ * generateDetailedLog - Generatedetailedlog
+ *
+ * @returns {{*}} Return description
+ */
+// - generateDetailedLog() - Generatedetailedlog
+/**
+ * copyDetailedLogLocal - Copydetailedloglocal
+ *
+ * @returns {{*}} Return description
+ */
+// - copyDetailedLogLocal() - Copydetailedloglocal
+
 // DB Extra Data Page Script
 // document.addEventListener('DOMContentLoaded', function () {
 //     console.log('טבלאות עזר - עמוד נטען');
@@ -13,6 +52,12 @@
 // Sorting functions
 
 // Trigger functions
+/**
+ * showTriggerDetails - Showtriggerdetails
+ *
+ * @param {*} triggerId - Parameter description
+ * @returns {{*}} Return description
+ */
 function showTriggerDetails(triggerId) {
     if (typeof window.showTriggerDetails === 'function') {
         window.showTriggerDetails(triggerId);

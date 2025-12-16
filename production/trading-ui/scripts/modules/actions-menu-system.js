@@ -17,6 +17,31 @@
  * No manual initialization needed.
  */
 
+
+// ===== FUNCTION INDEX =====
+// === Object Methods ===
+// - debugActionsMenu() - Debugactionsmenu
+// - debugActionsMenu() - Debugactionsmenu
+// - debugActionsMenuHover() - Debugactionsmenuhover
+// - debugActionsMenuHover() - Debugactionsmenuhover
+// - debugActionsMenuOverflow() - Debugactionsmenuoverflow
+// - debugActionsMenuOverflow() - Debugactionsmenuoverflow
+// - debugActionsMenuZIndex() - Debugactionsmenuzindex
+// - debugActionsMenuZIndex() - Debugactionsmenuzindex
+
+// === Event Handlers ===
+// - actionsMenuDebugLog() - Actionsmenudebuglog
+// - handleMouseLeave() - Handlemouseleave
+
+// === UI Functions ===
+// - clearHideTimeout() - Clearhidetimeout
+
+// === Utility Functions ===
+// - checkOverflow() - Checkoverflow
+
+// === Other ===
+// - observePopup() - Observepopup
+
 const ACTIONS_MENU_DEBUG_ENABLED = window.ActionsMenuDebugMode === true;
 const actionsMenuDebugLog = (...args) => {
     if (ACTIONS_MENU_DEBUG_ENABLED) {
@@ -268,6 +293,9 @@ class ActionsMenuSystem {
                     case 'VIEW': icon = '👁️'; break;
                     case 'ADD': icon = '➕'; break;
                     case 'MENU': icon = '⚙️'; break;
+                    case 'DASHBOARD': icon = '📊'; break;
+                    case 'REFRESH': icon = '🔄'; break;
+                    case 'RERUN': icon = '🔄'; break;
                     default: icon = '⚙️'; break;
                 }
             }
@@ -277,7 +305,8 @@ class ActionsMenuSystem {
             if (escapedOnclick) {
                 // Escape single quotes (since we use single quotes for the attribute wrapper)
                 escapedOnclick = escapedOnclick.replace(/'/g, '&#39;');
-                // Double quotes are OK inside single-quoted attribute
+                // Also escape double quotes to prevent parsing issues
+                escapedOnclick = escapedOnclick.replace(/"/g, '&quot;');
             }
             
             // Use single quotes for the data-onclick attribute value - allows double quotes inside without escaping
@@ -460,6 +489,9 @@ class ActionsMenuSystem {
     attachHoverPositioning() {
         // Observe all action menu popups and reposition when they become visible
         const observePopup = (popup) => {
+            if (!popup || !popup.nodeType || popup.nodeType !== Node.ELEMENT_NODE) {
+                return; // Skip if popup is not a valid element
+            }
             const observer = new MutationObserver((mutations) => {
                 mutations.forEach((mutation) => {
                     if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
@@ -473,7 +505,14 @@ class ActionsMenuSystem {
                     }
                 });
             });
-            observer.observe(popup, { attributes: true, attributeFilter: ['style'] });
+            try {
+                observer.observe(popup, { attributes: true, attributeFilter: ['style'] });
+            } catch (error) {
+                // Popup is not a valid Node - skip
+                if (window.Logger) {
+                    window.Logger.debug('Failed to observe popup:', error);
+                }
+            }
         };
 
         // Observe existing popups
@@ -493,7 +532,27 @@ class ActionsMenuSystem {
                 });
             });
         });
-        documentObserver.observe(document.body, { childList: true, subtree: true });
+        
+        // Wait for document.body to be available
+        if (document.body) {
+            documentObserver.observe(document.body, { childList: true, subtree: true });
+        } else {
+            // Retry after DOM is ready
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', () => {
+                    if (document.body) {
+                        documentObserver.observe(document.body, { childList: true, subtree: true });
+                    }
+                });
+            } else {
+                // DOM already loaded but body not available - retry after delay
+                setTimeout(() => {
+                    if (document.body) {
+                        documentObserver.observe(document.body, { childList: true, subtree: true });
+                    }
+                }, 100);
+            }
+        }
 
         // Also position on mouseenter as fallback
         document.addEventListener('mouseenter', (e) => {
@@ -744,6 +803,7 @@ window.createActionsMenu = function(buttons) {
                 case 'DELETE': icon = '🗑️'; break;
                 case 'VIEW': icon = '👁️'; break;
                 case 'ADD': icon = '➕'; break;
+                case 'DASHBOARD': icon = '📊'; break;
                 default: icon = '⚙️'; break;
             }
         }

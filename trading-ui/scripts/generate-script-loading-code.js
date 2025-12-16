@@ -28,9 +28,13 @@ const path = require('path');
 function detectEnvironment() {
   const cwd = process.cwd();
   const workspaceName = path.basename(cwd);
-  
+
   // Check for Production in directory name (case-insensitive)
   if (workspaceName.includes('Production') || workspaceName.includes('production')) {
+    // TikTrackApp-Production should use testing environment
+    if (workspaceName === 'TikTrackApp-Production') {
+      return 'testing';
+    }
     return 'production';
   } else if (workspaceName === 'TikTrackApp') {
     return 'development';
@@ -99,9 +103,9 @@ function generateScriptLoadingCode(pageName, mode = null, useBundles = null) {
   }
   
   // Auto-set useBundles based on environment
-  // Production uses bundles, development doesn't
+  // Production and testing use bundles, development doesn't
   if (useBundles === null) {
-    useBundles = (mode === 'production');
+    useBundles = (mode === 'production' || mode === 'testing');
   }
   const pageConfig = PAGE_CONFIGS[pageName];
   if (!pageConfig) {
@@ -112,7 +116,8 @@ function generateScriptLoadingCode(pageName, mode = null, useBundles = null) {
   const packages = pageConfig.packages || ['base'];
   
   // Determine if we should use bundles
-  const shouldUseBundles = useBundles && mode === 'production';
+  // Production and testing use bundles, development doesn't
+  const shouldUseBundles = useBundles && (mode === 'production' || mode === 'testing');
   
   let html = '';
   html += '    <!-- =============================================================== -->\n';
@@ -313,7 +318,8 @@ if (noBundlesArg !== undefined) {
   useBundles = false;
 } else {
   // Auto-set based on mode
-  useBundles = (mode === 'production');
+  // Production and testing use bundles, development doesn't
+  useBundles = (mode === 'production' || mode === 'testing');
 }
 
 if (pageName) {

@@ -199,8 +199,15 @@ class UpdateMaster:
             json.dump(serializable_state, f, indent=2)
     
     def _get_steps_to_run(self, requested_steps: Optional[List[int]] = None,
-                         skip_steps: Optional[List[int]] = None) -> List[int]:
-        """Determine which steps to run"""
+                         skip_steps: Optional[List[int]] = None,
+                         skip_db: bool = False) -> List[int]:
+        """Determine which steps to run
+        
+        Args:
+            requested_steps: Specific steps to run
+            skip_steps: Steps to skip
+            skip_db: If True, skip database operations (step 3: backup, step 8: migrations)
+        """
         max_step = max(STEP_MODULES.keys()) if STEP_MODULES else 16
         if requested_steps:
             steps = [s for s in requested_steps if 1 <= s <= max_step and s in STEP_MODULES]
@@ -209,6 +216,11 @@ class UpdateMaster:
         
         if skip_steps:
             steps = [s for s in steps if s not in skip_steps]
+        
+        # Skip database operations if requested
+        if skip_db:
+            db_steps = [3, 8]  # Step 3: backup, Step 8: migrations
+            steps = [s for s in steps if s not in db_steps]
         
         return sorted(steps)
     
@@ -284,7 +296,8 @@ class UpdateMaster:
             return {'success': False, 'error': str(e)}
     
     def run(self, steps: Optional[List[int]] = None, skip: Optional[List[int]] = None,
-            dry_run: bool = False, resume: bool = False, create_snapshot: bool = True) -> bool:
+            dry_run: bool = False, resume: bool = False, create_snapshot: bool = True,
+            skip_db: bool = False) -> bool:
         """
         Run the update process
         
@@ -294,6 +307,7 @@ class UpdateMaster:
             dry_run: If True, don't make changes
             resume: Resume from last failure
             create_snapshot: Create rollback snapshot before starting
+            skip_db: If True, skip database operations (backup and migrations)
         
         Returns:
             True if all steps succeeded
@@ -304,6 +318,8 @@ class UpdateMaster:
         self.logger.info(f"Started: {datetime.now().isoformat()}")
         if dry_run:
             self.logger.info("  [DRY RUN MODE - No changes will be made]")
+        if skip_db:
+            self.logger.info("  [SKIP DB MODE - Skipping database backup (step 3) and migrations (step 8)]")
         self.logger.info("")
         
         # Create snapshot
@@ -313,7 +329,7 @@ class UpdateMaster:
             self._save_state()
         
         # Determine steps to run
-        steps_to_run = self._get_steps_to_run(steps, skip)
+        steps_to_run = self._get_steps_to_run(steps, skip, skip_db=skip_db)
         
         if resume and self.state.get('last_failed_step'):
             # Resume from last failure
@@ -385,6 +401,9 @@ Examples:
 
   # Resume from last failure
   python scripts/production-update/master.py --resume
+
+  # Skip database operations (backup and migrations)
+  python scripts/production-update/master.py --skip-db
         """
     )
     
@@ -418,6 +437,12 @@ Examples:
         help='Skip creating rollback snapshot'
     )
     
+    parser.add_argument(
+        '--skip-db',
+        action='store_true',
+        help='Skip database operations (backup step 3 and migrations step 8)'
+    )
+    
     args = parser.parse_args()
     
     # Parse steps
@@ -444,7 +469,8 @@ Examples:
         skip=skip,
         dry_run=args.dry_run,
         resume=args.resume,
-        create_snapshot=not args.no_snapshot
+        create_snapshot=not args.no_snapshot,
+        skip_db=args.skip_db
     )
     
     sys.exit(0 if success else 1)

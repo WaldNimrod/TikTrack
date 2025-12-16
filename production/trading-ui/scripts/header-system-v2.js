@@ -22,12 +22,29 @@
  * @lastUpdated November 23, 2025
  */
 
+
+// ===== FUNCTION INDEX =====
+// === Class Methods ===
+// - MenuManager.closeMenu() - Closemenu
+// - MenuManager.init() - Init
+// - MenuManager.openMenu() - Openmenu
+// - MenuManager.setupHoverBehavior() - Setuphoverbehavior
+
+// === Event Handlers ===
+// - positionSubmenu() - Positionsubmenu
+// - debouncedPositionSubmenu() - Debouncedpositionsubmenu
+
+// === Other ===
+// - clearTimeouts() - Cleartimeouts
+
 if (window.Logger) {
   window.Logger.info('🚀 Loading Header System v7.0.0...', { page: 'header-system' });
 }
 
 // ===== FilterManager Class =====
-class FilterManager {
+// Prevent duplicate declaration
+if (typeof window.FilterManager === 'undefined') {
+window.FilterManager = class FilterManager {
   constructor() {
     this.currentFilters = {
       search: '',
@@ -599,7 +616,10 @@ class FilterManager {
       const accountItem = document.createElement('div');
       accountItem.className = 'account-filter-item';
       accountItem.setAttribute('data-value', account.id.toString());
-      accountItem.innerHTML = `<span class="option-text">${account.name || account.id}</span>`;
+      const span = document.createElement('span');
+      span.className = 'option-text';
+      span.textContent = account.name || account.id;
+      accountItem.appendChild(span);
       accountMenu.appendChild(accountItem);
     });
 
@@ -651,26 +671,249 @@ class MenuManager {
         }, 150);
       });
 
-      item.addEventListener('mouseleave', () => {
+      item.addEventListener('mouseleave', (e) => {
         clearTimeouts();
+        // Check if mouse is moving to menu or submenu
+        const relatedTarget = e.relatedTarget;
+        const submenu = menu.querySelector('.level3-submenu');
+        
+        // Don't close if moving to menu or submenu
+        if (menu.contains(relatedTarget) || (submenu && submenu.contains(relatedTarget))) {
+          return;
+        }
+        
         closeTimeout = setTimeout(() => {
           if (!item.matches(':hover') && !menu.matches(':hover')) {
-            this.closeMenu(menu.id);
+            const activeSubmenu = menu.querySelector('.level3-submenu:not([style*="display: none"])');
+            if (!activeSubmenu || !activeSubmenu.matches(':hover')) {
+              this.closeMenu(menu.id);
+            }
           }
-        }, 200);
+        }, 800);
       });
 
       menu.addEventListener('mouseenter', () => {
         clearTimeouts();
       });
 
-      menu.addEventListener('mouseleave', () => {
+      menu.addEventListener('mouseleave', (e) => {
         clearTimeouts();
+        // Check if mouse is moving to level 3 submenu
+        const submenu = menu.querySelector('.level3-submenu');
+        const relatedTarget = e.relatedTarget;
+        
+        // Don't close if moving to submenu or its parent
+        if (submenu && (submenu.contains(relatedTarget) || menu.querySelector('.dropdown-submenu')?.contains(relatedTarget))) {
+          return;
+        }
+        
         closeTimeout = setTimeout(() => {
           if (!item.matches(':hover') && !menu.matches(':hover')) {
             this.closeMenu(menu.id);
           }
-        }, 200);
+        }, 800);
+      });
+
+      // Handle level 3 submenu hover
+      const submenus = menu.querySelectorAll('.level3-submenu');
+      submenus.forEach(submenu => {
+        let isPositioning = false;
+        let lastPosition = null;
+        let positionTimeout = null;
+        
+        // Position submenu to prevent overflow with debouncing
+        const positionSubmenu = (source = 'unknown') => {
+          // Prevent concurrent positioning calls
+          if (isPositioning) {
+            window.Logger?.debug?.('⏸️ Submenu positioning already in progress, skipping', { source, submenu: submenu.id || 'unnamed' });
+            return;
+          }
+          
+          // Check if submenu is visible using computed style
+          const computedStyle = window.getComputedStyle(submenu);
+          if (computedStyle.display === 'none' || computedStyle.visibility === 'hidden' || computedStyle.opacity === '0') {
+            window.Logger?.debug?.('👻 Submenu not visible, skipping position check', { source });
+            return;
+          }
+          
+          isPositioning = true;
+          window.Logger?.debug?.('🔍 Checking submenu position', { source, submenu: submenu.id || 'unnamed' });
+          
+          // Wait for submenu to be fully rendered
+          setTimeout(() => {
+            try {
+              // Get current state BEFORE making any changes
+              const hasBottomAligned = submenu.classList.contains('bottom-aligned');
+              const submenuRect = submenu.getBoundingClientRect();
+              const viewportHeight = window.innerHeight;
+              
+              // Calculate position based on CURRENT state (before change)
+              // If already bottom-aligned, we need to check what it would be in top position
+              // If in top position, check current bottom space
+              let bottomSpace;
+              let needsBottomAlign;
+              
+              if (hasBottomAligned) {
+                // Currently bottom-aligned - check what it would be in top position
+                // We need to temporarily remove the class to measure
+                submenu.classList.remove('bottom-aligned');
+                // Force reflow
+                void submenu.offsetHeight;
+                const topRect = submenu.getBoundingClientRect();
+                bottomSpace = viewportHeight - topRect.bottom;
+                // Restore original state
+                submenu.classList.add('bottom-aligned');
+                void submenu.offsetHeight;
+                
+                // If in top position it would overflow, keep bottom-aligned
+                needsBottomAlign = bottomSpace < 10;
+                window.Logger?.debug?.('🔍 Currently bottom-aligned, checking top position', {
+                  topPositionBottom: topRect.bottom.toFixed(1),
+                  topPositionBottomSpace: bottomSpace.toFixed(1)
+                });
+              } else {
+                // Currently in top position - check current bottom space
+                bottomSpace = viewportHeight - submenuRect.bottom;
+                needsBottomAlign = bottomSpace < 10;
+                window.Logger?.debug?.('🔍 Currently in top position', {
+                  currentBottom: submenuRect.bottom.toFixed(1),
+                  bottomSpace: bottomSpace.toFixed(1)
+                });
+              }
+              
+              // Check if position has actually changed
+              const currentPosition = needsBottomAlign ? 'bottom' : 'top';
+              const wasBottomAligned = hasBottomAligned;
+              
+              if (lastPosition === currentPosition && wasBottomAligned === needsBottomAlign) {
+                window.Logger?.debug?.('✅ Submenu position unchanged, skipping update', { 
+                  position: currentPosition, 
+                  bottomSpace: bottomSpace.toFixed(1),
+                  wasBottomAligned,
+                  needsBottomAlign
+                });
+                isPositioning = false;
+                return;
+              }
+              
+              window.Logger?.info?.('📍 Updating submenu position', { 
+                from: lastPosition || (wasBottomAligned ? 'bottom' : 'top'),
+                to: currentPosition,
+                bottomSpace: bottomSpace.toFixed(1),
+                viewportHeight,
+                currentBottom: submenuRect.bottom.toFixed(1),
+                wasBottomAligned,
+                needsBottomAlign
+              });
+              
+              // Update position
+              if (needsBottomAlign && !wasBottomAligned) {
+                submenu.classList.add('bottom-aligned');
+                window.Logger?.debug?.('⬇️ Added bottom-aligned class');
+              } else if (!needsBottomAlign && wasBottomAligned) {
+                submenu.classList.remove('bottom-aligned');
+                window.Logger?.debug?.('⬆️ Removed bottom-aligned class');
+              }
+              
+              lastPosition = currentPosition;
+            } catch (error) {
+              window.Logger?.error?.('❌ Error positioning submenu', { error: error.message });
+            } finally {
+              isPositioning = false;
+            }
+          }, 10);
+        };
+
+        // Debounced version for resize and observer
+        const debouncedPositionSubmenu = (source) => {
+          if (positionTimeout) {
+            clearTimeout(positionTimeout);
+          }
+          positionTimeout = setTimeout(() => {
+            positionSubmenu(source);
+          }, 100);
+        };
+
+        // Check position on hover - using MutationObserver to detect CSS changes
+        const parentSubmenu = submenu.closest('.dropdown-submenu');
+        if (parentSubmenu) {
+          // Check position when parent is hovered
+          parentSubmenu.addEventListener('mouseenter', () => {
+            lastPosition = null; // Reset position cache on new hover
+            setTimeout(() => positionSubmenu('mouseenter'), 100);
+          });
+          
+          // Use MutationObserver to detect when submenu becomes visible
+          // But ignore changes we made ourselves (class changes)
+          let isOurChange = false;
+          const observer = new MutationObserver((mutations) => {
+            // Ignore if we're the ones making the change
+            if (isOurChange) {
+              isOurChange = false;
+              return;
+            }
+            
+            // Check if submenu became visible
+            const computedStyle = window.getComputedStyle(submenu);
+            if (computedStyle.display !== 'none' && computedStyle.visibility !== 'hidden' && computedStyle.opacity !== '0') {
+              debouncedPositionSubmenu('mutation-observer');
+            }
+          });
+          
+          observer.observe(submenu, {
+            attributes: true,
+            attributeFilter: ['style', 'class'],
+            attributeOldValue: true
+          });
+          
+          // Store observer for cleanup if needed
+          submenu._positionObserver = observer;
+          
+          // Intercept class changes to mark them as ours
+          const originalClassListAdd = submenu.classList.add.bind(submenu.classList);
+          const originalClassListRemove = submenu.classList.remove.bind(submenu.classList);
+          
+          submenu.classList.add = function(...args) {
+            if (args.includes('bottom-aligned')) {
+              isOurChange = true;
+            }
+            return originalClassListAdd(...args);
+          };
+          
+          submenu.classList.remove = function(...args) {
+            if (args.includes('bottom-aligned')) {
+              isOurChange = true;
+            }
+            return originalClassListRemove(...args);
+          };
+        }
+
+        submenu.addEventListener('mouseenter', () => {
+          clearTimeouts();
+          debouncedPositionSubmenu('submenu-mouseenter');
+        });
+
+        submenu.addEventListener('mouseleave', () => {
+          clearTimeouts();
+          closeTimeout = setTimeout(() => {
+            if (!item.matches(':hover') && !menu.matches(':hover') && !submenu.matches(':hover')) {
+              this.closeMenu(menu.id);
+            }
+          }, 800);
+        });
+
+        // Check position on window resize (debounced)
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+          clearTimeout(resizeTimeout);
+          resizeTimeout = setTimeout(() => {
+            const computedStyle = window.getComputedStyle(submenu);
+            if (computedStyle.display !== 'none' && computedStyle.visibility !== 'hidden' && computedStyle.opacity !== '0') {
+              lastPosition = null; // Reset on resize
+              debouncedPositionSubmenu('window-resize');
+            }
+          }, 150);
+        });
       });
     });
   }
@@ -717,7 +960,8 @@ class MenuManager {
       }
     });
   }
-}
+};
+} // End of if (typeof window.FilterManager === 'undefined')
 
 // ===== HeaderSystem Class =====
 class HeaderSystem {
@@ -766,7 +1010,12 @@ class HeaderSystem {
 
     const existingHeader = document.getElementById('unified-header');
     const headerHTML = HeaderSystem.getHeaderHTML();
-    existingHeader.innerHTML = headerHTML;
+    existingHeader.textContent = '';
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(headerHTML, 'text/html');
+    doc.body.childNodes.forEach(node => {
+        existingHeader.appendChild(node.cloneNode(true));
+    });
   }
 
   static getHeaderHTML() {
@@ -792,10 +1041,14 @@ class HeaderSystem {
                         <span class="nav-text">תכנון</span>
                       </a>
                     </li>
-                    <li class="tiktrack-nav-item">
-                      <a href="/trades" class="tiktrack-nav-link" data-page="trades">
+                    <li class="tiktrack-nav-item dropdown">
+                      <a href="/trades" class="tiktrack-nav-link tiktrack-dropdown-toggle" data-page="trades">
                         <span class="nav-text">מעקב</span>
+                        <span class="tiktrack-dropdown-arrow">▼</span>
                       </a>
+                      <ul class="tiktrack-dropdown-menu">
+                        <li><a class="tiktrack-dropdown-item" href="/watch-lists">רשימות צפייה</a></li>
+                      </ul>
                     </li>
                     <li class="tiktrack-nav-item">
                       <a href="/research" class="tiktrack-nav-link" data-page="research">
@@ -853,7 +1106,30 @@ class HeaderSystem {
                         <li><a class="tiktrack-dropdown-item" href="/test-header-only">🧪 בדיקת ראש הדף</a></li>
                         <li class="separator"></li>
                         <li><a class="tiktrack-dropdown-item" href="/css-management">🎨 מנהל CSS</a></li>
-                        <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/tradingview-test-page.html">📈 גראפים TV</a></li>
+                        <li class="dropdown-submenu">
+                          <a class="tiktrack-dropdown-item" href="#">📐 מוקאפים <span class="tiktrack-dropdown-arrow" style="font-size: 0.7rem;">◀</span></a>
+                          <ul class="level3-submenu">
+                            <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/comparative-analysis-page.html">📊 ניתוח השוואתי</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/date-comparison-modal.html">📅 השוואת תאריכים</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/economic-calendar-page.html">📆 לוח כלכלי</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/emotional-tracking-widget.html">😊 תיעוד רגשי</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/history-widget.html">📜 ווידג'ט היסטוריה</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/portfolio-state-page.html">💼 מצב תיק היסטורי</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/price-history-page.html">💰 היסטוריית מחירים</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/strategy-analysis-page.html">🎯 ניתוח אסטרטגיות</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/trade-history-page.html">📈 היסטוריית טרייד</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/trading-journal-page.html">📓 יומן מסחר</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/tradingview-test-page.html">📈 גראפים TV</a></li>
+                            <li class="separator"></li>
+                            <li><a class="tiktrack-dropdown-item" href="/conditions-modals.html">🧩 מודלי תנאים</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/conditions-test.html">🧪 בדיקות תנאים</a></li>
+                            <li class="separator"></li>
+                            <li><a class="tiktrack-dropdown-item" href="/mockups/add-ticker-modal.html">➕ הוספת טיקר</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/mockups/flag-quick-action.html">🚩 פעולה מהירה</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/mockups/watch-list-modal.html">👁️ רשימת מעקב</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/mockups/watch-lists-page.html">📋 רשימות מעקב</a></li>
+                          </ul>
+                        </li>
                         <li><a class="tiktrack-dropdown-item" href="/chart-management">📊 ניהול גרפים</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/dynamic-colors-display">🌈 תצוגת צבעים דינמית</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/designs">🎭 עיצובים</a></li>
@@ -957,8 +1233,8 @@ class HeaderSystem {
                   <div class="type-filter-item" data-value="השקעה">
                     <span class="option-text">השקעה</span>
                   </div>
-                  <div class="type-filter-item" data-value="פסיבי">
-                    <span class="option-text">פסיבי</span>
+                  <div class="type-filter-item" data-value="פאסיבי">
+                    <span class="option-text">פאסיבי</span>
                   </div>
                 </div>
               </div>
@@ -1223,7 +1499,12 @@ window.handleSearchInput = function(event) {
 window.clearSearchFilter = function() {
   const searchInput = document.getElementById('searchFilterInput');
   if (searchInput) {
-    searchInput.value = '';
+    // Use DataCollectionService to clear field if available
+    if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+      window.DataCollectionService.setValue('searchFilterInput', '', 'text');
+    } else {
+      searchInput.value = '';
+    }
     if (window.headerSystem && window.headerSystem.filterManager) {
       window.headerSystem.filterManager.currentFilters.search = '';
       window.headerSystem.filterManager.saveFilters();
@@ -1301,7 +1582,12 @@ window.resetAllFilters = async function() {
     // Reset search input
     const searchInput = document.getElementById('searchFilterInput');
     if (searchInput) {
-      searchInput.value = defaultFilters.search;
+      // Use DataCollectionService to set value if available
+      if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
+        window.DataCollectionService.setValue('searchFilterInput', defaultFilters.search, 'text');
+      } else {
+        searchInput.value = defaultFilters.search;
+      }
     }
 
     window.Logger?.info?.('✅ resetAllFilters completed', { page: 'header-system' });

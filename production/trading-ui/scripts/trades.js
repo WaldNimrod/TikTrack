@@ -331,12 +331,18 @@ async function loadTradesData() {
       try {
         let response = await fetch('/api/trades/', { cache: 'no-store' });
         if (!response.ok) {
-          // retry without trailing slash
-          const retry = await fetch('/api/trades', { cache: 'no-store' });
-          if (!retry.ok) {
-            throw new Error(`HTTP ${response.status}`);
+          // Gracefully handle auth errors (avoid hard fail)
+          if (response.status === 401 || response.status === 403) {
+            window.Logger?.warn?.('⚠️ Trades API unauthorized, skipping load (no session)', { status: response.status }, { page: 'trades' });
+            rawData = [];
+          } else {
+            // retry without trailing slash
+            const retry = await fetch('/api/trades', { cache: 'no-store' });
+            if (!retry.ok) {
+              throw new Error(`HTTP ${response.status}`);
+            }
+            response = retry;
           }
-          response = retry;
         }
         const json = await response.json();
         rawData = Array.isArray(json?.data) ? json.data : (Array.isArray(json) ? json : []);

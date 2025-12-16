@@ -38,6 +38,8 @@
     justify-content: center;
     min-width: 32px;
     min-height: 32px;
+    background-color: white !important;
+    border: 1px solid var(--current-entity-color, #26baac) !important;
 }
 
 /* Actions Menu Popup */

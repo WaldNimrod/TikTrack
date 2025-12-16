@@ -12,6 +12,14 @@
  * @since 2025-01-16
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Debug Functions ===
+// - debugImportFiltering() - Debug Import Filtering
+// - analyzeImportData() - Analyze Import Data
+// - validateImportFilters() - Validate Import Filters
+
 (function() {
     'use strict';
 

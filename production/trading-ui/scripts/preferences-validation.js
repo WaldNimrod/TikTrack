@@ -64,13 +64,27 @@ if (window.Logger && window.Logger.info) {
 /**
  * ValidationError is already defined in preferences-core-new.js
  * Using the existing ValidationError class
+ * If not available, define a fallback
  */
+if (typeof ValidationError === 'undefined' && typeof window.ValidationError === 'undefined') {
+    class ValidationError extends Error {
+        constructor(message, preferenceName = null) {
+            super(message);
+            this.name = 'ValidationError';
+            this.preferenceName = preferenceName;
+        }
+    }
+    window.ValidationError = ValidationError;
+}
+
+// Use global ValidationError if available
+const ValidationErrorClass = window.ValidationError || ValidationError;
 
 /**
  * Existence Error
  * Error for preference not found in database
  */
-class ExistenceError extends ValidationError {
+class ExistenceError extends ValidationErrorClass {
   constructor(preferenceName) {
     super(`Preference '${preferenceName}' not found in database. Please create a migration to add this preference.`, preferenceName, 'NOT_FOUND');
     this.name = 'ExistenceError';
@@ -81,7 +95,7 @@ class ExistenceError extends ValidationError {
  * Format Error
  * Error for invalid data format
  */
-class FormatError extends ValidationError {
+class FormatError extends ValidationErrorClass {
   constructor(preferenceName, expectedFormat, actualValue) {
     super(`Invalid format for '${preferenceName}': expected ${expectedFormat}, got ${typeof actualValue}`, preferenceName, 'INVALID_FORMAT');
     this.name = 'FormatError';
@@ -94,7 +108,7 @@ class FormatError extends ValidationError {
  * Constraint Error
  * Error for constraint violations
  */
-class ConstraintError extends ValidationError {
+class ConstraintError extends ValidationErrorClass {
   constructor(preferenceName, constraint, value) {
     super(`Constraint violation for '${preferenceName}': ${constraint}`, preferenceName, 'CONSTRAINT_VIOLATION');
     this.name = 'ConstraintError';
@@ -579,7 +593,7 @@ class PreferenceValidator {
 
     } catch (error) {
       window.Logger.error(`❌ Validation error for ${preferenceName}:`, error, { page: 'preferences-validation' });
-      result.errors.push(new ValidationError(`Validation failed: ${error.message}`, preferenceName));
+      result.errors.push(new ValidationErrorClass(`Validation failed: ${error.message}`, preferenceName));
       result.valid = false;
       this.validationStats.failed++;
       this.validationStats.errors.push(result.errors[result.errors.length - 1]);

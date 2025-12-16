@@ -56,6 +56,27 @@ class InfoSummarySystem {
         }
         return data.filter(item => item[params.field] === params.value).length;
       },
+      countByAvailability: (data, params) => {
+        // Count items with availability (cache or note)
+        // For AI analysis, check _availability property
+        // Only count completed items (availability is only set for completed items)
+        if (params.type === 'cache') {
+          return data.filter(item => {
+            // Only check completed items
+            if (item.status !== 'completed') return false;
+            const availability = item._availability || {};
+            return availability.has_cache === true;
+          }).length;
+        } else if (params.type === 'note') {
+          return data.filter(item => {
+            // Only check completed items
+            if (item.status !== 'completed') return false;
+            const availability = item._availability || {};
+            return availability.has_note === true && availability.note_id !== null;
+          }).length;
+        }
+        return 0;
+      },
       
       // Sum a numeric field
       sumField: (data, params) => {
@@ -402,7 +423,10 @@ class InfoSummarySystem {
   renderInfoSummary(containerId, stats, config) {
     const container = document.getElementById(containerId);
     if (!container) {
-      console.error(`Container '${containerId}' not found`);
+      // Silent fail - container might be optional for some pages
+      if (window.Logger) {
+        window.Logger.debug(`Container '${containerId}' not found - skipping render`, { containerId });
+      }
       return;
     }
     
@@ -426,19 +450,20 @@ class InfoSummarySystem {
       }
     });
     
-    console.log('📝 Setting innerHTML to:', html.substring(0, 300));
-    container.innerHTML = html;
-    console.log('✅ innerHTML set. Current innerHTML:', container.innerHTML.substring(0, 300));
+    container.textContent = '';
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+    doc.body.childNodes.forEach(node => {
+      container.appendChild(node.cloneNode(true));
+    });
     
-    // Use console.log instead of Logger to avoid potential circular dependencies
-    const DEBUG_MODE = window.location.hostname === 'localhost' || 
-                       window.location.hostname === '127.0.0.1' ||
-                       window.location.search.includes('debug=true');
-    
-    if (DEBUG_MODE) {
-      console.debug(`Info summary rendered for container '${containerId}'`, { 
+    // Use Logger.debug instead of console.log to avoid cluttering console
+    // Only log in debug mode
+    if (window.Logger && window.Logger.debug) {
+      window.Logger.debug(`Info summary rendered for container '${containerId}'`, { 
         statsCount: config.stats.length,
-        containerId 
+        containerId,
+        page: 'info-summary-system'
       });
     }
   }
@@ -497,37 +522,44 @@ class InfoSummarySystem {
    */
   async calculateAndRender(data, config) {
     const dataset = this._resolveDataSource(data, config);
-    console.log('🔍 InfoSummarySystem.calculateAndRender called with:', {
-      providedDataLength: Array.isArray(data) ? data.length : null,
-      resolvedDataLength: Array.isArray(dataset) ? dataset.length : null,
-      statsCount: config?.stats?.length,
-      containerId: config?.containerId,
-      tableType: config?.tableType || null,
-    });
+    
+    // Use Logger.debug instead of console.log to avoid cluttering console
+    if (window.Logger && window.Logger.debug) {
+      window.Logger.debug('InfoSummarySystem.calculateAndRender called', {
+        providedDataLength: Array.isArray(data) ? data.length : null,
+        resolvedDataLength: Array.isArray(dataset) ? dataset.length : null,
+        statsCount: config?.stats?.length,
+        containerId: config?.containerId,
+        tableType: config?.tableType || null,
+        page: 'info-summary-system'
+      });
+    }
     
     if (!Array.isArray(dataset)) {
-      console.warn('Invalid data provided to InfoSummarySystem');
+      if (window.Logger && window.Logger.warn) {
+        window.Logger.warn('Invalid data provided to InfoSummarySystem', { page: 'info-summary-system' });
+      }
       return;
     }
     
     if (!config || !config.stats) {
-      console.warn('Invalid config provided to InfoSummarySystem');
+      if (window.Logger && window.Logger.warn) {
+        window.Logger.warn('Invalid config provided to InfoSummarySystem', { page: 'info-summary-system' });
+      }
       return;
     }
     
     try {
       // Calculate statistics (now async to support async calculators)
-      console.log('⚙️ Calculating stats from data...');
       const stats = await this.calculateStatsFromData(dataset, config.stats);
-      console.log('✅ Stats calculated:', stats);
       
       // Render the summary
       this.renderInfoSummary(config.containerId, stats, config);
-      console.log('✅ Summary rendered to container:', config.containerId);
-      console.log('📄 HTML Content:', document.getElementById(config.containerId)?.innerHTML?.substring(0, 200));
       
     } catch (error) {
-      console.error('Error in InfoSummarySystem.calculateAndRender:', error);
+      if (window.Logger && window.Logger.error) {
+        window.Logger.error('Error in InfoSummarySystem.calculateAndRender:', error, { page: 'info-summary-system' });
+      }
     }
   }
 

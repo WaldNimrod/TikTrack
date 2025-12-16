@@ -10,6 +10,12 @@
  * @module TradingViewWidgetsManager
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Event Handlers ===
+// - handleResize() - Handleresize
+
 (function() {
   'use strict';
 
@@ -70,11 +76,7 @@
 
         this._initialized = true;
 
-        if (window.Logger) {
-          window.Logger.info('TradingViewWidgetsManager: Initialized successfully', {
-            module: 'TradingViewWidgetsManager'
-          });
-        }
+        // TradingViewWidgetsManager initialized successfully
       } catch (error) {
         if (window.Logger) {
           window.Logger.error('TradingViewWidgetsManager: Initialization failed', error, {

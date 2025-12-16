@@ -1,13 +1,13 @@
 {
   "production": {
-    "version": "1.3.17.0",
+    "version": "1.3.20.2",
     "major": 1,
     "minor": 3,
-    "patch": 17,
-    "build": 0,
-    "commit": "656e7b7643f7a55221a56b43841940ac0741b404",
-    "updated_at": "2025-12-11T01:13:59+00:00",
-    "notes": "ייצוב מלא ו-CRUD מקצה לקצה - הפרויקט מוכן לייצור"
+    "patch": 20,
+    "build": 2,
+    "commit": "8c08a0b9ef1eaa20194a280ae055af6c3ed9d92f",
+    "updated_at": "2025-12-16T22:41:58+00:00",
+    "notes": "Restore Chrome driver configuration for Selenium tests"
   },
   "development": {
     "version": "1.3.112.0",

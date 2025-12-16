@@ -3,6 +3,54 @@
  * Builds the designs page dynamically from the unified button & color systems.
  */
 
+
+// ===== FUNCTION INDEX =====
+
+// === Initialization ===
+// - buildLegacyHtml() - Buildlegacyhtml
+// - buildModernHtml() - Buildmodernhtml
+// - buildJsSnippet() - Buildjssnippet
+// - buildVariantData() - Buildvariantdata
+// - createVariantButton() - Createvariantbutton
+// - createColorPreview() - Createcolorpreview
+// - createCodeCell() - Createcodecell
+// - createButtonRow() - Createbuttonrow
+// - initializeButtonFilters() - Initializebuttonfilters
+// - createColorDetailsList() - Createcolordetailslist
+// - createColorTableRow() - Createcolortablerow
+// - initializeColorFilters() - Initializecolorfilters
+// - initializeDesignsPage() - Initializedesignspage
+
+// === Event Handlers ===
+// - resolveButtonText() - Resolvebuttontext
+// - resolveButtonIcon() - Resolvebuttonicon
+// - getFilteredButtons() - Getfilteredbuttons
+// - renderButtonTable() - Renderbuttontable
+// - filterButtons() - Filterbuttons
+// - updateFilterSelection() - Updatefilterselection
+// - getActionColorRows() - Getactioncolorrows
+// - loadButtonTable() - Loadbuttontable
+
+// === UI Functions ===
+// - updateStats() - Updatestats
+// - renderColorTables() - Rendercolortables
+
+// === Data Functions ===
+// - getCssVariableValue() - Getcssvariablevalue
+// - getEntityVariantSet() - Getentityvariantset
+// - getBrandColorRows() - Getbrandcolorrows
+// - getEntityColorRows() - Getentitycolorrows
+// - getStatusColorRows() - Getstatuscolorrows
+// - getInvestmentColorRows() - Getinvestmentcolorrows
+// - getNumericColorRows() - Getnumericcolorrows
+// - getColorRowsByGroup() - Getcolorrowsbygroup
+// - loadFiltersState() - Loadfiltersstate
+
+// === Other ===
+// - escapeAttributeValue() - Escapeattributevalue
+// - resolveColorVariable() - Resolvecolorvariable
+// - persistFiltersState() - Persistfiltersstate
+
 const BUTTON_COLOR_VARIABLES = {
     EDIT: '--color-action-edit',
     DELETE: '--color-action-delete',
@@ -250,7 +298,15 @@ function createColorPreview(variable, type) {
     chip.style.background = computedValue || variable || '#e9ecef';
 
     const labelWrapper = document.createElement('div');
-    labelWrapper.innerHTML = `<div><strong>${resolveButtonText(type)}</strong></div><code>${variable || '—'}</code>`;
+    labelWrapper.textContent = '';
+    const div = document.createElement('div');
+    const strong = document.createElement('strong');
+    strong.textContent = resolveButtonText(type);
+    div.appendChild(strong);
+    labelWrapper.appendChild(div);
+    const code = document.createElement('code');
+    code.textContent = variable || '—';
+    labelWrapper.appendChild(code);
 
     wrapper.appendChild(chip);
     wrapper.appendChild(labelWrapper);
@@ -321,7 +377,11 @@ function createCodeCell(snippet, buttonType, snippetKey) {
     const cell = document.createElement('td');
 
     if (!snippet || snippet === '—') {
-        cell.innerHTML = '<span class="text-muted">—</span>';
+        cell.textContent = '';
+        const span = document.createElement('span');
+        span.className = 'text-muted';
+        span.textContent = '—';
+        cell.appendChild(span);
         return cell;
     }
 
@@ -389,7 +449,15 @@ function createButtonRow(button) {
     row.appendChild(liveCell);
 
     const nameCell = document.createElement('td');
-    nameCell.innerHTML = `<strong>${button.name}</strong><br><small class="text-muted">${button.type}</small>`;
+    nameCell.textContent = '';
+    const strong = document.createElement('strong');
+    strong.textContent = button.name;
+    nameCell.appendChild(strong);
+    nameCell.appendChild(document.createElement('br'));
+    const small = document.createElement('small');
+    small.className = 'text-muted';
+    small.textContent = button.type;
+    nameCell.appendChild(small);
     row.appendChild(nameCell);
 
     const descriptionCell = document.createElement('td');
@@ -457,7 +525,7 @@ function renderButtonTable() {
     }
 
     const filteredButtons = getFilteredButtons();
-    tbody.innerHTML = '';
+    tbody.textContent = '';
 
     filteredButtons.forEach((button) => {
         tbody.appendChild(createButtonRow(button));
@@ -501,7 +569,7 @@ function initializeButtonFilters() {
         return;
     }
 
-    container.innerHTML = '';
+    container.textContent = '';
     BUTTON_CATEGORY_FILTERS.forEach((filter) => {
         const button = document.createElement('button');
         button.type = 'button';
@@ -564,11 +632,24 @@ function createColorTableRow(entry) {
     row.appendChild(groupCell);
 
     const nameCell = document.createElement('td');
-    nameCell.innerHTML = `<strong>${entry.name}</strong>${entry.subtitle ? `<br><small class="text-muted">${entry.subtitle}</small>` : ''}`;
+    nameCell.textContent = '';
+    const strong = document.createElement('strong');
+    strong.textContent = entry.name;
+    nameCell.appendChild(strong);
+    if (entry.subtitle) {
+        nameCell.appendChild(document.createElement('br'));
+        const small = document.createElement('small');
+        small.className = 'text-muted';
+        small.textContent = entry.subtitle;
+        nameCell.appendChild(small);
+    }
     row.appendChild(nameCell);
 
     const identifierCell = document.createElement('td');
-    identifierCell.innerHTML = `<code>${entry.identifier || '—'}</code>`;
+    identifierCell.textContent = '';
+    const code = document.createElement('code');
+    code.textContent = entry.identifier || '—';
+    identifierCell.appendChild(code);
     row.appendChild(identifierCell);
 
     const valueCell = document.createElement('td');
@@ -588,7 +669,11 @@ function createColorTableRow(entry) {
     if (entry.details?.length) {
         detailsCell.appendChild(createColorDetailsList(entry.details));
     } else {
-        detailsCell.innerHTML = '<span class="text-muted">—</span>';
+        detailsCell.textContent = '';
+        const span = document.createElement('span');
+        span.className = 'text-muted';
+        span.textContent = '—';
+        detailsCell.appendChild(span);
     }
     row.appendChild(detailsCell);
 
@@ -918,7 +1003,7 @@ function renderColorTables() {
 
     const rows = getColorRowsByGroup(currentColorGroup);
 
-    tbody.innerHTML = '';
+    tbody.textContent = '';
     rows.forEach((rowData) => tbody.appendChild(createColorTableRow(rowData)));
 
     if (window.advancedButtonSystem?.processButtons) {
@@ -944,7 +1029,7 @@ function initializeColorFilters() {
         return;
     }
 
-    container.innerHTML = '';
+    container.textContent = '';
     COLOR_GROUP_FILTERS.forEach((filter) => {
         const button = document.createElement('button');
         button.type = 'button';

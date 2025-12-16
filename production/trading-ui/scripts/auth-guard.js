@@ -127,7 +127,7 @@ async function initAuthGuard() {
   // Small delay to allow session cookie to be set after page reload
   // This prevents race condition where we check auth before session is ready
   // Increased delay to 500ms to give session more time to stabilize
-  await new Promise(resolve => setTimeout(resolve, 500));
+  await new Promise(resolve => setTimeout(resolve, 2000));
   
   // Wait briefly for token to be available (UC or sessionStorage) before first check
   let tokenReady = false;

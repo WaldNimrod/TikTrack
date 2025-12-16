@@ -125,7 +125,12 @@ async function saveAuthToCache(user, token = 'session_based') {
     if (window.UnifiedCacheManager) {
       await window.UnifiedCacheManager.save('currentUser', user, authCacheOptions);
       await window.UnifiedCacheManager.save('authToken', token, authCacheOptions);
-    } else if (typeof sessionStorage !== 'undefined') {
+    
+    // Also save to localStorage as backup
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem('authToken', token);
+      localStorage.setItem('currentUser', JSON.stringify(user));
+    }    } else if (typeof sessionStorage !== 'undefined') {
       sessionStorage.setItem(DEV_SESSION_USER_KEY, JSON.stringify(user));
       sessionStorage.setItem(DEV_SESSION_TOKEN_KEY, token);
     } else {

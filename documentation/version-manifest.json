@@ -1,13 +1,13 @@
 {
   "production": {
-    "version": "1.3.20.4",
+    "version": "1.3.20.5",
     "major": 1,
     "minor": 3,
     "patch": 20,
-    "build": 4,
-    "commit": "7614dbb013e24df8f08905387cf1255886c0c883",
-    "updated_at": "2025-12-16T22:49:37+00:00",
-    "notes": "Fix authentication and JavaScript issues - prevent multiple login modals, fix SyntaxError, add auth checks"
+    "build": 5,
+    "commit": "aeb88d33743723b2db90a2600ab71243bf24b50c",
+    "updated_at": "2025-12-16T22:54:47+00:00",
+    "notes": "Fix authentication issues - prevent multiple login modals, fix function name conflicts, add auth checks before API calls"
   },
   "development": {
     "version": "1.3.111.0",

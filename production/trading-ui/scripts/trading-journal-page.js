@@ -2152,7 +2152,7 @@ window.handleAddEntry = handleAddEntry;
 /**
    * Save page state to PageStateManager
    */
-const loadTradingJournalPageState = async function() {
+const loadTradingJournalState = async function() {
   if (window.PageStateManager && typeof window.PageStateManager.loadPageState === 'function') {
     try {
       const state = await window.PageStateManager.loadPageState(PAGE_NAME);
@@ -2200,7 +2200,7 @@ const initializePage = async function() {
   }
 
   // Load saved page state
-  await loadTradingJournalPageState();
+  await loadTradingJournalState();
   if (!window.currentEntityFilter) {
     window.currentEntityFilter = 'all';
   }

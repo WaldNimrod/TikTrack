@@ -1178,7 +1178,8 @@ function setupLoginForm(formId = 'loginForm', onSuccess = null) {
 // פונקציה לבדיקת התחברות בעת טעינת הדף
 async function checkAuthentication(onAuthenticated = null, onNotAuthenticated = null) {
   console.log('[auth.js] checkAuthentication: Starting authentication check');
-  
+    console.log('[auth.js] checkAuthentication: UnifiedCacheManager exists:', !!window.UnifiedCacheManager);
+    console.log('[auth.js] checkAuthentication: UnifiedCacheManager initialized:', window.UnifiedCacheManager?.initialized);  
   // Prevent multiple simultaneous calls
   if (window._checkingAuth) {
     console.log('[auth.js] checkAuthentication: Already checking, skipping...');

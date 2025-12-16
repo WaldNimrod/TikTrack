@@ -110,7 +110,6 @@ ALL_PAGES = [
     {"name": "מצב תיק היסטורי", "url": "/portfolio-state.html", "category": "main", "priority": "high"},
     {"name": "יומן מסחר", "url": "/trading-journal.html", "category": "main", "priority": "high"},
     {"name": "ניתוח אסטרטגיות", "url": "/strategy-analysis", "category": "main", "priority": "high"},
-    {"name": "יומן מסחר (מוקאפ)", "url": "/mockups/daily-snapshots/trading-journal-page.html", "category": "main", "priority": "low"},
     {"name": "מודל רשימת צפייה", "url": "/mockups/watch-list-modal.html", "category": "watchlists", "priority": "medium"},
     {"name": "מודל הוספת טיקר", "url": "/mockups/add-ticker-modal.html", "category": "watchlists", "priority": "medium"},
     {"name": "פעולה מהירה דגלים", "url": "/mockups/flag-quick-action.html", "category": "watchlists", "priority": "medium"},
@@ -641,6 +640,7 @@ def main():
     """Main test function"""
     parser = argparse.ArgumentParser(description='Test console errors on pages')
     parser.add_argument('--page', type=str, help='Test specific page URL (e.g., /watch-list.html)')
+    parser.add_argument('--all', action='store_true', help='Test all pages (default without flag = quick 3-page smoke)')
     args = parser.parse_args()
     
     # Filter pages if --page is specified, or use quick test pages
@@ -654,7 +654,7 @@ def main():
             for p in [p for p in ALL_PAGES if 'watch-list' in p['url'].lower()]:
                 print(f"  - {p['url']} ({p['name']})")
             return
-    else:
+    elif not args.all:
         # Quick test - only 3 critical pages to verify login modal fix
         pages_to_test = [
             p for p in ALL_PAGES

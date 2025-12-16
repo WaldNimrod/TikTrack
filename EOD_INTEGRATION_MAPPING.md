@@ -1,4 +1,5 @@
 # EOD Historical Metrics Integration Mapping
+
 ## מיפוי חישובים היסטוריים בכל העמודים במערכת
 
 מסמך זה מפרט את כל החישובים ההיסטוריים שזוהו במערכת ואיך להחליף אותם בנתונים מ-EOD Historical Metrics.
@@ -16,6 +17,7 @@
 ## 🎯 **עמודים שכבר מיושמו (4)**
 
 ### ✅ Trading Journal (`trading-journal.html`)
+
 **קובץ JS:** `trading-ui/scripts/trading-journal-page.js`
 
 | חישוב | מיקום בקוד | סוג נתונים | EOD API | סטטוס |
@@ -24,6 +26,7 @@
 | Calendar day indicators | `loadAndRenderCalendar()` | NAV, P&L | `EODMetricsDataService.getPortfolioMetrics()` | ✅ מיושם |
 
 ### ✅ Dashboard/Home (`index.html`)
+
 **קובץ JS:** `trading-ui/scripts/services/dashboard-data.js`
 
 | חישוב | מיקום בקוד | סוג נתונים | EOD API | סטטוס |
@@ -32,6 +35,7 @@
 | Daily portfolio metrics | `enhanceDashboardWithEOD()` | Portfolio totals | `EODMetricsDataService.getPortfolioMetrics()` | ✅ מיושם |
 
 ### ✅ Trading Accounts (`trading_accounts.html`)
+
 **קובץ JS:** `trading-ui/scripts/services/trading-accounts-data.js`
 
 | חישוב | מיקום בקוד | סוג נתונים | EOD API | סטטוס |
@@ -40,6 +44,7 @@
 | Account enrichment | `enhanceAccountData()` | Historical performance | `EODMetricsDataService.getPortfolioMetrics()` | ✅ מיושם |
 
 ### ✅ Cash Flows (`cash_flows.html`)
+
 **קובץ JS:** `trading-ui/scripts/cash_flows.js`
 
 | חישוב | מיקום בקוד | סוג נתונים | EOD API | סטטוס |
@@ -52,10 +57,11 @@
 ## 🎯 **עמודים ליישום - עדיפות גבוהה (2)**
 
 ### 🔥 Portfolio State Page (`mockups/daily-snapshots/portfolio-state-page.html`)
+
 **קובץ JS:** `trading-ui/scripts/portfolio-state-page.js`
 **היקף:** עמוד מוקאפ מוקדש להיסטוריה יומית
 
-#### חישובים לזיהוי והחלפה:
+#### חישובים לזיהוי והחלפה
 
 | חישוב | מיקום בקוד | שורה | סוג נתונים | EOD API | הערות |
 |-------|------------|------|-------------|---------|-------|
@@ -65,17 +71,19 @@
 | Value charts | `initPortfolioValueChart()` | - | NAV trends | `EODMetricsDataService.getPortfolioMetrics()` | מגמות ערך |
 | P&L trends | `initPLTrendChart()` | - | P&L history | `EODMetricsDataService.getPortfolioMetrics()` | מגמות P&L |
 
-#### הצעות ליישום EOD:
+#### הצעות ליישום EOD
+
 1. **החלפת `ensurePortfolioHistoricalData()`** - שימוש ב-EOD במקום ExternalDataService
 2. **העשרת `updateSummaryCards()`** - שימוש ב-EOD כמקור עיקרי
 3. **אינטגרציה בגרפים** - הצגת snapshots יומיים מ-EOD
 4. **Date range filters** - שימוש ב-EOD data לפי תאריכים
 
 ### 🔥 Trade History Page (`mockups/daily-snapshots/trade-history-page.html`)
+
 **קובץ JS:** `trading-ui/scripts/trade-history-page.js`
 **היקף:** עמוד מוקאפ מוקדש להיסטוריה יומית
 
-#### חישובים לזיהוי והחלפה:
+#### חישובים לזיהוי והחלפה
 
 | חישוב | מיקום בקוד | שורה | סוג נתונים | EOD API | הערות |
 |-------|------------|------|-------------|---------|-------|
@@ -84,7 +92,8 @@
 | Timeline calculations | `renderTimelineSteps()` | - | Trade timeline | `EODMetricsDataService.getPortfolioMetrics()` | ציר זמן טרייד |
 | Comparison values | `renderComparisonValue()` | - | Plan vs execution | `EODMetricsDataService.getPortfolioMetrics()` | השוואות |
 
-#### הצעות ליישום EOD:
+#### הצעות ליישום EOD
+
 1. **העשרת `renderStatistics()`** - שימוש ב-EOD לנתוני P&L מצטברים
 2. **אינטגרציה ב-`loadTradeForAnalysis()`** - טעינת נתונים היסטוריים מ-EOD
 3. **Performance charts** - הצגת מגמות P&L יומיות מ-EOD
@@ -95,10 +104,11 @@
 ## 🎯 **עמודים ליישום - עדיפות בינונית (4)**
 
 ### 📈 Trades Page (`trades.html`)
+
 **קובץ JS:** `trading-ui/scripts/trades.js`
 **היקף:** ניהול טריידים פעילים וסגורים
 
-#### חישובים לזיהוי והחלפה:
+#### חישובים לזיהוי והחלפה
 
 | חישוב | מיקום בקוד | שורה | סוג נתונים | EOD API | הערות |
 |-------|------------|------|-------------|---------|-------|
@@ -107,17 +117,19 @@
 | Performance indicators | Table columns | - | Trade returns | `EODMetricsDataService.getPortfolioMetrics()` | תשואות |
 | Historical P&L | Tooltip/expand | - | Trade history | `EODMetricsDataService.getPortfolioMetrics()` | היסטוריה מורחבת |
 
-#### הצעות ליישום EOD:
+#### הצעות ליישום EOD
+
 1. **העשרת עמודת P&L** - הצגת P&L היסטורי מ-EOD
 2. **Tooltip עם היסטוריה** - הצגת מגמות P&L יומיות
 3. **Performance indicators** - חישוב תשואות מ-EOD data
 4. **Filter integration** - סינון לפי ביצועים היסטוריים
 
 ### 📊 Executions Page (`executions.html`)
+
 **קובץ JS:** `trading-ui/scripts/executions.js`
 **היקף:** ניתוח ביצועי עסקאות
 
-#### חישובים לזיהוי והחלפה:
+#### חישובים לזיהוי והחלפה
 
 | חישוב | מיקום בקוד | שורה | סוג נתונים | EOD API | הערות |
 |-------|------------|------|-------------|---------|-------|
@@ -126,17 +138,19 @@
 | Statistics | Table summaries | - | Daily stats | `EODMetricsDataService.getPortfolioMetrics()` | סטטיסטיקות יומיות |
 | P&L tracking | Execution records | - | Realized P&L | `EODMetricsDataService.getPortfolioMetrics()` | מעקב P&L |
 
-#### הצעות ליישום EOD:
+#### הצעות ליישום EOD
+
 1. **העשרת `updateExecutionsSummary()`** - שימוש ב-EOD לנתוני ביצועים
 2. **Performance dashboard** - לוח בקרה עם מדדי EOD
 3. **Historical analysis** - ניתוח מגמות ביצועים
 4. **Statistics enhancement** - סטטיסטיקות יומיות מ-EOD
 
 ### 📡 Server Monitor (`server-monitor.html`)
+
 **קובץ JS:** `trading-ui/scripts/server-monitor.js`
 **היקף:** ניטור שרת ומערכת
 
-#### שימושים אפשריים ב-EOD:
+#### שימושים אפשריים ב-EOD
 
 | שימוש | מטרה | EOD API | הערות |
 |--------|-------|---------|-------|
@@ -145,17 +159,19 @@
 | Job status | מצב משימות EOD | `EODMetricsDataService.getRecomputeStatus()` | סטטוס משימות |
 | Error tracking | שגיאות EOD | Validation errors | מעקב שגיאות |
 
-#### הצעות ליישום EOD:
+#### הצעות ליישום EOD
+
 1. **Performance dashboard** - ניטור ביצועי EOD calculations
 2. **Job monitoring** - הצגת סטטוס משימות EOD
 3. **Error analytics** - ניתוח שגיאות ולידציה
 4. **Cache analytics** - ניתוח יעילות מטמון EOD
 
 ### ⚙️ System Management (`system-management.html`)
+
 **קובץ JS:** `trading-ui/scripts/system-management.js`
 **היקף:** ניהול מערכת ואדמין
 
-#### שימושים אפשריים ב-EOD:
+#### שימושים אפשריים ב-EOD
 
 | שימוש | מטרה | EOD API | הערות |
 |--------|-------|---------|-------|
@@ -164,7 +180,8 @@
 | Data integrity | בדיקת איכות נתונים | Validation APIs | בדיקות שלמות |
 | Performance stats | סטטיסטיקות מערכת | System metrics | EOD performance |
 
-#### הצעות ליישום EOD:
+#### הצעות ליישום EOD
+
 1. **Recompute controls** - ממשק לטריגור recompute
 2. **Job queue management** - ניהול תור משימות EOD
 3. **Data validation tools** - כלים לבדיקת איכות נתונים
@@ -175,10 +192,11 @@
 ## 🎯 **עמודים ליישום - עדיפות נמוכה (4)**
 
 ### 🔬 Research Page (`research.html`)
+
 **קובץ JS:** `trading-ui/scripts/research.js`
 **היקף:** תחקיר שוק ומחקר
 
-#### שימושים אפשריים ב-EOD:
+#### שימושים אפשריים ב-EOD
 
 | שימוש | מטרה | EOD API | הערות |
 |--------|-------|---------|-------|
@@ -187,17 +205,19 @@
 | Performance analysis | ניתוח ביצועים | `EODMetricsDataService.getPortfolioMetrics()` | מגמות |
 | Scenario analysis | ניתוח תרחישים | `EODMetricsDataService.getPortfolioMetrics()` | "מה אם" |
 
-#### הצעות ליישום EOD:
+#### הצעות ליישום EOD
+
 1. **Historical comparisons** - השוואת ביצועים בין תקופות
 2. **Backtesting framework** - כלים לבדיקת אסטרטגיות
 3. **Performance analytics** - ניתוח מגמות מתקדם
 4. **Scenario modeling** - מודלים "מה אם" עם EOD data
 
 ### 🔔 Alerts Page (`alerts.html`)
+
 **קובץ JS:** `trading-ui/scripts/alerts.js`
 **היקף:** מערכת התראות
 
-#### שימושים אפשריים ב-EOD:
+#### שימושים אפשריים ב-EOD
 
 | שימוש | מטרה | EOD API | הערות |
 |--------|-------|---------|-------|
@@ -206,17 +226,19 @@
 | Data quality alerts | התראות איכות נתונים | Missing data alerts | חוסרים |
 | Threshold alerts | התראות סף | Portfolio metrics | חריגות מסף |
 
-#### הצעות ליישום EOD:
+#### הצעות ליישום EOD
+
 1. **EOD-based conditions** - תנאים מבוססי EOD metrics
 2. **Deviation detection** - זיהוי חריגות מנורמה
 3. **Performance monitoring** - התראות על שינויים בביצועים
 4. **Data quality monitoring** - התראות על בעיות איכות נתונים
 
 ### 🗄️ DB Display (`db_display.html`)
+
 **קובץ JS:** `trading-ui/scripts/db_display.js`
 **היקף:** תצוגת בסיס נתונים
 
-#### שימושים אפשריים ב-EOD:
+#### שימושים אפשריים ב-EOD
 
 | שימוש | מטרה | EOD API | הערות |
 |--------|-------|---------|-------|
@@ -225,17 +247,19 @@
 | Historical data browser | גלישה בנתונים היסטוריים | Table queries | browsing |
 | Data quality analysis | ניתוח איכות נתונים | Quality metrics | statistics |
 
-#### הצעות ליישום EOD:
+#### הצעות ליישום EOD
+
 1. **EOD tables section** - הצגת טבלאות EOD
 2. **Integrity check tools** - כלים לבדיקת שלמות
 3. **Data browser** - ממשק לגלישה בנתונים היסטוריים
 4. **Quality analytics** - ניתוח איכות נתונים
 
 ### ⏰ Background Tasks (`background-tasks.html`)
+
 **קובץ JS:** `trading-ui/scripts/background-tasks.js`
 **היקף:** ניהול משימות רקע
 
-#### שימושים אפשריים ב-EOD:
+#### שימושים אפשריים ב-EOD
 
 | שימוש | מטרה | EOD API | הערות |
 |--------|-------|---------|-------|
@@ -244,7 +268,8 @@
 | Performance analytics | ניתוח ביצועים | Job performance data | timing, success rates |
 | Error tracking | מעקב שגיאות | Job error logs | failure analysis |
 
-#### הצעות ליישום EOD:
+#### הצעות ליישום EOD
+
 1. **EOD job dashboard** - לוח בקרה למשימות EOD
 2. **Queue management** - ניהול תור ומשימות
 3. **Performance monitoring** - ניתוח ביצועי משימות
@@ -255,17 +280,20 @@
 ## 📋 **תוכנית יישום מפורטת**
 
 ### **שלב 0: הכנה (1-2 ימים)**
+
 - [ ] סריקה מעמיקה של כל עמוד
 - [ ] יצירת מסמך מיפוי מלא (זה המסמך)
 - [ ] בדיקת EODIntegrationHelper
 - [ ] הכנת תבניות קוד
 
 ### **שלב 1: עדיפות גבוהה (3-4 ימים)**
+
 - [ ] Portfolio State Page - מימוש מלא
 - [ ] Trade History Page - מימוש מלא
 - [ ] בדיקות ותיקונים לכל אחד
 
 ### **שלב 2: עדיפות בינונית (5-6 ימים)**
+
 - [ ] Trades Page - מימוש מלא
 - [ ] Executions Page - מימוש מלא
 - [ ] Server Monitor - מימוש EOD monitoring
@@ -273,6 +301,7 @@
 - [ ] בדיקות ותיקונים לכל אחד
 
 ### **שלב 3: עדיפות נמוכה (4-5 ימים)**
+
 - [ ] Research Page - מימוש EOD integration
 - [ ] Alerts Page - מימוש EOD-based alerts
 - [ ] DB Display - מימוש EOD tables
@@ -280,18 +309,21 @@
 - [ ] בדיקות ותיקונים לכל אחד
 
 ### **שלב 4: בדיקות מקיפות (2-3 ימים)**
+
 - [ ] Selenium tests לכל העמודים
 - [ ] בדיקות פונקציונליות
 - [ ] בדיקות ביצועים
 - [ ] אופטימיזציה
 
 ### **שלב 5: תיעוד (2-3 ימים)**
+
 - [ ] עדכון PAGES_LIST.md
 - [ ] יצירת מדריך למפתח
 - [ ] עדכון תיעוד ארכיטקטורה
 - [ ] הוספת JSDoc ו-Function Index
 
 ### **שלב 6: בדיקות סופיות (1-2 ימים)**
+
 - [ ] בדיקות סופיות
 - [ ] אימות 100% הצלחה
 - [ ] יצירת דוח סופי
@@ -320,12 +352,14 @@
 
 **סה"כ זמן משוער:** 18-25 ימי עבודה
 
-### חישובים קיימים:
+### חישובים קיימים
+
 - **KPIs (renderKPICards())**: מחשב price, change, volume, ATR, 52W High/Low, MA20/150
 - **נתונים**: משתמש ב-tickerData ישיר (current_price, daily_change, volume, etc.)
 - **מיקום**: שורות 1288-1700 בקירוב
 
-### חישובים שצריך להחליף ב-EOD:
+### חישובים שצריך להחליף ב-EOD
+
 - Price change calculations
 - Volume metrics
 - Technical indicators (ATR, 52W, MA)
@@ -335,12 +369,14 @@
 
 ## עמוד 2: Trading Journal (`trading-journal-page.js`)
 
-### חישובים קיימים:
+### חישובים קיימים
+
 - **Calendar display**: מציג entries לפי תאריכים
 - **Activity metrics**: ספירת entries ביום/חודש
 - **Navigation**: month/year navigation
 
-### חישובים שצריך להוסיף EOD:
+### חישובים שצריך להוסיף EOD
+
 - Daily portfolio snapshots
 - Monthly aggregations
 - Activity charts with EOD data
@@ -350,12 +386,14 @@
 
 ## עמוד 3: Dashboard/Home (`index.html` + `dashboard-data.js`)
 
-### חישובים קיימים:
+### חישובים קיימים
+
 - **Portfolio summary**: trades, alerts, accounts, cash flows
 - **Dashboard data**: loadDashboardData() function
 - **Caching**: UnifiedCacheManager
 
-### חישובים שצריך להוסיף EOD:
+### חישובים שצריך להוסיף EOD
+
 - Portfolio performance summary (NAV, P&L, returns)
 - Historical trends
 - Account balances over time
@@ -364,12 +402,14 @@
 
 ## עמוד 4: Trading Accounts (`trading-accounts-data.js`)
 
-### חישובים קיימים:
+### חישובים קיימים
+
 - **Account data loading**: fetchTradingAccountsFromApi()
 - **CRUD operations**: create/update/delete accounts
 - **Caching**: saveAccountsCache()
 
-### חישובים שצריך להוסיף EOD:
+### חישובים שצריך להוסיף EOD
+
 - Account-level portfolio metrics
 - Account performance over time
 - Balance tracking
@@ -378,12 +418,14 @@
 
 ## עמוד 5: Cash Flows (`cash_flows.js`)
 
-### חישובים קיימים:
+### חישובים קיימים
+
 - **Page summary stats**: updatePageSummaryStats()
 - **Balance calculations**: calculateBalance()
 - **Cash flow aggregations**: manual calculations
 
-### חישובים שכבר משתמשים ב-EOD (חלקי):
+### חישובים שכבר משתמשים ב-EOD (חלקי)
+
 - כבר יש שימוש ב-EOD APIs
 - צריך להרחיב לשימוש מלא
 
@@ -391,24 +433,26 @@
 
 ## סיכום מיפוי
 
-### מצב נוכחי:
+### מצב נוכחי
+
 - **ticker-dashboard.js**: מחשב KPIs ישירות - צריך החלפה מלאה
 - **trading-journal-page.js**: מציג calendar - צריך הוספת EOD snapshots
 - **dashboard-data.js**: טוען dashboard data - צריך הוספת portfolio metrics
 - **trading-accounts-data.js**: CRUD accounts - צריך הוספת account metrics
 - **cash_flows.js**: משתמש חלקי ב-EOD - צריך הרחבה
 
-### דרישות EOD APIs:
+### דרישות EOD APIs
 
 1. **getPortfolioMetrics(userId, filters)** - מדדי פורטפוליו
 2. **getPositions(userId, filters)** - פוזיציות יומיות
 3. **getCashFlows(userId, filters)** - תזרימי מזומנים
 
-### תבנית אינטגרציה אחידה:
+### תבנית אינטגרציה אחידה
 
 נוצר `EODIntegrationHelper` (`trading-ui/scripts/services/eod-integration-helper.js`) עם:
 
 **פונקציות עיקריות:**
+
 - `integrateEODMetrics()` - אינטגרציה מלאה עם loading states
 - `loadEODDataWithFallback()` - טעינת נתונים עם fallback mechanism
 - `handleEODError()` - טיפול אחיד בשגיאות
@@ -441,6 +485,7 @@ await EODIntegrationHelper.integrateEODMetrics(
 ## שלב הבא: שלב 1.2 - הגדרת תבנית סטנדרטית
 
 צור `EODIntegrationHelper` עם:
+
 - Error handling אחיד
 - Fallback mechanism
 - Loading states

@@ -1,11 +1,13 @@
 # מדריך להוספת חבילות לעמודים
 
 ## 🎯 מטרה
+
 מסמך זה מספק הנחיות ברורות להוספת חבילות חדשות לעמודים, עם דגש על מניעת השגיאה הקלאסית של "Missing required globals".
 
 ## 📋 תהליך מלא להוספת חבילה לעמוד
 
 ### שלב 1: הגדרת החבילה ב-package-manifest.js
+
 ```javascript
 'my-package': {
   id: 'my-package',
@@ -29,6 +31,7 @@
 ```
 
 ### שלב 2: הוספה ל-page-initialization-configs.js
+
 ```javascript
 'my-page': {
   // ... existing config
@@ -44,6 +47,7 @@
 ```
 
 ### שלב 3: הוספת script tags ל-HTML (השלב החשוב ביותר!)
+
 ```html
 <!-- [XX.X] Load Order: XX.X | Strategy: defer -->
 <script src="../../scripts/my-package.js?v=1.0.0" defer></script>
@@ -54,6 +58,7 @@
 ## 🔍 בדיקת תקינות לאחר הוספה
 
 ### 1. בדיקה אוטומטית
+
 ```bash
 # הרץ בדיקה מקיפה של טעינת עמודים
 python3 scripts/test_pages_console_errors.py --page my-page
@@ -63,6 +68,7 @@ python3 scripts/test_portfolio_state_status_check.py
 ```
 
 ### 2. בדיקה ידנית בדפדפן
+
 ```javascript
 // פתח console ורץ:
 console.log('MyPackage loaded:', !!window.MyPackage);
@@ -77,17 +83,20 @@ console.log('Systems status:', {
 ### שגיאה: "Missing required globals for my-page"
 
 **סימפטומים:**
+
 - שגיאת JavaScript: "Missing required globals"
 - מערכות לא עובדות
 - console errors על globals לא מוגדרים
 
 **סיבות נפוצות:**
+
 1. ❌ **חסרים script tags ב-HTML** (השגיאה הנפוצה ביותר!)
 2. ❌ נתיב שגוי ב-script src
 3. ❌ globalCheck שגוי ב-package-manifest.js
 4. ❌ חבילה לא ברשימת packages של העמוד
 
 **פתרון מיידי:**
+
 ```bash
 # בדוק אם הסקריפט נטען
 grep "my-package.js" trading-ui/my-page.html
@@ -99,6 +108,7 @@ grep "my-package.js" trading-ui/my-page.html
 ## 📚 דוגמאות מוצלחות
 
 ### ✅ דוגמה טובה: portfolio-state עם info-summary
+
 ```javascript
 // 1. package-manifest.js - הגדרה נכונה
 'info-summary': {
@@ -115,6 +125,7 @@ requiredGlobals: ["window.InfoSummarySystem"]
 ```
 
 ### ❌ דוגמה רעה: חבילה בלי script tags
+
 ```javascript
 // package-manifest.js - בסדר
 'my-package': { /* הגדרה נכונה */ }
@@ -130,6 +141,7 @@ requiredGlobals: ["window.MyPackage"]
 ## 🔧 כלי עזר לפיתוח
 
 ### 1. בדיקת טעינת חבילות
+
 ```javascript
 // scripts/debug_package_loading.js
 const debug = {
@@ -149,6 +161,7 @@ const debug = {
 ```
 
 ### 2. Validation script
+
 ```bash
 # scripts/validate_package_loading.py
 # בודק שהכל תואם בין manifest, config, ו-HTML
@@ -171,22 +184,27 @@ const debug = {
 ## 🎯 לקחים חשובים
 
 ### 1. **HTML הוא המלך**
+
 package-manifest.js מגדיר *מה* לטעון, אבל HTML מגדיר *איפה* לטען.
 
 ### 2. **בדוק תמיד את השלושה**
+
 - package-manifest.js (הגדרת חבילה)
 - page-initialization-configs.js (שיוך לעמוד)
 - HTML file (טעינת סקריפט)
 
 ### 3. **השגיאה הכי נפוצה**
+
 חבילה מוגדרת נכון, אבל script tags חסרים מה-HTML. תמיד בדוק קודם את ה-HTML!
 
 ### 4. **בדיקות אוטומטיות מצילות חיים**
+
 הרץ בדיקות אוטומטיות אחרי כל שינוי כדי לתפוס בעיות מוקדם.
 
 ## 📞 קבלת עזרה
 
 אם נתקעת:
+
 1. הרץ `python3 scripts/test_pages_console_errors.py --page your-page`
 2. בדוק console errors
 3. השווה עם עמוד אחר שעובד

@@ -7,6 +7,7 @@
 ## שלב 1: הכנה ותשתית
 
 ### 1.1 בדיקת תלויות קיימות
+
 ```bash
 # וודא שכל המערכות הקיימות פעילות
 cd /Users/nimrod/Documents/TikTrack/TikTrackApp
@@ -23,6 +24,7 @@ ls trading-ui/scripts/services/ | grep -E "(cache|notification|statistics)"
 ```
 
 ### 1.2 הגדרת סכמות DB חדשות
+
 ```sql
 -- Backend/models/eod_metrics_models.py
 from sqlalchemy import Column, Integer, String, Date, Numeric, TIMESTAMP, JSON, Text, Index
@@ -145,6 +147,7 @@ class EODJobRuns(Base):
 ```
 
 ### 1.3 יצירת Migration
+
 ```python
 # Backend/migrations/versions/xxx_add_eod_metrics_tables.py
 """Add EOD metrics tables"""
@@ -260,6 +263,7 @@ def downgrade():
 ## שלב 2: שירותי Backend
 
 ### 2.1 EODMetricsService
+
 ```python
 # Backend/services/eod_metrics_service.py
 from datetime import date, datetime
@@ -302,6 +306,7 @@ class EODMetricsService:
 ```
 
 ### 2.2 RecomputeService
+
 ```python
 # Backend/services/recompute_service.py
 from datetime import date, datetime, timedelta
@@ -337,6 +342,7 @@ class RecomputeService:
 ```
 
 ### 2.3 API Routes
+
 ```python
 # Backend/routes/api/eod_metrics.py
 from flask import Blueprint, request, jsonify
@@ -389,6 +395,7 @@ def get_recompute_history():
 ## שלב 3: שירותי Frontend
 
 ### 3.1 EODMetricsDataService
+
 ```javascript
 // trading-ui/scripts/services/eod-metrics-data.js
 class EODMetricsDataService {
@@ -434,6 +441,7 @@ window.EODMetricsDataService = new EODMetricsDataService();
 ```
 
 ### 3.2 EODValidationService
+
 ```javascript
 // trading-ui/scripts/services/eod-validation-service.js
 class EODValidationService {
@@ -492,6 +500,7 @@ window.EODValidationService = new EODValidationService();
 ## שלב 4: אינטגרציה בעמודים
 
 ### 4.1 דשבורד טיקר (ticker-dashboard.html)
+
 ```javascript
 // הוסף ל-package-manifest
 {
@@ -543,6 +552,7 @@ class TickerDashboardManager {
 ```
 
 ### 4.2 יומן מסחר (trading-journal.html)
+
 ```javascript
 // ב-trading-journal.js
 class TradingJournalManager {
@@ -561,6 +571,7 @@ class TradingJournalManager {
 ```
 
 ### 4.3 דף הבית (index.html)
+
 ```javascript
 // ב-dashboard.js
 class DashboardManager {
@@ -586,6 +597,7 @@ class DashboardManager {
 ```
 
 ### 4.4 עמודי מוקאפ (trade-history-page.html, portfolio-state-page.html)
+
 ```javascript
 // ב-trade-history-page.js
 class TradeHistoryManager {
@@ -602,6 +614,7 @@ class TradeHistoryManager {
 ## שלב 5: בדיקות
 
 ### 5.1 בדיקות יחידה (Backend)
+
 ```python
 # Backend/tests/test_eod_metrics.py
 import pytest
@@ -635,6 +648,7 @@ class TestEODMetricsService:
 ```
 
 ### 5.2 בדיקות Frontend
+
 ```javascript
 // tests/eod-metrics-service.test.js
 describe('EODMetricsDataService', () => {
@@ -643,6 +657,7 @@ describe('EODMetricsDataService', () => {
 ```
 
 ### 5.3 הרצת בדיקות
+
 ```bash
 # Backend tests
 cd Backend
@@ -659,9 +674,11 @@ python3 scripts/test_pages_console_errors.py
 ## שלב 6: תיעוד
 
 ### 6.1 מדריך למפתחים
+
 ראה `documentation/04-FEATURES/CORE/EOD_HISTORICAL_METRICS_SYSTEM.md`
 
 ### 6.2 Checklist הטמעה
+
 - [x] יצירת טבלאות DB ו-migration
 - [x] יישום EODMetricsService ו-RecomputeService
 - [x] הוספת API routes
@@ -675,6 +692,7 @@ python3 scripts/test_pages_console_errors.py
 - [x] תיעוד מלא
 
 ### 6.3 ניטור ותחזוקה
+
 - הוסף ל-Metrics Collector: מספר records בטבלאות EOD, זמני חישוב, שיעור שגיאות
 - הוסף ל-Health Service: בדיקת זמינות טבלאות EOD
 - לוגים: שגיאות ולידציה, זמני חישוב, נפח נתונים

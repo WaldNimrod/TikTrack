@@ -21,6 +21,7 @@
 - **Violations**: 2
 
 **Violations:**
+
 - `from` (class): Class "from" should be PascalCase (e.g., MyClass)
 - `to` (class): Class "to" should be PascalCase (e.g., MyClass)
 
@@ -39,6 +40,7 @@
 - **Violations**: 1
 
 **Violations:**
+
 - `FieldRenderer` (variable): Variable "FieldRenderer" should be camelCase (e.g., myVariable)
 
 ---
@@ -70,6 +72,7 @@
 - **Violations**: 2
 
 **Violations:**
+
 - `related_type_id` (variable): Variable "related_type_id" should be camelCase (e.g., myVariable)
 - `related_id` (variable): Variable "related_id" should be camelCase (e.g., myVariable)
 
@@ -88,6 +91,7 @@
 - **Violations**: 1
 
 **Violations:**
+
 - `currency_id` (variable): Variable "currency_id" should be camelCase (e.g., myVariable)
 
 ---
@@ -98,6 +102,7 @@
 - **Violations**: 5
 
 **Violations:**
+
 - `trading_accounts` (variable): Variable "trading_accounts" should be camelCase (e.g., myVariable)
 - `trading_accounts` (variable): Variable "trading_accounts" should be camelCase (e.g., myVariable)
 - `trading_accounts` (variable): Variable "trading_accounts" should be camelCase (e.g., myVariable)
@@ -119,6 +124,7 @@
 - **Violations**: 1
 
 **Violations:**
+
 - `PreferenceTypesAudit` (variable): Variable "PreferenceTypesAudit" should be camelCase (e.g., myVariable)
 
 ---

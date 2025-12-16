@@ -21,6 +21,7 @@
 - **Coverage**: 25.00%
 
 **Functions without try-catch:**
+
 - `toNumber()`
 - `resolveDateValue()`
 - `normalizeArray()`
@@ -51,6 +52,7 @@
 - **Coverage**: 71.95%
 
 **Functions without try-catch:**
+
 - `getTradesPaginationOptions()`
 - `handleTradesPageRender()`
 - `handleTradesFilteredChange()`
@@ -83,6 +85,7 @@
 - **Coverage**: 50.00%
 
 **Functions without try-catch:**
+
 - `updateRealizedPLField()`
 - `updateExecution()`
 - `loadExecutionsData()`
@@ -136,6 +139,7 @@
 - **Coverage**: 54.55%
 
 **Functions without try-catch:**
+
 - `loadAlertsDataInternal()`
 - `updateAlertsTable()`
 - `enableConditionFields()`
@@ -170,6 +174,7 @@
 - **Coverage**: 54.17%
 
 **Functions without try-catch:**
+
 - `displayTradePlanTickerInfo()`
 - `updateEditTickerInfo()`
 - `checkLinkedItemsBeforeCancel()`
@@ -212,6 +217,7 @@
 - **Coverage**: 49.18%
 
 **Functions without try-catch:**
+
 - `loadCashFlowsData()`
 - `resolveExchangeDirectionFromType()`
 - `getCashFlowsPaginationInstance()`
@@ -252,6 +258,7 @@
 - **Coverage**: 81.58%
 
 **Functions without try-catch:**
+
 - `editNote()`
 - `updateNotesTable()`
 - `onNoteRelationTypeChange()`
@@ -268,6 +275,7 @@
 - **Coverage**: 14.29%
 
 **Functions without try-catch:**
+
 - `getContainer()`
 - `renderPlaceholder()`
 - `renderDataState()`
@@ -283,6 +291,7 @@
 - **Coverage**: 67.92%
 
 **Functions without try-catch:**
+
 - `editTicker()`
 - `initializeProviderSymbolFields()`
 - `collectProviderSymbols()`
@@ -309,6 +318,7 @@
 - **Coverage**: 45.24%
 
 **Functions without try-catch:**
+
 - `loadCurrenciesFromServer()`
 - `generateCurrencyOptions()`
 - `loadTradingAccountsFromServer()`
@@ -341,6 +351,7 @@
 - **Coverage**: 86.67%
 
 **Functions without try-catch:**
+
 - `fetchTableData()`
 - `addRecord()`
 
@@ -352,6 +363,7 @@
 - **Coverage**: 80.00%
 
 **Functions without try-catch:**
+
 - `initializePreferencesPage()`
 
 ---

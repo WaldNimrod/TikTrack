@@ -1192,6 +1192,12 @@ async function loadDashboardDataFromService(options = {}) {
 }
 
 window.loadDashboardData = async function(options = {}) {
+    // Check authentication before loading data
+    if (!window.TikTrackAuth?.currentUser window.loadDashboardData = async function(options = {}) {window.loadDashboardData = async function(options = {}) { !window.TikTrackAuth?.authToken) {
+        window.Logger?.info?.('ℹ️ Skipping dashboard data load - user not authenticated', { page: 'index' });
+        return { trades: [], alerts: [], accounts: [], cashFlows: [] };
+    }
+
     const { force = false, ttl = DASHBOARD_DATA_TTL } = options;
 
     // Check authentication before loading data

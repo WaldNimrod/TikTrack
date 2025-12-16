@@ -1,13 +1,13 @@
 {
   "production": {
-    "version": "1.3.20.3",
+    "version": "1.3.20.4",
     "major": 1,
     "minor": 3,
     "patch": 20,
-    "build": 3,
-    "commit": "4d220783ecd78225f46882c60700cc0150808bee",
-    "updated_at": "2025-12-16T22:43:03+00:00",
-    "notes": "Add environment isolation configuration (.env, ENVIRONMENT files)"
+    "build": 4,
+    "commit": "7614dbb013e24df8f08905387cf1255886c0c883",
+    "updated_at": "2025-12-16T22:49:37+00:00",
+    "notes": "Fix authentication and JavaScript issues - prevent multiple login modals, fix SyntaxError, add auth checks"
   },
   "development": {
     "version": "1.3.111.0",

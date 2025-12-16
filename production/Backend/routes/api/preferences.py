@@ -12,7 +12,7 @@ Date: January 2025
 """
 
 from flask import Blueprint, request, jsonify, g
-from services.preferences_service import preferences_service, ValidationError
+from services.preferences_service import PreferencesService, ValidationError
 from typing import Any, Dict, List, Optional, Tuple
 import logging
 import json
@@ -27,7 +27,7 @@ from routes.api.base_entity_decorators import require_authentication  # noqa: F4
 from .base_entity_utils import BaseEntityUtils
 
 logger = logging.getLogger(__name__)
-
+preferences_service = PreferencesService()
 def _get_preferences_version(user_id: int, profile_id: Optional[int]) -> Tuple[Optional[str], int]:
     """
     Retrieve the latest update timestamp for the given user/profile combination.
@@ -379,11 +379,21 @@ def get_user_preferences() -> Any:
         # קבלת כל ההעדפות לפי הפרופיל שנבחר בפועל
         logger.info(f"🔍 DEBUG: /api/preferences/user - user_id={user_id}, requested_profile_id={requested_profile_id}, resolved_profile_id={resolved_profile_id}, use_cache={use_cache}")
         
-        preferences = preferences_service.get_all_user_preferences(
-            user_id=user_id,
-            profile_id=resolved_profile_id,
-            use_cache=use_cache
-        )
+        # Get all preferences by getting all preference types and their values
+        all_prefs = {}
+        preference_types = preferences_service.get_all_preference_types()
+        for pref_type in preference_types:
+            try:
+                value = preferences_service.get_preference(
+                    user_id=user_id,
+                    preference_name=pref_type["preference_name"],
+                    profile_id=resolved_profile_id,
+                    use_cache=use_cache
+                )
+                all_prefs[pref_type["preference_name"]] = value
+            except Exception as e:
+                logger.warning("Failed to get preference %s: %s", pref_type["preference_name"], str(e))
+                all_prefs[pref_type["preference_name"]] = pref_type.get("default_value")
         
         # DEBUG: Log preferences result
         logger.info(f"🔍 DEBUG: /api/preferences/user - get_all_user_preferences returned {len(preferences)} preferences")

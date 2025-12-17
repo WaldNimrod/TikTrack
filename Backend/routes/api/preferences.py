@@ -378,12 +378,21 @@ def get_user_preferences() -> Any:
         
         # קבלת כל ההעדפות לפי הפרופיל שנבחר בפועל
         logger.info(f"🔍 DEBUG: /api/preferences/user - user_id={user_id}, requested_profile_id={requested_profile_id}, resolved_profile_id={resolved_profile_id}, use_cache={use_cache}")
-        
+
+        # #region agent log
+        import time
+        fetch('http://127.0.0.1:7242/ingest/8d888219-eb25-465c-b8cb-5e56611fb592',{'method':'POST','headers':{'Content-Type':'application/json'},'body':JSON.stringify({'location':'Backend/routes/api/preferences.py:382','message':'About to call get_all_user_preferences','data':{'user_id':user_id,'profile_id':resolved_profile_id,'use_cache':use_cache,'runId':'debug-cash-flows','hypothesisId':'H1','sessionId':'debug-session'},'timestamp':Date.now()})}).catch(()=>{})
+        # #endregion
+
         preferences = preferences_service.get_all_user_preferences(
             user_id=user_id,
             profile_id=resolved_profile_id,
             use_cache=use_cache
         )
+
+        # #region agent log
+        fetch('http://127.0.0.1:7242/ingest/8d888219-eb25-465c-b8cb-5e56611fb592',{'method':'POST','headers':{'Content-Type':'application/json'},'body':JSON.stringify({'location':'Backend/routes/api/preferences.py:386','message':'get_all_user_preferences completed','data':{'preferences_count':len(preferences),'runId':'debug-cash-flows','hypothesisId':'H1','sessionId':'debug-session'},'timestamp':Date.now()})}).catch(()=>{})
+        # #endregion
         
         # DEBUG: Log preferences result
         logger.info(f"🔍 DEBUG: /api/preferences/user - get_all_user_preferences returned {len(preferences)} preferences")

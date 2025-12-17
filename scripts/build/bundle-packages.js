@@ -108,23 +108,28 @@ async function bundlePackage(packageId, packageConfig) {
   try {
     // Read all scripts and concatenate them in order (preserving execution order)
     // This ensures that global scripts execute in the correct order
+    // REMOVED: IIFE wrapper that was isolating global variables
     let bundledContent = `/* ${packageConfig.name} Bundle - Generated: ${new Date().toISOString()} */\n`;
-    bundledContent += `(function() {\n`;
     bundledContent += `'use strict';\n\n`;
-    
+
+    // Add initialization guard for this bundle
+    bundledContent += `// Bundle initialization guard\n`;
+    bundledContent += `if (typeof window !== 'undefined') {\n`;
+    bundledContent += `  window.__BUNDLE_INITIALIZED_${packageId.toUpperCase().replace(/-/g, '_')} = true;\n`;
+    bundledContent += `}\n\n`;
+
     // Add each script with a separator comment
     for (let i = 0; i < scriptPaths.length; i++) {
       const scriptPath = scriptPaths[i];
       const scriptContent = fs.readFileSync(scriptPath, 'utf8');
       const scriptName = path.basename(scriptPath);
-      
+
       bundledContent += `\n/* ===== Script ${i + 1}/${scriptPaths.length}: ${scriptName} ===== */\n`;
       bundledContent += scriptContent;
       bundledContent += `\n`;
     }
-    
-    bundledContent += `\n})();\n`;
-    bundledContent += `//# sourceMappingURL=${packageId}.bundle.js.map\n`;
+
+    bundledContent += `\n//# sourceMappingURL=${packageId}.bundle.js.map\n`;
 
     // Write bundled content
     console.log(`    📝 Writing bundle to: ${outputFile}`);

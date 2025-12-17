@@ -63,7 +63,7 @@ function updatePage(pageName) {
         fs.copyFileSync(htmlPath, backupPath);
         
         // Generate new script loading code
-        const cmd = `node "${GENERATE_SCRIPT}" ${pageName} --mode=production --use-bundles`;
+        const cmd = `node "${GENERATE_SCRIPT}" ${pageName} --mode=development --no-bundles`;
         console.log(`Running: ${cmd} in ${path.dirname(GENERATE_SCRIPT)}`);
         const newScripts = execSync(cmd, { encoding: 'utf8', cwd: path.dirname(GENERATE_SCRIPT) });
         

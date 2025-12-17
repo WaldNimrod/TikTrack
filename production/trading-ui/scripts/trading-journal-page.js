@@ -2183,7 +2183,7 @@ const loadTradingJournalState = async function() {
 /**
    * Initialize page
    */
-const initializePage = async function() {
+const initializeTradingJournalPage = async function() {
   // Initialize Header System first
   initializeHeader();
 

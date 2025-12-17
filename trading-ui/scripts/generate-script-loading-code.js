@@ -162,10 +162,32 @@ function generateScriptLoadingCode(pageName, mode = null, useBundles = null) {
       
       const bundleSrc = `scripts/bundles/${pkg.id}.bundle.js?v=1.0.0`;
       let scriptTag;
-      if (loadingStrategy === 'sync') {
-        scriptTag = `    <script src="${bundleSrc}"></script> <!-- ${pkg.name} bundle -->\n`;
+
+      // Add initialization guard if specified
+      if (pkg.initializationGuard) {
+        html += `    <script>\n`;
+        html += `      // Initialization guard for ${pkg.name}\n`;
+        html += `      (function() {\n`;
+        html += `        function checkAndLoad${pkg.id.charAt(0).toUpperCase() + pkg.id.slice(1)}() {\n`;
+        html += `          if (${pkg.initializationGuard}) {\n`;
+        html += `            const script = document.createElement('script');\n`;
+        html += `            script.src = '${bundleSrc}';\n`;
+        html += `            script.${loadingStrategy} = true;\n`;
+        html += `            document.head.appendChild(script);\n`;
+        html += `          } else {\n`;
+        html += `            setTimeout(checkAndLoad${pkg.id.charAt(0).toUpperCase() + pkg.id.slice(1)}, 10);\n`;
+        html += `          }\n`;
+        html += `        }\n`;
+        html += `        checkAndLoad${pkg.id.charAt(0).toUpperCase() + pkg.id.slice(1)}();\n`;
+        html += `      })();\n`;
+        html += `    </script>\n`;
+        scriptTag = `    <!-- Bundle ${pkg.id} will be loaded dynamically after guard check -->\n`;
       } else {
-        scriptTag = `    <script src="${bundleSrc}" ${loadingStrategy}></script> <!-- ${pkg.name} bundle -->\n`;
+        if (loadingStrategy === 'sync') {
+          scriptTag = `    <script src="${bundleSrc}"></script> <!-- ${pkg.name} bundle -->\n`;
+        } else {
+          scriptTag = `    <script src="${bundleSrc}" ${loadingStrategy}></script> <!-- ${pkg.name} bundle -->\n`;
+        }
       }
       html += scriptTag;
       scriptCounter++;

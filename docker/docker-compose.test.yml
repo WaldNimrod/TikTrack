@@ -4,10 +4,12 @@ services:
   postgres-test:
     image: postgres:15-alpine
     container_name: tiktrack-postgres-test
+    ports:
+      - "5432:5432"
     environment:
-      POSTGRES_DB: ${POSTGRES_TEST_DB:-tiktrack_test}
-      POSTGRES_USER: ${POSTGRES_TEST_USER:-tiktrack_test}
-      POSTGRES_PASSWORD: ${POSTGRES_TEST_PASSWORD:-tiktrack_test_password}
+      POSTGRES_DB: ${POSTGRES_TEST_DB:-TikTrack-db-testing}
+      POSTGRES_USER: ${POSTGRES_TEST_USER:-TikTrakDBAdmin}
+      POSTGRES_PASSWORD: ${POSTGRES_TEST_PASSWORD:-BigMeZoo1974!?}
     volumes:
       - postgres-test-data:/var/lib/postgresql/data
     healthcheck:

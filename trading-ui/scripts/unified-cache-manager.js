@@ -527,9 +527,32 @@ class UnifiedCacheManager {
      * @returns {Promise<any>} הנתונים או null
      */
     async get(key, options = {}) {
+        // If not initialized, try to initialize or use fallback
         if (!this.initialized) {
-            window.Logger.error('❌ Unified Cache Manager not initialized - cannot get', { page: "unified-cache-manager", key });
-            throw new Error('UnifiedCacheManager not initialized');
+            window.Logger?.warn?.('⚠️ Unified Cache Manager not initialized - attempting initialization', { page: "unified-cache-manager", key });
+            try {
+                await this.initialize();
+                if (!this.initialized) {
+                    // Initialization failed - use fallback if available
+                    if (options.fallback) {
+                        window.Logger?.warn?.('⚠️ Using fallback for uninitialized cache', { page: "unified-cache-manager", key });
+                        return await options.fallback();
+                    }
+                    // No fallback - return null instead of throwing
+                    window.Logger?.warn?.('⚠️ Unified Cache Manager not initialized - returning null', { page: "unified-cache-manager", key });
+                    return null;
+                }
+            } catch (initError) {
+                window.Logger?.warn?.('⚠️ Unified Cache Manager initialization failed - using fallback', { 
+                    page: "unified-cache-manager", 
+                    key,
+                    error: initError?.message 
+                });
+                if (options.fallback) {
+                    return await options.fallback();
+                }
+                return null;
+            }
         }
         
         // Add user_id to cache key for multi-user support (unless explicitly disabled)

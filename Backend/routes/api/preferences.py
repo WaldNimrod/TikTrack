@@ -1019,6 +1019,15 @@ def get_preference_types() -> Any:
     קבלת סוגי העדפות (Public - לא דורש הרשאות)
     """
     try:
+        # Verify preferences_service is available
+        if not preferences_service:
+            logger.error("preferences_service is not defined")
+            return jsonify({
+                "success": False,
+                "error": "Preferences service not available",
+                "timestamp": datetime.now().isoformat()
+            }), 500
+        
         preference_types = preferences_service.get_all_preference_types()
         return jsonify({
             "success": True,
@@ -1029,8 +1038,16 @@ def get_preference_types() -> Any:
             "timestamp": datetime.now().isoformat()
         }), 200
     
+    except NameError as e:
+        # Handle case where preferences_service is not defined
+        logger.error(f"preferences_service not defined: {e}")
+        return jsonify({
+            "success": False,
+            "error": f"Preferences service not available: {str(e)}",
+            "timestamp": datetime.now().isoformat()
+        }), 500
     except Exception as e:
-        logger.error(f"Error getting preference types: {e}")
+        logger.error(f"Error getting preference types: {e}", exc_info=True)
         return jsonify({
             "success": False,
             "error": str(e),

@@ -1190,6 +1190,30 @@ class ModalManagerV2 {
      */
     async showModal(modalId, mode = 'add', entityData = null, options = {}) {
         try {
+            // Check if ModalManagerV2 is initialized
+            if (!this.isInitialized) {
+                window.Logger?.warn?.('⚠️ [ModalManagerV2] Not initialized, attempting initialization', { modalId, mode });
+                try {
+                    this.init();
+                    // Wait a bit for initialization to complete
+                    let retries = 0;
+                    while (!this.isInitialized && retries < 10) {
+                        await new Promise(resolve => setTimeout(resolve, 100));
+                        retries++;
+                    }
+                    if (!this.isInitialized) {
+                        throw new Error('ModalManagerV2 initialization failed');
+                    }
+                } catch (initError) {
+                    window.Logger?.error?.('❌ [ModalManagerV2] Initialization failed', { 
+                        modalId, 
+                        mode, 
+                        error: initError?.message 
+                    });
+                    throw new Error(`ModalManagerV2 not initialized: ${initError?.message}`);
+                }
+            }
+            
             console.log(`🔍 [ModalManagerV2] showModal called:`, { modalId, mode, entityData, options, modalsCount: this.modals.size });
             
             // בדיקה שהמודל קיים - אם לא, ננסה ליצור אותו מהקונפיגורציה

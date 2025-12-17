@@ -1,17 +1,40 @@
 /**
  * Related Object Filters - Comprehensive Function Index
  * ==========================================
- * 
+ *
  * This file contains a centralized filtering system for filtering items by related object type.
  * Supports all entities with `related_type_id` field and filter buttons with `data-type` attribute.
- * 
+ *
  * Related Documentation:
  * - documentation/02-ARCHITECTURE/FRONTEND/RELATED_OBJECT_FILTERS_SYSTEM.md
- * 
+ *
  * Author: TikTrack Development Team
  * Version: 2.0
  * Last Updated: 2025-01-27
  */
+
+// Only load on pages that need related object filtering
+const pagesNeedingRelatedFilters = [
+  'trades', 'trade_plans', 'alerts', 'notes', 'research', 'ai-analysis',
+  'watch-lists', 'watch-list', 'ticker-dashboard', 'strategy-analysis',
+  'portfolio-state', 'trade-history'
+];
+
+const currentPath = window.location.pathname || '';
+const needsRelatedFilters = pagesNeedingRelatedFilters.some(page =>
+  currentPath.includes(page) || currentPath.includes(page.replace('-', '_'))
+);
+
+if (!needsRelatedFilters) {
+  // Skip loading on pages that don't need related object filters
+  if (window.Logger) {
+    window.Logger.info('Related object filters skipped - not needed on this page', {
+      currentPath,
+      page: 'related-object-filters'
+    });
+  }
+  // Exit early without executing the rest of the script
+} else {
 
 /**
  * Filter by related object type using unified table pipeline
@@ -625,6 +648,18 @@ window.createRelatedObjectFilter = createRelatedObjectFilter;
 window.initializeRelatedObjectFilters = initializeRelatedObjectFilters;
 
 // New centralized filter button generation functions
-window.generateEntityTypeFilterButtons = generateEntityTypeFilterButtons;
-window.generateEntityTypeFilterButton = generateEntityTypeFilterButton;
-window.generateAllFilterButton = generateAllFilterButton;
+// Only export if we're on a page that needs these filters
+// Check if already defined to prevent duplicate declaration errors
+if (needsRelatedFilters) {
+  if (typeof window.generateEntityTypeFilterButtons === 'undefined') {
+    window.generateEntityTypeFilterButtons = generateEntityTypeFilterButtons;
+  }
+  if (typeof window.generateEntityTypeFilterButton === 'undefined') {
+    window.generateEntityTypeFilterButton = generateEntityTypeFilterButton;
+  }
+  if (typeof window.generateAllFilterButton === 'undefined') {
+    window.generateAllFilterButton = generateAllFilterButton;
+  }
+}
+
+} // End of page check

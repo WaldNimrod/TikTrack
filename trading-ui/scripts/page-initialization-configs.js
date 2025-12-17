@@ -204,7 +204,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'modules', // Required for ModalManagerV2 (tag search drawer)
         'crud',
         'preferences',
-        'entity-services',
+        // 'entity-services', // Temporarily removed to fix script loading issues
         'entity-details',
         'info-summary',
         'dashboard-widgets',

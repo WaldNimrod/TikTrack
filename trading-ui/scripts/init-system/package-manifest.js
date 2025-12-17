@@ -1491,27 +1491,6 @@ const PACKAGE_MANIFEST = {
         loadOrder: 10.5
       },
       {
-        file: 'calendar/calendar-data-loader.js',
-        globalCheck: 'window.CalendarDataLoader',
-        description: 'Calendar data loader for trading journal',
-        required: false,  // Required only for trading-journal-page
-        loadOrder: 10.6
-      },
-      {
-        file: 'calendar/calendar-renderer.js',
-        globalCheck: 'window.CalendarRenderer',
-        description: 'Calendar renderer for trading journal',
-        required: false,  // Required only for trading-journal-page
-        loadOrder: 10.7
-      },
-      {
-        file: 'trading-journal-page.js',
-        globalCheck: 'window.tradingJournalPage',
-        description: 'Trading journal page script (page-specific)',
-        required: false,  // Required only for trading-journal-page
-        loadOrder: 10.8
-      },
-      {
         file: 'account-service.js',
         globalCheck: 'window.getAccounts',
         description: 'Account service',
@@ -1629,13 +1608,6 @@ const PACKAGE_MANIFEST = {
         description: 'Linked items',
         required: true,
         loadOrder: 12
-      },
-      {
-        file: 'related-object-filters.js',
-        globalCheck: 'window.filterByRelatedObjectType',
-        description: 'Related object filters',
-        required: true,
-        loadOrder: 13
       },
       {
         file: 'account-activity.js',
@@ -2468,19 +2440,21 @@ class PackageManifest {
   getScriptsForPackages(packageIds) {
     const scripts = [];
     const seen = new Set();
-    
+
     packageIds.forEach(pkgId => {
       const pkg = this.getPackage(pkgId);
       if (pkg && pkg.scripts) {
         pkg.scripts.forEach(script => {
-          if (!seen.has(script.file)) {
+          // Only load scripts that are required (required: true or undefined)
+          // Skip scripts marked as required: false
+          if (script.required !== false && !seen.has(script.file)) {
             scripts.push(script);
             seen.add(script.file);
           }
         });
       }
     });
-    
+
     return scripts;
   }
 

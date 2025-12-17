@@ -66,3 +66,4 @@ This log records every production version update, including manual major/minor a
 | 2025-12-12T05:12:27+00:00 | 1.3.20.1 | 1.3.20.0 | 99472475aa41f572d73ea519a8f118cebc1d47e9 | 2bf52cf3416dca0e6a4dac134e35f487e624d78e | build | Comprehensive testing completed - all APIs and E2E tests passed successfully |
 | 2025-12-16T22:41:58+00:00 | 1.3.20.2 | 1.3.20.1 | 8c08a0b9ef1eaa20194a280ae055af6c3ed9d92f | 99472475aa41f572d73ea519a8f118cebc1d47e9 | build | Restore Chrome driver configuration for Selenium tests |
 | 2025-12-16T22:43:03+00:00 | 1.3.20.3 | 1.3.20.2 | 4d220783ecd78225f46882c60700cc0150808bee | 8c08a0b9ef1eaa20194a280ae055af6c3ed9d92f | build | Add environment isolation configuration (.env, ENVIRONMENT files) |
+| 2025-12-17T21:37:44+00:00 | 1.3.21.0 | 1.3.20.3 | b2d5848d1a71e10d0ac3695701b339219dc49b88 | 4d220783ecd78225f46882c60700cc0150808bee | patch | ייצוב סופי ו-CRUD מקצה לקצה - הפרויקט מוכן לייצור |

@@ -90,7 +90,7 @@
     }
 
     const headers = { ...(options.headers || {}) };
-
+    console.log(`[API Fetch Wrapper] Making request to ${url}`, { hasToken: !!headers.Authorization });
     if (!headers.Authorization && !headers.authorization) {
       const token = await getAuthToken();
       if (token) {

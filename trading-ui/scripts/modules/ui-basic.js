@@ -327,7 +327,7 @@ function formatPrice(price) {
 // function getBootstrapColor(type) { ... }
 
 // ===== Export Functions =====
-window.showModal = showModal;
+// REMOVED: window.showModal = showModal; - function removed, use ModalManagerV2.showModal()
 
 // Export price calculation functions to global scope
 window.calculateStopPrice = calculateStopPrice;

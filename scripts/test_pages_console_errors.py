@@ -15,9 +15,9 @@ import requests
 
 try:
     from selenium import webdriver
-    from selenium.webdriver.firefox.service import Service
-    from selenium.webdriver.firefox.options import Options
-    from selenium.webdriver.chrome.service import Service as ChromeService
+    from selenium.webdriver.chrome.service import Service
+    from selenium.webdriver.chrome.options import Options
+    from selenium.webdriver.chrome.service import Service as FirefoxService
     from selenium.webdriver.chrome.options import Options as ChromeOptions
     from selenium.webdriver.common.by import By
     from selenium.webdriver.support.ui import WebDriverWait
@@ -202,15 +202,11 @@ def setup_driver(prefer_chrome: bool = False):
 
     def create_firefox():
         firefox_options = Options()
-        # firefox_options.add_argument('--headless')  # intentionally visible for debugging
         firefox_options.set_preference('devtools.console.stdout.content', True)
         firefox_options.add_argument('--no-sandbox')
         firefox_options.add_argument('--disable-dev-shm-usage')
         firefox_options.add_argument('--width=1920')
         firefox_options.add_argument('--height=1080')
-        dev_edition_path = "/Applications/Firefox Developer Edition.app/Contents/MacOS/firefox"
-        if Path(dev_edition_path).exists():
-            firefox_options.binary_location = dev_edition_path
         service = Service(GeckoDriverManager().install())
         driver = webdriver.Firefox(service=service, options=firefox_options)
         driver.set_script_timeout(60)
@@ -222,12 +218,7 @@ def setup_driver(prefer_chrome: bool = False):
         chrome_options.add_argument('--disable-dev-shm-usage')
         chrome_options.add_argument('--disable-gpu')
         chrome_options.add_argument('--window-size=1920,1080')
-        # Force fresh cache - disable cache completely
-        chrome_options.add_argument('--disable-cache')
-        chrome_options.add_argument('--disable-web-security')
-        chrome_options.add_argument('--disable-features=VizDisplayCompositor')
-        chrome_options.add_argument('--incognito')  # Private browsing mode
-        service = ChromeService(ChromeDriverManager().install())
+        service = Service(ChromeDriverManager().install())
         driver = webdriver.Chrome(service=service, options=chrome_options)
         driver.set_script_timeout(60)
         return driver
@@ -442,11 +433,9 @@ def test_page_console(driver, page_info, retry_count: int = 0):
         except AttributeError:
             pass
         
-        # Navigate to page with cache busting
+        # Navigate to page
         start_time = time.time()
-        import time as time_module
-        cache_bust_url = f"{url}{'&' if '?' in url else '?'}t={int(time_module.time()*1000)}"
-        driver.get(cache_bust_url)
+        driver.get(url)
         
         # Wait for page to load
         try:
@@ -462,21 +451,6 @@ def test_page_console(driver, page_info, retry_count: int = 0):
         # Wait additional time for JavaScript to execute
         time.sleep(2)
         
-        # Debug: Log all loaded scripts
-        loaded_scripts = driver.execute_script("""
-            const scripts = Array.from(document.querySelectorAll('script[src]')).map(s => s.src);
-            return scripts.filter(src => src.includes('trading-journal-page') || src.includes('related-object-filters'));
-        """)
-        if loaded_scripts:
-            result["page_errors"].append(f"Unexpected scripts loaded: {loaded_scripts}")
-
-        # Debug: Check what packages are loaded
-        loaded_packages = driver.execute_script("""
-            return window.LOADED_PACKAGES || [];
-        """)
-        if loaded_packages:
-            result["page_errors"].append(f"Loaded packages: {loaded_packages}")
-
         # Get console logs (if supported)
         try:
             logs = driver.get_log('browser')

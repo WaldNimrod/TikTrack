@@ -11,5 +11,14 @@
   // Terminal settings for background tasks
   "terminal.integrated.automationProfile.osx": {
     "path": "/bin/zsh"
-  }
+  },
+  "python.testing.unittestArgs": [
+    "-v",
+    "-s",
+    "./production",
+    "-p",
+    "*test.py"
+  ],
+  "python.testing.pytestEnabled": false,
+  "python.testing.unittestEnabled": true
 }

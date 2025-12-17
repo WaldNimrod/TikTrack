@@ -127,14 +127,35 @@ async function initAuthGuard() {
   // Small delay to allow session cookie to be set after page reload
   // This prevents race condition where we check auth before session is ready
   // Increased delay to 500ms to give session more time to stabilize
-  await new Promise(resolve => setTimeout(resolve, 500));
+  await new Promise(resolve => setTimeout(resolve, 2000));
   
   // Wait briefly for token to be available (UC or sessionStorage) before first check
   let tokenReady = false;
+  let cacheReady = false;
+  
+  // Wait for UnifiedCacheManager to be ready
+  for (let i = 0; i < 50; i++) {
+    if (window.UnifiedCacheManager?.initialized) {
+      cacheReady = true;
+      break;
+    }
+    await new Promise(resolve => setTimeout(resolve, 100));
+  }
+  
+  if (!cacheReady) {
+    console.warn('[Auth Guard] UnifiedCacheManager not ready after 5 seconds, proceeding anyway');
+  }
+  
   for (let i = 0; i < 10; i++) {
     const hasUC = window.UnifiedCacheManager?.initialized;
     const ucToken = hasUC ? await window.UnifiedCacheManager.get('authToken', { includeUserId: false }).catch(() => null) : null;
     const ssToken = (typeof sessionStorage !== 'undefined') ? sessionStorage.getItem('dev_authToken') : null;
+    if (ucToken || ssToken) {
+      tokenReady = true;
+      break;
+    }
+    await new Promise(resolve => setTimeout(resolve, 100));
+  }    const ssToken = (typeof sessionStorage !== 'undefined') ? sessionStorage.getItem('dev_authToken') : null;
     if (ucToken || ssToken) {
       tokenReady = true;
       break;

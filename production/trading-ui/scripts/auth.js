@@ -125,7 +125,12 @@ async function saveAuthToCache(user, token = 'session_based') {
     if (window.UnifiedCacheManager) {
       await window.UnifiedCacheManager.save('currentUser', user, authCacheOptions);
       await window.UnifiedCacheManager.save('authToken', token, authCacheOptions);
-    } else if (typeof sessionStorage !== 'undefined') {
+    
+    // Also save to localStorage as backup
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem('authToken', token);
+      localStorage.setItem('currentUser', JSON.stringify(user));
+    }    } else if (typeof sessionStorage !== 'undefined') {
       sessionStorage.setItem(DEV_SESSION_USER_KEY, JSON.stringify(user));
       sessionStorage.setItem(DEV_SESSION_TOKEN_KEY, token);
     } else {
@@ -473,7 +478,8 @@ async function login(username, password) {
 
   // Store user + token in UnifiedCacheManager - ONLY UnifiedCacheManager, no fallbacks
   if (data.data?.user) {
-    currentUser = data.data.user;
+    currentUser = data.data.user; 
+    loginModalShowing = false;
     authToken = data.data?.access_token;
     await saveAuthToCache(currentUser, authToken);
   }
@@ -884,7 +890,8 @@ async function isAuthenticatedSync() {
       const data = await response.json();
       if (data.status === 'success' && data.data?.user) {
         // Update cache with fresh data - ONLY UnifiedCacheManager, no fallbacks
-        currentUser = data.data.user;
+        currentUser = data.data.user; 
+    loginModalShowing = false;
         
         window.AuthDebugMonitor?.log('info', '✅ isAuthenticatedSync: User authenticated', {
           userId: currentUser?.id,
@@ -1171,7 +1178,8 @@ function setupLoginForm(formId = 'loginForm', onSuccess = null) {
 // פונקציה לבדיקת התחברות בעת טעינת הדף
 async function checkAuthentication(onAuthenticated = null, onNotAuthenticated = null) {
   console.log('[auth.js] checkAuthentication: Starting authentication check');
-  
+    console.log('[auth.js] checkAuthentication: UnifiedCacheManager exists:', !!window.UnifiedCacheManager);
+    console.log('[auth.js] checkAuthentication: UnifiedCacheManager initialized:', window.UnifiedCacheManager?.initialized);  
   // Prevent multiple simultaneous calls
   if (window._checkingAuth) {
     console.log('[auth.js] checkAuthentication: Already checking, skipping...');
@@ -1401,8 +1409,17 @@ function createLogoutButton(containerId) {
  * Show login modal instead of redirecting to login page
  * הצגת modal כניסה במקום redirect לעמוד כניסה
  */
+let loginModalShowing = false;
+
 async function showLoginModal(onSuccess = null) {
-  window.Logger?.info?.('🔐 [auth.js] showLoginModal called', { page: 'auth' });
+  window.Logger?.info?.('🔐 [auth.js] showLoginModal called', { page: 'auth' }); 
+  
+  // Prevent multiple login modals 
+  if (loginModalShowing) { 
+    window.Logger?.info?.('ℹ️ [auth.js] showLoginModal skipped - modal already showing', { page: 'auth' }); 
+    return; 
+  } 
+  loginModalShowing = true;
   // Skip if already authenticated (dev/no-cache support via globals/session/localStorage)
   try {
     const devToken = (typeof sessionStorage !== 'undefined') ? sessionStorage.getItem(DEV_SESSION_TOKEN_KEY) : null;
@@ -1781,7 +1798,8 @@ async function updateUserProfile(updates) {
 
   // Update cache
   if (data.data?.user) {
-    currentUser = data.data.user;
+    currentUser = data.data.user; 
+    loginModalShowing = false;
     if (window.UnifiedCacheManager) {
       await window.UnifiedCacheManager.save('currentUser', currentUser, authCacheOptions);
     } else {
@@ -2327,7 +2345,8 @@ function setupVisibilityCheck() {
           // Session is valid - update cache with fresh data
           const data = await response.json();
           if (data.status === 'success' && data.data?.user) {
-            currentUser = data.data.user;
+            currentUser = data.data.user; 
+    loginModalShowing = false;
             if (window.UnifiedCacheManager) {
               await window.UnifiedCacheManager.save('currentUser', currentUser, authCacheOptions);
               await window.UnifiedCacheManager.save('authToken', authToken, authCacheOptions);

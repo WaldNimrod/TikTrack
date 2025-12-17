@@ -158,7 +158,7 @@ const PACKAGE_MANIFEST = {
     critical: true,
     loadOrder: 1,
     dependencies: [],
-    loadingStrategy: 'async', // Changed to async to avoid execution order conflicts in bundle
+    loadingStrategy: 'defer', // Critical package - must load first, defer ensures proper initialization order
     scripts: [
       {
         file: 'api-config.js',
@@ -762,7 +762,8 @@ const PACKAGE_MANIFEST = {
     critical: false,
     loadOrder: 2.5,
     dependencies: ['base', 'services'],
-    loadingStrategy: 'defer', // Critical package - modal system and UI components, has dependencies
+    loadingStrategy: 'defer', // Defer to maintain dependency order with base package
+    initializationGuard: 'window.__BUNDLE_INITIALIZED_BASE && window.showModalSafe', // Wait for base bundle and showModalSafe
     scripts: [
       {
         file: 'modal-navigation-manager.js',

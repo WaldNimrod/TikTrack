@@ -1,22 +1,22 @@
 {
   "production": {
-    "version": "1.3.21.0",
+    "version": "1.3.23.0",
     "major": 1,
     "minor": 3,
-    "patch": 21,
+    "patch": 23,
     "build": 0,
-    "commit": "b2d5848d1a71e10d0ac3695701b339219dc49b88",
-    "updated_at": "2025-12-17T21:37:44+00:00",
-    "notes": "ייצוב סופי ו-CRUD מקצה לקצה - הפרויקט מוכן לייצור"
+    "commit": "12fa4bc74e520fa326a054d06315963d93c88e4b",
+    "updated_at": "2025-12-17T21:47:17+00:00",
+    "notes": "Push all local code updates - bundle testing changes and fixes"
   },
   "development": {
-    "version": "1.3.114.0",
+    "version": "1.3.113.0",
     "major": 1,
     "minor": 3,
-    "patch": 114,
+    "patch": 113,
     "build": 0,
-    "commit": "b0d875ddb4cc438096a653b9a52e268543dbf0c5",
-    "updated_at": "2025-12-17T21:46:44+00:00",
-    "notes": "תיקון בעיות שאינן קשורות לבנדלים: שיפור error handling ו-initialization checks"
+    "commit": "b4b251464754359cc3e87c0a0d086fd09c7c00b1",
+    "updated_at": "2025-12-16T22:43:18+00:00",
+    "notes": "Ongoing development work - AI analysis, watch lists, and system management updates"
   }
 }

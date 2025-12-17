@@ -6,6 +6,7 @@ This version removes the sqlite3 dependency and relies entirely on SQLAlchemy
 models so it can run both in Dockerized environments and on AWS RDS.
 """
 
+print("🔍 LOADING: preferences_service.py")
 import json
 import logging
 import time
@@ -377,6 +378,63 @@ class PreferencesService:
                 for profile in profiles
             ]
 
+    def get_all_user_preferences(
+        self,
+        user_id: int,
+        profile_id: Optional[int] = None,
+        use_cache: bool = True,
+    ) -> List[Dict[str, Any]]:
+        """
+        Get all user preferences for a specific profile
+        """
+        cache_key = f"user_preferences:{user_id}:{profile_id}" if use_cache and self._cache_enabled else None
+
+        if use_cache and self._cache_enabled and cache_key and cache_key in self.cache:
+            logger.info(f"🔍 DEBUG: get_all_user_preferences - returning cached data")
+            return self.cache[cache_key]
+
+        with self._session_scope() as session:
+            # Get active profile if not specified
+            if profile_id is None:
+                profile_id = self._get_active_profile_id(session, user_id)
+
+            # Get all preference types
+            pref_types = session.scalars(
+                select(PreferenceType).where(PreferenceType.is_active.is_(True))
+            ).all()
+
+            data = []
+            for pref_type in pref_types:
+                # Get user preference value if exists
+                stmt = select(UserPreference.saved_value).where(
+                    UserPreference.user_id == user_id,
+                    UserPreference.profile_id == profile_id,
+                    UserPreference.preference_id == pref_type.id,
+                )
+                user_value = session.scalar(stmt)
+
+                # Use user value or default
+                value = user_value if user_value is not None else pref_type.default_value
+
+                data.append({
+                    "preference_name": pref_type.preference_name,
+                    "value": value,
+                    "type": pref_type.preference_type,
+                    "category": pref_type.category,
+                    "description": pref_type.description,
+                    "is_custom": user_value is not None,
+                })
+
+            logger.info(f"🔍 DEBUG: get_all_user_preferences - returning {len(data)} preferences")
+            if len(data) > 0:
+                logger.info(f"🔍 DEBUG: First 3 preferences in result: {data[:3]}")
+
+            if use_cache and self._cache_enabled and cache_key:
+                self.cache[cache_key] = data
+                self.cache_timestamps[cache_key] = time.time()
+
+            return data
+
     # ------------------------------------------------------------------ #
     # Mutation helpers
     # ------------------------------------------------------------------ #
@@ -519,6 +577,9 @@ class PreferencesService:
             return session.scalar(stmt) is not None
 
     def get_all_preference_types(self) -> List[Dict[str, Any]]:
+        # DEBUG: Log that this method was called
+        print("🔍 DEBUG: get_all_preference_types called - method exists!")
+        logger.info("🔍 DEBUG: get_all_preference_types called")
         with self._session_scope() as session:
             stmt = (
                 select(PreferenceType, PreferenceGroup)

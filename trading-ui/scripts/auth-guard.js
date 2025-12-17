@@ -10,6 +10,10 @@
  * Last Updated: December 2025
  */
 
+// #region agent log
+fetch('http://127.0.0.1:7242/ingest/8d888219-eb25-465c-b8cb-5e56611fb592',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'trading-ui/scripts/auth-guard.js:14',message:'Auth Guard script loaded, checking showLoginModal availability',data:{showLoginModalAvailable:typeof window.showLoginModal !== 'undefined',runId:'debug-cash-flows',hypothesisId:'H1',sessionId:'debug-session'},timestamp:Date.now()})}).catch(()=>{});
+// #endregion
+
 
 // ===== FUNCTION INDEX =====
 
@@ -163,6 +167,9 @@ async function initAuthGuard() {
       error: result.error 
     });
     // User is not authenticated - show login modal
+    // #region agent log
+    fetch('http://127.0.0.1:7242/ingest/8d888219-eb25-465c-b8cb-5e56611fb592',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'trading-ui/scripts/auth-guard.js:167',message:'About to call showLoginModal',data:{showLoginModalType:typeof window.showLoginModal,tikTrackAuthExists:typeof window.TikTrackAuth !== 'undefined',runId:'debug-cash-flows',hypothesisId:'H1',sessionId:'debug-session'},timestamp:Date.now()})}).catch(()=>{});
+    // #endregion
     await showLoginModal();
   }
 }

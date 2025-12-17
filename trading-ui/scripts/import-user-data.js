@@ -7606,7 +7606,7 @@ async function openAddTickerModal(symbol, currency = 'USD') {
             ? window.ModalManagerV2.showModal.bind(window.ModalManagerV2)
             : null);
 
-    let canUseModal = Boolean(showModal);
+    let canUseModal = typeof showModal === 'function';
 
     if (canUseModal) {
         const configLoaded = await ensureTickersModalConfigLoaded();
@@ -7639,7 +7639,7 @@ async function openAddTickerModal(symbol, currency = 'USD') {
         }
     }
 
-    if (canUseModal) {
+    if (canUseModal && typeof showModal === 'function') {
         try {
             await showModal('tickersModal', 'add', null);
 

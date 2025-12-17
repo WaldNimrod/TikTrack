@@ -1,3 +1,4 @@
+    const { force = false, ttl = DASHBOARD_DATA_TTL } = options;
 /*
  * ==========================================
  * FUNCTION INDEX
@@ -1192,29 +1193,7 @@ async function loadDashboardDataFromService(options = {}) {
 }
 
 window.loadDashboardData = async function(options = {}) {
-    // Check authentication before loading data
-    if (!window.TikTrackAuth?.currentUser && !window.TikTrackAuth?.authToken) {
-        window.Logger?.info?.('ℹ️ Skipping dashboard data load - user not authenticated', { page: 'index' });
-        return { trades: [], alerts: [], accounts: [], cashFlows: [] };
-    }
-
 
     const { force = false, ttl = DASHBOARD_DATA_TTL } = options;
-
-    // Try to use DashboardData service first
-    if (window.DashboardData?.load) {
-        if (force && typeof window.DashboardData.invalidate === 'function') {
-            try {
-                await window.DashboardData.invalidate();
-            } catch (error) {
-                window.Logger?.warn?.('⚠️ Failed to invalidate dashboard data cache', { error: error?.message }, { page: 'index' });
-            }
-        }
-        return window.DashboardData.load({ force });
-    }
-
-    window.Logger?.warn?.('⚠️ DashboardData service not available, using legacy fetch', { page: 'index' });
-    return legacyFetchDashboardDataFromApi();
-}
 
 

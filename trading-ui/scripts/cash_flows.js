@@ -2,17 +2,22 @@
  * ==========================================
  * FUNCTION INDEX
  * ==========================================
- * 
+ *
  * This index lists all functions in this file, organized by category.
- * 
+ *
  * Total Functions: 61
- * 
+ *
  * PAGE INITIALIZATION (5)
  * - setupCashFlowTypeFilterDropdown() - * Set active cash flow type filter (buttons and dropdown)
  * - setupExchangeRowInteractions() - setupExchangeRowInteractions function
  * - initializeCashFlowsPage() - initializeCashFlowsPage function
  * - setupSourceFieldListeners() - setupSourceFieldListeners function
  * - initializeExternalIdFields() - * Setup source field listeners
+ */
+
+// #region agent log
+fetch('http://127.0.0.1:7242/ingest/8d888219-eb25-465c-b8cb-5e56611fb592',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'trading-ui/scripts/cash_flows.js:1',message:'Cash flows script loaded',data:{windowDefined:typeof window !== 'undefined',runId:'debug-cash-flows',hypothesisId:'H5',sessionId:'debug-session'},timestamp:Date.now()})}).catch(()=>{});
+// #endregion
  * 
  * DATA LOADING (11)
  * - loadCashFlowsData() - loadCashFlowsData function
@@ -132,6 +137,10 @@ async function loadCashFlowsData(options = {}) {
     if (typeof window.CashFlowsData?.fetchFresh === 'function') {
       return await window.CashFlowsData.fetchFresh(loadOptions);
     }
+    // #region agent log
+    fetch('http://127.0.0.1:7242/ingest/8d888219-eb25-465c-b8cb-5e56611fb592',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'trading-ui/scripts/cash_flows.js:140','message':'About to fetch cash flows data','data':{'url':'/api/cash-flows/','runId':'debug-cash-flows','hypothesisId':'H4','sessionId':'debug-session'},timestamp:Date.now()})}).catch(()=>{});
+    // #endregion
+
     const response = await fetch(`/api/cash-flows/?_t=${Date.now()}`, {
       method: 'GET',
       headers: {
@@ -2912,10 +2921,11 @@ async function initializeCashFlowsPage() {
     }
 
     // שחזור מצב סידור
-    if (window.pageUtils?.restoreSortState) {
+    // Use the global table sort restoration function
+    if (window.restoreAnyTableSort) {
+      await window.restoreAnyTableSort('cash_flows');
+    } else if (window.pageUtils?.restoreSortState) {
       await window.pageUtils.restoreSortState('cash_flows');
-    } else {
-      await window.restoreSortState?.('cash_flows');
     }
 
     // הגדרת event listeners לשדות מקור
@@ -4376,7 +4386,7 @@ window.generateDetailedLog = generateDetailedLog;
 
 // פונקציות אתחול
 window.initializeCashFlowsPage = initializeCashFlowsPage;
-window.restoreSortState = restoreSortState;
+// REMOVED: window.restoreSortState = restoreSortState; - deprecated, use window.restoreAnyTableSort
 window.startAutoRefresh = startAutoRefresh;
 // window.loadUserPreferences export removed - using global function from preferences-core.js
 window.applyUserPreferences = applyUserPreferences;

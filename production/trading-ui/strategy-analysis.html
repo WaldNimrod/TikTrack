@@ -268,370 +268,14 @@
                                             <label for="compareByTags" class="form-check-label fw-bold mb-0">תגיות</label>
                                             <button class="btn btn-link btn-link-small p-0 text-decoration-none" data-onclick="selectAllOptions('comparisonTags')" title="בחר את כל התגיות להשוואה" disabled id="btn-select-all-comparison-tags" data-button-type="LINK">
                                                 <span class="icon-placeholder icon" data-icon="check" data-size="8" data-alt="check" aria-label="check"></span>
-                                            </button>
-                                            <button class="btn btn-link btn-link-small p-0 text-decoration-none" data-onclick="clearAllOptions('comparisonTags')" title="נקה את כל בחירות התגיות להשוואה" disabled id="btn-clear-all-comparison-tags" data-button-type="LINK">
-                                                <span class="icon-placeholder icon" data-icon="x" data-size="8" data-alt="x" aria-label="x"></span>
-                                            </button>
-                                        </div>
-                                        <select id="comparisonTags" class="form-select form-select-sm tag-multi-select" multiple data-onchange="applyComparisonParameters()" title="בחר תגיות להשוואה" disabled>
-                                            <!-- Will be populated by TagUIManager -->
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Strategy Comparison Table Section -->
-                <div class="content-section"  data-section="comparison-table-section">
-                    <div class="section-header">
-                        <h2><span class="icon-placeholder icon" data-icon="clipboard-list" data-size="16" data-alt="table" aria-label="table"></span> טבלת השוואות</h2>
-                        <div class="header-actions">
-                            <button class="filter-toggle-btn" data-onclick="toggleSection('comparison-table-section')" title="הצג/הסתר טבלת השוואות בין אסטרטגיות" data-button-type="FILTER">
-                                <span class="section-toggle-icon">▼</span>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="section-body">
-                        <div class="table-responsive">
-                            <table class="table table-hover" data-table-type="comparison-table">
-                                <thead>
-                                    <tr>
-                                        <!-- Headers will be populated dynamically based on selected comparison parameters -->
-                                    </tr>
-                                </thead>
-                                <tbody id="comparison-table-body">
-                                    <!-- Will be populated dynamically -->
-                                </tbody>
-                                <tfoot>
-                                    <tr class="table-info">
-                                        <td colspan="5" id="comparison-table-summary">
-                                            <strong>סיכום:</strong> טוען נתונים...
-                                        </td>
-                                    </tr>
-                                    <tr class="table-secondary form-label-small">
-                                        <td colspan="5" id="comparison-table-filter-info">
-                                            <strong>פרמטרי סינון:</strong> טוען נתונים...
-                                        </td>
-                                    </tr>
-                                    <tr class="table-secondary form-label-small">
-                                        <td colspan="5" id="comparison-table-comparison-info">
-                                            <strong>פרמטרי השוואה:</strong> טוען נתונים...
-                                        </td>
-                                    </tr>
-                                </tfoot>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Heatmap Section -->
-                <div class="content-section"  data-section="heatmap-section">
-                    <div class="section-header">
-                        <h2><span class="icon-placeholder icon" data-icon="chart-dots" data-size="16" data-alt="grid" aria-label="grid"></span> Heatmap - מטריצת השוואות</h2>
-                        <div class="header-actions">
-                            <button class="filter-toggle-btn" data-onclick="toggleSection('heatmap-section')" title="הצג/הסתר מפת חום של ביצועי אסטרטגיות" data-button-type="FILTER">
-                                <span class="section-toggle-icon">▼</span>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="section-body">
-                        <div class="table-responsive">
-                            <table class="table table-bordered" data-table-type="heatmap-matrix">
-                                <thead>
-                                    <tr>
-                                        <th></th>
-                                        <th>טריידים</th>
-                                        <th>P/L ממוצע</th>
-                                        <th>P/L כולל</th>
-                                        <th>אחוז הצלחה</th>
-                                        <th class="text-end">מקס בנקודה</th>
-                                        <th class="text-end">סה"כ קניות</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="heatmap-table-body">
-                                    <!-- Will be populated dynamically -->
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="mt-3">
-                            <div class="mb-2">
-                                <strong>ערכים חיוביים (ירוק בלבד):</strong>
-                                <span class="badge heatmap-excellent me-1">מצוין (90%+)</span>
-                                <span class="badge heatmap-very-good me-1">טוב מאוד (75-90%)</span>
-                                <span class="badge heatmap-good me-1">טוב (60-75%)</span>
-                                <span class="badge heatmap-average me-1">בינוני (40-60%)</span>
-                                <span class="badge heatmap-below-avg me-1">חלש (25-40%)</span>
-                                <span class="badge heatmap-poor me-1">חלש מאוד (10-25%)</span>
-                                <span class="badge heatmap-very-poor">חלש ביותר (&lt;10%)</span>
-                            </div>
-                            <div>
-                                <strong>ערכים שליליים (אדום בלבד):</strong>
-                                <span class="badge heatmap-negative-excellent me-1">גרוע מאוד (&lt;10%)</span>
-                                <span class="badge heatmap-negative-very-poor me-1">גרוע (10-25%)</span>
-                                <span class="badge heatmap-negative-poor me-1">פחות גרוע (25-40%)</span>
-                                <span class="badge heatmap-negative-average me-1">בינוני (40-60%)</span>
-                                <span class="badge heatmap-negative-below-avg me-1">פחות גרוע (60-75%)</span>
-                                <span class="badge heatmap-negative-good me-1">פחות גרוע (75-90%)</span>
-                                <span class="badge heatmap-negative-very-good">פחות גרוע (90%+)</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Visual Heatmap Section -->
-                <div class="content-section"  data-section="visual-heatmap-section">
-                    <div class="section-header">
-                        <h2><span class="icon-placeholder icon" data-icon="chart-dots" data-size="16" data-alt="grid" aria-label="grid"></span> מפת חום ויזואלית</h2>
-                        <div class="header-actions">
-                            <button class="filter-toggle-btn" data-onclick="toggleSection('visual-heatmap-section')" title="הצג/הסתר מפת חום ויזואלית של ביצועי אסטרטגיות" data-button-type="FILTER">
-                                <span class="section-toggle-icon">▼</span>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="section-body">
-                        <div class="visual-heatmap-controls mb-3">
-                            <div class="control-group">
-                                <label for="visualHeatmapSortBy">מיון לפי:</label>
-                                <select id="visualHeatmapSortBy" class="form-select form-select-sm" class="mockup-inline-block mockup-auto-width" title="בחר קריטריון למיון מפת החום הוויזואלית - P/L כולל, אחוז הצלחה, מספר טריידים או P/L ממוצע">
-                                    <option value="totalPL">P/L כולל</option>
-                                    <option value="successRate">אחוז הצלחה</option>
-                                    <option value="trades">מספר טריידים</option>
-                                    <option value="avgPL">P/L ממוצע</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="visual-heatmap-container">
-                            <div class="visual-heatmap-title" id="visual-heatmap-title">מפת חום - P/L כולל לפי קטגוריה</div>
-                            <div class="visual-heatmap-grid" id="visual-heatmap-grid">
-                                <!-- Will be populated by JavaScript -->
-                            </div>
-                        </div>
-                        <div class="visual-heatmap-legend mt-3">
-                            <div class="legend-section">
-                                <div class="legend-title">ערכים חיוביים (ירוק בלבד):</div>
-                                <div class="legend-items">
-                                    <div class="legend-item">
-                                        <div class="legend-color heatmap-excellent"></div>
-                                        <span>מצוין (90%+)</span>
-                                    </div>
-                                    <div class="legend-item">
-                                        <div class="legend-color heatmap-very-good"></div>
-                                        <span>טוב מאוד (75-90%)</span>
-                                    </div>
-                                    <div class="legend-item">
-                                        <div class="legend-color heatmap-good"></div>
-                                        <span>טוב (60-75%)</span>
-                                    </div>
-                                    <div class="legend-item">
-                                        <div class="legend-color heatmap-average"></div>
-                                        <span>בינוני (40-60%)</span>
-                                    </div>
-                                    <div class="legend-item">
-                                        <div class="legend-color heatmap-below-avg"></div>
-                                        <span>חלש (25-40%)</span>
-                                    </div>
-                                    <div class="legend-item">
-                                        <div class="legend-color heatmap-poor"></div>
-                                        <span>חלש מאוד (10-25%)</span>
-                                    </div>
-                                    <div class="legend-item">
-                                        <div class="legend-color heatmap-very-poor"></div>
-                                        <span>חלש ביותר (&lt;10%)</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="legend-section">
-                                <div class="legend-title">ערכים שליליים (אדום בלבד):</div>
-                                <div class="legend-items">
-                                    <div class="legend-item">
-                                        <div class="legend-color heatmap-negative-excellent"></div>
-                                        <span>גרוע מאוד (&lt;10%)</span>
-                                    </div>
-                                    <div class="legend-item">
-                                        <div class="legend-color heatmap-negative-very-poor"></div>
-                                        <span>גרוע (10-25%)</span>
-                                    </div>
-                                    <div class="legend-item">
-                                        <div class="legend-color heatmap-negative-poor"></div>
-                                        <span>פחות גרוע (25-40%)</span>
-                                    </div>
-                                    <div class="legend-item">
-                                        <div class="legend-color heatmap-negative-average"></div>
-                                        <span>בינוני (40-60%)</span>
-                                    </div>
-                                    <div class="legend-item">
-                                        <div class="legend-color heatmap-negative-below-avg"></div>
-                                        <span>פחות גרוע (60-75%)</span>
-                                    </div>
-                                    <div class="legend-item">
-                                        <div class="legend-color heatmap-negative-good"></div>
-                                        <span>פחות גרוע (75-90%)</span>
-                                    </div>
-                                    <div class="legend-item">
-                                        <div class="legend-color heatmap-negative-very-good"></div>
-                                        <span>פחות גרוע (90%+)</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Strategy Performance Chart Section -->
-                <div class="content-section"  data-section="strategy-performance-chart-section">
-                    <div class="section-header">
-                        <h2><span class="icon-placeholder icon" data-icon="chart-bar" data-size="16" data-alt="chart-bar" aria-label="chart-bar"></span> ביצועי אסטרטגיות</h2>
-                        <div class="header-actions">
-                            <button class="filter-toggle-btn" data-onclick="toggleSection('strategy-performance-chart-section')" title="הצג/הסתר גרף ביצועי אסטרטגיות לאורך זמן" data-button-type="FILTER">
-                                <span class="section-toggle-icon">▼</span>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="section-body">
-                        <div id="strategy-chart-series-controls" class="comparison-chart-series-controls mb-3">
-                            <div class="comparison-chart-series-controls-title">בחר סדרות להצגה:</div>
-                            <div class="comparison-chart-series-checkboxes" id="series-checkboxes-container">
-                                <!-- Will be populated dynamically -->
-                            </div>
-                        </div>
-                        <div id="strategy-chart-legend" class="comparison-chart-legend mb-2">
-                            <!-- Legend will be populated dynamically -->
-                        </div>
-                        <!-- Chart Container Wrapper -->
-                        <div class="chart-container-wrapper">
-                            <div class="tradingview-chart-wrapper comparison-chart-wrapper">
-                                <div class="tradingview-chart-container tradingview-comparison-chart-container" id="strategy-performance-chart-container">
-                                    <div class="chart-loading">
-                                        <span class="icon-placeholder icon" data-icon="clock" data-size="16" data-alt="hourglass" aria-label="hourglass"></span> טוען גרף...
-                                    </div>
-                                    <div id="chart-scale-labels" class="chart-scale-labels">
-                                        <div id="left-scale-label" class="left-scale-label">
-                                            אחוז הצלחה (%)
-                                        </div>
-                                        <div id="right-scale-label" class="right-scale-label">
-                                            P/L כולל ($)
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Strategy Insights Section -->
-                <div class="content-section"  data-section="strategy-insights-section">
-                    <div class="section-header">
-                        <h2><span class="icon-placeholder icon" data-icon="note" data-size="16" data-alt="icon" aria-label="icon"></span> תובנות</h2>
-                        <div class="header-actions">
-                            <button class="filter-toggle-btn" data-onclick="toggleSection('strategy-insights-section')" title="הצג/הסתר תובנות והמלצות על בסיס ניתוח האסטרטגיות" data-button-type="FILTER">
-                                <span class="section-toggle-icon">▼</span>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="section-body">
-                        <!-- Strategy Insights Cards -->
-                        <div class="row mb-3">
-                            <div class="col-md-4">
-                                <div class="card">
-                                    <div class="card-body">
-                                        <p class="card-text" id="best-strategy-insight">
-                                            <span class="icon-placeholder icon" data-icon="note" data-size="16" data-alt="icon" aria-label="icon"></span>
-                                            <strong>אסטרטגיה הטובה ביותר:</strong> טוען...
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="card">
-                                    <div class="card-body">
-                                        <p class="card-text" id="best-success-rate-insight">
-                                            <span class="icon-placeholder icon" data-icon="note" data-size="16" data-alt="info-circle" aria-label="info-circle"></span>
-                                            <strong>אחוז הצלחה הגבוה ביותר:</strong> טוען...
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="card">
-                                    <div class="card-body">
-                                        <p class="card-text" id="recommendation-insight">
-                                            <span class="icon-placeholder icon" data-icon="alert-triangle" data-size="16" data-alt="alert-triangle" aria-label="alert-triangle"></span>
-                                            <strong>המלצה:</strong> טוען...
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                                <div class="table-responsive">
-                                    <table class="table table-hover" data-table-type="strategy-list">
-                                        <thead>
-                                            <tr>
-                                                <th>שם אסטרטגיה</th>
-                                                <th>תיאור</th>
-                                                <th>טריידים</th>
-                                                <th>P/L כולל</th>
-                                                <th>אחוז הצלחה</th>
-                                                <th>פעולות</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="strategy-list-table-body">
-                                            <!-- Will be populated dynamically -->
-                                        </tbody>
-                                    </table>
-                                
-                    </div>
-                </div>
-                        
-                        
-                        <div class="card mb-4">
-                            <div class="card-body">
-                                <h5 class="card-title">תובנות</h5>
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="alert alert-success">
-                                            <span class="icon-placeholder icon" data-icon="note" data-size="16" data-alt="icon" aria-label="icon"></span>
-                                            <strong>אסטרטגיה הטובה ביותר:</strong> Breakout Strategy עם P/L כולל של $8,000
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="alert alert-info">
-                                            <span class="icon-placeholder icon" data-icon="note" data-size="16" data-alt="info-circle" aria-label="info-circle"></span>
-                                            <strong>אחוז הצלחה הגבוה ביותר:</strong> Support Bounce עם 70%
-                                        </div>
-                                    </div>
-                                    <div class="col-md-12">
-                                        <div class="alert alert-warning">
-                                            <span class="icon-placeholder icon" data-icon="alert-triangle" data-size="16" data-alt="alert-triangle" aria-label="alert-triangle"></span>
-                                            <strong>המלצה:</strong> שקול להגדיל את השימוש ב-Breakout Strategy בגלל ה-Risk/Reward הגבוה (1:3)
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    
-    <!-- Page Bottom Spacing -->
-    <div class="page-bottom-spacing"></div>
-    
-    <!-- Notification System Containers -->
-    <div class="notification-container" id="notificationContainer"></div>
-    <div id="toastContainer" class="toast-container position-fixed top-0 end-0 p-3"></div>
-</div>
-
     <!-- =============================================================== -->
     <!-- ===== START SCRIPT LOADING ORDER ===== -->
     <!-- =============================================================== -->
     <!-- ⚠️ DO NOT MODIFY MANUALLY - Generated by generate-script-loading-code.js -->
     <!-- 📋 Loading Order: BASE → SERVICES → MODULES → UI-ADVANCED → CRUD → PREFERENCES → INIT-SYSTEM -->
-    <!-- 🎯 Page: strategy-analysis | Generated: 2025-12-07T21:33:26.957Z -->
+    <!-- 🎯 Page: strategy-analysis | Generated: 2025-12-17T21:50:18.750Z -->
     <!-- 📦 Packages: base, services, ui-advanced, modules, crud, preferences, entity-services, entity-details, info-summary, conditions, tradingview-charts, init-system -->
-    <!-- 🔧 Mode: development | Use Bundles: false -->
+    <!-- 🔧 Mode: production | Use Bundles: true -->
 
     <!-- =============================================================== -->
     <!-- ===== PACKAGE 1/12: BASE PACKAGE ===== -->
@@ -640,56 +284,14 @@
     <!-- Dependencies:  -->
     <!-- Critical: YES | Version: 1.5.0 -->
 
-    <!-- [1] Load Order: 1 | Strategy: defer -->
-    <script src="scripts/api-config.js?v=1.0.0" defer></script> <!-- Central API configuration -->
-    <!-- [2] Load Order: 2 | Strategy: defer -->
-    <script src="scripts/global-favicon.js?v=1.0.0" defer></script> <!-- Favicon management -->
-    <!-- [3] Load Order: 3 | Strategy: defer -->
-    <script src="scripts/notification-system.js?v=1.0.0" defer></script> <!-- Notification system -->
-    <!-- [4] Load Order: 4 | Strategy: defer -->
-    <script src="scripts/cache-sync-manager.js?v=1.0.0" defer></script> <!-- Cache synchronization manager -->
-    <!-- [5] Load Order: 5 | Strategy: defer -->
-    <script src="scripts/ui-utils.js?v=1.0.0" defer></script> <!-- UI utilities -->
-    <!-- [6] Load Order: 6 | Strategy: defer -->
-    <script src="scripts/warning-system.js?v=1.0.0" defer></script> <!-- Warning system -->
-    <!-- [7] Load Order: 7 | Strategy: defer -->
-    <script src="scripts/error-handlers.js?v=1.0.0" defer></script> <!-- Error handling system -->
-    <!-- [8] Load Order: 8 | Strategy: defer -->
-    <script src="scripts/unified-cache-manager.js?v=1.0.0" defer></script> <!-- Unified cache manager -->
-    <!-- [9] Load Order: 9 | Strategy: defer -->
-    <script src="scripts/icon-mappings.js?v=1.0.0" defer></script> <!-- Central icon mappings -->
-    <!-- [10] Load Order: 10 | Strategy: defer -->
-    <script src="scripts/icon-system.js?v=1.0.0" defer></script> <!-- Central icon system -->
-    <!-- [11] Load Order: 11 | Strategy: defer -->
-    <script src="scripts/icon-replacement-helper.js?v=1.0.0" defer></script> <!-- Icon replacement helper for standardizing icon usage -->
-    <!-- [12] Load Order: 12 | Strategy: defer -->
-    <script src="scripts/cache-clear-menu.js?v=1.0.0" defer></script> <!-- Cache clearing control (Stage B-Lite) -->
-    <!-- [13] Load Order: 13 | Strategy: defer -->
-    <script src="scripts/cache-ttl-guard.js?v=1.0.0" defer></script> <!-- TTL guard for entity loaders -->
-    <!-- [14] Load Order: 14 | Strategy: defer -->
-    <script src="scripts/auth.js?v=1.0.0" defer></script> <!-- Authentication system -->
-    <!-- [15] Load Order: 15 | Strategy: defer -->
-    <script src="scripts/auth-guard.js?v=1.0.0" defer></script> <!-- Page protection - authentication guard -->
-    <!-- [16] Load Order: 16 | Strategy: defer -->
-    <script src="scripts/logger-service.js?v=1.0.0" defer></script> <!-- Advanced logging service -->
-    <!-- [17] Load Order: 17 | Strategy: defer -->
-    <script src="scripts/header-system.js?v=1.0.0" defer></script> <!-- Header system -->
-    <!-- [18] Load Order: 18 | Strategy: defer -->
-    <script src="scripts/page-state-manager.js?v=1.0.0" defer></script> <!-- Unified page state manager -->
-    <!-- [19] Load Order: 19 | Strategy: defer -->
-    <script src="scripts/page-utils.js?v=1.0.0" defer></script> <!-- Page utilities -->
-    <!-- [20] Load Order: 20 | Strategy: defer -->
-    <script src="scripts/translation-utils.js?v=1.0.0" defer></script> <!-- Translations -->
-    <!-- [21] Load Order: 21 | Strategy: defer -->
-    <script src="scripts/button-icons.js?v=1.0.0" defer></script> <!-- Icon and button system -->
-    <!-- [22] Load Order: 22 | Strategy: defer -->
+    <!-- [1] Package Bundle: base.bundle.js | Strategy: defer -->
+    <script src="scripts/bundles/base.bundle.js?v=1.0.0" defer></script> <!-- Base Package bundle -->
+    <!-- [2] External Script: https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js | Strategy: defer -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script> <!-- Bootstrap JS Bundle (Tooltips & Modals) -->
-    <!-- [23] Load Order: 23 | Strategy: defer -->
-    <script src="scripts/event-handler-manager.js?v=1.0.0" defer></script> <!-- Central event management system -->
-    <!-- [24] Load Order: 24 | Strategy: defer -->
-    <script src="scripts/button-system-init.js?v=1.0.0" defer></script> <!-- Button system -->
-    <!-- [25] Load Order: 25 | Strategy: defer -->
-    <script src="scripts/color-scheme-system.js?v=1.0.0" defer></script> <!-- Dynamic color system -->
+    <!-- [3] External Script: https://cdn.jsdelivr.net/npm/@floating-ui/dom@1.6.0/dist/floating-ui.dom.min.js | Strategy: defer -->
+    <script src="https://cdn.jsdelivr.net/npm/@floating-ui/dom@1.6.0/dist/floating-ui.dom.min.js" defer></script> <!-- Floating UI DOM - Smart positioning library (for overlay/tooltip positioning) -->
+    <!-- [4] External Script: https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js | Strategy: defer -->
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js" defer></script> <!-- GSAP - GreenSock Animation Platform (for smooth animations) -->
 
     <!-- =============================================================== -->
     <!-- ===== PACKAGE 2/12: SERVICES PACKAGE ===== -->
@@ -698,42 +300,14 @@
     <!-- Dependencies: base -->
     <!-- Critical: NO | Version: 1.5.0 -->
 
-    <!-- [26] Load Order: 26 | Strategy: defer -->
-    <script src="scripts/services/data-collection-service.js?v=1.0.0" defer></script> <!-- Data collection service -->
-    <!-- [27] Load Order: 27 | Strategy: defer -->
-    <script src="scripts/services/field-renderer-service.js?v=1.0.0" defer></script> <!-- Field rendering service -->
-    <!-- [28] Load Order: 28 | Strategy: defer -->
-    <script src="scripts/services/select-populator-service.js?v=1.0.0" defer></script> <!-- Select box population service -->
-    <!-- [29] Load Order: 29 | Strategy: defer -->
+    <!-- [5] Package Bundle: services.bundle.js | Strategy: defer -->
+    <script src="scripts/bundles/services.bundle.js?v=1.0.0" defer></script> <!-- Services Package bundle -->
+    <!-- [6] External Script: https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js | Strategy: defer -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script> <!-- jsPDF library (for AI analysis PDF export) -->
-    <!-- [30] Load Order: 30 | Strategy: defer -->
-    <script src="scripts/services/ai-analysis-data.js?v=1.0.0" defer></script> <!-- AI Analysis data service -->
-    <!-- [31] Load Order: 31 | Strategy: defer -->
-    <script src="scripts/services/statistics-calculator.js?v=1.0.0" defer></script> <!-- Statistics calculator -->
-    <!-- [32] Load Order: 32 | Strategy: defer -->
-    <script src="scripts/services/default-value-setter.js?v=1.0.0" defer></script> <!-- Default value service -->
-    <!-- [33] Load Order: 33 | Strategy: defer -->
-    <script src="scripts/services/preferences-data.js?v=1.0.0" defer></script> <!-- Preferences data service (API + Cache) -->
-    <!-- [34] Load Order: 34 | Strategy: defer -->
-    <script src="scripts/services/unified-progress-manager.js?v=1.0.0" defer></script> <!-- Unified progress manager for process tracking -->
-    <!-- [35] Load Order: 35 | Strategy: defer -->
-    <script src="scripts/services/crud-response-handler.js?v=1.0.0" defer></script> <!-- CRUD response handler -->
-    <!-- [36] Load Order: 36 | Strategy: defer -->
-    <script src="scripts/services/unified-crud-service.js?v=1.0.0" defer></script> <!-- Unified CRUD service for all entities -->
-    <!-- [37] Load Order: 37 | Strategy: defer -->
-    <script src="scripts/services/investment-calculation-service.js?v=1.0.0" defer></script> <!-- Investment form amount ↔ quantity calculations -->
-    <!-- [38] Load Order: 38 | Strategy: defer -->
-    <script src="scripts/services/tag-service.js?v=1.0.0" defer></script> <!-- Central tag service (tag management and retrieval) -->
-    <!-- [39] Load Order: 39 | Strategy: defer -->
-    <script src="scripts/services/table-sort-value-adapter.js?v=1.0.0" defer></script> <!-- Adapter for unified sort values (DateEnvelope, legacy) -->
-    <!-- [40] Load Order: 40 | Strategy: defer -->
-    <script src="scripts/services/lint-status-service.js?v=1.0.0" defer></script> <!-- Unified linter status service (API reading and data conversion) -->
-    <!-- [41] Load Order: 41 | Strategy: defer -->
+    <!-- [7] External Script: https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.min.js | Strategy: defer -->
     <script src="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.min.js" defer></script> <!-- Quill.js - Rich Text Editor Library -->
-    <!-- [42] Load Order: 42 | Strategy: defer -->
+    <!-- [8] External Script: https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js | Strategy: defer -->
     <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js" defer></script> <!-- DOMPurify - HTML Sanitizer -->
-    <!-- [43] Load Order: 43 | Strategy: defer -->
-    <script src="scripts/services/rich-text-editor-service.js?v=1.0.0" defer></script> <!-- Rich text editor service -->
 
     <!-- =============================================================== -->
     <!-- ===== PACKAGE 3/12: MODULES PACKAGE ===== -->
@@ -742,44 +316,24 @@
     <!-- Dependencies: base, services -->
     <!-- Critical: NO | Version: 1.5.0 -->
 
-    <!-- [44] Load Order: 44 | Strategy: defer -->
-    <script src="scripts/modal-navigation-manager.js?v=1.0.0" defer></script> <!-- Nested modal navigation system -->
-    <!-- [45] Load Order: 45 | Strategy: defer -->
-    <script src="scripts/modal-z-index-manager.js?v=1.0.0" defer></script> <!-- Dynamic z-index management for nested modals -->
-    <!-- [46] Load Order: 46 | Strategy: defer -->
-    <script src="scripts/tag-ui-manager.js?v=1.0.0" defer></script> <!-- Tag selection management in modals -->
-    <!-- [47] Load Order: 47 | Strategy: defer -->
-    <script src="scripts/tag-events.js?v=1.0.0" defer></script> <!-- Global tag events system -->
-    <!-- [48] Load Order: 48 | Strategy: defer -->
-    <script src="scripts/modules/data-basic.js?v=1.0.0" defer></script> <!-- Basic data -->
-    <!-- [49] Load Order: 49 | Strategy: defer -->
-    <script src="scripts/modules/ui-basic.js?v=1.0.0" defer></script> <!-- Basic interface -->
-    <!-- [50] Load Order: 50 | Strategy: defer -->
-    <script src="scripts/modules/data-advanced.js?v=1.0.0" defer></script> <!-- Advanced data -->
-    <!-- [51] Load Order: 51 | Strategy: defer -->
-    <script src="scripts/modules/ui-advanced.js?v=1.0.0" defer></script> <!-- Advanced interface -->
-    <!-- [52] Load Order: 52 | Strategy: defer -->
-    <script src="scripts/modules/communication-module.js?v=1.0.0" defer></script> <!-- Communication module -->
-    <!-- [53] Load Order: 53 | Strategy: defer -->
-    <script src="scripts/modules/business-module.js?v=1.0.0" defer></script> <!-- Business module -->
-    <!-- [54] Load Order: 54 | Strategy: defer -->
-    <script src="scripts/modules/localstorage-sync.js?v=1.0.0" defer></script> <!-- localStorage synchronization -->
-    <!-- [55] Load Order: 55 | Strategy: defer -->
-    <script src="scripts/modules/dynamic-loader-config.js?v=1.0.0" defer></script> <!-- Dynamic loader configuration -->
-    <!-- [56] Load Order: 56 | Strategy: defer -->
-    <script src="scripts/import-user-data.js?v=1.0.0" defer></script> <!-- Execution data import modal -->
-    <!-- [57] Load Order: 57 | Strategy: defer -->
-    <script src="scripts/modal-configs/trades-config.js?v=1.0.0" defer></script> <!-- Trades modal configuration -->
-    <!-- [58] Load Order: 58 | Strategy: defer -->
-    <script src="scripts/modal-configs/trade-plans-config.js?v=1.0.0" defer></script> <!-- Trade plans modal configuration -->
-    <!-- [59] Load Order: 59 | Strategy: defer -->
-    <script src="scripts/modal-configs/watch-lists-config.js?v=1.0.0" defer></script> <!-- Watch lists modal configuration -->
-    <!-- [60] Load Order: 60 | Strategy: defer -->
-    <script src="scripts/modal-configs/cash-flows-config.js?v=1.0.0" defer></script> <!-- Cash flows modal configuration -->
-    <!-- [61] Load Order: 61 | Strategy: defer -->
-    <script src="scripts/modal-configs/tag-management-config.js?v=1.0.0" defer></script> <!-- Tag system modal configuration -->
-    <!-- [62] Load Order: 62 | Strategy: defer -->
-    <script src="scripts/modal-manager-v2.js?v=1.0.0" defer></script> <!-- Modal manager V2 - MUST load after all modal configs -->
+    <!-- [9] Package Bundle: modules.bundle.js | Strategy: defer -->
+    <script>
+      // Initialization guard for Modules Package
+      (function() {
+        function checkAndLoadModules() {
+          if (window.__BUNDLE_INITIALIZED_BASE && window.showModalSafe) {
+            const script = document.createElement('script');
+            script.src = 'scripts/bundles/modules.bundle.js?v=1.0.0';
+            script.defer = true;
+            document.head.appendChild(script);
+          } else {
+            setTimeout(checkAndLoadModules, 10);
+          }
+        }
+        checkAndLoadModules();
+      })();
+    </script>
+    <!-- Bundle modules will be loaded dynamically after guard check -->
 
     <!-- =============================================================== -->
     <!-- ===== PACKAGE 4/12: UI ADVANCED PACKAGE ===== -->
@@ -788,14 +342,8 @@
     <!-- Dependencies: base, services, modules -->
     <!-- Critical: NO | Version: 1.5.0 -->
 
-    <!-- [63] Load Order: 63 | Strategy: defer -->
-    <script src="scripts/tables.js?v=1.0.0" defer></script> <!-- Table system -->
-    <!-- [64] Load Order: 64 | Strategy: defer -->
-    <script src="scripts/table-data-registry.js?v=1.0.0" defer></script> <!-- Table data registry -->
-    <!-- [65] Load Order: 65 | Strategy: defer -->
-    <script src="scripts/pagination-system.js?v=1.0.0" defer></script> <!-- Pagination system -->
-    <!-- [66] Load Order: 66 | Strategy: defer -->
-    <script src="scripts/modules/actions-menu-system.js?v=1.0.0" defer></script> <!-- Actions menu system -->
+    <!-- [10] Package Bundle: ui-advanced.bundle.js | Strategy: defer -->
+    <script src="scripts/bundles/ui-advanced.bundle.js?v=1.0.0" defer></script> <!-- UI Advanced Package bundle -->
 
     <!-- =============================================================== -->
     <!-- ===== PACKAGE 5/12: CRUD OPERATIONS PACKAGE ===== -->
@@ -804,12 +352,8 @@
     <!-- Dependencies: base, services -->
     <!-- Critical: NO | Version: 1.5.0 -->
 
-    <!-- [67] Load Order: 67 | Strategy: defer -->
-    <script src="scripts/date-utils.js?v=1.0.0" defer></script> <!-- Date utilities -->
-    <!-- [68] Load Order: 68 | Strategy: defer -->
-    <script src="scripts/data-utils.js?v=1.0.0" defer></script> <!-- General data utilities -->
-    <!-- [69] Load Order: 69 | Strategy: defer -->
-    <script src="scripts/unified-table-system.js?v=1.0.0" defer></script> <!-- Unified central table system -->
+    <!-- [11] Package Bundle: crud.bundle.js | Strategy: defer -->
+    <script src="scripts/bundles/crud.bundle.js?v=1.0.0" defer></script> <!-- CRUD Operations Package bundle -->
 
     <!-- =============================================================== -->
     <!-- ===== PACKAGE 6/12: PREFERENCES PACKAGE ===== -->
@@ -818,32 +362,8 @@
     <!-- Dependencies: base, services -->
     <!-- Critical: NO | Version: 1.5.0 -->
 
-    <!-- [70] Load Order: 70 | Strategy: defer -->
-    <script src="scripts/preferences-cache.js?v=1.0.0" defer></script> <!-- Preferences cache management layer -->
-    <!-- [71] Load Order: 71 | Strategy: defer -->
-    <script src="scripts/services/preferences-v4.js?v=1.0.0" defer></script> <!-- Preferences V4 SDK (group-first) -->
-    <!-- [72] Load Order: 72 | Strategy: defer -->
-    <script src="scripts/preferences-events.js?v=1.0.0" defer></script> <!-- Preferences event system -->
-    <!-- [73] Load Order: 73 | Strategy: defer -->
-    <script src="scripts/preferences-core-new.js?v=1.0.0" defer></script> <!-- Preferences core (without colors) -->
-    <!-- [74] Load Order: 74 | Strategy: defer -->
-    <script src="scripts/preferences-ui-layer.js?v=1.0.0" defer></script> <!-- Preferences UI layer -->
-    <!-- [75] Load Order: 75 | Strategy: defer -->
-    <script src="scripts/preferences-colors.js?v=1.0.0" defer></script> <!-- Color system (60+ preferences) -->
-    <!-- [76] Load Order: 76 | Strategy: defer -->
-    <script src="scripts/preferences-manager.js?v=1.0.0" defer></script> <!-- Preferences manager (central) -->
-    <!-- [77] Load Order: 77 | Strategy: defer -->
-    <script src="scripts/preferences-profiles.js?v=1.0.0" defer></script> <!-- Profile management -->
-    <!-- [78] Load Order: 78 | Strategy: defer -->
-    <script src="scripts/preferences-lazy-loader.js?v=1.0.0" defer></script> <!-- lazy loading system -->
-    <!-- [79] Load Order: 79 | Strategy: defer -->
-    <script src="scripts/preferences-validation.js?v=1.0.0" defer></script> <!-- validation system -->
-    <!-- [80] Load Order: 80 | Strategy: defer -->
-    <script src="scripts/preferences-ui-v4.js?v=1.0.0" defer></script> <!-- User interface V4 (Group-First) -->
-    <!-- [81] Load Order: 81 | Strategy: defer -->
-    <script src="scripts/preferences-ui.js?v=1.0.0" defer></script> <!-- User interface -->
-    <!-- [82] Load Order: 82 | Strategy: defer -->
-    <script src="scripts/preferences-group-manager.js?v=1.0.0" defer></script> <!-- Preferences group manager -->
+    <!-- [12] Package Bundle: preferences.bundle.js | Strategy: defer -->
+    <script src="scripts/bundles/preferences.bundle.js?v=1.0.0" defer></script> <!-- Preferences Package bundle -->
 
     <!-- =============================================================== -->
     <!-- ===== PACKAGE 7/12: CONDITIONS PACKAGE ===== -->
@@ -852,48 +372,18 @@
     <!-- Dependencies: base, validation -->
     <!-- Critical: NO | Version: 1.5.0 -->
 
-    <!-- [83] Load Order: 83 | Strategy: defer -->
-    <script src="scripts/conditions/conditions-translations.js?v=1.0.0" defer></script> <!-- Condition translations -->
-    <!-- [84] Load Order: 84 | Strategy: defer -->
-    <script src="scripts/conditions/conditions-validator.js?v=1.0.0" defer></script> <!-- Condition validator -->
-    <!-- [85] Load Order: 85 | Strategy: defer -->
-    <script src="scripts/conditions/conditions-form-generator.js?v=1.0.0" defer></script> <!-- Condition form generator -->
-    <!-- [86] Load Order: 86 | Strategy: defer -->
-    <script src="scripts/conditions/conditions-crud-manager.js?v=1.0.0" defer></script> <!-- Condition CRUD manager -->
-    <!-- [87] Load Order: 87 | Strategy: defer -->
-    <script src="scripts/conditions/conditions-initializer.js?v=1.0.0" defer></script> <!-- Condition initializer -->
-    <!-- [88] Load Order: 88 | Strategy: defer -->
-    <script src="scripts/conditions/conditions-ui-manager.js?v=1.0.0" defer></script> <!-- Condition UI manager -->
-    <!-- [89] Load Order: 89 | Strategy: defer -->
-    <script src="scripts/conditions/conditions-modal-controller.js?v=1.0.0" defer></script> <!-- Condition modal controller -->
+    <!-- [13] Package Bundle: conditions.bundle.js | Strategy: defer -->
+    <script src="scripts/bundles/conditions.bundle.js?v=1.0.0" defer></script> <!-- Conditions Package bundle -->
 
     <!-- =============================================================== -->
     <!-- ===== PACKAGE 8/12: ENTITY SERVICES PACKAGE ===== -->
     <!-- =============================================================== -->
-    <!-- Load Order: 10 | Description: Entity services -->
+    <!-- Load Order: 8 | Description: Entity services -->
     <!-- Dependencies: base, services -->
     <!-- Critical: NO | Version: 1.5.0 -->
 
-    <!-- [90] Load Order: 90 | Strategy: defer -->
-    <script src="scripts/account-service.js?v=1.0.0" defer></script> <!-- Account service -->
-    <!-- [91] Load Order: 91 | Strategy: defer -->
-    <script src="scripts/alert-service.js?v=1.0.0" defer></script> <!-- Alert service -->
-    <!-- [92] Load Order: 92 | Strategy: defer -->
-    <script src="scripts/ticker-service.js?v=1.0.0" defer></script> <!-- Ticker service -->
-    <!-- [93] Load Order: 93 | Strategy: defer -->
-    <script src="scripts/services/trade-plans-data.js?v=1.0.0" defer></script> <!-- Trade plans data service -->
-    <!-- [94] Load Order: 94 | Strategy: defer -->
-    <script src="scripts/trade-plan-service.js?v=1.0.0" defer></script> <!-- Trade plan service -->
-    <!-- [95] Load Order: 95 | Strategy: defer -->
-    <script src="scripts/condition-translator.js?v=1.0.0" defer></script> <!-- Condition translator -->
-    <!-- [96] Load Order: 96 | Strategy: defer -->
-    <script src="scripts/constraints.js?v=1.0.0" defer></script> <!-- Constraints system -->
-    <!-- [97] Load Order: 97 | Strategy: defer -->
-    <script src="scripts/services/linked-items-service.js?v=1.0.0" defer></script> <!-- Shared logic service for linked items -->
-    <!-- [98] Load Order: 98 | Strategy: defer -->
-    <script src="scripts/linked-items.js?v=1.0.0" defer></script> <!-- Linked items -->
-    <!-- [99] Load Order: 99 | Strategy: defer -->
-    <script src="scripts/related-object-filters.js?v=1.0.0" defer></script> <!-- Related object filters -->
+    <!-- [14] Package Bundle: entity-services.bundle.js | Strategy: defer -->
+    <script src="scripts/bundles/entity-services.bundle.js?v=1.0.0" defer></script> <!-- Entity Services Package bundle -->
 
     <!-- =============================================================== -->
     <!-- ===== PACKAGE 9/12: ENTITY DETAILS PACKAGE ===== -->
@@ -902,12 +392,8 @@
     <!-- Dependencies: base, services, ui-advanced, crud, preferences, entity-services -->
     <!-- Critical: NO | Version: 1.5.0 -->
 
-    <!-- [100] Load Order: 100 | Strategy: defer -->
-    <script src="scripts/entity-details-api.js?v=1.0.0" defer></script> <!-- Entity details API -->
-    <!-- [101] Load Order: 101 | Strategy: defer -->
-    <script src="scripts/entity-details-renderer.js?v=1.0.0" defer></script> <!-- Entity details renderer -->
-    <!-- [102] Load Order: 102 | Strategy: defer -->
-    <script src="scripts/entity-details-modal.js?v=1.0.0" defer></script> <!-- Entity details modal -->
+    <!-- [15] Package Bundle: entity-details.bundle.js | Strategy: defer -->
+    <script src="scripts/bundles/entity-details.bundle.js?v=1.0.0" defer></script> <!-- Entity Details Package bundle -->
 
     <!-- =============================================================== -->
     <!-- ===== PACKAGE 10/12: INFO SUMMARY PACKAGE ===== -->
@@ -916,10 +402,8 @@
     <!-- Dependencies: base, services -->
     <!-- Critical: NO | Version: 1.0.0 -->
 
-    <!-- [103] Load Order: 103 | Strategy: defer -->
-    <script src="scripts/info-summary-system.js?v=1.0.0" defer></script> <!-- Core data summary system -->
-    <!-- [104] Load Order: 104 | Strategy: defer -->
-    <script src="scripts/info-summary-configs.js?v=1.0.0" defer></script> <!-- Page configurations for data summary -->
+    <!-- [16] Package Bundle: info-summary.bundle.js | Strategy: defer -->
+    <script src="scripts/bundles/info-summary.bundle.js?v=1.0.0" defer></script> <!-- Info Summary Package bundle -->
 
     <!-- =============================================================== -->
     <!-- ===== PACKAGE 11/12: TRADINGVIEW CHARTS PACKAGE ===== -->
@@ -928,12 +412,8 @@
     <!-- Dependencies: base -->
     <!-- Critical: NO | Version: 1.0.0 -->
 
-    <!-- [105] Load Order: 105 | Strategy: async -->
-    <script src="scripts/charts/vendor/lightweight-charts.standalone.production.js?v=1.0.0" async></script> <!-- TradingView Lightweight Charts -->
-    <!-- [106] Load Order: 106 | Strategy: async -->
-    <script src="scripts/charts/tradingview-theme.js?v=1.0.0" async></script> <!-- TradingView theme -->
-    <!-- [107] Load Order: 107 | Strategy: async -->
-    <script src="scripts/charts/tradingview-adapter.js?v=1.0.0" async></script> <!-- TradingView system adapter -->
+    <!-- [17] Package Bundle: tradingview-charts.bundle.js | Strategy: async -->
+    <script src="scripts/bundles/tradingview-charts.bundle.js?v=1.0.0" async></script> <!-- TradingView Charts Package bundle -->
 
     <!-- =============================================================== -->
     <!-- ===== PACKAGE 12/12: INITIALIZATION PACKAGE ===== -->
@@ -942,16 +422,8 @@
     <!-- Dependencies: base -->
     <!-- Critical: NO | Version: 1.5.0 -->
 
-    <!-- [108] Load Order: 108 | Strategy: defer -->
-    <script src="scripts/init-system/package-manifest.js?v=1.0.0" defer></script> <!-- Package manifest -->
-    <!-- [109] Load Order: 109 | Strategy: defer -->
-    <script src="scripts/page-initialization-configs.js?v=1.0.0" defer></script> <!-- Page initialization configurations -->
-    <!-- [110] Load Order: 110 | Strategy: defer -->
-    <script src="scripts/init-system-check.js?v=1.0.0" defer></script> <!-- Initialization system check -->
-    <!-- [111] Load Order: 111 | Strategy: defer -->
-    <script src="scripts/monitoring-functions.js?v=1.0.0" defer></script> <!-- Page monitoring functions -->
-    <!-- [112] Load Order: 112 | Strategy: defer -->
-    <script src="scripts/modules/core-systems.js?v=1.0.0" defer></script> <!-- Unified initialization system - single entry point (required for all pages) -->
+    <!-- [18] Package Bundle: init-system.bundle.js | Strategy: defer -->
+    <script src="scripts/bundles/init-system.bundle.js?v=1.0.0" defer></script> <!-- Initialization Package bundle -->
 
     <!-- =============================================================== -->
     <!-- ===== PAGE-SPECIFIC SCRIPTS ===== -->
@@ -960,11 +432,6 @@
     <!-- =============================================================== -->
     <!-- ===== FINAL SUMMARY ===== -->
     <!-- =============================================================== -->
-    <!-- 📊 Total Scripts Processed: 112 | Unique Scripts Loaded: 112 -->
+    <!-- 📊 Total Scripts Processed: 18 | Unique Scripts Loaded: 18 -->
     <!-- 🔧 For maintenance: Use generate-script-loading-code.js -->
 
-
-    <!-- Page-specific script -->
-    <script src="scripts/strategy-analysis-page.js?v=1.0.0" defer></script>
-</body>
-</html>

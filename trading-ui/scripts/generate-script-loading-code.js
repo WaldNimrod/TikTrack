@@ -165,21 +165,20 @@ function generateScriptLoadingCode(pageName, mode = null, useBundles = null) {
 
       // Add initialization guard if specified
       if (pkg.initializationGuard) {
+        const funcName = `checkAndLoad${pkg.id.charAt(0).toUpperCase() + pkg.id.slice(1)}`;
         html += `    <script>\n`;
         html += `      // Initialization guard for ${pkg.name}\n`;
-        html += `      (function() {\n`;
-        html += `        function checkAndLoad${pkg.id.charAt(0).toUpperCase() + pkg.id.slice(1)}() {\n`;
-        html += `          if (${pkg.initializationGuard}) {\n`;
-        html += `            const script = document.createElement('script');\n`;
-        html += `            script.src = '${bundleSrc}';\n`;
-        html += `            script.${loadingStrategy} = true;\n`;
-        html += `            document.head.appendChild(script);\n`;
-        html += `          } else {\n`;
-        html += `            setTimeout(checkAndLoad${pkg.id.charAt(0).toUpperCase() + pkg.id.slice(1)}, 10);\n`;
-        html += `          }\n`;
+        html += `      function ${funcName}() {\n`;
+        html += `        if (${pkg.initializationGuard}) {\n`;
+        html += `          const script = document.createElement('script');\n`;
+        html += `          script.src = '${bundleSrc}';\n`;
+        html += `          script.${loadingStrategy} = true;\n`;
+        html += `          document.head.appendChild(script);\n`;
+        html += `        } else {\n`;
+        html += `          setTimeout(${funcName}, 10);\n`;
         html += `        }\n`;
-        html += `        checkAndLoad${pkg.id.charAt(0).toUpperCase() + pkg.id.slice(1)}();\n`;
-        html += `      })();\n`;
+        html += `      }\n`;
+        html += `      ${funcName}();\n`;
         html += `    </script>\n`;
         scriptTag = `    <!-- Bundle ${pkg.id} will be loaded dynamically after guard check -->\n`;
       } else {
@@ -255,18 +254,22 @@ function generateScriptLoadingCode(pageName, mode = null, useBundles = null) {
   
   // First, add the main page-specific script (e.g., cash_flows.js, alerts.js, trades.js)
   // This is the primary script file for each page
-  const mainPageScript = `${pageName}.js`;
-  // __dirname is trading-ui/scripts, so the script is in the same directory
-  const mainPageScriptPath = path.join(__dirname, mainPageScript);
-  if (fs.existsSync(mainPageScriptPath) && !loadedScripts.has(mainPageScript)) {
-    html += `    <!-- [${scriptCounter}] Page-specific: ${mainPageScript} | Strategy: defer -->\n`;
-    html += `    <script src="scripts/${mainPageScript}?v=1.0.0" defer></script> <!-- Main page script -->\n\n`;
-    loadedScripts.add(mainPageScript);
-    scriptCounter++;
+  // NOTE: When using bundles, page-specific scripts are included in bundles and should not be loaded separately
+  if (!shouldUseBundles) {
+    const mainPageScript = `${pageName}.js`;
+    // __dirname is trading-ui/scripts, so the script is in the same directory
+    const mainPageScriptPath = path.join(__dirname, mainPageScript);
+    if (fs.existsSync(mainPageScriptPath) && !loadedScripts.has(mainPageScript)) {
+      html += `    <!-- [${scriptCounter}] Page-specific: ${mainPageScript} | Strategy: defer -->\n`;
+      html += `    <script src="scripts/${mainPageScript}?v=1.0.0" defer></script> <!-- Main page script -->\n\n`;
+      loadedScripts.add(mainPageScript);
+      scriptCounter++;
+    }
   }
   
   // Add other page-specific scripts that are not in packages
-  const pageSpecificScripts = [
+  // NOTE: When using bundles, these scripts are included in bundles and should not be loaded separately
+  const pageSpecificScripts = shouldUseBundles ? [] : [
     `${pageName}-manager.js`,
     `${pageName}-selector.js`,
     `${pageName}-renderer.js`,
@@ -286,7 +289,8 @@ function generateScriptLoadingCode(pageName, mode = null, useBundles = null) {
   });
   
   // Special handling for ai-analysis
-  if (pageName === 'ai-analysis') {
+  // NOTE: When using bundles, these scripts are included in bundles and should not be loaded separately
+  if (pageName === 'ai-analysis' && !shouldUseBundles) {
     const aiScripts = [
       'ai-analysis-manager.js',
       'ai-template-selector.js',
@@ -312,7 +316,8 @@ function generateScriptLoadingCode(pageName, mode = null, useBundles = null) {
   html += '    <!-- =============================================================== -->\n';
   html += `    <!-- 📊 Total Scripts Processed: ${scriptCounter - 1} | Unique Scripts Loaded: ${scriptCounter - 1} -->\n`;
   html += `    <!-- 🔧 For maintenance: Use generate-script-loading-code.js -->\n`;
-  
+  html += '\n\n</body>\n</html>\n';
+
   return html;
 }
 

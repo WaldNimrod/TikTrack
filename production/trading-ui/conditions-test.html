@@ -268,263 +268,14 @@
                             </div>
                             <div class="test-item-controls">
                                 <button class="btn btn-sm btn-primary run-test-btn" data-test="evaluate-single">
-                                    <img src="/trading-ui/images/icons/tabler/player-play.svg" width="16" height="16" alt="player-play" class="icon">
-                                    Run Test
-                                </button>
-                                <span class="test-duration" id="duration-8"></span>
-                            </div>
-                        </div>
-
-                        <!-- Test 9: Evaluate All Conditions -->
-                        <div class="test-item" data-test="evaluate-all">
-                            <div class="test-item-header">
-                                <span class="test-number">9</span>
-                                <span class="test-name">הערכת כל התנאים</span>
-                                <span class="test-status" id="status-9">⚪</span>
-                            </div>
-                            <div class="test-item-controls">
-                                <button class="btn btn-sm btn-primary run-test-btn" data-test="evaluate-all">
-                                    <img src="/trading-ui/images/icons/tabler/player-play.svg" width="16" height="16" alt="player-play" class="icon">
-                                    Run Test
-                                </button>
-                                <span class="test-duration" id="duration-9"></span>
-                            </div>
-                        </div>
-
-                        <!-- Test 10: Alert Auto-Generation -->
-                        <div class="test-item" data-test="alert-auto-generation">
-                            <div class="test-item-header">
-                                <span class="test-number">10</span>
-                                <span class="test-name">יצירת התראות אוטומטית</span>
-                                <span class="test-status" id="status-10">⚪</span>
-                            </div>
-                            <div class="test-item-controls">
-                                <button class="btn btn-sm btn-primary run-test-btn" data-test="alert-auto-generation">
-                                    <img src="/trading-ui/images/icons/tabler/player-play.svg" width="16" height="16" alt="player-play" class="icon">
-                                    Run Test
-                                </button>
-                                <span class="test-duration" id="duration-10"></span>
-                            </div>
-                        </div>
-                    </div>
-
-                    </div>
-                </div>
-
-                <!-- Content Section 2 - Quick Stats & Links -->
-                <div class="content-section" id="quick-stats" data-section="quick-stats">
-                    <div class="section-header">
-                        <div class="table-title">
-                            <img src="images/icons/entities/development.svg" alt="סטטיסטיקות מהירות" class="section-icon">
-                            סטטיסטיקות מהירות וקישורים
-                        </div>
-                        <div class="table-actions">
-                            <button class="btn btn-sm btn-info" id="refreshStatsBtn">
-                                <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">
-                                רענן
-                            </button>
-                        </div>
-                    </div>
-                    <div class="section-body">
-                        <div class="quick-stats-container">
-                            <!-- Quick Stats -->
-                            <div class="stats-grid">
-                                <div class="stat-item">
-                                    <div class="stat-label">טריידים פעילים</div>
-                                    <div class="stat-value" id="activeTradesCount">טוען...</div>
-                                </div>
-                                <div class="stat-item">
-                                    <div class="stat-label">תנאים פעילים</div>
-                                    <div class="stat-value" id="activeConditionsCount">טוען...</div>
-                                </div>
-                                <div class="stat-item">
-                                    <div class="stat-label">שיטות מסחר</div>
-                                    <div class="stat-value" id="tradingMethodsCount">טוען...</div>
-                                </div>
-                                <div class="stat-item">
-                                    <div class="stat-label">תכניות מסחר</div>
-                                    <div class="stat-value" id="tradePlansCount">טוען...</div>
-                                </div>
-                            </div>
-                            
-                            <!-- Quick Links -->
-                            <div class="quick-links">
-                                <h5>קישורים מהירים:</h5>
-                                <div class="links-grid">
-                                    <a href="trade_plans.html" class="quick-link">
-                                        <img src="/trading-ui/images/icons/tabler/chart-line.svg" width="16" height="16" alt="chart-line" class="icon">
-                                        תכניות מסחר
-                                    </a>
-                                    <a href="trades.html" class="quick-link">
-                                        <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">
-                                        טריידים
-                                    </a>
-                                    <a href="alerts.html" class="quick-link">
-                                        <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">
-                                        התראות
-                                    </a>
-                                    <a href="index.html" class="quick-link">
-                                        <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">
-                                        דף הבית
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Content Section 3 - Log Display -->
-                <div class="content-section" id="log-display" data-section="log-display">
-                    <div class="section-header">
-                        <div class="table-title">
-                            <img src="images/icons/entities/development.svg" alt="Log Output" class="section-icon">
-                            Log Output
-                        </div>
-                        <div class="table-actions">
-                            <button class="btn btn-sm btn-secondary" id="copyFormattedBtn">
-                                <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">
-                                Copy Formatted
-                            </button>
-                            <button class="btn btn-sm btn-secondary" id="copyRawBtn">
-                                <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">
-                                Copy Raw
-                            </button>
-                        </div>
-                    </div>
-                    <div class="section-body">
-                        <div class="log-content" id="logContent">
-                            <div class="log-entry info">
-                                <span class="log-timestamp">[2025-10-19 15:30:45]</span>
-                                <span class="log-level">INFO:</span>
-                                <span class="log-message">מערכת בדיקת תנאים מוכנה לשימוש</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Content Section 3 - Conditions UI Demo -->
-                <div class="content-section" id="conditions-ui-demo" data-section="conditions-ui-demo">
-                    <div class="section-header">
-                        <div class="table-title">
-                            <img src="images/icons/entities/development.svg" alt="ממשק תנאים לדוגמה" class="section-icon">
-                            ממשק תנאים לדוגמה - Conditions UI Demo
-                        </div>
-                        <div class="table-actions">
-                            <button class="btn btn-sm btn-success" id="addConditionBtn">
-                                <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">
-                                תנאי חדש
-                            </button>
-                            <button class="btn btn-sm btn-primary" id="refreshConditionsBtn">
-                                <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">
-                                רענון
-                            </button>
-                        </div>
-                    </div>
-                    <div class="section-body">
-                        <div class="conditions-ui-container">
-                            <!-- Conditions List -->
-                            <div class="conditions-list" id="conditionsList">
-                                <div class="conditions-list-header">
-                                    <h4>רשימת תנאים</h4>
-                                    <div class="evaluation-controls">
-                                        <button class="btn btn-sm btn-info" id="evaluateAllBtn">
-                                            <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">
-                                            הערך הכל
-                                        </button>
-                                        <button class="btn btn-sm btn-warning" id="refreshEvaluationsBtn">
-                                            <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">
-                                            רענן הערכות
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="conditions-list-body" id="conditionsListBody">
-                                    <div class="text-center p-3 text-muted">
-                                        <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">
-                                        טוען תנאים...
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Condition Form -->
-                            <div class="condition-form" id="conditionForm" >
-                                <div class="condition-form-header">
-                                    <h4 id="formTitle">תנאי חדש</h4>
-                                    <button class="btn btn-sm btn-secondary" id="closeFormBtn">
-                                        <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">
-                                    </button>
-                                </div>
-                                <div class="condition-form-body">
-                                    <div class="mb-3">
-                                        <label for="methodSelect" class="form-label">שיטת מסחר</label>
-                                        <select class="form-select" id="methodSelect">
-                                            <option value="">בחר שיטה...</option>
-                                        </select>
-                                    </div>
-                                    <div id="parametersContainer"></div>
-                                    <div class="mb-3">
-                                        <label for="logicalOperator" class="form-label">אופרטור לוגי</label>
-                                        <select class="form-select" id="logicalOperator">
-                                            <option value="NONE">ללא</option>
-                                            <option value="AND">AND</option>
-                                            <option value="OR">OR</option>
-                                        </select>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="conditionGroup" class="form-label">קבוצה</label>
-                                        <input type="number" class="form-control" id="conditionGroup" value="0" min="0">
-                                    </div>
-                                    <div class="form-check mb-3">
-                                        <input class="form-check-input" type="checkbox" id="isActive" checked>
-                                        <label class="form-check-label" for="isActive">
-                                            פעיל
-                                        </label>
-                                    </div>
-                                    <div class="d-flex gap-2">
-                                        <button class="btn btn-primary" id="saveConditionBtn">
-                                            <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">
-                                            שמירה
-                                        </button>
-                                        <button class="btn btn-secondary" id="cancelFormBtn">
-                                            <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">
-                                            ביטול
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Notification Container -->
-    <div id="notificationContainer" class="notification-container"></div>
-
-    <!-- Bootstrap JS -->
-    
-    <!-- TikTrack Base Package Scripts -->
-    <!-- Page Configs and Initializer -->
-        <!-- =============================================================== -->
-        <!-- =============================================================== -->
-        <!-- =============================================================== -->
-        <!-- =============================================================== -->
-        <!-- =============================================================== -->
-        <!-- =============================================================== -->
-        <!-- =============================================================== -->
-        <!-- =============================================================== -->
-        <!-- =============================================================== -->
-        <!-- =============================================================== -->
-        <!-- =============================================================== -->
-        <!-- =============================================================== -->
-        <!-- =============================================================== -->
-        <!-- =============================================================== -->
+    <!-- =============================================================== -->
     <!-- ===== START SCRIPT LOADING ORDER ===== -->
     <!-- =============================================================== -->
     <!-- ⚠️ DO NOT MODIFY MANUALLY - Generated by generate-script-loading-code.js -->
     <!-- 📋 Loading Order: BASE → SERVICES → MODULES → UI-ADVANCED → CRUD → PREFERENCES → INIT-SYSTEM -->
-    <!-- 🎯 Page: conditions-test | Generated: 2025-12-05T20:51:04.271Z -->
+    <!-- 🎯 Page: conditions-test | Generated: 2025-12-17T21:50:17.897Z -->
     <!-- 📦 Packages: base, init-system -->
+    <!-- 🔧 Mode: production | Use Bundles: true -->
 
     <!-- =============================================================== -->
     <!-- ===== PACKAGE 1/2: BASE PACKAGE ===== -->
@@ -533,56 +284,14 @@
     <!-- Dependencies:  -->
     <!-- Critical: YES | Version: 1.5.0 -->
 
-    <!-- [1] Load Order: 1 | Strategy: defer -->
-    <script src="scripts/api-config.js?v=1.0.0" defer></script> <!-- Central API configuration -->
-    <!-- [2] Load Order: 2 | Strategy: defer -->
-    <script src="scripts/global-favicon.js?v=1.0.0" defer></script> <!-- Favicon management -->
-    <!-- [3] Load Order: 3 | Strategy: defer -->
-    <script src="scripts/notification-system.js?v=1.0.0" defer></script> <!-- Notification system -->
-    <!-- [4] Load Order: 4 | Strategy: defer -->
-    <script src="scripts/cache-sync-manager.js?v=1.0.0" defer></script> <!-- Cache synchronization manager -->
-    <!-- [5] Load Order: 5 | Strategy: defer -->
-    <script src="scripts/ui-utils.js?v=1.0.0" defer></script> <!-- UI utilities -->
-    <!-- [6] Load Order: 6 | Strategy: defer -->
-    <script src="scripts/warning-system.js?v=1.0.0" defer></script> <!-- Warning system -->
-    <!-- [7] Load Order: 7 | Strategy: defer -->
-    <script src="scripts/error-handlers.js?v=1.0.0" defer></script> <!-- Error handling system -->
-    <!-- [8] Load Order: 8 | Strategy: defer -->
-    <script src="scripts/unified-cache-manager.js?v=1.0.0" defer></script> <!-- Unified cache manager -->
-    <!-- [9] Load Order: 9 | Strategy: defer -->
-    <script src="scripts/icon-mappings.js?v=1.0.0" defer></script> <!-- Central icon mappings -->
-    <!-- [10] Load Order: 10 | Strategy: defer -->
-    <script src="scripts/icon-system.js?v=1.0.0" defer></script> <!-- Central icon system -->
-    <!-- [11] Load Order: 11 | Strategy: defer -->
-    <script src="scripts/icon-replacement-helper.js?v=1.0.0" defer></script> <!-- Icon replacement helper for standardizing icon usage -->
-    <!-- [12] Load Order: 12 | Strategy: defer -->
-    <script src="scripts/cache-clear-menu.js?v=1.0.0" defer></script> <!-- Cache clearing control (Stage B-Lite) -->
-    <!-- [13] Load Order: 13 | Strategy: defer -->
-    <script src="scripts/cache-ttl-guard.js?v=1.0.0" defer></script> <!-- TTL guard for entity loaders -->
-    <!-- [14] Load Order: 14 | Strategy: defer -->
-    <script src="scripts/auth.js?v=1.0.0" defer></script> <!-- Authentication system -->
-    <!-- [15] Load Order: 15 | Strategy: defer -->
-    <script src="scripts/auth-guard.js?v=1.0.0" defer></script> <!-- Page protection - authentication guard -->
-    <!-- [16] Load Order: 16 | Strategy: defer -->
-    <script src="scripts/logger-service.js?v=1.0.0" defer></script> <!-- Advanced logging service -->
-    <!-- [17] Load Order: 17 | Strategy: defer -->
-    <script src="scripts/header-system.js?v=1.0.0" defer></script> <!-- Header system -->
-    <!-- [18] Load Order: 18 | Strategy: defer -->
-    <script src="scripts/page-state-manager.js?v=1.0.0" defer></script> <!-- Unified page state manager -->
-    <!-- [19] Load Order: 19 | Strategy: defer -->
-    <script src="scripts/page-utils.js?v=1.0.0" defer></script> <!-- Page utilities -->
-    <!-- [20] Load Order: 20 | Strategy: defer -->
-    <script src="scripts/translation-utils.js?v=1.0.0" defer></script> <!-- Translations -->
-    <!-- [21] Load Order: 21 | Strategy: defer -->
-    <script src="scripts/button-icons.js?v=1.0.0" defer></script> <!-- Icon and button system -->
-    <!-- [22] Load Order: 22 | Strategy: defer -->
+    <!-- [1] Package Bundle: base.bundle.js | Strategy: defer -->
+    <script src="scripts/bundles/base.bundle.js?v=1.0.0" defer></script> <!-- Base Package bundle -->
+    <!-- [2] External Script: https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js | Strategy: defer -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script> <!-- Bootstrap JS Bundle (Tooltips & Modals) -->
-    <!-- [23] Load Order: 23 | Strategy: defer -->
-    <script src="scripts/event-handler-manager.js?v=1.0.0" defer></script> <!-- Central event management system -->
-    <!-- [24] Load Order: 24 | Strategy: defer -->
-    <script src="scripts/button-system-init.js?v=1.0.0" defer></script> <!-- Button system -->
-    <!-- [25] Load Order: 25 | Strategy: defer -->
-    <script src="scripts/color-scheme-system.js?v=1.0.0" defer></script> <!-- Dynamic color system -->
+    <!-- [3] External Script: https://cdn.jsdelivr.net/npm/@floating-ui/dom@1.6.0/dist/floating-ui.dom.min.js | Strategy: defer -->
+    <script src="https://cdn.jsdelivr.net/npm/@floating-ui/dom@1.6.0/dist/floating-ui.dom.min.js" defer></script> <!-- Floating UI DOM - Smart positioning library (for overlay/tooltip positioning) -->
+    <!-- [4] External Script: https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js | Strategy: defer -->
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js" defer></script> <!-- GSAP - GreenSock Animation Platform (for smooth animations) -->
 
     <!-- =============================================================== -->
     <!-- ===== PACKAGE 2/2: INITIALIZATION PACKAGE ===== -->
@@ -591,16 +300,8 @@
     <!-- Dependencies: base -->
     <!-- Critical: NO | Version: 1.5.0 -->
 
-    <!-- [26] Load Order: 26 | Strategy: defer -->
-    <script src="scripts/init-system/package-manifest.js?v=1.0.0" defer></script> <!-- Package manifest -->
-    <!-- [27] Load Order: 27 | Strategy: defer -->
-    <script src="scripts/page-initialization-configs.js?v=1.0.0" defer></script> <!-- Page initialization configurations -->
-    <!-- [28] Load Order: 28 | Strategy: defer -->
-    <script src="scripts/init-system-check.js?v=1.0.0" defer></script> <!-- Initialization system check -->
-    <!-- [29] Load Order: 29 | Strategy: defer -->
-    <script src="scripts/monitoring-functions.js?v=1.0.0" defer></script> <!-- Page monitoring functions -->
-    <!-- [30] Load Order: 30 | Strategy: defer -->
-    <script src="scripts/modules/core-systems.js?v=1.0.0" defer></script> <!-- Unified initialization system - single entry point (required for all pages) -->
+    <!-- [5] Package Bundle: init-system.bundle.js | Strategy: defer -->
+    <script src="scripts/bundles/init-system.bundle.js?v=1.0.0" defer></script> <!-- Initialization Package bundle -->
 
     <!-- =============================================================== -->
     <!-- ===== PAGE-SPECIFIC SCRIPTS ===== -->
@@ -609,7 +310,6 @@
     <!-- =============================================================== -->
     <!-- ===== FINAL SUMMARY ===== -->
     <!-- =============================================================== -->
-    <!-- 📊 Total Scripts Processed: 30 | Unique Scripts Loaded: 30 -->
+    <!-- 📊 Total Scripts Processed: 5 | Unique Scripts Loaded: 5 -->
     <!-- 🔧 For maintenance: Use generate-script-loading-code.js -->
-</body>
-</html>
+

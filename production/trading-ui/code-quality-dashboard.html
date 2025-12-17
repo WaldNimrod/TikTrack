@@ -268,526 +268,14 @@
           <div class="content-section" id="naming-section" data-section="naming-section">
             <div class="section-header">
               <h2>🔤 Naming Conventions</h2>
-              <div class="section-header-actions">
-                <button
-                  data-button-type="PLAY"
-                  data-onclick="runNamingCheck()"
-                  data-text="בדוק"
-                  title="הרץ בדיקת Naming Conventions"
-                >
-                </button>
-                <button
-                  data-button-type="TOGGLE"
-                  data-variant="small"
-                  data-onclick="toggleSection('naming-section')"
-                  data-text="הצג/הסתר"
-                  title="הצג/הסתר סקשן"
-                >
-                </button>
-              </div>
-            </div>
-            <div class="section-body">
-              <div class="row">
-                <div class="col-md-8">
-                  <div class="card">
-                    <div class="card-header">
-                      <h5 class="card-title mb-0">
-                        <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">
-                        קונבנציות שמות
-                      </h5>
-                    </div>
-                    <div class="card-body">
-                      <div id="naming-results">
-                        <div class="text-center text-muted"> לחץ על "בדוק" כדי להריץ בדיקת Naming Conventions </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-md-4">
-                  <div class="card">
-                    <div class="card-header">
-                      <h6 class="card-title mb-0">
-                        <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">
-                        מידע על Naming Conventions
-                      </h6>
-                    </div>
-                    <div class="card-body">
-                      <p class="card-text small">
-                        בדיקה זו מאמתת עמידה בקונבנציות שמות: camelCase לפונקציות ומשתנים, PascalCase לקלאסים.
-                      </p>
-                      <div class="mt-3">
-                        <h6 class="text-muted mb-2">סטטיסטיקות</h6>
-                        <div id="naming-stats">
-                          <div class="stat-item">
-                            <span class="stat-label">עמידה בקונבנציות:</span>
-                            <span class="stat-value" id="naming-compliant">0</span>
-                          </div>
-                          <div class="stat-item">
-                            <span class="stat-label">הפרות:</span>
-                            <span class="stat-value" id="naming-violations">0</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Duplicate Detection Section -->
-          <div class="content-section" id="duplicates-section" data-section="duplicates-section">
-            <div class="section-header">
-              <h2>🔍 זיהוי כפילויות</h2>
-              <div class="section-header-actions">
-                <button
-                  data-button-type="PLAY"
-                  data-onclick="runDuplicateCheck()"
-                  data-text="הרץ בדיקת כפילויות"
-                  title="הרץ זיהוי כפילויות"
-                >
-                </button>
-                <button
-                  data-button-type="REFRESH"
-                  data-onclick="resetDuplicateFilters()"
-                  data-text="אפס מסננים"
-                  title="אפס מסננים"
-                >
-                </button>
-                <button
-                  data-button-type="TOGGLE"
-                  data-variant="small"
-                  data-onclick="toggleSection('duplicates-section')"
-                  data-text="הצג/הסתר"
-                  title="הצג/הסתר סקשן"
-                >
-                </button>
-              </div>
-            </div>
-            <div class="section-body" id="duplicate-section-body">
-              <div class="info-summary" id="duplicate-summary">
-                <div>סה"כ כפילויות: <strong id="duplicate-total-count">0</strong></div>
-                <div>מדויקות: <strong id="duplicate-exact-count">0</strong></div>
-                <div>קרובות: <strong id="duplicate-near-count">0</strong></div>
-                <div>דפוסים דומים: <strong id="duplicate-similar-count">0</strong></div>
-                <div>פוטנציאליות: <strong id="duplicate-potential-count">0</strong></div>
-                <div>קטגוריות ייחודיות: <strong id="duplicate-category-count">0</strong></div>
-              </div>
-
-              <div class="card mt-3">
-                <div class="card-header">
-                  <h5 class="card-title mb-0">מסננים</h5>
-                </div>
-                <div class="card-body">
-                  <div class="row g-3">
-                    <div class="col-md-4">
-                      <label class="form-label" for="duplicate-type-filter">סוג כפילות</label>
-                      <select class="form-select" id="duplicate-type-filter">
-                        <option value="all">הכל</option>
-                        <option value="exact">מדויקות</option>
-                        <option value="near">קרובות</option>
-                        <option value="similar">דפוסים דומים</option>
-                        <option value="potential">פוטנציאליות</option>
-                      </select>
-                    </div>
-                    <div class="col-md-4">
-                      <label class="form-label" for="duplicate-category-filter">קטגוריה</label>
-                      <select class="form-select" id="duplicate-category-filter">
-                        <option value="all">הכל</option>
-                      </select>
-                    </div>
-                    <div class="col-md-4">
-                      <label class="form-label" for="duplicate-similarity-range">רמת דמיון מינימלית</label>
-                      <input
-                        type="range"
-                        class="form-range"
-                        id="duplicate-similarity-range"
-                        min="0"
-                        max="100"
-                        step="5"
-                        value="70"
-                      />
-                      <div class="text-center text-muted small"
-                        >דמיון נוכחי: <span id="duplicate-similarity-value">70%</span></div
-                      >
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="card mt-3">
-                <div class="card-header">
-                  <h5 class="card-title mb-0">כפילויות שנמצאו</h5>
-                </div>
-                <div class="card-body">
-                  <div class="table-responsive" id="duplicate-results">
-                    <table class="table table-sm align-middle">
-                      <thead>
-                        <tr>
-                          <th>סוג</th>
-                          <th>דמיון</th>
-                          <th>ביטחון</th>
-                          <th>פונקציה 1</th>
-                          <th>פונקציה 2</th>
-                          <th>קטגוריה</th>
-                        </tr>
-                      </thead>
-                      <tbody id="duplicate-table-body">
-                        <tr>
-                          <td colspan="6" class="text-center text-muted">אין נתונים זמינים</td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                  <div class="mt-3" id="duplicate-details-panel">
-                    <div class="text-center text-muted">בחר רשומה כדי לראות פרטים מלאים</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Function Index Section -->
-          <div class="content-section" id="function-index-section" data-section="function-index-section">
-            <div class="section-header">
-              <h2>📇 Function Index</h2>
-              <div class="section-header-actions">
-                <button
-                  data-button-type="PLAY"
-                  data-onclick="runFunctionIndexCheck()"
-                  data-text="בדוק"
-                  title="הרץ בדיקת Function Index"
-                >
-                </button>
-                <button
-                  data-button-type="PLAY"
-                  data-onclick="generateFunctionIndex()"
-                  data-text="ייצר אינדקס"
-                  title="ייצר Function Index לכל הקבצים"
-                >
-                </button>
-                <button
-                  data-button-type="TOGGLE"
-                  data-variant="small"
-                  data-onclick="toggleSection('function-index-section')"
-                  data-text="הצג/הסתר"
-                  title="הצג/הסתר סקשן"
-                >
-                </button>
-              </div>
-            </div>
-            <div class="section-body">
-              <div class="row">
-                <div class="col-md-8">
-                  <div class="card">
-                    <div class="card-header">
-                      <h5 class="card-title mb-0">
-                        <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">
-                        סטטוס Function Index
-                      </h5>
-                    </div>
-                    <div class="card-body">
-                      <div id="function-index-results">
-                        <div class="text-center text-muted"> לחץ על "בדוק" כדי לבדוק את סטטוס Function Index </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-md-4">
-                  <div class="card">
-                    <div class="card-header">
-                      <h6 class="card-title mb-0">
-                        <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon">
-                        מידע על Function Index
-                      </h6>
-                    </div>
-                    <div class="card-body">
-                      <p class="card-text small">
-                        בדיקה זו מאמתת שכל הקבצים מכילים Function Index מעודכן. ניתן לייצר אינדקס אוטומטית לכל הקבצים.
-                      </p>
-                      <div class="alert alert-warning p-2 small" role="alert">
-                        <strong>הערת Timespan:</strong> נכון להיום אנו שומרים היסטוריית Function Index ל־30 הימים
-                        האחרונים בלבד. בעתיד שנרצה להרחיב את ה-timespan יש לוודא שגם צד השרת ו־API הדוחות מתעדכנים בהתאם
-                        כדי שלא נאבד ריצות ישנות.
-                      </div>
-                      <div class="mt-3">
-                        <h6 class="text-muted mb-2">סטטיסטיקות</h6>
-                        <div id="function-index-stats">
-                          <div class="stat-item">
-                            <span class="stat-label">קבצים עם אינדקס:</span>
-                            <span class="stat-value" id="files-with-index">0</span>
-                          </div>
-                          <div class="stat-item">
-                            <span class="stat-label">קבצים ללא אינדקס:</span>
-                            <span class="stat-value" id="files-without-index">0</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Lint Monitor Section Start -->
-          <div
-            class="top-section"
-            id="lint-summary-section"
-            data-section="lint-summary"
-            data-table-type="code-quality-dashboard"
-          >
-            <div class="section-header">
-              <div class="table-title">
-                <img src="images/icons/entities/development.svg" alt="Lint Monitor" class="table-icon" />
-                ניטור איכות קוד
-              </div>
-              <div class="header-actions d-flex align-items-center gap-2">
-                <button id="lint-copy-log-button" class="btn btn-sm btn-outline-secondary" type="button">
-                  <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> העתק לוג מפורט
-                </button>
-                <button id="lint-copy-report-button" class="btn btn-sm btn-outline-secondary" type="button">
-                  <img src="/trading-ui/images/icons/tabler/copy.svg" width="16" height="16" alt="copy" class="icon"> העתק דוח JSON
-                </button>
-                <button id="lint-download-header-button" class="btn btn-sm btn-outline-secondary" type="button">
-                  <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> הורד דוח
-                </button>
-                <button id="lint-refresh-button" class="btn btn-sm btn-primary" type="button">
-                  <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> רענן נתונים
-                </button>
-                <button
-                  data-button-type="TOGGLE"
-                  data-variant="small"
-                  data-onclick="toggleSection('lint-summary-section')"
-                  data-text="הצג/הסתר"
-                  title="הצג/הסתר ניטור איכות קוד"
-                ></button>
-              </div>
-            </div>
-            <div class="section-body">
-              <div id="lint-loading-indicator" class="lint-loading hidden">
-                <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> טוען נתונים מהשרת...
-              </div>
-
-              <div id="lint-empty-state" class="lint-empty-state hidden">
-                <p>לא נמצא דוח לינטר. להרצת בדיקה יש להריץ את הפקודה:</p>
-                <code>npm run lint:collect</code>
-                <p class="mt-2">לאחר מכן רענן את הדף כדי לטעון את הדוח האחרון.</p>
-              </div>
-
-              <div id="lint-summary-cards" class="lint-summary-grid overview-grid"></div>
-
-              <div class="lint-meta">
-                <span>עודכן לאחרונה: <span id="lint-last-updated">טרם בוצעה ריצה</span></span>
-              </div>
-            </div>
-          </div>
-
-          <div
-            class="content-section"
-            id="lint-tools-section"
-            data-section="lint-tools"
-            data-table-type="code-quality-dashboard"
-          >
-            <div class="section-header">
-              <div class="table-title"> סטטוס כלי איכות קוד </div>
-              <div class="section-header-actions">
-                <span class="lint-section-hint">ESLint, Stylelint, HTMLHint, Prettier</span>
-                <button
-                  data-button-type="TOGGLE"
-                  data-variant="small"
-                  data-onclick="toggleSection('lint-tools-section')"
-                  data-text="הצג/הסתר"
-                  title="הצג/הסתר סטטוס כלי איכות קוד"
-                ></button>
-              </div>
-            </div>
-            <div class="section-body">
-              <div class="table-responsive">
-                <table class="table table-sm table-striped align-middle">
-                  <thead>
-                    <tr>
-                      <th>כלי</th>
-                      <th>סטטוס</th>
-                      <th>שגיאות</th>
-                      <th>אזהרות</th>
-                      <th>משך</th>
-                    </tr>
-                  </thead>
-                  <tbody id="lint-tool-status-body">
-                    <tr>
-                      <td colspan="5" class="lint-table-empty">טוען נתונים...</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-
-          <div
-            class="content-section"
-            id="lint-issues-section"
-            data-section="lint-issues"
-            data-table-type="lint_monitor_issues"
-          >
-            <div class="section-header">
-              <div class="table-title"> סוגיות פעילות </div>
-              <div class="section-header-actions">
-                <span class="lint-section-hint">ממויין לפי חומרה ותאריך</span>
-                <button
-                  data-button-type="TOGGLE"
-                  data-variant="small"
-                  data-onclick="toggleSection('lint-issues-section')"
-                  data-text="הצג/הסתר"
-                  title="הצג/הסתר סוגיות פעילות"
-                ></button>
-              </div>
-            </div>
-            <div class="section-body">
-              <div class="table-responsive">
-                <table
-                  id="lint-issues-table"
-                  class="table table-bordered table-hover"
-                  data-table-type="lint_monitor_issues"
-                >
-                  <thead>
-                    <tr>
-                      <th>כלי</th>
-                      <th>חומרה</th>
-                      <th>קובץ</th>
-                      <th>כלל</th>
-                      <th>תיאור</th>
-                      <th>מיקום</th>
-                    </tr>
-                  </thead>
-                  <tbody id="lint-issues-table-body">
-                    <tr>
-                      <td colspan="6" class="lint-table-empty">אין סוגיות להצגה</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-
-          <div
-            class="content-section"
-            id="lint-actions-section"
-            data-section="lint-actions"
-            data-table-type="code-quality-dashboard"
-          >
-            <div class="section-header">
-              <div class="table-title"> בדיקות ידניות ותהליכי תחזוקה </div>
-              <div class="section-header-actions">
-                <button
-                  data-button-type="TOGGLE"
-                  data-variant="small"
-                  data-onclick="toggleSection('lint-actions-section')"
-                  data-text="הצג/הסתר"
-                  title="הצג/הסתר בדיקות ידניות ותהליכי תחזוקה"
-                ></button>
-              </div>
-            </div>
-            <div class="section-body">
-              <div class="lint-actions-grid">
-                <div class="lint-action-card">
-                  <h3>1. הפקת דוח</h3>
-                  <p>הרץ פקודה מרכזית לאיסוף תוצאות:</p>
-                  <code>npm run lint:collect</code>
-                  <p class="lint-action-note">
-                    הפקודה מריצה ESLint, Stylelint, HTMLHint ו-Prettier ומעדכנת את הדוח המאוחד.
-                  </p>
-                  <div class="lint-action-footer">
-                    <button id="lint-run-collect-button" class="btn btn-sm btn-primary" type="button">
-                      <img src="/trading-ui/images/icons/tabler/player-play.svg" width="16" height="16" alt="player-play" class="icon"> הרץ דוח מלא
-                    </button>
-                    <span id="lint-run-status" class="lint-action-status text-muted">מוכן להרצה</span>
-                  </div>
-                </div>
-                <div class="lint-action-card">
-                  <h3>2. אימות פורמט</h3>
-                  <p>לאחר התיקונים הרץ:</p>
-                  <code>npm run check:all</code>
-                  <p class="lint-action-note">מוודא שאין סטיות פורמט או שגיאות נוספות לפני merge.</p>
-                  <div class="lint-action-footer">
-                    <button id="lint-download-report-button" class="btn btn-sm btn-outline-secondary" type="button">
-                      <img src="/trading-ui/images/icons/tabler/info-circle.svg" width="16" height="16" alt="icon" class="icon"> הורד דוח JSON
-                    </button>
-                  </div>
-                </div>
-                <div class="lint-action-card">
-                  <h3>3. בדיקות משלימות</h3>
-                  <ul class="lint-action-list">
-                    <li>בדוק את כמות הסוגיות החוזרות בהיסטוריה.</li>
-                    <li>וודא שכל הקבצים שתוקנו מריצים מחדש את הלינטר בהצלחה.</li>
-                    <li>עדכן את דוח הידני לאחר מיזוג.</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div
-            class="content-section"
-            id="lint-history-section"
-            data-section="lint-history"
-            data-table-type="code-quality-dashboard"
-          >
-            <div class="section-header">
-              <div class="table-title"> היסטוריית ריצות </div>
-              <div class="section-header-actions">
-                <button
-                  data-button-type="TOGGLE"
-                  data-variant="small"
-                  data-onclick="toggleSection('lint-history-section')"
-                  data-text="הצג/הסתר"
-                  title="הצג/הסתר היסטוריית ריצות"
-                ></button>
-              </div>
-            </div>
-            <div class="section-body">
-              <ul id="lint-history-list" class="lint-history-list">
-                <li class="lint-history-empty">אין היסטוריה זמינה</li>
-              </ul>
-            </div>
-          </div>
-          <!-- Lint Monitor Section End -->
-        </div>
-      </div>
-    </div>
-
-    <!-- =============================================================== -->
-        <!-- =============================================================== -->
-        <!-- =============================================================== -->
-        <!-- =============================================================== -->
-        <!-- =============================================================== -->
-        <!-- =============================================================== -->
-        <!-- =============================================================== -->
-        <!-- =============================================================== -->
-        <!-- =============================================================== -->
-        <!-- =============================================================== -->
-        <!-- =============================================================== -->
-        <!-- =============================================================== -->
-        <!-- =============================================================== -->
-        <!-- =============================================================== -->
-        <!-- =============================================================== -->
-    <!-- ===== START SCRIPT LOADING ORDER ===== -->
-    <!-- =============================================================== -->
-    <!-- ⚠️ DO NOT MODIFY MANUALLY - Generated by generate-script-loading-code.js -->
-    <!-- 📋 Loading Order: BASE → SERVICES → MODULES → UI-ADVANCED → CRUD → PREFERENCES → INIT-SYSTEM -->
     <!-- =============================================================== -->
     <!-- ===== START SCRIPT LOADING ORDER ===== -->
     <!-- =============================================================== -->
     <!-- ⚠️ DO NOT MODIFY MANUALLY - Generated by generate-script-loading-code.js -->
     <!-- 📋 Loading Order: BASE → SERVICES → MODULES → UI-ADVANCED → CRUD → PREFERENCES → INIT-SYSTEM -->
-    <!-- =============================================================== -->
-    <!-- ===== START SCRIPT LOADING ORDER ===== -->
-    <!-- =============================================================== -->
-    <!-- ⚠️ DO NOT MODIFY MANUALLY - Generated by generate-script-loading-code.js -->
-    <!-- 📋 Loading Order: BASE → SERVICES → MODULES → UI-ADVANCED → CRUD → PREFERENCES → INIT-SYSTEM -->
-    <!-- 🎯 Page: code-quality-dashboard | Generated: 2025-12-07T01:43:45.596Z -->
+    <!-- 🎯 Page: code-quality-dashboard | Generated: 2025-12-17T21:50:17.835Z -->
     <!-- 📦 Packages: base, services, ui-advanced, crud, preferences, init-system -->
-    <!-- 🔧 Mode: development | Use Bundles: false -->
+    <!-- 🔧 Mode: production | Use Bundles: true -->
 
     <!-- =============================================================== -->
     <!-- ===== PACKAGE 1/6: BASE PACKAGE ===== -->
@@ -796,56 +284,14 @@
     <!-- Dependencies:  -->
     <!-- Critical: YES | Version: 1.5.0 -->
 
-    <!-- [1] Load Order: 1 | Strategy: defer -->
-    <script src="scripts/api-config.js?v=1.0.0" defer></script> <!-- Central API configuration -->
-    <!-- [2] Load Order: 2 | Strategy: defer -->
-    <script src="scripts/global-favicon.js?v=1.0.0" defer></script> <!-- Favicon management -->
-    <!-- [3] Load Order: 3 | Strategy: defer -->
-    <script src="scripts/notification-system.js?v=1.0.0" defer></script> <!-- Notification system -->
-    <!-- [4] Load Order: 4 | Strategy: defer -->
-    <script src="scripts/cache-sync-manager.js?v=1.0.0" defer></script> <!-- Cache synchronization manager -->
-    <!-- [5] Load Order: 5 | Strategy: defer -->
-    <script src="scripts/ui-utils.js?v=1.0.0" defer></script> <!-- UI utilities -->
-    <!-- [6] Load Order: 6 | Strategy: defer -->
-    <script src="scripts/warning-system.js?v=1.0.0" defer></script> <!-- Warning system -->
-    <!-- [7] Load Order: 7 | Strategy: defer -->
-    <script src="scripts/error-handlers.js?v=1.0.0" defer></script> <!-- Error handling system -->
-    <!-- [8] Load Order: 8 | Strategy: defer -->
-    <script src="scripts/unified-cache-manager.js?v=1.0.0" defer></script> <!-- Unified cache manager -->
-    <!-- [9] Load Order: 9 | Strategy: defer -->
-    <script src="scripts/icon-mappings.js?v=1.0.0" defer></script> <!-- Central icon mappings -->
-    <!-- [10] Load Order: 10 | Strategy: defer -->
-    <script src="scripts/icon-system.js?v=1.0.0" defer></script> <!-- Central icon system -->
-    <!-- [11] Load Order: 11 | Strategy: defer -->
-    <script src="scripts/icon-replacement-helper.js?v=1.0.0" defer></script> <!-- Icon replacement helper for standardizing icon usage -->
-    <!-- [12] Load Order: 12 | Strategy: defer -->
-    <script src="scripts/cache-clear-menu.js?v=1.0.0" defer></script> <!-- Cache clearing control (Stage B-Lite) -->
-    <!-- [13] Load Order: 13 | Strategy: defer -->
-    <script src="scripts/cache-ttl-guard.js?v=1.0.0" defer></script> <!-- TTL guard for entity loaders -->
-    <!-- [14] Load Order: 14 | Strategy: defer -->
-    <script src="scripts/auth.js?v=1.0.0" defer></script> <!-- Authentication system -->
-    <!-- [15] Load Order: 15 | Strategy: defer -->
-    <script src="scripts/auth-guard.js?v=1.0.0" defer></script> <!-- Page protection - authentication guard -->
-    <!-- [16] Load Order: 16 | Strategy: defer -->
-    <script src="scripts/logger-service.js?v=1.0.0" defer></script> <!-- Advanced logging service -->
-    <!-- [17] Load Order: 17 | Strategy: defer -->
-    <script src="scripts/header-system.js?v=1.0.0" defer></script> <!-- Header system -->
-    <!-- [18] Load Order: 18 | Strategy: defer -->
-    <script src="scripts/page-state-manager.js?v=1.0.0" defer></script> <!-- Unified page state manager -->
-    <!-- [19] Load Order: 19 | Strategy: defer -->
-    <script src="scripts/page-utils.js?v=1.0.0" defer></script> <!-- Page utilities -->
-    <!-- [20] Load Order: 20 | Strategy: defer -->
-    <script src="scripts/translation-utils.js?v=1.0.0" defer></script> <!-- Translations -->
-    <!-- [21] Load Order: 21 | Strategy: defer -->
-    <script src="scripts/button-icons.js?v=1.0.0" defer></script> <!-- Icon and button system -->
-    <!-- [22] Load Order: 22 | Strategy: defer -->
+    <!-- [1] Package Bundle: base.bundle.js | Strategy: defer -->
+    <script src="scripts/bundles/base.bundle.js?v=1.0.0" defer></script> <!-- Base Package bundle -->
+    <!-- [2] External Script: https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js | Strategy: defer -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script> <!-- Bootstrap JS Bundle (Tooltips & Modals) -->
-    <!-- [23] Load Order: 23 | Strategy: defer -->
-    <script src="scripts/event-handler-manager.js?v=1.0.0" defer></script> <!-- Central event management system -->
-    <!-- [24] Load Order: 24 | Strategy: defer -->
-    <script src="scripts/button-system-init.js?v=1.0.0" defer></script> <!-- Button system -->
-    <!-- [25] Load Order: 25 | Strategy: defer -->
-    <script src="scripts/color-scheme-system.js?v=1.0.0" defer></script> <!-- Dynamic color system -->
+    <!-- [3] External Script: https://cdn.jsdelivr.net/npm/@floating-ui/dom@1.6.0/dist/floating-ui.dom.min.js | Strategy: defer -->
+    <script src="https://cdn.jsdelivr.net/npm/@floating-ui/dom@1.6.0/dist/floating-ui.dom.min.js" defer></script> <!-- Floating UI DOM - Smart positioning library (for overlay/tooltip positioning) -->
+    <!-- [4] External Script: https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js | Strategy: defer -->
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js" defer></script> <!-- GSAP - GreenSock Animation Platform (for smooth animations) -->
 
     <!-- =============================================================== -->
     <!-- ===== PACKAGE 2/6: SERVICES PACKAGE ===== -->
@@ -854,42 +300,14 @@
     <!-- Dependencies: base -->
     <!-- Critical: NO | Version: 1.5.0 -->
 
-    <!-- [26] Load Order: 26 | Strategy: defer -->
-    <script src="scripts/services/data-collection-service.js?v=1.0.0" defer></script> <!-- Data collection service -->
-    <!-- [27] Load Order: 27 | Strategy: defer -->
-    <script src="scripts/services/field-renderer-service.js?v=1.0.0" defer></script> <!-- Field rendering service -->
-    <!-- [28] Load Order: 28 | Strategy: defer -->
-    <script src="scripts/services/select-populator-service.js?v=1.0.0" defer></script> <!-- Select box population service -->
-    <!-- [29] Load Order: 29 | Strategy: defer -->
+    <!-- [5] Package Bundle: services.bundle.js | Strategy: defer -->
+    <script src="scripts/bundles/services.bundle.js?v=1.0.0" defer></script> <!-- Services Package bundle -->
+    <!-- [6] External Script: https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js | Strategy: defer -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script> <!-- jsPDF library (for AI analysis PDF export) -->
-    <!-- [30] Load Order: 30 | Strategy: defer -->
-    <script src="scripts/services/ai-analysis-data.js?v=1.0.0" defer></script> <!-- AI Analysis data service -->
-    <!-- [31] Load Order: 31 | Strategy: defer -->
-    <script src="scripts/services/statistics-calculator.js?v=1.0.0" defer></script> <!-- Statistics calculator -->
-    <!-- [32] Load Order: 32 | Strategy: defer -->
-    <script src="scripts/services/default-value-setter.js?v=1.0.0" defer></script> <!-- Default value service -->
-    <!-- [33] Load Order: 33 | Strategy: defer -->
-    <script src="scripts/services/preferences-data.js?v=1.0.0" defer></script> <!-- Preferences data service (API + Cache) -->
-    <!-- [34] Load Order: 34 | Strategy: defer -->
-    <script src="scripts/services/unified-progress-manager.js?v=1.0.0" defer></script> <!-- Unified progress manager for process tracking -->
-    <!-- [35] Load Order: 35 | Strategy: defer -->
-    <script src="scripts/services/crud-response-handler.js?v=1.0.0" defer></script> <!-- CRUD response handler -->
-    <!-- [36] Load Order: 36 | Strategy: defer -->
-    <script src="scripts/services/unified-crud-service.js?v=1.0.0" defer></script> <!-- Unified CRUD service for all entities -->
-    <!-- [37] Load Order: 37 | Strategy: defer -->
-    <script src="scripts/services/investment-calculation-service.js?v=1.0.0" defer></script> <!-- Investment form amount ↔ quantity calculations -->
-    <!-- [38] Load Order: 38 | Strategy: defer -->
-    <script src="scripts/services/tag-service.js?v=1.0.0" defer></script> <!-- Central tag service (tag management and retrieval) -->
-    <!-- [39] Load Order: 39 | Strategy: defer -->
-    <script src="scripts/services/table-sort-value-adapter.js?v=1.0.0" defer></script> <!-- Adapter for unified sort values (DateEnvelope, legacy) -->
-    <!-- [40] Load Order: 40 | Strategy: defer -->
-    <script src="scripts/services/lint-status-service.js?v=1.0.0" defer></script> <!-- Unified linter status service (API reading and data conversion) -->
-    <!-- [41] Load Order: 41 | Strategy: defer -->
+    <!-- [7] External Script: https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.min.js | Strategy: defer -->
     <script src="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.min.js" defer></script> <!-- Quill.js - Rich Text Editor Library -->
-    <!-- [42] Load Order: 42 | Strategy: defer -->
+    <!-- [8] External Script: https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js | Strategy: defer -->
     <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js" defer></script> <!-- DOMPurify - HTML Sanitizer -->
-    <!-- [43] Load Order: 43 | Strategy: defer -->
-    <script src="scripts/services/rich-text-editor-service.js?v=1.0.0" defer></script> <!-- Rich text editor service -->
 
     <!-- =============================================================== -->
     <!-- ===== PACKAGE 3/6: UI ADVANCED PACKAGE ===== -->
@@ -898,14 +316,8 @@
     <!-- Dependencies: base, services, modules -->
     <!-- Critical: NO | Version: 1.5.0 -->
 
-    <!-- [44] Load Order: 44 | Strategy: defer -->
-    <script src="scripts/tables.js?v=1.0.0" defer></script> <!-- Table system -->
-    <!-- [45] Load Order: 45 | Strategy: defer -->
-    <script src="scripts/table-data-registry.js?v=1.0.0" defer></script> <!-- Table data registry -->
-    <!-- [46] Load Order: 46 | Strategy: defer -->
-    <script src="scripts/pagination-system.js?v=1.0.0" defer></script> <!-- Pagination system -->
-    <!-- [47] Load Order: 47 | Strategy: defer -->
-    <script src="scripts/modules/actions-menu-system.js?v=1.0.0" defer></script> <!-- Actions menu system -->
+    <!-- [9] Package Bundle: ui-advanced.bundle.js | Strategy: defer -->
+    <script src="scripts/bundles/ui-advanced.bundle.js?v=1.0.0" defer></script> <!-- UI Advanced Package bundle -->
 
     <!-- =============================================================== -->
     <!-- ===== PACKAGE 4/6: CRUD OPERATIONS PACKAGE ===== -->
@@ -914,12 +326,8 @@
     <!-- Dependencies: base, services -->
     <!-- Critical: NO | Version: 1.5.0 -->
 
-    <!-- [48] Load Order: 48 | Strategy: defer -->
-    <script src="scripts/date-utils.js?v=1.0.0" defer></script> <!-- Date utilities -->
-    <!-- [49] Load Order: 49 | Strategy: defer -->
-    <script src="scripts/data-utils.js?v=1.0.0" defer></script> <!-- General data utilities -->
-    <!-- [50] Load Order: 50 | Strategy: defer -->
-    <script src="scripts/unified-table-system.js?v=1.0.0" defer></script> <!-- Unified central table system -->
+    <!-- [10] Package Bundle: crud.bundle.js | Strategy: defer -->
+    <script src="scripts/bundles/crud.bundle.js?v=1.0.0" defer></script> <!-- CRUD Operations Package bundle -->
 
     <!-- =============================================================== -->
     <!-- ===== PACKAGE 5/6: PREFERENCES PACKAGE ===== -->
@@ -928,32 +336,8 @@
     <!-- Dependencies: base, services -->
     <!-- Critical: NO | Version: 1.5.0 -->
 
-    <!-- [51] Load Order: 51 | Strategy: defer -->
-    <script src="scripts/preferences-cache.js?v=1.0.0" defer></script> <!-- Preferences cache management layer -->
-    <!-- [52] Load Order: 52 | Strategy: defer -->
-    <script src="scripts/services/preferences-v4.js?v=1.0.0" defer></script> <!-- Preferences V4 SDK (group-first) -->
-    <!-- [53] Load Order: 53 | Strategy: defer -->
-    <script src="scripts/preferences-events.js?v=1.0.0" defer></script> <!-- Preferences event system -->
-    <!-- [54] Load Order: 54 | Strategy: defer -->
-    <script src="scripts/preferences-core-new.js?v=1.0.0" defer></script> <!-- Preferences core (without colors) -->
-    <!-- [55] Load Order: 55 | Strategy: defer -->
-    <script src="scripts/preferences-ui-layer.js?v=1.0.0" defer></script> <!-- Preferences UI layer -->
-    <!-- [56] Load Order: 56 | Strategy: defer -->
-    <script src="scripts/preferences-colors.js?v=1.0.0" defer></script> <!-- Color system (60+ preferences) -->
-    <!-- [57] Load Order: 57 | Strategy: defer -->
-    <script src="scripts/preferences-manager.js?v=1.0.0" defer></script> <!-- Preferences manager (central) -->
-    <!-- [58] Load Order: 58 | Strategy: defer -->
-    <script src="scripts/preferences-profiles.js?v=1.0.0" defer></script> <!-- Profile management -->
-    <!-- [59] Load Order: 59 | Strategy: defer -->
-    <script src="scripts/preferences-lazy-loader.js?v=1.0.0" defer></script> <!-- lazy loading system -->
-    <!-- [60] Load Order: 60 | Strategy: defer -->
-    <script src="scripts/preferences-validation.js?v=1.0.0" defer></script> <!-- validation system -->
-    <!-- [61] Load Order: 61 | Strategy: defer -->
-    <script src="scripts/preferences-ui-v4.js?v=1.0.0" defer></script> <!-- User interface V4 (Group-First) -->
-    <!-- [62] Load Order: 62 | Strategy: defer -->
-    <script src="scripts/preferences-ui.js?v=1.0.0" defer></script> <!-- User interface -->
-    <!-- [63] Load Order: 63 | Strategy: defer -->
-    <script src="scripts/preferences-group-manager.js?v=1.0.0" defer></script> <!-- Preferences group manager -->
+    <!-- [11] Package Bundle: preferences.bundle.js | Strategy: defer -->
+    <script src="scripts/bundles/preferences.bundle.js?v=1.0.0" defer></script> <!-- Preferences Package bundle -->
 
     <!-- =============================================================== -->
     <!-- ===== PACKAGE 6/6: INITIALIZATION PACKAGE ===== -->
@@ -962,27 +346,16 @@
     <!-- Dependencies: base -->
     <!-- Critical: NO | Version: 1.5.0 -->
 
-    <!-- [64] Load Order: 64 | Strategy: defer -->
-    <script src="scripts/init-system/package-manifest.js?v=1.0.0" defer></script> <!-- Package manifest -->
-    <!-- [65] Load Order: 65 | Strategy: defer -->
-    <script src="scripts/page-initialization-configs.js?v=1.0.0" defer></script> <!-- Page initialization configurations -->
-    <!-- [66] Load Order: 66 | Strategy: defer -->
-    <script src="scripts/init-system-check.js?v=1.0.0" defer></script> <!-- Initialization system check -->
-    <!-- [67] Load Order: 67 | Strategy: defer -->
-    <script src="scripts/monitoring-functions.js?v=1.0.0" defer></script> <!-- Page monitoring functions -->
-    <!-- [68] Load Order: 68 | Strategy: defer -->
-    <script src="scripts/modules/core-systems.js?v=1.0.0" defer></script> <!-- Unified initialization system - single entry point (required for all pages) -->
+    <!-- [12] Package Bundle: init-system.bundle.js | Strategy: defer -->
+    <script src="scripts/bundles/init-system.bundle.js?v=1.0.0" defer></script> <!-- Initialization Package bundle -->
 
     <!-- =============================================================== -->
     <!-- ===== PAGE-SPECIFIC SCRIPTS ===== -->
     <!-- =============================================================== -->
 
-    <!-- [69] Page-specific: code-quality-dashboard.js | Strategy: defer -->
-    <script src="scripts/code-quality-dashboard.js?v=1.0.0" defer></script> <!-- Main page script -->
-
     <!-- =============================================================== -->
     <!-- ===== FINAL SUMMARY ===== -->
     <!-- =============================================================== -->
-    <!-- 📊 Total Scripts Processed: 69 | Unique Scripts Loaded: 69 -->
-    <!-- 🔧 For maintenance: Use generate-script-loading-code.js --></body>
-</html>
+    <!-- 📊 Total Scripts Processed: 12 | Unique Scripts Loaded: 12 -->
+    <!-- 🔧 For maintenance: Use generate-script-loading-code.js -->
+

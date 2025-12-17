@@ -763,7 +763,7 @@ const PACKAGE_MANIFEST = {
     loadOrder: 2.5,
     dependencies: ['base', 'services'],
     loadingStrategy: 'defer', // Defer to maintain dependency order with base package
-    initializationGuard: 'window.__BUNDLE_INITIALIZED_BASE && window.showModalSafe', // Wait for base bundle and showModalSafe
+    // initializationGuard: 'window.__BUNDLE_INITIALIZED_BASE && window.showModalSafe', // Temporarily disabled for testing
     scripts: [
       {
         file: 'modal-navigation-manager.js',

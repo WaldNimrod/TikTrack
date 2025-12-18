@@ -270,3 +270,4 @@ This log tracks version bumps for the development environment (branch `main`). M
 | 2025-12-12T00:13:02+00:00 | 1.3.112.0 | 1.3.111.0 | d814d0c74935b83b55a6c78f358661e12fcc0e4c | 436935d4bd29c0e658c8cfa1dfed9baf4dbb70fd | patch | Improve login UX by auto-reloading page after successful login |
 | 2025-12-16T22:43:18+00:00 | 1.3.113.0 | 1.3.112.0 | b4b251464754359cc3e87c0a0d086fd09c7c00b1 | d814d0c74935b83b55a6c78f358661e12fcc0e4c | patch | Ongoing development work - AI analysis, watch lists, and system management updates |
 | 2025-12-17T21:46:44+00:00 | 1.3.114.0 | 1.3.113.0 | b0d875ddb4cc438096a653b9a52e268543dbf0c5 | b4b251464754359cc3e87c0a0d086fd09c7c00b1 | patch | תיקון בעיות שאינן קשורות לבנדלים: שיפור error handling ו-initialization checks |
+| 2025-12-18T18:33:56+00:00 | 1.3.114.0 | 1.3.113.0 | 725118336362a9b6d224584dfebbe89f9a989e35 | b4b251464754359cc3e87c0a0d086fd09c7c00b1 | patch | שלב 1: מימוש מינימלי ויפה של מערכת התנאים - הושלם |

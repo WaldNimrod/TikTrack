@@ -708,6 +708,59 @@ class ActiveAlertsComponent extends HTMLElement {
       body.appendChild(conditionRow);
     }
 
+    // Show condition source if alert is from a condition
+    if (alert.plan_condition_id || alert.trade_condition_id) {
+      const sourceRow = document.createElement('div');
+      sourceRow.className = 'active-alerts__row active-alerts__row--source';
+      const sourceLabel = document.createElement('span');
+      sourceLabel.className = 'active-alerts__row-label';
+      sourceLabel.textContent = 'מקור';
+      const sourceValue = document.createElement('span');
+      sourceValue.className = 'active-alerts__row-value';
+      
+      if (alert.plan_condition_id) {
+        const planId = alert.trade_plan_id || alert.related_id;
+        const badge = document.createElement('span');
+        badge.className = 'badge bg-success me-2';
+        badge.textContent = '📋 מתנאי תכנית';
+        sourceValue.appendChild(badge);
+        if (planId && typeof showEntityDetails === 'function') {
+          const link = document.createElement('a');
+          link.href = '#';
+          link.className = 'ms-2';
+          link.textContent = `תכנית #${planId}`;
+          link.onclick = (e) => {
+            e.preventDefault();
+            showEntityDetails('trade_plan', planId);
+            return false;
+          };
+          sourceValue.appendChild(link);
+        }
+      } else if (alert.trade_condition_id) {
+        const tradeId = alert.trade_id || alert.related_id;
+        const badge = document.createElement('span');
+        badge.className = 'badge bg-primary me-2';
+        badge.textContent = '📈 מתנאי טרייד';
+        sourceValue.appendChild(badge);
+        if (tradeId && typeof showEntityDetails === 'function') {
+          const link = document.createElement('a');
+          link.href = '#';
+          link.className = 'ms-2';
+          link.textContent = `טרייד #${tradeId}`;
+          link.onclick = (e) => {
+            e.preventDefault();
+            showEntityDetails('trade', tradeId);
+            return false;
+          };
+          sourceValue.appendChild(link);
+        }
+      }
+      
+      sourceRow.appendChild(sourceLabel);
+      sourceRow.appendChild(sourceValue);
+      body.appendChild(sourceRow);
+    }
+
     if (alert.message) {
       const messageRow = document.createElement('div');
       messageRow.className = 'active-alerts__row active-alerts__row--message';

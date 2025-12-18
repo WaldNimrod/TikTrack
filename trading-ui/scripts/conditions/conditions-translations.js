@@ -182,7 +182,14 @@ class ConditionsTranslations {
                 'single_condition_evaluate_error': 'שגיאה בבדיקת התנאי.',
                 'auto_alerts_enabled': 'התראות אוטומטיות הופעלו עבור תנאי זה.',
                 'auto_alerts_disabled': 'התראות אוטומטיות כובו עבור תנאי זה.',
-                'auto_alerts_toggle_error': 'שגיאה בעדכון מצב ההתראות.'
+                'auto_alerts_toggle_error': 'שגיאה בעדכון מצב ההתראות.',
+                'readiness_ready': 'מוכן',
+                'readiness_waiting_for_data': 'ממתין לנתונים',
+                'readiness_error': 'שגיאה',
+                'readiness_ready_message': 'התנאי פעיל וניתן להערכה',
+                'readiness_waiting_message': 'התנאי נשמר אבל יתחיל לעבוד לאחר השלמת נתונים',
+                'readiness_error_message': 'שגיאה בבדיקת נתונים',
+                'load_data_button': 'טען נתונים'
             },
             
             // Form Labels

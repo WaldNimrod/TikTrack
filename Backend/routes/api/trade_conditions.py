@@ -15,6 +15,7 @@ from models.plan_condition import PlanCondition
 from services.conditions_validation_service import ConditionsValidationService
 from services.preferences_service import PreferencesService
 from services.alert_service import AlertService
+from services.conditions_data_requirements_service import ConditionsDataRequirementsService
 from config.database import get_db
 from .base_entity_utils import BaseEntityUtils
 
@@ -188,9 +189,22 @@ def create_trade_condition(trade_id):
             db_session.add(condition)
             db_session.commit()
             
+            # Check condition readiness
+            readiness_service = ConditionsDataRequirementsService(db_session)
+            ticker_id = trade.ticker_id
+            readiness = readiness_service.check_condition_readiness(
+                condition.id,
+                'trade',
+                ticker_id
+            )
+            
             # Return created condition
             condition_dict = condition.to_dict()
             condition_dict['alert_stats'] = AlertService.default_condition_stats()
+            # Add readiness status
+            condition_dict['readiness_status'] = readiness['status']
+            condition_dict['readiness_message'] = readiness['message']
+            condition_dict['missing_data'] = readiness.get('missing_data', [])
             
             payload = BaseEntityUtils.create_success_payload(
                 normalizer,
@@ -359,10 +373,34 @@ def update_trade_condition(condition_id):
             
             db_session.commit()
             
+            # Check condition readiness
+            readiness_service = ConditionsDataRequirementsService(db_session)
+            # Get ticker_id from trade
+            trade = db_session.query(Trade).filter(
+                Trade.id == condition.trade_id
+            ).first()
+            if trade:
+                ticker_id = trade.ticker_id
+                readiness = readiness_service.check_condition_readiness(
+                    condition.id,
+                    'trade',
+                    ticker_id
+                )
+            else:
+                readiness = {
+                    'status': 'error',
+                    'message': 'Trade not found',
+                    'missing_data': []
+                }
+            
             # Return updated condition with alert stats
             stats_map = AlertService.get_condition_alert_stats(db_session, [condition.id], 'trade')
             condition_dict = condition.to_dict()
             condition_dict['alert_stats'] = _build_condition_alert_stats(stats_map, condition.id)
+            # Add readiness status
+            condition_dict['readiness_status'] = readiness['status']
+            condition_dict['readiness_message'] = readiness['message']
+            condition_dict['missing_data'] = readiness.get('missing_data', [])
             
             # Normalize dates in condition dict
             normalized_dict = normalizer.normalize_output(condition_dict)

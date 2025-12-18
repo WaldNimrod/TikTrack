@@ -571,6 +571,40 @@ def test_page_console(driver, page_info, retry_count: int = 0):
             # Non-fatal; ignore detection errors
             pass
         
+        # Check conditions system availability (for trade_plans.html and trades.html)
+        if 'trade_plans' in page_info["url"] or 'trades' in page_info["url"]:
+            try:
+                conditions_check = driver.execute_script("""
+                    return {
+                        conditionsSystem: !!(window.conditionsSystem),
+                        conditionsModalController: !!(window.ConditionsModalController),
+                        conditionsUIManager: !!(window.conditionsUIManager),
+                        conditionsCRUDManager: !!(window.conditionsCRUDManager),
+                        conditionsFormGenerator: !!(window.conditionsFormGenerator),
+                        conditionsTranslations: !!(window.conditionsTranslations)
+                    };
+                """)
+                result["conditions_system_available"] = conditions_check.get("conditionsSystem", False)
+                result["conditions_components"] = conditions_check
+                
+                # Check for readiness status display in conditions table
+                if conditions_check.get("conditionsSystem"):
+                    readiness_check = driver.execute_script("""
+                        const tables = document.querySelectorAll('table');
+                        let hasReadinessColumn = false;
+                        tables.forEach(table => {
+                            const headers = Array.from(table.querySelectorAll('thead th'));
+                            const headerTexts = headers.map(h => h.textContent || '');
+                            if (headerTexts.some(text => text.includes('מצב כשירות') || text.includes('readiness'))) {
+                                hasReadinessColumn = true;
+                            }
+                        });
+                        return hasReadinessColumn;
+                    """)
+                    result["conditions_readiness_column_present"] = readiness_check
+            except Exception as e:
+                result["conditions_check_error"] = str(e)
+        
         # Check for critical errors
         critical_errors = [
             "Maximum call stack size exceeded",

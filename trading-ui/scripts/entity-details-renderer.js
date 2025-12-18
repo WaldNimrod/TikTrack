@@ -3737,6 +3737,16 @@ class EntityDetailsRenderer {
                 </div>
             ` : '';
             
+            // יצירת סעיף מקור תנאי (אם ההתראה מקושרת לתנאי)
+            const conditionSourceSection = this.renderAlertConditionSource(alertData);
+            const conditionSourceSectionHtml = conditionSourceSection ? `
+                <div class="row g-3 mt-3">
+                    <div class="col-12">
+                        ${conditionSourceSection}
+                    </div>
+                </div>
+            ` : '';
+            
             // יצירת פריטים מקושרים (ללא פילטר)
             const linkedItems = this.renderLinkedItems(
                 alertData.linked_items || [],
@@ -3765,6 +3775,7 @@ class EntityDetailsRenderer {
                         
                         ${alertDetailsRow}
                         ${alertConditionSection}
+                        ${conditionSourceSectionHtml}
                         ${linkedItemsSection}
                     </div>
                 </div>
@@ -3862,6 +3873,50 @@ class EntityDetailsRenderer {
                 </div>
             </div>
         `;
+    }
+
+    /**
+     * Render alert condition source - רנדור מקור התנאי (אם ההתראה מקושרת לתנאי)
+     */
+    renderAlertConditionSource(alertData) {
+        if (!alertData.plan_condition_id && !alertData.trade_condition_id) {
+            return '';
+        }
+        
+        let sourceHtml = '';
+        if (alertData.plan_condition_id) {
+            const planId = alertData.trade_plan_id || alertData.related_id;
+            sourceHtml = `
+                <div class="info-section">
+                    <h4>מקור תנאי</h4>
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="badge bg-success">📋 מתנאי תכנית מסחר</span>
+                        ${planId ? `
+                            <a href="#" onclick="showEntityDetails('trade_plan', ${planId}); return false;" class="text-decoration-none">
+                                תכנית מסחר #${planId}
+                            </a>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+        } else if (alertData.trade_condition_id) {
+            const tradeId = alertData.trade_id || alertData.related_id;
+            sourceHtml = `
+                <div class="info-section">
+                    <h4>מקור תנאי</h4>
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="badge bg-primary">📈 מתנאי טרייד</span>
+                        ${tradeId ? `
+                            <a href="#" onclick="showEntityDetails('trade', ${tradeId}); return false;" class="text-decoration-none">
+                                טרייד #${tradeId}
+                            </a>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+        }
+        
+        return sourceHtml;
     }
 
     /**

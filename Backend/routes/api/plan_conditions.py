@@ -19,6 +19,7 @@ from models.trade_plan import TradePlan
 from services.conditions_validation_service import ConditionsValidationService
 from services.preferences_service import PreferencesService
 from services.alert_service import AlertService
+from services.conditions_data_requirements_service import ConditionsDataRequirementsService
 from config.database import get_db
 from .base_entity_utils import BaseEntityUtils
 from .base_entity_decorators import handle_database_session
@@ -367,6 +368,15 @@ def create_plan_condition(plan_id):
             db_session.add(condition)
             db_session.commit()
             
+            # Check condition readiness
+            readiness_service = ConditionsDataRequirementsService(db_session)
+            ticker_id = plan.ticker_id
+            readiness = readiness_service.check_condition_readiness(
+                condition.id,
+                'plan',
+                ticker_id
+            )
+            
             # Return created condition
             condition_dict = condition.to_dict()
             condition_dict['alert_stats'] = AlertService.default_condition_stats()
@@ -374,6 +384,10 @@ def create_plan_condition(plan_id):
                 AlertService.get_condition_alert_stats(db_session, [condition.id], 'plan'),
                 condition.id
             )
+            # Add readiness status
+            condition_dict['readiness_status'] = readiness['status']
+            condition_dict['readiness_message'] = readiness['message']
+            condition_dict['missing_data'] = readiness.get('missing_data', [])
             
             payload = BaseEntityUtils.create_success_payload(
                 normalizer,
@@ -552,10 +566,34 @@ def update_plan_condition(condition_id):
             
             db_session.commit()
             
+            # Check condition readiness
+            readiness_service = ConditionsDataRequirementsService(db_session)
+            # Get ticker_id from trade_plan
+            plan = db_session.query(TradePlan).filter(
+                TradePlan.id == condition.trade_plan_id
+            ).first()
+            if plan:
+                ticker_id = plan.ticker_id
+                readiness = readiness_service.check_condition_readiness(
+                    condition.id,
+                    'plan',
+                    ticker_id
+                )
+            else:
+                readiness = {
+                    'status': 'error',
+                    'message': 'Trade plan not found',
+                    'missing_data': []
+                }
+            
             # Return updated condition with alert stats
             stats_map = AlertService.get_condition_alert_stats(db_session, [condition.id], 'plan')
             condition_dict = condition.to_dict()
             condition_dict['alert_stats'] = _build_condition_alert_stats(stats_map, condition.id)
+            # Add readiness status
+            condition_dict['readiness_status'] = readiness['status']
+            condition_dict['readiness_message'] = readiness['message']
+            condition_dict['missing_data'] = readiness.get('missing_data', [])
             
             payload = BaseEntityUtils.create_success_payload(
                 normalizer,

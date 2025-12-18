@@ -1053,17 +1053,24 @@ function setupLoginForm(formId = 'loginForm', onSuccess = null) {
         timestamp: new Date().toISOString()
       });
 
-      // Show brief success message then auto-reload
-      showLoginSuccess('✅ התחברות הצליחה! העמוד ירענן אוטומטית...', 'loginSuccess', false);
+      // Show success message with reload button (instead of auto-reload)
+      window.AuthDebugMonitor?.log('info', '✅ LOGIN FORM: Login successful, showing success message with reload button', {
+        userId: currentUser?.id,
+        username: currentUser?.username,
+        timestamp: new Date().toISOString()
+      });
 
-      // Auto-reload after a short delay to allow user to see success message
+      showLoginSuccess('✅ התחברות הצליחה! לחץ על "רענן עמוד" להמשך', 'loginSuccess', true);
+
+      // Verify button was added
       setTimeout(() => {
-        window.AuthDebugMonitor?.log('info', '🔄 Auto-reloading page after successful login', {
-          userId: currentUser?.id,
-          timestamp: new Date().toISOString()
-        });
-        window.location.reload();
-      }, 1500);
+        const reloadBtn = document.querySelector('#loginSuccess button');
+        if (reloadBtn) {
+          window.AuthDebugMonitor?.log('info', '✅ Reload button successfully added to DOM');
+        } else {
+          window.AuthDebugMonitor?.log('error', '❌ Reload button NOT found in DOM after showLoginSuccess');
+        }
+      }, 100);
 
       // Broadcast login event to other tabs
       broadcastAuthEvent({

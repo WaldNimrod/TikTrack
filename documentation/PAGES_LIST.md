@@ -104,9 +104,9 @@
 | עמוד | תיאור | גישה | API | Business Logic Service | סטטוס |
 |------|--------|------|-----|----------------------|-------|
 | **index.html** | דשבורד ראשי | `http://localhost:5000/` | `/api/dashboard/*` | ❌ חסר | ⏳ צריך Business Service |
-| **trades.html** | ניהול טריידים | `http://localhost:5000/trades.html` | `/api/trades/*` | ✅ TradeBusinessService | ✅ מוכן |
-| **trade_plans.html** | תכניות מסחר | `http://localhost:5000/trade_plans.html` | `/api/trade-plans/*` | ✅ TradePlanBusinessService | ✅ מוכן |
-| **alerts.html** | מערכת התראות | `http://localhost:5000/alerts.html` | `/api/alerts/*` | ✅ AlertBusinessService | ✅ מוכן |
+| **trades.html** | ניהול טריידים | `http://localhost:5000/trades.html` | `/api/trades/*` | ✅ TradeBusinessService | ✅ מוכן | ✅ מערכת תנאים (שלב 1) |
+| **trade_plans.html** | תכניות מסחר | `http://localhost:5000/trade_plans.html` | `/api/trade-plans/*` | ✅ TradePlanBusinessService | ✅ מוכן | ✅ מערכת תנאים (שלב 1) |
+| **alerts.html** | מערכת התראות | `http://localhost:5000/alerts.html` | `/api/alerts/*` | ✅ AlertBusinessService | ✅ מוכן | ✅ קישור חזרה לתנאים (שלב 1) |
 | **tickers.html** | ניהול טיקרים | `http://localhost:5000/tickers.html` | `/api/tickers/*` | ✅ TickerBusinessService | ✅ מוכן |
 | **ticker-dashboard.html** | דשבורד טיקר מורחב | `http://localhost:5000/ticker-dashboard.html` | `/api/tickers/{id}/*` | ✅ TickerBusinessService | ✅ מוכן - בדיקות הושלמו 30.01.2025 |
 | **trading_accounts.html** | חשבונות מסחר | `http://localhost:5000/trading_accounts.html` | `/api/trading-accounts/*` | ✅ TradingAccountBusinessService | ✅ מוכן |
@@ -261,7 +261,13 @@
 1. **כל העמודים** עובדים עם מערכת האתחול המאוחדת
 2. **כל העמודים** תומכים במערכת המטמון המאוחדת
 3. **כל העמודים** עובדים עם מערכת ההתראות הגלובלית
-4. **כל העמודים** תומכים במערכת התנאים החדשה
+4. **כל העמודים** תומכים במערכת התנאים החדשה ✅ **שלב 1 הושלם** (2025-12-18)
+   - ✅ בדיקת דרישות נתונים אוטומטית
+   - ✅ הצגת מצב כשירות ב-UI
+   - ✅ הודעות למשתמש
+   - ✅ קישור חזרה לישות בהתראות
+   - 📖 [תיעוד טכני - שלב 1](04-FEATURES/CORE/conditions-system/PHASE_1_IMPLEMENTATION.md)
+   - 📖 [מדריך משתמש - שלב 1](04-FEATURES/CORE/conditions-system/USER_GUIDE_PHASE_1.md)
 5. **כל העמודים** עובדים עם מערכת הכפתורים המרכזית
 6. עמוד `page-scripts-matrix` הועבר לארכיון ב-7 בנובמבר 2025 ואינו זמין בסביבת הפיתוח הפעילה
 7. כלי זיהוי הכפילויות הועבר לדשבורד איכות הקוד (`/code-quality-dashboard`) ב-7 בנובמבר 2025 והעמוד `duplicate-detector.html` הועבר לארכיון

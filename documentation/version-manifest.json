@@ -10,13 +10,13 @@
     "notes": "Bundle Implementation Complete - 95% Performance Boost"
   },
   "development": {
-    "version": "1.3.113.0",
+    "version": "1.3.114.0",
     "major": 1,
     "minor": 3,
-    "patch": 113,
+    "patch": 114,
     "build": 0,
-    "commit": "b4b251464754359cc3e87c0a0d086fd09c7c00b1",
-    "updated_at": "2025-12-16T22:43:18+00:00",
-    "notes": "Ongoing development work - AI analysis, watch lists, and system management updates"
+    "commit": "725118336362a9b6d224584dfebbe89f9a989e35",
+    "updated_at": "2025-12-18T18:33:56+00:00",
+    "notes": "שלב 1: מימוש מינימלי ויפה של מערכת התנאים - הושלם"
   }
 }

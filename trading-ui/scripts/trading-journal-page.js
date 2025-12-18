@@ -63,6 +63,17 @@
 
 'use strict';
 
+// Only run on trading-journal page
+if (!window.location.pathname.includes('trading-journal')) {
+  if (window.Logger) {
+    window.Logger.info('Trading journal page script skipped - not on trading journal page', {
+      currentPath: window.location.pathname
+    });
+  }
+  // Exit early without executing the rest of the script
+  // This prevents loading calendar/trading journal code on other pages
+} else {
+
 // Current month and year for calendar navigation
 let currentMonth = new Date().getMonth();
 let currentYear = new Date().getFullYear();
@@ -1335,10 +1346,10 @@ const switchViewMode = async mode => {
   }
 };
 
-/**
+  /**
      * Generate entity type filter buttons using related-object-filters system
      */
-const generateEntityTypeFilterButtons = async function() {
+  const generateJournalEntityTypeFilterButtons = async function() {
   try {
     // Wait for generateEntityTypeFilterButton to be available
     let retries = 0;
@@ -2116,12 +2127,12 @@ const loadAndRenderActivityChart = async function() {
 
 // Export functions to window
 window.tradingJournalPage = {
+  loadAndRenderCalendar,
   navigateMonth,
   prevMonth,
   nextMonth,
   navigateToToday,
   filterJournalByEntityType,
-  loadAndRenderCalendar,
   loadAndRenderJournalEntries,
   renderJournalEntriesTable,
   renderJournalEntriesCards,
@@ -2226,7 +2237,7 @@ const initializePage = async function() {
     }
 
     // Generate entity type filter buttons
-    await generateEntityTypeFilterButtons();
+    await generateJournalEntityTypeFilterButtons();
 
     // Load ticker filter
     await loadTickerFilter();
@@ -2252,5 +2263,7 @@ const initializePage = async function() {
   } else {
     setTimeout(initAfterLoad, 500);
   }
-};
+}
+
+} // End of trading-journal page check
 

@@ -116,6 +116,40 @@ class ConditionsUIManager {
         this.logEvent('init-complete');
     }
 
+    async getTickerId() {
+        /**
+         * Get ticker_id for the current entity (trade plan or trade)
+         * @returns {Promise<number|null>} Ticker ID or null if not found
+         */
+        try {
+            if (this.entityType === 'plan') {
+                // Get trade plan details
+                const response = await fetch(`/api/trade-plans/${this.entityId}`);
+                const data = await response.json();
+                if (data?.data?.ticker_id) {
+                    return data.data.ticker_id;
+                }
+                if (data?.data?.ticker?.id) {
+                    return data.data.ticker.id;
+                }
+            } else if (this.entityType === 'trade') {
+                // Get trade details
+                const response = await fetch(`/api/trades/${this.entityId}`);
+                const data = await response.json();
+                if (data?.data?.ticker_id) {
+                    return data.data.ticker_id;
+                }
+                if (data?.data?.ticker?.id) {
+                    return data.data.ticker.id;
+                }
+            }
+            return null;
+        } catch (error) {
+            window.Logger?.error('[ConditionsUIManager] Error getting ticker_id', { error: error?.message }, { page: 'conditions-ui-manager' });
+            return null;
+        }
+    }
+
     renderLayout() {
         this.container.textContent = '';
         const managerDiv = document.createElement('div');
@@ -332,7 +366,19 @@ class ConditionsUIManager {
             const savedCondition = await this.crudManager.createCondition(this.entityId, formData);
             window.Logger?.info('[ConditionsUIManager] Condition created successfully', { entityId: this.entityId, conditionId: savedCondition?.id }, { page: 'conditions-ui-manager' });
             this.logEvent('create-success', { conditionId: savedCondition?.id });
-            this.showNotification(this.translator.getMessage('condition_created') || 'תנאי נוצר בהצלחה', 'success');
+            
+            // Show readiness status message
+            const readinessStatus = savedCondition?.readiness_status;
+            if (readinessStatus === 'waiting_for_data') {
+                const message = savedCondition?.readiness_message || this.translator.getMessage('readiness_waiting_message') || 'התנאי נשמר אבל יתחיל לעבוד לאחר השלמת נתונים';
+                this.showNotification(message, 'warning');
+            } else if (readinessStatus === 'ready') {
+                const message = this.translator.getMessage('readiness_ready_message') || 'התנאי פעיל וניתן להערכה';
+                this.showNotification(message, 'success');
+            } else {
+                this.showNotification(this.translator.getMessage('condition_created') || 'תנאי נוצר בהצלחה', 'success');
+            }
+            
             await this.refreshConditions(true);
             this.emitConditionsUpdated('create', savedCondition);
             await this.handlePostSaveSuccess('create', savedCondition);
@@ -353,7 +399,19 @@ class ConditionsUIManager {
             const updatedCondition = await this.crudManager.updateCondition(conditionId, formData, this.entityId);
             window.Logger?.info('[ConditionsUIManager] Condition updated successfully', { entityId: this.entityId, conditionId }, { page: 'conditions-ui-manager' });
             this.logEvent('update-success', { conditionId });
-            this.showNotification(this.translator.getMessage('condition_updated') || 'תנאי עודכן בהצלחה', 'success');
+            
+            // Show readiness status message
+            const readinessStatus = updatedCondition?.readiness_status;
+            if (readinessStatus === 'waiting_for_data') {
+                const message = updatedCondition?.readiness_message || this.translator.getMessage('readiness_waiting_message') || 'התנאי נשמר אבל יתחיל לעבוד לאחר השלמת נתונים';
+                this.showNotification(message, 'warning');
+            } else if (readinessStatus === 'ready') {
+                const message = this.translator.getMessage('readiness_ready_message') || 'התנאי פעיל וניתן להערכה';
+                this.showNotification(message, 'success');
+            } else {
+                this.showNotification(this.translator.getMessage('condition_updated') || 'תנאי עודכן בהצלחה', 'success');
+            }
+            
             await this.refreshConditions(true);
             this.emitConditionsUpdated('update', updatedCondition);
             await this.handlePostSaveSuccess('update', updatedCondition);
@@ -922,6 +980,81 @@ window.ConditionsUIManager = ConditionsUIManager;
         `;
     }
 
+    function formatReadinessCell(condition) {
+        const readinessStatus = condition?.readiness_status || 'ready';
+        const readinessMessage = condition?.readiness_message || '';
+        const missingData = condition?.missing_data || [];
+        
+        let badgeClass = 'bg-secondary';
+        let badgeText = 'לא ידוע';
+        let tooltipText = readinessMessage || 'מצב כשירות לא זמין';
+        
+        if (readinessStatus === 'ready') {
+            badgeClass = 'bg-success';
+            badgeText = window.conditionsTranslations?.getMessage('readiness_ready') || 'מוכן';
+            tooltipText = window.conditionsTranslations?.getMessage('readiness_ready_message') || 'התנאי פעיל וניתן להערכה';
+        } else if (readinessStatus === 'waiting_for_data') {
+            badgeClass = 'bg-warning';
+            badgeText = window.conditionsTranslations?.getMessage('readiness_waiting_for_data') || 'ממתין לנתונים';
+            tooltipText = readinessMessage || window.conditionsTranslations?.getMessage('readiness_waiting_message') || 'התנאי נשמר אבל יתחיל לעבוד לאחר השלמת נתונים';
+            if (missingData.length > 0) {
+                tooltipText += `\nנתונים חסרים: ${missingData.join(', ')}`;
+            }
+        } else if (readinessStatus === 'error') {
+            badgeClass = 'bg-danger';
+            badgeText = window.conditionsTranslations?.getMessage('readiness_error') || 'שגיאה';
+            tooltipText = readinessMessage || window.conditionsTranslations?.getMessage('readiness_error_message') || 'שגיאה בבדיקת נתונים';
+        }
+        
+        const loadDataButton = readinessStatus === 'waiting_for_data' ? `
+            <button
+                type="button"
+                class="btn btn-sm btn-outline-primary mt-1"
+                data-condition-load-data="${condition?.id || ''}"
+                data-tooltip="טען נתונים חסרים"
+                aria-label="טען נתונים חסרים"
+                onclick="(async function() {
+                    if(window.ExternalDataService && window.conditionsUIManager) {
+                        try {
+                            const tickerId = await window.conditionsUIManager.getTickerId();
+                            if(tickerId) {
+                                const button = event.target;
+                                button.disabled = true;
+                                button.textContent = 'טוען...';
+                                await window.ExternalDataService.refreshTickerData(tickerId, {
+                                    forceRefresh: false,
+                                    includeHistorical: true,
+                                    daysBack: 150
+                                });
+                                await window.conditionsUIManager.refreshConditions(true);
+                                window.NotificationSystem?.showSuccess('נתונים נטענו', 'הנתונים נטענו בהצלחה');
+                                button.disabled = false;
+                                button.textContent = '${window.conditionsTranslations?.getMessage('load_data_button') || 'טען נתונים'}';
+                            } else {
+                                window.NotificationSystem?.showError('שגיאה', 'לא נמצא טיקר עבור ישות זו');
+                            }
+                        } catch(err) {
+                            window.NotificationSystem?.showError('שגיאה', 'שגיאה בטעינת נתונים: ' + err.message);
+                            const button = event.target;
+                            button.disabled = false;
+                            button.textContent = '${window.conditionsTranslations?.getMessage('load_data_button') || 'טען נתונים'}';
+                        }
+                    }
+                })()">
+                ${window.conditionsTranslations?.getMessage('load_data_button') || 'טען נתונים'}
+            </button>
+        ` : '';
+        
+        return `
+            <div class="d-flex flex-column gap-1 align-items-start">
+                <span class="badge ${badgeClass}" data-bs-toggle="tooltip" data-bs-placement="top" title="${escapeHtml(tooltipText)}">
+                    ${escapeHtml(badgeText)}
+                </span>
+                ${loadDataButton}
+            </div>
+        `;
+    }
+
     function formatActionCell(condition) {
         const actionLabel = getConditionActionLabel(condition);
         const notesPreview = stripHtml(condition?.action_notes || condition?.actionNotes || '');
@@ -996,6 +1129,7 @@ window.ConditionsUIManager = ConditionsUIManager;
         const alertsHtml = formatAlertStatsCell(condition);
         const autoAlertsHtml = formatAutoAlertToggleCell(condition, handlerConfig.toggle);
         const evaluationHtml = formatEvaluationCell(entityType, condition);
+        const readinessHtml = formatReadinessCell(condition);
 
         return `
             <tr>
@@ -1003,6 +1137,7 @@ window.ConditionsUIManager = ConditionsUIManager;
                 <td>${escapeHtml(operatorName)}</td>
                 <td>${parametersHtml}</td>
                 <td>${formatActionCell(condition)}</td>
+                <td>${readinessHtml}</td>
                 <td>${evaluationHtml}</td>
                 <td>${alertsHtml}</td>
                 <td>${autoAlertsHtml}</td>
@@ -1028,6 +1163,7 @@ window.ConditionsUIManager = ConditionsUIManager;
                             <th>אופרטור</th>
                             <th>פרמטרים</th>
                             <th>פעולה</th>
+                            <th>מצב כשירות</th>
                             <th>בדיקה אחרונה</th>
                             <th>התראות</th>
                             <th>אוטומציה</th>

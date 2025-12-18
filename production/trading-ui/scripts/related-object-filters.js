@@ -625,6 +625,13 @@ window.createRelatedObjectFilter = createRelatedObjectFilter;
 window.initializeRelatedObjectFilters = initializeRelatedObjectFilters;
 
 // New centralized filter button generation functions
-window.generateEntityTypeFilterButtons = generateEntityTypeFilterButtons;
-window.generateEntityTypeFilterButton = generateEntityTypeFilterButton;
-window.generateAllFilterButton = generateAllFilterButton;
+// Check if already defined to prevent duplicate declaration errors
+if (typeof window.generateEntityTypeFilterButtons === 'undefined') {
+  window.generateEntityTypeFilterButtons = generateEntityTypeFilterButtons;
+}
+if (typeof window.generateEntityTypeFilterButton === 'undefined') {
+  window.generateEntityTypeFilterButton = generateEntityTypeFilterButton;
+}
+if (typeof window.generateAllFilterButton === 'undefined') {
+  window.generateAllFilterButton = generateAllFilterButton;
+}

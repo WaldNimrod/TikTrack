@@ -399,20 +399,26 @@ function getConditionSourceDisplay(alert) {
   try {
     // בדיקה אם ההתראה מקושרת לתנאי
     if (alert.plan_condition_id) {
-      // שימוש במערכת הקיימת - renderType עם 'plan' type
-      return window.renderType ? 
-        window.renderType('plan', null) :
-        `<span class="badge badge-success" title="תנאי תכנית מסחר">📋 תכנית ${alert.plan_condition_id}</span>`;
+      // התראה מתנאי תכנית מסחר - הצג קישור ל-Trade Plan
+      const planId = alert.trade_plan_id || alert.related_id;
+      const badgeHtml = `<span class="badge bg-success" title="תנאי תכנית מסחר">📋 מתנאי</span>`;
+      if (planId && typeof showEntityDetails === 'function') {
+        return `${badgeHtml} <a href="#" class="ms-2" onclick="showEntityDetails('trade_plan', ${planId}); return false;" title="עבור לתכנית מסחר">תכנית #${planId}</a>`;
+      }
+      return badgeHtml;
     } else if (alert.trade_condition_id) {
-      // שימוש במערכת הקיימת - renderType עם 'trade' type  
-      return window.renderType ? 
-        window.renderType('trade', null) :
-        `<span class="badge badge-primary" title="תנאי טרייד">📈 טרייד ${alert.trade_condition_id}</span>`;
+      // התראה מתנאי טרייד - הצג קישור ל-Trade
+      const tradeId = alert.trade_id || alert.related_id;
+      const badgeHtml = `<span class="badge bg-primary" title="תנאי טרייד">📈 מתנאי</span>`;
+      if (tradeId && typeof showEntityDetails === 'function') {
+        return `${badgeHtml} <a href="#" class="ms-2" onclick="showEntityDetails('trade', ${tradeId}); return false;" title="עבור לטרייד">טרייד #${tradeId}</a>`;
+      }
+      return badgeHtml;
     } else {
-      // שימוש במערכת הקיימת - renderStatus עם 'manual' status
+      // התראה ידנית
       return window.renderStatus ? 
         window.renderStatus('manual', 'alert') :
-        `<span class="badge badge-secondary" title="התראה ידנית">✋ ידני</span>`;
+        `<span class="badge bg-secondary" title="התראה ידנית">✋ ידני</span>`;
     }
   } catch (error) {
     window.Logger.error('שגיאה ב-getConditionSourceDisplay:', error, { page: "alerts" });

@@ -87,6 +87,7 @@
 // ===== ENTITY TYPE DEFINITIONS =====
 // עטיפת כל הקובץ בפונקציה כדי למנוע טעינה כפולה
 // Color Scheme System - IIFE removed for bundle compatibility
+(function() {
     // בדיקה שהקובץ לא נטען פעמיים
     if (window.VALID_ENTITY_TYPES) {
         console.warn('⚠️ color-scheme-system.js כבר נטען - מדלג על טעינה חוזרת');
@@ -1768,4 +1769,6 @@ if (document.readyState === 'loading') {
 window.colorSchemeSystemReady = true;
 // if (window.Logger) { window.Logger.info('✅ Color Scheme System ready', { page: "color-scheme" }); }
 
-// IIFE wrapper removed for bundle compatibility
+})();
+
+// IIFE wrapper added for proper JavaScript execution

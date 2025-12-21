@@ -64,7 +64,7 @@ let currentUser = null;
 
 // Helper functions for cache operations with consistent key handling
 // CRITICAL: Always use includeUserId: false for auth-related keys to avoid key mismatches
-const authCacheOptions = { includeUserId: false };
+const authCacheOptions = { includeUserId: false, layer: 'localStorage' };
 const DEV_SESSION_TOKEN_KEY = 'dev_authToken';
 const DEV_SESSION_USER_KEY = 'dev_currentUser';
 const authBroadcastChannel = (typeof BroadcastChannel !== 'undefined') ? new BroadcastChannel('tiktrack_auth_channel') : null;
@@ -1176,11 +1176,17 @@ function setupLoginForm(formId = 'loginForm', onSuccess = null) {
 }
 
 // פונקציה לבדיקת התחברות בעת טעינת הדף
+
 async function checkAuthentication(onAuthenticated = null, onNotAuthenticated = null) {
-  console.log('[auth.js] checkAuthentication: Starting authentication check');
-  
+
+    console.log('[auth.js] checkAuthentication: Starting authentication check');
+    console.log('[auth.js] checkAuthentication: Looking for stored tokens...');
+    console.log('[auth.js] checkAuthentication: UnifiedCacheManager exists:', !!window.UnifiedCacheManager);
+    console.log('[auth.js] checkAuthentication: UnifiedCacheManager initialized:', window.UnifiedCacheManager?.initialized);
+
   // Prevent multiple simultaneous calls
   if (window._checkingAuth) {
+
     console.log('[auth.js] checkAuthentication: Already checking, skipping...');
     return;
   }
@@ -1190,11 +1196,24 @@ async function checkAuthentication(onAuthenticated = null, onNotAuthenticated = 
     // Ensure we have a token before hitting the server
     let tokenAvailable = false;
     let effectiveToken = null;
-    if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
-      const t = await window.UnifiedCacheManager.get('authToken', authCacheOptions).catch(() => null);
-      if (t) {
-        tokenAvailable = true;
-        effectiveToken = t;
+
+    // First try UnifiedCacheManager if available
+    if (window.UnifiedCacheManager) {
+      // Wait for initialization if needed
+      if (!window.UnifiedCacheManager.initialized) {
+        let attempts = 0;
+        while (!window.UnifiedCacheManager.initialized && attempts < 50) {
+          await new Promise(resolve => setTimeout(resolve, 100));
+          attempts++;
+        }
+      }
+
+      if (window.UnifiedCacheManager.initialized) {
+        const t = await window.UnifiedCacheManager.get('authToken', authCacheOptions).catch(() => null);
+        if (t) {
+          tokenAvailable = true;
+          effectiveToken = t;
+        }
       }
     }
     if (!tokenAvailable && typeof sessionStorage !== 'undefined') {
@@ -1223,13 +1242,17 @@ async function checkAuthentication(onAuthenticated = null, onNotAuthenticated = 
       }
     }
 
+    console.log('[auth.js] checkAuthentication: tokenAvailable =', tokenAvailable, 'effectiveToken =', effectiveToken ? 'present' : 'null');
+    console.log('[auth.js] checkAuthentication: UnifiedCacheManager initialized =', window.UnifiedCacheManager?.initialized);
+    console.log('[auth.js] checkAuthentication: sessionStorage token =', (typeof sessionStorage !== 'undefined') ? (sessionStorage.getItem(DEV_SESSION_TOKEN_KEY) ? 'present' : 'null') : 'no sessionStorage');
+
     if (!tokenAvailable) {
-      window.Logger?.info?.('❌ [auth.js] No token available, skipping /api/auth/me and showing login', { page: 'auth' });
+      console.log('[auth.js] checkAuthentication: No token found');
+      window.Logger?.info?.('❌ [auth.js] No token available, skipping /api/auth/me', { page: 'auth' });
       if (onNotAuthenticated && typeof onNotAuthenticated === 'function') {
         onNotAuthenticated();
-      } else if (typeof window.TikTrackAuth?.showLoginModal === 'function') {
-        await window.TikTrackAuth.showLoginModal();
       }
+      // Return result without showing modal - let caller decide what to do
       return { authenticated: false, user: null, error: 'no_token' };
     }
 
@@ -1241,9 +1264,10 @@ async function checkAuthentication(onAuthenticated = null, onNotAuthenticated = 
     });
     
     console.log('[auth.js] checkAuthentication: Server response status:', response.status);
-    
+
     if (response.ok) {
       const data = await response.json();
+      console.log('[auth.js] checkAuthentication: Server response data:', data);
       if (data.status === 'success' && data.data?.user) {
         const newUser = data.data.user;
         const wasAuthenticated = !!currentUser;
@@ -1286,7 +1310,7 @@ async function checkAuthentication(onAuthenticated = null, onNotAuthenticated = 
         } else {
           showDashboard();
         }
-        return;
+        return { authenticated: true, user: currentUser, error: null };
       }
     } else if (response.status === 401) {
       // 401 is expected when not authenticated - silently handle it
@@ -1322,16 +1346,21 @@ async function checkAuthentication(onAuthenticated = null, onNotAuthenticated = 
   await removeAuthFromCache();
   
   // Not authenticated
+
   if (onNotAuthenticated && typeof onNotAuthenticated === 'function') {
     onNotAuthenticated();
   } else {
     // Show login modal; fallback to homepage
     if (typeof window.TikTrackAuth?.showLoginModal === 'function') {
+
       await window.TikTrackAuth.showLoginModal();
     } else {
+
       window.location.href = '/';
     }
   }
+
+  return { authenticated: false, user: null, error: 'authentication_failed' };
 }
 
 // פונקציה ליצירת ממשק התחברות דינמי
@@ -1408,7 +1437,20 @@ function createLogoutButton(containerId) {
  * Show login modal instead of redirecting to login page
  * הצגת modal כניסה במקום redirect לעמוד כניסה
  */
+
 async function showLoginModal(onSuccess = null) {
+
+  // PREVENT MULTIPLE MODALS: Check if already showing
+  // TEMPORARILY DISABLED FOR DEBUGGING
+  /*
+  if (window._loginModalShowing) {
+    console.warn('[auth.js] showLoginModal prevented - already showing modal');
+    return;
+  }
+  */
+  console.log('[auth.js] showLoginModal: setting flag to true');
+  window._loginModalShowing = true;
+
   window.Logger?.info?.('🔐 [auth.js] showLoginModal called', { page: 'auth' });
   // Skip if already authenticated (dev/no-cache support via globals/session/localStorage)
   try {
@@ -1432,15 +1474,31 @@ async function showLoginModal(onSuccess = null) {
   } catch (e) {
     window.Logger?.warn?.('⚠️ [auth.js] showLoginModal skip check failed', { error: e?.message });
   }
-  
+
   const modalId = 'loginModal';
-  
-  // Remove existing modal if any
-  const existingModal = document.getElementById(modalId);
-  if (existingModal) {
-    window.Logger?.info?.('🔍 [auth.js] Removing existing modal', { page: 'auth' });
-    existingModal.remove();
+
+  // CLEANUP ALL EXISTING MODALS FIRST - prevent zombie modals
+  const allExistingModals = document.querySelectorAll('#loginModal');
+  if (allExistingModals.length > 0) {
+    window.Logger?.info?.('🔍 [auth.js] Cleaning up all existing login modals', { count: allExistingModals.length, page: 'auth' });
+    allExistingModals.forEach(modal => {
+      try {
+        modal.remove();
+      } catch (e) {
+        // Ignore errors when removing
+      }
+    });
   }
+
+  // Also clean up any orphaned backdrops
+  const orphanedBackdrops = document.querySelectorAll('.modal-backdrop');
+  orphanedBackdrops.forEach(backdrop => {
+    try {
+      backdrop.remove();
+    } catch (e) {
+      // Ignore errors when removing
+    }
+  });
   
   // Remove orphaned Bootstrap backdrops (leave the global backdrop managed by ModalManagerV2)
   const strayBackdrops = document.querySelectorAll('.modal-backdrop:not(#globalModalBackdrop)');
@@ -1669,6 +1727,11 @@ async function showLoginModal(onSuccess = null) {
   } else {
     window.Logger?.error?.('❌ [auth.js] Modal element not found after adding to DOM', { page: 'auth' });
   }
+
+  // RELEASE THE LOCK when modal is closed or after timeout
+  setTimeout(() => {
+    window._loginModalShowing = false;
+  }, 5000); // INCREASED: Allow modal to be shown for 5 seconds before allowing new ones
 }
 
 // פונקציה לבדיקת הרשאות

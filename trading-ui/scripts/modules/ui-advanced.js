@@ -2770,6 +2770,12 @@ window.getInvestmentTypeTextColor = getInvestmentTypeTextColor;
 window.getInvestmentTypeBorderColor = getInvestmentTypeBorderColor;
 window.createInvestmentTypeLegend = createInvestmentTypeLegend;
 
+// Add missing getInventoryData function (placeholder - needs proper implementation)
+window.getInventoryData = function() {
+    console.warn('getInventoryData called but not implemented yet');
+    return [];
+};
+
 // ⚠️ REMOVED: These functions are exported by color-scheme-system.js
 // Do NOT export them here to avoid conflicts with the centralized system
 // Use window.getEntityColor, window.getStatusColor, etc. from color-scheme-system.js instead

@@ -133,14 +133,33 @@ async function initAuthGuard() {
   // Increased delay to 500ms to give session more time to stabilize
   await new Promise(resolve => setTimeout(resolve, 500));
   
+  // Wait for UnifiedCacheManager to be initialized first
+  if (window.UnifiedCacheManager && !window.UnifiedCacheManager.initialized) {
+    window.Logger?.info?.('⏳ [Auth Guard] Waiting for UnifiedCacheManager initialization', { page: 'auth-guard' });
+    let attempts = 0;
+    while (!window.UnifiedCacheManager.initialized && attempts < 50) {
+      await new Promise(resolve => setTimeout(resolve, 100));
+      attempts++;
+    }
+    if (window.UnifiedCacheManager.initialized) {
+      window.Logger?.info?.('✅ [Auth Guard] UnifiedCacheManager initialized', { page: 'auth-guard' });
+    } else {
+      window.Logger?.warn?.('⚠️ [Auth Guard] UnifiedCacheManager not initialized after waiting', { page: 'auth-guard' });
+    }
+  }
+
   // Wait briefly for token to be available (UC or sessionStorage) before first check
   let tokenReady = false;
   for (let i = 0; i < 10; i++) {
     const hasUC = window.UnifiedCacheManager?.initialized;
     const ucToken = hasUC ? await window.UnifiedCacheManager.get('authToken', { includeUserId: false }).catch(() => null) : null;
     const ssToken = (typeof sessionStorage !== 'undefined') ? sessionStorage.getItem('dev_authToken') : null;
+
+    console.log('[auth-guard] Check', i, '- UC initialized:', hasUC, 'UC token:', !!ucToken, 'SS token:', !!ssToken);
+
     if (ucToken || ssToken) {
       tokenReady = true;
+      console.log('[auth-guard] Token found! UC:', !!ucToken, 'SS:', !!ssToken);
       break;
     }
     await new Promise(resolve => setTimeout(resolve, 100));
@@ -148,7 +167,14 @@ async function initAuthGuard() {
   
   let result = { authenticated: false, user: null, error: 'unknown' };
   try {
+    window.Logger?.info?.('🔍 [Auth Guard] Calling checkAuthentication', { page: 'auth-guard' });
     const r = await checkAuthentication();
+    window.Logger?.info?.('🔍 [Auth Guard] checkAuthentication result', {
+      authenticated: r?.authenticated,
+      hasUser: !!r?.user,
+      error: r?.error,
+      page: 'auth-guard'
+    });
     if (r) result = r;
   } catch (e) {
     window.Logger?.error?.('❌ [Auth Guard] checkAuthentication threw', { error: e?.message });
@@ -166,11 +192,17 @@ async function initAuthGuard() {
       page: 'auth-guard',
       error: result.error 
     });
-    // User is not authenticated - show login modal
-    // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/8d888219-eb25-465c-b8cb-5e56611fb592',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'trading-ui/scripts/auth-guard.js:167',message:'About to call showLoginModal',data:{showLoginModalType:typeof window.showLoginModal,tikTrackAuthExists:typeof window.TikTrackAuth !== 'undefined',runId:'debug-cash-flows',hypothesisId:'H1',sessionId:'debug-session'},timestamp:Date.now()})}).catch(()=>{});
-    // #endregion
-    await showLoginModal();
+    // User is not authenticated - redirect to login page
+    window.Logger?.info?.('🔄 [Auth Guard] Redirecting to login page', {
+      page: 'auth-guard',
+      currentUrl: window.location.href
+    });
+
+    // Save current URL for redirect after login
+    sessionStorage.setItem('login_redirect_url', window.location.href);
+
+    // Redirect to login page
+    window.location.href = '/login.html';
   }
 }
 

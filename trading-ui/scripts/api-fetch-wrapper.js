@@ -77,11 +77,11 @@
       await window.UnifiedCacheManager.remove('authToken', { includeUserId: false });
     }
 
-    if (window.location.pathname !== '/' && !window.location.pathname.includes('index.html')) {
-      window.location.href = '/';
-    } else if (window.TikTrackAuth?.showLoginModal) {
-      await window.TikTrackAuth.showLoginModal();
-    }
+    // Save current URL for redirect after login
+    sessionStorage.setItem('login_redirect_url', window.location.href);
+
+    // Redirect to login page
+    window.location.href = '/login.html';
   }
 
   window.fetch = async function (url, options = {}) {

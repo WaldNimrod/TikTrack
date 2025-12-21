@@ -4,6 +4,7 @@ from pathlib import Path
 # Environment detection - check if production mode is requested
 ENVIRONMENT = os.getenv("TIKTRACK_ENV", "development").lower()
 IS_PRODUCTION = ENVIRONMENT == "production"
+IS_TESTING = os.getenv("TESTING", "false").lower() == "true"
 
 # Paths
 BASE_DIR = Path(__file__).parent.parent
@@ -69,6 +70,5 @@ DEFAULT_CACHE_TTL = 10 if DEVELOPMENT_MODE else 300
 CACHE_ENABLED = not CACHE_DISABLED
 
 # Checks (skip in testing mode)
-if not os.getenv("TESTING") and not UI_DIR.exists():
+if not IS_TESTING and not UI_DIR.exists():
     raise FileNotFoundError(f"UI directory not found at: {UI_DIR}")
-

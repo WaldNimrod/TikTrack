@@ -2,8 +2,14 @@
  * Page Standardization Script
  * סקריפט לסטנדרטיזציה של כל העמודים במערכת
  *
- * @version 1.0.0
+ * Code Review Fix (December 2025):
+ * - Removed packageScripts fallback configuration
+ * - Now uses PACKAGE_MANIFEST exclusively
+ * - Eliminated dual configuration sources that could cause inconsistent script loading
+ *
+ * @version 1.1.0
  * @created October 2025
+ * @updated December 2025 - Removed packageScripts fallback
  * @author TikTrack Development Team
  */
 
@@ -39,70 +45,6 @@ class PageStandardizer {
       'init-system-management',
     ];
 
-    this.packageScripts = {
-      base: [
-        'scripts/global-favicon.js?v=1.0.0',
-        'scripts/notification-system.js?v=1.0.0',
-        'scripts/cache-sync-manager.js?v=1.0.0',
-        'scripts/ui-utils.js?v=1.0.0',
-        'scripts/warning-system.js?v=1.0.0',
-        'scripts/error-handlers.js?v=1.0.0',
-        'scripts/unified-cache-manager.js?v=1.0.0',
-        'scripts/logger-service.js?v=1.0.0',
-        'scripts/header-system.js?v=v6.0.0',
-        'scripts/page-utils.js?v=1.0.0',
-        'scripts/translation-utils.js?v=1.0.0',
-        'scripts/button-icons.js?v=1.0.0',
-        'scripts/event-handler-manager.js?v=1.0.0',
-        'scripts/button-system-init.js?v=1.0.0',
-        'scripts/color-scheme-system.js?v=1.0.0',
-      ],
-      crud: [
-        'scripts/tables.js?v=1.0.0',
-        'scripts/data-utils.js?v=1.0.0',
-        'scripts/pagination-system.js?v=1.0.0',
-      ],
-      filters: ['scripts/related-object-filters.js?v=1.0.0'],
-      charts: ['scripts/chart-management.js?v=1.0.0'],
-      services: [
-        'scripts/services/data-collection-service.js?v=1.0.0',
-        'scripts/services/field-renderer-service.js?v=1.0.0',
-        'scripts/services/select-populator-service.js?v=1.0.0',
-        'scripts/services/statistics-calculator.js?v=1.0.0',
-        'scripts/services/default-value-setter.js?v=1.0.0',
-        'scripts/services/crud-response-handler.js?v=1.0.0',
-        'scripts/services/investment-calculation-service.js?v=1.0.0',
-        'https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.min.js',
-        'https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js',
-        'scripts/services/rich-text-editor-service.js?v=1.0.0',
-      ],
-      preferences: [
-        'scripts/preferences-core.js?v=1.0.0',
-        'scripts/preferences-page.js?v=1.0.0',
-        'scripts/preferences-group-manager.js?v=1.0.0',
-      ],
-      validation: ['scripts/validation-utils.js?v=1.0.0', 'scripts/constraint-manager.js?v=1.0.0'],
-      'advanced-notifications': [
-        'scripts/active-alerts-component.js?v=1.0.0',
-        'scripts/notifications-center.js?v=1.0.0',
-        'scripts/realtime-notifications-client.js?v=1.0.0',
-      ],
-      'external-data': [
-        'scripts/external-data-service.js?v=1.0.0',
-        'scripts/yahoo-finance-service.js?v=1.0.0',
-        'scripts/external-data-dashboard.js?v=1.0.0',
-      ],
-      'system-management': [
-        'scripts/system-management.js?v=1.0.0',
-        'scripts/cache-management.js?v=1.0.0',
-        'scripts/server-monitor.js?v=1.0.0',
-      ],
-      'dev-tools': [
-        'scripts/crud-testing-dashboard.js?v=1.0.0',
-        'scripts/css-duplicates-analyzer.js?v=1.0.0',
-      ],
-    };
-
     this.coreScripts = [
       'scripts/page-initialization-configs.js?v=1.0.0',
       'scripts/unified-app-initializer.js?v=1.0.0',
@@ -115,7 +57,7 @@ class PageStandardizer {
   getScriptsForPage(pageName) {
     if (!window.PAGE_CONFIGS || !window.PAGE_CONFIGS[pageName]) {
       console.warn(`No config found for page: ${pageName}`);
-      // Fallback to base package from PACKAGE_MANIFEST or old packageScripts
+      // Fallback to base package from PACKAGE_MANIFEST
       if (window.PACKAGE_MANIFEST && window.PACKAGE_MANIFEST.base) {
         const baseScripts = window.PACKAGE_MANIFEST.base.scripts
           .filter(s => s.required !== false)
@@ -123,7 +65,8 @@ class PageStandardizer {
           .map(s => `scripts/${s.file}?v=1.0.0`);
         return baseScripts.concat(this.coreScripts);
       }
-      return this.packageScripts.base.concat(this.coreScripts);
+      console.error(`No PACKAGE_MANIFEST available for fallback on page: ${pageName}`);
+      return this.coreScripts; // Return only core scripts as last resort
     }
 
     const config = window.PAGE_CONFIGS[pageName];
@@ -131,7 +74,7 @@ class PageStandardizer {
 
     let scripts = [];
 
-    // Try to use PACKAGE_MANIFEST first, fallback to old packageScripts
+    // Use PACKAGE_MANIFEST only
     packages.forEach(pkg => {
       if (window.PACKAGE_MANIFEST && window.PACKAGE_MANIFEST[pkg]) {
         // Use PACKAGE_MANIFEST
@@ -143,14 +86,8 @@ class PageStandardizer {
             .map(s => `scripts/${s.file}?v=1.0.0`);
           scripts = scripts.concat(pkgScripts);
         }
-      } else if (this.packageScripts[pkg]) {
-        // Fallback to old packageScripts
-        scripts = scripts.concat(this.packageScripts[pkg]);
       } else {
-        // Only warn if PACKAGE_MANIFEST is available - otherwise it's expected
-        if (window.PACKAGE_MANIFEST) {
-          console.warn(`Package ${pkg} not found in PACKAGE_MANIFEST or packageScripts`);
-        }
+        console.error(`Package ${pkg} not found in PACKAGE_MANIFEST - this should not happen in production`);
       }
     });
 

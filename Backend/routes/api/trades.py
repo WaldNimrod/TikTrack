@@ -37,6 +37,7 @@ def _get_date_normalizer():
 
 
 @trades_bp.route('/pending-plan/assignments', methods=['GET'])
+@require_authentication()
 @cache_with_deps(ttl=60, dependencies=['trades', 'trade-plans'])
 @handle_database_session()
 def get_trades_pending_plan_assignments():
@@ -77,6 +78,7 @@ def get_trades_pending_plan_assignments():
 
 
 @trades_bp.route('/pending-plan/creations', methods=['GET'])
+@require_authentication()
 @cache_with_deps(ttl=60, dependencies=['trades', 'trade-plans'])
 @handle_database_session()
 def get_trades_pending_plan_creations():

@@ -87,6 +87,18 @@ python Backend/dev_server.py
 - All pages should load without errors
 - Navigation should work properly
 
+### **Local Environment Layout**
+
+- **Primary development instance**: `/Users/nimrod/Documents/TikTrack/TikTRACKAPP` (serves on port `8080`).
+- **Test/staging instance**: `/Users/nimrod/Documents/TikTrack/TikTrackApp-Production` (serves on port `5001`).
+- Ensure you run commands in the correct folder for the environment you intend to test.
+
+### **Accessing the code review workplan**
+
+- The Hebrew code-review report and work plan lives in Git at `reports/code_review_initial_findings.md` on branch `work`.
+- To make it available locally: `git fetch origin` then either `git checkout work` or cherry-pick/merge into your working branch before opening the file.
+- Keep your local clone in sync before running the servers on ports `8080`/`5001` to ensure the latest plan is visible.
+
 ## 📁 Project Structure
 
 ```

@@ -696,6 +696,13 @@ const PACKAGE_MANIFEST = {
         description: 'Execution cluster helper functions (rendering, actions, calculations)',
         required: false,
         loadOrder: 19
+      },
+      {
+        file: 'services/modal-helper-service.js',
+        globalCheck: 'window.ModalHelperService',
+        description: 'Modal helper service - provides showModalSafe function globally',
+        required: true,  // Required for all pages with modal functionality
+        loadOrder: 20
       }
     ],
     estimatedSize: '~180KB',

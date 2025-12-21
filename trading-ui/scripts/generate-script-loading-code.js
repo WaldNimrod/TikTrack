@@ -97,11 +97,12 @@ try {
  * @param {boolean} useBundles - Whether to use bundles (auto-set based on mode if null)
  */
 function generateScriptLoadingCode(pageName, mode = null, useBundles = null) {
+
   // Auto-detect environment if not provided
   if (!mode) {
     mode = detectEnvironment();
   }
-  
+
   // Auto-set useBundles based on environment
   // Production and testing use bundles, development doesn't
   if (useBundles === null) {

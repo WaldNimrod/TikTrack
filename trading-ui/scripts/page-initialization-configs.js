@@ -478,7 +478,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'core-ui', // Core UI systems loaded after header
         'services',
         'ui-advanced',
-        'modules', // Required for ModalManagerV2
+        // REMOVED: 'modules' - Not needed for preferences page (no modals required)
         'crud',
         'preferences',
         'validation',
@@ -508,7 +508,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.UnifiedAppInitializer', // Unified Init System
         'window.PAGE_CONFIGS', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
-        'window.ModalManagerV2', // Modal Manager V2
+        // REMOVED: 'window.ModalManagerV2' - Not needed for preferences page
         // REMOVED: 'window.ConditionsSummaryRenderer' - Not needed for preferences page
       // ← NEW: מטאדאטה
       ],

@@ -506,22 +506,27 @@ class IntegratedCRUDE2ETester {
             workflow.steps.push(`נמצאו ${initialRows} טריידים קיימים`);
             this.updateTestResults();
 
-            // Step 4: Open Add Trade modal using global function
-            workflow.steps.push('פתיחת מודל הוספת טרייד');
-            if (window.addTrade && typeof window.addTrade === 'function') {
-                await window.addTrade();
-            } else if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
-                await window.ModalManagerV2.showModal('tradesModal', 'add');
+            // Step 4: Open Add Trade modal in iframe
+            workflow.steps.push('פתיחת מודל הוספת טרייד ב-iframe');
+            this.updateTestResults();
+            const iframeWindow = testIframe.contentWindow;
+            if (iframeWindow.addTrade && typeof iframeWindow.addTrade === 'function') {
+                await iframeWindow.addTrade();
+            } else if (iframeWindow.ModalManagerV2 && typeof iframeWindow.ModalManagerV2.showModal === 'function') {
+                await iframeWindow.ModalManagerV2.showModal('tradesModal', 'add');
             } else {
-                throw new Error('Add Trade function not available');
+                throw new Error('Add Trade function not available in iframe');
             }
-            workflow.steps.push('מודל הוספת טרייד נפתח');
+            workflow.steps.push('מודל הוספת טרייד נפתח ב-iframe');
+            this.updateTestResults();
 
-            // Step 5: Wait for modal to be fully loaded
-            workflow.steps.push('ממתין לטעינת המודל המלא');
-            await this.waitForElement('#tradesModal.show, #tradesModal.modal.show, .modal.show', 10000);
+            // Step 5: Wait for modal to be fully loaded in iframe
+            workflow.steps.push('ממתין לטעינת המודל המלא ב-iframe');
+            this.updateTestResults();
+            await this.waitForElementInIframe(testIframe, '#tradesModal.show, #tradesModal.modal.show, .modal.show', 10000);
             await new Promise(resolve => setTimeout(resolve, 1000)); // Wait for form to initialize
-            workflow.steps.push('המודל נטען בהצלחה');
+            workflow.steps.push('המודל נטען בהצלחה ב-iframe');
+            this.updateTestResults();
 
             // Step 6: Get available data for form
             workflow.steps.push('קבלת נתונים למילוי הטופס');
@@ -548,8 +553,9 @@ class IntegratedCRUDE2ETester {
             const tickerId = tickers[0].id;
             workflow.steps.push(`נתונים נטענו: חשבון ${tradingAccountId}, טיקר ${tickerId}`);
 
-            // Step 7: Fill form fields - try multiple selectors
-            workflow.steps.push('מילוי שדות הטופס');
+            // Step 7: Fill form fields in iframe - try multiple selectors
+            workflow.steps.push('מילוי שדות הטופס ב-iframe');
+            this.updateTestResults();
             
             // Fill trading account - try multiple selectors
             const accountSelectors = [
@@ -561,7 +567,7 @@ class IntegratedCRUDE2ETester {
             ];
             let accountSelect = null;
             for (const selector of accountSelectors) {
-                accountSelect = document.querySelector(selector);
+                accountSelect = iframeDoc.querySelector(selector);
                 if (accountSelect) break;
             }
             if (accountSelect) {
@@ -569,6 +575,7 @@ class IntegratedCRUDE2ETester {
                 accountSelect.dispatchEvent(new Event('change', { bubbles: true }));
                 await new Promise(resolve => setTimeout(resolve, 500));
                 workflow.steps.push(`חשבון מסחר נבחר: ${tradingAccountId}`);
+                this.updateTestResults();
             }
 
             // Fill ticker - try multiple selectors
@@ -580,7 +587,7 @@ class IntegratedCRUDE2ETester {
             ];
             let tickerSelect = null;
             for (const selector of tickerSelectors) {
-                tickerSelect = document.querySelector(selector);
+                tickerSelect = iframeDoc.querySelector(selector);
                 if (tickerSelect) break;
             }
             if (tickerSelect) {
@@ -588,6 +595,7 @@ class IntegratedCRUDE2ETester {
                 tickerSelect.dispatchEvent(new Event('change', { bubbles: true }));
                 await new Promise(resolve => setTimeout(resolve, 500));
                 workflow.steps.push(`טיקר נבחר: ${tickerId}`);
+                this.updateTestResults();
             }
 
             // Fill planned amount
@@ -598,13 +606,14 @@ class IntegratedCRUDE2ETester {
                 '#tradesModal input[id*="planned_amount"]'
             ];
             for (const selector of amountSelectors) {
-                const field = document.querySelector(selector);
+                const field = iframeDoc.querySelector(selector);
                 if (field) {
                     field.value = '10000';
                     field.dispatchEvent(new Event('input', { bubbles: true }));
                     field.dispatchEvent(new Event('change', { bubbles: true }));
                     await new Promise(resolve => setTimeout(resolve, 200));
                     workflow.steps.push('סכום מתוכנן הוזן: 10000');
+                    this.updateTestResults();
                     break;
                 }
             }
@@ -617,13 +626,14 @@ class IntegratedCRUDE2ETester {
                 '#tradesModal input[id*="entry_price"]'
             ];
             for (const selector of priceSelectors) {
-                const field = document.querySelector(selector);
+                const field = iframeDoc.querySelector(selector);
                 if (field) {
                     field.value = '100';
                     field.dispatchEvent(new Event('input', { bubbles: true }));
                     field.dispatchEvent(new Event('change', { bubbles: true }));
                     await new Promise(resolve => setTimeout(resolve, 200));
                     workflow.steps.push('מחיר כניסה הוזן: 100');
+                    this.updateTestResults();
                     break;
                 }
             }
@@ -635,12 +645,13 @@ class IntegratedCRUDE2ETester {
                 '#tradesModal select[name*="investment_type"]'
             ];
             for (const selector of investmentSelectors) {
-                const field = document.querySelector(selector);
+                const field = iframeDoc.querySelector(selector);
                 if (field) {
                     field.value = 'swing';
                     field.dispatchEvent(new Event('change', { bubbles: true }));
                     await new Promise(resolve => setTimeout(resolve, 300));
                     workflow.steps.push('סוג השקעה נבחר: swing');
+                    this.updateTestResults();
                     break;
                 }
             }
@@ -652,52 +663,40 @@ class IntegratedCRUDE2ETester {
                 '#tradesModal select[name*="side"]'
             ];
             for (const selector of sideSelectors) {
-                const field = document.querySelector(selector);
+                const field = iframeDoc.querySelector(selector);
                 if (field) {
                     field.value = 'buy';
                     field.dispatchEvent(new Event('change', { bubbles: true }));
                     await new Promise(resolve => setTimeout(resolve, 300));
                     workflow.steps.push('צד נבחר: buy');
+                    this.updateTestResults();
                     break;
                 }
             }
 
-            workflow.steps.push('כל שדות הטופס מולאו בהצלחה');
+            workflow.steps.push('כל שדות הטופס מולאו בהצלחה ב-iframe');
+            this.updateTestResults();
 
-            // Step 8: Click save button - try multiple selectors
-            workflow.steps.push('לחיצה על כפתור שמירה');
+            // Step 8: Click save button in iframe - try multiple selectors
+            workflow.steps.push('לחיצה על כפתור שמירה ב-iframe');
+            this.updateTestResults();
             const saveButtonSelectors = [
                 '#tradesModal button[type="submit"]',
                 '#tradesModal button.btn-primary',
                 '#tradesModal button[data-action="save"]',
-                '#tradesModal button:contains("שמור")',
-                '#tradesModal button:contains("Save")',
                 '#tradesModal .modal-footer button.btn-primary',
                 '#tradesModal .modal-footer button:last-child'
             ];
             
             let saveButton = null;
             for (const selector of saveButtonSelectors) {
-                // Handle :contains() pseudo-selector manually
-                if (selector.includes(':contains')) {
-                    const baseSelector = selector.split(':contains')[0];
-                    const text = selector.match(/:contains\("([^"]+)"\)/)?.[1];
-                    const buttons = document.querySelectorAll(baseSelector);
-                    for (const btn of buttons) {
-                        if (btn.textContent.includes(text)) {
-                            saveButton = btn;
-                            break;
-                        }
-                    }
-                } else {
-                    saveButton = document.querySelector(selector);
-                }
+                saveButton = iframeDoc.querySelector(selector);
                 if (saveButton) break;
             }
             
             if (!saveButton) {
                 // Last resort: find any button in modal footer
-                const modalFooter = document.querySelector('#tradesModal .modal-footer');
+                const modalFooter = iframeDoc.querySelector('#tradesModal .modal-footer');
                 if (modalFooter) {
                     const buttons = modalFooter.querySelectorAll('button');
                     saveButton = Array.from(buttons).find(btn => 
@@ -712,42 +711,68 @@ class IntegratedCRUDE2ETester {
                 throw new Error('Save button not found in modal');
             }
             
-            await this.clickButton(saveButton);
-            workflow.steps.push('כפתור שמירה נלחץ');
+            saveButton.click();
+            await new Promise(resolve => setTimeout(resolve, 500));
+            workflow.steps.push('כפתור שמירה נלחץ ב-iframe');
+            this.updateTestResults();
 
-            // Step 9: Wait for modal to close and table to update
-            workflow.steps.push('ממתין לסגירת המודל ועדכון הטבלה');
-            await this.waitForElementToDisappear('#tradesModal.show, .modal.show', 15000);
+            // Step 9: Wait for modal to close and table to update in iframe
+            workflow.steps.push('ממתין לסגירת המודל ועדכון הטבלה ב-iframe');
+            this.updateTestResults();
+            await this.waitForElementToDisappear(testIframe, '#tradesModal.show, .modal.show', 15000);
             await new Promise(resolve => setTimeout(resolve, 2000)); // Wait for table update
-            workflow.steps.push('המודל נסגר והטבלה עודכנה');
+            workflow.steps.push('המודל נסגר והטבלה עודכנה ב-iframe');
+            this.updateTestResults();
 
-            // Step 10: Verify trade appears in table
-            workflow.steps.push('אימות הופעת הטרייד בטבלה');
-            const finalRows = document.querySelectorAll('table tbody tr').length;
+            // Step 10: Verify trade appears in table in iframe
+            workflow.steps.push('אימות הופעת הטרייד בטבלה ב-iframe');
+            this.updateTestResults();
+            const finalRows = iframeDoc.querySelectorAll('table tbody tr').length;
             if (finalRows <= initialRows) {
                 throw new Error(`Trade not added to table. Initial: ${initialRows}, Final: ${finalRows}`);
             }
             workflow.steps.push(`הטרייד הופיע בטבלה (${initialRows} → ${finalRows} שורות)`);
+            this.updateTestResults();
 
-            // Step 11: Find and delete the test trade
-            workflow.steps.push('מחיקת טרייד הבדיקה');
-            const lastRow = document.querySelector('table tbody tr:last-child');
+            // Step 11: Find and delete the test trade in iframe
+            workflow.steps.push('מחיקת טרייד הבדיקה ב-iframe');
+            this.updateTestResults();
+            const lastRow = iframeDoc.querySelector('table tbody tr:last-child');
             if (lastRow) {
-                const deleteButton = lastRow.querySelector('button[data-action*="delete"], button:contains("מחק"), [onclick*="delete"]');
+                const deleteButton = lastRow.querySelector('button[data-action*="delete"], [onclick*="delete"]');
+                if (!deleteButton) {
+                    // Try finding button by text
+                    const buttons = lastRow.querySelectorAll('button');
+                    deleteButton = Array.from(buttons).find(btn => btn.textContent.includes('מחק') || btn.textContent.includes('Delete'));
+                }
                 if (deleteButton) {
-                    await this.clickButton(deleteButton);
-                    // Wait for confirmation if needed
+                    deleteButton.click();
                     await new Promise(resolve => setTimeout(resolve, 1000));
                     // Confirm deletion if confirmation modal appears
-                    const confirmButton = document.querySelector('.modal.show button:contains("אישור"), .modal.show button:contains("Confirm")');
-                    if (confirmButton) {
-                        await this.clickButton(confirmButton);
+                    const confirmButton = iframeDoc.querySelector('.modal.show button:contains("אישור"), .modal.show button:contains("Confirm")');
+                    if (!confirmButton) {
+                        const modalButtons = iframeDoc.querySelectorAll('.modal.show button');
+                        const confirmBtn = Array.from(modalButtons).find(btn => 
+                            btn.textContent.includes('אישור') || btn.textContent.includes('Confirm')
+                        );
+                        if (confirmBtn) {
+                            confirmBtn.click();
+                        }
+                    } else {
+                        confirmButton.click();
                     }
                     await new Promise(resolve => setTimeout(resolve, 2000));
-                    workflow.steps.push('טרייד הבדיקה נמחק בהצלחה');
+                    workflow.steps.push('טרייד הבדיקה נמחק בהצלחה ב-iframe');
+                    this.updateTestResults();
                 } else {
                     workflow.steps.push('אזהרה: כפתור מחיקה לא נמצא');
+                    this.updateTestResults();
                 }
+            }
+
+            // Cleanup: Remove iframe
+            if (testIframe && testIframe.parentNode) {
+                testIframe.parentNode.removeChild(testIframe);
             }
 
             const executionTime = Date.now() - startTime;
@@ -763,6 +788,11 @@ class IntegratedCRUDE2ETester {
             this.updateTestResults();
 
         } catch (error) {
+            // Cleanup: Remove iframe even on error
+            if (testIframe && testIframe.parentNode) {
+                testIframe.parentNode.removeChild(testIframe);
+            }
+            
             const executionTime = Date.now() - startTime;
             this.logger?.error(`❌ Trade Creation E2E Test failed:`, error);
             this.results.e2e.push({
@@ -783,45 +813,59 @@ class IntegratedCRUDE2ETester {
             name: 'Alert Management E2E',
             steps: []
         };
+        let testIframe = null;
 
         try {
-            this.logger?.info('🧪 Starting Alert Management E2E Test - Full UI Simulation');
+            this.logger?.info('🧪 Starting Alert Management E2E Test - Full UI Simulation via Hidden Iframe');
 
-            // Step 1: Navigate to alerts page
-            workflow.steps.push('נווט לעמוד התראות');
-            await this.navigateToPage('/alerts.html');
-            workflow.steps.push('עמוד התראות נטען');
+            // Step 1: Load alerts page in hidden iframe
+            workflow.steps.push('טוען עמוד התראות ב-iframe נסתר');
+            this.updateTestResults();
+            testIframe = await this.loadPageInIframe('/alerts.html');
+            workflow.steps.push('עמוד התראות נטען ב-iframe');
+            this.updateTestResults();
 
-            // Step 2: Wait for page to be fully loaded
-            workflow.steps.push('ממתין לטעינת העמוד המלא');
-            await this.waitForElement('table tbody, .alerts-container', 15000);
-            workflow.steps.push('העמוד נטען בהצלחה');
+            // Step 2: Wait for page to be fully loaded in iframe
+            workflow.steps.push('ממתין לטעינת העמוד המלא ב-iframe');
+            this.updateTestResults();
+            const iframeDoc = this.getIframeDocument(testIframe);
+            await this.waitForElementInIframe(testIframe, 'table tbody, .alerts-container', 15000);
+            workflow.steps.push('העמוד נטען בהצלחה ב-iframe');
+            this.updateTestResults();
 
-            // Step 3: Get initial alert count
+            // Step 3: Get initial alert count from iframe
             workflow.steps.push('ספירת התראות קיימות');
-            const initialRows = document.querySelectorAll('table tbody tr, .alert-item').length;
+            this.updateTestResults();
+            const initialRows = iframeDoc.querySelectorAll('table tbody tr, .alert-item').length;
             this.logger?.debug(`Initial alerts count: ${initialRows}`);
             workflow.steps.push(`נמצאו ${initialRows} התראות קיימות`);
+            this.updateTestResults();
 
-            // Step 4: Open Add Alert modal
-            workflow.steps.push('פתיחת מודל הוספת התראה');
-            if (window.ModalManagerV2 && typeof window.ModalManagerV2.showModal === 'function') {
-                await window.ModalManagerV2.showModal('alertsModal', 'add');
-            } else if (typeof window.showModalSafe === 'function') {
-                await window.showModalSafe('alertsModal', 'add');
+            // Step 4: Open Add Alert modal in iframe
+            workflow.steps.push('פתיחת מודל הוספת התראה ב-iframe');
+            this.updateTestResults();
+            const iframeWindow = testIframe.contentWindow;
+            if (iframeWindow.ModalManagerV2 && typeof iframeWindow.ModalManagerV2.showModal === 'function') {
+                await iframeWindow.ModalManagerV2.showModal('alertsModal', 'add');
+            } else if (typeof iframeWindow.showModalSafe === 'function') {
+                await iframeWindow.showModalSafe('alertsModal', 'add');
             } else {
-                throw new Error('Alert modal system not available');
+                throw new Error('Alert modal system not available in iframe');
             }
-            workflow.steps.push('מודל הוספת התראה נפתח');
+            workflow.steps.push('מודל הוספת התראה נפתח ב-iframe');
+            this.updateTestResults();
 
-            // Step 5: Wait for modal to be fully loaded
-            workflow.steps.push('ממתין לטעינת המודל המלא');
-            await this.waitForElement('#alertsModal.show, #alertsModal.modal.show, .modal.show', 10000);
+            // Step 5: Wait for modal to be fully loaded in iframe
+            workflow.steps.push('ממתין לטעינת המודל המלא ב-iframe');
+            this.updateTestResults();
+            await this.waitForElementInIframe(testIframe, '#alertsModal.show, #alertsModal.modal.show, .modal.show', 10000);
             await new Promise(resolve => setTimeout(resolve, 1000));
-            workflow.steps.push('המודל נטען בהצלחה');
+            workflow.steps.push('המודל נטען בהצלחה ב-iframe');
+            this.updateTestResults();
 
-            // Step 6: Fill form fields
-            workflow.steps.push('מילוי שדות הטופס');
+            // Step 6: Fill form fields in iframe
+            workflow.steps.push('מילוי שדות הטופס ב-iframe');
+            this.updateTestResults();
             
             // Fill condition attribute
             const conditionAttrSelectors = [
@@ -830,12 +874,13 @@ class IntegratedCRUDE2ETester {
                 '#alertsModal select[name*="condition_attribute"]'
             ];
             for (const selector of conditionAttrSelectors) {
-                const field = document.querySelector(selector);
+                const field = iframeDoc.querySelector(selector);
                 if (field) {
                     field.value = 'price';
                     field.dispatchEvent(new Event('change', { bubbles: true }));
                     await new Promise(resolve => setTimeout(resolve, 300));
                     workflow.steps.push('תנאי נבחר: price');
+                    this.updateTestResults();
                     break;
                 }
             }
@@ -847,12 +892,13 @@ class IntegratedCRUDE2ETester {
                 '#alertsModal select[name*="condition_operator"]'
             ];
             for (const selector of conditionOpSelectors) {
-                const field = document.querySelector(selector);
+                const field = iframeDoc.querySelector(selector);
                 if (field) {
                     field.value = 'greater_than';
                     field.dispatchEvent(new Event('change', { bubbles: true }));
                     await new Promise(resolve => setTimeout(resolve, 300));
                     workflow.steps.push('אופרטור נבחר: greater_than');
+                    this.updateTestResults();
                     break;
                 }
             }
@@ -864,13 +910,14 @@ class IntegratedCRUDE2ETester {
                 '#alertsModal input[name*="condition_number"]'
             ];
             for (const selector of conditionNumSelectors) {
-                const field = document.querySelector(selector);
+                const field = iframeDoc.querySelector(selector);
                 if (field) {
                     field.value = '100';
                     field.dispatchEvent(new Event('input', { bubbles: true }));
                     field.dispatchEvent(new Event('change', { bubbles: true }));
                     await new Promise(resolve => setTimeout(resolve, 200));
                     workflow.steps.push('מספר תנאי הוזן: 100');
+                    this.updateTestResults();
                     break;
                 }
             }
@@ -883,21 +930,24 @@ class IntegratedCRUDE2ETester {
                 '#alertsModal input[id="message"]'
             ];
             for (const selector of messageSelectors) {
-                const field = document.querySelector(selector);
+                const field = iframeDoc.querySelector(selector);
                 if (field) {
                     field.value = 'E2E Test Alert - Price above 100';
                     field.dispatchEvent(new Event('input', { bubbles: true }));
                     field.dispatchEvent(new Event('change', { bubbles: true }));
                     await new Promise(resolve => setTimeout(resolve, 200));
                     workflow.steps.push('הודעה הוזנה');
+                    this.updateTestResults();
                     break;
                 }
             }
 
-            workflow.steps.push('כל שדות הטופס מולאו בהצלחה');
+            workflow.steps.push('כל שדות הטופס מולאו בהצלחה ב-iframe');
+            this.updateTestResults();
 
-            // Step 7: Click save button
-            workflow.steps.push('לחיצה על כפתור שמירה');
+            // Step 7: Click save button in iframe
+            workflow.steps.push('לחיצה על כפתור שמירה ב-iframe');
+            this.updateTestResults();
             const saveButtonSelectors = [
                 '#alertsModal button[type="submit"]',
                 '#alertsModal button.btn-primary',
@@ -907,12 +957,12 @@ class IntegratedCRUDE2ETester {
             
             let saveButton = null;
             for (const selector of saveButtonSelectors) {
-                saveButton = document.querySelector(selector);
+                saveButton = iframeDoc.querySelector(selector);
                 if (saveButton) break;
             }
             
             if (!saveButton) {
-                const modalFooter = document.querySelector('#alertsModal .modal-footer');
+                const modalFooter = iframeDoc.querySelector('#alertsModal .modal-footer');
                 if (modalFooter) {
                     const buttons = modalFooter.querySelectorAll('button');
                     saveButton = Array.from(buttons).find(btn => 
@@ -926,40 +976,61 @@ class IntegratedCRUDE2ETester {
                 throw new Error('Save button not found in alert modal');
             }
             
-            await this.clickButton(saveButton);
-            workflow.steps.push('כפתור שמירה נלחץ');
+            saveButton.click();
+            await new Promise(resolve => setTimeout(resolve, 500));
+            workflow.steps.push('כפתור שמירה נלחץ ב-iframe');
+            this.updateTestResults();
 
-            // Step 8: Wait for modal to close and table to update
-            workflow.steps.push('ממתין לסגירת המודל ועדכון הטבלה');
-            await this.waitForElementToDisappear('#alertsModal.show, .modal.show', 15000);
+            // Step 8: Wait for modal to close and table to update in iframe
+            workflow.steps.push('ממתין לסגירת המודל ועדכון הטבלה ב-iframe');
+            this.updateTestResults();
+            await this.waitForElementToDisappear(testIframe, '#alertsModal.show, .modal.show', 15000);
             await new Promise(resolve => setTimeout(resolve, 2000));
-            workflow.steps.push('המודל נסגר והטבלה עודכנה');
+            workflow.steps.push('המודל נסגר והטבלה עודכנה ב-iframe');
+            this.updateTestResults();
 
-            // Step 9: Verify alert appears in table
-            workflow.steps.push('אימות הופעת ההתראה בטבלה');
-            const finalRows = document.querySelectorAll('table tbody tr, .alert-item').length;
+            // Step 9: Verify alert appears in table in iframe
+            workflow.steps.push('אימות הופעת ההתראה בטבלה ב-iframe');
+            this.updateTestResults();
+            const finalRows = iframeDoc.querySelectorAll('table tbody tr, .alert-item').length;
             if (finalRows <= initialRows) {
                 throw new Error(`Alert not added to table. Initial: ${initialRows}, Final: ${finalRows}`);
             }
             workflow.steps.push(`ההתראה הופיעה בטבלה (${initialRows} → ${finalRows} שורות)`);
+            this.updateTestResults();
 
-            // Step 10: Find and delete the test alert
-            workflow.steps.push('מחיקת התראת הבדיקה');
-            const lastRow = document.querySelector('table tbody tr:last-child, .alert-item:last-child');
+            // Step 10: Find and delete the test alert in iframe
+            workflow.steps.push('מחיקת התראת הבדיקה ב-iframe');
+            this.updateTestResults();
+            const lastRow = iframeDoc.querySelector('table tbody tr:last-child, .alert-item:last-child');
             if (lastRow) {
-                const deleteButton = lastRow.querySelector('button[data-action*="delete"], button:contains("מחק"), [onclick*="delete"]');
+                let deleteButton = lastRow.querySelector('button[data-action*="delete"], [onclick*="delete"]');
+                if (!deleteButton) {
+                    const buttons = lastRow.querySelectorAll('button');
+                    deleteButton = Array.from(buttons).find(btn => btn.textContent.includes('מחק') || btn.textContent.includes('Delete'));
+                }
                 if (deleteButton) {
-                    await this.clickButton(deleteButton);
+                    deleteButton.click();
                     await new Promise(resolve => setTimeout(resolve, 1000));
-                    const confirmButton = document.querySelector('.modal.show button:contains("אישור"), .modal.show button:contains("Confirm")');
+                    const confirmButtons = iframeDoc.querySelectorAll('.modal.show button');
+                    const confirmButton = Array.from(confirmButtons).find(btn => 
+                        btn.textContent.includes('אישור') || btn.textContent.includes('Confirm')
+                    );
                     if (confirmButton) {
-                        await this.clickButton(confirmButton);
+                        confirmButton.click();
                     }
                     await new Promise(resolve => setTimeout(resolve, 2000));
-                    workflow.steps.push('התראת הבדיקה נמחקה בהצלחה');
+                    workflow.steps.push('התראת הבדיקה נמחקה בהצלחה ב-iframe');
+                    this.updateTestResults();
                 } else {
                     workflow.steps.push('אזהרה: כפתור מחיקה לא נמצא');
+                    this.updateTestResults();
                 }
+            }
+
+            // Cleanup: Remove iframe
+            if (testIframe && testIframe.parentNode) {
+                testIframe.parentNode.removeChild(testIframe);
             }
 
             const executionTime = Date.now() - startTime;
@@ -975,6 +1046,11 @@ class IntegratedCRUDE2ETester {
             this.updateTestResults();
 
         } catch (error) {
+            // Cleanup: Remove iframe even on error
+            if (testIframe && testIframe.parentNode) {
+                testIframe.parentNode.removeChild(testIframe);
+            }
+            
             const executionTime = Date.now() - startTime;
             this.logger?.error(`❌ Alert Management E2E Test failed:`, error);
             this.results.e2e.push({
@@ -995,25 +1071,32 @@ class IntegratedCRUDE2ETester {
             name: 'User Profile E2E',
             steps: []
         };
+        let testIframe = null;
 
         try {
-            this.logger?.info('🧪 Starting User Profile E2E Test - Full UI Simulation');
+            this.logger?.info('🧪 Starting User Profile E2E Test - Full UI Simulation via Hidden Iframe');
 
-            // Step 1: Navigate to user profile page
-            workflow.steps.push('נווט לעמוד פרופיל משתמש');
-            await this.navigateToPage('/user_profile.html');
-            workflow.steps.push('עמוד פרופיל משתמש נטען');
+            // Step 1: Load user profile page in hidden iframe
+            workflow.steps.push('טוען עמוד פרופיל משתמש ב-iframe נסתר');
+            this.updateTestResults();
+            testIframe = await this.loadPageInIframe('/user_profile.html');
+            workflow.steps.push('עמוד פרופיל משתמש נטען ב-iframe');
+            this.updateTestResults();
 
-            // Step 2: Wait for page to be fully loaded
-            workflow.steps.push('ממתין לטעינת העמוד המלא');
-            await this.waitForElement('form, .user-profile-form, input[name*="first_name"], input[name*="email"]', 15000);
-            workflow.steps.push('העמוד נטען בהצלחה');
+            // Step 2: Wait for page to be fully loaded in iframe
+            workflow.steps.push('ממתין לטעינת העמוד המלא ב-iframe');
+            this.updateTestResults();
+            const iframeDoc = this.getIframeDocument(testIframe);
+            await this.waitForElementInIframe(testIframe, 'form, .user-profile-form, input[name*="first_name"], input[name*="email"]', 15000);
+            workflow.steps.push('העמוד נטען בהצלחה ב-iframe');
+            this.updateTestResults();
 
-            // Step 3: Get current values
+            // Step 3: Get current values from iframe
             workflow.steps.push('קבלת ערכים נוכחיים');
-            const firstNameField = document.querySelector('input[name="first_name"], input[id*="first_name"]');
-            const lastNameField = document.querySelector('input[name="last_name"], input[id*="last_name"]');
-            const emailField = document.querySelector('input[name="email"], input[id*="email"]');
+            this.updateTestResults();
+            const firstNameField = iframeDoc.querySelector('input[name="first_name"], input[id*="first_name"]');
+            const lastNameField = iframeDoc.querySelector('input[name="last_name"], input[id*="last_name"]');
+            const emailField = iframeDoc.querySelector('input[name="email"], input[id*="email"]');
             
             if (!firstNameField && !lastNameField && !emailField) {
                 throw new Error('Profile form fields not found');
@@ -1024,9 +1107,11 @@ class IntegratedCRUDE2ETester {
             const originalEmail = emailField ? emailField.value : '';
             
             workflow.steps.push(`ערכים נוכחיים: ${originalFirstName} ${originalLastName} (${originalEmail})`);
+            this.updateTestResults();
 
-            // Step 4: Update first name (add "Test" suffix if empty, otherwise keep original)
-            workflow.steps.push('עדכון שם פרטי');
+            // Step 4: Update first name in iframe
+            workflow.steps.push('עדכון שם פרטי ב-iframe');
+            this.updateTestResults();
             const newFirstName = originalFirstName || 'Test';
             if (firstNameField) {
                 firstNameField.value = newFirstName;
@@ -1034,10 +1119,12 @@ class IntegratedCRUDE2ETester {
                 firstNameField.dispatchEvent(new Event('change', { bubbles: true }));
                 await new Promise(resolve => setTimeout(resolve, 200));
                 workflow.steps.push(`שם פרטי עודכן: ${newFirstName}`);
+                this.updateTestResults();
             }
 
-            // Step 5: Update last name
-            workflow.steps.push('עדכון שם משפחה');
+            // Step 5: Update last name in iframe
+            workflow.steps.push('עדכון שם משפחה ב-iframe');
+            this.updateTestResults();
             const newLastName = originalLastName || 'User';
             if (lastNameField) {
                 lastNameField.value = newLastName;
@@ -1045,54 +1132,57 @@ class IntegratedCRUDE2ETester {
                 lastNameField.dispatchEvent(new Event('change', { bubbles: true }));
                 await new Promise(resolve => setTimeout(resolve, 200));
                 workflow.steps.push(`שם משפחה עודכן: ${newLastName}`);
+                this.updateTestResults();
             }
 
-            // Step 6: Find and click save button
-            workflow.steps.push('לחיצה על כפתור שמירה');
+            // Step 6: Find and click save button in iframe
+            workflow.steps.push('לחיצה על כפתור שמירה ב-iframe');
+            this.updateTestResults();
             const saveButtonSelectors = [
                 'button[type="submit"]',
                 'button.btn-primary',
-                'button[data-action="save"]',
-                'button:contains("שמור")',
-                'button:contains("Save")'
+                'button[data-action="save"]'
             ];
             
             let saveButton = null;
             for (const selector of saveButtonSelectors) {
-                if (selector.includes(':contains')) {
-                    const text = selector.match(/:contains\("([^"]+)"\)/)?.[1];
-                    const buttons = document.querySelectorAll('button');
-                    for (const btn of buttons) {
-                        if (btn.textContent.includes(text)) {
-                            saveButton = btn;
-                            break;
-                        }
-                    }
-                } else {
-                    saveButton = document.querySelector(selector);
-                }
+                saveButton = iframeDoc.querySelector(selector);
                 if (saveButton) break;
+            }
+            
+            if (!saveButton) {
+                const buttons = iframeDoc.querySelectorAll('button');
+                saveButton = Array.from(buttons).find(btn => 
+                    btn.textContent.includes('שמור') || 
+                    btn.textContent.includes('Save') ||
+                    btn.classList.contains('btn-primary')
+                ) || buttons[buttons.length - 1];
             }
             
             if (!saveButton) {
                 throw new Error('Save button not found');
             }
             
-            await this.clickButton(saveButton);
-            workflow.steps.push('כפתור שמירה נלחץ');
+            saveButton.click();
+            await new Promise(resolve => setTimeout(resolve, 500));
+            workflow.steps.push('כפתור שמירה נלחץ ב-iframe');
+            this.updateTestResults();
 
             // Step 7: Wait for save to complete
-            workflow.steps.push('ממתין לסיום השמירה');
+            workflow.steps.push('ממתין לסיום השמירה ב-iframe');
+            this.updateTestResults();
             await new Promise(resolve => setTimeout(resolve, 3000));
-            workflow.steps.push('השמירה הושלמה');
+            workflow.steps.push('השמירה הושלמה ב-iframe');
+            this.updateTestResults();
 
-            // Step 8: Verify values were saved (reload page or check DOM)
-            workflow.steps.push('אימות עדכון הפרופיל');
+            // Step 8: Verify values were saved in iframe
+            workflow.steps.push('אימות עדכון הפרופיל ב-iframe');
+            this.updateTestResults();
             await new Promise(resolve => setTimeout(resolve, 1000));
             
             // Check if values are still in the form (they should be)
-            const updatedFirstNameField = document.querySelector('input[name="first_name"], input[id*="first_name"]');
-            const updatedLastNameField = document.querySelector('input[name="last_name"], input[id*="last_name"]');
+            const updatedFirstNameField = iframeDoc.querySelector('input[name="first_name"], input[id*="first_name"]');
+            const updatedLastNameField = iframeDoc.querySelector('input[name="last_name"], input[id*="last_name"]');
             
             if (updatedFirstNameField && updatedFirstNameField.value !== newFirstName) {
                 throw new Error(`First name not updated: expected ${newFirstName}, got ${updatedFirstNameField.value}`);
@@ -1101,7 +1191,13 @@ class IntegratedCRUDE2ETester {
                 throw new Error(`Last name not updated: expected ${newLastName}, got ${updatedLastNameField.value}`);
             }
             
-            workflow.steps.push('עדכון הפרופיל אומת בהצלחה');
+            workflow.steps.push('עדכון הפרופיל אומת בהצלחה ב-iframe');
+            this.updateTestResults();
+
+            // Cleanup: Remove iframe
+            if (testIframe && testIframe.parentNode) {
+                testIframe.parentNode.removeChild(testIframe);
+            }
 
             const executionTime = Date.now() - startTime;
             this.results.e2e.push({
@@ -1116,6 +1212,11 @@ class IntegratedCRUDE2ETester {
             this.updateTestResults();
 
         } catch (error) {
+            // Cleanup: Remove iframe even on error
+            if (testIframe && testIframe.parentNode) {
+                testIframe.parentNode.removeChild(testIframe);
+            }
+            
             const executionTime = Date.now() - startTime;
             this.logger?.error(`❌ User Profile E2E Test failed:`, error);
             this.results.e2e.push({

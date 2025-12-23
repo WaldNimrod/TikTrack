@@ -922,12 +922,26 @@ class PreferencesCore {
         }
       }
 
+      // Resolve profileId - use provided value, or get from latestProfileContext, or fallback to 0 (default profile)
+      // CRITICAL: Don't use invalid profile_id - always validate against latestProfileContext
+      let finalProfileId = profileId;
+      if (finalProfileId === null || finalProfileId === undefined) {
+        // Try to get from latestProfileContext first (most reliable)
+        if (this.latestProfileContext?.resolved_profile_id !== null && this.latestProfileContext?.resolved_profile_id !== undefined) {
+          finalProfileId = this.latestProfileContext.resolved_profile_id;
+        } else if (this.currentProfileId !== null && this.currentProfileId !== undefined) {
+          finalProfileId = this.currentProfileId;
+        } else {
+          finalProfileId = 0; // Default profile
+        }
+      }
+
       // Save via API
       const success = await this.apiClient.savePreference(
         preferenceName,
         value,
         userId || this.currentUserId,
-        profileId || this.currentProfileId,
+        finalProfileId,
       );
 
       if (success) {
@@ -974,6 +988,20 @@ class PreferencesCore {
      * @returns {Promise<Object>} Save results
      */
   async savePreferences(preferences, userId = null, profileId = null) {
+    // Resolve profileId - use provided value, or get from latestProfileContext, or fallback to 0 (default profile)
+    // CRITICAL: Don't use invalid profile_id - always validate against latestProfileContext
+    let finalProfileId = profileId;
+    if (finalProfileId === null || finalProfileId === undefined) {
+      // Try to get from latestProfileContext first (most reliable)
+      if (this.latestProfileContext?.resolved_profile_id !== null && this.latestProfileContext?.resolved_profile_id !== undefined) {
+        finalProfileId = this.latestProfileContext.resolved_profile_id;
+      } else if (this.currentProfileId !== null && this.currentProfileId !== undefined) {
+        finalProfileId = this.currentProfileId;
+      } else {
+        finalProfileId = 0; // Default profile
+      }
+    }
+
     const results = {
       saved: 0,
       errors: 0,
@@ -982,7 +1010,7 @@ class PreferencesCore {
 
     for (const [name, value] of Object.entries(preferences)) {
       try {
-        const success = await this.savePreference(name, value, userId, profileId);
+        const success = await this.savePreference(name, value, userId, finalProfileId);
         if (success) {
           results.saved++;
           results.details[name] = { status: 'success' };

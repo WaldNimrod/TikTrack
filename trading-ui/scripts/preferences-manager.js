@@ -239,8 +239,14 @@ class PreferencesManager {
         });
 
         // Optimistic update: update UI immediately
+        // Note: PreferencesUI.updateFields doesn't exist - removed optimistic update for now
+        // The UI will be updated after successful save via PreferencesUI.refresh() or similar
         if (optimisticUpdate && window.PreferencesUI) {
-          window.PreferencesUI.updateFields(preferences);
+          // Skip optimistic update - PreferencesUI.updateFields doesn't exist
+          // UI will be updated after successful save
+          window.Logger?.debug?.('Skipping optimistic update - PreferencesUI.updateFields not available', {
+            page: 'preferences-manager',
+          });
         }
 
         // Save to server

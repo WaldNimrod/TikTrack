@@ -21,22 +21,46 @@
 
     <!-- Page-specific Styles for Dev Tools Tables -->
     <style>
-        /* Dev Tools Table Column Styles - Fix Bootstrap grid classes on th elements */
-        .filename-column { width: 20%; min-width: 150px; }
-        .description-column { width: 35%; min-width: 200px; }
-        .category-column { width: 15%; min-width: 120px; }
-        .access-column { width: 15%; min-width: 120px; }
-        .actions-column { width: 15%; min-width: 100px; }
+        /* Dev Tools Table Column Styles - Fix table headers layout */
+        .table-responsive table th {
+            white-space: nowrap;
+            vertical-align: middle;
+            text-align: center;
+        }
+
+        .table-responsive table td {
+            vertical-align: middle;
+        }
+
+        /* Ensure sortable headers are visible */
+        .sortable-header {
+            display: inline-block;
+            width: 100%;
+            padding: 0.5rem 0.25rem;
+            background: none;
+            border: none;
+            color: inherit;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .sortable-header:hover {
+            color: #26baac;
+            text-decoration: underline;
+        }
 
         /* Responsive adjustments */
         @media (max-width: 768px) {
-            .filename-column,
-            .description-column,
-            .category-column,
-            .access-column,
-            .actions-column {
-                width: auto;
-                min-width: auto;
+            .table-responsive table th,
+            .table-responsive table td {
+                padding: 0.25rem;
+                font-size: 0.875rem;
+            }
+
+            .sortable-header {
+                padding: 0.25rem;
+                font-size: 0.875rem;
             }
         }
     </style>
@@ -141,7 +165,7 @@
                                 <h2>🏠 עמודים ראשיים (22 עמודים)</h2>
                                 <button data-button-type="TOGGLE" data-variant="small" data-icon="▼" data-classes="btn-outline-warning" data-onclick="window.toggleSection('primary-pages')" title="הצג/הסתר" type="button"></button>
                             </div>
-                            <div class="section-body">
+                            <div class="section-body d-none">
                                 <div class="table-responsive">
                                     <table class="table table-striped table-hover" data-table-type="dev-tools-technical-pages">
                                         <thead class="table-light">
@@ -299,7 +323,7 @@
                                 <h2>🔧 עמודים טכניים (12 עמודים)</h2>
                                 <button data-button-type="TOGGLE" data-variant="small" data-icon="▼" data-classes="btn-outline-warning" data-onclick="window.toggleSection('technical-pages')" title="הצג/הסתר" type="button"></button>
                             </div>
-                            <div class="section-body">
+                            <div class="section-body d-none">
                                 <div class="table-responsive">
                                     <table class="table table-striped table-hover" data-table-type="dev-tools-technical-pages">
                                         <thead class="table-light">
@@ -408,7 +432,7 @@
                                 <h2>🛠️ עמודי כלי פיתוח (10 עמודים)</h2>
                                 <button data-button-type="TOGGLE" data-variant="small" data-icon="▼" data-classes="btn-outline-warning" data-onclick="window.toggleSection('development-tools')" title="הצג/הסתר" type="button"></button>
                             </div>
-                            <div class="section-body">
+                            <div class="section-body d-none">
                                 <div class="table-responsive">
                                     <table class="table table-striped table-hover" data-table-type="dev-tools-dev-pages">
                                         <thead class="table-light">
@@ -482,7 +506,7 @@
                                 <h2>🔐 עמודי אימות (4 עמודים)</h2>
                                 <button data-button-type="TOGGLE" data-variant="small" data-icon="▼" data-classes="btn-outline-warning" data-onclick="window.toggleSection('auth-pages')" title="הצג/הסתר" type="button"></button>
                             </div>
-                            <div class="section-body">
+                            <div class="section-body d-none">
                                 <div class="table-responsive">
                                     <table class="table table-striped table-hover" data-table-type="dev-tools-auth-pages">
                                         <thead class="table-light">
@@ -535,7 +559,7 @@
                                 <h2>🧪 עמודי בדיקה וכלים (18 עמודים)</h2>
                                 <button data-button-type="TOGGLE" data-variant="small" data-icon="▼" data-classes="btn-outline-warning" data-onclick="window.toggleSection('test-pages')" title="הצג/הסתר" type="button"></button>
                             </div>
-                            <div class="section-body">
+                            <div class="section-body d-none">
                                 <div class="table-responsive">
                                     <table class="table table-striped table-hover" data-table-type="dev-tools-test-pages">
                                         <thead class="table-light">
@@ -707,7 +731,7 @@
                                 <h2>🎨 עמודי מוקאפים (14 עמודים)</h2>
                                 <button data-button-type="TOGGLE" data-variant="small" data-icon="▼" data-classes="btn-outline-warning" data-onclick="window.toggleSection('mockups')" title="הצג/הסתר" type="button"></button>
                             </div>
-                            <div class="section-body">
+                            <div class="section-body d-none">
                                 <div class="table-responsive">
                                     <table class="table table-striped table-hover" data-table-type="dev-tools-mockup-pages">
                                         <thead class="table-light">
@@ -880,7 +904,7 @@
     <!-- [17] Load Order: 17 | Strategy: defer -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script> <!-- Bootstrap JS Bundle (Tooltips & Modals) -->
     <!-- [18] Load Order: 18 | Strategy: defer -->
-    <script src="https://cdn.jsdelivr.net/npm/@floating-ui/dom@1.6.0/dist/floating-ui.dom.min.js" defer></script> <!-- Floating UI DOM - Smart positioning library (for overlay/tooltip positioning) -->
+    <!-- Floating UI moved to later loading to prevent layout issues -->
     <!-- [19] Load Order: 19 | Strategy: defer -->
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js" defer></script> <!-- GSAP - GreenSock Animation Platform (for smooth animations) -->
     <!-- [20] Load Order: 20 | Strategy: defer -->
@@ -934,6 +958,8 @@
     <!-- [32] Load Order: 32 | Strategy: defer -->
     <script src="scripts/modules/core-systems.js?v=1.0.0" defer></script> <!-- Unified initialization system - single entry point (required for all pages) -->
     <!-- [33] Load Order: 33 | Strategy: defer -->
+    <script src="https://cdn.jsdelivr.net/npm/@floating-ui/dom@1.7.4/dist/floating-ui.dom.min.js" defer></script> <!-- Floating UI DOM - Smart positioning library (for overlay/tooltip positioning) -->
+    <!-- [34] Load Order: 34 | Strategy: defer -->
     <script src="scripts/init-system/all-pages-monitoring-test.js?v=1.0.0" defer></script> <!-- Automatic check of all pages -->
     <!-- [34] Load Order: 34 | Strategy: defer -->
     <script src="scripts/init-system/pages-standardization-plan.js?v=1.0.0" defer></script> <!-- Standardization plan for all pages -->

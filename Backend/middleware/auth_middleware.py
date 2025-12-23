@@ -43,6 +43,7 @@ def setup_auth_middleware(app):
 
         auth_header = request.headers.get('Authorization', '')
         if not auth_header.lower().startswith('bearer '):
+            logger.debug(f"⚠️ [Auth Middleware] No Bearer token for path={request.path}")
             return
 
         token = auth_header.split(' ', 1)[1].strip()
@@ -65,6 +66,7 @@ def setup_auth_middleware(app):
                     g.user_id = user_id
                     g.username = username or user.get('username')
                     g.current_user = user
+                    logger.debug(f"✅ [Auth Middleware] Set g.user_id={user_id} for path={request.path}")
                 else:
                     logger.warning(f"User {user_id} not found or inactive, token ignored")
             except Exception as e:

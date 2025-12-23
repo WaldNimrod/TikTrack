@@ -1361,7 +1361,7 @@ async function scanSingleFile(fileName) {
         'cache-test.html',
         'page-scripts-mapping.html',
         'color-scheme-examples.html',
-        'crud-testing-dashboard.html',
+        'crud_testing_dashboard.html',
         'designs.html',
         'dynamic-colors-display.html',
         'page-scripts-matrix-BACKUP-20250918_213951.html',

@@ -108,7 +108,7 @@ class UserPreference(BaseModel):
     # profile = relationship("PreferenceProfile", back_populates="user_preferences")
     
     def __repr__(self):
-        return f"<UserPreference(user_id={self.user_id}, preference='{self.preference_type.preference_name if self.preference_type else 'unknown'}', value='{self.saved_value}')>"
+        return f"<UserPreference(user_id={self.user_id}, preference_id={self.preference_id}, value='{self.saved_value}')>"
 
 
 # UserPreferences model removed - using new dynamic preferences system

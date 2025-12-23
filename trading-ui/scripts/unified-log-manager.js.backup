@@ -661,7 +661,7 @@ class UnifiedLogManager {
                         title: 'סקירת מערכת נתונים חיצוניים',
                         message: `מערכת נתונים חיצוניים פעילה - ${totalQuotes.toLocaleString()} רשומות זמינות`,
                         category: 'system',
-                        page: 'external-data-dashboard.html',
+                        page: 'external_data_dashboard.html',
                         source: 'system_overview',
                         details: {
                             total_quotes: totalQuotes,
@@ -679,7 +679,7 @@ class UnifiedLogManager {
                             title: `ספק ${provider.display_name || provider.name}`,
                             message: `ספק ${provider.display_name || provider.name}: ${provider.is_healthy ? 'פעיל' : 'לא פעיל'}`,
                             category: 'api',
-                            page: 'external-data-dashboard.html',
+                            page: 'external_data_dashboard.html',
                             source: 'provider_status',
                             details: {
                                 provider: provider.name,
@@ -699,7 +699,7 @@ class UnifiedLogManager {
                             title: 'סטטיסטיקות מטמון',
                             message: `מטמון פעיל - ${statusData.cache.total_quotes?.toLocaleString() || 0} רשומות, ${statusData.cache.cache_hit_rate || 0}% הצלחה`,
                             category: 'cache',
-                            page: 'external-data-dashboard.html',
+                            page: 'external_data_dashboard.html',
                             source: 'cache_stats',
                             details: {
                                 total_quotes: statusData.cache.total_quotes,
@@ -719,7 +719,7 @@ class UnifiedLogManager {
                                 title: 'פעילות אחרונה במערכת',
                                 message: activity.message || 'פעילות במערכת',
                                 category: 'system',
-                                page: 'external-data-dashboard.html',
+                                page: 'external_data_dashboard.html',
                                 source: 'recent_activity',
                                 details: activity
                             });

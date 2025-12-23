@@ -8,13 +8,15 @@
 
 ## 📋 סקירה כללית
 
-### מה משתנה?
+### מה משתנה
+
 - **שם סביבה:** `production` → `testing`
 - **שם Database:** `TikTrack-db-production` → `TikTrack-db-testing`
 - **הגדרות Config:** `IS_PRODUCTION = True` → `IS_TESTING = True`
 - **תיקייה:** `production/` נשארת (רק המשמעות משתנה)
 
-### מה נשאר זהה?
+### מה נשאר זהה
+
 - תיקיית הקוד: `production/` (נשאר)
 - פורט: 5001 (נשאר)
 - תהליך עדכון: Master Script נשאר זהה
@@ -23,13 +25,15 @@
 
 ## ⚠️ חשוב לפני התחלה
 
-### חובה לפני התחלה:
+### חובה לפני התחלה
+
 - ✅ **גיבוי מלא** של database הנוכחי
 - ✅ **גיבוי** של כל קבצי config
 - ✅ **בדיקה** שהסביבה הנוכחית עובדת
 - ✅ **תיעוד** של כל ההגדרות הנוכחיות
 
-### תנאים:
+### תנאים
+
 - ✅ יש גישה ל-PostgreSQL
 - ✅ יש גישה לתיקייה `production/`
 - ✅ יש הרשאות לערוך קבצים
@@ -77,6 +81,7 @@ psql -U TikTrakDBAdmin -l | grep -i tiktrack
 ```
 
 **תוצאה צפויה:**
+
 ```
 TikTrack-db-development
 TikTrack-db-production  (אם קיים)
@@ -140,6 +145,7 @@ psql -U TikTrakDBAdmin -d "TikTrack-db-testing" -c \
 **שינויים נדרשים:**
 
 1. **הוספת IS_TESTING:**
+
 ```python
 # לפני:
 IS_PRODUCTION = ENVIRONMENT == "production"
@@ -151,6 +157,7 @@ IS_ONLINE = ENVIRONMENT == "online"
 ```
 
 2. **עדכון Database Name:**
+
 ```python
 # לפני:
 POSTGRES_DB = os.getenv("POSTGRES_DB", "TikTrack-db-development")
@@ -167,6 +174,7 @@ POSTGRES_DB = os.getenv("POSTGRES_DB", DEFAULT_DB_NAME)
 ```
 
 3. **עדכון Port:**
+
 ```python
 # לפני:
 PORT = 5001 if IS_PRODUCTION else 8080
@@ -176,6 +184,7 @@ PORT = 5001 if (IS_PRODUCTION or IS_TESTING) else 8080
 ```
 
 4. **עדכון Development Mode:**
+
 ```python
 # לפני:
 if IS_PRODUCTION:
@@ -198,6 +207,7 @@ python3 -c "from config.settings import IS_TESTING, POSTGRES_DB; \
 ```
 
 **תוצאה צפויה:**
+
 ```
 Testing: True, DB: TikTrack-db-testing
 ```
@@ -213,6 +223,7 @@ Testing: True, DB: TikTrack-db-testing
 **שינויים נדרשים:**
 
 1. **עדכון detect_environment_from_directory:**
+
 ```bash
 # לפני:
 if [[ "$workspace_name" == *"Production"* ]]; then
@@ -231,6 +242,7 @@ elif [[ "$workspace_name" == *"Production"* ]] || [[ "$workspace_name" == *"prod
 ```
 
 2. **עדכון setup_postgresql_env:**
+
 ```bash
 # הוספת case ל-testing:
 elif [ "$ENVIRONMENT" = "testing" ]; then
@@ -243,6 +255,7 @@ elif [ "$ENVIRONMENT" = "testing" ]; then
 ```
 
 3. **עדכון case statement:**
+
 ```bash
 # הוספת case ל-testing:
 case "$ENVIRONMENT" in
@@ -291,6 +304,7 @@ print(f'Port: {PORT}')
 ```
 
 **תוצאה צפויה (כאשר TIKTRACK_ENV=testing):**
+
 ```
 Environment: testing
 IS_PRODUCTION: False
@@ -321,6 +335,7 @@ export TIKTRACK_ENV=testing
 ```
 
 **בדיקות:**
+
 ```bash
 # בדיקת health endpoint
 curl http://localhost:5001/api/health
@@ -348,11 +363,13 @@ open http://localhost:5001
 ### בעיה: Database לא נמצא
 
 **תסמינים:**
+
 ```
 Error: database "TikTrack-db-testing" does not exist
 ```
 
 **פתרון:**
+
 ```bash
 # יצירת database
 createdb -U TikTrakDBAdmin "TikTrack-db-testing"
@@ -364,12 +381,14 @@ psql -U TikTrakDBAdmin -l | grep testing
 ### בעיה: Config לא מזהה testing
 
 **תסמינים:**
+
 ```
 IS_TESTING: False
 Database: TikTrack-db-development
 ```
 
 **פתרון:**
+
 ```bash
 # בדיקת משתנה סביבה
 echo $TIKTRACK_ENV
@@ -385,11 +404,13 @@ python3 -c "from config.settings import IS_TESTING; print(IS_TESTING)"
 ### בעיה: Server לא מתחיל
 
 **תסמינים:**
+
 ```
 Server process exited immediately
 ```
 
 **פתרון:**
+
 ```bash
 # בדיקת לוגים
 tail -f production/Backend/server_output.log
@@ -404,11 +425,13 @@ docker ps | grep postgres
 ### בעיה: Port כבר בשימוש
 
 **תסמינים:**
+
 ```
 Port 5001 is already in use
 ```
 
 **פתרון:**
+
 ```bash
 # מציאת process
 lsof -i :5001
@@ -424,7 +447,8 @@ kill <PID>
 
 ## ✅ Checklist סופי
 
-### לפני סיום:
+### לפני סיום
+
 - [ ] Database `TikTrack-db-testing` נוצר
 - [ ] Data הועתק (אם נדרש)
 - [ ] `settings.py` עודכן
@@ -436,7 +460,8 @@ kill <PID>
 - [ ] UI נטען נכון
 - [ ] אין שגיאות ב-console
 
-### אחרי סיום:
+### אחרי סיום
+
 - [ ] גיבויים נשמרו
 - [ ] שינויים commit & push
 - [ ] תיעוד עודכן
@@ -449,17 +474,20 @@ kill <PID>
 **אם יש בעיות:**
 
 1. **בדיקת לוגים:**
+
    ```bash
    tail -f production/Backend/server_output.log
    ```
 
 2. **בדיקת config:**
+
    ```bash
    cd production/Backend
    python3 -c "from config.settings import *; print(locals())"
    ```
 
 3. **בדיקת database:**
+
    ```bash
    psql -U TikTrakDBAdmin -d "TikTrack-db-testing" -c "\dt"
    ```
@@ -474,10 +502,12 @@ kill <PID>
 ## 🔗 קבצים רלוונטיים
 
 ### קבצי Config
+
 - `production/Backend/config/settings.py` - הגדרות סביבה
 - `start_server.sh` - סקריפט הפעלה
 
 ### Documentation
+
 - `documentation/production/ONLINE_DEPLOYMENT/TESTING_ENVIRONMENT_QUICK_REFERENCE.md` - Quick reference
 - `documentation/production/ONLINE_DEPLOYMENT/HANDOFF_README.md` - README להעברה
 - `documentation/production/ONLINE_DEPLOYMENT/ENVIRONMENT_NAMING.md` - שמות סביבות

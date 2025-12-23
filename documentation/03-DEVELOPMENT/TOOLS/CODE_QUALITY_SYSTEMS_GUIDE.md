@@ -123,7 +123,7 @@
 
 ### **2. מערכת בדיקות CRUD מתקדמת**
 
-- **מיקום**: `trading-ui/crud-testing-dashboard-smart.html`
+- **מיקום**: `archive/smart-pages/crud-testing-dashboard-smart.html`
 - **סקריפט**: `trading-ui/scripts/crud-testing-enhanced.js`
 - **גישה**: `http://localhost:8080/crud-testing-dashboard-smart`
 - **תכונות**:

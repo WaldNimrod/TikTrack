@@ -182,95 +182,107 @@
     <script src="scripts/debug-modal-z-index.js?v=1.0.0" defer></script> <!-- Debug tool for checking modal z-index layers -->
 
     <!-- =============================================================== -->
-    <!-- ===== PACKAGE 2/7: SERVICES PACKAGE ===== -->
+    <!-- ===== PACKAGE 2/7: AUTHENTICATION PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 1 | Description: Authentication systems loaded FIRST to provide dependencies for other packages -->
+    <!-- Dependencies: base -->
+    <!-- Critical: YES | Version: 1.5.0 -->
+
+    <!-- [23] Load Order: 23 | Strategy: defer -->
+    <script src="scripts/auth.js?v=1.0.0" defer></script> <!-- Authentication system -->
+    <!-- [24] Load Order: 24 | Strategy: defer -->
+    <script src="scripts/auth-guard.js?v=1.0.0" defer></script> <!-- Page protection - authentication guard -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 3/7: SERVICES PACKAGE ===== -->
     <!-- =============================================================== -->
     <!-- Load Order: 2 | Description: General services -->
     <!-- Dependencies: base -->
     <!-- Critical: NO | Version: 1.5.0 -->
 
-    <!-- [23] Load Order: 23 | Strategy: defer -->
-    <script src="scripts/services/data-collection-service.js?v=1.0.0" defer></script> <!-- Data collection service -->
-    <!-- [24] Load Order: 24 | Strategy: defer -->
-    <script src="scripts/services/date-range-picker-service.js?v=1.0.0" defer></script> <!-- Date range picker service with preset options and calendar UI -->
-    <!-- [25] Load Order: 25 | Strategy: defer -->
-    <script src="scripts/services/field-renderer-service.js?v=1.0.0" defer></script> <!-- Field rendering service -->
-    <!-- [26] Load Order: 26 | Strategy: defer -->
-    <script src="scripts/services/select-populator-service.js?v=1.0.0" defer></script> <!-- Select box population service -->
     <!-- [27] Load Order: 27 | Strategy: defer -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script> <!-- jsPDF library (for AI analysis PDF export) -->
+    <script src="scripts/services/data-collection-service.js?v=1.0.0" defer></script> <!-- Data collection service -->
     <!-- [28] Load Order: 28 | Strategy: defer -->
-    <script src="scripts/services/ai-analysis-data.js?v=1.0.0" defer></script> <!-- AI Analysis data service -->
+    <script src="scripts/services/date-range-picker-service.js?v=1.0.0" defer></script> <!-- Date range picker service with preset options and calendar UI -->
     <!-- [29] Load Order: 29 | Strategy: defer -->
-    <script src="scripts/services/statistics-calculator.js?v=1.0.0" defer></script> <!-- Statistics calculator -->
+    <script src="scripts/services/field-renderer-service.js?v=1.0.0" defer></script> <!-- Field rendering service -->
     <!-- [30] Load Order: 30 | Strategy: defer -->
-    <script src="scripts/services/default-value-setter.js?v=1.0.0" defer></script> <!-- Default value service -->
+    <script src="scripts/services/select-populator-service.js?v=1.0.0" defer></script> <!-- Select box population service -->
+    <!-- [29] Load Order: 29 | Strategy: defer -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script> <!-- jsPDF library (for AI analysis PDF export) -->
+    <!-- [30] Load Order: 30 | Strategy: defer -->
+    <script src="scripts/services/ai-analysis-data.js?v=1.0.0" defer></script> <!-- AI Analysis data service -->
     <!-- [31] Load Order: 31 | Strategy: defer -->
-    <script src="scripts/services/preferences-data.js?v=1.0.0" defer></script> <!-- Preferences data service (API + Cache) -->
+    <script src="scripts/services/statistics-calculator.js?v=1.0.0" defer></script> <!-- Statistics calculator -->
     <!-- [32] Load Order: 32 | Strategy: defer -->
-    <script src="scripts/services/executions-data.js?v=1.0.0" defer></script> <!-- Executions data service (API + Cache + CRUD) -->
+    <script src="scripts/services/default-value-setter.js?v=1.0.0" defer></script> <!-- Default value service -->
     <!-- [33] Load Order: 33 | Strategy: defer -->
-    <script src="scripts/services/unified-progress-manager.js?v=1.0.0" defer></script> <!-- Unified progress manager for process tracking -->
+    <script src="scripts/services/preferences-data.js?v=1.0.0" defer></script> <!-- Preferences data service (API + Cache) -->
     <!-- [34] Load Order: 34 | Strategy: defer -->
-    <script src="scripts/services/crud-response-handler.js?v=1.0.0" defer></script> <!-- CRUD response handler -->
+    <script src="scripts/services/executions-data.js?v=1.0.0" defer></script> <!-- Executions data service (API + Cache + CRUD) -->
     <!-- [35] Load Order: 35 | Strategy: defer -->
-    <script src="scripts/services/unified-crud-service.js?v=1.0.0" defer></script> <!-- Unified CRUD service for all entities -->
+    <script src="scripts/services/unified-progress-manager.js?v=1.0.0" defer></script> <!-- Unified progress manager for process tracking -->
     <!-- [36] Load Order: 36 | Strategy: defer -->
-    <script src="scripts/services/research-data.js?v=1.0.0" defer></script> <!-- Research data service -->
+    <script src="scripts/services/crud-response-handler.js?v=1.0.0" defer></script> <!-- CRUD response handler -->
     <!-- [37] Load Order: 37 | Strategy: defer -->
-    <script src="scripts/services/investment-calculation-service.js?v=1.0.0" defer></script> <!-- Investment form amount ↔ quantity calculations -->
+    <script src="scripts/services/unified-crud-service.js?v=1.0.0" defer></script> <!-- Unified CRUD service for all entities -->
     <!-- [38] Load Order: 38 | Strategy: defer -->
-    <script src="scripts/services/tag-service.js?v=1.0.0" defer></script> <!-- Central tag service (tag management and retrieval) -->
+    <script src="scripts/services/research-data.js?v=1.0.0" defer></script> <!-- Research data service -->
     <!-- [39] Load Order: 39 | Strategy: defer -->
-    <script src="scripts/services/autocomplete-service.js?v=1.0.0" defer></script> <!-- General autocomplete service for reusable suggestions dropdown -->
+    <script src="scripts/services/investment-calculation-service.js?v=1.0.0" defer></script> <!-- Investment form amount ↔ quantity calculations -->
     <!-- [40] Load Order: 40 | Strategy: defer -->
-    <script src="scripts/services/widget-z-index-manager.js?v=1.0.0" defer></script> <!-- Central z-index manager for widget overlays -->
+    <script src="scripts/services/tag-service.js?v=1.0.0" defer></script> <!-- Central tag service (tag management and retrieval) -->
     <!-- [41] Load Order: 41 | Strategy: defer -->
-    <script src="scripts/services/unified-ui-positioning-service.js?v=1.0.0" defer></script> <!-- Unified UI positioning service using Floating UI (with fallback) -->
+    <script src="scripts/services/autocomplete-service.js?v=1.0.0" defer></script> <!-- General autocomplete service for reusable suggestions dropdown -->
     <!-- [42] Load Order: 42 | Strategy: defer -->
-    <script src="scripts/services/widget-overlay-service.js?v=1.0.0" defer></script> <!-- Central widget overlay service for hover details -->
+    <script src="scripts/services/widget-z-index-manager.js?v=1.0.0" defer></script> <!-- Central z-index manager for widget overlays -->
     <!-- [43] Load Order: 43 | Strategy: defer -->
-    <script src="scripts/services/widget-overlay-debugger.js?v=1.0.0" defer></script> <!-- Visual debugging tool for widget overlay positioning issues -->
+    <script src="scripts/services/unified-ui-positioning-service.js?v=1.0.0" defer></script> <!-- Unified UI positioning service using Floating UI (with fallback) -->
     <!-- [44] Load Order: 44 | Strategy: defer -->
-    <script src="scripts/services/table-sort-value-adapter.js?v=1.0.0" defer></script> <!-- Adapter for unified sort values (DateEnvelope, legacy) -->
+    <script src="scripts/services/widget-overlay-service.js?v=1.0.0" defer></script> <!-- Central widget overlay service for hover details -->
     <!-- [45] Load Order: 45 | Strategy: defer -->
-    <script src="scripts/services/lint-status-service.js?v=1.0.0" defer></script> <!-- Unified linter status service (API reading and data conversion) -->
+    <script src="scripts/services/widget-overlay-debugger.js?v=1.0.0" defer></script> <!-- Visual debugging tool for widget overlay positioning issues -->
     <!-- [46] Load Order: 46 | Strategy: defer -->
-    <script src="scripts/services/alert-condition-renderer.js?v=1.0.0" defer></script> <!-- Alert condition renderer -->
+    <script src="scripts/services/table-sort-value-adapter.js?v=1.0.0" defer></script> <!-- Adapter for unified sort values (DateEnvelope, legacy) -->
     <!-- [47] Load Order: 47 | Strategy: defer -->
-    <script src="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.min.js" defer></script> <!-- Quill.js - Rich Text Editor Library -->
+    <script src="scripts/services/lint-status-service.js?v=1.0.0" defer></script> <!-- Unified linter status service (API reading and data conversion) -->
     <!-- [48] Load Order: 48 | Strategy: defer -->
-    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js" defer></script> <!-- DOMPurify - HTML Sanitizer -->
+    <script src="scripts/services/alert-condition-renderer.js?v=1.0.0" defer></script> <!-- Alert condition renderer -->
     <!-- [49] Load Order: 49 | Strategy: defer -->
-    <script src="scripts/services/rich-text-editor-service.js?v=1.0.0" defer></script> <!-- Rich text editor service -->
+    <script src="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.min.js" defer></script> <!-- Quill.js - Rich Text Editor Library -->
     <!-- [50] Load Order: 50 | Strategy: defer -->
-    <script src="scripts/services/pending-actions-cache-service.js?v=1.0.0" defer></script> <!-- Pending actions cache service (dismissed items management) -->
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js" defer></script> <!-- DOMPurify - HTML Sanitizer -->
     <!-- [51] Load Order: 51 | Strategy: defer -->
-    <script src="scripts/services/execution-clustering-service.js?v=1.0.0" defer></script> <!-- Execution clustering service (trade creation clusters) -->
+    <script src="scripts/services/rich-text-editor-service.js?v=1.0.0" defer></script> <!-- Rich text editor service -->
     <!-- [52] Load Order: 52 | Strategy: defer -->
-    <script src="scripts/services/execution-assignment-service.js?v=1.0.0" defer></script> <!-- Execution assignment service (highlights/suggestions) -->
+    <script src="scripts/services/pending-actions-cache-service.js?v=1.0.0" defer></script> <!-- Pending actions cache service (dismissed items management) -->
     <!-- [53] Load Order: 53 | Strategy: defer -->
-    <script src="scripts/services/trade-plan-assignment-service.js?v=1.0.0" defer></script> <!-- Trade plan assignment service (assignments and creations) -->
+    <script src="scripts/services/execution-clustering-service.js?v=1.0.0" defer></script> <!-- Execution clustering service (trade creation clusters) -->
     <!-- [54] Load Order: 54 | Strategy: defer -->
-    <script src="scripts/services/execution-cluster-helpers.js?v=1.0.0" defer></script> <!-- Execution cluster helper functions (rendering, actions, calculations) -->
+    <script src="scripts/services/execution-assignment-service.js?v=1.0.0" defer></script> <!-- Execution assignment service (highlights/suggestions) -->
     <!-- [55] Load Order: 55 | Strategy: defer -->
+    <script src="scripts/services/trade-plan-assignment-service.js?v=1.0.0" defer></script> <!-- Trade plan assignment service (assignments and creations) -->
+    <!-- [56] Load Order: 56 | Strategy: defer -->
+    <script src="scripts/services/execution-cluster-helpers.js?v=1.0.0" defer></script> <!-- Execution cluster helper functions (rendering, actions, calculations) -->
+    <!-- [57] Load Order: 57 | Strategy: defer -->
     <script src="scripts/services/modal-helper-service.js?v=1.0.0" defer></script> <!-- Modal helper service - provides showModalSafe function globally -->
 
     <!-- =============================================================== -->
-    <!-- ===== PACKAGE 3/7: UI ADVANCED PACKAGE ===== -->
+    <!-- ===== PACKAGE 4/7: UI ADVANCED PACKAGE ===== -->
     <!-- =============================================================== -->
     <!-- Load Order: 3 | Description: Advanced user interface -->
     <!-- Dependencies: base, services, modules -->
     <!-- Critical: NO | Version: 1.5.0 -->
 
-    <!-- [56] Load Order: 56 | Strategy: defer -->
-    <script src="scripts/table-mappings.js?v=1.0.0" defer></script> <!-- Table mappings (optional - only for pages with tables) -->
-    <!-- [57] Load Order: 57 | Strategy: defer -->
-    <script src="scripts/tables.js?v=1.0.0" defer></script> <!-- Table system -->
-    <!-- [58] Load Order: 58 | Strategy: defer -->
-    <script src="scripts/table-data-registry.js?v=1.0.0" defer></script> <!-- Table data registry -->
-    <!-- [59] Load Order: 59 | Strategy: defer -->
-    <script src="scripts/pagination-system.js?v=1.0.0" defer></script> <!-- Pagination system -->
     <!-- [60] Load Order: 60 | Strategy: defer -->
+    <script src="scripts/table-mappings.js?v=1.0.0" defer></script> <!-- Table mappings (optional - only for pages with tables) -->
+    <!-- [59] Load Order: 59 | Strategy: defer -->
+    <script src="scripts/tables.js?v=1.0.0" defer></script> <!-- Table system -->
+    <!-- [60] Load Order: 60 | Strategy: defer -->
+    <script src="scripts/table-data-registry.js?v=1.0.0" defer></script> <!-- Table data registry -->
+    <!-- [61] Load Order: 61 | Strategy: defer -->
+    <script src="scripts/pagination-system.js?v=1.0.0" defer></script> <!-- Pagination system -->
+    <!-- [62] Load Order: 62 | Strategy: defer -->
     <script src="scripts/modules/actions-menu-system.js?v=1.0.0" defer></script> <!-- Actions menu system -->
 
     <!-- =============================================================== -->
@@ -280,11 +292,11 @@
     <!-- Dependencies: base, services -->
     <!-- Critical: NO | Version: 1.5.0 -->
 
-    <!-- [61] Load Order: 61 | Strategy: defer -->
-    <script src="scripts/date-utils.js?v=1.0.0" defer></script> <!-- Date utilities -->
-    <!-- [62] Load Order: 62 | Strategy: defer -->
-    <script src="scripts/data-utils.js?v=1.0.0" defer></script> <!-- General data utilities -->
     <!-- [63] Load Order: 63 | Strategy: defer -->
+    <script src="scripts/date-utils.js?v=1.0.0" defer></script> <!-- Date utilities -->
+    <!-- [64] Load Order: 64 | Strategy: defer -->
+    <script src="scripts/data-utils.js?v=1.0.0" defer></script> <!-- General data utilities -->
+    <!-- [65] Load Order: 65 | Strategy: defer -->
     <script src="scripts/unified-table-system.js?v=1.0.0" defer></script> <!-- Unified central table system -->
 
     <!-- =============================================================== -->
@@ -294,37 +306,37 @@
     <!-- Dependencies: base, services -->
     <!-- Critical: NO | Version: 1.5.0 -->
 
-    <!-- [64] Load Order: 64 | Strategy: defer -->
-    <script src="scripts/preferences-cache.js?v=1.0.0" defer></script> <!-- Preferences cache management layer -->
-    <!-- [65] Load Order: 65 | Strategy: defer -->
-    <script src="scripts/services/preferences-v4.js?v=1.0.0" defer></script> <!-- Preferences V4 SDK (group-first) -->
     <!-- [66] Load Order: 66 | Strategy: defer -->
-    <script src="scripts/preferences-events.js?v=1.0.0" defer></script> <!-- Preferences event system -->
+    <script src="scripts/preferences-cache.js?v=1.0.0" defer></script> <!-- Preferences cache management layer -->
     <!-- [67] Load Order: 67 | Strategy: defer -->
-    <script src="scripts/preferences-core-new.js?v=1.0.0" defer></script> <!-- Preferences core (without colors) -->
+    <script src="scripts/services/preferences-v4.js?v=1.0.0" defer></script> <!-- Preferences V4 SDK (group-first) -->
     <!-- [68] Load Order: 68 | Strategy: defer -->
-    <script src="scripts/preferences-ui-layer.js?v=1.0.0" defer></script> <!-- Preferences UI layer -->
+    <script src="scripts/preferences-events.js?v=1.0.0" defer></script> <!-- Preferences event system -->
     <!-- [69] Load Order: 69 | Strategy: defer -->
-    <script src="scripts/preferences-colors.js?v=1.0.0" defer></script> <!-- Color system (60+ preferences) -->
+    <script src="scripts/preferences-core-new.js?v=1.0.0" defer></script> <!-- Preferences core (without colors) -->
     <!-- [70] Load Order: 70 | Strategy: defer -->
-    <script src="scripts/preferences-manager.js?v=1.0.0" defer></script> <!-- Preferences manager (central) -->
+    <script src="scripts/preferences-ui-layer.js?v=1.0.0" defer></script> <!-- Preferences UI layer -->
     <!-- [71] Load Order: 71 | Strategy: defer -->
-    <script src="scripts/preferences-profiles.js?v=1.0.0" defer></script> <!-- Profile management -->
+    <script src="scripts/preferences-colors.js?v=1.0.0" defer></script> <!-- Color system (60+ preferences) -->
     <!-- [72] Load Order: 72 | Strategy: defer -->
-    <script src="scripts/preferences-lazy-loader.js?v=1.0.0" defer></script> <!-- lazy loading system -->
+    <script src="scripts/preferences-manager.js?v=1.0.0" defer></script> <!-- Preferences manager (central) -->
     <!-- [73] Load Order: 73 | Strategy: defer -->
-    <script src="scripts/preferences-validation.js?v=1.0.0" defer></script> <!-- validation system -->
+    <script src="scripts/preferences-profiles.js?v=1.0.0" defer></script> <!-- Profile management -->
     <!-- [74] Load Order: 74 | Strategy: defer -->
-    <script src="scripts/preferences-ui-v4.js?v=1.0.0" defer></script> <!-- User interface V4 (Group-First) -->
+    <script src="scripts/preferences-lazy-loader.js?v=1.0.0" defer></script> <!-- lazy loading system -->
     <!-- [75] Load Order: 75 | Strategy: defer -->
-    <script src="scripts/preferences-ui.js?v=1.0.0" defer></script> <!-- User interface -->
+    <script src="scripts/preferences-validation.js?v=1.0.0" defer></script> <!-- validation system -->
     <!-- [76] Load Order: 76 | Strategy: defer -->
-    <script src="scripts/preferences-page.js?v=1.0.0" defer></script> <!-- Preferences page specific functions -->
+    <script src="scripts/preferences-ui-v4.js?v=1.0.0" defer></script> <!-- User interface V4 (Group-First) -->
     <!-- [77] Load Order: 77 | Strategy: defer -->
-    <script src="scripts/preferences-debug-monitor.js?v=1.0.0" defer></script> <!-- Monitoring and debugging code for preferences issues -->
+    <script src="scripts/preferences-ui.js?v=1.0.0" defer></script> <!-- User interface -->
     <!-- [78] Load Order: 78 | Strategy: defer -->
-    <script src="scripts/preferences-group-manager.js?v=1.0.0" defer></script> <!-- Preferences group manager -->
+    <script src="scripts/preferences-page.js?v=1.0.0" defer></script> <!-- Preferences page specific functions -->
     <!-- [79] Load Order: 79 | Strategy: defer -->
+    <script src="scripts/preferences-debug-monitor.js?v=1.0.0" defer></script> <!-- Monitoring and debugging code for preferences issues -->
+    <!-- [80] Load Order: 80 | Strategy: defer -->
+    <script src="scripts/preferences-group-manager.js?v=1.0.0" defer></script> <!-- Preferences group manager -->
+    <!-- [81] Load Order: 81 | Strategy: defer -->
     <script src="scripts/testing/automated/preferences-browser-test.js?v=1.0.0" defer></script> <!-- Automated browser test suite for preferences -->
 
     <!-- =============================================================== -->
@@ -334,19 +346,19 @@
     <!-- Dependencies: base, validation -->
     <!-- Critical: NO | Version: 1.5.0 -->
 
-    <!-- [80] Load Order: 80 | Strategy: defer -->
-    <script src="scripts/conditions/conditions-translations.js?v=1.0.0" defer></script> <!-- Condition translations -->
-    <!-- [81] Load Order: 81 | Strategy: defer -->
-    <script src="scripts/conditions/conditions-validator.js?v=1.0.0" defer></script> <!-- Condition validator -->
     <!-- [82] Load Order: 82 | Strategy: defer -->
-    <script src="scripts/conditions/conditions-form-generator.js?v=1.0.0" defer></script> <!-- Condition form generator -->
+    <script src="scripts/conditions/conditions-translations.js?v=1.0.0" defer></script> <!-- Condition translations -->
     <!-- [83] Load Order: 83 | Strategy: defer -->
-    <script src="scripts/conditions/conditions-crud-manager.js?v=1.0.0" defer></script> <!-- Condition CRUD manager -->
+    <script src="scripts/conditions/conditions-validator.js?v=1.0.0" defer></script> <!-- Condition validator -->
     <!-- [84] Load Order: 84 | Strategy: defer -->
-    <script src="scripts/conditions/conditions-initializer.js?v=1.0.0" defer></script> <!-- Condition initializer -->
+    <script src="scripts/conditions/conditions-form-generator.js?v=1.0.0" defer></script> <!-- Condition form generator -->
     <!-- [85] Load Order: 85 | Strategy: defer -->
-    <script src="scripts/conditions/conditions-ui-manager.js?v=1.0.0" defer></script> <!-- Condition UI manager -->
+    <script src="scripts/conditions/conditions-crud-manager.js?v=1.0.0" defer></script> <!-- Condition CRUD manager -->
     <!-- [86] Load Order: 86 | Strategy: defer -->
+    <script src="scripts/conditions/conditions-initializer.js?v=1.0.0" defer></script> <!-- Condition initializer -->
+    <!-- [87] Load Order: 87 | Strategy: defer -->
+    <script src="scripts/conditions/conditions-ui-manager.js?v=1.0.0" defer></script> <!-- Condition UI manager -->
+    <!-- [88] Load Order: 88 | Strategy: defer -->
     <script src="scripts/conditions/conditions-modal-controller.js?v=1.0.0" defer></script> <!-- Condition modal controller -->
 
     <!-- =============================================================== -->
@@ -356,23 +368,23 @@
     <!-- Dependencies: base -->
     <!-- Critical: NO | Version: 1.5.0 -->
 
-    <!-- [87] Load Order: 87 | Strategy: defer -->
+    <!-- [89] Load Order: 89 | Strategy: defer -->
     <script src="scripts/init-system/package-manifest.js?v=1.0.0" defer></script> <!-- Package manifest -->
-    <!-- [88] Load Order: 88 | Strategy: defer -->
+    <!-- [90] Load Order: 90 | Strategy: defer -->
     <script src="scripts/page-initialization-configs.js?v=1.0.0" defer></script> <!-- Page initialization configurations -->
-    <!-- [89] Load Order: 89 | Strategy: defer -->
-    <script src="scripts/init-system-check.js?v=1.0.0" defer></script> <!-- Initialization system check -->
-    <!-- [90] Load Order: 90 | Strategy: defer -->
-    <script src="scripts/monitoring-functions.js?v=1.0.0" defer></script> <!-- Page monitoring functions -->
     <!-- [91] Load Order: 91 | Strategy: defer -->
-    <script src="scripts/modules/core-systems.js?v=1.0.0" defer></script> <!-- Unified initialization system - single entry point (required for all pages) -->
+    <script src="scripts/init-system-check.js?v=1.0.0" defer></script> <!-- Initialization system check -->
     <!-- [92] Load Order: 92 | Strategy: defer -->
-    <script src="scripts/init-system/all-pages-monitoring-test.js?v=1.0.0" defer></script> <!-- Automatic check of all pages -->
+    <script src="scripts/monitoring-functions.js?v=1.0.0" defer></script> <!-- Page monitoring functions -->
     <!-- [93] Load Order: 93 | Strategy: defer -->
-    <script src="scripts/init-system/pages-standardization-plan.js?v=1.0.0" defer></script> <!-- Standardization plan for all pages -->
+    <script src="scripts/modules/core-systems.js?v=1.0.0" defer></script> <!-- Unified initialization system - single entry point (required for all pages) -->
     <!-- [94] Load Order: 94 | Strategy: defer -->
-    <script src="scripts/init-system/dependency-analyzer.js?v=1.0.0" defer></script> <!-- Dependencies analysis in package manifest -->
+    <script src="scripts/init-system/all-pages-monitoring-test.js?v=1.0.0" defer></script> <!-- Automatic check of all pages -->
     <!-- [95] Load Order: 95 | Strategy: defer -->
+    <script src="scripts/init-system/pages-standardization-plan.js?v=1.0.0" defer></script> <!-- Standardization plan for all pages -->
+    <!-- [96] Load Order: 96 | Strategy: defer -->
+    <script src="scripts/init-system/dependency-analyzer.js?v=1.0.0" defer></script> <!-- Dependencies analysis in package manifest -->
+    <!-- [97] Load Order: 97 | Strategy: defer -->
     <script src="scripts/init-system/load-order-validator.js?v=1.0.0" defer></script> <!-- Actual loading order check in pages -->
 
     <!-- =============================================================== -->
@@ -390,97 +402,4 @@
 
 
 </body>
-</html><script src="scripts/page-initialization-configs.js?v=1.0.0" defer></script> <!-- Page initialization configurations -->
-    <!-- [89] Load Order: 89 | Strategy: defer -->
-    <script src="scripts/init-system-check.js?v=1.0.0" defer></script> <!-- Initialization system check -->
-    <!-- [90] Load Order: 90 | Strategy: defer -->
-    <script src="scripts/monitoring-functions.js?v=1.0.0" defer></script> <!-- Page monitoring functions -->
-    <!-- [91] Load Order: 91 | Strategy: defer -->
-    <script src="scripts/modules/core-systems.js?v=1.0.0" defer></script> <!-- Unified initialization system - single entry point (required for all pages) -->
-    <!-- [92] Load Order: 92 | Strategy: defer -->
-    <script src="scripts/init-system/all-pages-monitoring-test.js?v=1.0.0" defer></script> <!-- Automatic check of all pages -->
-    <!-- [93] Load Order: 93 | Strategy: defer -->
-    <script src="scripts/init-system/pages-standardization-plan.js?v=1.0.0" defer></script> <!-- Standardization plan for all pages -->
-    <!-- [94] Load Order: 94 | Strategy: defer -->
-    <script src="scripts/init-system/dependency-analyzer.js?v=1.0.0" defer></script> <!-- Dependencies analysis in package manifest -->
-    <!-- [95] Load Order: 95 | Strategy: defer -->
-    <script src="scripts/init-system/load-order-validator.js?v=1.0.0" defer></script> <!-- Actual loading order check in pages -->
-
-    <!-- =============================================================== -->
-    <!-- ===== PAGE-SPECIFIC SCRIPTS ===== -->
-    <!-- =============================================================== -->
-
-    <!-- [96] Page-specific: research.js | Strategy: defer -->
-    <script src="scripts/research.js?v=1.0.0" defer></script> <!-- Main page script -->
-
-    <!-- =============================================================== -->
-    <!-- ===== FINAL SUMMARY ===== -->
-    <!-- =============================================================== -->
-    <!-- 📊 Total Scripts Processed: 96 | Unique Scripts Loaded: 96 -->
-    <!-- 🔧 For maintenance: Use generate-script-loading-code.js -->
-
-
-</body>
-</html><script src="scripts/page-initialization-configs.js?v=1.0.0" defer></script> <!-- Page initialization configurations -->
-    <!-- [89] Load Order: 89 | Strategy: defer -->
-    <script src="scripts/init-system-check.js?v=1.0.0" defer></script> <!-- Initialization system check -->
-    <!-- [90] Load Order: 90 | Strategy: defer -->
-    <script src="scripts/monitoring-functions.js?v=1.0.0" defer></script> <!-- Page monitoring functions -->
-    <!-- [91] Load Order: 91 | Strategy: defer -->
-    <script src="scripts/modules/core-systems.js?v=1.0.0" defer></script> <!-- Unified initialization system - single entry point (required for all pages) -->
-    <!-- [92] Load Order: 92 | Strategy: defer -->
-    <script src="scripts/init-system/all-pages-monitoring-test.js?v=1.0.0" defer></script> <!-- Automatic check of all pages -->
-    <!-- [93] Load Order: 93 | Strategy: defer -->
-    <script src="scripts/init-system/pages-standardization-plan.js?v=1.0.0" defer></script> <!-- Standardization plan for all pages -->
-    <!-- [94] Load Order: 94 | Strategy: defer -->
-    <script src="scripts/init-system/dependency-analyzer.js?v=1.0.0" defer></script> <!-- Dependencies analysis in package manifest -->
-    <!-- [95] Load Order: 95 | Strategy: defer -->
-    <script src="scripts/init-system/load-order-validator.js?v=1.0.0" defer></script> <!-- Actual loading order check in pages -->
-
-    <!-- =============================================================== -->
-    <!-- ===== PAGE-SPECIFIC SCRIPTS ===== -->
-    <!-- =============================================================== -->
-
-    <!-- [96] Page-specific: research.js | Strategy: defer -->
-    <script src="scripts/research.js?v=1.0.0" defer></script> <!-- Main page script -->
-
-    <!-- =============================================================== -->
-    <!-- ===== FINAL SUMMARY ===== -->
-    <!-- =============================================================== -->
-    <!-- 📊 Total Scripts Processed: 96 | Unique Scripts Loaded: 96 -->
-    <!-- 🔧 For maintenance: Use generate-script-loading-code.js -->
-
-
-</body>
-</html><script src="scripts/page-initialization-configs.js?v=1.0.0" defer></script> <!-- Page initialization configurations -->
-    <!-- [88] Load Order: 88 | Strategy: defer -->
-    <script src="scripts/init-system-check.js?v=1.0.0" defer></script> <!-- Initialization system check -->
-    <!-- [89] Load Order: 89 | Strategy: defer -->
-    <script src="scripts/monitoring-functions.js?v=1.0.0" defer></script> <!-- Page monitoring functions -->
-    <!-- [90] Load Order: 90 | Strategy: defer -->
-    <script src="scripts/modules/core-systems.js?v=1.0.0" defer></script> <!-- Unified initialization system - single entry point (required for all pages) -->
-    <!-- [91] Load Order: 91 | Strategy: defer -->
-    <script src="scripts/init-system/all-pages-monitoring-test.js?v=1.0.0" defer></script> <!-- Automatic check of all pages -->
-    <!-- [92] Load Order: 92 | Strategy: defer -->
-    <script src="scripts/init-system/pages-standardization-plan.js?v=1.0.0" defer></script> <!-- Standardization plan for all pages -->
-    <!-- [93] Load Order: 93 | Strategy: defer -->
-    <script src="scripts/init-system/dependency-analyzer.js?v=1.0.0" defer></script> <!-- Dependencies analysis in package manifest -->
-    <!-- [94] Load Order: 94 | Strategy: defer -->
-    <script src="scripts/init-system/load-order-validator.js?v=1.0.0" defer></script> <!-- Actual loading order check in pages -->
-
-    <!-- =============================================================== -->
-    <!-- ===== PAGE-SPECIFIC SCRIPTS ===== -->
-    <!-- =============================================================== -->
-
-    <!-- [95] Page-specific: research.js | Strategy: defer -->
-    <script src="scripts/research.js?v=1.0.0" defer></script> <!-- Main page script -->
-
-    <!-- =============================================================== -->
-    <!-- ===== FINAL SUMMARY ===== -->
-    <!-- =============================================================== -->
-    <!-- 📊 Total Scripts Processed: 95 | Unique Scripts Loaded: 95 -->
-    <!-- 🔧 For maintenance: Use generate-script-loading-code.js -->
-
-
-    <!-- 🔧 For maintenance: Use generate-script-loading-code.js --></body>
 </html>

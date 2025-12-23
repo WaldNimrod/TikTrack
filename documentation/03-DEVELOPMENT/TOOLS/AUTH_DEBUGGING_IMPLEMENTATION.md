@@ -8,7 +8,8 @@
 ## 1) ארכיטקטורת אימות ובידוד נתונים
 
 - **Token בלבד (Bearer)**: ללא cookies. `api-fetch-wrapper.js` מזריק Authorization אוטומטית.
-- **UnifiedCacheManager**: authToken/currentUser נשמרים עם `includeUserId:false` בלבד; פינוי דרך `forceLogoutAndPrompt`.
+- **UnifiedCacheManager עם SessionStorageLayer**: authToken/currentUser נשמרים ב-SessionStorageLayer (שכבה 5) עם `includeUserId:false` בלבד; פינוי דרך `forceLogoutAndPrompt`.
+- **Bootstrap Mechanism**: `bootstrapAuthFromSessionStorage()` רץ לפני UnifiedCacheManager ומסתנכרן אוטומטית ל-SessionStorageLayer אחרי אתחול.
 - **Login Modal**: מסלול יחיד. כל עמוד מוגן מפעיל `auth-guard.js`; ב-401/חוסר טוקן מוצג המודל.
 - **Z-Index/Stack**: רישום המודל ב־`ModalNavigationService` והפעלת `ModalZIndexManager.forceUpdate(modalElement)` כדי להבטיח שהוא מעל ה-backdrop.
 - **Preferences ברירת מחדל**: `/api/preferences/default` מחזיר צבעי לוגו (#26baac, #fc5a06). טעינה רכה (soft-fail) כשאין משתמש.
@@ -40,7 +41,9 @@
 3. **Modal & Z-Index**  
    - לפתוח עמוד מוגן ללא טוקן → modal מוצג, מעל backdrop, אין "Modal not found in stack".
 4. **Auth/Cache**  
-   - אחרי login: `UnifiedCacheManager.get('authToken', {includeUserId:false})` קיים; בטאב נוסף אין 401 מוקדמים ל-tickers/watch-list/preferences.
+   - אחרי login: `UnifiedCacheManager.get('authToken', {layer: 'sessionStorage', includeUserId:false})` קיים; בטאב נוסף אין 401 מוקדמים ל-tickers/watch-list/preferences.
+   - Bootstrap: `sessionStorage.getItem('dev_authToken')` זמין לפני UnifiedCacheManager מאותחל.
+   - Sync: אחרי אתחול, auth tokens מסתנכרנים ל-SessionStorageLayer אוטומטית.
 5. **Preferences**  
    - עם טוקן: `/api/preferences/user` ללא 401.  
    - ללא טוקן: soft-fail, לוג debug, צבעי ברירת מחדל זמינים.
@@ -74,7 +77,7 @@ await window.TikTrackAuth.showLoginModal(); // modal מוצג
 ## 6) הנחיות יישום לממשקים חדשים
 
 - כל fetch עובר דרך ה-wrapper הגלובלי; אין `credentials: 'include'`.
-- auth נשמר ונמחק רק ב-`UnifiedCacheManager` (includeUserId:false); אין שימוש ב-localStorage ל-auth.
+- auth נשמר ונמחק ב-SessionStorageLayer דרך `UnifiedCacheManager` (layer: 'sessionStorage', includeUserId:false); bootstrap keys (`dev_authToken`, `dev_currentUser`) משמשים רק לפני אתחול.
 - כניסה רק דרך modal; אין דפי login.
 - 401/403 → לוג warn/debug ו־soft-fail; אין קריסה של העמוד.
 - עמודים עתירי trade-plans → לצמצם מקביליות, להגדיל דיליי, להפעיל CacheTTLGuard/RateLimitTracker.

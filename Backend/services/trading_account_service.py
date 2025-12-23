@@ -37,13 +37,20 @@ class TradingAccountService:
         return query.first()
     
     @staticmethod
-    def get_open_trading_accounts(db: Session, user_id: int) -> List[TradingAccount]:
+    def get_open_trading_accounts(db: Session, user_id: Optional[int] = None) -> List[TradingAccount]:
         """Get all open trading_accounts for a specific user (user_id is required for data isolation)"""
+        if user_id is None:
+            logger.warning("get_open_trading_accounts called without user_id - returning empty list")
+            return []
         query = db.query(TradingAccount).filter(
             TradingAccount.status == 'open',
             TradingAccount.user_id == user_id
         )
-        return query.all()
+        accounts = query.all()
+        logger.info(f"🔍 [TradingAccountService.get_open_trading_accounts] Found {len(accounts)} open accounts for user_id={user_id}")
+        if len(accounts) > 0:
+            logger.info(f"🔍 [TradingAccountService.get_open_trading_accounts] Account IDs: {[acc.id for acc in accounts]}")
+        return accounts
     
     @staticmethod
     def create(db: Session, data: Dict[str, Any], user_id: Optional[int] = None) -> TradingAccount:

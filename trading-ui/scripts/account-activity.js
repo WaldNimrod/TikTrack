@@ -265,9 +265,39 @@ async function populateAccountSelector(autoSelectDefault = false) {
         let defaultAccountId = null;
 
         // Get default account from PreferencesCore (single source of truth)
-        // NOTE: Removed fallback to window.getPreference to prevent recursion
-        // window.getPreference just calls PreferencesCore.getPreference again, causing recursion
-        if (window.PreferencesCore && typeof window.PreferencesCore.getPreference === 'function') {
+        // NOTE: Check for recursion flag to prevent infinite loops
+        // If preferences are currently loading, use getCurrentPreference instead
+        if (window.__GET_PREFERENCE_IN_PROGRESS__) {
+          // Preferences are loading - use cached value or skip
+          if (window.getCurrentPreference && typeof window.getCurrentPreference === 'function') {
+            try {
+              const prefValue = await window.getCurrentPreference('default_trading_account', { fallbackValue: null });
+              if (prefValue) {
+                // Handle different value types
+                let accountId = null;
+                if (typeof prefValue === 'object' && prefValue !== null) {
+                  accountId = prefValue.id || prefValue.value || null;
+                } else {
+                  const parsed = parseInt(prefValue);
+                  if (!isNaN(parsed)) {
+                    accountId = parsed;
+                  } else {
+                    const account = window.trading_accountsData?.find(acc => acc.name === prefValue);
+                    if (account) {
+                      accountId = account.id;
+                    }
+                  }
+                }
+                if (accountId) {
+                  defaultAccountId = accountId;
+                  window.Logger.debug(`✅ Got default account from cached preferences: ${defaultAccountId}`, { page: 'trading_accounts' });
+                }
+              }
+            } catch (e) {
+              window.Logger.debug('⚠️ Error getting default account from cached preferences:', e, { page: 'trading_accounts' });
+            }
+          }
+        } else if (window.PreferencesCore && typeof window.PreferencesCore.getPreference === 'function') {
           try {
             const prefValue = await window.PreferencesCore.getPreference('default_trading_account');
             if (prefValue) {

@@ -667,11 +667,75 @@ def test_page_console(driver, page_info, retry_count: int = 0):
     
     return result
 
+def test_page_crud(driver, page):
+    """Run comprehensive CRUD tests on a page"""
+    try:
+        print(f"  🧪 Running CRUD tests...")
+
+        # Load comprehensive test script
+        script_path = Path(__file__).parent.parent / "trading-ui" / "scripts" / "comprehensive-crud-test-runner.js"
+        with open(script_path, 'r', encoding='utf-8') as f:
+            test_script = f.read()
+
+        # Inject the script
+        driver.execute_script(test_script)
+
+        # Extract page name from URL (remove .html and leading slash)
+        page_name = page['url'].strip('/').replace('.html', '') or 'index'
+
+        # Run the individual tests
+        crud_result = driver.execute_async_script(f"""
+            var callback = arguments[arguments.length - 1];
+            var pageName = '{page_name}';
+
+            try {{
+                // Run loading order check
+                checkPageLoadingOrder(pageName).then(function(loadingResult) {{
+                    // Run CRUD test
+                    testPageCRUD(pageName).then(function(crudTestResult) {{
+                        callback({{
+                            page: pageName,
+                            loadingOrder: loadingResult,
+                            crud: crudTestResult
+                        }});
+                    }}).catch(function(crudError) {{
+                        callback({{
+                            page: pageName,
+                            loadingOrder: loadingResult,
+                            crud: {{ page: pageName, crud: 'ERROR', error: crudError.message }}
+                        }});
+                    }});
+                }}).catch(function(loadingError) {{
+                    callback({{
+                        page: pageName,
+                        loadingOrder: {{ page: pageName, loadingOrder: 'ERROR', error: loadingError.message }},
+                        crud: {{ page: pageName, crud: 'ERROR', error: 'Loading failed' }}
+                    }});
+                }});
+            }} catch (globalError) {{
+                callback({{
+                    page: pageName,
+                    loadingOrder: {{ page: pageName, loadingOrder: 'ERROR', error: globalError.message }},
+                    crud: {{ page: pageName, crud: 'ERROR', error: globalError.message }}
+                }});
+            }}
+        """)
+
+        return crud_result
+
+    except Exception as e:
+        return {
+            'page': page['url'],
+            'loadingOrder': { 'loadingOrder': 'ERROR', 'error': str(e) },
+            'crud': { 'crud': 'ERROR', 'error': str(e) }
+        }
+
 def main():
     """Main test function"""
     parser = argparse.ArgumentParser(description='Test console errors on pages')
     parser.add_argument('--page', type=str, help='Test specific page URL (e.g., /watch-list.html)')
     parser.add_argument('--all', action='store_true', help='Test all pages (default without flag = quick 3-page smoke)')
+    parser.add_argument('--comprehensive', action='store_true', help='Run comprehensive CRUD tests in addition to console errors')
     args = parser.parse_args()
     
     # Filter pages if --page is specified, or use quick test pages
@@ -731,6 +795,12 @@ def main():
                     print(f"  📊 Rate limit stats: {stats['rate_limit_hits']} hits, delay: {stats['adaptive_delay']:.2f}s")
             
             result = test_page_console(driver, page)
+
+            # Run comprehensive CRUD tests if requested
+            if args.comprehensive:
+                crud_result = test_page_crud(driver, page)
+                result['crud_tests'] = crud_result
+
             results.append(result)
             
             status_icon = "✅" if result["success"] else "❌"

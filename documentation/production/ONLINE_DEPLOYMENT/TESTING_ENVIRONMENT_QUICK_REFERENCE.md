@@ -66,17 +66,20 @@ tail -f production/Backend/server_output.log
 ## 📋 Checklist מהיר
 
 ### לפני התחלה
+
 - [ ] גיבוי database
 - [ ] גיבוי config
 - [ ] בדיקת PostgreSQL
 
 ### ביצוע
+
 - [ ] יצירת `TikTrack-db-testing`
 - [ ] העתקת data
 - [ ] עדכון `settings.py`
 - [ ] עדכון `start_server.sh`
 
 ### אחרי ביצוע
+
 - [ ] בדיקת config
 - [ ] בדיקת database
 - [ ] בדיקת server startup
@@ -104,6 +107,7 @@ EOF
 ```
 
 **תוצאה צפויה:**
+
 ```
 Environment: testing
 IS_PRODUCTION: False
@@ -192,6 +196,7 @@ python3 -c "from config.settings import IS_TESTING; print(IS_TESTING)"
 **קובץ:** `production/Backend/config/settings.py`
 
 **שינויים עיקריים:**
+
 - הוספת `IS_TESTING = ENVIRONMENT == "testing"`
 - עדכון `POSTGRES_DB` default ל-`TikTrack-db-testing` כאשר `IS_TESTING`
 - עדכון `PORT` ל-5001 גם עבור testing
@@ -264,11 +269,13 @@ kill <PID>
 ## 🔗 קישורים מהירים
 
 ### Documentation
+
 - `TESTING_ENVIRONMENT_WORK_INSTRUCTIONS.md` - הוראות מפורטות
 - `HANDOFF_README.md` - README להעברה
 - `ENVIRONMENT_NAMING.md` - שמות סביבות
 
 ### קבצים
+
 - `production/Backend/config/settings.py` - Config
 - `start_server.sh` - סקריפט הפעלה
 - `production/Backend/server_output.log` - לוגים

@@ -64,13 +64,10 @@ class TestRunner {
             // Test 12: CLI
             await this.testCLI();
             
-            // Test 13: Smart HTML Pages
-            await this.testSmartHTMLPages();
-            
-            // Test 14: System Management Integration
+            // Test 13: System Management Integration
             await this.testSystemManagementIntegration();
             
-            // Test 15: Backward Compatibility
+            // Test 14: Backward Compatibility
             await this.testBackwardCompatibility();
             
             this.results.endTime = Date.now();
@@ -396,30 +393,6 @@ class TestRunner {
         }
     }
 
-    /**
-     * Test Smart HTML Pages
-     * בדיקת Smart HTML Pages
-     */
-    async testSmartHTMLPages() {
-        const smartPages = [
-            'preferences-smart.html',
-            'trades-smart.html', 
-            'alerts-smart.html',
-            'index-smart.html',
-            'crud-testing-dashboard-smart.html'
-        ];
-
-        for (const page of smartPages) {
-            try {
-                // Test if page exists by trying to fetch it
-                const response = await fetch(page);
-                const exists = response.ok;
-                this.addResult(`Smart Page: ${page}`, exists, exists ? 'Available' : 'Not found');
-            } catch (error) {
-                this.addResult(`Smart Page: ${page}`, false, `Error: ${error.message}`);
-            }
-        }
-    }
 
     /**
      * Test System Management Integration

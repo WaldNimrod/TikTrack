@@ -1233,8 +1233,9 @@ class HeaderSystem {
                         <span class="tiktrack-dropdown-arrow">▼</span>
                       </a>
                       <ul class="tiktrack-dropdown-menu">
-                        <li><a class="tiktrack-dropdown-item" href="/watch-list">רשימות צפייה</a></li>
-                        <li><a class="tiktrack-dropdown-item" href="/trading-journal">📓 יומן מסחר</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/watch_lists">רשימות צפייה</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/ticker_dashboard">📊 דשבורד טיקר</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/trading_journal">📓 יומן מסחר</a></li>
                       </ul>
                     </li>
                     <li class="tiktrack-nav-item dropdown">
@@ -1243,7 +1244,7 @@ class HeaderSystem {
                         <span class="tiktrack-dropdown-arrow">▼</span>
                       </a>
                       <ul class="tiktrack-dropdown-menu">
-                        <li><a class="tiktrack-dropdown-item" href="/ai-analysis">אנליזת AI</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/ai_analysis">אנליזת AI</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/strategy-analysis">📊 ניתוח אסטרטגיות</a></li>
                         <li class="separator"></li>
                         <li><a class="tiktrack-dropdown-item" href="/trade-history">📈 היסטוריית טרייד</a></li>
@@ -1270,10 +1271,10 @@ class HeaderSystem {
                         <span class="tiktrack-dropdown-arrow">▼</span>
                       </a>
                       <ul class="tiktrack-dropdown-menu">
-                        <li><a class="tiktrack-dropdown-item" href="/user-profile.html">👤 פרופיל משתמש</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/user_profile">👤 פרופיל משתמש</a></li>
                         <li class="separator"></li>
                         <li><a class="tiktrack-dropdown-item" href="/data_import">ייבוא נתונים</a></li>
-                        <li><a class="tiktrack-dropdown-item" href="/tag-management">ניהול תגיות</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/tag_management">ניהול תגיות</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/preferences">העדפות</a></li>
                         <li class="separator"></li>
                         <li><a class="tiktrack-dropdown-item" href="/db_display">בסיס נתונים</a></li>
@@ -1286,18 +1287,20 @@ class HeaderSystem {
                         <span class="tiktrack-dropdown-arrow">▼</span>
                       </a>
                       <ul class="tiktrack-dropdown-menu">
+                        <li><a class="tiktrack-dropdown-item" href="/dev_tools">🛠️ כלי פיתוח ראשי</a></li>
+                        <li class="separator"></li>
                         <li><a class="tiktrack-dropdown-item" href="/system-management">🔧 ניהול מערכת</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/server-monitor">🖥️ ניטור שרת</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/background-tasks">⚙️ ניהול משימות רקע</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/notifications-center">🔔 מרכז התראות</a></li>
-                        <li><a class="tiktrack-dropdown-item" href="/external-data-dashboard">📊 דשבורד נתונים חיצוניים</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/external_data_dashboard">📊 דשבורד נתונים חיצוניים</a></li>
                         <li class="separator"></li>
                         <li><a class="tiktrack-dropdown-item" href="/code-quality-dashboard">📊 איכות קוד ולינטר</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/cache-management">💾 ניהול מטמון</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/init-system-management">🚀 ניהול מערכת אתחול</a></li>
                         <li class="separator"></li>
                         <li><a class="tiktrack-dropdown-item" href="/cache-test">💾 בדיקת Cache</a></li>
-                        <li><a class="tiktrack-dropdown-item" href="/crud-testing-dashboard">🧪 דשבורד בדיקות CRUD</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/crud_testing_dashboard">🧪 דשבורד בדיקות CRUD</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/conditions-test">🧩 בדיקות תנאים</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/constraints">🔒 מוניטור אילוצים</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/test-header-only">🧪 בדיקת ראש הדף</a></li>
@@ -1311,10 +1314,10 @@ class HeaderSystem {
                             <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/economic-calendar-page.html">📆 לוח כלכלי</a></li>
                             <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/emotional-tracking-widget.html">😊 תיעוד רגשי</a></li>
                             <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/history-widget.html">📜 ווידג'ט היסטוריה</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/portfolio-state-page.html">💼 מצב תיק היסטורי</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/portfolio_state">💼 מצב תיק היסטורי</a></li>
                             <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/price-history-page.html">💰 היסטוריית מחירים</a></li>
                             <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/strategy-analysis-page.html">🎯 ניתוח אסטרטגיות</a></li>
-                            <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/trade-history-page.html">📈 היסטוריית טרייד</a></li>
+                            <li><a class="tiktrack-dropdown-item" href="/trade_history">📈 היסטוריית טרייד</a></li>
                             <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/tradingview-test-page.html">📈 גראפים TV</a></li>
                             <li class="separator"></li>
                             <li><a class="tiktrack-dropdown-item" href="/conditions-modals.html">🧩 מודלי תנאים</a></li>
@@ -1326,10 +1329,11 @@ class HeaderSystem {
                             <li><a class="tiktrack-dropdown-item" href="/mockups/watch-lists-page.html">📋 רשימות מעקב</a></li>
                           </ul>
                         </li>
-                        <li><a class="tiktrack-dropdown-item" href="/chart-management">📊 ניהול גרפים</a></li>
+                        <li><a class="tiktrack-dropdown-item" href="/chart_management">📊 ניהול גרפים</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/dynamic-colors-display">🌈 תצוגת צבעים דינמית</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/designs">🎭 עיצובים</a></li>
                         <li class="separator"></li>
+                        <li><a class="tiktrack-dropdown-item" href="/mockups/daily-snapshots/tradingview-test-page.html">📈 בדיקת TradingView</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/tradingview-widgets-showcase">🎯 ווידג'טים TradingView</a></li>
                       </ul>
                     </li>
@@ -1515,7 +1519,7 @@ class HeaderSystem {
             </div>
 
             <div class="filter-user-section" id="filterUserSection" style="margin-right: auto; display: flex; align-items: center; gap: 8px;">
-              <a href="/user-profile.html" class="user-profile-link" id="filterUserProfileLink" title="פרופיל משתמש" style="text-decoration: none; display: none;">
+              <a href="/user_profile" class="user-profile-link" id="filterUserProfileLink" title="פרופיל משתמש" style="text-decoration: none; display: none;">
                 <div class="user-avatar-badge" id="filterUserAvatar" style="width: 36px; height: 36px; border-radius: 50%; background: #26baac; color: white; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 14px; cursor: pointer;">
                   <span id="filterUserInitials">?</span>
                 </div>

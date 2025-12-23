@@ -3131,7 +3131,7 @@ function renderTickersTableRows(tickers) {
         if (!window.createActionsMenu) return '<!-- Actions menu not available -->';
         const actions = [
           { type: 'VIEW', onclick: `window.showEntityDetails('ticker', ${ticker.id}, { mode: 'view' })`, title: 'צפה בפרטי טיקר' },
-          { type: 'DASHBOARD', onclick: `window.location.href='/ticker-dashboard.html?tickerId=${ticker.id}'`, title: 'דשבורד מלא' },
+          { type: 'DASHBOARD', onclick: `window.location.href='/ticker_dashboard.html?tickerId=${ticker.id}'`, title: 'דשבורד מלא' },
           { type: 'REFRESH', onclick: `refreshTickerExternalData(${ticker.id}, ${ticker.symbol ? `'${String(ticker.symbol).replace(/'/g, "\\'")}'` : '""'})`, title: 'רענון נתונים חיצוניים' },
           { type: 'EDIT', onclick: `window.ModalManagerV2 && window.ModalManagerV2.showEditModal('tickersModal', 'ticker', ${ticker.id})`, title: 'ערוך' },
           { type: ticker.status === 'cancelled' ? 'REACTIVATE' : 'CANCEL', onclick: `${ticker.status === 'cancelled' ? 'reactivateTicker' : 'performTickerCancellation'}(${ticker.id})`, title: ticker.status === 'cancelled' ? 'הפעל מחדש טיקר' : 'בטל טיקר' },

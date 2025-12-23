@@ -804,6 +804,8 @@ window.createActionsMenu = function(buttons) {
                 case 'VIEW': icon = '👁️'; break;
                 case 'ADD': icon = '➕'; break;
                 case 'DASHBOARD': icon = '📊'; break;
+                case 'SELECT': icon = '✅'; break;
+                case 'CANCEL': icon = '❌'; break;
                 default: icon = '⚙️'; break;
             }
         }

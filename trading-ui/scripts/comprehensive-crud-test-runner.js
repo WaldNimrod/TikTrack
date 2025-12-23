@@ -6,7 +6,7 @@
  * כולל בדיקת סדר טעינה, בדיקות CRUD מלאות, ועדכון רשומות בפועל
  * 
  * שימוש:
- * 1. פתח את הדפדפן בדף: http://localhost:8080/crud-testing-dashboard.html
+ * 1. פתח את הדפדפן בדף: http://localhost:8080/crud_testing_dashboard.html
  * 2. פתח את הקונסול (F12)
  * 3. העתק והדבק את הקוד הזה בקונסול
  * 4. לחץ Enter
@@ -28,27 +28,48 @@
 // - testPageCRUD() - Testpagecrud
 
 /**
- * רשימת העמודים המרכזיים לבדיקה
+ * רשימת העמודים המרכזיים לבדיקה (15 עמודים)
+ * כולל כל עמודי המשתמש הראשיים לפי התוכנית המקורית
  */
 const MAIN_PAGES = [
-  'cash_flows',
-  'executions',
+  // עמודי משתמש מרכזיים (15)
+  'index',
+  'trades',
+  'trade_plans',
+  'alerts',
   'tickers',
   'trading_accounts',
+  'executions',
+  'cash_flows',
   'notes',
-  'alerts',
-  'trades',
-  'trade_plans'
+  'research',
+  'preferences',
+  'ai-analysis',
+  'user-profile',
+  'watch-list',
+  'ticker-dashboard'
 ];
 
 /**
  * בדיקת סדר טעינה של עמוד
  */
 async function checkPageLoadingOrder(pageName) {
+  // #region agent log
+  fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'comprehensive-crud-test-runner.js:56',message:'Starting checkPageLoadingOrder',data:{pageName:pageName},timestamp:Date.now(),sessionId:'debug-session',runId:'comprehensive-tests',hypothesisId:'LOADING'})}).catch(()=>{});
+  // #endregion
+
   try {
+    // #region agent log
+    fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'comprehensive-crud-test-runner.js:59',message:'Navigating to page',data:{url:`/${pageName}.html`},timestamp:Date.now(),sessionId:'debug-session',runId:'comprehensive-tests',hypothesisId:'LOADING'})}).catch(()=>{});
+    // #endregion
+
     // נווט לעמוד
     window.location.href = `/${pageName}.html`;
     await new Promise(resolve => setTimeout(resolve, 2000)); // המתן לטעינה
+
+    // #region agent log
+    fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'comprehensive-crud-test-runner.js:62',message:'Page loaded, checking scripts',data:{scriptsCount:document.querySelectorAll('script[src]').length},timestamp:Date.now(),sessionId:'debug-session',runId:'comprehensive-tests',hypothesisId:'LOADING'})}).catch(()=>{});
+    // #endregion
     
     // בדוק את סדר הטעינה
     const scripts = Array.from(document.querySelectorAll('script[src]'));
@@ -81,9 +102,17 @@ async function checkPageLoadingOrder(pageName) {
  * הרצת בדיקות CRUD על עמוד
  */
 async function testPageCRUD(pageName) {
+  // #region agent log
+  fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'comprehensive-crud-test-runner.js:104',message:'Starting testPageCRUD',data:{pageName:pageName,hasCrudTester:!!window.CRUDEnhancedTester},timestamp:Date.now(),sessionId:'debug-session',runId:'comprehensive-tests',hypothesisId:'CRUD'})}).catch(()=>{});
+  // #endregion
+
   try {
     // בדיקה שהמערכת זמינה
     if (!window.CRUDEnhancedTester) {
+      // #region agent log
+      fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'comprehensive-crud-test-runner.js:107',message:'CRUDEnhancedTester not available',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'comprehensive-tests',hypothesisId:'CRUD'})}).catch(()=>{});
+      // #endregion
+
       return {
         page: pageName,
         crud: 'ERROR',
@@ -119,6 +148,10 @@ async function testPageCRUD(pageName) {
  * הרצת בדיקות מקיפות על כל העמודים
  */
 async function runComprehensiveTests() {
+  // #region agent log
+  fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'comprehensive-crud-test-runner.js:150',message:'Starting runComprehensiveTests',data:{pagesCount:MAIN_PAGES.length,pages:MAIN_PAGES},timestamp:Date.now(),sessionId:'debug-session',runId:'comprehensive-tests',hypothesisId:'START'})}).catch(()=>{});
+  // #endregion
+
   console.log('🚀 Starting Comprehensive CRUD Tests...');
   console.log(`📋 Testing ${MAIN_PAGES.length} main pages\n`);
   
@@ -156,7 +189,7 @@ async function runComprehensiveTests() {
   
   // חזרה לדשבורד לבדיקות CRUD
   console.log('\n🔄 Returning to CRUD testing dashboard...');
-  window.location.href = '/crud-testing-dashboard.html';
+  window.location.href = '/crud_testing_dashboard.html';
   await new Promise(resolve => setTimeout(resolve, 3000));
   
   // בדיקות CRUD
@@ -196,16 +229,22 @@ async function runComprehensiveTests() {
   console.log(`   ❌ Failed: ${results.summary.crudFailed}/${results.summary.total}`);
   console.log(`   💥 Errors: ${results.summary.crudErrors}/${results.summary.total}`);
   
+  // #region agent log
+  fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'comprehensive-crud-test-runner.js:233',message:'Comprehensive tests completed',data:{summary:results.summary,totalPages:results.summary.total},timestamp:Date.now(),sessionId:'debug-session',runId:'comprehensive-tests',hypothesisId:'END'})}).catch(()=>{});
+  // #endregion
+
   // שמירת תוצאות
   localStorage.setItem('comprehensive_crud_test_report', JSON.stringify(results));
   console.log('\n💾 Results saved to localStorage as "comprehensive_crud_test_report"');
-  
+
   return results;
 }
 
-// יצירת פונקציה גלובלית
+// יצירת פונקציות גלובליות
 if (typeof window !== 'undefined') {
   window.runComprehensiveTests = runComprehensiveTests;
+  window.checkPageLoadingOrder = checkPageLoadingOrder;
+  window.testPageCRUD = testPageCRUD;
 }
 
 // הודעת הוראות

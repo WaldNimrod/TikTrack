@@ -5,13 +5,13 @@
  * סקריפט להרצת בדיקות CRUD אוטומטיות על 8 העמודים המרכזיים
  * 
  * שימוש:
- * 1. פתח את הדפדפן בדף: http://localhost:8080/crud-testing-dashboard.html
+ * 1. פתח את הדפדפן בדף: http://localhost:8080/crud_testing_dashboard.html
  * 2. פתח את הקונסול (F12)
  * 3. העתק והדבק את הקוד הזה בקונסול
  * 4. לחץ Enter
  * 
  * או:
- * 1. פתח את הדפדפן בדף: http://localhost:8080/crud-testing-dashboard.html
+ * 1. פתח את הדפדפן בדף: http://localhost:8080/crud_testing_dashboard.html
  * 2. לחץ על כפתור "הרץ כל הבדיקות"
  * 
  * @version 1.0.0
@@ -34,7 +34,7 @@ async function runCRUDAutomatedTests() {
   
   // בדיקה שהמערכת זמינה
   if (!window.CRUDEnhancedTester) {
-    console.error('❌ CRUDEnhancedTester not available. Make sure you are on crud-testing-dashboard.html');
+    console.error('❌ CRUDEnhancedTester not available. Make sure you are on crud_testing_dashboard.html');
     return null;
   }
   

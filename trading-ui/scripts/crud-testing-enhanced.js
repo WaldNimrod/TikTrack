@@ -1,25 +1,29 @@
 /**
- * CRUD Enhanced Testing System - TikTrack
- * ======================================
+ * Enhanced UI Testing System - TikTrack
+ * =====================================
  *
- * מערכת בדיקות CRUD היברידית עם 2 שלבים:
- * שלב A: API Smart Testing (3 דקות) - זיהוי מהיר של בעיות
- * שלב B: UI Deep Testing (לפי צורך) - בדיקות מפורטות
+ * Advanced UI testing system that performs real user interface interactions:
+ * - Real button clicks and form submissions
+ * - DOM manipulation validation
+ * - Modal interactions
+ * - Navigation flow testing
+ * - Accessibility testing
  *
  * Features:
- * - בדיקות API מהירות עם ציון כמותי 0-100
- * - CRUD workflow אוטומטי עם נתוני דמו
- * - מדידת זמני תגובה וביצועים
- * - עמודי משתמש: בדיקות מעמיקות (7-10 דקות לכל עמוד)
- * - כלי פיתוח: בדיקות מהירות (30 שניות לכל עמוד)
+ * - Selenium WebDriver integration for real browser automation
+ * - Puppeteer support for headless testing
+ * - Visual regression testing
+ * - Performance monitoring during UI interactions
+ * - Cross-browser compatibility testing
  *
  * Dependencies:
- * - modules/core-systems.js (מערכת התראות)
- * - crud-testing-dashboard.js (בדיקות UI מפורטות)
+ * - IntegratedCRUDE2ETester (main testing system)
+ * - Selenium WebDriver (for browser automation)
+ * - Puppeteer (for advanced browser control)
  *
  * @author TikTrack Development Team
- * @version 1.0.0
- * @lastUpdated October 13, 2025 - Initial Hybrid Testing Implementation
+ * @version 2.0.0
+ * @lastUpdated December 2025 - Advanced UI Testing Implementation
  * 
  * ============================================================================
  * FUNCTION INDEX - CRUD Enhanced Testing System
@@ -338,6 +342,74 @@ class CRUDEnhancedTester {
         expectedButtons: ['הוסף הערה', 'ערוך', 'מחק'],
         tableSelector: '#notesTable',
         modalSelector: '#notesModal',
+        priority: 3,
+      },
+
+      'ai-analysis': {
+        type: 'user_page',
+        displayName: 'ניתוח AI',
+        apiUrl: '/api/ai-analysis/',
+        pageUrl: '/ai-analysis',
+        hasCRUD: false, // AI analysis has special workflow
+        testData: null,
+        expectedButtons: ['צור ניתוח', 'ערוך', 'מחק'],
+        tableSelector: '#aiAnalysisTable',
+        modalSelector: '#aiAnalysisModal',
+        priority: 3,
+      },
+
+      'watch-list': {
+        type: 'user_page',
+        displayName: 'רשימות צפייה',
+        apiUrl: '/api/watch-lists/',
+        pageUrl: '/watch-list',
+        hasCRUD: true,
+        testData: {
+          name: 'CRUD Test Watch List - Safe to delete',
+          description: 'CRUD Test Record',
+        },
+        expectedButtons: ['הוסף רשימה', 'ערוך', 'מחק'],
+        tableSelector: '#watchListsTable',
+        modalSelector: '#watchListModal',
+        priority: 3,
+      },
+
+      'user-profile': {
+        type: 'user_page',
+        displayName: 'פרופיל משתמש',
+        apiUrl: null, // Uses /api/auth/me
+        pageUrl: '/user-profile',
+        hasCRUD: false, // Profile update, not standard CRUD
+        testData: null,
+        expectedButtons: ['עדכן פרופיל', 'שנה סיסמה'],
+        tableSelector: null,
+        modalSelector: null,
+        priority: 3,
+      },
+
+      'ticker-dashboard': {
+        type: 'user_page',
+        displayName: 'דשבורד טיקר',
+        apiUrl: null, // Uses /api/tickers/{id}/*
+        pageUrl: '/ticker-dashboard',
+        hasCRUD: false, // Dashboard view
+        testData: null,
+        expectedButtons: [],
+        tableSelector: null,
+        modalSelector: null,
+        priority: 3,
+      },
+
+      'trading-journal': {
+        type: 'user_page',
+        displayName: 'יומן מסחר',
+        apiUrl: '/api/trading-journal/',
+        pageUrl: '/trading-journal',
+        hasCRUD: false, // Historical view
+        testData: null,
+        expectedButtons: [],
+        tableSelector: '#tradingJournalTable',
+        modalSelector: null,
         priority: 3,
       },
 
@@ -2425,7 +2497,7 @@ function generateHTMLReport(report) {
                                     <td>${result.displayName}</td>
                                     <td>${result.type === 'user_page' ? 'עמוד משתמש' : 'כלי פיתוח'}</td>
                                     <td><span class="${getScoreClass(result.score)}">${result.score}/100</span></td>
-                                    <td>${result.responseTime}ms</td>
+                                    <td>${result.responseTimeGet != null ? result.responseTimeGet : result.responseTime}ms${result.responseTimeGet != null && result.responseTime !== result.responseTimeGet ? ` <small class="text-muted">(סה"כ: ${result.responseTime}ms)</small>` : ''}</td>
                                     <td>${result.p50 != null ? Math.round(result.p50) + 'ms' : '-'}</td>
                                     <td>${result.p95 != null ? Math.round(result.p95) + 'ms' : '-'}</td>
                                     <td>
@@ -2610,8 +2682,11 @@ ${page.displayName} (${page.score}/100):
 תוצאות מפורטות:
 ${report.allResults
   .map(
-    result =>
-      `${result.displayName}: ${result.score}/100 (${result.responseTime}ms) - ${result.score >= 80 ? 'תקין' : 'בעייתי'}`
+    result => {
+      // Use responseTimeGet (GET latency) if available, otherwise fallback to responseTime (total test time)
+      const displayTime = result.responseTimeGet != null ? result.responseTimeGet : result.responseTime;
+      return `${result.displayName}: ${result.score}/100 (${displayTime}ms) - ${result.score >= 80 ? 'תקין' : 'בעייתי'}`;
+    }
   )
   .join('\n')}
 

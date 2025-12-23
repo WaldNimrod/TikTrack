@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>התחברות - TikTrack</title>
+
+    <!-- Core CSS -->
+    <link rel="stylesheet" href="styles-new/main.css?v=1.0.0">
+    <link rel="stylesheet" href="styles-new/07-pages/_login.css?v=1.0.0">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="images/favicon.ico">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="login-page">
+    <div class="login-wrapper">
+        <div class="login-container">
+            <div class="login-header">
+                <div class="login-logo">
+                    <img src="images/logo.svg" alt="TikTrack Logo" />
+                </div>
+                <h1 class="login-title">התחברות</h1>
+                <p class="login-subtitle">ברוכים הבאים ל-TikTrack</p>
+            </div>
+
+            <div class="login-error" id="loginError"></div>
+            <div class="login-success" id="loginSuccess"></div>
+
+            <form id="loginForm">
+                <div class="form-group">
+                    <label class="form-label" for="username">שם משתמש</label>
+                    <input type="text" id="username" class="form-control" placeholder="הכנס שם משתמש" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="password">סיסמה</label>
+                    <input type="password" id="password" class="form-control" placeholder="הכנס סיסמה" required>
+                </div>
+
+                <div class="remember-me">
+                    <input type="checkbox" id="rememberMe">
+                    <label for="rememberMe">זכור אותי לתקופת הפיתוח</label>
+                </div>
+
+                <button type="submit" class="btn-login" id="loginBtn">
+                    <span id="loginBtnText">התחבר</span>
+                    <span id="loginBtnSpinner" style="display: none;">⏳ מתחבר...</span>
+                </button>
+            </form>
+
+            <div style="text-align: center; margin-top: 1rem;">
+                <a href="forgot-password.html" style="color: #26baac; text-decoration: none; font-size: 0.9rem;">שכחת סיסמה?</a>
+            </div>
+
+            <div class="demo-credentials">
+                <h6>פרטי התחברות לדמו:</h6>
+                <p><strong>מנהל:</strong> username=admin, password=admin123</p>
+                <p><strong>משתמש:</strong> username=user, password=user123</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="scripts/api-config.js?v=1.0.0"></script>
+    <script src="scripts/api-fetch-wrapper.js?v=1.0.0"></script>
+    <script src="scripts/unified-cache-manager.js?v=1.0.0"></script>
+    <script src="scripts/auth.js?v=1.0.0"></script>
+    <script src="scripts/logger-service.js?v=1.0.0"></script>
+    <script src="scripts/login.js?v=1.0.0"></script>
+</body>
+</html>

@@ -209,8 +209,8 @@ const IconMappings = {
         'db_display.html': 'database',
         'db_extradata.html': 'database',
         'cache-management.html': 'database',
-        'crud-testing-dashboard.html': 'flask',
-        'external-data-dashboard.html': 'world',
+        'crud_testing_dashboard.html': 'flask',
+        'external_data_dashboard.html': 'world',
         'server-monitor.html': 'server',
         'css-management.html': 'palette',
         'constraints.html': 'lock'

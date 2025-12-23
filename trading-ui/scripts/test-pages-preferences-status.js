@@ -26,7 +26,7 @@
     { name: 'trade_plans', file: 'trade_plans.html', description: 'תוכניות מסחר' },
     { name: 'alerts', file: 'alerts.html', description: 'התראות' },
     { name: 'tickers', file: 'tickers.html', description: 'טיקרים' },
-    { name: 'ticker-dashboard', file: 'ticker-dashboard.html', description: 'דשבורד טיקר' },
+    { name: 'ticker-dashboard', file: 'ticker_dashboard.html', description: 'דשבורד טיקר' },
     { name: 'trading_accounts', file: 'trading_accounts.html', description: 'חשבונות מסחר' },
     { name: 'executions', file: 'executions.html', description: 'ביצועים' },
     { name: 'cash_flows', file: 'cash_flows.html', description: 'תזרימי מזומן' },

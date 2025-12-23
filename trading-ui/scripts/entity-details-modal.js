@@ -1225,7 +1225,7 @@ class EntityDetailsModal {
                 }
                 
                 // Escape onclick for HTML attribute
-                const escapedOnclick = `window.location.href='/ticker-dashboard.html?tickerId=${tickerId}'`.replace(/'/g, '&#39;');
+                const escapedOnclick = `window.location.href='/ticker_dashboard.html?tickerId=${tickerId}'`.replace(/'/g, '&#39;');
                 
                 buttonsHtml = `
                     <button type="button" 

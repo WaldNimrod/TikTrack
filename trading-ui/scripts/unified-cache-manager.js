@@ -238,6 +238,7 @@ class UnifiedCacheManager {
             },
             layers: {
                 memory: { entries: 0, size: 0 },
+                sessionStorage: { entries: 0, size: 0 },  // NEW: Session storage layer stats
                 localStorage: { entries: 0, size: 0 },
                 indexedDB: { entries: 0, size: 0 },
                 backend: { entries: 0, size: 0 }
@@ -338,6 +339,7 @@ class UnifiedCacheManager {
         // ממשקי שכבות מטמון
         this.layers = {
             memory: new MemoryLayer(),
+            sessionStorage: new SessionStorageLayer(),  // NEW: Session storage layer for auth tokens
             localStorage: new LocalStorageLayer(),
             indexedDB: null, // יאותחל מאוחר יותר
             backend: new BackendCacheLayer()
@@ -425,6 +427,7 @@ class UnifiedCacheManager {
             
             // אתחול שכבות אחרות
             await this.layers.memory.initialize();
+            await this.layers.sessionStorage.initialize();
             await this.layers.localStorage.initialize();
             await this.layers.backend.initialize();
             
@@ -495,7 +498,7 @@ class UnifiedCacheManager {
             if (!this.stats) {
                 this.stats = {
                     operations: { save: 0, get: 0, remove: 0, clear: 0 },
-                    layers: { memory: { entries: 0, size: 0 }, localStorage: { entries: 0, size: 0 }, indexedDB: { entries: 0, size: 0 }, backend: { entries: 0, size: 0 } },
+                    layers: { memory: { entries: 0, size: 0 }, sessionStorage: { entries: 0, size: 0 }, localStorage: { entries: 0, size: 0 }, indexedDB: { entries: 0, size: 0 }, backend: { entries: 0, size: 0 } },
                     performance: { avgResponseTime: 0, totalRequests: 0, successfulRequests: 0 }
                 };
             }
@@ -700,6 +703,7 @@ class UnifiedCacheManager {
                         entries: Object.keys(this.memoryCache).length,
                         size: JSON.stringify(this.memoryCache).length
                     },
+                    sessionStorage: this.stats.layers.sessionStorage || { entries: 0, size: 0 },
                     localStorage: {
                         entries: Object.keys(localStorage).length,
                         size: new Blob([JSON.stringify(localStorage)]).size
@@ -1189,6 +1193,7 @@ class UnifiedCacheManager {
                     },
                     layers: {
                         memory: { entries: 0, size: 0 },
+                        sessionStorage: { entries: 0, size: 0 },
                         localStorage: { entries: 0, size: 0 },
                         indexedDB: { entries: 0, size: 0 },
                         backend: { entries: 0, size: 0 }
@@ -1352,6 +1357,138 @@ class LocalStorageLayer {
             return Object.keys(localStorage).filter(key => key.startsWith(this.prefix));
         } catch (error) {
             window.Logger.warn('⚠️ Error getting localStorage keys:', error, { page: "unified-cache-manager" });
+            return [];
+        }
+    }
+}
+
+/**
+ * SessionStorage Layer - שכבה 2.5: נתוני session (בעיקר auth tokens)
+ * Used for bootstrap authentication before UnifiedCacheManager initializes
+ */
+class SessionStorageLayer {
+    constructor() {
+        this.prefix = 'tiktrack_session_';
+    }
+
+    async initialize() {
+        // sessionStorage is always available in browsers
+        return true;
+    }
+
+    async save(key, data, policy) {
+        try {
+            if (typeof sessionStorage === 'undefined') {
+                window.Logger.warn('⚠️ SessionStorage not available', { page: "unified-cache-manager" });
+                return false;
+            }
+            const fullKey = this.prefix + key;
+            const value = JSON.stringify(data);
+            sessionStorage.setItem(fullKey, value);
+            return true;
+        } catch (error) {
+            window.Logger.error('❌ SessionStorage save failed:', error, { page: "unified-cache-manager" });
+            return false;
+        }
+    }
+
+    async get(key, options) {
+        try {
+            if (typeof sessionStorage === 'undefined') {
+                return null;
+            }
+            const fullKey = this.prefix + key;
+            const value = sessionStorage.getItem(fullKey);
+            if (value === null || value === undefined) {
+                return null;
+            }
+            // Handle "undefined" string that was stored incorrectly
+            if (value === 'undefined' || value === 'null') {
+                return null;
+            }
+            return JSON.parse(value);
+        } catch (error) {
+            window.Logger.error('❌ SessionStorage get failed:', error, { page: "unified-cache-manager" });
+            return null;
+        }
+    }
+
+    async remove(key, options) {
+        try {
+            if (typeof sessionStorage === 'undefined') {
+                return false;
+            }
+            const fullKey = this.prefix + key;
+            sessionStorage.removeItem(fullKey);
+            return true;
+        } catch (error) {
+            window.Logger.error('❌ SessionStorage remove failed:', error, { page: "unified-cache-manager" });
+            return false;
+        }
+    }
+
+    async clear(options) {
+        try {
+            if (typeof sessionStorage === 'undefined') {
+                return true;
+            }
+            const keys = Object.keys(sessionStorage);
+            let clearedCount = 0;
+            keys.forEach(key => {
+                if (key.startsWith(this.prefix)) {
+                    sessionStorage.removeItem(key);
+                    clearedCount++;
+                }
+            });
+            // Also clear bootstrap keys (dev_authToken, dev_currentUser, recent_login_timestamp)
+            // These are used by bootstrapAuthFromSessionStorage() before UnifiedCacheManager initializes
+            const bootstrapKeys = ['dev_authToken', 'dev_currentUser', 'recent_login_timestamp'];
+            bootstrapKeys.forEach(key => {
+                if (sessionStorage.getItem(key) !== null) {
+                    sessionStorage.removeItem(key);
+                    clearedCount++;
+                }
+            });
+            return true;
+        } catch (error) {
+            window.Logger.error('❌ SessionStorage clear failed:', error, { page: "unified-cache-manager" });
+            return false;
+        }
+    }
+
+    getStats() {
+        try {
+            if (typeof sessionStorage === 'undefined') {
+                return { entries: 0, size: 0 };
+            }
+            let entries = 0;
+            let size = 0;
+            
+            const keys = Object.keys(sessionStorage);
+            keys.forEach(key => {
+                if (key.startsWith(this.prefix)) {
+                    entries++;
+                    const value = sessionStorage.getItem(key);
+                    if (value) {
+                        size += value.length;
+                    }
+                }
+            });
+            
+            return { entries, size };
+        } catch (error) {
+            return { entries: 0, size: 0 };
+        }
+    }
+    
+    async getAllKeys() {
+        try {
+            if (typeof sessionStorage === 'undefined') {
+                return [];
+            }
+            return Object.keys(sessionStorage).filter(key => key.startsWith(this.prefix));
+        } catch (error) {
+            window.Logger.warn('⚠️ Error getting sessionStorage keys:', error, { page: "unified-cache-manager" });
             return [];
         }
     }
@@ -1661,6 +1798,7 @@ class BackendCacheLayer {
                 this.stats = {
                     layers: {
                         memory: { entries: 0, size: 0 },
+                        sessionStorage: { entries: 0, size: 0 },
                         localStorage: { entries: 0, size: 0 },
                         indexedDB: { entries: 0, size: 0 },
                         backend: { entries: 0, size: 0 }
@@ -1702,6 +1840,7 @@ class BackendCacheLayer {
                 this.stats = {
                     layers: {
                         memory: { entries: 0, size: 0 },
+                        sessionStorage: { entries: 0, size: 0 },
                         localStorage: { entries: 0, size: 0 },
                         indexedDB: { entries: 0, size: 0 },
                         backend: { entries: 0, size: 0 }
@@ -1739,6 +1878,7 @@ class BackendCacheLayer {
                 this.stats = {
                     layers: {
                         memory: { entries: 0, size: 0 },
+                        sessionStorage: { entries: 0, size: 0 },
                         localStorage: { entries: 0, size: 0 },
                         indexedDB: { entries: 0, size: 0 },
                         backend: { entries: 0, size: 0 }
@@ -1912,10 +2052,21 @@ UnifiedCacheManager.prototype.clearAllCache = async function(options = {}) {
         }
         
         // 3. Clear sessionStorage (only our keys)
+        // NOTE: SessionStorageLayer and auth bootstrap keys (dev_authToken, dev_currentUser, recent_login_timestamp)
+        // are already cleared by SessionStorageLayer.clear() in step 1 (via this.clear('all')).
+        // This section clears other sessionStorage keys (preferences, etc.) that aren't managed by SessionStorageLayer.
         try {
             const keys = Object.keys(sessionStorage);
             const ourKeys = keys.filter(key => {
-                // UnifiedCacheManager keys (with prefix)
+                // Skip SessionStorageLayer keys (already cleared in step 1 via this.clear('all'))
+                if (key.startsWith('tiktrack_session_')) return false;
+                
+                // Skip auth bootstrap keys (already cleared by SessionStorageLayer.clear() in step 1)
+                if (key === 'dev_authToken') return false;
+                if (key === 'dev_currentUser') return false;
+                if (key === 'recent_login_timestamp') return false;
+                
+                // UnifiedCacheManager keys (with prefix) - but not sessionStorage layer
                 if (key.startsWith('tiktrack_')) return true;
                 
                 // Preferences keys (without prefix)
@@ -1957,8 +2108,8 @@ UnifiedCacheManager.prototype.clearAllCache = async function(options = {}) {
             });
             
             ourKeys.forEach(key => sessionStorage.removeItem(key));
-            clearedLayers.push(`sessionStorage (${ourKeys.length} keys)`);
-            window.Logger.info(`✅ sessionStorage cleared successfully (${ourKeys.length} keys)`, { page: "unified-cache-manager" });
+            clearedLayers.push(`sessionStorage (${ourKeys.length} additional keys + SessionStorageLayer cleared)`);
+            window.Logger.info(`✅ sessionStorage cleared successfully (${ourKeys.length} additional keys + SessionStorageLayer)`, { page: "unified-cache-manager" });
         } catch (error) {
             window.Logger.error('❌ Error clearing sessionStorage:', error, { page: "unified-cache-manager" });
             errors.push(`sessionStorage: ${error.message}`);

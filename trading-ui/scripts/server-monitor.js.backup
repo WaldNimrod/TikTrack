@@ -1387,8 +1387,8 @@ class ServerMonitor {
   // פתיחת כל הדשבורדים
   openAllDashboards() {
     window.open('http://127.0.0.1:8080/server-monitor', '_blank');
-    window.open('http://127.0.0.1:8080/external-data-dashboard.html', '_blank');
-    window.open('http://127.0.0.1:8080/crud-testing-dashboard.html', '_blank');
+    window.open('http://127.0.0.1:8080/external_data_dashboard.html', '_blank');
+    window.open('http://127.0.0.1:8080/crud_testing_dashboard.html', '_blank');
     this.addLog('🚀 פתיחת כל הדשבורדים', 'info');
   }
 

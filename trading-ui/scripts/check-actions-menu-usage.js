@@ -55,7 +55,7 @@ const TECHNICAL_PAGES = [
 ];
 
 const SECONDARY_PAGES = [
-    'external-data-dashboard.html', 'chart-management.html'
+    'external_data_dashboard.html', 'chart_management.html'
 ];
 
 const MOCKUP_PAGES = [

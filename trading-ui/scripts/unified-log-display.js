@@ -840,8 +840,8 @@ class UnifiedLogDisplay {
             'db_display.html': '/trading-ui/images/icons/tabler/database.svg',
             'db_extradata.html': '/trading-ui/images/icons/tabler/database.svg',
             'cache-management.html': '/trading-ui/images/icons/tabler/database.svg',
-            'crud-testing-dashboard.html': '/trading-ui/images/icons/tabler/flask.svg',
-            'external-data-dashboard.html': '/trading-ui/images/icons/tabler/world.svg',
+            'crud_testing_dashboard.html': '/trading-ui/images/icons/tabler/flask.svg',
+            'external_data_dashboard.html': '/trading-ui/images/icons/tabler/world.svg',
             'server-monitor.html': '/trading-ui/images/icons/tabler/server.svg',
             'css-management.html': '/trading-ui/images/icons/tabler/palette.svg',
             'constraints.html': '/trading-ui/images/icons/tabler/lock.svg'

@@ -44,11 +44,22 @@
 
   async function getAuthToken() {
     try {
+      // Try SessionStorageLayer through UnifiedCacheManager first (preferred method)
       if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
-        const token = await window.UnifiedCacheManager.get('authToken', { includeUserId: false });
+        const token = await window.UnifiedCacheManager.get('authToken', { 
+          layer: 'sessionStorage', 
+          includeUserId: false 
+        });
         if (token) return token;
       }
-      // Dev/no-cache fallbacks
+      
+      // Fallback: direct sessionStorage (bootstrap mode - before UnifiedCacheManager initializes)
+      if (typeof sessionStorage !== 'undefined') {
+        const fallback = sessionStorage.getItem('dev_authToken');
+        if (fallback) return fallback;
+      }
+      
+      // Additional fallbacks for compatibility
       if (window.authToken) {
         return window.authToken;
       }
@@ -56,10 +67,7 @@
         const lsToken = localStorage.getItem('authToken');
         if (lsToken) return lsToken;
       }
-      if (typeof sessionStorage !== 'undefined') {
-        const fallback = sessionStorage.getItem('dev_authToken');
-        if (fallback) return fallback;
-      }
+      
       return null;
     } catch (error) {
       window.Logger?.warn?.('⚠️ [API Fetch Wrapper] Failed to get auth token', { error: error.message });
@@ -68,7 +76,17 @@
   }
 
   async function handle401Error(url) {
-    window.Logger?.info?.('🔒 [API Fetch Wrapper] 401 Unauthorized detected', { url });
+    window.Logger?.info?.('🔒 [API Fetch Wrapper] 401 Unauthorized detected', { url, checkingAuth: window._checkingAuth });
+
+    // Don't redirect if we're currently checking authentication
+    // This prevents race conditions during page load
+    if (window._checkingAuth) {
+      window.Logger?.info?.('⏳ [API Fetch Wrapper] Skipping redirect - authentication check in progress', { url });
+      // #region agent log
+      fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'api-fetch-wrapper.js:handle401Error',message:'Skipped redirect due to _checkingAuth flag',data:{url:url,checkingAuth:window._checkingAuth},timestamp:Date.now(),sessionId:'debug-session',runId:'fix-auth-redirect',hypothesisId:'AUTH_REDIRECT_FIX'})}).catch(()=>{});
+      // #endregion
+      return;
+    }
 
     if (window.TikTrackAuth?.forceLogoutAndPrompt) {
       await window.TikTrackAuth.forceLogoutAndPrompt('api_fetch_401');

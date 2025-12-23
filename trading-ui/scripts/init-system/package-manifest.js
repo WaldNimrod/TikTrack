@@ -1050,7 +1050,7 @@ const PACKAGE_MANIFEST = {
     loadingStrategy: 'defer', // Critical package - tag management, has dependencies on multiple packages
     scripts: [
       {
-        file: 'tag-management-page.js',
+        file: 'tag_management.js',
         globalCheck: 'window.TagManagementPage',
         description: 'Tag management page display management',
         required: true,
@@ -2050,7 +2050,7 @@ const PACKAGE_MANIFEST = {
         loadOrder: 2
       },
       {
-        file: 'watch-lists-page.js',
+        file: 'watch_lists.js',
         globalCheck: 'window.WatchListsPage',
         description: 'Watch lists main page',
         required: true,

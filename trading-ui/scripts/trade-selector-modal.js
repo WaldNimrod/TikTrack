@@ -583,20 +583,24 @@ class TradeSelectorModal {
 
     /**
      * Format date for table - עיצוב תאריך לטבלה
-     * 
+     *
      * @param {string} dateString - Date string
      * @returns {string} Formatted date (dd.mm.yyyy)
      */
     formatTableDate(dateString) {
-        if (!dateString) return '';
+        if (!dateString) return 'לא זמין';
         try {
             const date = new Date(dateString);
+            // בדיקה אם התאריך תקין
+            if (isNaN(date.getTime())) {
+                return 'לא זמין';
+            }
             const day = String(date.getDate()).padStart(2, '0');
             const month = String(date.getMonth() + 1).padStart(2, '0');
             const year = date.getFullYear();
             return `${day}.${month}.${year}`;
         } catch (error) {
-            return '';
+            return 'לא זמין';
         }
     }
 

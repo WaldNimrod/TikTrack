@@ -11,28 +11,32 @@
 
 ## 🔧 Code Review Implementation - December 2025
 
-### שיפורי ביצועים ואבטחה:
+### שיפורי ביצועים ואבטחה
 
 #### ✅ **async/defer Strategy - הושלם**
+
 - **לפני**: 0 עמודים עם defer לסקריפטים קריטיים
 - **אחרי**: כל הסקריפטים הקריטיים משתמשים ב-`defer`
 - **תוצאה**: טעינה מקבילית ללא מצבי מרוץ
 
 #### ✅ **ModalHelperService - חדש**
+
 - שירות מרכזי לכל פעולות מודלים
 - הסרת הגדרות כפולות מ-8 עמודים
 - שיפור ביצועים וזיכרון
 
 #### ✅ **API Security Enhancement**
+
 - הוספת אימות לכל מסלולי `/pending-plan/*`
 - מניעת גישה אנונימית לנתונים רגישים
 
 #### ✅ **Configuration Cleanup**
+
 - הסרת `packageScripts` fallback
 - קונפיגורציה נקייה ומרכזית
 - פחות קוד כפול
 
-### מדדי ביצועים:
+### מדדי ביצועים
 
 | מדד | לפני | אחרי | שיפור |
 |-----|-------|------|--------|
@@ -87,18 +91,21 @@
 ### Bundle Implementation Details
 
 **ארכיטקטורה:**
+
 - **21 bundles** מאורגנים לפי פונקציונליות (base, auth, ui-advanced, etc.)
 - **Defer loading** לחבילות קריטיות לשמירת סדר ביצוע
 - **Initialization guards** למניעת טעינה מוקדמת של תלויות
 - **Source maps** לכל bundle לצורך debugging
 
 **בעיות שנפתרו:**
+
 - IIFE wrapper שהפריע לגלובלים
 - Race conditions בטעינת dependencies
 - Script loading order conflicts
 - Global variable isolation problems
 
 **כלי הפיתוח:**
+
 - `npm run build:bundles` - בניית bundles
 - `npm run test:bundles` - בדיקת תקינות
 - `generate-script-loading-code.js` - יצירת קוד טעינת scripts

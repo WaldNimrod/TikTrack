@@ -35,7 +35,7 @@ const PAGES = {
         'dynamic-colors-display.html', 'designs.html', 'tradingview-test-page.html'
     ],
     secondary: [
-        'external-data-dashboard.html', 'chart-management.html'
+        'external_data_dashboard.html', 'chart_management.html'
     ],
     mockups: [
         'mockups/daily-snapshots/portfolio-state-page.html',

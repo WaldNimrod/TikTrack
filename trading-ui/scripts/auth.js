@@ -64,13 +64,55 @@ let currentUser = null;
 
 // Helper functions for cache operations with consistent key handling
 // CRITICAL: Always use includeUserId: false for auth-related keys to avoid key mismatches
-const authCacheOptions = { includeUserId: false, layer: 'localStorage' };
+// SessionStorageLayer is used for auth tokens (bootstrap compatibility + unified management)
+const authCacheOptions = { includeUserId: false, layer: 'sessionStorage' };
 const DEV_SESSION_TOKEN_KEY = 'dev_authToken';
 const DEV_SESSION_USER_KEY = 'dev_currentUser';
 const authBroadcastChannel = (typeof BroadcastChannel !== 'undefined') ? new BroadcastChannel('tiktrack_auth_channel') : null;
 
+/**
+ * Helper function to check if current page is a public page (login, register, etc.)
+ * @returns {boolean}
+ */
+function isPublicPage() {
+  const path = window.location?.pathname || '';
+  const publicPages = ['login.html', 'register.html', 'reset-password.html', 'forgot-password.html'];
+  return publicPages.some(page => path.includes(page));
+}
+
+/**
+ * Helper function to send debug log only if not on public page
+ * Prevents CORS errors on login.html and other public pages
+ */
+function sendDebugLog(location, message, data, hypothesisId) {
+  if (isPublicPage()) {
+    return; // Don't send logs on public pages to avoid CORS errors
+  }
+  fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({
+      location,
+      message,
+      data,
+      timestamp:Date.now(),
+      sessionId:'debug-session',
+      runId:'run2',
+      hypothesisId
+    })
+  }).catch(()=>{});
+}
+
 // Bootstrap auth from sessionStorage (dev mode) as early as possible
 (function bootstrapAuthFromSessionStorage() {
+  // #region agent log
+  sendDebugLog('auth.js:73', 'bootstrapAuthFromSessionStorage ENTRY', {
+    hasSessionStorage: typeof sessionStorage !== 'undefined',
+    storedToken: typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('dev_authToken') : null,
+    storedUser: typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('dev_currentUser') : null,
+    pathname: window.location?.pathname
+  }, 'C');
+  // #endregion
   try {
     if (typeof sessionStorage === 'undefined') return;
     const storedToken = sessionStorage.getItem(DEV_SESSION_TOKEN_KEY);
@@ -79,10 +121,44 @@ const authBroadcastChannel = (typeof BroadcastChannel !== 'undefined') ? new Bro
     const storedUser = JSON.parse(storedUserRaw);
     authToken = storedToken;
     currentUser = storedUser;
-    // Best effort: persist into UC if initialized
-    if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
-      window.UnifiedCacheManager.save('authToken', storedToken, authCacheOptions).catch(() => {});
-      window.UnifiedCacheManager.save('currentUser', storedUser, authCacheOptions).catch(() => {});
+    // #region agent log
+    sendDebugLog('auth.js:81', 'bootstrapAuthFromSessionStorage SUCCESS', {
+      hasToken: !!authToken,
+      hasUser: !!currentUser,
+      userId: currentUser?.id
+    }, 'C');
+    // #endregion
+    // Best effort: sync to UnifiedCacheManager after initialization
+    // This ensures bootstrap data is synced to SessionStorageLayer for unified management
+    if (window.UnifiedCacheManager) {
+      // Try immediate sync if already initialized
+      if (window.UnifiedCacheManager.initialized) {
+        window.UnifiedCacheManager.save('authToken', storedToken, { 
+          layer: 'sessionStorage', 
+          includeUserId: false 
+        }).catch(() => {});
+        window.UnifiedCacheManager.save('currentUser', storedUser, { 
+          layer: 'sessionStorage', 
+          includeUserId: false 
+        }).catch(() => {});
+      } else {
+        // Wait for initialization and sync (non-blocking)
+        const syncInterval = setInterval(() => {
+          if (window.UnifiedCacheManager?.initialized) {
+            clearInterval(syncInterval);
+            window.UnifiedCacheManager.save('authToken', storedToken, { 
+              layer: 'sessionStorage', 
+              includeUserId: false 
+            }).catch(() => {});
+            window.UnifiedCacheManager.save('currentUser', storedUser, { 
+              layer: 'sessionStorage', 
+              includeUserId: false 
+            }).catch(() => {});
+          }
+        }, 100);
+        // Timeout after 5 seconds to prevent infinite polling
+        setTimeout(() => clearInterval(syncInterval), 5000);
+      }
     }
     window.Logger?.info?.('✅ [auth.js] Bootstrapped auth from sessionStorage', {
       page: 'auth',
@@ -115,6 +191,9 @@ function broadcastAuthEvent(eventPayload) {
 }
 
 async function saveAuthToCache(user, token = 'session_based') {
+  // #region agent log
+  fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'auth.js:123',message:'saveAuthToCache ENTRY',data:{hasUser:!!user,userId:user?.id,hasToken:!!token,tokenType:typeof token,hasUnifiedCache:!!window.UnifiedCacheManager,ucInitialized:window.UnifiedCacheManager?.initialized,hasSessionStorage:typeof sessionStorage!=='undefined'},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
+  // #endregion
   window.AuthDebugMonitor?.log('info', '💾 saveAuthToCache called', {
     userId: user?.id,
     username: user?.username,
@@ -122,24 +201,53 @@ async function saveAuthToCache(user, token = 'session_based') {
   });
   
   try {
-    if (window.UnifiedCacheManager) {
-      await window.UnifiedCacheManager.save('currentUser', user, authCacheOptions);
-      await window.UnifiedCacheManager.save('authToken', token, authCacheOptions);
-    } else if (typeof sessionStorage !== 'undefined') {
-      sessionStorage.setItem(DEV_SESSION_USER_KEY, JSON.stringify(user));
-      sessionStorage.setItem(DEV_SESSION_TOKEN_KEY, token);
+    if (window.UnifiedCacheManager?.initialized) {
+      // Use SessionStorageLayer through UnifiedCacheManager (preferred method)
+      await window.UnifiedCacheManager.save('authToken', token, { 
+        layer: 'sessionStorage', 
+        includeUserId: false 
+      });
+      await window.UnifiedCacheManager.save('currentUser', user, { 
+        layer: 'sessionStorage', 
+        includeUserId: false 
+      });
+      
+      // Also save to bootstrap keys for compatibility (fallback if UnifiedCacheManager not available)
+      if (typeof sessionStorage !== 'undefined') {
+        sessionStorage.setItem(DEV_SESSION_TOKEN_KEY, token);
+        sessionStorage.setItem(DEV_SESSION_USER_KEY, JSON.stringify(user));
+      }
     } else {
-      window.AuthDebugMonitor?.log('error', '❌ No cache layer available for saveAuthToCache');
-      return false;
+      // Fallback: direct sessionStorage (bootstrap mode - before UnifiedCacheManager initializes)
+      if (typeof sessionStorage !== 'undefined') {
+        sessionStorage.setItem(DEV_SESSION_TOKEN_KEY, token);
+        sessionStorage.setItem(DEV_SESSION_USER_KEY, JSON.stringify(user));
+      } else {
+        window.AuthDebugMonitor?.log('error', '❌ No sessionStorage available for saveAuthToCache');
+        return false;
+      }
     }
     
-    // Verify
-    const verifyUser = window.UnifiedCacheManager
-      ? await window.UnifiedCacheManager.get('currentUser', authCacheOptions)
-      : JSON.parse(sessionStorage.getItem(DEV_SESSION_USER_KEY) || 'null');
-    const verifyToken = window.UnifiedCacheManager
-      ? await window.UnifiedCacheManager.get('authToken', authCacheOptions)
-      : sessionStorage.getItem(DEV_SESSION_TOKEN_KEY);
+    // Verify - check SessionStorageLayer first, then bootstrap keys
+    let verifyUser = null;
+    let verifyToken = null;
+    if (window.UnifiedCacheManager?.initialized) {
+      verifyUser = await window.UnifiedCacheManager.get('currentUser', { 
+        layer: 'sessionStorage', 
+        includeUserId: false 
+      });
+      verifyToken = await window.UnifiedCacheManager.get('authToken', { 
+        layer: 'sessionStorage', 
+        includeUserId: false 
+      });
+    }
+    // Fallback to bootstrap keys if not found in SessionStorageLayer
+    if (!verifyUser || !verifyToken) {
+      if (typeof sessionStorage !== 'undefined') {
+        verifyUser = JSON.parse(sessionStorage.getItem(DEV_SESSION_USER_KEY) || 'null');
+        verifyToken = sessionStorage.getItem(DEV_SESSION_TOKEN_KEY);
+      }
+    }
     
     window.AuthDebugMonitor?.log('info', '✅ saveAuthToCache completed', {
       userSaved: verifyUser !== null,
@@ -161,23 +269,36 @@ async function getAuthFromCache() {
   window.AuthDebugMonitor?.log('info', '🔍 getAuthFromCache', {});
   
   try {
-    if (window.UnifiedCacheManager) {
-      const user = await window.UnifiedCacheManager.get('currentUser', authCacheOptions);
-      const token = await window.UnifiedCacheManager.get('authToken', authCacheOptions);
-      
-      window.AuthDebugMonitor?.log('info', '✅ getAuthFromCache result', {
-        userFound: user !== null,
-        tokenFound: token !== null,
-        userId: user?.id
+    // Try SessionStorageLayer through UnifiedCacheManager first (preferred method)
+    if (window.UnifiedCacheManager?.initialized) {
+      const user = await window.UnifiedCacheManager.get('currentUser', { 
+        layer: 'sessionStorage', 
+        includeUserId: false 
+      });
+      const token = await window.UnifiedCacheManager.get('authToken', { 
+        layer: 'sessionStorage', 
+        includeUserId: false 
       });
       
-      return { user, token };
+      if (user && token) {
+        window.AuthDebugMonitor?.log('info', '✅ getAuthFromCache result (SessionStorageLayer)', {
+          userFound: user !== null,
+          tokenFound: token !== null,
+          userId: user?.id
+        });
+        return { user, token };
+      }
     }
+    
+    // Fallback: direct sessionStorage (bootstrap mode - before UnifiedCacheManager initializes)
     if (typeof sessionStorage !== 'undefined') {
       const user = JSON.parse(sessionStorage.getItem(DEV_SESSION_USER_KEY) || 'null');
       const token = sessionStorage.getItem(DEV_SESSION_TOKEN_KEY);
-      return { user, token };
+      if (user && token) {
+        return { user, token };
+      }
     }
+    
     window.AuthDebugMonitor?.log('error', '❌ No cache layer available for getAuthFromCache');
     return { user: null, token: null };
   } catch (error) {
@@ -192,13 +313,22 @@ async function removeAuthFromCache() {
   window.AuthDebugMonitor?.log('warn', '🗑️ removeAuthFromCache called');
   
   try {
-    if (window.UnifiedCacheManager) {
-      await window.UnifiedCacheManager.remove('currentUser', authCacheOptions);
-      await window.UnifiedCacheManager.remove('authToken', authCacheOptions);
+    // Remove from SessionStorageLayer through UnifiedCacheManager (preferred method)
+    if (window.UnifiedCacheManager?.initialized) {
+      await window.UnifiedCacheManager.remove('authToken', { 
+        layer: 'sessionStorage', 
+        includeUserId: false 
+      });
+      await window.UnifiedCacheManager.remove('currentUser', { 
+        layer: 'sessionStorage', 
+        includeUserId: false 
+      });
     }
+    
+    // Always clear bootstrap keys as fallback (bootstrap mode compatibility)
     if (typeof sessionStorage !== 'undefined') {
-      sessionStorage.removeItem(DEV_SESSION_USER_KEY);
       sessionStorage.removeItem(DEV_SESSION_TOKEN_KEY);
+      sessionStorage.removeItem(DEV_SESSION_USER_KEY);
     }
     
     window.AuthDebugMonitor?.log('info', '✅ removeAuthFromCache completed');
@@ -459,7 +589,14 @@ async function login(username, password) {
       status: response.status,
       error: data.error?.message 
     });
-    throw new Error(data.error?.message || 'שגיאה בהתחברות');
+    // Add confirm dialog to allow user to copy console logs before showing error
+    const errorMsg = data.error?.message || 'שגיאה בהתחברות';
+    const shouldShowError = confirm('❌ שגיאה בהתחברות:\n\n' + errorMsg + '\n\nClick OK to continue, or Cancel to stay on page (allows copying console logs).');
+    if (!shouldShowError) {
+      // User cancelled - stay on page to copy logs
+      return;
+    }
+    throw new Error(errorMsg);
   }
 
   // BREAKPOINT: After successful login response
@@ -475,7 +612,32 @@ async function login(username, password) {
   if (data.data?.user) {
     currentUser = data.data.user;
     authToken = data.data?.access_token;
+    // #region agent log
+    sendDebugLog('auth.js:609', 'BEFORE saveAuthToCache in login()', {
+      hasUser: !!data.data?.user,
+      userId: data.data?.user?.id,
+      hasToken: !!data.data?.access_token,
+      hasUnifiedCache: !!window.UnifiedCacheManager,
+      ucInitialized: window.UnifiedCacheManager?.initialized
+    }, 'B');
+    // #endregion
     await saveAuthToCache(currentUser, authToken);
+    // #region agent log
+    sendDebugLog('auth.js:613', 'AFTER saveAuthToCache in login()', {
+      sessionToken: typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('dev_authToken') : null,
+      sessionUser: typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('dev_currentUser') : null
+    }, 'B');
+    // #endregion
+    
+    // Save timestamp to prevent redirect loop (auth-guard checks this)
+    if (typeof sessionStorage !== 'undefined') {
+      sessionStorage.setItem('recent_login_timestamp', Date.now().toString());
+      // #region agent log
+      sendDebugLog('auth.js:618', 'recent_login_timestamp saved in login()', {
+        timestamp: sessionStorage.getItem('recent_login_timestamp')
+      }, 'D');
+      // #endregion
+    }
   }
 
   window.AuthDebugMonitor?.log('info', '✅ LOGIN function completed', { username, userId: currentUser?.id });
@@ -729,28 +891,45 @@ async function logout() {
     console.warn('Logout API call failed:', error);
   }
   
-  // Clear local state - ONLY UnifiedCacheManager, no fallbacks
+  // Clear local state - ALL storage layers
   authToken = null;
   currentUser = null;
-  await removeAuthFromCache();
-  // Keep saved credentials in localStorage for cross-tab sync
-  localStorage.removeItem('savedUsername');
-  localStorage.removeItem('savedPassword');
-  localStorage.removeItem('rememberCredentials');
   
-  // Clear sessionStorage (redirectAfterLogin, etc.)
+  // Clear from UnifiedCacheManager (SessionStorageLayer)
+  await removeAuthFromCache();
+  
+  // Clear from localStorage directly (critical - must be explicit)
+  try {
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('currentUser');
+    // Keep saved credentials in localStorage for cross-tab sync (these are safe to keep)
+    // localStorage.removeItem('savedUsername'); // Keep for convenience
+    // localStorage.removeItem('savedPassword'); // Keep for convenience
+    // localStorage.removeItem('rememberCredentials'); // Keep for convenience
+  } catch (error) {
+    console.warn('Error clearing localStorage during logout:', error);
+  }
+  
+  // Clear sessionStorage (redirectAfterLogin, recent_login_timestamp, etc.)
   try {
     sessionStorage.removeItem('redirectAfterLogin');
+    sessionStorage.removeItem('recent_login_timestamp');
+    sessionStorage.removeItem('login_redirect_url');
     // Clear any other sessionStorage keys that might contain user data
     const sessionKeys = Object.keys(sessionStorage);
     sessionKeys.forEach(key => {
-      if (key.startsWith('tiktrack_') || key.includes('auth') || key.includes('user')) {
+      if (key.startsWith('tiktrack_') || key.includes('auth') || key.includes('user') || 
+          key === 'dev_authToken' || key === 'dev_currentUser') {
         sessionStorage.removeItem(key);
       }
     });
   } catch (error) {
     console.warn('Error clearing sessionStorage during logout:', error);
   }
+  
+  // Clear window globals (for dev/no-cache flows)
+  window.authToken = null;
+  window.currentUser = null;
 
   // Clear all cache layers
   try {
@@ -816,16 +995,11 @@ async function logout() {
     window.dashboardDataState.lastLoadedAt = null;
   }
 
-  // Small delay to allow UI updates, then show login modal
-  setTimeout(async () => {
-    // Show login modal instead of redirecting
-    if (typeof window.TikTrackAuth?.showLoginModal === 'function') {
-      await window.TikTrackAuth.showLoginModal();
-    } else {
-      // Fallback: redirect to home if modal not available
-      window.location.href = '/';
-    }
-  }, 100);
+  // Redirect to login page after logout (not modal - full page redirect for clean state)
+  // Small delay to allow UI updates and cache clearing to complete
+  setTimeout(() => {
+    window.location.href = '/login.html';
+  }, 200);
 }
 
 /**
@@ -1178,20 +1352,59 @@ function setupLoginForm(formId = 'loginForm', onSuccess = null) {
 // פונקציה לבדיקת התחברות בעת טעינת הדף
 
 async function checkAuthentication(onAuthenticated = null, onNotAuthenticated = null) {
+  // #region agent log
+  fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'auth.js:1282',message:'checkAuthentication ENTRY',data:{hasOnAuthenticated:!!onAuthenticated,hasOnNotAuthenticated:!!onNotAuthenticated,hasUnifiedCache:!!window.UnifiedCacheManager,ucInitialized:window.UnifiedCacheManager?.initialized,hasSessionStorage:typeof sessionStorage!=='undefined',pathname:window.location?.pathname},timestamp:Date.now(),sessionId:'debug-session',runId:'run2',hypothesisId:'A'})}).catch(()=>{});
+  // #endregion
 
     console.log('[auth.js] checkAuthentication: Starting authentication check');
     console.log('[auth.js] checkAuthentication: Looking for stored tokens...');
     console.log('[auth.js] checkAuthentication: UnifiedCacheManager exists:', !!window.UnifiedCacheManager);
     console.log('[auth.js] checkAuthentication: UnifiedCacheManager initialized:', window.UnifiedCacheManager?.initialized);
 
-  // Prevent multiple simultaneous calls
+  // Prevent multiple simultaneous calls - wait for existing call instead of skipping
   if (window._checkingAuth) {
-
-    console.log('[auth.js] checkAuthentication: Already checking, skipping...');
-    return;
+    // #region agent log
+    fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'auth.js:1293',message:'checkAuthentication already checking - waiting for result',data:{hasPendingResult:!!window._checkingAuthPromise},timestamp:Date.now(),sessionId:'debug-session',runId:'run2',hypothesisId:'A'})}).catch(()=>{});
+    // #endregion
+    console.log('[auth.js] checkAuthentication: Already checking, waiting for result...');
+    // Wait for the existing call to complete instead of returning undefined
+    // Try to get the promise immediately
+    if (window._checkingAuthPromise) {
+      console.log('[auth.js] checkAuthentication: Found existing promise, waiting for result...');
+      const result = await window._checkingAuthPromise;
+      console.log('[auth.js] checkAuthentication: Got result from existing promise:', result);
+      return result;
+    }
+    // If no promise exists yet, wait for it to be created (may be created between checks)
+    console.log('[auth.js] checkAuthentication: No promise yet, waiting for it to be created...');
+    let attempts = 0;
+    const maxAttempts = 100; // Wait up to 10 seconds (100 * 100ms)
+    while (window._checkingAuth && attempts < maxAttempts) {
+      await new Promise(resolve => setTimeout(resolve, 100));
+      attempts++;
+      if (window._checkingAuthPromise) {
+        console.log('[auth.js] checkAuthentication: Promise created after', attempts, 'attempts, waiting for result...');
+        const result = await window._checkingAuthPromise;
+        console.log('[auth.js] checkAuthentication: Got result after waiting:', result);
+        return result;
+      }
+    }
+    // If still checking after waiting, it means the promise was never created or resolved
+    console.warn('[auth.js] checkAuthentication: Still checking after', maxAttempts, 'attempts, returning error');
+    return { authenticated: false, user: null, error: 'check_timeout' };
   }
   window._checkingAuth = true;
+  // Create promise that will be resolved with the result
+  let resolvePromise;
+  window._checkingAuthPromise = new Promise((resolve) => {
+    resolvePromise = resolve;
+  });
+  // #region agent log
+  fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'auth.js:1319',message:'checkAuthentication starting - _checkingAuth set to true',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'run2',hypothesisId:'A'})}).catch(()=>{});
+  // #endregion
   
+  // Wrap everything in try-catch-finally to ensure promise is resolved
+  let finalResult;
   try {
     // Ensure we have a token before hitting the server
     let tokenAvailable = false;
@@ -1209,7 +1422,18 @@ async function checkAuthentication(onAuthenticated = null, onNotAuthenticated = 
       }
 
       if (window.UnifiedCacheManager.initialized) {
-        const t = await window.UnifiedCacheManager.get('authToken', authCacheOptions).catch(() => null);
+        // #region agent log
+        fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'auth.js:1316',message:'BEFORE UnifiedCacheManager.get authToken',data:{initialized:window.UnifiedCacheManager.initialized,options:authCacheOptions},timestamp:Date.now(),sessionId:'debug-session',runId:'run2',hypothesisId:'B'})}).catch(()=>{});
+        // #endregion
+        const t = await window.UnifiedCacheManager.get('authToken', authCacheOptions).catch((e) => {
+          // #region agent log
+          fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'auth.js:1316',message:'UnifiedCacheManager.get authToken ERROR',data:{error:e?.message,stack:e?.stack},timestamp:Date.now(),sessionId:'debug-session',runId:'run2',hypothesisId:'B'})}).catch(()=>{});
+          // #endregion
+          return null;
+        });
+        // #region agent log
+        fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'auth.js:1322',message:'AFTER UnifiedCacheManager.get authToken',data:{hasToken:!!t,tokenType:typeof t,tokenLength:t?.length},timestamp:Date.now(),sessionId:'debug-session',runId:'run2',hypothesisId:'B'})}).catch(()=>{});
+        // #endregion
         if (t) {
           tokenAvailable = true;
           effectiveToken = t;
@@ -1247,22 +1471,32 @@ async function checkAuthentication(onAuthenticated = null, onNotAuthenticated = 
     console.log('[auth.js] checkAuthentication: sessionStorage token =', (typeof sessionStorage !== 'undefined') ? (sessionStorage.getItem(DEV_SESSION_TOKEN_KEY) ? 'present' : 'null') : 'no sessionStorage');
 
     if (!tokenAvailable) {
+      // #region agent log
+      fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'auth.js:1354',message:'No token available - returning no_token',data:{hasOnNotAuthenticated:!!onNotAuthenticated},timestamp:Date.now(),sessionId:'debug-session',runId:'run2',hypothesisId:'B'})}).catch(()=>{});
+      // #endregion
       console.log('[auth.js] checkAuthentication: No token found');
       window.Logger?.info?.('❌ [auth.js] No token available, skipping /api/auth/me', { page: 'auth' });
       if (onNotAuthenticated && typeof onNotAuthenticated === 'function') {
         onNotAuthenticated();
       }
       // Return result without showing modal - let caller decide what to do
-      return { authenticated: false, user: null, error: 'no_token' };
+      finalResult = { authenticated: false, user: null, error: 'no_token' };
+      if (resolvePromise) resolvePromise(finalResult);
+      return finalResult;
     }
 
     console.log('[auth.js] checkAuthentication: Checking server authentication...');
+    // #region agent log
+    fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'auth.js:1363',message:'BEFORE fetch /api/auth/me',data:{tokenAvailable,hasEffectiveToken:!!effectiveToken,tokenLength:effectiveToken?.length,hasAuthHeader:!!effectiveToken,tokenPrefix:effectiveToken?.substring(0,20)},timestamp:Date.now(),sessionId:'debug-session',runId:'run2',hypothesisId:'A'})}).catch(()=>{});
+    // #endregion
     const response = await fetch('/api/auth/me', {
       method: 'GET',
       headers: effectiveToken ? { 'Authorization': `Bearer ${effectiveToken}` } : undefined
       // Authorization also injected by api-fetch-wrapper if present
     });
-    
+    // #region agent log
+    fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'auth.js:1372',message:'AFTER fetch /api/auth/me',data:{status:response.status,ok:response.ok,statusText:response.statusText},timestamp:Date.now(),sessionId:'debug-session',runId:'run2',hypothesisId:'A'})}).catch(()=>{});
+    // #endregion
     console.log('[auth.js] checkAuthentication: Server response status:', response.status);
 
     if (response.ok) {
@@ -1283,6 +1517,11 @@ async function checkAuthentication(onAuthenticated = null, onNotAuthenticated = 
         localStorage.setItem('currentUser', JSON.stringify(currentUser));
         // Save to UnifiedCacheManager using helper function
         await saveAuthToCache(currentUser, authToken);
+        
+        // Save timestamp to prevent redirect loop (auth-guard checks this)
+        if (typeof sessionStorage !== 'undefined') {
+          sessionStorage.setItem('recent_login_timestamp', Date.now().toString());
+        }
 
         // Close login modal if present (prevents lingering modal in dev/no-cache)
         closeLoginModal();
@@ -1305,39 +1544,71 @@ async function checkAuthentication(onAuthenticated = null, onNotAuthenticated = 
           });
         }
         
+        // #region agent log
+        fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'auth.js:1467',message:'AUTHENTICATION SUCCESS - returning authenticated=true',data:{userId:currentUser?.id,username:currentUser?.username,hasOnAuthenticated:!!onAuthenticated},timestamp:Date.now(),sessionId:'debug-session',runId:'run2',hypothesisId:'A'})}).catch(()=>{});
+        // #endregion
+        finalResult = { authenticated: true, user: currentUser, error: null };
         if (onAuthenticated && typeof onAuthenticated === 'function') {
           onAuthenticated();
         } else {
           showDashboard();
         }
-        return { authenticated: true, user: currentUser, error: null };
+        if (resolvePromise) resolvePromise(finalResult);
+        return finalResult;
       }
     } else if (response.status === 401) {
+      // #region agent log
+      fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'auth.js:1433',message:'401 response from /api/auth/me - server says unauthenticated',data:{status:response.status,hasEffectiveToken:!!effectiveToken},timestamp:Date.now(),sessionId:'debug-session',runId:'run2',hypothesisId:'A'})}).catch(()=>{});
+      // #endregion
       // 401 is expected when not authenticated - silently handle it
       // Don't log as error to avoid console pollution
     }
   } catch (error) {
+    // #region agent log
+    fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'auth.js:1437',message:'checkAuthentication catch block - error occurred',data:{errorMessage:error?.message,errorStack:error?.stack,is401Error:error?.message?.includes('401')},timestamp:Date.now(),sessionId:'debug-session',runId:'run2',hypothesisId:'A'})}).catch(()=>{});
+    // #endregion
     // Only log non-401 errors to avoid console pollution
     // 401 errors are expected and handled silently
     if (error.message && !error.message.includes('401')) {
       console.warn('Failed to check authentication:', error);
     }
   } finally {
+    // Ensure promise is resolved even if there was an error
+    if (resolvePromise && !finalResult) {
+      finalResult = { authenticated: false, user: null, error: 'check_failed' };
+      resolvePromise(finalResult);
+    }
     window._checkingAuth = false;
+    window._checkingAuthPromise = null;
+    // #region agent log
+    fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'auth.js:1501',message:'checkAuthentication finally - _checkingAuth set to false',data:{hasFinalResult:!!finalResult,finalResultAuthenticated:finalResult?.authenticated},timestamp:Date.now(),sessionId:'debug-session',runId:'run2',hypothesisId:'A'})}).catch(()=>{});
+    // #endregion
   }
   
   // Server check failed - check cache first - ONLY UnifiedCacheManager, no fallbacks
   let cachedUser = null;
   if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
+    // #region agent log
+    fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'auth.js:1447',message:'BEFORE checking cachedUser (server failed)',data:{initialized:window.UnifiedCacheManager.initialized,options:authCacheOptions},timestamp:Date.now(),sessionId:'debug-session',runId:'run2',hypothesisId:'A'})}).catch(()=>{});
+    // #endregion
     cachedUser = await window.UnifiedCacheManager.get('currentUser', authCacheOptions);
+    // #region agent log
+    fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'auth.js:1450',message:'AFTER checking cachedUser (server failed)',data:{hasCachedUser:!!cachedUser,cachedUserId:cachedUser?.id},timestamp:Date.now(),sessionId:'debug-session',runId:'run2',hypothesisId:'A'})}).catch(()=>{});
+    // #endregion
   }
   
   // If server said unauthenticated, always clear auth cache and force login
   if (cachedUser) {
     console.debug('[auth.js] checkAuthentication: Server check failed, clearing cached auth and showing login');
+    // #region agent log
+    fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'auth.js:1455',message:'Server failed but cachedUser exists - clearing cache',data:{cachedUserId:cachedUser?.id},timestamp:Date.now(),sessionId:'debug-session',runId:'run2',hypothesisId:'A'})}).catch(()=>{});
+    // #endregion
   }
   currentUser = null;
   authToken = null;
+  // #region agent log
+  fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'auth.js:1460',message:'BEFORE removeAuthFromCache (server failed)',data:{},timestamp:Date.now(),sessionId:'debug-session',runId:'run2',hypothesisId:'A'})}).catch(()=>{});
+  // #endregion
   await removeAuthFromCache();
   
   // No cached user - safe to clear - ONLY UnifiedCacheManager, no fallbacks
@@ -1346,7 +1617,12 @@ async function checkAuthentication(onAuthenticated = null, onNotAuthenticated = 
   await removeAuthFromCache();
   
   // Not authenticated
+  // #region agent log
+  fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'auth.js:1527',message:'AUTHENTICATION FAILED - returning authenticated=false',data:{hasCachedUser:!!cachedUser,hasOnNotAuthenticated:!!onNotAuthenticated,hasShowLoginModal:typeof window.TikTrackAuth?.showLoginModal==='function'},timestamp:Date.now(),sessionId:'debug-session',runId:'run2',hypothesisId:'A'})}).catch(()=>{});
+  // #endregion
 
+  finalResult = { authenticated: false, user: null, error: 'authentication_failed' };
+  
   if (onNotAuthenticated && typeof onNotAuthenticated === 'function') {
     onNotAuthenticated();
   } else {
@@ -1360,7 +1636,8 @@ async function checkAuthentication(onAuthenticated = null, onNotAuthenticated = 
     }
   }
 
-  return { authenticated: false, user: null, error: 'authentication_failed' };
+  if (resolvePromise) resolvePromise(finalResult);
+  return finalResult;
 }
 
 // פונקציה ליצירת ממשק התחברות דינמי

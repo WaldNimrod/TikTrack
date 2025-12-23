@@ -401,7 +401,7 @@
           <div class="ticker-list-widget-item-actions">
             <button data-button-type="DASHBOARD"
                     data-variant="small"
-                    data-onclick="window.location.href='/ticker-dashboard.html?tickerId=${ticker.id}'"
+                    data-onclick="window.location.href='/ticker_dashboard.html?tickerId=${ticker.id}'"
                     title="דשבורד מלא"
                     class="btn btn-sm btn-outline-primary">
               ${window.BUTTON_ICONS?.DASHBOARD ? `<img src="${window.BUTTON_ICONS.DASHBOARD}" width="16" height="16" alt="דשבורד" class="icon me-1">` : ''}

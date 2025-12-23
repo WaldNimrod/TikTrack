@@ -76,7 +76,7 @@
 - עמודי test (test-*.html)
 - עמודי mockup (daily-snapshots-*.html)
 - עמודי modal (modal-*.html)
-- עמודי smart (*-smart.html)
+- עמודי smart (הועברו לארכיון: archive/smart-pages/*-smart.html)
 
 ---
 

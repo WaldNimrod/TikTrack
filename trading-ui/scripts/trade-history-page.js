@@ -1010,7 +1010,7 @@
                 
                 // Fetch historical data with full progress tracking (like ticker dashboard)
                 const overlayId = `fetchHistoricalData-${tickerId}`;
-                // Use same variable name as ticker-dashboard.js (lowercase)
+                // Use same variable name as ticker_dashboard.js (lowercase)
                 const progressManager = window.unifiedProgressManager || window.UnifiedProgressManager;
                 
                 if (window.Logger) {

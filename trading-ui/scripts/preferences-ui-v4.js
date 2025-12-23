@@ -30,7 +30,7 @@
       }
 
       this.initialized = true;
-      
+
       // Step 1: Initialize lazy loading FIRST (like other pages)
       // This ensures preferences are loaded to window.currentPreferences before UI initialization
       const userId = window.PreferencesCore?.currentUserId ?? 1;
@@ -198,7 +198,7 @@
       }
 
       // Load accounts for default account preference (only if element exists - preferences page only)
-      const defaultAccountSelect = document.getElementById('defaultAccountSelect') || document.getElementById('defaultAccount');
+      const defaultAccountSelect = document.getElementById('default_trading_account') || document.getElementById('defaultAccountSelect') || document.getElementById('defaultAccount');
       if (defaultAccountSelect && typeof window.loadAccountsForPreferences === 'function') {
         await window.loadAccountsForPreferences();
       }

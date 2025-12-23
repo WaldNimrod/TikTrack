@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl" class="tag-management-page">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="ניהול תגיות וקטגוריות במערכת TikTrack">
+    <meta name="keywords" content="TikTrack, תגיות, ניהול תגיות, קטגוריות, אנליטיקה">
+    <meta name="author" content="TikTrack">
+    <title>ניהול תגיות - TikTrack</title>
+
+    <!-- Google Fonts -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wght@300;400;500;600;700&display=swap">
+
+    <!-- Bootstrap CSS (חובה ראשון) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css?v=0da3519a_20251102_104906">
+
+    <!-- LOCK: DO NOT MODIFY - ITCSS Loading Order -->
+    <!-- ITCSS Layer 1: Settings -->
+    <link rel="stylesheet" href="styles-new/01-settings/_variables.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/01-settings/_color-variables.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/01-settings/_colors-semantic.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/01-settings/_typography.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/01-settings/_spacing.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/01-settings/_breakpoints.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/01-settings/_rtl-logical.css?v=0da3519a_20251102_104906">
+
+    <!-- ITCSS Layer 2: Tools -->
+    <link rel="stylesheet" href="styles-new/02-tools/_mixins.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/02-tools/_functions.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/02-tools/_rtl-helpers.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/02-tools/_utilities.css?v=0da3519a_20251102_104906">
+
+    <!-- ITCSS Layer 3: Generic -->
+    <link rel="stylesheet" href="styles-new/03-generic/_reset.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/03-generic/_base.css?v=0da3519a_20251102_104906">
+
+    <!-- ITCSS Layer 4: Elements -->
+    <link rel="stylesheet" href="styles-new/04-elements/_headings.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/04-elements/_forms-base.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/04-elements/_buttons-base.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/04-elements/_links.css?v=0da3519a_20251102_104906">
+
+    <!-- ITCSS Layer 5: Objects -->
+    <link rel="stylesheet" href="styles-new/05-objects/_layout.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/05-objects/_grid.css?v=0da3519a_20251102_104906">
+
+    <!-- ITCSS Layer 6: Components -->
+    <link rel="stylesheet" href="styles-new/06-components/_bootstrap-overrides.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/06-components/_buttons-advanced.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/06-components/_tables.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/06-components/_forms-advanced.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/06-components/_cards.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/06-components/_info-summary.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/06-components/_modals.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/06-components/_navigation.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/06-components/_linked-items.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/06-components/_actions-menu.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/06-components/_badges-status.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/06-components/_entity-colors.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/06-components/_pagination-system.css?v=0da3519a_20251102_104906">
+
+    <!-- ITCSS Layer 7: Pages -->
+    <link rel="stylesheet" href="styles-new/07-pages/_tag-management.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/header-styles.css?v=0da3519a_20251102_104906">
+
+    <!-- ITCSS Layer 8: Themes -->
+    <link rel="stylesheet" href="styles-new/08-themes/_light.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/08-themes/_high-contrast.css?v=0da3519a_20251102_104906">
+
+    <!-- ITCSS Layer 9: Utilities -->
+    <link rel="stylesheet" href="styles-new/07-utilities/_common-patterns.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/09-utilities/_utilities.css?v=0da3519a_20251102_104906">
+
+    <!-- Icons -->
+    
+    
+    <!-- Bootstrap Icons and FontAwesome removed - using Tabler Icons via IconSystem -->
+</head>
+<body class="tag-management-page">
+    <!-- 
+        TikTrack Page Template
+        גרסה: 2.0
+        תאריך: 14 בנובמבר 2025
+        מערכת: 8 מודולי אתחול + ITCSS מלא
+        מטמון: 4 שכבות מאוחדות
+    -->
+    <!-- LOCK: DO NOT MODIFY - Page Structure -->
+    <div class="container-fluid page-container">
+        <header class="row g-0">
+            <div class="col-12">
+                <div id="unified-header"></div>
+            </div>
+        </header>
+
+        <main class="row g-0">
+            <div class="col-12">
+                <div class="background-wrapper">
+                    <div class="page-body">
+                        <div class="main-content">
+                <div class="top-section" id="tag-management-top" data-section="top">
+                    <div class="section-header">
+                        <div class="table-title">
+                            <img src="/trading-ui/images/icons/tabler/tags.svg" width="16" height="16" alt="tags" class="icon section-icon text-success">
+                            <span>ניהול תגיות</span>
+                        </div>
+                        <div class="table-actions">
+                            <button type="button"
+                                    data-button-type="TOGGLE"
+                                    data-variant="small"
+                                    data-onclick="toggleSection('tag-management-top')"
+                                    data-text="הצג/הסתר">
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <p class="text-muted mb-3">
+                            מסך מרכזי לניהול קטגוריות, תגיות, סינון מתקדם ונתוני שימוש בכל רחבי המערכת.
+                        </p>
+                        <div class="button-row d-flex flex-wrap gap-2">
+                            <button type="button"
+                                    data-button-type="ADD"
+                                    data-variant="primary"
+                                    data-icon="➕"
+                                    data-text="קטגוריה חדשה"
+                                    data-onclick="window.TagManagementPage?.openCategoryModal('add')">
+                            </button>
+                            <button type="button"
+                                    data-button-type="ADD"
+                                    data-variant="outline"
+                                    data-icon="🏷️"
+                                    data-text="תגית חדשה"
+                                    data-onclick="window.TagManagementPage?.openTagModal('add')">
+                            </button>
+                            <button type="button"
+                                    data-button-type="REFRESH"
+                                    data-icon="🔄"
+                                    data-text="רענן נתונים"
+                                    data-onclick="window.TagManagementPage?.refreshAll()">
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <section class="content-section" id="tag-analytics-section" data-group="analytics" data-section="tag-analytics">
+                    <div class="section-header">
+                        <div class="table-title">
+                            <img src="/trading-ui/images/icons/tabler/chart-line.svg" width="16" height="16" alt="chart-line" class="icon section-icon text-primary">
+                            <span>אנליטיקה</span>
+                        </div>
+                        <div class="table-actions">
+                            <button type="button"
+                                    data-button-type="REFRESH"
+                                    data-variant="small"
+                                    data-icon="🔄"
+                                    data-onclick="window.TagManagementPage?.refreshAnalytics()">
+                            </button>
+                            <button type="button"
+                                    data-button-type="TOGGLE"
+                                    data-variant="small"
+                                    data-onclick="toggleSection('tag-analytics-section')"
+                                    data-text="הצג/הסתר">
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div class="row g-3" id="tagAnalyticsSummary">
+                            <div class="col-md-3 col-sm-6">
+                                <div class="info-card info-card-primary">
+                                    <div class="info-card-label">סה״כ תגיות פעילות</div>
+                                    <div class="info-card-value" id="totalActiveTags">-</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-sm-6">
+                                <div class="info-card info-card-secondary">
+                                    <div class="info-card-label">קטגוריות פעילות</div>
+                                    <div class="info-card-value" id="totalActiveCategories">-</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-sm-6">
+                                <div class="info-card info-card-success">
+                                    <div class="info-card-label">הצעות זמינות</div>
+                                    <div class="info-card-value" id="suggestionsAvailable">-</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-sm-6">
+                                <div class="info-card info-card-warning">
+                                    <div class="info-card-label">שימושים ב-30 ימים</div>
+                                    <div class="info-card-value" id="recentUsageCount">-</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="table-responsive mt-3">
+                            <table class="table table-sm table-striped align-middle" id="tagUsageLeaderboardTable" data-table-type="tag_usage_leaderboard">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th class="sortable-header">תגית</th>
+                                        <th class="sortable-header">קטגוריה</th>
+                                        <th class="sortable-header">שימושים</th>
+                                        <th>ישויות מובילות</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td colspan="4" class="text-center text-muted">טוען נתונים...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="content-section" id="tag-categories-section" data-group="categories" data-section="tag-categories">
+                    <div class="section-header">
+                        <div class="table-title">
+                            <img src="/trading-ui/images/icons/tabler/layers.svg" width="16" height="16" alt="layers" class="icon section-icon text-secondary">
+                            <span>קטגוריות תגיות</span>
+                        </div>
+                        <div class="table-actions">
+                            <button type="button"
+                                    data-button-type="ADD"
+                                    data-variant="small"
+                                    data-icon="➕"
+                                    data-onclick="window.TagManagementPage?.openCategoryModal('add')">
+                            </button>
+                            <button type="button"
+                                    data-button-type="TOGGLE"
+                                    data-variant="small"
+                                    data-onclick="toggleSection('tag-categories-section')"
+                                    data-text="הצג/הסתר">
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle" id="tagCategoriesTable" data-table-type="tag_categories">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th class="sortable-header">שם</th>
+                                        <th class="sortable-header">תיאור</th>
+                                        <th class="sortable-header">תגיות פעילות</th>
+                                        <th class="sortable-header">עודכן</th>
+                                        <th>פעולות</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td colspan="5" class="text-center text-muted">טוען קטגוריות...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="content-section" id="tags-section" data-group="tags" data-section="tags-list">
+                    <div class="section-header">
+                        <div class="table-title">
+                            <i class="bi bi-tags section-icon text-success"></i>
+                            <span>תגיות</span>
+                        </div>
+                        <div class="table-actions">
+                            <button type="button"
+                                    data-button-type="ADD"
+                                    data-variant="small"
+                                    data-icon="🏷️"
+                                    data-onclick="window.TagManagementPage?.openTagModal('add')">
+                            </button>
+                            <button type="button"
+                                    data-button-type="TOGGLE"
+                                    data-variant="small"
+                                    data-onclick="toggleSection('tags-section')"
+                                    data-text="הצג/הסתר">
+                            </button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-4">
+                                <label for="tagsCategoryFilter" class="form-label small">סינון לפי קטגוריה</label>
+                                <select id="tagsCategoryFilter" class="form-select">
+                                    <option value="">הצג הכול</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="tagsSearchInput" class="form-label small">חיפוש תגית</label>
+                                <input type="search" id="tagsSearchInput" class="form-control" placeholder="שם תגית...">
+                            </div>
+                            <div class="col-md-4 d-flex align-items-end">
+                                <button type="button"
+                                        data-button-type="SECONDARY"
+                                        data-variant="full"
+                                        data-icon="🧹"
+                                        data-text="נקה סינון"
+                                        data-onclick="window.TagManagementPage?.resetFilters()">
+                                </button>
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle" id="tagsTable" data-table-type="tags">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th class="sortable-header">שם</th>
+                                        <th class="sortable-header">קטגוריה</th>
+                                        <th class="sortable-header">תיאור</th>
+                                        <th class="sortable-header">שימושים</th>
+                                        <th class="sortable-header">שימוש אחרון</th>
+                                        <th>פעולות</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td colspan="6" class="text-center text-muted">טוען תגיות...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+                            <div class="page-bottom-spacing"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="row g-0" aria-hidden="true">
+            <div class="col-12"><!-- Space reserved for global footer system --></div>
+        </footer>
+    </div>
+
+    <!-- LOCK: DO NOT MODIFY - Cache System Integration -->
+    <div class="notification-container" id="notificationContainer"></div>
+    <div id="toastContainer" class="toast-container position-fixed top-0 end-0 p-3"></div>
+
+    <!-- LOCK: DO NOT MODIFY - JavaScript Module Loading -->
+        <!-- =============================================================== -->
+        <!-- =============================================================== -->
+        <!-- =============================================================== -->
+        <!-- =============================================================== -->
+        <!-- =============================================================== -->
+        <!-- =============================================================== -->
+        <!-- =============================================================== -->
+        <!-- =============================================================== -->
+        <!-- =============================================================== -->
+        <!-- =============================================================== -->
+        <!-- =============================================================== -->
+        <!-- =============================================================== -->
+        <!-- =============================================================== -->
+        <!-- =============================================================== -->
+    <!-- ===== START SCRIPT LOADING ORDER ===== -->
+    <!-- =============================================================== -->
+    <!-- ⚠️ DO NOT MODIFY MANUALLY - Generated by generate-script-loading-code.js -->
+    <!-- 📋 Loading Order: BASE → SERVICES → MODULES → UI-ADVANCED → CRUD → PREFERENCES → INIT-SYSTEM -->
+    <!-- =============================================================== -->
+    <!-- ===== START SCRIPT LOADING ORDER ===== -->
+    <!-- =============================================================== -->
+    <!-- ⚠️ DO NOT MODIFY MANUALLY - Generated by generate-script-loading-code.js -->
+    <!-- 📋 Loading Order: BASE → SERVICES → MODULES → UI-ADVANCED → CRUD → PREFERENCES → INIT-SYSTEM -->
+    <!-- =============================================================== -->
+    <!-- ===== START SCRIPT LOADING ORDER ===== -->
+    <!-- =============================================================== -->
+    <!-- ⚠️ DO NOT MODIFY MANUALLY - Generated by generate-script-loading-code.js -->
+    <!-- 📋 Loading Order: BASE → SERVICES → MODULES → UI-ADVANCED → CRUD → PREFERENCES → INIT-SYSTEM -->
+    <!-- 🎯 Page: tag-management | Generated: 2025-12-07T01:43:46.226Z -->
+    <!-- 📦 Packages: base, services, modules, ui-advanced, crud, tag-management, preferences, validation, init-system -->
+    <!-- 🔧 Mode: development | Use Bundles: false -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 1/9: BASE PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 1 | Description: Core systems required for all pages -->
+    <!-- Dependencies:  -->
+    <!-- Critical: YES | Version: 1.5.0 -->
+
+    <!-- [1] Load Order: 1 | Strategy: defer -->
+    <script src="scripts/api-config.js?v=1.0.0" defer></script> <!-- Central API configuration -->
+    <!-- [2] Load Order: 2 | Strategy: defer -->
+    <script src="scripts/global-favicon.js?v=1.0.0" defer></script> <!-- Favicon management -->
+    <!-- [3] Load Order: 3 | Strategy: defer -->
+    <script src="scripts/notification-system.js?v=1.0.0" defer></script> <!-- Notification system -->
+    <!-- [4] Load Order: 4 | Strategy: defer -->
+    <script src="scripts/cache-sync-manager.js?v=1.0.0" defer></script> <!-- Cache synchronization manager -->
+    <!-- [5] Load Order: 5 | Strategy: defer -->
+    <script src="scripts/ui-utils.js?v=1.0.0" defer></script> <!-- UI utilities -->
+    <!-- [6] Load Order: 6 | Strategy: defer -->
+    <script src="scripts/warning-system.js?v=1.0.0" defer></script> <!-- Warning system -->
+    <!-- [7] Load Order: 7 | Strategy: defer -->
+    <script src="scripts/error-handlers.js?v=1.0.0" defer></script> <!-- Error handling system -->
+    <!-- [8] Load Order: 8 | Strategy: defer -->
+    <script src="scripts/unified-cache-manager.js?v=1.0.0" defer></script> <!-- Unified cache manager -->
+    <!-- [9] Load Order: 9 | Strategy: defer -->
+    <script src="scripts/icon-mappings.js?v=1.0.0" defer></script> <!-- Central icon mappings -->
+    <!-- [10] Load Order: 10 | Strategy: defer -->
+    <script src="scripts/icon-system.js?v=1.0.0" defer></script> <!-- Central icon system -->
+    <!-- [11] Load Order: 11 | Strategy: defer -->
+    <script src="scripts/icon-replacement-helper.js?v=1.0.0" defer></script> <!-- Icon replacement helper for standardizing icon usage -->
+    <!-- [12] Load Order: 12 | Strategy: defer -->
+    <script src="scripts/cache-clear-menu.js?v=1.0.0" defer></script> <!-- Cache clearing control (Stage B-Lite) -->
+    <!-- [13] Load Order: 13 | Strategy: defer -->
+    <script src="scripts/cache-ttl-guard.js?v=1.0.0" defer></script> <!-- TTL guard for entity loaders -->
+    <!-- [14] Load Order: 14 | Strategy: defer -->
+    <script src="scripts/auth.js?v=1.0.0" defer></script> <!-- Authentication system -->
+    <!-- [15] Load Order: 15 | Strategy: defer -->
+    <script src="scripts/auth-guard.js?v=1.0.0" defer></script> <!-- Page protection - authentication guard -->
+    <!-- [16] Load Order: 16 | Strategy: defer -->
+    <script src="scripts/logger-service.js?v=1.0.0" defer></script> <!-- Advanced logging service -->
+    <!-- [17] Load Order: 17 | Strategy: defer -->
+    <script src="scripts/header-system.js?v=1.0.0" defer></script> <!-- Header system -->
+    <!-- [18] Load Order: 18 | Strategy: defer -->
+    <script src="scripts/page-state-manager.js?v=1.0.0" defer></script> <!-- Unified page state manager -->
+    <!-- [19] Load Order: 19 | Strategy: defer -->
+    <script src="scripts/page-utils.js?v=1.0.0" defer></script> <!-- Page utilities -->
+    <!-- [20] Load Order: 20 | Strategy: defer -->
+    <script src="scripts/translation-utils.js?v=1.0.0" defer></script> <!-- Translations -->
+    <!-- [21] Load Order: 21 | Strategy: defer -->
+    <script src="scripts/button-icons.js?v=1.0.0" defer></script> <!-- Icon and button system -->
+    <!-- [22] Load Order: 22 | Strategy: defer -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script> <!-- Bootstrap JS Bundle (Tooltips & Modals) -->
+    <!-- [23] Load Order: 23 | Strategy: defer -->
+    <script src="scripts/event-handler-manager.js?v=1.0.0" defer></script> <!-- Central event management system -->
+    <!-- [24] Load Order: 24 | Strategy: defer -->
+    <script src="scripts/button-system-init.js?v=1.0.0" defer></script> <!-- Button system -->
+    <!-- [25] Load Order: 25 | Strategy: defer -->
+    <script src="scripts/color-scheme-system.js?v=1.0.0" defer></script> <!-- Dynamic color system -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 2/9: SERVICES PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 2 | Description: General services -->
+    <!-- Dependencies: base -->
+    <!-- Critical: NO | Version: 1.5.0 -->
+
+    <!-- [26] Load Order: 26 | Strategy: defer -->
+    <script src="scripts/services/data-collection-service.js?v=1.0.0" defer></script> <!-- Data collection service -->
+    <!-- [27] Load Order: 27 | Strategy: defer -->
+    <script src="scripts/services/field-renderer-service.js?v=1.0.0" defer></script> <!-- Field rendering service -->
+    <!-- [28] Load Order: 28 | Strategy: defer -->
+    <script src="scripts/services/select-populator-service.js?v=1.0.0" defer></script> <!-- Select box population service -->
+    <!-- [29] Load Order: 29 | Strategy: defer -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script> <!-- jsPDF library (for AI analysis PDF export) -->
+    <!-- [30] Load Order: 30 | Strategy: defer -->
+    <script src="scripts/services/ai-analysis-data.js?v=1.0.0" defer></script> <!-- AI Analysis data service -->
+    <!-- [31] Load Order: 31 | Strategy: defer -->
+    <script src="scripts/services/statistics-calculator.js?v=1.0.0" defer></script> <!-- Statistics calculator -->
+    <!-- [32] Load Order: 32 | Strategy: defer -->
+    <script src="scripts/services/default-value-setter.js?v=1.0.0" defer></script> <!-- Default value service -->
+    <!-- [33] Load Order: 33 | Strategy: defer -->
+    <script src="scripts/services/preferences-data.js?v=1.0.0" defer></script> <!-- Preferences data service (API + Cache) -->
+    <!-- [34] Load Order: 34 | Strategy: defer -->
+    <script src="scripts/services/unified-progress-manager.js?v=1.0.0" defer></script> <!-- Unified progress manager for process tracking -->
+    <!-- [35] Load Order: 35 | Strategy: defer -->
+    <script src="scripts/services/crud-response-handler.js?v=1.0.0" defer></script> <!-- CRUD response handler -->
+    <!-- [36] Load Order: 36 | Strategy: defer -->
+    <script src="scripts/services/unified-crud-service.js?v=1.0.0" defer></script> <!-- Unified CRUD service for all entities -->
+    <!-- [37] Load Order: 37 | Strategy: defer -->
+    <script src="scripts/services/investment-calculation-service.js?v=1.0.0" defer></script> <!-- Investment form amount ↔ quantity calculations -->
+    <!-- [38] Load Order: 38 | Strategy: defer -->
+    <script src="scripts/services/tag-service.js?v=1.0.0" defer></script> <!-- Central tag service (tag management and retrieval) -->
+    <!-- [39] Load Order: 39 | Strategy: defer -->
+    <script src="scripts/services/table-sort-value-adapter.js?v=1.0.0" defer></script> <!-- Adapter for unified sort values (DateEnvelope, legacy) -->
+    <!-- [40] Load Order: 40 | Strategy: defer -->
+    <script src="scripts/services/lint-status-service.js?v=1.0.0" defer></script> <!-- Unified linter status service (API reading and data conversion) -->
+    <!-- [41] Load Order: 41 | Strategy: defer -->
+    <script src="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.min.js" defer></script> <!-- Quill.js - Rich Text Editor Library -->
+    <!-- [42] Load Order: 42 | Strategy: defer -->
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js" defer></script> <!-- DOMPurify - HTML Sanitizer -->
+    <!-- [43] Load Order: 43 | Strategy: defer -->
+    <script src="scripts/services/rich-text-editor-service.js?v=1.0.0" defer></script> <!-- Rich text editor service -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 3/9: VALIDATION PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 2.4 | Description: Validation systems -->
+    <!-- Dependencies: base -->
+    <!-- Critical: NO | Version: 1.5.0 -->
+
+    <!-- [44] Load Order: 44 | Strategy: defer -->
+    <script src="scripts/validation-utils.js?v=1.0.0" defer></script> <!-- Validation utilities -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 4/9: MODULES PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 2.5 | Description: General modules -->
+    <!-- Dependencies: base, services -->
+    <!-- Critical: NO | Version: 1.5.0 -->
+
+    <!-- [45] Load Order: 45 | Strategy: defer -->
+    <script src="scripts/modal-navigation-manager.js?v=1.0.0" defer></script> <!-- Nested modal navigation system -->
+    <!-- [46] Load Order: 46 | Strategy: defer -->
+    <script src="scripts/modal-z-index-manager.js?v=1.0.0" defer></script> <!-- Dynamic z-index management for nested modals -->
+    <!-- [47] Load Order: 47 | Strategy: defer -->
+    <script src="scripts/tag-ui-manager.js?v=1.0.0" defer></script> <!-- Tag selection management in modals -->
+    <!-- [48] Load Order: 48 | Strategy: defer -->
+    <script src="scripts/tag-events.js?v=1.0.0" defer></script> <!-- Global tag events system -->
+    <!-- [49] Load Order: 49 | Strategy: defer -->
+    <script src="scripts/modules/data-basic.js?v=1.0.0" defer></script> <!-- Basic data -->
+    <!-- [50] Load Order: 50 | Strategy: defer -->
+    <script src="scripts/modules/ui-basic.js?v=1.0.0" defer></script> <!-- Basic interface -->
+    <!-- [51] Load Order: 51 | Strategy: defer -->
+    <script src="scripts/modules/data-advanced.js?v=1.0.0" defer></script> <!-- Advanced data -->
+    <!-- [52] Load Order: 52 | Strategy: defer -->
+    <script src="scripts/modules/ui-advanced.js?v=1.0.0" defer></script> <!-- Advanced interface -->
+    <!-- [53] Load Order: 53 | Strategy: defer -->
+    <script src="scripts/modules/communication-module.js?v=1.0.0" defer></script> <!-- Communication module -->
+    <!-- [54] Load Order: 54 | Strategy: defer -->
+    <script src="scripts/modules/business-module.js?v=1.0.0" defer></script> <!-- Business module -->
+    <!-- [55] Load Order: 55 | Strategy: defer -->
+    <script src="scripts/modules/localstorage-sync.js?v=1.0.0" defer></script> <!-- localStorage synchronization -->
+    <!-- [56] Load Order: 56 | Strategy: defer -->
+    <script src="scripts/modules/dynamic-loader-config.js?v=1.0.0" defer></script> <!-- Dynamic loader configuration -->
+    <!-- [57] Load Order: 57 | Strategy: defer -->
+    <script src="scripts/import-user-data.js?v=1.0.0" defer></script> <!-- Execution data import modal -->
+    <!-- [58] Load Order: 58 | Strategy: defer -->
+    <script src="scripts/modal-configs/trades-config.js?v=1.0.0" defer></script> <!-- Trades modal configuration -->
+    <!-- [59] Load Order: 59 | Strategy: defer -->
+    <script src="scripts/modal-configs/trade-plans-config.js?v=1.0.0" defer></script> <!-- Trade plans modal configuration -->
+    <!-- [60] Load Order: 60 | Strategy: defer -->
+    <script src="scripts/modal-configs/watch-lists-config.js?v=1.0.0" defer></script> <!-- Watch lists modal configuration -->
+    <!-- [61] Load Order: 61 | Strategy: defer -->
+    <script src="scripts/modal-configs/cash-flows-config.js?v=1.0.0" defer></script> <!-- Cash flows modal configuration -->
+    <!-- [62] Load Order: 62 | Strategy: defer -->
+    <script src="scripts/modal-configs/tag-management-config.js?v=1.0.0" defer></script> <!-- Tag system modal configuration -->
+    <!-- [63] Load Order: 63 | Strategy: defer -->
+    <script src="scripts/modal-manager-v2.js?v=1.0.0" defer></script> <!-- Modal manager V2 - MUST load after all modal configs -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 5/9: UI ADVANCED PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 3 | Description: Advanced user interface -->
+    <!-- Dependencies: base, services, modules -->
+    <!-- Critical: NO | Version: 1.5.0 -->
+
+    <!-- [64] Load Order: 64 | Strategy: defer -->
+    <script src="scripts/tables.js?v=1.0.0" defer></script> <!-- Table system -->
+    <!-- [65] Load Order: 65 | Strategy: defer -->
+    <script src="scripts/table-data-registry.js?v=1.0.0" defer></script> <!-- Table data registry -->
+    <!-- [66] Load Order: 66 | Strategy: defer -->
+    <script src="scripts/pagination-system.js?v=1.0.0" defer></script> <!-- Pagination system -->
+    <!-- [67] Load Order: 67 | Strategy: defer -->
+    <script src="scripts/modules/actions-menu-system.js?v=1.0.0" defer></script> <!-- Actions menu system -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 6/9: CRUD OPERATIONS PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 4 | Description: Data and table management systems -->
+    <!-- Dependencies: base, services -->
+    <!-- Critical: NO | Version: 1.5.0 -->
+
+    <!-- [68] Load Order: 68 | Strategy: defer -->
+    <script src="scripts/date-utils.js?v=1.0.0" defer></script> <!-- Date utilities -->
+    <!-- [69] Load Order: 69 | Strategy: defer -->
+    <script src="scripts/data-utils.js?v=1.0.0" defer></script> <!-- General data utilities -->
+    <!-- [70] Load Order: 70 | Strategy: defer -->
+    <script src="scripts/unified-table-system.js?v=1.0.0" defer></script> <!-- Unified central table system -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 7/9: PREFERENCES PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 5 | Description: User preferences system v2.0 (10 files) -->
+    <!-- Dependencies: base, services -->
+    <!-- Critical: NO | Version: 1.5.0 -->
+
+    <!-- [71] Load Order: 71 | Strategy: defer -->
+    <script src="scripts/preferences-cache.js?v=1.0.0" defer></script> <!-- Preferences cache management layer -->
+    <!-- [72] Load Order: 72 | Strategy: defer -->
+    <script src="scripts/services/preferences-v4.js?v=1.0.0" defer></script> <!-- Preferences V4 SDK (group-first) -->
+    <!-- [73] Load Order: 73 | Strategy: defer -->
+    <script src="scripts/preferences-events.js?v=1.0.0" defer></script> <!-- Preferences event system -->
+    <!-- [74] Load Order: 74 | Strategy: defer -->
+    <script src="scripts/preferences-core-new.js?v=1.0.0" defer></script> <!-- Preferences core (without colors) -->
+    <!-- [75] Load Order: 75 | Strategy: defer -->
+    <script src="scripts/preferences-ui-layer.js?v=1.0.0" defer></script> <!-- Preferences UI layer -->
+    <!-- [76] Load Order: 76 | Strategy: defer -->
+    <script src="scripts/preferences-colors.js?v=1.0.0" defer></script> <!-- Color system (60+ preferences) -->
+    <!-- [77] Load Order: 77 | Strategy: defer -->
+    <script src="scripts/preferences-manager.js?v=1.0.0" defer></script> <!-- Preferences manager (central) -->
+    <!-- [78] Load Order: 78 | Strategy: defer -->
+    <script src="scripts/preferences-profiles.js?v=1.0.0" defer></script> <!-- Profile management -->
+    <!-- [79] Load Order: 79 | Strategy: defer -->
+    <script src="scripts/preferences-lazy-loader.js?v=1.0.0" defer></script> <!-- lazy loading system -->
+    <!-- [80] Load Order: 80 | Strategy: defer -->
+    <script src="scripts/preferences-validation.js?v=1.0.0" defer></script> <!-- validation system -->
+    <!-- [81] Load Order: 81 | Strategy: defer -->
+    <script src="scripts/preferences-ui-v4.js?v=1.0.0" defer></script> <!-- User interface V4 (Group-First) -->
+    <!-- [82] Load Order: 82 | Strategy: defer -->
+    <script src="scripts/preferences-ui.js?v=1.0.0" defer></script> <!-- User interface -->
+    <!-- [83] Load Order: 83 | Strategy: defer -->
+    <script src="scripts/preferences-group-manager.js?v=1.0.0" defer></script> <!-- Preferences group manager -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 8/9: TAG MANAGEMENT PAGE PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 5.2 | Description: Dedicated logic for tag management page -->
+    <!-- Dependencies: base, services, modules, ui-advanced, crud, preferences -->
+    <!-- Critical: NO | Version: 1.0.0 -->
+
+    <!-- [84] Load Order: 84 | Strategy: defer -->
+    <script src="scripts/tag_management.js?v=1.0.0" defer></script> <!-- Tag management page display management -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PACKAGE 9/9: INITIALIZATION PACKAGE ===== -->
+    <!-- =============================================================== -->
+    <!-- Load Order: 22 | Description: Initialization and monitoring systems -->
+    <!-- Dependencies: base -->
+    <!-- Critical: NO | Version: 1.5.0 -->
+
+    <!-- [85] Load Order: 85 | Strategy: defer -->
+    <script src="scripts/init-system/package-manifest.js?v=1.0.0" defer></script> <!-- Package manifest -->
+    <!-- [86] Load Order: 86 | Strategy: defer -->
+    <script src="scripts/page-initialization-configs.js?v=1.0.0" defer></script> <!-- Page initialization configurations -->
+    <!-- [87] Load Order: 87 | Strategy: defer -->
+    <script src="scripts/init-system-check.js?v=1.0.0" defer></script> <!-- Initialization system check -->
+    <!-- [88] Load Order: 88 | Strategy: defer -->
+    <script src="scripts/monitoring-functions.js?v=1.0.0" defer></script> <!-- Page monitoring functions -->
+    <!-- [89] Load Order: 89 | Strategy: defer -->
+    <script src="scripts/modules/core-systems.js?v=1.0.0" defer></script> <!-- Unified initialization system - single entry point (required for all pages) -->
+
+    <!-- =============================================================== -->
+    <!-- ===== PAGE-SPECIFIC SCRIPTS ===== -->
+    <!-- =============================================================== -->
+
+    <!-- =============================================================== -->
+    <!-- ===== FINAL SUMMARY ===== -->
+    <!-- =============================================================== -->
+    <!-- 📊 Total Scripts Processed: 89 | Unique Scripts Loaded: 89 -->
+    <!-- 🔧 For maintenance: Use generate-script-loading-code.js --></body>
+</html>
+
+
+
+
+

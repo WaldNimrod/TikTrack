@@ -215,12 +215,12 @@ function main() {
         relativePath === 'data_import.js' ||
         relativePath === 'css-management.js' ||
         relativePath === 'notifications-center.js' ||
-        relativePath === 'external-data-dashboard.js' ||
+        relativePath === 'external_data_dashboard.js' ||
         relativePath === 'designs.js' ||
         relativePath === 'constraints.js' ||
         relativePath === 'background-tasks.js' ||
         relativePath === 'system-management.js' ||
-        relativePath === 'tag-management-page.js' ||
+        relativePath === 'tag_management.js' ||
         relativePath === 'db_display.js' ||
         relativePath === 'db_extradata.js' ||
         relativePath === 'trades.js' ||

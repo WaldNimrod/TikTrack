@@ -154,15 +154,18 @@ git push origin production
 #### אופציה 1: לדלג על כל פעולות DB (מומלץ אם DB כבר מוכן)
 
 אם בסיס הנתונים כבר מעודכן ומוכן, ניתן לדלג על:
+
 - **שלב 3:** גיבוי PostgreSQL
 - **שלב 8:** הרצת מיגרציות
 
 **שימוש:**
+
 ```bash
 python3 scripts/production-update/master.py --skip-db
 ```
 
 **מתי להשתמש:**
+
 - בסיס הנתונים כבר מעודכן ומעודכן
 - אין צורך בגיבוי נוסף
 - אין מיגרציות חדשות להריץ
@@ -173,6 +176,7 @@ python3 scripts/production-update/master.py --skip-db
 אם רוצים להריץ מיגרציות אבל לא צריך גיבוי:
 
 **שימוש:**
+
 ```bash
 python3 scripts/production-update/master.py --skip 3
 ```
@@ -182,11 +186,13 @@ python3 scripts/production-update/master.py --skip 3
 אם רוצים גיבוי מלא ומיגרציות:
 
 **שימוש:**
+
 ```bash
 python3 scripts/production-update/master.py
 ```
 
 **מתי להשתמש:**
+
 - רוצים גיבוי בטיחותי לפני עדכון
 - יש מיגרציות חדשות להריץ
 - זה עדכון גדול או משמעותי

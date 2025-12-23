@@ -621,7 +621,7 @@
             if (typeof window.navigateToPage === 'function') {
                 window.navigateToPage('tag-management', { preserveState: true });
             } else {
-                window.location.href = 'tag-management.html';
+                window.location.href = 'tag_management.html';
             }
         },
 

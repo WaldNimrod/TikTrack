@@ -157,11 +157,78 @@ const PUBLIC_PAGES = [
 ];
 ```
 
+**איך זה עובד:**
+1. `auth-guard.js` בודק אם העמוד הנוכחי הוא public page לפני בדיקת authentication
+2. אם העמוד הוא public page, `initAuthGuard()` מחזיר מיד ללא בדיקת authentication
+3. זה מונע redirect loop כשמנסים לגשת לעמודים ציבוריים
+
 **אין צורך לעשות כלום** - auth-guard מזהה עמודים ציבוריים אוטומטית.
+
+**הוספת עמוד ציבורי חדש:**
+אם יוצרים עמוד ציבורי חדש, יש להוסיף אותו ל-`PUBLIC_PAGES` ב-`auth-guard.js`.
 
 ### עמודים פרטיים
 
 **אין צורך לעשות כלום** - auth-guard נטען אוטומטית דרך BASE package ומגן על כל העמודים.
+
+### מניעת לופ הפניה (Redirect Loop Prevention)
+
+**בעיה נפוצה:** אחרי login מוצלח, המשתמש מועבר חזרה לעמוד המקורי, אבל `auth-guard.js` בודק authentication לפני שה-session cookie נשמר במלואו, מה שגורם ל-redirect loop.
+
+**פתרון:**
+
+1. **בדיקת עמוד ציבורי ראשונה:**
+   - `initAuthGuard()` בודק אם העמוד הוא public page לפני כל בדיקה אחרת
+   - אם כן, מחזיר מיד ללא בדיקת authentication
+
+2. **מנגנון timestamp:**
+   - אחרי login מוצלח, `auth.js` שומר timestamp ב-`sessionStorage`: `sessionStorage.setItem('recent_login_timestamp', Date.now().toString())`
+   - `auth-guard.js` בודק את ה-timestamp לפני בדיקת authentication
+   - אם login היה לפני פחות מ-5 שניות, ממתין 2 שניות נוספות לפני בדיקה
+   - אחרי המתנה, מנקה את ה-timestamp
+
+3. **הארכת זמן המתנה:**
+   - זמן המתנה הוגדל מ-500ms ל-1000ms כדי לתת ל-session cookie יותר זמן להישמר
+
+4. **בדיקת login page:**
+   - אם המשתמש כבר ב-`/login.html`, לא מבצע redirect
+
+**דוגמת קוד:**
+
+```javascript
+// ב-auth-guard.js - initAuthGuard()
+async function initAuthGuard() {
+  // בדיקה ראשונה - האם זה עמוד ציבורי?
+  if (isPublicPage()) {
+    return; // אין צורך לבדוק authentication
+  }
+  
+  // בדיקת מניעת לופ
+  const recentLogin = sessionStorage.getItem('recent_login_timestamp');
+  if (recentLogin) {
+    const timeSinceLogin = Date.now() - parseInt(recentLogin);
+    if (timeSinceLogin < 5000) {
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      sessionStorage.removeItem('recent_login_timestamp');
+    }
+  }
+  
+  // הארכת זמן המתנה
+  await new Promise(resolve => setTimeout(resolve, 1000));
+  
+  // ... rest of authentication check
+}
+
+// ב-auth.js - אחרי login מוצלח
+if (data.data?.user) {
+  await saveAuthToCache(currentUser, authToken);
+  
+  // Save timestamp to prevent redirect loop
+  if (typeof sessionStorage !== 'undefined') {
+    sessionStorage.setItem('recent_login_timestamp', Date.now().toString());
+  }
+}
+```
 
 ### יצירת עמוד חדש
 

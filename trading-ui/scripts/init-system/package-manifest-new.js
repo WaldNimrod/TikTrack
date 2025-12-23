@@ -397,7 +397,7 @@ const PACKAGE_MANIFEST = {
         required: true
       },
       {
-        file: 'external-data-dashboard.js',
+        file: 'external_data_dashboard.js',
         globalCheck: 'window.ExternalDataDashboard',
         description: 'דשבורד נתונים חיצוניים',
         required: true

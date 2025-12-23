@@ -922,18 +922,14 @@ class PreferencesCore {
         }
       }
 
-      // Resolve profileId - use provided value, or get from latestProfileContext, or fallback to 0 (default profile)
-      // CRITICAL: Don't use invalid profile_id - always validate against latestProfileContext
+      // Resolve profileId - if not provided, send null to let backend resolve active profile
+      // CRITICAL: Don't use invalid profile_id from cache - let backend resolve it
+      // Backend will use _get_active_profile_id() if profile_id is None
       let finalProfileId = profileId;
       if (finalProfileId === null || finalProfileId === undefined) {
-        // Try to get from latestProfileContext first (most reliable)
-        if (this.latestProfileContext?.resolved_profile_id !== null && this.latestProfileContext?.resolved_profile_id !== undefined) {
-          finalProfileId = this.latestProfileContext.resolved_profile_id;
-        } else if (this.currentProfileId !== null && this.currentProfileId !== undefined) {
-          finalProfileId = this.currentProfileId;
-        } else {
-          finalProfileId = 0; // Default profile
-        }
+        // Send null to backend - backend will resolve active profile automatically
+        // This prevents using stale/invalid profile_id from cache
+        finalProfileId = null;
       }
 
       // Save via API
@@ -988,18 +984,14 @@ class PreferencesCore {
      * @returns {Promise<Object>} Save results
      */
   async savePreferences(preferences, userId = null, profileId = null) {
-    // Resolve profileId - use provided value, or get from latestProfileContext, or fallback to 0 (default profile)
-    // CRITICAL: Don't use invalid profile_id - always validate against latestProfileContext
+    // Resolve profileId - if not provided, send null to let backend resolve active profile
+    // CRITICAL: Don't use invalid profile_id from cache - let backend resolve it
+    // Backend will use _get_active_profile_id() if profile_id is None
     let finalProfileId = profileId;
     if (finalProfileId === null || finalProfileId === undefined) {
-      // Try to get from latestProfileContext first (most reliable)
-      if (this.latestProfileContext?.resolved_profile_id !== null && this.latestProfileContext?.resolved_profile_id !== undefined) {
-        finalProfileId = this.latestProfileContext.resolved_profile_id;
-      } else if (this.currentProfileId !== null && this.currentProfileId !== undefined) {
-        finalProfileId = this.currentProfileId;
-      } else {
-        finalProfileId = 0; // Default profile
-      }
+      // Send null to backend - backend will resolve active profile automatically
+      // This prevents using stale/invalid profile_id from cache
+      finalProfileId = null;
     }
 
     const results = {
@@ -1163,7 +1155,15 @@ class PreferencesCore {
      */
   async saveGroupPreferences(groupName, preferences, userId = null, profileId = null) {
     const finalUserId = userId || this.currentUserId;
-    const finalProfileId = profileId !== null && profileId !== undefined ? profileId : this.currentProfileId !== null ? this.currentProfileId : 0;
+    // Resolve profileId - if not provided, send null to let backend resolve active profile
+    // CRITICAL: Don't use invalid profile_id from cache - let backend resolve it
+    // Backend will use _get_active_profile_id() if profile_id is None
+    let finalProfileId = profileId;
+    if (finalProfileId === null || finalProfileId === undefined) {
+      // Send null to backend - backend will resolve active profile automatically
+      // This prevents using stale/invalid profile_id from cache
+      finalProfileId = null;
+    }
 
     // Save to server
     const results = await this.savePreferences(preferences, finalUserId, finalProfileId);

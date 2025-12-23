@@ -392,26 +392,148 @@ class IntegratedCRUDE2ETester {
     }
 
     /**
+     * Helper function to authenticate iframe before loading page
+     * Performs login in parent window and transfers auth to iframe
+     */
+    async authenticateIframe(iframe) {
+        const iframeWindow = iframe.contentWindow;
+        
+        try {
+            // Perform login via API in parent window (same origin)
+            this.logger?.info('🔐 Authenticating iframe via parent window API', { url: iframe.src });
+            
+            const loginResponse = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include', // Important: include cookies
+                body: JSON.stringify({
+                    username: 'admin',
+                    password: 'admin123'
+                })
+            });
+
+            if (!loginResponse.ok) {
+                const errorData = await loginResponse.json();
+                throw new Error(`Login failed: ${loginResponse.status} - ${errorData.error?.message || 'Unknown error'}`);
+            }
+
+            const loginData = await loginResponse.json();
+            
+            if (loginData.status !== 'success' || !loginData.data?.access_token) {
+                throw new Error('Login response missing token');
+            }
+
+            // Wait for iframe to be ready
+            await new Promise((resolve) => {
+                if (iframeWindow.document.readyState === 'complete') {
+                    resolve();
+                } else {
+                    iframeWindow.addEventListener('load', resolve, { once: true });
+                    setTimeout(resolve, 1000); // Fallback timeout
+                }
+            });
+
+            // Transfer auth data to iframe via postMessage and direct storage
+            const authData = {
+                token: loginData.data.access_token,
+                user: loginData.data.user,
+                timestamp: Date.now()
+            };
+
+            // Store in iframe's sessionStorage
+            if (iframeWindow.sessionStorage) {
+                iframeWindow.sessionStorage.setItem('auth_token', authData.token);
+                iframeWindow.sessionStorage.setItem('user_data', JSON.stringify(authData.user));
+                iframeWindow.sessionStorage.setItem('recent_login_timestamp', authData.timestamp.toString());
+            }
+
+            // Also store in iframe's localStorage
+            if (iframeWindow.localStorage) {
+                iframeWindow.localStorage.setItem('auth_token', authData.token);
+                iframeWindow.localStorage.setItem('user_data', JSON.stringify(authData.user));
+            }
+
+            // Send auth data via postMessage as backup
+            iframeWindow.postMessage({
+                type: 'AUTH_DATA',
+                data: authData
+            }, window.location.origin);
+
+            // Also try to set via UnifiedCacheManager if available
+            if (iframeWindow.UnifiedCacheManager && typeof iframeWindow.UnifiedCacheManager.set === 'function') {
+                try {
+                    await iframeWindow.UnifiedCacheManager.set('auth_token', authData.token);
+                    await iframeWindow.UnifiedCacheManager.set('user_data', authData.user);
+                } catch (cacheError) {
+                    this.logger?.warn('⚠️ Failed to set auth in iframe UnifiedCacheManager', { error: cacheError.message });
+                }
+            }
+
+            this.logger?.info('✅ Iframe authenticated successfully', {
+                userId: authData.user?.id,
+                username: authData.user?.username
+            });
+
+            return true;
+        } catch (error) {
+            this.logger?.error('❌ Iframe authentication failed', { error: error.message });
+            throw error;
+        }
+    }
+
+    /**
      * Helper function to load page content in iframe for testing
      */
     async loadPageInIframe(url) {
-        return new Promise((resolve, reject) => {
-            // Create iframe for testing
-            const iframe = document.createElement('iframe');
-            iframe.style.display = 'none';
-            iframe.style.width = '0';
-            iframe.style.height = '0';
-            iframe.src = url;
-            
-            iframe.onload = () => {
-                setTimeout(() => resolve(iframe), 2000); // Wait for dynamic content
-            };
-            
-            iframe.onerror = () => {
-                reject(new Error(`Failed to load ${url} in iframe`));
-            };
-            
-            document.body.appendChild(iframe);
+        return new Promise(async (resolve, reject) => {
+            try {
+                // Create iframe for testing
+                const iframe = document.createElement('iframe');
+                iframe.style.display = 'none';
+                iframe.style.width = '0';
+                iframe.style.height = '0';
+                iframe.src = url;
+                
+                // Set up message listener for iframe ready signal
+                const messageHandler = (event) => {
+                    if (event.data && event.data.type === 'IFRAME_READY' && event.source === iframe.contentWindow) {
+                        window.removeEventListener('message', messageHandler);
+                        // Authenticate after iframe is ready
+                        this.authenticateIframe(iframe)
+                            .then(() => {
+                                setTimeout(() => resolve(iframe), 1000); // Wait for auth to propagate
+                            })
+                            .catch(reject);
+                    }
+                };
+                window.addEventListener('message', messageHandler);
+                
+                iframe.onload = async () => {
+                    try {
+                        // Wait a bit for iframe to initialize
+                        await new Promise(resolve => setTimeout(resolve, 500));
+                        
+                        // Authenticate iframe
+                        await this.authenticateIframe(iframe);
+                        
+                        // Wait for dynamic content
+                        setTimeout(() => resolve(iframe), 2000);
+                    } catch (error) {
+                        reject(error);
+                    }
+                };
+                
+                iframe.onerror = () => {
+                    window.removeEventListener('message', messageHandler);
+                    reject(new Error(`Failed to load ${url} in iframe`));
+                };
+                
+                document.body.appendChild(iframe);
+            } catch (error) {
+                reject(error);
+            }
         });
     }
 

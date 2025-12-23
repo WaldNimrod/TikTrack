@@ -1281,12 +1281,15 @@ class HeaderSystem {
                         <li><a class="tiktrack-dropdown-item" href="/db_extradata">טבלאות עזר</a></li>
                       </ul>
                     </li>
-                    <li class="tiktrack-nav-item">
-                      <a href="/dev_tools" class="tiktrack-nav-link" data-page="development-tools">
+                    <li class="tiktrack-nav-item dropdown">
+                      <a href="#" class="tiktrack-nav-link tiktrack-dropdown-toggle" data-page="development-tools">
                         <span class="nav-text">פיתוח</span>
-                      </a>
+                        <span class="tiktrack-dropdown-arrow">▼</span>                      </a>
                     </li>
-                    <li class="tiktrack-nav-item">
+                      <ul class="tiktrack-dropdown-menu">
+                        <li><a class="tiktrack-dropdown-item" href="/dev_tools">🛠️ כלי פיתוח ראשי</a></li>
+                        <li class="separator"></li>
+                      </ul>                    <li class="tiktrack-nav-item">
                       <a href="#" class="tiktrack-nav-link" data-onclick="CacheControlMenu.triggerAction('full', event)" 
                          title="ניקוי מטמון לפיתוח">
                         <span class="nav-text" style="color: #ff0000; font-size: 1.2rem;">🧹</span>

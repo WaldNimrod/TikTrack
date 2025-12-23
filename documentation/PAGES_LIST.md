@@ -1,6 +1,6 @@
 # רשימת עמודים - TikTrack
 
-**תאריך עדכון:** דצמבר 2025 - תיקון קטגוריזציה והעברת tradingview-widgets-showcase.html
+**תאריך עדכון:** דצמבר 2025 - תיקון data_import.html מושלם
 **גרסה:** 4.1.6
 **סטטוס:** ✅ מעודכן - תיקון תיעוד וכפילויות במניפסט  
 
@@ -111,7 +111,7 @@
 | **ticker_dashboard.html** | דשבורד טיקר מורחב | `http://localhost:8080/ticker_dashboard` | `/api/tickers/{id}/*` | ✅ TickerBusinessService | ✅ מוכן - בדיקות הושלמו 30.01.2025 |
 | **trading_accounts.html** | חשבונות מסחר | `http://localhost:5000/trading_accounts.html` | `/api/trading-accounts/*` | ✅ TradingAccountBusinessService | ✅ מוכן |
 | **executions.html** | ביצועי עסקאות | `http://localhost:5000/executions.html` | `/api/executions/*` | ✅ ExecutionBusinessService | ✅ מוכן |
-| **data_import.html** | ייבוא נתונים | `http://localhost:5000/data_import.html` | `/api/user-data-import/*` | ❌ חסר | ⏳ צריך Business Service |
+| **data_import.html** | ייבוא נתונים | `http://localhost:8080/data_import.html` | `/api/user-data-import/*` | ✅ DataImportBusinessService | ✅ מושלם |
 | **cash_flows.html** | תזרימי מזומן | `http://localhost:5000/cash_flows.html` | `/api/cash-flows/*` | ✅ CashFlowBusinessService | ✅ מוכן |
 | **notes.html** | מערכת הערות | `http://localhost:5000/notes.html` | `/api/notes/*` | ✅ NoteBusinessService | ✅ מוכן |
 | **research.html** | מחקר וניתוח | `http://localhost:5000/research.html` | `/api/research/*` | ❌ חסר | ⏳ צריך Business Service |
@@ -135,7 +135,7 @@
 
 | קטגוריה | מספר עמודים | סטטוס authentication | אחוז | הערות |
 |----------|-------------|---------------------|------|--------|
-| **עמודי משתמש עיקריים** | 25 | ✅ **100% authentication מלאה** | 32% | כוללים auth.js + auth-guard.js |
+| **עמודי משתמש עיקריים** | 26 | ✅ **100% authentication מלאה** | 33% | כוללים auth.js + auth-guard.js |
 | **עמודי אימות** | 4 | ❌ **ציבוריים (כנדרש)** | 5% | login, register, reset, forgot |
 | **עמודי בדיקה** | 15 | ❌ **רובם ציבוריים** | 19% | 13 ציבוריים, 2 עם authentication |
 | **עמודי טכניים** | 10 | ❌ **ציבוריים** | 13% | db_*, constraints, designs, etc. |
@@ -149,7 +149,7 @@
 
 כל העמודים האלה כוללים **authentication מלאה** (auth.js + auth-guard.js + absolute paths + no duplicates):
 
-### עמודי ליבה (10):
+### עמודי ליבה (11):
 | עמוד | תיאור | סטטוס |
 |------|--------|-------|
 | **index.html** | דשבורד ראשי | ✅ תקין |
@@ -162,8 +162,9 @@
 | **notes.html** | מערכת הערות | ✅ תקין |
 | **cash_flows.html** | תזרימי מזומן | ✅ תקין |
 | **preferences.html** | הגדרות מערכת | ✅ תקין |
+| **data_import.html** | ייבוא נתונים | ✅ מושלם |
 
-### עמודי מתקדמים (10):
+### עמודי מתקדמים (9):
 | עמוד | תיאור | סטטוס |
 |------|--------|-------|
 | **ai_analysis.html** | ניתוח AI | ✅ תקין |
@@ -175,7 +176,6 @@
 | **trading_journal.html** | יומן מסחר | ✅ תקין |
 | **trade_history.html** | היסטוריית טרייד | ✅ תקין |
 | **portfolio_state.html** | מצב תיק היסטורי | ✅ תקין |
-| **data_import.html** | ייבוא נתונים | ⚠️ קובץ לא מלא |
 
 ### עמודי חיצוניים (5):
 | עמוד | תיאור | סטטוס |
@@ -284,7 +284,7 @@
 - **עמודי כלי פיתוח ציבוריים:** הוסרו authentication מעמודי פיתוח ובדיקה
 
 ### ⚠️ **נקודות לשיפור:**
-- **data_import.html:** צריך השלמה עם authentication
+- **data_import.html:** הושלם עם authentication מלא
 - **עמודי mockups:** תיקון relative paths אם יהיו פעילים
 
 ### 🎯 **המלצה כללית:**
@@ -547,4 +547,4 @@
 
 **תאריך עדכון אחרון:** 23 בדצמבר 2025
 **גרסה:** 2.2.0
-**סטטוס:** ✅ מיפוי authentication מלא - עמודי כלי פיתוח ובדיקה ציבוריים
+**סטטוס:** ✅ מיפוי authentication מלא - data_import.html הושלם

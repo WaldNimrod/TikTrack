@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl" class="dev-tools-page">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="כלי פיתוח ראשי - סקירה מלאה של כל העמודים והמערכות במערכת TikTrack">
+    <meta name="keywords" content="TikTrack, כלי פיתוח, דוקומנטציה, עמודים, מערכות">
+    <meta name="author" content="TikTrack">
+    <title>כלי פיתוח ראשי - TikTrack</title>
+
+    <!-- Google Fonts -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wght@300;400;500;600;700&display=swap">
+
+    <!-- Bootstrap CSS (חובה ראשון) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css?v=0da3519a_20251102_104906">
+
+    <!-- LOCK: DO NOT MODIFY - ITCSS Loading Order -->
+    <!-- ITCSS Layer 1: Settings -->
+    <link rel="stylesheet" href="styles-new/01-settings/_variables.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/01-settings/_color-variables.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/01-settings/_colors-semantic.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/01-settings/_typography.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/01-settings/_spacing.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/01-settings/_breakpoints.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/01-settings/_rtl-logical.css?v=0da3519a_20251102_104906">
+
+    <!-- ITCSS Layer 2: Tools -->
+    <link rel="stylesheet" href="styles-new/02-tools/_mixins.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/02-tools/_functions.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/02-tools/_rtl-helpers.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/02-tools/_utilities.css?v=0da3519a_20251102_104906">
+
+    <!-- ITCSS Layer 3: Generic -->
+    <link rel="stylesheet" href="styles-new/03-generic/_reset.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/03-generic/_base.css?v=0da3519a_20251102_104906">
+
+    <!-- ITCSS Layer 4: Elements -->
+    <link rel="stylesheet" href="styles-new/04-elements/_headings.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/04-elements/_forms-base.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/04-elements/_buttons-base.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/04-elements/_links.css?v=0da3519a_20251102_104906">
+
+    <!-- ITCSS Layer 5: Objects -->
+    <link rel="stylesheet" href="styles-new/05-objects/_layout.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/05-objects/_grid.css?v=0da3519a_20251102_104906">
+
+    <!-- ITCSS Layer 6: Components -->
+    <link rel="stylesheet" href="styles-new/06-components/_bootstrap-overrides.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/06-components/_buttons-advanced.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/06-components/_tables.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/06-components/_cards.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/06-components/_modals.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/06-components/_notifications.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/06-components/_forms-advanced.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/06-components/_filters.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/06-components/_header.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/06-components/_sections.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/06-components/_loading.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/06-components/_responsive.css?v=0da3519a_20251102_104906">
+
+    <!-- ITCSS Layer 7: Utilities -->
+    <link rel="stylesheet" href="styles-new/07-utilities/_spacing.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/07-utilities/_text.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/07-utilities/_colors.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/07-utilities/_display.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/07-utilities/_position.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/07-utilities/_flexbox.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/07-utilities/_grid.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/07-utilities/_borders.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/07-utilities/_animations.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/07-utilities/_rtl.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/07-utilities/_debug.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/07-utilities/_accessibility.css?v=0da3519a_20251102_104906">
+
+    <!-- ITCSS Layer 8: Vendor Overrides -->
+    <link rel="stylesheet" href="styles-new/08-vendor/_bootstrap.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/08-vendor/_tabler-icons.css?v=0da3519a_20251102_104906">
+    <link rel="stylesheet" href="styles-new/08-vendor/_flatpickr.css?v=0da3519a_20251102_104906">
+
+    <!-- Master CSS File (Unified Styles) -->
+    <link rel="stylesheet" href="styles-new/master.css?v=0da3519a_20251102_104906">
+
+    <!-- Header Styles -->
+    <link rel="stylesheet" href="styles-new/header-styles.css?v=0da3519a_20251102_104906">
+</head>
+<body class="dev-tools-page">
+    <!-- 🔒 LOCKED TEMPLATE ZONE 1 - Header & Navigation (DO NOT MODIFY) -->
+    <div id="unified-header"></div>
+    <!-- 🔒 LOCKED TEMPLATE ZONE 2 - Background Wrapper (DO NOT MODIFY) -->
+    <div class="background-wrapper">
+        <div class="page-body">
+            <!-- 🔒 LOCKED TEMPLATE ZONE 3 - Main Content Container (DO NOT MODIFY) -->
+            <div class="main-content">
+                <!-- Development Tools Overview Section -->
+                <div class="content-section" id="main-section">
+                    <div class="section-header">
+                        <h1><img src="images/icons/tabler/tools.svg" width="32" height="32" alt="tools" class="icon"> כלי פיתוח ראשי</h1>
+                        <div class="section-header-controls">
+                            <button data-button-type="REFRESH" data-variant="full" data-icon="🔄" data-text="רענן נתונים" data-classes="btn-primary btn-sm" data-onclick="window.refreshDevToolsData()" type="button" title="רענן את נתוני כלי הפיתוח"></button>
+                            <button data-button-type="SECONDARY" data-variant="small" data-icon="📊" data-text="סטטיסטיקות" data-classes="btn-outline-info btn-sm" data-onclick="window.showDevToolsStats()" type="button" title="הצג סטטיסטיקות מערכת"></button>
+                        </div>
+                    </div>
+                    <div class="section-body">
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <div class="alert alert-info">
+                                    <h5><img src="images/icons/tabler/info-circle.svg" width="20" height="20" alt="info" class="icon"> מידע כללי</h5>
+                                    <p class="mb-0">עמוד זה מספק סקירה מלאה של כל העמודים והמערכות במערכת TikTrack, מאורגן לפי קטגוריות עם קישורים ישירים ומידע טכני.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Primary Pages Section -->
+                        <div class="content-section" id="primary-pages">
+                            <div class="section-header">
+                                <h2>🏠 עמודים מרכזיים (17 עמודים)</h2>
+                                <button data-button-type="TOGGLE" data-variant="small" data-icon="▼" data-classes="btn-outline-warning" data-onclick="window.toggleSection('primary-pages')" title="הצג/הסתר" type="button"></button>
+                            </div>
+                            <div class="section-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="card mb-3">
+                                            <div class="card-header bg-primary text-white">
+                                                <h6 class="mb-0">📊 דשבורד וניווט</h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="mb-2"><strong>index.html</strong> - דשבורד ראשי (<a href="/" target="_blank">לעמוד</a>)</div>
+                                                <div class="mb-2"><strong>research.html</strong> - מחקר וניתוח (<a href="/research" target="_blank">לעמוד</a>)</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="card mb-3">
+                                            <div class="card-header bg-success text-white">
+                                                <h6 class="mb-0">📈 מסחר וניהול</h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="mb-2"><strong>trades.html</strong> - ניהול טריידים (<a href="/trades" target="_blank">לעמוד</a>)</div>
+                                                <div class="mb-2"><strong>trade_plans.html</strong> - תכניות מסחר (<a href="/trade_plans" target="_blank">לעמוד</a>)</div>
+                                                <div class="mb-2"><strong>trading_accounts.html</strong> - חשבונות מסחר (<a href="/trading_accounts" target="_blank">לעמוד</a>)</div>
+                                                <div class="mb-2"><strong>executions.html</strong> - ביצועי עסקאות (<a href="/executions" target="_blank">לעמוד</a>)</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="card mb-3">
+                                            <div class="card-header bg-info text-white">
+                                                <h6 class="mb-0">📊 ניתוח ודו"חות</h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="mb-2"><strong>tickers.html</strong> - ניהול טיקרים (<a href="/tickers" target="_blank">לעמוד</a>)</div>
+                                                <div class="mb-2"><strong>ticker_dashboard.html</strong> - דשבורד טיקר מורחב (<a href="/ticker_dashboard" target="_blank">לעמוד</a>)</div>
+                                                <div class="mb-2"><strong>portfolio_state.html</strong> - מצב תיק היסטורי (<a href="/portfolio_state" target="_blank">לעמוד</a>)</div>
+                                                <div class="mb-2"><strong>trade_history.html</strong> - היסטוריית טרייד (<a href="/trade_history" target="_blank">לעמוד</a>)</div>
+                                                <div class="mb-2"><strong>trading_journal.html</strong> - יומן מסחר (<a href="/trading_journal" target="_blank">לעמוד</a>)</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="card mb-3">
+                                            <div class="card-header bg-warning text-dark">
+                                                <h6 class="mb-0">🤖 בינה מלאכותית</h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="mb-2"><strong>ai_analysis.html</strong> - ניתוח AI (<a href="/ai_analysis" target="_blank">לעמוד</a>) <a href="documentation/03-DEVELOPMENT/TOOLS/AI_ANALYSIS_GUIDE.md" target="_blank" class="text-muted small">📖</a></div>
+                                            </div>
+                                        </div>
+                                        <div class="card mb-3">
+                                            <div class="card-header bg-secondary text-white">
+                                                <h6 class="mb-0">📋 ניהול ותצורה</h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="mb-2"><strong>alerts.html</strong> - מערכת התראות (<a href="/alerts" target="_blank">לעמוד</a>)</div>
+                                                <div class="mb-2"><strong>notes.html</strong> - מערכת הערות (<a href="/notes" target="_blank">לעמוד</a>)</div>
+                                                <div class="mb-2"><strong>watch_lists.html</strong> - ניהול רשימות צפייה (<a href="/watch_lists" target="_blank">לעמוד</a>)</div>
+                                                <div class="mb-2"><strong>cash_flows.html</strong> - תזרימי מזומנים (<a href="/cash_flows" target="_blank">לעמוד</a>)</div>
+                                                <div class="mb-2"><strong>data_import.html</strong> - ייבוא נתונים (<a href="/data_import" target="_blank">לעמוד</a>)</div>
+                                                <div class="mb-2"><strong>preferences.html</strong> - הגדרות מערכת (<a href="/preferences" target="_blank">לעמוד</a>)</div>
+                                                <div class="mb-2"><strong>user_profile.html</strong> - פרופיל משתמש (<a href="/user_profile" target="_blank">לעמוד</a>)</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Technical Pages Section -->
+                        <div class="content-section" id="technical-pages">
+                            <div class="section-header">
+                                <h2>🔧 עמודים טכניים (12 עמודים)</h2>
+                                <button data-button-type="TOGGLE" data-variant="small" data-icon="▼" data-classes="btn-outline-warning" data-onclick="window.toggleSection('technical-pages')" title="הצג/הסתר" type="button"></button>
+                            </div>
+                            <div class="section-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="card mb-3">
+                                            <div class="card-header bg-dark text-white">
+                                                <h6 class="mb-0">💾 בסיס נתונים</h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="mb-2"><strong>db_display.html</strong> - תצוגת בסיס נתונים (<a href="/db_display" target="_blank">לעמוד</a>) <a href="documentation/03-DEVELOPMENT/DATABASE/DATABASE_MANAGEMENT.md" target="_blank" class="text-muted small">📖</a></div>
+                                                <div class="mb-2"><strong>db_extradata.html</strong> - נתונים נוספים (<a href="/db_extradata" target="_blank">לעמוד</a>)</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="card mb-3">
+                                            <div class="card-header bg-danger text-white">
+                                                <h6 class="mb-0">⚙️ ניטור ובקרה</h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="mb-2"><strong>server-monitor.html</strong> - ניטור שרת (<a href="/server-monitor" target="_blank">לעמוד</a>) <a href="documentation/03-DEVELOPMENT/TOOLS/SERVER_MONITORING_GUIDE.md" target="_blank" class="text-muted small">📖</a></div>
+                                                <div class="mb-2"><strong>background-tasks.html</strong> - משימות רקע (<a href="/background-tasks" target="_blank">לעמוד</a>)</div>
+                                                <div class="mb-2"><strong>system-management.html</strong> - ניהול מערכת (<a href="/system-management" target="_blank">לעמוד</a>) <a href="documentation/03-DEVELOPMENT/TOOLS/SYSTEM_MANAGEMENT_GUIDE.md" target="_blank" class="text-muted small">📖</a></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="card mb-3">
+                                            <div class="card-header bg-primary text-white">
+                                                <h6 class="mb-0">🔔 התראות</h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="mb-2"><strong>notifications-center.html</strong> - מרכז התראות (<a href="/notifications-center" target="_blank">לעמוד</a>) <a href="documentation/03-DEVELOPMENT/TOOLS/NOTIFICATIONS_SYSTEM_GUIDE.md" target="_blank" class="text-muted small">📖</a></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="card mb-3">
+                                            <div class="card-header bg-info text-white">
+                                                <h6 class="mb-0">🎨 עיצוב וסטייל</h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="mb-2"><strong>css-management.html</strong> - ניהול CSS (<a href="/css-management" target="_blank">לעמוד</a>) <a href="documentation/03-DEVELOPMENT/STYLING/CSS_MANAGEMENT_GUIDE.md" target="_blank" class="text-muted small">📖</a></div>
+                                                <div class="mb-2"><strong>designs.html</strong> - עיצובים (<a href="/designs" target="_blank">לעמוד</a>)</div>
+                                                <div class="mb-2"><strong>dynamic-colors-display.html</strong> - תצוגת צבעים (<a href="/dynamic-colors-display" target="_blank">לעמוד</a>) <a href="documentation/03-DEVELOPMENT/STYLING/COLOR_SYSTEM_GUIDE.md" target="_blank" class="text-muted small">📖</a></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="card mb-3">
+                                            <div class="card-header bg-success text-white">
+                                                <h6 class="mb-0">📊 גרפים</h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="mb-2"><strong>chart_management.html</strong> - ניהול גרפים (<a href="/chart_management" target="_blank">לעמוד</a>) <a href="documentation/03-DEVELOPMENT/TOOLS/CHART_MANAGEMENT_GUIDE.md" target="_blank" class="text-muted small">📖</a></div>
+                                                <div class="mb-2"><strong>tradingview-test-page.html</strong> - בדיקת TradingView (<a href="/mockups/daily-snapshots/tradingview-test-page.html" target="_blank">לעמוד</a>) <a href="documentation/03-DEVELOPMENT/TOOLS/TRADINGVIEW_INTEGRATION_GUIDE.md" target="_blank" class="text-muted small">📖</a></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="card mb-3">
+                                            <div class="card-header bg-warning text-dark">
+                                                <h6 class="mb-0">⚠️ אילוצים ובקרות</h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="mb-2"><strong>constraints.html</strong> - אילוצי מערכת (<a href="/constraints" target="_blank">לעמוד</a>) <a href="documentation/03-DEVELOPMENT/TOOLS/CONSTRAINTS_SYSTEM_GUIDE.md" target="_blank" class="text-muted small">📖</a></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Development Tools Section -->
+                        <div class="content-section" id="development-tools">
+                            <div class="section-header">
+                                <h2>🛠️ עמודי כלי פיתוח (10 עמודים)</h2>
+                                <button data-button-type="TOGGLE" data-variant="small" data-icon="▼" data-classes="btn-outline-warning" data-onclick="window.toggleSection('development-tools')" title="הצג/הסתר" type="button"></button>
+                            </div>
+                            <div class="section-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="card mb-3">
+                                            <div class="card-header bg-dark text-white">
+                                                <h6 class="mb-0">🔍 ניתוח ובדיקה</h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="mb-2"><strong>code-quality-dashboard.html</strong> - דשבורד איכות קוד (<a href="/code-quality-dashboard" target="_blank">לעמוד</a>) <a href="documentation/03-DEVELOPMENT/TOOLS/CODE_QUALITY_SYSTEMS_GUIDE.md" target="_blank" class="text-muted small">📖</a></div>
+                                                <div class="mb-2"><strong>init-system-management.html</strong> - ניהול מערכת אתחול (<a href="/init-system-management" target="_blank">לעמוד</a>) <a href="documentation/03-DEVELOPMENT/TOOLS/INIT_SYSTEM_MANAGEMENT_GUIDE.md" target="_blank" class="text-muted small">📖</a></div>
+                                            </div>
+                                        </div>
+                                        <div class="card mb-3">
+                                            <div class="card-header bg-primary text-white">
+                                                <h6 class="mb-0">💾 מטמון וניהול</h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="mb-2"><strong>cache-management.html</strong> - ניהול מטמון (<a href="/cache-management" target="_blank">לעמוד</a>) <a href="documentation/03-DEVELOPMENT/TOOLS/CACHE_MANAGEMENT_GUIDE.md" target="_blank" class="text-muted small">📖</a></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="card mb-3">
+                                            <div class="card-header bg-success text-white">
+                                                <h6 class="mb-0">🏷️ ניהול תגיות</h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="mb-2"><strong>tag_management.html</strong> - ניהול תגיות (<a href="/tag_management" target="_blank">לעמוד</a>) <a href="documentation/03-DEVELOPMENT/TOOLS/TAG_MANAGEMENT_GUIDE.md" target="_blank" class="text-muted small">📖</a></div>
+                                            </div>
+                                        </div>
+                                        <div class="card mb-3">
+                                            <div class="card-header bg-info text-white">
+                                                <h6 class="mb-0">🎨 כלי עיצוב</h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="mb-2"><strong>button-color-mapping.html</strong> - מיפוי צבעי כפתורים (<a href="/button-color-mapping" target="_blank">לעמוד</a>) <a href="documentation/03-DEVELOPMENT/STYLING/BUTTON_COLOR_MAPPING_GUIDE.md" target="_blank" class="text-muted small">📖</a></div>
+                                                <div class="mb-2"><strong>button-color-mapping-simple.html</strong> - מיפוי צבעי כפתורים (פשוט) (<a href="/button-color-mapping-simple" target="_blank">לעמוד</a>)</div>
+                                                <div class="mb-2"><strong>preferences-groups-management.html</strong> - ניהול קבוצות העדפות (<a href="/preferences-groups-management" target="_blank">לעמוד</a>) <a href="documentation/03-DEVELOPMENT/TOOLS/PREFERENCES_MANAGEMENT_GUIDE.md" target="_blank" class="text-muted small">📖</a></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Authentication Pages Section -->
+                        <div class="content-section" id="auth-pages">
+                            <div class="section-header">
+                                <h2>🔐 עמודי אימות (4 עמודים)</h2>
+                                <button data-button-type="TOGGLE" data-variant="small" data-icon="▼" data-classes="btn-outline-warning" data-onclick="window.toggleSection('auth-pages')" title="הצג/הסתר" type="button"></button>
+                            </div>
+                            <div class="section-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="card mb-3">
+                                            <div class="card-header bg-warning text-dark">
+                                                <h6 class="mb-0">🔑 כניסה והרשמה</h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="mb-2"><strong>login.html</strong> - כניסה למערכת (<a href="/login" target="_blank">לעמוד</a>) <a href="documentation/03-DEVELOPMENT/AUTHENTICATION/AUTH_SYSTEM_GUIDE.md" target="_blank" class="text-muted small">📖</a></div>
+                                                <div class="mb-2"><strong>register.html</strong> - הרשמה למערכת (<a href="/register" target="_blank">לעמוד</a>)</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="card mb-3">
+                                            <div class="card-header bg-info text-white">
+                                                <h6 class="mb-0">🔑 שחזור וניהול</h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="mb-2"><strong>forgot-password.html</strong> - שחזור סיסמה (<a href="/forgot-password" target="_blank">לעמוד</a>) <a href="documentation/03-DEVELOPMENT/AUTHENTICATION/PASSWORD_RECOVERY_GUIDE.md" target="_blank" class="text-muted small">📖</a></div>
+                                                <div class="mb-2"><strong>reset-password.html</strong> - איפוס סיסמה (<a href="/reset-password" target="_blank">לעמוד</a>)</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Test Pages Section -->
+                        <div class="content-section" id="test-pages">
+                            <div class="section-header">
+                                <h2>🧪 עמודי בדיקה וכלים (15+ עמודים)</h2>
+                                <button data-button-type="TOGGLE" data-variant="small" data-icon="▼" data-classes="btn-outline-warning" data-onclick="window.toggleSection('test-pages')" title="הצג/הסתר" type="button"></button>
+                            </div>
+                            <div class="section-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="card mb-3">
+                                            <div class="card-header bg-danger text-white">
+                                                <h6 class="mb-0">🧪 בדיקות אוטומטיות</h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="mb-2"><strong>crud_testing_dashboard.html</strong> - דשבורד בדיקות CRUD (<a href="/crud_testing_dashboard" target="_blank">לעמוד</a>) <a href="documentation/03-DEVELOPMENT/TESTING/CRUD_TESTING_GUIDE.md" target="_blank" class="text-muted small">📖</a></div>
+                                                <div class="mb-2"><strong>conditions-test.html</strong> - בדיקות תנאים (<a href="/conditions-test" target="_blank">לעמוד</a>) <a href="documentation/03-DEVELOPMENT/TESTING/CONDITIONS_TESTING_GUIDE.md" target="_blank" class="text-muted small">📖</a></div>
+                                                <div class="mb-2"><strong>test-header-only.html</strong> - בדיקת ראש הדף (<a href="/test-header-only" target="_blank">לעמוד</a>)</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="card mb-3">
+                                            <div class="card-header bg-primary text-white">
+                                                <h6 class="mb-0">📊 בדיקות חיצוניות</h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="mb-2"><strong>external_data_dashboard.html</strong> - דשבורד נתונים חיצוניים (<a href="/external_data_dashboard" target="_blank">לעמוד</a>) <a href="documentation/03-DEVELOPMENT/EXTERNAL_DATA/EXTERNAL_DATA_GUIDE.md" target="_blank" class="text-muted small">📖</a></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="card mb-3">
+                                            <div class="card-header bg-success text-white">
+                                                <h6 class="mb-0">💾 בדיקות מטמון</h6>
+                                            </div>
+                                            <div class="card-body">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="card mb-3">
+                                            <div class="card-header bg-info text-white">
+                                                <h6 class="mb-0">🎯 בדיקות מתקדמות</h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="mb-2"><strong>tradingview-widgets-showcase.html</strong> - ווידג'טים TradingView (<a href="/tradingview-widgets-showcase" target="_blank">לעמוד</a>) <a href="documentation/03-DEVELOPMENT/TOOLS/TRADINGVIEW_WIDGETS_GUIDE.md" target="_blank" class="text-muted small">📖</a></div>
+                                                <div class="mb-2"><strong>conditions-modals.html</strong> - מודלי תנאים (<a href="/conditions-modals" target="_blank">לעמוד</a>) <a href="documentation/03-DEVELOPMENT/TOOLS/CONDITIONS_MODALS_GUIDE.md" target="_blank" class="text-muted small">📖</a></div>
+                                                <div class="mb-2"><strong>scripts/test-user-ticker-frontend.html</strong> - בדיקת טיקר משתמש (scripts) (<a href="/scripts/test-user-ticker-frontend.html" target="_blank">לעמוד</a>)</div>
+                                                <div class="mb-2"><strong>test-bootstrap-popover-comparison.html</strong> - השוואת popover Bootstrap (<a href="/test-bootstrap-popover-comparison" target="_blank">לעמוד</a>)</div>
+                                                <div class="mb-2"><strong>test-frontend-wrappers.html</strong> - בדיקת wrappers קדמיים (<a href="/test-frontend-wrappers" target="_blank">לעמוד</a>)</div>
+                                                <div class="mb-2"><strong>test-monitoring.html</strong> - בדיקת מוניטורינג (<a href="/test-monitoring" target="_blank">לעמוד</a>)</div>
+                                                <div class="mb-2"><strong>test-nested-modal-rich-text.html</strong> - בדיקת modal מקונן עם rich text (<a href="/test-nested-modal-rich-text" target="_blank">לעמוד</a>)</div>
+                                                <div class="mb-2"><strong>test-overlay-debug.html</strong> - בדיקת overlay debug (<a href="/test-overlay-debug" target="_blank">לעמוד</a>)</div>
+                                                <div class="mb-2"><strong>test-phase1-recovery.html</strong> - בדיקת שחזור phase 1 (<a href="/test-phase1-recovery" target="_blank">לעמוד</a>)</div>
+                                                <div class="mb-2"><strong>test-phase3-1-comprehensive.html</strong> - בדיקת phase 3.1 מקיפה (<a href="/test-phase3-1-comprehensive" target="_blank">לעמוד</a>)</div>
+                                                <div class="mb-2"><strong>test-quill.html</strong> - בדיקת Quill editor (<a href="/test-quill" target="_blank">לעמוד</a>)</div>
+                                                <div class="mb-2"><strong>test-recent-items-widget.html</strong> - בדיקת ווידג'ט פריטים אחרונים (<a href="/test-recent-items-widget" target="_blank">לעמוד</a>)</div>
+                                                <div class="mb-2"><strong>test-ticker-widgets-performance.html</strong> - בדיקת ביצועי ווידג'טים טיקר (<a href="/test-ticker-widgets-performance" target="_blank">לעמוד</a>)</div>
+                                                <div class="mb-2"><strong>test-unified-widget-comprehensive.html</strong> - בדיקת ווידג'ט מאוחד מקיף (<a href="/test-unified-widget-comprehensive" target="_blank">לעמוד</a>)</div>
+                                                <div class="mb-2"><strong>test-unified-widget-integration.html</strong> - בדיקת אינטגרציה ווידג'ט מאוחד (<a href="/test-unified-widget-integration" target="_blank">לעמוד</a>)</div>
+                                                <div class="mb-2"><strong>test-unified-widget.html</strong> - בדיקת ווידג'ט מאוחד (<a href="/test-unified-widget" target="_blank">לעמוד</a>)</div>
+                                                <div class="mb-2"><strong>test-user-ticker-integration.html</strong> - בדיקת אינטגרציה טיקר משתמש (<a href="/test-user-ticker-integration" target="_blank">לעמוד</a>)</div>
+                                                <div class="mb-2"><strong>scripts/test-user-ticker-frontend.html</strong> - בדיקת טיקר משתמש (scripts) (<a href="/scripts/test-user-ticker-frontend.html" target="_blank">לעמוד</a>)</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Mockups Section -->
+                        <div class="content-section" id="mockups">
+                            <div class="section-header">
+                                <h2>🎨 עמודי מוקאפים (13 עמודים)</h2>
+                                <button data-button-type="TOGGLE" data-variant="small" data-icon="▼" data-classes="btn-outline-warning" data-onclick="window.toggleSection('mockups')" title="הצג/הסתר" type="button"></button>
+                            </div>
+                            <div class="section-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="card mb-3">
+                                            <div class="card-header bg-secondary text-white">
+                                                <h6 class="mb-0">📊 ניתוח והשוואות</h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="mb-2"><strong>comparative-analysis-page.html</strong> - ניתוח השוואתי (<a href="/mockups/daily-snapshots/comparative-analysis-page.html" target="_blank">לעמוד</a>)</div>
+                                                <div class="mb-2"><strong>date-comparison-modal.html</strong> - השוואת תאריכים (<a href="/mockups/daily-snapshots/date-comparison-modal.html" target="_blank">לעמוד</a>)</div>
+                                                <div class="mb-2"><strong>economic-calendar-page.html</strong> - לוח כלכלי (<a href="/mockups/daily-snapshots/economic-calendar-page.html" target="_blank">לעמוד</a>)</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="card mb-3">
+                                            <div class="card-header bg-info text-white">
+                                                <h6 class="mb-0">📈 גרפים והיסטוריה</h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="mb-2"><strong>price-history-page.html</strong> - היסטוריית מחירים (<a href="/mockups/daily-snapshots/price-history-page.html" target="_blank">לעמוד</a>)</div>
+                                                <div class="mb-2"><strong>strategy-analysis-page.html</strong> - ניתוח אסטרטגיות (<a href="/mockups/daily-snapshots/strategy-analysis-page.html" target="_blank">לעמוד</a>)</div>
+                                                <div class="mb-2"><strong>history-widget.html</strong> - ווידג'ט היסטוריה (<a href="/mockups/daily-snapshots/history-widget.html" target="_blank">לעמוד</a>)</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="card mb-3">
+                                            <div class="card-header bg-warning text-dark">
+                                                <h6 class="mb-0">😊 רגשות וחוויה</h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="mb-2"><strong>emotional-tracking-widget.html</strong> - תיעוד רגשי (<a href="/mockups/daily-snapshots/emotional-tracking-widget.html" target="_blank">לעמוד</a>)</div>
+                                                <div class="mb-2"><strong>heatmap-visual-example.html</strong> - דוגמת מפת חום (<a href="/mockups/daily-snapshots/heatmap-visual-example.html" target="_blank">לעמוד</a>)</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="card mb-3">
+                                            <div class="card-header bg-success text-white">
+                                                <h6 class="mb-0">📋 רשימות וניווט</h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="mb-2"><strong>add-ticker-modal.html</strong> - הוספת טיקר (<a href="/mockups/add-ticker-modal.html" target="_blank">לעמוד</a>)</div>
+                                                <div class="mb-2"><strong>flag-quick-action.html</strong> - פעולה מהירה (<a href="/mockups/flag-quick-action.html" target="_blank">לעמוד</a>)</div>
+                                                <div class="mb-2"><strong>watch-list-modal.html</strong> - רשימת מעקב (<a href="/mockups/watch-list-modal.html" target="_blank">לעמוד</a>)</div>
+                                                <div class="mb-2"><strong>watch-lists-page.html</strong> - רשימות מעקב (<a href="/mockups/watch-lists-page.html" target="_blank">לעמוד</a>)</div>
+                                                <div class="mb-2"><strong>strategy-analysis.html</strong> - ניתוח אסטרטגיות (מוקאפ) (<a href="/strategy-analysis" target="_blank">לעמוד</a>)</div>
+                                                <div class="mb-2"><strong>trades_formatted.html</strong> - טריידים מעוצבים (מוקאפ) (<a href="/trades_formatted" target="_blank">לעמוד</a>)</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Statistics Section -->
+                        <div class="content-section" id="statistics">
+                            <div class="section-header">
+                                <h2>📊 סטטיסטיקות מערכת</h2>
+                                <button data-button-type="TOGGLE" data-variant="small" data-icon="▼" data-classes="btn-outline-warning" data-onclick="window.toggleSection('statistics')" title="הצג/הסתר" type="button"></button>
+                            </div>
+                            <div class="section-body">
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <div class="card text-center mb-3">
+                                            <div class="card-body">
+                                                <h3 class="text-primary">78</h3>
+                                                <p class="mb-0">עמודי HTML פעילים</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="card text-center mb-3">
+                                            <div class="card-body">
+                                                <h3 class="text-success">17</h3>
+                                                <p class="mb-0">עמודים מרכזיים</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="card text-center mb-3">
+                                            <div class="card-body">
+                                                <h3 class="text-info">12</h3>
+                                                <p class="mb-0">עמודים טכניים</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="card text-center mb-3">
+                                            <div class="card-body">
+                                                <h3 class="text-warning">10</h3>
+                                                <p class="mb-0">כלי פיתוח</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="card text-center mb-3">
+                                            <div class="card-body">
+                                                <h3 class="text-danger">4</h3>
+                                                <p class="mb-0">עמודי אימות</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="card text-center mb-3">
+                                            <div class="card-body">
+                                                <h3 class="text-secondary">17</h3>
+                                                <p class="mb-0">עמודי בדיקה</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="card text-center mb-3">
+                                            <div class="card-body">
+                                                <h3 class="text-dark">13</h3>
+                                                <p class="mb-0">עמודי מוקאפים</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🔒 LOCKED TEMPLATE ZONE 4 - Scripts Loading (DO NOT MODIFY ORDER) -->
+    <!-- Core System Scripts -->
+    <script src="scripts/core/unified-init-v2.js?v=0da3519a_20251102_104906"></script>
+    <script src="scripts/core/icon-system.js?v=0da3519a_20251102_104906"></script>
+    <script src="scripts/core/notification-system.js?v=0da3519a_20251102_104906"></script>
+    <script src="scripts/core/modal-manager-v2.js?v=0da3519a_20251102_104906"></script>
+    <script src="scripts/core/cache-system-v4.js?v=0da3519a_20251102_104906"></script>
+    <script src="scripts/core/preferences-system.js?v=0da3519a_20251102_104906"></script>
+    <script src="scripts/core/auth.js?v=0da3519a_20251102_104906"></script>
+    <script src="scripts/core/header-system.js?v=0da3519a_20251102_104906"></script>
+
+    <!-- Page-specific script -->
+    <script src="scripts/dev_tools.js?v=1.0.0" defer></script>
+</body>
+</html>

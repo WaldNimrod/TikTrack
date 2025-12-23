@@ -1,8 +1,8 @@
 # רשימת עמודים - TikTrack
 
-**תאריך עדכון:** דצמבר 2025 - לאחר השלמת EOD Historical Metrics System
-**גרסה:** 4.1.0
-**סטטוס:** ✅ מעודכן - EOD Historical Metrics System מלא + סריקה מקיפה  
+**תאריך עדכון:** דצמבר 2025 - תיקון תיעוד וכפילויות במניפסט
+**גרסה:** 4.1.6
+**סטטוס:** ✅ מעודכן - תיקון תיעוד וכפילויות במניפסט  
 
 ---
 
@@ -108,22 +108,57 @@
 | **trade_plans.html** | תכניות מסחר | `http://localhost:5000/trade_plans.html` | `/api/trade-plans/*` | ✅ TradePlanBusinessService | ✅ מוכן | ✅ מערכת תנאים (שלב 1) |
 | **alerts.html** | מערכת התראות | `http://localhost:5000/alerts.html` | `/api/alerts/*` | ✅ AlertBusinessService | ✅ מוכן | ✅ קישור חזרה לתנאים (שלב 1) |
 | **tickers.html** | ניהול טיקרים | `http://localhost:5000/tickers.html` | `/api/tickers/*` | ✅ TickerBusinessService | ✅ מוכן |
-| **ticker-dashboard.html** | דשבורד טיקר מורחב | `http://localhost:5000/ticker-dashboard.html` | `/api/tickers/{id}/*` | ✅ TickerBusinessService | ✅ מוכן - בדיקות הושלמו 30.01.2025 |
+| **ticker_dashboard.html** | דשבורד טיקר מורחב | `http://localhost:8080/ticker_dashboard` | `/api/tickers/{id}/*` | ✅ TickerBusinessService | ✅ מוכן - בדיקות הושלמו 30.01.2025 |
 | **trading_accounts.html** | חשבונות מסחר | `http://localhost:5000/trading_accounts.html` | `/api/trading-accounts/*` | ✅ TradingAccountBusinessService | ✅ מוכן |
 | **executions.html** | ביצועי עסקאות | `http://localhost:5000/executions.html` | `/api/executions/*` | ✅ ExecutionBusinessService | ✅ מוכן |
 | **data_import.html** | ייבוא נתונים | `http://localhost:5000/data_import.html` | `/api/user-data-import/*` | ❌ חסר | ⏳ צריך Business Service |
 | **cash_flows.html** | תזרימי מזומן | `http://localhost:5000/cash_flows.html` | `/api/cash-flows/*` | ✅ CashFlowBusinessService | ✅ מוכן |
 | **notes.html** | מערכת הערות | `http://localhost:5000/notes.html` | `/api/notes/*` | ✅ NoteBusinessService | ✅ מוכן |
 | **research.html** | מחקר וניתוח | `http://localhost:5000/research.html` | `/api/research/*` | ❌ חסר | ⏳ צריך Business Service |
-| **portfolio-state-page.html** | מצב תיק היסטורי - ניתוח וצפייה במצב תיק בנקודות זמן שונות | `http://localhost:8080/mockups/daily-snapshots/portfolio-state-page.html` | `/api/portfolio-state/*` | ❌ חסר | ✅ **מוכן** |
-| **trade-history-page.html** | היסטוריית טרייד - ניתוח וצפייה בהיסטוריית טריידים | `http://localhost:8080/mockups/daily-snapshots/trade-history-page.html` | `/api/trade-history/*` | ❌ חסר | ✅ **מוכן** |
-| **trading-journal.html** | יומן מסחר - ניהול ותצוגת יומן מסחר עם לוח שנה | `http://localhost:8080/trading-journal.html` | `/api/trading-journal/*` | ✅ HistoricalDataBusinessService | ✅ **מוכן** - מימוש מלא הושלם 07.12.2025<br>✅ **שיפורים נוספים הושלמו 08.12.2025**: טבלה חכמה, זום ליום, פילטר טיקר, גרף פעילות |
-| **ai-analysis.html** | ניתוח AI - יצירת ניתוחים באמצעות מנועי LLM | `http://localhost:8080/ai-analysis` | `/api/ai-analysis/*` | ✅ AIAnalysisService | ✅ מוכן |
-| **watch-list.html** | ניהול רשימות צפייה | `http://localhost:8080/watch-list` | `/api/watch-lists/*` | ✅ WatchListService | ✅ מוכן |
+| **portfolio_state.html** | מצב תיק היסטורי - ניתוח וצפייה במצב תיק בנקודות זמן שונות | `http://localhost:8080/portfolio_state` | `/api/portfolio-state/*` | ✅ HistoricalDataBusinessService | ✅ **מוכן** |
+| **trade_history.html** | היסטוריית טרייד - ניתוח וצפייה בהיסטוריית טריידים | `http://localhost:8080/trade_history` | `/api/trade-history/*` | ✅ HistoricalDataBusinessService | ✅ **מוכן** |
+| **trading_journal.html** | יומן מסחר - ניהול ותצוגת יומן מסחר עם לוח שנה | `http://localhost:8080/trading_journal` | `/api/trading-journal/*` | ✅ HistoricalDataBusinessService | ✅ **מוכן** - מימוש מלא הושלם 07.12.2025<br>✅ **שיפורים נוספים הושלמו 08.12.2025**: טבלה חכמה, זום ליום, פילטר טיקר, גרף פעילות |
+| **ai_analysis.html** | ניתוח AI - יצירת ניתוחים באמצעות מנועי LLM | `http://localhost:8080/ai_analysis` | `/api/ai-analysis/*` | ✅ AIAnalysisService | ✅ מוכן |
+| **watch_lists.html** | ניהול רשימות צפייה | `http://localhost:8080/watch_lists` | `/api/watch-lists/*` | ✅ WatchListService | ✅ מוכן |
 | **preferences.html** | הגדרות מערכת v3.0 | `http://localhost:8080/preferences.html` | `/api/preferences/*` | ❌ חסר (מורכב) | ⏳ אופציונלי |
-| **user-profile.html** | ניהול פרופיל משתמש | `http://localhost:8080/user-profile.html` | `/api/auth/me`, `/api/auth/me/password` | ❌ חסר | ✅ מוכן |
+| **user_profile.html** | ניהול פרופיל משתמש | `http://localhost:8080/user_profile` | `/api/auth/me`, `/api/auth/me/password` | ❌ חסר | ✅ מוכן |
 
 **הערה:** כל העמודים עם Business Logic Service משולבים במלואם עם מערכות מטמון ואיתחול. ראה [Business Logic Layer Documentation](../02-ARCHITECTURE/BACKEND/BUSINESS_LOGIC_LAYER.md) לפרטים מלאים.
+
+### Authentication Status
+
+**תאריך עדכון:** 22 בדצמבר 2025
+
+| עמוד | auth.js | auth-guard.js | Absolute Paths | No Duplicates | סטטוס |
+|------|---------|---------------|----------------|---------------|-------|
+| **index.html** | ✅ | ✅ | ✅ | ✅ | ✅ תקין |
+| **trades.html** | ✅ | ✅ | ✅ | ✅ | ✅ תקין |
+| **executions.html** | ✅ | ✅ | ✅ | ✅ | ✅ תקין |
+| **alerts.html** | ✅ | ✅ | ✅ | ✅ | ✅ תקין |
+| **trade_plans.html** | ✅ | ✅ | ✅ | ✅ | ✅ תקין |
+| **tickers.html** | ✅ | ✅ | ✅ | ✅ | ✅ תקין |
+| **ticker_dashboard.html** | ✅ | ✅ | ✅ | ✅ | ✅ תקין |
+| **trading_accounts.html** | ✅ | ✅ | ✅ | ✅ | ✅ תקין |
+| **cash_flows.html** | ✅ | ✅ | ✅ | ✅ | ✅ תקין |
+| **notes.html** | ✅ | ✅ | ✅ | ✅ | ✅ תקין |
+| **ai_analysis.html** | ✅ | ✅ | ✅ | ✅ | ✅ תקין |
+| **watch_lists.html** | ✅ | ✅ | ✅ | ✅ | ✅ תקין |
+| **user_profile.html** | ✅ | ✅ | ✅ | ✅ | ✅ תקין |
+| **external-data-dashboard.html** | ✅ | ✅ | ✅ | ✅ | ✅ תקין |
+| **trading_journal.html** | ✅ | ✅ | ✅ | ✅ | ✅ תקין |
+| **trade_history.html** | ✅ | ✅ | ✅ | ✅ | ✅ תקין |
+| **portfolio_state.html** | ✅ | ✅ | ✅ | ✅ | ✅ תקין |
+| **research.html** | ✅ | ✅ | ✅ | ✅ | ✅ תקין |
+| **preferences.html** | ✅ | ✅ | ✅ | ✅ | ✅ תקין |
+| **data_import.html** | ❌ | ❌ | ✅ | ✅ | ⚠️ קובץ לא מלא |
+
+**סיכום:**
+- **עמודים תקינים:** 19/20 (95%)
+- **עמודים עם בעיות:** 1/20 (5% - data_import.html לא מלא)
+
+**הערה:** `data_import.html` הוא קובץ לא מלא (35 שורות בלבד) ולא פעיל כרגע. בעת השלמת הקובץ, יש לוודא שכלול authentication.
+
+ראה [Authentication Implementation Guide](03-DEVELOPMENT/GUIDES/AUTHENTICATION_IMPLEMENTATION_GUIDE.md) לפרטים מלאים על יישום authentication.
 
 ### עמודים טכניים
 
@@ -151,7 +186,6 @@
 
 | עמוד | תיאור | גישה |
 |------|--------|------|
-| **external-data-dashboard.html** | דשבורד נתונים חיצוניים | `http://localhost:5000/external-data-dashboard.html` |
 | **chart-management.html** | ניהול גרפים | `http://localhost:5000/chart-management.html` |
 | **crud-testing-dashboard.html** | דשבורד בדיקות CRUD | `http://localhost:5000/crud-testing-dashboard.html` |
 
@@ -166,21 +200,41 @@
 
 | עמוד | תיאור | גישה |
 |------|--------|------|
-| **~~login.html~~** | ~~כניסה למערכת~~ | **הוסר - כניסה עובדת במודול (auth.js)** |
+| **login.html** | כניסה למערכת | `http://localhost:8080/login.html` |
 | **register.html** | הרשמה למערכת | `http://localhost:8080/register.html` |
 | **forgot-password.html** | שחזור סיסמה | `http://localhost:8080/forgot-password.html` |
 | **reset-password.html** | איפוס סיסמה | `http://localhost:8080/reset-password.html` |
 
-**הערה:** מסך הכניסה עבר לעבוד במודול (`auth.js` - `showLoginModal()`) ולא בעמוד נפרד. המודול מופיע אוטומטית כאשר נדרש authentication.
+**הערה:** מסך הכניסה חזר לעבוד כעמוד נפרד (`login.html`) במקום מודול.
 
 ### עמודי כלים לפיתוח
 
 | עמוד | תיאור | גישה |
 |------|--------|------|
+| **dev_tools.html** | כלי פיתוח ראשי - סקירה מלאה של כל העמודים והמערכות | `http://localhost:8080/dev_tools` |
+| **external_data_dashboard.html** | דשבורד נתונים חיצוניים | `http://localhost:8080/external_data_dashboard` |
+| **chart_management.html** | ניהול גרפים | `http://localhost:8080/chart_management` |
+| **crud_testing_dashboard.html** | דשבורד בדיקות CRUD | `http://localhost:8080/crud_testing_dashboard` |
+| **scripts/test-user-ticker-frontend.html** | בדיקת טיקר משתמש (scripts) | `http://localhost:8080/scripts/test-user-ticker-frontend.html` |
+| **test-bootstrap-popover-comparison.html** | השוואת popover Bootstrap | `http://localhost:8080/test-bootstrap-popover-comparison` |
+| **test-frontend-wrappers.html** | בדיקת wrappers קדמיים | `http://localhost:8080/test-frontend-wrappers` |
+| **test-header-only.html** | בדיקת ראש הדף | `http://localhost:8080/test-header-only` |
+| **test-monitoring.html** | בדיקת מוניטורינג | `http://localhost:8080/test-monitoring` |
+| **test-nested-modal-rich-text.html** | בדיקת modal מקונן עם rich text | `http://localhost:8080/test-nested-modal-rich-text` |
+| **test-overlay-debug.html** | בדיקת overlay debug | `http://localhost:8080/test-overlay-debug` |
+| **test-phase1-recovery.html** | בדיקת שחזור phase 1 | `http://localhost:8080/test-phase1-recovery` |
+| **test-phase3-1-comprehensive.html** | בדיקת phase 3.1 מקיף | `http://localhost:8080/test-phase3-1-comprehensive` |
+| **test-quill.html** | בדיקת Quill editor | `http://localhost:8080/test-quill` |
+| **test-recent-items-widget.html** | בדיקת ווידג'ט פריטים אחרונים | `http://localhost:8080/test-recent-items-widget` |
+| **test-ticker-widgets-performance.html** | בדיקת ביצועי ווידג'טים טיקר | `http://localhost:8080/test-ticker-widgets-performance` |
+| **test-unified-widget-comprehensive.html** | בדיקת ווידג'ט מאוחד מקיף | `http://localhost:8080/test-unified-widget-comprehensive` |
+| **test-unified-widget-integration.html** | בדיקת אינטגרציה ווידג'ט מאוחד | `http://localhost:8080/test-unified-widget-integration` |
+| **test-unified-widget.html** | בדיקת ווידג'ט מאוחד | `http://localhost:8080/test-unified-widget` |
+| **test-user-ticker-integration.html** | בדיקת אינטגרציה טיקר משתמש | `http://localhost:8080/test-user-ticker-integration` |
 | **button-color-mapping.html** | מיפוי צבעי כפתורים | `http://localhost:8080/button-color-mapping.html` |
 | **button-color-mapping-simple.html** | מיפוי צבעי כפתורים - פשוט | `http://localhost:8080/button-color-mapping-simple.html` |
 | **preferences-groups-management.html** | ניהול קבוצות העדפות | `http://localhost:8080/preferences-groups-management.html` |
-| **tag-management.html** | ניהול תגיות | `http://localhost:8080/tag-management.html` |
+| **tag_management.html** | ניהול תגיות | `http://localhost:8080/tag_management` |
 | **cache-management.html** | ניהול מטמון | `http://localhost:8080/cache-management.html` |
 | **code-quality-dashboard.html** | דשבורד איכות קוד | `http://localhost:8080/code-quality-dashboard.html` |
 | **init-system-management.html** | ניהול מערכת אתחול | `http://localhost:8080/init-system-management.html` |
@@ -210,9 +264,9 @@
 | **daily-snapshots-emotional-tracking-widget.html** | ווידג'ט מעקב רגשי - מוקאפ | `http://localhost:8080/daily-snapshots-emotional-tracking-widget.html` |
 | **daily-snapshots-heatmap-visual-example.html** | דוגמת מפת חום - מוקאפ | `http://localhost:8080/daily-snapshots-heatmap-visual-example.html` |
 | **daily-snapshots-history-widget.html** | ווידג'ט היסטוריה - מוקאפ | `http://localhost:8080/daily-snapshots-history-widget.html` |
-| **portfolio-state-page.html** | מצב תיק היסטורי - ניתוח וצפייה במצב תיק בנקודות זמן שונות | `http://localhost:8080/mockups/daily-snapshots/portfolio-state-page.html` | ✅ **משולב** | `/api/portfolio-state/*` | ❌ חסר | ✅ **מוכן** |
-| **trade-history-page.html** | היסטוריית טרייד - ניתוח וצפייה בהיסטוריית טריידים | `http://localhost:8080/mockups/daily-snapshots/trade-history-page.html` | ✅ **משולב** | `/api/trade-history/*` | ❌ חסר | ✅ **מוכן** |
-| **trading-journal.html** | יומן מסחר - ניהול ותצוגת יומן מסחר עם לוח שנה | `http://localhost:8080/trading-journal.html` | ✅ **משולב** | `/api/trading-journal/*` | ✅ HistoricalDataBusinessService | ✅ **מוכן** - מימוש מלא הושלם 07.12.2025 |
+| **portfolio_state.html** | מצב תיק היסטורי - ניתוח וצפייה במצב תיק בנקודות זמן שונות | `http://localhost:8080/portfolio_state` | ✅ **משולב** | `/api/portfolio-state/*` | ✅ HistoricalDataBusinessService | ✅ **מוכן** |
+| **trade_history.html** | היסטוריית טרייד - ניתוח וצפייה בהיסטוריית טריידים | `http://localhost:8080/trade_history` | ✅ **משולב** | `/api/trade-history/*` | ✅ HistoricalDataBusinessService | ✅ **מוכן** |
+| **trading_journal.html** | יומן מסחר - ניהול ותצוגת יומן מסחר עם לוח שנה | `http://localhost:8080/trading_journal` | ✅ **משולב** | `/api/trading-journal/*` | ✅ HistoricalDataBusinessService | ✅ **מוכן** - מימוש מלא הושלם 07.12.2025 |
 | **daily-snapshots-price-history-page.html** | היסטוריית מחירים - מוקאפ | `http://localhost:8080/daily-snapshots-price-history-page.html` |
 | **daily-snapshots-strategy-analysis-page.html** | ניתוח אסטרטגיה - מוקאפ | `http://localhost:8080/daily-snapshots-strategy-analysis-page.html` |
 
@@ -221,7 +275,8 @@
 | עמוד | תיאור | גישה |
 |------|--------|------|
 | **tradingview-widgets-showcase.html** | תצוגת ווידג'טים TradingView | `http://localhost:8080/tradingview-widgets-showcase.html` |
-| **trades_formatted.html** | טריידים מעוצבים | `http://localhost:8080/trades_formatted.html` |
+| **strategy-analysis.html** | ניתוח אסטרטגיות (מוקאפ) | `http://localhost:8080/strategy-analysis.html` |
+| **trades_formatted.html** | טריידים מעוצבים (מוקאפ) | `http://localhost:8080/trades_formatted.html` |
 
 ---
 
@@ -244,15 +299,14 @@
 ## 📊 סטטיסטיקות
 
 - **סה"כ עמודים ראשיים:** 25 עמודים
-- **עמודים מרכזיים:** 13 עמודים
+- **עמודים מרכזיים:** 17 עמודים
 - **עמודים טכניים:** 12 עמודים
-- **עמודים משניים:** 5 עמודים
+- **עמודים משניים:** 3 עמודים
 - **עמודי אימות:** 4 עמודים
-- **עמודי כלים לפיתוח:** 10 עמודים
-- **עמודי רשימות מעקב (מוקאפים):** 3 עמודים
-- **עמודי מוקאפים:** 11 עמודים
-- **עמודים נוספים:** 2 עמודים
-- **סה"כ עמודים:** 60 עמודים
+- **עמודי כלי פיתוח:** 14 עמודים
+- **עמודי בדיקה:** 15 עמודים
+- **עמודי מוקאפים:** 13 עמודים
+- **סה"כ עמודים:** 78 עמודים (כולל כלי פיתוח ובדיקות)
 
 ---
 
@@ -273,6 +327,7 @@
 7. כלי זיהוי הכפילויות הועבר לדשבורד איכות הקוד (`/code-quality-dashboard`) ב-7 בנובמבר 2025 והעמוד `duplicate-detector.html` הועבר לארכיון
 8. עמוד `js-map` (מפת JS) הועבר לארכיון ב-7 בנובמבר 2025; פונקציות המיפוי עברו לכלים משודרגים ומטופלות בדוחות מערכת אחרים
 9. כלי `import-user-data` (ייבוא נתוני משתמש) הוסר מהתפריט והועבר לארכיון ב-8 בנובמבר 2025; הייבוא מבוצע כיום דרך תהליכי API ו-Dashboard ייעודיים
+10. עמודי Smart System (*-smart.html) הועברו לארכיון ב-23 בדצמבר 2025; הם היו ניסוי של מערכת אתחול חכמה שלא התממש
 
 ---
 
@@ -344,6 +399,17 @@
 - **אמינות נתונים**: מקור אמת יחיד לנתונים היסטוריים
 - **חוויית משתמש**: טעינה מהירה יותר ונתונים מדויקים
 - **תחזוקה קלה**: ארכיטקטורה מודולרית
+
+---
+
+## 📊 מניפסט טעינה מערכת
+
+**קובץ:** `trading-ui/scripts/page-initialization-configs.js`  
+**מספר עמודים מוגדרים:** 42 (לאחר תיקון כפילויות)  
+**הגדרות:** חבילות, globals נדרשים, הגדרות UI  
+**סטטוס:** ✅ נקי מכפילויות
+
+**הערה:** המניפסט מכיל רק עמודים שזקוקים להגדרות מיוחדות. עמודים רגילים משתמשים בהגדרות ברירת מחדל.
 
 ---
 

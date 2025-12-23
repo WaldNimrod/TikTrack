@@ -135,11 +135,21 @@ class IntegratedCRUDE2ETester {
         this.logger?.info('🖱️ Starting UI Tests');
         this.currentTestType = 'ui';
 
-        // Include all user pages for UI testing, not just CRUD pages
-        const uiPages = Object.entries(this.pages).filter(([_, page]) => page.type === 'user_page');
+        try {
+            // Include all user pages for UI testing, not just CRUD pages
+            const uiPages = Object.entries(this.pages).filter(([_, page]) => page.type === 'user_page');
 
-        for (const [key, page] of uiPages) {
-            await this.runUIPageTest(key, page);
+            this.logger?.info(`Found ${uiPages.length} user pages for UI testing`);
+
+            for (const [key, page] of uiPages) {
+                this.logger?.debug(`Testing page: ${page.displayName} (${key})`);
+                await this.runUIPageTest(key, page);
+            }
+
+            this.logger?.info('✅ UI Tests completed successfully');
+        } catch (error) {
+            this.logger?.error('❌ UI Tests failed with error:', error);
+            throw error;
         }
     }
 
@@ -196,9 +206,13 @@ class IntegratedCRUDE2ETester {
         const startTime = Date.now();
 
         try {
+            this.logger?.debug(`Starting UI test for ${page.displayName}`);
+
             // Simulate real UI interactions
             const result = await this.simulateUIInteractions(page);
             result.executionTime = Date.now() - startTime;
+
+            this.logger?.debug(`UI test completed for ${page.displayName} in ${result.executionTime}ms`);
 
             this.results.ui.push(result);
             this.updateTestResults();

@@ -392,33 +392,84 @@ class IntegratedCRUDE2ETester {
     }
 
     /**
-     * Helper function to navigate to page and wait for it to load
+     * Helper function to load page content in iframe for testing
      */
-    async navigateToPage(url) {
-        const currentUrl = window.location.href;
-        if (currentUrl.includes(url)) {
-            // Already on the page, just wait for it to be ready
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            return;
-        }
-
-        // Navigate to page
-        window.location.href = url;
-        
-        // Wait for navigation
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        
-        // Wait for page to be ready
-        await new Promise(resolve => {
-            if (document.readyState === 'complete') {
-                resolve();
-            } else {
-                window.addEventListener('load', resolve, { once: true });
-            }
+    async loadPageInIframe(url) {
+        return new Promise((resolve, reject) => {
+            // Create iframe for testing
+            const iframe = document.createElement('iframe');
+            iframe.style.display = 'none';
+            iframe.style.width = '0';
+            iframe.style.height = '0';
+            iframe.src = url;
+            
+            iframe.onload = () => {
+                setTimeout(() => resolve(iframe), 2000); // Wait for dynamic content
+            };
+            
+            iframe.onerror = () => {
+                reject(new Error(`Failed to load ${url} in iframe`));
+            };
+            
+            document.body.appendChild(iframe);
         });
-        
-        // Additional wait for dynamic content
-        await new Promise(resolve => setTimeout(resolve, 2000));
+    }
+
+    /**
+     * Helper function to get iframe document
+     */
+    getIframeDocument(iframe) {
+        return iframe.contentDocument || iframe.contentWindow.document;
+    }
+
+    /**
+     * Helper function to wait for element in iframe
+     */
+    async waitForElementInIframe(iframe, selector, timeout = 10000) {
+        const startTime = Date.now();
+        while (Date.now() - startTime < timeout) {
+            const doc = this.getIframeDocument(iframe);
+            const element = doc.querySelector(selector);
+            if (element && element.offsetParent !== null) {
+                return element;
+            }
+            await new Promise(resolve => setTimeout(resolve, 100));
+        }
+        throw new Error(`Element ${selector} not found in iframe within ${timeout}ms`);
+    }
+
+    /**
+     * Helper function to fill form field in iframe
+     */
+    async fillFormFieldInIframe(iframe, selector, value) {
+        const field = await this.waitForElementInIframe(iframe, selector);
+        const doc = this.getIframeDocument(iframe);
+        const element = doc.querySelector(selector);
+        element.value = value;
+        element.dispatchEvent(new Event('input', { bubbles: true }));
+        element.dispatchEvent(new Event('change', { bubbles: true }));
+        await new Promise(resolve => setTimeout(resolve, 100));
+    }
+
+    /**
+     * Helper function to click button in iframe
+     */
+    async clickButtonInIframe(iframe, selector) {
+        const button = await this.waitForElementInIframe(iframe, selector);
+        button.click();
+        await new Promise(resolve => setTimeout(resolve, 200));
+    }
+
+    /**
+     * Helper function to call function in iframe window
+     */
+    async callFunctionInIframe(iframe, functionName, ...args) {
+        const iframeWindow = iframe.contentWindow;
+        if (typeof iframeWindow[functionName] === 'function') {
+            return await iframeWindow[functionName](...args);
+    } else {
+            throw new Error(`Function ${functionName} not found in iframe`);
+        }
     }
 
     async runTradeWorkflowTest() {
@@ -427,25 +478,33 @@ class IntegratedCRUDE2ETester {
             name: 'Trade Creation E2E',
             steps: []
         };
+        let testIframe = null;
 
         try {
-            this.logger?.info('🧪 Starting Trade Creation E2E Test - Full UI Simulation');
+            this.logger?.info('🧪 Starting Trade Creation E2E Test - Full UI Simulation via Hidden Iframe');
 
-            // Step 1: Navigate to trades page
-            workflow.steps.push('נווט לעמוד טריידים');
-            await this.navigateToPage('/trades.html');
-            workflow.steps.push('עמוד טריידים נטען');
+            // Step 1: Load trades page in hidden iframe
+            workflow.steps.push('טוען עמוד טריידים ב-iframe נסתר');
+            this.updateTestResults(); // Update UI with progress
+            testIframe = await this.loadPageInIframe('/trades.html');
+            workflow.steps.push('עמוד טריידים נטען ב-iframe');
+            this.updateTestResults();
 
-            // Step 2: Wait for page to be fully loaded
-            workflow.steps.push('ממתין לטעינת העמוד המלא');
-            await this.waitForElement('table tbody', 15000);
-            workflow.steps.push('העמוד נטען בהצלחה');
+            // Step 2: Wait for page to be fully loaded in iframe
+            workflow.steps.push('ממתין לטעינת העמוד המלא ב-iframe');
+            this.updateTestResults();
+            const iframeDoc = this.getIframeDocument(testIframe);
+            await this.waitForElementInIframe(testIframe, 'table tbody', 15000);
+            workflow.steps.push('העמוד נטען בהצלחה ב-iframe');
+            this.updateTestResults();
 
-            // Step 3: Get initial trade count
+            // Step 3: Get initial trade count from iframe
             workflow.steps.push('ספירת טריידים קיימים');
-            const initialRows = document.querySelectorAll('table tbody tr').length;
+            this.updateTestResults();
+            const initialRows = iframeDoc.querySelectorAll('table tbody tr').length;
             this.logger?.debug(`Initial trades count: ${initialRows}`);
             workflow.steps.push(`נמצאו ${initialRows} טריידים קיימים`);
+            this.updateTestResults();
 
             // Step 4: Open Add Trade modal using global function
             workflow.steps.push('פתיחת מודל הוספת טרייד');

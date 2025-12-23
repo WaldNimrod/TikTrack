@@ -482,10 +482,10 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'crud',
         'preferences',
         'validation',
-        'entity-details',
-        'info-summary',
-        'dashboard-widgets', // Pending Trade Plan Widget
-        'conditions', // Conditions System
+        // REMOVED: 'entity-details' - Not needed for preferences page
+        // REMOVED: 'info-summary' - Not needed for preferences page
+        // REMOVED: 'dashboard-widgets' - Not needed for preferences page
+        // REMOVED: 'conditions' - Not needed for preferences page
         'init-system',
       ],
       // ← NEW: בדיקות תקינות
@@ -496,20 +496,20 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'window.Logger',
         'window.CacheSyncManager',
         'window.PreferencesUIV4',
-        'window.InfoSummarySystem', // Info Summary System
-        'window.conditionsInitializer', // Conditions System
-        'window.ConditionsUIManager', // Conditions System
+        // REMOVED: 'window.InfoSummarySystem' - Not needed for preferences page
+        // REMOVED: 'window.conditionsInitializer' - Not needed for preferences page
+        // REMOVED: 'window.ConditionsUIManager' - Not needed for preferences page
         'window.LinkedItemsService', // Linked Items Service
         'window.CRUDResponseHandler', // CRUD Response Handler
         'window.createActionsMenu', // Actions Menu Toolkit
         'window.PaginationSystem', // Pagination System
-        'window.showEntityDetails', // Entity Details Modal
-        'window.PendingTradePlanWidget', // Pending Trade Plan Widget
+        // REMOVED: 'window.showEntityDetails' - Not needed for preferences page
+        // REMOVED: 'window.PendingTradePlanWidget' - Not needed for preferences page
         'window.UnifiedAppInitializer', // Unified Init System
         'window.PAGE_CONFIGS', // Unified Init System
         'window.PACKAGE_MANIFEST', // Unified Init System
         'window.ModalManagerV2', // Modal Manager V2
-        'window.ConditionsSummaryRenderer', // Conditions Summary Renderer
+        // REMOVED: 'window.ConditionsSummaryRenderer' - Not needed for preferences page
       // ← NEW: מטאדאטה
       ],
       description: 'עמוד העדפות משתמש - הגדרות מערכת וצבעים',

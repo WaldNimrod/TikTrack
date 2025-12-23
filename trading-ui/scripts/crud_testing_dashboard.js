@@ -136,8 +136,8 @@ class IntegratedCRUDE2ETester {
         this.currentTestType = 'ui';
 
         try {
-            // Include all user pages for UI testing, not just CRUD pages
-            const uiPages = Object.entries(this.pages).filter(([_, page]) => page.type === 'user_page');
+        // Include all user pages for UI testing, not just CRUD pages
+        const uiPages = Object.entries(this.pages).filter(([_, page]) => page.type === 'user');
 
             this.logger?.info(`Found ${uiPages.length} user pages for UI testing`);
 

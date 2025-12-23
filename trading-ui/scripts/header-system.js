@@ -2030,7 +2030,7 @@ if (window.HeaderSystem && !window.HeaderSystem.createFilterSystem) {
 }
 
 if (window.Logger) {
-  window.Logger.info('✅ Header System v7.0.0 loaded successfully!', { page: 'header-system' });
+  window.Logger.debug('✅ Header System v7.0.0 loaded successfully!', { page: 'header-system' });
 }
 
 // ===== AUTO-INITIALIZATION FALLBACK =====

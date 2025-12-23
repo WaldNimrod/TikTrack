@@ -727,5 +727,5 @@ if (document.readyState === 'loading') {
 }
 
 if (window.Logger && window.Logger.info) {
-  window.Logger.info('✅ preferences-validation.js loaded successfully', { page: 'preferences-validation' });
+  window.Logger.debug('✅ preferences-validation.js loaded successfully', { page: 'preferences-validation' });
 }

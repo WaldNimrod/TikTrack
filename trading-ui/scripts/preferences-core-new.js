@@ -434,12 +434,13 @@ class PreferencesCore {
     // Note: ProfileManager is now in preferences-profiles.js (window.ProfileManager)
 
     this.currentUserId = 1; // Nimrod
-    this.currentProfileId = null; // Will be loaded from server
+    this.currentProfileId = 0; // Default profile (0) - will be updated from server/bootstrap
     this.latestProfileContext = null;
     this.defaultPreferenceCache = new Map();
     this.defaultPreferenceEndpointAvailable = true;
     // High-level deduplication registry
     this._getAllPreferencesInflight = new Map();
+    this._initLazyLoadingInflight = new Map(); // Deduplication for initializeWithLazyLoading
   }
 
   /**
@@ -1195,41 +1196,75 @@ class PreferencesCore {
      * @param {number} profileId - Profile ID
      */
   async initializeWithLazyLoading(userId = null, profileId = null) {
-    try {
-      // Update current profile if provided
-      if (userId !== null && profileId !== null) {
-        await this.setCurrentProfile(userId, profileId);
-      }
-
-      // Initialize lazy loader if available
-      if (window.LazyLoader) {
-        // Ensure profileId is explicitly set (null means use active profile from server, not 0 or 1)
-        const finalUserId = userId || this.currentUserId || 1;
-        // If profileId is null/undefined, pass null to let server determine active profile
-        // Don't use cached currentProfileId if it might be stale (e.g., from SQLite migration)
-        const finalProfileId = profileId !== null && profileId !== undefined ? profileId : null;
-
-        await window.LazyLoader.initialize(
-          finalUserId,
-          finalProfileId,
-        );
-      } else {
-        // Fallback to standard loading
-        await this.getAllPreferences(userId, profileId);
-      }
-
-    } catch (error) {
-      // Only log critical errors
-      if (window.DEBUG_MODE) {
-        console.warn('⚠️ Error initializing lazy loading:', error);
-      }
-      // Fallback to standard loading
-      try {
-        await this.getAllPreferences(userId, profileId);
-      } catch (fallbackError) {
-        // Silent fail - continue without preferences
-      }
+    // Deduplication: prevent multiple initialization calls with same params
+    const dedupeKey = `initLazy:u${userId ?? 'null'}:p${profileId ?? 'null'}`;
+    if (this._initLazyLoadingInflight?.has(dedupeKey)) {
+      window.Logger?.debug?.('⏭️ PreferencesCore.initializeWithLazyLoading deduplicated', {
+        page: 'preferences-core-new',
+        dedupeKey,
+      });
+      return await this._initLazyLoadingInflight.get(dedupeKey);
     }
+
+    const initPromise = (async () => {
+      try {
+        // Resolve userId
+        const finalUserId = userId || this.currentUserId || 1;
+        
+        // Resolve profileId - use provided value, or current, or fallback to 0 (default profile)
+        // CRITICAL: Don't use null - always use explicit 0 for default profile
+        let finalProfileId = profileId;
+        if (finalProfileId === null || finalProfileId === undefined) {
+          // If not provided, use currentProfileId if set, otherwise use 0 (default profile)
+          finalProfileId = this.currentProfileId !== null && this.currentProfileId !== undefined 
+            ? this.currentProfileId 
+            : 0;
+        }
+
+        // Update current profile
+        await this.setCurrentProfile(finalUserId, finalProfileId);
+
+        // Initialize lazy loader if available
+        if (window.LazyLoader) {
+          await window.LazyLoader.initialize(
+            finalUserId,
+            finalProfileId, // Always pass explicit value (0 for default, not null)
+          );
+        } else {
+          // Fallback to standard loading
+          await this.getAllPreferences(finalUserId, finalProfileId);
+        }
+
+      } catch (error) {
+        window.Logger?.warn?.('⚠️ Error initializing lazy loading', {
+          page: 'preferences-core-new',
+          error: error?.message,
+        });
+        // Fallback to standard loading
+        try {
+          const finalUserId = userId || this.currentUserId || 1;
+          const finalProfileId = profileId !== null && profileId !== undefined 
+            ? profileId 
+            : (this.currentProfileId !== null && this.currentProfileId !== undefined ? this.currentProfileId : 0);
+          await this.getAllPreferences(finalUserId, finalProfileId);
+        } catch (fallbackError) {
+          // Silent fail - continue without preferences
+        }
+      } finally {
+        // Clean up deduplication
+        if (this._initLazyLoadingInflight) {
+          this._initLazyLoadingInflight.delete(dedupeKey);
+        }
+      }
+    })();
+
+    // Store promise for deduplication
+    if (!this._initLazyLoadingInflight) {
+      this._initLazyLoadingInflight = new Map();
+    }
+    this._initLazyLoadingInflight.set(dedupeKey, initPromise);
+
+    return initPromise;
   }
 }
 

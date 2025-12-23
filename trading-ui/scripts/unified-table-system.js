@@ -2243,7 +2243,7 @@ window.filterTable = function(tableType, filterType, value) {
 
 // System ready
 if (window.Logger) {
-  window.Logger.info('✅ UnifiedTableSystem loaded', { page: 'unified-table-system' });
+  window.Logger.debug('✅ UnifiedTableSystem loaded', { page: 'unified-table-system' });
 } else {
   console.log('✅ UnifiedTableSystem loaded');
 }

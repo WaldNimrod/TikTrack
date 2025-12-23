@@ -39,7 +39,7 @@ class QuickQualityCheckManager {
 
             this.isInitialized = true;
             if (window.Logger) {
-                window.Logger.info('✅ Quick Quality Check Manager initialized', { page: 'quick-quality-check' });
+                window.Logger.debug('✅ Quick Quality Check Manager initialized', { page: 'quick-quality-check' });
             }
         } catch (error) {
             if (window.Logger) {
@@ -369,5 +369,5 @@ if (document.readyState === 'loading') {
 window.QuickQualityCheckManager = quickQualityCheckManager;
 
 if (window.Logger) {
-    window.Logger.info('✅ Quick Quality Check loaded successfully', { page: 'quick-quality-check' });
+    window.Logger.debug('✅ Quick Quality Check loaded successfully', { page: 'quick-quality-check' });
 }

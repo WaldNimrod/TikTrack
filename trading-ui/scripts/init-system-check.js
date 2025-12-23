@@ -24,7 +24,7 @@
 // - waitForNavList() - Waitfornavlist
 
 if (window.Logger) {
-  window.Logger.info('🔍 Loading Init System Check...', { page: 'init-check' });
+  window.Logger.debug('🔍 Loading Init System Check...', { page: 'init-check' });
 }
 
 /**
@@ -45,7 +45,7 @@ class InitSystemCheck {
         
         this.isInitialized = true;
         if (window.Logger) {
-          window.Logger.info('✅ Init System Check initialized', { page: 'init-check' });
+          window.Logger.debug('✅ Init System Check initialized', { page: 'init-check' });
         }
     }
 

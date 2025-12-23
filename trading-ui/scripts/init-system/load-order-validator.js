@@ -20,7 +20,7 @@
 
 
 if (window.Logger) {
-  window.Logger.info('🔍 Loading Load Order Validator...', { page: 'load-order-validator' });
+  window.Logger.debug('🔍 Loading Load Order Validator...', { page: 'load-order-validator' });
 }
 
 /**
@@ -466,5 +466,5 @@ const loadOrderValidator = new LoadOrderValidator();
 window.loadOrderValidator = loadOrderValidator;
 
 if (window.Logger) {
-  window.Logger.info('✅ Load Order Validator loaded successfully', { page: 'load-order-validator' });
+  window.Logger.debug('✅ Load Order Validator loaded successfully', { page: 'load-order-validator' });
 }

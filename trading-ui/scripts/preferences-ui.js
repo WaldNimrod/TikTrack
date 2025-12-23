@@ -2340,5 +2340,5 @@ function hideDefaultProfileWarning() {
 // This ensures single point of entry, proper cache usage, and no duplicate API calls
 
 if (window.Logger && window.Logger.info) {
-  window.Logger.info('✅ preferences-ui.js loaded successfully', { page: 'preferences-ui' });
+  window.Logger.debug('✅ preferences-ui.js loaded successfully', { page: 'preferences-ui' });
 }

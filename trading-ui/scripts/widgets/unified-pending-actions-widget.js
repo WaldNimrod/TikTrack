@@ -1582,7 +1582,7 @@
   
   // Log successful load
   if (window.Logger) {
-    window.Logger.info('✅ Unified Pending Actions Widget loaded successfully', { 
+    window.Logger.debug('✅ Unified Pending Actions Widget loaded successfully', { 
       page: 'unified-pending-actions-widget', 
       version: '2.0.0' 
     });

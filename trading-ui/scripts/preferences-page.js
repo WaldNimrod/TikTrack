@@ -1032,4 +1032,4 @@ window.loadAccountsForPreferences = loadAccountsForPreferences;
 window.initializePreferencesPage = initializePreferencesPage;
 window.copyDetailedLogLocal = copyDetailedLogLocal;
 
-window.Logger.info('✅ preferences-page.js v3.1 loaded successfully', { page: 'preferences-page' });
+window.Logger.debug('✅ preferences-page.js v3.1 loaded successfully', { page: 'preferences-page' });

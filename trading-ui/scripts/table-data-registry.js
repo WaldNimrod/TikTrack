@@ -551,7 +551,7 @@
   window.tableDataRegistry = registryInstance;
 
   if (window.Logger?.info) {
-    window.Logger.info('✅ TableDataRegistry loaded', { page: 'table-data-registry' });
+    window.Logger.debug('✅ TableDataRegistry loaded', { page: 'table-data-registry' });
   } else {
     console.log('✅ TableDataRegistry loaded');
   }

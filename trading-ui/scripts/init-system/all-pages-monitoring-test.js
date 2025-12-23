@@ -19,7 +19,7 @@
  */
 
 if (window.Logger) {
-  window.Logger.info('🔍 Loading All Pages Monitoring Test...', { page: 'all-pages-monitoring-test' });
+  window.Logger.debug('🔍 Loading All Pages Monitoring Test...', { page: 'all-pages-monitoring-test' });
 }
 
 /**
@@ -58,7 +58,7 @@ class AllPagesMonitoringTest {
         }
 
         if (window.Logger) {
-            window.Logger.info(`✅ All Pages Monitoring Test initialized with ${this.pages.length} pages`, { page: 'all-pages-monitoring-test' });
+            window.Logger.debug(`✅ All Pages Monitoring Test initialized with ${this.pages.length} pages`, { page: 'all-pages-monitoring-test' });
         }
     }
 
@@ -484,7 +484,7 @@ if (document.readyState === 'loading') {
 window.allPagesMonitoringTest = allPagesMonitoringTest;
 
 if (window.Logger) {
-  window.Logger.info('✅ All Pages Monitoring Test loaded successfully', { page: 'all-pages-monitoring-test' });
+  window.Logger.debug('✅ All Pages Monitoring Test loaded successfully', { page: 'all-pages-monitoring-test' });
 }
 
 

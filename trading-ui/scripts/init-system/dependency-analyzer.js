@@ -21,7 +21,7 @@
 
 
 if (window.Logger) {
-  window.Logger.info('🔍 Loading Dependency Analyzer...', { page: 'dependency-analyzer' });
+  window.Logger.debug('🔍 Loading Dependency Analyzer...', { page: 'dependency-analyzer' });
 }
 
 /**
@@ -383,5 +383,5 @@ const dependencyAnalyzer = new DependencyAnalyzer();
 window.dependencyAnalyzer = dependencyAnalyzer;
 
 if (window.Logger) {
-  window.Logger.info('✅ Dependency Analyzer loaded successfully', { page: 'dependency-analyzer' });
+  window.Logger.debug('✅ Dependency Analyzer loaded successfully', { page: 'dependency-analyzer' });
 }

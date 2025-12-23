@@ -405,7 +405,7 @@ class UnifiedCacheManager {
      */
     async initialize() {
         try {
-            window.Logger.info('🔄 Initializing Unified Cache Manager...', { page: "unified-cache-manager" });
+            window.Logger.debug('🔄 Initializing Unified Cache Manager...', { page: "unified-cache-manager" });
             
             // אתחול IndexedDB
             if (window.indexedDB) {
@@ -435,7 +435,7 @@ class UnifiedCacheManager {
             await this.updateStats();
             
             this.initialized = true;
-            window.Logger.info('✅ Unified Cache Manager initialized successfully', { page: "unified-cache-manager" });
+            window.Logger.debug('✅ Unified Cache Manager initialized successfully', { page: "unified-cache-manager" });
             
             return true;
         } catch (error) {
@@ -1531,7 +1531,7 @@ class IndexedDBLayer {
             request.onsuccess = () => {
                 clearTimeout(timeout);
                 this.db = request.result;
-                window.Logger.info('✅ IndexedDB Layer initialized', { page: "unified-cache-manager" });
+                window.Logger.debug('✅ IndexedDB Layer initialized', { page: "unified-cache-manager" });
                 resolve(true);
             };
             
@@ -1762,7 +1762,7 @@ class BackendCacheLayer {
                 request.onsuccess = () => {
                     try {
                         this.db = request.result;
-                        window.Logger.info('✅ IndexedDB initialized', { page: "unified-cache-manager" });
+                        window.Logger.debug('✅ IndexedDB initialized', { page: "unified-cache-manager" });
                         resolve();
                     } catch (successError) {
                         window.Logger.error('❌ Error after IndexedDB success:', successError, { page: "unified-cache-manager" });
@@ -4130,7 +4130,7 @@ window.clearCacheComplete = async function(event) {
     if (window.UnifiedCacheManager && !window.UnifiedCacheManager.initialized) {
         try {
             await window.UnifiedCacheManager.initialize();
-            window.Logger.info('✅ Unified Cache Manager auto-initialized successfully', { page: "unified-cache-manager" });
+            window.Logger.debug('✅ Unified Cache Manager auto-initialized successfully', { page: "unified-cache-manager" });
         } catch (error) {
             window.Logger.warn('⚠️ Failed to auto-initialize Unified Cache Manager:', error, { page: "unified-cache-manager" });
         }

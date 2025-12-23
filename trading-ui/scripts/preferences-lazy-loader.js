@@ -892,15 +892,15 @@ window.isPreferenceLoaded = function(preferenceName) {
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => {
     if (window.Logger && window.Logger.info) {
-      window.Logger.info('📄 Lazy loading system ready', { page: 'preferences-lazy-loader' });
+      window.Logger.debug('📄 Lazy loading system ready', { page: 'preferences-lazy-loader' });
     }
   });
 } else {
   if (window.Logger && window.Logger.info) {
-    window.Logger.info('📄 Lazy loading system ready', { page: 'preferences-lazy-loader' });
+    window.Logger.debug('📄 Lazy loading system ready', { page: 'preferences-lazy-loader' });
   }
 }
 
 if (window.Logger && window.Logger.info) {
-  window.Logger.info('✅ preferences-lazy-loader.js loaded successfully', { page: 'preferences-lazy-loader' });
+  window.Logger.debug('✅ preferences-lazy-loader.js loaded successfully', { page: 'preferences-lazy-loader' });
 }

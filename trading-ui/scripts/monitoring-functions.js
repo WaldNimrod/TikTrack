@@ -46,7 +46,7 @@
 // - compareHTMLvsDOM() - Comparehtmlvsdom
 
 if (window.Logger) {
-  window.Logger.info('🔍 Loading Monitoring Functions...', { page: 'monitoring' });
+  window.Logger.debug('🔍 Loading Monitoring Functions...', { page: 'monitoring' });
 }
 
 /**
@@ -1547,5 +1547,5 @@ window.formatComparisonReport = formatComparisonReport;
 window.generateFixRecommendations = generateFixRecommendations;
 
 if (window.Logger) {
-  window.Logger.info('✅ Monitoring Functions loaded successfully', { page: 'monitoring' });
+  window.Logger.debug('✅ Monitoring Functions loaded successfully', { page: 'monitoring' });
 }

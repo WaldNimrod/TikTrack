@@ -881,10 +881,24 @@
      * @param {object} config - Configuration object (optional)
      */
     init(containerId = CONTAINER_ID, config = {}) {
+      // Deduplication: prevent multiple initialization calls
       if (state.initialized) {
-        window.Logger?.info?.('RecentItemsWidget: Already initialized', { page: 'recent-items-widget' });
+        window.Logger?.debug?.('RecentItemsWidget: Already initialized, skipping duplicate init', { 
+          page: 'recent-items-widget',
+          containerId 
+        });
         return;
       }
+      
+      // Mark as initializing to prevent race conditions
+      if (state._initializing) {
+        window.Logger?.debug?.('RecentItemsWidget: Initialization already in progress, skipping duplicate call', { 
+          page: 'recent-items-widget',
+          containerId 
+        });
+        return;
+      }
+      state._initializing = true;
 
       // Merge configuration with defaults
       state.config = {
@@ -930,6 +944,7 @@
       }
       
       state.initialized = true;
+      state._initializing = false; // Clear initializing flag
       
       // Reset positioning after initialization to ensure proper layout
       resetTabPanesPositioning();

@@ -198,7 +198,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'auth', // Authentication loaded FIRST to provide dependencies
         'header', // Header system loaded after auth
         'core-ui', // Core UI systems loaded after header
-        'core-init', // Core initialization loaded separately to avoid bundle conflicts
         'services',
         'ui-advanced',
         'modules', // Required for ModalManagerV2 (tag search drawer)
@@ -421,7 +420,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'auth', // Authentication loaded FIRST to provide dependencies
         'header', // Header system loaded after auth
         'core-ui', // Core UI systems loaded after header
-        'core-init', // Core initialization loaded separately to avoid bundle conflicts
         'services',
         'modules',
         'ui-advanced',
@@ -478,7 +476,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'auth', // Authentication loaded FIRST to provide dependencies
         'header', // Header system loaded after auth
         'core-ui', // Core UI systems loaded after header
-        'core-init', // Core initialization loaded separately to avoid bundle conflicts
         'services',
         'ui-advanced',
         'modules', // Required for ModalManagerV2
@@ -540,7 +537,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'auth', // Authentication loaded FIRST to provide dependencies
         'header', // Header system loaded after auth
         'core-ui', // Core UI systems loaded after header
-        'core-init', // Core initialization loaded separately to avoid bundle conflicts
         'services',
         'ui-advanced',
         'modules',
@@ -628,7 +624,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'auth', // Authentication loaded FIRST to provide dependencies
         'header', // Header system loaded after auth
         'core-ui', // Core UI systems loaded after header
-        'core-init', // Core initialization loaded separately to avoid bundle conflicts
         'services',
         'modules',
         'ui-advanced',
@@ -732,7 +727,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'auth', // Authentication loaded FIRST to provide dependencies
         'header', // Header system loaded after auth
         'core-ui', // Core UI systems loaded after header
-        'core-init', // Core initialization loaded separately to avoid bundle conflicts
         'services',
         'ui-advanced',
         'modules',
@@ -865,7 +859,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'auth', // Authentication loaded FIRST to provide dependencies
         'header', // Header system loaded after auth
         'core-ui', // Core UI systems loaded after header
-        'core-init', // Core initialization loaded separately to avoid bundle conflicts
         'services',
         'ui-advanced',
         'modules',
@@ -936,7 +929,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'auth', // Authentication loaded FIRST to provide dependencies
         'header', // Header system loaded after auth
         'core-ui', // Core UI systems loaded after header
-        'core-init', // Core initialization loaded separately to avoid bundle conflicts
         'services',
         'modules',
         'ui-advanced',
@@ -1038,7 +1030,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'auth', // Authentication loaded FIRST to provide dependencies
         'header', // Header system loaded after auth
         'core-ui', // Core UI systems loaded after header
-        'core-init', // Core initialization loaded separately to avoid bundle conflicts
         'services',
         'ui-advanced',
         'modules',
@@ -1134,7 +1125,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'auth', // Authentication loaded FIRST to provide dependencies
         'header', // Header system loaded after auth
         'core-ui', // Core UI systems loaded after header
-        'core-init', // Core initialization loaded separately to avoid bundle conflicts
         'services',
         'ui-advanced',
         'modules',
@@ -1336,7 +1326,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'auth', // Authentication loaded FIRST to provide dependencies
         'header', // Header system loaded after auth
         'core-ui', // Core UI systems loaded after header
-        'core-init', // Core initialization loaded separately to avoid bundle conflicts
         'services',
         'ui-advanced',
         'modules',
@@ -1413,7 +1402,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'auth', // Authentication loaded FIRST to provide dependencies
         'header', // Header system loaded after auth
         'core-ui', // Core UI systems loaded after header
-        'core-init', // Core initialization loaded separately to avoid bundle conflicts
         'services',
         'ui-advanced',
         'modules',
@@ -1479,7 +1467,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'auth', // Authentication loaded FIRST to provide dependencies
         'header', // Header system loaded after auth
         'core-ui', // Core UI systems loaded after header
-        'core-init', // Core initialization loaded separately to avoid bundle conflicts
         'services',
         'ui-advanced',
         'modules',
@@ -1559,7 +1546,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'auth', // Authentication loaded FIRST to provide dependencies
         'header', // Header system loaded after auth
         'core-ui', // Core UI systems loaded after header
-        'core-init', // Core initialization loaded separately to avoid bundle conflicts
         'services',
         'ui-advanced',
         'modules',
@@ -1656,7 +1642,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'auth', // Authentication loaded FIRST to provide dependencies
         'header', // Header system loaded after auth
         'core-ui', // Core UI systems loaded after header
-        'core-init', // Core initialization loaded separately to avoid bundle conflicts
         'services',
         'ui-advanced',
         'modules',
@@ -1740,7 +1725,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'auth', // Authentication loaded FIRST to provide dependencies
         'header', // Header system loaded after auth
         'core-ui', // Core UI systems loaded after header
-        'core-init', // Core initialization loaded separately to avoid bundle conflicts
         'services',
         'ui-advanced',
         'modules',
@@ -1806,7 +1790,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'auth', // Authentication loaded FIRST to provide dependencies
         'header', // Header system loaded after auth
         'core-ui', // Core UI systems loaded after header
-        'core-init', // Core initialization loaded separately to avoid bundle conflicts
         'services',
         'ui-advanced',
         'modules',
@@ -1894,7 +1877,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'auth', // Authentication loaded FIRST to provide dependencies
         'header', // Header system loaded after auth
         'core-ui', // Core UI systems loaded after header
-        'core-init', // Core initialization loaded separately to avoid bundle conflicts
         'services',
         'ui-advanced',
         'modules',
@@ -2100,7 +2082,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'auth', // Authentication loaded FIRST to provide dependencies
         'header', // Header system loaded after auth
         'core-ui', // Core UI systems loaded after header
-        'core-init', // Core initialization loaded separately to avoid bundle conflicts
         'services',
         'ui-advanced',
         'modules',
@@ -2319,7 +2300,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'auth', // Authentication loaded FIRST to provide dependencies
         'header', // Header system loaded after auth
         'core-ui', // Core UI systems loaded after header
-        'core-init', // Core initialization loaded separately to avoid bundle conflicts
         'services',
         'ui-advanced',
         'modules',
@@ -2422,7 +2402,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'auth', // Authentication loaded FIRST to provide dependencies
         'header', // Header system loaded after auth
         'core-ui', // Core UI systems loaded after header
-        'core-init', // Core initialization loaded separately to avoid bundle conflicts
         'services',
         'ui-advanced',
         'crud',
@@ -2600,7 +2579,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'auth', // Authentication loaded FIRST to provide dependencies
         'header', // Header system loaded after auth
         'core-ui', // Core UI systems loaded after header
-        'core-init', // Core initialization loaded separately to avoid bundle conflicts
         'services',
         'ui-advanced',
         'crud',
@@ -2649,7 +2627,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'auth', // Authentication loaded FIRST to provide dependencies
         'header', // Header system loaded after auth
         'core-ui', // Core UI systems loaded after header
-        'core-init', // Core initialization loaded separately to avoid bundle conflicts
         'services',
         'ui-advanced',
         'modules',
@@ -2719,7 +2696,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'auth', // Authentication loaded FIRST to provide dependencies
         'header', // Header system loaded after auth
         'core-ui', // Core UI systems loaded after header
-        'core-init', // Core initialization loaded separately to avoid bundle conflicts
         'services',
         'ui-advanced',
         'modules',
@@ -2778,7 +2754,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'auth', // Authentication loaded FIRST to provide dependencies
         'header', // Header system loaded after auth
         'core-ui', // Core UI systems loaded after header
-        'core-init', // Core initialization loaded separately to avoid bundle conflicts
         'services',
         'ui-advanced',
         'modules',
@@ -2836,7 +2811,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'auth', // Authentication loaded FIRST to provide dependencies
         'header', // Header system loaded after auth
         'core-ui', // Core UI systems loaded after header
-        'core-init', // Core initialization loaded separately to avoid bundle conflicts
         'services',
         'ui-advanced',
         'modules',
@@ -2895,7 +2869,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'auth', // Authentication loaded FIRST to provide dependencies
         'header', // Header system loaded after auth
         'core-ui', // Core UI systems loaded after header
-        'core-init', // Core initialization loaded separately to avoid bundle conflicts
         'services',
         'ui-advanced',
         'modules',
@@ -3337,7 +3310,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'auth', // Authentication loaded FIRST to provide dependencies
         'header', // Header system loaded after auth
         'core-ui', // Core UI systems loaded after header
-        'core-init', // Core initialization loaded separately to avoid bundle conflicts
         'services',
         'validation', // Required for form validation - must load before modules/ui-advanced
         'modules', // Required for ModalManagerV2 and watch-lists-config.js
@@ -3404,7 +3376,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'auth', // Authentication loaded FIRST to provide dependencies
         'header', // Header system loaded after auth
         'core-ui', // Core UI systems loaded after header
-        'core-init', // Core initialization loaded separately to avoid bundle conflicts
         'services',
         'ui-advanced',
         'watch-lists'
@@ -3439,7 +3410,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'auth', // Authentication loaded FIRST to provide dependencies
         'header', // Header system loaded after auth
         'core-ui', // Core UI systems loaded after header
-        'core-init', // Core initialization loaded separately to avoid bundle conflicts
         'services',
         'validation',
         'modules', // Required for tickersModalConfig and ModalManagerV2
@@ -3477,7 +3447,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'auth', // Authentication loaded FIRST to provide dependencies
         'header', // Header system loaded after auth
         'core-ui', // Core UI systems loaded after header
-        'core-init', // Core initialization loaded separately to avoid bundle conflicts
         'services',
         'ui-advanced',
         'watch-lists'
@@ -3511,7 +3480,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'auth', // Authentication loaded FIRST to provide dependencies
         'header', // Header system loaded after auth
         'core-ui', // Core UI systems loaded after header
-        'core-init', // Core initialization loaded separately to avoid bundle conflicts
         'services',
         'ui-advanced',
         'modules',
@@ -3597,7 +3565,6 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
         'auth', // Authentication loaded FIRST to provide dependencies
         'header', // Header system loaded after auth
         'core-ui', // Core UI systems loaded after header
-        'core-init', // Core initialization loaded separately to avoid bundle conflicts
         'services',
         'ui-advanced',
         'modules',
@@ -4406,6 +4373,7 @@ if (!PAGE_CONFIGS['dev_tools']) {
       'window.IconSystem',
       'window.FieldRendererService',
       'window.updatePageSummaryStats',
+      'window.toggleSection', // UI utilities for section toggling
     ],
     description: 'עמוד כלי פיתוח ראשי - סקירה מלאה של כל העמודים והמערכות',
     lastModified: '2025-12-23',

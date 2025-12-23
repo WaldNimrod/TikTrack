@@ -566,7 +566,7 @@
 
   // Log successful load
   if (window.Logger) {
-    window.Logger.info('✅ Autocomplete Service loaded successfully', { 
+    window.Logger.debug('✅ Autocomplete Service loaded successfully', { 
       page: 'autocomplete-service', 
       version: '1.0.0' 
     });

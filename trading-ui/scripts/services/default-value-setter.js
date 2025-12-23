@@ -92,9 +92,30 @@ class DefaultValueSetter {
         
         try {
             // 1) קודם מתוך ההעדפות שבזיכרון (ללא קריאת API)
+            // Try multiple sources: PreferencesSystem, window.currentPreferences, getPreferenceFromMemory
+            let cachedValue = null;
+            
+            // Try PreferencesSystem first
             const cachedPrefs = window.PreferencesSystem?.manager?.currentPreferences;
-            const cachedValue = cachedPrefs ? cachedPrefs[preferenceName] : null;
-            if (cachedValue) {
+            if (cachedPrefs && cachedPrefs[preferenceName] !== undefined && cachedPrefs[preferenceName] !== null) {
+                cachedValue = cachedPrefs[preferenceName];
+            }
+            
+            // Try window.currentPreferences if not found
+            if (cachedValue === null && window.currentPreferences && typeof window.currentPreferences === 'object') {
+                cachedValue = window.currentPreferences[preferenceName] ?? null;
+            }
+            
+            // Try getPreferenceFromMemory if available (async)
+            if (cachedValue === null && typeof window.getPreferenceFromMemory === 'function') {
+                try {
+                    cachedValue = await window.getPreferenceFromMemory(preferenceName);
+                } catch (e) {
+                    // Silent fail - continue
+                }
+            }
+            
+            if (cachedValue !== null && cachedValue !== undefined) {
               // Use DataCollectionService to set value if available
               if (typeof window.DataCollectionService !== 'undefined' && window.DataCollectionService.setValue) {
                 window.DataCollectionService.setValue(element.id, cachedValue, 'text');

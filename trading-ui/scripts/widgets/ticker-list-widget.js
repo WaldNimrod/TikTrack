@@ -788,7 +788,7 @@
   window.TickerListWidget = TickerListWidget;
 
   if (window.Logger) {
-    window.Logger.info('✅ TickerListWidget loaded successfully', { page: 'ticker-list-widget' });
+    window.Logger.debug('✅ TickerListWidget loaded successfully', { page: 'ticker-list-widget' });
   }
 })();
 

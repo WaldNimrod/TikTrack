@@ -681,5 +681,5 @@ if (document.readyState === 'loading') {
 }
 
 if (window.Logger && window.Logger.info) {
-  window.Logger.info('✅ preferences-colors.js loaded successfully', { page: 'preferences-colors' });
+  window.Logger.debug('✅ preferences-colors.js loaded successfully', { page: 'preferences-colors' });
 }

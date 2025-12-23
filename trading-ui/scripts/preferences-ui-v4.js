@@ -33,18 +33,25 @@
 
       // Step 1: Initialize lazy loading FIRST (like other pages)
       // This ensures preferences are loaded to window.currentPreferences before UI initialization
+      // NOTE: This step is skipped if already initialized by core-systems.js (deduplication)
       const userId = window.PreferencesCore?.currentUserId ?? 1;
-      const profileId = window.PreferencesCore?.currentProfileId ?? null;
+      const profileId = window.PreferencesCore?.currentProfileId ?? 0; // Use 0 (default) instead of null
       
-      if (window.PreferencesCore && typeof window.PreferencesCore.initializeWithLazyLoading === 'function') {
-        window.Logger?.info?.('🚀 Initializing preferences with lazy loading (step 1)...', {
+      // Check if already initialized by core-systems.js
+      if (window.__preferencesLazyLoadingInitialized) {
+        window.Logger?.debug?.('⏭️ Preferences lazy loading already initialized by core-systems, skipping', {
+          page: 'preferences-ui-v4',
+        });
+      } else if (window.PreferencesCore && typeof window.PreferencesCore.initializeWithLazyLoading === 'function') {
+        window.Logger?.debug?.('🚀 Initializing preferences with lazy loading (step 1)...', {
           page: 'preferences-ui-v4',
           userId,
           profileId,
         });
         try {
           await window.PreferencesCore.initializeWithLazyLoading(userId, profileId);
-          window.Logger?.info?.('✅ Lazy loading initialized, preferences should be in window.currentPreferences', {
+          window.__preferencesLazyLoadingInitialized = true;
+          window.Logger?.debug?.('✅ Lazy loading initialized, preferences should be in window.currentPreferences', {
             page: 'preferences-ui-v4',
             preferencesCount: Object.keys(window.currentPreferences || {}).length,
           });
@@ -87,7 +94,7 @@
       const finalUserId = this.currentUserId ?? userId;
       const finalProfileId = this.currentProfileId ?? profileId;
       
-      window.Logger?.info?.('📦 Loading preference groups for UI...', {
+      window.Logger?.debug?.('📦 Loading preference groups for UI...', {
         page: 'preferences-ui-v4',
         groups: this.requiredGroups,
         userId: finalUserId,
@@ -101,7 +108,7 @@
       // CRITICAL: Use finalUserId and finalProfileId (from bootstrap) not initial userId/profileId
       if (window.PreferencesCore && typeof window.PreferencesCore.getAllPreferences === 'function') {
         try {
-          window.Logger?.info?.('📥 Loading all preferences to window.currentPreferences...', {
+          window.Logger?.debug?.('📥 Loading all preferences to window.currentPreferences...', {
             page: 'preferences-ui-v4',
             userId: finalUserId,
             profileId: finalProfileId,
@@ -160,7 +167,7 @@
           }));
           
           if (preferencesCount > 0) {
-            window.Logger?.info?.('✅ Dispatched preferences:critical-loaded event', {
+            window.Logger?.debug?.('✅ Dispatched preferences:critical-loaded event', {
               page: 'preferences-ui-v4',
               count: preferencesCount,
             });
@@ -173,7 +180,7 @@
             });
           }
           
-          window.Logger?.info?.('✅ Loaded all preferences to window.currentPreferences', {
+          window.Logger?.debug?.('✅ Loaded all preferences to window.currentPreferences', {
             page: 'preferences-ui-v4',
             count: preferencesCount,
             isEmpty: preferencesCount === 0,

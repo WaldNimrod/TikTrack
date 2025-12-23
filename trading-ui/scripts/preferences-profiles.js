@@ -311,5 +311,5 @@ window.deleteProfile = async function(profileId, userId = 1) {
 // INITIALIZATION
 // ============================================================================
 
-window.Logger.info('✅ preferences-profiles.js v1.0.0 loaded successfully', { page: 'preferences-profiles' });
+window.Logger.debug('✅ preferences-profiles.js v1.0.0 loaded successfully', { page: 'preferences-profiles' });
 

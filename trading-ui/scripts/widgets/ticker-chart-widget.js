@@ -623,7 +623,7 @@
   window.TickerChartWidget = TickerChartWidget;
 
   if (window.Logger) {
-    window.Logger.info('✅ TickerChartWidget loaded successfully', { page: 'ticker-chart-widget' });
+    window.Logger.debug('✅ TickerChartWidget loaded successfully', { page: 'ticker-chart-widget' });
   }
 })();
 

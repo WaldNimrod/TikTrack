@@ -169,7 +169,7 @@ class EntityDetailsRenderer {
             // הוספה לאובייקט הגלובלי
             window.entityDetailsRenderer = this;
             
-            window.Logger.info('✅ EntityDetailsRenderer initialized successfully with preferences support', { page: "entity-details-renderer" });
+            window.Logger.debug('✅ EntityDetailsRenderer initialized successfully with preferences support', { page: "entity-details-renderer" });
             
         } catch (error) {
             window.Logger.error('❌ Error initializing EntityDetailsRenderer:', error, { page: "entity-details-renderer" });
@@ -189,7 +189,7 @@ class EntityDetailsRenderer {
 
         // ניסיון לטעון צבעים מהעדפות ראשית
         try {
-            window.Logger.info('🎨 Loading entity colors from Color Scheme System...', { page: "entity-details-renderer" });
+            window.Logger.debug('🎨 Loading entity colors from Color Scheme System...', { page: "entity-details-renderer" });
             
             // Use centralized Color Scheme System API
             if (typeof window.getEntityColor === 'function') {
@@ -205,7 +205,7 @@ class EntityDetailsRenderer {
                 }
                 
                 if (Object.keys(this.entityColors).length > 0) {
-                    window.Logger.info('✅ Loaded entity colors from Color Scheme System', { page: "entity-details-renderer" });
+                    window.Logger.debug('✅ Loaded entity colors from Color Scheme System', { page: "entity-details-renderer" });
                     return;
                 }
             }

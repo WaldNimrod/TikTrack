@@ -1028,7 +1028,7 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
         window.cacheSystemReady = true;
         
         if (window.Logger?.info) {
-          window.Logger.info('✅ Cache system ready (4-layer architecture)', {}, { page: 'core-systems' });
+          window.Logger.debug('✅ Cache system ready (4-layer architecture)', {}, { page: 'core-systems' });
         }
 
         // Initialize preferences system (standardized loading for all pages)
@@ -1270,7 +1270,7 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
               if (profileContext) {
                 resolvedUserId = profileContext?.user_id ?? profileContext?.user?.id ?? 1;
                 resolvedProfileId = profileContext?.resolved_profile_id ?? profileContext?.resolved_profile?.id ?? 0;
-                window.Logger?.info?.('📄 Bootstrapped profile context for preferences page', {
+                window.Logger?.debug?.('📄 Bootstrapped profile context for preferences page', {
                   page: 'core-systems',
                   pageName,
                   userId: resolvedUserId,
@@ -1289,7 +1289,7 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
           // Second: Initialize lazy loading with correct userId/profileId
           if (window.PreferencesCore && typeof window.PreferencesCore.initializeWithLazyLoading === 'function') {
             const initStartTime = performance.now();
-            window.Logger?.info?.('📄 Initializing preferences with lazy loading for preferences page', {
+            window.Logger?.debug?.('📄 Initializing preferences with lazy loading for preferences page', {
               page: 'core-systems',
               pageName,
               userId: resolvedUserId,
@@ -1311,7 +1311,8 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
             try {
               await Promise.race([initPromise, timeoutPromise]);
               const initDuration = performance.now() - initStartTime;
-              window.Logger?.info?.('✅ Preferences lazy loading initialized for preferences page', {
+              window.__preferencesLazyLoadingInitialized = true; // Mark as initialized to prevent duplicate calls
+              window.Logger?.debug?.('✅ Preferences lazy loading initialized for preferences page', {
                 page: 'core-systems',
                 pageName,
                 duration: `${initDuration.toFixed(2)}ms`,
@@ -1334,7 +1335,7 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
           
           // Third: Initialize UI (this will populate forms and display preferences)
           if (window.PreferencesUIV4 && typeof window.PreferencesUIV4.initialize === 'function') {
-            window.Logger?.info?.('📄 Initializing Preferences UI V4 for preferences page', {
+            window.Logger?.debug?.('📄 Initializing Preferences UI V4 for preferences page', {
               page: 'core-systems',
               pageName,
             });
@@ -1343,7 +1344,7 @@ if (typeof window.UnifiedAppInitializer === 'undefined') {
             return;
           } else if (window.PreferencesUI && typeof window.PreferencesUI.initialize === 'function') {
             // Fallback to PreferencesUI if V4 not available
-            window.Logger?.info?.('📄 Initializing Preferences UI (legacy) for preferences page', {
+            window.Logger?.debug?.('📄 Initializing Preferences UI (legacy) for preferences page', {
               page: 'core-systems',
               pageName,
             });

@@ -222,7 +222,7 @@ class ActionsMenuSystem {
     init() {
         
         if (window.Logger) {
-            window.Logger.info('✅ Actions Menu System initialized', { page: "actions-menu-system", keepInfo: true });
+            window.Logger.debug('✅ Actions Menu System initialized', { page: "actions-menu-system", keepInfo: true });
         }
         
         // Set up hover event listeners to position popup dynamically
@@ -850,7 +850,7 @@ window.ActionsMenuSystem = ActionsMenuSystem;
 if (!window.actionsMenuSystem) {
     window.actionsMenuSystem = new ActionsMenuSystem();
     if (window.Logger) {
-        window.Logger.info('✅ ActionsMenuSystem initialized manually', { page: "actions-menu-system", keepInfo: true });
+        window.Logger.debug('✅ ActionsMenuSystem initialized manually', { page: "actions-menu-system", keepInfo: true });
     }
 }
 

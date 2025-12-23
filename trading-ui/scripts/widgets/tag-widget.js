@@ -1787,7 +1787,7 @@
   
   // Log successful load
   if (window.Logger) {
-    window.Logger.info('✅ Tag Widget loaded successfully', { page: 'tag-widget', version: '1.0.0' });
+    window.Logger.debug('✅ Tag Widget loaded successfully', { page: 'tag-widget', version: '1.0.0' });
   }
 })();
 

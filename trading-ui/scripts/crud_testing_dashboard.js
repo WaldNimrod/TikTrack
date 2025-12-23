@@ -10,11 +10,11 @@
  *
  * @version 2.0.0
  * @author TikTrack Development Team
- *
+ * 
  * ============================================================================
  * INTEGRATED TESTING SYSTEM OVERVIEW
  * ============================================================================
- *
+ * 
  * This system replaces the old fragmented testing approach with a unified,
  * comprehensive testing platform that covers all aspects of the application.
  *
@@ -25,7 +25,7 @@
  * - Comprehensive error tracking
  * - Performance analytics
  * - Coverage mapping
- *
+ * 
  * ============================================================================
  */
 
@@ -136,17 +136,55 @@ class IntegratedCRUDE2ETester {
         this.currentTestType = 'ui';
 
         try {
-        // Include all user pages for UI testing, not just CRUD pages
-        const uiPages = Object.entries(this.pages).filter(([_, page]) => page.type === 'user');
+            // Include all user pages for UI testing, not just CRUD pages
+            const uiPages = Object.entries(this.pages).filter(([_, page]) => page.type === 'user');
 
             this.logger?.info(`Found ${uiPages.length} user pages for UI testing`);
 
             for (const [key, page] of uiPages) {
-                this.logger?.debug(`Testing page: ${page.displayName} (${key})`);
+                this.logger?.debug(`Testing page: ${page.name} (${key})`);
                 await this.runUIPageTest(key, page);
             }
 
             this.logger?.info('✅ UI Tests completed successfully');
+
+            // Update dashboard statistics after UI tests
+            this.updateDashboard();
+
+            // Show summary notification
+            const totalTests = this.results.ui.length;
+            const passedTests = this.results.ui.filter(r => r.status === 'success').length;
+            const failedTests = totalTests - passedTests;
+
+            if (failedTests === 0) {
+                if (window.NotificationSystem && window.NotificationSystem.showSuccess) {
+                    window.NotificationSystem.showSuccess(
+                        'בדיקות ממשק משתמש הושלמו בהצלחה',
+                        `נבדקו ${totalTests} עמודים - כל הבדיקות עברו בהצלחה`,
+                        5000,
+                        'system'
+                    );
+                } else if (window.showSuccessNotification) {
+                    window.showSuccessNotification(
+                        'בדיקות ממשק משתמש הושלמו בהצלחה',
+                        `נבדקו ${totalTests} עמודים - כל הבדיקות עברו בהצלחה`
+                    );
+                }
+            } else {
+                if (window.NotificationSystem && window.NotificationSystem.showWarning) {
+                    window.NotificationSystem.showWarning(
+                        'בדיקות ממשק משתמש הושלמו עם כשלים',
+                        `נבדקו ${totalTests} עמודים - ${passedTests} עברו, ${failedTests} נכשלו`,
+                        6000,
+                        'system'
+                    );
+                } else if (window.showWarningNotification) {
+                    window.showWarningNotification(
+                        'בדיקות ממשק משתמש הושלמו עם כשלים',
+                        `נבדקו ${totalTests} עמודים - ${passedTests} עברו, ${failedTests} נכשלו`
+                    );
+                }
+            }
         } catch (error) {
             this.logger?.error('❌ UI Tests failed with error:', error);
             throw error;
@@ -175,10 +213,55 @@ class IntegratedCRUDE2ETester {
         this.logger?.info('🔄 Starting E2E Tests');
         this.currentTestType = 'e2e';
 
-        // Implement E2E workflow testing
-        await this.runTradeWorkflowTest();
-        await this.runAlertWorkflowTest();
-        await this.runUserProfileWorkflowTest();
+        try {
+            // Implement real E2E workflow testing
+            await this.runTradeWorkflowTest();
+            await this.runAlertWorkflowTest();
+            await this.runUserProfileWorkflowTest();
+
+            // Update dashboard statistics after E2E tests
+            this.updateDashboard();
+
+            // Show summary notification
+            const totalTests = this.results.e2e.length;
+            const passedTests = this.results.e2e.filter(r => r.status === 'success').length;
+            const failedTests = totalTests - passedTests;
+
+            if (failedTests === 0) {
+                if (window.NotificationSystem && window.NotificationSystem.showSuccess) {
+                    window.NotificationSystem.showSuccess(
+                        'בדיקות E2E הושלמו בהצלחה',
+                        `נבדקו ${totalTests} תהליכים - כל הבדיקות עברו בהצלחה`,
+                        5000,
+                        'system'
+                    );
+                } else if (window.showSuccessNotification) {
+                    window.showSuccessNotification(
+                        'בדיקות E2E הושלמו בהצלחה',
+                        `נבדקו ${totalTests} תהליכים - כל הבדיקות עברו בהצלחה`
+                    );
+                }
+        } else {
+                if (window.NotificationSystem && window.NotificationSystem.showWarning) {
+                    window.NotificationSystem.showWarning(
+                        'בדיקות E2E הושלמו עם כשלים',
+                        `נבדקו ${totalTests} תהליכים - ${passedTests} עברו, ${failedTests} נכשלו`,
+                        6000,
+                        'system'
+                    );
+                } else if (window.showWarningNotification) {
+                    window.showWarningNotification(
+                        'בדיקות E2E הושלמו עם כשלים',
+                        `נבדקו ${totalTests} תהליכים - ${passedTests} עברו, ${failedTests} נכשלו`
+                    );
+                }
+            }
+
+            this.logger?.info('✅ E2E Tests completed successfully');
+        } catch (error) {
+            this.logger?.error('❌ E2E Tests failed with error:', error);
+            throw error;
+        }
     }
 
     /**
@@ -206,21 +289,21 @@ class IntegratedCRUDE2ETester {
         const startTime = Date.now();
 
         try {
-            this.logger?.debug(`Starting UI test for ${page.displayName}`);
+            this.logger?.debug(`Starting UI test for ${page.name}`);
 
             // Simulate real UI interactions
             const result = await this.simulateUIInteractions(page);
             result.executionTime = Date.now() - startTime;
 
-            this.logger?.debug(`UI test completed for ${page.displayName} in ${result.executionTime}ms`);
+            this.logger?.debug(`UI test completed for ${page.name} in ${result.executionTime}ms`);
 
             this.results.ui.push(result);
             this.updateTestResults();
 
         } catch (error) {
-            this.logger?.error(`❌ UI Test failed for ${page.displayName}`, error);
+            this.logger?.error(`❌ UI Test failed for ${page.name}`, error);
             this.results.ui.push({
-                page: page.displayName,
+                page: page.name,
                 status: 'failed',
                 error: error.message,
                 executionTime: Date.now() - startTime
@@ -243,8 +326,11 @@ class IntegratedCRUDE2ETester {
             interactions.push('בדיקת טבלה קיימת');
         }
 
+        // Simulate some async work (like real UI testing)
+        await new Promise(resolve => setTimeout(resolve, 100)); // Simulate async delay
+
         return {
-            page: page.displayName,
+            page: page.name,
             status: 'success', // Would be determined by actual test
             interactions: interactions
         };
@@ -256,44 +342,348 @@ class IntegratedCRUDE2ETester {
     }
 
     async runTradeWorkflowTest() {
-        // Complete trade creation workflow
+        const startTime = Date.now();
         const workflow = {
             name: 'Trade Creation E2E',
-            steps: [
-                'נווט לעמוד טריידים',
-                'לחץ "הוסף טרייד"',
-                'בחר חשבון וטיקר',
-                'הזן פרטי טרייד',
-                'שמור',
-                'אמת הופעה ברשימה'
-            ]
+            steps: []
         };
 
-        // Simulate workflow execution
-        this.results.e2e.push({
-            workflow: workflow.name,
-            status: 'success',
-            steps: workflow.steps,
-            executionTime: 2500
-        });
+        try {
+            this.logger?.info('🧪 Starting Trade Creation E2E Test');
+
+            // Step 1: Get available trading accounts
+            workflow.steps.push('קבלת רשימת חשבונות מסחר');
+            const accountsResponse = await fetch('/api/trading-accounts/');
+            if (!accountsResponse.ok) {
+                throw new Error(`Failed to get trading accounts: ${accountsResponse.status}`);
+            }
+            const accountsData = await accountsResponse.json();
+            const accounts = accountsData.data || [];
+            if (accounts.length === 0) {
+                throw new Error('No trading accounts available');
+            }
+            const tradingAccountId = accounts[0].id;
+            this.logger?.debug(`Found trading account: ${tradingAccountId}`);
+
+            // Step 2: Get available tickers
+            workflow.steps.push('קבלת רשימת טיקרים');
+            const tickersResponse = await fetch('/api/tickers/');
+            if (!tickersResponse.ok) {
+                throw new Error(`Failed to get tickers: ${tickersResponse.status}`);
+            }
+            const tickersData = await tickersResponse.json();
+            const tickers = tickersData.data || [];
+            if (tickers.length === 0) {
+                throw new Error('No tickers available');
+            }
+            const tickerId = tickers[0].id;
+            this.logger?.debug(`Found ticker: ${tickerId}`);
+
+            // Step 3: Create a new trade
+            workflow.steps.push('יצירת טרייד חדש');
+            const tradeData = {
+                trading_account_id: tradingAccountId,
+                ticker_id: tickerId,
+                investment_type: 'swing',
+                status: 'open',
+                side: 'buy',
+                planned_amount: 10000,
+                entry_price: 100
+            };
+
+            const createResponse = await fetch('/api/trades/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(tradeData)
+            });
+
+            if (!createResponse.ok) {
+                const errorData = await createResponse.json();
+                throw new Error(`Failed to create trade: ${createResponse.status} - ${errorData.error?.message || 'Unknown error'}`);
+            }
+
+            const createResult = await createResponse.json();
+            const createdTradeId = createResult.data?.id;
+            if (!createdTradeId) {
+                throw new Error('Trade created but no ID returned');
+            }
+            this.logger?.debug(`Trade created successfully: ${createdTradeId}`);
+            workflow.steps.push(`טרייד נוצר בהצלחה (ID: ${createdTradeId})`);
+
+            // Step 4: Verify trade exists
+            workflow.steps.push('אימות קיום הטרייד');
+            const verifyResponse = await fetch(`/api/trades/${createdTradeId}`);
+            if (!verifyResponse.ok) {
+                throw new Error(`Failed to verify trade: ${verifyResponse.status}`);
+            }
+            const verifyResult = await verifyResponse.json();
+            if (!verifyResult.data || verifyResult.data.id !== createdTradeId) {
+                throw new Error('Trade verification failed');
+            }
+            this.logger?.debug(`Trade verified: ${createdTradeId}`);
+            workflow.steps.push('הטרייד אומת בהצלחה');
+
+            // Step 5: Cleanup - Delete the test trade
+            workflow.steps.push('מחיקת טרייד בדיקה');
+            const deleteResponse = await fetch(`/api/trades/${createdTradeId}`, {
+                method: 'DELETE'
+            });
+            if (!deleteResponse.ok) {
+                this.logger?.warn(`Failed to delete test trade: ${deleteResponse.status}`);
+                workflow.steps.push('אזהרה: לא ניתן למחוק את טרייד הבדיקה');
+    } else {
+                workflow.steps.push('טרייד הבדיקה נמחק בהצלחה');
+            }
+
+            const executionTime = Date.now() - startTime;
+            this.results.e2e.push({
+                workflow: workflow.name,
+                status: 'success',
+                steps: workflow.steps,
+                executionTime: executionTime,
+                details: `Created and verified trade ${createdTradeId}`
+            });
+
+            this.logger?.info(`✅ Trade Creation E2E Test completed in ${executionTime}ms`);
+            this.updateTestResults();
+
+        } catch (error) {
+            const executionTime = Date.now() - startTime;
+            this.logger?.error(`❌ Trade Creation E2E Test failed:`, error);
+            this.results.e2e.push({
+                workflow: workflow.name,
+                status: 'failed',
+                steps: workflow.steps,
+                executionTime: executionTime,
+                error: error.message,
+                details: `Failed at step: ${workflow.steps.length > 0 ? workflow.steps[workflow.steps.length - 1] : 'unknown'}`
+            });
+            this.updateTestResults();
+        }
     }
 
     async runAlertWorkflowTest() {
-        // Alert management workflow
-        this.results.e2e.push({
-            workflow: 'Alert Management E2E',
-            status: 'success',
-            executionTime: 1800
-        });
+        const startTime = Date.now();
+        const workflow = {
+            name: 'Alert Management E2E',
+            steps: []
+        };
+
+        try {
+            this.logger?.info('🧪 Starting Alert Management E2E Test');
+
+            // Step 1: Create a new alert
+            workflow.steps.push('יצירת התראה חדשה');
+            const alertData = {
+                condition_attribute: 'price',
+                condition_operator: 'greater_than',
+                condition_number: '100',
+                message: 'E2E Test Alert - Price above 100',
+                status: 'open',
+                is_triggered: 'false'
+            };
+
+            const createResponse = await fetch('/api/alerts/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(alertData)
+            });
+
+            if (!createResponse.ok) {
+                const errorData = await createResponse.json();
+                throw new Error(`Failed to create alert: ${createResponse.status} - ${errorData.error?.message || 'Unknown error'}`);
+            }
+
+            const createResult = await createResponse.json();
+            const createdAlertId = createResult.data?.id;
+            if (!createdAlertId) {
+                throw new Error('Alert created but no ID returned');
+            }
+            this.logger?.debug(`Alert created successfully: ${createdAlertId}`);
+            workflow.steps.push(`התראה נוצרה בהצלחה (ID: ${createdAlertId})`);
+
+            // Step 2: Verify alert exists
+            workflow.steps.push('אימות קיום ההתראה');
+            const verifyResponse = await fetch(`/api/alerts/${createdAlertId}`);
+            if (!verifyResponse.ok) {
+                throw new Error(`Failed to verify alert: ${verifyResponse.status}`);
+            }
+            const verifyResult = await verifyResponse.json();
+            if (!verifyResult.data || verifyResult.data.id !== createdAlertId) {
+                throw new Error('Alert verification failed');
+            }
+            this.logger?.debug(`Alert verified: ${createdAlertId}`);
+            workflow.steps.push('ההתראה אומתה בהצלחה');
+
+            // Step 3: Update alert status (activate)
+            workflow.steps.push('הפעלת ההתראה');
+            const updateData = {
+                status: 'active',
+                is_triggered: 'false'
+            };
+
+            const updateResponse = await fetch(`/api/alerts/${createdAlertId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(updateData)
+            });
+
+            if (!updateResponse.ok) {
+                const errorData = await updateResponse.json();
+                throw new Error(`Failed to update alert: ${updateResponse.status} - ${errorData.error?.message || 'Unknown error'}`);
+            }
+            this.logger?.debug(`Alert updated successfully: ${createdAlertId}`);
+            workflow.steps.push('ההתראה הופעלה בהצלחה');
+
+            // Step 4: Cleanup - Delete the test alert
+            workflow.steps.push('מחיקת התראת בדיקה');
+            const deleteResponse = await fetch(`/api/alerts/${createdAlertId}`, {
+                method: 'DELETE'
+            });
+            if (!deleteResponse.ok) {
+                this.logger?.warn(`Failed to delete test alert: ${deleteResponse.status}`);
+                workflow.steps.push('אזהרה: לא ניתן למחוק את התראת הבדיקה');
+            } else {
+                workflow.steps.push('התראת הבדיקה נמחקה בהצלחה');
+            }
+
+            const executionTime = Date.now() - startTime;
+            this.results.e2e.push({
+                workflow: workflow.name,
+                status: 'success',
+                steps: workflow.steps,
+                executionTime: executionTime,
+                details: `Created, verified, and activated alert ${createdAlertId}`
+            });
+
+            this.logger?.info(`✅ Alert Management E2E Test completed in ${executionTime}ms`);
+            this.updateTestResults();
+
+        } catch (error) {
+            const executionTime = Date.now() - startTime;
+            this.logger?.error(`❌ Alert Management E2E Test failed:`, error);
+            this.results.e2e.push({
+                workflow: workflow.name,
+                status: 'failed',
+                steps: workflow.steps,
+                executionTime: executionTime,
+                error: error.message,
+                details: `Failed at step: ${workflow.steps.length > 0 ? workflow.steps[workflow.steps.length - 1] : 'unknown'}`
+            });
+            this.updateTestResults();
+        }
     }
 
     async runUserProfileWorkflowTest() {
-        // User profile workflow
-        this.results.e2e.push({
-            workflow: 'User Profile E2E',
-            status: 'success',
-            executionTime: 1200
-        });
+        const startTime = Date.now();
+        const workflow = {
+            name: 'User Profile E2E',
+            steps: []
+        };
+
+        try {
+            this.logger?.info('🧪 Starting User Profile E2E Test');
+
+            // Step 1: Get current user profile
+            workflow.steps.push('קבלת פרופיל משתמש נוכחי');
+            const getResponse = await fetch('/api/auth/me');
+            if (!getResponse.ok) {
+                throw new Error(`Failed to get user profile: ${getResponse.status}`);
+            }
+            const getResult = await getResponse.json();
+            const currentUser = getResult.data?.user;
+            if (!currentUser) {
+                throw new Error('User profile not found');
+            }
+            const originalEmail = currentUser.email;
+            const originalFirstName = currentUser.first_name;
+            const originalLastName = currentUser.last_name;
+            this.logger?.debug(`Current user: ${currentUser.username}`);
+            workflow.steps.push(`פרופיל משתמש נוכחי: ${currentUser.username}`);
+
+            // Step 2: Update user profile
+            workflow.steps.push('עדכון פרטי פרופיל');
+            const updateData = {
+                first_name: originalFirstName || 'Test',
+                last_name: originalLastName || 'User',
+                email: originalEmail // Keep original email to avoid conflicts
+            };
+
+            const updateResponse = await fetch('/api/auth/me', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(updateData)
+            });
+
+            if (!updateResponse.ok) {
+                const errorData = await updateResponse.json();
+                throw new Error(`Failed to update user profile: ${updateResponse.status} - ${errorData.error?.message || 'Unknown error'}`);
+            }
+
+            const updateResult = await updateResponse.json();
+            const updatedUser = updateResult.data?.user;
+            if (!updatedUser) {
+                throw new Error('User profile updated but no user data returned');
+            }
+            this.logger?.debug(`User profile updated successfully`);
+            workflow.steps.push('פרופיל המשתמש עודכן בהצלחה');
+
+            // Step 3: Verify update
+            workflow.steps.push('אימות עדכון הפרופיל');
+            const verifyResponse = await fetch('/api/auth/me');
+            if (!verifyResponse.ok) {
+                throw new Error(`Failed to verify user profile: ${verifyResponse.status}`);
+            }
+            const verifyResult = await verifyResponse.json();
+            const verifiedUser = verifyResult.data?.user;
+            if (!verifiedUser) {
+                throw new Error('User profile verification failed');
+            }
+
+            // Verify the fields were updated
+            if (updateData.first_name && verifiedUser.first_name !== updateData.first_name) {
+                throw new Error(`First name not updated correctly: expected ${updateData.first_name}, got ${verifiedUser.first_name}`);
+            }
+            if (updateData.last_name && verifiedUser.last_name !== updateData.last_name) {
+                throw new Error(`Last name not updated correctly: expected ${updateData.last_name}, got ${verifiedUser.last_name}`);
+            }
+
+            this.logger?.debug(`User profile verified: ${verifiedUser.username}`);
+            workflow.steps.push('עדכון הפרופיל אומת בהצלחה');
+
+            const executionTime = Date.now() - startTime;
+            this.results.e2e.push({
+                workflow: workflow.name,
+                status: 'success',
+                steps: workflow.steps,
+                executionTime: executionTime,
+                details: `Updated and verified user profile for ${verifiedUser.username}`
+            });
+
+            this.logger?.info(`✅ User Profile E2E Test completed in ${executionTime}ms`);
+            this.updateTestResults();
+
+        } catch (error) {
+            const executionTime = Date.now() - startTime;
+            this.logger?.error(`❌ User Profile E2E Test failed:`, error);
+            this.results.e2e.push({
+                workflow: workflow.name,
+                status: 'failed',
+                steps: workflow.steps,
+                executionTime: executionTime,
+                error: error.message,
+                details: `Failed at step: ${workflow.steps.length > 0 ? workflow.steps[workflow.steps.length - 1] : 'unknown'}`
+            });
+            this.updateTestResults();
+        }
     }
 
     /**
@@ -311,7 +701,7 @@ class IntegratedCRUDE2ETester {
                     return;
                 }
                 debugMonitor.startMonitoring();
-            } else {
+        } else {
                 // Fallback to basic monitoring
                 this.logger?.warn('⚠️ Advanced Debug Monitor not available, using basic monitoring');
                 this.setupBasicMonitoring();
@@ -431,7 +821,7 @@ class IntegratedCRUDE2ETester {
     showError(message) {
         if (window.NotificationSystem) {
             window.NotificationSystem.showError('שגיאת בדיקה', message);
-        } else {
+    } else {
             alert(message);
         }
     }

@@ -288,12 +288,12 @@ const PACKAGE_MANIFEST = {
         external: true
       },
       {
-        file: 'https://cdn.jsdelivr.net/npm/@floating-ui/dom@1.6.0/dist/floating-ui.dom.min.js',
-        globalCheck: 'window.computePosition',
+        file: 'scripts/vendor/floating-ui.dom.min.js',
+        globalCheck: 'window.FloatingUIDOM',
         description: 'Floating UI DOM - Smart positioning library (for overlay/tooltip positioning)',
         required: false, // Optional - UnifiedUIPositioningService has fallback
         loadOrder: 16.5,
-        external: true
+        external: false
       },
       {
         file: 'https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js',

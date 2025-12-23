@@ -96,8 +96,11 @@ class SelectPopulatorService {
             if (deps.preferencesCore && deps.unifiedCacheManager) {
                 try {
                     // Build cache key like PreferencesCore does
-                    const userId = window.PreferencesCore.currentUserId || 1;
-                    const profileId = window.PreferencesCore.currentProfileId !== null ? window.PreferencesCore.currentProfileId : 0;
+                    const userId = window.PreferencesCore?.currentUserId || 1;
+                    // Use 0 (default profile) if currentProfileId is null/undefined
+                    const profileId = (window.PreferencesCore?.currentProfileId !== null && window.PreferencesCore?.currentProfileId !== undefined) 
+                        ? window.PreferencesCore.currentProfileId 
+                        : 0;
                     
                     console.log(`🔍 Looking for preference ${preferenceName} with userId=${userId}, profileId=${profileId}`);
                     

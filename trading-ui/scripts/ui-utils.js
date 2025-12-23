@@ -1144,10 +1144,10 @@ async function autoRefreshCurrentPage(operationName = 'פעולה') {
 window.toggleSection = function (sectionId) {
   // Use console.log instead of Logger to break circular dependency
   // Logger should not depend on toggleSection, and toggleSection should not depend on Logger
-  const DEBUG_MODE = window.location.hostname === 'localhost' || 
+  const DEBUG_MODE = window.location.hostname === 'localhost' ||
                      window.location.hostname === '127.0.0.1' ||
                      window.location.search.includes('debug=true');
-  
+
   if (DEBUG_MODE) {
     console.debug(`🚀 ===== toggleSection CALLED =====`);
     console.debug(`📋 Section ID: "${sectionId}"`);

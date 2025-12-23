@@ -2302,11 +2302,7 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
             }
           };
 
-          window.runUITests = function () {
-            if (window.crudTester) {
-              window.crudTester.runUITests();
-            }
-          };
+          // UI Tests handled by crud_testing_dashboard.js
 
           window.Logger.info('✅ CRUD Testing Dashboard initialized successfully', {
             page: 'page-initialization-configs',

@@ -1,7 +1,7 @@
 # רשימת עמודים - TikTrack
 
 **תאריך עדכון:** דצמבר 2025 - תיקון paths בעמודי mockups
-**גרסה:** 4.1.7
+**גרסה:** 4.1.8
 **סטטוס:** ✅ מעודכן - תיקון תיעוד וכפילויות במניפסט  
 
 ---
@@ -204,16 +204,22 @@
 | test-overlay-debug.html | debug overlay | 🔵 ציבורי |
 | test-phase3-1-comprehensive.html | בדיקות מקיפות | 🔵 ציבורי |
 | test-quill.html | עורך טקסט | 🔵 ציבורי |
-| test-recent-items-widget.html | ווידג'ט פריטים אחרונים | 🔵 ציבורי |
-| test-ticker-widgets-performance.html | ביצועי ווידג'טים | 🔵 ציבורי |
+| test-recent-items-widget.html | ווידג'ט פריטים אחרונים | 🔴 מוגן |
+| test-ticker-widgets-performance.html | ביצועי ווידג'טים | 🔴 מוגן |
 | test-unified-widget-comprehensive.html | ווידג'ט מאוחד | 🔵 ציבורי |
 | test-unified-widget-integration.html | אינטגרציה | 🔵 ציבורי |
 | test-unified-widget.html | ווידג'ט בסיסי | 🔵 ציבורי |
-| test-user-ticker-integration.html | אינטגרציית משתמש | 🔵 ציבורי |
+| test-user-ticker-integration.html | אינטגרציית משתמש | 🔴 מוגן |
 | test-frontend-wrappers.html | wrappers | 🔵 ציבורי |
 | test-bootstrap-popover-comparison.html | השוואת popover | 🔵 ציבורי |
 
 **הערה:** עמוד `test-nested-modal-rich-text.html` הוסר מהרשימה - הוא לא כולל authentication.
+
+**עדכון:** עמודי בדיקה שעושים fetch קריאות ל-APIs מוגנים הוגנו עם authentication:
+- test-user-ticker-integration.html
+- test-ticker-widgets-performance.html
+- test-recent-items-widget.html
+- test-user-ticker-frontend.html (ב-scripts/)
 
 ---
 

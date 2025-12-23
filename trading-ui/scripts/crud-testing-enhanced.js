@@ -349,7 +349,7 @@ class CRUDEnhancedTester {
         type: 'user_page',
         displayName: 'ניתוח AI',
         apiUrl: '/api/ai-analysis/templates',
-        pageUrl: '/ai-analysis',
+        pageUrl: '/ai_analysis',
         hasCRUD: false, // AI analysis has special workflow
         testData: null,
         expectedButtons: ['צור ניתוח', 'ערוך', 'מחק'],
@@ -362,7 +362,7 @@ class CRUDEnhancedTester {
         type: 'user_page',
         displayName: 'רשימות צפייה',
         apiUrl: '/api/watch-lists/',
-        pageUrl: '/watch-list',
+        pageUrl: '/watch_lists',
         hasCRUD: true,
         testData: {
           name: 'CRUD Test Watch List - Safe to delete',
@@ -378,7 +378,7 @@ class CRUDEnhancedTester {
         type: 'user_page',
         displayName: 'פרופיל משתמש',
         apiUrl: null, // Uses /api/auth/me
-        pageUrl: '/user-profile',
+        pageUrl: '/user_profile',
         hasCRUD: false, // Profile update, not standard CRUD
         testData: null,
         expectedButtons: ['עדכן פרופיל', 'שנה סיסמה'],
@@ -391,7 +391,7 @@ class CRUDEnhancedTester {
         type: 'user_page',
         displayName: 'דשבורד טיקר',
         apiUrl: null, // Uses /api/tickers/{id}/*
-        pageUrl: '/ticker-dashboard',
+        pageUrl: '/ticker_dashboard',
         hasCRUD: false, // Dashboard view
         testData: null,
         expectedButtons: [],
@@ -404,7 +404,7 @@ class CRUDEnhancedTester {
         type: 'user_page',
         displayName: 'יומן מסחר',
         apiUrl: '/api/trading-journal/statistics?start_date=2025-01-01T00:00:00Z&end_date=2025-12-31T23:59:59Z',
-        pageUrl: '/trading-journal',
+        pageUrl: '/trading_journal',
         hasCRUD: false, // Historical view
         testData: null,
         expectedButtons: [],
@@ -523,7 +523,7 @@ class CRUDEnhancedTester {
         type: 'dev_tool',
         displayName: 'נתונים חיצוניים',
         apiUrl: null,
-        pageUrl: '/external-data-dashboard',
+        pageUrl: '/external_data_dashboard',
         hasCRUD: false,
         testData: null,
         expectedButtons: [],
@@ -562,7 +562,7 @@ class CRUDEnhancedTester {
         type: 'dev_tool',
         displayName: 'ניהול גרפים',
         apiUrl: null,
-        pageUrl: '/chart-management',
+        pageUrl: '/chart_management',
         hasCRUD: false,
         testData: null,
         expectedButtons: [],
@@ -588,7 +588,7 @@ class CRUDEnhancedTester {
         type: 'dev_tool',
         displayName: 'דשבורד בדיקות CRUD',
         apiUrl: null,
-        pageUrl: '/crud-testing-dashboard',
+        pageUrl: '/crud_testing_dashboard',
         hasCRUD: false,
         testData: null,
         expectedButtons: [],

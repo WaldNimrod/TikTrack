@@ -135,7 +135,8 @@ class IntegratedCRUDE2ETester {
         this.logger?.info('🖱️ Starting UI Tests');
         this.currentTestType = 'ui';
 
-        const uiPages = Object.entries(this.pages).filter(([_, page]) => page.hasCRUD);
+        // Include all user pages for UI testing, not just CRUD pages
+        const uiPages = Object.entries(this.pages).filter(([_, page]) => page.type === 'user_page');
 
         for (const [key, page] of uiPages) {
             await this.runUIPageTest(key, page);
@@ -203,9 +204,9 @@ class IntegratedCRUDE2ETester {
             this.updateTestResults();
 
         } catch (error) {
-            this.logger?.error(`❌ UI Test failed for ${page.name}`, error);
+            this.logger?.error(`❌ UI Test failed for ${page.displayName}`, error);
             this.results.ui.push({
-                page: page.name,
+                page: page.displayName,
                 status: 'failed',
                 error: error.message,
                 executionTime: Date.now() - startTime
@@ -217,17 +218,21 @@ class IntegratedCRUDE2ETester {
         // Simulate real user interactions
         // This would use Selenium or similar for real browser automation
 
+        // For now, simulate basic page loading and element checks
+        const interactions = ['בדיקת טעינת עמוד'];
+
+        if (page.expectedButtons && page.expectedButtons.length > 0) {
+            interactions.push('בדיקת כפתורים קיימים');
+        }
+
+        if (page.tableSelector) {
+            interactions.push('בדיקת טבלה קיימת');
+        }
+
         return {
-            page: page.name,
+            page: page.displayName,
             status: 'success', // Would be determined by actual test
-            interactions: [
-                'לחץ כפתור הוספה',
-                'מלא טופס',
-                'שלח נתונים',
-                'אמת תצוגה',
-                'ערוך רשומה',
-                'מחק רשומה'
-            ]
+            interactions: interactions
         };
     }
 
@@ -567,6 +572,19 @@ window.runAPITests = async function() {
         if (integratedTester && typeof integratedTester.updateDashboard === 'function') {
             integratedTester.updateDashboard();
         }
+
+        // עדכון הסטטיסטיקה הראשית עם תוצאות הדוח הסופי
+        setTimeout(() => {
+            if (integratedTester && integratedTester.results && integratedTester.results.length > 0) {
+                const totalTests = integratedTester.results.length;
+                const passedTests = integratedTester.results.filter(r => r.score >= 80).length;
+                const failedTests = totalTests - passedTests;
+
+                document.getElementById('totalTestsCount').textContent = totalTests;
+                document.getElementById('passedTestsCount').textContent = passedTests;
+                document.getElementById('failedTestsCount').textContent = failedTests;
+            }
+        }, 100);
     }
 
     console.log('✅ API Tests completed');

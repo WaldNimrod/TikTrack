@@ -999,7 +999,17 @@
     <!-- Dependencies: base -->
     <!-- Critical: NO | Version: 1.5.0 -->
 
-    <!-- [24] Load Order: 24 | Strategy: async -->
+    <!-- [23.5] Load Order: 23.5 | Strategy: defer -->
+    <script src="scripts/ui-utils.js?v=1.0.0" defer></script> <!-- UI utilities (includes updatePageSummaryStats) -->
+    <!-- [24] Load Order: 24 | Strategy: defer -->
+    <script src="scripts/services/data-collection-service.js?v=1.0.0" defer></script> <!-- Data collection service -->
+    <!-- [25] Load Order: 25 | Strategy: defer -->
+    <script src="scripts/services/date-range-picker-service.js?v=1.0.0" defer></script> <!-- Date range picker service -->
+    <!-- [26] Load Order: 26 | Strategy: defer -->
+    <script src="scripts/services/field-renderer-service.js?v=1.0.0" defer></script> <!-- Field rendering service -->
+    <!-- [27] Load Order: 27 | Strategy: defer -->
+    <script src="scripts/services/select-populator-service.js?v=1.0.0" defer></script> <!-- Select box population service -->
+    <!-- [28] Load Order: 28 | Strategy: async -->
     <script src="scripts/init-system/dev-tools/page-template-generator.js?v=1.0.0" async></script> <!-- Page template generator -->
     <!-- [29] Load Order: 29 | Strategy: async -->
     <script src="scripts/init-system/dev-tools/script-analyzer.js?v=1.0.0" async></script> <!-- Script analyzer -->
@@ -1015,23 +1025,23 @@
     <!-- Dependencies: base -->
     <!-- Critical: NO | Version: 1.5.0 -->
 
-    <!-- [28] Load Order: 28 | Strategy: defer -->
-    <script src="scripts/init-system/package-manifest.js?v=1.0.0" defer></script> <!-- Package manifest -->
-    <!-- [29] Load Order: 29 | Strategy: defer -->
-    <script src="scripts/page-initialization-configs.js?v=1.0.0" defer></script> <!-- Page initialization configurations -->
-    <!-- [30] Load Order: 30 | Strategy: defer -->
-    <script src="scripts/init-system-check.js?v=1.0.0" defer></script> <!-- Initialization system check -->
-    <!-- [31] Load Order: 31 | Strategy: defer -->
-    <script src="scripts/monitoring-functions.js?v=1.0.0" defer></script> <!-- Page monitoring functions -->
     <!-- [32] Load Order: 32 | Strategy: defer -->
-    <script src="scripts/modules/core-systems.js?v=1.0.0" defer></script> <!-- Unified initialization system - single entry point (required for all pages) -->
+    <script src="scripts/init-system/package-manifest.js?v=1.0.0" defer></script> <!-- Package manifest -->
     <!-- [33] Load Order: 33 | Strategy: defer -->
-    <script src="scripts/init-system/all-pages-monitoring-test.js?v=1.0.0" defer></script> <!-- Automatic check of all pages -->
+    <script src="scripts/page-initialization-configs.js?v=1.0.0" defer></script> <!-- Page initialization configurations -->
     <!-- [34] Load Order: 34 | Strategy: defer -->
-    <script src="scripts/init-system/pages-standardization-plan.js?v=1.0.0" defer></script> <!-- Standardization plan for all pages -->
+    <script src="scripts/init-system-check.js?v=1.0.0" defer></script> <!-- Initialization system check -->
     <!-- [35] Load Order: 35 | Strategy: defer -->
-    <script src="scripts/init-system/dependency-analyzer.js?v=1.0.0" defer></script> <!-- Dependencies analysis in package manifest -->
+    <script src="scripts/monitoring-functions.js?v=1.0.0" defer></script> <!-- Page monitoring functions -->
     <!-- [36] Load Order: 36 | Strategy: defer -->
+    <script src="scripts/modules/core-systems.js?v=1.0.0" defer></script> <!-- Unified initialization system - single entry point (required for all pages) -->
+    <!-- [37] Load Order: 37 | Strategy: defer -->
+    <script src="scripts/init-system/all-pages-monitoring-test.js?v=1.0.0" defer></script> <!-- Automatic check of all pages -->
+    <!-- [38] Load Order: 38 | Strategy: defer -->
+    <script src="scripts/init-system/pages-standardization-plan.js?v=1.0.0" defer></script> <!-- Standardization plan for all pages -->
+    <!-- [39] Load Order: 39 | Strategy: defer -->
+    <script src="scripts/init-system/dependency-analyzer.js?v=1.0.0" defer></script> <!-- Dependencies analysis in package manifest -->
+    <!-- [40] Load Order: 40 | Strategy: defer -->
     <script src="scripts/init-system/load-order-validator.js?v=1.0.0" defer></script> <!-- Actual loading order check in pages -->
 
     <!-- =============================================================== -->

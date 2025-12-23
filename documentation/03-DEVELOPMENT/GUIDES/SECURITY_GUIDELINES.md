@@ -158,6 +158,7 @@ const PUBLIC_PAGES = [
 ```
 
 **איך זה עובד:**
+
 1. `auth-guard.js` בודק אם העמוד הנוכחי הוא public page לפני בדיקת authentication
 2. אם העמוד הוא public page, `initAuthGuard()` מחזיר מיד ללא בדיקת authentication
 3. זה מונע redirect loop כשמנסים לגשת לעמודים ציבוריים

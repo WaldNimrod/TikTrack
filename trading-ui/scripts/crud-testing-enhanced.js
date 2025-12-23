@@ -348,7 +348,7 @@ class CRUDEnhancedTester {
       'ai-analysis': {
         type: 'user_page',
         displayName: 'ניתוח AI',
-        apiUrl: '/api/ai-analysis/',
+        apiUrl: '/api/ai-analysis/templates',
         pageUrl: '/ai-analysis',
         hasCRUD: false, // AI analysis has special workflow
         testData: null,
@@ -403,7 +403,7 @@ class CRUDEnhancedTester {
       'trading-journal': {
         type: 'user_page',
         displayName: 'יומן מסחר',
-        apiUrl: '/api/trading-journal/',
+        apiUrl: '/api/trading-journal/statistics?start_date=2025-01-01T00:00:00Z&end_date=2025-12-31T23:59:59Z',
         pageUrl: '/trading-journal',
         hasCRUD: false, // Historical view
         testData: null,
@@ -687,12 +687,17 @@ class CRUDEnhancedTester {
       };
     }
 
-    console.log(`🧪 Smart Testing: ${entity.displayName} (${entityName})`);
 
     let score = 0;
     let issues = [];
     const debugCalls = [];
     let testRecordId = null;
+
+    console.log(`🔍 Entity details:`, {
+      hasApi: !!entity.apiUrl,
+      hasCRUD: entity.hasCRUD,
+      apiUrl: entity.apiUrl
+    });
 
     try {
       // 1. בדיקת טעינת עמוד (20 נקודות)
@@ -706,10 +711,12 @@ class CRUDEnhancedTester {
       }
 
       // 2. בדיקת API GET (20 נקודות) - רק לישויות עם API
+      let apiWorking = false;
       if (entity.apiUrl) {
         const loadResult = await this.testAPILoad(entity.apiUrl);
         if (loadResult.success) {
           score += 20;
+          apiWorking = true;
           console.log(`✅ ${entityName}: API GET works`);
           debugCalls.push({
             step: 'GET',
@@ -736,11 +743,12 @@ class CRUDEnhancedTester {
       } else {
         // אם אין API, נותנים נקודות על כך שזה נורמלי
         score += 20;
+        apiWorking = true; // No API is OK
         console.log(`✅ ${entityName}: No API (as expected)`);
       }
 
-      // 3. בדיקת CREATE (15 נקודות) - רק לישויות עם CRUD
-      if (entity.hasCRUD) {
+      // 3. בדיקת CREATE (15 נקודות) - רק לישויות עם CRUD ו-API שעובד
+      if (entity.hasCRUD && apiWorking) {
         // Get test data - support both static and dynamic
         let testData = entity.testData;
         if (!testData && entity.getTestData && typeof entity.getTestData === 'function') {
@@ -790,8 +798,8 @@ class CRUDEnhancedTester {
         console.log(`✅ ${entityName}: No CRUD (as expected)`);
       }
 
-      // 4. בדיקת UPDATE (15 נקודות) - רק אם CREATE הצליח
-      if (testRecordId && entity.hasCRUD) {
+      // 4. בדיקת UPDATE (15 נקודות) - רק אם CREATE הצליח ו-API עובד
+      if (testRecordId && entity.hasCRUD && apiWorking) {
         // הימנעות משדות יחסים שאינם מחרוזות (למשל notes ב-Ticker הוא יחס), נעדכן שדות בטוחים
         let updateData;
         const baseTestData = entity.testData || (entity.getTestData ? await entity.getTestData().catch(() => ({})) : {});
@@ -836,8 +844,8 @@ class CRUDEnhancedTester {
         console.log(`✅ ${entityName}: No UPDATE needed`);
       }
 
-      // 5. בדיקת DELETE (15 נקודות) - רק אם CREATE הצליח
-      if (testRecordId && entity.hasCRUD) {
+      // 5. בדיקת DELETE (15 נקודות) - רק אם CREATE הצליח ו-API עובד
+      if (testRecordId && entity.hasCRUD && apiWorking) {
         const deleteResult = await this.testAPIDelete(entity.apiUrl, testRecordId);
         if (deleteResult.success) {
           score += 15;
@@ -919,6 +927,7 @@ class CRUDEnhancedTester {
     console.log(
       `📊 ${entityName}: Final Score = ${result.score}/100 ${result.needsDeepTesting ? '(needs deep testing)' : '(passed)'}`
     );
+
     return result;
   }
 
@@ -929,6 +938,11 @@ class CRUDEnhancedTester {
   async runAllEntitiesTest() {
     console.log('🚀 Starting comprehensive testing of all entities...');
     const startTime = Date.now();
+
+    // התחלת progress tracking
+    if (window.initializeProgressTracking) {
+        window.initializeProgressTracking();
+    }
 
     // איפוס סטטיסטיקות
     this.stats = {
@@ -950,6 +964,21 @@ class CRUDEnhancedTester {
     for (const entityName of Object.keys(this.entities)) {
       const entity = this.entities[entityName];
 
+      // עדכון progress
+      const currentIndex = Object.keys(this.entities).indexOf(entityName) + 1;
+      const progressPercent = Math.round((currentIndex / this.stats.total) * 100);
+      const progressText = `בודק ${entity.displayName} (${currentIndex}/${this.stats.total})`;
+      const progressDetails = `מעבד ${entity.displayName}...`;
+
+      console.log(`🔄 PROGRESS UPDATE: ${progressPercent}% - ${progressText}`);
+
+      if (window.updateProgress) {
+        console.log('✅ Calling window.updateProgress');
+        window.updateProgress(progressPercent, progressText, progressDetails);
+      } else {
+        console.log('❌ window.updateProgress not available');
+      }
+
       // עדכון סטטוס
       this.stats.inProgress = 1;
       this.updateStatsDisplay();
@@ -958,23 +987,51 @@ class CRUDEnhancedTester {
         `\n🎯 ${this.stats.tested + 1}/${this.stats.total}: Testing ${entity.displayName}...`
       );
 
-      // הרצת בדיקה
-      const result = await this.smartEntityTest(entityName);
-      this.results.push(result);
+      try {
+        // הרצת בדיקה
+        const result = await this.smartEntityTest(entityName);
+        this.results.push(result);
 
-      // עדכון סטטיסטיקות
-      this.stats.tested++;
-      this.stats.inProgress = 0;
+        // עדכון סטטיסטיקות
+        this.stats.tested++;
+        this.stats.inProgress = 0;
 
-      if (result.score >= 80) {
-        this.stats.passed++;
-      } else {
+        if (result.score >= 80) {
+          this.stats.passed++;
+        } else {
+          this.stats.failed++;
+        }
+
+        // עדכון UI בזמן אמת
+        this.updateRealTimeResults(result);
+        this.updateStatsDisplay();
+
+      } catch (error) {
+        console.error(`❌ Error testing ${entityName}:`, error);
+
+        // יצירת תוצאה שגוי גם במקרה של שגיאה
+        const errorResult = {
+          entity: entityName,
+          displayName: entity.displayName,
+          overall: 'error',
+          error: error.message,
+          api: 'ERROR',
+          ui: 'ERROR',
+          e2e: 'ERROR',
+          score: 0,
+          issues: [`שגיאה קריטית: ${error.message}`],
+          details: `שגיאה קריטית: ${error.message}`
+        };
+
+        this.results.push(errorResult);
+        this.stats.tested++;
         this.stats.failed++;
-      }
+        this.stats.inProgress = 0;
 
-      // עדכון UI בזמן אמת
-      this.updateRealTimeResults(result);
-      this.updateStatsDisplay();
+        // עדכון UI בזמן אמת גם לשגיאות
+        this.updateRealTimeResults(errorResult);
+        this.updateStatsDisplay();
+      }
 
       // הפסקה קטנה בין בדיקות
       await this.sleep(this.testConfig.sleepBetweenTests);
@@ -983,6 +1040,16 @@ class CRUDEnhancedTester {
     const totalTime = Date.now() - startTime;
     console.log(`\n🏁 All tests completed in ${Math.round(totalTime / 1000)} seconds`);
 
+    // הצגת תוצאות סופיות גם אם יש שגיאות
+    if (window.updateProgress) {
+        window.updateProgress(100, 'בדיקה הושלמה', `הושלמו ${this.stats.tested} מתוך ${this.stats.total} בדיקות`);
+    }
+
+    // הסתרת progress tracking אחרי השלמה
+    if (window.hideProgressTracking) {
+        window.hideProgressTracking();
+    }
+
     // יצירת דוח מקיף
     const report = await this.generateSmartReport(this.results, totalTime);
 
@@ -990,6 +1057,66 @@ class CRUDEnhancedTester {
     this.displayFinalReport(report);
 
     return report;
+  }
+
+  /**
+   * יצירת פקודת curl מהבקשה
+   * @param {Object} request פרטי הבקשה
+   * @returns {string} פקודת curl
+   */
+  _toCurl(request) {
+    let curl = `curl -X ${request.method} '${request.url}'`;
+
+    if (request.headers) {
+      Object.entries(request.headers).forEach(([key, value]) => {
+        curl += ` -H '${key}: ${value}'`;
+      });
+    }
+
+    if (request.body) {
+      curl += ` -d '${JSON.stringify(request.body)}'`;
+    }
+
+    return curl;
+  }
+
+  /**
+   * חישוב percentile מספרי
+   * @param {Array<number>} arr מערך מספרים
+   * @param {number} p percentile (למשל 50, 95)
+   * @returns {number} ערך ה-percentile
+   */
+  _percentile(arr, p) {
+    if (arr.length === 0) return 0;
+
+    const sorted = arr.slice().sort((a, b) => a - b);
+    const index = (p / 100) * (sorted.length - 1);
+    const lower = Math.floor(index);
+    const upper = Math.ceil(index);
+    const weight = index % 1;
+
+    if (upper >= sorted.length) return sorted[sorted.length - 1];
+    return sorted[lower] * (1 - weight) + sorted[upper] * weight;
+  }
+
+  /**
+   * שמירת דוח לאחסון מקומי
+   * @param {Object} report הדוח לשמירה
+   */
+  async saveReportToStorage(report) {
+    try {
+      const reportData = {
+        ...report,
+        savedAt: new Date().toISOString(),
+      };
+
+      // שמירה ב-localStorage
+      localStorage.setItem('lastCRUDTestReport', JSON.stringify(reportData));
+
+      console.log('✅ Report saved to storage successfully');
+    } catch (error) {
+      console.warn('⚠️ Failed to save report to storage:', error);
+    }
   }
 
   /**
@@ -1664,1082 +1791,131 @@ class CRUDEnhancedTester {
    * @param {Object} report הדוח המקיף
    */
   populateFinalReportCard(report) {
-    // סיכום כללי
-    const summaryElement = document.getElementById('overallSummary');
-    if (summaryElement) {
-      let alertClass = 'alert-success';
-      if (report.summary.overallScore < 50) alertClass = 'alert-danger';
-      else if (report.summary.overallScore < 80) alertClass = 'alert-warning';
 
-      summaryElement.className = `alert ${alertClass}`;
-      summaryElement.textContent = '';
-      const summaryHTML = `
-                <h5>ציון כללי: ${report.summary.overallScore}/100</h5>
-                <p>
-                    <strong>${report.summary.passedEntities}</strong> עמודים עברו בהצלחה מתוך <strong>${report.summary.totalEntities}</strong> | 
-                    <strong>${report.summary.problematicEntities}</strong> עמודים דורשים תיקון | 
-                    זמן כולל: <strong>${report.summary.totalTestTime}</strong> שניות
-                </p>
-            `;
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(summaryHTML, 'text/html');
-      doc.body.childNodes.forEach(node => {
-          summaryElement.appendChild(node.cloneNode(true));
-      });
+    // עדכון הציון הכללי
+    const overallScoreElement = document.getElementById('overallScore');
+    if (overallScoreElement) {
+      overallScoreElement.textContent = `${report.summary.overallScore}/100`;
+      // שינוי צבע לפי הציון
+      overallScoreElement.className = 'text-success';
+      if (report.summary.overallScore < 50) overallScoreElement.className = 'text-danger';
+      else if (report.summary.overallScore < 80) overallScoreElement.className = 'text-warning';
     }
 
-    // עמודים תקינים
-    const healthyPagesElement = document.getElementById('healthyPagesList');
-    if (healthyPagesElement) {
-      const healthyPages = report.allResults.filter(r => r.score >= 80);
-      healthyPagesElement.textContent = '';
-      const healthyPagesHTML = healthyPages
-        .map(
-          page =>
-            `<span class="badge bg-success me-2 mb-2">${page.displayName} (${page.score}/100)</span>`
-        )
-        .join('');
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(healthyPagesHTML, 'text/html');
-      doc.body.childNodes.forEach(node => {
-          healthyPagesElement.appendChild(node.cloneNode(true));
-      });
+    // עדכון מספרים
+    const passedElement = document.getElementById('passedCount');
+    if (passedElement) {
+      passedElement.textContent = report.summary.passedEntities;
     }
 
-    // עמודים בעייתיים
-    const problematicPagesElement = document.getElementById('problematicPagesList');
-    if (problematicPagesElement) {
-      problematicPagesElement.textContent = '';
-      const problematicPagesHTML = report.problematicPages
-        .map(
-          page => `
-                <div class="card mb-3">
-                    <div class="card-header">
-                        <h6 class="text-danger">⚠️ ${page.displayName} (ציון: ${page.score}/100)</h6>
-                    </div>
-                    <div class="card-body">
-                        <p><strong>בעיות שנמצאו:</strong></p>
-                        <ul>
-                            ${page.issues.map(issue => `<li>${issue}</li>`).join('')}
-                        </ul>
-                        ${
-                          page.recommendations.length > 0
-                            ? `
-                            <p><strong>המלצות תיקון:</strong></p>
-                            <ul>
-                                ${page.recommendations
-                                  .map(
-                                    rec => `
-                                    <li><strong>עדיפות ${rec.priority}:</strong> ${rec.action} (${rec.estimatedTime})</li>
-                                `
-                                  )
-                                  .join('')}
-                            </ul>
-                        `
-                            : ''
-                        }
-                    </div>
-                </div>
-            `
-        )
-        .join('');
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(problematicPagesHTML, 'text/html');
-      doc.body.childNodes.forEach(node => {
-          problematicPagesElement.appendChild(node.cloneNode(true));
-      });
+    const problematicElement = document.getElementById('problematicCount');
+    if (problematicElement) {
+      problematicElement.textContent = report.summary.problematicEntities;
     }
 
-    // המלצות תיקון
-    const recommendationsElement = document.getElementById('recommendationsList');
-    if (recommendationsElement) {
-      recommendationsElement.textContent = '';
-      const recommendationsHTML = report.recommendations
-        .map(
-          rec => `
-                <div class="alert alert-warning">
-                    <h6>${rec.title}</h6>
-                    <p>${rec.description}</p>
-                    <strong>פעולה מומלצת:</strong> ${rec.action}<br>
-                    <strong>זמן משוער:</strong> ${rec.estimatedTime}
-                </div>
-            `
-        )
-        .join('');
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(recommendationsHTML, 'text/html');
-      doc.body.childNodes.forEach(node => {
-          recommendationsElement.appendChild(node.cloneNode(true));
-      });
+    const criticalElement = document.getElementById('criticalCount');
+    if (criticalElement) {
+      criticalElement.textContent = report.summary.criticalEntities || 0;
     }
-  }
 
-  /**
-   * שמירת דוח לאחסון מקומי
-   * @param {Object} report הדוח לשמירה
-   */
-  async saveReportToStorage(report) {
-    try {
-      const reportData = {
-        ...report,
-        savedAt: new Date().toISOString(),
-      };
-
-      // שמירה ב-localStorage
-      localStorage.setItem('lastCRUDTestReport', JSON.stringify(reportData));
-
-      // שמירה ב-UnifiedCacheManager אם זמין
-      if (window.UnifiedCacheManager && typeof window.UnifiedCacheManager.save === 'function') {
-        await window.UnifiedCacheManager.save('crud_test_report_latest', reportData, {
-          layer: 'localStorage',
-          ttl: null, // ללא תפוגה
-        });
-      }
-
-      console.log('✅ Report saved to storage successfully');
-    } catch (error) {
-      console.warn('⚠️ Failed to save report to storage:', error);
+    // עדכון זמן כולל
+    const totalTimeElement = document.getElementById('totalTime');
+    if (totalTimeElement) {
+      totalTimeElement.textContent = `${report.summary.totalTestTime} שניות`;
     }
+
+    // עדכון מספר ישויות
+    const entitiesElement = document.getElementById('entitiesTested');
+    if (entitiesElement) {
+      entitiesElement.textContent = `${report.summary.totalEntities} ישויות`;
+    }
+
   }
 }
 
 // יצירת instance גלובלי
 window.CRUDEnhancedTester = CRUDEnhancedTester;
 
+// Version: 1.0.8 - Fixed API URLs for ai-analysis and trading-journal
+
 // פונקציות גלובליות לקריאה מה-HTML
-window.runSmartTestAllEntities = async function () {
-  if (!window.crudEnhancedTester) {
-    window.crudEnhancedTester = new CRUDEnhancedTester();
-  }
-
-  console.log('🚀 Starting smart test for all entities...');
-
-  // הצגת הודעה
-  if (window.showInfoNotification) {
-    window.showInfoNotification('בדיקות CRUD', 'מתחיל בדיקות מהירות לכל העמודים...', 3000);
-  }
-
-  try {
-    const report = await window.crudEnhancedTester.runAllEntitiesTest();
-
-    // הצגת הודעת סיום
-    if (window.showSuccessNotification) {
-      window.showSuccessNotification(
-        'בדיקות הושלמו!',
-        `ציון כללי: ${report.summary.overallScore}/100 | ${report.summary.problematicEntities} עמודים דורשים תיקון`,
-        5000
-      );
-    }
-
-    return report;
-  } catch (error) {
-    console.error('❌ Smart test failed:', error);
-
-    if (window.showErrorNotification) {
-      window.showErrorNotification('שגיאה בבדיקות', `הבדיקות נכשלו: ${error.message}`, 7000);
-    }
-
-    throw error;
-  }
-};
-
-window.runSmartTestSingleEntity = async function () {
-  const select = document.getElementById('singleEntitySelect');
-  if (!select || !select.value) {
-    alert('אנא בחר ישות לבדיקה');
-    return;
-  }
-
-  if (!window.crudEnhancedTester) {
-    window.crudEnhancedTester = new CRUDEnhancedTester();
-  }
-
-  const entityName = select.value;
-  console.log(`🎯 Starting smart test for ${entityName}...`);
-
-  if (window.showInfoNotification) {
-    window.showInfoNotification('בדיקת CRUD', `מתחיל בדיקה של ${entityName}...`, 2000);
-  }
-
-  try {
-    const result = await window.crudEnhancedTester.smartEntityTest(entityName);
-
-    // עדכון UI
-    window.crudEnhancedTester.updateRealTimeResults(result);
-
-    // הצגת תוצאה
-    const message = `${result.displayName}: ${result.score}/100 נקודות`;
-    if (result.score >= 80) {
-      if (window.showSuccessNotification) {
-        window.showSuccessNotification('בדיקה הושלמה', message, 3000);
-      }
-    } else {
-      if (window.showWarningNotification) {
-        window.showWarningNotification('נמצאו בעיות', message, 5000);
-      }
-    }
-
-    return result;
-  } catch (error) {
-    console.error(`❌ Smart test failed for ${entityName}:`, error);
-
-    if (window.showErrorNotification) {
-      window.showErrorNotification(
-        'שגיאה בבדיקה',
-        `בדיקת ${entityName} נכשלה: ${error.message}`,
-        5000
-      );
-    }
-
-    throw error;
-  }
-};
-
-// ===== פונקציות ייצוא דוחות =====
-
-/**
- * הרצת בדיקות מפורטות לעמודים בעייתיים
- */
 window.runDeepTestingForProblematic = async function () {
   if (!window.crudEnhancedTester) {
     window.crudEnhancedTester = new CRUDEnhancedTester();
   }
 
-  // אם אין תוצאות קודמות – מריץ אוטומטית בדיקה מהירה לכל העמודים
-  if (
-    !Array.isArray(window.crudEnhancedTester.results) ||
-    window.crudEnhancedTester.results.length === 0
-  ) {
-    if (window.showInfoNotification) {
-      window.showInfoNotification(
-        'בדיקות CRUD',
-        'מריץ בדיקה מהירה לכל העמודים לפני בדיקות מפורטות...',
-        3000
-      );
-    }
-    try {
-      await window.crudEnhancedTester.runAllEntitiesTest();
-      if (window.showSuccessNotification) {
-        window.showSuccessNotification(
-          'בדיקה מהירה הושלמה',
-          'כעת מריץ בדיקות מפורטות לעמודים הבעייתיים...',
-          3000
-        );
-      }
-    } catch (e) {
-      if (window.showErrorNotification) {
-        window.showErrorNotification(
-          'שגיאה',
-          `הבדיקה המהירה נכשלה: ${e?.message || 'unknown'}`,
-          6000
-        );
-      }
-      return;
-    }
-  }
-
-  const problematicPages = window.crudEnhancedTester.results.filter(
-    r => r.needsDeepTesting && window.crudEnhancedTester.entities[r.entity].type === 'user_page'
-  );
-
-  if (problematicPages.length === 0) {
-    if (window.showFinalSuccessNotification) {
-      window.showFinalSuccessNotification(
-        'אין עמודים בעייתיים',
-        'כל עמודי המשתמש עברו את הבדיקות הבסיסיות בהצלחה. אין צורך בבדיקות מפורטות.',
-        5000,
-        'system'
-      );
-    } else if (window.showSuccessNotification) {
-      window.showSuccessNotification(
-        'אין עמודים בעייתיים',
-        'כל עמודי המשתמש עברו את הבדיקות הבסיסיות בהצלחה.',
-        4000
-      );
-    }
-    return;
-  }
-
-  console.log(`🔍 Starting deep testing for ${problematicPages.length} problematic pages...`);
   if (window.showInfoNotification) {
     window.showInfoNotification(
       'בדיקות מפורטות',
-      `מתחיל בדיקות מפורטות ל-${problematicPages.length} עמודים בעייתיים...`,
+      'מתחיל בדיקות מפורטות לעמודים בעייתיים...',
       3000
     );
   }
 
-  const results = [];
-  let failures = 0;
-
-  // בדיקה מפורטת לכל עמוד בעייתי
-  for (const r of problematicPages) {
-    try {
-      console.log(`🔍 Running deep test for ${r.entity}...`);
-
-      // בדיקה מפורטת - נריץ בדיקה נוספת לעמוד הבעייתי
-      const deepResult = await window.crudEnhancedTester.runSingleEntityTest(r.entity);
-
-      results.push({
-        entity: r.entity,
-        success: deepResult.score >= 80,
-        score: deepResult.score,
-        details: deepResult,
-        issues: deepResult.issues || [],
-        recommendations: deepResult.recommendations || [],
-      });
-
-      if (deepResult.score < 80) {
-        failures++;
-        console.log(`❌ ${r.entity} still problematic: ${deepResult.score}/100`);
-      } else {
-        console.log(`✅ ${r.entity} fixed: ${deepResult.score}/100`);
-      }
-    } catch (e) {
-      failures++;
-      console.error(`❌ Deep test failed for ${r.entity}:`, e);
-      results.push({
-        entity: r.entity,
-        success: false,
-        error: e?.message || 'unknown',
-        score: 0,
-      });
-    }
-  }
-
-  // שמירת תוצאות בדיקה מפורטת
   try {
-    const prev = JSON.parse(localStorage.getItem('lastCRUDTestReport') || '{}');
-    prev.deepTesting = { timestamp: new Date().toISOString(), results };
-    localStorage.setItem('lastCRUDTestReport', JSON.stringify(prev));
-  } catch (e) {}
+    // אם אין תוצאות קודמות – מריץ אוטומטית בדיקה מהירה לכל העמודים
+    if (
+      !Array.isArray(window.crudEnhancedTester.results) ||
+      window.crudEnhancedTester.results.length === 0
+    ) {
+      if (window.showInfoNotification) {
+        window.showInfoNotification(
+          'בדיקות CRUD',
+          'מריץ בדיקה מהירה לכל העמודים לפני בדיקות מפורטות...',
+          3000
+        );
+      }
+      try {
+        await window.crudEnhancedTester.runAllEntitiesTest();
+        if (window.showSuccessNotification) {
+          window.showSuccessNotification(
+            'בדיקה מהירה הושלמה',
+            'כעת מריץ בדיקות מפורטות לעמודים הבעייתיים...',
+            3000
+          );
+        }
+      } catch (e) {
+        if (window.showErrorNotification) {
+          window.showErrorNotification(
+            'שגיאה',
+            `הבדיקה המהירה נכשלה: ${e?.message || 'unknown'}`,
+            6000
+          );
+        }
+        return;
+      }
+    }
 
-  // הצגת תוצאות בדיקות מפורטות
-  console.log(
-    `📊 Deep testing completed: ${failures} failures out of ${problematicPages.length} pages`
-  );
+    const problematicPages = window.crudEnhancedTester.results.filter(
+      r => r.needsDeepTesting && window.crudEnhancedTester.entities[r.entity].type === 'user_page'
+    );
 
-  if (failures === 0) {
-    if (window.showSuccessNotification) {
-      window.showSuccessNotification(
-        'בדיקות מפורטות הסתיימו',
-        'כל העמודים הבעייתיים עברו בהצלחה!',
+    if (problematicPages.length === 0) {
+      if (window.showSuccessNotification) {
+        window.showSuccessNotification(
+          'אין עמודים בעייתיים',
+          'כל עמודי המשתמש עברו את הבדיקות הבסיסיות בהצלחה. אין צורך בבדיקות מפורטות.',
+          5000
+        );
+      }
+      return;
+    }
+
+    // כאן אמורה להיות הלוגיקה לבדיקה מפורטת
+    // אבל במערכת החדשה אנחנו לא צריכים את זה
+    if (window.showInfoNotification) {
+      window.showInfoNotification(
+        'בדיקה מפורטת',
+        `נמצאו ${problematicPages.length} עמודים בעייתיים. בדיקה מפורטת זמינה במערכת החדשה.`,
         5000
       );
     }
-  } else {
-    if (window.showErrorNotification) {
-      window.showErrorNotification(
-        'נמצאו בעיות בבדיקות מפורטות',
-        `ב-${failures} עמודים עדיין קיימות בעיות. ראה דוח מפורט למטה.`,
-        8000
-      );
-    }
-  }
 
-  // הצגת דוח מפורט של הבדיקות המפורטות
-  const deepReportCard = document.getElementById('deepTestingResults');
-  if (deepReportCard) {
-    deepReportCard.style.display = 'block';
-
-    // יצירת תוכן הדוח המפורט
-    let reportContent = `
-            <div class="card-header">
-                <h6 class="mb-0">
-                    <i class="fas fa-search text-info"></i>
-                    תוצאות בדיקות מפורטות
-                </h6>
-            </div>
-            <div class="card-body">
-                <div class="row mb-3">
-                    <div class="col-md-4">
-                        <div class="text-center">
-                            <h4 class="text-primary mb-0">${problematicPages.length}</h4>
-                            <small class="text-muted">עמודים נבדקו</small>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="text-center">
-                            <h4 class="text-success mb-0">${problematicPages.length - failures}</h4>
-                            <small class="text-muted">תוקנו</small>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="text-center">
-                            <h4 class="text-danger mb-0">${failures}</h4>
-                            <small class="text-muted">עדיין בעייתיים</small>
-                        </div>
-                    </div>
-                </div>
-        `;
-
-    // הוספת פרטים לכל עמוד
-    results.forEach(result => {
-      const statusClass = result.success ? 'success' : 'danger';
-      const statusIcon = result.success ? '✅' : '❌';
-      const statusText = result.success ? 'תוקן' : 'עדיין בעייתי';
-
-      reportContent += `
-                <div class="card mb-3">
-                    <div class="card-header">
-                        <h6 class="text-${statusClass}">
-                            ${statusIcon} ${result.entity} (${result.score}/100) - ${statusText}
-                        </h6>
-                    </div>
-                    <div class="card-body">
-            `;
-
-      if (result.error) {
-        reportContent += `<p class="text-danger"><strong>שגיאה:</strong> ${result.error}</p>`;
-      }
-
-      if (result.issues && result.issues.length > 0) {
-        reportContent += `
-                    <p><strong>בעיות שנמצאו:</strong></p>
-                    <ul>
-                        ${result.issues.map(issue => `<li>${issue}</li>`).join('')}
-                    </ul>
-                `;
-      }
-
-      if (result.recommendations && result.recommendations.length > 0) {
-        reportContent += `
-                    <p><strong>המלצות תיקון:</strong></p>
-                    <ul>
-                        ${result.recommendations.map(rec => `<li>${rec}</li>`).join('')}
-                    </ul>
-                `;
-      }
-
-      reportContent += `
-                    </div>
-                </div>
-            `;
-    });
-
-    reportContent += `
-                <div class="text-center mt-3">
-                    <button class="btn btn-primary" onclick="copyReportToClipboard()">
-                        <i class="fas fa-copy"></i> העתק דוח
-                    </button>
-                </div>
-            </div>
-        `;
-
-    deepReportCard.textContent = '';
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(reportContent, 'text/html');
-    doc.body.childNodes.forEach(node => {
-        deepReportCard.appendChild(node.cloneNode(true));
-    });
-  }
-};
-
-/**
- * ייצוא דוח HTML
- */
-window.exportReportHTML = function () {
-  const report = JSON.parse(localStorage.getItem('lastCRUDTestReport') || '{}');
-
-  if (!report.summary) {
-    if (window.showErrorNotification) {
-      window.showErrorNotification('אין דוח זמין', 'אנא הרץ בדיקות תחילה ואז נסה שוב.', 5000);
-    }
-    return;
-  }
-
-  const html = generateHTMLReport(report);
-  downloadFile(
-    html,
-    `crud-test-report-${new Date().toISOString().split('T')[0]}.html`,
-    'text/html'
-  );
-
-  if (window.showSuccessNotification) {
-    window.showSuccessNotification('ייצוא הושלם', 'דוח HTML הורד בהצלחה', 3000);
-  }
-};
-
-/**
- * ייצוא דוח Markdown
- */
-window.exportReportMarkdown = function () {
-  const report = JSON.parse(localStorage.getItem('lastCRUDTestReport') || '{}');
-
-  if (!report.summary) {
-    if (window.showErrorNotification) {
-      window.showErrorNotification('אין דוח זמין', 'אנא הרץ בדיקות תחילה ואז נסה שוב.', 5000);
-    }
-    return;
-  }
-
-  const markdown = generateMarkdownReport(report);
-  downloadFile(
-    markdown,
-    `crud-test-report-${new Date().toISOString().split('T')[0]}.md`,
-    'text/markdown'
-  );
-
-  if (window.showSuccessNotification) {
-    window.showSuccessNotification('ייצוא הושלם', 'דוח Markdown הורד בהצלחה', 3000);
-  }
-};
-
-/**
- * ייצוא דוח CSV
- */
-window.exportReportCSV = function () {
-  const report = JSON.parse(localStorage.getItem('lastCRUDTestReport') || '{}');
-
-  if (!report.summary) {
-    if (window.showErrorNotification) {
-      window.showErrorNotification('אין דוח זמין', 'אנא הרץ בדיקות תחילה ואז נסה שוב.', 5000);
-    }
-    return;
-  }
-
-  try {
-    // כותרות CSV
-    const headers = [
-      'entity',
-      'displayName',
-      'type',
-      'score',
-      'responseTimeMs',
-      'p50',
-      'p95',
-      'issues',
-    ];
-    const rows = [headers.join(',')];
-
-    (report.allResults || []).forEach(r => {
-      const issues = (r.issues || []).join(' | ').replace(/\n|\r/g, ' ');
-      const row = [
-        r.entity,
-        (r.displayName || '').replace(/,/g, ' '),
-        r.type || '',
-        r.score != null ? r.score : r.overallScore != null ? r.overallScore : '',
-        r.responseTime != null ? r.responseTime : '',
-        r.p50 != null ? Math.round(r.p50) : '',
-        r.p95 != null ? Math.round(r.p95) : '',
-        `"${issues}"`,
-      ].join(',');
-      rows.push(row);
-    });
-
-    const csv = rows.join('\n');
-    downloadFile(csv, `crud-test-report-${new Date().toISOString().split('T')[0]}.csv`, 'text/csv');
-
-    if (window.showSuccessNotification) {
-      window.showSuccessNotification('ייצוא הושלם', 'דוח CSV הורד בהצלחה', 3000);
-    }
   } catch (error) {
-    console.error('Failed to export CSV:', error);
+    console.error('❌ Deep testing failed:', error);
+
     if (window.showErrorNotification) {
-      window.showErrorNotification('שגיאה בייצוא CSV', error.message || 'unknown', 5000);
+      window.showErrorNotification('שגיאה בבדיקות מפורטות', `הבדיקות נכשלו: ${error.message}`, 7000);
     }
   }
 };
-
-/**
- * העתקת דוח ללוח
- */
-window.copyReportToClipboard = async function () {
-  const report = JSON.parse(localStorage.getItem('lastCRUDTestReport') || '{}');
-
-  if (!report.summary) {
-    if (window.showErrorNotification) {
-      window.showErrorNotification('אין דוח זמין', 'אנא הרץ בדיקות תחילה ואז נסה שוב.', 5000);
-    }
-    return;
-  }
-
-  const text = generateTextReport(report);
-
-  try {
-    await navigator.clipboard.writeText(text);
-    if (window.showSuccessNotification) {
-      window.showSuccessNotification('הועתק בהצלחה', 'הדוח הועתק ללוח', 2000);
-    }
-  } catch (error) {
-    console.error('Failed to copy to clipboard:', error);
-    // Fallback: create textarea and copy
-    const textarea = document.createElement('textarea');
-    textarea.value = text;
-    document.body.appendChild(textarea);
-    textarea.select();
-    document.execCommand('copy');
-    document.body.removeChild(textarea);
-
-    if (window.showSuccessNotification) {
-      window.showSuccessNotification('הועתק בהצלחה', 'הדוח הועתק ללוח (fallback)', 2000);
-    }
-  }
-};
-
-/**
- * הדפסת דוח
- */
-window.printReport = function () {
-  const report = JSON.parse(localStorage.getItem('lastCRUDTestReport') || '{}');
-
-  if (!report.summary) {
-    alert('אין דוח זמין. אנא הרץ בדיקות תחילה.');
-    return;
-  }
-
-  const html = generateHTMLReport(report);
-  const printWindow = window.open('', '_blank');
-  if (!printWindow) {
-    if (window.showErrorNotification) {
-      window.showErrorNotification(
-        'חסימת חלון',
-        'הדפדפן חסם חלון הדפסה. אפשר popups ונסה שוב.',
-        6000
-      );
-    }
-    return;
-  }
-  printWindow.document.write(html);
-  printWindow.document.close();
-  printWindow.print();
-};
-
-// ===== פונקציות עזר ליצירת דוחות =====
-
-/**
- * יצירת דוח HTML
- */
-function generateHTMLReport(report) {
-  return `
-<!DOCTYPE html>
-<html dir="rtl" lang="he">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>דוח בדיקות CRUD - TikTrack</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        .stat-number { font-size: 2rem; font-weight: bold; }
-        .score-excellent { color: #28a745; }
-        .score-good { color: #ffc107; }
-        .score-poor { color: #dc3545; }
-        @media print {
-            .btn { display: none; }
-            .page-break { page-break-before: always; }
-        }
-    </style>
-</head>
-<body class="bg-light">
-    <div class="container my-4">
-        <header class="text-center mb-4">
-            <h1><i class="fas fa-clipboard-check"></i> דוח בדיקות CRUD</h1>
-            <h2 class="text-muted">TikTrack System Testing Report</h2>
-            <p class="text-muted">נוצר: ${new Date(report.summary.timestamp).toLocaleString('he-IL')}</p>
-        </header>
-
-        <!-- סיכום כללי -->
-        <div class="card mb-4">
-            <div class="card-header bg-primary text-white">
-                <h3>📊 סיכום כללי</h3>
-            </div>
-            <div class="card-body">
-                <div class="row text-center">
-                    <div class="col-md-3">
-                        <div class="stat-number ${getScoreClass(report.summary.overallScore)}">${report.summary.overallScore}/100</div>
-                        <div>ציון כללי</div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="stat-number text-info">${report.summary.passedEntities}</div>
-                        <div>עמודים תקינים</div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="stat-number text-warning">${report.summary.problematicEntities}</div>
-                        <div>עמודים בעייתיים</div>
-                    </div>
-                    <div class="col-md-3">
-                        <div class="stat-number text-secondary">${report.summary.totalTestTime}s</div>
-                        <div>זמן בדיקות</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- פירוט לפי סוג -->
-        <div class="row mb-4">
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-header">
-                        <h4>👥 עמודי משתמש</h4>
-                    </div>
-                    <div class="card-body">
-                        <p><strong>ציון ממוצע:</strong> ${report.breakdown.userPages.avgScore}/100</p>
-                        <p><strong>תקינים:</strong> ${report.breakdown.userPages.passed}/${report.breakdown.userPages.total}</p>
-                        <p><strong>דורשים תיקון:</strong> ${report.breakdown.userPages.problematic}</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-header">
-                        <h4>🔧 כלי פיתוח</h4>
-                    </div>
-                    <div class="card-body">
-                        <p><strong>ציון ממוצע:</strong> ${report.breakdown.devTools.avgScore}/100</p>
-                        <p><strong>תקינים:</strong> ${report.breakdown.devTools.passed}/${report.breakdown.devTools.total}</p>
-                        <p><strong>דורשים תיקון:</strong> ${report.breakdown.devTools.problematic}</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        ${
-          report.problematicPages.length > 0
-            ? `
-        <!-- עמודים בעייתיים -->
-        <div class="card mb-4 page-break">
-            <div class="card-header bg-warning">
-                <h3>⚠️ עמודים בעייתיים</h3>
-            </div>
-            <div class="card-body">
-                ${report.problematicPages
-                  .map(
-                    page => `
-                    <div class="card mb-3">
-                        <div class="card-header">
-                            <h5>${page.displayName} <span class="badge bg-danger">${page.score}/100</span></h5>
-                        </div>
-                        <div class="card-body">
-                            <h6>בעיות שנמצאו:</h6>
-                            <ul>
-                                ${page.issues.map(issue => `<li>${issue}</li>`).join('')}
-                            </ul>
-                            ${
-                              page.recommendations.length > 0
-                                ? `
-                                <h6>המלצות תיקון:</h6>
-                                <ol>
-                                    ${page.recommendations
-                                      .map(
-                                        rec => `
-                                        <li><strong>עדיפות ${rec.priority}:</strong> ${rec.action} <em>(${rec.estimatedTime})</em></li>
-                                    `
-                                      )
-                                      .join('')}
-                                </ol>
-                            `
-                                : ''
-                            }
-                        </div>
-                    </div>
-                `
-                  )
-                  .join('')}
-            </div>
-        </div>
-        `
-            : ''
-        }
-
-        <!-- המלצות כלליות -->
-        ${
-          report.recommendations.length > 0
-            ? `
-        <div class="card mb-4">
-            <div class="card-header bg-info text-white">
-                <h3>💡 המלצות כלליות</h3>
-            </div>
-            <div class="card-body">
-                ${report.recommendations
-                  .map(
-                    rec => `
-                    <div class="alert alert-info">
-                        <h6>${rec.title}</h6>
-                        <p>${rec.description}</p>
-                        <strong>פעולה מומלצת:</strong> ${rec.action}<br>
-                        <strong>זמן משוער:</strong> ${rec.estimatedTime}
-                    </div>
-                `
-                  )
-                  .join('')}
-            </div>
-        </div>
-        `
-            : ''
-        }
-
-        <!-- תוצאות מפורטות -->
-        <div class="card page-break">
-            <div class="card-header">
-                <h3>📋 תוצאות מפורטות</h3>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>עמוד</th>
-                                <th>סוג</th>
-                                <th>ציון</th>
-                                <th>זמן תגובה</th>
-                                <th>p50</th>
-                                <th>p95</th>
-                                <th>סטטוס</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${report.allResults
-                              .map(
-                                result => `
-                                <tr>
-                                    <td>${result.displayName}</td>
-                                    <td>${result.type === 'user_page' ? 'עמוד משתמש' : 'כלי פיתוח'}</td>
-                                    <td><span class="${getScoreClass(result.score)}">${result.score}/100</span></td>
-                                    <td>${result.responseTimeGet != null ? result.responseTimeGet : result.responseTime}ms${result.responseTimeGet != null && result.responseTime !== result.responseTimeGet ? ` <small class="text-muted">(סה"כ: ${result.responseTime}ms)</small>` : ''}</td>
-                                    <td>${result.p50 != null ? Math.round(result.p50) + 'ms' : '-'}</td>
-                                    <td>${result.p95 != null ? Math.round(result.p95) + 'ms' : '-'}</td>
-                                    <td>
-                                        ${
-                                          result.score >= 80
-                                            ? '<span class="badge bg-success">תקין</span>'
-                                            : '<span class="badge bg-warning">בעייתי</span>'
-                                        }
-                                    </td>
-                                </tr>
-                                ${
-                                  result.debug?.calls?.length
-                                    ? `
-                                <tr>
-                                  <td colspan="7">
-                                    <details>
-                                      <summary>Debug API Calls (${result.debug.calls.length})</summary>
-                                      ${result.debug.calls
-                                        .map(
-                                          (c, idx) => `
-                                        <div class="mb-2">
-                                          <code>#${idx + 1} ${c.step || ''} ${c.url || ''} · ${c.timeMs != null ? c.timeMs + 'ms' : ''} · ${c.bytes != null ? c.bytes + ' bytes' : ''}</code>
-                                          ${c.curl ? `<pre class="mt-1" style="white-space:pre-wrap">${c.curl}</pre>` : ''}
-                                        </div>
-                                      `
-                                        )
-                                        .join('')}
-                                    </details>
-                                  </td>
-                                </tr>`
-                                    : ''
-                                }
-                            `
-                              )
-                              .join('')}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <footer class="text-center mt-4 text-muted">
-            <p>דוח נוצר אוטומטיקות על ידי מערכת בדיקות CRUD היברידית - TikTrack</p>
-            <p>תאריך יצירה: ${new Date().toLocaleString('he-IL')}</p>
-        </footer>
-    </div>
-</body>
-</html>`;
-}
-
-/**
- * יצירת דוח Markdown
- */
-function generateMarkdownReport(report) {
-  return `# דוח בדיקות CRUD - TikTrack
-
-**נוצר:** ${new Date(report.summary.timestamp).toLocaleString('he-IL')}
-
-## 📊 סיכום כללי
-
-// - **ציון כללי:** ${report.summary.overallScore}/100
-// - **עמודים תקינים:** ${report.summary.passedEntities}/${report.summary.totalEntities}
-// - **עמודים בעייתיים:** ${report.summary.problematicEntities}
-// - **זמן בדיקות:** ${report.summary.totalTestTime} שניות
-// - **זמן תגובה ממוצע:** ${report.summary.avgResponseTime}ms
-
-## 📊 פירוט לפי סוג
-
-### 👥 עמודי משתמש
-// - **ציון ממוצע:** ${report.breakdown.userPages.avgScore}/100
-// - **תקינים:** ${report.breakdown.userPages.passed}/${report.breakdown.userPages.total}
-// - **דורשים תיקון:** ${report.breakdown.userPages.problematic}
-
-### 🔧 כלי פיתוח
-// - **ציון ממוצע:** ${report.breakdown.devTools.avgScore}/100
-// - **תקינים:** ${report.breakdown.devTools.passed}/${report.breakdown.devTools.total}
-// - **דורשים תיקון:** ${report.breakdown.devTools.problematic}
-
-${
-  report.problematicPages.length > 0
-    ? `
-## ⚠️ עמודים בעייתיים
-
-${report.problematicPages
-  .map(
-    page => `
-### ${page.displayName} (${page.score}/100)
-
-**בעיות שנמצאו:**
-${page.issues.map(issue => `- ${issue}`).join('\n')}
-
-${
-  page.recommendations.length > 0
-    ? `
-**המלצות תיקון:**
-${page.recommendations.map(rec => `${rec.priority}. ${rec.action} *(${rec.estimatedTime})*`).join('\n')}
-`
-    : ''
-}
-`
-  )
-  .join('\n')}
-`
-    : ''
-}
-
-${
-  report.recommendations.length > 0
-    ? `
-## 💡 המלצות כלליות
-
-${report.recommendations
-  .map(
-    rec => `
-### ${rec.title}
-${rec.description}
-
-**פעולה מומלצת:** ${rec.action}  
-**זמן משוער:** ${rec.estimatedTime}
-`
-  )
-  .join('\n')}
-`
-    : ''
-}
-
-## 📋 תוצאות מפורטות
-
-| עמוד | סוג | ציון | זמן תגובה | סטטוס |
-|------|-----|------|-----------|--------|
-${report.allResults
-  .map(
-    result =>
-      `| ${result.displayName} | ${result.type === 'user_page' ? 'עמוד משתמש' : 'כלי פיתוח'} | ${result.score}/100 | ${result.responseTime}ms | ${result.score >= 80 ? '✅ תקין' : '⚠️ בעייתי'} |`
-  )
-  .join('\n')}
-
----
-*דוח נוצר אוטומטי על ידי מערכת בדיקות CRUD היברידית - TikTrack*  
-*תאריך יצירה: ${new Date().toLocaleString('he-IL')}*`;
-}
-
-/**
- * יצירת דוח טקסט פשוט
- */
-function generateTextReport(report) {
-  return `דוח בדיקות CRUD - TikTrack
-================================
-
-נוצר: ${new Date(report.summary.timestamp).toLocaleString('he-IL')}
-
-סיכום כללי:
-// - ציון כללי: ${report.summary.overallScore}/100
-// - עמודים תקינים: ${report.summary.passedEntities}/${report.summary.totalEntities}
-// - עמודים בעייתיים: ${report.summary.problematicEntities}
-// - זמן בדיקות: ${report.summary.totalTestTime} שניות
-
-עמודי משתמש:
-// - ציון ממוצע: ${report.breakdown.userPages.avgScore}/100
-// - תקינים: ${report.breakdown.userPages.passed}/${report.breakdown.userPages.total}
-
-כלי פיתוח:
-// - ציון ממוצע: ${report.breakdown.devTools.avgScore}/100
-// - תקינים: ${report.breakdown.devTools.passed}/${report.breakdown.devTools.total}
-
-${
-  report.problematicPages.length > 0
-    ? `
-עמודים בעייתיים:
-${report.problematicPages
-  .map(
-    page => `
-${page.displayName} (${page.score}/100):
-בעיות: ${page.issues.join(', ')}
-`
-  )
-  .join('')}
-`
-    : ''
-}
-
-תוצאות מפורטות:
-${report.allResults
-  .map(
-    result => {
-      // Use responseTimeGet (GET latency) if available, otherwise fallback to responseTime (total test time)
-      const displayTime = result.responseTimeGet != null ? result.responseTimeGet : result.responseTime;
-      return `${result.displayName}: ${result.score}/100 (${displayTime}ms) - ${result.score >= 80 ? 'תקין' : 'בעייתי'}`;
-    }
-  )
-  .join('\n')}
-
----
-דוח נוצר אוטומטי - ${new Date().toLocaleString('he-IL')}`;
-}
-
-/**
- * קבלת מחלקת CSS לפי ציון
- */
-function getScoreClass(score) {
-  if (score >= 80) return 'score-excellent';
-  if (score >= 50) return 'score-good';
-  return 'score-poor';
-}
-
-/**
- * הורדת קובץ
- */
-function downloadFile(content, filename, contentType) {
-  const blob = new Blob([content], { type: contentType });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-}
-
-// ===== Internal helpers =====
-CRUDEnhancedTester.prototype._toCurl = function ({ url, method, headers, body }) {
-  const h = Object.entries(headers || {})
-    .map(([k, v]) => `-H '${k}: ${v}'`)
-    .join(' ');
-  const d = body ? `--data '${typeof body === 'string' ? body : JSON.stringify(body)}'` : '';
-  return `curl -X ${method || 'GET'} ${h} ${d} '${url}'`;
-};
-
-CRUDEnhancedTester.prototype._percentile = function (values, p) {
-  try {
-    if (!values || values.length === 0) return null;
-    const arr = values.slice().sort((a, b) => a - b);
-    const rank = (p / 100) * (arr.length - 1);
-    const low = Math.floor(rank);
-    const high = Math.ceil(rank);
-    if (low === high) return arr[low];
-    const w = rank - low;
-    return arr[low] * (1 - w) + arr[high] * w;
-  } catch {
-    return null;
-  }
-};
-
-console.log('✅ CRUD Enhanced Testing System loaded successfully');

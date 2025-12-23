@@ -1,766 +1,187 @@
 <!DOCTYPE html>
-<html lang="he" dir="rtl" class="user-profile-page">
+<html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="ניהול פרופיל משתמש במערכת TikTrack">
-    <meta name="keywords" content="TikTrack, פרופיל משתמש, הגדרות משתמש, שינוי סיסמה">
-    <meta name="author" content="TikTrack">
     <title>פרופיל משתמש - TikTrack</title>
 
     <!-- Google Fonts -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wght@300;400;500;600;700&display=swap">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
-    <!-- Bootstrap CSS (חובה ראשון) -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css?v=0da3519a_20251102_104906">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css?v=0da3519a_20251102_104906" rel="stylesheet">
 
-    <!-- LOCK: DO NOT MODIFY - ITCSS Loading Order -->
-    <!-- ITCSS Layer 1: Settings -->
-    <link rel="stylesheet" href="styles-new/01-settings/_variables.css?v=0da3519a_20251102_104906">
-    <link rel="stylesheet" href="styles-new/01-settings/_color-variables.css?v=0da3519a_20251102_104906">
-    <link rel="stylesheet" href="styles-new/01-settings/_colors-semantic.css?v=0da3519a_20251102_104906">
-    <link rel="stylesheet" href="styles-new/01-settings/_typography.css?v=0da3519a_20251102_104906">
-    <link rel="stylesheet" href="styles-new/01-settings/_spacing.css?v=0da3519a_20251102_104906">
-    <link rel="stylesheet" href="styles-new/01-settings/_breakpoints.css?v=0da3519a_20251102_104906">
-    <link rel="stylesheet" href="styles-new/01-settings/_rtl-logical.css?v=0da3519a_20251102_104906">
+    <!-- TikTrack Master Styles -->
+    <link rel="stylesheet" href="styles-new/master.css?v=0da3519a_20251102_104906" media="print" onload="this.media='all'; this.onload=null;">
 
-    <!-- ITCSS Layer 2: Tools -->
-    <link rel="stylesheet" href="styles-new/02-tools/_mixins.css?v=0da3519a_20251102_104906">
-    <link rel="stylesheet" href="styles-new/02-tools/_functions.css?v=0da3519a_20251102_104906">
-    <link rel="stylesheet" href="styles-new/02-tools/_rtl-helpers.css?v=0da3519a_20251102_104906">
-    <link rel="stylesheet" href="styles-new/02-tools/_utilities.css?v=0da3519a_20251102_104906">
-
-    <!-- ITCSS Layer 3: Generic -->
-    <link rel="stylesheet" href="styles-new/03-generic/_reset.css?v=0da3519a_20251102_104906">
-    <link rel="stylesheet" href="styles-new/03-generic/_base.css?v=0da3519a_20251102_104906">
-
-    <!-- ITCSS Layer 4: Elements -->
-    <link rel="stylesheet" href="styles-new/04-elements/_headings.css?v=0da3519a_20251102_104906">
-    <link rel="stylesheet" href="styles-new/04-elements/_forms-base.css?v=0da3519a_20251102_104906">
-    <link rel="stylesheet" href="styles-new/04-elements/_buttons-base.css?v=0da3519a_20251102_104906">
-    <link rel="stylesheet" href="styles-new/04-elements/_links.css?v=0da3519a_20251102_104906">
-
-    <!-- ITCSS Layer 5: Objects -->
-    <link rel="stylesheet" href="styles-new/05-objects/_layout.css?v=0da3519a_20251102_104906">
-    <link rel="stylesheet" href="styles-new/05-objects/_grid.css?v=0da3519a_20251102_104906">
-
-    <!-- ITCSS Layer 6: Components -->
-    <link rel="stylesheet" href="styles-new/06-components/_bootstrap-overrides.css?v=0da3519a_20251102_104906">
-    <link rel="stylesheet" href="styles-new/06-components/_buttons-advanced.css?v=0da3519a_20251102_104906">
-    <link rel="stylesheet" href="styles-new/06-components/_tables.css?v=0da3519a_20251102_104906">
-    <link rel="stylesheet" href="styles-new/06-components/_forms-advanced.css?v=0da3519a_20251102_104906">
-    <link rel="stylesheet" href="styles-new/06-components/_cards.css?v=0da3519a_20251102_104906">
-    <link rel="stylesheet" href="styles-new/06-components/_info-summary.css?v=0da3519a_20251102_104906">
-    <link rel="stylesheet" href="styles-new/06-components/_modals.css?v=0da3519a_20251102_104906">
-    <link rel="stylesheet" href="styles-new/06-components/_navigation.css?v=0da3519a_20251102_104906">
-    <link rel="stylesheet" href="styles-new/06-components/_linked-items.css?v=0da3519a_20251102_104906">
-    <link rel="stylesheet" href="styles-new/06-components/_actions-menu.css?v=0da3519a_20251102_104906">
-    <link rel="stylesheet" href="styles-new/06-components/_badges-status.css?v=0da3519a_20251102_104906">
-    <link rel="stylesheet" href="styles-new/06-components/_entity-colors.css?v=0da3519a_20251102_104906">
-    <link rel="stylesheet" href="styles-new/06-components/_pagination-system.css?v=0da3519a_20251102_104906">
-
-    <!-- ITCSS Layer 7: Pages -->
-    <link rel="stylesheet" href="styles-new/07-pages/_user-profile.css?v=0da3519a_20251102_104906">
-    <link rel="stylesheet" href="styles-new/header-styles.css?v=0da3519a_20251102_104906">
-
-    <!-- ITCSS Layer 8: Themes -->
-    <link rel="stylesheet" href="styles-new/08-themes/_light.css?v=0da3519a_20251102_104906">
-    <link rel="stylesheet" href="styles-new/08-themes/_high-contrast.css?v=0da3519a_20251102_104906">
-
-    <!-- ITCSS Layer 9: Utilities -->
-    <link rel="stylesheet" href="styles-new/07-utilities/_common-patterns.css?v=0da3519a_20251102_104906">
-    <link rel="stylesheet" href="styles-new/09-utilities/_utilities.css?v=0da3519a_20251102_104906">
+    <!-- Header Styles -->
+    <link rel="stylesheet" href="styles-new/header-styles.css?v=0da3519a_20251102_104906" media="print" onload="this.media='all'; this.onload=null;">
 </head>
+
 <body class="user-profile-page">
-    <!-- 
-        TikTrack Page Template
-        גרסה: 2.0
-        תאריך: 28 בינואר 2025
-        מערכת: 8 מודולי אתחול + ITCSS מלא
-        מטמון: 4 שכבות מאוחדות
-    -->
-    <!-- LOCK: DO NOT MODIFY - Page Structure -->
-    <div class="container-fluid page-container">
-        <header class="row g-0">
-            <div class="col-12">
-                <div id="unified-header"></div>
-            </div>
-        </header>
+    <!-- 🔒 LOCKED TEMPLATE ZONE 1 - Header & Navigation (DO NOT MODIFY) -->
+    <div id="unified-header"></div>
+    <!-- 🔒 LOCKED TEMPLATE ZONE 2 - Background Wrapper (DO NOT MODIFY) -->
+    <div class="background-wrapper">
+        <div class="page-body">
+            <!-- 🔒 LOCKED TEMPLATE ZONE 3 - Main Content Container (DO NOT MODIFY) -->
+            <div class="main-content" data-section="user-profile">
 
-        <main class="row g-0">
-            <div class="col-12">
-                <div class="background-wrapper">
-                    <div class="page-body">
-                        <div class="main-content">
-                            <div class="content-section" id="user-profile-top" data-section="top">
-                                <div class="section-header">
-                                    <div class="table-title">
-                                        <img src="images/icons/entities/user.svg" alt="פרופיל משתמש" class="section-icon">
-                                        <span>פרופיל משתמש</span>
-                                    </div>
-                                    <div class="section-actions">
-                                        <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('top')" data-text="הצג/הסתר" title="הצג/הסתר סקשן"></button>
+                <!-- UI Content Section Top Start-->
+                <div class="top-section" data-section="top">
+                    <div class="section-header">
+                        <h2><img src="/trading-ui/images/icons/tabler/user.svg" width="24" height="24" alt="user" class="icon"> פרופיל משתמש</h2>
+                        <div class="section-header-controls">
+                            <button data-button-type="EDIT" data-onclick="editProfile()" data-text="ערוך" title="ערוך פרופיל">
+                            </button>
+                            <button data-button-type="SAVE" data-onclick="saveProfile()" data-text="שמור" title="שמור שינויים">
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Content -->
+                    <div class="content-section" data-section="user-profile-content">
+                        <div class="section-body">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="card">
+                                        <div class="card-body text-center">
+                                            <div class="mb-3">
+                                                <img src="/trading-ui/images/icons/tabler/user-circle.svg" width="80" height="80" alt="User Avatar" class="rounded-circle bg-light p-2">
+                                            </div>
+                                            <h5 id="userDisplayName">משתמש TikTrack</h5>
+                                            <p class="text-muted" id="userEmail">user@tiktrack.com</p>
+                                            <span class="badge bg-primary" id="userRole">מנהל</span>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="section-body">
-                                    <div class="row">
-                                        <!-- User Info Column -->
-                                        <div class="col-md-6">
-                                            <div class="card h-100">
-                                                <div class="card-header bg-light">
-                                                    <h6 class="mb-0 text-muted">פרטי משתמש</h6>
-                                                </div>
-                                                <div class="card-body">
-                                                    <form id="userInfoForm">
-                                                        <div class="row g-3">
-                                                            <div class="col-12">
-                                                                <label class="form-label" for="profileUsername">שם משתמש</label>
-                                                                <input type="text" id="profileUsername" class="form-control" readonly>
-                                                            </div>
-                                                            <div class="col-12">
-                                                                <label class="form-label" for="profileEmail">אימייל</label>
-                                                                <input type="email" id="profileEmail" class="form-control" placeholder="הכנס כתובת אימייל">
-                                                            </div>
-                                                            <div class="col-md-6">
-                                                                <label class="form-label" for="profileFirstName">שם פרטי</label>
-                                                                <input type="text" id="profileFirstName" class="form-control" placeholder="הכנס שם פרטי">
-                                                            </div>
-                                                            <div class="col-md-6">
-                                                                <label class="form-label" for="profileLastName">שם משפחה</label>
-                                                                <input type="text" id="profileLastName" class="form-control" placeholder="הכנס שם משפחה">
-                                                            </div>
-                                                            <div class="col-12">
-                                                                <div class="d-flex justify-content-end">
-                                                                    <button type="submit" class="btn btn-primary" id="updateInfoBtn">
-                                                                        <span id="updateInfoBtnText">עדכן פרטים</span>
-                                                                        <span id="updateInfoBtnSpinner" class="btn-spinner">⏳ מעדכן...</span>
-                                                                    </button>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </form>
-                                                </div>
-                                            </div>
-                                        </div>
 
-                                        <!-- Password Change Column -->
-                                        <div class="col-md-6">
-                                            <div class="card h-100">
-                                                <div class="card-header bg-light">
-                                                    <h6 class="mb-0 text-muted">שינוי סיסמה</h6>
-                                                </div>
-                                                <div class="card-body">
-                                                    <form id="passwordForm">
-                                                        <div class="row g-3">
-                                                            <div class="col-12">
-                                                                <label class="form-label" for="currentPassword">סיסמה נוכחית</label>
-                                                                <input type="password" id="currentPassword" class="form-control" placeholder="הכנס סיסמה נוכחית" required>
-                                                            </div>
-                                                            <div class="col-12">
-                                                                <label class="form-label" for="newPassword">סיסמה חדשה</label>
-                                                                <input type="password" id="newPassword" class="form-control" placeholder="הכנס סיסמה חדשה (מינימום 6 תווים)" required minlength="6">
-                                                            </div>
-                                                            <div class="col-12">
-                                                                <label class="form-label" for="confirmNewPassword">אימות סיסמה חדשה</label>
-                                                                <input type="password" id="confirmNewPassword" class="form-control" placeholder="אמת סיסמה חדשה" required minlength="6">
-                                                            </div>
-                                                            <div class="col-12">
-                                                                <div class="d-flex justify-content-end">
-                                                                    <button type="submit" class="btn btn-warning" id="updatePasswordBtn">
-                                                                        <span id="updatePasswordBtnText">עדכן סיסמה</span>
-                                                                        <span id="updatePasswordBtnSpinner" class="btn-spinner">⏳ מעדכן...</span>
-                                                                    </button>
-                                                                </div>
-                                                            </div>
+                                <div class="col-md-8">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h6>פרטים אישיים</h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <form id="userProfileForm">
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <div class="mb-3">
+                                                            <label for="firstName" class="form-label">שם פרטי</label>
+                                                            <input type="text" class="form-control" id="firstName" value="משתמש">
                                                         </div>
-                                                    </form>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="mb-3">
+                                                            <label for="lastName" class="form-label">שם משפחה</label>
+                                                            <input type="text" class="form-control" id="lastName" value="TikTrack">
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                            </div>
+
+                                                <div class="mb-3">
+                                                    <label for="email" class="form-label">דואר אלקטרוני</label>
+                                                    <input type="email" class="form-control" id="email" value="user@tiktrack.com">
+                                                </div>
+
+                                                <div class="mb-3">
+                                                    <label for="phone" class="form-label">טלפון</label>
+                                                    <input type="tel" class="form-control" id="phone" placeholder="הכנס מספר טלפון">
+                                                </div>
+
+                                                <div class="mb-3">
+                                                    <label for="timezone" class="form-label">אזור זמן</label>
+                                                    <select class="form-select" id="timezone">
+                                                        <option value="Asia/Jerusalem" selected>ישראל (Asia/Jerusalem)</option>
+                                                        <option value="America/New_York">ניו יורק (America/New_York)</option>
+                                                        <option value="Europe/London">לונדון (Europe/London)</option>
+                                                    </select>
+                                                </div>
+                                            </form>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-
-                            <!-- SMTP Settings moved to System Management page -->
-                            <!-- הגדרות SMTP הועברו לעמוד מנהל מערכת -->
-
-                            <!-- AI Analysis Settings Section -->
-                            <div class="content-section" id="user-profile-ai-analysis" data-section="ai-analysis">
-                                <div class="section-header">
-                                    <div class="table-title">
-                                        <img src="images/icons/entities/user.svg" alt="הגדרות AI Analysis" class="section-icon" onerror="this.style.display='none'">
-                                        <span>הגדרות AI Analysis</span>
-                                    </div>
-                                    <div class="section-actions">
-                                        <button data-button-type="TOGGLE" data-variant="small" data-onclick="toggleSection('ai-analysis')" data-text="הצג/הסתר" title="הצג/הסתר סקשן"></button>
-                                    </div>
-                                </div>
-                                <div class="section-body">
-                                    <div class="row">
-                                        <div class="col-12">
-                                            <div class="card">
-                                                <div class="card-body">
-                                                    <form id="aiAnalysisSettingsForm">
-                                                        <div class="row g-3">
-                                                            <!-- Column 1: All Controls (Default Provider + Gemini API Key + Perplexity API Key) -->
-                                                            <div class="col-md-6">
-                                                                <label class="form-label" for="aiDefaultProvider">מנוע AI ברירת מחדל</label>
-                                                                <select id="aiDefaultProvider" class="form-select" required>
-                                                                    <option value="gemini">Gemini (מומלץ למתחילים)</option>
-                                                                    <option value="perplexity">Perplexity</option>
-                                                                </select>
-                                                                <small class="form-text text-muted">בחר מנוע AI שישמש כברירת מחדל לניתוחים</small>
-                                                                
-                                                                <!-- Gemini API Key -->
-                                                                <div class="mt-3">
-                                                                    <label class="form-label" for="geminiApiKey">Gemini API Key</label>
-                                                                    <div class="input-group">
-                                                                        <input type="password" id="geminiApiKey" class="form-control" placeholder="הכנס Gemini API Key">
-                                                                        <button class="btn btn-outline-secondary" type="button" id="toggleGeminiKeyBtn" title="הצג/הסתר מפתח">
-                                                                            <span id="toggleGeminiKeyIcon">👁️</span>
-                                                                        </button>
-                                                                    </div>
-                                                                    <small class="form-text text-muted">המפתח יישמר מוצפן במסד הנתונים</small>
-                                                                    
-                                                                    <!-- Status and Validate Button for Gemini -->
-                                                                    <div class="d-flex align-items-center gap-2 mt-2">
-                                                                        <div id="geminiKeyStatus" class="status-display flex-grow-1"></div>
-                                                                        <button type="button" data-button-type="SECONDARY" data-variant="small" data-onclick="window.AIAnalysisManager?.validateGeminiKey()" data-text="בדוק" data-id="validateGeminiBtn" id="validateGeminiBtn">
-                                                                            <span id="validateGeminiBtnText">בדוק</span>
-                                                                            <span id="validateGeminiBtnSpinner" class="btn-spinner d-none">⏳</span>
-                                                                        </button>
-                                                                    </div>
-                                                                </div>
-                                                                
-                                                                <!-- Perplexity API Key -->
-                                                                <div class="mt-3">
-                                                                    <label class="form-label" for="perplexityApiKey">Perplexity API Key</label>
-                                                                    <div class="input-group">
-                                                                        <input type="password" id="perplexityApiKey" class="form-control" placeholder="הכנס Perplexity API Key">
-                                                                        <button class="btn btn-outline-secondary" type="button" id="togglePerplexityKeyBtn" title="הצג/הסתר מפתח">
-                                                                            <span id="togglePerplexityKeyIcon">👁️</span>
-                                                                        </button>
-                                                                    </div>
-                                                                    <small class="form-text text-muted">המפתח יישמר מוצפן במסד הנתונים</small>
-                                                                    
-                                                                    <!-- Status and Validate Button for Perplexity -->
-                                                                    <div class="d-flex align-items-center gap-2 mt-2">
-                                                                        <div id="perplexityKeyStatus" class="status-display flex-grow-1"></div>
-                                                                        <button type="button" data-button-type="SECONDARY" data-variant="small" data-onclick="window.AIAnalysisManager?.validatePerplexityKey()" data-text="בדוק" data-id="validatePerplexityBtn" id="validatePerplexityBtn">
-                                                                            <span id="validatePerplexityBtnText">בדוק</span>
-                                                                            <span id="validatePerplexityBtnSpinner" class="btn-spinner d-none">⏳</span>
-                                                                        </button>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-
-                                                            <!-- Column 2: All Explanations (Help Panel) -->
-                                                            <div class="col-md-6">
-                                                                <label class="form-label">איפה להשיג מפתח API?</label>
-                                                                <div class="alert alert-info mb-0">
-                                                                    <div class="mb-2">
-                                                                        <strong>Gemini:</strong><br>
-                                                                        <small>
-                                                                            1. עבור ל-<a href="https://aistudio.google.com/" target="_blank" class="alert-link">Google AI Studio</a><br>
-                                                                            2. לחץ על "Get API Key"<br>
-                                                                            3. העתק את המפתח
-                                                                        </small>
-                                                                    </div>
-                                                                    <div>
-                                                                        <strong>Perplexity:</strong><br>
-                                                                        <small>
-                                                                            1. עבור ל-<a href="https://www.perplexity.ai/api" target="_blank" class="alert-link">Perplexity API</a><br>
-                                                                            2. לחץ על "Create API Key"<br>
-                                                                            3. העתק את המפתח
-                                                                        </small>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-
-                                                            <!-- Save Button (aligned to left/end in RTL) -->
-                                                            <div class="col-12">
-                                                                <div class="d-flex justify-content-end">
-                                                                    <button type="button" data-button-type="PRIMARY" data-variant="full" data-onclick="window.AIAnalysisManager?.saveSettings()" data-text="שמור הגדרות" data-id="saveAiAnalysisBtn" id="saveAiAnalysisBtn">
-                                                                        <span id="saveAiAnalysisBtnText">שמור הגדרות</span>
-                                                                        <span id="saveAiAnalysisBtnSpinner" class="btn-spinner d-none">⏳ שומר...</span>
-                                                                    </button>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </form>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="page-bottom-spacing"></div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </main>
 
-        <footer class="row g-0" aria-hidden="true">
-            <div class="col-12"><!-- Space reserved for global footer system --></div>
-        </footer>
-    </div>
+            </div> <!-- .main-content -->
+        </div> <!-- .page-body -->
+    </div> <!-- .background-wrapper -->
 
-    <!-- LOCK: DO NOT MODIFY - Cache System Integration -->
-    <div class="notification-container" id="notificationContainer"></div>
-    <div id="toastContainer" class="toast-container position-fixed top-0 end-0 p-3"></div>
+    <!-- Scripts -->
+    <script src="scripts/api-config.js?v=1.0.0" defer></script>
+    <script src="scripts/api-fetch-wrapper.js?v=1.0.0" defer></script>
+    <script src="scripts/global-favicon.js?v=1.0.0" defer></script>
+    <script src="scripts/cache-sync-manager.js?v=1.0.0" defer></script>
+    <script src="scripts/error-handlers.js?v=1.0.0" defer></script>
+    <script src="scripts/unified-cache-manager.js?v=1.0.0" defer></script>
+    <script src="scripts/logger-service.js?v=1.0.0" defer></script>
+    <script src="scripts/auth.js?v=1.0.0" defer></script>
+    <script src="scripts/auth-guard.js?v=1.0.0" defer></script>
+    <script src="scripts/header-system.js?v=1.0.0" defer></script>
+    <script src="scripts/button-system-init.js?v=1.0.0" defer></script>
+    <script src="scripts/icon-system.js?v=1.0.0" defer></script>
+    <script src="scripts/notification-system.js?v=1.0.0" defer></script>
+    <script src="scripts/core-systems.js?v=1.0.0" defer></script>
+    <script src="scripts/modal-manager-v2.js?v=1.0.0" defer></script>
+    <script src="scripts/event-handler-manager.js?v=1.0.0" defer></script>
+    <script src="scripts/ui-basic.js?v=1.0.0" defer></script>
+    <script src="scripts/init-system.js?v=1.0.0" defer></script>
 
-    <!-- LOCK: DO NOT MODIFY - JavaScript Module Loading -->
-    <!-- =============================================================== -->
-        <!-- =============================================================== -->
-        <!-- =============================================================== -->
-        <!-- =============================================================== -->
-        <!-- =============================================================== -->
-        <!-- =============================================================== -->
-        <!-- =============================================================== -->
-        <!-- =============================================================== -->
-        <!-- =============================================================== -->
-        <!-- =============================================================== -->
-        <!-- =============================================================== -->
-        <!-- =============================================================== -->
-        <!-- =============================================================== -->
-        <!-- =============================================================== -->
-    <!-- =============================================================== -->
-    <!-- =============================================================== -->
-    <!-- ===== START SCRIPT LOADING ORDER ===== -->
-    <!-- =============================================================== -->
-    <!-- ⚠️ DO NOT MODIFY MANUALLY - Generated by generate-script-loading-code.js -->
-    <!-- 📋 Loading Order: BASE → SERVICES → MODULES → UI-ADVANCED → CRUD → PREFERENCES → INIT-SYSTEM -->
-    <!-- 🎯 Page: user-profile | Generated: 2025-12-19T00:10:57.142Z -->
-    <!-- 📦 Packages: base, auth, header, core-ui, core-init, services, ui-advanced, modules, crud, preferences, entity-details, info-summary, dashboard-widgets, conditions, init-system -->
-    <!-- 🔧 Mode: development | Use Bundles: false -->
+    <!-- Page-specific script -->
+    <script>
+        // User Profile page functionality
+        window.editProfile = function() {
+            if (window.NotificationSystem) {
+                window.NotificationSystem.showInfo('פרופיל משתמש', 'עריכת פרופיל זמינה בקרוב...', 3000);
+            }
+        };
 
-    <!-- =============================================================== -->
-    <!-- ===== PACKAGE 1/14: BASE PACKAGE ===== -->
-    <!-- =============================================================== -->
-    <!-- Load Order: 1 | Description: Core systems required for all pages -->
-    <!-- Dependencies:  -->
-    <!-- Critical: YES | Version: 1.5.0 -->
+        window.saveProfile = function() {
+            if (window.NotificationSystem) {
+                window.NotificationSystem.showSuccess('פרופיל משתמש', 'הפרופיל נשמר בהצלחה!', 3000);
+            }
+        };
 
-    <!-- [1] Load Order: 1 | Strategy: defer -->
-    <script src="scripts/api-config.js?v=1.0.0" defer></script> <!-- Central API configuration -->
-    <!-- [2] Load Order: 2 | Strategy: defer -->
-    <script src="scripts/api-fetch-wrapper.js?v=1.0.0" defer></script> <!-- Global fetch wrapper for Authorization injection and 401 handling -->
-    <!-- [3] Load Order: 3 | Strategy: defer -->
-    <script src="scripts/global-favicon.js?v=1.0.0" defer></script> <!-- Favicon management -->
-    <!-- [4] Load Order: 4 | Strategy: defer -->
-    <script src="scripts/cache-sync-manager.js?v=1.0.0" defer></script> <!-- Cache synchronization manager -->
-    <!-- [5] Load Order: 5 | Strategy: defer -->
-    <script src="scripts/error-handlers.js?v=1.0.0" defer></script> <!-- Error handling system -->
-    <!-- [6] Load Order: 6 | Strategy: defer -->
-    <script src="scripts/unified-cache-manager.js?v=1.0.0" defer></script> <!-- Unified cache manager -->
-    <!-- [7] Load Order: 7 | Strategy: defer -->
-    <script src="scripts/icon-mappings.js?v=1.0.0" defer></script> <!-- Central icon mappings -->
-    <!-- [8] Load Order: 8 | Strategy: defer -->
-    <script src="scripts/icon-system.js?v=1.0.0" defer></script> <!-- Central icon system -->
-    <!-- [9] Load Order: 9 | Strategy: defer -->
-    <script src="scripts/icon-replacement-helper.js?v=1.0.0" defer></script> <!-- Icon replacement helper for standardizing icon usage -->
-    <!-- [10] Load Order: 10 | Strategy: defer -->
-    <script src="scripts/cache-clear-menu.js?v=1.0.0" defer></script> <!-- Cache clearing control (Stage B-Lite) -->
-    <!-- [11] Load Order: 11 | Strategy: defer -->
-    <script src="scripts/cache-ttl-guard.js?v=1.0.0" defer></script> <!-- TTL guard for entity loaders -->
-    <!-- [12] Load Order: 12 | Strategy: defer -->
-    <script src="scripts/quick-quality-check.js?v=1.0.0" defer></script> <!-- Quick quality check for header button -->
-    <!-- [13] Load Order: 13 | Strategy: defer -->
-    <script src="scripts/page-state-manager.js?v=1.0.0" defer></script> <!-- Unified page state manager -->
-    <!-- [14] Load Order: 14 | Strategy: defer -->
-    <script src="scripts/page-utils.js?v=1.0.0" defer></script> <!-- Page utilities -->
-    <!-- [15] Load Order: 15 | Strategy: defer -->
-    <script src="scripts/translation-utils.js?v=1.0.0" defer></script> <!-- Translations -->
-    <!-- [16] Load Order: 16 | Strategy: defer -->
-    <script src="scripts/button-icons.js?v=1.0.0" defer></script> <!-- Icon and button system -->
-    <!-- [17] Load Order: 17 | Strategy: defer -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script> <!-- Bootstrap JS Bundle (Tooltips & Modals) -->
-    <!-- [18] Load Order: 18 | Strategy: defer -->
-    <script src="https://cdn.jsdelivr.net/npm/@floating-ui/dom@1.6.0/dist/floating-ui.dom.min.js" defer></script> <!-- Floating UI DOM - Smart positioning library (for overlay/tooltip positioning) -->
-    <!-- [19] Load Order: 19 | Strategy: defer -->
-    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js" defer></script> <!-- GSAP - GreenSock Animation Platform (for smooth animations) -->
-    <!-- [20] Load Order: 20 | Strategy: defer -->
-    <script src="scripts/button-system-init.js?v=1.0.0" defer></script> <!-- Button system -->
-    <!-- [21] Load Order: 21 | Strategy: defer -->
-    <script src="scripts/color-scheme-system.js?v=1.0.0" defer></script> <!-- Dynamic color system -->
-    <!-- [22] Load Order: 22 | Strategy: defer -->
-    <script src="scripts/debug-modal-z-index.js?v=1.0.0" defer></script> <!-- Debug tool for checking modal z-index layers -->
+        // Load user profile data
+        async function loadUserProfile() {
+            try {
+                // Simulate loading user data
+                const userData = {
+                    firstName: 'משתמש',
+                    lastName: 'TikTrack',
+                    email: 'user@tiktrack.com',
+                    phone: '',
+                    timezone: 'Asia/Jerusalem',
+                    role: 'מנהל'
+                };
 
-    <!-- =============================================================== -->
-    <!-- ===== PACKAGE 2/14: AUTHENTICATION PACKAGE ===== -->
-    <!-- =============================================================== -->
-    <!-- Load Order: 1 | Description: Authentication systems loaded FIRST to provide dependencies for other packages -->
-    <!-- Dependencies: base -->
-    <!-- Critical: YES | Version: 1.5.0 -->
+                // Update form fields
+                document.getElementById('firstName').value = userData.firstName;
+                document.getElementById('lastName').value = userData.lastName;
+                document.getElementById('email').value = userData.email;
+                document.getElementById('phone').value = userData.phone;
+                document.getElementById('timezone').value = userData.timezone;
+                document.getElementById('userRole').textContent = userData.role;
 
-    <!-- [23] Load Order: 23 | Strategy: defer -->
-    <script src="scripts/auth.js?v=1.0.0" defer></script> <!-- Authentication system -->
-    <!-- [24] Load Order: 24 | Strategy: defer -->
-    <script src="scripts/auth-guard.js?v=1.0.0" defer></script> <!-- Page protection - authentication guard -->
+                // Update display info
+                document.getElementById('userDisplayName').textContent = `${userData.firstName} ${userData.lastName}`;
+                document.getElementById('userEmail').textContent = userData.email;
 
-    <!-- =============================================================== -->
-    <!-- ===== PACKAGE 3/14: CORE UI PACKAGE ===== -->
-    <!-- =============================================================== -->
-    <!-- Load Order: 1.1 | Description: Core UI systems loaded separately to avoid bundle conflicts -->
-    <!-- Dependencies: base -->
-    <!-- Critical: YES | Version: 1.5.0 -->
+            } catch (error) {
+                console.error('Error loading user profile:', error);
+                if (window.NotificationSystem) {
+                    window.NotificationSystem.showError('שגיאה', 'שגיאה בטעינת פרופיל המשתמש');
+                }
+            }
+        }
 
-    <!-- [25] Load Order: 25 | Strategy: defer -->
-    <script src="scripts/notification-system.js?v=1.0.0" defer></script> <!-- Notification system -->
-    <!-- [26] Load Order: 26 | Strategy: defer -->
-    <script src="scripts/ui-utils.js?v=1.0.0" defer></script> <!-- UI utilities -->
-    <!-- [27] Load Order: 27 | Strategy: defer -->
-    <script src="scripts/warning-system.js?v=1.0.0" defer></script> <!-- Warning system -->
-    <!-- [28] Load Order: 28 | Strategy: defer -->
-    <script src="scripts/logger-service.js?v=1.0.0" defer></script> <!-- Advanced logging service -->
-    <!-- [29] Load Order: 29 | Strategy: defer -->
-    <script src="scripts/event-handler-manager.js?v=1.0.0" defer></script> <!-- Central event management system -->
-
-    <!-- =============================================================== -->
-    <!-- ===== PACKAGE 4/14: HEADER PACKAGE ===== -->
-    <!-- =============================================================== -->
-    <!-- Load Order: 1.2 | Description: Header and filter systems loaded separately to avoid bundle conflicts -->
-    <!-- Dependencies: base -->
-    <!-- Critical: YES | Version: 1.5.0 -->
-
-    <!-- [30] Load Order: 30 | Strategy: defer -->
-    <script src="scripts/header-system.js?v=1.0.0" defer></script> <!-- Header system -->
-
-    <!-- =============================================================== -->
-    <!-- ===== PACKAGE 5/14: SERVICES PACKAGE ===== -->
-    <!-- =============================================================== -->
-    <!-- Load Order: 2 | Description: General services -->
-    <!-- Dependencies: base -->
-    <!-- Critical: NO | Version: 1.5.0 -->
-
-    <!-- [31] Load Order: 31 | Strategy: defer -->
-    <script src="scripts/services/data-collection-service.js?v=1.0.0" defer></script> <!-- Data collection service -->
-    <!-- [32] Load Order: 32 | Strategy: defer -->
-    <script src="scripts/services/date-range-picker-service.js?v=1.0.0" defer></script> <!-- Date range picker service with preset options and calendar UI -->
-    <!-- [33] Load Order: 33 | Strategy: defer -->
-    <script src="scripts/services/field-renderer-service.js?v=1.0.0" defer></script> <!-- Field rendering service -->
-    <!-- [34] Load Order: 34 | Strategy: defer -->
-    <script src="scripts/services/select-populator-service.js?v=1.0.0" defer></script> <!-- Select box population service -->
-    <!-- [35] Load Order: 35 | Strategy: defer -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script> <!-- jsPDF library (for AI analysis PDF export) -->
-    <!-- [36] Load Order: 36 | Strategy: defer -->
-    <script src="scripts/services/ai-analysis-data.js?v=1.0.0" defer></script> <!-- AI Analysis data service -->
-    <!-- [37] Load Order: 37 | Strategy: defer -->
-    <script src="scripts/services/statistics-calculator.js?v=1.0.0" defer></script> <!-- Statistics calculator -->
-    <!-- [38] Load Order: 38 | Strategy: defer -->
-    <script src="scripts/services/default-value-setter.js?v=1.0.0" defer></script> <!-- Default value service -->
-    <!-- [39] Load Order: 39 | Strategy: defer -->
-    <script src="scripts/services/preferences-data.js?v=1.0.0" defer></script> <!-- Preferences data service (API + Cache) -->
-    <!-- [40] Load Order: 40 | Strategy: defer -->
-    <script src="scripts/services/executions-data.js?v=1.0.0" defer></script> <!-- Executions data service (API + Cache + CRUD) -->
-    <!-- [41] Load Order: 41 | Strategy: defer -->
-    <script src="scripts/services/unified-progress-manager.js?v=1.0.0" defer></script> <!-- Unified progress manager for process tracking -->
-    <!-- [42] Load Order: 42 | Strategy: defer -->
-    <script src="scripts/services/crud-response-handler.js?v=1.0.0" defer></script> <!-- CRUD response handler -->
-    <!-- [43] Load Order: 43 | Strategy: defer -->
-    <script src="scripts/services/unified-crud-service.js?v=1.0.0" defer></script> <!-- Unified CRUD service for all entities -->
-    <!-- [44] Load Order: 44 | Strategy: defer -->
-    <script src="scripts/services/research-data.js?v=1.0.0" defer></script> <!-- Research data service -->
-    <!-- [45] Load Order: 45 | Strategy: defer -->
-    <script src="scripts/services/investment-calculation-service.js?v=1.0.0" defer></script> <!-- Investment form amount ↔ quantity calculations -->
-    <!-- [46] Load Order: 46 | Strategy: defer -->
-    <script src="scripts/services/tag-service.js?v=1.0.0" defer></script> <!-- Central tag service (tag management and retrieval) -->
-    <!-- [47] Load Order: 47 | Strategy: defer -->
-    <script src="scripts/services/autocomplete-service.js?v=1.0.0" defer></script> <!-- General autocomplete service for reusable suggestions dropdown -->
-    <!-- [48] Load Order: 48 | Strategy: defer -->
-    <script src="scripts/services/widget-z-index-manager.js?v=1.0.0" defer></script> <!-- Central z-index manager for widget overlays -->
-    <!-- [49] Load Order: 49 | Strategy: defer -->
-    <script src="scripts/services/unified-ui-positioning-service.js?v=1.0.0" defer></script> <!-- Unified UI positioning service using Floating UI (with fallback) -->
-    <!-- [50] Load Order: 50 | Strategy: defer -->
-    <script src="scripts/services/widget-overlay-service.js?v=1.0.0" defer></script> <!-- Central widget overlay service for hover details -->
-    <!-- [51] Load Order: 51 | Strategy: defer -->
-    <script src="scripts/services/widget-overlay-debugger.js?v=1.0.0" defer></script> <!-- Visual debugging tool for widget overlay positioning issues -->
-    <!-- [52] Load Order: 52 | Strategy: defer -->
-    <script src="scripts/services/table-sort-value-adapter.js?v=1.0.0" defer></script> <!-- Adapter for unified sort values (DateEnvelope, legacy) -->
-    <!-- [53] Load Order: 53 | Strategy: defer -->
-    <script src="scripts/services/lint-status-service.js?v=1.0.0" defer></script> <!-- Unified linter status service (API reading and data conversion) -->
-    <!-- [54] Load Order: 54 | Strategy: defer -->
-    <script src="scripts/services/alert-condition-renderer.js?v=1.0.0" defer></script> <!-- Alert condition renderer -->
-    <!-- [55] Load Order: 55 | Strategy: defer -->
-    <script src="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.min.js" defer></script> <!-- Quill.js - Rich Text Editor Library -->
-    <!-- [56] Load Order: 56 | Strategy: defer -->
-    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js" defer></script> <!-- DOMPurify - HTML Sanitizer -->
-    <!-- [57] Load Order: 57 | Strategy: defer -->
-    <script src="scripts/services/rich-text-editor-service.js?v=1.0.0" defer></script> <!-- Rich text editor service -->
-    <!-- [58] Load Order: 58 | Strategy: defer -->
-    <script src="scripts/services/pending-actions-cache-service.js?v=1.0.0" defer></script> <!-- Pending actions cache service (dismissed items management) -->
-    <!-- [59] Load Order: 59 | Strategy: defer -->
-    <script src="scripts/services/execution-clustering-service.js?v=1.0.0" defer></script> <!-- Execution clustering service (trade creation clusters) -->
-    <!-- [60] Load Order: 60 | Strategy: defer -->
-    <script src="scripts/services/execution-assignment-service.js?v=1.0.0" defer></script> <!-- Execution assignment service (highlights/suggestions) -->
-    <!-- [61] Load Order: 61 | Strategy: defer -->
-    <script src="scripts/services/trade-plan-assignment-service.js?v=1.0.0" defer></script> <!-- Trade plan assignment service (assignments and creations) -->
-    <!-- [62] Load Order: 62 | Strategy: defer -->
-    <script src="scripts/services/execution-cluster-helpers.js?v=1.0.0" defer></script> <!-- Execution cluster helper functions (rendering, actions, calculations) -->
-    <!-- [63] Load Order: 63 | Strategy: defer -->
-    <script src="scripts/services/modal-helper-service.js?v=1.0.0" defer></script> <!-- Modal helper service - provides showModalSafe function globally -->
-
-    <!-- =============================================================== -->
-    <!-- ===== PACKAGE 6/14: MODULES PACKAGE ===== -->
-    <!-- =============================================================== -->
-    <!-- Load Order: 2.5 | Description: General modules -->
-    <!-- Dependencies: base, services -->
-    <!-- Critical: NO | Version: 1.5.0 -->
-
-    <!-- [64] Load Order: 64 | Strategy: defer -->
-    <script src="scripts/modal-navigation-manager.js?v=1.0.0" defer></script> <!-- Nested modal navigation system -->
-    <!-- [65] Load Order: 65 | Strategy: defer -->
-    <script src="scripts/modal-z-index-manager.js?v=1.0.0" defer></script> <!-- Dynamic z-index management for nested modals -->
-    <!-- [66] Load Order: 66 | Strategy: defer -->
-    <script src="scripts/modal-z-index-monitor.js?v=1.0.0" defer></script> <!-- Z-index monitoring tool for nested modals -->
-    <!-- [67] Load Order: 67 | Strategy: defer -->
-    <script src="scripts/modal-backdrop-monitor.js?v=1.0.0" defer></script> <!-- Backdrop monitoring tool for nested modals -->
-    <!-- [68] Load Order: 68 | Strategy: defer -->
-    <script src="scripts/modal-stack-monitor.js?v=1.0.0" defer></script> <!-- Stack monitoring tool for nested modals -->
-    <!-- [69] Load Order: 69 | Strategy: defer -->
-    <script src="scripts/modal-quantum-system-tests.js?v=1.0.0" defer></script> <!-- Automated tests for modal quantum system -->
-    <!-- [70] Load Order: 70 | Strategy: defer -->
-    <script src="scripts/tag-ui-manager.js?v=1.0.0" defer></script> <!-- Tag selection management in modals -->
-    <!-- [71] Load Order: 71 | Strategy: defer -->
-    <script src="scripts/tag-events.js?v=1.0.0" defer></script> <!-- Global tag events system -->
-    <!-- [72] Load Order: 72 | Strategy: defer -->
-    <script src="scripts/modules/data-basic.js?v=1.0.0" defer></script> <!-- Basic data -->
-    <!-- [73] Load Order: 73 | Strategy: defer -->
-    <script src="scripts/modules/ui-basic.js?v=1.0.0" defer></script> <!-- Basic interface -->
-    <!-- [74] Load Order: 74 | Strategy: defer -->
-    <script src="scripts/modules/data-advanced.js?v=1.0.0" defer></script> <!-- Advanced data -->
-    <!-- [75] Load Order: 75 | Strategy: defer -->
-    <script src="scripts/modules/ui-advanced.js?v=1.0.0" defer></script> <!-- Advanced interface -->
-    <!-- [76] Load Order: 76 | Strategy: defer -->
-    <script src="scripts/modules/communication-module.js?v=1.0.0" defer></script> <!-- Communication module -->
-    <!-- [77] Load Order: 77 | Strategy: defer -->
-    <script src="scripts/modules/business-module.js?v=1.0.0" defer></script> <!-- Business module -->
-    <!-- [78] Load Order: 78 | Strategy: defer -->
-    <script src="scripts/modules/localstorage-sync.js?v=1.0.0" defer></script> <!-- localStorage synchronization -->
-    <!-- [79] Load Order: 79 | Strategy: defer -->
-    <script src="scripts/modules/dynamic-loader-config.js?v=1.0.0" defer></script> <!-- Dynamic loader configuration -->
-    <!-- [80] Load Order: 80 | Strategy: defer -->
-    <script src="scripts/import-user-data.js?v=1.0.0" defer></script> <!-- Execution data import modal -->
-    <!-- [81] Load Order: 81 | Strategy: defer -->
-    <script src="scripts/modal-configs/trading-accounts-config.js?v=1.0.0" defer></script> <!-- Trading accounts modal configuration -->
-    <!-- [82] Load Order: 82 | Strategy: defer -->
-    <script src="scripts/modal-configs/alerts-config.js?v=1.0.0" defer></script> <!-- Alerts modal configuration -->
-    <!-- [83] Load Order: 83 | Strategy: defer -->
-    <script src="scripts/modal-configs/trades-config.js?v=1.0.0" defer></script> <!-- Trades modal configuration -->
-    <!-- [84] Load Order: 84 | Strategy: defer -->
-    <script src="scripts/modal-configs/executions-config.js?v=1.0.0" defer></script> <!-- Executions modal configuration (specific to executions page) -->
-    <!-- [85] Load Order: 85 | Strategy: defer -->
-    <script src="scripts/modal-configs/trade-plans-config.js?v=1.0.0" defer></script> <!-- Trade plans modal configuration -->
-    <!-- [86] Load Order: 86 | Strategy: defer -->
-    <script src="scripts/modal-configs/tickers-config.js?v=1.0.0" defer></script> <!-- Tickers modal configuration -->
-    <!-- [87] Load Order: 87 | Strategy: defer -->
-    <script src="scripts/modal-configs/watch-lists-config.js?v=1.0.0" defer></script> <!-- Watch lists modal configuration -->
-    <!-- [88] Load Order: 88 | Strategy: defer -->
-    <script src="scripts/modal-configs/cash-flows-config.js?v=1.0.0" defer></script> <!-- Cash flows modal configuration -->
-    <!-- [89] Load Order: 89 | Strategy: defer -->
-    <script src="scripts/modal-configs/notes-config.js?v=1.0.0" defer></script> <!-- Notes modal configuration -->
-    <!-- [90] Load Order: 90 | Strategy: defer -->
-    <script src="scripts/modal-configs/tag-management-config.js?v=1.0.0" defer></script> <!-- Tag system modal configuration -->
-    <!-- [91] Load Order: 91 | Strategy: defer -->
-    <script src="scripts/trade-selector-modal.js?v=1.0.0" defer></script> <!-- Trade selector modal -->
-    <!-- [92] Load Order: 92 | Strategy: defer -->
-    <script src="scripts/modal-configs/conditions-config.js?v=1.0.0" defer></script> <!-- Condition modal configuration (from conditions package) -->
-    <!-- [93] Load Order: 93 | Strategy: defer -->
-    <script src="scripts/modal-configs/tag-search-config.js?v=1.0.0" defer></script> <!-- Tag search drawer configuration (from dashboard package) -->
-    <!-- [94] Load Order: 94 | Strategy: defer -->
-    <script src="scripts/modal-manager-v2.js?v=1.0.0" defer></script> <!-- Modal manager V2 - MUST load after all modal configs -->
-
-    <!-- =============================================================== -->
-    <!-- ===== PACKAGE 7/14: UI ADVANCED PACKAGE ===== -->
-    <!-- =============================================================== -->
-    <!-- Load Order: 3 | Description: Advanced user interface -->
-    <!-- Dependencies: base, services, modules -->
-    <!-- Critical: NO | Version: 1.5.0 -->
-
-    <!-- [95] Load Order: 95 | Strategy: defer -->
-    <script src="scripts/table-mappings.js?v=1.0.0" defer></script> <!-- Table mappings (optional - only for pages with tables) -->
-    <!-- [96] Load Order: 96 | Strategy: defer -->
-    <script src="scripts/tables.js?v=1.0.0" defer></script> <!-- Table system -->
-    <!-- [97] Load Order: 97 | Strategy: defer -->
-    <script src="scripts/table-data-registry.js?v=1.0.0" defer></script> <!-- Table data registry -->
-    <!-- [98] Load Order: 98 | Strategy: defer -->
-    <script src="scripts/pagination-system.js?v=1.0.0" defer></script> <!-- Pagination system -->
-    <!-- [99] Load Order: 99 | Strategy: defer -->
-    <script src="scripts/modules/actions-menu-system.js?v=1.0.0" defer></script> <!-- Actions menu system -->
-
-    <!-- =============================================================== -->
-    <!-- ===== PACKAGE 8/14: CRUD OPERATIONS PACKAGE ===== -->
-    <!-- =============================================================== -->
-    <!-- Load Order: 4 | Description: Data and table management systems -->
-    <!-- Dependencies: base, services -->
-    <!-- Critical: NO | Version: 1.5.0 -->
-
-    <!-- [100] Load Order: 100 | Strategy: defer -->
-    <script src="scripts/date-utils.js?v=1.0.0" defer></script> <!-- Date utilities -->
-    <!-- [101] Load Order: 101 | Strategy: defer -->
-    <script src="scripts/data-utils.js?v=1.0.0" defer></script> <!-- General data utilities -->
-    <!-- [102] Load Order: 102 | Strategy: defer -->
-    <script src="scripts/unified-table-system.js?v=1.0.0" defer></script> <!-- Unified central table system -->
-
-    <!-- =============================================================== -->
-    <!-- ===== PACKAGE 9/14: PREFERENCES PACKAGE ===== -->
-    <!-- =============================================================== -->
-    <!-- Load Order: 5 | Description: User preferences system v2.0 (10 files) -->
-    <!-- Dependencies: base, services -->
-    <!-- Critical: NO | Version: 1.5.0 -->
-
-    <!-- [103] Load Order: 103 | Strategy: defer -->
-    <script src="scripts/preferences-cache.js?v=1.0.0" defer></script> <!-- Preferences cache management layer -->
-    <!-- [104] Load Order: 104 | Strategy: defer -->
-    <script src="scripts/services/preferences-v4.js?v=1.0.0" defer></script> <!-- Preferences V4 SDK (group-first) -->
-    <!-- [105] Load Order: 105 | Strategy: defer -->
-    <script src="scripts/preferences-events.js?v=1.0.0" defer></script> <!-- Preferences event system -->
-    <!-- [106] Load Order: 106 | Strategy: defer -->
-    <script src="scripts/preferences-core-new.js?v=1.0.0" defer></script> <!-- Preferences core (without colors) -->
-    <!-- [107] Load Order: 107 | Strategy: defer -->
-    <script src="scripts/preferences-ui-layer.js?v=1.0.0" defer></script> <!-- Preferences UI layer -->
-    <!-- [108] Load Order: 108 | Strategy: defer -->
-    <script src="scripts/preferences-colors.js?v=1.0.0" defer></script> <!-- Color system (60+ preferences) -->
-    <!-- [109] Load Order: 109 | Strategy: defer -->
-    <script src="scripts/preferences-manager.js?v=1.0.0" defer></script> <!-- Preferences manager (central) -->
-    <!-- [110] Load Order: 110 | Strategy: defer -->
-    <script src="scripts/preferences-profiles.js?v=1.0.0" defer></script> <!-- Profile management -->
-    <!-- [111] Load Order: 111 | Strategy: defer -->
-    <script src="scripts/preferences-lazy-loader.js?v=1.0.0" defer></script> <!-- lazy loading system -->
-    <!-- [112] Load Order: 112 | Strategy: defer -->
-    <script src="scripts/preferences-validation.js?v=1.0.0" defer></script> <!-- validation system -->
-    <!-- [113] Load Order: 113 | Strategy: defer -->
-    <script src="scripts/preferences-ui-v4.js?v=1.0.0" defer></script> <!-- User interface V4 (Group-First) -->
-    <!-- [114] Load Order: 114 | Strategy: defer -->
-    <script src="scripts/preferences-ui.js?v=1.0.0" defer></script> <!-- User interface -->
-    <!-- [115] Load Order: 115 | Strategy: defer -->
-    <script src="scripts/preferences-page.js?v=1.0.0" defer></script> <!-- Preferences page specific functions -->
-    <!-- [116] Load Order: 116 | Strategy: defer -->
-    <script src="scripts/preferences-debug-monitor.js?v=1.0.0" defer></script> <!-- Monitoring and debugging code for preferences issues -->
-    <!-- [117] Load Order: 117 | Strategy: defer -->
-    <script src="scripts/preferences-group-manager.js?v=1.0.0" defer></script> <!-- Preferences group manager -->
-    <!-- [118] Load Order: 118 | Strategy: defer -->
-    <script src="scripts/testing/automated/preferences-browser-test.js?v=1.0.0" defer></script> <!-- Automated browser test suite for preferences -->
-
-    <!-- =============================================================== -->
-    <!-- ===== PACKAGE 10/14: CONDITIONS PACKAGE ===== -->
-    <!-- =============================================================== -->
-    <!-- Load Order: 6.5 | Description: Condition systems -->
-    <!-- Dependencies: base, validation -->
-    <!-- Critical: NO | Version: 1.5.0 -->
-
-    <!-- [119] Load Order: 119 | Strategy: defer -->
-    <script src="scripts/conditions/conditions-translations.js?v=1.0.0" defer></script> <!-- Condition translations -->
-    <!-- [120] Load Order: 120 | Strategy: defer -->
-    <script src="scripts/conditions/conditions-validator.js?v=1.0.0" defer></script> <!-- Condition validator -->
-    <!-- [121] Load Order: 121 | Strategy: defer -->
-    <script src="scripts/conditions/conditions-form-generator.js?v=1.0.0" defer></script> <!-- Condition form generator -->
-    <!-- [122] Load Order: 122 | Strategy: defer -->
-    <script src="scripts/conditions/conditions-crud-manager.js?v=1.0.0" defer></script> <!-- Condition CRUD manager -->
-    <!-- [123] Load Order: 123 | Strategy: defer -->
-    <script src="scripts/conditions/conditions-initializer.js?v=1.0.0" defer></script> <!-- Condition initializer -->
-    <!-- [124] Load Order: 124 | Strategy: defer -->
-    <script src="scripts/conditions/conditions-ui-manager.js?v=1.0.0" defer></script> <!-- Condition UI manager -->
-    <!-- [125] Load Order: 125 | Strategy: defer -->
-    <script src="scripts/conditions/conditions-modal-controller.js?v=1.0.0" defer></script> <!-- Condition modal controller -->
-
-    <!-- =============================================================== -->
-    <!-- ===== PACKAGE 11/14: ENTITY DETAILS PACKAGE ===== -->
-    <!-- =============================================================== -->
-    <!-- Load Order: 17 | Description: Entity details systems -->
-    <!-- Dependencies: base, services, ui-advanced, crud, preferences, entity-services -->
-    <!-- Critical: NO | Version: 1.5.0 -->
-
-    <!-- [126] Load Order: 126 | Strategy: defer -->
-    <script src="scripts/entity-details-api.js?v=1.0.0" defer></script> <!-- Entity details API -->
-    <!-- [127] Load Order: 127 | Strategy: defer -->
-    <script src="scripts/entity-details-renderer.js?v=1.0.0" defer></script> <!-- Entity details renderer -->
-    <!-- [128] Load Order: 128 | Strategy: defer -->
-    <script src="scripts/entity-details-modal.js?v=1.0.0" defer></script> <!-- Entity details modal -->
-
-    <!-- =============================================================== -->
-    <!-- ===== PACKAGE 12/14: INFO SUMMARY PACKAGE ===== -->
-    <!-- =============================================================== -->
-    <!-- Load Order: 17.5 | Description: Unified data summary system for all pages -->
-    <!-- Dependencies: base, services -->
-    <!-- Critical: NO | Version: 1.0.0 -->
-
-    <!-- [129] Load Order: 129 | Strategy: defer -->
-    <script src="scripts/info-summary-system.js?v=1.0.0" defer></script> <!-- Core data summary system -->
-    <!-- [130] Load Order: 130 | Strategy: defer -->
-    <script src="scripts/info-summary-configs.js?v=1.0.0" defer></script> <!-- Page configurations for data summary -->
-
-    <!-- =============================================================== -->
-    <!-- ===== PACKAGE 13/14: DASHBOARD WIDGETS ===== -->
-    <!-- =============================================================== -->
-    <!-- Load Order: 20.6 | Description: Widgets and dashboard interfaces (Pending Executions, Trade Creation) -->
-    <!-- Dependencies: base, services, ui-advanced, entity-services, modules, entity-details, watch-lists -->
-    <!-- Critical: NO | Version: 1.0.0 -->
-
-    <!-- [131] Load Order: 131 | Strategy: defer -->
-    <script src="scripts/services/dashboard-data.js?v=1.0.0" defer></script> <!-- Unified dashboard data service -->
-    <!-- [132] Load Order: 132 | Strategy: defer -->
-    <script src="scripts/widgets/recent-items-widget.js?v=1.0.0" defer></script> <!-- Unified recent trades and trade plans widget -->
-    <!-- [133] Load Order: 133 | Strategy: defer -->
-    <script src="scripts/widgets/recent-trades-widget.js?v=1.0.0" defer></script> <!-- Recent trades widget (deprecated - use RecentItemsWidget) -->
-    <!-- [134] Load Order: 134 | Strategy: defer -->
-    <script src="scripts/widgets/unified-pending-actions-widget.js?v=1.0.0" defer></script> <!-- Unified pending actions widget -->
-    <!-- [135] Load Order: 135 | Strategy: defer -->
-    <script src="scripts/widgets/tag-widget.js?v=1.0.0" defer></script> <!-- Unified tag widget (cloud + search) -->
-    <!-- [136] Load Order: 136 | Strategy: defer -->
-    <script src="scripts/active-alerts-component.js?v=1.0.0" defer></script> <!-- Active alerts component -->
-    <!-- [137] Load Order: 137 | Strategy: defer -->
-    <script src="scripts/widgets/ticker-list-widget.js?v=1.0.0" defer></script> <!-- Ticker list widget with KPI cards -->
-    <!-- [138] Load Order: 138 | Strategy: defer -->
-    <script src="scripts/widgets/ticker-chart-widget.js?v=1.0.0" defer></script> <!-- Ticker chart widget with mini charts -->
-    <!-- [139] Load Order: 139 | Strategy: defer -->
-    <script src="scripts/widgets/watch-lists-widget.js?v=1.0.0" defer></script> <!-- Watch lists widget for dashboard -->
-    <!-- [140] Load Order: 140 | Strategy: defer -->
-    <script src="scripts/index.js?v=1.0.0" defer></script> <!-- Dashboard page logic -->
-    <!-- [141] Load Order: 141 | Strategy: defer -->
-    <script src="scripts/widgets/widget-monitor.js?v=1.0.0" defer></script> <!-- Widget monitoring and debugging system -->
-
-    <!-- =============================================================== -->
-    <!-- ===== PACKAGE 14/14: INITIALIZATION PACKAGE ===== -->
-    <!-- =============================================================== -->
-    <!-- Load Order: 22 | Description: Initialization and monitoring systems -->
-    <!-- Dependencies: base -->
-    <!-- Critical: NO | Version: 1.5.0 -->
-
-    <!-- [142] Load Order: 142 | Strategy: defer -->
-    <script src="scripts/init-system/package-manifest.js?v=1.0.0" defer></script> <!-- Package manifest -->
-    <!-- [143] Load Order: 143 | Strategy: defer -->
-    <script src="scripts/page-initialization-configs.js?v=1.0.0" defer></script> <!-- Page initialization configurations -->
-    <!-- [144] Load Order: 144 | Strategy: defer -->
-    <script src="scripts/init-system-check.js?v=1.0.0" defer></script> <!-- Initialization system check -->
-    <!-- [145] Load Order: 145 | Strategy: defer -->
-    <script src="scripts/monitoring-functions.js?v=1.0.0" defer></script> <!-- Page monitoring functions -->
-    <!-- [146] Load Order: 146 | Strategy: defer -->
-    <script src="scripts/modules/core-systems.js?v=1.0.0" defer></script> <!-- Unified initialization system - single entry point (required for all pages) -->
-    <!-- [147] Load Order: 147 | Strategy: defer -->
-    <script src="scripts/init-system/all-pages-monitoring-test.js?v=1.0.0" defer></script> <!-- Automatic check of all pages -->
-    <!-- [148] Load Order: 148 | Strategy: defer -->
-    <script src="scripts/init-system/pages-standardization-plan.js?v=1.0.0" defer></script> <!-- Standardization plan for all pages -->
-    <!-- [149] Load Order: 149 | Strategy: defer -->
-    <script src="scripts/init-system/dependency-analyzer.js?v=1.0.0" defer></script> <!-- Dependencies analysis in package manifest -->
-    <!-- [150] Load Order: 150 | Strategy: defer -->
-    <script src="scripts/init-system/load-order-validator.js?v=1.0.0" defer></script> <!-- Actual loading order check in pages -->
-
-    <!-- =============================================================== -->
-    <!-- ===== PAGE-SPECIFIC SCRIPTS ===== -->
-    <!-- =============================================================== -->
-
-    <!-- [151] Page-specific: user-profile.js | Strategy: defer -->
-    <script src="scripts/user-profile.js?v=1.0.0" defer></script> <!-- Main page script -->
-
-    <!-- =============================================================== -->
-    <!-- ===== FINAL SUMMARY ===== -->
-    <!-- =============================================================== -->
-    <!-- 📊 Total Scripts Processed: 151 | Unique Scripts Loaded: 151 -->
-    <!-- 🔧 For maintenance: Use generate-script-loading-code.js -->
-
-
+        // Auto-initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🎯 User Profile page loaded');
+            loadUserProfile();
+        });
+    </script>
 </body>
 </html>

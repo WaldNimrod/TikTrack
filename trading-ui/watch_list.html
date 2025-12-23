@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ניתוח AI - TikTrack</title>
+    <title>רשימת מעקב - TikTrack</title>
 
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -18,71 +18,62 @@
     <link rel="stylesheet" href="styles-new/header-styles.css?v=0da3519a_20251102_104906" media="print" onload="this.media='all'; this.onload=null;">
 </head>
 
-<body class="ai-analysis-page">
+<body class="watch-list-page">
     <!-- 🔒 LOCKED TEMPLATE ZONE 1 - Header & Navigation (DO NOT MODIFY) -->
     <div id="unified-header"></div>
     <!-- 🔒 LOCKED TEMPLATE ZONE 2 - Background Wrapper (DO NOT MODIFY) -->
     <div class="background-wrapper">
         <div class="page-body">
             <!-- 🔒 LOCKED TEMPLATE ZONE 3 - Main Content Container (DO NOT MODIFY) -->
-            <div class="main-content" data-section="ai-analysis">
+            <div class="main-content" data-section="watch-list">
 
                 <!-- UI Content Section Top Start-->
                 <div class="top-section" data-section="top">
                     <div class="section-header">
-                        <h2><img src="/trading-ui/images/icons/tabler/brain.svg" width="24" height="24" alt="brain" class="icon"> ניתוח AI</h2>
+                        <h2><img src="/trading-ui/images/icons/tabler/eye.svg" width="24" height="24" alt="eye" class="icon"> רשימת מעקב</h2>
                         <div class="section-header-controls">
-                            <button data-button-type="REFRESH" data-onclick="refreshAIAnalysis()" data-text="רענן" title="רענן נתוני AI">
+                            <button data-button-type="ADD" data-onclick="addToWatchList()" data-text="הוסף" title="הוסף טיקר למעקב">
+                            </button>
+                            <button data-button-type="REFRESH" data-onclick="refreshWatchList()" data-text="רענן" title="רענן נתונים">
                             </button>
                         </div>
                     </div>
 
                     <!-- Content -->
-                    <div class="content-section" data-section="ai-analysis-content">
+                    <div class="content-section" data-section="watch-list-content">
                         <div class="section-body">
                             <div class="card">
                                 <div class="card-body">
                                     <div class="alert alert-info">
-                                        <h5><i class="fas fa-brain"></i> מערכת ניתוח AI</h5>
-                                        <p>מערכת זו מספקת ניתוחים מתקדמים מבוססי בינה מלאכותית עבור נתוני המסחר שלך.</p>
+                                        <h5><i class="fas fa-eye"></i> רשימת מעקב</h5>
+                                        <p>רשימת הטיקרים שברצונך לעקוב אחריהם בזמן אמת.</p>
                                         <p><strong>סטטוס:</strong> <span class="badge bg-success">פעיל</span></p>
-                                        <p><strong>גרסה:</strong> AI Engine v2.1.0</p>
+                                        <p><strong>טיקרים במעקב:</strong> <span id="watchListCount">0</span></p>
                                     </div>
 
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="card">
-                                                <div class="card-header">
-                                                    <h6>ניתוח טרנדים</h6>
-                                                </div>
-                                                <div class="card-body">
-                                                    <p>זיהוי דפוסי מסחר וטרנדים בשוק</p>
-                                                    <div class="text-center">
-                                                        <div class="spinner-border text-primary" role="status">
-                                                            <span class="visually-hidden">טוען...</span>
-                                                        </div>
-                                                        <p class="mt-2 text-muted">מנתח נתונים...</p>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div class="col-md-6">
-                                            <div class="card">
-                                                <div class="card-header">
-                                                    <h6>חיזוי ביצועים</h6>
-                                                </div>
-                                                <div class="card-body">
-                                                    <p>חיזוי ביצועי עסקאות עתידיות</p>
-                                                    <div class="text-center">
-                                                        <div class="spinner-border text-success" role="status">
-                                                            <span class="visually-hidden">טוען...</span>
-                                                        </div>
-                                                        <p class="mt-2 text-muted">מחשב חיזויים...</p>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
+                                    <!-- Watch List Table -->
+                                    <div class="table-responsive">
+                                        <table class="table table-striped" id="watchListTable">
+                                            <thead>
+                                                <tr>
+                                                    <th>טיקר</th>
+                                                    <th>שם חברה</th>
+                                                    <th>מחיר נוכחי</th>
+                                                    <th>שינוי יומי</th>
+                                                    <th>שינוי %</th>
+                                                    <th>פעולות</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="watchListBody">
+                                                <tr>
+                                                    <td colspan="6" class="text-center text-muted">
+                                                        <i class="fas fa-eye-slash"></i> אין טיקרים ברשימת המעקב
+                                                        <br>
+                                                        <small>לחץ על "הוסף" כדי להתחיל לעקוב אחרי טיקרים</small>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
                                     </div>
                                 </div>
                             </div>
@@ -116,23 +107,41 @@
 
     <!-- Page-specific script -->
     <script>
-        // AI Analysis page functionality
-        window.refreshAIAnalysis = function() {
+        // Watch List page functionality
+        window.watchListData = [];
+
+        window.addToWatchList = function() {
+            // Placeholder for adding ticker to watch list
             if (window.NotificationSystem) {
-                window.NotificationSystem.showInfo('ניתוח AI', 'מרענן נתונים...', 2000);
+                window.NotificationSystem.showInfo('רשימת מעקב', 'פונקציונליות הוספה תתווסף בקרוב...', 3000);
+            }
+        };
+
+        window.refreshWatchList = function() {
+            if (window.NotificationSystem) {
+                window.NotificationSystem.showInfo('רשימת מעקב', 'מרענן נתונים...', 2000);
             }
 
-            // Simulate AI processing
+            // Simulate data refresh
             setTimeout(() => {
+                updateWatchListCount();
                 if (window.NotificationSystem) {
-                    window.NotificationSystem.showSuccess('ניתוח AI', 'הנתונים עודכנו בהצלחה!', 3000);
+                    window.NotificationSystem.showSuccess('רשימת מעקב', 'הנתונים עודכנו!', 3000);
                 }
-            }, 2000);
+            }, 1000);
         };
+
+        function updateWatchListCount() {
+            const countElement = document.getElementById('watchListCount');
+            if (countElement) {
+                countElement.textContent = window.watchListData.length;
+            }
+        }
 
         // Auto-initialize
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('🎯 AI Analysis page loaded');
+            console.log('🎯 Watch List page loaded');
+            updateWatchListCount();
         });
     </script>
 </body>

@@ -38,24 +38,7 @@ const PUBLIC_PAGES = [
  * Helper function to send debug log only if not on public page
  * Prevents CORS errors on login.html and other public pages
  */
-function sendDebugLog(location, message, data, hypothesisId) {
-  if (isPublicPage()) {
-    return; // Don't send logs on public pages to avoid CORS errors
-  }
-  fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({
-      location,
-      message,
-      data,
-      timestamp:Date.now(),
-      sessionId:'debug-session',
-      runId:'run2',
-      hypothesisId
-    })
-  }).catch(()=>{});
-}
+// Debug logging function removed to avoid CORS errors
 
 /**
  * Check if current page is a public page (doesn't require authentication)
@@ -166,47 +149,20 @@ async function showLoginModal() {
  * Checks authentication on page load
  */
 async function initAuthGuard() {
-  // #region agent log
-  sendDebugLog('auth-guard.js:148', 'initAuthGuard ENTRY', {
-    pathname: window.location.pathname,
-    search: window.location.search,
-    hash: window.location.hash,
-    readyState: document.readyState
-  }, 'C');
-  // #endregion
   window.Logger?.info?.('🚀 [Auth Guard] Initializing', { page: 'auth-guard' });
   
   // Check if this is a public page - skip authentication check
   const isPublic = isPublicPage();
-  // #region agent log
-  sendDebugLog('auth-guard.js:155', 'isPublicPage check', {
-    pathname: window.location.pathname,
-    isPublic,
-    publicPages: PUBLIC_PAGES
-  }, 'C');
-  // #endregion
   if (isPublic) {
     window.Logger?.info?.('✅ [Auth Guard] Public page detected, skipping auth check', { 
       page: 'auth-guard',
       path: window.location.pathname 
     });
-    // #region agent log
-    sendDebugLog('auth-guard.js:163', 'Returning early - public page', {
-      pathname: window.location.pathname
-    }, 'C');
-    // #endregion
     return; // No need to check authentication for public pages
   }
   
   // Check for recent login to prevent redirect loop
   const recentLogin = sessionStorage.getItem('recent_login_timestamp');
-  // #region agent log
-  sendDebugLog('auth-guard.js:162', 'recent_login_timestamp check', {
-    recentLogin,
-    timeSinceLogin: recentLogin ? Date.now() - parseInt(recentLogin) : null,
-    hasRecentLogin: !!recentLogin
-  }, 'D');
-  // #endregion
   if (recentLogin) {
     const timeSinceLogin = Date.now() - parseInt(recentLogin);
     if (timeSinceLogin < 5000) {
@@ -242,12 +198,6 @@ async function initAuthGuard() {
 
   // Wait briefly for token to be available (SessionStorageLayer or bootstrap fallback) before first check
   let tokenReady = false;
-  // #region agent log
-  sendDebugLog('auth-guard.js:201', 'Starting token availability check loop', {
-    hasUnifiedCache: !!window.UnifiedCacheManager,
-    ucInitialized: window.UnifiedCacheManager?.initialized
-  }, 'B');
-  // #endregion
   for (let i = 0; i < 10; i++) {
     const hasUC = window.UnifiedCacheManager?.initialized;
     // Try SessionStorageLayer through UnifiedCacheManager first (preferred method)
@@ -255,70 +205,25 @@ async function initAuthGuard() {
       layer: 'sessionStorage', 
       includeUserId: false 
     }).catch((e) => {
-      // #region agent log
-      sendDebugLog('auth-guard.js:207', 'UnifiedCacheManager.get authToken ERROR', {
-        error: e?.message,
-        attempt: i
-      }, 'B');
-      // #endregion
       return null;
     }) : null;
     // Fallback: direct sessionStorage (bootstrap mode - before UnifiedCacheManager initializes)
     const ssToken = (typeof sessionStorage !== 'undefined') ? sessionStorage.getItem('dev_authToken') : null;
 
     console.log('[auth-guard] Check', i, '- UC initialized:', hasUC, 'UC token:', !!ucToken, 'SS token:', !!ssToken);
-    // #region agent log
-    sendDebugLog('auth-guard.js:213', 'Token check iteration', {
-      attempt: i,
-      hasUC,
-      hasUCToken: !!ucToken,
-      hasSSToken: !!ssToken
-    }, 'B');
-    // #endregion
 
     if (ucToken || ssToken) {
       tokenReady = true;
       console.log('[auth-guard] Token found! UC:', !!ucToken, 'SS:', !!ssToken);
-      // #region agent log
-      sendDebugLog('auth-guard.js:218', 'Token found in auth-guard', {
-        hasUCToken: !!ucToken,
-        hasSSToken: !!ssToken,
-        attempt: i,
-        hasUC: hasUC
-      }, 'B');
-      // #endregion
       break;
     }
     await new Promise(resolve => setTimeout(resolve, 100));
   }
-  // #region agent log
-  sendDebugLog('auth-guard.js:223', 'Token availability check loop finished', {
-    tokenReady
-  }, 'B');
-  // #endregion
   
   let result = { authenticated: false, user: null, error: 'unknown' };
-  // #region agent log
-  sendDebugLog('auth-guard.js:247', 'BEFORE checkAuthentication call', {
-    hasTikTrackAuth: typeof window.TikTrackAuth !== 'undefined',
-    hasCheckAuth: typeof window.TikTrackAuth?.checkAuthentication === 'function',
-    hasSessionStorage: typeof sessionStorage !== 'undefined',
-    sessionToken: typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('dev_authToken') : null,
-    pathname: window.location.pathname
-  }, 'A');
-  // #endregion
   try {
     window.Logger?.info?.('🔍 [Auth Guard] Calling checkAuthentication', { page: 'auth-guard' });
     const r = await checkAuthentication();
-    // #region agent log
-    sendDebugLog('auth-guard.js:253', 'AFTER checkAuthentication call', {
-      authenticated: r?.authenticated,
-      hasUser: !!r?.user,
-      error: r?.error,
-      userId: r?.user?.id,
-      pathname: window.location.pathname
-    }, 'A');
-    // #endregion
     window.Logger?.info?.('🔍 [Auth Guard] checkAuthentication result', {
       authenticated: r?.authenticated,
       hasUser: !!r?.user,
@@ -342,14 +247,6 @@ async function initAuthGuard() {
       page: 'auth-guard',
       error: result.error 
     });
-      // #region agent log
-      sendDebugLog('auth-guard.js:252', 'User NOT authenticated - preparing redirect', {
-        authenticated: result.authenticated,
-        error: result.error,
-        pathname: window.location.pathname,
-        isLoginPage: window.location.pathname.includes('login.html')
-      }, 'A');
-      // #endregion
       // User is not authenticated - redirect to login page
       window.Logger?.info?.('🔄 [Auth Guard] Redirecting to login page', {
         page: 'auth-guard',
@@ -363,15 +260,6 @@ async function initAuthGuard() {
 
       // Redirect to login page (only if not already on login page)
       if (!window.location.pathname.includes('login.html')) {
-        // #region agent log
-        sendDebugLog('auth-guard.js:294', 'BEFORE window.location.href redirect to login.html', {
-          targetUrl: '/login.html',
-          currentPath: window.location.pathname,
-          page: 'auth-guard',
-          authenticated: result.authenticated,
-          error: result.error
-        }, 'E');
-        // #endregion
         // Redirect to login page immediately (no confirm dialog)
         window.location.href = '/login.html';
     } else {

@@ -283,18 +283,22 @@ class IntegratedCRUDE2ETester {
     startLiveMonitoring() {
         this.monitoringActive = true;
 
-        // Use advanced debug monitor if available
-        if (window.getDebugMonitor) {
-            const debugMonitor = window.getDebugMonitor();
-            if (debugMonitor.isActive) {
-                this.logger?.info('✅ Advanced Debug Monitor already active');
-                return;
+        // Use advanced debug monitor if available (without CORS issues)
+        try {
+            if (window.getDebugMonitor) {
+                const debugMonitor = window.getDebugMonitor();
+                if (debugMonitor.isActive) {
+                    this.logger?.info('✅ Advanced Debug Monitor already active');
+                    return;
+                }
+                debugMonitor.startMonitoring();
+            } else {
+                // Fallback to basic monitoring
+                this.logger?.warn('⚠️ Advanced Debug Monitor not available, using basic monitoring');
+                this.setupBasicMonitoring();
             }
-            debugMonitor.startMonitoring();
-        } else {
-            // Fallback to basic monitoring
-            this.logger?.warn('⚠️ Advanced Debug Monitor not available, using basic monitoring');
-            this.setupBasicMonitoring();
+        } catch (error) {
+            this.logger?.warn('⚠️ Debug monitoring failed due to CORS, continuing without it', error);
         }
     }
 
@@ -415,6 +419,76 @@ class IntegratedCRUDE2ETester {
 }
 
 // ============================================================================
+// PROGRESS TRACKING FUNCTIONS
+// ============================================================================
+
+/**
+ * Initialize progress tracking UI
+ */
+function initializeProgressTracking() {
+    console.log('🎯 initializeProgressTracking called!');
+    const progressContainer = document.getElementById('progressContainer');
+    if (progressContainer) {
+        console.log('✅ Found progress container, showing it');
+        progressContainer.style.display = 'block';
+        updateProgress(0, 'מתכונן לבדיקה...', 'מאתחל מערכת בדיקות...');
+    } else {
+        console.log('❌ Progress container not found!');
+    }
+}
+
+/**
+ * Update progress bar and status
+ */
+function updateProgress(percent, text, details = '') {
+    const progressBar = document.getElementById('progressBar');
+    const progressText = document.getElementById('progressText');
+    const progressPercent = document.getElementById('progressPercent');
+    const progressDetails = document.getElementById('progressDetails');
+
+    if (progressBar) {
+        progressBar.style.width = percent + '%';
+        progressBar.setAttribute('aria-valuenow', percent);
+    }
+
+    if (progressText) progressText.textContent = text;
+    if (progressPercent) progressPercent.textContent = percent + '%';
+    if (progressDetails && details) progressDetails.textContent = details;
+}
+
+/**
+ * Hide progress tracking UI
+ */
+function hideProgressTracking() {
+    const progressContainer = document.getElementById('progressContainer');
+    if (progressContainer) {
+        setTimeout(() => {
+            progressContainer.style.display = 'none';
+        }, 2000); // Hide after 2 seconds
+    }
+}
+
+/**
+ * Update system status message
+ */
+function updateSystemStatus(message, type = 'info') {
+    const systemStatus = document.getElementById('systemStatus');
+    if (systemStatus) {
+        const alertClass = type === 'success' ? 'alert-success' :
+                          type === 'error' ? 'alert-danger' :
+                          type === 'warning' ? 'alert-warning' : 'alert-info';
+
+        systemStatus.innerHTML = `<div class="alert ${alertClass} mb-0">${message}</div>`;
+    }
+}
+
+// Export functions to global scope for crud-testing-enhanced.js
+window.updateProgress = updateProgress;
+window.updateSystemStatus = updateSystemStatus;
+window.initializeProgressTracking = initializeProgressTracking;
+window.hideProgressTracking = hideProgressTracking;
+
+// ============================================================================
 // GLOBAL FUNCTIONS FOR HTML INTEGRATION
 // ============================================================================
 
@@ -429,9 +503,6 @@ async function initializeCRUDTestingDashboard() {
     if (!integratedTester) {
         integratedTester = new IntegratedCRUDE2ETester();
     }
-
-    // Update system status
-    updateSystemStatus('מערכת הבדיקות מוכנה לפעולה. בחר סוג בדיקה כדי להתחיל.');
 }
 
 /**
@@ -462,14 +533,36 @@ window.runUITests = async function() {
  * Run API tests only
  */
 window.runAPITests = async function() {
-    console.log('🧪 Starting API Tests from browser...');
 
     if (!integratedTester) {
         integratedTester = new IntegratedCRUDE2ETester();
     }
 
     showTestSection('test-results');
-    await integratedTester.runAPITests();
+
+    // Initialize progress tracking
+    initializeProgressTracking();
+
+    try {
+        // הוספת timeout למקרה שהבדיקה נתקעת
+        const testPromise = integratedTester.runAPITests();
+        const timeoutPromise = new Promise((_, reject) => {
+            setTimeout(() => reject(new Error('הבדיקה נתקעה - timeout אחרי 5 דקות')), 300000); // 5 minutes
+        });
+
+        await Promise.race([testPromise, timeoutPromise]);
+        updateSystemStatus('✅ בדיקות API הושלמו בהצלחה!', 'success');
+    } catch (error) {
+        console.error('❌ API Tests failed:', error);
+        updateSystemStatus('❌ בדיקות API נכשלו: ' + error.message, 'error');
+
+        // הצגת תוצאות גם אם יש שגיאה
+        if (integratedTester && integratedTester.results && integratedTester.results.length > 0) {
+            updateSystemStatus(`⚠️ הבדיקה נעצרה אבל יש ${integratedTester.results.length} תוצאות חלקיות`, 'warning');
+        }
+    } finally {
+        hideProgressTracking();
+    }
 
     console.log('✅ API Tests completed');
 };
@@ -530,12 +623,18 @@ window.showErrorTracker = function() {
  * Utility functions
  */
 function showTestSection(sectionId) {
-    // Hide all sections
-    document.querySelectorAll('[data-section]').forEach(section => {
-        section.style.display = 'none';
+    // Sections that should always be visible
+    const alwaysVisibleSections = ['top', 'test-selection'];
+
+    // Hide all test result sections (not main content and not always visible)
+    document.querySelectorAll('[data-section]:not(.main-content)').forEach(section => {
+        const sectionName = section.getAttribute('data-section');
+        if (!alwaysVisibleSections.includes(sectionName)) {
+            section.style.display = 'none';
+        }
     });
 
-    // Show selected section
+    // Show selected section (if not already visible)
     const targetSection = document.querySelector(`[data-section="${sectionId}"]`);
     if (targetSection) {
         targetSection.style.display = 'block';

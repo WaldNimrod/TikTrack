@@ -191,9 +191,6 @@ async function loadCashFlowsData(options = {}) {
 
   try {
     const beforeCount = Array.isArray(cashFlowsData) ? cashFlowsData.length : 0;
-    // #region agent log
-    window.Logger?.debug('🔍 [DEBUG] loadCashFlowsData started', { beforeCount, useService: typeof window.CashFlowsData?.loadCashFlowsData === 'function', page: 'cash_flows' });
-    // #endregion
     window.Logger.info('Loading cash flows data', {
       page: 'cash_flows',
       force: loadOptions.force,
@@ -204,9 +201,6 @@ async function loadCashFlowsData(options = {}) {
     const data = useService
       ? await window.CashFlowsData.loadCashFlowsData(loadOptions)
       : await fallbackLoader();
-    // #region agent log
-    window.Logger?.debug('🔍 [DEBUG] Data loaded from service/fallback', { dataLength: Array.isArray(data) ? data.length : 'not array', dataType: typeof data, isArray: Array.isArray(data), page: 'cash_flows' });
-    // #endregion
 
     const normalizedCashFlows = Array.isArray(data)
       ? data.map(cf => ({
@@ -216,18 +210,12 @@ async function loadCashFlowsData(options = {}) {
       : [];
 
     const preparedCashFlows = ensureExchangePairsAdjacency(normalizedCashFlows);
-    // #region agent log
-    window.Logger?.debug('🔍 [DEBUG] Cash flows prepared and assigned', { normalizedLength: normalizedCashFlows.length, preparedLength: preparedCashFlows.length, page: 'cash_flows' });
-    // #endregion
     window.cashFlowsData = preparedCashFlows;
     window.allCashFlowsData = preparedCashFlows;
     window.filteredCashFlowsData = preparedCashFlows;
     cashFlowsData = preparedCashFlows;
 
     await syncCashFlowsPagination(preparedCashFlows);
-    // #region agent log
-    window.Logger?.debug('🔍 [DEBUG] Pagination synced', { hasPaginationInstance: !!window.cashFlowsPaginationInstance, page: 'cash_flows' });
-    // #endregion
 
     if (typeof window.applyDefaultSort === 'function') {
       try {
@@ -1461,9 +1449,6 @@ async function renderCashFlowsTable() {
   const dataToRender = Array.isArray(window.filteredCashFlowsData) && window.filteredCashFlowsData.length > 0
     ? window.filteredCashFlowsData
     : (Array.isArray(cashFlowsData) ? cashFlowsData : []);
-  // #region agent log
-  window.Logger?.debug('🔍 [DEBUG] renderCashFlowsTable started', { filteredDataLength: window.filteredCashFlowsData?.length || 0, cashFlowsDataLength: Array.isArray(cashFlowsData) ? cashFlowsData.length : 0, dataToRenderLength: dataToRender.length, hasTbody: !!tbody, page: 'cash_flows' });
-  // #endregion
   window.Logger?.debug('🎨 [renderCashFlowsTable] Rendering table', {
     filteredDataLength: window.filteredCashFlowsData?.length || 0,
     cashFlowsDataLength: cashFlowsData?.length || 0,
@@ -1669,9 +1654,6 @@ async function renderCashFlowsTable() {
     tbody.appendChild(row);
   });
 
-  // #region agent log
-  window.Logger?.debug('🔍 [DEBUG] renderCashFlowsTable completed', { rowsToRender: dataToRender.length, rowsRendered: tbody.children.length, hasTbody: !!tbody, page: 'cash_flows' });
-  // #endregion
   window.Logger?.info('✅ [renderCashFlowsTable] Rendered rows', {
     rowsRendered: dataToRender.length,
     tbodyChildren: tbody.children.length,
@@ -2913,9 +2895,6 @@ function applyUserPreferences(preferences) {
  * @returns {Promise<void>}
  */
 async function initializeCashFlowsPage() {
-  // #region agent log
-  window.Logger?.debug('🔍 [DEBUG] initializeCashFlowsPage called', { page: 'cash_flows' });
-  // #endregion
   window.Logger?.debug('🚀 [initializeCashFlowsPage] Starting initialization...');
   window.Logger.info('Initializing cash flows page', { page: 'cash_flows' });
 
@@ -2939,13 +2918,7 @@ async function initializeCashFlowsPage() {
     await window.loadCurrenciesFromServer();
 
     // טעינת נתונים
-    // #region agent log
-    window.Logger?.debug('🔍 [DEBUG] About to call loadCashFlowsData from init', { page: 'cash_flows' });
-    // #endregion
     await loadCashFlowsData();
-    // #region agent log
-    window.Logger?.debug('🔍 [DEBUG] loadCashFlowsData returned from init', { dataLength: Array.isArray(window.cashFlowsData) ? window.cashFlowsData.length : 'not array', page: 'cash_flows' });
-    // #endregion
 
     // שחזור מצב הסגירה
     if (typeof window.restoreSectionStates === 'function') {

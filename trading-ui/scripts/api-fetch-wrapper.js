@@ -82,9 +82,6 @@
     // This prevents race conditions during page load
     if (window._checkingAuth) {
       window.Logger?.info?.('⏳ [API Fetch Wrapper] Skipping redirect - authentication check in progress', { url });
-      // #region agent log
-      // Note: Debug logs removed to prevent CORS errors - use browser console for debugging
-      // #endregion
       return;
     }
 

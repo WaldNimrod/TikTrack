@@ -2673,55 +2673,11 @@ def serve_ui_files(filename):
     if guessed:
         resp.mimetype = guessed
 
-    # #region agent log - hypothesis A: Trading UI route response
-    try:
-        with open('/Users/nimrod/Documents/TikTrack/TikTrackApp/.cursor/debug.log', 'a') as f:
-            log_entry = json.dumps({
-                "sessionId": "debug-session",
-                "runId": "initial-run",
-                "hypothesisId": "A",
-                "location": "Backend/app.py:2652",
-                "message": "trading-ui route response",
-                "data": {
-                    "filename": filename,
-                    "guessed_mimetype": guessed,
-                    "response_mimetype": getattr(resp, 'mimetype', 'no-mimetype'),
-                    "content_type": resp.headers.get('Content-Type', 'no-content-type')
-                },
-                "timestamp": int(time.time() * 1000)
-            })
-            f.write(log_entry + '\n')
-    except Exception as e:
-        pass
-    # #endregion
-
     return resp
 
 @app.route('/<path:filename>')
 def serve_static_files(filename):
     """Backward compatibility for existing relative links"""
-    # #region agent log - hypothesis A: Static file serving with wrong MIME types
-    import json
-    import os
-    try:
-        with open('/Users/nimrod/Documents/TikTrack/TikTrackApp/.cursor/debug.log', 'a') as f:
-            log_entry = json.dumps({
-                "sessionId": "debug-session",
-                "runId": "initial-run",
-                "hypothesisId": "A",
-                "location": "Backend/app.py:2655",
-                "message": "serve_static_files called",
-                "data": {
-                    "filename": filename,
-                    "exists_in_ui": os.path.exists(os.path.join(UI_DIR, filename)),
-                    "file_extension": os.path.splitext(filename)[1] if '.' in filename else 'no-ext'
-                },
-                "timestamp": int(time.time() * 1000)
-            })
-            f.write(log_entry + '\n')
-    except Exception as e:
-        pass  # Ignore logging errors
-    # #endregion
 
     # First try UI directory
     ui_path = os.path.join(UI_DIR, filename)
@@ -2729,28 +2685,6 @@ def serve_static_files(filename):
         # Guess mimetype and set explicitly to avoid JSON default
         import mimetypes
         guessed, _ = mimetypes.guess_type(ui_path)
-
-        # #region agent log - hypothesis A: Sending file with MIME type
-        try:
-            with open('/Users/nimrod/Documents/TikTrack/TikTrackApp/.cursor/debug.log', 'a') as f:
-                log_entry = json.dumps({
-                    "sessionId": "debug-session",
-                    "runId": "initial-run",
-                    "hypothesisId": "A",
-                    "location": "Backend/app.py:2659",
-                    "message": "sending file from UI directory with MIME type",
-                    "data": {
-                        "filename": filename,
-                        "ui_path": ui_path,
-                        "guessed_mimetype": guessed
-                    },
-                    "timestamp": int(time.time() * 1000)
-                })
-                f.write(log_entry + '\n')
-        except Exception as e:
-            pass
-        # #endregion
-
         resp = send_from_directory(UI_DIR, filename)
         if guessed:
             resp.mimetype = guessed
@@ -2758,28 +2692,6 @@ def serve_static_files(filename):
             resp.mimetype = 'text/css'
         elif filename.endswith('.js'):
             resp.mimetype = 'application/javascript'
-
-        # #region agent log - hypothesis A: Response MIME type check
-        try:
-            with open('/Users/nimrod/Documents/TikTrack/TikTrackApp/.cursor/debug.log', 'a') as f:
-                log_entry = json.dumps({
-                    "sessionId": "debug-session",
-                    "runId": "initial-run",
-                    "hypothesisId": "A",
-                    "location": "Backend/app.py:2660",
-                    "message": "response created",
-                    "data": {
-                        "filename": filename,
-                        "mimetype": getattr(resp, 'mimetype', 'no-mimetype'),
-                        "content_type": resp.headers.get('Content-Type', 'no-content-type')
-                    },
-                    "timestamp": int(time.time() * 1000)
-                })
-                f.write(log_entry + '\n')
-        except Exception as e:
-            pass
-        # #endregion
-
         return resp
     return "File not found", 404
 

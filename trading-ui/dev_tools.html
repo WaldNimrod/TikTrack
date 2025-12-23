@@ -50,6 +50,32 @@
             text-decoration: underline;
         }
 
+        /* Column width definitions for consistent table headers */
+        .filename-column {
+            width: 25%;
+            min-width: 200px;
+        }
+
+        .description-column {
+            width: 45%;
+            min-width: 300px;
+        }
+
+        .category-column {
+            width: 15%;
+            min-width: 120px;
+        }
+
+        .access-column {
+            width: 10%;
+            min-width: 80px;
+        }
+
+        .actions-column {
+            width: 5%;
+            min-width: 60px;
+        }
+
         /* Responsive adjustments */
         @media (max-width: 768px) {
             .table-responsive table th,
@@ -61,6 +87,14 @@
             .sortable-header {
                 padding: 0.25rem;
                 font-size: 0.875rem;
+            }
+
+            .filename-column,
+            .description-column,
+            .category-column,
+            .access-column,
+            .actions-column {
+                min-width: auto;
             }
         }
     </style>

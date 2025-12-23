@@ -295,7 +295,7 @@ function waitForModalManager() {
     const checkInterval = setInterval(() => {
         attempts++;
         if (window.ModalManagerV2) {
-            window.Logger?.info?.(`✅ ModalManagerV2 available after ${attempts} attempts, initializing Watch Lists modals...`);
+            window.Logger?.debug?.(`✅ ModalManagerV2 available after ${attempts} attempts, initializing Watch Lists modals...`, { page: 'watch-lists-config' });
             clearInterval(checkInterval);
             if (initializeWatchListModal()) {
                 window.Logger?.debug?.('✅ Watch List modal initialized successfully', { page: 'watch-lists-config' });
@@ -319,7 +319,7 @@ if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', function() {
         // Try immediately if ModalManagerV2 is available
         if (window.ModalManagerV2) {
-            window.Logger?.info?.('✅ ModalManagerV2 available on DOMContentLoaded, initializing Watch Lists modals...');
+            window.Logger?.debug?.('✅ ModalManagerV2 available on DOMContentLoaded, initializing Watch Lists modals...', { page: 'watch-lists-config' });
             if (initializeWatchListModal()) {
                 window.Logger?.debug?.('✅ Watch List modal initialized successfully', { page: 'watch-lists-config' });
             } else {
@@ -340,7 +340,7 @@ if (document.readyState === 'loading') {
 } else {
     // DOM already loaded - try immediately
     if (window.ModalManagerV2) {
-        window.Logger?.info?.('✅ ModalManagerV2 available, initializing Watch Lists modals...');
+        window.Logger?.debug?.('✅ ModalManagerV2 available, initializing Watch Lists modals...', { page: 'watch-lists-config' });
         if (initializeWatchListModal()) {
             window.Logger?.info?.('✅ Watch List modal initialized successfully');
         } else {

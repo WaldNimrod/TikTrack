@@ -480,13 +480,16 @@
     <!-- [56] Page-specific: advanced-debug-monitor.js | Strategy: defer -->
     <script src="scripts/advanced-debug-monitor.js?v=1.0.0" defer></script> <!-- Advanced debug and monitoring system -->
     <!-- [57] Page-specific: crud-testing-dashboard.js | Strategy: defer -->
-    <script src="scripts/crud_testing_dashboard.js?v=1.0.25" defer></script> <!-- Main page script -->
+    <script src="scripts/crud_testing_dashboard.js?v=1.0.26" defer></script> <!-- Main page script -->
 
     <!-- =============================================================== -->
     <!-- ===== FINAL SUMMARY ===== -->
     <!-- =============================================================== -->
     <!-- 📊 Total Scripts Processed: 56 | Unique Scripts Loaded: 56 -->
     <!-- 🔧 For maintenance: Use generate-script-loading-code.js -->
+
+    <!-- Hidden container for E2E test iframes -->
+    <div id="testIframeContainer" style="position: fixed; top: 0; left: 0; width: 1px; height: 1px; overflow: hidden; z-index: -1; opacity: 0; pointer-events: none;"></div>
 
     <!-- Modal for Button System Tests Results -->
     <div class="modal fade" id="buttonSystemTestsModal" tabindex="-1" aria-labelledby="buttonSystemTestsModalLabel" aria-hidden="true">

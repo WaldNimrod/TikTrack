@@ -564,21 +564,51 @@ class IntegratedCRUDE2ETester {
                     reject(new Error(`Failed to load ${url} in iframe: ${error}`));
                 };
                 
-                this.logger?.info('🔵 [loadPageInIframe] Appending iframe to DOM');
-                document.body.appendChild(iframe);
+                // Find or create container for iframes
+                let container = document.getElementById('testIframeContainer');
+                if (!container) {
+                    container = document.createElement('div');
+                    container.id = 'testIframeContainer';
+                    container.style.cssText = 'position: fixed; top: 0; left: 0; width: 1px; height: 1px; overflow: hidden; z-index: -1; opacity: 0; pointer-events: none;';
+                    document.body.appendChild(container);
+                    this.logger?.info('🔵 [loadPageInIframe] Created testIframeContainer');
+                }
                 
-                this.logger?.info('🔵 [loadPageInIframe] Iframe appended to DOM', { 
+                this.logger?.info('🔵 [loadPageInIframe] Appending iframe to container', {
+                    containerExists: !!container,
+                    containerId: container.id
+                });
+                container.appendChild(iframe);
+                
+                this.logger?.info('🔵 [loadPageInIframe] Iframe appended to container', { 
                     iframeInDOM: !!iframe.parentNode,
-                    iframeId: iframe.id 
+                    iframeId: iframe.id,
+                    parentId: iframe.parentNode?.id,
+                    iframeInContainer: iframe.parentNode === container
+                });
+                
+                // Log all iframes in DOM for debugging
+                const allIframes = document.querySelectorAll('iframe');
+                this.logger?.info('🔵 [loadPageInIframe] All iframes in DOM', {
+                    totalIframes: allIframes.length,
+                    iframes: Array.from(allIframes).map(iframe => ({
+                        id: iframe.id,
+                        src: iframe.src,
+                        inDOM: !!iframe.parentNode,
+                        parentId: iframe.parentNode?.id
+                    }))
                 });
                 
                 // Fallback timeout
                 setTimeout(() => {
                     if (!loadHandlerCalled) {
+                        const allIframesAfterTimeout = document.querySelectorAll('iframe');
                         this.logger?.warn('⚠️ [loadPageInIframe] onload not called within 10 seconds, checking iframe state', {
                             iframeInDOM: !!iframe.parentNode,
                             iframeSrc: iframe.src,
-                            iframeContentWindow: !!iframe.contentWindow
+                            iframeContentWindow: !!iframe.contentWindow,
+                            totalIframesInDOM: allIframesAfterTimeout.length,
+                            iframeFoundInDOM: Array.from(allIframesAfterTimeout).some(i => i.id === iframe.id)
                         });
                     }
                 }, 10000);

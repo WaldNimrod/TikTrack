@@ -484,18 +484,10 @@ class TableSorter {
 
       // שימוש ב-sortTableData הקיים (שכבר מעדכן Registry ו-pagination)
       const { safeUpdateFunction, release: releaseUpdate } = TableSorter.prepareUpdateFunction(tableType, config);
-
-      // #region agent log
-      fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'unified-table-system.js:488',message:'Preparing to call sortTableData',data:{tableType,columnIndex,dataLength:data.length,hasSortTableData:typeof window.sortTableData === 'function',hasSafeUpdateFunction:typeof safeUpdateFunction === 'function'},timestamp:Date.now(),sessionId:'debug-session',runId:'sort-debug',hypothesisId:'C'})}).catch(()=>{});
-      // #endregion
+      
+      // Use window.sortTableData if available, otherwise perform sorting directly
       if (typeof window.sortTableData === 'function') {
-        // #region agent log
-        fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'unified-table-system.js:490',message:'Calling sortTableData',data:{tableType,columnIndex,dataLength:data.length},timestamp:Date.now(),sessionId:'debug-session',runId:'sort-debug',hypothesisId:'C'})}).catch(()=>{});
-        // #endregion
         const sortResult = window.sortTableData(columnIndex, data, tableType, safeUpdateFunction, sortOptions);
-        // #region agent log
-        fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'unified-table-system.js:492',message:'sortTableData returned',data:{tableType,columnIndex,resultType:typeof sortResult,isPromise:sortResult && typeof sortResult.then === 'function',resultLength:Array.isArray(sortResult) ? sortResult.length : null},timestamp:Date.now(),sessionId:'debug-session',runId:'sort-debug',hypothesisId:'C'})}).catch(()=>{});
-        // #endregion
         if (sortResult && typeof sortResult.then === 'function') {
           return sortResult
             .then((sortedData) => {
@@ -561,13 +553,165 @@ class TableSorter {
         releaseSorter();
         return sortResult;
       } else {
-        if (window.Logger) {
-          window.Logger.error('TableSorter.sort: window.sortTableData not available', { page: 'unified-table-system' });
+        // Fallback: Perform sorting directly without window.sortTableData
+        
+        // Get sort direction from options or determine from current state
+        const forcedDirection = sortOptions.direction || sortOptions.forceDirection || null;
+        let newDirection = forcedDirection ? (forcedDirection === 'desc' ? 'desc' : 'asc') : 'asc';
+        
+        // Get current sort state if available (read directly from localStorage for synchronous access)
+        if (!forcedDirection) {
+          try {
+            const tableStateKey = `sortState_${tableType}`;
+            let currentTableState = null;
+            
+            // Try to get from localStorage directly (synchronous)
+            if (typeof localStorage !== 'undefined') {
+              const stored = localStorage.getItem(tableStateKey);
+              if (stored) {
+                try {
+                  currentTableState = JSON.parse(stored);
+                } catch (e) {
+                  // Invalid JSON, ignore
+                }
+              }
+            }
+            
+            // If not found in localStorage, try UnifiedCacheManager (async, but we'll use it if available)
+            if (!currentTableState && window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
+              // Try synchronous access if available
+              if (typeof window.UnifiedCacheManager.getSync === 'function') {
+                currentTableState = window.UnifiedCacheManager.getSync(tableStateKey, { layer: 'localStorage' });
+              }
+            }
+            
+            // Toggle direction if same column is clicked
+            if (currentTableState && typeof currentTableState.columnIndex === 'number' && currentTableState.columnIndex === columnIndex) {
+              const currentDirection = currentTableState.direction || 'asc';
+              newDirection = currentDirection === 'asc' ? 'desc' : 'asc';
+            }
+          } catch (err) {
+            // Ignore errors - use default direction
+          }
         }
-        window._updateFunctionInProgress = false;
+        
+        // Get column mapping for sort type
+        const columnMapping = window.TABLE_COLUMN_MAPPINGS?.[tableType]?.[columnIndex];
+        const sortType = columnMapping?.sortType || null;
+        
+        // Perform sorting
+        const sortedData = [...data].sort((a, b) => {
+          // Extract values from data rows (assuming data is array of arrays)
+          const aValue = Array.isArray(a) ? a[columnIndex] : null;
+          const bValue = Array.isArray(b) ? b[columnIndex] : null;
+          
+          // Handle null/undefined
+          if (aValue === null || aValue === undefined) return 1;
+          if (bValue === null || bValue === undefined) return -1;
+          
+          // String comparison
+          if (sortType === 'string' || typeof aValue === 'string' && typeof bValue === 'string') {
+            const result = String(aValue).localeCompare(String(bValue), 'he-IL', { sensitivity: 'base' });
+            return newDirection === 'asc' ? result : -result;
+          }
+          
+          // Numeric comparison
+          if (sortType === 'number' || sortType === 'int' || sortType === 'float') {
+            const numA = Number(aValue);
+            const numB = Number(bValue);
+            if (!isNaN(numA) && !isNaN(numB)) {
+              return newDirection === 'asc' ? numA - numB : numB - numA;
+            }
+          }
+          
+          // Boolean comparison
+          if (sortType === 'boolean') {
+            const boolA = Boolean(aValue);
+            const boolB = Boolean(bValue);
+            if (boolA === boolB) return 0;
+            return newDirection === 'asc' ? (boolA ? 1 : -1) : (boolA ? -1 : 1);
+          }
+          
+          // Default: string comparison
+          const result = String(aValue).localeCompare(String(bValue), 'he-IL', { sensitivity: 'base' });
+          return newDirection === 'asc' ? result : -result;
+        });
+        
+        // Save sort state
+        if (sortOptions.saveState !== false) {
+          try {
+            const sortState = {
+              columnIndex,
+              direction: newDirection,
+              timestamp: Date.now()
+            };
+            
+            // Save to localStorage directly (synchronous)
+            if (typeof localStorage !== 'undefined') {
+              const tableStateKey = `sortState_${tableType}`;
+              localStorage.setItem(tableStateKey, JSON.stringify(sortState));
+            }
+            
+            // Also save via UnifiedCacheManager if available (async, but doesn't block)
+            if (window.saveSortState && typeof window.saveSortState === 'function') {
+              window.saveSortState(tableType, columnIndex, newDirection, {
+                chain: sortOptions.chain || null,
+                pageName: sortOptions.pageName || null
+              }).catch(() => {
+                // Ignore async errors - localStorage already saved
+              });
+            }
+          } catch (err) {
+            // Ignore errors
+          }
+        }
+        
+        // Update sort icons if available
+        if (typeof window.updateSortIcons === 'function') {
+          try {
+            window.updateSortIcons(tableType, columnIndex, newDirection);
+          } catch (err) {
+            // Ignore errors
+          }
+        }
+        
+        // Call update function
+        if (typeof safeUpdateFunction === 'function') {
+          try {
+            safeUpdateFunction(sortedData);
+          } catch (err) {
+            if (window.Logger) {
+              window.Logger.warn(`TableSorter.sort: Failed to call updateFunction for "${tableType}"`, err, { page: 'unified-table-system' });
+            }
+          }
+        }
+        
+        // Update Registry and pagination
+        if (window.TableDataRegistry && tableId) {
+          try {
+            window.TableDataRegistry.setFilteredData(tableType, sortedData, { tableId, skipPageReset: true });
+          } catch (err) {
+            if (window.Logger) {
+              window.Logger.warn(`TableSorter.sort: Failed to update TableDataRegistry for "${tableType}"`, err, { page: 'unified-table-system' });
+            }
+          }
+        }
+        if (tableId && window.PaginationSystem) {
+          try {
+            const paginationInstance = window.PaginationSystem.get(tableId);
+            if (paginationInstance && typeof paginationInstance.setData === 'function') {
+              paginationInstance.setData(sortedData);
+            }
+          } catch (err) {
+            if (window.Logger) {
+              window.Logger.warn(`TableSorter.sort: Failed to update pagination for "${tableType}"`, err, { page: 'unified-table-system' });
+            }
+          }
+        }
+        
         releaseUpdate();
         releaseSorter();
-        return null;
+        return sortedData;
       }
     } catch (error) {
       releaseSorter();
@@ -2073,6 +2217,15 @@ class TableEventHandler {
     const thElements = table.querySelectorAll('thead th');
     thElements.forEach((th, thIndex) => {
       // Find sortable header element (can be the th itself or a button inside it)
+      const buttons = th.querySelectorAll('button');
+      const buttonClasses = Array.from(buttons).map(btn => ({
+        tag: btn.tagName,
+        classes: btn.className,
+        hasSortableHeader: btn.classList.contains('sortable-header'),
+        dataClasses: btn.getAttribute('data-classes'),
+        dataButtonType: btn.getAttribute('data-button-type'),
+        dataButtonProcessed: btn.getAttribute('data-button-processed')
+      }));
       const sortableHeader = th.classList.contains('sortable-header') 
         ? th 
         : th.querySelector('.sortable-header');

@@ -252,14 +252,8 @@
                 window.UnifiedTableSystem.registry.register(tableType, {
                     dataGetter: () => data,
                     updateFunction: (sortedData) => {
-                        // #region agent log
-                        fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'dev_tools.js:254',message:'updateFunction called',data:{tableType,sortedDataLength:Array.isArray(sortedData) ? sortedData.length : 0,isArray:Array.isArray(sortedData)},timestamp:Date.now(),sessionId:'debug-session',runId:'sort-debug',hypothesisId:'D'})}).catch(()=>{});
-                        // #endregion
                         const tbody = table.querySelector('tbody');
                         if (!tbody || !Array.isArray(sortedData)) {
-                            // #region agent log
-                            fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'dev_tools.js:258',message:'updateFunction early return',data:{tableType,hasTbody:!!tbody,isArray:Array.isArray(sortedData)},timestamp:Date.now(),sessionId:'debug-session',runId:'sort-debug',hypothesisId:'D'})}).catch(()=>{});
-                            // #endregion
                             return;
                         }
                         
@@ -273,9 +267,6 @@
                             return originalRow ? originalRow.outerHTML : '';
                         }).filter(html => html);
                         
-                        // #region agent log
-                        fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'dev_tools.js:270',message:'Updating tbody innerHTML',data:{tableType,sortedRowsHTMLCount:sortedRowsHTML.length,originalRowsCount:rows.length},timestamp:Date.now(),sessionId:'debug-session',runId:'sort-debug',hypothesisId:'D'})}).catch(()=>{});
-                        // #endregion
                         tbody.innerHTML = sortedRowsHTML.join('');
                     },
                     tableSelector: `table[data-table-type="${tableType}"]`,
@@ -290,6 +281,16 @@
                 log(`Error registering table ${tableType}:`, error);
             }
         });
+        
+        // CRITICAL: After registering all tables, call setupSortHandlers again
+        // This is needed because setupSortableHeaders might have been called before registration
+        if (window.UnifiedTableSystem?.events?.setupSortHandlers) {
+            tableTypes.forEach(tableType => {
+                if (window.UnifiedTableSystem.registry.isRegistered(tableType)) {
+                    window.UnifiedTableSystem.events.setupSortHandlers(tableType);
+                }
+            });
+        }
     }
 
     /**

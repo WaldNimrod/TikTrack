@@ -913,7 +913,7 @@ class IntegratedCRUDE2ETester {
             workflow.steps.push('פתיחת מודל הוספת טרייד ב-iframe');
             this.updateTestResults();
             const iframeWindow = testIframe.contentWindow;
-            const iframeDoc = this.getIframeDocument(testIframe);
+            // iframeDoc already declared above
             
             // Try to find and click the "Add Trade" button
             const addButtonSelectors = [

@@ -19,7 +19,7 @@ from sqlalchemy.orm import Session
 
 from config.database import SessionLocal
 from config.settings import DB_PATH
-from models.preferences import PreferenceGroup, PreferenceProfile, PreferenceType, UserPreference, DEFAULT_PREFERENCES
+from models.preferences import PreferenceGroup, PreferenceProfile, PreferenceType, UserPreference, DEFAULT_PREFERENCES, COLOR_DEFAULTS, COLOR_DEFAULTS
 from models.user import User
 from services.constraint_service import ConstraintService
 
@@ -283,7 +283,11 @@ class PreferencesService:
                 UserPreference.preference_id == pref_type.id,
             )
             value = session.scalar(stmt)
-            return value if value is not None else pref_type.default_value
+            # Hierarchy: saved_value → PreferenceType.default_value → fallback
+            return value if value is not None else (
+                pref_type.default_value if pref_type.default_value else 
+                self._get_fallback_default(preference_name)
+            )
 
     def get_preference_value(
         self,
@@ -294,29 +298,67 @@ class PreferencesService:
     ) -> Any:
         return self.get_preference(user_id, preference_name, profile_id, use_cache=use_cache)
 
-    def get_default_preference(self, preference_name: str) -> Any:
-        """Get default preference value - hardcoded for critical colors"""
-        # Hardcoded defaults for critical colors (TikTrack logo colors)
-        defaults = {
-            "primary_color": "#26baac",
-            "secondary_color": "#fc5a06", 
-            "chartSecondaryColor": "#26baac"
-        }
+    def _get_fallback_default(self, preference_name: str) -> Any:
+        """
+        מקור מרכזי לברירות מחדל עבור העדפות שלא ב-PreferenceType
+        Single source of truth for default values
+        """
+        # 1. נסה מ-DEFAULT_PREFERENCES (כולל COLOR_DEFAULTS)
+        if preference_name in DEFAULT_PREFERENCES:
+            return DEFAULT_PREFERENCES[preference_name]
         
-        if preference_name in defaults:
-            return defaults[preference_name]
+        # 2. נסה לפי סוג העדפה (אם זה צבע)
+        if self._is_color_preference(preference_name):
+            return self._get_color_default(preference_name)
+        
+        # 3. ברירת מחדל גנרית
+        return None
+    
+    def _is_color_preference(self, name: str) -> bool:
+        """בדיקה אם העדפה היא צבע"""
+        return 'color' in name.lower() or name.endswith('Color')
+    
+    def _get_color_default(self, name: str) -> Any:
+        """ברירת מחדל לצבעים"""
+        return COLOR_DEFAULTS.get(name) or DEFAULT_PREFERENCES.get(name)
+    
+    def _load_saved_values(self, session: Session, user_id: int, profile_id: int, pref_type_map: Dict[str, PreferenceType]) -> Dict[str, Any]:
+        """
+        טעינה יעילה של כל הערכים השמורים לפרופיל
+        Single query to load all saved values for requested preferences
+        """
+        if not pref_type_map:
+            return {}
+        
+        preference_ids = [pt.id for pt in pref_type_map.values()]
+        stmt = select(
+            PreferenceType.preference_name,
+            UserPreference.saved_value
+        ).join(
+            UserPreference, PreferenceType.id == UserPreference.preference_id
+        ).where(
+            UserPreference.user_id == user_id,
+            UserPreference.profile_id == profile_id,
+            PreferenceType.id.in_(preference_ids)
+        )
+        
+        results = session.execute(stmt).all()
+        return {name: value for name, value in results}
+
+    def get_default_preference(self, preference_name: str) -> Any:
+        """Get default preference value - uses centralized DEFAULT_PREFERENCES"""
+        # Try centralized defaults first (includes all colors)
+        if preference_name in DEFAULT_PREFERENCES:
+            return DEFAULT_PREFERENCES[preference_name]
         
         # Fallback to database for other preferences
-        with self._session_scope() as session:
-            pref_type = self._get_preference_type(session, preference_name)
-            return pref_type.default_value
-            logger.info(f"🔍 DEBUG: get_all_user_preferences - returning {len(data)} preferences")
-            if len(data) > 0:
-                logger.info(f"🔍 DEBUG: First 3 preferences in result: {data[:3]}")
-        if use_cache and self._cache_enabled and cache_key:
-            self.cache[cache_key] = data
-            self.cache_timestamps[cache_key] = time.time()
-        return data
+        try:
+            with self._session_scope() as session:
+                pref_type = self._get_preference_type(session, preference_name)
+                return pref_type.default_value
+        except ValidationError:
+            # Preference not found in PreferenceType - return None
+            return None
 
     def get_preferences_version_info(
         self, user_id: int, profile_id: Optional[int] = None
@@ -351,26 +393,26 @@ class PreferencesService:
             # Build a map of preference_name -> PreferenceType for quick lookup
             pref_type_map = {pt.preference_name: pt for pt in pref_types}
             
-            result: Dict[str, Any] = {}
+            # טען ערכים שמורים (בקשה אחת יעילה)
+            saved_values_map = self._load_saved_values(session, user_id, profile_id, pref_type_map)
             
-            # CRITICAL: Process ALL requested names, not just those found in PreferenceType
-            # This ensures that even if a preference doesn't exist in PreferenceType,
-            # we still return it (with None/default) so the client can use its own defaults
+            # עבור כל שם מבוקש - החזר תמיד ערך תקין
+            result: Dict[str, Any] = {}
             for name in target_names:
                 if name in pref_type_map:
-                    # Preference exists in PreferenceType - get user value or default
+                    # קיים ב-PreferenceType
                     pref_type = pref_type_map[name]
-                    stmt = select(UserPreference.saved_value).where(
-                        UserPreference.user_id == user_id,
-                        UserPreference.profile_id == profile_id,
-                        UserPreference.preference_id == pref_type.id,
+                    saved_value = saved_values_map.get(name)
+                    # היררכיה: שמור → default_value → fallback
+                    result[name] = (
+                        saved_value if saved_value is not None else (
+                            pref_type.default_value if pref_type.default_value else 
+                            self._get_fallback_default(name)
+                        )
                     )
-                    value = session.scalar(stmt)
-                    result[name] = value if value is not None else pref_type.default_value
                 else:
-                    # Preference doesn't exist in PreferenceType - return None
-                    # Client will use its own defaults (e.g., ColorManager.defaultColors)
-                    result[name] = None
+                    # לא קיים ב-PreferenceType - השתמש ב-fallback
+                    result[name] = self._get_fallback_default(name)
                     
             return result
 
@@ -435,8 +477,12 @@ class PreferencesService:
                 )
                 user_value = session.scalar(stmt)
 
-                # Use user value or default
-                value = user_value if user_value is not None else pref_type.default_value
+                # Use user value or default - ensure always valid value
+                # Hierarchy: saved_value → PreferenceType.default_value → fallback
+                value = user_value if user_value is not None else (
+                    pref_type.default_value if pref_type.default_value else 
+                    self._get_fallback_default(pref_type.preference_name)
+                )
 
                 data.append({
                     "preference_name": pref_type.preference_name,
@@ -491,8 +537,12 @@ class PreferencesService:
                 )
                 user_value = session.scalar(stmt)
 
-                # Use user value or default
-                value = user_value if user_value is not None else pref_type.default_value
+                # Use user value or default - ensure always valid value
+                # Hierarchy: saved_value → PreferenceType.default_value → fallback
+                value = user_value if user_value is not None else (
+                    pref_type.default_value if pref_type.default_value else 
+                    self._get_fallback_default(pref_type.preference_name)
+                )
 
                 data.append({
                     "preference_name": pref_type.preference_name,

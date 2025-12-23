@@ -818,43 +818,15 @@ class PreferencesCore {
             this.currentUserId = finalUserId;
           }
 
-          // If no preferences loaded, load all default values from preference_types table
-          // This ensures the system always has default values to work with
+          // CRITICAL: Server now always returns valid values for all requested preferences
+          // No need for business logic here - server already provided defaults
+          // If server returned empty preferences, it's an error condition, not a fallback scenario
           if (Object.keys(allPreferences).length === 0) {
-            try {
-              // Try to load preference types metadata to get all preference names
-              if (window.PreferencesData && typeof window.PreferencesData.loadPreferenceTypes === 'function') {
-                const typesData = await window.PreferencesData.loadPreferenceTypes({ force: false });
-                const types = typesData?.types || typesData?.data?.types || typesData || [];
-                
-                if (Array.isArray(types) && types.length > 0) {
-                  // Load default value for each preference type
-                  const defaultPreferences = {};
-                  for (const prefType of types) {
-                    const prefName = prefType?.preference_name || prefType?.name || prefType?.html_id;
-                    if (!prefName) continue;
-                    
-                    try {
-                      const defaultValue = await this.getDefaultPreference(prefName);
-                      if (defaultValue !== null && defaultValue !== undefined) {
-                        defaultPreferences[prefName] = defaultValue;
-                      } else if (prefType?.default_value !== null && prefType?.default_value !== undefined) {
-                        // Fallback: use default_value from types data if available
-                        defaultPreferences[prefName] = prefType.default_value;
-                      }
-                    } catch (defaultError) {
-                      // Non-critical - continue loading other defaults
-                    }
-                  }
-                  
-                  if (Object.keys(defaultPreferences).length > 0) {
-                    allPreferences = defaultPreferences;
-                  }
-                }
-              }
-            } catch (defaultLoadError) {
-              // Silent fail - continue with empty preferences
-            }
+            window.Logger?.warn?.('[PreferencesCore] Server returned empty preferences - this should not happen', {
+              page: 'preferences-core-new',
+              userId: finalUserId,
+              profileId: finalProfileId,
+            });
           }
 
           // Merge critical preferences

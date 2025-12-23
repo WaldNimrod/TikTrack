@@ -450,29 +450,13 @@
         preferencesCount: Object.keys(window.currentPreferences || {}).length 
       });
       
+      // CRITICAL: Server now always returns valid values for all requested preferences
+      // No need for business logic here - server already provided defaults
       if (!window.currentPreferences || Object.keys(window.currentPreferences).length === 0) {
-        window.Logger?.warn?.('⚠️ No preferences available to populate forms', { page: 'preferences-ui-v4' });
-        // Try to load default colors as last resort
-        if (window.ColorManager && window.ColorManager.defaultColors) {
-          try {
-            if (!window.currentPreferences) {
-              window.currentPreferences = {};
-            }
-            Object.assign(window.currentPreferences, window.ColorManager.defaultColors);
-            window.Logger?.debug?.('✅ Loaded default colors in _populateAllFormFields', {
-              page: 'preferences-ui-v4',
-              colorCount: Object.keys(window.ColorManager.defaultColors).length,
-            });
-          } catch (error) {
-            window.Logger?.warn?.('⚠️ Failed to load default colors in _populateAllFormFields', {
-              page: 'preferences-ui-v4',
-              error: error?.message,
-            });
-            return;
-          }
-        } else {
-          return;
-        }
+        window.Logger?.warn?.('⚠️ No preferences available to populate forms - server should have provided defaults', { 
+          page: 'preferences-ui-v4' 
+        });
+        return;
       }
 
       const form = document.getElementById('preferencesForm');

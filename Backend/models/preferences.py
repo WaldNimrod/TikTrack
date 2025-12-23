@@ -130,8 +130,103 @@ class Preference(BaseModel):
         return f"<Preference(key='{self.key}', value='{self.value}')>"
 
 # Default preferences for fallback when user preferences are not available
+# CRITICAL: This is the single source of truth for all default preference values
+# The backend MUST return valid values for all requested preferences, using this as fallback
+
+# Color defaults - complete list matching ColorManager.defaultColors
+COLOR_DEFAULTS = {
+    # Chart colors (7)
+    'chartBackgroundColor': '#ffffff',
+    'chartBorderColor': '#e0e0e0',
+    'chartGridColor': '#f0f0f0',
+    'chartPointColor': '#26baac',
+    'chartPrimaryColor': '#1a8f83',
+    'chartSecondaryColor': '#fc5a06',
+    'chartTextColor': '#333333',
+    
+    # Entity colors (30)
+    'entityAlertColor': '#ff9800',
+    'entityAlertColorDark': '#f57c00',
+    'entityAlertColorLight': '#ffb74d',
+    'entityInfoColor': '#17a2b8',
+    'entityInfoColorDark': '#138496',
+    'entityInfoColorLight': '#bee5eb',
+    'entityNoteColor': '#607d8b',
+    'entityNoteColorDark': '#455a64',
+    'entityNoteColorLight': '#90a4ae',
+    'entityTradeColor': '#26baac',
+    'entityTradeColorDark': '#1a8f83',
+    'entityTradeColorLight': '#6ed8ca',
+    'entityTickerColor': '#17a2b8',
+    'entityTickerColorDark': '#138496',
+    'entityTickerColorLight': '#20c997',
+    'entityExecutionColor': '#6f42c1',
+    'entityExecutionColorDark': '#5a2d91',
+    'entityExecutionColorLight': '#8e44ad',
+    'entityTradingAccountColor': '#28a745',
+    'entityTradingAccountColorDark': '#1e7e34',
+    'entityTradingAccountColorLight': '#34ce57',
+    'entityTradePlanColor': '#9c27b0',
+    'entityTradePlanColorDark': '#7b1fa2',
+    'entityTradePlanColorLight': '#ba68c8',
+    'entityCashFlowColor': '#20c997',
+    'entityCashFlowColorDark': '#138496',
+    'entityCashFlowColorLight': '#20c997',
+    'entityPreferencesColor': '#607d8b',
+    'entityPreferencesColorDark': '#455a64',
+    'entityPreferencesColorLight': '#90a4ae',
+    'entityResearchColor': '#9c27b0',
+    'entityResearchColorDark': '#7b1fa2',
+    'entityResearchColorLight': '#ba68c8',
+    
+    # Status colors (3)
+    'statusOpenColor': '#28a745',
+    'statusClosedColor': '#6c757d',
+    'statusCancelledColor': '#dc3545',
+    
+    # Value colors (9)
+    'valuePositiveColor': '#28a745',
+    'valueNegativeColor': '#dc3545',
+    'valueNeutralColor': '#6c757d',
+    'valuePositiveColorLight': '#e8f5e8',
+    'valuePositiveColorDark': '#1e7e34',
+    'valueNegativeColorLight': '#fdeaea',
+    'valueNegativeColorDark': '#c82333',
+    'valueNeutralColorLight': '#f8f9fa',
+    'valueNeutralColorDark': '#495057',
+    
+    # Theme colors (7)
+    'primaryColor': '#26baac',
+    'secondaryColor': '#fc5a06',
+    'successColor': '#28a745',
+    'dangerColor': '#dc3545',
+    'warningColor': '#ffc107',
+    'infoColor': '#17a2b8',
+    'linkColor': '#26baac',
+    
+    # UI colors (6)
+    'backgroundColor': '#ffffff',
+    'textColor': '#333333',
+    'borderColor': '#dee2e6',
+    'shadowColor': '#666666',
+    'highlightColor': '#26baac',
+    
+    # Notification colors (4)
+    'notificationSuccessColor': '#28a745',
+    'notificationErrorColor': '#dc3545',
+    'notificationWarningColor': '#ffc107',
+    'notificationInfoColor': '#17a2b8',
+}
+
+# Legacy color names (for backward compatibility)
+LEGACY_COLOR_DEFAULTS = {
+    "primary_color": "#26baac",  # Maps to primaryColor
+    "secondary_color": "#fc5a06",  # Maps to secondaryColor
+    "chartSecondaryColor": "#26baac",  # Maps to chartSecondaryColor
+}
+
+# Unified default preferences - single source of truth
 DEFAULT_PREFERENCES = {
-    "primary_color": "#26baac",
-    "secondary_color": "#fc5a06",
-    "chartSecondaryColor": "#26baac",
+    **COLOR_DEFAULTS,
+    **LEGACY_COLOR_DEFAULTS,
 }

@@ -86,12 +86,17 @@ class SelectPopulatorService {
     }
     
     static async _getPreferenceFromMemory(preferenceName, aliases = []) {
-        console.log(`🔍 _getPreferenceFromMemory called for: ${preferenceName} with aliases:`, aliases);
+        window.Logger?.debug?.(`🔍 _getPreferenceFromMemory called for: ${preferenceName}`, { 
+            page: 'select-populator-service',
+            aliases 
+        });
         
         try {
             // בדיקת תלויות עם validation
             const deps = this._checkDependencies();
             
+            // CRITICAL: Server now always returns valid values for all requested preferences
+            // No need for business logic here - just use what the server returned
             // First, try PreferencesCore (synchronous check with cached data)
             if (deps.preferencesCore && deps.unifiedCacheManager) {
                 try {
@@ -102,14 +107,17 @@ class SelectPopulatorService {
                         ? window.PreferencesCore.currentProfileId 
                         : 0;
                     
-                    console.log(`🔍 Looking for preference ${preferenceName} with userId=${userId}, profileId=${profileId}`);
+                    window.Logger?.debug?.(`🔍 Looking for preference ${preferenceName}`, {
+                        page: 'select-populator-service',
+                        userId,
+                        profileId
+                    });
                     
                     // Try multiple profile IDs in case preferences are saved for different profiles
                     const profileIdsToTry = profileId !== 0 ? [profileId, 0] : [0];
                     
                     for (const tryProfileId of profileIdsToTry) {
                         const cacheKey = `preference_${preferenceName}_${userId}_${tryProfileId}`;
-                        console.log(`🔍 Trying cache key: tiktrack_${cacheKey}`);
                         
                         // Try to get from cache synchronously - check both tiktrack_ prefix and without it
                         try {

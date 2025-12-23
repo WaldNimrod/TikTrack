@@ -198,17 +198,15 @@ class ColorManager {
         force: true,
       });
 
-      const allColors = {};
-      colorNames.forEach(name => {
-        // CRITICAL: Use default if value is null, undefined, or empty
-        // This ensures defaults are used when preference doesn't exist for profile
-        // Server now returns None for preferences not in PreferenceType, so we use ColorManager defaults
-        const fetchedValue = fetched?.[name];
-        const value = (fetchedValue !== null && fetchedValue !== undefined && fetchedValue !== '') 
-          ? fetchedValue 
-          : this.defaultColors[name];
-        allColors[name] = value;
-        this.colorCache.set(name, value);
+      // CRITICAL: Server now always returns valid values for all requested preferences
+      // No need for business logic here - just use what the server returned
+      const allColors = fetched || {};
+      
+      // Update cache with values from server
+      Object.entries(allColors).forEach(([name, value]) => {
+        if (value !== null && value !== undefined) {
+          this.colorCache.set(name, value);
+        }
       });
 
       window.Logger.info(`✅ Loaded ${Object.keys(allColors, { page: 'preferences-colors' }).length} color preferences`);

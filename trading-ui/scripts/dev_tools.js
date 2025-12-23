@@ -137,12 +137,17 @@
             // Initialize UI state
             initializeUI();
 
-            // Register tables IMMEDIATELY (don't wait) - core-systems.js will call setupSortableHeaders later
-            // This ensures tables are registered before setupSortableHeaders is called
-            // Use requestAnimationFrame to ensure DOM is ready but don't wait too long
-            requestAnimationFrame(() => {
-                waitAndRegisterTables();
-            });
+            // Register tables using package manifest-based waiting
+            // According to manifest: crud package loadOrder is 4, init-system (core-systems.js) is 22
+            // So UnifiedTableSystem should be available before core-systems.js calls setupSortableHeaders
+            // But we need to wait for DOM to be ready first
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', waitAndRegisterTables);
+            } else {
+                // DOM already loaded - wait a bit for packages to load (crud package loadOrder: 4)
+                // But don't wait too long - core-systems.js (loadOrder: 22) will call setupSortableHeaders
+                setTimeout(waitAndRegisterTables, 100);
+            }
 
             // Load initial data
             loadPageData();

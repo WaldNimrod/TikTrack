@@ -21,7 +21,7 @@ try:
     from selenium.webdriver.chrome.service import Service
     from selenium.webdriver.chrome.options import Options
     from selenium.webdriver.common.by import By
-    from selenium.webdriver.support.ui import WebDriverWait
+    from selenium.webdriver.support.ui import WebDriverWait, Select
     from selenium.webdriver.support import expected_conditions as EC
     from selenium.common.exceptions import TimeoutException, WebDriverException, NoSuchElementException
     from webdriver_manager.chrome import ChromeDriverManager
@@ -139,6 +139,20 @@ def test_preference_types(driver):
                 # For color pickers, use JavaScript
                 driver.execute_script(f"document.getElementById('{pref['id']}').value = '{pref['value']}';")
                 driver.execute_script(f"document.getElementById('{pref['id']}').dispatchEvent(new Event('change'));")
+            elif pref['type'] == 'select':
+                # For select elements, use Select class
+                select = Select(element)
+                try:
+                    select.select_by_value(pref['value'])
+                except:
+                    # If value doesn't exist, try by visible text
+                    try:
+                        select.select_by_visible_text(pref['value'])
+                    except:
+                        # If that fails, try by index
+                        select.select_by_index(0)
+                # Trigger change event
+                driver.execute_script(f"document.getElementById('{pref['id']}').dispatchEvent(new Event('change'));")
             else:
                 element.clear()
                 element.send_keys(pref['value'])
@@ -185,8 +199,19 @@ def test_save_preferences(driver):
         if save_buttons:
             print(f"✅ Found {len(save_buttons)} save button(s)")
             
-            # Click first save button
-            save_buttons[0].click()
+            # Scroll to button and click using JavaScript to avoid interception
+            save_button = save_buttons[0]
+            driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", save_button)
+            time.sleep(0.5)
+            
+            # Try regular click first
+            try:
+                save_button.click()
+            except Exception as e:
+                # If regular click fails, use JavaScript click
+                print(f"   ⚠️ Regular click failed, using JavaScript click: {e}")
+                driver.execute_script("arguments[0].click();", save_button)
+            
             time.sleep(2)
             
             # Check for success notification

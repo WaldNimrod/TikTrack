@@ -489,15 +489,28 @@ class IntegratedCRUDE2ETester {
     async loadPageInIframe(url) {
         return new Promise(async (resolve, reject) => {
             try {
+                this.logger?.info('🔵 [loadPageInIframe] Starting to load iframe', { url });
+                
                 // Create iframe for testing
                 const iframe = document.createElement('iframe');
                 iframe.style.display = 'none';
                 iframe.style.width = '0';
                 iframe.style.height = '0';
+                iframe.id = `test-iframe-${Date.now()}`;
                 iframe.src = url;
+                
+                this.logger?.info('🔵 [loadPageInIframe] Iframe element created', { 
+                    id: iframe.id, 
+                    url: iframe.src,
+                    display: iframe.style.display 
+                });
                 
                 // Set up message listener for iframe ready signal
                 const messageHandler = (event) => {
+                    this.logger?.info('🔵 [loadPageInIframe] Message received', { 
+                        type: event.data?.type,
+                        source: event.source === iframe.contentWindow ? 'iframe' : 'other'
+                    });
                     if (event.data && event.data.type === 'IFRAME_READY' && event.source === iframe.contentWindow) {
                         window.removeEventListener('message', messageHandler);
                         // Authenticate after iframe is ready
@@ -510,28 +523,67 @@ class IntegratedCRUDE2ETester {
                 };
                 window.addEventListener('message', messageHandler);
                 
+                let loadHandlerCalled = false;
                 iframe.onload = async () => {
+                    if (loadHandlerCalled) {
+                        this.logger?.warn('⚠️ [loadPageInIframe] onload called multiple times');
+                        return;
+                    }
+                    loadHandlerCalled = true;
+                    
                     try {
+                        this.logger?.info('🔵 [loadPageInIframe] onload fired', { url });
+                        
                         // Wait a bit for iframe to initialize
                         await new Promise(resolve => setTimeout(resolve, 500));
+                        
+                        this.logger?.info('🔵 [loadPageInIframe] Starting authentication');
                         
                         // Authenticate iframe
                         await this.authenticateIframe(iframe);
                         
+                        this.logger?.info('🔵 [loadPageInIframe] Authentication complete, waiting for dynamic content');
+                        
                         // Wait for dynamic content
-                        setTimeout(() => resolve(iframe), 2000);
+                        setTimeout(() => {
+                            this.logger?.info('🔵 [loadPageInIframe] Resolving iframe', { 
+                                iframeExists: !!iframe.parentNode,
+                                iframeId: iframe.id 
+                            });
+                            resolve(iframe);
+                        }, 2000);
                     } catch (error) {
+                        this.logger?.error('❌ [loadPageInIframe] Error in onload handler', { error: error.message });
                         reject(error);
                     }
                 };
                 
-                iframe.onerror = () => {
+                iframe.onerror = (error) => {
+                    this.logger?.error('❌ [loadPageInIframe] iframe onerror fired', { error, url });
                     window.removeEventListener('message', messageHandler);
-                    reject(new Error(`Failed to load ${url} in iframe`));
+                    reject(new Error(`Failed to load ${url} in iframe: ${error}`));
                 };
                 
+                this.logger?.info('🔵 [loadPageInIframe] Appending iframe to DOM');
                 document.body.appendChild(iframe);
+                
+                this.logger?.info('🔵 [loadPageInIframe] Iframe appended to DOM', { 
+                    iframeInDOM: !!iframe.parentNode,
+                    iframeId: iframe.id 
+                });
+                
+                // Fallback timeout
+                setTimeout(() => {
+                    if (!loadHandlerCalled) {
+                        this.logger?.warn('⚠️ [loadPageInIframe] onload not called within 10 seconds, checking iframe state', {
+                            iframeInDOM: !!iframe.parentNode,
+                            iframeSrc: iframe.src,
+                            iframeContentWindow: !!iframe.contentWindow
+                        });
+                    }
+                }, 10000);
             } catch (error) {
+                this.logger?.error('❌ [loadPageInIframe] Error creating iframe', { error: error.message });
                 reject(error);
             }
         });
@@ -549,14 +601,78 @@ class IntegratedCRUDE2ETester {
      */
     async waitForElementInIframe(iframe, selector, timeout = 10000) {
         const startTime = Date.now();
+        let attemptCount = 0;
+        
+        this.logger?.info('🔵 [waitForElementInIframe] Starting wait', { selector, timeout });
+        
         while (Date.now() - startTime < timeout) {
-            const doc = this.getIframeDocument(iframe);
-            const element = doc.querySelector(selector);
-            if (element && element.offsetParent !== null) {
-                return element;
+            attemptCount++;
+            try {
+                const doc = this.getIframeDocument(iframe);
+                
+                if (!doc) {
+                    this.logger?.warn(`⚠️ [waitForElementInIframe] Attempt ${attemptCount}: No document`, {
+                        elapsed: Date.now() - startTime,
+                        iframeExists: !!iframe,
+                        iframeContentWindow: !!iframe?.contentWindow
+                    });
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    continue;
+                }
+                
+                const element = doc.querySelector(selector);
+                const elementExists = !!element;
+                const elementVisible = element && element.offsetParent !== null;
+                
+                if (attemptCount % 10 === 0) { // Log every 10 attempts (1 second)
+                    this.logger?.info(`🔵 [waitForElementInIframe] Attempt ${attemptCount}`, {
+                        elapsed: Date.now() - startTime,
+                        elementExists,
+                        elementVisible,
+                        docReadyState: doc.readyState,
+                        docBody: !!doc.body,
+                        selector
+                    });
+                }
+                
+                if (element && element.offsetParent !== null) {
+                    this.logger?.info('✅ [waitForElementInIframe] Element found', {
+                        selector,
+                        attempts: attemptCount,
+                        elapsed: Date.now() - startTime
+                    });
+                    return element;
+                }
+            } catch (error) {
+                this.logger?.error(`❌ [waitForElementInIframe] Error on attempt ${attemptCount}`, {
+                    error: error.message,
+                    elapsed: Date.now() - startTime
+                });
             }
+            
             await new Promise(resolve => setTimeout(resolve, 100));
         }
+        
+        // Final check before throwing
+        try {
+            const doc = this.getIframeDocument(iframe);
+            const element = doc?.querySelector(selector);
+            this.logger?.error('❌ [waitForElementInIframe] Timeout - final state', {
+                selector,
+                attempts: attemptCount,
+                elapsed: Date.now() - startTime,
+                elementExists: !!element,
+                elementVisible: element && element.offsetParent !== null,
+                docExists: !!doc,
+                docReadyState: doc?.readyState,
+                docBodyHTML: doc?.body?.innerHTML?.substring(0, 200) // First 200 chars
+            });
+        } catch (finalError) {
+            this.logger?.error('❌ [waitForElementInIframe] Error in final check', {
+                error: finalError.message
+            });
+        }
+        
         throw new Error(`Element ${selector} not found in iframe within ${timeout}ms`);
     }
 
@@ -608,15 +724,36 @@ class IntegratedCRUDE2ETester {
             // Step 1: Load trades page in hidden iframe
             workflow.steps.push('טוען עמוד טריידים ב-iframe נסתר');
             this.updateTestResults(); // Update UI with progress
+            
+            this.logger?.info('🔵 [runTradeWorkflowTest] Calling loadPageInIframe');
             testIframe = await this.loadPageInIframe('/trades.html');
+            this.logger?.info('🔵 [runTradeWorkflowTest] loadPageInIframe returned', {
+                iframeExists: !!testIframe,
+                iframeId: testIframe?.id,
+                iframeInDOM: !!testIframe?.parentNode,
+                iframeSrc: testIframe?.src
+            });
+            
             workflow.steps.push('עמוד טריידים נטען ב-iframe');
             this.updateTestResults();
 
             // Step 2: Wait for page to be fully loaded in iframe
             workflow.steps.push('ממתין לטעינת העמוד המלא ב-iframe');
             this.updateTestResults();
+            
+            this.logger?.info('🔵 [runTradeWorkflowTest] Getting iframe document');
             const iframeDoc = this.getIframeDocument(testIframe);
+            this.logger?.info('🔵 [runTradeWorkflowTest] Got iframe document', {
+                docExists: !!iframeDoc,
+                docReadyState: iframeDoc?.readyState,
+                docBody: !!iframeDoc?.body,
+                docTitle: iframeDoc?.title
+            });
+            
+            this.logger?.info('🔵 [runTradeWorkflowTest] Waiting for table tbody element');
             await this.waitForElementInIframe(testIframe, 'table tbody', 15000);
+            this.logger?.info('🔵 [runTradeWorkflowTest] Found table tbody element');
+            
             workflow.steps.push('העמוד נטען בהצלחה ב-iframe');
             this.updateTestResults();
 

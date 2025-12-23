@@ -170,11 +170,17 @@ class PreferencesAPIClient {
       window.Logger?.warn?.('[PreferencesCore] loadPreference API is not available', { page: 'preferences-core-new' });
       return null;
     }
+    // #region agent log
+    fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'preferences-core-new.js:173',message:'getPreference - Calling loadPreference',data:{preferenceName:preferenceName,userId:userId||this.defaultUserId,profileId:profileId,currentProfileId:this.currentProfileId},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
+    // #endregion
     const result = await window.PreferencesData.loadPreference({
       preferenceName,
       userId: userId || this.defaultUserId,
       profileId,
     });
+    // #region agent log
+    fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'preferences-core-new.js:180',message:'getPreference - loadPreference result',data:{preferenceName:preferenceName,resultValue:result?.value,resultType:typeof result?.value,isNull:result?.value===null,isUndefined:result?.value===undefined},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
+    // #endregion
     return result?.value ?? null;
   }
 
@@ -293,7 +299,12 @@ class PreferencesAPIClient {
       userId: userId || this.defaultUserId,
       profileId,
     });
-    return result?.success !== false;
+    // Return full result including profile_id from server response
+    return {
+      success: result?.success !== false,
+      profileId: result?.data?.profile_id || result?.profile_id || null,
+      data: result?.data || null,
+    };
   }
 
   /**
@@ -933,18 +944,59 @@ class PreferencesCore {
       }
 
       // Save via API
-      const success = await this.apiClient.savePreference(
+      const saveResult = await this.apiClient.savePreference(
         preferenceName,
         value,
         userId || this.currentUserId,
         finalProfileId,
       );
 
-      if (success) {
+      if (saveResult.success) {
         // Preference saved
+        
+        // Update currentProfileId with the profile_id returned from server (if different)
+        const serverProfileId = saveResult.profileId;
+        // #region agent log
+        fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'preferences-core-new.js:951',message:'savePreference - Server response profile_id',data:{serverProfileId:serverProfileId,finalProfileId:finalProfileId,currentProfileId:this.currentProfileId,preferenceName:preferenceName},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
+        // #endregion
+        if (serverProfileId !== null && serverProfileId !== undefined && serverProfileId !== finalProfileId) {
+          this.currentProfileId = serverProfileId;
+          window.Logger?.debug?.('Updated currentProfileId from server response', {
+            page: 'preferences-core-new',
+            oldProfileId: finalProfileId,
+            newProfileId: serverProfileId,
+          });
+          // #region agent log
+          fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'preferences-core-new.js:960',message:'savePreference - Updated currentProfileId',data:{oldProfileId:finalProfileId,newProfileId:serverProfileId},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
+          // #endregion
+        }
 
-        // ✅ מוחק cache אחרי שמירה מוצלחת
-        await this.invalidatePreference(preferenceName, userId, profileId);
+        // ✅ CRITICAL: Update cache with new value instead of invalidating
+        // This ensures the value persists after hard refresh (Ctrl+F5)
+        const cacheProfileId = serverProfileId !== null && serverProfileId !== undefined 
+          ? serverProfileId 
+          : (profileId !== null && profileId !== undefined ? profileId : this.currentProfileId);
+        const finalUserId = userId || this.currentUserId;
+        
+        // Update cache using UnifiedCacheManager (following system architecture)
+        if (window.UnifiedCacheManager) {
+          // Build cache key matching PreferencesData format
+          const cacheKey = `preference_${preferenceName}_u${finalUserId}_p${cacheProfileId ?? 'active'}`;
+          await window.UnifiedCacheManager.save(cacheKey, value, {
+            layer: 'localStorage',
+            ttl: 300000, // 5 minutes TTL
+          });
+          
+          // Also invalidate all_preferences cache to force reload on next access
+          const allPrefsKey = `all_preferences_${finalUserId}_${cacheProfileId}`;
+          await window.UnifiedCacheManager.remove(allPrefsKey, { layer: 'localStorage' });
+          const prefixedAllPrefsKey = `tiktrack_${allPrefsKey}`;
+          await window.UnifiedCacheManager.remove(prefixedAllPrefsKey, { layer: 'localStorage' });
+        }
+        
+        // #region agent log
+        fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'preferences-core-new.js:980',message:'savePreference - Updated cache with new value',data:{cacheProfileId:cacheProfileId,preferenceName:preferenceName,value:value,userId:finalUserId},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
+        // #endregion
 
         return {
           success: true,
@@ -1000,12 +1052,18 @@ class PreferencesCore {
       details: {},
     };
 
+    let lastServerProfileId = finalProfileId;
     for (const [name, value] of Object.entries(preferences)) {
       try {
-        const success = await this.savePreference(name, value, userId, finalProfileId);
-        if (success) {
+        const saveResult = await this.savePreference(name, value, userId, lastServerProfileId);
+        if (saveResult.success) {
           results.saved++;
           results.details[name] = { status: 'success' };
+          // Update profileId for next iteration if server returned a different one
+          if (saveResult.profileId !== null && saveResult.profileId !== undefined) {
+            lastServerProfileId = saveResult.profileId;
+            this.currentProfileId = saveResult.profileId;
+          }
         } else {
           results.errors++;
           results.details[name] = { status: 'error', message: 'Save failed' };

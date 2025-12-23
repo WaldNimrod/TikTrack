@@ -113,6 +113,8 @@
             userId: finalUserId,
             profileId: finalProfileId,
             note: 'Using profile from bootstrap, not initial values',
+            currentPreferencesExists: Boolean(window.currentPreferences),
+            currentPreferencesCount: Object.keys(window.currentPreferences || {}).length,
           });
           const allPreferences = await window.PreferencesCore.getAllPreferences(finalUserId, finalProfileId);
           
@@ -236,6 +238,39 @@
       // Populate known UI elements
       this._applyUiGroup();
       this._populatePreferencesTable();
+      
+      // Wait a bit to ensure preferences are fully loaded
+      // This is a workaround for race condition where preferences are still loading
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      // Double-check that preferences are loaded before populating
+      if (!window.currentPreferences || Object.keys(window.currentPreferences).length === 0) {
+        window.Logger?.warn?.('⚠️ window.currentPreferences is empty, waiting for preferences to load...', {
+          page: 'preferences-ui-v4',
+        });
+        // Wait a bit more and try to load preferences directly
+        await new Promise(resolve => setTimeout(resolve, 500));
+        if (window.PreferencesCore && typeof window.PreferencesCore.getAllPreferences === 'function') {
+          try {
+            const allPrefs = await window.PreferencesCore.getAllPreferences(finalUserId, finalProfileId);
+            if (allPrefs && typeof allPrefs === 'object') {
+              if (!window.currentPreferences) {
+                window.currentPreferences = {};
+              }
+              Object.assign(window.currentPreferences, allPrefs);
+              window.Logger?.debug?.('✅ Loaded preferences directly to window.currentPreferences', {
+                page: 'preferences-ui-v4',
+                count: Object.keys(window.currentPreferences).length,
+              });
+            }
+          } catch (error) {
+            window.Logger?.warn?.('⚠️ Failed to load preferences directly', {
+              page: 'preferences-ui-v4',
+              error: error?.message,
+            });
+          }
+        }
+      }
       
       // CRITICAL: Populate all form fields with loaded preferences
       await this._populateAllFormFields();

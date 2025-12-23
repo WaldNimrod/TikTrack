@@ -562,6 +562,11 @@ window.runAPITests = async function() {
         }
     } finally {
         hideProgressTracking();
+
+        // עדכון הסטטיסטיקה בדשבורד לאחר סיום הבדיקה
+        if (integratedTester && typeof integratedTester.updateDashboard === 'function') {
+            integratedTester.updateDashboard();
+        }
     }
 
     console.log('✅ API Tests completed');

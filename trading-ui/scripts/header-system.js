@@ -1281,14 +1281,17 @@ class HeaderSystem {
                         <li><a class="tiktrack-dropdown-item" href="/db_extradata">טבלאות עזר</a></li>
                       </ul>
                     </li>
+                    <li class="tiktrack-nav-item">
+                      <a href="/dev_tools" class="tiktrack-nav-link" data-page="dev-tools">
+                        <span class="nav-text">כלי פיתוח</span>
+                      </a>
+                    </li>
                     <li class="tiktrack-nav-item dropdown">
                       <a href="#" class="tiktrack-nav-link tiktrack-dropdown-toggle" data-page="development-tools">
                         <span class="nav-text">פיתוח</span>
                         <span class="tiktrack-dropdown-arrow">▼</span>
                       </a>
                       <ul class="tiktrack-dropdown-menu">
-                        <li><a class="tiktrack-dropdown-item" href="/dev_tools">🛠️ כלי פיתוח ראשי</a></li>
-                        <li class="separator"></li>
                         <li><a class="tiktrack-dropdown-item" href="/system-management">🔧 ניהול מערכת</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/server-monitor">🖥️ ניטור שרת</a></li>
                         <li><a class="tiktrack-dropdown-item" href="/background-tasks">⚙️ ניהול משימות רקע</a></li>

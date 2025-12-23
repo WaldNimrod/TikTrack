@@ -1164,13 +1164,6 @@ const PACKAGE_MANIFEST = {
         loadOrder: 7
       },
       {
-        file: 'preferences-debug-monitor.js',
-        globalCheck: 'window.PreferencesDebugMonitor',
-        description: 'Monitoring and debugging code for preferences issues',
-        required: false,
-        loadOrder: 7.1
-      },
-      {
         file: 'preferences-group-manager.js',
         globalCheck: 'window.PreferencesGroupManager',
         description: 'Preferences group manager',

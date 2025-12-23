@@ -1029,15 +1029,29 @@ class IntegratedCRUDE2ETester {
                 if (attemptCount === 1) {
                     // Check if there are any API calls in progress or completed
                     const apiCallsMade = window.performance?.getEntriesByType('resource')
-                        .filter(r => r.name.includes('/api/') && r.initiatorType === 'fetch')
+                        .filter(r => r.name.includes('/api/') && (r.initiatorType === 'fetch' || r.initiatorType === 'xmlhttprequest'))
                         .length || 0;
-                    this.logger?.debug('🔵 [waitForElementInIframe] First attempt - checking API calls', {
+                    
+                    // Check iframe services (hypothesis E)
+                    const iframeWindow = iframe.contentWindow;
+                    const servicesAvailable = {
+                        UnifiedCRUDService: !!iframeWindow?.UnifiedCRUDService,
+                        DataCollectionService: !!iframeWindow?.DataCollectionService,
+                        ModalManagerV2: !!iframeWindow?.ModalManagerV2,
+                        TikTrackAuth: !!iframeWindow?.TikTrackAuth
+                    };
+                    
+                    this.logger?.info('🔵 [waitForElementInIframe] First attempt - checking state', {
                         apiCallsMade,
                         docReadyState: doc.readyState,
                         docBody: !!doc.body,
-                        docBodyHTML: doc.body?.innerHTML?.substring(0, 200),
+                        docBodyHTML: doc.body?.innerHTML?.substring(0, 300),
+                        servicesAvailable,
+                        hasTable: !!doc.querySelector('table'),
+                        hasTbody: !!doc.querySelector('tbody'),
+                        scriptsCount: doc.querySelectorAll('script').length,
                         page: 'crud_testing_dashboard',
-                        hypothesisId: 'C'
+                        hypothesisId: 'C,E'
                     });
                 }
                 
@@ -1094,13 +1108,48 @@ class IntegratedCRUDE2ETester {
                 UnifiedCRUDService: !!iframeWindow?.UnifiedCRUDService,
                 DataCollectionService: !!iframeWindow?.DataCollectionService,
                 ModalManagerV2: !!iframeWindow?.ModalManagerV2,
-                checkLinkedItemsBeforeAction: !!iframeWindow?.checkLinkedItemsBeforeAction
+                checkLinkedItemsBeforeAction: !!iframeWindow?.checkLinkedItemsBeforeAction,
+                TikTrackAuth: !!iframeWindow?.TikTrackAuth,
+                NotificationSystem: !!iframeWindow?.NotificationSystem
             };
             
-            // Check if API calls were made
-            const apiCalls = window.performance?.getEntriesByType('resource')
-                .filter(r => r.name.includes('/api/') && r.initiatorType === 'fetch')
+            // Check if API calls were made - check both parent and iframe
+            const parentApiCalls = window.performance?.getEntriesByType('resource')
+                .filter(r => r.name.includes('/api/') && (r.initiatorType === 'fetch' || r.initiatorType === 'xmlhttprequest'))
                 .map(r => ({ url: r.name, status: r.responseStatus || 'pending', duration: r.duration })) || [];
+            
+            // Check iframe document structure (hypothesis B)
+            const domStructure = {
+                hasBody: !!doc?.body,
+                bodyChildren: doc?.body?.children?.length || 0,
+                hasTable: !!doc?.querySelector('table'),
+                hasTbody: !!doc?.querySelector('tbody'),
+                hasMain: !!doc?.querySelector('main'),
+                hasScripts: doc?.querySelectorAll('script')?.length || 0,
+                scriptsLoaded: Array.from(doc?.querySelectorAll('script') || []).filter(s => s.src).length
+            };
+            
+            // Check iframe window state
+            const iframeState = {
+                documentReadyState: doc?.readyState,
+                windowExists: !!iframeWindow,
+                location: iframeWindow?.location?.href || 'unknown',
+                hasAuth: {
+                    sessionStorage: !!iframeWindow?.sessionStorage?.getItem('auth_token'),
+                    localStorage: !!iframeWindow?.localStorage?.getItem('auth_token'),
+                    UnifiedCacheManager: null // Will check separately
+                }
+            };
+            
+            // Check UnifiedCacheManager auth separately
+            if (iframeWindow?.UnifiedCacheManager) {
+                try {
+                    const cachedToken = await iframeWindow.UnifiedCacheManager.get('authToken', { includeUserId: false });
+                    iframeState.hasAuth.UnifiedCacheManager = !!cachedToken;
+                } catch (e) {
+                    iframeState.hasAuth.UnifiedCacheManager = 'error';
+                }
+            }
             
             this.logger?.error('❌ [waitForElementInIframe] Timeout - final state', {
                 selector,
@@ -1110,14 +1159,20 @@ class IntegratedCRUDE2ETester {
                 elementVisible: element && element.offsetParent !== null,
                 docExists: !!doc,
                 docReadyState: doc?.readyState,
-                docBodyHTML: doc?.body?.innerHTML?.substring(0, 200), // First 200 chars
-                // Additional debugging info
-                servicesAvailable,
-                apiCallsCount: apiCalls.length,
-                apiCalls: apiCalls.slice(0, 5), // First 5 API calls
+                docBodyHTML: doc?.body?.innerHTML?.substring(0, 500), // First 500 chars
+                // Hypothesis B: DOM structure
+                domStructure,
+                // Hypothesis C: API calls
+                parentApiCallsCount: parentApiCalls.length,
+                parentApiCalls: parentApiCalls.slice(0, 10), // First 10 API calls
+                // Hypothesis D: JavaScript errors
                 hasErrors,
+                // Hypothesis E: Services availability
+                servicesAvailable,
+                // Hypothesis F: Iframe state
+                iframeState,
                 page: 'crud_testing_dashboard',
-                hypothesisId: 'B,C,D,E'
+                hypothesisId: 'B,C,D,E,F'
             });
         } catch (finalError) {
             this.logger?.error('❌ [waitForElementInIframe] Error in final check', {

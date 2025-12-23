@@ -268,7 +268,7 @@
                         tbody.innerHTML = sortedRowsHTML.join('');
                     },
                     tableSelector: `table[data-table-type="${tableType}"]`,
-                    columns: ['filename', 'description', 'category', 'subcategory', 'access', 'actions'],
+                    columns: ['filename', 'hebrew_name', 'description', 'category', 'subcategory', 'auth_status', 'has_crud', 'access', 'actions'],
                     sortable: true,
                     filterable: false,
                     defaultSort: { columnIndex: 0, direction: 'asc', key: 'filename' }

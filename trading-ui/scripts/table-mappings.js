@@ -289,6 +289,74 @@ const TABLE_COLUMN_MAPPINGS = {
   ],
 
   // טבלת ניטור לינטר - Lint Monitor Issues
+  // Dev Tools Tables - Static HTML tables for development tools page
+  'dev-tools-primary-pages': [
+    'filename',        // 0 - שם קובץ
+    'hebrew_name',     // 1 - שם עברית
+    'description',     // 2 - תיאור
+    'category',        // 3 - קטגוריה
+    'subcategory',     // 4 - קטגוריה פנימית
+    'auth_status',     // 5 - מצב אוטנטיקציה
+    'has_crud',        // 6 - CRUD
+    'access',          // 7 - גישה
+    'actions'          // 8 - פעולות
+  ],
+  'dev-tools-technical-pages': [
+    'filename',        // 0 - שם קובץ
+    'hebrew_name',     // 1 - שם עברית
+    'description',     // 2 - תיאור
+    'category',        // 3 - קטגוריה
+    'subcategory',     // 4 - קטגוריה פנימית
+    'auth_status',     // 5 - מצב אוטנטיקציה
+    'has_crud',        // 6 - CRUD
+    'access',          // 7 - גישה
+    'actions'          // 8 - פעולות
+  ],
+  'dev-tools-dev-pages': [
+    'filename',        // 0 - שם קובץ
+    'hebrew_name',     // 1 - שם עברית
+    'description',     // 2 - תיאור
+    'category',        // 3 - קטגוריה
+    'subcategory',     // 4 - קטגוריה פנימית
+    'auth_status',     // 5 - מצב אוטנטיקציה
+    'has_crud',        // 6 - CRUD
+    'access',          // 7 - גישה
+    'actions'          // 8 - פעולות
+  ],
+  'dev-tools-auth-pages': [
+    'filename',        // 0 - שם קובץ
+    'hebrew_name',     // 1 - שם עברית
+    'description',     // 2 - תיאור
+    'category',        // 3 - קטגוריה
+    'subcategory',     // 4 - קטגוריה פנימית
+    'auth_status',     // 5 - מצב אוטנטיקציה
+    'has_crud',        // 6 - CRUD
+    'access',          // 7 - גישה
+    'actions'          // 8 - פעולות
+  ],
+  'dev-tools-test-pages': [
+    'filename',        // 0 - שם קובץ
+    'hebrew_name',     // 1 - שם עברית
+    'description',     // 2 - תיאור
+    'category',        // 3 - קטגוריה
+    'subcategory',     // 4 - קטגוריה פנימית
+    'auth_status',     // 5 - מצב אוטנטיקציה
+    'has_crud',        // 6 - CRUD
+    'access',          // 7 - גישה
+    'actions'          // 8 - פעולות
+  ],
+  'dev-tools-mockup-pages': [
+    'filename',        // 0 - שם קובץ
+    'hebrew_name',     // 1 - שם עברית
+    'description',     // 2 - תיאור
+    'category',        // 3 - קטגוריה
+    'subcategory',     // 4 - קטגוריה פנימית
+    'auth_status',     // 5 - מצב אוטנטיקציה
+    'has_crud',        // 6 - CRUD
+    'access',          // 7 - גישה
+    'actions'          // 8 - פעולות
+  ],
+
   'lint_monitor_issues': [
     { key: 'tool', sortType: 'string' },        // 0 - כלי הלינטר (ESLint / Stylelint וכו')
     { key: 'severity', sortType: 'string' },    // 1 - חומרה (error/warning/info)

@@ -289,6 +289,14 @@ class Logger {
             return;
         }
 
+        // בסביבת פיתוח - תמיד שמירת כל הלוגים (DEBUG ומעלה)
+        // העדפת המשתמש לא יכולה לעקוף את זה
+        if (Logger.DEBUG_MODE) {
+            this.currentLevel = Logger.LogLevel.DEBUG;
+            return;
+        }
+
+        // במצב ייצור - אפשר להגדיר רמה לפי העדפה
         const normalized = String(prefValue).trim().toUpperCase();
         const levelMap = {
             DEBUG: Logger.LogLevel.DEBUG,

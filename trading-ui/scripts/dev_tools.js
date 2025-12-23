@@ -65,6 +65,9 @@
             // Initialize UI state
             initializeUI();
 
+            // Register sortable tables
+            registerSortableTables();
+
             // Load initial data
             loadPageData();
 
@@ -123,6 +126,59 @@
         if (refreshTimeElement && state.lastRefresh) {
             refreshTimeElement.textContent = state.lastRefresh.toLocaleString('he-IL');
         }
+    }
+
+    /**
+     * Register sortable tables with UnifiedTableSystem
+     */
+    function registerSortableTables() {
+        if (!window.UnifiedTableSystem) {
+            log('UnifiedTableSystem not available, skipping table registration');
+            return;
+        }
+
+        const tableTypes = [
+            'dev-tools-technical-pages',
+            'dev-tools-dev-pages',
+            'dev-tools-auth-pages',
+            'dev-tools-test-pages',
+            'dev-tools-mockup-pages'
+        ];
+
+        tableTypes.forEach(tableType => {
+            try {
+                const table = document.querySelector(`table[data-table-type="${tableType}"]`);
+                if (table) {
+                    // For dev_tools tables, we create static data from the existing HTML rows
+                    const rows = Array.from(table.querySelectorAll('tbody tr'));
+                    const data = rows.map(row => {
+                        const cells = Array.from(row.querySelectorAll('td'));
+                        return cells.map(cell => cell.textContent.trim());
+                    });
+
+                    window.UnifiedTableSystem.registry.register(tableType, {
+                        dataGetter: () => data,
+                        updateFunction: (sortedData) => {
+                            const tbody = table.querySelector('tbody');
+                            if (tbody && Array.isArray(sortedData)) {
+                                tbody.innerHTML = sortedData.map(row =>
+                                    `<tr>${row.map(cell => `<td>${cell}</td>`).join('')}</tr>`
+                                ).join('');
+                            }
+                        },
+                        tableSelector: `table[data-table-type="${tableType}"]`,
+                        columns: ['filename', 'description', 'category', 'access', 'actions'],
+                        sortable: true,
+                        filterable: false,
+                        defaultSort: { columnIndex: 0, direction: 'asc', key: 'filename' }
+                    });
+
+                    log(`Registered sortable table: ${tableType}`);
+                }
+            } catch (error) {
+                log(`Error registering table ${tableType}:`, error);
+            }
+        });
     }
 
     /**

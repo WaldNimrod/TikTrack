@@ -18,6 +18,28 @@
     <!-- Basic CSS files (existing ones only) -->
     <link rel="stylesheet" href="styles-new/header-styles.css?v=0da3519a_20251102_104906">
     <link rel="stylesheet" href="styles-new/master.css?v=0da3519a_20251102_104906">
+
+    <!-- Page-specific Styles for Dev Tools Tables -->
+    <style>
+        /* Dev Tools Table Column Styles - Fix Bootstrap grid classes on th elements */
+        .filename-column { width: 20%; min-width: 150px; }
+        .description-column { width: 35%; min-width: 200px; }
+        .category-column { width: 15%; min-width: 120px; }
+        .access-column { width: 15%; min-width: 120px; }
+        .actions-column { width: 15%; min-width: 100px; }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .filename-column,
+            .description-column,
+            .category-column,
+            .access-column,
+            .actions-column {
+                width: auto;
+                min-width: auto;
+            }
+        }
+    </style>
 </head>
 <body class="dev-tools-page">
     <!-- 🔒 LOCKED TEMPLATE ZONE 1 - Header & Navigation (DO NOT MODIFY) -->
@@ -124,11 +146,11 @@
                                     <table class="table table-striped table-hover" data-table-type="dev-tools-technical-pages">
                                         <thead class="table-light">
                                             <tr>
-                                                <th scope="col" class="col-md-2 sortable-header" data-column="filename">שם קובץ</th>
-                                                <th scope="col" class="col-md-3 sortable-header" data-column="description">תיאור</th>
-                                                <th scope="col" class="col-md-2 sortable-header" data-column="category">קטגוריה</th>
-                                                <th scope="col" class="col-md-2 sortable-header" data-column="access">גישה</th>
-                                                <th scope="col" class="col-md-1 sortable-header" data-column="actions">פעולות</th>
+                                                <th scope="col" class="filename-column sortable-header" data-column="filename">שם קובץ</th>
+                                                <th scope="col" class="description-column sortable-header" data-column="description">תיאור</th>
+                                                <th scope="col" class="category-column sortable-header" data-column="category">קטגוריה</th>
+                                                <th scope="col" class="access-column sortable-header" data-column="access">גישה</th>
+                                                <th scope="col" class="actions-column sortable-header" data-column="actions">פעולות</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -282,11 +304,11 @@
                                     <table class="table table-striped table-hover" data-table-type="dev-tools-technical-pages">
                                         <thead class="table-light">
                                             <tr>
-                                                <th scope="col" class="col-md-2 sortable-header" data-column="filename">שם קובץ</th>
-                                                <th scope="col" class="col-md-3 sortable-header" data-column="description">תיאור</th>
-                                                <th scope="col" class="col-md-2 sortable-header" data-column="category">קטגוריה</th>
-                                                <th scope="col" class="col-md-2 sortable-header" data-column="access">גישה</th>
-                                                <th scope="col" class="col-md-1 sortable-header" data-column="actions">פעולות</th>
+                                                <th scope="col" class="filename-column sortable-header" data-column="filename">שם קובץ</th>
+                                                <th scope="col" class="description-column sortable-header" data-column="description">תיאור</th>
+                                                <th scope="col" class="category-column sortable-header" data-column="category">קטגוריה</th>
+                                                <th scope="col" class="access-column sortable-header" data-column="access">גישה</th>
+                                                <th scope="col" class="actions-column sortable-header" data-column="actions">פעולות</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -391,11 +413,11 @@
                                     <table class="table table-striped table-hover" data-table-type="dev-tools-dev-pages">
                                         <thead class="table-light">
                                             <tr>
-                                                <th scope="col" class="col-md-2 sortable-header" data-column="filename">שם קובץ</th>
-                                                <th scope="col" class="col-md-3 sortable-header" data-column="description">תיאור</th>
-                                                <th scope="col" class="col-md-2 sortable-header" data-column="category">קטגוריה</th>
-                                                <th scope="col" class="col-md-2 sortable-header" data-column="access">גישה</th>
-                                                <th scope="col" class="col-md-1 sortable-header" data-column="actions">פעולות</th>
+                                                <th scope="col" class="filename-column sortable-header" data-column="filename">שם קובץ</th>
+                                                <th scope="col" class="description-column sortable-header" data-column="description">תיאור</th>
+                                                <th scope="col" class="category-column sortable-header" data-column="category">קטגוריה</th>
+                                                <th scope="col" class="access-column sortable-header" data-column="access">גישה</th>
+                                                <th scope="col" class="actions-column sortable-header" data-column="actions">פעולות</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -465,11 +487,11 @@
                                     <table class="table table-striped table-hover" data-table-type="dev-tools-auth-pages">
                                         <thead class="table-light">
                                             <tr>
-                                                <th scope="col" class="col-md-2 sortable-header" data-column="filename">שם קובץ</th>
-                                                <th scope="col" class="col-md-3 sortable-header" data-column="description">תיאור</th>
-                                                <th scope="col" class="col-md-2 sortable-header" data-column="category">קטגוריה</th>
-                                                <th scope="col" class="col-md-2 sortable-header" data-column="access">גישה</th>
-                                                <th scope="col" class="col-md-1 sortable-header" data-column="actions">פעולות</th>
+                                                <th scope="col" class="filename-column sortable-header" data-column="filename">שם קובץ</th>
+                                                <th scope="col" class="description-column sortable-header" data-column="description">תיאור</th>
+                                                <th scope="col" class="category-column sortable-header" data-column="category">קטגוריה</th>
+                                                <th scope="col" class="access-column sortable-header" data-column="access">גישה</th>
+                                                <th scope="col" class="actions-column sortable-header" data-column="actions">פעולות</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -518,11 +540,11 @@
                                     <table class="table table-striped table-hover" data-table-type="dev-tools-test-pages">
                                         <thead class="table-light">
                                             <tr>
-                                                <th scope="col" class="col-md-2 sortable-header" data-column="filename">שם קובץ</th>
-                                                <th scope="col" class="col-md-3 sortable-header" data-column="description">תיאור</th>
-                                                <th scope="col" class="col-md-2 sortable-header" data-column="category">קטגוריה</th>
-                                                <th scope="col" class="col-md-2 sortable-header" data-column="access">גישה</th>
-                                                <th scope="col" class="col-md-1 sortable-header" data-column="actions">פעולות</th>
+                                                <th scope="col" class="filename-column sortable-header" data-column="filename">שם קובץ</th>
+                                                <th scope="col" class="description-column sortable-header" data-column="description">תיאור</th>
+                                                <th scope="col" class="category-column sortable-header" data-column="category">קטגוריה</th>
+                                                <th scope="col" class="access-column sortable-header" data-column="access">גישה</th>
+                                                <th scope="col" class="actions-column sortable-header" data-column="actions">פעולות</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -690,11 +712,11 @@
                                     <table class="table table-striped table-hover" data-table-type="dev-tools-mockup-pages">
                                         <thead class="table-light">
                                             <tr>
-                                                <th scope="col" class="col-md-2 sortable-header" data-column="filename">שם קובץ</th>
-                                                <th scope="col" class="col-md-3 sortable-header" data-column="description">תיאור</th>
-                                                <th scope="col" class="col-md-2 sortable-header" data-column="category">קטגוריה</th>
-                                                <th scope="col" class="col-md-2 sortable-header" data-column="access">גישה</th>
-                                                <th scope="col" class="col-md-1 sortable-header" data-column="actions">פעולות</th>
+                                                <th scope="col" class="filename-column sortable-header" data-column="filename">שם קובץ</th>
+                                                <th scope="col" class="description-column sortable-header" data-column="description">תיאור</th>
+                                                <th scope="col" class="category-column sortable-header" data-column="category">קטגוריה</th>
+                                                <th scope="col" class="access-column sortable-header" data-column="access">גישה</th>
+                                                <th scope="col" class="actions-column sortable-header" data-column="actions">פעולות</th>
                                             </tr>
                                         </thead>
                                         <tbody>

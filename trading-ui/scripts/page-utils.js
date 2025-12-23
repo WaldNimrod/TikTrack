@@ -745,6 +745,9 @@ function setupFilterEventHandlers(_pageName) {
  */
 function handleHeaderSort(pageName, columnIndex, event = null) {
   try {
+    // #region agent log
+    fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'page-utils.js:746',message:'handleHeaderSort called',data:{pageName,columnIndex,hasEvent:!!event},timestamp:Date.now(),sessionId:'debug-session',runId:'sort-debug',hypothesisId:'A'})}).catch(()=>{});
+    // #endregion
     let tableType = null;
 
     if (event?.currentTarget) {
@@ -758,14 +761,29 @@ function handleHeaderSort(pageName, columnIndex, event = null) {
       tableType = activeTable ? activeTable.getAttribute('data-table-type') : null;
     }
 
+    // #region agent log
+    fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'page-utils.js:760',message:'Table type resolved',data:{tableType,columnIndex,isValid:!!tableType && typeof columnIndex === 'number'},timestamp:Date.now(),sessionId:'debug-session',runId:'sort-debug',hypothesisId:'A'})}).catch(()=>{});
+    // #endregion
+
     if (!tableType || typeof columnIndex !== 'number') {
       return;
     }
 
     // CRITICAL: Check UnifiedTableSystem FIRST if table is registered
     // This handles static tables that are registered directly with UnifiedTableSystem
-    if (window.UnifiedTableSystem && window.UnifiedTableSystem.registry.isRegistered(tableType)) {
+    const unifiedTableSystemAvailable = !!window.UnifiedTableSystem;
+    const tableRegistered = unifiedTableSystemAvailable && window.UnifiedTableSystem.registry.isRegistered(tableType);
+    // #region agent log
+    fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'page-utils.js:770',message:'Checking UnifiedTableSystem',data:{tableType,columnIndex,unifiedTableSystemAvailable,tableRegistered,hasRegistry:unifiedTableSystemAvailable && !!window.UnifiedTableSystem.registry},timestamp:Date.now(),sessionId:'debug-session',runId:'sort-debug',hypothesisId:'B'})}).catch(()=>{});
+    // #endregion
+    if (unifiedTableSystemAvailable && tableRegistered) {
+      // #region agent log
+      fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'page-utils.js:773',message:'Calling UnifiedTableSystem.sorter.sort',data:{tableType,columnIndex},timestamp:Date.now(),sessionId:'debug-session',runId:'sort-debug',hypothesisId:'B'})}).catch(()=>{});
+      // #endregion
       const result = window.UnifiedTableSystem.sorter.sort(tableType, columnIndex);
+      // #region agent log
+      fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'page-utils.js:776',message:'UnifiedTableSystem.sort completed',data:{tableType,columnIndex,resultType:typeof result,resultLength:Array.isArray(result) ? result.length : null,resultIsNull:result === null},timestamp:Date.now(),sessionId:'debug-session',runId:'sort-debug',hypothesisId:'B'})}).catch(()=>{});
+      // #endregion
       if (window.Logger) {
         window.Logger.debug(`handleHeaderSort: Sorted table "${tableType}" by column ${columnIndex} using UnifiedTableSystem`, { 
           page: pageName || 'global',

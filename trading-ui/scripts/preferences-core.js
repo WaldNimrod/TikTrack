@@ -1364,15 +1364,44 @@ window.getCurrentPreference = async function(preferenceName, options = {}) {
     fallbackToLocalStorage = true,
   } = options;
 
+  // CRITICAL: Prevent recursion - if getPreference is already in progress, don't call it
+  const isGetPreferenceInProgress = window.__GET_PREFERENCE_IN_PROGRESS__ === true;
+
   try {
+    // 1. Check window.currentPreferences first (fastest, already loaded)
     if (window.currentPreferences && Object.prototype.hasOwnProperty.call(window.currentPreferences, preferenceName)) {
       const currentValue = window.currentPreferences[preferenceName];
-      if (currentValue !== undefined) {
+      if (currentValue !== undefined && currentValue !== null) {
         return currentValue;
       }
     }
 
-    if (window.PreferencesCore && typeof window.PreferencesCore.getPreference === 'function') {
+    // 2. Check cache directly if getPreference is in progress (prevents recursion)
+    if (isGetPreferenceInProgress) {
+      try {
+        const finalUserId = userId || window.PreferencesCore?.currentUserId || 1;
+        const finalProfileId = profileId !== null && profileId !== undefined ? profileId : (window.PreferencesCore?.currentProfileId !== null ? window.PreferencesCore.currentProfileId : 0);
+        const cacheKey = `preference_${preferenceName}_${finalUserId}_${finalProfileId}`;
+        
+        if (window.UnifiedCacheManager && window.UnifiedCacheManager.initialized) {
+          const cached = await window.UnifiedCacheManager.get(cacheKey, {
+            layer: 'localStorage',
+            ttl: 300000,
+          });
+          if (cached !== null && cached !== undefined) {
+            return cached;
+          }
+        }
+      } catch (e) {
+        // Ignore cache errors during recursion prevention
+      }
+      
+      // Return fallback or null to prevent recursion
+      return fallbackValue !== null ? fallbackValue : null;
+    }
+
+    // 3. Only call getPreference if NOT in progress (prevents recursion)
+    if (window.PreferencesCore && typeof window.PreferencesCore.getPreference === 'function' && !isGetPreferenceInProgress) {
       const value = await window.PreferencesCore.getPreference(preferenceName, userId, profileId);
       if (value !== null && value !== undefined) {
         return value;

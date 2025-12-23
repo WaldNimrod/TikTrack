@@ -57,20 +57,54 @@ class Logger {
     static _debugMode = null;
     static get DEBUG_MODE() {
         if (Logger._debugMode === null) {
-            Logger._debugMode = window.location.hostname === 'localhost' || 
-                                window.location.hostname === '127.0.0.1' ||
-                                window.location.hostname === '0.0.0.0' ||
-                                window.location.search.includes('debug=true') ||
-                                window.location.search.includes('dev=true') ||
-                                window.location.port === '8080'; // Development server port
+            // Development environment detection - comprehensive check
+            const hostname = window.location.hostname;
+            const port = window.location.port;
+            const search = window.location.search;
+            const href = window.location.href;
+            
+            // Check hostname (localhost variants)
+            const isLocalhost = hostname === 'localhost' || 
+                               hostname === '127.0.0.1' ||
+                               hostname === '0.0.0.0' ||
+                               hostname === '[::1]' ||
+                               hostname.startsWith('192.168.') ||
+                               hostname.startsWith('10.0.');
+            
+            // Check port (development ports)
+            const isDevPort = port === '8080' || 
+                             port === '5001' || // Testing environment
+                             port === '3000' ||
+                             port === '5173' || // Vite default
+                             port === '';
+            
+            // Check URL parameters
+            const hasDebugParam = search.includes('debug=true') || 
+                                 search.includes('dev=true') ||
+                                 search.includes('development=true');
+            
+            // Check if running in development mode (check for common dev indicators)
+            const isDevMode = href.includes('/development/') ||
+                             href.includes('/dev/') ||
+                             href.includes('localhost') ||
+                             href.includes('127.0.0.1');
+            
+            // Development = localhost OR dev port OR debug params OR dev URL
+            Logger._debugMode = isLocalhost || isDevPort || hasDebugParam || isDevMode;
+            
+            // Force DEBUG mode if explicitly set in window object
+            if (window.FORCE_DEBUG_MODE === true) {
+                Logger._debugMode = true;
+            }
         }
         return Logger._debugMode;
     }
 
     constructor() {
         this.initialized = false;
-        // במצב DEBUG - מציגים INFO ומעלה, במצב ייצור - רק WARN ומעלה
-        this.currentLevel = Logger.DEBUG_MODE ? Logger.LogLevel.INFO : Logger.LogLevel.WARN;
+        // במצב DEBUG - מציגים DEBUG ומעלה (כל הלוגים), במצב ייצור - רק WARN ומעלה
+        // בסביבת פיתוח - שמירת כל הלוגים לשרת
+        this.currentLevel = Logger.DEBUG_MODE ? Logger.LogLevel.DEBUG : Logger.LogLevel.WARN;
         this.pendingLogs = [];
         this.batchSize = 50; // הגדלת batch size להפחתת בקשות
         this.batchTimeout = 10000; // 10 seconds - הפחתת תדירות
@@ -272,7 +306,9 @@ class Logger {
     }
 
     resetLogLevelToDefault() {
-        this.currentLevel = Logger.DEBUG_MODE ? Logger.LogLevel.INFO : Logger.LogLevel.WARN;
+        // בסביבת פיתוח - שמירת כל הלוגים (DEBUG ומעלה)
+        // במצב ייצור - רק WARN ומעלה
+        this.currentLevel = Logger.DEBUG_MODE ? Logger.LogLevel.DEBUG : Logger.LogLevel.WARN;
     }
 
     normalizeBoolean(value) {
@@ -637,12 +673,22 @@ class Logger {
             return;
         }
 
-        // הגבלה: שולחים לשרת רק במצב דיבג או שגיאות קריטיות
+        // בסביבת פיתוח - שולחים כל הלוגים לשרת
+        // במצב ייצור - רק שגיאות קריטיות
         const shouldSendToServer = Logger.DEBUG_MODE || 
-            this.pendingLogs.some(log => log.level >= Logger.LogLevel.ERROR);
+            this.pendingLogs.some(log => {
+                // Convert level string to number for comparison
+                const levelNum = typeof log.level === 'string' 
+                    ? Logger.LogLevel[log.level.toUpperCase()] || Logger.LogLevel.ERROR
+                    : log.level;
+                return levelNum >= Logger.LogLevel.ERROR;
+            });
         
         if (!shouldSendToServer) {
-            this.pendingLogs = []; // מנקים את הלוגים
+            // במצב ייצור - מנקים לוגים שלא ברמת ERROR
+            if (!Logger.DEBUG_MODE) {
+                this.pendingLogs = [];
+            }
             return;
         }
 

@@ -1141,14 +1141,24 @@ class IntegratedCRUDE2ETester {
                 }
             };
             
-            // Check UnifiedCacheManager auth separately
+            // Check UnifiedCacheManager auth separately (async check)
             if (iframeWindow?.UnifiedCacheManager) {
                 try {
-                    const cachedToken = await iframeWindow.UnifiedCacheManager.get('authToken', { includeUserId: false });
-                    iframeState.hasAuth.UnifiedCacheManager = !!cachedToken;
+                    // Use Promise to check without await (since we're in sync context)
+                    iframeWindow.UnifiedCacheManager.get('authToken', { includeUserId: false })
+                        .then(token => {
+                            iframeState.hasAuth.UnifiedCacheManager = !!token;
+                        })
+                        .catch(() => {
+                            iframeState.hasAuth.UnifiedCacheManager = 'error';
+                        });
+                    // Set initial value
+                    iframeState.hasAuth.UnifiedCacheManager = 'checking';
                 } catch (e) {
                     iframeState.hasAuth.UnifiedCacheManager = 'error';
                 }
+            } else {
+                iframeState.hasAuth.UnifiedCacheManager = 'not_available';
             }
             
             this.logger?.error('❌ [waitForElementInIframe] Timeout - final state', {

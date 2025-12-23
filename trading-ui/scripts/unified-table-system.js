@@ -485,8 +485,17 @@ class TableSorter {
       // שימוש ב-sortTableData הקיים (שכבר מעדכן Registry ו-pagination)
       const { safeUpdateFunction, release: releaseUpdate } = TableSorter.prepareUpdateFunction(tableType, config);
 
+      // #region agent log
+      fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'unified-table-system.js:488',message:'Preparing to call sortTableData',data:{tableType,columnIndex,dataLength:data.length,hasSortTableData:typeof window.sortTableData === 'function',hasSafeUpdateFunction:typeof safeUpdateFunction === 'function'},timestamp:Date.now(),sessionId:'debug-session',runId:'sort-debug',hypothesisId:'C'})}).catch(()=>{});
+      // #endregion
       if (typeof window.sortTableData === 'function') {
+        // #region agent log
+        fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'unified-table-system.js:490',message:'Calling sortTableData',data:{tableType,columnIndex,dataLength:data.length},timestamp:Date.now(),sessionId:'debug-session',runId:'sort-debug',hypothesisId:'C'})}).catch(()=>{});
+        // #endregion
         const sortResult = window.sortTableData(columnIndex, data, tableType, safeUpdateFunction, sortOptions);
+        // #region agent log
+        fetch('http://127.0.0.1:7243/ingest/6e906bd0-148a-41fc-aa3b-e13c2ed1de41',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'unified-table-system.js:492',message:'sortTableData returned',data:{tableType,columnIndex,resultType:typeof sortResult,isPromise:sortResult && typeof sortResult.then === 'function',resultLength:Array.isArray(sortResult) ? sortResult.length : null},timestamp:Date.now(),sessionId:'debug-session',runId:'sort-debug',hypothesisId:'C'})}).catch(()=>{});
+        // #endregion
         if (sortResult && typeof sortResult.then === 'function') {
           return sortResult
             .then((sortedData) => {

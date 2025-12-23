@@ -91,6 +91,9 @@ ALL_PAGES = [
     {"name": "שחזור סיסמה", "url": "/forgot-password.html", "category": "auth", "priority": "medium"},
     {"name": "איפוס סיסמה", "url": "/reset-password.html", "category": "auth", "priority": "medium"},
     
+    # עמודי כלי פיתוח ראשי (Dev Tools Main)
+    {"name": "כלי פיתוח ראשי", "url": "/dev_tools", "category": "dev", "priority": "high"},
+
     # עמודי כלים לפיתוח (Dev Tools)
     {"name": "מיפוי צבעי כפתורים", "url": "/button-color-mapping.html", "category": "dev", "priority": "low"},
     {"name": "מיפוי צבעי כפתורים - פשוט", "url": "/button-color-mapping-simple.html", "category": "dev", "priority": "low"},

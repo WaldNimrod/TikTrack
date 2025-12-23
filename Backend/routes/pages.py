@@ -1,5 +1,6 @@
 from flask import Blueprint, send_from_directory, request, make_response, send_file
 from config.settings import UI_DIR
+PROJECT_ROOT = UI_DIR.parent
 import os
 import mimetypes
 from typing import Any
@@ -179,39 +180,51 @@ def trading_journal() -> Any:
 def styles_files(filename: str) -> Any:
     """CSS files"""
     response = send_from_directory(UI_DIR / "styles", filename)
-    
-    # Add cache control headers for CSS files
+
+    # Set correct MIME types
     if filename.endswith('.css'):
+        response.headers['Content-Type'] = 'text/css; charset=utf-8'
         response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
         response.headers['Pragma'] = 'no-cache'
         response.headers['Expires'] = '0'
-    
+    elif filename.endswith('.js'):
+        response.headers['Content-Type'] = 'application/javascript; charset=utf-8'
+
     return response
 
 @pages_bp.route('/styles-new/<path:filename>')
 def styles_new_files(filename: str) -> Any:
     """New CSS architecture files"""
-    response = send_from_directory(UI_DIR / "styles-new", filename)
-    
-    # Add cache control headers for CSS files
+    import os
+    # Hardcoded path to trading-ui/styles-new
+    styles_dir = "/Users/nimrod/Documents/TikTrack/TikTrackApp/trading-ui/styles-new"
+    response = send_from_directory(styles_dir, filename)
+
+    # Set correct MIME types
     if filename.endswith('.css'):
+        response.headers['Content-Type'] = 'text/css; charset=utf-8'
         response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
         response.headers['Pragma'] = 'no-cache'
         response.headers['Expires'] = '0'
-    
+    elif filename.endswith('.js'):
+        response.headers['Content-Type'] = 'application/javascript; charset=utf-8'
+
     return response
 
 @pages_bp.route('/scripts/<path:filename>')
 def scripts_files(filename: str) -> Any:
     """JavaScript files"""
     response = send_from_directory(UI_DIR / "scripts", filename)
-    
-    # Add cache control headers for JavaScript files
+
+    # Set correct MIME types
     if filename.endswith('.js'):
+        response.headers['Content-Type'] = 'application/javascript'
         response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
         response.headers['Pragma'] = 'no-cache'
         response.headers['Expires'] = '0'
-    
+    elif filename.endswith('.css'):
+        response.headers['Content-Type'] = 'text/css'
+
     return response
 
 @pages_bp.route('/images/<path:filename>')

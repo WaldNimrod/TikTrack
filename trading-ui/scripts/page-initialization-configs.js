@@ -4390,6 +4390,93 @@ if (typeof window.PAGE_CONFIGS === 'undefined' || window.PAGE_CONFIGS.__SOURCE =
   window.pageInitializationConfigs = PAGE_CONFIGS;
   // Also set PAGE_INITIALIZATION_CONFIGS for backward compatibility (used by check-pages-loading.js and package-manifest.js)
   window.PAGE_INITIALIZATION_CONFIGS = PAGE_CONFIGS;
+
+// #endregion
+
+// ================================================================================================
+// ===== DEV TOOLS PAGE CONFIGURATION =====
+// ================================================================================================
+
+if (!PAGE_CONFIGS['dev_tools']) {
+  PAGE_CONFIGS['dev_tools'] = {
+    name: 'Development Tools',
+    packages: ['base', 'dev-tools', 'init-system'],
+    requiredGlobals: [
+      'window.UnifiedAppInitializer', // Unified Init System
+      'window.PAGE_CONFIGS', // Unified Init System
+      'window.PACKAGE_MANIFEST', // Unified Init System
+
+      'NotificationSystem',
+      'window.IconSystem',
+      'window.FieldRendererService',
+      'window.updatePageSummaryStats',
+    ],
+    description: 'עמוד כלי פיתוח ראשי - סקירה מלאה של כל העמודים והמערכות',
+    lastModified: '2025-12-23',
+    pageType: 'development',
+    preloadAssets: ['dev-tools-data'],
+    cacheStrategy: 'standard',
+    requiresFilters: false,
+    requiresValidation: false,
+    requiresTables: false,
+    customInitializers: [
+      function () {
+        window.Logger.info('🛠️ Initializing Development Tools page...', {
+          page: 'dev_tools',
+          timestamp: new Date().toISOString()
+        });
+
+        // Initialize development tools specific functionality
+        if (typeof window.initializeDevTools === 'function') {
+          window.initializeDevTools();
+        }
+      },
+    ],
+  };
+}
+
+// CRUD Testing Dashboard 2.0
+if (!PAGE_CONFIGS['crud_testing_dashboard']) {
+  PAGE_CONFIGS['crud_testing_dashboard'] = {
+    name: 'CRUD Testing Dashboard 2.0',
+    packages: ['base', 'services', 'ui-advanced', 'crud', 'init-system'],
+    requiredGlobals: [
+      'window.UnifiedAppInitializer', // Unified Init System
+      'window.PAGE_CONFIGS', // Unified Init System
+      'window.PACKAGE_MANIFEST', // Unified Init System
+
+      'NotificationSystem',
+      'window.IconSystem',
+      'window.Logger',
+      'window.initializeCRUDTestingDashboard',
+      'window.runIntegratedTests',
+      'window.runUITests',
+      'window.runAPITests',
+      'window.runDebugTools'
+    ],
+    description: 'Advanced testing dashboard for CRUD operations with UI, API, and E2E testing',
+    lastModified: '2025-12-23',
+    pageType: 'dev-tools',
+    preloadAssets: [],
+    cacheStrategy: 'standard',
+    requiresFilters: false,
+    requiresValidation: false,
+    requiresTables: true,
+    customInitializers: [
+      async function () {
+        window.Logger?.info('🧪 Initializing CRUD Testing Dashboard 2.0...', {
+          page: 'crud_testing_dashboard',
+          timestamp: new Date().toISOString()
+        });
+
+        // Initialize the CRUD testing dashboard
+        if (window.initializeCRUDTestingDashboard) {
+          await window.initializeCRUDTestingDashboard();
+        }
+      },
+    ],
+  };
+}
 } else {
   // אם PAGE_CONFIGS כבר הוגדר, נמזג רק את הקונפיגים החדשים
   if (typeof PAGE_CONFIGS !== 'undefined') {
